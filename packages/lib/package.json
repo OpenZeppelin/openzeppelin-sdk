@@ -1,0 +1,23 @@
+{
+  "name": "zos-core",
+  "version": "0.0.1",
+  "description": "zeppelin_os core",
+  "scripts": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zeppelinos/core.git"
+  },
+  "keywords": [
+    "zeppelin_os",
+    "zeppelin",
+    "ethereum",
+    "smartcontracts",
+    "solidity"
+  ],
+  "author": "Manuel Araoz <manuel@zeppelin.solutions>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/zeppelinos/core/issues"
+  },
+  "homepage": "https://github.com/zeppelinos/core#readme"
+}
