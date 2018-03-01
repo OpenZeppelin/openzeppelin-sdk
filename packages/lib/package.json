@@ -2,7 +2,9 @@
   "name": "zos-core",
   "version": "0.0.1",
   "description": "zeppelin_os core",
-  "scripts": {},
+  "scripts": {
+    "test": "npx truffle test"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/zeppelinos/core.git"
@@ -19,5 +21,8 @@
   "bugs": {
     "url": "https://github.com/zeppelinos/core/issues"
   },
-  "homepage": "https://github.com/zeppelinos/core#readme"
+  "homepage": "https://github.com/zeppelinos/core#readme",
+  "devDependencies": {
+    "truffle": "^4.1.0"
+  }
 }
