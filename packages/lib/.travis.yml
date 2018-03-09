@@ -1,0 +1,14 @@
+language: node_js
+node_js:
+- '8'
+cache:
+  directories:
+  - node_modules
+script:
+- npm test
+notifications:
+  slack:
+    rooms:
+      secure: HptFVqeUs3tokORjJPC9umkVKMZJEgJxnDJpohsRQO8vwW7mU36QjR+aL5Bg//ay8rkWWTY01DElc+BWXlFPaV1AlWOnrEUSj9j9iA8plcEDPf3poS/9ew7Vr4+3fR5BAHOxRMGhjIpo0P+8sDr25mVEaVC+DJTHgbAwN+sJje0U/c5ROx0q324OEVo4ttvYv7YM1YfgI5fJde8LYSorvPhK3bhlB6wktXEhmR+bXSjX4IEIsSdJDrsi1vX8IpH1SMVf3n2sAKS8jdPvafoBaJ64J/nsfDi4FIzW9di10jD9E6fIw1Ppoee8GxFWzUfxTwdyOhzJPNh8pHzamO2gkliL35dUmwz/wjodn4rEJ3xI4ZEdc18KmzJZyorBDAieOSmWgCqE8SXjbz5shSllXunlVqbRhBuWCodG2B/2tWWfS7KQOeGF3eytRQ4nqlnMvYljDe5oLEENmR7QpJnkdaImA3nkYG+xNInVDZrqbA9d7ITNv/OKdoSN0SAFO5ZX/SBDn4nBss3JZu5VhH5ggyP1U31TSBbQ37xlJ/L+XUnnTekSYRa5+O1weyQ7ECULsI+7CDNAkUaOHS68j+u/sxDx8Vs44SkqmY6UYkteRSZ5cBSuJh/2VvEbLrXGSVHoe3NkU5QUFPJJ2ivmmlddpLtx3nt0LdeIHpQRYd0/R0c=
+    on_success: change
+    on_failure: always
