@@ -1,6 +1,6 @@
 {
   "name": "zos-core",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "zeppelin_os core",
   "scripts": {
     "test": "npx truffle test"
@@ -14,7 +14,11 @@
     "zeppelin",
     "ethereum",
     "smartcontracts",
-    "solidity"
+    "solidity",
+    "upgradeability",
+    "security",
+    "proxy",
+    "evm"
   ],
   "author": "Manuel Araoz <manuel@zeppelin.solutions>",
   "license": "MIT",
