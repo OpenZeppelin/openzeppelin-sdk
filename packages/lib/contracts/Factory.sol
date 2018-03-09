@@ -1,37 +1,34 @@
 pragma solidity ^0.4.18;
 
-import './IRegistry.sol';
-import '../upgradeability/OwnedUpgradeabilityProxy.sol';
+import './upgradeability/OwnedUpgradeabilityProxy.sol';
+import './Registry.sol';
 
 
 /**
- * @title Registry
- * @dev This contract works as a registry of versions, it holds the implementations for the registered versions.
+ * @title Factory
+ * @dev 
  */
-contract Registry is IRegistry {
-  // Mapping of versions to implementations of different functions
-  mapping (string => address) private versions;
+contract Factory {
 
-  /**
-  * @dev Registers a new version with its implementation address
-  * @param version representing the version name of the new implementation to be registered
-  * @param implementation representing the address of the new implementation to be registered
-  */
-  function addVersion(string version, address implementation) public {
-    require(versions[version] == address(0));
-    require(implementation != address(0));
-    versions[version] = implementation;
-    VersionAdded(version, implementation);
+  Registry internal _registry;
+
+  function Factory(Registry registry) public {
+    _registry = registry;
   }
 
   /**
-  * @dev Tells the address of the implementation for a given version
-  * @param version to query the implementation of
-  * @return address of the implementation registered for the given version
+  * @dev Tells the address of registry
+  * @return address of the registry
   */
-  function getVersion(string version) public view returns (address) {
-    return versions[version];
+  function registry() public view returns (Registry) {
+    return _registry;
   }
+
+  /**
+  * @dev This event will be emitted every time a new proxy is created
+  * @param proxy representing the address of the proxy created
+  */
+  event ProxyCreated(address proxy);
 
   /**
   * @dev Creates an upgradeable proxy upgraded to an initial version
@@ -64,7 +61,7 @@ contract Registry is IRegistry {
   * @return address of the new proxy created
   */
   function _createProxy() internal returns (OwnedUpgradeabilityProxy) {
-    OwnedUpgradeabilityProxy proxy = new OwnedUpgradeabilityProxy();
+    OwnedUpgradeabilityProxy proxy = new OwnedUpgradeabilityProxy(_registry);
     ProxyCreated(proxy);
     return proxy;
   }

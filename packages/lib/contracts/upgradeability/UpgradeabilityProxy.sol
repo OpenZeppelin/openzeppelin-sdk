@@ -1,5 +1,6 @@
 pragma solidity ^0.4.18;
 
+import '../Registry.sol';
 import './Proxy.sol';
 import './UpgradeabilityStorage.sol';
 
@@ -14,6 +15,12 @@ contract UpgradeabilityProxy is Proxy, UpgradeabilityStorage {
   * @param implementation representing the address of the upgraded implementation
   */
   event Upgraded(string version, address indexed implementation);
+
+  function UpgradeabilityProxy(Registry registry) 
+    Proxy()
+    UpgradeabilityStorage(registry)
+    public
+  {}
 
   /**
   * @dev Upgrades the implementation address

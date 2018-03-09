@@ -1,6 +1,6 @@
 pragma solidity ^0.4.18;
 
-import '../registry/IRegistry.sol';
+import '../Registry.sol';
 
 /**
  * @title UpgradeabilityStorage
@@ -8,7 +8,7 @@ import '../registry/IRegistry.sol';
  */
 contract UpgradeabilityStorage {
   // Versions registry
-  IRegistry private _registry;
+  Registry private _registry;
 
   // Version name of the current implementation
   string internal _version;
@@ -19,8 +19,8 @@ contract UpgradeabilityStorage {
   /**
   * @dev Constructor function
   */
-  function UpgradeabilityStorage() public {
-    _registry = IRegistry(msg.sender);
+  function UpgradeabilityStorage(Registry registry) public {
+    _registry = registry;
   }
 
   /**
@@ -43,7 +43,7 @@ contract UpgradeabilityStorage {
   * @dev Tells the address of registry
   * @return address of the registry
   */
-  function registry() public view returns (IRegistry) {
+  function registry() public view returns (Registry) {
     return _registry;
   }
 }

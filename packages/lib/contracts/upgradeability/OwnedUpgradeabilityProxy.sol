@@ -1,13 +1,13 @@
 pragma solidity ^0.4.18;
 
 import './UpgradeabilityProxy.sol';
-import './UpgradeabilityOwnerStorage.sol';
+import './OwnedUpgradeabilityStorage.sol';
 
 /**
  * @title OwnedUpgradeabilityProxy
  * @dev This contract combines an upgradeability proxy with basic authorization control functionalities
  */
-contract OwnedUpgradeabilityProxy is UpgradeabilityProxy, UpgradeabilityOwnerStorage {
+contract OwnedUpgradeabilityProxy is UpgradeabilityProxy, OwnedUpgradeabilityStorage {
   /**
   * @dev Event to show ownership has been transferred
   * @param previousOwner representing the address of the previous owner
@@ -18,7 +18,11 @@ contract OwnedUpgradeabilityProxy is UpgradeabilityProxy, UpgradeabilityOwnerSto
   /**
   * @dev the constructor sets the original owner of the contract to the sender account.
   */
-  function OwnedUpgradeabilityProxy() public {
+  function OwnedUpgradeabilityProxy(Registry registry) 
+    UpgradeabilityProxy(registry)
+    OwnedUpgradeabilityStorage(registry)
+    public
+  {
     setUpgradeabilityOwner(msg.sender);
   }
 
@@ -35,7 +39,7 @@ contract OwnedUpgradeabilityProxy is UpgradeabilityProxy, UpgradeabilityOwnerSto
    * @return the address of the proxy owner
    */
   function proxyOwner() public view returns (address) {
-    return upgradeabilityOwner();
+    return upgradeabilityOwner;
   }
 
   /**

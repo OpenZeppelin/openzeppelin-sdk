@@ -1,14 +1,18 @@
+'use strict'
+
 const assertRevert = require('../helpers/assertRevert')
 const Registry = artifacts.require('Registry')
+const Factory = artifacts.require('Factory')
 const OwnedUpgradeabilityProxy = artifacts.require('OwnedUpgradeabilityProxy')
 
 contract('OwnedUpgradeabilityProxy', ([owner, anotherAccount, implementation_v0, implementation_v1]) => {
   beforeEach(async function () {
     this.registry = await Registry.new()
+    this.factory = await Factory.new(this.registry.address)
     await this.registry.addVersion('0', implementation_v0)
     await this.registry.addVersion('1', implementation_v1)
 
-    const { logs } = await this.registry.createProxy('0', { from: owner })
+    const { logs } = await this.factory.createProxy('0', { from: owner })
     const proxyAddress = logs.find(l => l.event === 'ProxyCreated').args.proxy
     this.proxy = await OwnedUpgradeabilityProxy.at(proxyAddress)
   })
