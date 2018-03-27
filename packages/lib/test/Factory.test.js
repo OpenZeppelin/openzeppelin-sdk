@@ -7,7 +7,7 @@ const InitializableMock = artifacts.require('InitializableMock')
 const assertRevert = require('./helpers/assertRevert')
 const abi = require('ethereumjs-abi')
 
-contract('Factory', ([_, owner, implementation]) => {
+contract('Factory', ([_, owner, implementation_v0]) => {
   beforeEach(async function () {
     this.registry = await Registry.new()
     this.factory = await Factory.new(this.registry.address)
@@ -29,7 +29,7 @@ contract('Factory', ([_, owner, implementation]) => {
 
     describe('when the requested version was already registered', function () {
       beforeEach(async function () {
-        await this.registry.addVersion(version, implementation)
+        await this.registry.addVersion(version, implementation_v0)
         const { logs } = await this.factory.createProxy(version, { from: owner })
         this.logs = logs
         this.proxyAddress = this.logs.find(l => l.event === 'ProxyCreated').args.proxy
@@ -47,7 +47,7 @@ contract('Factory', ([_, owner, implementation]) => {
         assert.equal(version, '0')
 
         const implementation = await this.proxy.implementation()
-        assert.equal(implementation, implementation)
+        assert.equal(implementation, implementation_v0)
       })
 
       it('emits an event', async function () {
