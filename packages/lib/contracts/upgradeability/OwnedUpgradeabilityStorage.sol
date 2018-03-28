@@ -1,9 +1,7 @@
 pragma solidity ^0.4.18;
 
-
 import './UpgradeabilityStorage.sol';
 import '../Registry.sol';
-
 
 /**
  * @title OwnedUpgradeabilityStorage
@@ -13,6 +11,9 @@ contract OwnedUpgradeabilityStorage is UpgradeabilityStorage {
   // Owner of the contract
   address public upgradeabilityOwner;
 
+  /**
+  * @dev Constructor function
+  */
   function OwnedUpgradeabilityStorage(Registry registry) 
     UpgradeabilityStorage(registry)
     public

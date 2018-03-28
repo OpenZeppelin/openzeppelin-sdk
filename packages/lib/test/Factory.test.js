@@ -58,6 +58,7 @@ contract('Factory', ([_, owner, implementation_v0]) => {
       })
     })
   })
+
   describe('createProxyAndCall', function () {
     const version = '0'
     const value = 42;
@@ -96,5 +97,4 @@ contract('Factory', ([_, owner, implementation_v0]) => {
       assert.equal(registry, this.registry.address);
     })
   })
-
 })

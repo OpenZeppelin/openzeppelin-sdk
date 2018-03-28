@@ -3,21 +3,23 @@ pragma solidity ^0.4.18;
 import './upgradeability/OwnedUpgradeabilityProxy.sol';
 import './Registry.sol';
 
-
 /**
  * @title Factory
- * @dev 
+ * @dev This contracts provides required functionality to create upgradeability proxies
  */
 contract Factory {
-
+  // Versions registry
   Registry internal _registry;
 
+  /**
+  * @dev Constructor function
+  */
   function Factory(Registry registry) public {
     _registry = registry;
   }
 
   /**
-  * @dev Tells the address of registry
+  * @dev Tells the address of the registry
   * @return address of the registry
   */
   function registry() public view returns (Registry) {

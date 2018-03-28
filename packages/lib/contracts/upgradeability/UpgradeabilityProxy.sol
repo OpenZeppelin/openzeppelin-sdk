@@ -16,6 +16,9 @@ contract UpgradeabilityProxy is Proxy, UpgradeabilityStorage {
   */
   event Upgraded(string version, address indexed implementation);
 
+  /**
+  * @dev Constructor function
+  */
   function UpgradeabilityProxy(Registry registry) 
     Proxy()
     UpgradeabilityStorage(registry)

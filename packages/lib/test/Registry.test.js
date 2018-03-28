@@ -91,5 +91,4 @@ contract('Registry', ([_, owner, implementation_v0, implementation_v1]) => {
       })
     })
   })
-
 })
