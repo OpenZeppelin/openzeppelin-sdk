@@ -17,7 +17,7 @@ contract('Registry', ([_, owner, implementation_v0, implementation_v1]) => {
         it('registers the given version', async function () {
           await this.registry.addVersion(version, implementation)
 
-          const registeredImplementation = await this.registry.getVersion(version)
+          const registeredImplementation = await this.registry.getImplementation(version)
           assert.equal(registeredImplementation, implementation)
         })
 
@@ -37,10 +37,10 @@ contract('Registry', ([_, owner, implementation_v0, implementation_v1]) => {
           await this.registry.addVersion(version, implementation)
           await this.registry.addVersion(anotherVersion, anotherImplementation)
 
-          const registeredImplementation = await this.registry.getVersion(version)
+          const registeredImplementation = await this.registry.getImplementation(version)
           assert.equal(registeredImplementation, implementation)
 
-          const newRegisteredImplementation = await this.registry.getVersion(anotherVersion)
+          const newRegisteredImplementation = await this.registry.getImplementation(anotherVersion)
           assert.equal(newRegisteredImplementation, anotherImplementation)
         })
       })
@@ -74,10 +74,10 @@ contract('Registry', ([_, owner, implementation_v0, implementation_v1]) => {
 
           await this.registry.addVersion(anotherVersion, anotherImplementation)
 
-          const registeredImplementation = await this.registry.getVersion(version)
+          const registeredImplementation = await this.registry.getImplementation(version)
           assert.equal(registeredImplementation, implementation)
 
-          const newRegisteredImplementation = await this.registry.getVersion(anotherVersion)
+          const newRegisteredImplementation = await this.registry.getImplementation(anotherVersion)
           assert.equal(newRegisteredImplementation, anotherImplementation)
         })
       })

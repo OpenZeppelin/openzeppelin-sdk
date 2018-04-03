@@ -32,7 +32,7 @@ contract Registry {
   * @param version to query the implementation of
   * @return address of the implementation registered for the given version
   */
-  function getVersion(string version) public view returns (address) {
+  function getImplementation(string version) public view returns (address) {
     return versions[version];
   }
 }

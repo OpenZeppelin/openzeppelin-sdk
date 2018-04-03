@@ -8,16 +8,11 @@ import '../Registry.sol';
  * @dev This contract is a mock to test upgradeability functionality
  */
 contract InitializableMock is OwnedUpgradeabilityStorage {
-
   uint256 public x;
 
-  function InitializableMock() 
-    OwnedUpgradeabilityStorage(Registry(0x0))
-    public
-  {}
+  function InitializableMock() public {}
   
   function initialize(uint256 value) public {
     x = value;
   }
-
 }

@@ -1,35 +1,22 @@
 'use strict'
 
 const assertRevert = require('../helpers/assertRevert')
-const Registry = artifacts.require('Registry')
-const Factory = artifacts.require('Factory')
 const OwnedUpgradeabilityProxy = artifacts.require('OwnedUpgradeabilityProxy')
+const UpgradeabilityProxyFactory = artifacts.require('UpgradeabilityProxyFactory')
 
-contract('OwnedUpgradeabilityProxy', ([owner, anotherAccount, implementation_v0, implementation_v1]) => {
+contract('OwnedUpgradeabilityProxy', ([_, owner, anotherAccount, implementation_v0, implementation_v1]) => {
   beforeEach(async function () {
-    this.registry = await Registry.new()
-    this.factory = await Factory.new(this.registry.address)
-    await this.registry.addVersion('0', implementation_v0)
-    await this.registry.addVersion('1', implementation_v1)
-
-    const { logs } = await this.factory.createProxy('0', { from: owner })
+    this.factory = await UpgradeabilityProxyFactory.new()
+    const { logs } = await this.factory.createProxy(owner, implementation_v0)
     const proxyAddress = logs.find(l => l.event === 'ProxyCreated').args.proxy
     this.proxy = await OwnedUpgradeabilityProxy.at(proxyAddress)
   })
 
   describe('owner', function () {
-    it('sets the sender as the owner', async function () {
+    it('transfers the ownership to the requested owner', async function () {
       const proxyOwner = await this.proxy.proxyOwner()
 
       assert.equal(proxyOwner, owner)
-    })
-  })
-
-  describe('version', function () {
-    it('returns the current version', async function () {
-      const version = await this.proxy.version()
-
-      assert.equal(version, '0')
     })
   })
 
@@ -42,23 +29,32 @@ contract('OwnedUpgradeabilityProxy', ([owner, anotherAccount, implementation_v0,
   })
 
   describe('upgradeTo', function () {
-    it('returns the new version and implementation', async function () {
-      await this.proxy.upgradeTo('1')
 
-      const version = await this.proxy.version();
-      const implementation = await this.proxy.implementation()
+    describe('when the sender is the owner', function () {
+      const from = owner
 
-      assert.equal(version, '1')
-      assert.equal(implementation, implementation_v1)
+      it('returns the new implementation', async function () {
+        await this.proxy.upgradeTo(implementation_v1, { from })
+
+        const implementation = await this.proxy.implementation()
+        assert.equal(implementation, implementation_v1)
+      })
+
+      it('emits an event', async function () {
+        const { logs } = await this.proxy.upgradeTo(implementation_v1, { from })
+
+        assert.equal(logs.length, 1)
+        assert.equal(logs[0].event, 'Upgraded')
+        assert.equal(logs[0].args.implementation, implementation_v1)
+      })
     })
 
-    it('emits an event', async function () {
-      const { logs } = await this.proxy.upgradeTo('1')
+    describe('when the sender is not the owner', function () {
+      const from = anotherAccount
 
-      assert.equal(logs.length, 1)
-      assert.equal(logs[0].event, 'Upgraded')
-      assert.equal(logs[0].args.version, '1')
-      assert.equal(logs[0].args.implementation, implementation_v1)
+      it('reverts', async function () {
+        await assertRevert(this.proxy.upgradeTo(implementation_v1, { from }))
+      })
     })
   })
 
