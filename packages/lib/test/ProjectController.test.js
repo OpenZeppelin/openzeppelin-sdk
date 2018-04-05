@@ -3,6 +3,7 @@
 const encodeCall = require('./helpers/encodeCall')
 const decodeLogs = require('./helpers/decodeLogs')
 const assertRevert = require('./helpers/assertRevert')
+const shouldBehaveLikeOwnable = require('./ownership/Ownable.behavior')
 const Registry = artifacts.require('Registry')
 const ProjectController = artifacts.require('ProjectController')
 const InitializableMock = artifacts.require('InitializableMock')
@@ -10,17 +11,25 @@ const OwnedUpgradeabilityProxy = artifacts.require('OwnedUpgradeabilityProxy')
 const ImplementationProviderMock = artifacts.require('ImplementationProviderMock')
 const UpgradeabilityProxyFactory = artifacts.require('UpgradeabilityProxyFactory')
 
-contract('ProjectController', ([_, anAddress, owner, anotherAccount, implementation_v0, implementation_v1]) => {
+contract('ProjectController', ([_, controllerOwner, registryOwner, anAddress, anotherAccount, implementation_v0, implementation_v1]) => {
   const version_0 = 'version_0'
   const version_1 = 'version_1'
   const projectName = 'my project'
   const contractName = 'ERC721'
 
   beforeEach(async function () {
-    this.registry = await Registry.new()
+    this.registry = await Registry.new({ from: registryOwner })
     this.factory = await UpgradeabilityProxyFactory.new()
     this.fallbackProvider = await ImplementationProviderMock.new(anAddress)
-    this.controller = await ProjectController.new(projectName, this.registry.address, this.factory.address, this.fallbackProvider.address, { from: owner })
+    this.controller = await ProjectController.new(projectName, this.registry.address, this.factory.address, this.fallbackProvider.address, { from: controllerOwner })
+  })
+
+  describe('ownership', function () {
+    beforeEach(function () {
+      this.ownable = this.controller
+    })
+
+    shouldBehaveLikeOwnable(controllerOwner, anotherAccount)
   })
 
   it('a registry, factory and project name must be provided', async function () {
@@ -31,7 +40,7 @@ contract('ProjectController', ([_, anAddress, owner, anotherAccount, implementat
 
   describe('owner', function () {
     it('sets the creator as the owner of the controller', async function () {
-      const controllerOwner = await this.controller.owner()
+      const owner = await this.controller.owner()
       assert.equal(controllerOwner, owner)
     })
   })
@@ -63,7 +72,7 @@ contract('ProjectController', ([_, anAddress, owner, anotherAccount, implementat
   describe('create', function () {
     describe('when the given version was registered', function () {
       beforeEach(async function () {
-        await this.registry.addImplementation(version_0, contractName, implementation_v0)
+        await this.registry.addImplementation(version_0, contractName, implementation_v0, { from: registryOwner })
 
         const { receipt } = await this.controller.create(projectName, version_0, contractName)
         this.logs = decodeLogs([receipt.logs[0]], UpgradeabilityProxyFactory, this.factory.address);
@@ -99,7 +108,7 @@ contract('ProjectController', ([_, anAddress, owner, anotherAccount, implementat
 
     describe('when the given version was registered', function () {
       beforeEach(async function () {
-        await this.registry.addImplementation(version_0, contractName, this.behavior.address)
+        await this.registry.addImplementation(version_0, contractName, this.behavior.address, { from: registryOwner })
 
         const { receipt } = await this.controller.createAndCall(projectName, version_0, contractName, initializeData, { value })
         this.logs = decodeLogs([receipt.logs[0]], UpgradeabilityProxyFactory, this.factory.address);
@@ -138,7 +147,7 @@ contract('ProjectController', ([_, anAddress, owner, anotherAccount, implementat
 
   describe('upgradeTo', function () {
     beforeEach(async function () {
-      await this.registry.addImplementation(version_0, contractName, implementation_v0)
+      await this.registry.addImplementation(version_0, contractName, implementation_v0, { from: registryOwner })
       const { receipt } = await this.controller.create(projectName, version_0, contractName)
       this.logs = decodeLogs([receipt.logs[0]], UpgradeabilityProxyFactory, this.factory.address);
       this.proxyAddress = this.logs.find(l => l.event === 'ProxyCreated').args.proxy
@@ -146,11 +155,11 @@ contract('ProjectController', ([_, anAddress, owner, anotherAccount, implementat
     })
 
     describe('when the sender is the controller owner', function () {
-      const from = owner
+      const from = controllerOwner
 
       describe('when the given version was registered', function () {
         beforeEach(async function () {
-          await this.registry.addImplementation(version_1, contractName, implementation_v1)
+          await this.registry.addImplementation(version_1, contractName, implementation_v1, { from: registryOwner })
         })
 
         it('upgrades to the requested implementation', async function () {
@@ -172,7 +181,7 @@ contract('ProjectController', ([_, anAddress, owner, anotherAccount, implementat
       const from = anotherAccount
 
       it('reverts', async function () {
-        await this.registry.addImplementation(version_1, contractName, implementation_v1)
+        await this.registry.addImplementation(version_1, contractName, implementation_v1, { from: registryOwner })
         await assertRevert(this.controller.upgradeTo(this.proxyAddress, projectName, version_1, contractName, { from }))
       })
     })
@@ -182,7 +191,7 @@ contract('ProjectController', ([_, anAddress, owner, anotherAccount, implementat
     const initializeData = encodeCall('initialize', ['uint256'], [42])
 
     beforeEach(async function () {
-      await this.registry.addImplementation(version_0, contractName, implementation_v0)
+      await this.registry.addImplementation(version_0, contractName, implementation_v0, { from: registryOwner })
       const { receipt } = await this.controller.create(projectName, version_0, contractName)
       this.logs = decodeLogs([receipt.logs[0]], UpgradeabilityProxyFactory, this.factory.address);
       this.proxyAddress = this.logs.find(l => l.event === 'ProxyCreated').args.proxy
@@ -190,13 +199,13 @@ contract('ProjectController', ([_, anAddress, owner, anotherAccount, implementat
       this.behavior = await InitializableMock.new()
     })
 
-    describe('when the sender is the owner', function () {
-      const from = owner
+    describe('when the sender is the controller owner', function () {
+      const from = controllerOwner
       const value = 1e5
 
       describe('when the given version was registered', function () {
         beforeEach(async function () {
-          await this.registry.addImplementation(version_1, contractName, this.behavior.address)
+          await this.registry.addImplementation(version_1, contractName, this.behavior.address, { from: registryOwner })
         })
 
         it('upgrades to the requested implementation', async function () {
@@ -233,7 +242,7 @@ contract('ProjectController', ([_, anAddress, owner, anotherAccount, implementat
       const from = anotherAccount
 
       it('reverts', async function () {
-        await this.registry.addImplementation(version_1, contractName, this.behavior.address)
+        await this.registry.addImplementation(version_1, contractName, this.behavior.address, { from: registryOwner })
         await assertRevert(this.controller.upgradeToAndCall(this.proxyAddress, projectName, version_1, contractName, initializeData, { from }))
       })
     })
@@ -241,7 +250,7 @@ contract('ProjectController', ([_, anAddress, owner, anotherAccount, implementat
 
   describe('getImplementation', function () {
     beforeEach(async function () {
-      await this.registry.addImplementation(version_0, contractName, implementation_v0)
+      await this.registry.addImplementation(version_0, contractName, implementation_v0, { from: registryOwner })
     })
 
     describe('when the given distribution name is equal to the project name', function () {
@@ -260,39 +269,6 @@ contract('ProjectController', ([_, anAddress, owner, anotherAccount, implementat
         const fallbackProviderImplementation = await this.fallbackProvider.implementation()
         const implementation = await this.controller.getImplementation(distribution, version_0, contractName)
         assert.equal(implementation, fallbackProviderImplementation);
-      })
-    })
-  })
-
-  describe('transferOwnership', function () {
-    describe('when the proposed owner is not the zero address', function () {
-      const newOwner = anotherAccount
-
-      describe('when the sender is the owner', function () {
-        const from = owner
-
-        it('transfers the ownership', async function () {
-          await this.controller.transferOwnership(newOwner, { from })
-
-          const controllerOwner = await this.controller.owner()
-          assert.equal(controllerOwner, anotherAccount)
-        })
-      })
-
-      describe('when the sender is not the owner', function () {
-        const from = anotherAccount
-
-        it('reverts', async function () {
-          await assertRevert(this.controller.transferOwnership(newOwner, { from }))
-        })
-      })
-    })
-
-    describe('when the new proposed owner is the zero address', function () {
-      const newOwner = 0x0
-
-      it('reverts', async function () {
-        await assertRevert(this.controller.transferOwnership(newOwner, { from: owner }))
       })
     })
   })

@@ -1,11 +1,13 @@
 pragma solidity ^0.4.18;
 
+import './ownership/Ownable.sol';
+
 /**
  * @title Registry
  * @dev This contract works as a registry of versions, it holds different implementations for different versions of
  * different registered contracts.
  */
-contract Registry {
+contract Registry is Ownable {
   /**
   * @dev This event will be emitted every time a new implementation is registered
   * @param version representing the version name of the registered implementation
@@ -23,7 +25,7 @@ contract Registry {
   * @param contractName representing the name of the contract of the new implementation to be registered
   * @param implementation representing the address of the new implementation to be registered
   */
-  function addImplementation(string version, string contractName, address implementation) public {
+  function addImplementation(string version, string contractName, address implementation) public onlyOwner {
     require(getImplementation(version, contractName) == address(0));
     require(implementation != address(0));
     implementations[version][contractName] = implementation;
