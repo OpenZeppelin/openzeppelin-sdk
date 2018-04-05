@@ -2,9 +2,9 @@ pragma solidity ^0.4.18;
 
 import './Registry.sol';
 import './ImplementationProvider.sol';
-import './ownership/Ownable.sol';
 import './upgradeability/OwnedUpgradeabilityProxy.sol';
 import './upgradeability/UpgradeabilityProxyFactory.sol';
+import 'zeppelin-solidity/contracts/ownership/Ownable.sol';
 
 /**
  * @title ProjectController
