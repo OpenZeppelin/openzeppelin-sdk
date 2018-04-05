@@ -30,5 +30,8 @@
     "ethereumjs-abi": "^0.6.5",
     "truffle": "^4.1.0",
     "web3": "^0.18.4"
+  },
+  "dependencies": {
+    "zeppelin-solidity": "^1.8.0"
   }
 }
