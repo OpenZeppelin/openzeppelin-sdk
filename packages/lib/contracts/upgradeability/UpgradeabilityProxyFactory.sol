@@ -19,7 +19,7 @@ contract UpgradeabilityProxyFactory {
   event ProxyCreated(address proxy);
 
   /**
-  * @dev Creates an upgradeable proxy upgraded to an initial version
+  * @dev Creates an upgradeability proxy upgraded to an initial version
   * @param owner representing the owner of the proxy to be set
   * @param implementation representing the address of the initial implementation to be set
   * @return address of the new proxy created
@@ -32,7 +32,7 @@ contract UpgradeabilityProxyFactory {
   }
 
   /**
-  * @dev Creates an upgradeable proxy upgraded to an initial version and call the new implementation
+  * @dev Creates an upgradeability proxy upgraded to an initial version and call the new implementation
   * @param owner representing the owner of the proxy to be set
   * @param implementation representing the address of the initial implementation to be set
   * @param data represents the msg.data to bet sent in the low level call. This parameter may include the function

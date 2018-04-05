@@ -1,5 +1,4 @@
 const Registry = artifacts.require('Registry')
-const OwnedUpgradeabilityProxy = artifacts.require('OwnedUpgradeabilityProxy')
 const assertRevert = require('./helpers/assertRevert')
 
 contract('Registry', ([_, owner, implementation_v0, implementation_v1]) => {

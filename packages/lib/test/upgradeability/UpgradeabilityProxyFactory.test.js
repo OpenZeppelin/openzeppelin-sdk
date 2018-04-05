@@ -18,7 +18,7 @@ contract('UpgradeabilityProxyFactory', ([_, owner, implementation_v0]) => {
       this.proxy = await OwnedUpgradeabilityProxy.at(this.proxyAddress)
     })
 
-    it('upgrades that proxy to the requested version', async function () {
+    it('creates a proxy pointing to the requested implementation', async function () {
       const implementation = await this.proxy.implementation()
       assert.equal(implementation, implementation_v0)
     })
@@ -46,7 +46,7 @@ contract('UpgradeabilityProxyFactory', ([_, owner, implementation_v0]) => {
       this.proxy = await OwnedUpgradeabilityProxy.at(this.proxyAddress)
     })
 
-    it('upgrades that proxy to the requested version', async function () {
+    it('creates a proxy pointing to the requested implementation', async function () {
       const implementation = await this.proxy.implementation()
       assert.equal(implementation, this.behavior.address)
     })

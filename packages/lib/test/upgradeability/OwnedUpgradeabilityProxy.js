@@ -1,6 +1,8 @@
 'use strict'
 
+const encodeCall = require('../helpers/encodeCall')
 const assertRevert = require('../helpers/assertRevert')
+const InitializableMock = artifacts.require('InitializableMock')
 const OwnedUpgradeabilityProxy = artifacts.require('OwnedUpgradeabilityProxy')
 const UpgradeabilityProxyFactory = artifacts.require('UpgradeabilityProxyFactory')
 
@@ -8,8 +10,8 @@ contract('OwnedUpgradeabilityProxy', ([_, owner, anotherAccount, implementation_
   beforeEach(async function () {
     this.factory = await UpgradeabilityProxyFactory.new()
     const { logs } = await this.factory.createProxy(owner, implementation_v0)
-    const proxyAddress = logs.find(l => l.event === 'ProxyCreated').args.proxy
-    this.proxy = await OwnedUpgradeabilityProxy.at(proxyAddress)
+    this.proxyAddress = logs.find(l => l.event === 'ProxyCreated').args.proxy
+    this.proxy = await OwnedUpgradeabilityProxy.at(this.proxyAddress)
   })
 
   describe('owner', function () {
@@ -29,11 +31,10 @@ contract('OwnedUpgradeabilityProxy', ([_, owner, anotherAccount, implementation_
   })
 
   describe('upgradeTo', function () {
-
     describe('when the sender is the owner', function () {
       const from = owner
 
-      it('returns the new implementation', async function () {
+      it('upgrades to the requested implementation', async function () {
         await this.proxy.upgradeTo(implementation_v1, { from })
 
         const implementation = await this.proxy.implementation()
@@ -58,7 +59,50 @@ contract('OwnedUpgradeabilityProxy', ([_, owner, anotherAccount, implementation_
     })
   })
 
-  describe('transfer ownership', function () {
+  describe('upgradeToAndCall', function () {
+    const initializeData = encodeCall('initialize', ['uint256'], [42])
+
+    beforeEach(async function () {
+      this.behavior = await InitializableMock.new()
+    })
+    
+    describe('when the sender is the owner', function () {
+      const from = owner
+
+      it('upgrades to the requested implementation', async function () {
+        await this.proxy.upgradeToAndCall(this.behavior.address, initializeData, { from })
+
+        const implementation = await this.proxy.implementation()
+        assert.equal(implementation, this.behavior.address)
+      })
+
+      it('emits an event', async function () {
+        const { logs } = await this.proxy.upgradeToAndCall(this.behavior.address, initializeData, { from })
+
+        assert.equal(logs.length, 1)
+        assert.equal(logs[0].event, 'Upgraded')
+        assert.equal(logs[0].args.implementation, this.behavior.address)
+      })
+  
+      it('calls the "initialize" function', async function() {
+        await this.proxy.upgradeToAndCall(this.behavior.address, initializeData, { from })
+
+        const initializable = InitializableMock.at(this.proxyAddress)
+        const x = await initializable.x()
+        assert.equal(x, 42)
+      })
+    })
+
+    describe('when the sender is not the owner', function () {
+      const from = anotherAccount
+
+      it('reverts', async function () {
+        await assertRevert(this.proxy.upgradeToAndCall(this.behavior.address, initializeData, { from }))
+      })
+    })
+  })
+
+  describe('transferOwnership', function () {
     describe('when the new proposed owner is not the zero address', function () {
       const newOwner = anotherAccount
 
