@@ -68,16 +68,17 @@ contract('OwnedUpgradeabilityProxy', ([_, owner, anotherAccount, implementation_
     
     describe('when the sender is the owner', function () {
       const from = owner
+      const value = 1e5
 
       it('upgrades to the requested implementation', async function () {
-        await this.proxy.upgradeToAndCall(this.behavior.address, initializeData, { from })
+        await this.proxy.upgradeToAndCall(this.behavior.address, initializeData, { from, value })
 
         const implementation = await this.proxy.implementation()
         assert.equal(implementation, this.behavior.address)
       })
 
       it('emits an event', async function () {
-        const { logs } = await this.proxy.upgradeToAndCall(this.behavior.address, initializeData, { from })
+        const { logs } = await this.proxy.upgradeToAndCall(this.behavior.address, initializeData, { from, value })
 
         assert.equal(logs.length, 1)
         assert.equal(logs[0].event, 'Upgraded')
@@ -85,11 +86,18 @@ contract('OwnedUpgradeabilityProxy', ([_, owner, anotherAccount, implementation_
       })
   
       it('calls the "initialize" function', async function() {
-        await this.proxy.upgradeToAndCall(this.behavior.address, initializeData, { from })
+        await this.proxy.upgradeToAndCall(this.behavior.address, initializeData, { from, value })
 
         const initializable = InitializableMock.at(this.proxyAddress)
         const x = await initializable.x()
         assert.equal(x, 42)
+      })
+
+      it('sends given value to the delegated implementation', async function() {
+        await this.proxy.upgradeToAndCall(this.behavior.address, initializeData, { from, value })
+
+        const balance = await web3.eth.getBalance(this.proxyAddress)
+        assert(balance.eq(value))
       })
     })
 

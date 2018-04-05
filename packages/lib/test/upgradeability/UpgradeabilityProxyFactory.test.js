@@ -36,11 +36,12 @@ contract('UpgradeabilityProxyFactory', ([_, owner, implementation_v0]) => {
   })
 
   describe('createProxyAndCall', function () {
+    const value = 1e5
     const initializeData = encodeCall('initialize', ['uint256'], [42])
 
     beforeEach(async function () {
       this.behavior = await InitializableMock.new()
-      const { logs } = await this.factory.createProxyAndCall(owner, this.behavior.address, initializeData)
+      const { logs } = await this.factory.createProxyAndCall(owner, this.behavior.address, initializeData, { value })
       this.logs = logs
       this.proxyAddress = logs.find(l => l.event === 'ProxyCreated').args.proxy
       this.proxy = await OwnedUpgradeabilityProxy.at(this.proxyAddress)
@@ -66,6 +67,11 @@ contract('UpgradeabilityProxyFactory', ([_, owner, implementation_v0]) => {
       const initializable = InitializableMock.at(this.proxyAddress);
       const x = await initializable.x();
       assert.equal(x, 42);
+    })
+
+    it('sends given value to the delegated implementation', async function() {
+      const balance = await web3.eth.getBalance(this.proxyAddress)
+      assert(balance.eq(value))
     })
   })
 })
