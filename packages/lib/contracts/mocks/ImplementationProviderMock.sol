@@ -1,4 +1,4 @@
-pragma solidity ^0.4.18;
+pragma solidity ^0.4.21;
 
 import '../ImplementationProvider.sol';
 
@@ -13,7 +13,7 @@ contract ImplementationProviderMock is ImplementationProvider {
     implementation = _implementation;
   }
 
-  function getImplementation(string distribution, string version, string contractName) public view returns (address) {
+  function getImplementation(string /*distribution*/, string /*version*/, string /*contractName*/) public view returns (address) {
     return implementation;
   }
 }

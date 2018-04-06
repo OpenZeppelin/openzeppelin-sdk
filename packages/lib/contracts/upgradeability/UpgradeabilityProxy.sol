@@ -1,4 +1,4 @@
-pragma solidity ^0.4.18;
+pragma solidity ^0.4.21;
 
 import './Proxy.sol';
 
@@ -51,6 +51,6 @@ contract UpgradeabilityProxy is Proxy {
     address currentImplementation = implementation();
     require(currentImplementation != newImplementation);
     setImplementation(newImplementation);
-    Upgraded(newImplementation);
+    emit Upgraded(newImplementation);
   }
 }

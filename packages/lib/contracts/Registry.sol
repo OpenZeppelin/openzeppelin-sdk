@@ -1,4 +1,4 @@
-pragma solidity ^0.4.18;
+pragma solidity ^0.4.21;
 
 import 'zeppelin-solidity/contracts/ownership/Ownable.sol';
 
@@ -29,7 +29,7 @@ contract Registry is Ownable {
     require(getImplementation(version, contractName) == address(0));
     require(implementation != address(0));
     implementations[version][contractName] = implementation;
-    ImplementationAdded(version, contractName, implementation);
+    emit ImplementationAdded(version, contractName, implementation);
   }
 
   /**

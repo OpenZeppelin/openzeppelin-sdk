@@ -1,4 +1,4 @@
-pragma solidity ^0.4.18;
+pragma solidity ^0.4.21;
 
 import './OwnedUpgradeabilityProxy.sol';
 
@@ -52,7 +52,7 @@ contract UpgradeabilityProxyFactory {
   */
   function _createProxy() internal returns (OwnedUpgradeabilityProxy) {
     OwnedUpgradeabilityProxy proxy = new OwnedUpgradeabilityProxy();
-    ProxyCreated(proxy);
+    emit ProxyCreated(proxy);
     return proxy;
   }
 }
