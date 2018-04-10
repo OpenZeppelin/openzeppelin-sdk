@@ -4,8 +4,15 @@ node_js:
 cache:
   directories:
   - node_modules
+env:
+  -
+  - SOLIDITY_COVERAGE=true
+matrix:
+  fast_finish: true
+  allow_failures:
+    - env: SOLIDITY_COVERAGE=true
 script:
-- npm test
+  - npm test
 notifications:
   slack:
     rooms:
