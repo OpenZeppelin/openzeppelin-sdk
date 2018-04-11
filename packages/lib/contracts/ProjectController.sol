@@ -139,7 +139,7 @@ contract ProjectController is ImplementationProvider, Ownable {
   function getImplementation(string distribution, string version, string contractName) public view returns (address) {
     if(keccak256(distribution) == _projectNameHash) return _registry.getImplementation(version, contractName);
     if(_fallbackProvider != address(0)) return _fallbackProvider.getImplementation(distribution, version, contractName);
-    else return address(0);
+    return address(0);
   }
 
   /**

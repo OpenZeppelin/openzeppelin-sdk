@@ -18,18 +18,18 @@ contract OwnedUpgradeabilityProxy is UpgradeabilityProxy {
   bytes32 private constant proxyOwnerPosition = keccak256("org.zeppelinos.proxy.owner");
 
   /**
-  * @dev the constructor sets the original owner of the contract to the sender account.
-  */
-  function OwnedUpgradeabilityProxy() public {
-    setUpgradeabilityOwner(msg.sender);
-  }
-
-  /**
   * @dev Throws if called by any account other than the owner.
   */
   modifier onlyProxyOwner() {
     require(msg.sender == proxyOwner());
     _;
+  }
+
+  /**
+  * @dev the constructor sets the original owner of the contract to the sender account.
+  */
+  function OwnedUpgradeabilityProxy() public {
+    setUpgradeabilityOwner(msg.sender);
   }
 
   /**
@@ -40,16 +40,6 @@ contract OwnedUpgradeabilityProxy is UpgradeabilityProxy {
     bytes32 position = proxyOwnerPosition;
     assembly {
       owner := sload(position)
-    }
-  }
-
-  /**
-   * @dev Sets the address of the owner
-   */
-  function setUpgradeabilityOwner(address newProxyOwner) internal {
-    bytes32 position = proxyOwnerPosition;
-    assembly {
-      sstore(position, newProxyOwner)
     }
   }
 
@@ -81,5 +71,15 @@ contract OwnedUpgradeabilityProxy is UpgradeabilityProxy {
   function upgradeToAndCall(address implementation, bytes data) payable public onlyProxyOwner {
     upgradeTo(implementation);
     require(this.call.value(msg.value)(data));
+  }
+
+  /**
+   * @dev Sets the address of the owner
+   */
+  function setUpgradeabilityOwner(address newProxyOwner) internal {
+    bytes32 position = proxyOwnerPosition;
+    assembly {
+      sstore(position, newProxyOwner)
+    }
   }
 }

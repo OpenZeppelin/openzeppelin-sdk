@@ -30,23 +30,68 @@ contract('OwnedUpgradeabilityProxy', ([_, owner, anotherAccount, implementation_
     })
   })
 
+  describe('fallback', function () {
+    beforeEach(async function () {
+      this.behavior = await InitializableMock.new()
+      this.proxy = await OwnedUpgradeabilityProxy.new()
+      this.mock = InitializableMock.at(this.proxy.address)
+    })
+
+    describe('when there is an implementation set', function () {
+      it('calls the implementation', async function () {
+        await this.proxy.upgradeTo(this.behavior.address)
+
+        await this.mock.initialize(42)
+        const value = await this.mock.x()
+
+        assert.equal(value, 42)
+      })
+    })
+
+    describe('when there is no implementation set', function () {
+      it('reverts', async function () {
+        await assertRevert(this.mock.initialize(42))
+      })
+    })
+  })
+
   describe('upgradeTo', function () {
     describe('when the sender is the owner', function () {
       const from = owner
 
-      it('upgrades to the requested implementation', async function () {
-        await this.proxy.upgradeTo(implementation_v1, { from })
+      describe('when the given implementation is different from the current one', function () {
+        const newImplementation = implementation_v1
 
-        const implementation = await this.proxy.implementation()
-        assert.equal(implementation, implementation_v1)
+        it('upgrades to the requested implementation', async function () {
+          await this.proxy.upgradeTo(newImplementation, { from })
+
+          const implementation = await this.proxy.implementation()
+          assert.equal(implementation, implementation_v1)
+        })
+
+        it('emits an event', async function () {
+          const { logs } = await this.proxy.upgradeTo(newImplementation, { from })
+
+          assert.equal(logs.length, 1)
+          assert.equal(logs[0].event, 'Upgraded')
+          assert.equal(logs[0].args.implementation, implementation_v1)
+        })
       })
 
-      it('emits an event', async function () {
-        const { logs } = await this.proxy.upgradeTo(implementation_v1, { from })
+      describe('when the given implementation is the same as the current one', function () {
+        const newImplementation = implementation_v0
 
-        assert.equal(logs.length, 1)
-        assert.equal(logs[0].event, 'Upgraded')
-        assert.equal(logs[0].args.implementation, implementation_v1)
+        it('reverts', async function () {
+          await assertRevert(this.proxy.upgradeTo(newImplementation, { from }))
+        })
+      })
+
+      describe('when the given implementation is the zero address', function () {
+        const newImplementation = 0x0
+
+        it('reverts', async function () {
+          await assertRevert(this.proxy.upgradeTo(newImplementation, { from }))
+        })
       })
     })
 
@@ -60,54 +105,65 @@ contract('OwnedUpgradeabilityProxy', ([_, owner, anotherAccount, implementation_
   })
 
   describe('upgradeToAndCall', function () {
-    const initializeData = encodeCall('initialize', ['uint256'], [42])
 
     beforeEach(async function () {
       this.behavior = await InitializableMock.new()
     })
-    
-    describe('when the sender is the owner', function () {
-      const from = owner
-      const value = 1e5
 
-      beforeEach(async function () {
-        this.logs = (await this.proxy.upgradeToAndCall(this.behavior.address, initializeData, { from, value })).logs
+    describe('when the call does not fail', function () {
+      const initializeData = encodeCall('initialize', ['uint256'], [42])
+
+      describe('when the sender is the owner', function () {
+        const from = owner
+        const value = 1e5
+
+        beforeEach(async function () {
+          this.logs = (await this.proxy.upgradeToAndCall(this.behavior.address, initializeData, { from, value })).logs
+        })
+
+        it('upgrades to the requested implementation', async function () {
+          const implementation = await this.proxy.implementation()
+          assert.equal(implementation, this.behavior.address)
+        })
+
+        it('emits an event', async function () {
+          assert.equal(this.logs.length, 1)
+          assert.equal(this.logs[0].event, 'Upgraded')
+          assert.equal(this.logs[0].args.implementation, this.behavior.address)
+        })
+
+        it('calls the "initialize" function', async function() {
+          const initializable = InitializableMock.at(this.proxyAddress)
+          const x = await initializable.x()
+          assert.equal(x, 42)
+        })
+
+        it('sends given value to the delegated implementation', async function() {
+          const balance = await web3.eth.getBalance(this.proxyAddress)
+          assert(balance.eq(value))
+        })
+
+        it('uses the storage of the proxy', async function () {
+          // fetch the x value of Initializable at position 0 of the storage
+          const storedValue = await web3.eth.getStorageAt(this.proxyAddress, 1);
+          assert.equal(storedValue, 42);
+        })
       })
 
-      it('upgrades to the requested implementation', async function () {
-        const implementation = await this.proxy.implementation()
-        assert.equal(implementation, this.behavior.address)
-      })
+      describe('when the sender is not the owner', function () {
+        const from = anotherAccount
 
-      it('emits an event', async function () {
-        assert.equal(this.logs.length, 1)
-        assert.equal(this.logs[0].event, 'Upgraded')
-        assert.equal(this.logs[0].args.implementation, this.behavior.address)
-      })
-  
-      it('calls the "initialize" function', async function() {
-        const initializable = InitializableMock.at(this.proxyAddress)
-        const x = await initializable.x()
-        assert.equal(x, 42)
-      })
-
-      it('sends given value to the delegated implementation', async function() {
-        const balance = await web3.eth.getBalance(this.proxyAddress)
-        assert(balance.eq(value))
-      })
-
-      it('uses the storage of the proxy', async function () {
-        // fetch the x value of Initializable at position 0 of the storage
-        const storedValue = await web3.eth.getStorageAt(this.proxyAddress, 0);
-        assert.equal(storedValue, 42);
+        it('reverts', async function () {
+          await assertRevert(this.proxy.upgradeToAndCall(this.behavior.address, initializeData, { from }))
+        })
       })
     })
 
-    describe('when the sender is not the owner', function () {
-      const from = anotherAccount
+    describe('when the call does fail', function () {
+      const initializeData = encodeCall('fail')
 
       it('reverts', async function () {
-        await assertRevert(this.proxy.upgradeToAndCall(this.behavior.address, initializeData, { from }))
+        await assertRevert(this.proxy.upgradeToAndCall(this.behavior.address, initializeData, { from: owner }))
       })
     })
   })
@@ -157,14 +213,14 @@ contract('OwnedUpgradeabilityProxy', ([_, owner, anotherAccount, implementation_
   describe('storage', function () {
     it('should store the implementation address in specified location', async function () {
       const position = web3.sha3("org.zeppelinos.proxy.implementation");
-      const implementation = await web3.eth.getStorageAt(this.proxy.address, position);
+      const implementation = await web3.eth.getStorageAt(this.proxyAddress, position);
 
       assert.equal(implementation, implementation_v0);
     })
 
     it('should store the owner proxy in specified location', async function () {
       const position = web3.sha3("org.zeppelinos.proxy.owner");
-      const proxyOwner = await web3.eth.getStorageAt(this.proxy.address, position);
+      const proxyOwner = await web3.eth.getStorageAt(this.proxyAddress, position);
 
       assert.equal(proxyOwner, owner);
     })

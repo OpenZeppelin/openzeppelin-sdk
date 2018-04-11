@@ -32,7 +32,7 @@ contract('ProjectController', ([_, controllerOwner, registryOwner, anAddress, an
     shouldBehaveLikeOwnable(controllerOwner, anotherAccount)
   })
 
-  it('a registry, factory and project name must be provided', async function () {
+  it('must receive a registry, factory and a project name', async function () {
     await assertRevert(ProjectController.new(projectName, 0x0, this.factory.address, this.fallbackProvider.address))
     await assertRevert(ProjectController.new(projectName, this.registry.address, 0x0, this.fallbackProvider.address))
     await assertRevert(ProjectController.new("", this.registry.address, this.factory.address, this.fallbackProvider.address))
@@ -58,6 +58,15 @@ contract('ProjectController', ([_, controllerOwner, registryOwner, anAddress, an
       const registry = await this.controller.registry()
 
       assert.equal(registry, this.registry.address)
+    })
+  })
+
+  describe('projectNameHash', function () {
+    it('returns the hash of the project name', async function () {
+      const projectNameHash = await this.controller.projectNameHash()
+      const expectedHash = web3.sha3(projectName)
+
+      assert.equal(projectNameHash, expectedHash)
     })
   })
 
@@ -139,7 +148,7 @@ contract('ProjectController', ([_, controllerOwner, registryOwner, anAddress, an
 
       it('uses the storage of the proxy', async function () {
         // fetch the x value of Initializable at position 0 of the storage
-        const storedValue = await web3.eth.getStorageAt(this.proxyAddress, 0);
+        const storedValue = await web3.eth.getStorageAt(this.proxyAddress, 1);
         assert.equal(storedValue, 42);
       })
     })
@@ -233,7 +242,7 @@ contract('ProjectController', ([_, controllerOwner, registryOwner, anAddress, an
 
         it('uses the storage of the proxy', async function () {
           // fetch the x value of Initializable at position 0 of the storage
-          const storedValue = await web3.eth.getStorageAt(this.proxyAddress, 0);
+          const storedValue = await web3.eth.getStorageAt(this.proxyAddress, 1);
           assert.equal(storedValue, 42);
         })
       })
@@ -269,13 +278,26 @@ contract('ProjectController', ([_, controllerOwner, registryOwner, anAddress, an
       })
     })
 
-    describe('when the given distribution name is not to the project name', function () {
+    describe('when the given distribution is not equal to the project name', function () {
       const distribution = 'Zeppelin'
 
-      it('fetches the requested implementation from the fallback implementation provider', async function () {
-        const fallbackProviderImplementation = await this.fallbackProvider.implementation()
-        const implementation = await this.controller.getImplementation(distribution, version_0, contractName)
-        assert.equal(implementation, fallbackProviderImplementation);
+      describe('when there is a fallback provider', function () {
+        it('fetches the requested implementation from the fallback implementation provider', async function () {
+          const fallbackProviderImplementation = await this.fallbackProvider.implementation()
+          const implementation = await this.controller.getImplementation(distribution, version_0, contractName)
+          assert.equal(implementation, fallbackProviderImplementation);
+        })
+      })
+
+      describe('when there is no fallback provider', function () {
+        beforeEach(async function () {
+          this.anotherController = await ProjectController.new(projectName, this.registry.address, this.factory.address, 0, { from: controllerOwner })
+        })
+
+        it('returns a zero address', async function () {
+          const implementation = await this.anotherController.getImplementation(distribution, version_0, contractName)
+          assert.equal(implementation, 0x0);
+        })
       })
     })
   })

@@ -76,7 +76,7 @@ contract('UpgradeabilityProxyFactory', ([_, owner, implementation_v0]) => {
 
     it('uses the storage of the proxy', async function () {
       // fetch the x value of Initializable at position 0 of the storage
-      const storedValue = await web3.eth.getStorageAt(this.proxyAddress, 0);
+      const storedValue = await web3.eth.getStorageAt(this.proxyAddress, 1);
       assert.equal(storedValue, 42);
     })
   })
