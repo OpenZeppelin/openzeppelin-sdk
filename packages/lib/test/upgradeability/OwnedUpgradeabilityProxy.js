@@ -70,34 +70,36 @@ contract('OwnedUpgradeabilityProxy', ([_, owner, anotherAccount, implementation_
       const from = owner
       const value = 1e5
 
-      it('upgrades to the requested implementation', async function () {
-        await this.proxy.upgradeToAndCall(this.behavior.address, initializeData, { from, value })
+      beforeEach(async function () {
+        this.logs = (await this.proxy.upgradeToAndCall(this.behavior.address, initializeData, { from, value })).logs
+      })
 
+      it('upgrades to the requested implementation', async function () {
         const implementation = await this.proxy.implementation()
         assert.equal(implementation, this.behavior.address)
       })
 
       it('emits an event', async function () {
-        const { logs } = await this.proxy.upgradeToAndCall(this.behavior.address, initializeData, { from, value })
-
-        assert.equal(logs.length, 1)
-        assert.equal(logs[0].event, 'Upgraded')
-        assert.equal(logs[0].args.implementation, this.behavior.address)
+        assert.equal(this.logs.length, 1)
+        assert.equal(this.logs[0].event, 'Upgraded')
+        assert.equal(this.logs[0].args.implementation, this.behavior.address)
       })
   
       it('calls the "initialize" function', async function() {
-        await this.proxy.upgradeToAndCall(this.behavior.address, initializeData, { from, value })
-
         const initializable = InitializableMock.at(this.proxyAddress)
         const x = await initializable.x()
         assert.equal(x, 42)
       })
 
       it('sends given value to the delegated implementation', async function() {
-        await this.proxy.upgradeToAndCall(this.behavior.address, initializeData, { from, value })
-
         const balance = await web3.eth.getBalance(this.proxyAddress)
         assert(balance.eq(value))
+      })
+
+      it('uses the storage of the proxy', async function () {
+        // fetch the x value of Initializable at position 0 of the storage
+        const storedValue = await web3.eth.getStorageAt(this.proxyAddress, 0);
+        assert.equal(storedValue, 42);
       })
     })
 
@@ -149,6 +151,22 @@ contract('OwnedUpgradeabilityProxy', ([_, owner, anotherAccount, implementation_
       it('reverts', async function () {
         await assertRevert(this.proxy.transferProxyOwnership(newOwner, { from: owner }))
       })
+    })
+  })
+
+  describe('storage', function () {
+    it('should store the implementation address in specified location', async function () {
+      const position = web3.sha3("org.zeppelinos.proxy.implementation");
+      const implementation = await web3.eth.getStorageAt(this.proxy.address, position);
+
+      assert.equal(implementation, implementation_v0);
+    })
+
+    it('should store the owner proxy in specified location', async function () {
+      const position = web3.sha3("org.zeppelinos.proxy.owner");
+      const proxyOwner = await web3.eth.getStorageAt(this.proxy.address, position);
+
+      assert.equal(proxyOwner, owner);
     })
   })
 })

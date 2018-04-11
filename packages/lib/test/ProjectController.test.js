@@ -136,6 +136,12 @@ contract('ProjectController', ([_, controllerOwner, registryOwner, anAddress, an
         const balance = await web3.eth.getBalance(this.proxyAddress)
         assert(balance.eq(value))
       })
+
+      it('uses the storage of the proxy', async function () {
+        // fetch the x value of Initializable at position 0 of the storage
+        const storedValue = await web3.eth.getStorageAt(this.proxyAddress, 0);
+        assert.equal(storedValue, 42);
+      })
     })
 
     describe('when the given version was not registered', function () {
@@ -206,28 +212,29 @@ contract('ProjectController', ([_, controllerOwner, registryOwner, anAddress, an
       describe('when the given version was registered', function () {
         beforeEach(async function () {
           await this.registry.addImplementation(version_1, contractName, this.behavior.address, { from: registryOwner })
+          await this.controller.upgradeToAndCall(this.proxyAddress, projectName, version_1, contractName, initializeData, { from, value })
         })
 
         it('upgrades to the requested implementation', async function () {
-          await this.controller.upgradeToAndCall(this.proxyAddress, projectName, version_1, contractName, initializeData, { from, value })
-
           const implementation = await this.proxy.implementation()
           assert.equal(implementation, this.behavior.address)
         })
 
         it('calls the "initialize" function', async function() {
-          await this.controller.upgradeToAndCall(this.proxyAddress, projectName, version_1, contractName, initializeData, { from, value })
-
           const initializable = InitializableMock.at(this.proxyAddress)
           const x = await initializable.x()
           assert.equal(x, 42)
         })
 
         it('sends given value to the delegated implementation', async function() {
-          await this.controller.upgradeToAndCall(this.proxyAddress, projectName, version_1, contractName, initializeData, { from, value })
-
           const balance = await web3.eth.getBalance(this.proxyAddress)
           assert(balance.eq(value))
+        })
+
+        it('uses the storage of the proxy', async function () {
+          // fetch the x value of Initializable at position 0 of the storage
+          const storedValue = await web3.eth.getStorageAt(this.proxyAddress, 0);
+          assert.equal(storedValue, 42);
         })
       })
 
