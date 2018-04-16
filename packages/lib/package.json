@@ -1,13 +1,13 @@
 {
-  "name": "zos-core",
-  "version": "0.0.2",
-  "description": "zeppelin_os core",
+  "name": "zos-upgradeability",
+  "version": "0.0.1",
+  "description": "zeppelin_os upgradeability library",
   "scripts": {
     "test": "scripts/test.sh"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/zeppelinos/core.git"
+    "url": "git+https://github.com/zeppelinos/upgradeability-lib.git"
   },
   "keywords": [
     "zeppelin_os",
@@ -20,12 +20,12 @@
     "proxy",
     "evm"
   ],
-  "author": "Manuel Araoz <manuel@zeppelin.solutions>",
+  "author": "Manuel Araoz <manuel@zeppelinos.org>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/zeppelinos/core/issues"
+    "url": "https://github.com/zeppelinos/upgradeability-lib/issues"
   },
-  "homepage": "https://github.com/zeppelinos/core#readme",
+  "homepage": "https://github.com/zeppelinos/upgradeability-lib#readme",
   "devDependencies": {
     "coveralls": "^3.0.0",
     "ethereumjs-abi": "^0.6.5",
