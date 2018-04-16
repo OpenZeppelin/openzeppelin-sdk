@@ -1,0 +1,24 @@
+{
+  "name": "zos-cli",
+  "version": "0.0.1",
+  "description": "zeppelin_os command line interface",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/zeppelinos/cli.git"
+  },
+  "keywords": [
+    "zos",
+    "zeppelin_os",
+    "cli"
+  ],
+  "author": "Manuel Araoz <manuel@zeppelinos.org>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/zeppelinos/cli/issues"
+  },
+  "homepage": "https://github.com/zeppelinos/cli#readme"
+}
