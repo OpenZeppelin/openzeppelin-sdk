@@ -15,7 +15,7 @@ contract InitializableMock is Initializable {
     x = value;
   }
 
-  function fail() public {
+  function fail() public pure {
     require(false);
   }
 }
