@@ -1,18 +1,29 @@
 import fs from 'fs'
 import colors from 'colors'
 
-const FILENAME = 'package.zos.json'
 
 class PacakageFileInterface {
-  read() {
-    const data = fs.readFileSync(FILENAME)
+  constructor() {
+    this.packageFileName = 'package.zos.json'
+  }
+
+  readFrom(fileName) {
+    const data = fs.readFileSync(fileName)
     return JSON.parse(data)
   }
 
-  write(zosPackage) {
+  writeTo(fileName, zosPackage) {
     const data = JSON.stringify(zosPackage, null, 2)
-    fs.writeFileSync(FILENAME, data)
-    console.log(`Successfully created ${FILENAME} for ${zosPackage.name} v${zosPackage.version}`.green)
+    fs.writeFileSync(fileName, data)
+    console.log(`Successfully written ${fileName}`.green)
+  }
+
+  writePackageFile(zosPackage) {
+    this.writeTo(this.packageFileName, zosPackage)
+  }
+
+  readPackageFile() {
+    return this.readFrom(this.packageFileName)
   }
 }
 
