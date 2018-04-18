@@ -1,12 +1,10 @@
-import PackageFileInterface from '../utils/PackageFileInterface'
+import PackageFilesInterface from '../utils/PackageFilesInterface'
 
 
 function addImplementation(contractName, alias, ...args) {
-  const zosPackage = PackageFileInterface.readPackageFile()
-
+  const zosPackage = PackageFilesInterface.read()
   zosPackage.contracts[alias] = contractName
-
-  PackageFileInterface.writePackageFile(zosPackage)
+  PackageFilesInterface.write(zosPackage)
 }
 
 

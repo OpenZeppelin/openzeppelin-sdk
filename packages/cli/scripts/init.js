@@ -1,4 +1,4 @@
-import PackageFileInterface from '../utils/PackageFileInterface'
+import PackageFilesInterface from '../utils/PackageFilesInterface'
 
 const DEFAULT_VERSION = '1.0.0'
 const BASE_PACKAGE = {
@@ -14,7 +14,7 @@ function init(name, version) {
   zosPackage.name = name
   zosPackage.version = version || DEFAULT_VERSION
 
-  PackageFileInterface.writePackageFile(zosPackage)
+  PackageFilesInterface.write(zosPackage)
 }
 
 
