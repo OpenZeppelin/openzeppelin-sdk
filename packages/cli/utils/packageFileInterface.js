@@ -1,16 +1,16 @@
 import fs from 'fs'
 
-let fileName = 'package.zos'
+const FILENAME = 'package.zos'
 
 class PacakageFileInterface {
   read() {
-    let blob = fs.readFileSync(fileName)
+    const blob = fs.readFileSync(FILENAME)
     return JSON.parse(blob)
   }
 
   write(data) {
-    let blob = JSON.stringify(data, null, 2)
-    fs.writeFileSync(fileName, blob, 'utf8')
+    const blob = JSON.stringify(data, null, 2)
+    fs.writeFileSync(FILENAME, blob)
   }
 }
 

@@ -1,12 +1,11 @@
 import shelljs from 'shelljs'
 
 function run() {
-  let node = 'npx babel-node'
-  let script = `./scripts/${process.argv[2]}.js`
-  let args = process.argv.slice(3).join(' ')
-  let command = `${node} ${script} ${args}`
+  const node = 'npx babel-node'
+  const script = `./scripts/${process.argv[2]}.js`
+  const args = process.argv.slice(3).join(' ')
+  const command = `${node} ${script} ${args}`
 
-  console.log(command)
   shelljs.exec(command)
 }
 

@@ -1,14 +1,15 @@
 import packageFileInterface from '../utils/packageFileInterface'
 
-let DEFAULT_VERSION = '0.0.1'
-
-let BASE_PACKAGE = {
+const DEFAULT_VERSION = '1.0.0'
+const BASE_PACKAGE = {
+  'version': null,
   'contracts': {},
   'stdlib': {}
 }
 
+
 function init(projectName, version) {
-  let zosPackage = BASE_PACKAGE
+  const zosPackage = BASE_PACKAGE
 
   zosPackage.projectName = projectName
   zosPackage.version = version || DEFAULT_VERSION
@@ -18,7 +19,7 @@ function init(projectName, version) {
 
 
 function run() {
-  let { argv } = process
+  const { argv } = process
   init(argv[2], argv[3])
 }
 
