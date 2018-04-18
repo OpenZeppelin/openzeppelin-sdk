@@ -10,6 +10,7 @@ class PacakageFileInterface {
   /*
   * Package file functions
   */
+
   read() {
     return this.readFrom(this.packageFileName)
   }
@@ -21,6 +22,7 @@ class PacakageFileInterface {
   /*
   * Network file functions
   */
+
   readNetworkFile(network) {
     const fileName = this.fileNameFor(network)
     return this.readFrom(fileName)
