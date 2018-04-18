@@ -8,10 +8,9 @@ const BASE_PACKAGE = {
 }
 
 
-function init(projectName, version) {
+function init(version) {
   const zosPackage = BASE_PACKAGE
 
-  zosPackage.projectName = projectName
   zosPackage.version = version || DEFAULT_VERSION
 
   packageFileInterface.write(zosPackage)
@@ -19,8 +18,7 @@ function init(projectName, version) {
 
 
 function run() {
-  const { argv } = process
-  init(argv[2], argv[3])
+  init(process.argv[2])
 }
 
 run()

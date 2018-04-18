@@ -1,4 +1,6 @@
-import shelljs from 'shelljs'
+#! /usr/bin/env node
+
+const shelljs = require('shelljs')
 
 function run() {
   const node = 'npx babel-node'

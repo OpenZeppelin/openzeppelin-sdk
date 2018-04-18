@@ -1,6 +1,6 @@
 import fs from 'fs'
 
-const FILENAME = 'package.zos'
+const FILENAME = 'package.zos.json'
 
 class PacakageFileInterface {
   read() {
