@@ -2,7 +2,7 @@ import fs from 'fs'
 import colors from 'colors'
 
 
-class PacakageFileInterface {
+class PacakageFilesInterface {
   constructor() {
     this.packageFileName = 'package.zos.json'
   }
@@ -54,4 +54,4 @@ class PacakageFileInterface {
 }
 
 
-module.exports = new PacakageFileInterface()
+module.exports = new PacakageFilesInterface()
