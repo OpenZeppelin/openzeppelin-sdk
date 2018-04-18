@@ -27,6 +27,7 @@
     "babel-preset-stage-2": "^6.24.1",
     "babel-preset-stage-3": "^6.24.1",
     "babel-register": "^6.26.0",
+    "colors": "^1.2.1",
     "shelljs": "^0.8.1",
     "truffle": "^4.1.6"
   }

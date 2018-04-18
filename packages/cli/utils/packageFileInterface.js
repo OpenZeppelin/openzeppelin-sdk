@@ -1,16 +1,18 @@
 import fs from 'fs'
+import colors from 'colors'
 
 const FILENAME = 'package.zos.json'
 
 class PacakageFileInterface {
   read() {
-    const blob = fs.readFileSync(FILENAME)
-    return JSON.parse(blob)
+    const data = fs.readFileSync(FILENAME)
+    return JSON.parse(data)
   }
 
-  write(data) {
-    const blob = JSON.stringify(data, null, 2)
-    fs.writeFileSync(FILENAME, blob)
+  write(zosPackage) {
+    const data = JSON.stringify(zosPackage, null, 2)
+    fs.writeFileSync(FILENAME, data)
+    console.log(`Successfully created ${FILENAME} for ${zosPackage.name} v${zosPackage.version}`.green)
   }
 }
 

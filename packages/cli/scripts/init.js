@@ -8,9 +8,10 @@ const BASE_PACKAGE = {
 }
 
 
-function init(version) {
+function init(name, version) {
   const zosPackage = BASE_PACKAGE
 
+  zosPackage.name = name
   zosPackage.version = version || DEFAULT_VERSION
 
   packageFileInterface.write(zosPackage)
@@ -18,7 +19,8 @@ function init(version) {
 
 
 function run() {
-  init(process.argv[2])
+  const { argv } = process
+  init(argv[2], argv[3])
 }
 
 run()
