@@ -14,5 +14,7 @@ contract('Initializable', ([]) => {
       assert.equal(x, 42)
       await assertRevert(this.initializable.initialize(100))
     })
+
+    it('becomes initialized')
   })
 })

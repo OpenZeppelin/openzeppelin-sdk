@@ -8,4 +8,8 @@ contract Initializable {
     _;
     _initialized = true;
   }
+
+  function isInitialized() public view returns (bool) {
+    return _initialized;
+  }
 }
