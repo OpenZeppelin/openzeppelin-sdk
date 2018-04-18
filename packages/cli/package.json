@@ -20,5 +20,14 @@
   "bugs": {
     "url": "https://github.com/zeppelinos/cli/issues"
   },
-  "homepage": "https://github.com/zeppelinos/cli#readme"
+  "homepage": "https://github.com/zeppelinos/cli#readme",
+  "dependencies": {
+    "babel-polyfill": "^6.26.0",
+    "babel-preset-es2015": "^6.24.1",
+    "babel-preset-stage-2": "^6.24.1",
+    "babel-preset-stage-3": "^6.24.1",
+    "babel-register": "^6.26.0",
+    "shelljs": "^0.8.1",
+    "truffle": "^4.1.6"
+  }
 }
