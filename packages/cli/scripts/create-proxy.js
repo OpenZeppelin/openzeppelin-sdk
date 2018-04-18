@@ -1,17 +1,25 @@
 import PackageFilesInterface from '../utils/PackageFilesInterface'
 
 const AppManager = {
-  createProxy: () => 0x1
+  create: () => '0x2'
 }
 
 
 function createProxy(network, contractName, version, ...args) {
   // TODO: if network file does not exists, create it
-  const zosNetworkPackage = PackageFilesInterface.readNetworkFile(network)
-  const proxy = AppManager.createProxy(version, contractName)
+  const zosNetworkFile = PackageFilesInterface.readNetworkFile(network)
+  const { proxies } = zosNetworkFile
 
-  zosNetworkPackage.proxies[contractName] = { proxy, version }
-  PackageFilesInterface.writeNetworkFile(network, zosNetworkPackage)
+  const address = AppManager.create(version, contractName)
+
+  if (proxies[contractName] == undefined) {
+    proxies[contractName] = []
+  }
+
+  proxies[contractName].push({ address, version })
+
+  zosNetworkFile.proxies = proxies
+  PackageFilesInterface.writeNetworkFile(network, zosNetworkFile)
 }
 
 
