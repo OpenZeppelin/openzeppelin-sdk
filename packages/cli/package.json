@@ -29,6 +29,7 @@
     "shelljs": "^0.8.1",
     "truffle": "^4.1.6",
     "truffle-contract": "^3.0.5",
+    "zos-kernel": "git://github.com/zeppelinos/kernel.git",
     "zos-upgradeability": "git://github.com/zeppelinos/upgradeability-lib.git"
   },
   "devDependencies": {
