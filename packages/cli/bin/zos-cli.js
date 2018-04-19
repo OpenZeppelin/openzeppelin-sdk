@@ -1,12 +1,13 @@
 #! /usr/bin/env node
 
+const Path = require('path')
 const shelljs = require('shelljs')
 
 function run() {
-  const node = 'npx babel-node'
-  const script = `../src/scripts/${process.argv[2]}.js`
-  const args = process.argv.slice(3).join(' ')
-  const command = `${node} ${script} ${args}`
+  const bin = 'npx truffle exec'
+  const script = Path.resolve(__dirname, '../src/entrypoint.js')
+  const args = process.argv.slice(2).join(' ')
+  const command = `${bin} ${script} ${args}`
 
   shelljs.exec(command)
 }

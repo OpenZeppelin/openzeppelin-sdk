@@ -25,6 +25,7 @@
     "babel-cli": "^6.26.0",
     "babel-polyfill": "^6.26.0",
     "colors": "^1.2.1",
+    "commander": "^2.15.1",
     "ethereumjs-abi": "^0.6.5",
     "shelljs": "^0.8.1",
     "truffle": "^4.1.6",
