@@ -34,4 +34,9 @@ export default class Stdlib {
     }));
     return directory;
   }
+
+  getDeployed(network) {
+    const networkInfo = JSON.parse(fs.readFileSync(`node_modules/${this.name}/package.zos.${network}.json`))
+    return  networkInfo.app.address;
+  }
 }
