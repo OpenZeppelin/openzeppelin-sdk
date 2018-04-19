@@ -1,7 +1,7 @@
 const BigNumber = web3.BigNumber
 const contract = require("truffle-contract")
 const promptBoolean = require('../utils/promptBoolean')
-const KERNEL_ADDRESS = require('../utils/constants').KERNEL_ADDRESS
+const { KERNEL_ADDRESS } = require('../utils/constants')
 
 async function unvouch(releaseAddress, rawAmount, { from }) {
   const data = ''

@@ -1,11 +1,11 @@
 import PackageFilesInterface from '../utils/PackageFilesInterface'
 import { AppManager } from './models/AppManager'
 
-const interface = new PackageFilesInterface()
 
-async function createProxy(contractName, ...args, { network, from }) {
+async function createProxy(contractName, { network, from, packageFileName }) {
+  const files = new PackageFilesInterface(packageFileName)
   // TODO: if network file does not exists, create it
-  const zosNetworkFile = interface.readNetworkFile(network)
+  const zosNetworkFile = files.readNetworkFile(network)
   const { proxies } = zosNetworkFile
 
   const contractClass = artifacts.require(contractName)
@@ -18,7 +18,7 @@ async function createProxy(contractName, ...args, { network, from }) {
   proxies[contractName].push({ address, version })
 
   zosNetworkFile.proxies = proxies
-  interface.writeNetworkFile(network, zosNetworkFile)
+  files.writeNetworkFile(network, zosNetworkFile)
 }
 
 export default createProxy

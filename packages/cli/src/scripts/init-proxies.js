@@ -1,10 +1,10 @@
 import PackageFilesInterface from '../utils/PackageFilesInterface'
 import AppManager from '../models/AppManager'
 
-const interface = new PackageFilesInterface()
 
-async function initProxies({ network }) {
-  const zosPackage = interface.read()
+async function initProxies({ network, from, packageFileName }) {
+  const files = new PackageFilesInterface(packageFileName)
+  const zosPackage = files.read()
 
   const zosNetworkFile = {
     'app': {
@@ -21,7 +21,7 @@ async function initProxies({ network }) {
     zosNetworkFile.package.contracts[contractName] = await AppManager.getImplementation(contractName)
   }
 
-  interface.writeNetworkFile(network, zosNetworkFile)
+  files.writeNetworkFile(network, zosNetworkFile)
 }
 
 export default initProxies

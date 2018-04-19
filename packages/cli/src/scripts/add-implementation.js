@@ -1,9 +1,9 @@
 import PackageFilesInterface from '../utils/PackageFilesInterface'
 
-const interface = new PackageFilesInterface()
 
-export default function addImplementation(contractName, alias, ...args, { network, from }) {
-  const zosPackage = interface.read()
+module.exports = async function addImplementation(contractName, alias, { packageFileName }) {
+  const files = new PackageFilesInterface(packageFileName)
+  const zosPackage = files.read()
   zosPackage.contracts[alias] = contractName
-  interface.write(zosPackage)
+  files.write(zosPackage)
 }

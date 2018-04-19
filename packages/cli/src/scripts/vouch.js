@@ -1,8 +1,8 @@
 const BigNumber = web3.BigNumber
 const contract = require("truffle-contract")
 const promptBoolean = require('../utils/promptBoolean')
-const KERNEL_ADDRESS = require('../utils/constants').KERNEL_ADDRESS
-const ZEP_TOKEN_ADDRESS = require('../utils/constants').ZEP_TOKEN_ADDRESS
+const { KERNEL_ADDRESS } = require('../utils/constants')
+const { ZEP_TOKEN_ADDRESS } = require('../utils/constants')
 
 async function vouch(releaseAddress, rawAmount, { from }) {
   const data = ''

@@ -1,10 +1,10 @@
 import PackageFilesInterface from '../utils/PackageFilesInterface'
 
-const interface = new PackageFilesInterface()
 
-export default function newVersion(version, ...args, { from, network }) {
-  const zosPackage = interface.read()
+export default function newVersion(version, { network, from, packageFileName }) {
+  const files = new PackageFilesInterface(packageFileName)
+  const zosPackage = files.read()
   zosPackage.version = version
   zosPackage.contracts = {}
-  interface.write(zosPackage)
+  files.write(zosPackage)
 }
