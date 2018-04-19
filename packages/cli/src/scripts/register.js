@@ -12,8 +12,7 @@ export default async function register(releaseAddress, { from }) {
 
   promptBoolean(`To register a new version ${newVersionCost} ZEP tokens will be burned. Do you want to proceed?`, async function () {
     try {
-      const receipt = await kernel.register(releaseAddress)
-      console.log(`Release registered successfully. Transaction hash: ${receipt.tx}.`)
+      await kernel.register(releaseAddress)
     } catch (error) {
       console.error('There was an error trying to register your release.', error)
     }
