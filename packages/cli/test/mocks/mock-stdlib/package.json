@@ -1,0 +1,12 @@
+{
+  "name": "mock-stdlib",
+  "version": "1.0.0",
+  "description": "Mock kernel stdlib for tests in zos-cli",
+  "main": "index.js",
+  "private": true,
+  "scripts": {
+    "test": "truffle test"
+  },
+  "author": "santiago@zeppelin.solutions",
+  "license": "MIT"
+}

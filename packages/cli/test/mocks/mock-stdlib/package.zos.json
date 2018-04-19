@@ -1,0 +1,5 @@
+{
+  "contracts": {
+    "Greeter": "GreeterImpl"
+  }
+}
