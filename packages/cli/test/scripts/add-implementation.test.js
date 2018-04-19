@@ -3,7 +3,7 @@ import addImplementation from "../../src/scripts/add-implementation.js";
 import fs from 'fs';
 import PackageFilesInterface from '../../src/utils/PackageFilesInterface';
 
-contract.only('add-implementation', function(accounts) {
+contract('add-implementation command', function(accounts) {
 
   const packageFileName = "package.test.zos.json";
   const appName = "MyApp";

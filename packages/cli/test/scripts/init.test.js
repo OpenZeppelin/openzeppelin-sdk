@@ -2,7 +2,7 @@ import init from "../../src/scripts/init.js";
 import fs from 'fs';
 import PackageFilesInterface from '../../src/utils/PackageFilesInterface';
 
-contract('init', function(accounts) {
+contract('init command', function(accounts) {
 
   const packageFileName = "package.test.zos.json";
   const appName = "MyApp";
