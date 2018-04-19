@@ -4,7 +4,7 @@ import promptBoolean from '../utils/promptBoolean'
 const BigNumber = web3.BigNumber
 const { KERNEL_ADDRESS } = require('../utils/constants')
 
-export default async function unvouch(releaseAddress, rawAmount, { from }) {
+async function unvouch(releaseAddress, rawAmount, { from }) {
   const kernelAddress = KERNEL_ADDRESS
   const txParams = { from: from, gas: 6000000 }
 
@@ -21,3 +21,5 @@ export default async function unvouch(releaseAddress, rawAmount, { from }) {
     }
   })
 }
+
+module.exports = unvouch

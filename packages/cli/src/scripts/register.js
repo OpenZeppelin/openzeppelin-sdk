@@ -2,7 +2,7 @@ import Kernel from '../models/Kernel'
 import promptBoolean from '../utils/promptBoolean'
 const { KERNEL_ADDRESS } = require('../utils/constants')
 
-export default async function register(releaseAddress, { from }) {
+async function register(releaseAddress, { from }) {
   const kernelAddress = KERNEL_ADDRESS
   const txParams = { from: from, gas: 6000000 }
 
@@ -18,3 +18,5 @@ export default async function register(releaseAddress, { from }) {
     }
   })
 }
+
+module.exports = register
