@@ -3,7 +3,7 @@ import { AppManager } from './models/AppManager'
 
 const interface = new PackageFilesInterface()
 
-async function createProxy(network, contractName, ...args) {
+async function createProxy(contractName, ...args, { network, from }) {
   // TODO: if network file does not exists, create it
   const zosNetworkFile = interface.readNetworkFile(network)
   const { proxies } = zosNetworkFile
@@ -21,10 +21,4 @@ async function createProxy(network, contractName, ...args) {
   interface.writeNetworkFile(network, zosNetworkFile)
 }
 
-
-function run() {
-  const args = process.argv.slice(2)
-  createProxy(...args)
-}
-
-run()
+export default createProxy

@@ -3,7 +3,7 @@ import AppManager from '../models/AppManager'
 
 const interface = new PackageFilesInterface()
 
-async function initProxies(network) {
+async function initProxies({ network }) {
   const zosPackage = interface.read()
 
   const zosNetworkFile = {
@@ -24,10 +24,4 @@ async function initProxies(network) {
   interface.writeNetworkFile(network, zosNetworkFile)
 }
 
-
-function run() {
-  const args = process.argv.slice(2)
-  initProxies(...args)
-}
-
-run()
+export default initProxies

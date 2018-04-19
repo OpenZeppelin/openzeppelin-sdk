@@ -1,8 +1,9 @@
 import PackageFilesInterface from '../utils/PackageFilesInterface'
-import AppManager from "../models/AppManager";
+import AppManager from './models/AppManager'
+
 const interface = new PackageFilesInterface()
 
-async function upgradeProxy(network, proxyAddress, contractName, ...args) {
+async function upgradeProxy(proxyAddress, contractName, ...args, { from, network }) {
   const zosNetworkFile = interface.readNetworkFile(network)
   const { proxies } = zosNetworkFile
 
@@ -20,10 +21,4 @@ async function upgradeProxy(network, proxyAddress, contractName, ...args) {
   interface.writeNetworkFile(network, zosNetworkFile)
 }
 
-
-function run() {
-  const args = process.argv.slice(2)
-  upgradeProxy(...args)
-}
-
-run()
+export default upgradeProxy

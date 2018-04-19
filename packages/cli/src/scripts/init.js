@@ -9,7 +9,7 @@ const BASE_PACKAGE = {
 
 const interface = new PackageFilesInterface();
 
-function init(name, version) {
+export default function init(name, version, { from }) {
   const zosPackage = BASE_PACKAGE
 
   zosPackage.name = name
@@ -17,11 +17,3 @@ function init(name, version) {
 
   interface.write(zosPackage)
 }
-
-
-function run() {
-  const args = process.argv.slice(2)
-  init(...args)
-}
-
-run()

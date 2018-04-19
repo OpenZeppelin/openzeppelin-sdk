@@ -2,16 +2,8 @@ import PackageFilesInterface from '../utils/PackageFilesInterface'
 
 const interface = new PackageFilesInterface()
 
-function addImplementation(contractName, alias, ...args) {
+export default function addImplementation(contractName, alias, ...args, { network, from }) {
   const zosPackage = interface.read()
   zosPackage.contracts[alias] = contractName
   interface.write(zosPackage)
 }
-
-
-function run() {
-  const args = process.argv.slice(2)
-  addImplementation(...args)
-}
-
-run()

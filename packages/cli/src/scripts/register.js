@@ -3,9 +3,8 @@ const promptBoolean = require('../utils/promptBoolean')
 const KERNEL_ADDRESS = require('../utils/constants').KERNEL_ADDRESS
 const ZEP_TOKEN_ADDRESS = require('../utils/constants').ZEP_TOKEN_ADDRESS
 
-async function register() {
-  const releaseAddress = '0x575c467d94f0abde1bca0d529eb233fd5f27d0b4'
-  const developerAddress = web3.eth.accounts[2]
+async function register(releaseAddress, { from }) {
+  const developerAddress = from
 
   const Kernel = contract(require('zos-kernel/build/contracts/Kernel.json'))
   Kernel.setProvider(web3.currentProvider)
@@ -57,6 +56,4 @@ async function register() {
   })
 }
 
-module.exports = function(cb) {
-  register().then(cb).catch(cb)
-}
+export default register

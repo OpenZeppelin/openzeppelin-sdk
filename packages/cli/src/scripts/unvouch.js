@@ -3,12 +3,10 @@ const contract = require("truffle-contract")
 const promptBoolean = require('../utils/promptBoolean')
 const KERNEL_ADDRESS = require('../utils/constants').KERNEL_ADDRESS
 
-async function unvouch() {
+async function unvouch(releaseAddress, rawAmount, { from }) {
   const data = ''
-  const amount = new BigNumber(10)
-
-  const releaseAddress = '0x575c467d94f0abde1bca0d529eb233fd5f27d0b4'
-  const voucher = web3.eth.accounts[2]
+  const amount = new BigNumber(rawAmount)
+  const voucher = from
 
   const Kernel = contract(require('zos-kernel/build/contracts/Kernel.json'))
   Kernel.setProvider(web3.currentProvider)
@@ -44,6 +42,4 @@ async function unvouch() {
   })
 }
 
-module.exports = function(cb) {
-  unvouch().then(cb).catch(cb)
-}
+export default unvouch

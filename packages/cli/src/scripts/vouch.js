@@ -52,4 +52,4 @@ async function vouch(releaseAddress, rawAmount, { from }) {
   })
 }
 
-module.exports = vouch;
+export default vouch

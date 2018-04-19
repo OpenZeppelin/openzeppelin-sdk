@@ -1,5 +1,6 @@
-global.artifacts = artifacts;
-global.web3 = web3;
+global.artifacts = artifacts
+global.web3 = web3
+global.truffleDefaults = artifacts.require('ContractDirectory').class_defaults // TODO: Make less horrible
 
 const program = require('commander')
 
@@ -12,5 +13,5 @@ module.exports = function(cb) {
 
   const script = `./scripts/${program.args[2]}.js`
   const args = program.args.slice(3)
-  require(script)(...args, { from: program.from }).then(cb).catch(cb);
-};
+  require(script)(...args, { from: program.from }).then(cb).catch(cb)
+}

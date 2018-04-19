@@ -3,7 +3,7 @@ import { AppManager } from './models/AppManager'
 
 const interface = new PackageFilesInterface()
 
-async function sync(network) {
+async function sync({ from, network }) {
   const zosPackage = interface.read()
   const zosNetworkFile = interface.readNetworkFile(network)
 
@@ -25,10 +25,4 @@ async function sync(network) {
   interface.writeNetworkFile(network, zosNetworkFile)
 }
 
-
-function run() {
-  const args = process.argv.slice(2)
-  sync(...args)
-}
-
-run()
+export default sync
