@@ -7,6 +7,7 @@ const BASE_PACKAGE = {
   'stdlib': {}
 }
 
+const interface = new PackageFilesInterface();
 
 function init(name, version) {
   const zosPackage = BASE_PACKAGE
@@ -14,7 +15,7 @@ function init(name, version) {
   zosPackage.name = name
   zosPackage.version = version || DEFAULT_VERSION
 
-  PackageFilesInterface.write(zosPackage)
+  interface.write(zosPackage)
 }
 
 

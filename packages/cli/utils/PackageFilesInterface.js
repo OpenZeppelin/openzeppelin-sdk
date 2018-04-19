@@ -2,9 +2,9 @@ import fs from 'fs'
 import colors from 'colors'
 
 
-class PacakageFilesInterface {
-  constructor() {
-    this.packageFileName = 'package.zos.json'
+export default class PackageFilesInterface {
+  constructor(packageFileName) {
+    this.packageFileName = packageFileName || 'package.zos.json'
   }
 
   /*
@@ -52,6 +52,3 @@ class PacakageFilesInterface {
     console.log(`Successfully written ${fileName}`.green)
   }
 }
-
-
-module.exports = new PacakageFilesInterface()

@@ -4,9 +4,10 @@ const AppManager = {
   upgradeProxy: () => '2.0.1'
 }
 
+const interface = new PackageFilesInterface();
 
 function upgradeProxy(network, proxyAddress, contractName, ...args) {
-  const zosNetworkFile = PackageFilesInterface.readNetworkFile(network)
+  const zosNetworkFile = interface.readNetworkFile(network)
   const { proxies } = zosNetworkFile
 
   const index = proxies[contractName].findIndex(proxy => proxy.address === proxyAddress)
@@ -20,7 +21,7 @@ function upgradeProxy(network, proxyAddress, contractName, ...args) {
   proxies[contractName][index].version = newVersion
 
   zosNetworkFile.proxies = proxies
-  PackageFilesInterface.writeNetworkFile(network, zosNetworkFile)
+  interface.writeNetworkFile(network, zosNetworkFile)
 }
 
 

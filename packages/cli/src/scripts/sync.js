@@ -4,10 +4,11 @@ const AppManager = {
   getImplementation: contractName => `${contractName}_contract_address`
 }
 
+const interface = new PackageFilesInterface();
 
 function sync(network) {
-  const zosPackage = PackageFilesInterface.read()
-  const zosNetworkFile = PackageFilesInterface.readNetworkFile(network)
+  const zosPackage = interface.read()
+  const zosNetworkFile = interface.readNetworkFile(network)
 
   zosNetworkFile.app.version = zosPackage.version
 
@@ -18,7 +19,7 @@ function sync(network) {
     zosNetworkFile.package.contracts[contractName] = AppManager.getImplementation(contractName)
   }
 
-  PackageFilesInterface.writeNetworkFile(network, zosNetworkFile)
+  interface.writeNetworkFile(network, zosNetworkFile)
 }
 
 

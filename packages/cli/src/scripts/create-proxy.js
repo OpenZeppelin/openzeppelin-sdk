@@ -4,10 +4,11 @@ const AppManager = {
   create: () => '0x2'
 }
 
+const interface = new PackageFilesInterface();
 
 function createProxy(network, contractName, version, ...args) {
   // TODO: if network file does not exists, create it
-  const zosNetworkFile = PackageFilesInterface.readNetworkFile(network)
+  const zosNetworkFile = interface.readNetworkFile(network)
   const { proxies } = zosNetworkFile
 
   const address = AppManager.create(version, contractName)
@@ -19,7 +20,7 @@ function createProxy(network, contractName, version, ...args) {
   proxies[contractName].push({ address, version })
 
   zosNetworkFile.proxies = proxies
-  PackageFilesInterface.writeNetworkFile(network, zosNetworkFile)
+  interface.writeNetworkFile(network, zosNetworkFile)
 }
 
 
