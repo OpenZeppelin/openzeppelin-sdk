@@ -10,7 +10,7 @@ const should = require('chai')
       .use(require('chai-as-promised'))
       .should();
 
-contract.skip('create-proxy command', function([_, owner]) {
+contract('create-proxy command', function([_, owner]) {
 
   const from = owner;
   const appName = "MyApp";
