@@ -11,7 +11,7 @@ const should = require('chai')
       .use(require('chai-as-promised'))
       .should();
 
-contract.only('create-proxy command', function([_, owner]) {
+contract.skip('upgrade-proxy command', function([_, owner]) {
 
   const from = owner;
   const appName = "MyApp";
@@ -41,7 +41,7 @@ contract.only('create-proxy command', function([_, owner]) {
   it('should upgrade the version of a proxy', async function() {
     let data = files.readNetworkFile(network);
     let proxy = data.proxies[contractAlias][0];
-    await upgradeProxy(proxy.address, contractAlias {network, packageFileName, from});
+    await upgradeProxy(proxy.address, contractAlias, {network, packageFileName, from});
     data = files.readNetworkFile(network);
     proxy = data.proxies[contractAlias][0];
     proxy.version.should.eq(version);
