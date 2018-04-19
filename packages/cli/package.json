@@ -6,6 +6,9 @@
   "scripts": {
     "test": "NODE_ENV=test truffle test"
   },
+  "bin": {
+    "zos": "./bin/zos-cli.js"
+  },
   "repository": {
     "type": "git",
     "url": "git+ssh://git@github.com/zeppelinos/cli.git"
