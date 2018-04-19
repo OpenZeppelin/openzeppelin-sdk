@@ -1,4 +1,4 @@
-import PackageFilesInterface from '../../utils/PackageFilesInterface'
+import PackageFilesInterface from '../utils/PackageFilesInterface'
 
 const DEFAULT_VERSION = '0.1.0'
 const BASE_PACKAGE = {
