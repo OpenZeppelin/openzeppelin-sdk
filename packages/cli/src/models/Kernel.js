@@ -30,17 +30,6 @@ export default class KernelWrapper {
     return this.newVersionCost
   }
 
-  async validateCanRegister(release) {
-    await this._ifRegisteredThrow(release, `Given release ${release} must be frozen to be registered.`)
-    await this._ifFrozenThrow(release, `Given release ${release} must be frozen to be registered.`)
-    await this._ifNotEnoughBalanceToRegisterThrow(`You don't have enough ZEP tokens to register a new release.`)
-  }
-
-  async validateCanUnvouch(release, amount) {
-    await this._ifNotRegisteredThrow(release, `Given release ${release} is not registered yet.`)
-    await this._ifNotEnoughVouchThrow(release, amount, "You don't have enough vouched tokens to unvouch given amount.")
-  }
-
   async register(release) {
     const newVersionCost = await this.newVersionCost()
     console.log(`Approving ${newVersionCost} ZEP tokens to zOS kernel contract...`)
@@ -51,10 +40,36 @@ export default class KernelWrapper {
     console.log(`Release registered successfully. Transaction hash: ${receipt.tx}.`)
   }
 
+  async vouch(release, amount, data = '') {
+    console.log(`Approving ${amount} ZEP tokens to zOS kernel contract...`)
+    const zepToken = await this.zepToken()
+    await zepToken.approve(this.kernel.address, amount, this.txParams)
+    console.log(`Vouching ${amount} ZEP tokens for release ${release}...`)
+    const receipt = await this.kernel.vouch(release, amount, data, this.txParams)
+    console.log(`Vouch processed successfully. Transaction hash: ${receipt.tx}.`)
+  }
+
   async unvouch(release, amount, data = '') {
     console.log(`Unvouching ${amount} ZEP tokens from release ${release}...`)
-    const receipt = await kernel.unvouch(release, amount, data, this.txParams)
+    const receipt = await this.kernel.unvouch(release, amount, data, this.txParams)
     console.log(`Unvouch processed successfully. Transaction hash: ${receipt.tx}.`)
+  }
+
+  async validateCanRegister(release) {
+    await this._ifRegisteredThrow(release, `Given release ${release} must be frozen to be registered.`)
+    await this._ifFrozenThrow(release, `Given release ${release} must be frozen to be registered.`)
+    await this._ifNotEnoughBalanceToRegisterThrow(`You don't have enough ZEP tokens to register a new release.`)
+  }
+
+  async validateCanVouch(release, amount) {
+    await this._ifNotRegisteredThrow(release, `Given release ${release} is not registered yet.`)
+    await this._ifNotEnoughZepBalance(amount, "You don't have enough ZEP tokens to vouch given amount.")
+    await this._ifDoesNotReachPayout(amount, `You have to vouch ${await this.kernel.developerFraction()} ZEP tokens at least.`)
+  }
+
+  async validateCanUnvouch(release, amount) {
+    await this._ifNotRegisteredThrow(release, `Given release ${release} is not registered yet.`)
+    await this._ifNotEnoughVouchThrow(release, amount, "You don't have enough vouched tokens to unvouch given amount.")
   }
 
   async _ifRegisteredThrow(release, error) {
@@ -76,9 +91,22 @@ export default class KernelWrapper {
   async _ifNotEnoughBalanceToRegisterThrow(error) {
     const zepToken = await this.zepToken()
     const newVersionCost = await this.newVersionCost()
-    const developerBalance = await zepToken.balanceOf(this.txParams.from, this.txParams)
+    const developerBalance = await zepToken.balanceOf(this.txParams.from)
     const doesNotHaveEnoughTokens = developerBalance.lt(newVersionCost)
     if(doesNotHaveEnoughTokens) throw new Error(error)
+  }
+
+  async _ifNotEnoughZepBalance(amount, error) {
+    const zepToken = await this.zepToken()
+    const voucherBalance = await zepToken.balanceOf(this.txParams.from)
+    const doesNotHaveEnoughTokens = voucherBalance.lt(amount)
+    if(doesNotHaveEnoughTokens) throw new Error(error)
+  }
+
+  async _ifDoesNotReachPayout(amount, error) {
+    const developerFraction = await this.kernel.developerFraction()
+    const payout = amount.divToInt(developerFraction)
+    if(payout <= 0) throw new Error(error)
   }
 
   async _ifNotEnoughVouchThrow(release, amount, error) {

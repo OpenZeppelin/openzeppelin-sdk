@@ -1,51 +1,21 @@
+import Kernel from '../models/Kernel'
+import promptBoolean from '../utils/promptBoolean'
+
 const BigNumber = web3.BigNumber
-const contract = require("truffle-contract")
-const promptBoolean = require('../utils/promptBoolean')
 const { KERNEL_ADDRESS } = require('../utils/constants')
-const { ZEP_TOKEN_ADDRESS } = require('../utils/constants')
 
 async function vouch(releaseAddress, rawAmount, { from }) {
+  const kernelAddress = KERNEL_ADDRESS
+  const txParams = { from: from, gas: 6000000 }
+
   const data = ''
   const amount = new BigNumber(rawAmount)
-  const voucher = from
-
-  const Kernel = contract(require('zos-kernel/build/contracts/Kernel.json'))
-  Kernel.setProvider(web3.currentProvider)
-  const kernel = Kernel.at(KERNEL_ADDRESS)
-
-  const ZepToken = contract(require('zos-kernel/build/contracts/ZepToken.json'))
-  ZepToken.setProvider(web3.currentProvider)
-  const zepToken = ZepToken.at(ZEP_TOKEN_ADDRESS)
-
-  const txParams = { from: voucher, gas: 6000000  }
-
-  const isRegistered = await kernel.isRegistered(releaseAddress, txParams)
-  if(!isRegistered) {
-    console.error(`Given release ${releaseAddress} is not registered yet.`)
-    return
-  }
-
-  const voucherBalance = await zepToken.balanceOf(voucher, txParams)
-  const doesNotHaveEnoughTokens = voucherBalance.lt(amount)
-  if(doesNotHaveEnoughTokens) {
-    console.error("You don't have enough ZEP tokens to vouch given amount.")
-    return
-  }
-
-  const developerFraction = await kernel.developerFraction(txParams)
-  const payout = amount.divToInt(developerFraction)
-  if(payout <= 0) {
-    console.error(`You have to vouch ${developerFraction} ZEP tokens at least.`)
-    return
-  }
+  const kernel = new Kernel(kernelAddress, txParams)
+  await kernel.validateCanVouch(releaseAddress, amount)
 
   promptBoolean(`Are you sure you want to vouch ${amount} ZEP tokens for release ${releaseAddress}?`, async function () {
     try {
-      console.log(`Approving ${amount} ZEP tokens to zOS kernel contract...`)
-      await zepToken.approve(KERNEL_ADDRESS, amount, txParams)
-      console.log(`Vouching ${amount} ZEP tokens for release ${releaseAddress}...`)
-      const receipt = await kernel.vouch(releaseAddress, amount, data, txParams)
-      console.log(`Vouch processed successfully. Transaction hash: ${receipt.transactionHash}.`)
+      await this.kernel.vouch(releaseAddress, amount, data)
     } catch (error) {
       console.error('There was an error trying to vouch your tokens.', error)
     }
