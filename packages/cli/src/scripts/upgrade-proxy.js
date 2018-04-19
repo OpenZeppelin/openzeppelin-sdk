@@ -1,9 +1,11 @@
 import PackageFilesInterface from '../utils/PackageFilesInterface'
-import AppManager from './models/AppManager'
+import AppManager from '../models/AppManager'
 
 
 async function upgradeProxy(proxyAddress, contractName, { network, from, packageFileName }) {
+  const appManager = new AppManager(from)
   const files = new PackageFilesInterface(packageFileName)
+
   const zosNetworkFile = files.readNetworkFile(network)
   const { proxies } = zosNetworkFile
 
@@ -15,10 +17,10 @@ async function upgradeProxy(proxyAddress, contractName, { network, from, package
   }
 
   await AppManager.upgradeProxy(proxyAddress, contractName)
-  proxies[contractName][index].version = AppManager.version
+  proxies[contractName][index].version = appManager.version
 
   zosNetworkFile.proxies = proxies
   files.writeNetworkFile(network, zosNetworkFile)
 }
 
-export default upgradeProxy
+module.exports = upgradeProxy

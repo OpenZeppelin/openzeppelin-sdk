@@ -37,7 +37,6 @@ class AppManagerWrapper {
     this.factory = UpgradeabilityProxyFactory.at(await this.appManager.factory());
     this.version = await this.appManager.version();
     this.directories[this.version] = AppDirectory.at(await this.package.getVersion(this.version));
-    console.log(this.version)
   }
 
   async newVersion(versionName) {
