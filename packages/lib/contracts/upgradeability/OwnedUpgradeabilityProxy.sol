@@ -8,26 +8,26 @@ import './UpgradeabilityProxy.sol';
  */
 contract OwnedUpgradeabilityProxy is UpgradeabilityProxy {
   /**
-  * @dev Event to show ownership has been transferred
-  * @param previousOwner representing the address of the previous owner
-  * @param newOwner representing the address of the new owner
-  */
+   * @dev Event to show ownership has been transferred
+   * @param previousOwner representing the address of the previous owner
+   * @param newOwner representing the address of the new owner
+   */
   event ProxyOwnershipTransferred(address previousOwner, address newOwner);
 
   // Storage position of the owner of the contract
   bytes32 private constant proxyOwnerPosition = keccak256("org.zeppelinos.proxy.owner");
 
   /**
-  * @dev Throws if called by any account other than the owner.
-  */
+   * @dev Throws if called by any account other than the owner.
+   */
   modifier onlyProxyOwner() {
     require(msg.sender == proxyOwner());
     _;
   }
 
   /**
-  * @dev the constructor sets the original owner of the contract to the sender account.
-  */
+   * @dev the constructor sets the original owner of the contract to the sender account.
+   */
   function OwnedUpgradeabilityProxy() public {
     setUpgradeabilityOwner(msg.sender);
   }
