@@ -2,6 +2,7 @@ import init from "../../src/scripts/init.js";
 import newVersion from "../../src/scripts/new-version.js";
 import fs from 'fs';
 import PackageFilesInterface from '../../src/utils/PackageFilesInterface';
+import { cleanup, cleanupfn } from "../helpers/cleanup.js";
 
 const should = require('chai')
       .use(require('chai-as-promised'))
@@ -16,13 +17,11 @@ contract('new-version command', function([_, owner]) {
   const files = new PackageFilesInterface(packageFileName);
 
   beforeEach('setup', async function() {
+    cleanup(packageFileName)
     await init(appName, defaultVersion, {packageFileName});
   });
 
-  afterEach('cleanup', function() {
-    console.log('cleaning up files...');
-    fs.unlinkSync(packageFileName);
-  });
+  after('cleanup', cleanupfn(packageFileName));
 
   it('it should update the app version in the main package file', async function() {
     const version = '0.2.0';

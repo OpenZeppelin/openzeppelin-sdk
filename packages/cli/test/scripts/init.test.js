@@ -1,6 +1,11 @@
 import init from "../../src/scripts/init.js";
 import fs from 'fs';
 import PackageFilesInterface from '../../src/utils/PackageFilesInterface';
+import { cleanupfn } from "../helpers/cleanup.js";
+
+const should = require('chai')
+      .use(require('chai-as-promised'))
+      .should();
 
 contract('init command', function(accounts) {
 
@@ -9,10 +14,8 @@ contract('init command', function(accounts) {
   const defaultVersion = "0.1.0";
   const files = new PackageFilesInterface(packageFileName);
 
-  afterEach('cleanup', function() {
-    console.log('cleaning up files...');
-    fs.unlinkSync(packageFileName);
-  });
+  beforeEach(cleanupfn(packageFileName))
+  after(cleanupfn(packageFileName))
 
   describe('created file', function() {
 

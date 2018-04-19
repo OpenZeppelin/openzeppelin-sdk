@@ -6,6 +6,7 @@ import createProxy from "../../src/scripts/create-proxy.js";
 import upgradeProxy from "../../src/scripts/upgrade-proxy.js";
 import fs from 'fs';
 import PackageFilesInterface from '../../src/utils/PackageFilesInterface';
+import { cleanup, cleanupfn } from "../helpers/cleanup.js";
 
 const should = require('chai')
       .use(require('chai-as-promised'))
@@ -25,6 +26,9 @@ contract.skip('upgrade-proxy command', function([_, owner]) {
   const files = new PackageFilesInterface(packageFileName);
 
   beforeEach('setup', async function() {
+    cleanup(packageFileName)
+    cleanup(networkPackageFileName)
+
     await init(appName, defaultVersion, {packageFileName});
     await addImplementation(contractName, contractAlias, {packageFileName});
     await sync({ packageFileName, network, from });
@@ -32,11 +36,8 @@ contract.skip('upgrade-proxy command', function([_, owner]) {
     await newVersion(version, {packageFileName});
   });
 
-  afterEach('cleanup', function() {
-    console.log('cleaning up files...');
-    fs.unlinkSync(packageFileName);
-    fs.unlinkSync(networkPackageFileName);
-  });
+  after(cleanupfn(packageFileName));
+  after(cleanupfn(networkPackageFileName));
 
   it('should upgrade the version of a proxy', async function() {
     let data = files.readNetworkFile(network);

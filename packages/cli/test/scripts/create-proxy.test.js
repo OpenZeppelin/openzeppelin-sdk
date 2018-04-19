@@ -4,6 +4,7 @@ import sync from "../../src/scripts/sync.js";
 import createProxy from "../../src/scripts/create-proxy.js";
 import fs from 'fs';
 import PackageFilesInterface from '../../src/utils/PackageFilesInterface';
+import { cleanup, cleanupfn } from "../helpers/cleanup.js";
 
 const should = require('chai')
       .use(require('chai-as-promised'))
@@ -22,16 +23,15 @@ contract.skip('create-proxy command', function([_, owner]) {
   const files = new PackageFilesInterface(packageFileName);
 
   beforeEach('setup', async function() {
+    cleanup(packageFileName)
+    cleanup(networkPackageFileName)
     await init(appName, defaultVersion, {packageFileName});
     await addImplementation(contractName, contractAlias, {packageFileName});
     await sync({ packageFileName, network, from });
   });
 
-  afterEach('cleanup', function() {
-    console.log('cleaning up files...');
-    fs.unlinkSync(packageFileName);
-    fs.unlinkSync(networkPackageFileName);
-  });
+  after(cleanupfn(packageFileName))
+  after(cleanupfn(networkPackageFileName))
 
   it('should create a proxy for one of its contracts', async function() {
     await createProxy(contractAlias, {packageFileName, network, from});

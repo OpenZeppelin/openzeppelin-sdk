@@ -2,6 +2,11 @@ import init from "../../src/scripts/init.js";
 import addImplementation from "../../src/scripts/add-implementation.js";
 import fs from 'fs';
 import PackageFilesInterface from '../../src/utils/PackageFilesInterface';
+import { cleanup, cleanupfn } from "../helpers/cleanup.js";
+
+const should = require('chai')
+      .use(require('chai-as-promised'))
+      .should();
 
 contract('add-implementation command', function(accounts) {
 
@@ -13,13 +18,11 @@ contract('add-implementation command', function(accounts) {
   const files = new PackageFilesInterface(packageFileName);
 
   beforeEach('setup', function() {
+    cleanup(packageFileName);
     init(appName, defaultVersion, {packageFileName});
   });
 
-  afterEach('cleanup', function() {
-    console.log('cleaning up files...');
-    fs.unlinkSync(packageFileName);
-  });
+  after(cleanupfn(packageFileName));
 
   it('should add an implementation with an alias and a filename', function() {
     addImplementation(contractName, contractAlias, {packageFileName});
