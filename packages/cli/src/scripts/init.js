@@ -17,7 +17,7 @@ async function init(name, version, { from, packageFileName }) {
     return
   }
 
-  const files = new PackageFilesInterface(packageFileName);
+  const files = new PackageFilesInterface(packageFileName)
   const zosPackage = BASE_PACKAGE
 
   zosPackage.name = name

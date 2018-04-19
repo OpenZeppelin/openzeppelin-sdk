@@ -5,7 +5,7 @@ class Logger {
     this.prefix = prefix
   }
 
-  success(msg) {
+  info(msg) {
     console.log(`[${this.prefix}] ${msg}`.green)
   }
 
@@ -15,7 +15,7 @@ class Logger {
 }
 
 class SilentLogger {
-  success(msg) { }
+  info(msg) { }
   error(msg) { }
 }
 

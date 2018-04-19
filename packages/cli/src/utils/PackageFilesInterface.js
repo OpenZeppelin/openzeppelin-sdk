@@ -64,6 +64,6 @@ export default class PackageFilesInterface {
   writeTo(fileName, zosPackage) {
     const data = JSON.stringify(zosPackage, null, 2)
     fs.writeFileSync(fileName, data)
-    log.success(`Successfully written ${fileName}`)
+    log.info(`Successfully written ${fileName}`)
   }
 }
