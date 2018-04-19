@@ -1,12 +1,9 @@
 import PackageFilesInterface from '../utils/PackageFilesInterface'
-
-const AppManager = {
-  getImplementation: contractName => `${contractName}_contract_address`
-}
+import { AppManager } from './models/AppManager'
 
 const interface = new PackageFilesInterface();
 
-function initProxies(network) {
+async function initProxies(network) {
   const zosPackage = interface.read()
 
   const zosNetworkFile = {
@@ -21,7 +18,7 @@ function initProxies(network) {
   delete zosNetworkFile.package['version']
 
   for (let contractName in zosPackage.contracts) {
-    zosNetworkFile.package.contracts[contractName] = AppManager.getImplementation(contractName)
+    zosNetworkFile.package.contracts[contractName] = await AppManager.getImplementation(contractName)
   }
 
   interface.writeNetworkFile(network, zosNetworkFile)

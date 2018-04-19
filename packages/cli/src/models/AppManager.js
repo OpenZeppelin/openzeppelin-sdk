@@ -43,6 +43,11 @@ class AppManagerWrapper {
     this.version = versionName;
   }
 
+  async getImplementation(contractName) {
+    const directory = this.getCurrentDirectory();
+    return directory.getImplementation(contractName)
+  }
+
   async setImplementation(contractClass, contractName) {
     const implementation = await contractClass.new({ from: this.owner });
     const directory = this.getCurrentDirectory();

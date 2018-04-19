@@ -1,22 +1,25 @@
 import PackageFilesInterface from '../utils/PackageFilesInterface'
-
-const AppManager = {
-  getImplementation: contractName => `${contractName}_contract_address`
-}
+import { AppManager } from './models/AppManager'
 
 const interface = new PackageFilesInterface();
 
-function sync(network) {
+async function sync(network) {
   const zosPackage = interface.read()
   const zosNetworkFile = interface.readNetworkFile(network)
 
-  zosNetworkFile.app.version = zosPackage.version
+  if (zosPackage.version !== zosNetworkFile.app.version) {
+    await AppManager.newVersion(zosPackage.version)
+    zosNetworkFile.app.version = zosPackage.version
+  }
 
   delete zosPackage['version']
   zosNetworkFile.package = zosPackage
 
   for (let contractName in zosPackage.contracts) {
-    zosNetworkFile.package.contracts[contractName] = AppManager.getImplementation(contractName)
+    // TODO: store the implementation's hash to avoid unnecessary deployments
+    const contractClass = artifacts.require(contractName)
+    const contractInstance = await AppManager.setImplementation(contractClass, contractName)
+    zosNetworkFile.package.contracts[contractName] = contractInstance.address
   }
 
   interface.writeNetworkFile(network, zosNetworkFile)

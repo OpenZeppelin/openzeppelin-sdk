@@ -1,12 +1,9 @@
 import PackageFilesInterface from '../utils/PackageFilesInterface'
-
-const AppManager = {
-  upgradeProxy: () => '2.0.1'
-}
+import { AppManager } from './models/AppManager'
 
 const interface = new PackageFilesInterface();
 
-function upgradeProxy(network, proxyAddress, contractName, ...args) {
+async function upgradeProxy(network, proxyAddress, contractName, ...args) {
   const zosNetworkFile = interface.readNetworkFile(network)
   const { proxies } = zosNetworkFile
 
@@ -17,8 +14,8 @@ function upgradeProxy(network, proxyAddress, contractName, ...args) {
     return
   }
 
-  const newVersion = AppManager.upgradeProxy(proxyAddress, contractName)
-  proxies[contractName][index].version = newVersion
+  await AppManager.upgradeProxy(proxyAddress, contractName)
+  proxies[contractName][index].version = AppManager.version
 
   zosNetworkFile.proxies = proxies
   interface.writeNetworkFile(network, zosNetworkFile)
