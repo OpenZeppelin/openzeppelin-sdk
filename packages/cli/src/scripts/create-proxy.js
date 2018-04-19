@@ -28,13 +28,13 @@ async function createProxy(contractAlias, { network, from, packageFileName }) {
   }
 
   const contractClass = artifacts.require(contractName)
-  const proxyInstance = await appManager.createProxy(contractClass, contractName)
+  const proxyInstance = await appManager.createProxy(contractClass, contractAlias)
 
   const { address } = proxyInstance
   const { version } = appManager
 
-  proxies[contractName] = proxies[contractName] || []
-  proxies[contractName].push({ address, version })
+  proxies[contractAlias] = proxies[contractAlias] || []
+  proxies[contractAlias].push({ address, version })
 
   zosNetworkFile.proxies = proxies
   files.writeNetworkFile(network, zosNetworkFile)
