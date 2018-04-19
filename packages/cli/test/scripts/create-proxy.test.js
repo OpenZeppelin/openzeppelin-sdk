@@ -1,0 +1,66 @@
+import init from "../../src/scripts/init.js";
+import addImplementation from "../../src/scripts/add-implementation.js";
+import sync from "../../src/scripts/sync.js";
+import createProxy from "../../src/scripts/create-proxy.js";
+import fs from 'fs';
+import PackageFilesInterface from '../../src/utils/PackageFilesInterface';
+
+const should = require('chai')
+      .use(require('chai-as-promised'))
+      .should();
+
+contract.only('create-proxy command', function([_, owner]) {
+
+  const from = owner;
+  const appName = "MyApp";
+  const contractName = "ImplV1";
+  const contractAlias = "Impl";
+  const defaultVersion = "0.1.0";
+  const packageFileName = "package.test.zos.json";
+  const network = "test";
+  const networkPackageFileName = `package.zos.${network}.json`;
+  const files = new PackageFilesInterface(packageFileName);
+
+  beforeEach('setup', async function() {
+    await init(appName, defaultVersion, {packageFileName});
+    await addImplementation(contractName, contractAlias, {packageFileName});
+    await sync({ packageFileName, network, from });
+  });
+
+  afterEach('cleanup', function() {
+    console.log('cleaning up files...');
+    fs.unlinkSync(packageFileName);
+    fs.unlinkSync(networkPackageFileName);
+  });
+
+  it('should create a proxy for one of its contracts', async function() {
+    await createProxy(contractAlias, {packageFileName, network, from});
+    const data = files.readNetworkFile(network);
+    const proxy0 = data.proxies[contractAlias][0];
+    proxy0.address.should.be.not.null;
+    proxy0.version.should.be.eq(defaultVersion);
+  });
+
+  it('should be able to have multiple proxies for one of its contracts', async function() {
+    await createProxy(contractAlias, {packageFileName, network, from});
+    await createProxy(contractAlias, {packageFileName, network, from});
+    await createProxy(contractAlias, {packageFileName, network, from});
+    const data = files.readNetworkFile(network);
+    assert.equal(3, data.proxies[contractAlias].length);
+  });
+
+  it('should be able to handle proxies for more than one contract', async function() {
+    const customAlias = 'SomeOtherAlias';
+    await addImplementation('ImplV2.sol', customAlias, {packageFileName});
+    await sync({ packageFileName, network, from });
+    await createProxy(contractAlias, {packageFileName, network, from});
+    await createProxy(customAlias, {packageFileName, network, from});
+    const data = files.readNetworkFile(network);
+    const proxy0 = data.proxies[contractAlias][0];
+    const proxy1 = data.proxies[customAlias][0];
+    proxy0.address.should.be.not.null;
+    proxy0.version.should.be.eq(defaultVersion);
+    proxy1.address.should.be.not.null;
+    proxy1.version.should.be.eq(defaultVersion);
+  });
+});
