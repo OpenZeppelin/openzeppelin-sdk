@@ -7,7 +7,7 @@ const should = require('chai')
       .use(require('chai-as-promised'))
       .should();
 
-contract.only('create-proxy command', function([_, owner]) {
+contract('new-version command', function([_, owner]) {
 
   const from = owner;
   const appName = "MyApp";
@@ -26,8 +26,8 @@ contract.only('create-proxy command', function([_, owner]) {
 
   it('it should update the app version in the main package file', async function() {
     const version = '0.2.0';
-    await newVersion(version);
+    await newVersion(version, {packageFileName});
     const data = files.read();
-    data.version.should.eq(versoin);
+    data.version.should.eq(version);
   });
 });
