@@ -14,5 +14,10 @@ class Logger {
   }
 }
 
+class SilentLogger {
+  success(msg) { }
+  error(msg) { }
+}
 
-module.exports = Logger
+
+module.exports = process.env.NODE_ENV === 'test' ? SilentLogger : Logger

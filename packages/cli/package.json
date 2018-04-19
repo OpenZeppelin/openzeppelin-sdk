@@ -4,7 +4,7 @@
   "description": "zeppelin_os command line interface",
   "main": "index.js",
   "scripts": {
-    "test": "truffle test"
+    "test": "NODE_ENV=test truffle test"
   },
   "repository": {
     "type": "git",
