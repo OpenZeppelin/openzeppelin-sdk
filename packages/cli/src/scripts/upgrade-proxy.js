@@ -1,7 +1,7 @@
 import PackageFilesInterface from '../utils/PackageFilesInterface'
 import { AppManager } from './models/AppManager'
 
-const interface = new PackageFilesInterface();
+const interface = new PackageFilesInterface()
 
 async function upgradeProxy(network, proxyAddress, contractName, ...args) {
   const zosNetworkFile = interface.readNetworkFile(network)

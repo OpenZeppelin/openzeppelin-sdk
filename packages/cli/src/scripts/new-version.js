@@ -1,6 +1,6 @@
 import PackageFilesInterface from '../utils/PackageFilesInterface'
 
-const interface = new PackageFilesInterface();
+const interface = new PackageFilesInterface()
 
 function newVersion(version, ...args) {
   const zosPackage = interface.read()

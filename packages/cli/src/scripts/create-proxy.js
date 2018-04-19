@@ -1,7 +1,7 @@
 import PackageFilesInterface from '../utils/PackageFilesInterface'
 import { AppManager } from './models/AppManager'
 
-const interface = new PackageFilesInterface();
+const interface = new PackageFilesInterface()
 
 async function createProxy(network, contractName, ...args) {
   // TODO: if network file does not exists, create it
