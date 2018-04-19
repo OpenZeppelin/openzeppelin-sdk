@@ -61,7 +61,7 @@ function createNetworkFile(network, address, packageFileName) {
   const zosNetworkFile = {
     'app': { address, version },
     'proxies': {},
-    'package': zosPackage
+    ...zosPackage
   }
 
   files.writeNetworkFile(network, zosNetworkFile)
