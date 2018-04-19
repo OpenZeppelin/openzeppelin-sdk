@@ -16,7 +16,8 @@ async function upgradeProxy(proxyAddress, contractName, { network, from, package
     return
   }
 
-  await AppManager.upgradeProxy(proxyAddress, contractName)
+  await appManager.connect(zosNetworkFile.app.address)
+  await appManager.upgradeProxy(proxyAddress, contractName)
   proxies[contractName][index].version = appManager.version
 
   zosNetworkFile.proxies = proxies
