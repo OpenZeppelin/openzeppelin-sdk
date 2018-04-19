@@ -1,18 +1,17 @@
-const readline = require('readline')
-
-export default function promptBoolean(question, onTrue, onFalse = () => {}) {
+function promptBoolean(question, onTrue, onFalse = () => {}) {
+  const readline = require('readline')
   const prompt = readline.createInterface({ input: process.stdin, output: process.stdout });
 
-  const recursivePrompt = () => {
-    prompt.question(`${question} (Y/n): `, function(answer) {
+  function recursivePrompt() {
+    prompt.question(`${question} (Y/n): `, async function (answer) {
       const parsedAnswer = answer.toUpperCase();
-      if(parsedAnswer === 'Y') {
+      if(parsedAnswer === 'Y' || parsedAnswer === '') {
         prompt.close()
-        onTrue()
+        await onTrue()
       }
       else if(parsedAnswer === 'N') {
         prompt.close()
-        onFalse()
+        await onFalse()
       }
       else {
         console.log('Please enter a valid answer')
@@ -23,3 +22,5 @@ export default function promptBoolean(question, onTrue, onFalse = () => {}) {
 
   recursivePrompt()
 }
+
+module.exports = promptBoolean

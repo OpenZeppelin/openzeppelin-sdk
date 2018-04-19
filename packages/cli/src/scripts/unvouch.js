@@ -1,25 +1,22 @@
 import Kernel from '../models/Kernel'
-import promptBoolean from '../utils/promptBoolean'
+import kernelAddress from '../utils/kernelAddress'
 
-const BigNumber = web3.BigNumber
-const { KERNEL_ADDRESS } = require('../utils/constants')
-
-async function unvouch(releaseAddress, rawAmount, { from }) {
-  const kernelAddress = KERNEL_ADDRESS
-  const txParams = { from: from, gas: 6000000 }
+async function unvouch(releaseAddress, rawAmount, { network, from }) {
+  if(!releaseAddress) throw new Error('You must provide a release address to unvouch from')
+  if(!rawAmount) throw new Error('You must provide an amount of ZEP tokens to unvouch')
+  const address = kernelAddress(network)
+  const txParams = Object.assign({}, global.truffleDefaults, { from })
 
   const data = ''
-  const amount = new BigNumber(rawAmount)
-  const kernel = new Kernel(kernelAddress, txParams)
+  const amount = new web3.BigNumber(rawAmount)
+  const kernel = new Kernel(address, txParams)
   await kernel.validateCanUnvouch(releaseAddress, amount)
 
-  promptBoolean(`Are you sure you want to unvouch ${amount} ZEP tokens from release ${releaseAddress}?`, async function () {
-    try {
-      await kernel.unvouch(releaseAddress, amount, data)
-    } catch (error) {
-      console.error('There was an error trying to unvouch your tokens.', error)
-    }
-  })
+  try {
+    await kernel.unvouch(releaseAddress, amount, data)
+  } catch (error) {
+    console.error('There was an error trying to unvouch your tokens.', error)
+  }
 }
 
 module.exports = unvouch

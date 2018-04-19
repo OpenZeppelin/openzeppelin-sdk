@@ -1,25 +1,22 @@
 import Kernel from '../models/Kernel'
-import promptBoolean from '../utils/promptBoolean'
+import kernelAddress from '../utils/kernelAddress'
 
-const BigNumber = web3.BigNumber
-const { KERNEL_ADDRESS } = require('../utils/constants')
-
-async function vouch(releaseAddress, rawAmount, { from }) {
-  const kernelAddress = KERNEL_ADDRESS
-  const txParams = { from: from, gas: 6000000 }
+async function vouch(releaseAddress, rawAmount, { network, from }) {
+  if(!releaseAddress) throw new Error('You must provide a release address to vouch for')
+  if(!rawAmount) throw new Error('You must provide a vouching amount of ZEP tokens')
+  const address = kernelAddress(network)
+  const txParams = Object.assign({}, global.truffleDefaults, { from })
 
   const data = ''
-  const amount = new BigNumber(rawAmount)
-  const kernel = new Kernel(kernelAddress, txParams)
+  const amount = new web3.BigNumber(rawAmount)
+  const kernel = new Kernel(address, txParams)
   await kernel.validateCanVouch(releaseAddress, amount)
 
-  promptBoolean(`Are you sure you want to vouch ${amount} ZEP tokens for release ${releaseAddress}?`, async function () {
-    try {
-      await this.kernel.vouch(releaseAddress, amount, data)
-    } catch (error) {
-      console.error('There was an error trying to vouch your tokens.', error)
-    }
-  })
+  try {
+    await kernel.vouch(releaseAddress, amount, data)
+  } catch (error) {
+    console.error('There was an error trying to vouch your tokens.', error)
+  }
 }
 
 module.exports = vouch

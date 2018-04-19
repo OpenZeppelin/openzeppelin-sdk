@@ -1,22 +1,19 @@
 import Kernel from '../models/Kernel'
-import promptBoolean from '../utils/promptBoolean'
-const { KERNEL_ADDRESS } = require('../utils/constants')
+import kernelAddress from '../utils/kernelAddress'
 
-async function register(releaseAddress, { from }) {
-  const kernelAddress = KERNEL_ADDRESS
-  const txParams = { from: from, gas: 6000000 }
+async function register(releaseAddress, { network, from }) {
+  if(!releaseAddress) throw new Error('You must provide a release address')
+  const address = kernelAddress(network)
+  const txParams = Object.assign({}, global.truffleDefaults, { from })
 
-  const kernel = new Kernel(kernelAddress, txParams)
+  const kernel = new Kernel(address, txParams)
   await kernel.validateCanRegister(releaseAddress)
-  const newVersionCost = await kernel.newVersionCost()
 
-  promptBoolean(`To register a new version ${newVersionCost} ZEP tokens will be burned. Do you want to proceed?`, async function () {
-    try {
-      await kernel.register(releaseAddress)
-    } catch (error) {
-      console.error('There was an error trying to register your release.', error)
-    }
-  })
+  try {
+    await kernel.register(releaseAddress)
+  } catch (error) {
+    console.error('There was an error trying to register your release.', error)
+  }
 }
 
 module.exports = register

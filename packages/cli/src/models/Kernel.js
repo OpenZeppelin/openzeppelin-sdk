@@ -1,8 +1,8 @@
 const contract = require("truffle-contract")
-const Kernel = contract(require('zos-kernel/build/contracts/Kernel.json'))
-const Release = contract(require('zos-kernel/build/contracts/Release.json'))
-const ZepToken = contract(require('zos-kernel/build/contracts/ZepToken.json'))
-const Vouching = contract(require('zos-kernel/build/contracts/Vouching.json'))
+const Kernel = contract(require('../../node_modules/kernel/build/contracts/Kernel.json'))
+const Release = contract(require('../../node_modules/kernel/build/contracts/Release.json'))
+const ZepToken = contract(require('../../node_modules/kernel/build/contracts/ZepToken.json'))
+const Vouching = contract(require('../../node_modules/kernel/build/contracts/Vouching.json'))
 
 Kernel.setProvider(web3.currentProvider)
 Release.setProvider(web3.currentProvider)
@@ -13,21 +13,6 @@ export default class KernelWrapper {
   constructor(address, txParams) {
     this.txParams = txParams
     this.kernel = Kernel.at(address)
-  }
-
-  async zepToken() {
-    if(!this.zepToken) this.zepToken = ZepToken.at(await this.kernel.zepToken())
-    return this.zepToken
-  }
-
-  async vouching() {
-    if(!this.vouching) this.vouching = Vouching.at(await this.kernel.vouches())
-    return this.vouching
-  }
-
-  async newVersionCost() {
-    if(!this.newVersionCost) this.newVersionCost = await this.kernel.newVersionCost()
-    return this.newVersionCost
   }
 
   async register(release) {
@@ -82,8 +67,8 @@ export default class KernelWrapper {
     if(!isRegistered) throw new Error(error)
   }
 
-  async _ifFrozenThrow(release, error) {
-    const release = Release.at(release)
+  async _ifFrozenThrow(releaseAddress, error) {
+    const release = Release.at(releaseAddress)
     const isFrozen = await release.frozen(this.txParams)
     if(!isFrozen) throw new Error(error)
   }
@@ -114,5 +99,20 @@ export default class KernelWrapper {
     const vouches = await vouching.vouchedFor(this.txParams.from, release)
     const doesNotHaveEnoughVouches = vouches.lt(amount)
     if(doesNotHaveEnoughVouches) throw new Error(error)
+  }
+
+  async zepToken() {
+    if(!this.zepTokenAddress) this.zepTokenAddress = await this.kernel.token()
+    return ZepToken.at(this.zepTokenAddress)
+  }
+
+  async vouching() {
+    if(!this.vouchingAddress) this.vouchingAddress = await this.kernel.vouches()
+    return Vouching.at(this.vouchingAddress)
+  }
+
+  async newVersionCost() {
+    if(!this.versionCost) this.versionCost = await this.kernel.newVersionCost()
+    return this.versionCost
   }
 }
