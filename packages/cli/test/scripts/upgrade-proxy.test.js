@@ -12,7 +12,7 @@ const should = require('chai')
       .use(require('chai-as-promised'))
       .should();
 
-contract.skip('upgrade-proxy command', function([_, owner]) {
+contract('upgrade-proxy command', function([_, owner]) {
 
   const from = owner;
   const appName = "MyApp";
@@ -33,7 +33,7 @@ contract.skip('upgrade-proxy command', function([_, owner]) {
     await addImplementation(contractName, contractAlias, {packageFileName});
     await sync({ packageFileName, network, from });
     await createProxy(contractAlias, {packageFileName, network, from});
-    await newVersion(version, {packageFileName});
+    // await newVersion(version, {packageFileName, from});
   });
 
   after(cleanupfn(packageFileName));
