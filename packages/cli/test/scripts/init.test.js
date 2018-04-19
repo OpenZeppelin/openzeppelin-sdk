@@ -39,5 +39,13 @@ contract('init', function(accounts) {
       const data = files.read();
       data.version.should.eq(customVersion);
     });
+
+    it('should have an empty contracts object', function() {
+      init(appName, null, {packageFileName});
+      const data = files.read();
+      data.contracts.should.eql({});
+    });
+
+    // TODO: add tests for stdlib
   });
 });
