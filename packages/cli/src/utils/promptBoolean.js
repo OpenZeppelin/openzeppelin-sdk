@@ -1,6 +1,6 @@
 const readline = require('readline')
 
-function promptBoolean(question, onTrue, onFalse = () => {}) {
+export default function promptBoolean(question, onTrue, onFalse = () => {}) {
   const prompt = readline.createInterface({ input: process.stdin, output: process.stdout });
 
   const recursivePrompt = () => {
@@ -23,5 +23,3 @@ function promptBoolean(question, onTrue, onFalse = () => {}) {
 
   recursivePrompt()
 }
-
-module.exports = promptBoolean
