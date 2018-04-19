@@ -13,5 +13,5 @@ module.exports = function(cb) {
 
   const script = `./scripts/${program.args[2]}.js`
   const args = program.args.slice(3)
-  require(script)(...args, { from: program.from || web3.eth.accounts[0] }).then(cb).catch(cb)
+  require(script)(...args, { network: program.network, from: program.from || web3.eth.accounts[0] }).then(cb).catch(cb)
 }

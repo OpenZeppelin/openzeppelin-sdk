@@ -1,11 +1,27 @@
 import PackageFilesInterface from '../utils/PackageFilesInterface'
 import AppManager from '../models/AppManager'
 
+
 async function sync({ network, from, packageFileName }) {
   const files = new PackageFilesInterface(packageFileName)
-  const zosPackage = files.read()
-  const zosNetworkFile = files.readNetworkFile(network)
   const appManager = new AppManager(from)
+
+  if (! files.exists()) {
+    console.error(`Could not find package file ${packageFileName}`)
+    return
+  }
+
+  const zosPackage = files.read()
+  let zosNetworkFile
+
+  if (! files.existsNetworkFile(network)) {
+    await appManager.deploy(zosPackage.version)
+    createNetworkFile(network, appManager.address(), packageFileName)
+    zosNetworkFile = files.readNetworkFile(network)
+  } else {
+    zosNetworkFile = files.readNetworkFile(network)
+    await appManager.connect(zosNetworkFile.app.address)
+  }
 
   if (zosPackage.version !== zosNetworkFile.app.version) {
     await appManager.newVersion(zosPackage.version)
@@ -17,12 +33,31 @@ async function sync({ network, from, packageFileName }) {
 
   for (let contractName in zosPackage.contracts) {
     // TODO: store the implementation's hash to avoid unnecessary deployments
-    const contractClass = artifacts.require(contractName)
+    const contractClass = artifacts.require(zosPackage.contracts[contractName])
     const contractInstance = await appManager.setImplementation(contractClass, contractName)
     zosNetworkFile.package.contracts[contractName] = contractInstance.address
   }
 
   files.writeNetworkFile(network, zosNetworkFile)
 }
+
+
+function createNetworkFile(network, address, packageFileName) {
+  const files = new PackageFilesInterface(packageFileName)
+  const zosPackage = files.read()
+
+  const { version } = zosPackage
+  delete zosPackage['version']
+
+  const zosNetworkFile = {
+    'app': { address, version },
+    'proxies': {},
+    'package': zosPackage
+  }
+
+  files.writeNetworkFile(network, zosNetworkFile)
+  return true
+}
+
 
 module.exports = sync

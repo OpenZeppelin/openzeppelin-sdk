@@ -17,6 +17,10 @@ class AppManagerWrapper {
     return this.directories[this.version];
   }
 
+  address() {
+    return this.appManager.address;
+  }
+
   async deploy(initialVersion) {
     this.factory = await UpgradeabilityProxyFactory.new({ from: this.owner });
     this.package = await Package.new({ from: this.owner });
@@ -33,6 +37,7 @@ class AppManagerWrapper {
     this.factory = UpgradeabilityProxyFactory.at(await this.appManager.factory());
     this.version = await this.appManager.version();
     this.directories[this.version] = AppDirectory.at(await this.package.getVersion(this.version));
+    console.log(this.version)
   }
 
   async newVersion(versionName) {

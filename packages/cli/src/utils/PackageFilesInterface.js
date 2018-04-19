@@ -11,6 +11,10 @@ export default class PackageFilesInterface {
   * Package file functions
   */
 
+  exists() {
+    return this._exists(this.packageFileName)
+  }
+
   read() {
     return this.readFrom(this.packageFileName)
   }
@@ -22,6 +26,11 @@ export default class PackageFilesInterface {
   /*
   * Network file functions
   */
+
+  existsNetworkFile(network) {
+    const fileName = this.fileNameFor(network)
+    return this._exists(fileName)
+  }
 
   readNetworkFile(network) {
     const fileName = this.fileNameFor(network)
@@ -36,6 +45,10 @@ export default class PackageFilesInterface {
   /*
   * Helpers
   */
+
+  _exists(fileName) {
+    return fs.existsSync(fileName)
+  }
 
   fileNameFor(network) {
     return `package.zos.${network}.json`
