@@ -1,6 +1,5 @@
 import PackageFilesInterface from '../utils/PackageFilesInterface'
-import { AppManager } from './models/AppManager'
-
+import AppManager from "../models/AppManager";
 const interface = new PackageFilesInterface()
 
 async function upgradeProxy(network, proxyAddress, contractName, ...args) {
