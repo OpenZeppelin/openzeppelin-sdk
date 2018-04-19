@@ -1,5 +1,8 @@
-import PackageFilesInterface from '../utils/PackageFilesInterface'
 import AppManager from '../models/AppManager'
+import PackageFilesInterface from '../utils/PackageFilesInterface'
+import Logger from '../utils/Logger'
+
+const log = new Logger('sync')
 
 
 async function sync({ network, from, packageFileName }) {
@@ -7,7 +10,7 @@ async function sync({ network, from, packageFileName }) {
   const appManager = new AppManager(from)
 
   if (! files.exists()) {
-    console.error(`Could not find package file ${packageFileName}`)
+    log.error(`Could not find package file ${packageFileName}`)
     return
   }
 

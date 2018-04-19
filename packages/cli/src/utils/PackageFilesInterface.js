@@ -1,5 +1,7 @@
 import fs from 'fs'
-import colors from 'colors'
+import Logger from './Logger'
+
+const log = new Logger('PackageFilesInterface')
 
 
 export default class PackageFilesInterface {
@@ -62,6 +64,6 @@ export default class PackageFilesInterface {
   writeTo(fileName, zosPackage) {
     const data = JSON.stringify(zosPackage, null, 2)
     fs.writeFileSync(fileName, data)
-    console.log(`Successfully written ${fileName}`.green)
+    log.success(`Successfully written ${fileName}`)
   }
 }
