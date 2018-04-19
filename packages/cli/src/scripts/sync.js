@@ -34,6 +34,12 @@ async function sync({ network, from, packageFileName }) {
   delete zosPackage['version']
   zosNetworkFile.package = zosPackage
 
+  const currentProvider = await appManager.getCurrentDirectory()
+
+  zosNetworkFile.provider = {
+    'address': currentProvider.address
+  }
+
   for (let contractName in zosPackage.contracts) {
     // TODO: store the implementation's hash to avoid unnecessary deployments
     const contractClass = artifacts.require(zosPackage.contracts[contractName])
