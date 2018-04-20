@@ -16,7 +16,7 @@ module.exports = function(cb) {
   const args = program.args.slice(3)
   require(script)(...args, {
     network: program.network,
-    initArgs: program.init.split(","),
+    initArgs: program.init ? program.init.split(",") : [],
     from: program.from || web3.eth.accounts[0],
     stdlib: program.stdlib
   }).then(cb).catch(cb)
