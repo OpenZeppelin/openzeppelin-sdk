@@ -4,7 +4,7 @@
   "description": "zeppelin_os command line interface",
   "main": "lib/index.js",
   "scripts": {
-    "build": "babel src --out-dir lib",
+    "build": "sed -i 's/\\/src/\\/lib/g' bin/zos-cli.js && babel src --out-dir lib",
     "test": "NODE_ENV=test truffle test",
     "prepublish": "npm run build"
   },
