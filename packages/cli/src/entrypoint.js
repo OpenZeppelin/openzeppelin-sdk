@@ -10,6 +10,7 @@ module.exports = function(cb) {
     .option('-n, --network <network>', 'Truffle network')
     .option('-s, --stdlib <stdlib>', 'Standard library to use')
     .option('-i, --init <arg1,arg2,...>', 'Initialize arguments')
+    .option('--no-install', 'Skip installing stdlib npm dependencies')
     .parse(process.argv)
 
   const script = `./scripts/${program.args[2]}.js`
@@ -18,6 +19,7 @@ module.exports = function(cb) {
     network: program.network,
     initArgs: program.init ? program.init.split(",") : [],
     from: program.from || web3.eth.accounts[0],
-    stdlib: program.stdlib
+    stdlib: program.stdlib,
+    installDeps: program.install
   }).then(cb).catch(cb)
 }

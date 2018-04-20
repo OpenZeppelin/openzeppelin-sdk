@@ -26,10 +26,12 @@ export default class PackageFilesInterface {
     this.writeTo(this.packageFileName, zosPackage)
   }
 
-  async setStdlib(zosPackage, stdlibName) {
+  async setStdlib(zosPackage, stdlibName, installDeps) {
     if (stdlibName) {
       const stdlib = new Stdlib(stdlibName)
-      await stdlib.installDependency();
+      if (installDeps) {
+        await stdlib.installDependency();
+      }
       zosPackage.stdlib = {
         name: stdlib.getName(),
         version: stdlib.getVersion()
