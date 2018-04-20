@@ -1,7 +1,7 @@
-node_modules
-src
-test
-contracts
-migrations
-package.zos*
-truffle.js
+/node_modules
+/src
+/test
+/contracts
+/migrations
+/package.zos*
+/truffle.js

@@ -11,7 +11,7 @@ const BASE_PACKAGE = {
 }
 
 
-async function init(name, version, stdlibName, { from, packageFileName }) {
+async function init(name, version, { from, packageFileName, stdlib }) {
   if (name === undefined) {
     log.error('Must provide a project name')
     return
@@ -22,7 +22,7 @@ async function init(name, version, stdlibName, { from, packageFileName }) {
 
   zosPackage.name = name
   zosPackage.version = version || DEFAULT_VERSION
-  await files.setStdlib(zosPackage, stdlibName);
+  await files.setStdlib(zosPackage, stdlib);
 
   files.write(zosPackage)
 }

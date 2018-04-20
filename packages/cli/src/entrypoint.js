@@ -8,6 +8,7 @@ module.exports = function(cb) {
   program
     .option('-f', '--from <from>', 'Sender')
     .option('-n', '--network <network>', 'Truffle network')
+    .option('-s', '--stdlib <stdlib>', 'Standard library to use')
     .option('-i', '--initialize <initArgs>', 'Initialize arguments')
     .parse(process.argv)
 
@@ -16,6 +17,7 @@ module.exports = function(cb) {
   require(script)(...args, {
     network: program.network,
     initArgs: program.initArgs,
-    from: program.from || web3.eth.accounts[0]
+    from: program.from || web3.eth.accounts[0],
+    stdlib: program.stdlib
   }).then(cb).catch(cb)
 }

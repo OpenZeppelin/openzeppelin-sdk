@@ -1,71 +1,83 @@
+Scenario 1: develop stdlib
+$ init --release OpenZeppelin 0.1.0
+$ add-implementation ERC20 ERC20v0
+$ deploy
+
+
+Scenario 2: vouching for a stdlib version
+
+
+--------
+
+
 // -------------------------------------------------------------
-// 1. Initializes the project
-$ zos init Herbs 0.0.1
+// 1. Initializes the release
+$ zos init --release OpenZeppelin 0.1.0
 // -------------------------------------------------------------
 
 // -> package.zos.json // <--------------------------
 {
-  "name": "Herbs",
-  "version": "0.0.1",
+  "name": "OpenZeppelin",
+  "version": "0.1.0",
   "contracts": {},
   "stdlib": {}
 }
 
 // -------------------------------------------------------------
-// 2. Adds the first basil implementation to the project
-$ zos add-implementation Basil_v0 Basil
+// 2. Adds the first ERC20 implementation to the project
+$ zos add-implementation ERC20_v0 ERC20
 // -------------------------------------------------------------
 
 // -> package.zos.json
 {
-  "name": "Herbs",
-  "version": "0.0.1",
+  "name": "OpenZeppelin",
+  "version": "0.1.0",
   "contracts": {
-    "Basil": "Basil_v0" // <-----------------------------
+    "ERC20": "ERC20_v0" // <-----------------------------
   },
   "stdlib": {}
 }
 
 // -------------------------------------------------------------
 // 3. Sync on development network
-$ zos sync --network development
+$ zos deploy --network development
 // -------------------------------------------------------------
 
 // -> package.zos.json
 {
-  "name": "Herbs",
-  "version": "0.0.1",
+  "name": "OpenZeppelin",
+  "version": "0.1.0",
   "contracts": {
-    "Basil": "Basil_v0"
+    "ERC20": "ERC20_v0"
   },
-  "stdlib": {}
+  "stdlib": {},
 }
 
 // -> package.zos.development.json // <-----------------------------
 {
   "app": {
     "address": "0x101",
-    "version": "0.0.1"
+    "version": "0.1.0"
   },
   "proxies": {},
   "contracts": {
-    "Basil": "0x123"
+    "ERC20": "0x123"
   },
   "stdlib": {},
   "provider": "0x780"
 }
 
 // -------------------------------------------------------------
-// 4. Creates a proxy for Basil
-$ zos create-proxy Basil --network development
+// 4. Creates a proxy for ERC20
+$ zos create-proxy ERC20 --network development
 // -------------------------------------------------------------
 
 // -> package.zos.json
 {
-  "name": "Herbs",
-  "version": "0.0.1",
+  "name": "OpenZeppelin",
+  "version": "0.1.0",
   "contracts": {
-    "Basil": "Basil_v0"
+    "ERC20": "ERC20_v0"
   },
   "stdlib": {}
 }
@@ -74,18 +86,18 @@ $ zos create-proxy Basil --network development
 {
   "app": {
     "address": "0x101",
-    "version": "0.0.1"
+    "version": "0.1.0"
   },
   "proxies": {
-    "Basil": [ // <------------------------------------------------
+    "ERC20": [ // <------------------------------------------------
       {
         "address": "0x321",
-        "version": "0.0.1"
+        "version": "0.1.0"
       }
     ]
   },
   "contracts": {
-    "Basil": "0x123"
+    "ERC20": "0x123"
   },
   "stdlib": {},
   "provider": "0x780"
@@ -99,7 +111,7 @@ $ zos version 0.0.2
 
 // -> package.zos.json
 {
-  "name": "Herbs",
+  "name": "OpenZeppelin",
   "version": "0.0.2", // <----------------------------------
   "contracts": {}, // <-----------------------------
   "stdlib": {}
@@ -109,16 +121,16 @@ $ zos version 0.0.2
 // same
 
 // -------------------------------------------------------------
-// 7. Adds a new implementation of Basil
-$ zos add Basil Basil_v1
+// 7. Adds a new implementation of ERC20
+$ zos add ERC20 Basil_v1
 // -------------------------------------------------------------
 
 // -> package.zos.json
 {
-  "name": "Herbs",
+  "name": "OpenZeppelin",
   "version": "0.0.2",
   "contracts": {
-    "Basil": "Basil_v1" // <---------------------------------
+    "ERC20": "Basil_v1" // <---------------------------------
   },
   "stdlib": {}
 }
@@ -133,10 +145,10 @@ $ zos sync --network development
 
 // -> package.zos.json
 {
-  "name": "Herbs",
+  "name": "OpenZeppelin",
   "version": "0.0.2",
   "contracts": {
-    "Basil": "Basil_v1" 
+    "ERC20": "Basil_v1" 
   },
   "stdlib": {}
 }
@@ -148,31 +160,31 @@ $ zos sync --network development
     "version": "0.0.2"
   },
   "proxies": {
-    "Basil": [
+    "ERC20": [
       {
         "address": "0x321",
-        "version": "0.0.1" 
+        "version": "0.1.0" 
       }
     ]
   },
   "contracts": {
-    "Basil": "0x456" // CHANGED ADDRESS <---------------------------------------
+    "ERC20": "0x456" // CHANGED ADDRESS <---------------------------------------
   },
   "stdlib": {},
   "provider": "0x987"
 }
 
 // -------------------------------------------------------------
-// 9. Upgrades Basil's proxy
-$ zos upgrade 0x321 Basil --network development
+// 9. Upgrades ERC20's proxy
+$ zos upgrade 0x321 ERC20 --network development
 // -------------------------------------------------------------
 
 // -> package.zos.json
 {
-  "name": "Herbs",
+  "name": "OpenZeppelin",
   "version": "0.0.2",
   "contracts": {
-    "Basil": "Basil_v1" 
+    "ERC20": "Basil_v1" 
   },
   "stdlib": {}
 }
@@ -184,7 +196,7 @@ $ zos upgrade 0x321 Basil --network development
     "version": "0.0.2"
   },
   "proxies": {
-    "Basil": [
+    "ERC20": [
       {
         "address": "0x321",
         "version": "0.0.2" // CHANGED <-----------------------------------
@@ -192,7 +204,7 @@ $ zos upgrade 0x321 Basil --network development
     ]
   },
   "contracts": {
-    "Basil": "0x456" 
+    "ERC20": "0x456" 
   },
   "stdlib": {},
   "provider": "0x987"

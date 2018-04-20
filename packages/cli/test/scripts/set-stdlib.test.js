@@ -17,7 +17,7 @@ contract('set-stdlib command', function([_, owner]) {
 
   beforeEach('setup', async function() {
     cleanup(packageFileName)
-    await init(appName, defaultVersion, 'mock-stdlib@1.0.0', {packageFileName});
+    await init(appName, defaultVersion, { packageFileName, stdlib: 'mock-stdlib@1.0.0' });
   });
 
   after('cleanup', cleanupfn(packageFileName));

@@ -19,7 +19,7 @@ contract('add-implementation command', function(accounts) {
 
   beforeEach('setup', async function() {
     cleanup(packageFileName);
-    await init(appName, defaultVersion, null, {packageFileName});
+    await init(appName, defaultVersion, {packageFileName});
   });
 
   after(cleanupfn(packageFileName));

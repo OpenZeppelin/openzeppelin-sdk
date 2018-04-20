@@ -18,21 +18,21 @@ contract('new-version command', function([_, owner]) {
 
   beforeEach('setup', async function() {
     cleanup(packageFileName)
-    await init(appName, defaultVersion, null,  {packageFileName});
+    await init(appName, defaultVersion, {packageFileName});
   });
 
   after('cleanup', cleanupfn(packageFileName));
 
   it('it should update the app version in the main package file', async function() {
     const version = '0.2.0';
-    await newVersion(version, null, {packageFileName});
+    await newVersion(version, {packageFileName});
     const data = files.read();
     data.version.should.eq(version);
   });
 
   it('should set stdlib', async function () {
     const version = '0.2.0';
-    await newVersion(version, 'mock-stdlib@1.1.0', {packageFileName});
+    await newVersion(version, { packageFileName, stdlib: 'mock-stdlib@1.1.0' });
     const data = files.read();
     data.stdlib.name.should.eq('mock-stdlib');
     data.stdlib.version.should.eq('1.1.0');
