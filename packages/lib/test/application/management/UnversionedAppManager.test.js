@@ -7,9 +7,15 @@ const UnversionedAppManager = artifacts.require('UnversionedAppManager')
 const shouldBehaveLikeOwnable = require('../../ownership/Ownable.behavior')
 const OwnedUpgradeabilityProxy = artifacts.require('OwnedUpgradeabilityProxy')
 const UpgradeabilityProxyFactory = artifacts.require('UpgradeabilityProxyFactory')
+const DummyImplementation = artifacts.require('DummyImplementation')
 
-contract('UnversionedAppManager', ([_, managerOwner, directoryOwner, anotherAccount, implementation_v0, implementation_v1]) => {
+contract('UnversionedAppManager', ([_, managerOwner, directoryOwner, anotherAccount]) => {
   const contract = 'ERC721'
+
+  before(async function () {
+    this.implementation_v0 = (await DummyImplementation.new()).address
+    this.implementation_v1 = (await DummyImplementation.new()).address
+  })
 
   beforeEach(async function () {
     this.factory = await UpgradeabilityProxyFactory.new()
@@ -41,7 +47,7 @@ contract('UnversionedAppManager', ([_, managerOwner, directoryOwner, anotherAcco
   describe('create', function () {
     describe('when the requested contract was registered in the contract provider', function () {
       beforeEach(async function () {
-        await this.directory.setImplementation(contract, implementation_v0, { from: directoryOwner })
+        await this.directory.setImplementation(contract, this.implementation_v0, { from: directoryOwner })
 
         const { receipt } = await this.manager.create(contract)
         this.logs = decodeLogs([receipt.logs[0]], UpgradeabilityProxyFactory)
@@ -51,7 +57,7 @@ contract('UnversionedAppManager', ([_, managerOwner, directoryOwner, anotherAcco
 
       it('creates a proxy pointing to the requested implementation', async function () {
         const implementation = await this.proxy.implementation()
-        assert.equal(implementation, implementation_v0)
+        assert.equal(implementation, this.implementation_v0)
       })
 
       it('transfers the ownership to the manager', async function () {
@@ -122,7 +128,7 @@ contract('UnversionedAppManager', ([_, managerOwner, directoryOwner, anotherAcco
 
   describe('upgradeTo', function () {
     beforeEach(async function () {
-      await this.directory.setImplementation(contract, implementation_v0, { from: directoryOwner })
+      await this.directory.setImplementation(contract, this.implementation_v0, { from: directoryOwner })
       const { receipt } = await this.manager.create(contract)
       this.logs = decodeLogs([receipt.logs[0]], UpgradeabilityProxyFactory)
       this.proxyAddress = this.logs.find(l => l.event === 'ProxyCreated').args.proxy
@@ -134,14 +140,14 @@ contract('UnversionedAppManager', ([_, managerOwner, directoryOwner, anotherAcco
 
       describe('when the requested contract was registered', function () {
         beforeEach(async function () {
-          await this.directory.setImplementation(contract, implementation_v1, { from: directoryOwner })
+          await this.directory.setImplementation(contract, this.implementation_v1, { from: directoryOwner })
         })
 
         it('upgrades to the requested implementation', async function () {
           await this.manager.upgradeTo(this.proxyAddress, contract, { from })
 
           const implementation = await this.proxy.implementation()
-          assert.equal(implementation, implementation_v1)
+          assert.equal(implementation, this.implementation_v1)
         })
       })
 
@@ -156,7 +162,7 @@ contract('UnversionedAppManager', ([_, managerOwner, directoryOwner, anotherAcco
       const from = anotherAccount
 
       it('reverts', async function () {
-        await this.directory.setImplementation(contract, implementation_v1, { from: directoryOwner })
+        await this.directory.setImplementation(contract, this.implementation_v1, { from: directoryOwner })
         await assertRevert(this.manager.upgradeTo(this.proxyAddress, contract, { from }))
       })
     })
@@ -166,7 +172,7 @@ contract('UnversionedAppManager', ([_, managerOwner, directoryOwner, anotherAcco
     const initializeData = encodeCall('initialize', ['uint256'], [42])
 
     beforeEach(async function () {
-      await this.directory.setImplementation(contract, implementation_v0, { from: directoryOwner })
+      await this.directory.setImplementation(contract, this.implementation_v0, { from: directoryOwner })
       const { receipt } = await this.manager.create(contract)
       this.logs = decodeLogs([receipt.logs[0]], UpgradeabilityProxyFactory)
       this.proxyAddress = this.logs.find(l => l.event === 'ProxyCreated').args.proxy
@@ -228,12 +234,12 @@ contract('UnversionedAppManager', ([_, managerOwner, directoryOwner, anotherAcco
 
     describe('when the requested contract was registered in the directory', function () {
       beforeEach(async function () {
-        await this.directory.setImplementation(contract, implementation_v0, { from: directoryOwner })
+        await this.directory.setImplementation(contract, this.implementation_v0, { from: directoryOwner })
       })
 
       it('fetches the requested implementation from the directory', async function () {
         const implementation = await this.manager.getImplementation(contract)
-        assert.equal(implementation, implementation_v0)
+        assert.equal(implementation, this.implementation_v0)
       })
     })
 

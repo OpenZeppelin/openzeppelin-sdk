@@ -8,11 +8,17 @@ const MigratableMockV3 = artifacts.require('MigratableMockV3')
 const InitializableMock = artifacts.require('InitializableMock')
 const OwnedUpgradeabilityProxy = artifacts.require('OwnedUpgradeabilityProxy')
 const UpgradeabilityProxyFactory = artifacts.require('UpgradeabilityProxyFactory')
+const DummyImplementation = artifacts.require('DummyImplementation')
 
-contract('OwnedUpgradeabilityProxy', ([_, owner, anotherAccount, implementation_v0, implementation_v1]) => {
+contract('OwnedUpgradeabilityProxy', ([_, owner, anotherAccount]) => {
+  before(async function () {
+    this.implementation_v0 = (await DummyImplementation.new()).address
+    this.implementation_v1 = (await DummyImplementation.new()).address
+  })
+
   beforeEach(async function () {
     this.factory = await UpgradeabilityProxyFactory.new()
-    const { logs } = await this.factory.createProxy(owner, implementation_v0)
+    const { logs } = await this.factory.createProxy(owner, this.implementation_v0)
     this.proxyAddress = logs.find(l => l.event === 'ProxyCreated').args.proxy
     this.proxy = await OwnedUpgradeabilityProxy.at(this.proxyAddress)
   })
@@ -29,7 +35,7 @@ contract('OwnedUpgradeabilityProxy', ([_, owner, anotherAccount, implementation_
     it('returns the current implementation address', async function () {
       const implementation = await this.proxy.implementation()
 
-      assert.equal(implementation, implementation_v0)
+      assert.equal(implementation, this.implementation_v0)
     })
   })
 
@@ -63,37 +69,31 @@ contract('OwnedUpgradeabilityProxy', ([_, owner, anotherAccount, implementation_
       const from = owner
 
       describe('when the given implementation is different from the current one', function () {
-        const newImplementation = implementation_v1
-
         it('upgrades to the requested implementation', async function () {
-          await this.proxy.upgradeTo(newImplementation, { from })
+          await this.proxy.upgradeTo(this.implementation_v1, { from })
 
           const implementation = await this.proxy.implementation()
-          assert.equal(implementation, implementation_v1)
+          assert.equal(implementation, this.implementation_v1)
         })
 
         it('emits an event', async function () {
-          const { logs } = await this.proxy.upgradeTo(newImplementation, { from })
+          const { logs } = await this.proxy.upgradeTo(this.implementation_v1, { from })
 
           assert.equal(logs.length, 1)
           assert.equal(logs[0].event, 'Upgraded')
-          assert.equal(logs[0].args.implementation, implementation_v1)
+          assert.equal(logs[0].args.implementation, this.implementation_v1)
         })
       })
 
       describe('when the given implementation is the same as the current one', function () {
-        const newImplementation = implementation_v0
-
         it('reverts', async function () {
-          await assertRevert(this.proxy.upgradeTo(newImplementation, { from }))
+          await assertRevert(this.proxy.upgradeTo(this.implementation_v0, { from }))
         })
       })
 
       describe('when the given implementation is the zero address', function () {
-        const newImplementation = 0x0
-
         it('reverts', async function () {
-          await assertRevert(this.proxy.upgradeTo(newImplementation, { from }))
+          await assertRevert(this.proxy.upgradeTo(0, { from }))
         })
       })
     })
@@ -102,7 +102,7 @@ contract('OwnedUpgradeabilityProxy', ([_, owner, anotherAccount, implementation_
       const from = anotherAccount
 
       it('reverts', async function () {
-        await assertRevert(this.proxy.upgradeTo(implementation_v1, { from }))
+        await assertRevert(this.proxy.upgradeTo(this.implementation_v1, { from }))
       })
     })
   })
@@ -326,7 +326,7 @@ contract('OwnedUpgradeabilityProxy', ([_, owner, anotherAccount, implementation_
       const position = web3.sha3("org.zeppelinos.proxy.implementation");
       const implementation = await web3.eth.getStorageAt(this.proxyAddress, position);
 
-      assert.equal(implementation, implementation_v0);
+      assert.equal(implementation, this.implementation_v0);
     })
 
     it('should store the owner proxy in specified location', async function () {

@@ -4,15 +4,20 @@ const encodeCall = require('../helpers/encodeCall')
 const InitializableMock = artifacts.require('InitializableMock')
 const OwnedUpgradeabilityProxy = artifacts.require('OwnedUpgradeabilityProxy')
 const UpgradeabilityProxyFactory = artifacts.require('UpgradeabilityProxyFactory')
+const DummyImplementation = artifacts.require('DummyImplementation')
 
-contract('UpgradeabilityProxyFactory', ([_, owner, implementation_v0]) => {
+contract('UpgradeabilityProxyFactory', ([_, owner]) => {
+  before(async function () {
+    this.implementation_v0 = (await DummyImplementation.new()).address
+  })
+
   beforeEach(async function () {
     this.factory = await UpgradeabilityProxyFactory.new()
   })
 
   describe('createProxy', function () {
     beforeEach(async function () {
-      const { logs } = await this.factory.createProxy(owner, implementation_v0)
+      const { logs } = await this.factory.createProxy(owner, this.implementation_v0)
       this.logs = logs
       this.proxyAddress = this.logs.find(l => l.event === 'ProxyCreated').args.proxy
       this.proxy = await OwnedUpgradeabilityProxy.at(this.proxyAddress)
@@ -20,7 +25,7 @@ contract('UpgradeabilityProxyFactory', ([_, owner, implementation_v0]) => {
 
     it('creates a proxy pointing to the requested implementation', async function () {
       const implementation = await this.proxy.implementation()
-      assert.equal(implementation, implementation_v0)
+      assert.equal(implementation, this.implementation_v0)
     })
 
     it('transfers the ownership to the requested owner', async function () {

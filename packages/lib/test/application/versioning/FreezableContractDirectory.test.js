@@ -1,8 +1,14 @@
 const assertRevert = require('../../helpers/assertRevert')
 const FreezableContractDirectory = artifacts.require('FreezableContractDirectory')
 const shouldBehaveLikeContractDirectory = require('./ContractDirectory.behavior')
+const DummyImplementation = artifacts.require('DummyImplementation')
 
-contract('FreezableContractDirectory', ([_, owner, anotherAddress, implementation_v0, implementation_v1]) => {
+contract('FreezableContractDirectory', ([_, owner, anotherAddress]) => {
+  before(async function () {
+    this.implementation_v0 = (await DummyImplementation.new()).address
+    this.implementation_v1 = (await DummyImplementation.new()).address
+  })
+
   beforeEach(async function () {
     this.directory = await FreezableContractDirectory.new({ from: owner })
   })
@@ -46,7 +52,7 @@ contract('FreezableContractDirectory', ([_, owner, anotherAddress, implementatio
 
   describe('setImplementation', function () {
     describe('when it is not frozen', function () {
-      shouldBehaveLikeContractDirectory(owner, anotherAddress, implementation_v0, implementation_v1)
+      shouldBehaveLikeContractDirectory(owner, anotherAddress, this.implementation_v0, this.implementation_v1)
     })
 
     describe('when it is frozen', function () {
@@ -55,7 +61,7 @@ contract('FreezableContractDirectory', ([_, owner, anotherAddress, implementatio
       })
 
       it('reverts', async function () {
-        await assertRevert(this.directory.setImplementation('ERC721', implementation_v1, { from: owner }))
+        await assertRevert(this.directory.setImplementation('ERC721', this.implementation_v1, { from: owner }))
       })
     })
   })

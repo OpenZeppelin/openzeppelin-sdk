@@ -2,8 +2,14 @@ const Package = artifacts.require('Package')
 const assertRevert = require('../../helpers/assertRevert')
 const ContractDirectory = artifacts.require('ContractDirectory')
 const shouldBehaveLikeOwnable = require('../../ownership/Ownable.behavior')
+const DummyImplementation = artifacts.require('DummyImplementation')
 
-contract('Package', ([_, owner, anotherAddress, implementation_v0]) => {
+contract('Package', ([_, owner, anotherAddress]) => {
+  before(async function () {
+    this.implementation_v0 = (await DummyImplementation.new()).address
+    this.implementation_v1 = (await DummyImplementation.new()).address
+  })
+
   beforeEach(async function () {
     this.package = await Package.new({ from: owner })
     this.directory_V0 = await ContractDirectory.new({ from: owner })
@@ -132,12 +138,12 @@ contract('Package', ([_, owner, anotherAddress, implementation_v0]) => {
 
       describe('when the requested version holds the requested contract name', function () {
         beforeEach(async function () {
-          await this.directory_V0.setImplementation(contractName, implementation_v0, { from: owner })
+          await this.directory_V0.setImplementation(contractName, this.implementation_v0, { from: owner })
         })
 
         it('returns the requested implementation', async function () {
           const implementation = await this.package.getImplementation(version, contractName)
-          assert.equal(implementation, implementation_v0)
+          assert.equal(implementation, this.implementation_v0)
         })
       })
 
