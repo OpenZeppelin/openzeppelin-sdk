@@ -1,5 +1,5 @@
 # zeppelin_os command line interface
-[![Build Status](https://travis-ci.org/zeppelinos/cli.svg?branch=master)](https://travis-ci.org/zeppelinos/cli)
+[![Build Status](https://travis-ci.org/zeppelinos/zos-cli.svg?branch=master)](https://travis-ci.org/zeppelinos/zos-cli)
 
 ## Managing a project with zeppein_os
 
@@ -69,7 +69,7 @@ $ zos new-version [NEW_VERSION]
 
 This command will update the `version` property of your `package.zos.json` file and reset its contracts list. 
 Therefore, you will have to add the corresponding contract implementations to be included in it, as you did in the 
-[third step](https://github.com/zeppelinos/cli#add-your-contracts-implementations):
+[third step](https://github.com/zeppelinos/zos-cli#add-your-contracts-implementations):
 
 ```
 $ zos add-implementation [CONTRACT_NAME_1] [ALIAS_2] --network [NETWORK]
