@@ -38,11 +38,11 @@ class AppManagerWrapper {
   }
 
   async connect(address) {
-    this.appManager = await AppManager.at(address);
-    this.package = Package.at(await this.appManager.package());
-    this.factory = UpgradeabilityProxyFactory.at(await this.appManager.factory());
+    this.appManager = new AppManager(address);
+    this.package = new Package(await this.appManager.package());
+    this.factory = new UpgradeabilityProxyFactory(await this.appManager.factory());
     this.version = await this.appManager.version();
-    this.directories[this.version] = AppDirectory.at(await this.package.getVersion(this.version));
+    this.directories[this.version] = new AppDirectory(await this.package.getVersion(this.version));
   }
 
   async newVersion(versionName, stdlib) {
@@ -79,7 +79,7 @@ class AppManagerWrapper {
 
     const logs = decodeLogs([receipt.logs[0]], UpgradeabilityProxyFactory, 0x0);
     const address = logs.find(l => l.event === 'ProxyCreated').args.proxy;
-    return contractClass.at(address);
+    return new contractClass(address);
   }
 
   async upgradeProxy(proxyAddress, contractClass, contractName, initMethodName, initArgs) {

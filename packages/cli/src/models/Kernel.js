@@ -10,7 +10,7 @@ const Vouching = makeContract(require('zos-kernel/build/contracts/Vouching.json'
 export default class KernelWrapper {
   constructor(address, txParams) {
     this.txParams = txParams
-    this.kernel = Kernel.at(address)
+    this.kernel = new Kernel(address)
   }
 
   async register(release) {
@@ -66,7 +66,7 @@ export default class KernelWrapper {
   }
 
   async _ifFrozenThrow(releaseAddress, error) {
-    const release = Release.at(releaseAddress)
+    const release = new Release(releaseAddress)
     const isFrozen = await release.frozen(this.txParams)
     if(!isFrozen) throw error
   }
@@ -101,12 +101,12 @@ export default class KernelWrapper {
 
   async zepToken() {
     if(!this.zepTokenAddress) this.zepTokenAddress = await this.kernel.token()
-    return ZepToken.at(this.zepTokenAddress)
+    return new ZepToken(this.zepTokenAddress)
   }
 
   async vouching() {
     if(!this.vouchingAddress) this.vouchingAddress = await this.kernel.vouches()
-    return Vouching.at(this.vouchingAddress)
+    return new Vouching(this.vouchingAddress)
   }
 
   async newVersionCost() {

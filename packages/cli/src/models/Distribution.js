@@ -13,20 +13,20 @@ class Distribution {
   }
 
   async connect(address) {
-    this.package = await Package.at(address)
+    this.package = new Package(address)
     return this.package
   }
 
   async deploy(initialVersion) {
-    this.package = await Package.new({ from: this.owner })
-    const release = await Release.new({ from: this.owner })
+    this.package = new Package({ from: this.owner })
+    const release = new Release({ from: this.owner })
     await this.package.addVersion(initialVersion, release.address, { from: this.owner })
     return this.package
   }
 
   async getRelease(version) {
     const releaseAddress = await this.package.getVersion(version)
-    return await Release.at(releaseAddress)
+    return new Release(releaseAddress)
   }
 
   async hasVersion(version) {
@@ -34,7 +34,7 @@ class Distribution {
   }
 
   async newVersion(version) {
-    const release = await Release.new({ from: this.owner })
+    const release = new Release({ from: this.owner })
     await this.package.addVersion(version, release.address, { from: this.owner })
   }
 
