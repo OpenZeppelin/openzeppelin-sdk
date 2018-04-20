@@ -1,5 +1,7 @@
 import decodeLogs from '../utils/decodeLogs';
 import encodeCall from '../utils/encodeCall';
+import Stdlib from './Stdlib';
+import _ from 'lodash';
 
 const AppManager = artifacts.require('PackagedAppManager');
 const AppDirectory = artifacts.require('AppDirectory');
@@ -8,8 +10,9 @@ const UpgradeabilityProxyFactory = artifacts.require('UpgradeabilityProxyFactory
 
 class AppManagerWrapper {
 
-  constructor(owner) {
+  constructor(owner, network) {
     this.owner = owner;
+    this.network = network;
     this.directories = {};
   }
 
@@ -21,14 +24,25 @@ class AppManagerWrapper {
     return this.appManager.address;
   }
 
-  async deploy(initialVersion) {
+  async deploy(initialVersion, stdlib) {
     this.factory = await UpgradeabilityProxyFactory.new({ from: this.owner });
     this.package = await Package.new({ from: this.owner });
-    const directory = await AppDirectory.new(0, { from: this.owner });
+    const stdlibAddress = this._getStdlibAddress(stdlib);
+    const directory = await AppDirectory.new(stdlibAddress, { from: this.owner });
     await this.package.addVersion(initialVersion, directory.address, { from: this.owner });
     this.directories[initialVersion] = directory;
     this.version = initialVersion;
     this.appManager = await AppManager.new(this.package.address, initialVersion, this.factory.address, { from: this.owner });
+  }
+
+  _getStdlibAddress(stdlib) {
+    if (!stdlib || _.isEmpty(stdlib)) {
+      return 0;
+    } else if (stdlib.getDeployed) {
+      return stdlib.getDeployed(this.network);
+    } else {
+      return (new Stdlib(stdlib)).getDeployed(this.network);
+    }
   }
 
   async connect(address) {
@@ -39,8 +53,9 @@ class AppManagerWrapper {
     this.directories[this.version] = AppDirectory.at(await this.package.getVersion(this.version));
   }
 
-  async newVersion(versionName) {
-    const directory = await AppDirectory.new(0, { from: this.owner });
+  async newVersion(versionName, stdlib) {
+    const stdlibAddress = this._getStdlibAddress(stdlib);
+    const directory = await AppDirectory.new(stdlibAddress, { from: this.owner });
     await this.package.addVersion(versionName, directory.address, { from: this.owner });
     await this.appManager.setVersion(versionName, { from: this.owner });
     this.directories[versionName] = directory;
@@ -57,7 +72,13 @@ class AppManagerWrapper {
     const directory = this.getCurrentDirectory();
     await directory.setImplementation(contractName, implementation.address, { from: this.owner });
     return implementation;
-  }  
+  }
+
+  async setStdlib(stdlib) {
+    const stdlibAddress = this._getStdlibAddress(stdlib);
+    await this.getCurrentDirectory().setStdlib(stdlibAddress, { from: this.owner });
+    return stdlibAddress;
+  }
 
   async createProxy(contractClass, contractName, initArgs) {
     const initMethodName = 'initialize';

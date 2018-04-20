@@ -1,13 +1,14 @@
 import AppManager from '../models/AppManager'
 import PackageFilesInterface from '../utils/PackageFilesInterface'
 import Logger from '../utils/Logger'
+import Stdlib from '../models/Stdlib';
 
 const log = new Logger('sync')
 
 
 async function sync({ network, from, packageFileName }) {
   const files = new PackageFilesInterface(packageFileName)
-  const appManager = new AppManager(from)
+  const appManager = new AppManager(from, network)
 
   if (! files.exists()) {
     log.error(`Could not find package file ${packageFileName}`)
@@ -44,7 +45,15 @@ async function sync({ network, from, packageFileName }) {
     // TODO: store the implementation's hash to avoid unnecessary deployments
     const contractClass = artifacts.require(zosPackage.contracts[contractName])
     const contractInstance = await appManager.setImplementation(contractClass, contractName)
-    zosNetworkFile.package.contracts[contractName] = contractInstance.address
+      zosNetworkFile.package.contracts[contractName] = contractInstance.address
+  }
+  
+  if (zosPackage.stdlib) {
+    const stdlibAddress = await appManager.setStdlib(zosPackage.stdlib);
+    zosNetworkFile.stdlib = { address: stdlibAddress };
+  } else {
+    delete zosNetworkFile['stdlib'];
+    await appManager.setStdlib(null);
   }
 
   files.writeNetworkFile(network, zosNetworkFile)

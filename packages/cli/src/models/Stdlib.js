@@ -1,18 +1,33 @@
 import truffleContract from 'truffle-contract';
 import fs from 'fs';
 import path from 'path';
+import npm from 'npm-programmatic';
 
 const ContractDirectory = artifacts.require('ContractDirectory');
 
 export default class Stdlib {
-  constructor(name, owner) {
+  constructor(nameWithVersion, owner) {
+    let name, version;
+    if (typeof(nameWithVersion) === 'string') {
+      [name, version] = nameWithVersion.split('@');
+    } else {
+      ({ name, version } = nameWithVersion);
+    }
+    
     this.name = name;
+    this.version = version;
     this.owner = owner;
-    this.package = JSON.parse(fs.readFileSync(`node_modules/${this.name}/package.zos.json`));
+  }
+
+  getPackage() {
+    if (!this.package) {
+      this.package = JSON.parse(fs.readFileSync(`node_modules/${this.name}/package.zos.json`));
+    }
+    return this.package;
   }
 
   async getContract(contractName) {
-    const implName = this.package.contracts[contractName];
+    const implName = this.getPackage().contracts[contractName];
     if (!implName) throw `Contract ${contractName} not found in package`;
     const schema = JSON.parse(fs.readFileSync(`node_modules/${this.name}/build/contracts/${implName}.json`));
     const contract = truffleContract(schema);
@@ -22,7 +37,7 @@ export default class Stdlib {
   }
 
   listContracts() {
-    return Object.keys(this.package.contracts);
+    return Object.keys(this.getPackage().contracts);
   }
 
   async deploy() {
@@ -36,7 +51,30 @@ export default class Stdlib {
   }
 
   getDeployed(network) {
-    const networkInfo = JSON.parse(fs.readFileSync(`node_modules/${this.name}/package.zos.${network}.json`))
-    return  networkInfo.app.address;
+    if (!network) throw "Must specify network to read stdlib deployment address";
+    const networkInfo = JSON.parse(fs.readFileSync(`node_modules/${this.name}/package.zos.${network}.json`));
+    return networkInfo.provider.address;
+  }
+
+  async installDependency() {
+    const stdlibString = this.version
+      ? `${this.name}@${this.version}`
+      : this.name
+    if (process.env.NODE_ENV !== 'test') {
+      await npm.install([stdlibString], {
+        save: true, cwd: process.cwd()
+      })
+    }
+  }
+
+  getName() {
+    return this.name;
+  }
+
+  getVersion() {
+    if (!this.version) {
+      this.version = this.getPackage().version;
+    }
+    return this.version;
   }
 }

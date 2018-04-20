@@ -1,5 +1,6 @@
 import fs from 'fs'
 import Logger from './Logger'
+import Stdlib from '../models/Stdlib'
 
 const log = new Logger('PackageFilesInterface')
 
@@ -23,6 +24,19 @@ export default class PackageFilesInterface {
 
   write(zosPackage) {
     this.writeTo(this.packageFileName, zosPackage)
+  }
+
+  async setStdlib(zosPackage, stdlibName) {
+    if (stdlibName) {
+      const stdlib = new Stdlib(stdlibName)
+      await stdlib.installDependency();
+      zosPackage.stdlib = {
+        name: stdlib.getName(),
+        version: stdlib.getVersion()
+      }
+    } else {
+      zosPackage.stdlib = {};
+    }
   }
 
   /*

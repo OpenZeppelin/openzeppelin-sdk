@@ -25,7 +25,7 @@ contract('create-proxy command', function([_, owner]) {
   beforeEach('setup', async function() {
     cleanup(packageFileName)
     cleanup(networkPackageFileName)
-    await init(appName, defaultVersion, {packageFileName});
+    await init(appName, defaultVersion, null, {packageFileName});
     await addImplementation(contractName, contractAlias, {packageFileName});
     await sync({ packageFileName, network, from });
   });

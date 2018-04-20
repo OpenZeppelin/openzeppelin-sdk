@@ -17,9 +17,9 @@ contract('add-implementation command', function(accounts) {
   const defaultVersion = "0.1.0";
   const files = new PackageFilesInterface(packageFileName);
 
-  beforeEach('setup', function() {
+  beforeEach('setup', async function() {
     cleanup(packageFileName);
-    init(appName, defaultVersion, {packageFileName});
+    await init(appName, defaultVersion, null, {packageFileName});
   });
 
   after(cleanupfn(packageFileName));
