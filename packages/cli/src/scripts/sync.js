@@ -2,7 +2,7 @@ import AppManager from '../models/AppManager'
 import makeContract from '../utils/contract'
 import PackageFilesInterface from '../utils/PackageFilesInterface'
 
-async function sync({ network, from, packageFileName }) {
+async function sync({ network, from, packageFileName, handleStdlib }) {
   const files = new PackageFilesInterface(packageFileName)
   const appManager = new AppManager(from, network)
   if (! files.exists()) throw `Could not find package file ${packageFileName}`
@@ -36,7 +36,9 @@ async function sync({ network, from, packageFileName }) {
   }
 
   if (zosPackage.stdlib) {
-    const stdlibAddress = await appManager.setStdlib(zosPackage.stdlib)
+    const stdlibAddress = handleStdlib
+      ? await handleStdlib(appManager, zosPackage.stdlib)
+      : await appManager.setStdlib(zosPackage.stdlib);
     zosNetworkFile.stdlib = { address: stdlibAddress }
   } else {
     delete zosNetworkFile['stdlib']

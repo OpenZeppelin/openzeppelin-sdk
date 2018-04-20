@@ -110,6 +110,7 @@ class AppManagerWrapper {
 
   _getStdlibAddress(stdlib) {
     if (!stdlib || _.isEmpty(stdlib)) return 0;
+    else if (typeof(stdlib) === 'string' && stdlib.startsWith('0x')) return stdlib;
     else if (stdlib.getDeployed) return stdlib.getDeployed(this.network);
     else return (new Stdlib(stdlib)).getDeployed(this.network);
   }
