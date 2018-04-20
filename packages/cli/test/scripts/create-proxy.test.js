@@ -1,10 +1,9 @@
 import init from "../../src/scripts/init.js";
-import addImplementation from "../../src/scripts/add-implementation.js";
 import sync from "../../src/scripts/sync.js";
-import createProxy from "../../src/scripts/create-proxy.js";
-import fs from 'fs';
-import PackageFilesInterface from '../../src/utils/PackageFilesInterface';
 import { cleanup, cleanupfn } from "../helpers/cleanup.js";
+import createProxy from "../../src/scripts/create-proxy.js";
+import addImplementation from "../../src/scripts/add-implementation.js";
+import PackageFilesInterface from '../../src/utils/PackageFilesInterface';
 
 const should = require('chai')
       .use(require('chai-as-promised'))
