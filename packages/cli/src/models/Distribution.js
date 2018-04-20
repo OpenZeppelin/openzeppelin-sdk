@@ -1,6 +1,6 @@
-const Release = artifacts.require('Release')
-const Package = artifacts.require('Package')
-
+import makeContract from '../utils/contract'
+const Release = makeContract('Release')
+const Package = makeContract('Package')
 
 class Distribution {
 
