@@ -14,7 +14,7 @@ async function init(name, version, { from, packageFileName, stdlib, installDeps 
 
   zosPackage.name = name
   zosPackage.version = version || DEFAULT_VERSION
-  await files.setStdlib(zosPackage, stdlib, installDeps);
+  await files.setStdlib(zosPackage, stdlib, installDeps)
   files.write(zosPackage)
 }
 
