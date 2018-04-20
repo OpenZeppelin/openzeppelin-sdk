@@ -6,10 +6,10 @@ const program = require('commander')
 
 module.exports = function(cb) {
   program
-    .option('-f', '--from <from>', 'Sender')
-    .option('-n', '--network <network>', 'Truffle network')
-    .option('-s', '--stdlib <stdlib>', 'Standard library to use')
-    .option('-i', '--init <initArgs>', 'Initialize arguments')
+    .option('-f, --from <from>', 'Sender')
+    .option('-n, --network <network>', 'Truffle network')
+    .option('-s, --stdlib <stdlib>', 'Standard library to use')
+    .option('-i, --init <initArgs>', 'Initialize arguments')
     .parse(process.argv)
 
   const script = `./scripts/${program.args[2]}.js`
