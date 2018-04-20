@@ -42,11 +42,9 @@ contract('upgrade-proxy command', function([_, owner]) {
   after(cleanupfn(networkPackageFileName));
 
   it('should upgrade the version of a proxy', async function() {
-    let data = files.readNetworkFile(network);
-    let proxy = data.proxies[contractAlias][0];
-    await upgradeProxy(proxy.address, contractAlias, {network, packageFileName, from});
-    data = files.readNetworkFile(network);
-    proxy = data.proxies[contractAlias][0];
+    await upgradeProxy(contractAlias, null, {network, packageFileName, from});
+    const data = files.readNetworkFile(network);
+    const proxy = data.proxies[contractAlias][0];
     proxy.version.should.eq(version);
   });
 });
