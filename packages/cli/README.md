@@ -1,100 +1,196 @@
 # zeppelin_os command line interface
+[![NPM Package](https://img.shields.io/npm/v/zos.svg?style=flat-square)](https://www.npmjs.org/package/zos)
 [![Build Status](https://travis-ci.org/zeppelinos/zos-cli.svg?branch=master)](https://travis-ci.org/zeppelinos/zos-cli)
 
 :warning: **Under heavy development: do not use in production** :warning: 
 
-## Managing a project with zeppein_os
+`zos` is a tool to develop, manage and operate upgradeable smart contract applications in Ethereum. It can be used to create complex smart contract systems that can be fixed or improved over time, enabling developers to opt-in to mutability for their deployed code. `zos` also provides an interface to connect your application code to already deployed standard libraries from [the zOS Kernel](https://github.com/zeppelinos/kernel).
 
-### Install
+Use this tool if you want to develop, deploy or operate an upgradeable smart contract system.
 
+If you want a lower-level, programmatic development experience, see [`zos-lib`](https://github.com/zeppelinos/zos-lib). 
+
+# Getting Started
+
+To install `zos` simply run:
+```sh
+npm i -g zos
 ```
-$ npm install zos --save
-```
+Next, learn how to:
 
-By now, zeppelin_os cli tool runs on top of truffle exec. Then, it requires to have a truffle.js file including the
-networks configurations you will use for your project. 
+- [Develop an upgradeable smart contract application using `zos`](#develop)
+- [Develop a new zOS Kernel standard library release using `zos`](#kernel)
+- [Use `zos` to fund development and auditing of zOS Kernel releases with your ZEP tokens](#vouching)
+
+## <a name="develop"></a>Develop an upgradeable smart contract application using `zos`
+
+### Before you begin
+`zos` integrates with [Truffle](http://truffleframework.com/), an Ethereum development environment. Please install Truffle and initialize your project with it:
+
+```sh
+npm install -g truffle
+mkdir myproject && cd myproject
+truffle init
+```
 
 ### Setup your project 
 
-Initialize your project with zeppelin_os, the next command will create a new package.zos file:
+Initialize your project with zeppelin_os. The next command will create a new `package.zos.json` file:
+
+```sh
+zos init [NAME] [VERSION] --network [NETWORK]
+```
+
+### Write your smart contracts
+Write your contracts as you would usually do, but replacing constructors with `initialize` functions. You can do this more easily by using the `Initializable` helper contract in [`zos-lib`](https://github.com/zeppelinos/zos-lib).
+
+- For an upgradeable contract development full example, see [the examples folder in `zos-lib`](https://github.com/zeppelinos/zos-lib/blob/master/examples/single/contracts/MyContract_v0.sol).
+- For an introductory smart contract development guide, see [this blog post series](https://blog.zeppelin.solutions/a-gentle-introduction-to-ethereum-programming-part-1-783cc7796094).
+
+In this example, we'll use this simple contract:
+```sol
+import "zos-lib/contracts/migrations/Initializable.sol";
+
+contract MyContract is Initializable {
+  uint256 public x;
+  
+  function initialize(uint256 _x) isInitializer public {
+    x = _x;
+  }
+}
+```
+
+### Register your initial contract implementations
+
+The next step is to register all the contract implementations of the first `version` of your project. To do this please run:
 
 ```
-$ zos init [NAME] [VERSION] --network [NETWORK]
-```
-
-### Add your contracts implementations
-
-The next step is to register all the contract implementations of the current `version` of your project. It is important
-to keep your `package.zos.json` file up-to-date. To do this please run:  
-
-```
-$ zos add-implementation [CONTRACT_NAME_1] [ALIAS_2] --network [NETWORK]
-$ zos add-implementation [CONTRACT_NAME_2] [ALIAS_2] --network [NETWORK]
-$ ...
-$ zos add-implementation [CONTRACT_NAME_N] [ALIAS_N] --network [NETWORK]
+zos add-implementation [CONTRACT_NAME_1] [ALIAS_2] --network [NETWORK]
+zos add-implementation [CONTRACT_NAME_2] [ALIAS_2] --network [NETWORK]
+...
+zos add-implementation [CONTRACT_NAME_N] [ALIAS_N] --network [NETWORK]
 ```
 
 Where `[CONTRACT_NAME]` is the name of your Solidity contract, and `[ALIAS]` is the name under which it will be registered 
 in zeppelin_os. 
 
-### Sync your project with the blockchain 
-
-This command will create a new application manager. This is the contract that handles all the versions of your project
-contracts. This command will deploy each registered contract implementation to the requested network, and will packaged
-them using the `version` property of your `package.zos.json` file:
-
+In our example, run:
 ```
-$ zos sync --network [NETWORK]
+zos add-implementation MyContract MyContract --network ropsten
 ```
 
-Note that if you never synced your project with the requested network, a new `package.zos.<network>.json` should have
-been created. This file will reflect the status of your project in that network.
+To have your `package.zos.json` file always up-to-date, run `zos add-implementation` for every new contract you add to your project.
 
-### Create a new contract proxy 
+### Sync your project with the blockchain with `zos sync`
 
-The next command will deploy a new proxy to make your contract upgradeable. All these proxies will be held in your 
-`package.zos.<network>.json` file:
+This command will deploy your upgradeable application to the blockchain:
+```
+zos sync --network [NETWORK]
+```
+
+The first time you run this command for a specific network, a new `package.zos.<network>.json` will be created. This file will reflect the status of your project in that network.
+
+### Create upgradeability proxies for each of your contracts  
+
+The next commands will deploy new proxies to make your contracts upgradeable:
 
 ```
-$ zos create-proxy [ALIAS_1] --network [NETWORK]
-$ zos create-proxy [ALIAS_2] --network [NETWORK]
+zos create-proxy [ALIAS_1] --network [NETWORK]
+zos create-proxy [ALIAS_2] --network [NETWORK]
 ...
-$ zos create-proxy [ALIAS_N] --network [NETWORK]
+zos create-proxy [ALIAS_N] --network [NETWORK]
 ``` 
 
-### Add a new version 
-
-To add a new version of your project, you will have to register it first. To do so run:
+In our simple example:
 ```
-$ zos new-version [NEW_VERSION]
+zos create-proxy MyContract --network ropsten
 ```
 
-This command will update the `version` property of your `package.zos.json` file and reset its contracts list. 
-Therefore, you will have to add the corresponding contract implementations to be included in it, as you did in the 
-[third step](https://github.com/zeppelinos/zos-cli#add-your-contracts-implementations):
+The proxy addresses, which you'll need to interact with your upgradeable contracts, will be stored in the `package.zos.<network>.json` file.
+
+Open the `package.zos.<network>.json` and use the addresses found there to interact with your deployed contracts. Congratulations! The first version of your upgradeable smart contract app is deployed in the blockchain!
+
+### Update your smart contract code
+Some time later you might want to change your smart contract code: fix a bug, add a new feature, etc. 
+To do so, update your contracts, making sure you don't change their pre-existing storage structure. This is required
+by **zeppelin_os** upgadeability mechanism. This means you can add new state variables, but you can't remove the ones you already have. In the example above, this could be the new version of `MyContract`:
+
+```sol
+import "zos-lib/contracts/migrations/Initializable.sol";
+
+contract MyContract is Initializable {
+  uint256 public x;
+  
+  function initialize(uint256 _x) isInitializer public {
+    x = _x;
+  }
+  
+  function y() public pure returns (uint256) {
+    return 1337;
+  }
+}
+```
+
+We'll now use `zos` to register and deploy the new code for `MyContract` to the blockchain.
+
+### Bump your application version 
+
+To bump the version of your project, run:
+```
+zos new-version [NEW_VERSION_NAME] --network [NETWORK]
+```
+
+This command will update the `version` property of your `package.zos.json` file and reset its contract list. 
+Therefore, you will have to re-add the corresponding contract implementations to be included in the new version, as you did before for the first version.
 
 ```
-$ zos add-implementation [CONTRACT_NAME_1] [ALIAS_2] --network [NETWORK]
-$ zos add-implementation [CONTRACT_NAME_2] [ALIAS_2] --network [NETWORK]
-$ ...
-$ zos add-implementation [CONTRACT_NAME_N] [ALIAS_N] --network [NETWORK]
+zos add-implementation [CONTRACT_NAME_1] [ALIAS_2] --network [NETWORK]
+zos add-implementation [CONTRACT_NAME_2] [ALIAS_2] --network [NETWORK]
+...
+zos add-implementation [CONTRACT_NAME_N] [ALIAS_N] --network [NETWORK]
+```
+In our
+```
+zos add-implementation MyContract MyContract --network ropsten
 ```
 
-Let's sync the new version of your project to the blockchain running: 
+Sync the new version of your project to the blockchain by running: 
 
 ```
-$ zos sync
+zos sync --network [NETWORK]
 ```
 
-Now the new version of your project has been updated in your application manager. Finally, you just need to upgrade 
+After running this command, the new version of your project is deployed in the blockchain. Finally, you just need to upgrade 
 all your contract proxies: 
 
 ```
-$ zos upgrade-proxy [ALIAS_1] --network [NETWORK]
-$ zos upgrade-proxy [ALIAS_2] --network [NETWORK]
+zos upgrade-proxy [ALIAS_1] --network [NETWORK]
+zos upgrade-proxy [ALIAS_2] --network [NETWORK]
 ...
-$ zos upgrade-proxy [ALIAS_N] --network [NETWORK]
+zos upgrade-proxy [ALIAS_N] --network [NETWORK]
 ```
 
-## Registering and vouching zeppelin_os releases
-TODO!
+In our simple example:
+```
+zos upgrade-proxy MyContract --network ropsten
+```
+Voila! Your contract has now been upgraded. The address is the same as before, but the code has been changed to the latest version. Repeat the same steps for every code update you want to perform.
+
+
+## <a name="kernel"></a> Develop a new zOS Kernel standard library release using `zos`
+TODO
+
+## <a name="vouching"></a> Use `zos` to fund development and auditing of zOS Kernel releases with your ZEP tokens
+
+To fund development of a zOS Kernel standard library release, you can vouch your ZEP tokens to that specific release. This will give a small payout to the release developer and incentivize further auditing and development of the code.
+
+To vouch for the release you're using in your app, run:
+```
+zos vouch [RELEASE_ADDRESS] [ZEP_AMOUNT_IN_UNITS] --from [ZEP_HOLDING_ADDRESS]
+```
+If you want to stop supporting this release, run:
+```
+zos unvouch [RELEASE_ADDRESS] [ZEP_AMOUNT_IN_UNITS] --from [ADDRESS_THAT_VOUCHED]
+```
+
+
