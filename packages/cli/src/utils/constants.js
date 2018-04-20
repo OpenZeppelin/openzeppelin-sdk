@@ -1,2 +1,0 @@
-export const KERNEL_ADDRESS = '0x20d8cdd4d00611ecd8b8c7004e8d5223449aa6f9'
-export const ZEP_TOKEN_ADDRESS = '0x413acdf9bf86ccb578aad3fe65d2cd109e313070'
