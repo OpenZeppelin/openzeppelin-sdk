@@ -1,8 +1,8 @@
 const makeContract = require('../utils/contract')
-const Kernel = makeContract(require('../../node_modules/kernel/build/contracts/Kernel.json'))
-const Release = makeContract(require('../../node_modules/kernel/build/contracts/Release.json'))
-const ZepToken = makeContract(require('../../node_modules/kernel/build/contracts/ZepToken.json'))
-const Vouching = makeContract(require('../../node_modules/kernel/build/contracts/Vouching.json'))
+const Kernel = makeContract(require('zos-kernel/build/contracts/Kernel.json'))
+const Release = makeContract(require('zos-kernel/build/contracts/Release.json'))
+const ZepToken = makeContract(require('zos-kernel/build/contracts/ZepToken.json'))
+const Vouching = makeContract(require('zos-kernel/build/contracts/Vouching.json'))
 
 export default class KernelWrapper {
   constructor(address, txParams) {

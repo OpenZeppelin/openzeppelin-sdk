@@ -31,7 +31,6 @@
     "colors": "^1.2.1",
     "commander": "^2.15.1",
     "ethereumjs-abi": "^0.6.5",
-    "kernel": "git://github.com/zeppelinos/kernel.git",
     "lodash": "^4.17.5",
     "npm-programmatic": "0.0.10",
     "shelljs": "^0.8.1",
@@ -39,6 +38,7 @@
     "truffle-contract": "^3.0.5",
     "truffle-provisioner": "^0.1.0",
     "truffle-resolver": "^4.0.3",
+    "zos-kernel": "^0.1.0",
     "zos-lib": "0.0.3"
   },
   "devDependencies": {
