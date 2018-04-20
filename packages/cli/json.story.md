@@ -10,22 +10,22 @@ $ zos init Basil 0.0.1
   "name": "Basil",
   "version": "0.0.1",
   "contracts": {},
-  "stdlib": "???"
+  "stdlib": {}
 }
 
 // -------------------------------------------------------------
 // 2. Adds the first basil implementation to the project
-$ zos add-implementation Basil_v0.sol Basil
+$ zos add-implementation Basil_v0 Basil
 // -------------------------------------------------------------
 
 // -> package.zos.json
 {
-  "name": "Basil",
+  "name": "Herbs",
   "version": "0.0.1",
   "contracts": {
-    "Basil": "Basil_v0.sol" // <-----------------------------
+    "Basil": "Basil_v0" // <-----------------------------
   },
-  "stdlib": "???"
+  "stdlib": {}
 }
 
 // -------------------------------------------------------------
@@ -35,27 +35,26 @@ $ zos sync --network development
 
 // -> package.zos.json
 {
-  "name": "Basil",
+  "name": "Herbs",
   "version": "0.0.1",
   "contracts": {
-    "Basil": "Basil_v0.sol"
+    "Basil": "Basil_v0"
   },
-  "stdlib": "???"
+  "stdlib": {}
 }
 
 // -> package.zos.development.json // <-----------------------------
 {
   "app": {
-    "address": "0x123",
+    "address": "0x101",
     "version": "0.0.1"
   },
   "proxies": {},
-  "package": {
-    "contracts": {
-      "Basil": "0x123"
-    },
-    "stdlib": "???"
-  }
+  "contracts": {
+    "Basil": "0x123"
+  },
+  "stdlib": {},
+  "provider": "0x780"
 }
 
 // -------------------------------------------------------------
@@ -65,34 +64,33 @@ $ zos create-proxy Basil --network development
 
 // -> package.zos.json
 {
-  "name": "Basil",
+  "name": "Herbs",
   "version": "0.0.1",
   "contracts": {
-    "Basil": "Basil_v0.sol"
+    "Basil": "Basil_v0"
   },
-  "stdlib": "???"
+  "stdlib": {}
 }
 
 // -> package.zos.development.json
 {
   "app": {
-    "address": "0x123",
+    "address": "0x101",
     "version": "0.0.1"
   },
   "proxies": {
     "Basil": [ // <------------------------------------------------
       {
-        "address": "0x123",
+        "address": "0x321",
         "version": "0.0.1"
       }
     ]
   },
-  "package": {
-    "contracts": {
-      "Basil": "0x123"
-    },
-    "stdlib": "???"
-  }
+  "contracts": {
+    "Basil": "0x123"
+  },
+  "stdlib": {},
+  "provider": "0x780"
 }
 
 // -------------------------------------------------------------
@@ -103,10 +101,10 @@ $ zos version 0.0.2
 
 // -> package.zos.json
 {
-  "name": "Basil",
+  "name": "Herbs",
   "version": "0.0.2", // <----------------------------------
   "contracts": {}, // <-----------------------------
-  "stdlib": "???"
+  "stdlib": {}
 }
 
 // -> package.zos.development.json
@@ -114,17 +112,17 @@ $ zos version 0.0.2
 
 // -------------------------------------------------------------
 // 7. Adds a new implementation of basil
-$ zos add Basil Basil_v1.sol
+$ zos add Basil Basil_v1
 // -------------------------------------------------------------
 
 // -> package.zos.json
 {
-  "name": "Basil",
+  "name": "Herbs",
   "version": "0.0.2",
   "contracts": {
-    "Basil": "Basil_v1.sol" // <---------------------------------
+    "Basil": "Basil_v1" // <---------------------------------
   },
-  "stdlib": "???"
+  "stdlib": {}
 }
 
 // -> package.zos.development.json
@@ -137,49 +135,48 @@ $ zos sync --network development
 
 // -> package.zos.json
 {
-  "name": "Basil",
+  "name": "Herbs",
   "version": "0.0.2",
   "contracts": {
-    "Basil": "Basil_v1.sol" 
+    "Basil": "Basil_v1" 
   },
-  "stdlib": "???"
+  "stdlib": {}
 }
 
 // -> package.zos.development.json
 {
   "app": {
-    "address": "0x123",
+    "address": "0x101",
     "version": "0.0.2"
   },
   "proxies": {
     "Basil": [
       {
-        "address": "0x123",
-        "version": "0.0.2" 
+        "address": "0x321",
+        "version": "0.0.1" 
       }
     ]
   },
-  "package": {
-    "contracts": {
-      "Basil": "0x456" // CHANGED ADDRESS <---------------------------------------
-    },
-    "stdlib": "???"
-  }
+  "contracts": {
+    "Basil": "0x456" // CHANGED ADDRESS <---------------------------------------
+  },
+  "stdlib": {},
+  "provider": "0x987"
 }
 
 // -------------------------------------------------------------
 // 9. Upgrades Basil's proxy
-$ zos upgrade Basil --network development
+$ zos upgrade 0x321 Basil --network development
 // -------------------------------------------------------------
 
 // -> package.zos.json
 {
-  "name": "Basil",
+  "name": "Herbs",
   "version": "0.0.2",
   "contracts": {
-    "Basil": "Basil_v1.sol" 
+    "Basil": "Basil_v1" 
   },
-  "stdlib": "???"
+  "stdlib": {}
 }
 
 // -> package.zos.development.json
@@ -191,15 +188,14 @@ $ zos upgrade Basil --network development
   "proxies": {
     "Basil": [
       {
-        "address": "0x123",
+        "address": "0x321",
         "version": "0.0.2" // CHANGED <-----------------------------------
       }
     ]
   },
-  "package": {
-    "contracts": {
-      "Basil": "0x456" 
-    },
-    "stdlib": "???"
-  }
+  "contracts": {
+    "Basil": "0x456" 
+  },
+  "stdlib": {},
+  "provider": "0x987"
 }
