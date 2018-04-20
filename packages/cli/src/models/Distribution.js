@@ -1,5 +1,5 @@
 import makeContract from '../utils/contract'
-const Release = makeContract('Release')
+const Release = makeContract(require('zos-kernel/build/contracts/Release.json'))
 const Package = makeContract('Package')
 
 class Distribution {
@@ -18,7 +18,7 @@ class Distribution {
   }
 
   async deploy() {
-    this.package = new Package({ from: this.owner })
+    this.package = await Package.new({ from: this.owner })
     return this.package
   }
 
@@ -32,7 +32,7 @@ class Distribution {
   }
 
   async newVersion(version) {
-    const release = new Release({ from: this.owner })
+    const release = await Release.new({ from: this.owner })
     await this.package.addVersion(version, release.address, { from: this.owner })
     return release
   }
