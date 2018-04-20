@@ -1,15 +1,20 @@
 const Release = artifacts.require('Release')
 const Package = artifacts.require('Package')
 
+
 class Distribution {
 
-  constructor(owner, network) {
+  constructor(owner) {
     this.owner = owner
-    this.network = network
   }
 
   address() {
     return this.package.address
+  }
+
+  async connect(address) {
+    this.package = await Package.at(address)
+    return this.package
   }
 
   async deploy(initialVersion) {
@@ -20,12 +25,12 @@ class Distribution {
   }
 
   async getRelease(version) {
-    return this.package.getRelease(version)
+    const releaseAddress = await this.package.getVersion(version)
+    return await Release.at(releaseAddress)
   }
 
-  async connect(address) {
-    this.package = Package.at(address)
-    return this.package
+  async hasVersion(version) {
+    return await this.package.hasVersion(version, { from: this.owner })
   }
 
   async newVersion(version) {
@@ -35,7 +40,7 @@ class Distribution {
 
   async getImplementation(version, contractName) {
     const release = await this.getRelease(version)
-    return release.getImplementation(contractName)
+    return await release.getImplementation(contractName)
   }
 
   async setImplementation(version, contractClass, contractName) {
@@ -45,9 +50,14 @@ class Distribution {
     return implementation
   }
 
+  async frozen(version) {
+    const release = await this.getRelease(version)
+    return await release.frozen()
+  }
+
   async freeze(version) {
     const release = await this.getRelease(version)
-    await release.freeze()
+    await release.freeze({ from: this.owner })
   }
 }
 

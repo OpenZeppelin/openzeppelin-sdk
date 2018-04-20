@@ -1,4 +1,5 @@
 import Distribution from '../../src/models/Distribution'
+import assertRevert from 'zos-lib/test/helpers/assertRevert'
 
 const ImplV1 = artifacts.require('ImplV1')
 const ImplV2 = artifacts.require('ImplV2')
@@ -39,7 +40,7 @@ contract.skip('Distribution', function ([_, owner]) {
   describe('connect', function () {
     beforeEach("connecting to existing instance", async function () {
       const connectedDistribution = new Distribution(owner)
-      await connectedDistribution.connect(this.distribution.address)
+      await connectedDistribution.connect(this.distribution.address())
       this.distribution = connectedDistribution
     })
 
@@ -47,44 +48,67 @@ contract.skip('Distribution', function ([_, owner]) {
   })
 
 
-  const createVersion = async function () {
-    await this.distribution.newVersion(newVersion)
-  }
-
   describe('newVersion', function () {
-    beforeEach('creating a new version', createVersion)
-
-    it('updates own properties', async function () {
-      this.distribution.version.should.eq(newVersion)
-      this.distribution.directories.should.include.key(newVersion)
+    beforeEach('creating a new version', async function() {
+      await this.distribution.newVersion(newVersion)
     })
 
-    it('registers new version on package', async function () {
-      (await this.distribution.package.hasVersion(newVersion)).should.be.true
+    it('registers new version on distribution', async function () {
+      const hasVersion = await this.distribution.hasVersion(newVersion)
+      hasVersion.should.be.true
     })
 
-    it('returns the current directory', async function () {
-      const currentDirectory = await this.distribution.package.getVersion(newVersion)
-      this.distribution.getCurrentDirectory().address.should.eq(currentDirectory)
+    it('keeps the initial version', async function () {
+      const hasVersion = await this.distribution.hasVersion(initialVersion)
+      hasVersion.should.be.true
     })
   })
 
 
-  const setImplementation = async function () {
-    this.implementation = await this.distribution.setImplementation(ImplV1, contractName)
-  }
-
-  describe('setImplementation', function () {
-    beforeEach('setting implementation', setImplementation)
-
-    it('should return implementation', async function () {
-      this.implementation.address.should.be.not.null
+  describe('freeze', function() {
+    it('should not be frozen by default', async function () {
+      const frozen = await this.distribution.frozen(initialVersion)
+      frozen.should.be.false
     })
 
-    it('should register implementation on directory', async function () {
-      const implementation = await this.distribution.getCurrentDirectory().getImplementation(contractName)
-      implementation.should.eq(this.implementation.address)
+    it('should be freezable', async function () {
+      await this.distribution.freeze(initialVersion)
+      const frozen = await this.distribution.frozen(initialVersion)
+      frozen.should.be.true
     })
   })
+
+
+  describe('get and set implementation', function () {
+
+    describe('while unfrozen', async function() {
+      beforeEach('setting implementation', async function() {
+        this.implementation = await this.distribution.setImplementation(initialVersion, ImplV1, contractName)
+      })
+
+      it('should return implementation', async function () {
+        const implementation = await this.distribution.getImplementation(initialVersion, contractName)
+        implementation.should.be.not.null
+      })
+
+      it('should register implementation on release version', async function () {
+        const implementation = await this.distribution.getImplementation(initialVersion, contractName)
+        implementation.should.eq(this.implementation.address)
+      })
+      
+    })
+
+    describe('while frozen', function() {
+      beforeEach('freezing', async function() {
+        await this.distribution.freeze(initialVersion)
+      })
+
+      it('should revert when registering an implementation', async function() {
+        await assertRevert(this.distribution.setImplementation(initialVersion, ImplV1, contractName))
+      })
+    })
+
+  })
+
 
 })
