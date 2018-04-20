@@ -1,0 +1,24 @@
+{
+  "name": "upgradeability-lib-complex-example",
+  "version": "0.0.1",
+  "description": "Example of using the upgradeability-lib's AppManager",
+  "main": "index.js",
+  "scripts": {
+    "compile": "rm -rf build && npx truffle compile",
+    "start": "npm run compile && npx truffle exec index.js"
+  },
+  "keywords": [
+    "zos",
+    "zeppelin_os"
+  ],
+  "author": "ajs",
+  "license": "ISC",
+  "dependencies": {
+    "babel-polyfill": "^6.26.0",
+    "babel-preset-es2015": "^6.24.1",
+    "babel-preset-stage-2": "^6.24.1",
+    "babel-preset-stage-3": "^6.24.1",
+    "babel-register": "^6.26.0",
+    "truffle": "^4.1.5",
+  }
+}
