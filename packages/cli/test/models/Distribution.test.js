@@ -7,7 +7,7 @@ const should = require('chai')
   .use(require('chai-as-promised'))
   .should()
 
-contract.only('Distribution', function ([_, owner]) {
+contract.skip('Distribution', function ([_, owner]) {
   
   const contractName = 'Impl'
   const initialVersion = "1.0"
