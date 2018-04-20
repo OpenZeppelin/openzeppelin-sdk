@@ -5,7 +5,6 @@ import makeContract from '../utils/contract'
 
 const log = new Logger('PackageFilesInterface')
 
-
 export default class PackageFilesInterface {
   constructor(packageFileName) {
     this.packageFileName = packageFileName || 'package.zos.json'

@@ -1,8 +1,7 @@
 import AppManager from '../models/AppManager'
-import makeContract from '../utils/contract'
 import PackageFilesInterface from '../utils/PackageFilesInterface'
 
-async function upgradeProxy(contractAlias, proxyAddress, { initArgs, network, from, packageFileName }) {
+async function upgradeProxy(contractAlias, proxyAddress, { initMethod, initArgs, network, from, packageFileName }) {
   if (contractAlias === undefined) throw `Must provide a contract name`
 
   // TODO: if network file does not exists, create it
@@ -26,8 +25,7 @@ async function upgradeProxy(contractAlias, proxyAddress, { initArgs, network, fr
   await appManager.connect(zosNetworkFile.app.address)
 
   const contractClass = await files.getContractClass(zosPackage, contractAlias)
-  await appManager.upgradeProxy(proxyAddress, contractClass, contractAlias)
-  // TODO: Support more than one initialize function
+  await appManager.upgradeProxy(proxyAddress, contractClass, contractAlias, initMethod, initArgs)
 
   proxies[contractAlias][index].version = appManager.version
   zosNetworkFile.proxies = proxies
