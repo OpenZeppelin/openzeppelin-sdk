@@ -1,13 +1,8 @@
-const contract = require("truffle-contract")
-const Kernel = contract(require('../../node_modules/kernel/build/contracts/Kernel.json'))
-const Release = contract(require('../../node_modules/kernel/build/contracts/Release.json'))
-const ZepToken = contract(require('../../node_modules/kernel/build/contracts/ZepToken.json'))
-const Vouching = contract(require('../../node_modules/kernel/build/contracts/Vouching.json'))
-
-Kernel.setProvider(web3.currentProvider)
-Release.setProvider(web3.currentProvider)
-ZepToken.setProvider(web3.currentProvider)
-Vouching.setProvider(web3.currentProvider)
+const makeContract = require('../utils/contract')
+const Kernel = makeContract(require('../../node_modules/kernel/build/contracts/Kernel.json'))
+const Release = makeContract(require('../../node_modules/kernel/build/contracts/Release.json'))
+const ZepToken = makeContract(require('../../node_modules/kernel/build/contracts/ZepToken.json'))
+const Vouching = makeContract(require('../../node_modules/kernel/build/contracts/Vouching.json'))
 
 export default class KernelWrapper {
   constructor(address, txParams) {

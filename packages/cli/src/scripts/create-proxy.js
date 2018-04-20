@@ -1,9 +1,9 @@
 import AppManager from '../models/AppManager'
 import PackageFilesInterface from '../utils/PackageFilesInterface'
 import Logger from '../utils/Logger'
+import makeContract from '../utils/contract'
 
 const log = new Logger('creaty-proxy')
-
 
 async function createProxy(contractAlias, { network, from, packageFileName }) {
   if (contractAlias === undefined) {
@@ -27,7 +27,7 @@ async function createProxy(contractAlias, { network, from, packageFileName }) {
     return
   }
 
-  const contractClass = artifacts.require(contractName)
+  const contractClass = makeContract(contractName)
   const proxyInstance = await appManager.createProxy(contractClass, contractAlias)
 
   const { address } = proxyInstance

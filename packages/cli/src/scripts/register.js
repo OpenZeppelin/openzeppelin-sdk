@@ -4,7 +4,7 @@ import kernelAddress from '../utils/kernelAddress'
 async function register(releaseAddress, { network, from }) {
   if(!releaseAddress) throw new Error('You must provide a release address')
   const address = kernelAddress(network)
-  const txParams = Object.assign({}, global.truffleDefaults, { from })
+  const txParams = { from }
 
   const kernel = new Kernel(address, txParams)
   await kernel.validateCanRegister(releaseAddress)

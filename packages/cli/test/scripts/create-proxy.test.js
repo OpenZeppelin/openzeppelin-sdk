@@ -51,7 +51,7 @@ contract('create-proxy command', function([_, owner]) {
 
   it('should be able to handle proxies for more than one contract', async function() {
     const customAlias = 'SomeOtherAlias';
-    await addImplementation('ImplV2.sol', customAlias, {packageFileName});
+    await addImplementation('ImplV2', customAlias, {packageFileName});
     await sync({ packageFileName, network, from });
     await createProxy(contractAlias, {packageFileName, network, from});
     await createProxy(customAlias, {packageFileName, network, from});

@@ -7,4 +7,5 @@ cache:
 matrix:
   fast_finish: true
 script:
+  - npx truffle compile
   - npm test

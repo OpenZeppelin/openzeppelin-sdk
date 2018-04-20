@@ -2,6 +2,7 @@ import AppManager from '../models/AppManager'
 import PackageFilesInterface from '../utils/PackageFilesInterface'
 import Logger from '../utils/Logger'
 import Stdlib from '../models/Stdlib';
+import makeContract from '../utils/contract'
 
 const log = new Logger('sync')
 
@@ -43,7 +44,7 @@ async function sync({ network, from, packageFileName }) {
 
   for (let contractName in zosPackage.contracts) {
     // TODO: store the implementation's hash to avoid unnecessary deployments
-    const contractClass = artifacts.require(zosPackage.contracts[contractName])
+    const contractClass = makeContract(zosPackage.contracts[contractName])
     const contractInstance = await appManager.setImplementation(contractClass, contractName)
       zosNetworkFile.package.contracts[contractName] = contractInstance.address
   }

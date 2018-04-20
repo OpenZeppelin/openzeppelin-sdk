@@ -5,7 +5,7 @@ async function vouch(releaseAddress, rawAmount, { network, from }) {
   if(!releaseAddress) throw new Error('You must provide a release address to vouch for')
   if(!rawAmount) throw new Error('You must provide a vouching amount of ZEP tokens')
   const address = kernelAddress(network)
-  const txParams = Object.assign({}, global.truffleDefaults, { from })
+  const txParams = { from }
 
   const data = ''
   const amount = new web3.BigNumber(rawAmount)

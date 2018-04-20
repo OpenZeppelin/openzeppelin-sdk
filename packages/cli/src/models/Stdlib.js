@@ -2,8 +2,9 @@ import truffleContract from 'truffle-contract';
 import fs from 'fs';
 import path from 'path';
 import npm from 'npm-programmatic';
+import makeContract from '../utils/contract'
 
-const ContractDirectory = artifacts.require('ContractDirectory');
+const ContractDirectory = makeContract('ContractDirectory');
 
 export default class Stdlib {
   constructor(nameWithVersion, owner) {
@@ -30,9 +31,7 @@ export default class Stdlib {
     const implName = this.getPackage().contracts[contractName];
     if (!implName) throw `Contract ${contractName} not found in package`;
     const schema = JSON.parse(fs.readFileSync(`node_modules/${this.name}/build/contracts/${implName}.json`));
-    const contract = truffleContract(schema);
-    contract.setProvider(web3.currentProvider);
-    contract.defaults(ContractDirectory.class_defaults);
+    const contract = makeContract(schema);
     return contract;
   }
 

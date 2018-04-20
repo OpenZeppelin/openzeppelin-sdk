@@ -2,11 +2,12 @@ import decodeLogs from '../utils/decodeLogs';
 import encodeCall from '../utils/encodeCall';
 import Stdlib from './Stdlib';
 import _ from 'lodash';
+import makeContract from '../utils/contract';
 
-const AppManager = artifacts.require('PackagedAppManager');
-const AppDirectory = artifacts.require('AppDirectory');
-const Package = artifacts.require('Package');
-const UpgradeabilityProxyFactory = artifacts.require('UpgradeabilityProxyFactory');
+const AppManager = makeContract('PackagedAppManager');
+const AppDirectory = makeContract('AppDirectory');
+const Package = makeContract('Package');
+const UpgradeabilityProxyFactory = makeContract('UpgradeabilityProxyFactory');
 
 class AppManagerWrapper {
 

@@ -1,11 +1,10 @@
-global.artifacts = artifacts
+// Set global variables to be used in scripts and models
 global.web3 = web3
-global.truffleDefaults = artifacts.require('ContractDirectory').class_defaults // TODO: Make less horrible
+global.artifacts = artifacts
 
 const program = require('commander')
 
 module.exports = function(cb) {
-
   program
     .option('--network [network]', 'Truffle network')
     .option('--from [from]', 'Sender')
