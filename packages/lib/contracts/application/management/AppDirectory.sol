@@ -10,6 +10,12 @@ import "zeppelin-solidity/contracts/ownership/Ownable.sol";
  * @dev Will search the stdlib for an implementation if none is found in the directory
  */
 contract AppDirectory is ContractDirectory {
+  /**
+   * @dev Emitted when the stdlib is changed
+   * @param newStdlib New address of stdlib
+   */
+  event StdlibChanged(address newStdlib);
+
   // Default contract provider
   ContractProvider public stdlib;
   
@@ -41,5 +47,6 @@ contract AppDirectory is ContractDirectory {
    */
   function setStdlib(ContractProvider _stdlib) public onlyOwner {
     stdlib = _stdlib;
+    StdlibChanged(_stdlib);
   }
 }

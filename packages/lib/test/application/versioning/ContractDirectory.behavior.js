@@ -29,7 +29,7 @@ function shouldBehaveLikeContractDirectory(owner, anotherAddress) {
         const { logs } = await this.directory.setImplementation(contractName, this.implementation_v0, { from })
 
         assert.equal(logs.length, 1)
-        assert.equal(logs[0].event, 'ImplementationAdded')
+        assert.equal(logs[0].event, 'ImplementationChanged')
         assert.equal(logs[0].args.contractName, contractName)
         assert.equal(logs[0].args.implementation, this.implementation_v0)
       })

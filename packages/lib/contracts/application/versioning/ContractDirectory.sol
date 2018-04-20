@@ -10,11 +10,10 @@ import "zeppelin-solidity/contracts/ownership/Ownable.sol";
 contract ContractDirectory is ContractProvider, Ownable {
   /**
    * @dev This event will be emitted when an implementation is added to the directory
-   * @dev contractName is not indexed due to truffle testing constraints
    * @param contractName Name of the contract for which an implementation was added
    * @param implementation Address of added implementation
    */
-  event ImplementationAdded(string contractName, address indexed implementation);
+  event ImplementationChanged(string contractName, address implementation);
 
   // mapping where the addresses of the implementations are stored
   mapping (string => address) internal implementations;
@@ -35,6 +34,6 @@ contract ContractDirectory is ContractProvider, Ownable {
    */
   function setImplementation(string contractName, address implementation) public onlyOwner {
     implementations[contractName] = implementation;
-    emit ImplementationAdded(contractName, implementation);
+    emit ImplementationChanged(contractName, implementation);
   }
 }

@@ -138,23 +138,11 @@ contract('UnversionedAppManager', ([_, managerOwner, directoryOwner, anotherAcco
     describe('when the sender is the manager owner', function () {
       const from = managerOwner
 
-      describe('when the requested contract was registered', function () {
-        beforeEach(async function () {
-          await this.directory.setImplementation(contract, this.implementation_v1, { from: directoryOwner })
-        })
+      it('upgrades to the requested implementation', async function () {
+        await this.manager.upgradeTo(this.proxyAddress, contract, { from })
 
-        it('upgrades to the requested implementation', async function () {
-          await this.manager.upgradeTo(this.proxyAddress, contract, { from })
-
-          const implementation = await this.proxy.implementation()
-          assert.equal(implementation, this.implementation_v1)
-        })
-      })
-
-      describe('when the requested contract was not registered', function () {
-        it('reverts', async function () {
-          await assertRevert(this.manager.upgradeTo(this.proxyAddress, contract, { from }))
-        })
+        const implementation = await this.proxy.implementation()
+        assert.equal(implementation, this.implementation_v0)
       })
     })
 
@@ -184,39 +172,31 @@ contract('UnversionedAppManager', ([_, managerOwner, directoryOwner, anotherAcco
       const from = managerOwner
       const value = 1e5
 
-      describe('when the requested contract was registered', function () {
-        beforeEach(async function () {
-          await this.directory.setImplementation(contract, this.behavior.address, { from: directoryOwner })
-          await this.manager.upgradeToAndCall(this.proxyAddress, contract, initializeData, { from, value })
-        })
-
-        it('upgrades to the requested implementation', async function () {
-          const implementation = await this.proxy.implementation()
-          assert.equal(implementation, this.behavior.address)
-        })
-
-        it('calls the "initialize" function', async function() {
-          const initializable = InitializableMock.at(this.proxyAddress)
-          const x = await initializable.x()
-          assert.equal(x, 42)
-        })
-
-        it('sends given value to the delegated implementation', async function() {
-          const balance = await web3.eth.getBalance(this.proxyAddress)
-          assert(balance.eq(value))
-        })
-
-        it('uses the storage of the proxy', async function () {
-          // fetch the x value of Initializable at position 0 of the storage
-          const storedValue = await web3.eth.getStorageAt(this.proxyAddress, 1)
-          assert.equal(storedValue, 42)
-        })
+      beforeEach(async function () {
+        await this.directory.setImplementation(contract, this.behavior.address, { from: directoryOwner })
+        await this.manager.upgradeToAndCall(this.proxyAddress, contract, initializeData, { from, value })
       })
 
-      describe('when the requested contract was not registered', function () {
-        it('reverts', async function () {
-          await assertRevert(this.manager.upgradeToAndCall(this.proxyAddress, contract, initializeData, { from, value }))
-        })
+      it('upgrades to the requested implementation', async function () {
+        const implementation = await this.proxy.implementation()
+        assert.equal(implementation, this.behavior.address)
+      })
+
+      it('calls the "initialize" function', async function() {
+        const initializable = InitializableMock.at(this.proxyAddress)
+        const x = await initializable.x()
+        assert.equal(x, 42)
+      })
+
+      it('sends given value to the delegated implementation', async function() {
+        const balance = await web3.eth.getBalance(this.proxyAddress)
+        assert(balance.eq(value))
+      })
+
+      it('uses the storage of the proxy', async function () {
+        // fetch the x value of Initializable at position 0 of the storage
+        const storedValue = await web3.eth.getStorageAt(this.proxyAddress, 1)
+        assert.equal(storedValue, 42)
       })
     })
 

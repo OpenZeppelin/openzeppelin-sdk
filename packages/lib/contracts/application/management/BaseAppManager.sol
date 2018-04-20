@@ -44,7 +44,7 @@ contract BaseAppManager is Ownable {
    * @return Address of the new proxy
    */
   function create(string contractName) public returns (OwnedUpgradeabilityProxy) {
-    address implementation = getImplementationOrRevert(contractName);
+    address implementation = getImplementation(contractName);
     return factory.createProxy(this, implementation);
   }
 
@@ -56,7 +56,7 @@ contract BaseAppManager is Ownable {
    @return Address of the new proxy
    */
    function createAndCall(string contractName, bytes data) payable public returns (OwnedUpgradeabilityProxy) {
-    address implementation = getImplementationOrRevert(contractName);
+    address implementation = getImplementation(contractName);
     return factory.createProxyAndCall.value(msg.value)(this, implementation, data);
   }
 
@@ -66,7 +66,7 @@ contract BaseAppManager is Ownable {
    * @param contractName Name of the contract with a new implmentation
    */
   function upgradeTo(OwnedUpgradeabilityProxy proxy, string contractName) public onlyOwner {
-    address implementation = getImplementationOrRevert(contractName);
+    address implementation = getImplementation(contractName);
     proxy.upgradeTo(implementation);
   }
 
@@ -77,19 +77,7 @@ contract BaseAppManager is Ownable {
    * @param data Data to be sent as msg.data in the low level call. It should include the signature of the function to be called in the implementation together with its parameters, as described in https://solidity.readthedocs.io/en/develop/abi-spec.html#function-selector-and-argument-encoding.
    */
   function upgradeToAndCall(OwnedUpgradeabilityProxy proxy, string contractName, bytes data) payable public onlyOwner {
-    address implementation = getImplementationOrRevert(contractName);
-    proxy.upgradeToAndCall.value(msg.value)(implementation, data);
-  }
-
-  /**
-   * @dev Gets the implementation address for a given contract name, provided by the contract provider
-   * @dev If no implementation is found, it reverts
-   * @param contractName Name of the contract whose implementation address is desired
-   * @return Address where the contract is implemented
-   */
-  function getImplementationOrRevert(string contractName) internal view returns (address) {
     address implementation = getImplementation(contractName);
-    require(implementation != address(0));
-    return implementation;
+    proxy.upgradeToAndCall.value(msg.value)(implementation, data);
   }
 }

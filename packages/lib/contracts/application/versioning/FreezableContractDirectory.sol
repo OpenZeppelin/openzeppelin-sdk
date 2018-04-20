@@ -31,7 +31,7 @@ import "./ContractDirectory.sol";
    * @param contractName Name of the contract whose implementation address is being added
    * @param implementation Address where the added contract is implemented
    */
-  function setImplementation(string contractName, address implementation) public onlyOwner whenNotFrozen {
+  function setImplementation(string contractName, address implementation) public whenNotFrozen {
     super.setImplementation(contractName, implementation);
   }
 }

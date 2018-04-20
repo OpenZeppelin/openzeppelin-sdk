@@ -8,11 +8,6 @@ import './OwnedUpgradeabilityProxy.sol';
  */
 contract UpgradeabilityProxyFactory {
   /**
-   * @dev Constructor function
-   */
-  function UpgradeabilityProxyFactory() public {}
-
-  /**
    * @dev This event will be emitted every time a new proxy is created
    * @param proxy representing the address of the proxy created
    */
@@ -47,6 +42,7 @@ contract UpgradeabilityProxyFactory {
 
   /**
    * @dev Internal function to create an upgradeable proxy
+   * @param implementation representing the address of the initial implementation to be set
    * @return address of the new proxy created
    */
   function _createProxy(address implementation) internal returns (OwnedUpgradeabilityProxy) {

@@ -12,16 +12,17 @@ contract UpgradeabilityProxy is Proxy {
    * @dev This event will be emitted every time the implementation gets upgraded
    * @param implementation representing the address of the upgraded implementation
    */
-  event Upgraded(address indexed implementation);
+  event Upgraded(address implementation);
 
-  // Storage position of the address of the current implementation
-  bytes32 private constant implementationPosition = keccak256("org.zeppelinos.proxy.implementation");
+  // Storage slot of the address of the current implementation
+  bytes32 private constant implementationSlot = keccak256("org.zeppelinos.proxy.implementation");
 
   /**
    * @dev Constructor function
+   * @param _implementation representing the address of the initial implementation to be set
    */
   function UpgradeabilityProxy(address _implementation) public {
-    setImplementation(_implementation);
+    _setImplementation(_implementation);
   }
 
   /**
@@ -29,9 +30,9 @@ contract UpgradeabilityProxy is Proxy {
    * @return address of the current implementation
    */
   function implementation() public view returns (address impl) {
-    bytes32 position = implementationPosition;
+    bytes32 slot = implementationSlot;
     assembly {
-      impl := sload(position)
+      impl := sload(slot)
     }
   }
 
@@ -39,12 +40,12 @@ contract UpgradeabilityProxy is Proxy {
    * @dev Sets the address of the current implementation
    * @param newImplementation address representing the new implementation to be set
    */
-  function setImplementation(address newImplementation) internal {
+  function _setImplementation(address newImplementation) internal {
     require(AddressUtils.isContract(newImplementation));
 
-    bytes32 position = implementationPosition;
+    bytes32 slot = implementationSlot;
     assembly {
-      sstore(position, newImplementation)
+      sstore(slot, newImplementation)
     }
 
     emit Upgraded(newImplementation);
@@ -55,8 +56,6 @@ contract UpgradeabilityProxy is Proxy {
    * @param newImplementation representing the address of the new implementation to be set
    */
   function _upgradeTo(address newImplementation) internal {
-    address currentImplementation = implementation();
-    require(currentImplementation != newImplementation);
-    setImplementation(newImplementation);
+    _setImplementation(newImplementation);
   }
 }

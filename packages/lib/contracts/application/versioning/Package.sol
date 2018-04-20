@@ -15,7 +15,7 @@ contract Package is Ownable {
    * @param version Name of the version for which a directory was added
    * @param provider ContractProvider associated to the added version
    */
-  event VersionAdded(string version, ContractProvider indexed provider);
+  event VersionAdded(string version, ContractProvider provider);
 
   // mapping that stores the association between versions and their contract providers
   mapping (string => ContractProvider) internal versions;
@@ -26,7 +26,9 @@ contract Package is Ownable {
    * @return Contract provider for the given version
    */
   function getVersion(string version) public view returns (ContractProvider) {
-    return versions[version];
+    ContractProvider provider = versions[version];
+    require(provider != address(0));
+    return provider;
   }
 
   /**
@@ -46,7 +48,7 @@ contract Package is Ownable {
    * @return Whether the version is already in the directory
    */
   function hasVersion(string version) public view returns (bool) {
-    return address(getVersion(version)) != address(0);
+    return address(versions[version]) != address(0);
   }
 
   /**
@@ -57,7 +59,6 @@ contract Package is Ownable {
    */
   function getImplementation(string version, string contractName) public view returns (address) {
     ContractProvider provider = getVersion(version);
-    require(address(provider) != address(0));
     return provider.getImplementation(contractName);
   }
 }

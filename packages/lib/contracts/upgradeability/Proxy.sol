@@ -22,12 +22,11 @@ contract Proxy {
       let ptr := mload(0x40)
       calldatacopy(ptr, 0, calldatasize)
       let result := delegatecall(gas, _impl, ptr, calldatasize, 0, 0)
-      let size := returndatasize
-      returndatacopy(ptr, 0, size)
+      returndatacopy(ptr, 0, returndatasize)
 
       switch result
-      case 0 { revert(ptr, size) }
-      default { return(ptr, size) }
+      case 0 { revert(ptr, returndatasize) }
+      default { return(ptr, returndatasize) }
     }
   }
 }

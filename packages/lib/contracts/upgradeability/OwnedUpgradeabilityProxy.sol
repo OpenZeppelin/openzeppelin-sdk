@@ -14,8 +14,8 @@ contract OwnedUpgradeabilityProxy is UpgradeabilityProxy {
    */
   event ProxyOwnershipTransferred(address previousOwner, address newOwner);
 
-  // Storage position of the owner of the contract
-  bytes32 private constant proxyOwnerPosition = keccak256("org.zeppelinos.proxy.owner");
+  // Storage slot of the owner of the contract
+  bytes32 private constant proxyOwnerSlot = keccak256("org.zeppelinos.proxy.owner");
 
   /**
    * @dev Throws if called by any account other than the owner.
@@ -27,6 +27,7 @@ contract OwnedUpgradeabilityProxy is UpgradeabilityProxy {
 
   /**
    * @dev the constructor sets the original owner of the contract to the sender account.
+   * @param _implementation representing the address of the initial implementation to be set
    */
   function OwnedUpgradeabilityProxy(address _implementation) UpgradeabilityProxy(_implementation) public {
     setUpgradeabilityOwner(msg.sender);
@@ -37,9 +38,9 @@ contract OwnedUpgradeabilityProxy is UpgradeabilityProxy {
    * @return the address of the owner
    */
   function proxyOwner() public view returns (address owner) {
-    bytes32 position = proxyOwnerPosition;
+    bytes32 slot = proxyOwnerSlot;
     assembly {
-      owner := sload(position)
+      owner := sload(slot)
     }
   }
 
@@ -77,9 +78,9 @@ contract OwnedUpgradeabilityProxy is UpgradeabilityProxy {
    * @dev Sets the address of the owner
    */
   function setUpgradeabilityOwner(address newProxyOwner) internal {
-    bytes32 position = proxyOwnerPosition;
+    bytes32 slot = proxyOwnerSlot;
     assembly {
-      sstore(position, newProxyOwner)
+      sstore(slot, newProxyOwner)
     }
   }
 }

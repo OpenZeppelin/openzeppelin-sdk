@@ -57,12 +57,6 @@ contract('OwnedUpgradeabilityProxy', ([_, owner, anotherAccount]) => {
         })
       })
 
-      describe('when the given implementation is the same as the current one', function () {
-        it('reverts', async function () {
-          await assertRevert(this.proxy.upgradeTo(this.implementation_v0, { from }))
-        })
-      })
-
       describe('when the given implementation is the zero address', function () {
         it('reverts', async function () {
           await assertRevert(this.proxy.upgradeTo(0, { from }))
