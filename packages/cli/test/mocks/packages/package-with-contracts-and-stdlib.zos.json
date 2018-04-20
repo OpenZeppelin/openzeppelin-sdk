@@ -1,0 +1,11 @@
+{
+  "name": "Herbs",
+  "version": "1.0",
+  "contracts": {
+    "Impl": "ImplV1"
+  },
+  "stdlib": {
+    "name": "mock-stdlib",
+    "version": "1.1"
+  }
+}

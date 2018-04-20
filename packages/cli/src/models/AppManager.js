@@ -3,6 +3,7 @@ import Stdlib from './Stdlib';
 import makeContract from '../utils/contract';
 import decodeLogs from 'zos-lib/test/helpers/decodeLogs';
 import encodeCall from 'zos-lib/test/helpers/encodeCall';
+import fs from 'fs';
 
 const AppManager = makeContract('PackagedAppManager');
 const AppDirectory = makeContract('AppDirectory');
@@ -111,6 +112,30 @@ class AppManagerWrapper {
     if (!stdlib || _.isEmpty(stdlib)) return 0;
     else if (stdlib.getDeployed) return stdlib.getDeployed(this.network);
     else return (new Stdlib(stdlib)).getDeployed(this.network);
+  }
+
+  // TODO: This code is in part duplicated from scripts/sync.js and ./Stdlib.js
+  // It also depends on packageData structure, unlike the rest of the methods in this class
+  // Consider moving it elsewhere
+  async deployAll(maybePackageData) {
+    // Deploy app manager
+    const packageData = maybePackageData || JSON.parse(fs.readFileSync('package.zos.json'));
+    await this.deploy(packageData.version);
+
+    // Deploy and set stdlib
+    if (!_.isEmpty(packageData.stdlib)) {
+      const stdlib = new Stdlib(packageData.stdlib, this.owner);
+      const directory = await stdlib.deploy();
+      await this.getCurrentDirectory().setStdlib(directory.address, { from: this.owner });
+    }
+
+    // Deploy all contracts
+    const directory = this.getCurrentDirectory()
+    await Promise.all(_.map(packageData.contracts, async (contractImpl, contractAlias) => {
+      const contractClass = await makeContract.local(contractImpl);
+      const deployed = await contractClass.new({ from: this.owner });
+      await directory.setImplementation(contractAlias, deployed.address, { from: this.owner });
+    }));
   }
 }
 

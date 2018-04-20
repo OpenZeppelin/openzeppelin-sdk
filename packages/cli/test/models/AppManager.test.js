@@ -1,5 +1,6 @@
 import AppManager from '../../src/models/AppManager';
 import Stdlib from '../../src/models/Stdlib';
+import fs from 'fs';
 
 const ImplV1 = artifacts.require('ImplV1');
 const ImplV2 = artifacts.require('ImplV2');
@@ -233,5 +234,30 @@ contract('AppManager', function ([_, owner]) {
       shouldInitialize();
       shouldConnectToStdlib();
     });
+  });
+
+  describe('from package data', async function () {
+    const greeterName = 'Greeter';
+
+    beforeEach("deploying all contracts", async function () {
+      this.app = new AppManager(owner, networkName);
+      const packageData = JSON.parse(fs.readFileSync('test/mocks/packages/package-with-contracts-and-stdlib.zos.json'));
+      await this.app.deployAll(packageData);
+      this.directory = await this.app.getCurrentDirectory();
+    });
+
+    describe('deployAll', function () {
+      shouldInitialize();
+      
+      it('should deploy stdlib', async function () {
+        (await this.directory.stdlib()).should.be.not.null;
+      })
+
+      it('should retrieve a mock from app directory', async function () {
+        const proxy = await this.app.createProxy(ImplV1, "Impl");
+        (await proxy.say()).should.eq('V1');
+      });
+    });    
+    
   });
  });
