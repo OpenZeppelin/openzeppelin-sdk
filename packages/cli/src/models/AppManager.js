@@ -1,8 +1,8 @@
-import decodeLogs from '../utils/decodeLogs';
-import encodeCall from '../utils/encodeCall';
-import Stdlib from './Stdlib';
 import _ from 'lodash';
+import Stdlib from './Stdlib';
 import makeContract from '../utils/contract';
+import decodeLogs from 'zos-lib/test/helpers/decodeLogs';
+import encodeCall from 'zos-lib/test/helpers/encodeCall';
 
 const AppManager = makeContract('PackagedAppManager');
 const AppDirectory = makeContract('AppDirectory');
@@ -15,6 +15,7 @@ class AppManagerWrapper {
     this.owner = owner;
     this.network = network;
     this.directories = {};
+    this.txParams = { from: this.owner }
   }
 
   getCurrentDirectory() {
@@ -26,24 +27,14 @@ class AppManagerWrapper {
   }
 
   async deploy(initialVersion, stdlib) {
-    this.factory = await UpgradeabilityProxyFactory.new({ from: this.owner });
-    this.package = await Package.new({ from: this.owner });
+    this.factory = await UpgradeabilityProxyFactory.new(this.txParams);
+    this.package = await Package.new(this.txParams);
     const stdlibAddress = this._getStdlibAddress(stdlib);
-    const directory = await AppDirectory.new(stdlibAddress, { from: this.owner });
-    await this.package.addVersion(initialVersion, directory.address, { from: this.owner });
+    const directory = await AppDirectory.new(stdlibAddress, this.txParams);
+    await this.package.addVersion(initialVersion, directory.address, this.txParams);
     this.directories[initialVersion] = directory;
     this.version = initialVersion;
-    this.appManager = await AppManager.new(this.package.address, initialVersion, this.factory.address, { from: this.owner });
-  }
-
-  _getStdlibAddress(stdlib) {
-    if (!stdlib || _.isEmpty(stdlib)) {
-      return 0;
-    } else if (stdlib.getDeployed) {
-      return stdlib.getDeployed(this.network);
-    } else {
-      return (new Stdlib(stdlib)).getDeployed(this.network);
-    }
+    this.appManager = await AppManager.new(this.package.address, initialVersion, this.factory.address, this.txParams);
   }
 
   async connect(address) {
@@ -56,9 +47,9 @@ class AppManagerWrapper {
 
   async newVersion(versionName, stdlib) {
     const stdlibAddress = this._getStdlibAddress(stdlib);
-    const directory = await AppDirectory.new(stdlibAddress, { from: this.owner });
-    await this.package.addVersion(versionName, directory.address, { from: this.owner });
-    await this.appManager.setVersion(versionName, { from: this.owner });
+    const directory = await AppDirectory.new(stdlibAddress, this.txParams);
+    await this.package.addVersion(versionName, directory.address, this.txParams);
+    await this.appManager.setVersion(versionName, this.txParams);
     this.directories[versionName] = directory;
     this.version = versionName;
   }
@@ -69,9 +60,9 @@ class AppManagerWrapper {
   }
 
   async setImplementation(contractClass, contractName) {
-    const implementation = await contractClass.new({ from: this.owner });
+    const implementation = await contractClass.new(this.txParams);
     const directory = this.getCurrentDirectory();
-    await directory.setImplementation(contractName, implementation.address, { from: this.owner });
+    await directory.setImplementation(contractName, implementation.address, this.txParams);
     return implementation;
   }
 
@@ -81,10 +72,9 @@ class AppManagerWrapper {
     return stdlibAddress;
   }
 
-  async createProxy(contractClass, contractName, initArgs) {
-    const initMethodName = 'initialize';
+  async createProxy(contractClass, contractName, initMethodName, initArgs) {
     const { receipt } = typeof(initArgs) === 'undefined'
-      ? await this._createProxy(contractClass, contractName)
+      ? await this._createProxy(contractName)
       : await this._createProxyAndCall(contractClass, contractName, initMethodName, initArgs);
 
     const logs = decodeLogs([receipt.logs[0]], UpgradeabilityProxyFactory, 0x0);
@@ -92,28 +82,35 @@ class AppManagerWrapper {
     return contractClass.at(address);
   }
 
+  async upgradeProxy(proxyAddress, contractClass, contractName, initMethodName, initArgs) {
+    if(typeof(initArgs) === 'undefined') return this.appManager.upgradeTo(proxyAddress, contractName, this.txParams);
+    const initMethod = this._validateInitMethod(contractClass, initMethodName, initArgs)
+    const initArgTypes = initMethod.inputs.map(input => input.type);
+    const callData = encodeCall(initMethodName, initArgTypes, initArgs);
+    return this.appManager.upgradeToAndCall(proxyAddress, contractName, callData, this.txParams);
+  }
+
+  async _createProxy(contractName) {
+    return this.appManager.create(contractName, this.txParams);
+  }
+
   async _createProxyAndCall(contractClass, contractName, initMethodName, initArgs) {
-    // TODO: Support more than one initialize function with different arg types
+    const initMethod = this._validateInitMethod(contractClass, initMethodName, initArgs);
+    const initArgTypes = initMethod.inputs.map(input => input.type);
+    const callData = encodeCall(initMethodName, initArgTypes, initArgs);
+    return this.appManager.createAndCall(contractName, callData, this.txParams);
+  }
+
+  _validateInitMethod(contractClass, initMethodName, initArgs) {
     const initMethod = contractClass.abi.find(fn => fn.name === initMethodName && fn.inputs.length === initArgs.length);
     if (!initMethod) throw `Could not find initialize method '${initMethodName}' with ${initArgs.length} arguments in contract class`;
-    
-    const initArgTypes = initMethod.inputs.map(input => input.type);
-    const initData = encodeCall('initialize', initArgTypes, initArgs);
-    return this.appManager.createAndCall(contractName, initData, { from: this.owner });
+    return initMethod;
   }
 
-  async _createProxy(contractClass, contractName) {
-    return this.appManager.create(contractName, { from: this.owner });
-  }
-
-  // TODO: Instead of accepting argTypes, could accept contractClass and lookup the types in its ABI. Decide which option is most usable.
-  async upgradeProxy(proxyAddress, contractName, methodName, argTypes, args) {
-    if (typeof(methodName) === 'undefined') {
-      return this.appManager.upgradeTo(proxyAddress, contractName, { from: this.owner });
-    } else {
-      const callData = encodeCall(methodName, argTypes, args);
-      return this.appManager.upgradeToAndCall(proxyAddress, contractName, callData, { from: this.owner });  
-    }
+  _getStdlibAddress(stdlib) {
+    if (!stdlib || _.isEmpty(stdlib)) return 0;
+    else if (stdlib.getDeployed) return stdlib.getDeployed(this.network);
+    else return (new Stdlib(stdlib)).getDeployed(this.network);
   }
 }
 

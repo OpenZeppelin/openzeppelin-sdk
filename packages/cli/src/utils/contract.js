@@ -5,7 +5,7 @@ function getDefaults() {
   if (typeof(artifacts) !== 'undefined') {
     return artifacts.options
   } else {
-    throw new "Could not retrieve truffle defaults"
+    throw "Could not retrieve truffle defaults"
   }
 }
 

@@ -9,7 +9,6 @@ const should = require('chai')
   .should();
 
 contract('AppManager', function ([_, owner]) {
-  
   const initialVersion = "1.0";
   const contractName = 'Impl';
   const networkName = 'test';
@@ -48,7 +47,6 @@ contract('AppManager', function ([_, owner]) {
     });
   };
 
-
   describe('without stdlib', function () {
 
     beforeEach("deploying", async function () {
@@ -56,11 +54,9 @@ contract('AppManager', function ([_, owner]) {
       await this.app.deploy(initialVersion);
     });
 
-
     describe('deploy', function () {
       shouldInitialize();
     });
-
 
     describe('connect', function () {
       beforeEach("connecting to existing instance", async function () {
@@ -71,7 +67,6 @@ contract('AppManager', function ([_, owner]) {
 
       shouldInitialize();
     });
-
 
     const newVersion = "2.0";
     const createVersion = async function () {
@@ -100,7 +95,6 @@ contract('AppManager', function ([_, owner]) {
       });
     });
 
-
     const setImplementation = async function () {
       this.implementation = await this.app.setImplementation(ImplV1, contractName);
     };
@@ -117,7 +111,6 @@ contract('AppManager', function ([_, owner]) {
         implementation.should.eq(this.implementation.address);
       });
     });
-
 
     const createProxy = async function () {
       this.proxy = await this.app.createProxy(ImplV1, contractName);
@@ -140,7 +133,7 @@ contract('AppManager', function ([_, owner]) {
 
       describe('with initializer', function () {
         beforeEach("creating a proxy", async function () {
-          this.proxy = await this.app.createProxy(ImplV1, contractName, [10]);
+          this.proxy = await this.app.createProxy(ImplV1, contractName, 'initialize', [10]);
         });
 
         shouldReturnProxy();
@@ -150,7 +143,6 @@ contract('AppManager', function ([_, owner]) {
         });
       });
     });
-
     
     describe('upgradeProxy', function () {
       beforeEach('setting implementation', setImplementation);
@@ -168,7 +160,7 @@ contract('AppManager', function ([_, owner]) {
 
       describe('without call', function () {
         beforeEach('upgrading the proxy', async function () {
-          await this.app.upgradeProxy(this.proxy.address, contractName);
+          await this.app.upgradeProxy(this.proxy.address, ImplV2, contractName);
         });
         
         shouldUpgradeProxy();
@@ -176,7 +168,7 @@ contract('AppManager', function ([_, owner]) {
 
       describe('with call', function () {
         beforeEach('upgrading the proxy', async function () {
-          await this.app.upgradeProxy(this.proxy.address, contractName, 'migrate', ['uint256'], [20]);
+          await this.app.upgradeProxy(this.proxy.address, ImplV2, contractName, 'migrate', [20]);
         });
         
         shouldUpgradeProxy();
@@ -207,7 +199,6 @@ contract('AppManager', function ([_, owner]) {
     });
   });
 
-
   describe('with stdlib', function () {
     beforeEach("deploying", async function () {
       this.stdlib = new Stdlib(stdlibName, owner);
@@ -220,7 +211,6 @@ contract('AppManager', function ([_, owner]) {
       shouldConnectToStdlib();
     });
 
-    
     describe('connect', function () {
       beforeEach("connecting to existing instance", async function () {
         const connectedApp = new AppManager(owner);
@@ -244,5 +234,4 @@ contract('AppManager', function ([_, owner]) {
       shouldConnectToStdlib();
     });
   });
-
  });

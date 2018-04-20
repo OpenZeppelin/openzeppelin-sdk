@@ -1,18 +1,12 @@
 import AppManager from '../models/AppManager'
-import PackageFilesInterface from '../utils/PackageFilesInterface'
-import Logger from '../utils/Logger'
 import makeContract from '../utils/contract'
+import PackageFilesInterface from '../utils/PackageFilesInterface'
 
-const log = new Logger('creaty-proxy')
+async function createProxy(contractAlias, { initArgs, network, from, packageFileName }) {
+  if (contractAlias === undefined) throw 'Must provide a contract alias'
 
-async function createProxy(contractAlias, { network, from, packageFileName }) {
-  if (contractAlias === undefined) {
-    log.error('Must provide a contract alias')
-    return
-  }
-
-  const files = new PackageFilesInterface(packageFileName)
   // TODO: if network file does not exists, create it
+  const files = new PackageFilesInterface(packageFileName)
   const zosPackage = files.read()
   const zosNetworkFile = files.readNetworkFile(network)
   const { proxies } = zosNetworkFile
@@ -21,14 +15,11 @@ async function createProxy(contractAlias, { network, from, packageFileName }) {
   await appManager.connect(zosNetworkFile.app.address)
 
   const contractName = zosPackage.contracts[contractAlias]
-
-  if (! contractName) {
-    log.error(`Could not find ${contractAlias} contract in zOS package file`)
-    return
-  }
+  if (!contractName) throw `Could not find ${contractAlias} contract in zOS package file`
 
   const contractClass = makeContract(contractName)
-  const proxyInstance = await appManager.createProxy(contractClass, contractAlias)
+  const proxyInstance = await appManager.createProxy(contractClass, contractAlias, 'initialize', initArgs)
+  // TODO: Support more than one initialize function
 
   const { address } = proxyInstance
   const { version } = appManager
