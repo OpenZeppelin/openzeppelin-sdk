@@ -1,6 +1,6 @@
 'use strict';
 
-const encodeCall = require('../helpers/encodeCall')
+const encodeCall = require('../../lib/encodeCall')
 const InitializableMock = artifacts.require('InitializableMock')
 const OwnedUpgradeabilityProxy = artifacts.require('OwnedUpgradeabilityProxy')
 const UpgradeabilityProxyFactory = artifacts.require('UpgradeabilityProxyFactory')

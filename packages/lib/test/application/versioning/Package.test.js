@@ -1,5 +1,5 @@
 const Package = artifacts.require('Package')
-const assertRevert = require('../../helpers/assertRevert')
+const assertRevert = require('../../../lib/assertRevert')
 const ContractDirectory = artifacts.require('ContractDirectory')
 const shouldBehaveLikeOwnable = require('../../ownership/Ownable.behavior')
 const DummyImplementation = artifacts.require('DummyImplementation')

@@ -1,4 +1,4 @@
-const assertRevert = require('../helpers/assertRevert')
+const assertRevert = require('../../lib/assertRevert')
 const InitializableMock = artifacts.require('InitializableMock')
 
 contract('Initializable', ([]) => {

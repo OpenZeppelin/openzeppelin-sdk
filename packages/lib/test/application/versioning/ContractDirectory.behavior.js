@@ -1,4 +1,4 @@
-const assertRevert = require('../../helpers/assertRevert')
+const assertRevert = require('../../../lib/assertRevert')
 const ContractDirectory = artifacts.require('ContractDirectory')
 const shouldBehaveLikeOwnable = require('../../ownership/Ownable.behavior')
 

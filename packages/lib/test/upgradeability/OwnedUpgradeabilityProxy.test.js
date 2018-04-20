@@ -1,7 +1,7 @@
 'use strict'
 
-const encodeCall = require('../helpers/encodeCall')
-const assertRevert = require('../helpers/assertRevert')
+const encodeCall = require('../../lib/encodeCall')
+const assertRevert = require('../../lib/assertRevert')
 const MigratableMockV1 = artifacts.require('MigratableMockV1')
 const MigratableMockV2 = artifacts.require('MigratableMockV2')
 const MigratableMockV3 = artifacts.require('MigratableMockV3')

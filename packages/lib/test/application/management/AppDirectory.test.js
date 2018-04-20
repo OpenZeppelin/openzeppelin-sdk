@@ -1,5 +1,5 @@
 const AppDirectory = artifacts.require('AppDirectory')
-const assertRevert = require('../../helpers/assertRevert')
+const assertRevert = require('../../../lib/assertRevert')
 const ContractDirectory = artifacts.require('ContractDirectory')
 const shouldBehaveLikeContractDirectory = require('../versioning/ContractDirectory.behavior')
 const DummyImplementation = artifacts.require('DummyImplementation')

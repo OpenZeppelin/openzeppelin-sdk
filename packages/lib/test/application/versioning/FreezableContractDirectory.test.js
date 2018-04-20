@@ -1,4 +1,4 @@
-const assertRevert = require('../../helpers/assertRevert')
+const assertRevert = require('../../../lib/assertRevert')
 const FreezableContractDirectory = artifacts.require('FreezableContractDirectory')
 const shouldBehaveLikeContractDirectory = require('./ContractDirectory.behavior')
 const DummyImplementation = artifacts.require('DummyImplementation')

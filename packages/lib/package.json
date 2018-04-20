@@ -21,6 +21,7 @@
     "evm"
   ],
   "author": "Manuel Araoz <manuel@zeppelinos.org>",
+  "main": "index.js",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/zeppelinos/zos-lib/issues"

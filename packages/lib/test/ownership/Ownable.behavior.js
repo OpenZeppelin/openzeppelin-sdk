@@ -1,4 +1,4 @@
-const assertRevert = require('../helpers/assertRevert')
+const assertRevert = require('../../lib/assertRevert')
 
 function shouldBehaveLikeOwnable(owner, anotherAccount) {
   describe('owner', function () {
