@@ -60,4 +60,4 @@ function createNetworkFile(network, address, packageFileName) {
   files.writeNetworkFile(network, zosNetworkFile)
 }
 
-module.exports = sync
+module.exports = deploy
