@@ -54,18 +54,18 @@ export default class KernelWrapper {
 
   async _ifRegisteredThrow(release, error) {
     const isRegistered = await this.kernel.isRegistered(release, this.txParams)
-    if(isRegistered) throw new Error(error)
+    if(isRegistered) throw error
   }
 
   async _ifNotRegisteredThrow(release, error) {
     const isRegistered = await this.kernel.isRegistered(release, this.txParams)
-    if(!isRegistered) throw new Error(error)
+    if(!isRegistered) throw error
   }
 
   async _ifFrozenThrow(releaseAddress, error) {
     const release = Release.at(releaseAddress)
     const isFrozen = await release.frozen(this.txParams)
-    if(!isFrozen) throw new Error(error)
+    if(!isFrozen) throw error
   }
 
   async _ifNotEnoughBalanceToRegisterThrow(error) {
@@ -73,27 +73,27 @@ export default class KernelWrapper {
     const newVersionCost = await this.newVersionCost()
     const developerBalance = await zepToken.balanceOf(this.txParams.from)
     const doesNotHaveEnoughTokens = developerBalance.lt(newVersionCost)
-    if(doesNotHaveEnoughTokens) throw new Error(error)
+    if(doesNotHaveEnoughTokens) throw error
   }
 
   async _ifNotEnoughZepBalance(amount, error) {
     const zepToken = await this.zepToken()
     const voucherBalance = await zepToken.balanceOf(this.txParams.from)
     const doesNotHaveEnoughTokens = voucherBalance.lt(amount)
-    if(doesNotHaveEnoughTokens) throw new Error(error)
+    if(doesNotHaveEnoughTokens) throw error
   }
 
   async _ifDoesNotReachPayout(amount, error) {
     const developerFraction = await this.kernel.developerFraction()
     const payout = amount.divToInt(developerFraction)
-    if(payout <= 0) throw new Error(error)
+    if(payout <= 0) throw error
   }
 
   async _ifNotEnoughVouchThrow(release, amount, error) {
     const vouching = await this.vouching()
     const vouches = await vouching.vouchedFor(this.txParams.from, release)
     const doesNotHaveEnoughVouches = vouches.lt(amount)
-    if(doesNotHaveEnoughVouches) throw new Error(error)
+    if(doesNotHaveEnoughVouches) throw error
   }
 
   async zepToken() {
