@@ -1,6 +1,8 @@
 # zeppelin_os command line interface
 [![Build Status](https://travis-ci.org/zeppelinos/zos-cli.svg?branch=master)](https://travis-ci.org/zeppelinos/zos-cli)
 
+:warning: **Under heavy development: do not use in production** :warning: 
+
 ## Managing a project with zeppein_os
 
 ### Install
