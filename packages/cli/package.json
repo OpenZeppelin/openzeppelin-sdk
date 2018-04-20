@@ -1,10 +1,12 @@
 {
-  "name": "zos-cli",
+  "name": "zos",
   "version": "0.0.1",
   "description": "zeppelin_os command line interface",
-  "main": "index.js",
+  "main": "lib/index.js",
   "scripts": {
-    "test": "NODE_ENV=test truffle test"
+    "build": "babel src --out-dir lib",
+    "test": "NODE_ENV=test truffle test",
+    "prepublish": "npm run build"
   },
   "bin": {
     "zos": "./bin/zos-cli.js"
