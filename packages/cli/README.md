@@ -34,7 +34,7 @@ $ ...
 $ zos add-implementation [CONTRACT_NAME_N] [ALIAS_N] --network [NETWORK]
 ```
 
-Where [CONTRACT_NAME] is the name of your Solidity contract, and [ALIAS] is the name under which it will be registered 
+Where `[CONTRACT_NAME]` is the name of your Solidity contract, and `[ALIAS]` is the name under which it will be registered 
 in zeppelin_os. 
 
 ### Sync your project with the blockchain 
