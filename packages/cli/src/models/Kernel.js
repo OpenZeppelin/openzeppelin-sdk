@@ -1,3 +1,6 @@
+import Logger from '../utils/Logger'
+
+const log = new Logger('Kernel')
 const makeContract = require('../utils/contract')
 const Kernel = makeContract(require('zos-kernel/build/contracts/Kernel.json'))
 const Release = makeContract(require('zos-kernel/build/contracts/Release.json'))
@@ -12,27 +15,27 @@ export default class KernelWrapper {
 
   async register(release) {
     const newVersionCost = await this.newVersionCost()
-    console.log(`Approving ${newVersionCost} ZEP tokens to zOS kernel contract...`)
+    log(`Approving ${newVersionCost} ZEP tokens to zOS kernel contract...`)
     const zepToken = await this.zepToken()
     await zepToken.approve(this.kernel.address, newVersionCost, this.txParams)
-    console.log(`Registering release ${release}...`)
+    log(`Registering release ${release}...`)
     const receipt = await this.kernel.register(release, this.txParams)
-    console.log(`Release registered successfully. Transaction hash: ${receipt.tx}.`)
+    log(`Release registered successfully. Transaction hash: ${receipt.tx}.`)
   }
 
   async vouch(release, amount, data = '') {
-    console.log(`Approving ${amount} ZEP tokens to zOS kernel contract...`)
+    log(`Approving ${amount} ZEP tokens to zOS kernel contract...`)
     const zepToken = await this.zepToken()
     await zepToken.approve(this.kernel.address, amount, this.txParams)
-    console.log(`Vouching ${amount} ZEP tokens for release ${release}...`)
+    log(`Vouching ${amount} ZEP tokens for release ${release}...`)
     const receipt = await this.kernel.vouch(release, amount, data, this.txParams)
-    console.log(`Vouch processed successfully. Transaction hash: ${receipt.tx}.`)
+    log(`Vouch processed successfully. Transaction hash: ${receipt.tx}.`)
   }
 
   async unvouch(release, amount, data = '') {
-    console.log(`Unvouching ${amount} ZEP tokens from release ${release}...`)
+    log(`Unvouching ${amount} ZEP tokens from release ${release}...`)
     const receipt = await this.kernel.unvouch(release, amount, data, this.txParams)
-    console.log(`Unvouch processed successfully. Transaction hash: ${receipt.tx}.`)
+    log(`Unvouch processed successfully. Transaction hash: ${receipt.tx}.`)
   }
 
   async validateCanRegister(release) {

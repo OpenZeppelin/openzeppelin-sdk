@@ -34,9 +34,9 @@ async function sync({ network, from, packageFileName }) {
     // TODO: store the implementation's hash to avoid unnecessary deployments
     const contractClass = makeContract.local(zosPackage.contracts[contractName])
     const contractInstance = await appManager.setImplementation(contractClass, contractName)
-      zosNetworkFile.package.contracts[contractName] = contractInstance.address
+    zosNetworkFile.package.contracts[contractName] = contractInstance.address
   }
-  
+
   if (zosPackage.stdlib) {
     const stdlibAddress = await appManager.setStdlib(zosPackage.stdlib);
     zosNetworkFile.stdlib = { address: stdlibAddress };
