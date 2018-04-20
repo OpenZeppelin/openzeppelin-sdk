@@ -2,8 +2,8 @@ import Kernel from '../models/Kernel'
 import kernelAddress from '../utils/kernelAddress'
 
 async function unvouch(releaseAddress, rawAmount, { network, from }) {
-  if(!releaseAddress) throw new Error('You must provide a release address to unvouch from')
-  if(!rawAmount) throw new Error('You must provide an amount of ZEP tokens to unvouch')
+  if(!releaseAddress) throw 'You must provide a release address to unvouch from'
+  if(!rawAmount) throw 'You must provide an amount of ZEP tokens to unvouch'
   const address = kernelAddress(network)
   const txParams = { from }
 

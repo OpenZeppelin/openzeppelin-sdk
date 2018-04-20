@@ -4,7 +4,7 @@ import PackageFilesInterface from '../utils/PackageFilesInterface'
 
 async function upgradeProxy(proxyAddress, contractAlias, { initArgs, network, from, packageFileName }) {
   if (proxyAddress === undefined) throw `Must provide a proxy address`
-  else if (contractAlias === undefined) throw `Must provide a contract name`
+  if (contractAlias === undefined) throw `Must provide a contract name`
 
   // TODO: if network file does not exists, create it
   const files = new PackageFilesInterface(packageFileName)

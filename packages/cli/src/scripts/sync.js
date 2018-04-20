@@ -1,20 +1,11 @@
 import AppManager from '../models/AppManager'
-import PackageFilesInterface from '../utils/PackageFilesInterface'
-import Logger from '../utils/Logger'
-import Stdlib from '../models/Stdlib';
 import makeContract from '../utils/contract'
-
-const log = new Logger('sync')
-
+import PackageFilesInterface from '../utils/PackageFilesInterface'
 
 async function sync({ network, from, packageFileName }) {
   const files = new PackageFilesInterface(packageFileName)
   const appManager = new AppManager(from, network)
-
-  if (! files.exists()) {
-    log.error(`Could not find package file ${packageFileName}`)
-    return
-  }
+  if (! files.exists()) throw `Could not find package file ${packageFileName}`
 
   const zosPackage = files.read()
   let zosNetworkFile
@@ -37,10 +28,7 @@ async function sync({ network, from, packageFileName }) {
   zosNetworkFile.package = zosPackage
 
   const currentProvider = await appManager.getCurrentDirectory()
-
-  zosNetworkFile.provider = {
-    'address': currentProvider.address
-  }
+  zosNetworkFile.provider = { address: currentProvider.address }
 
   for (let contractName in zosPackage.contracts) {
     // TODO: store the implementation's hash to avoid unnecessary deployments
@@ -60,7 +48,6 @@ async function sync({ network, from, packageFileName }) {
   files.writeNetworkFile(network, zosNetworkFile)
 }
 
-
 function createNetworkFile(network, address, packageFileName) {
   const files = new PackageFilesInterface(packageFileName)
   const zosPackage = files.read()
@@ -77,6 +64,5 @@ function createNetworkFile(network, address, packageFileName) {
   files.writeNetworkFile(network, zosNetworkFile)
   return true
 }
-
 
 module.exports = sync
