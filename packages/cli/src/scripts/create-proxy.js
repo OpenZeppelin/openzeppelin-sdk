@@ -17,7 +17,7 @@ async function createProxy(contractAlias, { initArgs, network, from, packageFile
   const contractName = zosPackage.contracts[contractAlias]
   if (!contractName) throw `Could not find ${contractAlias} contract in zOS package file`
 
-  const contractClass = makeContract(contractName)
+  const contractClass = makeContract.local(contractName)
   const proxyInstance = await appManager.createProxy(contractClass, contractAlias, 'initialize', initArgs)
   // TODO: Support more than one initialize function
 

@@ -26,3 +26,7 @@ module.exports = function(contractOrName) {
   
   return contract
 }
+
+module.exports.local = function(contractName) {
+  return artifacts.require(contractName)
+}
