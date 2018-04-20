@@ -8,7 +8,7 @@ const should = require('chai')
   .use(require('chai-as-promised'))
   .should()
 
-contract.skip('Distribution', function ([_, owner]) {
+contract('Distribution', function ([_, owner]) {
   
   const contractName = 'Impl'
   const initialVersion = "1.0"
@@ -18,17 +18,16 @@ contract.skip('Distribution', function ([_, owner]) {
     it('instantiates the distribution', async function() {
       this.distribution.address().should.not.be.null
     })
+  }
 
-    it('has the initial version', async function () {
-      const hasVersion = await this.distribution.hasVersion(initialVersion)
-      hasVersion.should.be.true
-    })
+  async function createRelease() {
+    await this.distribution.newVersion(initialVersion)
   }
 
 
   beforeEach("deploying", async function () {
     this.distribution = new Distribution(owner)
-    await this.distribution.deploy(initialVersion)
+    await this.distribution.deploy()
   })
 
 
@@ -49,23 +48,19 @@ contract.skip('Distribution', function ([_, owner]) {
 
 
   describe('newVersion', function () {
-    beforeEach('creating a new version', async function() {
-      await this.distribution.newVersion(newVersion)
-    })
+    beforeEach('creating a new release', createRelease)
 
     it('registers new version on distribution', async function () {
+      await this.distribution.newVersion(newVersion)
       const hasVersion = await this.distribution.hasVersion(newVersion)
-      hasVersion.should.be.true
-    })
-
-    it('keeps the initial version', async function () {
-      const hasVersion = await this.distribution.hasVersion(initialVersion)
       hasVersion.should.be.true
     })
   })
 
 
   describe('freeze', function() {
+    beforeEach('creating a new release', createRelease)
+
     it('should not be frozen by default', async function () {
       const frozen = await this.distribution.frozen(initialVersion)
       frozen.should.be.false
@@ -80,6 +75,7 @@ contract.skip('Distribution', function ([_, owner]) {
 
 
   describe('get and set implementation', function () {
+    beforeEach('creating a new release', createRelease)
 
     describe('while unfrozen', async function() {
       beforeEach('setting implementation', async function() {

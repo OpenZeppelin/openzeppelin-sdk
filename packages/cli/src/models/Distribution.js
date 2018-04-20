@@ -17,10 +17,8 @@ class Distribution {
     return this.package
   }
 
-  async deploy(initialVersion) {
+  async deploy() {
     this.package = new Package({ from: this.owner })
-    const release = new Release({ from: this.owner })
-    await this.package.addVersion(initialVersion, release.address, { from: this.owner })
     return this.package
   }
 
@@ -36,6 +34,7 @@ class Distribution {
   async newVersion(version) {
     const release = new Release({ from: this.owner })
     await this.package.addVersion(version, release.address, { from: this.owner })
+    return release
   }
 
   async getImplementation(version, contractName) {
