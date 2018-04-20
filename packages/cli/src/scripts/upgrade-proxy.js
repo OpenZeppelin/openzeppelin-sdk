@@ -25,11 +25,8 @@ async function upgradeProxy(contractAlias, proxyAddress, { initArgs, network, fr
   const appManager = new AppManager(from)
   await appManager.connect(zosNetworkFile.app.address)
 
-  const contractName = zosPackage.contracts[contractAlias]
-  if (!contractName) throw `Could not find ${contractAlias} contract in zOS package file`
-
-  const contractClass = makeContract(contractName)
-  await appManager.upgradeProxy(proxyAddress, contractClass, contractAlias, 'initialize', initArgs)
+  const contractClass = await files.getContractClass(zosPackage, contractAlias)
+  await appManager.upgradeProxy(proxyAddress, contractClass, contractAlias)
   // TODO: Support more than one initialize function
 
   proxies[contractAlias][index].version = appManager.version

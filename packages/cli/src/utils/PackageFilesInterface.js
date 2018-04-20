@@ -1,6 +1,7 @@
 import fs from 'fs'
 import Logger from './Logger'
 import Stdlib from '../models/Stdlib'
+import makeContract from '../utils/contract'
 
 const log = new Logger('PackageFilesInterface')
 
@@ -26,6 +27,11 @@ export default class PackageFilesInterface {
     this.writeTo(this.packageFileName, zosPackage)
   }
 
+  /*
+   * General functions for managing zosPackages
+   * TODO: Move to a different class
+   */
+
   async setStdlib(zosPackage, stdlibName, installDeps) {
     if (stdlibName) {
       const stdlib = new Stdlib(stdlibName)
@@ -38,6 +44,18 @@ export default class PackageFilesInterface {
       }
     } else {
       zosPackage.stdlib = {};
+    }
+  }
+
+  async getContractClass(zosPackage, contractAlias) {
+    const contractName = zosPackage.contracts[contractAlias]
+    if (contractName) {
+      return makeContract.local(contractName)
+    } else if (zosPackage.stdlib && !_.isEmpty(zosPackage.stdlib)) {
+      const stdlib = new Stdlib(zosPackage.stdlib)
+      return await stdlib.getContract(contractAlias);
+    } else {
+      throw `Could not find ${contractAlias} contract in zOS package file`
     }
   }
 
