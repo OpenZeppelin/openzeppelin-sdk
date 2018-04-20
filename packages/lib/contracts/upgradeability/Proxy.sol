@@ -17,7 +17,6 @@ contract Proxy {
    */
   function () payable public {
     address _impl = implementation();
-    require(_impl != address(0));
 
     assembly {
       let ptr := mload(0x40)

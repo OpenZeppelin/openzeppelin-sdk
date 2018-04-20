@@ -15,11 +15,14 @@ const SampleChildV4 = artifacts.require('SampleChildV4');
 const SampleChildV5 = artifacts.require('SampleChildV5');
 const OwnedUpgradeabilityProxy = artifacts.require('OwnedUpgradeabilityProxy');
 
+const DummyImplementation = artifacts.require('DummyImplementation');
+
 contract('Migratable', function ([_, owner, registrar]) {
   const from = owner;
-  let v1, v2, v3, v4, v5;
+  let v0, v1, v2, v3, v4, v5;
 
   before(async function () {
+    v0 = await DummyImplementation.new({ from: registrar });
     v1 = await SampleChildV1.new({ from: registrar });
     v2 = await SampleChildV2.new({ from: registrar });
     v3 = await SampleChildV3.new({ from: registrar });
@@ -28,7 +31,7 @@ contract('Migratable', function ([_, owner, registrar]) {
   });
 
   beforeEach(async function () {
-    this.proxy = await OwnedUpgradeabilityProxy.new({ from });
+    this.proxy = await OwnedUpgradeabilityProxy.new(v0.address, { from });
     this.contract = SampleChildV1.at(this.proxy.address);
   });
 

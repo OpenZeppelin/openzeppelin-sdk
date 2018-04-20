@@ -25,8 +25,7 @@ contract UpgradeabilityProxyFactory {
    * @return address of the new proxy created
    */
   function createProxy(address owner, address implementation) public returns (OwnedUpgradeabilityProxy) {
-    OwnedUpgradeabilityProxy proxy = _createProxy();
-    proxy.upgradeTo(implementation);
+    OwnedUpgradeabilityProxy proxy = _createProxy(implementation);
     proxy.transferProxyOwnership(owner);
     return proxy;
   }
@@ -40,8 +39,8 @@ contract UpgradeabilityProxyFactory {
    * @return address of the new proxy created
    */
   function createProxyAndCall(address owner, address implementation, bytes data) public payable returns (OwnedUpgradeabilityProxy) {
-    OwnedUpgradeabilityProxy proxy = _createProxy();
-    proxy.upgradeToAndCall.value(msg.value)(implementation, data);
+    OwnedUpgradeabilityProxy proxy = _createProxy(implementation);
+    require(proxy.call.value(msg.value)(data));
     proxy.transferProxyOwnership(owner);
     return proxy;
   }
@@ -50,8 +49,8 @@ contract UpgradeabilityProxyFactory {
    * @dev Internal function to create an upgradeable proxy
    * @return address of the new proxy created
    */
-  function _createProxy() internal returns (OwnedUpgradeabilityProxy) {
-    OwnedUpgradeabilityProxy proxy = new OwnedUpgradeabilityProxy();
+  function _createProxy(address implementation) internal returns (OwnedUpgradeabilityProxy) {
+    OwnedUpgradeabilityProxy proxy = new OwnedUpgradeabilityProxy(implementation);
     emit ProxyCreated(proxy);
     return proxy;
   }

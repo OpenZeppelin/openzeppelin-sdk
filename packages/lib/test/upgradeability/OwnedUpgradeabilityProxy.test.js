@@ -17,18 +17,8 @@ contract('OwnedUpgradeabilityProxy', ([_, owner, anotherAccount]) => {
   })
 
   beforeEach(async function () {
-    this.factory = await UpgradeabilityProxyFactory.new()
-    const { logs } = await this.factory.createProxy(owner, this.implementation_v0)
-    this.proxyAddress = logs.find(l => l.event === 'ProxyCreated').args.proxy
-    this.proxy = await OwnedUpgradeabilityProxy.at(this.proxyAddress)
-  })
-
-  describe('owner', function () {
-    it('transfers the ownership to the requested owner', async function () {
-      const proxyOwner = await this.proxy.proxyOwner()
-
-      assert.equal(proxyOwner, owner)
-    })
+    this.proxy = await OwnedUpgradeabilityProxy.new(this.implementation_v0, { from: owner })
+    this.proxyAddress = this.proxy.address;
   })
 
   describe('implementation', function () {
@@ -37,30 +27,12 @@ contract('OwnedUpgradeabilityProxy', ([_, owner, anotherAccount]) => {
 
       assert.equal(implementation, this.implementation_v0)
     })
-  })
 
-  describe('fallback', function () {
-    beforeEach(async function () {
-      this.behavior = await InitializableMock.new()
-      this.proxy = await OwnedUpgradeabilityProxy.new()
-      this.mock = InitializableMock.at(this.proxy.address)
-    })
+    it('delegates to the implementation', async function () {
+      const dummy = new DummyImplementation(this.proxyAddress);
+      const value = await dummy.get();
 
-    describe('when there is an implementation set', function () {
-      it('calls the implementation', async function () {
-        await this.proxy.upgradeTo(this.behavior.address)
-
-        await this.mock.initialize(42)
-        const value = await this.mock.x()
-
-        assert.equal(value, 42)
-      })
-    })
-
-    describe('when there is no implementation set', function () {
-      it('reverts', async function () {
-        await assertRevert(this.mock.initialize(42))
-      })
+      assert.equal(value, true)
     })
   })
 
