@@ -47,6 +47,6 @@ contract AppDirectory is ContractDirectory {
    */
   function setStdlib(ContractProvider _stdlib) public onlyOwner {
     stdlib = _stdlib;
-    StdlibChanged(_stdlib);
+    emit StdlibChanged(_stdlib);
   }
 }
