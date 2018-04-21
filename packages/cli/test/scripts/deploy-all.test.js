@@ -11,7 +11,7 @@ const should = require('chai')
   .use(require('chai-as-promised'))
   .should();
 
-contract.only('deployAll', function([_, owner]) {
+contract('deployAll', function([_, owner]) {
 
   const network = "test";
   const from = owner;
