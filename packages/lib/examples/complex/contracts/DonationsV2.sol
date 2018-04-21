@@ -14,6 +14,7 @@ contract DonationsV2 is DonationsV1 {
 
   function setToken(MintableERC721Token _token) external onlyOwner {
     require(_token != address(0));
+    require(token == address(0));
     token = _token;
   }
 
