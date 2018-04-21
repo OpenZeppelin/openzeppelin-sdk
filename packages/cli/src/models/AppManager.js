@@ -1,13 +1,13 @@
+import fs from 'fs';
 import _ from 'lodash';
 import Stdlib from './Stdlib';
 import makeContract from '../utils/contract';
-import decodeLogs from 'zos-lib/test/helpers/decodeLogs';
-import encodeCall from 'zos-lib/test/helpers/encodeCall';
-import fs from 'fs';
 
+const decodeLogs = require('zos-lib').decodeLogs;
+const encodeCall = require('zos-lib').encodeCall;
+const Package = makeContract('Package');
 const AppManager = makeContract('PackagedAppManager');
 const AppDirectory = makeContract('AppDirectory');
-const Package = makeContract('Package');
 const UpgradeabilityProxyFactory = makeContract('UpgradeabilityProxyFactory');
 
 class AppManagerWrapper {

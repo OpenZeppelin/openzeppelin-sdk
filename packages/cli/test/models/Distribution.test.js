@@ -1,8 +1,8 @@
 import Distribution from '../../src/models/Distribution'
-import assertRevert from 'zos-lib/test/helpers/assertRevert'
 
 const ImplV1 = artifacts.require('ImplV1')
 const ImplV2 = artifacts.require('ImplV2')
+const assertRevert = require('zos-lib').assertRevert
 
 const should = require('chai')
   .use(require('chai-as-promised'))
