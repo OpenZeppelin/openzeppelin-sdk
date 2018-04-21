@@ -132,36 +132,15 @@ contract MyContract is Initializable {
 ```
 
 We'll now use `zos` to register and deploy the new code for `MyContract` to the blockchain.
-
-### Bump your application version 
-
-To bump the version of your project, run:
-```
-zos new-version [NEW_VERSION_NAME] --network [NETWORK]
-```
-
-This command will update the `version` property of your `package.zos.json` file and reset its contract list. 
-Therefore, you will have to re-add the corresponding contract implementations to be included in the new version, as you did before for the first version.
-
-```
-zos add-implementation [CONTRACT_NAME_1] [ALIAS_2] --network [NETWORK]
-zos add-implementation [CONTRACT_NAME_2] [ALIAS_2] --network [NETWORK]
-...
-zos add-implementation [CONTRACT_NAME_N] [ALIAS_N] --network [NETWORK]
-```
-In our
-```
-zos add-implementation MyContract MyContract --network ropsten
-```
-
-Sync the new version of your project to the blockchain by running: 
+Doing so is very easy: sync the new version of your project to the blockchain by running: 
 
 ```
 zos sync --network [NETWORK]
 ```
 
-After running this command, the new version of your project is deployed in the blockchain. Finally, you just need to upgrade 
-all your contract proxies: 
+After running this command, the new versions of your project's contracts are deployed in the blockchain. 
+However, the already deployed proxies are still running with the old implementations. You need to upgrade
+each of the proxies individually. To do so, you just need to run this for every contract: 
 
 ```
 zos upgrade-proxy [ALIAS_1] --network [NETWORK]
