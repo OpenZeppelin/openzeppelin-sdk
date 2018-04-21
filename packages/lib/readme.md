@@ -34,14 +34,10 @@ To work with a single upgradeable smart contract, you just need to deal with a s
 import "zos-lib/contracts/migrations/Initializable.sol";
 
 contract MyContract is Initializable {
-  bool internal initialized;
-
   uint256 public x;
   
-  function initialize(uint256 _x) public {
-    require(!initialized);
+  function initialize(uint256 _x) isInitializer public {
     x = _x;
-    initialized = true;
   }
 }
 ```
@@ -69,14 +65,10 @@ console.log(await myContract.x()); // 42
 import "zos-lib/contracts/migrations/Initializable.sol";
 
 contract MyContract is Initializable {
-  bool internal initialized;
-
   uint256 public x;
   
-  function initialize(uint256 _x) public {
-    require(!initialized);
+  function initialize(uint256 _x) isInitializer public {
     x = _x;
-    initialized = true;
   }
 
   function y() public pure returns (uint256) {

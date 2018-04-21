@@ -5,14 +5,10 @@ import "zos-lib/contracts/migrations/Initializable.sol";
 
 
 contract MyContract_v1 is Initializable {
-  bool internal initialized;
-
   uint256 public x;
   
-  function initialize(uint256 _x) public {
-    require(!initialized);
+  function initialize(uint256 _x) isInitializer public {
     x = _x;
-    initialized = true;
   }
 
 
