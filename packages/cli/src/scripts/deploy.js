@@ -35,9 +35,7 @@ async function deploy(version, { network, from, packageFileName }) {
     log.info(`Deploying ${contractName} contract...`)
     // TODO: store the implementation's hash to avoid unnecessary deployments
     const contractClass = makeContract.local(zosPackage.contracts[contractName])
-    log.info(`Con un pibe`)
     const contractInstance = await distribution.setImplementation(version, contractClass, contractName)
-    log.info(`Con dos pibe`)
     zosNetworkFile.contracts[contractName] = contractInstance.address
   }
 
