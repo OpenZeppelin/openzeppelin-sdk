@@ -1,8 +1,10 @@
 import fs from 'fs';
 import _ from 'lodash';
 import Stdlib from './Stdlib';
+import Logger from '../utils/Logger'
 import makeContract from '../utils/contract';
 
+const log = new Logger('AppManager');
 const decodeLogs = require('zos-lib').decodeLogs;
 const encodeCall = require('zos-lib').encodeCall;
 const Package = makeContract('Package');
@@ -28,14 +30,20 @@ class AppManagerWrapper {
   }
 
   async deploy(initialVersion, stdlib) {
+    log.info('\nDeploying a new app manager...')
     this.factory = await UpgradeabilityProxyFactory.new(this.txParams);
+    log.info(` UpgradeabilityProxyFactory: ${this.factory.address}`)
     this.package = await Package.new(this.txParams);
+    log.info(` Package: ${this.package.address}`)
     const stdlibAddress = this._getStdlibAddress(stdlib);
     const directory = await AppDirectory.new(stdlibAddress, this.txParams);
+    log.info(` App directory: ${directory.address}`)
     await this.package.addVersion(initialVersion, directory.address, this.txParams);
+    log.info(` Added version: ${initialVersion}`)
     this.directories[initialVersion] = directory;
     this.version = initialVersion;
     this.appManager = await AppManager.new(this.package.address, initialVersion, this.factory.address, this.txParams);
+    log.info(` App Manager ${this.appManager.address}`)
   }
 
   async connect(address) {
@@ -47,10 +55,14 @@ class AppManagerWrapper {
   }
 
   async newVersion(versionName, stdlib) {
+    log.info(`\nAdding version ${versionName}...`)
     const stdlibAddress = this._getStdlibAddress(stdlib);
     const directory = await AppDirectory.new(stdlibAddress, this.txParams);
+    log.info(` App directory: ${directory.address}`)
     await this.package.addVersion(versionName, directory.address, this.txParams);
+    log.info(` Added version: ${versionName}`)
     await this.appManager.setVersion(versionName, this.txParams);
+    log.info(` Version set`)
     this.directories[versionName] = directory;
     this.version = versionName;
   }
@@ -61,34 +73,41 @@ class AppManagerWrapper {
   }
 
   async setImplementation(contractClass, contractName) {
+    log.info(`\nSetting implementation of ${contractName} in contract directory...`)
     const implementation = await contractClass.new(this.txParams);
     const directory = this.getCurrentDirectory();
     await directory.setImplementation(contractName, implementation.address, this.txParams);
+    log.info(` Implementation set: ${implementation.address}`)
     return implementation;
   }
 
   async setStdlib(stdlib) {
+    log.info(`\nSetting stdlib ${stdlib}...`)
     const stdlibAddress = this._getStdlibAddress(stdlib);
     await this.getCurrentDirectory().setStdlib(stdlibAddress, { from: this.owner });
     return stdlibAddress;
   }
 
   async createProxy(contractClass, contractName, initMethodName, initArgs) {
+    log.info(`\nCreating ${contractName} proxy...`)
     const { receipt } = typeof(initArgs) === 'undefined'
       ? await this._createProxy(contractName)
       : await this._createProxyAndCall(contractClass, contractName, initMethodName, initArgs);
 
+    log.info(` TX receipt received: ${receipt.transactionHash}`)
     const logs = decodeLogs([receipt.logs[1]], UpgradeabilityProxyFactory);
     const address = logs.find(l => l.event === 'ProxyCreated').args.proxy;
+    log.info(` ${contractName} proxy: ${address}`)
+    log.info(` ${contractName} proxy: ${address}`)
     return new contractClass(address);
   }
 
   async upgradeProxy(proxyAddress, contractClass, contractName, initMethodName, initArgs) {
-    if(typeof(initArgs) === 'undefined') return this.appManager.upgradeTo(proxyAddress, contractName, this.txParams);
-    const initMethod = this._validateInitMethod(contractClass, initMethodName, initArgs)
-    const initArgTypes = initMethod.inputs.map(input => input.type);
-    const callData = encodeCall(initMethodName, initArgTypes, initArgs);
-    return this.appManager.upgradeToAndCall(proxyAddress, contractName, callData, this.txParams);
+    log.info(`\nUpdating ${contractName} proxy...`)
+    const { receipt } = typeof(initArgs) === 'undefined'
+      ? await this._updateProxy(proxyAddress, contractName)
+      : await this._updateProxyAndCall(proxyAddress, contractClass, contractName, initMethodName, initArgs)
+    log.info(` TX receipt received: ${receipt.transactionHash}`)
   }
 
   async _createProxy(contractName) {
@@ -100,6 +119,17 @@ class AppManagerWrapper {
     const initArgTypes = initMethod.inputs.map(input => input.type);
     const callData = encodeCall(initMethodName, initArgTypes, initArgs);
     return this.appManager.createAndCall(contractName, callData, this.txParams);
+  }
+
+  async _updateProxy(proxyAddress, contractName) {
+    return this.appManager.upgradeTo(proxyAddress, contractName, this.txParams)
+  }
+
+  async _updateProxyAndCall(proxyAddress, contractClass, contractName, initMethodName, initArgs) {
+    const initMethod = this._validateInitMethod(contractClass, initMethodName, initArgs)
+    const initArgTypes = initMethod.inputs.map(input => input.type);
+    const callData = encodeCall(initMethodName, initArgTypes, initArgs);
+    return this.appManager.upgradeToAndCall(proxyAddress, contractName, callData, this.txParams);
   }
 
   _validateInitMethod(contractClass, initMethodName, initArgs) {

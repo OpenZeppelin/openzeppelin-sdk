@@ -1,11 +1,15 @@
+import Logger from '../utils/Logger'
 import makeContract from '../utils/contract'
-const Release = makeContract(require('zos-kernel/build/contracts/Release.json'))
+
+const log = new Logger('Distribution');
 const Package = makeContract('Package')
+const Release = makeContract(require('zos-kernel/build/contracts/Release.json'))
 
 class Distribution {
 
   constructor(owner) {
     this.owner = owner
+    this.txParams = { from: this.owner }
   }
 
   address() {
@@ -18,7 +22,7 @@ class Distribution {
   }
 
   async deploy() {
-    this.package = await Package.new({ from: this.owner })
+    this.package = await Package.new(this.txParams)
     return this.package
   }
 
@@ -28,12 +32,14 @@ class Distribution {
   }
 
   async hasVersion(version) {
-    return await this.package.hasVersion(version, { from: this.owner })
+    return await this.package.hasVersion(version, this.txParams)
   }
 
   async newVersion(version) {
-    const release = await Release.new({ from: this.owner })
-    await this.package.addVersion(version, release.address, { from: this.owner })
+    log.info('\nAdding new version...')
+    const release = await Release.new(this.txParams)
+    await this.package.addVersion(version, release.address, this.txParams)
+    log.info(' Added version:', version)
     return release
   }
 
@@ -43,9 +49,11 @@ class Distribution {
   }
 
   async setImplementation(version, contractClass, contractName) {
-    const implementation = await contractClass.new({ from: this.owner })
+    log.info(`\nSetting implementation of ${contractName} in version ${version}...`)
+    const implementation = await contractClass.new(this.txParams)
     const release = await this.getRelease(version)
-    await release.setImplementation(contractName, implementation.address, { from: this.owner })
+    await release.setImplementation(contractName, implementation.address, this.txParams)
+    log.info(' Implementation set:', implementation.address)
     return implementation
   }
 
@@ -55,8 +63,10 @@ class Distribution {
   }
 
   async freeze(version) {
+    log.info('\nFreezing new version...')
     const release = await this.getRelease(version)
-    await release.freeze({ from: this.owner })
+    await release.freeze(this.txParams)
+    log.info(' Release frozen')
   }
 }
 

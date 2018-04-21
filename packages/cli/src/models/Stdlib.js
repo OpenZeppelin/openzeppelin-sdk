@@ -1,9 +1,9 @@
-import truffleContract from 'truffle-contract';
 import fs from 'fs';
-import path from 'path';
 import npm from 'npm-programmatic';
+import Logger from '../utils/Logger'
 import makeContract from '../utils/contract'
 
+const log = new Logger('Stdlib');
 const ContractDirectory = makeContract('ContractDirectory');
 
 export default class Stdlib {
@@ -31,8 +31,7 @@ export default class Stdlib {
     const implName = this.getPackage().contracts[contractName];
     if (!implName) throw `Contract ${contractName} not found in package`;
     const schema = JSON.parse(fs.readFileSync(`node_modules/${this.name}/build/contracts/${implName}.json`));
-    const contract = makeContract(schema);
-    return contract;
+    return makeContract(schema);
   }
 
   listContracts() {
@@ -40,10 +39,14 @@ export default class Stdlib {
   }
 
   async deploy() {
+    log.info(`\nDeploying contract directory...`)
     const directory = await ContractDirectory.new({ from: this.owner });
+    log.info(' Contract directory:', directory.address)
     await Promise.all(this.listContracts().map(async (contractName) => {
+      log.info(` Deploying ${contractName}...`)
       const contract = await this.getContract(contractName);
       const deployed = await contract.new({ from: this.owner });
+      log.info(` ${contractName}: ${deployed.address}`)
       await directory.setImplementation(contractName, deployed.address, { from: this.owner });
     }));
     return directory;
