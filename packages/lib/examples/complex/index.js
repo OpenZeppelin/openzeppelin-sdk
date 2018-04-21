@@ -1,4 +1,4 @@
-const decodeLogs = require('zos-lib/test/helpers/decodeLogs');
+const decodeLogs = require('zos-lib').decodeLogs;
 
 const OwnedUpgradeabilityProxy = artifacts.require('zos-lib/contracts/upgradeability/OwnedUpgradeabilityProxy.sol');
 const UpgradeabilityProxyFactory = artifacts.require('UpgradeabilityProxyFactory');
@@ -9,7 +9,7 @@ const AppManager = artifacts.require('PackagedAppManager');
 const DonationsV1 = artifacts.require('DonationsV1');
 const DonationsV2 = artifacts.require('DonationsV2');
 
-const stdlib = "0x0";
+const stdlib = "0xA739d10Cc20211B973dEE09DB8F0D75736E2D817";
 const owner = web3.eth.accounts[1];
 const contractName = "Donations";
 const txParams = {
@@ -62,7 +62,7 @@ async function deployVersion1Implementation() {
   // Create a proxy to interact with the implementation.
   console.log(`Creating proxy...`);
   const {receipt} = await this.appManager.create(contractName, txParams);
-  const logs = decodeLogs([receipt.logs[0]], UpgradeabilityProxyFactory, 0x0);
+  const logs = decodeLogs([receipt.logs[1]], UpgradeabilityProxyFactory, 0x0);
   const proxyAddress = logs.find(l => l.event === 'ProxyCreated').args.proxy;
   this.proxy = OwnedUpgradeabilityProxy.at(proxyAddress);
   console.log(`Proxy created at ${proxyAddress}`);
@@ -102,13 +102,13 @@ async function deployVersion2() {
   // Add an ERC721 token implementation to the project.
   console.log(`Creating proxy for ERC721 token...`);
   const {receipt} = await this.appManager.create('MintableERC721Token', txParams);
-  const logs = decodeLogs([receipt.logs[0]], UpgradeabilityProxyFactory, 0x0);
+  const logs = decodeLogs([receipt.logs[1]], UpgradeabilityProxyFactory, 0x0);
   const proxyAddress = logs.find(l => l.event === 'ProxyCreated').args.proxy;
   console.log(`Token proxy created at ${proxyAddress}`);
 
   // Set the token in the new implementation.
   console.log(`Setting application's token...`);
-  const donations = DonationsV2.at(this.proxy);
+  const donations = DonationsV2.at(this.proxy.address);
   await donations.setToken(proxyAddress, txParams);
   console.log(`Token set succesfully`);
 }
