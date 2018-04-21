@@ -5,8 +5,7 @@
   "main": "index.js",
   "scripts": {
     "compile": "rm -rf build && npx truffle compile",
-    "start": "npm run compile && npx truffle exec index.js --network ropsten",
-    "startdev": "npm run compile && npx truffle exec index.js --network development"
+    "start": "npm run compile && npx truffle exec index.js --network ropsten"
   },
   "keywords": [
     "zos",

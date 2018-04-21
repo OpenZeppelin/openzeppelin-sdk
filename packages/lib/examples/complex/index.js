@@ -1,5 +1,5 @@
 const decodeLogs = require('zos-lib').decodeLogs;
-const encodeCall = require('zos-lib').decodeLogs;
+const encodeCall = require('zos-lib').encodeCall;
 
 const OwnedUpgradeabilityProxy = artifacts.require('zos-lib/contracts/upgradeability/OwnedUpgradeabilityProxy.sol');
 const UpgradeabilityProxyFactory = artifacts.require('UpgradeabilityProxyFactory');
@@ -16,7 +16,7 @@ const contractName = "Donations";
 const txParams = {
   from: owner,
   gas: 2000000,
-  gasPrice: 100000000000
+  gasPrice: 120000000000
 };
 
 async function setupAppManager() {
@@ -73,7 +73,6 @@ async function deployVersion1Implementation() {
   console.log(`Creating proxy for ${contractName}...`);
   const callData = encodeCall('initialize', ['address'], [owner]);
   const {receipt} = await this.appManager.createAndCall(contractName, callData, txParams);
-  console.log(JSON.stringify(receipt, null, 2));
   const logs = decodeLogs([receipt.logs[1]], UpgradeabilityProxyFactory, 0x0);
   const proxyAddress = logs.find(l => l.event === 'ProxyCreated').args.proxy;
   this.proxy = OwnedUpgradeabilityProxy.at(proxyAddress);
