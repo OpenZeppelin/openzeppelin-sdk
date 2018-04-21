@@ -60,6 +60,12 @@ contract MyContract is Initializable {
 }
 ```
 
+
+Before you continue, use truffle to compile your contracts:
+```sh
+npx truffle compile
+```
+
 ### Register your initial contract implementations
 
 The next step is to register all the contract implementations of the first `version` of your project. To do this please run:
@@ -129,6 +135,11 @@ contract MyContract is Initializable {
     return 1337;
   }
 }
+```
+
+Use truffle to compile the new version of your code:
+```sh
+npx truffle compile
 ```
 
 We'll now use `zos` to register and deploy the new code for `MyContract` to the blockchain.
