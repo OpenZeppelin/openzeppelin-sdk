@@ -133,6 +133,8 @@ contract('UnversionedAppManager', ([_, managerOwner, directoryOwner, anotherAcco
       this.logs = decodeLogs([receipt.logs[1]], UpgradeabilityProxyFactory)
       this.proxyAddress = this.logs.find(l => l.event === 'ProxyCreated').args.proxy
       this.proxy = await OwnedUpgradeabilityProxy.at(this.proxyAddress)
+      
+      await this.directory.setImplementation(contract, this.implementation_v1, { from: directoryOwner })
     })
 
     describe('when the sender is the manager owner', function () {
@@ -142,7 +144,7 @@ contract('UnversionedAppManager', ([_, managerOwner, directoryOwner, anotherAcco
         await this.manager.upgradeTo(this.proxyAddress, contract, { from })
 
         const implementation = await this.proxy.implementation()
-        assert.equal(implementation, this.implementation_v0)
+        assert.equal(implementation, this.implementation_v1)
       })
     })
 
@@ -150,7 +152,6 @@ contract('UnversionedAppManager', ([_, managerOwner, directoryOwner, anotherAcco
       const from = anotherAccount
 
       it('reverts', async function () {
-        await this.directory.setImplementation(contract, this.implementation_v1, { from: directoryOwner })
         await assertRevert(this.manager.upgradeTo(this.proxyAddress, contract, { from }))
       })
     })
