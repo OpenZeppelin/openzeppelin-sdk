@@ -96,7 +96,40 @@ Wohoo! We've upgraded our contract's behavior while preserving it's storage.
 For a fully working project with this example, see the [`examples/single`](https://github.com/zeppelinos/zos-lib/tree/master/examples/single) folder.
 
 ## <a name="complex"></a> Develop and operate a complex upgradeable app
+
+Note: This shows a low-level manual method of developing a complex upgradeable smart contract application. You probably want to use [the higher-level CLI guide](https://github.com/zeppelinos/zos-cli/blob/master/README.md) instead, but feel free to continue reading if you want to understand the core contracts of `zos-lib`.
+
 Most real-world applications require more than a single smart contract. Here's how to build a complex upgradeable app with multiple smart contracts and connect it to the zOS Kernel standard libraries.
+
+Let's imagine we want to build a simple donation application where we give donors some sort of recognition.
+
+An initial version of the contract can look like so:
+```sol
+```
+
+We want to use `zos-lib` to deploy this contract with upgradeability capabilities. Given this will probably be a complex application and we'll want to use the zOS Kernel standard libraries, we'll use the `AppManager` programming interface.
+
+The first step to do so is to create and configure the `AppManager` contract. This contract will live in the blockchain and manage the different versions of our smart contract code and upgradeability proxies. It's the single entry point to manage our application's contract's upgradeability and instances. Let's set it up:
+
+```js
+```
+
+Next, we need to deploy the first version of the app contracts. To do so, we register the implementation of our `DonationsV1` in the `AppManager` and request it to create a new upgradeable proxy for it. Let's do it:
+```js
+```
+
+Now let's suppose we want to give some sort of retribution to people donating money to our donation campaign. We want to mint new ERC721 cryptocollectibles for every received donation. To do so, we'll link our application to a zOS Kernel standard library release that contains an implementation of a mintable ERC721 token. Here's the new contract code: 
+
+```sol
+```
+
+What we need to do next is link our application to the zOS Kernel standard library release containing that mintable ERC721 implementation, and set it to our upgradeable contract. To do so, we create a new version of our application in the `AppManager`, register a new `AppDirectory` containing the new version of our contract implementation, and then set the standard library version of ERC721 to our upgradeable contract. Let's see how:
+
+```js
+```
+
+That's it! We now have the same contract, retaining the original balance, and storage, but with an upgraded code. The upgradeable contract is also linked to an on-chain upgradeable standard library containing an implementation of a mintable ERC721 token. State of the art!
+
 
 ## Develop a zOS Kernel standard library release
 See [this guide in the zeppelinos/kernel repo](https://github.com/zeppelinos/kernel#developing-kernel-standard-libraries) to learn how to develop new zOS kernel standard library releases.
