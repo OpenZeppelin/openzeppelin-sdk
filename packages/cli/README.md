@@ -19,12 +19,12 @@ npm i -g zos
 Next, learn how to:
 
 - [Develop an upgradeable smart contract application using `zos`](#develop).
+- [Testing a `zos` upgradeable application](#testing)
 - [Develop a new zOS Kernel standard library release using `zos`](#kernel).
 - [Use `zos` to fund development and auditing of zOS Kernel releases with your ZEP tokens](#vouching).
 - [Extend provided zOS Kernel standard library code in your own contracts](https://github.com/zeppelinos/labs/tree/master/extensibility-study#extensibility-study) (experimental).
 - [Migrate your non-upgradeable legacy ERC20 token into an upgradeable version with a managed approach](https://github.com/zeppelinos/labs/tree/master/migrating_legacy_token_managed#migrating-legacy-non-upgradeable-token-to-upgradeability-with-managed-strategy) (experimental).
 - [Migrate your non-upgradeable legacy ERC20 token into an upgradeable version with an opt-in approach](https://github.com/zeppelinos/labs/tree/master/migrating_legacy_token_opt_in#migrating-legacy-non-upgradeable-token-to-upgradeability-with-opt-in-strategy) (experimental).
-
 
 ## <a name="develop"></a>Develop an upgradeable smart contract application using `zos`
 
@@ -120,7 +120,30 @@ The proxy addresses, which you'll need to interact with your upgradeable contrac
 
 Open the `package.zos.<network>.json` and use the addresses found there to interact with your deployed contracts. Congratulations! The first version of your upgradeable smart contract app is deployed in the blockchain!
 
+## Using a standard library
+
+In addition to creating proxies for your own contracts, you can also re-use already deployed contracts from a zeppelin_os standard library. To do so, run the following command, with the name of the npm package of the stdlib you want to use. For example:
+
+```bash
+zos set-stdlib openzeppelin-zos --network [NETWORK]
+```
+
+The next `sync` operation will connect your application with the chosen standard library on the target network. From there on, you can create proxies for any contract provided by the stdlib:
+
+```bash
+zos create-proxy MintableToken --network [NETWORK]
+```
+
+However, if you're using development nodes (such as testrpc or ganache), the standard library is not already deployed, since you are running from an empty blockchain. To work around this, you can run the following command:
+
+```bash
+zos deploy-all --network [NETWORK]
+```
+
+This will deploy your entire application to the target network, along with the standard library you are using and all its contracts. This way, you can transparently work in development with the contracts provided by the stdlib.
+
 ### Update your smart contract code
+
 Some time later you might want to change your smart contract code: fix a bug, add a new feature, etc. 
 To do so, update your contracts, making sure you don't change their pre-existing storage structure. This is required
 by **zeppelin_os** upgadeability mechanism. This means you can add new state variables, but you can't remove the ones you already have. In the example above, this could be the new version of `MyContract`:
@@ -170,6 +193,41 @@ zos upgrade-proxy MyContract --network ropsten
 ```
 Voila! Your contract has now been upgraded. The address is the same as before, but the code has been changed to the latest version. Repeat the same steps for every code update you want to perform.
 
+## <a name="testing"></a> Testing a `zos` upgradeable application
+
+To simplify the testing process, you can use the `AppManager` class to set up your entire application (including a standard library) in the test network. This class also acts as wrapper to your deployed application, and can be used to programatically create new proxies of the contracts to test:
+
+```js
+import AppManager from 'zos/lib/models/AppManager';
+
+const MyContract = artifacts.require('MyContract');
+const MintableToken = artifacts.require('MintableToken');
+
+contract('MyContract', function([owner]) {
+  beforeEach(async function () {
+    this.appManager = new AppManager(owner, 'test');
+    await this.appManager.deployAll();
+  });
+
+  it('should create a proxy of MyContract', async function () {
+    const proxy = await this.appManager.createProxy(MyContract, 'MyContract');
+    const result = await proxy.y();
+    result.toNumber().should.eq(1337)
+  })
+
+  it('should create and initialize a proxy of MyContract', async function () {
+    const proxy = await this.appManager.createProxy(MyContract, 'MyContract', 'initialize', [42]);
+    const result = await proxy.x();
+    result.toNumber().should.eq(42)
+  })
+
+  it('should create a proxy from the stdlib', async function () {
+    const proxy = await this.appManager.createProxy(MintableToken, 'MintableToken');
+    const result = await proxy.totalSupply();
+    result.toNumber().should.eq(0);
+  })
+});
+```
 
 ## <a name="kernel"></a> Develop a new zOS Kernel standard library release using `zos`
 TODO
