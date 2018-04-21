@@ -18,9 +18,13 @@ npm i -g zos
 ```
 Next, learn how to:
 
-- [Develop an upgradeable smart contract application using `zos`](#develop)
-- [Develop a new zOS Kernel standard library release using `zos`](#kernel)
-- [Use `zos` to fund development and auditing of zOS Kernel releases with your ZEP tokens](#vouching)
+- [Develop an upgradeable smart contract application using `zos`](#develop).
+- [Develop a new zOS Kernel standard library release using `zos`](#kernel).
+- [Use `zos` to fund development and auditing of zOS Kernel releases with your ZEP tokens](#vouching).
+- [Extend provided zOS Kernel standard library code in your own contracts](https://github.com/zeppelinos/labs/tree/master/extensibility-study#extensibility-study) (experimental).
+- [Migrate your non-upgradeable legacy ERC20 token into an upgradeable version with a managed approach](https://github.com/zeppelinos/labs/tree/master/migrating_legacy_token_managed#migrating-legacy-non-upgradeable-token-to-upgradeability-with-managed-strategy) (experimental).
+- [Migrate your non-upgradeable legacy ERC20 token into an upgradeable version with an opt-in approach](https://github.com/zeppelinos/labs/tree/master/migrating_legacy_token_opt_in#migrating-legacy-non-upgradeable-token-to-upgradeability-with-opt-in-strategy) (experimental).
+
 
 ## <a name="develop"></a>Develop an upgradeable smart contract application using `zos`
 
