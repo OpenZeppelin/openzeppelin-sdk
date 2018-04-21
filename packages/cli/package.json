@@ -38,7 +38,7 @@
     "truffle-contract": "^3.0.5",
     "truffle-provisioner": "^0.1.0",
     "truffle-resolver": "^4.0.3",
-    "zos-kernel": "^0.1.1",
+    "zos-kernel": "^0.1.2",
     "zos-lib": "^0.1.1"
   },
   "devDependencies": {
