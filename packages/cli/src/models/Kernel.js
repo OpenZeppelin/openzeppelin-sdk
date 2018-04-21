@@ -15,27 +15,27 @@ export default class KernelWrapper {
 
   async register(release) {
     const newVersionCost = await this.newVersionCost()
-    log(`Approving ${newVersionCost} ZEP tokens to zOS kernel contract...`)
+    log.info(`Approving ${newVersionCost} ZEP tokens to zOS kernel contract...`)
     const zepToken = await this.zepToken()
     await zepToken.approve(this.kernel.address, newVersionCost, this.txParams)
-    log(`Registering release ${release}...`)
+    log.info(`Registering release ${release}...`)
     const receipt = await this.kernel.register(release, this.txParams)
-    log(`Release registered successfully. Transaction hash: ${receipt.tx}.`)
+    log.info(`Release registered successfully. Transaction hash: ${receipt.tx}.`)
   }
 
   async vouch(release, amount, data = '') {
-    log(`Approving ${amount} ZEP tokens to zOS kernel contract...`)
+    log.info(`Approving ${amount} ZEP tokens to zOS kernel contract...`)
     const zepToken = await this.zepToken()
     await zepToken.approve(this.kernel.address, amount, this.txParams)
-    log(`Vouching ${amount} ZEP tokens for release ${release}...`)
+    log.info(`Vouching ${amount} ZEP tokens for release ${release}...`)
     const receipt = await this.kernel.vouch(release, amount, data, this.txParams)
-    log(`Vouch processed successfully. Transaction hash: ${receipt.tx}.`)
+    log.info(`Vouch processed successfully. Transaction hash: ${receipt.tx}.`)
   }
 
   async unvouch(release, amount, data = '') {
-    log(`Unvouching ${amount} ZEP tokens from release ${release}...`)
+    log.info(`Unvouching ${amount} ZEP tokens from release ${release}...`)
     const receipt = await this.kernel.unvouch(release, amount, data, this.txParams)
-    log(`Unvouch processed successfully. Transaction hash: ${receipt.tx}.`)
+    log.info(`Unvouch processed successfully. Transaction hash: ${receipt.tx}.`)
   }
 
   async validateCanRegister(release) {
