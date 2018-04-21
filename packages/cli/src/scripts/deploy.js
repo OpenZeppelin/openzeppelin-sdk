@@ -20,7 +20,7 @@ async function deploy(version, { network, from, packageFileName }) {
     zosNetworkFile = files.readNetworkFile(network)
     await distribution.connect(zosNetworkFile.distribution.address)
   } else {
-    log.info('Network file not found, creating it...')
+    log.info('Network file not found, deploying new distribution...')
     await distribution.deploy(version)
     createNetworkFile(network, distribution.address(), packageFileName)
     zosNetworkFile = files.readNetworkFile(network)
@@ -48,6 +48,8 @@ async function deploy(version, { network, from, packageFileName }) {
   log.info(`Registering release into kernel address ${kernelAddress}`)
   const kernel = new Kernel(kernelAddress)
   await kernel.register(release.address)
+
+  zosNetworkFile.provider = { address: release.address }
 
   files.writeNetworkFile(network, zosNetworkFile)
 }
