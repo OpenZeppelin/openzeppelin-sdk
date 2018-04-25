@@ -1,9 +1,9 @@
 const abi = require('ethereumjs-abi')
 
-function encodeCall(name, arguments = [], rawValues = []) {
+function encodeCall(name, args = [], rawValues = []) {
   const values = rawValues.map(value => value.toString()) // convert BigNumbers to string
-  const methodId = abi.methodID(name, arguments).toString('hex');
-  const params = abi.rawEncode(arguments, values).toString('hex');
+  const methodId = abi.methodID(name, args).toString('hex');
+  const params = abi.rawEncode(args, values).toString('hex');
   return '0x' + methodId + params;
 }
 
