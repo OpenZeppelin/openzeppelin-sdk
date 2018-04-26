@@ -95,7 +95,7 @@ class AppManagerWrapper {
       : await this._createProxyAndCall(contractClass, contractName, initMethodName, initArgs);
 
     log.info(` TX receipt received: ${receipt.transactionHash}`)
-    const logs = decodeLogs([receipt.logs[1]], UpgradeabilityProxyFactory);
+    const logs = decodeLogs(receipt.logs, UpgradeabilityProxyFactory);
     const address = logs.find(l => l.event === 'ProxyCreated').args.proxy;
     log.info(` ${contractName} proxy: ${address}`)
     return new contractClass(address);
