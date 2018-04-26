@@ -39,7 +39,7 @@ export default class Stdlib {
   }
 
   async deploy() {
-    log.info(`\nDeploying contract directory...`)
+    log.info(`Deploying contract directory...`)
     const directory = await ContractDirectory.new({ from: this.owner });
     log.info(' Contract directory:', directory.address)
     await Promise.all(this.listContracts().map(async (contractName) => {

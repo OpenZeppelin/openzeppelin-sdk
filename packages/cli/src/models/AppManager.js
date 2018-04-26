@@ -30,7 +30,7 @@ class AppManagerWrapper {
   }
 
   async deploy(initialVersion, stdlib) {
-    log.info('\nDeploying a new app manager...')
+    log.info('Deploying a new app manager...')
     this.factory = await UpgradeabilityProxyFactory.new(this.txParams);
     log.info(` UpgradeabilityProxyFactory: ${this.factory.address}`)
     this.package = await Package.new(this.txParams);
@@ -55,7 +55,7 @@ class AppManagerWrapper {
   }
 
   async newVersion(versionName, stdlib) {
-    log.info(`\nAdding version ${versionName}...`)
+    log.info(`Adding version ${versionName}...`)
     const stdlibAddress = this._getStdlibAddress(stdlib);
     const directory = await AppDirectory.new(stdlibAddress, this.txParams);
     log.info(` App directory: ${directory.address}`)
@@ -73,7 +73,7 @@ class AppManagerWrapper {
   }
 
   async setImplementation(contractClass, contractName) {
-    log.info(`\nSetting implementation of ${contractName} in contract directory...`)
+    log.info(`Setting implementation of ${contractName} in contract directory...`)
     const implementation = await contractClass.new(this.txParams);
     const directory = this.getCurrentDirectory();
     await directory.setImplementation(contractName, implementation.address, this.txParams);
@@ -82,14 +82,14 @@ class AppManagerWrapper {
   }
 
   async setStdlib(stdlib) {
-    log.info(`\nSetting stdlib ${stdlib}...`)
+    log.info(`Setting stdlib ${stdlib}...`)
     const stdlibAddress = this._getStdlibAddress(stdlib);
     await this.getCurrentDirectory().setStdlib(stdlibAddress, { from: this.owner });
     return stdlibAddress;
   }
 
   async createProxy(contractClass, contractName, initMethodName, initArgs) {
-    log.info(`\nCreating ${contractName} proxy...`)
+    log.info(`Creating ${contractName} proxy...`)
     const { receipt } = typeof(initArgs) === 'undefined'
       ? await this._createProxy(contractName)
       : await this._createProxyAndCall(contractClass, contractName, initMethodName, initArgs);
@@ -98,12 +98,11 @@ class AppManagerWrapper {
     const logs = decodeLogs([receipt.logs[1]], UpgradeabilityProxyFactory);
     const address = logs.find(l => l.event === 'ProxyCreated').args.proxy;
     log.info(` ${contractName} proxy: ${address}`)
-    log.info(` ${contractName} proxy: ${address}`)
     return new contractClass(address);
   }
 
   async upgradeProxy(proxyAddress, contractClass, contractName, initMethodName, initArgs) {
-    log.info(`\nUpdating ${contractName} proxy...`)
+    log.info(`Updating ${contractName} proxy...`)
     const { receipt } = typeof(initArgs) === 'undefined'
       ? await this._updateProxy(proxyAddress, contractName)
       : await this._updateProxyAndCall(proxyAddress, contractClass, contractName, initMethodName, initArgs)

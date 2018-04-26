@@ -36,7 +36,7 @@ class Distribution {
   }
 
   async newVersion(version) {
-    log.info('\nAdding new version...')
+    log.info('Adding new version...')
     const release = await Release.new(this.txParams)
     await this.package.addVersion(version, release.address, this.txParams)
     log.info(' Added version:', version)
@@ -49,7 +49,7 @@ class Distribution {
   }
 
   async setImplementation(version, contractClass, contractName) {
-    log.info(`\nSetting implementation of ${contractName} in version ${version}...`)
+    log.info(`Setting implementation of ${contractName} in version ${version}...`)
     const implementation = await contractClass.new(this.txParams)
     const release = await this.getRelease(version)
     await release.setImplementation(contractName, implementation.address, this.txParams)
@@ -63,7 +63,7 @@ class Distribution {
   }
 
   async freeze(version) {
-    log.info('\nFreezing new version...')
+    log.info('Freezing new version...')
     const release = await this.getRelease(version)
     await release.freeze(this.txParams)
     log.info(' Release frozen')
