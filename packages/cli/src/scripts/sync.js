@@ -1,6 +1,9 @@
 import AppManager from '../models/AppManager'
 import makeContract from '../utils/contract'
 import PackageFilesInterface from '../utils/PackageFilesInterface'
+import Logger from '../utils/Logger'
+
+const log = new Logger('sync')
 
 async function sync({ network, from, packageFileName, handleStdlib }) {
   const files = new PackageFilesInterface(packageFileName)
@@ -35,11 +38,23 @@ async function sync({ network, from, packageFileName, handleStdlib }) {
     zosNetworkFile.contracts[contractName] = contractInstance.address
   }
 
-  if (zosPackage.stdlib) {
-    const stdlibAddress = handleStdlib
-      ? await handleStdlib(appManager, zosPackage.stdlib)
-      : await appManager.setStdlib(zosPackage.stdlib);
-    zosNetworkFile.stdlib = { address: stdlibAddress }
+  // If being called from deploy all, delegate to caller handling the stdlib deployment and flag as customDeploy
+  if (zosPackage.stdlib && handleStdlib) {
+    const stdlibAddress = await handleStdlib(appManager, zosPackage.stdlib)
+    zosNetworkFile.stdlib = { address: stdlibAddress, customDeploy: true, ... zosPackage.stdlib }
+  } else if (zosPackage.stdlib) {
+    const networkStdlibInfo = zosNetworkFile.stdlib
+    // If syncing on top of a custom deploy of a stdlib, link to that deploy
+    if (networkStdlibInfo && networkStdlibInfo.customDeploy && networkStdlibInfo.name === zosPackage.stdlib.name) {
+      log.info("Using existing custom deployment of stdlib")
+      await appManager.setStdlib(networkStdlibInfo.address)
+    // Otherwise, link to the public deployed version
+    } else {
+      log.info("Connecting to public deployment of stdlib")
+      const stdlibAddress = await appManager.setStdlib(zosPackage.stdlib)
+      zosNetworkFile.stdlib = { address: stdlibAddress, ... zosPackage.stdlib }
+    }
+  // If no stdlib requested, clear everything
   } else {
     delete zosNetworkFile['stdlib']
     await appManager.setStdlib(null)
