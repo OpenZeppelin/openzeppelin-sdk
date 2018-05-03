@@ -1,6 +1,6 @@
-const assertRevert = require('../../lib/assertRevert')
+import assertRevert from '../../src/helpers/assertRevert'
 
-function shouldBehaveLikeOwnable(owner, anotherAccount) {
+export default function shouldBehaveLikeOwnable(owner, anotherAccount) {
   describe('owner', function () {
     it('sets the creator as the owner of the contract', async function () {
       const contractOwner = await this.ownable.owner()
@@ -50,5 +50,3 @@ function shouldBehaveLikeOwnable(owner, anotherAccount) {
     })
   })
 }
-
-module.exports = shouldBehaveLikeOwnable

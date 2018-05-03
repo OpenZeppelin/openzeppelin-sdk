@@ -1,6 +1,7 @@
-const assertRevert = require('../../../lib/assertRevert')
+import assertRevert from '../../../src/helpers/assertRevert'
+import shouldBehaveLikeContractDirectory from './ContractDirectory.behavior'
+
 const FreezableContractDirectory = artifacts.require('FreezableContractDirectory')
-const shouldBehaveLikeContractDirectory = require('./ContractDirectory.behavior')
 const DummyImplementation = artifacts.require('DummyImplementation')
 
 contract('FreezableContractDirectory', ([_, owner, anotherAddress]) => {
@@ -52,7 +53,7 @@ contract('FreezableContractDirectory', ([_, owner, anotherAddress]) => {
 
   describe('setImplementation', function () {
     describe('when it is not frozen', function () {
-      shouldBehaveLikeContractDirectory(owner, anotherAddress, this.implementation_v0, this.implementation_v1)
+      shouldBehaveLikeContractDirectory(owner, anotherAddress)
     })
 
     describe('when it is frozen', function () {

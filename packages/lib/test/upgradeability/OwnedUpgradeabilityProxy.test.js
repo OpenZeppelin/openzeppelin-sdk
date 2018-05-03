@@ -1,14 +1,13 @@
-'use strict'
+import encodeCall from '../../src/helpers/encodeCall'
+import assertRevert from '../../src/helpers/assertRevert'
 
-const encodeCall = require('../../lib/encodeCall')
-const assertRevert = require('../../lib/assertRevert')
 const MigratableMockV1 = artifacts.require('MigratableMockV1')
 const MigratableMockV2 = artifacts.require('MigratableMockV2')
 const MigratableMockV3 = artifacts.require('MigratableMockV3')
 const InitializableMock = artifacts.require('InitializableMock')
+const DummyImplementation = artifacts.require('DummyImplementation')
 const OwnedUpgradeabilityProxy = artifacts.require('OwnedUpgradeabilityProxy')
 const UpgradeabilityProxyFactory = artifacts.require('UpgradeabilityProxyFactory')
-const DummyImplementation = artifacts.require('DummyImplementation')
 
 contract('OwnedUpgradeabilityProxy', ([_, owner, anotherAccount]) => {
   before(async function () {

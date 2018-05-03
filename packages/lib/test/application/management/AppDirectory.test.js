@@ -1,7 +1,8 @@
+import assertRevert from '../../../src/helpers/assertRevert'
+import shouldBehaveLikeContractDirectory from '../versioning/ContractDirectory.behavior'
+
 const AppDirectory = artifacts.require('AppDirectory')
-const assertRevert = require('../../../lib/assertRevert')
 const ContractDirectory = artifacts.require('ContractDirectory')
-const shouldBehaveLikeContractDirectory = require('../versioning/ContractDirectory.behavior')
 const DummyImplementation = artifacts.require('DummyImplementation')
 
 contract('AppDirectory', ([_, owner, stdlibOwner, anotherAddress, stdlibImplementation]) => {

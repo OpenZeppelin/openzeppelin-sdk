@@ -1,8 +1,9 @@
-const assertRevert = require('../../../lib/assertRevert')
-const ContractDirectory = artifacts.require('ContractDirectory')
-const shouldBehaveLikeOwnable = require('../../ownership/Ownable.behavior')
+import assertRevert from '../../../src/helpers/assertRevert'
+import shouldBehaveLikeOwnable from '../../ownership/Ownable.behavior'
 
-function shouldBehaveLikeContractDirectory(owner, anotherAddress) {
+const ContractDirectory = artifacts.require('ContractDirectory')
+
+export default function shouldBehaveLikeContractDirectory(owner, anotherAddress) {
   describe('ownership', function () {
     beforeEach(function () {
       this.ownable = this.directory
@@ -68,5 +69,3 @@ function shouldBehaveLikeContractDirectory(owner, anotherAddress) {
     })
   })
 }
-
-module.exports = shouldBehaveLikeContractDirectory

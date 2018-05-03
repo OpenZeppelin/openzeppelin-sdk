@@ -1,4 +1,4 @@
-async function assertRevert(promise, invariants = () => {}) {
+export default async function assertRevert(promise, invariants = () => {}) {
   try {
     await promise;
     assert.fail('Expected revert not received');
@@ -8,5 +8,3 @@ async function assertRevert(promise, invariants = () => {}) {
     invariants.call()
   }
 }
-
-module.exports = assertRevert;

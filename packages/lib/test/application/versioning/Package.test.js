@@ -1,7 +1,8 @@
+import assertRevert from '../../../src/helpers/assertRevert'
+import shouldBehaveLikeOwnable from '../../ownership/Ownable.behavior'
+
 const Package = artifacts.require('Package')
-const assertRevert = require('../../../lib/assertRevert')
 const ContractDirectory = artifacts.require('ContractDirectory')
-const shouldBehaveLikeOwnable = require('../../ownership/Ownable.behavior')
 const DummyImplementation = artifacts.require('DummyImplementation')
 
 contract('Package', ([_, owner, anotherAddress]) => {

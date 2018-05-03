@@ -1,14 +1,15 @@
+import encodeCall from '../../../src/helpers/encodeCall'
+import decodeLogs from '../../../src/helpers/decodeLogs'
+import assertRevert from '../../../src/helpers/assertRevert'
+import shouldBehaveLikeOwnable from '../../ownership/Ownable.behavior'
+
 const Package = artifacts.require('Package')
-const PackagedAppManager = artifacts.require('PackagedAppManager')
-const encodeCall = require('../../../lib/encodeCall')
-const decodeLogs = require('../../../lib/decodeLogs')
-const assertRevert = require('../../../lib/assertRevert')
 const ContractDirectory = artifacts.require('ContractDirectory')
 const InitializableMock = artifacts.require('InitializableMock')
-const shouldBehaveLikeOwnable = require('../../ownership/Ownable.behavior')
+const PackagedAppManager = artifacts.require('PackagedAppManager')
+const DummyImplementation = artifacts.require('DummyImplementation')
 const OwnedUpgradeabilityProxy = artifacts.require('OwnedUpgradeabilityProxy')
 const UpgradeabilityProxyFactory = artifacts.require('UpgradeabilityProxyFactory')
-const DummyImplementation = artifacts.require('DummyImplementation')
 
 contract('PackagedAppManager', ([_, managerOwner, packageOwner, directoryOwner, anotherAccount]) => {
   const contract = 'ERC721'

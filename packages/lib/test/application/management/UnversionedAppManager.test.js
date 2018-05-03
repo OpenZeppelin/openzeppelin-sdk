@@ -1,13 +1,14 @@
-const encodeCall = require('../../../lib/encodeCall')
-const decodeLogs = require('../../../lib/decodeLogs')
-const assertRevert = require('../../../lib/assertRevert')
+import decodeLogs from '../../../src/helpers/decodeLogs'
+import encodeCall from '../../../src/helpers/encodeCall'
+import assertRevert from '../../../src/helpers/assertRevert'
+import shouldBehaveLikeOwnable from '../../ownership/Ownable.behavior'
+
 const InitializableMock = artifacts.require('InitializableMock')
 const ContractDirectory = artifacts.require('ContractDirectory')
+const DummyImplementation = artifacts.require('DummyImplementation')
 const UnversionedAppManager = artifacts.require('UnversionedAppManager')
-const shouldBehaveLikeOwnable = require('../../ownership/Ownable.behavior')
 const OwnedUpgradeabilityProxy = artifacts.require('OwnedUpgradeabilityProxy')
 const UpgradeabilityProxyFactory = artifacts.require('UpgradeabilityProxyFactory')
-const DummyImplementation = artifacts.require('DummyImplementation')
 
 contract('UnversionedAppManager', ([_, managerOwner, directoryOwner, anotherAccount]) => {
   const contract = 'ERC721'

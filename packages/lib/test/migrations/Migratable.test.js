@@ -1,8 +1,8 @@
-const assert = require('chai').assert;
-const encodeCall = require('../../lib/encodeCall');
-const decodeLogs = require('../../lib/decodeLogs');
-const assertRevert = require('../../lib/assertRevert');
+import encodeCall from '../../src/helpers/encodeCall'
+import decodeLogs from '../../src/helpers/decodeLogs'
+import assertRevert from '../../src/helpers/assertRevert'
 
+const assert = require('chai').assert;
 const Migratable = artifacts.require('Migratable');
 const SampleMotherV1 = artifacts.require('SampleMotherV1');
 const SampleMotherV2 = artifacts.require('SampleMotherV2');

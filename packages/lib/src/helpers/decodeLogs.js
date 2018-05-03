@@ -1,6 +1,6 @@
 const SolidityEvent = require('web3/lib/web3/event.js');
 
-function decodeLogs (logs, contract) {
+export default function decodeLogs (logs, contract) {
   const decodedLogs = [];
   
   for (const log of logs) {
@@ -13,5 +13,3 @@ function decodeLogs (logs, contract) {
         
   return decodedLogs;
 }
-
-module.exports = decodeLogs
