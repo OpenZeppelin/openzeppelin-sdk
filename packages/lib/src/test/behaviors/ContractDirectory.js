@@ -1,7 +1,5 @@
-import assertRevert from '../../../src/helpers/assertRevert'
-import shouldBehaveLikeOwnable from '../../ownership/Ownable.behavior'
-
-const ContractDirectory = artifacts.require('ContractDirectory')
+import assertRevert from '../../helpers/assertRevert'
+import shouldBehaveLikeOwnable from './Ownable'
 
 export default function shouldBehaveLikeContractDirectory(owner, anotherAddress) {
   describe('ownership', function () {

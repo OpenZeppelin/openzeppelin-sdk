@@ -11,6 +11,9 @@ import Logger from './utils/Logger'
 import FileSystem from './utils/FileSystem'
 import ContractsProvider from './utils/ContractsProvider'
 
+// test behaviors
+import behaviors from './test'
+
 // app management
 import AppManagerWrapper from './app_manager/AppManagerWrapper'
 import AppManagerDeployer from './app_manager/AppManagerDeployer'
@@ -26,6 +29,7 @@ export {
   decodeLogs,
   encodeCall,
   assertRevert,
+  behaviors,
   Logger,
   FileSystem,
   ContractsProvider,

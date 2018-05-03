@@ -1,5 +1,5 @@
 import assertRevert from '../../../src/helpers/assertRevert'
-import shouldBehaveLikeContractDirectory from '../versioning/ContractDirectory.behavior'
+import shouldBehaveLikeContractDirectory from '../../../src/test/behaviors/ContractDirectory'
 
 const AppDirectory = artifacts.require('AppDirectory')
 const ContractDirectory = artifacts.require('ContractDirectory')

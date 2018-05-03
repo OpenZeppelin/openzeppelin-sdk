@@ -1,7 +1,7 @@
 import decodeLogs from '../../../src/helpers/decodeLogs'
 import encodeCall from '../../../src/helpers/encodeCall'
 import assertRevert from '../../../src/helpers/assertRevert'
-import shouldBehaveLikeOwnable from '../../ownership/Ownable.behavior'
+import shouldBehaveLikeOwnable from '../../../src/test/behaviors/Ownable'
 
 const InitializableMock = artifacts.require('InitializableMock')
 const ContractDirectory = artifacts.require('ContractDirectory')

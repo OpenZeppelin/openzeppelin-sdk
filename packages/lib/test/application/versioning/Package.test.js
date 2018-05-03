@@ -1,5 +1,5 @@
 import assertRevert from '../../../src/helpers/assertRevert'
-import shouldBehaveLikeOwnable from '../../ownership/Ownable.behavior'
+import shouldBehaveLikeOwnable from '../../../src/test/behaviors/Ownable'
 
 const Package = artifacts.require('Package')
 const ContractDirectory = artifacts.require('ContractDirectory')

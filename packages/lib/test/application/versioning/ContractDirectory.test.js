@@ -1,4 +1,4 @@
-import shouldBehaveLikeContractDirectory from './ContractDirectory.behavior'
+import shouldBehaveLikeContractDirectory from '../../../src/test/behaviors/ContractDirectory'
 
 const ContractDirectory = artifacts.require('ContractDirectory')
 const DummyImplementation = artifacts.require('DummyImplementation')
