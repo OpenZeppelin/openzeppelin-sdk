@@ -1,27 +1,29 @@
-import Distribution from '../models/Distribution'
-import Kernel from '../models/Kernel'
-import makeContract from '../utils/contract'
-import PackageFilesInterface from '../utils/PackageFilesInterface'
 import Logger from '../utils/Logger'
+import KernelProvider from "../zos-lib/kernel/KernelProvider"
+import ContractsProvider from '../zos-lib/utils/ContractsProvider'
+import PackageFilesInterface from '../utils/PackageFilesInterface'
+import DistributionProvider from "../zos-lib/distribution/DistributionProvider";
+import DistributionDeployer from "../zos-lib/distribution/DistributionDeployer";
 
 const log = new Logger('deploy')
 
-async function deploy(version, { network, from, packageFileName }) {
+// TODO: remove version param
+export default async function deploy({ version, network, txParams = {}, packageFileName = null}) {
   const files = new PackageFilesInterface(packageFileName)
-  const distribution = new Distribution(from, network)
   if (! files.exists()) throw `Could not find package file ${packageFileName}`
 
   const zosPackage = files.read()
   let zosNetworkFile
 
   // 1. Get or create distribution
+  let distribution
   if (files.existsNetworkFile(network)) {
     log.info('Reading network file...')
     zosNetworkFile = files.readNetworkFile(network)
-    await distribution.connect(zosNetworkFile.distribution.address)
+    distribution = await DistributionProvider.from(zosNetworkFile.distribution.address, txParams)
   } else {
     log.info('Network file not found, deploying new distribution...')
-    await distribution.deploy(version)
+    distribution = await DistributionDeployer.call(txParams)
     createNetworkFile(network, distribution.address(), packageFileName)
     zosNetworkFile = files.readNetworkFile(network)
   }
@@ -31,12 +33,13 @@ async function deploy(version, { network, from, packageFileName }) {
   const release = await distribution.newVersion(version)
 
   // 3. For each implementation, deploy it and register it into the release
-  for (let contractName in zosPackage.contracts) {
-    log.info(`Deploying ${contractName} contract...`)
+  for (let contractAlias in zosPackage.contracts) {
     // TODO: store the implementation's hash to avoid unnecessary deployments
-    const contractClass = makeContract.local(zosPackage.contracts[contractName])
-    const contractInstance = await distribution.setImplementation(version, contractClass, contractName)
-    zosNetworkFile.contracts[contractName] = contractInstance.address
+    log.info(`Deploying ${contractAlias} contract...`)
+    const contractName = zosPackage.contracts[contractAlias];
+    const contractClass = ContractsProvider.getFromArtifacts(contractName)
+    const contractInstance = await distribution.setImplementation(version, contractClass, contractAlias)
+    zosNetworkFile.contracts[contractAlias] = contractInstance.address
   }
 
   // 4. Freeze release
@@ -46,7 +49,7 @@ async function deploy(version, { network, from, packageFileName }) {
   // 5. Register release into kernel
   const kernelAddress = zosPackage.kernel.address
   log.info(`Registering release into kernel address ${kernelAddress}`)
-  const kernel = new Kernel(kernelAddress)
+  const kernel = await KernelProvider.fromAddress(kernelAddress, txParams)
   await kernel.register(release.address)
 
   zosNetworkFile.provider = { address: release.address }
@@ -69,5 +72,3 @@ function createNetworkFile(network, address, packageFileName) {
 
   files.writeNetworkFile(network, zosNetworkFile)
 }
-
-module.exports = deploy

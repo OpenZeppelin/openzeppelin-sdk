@@ -24,8 +24,8 @@ contract('create-proxy command', function([_, owner]) {
   beforeEach('setup', async function() {
     cleanup(packageFileName)
     cleanup(networkPackageFileName)
-    await init(appName, defaultVersion, {packageFileName});
-    await addImplementation(contractName, contractAlias, {packageFileName});
+    await init({ name: appName, version: defaultVersion, packageFileName });
+    await addImplementation({ contractName, contractAlias, packageFileName });
     await sync({ packageFileName, network, from });
   });
 
@@ -33,7 +33,7 @@ contract('create-proxy command', function([_, owner]) {
   after(cleanupfn(networkPackageFileName))
 
   it('should create a proxy for one of its contracts', async function() {
-    await createProxy(contractAlias, {packageFileName, network, from});
+    await createProxy({ contractAlias, packageFileName, network, from });
     const data = files.readNetworkFile(network);
     const proxy0 = data.proxies[contractAlias][0];
     proxy0.address.should.be.not.null;
@@ -41,19 +41,19 @@ contract('create-proxy command', function([_, owner]) {
   });
 
   it('should be able to have multiple proxies for one of its contracts', async function() {
-    await createProxy(contractAlias, {packageFileName, network, from});
-    await createProxy(contractAlias, {packageFileName, network, from});
-    await createProxy(contractAlias, {packageFileName, network, from});
+    await createProxy({ contractAlias, packageFileName, network, from });
+    await createProxy({ contractAlias, packageFileName, network, from });
+    await createProxy({ contractAlias, packageFileName, network, from });
     const data = files.readNetworkFile(network);
     assert.equal(3, data.proxies[contractAlias].length);
   });
 
   it('should be able to handle proxies for more than one contract', async function() {
     const customAlias = 'SomeOtherAlias';
-    await addImplementation('ImplV2', customAlias, {packageFileName});
+    await addImplementation({ contractName: 'ImplV2', contractAlias: customAlias, packageFileName });
     await sync({ packageFileName, network, from });
-    await createProxy(contractAlias, {packageFileName, network, from});
-    await createProxy(customAlias, {packageFileName, network, from});
+    await createProxy({ contractAlias, packageFileName, network, from });
+    await createProxy({ contractAlias: customAlias, packageFileName, network, from });
     const data = files.readNetworkFile(network);
     const proxy0 = data.proxies[contractAlias][0];
     const proxy1 = data.proxies[customAlias][0];

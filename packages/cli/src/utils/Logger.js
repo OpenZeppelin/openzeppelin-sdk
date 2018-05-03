@@ -1,6 +1,6 @@
 import colors from 'colors'
 
-class Logger {
+export default class Logger {
   constructor(prefix) {
     this.prefix = prefix
   }
@@ -13,11 +13,3 @@ class Logger {
     console.error(`[${this.prefix}] ${msg}`.red)
   }
 }
-
-class SilentLogger {
-  info(msg) { }
-  error(msg) { }
-}
-
-
-module.exports = process.env.NODE_ENV === 'test' ? SilentLogger : Logger

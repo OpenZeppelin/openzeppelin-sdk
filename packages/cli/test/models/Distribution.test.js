@@ -1,15 +1,16 @@
-import Distribution from '../../src/models/Distribution'
+import { assertRevert } from 'zos-lib'
+import DistributionProvider from "../../src/zos-lib/distribution/DistributionProvider";
+import DistributionDeployer from "../../src/zos-lib/distribution/DistributionDeployer";
 
 const ImplV1 = artifacts.require('ImplV1')
 const ImplV2 = artifacts.require('ImplV2')
-const assertRevert = require('zos-lib').assertRevert
 
 const should = require('chai')
   .use(require('chai-as-promised'))
   .should()
 
 contract('Distribution', function ([_, owner]) {
-  
+  const txParams = { from: owner }
   const contractName = 'Impl'
   const initialVersion = "1.0"
   const newVersion = "2.0"
@@ -26,8 +27,7 @@ contract('Distribution', function ([_, owner]) {
 
 
   beforeEach("deploying", async function () {
-    this.distribution = new Distribution(owner)
-    await this.distribution.deploy()
+    this.distribution = await DistributionDeployer.call(txParams)
   })
 
 
@@ -38,8 +38,7 @@ contract('Distribution', function ([_, owner]) {
 
   describe('connect', function () {
     beforeEach("connecting to existing instance", async function () {
-      const connectedDistribution = new Distribution(owner)
-      await connectedDistribution.connect(this.distribution.address())
+      const connectedDistribution = await DistributionProvider.from(this.distribution.address(), txParams)
       this.distribution = connectedDistribution
     })
 
@@ -62,13 +61,13 @@ contract('Distribution', function ([_, owner]) {
     beforeEach('creating a new release', createRelease)
 
     it('should not be frozen by default', async function () {
-      const frozen = await this.distribution.frozen(initialVersion)
+      const frozen = await this.distribution.isFrozen(initialVersion)
       frozen.should.be.false
     })
 
     it('should be freezable', async function () {
       await this.distribution.freeze(initialVersion)
-      const frozen = await this.distribution.frozen(initialVersion)
+      const frozen = await this.distribution.isFrozen(initialVersion)
       frozen.should.be.true
     })
   })

@@ -1,15 +1,12 @@
-import Kernel from '../models/Kernel'
-import kernelAddress from '../utils/kernelAddress'
+import KernelProvider from "../zos-lib/kernel/KernelProvider";
 
-async function unvouch(releaseAddress, rawAmount, { network, from }) {
+export default async function unvouch({ releaseAddress, rawAmount, network, txParams = {} }) {
   if(!releaseAddress) throw 'You must provide a release address to unvouch from'
   if(!rawAmount) throw 'You must provide an amount of ZEP tokens to unvouch'
-  const address = kernelAddress(network)
-  const txParams = { from }
 
   const data = ''
   const amount = new web3.BigNumber(rawAmount)
-  const kernel = new Kernel(address, txParams)
+  const kernel = await KernelProvider.fromKernelNetworkFile(network, txParams)
   await kernel.validateCanUnvouch(releaseAddress, amount)
 
   try {
@@ -18,5 +15,3 @@ async function unvouch(releaseAddress, rawAmount, { network, from }) {
     console.error('There was an error trying to unvouch your tokens.', error)
   }
 }
-
-module.exports = unvouch

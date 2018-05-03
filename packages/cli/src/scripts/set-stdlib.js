@@ -1,11 +1,11 @@
+import Stdlib from "../models/stdlib/Stdlib"
+import StdlibInstaller from "../models/stdlib/StdlibInstaller"
 import PackageFilesInterface from '../utils/PackageFilesInterface'
 
-async function setStdlib(stdlibName, { network, from, packageFileName, stdlib, installDeps }) {
+export default async function setStdlib({ stdlibNameVersion, installDeps = false, packageFileName = null }) {
   const files = new PackageFilesInterface(packageFileName)
   const zosPackage = files.read()
-  await files.setStdlib(zosPackage, stdlibName || stdlib, installDeps)
-    
+  const stdlib = installDeps ? await StdlibInstaller.call(stdlibNameVersion) : new Stdlib(stdlibNameVersion)
+  await files.setStdlib(zosPackage, stdlib)
   files.write(zosPackage)
 }
-
-module.exports = setStdlib

@@ -7,9 +7,7 @@ const should = require('chai')
       .use(require('chai-as-promised'))
       .should();
 
-contract('set-stdlib command', function([_, owner]) {
-
-  const from = owner;
+contract('set-stdlib command', function() {
   const appName = "MyApp";
   const defaultVersion = "0.1.0";
   const packageFileName = "package.test.zos.json";
@@ -17,13 +15,13 @@ contract('set-stdlib command', function([_, owner]) {
 
   beforeEach('setup', async function() {
     cleanup(packageFileName)
-    await init(appName, defaultVersion, { packageFileName, stdlib: 'mock-stdlib@1.0.0' });
+    await init({ name: appName, version: defaultVersion, packageFileName, stdlib: 'mock-stdlib@1.0.0' });
   });
 
   after('cleanup', cleanupfn(packageFileName));
 
   it('should set stdlib', async function () {
-    await setStdlib('mock-stdlib@1.1.0', {packageFileName});
+    await setStdlib({ stdlibNameVersion: 'mock-stdlib@1.1.0', packageFileName });
     const data = files.read();
     data.stdlib.name.should.eq('mock-stdlib');
     data.stdlib.version.should.eq('1.1.0');

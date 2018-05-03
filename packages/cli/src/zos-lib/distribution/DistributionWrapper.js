@@ -1,46 +1,48 @@
-import Logger from '../utils/Logger'
-import makeContract from '../utils/contract'
+import Logger from '../../utils/Logger'
+import ContractsProvider from "../utils/ContractsProvider";
 
 const log = new Logger('Distribution');
-const Package = makeContract('Package')
-const Release = makeContract(require('zos-kernel/build/contracts/Release.json'))
 
-class Distribution {
+export default class DistributionWrapper {
 
-  constructor(owner) {
-    this.owner = owner
-    this.txParams = { from: this.owner }
+  constructor(_package, txParams = {}) {
+    this.package = _package
+    this.txParams = txParams
   }
 
   address() {
     return this.package.address
   }
 
-  async connect(address) {
-    this.package = new Package(address)
-    return this.package
-  }
-
-  async deploy() {
-    this.package = await Package.new(this.txParams)
-    return this.package
-  }
-
-  async getRelease(version) {
-    const releaseAddress = await this.package.getVersion(version)
-    return new Release(releaseAddress)
-  }
-
   async hasVersion(version) {
     return await this.package.hasVersion(version, this.txParams)
   }
 
+  async getRelease(version) {
+    const releaseAddress = await this.package.getVersion(version)
+    const Release = ContractsProvider.release()
+    return new Release(releaseAddress)
+  }
+
   async newVersion(version) {
     log.info('Adding new version...')
+    const Release = ContractsProvider.release()
     const release = await Release.new(this.txParams)
     await this.package.addVersion(version, release.address, this.txParams)
     log.info(' Added version:', version)
     return release
+  }
+
+  async isFrozen(version) {
+    const release = await this.getRelease(version)
+    return await release.frozen()
+  }
+
+  async freeze(version) {
+    log.info('Freezing new version...')
+    const release = await this.getRelease(version)
+    await release.freeze(this.txParams)
+    log.info(' Release frozen')
   }
 
   async getImplementation(version, contractName) {
@@ -56,18 +58,4 @@ class Distribution {
     log.info(' Implementation set:', implementation.address)
     return implementation
   }
-
-  async frozen(version) {
-    const release = await this.getRelease(version)
-    return await release.frozen()
-  }
-
-  async freeze(version) {
-    log.info('Freezing new version...')
-    const release = await this.getRelease(version)
-    await release.freeze(this.txParams)
-    log.info(' Release frozen')
-  }
 }
-
-export default Distribution

@@ -1,7 +1,6 @@
+import fs from '../../src/zos-lib/utils/FileSystem';
 import sync from "../../src/scripts/sync.js";
-import fs from 'fs';
 import { cleanup, cleanupfn } from '../helpers/cleanup';
-import PackageFilesInterface from "../../src/utils/PackageFilesInterface.js";
 
 const AppManager = artifacts.require('PackagedAppManager');
 const Package = artifacts.require('Package');
@@ -15,7 +14,6 @@ contract('sync', function([_, owner]) {
 
   const network = "test";
   const from = owner;
-  const appName = "MyApp";
   const defaultVersion = "1.1.0";
 
   describe('an empty package', function() {
@@ -31,15 +29,15 @@ contract('sync', function([_, owner]) {
     after(cleanupfn(networkFileName));
 
     it('should create a network file', async function() {
-      fs.existsSync(networkFileName).should.be.true;
+      fs.exists(networkFileName).should.be.true;
     });
 
     it('should include deployment address', async function () {
-      JSON.parse(fs.readFileSync(networkFileName)).app.address.should.be.not.null;
+      fs.parseJson(networkFileName).app.address.should.be.not.null;
     });
 
     it('should deploy app at specified address', async function () {
-      const address = JSON.parse(fs.readFileSync(networkFileName)).app.address;
+      const address = fs.parseJson(networkFileName).app.address;
       const appManager = await AppManager.at(address);
       (await appManager.version()).should.eq(defaultVersion);
     });
@@ -59,7 +57,7 @@ contract('sync', function([_, owner]) {
     after(cleanupfn(networkFileName));
 
     it('should set stdlib in deployed app', async function () {
-      const address = JSON.parse(fs.readFileSync(networkFileName)).app.address;
+      const address = fs.parseJson(networkFileName).app.address;
       const appManager = await AppManager.at(address);
       const appPackage = await Package.at(await appManager.package());
       const provider = await AppDirectory.at(await appPackage.getVersion(defaultVersion));
@@ -69,7 +67,7 @@ contract('sync', function([_, owner]) {
     });
 
     it('should set address in network file', async function () {
-      JSON.parse(fs.readFileSync(networkFileName)).stdlib.address.should.eq(stdlibAddress);
+      fs.parseJson(networkFileName).stdlib.address.should.eq(stdlibAddress);
     });  
   });
   

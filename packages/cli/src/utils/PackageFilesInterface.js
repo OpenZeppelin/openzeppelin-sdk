@@ -1,7 +1,7 @@
-import fs from 'fs'
+import fs from '../zos-lib/utils/FileSystem'
 import Logger from './Logger'
-import Stdlib from '../models/Stdlib'
-import makeContract from '../utils/contract'
+import Stdlib from '../models/stdlib/Stdlib'
+import ContractsProvider from '../zos-lib/utils/ContractsProvider'
 
 const log = new Logger('PackageFilesInterface')
 
@@ -10,16 +10,12 @@ export default class PackageFilesInterface {
     this.packageFileName = packageFileName || 'package.zos.json'
   }
 
-  /*
-  * Package file functions
-  */
-
   exists() {
-    return this._exists(this.packageFileName)
+    return fs.exists(this.packageFileName)
   }
 
   read() {
-    return this.readFrom(this.packageFileName)
+    return fs.parseJson(this.packageFileName)
   }
 
   write(zosPackage) {
@@ -31,27 +27,19 @@ export default class PackageFilesInterface {
    * TODO: Move to a different class
    */
 
-  async setStdlib(zosPackage, stdlibName, installDeps) {
-    if (stdlibName) {
-      const stdlib = new Stdlib(stdlibName)
-      if (installDeps) {
-        await stdlib.installDependency();
-      }
-      zosPackage.stdlib = {
-        name: stdlib.getName(),
-        version: stdlib.getVersion()
-      }
-    } else {
-      zosPackage.stdlib = {};
+  async setStdlib(zosPackage, stdlib) {
+    zosPackage.stdlib = {
+      name: stdlib.getName(),
+      version: stdlib.getVersion()
     }
   }
 
   async getContractClass(zosPackage, contractAlias) {
     const contractName = zosPackage.contracts[contractAlias]
     if (contractName) {
-      return makeContract.local(contractName)
-    } else if (zosPackage.stdlib && !_.isEmpty(zosPackage.stdlib)) {
-      const stdlib = new Stdlib(zosPackage.stdlib)
+      return ContractsProvider.getFromArtifacts(contractName)
+    } else if (!_.isEmpty(zosPackage.stdlib)) {
+      const stdlib = new Stdlib(zosPackage.stdlib.name)
       return await stdlib.getContract(contractAlias);
     } else {
       throw `Could not find ${contractAlias} contract in zOS package file`
@@ -64,12 +52,12 @@ export default class PackageFilesInterface {
 
   existsNetworkFile(network) {
     const fileName = this.fileNameFor(network)
-    return this._exists(fileName)
+    return fs.exists(fileName)
   }
 
   readNetworkFile(network) {
     const fileName = this.fileNameFor(network)
-    return this.readFrom(fileName)
+    return fs.parseJson(fileName)
   }
 
   writeNetworkFile(network, data) {
@@ -81,22 +69,12 @@ export default class PackageFilesInterface {
   * Helpers
   */
 
-  _exists(fileName) {
-    return fs.existsSync(fileName)
-  }
-
   fileNameFor(network) {
     return `package.zos.${network}.json`
   }
 
-  readFrom(fileName) {
-    const data = fs.readFileSync(fileName)
-    return JSON.parse(data)
-  }
-
   writeTo(fileName, zosPackage) {
-    const data = JSON.stringify(zosPackage, null, 2)
-    fs.writeFileSync(fileName, data)
+    fs.writeJson(fileName, zosPackage)
     log.info(`Successfully written ${fileName}`)
   }
 }

@@ -1,24 +1,27 @@
-import AppManager from '../models/AppManager'
-import makeContract from '../utils/contract'
+import _ from 'lodash'
+import StdlibProvider from "../models/stdlib/StdlibProvider";
+import ContractsProvider from '../zos-lib/utils/ContractsProvider'
+import AppManagerProvider from "../zos-lib/app_manager/AppManagerProvider";
+import AppManagerDeployer from "../zos-lib/app_manager/AppManagerDeployer";
 import PackageFilesInterface from '../utils/PackageFilesInterface'
 import Logger from '../utils/Logger'
 
 const log = new Logger('sync')
 
-async function sync({ network, from, packageFileName, handleStdlib }) {
+export default async function sync({ network, deployStdlib, txParams = {}, packageFileName = null }) {
   const files = new PackageFilesInterface(packageFileName)
-  const appManager = new AppManager(from, network)
   if (! files.exists()) throw `Could not find package file ${packageFileName}`
 
   const zosPackage = files.read()
   let zosNetworkFile
+  let appManager
 
   // Get AppManager instance
   if (files.existsNetworkFile(network)) {
     zosNetworkFile = files.readNetworkFile(network)
-    await appManager.connect(zosNetworkFile.app.address)
+    appManager = await AppManagerProvider.from(zosNetworkFile.app.address, txParams)
   } else {
-    await appManager.deploy(zosPackage.version)
+    appManager = await AppManagerDeployer.call(zosPackage.version, txParams)
     createNetworkFile(network, appManager.address(), packageFileName)
     zosNetworkFile = files.readNetworkFile(network)
   }
@@ -28,21 +31,22 @@ async function sync({ network, from, packageFileName, handleStdlib }) {
     zosNetworkFile.app.version = zosPackage.version
   }
 
-  const currentProvider = await appManager.getCurrentDirectory()
+  const currentProvider = appManager.currentDirectory()
   zosNetworkFile.provider = { address: currentProvider.address }
 
-  for (let contractName in zosPackage.contracts) {
+  for (let contractAlias in zosPackage.contracts) {
     // TODO: store the implementation's hash to avoid unnecessary deployments
-    const contractClass = makeContract.local(zosPackage.contracts[contractName])
-    const contractInstance = await appManager.setImplementation(contractClass, contractName)
-    zosNetworkFile.contracts[contractName] = contractInstance.address
+    const contractName = zosPackage.contracts[contractAlias];
+    const contractClass = ContractsProvider.getFromArtifacts(contractName)
+    const contractInstance = await appManager.setImplementation(contractClass, contractAlias)
+    zosNetworkFile.contracts[contractAlias] = contractInstance.address
   }
 
   // If being called from deploy all, delegate to caller handling the stdlib deployment and flag as customDeploy
-  if (zosPackage.stdlib && handleStdlib) {
-    const stdlibAddress = await handleStdlib(appManager, zosPackage.stdlib)
+  if (!_.isEmpty(zosPackage.stdlib) && deployStdlib) {
+    const stdlibAddress = await deployStdlib(appManager, zosPackage.stdlib.name)
     zosNetworkFile.stdlib = { address: stdlibAddress, customDeploy: true, ... zosPackage.stdlib }
-  } else if (zosPackage.stdlib) {
+  } else if (!_.isEmpty(zosPackage.stdlib)) {
     const networkStdlibInfo = zosNetworkFile.stdlib
     // If syncing on top of a custom deploy of a stdlib, link to that deploy
     if (networkStdlibInfo && networkStdlibInfo.customDeploy && networkStdlibInfo.name === zosPackage.stdlib.name) {
@@ -51,13 +55,14 @@ async function sync({ network, from, packageFileName, handleStdlib }) {
     // Otherwise, link to the public deployed version
     } else {
       log.info("Connecting to public deployment of stdlib")
-      const stdlibAddress = await appManager.setStdlib(zosPackage.stdlib)
+      const stdlibAddress = StdlibProvider.from(zosPackage.stdlib.name, network);
+      await appManager.setStdlib(stdlibAddress)
       zosNetworkFile.stdlib = { address: stdlibAddress, ... zosPackage.stdlib }
     }
   // If no stdlib requested, clear everything
   } else {
     delete zosNetworkFile['stdlib']
-    await appManager.setStdlib(null)
+    await appManager.setStdlib()
   }
 
   files.writeNetworkFile(network, zosNetworkFile)
@@ -79,5 +84,3 @@ function createNetworkFile(network, address, packageFileName) {
 
   files.writeNetworkFile(network, zosNetworkFile)
 }
-
-module.exports = sync

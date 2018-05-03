@@ -1,23 +1,20 @@
-import Logger from '../utils/Logger'
+import Logger from '../../utils/Logger'
+import ContractsProvider from '../utils/ContractsProvider'
 
 const log = new Logger('Kernel')
-const makeContract = require('../utils/contract')
-const Kernel = makeContract(require('zos-kernel/build/contracts/Kernel.json'))
-const Release = makeContract(require('zos-kernel/build/contracts/Release.json'))
-const ZepToken = makeContract(require('zos-kernel/build/contracts/ZepToken.json'))
-const Vouching = makeContract(require('zos-kernel/build/contracts/Vouching.json'))
 
 export default class KernelWrapper {
-  constructor(address, txParams) {
+  constructor(kernel, zepToken, vouching, txParams = {}) {
+    this.kernel = kernel
+    this.zepToken = zepToken
+    this.vouching = vouching
     this.txParams = txParams
-    this.kernel = new Kernel(address)
   }
 
   async register(release) {
-    const newVersionCost = await this.newVersionCost()
+    const newVersionCost = await this.kernel.newVersionCost()
     log.info(`Approving ${newVersionCost} ZEP tokens to zOS kernel contract...`)
-    const zepToken = await this.zepToken()
-    await zepToken.approve(this.kernel.address, newVersionCost, this.txParams)
+    await this.zepToken.approve(this.kernel.address, newVersionCost, this.txParams)
     log.info(`Registering release ${release}...`)
     const receipt = await this.kernel.register(release, this.txParams)
     log.info(`Release registered successfully. Transaction hash: ${receipt.tx}.`)
@@ -25,8 +22,7 @@ export default class KernelWrapper {
 
   async vouch(release, amount, data = '') {
     log.info(`Approving ${amount} ZEP tokens to zOS kernel contract...`)
-    const zepToken = await this.zepToken()
-    await zepToken.approve(this.kernel.address, amount, this.txParams)
+    await this.zepToken.approve(this.kernel.address, amount, this.txParams)
     log.info(`Vouching ${amount} ZEP tokens for release ${release}...`)
     const receipt = await this.kernel.vouch(release, amount, data, this.txParams)
     log.info(`Vouch processed successfully. Transaction hash: ${receipt.tx}.`)
@@ -66,22 +62,21 @@ export default class KernelWrapper {
   }
 
   async _ifFrozenThrow(releaseAddress, error) {
+    const Release = ContractsProvider.release()
     const release = new Release(releaseAddress)
     const isFrozen = await release.frozen(this.txParams)
     if(!isFrozen) throw error
   }
 
   async _ifNotEnoughBalanceToRegisterThrow(error) {
-    const zepToken = await this.zepToken()
-    const newVersionCost = await this.newVersionCost()
-    const developerBalance = await zepToken.balanceOf(this.txParams.from)
+    const newVersionCost = await this.kernel.newVersionCost()
+    const developerBalance = await this.zepToken.balanceOf(this.txParams.from)
     const doesNotHaveEnoughTokens = developerBalance.lt(newVersionCost)
     if(doesNotHaveEnoughTokens) throw error
   }
 
   async _ifNotEnoughZepBalance(amount, error) {
-    const zepToken = await this.zepToken()
-    const voucherBalance = await zepToken.balanceOf(this.txParams.from)
+    const voucherBalance = await this.zepToken.balanceOf(this.txParams.from)
     const doesNotHaveEnoughTokens = voucherBalance.lt(amount)
     if(doesNotHaveEnoughTokens) throw error
   }
@@ -93,24 +88,8 @@ export default class KernelWrapper {
   }
 
   async _ifNotEnoughVouchThrow(release, amount, error) {
-    const vouching = await this.vouching()
-    const vouches = await vouching.vouchedFor(this.txParams.from, release)
+    const vouches = await this.vouching.vouchedFor(this.txParams.from, release)
     const doesNotHaveEnoughVouches = vouches.lt(amount)
     if(doesNotHaveEnoughVouches) throw error
-  }
-
-  async zepToken() {
-    if(!this.zepTokenAddress) this.zepTokenAddress = await this.kernel.token()
-    return new ZepToken(this.zepTokenAddress)
-  }
-
-  async vouching() {
-    if(!this.vouchingAddress) this.vouchingAddress = await this.kernel.vouches()
-    return new Vouching(this.vouchingAddress)
-  }
-
-  async newVersionCost() {
-    if(!this.versionCost) this.versionCost = await this.kernel.newVersionCost()
-    return this.versionCost
   }
 }
