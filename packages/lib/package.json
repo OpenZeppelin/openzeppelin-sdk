@@ -1,6 +1,6 @@
 {
   "name": "zos-lib",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "zeppelin_os library",
   "scripts": {
     "prepack": "truffle compile && babel src --out-dir lib",
