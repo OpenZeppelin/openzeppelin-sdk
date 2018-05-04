@@ -1,0 +1,27 @@
+{
+  "docs": {
+    "ABOUT": [
+      "start"
+    ]
+  },
+  "docs-api": {
+    "LIFECYCLE": [
+      "lifecycle_Migrations"
+    ],
+    "OWNERSHIP": [
+      "ownership_Ownable",
+      "ownership_OwnableStorage"
+    ],
+    "UPGRADEABILITY": [
+      "upgradeability_OwnedUpgradeabilityProxy",
+      "upgradeability_OwnedUpgradeabilityStorage",
+      "upgradeability_Proxy",
+      "upgradeability_UpgradeabilityProxy",
+      "upgradeability_UpgradeabilityStorage"
+    ],
+    "UNCATEGORIZED": [
+      "Factory",
+      "Registry"
+    ]
+  }
+}

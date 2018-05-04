@@ -1,0 +1,28 @@
+{
+  "name": "zos-docs",
+  "version": "0.1.0",
+  "description": "Documentation site for zeppelin_os",
+  "main": "index.js",
+  "scripts": {
+    "gen-docs": "node scripts/gen-docs.js",
+    "bump-docs": "node scripts/bump-docs.js",
+    "rebuild-docs": "cd docs/website && npm run build",
+    "start": "cd docs/website && npm start",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "zeppelinos",
+    "zeppelin",
+    "solidity",
+    "documentation",
+    "generation",
+    "soldoc"
+  ],
+  "author": "zeppelin_os",
+  "license": "MIT",
+  "dependencies": {
+    "shelljs": "^0.8.1",
+    "solidity-docgen": "^0.1.0",
+    "tmp": "0.0.33"
+  }
+}

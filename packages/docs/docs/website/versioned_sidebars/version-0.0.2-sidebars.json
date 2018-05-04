@@ -1,0 +1,27 @@
+{
+  "version-0.0.2-docs": {
+    "ABOUT": [
+      "version-0.0.2-start"
+    ]
+  },
+  "version-0.0.2-docs-api": {
+    "LIFECYCLE": [
+      "version-0.0.2-lifecycle_Migrations"
+    ],
+    "OWNERSHIP": [
+      "version-0.0.2-ownership_Ownable",
+      "version-0.0.2-ownership_OwnableStorage"
+    ],
+    "UPGRADEABILITY": [
+      "version-0.0.2-upgradeability_OwnedUpgradeabilityProxy",
+      "version-0.0.2-upgradeability_OwnedUpgradeabilityStorage",
+      "version-0.0.2-upgradeability_Proxy",
+      "version-0.0.2-upgradeability_UpgradeabilityProxy",
+      "version-0.0.2-upgradeability_UpgradeabilityStorage"
+    ],
+    "UNCATEGORIZED": [
+      "version-0.0.2-Factory",
+      "version-0.0.2-Registry"
+    ]
+  }
+}
