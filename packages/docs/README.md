@@ -2,6 +2,10 @@
 
 Centralised documentation site for zeppelin_os.
 
+## Writing docs
+
+Write custom documentation in Markdown in the `docs/docs` folder (see `start.md`).
+
 ## Generating docs
 
 To generate the documentation for a new version, run:
