@@ -3,6 +3,7 @@ import init from '../../scripts/init'
 module.exports = function(program) {
   program
     .command('init <project> [version]')
+    .usage('<project> [version] [options]')
     .description(`Initialize your project with zeppelin_os.
       Provide a <project> name.
       Provide a [version] number, otherwise 0.0.1 will be used by default.`)
