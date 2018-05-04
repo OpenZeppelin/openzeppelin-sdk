@@ -1,7 +1,7 @@
-const Web3 = require('web3')
-const TruffleConfig = require("truffle-config");
-const TruffleEnvironment = require("truffle-core/lib/environment");
-const ContractsProvider = require('./ContractsProvider')
+import Web3 from 'web3'
+import TruffleConfig from 'truffle-config'
+import TruffleEnvironment from 'truffle-core/lib/environment'
+import ContractsProvider from './ContractsProvider'
 
 function initTruffle(network) {
   const options = { logger: console }
