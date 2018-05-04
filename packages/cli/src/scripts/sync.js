@@ -1,6 +1,5 @@
 import _ from 'lodash'
 import StdlibProvider from '../models/stdlib/StdlibProvider'
-import ContractsProvider from '../utils/ContractsProvider'
 import PackageFilesInterface from '../utils/PackageFilesInterface'
 import { Logger, AppManagerProvider, AppManagerDeployer } from 'zos-lib'
 

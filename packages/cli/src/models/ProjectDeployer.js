@@ -1,6 +1,5 @@
 import _ from 'lodash'
 import StdlibDeployer from "./stdlib/StdlibDeployer"
-import ContractsProvider from "../utils/ContractsProvider"
 import { FileSystem as fs, AppManagerDeployer } from 'zos-lib'
 
 export default {

@@ -1,4 +1,3 @@
-import ContractsProvider from '../utils/ContractsProvider'
 import PackageFilesInterface from '../utils/PackageFilesInterface'
 import { KernelProvider } from 'zos-kernel'
 import { Logger, DistributionDeployer, DistributionProvider } from 'zos-lib'

@@ -1,5 +1,4 @@
 import { Logger, FileSystem as fs } from 'zos-lib'
-import ContractsProvider from "../../utils/ContractsProvider"
 
 const log = new Logger('StdlibDeployer')
 
