@@ -1,7 +1,7 @@
 import unvouch from '../../scripts/unvouch'
 import runWithTruffle from '../../utils/runWithTruffle'
 
-export default function(program) {
+module.exports = function(program) {
   program
     .command('unvouch <release> <amount>')
     .description(`Unvouches a requested amount of ZEP tokens to a given release.

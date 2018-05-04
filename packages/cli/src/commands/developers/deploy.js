@@ -1,7 +1,7 @@
 import deploy from '../../scripts/deploy'
 import runWithTruffle from '../../utils/runWithTruffle'
 
-export default function(program) {
+module.exports = function(program) {
   program
     .command('deploy <version>')
     .description(`Deploys the new stdlib release to the chosen network.

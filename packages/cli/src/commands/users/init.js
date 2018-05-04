@@ -1,6 +1,6 @@
 import init from '../../scripts/init'
 
-export default function(program) {
+module.exports = function(program) {
   program
     .command('init <project> [version]')
     .description(`Initialize your project with zeppelin_os.

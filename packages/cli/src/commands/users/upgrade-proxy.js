@@ -1,7 +1,7 @@
 import upgradeProxy from '../../scripts/upgrade-proxy'
 import runWithTruffle from '../../utils/runWithTruffle'
 
-export default function(program) {
+module.exports = function(program) {
   program
     .command('upgrade-proxy <alias> <address>')
     .description("Upgrade a proxied contract to a new implementation.\n  Provide the <alias> name you used to register your contract.")

@@ -1,7 +1,7 @@
 import sync from '../../scripts/sync'
 import runWithTruffle from '../../utils/runWithTruffle'
 
-export default function(program) {
+module.exports = function(program) {
   program
     .command('sync')
     .description("Sync your project with the blockchain")

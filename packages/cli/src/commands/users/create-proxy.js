@@ -1,7 +1,7 @@
 import createProxy from '../../scripts/create-proxy'
 import runWithTruffle from '../../utils/runWithTruffle'
 
-export default function(program) {
+module.exports = function(program) {
   program
     .command('create-proxy <alias>')
     .description(`Deploy a new proxy to make your contract upgradeable.

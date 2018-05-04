@@ -1,4 +1,4 @@
-const addImplementation = require('../../scripts/add-implementation')
+import addImplementation from '../../scripts/add-implementation'
 
 module.exports = function(program) {
   program

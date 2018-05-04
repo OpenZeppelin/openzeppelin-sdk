@@ -1,4 +1,4 @@
-const newVersion = require('../../scripts/new-version')
+import newVersion from '../../scripts/new-version'
 
 module.exports = function(program) {
   program

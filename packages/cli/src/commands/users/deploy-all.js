@@ -1,7 +1,7 @@
 import deployAll from '../../scripts/deploy-all'
 import runWithTruffle from '../../utils/runWithTruffle'
 
-export default function(program) {
+module.exports = function(program) {
   program
     .command('deploy-all')
     .description("Deploy your entire application to the target network, along with the standard library you are using and all its contracts.")

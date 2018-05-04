@@ -1,6 +1,6 @@
 import initDistribution from '../../scripts/init-distribution'
 
-export default function(program) {
+module.exports = function(program) {
   program
     .command('init-distribution <name> <kernel>')
     .description(`Initialize your distribution project for standard libraries.

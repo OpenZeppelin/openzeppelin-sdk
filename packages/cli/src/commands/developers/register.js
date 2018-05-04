@@ -1,7 +1,7 @@
 import register from '../../scripts/register'
 import runWithTruffle from '../../utils/runWithTruffle'
 
-export default function(program) {
+module.exports = function(program) {
   program
     .command('register <release>')
     .description(`Register an already deployed stdlib release to zeppelin_os kernel.
