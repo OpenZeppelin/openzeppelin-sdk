@@ -1,7 +1,6 @@
 import Logger from '../utils/Logger'
 import decodeLogs from '../helpers/decodeLogs'
 import encodeCall from '../helpers/encodeCall'
-import ContractsProvider from '../utils/ContractsProvider'
 
 const log = new Logger('AppManager')
 

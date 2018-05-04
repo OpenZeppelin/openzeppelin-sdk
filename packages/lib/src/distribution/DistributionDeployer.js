@@ -1,4 +1,3 @@
-import ContractsProvider from '../utils/ContractsProvider'
 import DistributionWrapper from './DistributionWrapper'
 
 export default {
