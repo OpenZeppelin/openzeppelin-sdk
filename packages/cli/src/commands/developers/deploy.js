@@ -11,6 +11,6 @@ module.exports = function(program) {
     .option('-n, --network <network>', 'Provide a network to be used')
     .action(function (version, options) {
       const { from, network } = options
-      runWithTruffle(() => deploy({ version, network, from }), network)
+      runWithTruffle(async () => await deploy({ version, network, from }), network)
     })
 }

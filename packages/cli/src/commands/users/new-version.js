@@ -6,8 +6,8 @@ module.exports = function(program) {
     .description("Bump a new <version> of your project with zeppelin_os.")
     .option('-s, --stdlib <stdlib>', 'Standard library to use')
     .option('--no-install', 'Skip installing stdlib npm dependencies')
-    .action(function (version, options) {
+    .action(async function (version, options) {
       const { stdlib: stdlibNameVersion, install: installDeps } = options
-      newVersion({ version, stdlibNameVersion, installDeps })
+      await newVersion({ version, stdlibNameVersion, installDeps })
     })
 }

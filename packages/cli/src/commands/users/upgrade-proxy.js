@@ -19,6 +19,6 @@ module.exports = function(program) {
       else if(typeof initArgs === 'boolean' || initMethod) initArgs = []
 
       const { from, network } = options
-      runWithTruffle(() => upgradeProxy({ contractAlias, proxyAddress, network, from, initMethod, initArgs }), network)
+      runWithTruffle(async () => await upgradeProxy({ contractAlias, proxyAddress, network, from, initMethod, initArgs }), network)
     })
 }

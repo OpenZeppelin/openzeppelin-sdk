@@ -20,6 +20,6 @@ module.exports = function(program) {
       else if(typeof initArgs === 'boolean' || initMethod) initArgs = []
 
       const { from, network } = options
-      runWithTruffle(() => createProxy({ contractAlias, network, from, initMethod, initArgs }), network)
+      runWithTruffle(async () => await createProxy({ contractAlias, network, from, initMethod, initArgs }), network)
     })
 }

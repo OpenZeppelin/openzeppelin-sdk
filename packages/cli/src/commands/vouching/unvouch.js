@@ -12,6 +12,6 @@ module.exports = function(program) {
     .option('-n, --network <network>', 'Provide a network to be used')
     .action(function (releaseAddress, rawAmount, options) {
       const { network, from } = options
-      runWithTruffle(() => unvouch({ releaseAddress, rawAmount, network, from }), network)
+      runWithTruffle(async () => await unvouch({ releaseAddress, rawAmount, network, from }), network)
     })
 }

@@ -10,6 +10,6 @@ module.exports = function(program) {
     .option('--no-install', 'Skip installing stdlib npm dependencies')
     .action(function (stdlibNameVersion, options) {
       const installDeps = options.install
-      runWithTruffle(() => setStdlib({ stdlibNameVersion, installDeps }))
+      runWithTruffle(async () => await setStdlib({ stdlibNameVersion, installDeps }))
     })
 }
