@@ -1,3 +1,4 @@
+import StdlibInstaller from './StdlibInstaller';
 import { FileSystem as fs } from 'zos-lib'
 
 export default class Stdlib {
@@ -9,20 +10,27 @@ export default class Stdlib {
     return this.name
   }
 
+  // TODO: Provided version and package.json version may not match, raise an error if so
   getVersion() {
-    if(this.version) return this.version
-    return this._packageJson().version
+    if (this.version) return this.version
+    return this.getPackage().version
   }
 
-  _packageJson() {
-    if(this.packageJson) return this.packageJson
+  getPackage() {
+    if (this._packageJson) return this._packageJson
     const filename = `node_modules/${this.name}/package.zos.json`
-    this.packageJson = fs.parseJson(filename)
+    this._packageJson = fs.parseJson(filename)
+    return this._packageJson
+  }
+  
+  async install() {
+    await StdlibInstaller.call(this.nameAndVersion)
   }
 
   _parseNameVersion(nameAndVersion) {
     const [name, version] = nameAndVersion.split('@')
     this.name = name
     this.version = version
+    this.nameAndVersion = nameAndVersion;
   }
 }

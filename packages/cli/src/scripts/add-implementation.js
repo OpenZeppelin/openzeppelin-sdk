@@ -1,11 +1,10 @@
-import PackageFilesInterface from '../utils/PackageFilesInterface'
+import AppController from "../models/AppController";
 
 export default function addImplementation({ contractName, contractAlias, packageFileName = null }) {
-  if (contractName === undefined) throw  'Must provide a contract name'
-  if (contractAlias === undefined) throw 'Must provide an alias'
+  if (contractName === undefined) throw new Error('Must provide a contract name')
+  if (contractAlias === undefined) throw new Error('Must provide an alias')
 
-  const files = new PackageFilesInterface(packageFileName)
-  const zosPackage = files.read()
-  zosPackage.contracts[contractAlias] = contractName
-  files.write(zosPackage)
+  const appController = new AppController(packageFileName)
+  appController.addImplementation(contractAlias, contractName)
+  appController.writePackage()
 }

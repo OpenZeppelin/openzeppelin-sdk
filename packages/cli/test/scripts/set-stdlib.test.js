@@ -1,7 +1,7 @@
 import init from "../../src/scripts/init.js";
 import setStdlib from "../../src/scripts/set-stdlib.js";
-import PackageFilesInterface from '../../src/utils/PackageFilesInterface';
 import { cleanup, cleanupfn } from "../helpers/cleanup.js";
+import { FileSystem as fs } from 'zos-lib';
 
 const should = require('chai')
       .use(require('chai-as-promised'))
@@ -10,8 +10,7 @@ const should = require('chai')
 contract('set-stdlib command', function() {
   const appName = "MyApp";
   const defaultVersion = "0.1.0";
-  const packageFileName = "package.test.zos.json";
-  const files = new PackageFilesInterface(packageFileName);
+  const packageFileName = "test/tmp/package.zos.json";
 
   beforeEach('setup', async function() {
     cleanup(packageFileName)
@@ -22,7 +21,7 @@ contract('set-stdlib command', function() {
 
   it('should set stdlib', async function () {
     await setStdlib({ stdlibNameVersion: 'mock-stdlib@1.1.0', packageFileName });
-    const data = files.read();
+    const data = fs.parseJson(packageFileName);
     data.stdlib.name.should.eq('mock-stdlib');
     data.stdlib.version.should.eq('1.1.0');
   });

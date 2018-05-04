@@ -27,18 +27,10 @@ export default {
 
   async _deployContract(name, contractName) {
     log.info(`Deploying new ${contractName}...`)
-    const contractClass = await this._getContractClass(name, contractName)
+    const contractClass = await ContractsProvider.getFromStdlib(name, contractName)
     const contract = await contractClass.new(this.txParams)
     log.info(`Deployed ${contractName} ${contract.address}`)
     return contract
-  },
-
-  async _getContractClass(name, contractName) {
-    const implementationName = this.jsonData.contracts[contractName]
-    if (!implementationName) throw `Contract ${contractName} not found in package`
-    const contractSchema = `node_modules/${name}/build/contracts/${implementationName}.json`;
-    const data = fs.parseJson(contractSchema)
-    return ContractsProvider.getByJSONData(data)
   },
   
   _contractsList() {

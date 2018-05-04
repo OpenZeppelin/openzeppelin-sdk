@@ -21,30 +21,6 @@ export default class PackageFilesInterface {
   }
 
   /*
-   * General functions for managing zosPackages
-   * TODO: Move to a different class
-   */
-
-  async setStdlib(zosPackage, stdlib) {
-    zosPackage.stdlib = {
-      name: stdlib.getName(),
-      version: stdlib.getVersion()
-    }
-  }
-
-  async getContractClass(zosPackage, contractAlias) {
-    const contractName = zosPackage.contracts[contractAlias]
-    if (contractName) {
-      return ContractsProvider.getFromArtifacts(contractName)
-    } else if (!_.isEmpty(zosPackage.stdlib)) {
-      const stdlib = new Stdlib(zosPackage.stdlib.name)
-      return await stdlib.getContract(contractAlias);
-    } else {
-      throw `Could not find ${contractAlias} contract in zOS package file`
-    }
-  }
-
-  /*
   * Network file functions
   */
 

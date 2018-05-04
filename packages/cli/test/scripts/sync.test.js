@@ -19,7 +19,7 @@ contract('sync', function([_, owner]) {
   describe('an empty package', function() {
 
     const packageFileName = "test/mocks/packages/package-empty.zos.json";
-    const networkFileName = "package.zos.test.json"; // TODO: Should generate file in same directory as package file, with the same file pattern (package-empty in this case)
+    const networkFileName = "test/mocks/packages/package-empty.zos.test.json";
 
     beforeEach("syncing package-empty", async function () {
       cleanup(networkFileName)
@@ -47,7 +47,7 @@ contract('sync', function([_, owner]) {
   describe('a package with stdlib', function () {
     const stdlibAddress = "0x0000000000000000000000000000000000000010";
     const packageFileName = "test/mocks/packages/package-with-stdlib.zos.json";
-    const networkFileName = "package.zos.test.json"; // TODO: Should generate file in same directory as package file, with the same file pattern (package-empty in this case)
+    const networkFileName = "test/mocks/packages/package-with-stdlib.zos.test.json";
 
     beforeEach("syncing package-stdlib", async function () {
       cleanup(networkFileName)

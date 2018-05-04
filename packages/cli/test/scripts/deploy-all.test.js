@@ -21,7 +21,7 @@ contract('deployAll', function([_, owner]) {
 
   describe('a package with stdlib', function () {
     const packageFileName = "test/mocks/packages/package-with-contracts-and-stdlib.zos.json";
-    const networkFileName = "package.zos.test.json"; // TODO: Should generate file in same directory as package file, with the same file pattern (package-empty in this case)
+    const networkFileName = "test/mocks/packages/package-with-contracts-and-stdlib.zos.test.json";
 
     beforeEach("syncing package-stdlib", async function () {
       cleanup(networkFileName)
@@ -110,7 +110,7 @@ contract('deployAll', function([_, owner]) {
       const packageFileName = "test/mocks/packages/package-with-contracts-and-stdlib-2.zos.json";
 
       beforeEach('running sync', async function () {
-        await sync({ packageFileName, network, txParams })
+        await sync({ packageFileName, networkFileName, network, txParams })
       });
 
       it('should include stdlib address in JSON file', async function () {
