@@ -1,5 +1,5 @@
 import Logger from '../src/utils/Logger'
-import ContractsProvider from '../lib/utils/ContractsProvider'
+import ContractsProvider from '../src/utils/ContractsProvider'
 
 global.ContractsProvider = ContractsProvider
 
