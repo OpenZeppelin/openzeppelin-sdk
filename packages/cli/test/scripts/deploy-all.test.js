@@ -1,9 +1,7 @@
-import fs from '../../src/zos-lib/utils/FileSystem';
+import { FileSystem as fs } from 'zos-lib'
 import deployAll from "../../src/scripts/deploy-all";
 import sync from "../../src/scripts/sync.js";
-import setStdlib from "../../src/scripts/set-stdlib.js";
 import { cleanup, cleanupfn } from '../helpers/cleanup';
-
 
 const AppManager = artifacts.require('PackagedAppManager');
 const Package = artifacts.require('Package');

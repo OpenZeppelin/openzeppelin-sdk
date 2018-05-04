@@ -1,6 +1,5 @@
-import fs from '../../zos-lib/utils/FileSystem'
-import Logger from '../../utils/Logger'
-import ContractsProvider from "../../zos-lib/utils/ContractsProvider"
+import { Logger, FileSystem as fs } from 'zos-lib'
+import ContractsProvider from "../../utils/ContractsProvider"
 
 const log = new Logger('StdlibDeployer')
 
@@ -15,7 +14,7 @@ export default {
 
   async _createContractDirectory() {
     log.info('Deploying new ContractDirectory...')
-    const ContractDirectory = ContractsProvider.getByName('ContractDirectory')
+    const ContractDirectory = ContractsProvider.getFromLib('ContractDirectory')
     this.contractDirectory = await ContractDirectory.new(this.txParams)
     log.info(`Deployed ContractDirectory ${this.contractDirectory.address}`)
   },

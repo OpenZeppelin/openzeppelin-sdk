@@ -1,9 +1,7 @@
-import Logger from '../utils/Logger'
-import KernelProvider from "../zos-lib/kernel/KernelProvider"
-import ContractsProvider from '../zos-lib/utils/ContractsProvider'
+import ContractsProvider from '../utils/ContractsProvider'
 import PackageFilesInterface from '../utils/PackageFilesInterface'
-import DistributionProvider from "../zos-lib/distribution/DistributionProvider";
-import DistributionDeployer from "../zos-lib/distribution/DistributionDeployer";
+import { KernelProvider } from 'zos-kernel'
+import { Logger, DistributionDeployer, DistributionProvider } from 'zos-lib'
 
 const log = new Logger('deploy')
 

@@ -1,8 +1,8 @@
-import Logger from '../../src/utils/Logger'
+import { Logger } from 'zos-lib'
 import Stdlib from '../../src/models/stdlib/Stdlib'
 import truffleContract from 'truffle-contract'
 import StdlibInstaller from '../../src/models/stdlib/StdlibInstaller'
-import ContractsProvider from '../../src/zos-lib/utils/ContractsProvider'
+import ContractsProvider from '../../src/utils/ContractsProvider'
 
 const DEFAULT_TX_PARAMS = {
   gas: 6721975,
@@ -30,4 +30,6 @@ function provideContractsFromTruffle() {
     contract.defaults(DEFAULT_TX_PARAMS)
     return contract
   }
+
+  global.ContractsProvider = ContractsProvider
 }

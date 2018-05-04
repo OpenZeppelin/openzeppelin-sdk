@@ -1,6 +1,4 @@
-import { assertRevert } from 'zos-lib'
-import DistributionProvider from "../../src/zos-lib/distribution/DistributionProvider";
-import DistributionDeployer from "../../src/zos-lib/distribution/DistributionDeployer";
+import { DistributionDeployer, DistributionProvider, assertRevert } from 'zos-lib'
 
 const ImplV1 = artifacts.require('ImplV1')
 const ImplV2 = artifacts.require('ImplV2')

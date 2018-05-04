@@ -1,7 +1,5 @@
-import fs from '../../src/zos-lib/utils/FileSystem';
 import ProjectDeployer from "../../src/models/ProjectDeployer";
-import AppManagerProvider from "../../src/zos-lib/app_manager/AppManagerProvider";
-import AppManagerDeployer from "../../src/zos-lib/app_manager/AppManagerDeployer";
+import { FileSystem as fs, AppManagerProvider, AppManagerDeployer } from 'zos-lib'
 
 const ImplV1 = artifacts.require('ImplV1');
 const ImplV2 = artifacts.require('ImplV2');

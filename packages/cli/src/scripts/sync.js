@@ -1,10 +1,8 @@
 import _ from 'lodash'
-import StdlibProvider from "../models/stdlib/StdlibProvider";
-import ContractsProvider from '../zos-lib/utils/ContractsProvider'
-import AppManagerProvider from "../zos-lib/app_manager/AppManagerProvider";
-import AppManagerDeployer from "../zos-lib/app_manager/AppManagerDeployer";
+import StdlibProvider from '../models/stdlib/StdlibProvider'
+import ContractsProvider from '../utils/ContractsProvider'
 import PackageFilesInterface from '../utils/PackageFilesInterface'
-import Logger from '../utils/Logger'
+import { Logger, AppManagerProvider, AppManagerDeployer } from 'zos-lib'
 
 const log = new Logger('sync')
 

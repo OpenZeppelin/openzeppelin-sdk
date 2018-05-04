@@ -1,4 +1,4 @@
-import KernelProvider from "../zos-lib/kernel/KernelProvider";
+import { KernelProvider } from 'zos-kernel'
 
 export default async function register({ releaseAddress, network, txParams = {} }) {
   if(!releaseAddress) throw 'You must provide a release address'

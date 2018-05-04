@@ -1,5 +1,5 @@
 import PackageFilesInterface from '../utils/PackageFilesInterface'
-import AppManagerProvider from "../zos-lib/app_manager/AppManagerProvider";
+import { AppManagerProvider } from 'zos-lib'
 
 export default async function upgradeProxy({ contractAlias, proxyAddress, initMethod, initArgs, network, txParams = {}, packageFileName = null }) {
   if (contractAlias === undefined) throw `Must provide a contract name`

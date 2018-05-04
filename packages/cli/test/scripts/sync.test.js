@@ -1,4 +1,4 @@
-import fs from '../../src/zos-lib/utils/FileSystem';
+import { FileSystem as fs } from 'zos-lib'
 import sync from "../../src/scripts/sync.js";
 import { cleanup, cleanupfn } from '../helpers/cleanup';
 

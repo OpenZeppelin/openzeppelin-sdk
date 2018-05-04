@@ -1,4 +1,4 @@
-import fs from '../../src/zos-lib/utils/FileSystem'
+import { FileSystem as fs } from 'zos-lib'
 import init from "../../src/scripts/init.js"
 import PackageFilesInterface from '../../src/utils/PackageFilesInterface';
 import { cleanupfn } from "../helpers/cleanup.js";
