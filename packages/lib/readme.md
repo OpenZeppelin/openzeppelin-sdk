@@ -140,63 +140,19 @@ We want to use `zos-lib` to deploy this contract with upgradeability capabilitie
 The first step to do so is to create and configure the `AppManager` contract. This contract will live in the blockchain and manage the different versions of our smart contract code and upgradeability proxies. It's the single entry point to manage our application's contract's upgradeability and instances. Let's set it up:
 
 ```js
-  const initialVersion = '0.0.1';
-
-  console.log("<< Setting up AppManager >>");
-
-  // Setup a proxy factory that will be in charge of creating proxy contracts
-  // for all of the project's upgradeable contracts.
-  console.log(`Deploying proxy factory...`);
-  this.factory = await UpgradeabilityProxyFactory.new(txParams);
-  console.log(`Deployed proxy factory at ${this.factory.address}`);
-
-  // A package keeps track of the project's versions, each of which is a
-  // contract directory, i.e. a list of contracts.
-  console.log(`Deploying application package...`);
-  this.package = await Package.new(txParams);
-  console.log(`Deployed application package at ${this.package.address}`);
-
-  // For each version, a directory keeps track of the project's contract implementations.
-  console.log(`Deploying application directory for version ${initialVersion}...`);
-  this.directory = await AppDirectory.new(0, txParams);
-  console.log(`Deployed application directory for initial version at ${this.directory.address}`);
-
-  // Initialize the package with the first contract directory.
-  console.log(`Adding version to package...`);
-  await this.package.addVersion(initialVersion, this.directory.address, txParams);
-  console.log(`Added application directory to package`);
-
-  // With a proxy factory and a package, the project's app manager is bootstrapped and ready for use.
-  console.log(`Deploying application manager...`);
-  this.appManager = await AppManager.new(this.package.address, initialVersion, this.factory.address, txParams);
-  console.log(`Deployed application manager at ${this.appManager.address}`);
-
+  // On-chain, single entry point of the entire application.
+  log("<< Setting up AppManager >>")
+  const initialVersion = '0.0.1'
+  const appManager = AppManagerDeployer.call(initialVersion, txParams)
 ```
 
 Next, we need to deploy the first version of the app contracts. To do so, we register the implementation of our `DonationsV1` in the `AppManager` and request it to create a new upgradeable proxy for it. Let's do it:
 ```js
-  console.log("\n<< Deploying version 1 >>");
-
-  // Deploy an implementation that defines the behavior of the main contract.
-  console.log(`Deploying first implementation of ${contractName}...`);
-  const implementation = await DonationsV1.new(txParams);
-  console.log(`Deployed first implementation at ${implementation.address}`);
-
-  // Register the implementation in the current version of the app.
-  console.log(`Registering implementation...`);
-  await this.directory.setImplementation(contractName, implementation.address, txParams);
-  console.log(`Registered implementation in current contract directory`);
-
-  // Create a proxy that wraps the implementation, making it upgradeable.
-  // At this point, the proxy's address is usable by any dapp, but can also be upgraded
-  // without having to use a new address or losing the contract's storage.
-  console.log(`Creating proxy for ${contractName}...`);
-  const callData = encodeCall('initialize', ['address'], [owner]);
-  const {receipt} = await this.appManager.createAndCall(contractName, callData, txParams);
-  const logs = decodeLogs([receipt.logs[1]], UpgradeabilityProxyFactory, 0x0);
-  const proxyAddress = logs.find(l => l.event === 'ProxyCreated').args.proxy;
-  this.proxy = OwnedUpgradeabilityProxy.at(proxyAddress);
-  console.log(`Proxy for ${contractName} created at ${proxyAddress}`);
+  // Register the first implementation of "Basil", and request a proxy for it.
+  log("\n<< Deploying version 1 >>")
+  const DonationsV1 = ContractsProvider.getByName('DonationsV1')
+  await appManager.setImplementation(DonationsV1, contractName);
+  await appManager.createProxy(DonationsV1, contractName, 'initialize', [owner])
 ```
 
 Now let's suppose we want to give some sort of retribution to people donating money to our donation campaign. We want to mint new ERC721 cryptocollectibles for every received donation. To do so, we'll link our application to a zOS Kernel standard library release that contains an implementation of a mintable ERC721 token. Here's the new contract code: 
@@ -241,49 +197,26 @@ contract DonationsV2 is DonationsV1 {
 What we need to do next is link our application to the zOS Kernel standard library release containing that mintable ERC721 implementation, and set it to our upgradeable contract. To do so, we create a new version of our application in the `AppManager`, register a new `AppDirectory` containing the new version of our contract implementation, and then set the standard library version of ERC721 to our upgradeable contract. Let's see how:
 
 ```js
-  console.log("\n<< Deploying version 2 >>");
+  // Create a new version of the app, liked to the zeppelin_os standard library.
+  // Register a new implementation for "Basil" and upgrade it's proxy to use the new implementation.
+  log("\n<< Deploying version 2 >>")
+  const secondVersion = '0.0.2'
+  await appManager.newVersion(secondVersion, stdlib)
+  const DonationsV2 = ContractsProvider.getByName('DonationsV2')
+  await appManager.setImplementation(DonationsV2, contractName);
+  const donations = await appManager.upgradeProxy(DonationsV1, contractName)
 
-  const versionName = '0.0.2';
-
-  // Prepare a new version for the app that will hold the new implementation for the main contract.
-  console.log(`Deploying new application directory...`);
-  this.directory = await AppDirectory.new(stdlib, txParams);
-  console.log(`Deployed application directory for new version ${versionName} at ${this.directory.address}`);
-
-  // Deploy contract implementation.
-  console.log(`Deploying new contract implementation...`);
-  const implementation = await DonationsV2.new(txParams);
-  console.log(`Deploying new implementation of ${contractName} at ${implementation.address}`);
-
-  // Register the new implementation in the current version.
-  console.log(`Registering new contract implementation...`);
-  await this.directory.setImplementation(contractName, implementation.address, txParams);
-  console.log(`Registered implementation in current contract directory`);
-
-  // Create a new application version with the new directory and
-  // update the app's version to it.
-  console.log(`Adding new application version ${versionName}`);
-  await this.package.addVersion(versionName, this.directory.address, txParams);
-  console.log(`Setting the app's version to ${versionName}`);
-  await this.appManager.setVersion(versionName, txParams);
-
-  // Upgrade the proxy to the application's latest version.
-  console.log(`Upgrading proxy for ${contractName}`);
-  await this.appManager.upgradeTo(this.proxy.address, contractName, txParams);
-  console.log(`Upgraded contract proxy for ${contractName} to latest app version ${versionName}`);
-
-  // Add an ERC721 token implementation to the project.
-  console.log(`Creating proxy for ERC721 token, for use in ${contractName}...`);
-  const {receipt} = await this.appManager.create('MintableERC721Token', txParams);
-  const logs = decodeLogs([receipt.logs[1]], UpgradeabilityProxyFactory, 0x0);
-  const proxyAddress = logs.find(l => l.event === 'ProxyCreated').args.proxy;
-  console.log(`Token proxy created at ${proxyAddress}`);
-
-  // Set the token in the new implementation.
-  console.log(`Setting application's token...`);
-  const donations = DonationsV2.at(this.proxy.address);
-  await donations.setToken(proxyAddress, txParams);
-  console.log(`Token set succesfully`);
+  // Add an ERC721 token implementation to the project, request a proxy for it,
+  // and set the token on "Basil".
+  log(`Creating ERC721 token proxy to use in ${contractName}...`)
+  const {receipt} = await this.appManager.create('MintableERC721Token', txParams)
+  const UpgradeabilityProxyFactory = ContractsProvider.getByName('UpgradeabilityProxyFactory')
+  const logs = decodeLogs([receipt.logs[1]], UpgradeabilityProxyFactory)
+  const proxyAddress = logs.find(l => l.event === 'ProxyCreated').args.proxy
+  log(`Token proxy created at ${proxyAddress}`)
+  log("Setting application's token...")
+  await donations.setToken(proxyAddress, txParams)
+  log("Token set succesfully")
 ```
 
 That's it! We now have the same contract, retaining the original balance, and storage, but with an upgraded code. The upgradeable contract is also linked to an on-chain upgradeable standard library containing an implementation of a mintable ERC721 token. State of the art!
