@@ -46,7 +46,7 @@ export default class NetworkAppController {
     if (contractAlias === undefined) throw new Error('Missing required argument contractAlias for createProxy')
 
     await this.loadApp();
-    const contractClass = await this.appController.getContractClass(contractAlias);
+    const contractClass = this.appController.getContractClass(contractAlias);
     const proxyInstance = await this.appManagerWrapper.createProxy(contractClass, contractAlias, initMethod, initArgs);
     
     const proxyInfo = {
@@ -59,29 +59,62 @@ export default class NetworkAppController {
     proxies[contractAlias].push(proxyInfo);
   }
 
-  async upgradeProxy(contractAlias, proxyAddress, initMethod, initArgs) {
-    if (contractAlias === undefined) throw new Error(`Must provide a contract name`)
-
-    const proxyInfo = this.findProxy(contractAlias, proxyAddress);
-    if (!proxyInfo) throw new Error(`Could not find a ${contractAlias} proxy with address ${proxyAddress}`)
+  async upgradeProxies(contractAlias, proxyAddress, initMethod, initArgs) {
+    const proxyInfos = this.getProxies(contractAlias, proxyAddress);
+    if (_.isEmpty(proxyInfos)) {
+      log.info("No proxies to upgrade were found");
+      return;
+    }
 
     await this.loadApp();
-    const contractClass = await this.appController.getContractClass(contractAlias)
-    await this.appManagerWrapper.upgradeProxy(proxyInfo.address, contractClass, contractAlias, initMethod, initArgs)
+    const newVersion = this.appManagerWrapper.version;
+    
+    await Promise.all(_.flatMap(proxyInfos, (contractProxyInfos, contractAlias) => {
+      const contractClass = this.appController.getContractClass(contractAlias);
+      return _.map(contractProxyInfos, async (proxyInfo) => {        
+        await this.appManagerWrapper.upgradeProxy(proxyInfo.address, contractClass, contractAlias, initMethod, initArgs);
+        proxyInfo.version = newVersion;
+      });
+    }));
 
-    proxyInfo.version = this.appManagerWrapper.version
+    return proxyInfos;
   }
 
-  findProxy(contractAlias, proxyAddress) {
-    const proxies = this.networkPackage.proxies;
-    if (_.isEmpty(proxies[contractAlias])) return null;
-    if (proxies[contractAlias].length > 1 && proxyAddress === undefined) throw new Error(`Must provide a proxy address for contracts that have more than one proxy`)
-    
-    const proxyInfo = proxies[contractAlias].length === 1
-      ? proxies[contractAlias][0]
-      : _.find(proxies[contractAlias], proxy => proxy.address == proxyAddress);
+  /**
+   * Returns all proxies, optionally filtered by a contract alias and a proxy address
+   * @param {*} contractAlias 
+   * @param {*} proxyAddress 
+   * @returns an object with contract aliases as keys, and arrays of Proxy (address, version) as values
+   */
+  getProxies(contractAlias, proxyAddress) {
+    if (!contractAlias) {
+      if (proxyAddress) throw new Error("Must set contract alias if filtering by proxy address");
+      return this.networkPackage.proxies;
+    }
 
-    return proxyInfo;
+    return { 
+      [contractAlias]: _.filter(this.networkPackage.proxies[contractAlias], proxy => (
+        !proxyAddress || proxy.address == proxyAddress
+      ))
+    };
+  }
+
+  /**
+   * Returns a single proxy object for the specified contract alias and optional proxy address
+   * @param {*} contractAlias 
+   * @param {*} proxyAddress address of the proxy, can be omitted if there is a single proxy for this contract
+   * @returns a Proxy object (address, version)
+   */
+  findProxy(contractAlias, proxyAddress) { 
+    const proxies = this.networkPackage.proxies; 
+    if (_.isEmpty(proxies[contractAlias])) return null; 
+    if (proxies[contractAlias].length > 1 && proxyAddress === undefined) throw new Error(`Must provide a proxy address for contracts that have more than one proxy`) 
+     
+    const proxyInfo = proxies[contractAlias].length === 1 
+      ? proxies[contractAlias][0] 
+      : _.find(proxies[contractAlias], proxy => proxy.address == proxyAddress); 
+ 
+    return proxyInfo; 
   }
 
   get package() {

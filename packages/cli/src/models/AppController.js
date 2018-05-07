@@ -67,7 +67,7 @@ export default class AppController {
     return this._package;
   }
 
-  async getContractClass(contractAlias) {
+  getContractClass(contractAlias) {
     const contractName = this.package.contracts[contractAlias];
     if (contractName) {
       return ContractsProvider.getFromArtifacts(contractName);

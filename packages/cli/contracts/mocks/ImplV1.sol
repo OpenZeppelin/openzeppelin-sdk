@@ -12,3 +12,9 @@ contract ImplV1 {
     return "V1";
   }
 }
+
+contract AnotherImplV1 is ImplV1 {
+  function say() public pure returns (string) {
+    return "AnotherV1";
+  }
+}
