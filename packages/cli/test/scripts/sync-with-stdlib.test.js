@@ -1,5 +1,4 @@
 import { FileSystem as fs } from 'zos-lib'
-import deployAll from "../../src/scripts/deploy-all";
 import sync from "../../src/scripts/sync.js";
 import { cleanup, cleanupfn } from '../helpers/cleanup';
 
@@ -12,7 +11,7 @@ const should = require('chai')
   .use(require('../helpers/assertions'))
   .should();
 
-contract('deployAll', function([_, owner]) {
+contract('sync-with-stdlib', function([_, owner]) {
 
   const from = owner;
   const txParams = { from };
@@ -25,7 +24,7 @@ contract('deployAll', function([_, owner]) {
 
     beforeEach("syncing package-stdlib", async function () {
       cleanup(networkFileName)
-      await deployAll({ packageFileName, network, txParams })
+      await sync({ packageFileName, network, txParams, deployStdlib: true })
     });
 
     after(cleanupfn(networkFileName));

@@ -138,10 +138,10 @@ In addition to creating proxies for your own contracts, you can also re-use alre
 zos set-stdlib openzeppelin-zos --network [NETWORK]
 ```
 
-The next `sync` operation will connect your application with the chosen standard library on the target network. However, if you're using development nodes (such as testrpc or ganache), the standard library is not already deployed, since you are running from an empty blockchain. To work around this, you can run the following command:
+The next `sync` operation will connect your application with the chosen standard library on the target network. However, if you're using development nodes (such as testrpc or ganache), the standard library is not already deployed, since you are running from an empty blockchain. To work around this, you can add a `--deploy-stdlib` flag to the `sync` command:
 
 ```bash
-zos deploy-all --network [NETWORK]
+zos sync --network [NETWORK] --deploy-stdlib
 ```
 
 This will deploy your entire application to the target network, along with the standard library you are using and all its contracts. This way, you can transparently work in development with the contracts provided by the stdlib.
@@ -180,13 +180,7 @@ Use truffle to compile the new version of your code:
 npx truffle compile
 ```
 
-We'll now use `zos` to register and deploy the new code for `MyContract` to the blockchain.
-If you're in development mode, run:
-```
-zos deploy-all --network development
-```
-
-If you're in a public network, sync the new version of your project to the blockchain by running: 
+We'll now use `zos` to register and deploy the new code for `MyContract` to the blockchain. Sync the new version of your project by running: 
 
 ```
 zos sync --network [NETWORK]
