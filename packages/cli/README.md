@@ -83,10 +83,10 @@ npx truffle compile
 The next step is to register all the contract implementations of the first `version` of your project. To do this please run:
 
 ```
-zos add-implementation [CONTRACT_NAME_1] [ALIAS_2] --network [NETWORK]
-zos add-implementation [CONTRACT_NAME_2] [ALIAS_2] --network [NETWORK]
+zos add-implementation [CONTRACT_NAME_1] --network [NETWORK]
+zos add-implementation [CONTRACT_NAME_2] --network [NETWORK]
 ...
-zos add-implementation [CONTRACT_NAME_N] [ALIAS_N] --network [NETWORK]
+zos add-implementation [CONTRACT_NAME_N] --network [NETWORK]
 ```
 
 Where `[CONTRACT_NAME]` is the name of your Solidity contract, and `[ALIAS]` is the name under which it will be registered 
@@ -94,7 +94,7 @@ in zeppelin_os.
 
 In our example, run:
 ```
-zos add-implementation MyContract MyContract --network development
+zos add-implementation MyContract --network development
 ```
 
 To have your `package.zos.json` file always up-to-date, run `zos add-implementation` for every new contract you add to your project.
@@ -252,7 +252,7 @@ Initializing the distribution will create a `package.zos.json` file that will tr
 ```
 zos add-implementation <contract-name> <alias> --network=<network>,
 ```
-where `<contract-name>` is the name of the contract and `<alias>` is an alternative reference to it. Note that this command must be repeated once for each contract included in the distribution. This will update the `package.zos.json` file with the contract names. 
+where `<contract-name>` is the name of the contract and the optional `<alias>` is an alternative reference to it. Note that this command must be repeated once for each contract included in the distribution. This will update the `package.zos.json` file with the contract names. 
 
 Finally, we need to deploy the `Package` representing the distribution, the `Release` containing the stdlib, and the individual library contracts, which must then be registered in the kernel. All of this is accomplished by:
 ```

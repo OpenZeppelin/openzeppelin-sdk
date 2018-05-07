@@ -10,7 +10,7 @@ const should = require('chai')
 contract('add-implementation command', function() {
   const packageFileName = "test/tmp/package.zos.json";
   const appName = "MyApp";
-  const contractName = "MyContract_v0.sol";
+  const contractName = "MyContract_v0";
   const contractAlias = "MyContract";
   const defaultVersion = "0.1.0";
   
@@ -29,7 +29,7 @@ contract('add-implementation command', function() {
 
   it('should allow to change an existing implementation', function() {
     addImplementation({ contractName, contractAlias, packageFileName });
-    const customFileName = "MyContract_v1.sol";
+    const customFileName = "MyContract_v1";
     addImplementation({ contractName: customFileName, contractAlias, packageFileName });
     const data = fs.parseJson(packageFileName);
     data.contracts[contractAlias].should.eq(customFileName);
@@ -37,9 +37,9 @@ contract('add-implementation command', function() {
 
   it('should handle multiple contracts', function() {
     const customAlias1 = "MyContract";
-    const customFileName1 = "MyContract_v2.sol";
+    const customFileName1 = "MyContract_v2";
     const customAlias2 = "MyOtherContract";
-    const customFileName2 = "MyOtherContract_v0.sol";
+    const customFileName2 = "MyOtherContract_v0";
     addImplementation({ contractName: customFileName1, contractAlias: customAlias1, packageFileName });
     addImplementation({ contractName: customFileName2, contractAlias: customAlias2, packageFileName });
     const data = fs.parseJson(packageFileName);
@@ -47,13 +47,10 @@ contract('add-implementation command', function() {
     data.contracts[customAlias2].should.eq(customFileName2);
   });
 
-  // TODO: implement
-  it.skip('should use a default alias if one is not provided', function() {
-    addImplementation({ contractName, contractAlias: null, packageFileName });
+  it('should use a default alias if one is not provided', function() {
+    addImplementation({ contractName, contractAlias: undefined, packageFileName });
     const data = fs.parseJson(packageFileName);
-    const expectedAlias = contractName.split('.')[0];
-    console.log(data);
-    data.contracts[expectedAlias].should.eq(contractName);
+    data.contracts[contractName].should.eq(contractName);
   });
 
   // TODO: test for invalid alias names

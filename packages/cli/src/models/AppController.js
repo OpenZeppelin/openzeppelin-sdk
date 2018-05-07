@@ -56,6 +56,7 @@ export default class AppController {
   }
 
   addImplementation(contractAlias, contractName) {
+    // TODO: Add some extra metadata on the contract when adding it, and validate it exists
     this.package.contracts[contractAlias] = contractName;
   }
 
