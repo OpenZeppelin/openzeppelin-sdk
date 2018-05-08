@@ -3,7 +3,7 @@ import encodeCall from '../../../src/helpers/encodeCall'
 import assertRevert from '../../../src/helpers/assertRevert'
 import shouldBehaveLikeOwnable from '../../../src/test/behaviors/Ownable'
 
-const InitializableMock = artifacts.require('InitializableMock')
+const MigratableMock = artifacts.require('MigratableMock')
 const ContractDirectory = artifacts.require('ContractDirectory')
 const DummyImplementation = artifacts.require('DummyImplementation')
 const UnversionedAppManager = artifacts.require('UnversionedAppManager')
@@ -79,7 +79,7 @@ contract('UnversionedAppManager', ([_, managerOwner, directoryOwner, anotherAcco
     const initializeData = encodeCall('initialize', ['uint256'], [42])
 
     beforeEach(async function () {
-      this.behavior = await InitializableMock.new()
+      this.behavior = await MigratableMock.new()
     })
 
     describe('when the requested contract was registered in the contract provider', function () {
@@ -103,8 +103,8 @@ contract('UnversionedAppManager', ([_, managerOwner, directoryOwner, anotherAcco
       })
 
       it('calls "initialize" function', async function() {
-        const initializable = InitializableMock.at(this.proxyAddress)
-        const x = await initializable.x()
+        const migratable = MigratableMock.at(this.proxyAddress)
+        const x = await migratable.x()
         assert.equal(x, 42)
       })
 
@@ -114,7 +114,7 @@ contract('UnversionedAppManager', ([_, managerOwner, directoryOwner, anotherAcco
       })
 
       it('uses the storage of the proxy', async function () {
-        // fetch the x value of Initializable at position 0 of the storage
+        // fetch the x value of Migratable at position 0 of the storage
         const storedValue = await web3.eth.getStorageAt(this.proxyAddress, 1)
         assert.equal(storedValue, 42)
       })
@@ -134,7 +134,7 @@ contract('UnversionedAppManager', ([_, managerOwner, directoryOwner, anotherAcco
       this.logs = decodeLogs([receipt.logs[1]], UpgradeabilityProxyFactory)
       this.proxyAddress = this.logs.find(l => l.event === 'ProxyCreated').args.proxy
       this.proxy = await OwnedUpgradeabilityProxy.at(this.proxyAddress)
-      
+
       await this.directory.setImplementation(contract, this.implementation_v1, { from: directoryOwner })
     })
 
@@ -167,7 +167,7 @@ contract('UnversionedAppManager', ([_, managerOwner, directoryOwner, anotherAcco
       this.logs = decodeLogs([receipt.logs[1]], UpgradeabilityProxyFactory)
       this.proxyAddress = this.logs.find(l => l.event === 'ProxyCreated').args.proxy
       this.proxy = await OwnedUpgradeabilityProxy.at(this.proxyAddress)
-      this.behavior = await InitializableMock.new()
+      this.behavior = await MigratableMock.new()
     })
 
     describe('when the sender is the manager owner', function () {
@@ -185,8 +185,8 @@ contract('UnversionedAppManager', ([_, managerOwner, directoryOwner, anotherAcco
       })
 
       it('calls the "initialize" function', async function() {
-        const initializable = InitializableMock.at(this.proxyAddress)
-        const x = await initializable.x()
+        const migratable = MigratableMock.at(this.proxyAddress)
+        const x = await migratable.x()
         assert.equal(x, 42)
       })
 

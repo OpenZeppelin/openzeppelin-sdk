@@ -1,6 +1,6 @@
 import encodeCall from '../../src/helpers/encodeCall'
 
-const InitializableMock = artifacts.require('InitializableMock')
+const MigratableMock = artifacts.require('MigratableMock')
 const OwnedUpgradeabilityProxy = artifacts.require('OwnedUpgradeabilityProxy')
 const UpgradeabilityProxyFactory = artifacts.require('UpgradeabilityProxyFactory')
 const DummyImplementation = artifacts.require('DummyImplementation')
@@ -44,7 +44,7 @@ contract('UpgradeabilityProxyFactory', ([_, owner]) => {
     const initializeData = encodeCall('initialize', ['uint256'], [42])
 
     beforeEach(async function () {
-      this.behavior = await InitializableMock.new()
+      this.behavior = await MigratableMock.new()
       const { logs } = await this.factory.createProxyAndCall(owner, this.behavior.address, initializeData, { value })
       this.logs = logs
       this.proxyAddress = logs.find(l => l.event === 'ProxyCreated').args.proxy
@@ -68,8 +68,8 @@ contract('UpgradeabilityProxyFactory', ([_, owner]) => {
     })
 
     it('calls "initialize" function', async function() {
-      const initializable = InitializableMock.at(this.proxyAddress);
-      const x = await initializable.x();
+      const migratable = MigratableMock.at(this.proxyAddress);
+      const x = await migratable.x();
       assert.equal(x, 42);
     })
 

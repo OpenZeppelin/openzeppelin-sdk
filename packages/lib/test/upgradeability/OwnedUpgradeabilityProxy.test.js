@@ -4,7 +4,7 @@ import assertRevert from '../../src/helpers/assertRevert'
 const MigratableMockV1 = artifacts.require('MigratableMockV1')
 const MigratableMockV2 = artifacts.require('MigratableMockV2')
 const MigratableMockV3 = artifacts.require('MigratableMockV3')
-const InitializableMock = artifacts.require('InitializableMock')
+const MigratableMock = artifacts.require('MigratableMock')
 const DummyImplementation = artifacts.require('DummyImplementation')
 const OwnedUpgradeabilityProxy = artifacts.require('OwnedUpgradeabilityProxy')
 const UpgradeabilityProxyFactory = artifacts.require('UpgradeabilityProxyFactory')
@@ -75,7 +75,7 @@ contract('OwnedUpgradeabilityProxy', ([_, owner, anotherAccount]) => {
   describe('upgradeToAndCall', function () {
     describe('without migrations', function () {
       beforeEach(async function () {
-        this.behavior = await InitializableMock.new()
+        this.behavior = await MigratableMock.new()
       })
 
       describe('when the call does not fail', function () {
@@ -101,8 +101,8 @@ contract('OwnedUpgradeabilityProxy', ([_, owner, anotherAccount]) => {
           })
 
           it('calls the "initialize" function', async function() {
-            const initializable = InitializableMock.at(this.proxyAddress)
-            const x = await initializable.x()
+            const migratable = MigratableMock.at(this.proxyAddress)
+            const x = await migratable.x()
             assert.equal(x, 42)
           })
 
@@ -112,7 +112,7 @@ contract('OwnedUpgradeabilityProxy', ([_, owner, anotherAccount]) => {
           })
 
           it('uses the storage of the proxy', async function () {
-            // fetch the x value of Initializable at position 0 of the storage
+            // fetch the x value of Migratable at position 0 of the storage
             const storedValue = await web3.eth.getStorageAt(this.proxyAddress, 1);
             assert.equal(storedValue, 42);
           })

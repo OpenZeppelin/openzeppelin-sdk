@@ -5,7 +5,7 @@ import shouldBehaveLikeOwnable from '../../../src/test/behaviors/Ownable'
 
 const Package = artifacts.require('Package')
 const ContractDirectory = artifacts.require('ContractDirectory')
-const InitializableMock = artifacts.require('InitializableMock')
+const MigratableMock = artifacts.require('MigratableMock')
 const PackagedAppManager = artifacts.require('PackagedAppManager')
 const DummyImplementation = artifacts.require('DummyImplementation')
 const OwnedUpgradeabilityProxy = artifacts.require('OwnedUpgradeabilityProxy')
@@ -69,26 +69,26 @@ contract('PackagedAppManager', ([_, managerOwner, packageOwner, directoryOwner, 
 
           it('sets a new version', async function () {
             await this.manager.setVersion(version, { from })
-            
+
             const newVersion = await this.manager.version()
             assert.equal(newVersion, version_1)
           })
         })
-        
+
         describe('when the requested version is registered in the package', function () {
           it('reverts', async function () {
             await assertRevert(this.manager.setVersion(version, { from }))
           })
         })
       })
-      
+
       describe('when the sender is the manager owner', function () {
         it('reverts', async function () {
           await assertRevert(this.manager.setVersion(version_1, { from: anotherAccount }))
         })
       })
     })
-    
+
     describe('create', function () {
       describe('when the requested contract was registered for the current version', function () {
         beforeEach(async function () {
@@ -123,7 +123,7 @@ contract('PackagedAppManager', ([_, managerOwner, packageOwner, directoryOwner, 
       const initializeData = encodeCall('initialize', ['uint256'], [42])
 
       beforeEach(async function () {
-        this.behavior = await InitializableMock.new()
+        this.behavior = await MigratableMock.new()
       })
 
       describe('when the requested contract was registered for the current version', function () {
@@ -147,7 +147,7 @@ contract('PackagedAppManager', ([_, managerOwner, packageOwner, directoryOwner, 
         })
 
         it('calls "initialize" function', async function() {
-          const initializable = InitializableMock.at(this.proxyAddress)
+          const initializable = MigratableMock.at(this.proxyAddress)
           const x = await initializable.x()
           assert.equal(x, 42)
         })
@@ -158,7 +158,7 @@ contract('PackagedAppManager', ([_, managerOwner, packageOwner, directoryOwner, 
         })
 
         it('uses the storage of the proxy', async function () {
-          // fetch the x value of Initializable at position 0 of the storage
+          // fetch the x value of Migratable at position 0 of the storage
           const storedValue = await web3.eth.getStorageAt(this.proxyAddress, 1)
           assert.equal(storedValue, 42)
         })
@@ -178,7 +178,7 @@ contract('PackagedAppManager', ([_, managerOwner, packageOwner, directoryOwner, 
         this.logs = decodeLogs([receipt.logs[1]], UpgradeabilityProxyFactory)
         this.proxyAddress = this.logs.find(l => l.event === 'ProxyCreated').args.proxy
         this.proxy = await OwnedUpgradeabilityProxy.at(this.proxyAddress)
-        
+
         // set new version
         await this.package.addVersion(version_1, this.firstVersionDirectory.address, { from: packageOwner })
         await this.manager.setVersion(version_1, { from: managerOwner })
@@ -226,7 +226,7 @@ contract('PackagedAppManager', ([_, managerOwner, packageOwner, directoryOwner, 
         this.logs = decodeLogs([receipt.logs[1]], UpgradeabilityProxyFactory)
         this.proxyAddress = this.logs.find(l => l.event === 'ProxyCreated').args.proxy
         this.proxy = await OwnedUpgradeabilityProxy.at(this.proxyAddress)
-        this.behavior = await InitializableMock.new()
+        this.behavior = await MigratableMock.new()
 
         // set new version
         await this.package.addVersion(version_1, this.firstVersionDirectory.address, { from: packageOwner })
@@ -249,7 +249,7 @@ contract('PackagedAppManager', ([_, managerOwner, packageOwner, directoryOwner, 
           })
 
           it('calls the "initialize" function', async function() {
-            const initializable = InitializableMock.at(this.proxyAddress)
+            const initializable = MigratableMock.at(this.proxyAddress)
             const x = await initializable.x()
             assert.equal(x, 42)
           })
@@ -260,7 +260,7 @@ contract('PackagedAppManager', ([_, managerOwner, packageOwner, directoryOwner, 
           })
 
           it('uses the storage of the proxy', async function () {
-            // fetch the x value of Initializable at position 0 of the storage
+            // fetch the x value of Migratable at position 0 of the storage
             const storedValue = await web3.eth.getStorageAt(this.proxyAddress, 1)
             assert.equal(storedValue, 42)
           })
