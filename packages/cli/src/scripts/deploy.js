@@ -5,7 +5,7 @@ import { Logger, DistributionDeployer, DistributionProvider } from 'zos-lib'
 const log = new Logger('deploy')
 
 // TODO: remove version param
-export default async function deploy({ version, network, txParams = {}, packageFileName = null}) {
+export default async function deploy({ version, network, txParams = {}, packageFileName = undefined}) {
   const files = new PackageFilesInterface(packageFileName)
   if (! files.exists()) throw `Could not find package file ${packageFileName}`
 

@@ -7,7 +7,7 @@ const BASE_DISTRIBUTION = {
   }
 }
 
-export default function initDistribution({ name, kernelAddress, packageFileName = null }) {
+export default function initDistribution({ name, kernelAddress, packageFileName = undefined }) {
   if (name === undefined) throw 'Must provide a distribution name'
   if (kernelAddress === undefined) throw 'Must provide a kernel address'
 
