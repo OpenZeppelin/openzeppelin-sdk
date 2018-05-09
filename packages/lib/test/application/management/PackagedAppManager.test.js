@@ -28,6 +28,12 @@ contract('PackagedAppManager', ([_, managerOwner, packageOwner, directoryOwner, 
     this.firstVersionDirectory = await ContractDirectory.new({ from: directoryOwner })
   })
 
+  describe('when the package address is null', function () {
+    it('reverts', async function () {
+      await assertRevert(PackagedAppManager.new(0, 'dummy', this.factory.address))
+    })
+  })
+
   describe('when the given package does not support the required version', function () {
     it('reverts', async function () {
       await assertRevert(PackagedAppManager.new(this.package.address, version_0, this.factory.address, { from: managerOwner }))
