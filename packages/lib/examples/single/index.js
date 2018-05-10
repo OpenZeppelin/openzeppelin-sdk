@@ -7,11 +7,11 @@ const OwnedUpgradeabilityProxy = artifacts.require('zos-lib/contracts/upgradeabi
 
 module.exports = async function() {
 
-  console.log('Deploying MyContract v0 implementation...');
-  const implementation_v0 = await MyContract_v0.new();
+  console.log('Deploying MyContract v0...');
+  const myContract_v0 = await MyContract_v0.new();
 
-  console.log('Deploying a proxy pointing to that implementation...')
-  const proxy = await OwnedUpgradeabilityProxy.new(implementation_v0.address);
+  console.log('Deploying a proxy pointing to v0...');
+  const proxy = await OwnedUpgradeabilityProxy.new(myContract_v0.address);
 
   console.log('Calling initialize(42) on proxy...');
   let myContract = await MyContract_v0.at(proxy.address);
@@ -21,16 +21,15 @@ module.exports = async function() {
 	console.log('Proxy\'s storage value for x: ' + (await myContract.x()).toString());
 
 
-  console.log('Deploying MyContract_v1, the v1 implementation...')
-  const implementation_v1 = await MyContract_v1.new();
+  console.log('Deploying MyContract v1...');
+  const myContract_v1 = await MyContract_v1.new();
 
-  console.log('Upgrading proxy to v1 implementation...');
-  await proxy.upgradeTo(implementation_v1.address);
+  console.log('Upgrading proxy to v1...');
+  await proxy.upgradeTo(myContract_v1.address);
   myContract = await MyContract_v1.at(proxy.address);
 
-  console.log('Proxy\'s storage value for x: ' + (await myContract.x()).toString())
-  console.log('Proxy\'s storage value for y: ' + (await myContract.y()).toString())
+  console.log('Proxy\'s storage value for x: ' + (await myContract.x()).toString());
+  console.log('Proxy\'s storage value for y: ' + (await myContract.y()).toString());
   console.log('Wohoo! We\'ve upgraded our contract\'s behavior while preserving storage.');
 
 };
-
