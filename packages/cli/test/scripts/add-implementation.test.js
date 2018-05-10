@@ -10,8 +10,8 @@ const should = require('chai')
 contract('add-implementation command', function() {
   const packageFileName = "test/tmp/package.zos.json";
   const appName = "MyApp";
-  const contractName = "MyContract_v0";
-  const contractAlias = "MyContract";
+  const contractName = "ImplV1";
+  const contractAlias = "Impl";
   const defaultVersion = "0.1.0";
   
   beforeEach('setup', async function() {
@@ -29,22 +29,22 @@ contract('add-implementation command', function() {
 
   it('should allow to change an existing implementation', function() {
     addImplementation({ contractName, contractAlias, packageFileName });
-    const customFileName = "MyContract_v1";
-    addImplementation({ contractName: customFileName, contractAlias, packageFileName });
+    const customContractName = "ImplV2";
+    addImplementation({ contractName: customContractName, contractAlias, packageFileName });
     const data = fs.parseJson(packageFileName);
-    data.contracts[contractAlias].should.eq(customFileName);
+    data.contracts[contractAlias].should.eq(customContractName);
   });
 
   it('should handle multiple contracts', function() {
-    const customAlias1 = "MyContract";
-    const customFileName1 = "MyContract_v2";
-    const customAlias2 = "MyOtherContract";
-    const customFileName2 = "MyOtherContract_v0";
-    addImplementation({ contractName: customFileName1, contractAlias: customAlias1, packageFileName });
-    addImplementation({ contractName: customFileName2, contractAlias: customAlias2, packageFileName });
+    const customAlias1 = "Impl";
+    const customContractName1 = "ImplV1";
+    const customAlias2 = "AnotherImpl";
+    const customContractName2 = "AnotherImplV1";
+    addImplementation({ contractName: customContractName1, contractAlias: customAlias1, packageFileName });
+    addImplementation({ contractName: customContractName2, contractAlias: customAlias2, packageFileName });
     const data = fs.parseJson(packageFileName);
-    data.contracts[customAlias1].should.eq(customFileName1);
-    data.contracts[customAlias2].should.eq(customFileName2);
+    data.contracts[customAlias1].should.eq(customContractName1);
+    data.contracts[customAlias2].should.eq(customContractName2);
   });
 
   it('should use a default alias if one is not provided', function() {
@@ -53,6 +53,13 @@ contract('add-implementation command', function() {
     data.contracts[contractName].should.eq(contractName);
   });
 
-  // TODO: test for invalid alias names
-  // TODO: test for invalid solidity file names
+  it('should fail to add a contract that does not exist', function() {
+    expect(() => addImplementation({ contractName: "NonExists", contractAlias, packageFileName })).to.throw(/not found/);
+  });
+
+  it('should fail to add an abstract contract', function() {
+    expect(() => addImplementation({ contractName: "Impl", contractAlias, packageFileName })).to.throw(/abstract/);
+  });
+
+  it('should fail to add a contract with an invalid alias');
 });

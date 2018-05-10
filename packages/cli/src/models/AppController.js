@@ -56,8 +56,21 @@ export default class AppController {
   }
 
   addImplementation(contractAlias, contractName) {
-    // TODO: Add some extra metadata on the contract when adding it, and validate it exists
     this.package.contracts[contractAlias] = contractName;
+  }
+
+  validateImplementation(contractName) {
+    // We are manually checking the build file instead of delegating to ContractsProvider, 
+    // as ContractsProvider requires initializing the entire truffle stack.
+    const folder = `${process.cwd()}/build/contracts`;
+    const path = `${folder}/${contractName}.json`;
+    if (!fs.exists(path)) {
+      throw new Error(`Contract ${contractName} not found in folder ${folder}`);
+    }
+    const bytecode = fs.parseJson(path).bytecode;
+    if (!bytecode || bytecode == "0x") {
+      throw new Error(`Contract ${contractName} is abstract and cannot be deployed as an implementation`);
+    }
   }
 
   get package() {

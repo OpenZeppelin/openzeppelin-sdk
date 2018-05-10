@@ -5,6 +5,7 @@ export default function addImplementation({ contractName, contractAlias, package
   if (!contractAlias) contractAlias = contractName
 
   const appController = new AppController(packageFileName)
+  appController.validateImplementation(contractName)
   appController.addImplementation(contractAlias, contractName)
   appController.writePackage()
 }
