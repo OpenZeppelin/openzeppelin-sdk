@@ -1,11 +1,10 @@
+import assertRevert from '../../src/helpers/assertRevert';
 import DistributionDeployer from '../../src/distribution/DistributionDeployer';
 import DistributionProvider from '../../src/distribution/DistributionProvider';
-import assertRevert from '../../src/helpers/assertRevert';
-
 
 const DummyImplementation = artifacts.require('DummyImplementation')
 
-const should = require('chai')
+require('chai')
   .should()
 
 contract('Distribution', function ([_, owner]) {
@@ -101,8 +100,5 @@ contract('Distribution', function ([_, owner]) {
         await assertRevert(this.distribution.setImplementation(initialVersion, DummyImplementation, contractName))
       })
     })
-
   })
-
-
 })
