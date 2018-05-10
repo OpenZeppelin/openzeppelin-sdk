@@ -5,7 +5,9 @@
   "main": "index.js",
   "scripts": {
     "compile": "rm -rf build && npx truffle compile",
-    "start": "npm run compile && npx truffle exec index.js --network ropsten",
+    "start": "npm run deploy",
+    "deploy": "npm run compile && npx truffle exec index.js --network development",
+    "deploy_ropsten": "npm run compile && npx truffle exec index.js --network ropsten",
     "test": "npm run compile && npx truffle test"
   },
   "keywords": [
