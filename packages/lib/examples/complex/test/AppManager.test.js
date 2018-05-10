@@ -1,30 +1,24 @@
-const OwnedUpgradeabilityProxy = artifacts.require('OwnedUpgradeabilityProxy.sol');
-const UpgradeabilityProxyFactory = artifacts.require('UpgradeabilityProxyFactory');
 const Package = artifacts.require('Package');
 const AppDirectory = artifacts.require('AppDirectory');
 const ContractDirectory = artifacts.require('ContractDirectory');
 const AppManager = artifacts.require('PackagedAppManager');
 const MintableERC721Token = artifacts.require('MintableERC721Token');
+const OwnedUpgradeabilityProxy = artifacts.require('OwnedUpgradeabilityProxy.sol');
+const UpgradeabilityProxyFactory = artifacts.require('UpgradeabilityProxyFactory');
 
 const DonationsV1 = artifacts.require('DonationsV1');
 const DonationsV2 = artifacts.require('DonationsV2');
 
-const decodeLogs = require('zos-lib').decodeLogs;
-const encodeCall = require('zos-lib').encodeCall;
+const deploy = require('../index.js');
 const validateAddress = require('./helpers/validateAddress.js');
 const shouldBehaveLikeDonations = require('./Donations.behavior.js');
 const shouldBehaveLikeDonationsWithTokens = require('./DonationsWithTokens.behavior.js');
-const should = require('chai').should();
-const deploy = require('../index.js');
 
+require('chai').should()
 contract('AppManager', ([_, owner, donor, wallet]) => {
-
-  let initialVersion = '0.0.1';
-  let updatedVersion = '0.0.2';
-  let contractName = "Donations";
-  let tokenClass = 'MintableERC721Token';
-  let tokenName = 'DonationToken';
-  let tokenSymbol = 'DON';
+  const initialVersion = '0.0.1';
+  const updatedVersion = '0.0.2';
+  const contractName = "Donations";
 
   describe('setup', function() {
 
@@ -73,9 +67,8 @@ contract('AppManager', ([_, owner, donor, wallet]) => {
   });
 
   describe('version 0.0.2', function() {
-
-    let tokenName = 'DonationToken';
-    let tokenSymbol = 'DON';
+    const tokenName = 'DonationToken';
+    const tokenSymbol = 'DON';
 
     beforeEach(async function() {
       this.appManager = await deploy.setupAppManager({owner});

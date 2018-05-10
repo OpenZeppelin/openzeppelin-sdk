@@ -12,4 +12,3 @@ else
   node_modules/.bin/truffle compile
   node_modules/.bin/truffle test "$@"
 fi
-

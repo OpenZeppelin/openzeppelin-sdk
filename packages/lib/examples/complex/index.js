@@ -6,7 +6,7 @@ const network = args.network;
 
 const ContractDirectory = artifacts.require('ContractDirectory');
 const MintableERC721Token = artifacts.require('MintableERC721Token');
-const { decodeLogs, Logger, AppManagerDeployer, ContractsProvider } = require('zos-lib')
+const { Logger, AppManagerDeployer, ContractsProvider } = require('zos-lib')
 const log = new Logger('ComplexExample')
 
 const owner = web3.eth.accounts[1];
@@ -23,7 +23,7 @@ async function setupAppManager(txParams) {
   return await AppManagerDeployer.call(initialVersion, txParams)
 }
 
-async function deployVersion1(appManager, txParams) {
+async function deployVersion1(appManager) {
 
   // Register the first implementation of "Donations", and request a proxy for it.
   log.info("<< Deploying version 1 >>")
@@ -80,7 +80,7 @@ module.exports = async function() {
     gasPrice: 100000000000
   };
   const appManager = await setupAppManager(txParams);
-  const donations = await deployVersion1(appManager, txParams);
+  const donations = await deployVersion1(appManager);
   await deployVersion2(appManager, donations, txParams);
 };
 
