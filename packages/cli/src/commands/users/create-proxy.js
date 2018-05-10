@@ -11,6 +11,7 @@ module.exports = function(program) {
     .option('-a, --args <arg1, arg2, ...>', 'Provide initialization arguments for your contract if required')
     .option('-f, --from <from>', 'Set the transactions sender')
     .option('-n, --network <network>', 'Provide a network to be used')
+    .option('--force', 'Force creation of the proxy even if contracts have local modifications')
     .action(function (contractAlias, options) {
       let initMethod = options.init
       if(typeof initMethod === 'boolean') initMethod = 'initialize'
@@ -19,7 +20,7 @@ module.exports = function(program) {
       if(typeof initArgs === 'string') initArgs = initArgs.split(",")
       else if(typeof initArgs === 'boolean' || initMethod) initArgs = []
 
-      const { from, network } = options
-      runWithTruffle(async () => await createProxy({ contractAlias, network, from, initMethod, initArgs }), network)
+      const { from, network, force } = options
+      runWithTruffle(async () => await createProxy({ contractAlias, network, from, initMethod, initArgs, force }), network)
     })
 }

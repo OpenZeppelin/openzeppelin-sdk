@@ -37,8 +37,8 @@ contract('upgrade-proxy command', function([_, owner]) {
     await sync({ packageFileName, network, txParams });
     
     const networkDataV1 = fs.parseJson(networkFileName);
-    this.implV1Address = networkDataV1.contracts["Impl"];
-    this.anotherImplV1Address = networkDataV1.contracts["AnotherImpl"];
+    this.implV1Address = networkDataV1.contracts["Impl"].address;
+    this.anotherImplV1Address = networkDataV1.contracts["AnotherImpl"].address;
 
     await createProxy({ contractAlias: "Impl", packageFileName, network, txParams });
     await createProxy({ contractAlias: "Impl", packageFileName, network, txParams });
@@ -50,8 +50,8 @@ contract('upgrade-proxy command', function([_, owner]) {
     await sync({ packageFileName, network, txParams });
 
     const networkDataV2 = fs.parseJson(networkFileName);
-    this.implV2Address = networkDataV2.contracts["Impl"];
-    this.anotherImplV2Address = networkDataV2.contracts["AnotherImpl"];
+    this.implV2Address = networkDataV2.contracts["Impl"].address;
+    this.anotherImplV2Address = networkDataV2.contracts["AnotherImpl"].address;
   });
 
   after(cleanupfn(packageFileName));
@@ -143,5 +143,29 @@ contract('upgrade-proxy command', function([_, owner]) {
     await upgradeProxy({ contractAlias: "Impl", initMethod: "migrate", initArgs: [42], proxyAddress: undefined, network, packageFileName, txParams });
     await assertProxyInfo('Impl', 0, { version: v2string, implementation: this.implV2Address, value: 42 });
     await assertProxyInfo('Impl', 1, { version: v2string, implementation: this.implV2Address, value: 42 });
+  });
+
+  it('should refuse to upgrade a proxy to an undeployed contract', async function() {
+    const data = fs.parseJson(networkFileName);
+    delete data.contracts["Impl"];
+    fs.writeJson(networkFileName, data);
+    await upgradeProxy({ contractAlias: "Impl", proxyAddress: null, network, packageFileName, txParams }).should.be.rejectedWith(/Impl are not deployed/)
+  });
+
+  describe('with local modifications', function () {
+    beforeEach("changing local network file to have a different bytecode", async function () {
+      const data = fs.parseJson(networkFileName);
+      data.contracts["Impl"].bytecodeHash = "0xabcd";
+      fs.writeJson(networkFileName, data);
+    });
+
+    it('should refuse to upgrade a proxy for a modified contract', async function () {
+      await upgradeProxy({ contractAlias: "Impl", packageFileName, network, txParams }).should.be.rejectedWith(/Impl have changed/);
+    });
+
+    it('should upgrade a proxy for a modified contract if force is set', async function () {
+      await upgradeProxy({ contractAlias: "Impl", packageFileName, network, txParams, force: true });
+      await assertProxyInfo('Impl', 0, { version: v2string, implementation: this.implV2Address })
+    });
   });
 });

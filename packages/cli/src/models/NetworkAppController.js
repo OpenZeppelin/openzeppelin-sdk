@@ -1,6 +1,7 @@
 import _ from 'lodash';
 import { Logger } from 'zos-lib';
 import { FileSystem as fs, AppManagerProvider, AppManagerDeployer } from "zos-lib";
+import { bytecodeDigest } from '../utils/digest';
 import StdlibProvider from './stdlib/StdlibProvider';
 import StdlibDeployer from './stdlib/StdlibDeployer';
 import Stdlib from './stdlib/Stdlib';
@@ -128,13 +129,17 @@ export default class NetworkAppController {
     return this._networkPackage;
   }
 
+  get appAddress() {
+    return this.networkPackage.app && this.networkPackage.app.address;
+  }
+
   writeNetworkPackage() {
     fs.writeJson(this.networkFileName, this.networkPackage);
     log.info(`Successfully written ${this.networkFileName}`)
   }
 
   async initApp() {
-    const address = this.networkPackage.app && this.networkPackage.app.address;
+    const address = this.appAddress;
     this.appManagerWrapper = address
       ? await AppManagerProvider.from(address, this.txParams)
       : await AppManagerDeployer.call(this.package.version, this.txParams);
@@ -142,7 +147,7 @@ export default class NetworkAppController {
   }
 
   async loadApp() {
-    const address = this.networkPackage.app && this.networkPackage.app.address;
+    const address = this.appAddress;
     if (!address) throw new Error("Must deploy app to network");
     this.appManagerWrapper = await AppManagerProvider.from(address, this.txParams);
   }
@@ -165,13 +170,16 @@ export default class NetworkAppController {
   }
 
   async uploadContracts() {
-    // TODO: Store the implementation's hash or full source code to avoid unnecessary deployments
+    // TODO: Store the implementation's hash or full source/byte code to avoid unnecessary deployments
     return Promise.all(_.map(this.package.contracts, async (contractName, contractAlias) => {
       const contractClass = ContractsProvider.getFromArtifacts(contractName);
       log.info(`Uploading ${contractName} implementation for ${contractAlias}`);
       const contractInstance = await this.appManagerWrapper.setImplementation(contractClass, contractAlias);
       log.info(`Uploaded ${contractName} at ${contractInstance.address}`);
-      this.networkPackage.contracts[contractAlias] = contractInstance.address;
+      this.networkPackage.contracts[contractAlias] = {
+        address: contractInstance.address,
+        bytecodeHash: bytecodeDigest(contractClass.bytecode)
+      };
     }));
   }
 
@@ -185,7 +193,7 @@ export default class NetworkAppController {
     const networkStdlib = this.networkPackage.stdlib;
     const hasNetworkStdlib = !_.isEmpty(networkStdlib);
     const hasCustomDeploy = hasNetworkStdlib && networkStdlib.customDeploy;
-    const customDeployMatches = hasCustomDeploy && networkStdlib.name === this.package.stdlib.name;
+    const customDeployMatches = hasCustomDeploy && Stdlib.equalNameAndVersion(networkStdlib, this.package.stdlib);
 
     if (customDeployMatches) {
       log.info(`Using existing custom deployment of stdlib at ${networkStdlib.address}`);
@@ -194,9 +202,69 @@ export default class NetworkAppController {
     }
 
     // TODO: Check that package version matches the requested one
+    // TODO: Do not invoke setStdlib if matches existing one
     log.info(`Connecting to public deployment of ${this.package.stdlib.name} in ${this.network}`);
     const stdlibAddress = StdlibProvider.from(this.package.stdlib.name, this.network);
     await this.appManagerWrapper.setStdlib(stdlibAddress);
     this.networkPackage.stdlib = { address: stdlibAddress, ... this.package.stdlib };
+  }
+
+  checkLocalContractsDeployed(throwIfFail = false) {
+    const contracts = _.keys(this.package.contracts);
+    let msg;
+    
+    const [contractsDeployed, contractsMissing] = _.partition(contracts, (alias) => this.isContractDeployed(alias));
+    const contractsChanged = _.filter(contractsDeployed, (alias) => this.hasContractChanged(alias));
+
+    if (!_.isEmpty(contractsMissing)) {
+      msg = `Contracts ${contractsMissing.join(', ')} are not deployed.`;
+    } else if (!_.isEmpty(contractsChanged)) {
+      msg = `Contracts ${contractsChanged.join(', ')} have changed since the last deploy.`;
+    }
+
+    if (msg && throwIfFail) throw new Error(msg);
+    else if (msg) log.info(msg);    
+  }
+
+  checkLocalContractDeployed(contractAlias, throwIfFail = false) {
+    let msg;
+    if (!this.isContractDefined(contractAlias)) {
+      msg = `Contract ${contractAlias} not found in application or stdlib`;
+    } else if (!this.isContractDeployed(contractAlias)) {
+      msg = `Contract ${contractAlias} is not deployed to ${this.network}.`;
+    } else if (this.hasContractChanged(contractAlias)) {
+      msg = `Contract ${contractAlias} has changed locally since the last deploy.`;
+    }
+
+    if (msg && throwIfFail) throw new Error(msg);
+    else if (msg) log.info(msg);
+  }
+
+  hasContractChanged(contractAlias) {
+    const contractName = this.package.contracts[contractAlias];
+    if (!this.isApplicationContract(contractAlias)) return false;
+    if (!this.isContractDeployed(contractAlias)) return true;
+    const contractClass = ContractsProvider.getFromArtifacts(contractName);
+    const currentBytecode = bytecodeDigest(contractClass.bytecode);
+    const deployedBytecode = this.networkPackage.contracts[contractAlias].bytecodeHash;
+    return currentBytecode != deployedBytecode;
+  }
+
+  isApplicationContract(contractAlias) {
+    return !!this.package.contracts[contractAlias];
+  }
+
+  isStdlibContract(contractAlias) {
+    if (!this.appController.hasStdlib()) return false;
+    const stdlib = new Stdlib(this.appController.package.stdlib.name);
+    return stdlib.hasContract(contractAlias);
+  }
+
+  isContractDefined(contractAlias) {
+    return this.isApplicationContract(contractAlias) || this.isStdlibContract(contractAlias);
+  }
+
+  isContractDeployed(contractAlias) {
+    return !this.isApplicationContract(contractAlias) || !_.isEmpty(this.networkPackage.contracts[contractAlias]);
   }
 }

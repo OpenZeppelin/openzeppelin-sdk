@@ -4,6 +4,9 @@ import { cleanup, cleanupfn } from "../helpers/cleanup.js";
 import { FileSystem as fs } from "zos-lib";
 import createProxy from "../../src/scripts/create-proxy.js";
 import addImplementation from "../../src/scripts/add-implementation.js";
+import setStdlib from "../../src/scripts/set-stdlib.js";
+
+const ImplV1 = artifacts.require('ImplV1');
 
 const should = require('chai')
       .use(require('chai-as-promised'))
@@ -16,6 +19,8 @@ contract('create-proxy command', function([_, owner]) {
   const appName = "MyApp";
   const contractName = "ImplV1";
   const contractAlias = "Impl";
+  const anotherContractName = "AnotherImplV1";
+  const anotherContractAlias = "AnotherImpl";
   const defaultVersion = "0.1.0";
   const network = "test";
   const packageFileName = "test/tmp/package.zos.json";
@@ -26,18 +31,37 @@ contract('create-proxy command', function([_, owner]) {
     cleanup(networkFileName)
     await init({ name: appName, version: defaultVersion, packageFileName });
     await addImplementation({ contractName, contractAlias, packageFileName });
+    await addImplementation({ contractName: anotherContractName, contractAlias: anotherContractAlias, packageFileName });
     await sync({ packageFileName, network, txParams });
   });
 
   after(cleanupfn(packageFileName))
   after(cleanupfn(networkFileName))
 
+  const assertProxy = async function(proxyInfo, { version, say }) {
+    proxyInfo.address.should.be.nonzeroAddress;
+    proxyInfo.version.should.eq(version);
+
+    if (say) {
+      const proxy = await ImplV1.at(proxyInfo.address);
+      const said = await proxy.say();
+      said.should.eq(say);
+    }
+  }
+
   it('should create a proxy for one of its contracts', async function() {
     await createProxy({ contractAlias, packageFileName, network, txParams });
     const data = fs.parseJson(networkFileName);
-    const proxy0 = data.proxies[contractAlias][0];
-    proxy0.address.should.be.not.null;
-    proxy0.version.should.be.eq(defaultVersion);
+    await assertProxy(data.proxies[contractAlias][0], { version: defaultVersion, say: "V1" });
+  });
+
+  it('should refuse to create a proxy for an undefined contract', async function() {
+    await createProxy({ contractAlias: "NotExists", packageFileName, network, txParams }).should.be.rejectedWith(/not found/);
+  });
+
+  it('should refuse to create a proxy for an undeployed contract', async function() {
+    await addImplementation({ contractName, contractAlias: "NotDeployed", packageFileName });
+    await createProxy({ contractAlias: "NotDeployed", packageFileName, network, txParams }).should.be.rejectedWith(/not deployed/);
   });
 
   it('should be able to have multiple proxies for one of its contracts', async function() {
@@ -49,17 +73,48 @@ contract('create-proxy command', function([_, owner]) {
   });
 
   it('should be able to handle proxies for more than one contract', async function() {
-    const customAlias = 'SomeOtherAlias';
-    await addImplementation({ contractName: 'ImplV2', contractAlias: customAlias, packageFileName });
-    await sync({ packageFileName, network, txParams });
     await createProxy({ contractAlias, packageFileName, network, txParams });
-    await createProxy({ contractAlias: customAlias, packageFileName, network, txParams });
+    await createProxy({ contractAlias: anotherContractAlias, packageFileName, network, txParams });
     const data = fs.parseJson(networkFileName);
-    const proxy0 = data.proxies[contractAlias][0];
-    const proxy1 = data.proxies[customAlias][0];
-    proxy0.address.should.be.not.null;
-    proxy0.version.should.be.eq(defaultVersion);
-    proxy1.address.should.be.not.null;
-    proxy1.version.should.be.eq(defaultVersion);
+    await assertProxy(data.proxies[contractAlias][0], { version: defaultVersion, say: "V1" });
+    await assertProxy(data.proxies[anotherContractAlias][0], { version: defaultVersion, say: "AnotherV1" });
   });
+
+  describe('with stdlib', function () {
+    beforeEach('setting stdlib', async function () {
+      await setStdlib({ stdlibNameVersion: 'mock-stdlib@1.1.0', packageFileName });
+      await sync({ packageFileName, network, txParams, deployStdlib: true });
+    });
+
+    it('should create a proxy for a stdlib contract', async function () {
+      await createProxy({ contractAlias: 'Greeter', packageFileName, network, txParams });
+      const data = fs.parseJson(networkFileName);
+      await assertProxy(data.proxies['Greeter'][0], { version: defaultVersion });
+    });
+  });
+
+  describe('with local modifications', function () {
+    beforeEach("changing local network file to have a different bytecode", async function () {
+      const data = fs.parseJson(networkFileName);
+      data.contracts[contractAlias].bytecodeHash = "0xabcd";
+      fs.writeJson(networkFileName, data);
+    });
+
+    it('should refuse to create a proxy for a modified contract', async function () {
+      await createProxy({ contractAlias, packageFileName, network, txParams }).should.be.rejectedWith(/has changed/);
+    });
+
+    it('should create a proxy for an unmodified contract', async function () {
+      await createProxy({ contractAlias: anotherContractAlias, packageFileName, network, txParams });
+      const data = fs.parseJson(networkFileName);
+      await assertProxy(data.proxies[anotherContractAlias][0], { version: defaultVersion, say: "AnotherV1" });
+    });
+
+    it('should create a proxy for a modified contract if force is set', async function () {
+      await createProxy({ contractAlias, packageFileName, network, txParams, force: true });
+      const data = fs.parseJson(networkFileName);
+      await assertProxy(data.proxies[contractAlias][0], { version: defaultVersion, say: "V1" });
+    });
+  });
+  
 });

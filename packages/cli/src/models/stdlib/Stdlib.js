@@ -1,5 +1,6 @@
 import StdlibInstaller from './StdlibInstaller';
 import { FileSystem as fs } from 'zos-lib'
+import _ from 'lodash';
 
 export default class Stdlib {
   constructor(nameAndVersion) {
@@ -22,6 +23,11 @@ export default class Stdlib {
     this._packageJson = fs.parseJson(filename)
     return this._packageJson
   }
+
+  hasContract(alias) {
+    if (!this.getPackage().contracts) return false;
+    return !_.isEmpty(this.getPackage().contracts[alias]);
+  }
   
   async install() {
     await StdlibInstaller.call(this.nameAndVersion)
@@ -32,5 +38,10 @@ export default class Stdlib {
     this.name = name
     this.version = version
     this.nameAndVersion = nameAndVersion;
+  }
+
+  static equalNameAndVersion(stdlib1, stdlib2) {
+    return stdlib1.name === stdlib2.name
+      && (stdlib1.getVersion ? stdlib1.getVersion() : stdlib1.version) === (stdlib2.getVersion ? stdlib2.getVersion() : stdlib2.version);
   }
 }

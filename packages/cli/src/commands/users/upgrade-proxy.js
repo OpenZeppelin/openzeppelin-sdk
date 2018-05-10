@@ -12,6 +12,7 @@ module.exports = function(program) {
     .option('--all', 'Skip the alias option and set --all to upgrade all proxies in the application')
     .option('-f, --from <from>', 'Set the transactions sender')
     .option('-n, --network <network>', 'Provide a network to be used')
+    .option('--force', 'Force upgrading the proxy even if contracts have local modifications')
     .action(function (contractAlias, proxyAddress, options) {
       let initMethod = options.init
       if(typeof initMethod === 'boolean') initMethod = 'initialize'
@@ -20,7 +21,7 @@ module.exports = function(program) {
       if(typeof initArgs === 'string') initArgs = initArgs.split(",")
       else if(typeof initArgs === 'boolean' || initMethod) initArgs = []
 
-      const { from, network, all } = options
-      runWithTruffle(async () => await upgradeProxy({ contractAlias, proxyAddress, network, from, initMethod, initArgs, all }), network)
+      const { from, network, all, force } = options
+      runWithTruffle(async () => await upgradeProxy({ contractAlias, proxyAddress, network, from, initMethod, initArgs, all, force }), network)
     })
 }

@@ -8,7 +8,10 @@
   },
   "package": {
     "contracts": {
-      "Greeter": "0x102030"
+      "Greeter": {
+        "address": "0x102030",
+        "bytecodeHash": "0x0002"
+      }
     }
   }
 }
