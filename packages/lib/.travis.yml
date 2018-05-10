@@ -13,7 +13,7 @@ matrix:
     - env: SOLIDITY_COVERAGE=true
 script:
   - npm test
-  - cd examples/complex && npm i && npm test
+  - npm run prepack && cd examples/complex && npm i && npm test
 notifications:
   slack:
     rooms:
