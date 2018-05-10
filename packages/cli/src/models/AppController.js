@@ -20,6 +20,9 @@ export default class AppController {
   }
 
   init(name, version) {
+    if (fs.exists(this.packageFileName)) {
+      throw new Error(`Cannot overwrite existing file ${this.packageFileName}`)
+    }
     if (this.package.name) {
       throw new Error(`Cannot initialize already initialized package ${this.package.name}`)
     }
@@ -31,13 +34,9 @@ export default class AppController {
 
   newVersion(version) {
     if (!version) {
-      throw new Error('Missign required argument version for initializing new version')
+      throw new Error('Missing required argument version for initializing new version')
     }
     this.package.version = version;
-
-    // TODO: Do not clean up contracts listing and stdlib, inherit from previous version
-    this.package.contracts = {};
-    delete this.package['stdlib'];
   }
 
   async setStdlib(stdlibNameVersion, installDeps = false) {

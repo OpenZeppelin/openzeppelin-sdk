@@ -53,5 +53,10 @@ contract('init command', function() {
       data.stdlib.name.should.eq('mock-stdlib');
       data.stdlib.version.should.eq('1.1.0');
     });
+
+    it('should not overwrite existing file', async function () {
+      fs.writeJson(packageFileName, { app: 'previous' });
+      await init({ name: appName, version: defaultVersion, packageFileName }).should.be.rejectedWith(/exist/)
+    });
   });
 });
