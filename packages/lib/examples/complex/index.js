@@ -63,7 +63,7 @@ async function deployVersion2(appManager, donations, txParams) {
 async function getStdLib(txParams) {
 
   // Use deployed standard library, or simulate one in local networks.
-  if(!network || network === 'development') {
+  if(!network || network === 'local') {
     const stdlib = await ContractDirectory.new(txParams);
     const tokenImplementation = await MintableERC721Token.new();
     await stdlib.setImplementation(tokenClass, tokenImplementation.address, txParams);
