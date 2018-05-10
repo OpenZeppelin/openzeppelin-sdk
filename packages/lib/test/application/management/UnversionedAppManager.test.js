@@ -127,7 +127,7 @@ contract('UnversionedAppManager', ([_, managerOwner, directoryOwner, anotherAcco
     })
   })
 
-  describe('upgradeTo', function () {
+  describe('upgrade', function () {
     beforeEach(async function () {
       await this.directory.setImplementation(contract, this.implementation_v0, { from: directoryOwner })
       const { receipt } = await this.manager.create(contract)
@@ -142,7 +142,7 @@ contract('UnversionedAppManager', ([_, managerOwner, directoryOwner, anotherAcco
       const from = managerOwner
 
       it('upgrades to the requested implementation', async function () {
-        await this.manager.upgradeTo(this.proxyAddress, contract, { from })
+        await this.manager.upgrade(this.proxyAddress, contract, { from })
 
         const implementation = await this.proxy.implementation()
         assert.equal(implementation, this.implementation_v1)
@@ -153,12 +153,12 @@ contract('UnversionedAppManager', ([_, managerOwner, directoryOwner, anotherAcco
       const from = anotherAccount
 
       it('reverts', async function () {
-        await assertRevert(this.manager.upgradeTo(this.proxyAddress, contract, { from }))
+        await assertRevert(this.manager.upgrade(this.proxyAddress, contract, { from }))
       })
     })
   })
 
-  describe('upgradeToAndCall', function () {
+  describe('upgradeAndCall', function () {
     const initializeData = encodeCall('initialize', ['uint256'], [42])
 
     beforeEach(async function () {
@@ -176,7 +176,7 @@ contract('UnversionedAppManager', ([_, managerOwner, directoryOwner, anotherAcco
 
       beforeEach(async function () {
         await this.directory.setImplementation(contract, this.behavior.address, { from: directoryOwner })
-        await this.manager.upgradeToAndCall(this.proxyAddress, contract, initializeData, { from, value })
+        await this.manager.upgradeAndCall(this.proxyAddress, contract, initializeData, { from, value })
       })
 
       it('upgrades to the requested implementation', async function () {
@@ -207,7 +207,7 @@ contract('UnversionedAppManager', ([_, managerOwner, directoryOwner, anotherAcco
 
       it('reverts', async function () {
         await this.directory.setImplementation(contract, this.behavior.address, { from: directoryOwner })
-        await assertRevert(this.manager.upgradeToAndCall(this.proxyAddress, contract, initializeData, { from }))
+        await assertRevert(this.manager.upgradeAndCall(this.proxyAddress, contract, initializeData, { from }))
       })
     })
   })

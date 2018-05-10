@@ -61,22 +61,22 @@ contract BaseAppManager is Ownable {
   }
 
   /**
-   * @dev Upgrades a proxy to a new implementation of a contract
+   * @dev Upgrades a proxy to the newest implementation of a contract
    * @param proxy Proxy to be upgraded
    * @param contractName Name of the contract with a new implmentation
    */
-  function upgradeTo(OwnedUpgradeabilityProxy proxy, string contractName) public onlyOwner {
+  function upgrade(OwnedUpgradeabilityProxy proxy, string contractName) public onlyOwner {
     address implementation = getImplementation(contractName);
     proxy.upgradeTo(implementation);
   }
 
   /**
-   * @dev Upgrades a proxy to a new implementation of a contract and forwards it the function call packed in data
+   * @dev Upgrades a proxy to the newest implementation of a contract and forwards it the function call packed in data
    * @param proxy Proxy to be upgraded
    * @param contractName Name of the contract with a new implmentation
    * @param data Data to be sent as msg.data in the low level call. It should include the signature of the function to be called in the implementation together with its parameters, as described in https://solidity.readthedocs.io/en/develop/abi-spec.html#function-selector-and-argument-encoding.
    */
-  function upgradeToAndCall(OwnedUpgradeabilityProxy proxy, string contractName, bytes data) payable public onlyOwner {
+  function upgradeAndCall(OwnedUpgradeabilityProxy proxy, string contractName, bytes data) payable public onlyOwner {
     address implementation = getImplementation(contractName);
     proxy.upgradeToAndCall.value(msg.value)(implementation, data);
   }

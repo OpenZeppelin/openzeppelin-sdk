@@ -177,7 +177,7 @@ contract('PackagedAppManager', ([_, managerOwner, packageOwner, directoryOwner, 
       })
     })
 
-    describe('upgradeTo', function () {
+    describe('upgrade', function () {
       beforeEach(async function () {
         await this.zeroVersionDirectory.setImplementation(contract, this.implementation_v0, { from: directoryOwner })
         const { receipt } = await this.manager.create(contract)
@@ -199,7 +199,7 @@ contract('PackagedAppManager', ([_, managerOwner, packageOwner, directoryOwner, 
           })
 
           it('upgrades to the requested implementation', async function () {
-            await this.manager.upgradeTo(this.proxyAddress, contract, { from })
+            await this.manager.upgrade(this.proxyAddress, contract, { from })
 
             const implementation = await this.proxy.implementation()
             assert.equal(implementation, this.implementation_v1)
@@ -208,7 +208,7 @@ contract('PackagedAppManager', ([_, managerOwner, packageOwner, directoryOwner, 
 
         describe('when the requested contract was not registered for the new version', function () {
           it('reverts', async function () {
-            await assertRevert(this.manager.upgradeTo(this.proxyAddress, contract, { from }))
+            await assertRevert(this.manager.upgrade(this.proxyAddress, contract, { from }))
           })
         })
       })
@@ -218,12 +218,12 @@ contract('PackagedAppManager', ([_, managerOwner, packageOwner, directoryOwner, 
 
         it('reverts', async function () {
           await this.firstVersionDirectory.setImplementation(contract, this.implementation_v1, { from: directoryOwner })
-          await assertRevert(this.manager.upgradeTo(this.proxyAddress, contract, { from }))
+          await assertRevert(this.manager.upgrade(this.proxyAddress, contract, { from }))
         })
       })
     })
 
-    describe('upgradeToAndCall', function () {
+    describe('upgradeAndCall', function () {
       const initializeData = encodeCall('initialize', ['uint256'], [42])
 
       beforeEach(async function () {
@@ -246,7 +246,7 @@ contract('PackagedAppManager', ([_, managerOwner, packageOwner, directoryOwner, 
         describe('when the requested contract was registered for the new version', function () {
           beforeEach(async function () {
             await this.firstVersionDirectory.setImplementation(contract, this.behavior.address, { from: directoryOwner })
-            await this.manager.upgradeToAndCall(this.proxyAddress, contract, initializeData, { from, value })
+            await this.manager.upgradeAndCall(this.proxyAddress, contract, initializeData, { from, value })
           })
 
           it('upgrades to the requested implementation', async function () {
@@ -274,7 +274,7 @@ contract('PackagedAppManager', ([_, managerOwner, packageOwner, directoryOwner, 
 
         describe('when the requested contract was not registered for the new version', function () {
           it('reverts', async function () {
-            await assertRevert(this.manager.upgradeToAndCall(this.proxyAddress, contract, initializeData, { from, value }))
+            await assertRevert(this.manager.upgradeAndCall(this.proxyAddress, contract, initializeData, { from, value }))
           })
         })
       })
@@ -284,7 +284,7 @@ contract('PackagedAppManager', ([_, managerOwner, packageOwner, directoryOwner, 
 
         it('reverts', async function () {
           await this.firstVersionDirectory.setImplementation(contract, this.behavior.address, { from: directoryOwner })
-          await assertRevert(this.manager.upgradeToAndCall(this.proxyAddress, contract, initializeData, { from }))
+          await assertRevert(this.manager.upgradeAndCall(this.proxyAddress, contract, initializeData, { from }))
         })
       })
     })

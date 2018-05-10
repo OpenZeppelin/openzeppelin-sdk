@@ -1,3 +1,5 @@
+'use strict'
+
 import Logger from '../utils/Logger'
 import decodeLogs from '../helpers/decodeLogs'
 import encodeCall from '../helpers/encodeCall'
@@ -90,14 +92,14 @@ export default class AppManagerWrapper {
   }
 
   async _updateProxy(proxyAddress, contractName) {
-    return this.appManager.upgradeTo(proxyAddress, contractName, this.txParams)
+    return this.appManager.upgrade(proxyAddress, contractName, this.txParams)
   }
 
   async _updateProxyAndCall(proxyAddress, contractClass, contractName, initMethodName, initArgs) {
     const initMethod = this._validateInitMethod(contractClass, initMethodName, initArgs)
     const initArgTypes = initMethod.inputs.map(input => input.type)
     const callData = encodeCall(initMethodName, initArgTypes, initArgs)
-    return this.appManager.upgradeToAndCall(proxyAddress, contractName, callData, this.txParams)
+    return this.appManager.upgradeAndCall(proxyAddress, contractName, callData, this.txParams)
   }
 
   _validateInitMethod(contractClass, initMethodName, initArgs) {
