@@ -14,7 +14,7 @@ If you want a lower-level, programmatic development experience, see [`zos-lib`](
 
 To install `zos` simply run:
 ```sh
-npm i -g zos
+npm install --global zos
 ```
 Next, learn how to:
 
@@ -32,7 +32,7 @@ Next, learn how to:
 `zos` integrates with [Truffle](http://truffleframework.com/), an Ethereum development environment. Please install Truffle and initialize your project with it:
 
 ```sh
-npm install -g truffle
+npm install --global truffle
 mkdir myproject && cd myproject
 truffle init
 ```
@@ -53,7 +53,7 @@ zos init myproject 0.1 --network development
 Write your contracts as you would usually do, but replacing constructors with `initialize` functions. You can do this more easily by using the `Initializable` helper contract in [`zos-lib`](https://github.com/zeppelinos/zos-lib).
 
 ```sh
-npm i zos-lib
+npm install zos-lib
 ```
 
 - For an upgradeable contract development full example, see [the examples folder in `zos-lib`](https://github.com/zeppelinos/zos-lib/blob/master/examples/single/contracts/MyContract_v0.sol).
