@@ -159,6 +159,7 @@ export default class NetworkAppController {
     if (requestedVersion !== currentVersion) {
       log.info(`Creating new version ${requestedVersion}`);
       await this.appManagerWrapper.newVersion(requestedVersion);
+      this.networkPackage.contracts = {};
     }
     this.networkPackage.app.version = requestedVersion;
   }

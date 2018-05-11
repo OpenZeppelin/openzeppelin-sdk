@@ -114,6 +114,16 @@ contract('sync', function([_, owner]) {
       const newAddress = fs.parseJson(networkFileName).contracts["Impl"].address;
       origAddress.should.not.eq(newAddress);
     });
+
+    it('should upload contracts to new directory when bumping version', async function () {
+      const newPackageFileName = "test/mocks/packages/package-with-contracts-2.zos.json";
+      await sync({ packageFileName: newPackageFileName, networkFileName, network, from });
+      const address = fs.parseJson(networkFileName).contracts["Impl"].address;
+      const appManagerWrapper = await AppManagerProvider.from(fs.parseJson(networkFileName).app.address);
+      appManagerWrapper.version.should.eq('1.2.0');
+      const directory = appManagerWrapper.currentDirectory();
+      (await directory.getImplementation("Impl")).should.eq(address);
+    });
   });
 
   describe('a package with stdlib', function () {
