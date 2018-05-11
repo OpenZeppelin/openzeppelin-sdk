@@ -97,6 +97,13 @@ contract('sync', function([_, owner]) {
       origAddress.should.eq(newAddress);
     });
 
+    it('should redeploy unmodified contract if forced', async function () {
+      const origAddress = fs.parseJson(networkFileName).contracts["Impl"].address;
+      await sync({ packageFileName, network, from, reupload: true });
+      const newAddress = fs.parseJson(networkFileName).contracts["Impl"].address;
+      origAddress.should.not.eq(newAddress);
+    });
+
     it('should redeploy contracts if modified', async function () {
       const networkData = fs.parseJson(networkFileName);
       const origAddress = networkData.contracts["Impl"].address;

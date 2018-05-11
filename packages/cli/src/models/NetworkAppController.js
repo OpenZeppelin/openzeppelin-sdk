@@ -25,11 +25,11 @@ export default class NetworkAppController {
     }
   }
 
-  async sync() {
+  async sync(reupload = false) {
     await this.initApp()
     await this.syncVersion()
     await this.fetchProvider()
-    await this.uploadContracts()
+    await this.uploadContracts(reupload)
     await this.setStdlib()
   }
 
@@ -169,11 +169,11 @@ export default class NetworkAppController {
     this.networkPackage.provider = { address: currentProvider.address };
   }
 
-  async uploadContracts() {
+  async uploadContracts(reupload) {
     return Promise.all(
       _(this.package.contracts)
         .toPairs()
-        .filter(([contractAlias, contractName]) => this.hasContractChanged(contractAlias))
+        .filter(([contractAlias, contractName]) => reupload || this.hasContractChanged(contractAlias))
         .map(async ([contractAlias, contractName]) => {
           const contractClass = ContractsProvider.getFromArtifacts(contractName);
           log.info(`Uploading ${contractName} implementation for ${contractAlias}`);
