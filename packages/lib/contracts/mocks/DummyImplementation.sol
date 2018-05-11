@@ -7,11 +7,11 @@ contract DummyImplementation {
     value = _value;
   }
 
-  function get() public view returns (bool) {
+  function get() public pure returns (bool) {
     return true;
   }
 
-  function version() public view returns (string) {
+  function version() public pure returns (string) {
     return "V1";
   }
 }
@@ -21,7 +21,7 @@ contract DummyImplementationV2 is DummyImplementation {
     value = newVal;
   }
 
-  function version() public view returns (string) {
+  function version() public pure returns (string) {
     return "V2";
   }
 }
