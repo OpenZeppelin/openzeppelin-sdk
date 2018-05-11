@@ -1,4 +1,3 @@
-import Stdlib from "../models/stdlib/Stdlib";
 import AppController from  '../models/AppController'
 
 export default async function init({ name, version, stdlibNameVersion = undefined, installDeps = false, packageFileName = undefined }) {
