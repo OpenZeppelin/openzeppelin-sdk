@@ -2,7 +2,7 @@ pragma solidity ^0.4.21;
 
 import '../migrations/Migratable.sol';
 
-// Sample contracts for testing upgradeability and migrations with multiple inheritance
+// Sample contracts showing upgradeability and migrations with multiple inheritance
 // Child contract inherits from Father and Mother contracts, and Father extends from Gramps
 // 
 //              Gramps

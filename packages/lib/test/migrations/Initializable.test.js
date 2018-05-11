@@ -1,3 +1,5 @@
+'use strict';
+
 import assertRevert from '../../src/helpers/assertRevert';
 
 const assert = require('chai').assert;
@@ -10,18 +12,18 @@ contract('Initializable', function () {
   });
 
   it('should not be initialized before initialize', async function () {
-    assert.isFalse(await this.contract.isInitialized());
+    assert.isFalse(await this.contract.initialized());
   });
 
   it('should be initialized after initialize', async function () {
     await this.contract.initialize();
-    assert.isTrue(await this.contract.isInitialized());
+    assert.isTrue(await this.contract.initialized());
   });
 
   it('should fail to initialize twice', async function () {
     await this.contract.initialize();
     await assertRevert(this.contract.initialize());
-    assert.isTrue(await this.contract.isInitialized());
+    assert.isTrue(await this.contract.initialized());
   });
 
 });
