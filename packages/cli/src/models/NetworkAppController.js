@@ -170,17 +170,21 @@ export default class NetworkAppController {
   }
 
   async uploadContracts() {
-    // TODO: Store the implementation's hash or full source/byte code to avoid unnecessary deployments
-    return Promise.all(_.map(this.package.contracts, async (contractName, contractAlias) => {
-      const contractClass = ContractsProvider.getFromArtifacts(contractName);
-      log.info(`Uploading ${contractName} implementation for ${contractAlias}`);
-      const contractInstance = await this.appManagerWrapper.setImplementation(contractClass, contractAlias);
-      log.info(`Uploaded ${contractName} at ${contractInstance.address}`);
-      this.networkPackage.contracts[contractAlias] = {
-        address: contractInstance.address,
-        bytecodeHash: bytecodeDigest(contractClass.bytecode)
-      };
-    }));
+    return Promise.all(
+      _(this.package.contracts)
+        .toPairs()
+        .filter(([contractAlias, contractName]) => this.hasContractChanged(contractAlias))
+        .map(async ([contractAlias, contractName]) => {
+          const contractClass = ContractsProvider.getFromArtifacts(contractName);
+          log.info(`Uploading ${contractName} implementation for ${contractAlias}`);
+          const contractInstance = await this.appManagerWrapper.setImplementation(contractClass, contractAlias);
+          log.info(`Uploaded ${contractName} at ${contractInstance.address}`);
+          this.networkPackage.contracts[contractAlias] = {
+            address: contractInstance.address,
+            bytecodeHash: bytecodeDigest(contractClass.bytecode)
+          };
+        }).value()
+    );
   }
 
   async setStdlib() {
