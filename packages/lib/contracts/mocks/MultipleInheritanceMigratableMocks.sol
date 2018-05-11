@@ -6,9 +6,9 @@ import '../migrations/Migratable.sol';
 // Child contract inherits from Father and Mother contracts, and Father extends from Gramps
 // 
 //              Gramps
-//                ↑
+//                |
 //    Mother    Father
-//      ↑         ↑
+//      |         |
 //      -- Child --
 //
 

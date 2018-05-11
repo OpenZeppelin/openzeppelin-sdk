@@ -6,7 +6,7 @@ pragma solidity ^0.4.21;
  */
 interface ContractProvider {
   /**
-   * @dev prototype of function that returns implementation addresses
+   * @dev Prototype of function that returns implementation addresses
    * @param contractName Name of the contract whose address is being fetched
    * @return Implementation address of desired contract
    */

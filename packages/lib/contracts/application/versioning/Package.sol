@@ -5,24 +5,24 @@ import "zeppelin-solidity/contracts/ownership/Ownable.sol";
 
 /**
  * @title Package
- * @dev Complex directory of contracts that groups contracts into versions
- * @dev Contracts with the same name can have different implementation addresses in the different versions
+ * @dev Complex collection of contracts that groups contracts into versions
+ * @dev Contracts with the same name can have different implementation addresses in different versions
  */
 contract Package is Ownable {
   /**
-   * @dev This event signals the addition of a version to the directory
-   * @dev version is not indexed due to truffle testing constraints
-   * @param version Name of the version for which a directory was added
-   * @param provider ContractProvider associated to the added version
+   * @dev This event signals the addition of a version to the package
+   * @dev Version is not indexed due to truffle testing constraints
+   * @param version Name of the version added
+   * @param provider ContractProvider associated with the added version
    */
   event VersionAdded(string version, ContractProvider provider);
 
-  // mapping that stores the association between versions and their contract providers
+  // Mapping that stores the association between versions and their contract providers
   mapping (string => ContractProvider) internal versions;
   
   /**
    * @dev Gets the contract provider for a given version
-   * @param version Name of the version whose contract provider
+   * @param version name of the version
    * @return Contract provider for the given version
    */
   function getVersion(string version) public view returns (ContractProvider) {
@@ -32,9 +32,9 @@ contract Package is Ownable {
   }
 
   /**
-   * @dev Adds the contract provider of a new version to the directory
+   * @dev Adds the contract provider of a new version to the package
    * @param version Name of the new version
-   * @param provider ContractProvider associated to the new version
+   * @param provider ContractProvider associated with the new version
    */
   function addVersion(string version, ContractProvider provider) public onlyOwner {
     require(!hasVersion(version));
@@ -43,9 +43,9 @@ contract Package is Ownable {
   }
 
   /**
-   * @dev Checks whether a version is present in the directory
+   * @dev Checks whether a version is present in the package
    * @param version Name of the version to be checked for
-   * @return Whether the version is already in the directory
+   * @return true if the version is already in the package
    */
   function hasVersion(string version) public view returns (bool) {
     return address(versions[version]) != address(0);
@@ -53,8 +53,8 @@ contract Package is Ownable {
 
   /**
    * @dev Gets the implementation address for a given version and contract name
-   * @param version Name of the version where the implementation address is to be fetched
-   * @param contractName Name of the contract whose implementation address is desired
+   * @param version Name of the version where the implementation address is fetched
+   * @param contractName Name of the contract whose implementation address is requested
    * @return Address where the contract is implemented
    */
   function getImplementation(string version, string contractName) public view returns (address) {

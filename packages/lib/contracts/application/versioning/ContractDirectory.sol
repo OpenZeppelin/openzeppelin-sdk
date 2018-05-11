@@ -15,7 +15,7 @@ contract ContractDirectory is ContractProvider, Ownable {
    */
   event ImplementationChanged(string contractName, address implementation);
 
-  // mapping where the addresses of the implementations are stored
+  // Mapping where the addresses of the implementations are stored
   mapping (string => address) internal implementations;
   
   /**
@@ -29,7 +29,7 @@ contract ContractDirectory is ContractProvider, Ownable {
   
   /**
    * @dev Adds the address of a contract implementation to the directory
-   * @param contractName Name of the contract whose implementation address is being added
+   * @param contractName Name of the contract whose implementation address is added
    * @param implementation Address where the added contract is implemented
    */
   function setImplementation(string contractName, address implementation) public onlyOwner {

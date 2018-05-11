@@ -7,7 +7,7 @@ import "./ContractDirectory.sol";
  * @dev Contract directory which can be made irreversibly immutable by the owner 
  */
  contract FreezableContractDirectory is ContractDirectory {
-  // stores the mutability state of the directory
+  // Stores the mutability state of the directory
   bool public frozen;
 
   /**
@@ -19,7 +19,7 @@ import "./ContractDirectory.sol";
   }
   
   /**
-   * @dev Makes the directory irreversibly immutable. Can only be called once, by the owner.
+   * @dev Makes the directory irreversibly immutable. Can only be called once, by the owner
    */
   function freeze() onlyOwner whenNotFrozen public {
     frozen = true;
@@ -27,7 +27,7 @@ import "./ContractDirectory.sol";
   
   /**
    * @dev Adds the address of a contract implementation to the directory
-   * @dev Overrides parent implementation to prevent it from running if the directory is fro
+   * @dev Overrides parent implementation to prevent it from running if the directory is frozen
    * @param contractName Name of the contract whose implementation address is being added
    * @param implementation Address where the added contract is implemented
    */

@@ -31,7 +31,7 @@ contract PackagedAppManager is BaseAppManager {
   }
 
   /**
-   * @dev Changes to a new version
+   * @dev Changes the application's current version
    * @dev Contract implementations for the given version must already be registered in the package
    * @param newVersion Name of the new version
    */
