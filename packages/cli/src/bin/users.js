@@ -5,6 +5,7 @@ const createProxy = require('../commands/users/create-proxy')
 const newVersion = require('../commands/users/new-version')
 const upgradeProxy = require('../commands/users/upgrade-proxy')
 const setStdlib = require('../commands/users/set-stdlib')
+const status = require('../commands/users/status')
 
 module.exports = function registerUserCommands(program) {
   init(program)
@@ -14,4 +15,5 @@ module.exports = function registerUserCommands(program) {
   newVersion(program)
   upgradeProxy(program)
   setStdlib(program)
+  status(program)
 }
