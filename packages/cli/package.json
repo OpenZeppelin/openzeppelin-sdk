@@ -36,7 +36,6 @@
     "truffle-config": "^1.0.4",
     "truffle-contract": "^3.0.5",
     "truffle-core": "^4.1.7",
-    "truffle-provisioner": "^0.1.0",
     "zos-kernel": "^0.1.5",
     "zos-lib": "^0.1.10"
   },
