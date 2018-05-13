@@ -5,12 +5,15 @@ import 'zeppelin-solidity/contracts/AddressUtils.sol';
 
 /**
  * @title UpgradeabilityProxy
- * @dev A proxy where the implementation address can be upgraded
+ *
+ * @dev This contract implements a proxy where the implementation address to
+ * @dev which it will delegate can be changed. Such a change is called an
+ * @dev implementation upgrade.
  */
 contract UpgradeabilityProxy is Proxy {
   /**
-   * @dev Event emitted every time the implementation gets upgraded
-   * @param implementation the address of the upgraded code
+   * @dev This event will be emitted every time the implementation is upgraded.
+   * @param implementation address of the new implementation
    */
   event Upgraded(address implementation);
 
@@ -18,43 +21,46 @@ contract UpgradeabilityProxy is Proxy {
   bytes32 private constant implementationSlot = keccak256("org.zeppelinos.proxy.implementation");
 
   /**
-   * @dev Constructor function
-   * @param _implementation the address of the initial implementation to be set
+   * @param _implementation address of the initial implementation
    */
   function UpgradeabilityProxy(address _implementation) public {
     _setImplementation(_implementation);
   }
 
   /**
+   * @dev Getter for the org.zeppelinos.proxy.implementation slot.
    * @return address of the current implementation
    */
-  function implementation() public view returns (address impl) {
+  function _implementation() internal view returns (address impl) {
     bytes32 slot = implementationSlot;
+
     assembly {
       impl := sload(slot)
     }
   }
 
   /**
-   * @dev Sets the address of the current implementation
-   * @param newImplementation Address the new implementation to be set
+   * @dev Upgrades the proxy to a new implementation.
+   * @param newImplementation address of the new implementation
    */
-  function _setImplementation(address newImplementation) internal {
-    require(AddressUtils.isContract(newImplementation));
-
-    bytes32 slot = implementationSlot;
-    assembly {
-      sstore(slot, newImplementation)
-    }
+  function _upgradeTo(address newImplementation) internal {
+    _setImplementation(newImplementation);
 
     emit Upgraded(newImplementation);
   }
 
   /**
-   * @dev Upgrades the implementation address
-   * @param newImplementation The address of the new implementation to be set
+   * @dev Setter for the org.zeppelinos.proxy.implementation slot.
+   * @dev Sets the implementation address of the proxy.
+   * @param newImplementation address of the new implementation
    */
-  function _upgradeTo(address newImplementation) internal {
-    _setImplementation(newImplementation);
+  function _setImplementation(address newImplementation) private {
+    require(AddressUtils.isContract(newImplementation));
+
+    bytes32 slot = implementationSlot;
+
+    assembly {
+      sstore(slot, newImplementation)
+    }
   }
 }

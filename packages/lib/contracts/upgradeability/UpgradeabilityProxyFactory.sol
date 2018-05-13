@@ -35,8 +35,8 @@ contract UpgradeabilityProxyFactory {
    */
   function createProxyAndCall(address owner, address implementation, bytes data) public payable returns (OwnedUpgradeabilityProxy) {
     OwnedUpgradeabilityProxy proxy = _createProxy(implementation);
-    require(proxy.call.value(msg.value)(data));
     proxy.transferProxyOwnership(owner);
+    require(proxy.call.value(msg.value)(data));
     return proxy;
   }
 

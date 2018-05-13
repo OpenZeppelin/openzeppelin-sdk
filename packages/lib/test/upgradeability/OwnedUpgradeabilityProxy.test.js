@@ -6,6 +6,8 @@ const MigratableMockV2 = artifacts.require('MigratableMockV2')
 const MigratableMockV3 = artifacts.require('MigratableMockV3')
 const MigratableMock = artifacts.require('MigratableMock')
 const DummyImplementation = artifacts.require('DummyImplementation')
+const ClashingImplementation = artifacts.require('ClashingImplementation')
+
 const OwnedUpgradeabilityProxy = artifacts.require('OwnedUpgradeabilityProxy')
 const UpgradeabilityProxyFactory = artifacts.require('UpgradeabilityProxyFactory')
 
@@ -22,7 +24,7 @@ contract('OwnedUpgradeabilityProxy', ([_, owner, anotherAccount]) => {
 
   describe('implementation', function () {
     it('returns the current implementation address', async function () {
-      const implementation = await this.proxy.implementation()
+      const implementation = await this.proxy.implementation({ from: owner })
 
       assert.equal(implementation, this.implementation_v0)
     })
@@ -43,7 +45,7 @@ contract('OwnedUpgradeabilityProxy', ([_, owner, anotherAccount]) => {
         it('upgrades to the requested implementation', async function () {
           await this.proxy.upgradeTo(this.implementation_v1, { from })
 
-          const implementation = await this.proxy.implementation()
+          const implementation = await this.proxy.implementation({ from: owner })
           assert.equal(implementation, this.implementation_v1)
         })
 
@@ -90,7 +92,7 @@ contract('OwnedUpgradeabilityProxy', ([_, owner, anotherAccount]) => {
           })
 
           it('upgrades to the requested implementation', async function () {
-            const implementation = await this.proxy.implementation()
+            const implementation = await this.proxy.implementation({ from: owner })
             assert.equal(implementation, this.behavior.address)
           })
 
@@ -151,7 +153,7 @@ contract('OwnedUpgradeabilityProxy', ([_, owner, anotherAccount]) => {
           })
 
           it('upgrades to the requested version and emits an event', async function () {
-            const implementation = await this.proxy.implementation()
+            const implementation = await this.proxy.implementation({ from: owner })
             assert.equal(implementation, this.behavior_v1.address)
             assert.equal(this.logs.length, 1)
             assert.equal(this.logs[0].event, 'Upgraded')
@@ -178,7 +180,7 @@ contract('OwnedUpgradeabilityProxy', ([_, owner, anotherAccount]) => {
             })
 
             it('upgrades to the requested version and emits an event', async function () {
-              const implementation = await this.proxy.implementation()
+              const implementation = await this.proxy.implementation({ from: owner })
               assert.equal(implementation, this.behavior_v2.address)
               assert.equal(this.logs.length, 1)
               assert.equal(this.logs[0].event, 'Upgraded')
@@ -208,7 +210,7 @@ contract('OwnedUpgradeabilityProxy', ([_, owner, anotherAccount]) => {
               })
 
               it('upgrades to the requested version and emits an event', async function () {
-                const implementation = await this.proxy.implementation()
+                const implementation = await this.proxy.implementation({ from: owner })
                 assert.equal(implementation, this.behavior_v3.address)
                 assert.equal(this.logs.length, 1)
                 assert.equal(this.logs[0].event, 'Upgraded')
@@ -249,22 +251,21 @@ contract('OwnedUpgradeabilityProxy', ([_, owner, anotherAccount]) => {
       const newOwner = anotherAccount
 
       describe('when the sender is the owner', function () {
-        const from = owner
+        beforeEach('transferring', async function () {
+          const { logs } = await this.proxy.transferProxyOwnership(newOwner, { from: owner })
+          this.logs = logs
+        })
 
-        it('transfers the ownership', async function () {
-          await this.proxy.transferProxyOwnership(newOwner, { from })
-
-          const proxyOwner = await this.proxy.proxyOwner()
+        it('assigns new proxy owner', async function () {
+          const proxyOwner = await this.proxy.proxyOwner({ from: newOwner })
           assert.equal(proxyOwner, anotherAccount)
         })
 
         it('emits an event', async function () {
-          const { logs } = await this.proxy.transferProxyOwnership(newOwner, { from })
-
-          assert.equal(logs.length, 1)
-          assert.equal(logs[0].event, 'ProxyOwnershipTransferred')
-          assert.equal(logs[0].args.previousOwner, owner)
-          assert.equal(logs[0].args.newOwner, newOwner)
+          assert.equal(this.logs.length, 1)
+          assert.equal(this.logs[0].event, 'ProxyOwnershipTransferred')
+          assert.equal(this.logs[0].args.previousOwner, owner)
+          assert.equal(this.logs[0].args.newOwner, newOwner)
         })
       })
 
@@ -301,4 +302,29 @@ contract('OwnedUpgradeabilityProxy', ([_, owner, anotherAccount]) => {
       assert.equal(proxyOwner, owner);
     })
   })
+
+  describe('transparent proxy', function () {
+    beforeEach('creating proxy', async function () {
+      this.impl = await ClashingImplementation.new();
+      this.proxy = await OwnedUpgradeabilityProxy.new(this.impl.address, { from: owner });
+
+      this.clashing = ClashingImplementation.at(this.proxy.address);
+    });
+
+    it('proxy owner cannot call delegated functions', async function () {
+      await assertRevert(this.clashing.delegatedFunction({ from: owner }));
+    });
+
+    context('when function names clash', function () {
+      it('when sender is proxy owner should run the proxy function', async function () {
+        const value = await this.proxy.proxyOwner({ from: owner });
+        assert.equal(value, owner);
+      });
+
+      it('when sender is other should delegate to implementation', async function () {
+        const value = await this.proxy.proxyOwner({ from: anotherAccount });
+        assert.equal(value, '0x0000000000000000000000000000000011111142')
+      });
+    });
+  });
 })

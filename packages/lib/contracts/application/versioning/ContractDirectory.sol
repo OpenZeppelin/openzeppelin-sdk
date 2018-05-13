@@ -17,7 +17,7 @@ contract ContractDirectory is ContractProvider, Ownable {
 
   // Mapping where the addresses of the implementations are stored
   mapping (string => address) internal implementations;
-  
+
   /**
    * @dev Gets the implementation address for a given contract name
    * @param contractName Name of the contract whose implementation address is desired
@@ -26,7 +26,7 @@ contract ContractDirectory is ContractProvider, Ownable {
   function getImplementation(string contractName) public view returns (address) {
     return implementations[contractName];
   }
-  
+
   /**
    * @dev Adds the address of a contract implementation to the directory
    * @param contractName Name of the contract whose implementation address is added

@@ -86,4 +86,21 @@ contract BaseAppManager is Ownable {
     address implementation = getImplementation(contractName);
     proxy.upgradeToAndCall.value(msg.value)(implementation, data);
   }
+
+  /**
+   * @dev Gets the implementation for one of the owned proxies.
+   * @dev It's necessary to have this here because only the proxy owner can query it.
+   * @return the address of the current implemetation of the given proxy
+   */
+  function getProxyImplementation(OwnedUpgradeabilityProxy proxy) public view returns (address) {
+    return proxy.implementation();
+  }
+
+  /**
+   * @dev Gets an owned proxy's owner. Necessary because only the owner can query it.
+   * @return the address of the current proxy owner of the given proxy
+   */
+  function getProxyOwner(OwnedUpgradeabilityProxy proxy) public view returns (address) {
+    return proxy.proxyOwner();
+  }
 }
