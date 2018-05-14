@@ -98,7 +98,7 @@ contract('status command', function([_, owner]) {
       await addImplementation({ contractName, contractAlias, packageFileName });
       await status({ network, packageFileName, networkFileName, logger });
 
-      logger.text.should.match(/contracts:(.+)not deployed/si);
+      logger.text.should.match(/not deployed/i);
     });
 
     it('should log out-of-sync contract', async function () {
@@ -108,7 +108,7 @@ contract('status command', function([_, owner]) {
       await addImplementation({ contractName: anotherContractName, contractAlias, packageFileName });
       await status({ network, packageFileName, networkFileName, logger });
 
-      logger.text.should.match(/contracts:(.+)out of date/si);
+      logger.text.should.match(/out of date/i);
     });
 
     it('should log deployed contract', async function () {
@@ -117,7 +117,7 @@ contract('status command', function([_, owner]) {
       await sync({ packageFileName, network, txParams });
       await status({ network, packageFileName, networkFileName, logger });
 
-      logger.text.should.match(/contracts:(.+)is deployed and up to date/si);
+      logger.text.should.match(/is deployed and up to date/i);
     });    
   });
 
@@ -128,8 +128,8 @@ contract('status command', function([_, owner]) {
       await setStdlib({ packageFileName, stdlibNameVersion, installDeps: false });
       await status({ network, packageFileName, networkFileName, logger });
 
-      logger.text.should.match(/standard library:(.+)mock-stdlib@0.1.0 required/si);
-      logger.text.should.match(/standard library:(.+)no stdlib is deployed/si);
+      logger.text.should.match(/mock-stdlib@0.1.0 required/i);
+      logger.text.should.match(/no stdlib is deployed/i);
     });
 
     it('should log connected stdlib', async function () {
@@ -137,8 +137,8 @@ contract('status command', function([_, owner]) {
       await sync({ packageFileName, network, txParams });
       await status({ network, packageFileName, networkFileName, logger });
 
-      logger.text.should.match(/standard library:(.+)mock-stdlib@0.1.0 required/si);
-      logger.text.should.match(/standard library:(.+)correctly connected to stdlib/si);
+      logger.text.should.match(/mock-stdlib@0.1.0 required/i);
+      logger.text.should.match(/correctly connected to stdlib/i);
     });
 
     it('should log different stdlib connected', async function () {
@@ -147,8 +147,8 @@ contract('status command', function([_, owner]) {
       await setStdlib({ packageFileName, stdlibNameVersion: 'mock-stdlib-2@0.2.0', installDeps: false });
       await status({ network, packageFileName, networkFileName, logger });
 
-      logger.text.should.match(/standard library:(.+)mock-stdlib-2@0.2.0 required/si);
-      logger.text.should.match(/standard library:(.+)connected to different stdlib mock-stdlib@0.1.0/si);
+      logger.text.should.match(/mock-stdlib-2@0.2.0 required/i);
+      logger.text.should.match(/connected to different stdlib mock-stdlib@0.1.0/i);
     });
 
     it('should log deployed stdlib', async function () {
@@ -156,8 +156,8 @@ contract('status command', function([_, owner]) {
       await sync({ packageFileName, network, txParams, deployStdlib: true });
       await status({ network, packageFileName, networkFileName, logger });
 
-      logger.text.should.match(/standard library:(.+)mock-stdlib@0.1.0 required/si);
-      logger.text.should.match(/standard library:(.+)custom deploy of stdlib set at 0x[0-9a-fA-F]{40}/si);
+      logger.text.should.match(/mock-stdlib@0.1.0 required/i);
+      logger.text.should.match(/custom deploy of stdlib set at 0x[0-9a-fA-F]{40}/i);
     });
 
     it('should log different stdlib connected', async function () {
@@ -166,8 +166,8 @@ contract('status command', function([_, owner]) {
       await setStdlib({ packageFileName, stdlibNameVersion: 'mock-stdlib-2@0.2.0', installDeps: false });
       await status({ network, packageFileName, networkFileName, logger });
 
-      logger.text.should.match(/standard library:(.+)mock-stdlib-2@0.2.0 required/si);
-      logger.text.should.match(/standard library:(.+)custom deploy of different stdlib mock-stdlib@0.1.0 at 0x[0-9a-fA-F]{40}/si);
+      logger.text.should.match(/mock-stdlib-2@0.2.0 required/i);
+      logger.text.should.match(/custom deploy of different stdlib mock-stdlib@0.1.0 at 0x[0-9a-fA-F]{40}/i);
     });
   });
 
@@ -178,7 +178,7 @@ contract('status command', function([_, owner]) {
       await sync({ packageFileName, network, txParams });
       await status({ network, packageFileName, networkFileName, logger });
 
-      logger.text.should.match(/deployed proxies:(.+)no proxies/si);
+      logger.text.should.match(/no proxies/i);
     });
 
     it('should log created proxies', async function () {
@@ -188,7 +188,7 @@ contract('status command', function([_, owner]) {
       await createProxy({ contractAlias, network, txParams, packageFileName, networkFileName });
       await status({ network, packageFileName, networkFileName, logger });
       
-      logger.text.should.match(/deployed proxies:(.+)Impl at 0x[0-9a-fA-F]{40} version 0.1.0/si);
+      logger.text.should.match(/Impl at 0x[0-9a-fA-F]{40} version 0.1.0/i);
     });
   });
 });
