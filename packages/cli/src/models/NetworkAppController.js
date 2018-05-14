@@ -175,17 +175,19 @@ export default class NetworkAppController {
       _(this.package.contracts)
         .toPairs()
         .filter(([contractAlias, contractName]) => reupload || this.hasContractChanged(contractAlias))
-        .map(async ([contractAlias, contractName]) => {
-          const contractClass = ContractsProvider.getFromArtifacts(contractName);
-          log.info(`Uploading ${contractName} implementation for ${contractAlias}`);
-          const contractInstance = await this.appManagerWrapper.setImplementation(contractClass, contractAlias);
-          log.info(`Uploaded ${contractName} at ${contractInstance.address}`);
-          this.networkPackage.contracts[contractAlias] = {
-            address: contractInstance.address,
-            bytecodeHash: bytecodeDigest(contractClass.bytecode)
-          };
-        }).value()
+        .map(([contractAlias, contractName]) => this.uploadContract(contractAlias, contractName))
     );
+  }
+
+  async uploadContract(contractAlias, contractName) {
+    const contractClass = ContractsProvider.getFromArtifacts(contractName);
+    log.info(`Uploading ${contractName} implementation for ${contractAlias}`);
+    const contractInstance = await this.appManagerWrapper.setImplementation(contractClass, contractAlias);
+    log.info(`Uploaded ${contractName} at ${contractInstance.address}`);
+    this.networkPackage.contracts[contractAlias] = {
+      address: contractInstance.address,
+      bytecodeHash: bytecodeDigest(contractClass.bytecode)
+    };
   }
 
   async setStdlib() {
