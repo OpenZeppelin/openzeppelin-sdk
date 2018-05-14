@@ -66,8 +66,8 @@ contract('upgrade-proxy command', function([_, owner]) {
 
     beforeEach('setup', async function() {
       await init({ name: appName, version: v1string, packageFileName });
-      await addImplementation({ contractName: "ImplV1", contractAlias: "Impl", packageFileName });
-      await addImplementation({ contractName: "AnotherImplV1", contractAlias: "AnotherImpl", packageFileName });
+      const contractsData = [{ name: 'ImplV1', alias: 'Impl' }, { name: 'AnotherImplV1', alias: 'AnotherImpl' }]
+      await addImplementation({ contractsData, packageFileName });
       await sync({ packageFileName, network, txParams });
 
       const networkDataV1 = fs.parseJson(networkFileName);
@@ -79,8 +79,8 @@ contract('upgrade-proxy command', function([_, owner]) {
       await createProxy({ contractAlias: "AnotherImpl", packageFileName, network, txParams });
 
       await newVersion({ version: v2string, packageFileName, txParams });
-      await addImplementation({ contractName: "ImplV2", contractAlias: "Impl", packageFileName });
-      await addImplementation({ contractName: "AnotherImplV2", contractAlias: "AnotherImpl", packageFileName });
+      const newContractsData = [{ name: 'ImplV2', alias: 'Impl' }, { name: 'AnotherImplV2', alias: 'AnotherImpl' }]
+      await addImplementation({ contractsData: newContractsData, packageFileName });
       await sync({ packageFileName, network, txParams });
 
       const networkDataV2 = fs.parseJson(networkFileName);

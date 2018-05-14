@@ -20,8 +20,8 @@ contract('status command', function([_, owner]) {
   const appName = "MyApp";
   const contractName = "ImplV1";
   const contractAlias = "Impl";
+  const contractsData = [{ name: contractName, alias: contractAlias }]
   const anotherContractName = "AnotherImplV1";
-  const anotherContractAlias = "AnotherImpl";
   const version = "0.1.0";
   const network = "test";
   const stdlibNameVersion = 'mock-stdlib@0.1.0';
@@ -75,7 +75,7 @@ contract('status command', function([_, owner]) {
     it('should log contract name when different to alias', async function () {
       await init({ name: appName, version, packageFileName });
       await sync({ packageFileName, network, txParams });
-      await addImplementation({ contractName, contractAlias, packageFileName });
+      await addImplementation({ contractsData, packageFileName });
       await status({ network, packageFileName, networkFileName, logger });
 
       logger.text.should.match(/Impl/i);
@@ -85,7 +85,7 @@ contract('status command', function([_, owner]) {
     it('should not log contract name when matches alias', async function () {
       await init({ name: appName, version, packageFileName });
       await sync({ packageFileName, network, txParams });
-      await addImplementation({ contractName: anotherContractName, packageFileName });
+      await addImplementation({ contractsData: [{ name: anotherContractName }], packageFileName });
       await status({ network, packageFileName, networkFileName, logger });
 
       logger.text.should.match(/AnotherImplV1/i);
@@ -95,7 +95,7 @@ contract('status command', function([_, owner]) {
     it('should log undeployed contract', async function () {
       await init({ name: appName, version, packageFileName });
       await sync({ packageFileName, network, txParams });
-      await addImplementation({ contractName, contractAlias, packageFileName });
+      await addImplementation({ contractsData, packageFileName });
       await status({ network, packageFileName, networkFileName, logger });
 
       logger.text.should.match(/not deployed/i);
@@ -103,9 +103,9 @@ contract('status command', function([_, owner]) {
 
     it('should log out-of-sync contract', async function () {
       await init({ name: appName, version, packageFileName });
-      await addImplementation({ contractName, contractAlias, packageFileName });
+      await addImplementation({ contractsData, packageFileName });
       await sync({ packageFileName, network, txParams });
-      await addImplementation({ contractName: anotherContractName, contractAlias, packageFileName });
+      await addImplementation({ contractsData: [{ name: anotherContractName, alias: contractAlias }], packageFileName });
       await status({ network, packageFileName, networkFileName, logger });
 
       logger.text.should.match(/out of date/i);
@@ -113,7 +113,7 @@ contract('status command', function([_, owner]) {
 
     it('should log deployed contract', async function () {
       await init({ name: appName, version, packageFileName });
-      await addImplementation({ contractName, contractAlias, packageFileName });
+      await addImplementation({ contractsData, packageFileName });
       await sync({ packageFileName, network, txParams });
       await status({ network, packageFileName, networkFileName, logger });
 
@@ -174,7 +174,7 @@ contract('status command', function([_, owner]) {
   describe('proxies', function () {
     it('should log no proxies', async function () {
       await init({ name: appName, version, packageFileName });
-      await addImplementation({ contractName, contractAlias, packageFileName });
+      await addImplementation({ contractsData, packageFileName });
       await sync({ packageFileName, network, txParams });
       await status({ network, packageFileName, networkFileName, logger });
 
@@ -183,7 +183,7 @@ contract('status command', function([_, owner]) {
 
     it('should log created proxies', async function () {
       await init({ name: appName, version, packageFileName });
-      await addImplementation({ contractName, contractAlias, packageFileName });
+      await addImplementation({ contractsData, packageFileName });
       await sync({ packageFileName, network, txParams });
       await createProxy({ contractAlias, network, txParams, packageFileName, networkFileName });
       await status({ network, packageFileName, networkFileName, logger });

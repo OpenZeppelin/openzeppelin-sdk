@@ -1,10 +1,12 @@
 import AppController from "../models/AppController";
 
-export default function addImplementation({ contractName, contractAlias = contractName, packageFileName = undefined }) {
-  if (!contractName) throw Error('A contract name must be provided to add a new implementation.')
+export default function addImplementation({ contractsData, packageFileName = undefined }) {
+  if (contractsData.length === 0) throw new Error('At least one contract name must be provided to add a new implementation.')
 
   const appController = new AppController(packageFileName)
-  appController.validateImplementation(contractName)
-  appController.addImplementation(contractAlias, contractName)
+  contractsData.forEach(({ name, alias }) => {
+    appController.validateImplementation(name)
+    appController.addImplementation(alias || name, name)
+  })
   appController.writePackage()
 }

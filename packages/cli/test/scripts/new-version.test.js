@@ -29,7 +29,7 @@ contract('new-version command', function() {
 
   it('should preserve added implementations', async function() {
     const version = '0.2.0';
-    await addImplementation({ contractName: "ImplV1", packageFileName });
+    await addImplementation({ contractsData: [{ name: "ImplV1" }], packageFileName });
     await newVersion({ version, packageFileName });
     const data = fs.parseJson(packageFileName);
     data.version.should.eq(version);

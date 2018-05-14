@@ -21,6 +21,7 @@ contract('create-proxy command', function([_, owner]) {
   const contractAlias = "Impl";
   const anotherContractName = "AnotherImplV1";
   const anotherContractAlias = "AnotherImpl";
+  const contractsData = [{ name: contractName, alias: contractAlias}, { name: anotherContractName, alias: anotherContractAlias }]
   const defaultVersion = "0.1.0";
   const network = "test";
   const packageFileName = "test/tmp/package.zos.json";
@@ -30,8 +31,7 @@ contract('create-proxy command', function([_, owner]) {
     cleanup(packageFileName)
     cleanup(networkFileName)
     await init({ name: appName, version: defaultVersion, packageFileName });
-    await addImplementation({ contractName, contractAlias, packageFileName });
-    await addImplementation({ contractName: anotherContractName, contractAlias: anotherContractAlias, packageFileName });
+    await addImplementation({ contractsData, packageFileName });
     await sync({ packageFileName, network, txParams });
   });
 
@@ -60,7 +60,8 @@ contract('create-proxy command', function([_, owner]) {
   });
 
   it('should refuse to create a proxy for an undeployed contract', async function() {
-    await addImplementation({ contractName, contractAlias: "NotDeployed", packageFileName });
+    const customContractsData = [{ name: contractName, alias: "NotDeployed" }]
+    await addImplementation({ contractsData: customContractsData, packageFileName });
     await createProxy({ contractAlias: "NotDeployed", packageFileName, network, txParams }).should.be.rejectedWith(/not deployed/);
   });
 

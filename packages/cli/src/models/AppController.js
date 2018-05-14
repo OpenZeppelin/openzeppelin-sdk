@@ -53,18 +53,35 @@ export default class AppController {
     this.package.contracts[contractAlias] = contractName;
   }
 
+  addAllImplementations() {
+    const folder = `${process.cwd()}/build/contracts`
+    fs.readDir(folder).forEach(file => {
+      const path = `${folder}/${file}`
+      if(this.hasBytecode(path)) {
+        const contractData = fs.parseJson(path)
+        const contractName = contractData.contractName
+        this.addImplementation(contractName, contractName)
+      }
+    })
+  }
+
   validateImplementation(contractName) {
-    // We are manually checking the build file instead of delegating to ContractsProvider, 
+    // We are manually checking the build file instead of delegating to ContractsProvider,
     // as ContractsProvider requires initializing the entire truffle stack.
-    const folder = `${process.cwd()}/build/contracts`;
-    const path = `${folder}/${contractName}.json`;
+    const folder = `${process.cwd()}/build/contracts`
+    const path = `${folder}/${contractName}.json`
     if (!fs.exists(path)) {
-      throw Error(`Contract ${contractName} not found in folder ${folder}`);
+      throw Error(`Contract ${contractName} not found in folder ${folder}`)
     }
-    const bytecode = fs.parseJson(path).bytecode;
-    if (!bytecode || bytecode === "0x") {
-      throw Error(`Contract ${contractName} is abstract and cannot be deployed as an implementation.`);
+    if (!this.hasBytecode(path)) {
+      throw Error(`Contract ${contractName} is abstract and cannot be deployed as an implementation.`)
     }
+  }
+
+  hasBytecode(contractDataPath) {
+    if (!fs.exists(contractDataPath)) return false
+    const bytecode = fs.parseJson(contractDataPath).bytecode
+    return bytecode && bytecode !== "0x"
   }
 
   get package() {
