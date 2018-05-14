@@ -1,4 +1,5 @@
 import Stdlib from "./Stdlib";
+import npm from 'npm-programmatic'
 
 export default {
   async call(stdlibNameAndVersion) {
