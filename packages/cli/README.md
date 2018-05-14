@@ -43,11 +43,11 @@ truffle init
 Initialize your project with zeppelin_os. The next command will create a new `package.zos.json` file:
 
 ```sh
-zos init <name> <version> --network <network>
+zos init <name> <version>
 ```
 For example:
 ```sh
-zos init myproject 0.1 --network development
+zos init myproject 0.1
 ```
 
 

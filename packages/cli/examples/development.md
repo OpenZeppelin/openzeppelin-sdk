@@ -7,7 +7,7 @@ Write your contracts as you would usually do, but replacing constructors with `i
 npm install zos-lib
 ```
 
-- For an upgradeable contract development full example, see [the examples folder in `zos-lib`](https://github.com/zeppelinos/zos-lib/blob/master/examples/single/contracts/MyContract_v0.sol).
+- For an upgradeable contract development full example, see [the examples folder in `zos-lib`](https://github.com/zeppelinos/zos-lib/blob/master/examples/simple/contracts/MyContract_v0.sol).
 - For an introductory smart contract development guide, see [this blog post series](https://blog.zeppelin.solutions/a-gentle-introduction-to-ethereum-programming-part-1-783cc7796094).
 
 In this example, we'll use this simple contract:
@@ -34,10 +34,10 @@ npx truffle compile
 The next step is to register all the contract implementations of the first `version` of your project. To do this please run:
 
 ```
-zos add-implementation <contract_name_1> --network <network>
-zos add-implementation <contract_name_2> --network <network>
+zos add-implementation <contract_name_1>
+zos add-implementation <contract_name_2>
 ...
-zos add-implementation <contract_name_n> --network <network>
+zos add-implementation <contract_name_n>
 ```
 
 Where `<contract_name>` is the name of your Solidity contract, and `<alias>` is the name under which it will be registered 
@@ -45,7 +45,7 @@ in zeppelin_os.
 
 In our example, run:
 ```
-zos add-implementation MyContract --network development
+zos add-implementation MyContract
 ```
 
 To have your `package.zos.json` file always up-to-date, run `zos add-implementation` for every new contract you add to your project.
@@ -86,13 +86,13 @@ Open the `package.zos.<network>.json` and use the addresses found there to inter
 In addition to creating proxies for your own contracts, you can also re-use already deployed contracts from a zeppelin_os standard library. To do so, run the following command, with the name of the npm package of the stdlib you want to use. For example:
 
 ```bash
-zos set-stdlib openzeppelin-zos --network <network>
+zos set-stdlib openzeppelin-zos
 ```
 
 The next `sync` operation will connect your application with the chosen standard library on the target network. However, if you're using development nodes (such as testrpc or ganache), the standard library is not already deployed, since you are running from an empty blockchain. To work around this, you can add a `--deploy-stdlib` flag to the `sync` command:
 
 ```bash
-zos sync --network <network> --deploy-stdlib
+zos sync --network <network>
 ```
 
 This will deploy your entire application to the target network, along with the standard library you are using and all its contracts. This way, you can transparently work in development with the contracts provided by the stdlib.
