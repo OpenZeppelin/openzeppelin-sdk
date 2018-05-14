@@ -24,10 +24,5 @@ function provideContractsFromTruffle() {
     return contract
   }
 
-  ContractsProvider.getFromKernel = contractName => {
-    const data = require(`zos-kernel/build/contracts/${contractName}.json`);
-    return ContractsProvider.getByJSONData(data)
-  }
-
   global.ContractsProvider = ContractsProvider
 }
