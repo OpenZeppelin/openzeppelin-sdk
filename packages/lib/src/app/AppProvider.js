@@ -1,6 +1,9 @@
 import AppWrapper from './AppWrapper'
 
-export default {
+/**
+ * 
+ */ 
+const AppProvider = {
   async from(address, txParams = {}) {
     this._fetchPackagedApp(address)
     await this._fetchFactory()
@@ -10,26 +13,28 @@ export default {
   },
 
   _fetchPackagedApp(address) {
-    const PackagedApp = ContractsProvider.getFromLib('PackagedApp')
+    const PackagedApp = Contracts.getFromLib('PackagedApp')
     this.packagedApp = new PackagedApp(address)
   },
   
   async _fetchAppDirectory() {
-    const AppDirectory = ContractsProvider.getFromLib('AppDirectory')
+    const AppDirectory = Contracts.getFromLib('AppDirectory')
     this.version = await this.packagedApp.version()
     const appDirectoryAddress = await this.package.getVersion(this.version)
     this.appDirectory = new AppDirectory(appDirectoryAddress)
   },
   
   async _fetchPackage() {
-    const Package = ContractsProvider.getFromLib('Package')
+    const Package = Contracts.getFromLib('Package')
     const packageAddress = await this.packagedApp.package()
     this.package = new Package(packageAddress)
   },
 
   async _fetchFactory() {
-    const UpgradeabilityProxyFactory = ContractsProvider.getFromLib('UpgradeabilityProxyFactory')
+    const UpgradeabilityProxyFactory = Contracts.getFromLib('UpgradeabilityProxyFactory')
     const factoryAddress = await this.packagedApp.factory()
     this.factory = new UpgradeabilityProxyFactory(factoryAddress)
   }
 }
+
+export default AppProvider;

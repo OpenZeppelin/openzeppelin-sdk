@@ -1,8 +1,8 @@
 import Logger from '../utils/Logger'
 
-const log = new Logger('Distribution')
+const log = new Logger('Package')
 
-export default class DistributionWrapper {
+export default class PackageWrapper {
   constructor(_package, txParams = {}) {
     this.package = _package
     this.txParams = txParams
@@ -18,13 +18,13 @@ export default class DistributionWrapper {
 
   async getRelease(version) {
     const releaseAddress = await this.package.getVersion(version)
-    const Release = ContractsProvider.getByName('Release')
+    const Release = Contracts.getByName('Release')
     return new Release(releaseAddress)
   }
 
   async newVersion(version) {
     log.info('Adding new version...')
-    const Release = ContractsProvider.getByName('Release')
+    const Release = Contracts.getByName('Release')
     const release = await Release.new(this.txParams)
     await this.package.addVersion(version, release.address, this.txParams)
     log.info(' Added version:', version)

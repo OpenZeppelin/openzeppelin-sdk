@@ -31,6 +31,7 @@
     "maxlen": 120,        // Maximum number of cols in a line
     "multistr": true,     // Allow use of multiline EOL escaping
     "experimental": ["asyncawait", "asyncreqawait"],
+    "esversion": 6,
 
     "predef": [ // Extra globals.
         "after",

@@ -9,7 +9,7 @@ import assertRevert from './helpers/assertRevert'
 // utils
 import Logger from './utils/Logger'
 import FileSystem from './utils/FileSystem'
-import ContractsProvider from './utils/ContractsProvider'
+import Contracts from './utils/Contracts'
 
 // test behaviors
 import behaviors from './test'
@@ -19,10 +19,10 @@ import AppWrapper from './app/AppWrapper'
 import AppDeployer from './app/AppDeployer'
 import AppProvider from './app/AppProvider'
 
-// distribution
-import DistributionWrapper from './distribution/DistributionWrapper'
-import DistributionDeployer from './distribution/DistributionDeployer'
-import DistributionProvider from './distribution/DistributionProvider'
+// package
+import PackageWrapper from './package/PackageWrapper'
+import PackageDeployer from './package/PackageDeployer'
+import PackageProvider from './package/PackageProvider'
 
 export {
   version,
@@ -32,11 +32,11 @@ export {
   behaviors,
   Logger,
   FileSystem,
-  ContractsProvider,
+  Contracts,
   AppWrapper,
   AppDeployer,
   AppProvider,
-  DistributionWrapper,
-  DistributionDeployer,
-  DistributionProvider,
+  PackageWrapper,
+  PackageDeployer,
+  PackageProvider,
 }

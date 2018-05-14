@@ -1,31 +1,31 @@
 import assertRevert from '../../src/helpers/assertRevert';
-import DistributionDeployer from '../../src/distribution/DistributionDeployer';
-import DistributionProvider from '../../src/distribution/DistributionProvider';
+import PackageDeployer from '../../src/package/PackageDeployer';
+import PackageProvider from '../../src/package/PackageProvider';
 
 const DummyImplementation = artifacts.require('DummyImplementation')
 
 require('chai')
   .should()
 
-contract('Distribution', function ([_, owner]) {
+contract('Package', function ([_, owner]) {
   const txParams = { from: owner }
   const contractName = 'DummyImplementation'
   const initialVersion = "1.0"
   const newVersion = "2.0"
 
   function shouldInitialize() {
-    it('instantiates the distribution', async function() {
-      this.distribution.address().should.not.be.null
+    it('instantiates the package', async function() {
+      this.package.address().should.not.be.null
     })
   }
 
   async function createRelease() {
-    await this.distribution.newVersion(initialVersion)
+    await this.package.newVersion(initialVersion)
   }
 
 
   beforeEach("deploying", async function () {
-    this.distribution = await DistributionDeployer.call(txParams)
+    this.package = await PackageDeployer.call(txParams)
   })
 
 
@@ -36,8 +36,8 @@ contract('Distribution', function ([_, owner]) {
 
   describe('connect', function () {
     beforeEach("connecting to existing instance", async function () {
-      const connectedDistribution = await DistributionProvider.from(this.distribution.address(), txParams)
-      this.distribution = connectedDistribution
+      const connectedPackage = await PackageProvider.from(this.package.address(), txParams)
+      this.package = connectedPackage
     })
 
     shouldInitialize()
@@ -47,9 +47,9 @@ contract('Distribution', function ([_, owner]) {
   describe('newVersion', function () {
     beforeEach('creating a new release', createRelease)
 
-    it('registers new version on distribution', async function () {
-      await this.distribution.newVersion(newVersion)
-      const hasVersion = await this.distribution.hasVersion(newVersion)
+    it('registers new version on package', async function () {
+      await this.package.newVersion(newVersion)
+      const hasVersion = await this.package.hasVersion(newVersion)
       hasVersion.should.be.true
     })
   })
@@ -59,13 +59,13 @@ contract('Distribution', function ([_, owner]) {
     beforeEach('creating a new release', createRelease)
 
     it('should not be frozen by default', async function () {
-      const frozen = await this.distribution.isFrozen(initialVersion)
+      const frozen = await this.package.isFrozen(initialVersion)
       frozen.should.be.false
     })
 
     it('should be freezable', async function () {
-      await this.distribution.freeze(initialVersion)
-      const frozen = await this.distribution.isFrozen(initialVersion)
+      await this.package.freeze(initialVersion)
+      const frozen = await this.package.isFrozen(initialVersion)
       frozen.should.be.true
     })
   })
@@ -76,16 +76,16 @@ contract('Distribution', function ([_, owner]) {
 
     describe('while unfrozen', async function() {
       beforeEach('setting implementation', async function() {
-        this.implementation = await this.distribution.setImplementation(initialVersion, DummyImplementation, contractName)
+        this.implementation = await this.package.setImplementation(initialVersion, DummyImplementation, contractName)
       })
 
       it('should return implementation', async function () {
-        const implementation = await this.distribution.getImplementation(initialVersion, contractName)
+        const implementation = await this.package.getImplementation(initialVersion, contractName)
         implementation.should.be.not.null
       })
 
       it('should register implementation on release version', async function () {
-        const implementation = await this.distribution.getImplementation(initialVersion, contractName)
+        const implementation = await this.package.getImplementation(initialVersion, contractName)
         implementation.should.eq(this.implementation.address)
       })
       
@@ -93,11 +93,11 @@ contract('Distribution', function ([_, owner]) {
 
     describe('while frozen', function() {
       beforeEach('freezing', async function() {
-        await this.distribution.freeze(initialVersion)
+        await this.package.freeze(initialVersion)
       })
 
       it('should revert when registering an implementation', async function() {
-        await assertRevert(this.distribution.setImplementation(initialVersion, DummyImplementation, contractName))
+        await assertRevert(this.package.setImplementation(initialVersion, DummyImplementation, contractName))
       })
     })
   })

@@ -21,7 +21,7 @@ const ReleaseDeployer = {
 
   async deployRelease() {
     log.info("Deploying a new Release...")
-    const Release = ContractsProvider.getByName('Release')
+    const Release = Contracts.getByName('Release')
     this.release = await Release.new(this.txParams)
     log.info(`Deployed at ${this.release.address}`)
   },
@@ -36,14 +36,14 @@ const ReleaseDeployer = {
   },
 
   async _deployLocalContract(contractName) {
-    const contractClass = ContractsProvider.getByName(contractName)
+    const contractClass = Contracts.getByName(contractName)
     return await ReleaseDeployer._deployContract(contractName, contractClass)
   },
 
   async _deployDependencyContract(contractName) {
     const path = `node_modules/${this.dependencyName}/build/contracts/${contractName}.json`
     const contractSchema = FileSystem.parseJson(path)
-    const contractClass = ContractsProvider.getByJSONData(contractSchema)
+    const contractClass = Contracts.getByJSONData(contractSchema)
     return await ReleaseDeployer._deployContract(contractName, contractClass)
   },
 

@@ -9,7 +9,9 @@ import "./FreezableImplementationDirectory.sol";
  */
 contract Release is FreezableImplementationDirectory {
 
-  // Developer address to which staking payouts will be sent, owner of the implementation directory
+  /**
+   * @dev Developer address, owner of the implementation directory
+   */
   address public developer;
   
   /**

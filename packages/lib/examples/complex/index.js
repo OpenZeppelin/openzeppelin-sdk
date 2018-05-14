@@ -1,14 +1,14 @@
 'use strict';
 
 global.artifacts = artifacts;
-global.ContractsProvider = require('zos-lib/src/utils/ContractsProvider').default;
+global.Contracts = require('zos-lib/src/utils/Contracts').default;
 
 const args = require('minimist')(process.argv.slice(2));
 const network = args.network;
 
 const ImplementationDirectory = artifacts.require('ImplementationDirectory');
 const MintableERC721Token = artifacts.require('MintableERC721Token');
-const { Logger, AppDeployer, ContractsProvider } = require('zos-lib')
+const { Logger, AppDeployer, Contracts } = require('zos-lib')
 const log = new Logger('ComplexExample')
 
 const owner = web3.eth.accounts[1];
@@ -29,7 +29,7 @@ async function deployVersion1(app) {
 
   // Register the first implementation of 'Donations', and request a proxy for it.
   log.info('<< Deploying version 1 >>')
-  const DonationsV1 = ContractsProvider.getByName('DonationsV1')
+  const DonationsV1 = Contracts.getByName('DonationsV1')
   await app.setImplementation(DonationsV1, contractName);
   return await app.createProxy(DonationsV1, contractName, 'initialize', [owner])
 }
@@ -41,7 +41,7 @@ async function deployVersion2(app, donations, txParams) {
   log.info('<< Deploying version 2 >>')
   const secondVersion = '0.0.2'
   await app.newVersion(secondVersion, await getStdLib(txParams))
-  const DonationsV2 = ContractsProvider.getByName('DonationsV2')
+  const DonationsV2 = Contracts.getByName('DonationsV2')
   await app.setImplementation(DonationsV2, contractName);
   await app.upgradeProxy(donations.address, null, contractName)
   donations = DonationsV2.at(donations.address)
