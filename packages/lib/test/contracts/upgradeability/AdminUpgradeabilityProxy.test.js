@@ -1,5 +1,7 @@
-import encodeCall from '../../src/helpers/encodeCall'
-import assertRevert from '../../src/helpers/assertRevert'
+'use strict';
+
+import encodeCall from '../../../src/helpers/encodeCall'
+import assertRevert from '../../../src/helpers/assertRevert'
 
 const MigratableMockV1 = artifacts.require('MigratableMockV1')
 const MigratableMockV2 = artifacts.require('MigratableMockV2')

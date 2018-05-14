@@ -1,7 +1,7 @@
 {
   "name": "zos-lib-complex-example",
   "version": "0.0.1",
-  "description": "Example of using the upgradeability-lib's AppManager",
+  "description": "Example of using the upgradeability-lib's App",
   "main": "index.js",
   "scripts": {
     "compile": "rm -rf build && npx truffle compile",

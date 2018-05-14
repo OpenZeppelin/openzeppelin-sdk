@@ -8,12 +8,12 @@ import shouldBehaveLikeOwnable from '../../../src/test/behaviors/Ownable'
 const Package = artifacts.require('Package')
 const ImplementationDirectory = artifacts.require('ImplementationDirectory')
 const MigratableMock = artifacts.require('MigratableMock')
-const PackagedAppManager = artifacts.require('PackagedAppManager')
+const PackagedApp = artifacts.require('PackagedApp')
 const DummyImplementation = artifacts.require('DummyImplementation')
 const AdminUpgradeabilityProxy = artifacts.require('AdminUpgradeabilityProxy')
 const UpgradeabilityProxyFactory = artifacts.require('UpgradeabilityProxyFactory')
 
-contract('PackagedAppManager', ([_, managerOwner, packageOwner, directoryOwner, anotherAccount]) => {
+contract('PackagedApp', ([_, appOwner, packageOwner, directoryOwner, anotherAccount]) => {
   const contract = 'ERC721'
   const version_0 = 'version_0'
   const version_1 = 'version_1'
@@ -32,33 +32,33 @@ contract('PackagedAppManager', ([_, managerOwner, packageOwner, directoryOwner, 
 
   describe('when the package address is null', function () {
     it('reverts', async function () {
-      await assertRevert(PackagedAppManager.new(0, 'dummy', this.factory.address))
+      await assertRevert(PackagedApp.new(0, 'dummy', this.factory.address))
     })
   })
 
   describe('when the given package does not support the required version', function () {
     it('reverts', async function () {
-      await assertRevert(PackagedAppManager.new(this.package.address, version_0, this.factory.address, { from: managerOwner }))
+      await assertRevert(PackagedApp.new(this.package.address, version_0, this.factory.address, { from: appOwner }))
     })
   })
 
   describe('when the given package supports the required version', function () {
     beforeEach(async function () {
       await this.package.addVersion(version_0, this.zeroVersionDirectory.address, { from: packageOwner })
-      this.manager = await PackagedAppManager.new(this.package.address, version_0, this.factory.address, { from: managerOwner })
+      this.app = await PackagedApp.new(this.package.address, version_0, this.factory.address, { from: appOwner })
     })
 
     describe('ownership', function () {
       beforeEach(function () {
-        this.ownable = this.manager
+        this.ownable = this.app
       })
 
-      shouldBehaveLikeOwnable(managerOwner, anotherAccount)
+      shouldBehaveLikeOwnable(appOwner, anotherAccount)
     })
 
     describe('factory', function () {
-      it('returns the proxy factory being used by the manager', async function () {
-        const factory = await this.manager.factory()
+      it('returns the proxy factory being used by the app', async function () {
+        const factory = await this.app.factory()
 
         assert.equal(factory, this.factory.address)
       })
@@ -67,8 +67,8 @@ contract('PackagedAppManager', ([_, managerOwner, packageOwner, directoryOwner, 
     describe('setVersion', function () {
       const version = version_1
 
-      describe('when the sender is the manager owner', function () {
-        const from = managerOwner
+      describe('when the sender is the app owner', function () {
+        const from = appOwner
 
         describe('whern the requested version is registered in the package', function () {
           beforeEach(async function () {
@@ -76,23 +76,23 @@ contract('PackagedAppManager', ([_, managerOwner, packageOwner, directoryOwner, 
           })
 
           it('sets a new version', async function () {
-            await this.manager.setVersion(version, { from })
+            await this.app.setVersion(version, { from })
 
-            const newVersion = await this.manager.version()
+            const newVersion = await this.app.version()
             assert.equal(newVersion, version_1)
           })
         })
 
         describe('when the requested version is registered in the package', function () {
           it('reverts', async function () {
-            await assertRevert(this.manager.setVersion(version, { from }))
+            await assertRevert(this.app.setVersion(version, { from }))
           })
         })
       })
 
-      describe('when the sender is the manager owner', function () {
+      describe('when the sender is the app owner', function () {
         it('reverts', async function () {
-          await assertRevert(this.manager.setVersion(version_1, { from: anotherAccount }))
+          await assertRevert(this.app.setVersion(version_1, { from: anotherAccount }))
         })
       })
     })
@@ -102,26 +102,26 @@ contract('PackagedAppManager', ([_, managerOwner, packageOwner, directoryOwner, 
         beforeEach(async function () {
           await this.zeroVersionDirectory.setImplementation(contract, this.implementation_v0, { from: directoryOwner })
 
-          const { receipt } = await this.manager.create(contract)
+          const { receipt } = await this.app.create(contract)
           this.logs = decodeLogs(receipt.logs, UpgradeabilityProxyFactory)
           this.proxyAddress = this.logs.find(l => l.event === 'ProxyCreated').args.proxy
           this.proxy = await AdminUpgradeabilityProxy.at(this.proxyAddress)
         })
 
         it('creates a proxy pointing to the requested implementation', async function () {
-          const implementation = await this.manager.getProxyImplementation(this.proxy.address)
+          const implementation = await this.app.getProxyImplementation(this.proxy.address)
           assert.equal(implementation, this.implementation_v0)
         })
 
-        it('transfers the ownership to the manager', async function () {
-          const admin = await this.manager.getProxyAdmin(this.proxy.address)
-          assert.equal(admin, this.manager.address)
+        it('transfers the ownership to the app', async function () {
+          const admin = await this.app.getProxyAdmin(this.proxy.address)
+          assert.equal(admin, this.app.address)
         })
       })
 
       describe('when the requested contract was not registered for the current version', function () {
         it('reverts', async function () {
-          await assertRevert(this.manager.create(contract))
+          await assertRevert(this.app.create(contract))
         })
       })
     })
@@ -138,20 +138,20 @@ contract('PackagedAppManager', ([_, managerOwner, packageOwner, directoryOwner, 
         beforeEach(async function () {
           await this.zeroVersionDirectory.setImplementation(contract, this.behavior.address, { from: directoryOwner })
 
-          const { receipt } = await this.manager.createAndCall(contract, initializeData, { value })
+          const { receipt } = await this.app.createAndCall(contract, initializeData, { value })
           this.logs = decodeLogs(receipt.logs, UpgradeabilityProxyFactory)
           this.proxyAddress = this.logs.find(l => l.event === 'ProxyCreated').args.proxy
           this.proxy = await AdminUpgradeabilityProxy.at(this.proxyAddress)
         })
 
         it('creates a proxy pointing to the requested implementation', async function () {
-          const implementation = await this.manager.getProxyImplementation(this.proxy.address)
+          const implementation = await this.app.getProxyImplementation(this.proxy.address)
           assert.equal(implementation, this.behavior.address)
         })
 
-        it('transfers the ownership to the manager', async function () {
-          const admin = await this.manager.getProxyAdmin(this.proxy.address)
-          assert.equal(admin, this.manager.address)
+        it('transfers the ownership to the app', async function () {
+          const admin = await this.app.getProxyAdmin(this.proxy.address)
+          assert.equal(admin, this.app.address)
         })
 
         it('calls "initialize" function', async function() {
@@ -174,7 +174,7 @@ contract('PackagedAppManager', ([_, managerOwner, packageOwner, directoryOwner, 
 
       describe('when the requested contract was not registered for the current version', function () {
         it('reverts', async function () {
-          await assertRevert(this.manager.createAndCall(contract, initializeData, { value }))
+          await assertRevert(this.app.createAndCall(contract, initializeData, { value }))
         })
       })
     })
@@ -182,18 +182,18 @@ contract('PackagedAppManager', ([_, managerOwner, packageOwner, directoryOwner, 
     describe('upgrade', function () {
       beforeEach(async function () {
         await this.zeroVersionDirectory.setImplementation(contract, this.implementation_v0, { from: directoryOwner })
-        const { receipt } = await this.manager.create(contract)
+        const { receipt } = await this.app.create(contract)
         this.logs = decodeLogs(receipt.logs, UpgradeabilityProxyFactory)
         this.proxyAddress = this.logs.find(l => l.event === 'ProxyCreated').args.proxy
         this.proxy = await AdminUpgradeabilityProxy.at(this.proxyAddress)
 
         // set new version
         await this.package.addVersion(version_1, this.firstVersionDirectory.address, { from: packageOwner })
-        await this.manager.setVersion(version_1, { from: managerOwner })
+        await this.app.setVersion(version_1, { from: appOwner })
       })
 
-      describe('when the sender is the manager owner', function () {
-        const from = managerOwner
+      describe('when the sender is the app owner', function () {
+        const from = appOwner
 
         describe('when the requested contract was registered for the new version', function () {
           beforeEach(async function () {
@@ -201,26 +201,26 @@ contract('PackagedAppManager', ([_, managerOwner, packageOwner, directoryOwner, 
           })
 
           it('upgrades to the requested implementation', async function () {
-            await this.manager.upgrade(this.proxyAddress, contract, { from })
+            await this.app.upgrade(this.proxyAddress, contract, { from })
 
-            const implementation = await this.manager.getProxyImplementation(this.proxy.address)
+            const implementation = await this.app.getProxyImplementation(this.proxy.address)
             assert.equal(implementation, this.implementation_v1)
           })
         })
 
         describe('when the requested contract was not registered for the new version', function () {
           it('reverts', async function () {
-            await assertRevert(this.manager.upgrade(this.proxyAddress, contract, { from }))
+            await assertRevert(this.app.upgrade(this.proxyAddress, contract, { from }))
           })
         })
       })
 
-      describe('when the sender is not the manager owner', function () {
+      describe('when the sender is not the app owner', function () {
         const from = anotherAccount
 
         it('reverts', async function () {
           await this.firstVersionDirectory.setImplementation(contract, this.implementation_v1, { from: directoryOwner })
-          await assertRevert(this.manager.upgrade(this.proxyAddress, contract, { from }))
+          await assertRevert(this.app.upgrade(this.proxyAddress, contract, { from }))
         })
       })
     })
@@ -230,7 +230,7 @@ contract('PackagedAppManager', ([_, managerOwner, packageOwner, directoryOwner, 
 
       beforeEach(async function () {
         await this.zeroVersionDirectory.setImplementation(contract, this.implementation_v0, { from: directoryOwner })
-        const { receipt } = await this.manager.create(contract)
+        const { receipt } = await this.app.create(contract)
         this.logs = decodeLogs(receipt.logs, UpgradeabilityProxyFactory)
         this.proxyAddress = this.logs.find(l => l.event === 'ProxyCreated').args.proxy
         this.proxy = await AdminUpgradeabilityProxy.at(this.proxyAddress)
@@ -238,21 +238,21 @@ contract('PackagedAppManager', ([_, managerOwner, packageOwner, directoryOwner, 
 
         // set new version
         await this.package.addVersion(version_1, this.firstVersionDirectory.address, { from: packageOwner })
-        await this.manager.setVersion(version_1, { from: managerOwner })
+        await this.app.setVersion(version_1, { from: appOwner })
       })
 
-      describe('when the sender is the manager owner', function () {
-        const from = managerOwner
+      describe('when the sender is the app owner', function () {
+        const from = appOwner
         const value = 1e5
 
         describe('when the requested contract was registered for the new version', function () {
           beforeEach(async function () {
             await this.firstVersionDirectory.setImplementation(contract, this.behavior.address, { from: directoryOwner })
-            await this.manager.upgradeAndCall(this.proxyAddress, contract, initializeData, { from, value })
+            await this.app.upgradeAndCall(this.proxyAddress, contract, initializeData, { from, value })
           })
 
           it('upgrades to the requested implementation', async function () {
-            const implementation = await this.manager.getProxyImplementation(this.proxy.address)
+            const implementation = await this.app.getProxyImplementation(this.proxy.address)
             assert.equal(implementation, this.behavior.address)
           })
 
@@ -276,17 +276,17 @@ contract('PackagedAppManager', ([_, managerOwner, packageOwner, directoryOwner, 
 
         describe('when the requested contract was not registered for the new version', function () {
           it('reverts', async function () {
-            await assertRevert(this.manager.upgradeAndCall(this.proxyAddress, contract, initializeData, { from, value }))
+            await assertRevert(this.app.upgradeAndCall(this.proxyAddress, contract, initializeData, { from, value }))
           })
         })
       })
 
-      describe('when the sender is not the manager owner', function () {
+      describe('when the sender is not the app owner', function () {
         const from = anotherAccount
 
         it('reverts', async function () {
           await this.firstVersionDirectory.setImplementation(contract, this.behavior.address, { from: directoryOwner })
-          await assertRevert(this.manager.upgradeAndCall(this.proxyAddress, contract, initializeData, { from }))
+          await assertRevert(this.app.upgradeAndCall(this.proxyAddress, contract, initializeData, { from }))
         })
       })
     })
@@ -296,7 +296,7 @@ contract('PackagedAppManager', ([_, managerOwner, packageOwner, directoryOwner, 
         it('fetches the implementation of the contract registered in the zero directory', async function () {
           await this.zeroVersionDirectory.setImplementation(contract, this.implementation_v0, { from: directoryOwner })
 
-          const implementation = await this.manager.getImplementation(contract)
+          const implementation = await this.app.getImplementation(contract)
           assert.equal(implementation, this.implementation_v0)
         })
       })
@@ -304,13 +304,13 @@ contract('PackagedAppManager', ([_, managerOwner, packageOwner, directoryOwner, 
       describe('when using the directory of the first version', function () {
         beforeEach(async function () {
           await this.package.addVersion(version_1, this.firstVersionDirectory.address, { from: packageOwner })
-          await this.manager.setVersion(version_1, { from: managerOwner })
+          await this.app.setVersion(version_1, { from: appOwner })
         })
 
         it('fetches the implementation of the contract registered in the first directory', async function () {
           await this.firstVersionDirectory.setImplementation(contract, this.implementation_v1, { from: directoryOwner })
 
-          const implementation = await this.manager.getImplementation(contract)
+          const implementation = await this.app.getImplementation(contract)
           assert.equal(implementation, this.implementation_v1)
         })
       })

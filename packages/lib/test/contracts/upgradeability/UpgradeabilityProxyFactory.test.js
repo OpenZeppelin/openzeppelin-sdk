@@ -1,7 +1,7 @@
 'use strict';
 
-import encodeCall from '../../src/helpers/encodeCall'
-import assertRevert from '../../src/helpers/assertRevert'
+import encodeCall from '../../../src/helpers/encodeCall'
+import assertRevert from '../../../src/helpers/assertRevert'
 
 const MigratableMock = artifacts.require('MigratableMock')
 const AdminUpgradeabilityProxy = artifacts.require('AdminUpgradeabilityProxy')

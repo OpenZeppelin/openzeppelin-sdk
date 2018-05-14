@@ -1,8 +1,8 @@
 'use strict';
 
-import encodeCall from '../../src/helpers/encodeCall'
-import decodeLogs from '../../src/helpers/decodeLogs'
-import assertRevert from '../../src/helpers/assertRevert'
+import encodeCall from '../../../src/helpers/encodeCall'
+import decodeLogs from '../../../src/helpers/decodeLogs'
+import assertRevert from '../../../src/helpers/assertRevert'
 
 const assert = require('chai').assert;
 const Migratable = artifacts.require('Migratable');

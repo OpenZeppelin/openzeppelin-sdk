@@ -1,53 +1,54 @@
-import AppManagerDeployer from '../../src/app_manager/AppManagerDeployer';
-import AppManagerProvider from '../../src/app_manager/AppManagerProvider';
+'use strict';
+
+import AppDeployer from '../../src/app/AppDeployer';
+import AppProvider from '../../src/app/AppProvider';
 
 const ImplV1 = artifacts.require('DummyImplementation');
 const ImplV2 = artifacts.require('DummyImplementationV2');
 
-const should = require('chai')
-  .should();
+require('chai').should();
 
-contract('AppManager', function ([_, owner]) {
+contract('App', function ([_, owner]) {
   const txParams = { from: owner }
-  const initialVersion = "1.0";
+  const initialVersion = '1.0';
   const contractName = 'Impl';
-  const stdlibAddress = "0x0000000000000000000000000000000000000010";
+  const stdlibAddress = '0x0000000000000000000000000000000000000010';
 
   const shouldInitialize = function () {
     it('deploys all contracts', async function() {
-      this.app.appManager.address.should.not.be.null;
-      this.app.factory.address.should.not.be.null;
-      this.app.package.address.should.not.be.null;
+      this.appWrapper.app.address.should.not.be.null;
+      this.appWrapper.factory.address.should.not.be.null;
+      this.appWrapper.package.address.should.not.be.null;
     });
 
-    it('sets app manager at initial version', async function () {
-      (await this.app.appManager.version()).should.eq(initialVersion);
+    it('sets app at initial version', async function () {
+      (await this.appWrapper.app.version()).should.eq(initialVersion);
     });
 
     it('registers initial version in package', async function () {
-      (await this.app.package.hasVersion(initialVersion)).should.be.true;
+      (await this.appWrapper.package.hasVersion(initialVersion)).should.be.true;
     });
 
     it('initializes all app properties', async function () {
-      this.app.version.should.eq(initialVersion);
-      this.app.directories.should.have.key(initialVersion);
+      this.appWrapper.version.should.eq(initialVersion);
+      this.appWrapper.directories.should.have.key(initialVersion);
     });
 
     it('returns the current directory', async function () {
-      this.app.currentDirectory().address.should.be.not.null;
+      this.appWrapper.currentDirectory().address.should.be.not.null;
     });
   };
 
   const shouldConnectToStdlib = function () {
     it('should connect current directory to stdlib', async function () {
-      const directory = this.app.currentDirectory();
+      const directory = this.appWrapper.currentDirectory();
       (await directory.stdlib()).should.eq(stdlibAddress);
     });
   };
 
   describe('without stdlib', function () {
-    beforeEach("deploying", async function () {
-      this.app = await AppManagerDeployer.call(initialVersion, txParams)
+    beforeEach('deploying', async function () {
+      this.appWrapper = await AppDeployer.call(initialVersion, txParams)
     });
 
     describe('deploy', function () {
@@ -55,43 +56,43 @@ contract('AppManager', function ([_, owner]) {
     });
 
     describe('connect', function () {
-      beforeEach("connecting to existing instance", async function () {
-        const connectedApp = await AppManagerProvider.from(this.app.appManager.address, txParams);
-        this.app = connectedApp;
+      beforeEach('connecting to existing instance', async function () {
+        const connectedApp = await AppProvider.from(this.appWrapper.app.address, txParams);
+        this.appWrapper = connectedApp;
       });
 
       shouldInitialize();
     });
 
-    const newVersion = "2.0";
+    const newVersion = '2.0';
     const createVersion = async function () {
-      await this.app.newVersion(newVersion);
+      await this.appWrapper.newVersion(newVersion);
     };
 
     describe('newVersion', function () {
       beforeEach('creating a new version', createVersion);
 
       it('updates own properties', async function () {
-        this.app.version.should.eq(newVersion);
-        this.app.directories.should.include.key(newVersion);
+        this.appWrapper.version.should.eq(newVersion);
+        this.appWrapper.directories.should.include.key(newVersion);
       });
 
-      it('updates app manager version', async function () {
-        (await this.app.appManager.version()).should.eq(newVersion);
+      it('updates app version', async function () {
+        (await this.appWrapper.app.version()).should.eq(newVersion);
       });
 
       it('registers new version on package', async function () {
-        (await this.app.package.hasVersion(newVersion)).should.be.true;
+        (await this.appWrapper.package.hasVersion(newVersion)).should.be.true;
       });
 
       it('returns the current directory', async function () {
-        const currentDirectory = await this.app.package.getVersion(newVersion);
-        this.app.currentDirectory().address.should.eq(currentDirectory);
+        const currentDirectory = await this.appWrapper.package.getVersion(newVersion);
+        this.appWrapper.currentDirectory().address.should.eq(currentDirectory);
       });
     });
 
     const setImplementation = async function () {
-      this.implementation = await this.app.setImplementation(ImplV1, contractName);
+      this.implementation = await this.appWrapper.setImplementation(ImplV1, contractName);
     };
 
     describe('setImplementation', function () {
@@ -102,13 +103,13 @@ contract('AppManager', function ([_, owner]) {
       });
 
       it('should register implementation on directory', async function () {
-        const implementation = await this.app.currentDirectory().getImplementation(contractName);
+        const implementation = await this.appWrapper.currentDirectory().getImplementation(contractName);
         implementation.should.eq(this.implementation.address);
       });
     });
 
     const createProxy = async function () {
-      this.proxy = await this.app.createProxy(ImplV1, contractName);
+      this.proxy = await this.appWrapper.createProxy(ImplV1, contractName);
     };
 
     describe('createProxy', function () {
@@ -117,18 +118,18 @@ contract('AppManager', function ([_, owner]) {
       const shouldReturnProxy = function () {
         it('should return a proxy', async function () {
           this.proxy.address.should.be.not.null;
-          (await this.proxy.version()).should.eq("V1");
+          (await this.proxy.version()).should.eq('V1');
         });
       };
 
       describe('without initializer', function () {
-        beforeEach("creating a proxy", createProxy);
+        beforeEach('creating a proxy', createProxy);
         shouldReturnProxy();
       });
 
       describe('with initializer', function () {
-        beforeEach("creating a proxy", async function () {
-          this.proxy = await this.app.createProxy(ImplV1, contractName, 'initialize', [10]);
+        beforeEach('creating a proxy', async function () {
+          this.proxy = await this.appWrapper.createProxy(ImplV1, contractName, 'initialize', [10]);
         });
 
         shouldReturnProxy();
@@ -144,18 +145,18 @@ contract('AppManager', function ([_, owner]) {
       beforeEach('create proxy', createProxy);
       beforeEach('creating new version', createVersion);
       beforeEach('setting new implementation', async function () {
-        this.implementation = await this.app.setImplementation(ImplV2, contractName);
+        this.implementation = await this.appWrapper.setImplementation(ImplV2, contractName);
       });
 
       const shouldUpgradeProxy = function () {
         it('should upgrade proxy to ImplV2', async function () {
-          (await this.proxy.version()).should.eq("V2");
+          (await this.proxy.version()).should.eq('V2');
         });
       };
 
       describe('without call', function () {
         beforeEach('upgrading the proxy', async function () {
-          await this.app.upgradeProxy(this.proxy.address, ImplV2, contractName);
+          await this.appWrapper.upgradeProxy(this.proxy.address, ImplV2, contractName);
         });
         
         shouldUpgradeProxy();
@@ -163,7 +164,7 @@ contract('AppManager', function ([_, owner]) {
 
       describe('with call', function () {
         beforeEach('upgrading the proxy', async function () {
-          await this.app.upgradeProxy(this.proxy.address, ImplV2, contractName, 'migrate', [20]);
+          await this.appWrapper.upgradeProxy(this.proxy.address, ImplV2, contractName, 'migrate', [20]);
         });
         
         shouldUpgradeProxy();
@@ -175,8 +176,8 @@ contract('AppManager', function ([_, owner]) {
     });
 
     describe('setStdlib', function () {
-      beforeEach("setting stdlib from name", async function () {
-        await this.app.setStdlib(stdlibAddress);
+      beforeEach('setting stdlib from name', async function () {
+        await this.appWrapper.setStdlib(stdlibAddress);
       });
 
       shouldConnectToStdlib();
@@ -184,8 +185,8 @@ contract('AppManager', function ([_, owner]) {
   });
 
   describe('with stdlib', function () {
-    beforeEach("deploying", async function () {
-      this.app = await AppManagerDeployer.withStdlib(initialVersion, stdlibAddress, txParams);
+    beforeEach('deploying', async function () {
+      this.appWrapper = await AppDeployer.withStdlib(initialVersion, stdlibAddress, txParams);
     });
 
     describe('deploy', function () {
@@ -194,9 +195,9 @@ contract('AppManager', function ([_, owner]) {
     });
 
     describe('connect', function () {
-      beforeEach("connecting to existing instance", async function () {
-        const connectedApp = await AppManagerProvider.from(this.app.appManager.address, txParams);
-        this.app = connectedApp;
+      beforeEach('connecting to existing instance', async function () {
+        const connectedApp = await AppProvider.from(this.appWrapper.app.address, txParams);
+        this.appWrapper = connectedApp;
       });
 
       shouldInitialize();
@@ -205,8 +206,8 @@ contract('AppManager', function ([_, owner]) {
   });
 
   describe('with stdlib', function () {
-    beforeEach("deploying", async function () {
-      this.app = await AppManagerDeployer.withStdlib(initialVersion, stdlibAddress, txParams);
+    beforeEach('deploying', async function () {
+      this.appWrapper = await AppDeployer.withStdlib(initialVersion, stdlibAddress, txParams);
     });
 
     describe('deploy', function () {

@@ -1,15 +1,15 @@
 pragma solidity ^0.4.21;
 
-import "./BaseAppManager.sol";
-import "../versioning/Package.sol";
-import "../../upgradeability/UpgradeabilityProxyFactory.sol";
+import "./BaseApp.sol";
+import "./versioning/Package.sol";
+import "../upgradeability/UpgradeabilityProxyFactory.sol";
 
 /**
- * @title PackagedAppManager
- * @dev Manager for an upgradeable user project that uses different versions
+ * @title PackagedApp
+ * @dev App for an upgradeable user project that uses different versions
  * @dev Standard entry point for an upgradeable user app
  */
-contract PackagedAppManager is BaseAppManager {
+contract PackagedApp is BaseApp {
   // Directory where the contract implementation addresses are stored
   Package public package;
   // Project version
@@ -20,8 +20,8 @@ contract PackagedAppManager is BaseAppManager {
    * @param _package Package that stores the contract implementation addresses
    * @param _factory Proxy factory
    */
-  function PackagedAppManager(Package _package, string _version, UpgradeabilityProxyFactory _factory)
-    BaseAppManager(_factory)
+  function PackagedApp(Package _package, string _version, UpgradeabilityProxyFactory _factory)
+    BaseApp(_factory)
     public
   {
     require(address(_package) != address(0));

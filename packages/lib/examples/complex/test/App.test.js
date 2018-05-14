@@ -8,7 +8,7 @@ const shouldBehaveLikeDonations = require('./Donations.behavior.js');
 const shouldBehaveLikeDonationsWithTokens = require('./DonationsWithTokens.behavior.js');
 
 require('chai').should()
-contract('AppManager', ([_, owner, donor, wallet]) => {
+contract('App', ([_, owner, donor, wallet]) => {
   const initialVersion = '0.0.1';
   const updatedVersion = '0.0.2';
   const contractName = 'Donations';
@@ -16,21 +16,21 @@ contract('AppManager', ([_, owner, donor, wallet]) => {
   describe('setup', function() {
 
     beforeEach(async function() {
-      this.appManager = await deploy.setupAppManager({owner});
+      this.app = await deploy.setupApp({owner});
     });
 
     describe('package', function() {
 
       describe('when queried for the initial version', function() {
         it('claims to have it', async function() {
-          (await this.appManager.package.hasVersion(initialVersion))
+          (await this.app.package.hasVersion(initialVersion))
             .should.be.true;
         });
       });
 
       describe('when queried for the updated version', function() {
         it('doesnt claim to have it', async function() {
-          (await this.appManager.package.hasVersion(updatedVersion))
+          (await this.app.package.hasVersion(updatedVersion))
             .should.be.false;
         });
       });
@@ -42,8 +42,8 @@ contract('AppManager', ([_, owner, donor, wallet]) => {
   describe('version 0.0.1', function() {
     
     beforeEach(async function() {
-      this.appManager = await deploy.setupAppManager({owner});
-      this.donations = await deploy.deployVersion1(this.appManager, {owner});
+      this.app = await deploy.setupApp({owner});
+      this.donations = await deploy.deployVersion1(this.app, {owner});
     });
     
     describe('directory', function() {
@@ -51,7 +51,7 @@ contract('AppManager', ([_, owner, donor, wallet]) => {
       describe('when queried for the implementation', function() {
 
         it('returns a valid address', async function() {
-          validateAddress(await this.appManager.directories[initialVersion].getImplementation(contractName)).should.be.true;
+          validateAddress(await this.app.directories[initialVersion].getImplementation(contractName)).should.be.true;
         });
       });
     });
@@ -66,9 +66,9 @@ contract('AppManager', ([_, owner, donor, wallet]) => {
     const tokenSymbol = 'DON';
 
     beforeEach(async function() {
-      this.appManager = await deploy.setupAppManager({owner});
-      this.donations = await deploy.deployVersion1(this.appManager, {owner});
-      this.token = await deploy.deployVersion2(this.appManager, this.donations, {owner});
+      this.app = await deploy.setupApp({owner});
+      this.donations = await deploy.deployVersion1(this.app, {owner});
+      this.token = await deploy.deployVersion2(this.app, this.donations, {owner});
       this.donations = DonationsV2.at(this.donations.address);
     });
 

@@ -1,5 +1,7 @@
-import assertRevert from '../../../src/helpers/assertRevert'
-import shouldBehaveLikeOwnable from '../../../src/test/behaviors/Ownable'
+'use strict';
+
+import assertRevert from '../../../../src/helpers/assertRevert'
+import shouldBehaveLikeOwnable from '../../../../src/test/behaviors/Ownable'
 
 const Package = artifacts.require('Package')
 const ImplementationDirectory = artifacts.require('ImplementationDirectory')

@@ -1,6 +1,6 @@
 'use strict';
 
-import assertRevert from '../../src/helpers/assertRevert';
+import assertRevert from '../../../src/helpers/assertRevert';
 
 const assert = require('chai').assert;
 

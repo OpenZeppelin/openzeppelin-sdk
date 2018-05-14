@@ -1,7 +1,7 @@
 pragma solidity ^0.4.21;
 
-import "../versioning/ImplementationProvider.sol";
-import "../versioning/ImplementationDirectory.sol";
+import "./versioning/ImplementationProvider.sol";
+import "./versioning/ImplementationDirectory.sol";
 import "zeppelin-solidity/contracts/ownership/Ownable.sol";
 
 /**

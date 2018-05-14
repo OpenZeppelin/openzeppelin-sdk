@@ -1,4 +1,6 @@
-import shouldBehaveLikeImplementationDirectory from '../../../src/test/behaviors/ImplementationDirectory'
+'use strict';
+
+import shouldBehaveLikeImplementationDirectory from '../../../../src/test/behaviors/ImplementationDirectory'
 
 const ImplementationDirectory = artifacts.require('ImplementationDirectory')
 const DummyImplementation = artifacts.require('DummyImplementation')

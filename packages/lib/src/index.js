@@ -15,9 +15,9 @@ import ContractsProvider from './utils/ContractsProvider'
 import behaviors from './test'
 
 // app management
-import AppManagerWrapper from './app_manager/AppManagerWrapper'
-import AppManagerDeployer from './app_manager/AppManagerDeployer'
-import AppManagerProvider from './app_manager/AppManagerProvider'
+import AppWrapper from './app/AppWrapper'
+import AppDeployer from './app/AppDeployer'
+import AppProvider from './app/AppProvider'
 
 // distribution
 import DistributionWrapper from './distribution/DistributionWrapper'
@@ -33,9 +33,9 @@ export {
   Logger,
   FileSystem,
   ContractsProvider,
-  AppManagerWrapper,
-  AppManagerDeployer,
-  AppManagerProvider,
+  AppWrapper,
+  AppDeployer,
+  AppProvider,
   DistributionWrapper,
   DistributionDeployer,
   DistributionProvider,

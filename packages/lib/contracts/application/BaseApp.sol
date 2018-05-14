@@ -1,16 +1,16 @@
 pragma solidity ^0.4.21;
 
-import "../versioning/ImplementationProvider.sol";
-import "../../upgradeability/AdminUpgradeabilityProxy.sol";
-import "../../upgradeability/UpgradeabilityProxyFactory.sol";
+import "./versioning/ImplementationProvider.sol";
+import "../upgradeability/AdminUpgradeabilityProxy.sol";
+import "../upgradeability/UpgradeabilityProxyFactory.sol";
 import "zeppelin-solidity/contracts/ownership/Ownable.sol";
 
 /**
- * @title BaseAppManager
+ * @title BaseApp
  * @dev Abstract base contract for the management of upgradeable user projects
  * @dev Handles the creation and upgrading of proxies 
  */
-contract BaseAppManager is Ownable {
+contract BaseApp is Ownable {
   // factory for proxy creation
   UpgradeabilityProxyFactory public factory;
 
@@ -18,14 +18,14 @@ contract BaseAppManager is Ownable {
    * @dev Constructor function
    * @param _factory Proxy factory
    */
-  function BaseAppManager(UpgradeabilityProxyFactory _factory) public {
+  function BaseApp(UpgradeabilityProxyFactory _factory) public {
     require(address(_factory) != address(0));
     factory = _factory;
   }
 
   /**
-   * @dev Abstract function for fetching the manager's implementation provider
-   * @return The manager's implementation provider
+   * @dev Abstract function for fetching the app's implementation provider
+   * @return The app's implementation provider
    */
   function getProvider() internal view returns (ImplementationProvider);
 

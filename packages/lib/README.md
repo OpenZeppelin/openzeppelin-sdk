@@ -139,22 +139,22 @@ contract DonationsV1 is Ownable {
 }
 ```
 
-2. We want to use `zos-lib` to deploy this contract with upgradeability capabilities. Given this will probably be a complex application and we'll want to use the zOS Kernel standard libraries, we'll use the `AppManager` contract. This contract will live in the blockchain and manage the different versions of our smart contract code and upgradeability proxies. It's the single entry point to manage our application's contract's upgradeability and instances. Let's create and configure it:
+2. We want to use `zos-lib` to deploy this contract with upgradeability capabilities. Given this will probably be a complex application and we'll want to use the zOS Kernel standard libraries, we'll use the `App` contract. This contract will live in the blockchain and manage the different versions of our smart contract code and upgradeability proxies. It's the single entry point to manage our application's contract's upgradeability and instances. Let's create and configure it:
 
 ```js
   // On-chain, single entry point of the entire application.
-  log.info("<< Setting up AppManager >>")
+  log.info("<< Setting up App >>")
   const initialVersion = '0.0.1'
-  return await AppManagerDeployer.call(initialVersion)
+  return await AppDeployer.call(initialVersion)
 ```
 
-3. Next, we need to deploy the first version of the app contracts. To do so, we register the implementation of our `DonationsV1` in the `AppManager` and request it to create a new upgradeable proxy for it. Let's do it:
+3. Next, we need to deploy the first version of the app contracts. To do so, we register the implementation of our `DonationsV1` in the `App` and request it to create a new upgradeable proxy for it. Let's do it:
 
 ```js
   const contractName = "Donations";
   const DonationsV1 = ContractsProvider.getByName('DonationsV1')
-  await appManager.setImplementation(DonationsV1, contractName);
-  return await appManager.createProxy(DonationsV1, contractName, 'initialize', [owner])
+  await app.setImplementation(DonationsV1, contractName);
+  return await app.createProxy(DonationsV1, contractName, 'initialize', [owner])
 ```
 
 4. Now let's suppose we want to give some sort of retribution to people donating money to our donation campaign. We want to mint new ERC721 cryptocollectibles for every received donation. To do so, we'll link our application to a zOS Kernel standard library release that contains an implementation of a mintable ERC721 token. Here's the new contract code:
@@ -188,22 +188,22 @@ contract DonationsV2 is DonationsV1 {
 }
 ```
 
-5. What we need to do next is link our application to the zOS Kernel standard library release containing that mintable ERC721 implementation, and set it to our upgradeable contract. To do so, we create a new version of our application in the `AppManager`, register a new `AppDirectory` containing the new version of our contract implementation, and then set the standard library version of ERC721 to our upgradeable contract. Let's see how:
+5. What we need to do next is link our application to the zOS Kernel standard library release containing that mintable ERC721 implementation, and set it to our upgradeable contract. To do so, we create a new version of our application in the `App`, register a new `AppDirectory` containing the new version of our contract implementation, and then set the standard library version of ERC721 to our upgradeable contract. Let's see how:
 
 ```js
   // Address of the zOS Kernel standard library.
   const stdlib = "0xA739d10Cc20211B973dEE09DB8F0D75736E2D817";
   const secondVersion = '0.0.2'
-  await appManager.newVersion(secondVersion, await getStdLib(txParams))
+  await app.newVersion(secondVersion, await getStdLib(txParams))
   const DonationsV2 = ContractsProvider.getByName('DonationsV2')
-  await appManager.setImplementation(DonationsV2, contractName);
-  await appManager.upgradeProxy(donations.address, null, contractName)
+  await app.setImplementation(DonationsV2, contractName);
+  await app.upgradeProxy(donations.address, null, contractName)
   donations = DonationsV2.at(donations.address)
 
   // Add an ERC721 token implementation to the project, request a proxy for it,
   // and set the token on "Donations".
   log.info(`Creating ERC721 token proxy to use in ${contractName}...`)
-  const token = await appManager.createProxy(
+  const token = await app.createProxy(
     MintableERC721Token, 
     tokenClass,
     'initialize',

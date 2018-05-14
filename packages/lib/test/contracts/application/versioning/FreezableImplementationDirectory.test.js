@@ -1,5 +1,7 @@
-import assertRevert from '../../../src/helpers/assertRevert'
-import shouldBehaveLikeImplementationDirectory from '../../../src/test/behaviors/ImplementationDirectory'
+'use strict';
+
+import assertRevert from '../../../../src/helpers/assertRevert'
+import shouldBehaveLikeImplementationDirectory from '../../../../src/test/behaviors/ImplementationDirectory'
 
 const FreezableImplementationDirectory = artifacts.require('FreezableImplementationDirectory')
 const DummyImplementation = artifacts.require('DummyImplementation')

@@ -4,11 +4,11 @@ import Logger from '../utils/Logger'
 import decodeLogs from '../helpers/decodeLogs'
 import encodeCall from '../helpers/encodeCall'
 
-const log = new Logger('AppManager')
+const log = new Logger('App')
 
-export default class AppManagerWrapper {
-  constructor(appManager, factory, appDirectory, _package, version, txParams = {}) {
-    this.appManager = appManager
+export default class AppWrapper {
+  constructor(app, factory, appDirectory, _package, version, txParams = {}) {
+    this.app = app
     this.factory = factory
     this.package = _package
     this.version = version
@@ -18,7 +18,7 @@ export default class AppManagerWrapper {
   }
 
   address() {
-    return this.appManager.address
+    return this.app.address
   }
 
   currentDirectory() {
@@ -52,7 +52,7 @@ export default class AppManagerWrapper {
     log.info(` App directory: ${directory.address}`)
     await this.package.addVersion(versionName, directory.address, this.txParams)
     log.info(` Added version: ${versionName}`)
-    await this.appManager.setVersion(versionName, this.txParams)
+    await this.app.setVersion(versionName, this.txParams)
     log.info(` Version set`)
     this.directories[versionName] = directory
     this.version = versionName
@@ -81,25 +81,25 @@ export default class AppManagerWrapper {
   }
 
   async _createProxy(contractName) {
-    return this.appManager.create(contractName, this.txParams)
+    return this.app.create(contractName, this.txParams)
   }
 
   async _createProxyAndCall(contractClass, contractName, initMethodName, initArgs) {
     const initMethod = this._validateInitMethod(contractClass, initMethodName, initArgs)
     const initArgTypes = initMethod.inputs.map(input => input.type)
     const callData = encodeCall(initMethodName, initArgTypes, initArgs)
-    return this.appManager.createAndCall(contractName, callData, this.txParams)
+    return this.app.createAndCall(contractName, callData, this.txParams)
   }
 
   async _updateProxy(proxyAddress, contractName) {
-    return this.appManager.upgrade(proxyAddress, contractName, this.txParams)
+    return this.app.upgrade(proxyAddress, contractName, this.txParams)
   }
 
   async _updateProxyAndCall(proxyAddress, contractClass, contractName, initMethodName, initArgs) {
     const initMethod = this._validateInitMethod(contractClass, initMethodName, initArgs)
     const initArgTypes = initMethod.inputs.map(input => input.type)
     const callData = encodeCall(initMethodName, initArgTypes, initArgs)
-    return this.appManager.upgradeAndCall(proxyAddress, contractName, callData, this.txParams)
+    return this.app.upgradeAndCall(proxyAddress, contractName, callData, this.txParams)
   }
 
   _validateInitMethod(contractClass, initMethodName, initArgs) {

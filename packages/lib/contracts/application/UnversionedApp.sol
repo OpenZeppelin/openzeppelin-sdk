@@ -1,14 +1,14 @@
 pragma solidity ^0.4.21;
 
-import "./BaseAppManager.sol";
-import "../versioning/ImplementationProvider.sol";
-import "../../upgradeability/UpgradeabilityProxyFactory.sol";
+import "./BaseApp.sol";
+import "./versioning/ImplementationProvider.sol";
+import "../upgradeability/UpgradeabilityProxyFactory.sol";
 
 /**
- * @title UnversionedAppManager
- * @dev Basic implementation of an upgradable user project manager with no versions
+ * @title UnversionedApp
+ * @dev Basic implementation of an upgradable app with no versioning
  */
-contract UnversionedAppManager is BaseAppManager {
+contract UnversionedApp is BaseApp {
   /*
    * @dev stores the contract implementation addresses
    */
@@ -19,15 +19,15 @@ contract UnversionedAppManager is BaseAppManager {
    * @param _provider Implementation provider
    * @param _factory Proxy factory
    */
-  function UnversionedAppManager(ImplementationProvider _provider, UpgradeabilityProxyFactory _factory)
-    BaseAppManager(_factory)
+  function UnversionedApp(ImplementationProvider _provider, UpgradeabilityProxyFactory _factory)
+    BaseApp(_factory)
     public
   {
     setProvider(_provider);
   }
 
   /**
-   * @return Implementation provider used by the manager
+   * @return Implementation provider used by the app
    */
   function getProvider() internal view returns (ImplementationProvider) {
     return provider;

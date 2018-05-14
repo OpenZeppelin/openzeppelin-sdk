@@ -1,7 +1,9 @@
-import Logger from '../utils/Logger'
-import AppManagerWrapper from './AppManagerWrapper'
+'use strict';
 
-const log = new Logger('AppManagerDeployer')
+import Logger from '../utils/Logger'
+import AppWrapper from './AppWrapper'
+
+const log = new Logger('AppDeployer')
 
 export default {
   async call(version, txParams = {}) {
@@ -14,15 +16,15 @@ export default {
     await this.createPackage()
     await this.createAppDirectory(stdlibAddress)
     await this.addVersion(version)
-    await this.createAppManager(version)
-    return new AppManagerWrapper(this.packagedAppManager, this.factory, this.appDirectory, this.package, this.version, this.txParams)
+    await this.createApp(version)
+    return new AppWrapper(this.packagedApp, this.factory, this.appDirectory, this.package, this.version, this.txParams)
   },
 
-  async createAppManager(version) {
-    log.info('Deploying new PackagedAppManager...')
-    const PackagedAppManager = ContractsProvider.getFromLib('PackagedAppManager')
-    this.packagedAppManager = await PackagedAppManager.new(this.package.address, version, this.factory.address, this.txParams)
-    log.info(`Deployed PackagedAppManager ${this.packagedAppManager.address}`)
+  async createApp(version) {
+    log.info('Deploying new PackagedApp...')
+    const PackagedApp = ContractsProvider.getFromLib('PackagedApp')
+    this.packagedApp = await PackagedApp.new(this.package.address, version, this.factory.address, this.txParams)
+    log.info(`Deployed PackagedApp ${this.packagedApp.address}`)
   },
 
   async createFactory() {
