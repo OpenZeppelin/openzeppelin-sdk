@@ -6,11 +6,6 @@ ContractsProvider.getFromLib = contractName => {
   return ContractsProvider.getByJSONData(data)
 }
 
-ContractsProvider.getFromKernel = contractName => {
-  const data = require(`zos-kernel/build/contracts/${contractName}.json`);
-  return ContractsProvider.getByJSONData(data)
-}
-
 ContractsProvider.getFromStdlib = (stdlibName, contractAlias) => {
   const implementationName = new Stdlib(stdlibName).contract(contractAlias)
   if (!implementationName) throw Error(`Could not find contract ${contractAlias} in stdlib package file`)

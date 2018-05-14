@@ -44,11 +44,11 @@ contract('Stdlib', function () {
   });
 
   xdescribe('deploy', function () {
-    beforeEach('deploying a contract directory', async function () {
+    beforeEach('deploying an implementation directory', async function () {
       this.directory = await this.stdlib.deploy();
     });
 
-    it('should deploy a contract directory', async function () {
+    it('should deploy an implementation directory', async function () {
       this.directory.address.should.not.be.null;
       (typeof(this.directory.getImplementation)).should.eq('function');
     });

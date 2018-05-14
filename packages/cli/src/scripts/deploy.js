@@ -1,5 +1,4 @@
 import PackageFilesInterface from '../utils/PackageFilesInterface'
-import { KernelProvider } from 'zos-kernel'
 import { Logger, DistributionDeployer, DistributionProvider } from 'zos-lib'
 
 const log = new Logger('deploy')
@@ -44,12 +43,6 @@ export default async function deploy({ version, network, txParams = {}, packageF
   // 4. Freeze release
   log.info('Freezing release...')
   await distribution.freeze(version)
-
-  // 5. Register release into kernel
-  const kernelAddress = zosPackage.kernel.address
-  log.info(`Registering release into kernel address ${kernelAddress}`)
-  const kernel = await KernelProvider.fromAddress(kernelAddress, txParams)
-  await kernel.register(release.address)
 
   zosNetworkFile.provider = { address: release.address }
 

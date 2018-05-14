@@ -7,10 +7,10 @@ import upgradeProxy from "../../src/scripts/upgrade-proxy.js";
 import { FileSystem as fs } from "zos-lib";
 import { cleanup, cleanupfn } from "../helpers/cleanup.js";
 
-const Proxy = artifacts.require('Proxy');
 const ImplV1 = artifacts.require('ImplV1');
 const ImplV2 = artifacts.require('ImplV2');
 const Greeter = artifacts.require('GreeterImpl');
+const PackagedAppManager = ContractsProvider.getFromLib('PackagedAppManager');
 
 const should = require('chai')
       .use(require('chai-as-promised'))
@@ -44,9 +44,8 @@ contract('upgrade-proxy command', function([_, owner]) {
     }
 
     if (implementation) {
-      // NOTE: The following may fail if transparent proxies are implemented
-      const proxy = Proxy.at(proxyInfo.address);
-      const actualImplementation = await proxy.implementation();
+      const appManager = PackagedAppManager.at(data.app.address)
+      const actualImplementation = await appManager.getProxyImplementation(proxyInfo.address)
       actualImplementation.should.eq(implementation);
     }
 
@@ -70,7 +69,7 @@ contract('upgrade-proxy command', function([_, owner]) {
       await addImplementation({ contractName: "ImplV1", contractAlias: "Impl", packageFileName });
       await addImplementation({ contractName: "AnotherImplV1", contractAlias: "AnotherImpl", packageFileName });
       await sync({ packageFileName, network, txParams });
-      
+
       const networkDataV1 = fs.parseJson(networkFileName);
       this.implV1Address = networkDataV1.contracts["Impl"].address;
       this.anotherImplV1Address = networkDataV1.contracts["AnotherImpl"].address;
@@ -78,7 +77,7 @@ contract('upgrade-proxy command', function([_, owner]) {
       await createProxy({ contractAlias: "Impl", packageFileName, network, txParams });
       await createProxy({ contractAlias: "Impl", packageFileName, network, txParams });
       await createProxy({ contractAlias: "AnotherImpl", packageFileName, network, txParams });
-    
+
       await newVersion({ version: v2string, packageFileName, txParams });
       await addImplementation({ contractName: "ImplV2", contractAlias: "Impl", packageFileName });
       await addImplementation({ contractName: "AnotherImplV2", contractAlias: "AnotherImpl", packageFileName });
@@ -177,10 +176,10 @@ contract('upgrade-proxy command', function([_, owner]) {
     beforeEach('setup', async function() {
       await init({ name: appName, version: v1string, packageFileName, stdlibNameVersion: 'mock-stdlib@1.1.0' });
       await sync({ packageFileName, network, txParams, deployStdlib: true });
-      
+
       await createProxy({ contractAlias: "Greeter", packageFileName, network, txParams });
       await createProxy({ contractAlias: "Greeter", packageFileName, network, txParams });
-    
+
       await newVersion({ version: v2string, packageFileName, txParams, stdlibNameVersion: "mock-stdlib-2@1.2.0" });
       await sync({ packageFileName, network, txParams, deployStdlib: true });
     });

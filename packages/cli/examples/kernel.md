@@ -1,4 +1,4 @@
-# Develop a new zOS Kernel standard library release using `zos`
+# Develop a new standard library using `zos`
 
 The **zeppelin_os** kernel handles releases of the standard library. Any developer can register new stdlib releases with the kernel, which can then be vouched for by other users, earning the developer a fraction of the `ZepTokens` staked. The *zos* CLI allows developers to go through this process seamlessly, by creating distributions that handle the different releases of the stdlib. 
 

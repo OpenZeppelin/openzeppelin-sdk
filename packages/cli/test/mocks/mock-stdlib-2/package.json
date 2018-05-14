@@ -1,7 +1,7 @@
 {
   "name": "mock-stdlib-2",
   "version": "1.2.0",
-  "description": "Mock kernel stdlib 2 for tests in zos-cli",
+  "description": "Mock stdlib 2 for tests in zos-cli",
   "main": "index.js",
   "private": true,
   "scripts": {

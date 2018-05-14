@@ -6,22 +6,22 @@ export default {
   async call(name, txParams = {}) {
     this.txParams = txParams
     this._parseJsonData(name)
-    await this._createContractDirectory()
+    await this._createImplementationDirectory()
     await this._deployContracts(name)
-    return this.contractDirectory.address
+    return this.implementationDirectory.address
   },
 
-  async _createContractDirectory() {
-    log.info('Deploying new ContractDirectory...')
-    const ContractDirectory = ContractsProvider.getFromLib('ContractDirectory')
-    this.contractDirectory = await ContractDirectory.new(this.txParams)
-    log.info(`Deployed ContractDirectory ${this.contractDirectory.address}`)
+  async _createImplementationDirectory() {
+    log.info('Deploying new ImplementationDirectory...')
+    const ImplementationDirectory = ContractsProvider.getFromLib('ImplementationDirectory')
+    this.implementationDirectory = await ImplementationDirectory.new(this.txParams)
+    log.info(`Deployed ImplementationDirectory ${this.implementationDirectory.address}`)
   },
 
   async _deployContracts(name) {
     await Promise.all(this._contractsList().map(async (contractName) => {
       const deployed = await this._deployContract(name, contractName)
-      await this.contractDirectory.setImplementation(contractName, deployed.address, this.txParams)
+      await this.implementationDirectory.setImplementation(contractName, deployed.address, this.txParams)
     }))
   },
 
