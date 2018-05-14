@@ -5,8 +5,12 @@ export default class Logger {
     this.prefix = prefix
   }
 
+  out(msg) {
+    console.log(msg)
+  }
+
   info(msg) {
-    console.log(`[${this.prefix}] ${msg}`.green)
+    console.error(`[${this.prefix}] ${msg}`.green)
   }
 
   error(msg) {
