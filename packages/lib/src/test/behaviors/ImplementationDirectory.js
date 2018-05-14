@@ -1,7 +1,9 @@
+'use strict';
+
 import assertRevert from '../../helpers/assertRevert'
 import shouldBehaveLikeOwnable from './Ownable'
 
-export default function shouldBehaveLikeContractDirectory(owner, anotherAddress) {
+export default function shouldBehaveLikeImplementationDirectory(owner, anotherAddress) {
   describe('ownership', function () {
     beforeEach(function () {
       this.ownable = this.directory

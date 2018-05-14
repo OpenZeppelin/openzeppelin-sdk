@@ -1,29 +1,31 @@
 pragma solidity ^0.4.21;
 
-import "../versioning/ContractProvider.sol";
-import "../versioning/ContractDirectory.sol";
+import "../versioning/ImplementationProvider.sol";
+import "../versioning/ImplementationDirectory.sol";
 import "zeppelin-solidity/contracts/ownership/Ownable.sol";
 
 /**
  * @title AppDirectory
- * @dev Contract directory with a standard library as a default provider
+ * @dev Implementation directory with a standard library as a default provider
  * @dev Will search the stdlib for an implementation if none is found in the directory
  */
-contract AppDirectory is ContractDirectory {
+contract AppDirectory is ImplementationDirectory {
   /**
    * @dev Emitted when the stdlib is changed
    * @param newStdlib New address of stdlib
    */
   event StdlibChanged(address newStdlib);
 
-  // Default contract provider
-  ContractProvider public stdlib;
+  /**
+   * @dev Provider for standard library implementations
+   */
+  ImplementationProvider public stdlib;
   
   /**
    * @dev Constructor function
-   * @param _stdlib Default contract provider where the missing implementations are searched for
+   * @param _stdlib Provider for standard library implementations
    */
-  function AppDirectory(ContractProvider _stdlib) public {
+  function AppDirectory(ImplementationProvider _stdlib) public {
     stdlib = _stdlib;
   }
 
@@ -31,7 +33,7 @@ contract AppDirectory is ContractDirectory {
    * @dev Gets the implementation address for a given contract name
    * @dev If the implementation is not found in the directory, search the stdlib
    * @dev Returns 0 if the implementation is absent from both the directory and stdlib
-   * @param contractName Name of the contract whose implementation address is desired
+   * @param contractName Name of the contract
    * @return Address where the contract is implemented
    */
   function getImplementation(string contractName) public view returns (address) {
@@ -42,10 +44,10 @@ contract AppDirectory is ContractDirectory {
   }
 
   /**
-   * @dev Sets a new default contract provider
-   * @param _stdlib New default contract provider
+   * @dev Sets a new implementation provider for standard library contracts
+   * @param _stdlib New implementation provider
    */
-  function setStdlib(ContractProvider _stdlib) public onlyOwner {
+  function setStdlib(ImplementationProvider _stdlib) public onlyOwner {
     stdlib = _stdlib;
     emit StdlibChanged(_stdlib);
   }

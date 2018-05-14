@@ -1,7 +1,7 @@
 pragma solidity ^0.4.21;
 
 import "./BaseAppManager.sol";
-import "../versioning/ContractProvider.sol";
+import "../versioning/ImplementationProvider.sol";
 import "../../upgradeability/UpgradeabilityProxyFactory.sol";
 
 /**
@@ -9,15 +9,17 @@ import "../../upgradeability/UpgradeabilityProxyFactory.sol";
  * @dev Basic implementation of an upgradable user project manager with no versions
  */
 contract UnversionedAppManager is BaseAppManager {
-  // Directory storing the contract implementation addresses
-  ContractProvider internal provider;
+  /*
+   * @dev stores the contract implementation addresses
+   */
+  ImplementationProvider internal provider;
 
   /**
    * @dev Constructor function
-   * @param _provider Contract provider
+   * @param _provider Implementation provider
    * @param _factory Proxy factory
    */
-  function UnversionedAppManager(ContractProvider _provider, UpgradeabilityProxyFactory _factory)
+  function UnversionedAppManager(ImplementationProvider _provider, UpgradeabilityProxyFactory _factory)
     BaseAppManager(_factory)
     public
   {
@@ -25,18 +27,17 @@ contract UnversionedAppManager is BaseAppManager {
   }
 
   /**
-   * @dev Gets the contract provider used by the manager
-   * @return Contract provider used by the manager
+   * @return Implementation provider used by the manager
    */
-  function getProvider() internal view returns (ContractProvider) {
+  function getProvider() internal view returns (ImplementationProvider) {
     return provider;
   }
 
   /**
-   * @dev Sets a new contract provider to be used by the manager
-   * @param _provider New contract provider
+   * @dev Sets a new implementation provider
+   * @param _provider New implementation provider
    */
-  function setProvider(ContractProvider _provider) public onlyOwner {
+  function setProvider(ImplementationProvider _provider) public onlyOwner {
     require(address(_provider) != address(0));
     provider = _provider;
   }

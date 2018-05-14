@@ -1,6 +1,6 @@
 pragma solidity ^0.4.21;
 
-import "../versioning/ContractProvider.sol";
+import "../versioning/ImplementationProvider.sol";
 import "../../upgradeability/OwnedUpgradeabilityProxy.sol";
 import "../../upgradeability/UpgradeabilityProxyFactory.sol";
 import "zeppelin-solidity/contracts/ownership/Ownable.sol";
@@ -24,13 +24,13 @@ contract BaseAppManager is Ownable {
   }
 
   /**
-   * @dev Abstract function for fetching the manager's contract provider
-   * @return The manager's contract provider
+   * @dev Abstract function for fetching the manager's implementation provider
+   * @return The manager's implementation provider
    */
-  function getProvider() internal view returns (ContractProvider);
+  function getProvider() internal view returns (ImplementationProvider);
 
   /**
-   * @dev Gets the implementation address for a given contract name, provided by the contract provider
+   * @dev Gets the implementation address for a given contract name, provided by the implementation provider
    * @param contractName Name of the contract whose implementation address is desired
    * @return Address where the contract is implemented
    */

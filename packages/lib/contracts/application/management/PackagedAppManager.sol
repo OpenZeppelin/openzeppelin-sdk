@@ -41,10 +41,9 @@ contract PackagedAppManager is BaseAppManager {
   }
 
   /**
-   * @dev Gets the contract provider where the implementation addresses of the current version are stored
-   * @return Contract provider for the current version
+   * @return Implementation provider for the current version
    */
-  function getProvider() internal view returns (ContractProvider) {
+  function getProvider() internal view returns (ImplementationProvider) {
     return package.getVersion(version);
   }
 }

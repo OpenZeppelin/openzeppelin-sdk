@@ -18,7 +18,7 @@ contract UpgradeabilityProxy is Proxy {
   event Upgraded(address implementation);
 
   // Storage slot of the address of the current implementation
-  bytes32 private constant implementationSlot = keccak256("org.zeppelinos.proxy.implementation");
+  bytes32 private constant IMPLEMENTATION_SLOT = keccak256("org.zeppelinos.proxy.implementation");
 
   /**
    * @param _implementation address of the initial implementation
@@ -32,8 +32,7 @@ contract UpgradeabilityProxy is Proxy {
    * @return address of the current implementation
    */
   function _implementation() internal view returns (address impl) {
-    bytes32 slot = implementationSlot;
-
+    bytes32 slot = IMPLEMENTATION_SLOT;
     assembly {
       impl := sload(slot)
     }
@@ -45,7 +44,6 @@ contract UpgradeabilityProxy is Proxy {
    */
   function _upgradeTo(address newImplementation) internal {
     _setImplementation(newImplementation);
-
     emit Upgraded(newImplementation);
   }
 
@@ -57,7 +55,7 @@ contract UpgradeabilityProxy is Proxy {
   function _setImplementation(address newImplementation) private {
     require(AddressUtils.isContract(newImplementation));
 
-    bytes32 slot = implementationSlot;
+    bytes32 slot = IMPLEMENTATION_SLOT;
 
     assembly {
       sstore(slot, newImplementation)

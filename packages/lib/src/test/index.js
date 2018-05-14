@@ -1,7 +1,7 @@
 import shouldBehaveLikeOwnable from './behaviors/Ownable'
-import shouldBehaveLikeContractDirectory from './behaviors/ContractDirectory'
+import shouldBehaveLikeImplementationDirectory from './behaviors/ImplementationDirectory'
 
 export default {
   shouldBehaveLikeOwnable,
-  shouldBehaveLikeContractDirectory,
+  shouldBehaveLikeImplementationDirectory,
 }

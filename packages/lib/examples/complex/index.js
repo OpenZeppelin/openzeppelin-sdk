@@ -1,16 +1,18 @@
+'use strict';
+
 global.artifacts = artifacts;
 global.ContractsProvider = require('zos-lib/src/utils/ContractsProvider').default;
 
 const args = require('minimist')(process.argv.slice(2));
 const network = args.network;
 
-const ContractDirectory = artifacts.require('ContractDirectory');
+const ImplementationDirectory = artifacts.require('ImplementationDirectory');
 const MintableERC721Token = artifacts.require('MintableERC721Token');
 const { Logger, AppManagerDeployer, ContractsProvider } = require('zos-lib')
 const log = new Logger('ComplexExample')
 
 const owner = web3.eth.accounts[1];
-const contractName = "Donations";
+const contractName = 'Donations';
 const tokenClass = 'MintableERC721Token';
 const tokenName = 'DonationToken';
 const tokenSymbol = 'DON';
@@ -25,8 +27,8 @@ async function setupAppManager(txParams) {
 
 async function deployVersion1(appManager) {
 
-  // Register the first implementation of "Donations", and request a proxy for it.
-  log.info("<< Deploying version 1 >>")
+  // Register the first implementation of 'Donations', and request a proxy for it.
+  log.info('<< Deploying version 1 >>')
   const DonationsV1 = ContractsProvider.getByName('DonationsV1')
   await appManager.setImplementation(DonationsV1, contractName);
   return await appManager.createProxy(DonationsV1, contractName, 'initialize', [owner])
@@ -35,8 +37,8 @@ async function deployVersion1(appManager) {
 async function deployVersion2(appManager, donations, txParams) {
 
   // Create a new version of the app, liked to the zeppelin_os standard library.
-  // Register a new implementation for "Donations" and upgrade it's proxy to use the new implementation.
-  log.info("<< Deploying version 2 >>")
+  // Register a new implementation for 'Donations' and upgrade it's proxy to use the new implementation.
+  log.info('<< Deploying version 2 >>')
   const secondVersion = '0.0.2'
   await appManager.newVersion(secondVersion, await getStdLib(txParams))
   const DonationsV2 = ContractsProvider.getByName('DonationsV2')
@@ -45,7 +47,7 @@ async function deployVersion2(appManager, donations, txParams) {
   donations = DonationsV2.at(donations.address)
 
   // Add an ERC721 token implementation to the project, request a proxy for it,
-  // and set the token on "Donations".
+  // and set the token on 'Donations'.
   log.info(`Creating ERC721 token proxy to use in ${contractName}...`)
   const token = await appManager.createProxy(
     MintableERC721Token, 
@@ -54,9 +56,9 @@ async function deployVersion2(appManager, donations, txParams) {
     [donations.address, tokenName, tokenSymbol]
   )
   log.info(`Token proxy created at ${token.address}`)
-  log.info("Setting application's token...")
+  log.info('Setting application\'s token...')
   await donations.setToken(token.address, txParams)
-  log.info("Token set succesfully")
+  log.info('Token set succesfully')
   return token;
 }
 
@@ -64,12 +66,12 @@ async function getStdLib(txParams) {
 
   // Use deployed standard library, or simulate one in local networks.
   if(!network || network === 'local') {
-    const stdlib = await ContractDirectory.new(txParams);
+    const stdlib = await ImplementationDirectory.new(txParams);
     const tokenImplementation = await MintableERC721Token.new();
     await stdlib.setImplementation(tokenClass, tokenImplementation.address, txParams);
     return stdlib.address;
   }
-  else if(network === 'ropsten') return "0xA739d10Cc20211B973dEE09DB8F0D75736E2D817";
+  else if(network === 'ropsten') return '0xA739d10Cc20211B973dEE09DB8F0D75736E2D817';
 }
 
 module.exports = async function() {

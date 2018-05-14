@@ -1,15 +1,15 @@
 pragma solidity ^0.4.21;
 
-import "./ContractProvider.sol";
+import "./ImplementationProvider.sol";
 import "zeppelin-solidity/contracts/ownership/Ownable.sol";
 
 /**
- * @title ContractDirectory
- * @dev Implementation of ContractProvider that stores contract implementation addresses
+ * @title ImplementationDirectory
+ * @dev Concrete version of ImplementationProvider that stores contract implementations in a mapping
  */
-contract ContractDirectory is ContractProvider, Ownable {
+contract ImplementationDirectory is ImplementationProvider, Ownable {
   /**
-   * @dev This event will be emitted when an implementation is added to the directory
+   * @dev Emitted when an implementation is added to the directory
    * @param contractName Name of the contract for which an implementation was added
    * @param implementation Address of added implementation
    */
@@ -21,16 +21,16 @@ contract ContractDirectory is ContractProvider, Ownable {
   /**
    * @dev Gets the implementation address for a given contract name
    * @param contractName Name of the contract whose implementation address is desired
-   * @return Address where the contract is implemented
+   * @return Address of the implementation
    */
   function getImplementation(string contractName) public view returns (address) {
     return implementations[contractName];
   }
 
   /**
-   * @dev Adds the address of a contract implementation to the directory
+   * @dev Adds the address of an implementation to the directory
    * @param contractName Name of the contract whose implementation address is added
-   * @param implementation Address where the added contract is implemented
+   * @param implementation Address of the implementation
    */
   function setImplementation(string contractName, address implementation) public onlyOwner {
     implementations[contractName] = implementation;

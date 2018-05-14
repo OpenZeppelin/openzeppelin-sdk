@@ -1,10 +1,10 @@
 pragma solidity ^0.4.21;
 
 /**
- * @title ContractProvider
- * @dev Interface for contracts that can provide implementation addresses for other contracts
+ * @title ImplementationProvider
+ * @dev Interface for providing implementation addresses for other contracts by name
  */
-interface ContractProvider {
+interface ImplementationProvider {
   /**
    * @dev Prototype of function that returns implementation addresses
    * @param contractName Name of the contract whose address is being fetched

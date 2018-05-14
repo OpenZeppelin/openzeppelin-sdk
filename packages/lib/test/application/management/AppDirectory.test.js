@@ -1,8 +1,10 @@
+'use strict';
+
 import assertRevert from '../../../src/helpers/assertRevert'
-import shouldBehaveLikeContractDirectory from '../../../src/test/behaviors/ContractDirectory'
+import shouldBehaveLikeImplementationDirectory from '../../../src/test/behaviors/ImplementationDirectory'
 
 const AppDirectory = artifacts.require('AppDirectory')
-const ContractDirectory = artifacts.require('ContractDirectory')
+const ImplementationDirectory = artifacts.require('ImplementationDirectory')
 const DummyImplementation = artifacts.require('DummyImplementation')
 
 contract('AppDirectory', ([_, owner, stdlibOwner, anotherAddress, stdlibImplementation]) => {
@@ -13,10 +15,10 @@ contract('AppDirectory', ([_, owner, stdlibOwner, anotherAddress, stdlibImplemen
 
   beforeEach(async function () {
     this.directory = await AppDirectory.new(0x0, { from: owner })
-    this.stdlib = await ContractDirectory.new({ from: stdlibOwner })
+    this.stdlib = await ImplementationDirectory.new({ from: stdlibOwner })
   })
 
-  shouldBehaveLikeContractDirectory(owner, anotherAddress)
+  shouldBehaveLikeImplementationDirectory(owner, anotherAddress)
 
   describe('getImplementation', function () {
     const contractName = 'ERC721'
@@ -106,7 +108,7 @@ contract('AppDirectory', ([_, owner, stdlibOwner, anotherAddress, stdlibImplemen
       })
 
       it('can reset a stdlib', async function () {
-        const anotherStdlib = await ContractDirectory.new({ from: stdlibOwner })
+        const anotherStdlib = await ImplementationDirectory.new({ from: stdlibOwner })
         await this.directory.setStdlib(anotherStdlib.address, { from })
 
         const stdlib = await this.directory.stdlib()

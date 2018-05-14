@@ -1,12 +1,5 @@
-const Package = artifacts.require('Package');
-const AppDirectory = artifacts.require('AppDirectory');
-const ContractDirectory = artifacts.require('ContractDirectory');
-const AppManager = artifacts.require('PackagedAppManager');
-const MintableERC721Token = artifacts.require('MintableERC721Token');
-const OwnedUpgradeabilityProxy = artifacts.require('OwnedUpgradeabilityProxy.sol');
-const UpgradeabilityProxyFactory = artifacts.require('UpgradeabilityProxyFactory');
+'use strict';
 
-const DonationsV1 = artifacts.require('DonationsV1');
 const DonationsV2 = artifacts.require('DonationsV2');
 
 const deploy = require('../index.js');
@@ -18,7 +11,7 @@ require('chai').should()
 contract('AppManager', ([_, owner, donor, wallet]) => {
   const initialVersion = '0.0.1';
   const updatedVersion = '0.0.2';
-  const contractName = "Donations";
+  const contractName = 'Donations';
 
   describe('setup', function() {
 
@@ -30,13 +23,15 @@ contract('AppManager', ([_, owner, donor, wallet]) => {
 
       describe('when queried for the initial version', function() {
         it('claims to have it', async function() {
-          (await this.appManager.package.hasVersion(initialVersion)).should.be.true;
+          (await this.appManager.package.hasVersion(initialVersion))
+            .should.be.true;
         });
       });
 
       describe('when queried for the updated version', function() {
         it('doesnt claim to have it', async function() {
-          (await this.appManager.package.hasVersion(updatedVersion)).should.be.false;
+          (await this.appManager.package.hasVersion(updatedVersion))
+            .should.be.false;
         });
       });
 

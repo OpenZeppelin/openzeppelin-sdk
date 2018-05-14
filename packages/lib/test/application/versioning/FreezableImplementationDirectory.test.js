@@ -1,17 +1,17 @@
 import assertRevert from '../../../src/helpers/assertRevert'
-import shouldBehaveLikeContractDirectory from '../../../src/test/behaviors/ContractDirectory'
+import shouldBehaveLikeImplementationDirectory from '../../../src/test/behaviors/ImplementationDirectory'
 
-const FreezableContractDirectory = artifacts.require('FreezableContractDirectory')
+const FreezableImplementationDirectory = artifacts.require('FreezableImplementationDirectory')
 const DummyImplementation = artifacts.require('DummyImplementation')
 
-contract('FreezableContractDirectory', ([_, owner, anotherAddress]) => {
+contract('FreezableImplementationDirectory', ([_, owner, anotherAddress]) => {
   before(async function () {
     this.implementation_v0 = (await DummyImplementation.new()).address
     this.implementation_v1 = (await DummyImplementation.new()).address
   })
 
   beforeEach(async function () {
-    this.directory = await FreezableContractDirectory.new({ from: owner })
+    this.directory = await FreezableImplementationDirectory.new({ from: owner })
   })
 
   it('starts unfrozen', async function () {
@@ -53,7 +53,7 @@ contract('FreezableContractDirectory', ([_, owner, anotherAddress]) => {
 
   describe('setImplementation', function () {
     describe('when it is not frozen', function () {
-      shouldBehaveLikeContractDirectory(owner, anotherAddress)
+      shouldBehaveLikeImplementationDirectory(owner, anotherAddress)
     })
 
     describe('when it is frozen', function () {

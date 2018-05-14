@@ -1,10 +1,12 @@
+'use strict';
+
 import encodeCall from '../../../src/helpers/encodeCall'
 import decodeLogs from '../../../src/helpers/decodeLogs'
 import assertRevert from '../../../src/helpers/assertRevert'
 import shouldBehaveLikeOwnable from '../../../src/test/behaviors/Ownable'
 
 const Package = artifacts.require('Package')
-const ContractDirectory = artifacts.require('ContractDirectory')
+const ImplementationDirectory = artifacts.require('ImplementationDirectory')
 const MigratableMock = artifacts.require('MigratableMock')
 const PackagedAppManager = artifacts.require('PackagedAppManager')
 const DummyImplementation = artifacts.require('DummyImplementation')
@@ -24,8 +26,8 @@ contract('PackagedAppManager', ([_, managerOwner, packageOwner, directoryOwner, 
   beforeEach(async function () {
     this.factory = await UpgradeabilityProxyFactory.new()
     this.package = await Package.new({ from: packageOwner })
-    this.zeroVersionDirectory = await ContractDirectory.new({ from: directoryOwner })
-    this.firstVersionDirectory = await ContractDirectory.new({ from: directoryOwner })
+    this.zeroVersionDirectory = await ImplementationDirectory.new({ from: directoryOwner })
+    this.firstVersionDirectory = await ImplementationDirectory.new({ from: directoryOwner })
   })
 
   describe('when the package address is null', function () {

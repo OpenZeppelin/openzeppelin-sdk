@@ -31,7 +31,7 @@ export default class AppManagerWrapper {
   }
 
   async setImplementation(contractClass, contractName) {
-    log.info(`Setting implementation of ${contractName} in contract directory...`)
+    log.info(`Setting implementation of ${contractName} in directory...`)
     const implementation = await contractClass.new(this.txParams)
     const directory = this.currentDirectory()
     await directory.setImplementation(contractName, implementation.address, this.txParams)
