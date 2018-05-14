@@ -1,7 +1,6 @@
 import { FileSystem as fs, AppManagerProvider } from 'zos-lib'
 import sync from "../../src/scripts/sync.js";
 import { cleanup, cleanupfn } from '../helpers/cleanup';
-import { promisify } from 'util';
 
 const AppManager = artifacts.require('PackagedAppManager');
 const Package = artifacts.require('Package');
