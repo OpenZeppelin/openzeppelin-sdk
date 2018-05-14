@@ -4,8 +4,20 @@ export function read(filename) {
   return fs.readFileSync(filename)
 }
 
+export function readDir(dir) {
+  return fs.readdirSync(dir)
+}
+
 export function exists(filename) {
   return fs.existsSync(filename)
+}
+
+export function ifExistsThrow(filename, message) {
+  if(exists(filename)) throw Error(message)
+}
+
+export function ifNotExistsThrow(filename, message) {
+  if(!exists(filename)) throw Error(message)
 }
 
 export function parseJson(filename) {
@@ -25,7 +37,10 @@ export function writeJson(filename, data) {
 
 export default {
   read,
+  readDir,
   exists,
+  ifExistsThrow,
+  ifNotExistsThrow,
   parseJson,
   parseJsonIfExists,
   writeJson
