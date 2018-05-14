@@ -10,6 +10,7 @@ import { cleanup, cleanupfn } from "../helpers/cleanup.js";
 const Proxy = artifacts.require('Proxy');
 const ImplV1 = artifacts.require('ImplV1');
 const ImplV2 = artifacts.require('ImplV2');
+const Greeter = artifacts.require('GreeterImpl');
 
 const should = require('chai')
       .use(require('chai-as-promised'))
@@ -27,33 +28,8 @@ contract('upgrade-proxy command', function([_, owner]) {
   const packageFileName = "test/tmp/package.zos.json";
   const networkFileName = `test/tmp/package.zos.${network}.json`;
 
-  beforeEach('setup', async function() {
-    cleanup(packageFileName)
-    cleanup(networkFileName)
-
-    await init({ name: appName, version: v1string, packageFileName });
-    await addImplementation({ contractName: "ImplV1", contractAlias: "Impl", packageFileName });
-    await addImplementation({ contractName: "AnotherImplV1", contractAlias: "AnotherImpl", packageFileName });
-    await sync({ packageFileName, network, txParams });
-    
-    const networkDataV1 = fs.parseJson(networkFileName);
-    this.implV1Address = networkDataV1.contracts["Impl"].address;
-    this.anotherImplV1Address = networkDataV1.contracts["AnotherImpl"].address;
-
-    await createProxy({ contractAlias: "Impl", packageFileName, network, txParams });
-    await createProxy({ contractAlias: "Impl", packageFileName, network, txParams });
-    await createProxy({ contractAlias: "AnotherImpl", packageFileName, network, txParams });
-  
-    await newVersion({ version: v2string, packageFileName, txParams });
-    await addImplementation({ contractName: "ImplV2", contractAlias: "Impl", packageFileName });
-    await addImplementation({ contractName: "AnotherImplV2", contractAlias: "AnotherImpl", packageFileName });
-    await sync({ packageFileName, network, txParams });
-
-    const networkDataV2 = fs.parseJson(networkFileName);
-    this.implV2Address = networkDataV2.contracts["Impl"].address;
-    this.anotherImplV2Address = networkDataV2.contracts["AnotherImpl"].address;
-  });
-
+  beforeEach(cleanupfn(packageFileName));
+  beforeEach(cleanupfn(networkFileName));
   after(cleanupfn(packageFileName));
   after(cleanupfn(networkFileName));
 
@@ -85,87 +61,156 @@ contract('upgrade-proxy command', function([_, owner]) {
     }
 
     return proxyInfo;
-  }
+  };
 
-  it('should upgrade the version of a proxy given its address', async function() {
-    // Upgrade single proxy
-    const proxyAddress = fs.parseJson(networkFileName).proxies["Impl"][0].address;
-    await upgradeProxy({ contractAlias: "Impl", proxyAddress, network, packageFileName, txParams });
-    await assertProxyInfo('Impl', 0, { version: v2string, implementation: this.implV2Address, address: proxyAddress });
+  describe('on application contract', function () {
 
-    // Check other proxies were unmodified
-    await assertProxyInfo('Impl', 1, { version: v1string, implementation: this.implV1Address });
-    await assertProxyInfo('AnotherImpl', 0, { version: v1string, implementation: this.anotherImplV1Address });
-  });
+    beforeEach('setup', async function() {
+      await init({ name: appName, version: v1string, packageFileName });
+      await addImplementation({ contractName: "ImplV1", contractAlias: "Impl", packageFileName });
+      await addImplementation({ contractName: "AnotherImplV1", contractAlias: "AnotherImpl", packageFileName });
+      await sync({ packageFileName, network, txParams });
+      
+      const networkDataV1 = fs.parseJson(networkFileName);
+      this.implV1Address = networkDataV1.contracts["Impl"].address;
+      this.anotherImplV1Address = networkDataV1.contracts["AnotherImpl"].address;
 
-  it('should upgrade the version of all proxies given the contract alias', async function() {
-    // Upgrade all "Impl" proxies
-    await upgradeProxy({ contractAlias: "Impl", proxyAddress: undefined, network, packageFileName, txParams });
-    await assertProxyInfo('Impl', 0, { version: v2string, implementation: this.implV2Address });
-    await assertProxyInfo('Impl', 1, { version: v2string, implementation: this.implV2Address });
+      await createProxy({ contractAlias: "Impl", packageFileName, network, txParams });
+      await createProxy({ contractAlias: "Impl", packageFileName, network, txParams });
+      await createProxy({ contractAlias: "AnotherImpl", packageFileName, network, txParams });
+    
+      await newVersion({ version: v2string, packageFileName, txParams });
+      await addImplementation({ contractName: "ImplV2", contractAlias: "Impl", packageFileName });
+      await addImplementation({ contractName: "AnotherImplV2", contractAlias: "AnotherImpl", packageFileName });
+      await sync({ packageFileName, network, txParams });
 
-    // Keep AnotherImpl unmodified
-    await assertProxyInfo('AnotherImpl', 0, { version: v1string, implementation: this.anotherImplV1Address });
-  });
+      const networkDataV2 = fs.parseJson(networkFileName);
+      this.implV2Address = networkDataV2.contracts["Impl"].address;
+      this.anotherImplV2Address = networkDataV2.contracts["AnotherImpl"].address;
+    });
 
-  it('should upgrade the version of all proxies in the app', async function() {
-    await upgradeProxy({ contractAlias: undefined, proxyAddress: undefined, all: true, network, packageFileName, txParams });
-    await assertProxyInfo('Impl', 0, { version: v2string, implementation: this.implV2Address });
-    await assertProxyInfo('Impl', 1, { version: v2string, implementation: this.implV2Address });
-    await assertProxyInfo('AnotherImpl', 0, { version: v2string, implementation: this.anotherImplV2Address });
-  });
+    it('should upgrade the version of a proxy given its address', async function() {
+      // Upgrade single proxy
+      const proxyAddress = fs.parseJson(networkFileName).proxies["Impl"][0].address;
+      await upgradeProxy({ contractAlias: "Impl", proxyAddress, network, packageFileName, txParams });
+      await assertProxyInfo('Impl', 0, { version: v2string, implementation: this.implV2Address, address: proxyAddress });
 
-  it('should require all flag to upgrade all proxies', async function() {
-    await upgradeProxy(
-      { contractAlias: undefined, proxyAddress: undefined, all: false, network, packageFileName, txParams }
-    ).should.be.rejected;
-  });
+      // Check other proxies were unmodified
+      await assertProxyInfo('Impl', 1, { version: v1string, implementation: this.implV1Address });
+      await assertProxyInfo('AnotherImpl', 0, { version: v1string, implementation: this.anotherImplV1Address });
+    });
 
-  it('should upgrade the remaining proxies if one was already upgraded', async function() {
-    // Upgrade a single proxy
-    const proxyAddress = fs.parseJson(networkFileName).proxies["Impl"][0].address;
-    await upgradeProxy({ contractAlias: "Impl", proxyAddress, network, packageFileName, txParams });
-    await assertProxyInfo('Impl', 0, { version: v2string, implementation: this.implV2Address, address: proxyAddress });
+    it('should upgrade the version of all proxies given the contract alias', async function() {
+      // Upgrade all "Impl" proxies
+      await upgradeProxy({ contractAlias: "Impl", proxyAddress: undefined, network, packageFileName, txParams });
+      await assertProxyInfo('Impl', 0, { version: v2string, implementation: this.implV2Address });
+      await assertProxyInfo('Impl', 1, { version: v2string, implementation: this.implV2Address });
 
-    // Upgrade all
-    await upgradeProxy({ contractAlias: undefined, proxyAddress: undefined, all: true, network, packageFileName, txParams });
-    await assertProxyInfo('Impl', 1, { version: v2string, implementation: this.implV2Address });
-    await assertProxyInfo('AnotherImpl', 0, { version: v2string, implementation: this.anotherImplV2Address });
-  });
+      // Keep AnotherImpl unmodified
+      await assertProxyInfo('AnotherImpl', 0, { version: v1string, implementation: this.anotherImplV1Address });
+    });
 
-  it('should upgrade a single proxy and migrate it', async function() {
-    const proxyAddress = fs.parseJson(networkFileName).proxies["Impl"][0].address;
-    await upgradeProxy({ contractAlias: "Impl", initMethod: "migrate", initArgs: [42], proxyAddress, network, packageFileName, txParams });
-    await assertProxyInfo('Impl', 0, { version: v2string, implementation: this.implV2Address, address: proxyAddress, value: 42 });
-  });
+    it('should upgrade the version of all proxies in the app', async function() {
+      await upgradeProxy({ contractAlias: undefined, proxyAddress: undefined, all: true, network, packageFileName, txParams });
+      await assertProxyInfo('Impl', 0, { version: v2string, implementation: this.implV2Address });
+      await assertProxyInfo('Impl', 1, { version: v2string, implementation: this.implV2Address });
+      await assertProxyInfo('AnotherImpl', 0, { version: v2string, implementation: this.anotherImplV2Address });
+    });
 
-  it('should upgrade multiple proxies and migrate them', async function() {
-    await upgradeProxy({ contractAlias: "Impl", initMethod: "migrate", initArgs: [42], proxyAddress: undefined, network, packageFileName, txParams });
-    await assertProxyInfo('Impl', 0, { version: v2string, implementation: this.implV2Address, value: 42 });
-    await assertProxyInfo('Impl', 1, { version: v2string, implementation: this.implV2Address, value: 42 });
-  });
+    it('should require all flag to upgrade all proxies', async function() {
+      await upgradeProxy(
+        { contractAlias: undefined, proxyAddress: undefined, all: false, network, packageFileName, txParams }
+      ).should.be.rejected;
+    });
 
-  it('should refuse to upgrade a proxy to an undeployed contract', async function() {
-    const data = fs.parseJson(networkFileName);
-    delete data.contracts["Impl"];
-    fs.writeJson(networkFileName, data);
-    await upgradeProxy({ contractAlias: "Impl", proxyAddress: null, network, packageFileName, txParams }).should.be.rejectedWith(/Impl are not deployed/)
-  });
+    it('should upgrade the remaining proxies if one was already upgraded', async function() {
+      // Upgrade a single proxy
+      const proxyAddress = fs.parseJson(networkFileName).proxies["Impl"][0].address;
+      await upgradeProxy({ contractAlias: "Impl", proxyAddress, network, packageFileName, txParams });
+      await assertProxyInfo('Impl', 0, { version: v2string, implementation: this.implV2Address, address: proxyAddress });
 
-  describe('with local modifications', function () {
-    beforeEach("changing local network file to have a different bytecode", async function () {
+      // Upgrade all
+      await upgradeProxy({ contractAlias: undefined, proxyAddress: undefined, all: true, network, packageFileName, txParams });
+      await assertProxyInfo('Impl', 1, { version: v2string, implementation: this.implV2Address });
+      await assertProxyInfo('AnotherImpl', 0, { version: v2string, implementation: this.anotherImplV2Address });
+    });
+
+    it('should upgrade a single proxy and migrate it', async function() {
+      const proxyAddress = fs.parseJson(networkFileName).proxies["Impl"][0].address;
+      await upgradeProxy({ contractAlias: "Impl", initMethod: "migrate", initArgs: [42], proxyAddress, network, packageFileName, txParams });
+      await assertProxyInfo('Impl', 0, { version: v2string, implementation: this.implV2Address, address: proxyAddress, value: 42 });
+    });
+
+    it('should upgrade multiple proxies and migrate them', async function() {
+      await upgradeProxy({ contractAlias: "Impl", initMethod: "migrate", initArgs: [42], proxyAddress: undefined, network, packageFileName, txParams });
+      await assertProxyInfo('Impl', 0, { version: v2string, implementation: this.implV2Address, value: 42 });
+      await assertProxyInfo('Impl', 1, { version: v2string, implementation: this.implV2Address, value: 42 });
+    });
+
+    it('should refuse to upgrade a proxy to an undeployed contract', async function() {
       const data = fs.parseJson(networkFileName);
-      data.contracts["Impl"].bytecodeHash = "0xabcd";
+      delete data.contracts["Impl"];
       fs.writeJson(networkFileName, data);
+      await upgradeProxy({ contractAlias: "Impl", proxyAddress: null, network, packageFileName, txParams }).should.be.rejectedWith(/Impl are not deployed/)
     });
 
-    it('should refuse to upgrade a proxy for a modified contract', async function () {
-      await upgradeProxy({ contractAlias: "Impl", packageFileName, network, txParams }).should.be.rejectedWith(/Impl have changed/);
+    describe('with local modifications', function () {
+      beforeEach("changing local network file to have a different bytecode", async function () {
+        const data = fs.parseJson(networkFileName);
+        data.contracts["Impl"].bytecodeHash = "0xabcd";
+        fs.writeJson(networkFileName, data);
+      });
+
+      it('should refuse to upgrade a proxy for a modified contract', async function () {
+        await upgradeProxy({ contractAlias: "Impl", packageFileName, network, txParams }).should.be.rejectedWith(/Impl have changed/);
+      });
+
+      it('should upgrade a proxy for a modified contract if force is set', async function () {
+        await upgradeProxy({ contractAlias: "Impl", packageFileName, network, txParams, force: true });
+        await assertProxyInfo('Impl', 0, { version: v2string, implementation: this.implV2Address })
+      });
+    });
+  });
+
+  describe('on stdlib contract', function () {
+
+    beforeEach('setup', async function() {
+      await init({ name: appName, version: v1string, packageFileName, stdlibNameVersion: 'mock-stdlib@1.1.0' });
+      await sync({ packageFileName, network, txParams, deployStdlib: true });
+      
+      await createProxy({ contractAlias: "Greeter", packageFileName, network, txParams });
+      await createProxy({ contractAlias: "Greeter", packageFileName, network, txParams });
+    
+      await newVersion({ version: v2string, packageFileName, txParams, stdlibNameVersion: "mock-stdlib-2@1.2.0" });
+      await sync({ packageFileName, network, txParams, deployStdlib: true });
     });
 
-    it('should upgrade a proxy for a modified contract if force is set', async function () {
-      await upgradeProxy({ contractAlias: "Impl", packageFileName, network, txParams, force: true });
-      await assertProxyInfo('Impl', 0, { version: v2string, implementation: this.implV2Address })
+    it('should upgrade the version of a proxy given its address', async function() {
+      const proxyAddress = fs.parseJson(networkFileName).proxies["Greeter"][0].address;
+      await upgradeProxy({ contractAlias: "Greeter", proxyAddress, network, packageFileName, txParams });
+      await assertProxyInfo('Greeter', 0, { version: v2string, address: proxyAddress });
+      const upgradedProxy = await Greeter.at(proxyAddress);
+      (await upgradedProxy.version()).should.eq('1.2.0');
+
+      const anotherProxyAddress = fs.parseJson(networkFileName).proxies["Greeter"][1].address;
+      const notUpgradedProxy = await Greeter.at(anotherProxyAddress);
+      (await notUpgradedProxy.version()).should.eq('1.1.0');
+    });
+
+    it('should upgrade the version of all proxies given their name', async function() {
+      await upgradeProxy({ contractAlias: "Greeter", network, packageFileName, txParams });
+      const { address: proxyAddress } = await assertProxyInfo('Greeter', 0, { version: v2string });
+      (await Greeter.at(proxyAddress).version()).should.eq('1.2.0');
+      const { address: anotherProxyAddress } = await assertProxyInfo('Greeter', 0, { version: v2string });
+      (await Greeter.at(anotherProxyAddress).version()).should.eq('1.2.0');
+    });
+
+    it('should upgrade the version of all proxies', async function() {
+      await upgradeProxy({ network, packageFileName, txParams, all: true });
+      const { address: proxyAddress } = await assertProxyInfo('Greeter', 0, { version: v2string });
+      (await Greeter.at(proxyAddress).version()).should.eq('1.2.0');
+      const { address: anotherProxyAddress } = await assertProxyInfo('Greeter', 0, { version: v2string });
+      (await Greeter.at(anotherProxyAddress).version()).should.eq('1.2.0');
     });
   });
 });
