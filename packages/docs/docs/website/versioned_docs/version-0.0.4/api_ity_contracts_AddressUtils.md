@@ -1,0 +1,7 @@
+---
+id: version-0.0.4-ity_contracts_AddressUtils
+title: AddressUtils
+original_id: ity_contracts_AddressUtils
+---
+
+<div class="contract-doc"><div class="contract"><h2 class="contract-header"><span class="contract-kind">library</span> AddressUtils</h2><p class="description">Utility library of inline functions on addresses.</p><div class="source">Source: <a href="git+https://github.com/zeppelinos/zos-lib/blob/v0.1.12/contracts/ity/contracts/AddressUtils.sol" target="_blank">ity/contracts/AddressUtils.sol</a></div></div><div class="index"><h2>Index</h2><ul><li><a href="ity_contracts_AddressUtils.html#isContract">isContract</a></li></ul></div><div class="reference"><h2>Reference</h2><div class="functions"><h3>Functions</h3><ul><li><div class="item function"><span id="isContract" class="anchor-marker"></span><h4 class="name">isContract</h4><div class="body"><code class="signature">function <strong>isContract</strong><span>(address addr) </span><span>internal </span><span>view </span><span>returns  (bool) </span></code><hr/><div class="description"><p>Returns whether there is code in the target address, This function will return false if invoked during the constructor of a contract, as the code is not actually created until after the constructor finishes.</p></div><dl><dt><span class="label-parameters">Parameters:</span></dt><dd><div><code>addr</code> - address address to check</div></dd><dt><span class="label-return">Returns:</span></dt><dd>whether there is code in the target address</dd></dl></div></div></li></ul></div></div></div>

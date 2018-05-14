@@ -1,0 +1,45 @@
+{
+  "version-0.0.4-docs": {
+    "ABOUT": [
+      "version-0.0.4-start",
+      "version-0.0.4-libstart",
+      "version-0.0.4-clistart"
+    ]
+  },
+  "version-0.0.4-docs-api": {
+    "ABOUT": [
+      "version-0.0.4-libapi"
+    ],
+    "APPLICATION / MANAGEMENT": [
+      "version-0.0.4-application_management_AppDirectory",
+      "version-0.0.4-application_management_BaseAppManager",
+      "version-0.0.4-application_management_PackagedAppManager",
+      "version-0.0.4-application_management_UnversionedAppManager"
+    ],
+    "APPLICATION / VERSIONING": [
+      "version-0.0.4-application_versioning_FreezableImplementationDirectory",
+      "version-0.0.4-application_versioning_ImplementationDirectory",
+      "version-0.0.4-application_versioning_ImplementationProvider",
+      "version-0.0.4-application_versioning_Package",
+      "version-0.0.4-application_versioning_Release"
+    ],
+    "LIFECYCLE": [
+      "version-0.0.4-lifecycle_Migrations"
+    ],
+    "MIGRATIONS": [
+      "version-0.0.4-migrations_Initializable",
+      "version-0.0.4-migrations_Migratable"
+    ],
+    "UPGRADEABILITY": [
+      "version-0.0.4-upgradeability_AdminUpgradeabilityProxy",
+      "version-0.0.4-upgradeability_Proxy",
+      "version-0.0.4-upgradeability_UpgradeabilityProxy",
+      "version-0.0.4-upgradeability_UpgradeabilityProxyFactory"
+    ]
+  },
+  "version-0.0.4-cli-api": {
+    "ABOUT": [
+      "version-0.0.4-cliapi"
+    ]
+  }
+}

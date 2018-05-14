@@ -1,27 +1,37 @@
 {
   "docs": {
     "ABOUT": [
-      "start"
+      "start",
+      "libstart",
+      "clistart"
     ]
   },
   "docs-api": {
+    "APPLICATION / MANAGEMENT": [
+      "application_management_AppDirectory",
+      "application_management_BaseAppManager",
+      "application_management_PackagedAppManager",
+      "application_management_UnversionedAppManager"
+    ],
+    "APPLICATION / VERSIONING": [
+      "application_versioning_FreezableImplementationDirectory",
+      "application_versioning_ImplementationDirectory",
+      "application_versioning_ImplementationProvider",
+      "application_versioning_Package",
+      "application_versioning_Release"
+    ],
     "LIFECYCLE": [
       "lifecycle_Migrations"
     ],
-    "OWNERSHIP": [
-      "ownership_Ownable",
-      "ownership_OwnableStorage"
+    "MIGRATIONS": [
+      "migrations_Initializable",
+      "migrations_Migratable"
     ],
     "UPGRADEABILITY": [
-      "upgradeability_OwnedUpgradeabilityProxy",
-      "upgradeability_OwnedUpgradeabilityStorage",
+      "upgradeability_AdminUpgradeabilityProxy",
       "upgradeability_Proxy",
       "upgradeability_UpgradeabilityProxy",
-      "upgradeability_UpgradeabilityStorage"
-    ],
-    "UNCATEGORIZED": [
-      "Factory",
-      "Registry"
+      "upgradeability_UpgradeabilityProxyFactory"
     ]
   }
 }
