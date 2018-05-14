@@ -4,7 +4,9 @@
   "description": "zeppelin_os library",
   "scripts": {
     "prepack": "truffle compile && babel src --out-dir lib",
-    "test": "scripts/test.sh"
+    "test_examples": "npm run prepack && cd examples/complex && npm i && npm test",
+    "test_root": "scripts/test.sh",
+    "test": "npm run test_root && npm run test_examples"
   },
   "repository": {
     "type": "git",
