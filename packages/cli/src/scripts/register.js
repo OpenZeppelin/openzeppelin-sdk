@@ -1,7 +1,8 @@
 import { KernelProvider } from 'zos-kernel'
 
 export default async function register({ releaseAddress, network, txParams = {} }) {
-  if(!releaseAddress) throw 'You must provide a release address'
+  if(!releaseAddress) throw Error('The release address to be registered must be provided.')
+
   const kernel = await KernelProvider.fromKernelNetworkFile(network, txParams)
   await kernel.validateCanRegister(releaseAddress)
 

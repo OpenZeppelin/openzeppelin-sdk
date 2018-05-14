@@ -20,8 +20,8 @@ export default class NetworkAppController {
     this.txParams = txParams;
     this.network = network;
     this.networkFileName = networkFileName || appController.packageFileName.replace(/\.zos\.json\s*$/, `.zos.${network}.json`);
-    if (this.networkFileName == appController.packageFileName) {
-      throw new Error(`Cannot create network file name from ${appController.packageFileName}`);
+    if (this.networkFileName === appController.packageFileName) {
+      throw Error(`Cannot create network file name from ${appController.packageFileName}`)
     }
   }
 
@@ -44,8 +44,6 @@ export default class NetworkAppController {
   }
 
   async createProxy(contractAlias, initMethod, initArgs) {
-    if (contractAlias === undefined) throw new Error('Missing required argument contractAlias for createProxy')
-
     await this.loadApp();
     const contractClass = this.appController.getContractClass(contractAlias);
     const proxyInstance = await this.appManagerWrapper.createProxy(contractClass, contractAlias, initMethod, initArgs);
@@ -89,13 +87,13 @@ export default class NetworkAppController {
    */
   getProxies(contractAlias, proxyAddress) {
     if (!contractAlias) {
-      if (proxyAddress) throw new Error("Must set contract alias if filtering by proxy address");
+      if (proxyAddress) throw Error('Must set contract alias if filtering by proxy address.');
       return this.networkPackage.proxies;
     }
 
     return { 
       [contractAlias]: _.filter(this.networkPackage.proxies[contractAlias], proxy => (
-        !proxyAddress || proxy.address == proxyAddress
+        !proxyAddress || proxy.address === proxyAddress
       ))
     };
   }
@@ -109,11 +107,11 @@ export default class NetworkAppController {
   findProxy(contractAlias, proxyAddress) { 
     const proxies = this.networkPackage.proxies; 
     if (_.isEmpty(proxies[contractAlias])) return null; 
-    if (proxies[contractAlias].length > 1 && proxyAddress === undefined) throw new Error(`Must provide a proxy address for contracts that have more than one proxy`) 
+    if (proxies[contractAlias].length > 1 && proxyAddress === undefined) throw Error(`Must provide a proxy address for contracts that have more than one proxy`)
      
     const proxyInfo = proxies[contractAlias].length === 1 
       ? proxies[contractAlias][0] 
-      : _.find(proxies[contractAlias], proxy => proxy.address == proxyAddress); 
+      : _.find(proxies[contractAlias], proxy => proxy.address === proxyAddress);
  
     return proxyInfo; 
   }
@@ -148,7 +146,7 @@ export default class NetworkAppController {
 
   async loadApp() {
     const address = this.appAddress;
-    if (!address) throw new Error("Must deploy app to network");
+    if (!address) throw Error('Your application must be deployed to interact with it.');
     this.appManagerWrapper = await AppManagerProvider.from(address, this.txParams);
   }
 
@@ -200,7 +198,7 @@ export default class NetworkAppController {
     const networkStdlib = this.networkPackage.stdlib;
     const hasNetworkStdlib = !_.isEmpty(networkStdlib);
     const hasCustomDeploy = hasNetworkStdlib && networkStdlib.customDeploy;
-    const customDeployMatches = hasCustomDeploy && Stdlib.equalNameAndVersion(networkStdlib, this.package.stdlib);
+    const customDeployMatches = hasCustomDeploy && this.areSameStdlib(networkStdlib, this.package.stdlib);
 
     if (customDeployMatches) {
       log.info(`Using existing custom deployment of stdlib at ${networkStdlib.address}`);
@@ -229,7 +227,7 @@ export default class NetworkAppController {
       msg = `Contracts ${contractsChanged.join(', ')} have changed since the last deploy.`;
     }
 
-    if (msg && throwIfFail) throw new Error(msg);
+    if (msg && throwIfFail) throw Error(msg);
     else if (msg) log.info(msg);    
   }
 
@@ -243,7 +241,7 @@ export default class NetworkAppController {
       msg = `Contract ${contractAlias} has changed locally since the last deploy.`;
     }
 
-    if (msg && throwIfFail) throw new Error(msg);
+    if (msg && throwIfFail) throw Error(msg);
     else if (msg) log.info(msg);
   }
 
@@ -254,7 +252,7 @@ export default class NetworkAppController {
     const contractClass = ContractsProvider.getFromArtifacts(contractName);
     const currentBytecode = bytecodeDigest(contractClass.bytecode);
     const deployedBytecode = this.networkPackage.contracts[contractAlias].bytecodeHash;
-    return currentBytecode != deployedBytecode;
+    return currentBytecode !== deployedBytecode;
   }
 
   isApplicationContract(contractAlias) {
@@ -273,5 +271,9 @@ export default class NetworkAppController {
 
   isContractDeployed(contractAlias) {
     return !this.isApplicationContract(contractAlias) || !_.isEmpty(this.networkPackage.contracts[contractAlias]);
+  }
+
+  areSameStdlib(aStdlib, anotherStdlib) {
+    return aStdlib.name === anotherStdlib.name && aStdlib.version === anotherStdlib.version
   }
 }

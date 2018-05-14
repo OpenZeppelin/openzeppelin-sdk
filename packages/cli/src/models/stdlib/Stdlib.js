@@ -24,9 +24,17 @@ export default class Stdlib {
     return this._packageJson
   }
 
+  contracts() {
+    return this.getPackage().contracts
+  }
+
+  contract(alias) {
+    return this.contracts()[alias]
+  }
+
   hasContract(alias) {
-    if (!this.getPackage().contracts) return false;
-    return !_.isEmpty(this.getPackage().contracts[alias]);
+    if (!this.contracts()) return false;
+    return !_.isEmpty(this.contract(alias));
   }
   
   async install() {
@@ -38,10 +46,5 @@ export default class Stdlib {
     this.name = name
     this.version = version
     this.nameAndVersion = nameAndVersion;
-  }
-
-  static equalNameAndVersion(stdlib1, stdlib2) {
-    return stdlib1.name === stdlib2.name
-      && (stdlib1.getVersion ? stdlib1.getVersion() : stdlib1.version) === (stdlib2.getVersion ? stdlib2.getVersion() : stdlib2.version);
   }
 }

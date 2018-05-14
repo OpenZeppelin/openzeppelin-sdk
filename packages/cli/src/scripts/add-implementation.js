@@ -1,8 +1,7 @@
 import AppController from "../models/AppController";
 
-export default function addImplementation({ contractName, contractAlias, packageFileName = undefined }) {
-  if (contractName === undefined) throw new Error('Must provide a contract name')
-  if (!contractAlias) contractAlias = contractName
+export default function addImplementation({ contractName, contractAlias = contractName, packageFileName = undefined }) {
+  if (!contractName) throw Error('A contract name must be provided to add a new implementation.')
 
   const appController = new AppController(packageFileName)
   appController.validateImplementation(contractName)

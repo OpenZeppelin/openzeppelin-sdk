@@ -4,6 +4,7 @@ import TruffleEnvironment from 'truffle-core/lib/environment'
 import ContractsProvider from './ContractsProvider'
 
 function initTruffle(network) {
+  if(!network) throw Error('A network name must be provided to execute the requested action.')
   const options = { logger: console }
   const config = TruffleConfig.detect(options)
   config.network = network

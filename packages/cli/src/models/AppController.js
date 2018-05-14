@@ -1,10 +1,8 @@
 import _ from 'lodash';
 import { Logger } from 'zos-lib';
-import { FileSystem as fs, AppManagerProvider, AppManagerDeployer } from "zos-lib";
-import StdlibProvider from './stdlib/StdlibProvider';
-import StdlibDeployer from './stdlib/StdlibDeployer';
 import Stdlib from './stdlib/Stdlib';
 import NetworkAppController from './NetworkAppController';
+import { FileSystem as fs, AppManagerProvider, AppManagerDeployer } from "zos-lib";
 
 const log = new Logger('AppController');
 
@@ -21,10 +19,10 @@ export default class AppController {
 
   init(name, version) {
     if (fs.exists(this.packageFileName)) {
-      throw new Error(`Cannot overwrite existing file ${this.packageFileName}`)
+      throw Error(`Cannot overwrite existing file ${this.packageFileName}`)
     }
     if (this.package.name) {
-      throw new Error(`Cannot initialize already initialized package ${this.package.name}`)
+      throw Error(`Cannot initialize already initialized package ${this.package.name}`)
     }
     
     this.package.name = name;
@@ -33,9 +31,6 @@ export default class AppController {
   }
 
   newVersion(version) {
-    if (!version) {
-      throw new Error('Missing required argument version for initializing new version')
-    }
     this.package.version = version;
   }
 
@@ -64,11 +59,11 @@ export default class AppController {
     const folder = `${process.cwd()}/build/contracts`;
     const path = `${folder}/${contractName}.json`;
     if (!fs.exists(path)) {
-      throw new Error(`Contract ${contractName} not found in folder ${folder}`);
+      throw Error(`Contract ${contractName} not found in folder ${folder}`);
     }
     const bytecode = fs.parseJson(path).bytecode;
-    if (!bytecode || bytecode == "0x") {
-      throw new Error(`Contract ${contractName} is abstract and cannot be deployed as an implementation`);
+    if (!bytecode || bytecode === "0x") {
+      throw Error(`Contract ${contractName} is abstract and cannot be deployed as an implementation.`);
     }
   }
 
@@ -86,7 +81,7 @@ export default class AppController {
     } else if (this.hasStdlib()) {
       return ContractsProvider.getFromStdlib(this.package.stdlib.name, contractAlias);
     } else {
-      throw new Error(`Could not find ${contractAlias} contract in zOS package file`);
+      throw Error(`Could not find ${contractAlias} contract in zOS project. Please provide one or make sure to set a stdlib that provides one.`);
     }
   }
 
