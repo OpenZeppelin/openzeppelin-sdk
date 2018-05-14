@@ -11,6 +11,7 @@ module.exports = function(program) {
     .option('-n, --network <network>', 'Provide a network to be used')
     .action(function (version, options) {
       const { from, network } = options
-      runWithTruffle(async () => await deploy({ version, network, from }), network)
+      const txParams = from ? { from } : {}
+      runWithTruffle(async () => await deploy({ version, network, txParams }), network)
     })
 }
