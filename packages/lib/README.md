@@ -5,7 +5,7 @@
 
 :warning: **Under heavy development: do not use in production** :warning:
 
-`zos-lib` is a library for writing upgradeable smart contracts on Ethereum. It can be used to create an upgradeable on-chain distributed application and is also used inside [the zOS Kernel](https://github.com/zeppelinos/kernel).
+`zos-lib` is a library for writing upgradeable smart contracts on Ethereum. It can be used to create an upgradeable on-chain distributed application.
 
 Use this library if you want to programmatically develop, deploy or operate an upgradeable smart contract system.
 
@@ -20,8 +20,7 @@ npm i zos-lib
 
 Next, learn how to:
 - [Develop and deploy a single smart contract which can be upgraded](#single) (for bugfixing or adding new features).
-- [Develop and operate a complex upgradeable app](#complex) with multiple smart contracts which are connected to the zOS Kernel upgradeable standard libraries.
-- [Develop a zOS Kernel standard library release.](https://github.com/zeppelinos/kernel#developing-kernel-standard-libraries)
+- [Develop and operate a complex upgradeable app](#complex) with multiple smart contracts which are connected to the zOS upgradeable standard libraries.
 
 ## <a name="single"></a> Develop and deploy a single upgradeable smart contract
 Note: This shows a low-level manual method of developing a single upgradeable smart contract. You probably want to use [the higher-level CLI guide](https://github.com/zeppelinos/zos-cli/blob/master/README.md).
@@ -105,7 +104,7 @@ Wohoo! We've upgraded our contract's behavior while preserving it's storage.
 
 Note: This shows a low-level manual method of developing a complex upgradeable smart contract application. You probably want to use [the higher-level CLI guide](https://github.com/zeppelinos/zos-cli/blob/master/README.md) instead, but feel free to continue reading if you want to understand the core contracts of `zos-lib`.
 
-Most real-world applications require more than a single smart contract. Here's how to build a complex upgradeable app with multiple smart contracts and connect it to the zOS Kernel standard libraries:
+Most real-world applications require more than a single smart contract. Here's how to build a complex upgradeable app with multiple smart contracts and connect it to the zOS standard libraries:
 
 1. Let's imagine we want to build a simple donation application where we give donors some sort of recognition. An initial version of the contract can look like so:
 
@@ -139,7 +138,7 @@ contract DonationsV1 is Ownable {
 }
 ```
 
-2. We want to use `zos-lib` to deploy this contract with upgradeability capabilities. Given this will probably be a complex application and we'll want to use the zOS Kernel standard libraries, we'll use the `App` contract. This contract will live in the blockchain and manage the different versions of our smart contract code and upgradeability proxies. It's the single entry point to manage our application's contract's upgradeability and instances. Let's create and configure it:
+2. We want to use `zos-lib` to deploy this contract with upgradeability capabilities. Given this will probably be a complex application and we'll want to use the zOS standard libraries, we'll use the `App` contract. This contract will live in the blockchain and manage the different versions of our smart contract code and upgradeability proxies. It's the single entry point to manage our application's contract's upgradeability and instances. Let's create and configure it:
 
 ```js
   // On-chain, single entry point of the entire application.
@@ -157,7 +156,7 @@ contract DonationsV1 is Ownable {
   return await app.createProxy(DonationsV1, contractName, 'initialize', [owner])
 ```
 
-4. Now let's suppose we want to give some sort of retribution to people donating money to our donation campaign. We want to mint new ERC721 cryptocollectibles for every received donation. To do so, we'll link our application to a zOS Kernel standard library release that contains an implementation of a mintable ERC721 token. Here's the new contract code:
+4. Now let's suppose we want to give some sort of retribution to people donating money to our donation campaign. We want to mint new ERC721 cryptocollectibles for every received donation. To do so, we'll link our application to a zOS standard library release that contains an implementation of a mintable ERC721 token. Here's the new contract code:
 
 ```sol
 pragma solidity ^0.4.21;
@@ -188,10 +187,10 @@ contract DonationsV2 is DonationsV1 {
 }
 ```
 
-5. What we need to do next is link our application to the zOS Kernel standard library release containing that mintable ERC721 implementation, and set it to our upgradeable contract. To do so, we create a new version of our application in the `App`, register a new `AppDirectory` containing the new version of our contract implementation, and then set the standard library version of ERC721 to our upgradeable contract. Let's see how:
+5. What we need to do next is link our application to the zOS standard library release containing that mintable ERC721 implementation, and set it to our upgradeable contract. To do so, we create a new version of our application in the `App`, register a new `AppDirectory` containing the new version of our contract implementation, and then set the standard library version of ERC721 to our upgradeable contract. Let's see how:
 
 ```js
-  // Address of the zOS Kernel standard library.
+  // Address of the zOS standard library.
   const stdlib = "0xA739d10Cc20211B973dEE09DB8F0D75736E2D817";
   const secondVersion = '0.0.2'
   await app.newVersion(secondVersion, await getStdLib(txParams))
@@ -218,5 +217,3 @@ contract DonationsV2 is DonationsV1 {
 
 That's it! We now have the same contract, retaining the original balance, and storage, but with an upgraded code. The upgradeable contract is also linked to an on-chain upgradeable standard library containing an implementation of a mintable ERC721 token. State of the art!
 
-## Develop a zOS Kernel standard library release
-See [this guide in the zeppelinos/kernel repo](https://github.com/zeppelinos/kernel#developing-kernel-standard-libraries) to learn how to develop new zOS kernel standard library releases.

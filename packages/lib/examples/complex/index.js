@@ -36,7 +36,7 @@ async function deployVersion1(app) {
 
 async function deployVersion2(app, donations, txParams) {
 
-  // Create a new version of the app, liked to the zeppelin_os standard library.
+  // Create a new version of the app, liked to the ZeppelinOS standard library.
   // Register a new implementation for 'Donations' and upgrade it's proxy to use the new implementation.
   log.info('<< Deploying version 2 >>')
   const secondVersion = '0.0.2'
