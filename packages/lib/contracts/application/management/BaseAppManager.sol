@@ -1,7 +1,7 @@
 pragma solidity ^0.4.21;
 
 import "../versioning/ImplementationProvider.sol";
-import "../../upgradeability/OwnedUpgradeabilityProxy.sol";
+import "../../upgradeability/AdminUpgradeabilityProxy.sol";
 import "../../upgradeability/UpgradeabilityProxyFactory.sol";
 import "zeppelin-solidity/contracts/ownership/Ownable.sol";
 
@@ -43,7 +43,7 @@ contract BaseAppManager is Ownable {
    * @param contractName Name of the contract for which a proxy is desired
    * @return Address of the new proxy
    */
-  function create(string contractName) public returns (OwnedUpgradeabilityProxy) {
+  function create(string contractName) public returns (AdminUpgradeabilityProxy) {
     address implementation = getImplementation(contractName);
     return factory.createProxy(this, implementation);
   }
@@ -58,7 +58,7 @@ contract BaseAppManager is Ownable {
    * https://solidity.readthedocs.io/en/develop/abi-spec.html#function-selector-and-argument-encoding.
    * @return Address of the new proxy
    */
-   function createAndCall(string contractName, bytes data) payable public returns (OwnedUpgradeabilityProxy) {
+   function createAndCall(string contractName, bytes data) payable public returns (AdminUpgradeabilityProxy) {
     address implementation = getImplementation(contractName);
     return factory.createProxyAndCall.value(msg.value)(this, implementation, data);
   }
@@ -68,7 +68,7 @@ contract BaseAppManager is Ownable {
    * @param proxy Proxy to be upgraded
    * @param contractName Name of the contract with a new implmentation
    */
-  function upgrade(OwnedUpgradeabilityProxy proxy, string contractName) public onlyOwner {
+  function upgrade(AdminUpgradeabilityProxy proxy, string contractName) public onlyOwner {
     address implementation = getImplementation(contractName);
     proxy.upgradeTo(implementation);
   }
@@ -82,7 +82,7 @@ contract BaseAppManager is Ownable {
    * implementation together with its parameters, as described in 
    * https://solidity.readthedocs.io/en/develop/abi-spec.html#function-selector-and-argument-encoding.
    */
-  function upgradeAndCall(OwnedUpgradeabilityProxy proxy, string contractName, bytes data) payable public onlyOwner {
+  function upgradeAndCall(AdminUpgradeabilityProxy proxy, string contractName, bytes data) payable public onlyOwner {
     address implementation = getImplementation(contractName);
     proxy.upgradeToAndCall.value(msg.value)(implementation, data);
   }
@@ -92,15 +92,15 @@ contract BaseAppManager is Ownable {
    * @dev It's necessary to have this here because only the proxy owner can query it.
    * @return the address of the current implemetation of the given proxy
    */
-  function getProxyImplementation(OwnedUpgradeabilityProxy proxy) public view returns (address) {
+  function getProxyImplementation(AdminUpgradeabilityProxy proxy) public view returns (address) {
     return proxy.implementation();
   }
 
   /**
-   * @dev Gets an owned proxy's owner. Necessary because only the owner can query it.
-   * @return the address of the current proxy owner of the given proxy
+   * @dev Gets a proxy's admin. Necessary because only the admin can query it.
+   * @return the address of the current proxy admin of the given proxy
    */
-  function getProxyOwner(OwnedUpgradeabilityProxy proxy) public view returns (address) {
-    return proxy.proxyOwner();
+  function getProxyAdmin(AdminUpgradeabilityProxy proxy) public view returns (address) {
+    return proxy.admin();
   }
 }

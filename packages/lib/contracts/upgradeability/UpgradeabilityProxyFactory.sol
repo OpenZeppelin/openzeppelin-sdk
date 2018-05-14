@@ -1,6 +1,6 @@
 pragma solidity ^0.4.21;
 
-import './OwnedUpgradeabilityProxy.sol';
+import './AdminUpgradeabilityProxy.sol';
 
 /**
  * @title UpgradeabilityProxyFactory
@@ -19,9 +19,9 @@ contract UpgradeabilityProxyFactory {
    * @param implementation the address of the initial implementation to be set
    * @return address of the new proxy created
    */
-  function createProxy(address owner, address implementation) public returns (OwnedUpgradeabilityProxy) {
-    OwnedUpgradeabilityProxy proxy = _createProxy(implementation);
-    proxy.transferProxyOwnership(owner);
+  function createProxy(address owner, address implementation) public returns (AdminUpgradeabilityProxy) {
+    AdminUpgradeabilityProxy proxy = _createProxy(implementation);
+    proxy.changeAdmin(owner);
     return proxy;
   }
 
@@ -33,9 +33,9 @@ contract UpgradeabilityProxyFactory {
    * signature of the implementation to be called with the needed payload
    * @return address of the new proxy created
    */
-  function createProxyAndCall(address owner, address implementation, bytes data) public payable returns (OwnedUpgradeabilityProxy) {
-    OwnedUpgradeabilityProxy proxy = _createProxy(implementation);
-    proxy.transferProxyOwnership(owner);
+  function createProxyAndCall(address owner, address implementation, bytes data) public payable returns (AdminUpgradeabilityProxy) {
+    AdminUpgradeabilityProxy proxy = _createProxy(implementation);
+    proxy.changeAdmin(owner);
     require(proxy.call.value(msg.value)(data));
     return proxy;
   }
@@ -45,8 +45,8 @@ contract UpgradeabilityProxyFactory {
    * @param implementation the address of the initial implementation to be set
    * @return address of the new proxy created
    */
-  function _createProxy(address implementation) internal returns (OwnedUpgradeabilityProxy) {
-    OwnedUpgradeabilityProxy proxy = new OwnedUpgradeabilityProxy(implementation);
+  function _createProxy(address implementation) internal returns (AdminUpgradeabilityProxy) {
+    AdminUpgradeabilityProxy proxy = new AdminUpgradeabilityProxy(implementation);
     emit ProxyCreated(proxy);
     return proxy;
   }

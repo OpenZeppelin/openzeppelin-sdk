@@ -1,19 +1,17 @@
+'use strict';
+
 import encodeCall from '../../src/helpers/encodeCall'
 import decodeLogs from '../../src/helpers/decodeLogs'
 import assertRevert from '../../src/helpers/assertRevert'
 
 const assert = require('chai').assert;
 const Migratable = artifacts.require('Migratable');
-const SampleMotherV1 = artifacts.require('SampleMotherV1');
-const SampleMotherV2 = artifacts.require('SampleMotherV2');
-const SampleFatherV1 = artifacts.require('SampleFatherV1');
-const SampleFatherV2 = artifacts.require('SampleFatherV2');
 const SampleChildV1 = artifacts.require('SampleChildV1');
 const SampleChildV2 = artifacts.require('SampleChildV2');
 const SampleChildV3 = artifacts.require('SampleChildV3');
 const SampleChildV4 = artifacts.require('SampleChildV4');
 const SampleChildV5 = artifacts.require('SampleChildV5');
-const OwnedUpgradeabilityProxy = artifacts.require('OwnedUpgradeabilityProxy');
+const AdminUpgradeabilityProxy = artifacts.require('AdminUpgradeabilityProxy');
 
 const DummyImplementation = artifacts.require('DummyImplementation');
 
@@ -31,7 +29,7 @@ contract('Migratable', function ([_, owner, registrar]) {
   });
 
   beforeEach(async function () {
-    this.proxy = await OwnedUpgradeabilityProxy.new(v0.address, { from });
+    this.proxy = await AdminUpgradeabilityProxy.new(v0.address, { from });
     this.contract = SampleChildV1.at(this.proxy.address);
   });
 

@@ -2,7 +2,7 @@
 
 const MyContract_v0 = artifacts.require('MyContract_v0');
 const MyContract_v1 = artifacts.require('MyContract_v1');
-const OwnedUpgradeabilityProxy = artifacts.require('zos-lib/contracts/upgradeability/OwnedUpgradeabilityProxy.sol');
+const AdminUpgradeabilityProxy = artifacts.require('zos-lib/contracts/upgradeability/AdminUpgradeabilityProxy.sol');
 
 
 module.exports = async function() {
@@ -11,7 +11,7 @@ module.exports = async function() {
   const myContract_v0 = await MyContract_v0.new();
 
   console.log('Deploying a proxy pointing to v0...');
-  const proxy = await OwnedUpgradeabilityProxy.new(myContract_v0.address);
+  const proxy = await AdminUpgradeabilityProxy.new(myContract_v0.address);
 
   console.log('Calling initialize(42) on proxy...');
   let myContract = await MyContract_v0.at(proxy.address);

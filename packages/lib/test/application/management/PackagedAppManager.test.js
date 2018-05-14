@@ -10,7 +10,7 @@ const ImplementationDirectory = artifacts.require('ImplementationDirectory')
 const MigratableMock = artifacts.require('MigratableMock')
 const PackagedAppManager = artifacts.require('PackagedAppManager')
 const DummyImplementation = artifacts.require('DummyImplementation')
-const OwnedUpgradeabilityProxy = artifacts.require('OwnedUpgradeabilityProxy')
+const AdminUpgradeabilityProxy = artifacts.require('AdminUpgradeabilityProxy')
 const UpgradeabilityProxyFactory = artifacts.require('UpgradeabilityProxyFactory')
 
 contract('PackagedAppManager', ([_, managerOwner, packageOwner, directoryOwner, anotherAccount]) => {
@@ -105,7 +105,7 @@ contract('PackagedAppManager', ([_, managerOwner, packageOwner, directoryOwner, 
           const { receipt } = await this.manager.create(contract)
           this.logs = decodeLogs(receipt.logs, UpgradeabilityProxyFactory)
           this.proxyAddress = this.logs.find(l => l.event === 'ProxyCreated').args.proxy
-          this.proxy = await OwnedUpgradeabilityProxy.at(this.proxyAddress)
+          this.proxy = await AdminUpgradeabilityProxy.at(this.proxyAddress)
         })
 
         it('creates a proxy pointing to the requested implementation', async function () {
@@ -114,8 +114,8 @@ contract('PackagedAppManager', ([_, managerOwner, packageOwner, directoryOwner, 
         })
 
         it('transfers the ownership to the manager', async function () {
-          const proxyOwner = await this.manager.getProxyOwner(this.proxy.address)
-          assert.equal(proxyOwner, this.manager.address)
+          const admin = await this.manager.getProxyAdmin(this.proxy.address)
+          assert.equal(admin, this.manager.address)
         })
       })
 
@@ -141,7 +141,7 @@ contract('PackagedAppManager', ([_, managerOwner, packageOwner, directoryOwner, 
           const { receipt } = await this.manager.createAndCall(contract, initializeData, { value })
           this.logs = decodeLogs(receipt.logs, UpgradeabilityProxyFactory)
           this.proxyAddress = this.logs.find(l => l.event === 'ProxyCreated').args.proxy
-          this.proxy = await OwnedUpgradeabilityProxy.at(this.proxyAddress)
+          this.proxy = await AdminUpgradeabilityProxy.at(this.proxyAddress)
         })
 
         it('creates a proxy pointing to the requested implementation', async function () {
@@ -150,8 +150,8 @@ contract('PackagedAppManager', ([_, managerOwner, packageOwner, directoryOwner, 
         })
 
         it('transfers the ownership to the manager', async function () {
-          const proxyOwner = await this.manager.getProxyOwner(this.proxy.address)
-          assert.equal(proxyOwner, this.manager.address)
+          const admin = await this.manager.getProxyAdmin(this.proxy.address)
+          assert.equal(admin, this.manager.address)
         })
 
         it('calls "initialize" function', async function() {
@@ -185,7 +185,7 @@ contract('PackagedAppManager', ([_, managerOwner, packageOwner, directoryOwner, 
         const { receipt } = await this.manager.create(contract)
         this.logs = decodeLogs(receipt.logs, UpgradeabilityProxyFactory)
         this.proxyAddress = this.logs.find(l => l.event === 'ProxyCreated').args.proxy
-        this.proxy = await OwnedUpgradeabilityProxy.at(this.proxyAddress)
+        this.proxy = await AdminUpgradeabilityProxy.at(this.proxyAddress)
 
         // set new version
         await this.package.addVersion(version_1, this.firstVersionDirectory.address, { from: packageOwner })
@@ -233,7 +233,7 @@ contract('PackagedAppManager', ([_, managerOwner, packageOwner, directoryOwner, 
         const { receipt } = await this.manager.create(contract)
         this.logs = decodeLogs(receipt.logs, UpgradeabilityProxyFactory)
         this.proxyAddress = this.logs.find(l => l.event === 'ProxyCreated').args.proxy
-        this.proxy = await OwnedUpgradeabilityProxy.at(this.proxyAddress)
+        this.proxy = await AdminUpgradeabilityProxy.at(this.proxyAddress)
         this.behavior = await MigratableMock.new()
 
         // set new version

@@ -5,5 +5,5 @@ import "zos-lib/contracts/application/versioning/ImplementationDirectory.sol";
 import "zos-lib/contracts/application/management/AppDirectory.sol";
 import "zos-lib/contracts/application/management/PackagedAppManager.sol";
 import "zos-lib/contracts/application/management/UnversionedAppManager.sol";
-import "zos-lib/contracts/upgradeability/OwnedUpgradeabilityProxy.sol";
+import "zos-lib/contracts/upgradeability/AdminUpgradeabilityProxy.sol";
 import "zos-lib/contracts/upgradeability/UpgradeabilityProxyFactory.sol";

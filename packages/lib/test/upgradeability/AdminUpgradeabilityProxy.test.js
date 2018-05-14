@@ -8,23 +8,22 @@ const MigratableMock = artifacts.require('MigratableMock')
 const DummyImplementation = artifacts.require('DummyImplementation')
 const ClashingImplementation = artifacts.require('ClashingImplementation')
 
-const OwnedUpgradeabilityProxy = artifacts.require('OwnedUpgradeabilityProxy')
-const UpgradeabilityProxyFactory = artifacts.require('UpgradeabilityProxyFactory')
+const AdminUpgradeabilityProxy = artifacts.require('AdminUpgradeabilityProxy')
 
-contract('OwnedUpgradeabilityProxy', ([_, owner, anotherAccount]) => {
+contract('AdminUpgradeabilityProxy', ([_, admin, anotherAccount]) => {
   before(async function () {
     this.implementation_v0 = (await DummyImplementation.new()).address
     this.implementation_v1 = (await DummyImplementation.new()).address
   })
 
   beforeEach(async function () {
-    this.proxy = await OwnedUpgradeabilityProxy.new(this.implementation_v0, { from: owner })
+    this.proxy = await AdminUpgradeabilityProxy.new(this.implementation_v0, { from: admin })
     this.proxyAddress = this.proxy.address;
   })
 
   describe('implementation', function () {
     it('returns the current implementation address', async function () {
-      const implementation = await this.proxy.implementation({ from: owner })
+      const implementation = await this.proxy.implementation({ from: admin })
 
       assert.equal(implementation, this.implementation_v0)
     })
@@ -38,14 +37,14 @@ contract('OwnedUpgradeabilityProxy', ([_, owner, anotherAccount]) => {
   })
 
   describe('upgradeTo', function () {
-    describe('when the sender is the owner', function () {
-      const from = owner
+    describe('when the sender is the admin', function () {
+      const from = admin
 
       describe('when the given implementation is different from the current one', function () {
         it('upgrades to the requested implementation', async function () {
           await this.proxy.upgradeTo(this.implementation_v1, { from })
 
-          const implementation = await this.proxy.implementation({ from: owner })
+          const implementation = await this.proxy.implementation({ from: admin })
           assert.equal(implementation, this.implementation_v1)
         })
 
@@ -65,7 +64,7 @@ contract('OwnedUpgradeabilityProxy', ([_, owner, anotherAccount]) => {
       })
     })
 
-    describe('when the sender is not the owner', function () {
+    describe('when the sender is not the admin', function () {
       const from = anotherAccount
 
       it('reverts', async function () {
@@ -83,8 +82,8 @@ contract('OwnedUpgradeabilityProxy', ([_, owner, anotherAccount]) => {
       describe('when the call does not fail', function () {
         const initializeData = encodeCall('initialize', ['uint256'], [42])
 
-        describe('when the sender is the owner', function () {
-          const from = owner
+        describe('when the sender is the admin', function () {
+          const from = admin
           const value = 1e5
 
           beforeEach(async function () {
@@ -92,17 +91,17 @@ contract('OwnedUpgradeabilityProxy', ([_, owner, anotherAccount]) => {
           })
 
           it('upgrades to the requested implementation', async function () {
-            const implementation = await this.proxy.implementation({ from: owner })
+            const implementation = await this.proxy.implementation({ from: admin })
             assert.equal(implementation, this.behavior.address)
           })
 
-          it('emits an event', async function () {
+          it('emits an event', function () {
             assert.equal(this.logs.length, 1)
             assert.equal(this.logs[0].event, 'Upgraded')
             assert.equal(this.logs[0].args.implementation, this.behavior.address)
           })
 
-          it('calls the "initialize" function', async function() {
+          it('calls the \'initialize\' function', async function() {
             const migratable = MigratableMock.at(this.proxyAddress)
             const x = await migratable.x()
             assert.equal(x, 42)
@@ -120,7 +119,7 @@ contract('OwnedUpgradeabilityProxy', ([_, owner, anotherAccount]) => {
           })
         })
 
-        describe('when the sender is not the owner', function () {
+        describe('when the sender is not the admin', function () {
           const from = anotherAccount
 
           it('reverts', async function () {
@@ -133,14 +132,14 @@ contract('OwnedUpgradeabilityProxy', ([_, owner, anotherAccount]) => {
         const initializeData = encodeCall('fail')
 
         it('reverts', async function () {
-          await assertRevert(this.proxy.upgradeToAndCall(this.behavior.address, initializeData, { from: owner }))
+          await assertRevert(this.proxy.upgradeToAndCall(this.behavior.address, initializeData, { from: admin }))
         })
       })
     })
 
     describe('with migrations', function () {
-      describe('when the sender is the owner', function () {
-        const from = owner
+      describe('when the sender is the admin', function () {
+        const from = admin
         const value = 1e5
 
         describe('when upgrading to V1', function () {
@@ -153,14 +152,14 @@ contract('OwnedUpgradeabilityProxy', ([_, owner, anotherAccount]) => {
           })
 
           it('upgrades to the requested version and emits an event', async function () {
-            const implementation = await this.proxy.implementation({ from: owner })
+            const implementation = await this.proxy.implementation({ from: admin })
             assert.equal(implementation, this.behavior_v1.address)
             assert.equal(this.logs.length, 1)
             assert.equal(this.logs[0].event, 'Upgraded')
             assert.equal(this.logs[0].args.implementation, this.behavior_v1.address)
           })
 
-          it('calls the "initialize" function and sends given value to the proxy', async function() {
+          it('calls the \'initialize\' function and sends given value to the proxy', async function() {
             const migratable = MigratableMockV1.at(this.proxyAddress)
 
             const x = await migratable.x()
@@ -180,14 +179,14 @@ contract('OwnedUpgradeabilityProxy', ([_, owner, anotherAccount]) => {
             })
 
             it('upgrades to the requested version and emits an event', async function () {
-              const implementation = await this.proxy.implementation({ from: owner })
+              const implementation = await this.proxy.implementation({ from: admin })
               assert.equal(implementation, this.behavior_v2.address)
               assert.equal(this.logs.length, 1)
               assert.equal(this.logs[0].event, 'Upgraded')
               assert.equal(this.logs[0].args.implementation, this.behavior_v2.address)
             })
 
-            it('calls the "migrate" function and sends given value to the proxy', async function() {
+            it('calls the \'migrate\' function and sends given value to the proxy', async function() {
               const migratable = MigratableMockV2.at(this.proxyAddress)
 
               const x = await migratable.x()
@@ -210,14 +209,14 @@ contract('OwnedUpgradeabilityProxy', ([_, owner, anotherAccount]) => {
               })
 
               it('upgrades to the requested version and emits an event', async function () {
-                const implementation = await this.proxy.implementation({ from: owner })
+                const implementation = await this.proxy.implementation({ from: admin })
                 assert.equal(implementation, this.behavior_v3.address)
                 assert.equal(this.logs.length, 1)
                 assert.equal(this.logs[0].event, 'Upgraded')
                 assert.equal(this.logs[0].args.implementation, this.behavior_v3.address)
               })
 
-              it('calls the "migrate" function and sends given value to the proxy', async function() {
+              it('calls the \'migrate\' function and sends given value to the proxy', async function() {
                 const migratable = MigratableMockV3.at(this.proxyAddress)
 
                 const x = await migratable.x()
@@ -234,7 +233,7 @@ contract('OwnedUpgradeabilityProxy', ([_, owner, anotherAccount]) => {
         })
       })
 
-      describe('when the sender is not the owner', function () {
+      describe('when the sender is not the admin', function () {
         const from = anotherAccount
 
         it('reverts', async function () {
@@ -246,83 +245,83 @@ contract('OwnedUpgradeabilityProxy', ([_, owner, anotherAccount]) => {
     })
   })
 
-  describe('transferOwnership', function () {
-    describe('when the new proposed owner is not the zero address', function () {
-      const newOwner = anotherAccount
+  describe('changeAdmin', function () {
+    describe('when the new proposed admin is not the zero address', function () {
+      const newAdmin = anotherAccount
 
-      describe('when the sender is the owner', function () {
+      describe('when the sender is the admin', function () {
         beforeEach('transferring', async function () {
-          const { logs } = await this.proxy.transferProxyOwnership(newOwner, { from: owner })
+          const { logs } = await this.proxy.changeAdmin(newAdmin, { from: admin })
           this.logs = logs
         })
 
-        it('assigns new proxy owner', async function () {
-          const proxyOwner = await this.proxy.proxyOwner({ from: newOwner })
-          assert.equal(proxyOwner, anotherAccount)
+        it('assigns new proxy admin', async function () {
+          const proxyAdmin = await this.proxy.admin({ from: newAdmin })
+          assert.equal(proxyAdmin, anotherAccount)
         })
 
-        it('emits an event', async function () {
+        it('emits an event', function () {
           assert.equal(this.logs.length, 1)
-          assert.equal(this.logs[0].event, 'ProxyOwnershipTransferred')
-          assert.equal(this.logs[0].args.previousOwner, owner)
-          assert.equal(this.logs[0].args.newOwner, newOwner)
+          assert.equal(this.logs[0].event, 'AdminChanged')
+          assert.equal(this.logs[0].args.previousAdmin, admin)
+          assert.equal(this.logs[0].args.newAdmin, newAdmin)
         })
       })
 
-      describe('when the sender is not the owner', function () {
+      describe('when the sender is not the admin', function () {
         const from = anotherAccount
 
         it('reverts', async function () {
-          await assertRevert(this.proxy.transferProxyOwnership(newOwner, { from }))
+          await assertRevert(this.proxy.changeAdmin(newAdmin, { from }))
         })
       })
     })
 
-    describe('when the new proposed owner is the zero address', function () {
-      const newOwner = 0x0
+    describe('when the new proposed admin is the zero address', function () {
+      const newAdmin = 0x0
 
       it('reverts', async function () {
-        await assertRevert(this.proxy.transferProxyOwnership(newOwner, { from: owner }))
+        await assertRevert(this.proxy.changeAdmin(newAdmin, { from: admin }))
       })
     })
   })
 
   describe('storage', function () {
     it('should store the implementation address in specified location', async function () {
-      const position = web3.sha3("org.zeppelinos.proxy.implementation");
+      const position = web3.sha3('org.zeppelinos.proxy.implementation');
       const implementation = await web3.eth.getStorageAt(this.proxyAddress, position);
 
       assert.equal(implementation, this.implementation_v0);
     })
 
-    it('should store the owner proxy in specified location', async function () {
-      const position = web3.sha3("org.zeppelinos.proxy.owner");
-      const proxyOwner = await web3.eth.getStorageAt(this.proxyAddress, position);
+    it('should store the admin proxy in specified location', async function () {
+      const position = web3.sha3('org.zeppelinos.proxy.admin');
+      const proxyAdmin = await web3.eth.getStorageAt(this.proxyAddress, position);
 
-      assert.equal(proxyOwner, owner);
+      assert.equal(proxyAdmin, admin);
     })
   })
 
   describe('transparent proxy', function () {
     beforeEach('creating proxy', async function () {
       this.impl = await ClashingImplementation.new();
-      this.proxy = await OwnedUpgradeabilityProxy.new(this.impl.address, { from: owner });
+      this.proxy = await AdminUpgradeabilityProxy.new(this.impl.address, { from: admin });
 
       this.clashing = ClashingImplementation.at(this.proxy.address);
     });
 
-    it('proxy owner cannot call delegated functions', async function () {
-      await assertRevert(this.clashing.delegatedFunction({ from: owner }));
+    it('proxy admin cannot call delegated functions', async function () {
+      await assertRevert(this.clashing.delegatedFunction({ from: admin }));
     });
 
     context('when function names clash', function () {
-      it('when sender is proxy owner should run the proxy function', async function () {
-        const value = await this.proxy.proxyOwner({ from: owner });
-        assert.equal(value, owner);
+      it('when sender is proxy admin should run the proxy function', async function () {
+        const value = await this.proxy.admin({ from: admin });
+        assert.equal(value, admin);
       });
 
       it('when sender is other should delegate to implementation', async function () {
-        const value = await this.proxy.proxyOwner({ from: anotherAccount });
+        const value = await this.proxy.admin({ from: anotherAccount });
         assert.equal(value, '0x0000000000000000000000000000000011111142')
       });
     });

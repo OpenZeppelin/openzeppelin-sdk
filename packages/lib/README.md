@@ -51,7 +51,7 @@ const myContract_v0 = await MyContract.new();
 3. Now we need to deploy the proxy that will let us upgrade our contract. Pass the address of the first version to the constructor:
 
 ```js
-const proxy = await OwnedUpgradeabilityProxy.new(myContract_v0.address);
+const proxy = await AdminUpgradeabilityProxy.new(myContract_v0.address);
 ```
 
 4. Next, call initialize on the proxy, to initialize the storage variables. Note that you have to wrap the proxy in a `MyContract` interface, because all calls will be delegated from the proxy to the contract with the implementation.
