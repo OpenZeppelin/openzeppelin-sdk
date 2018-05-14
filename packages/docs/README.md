@@ -1,6 +1,6 @@
-# zeppelin_os documentation site
+# ZeppelinOS documentation site
 
-Centralised documentation site for zeppelin_os.
+Centralised documentation site for ZeppelinOS.
 
 ## Writing docs
 
@@ -16,6 +16,6 @@ npm run bump-docs -- <tag>
 
 This command will automatically:
 
-* Run [solidity-docgen](https://github.com/spalladino/solidity-docgen) on the zeppelin_os codebase at the given tag.
-* Generate a new Docusaurus version matching the zeppelin_os release tag.
+* Run [solidity-docgen](https://github.com/spalladino/solidity-docgen) on the ZeppelinOS codebase at the given tag.
+* Generate a new Docusaurus version matching the ZeppelinOS release tag.
 * Build the Docusaurus project, yielding the result in `docs/website/build`.
