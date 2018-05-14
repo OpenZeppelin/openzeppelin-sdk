@@ -115,7 +115,7 @@ contract('sync', function([_, owner]) {
     });
 
     it('should upload contracts to new directory when bumping version', async function () {
-      const newPackageFileName = "test/mocks/packages/package-with-contracts-2.zos.json";
+      const newPackageFileName = "test/mocks/packages/package-with-contracts-v2.zos.json";
       await sync({ packageFileName: newPackageFileName, networkFileName, network, from });
       const address = fs.parseJson(networkFileName).contracts["Impl"].address;
       const appManagerWrapper = await AppManagerProvider.from(fs.parseJson(networkFileName).app.address);

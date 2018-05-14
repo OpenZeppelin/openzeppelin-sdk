@@ -106,7 +106,7 @@ contract('sync-with-stdlib', function([_, owner]) {
     describe('followed by sync with a different stdlib', function () {
 
       const stdlib2PackageAddress = '0x0000000000000000000000000000000000000210';
-      const packageFileName = "test/mocks/packages/package-with-contracts-and-stdlib-2.zos.json";
+      const packageFileName = "test/mocks/packages/package-with-contracts-and-stdlib-v2.zos.json";
 
       beforeEach('running sync', async function () {
         await sync({ packageFileName, networkFileName, network, txParams })
