@@ -5,6 +5,9 @@
     ]
   },
   "version-0.0.2-docs-api": {
+    "ABOUT": [
+      "version-0.0.2-libapi"
+    ],
     "LIFECYCLE": [
       "version-0.0.2-lifecycle_Migrations"
     ],
@@ -22,6 +25,11 @@
     "UNCATEGORIZED": [
       "version-0.0.2-Factory",
       "version-0.0.2-Registry"
+    ]
+  },
+  "version-0.0.2-docs-cli": {
+    "ABOUT": [
+      "version-0.0.2-cliapi"
     ]
   }
 }

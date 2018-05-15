@@ -7,6 +7,9 @@
     ]
   },
   "docs-api": {
+    "ABOUT": [
+      "libapi"
+    ],
     "APPLICATION / MANAGEMENT": [
       "application_management_AppDirectory",
       "application_management_BaseAppManager",
@@ -32,6 +35,11 @@
       "upgradeability_Proxy",
       "upgradeability_UpgradeabilityProxy",
       "upgradeability_UpgradeabilityProxyFactory"
+    ]
+  },
+  "docs-cli": {
+    "ABOUT": [
+      "cliapi"
     ]
   }
 }

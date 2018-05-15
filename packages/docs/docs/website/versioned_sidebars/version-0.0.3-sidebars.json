@@ -4,32 +4,14 @@
       "version-0.0.3-start"
     ]
   },
-  "version-0.0.3-lib-api": {
-    "START": [
+  "version-0.0.3-docs-api": {
+    "ABOUT": [
       "version-0.0.3-libapi"
-    ],
-    "LIFECYCLE": [
-      "version-0.0.3-lifecycle_Migrations"
-    ],
-    "OWNERSHIP": [
-      "version-0.0.3-ownership_Ownable",
-      "version-0.0.3-ownership_OwnableStorage"
-    ],
-    "UPGRADEABILITY": [
-      "version-0.0.3-upgradeability_OwnedUpgradeabilityProxy",
-      "version-0.0.3-upgradeability_OwnedUpgradeabilityStorage",
-      "version-0.0.3-upgradeability_Proxy",
-      "version-0.0.3-upgradeability_UpgradeabilityProxy",
-      "version-0.0.3-upgradeability_UpgradeabilityStorage"
-    ],
-    "UNCATEGORIZED": [
-      "version-0.0.3-Factory",
-      "version-0.0.3-Registry"
     ]
   },
-  "version-0.0.3-kernel-api": {
-    "START": [
-      "version-0.0.3-kernelapi"
+  "version-0.0.3-docs-cli": {
+    "ABOUT": [
+      "version-0.0.3-libapi"
     ]
   }
 }

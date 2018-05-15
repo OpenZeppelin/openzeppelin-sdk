@@ -11,5 +11,5 @@ General introductions to the Library and CLI can be found here:
 - [CLI](clistart.md)
 
 The API Reference can be found in the following links:
-- [Lib API](libapi.md)
-- [CLI API](cliapi.md)
+- [Lib API](api_libapi.md)
+- [CLI API](cli_cliapi.md)
