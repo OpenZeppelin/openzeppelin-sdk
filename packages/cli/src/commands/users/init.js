@@ -8,7 +8,7 @@ module.exports = function(program) {
     .description(`Initialize your project with zeppelin_os.
       Provide a <project> name.
       Provide a [version] number, otherwise 0.0.1 will be used by default.`)
-    .option('-s, --stdlib <stdlib>', 'Standard library to use')
+    .option('--stdlib <stdlib>', 'Standard library to use')
     .option('--no-install', 'Skip installing stdlib npm dependencies')
     .option('--push <network>', 'Push your changes to the specified network')
     .option('-f, --from <from>', 'Set the transactions sender in case you run with --push')

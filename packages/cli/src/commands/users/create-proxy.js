@@ -7,8 +7,8 @@ module.exports = function(program) {
     .usage('<alias> --network <network> [options]')
     .description(`Creates a new proxy for the specified implementation.
       Provide the <alias> name you used to register your contract.`)
-    .option('-i, --init [function]', "Tell whether your contract has to be initialized or not. You can provide name of the initialization function. If none is given, 'initialize' will be considered by default")
-    .option('-a, --args <arg1, arg2, ...>', 'Provide initialization arguments for your contract if required')
+    .option('--init [function]', "Tell whether your contract has to be initialized or not. You can provide name of the initialization function. If none is given, 'initialize' will be considered by default")
+    .option('--args <arg1, arg2, ...>', 'Provide initialization arguments for your contract if required')
     .option('-f, --from <from>', 'Set the transactions sender')
     .option('-n, --network <network>', 'Provide a network to be used')
     .option('--force', 'Force creation of the proxy even if contracts have local modifications')
