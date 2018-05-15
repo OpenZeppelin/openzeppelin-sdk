@@ -1,9 +1,23 @@
 {
   "docs": {
-    "ABOUT": [
+    "OVERVIEW": [
       "start",
-      "libstart",
-      "clistart"
+      "clistart",
+      "libstart"
+    ],
+    "GUIDES": [
+      "quickstart",
+      "building",
+      "migrating",
+      "testing"
+    ],
+    "DEMOS": [
+      "basil",
+      "crafting"
+    ],
+    "FURTHER INFORMATION": [
+      "faq",
+      "whitepaper"
     ]
   },
   "docs-api": {

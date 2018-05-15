@@ -1,7 +1,0 @@
----
-id: version-0.0.4-mocks_SingleInheritanceMigratableMocks_MigratableMockV3
-title: MigratableMockV3
-original_id: mocks_SingleInheritanceMigratableMocks_MigratableMockV3
----
-
-<div class="contract-doc"><div class="contract"><h2 class="contract-header"><span class="contract-kind">contract</span> MigratableMockV3</h2><p class="base-contracts"><span>is</span> <a href="mocks_SingleInheritanceMigratableMocks_MigratableMockV2.html">MigratableMockV2</a></p><p class="description">This contract is a mock to test migratable functionality without params.</p><div class="source">Source: <a href="git+https://github.com/zeppelinos/zos-lib/blob/v0.1.12/contracts/mocks/SingleInheritanceMigratableMocks.sol" target="_blank">mocks/SingleInheritanceMigratableMocks.sol</a></div></div><div class="index"><h2>Index</h2><ul><li><a href="mocks_SingleInheritanceMigratableMocks_MigratableMockV3.html#migrate">migrate</a></li></ul></div><div class="reference"><h2>Reference</h2><div class="functions"><h3>Functions</h3><ul><li><div class="item function"><span id="migrate" class="anchor-marker"></span><h4 class="name">migrate</h4><div class="body"><code class="signature">function <strong>migrate</strong><span>() </span><span>public </span><span>payable </span></code><hr/><dl><dt><span class="label-modifiers">Modifiers:</span></dt><dd><a href="migrations_Migratable.html#isMigration">isMigration </a></dd></dl></div></div></li></ul></div></div></div>

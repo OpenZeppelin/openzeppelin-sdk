@@ -1,7 +1,0 @@
----
-id: version-0.0.4-mocks_MultipleInheritanceMigratableMocks_SampleGrampsV1
-title: SampleGrampsV1
-original_id: mocks_MultipleInheritanceMigratableMocks_SampleGrampsV1
----
-
-<div class="contract-doc"><div class="contract"><h2 class="contract-header"><span class="contract-kind">contract</span> SampleGrampsV1</h2><p class="base-contracts"><span>is</span> <a href="migrations_Migratable.html">Migratable</a></p><p class="description">Sample base migratable contract that defines a field gramps.</p><div class="source">Source: <a href="git+https://github.com/zeppelinos/zos-lib/blob/v0.1.12/contracts/mocks/MultipleInheritanceMigratableMocks.sol" target="_blank">mocks/MultipleInheritanceMigratableMocks.sol</a></div></div><div class="index"><h2>Index</h2><ul><li><a href="mocks_MultipleInheritanceMigratableMocks_SampleGrampsV1.html#initialize">initialize</a></li></ul></div><div class="reference"><h2>Reference</h2><div class="functions"><h3>Functions</h3><ul><li><div class="item function"><span id="initialize" class="anchor-marker"></span><h4 class="name">initialize</h4><div class="body"><code class="signature">function <strong>initialize</strong><span>(uint256 value) </span><span>public </span></code><hr/><dl><dt><span class="label-modifiers">Modifiers:</span></dt><dd><a href="migrations_Migratable.html#isInitializer">isInitializer </a></dd><dt><span class="label-parameters">Parameters:</span></dt><dd><div><code>value</code> - uint256</div></dd></dl></div></div></li></ul></div></div></div>

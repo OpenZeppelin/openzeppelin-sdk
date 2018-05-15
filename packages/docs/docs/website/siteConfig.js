@@ -23,12 +23,16 @@ const siteConfig = {
       label: 'Docs',
     },
     {
-      doc: 'libapi',
-      label: 'Lib API',
+      doc: 'cliapi',
+      label: 'CLI',
     },
     {
-      doc: 'cliapi',
-      label: 'CLI API',
+      doc: 'libapi',
+      label: 'Library',
+    },
+    {
+    href: 'https://blog.zeppelinos.org',
+      label: 'Blog',
     },
     {
       href: 'https://github.com/zeppelinos',
