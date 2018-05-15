@@ -3,9 +3,9 @@ id: quickstart
 title: Quickstart
 ---
 
-# Quickstart
+The following guide will get you up and running with ZeppelinOS.
 
-## Install
+## Installation
 
 `zos` is the command line interface to ZeppelinOS. To install it, run:
 

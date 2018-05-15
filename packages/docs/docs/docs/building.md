@@ -1,13 +1,8 @@
 ---
 id: building
-title: Building an upgradeable application
+title: Building upgradeable applications
 sidebar_label: Building Apps
 ---
-
-# Building a smart contract with ZeppelinOS
-
-
-The command line tool `zos` simplifies all these tasks with a few simple commands.
 
 Let's set up an Ethereum project to go through the features of ZeppelinOS that will make our project safer and easier to maintain.
 

@@ -1,6 +1,6 @@
 ---
 id: testing
-title: Testing an upgradeable application
+title: Testing upgradeable applications
 sidebar_label: Testing
 ---
 

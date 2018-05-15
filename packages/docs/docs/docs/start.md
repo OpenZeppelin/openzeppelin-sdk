@@ -16,15 +16,13 @@ applications in Ethereum.
 ## Getting Started
 
 For a quick tour over the features and commands of
-ZeppelinOS, go to the [Quickstart guide](TODO link.
+ZeppelinOS, go to the [Quickstart guide](quickstart.md).
 
 For a more comprehensive look at an application that uses
 ZeppelinOS, follow our
-[guide to build a smart contract with ZeppelinOS](TODO link).
+[guide to build a smart contract with ZeppelinOS](building.md).
 
 ## Team
 
-ZeppelinOS is developed by the [Zeppelin](https://zeppelin.solutions/) team,
+ZeppelinOS is developed by the [Zeppelin team](https://zeppelin.solutions/),
 with contributions from the community.
-
-## Blog

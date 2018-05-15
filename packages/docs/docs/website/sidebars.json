@@ -4,6 +4,7 @@
       "start"
     ],
     "GUIDES": [
+      "quickstart",
       "building",
       "testing",
       "developing"
