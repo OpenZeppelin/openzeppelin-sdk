@@ -1,12 +1,9 @@
 import Release from './Release'
-import Logger from '../../src/utils/Logger'
-import Contracts from '../../src/utils/Contracts'
+import Logger from '../utils/Logger'
+import Contracts from '../utils/Contracts'
 
 const log = new Logger('ReleaseDeployer')
 
-/**
- *
- */
 const ReleaseDeployer = {
   async deploy(contracts, txParams = {}) {
     this.txParams = txParams

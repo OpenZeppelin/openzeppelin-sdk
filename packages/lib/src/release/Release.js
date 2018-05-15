@@ -1,12 +1,9 @@
-import Logger from '../../src/utils/Logger'
+import Logger from '../utils/Logger'
 
 import ReleaseDeployer from './ReleaseDeployer'
 
 const log = new Logger('Release')
 
-/**
- *
- */
 export default class Release {
   constructor(release, txParams = {}) {
     this._release = release
