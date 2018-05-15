@@ -6,7 +6,8 @@
     "GUIDES": [
       "building",
       "migrating",
-      "testing"
+      "testing",
+      "developing"
     ],
     "DEMOS": [
       "basil",
