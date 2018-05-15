@@ -1,12 +1,9 @@
 {
   "docs": {
     "OVERVIEW": [
-      "start",
-      "clistart",
-      "libstart"
+      "start"
     ],
     "GUIDES": [
-      "quickstart",
       "building",
       "migrating",
       "testing"
@@ -14,6 +11,10 @@
     "DEMOS": [
       "basil",
       "crafting"
+    ],
+    "REFERENCE": [
+      "clistart",
+      "libstart"
     ],
     "FURTHER INFORMATION": [
       "faq",
