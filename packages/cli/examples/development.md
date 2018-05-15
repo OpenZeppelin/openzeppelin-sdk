@@ -34,27 +34,26 @@ npx truffle compile
 The next step is to register all the contract implementations of the first `version` of your project. To do this please run:
 
 ```
-zos add-implementation <contract_name_1>
-zos add-implementation <contract_name_2>
+zos add <contract_name_1>
+zos add <contract_name_2>
 ...
-zos add-implementation <contract_name_n>
+zos add <contract_name_n>
 ```
 
-Where `<contract_name>` is the name of your Solidity contract, and `<alias>` is the name under which it will be registered 
-in zeppelin_os. 
+Where `<contract_name>` is the name of your Solidity contract.
 
 In our example, run:
 ```
-zos add-implementation MyContract
+zos add MyContract
 ```
 
-To have your `package.zos.json` file always up-to-date, run `zos add-implementation` for every new contract you add to your project.
+To have your `package.zos.json` file always up-to-date, run `zos add` for every new contract you add to your project.
 
-## Sync your project with the blockchain with `zos sync`
+## Sync your project with the blockchain with `zos push`
 
 This command will deploy your upgradeable application to the blockchain:
 ```
-zos sync --network <network>
+zos push --network <network>
 ```
 
 The first time you run this command for a specific network, a new `package.zos.<network>.json` will be created. This file will reflect the status of your project in that network.
@@ -64,17 +63,17 @@ The first time you run this command for a specific network, a new `package.zos.<
 The next commands will deploy new proxies to make your contracts upgradeable:
 
 ```
-zos create-proxy <alias_1> --network <network>
-zos create-proxy <alias_2> --network <network>
+zos create <contract_name_1> --network <network>
+zos create <contract_name_2> --network <network>
 ...
-zos create-proxy <alias_n> --network <network>
+zos create <contract_name_n> --network <network>
 ```
 
 Optionally, you can use the `-i` flag to call an initialization/migration function after you create the proxy.
 
 In our simple example, we want to call the `initialize` function, with some value (e.g: 42) thus:
 ```
-zos create-proxy MyContract -i initialize -p 40 --network development 
+zos create MyContract -i initialize -p 42 --network development 
 ```
 
 The proxy addresses, which you'll need to interact with your upgradeable contracts, will be stored in the `package.zos.<network>.json` file.
@@ -83,16 +82,16 @@ Open the `package.zos.<network>.json` and use the addresses found there to inter
 
 ## Using a standard library
 
-In addition to creating proxies for your own contracts, you can also re-use already deployed contracts from a zeppelin_os standard library. To do so, run the following command, with the name of the npm package of the stdlib you want to use. For example:
+In addition to creating proxies for your own contracts, you can also re-use already deployed contracts from a ZeppelinOS standard library. To do so, run the following command, with the name of the npm package of the stdlib you want to use. For example:
 
 ```bash
-zos set-stdlib openzeppelin-zos
+zos link openzeppelin-zos
 ```
 
-The next `sync` operation will connect your application with the chosen standard library on the target network. However, if you're using development nodes (such as testrpc or ganache), the standard library is not already deployed, since you are running from an empty blockchain. To work around this, you can add a `--deploy-stdlib` flag to the `sync` command:
+The next `push` operation will connect your application with the chosen standard library on the target network. However, if you're using development nodes (such as testrpc or ganache), the standard library is not already deployed, since you are running from an empty blockchain. To work around this, you can add a `--deploy-stdlib` flag to the `push` command:
 
 ```bash
-zos sync --network <network>
+zos push --deploy-stdlib --network <network>
 ```
 
 This will deploy your entire application to the target network, along with the standard library you are using and all its contracts. This way, you can transparently work in development with the contracts provided by the stdlib.
@@ -100,7 +99,7 @@ This will deploy your entire application to the target network, along with the s
 From there on, you can create proxies for any contract provided by the stdlib:
 
 ```bash
-zos create-proxy DetailedMintableToken --network <network>
+zos create DetailedMintableToken --network <network>
 ```
 
 
@@ -108,7 +107,7 @@ zos create-proxy DetailedMintableToken --network <network>
 
 Some time later you might want to change your smart contract code: fix a bug, add a new feature, etc. 
 To do so, update your contracts, making sure you don't change their pre-existing storage structure. This is required
-by **zeppelin_os** upgradeability mechanism. This means you can add new state variables, but you can't remove the ones you already have. In the example above, this could be the new version of `MyContract`:
+by **ZeppelinOS** upgradeability mechanism. This means you can add new state variables, but you can't remove the ones you already have. In the example above, this could be the new version of `MyContract`:
 
 ```sol
 import "zos-lib/contracts/migrations/Initializable.sol";
@@ -134,7 +133,7 @@ npx truffle compile
 We'll now use `zos` to register and deploy the new code for `MyContract` to the blockchain. Sync the new version of your project by running: 
 
 ```
-zos sync --network <network>
+zos push --network <network>
 ```
 
 After running this command, the new versions of your project's contracts are deployed in the blockchain. 
@@ -142,17 +141,15 @@ However, the already deployed proxies are still running with the old implementat
 each of the proxies individually. To do so, you just need to run this for every contract: 
 
 ```
-zos upgrade-proxy <alias_1> <proxy_address_1> --network <network>
-zos upgrade-proxy <alias_2> <proxy_address_2> --network <network>
+zos upgrade <contract_name_1> --network <network>
+zos upgrade <contract_name_2> --network <network>
 ...
-zos upgrade-proxy <alias_n> <proxy_address_n> --network <network>
+zos upgrade <contract_name_n> --network <network>
 ```
 
 In our simple example:
 ```
-zos upgrade-proxy MyContract <proxy_address> --network development
+zos upgrade MyContract --network development
 ```
 
-Where <proxy_address> is the address found in package.zos.<network>.json.
-  
-Voila! Your contract has now been upgraded. The address is the same as before, but the code has been changed to the latest version. Repeat the same steps for every code update you want to perform.
+Voilà! Your contract has now been upgraded. The address is the same as before, but the code has been changed to the latest version. Repeat the same steps for every code update you want to perform.

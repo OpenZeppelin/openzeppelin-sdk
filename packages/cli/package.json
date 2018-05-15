@@ -1,7 +1,7 @@
 {
   "name": "zos",
   "version": "0.3.18",
-  "description": "zeppelin_os command line interface",
+  "description": "ZeppelinOS command line interface",
   "main": "lib/index.js",
   "scripts": {
     "prepack": "truffle compile && babel src --out-dir lib",
@@ -17,7 +17,7 @@
   },
   "keywords": [
     "zos",
-    "zeppelin_os",
+    "zeppelinos",
     "cli"
   ],
   "files": [
