@@ -3,8 +3,8 @@ import runWithTruffle from '../../utils/runWithTruffle'
 
 function registerSync(program) {
   program
-    .command('sync')
-    .description('Sync your project with the blockchain')
+    .command('push')
+    .description('Pushes your project to the specified network')
     .usage('--network <network> [options]')
     .option('-f, --from <from>', 'Set the transactions sender')
     .option('-n, --network <network>', 'Provide a network to be used')

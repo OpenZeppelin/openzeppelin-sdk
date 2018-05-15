@@ -3,7 +3,7 @@ import runWithTruffle from '../../utils/runWithTruffle'
 
 module.exports = function(program) {
   program
-    .command('upgrade-proxy [alias] [address]')
+    .command('upgrade [alias] [address]')
     .usage('[alias] [address] --network <network> [options]')
     .description(`Upgrade a proxied contract to a new implementation.
       Provide the [alias] name you used to register your contract. Provide [address] to choose which proxy to upgrade, otherwise all will be upgraded.`)
