@@ -1,10 +1,10 @@
 import init from "../../src/scripts/init.js";
 import addImplementation from "../../src/scripts/add-implementation.js";
-import sync from "../../src/scripts/sync.js";
-import newVersion from "../../src/scripts/new-version.js";
+import push from "../../src/scripts/push.js";
+import bumpVersion from "../../src/scripts/bump-version.js";
 import createProxy from "../../src/scripts/create-proxy.js";
 import status from "../../src/scripts/status.js";
-import setStdlib from "../../src/scripts/set-stdlib";
+import linkStdlib from "../../src/scripts/link-stdlib";
 import { FileSystem as fs } from "zos-lib";
 import { cleanup, cleanupfn } from "../helpers/cleanup.js";
 import TestLogger from '../helpers/logger.js';
@@ -49,7 +49,7 @@ contract('status command', function([_, owner]) {
 
     it('should log plain app info', async function () {
       await init({ name: appName, version, packageFileName });
-      await sync({ packageFileName, network, txParams });
+      await push({ packageFileName, network, txParams });
       await status({ network, packageFileName, networkFileName, logger });
 
       logger.text.should.match(/deployed at 0x[0-9a-fA-F]{40}/i);
@@ -60,10 +60,10 @@ contract('status command', function([_, owner]) {
       logger.text.should.match(/no stdlib specified for current version/i);
     });
 
-    it('should log version out of sync', async function () {
+    it('should log version out-of-sync', async function () {
       await init({ name: appName, version, packageFileName });
-      await sync({ packageFileName, network, txParams });
-      await newVersion({ version: '0.2.0', packageFileName });
+      await push({ packageFileName, network, txParams });
+      await bumpVersion({ version: '0.2.0', packageFileName });
       await status({ network, packageFileName, networkFileName, logger });
 
       logger.text.should.match(/version 0.1.0 is out of date/i);
@@ -74,7 +74,7 @@ contract('status command', function([_, owner]) {
   describe('contracts', function () {
     it('should log contract name when different to alias', async function () {
       await init({ name: appName, version, packageFileName });
-      await sync({ packageFileName, network, txParams });
+      await push({ packageFileName, network, txParams });
       await addImplementation({ contractsData, packageFileName });
       await status({ network, packageFileName, networkFileName, logger });
 
@@ -84,7 +84,7 @@ contract('status command', function([_, owner]) {
 
     it('should not log contract name when matches alias', async function () {
       await init({ name: appName, version, packageFileName });
-      await sync({ packageFileName, network, txParams });
+      await push({ packageFileName, network, txParams });
       await addImplementation({ contractsData: [{ name: anotherContractName }], packageFileName });
       await status({ network, packageFileName, networkFileName, logger });
 
@@ -94,7 +94,7 @@ contract('status command', function([_, owner]) {
 
     it('should log undeployed contract', async function () {
       await init({ name: appName, version, packageFileName });
-      await sync({ packageFileName, network, txParams });
+      await push({ packageFileName, network, txParams });
       await addImplementation({ contractsData, packageFileName });
       await status({ network, packageFileName, networkFileName, logger });
 
@@ -104,7 +104,7 @@ contract('status command', function([_, owner]) {
     it('should log out-of-sync contract', async function () {
       await init({ name: appName, version, packageFileName });
       await addImplementation({ contractsData, packageFileName });
-      await sync({ packageFileName, network, txParams });
+      await push({ packageFileName, network, txParams });
       await addImplementation({ contractsData: [{ name: anotherContractName, alias: contractAlias }], packageFileName });
       await status({ network, packageFileName, networkFileName, logger });
 
@@ -114,7 +114,7 @@ contract('status command', function([_, owner]) {
     it('should log deployed contract', async function () {
       await init({ name: appName, version, packageFileName });
       await addImplementation({ contractsData, packageFileName });
-      await sync({ packageFileName, network, txParams });
+      await push({ packageFileName, network, txParams });
       await status({ network, packageFileName, networkFileName, logger });
 
       logger.text.should.match(/is deployed and up to date/i);
@@ -124,8 +124,8 @@ contract('status command', function([_, owner]) {
   describe('stdlib', function () {
     it('should log missing stdlib', async function () {
       await init({ name: appName, version, packageFileName });
-      await sync({ packageFileName, network, txParams });
-      await setStdlib({ packageFileName, stdlibNameVersion, installDeps: false });
+      await push({ packageFileName, network, txParams });
+      await linkStdlib({ packageFileName, stdlibNameVersion, installDeps: false });
       await status({ network, packageFileName, networkFileName, logger });
 
       logger.text.should.match(/mock-stdlib@0.1.0 required/i);
@@ -134,7 +134,7 @@ contract('status command', function([_, owner]) {
 
     it('should log connected stdlib', async function () {
       await init({ name: appName, stdlibNameVersion, version, packageFileName });
-      await sync({ packageFileName, network, txParams });
+      await push({ packageFileName, network, txParams });
       await status({ network, packageFileName, networkFileName, logger });
 
       logger.text.should.match(/mock-stdlib@0.1.0 required/i);
@@ -143,8 +143,8 @@ contract('status command', function([_, owner]) {
 
     it('should log different stdlib connected', async function () {
       await init({ name: appName, stdlibNameVersion, version, packageFileName });
-      await sync({ packageFileName, network, txParams });
-      await setStdlib({ packageFileName, stdlibNameVersion: 'mock-stdlib-2@0.2.0', installDeps: false });
+      await push({ packageFileName, network, txParams });
+      await linkStdlib({ packageFileName, stdlibNameVersion: 'mock-stdlib-2@0.2.0', installDeps: false });
       await status({ network, packageFileName, networkFileName, logger });
 
       logger.text.should.match(/mock-stdlib-2@0.2.0 required/i);
@@ -153,7 +153,7 @@ contract('status command', function([_, owner]) {
 
     it('should log deployed stdlib', async function () {
       await init({ name: appName, stdlibNameVersion, version, packageFileName });
-      await sync({ packageFileName, network, txParams, deployStdlib: true });
+      await push({ packageFileName, network, txParams, deployStdlib: true });
       await status({ network, packageFileName, networkFileName, logger });
 
       logger.text.should.match(/mock-stdlib@0.1.0 required/i);
@@ -162,8 +162,8 @@ contract('status command', function([_, owner]) {
 
     it('should log different stdlib connected', async function () {
       await init({ name: appName, stdlibNameVersion, version, packageFileName });
-      await sync({ packageFileName, network, txParams, deployStdlib: true });
-      await setStdlib({ packageFileName, stdlibNameVersion: 'mock-stdlib-2@0.2.0', installDeps: false });
+      await push({ packageFileName, network, txParams, deployStdlib: true });
+      await linkStdlib({ packageFileName, stdlibNameVersion: 'mock-stdlib-2@0.2.0', installDeps: false });
       await status({ network, packageFileName, networkFileName, logger });
 
       logger.text.should.match(/mock-stdlib-2@0.2.0 required/i);
@@ -175,7 +175,7 @@ contract('status command', function([_, owner]) {
     it('should log no proxies', async function () {
       await init({ name: appName, version, packageFileName });
       await addImplementation({ contractsData, packageFileName });
-      await sync({ packageFileName, network, txParams });
+      await push({ packageFileName, network, txParams });
       await status({ network, packageFileName, networkFileName, logger });
 
       logger.text.should.match(/no proxies/i);
@@ -184,7 +184,7 @@ contract('status command', function([_, owner]) {
     it('should log created proxies', async function () {
       await init({ name: appName, version, packageFileName });
       await addImplementation({ contractsData, packageFileName });
-      await sync({ packageFileName, network, txParams });
+      await push({ packageFileName, network, txParams });
       await createProxy({ contractAlias, network, txParams, packageFileName, networkFileName });
       await status({ network, packageFileName, networkFileName, logger });
       

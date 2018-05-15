@@ -1,7 +1,7 @@
 import init from "../../src/scripts/init.js";
 import addImplementation from "../../src/scripts/add-implementation.js";
-import sync from "../../src/scripts/sync.js";
-import newVersion from "../../src/scripts/new-version.js";
+import push from "../../src/scripts/push.js";
+import bumpVersion from "../../src/scripts/bump-version.js";
 import createProxy from "../../src/scripts/create-proxy.js";
 import upgradeProxy from "../../src/scripts/upgrade-proxy.js";
 import { Contracts, FileSystem as fs } from "zos-lib";
@@ -66,7 +66,7 @@ contract('upgrade-proxy command', function([_, owner]) {
       await init({ name: appName, version: v1string, packageFileName });
       const contractsData = [{ name: 'ImplV1', alias: 'Impl' }, { name: 'AnotherImplV1', alias: 'AnotherImpl' }]
       await addImplementation({ contractsData, packageFileName });
-      await sync({ packageFileName, network, txParams });
+      await push({ packageFileName, network, txParams });
 
       const networkDataV1 = fs.parseJson(networkFileName);
       this.implV1Address = networkDataV1.contracts["Impl"].address;
@@ -76,10 +76,10 @@ contract('upgrade-proxy command', function([_, owner]) {
       await createProxy({ contractAlias: "Impl", packageFileName, network, txParams });
       await createProxy({ contractAlias: "AnotherImpl", packageFileName, network, txParams });
 
-      await newVersion({ version: v2string, packageFileName, txParams });
+      await bumpVersion({ version: v2string, packageFileName, txParams });
       const newContractsData = [{ name: 'ImplV2', alias: 'Impl' }, { name: 'AnotherImplV2', alias: 'AnotherImpl' }]
       await addImplementation({ contractsData: newContractsData, packageFileName });
-      await sync({ packageFileName, network, txParams });
+      await push({ packageFileName, network, txParams });
 
       const networkDataV2 = fs.parseJson(networkFileName);
       this.implV2Address = networkDataV2.contracts["Impl"].address;
@@ -173,13 +173,13 @@ contract('upgrade-proxy command', function([_, owner]) {
 
     beforeEach('setup', async function() {
       await init({ name: appName, version: v1string, packageFileName, stdlibNameVersion: 'mock-stdlib@1.1.0' });
-      await sync({ packageFileName, network, txParams, deployStdlib: true });
+      await push({ packageFileName, network, txParams, deployStdlib: true });
 
       await createProxy({ contractAlias: "Greeter", packageFileName, network, txParams });
       await createProxy({ contractAlias: "Greeter", packageFileName, network, txParams });
 
-      await newVersion({ version: v2string, packageFileName, txParams, stdlibNameVersion: "mock-stdlib-2@1.2.0" });
-      await sync({ packageFileName, network, txParams, deployStdlib: true });
+      await bumpVersion({ version: v2string, packageFileName, txParams, stdlibNameVersion: "mock-stdlib-2@1.2.0" });
+      await push({ packageFileName, network, txParams, deployStdlib: true });
     });
 
     it('should upgrade the version of a proxy given its address', async function() {

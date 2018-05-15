@@ -1,5 +1,5 @@
-import sync from './sync'
-import newVersion from '../../scripts/new-version'
+import push from './push'
+import bumpVersion from '../../scripts/bump-version'
 
 module.exports = function(program) {
   program
@@ -12,7 +12,7 @@ module.exports = function(program) {
     .option('-f, --from <from>', 'Set the transactions sender in case you run with --push')
     .action(async function (version, options) {
       const { stdlib: stdlibNameVersion, install: installDeps } = options
-      await newVersion({ version, stdlibNameVersion, installDeps })
-      if(options.push) sync.action({ network: options.push, from: options.from })
+      await bumpVersion({ version, stdlibNameVersion, installDeps })
+      if(options.push) push.action({ network: options.push, from: options.from })
     })
 }

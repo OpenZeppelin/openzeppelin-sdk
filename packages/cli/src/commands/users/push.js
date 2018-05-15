@@ -1,7 +1,7 @@
-import sync from '../../scripts/sync'
+import push from '../../scripts/push'
 import runWithTruffle from '../../utils/runWithTruffle'
 
-function registerSync(program) {
+function registerPush(program) {
   program
     .command('push')
     .description('Pushes your project to the specified network')
@@ -17,8 +17,8 @@ function registerSync(program) {
 function action(options) {
   const { from, network, skipCompile, deployStdlib, reupload } = options
   const txParams = from ? { from } : {}
-  runWithTruffle(async () => await sync({ network, deployStdlib, reupload, txParams }), network, ! skipCompile)
+  runWithTruffle(async () => await push({ network, deployStdlib, reupload, txParams }), network, ! skipCompile)
 }
 
-module.exports = registerSync
+module.exports = registerPush
 module.exports.action = action

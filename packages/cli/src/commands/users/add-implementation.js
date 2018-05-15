@@ -1,4 +1,4 @@
-import sync from './sync'
+import push from './push'
 import addImplementation from '../../scripts/add-implementation'
 import addAllImplementations from '../../scripts/add-all-implementations'
 
@@ -22,6 +22,6 @@ module.exports = function(program) {
         })
         addImplementation({ contractsData })
       }
-      if(options.push) sync.action({ network: options.push, from: options.from })
+      if(options.push) push.action({ network: options.push, from: options.from })
     })
 }

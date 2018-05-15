@@ -1,5 +1,5 @@
-import sync from './sync'
-import setStdlib from '../../scripts/set-stdlib'
+import push from './push'
+import linkStdlib from '../../scripts/link-stdlib'
 
 module.exports = function(program) {
   program
@@ -11,7 +11,7 @@ module.exports = function(program) {
     .option('-f, --from <from>', 'Set the transactions sender in case you run with --push')
     .action(async function (stdlibNameVersion, options) {
       const installDeps = options.install
-      await setStdlib({ stdlibNameVersion, installDeps })
-      if(options.push) sync.action({ network: options.push, from: options.from })
+      await linkStdlib({ stdlibNameVersion, installDeps })
+      if(options.push) push.action({ network: options.push, from: options.from })
     })
 }

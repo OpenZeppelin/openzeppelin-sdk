@@ -1,5 +1,5 @@
 import { FileSystem as fs, App } from 'zos-lib'
-import sync from "../../src/scripts/sync.js";
+import push from "../../src/scripts/push.js";
 import { cleanup, cleanupfn } from '../helpers/cleanup';
 
 const ImplV1 = artifacts.require('ImplV1');
@@ -12,7 +12,7 @@ const should = require('chai')
   .use(require('../helpers/assertions'))
   .should();
 
-contract('sync', function([_, owner]) {
+contract('push', function([_, owner]) {
 
   const network = "test";
   const from = owner;
@@ -38,9 +38,9 @@ contract('sync', function([_, owner]) {
     const packageFileName = "test/mocks/packages/package-empty.zos.json";
     const networkFileName = "test/mocks/packages/package-empty.zos.test.json";
 
-    beforeEach("syncing package-empty", async function () {
+    beforeEach("pushing package-empty", async function () {
       cleanup(networkFileName)
-      await sync({ packageFileName, network, from })
+      await push({ packageFileName, network, from })
     });
 
     after(cleanupfn(networkFileName));
@@ -52,9 +52,9 @@ contract('sync', function([_, owner]) {
     const packageFileName = "test/mocks/packages/package-with-contracts.zos.json";
     const networkFileName = "test/mocks/packages/package-with-contracts.zos.test.json";
 
-    beforeEach("syncing package-with-contracts", async function () {
+    beforeEach("pushing package-with-contracts", async function () {
       cleanup(networkFileName)
-      await sync({ packageFileName, network, from })
+      await push({ packageFileName, network, from })
     });
 
     after(cleanupfn(networkFileName));
@@ -91,14 +91,14 @@ contract('sync', function([_, owner]) {
 
     it('should not redeploy contracts if unmodified', async function () {
       const origAddress = fs.parseJson(networkFileName).contracts["Impl"].address;
-      await sync({ packageFileName, network, from });
+      await push({ packageFileName, network, from });
       const newAddress = fs.parseJson(networkFileName).contracts["Impl"].address;
       origAddress.should.eq(newAddress);
     });
 
     it('should redeploy unmodified contract if forced', async function () {
       const origAddress = fs.parseJson(networkFileName).contracts["Impl"].address;
-      await sync({ packageFileName, network, from, reupload: true });
+      await push({ packageFileName, network, from, reupload: true });
       const newAddress = fs.parseJson(networkFileName).contracts["Impl"].address;
       origAddress.should.not.eq(newAddress);
     });
@@ -109,14 +109,14 @@ contract('sync', function([_, owner]) {
       networkData.contracts["Impl"].bytecodeHash = "0xabab";
       fs.writeJson(networkFileName, networkData);
 
-      await sync({ packageFileName, network, from });
+      await push({ packageFileName, network, from });
       const newAddress = fs.parseJson(networkFileName).contracts["Impl"].address;
       origAddress.should.not.eq(newAddress);
     });
 
     it('should upload contracts to new directory when bumping version', async function () {
       const newPackageFileName = "test/mocks/packages/package-with-contracts-v2.zos.json";
-      await sync({ packageFileName: newPackageFileName, networkFileName, network, from });
+      await push({ packageFileName: newPackageFileName, networkFileName, network, from });
       const address = fs.parseJson(networkFileName).contracts["Impl"].address;
       const app = await App.fetch(fs.parseJson(networkFileName).app.address);
       app.version.should.eq('1.2.0');
@@ -130,9 +130,9 @@ contract('sync', function([_, owner]) {
     const packageFileName = "test/mocks/packages/package-with-stdlib.zos.json";
     const networkFileName = "test/mocks/packages/package-with-stdlib.zos.test.json";
 
-    beforeEach("syncing package-stdlib", async function () {
+    beforeEach("pushing package-stdlib", async function () {
       cleanup(networkFileName)
-      await sync({ packageFileName, network, from })
+      await push({ packageFileName, network, from })
     });
 
     after(cleanupfn(networkFileName));

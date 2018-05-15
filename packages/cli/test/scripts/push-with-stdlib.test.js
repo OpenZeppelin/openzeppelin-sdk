@@ -1,5 +1,5 @@
 import { FileSystem as fs } from 'zos-lib'
-import sync from "../../src/scripts/sync.js";
+import push from "../../src/scripts/push.js";
 import { cleanup, cleanupfn } from '../helpers/cleanup';
 
 const Package = artifacts.require('Package');
@@ -11,7 +11,7 @@ const should = require('chai')
   .use(require('../helpers/assertions'))
   .should();
 
-contract('sync-with-stdlib', function([_, owner]) {
+contract('push-with-stdlib', function([_, owner]) {
 
   const from = owner;
   const txParams = { from };
@@ -24,7 +24,7 @@ contract('sync-with-stdlib', function([_, owner]) {
 
     beforeEach("syncing package-stdlib", async function () {
       cleanup(networkFileName)
-      await sync({ packageFileName, network, txParams, deployStdlib: true })
+      await push({ packageFileName, network, txParams, deployStdlib: true })
     });
 
     after(cleanupfn(networkFileName));
@@ -76,13 +76,13 @@ contract('sync-with-stdlib', function([_, owner]) {
 
     });
 
-    describe('followed by sync', function () {
+    describe('followed by push', function () {
 
       const stdlibPackageAddress = '0x0000000000000000000000000000000000000010';
       
-      beforeEach('running sync', async function () {
+      beforeEach('running push', async function () {
         this.stdlibAddress = fs.parseJson(networkFileName).stdlib.address;
-        await sync({ packageFileName, network, txParams })
+        await push({ packageFileName, network, txParams })
       });    
 
       it('should preserve stdlib address in JSON file', async function () {
@@ -103,13 +103,13 @@ contract('sync-with-stdlib', function([_, owner]) {
 
     });
 
-    describe('followed by sync with a different stdlib', function () {
+    describe('followed by push with a different stdlib', function () {
 
       const stdlib2PackageAddress = '0x0000000000000000000000000000000000000210';
       const packageFileName = "test/mocks/packages/package-with-contracts-and-stdlib-v2.zos.json";
 
-      beforeEach('running sync', async function () {
-        await sync({ packageFileName, networkFileName, network, txParams })
+      beforeEach('running push', async function () {
+        await push({ packageFileName, networkFileName, network, txParams })
       });
 
       it('should include stdlib address in JSON file', async function () {
