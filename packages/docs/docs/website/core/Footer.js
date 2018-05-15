@@ -35,11 +35,11 @@ class Footer extends React.Component {
           </a>
           <div>
             <h5>Docs</h5>
-            <a href="#">
-              API Reference
-            </a>
-            <a href="https://blog.zeppelin.solutions/guides/home">
+            <a href="https://docs.zeppelinos.org/docs/building.html">
               Guides
+            </a>
+            <a href="https://docs.zeppelinos.org/docs/clifront.html">
+              Reference
             </a>
           </div>
           {/* <div>
@@ -56,22 +56,12 @@ class Footer extends React.Component {
           <div>
             <h5>More</h5>
             <a href="https://blog.zeppelinos.org">Blog</a>
-            <a href={this.props.config.repoUrl}>GitHub</a>
-            <a
-              className="github-button"
-              href={this.props.config.repoUrl}
-              data-icon="octicon-star"
-              data-count-href="/facebook/docusaurus/stargazers"
-              data-show-count={true}
-              data-count-aria-label="# stargazers on GitHub"
-              aria-label="Star this project on GitHub">
-              Star
-            </a>
+            <a href="https://github.com/zeppelinos">Github</a>
           </div>
         </section>
 
         <a
-          href="https://openzeppelin.org"
+          href="https://zeppelinos.org"
           target="_blank"
           className="fbOpenSource">
           <img
