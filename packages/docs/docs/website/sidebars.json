@@ -13,8 +13,8 @@
       "crafting"
     ],
     "REFERENCE": [
-      "clistart",
-      "libstart"
+      "clifront",
+      "libfront"
     ],
     "FURTHER INFORMATION": [
       "faq",
@@ -23,7 +23,7 @@
   },
   "docs-api": {
     "ABOUT": [
-      "libapi"
+      "libstart"
     ],
     "APPLICATION / MANAGEMENT": [
       "application_management_AppDirectory",
@@ -54,7 +54,7 @@
   },
   "docs-cli": {
     "ABOUT": [
-      "cliapi"
+      "clistart"
     ]
   }
 }

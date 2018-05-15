@@ -23,11 +23,11 @@ const siteConfig = {
       label: 'Docs',
     },
     {
-      doc: 'cliapi',
+      doc: 'clistart',
       label: 'CLI',
     },
     {
-      doc: 'libapi',
+      doc: 'libstart',
       label: 'Library',
     },
     {

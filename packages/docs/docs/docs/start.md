@@ -7,7 +7,7 @@ Welcome to the ZeppelinOS Documentation Site!
 
 ## Features
 
-## Install
+## Installation
 
 ## Team
 
