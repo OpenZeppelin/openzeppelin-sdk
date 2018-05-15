@@ -108,7 +108,7 @@ zos create-proxy DetailedMintableToken --network <network>
 
 Some time later you might want to change your smart contract code: fix a bug, add a new feature, etc. 
 To do so, update your contracts, making sure you don't change their pre-existing storage structure. This is required
-by **zeppelin_os** upgadeability mechanism. This means you can add new state variables, but you can't remove the ones you already have. In the example above, this could be the new version of `MyContract`:
+by **zeppelin_os** upgradeability mechanism. This means you can add new state variables, but you can't remove the ones you already have. In the example above, this could be the new version of `MyContract`:
 
 ```sol
 import "zos-lib/contracts/migrations/Initializable.sol";
