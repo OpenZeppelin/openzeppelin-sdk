@@ -23,15 +23,13 @@ contract('App', ([_, owner, donor, wallet]) => {
 
       describe('when queried for the initial version', function() {
         it('claims to have it', async function() {
-          (await this.app.package.hasVersion(initialVersion))
-            .should.be.true;
+          (await this.app.package.hasVersion(initialVersion)).should.be.true;
         });
       });
 
       describe('when queried for the updated version', function() {
         it('doesnt claim to have it', async function() {
-          (await this.app.package.hasVersion(updatedVersion))
-            .should.be.false;
+          (await this.app.package.hasVersion(updatedVersion)).should.be.false;
         });
       });
 

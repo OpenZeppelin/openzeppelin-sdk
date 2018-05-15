@@ -1,6 +1,7 @@
 'use strict'
 
 import Logger from '../utils/Logger'
+import Contracts from '../utils/Contracts'
 import decodeLogs from '../helpers/decodeLogs'
 import encodeCall from '../helpers/encodeCall'
 

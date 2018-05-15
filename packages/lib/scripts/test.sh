@@ -10,5 +10,5 @@ if [ "$SOLIDITY_COVERAGE" = true ]; then
   fi
 else
   node_modules/.bin/truffle compile
-  node_modules/.bin/truffle test "$@"
+  NODE_ENV=test node_modules/.bin/truffle test "$@"
 fi

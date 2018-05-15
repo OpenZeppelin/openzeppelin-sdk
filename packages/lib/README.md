@@ -151,7 +151,7 @@ contract DonationsV1 is Ownable {
 
 ```js
   const contractName = "Donations";
-  const DonationsV1 = Contracts.getByName('DonationsV1')
+  const DonationsV1 = Contracts.getFromLib('DonationsV1')
   await app.setImplementation(DonationsV1, contractName);
   return await app.createProxy(DonationsV1, contractName, 'initialize', [owner])
 ```
@@ -194,7 +194,7 @@ contract DonationsV2 is DonationsV1 {
   const stdlib = "0xA739d10Cc20211B973dEE09DB8F0D75736E2D817";
   const secondVersion = '0.0.2'
   await app.newVersion(secondVersion, await getStdLib(txParams))
-  const DonationsV2 = Contracts.getByName('DonationsV2')
+  const DonationsV2 = Contracts.getFromLib('DonationsV2')
   await app.setImplementation(DonationsV2, contractName);
   await app.upgradeProxy(donations.address, null, contractName)
   donations = DonationsV2.at(donations.address)

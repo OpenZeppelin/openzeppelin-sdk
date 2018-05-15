@@ -1,8 +1,6 @@
+import Contracts from '../utils/Contracts'
 import App from './App'
 
-/**
- * 
- */ 
 const AppProvider = {
   async from(address, txParams = {}) {
     this._fetchPackagedApp(address)

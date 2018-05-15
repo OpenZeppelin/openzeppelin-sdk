@@ -1,6 +1,6 @@
 'use strict';
 
-import App from '../../src/app/App';
+import App from '../../../src/app/App';
 
 const ImplV1 = artifacts.require('DummyImplementation');
 const ImplV2 = artifacts.require('DummyImplementationV2');

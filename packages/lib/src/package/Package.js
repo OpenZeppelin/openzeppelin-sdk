@@ -1,13 +1,11 @@
 import Logger from '../utils/Logger'
+import Contracts from '../utils/Contracts'
 
 import PackageDeployer from './PackageDeployer'
 import PackageProvider from './PackageProvider'
 
 const log = new Logger('Package')
 
-/**
- *
- */
 export default class Package {
   constructor(_package, txParams = {}) {
     this.package = _package
@@ -33,13 +31,13 @@ export default class Package {
 
   async getRelease(version) {
     const releaseAddress = await this.package.getVersion(version)
-    const Release = Contracts.getByName('Release')
+    const Release = Contracts.getFromLib('Release')
     return new Release(releaseAddress)
   }
 
   async newVersion(version) {
     log.info('Adding new version...')
-    const Release = Contracts.getByName('Release')
+    const Release = Contracts.getFromLib('Release')
     const release = await Release.new(this.txParams)
     await this.package.addVersion(version, release.address, this.txParams)
     log.info(' Added version:', version)

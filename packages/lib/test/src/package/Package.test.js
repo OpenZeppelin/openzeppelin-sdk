@@ -1,5 +1,5 @@
-import assertRevert from '../../src/helpers/assertRevert';
-import Package from '../../src/package/Package';
+import assertRevert from '../../../src/helpers/assertRevert';
+import Package from '../../../src/package/Package';
 
 const DummyImplementation = artifacts.require('DummyImplementation')
 

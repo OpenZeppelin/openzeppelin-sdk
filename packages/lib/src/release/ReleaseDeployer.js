@@ -1,5 +1,6 @@
-import Logger from '../../src/utils/Logger'
 import Release from './Release'
+import Logger from '../../src/utils/Logger'
+import Contracts from '../../src/utils/Contracts'
 
 const log = new Logger('ReleaseDeployer')
 
@@ -16,7 +17,7 @@ const ReleaseDeployer = {
 
   async deployRelease() {
     log.info("Deploying a new Release...")
-    const Release = Contracts.getByName('Release')
+    const Release = Contracts.getFromLib('Release')
     this.release = await Release.new(this.txParams)
     log.info(`Deployed at ${this.release.address}`)
   },
@@ -31,7 +32,7 @@ const ReleaseDeployer = {
   },
 
   async _deployLocalContract(contractName) {
-    const contractClass = Contracts.getByName(contractName)
+    const contractClass = Contracts.getFromLib(contractName)
     return await ReleaseDeployer._deployContract(contractName, contractClass)
   },
 

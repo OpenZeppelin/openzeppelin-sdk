@@ -8,7 +8,7 @@
     "start": "npm run deploy",
     "deploy": "npm run compile && npx truffle exec index.js --network local",
     "deploy_ropsten": "npm run compile && npx truffle exec index.js --network ropsten",
-    "test": "npm run compile && npx truffle test"
+    "test": "npm run compile && NODE_ENV=test npx truffle test"
   },
   "keywords": [
     "zos",

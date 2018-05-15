@@ -1,4 +1,4 @@
-import Release from '../../src/release/Release'
+import Release from '../../../src/release/Release'
 
 require('chai')
   .use(require('chai-as-promised'))

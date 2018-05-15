@@ -1,8 +1,6 @@
 import Package from './Package'
+import Contracts from '../utils/Contracts'
 
-/**
- *
- */
 const PackageDeployer = {
   async deploy(txParams = {}) {
     this.txParams = txParams

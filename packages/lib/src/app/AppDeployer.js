@@ -1,6 +1,7 @@
 'use strict';
 
 import Logger from '../utils/Logger'
+import Contracts from '../utils/Contracts'
 import App from './App'
 
 const log = new Logger('AppDeployer')
