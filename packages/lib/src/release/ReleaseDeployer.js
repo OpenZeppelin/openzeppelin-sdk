@@ -1,22 +1,17 @@
 import Logger from '../../src/utils/Logger'
-import ReleaseWrapper from './ReleaseWrapper'
+import Release from './Release'
 
 const log = new Logger('ReleaseDeployer')
 
+/**
+ *
+ */
 const ReleaseDeployer = {
-  async call(contracts, txParams) {
+  async deploy(contracts, txParams = {}) {
     this.txParams = txParams
     await this.deployRelease()
     await this.deployAndRegisterContracts(contracts, this._deployLocalContract)
-    return new ReleaseWrapper(this.release, txParams)
-  },
-
-  async callForDependency(contracts, dependencyName, txParams) {
-    this.txParams = txParams
-    this.dependencyName = dependencyName
-    await this.deployRelease()
-    await this.deployAndRegisterContracts(contracts, this._deployDependencyContract)
-    return new ReleaseWrapper(this.release, txParams)
+    return new Release(this.release, txParams)
   },
 
   async deployRelease() {
@@ -37,13 +32,6 @@ const ReleaseDeployer = {
 
   async _deployLocalContract(contractName) {
     const contractClass = Contracts.getByName(contractName)
-    return await ReleaseDeployer._deployContract(contractName, contractClass)
-  },
-
-  async _deployDependencyContract(contractName) {
-    const path = `node_modules/${this.dependencyName}/build/contracts/${contractName}.json`
-    const contractSchema = FileSystem.parseJson(path)
-    const contractClass = Contracts.getByJSONData(contractSchema)
     return await ReleaseDeployer._deployContract(contractName, contractClass)
   },
 

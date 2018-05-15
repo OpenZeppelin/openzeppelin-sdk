@@ -1,5 +1,5 @@
-import assertRevert from '../../../src/helpers/assertRevert'
-import shouldBehaveLikeImplementationDirectory from '../../../src/test/behaviors/ImplementationDirectory'
+import assertRevert from '../../../../src/helpers/assertRevert'
+import shouldBehaveLikeImplementationDirectory from '../../../../src/test/behaviors/ImplementationDirectory'
 
 const Release = artifacts.require('Release');
 

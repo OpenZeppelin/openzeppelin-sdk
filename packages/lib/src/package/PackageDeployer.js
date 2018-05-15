@@ -1,13 +1,13 @@
-import PackageWrapper from './PackageWrapper'
+import Package from './Package'
 
 /**
  *
  */
 const PackageDeployer = {
-  async call(txParams = {}) {
+  async deploy(txParams = {}) {
     this.txParams = txParams
     await this._createPackage();
-    return new PackageWrapper(this.package, txParams)
+    return new Package(this.package, txParams)
   },
 
   async _createPackage() {

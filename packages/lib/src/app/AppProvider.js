@@ -1,4 +1,4 @@
-import AppWrapper from './AppWrapper'
+import App from './App'
 
 /**
  * 
@@ -9,7 +9,7 @@ const AppProvider = {
     await this._fetchFactory()
     await this._fetchPackage()
     await this._fetchAppDirectory()
-    return new AppWrapper(this.packagedApp, this.factory, this.appDirectory, this.package, this.version, txParams);
+    return new App(this.packagedApp, this.factory, this.appDirectory, this.package, this.version, txParams);
   },
 
   _fetchPackagedApp(address) {

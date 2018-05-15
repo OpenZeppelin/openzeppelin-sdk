@@ -1,12 +1,12 @@
 import Logger from '../utils/Logger'
-import PackageWrapper from './PackageWrapper'
+import Package from './Package'
 
 const log = new Logger('PackageProvider')
 
 const PackageProvider = {
   from(address, txParams = {}) {
     this._fetchPackage(address);
-    return new PackageWrapper(this.package, txParams)
+    return new Package(this.package, txParams)
   },
 
   _fetchPackage(address) {

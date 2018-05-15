@@ -1,12 +1,27 @@
 import Logger from '../utils/Logger'
 
+import PackageDeployer from './PackageDeployer'
+import PackageProvider from './PackageProvider'
+
 const log = new Logger('Package')
 
-export default class PackageWrapper {
+/**
+ *
+ */
+export default class Package {
   constructor(_package, txParams = {}) {
     this.package = _package
     this.txParams = txParams
   }
+
+  static async fetch() {
+    return await PackageProvider.from(...arguments);
+  }
+
+  static async deploy() {
+    return await PackageDeployer.deploy(...arguments);
+  }
+
 
   address() {
     return this.package.address

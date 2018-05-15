@@ -1,6 +1,5 @@
 import assertRevert from '../../src/helpers/assertRevert';
-import PackageDeployer from '../../src/package/PackageDeployer';
-import PackageProvider from '../../src/package/PackageProvider';
+import Package from '../../src/package/Package';
 
 const DummyImplementation = artifacts.require('DummyImplementation')
 
@@ -25,7 +24,7 @@ contract('Package', function ([_, owner]) {
 
 
   beforeEach("deploying", async function () {
-    this.package = await PackageDeployer.call(txParams)
+    this.package = await Package.deploy(txParams)
   })
 
 
@@ -36,7 +35,7 @@ contract('Package', function ([_, owner]) {
 
   describe('connect', function () {
     beforeEach("connecting to existing instance", async function () {
-      const connectedPackage = await PackageProvider.from(this.package.address(), txParams)
+      const connectedPackage = await Package.fetch(this.package.address(), txParams)
       this.package = connectedPackage
     })
 

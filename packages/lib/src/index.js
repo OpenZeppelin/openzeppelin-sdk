@@ -14,15 +14,10 @@ import Contracts from './utils/Contracts'
 // test behaviors
 import behaviors from './test'
 
-// app management
-import AppWrapper from './app/AppWrapper'
-import AppDeployer from './app/AppDeployer'
-import AppProvider from './app/AppProvider'
-
-// package
-import PackageWrapper from './package/PackageWrapper'
-import PackageDeployer from './package/PackageDeployer'
-import PackageProvider from './package/PackageProvider'
+// model objects
+import App from './app/App'
+import Package from './package/Package'
+import Release from './package/Release'
 
 export {
   version,
@@ -33,10 +28,7 @@ export {
   Logger,
   FileSystem,
   Contracts,
-  AppWrapper,
-  AppDeployer,
-  AppProvider,
-  PackageWrapper,
-  PackageDeployer,
-  PackageProvider,
+  App,
+  Package,
+  Release,
 }
