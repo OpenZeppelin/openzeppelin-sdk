@@ -4,8 +4,7 @@ import truffleProvision from 'truffle-provisioner'
 
 const DEFAULT_TESTING_TX_PARAMS = {
   gas: 6721975,
-  gasPrice: 100000000000,
-  from: web3.eth.accounts[0]
+  gasPrice: 100000000000
 }
 
 export default {
@@ -39,7 +38,7 @@ export default {
 
   _provideContractForTesting(contract) {
     contract.setProvider(web3.currentProvider)
-    contract.defaults(DEFAULT_TESTING_TX_PARAMS)
+    contract.defaults({ from: web3.eth.accounts[0], ... DEFAULT_TESTING_TX_PARAMS })
     return contract
   },
 
