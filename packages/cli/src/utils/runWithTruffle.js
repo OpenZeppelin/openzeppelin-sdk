@@ -2,7 +2,6 @@ import Web3 from 'web3'
 import TruffleConfig from 'truffle-config'
 import TruffleCompile from 'truffle-workflow-compile'
 import TruffleEnvironment from 'truffle-core/lib/environment'
-import ContractsProvider from './ContractsProvider'
 import { Logger } from 'zos-lib'
 
 const log = new Logger('RunWithTruffle')
@@ -17,7 +16,6 @@ function initTruffle(network) {
       if (error) throw error
       global.web3 = new Web3(config.provider)
       global.artifacts = config.resolver
-      global.ContractsProvider = ContractsProvider
       resolve()
     })
   });

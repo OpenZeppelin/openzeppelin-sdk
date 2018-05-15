@@ -1,9 +1,9 @@
-import { Logger, FileSystem as fs } from 'zos-lib'
+import { Contracts, Logger, FileSystem as fs } from 'zos-lib'
 
 const log = new Logger('StdlibDeployer')
 
-export default {
-  async call(name, txParams = {}) {
+const StdlibDeployer = {
+  async deploy(name, txParams = {}) {
     this.txParams = txParams
     this._parseJsonData(name)
     await this._createImplementationDirectory()
@@ -13,23 +13,24 @@ export default {
 
   async _createImplementationDirectory() {
     log.info('Deploying new ImplementationDirectory...')
-    const ImplementationDirectory = ContractsProvider.getFromLib('ImplementationDirectory')
+    const ImplementationDirectory = Contracts.getFromLib('ImplementationDirectory')
     this.implementationDirectory = await ImplementationDirectory.new(this.txParams)
     log.info(`Deployed ImplementationDirectory ${this.implementationDirectory.address}`)
   },
 
   async _deployContracts(name) {
-    await Promise.all(this._contractsList().map(async (contractName) => {
-      const deployed = await this._deployContract(name, contractName)
-      await this.implementationDirectory.setImplementation(contractName, deployed.address, this.txParams)
+    await Promise.all(this._contractsList().map(async contractAlias => {
+      const deployed = await this._deployContract(name, contractAlias)
+      await this.implementationDirectory.setImplementation(contractAlias, deployed.address, this.txParams)
     }))
   },
 
-  async _deployContract(name, contractName) {
-    log.info(`Deploying new ${contractName}...`)
-    const contractClass = await ContractsProvider.getFromStdlib(name, contractName)
+  async _deployContract(name, contractAlias) {
+    log.info(`Deploying new ${contractAlias}...`)
+    const contractName = this.jsonData.contracts[contractAlias]
+    const contractClass = await Contracts.getFromNodeModules(name, contractName)
     const contract = await contractClass.new(this.txParams)
-    log.info(`Deployed ${contractName} ${contract.address}`)
+    log.info(`Deployed ${contractAlias} ${contract.address}`)
     return contract
   },
   
@@ -42,3 +43,5 @@ export default {
     this.jsonData = fs.parseJson(filename)
   }
 }
+
+export default StdlibDeployer;

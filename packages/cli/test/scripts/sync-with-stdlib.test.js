@@ -2,8 +2,8 @@ import { FileSystem as fs } from 'zos-lib'
 import sync from "../../src/scripts/sync.js";
 import { cleanup, cleanupfn } from '../helpers/cleanup';
 
-const AppManager = artifacts.require('PackagedAppManager');
 const Package = artifacts.require('Package');
+const PackagedApp = artifacts.require('PackagedApp');
 const AppDirectory = artifacts.require('AppDirectory');
 
 const should = require('chai')
@@ -41,19 +41,19 @@ contract('sync-with-stdlib', function([_, owner]) {
       fs.parseJson(networkFileName).stdlib.address.should.be.nonzeroAddress;
     });
 
-    describe('on appManager', function () {
+    describe('on app', function () {
 
-      beforeEach('loading appManager', async function () {
+      beforeEach('loading app', async function () {
         const address = fs.parseJson(networkFileName).app.address;
-        this.appManager = await AppManager.at(address);
+        this.app = await PackagedApp.at(address);
       });
 
       it('should set version', async function () {
-        (await this.appManager.version()).should.eq(defaultVersion);
+        (await this.app.version()).should.eq(defaultVersion);
       });
 
       it('should set stdlib', async function () {
-        const appPackage = await Package.at(await this.appManager.package());
+        const appPackage = await Package.at(await this.app.package());
         const provider = await AppDirectory.at(await appPackage.getVersion(defaultVersion));
         const stdlib = await provider.stdlib();
 
@@ -65,12 +65,12 @@ contract('sync-with-stdlib', function([_, owner]) {
       });
 
       it('should retrieve a mock from app directory', async function () {
-        const address = await this.appManager.getImplementation('Impl');
+        const address = await this.app.getImplementation('Impl');
         address.should.be.nonzeroAddress;
       });
 
       it('should retrieve a mock from stdlib', async function () {
-        const address = await this.appManager.getImplementation('Greeter');
+        const address = await this.app.getImplementation('Greeter');
         address.should.be.nonzeroAddress;
       });
 
@@ -93,8 +93,8 @@ contract('sync-with-stdlib', function([_, owner]) {
 
       it('should preserve stdlib address in provider', async function () {
         const address = fs.parseJson(networkFileName).app.address;
-        const appManager = await AppManager.at(address);
-        const appPackage = await Package.at(await appManager.package());
+        const app = await PackagedApp.at(address);
+        const appPackage = await Package.at(await app.package());
         const provider = await AppDirectory.at(await appPackage.getVersion(defaultVersion));
         const stdlib = await provider.stdlib();
 
@@ -119,8 +119,8 @@ contract('sync-with-stdlib', function([_, owner]) {
 
       it('should set stdlib address in provider', async function () {
         const address = fs.parseJson(networkFileName).app.address;
-        const appManager = await AppManager.at(address);
-        const appPackage = await Package.at(await appManager.package());
+        const app = await PackagedApp.at(address);
+        const appPackage = await Package.at(await app.package());
         const provider = await AppDirectory.at(await appPackage.getVersion(defaultVersion));
         const stdlib = await provider.stdlib();
 

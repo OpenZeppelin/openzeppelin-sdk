@@ -70,7 +70,7 @@ contract('create-proxy command', function([_, owner]) {
     await createProxy({ contractAlias, packageFileName, network, txParams });
     await createProxy({ contractAlias, packageFileName, network, txParams });
     const data = fs.parseJson(networkFileName);
-    assert.equal(3, data.proxies[contractAlias].length);
+    data.proxies[contractAlias].should.have.lengthOf(3);
   });
 
   it('should be able to handle proxies for more than one contract', async function() {

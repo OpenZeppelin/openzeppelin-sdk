@@ -1,8 +1,8 @@
 import _ from 'lodash';
-import { Logger } from 'zos-lib';
+import { Contracts, Logger, FileSystem as fs } from 'zos-lib';
+
 import Stdlib from './stdlib/Stdlib';
 import NetworkAppController from './NetworkAppController';
-import { FileSystem as fs, AppManagerProvider, AppManagerDeployer } from "zos-lib";
 
 const log = new Logger('AppController');
 
@@ -66,8 +66,8 @@ export default class AppController {
   }
 
   validateImplementation(contractName) {
-    // We are manually checking the build file instead of delegating to ContractsProvider,
-    // as ContractsProvider requires initializing the entire truffle stack.
+    // We are manually checking the build file instead of delegating to Contracts,
+    // as Contracts requires initializing the entire truffle stack.
     const folder = `${process.cwd()}/build/contracts`
     const path = `${folder}/${contractName}.json`
     if (!fs.exists(path)) {
@@ -94,9 +94,11 @@ export default class AppController {
   getContractClass(contractAlias) {
     const contractName = this.package.contracts[contractAlias];
     if (contractName) {
-      return ContractsProvider.getFromArtifacts(contractName);
+      return Contracts.getFromLocal(contractName);
     } else if (this.hasStdlib()) {
-      return ContractsProvider.getFromStdlib(this.package.stdlib.name, contractAlias);
+      const stdlibName = this.package.stdlib.name;
+      const contractName = new Stdlib(stdlibName).contract(contractAlias)
+      return Contracts.getFromNodeModules(stdlibName, contractName);
     } else {
       throw Error(`Could not find ${contractAlias} contract in zOS project. Please provide one or make sure to set a stdlib that provides one.`);
     }

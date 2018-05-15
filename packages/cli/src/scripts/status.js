@@ -24,14 +24,14 @@ async function appInfo(appController) {
 
   await appController.loadApp();
   log.info(`Application is deployed at ${appController.appAddress}`);
-  log.info(`- Proxy factory is at ${appController.appManagerWrapper.factory.address}`);
-  log.info(`- Package is at ${appController.appManagerWrapper.package.address}`);
+  log.info(`- Proxy factory is at ${appController.app.factory.address}`);
+  log.info(`- Package is at ${appController.app.package.address}`);
   return true;
 }
 
 async function versionInfo(appController) {
   const requestedVersion = appController.package.version;
-  const currentVersion = appController.appManagerWrapper.version;
+  const currentVersion = appController.app.version;
   if (requestedVersion !== currentVersion) {
     log.info(`- Deployed version ${currentVersion} is out of date (latest is ${requestedVersion})`)
     return false;

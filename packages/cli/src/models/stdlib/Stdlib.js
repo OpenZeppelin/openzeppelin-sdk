@@ -1,8 +1,19 @@
-import StdlibInstaller from './StdlibInstaller';
-import { FileSystem as fs } from 'zos-lib'
 import _ from 'lodash';
+import { FileSystem as fs } from 'zos-lib'
+
+import StdlibProvider from './StdlibProvider';
+import StdlibDeployer from './StdlibDeployer';
+import StdlibInstaller from './StdlibInstaller';
 
 export default class Stdlib {
+  static fetch() {
+    return StdlibProvider.from(...arguments);
+  }
+
+  static async deploy() {
+    return await StdlibDeployer.deploy(...arguments);
+  }
+
   constructor(nameAndVersion) {
     this._parseNameVersion(nameAndVersion)
   }
@@ -11,8 +22,8 @@ export default class Stdlib {
     return this.name
   }
 
-  // TODO: Provided version and package.json version may not match, raise an error if so
   getVersion() {
+    // TODO: Provided version and package.json version may not match, raise an error if so
     if (this.version) return this.version
     return this.getPackage().version
   }

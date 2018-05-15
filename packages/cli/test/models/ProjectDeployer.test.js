@@ -11,8 +11,6 @@ const should = require('chai')
 contract('ProjectDeployer', function ([_, owner]) {
   const txParams = { from: owner }
   const initialVersion = "1.0";
-  const contractName = 'Impl';
-  const stdlibAddress = "0x0000000000000000000000000000000000000010";
 
   beforeEach("deploying all contracts", async function () {
     const packageData = fs.parseJson('test/mocks/packages/package-with-contracts-and-stdlib.zos.json')
@@ -21,13 +19,13 @@ contract('ProjectDeployer', function ([_, owner]) {
   });
 
   it('deploys all contracts', async function() {
-    this.app.appManager.address.should.not.be.null;
+    this.app._app.address.should.not.be.null;
     this.app.factory.address.should.not.be.null;
     this.app.package.address.should.not.be.null;
   });
 
-  it('sets app manager at initial version', async function () {
-    (await this.app.appManager.version()).should.eq(initialVersion);
+  it('sets app at initial version', async function () {
+    (await this.app._app.version()).should.eq(initialVersion);
   });
 
   it('registers initial version in package', async function () {

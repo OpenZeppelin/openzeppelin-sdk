@@ -1,10 +1,7 @@
 import _ from 'lodash';
-import { Logger } from 'zos-lib';
-import { FileSystem as fs, AppManagerProvider, AppManagerDeployer } from "zos-lib";
-import { bytecodeDigest } from '../utils/digest';
-import StdlibProvider from './stdlib/StdlibProvider';
-import StdlibDeployer from './stdlib/StdlibDeployer';
 import Stdlib from './stdlib/Stdlib';
+import { bytecodeDigest } from '../utils/digest';
+import { Logger, Contracts, FileSystem as fs, App } from "zos-lib";
 
 const log = new Logger('NetworkAppController');
 
@@ -38,19 +35,18 @@ export default class NetworkAppController {
       delete this.networkPackage['stdlib'];
       return;
     }
-
-    const stdlibAddress = await StdlibDeployer.call(this.package.stdlib.name, this.txParams);
+    const stdlibAddress = await Stdlib.deploy(this.package.stdlib.name, this.txParams);
     this.networkPackage.stdlib = { address: stdlibAddress, customDeploy: true, ... this.package.stdlib };
   }
 
   async createProxy(contractAlias, initMethod, initArgs) {
     await this.loadApp();
     const contractClass = this.appController.getContractClass(contractAlias);
-    const proxyInstance = await this.appManagerWrapper.createProxy(contractClass, contractAlias, initMethod, initArgs);
+    const proxyInstance = await this.app.createProxy(contractClass, contractAlias, initMethod, initArgs);
     
     const proxyInfo = {
       address: proxyInstance.address,
-      version: this.appManagerWrapper.version
+      version: this.app.version
     };
 
     const proxies = this.networkPackage.proxies;
@@ -66,12 +62,12 @@ export default class NetworkAppController {
     }
 
     await this.loadApp();
-    const newVersion = this.appManagerWrapper.version;
+    const newVersion = this.app.version;
     
     await Promise.all(_.flatMap(proxyInfos, (contractProxyInfos, contractAlias) => {
       const contractClass = this.appController.getContractClass(contractAlias);
       return _.map(contractProxyInfos, async (proxyInfo) => {        
-        await this.appManagerWrapper.upgradeProxy(proxyInfo.address, contractClass, contractAlias, initMethod, initArgs);
+        await this.app.upgradeProxy(proxyInfo.address, contractClass, contractAlias, initMethod, initArgs);
         proxyInfo.version = newVersion;
       });
     }));
@@ -98,24 +94,6 @@ export default class NetworkAppController {
     };
   }
 
-  /**
-   * Returns a single proxy object for the specified contract alias and optional proxy address
-   * @param {*} contractAlias 
-   * @param {*} proxyAddress address of the proxy, can be omitted if there is a single proxy for this contract
-   * @returns a Proxy object (address, version)
-   */
-  findProxy(contractAlias, proxyAddress) { 
-    const proxies = this.networkPackage.proxies; 
-    if (_.isEmpty(proxies[contractAlias])) return null; 
-    if (proxies[contractAlias].length > 1 && proxyAddress === undefined) throw Error(`Must provide a proxy address for contracts that have more than one proxy`)
-     
-    const proxyInfo = proxies[contractAlias].length === 1 
-      ? proxies[contractAlias][0] 
-      : _.find(proxies[contractAlias], proxy => proxy.address === proxyAddress);
- 
-    return proxyInfo; 
-  }
-
   get package() {
     return this.appController.package;
   }
@@ -138,32 +116,32 @@ export default class NetworkAppController {
 
   async initApp() {
     const address = this.appAddress;
-    this.appManagerWrapper = address
-      ? await AppManagerProvider.from(address, this.txParams)
-      : await AppManagerDeployer.call(this.package.version, this.txParams);
-    this.networkPackage.app.address = this.appManagerWrapper.address();
+    this.app = address
+      ? await App.fetch(address, this.txParams)
+      : await App.deploy(this.package.version, 0x0, this.txParams);
+    this.networkPackage.app.address = this.app.address();
   }
 
   async loadApp() {
     const address = this.appAddress;
     if (!address) throw Error('Your application must be deployed to interact with it.');
-    this.appManagerWrapper = await AppManagerProvider.from(address, this.txParams);
+    this.app = await App.fetch(address, this.txParams);
   }
 
   async syncVersion() {
     // TODO: Why is version on root level in package but within app in network?
     const requestedVersion = this.package.version;
-    const currentVersion = this.appManagerWrapper.version;
+    const currentVersion = this.app.version;
     if (requestedVersion !== currentVersion) {
       log.info(`Creating new version ${requestedVersion}`);
-      await this.appManagerWrapper.newVersion(requestedVersion);
+      await this.app.newVersion(requestedVersion);
       this.networkPackage.contracts = {};
     }
     this.networkPackage.app.version = requestedVersion;
   }
 
   async fetchProvider() {
-    const currentProvider = this.appManagerWrapper.currentDirectory();
+    const currentProvider = this.app.currentDirectory();
     log.info(`Current provider is at ${currentProvider.address}`);
     this.networkPackage.provider = { address: currentProvider.address };
   }
@@ -178,9 +156,9 @@ export default class NetworkAppController {
   }
 
   async uploadContract(contractAlias, contractName) {
-    const contractClass = ContractsProvider.getFromArtifacts(contractName);
+    const contractClass = Contracts.getFromLocal(contractName);
     log.info(`Uploading ${contractName} implementation for ${contractAlias}`);
-    const contractInstance = await this.appManagerWrapper.setImplementation(contractClass, contractAlias);
+    const contractInstance = await this.app.setImplementation(contractClass, contractAlias);
     log.info(`Uploaded ${contractName} at ${contractInstance.address}`);
     this.networkPackage.contracts[contractAlias] = {
       address: contractInstance.address,
@@ -190,7 +168,7 @@ export default class NetworkAppController {
 
   async setStdlib() {
     if (!this.appController.hasStdlib()) {
-      await this.appManagerWrapper.setStdlib();
+      await this.app.setStdlib();
       delete this.networkPackage['stdlib'];
       return;
     }
@@ -202,15 +180,15 @@ export default class NetworkAppController {
 
     if (customDeployMatches) {
       log.info(`Using existing custom deployment of stdlib at ${networkStdlib.address}`);
-      await this.appManagerWrapper.setStdlib(networkStdlib.address);
+      await this.app.setStdlib(networkStdlib.address);
       return;
     }
 
     // TODO: Check that package version matches the requested one
     // TODO: Do not invoke setStdlib if matches existing one
     log.info(`Connecting to public deployment of ${this.package.stdlib.name} in ${this.network}`);
-    const stdlibAddress = StdlibProvider.from(this.package.stdlib.name, this.network);
-    await this.appManagerWrapper.setStdlib(stdlibAddress);
+    const stdlibAddress = Stdlib.fetch(this.package.stdlib.name, this.network);
+    await this.app.setStdlib(stdlibAddress);
     this.networkPackage.stdlib = { address: stdlibAddress, ... this.package.stdlib };
   }
 
@@ -249,7 +227,7 @@ export default class NetworkAppController {
     const contractName = this.package.contracts[contractAlias];
     if (!this.isApplicationContract(contractAlias)) return false;
     if (!this.isContractDeployed(contractAlias)) return true;
-    const contractClass = ContractsProvider.getFromArtifacts(contractName);
+    const contractClass = Contracts.getFromLocal(contractName);
     const currentBytecode = bytecodeDigest(contractClass.bytecode);
     const deployedBytecode = this.networkPackage.contracts[contractAlias].bytecodeHash;
     return currentBytecode !== deployedBytecode;

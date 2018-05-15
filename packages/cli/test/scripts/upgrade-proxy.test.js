@@ -4,23 +4,21 @@ import sync from "../../src/scripts/sync.js";
 import newVersion from "../../src/scripts/new-version.js";
 import createProxy from "../../src/scripts/create-proxy.js";
 import upgradeProxy from "../../src/scripts/upgrade-proxy.js";
-import { FileSystem as fs } from "zos-lib";
-import { cleanup, cleanupfn } from "../helpers/cleanup.js";
+import { Contracts, FileSystem as fs } from "zos-lib";
+import { cleanupfn } from "../helpers/cleanup.js";
 
 const ImplV1 = artifacts.require('ImplV1');
 const ImplV2 = artifacts.require('ImplV2');
 const Greeter = artifacts.require('GreeterImpl');
-const PackagedAppManager = ContractsProvider.getFromLib('PackagedAppManager');
+const PackagedApp = Contracts.getFromLib('PackagedApp');
 
-const should = require('chai')
-      .use(require('chai-as-promised'))
-      .use(require('../helpers/assertions'))
-      .should();
+require('chai')
+  .use(require('chai-as-promised'))
+  .use(require('../helpers/assertions'))
+  .should();
 
 contract('upgrade-proxy command', function([_, owner]) {
-
-  const from = owner;
-  const txParams = { from };
+  const txParams = { from: owner };
   const appName = "MyApp";
   const v1string = "0.1.0";
   const v2string = "0.2.0";
@@ -44,8 +42,8 @@ contract('upgrade-proxy command', function([_, owner]) {
     }
 
     if (implementation) {
-      const appManager = PackagedAppManager.at(data.app.address)
-      const actualImplementation = await appManager.getProxyImplementation(proxyInfo.address)
+      const app = PackagedApp.at(data.app.address)
+      const actualImplementation = await app.getProxyImplementation(proxyInfo.address)
       actualImplementation.should.eq(implementation);
     }
 

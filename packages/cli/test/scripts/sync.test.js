@@ -1,11 +1,11 @@
-import { FileSystem as fs, AppManagerProvider } from 'zos-lib'
+import { FileSystem as fs, App } from 'zos-lib'
 import sync from "../../src/scripts/sync.js";
 import { cleanup, cleanupfn } from '../helpers/cleanup';
 
-const AppManager = artifacts.require('PackagedAppManager');
-const Package = artifacts.require('Package');
-const AppDirectory = artifacts.require('AppDirectory');
 const ImplV1 = artifacts.require('ImplV1');
+const Package = artifacts.require('Package');
+const PackagedApp = artifacts.require('PackagedApp');
+const AppDirectory = artifacts.require('AppDirectory');
 
 const should = require('chai')
   .use(require('chai-as-promised'))
@@ -29,8 +29,8 @@ contract('sync', function([_, owner]) {
 
     it('should deploy app at specified address', async function () {
       const address = fs.parseJson(networkFileName).app.address;
-      const appManager = await AppManager.at(address);
-      (await appManager.version()).should.eq(defaultVersion);
+      const app = await PackagedApp.at(address);
+      (await app.version()).should.eq(defaultVersion);
     });
   };
 
@@ -76,16 +76,16 @@ contract('sync', function([_, owner]) {
     });
 
     it('should register instances in directory', async function () {
-      const appManagerWrapper = await AppManagerProvider.from(fs.parseJson(networkFileName).app.address);
+      const app = await App.fetch(fs.parseJson(networkFileName).app.address);
       const address = fs.parseJson(networkFileName).contracts["Impl"].address;
-      const directory = appManagerWrapper.currentDirectory();
+      const directory = app.currentDirectory();
       (await directory.getImplementation("Impl")).should.eq(address);
     });
 
     it('should log instance deployment', async function () {
-      const appManagerWrapper = await AppManagerProvider.from(fs.parseJson(networkFileName).app.address);
+      const app = await App.fetch(fs.parseJson(networkFileName).app.address);
       const address = fs.parseJson(networkFileName).contracts["Impl"].address;
-      const directory = appManagerWrapper.currentDirectory();
+      const directory = app.currentDirectory();
       (await directory.getImplementation("Impl")).should.eq(address);
     });
 
@@ -118,9 +118,9 @@ contract('sync', function([_, owner]) {
       const newPackageFileName = "test/mocks/packages/package-with-contracts-v2.zos.json";
       await sync({ packageFileName: newPackageFileName, networkFileName, network, from });
       const address = fs.parseJson(networkFileName).contracts["Impl"].address;
-      const appManagerWrapper = await AppManagerProvider.from(fs.parseJson(networkFileName).app.address);
-      appManagerWrapper.version.should.eq('1.2.0');
-      const directory = appManagerWrapper.currentDirectory();
+      const app = await App.fetch(fs.parseJson(networkFileName).app.address);
+      app.version.should.eq('1.2.0');
+      const directory = app.currentDirectory();
       (await directory.getImplementation("Impl")).should.eq(address);
     });
   });
@@ -141,8 +141,8 @@ contract('sync', function([_, owner]) {
 
     it('should set stdlib in deployed app', async function () {
       const address = fs.parseJson(networkFileName).app.address;
-      const appManager = await AppManager.at(address);
-      const appPackage = await Package.at(await appManager.package());
+      const app = await PackagedApp.at(address);
+      const appPackage = await Package.at(await app.package());
       const provider = await AppDirectory.at(await appPackage.getVersion(defaultVersion));
       const stdlib = await provider.stdlib();
 
