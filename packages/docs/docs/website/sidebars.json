@@ -5,7 +5,6 @@
     ],
     "GUIDES": [
       "building",
-      "migrating",
       "testing",
       "developing"
     ],
@@ -18,7 +17,6 @@
       "libfront"
     ],
     "FURTHER INFORMATION": [
-      "faq",
       "whitepaper"
     ]
   },
