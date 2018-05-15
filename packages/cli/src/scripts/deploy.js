@@ -18,7 +18,7 @@ export default async function deploy({ version, network, txParams = {}, packageF
   if (files.existsNetworkFile(network)) {
     log.info('Reading network file...')
     zosNetworkFile = files.readNetworkFile(network)
-    _package = await Release.from(zosNetworkFile.distribution.address, txParams)
+    _package = await Package.fetch(zosNetworkFile.distribution.address, txParams)
   } else {
     log.info('Network file not found, deploying new package...')
     _package = await Package.deploy(txParams)
