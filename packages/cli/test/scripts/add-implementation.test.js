@@ -57,7 +57,6 @@ contract('add-implementation command', function() {
     delete contractsData[0].alias
     addImplementation({ contractsData, packageFileName });
     const data = fs.parseJson(packageFileName);
-    console.log(data.contracts)
     data.contracts[contractName].should.eq(contractName);
   });
 
