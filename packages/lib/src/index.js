@@ -17,7 +17,7 @@ import behaviors from './test'
 // model objects
 import App from './app/App'
 import Package from './package/Package'
-import Release from './package/Release'
+import Release from './release/Release'
 
 export {
   version,
