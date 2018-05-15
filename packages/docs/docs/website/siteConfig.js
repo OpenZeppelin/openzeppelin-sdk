@@ -8,7 +8,8 @@
 const siteConfig = {
   title: 'zeppelin_os',
   tagline: 'zeppelin_os rocks',
-  baseUrl: '/zos-docs/',
+  url: 'https://zeppelinos.org/docs/',
+  baseUrl: '/',
   organizationName: 'zeppelinos',
   projectName: 'zos-docs',
   initialDoc: 'start',
