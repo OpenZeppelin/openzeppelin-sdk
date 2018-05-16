@@ -1,3 +1,6 @@
+'use strict'
+require('../setup')
+
 import init from "../../src/scripts/init.js";
 import addImplementation from "../../src/scripts/add-implementation.js";
 import push from "../../src/scripts/push.js";
@@ -5,18 +8,11 @@ import bumpVersion from "../../src/scripts/bump-version.js";
 import createProxy from "../../src/scripts/create-proxy.js";
 import status from "../../src/scripts/status.js";
 import linkStdlib from "../../src/scripts/link-stdlib";
-import { FileSystem as fs } from "zos-lib";
 import { cleanup, cleanupfn } from "../helpers/cleanup.js";
 import TestLogger from '../helpers/logger.js';
 
-const should = require('chai')
-      .use(require('chai-as-promised'))
-      .should();
-
 contract('status command', function([_, owner]) {
-
-  const from = owner;
-  const txParams = { from };
+  const txParams = { from: owner };
   const appName = "MyApp";
   const contractName = "ImplV1";
   const contractAlias = "Impl";

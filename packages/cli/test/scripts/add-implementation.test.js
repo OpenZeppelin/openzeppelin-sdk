@@ -1,11 +1,10 @@
+'use strict'
+require('../setup')
+
 import init from "../../src/scripts/init.js";
 import addImplementation from "../../src/scripts/add-implementation.js";
 import { cleanup, cleanupfn } from "../helpers/cleanup.js";
 import { FileSystem as fs } from 'zos-lib';
-
-const should = require('chai')
-      .use(require('chai-as-promised'))
-      .should();
 
 contract('add-implementation command', function() {
   const packageFileName = "test/tmp/package.zos.json";

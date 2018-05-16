@@ -1,8 +1,7 @@
-import Stdlib from '../../src/models/stdlib/Stdlib';
+'use strict'
+require('../setup')
 
-const should = require('chai')
-  .use(require('chai-as-promised'))
-  .should();
+import Stdlib from '../../src/models/stdlib/Stdlib';
 
 contract('Stdlib', function () {
   const packageName = 'mock-stdlib';

@@ -3,10 +3,6 @@ import addAllImplementations from "../../src/scripts/add-all-implementations"
 import { cleanup, cleanupfn } from "../helpers/cleanup.js";
 import { FileSystem as fs } from 'zos-lib';
 
-require('chai')
-  .use(require('chai-as-promised'))
-  .should()
-
 contract('add-all-implementations command', function() {
   const appName = "MyApp"
   const defaultVersion = "0.1.0"

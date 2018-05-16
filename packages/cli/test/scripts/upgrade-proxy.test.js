@@ -1,3 +1,6 @@
+'use strict'
+require('../setup')
+
 import init from "../../src/scripts/init.js";
 import addImplementation from "../../src/scripts/add-implementation.js";
 import push from "../../src/scripts/push.js";
@@ -11,11 +14,6 @@ const ImplV1 = artifacts.require('ImplV1');
 const ImplV2 = artifacts.require('ImplV2');
 const Greeter = artifacts.require('GreeterImpl');
 const PackagedApp = Contracts.getFromLib('PackagedApp');
-
-require('chai')
-  .use(require('chai-as-promised'))
-  .use(require('../helpers/assertions'))
-  .should();
 
 contract('upgrade-proxy command', function([_, owner]) {
   const txParams = { from: owner };

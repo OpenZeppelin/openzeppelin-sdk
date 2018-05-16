@@ -1,11 +1,10 @@
+'use strict'
+require('../setup')
+
 import init from "../../src/scripts/init.js";
 import linkStdlib from "../../src/scripts/link-stdlib.js";
 import { cleanup, cleanupfn } from "../helpers/cleanup.js";
 import { FileSystem as fs } from 'zos-lib';
-
-const should = require('chai')
-      .use(require('chai-as-promised'))
-      .should();
 
 contract('link-stdlib command', function() {
   const appName = "MyApp";

@@ -1,13 +1,12 @@
+'use strict'
+require('../setup')
+
 import init from "../../src/scripts/init.js";
 import bumpVersion from "../../src/scripts/bump-version.js";
 import linkStdlib from "../../src/scripts/link-stdlib.js";
 import { FileSystem as fs } from 'zos-lib';
 import { cleanup, cleanupfn } from "../helpers/cleanup.js";
 import addImplementation from "../../src/scripts/add-implementation.js";
-
-const should = require('chai')
-      .use(require('chai-as-promised'))
-      .should();
 
 contract('new-version command', function() {
   const appName = "MyApp";

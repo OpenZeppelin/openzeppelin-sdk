@@ -1,15 +1,13 @@
+'use strict'
+require('../setup')
+
+import push from '../../src/scripts/push.js';
 import { FileSystem as fs } from 'zos-lib'
-import push from "../../src/scripts/push.js";
 import { cleanup, cleanupfn } from '../helpers/cleanup';
 
 const Package = artifacts.require('Package');
 const PackagedApp = artifacts.require('PackagedApp');
 const AppDirectory = artifacts.require('AppDirectory');
-
-const should = require('chai')
-  .use(require('chai-as-promised'))
-  .use(require('../helpers/assertions'))
-  .should();
 
 contract('push-with-stdlib', function([_, owner]) {
 

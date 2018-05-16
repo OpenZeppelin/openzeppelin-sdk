@@ -1,12 +1,11 @@
+'use strict'
+require('../setup')
+
 import { FileSystem as fs } from 'zos-lib';
 import ProjectDeployer from '../../src/models/ProjectDeployer';
 
 const ImplV1 = artifacts.require('ImplV1');
 const ImplV2 = artifacts.require('ImplV2');
-
-const should = require('chai')
-  .use(require('chai-as-promised'))
-  .should();
 
 contract('ProjectDeployer', function ([_, owner]) {
   const txParams = { from: owner }

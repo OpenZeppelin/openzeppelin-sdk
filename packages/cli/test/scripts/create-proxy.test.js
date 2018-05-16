@@ -1,3 +1,6 @@
+'use strict'
+require('../setup')
+
 import init from "../../src/scripts/init.js";
 import push from "../../src/scripts/push.js";
 import { cleanup, cleanupfn } from "../helpers/cleanup.js";
@@ -8,14 +11,8 @@ import linkStdlib from "../../src/scripts/link-stdlib.js";
 
 const ImplV1 = artifacts.require('ImplV1');
 
-const should = require('chai')
-      .use(require('chai-as-promised'))
-      .should();
-
 contract('create-proxy command', function([_, owner]) {
-
-  const from = owner;
-  const txParams = { from };
+  const txParams = { from: owner };
   const appName = "MyApp";
   const contractName = "ImplV1";
   const contractAlias = "Impl";
