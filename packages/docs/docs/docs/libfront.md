@@ -1,10 +1,8 @@
 ---
 id: libfront
 title: ZeppelinOS LIB API
-sidebar_label: Library
+sidebar_label: Lib API
 ---
 
-Welcome to the ZeppelinOS LIB API reference!
-
-- [LIB](libstart.md)
+Welcome to the [ZeppelinOS LIB API reference!](libmain.md)
 

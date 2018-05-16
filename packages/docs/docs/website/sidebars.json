@@ -14,14 +14,14 @@
       "crafting"
     ],
     "REFERENCE": [
-      "clifront",
-      "libfront",
+      "clistart",
+      "libstart",
       "whitepaper"
     ]
   },
-  "docs-api": {
-    "ABOUT": [
-      "libstart"
+  "lib-api": {
+    "OVERVIEW": [
+      "libmain"
     ],
     "APPLICATION / MANAGEMENT": [
       "application_management_AppDirectory",
@@ -50,9 +50,21 @@
       "upgradeability_UpgradeabilityProxyFactory"
     ]
   },
-  "docs-cli": {
-    "ABOUT": [
-      "clistart"
+  "cli-api": {
+    "OVERVIEW": [
+      "climain"
+    ],
+    "COMMANDS": [
+      "init",
+      "add",
+      "push",
+      "create",
+      "bump",
+      "upgrade",
+      "link",
+      "status",
+      "init-distribution",
+      "deploy"
     ]
   }
 }

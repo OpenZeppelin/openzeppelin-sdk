@@ -1,10 +1,7 @@
 ---
 id: clifront
 title: ZeppelinOS CLI API
-sidebar_label: CLI
+sidebar_label: CLI API
 ---
 
-Welcome to the ZeppelinOS CLI API reference!
-
-- [CLI](clistart.md)
-
+Welcome to the [ZeppelinOS CLI API reference!](cli_main.md)
