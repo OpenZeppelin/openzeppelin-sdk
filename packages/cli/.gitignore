@@ -2,3 +2,4 @@ node_modules
 package.zos*
 build
 lib
+.node-xmlhttprequest-sync-*

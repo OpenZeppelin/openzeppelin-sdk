@@ -23,7 +23,7 @@ export default class NetworkAppController extends NetworkBaseController {
   }
 
   async deploy() {
-    this.app = await App.deploy(this.packageData.version, 0x0, this.txParams);
+    this.app = await App.deploy(this.packageData.version, this.txParams);
     this.networkPackage.app = { address: this.app.address() };
     this.networkPackage.version = this.packageData.version;
     this.networkPackage.package = { address: this.app.package.address };

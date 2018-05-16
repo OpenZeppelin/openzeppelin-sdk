@@ -2,11 +2,11 @@ import _ from 'lodash'
 import Stdlib from "./stdlib/Stdlib"
 import { Contracts, FileSystem as fs, App } from 'zos-lib'
 
-export default {
+const ProjectDeployer = {
   async call(packageData = null, txParams = {}) {
     this.txParams = txParams
     if(!packageData) packageData = fs.parseJson('package.zos.json')
-    const app = await App.deploy(packageData.version, 0x0, this.txParams)
+    const app = await App.deploy(packageData.version, this.txParams)
     const directory = app.currentDirectory()
     await this._deployStdlib(directory, packageData)
     await this._deployAllContracts(directory, packageData)
@@ -28,3 +28,5 @@ export default {
     }
   }
 }
+
+export default ProjectDeployer
