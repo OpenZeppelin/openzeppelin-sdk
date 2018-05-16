@@ -52,6 +52,7 @@ export default class NetworkAppController {
     const proxies = this.networkPackage.proxies;
     if (!proxies[contractAlias]) proxies[contractAlias] = [];
     proxies[contractAlias].push(proxyInfo);
+    return proxyInstance;
   }
 
   async upgradeProxies(contractAlias, proxyAddress, initMethod, initArgs) {
