@@ -5,6 +5,7 @@ import init from "../../src/scripts/init.js";
 import push from "../../src/scripts/push.js";
 import { cleanup, cleanupfn } from "../helpers/cleanup.js";
 import { FileSystem as fs } from "zos-lib";
+import { editJson } from '../helpers/json.js';
 import createProxy from "../../src/scripts/create-proxy.js";
 import addImplementation from "../../src/scripts/add-implementation.js";
 import linkStdlib from "../../src/scripts/link-stdlib.js";
@@ -54,6 +55,11 @@ contract('create-proxy command', function([_, owner]) {
 
   it('should refuse to create a proxy for an undefined contract', async function() {
     await createProxy({ contractAlias: "NotExists", packageFileName, network, txParams }).should.be.rejectedWith(/not found/);
+  });
+
+  it('should refuse to create a proxy for a lib project', async function() {
+    editJson(packageFileName, p => { p.lib = true; });
+    await createProxy({ contractAlias, packageFileName, network, txParams }).should.be.rejectedWith(/lib/);
   });
 
   it('should refuse to create a proxy for an undeployed contract', async function() {

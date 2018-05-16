@@ -1,17 +1,12 @@
 {
-  "app": {
-    "address": "0x0000000000000000000000000000000000000220",
-    "version": "1.2"
-  },
+  "version": "1.2",
   "provider": {
     "address": "0x0000000000000000000000000000000000000210"
   },
-  "package": {
-    "contracts": {
-      "Greeter": {
-        "address": "0x102030",
-        "bytecodeHash": "0x0002"
-      }
+  "contracts": {
+    "Greeter": {
+      "address": "0x102030",
+      "bytecodeHash": "0x0002"
     }
   }
 }

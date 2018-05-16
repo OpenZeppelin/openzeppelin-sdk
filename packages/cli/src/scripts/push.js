@@ -1,9 +1,11 @@
-import AppController from '../models/AppController';
+import ControllerFor from "../models/local/ControllerFor";
 
 export default async function push({ network, deployStdlib, reupload = false, txParams = {}, packageFileName = undefined, networkFileName = undefined }) {
-  const appController = new AppController(packageFileName).onNetwork(network, txParams, networkFileName);
+  const appController = ControllerFor(packageFileName).onNetwork(network, txParams, networkFileName);
   
-  if (deployStdlib) await appController.deployStdlib();
+  if (deployStdlib && !appController.isLib()) {
+    await appController.deployStdlib();
+  }
   await appController.push(reupload);
   appController.writeNetworkPackage();
 }

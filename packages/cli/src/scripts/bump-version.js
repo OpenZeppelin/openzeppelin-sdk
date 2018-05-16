@@ -1,10 +1,17 @@
-import AppController from  '../models/AppController'
+import ControllerFor from  '../models/local/ControllerFor'
 
 export default async function bumpVersion({ version, stdlibNameVersion = undefined, installDeps = false, packageFileName = undefined }) {
   if (version === undefined || version === '') throw Error('A version name must be provided to initialize a new version.')
 
-  const appController = new AppController(packageFileName)
+  const appController = ControllerFor(packageFileName)
+  if (stdlibNameVersion && appController.isLib()) {
+    throw Error("Cannot link a stdlib for a lib project");
+  }
+
   appController.bumpVersion(version)
-  await appController.linkStdlib(stdlibNameVersion, installDeps)
+  if (!appController.isLib()) {
+    await appController.linkStdlib(stdlibNameVersion, installDeps)
+  }
+
   appController.writePackage()
 }

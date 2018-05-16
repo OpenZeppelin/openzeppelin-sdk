@@ -9,8 +9,7 @@ const Package = artifacts.require('Package');
 const PackagedApp = artifacts.require('PackagedApp');
 const AppDirectory = artifacts.require('AppDirectory');
 
-contract('push-with-stdlib', function([_, owner]) {
-
+contract('push-with-stdlib command', function([_, owner]) {
   const from = owner;
   const txParams = { from };
   const network = "test";

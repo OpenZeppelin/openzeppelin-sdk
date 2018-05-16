@@ -5,6 +5,7 @@ import init from "../../src/scripts/init.js";
 import addImplementation from "../../src/scripts/add-implementation.js";
 import { cleanup, cleanupfn } from "../helpers/cleanup.js";
 import { FileSystem as fs } from 'zos-lib';
+import { editJson } from '../helpers/json.js';
 
 contract('add-implementation command', function() {
   const packageFileName = "test/tmp/package.zos.json";
@@ -22,6 +23,13 @@ contract('add-implementation command', function() {
   after(cleanupfn(packageFileName));
 
   it('should add an implementation with an alias and a filename', function() {
+    addImplementation({ contractsData, packageFileName});
+    const data = fs.parseJson(packageFileName);
+    data.contracts[contractAlias].should.eq(contractName);
+  });
+
+  it('should add an implementation for a lib', function() {
+    editJson(packageFileName, p => { p.lib = true; });
     addImplementation({ contractsData, packageFileName});
     const data = fs.parseJson(packageFileName);
     data.contracts[contractAlias].should.eq(contractName);

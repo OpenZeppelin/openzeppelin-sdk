@@ -5,6 +5,7 @@ import init from "../../src/scripts/init.js";
 import linkStdlib from "../../src/scripts/link-stdlib.js";
 import { cleanup, cleanupfn } from "../helpers/cleanup.js";
 import { FileSystem as fs } from 'zos-lib';
+import { editJson } from '../helpers/json.js';
 
 contract('link-stdlib command', function() {
   const appName = "MyApp";
@@ -24,4 +25,10 @@ contract('link-stdlib command', function() {
     data.stdlib.name.should.eq('mock-stdlib');
     data.stdlib.version.should.eq('1.1.0');
   });
+
+  it('should refuse to set a stdlib for a lib project', async function () {
+    editJson(packageFileName, p => { p.lib = true; });
+    await linkStdlib({ stdlibNameVersion: 'mock-stdlib@1.1.0', packageFileName }).should.be.rejectedWith(/lib/);
+  });
+  
 });

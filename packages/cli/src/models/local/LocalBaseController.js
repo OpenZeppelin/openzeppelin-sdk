@@ -1,56 +1,39 @@
 import _ from 'lodash';
-import { Contracts, Logger, FileSystem as fs } from 'zos-lib';
+import Stdlib from '../stdlib/Stdlib';
+import { Contracts, Logger, FileSystem as fs } from "zos-lib";
 
-import Stdlib from './stdlib/Stdlib';
-import NetworkAppController from './NetworkAppController';
-
-const log = new Logger('AppController');
+const log = new Logger('LocalController');
 
 const DEFAULT_VERSION = '0.1.0';
 
-export default class AppController {
+export default class LocalBaseController {
   constructor(packageFileName = 'package.zos.json') {
     this.packageFileName = packageFileName;
-  }
-
-  onNetwork(network, txParams, networkFileName) {
-    return new NetworkAppController(this, network, txParams, networkFileName);
   }
 
   init(name, version) {
     if (fs.exists(this.packageFileName)) {
       throw Error(`Cannot overwrite existing file ${this.packageFileName}`)
     }
-    if (this.package.name) {
-      throw Error(`Cannot initialize already initialized package ${this.package.name}`)
+    if (this.packageData.name) {
+      throw Error(`Cannot initialize already initialized package ${this.packageData.name}`)
     }
     
-    this.package.name = name;
-    this.package.version = version || DEFAULT_VERSION;
-    this.package.contracts = {};
+    this.packageData.name = name;
+    this.packageData.version = version || DEFAULT_VERSION;
+    this.packageData.contracts = {};
   }
 
   bumpVersion(version) {
-    this.package.version = version;
-  }
-
-  async linkStdlib(stdlibNameVersion, installDeps = false) {
-    if (stdlibNameVersion) {
-      const stdlib = new Stdlib(stdlibNameVersion);
-      if (installDeps) await stdlib.install();
-      this.package.stdlib = {
-        name: stdlib.getName(),
-        version: stdlib.getVersion()
-      };
-    }
+    this.packageData.version = version;
   }
 
   hasStdlib() {
-    return !_.isEmpty(this.package.stdlib);
+    return false;
   }
 
   addImplementation(contractAlias, contractName) {
-    this.package.contracts[contractAlias] = contractName;
+    this.packageData.contracts[contractAlias] = contractName;
   }
 
   addAllImplementations() {
@@ -84,7 +67,7 @@ export default class AppController {
     return bytecode && bytecode !== "0x"
   }
 
-  get package() {
+  get packageData() {
     if (!this._package) {
       this._package = fs.parseJsonIfExists(this.packageFileName) || {};
     }
@@ -92,11 +75,11 @@ export default class AppController {
   }
 
   getContractClass(contractAlias) {
-    const contractName = this.package.contracts[contractAlias];
+    const contractName = this.packageData.contracts[contractAlias];
     if (contractName) {
       return Contracts.getFromLocal(contractName);
     } else if (this.hasStdlib()) {
-      const stdlibName = this.package.stdlib.name;
+      const stdlibName = this.packageData.stdlib.name;
       const contractName = new Stdlib(stdlibName).contract(contractAlias)
       return Contracts.getFromNodeModules(stdlibName, contractName);
     } else {
@@ -105,7 +88,7 @@ export default class AppController {
   }
 
   writePackage() {
-    fs.writeJson(this.packageFileName, this.package);
+    fs.writeJson(this.packageFileName, this.packageData);
     log.info(`Successfully written ${this.packageFileName}`)
   }
 }

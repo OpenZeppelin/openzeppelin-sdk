@@ -1,0 +1,9 @@
+{
+  "name": "Herbs",
+  "version": "1.1.0",
+  "lib": true,
+  "contracts": {
+    "Impl": "ImplV1",
+    "AnotherImpl": "AnotherImplV1"
+  }
+}

@@ -1,4 +1,4 @@
-import AppController from '../models/AppController';
+import ControllerFor from "../models/local/ControllerFor";
 import { Logger } from 'zos-lib';
 import _ from 'lodash';
 
@@ -6,14 +6,18 @@ let log = new Logger('scripts/status');
 
 export default async function status({ network, txParams = {}, packageFileName = undefined, networkFileName = undefined, logger = undefined }) {
   if (logger) log = logger;
-  const appController = new AppController(packageFileName).onNetwork(network, txParams, networkFileName);
-  log.info(`Application status for network ${network}`);
+  const appController = ControllerFor(packageFileName).onNetwork(network, txParams, networkFileName);
+  log.info(`Project status for network ${network}`);
 
-  if (!(await appInfo(appController))) return;
+  if (!(await rootInfo(appController))) return;
   if (!(await versionInfo(appController))) return;
   await stdlibInfo(appController);
   await contractsInfo(appController);
   await proxiesInfo(appController);
+}
+
+function rootInfo(appController) {
+  return appController.isLib() ? libInfo(appController) : appInfo(appController);
 }
 
 async function appInfo(appController) {
@@ -22,16 +26,27 @@ async function appInfo(appController) {
     return false;
   }
 
-  await appController.loadApp();
+  await appController.fetch();
   log.info(`Application is deployed at ${appController.appAddress}`);
   log.info(`- Proxy factory is at ${appController.app.factory.address}`);
   log.info(`- Package is at ${appController.app.package.address}`);
   return true;
 }
 
+async function libInfo(appController) {
+  if (!appController.packageAddress) {
+    log.info(`Library is not yet deployed`);
+    return false;
+  }
+
+  await appController.fetch();
+  log.info(`Library package is deployed at ${appController.packageAddress}`);
+  return true;
+}
+
 async function versionInfo(appController) {
-  const requestedVersion = appController.package.version;
-  const currentVersion = appController.app.version;
+  const requestedVersion = appController.packageData.version;
+  const currentVersion = appController.networkPackage.version;
   if (requestedVersion !== currentVersion) {
     log.info(`- Deployed version ${currentVersion} is out of date (latest is ${requestedVersion})`)
     return false;
@@ -43,12 +58,12 @@ async function versionInfo(appController) {
 
 async function contractsInfo(appController) {
   log.info('Application contracts:');
-  if (_.isEmpty(appController.package.contracts)) {
+  if (_.isEmpty(appController.packageData.contracts)) {
     log.info(`- No contracts registered`);
     return;
   }
 
-  _.each(appController.package.contracts, function (contractName, contractAlias) {
+  _.each(appController.packageData.contracts, function (contractName, contractAlias) {
     const isDeployed = appController.isContractDeployed(contractAlias);
     const hasChanged = appController.hasContractChanged(contractAlias);
     const fullName = contractName == contractAlias ? contractAlias : `${contractAlias} (implemented by ${contractName})`;
@@ -63,11 +78,12 @@ async function contractsInfo(appController) {
 }
 
 async function stdlibInfo(appController) {
+  if (appController.isLib()) return;
   log.info('Standard library:');
 
   // REFACTOR: Part of this logic is duplicated from NetworkAppController#setStdilb, consider deduplicating it
-  const requiredStdlib = appController.package.stdlib;
-  const requiresStdlib = !_.isEmpty(appController.package.stdlib);
+  const requiredStdlib = appController.packageData.stdlib;
+  const requiresStdlib = !_.isEmpty(appController.packageData.stdlib);
   const networkStdlib = appController.networkPackage.stdlib;
   const hasNetworkStdlib = !_.isEmpty(networkStdlib);
   const networkStdlibMatches = hasNetworkStdlib && networkStdlib.name === requiredStdlib.name && networkStdlib.version === requiredStdlib.version;
@@ -96,6 +112,7 @@ async function stdlibInfo(appController) {
 }
 
 async function proxiesInfo(appController) {
+  if (appController.isLib()) return;
   log.info("Deployed proxies:");
   const proxies = appController.networkPackage.proxies;
   if (_.isEmpty(proxies)) {
