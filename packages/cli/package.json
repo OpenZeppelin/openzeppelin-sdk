@@ -4,7 +4,7 @@
   "description": "ZeppelinOS command line interface",
   "main": "lib/index.js",
   "scripts": {
-    "prepack": "truffle compile && babel src --out-dir lib",
+    "prepack": "truffle compile && rm -rf lib && babel src --out-dir lib",
     "test": "NODE_ENV=test ./node_modules/.bin/truffle test",
     "gen-docs": "babel-node docs/bin/docs.js"
   },
