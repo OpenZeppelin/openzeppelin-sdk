@@ -1,8 +1,22 @@
 import colors from 'colors'
 
+const defaults = {
+  verbose: false,
+  silent: true
+};
+
 export default class Logger {
-  constructor(prefix) {
+  static silent(value) {
+    defaults.silent = value;
+  }
+
+  static verbose(value) {
+    defaults.verbose = value;
+  }
+
+  constructor(prefix, opts) {
     this.prefix = prefix
+    this.opts = Object.assign({}, defaults, opts);
   }
 
   out(msg) {
@@ -10,10 +24,21 @@ export default class Logger {
   }
 
   info(msg) {
-    console.error(`[${this.prefix}] ${msg}`.green)
+    this.log(msg, 'green')
   }
 
   error(msg) {
-    console.error(`[${this.prefix}] ${msg}`.red)
+    this.log(msg, 'red')
+  }
+
+  log(msg, color) {
+    if (this.opts.silent) {
+      return;
+    }
+    if (this.opts.verbose) {
+      console.error(`[${this.prefix}] ${msg}`[color])
+    } else {
+      console.error(msg[color])
+    }
   }
 }
