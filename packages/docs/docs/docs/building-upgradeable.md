@@ -1,7 +1,7 @@
 ---
 id: building-upgradeable
 title: Building upgradeable applications
-sidebar_label: Building Upgradeable Apps
+sidebar_label: Building upgradeable apps
 ---
 
 Let's set up an Ethereum project to go through the features of ZeppelinOS that will make our project safer and easier to maintain.

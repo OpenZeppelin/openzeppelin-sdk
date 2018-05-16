@@ -1,7 +1,7 @@
 ---
 id: developing
 title: Developing a new standard library
-sidebar_label: Developing Stdlibs
+sidebar_label: Developing stdlibs
 ---
 
 **ZeppelinOS** handles releases of the standard library. Any developer can publish new stdlib releases. The *zos* CLI allows developers to go through this process seamlessly, by creating packages that handle the different releases of the stdlib. 
