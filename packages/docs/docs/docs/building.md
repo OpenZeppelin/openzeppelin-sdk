@@ -61,7 +61,7 @@ We set the initial donation amount to 10 wei, and here you will find the only di
 
 We need to install the `openzeppelin-zos` dependency and to compile the contract:
 
-    npm install --save-dev zos-lib openzeppelin-zos
+    npm install --save-dev openzeppelin-zos
     truffle compile
 
 ## Using ZeppelinOS to link to the OpenZeppelin standard library

@@ -113,5 +113,8 @@ version.
 Voilà! With this, your contracts can be linked to standard libraries and can be
 easily upgraded.
 
-You can also see [all the available commands of zos](TODO link) and play with
-our demos [Basil](TODO link) and [Crafty](TODO link).
+You can also see
+[all the available commands of zos](https://docs.zeppelinos.org/docs/clifront.html)
+and play with our demos
+[Basil](https://docs.zeppelinos.org/docs/basil.html) and
+[Crafty](https://docs.zeppelinos.org/docs/crafting.html).
