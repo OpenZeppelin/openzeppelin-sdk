@@ -5,7 +5,7 @@ export default async function createProxy({ contractAlias, initMethod, initArgs,
 
   const appController = new AppController(packageFileName).onNetwork(network, txParams, networkFileName);
   await appController.checkLocalContractDeployed(contractAlias, !force);
-  await appController.createProxy(contractAlias, initMethod, initArgs);
+  const proxy = await appController.createProxy(contractAlias, initMethod, initArgs);
   appController.writeNetworkPackage();
+  return proxy;
 }
-
