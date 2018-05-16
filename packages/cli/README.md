@@ -2,7 +2,7 @@
 [![NPM Package](https://img.shields.io/npm/v/zos.svg?style=flat-square)](https://www.npmjs.org/package/zos)
 [![Build Status](https://travis-ci.org/zeppelinos/zos-cli.svg?branch=master)](https://travis-ci.org/zeppelinos/zos-cli)
 
-:warning: **Under heavy development: do not use in production** :warning: 
+:warning: **Under heavy development: do not use in production** :warning:
 
 This package provides a unified command line interface to [ZeppelinOS](https://zeppelinos.org/).
 
@@ -39,7 +39,7 @@ mkdir myproject && cd myproject
 truffle init
 ```
 
-#### Setup your project 
+#### Setup your project
 Initialize your project with ZeppelinOS. The next command will create a new `package.zos.json` file:
 
 ```sh
@@ -51,11 +51,12 @@ zos init myproject 0.1
 ```
 
 
-## Examples
+## Guides
 
-- [Develop an upgradeable smart contract application using `zos`](examples/development.md)
-- [Testing a `zos` upgradeable application](examples/testing.md)
-- [Develop a new standard library release using `zos`](examples/stdlib.md)
+- [Quickstart guide](https://docs.zeppelinos.org/docs/quickstart.html)
+- [Building upgradeable applications](https://docs.zeppelinos.org/docs/building.html)
+- [Testing upgradeable applications](https://docs.zeppelinos.org/docs/testing.html)
+- [Developing a new standard library](https://docs.zeppelinos.org/docs/developing.html)
 - [Extend provided standard library code in your own contracts](https://github.com/zeppelinos/labs/tree/master/extensibility-study#extensibility-study) (experimental)
 - [Migrate your non-upgradeable legacy ERC20 token into an upgradeable version with a managed approach](https://github.com/zeppelinos/labs/tree/master/migrating_legacy_token_managed#migrating-legacy-non-upgradeable-token-to-upgradeability-with-managed-strategy) (experimental)
 - [Migrate your non-upgradeable legacy ERC20 token into an upgradeable version with an opt-in approach](https://github.com/zeppelinos/labs/tree/master/migrating_legacy_token_opt_in#migrating-legacy-non-upgradeable-token-to-upgradeability-with-opt-in-strategy) (experimental)
