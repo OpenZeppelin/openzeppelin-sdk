@@ -5,17 +5,20 @@
     ],
     "GUIDES": [
       "quickstart",
-      "building",
-      "testing",
-      "developing"
+      "building-upgradeable",
+      "building-stdlib",
+      "developing",
+      "testing"
     ],
     "DEMOS": [
       "basil",
-      "crafting"
+      "crafty"
+    ],
+    "LIBRARY": [
+      "libstart"
     ],
     "REFERENCE": [
-      "clistart",
-      "libstart",
+      "stdlib",
       "whitepaper"
     ]
   },

@@ -10,17 +10,23 @@ applications in Ethereum.
 
 ## Features
 
-* Standard libraries: link contracts to standard libraries already deployed on the blockchain.
-* Upgrades: fix and improve contracts over time.
+* Upgrades: fix and improve your contracts over time.
+* Standard libraries: link your contracts to standard libraries already deployed on the blockchain.
 
 ## Getting Started
 
-For a quick tour over the features and commands of
+For a quick tour of the features and commands of
 ZeppelinOS, go to the [Quickstart guide](quickstart.md).
 
-For a more comprehensive look at an application that uses
+For a more comprehensive look at how to build an upgradeable application using
 ZeppelinOS, follow our
-[guide to build a smart contract with ZeppelinOS](building.md).
+[Building upgradeable applications](building-upgradeable.md) Guide.
+
+If you would like to use the ZeppelinOS on-chain standard libraries in your app,
+ follow our [Using the stdlib in your app](building-stdlib.md) Guide. 
+
+Finally, if you are interested in deploying your own standard libraries for ZeppelinOS,
+see our [Developing a new standard library](developing.md) Guide. 
 
 ## Team
 

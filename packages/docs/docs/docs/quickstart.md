@@ -117,4 +117,4 @@ You can also see
 [all the available commands of zos](https://docs.zeppelinos.org/docs/clifront.html)
 and play with our demos
 [Basil](https://docs.zeppelinos.org/docs/basil.html) and
-[Crafty](https://docs.zeppelinos.org/docs/crafting.html).
+[Crafty](https://docs.zeppelinos.org/docs/crafty.html).

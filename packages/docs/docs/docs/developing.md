@@ -16,7 +16,7 @@ zos add <contract-name>,
 ```
 where `<contract-name>` is the name of the contract. Note that this command must be repeated once for each contract included in the package. This will update the `package.zos.json` file with the contract names. 
 
-Finally, we need to deploy the `Package`, the `Release` containing the stdlib, and the individual library contracts. All of this is accomplished by:
+Finally, we need to deploy the `Package`, the specific `Release` of the stdlib, and the individual library contracts. All of this is accomplished by:
 ```
 zos push --lib --network=<network>.
 ```
