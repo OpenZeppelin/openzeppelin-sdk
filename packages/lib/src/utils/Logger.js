@@ -15,12 +15,8 @@ export default class Logger {
   }
 
   constructor(prefix, opts) {
-    this.prefix = prefix
-    this.opts = Object.assign({}, defaults, opts);
-  }
-
-  out(msg) {
-    console.log(msg)
+    this.prefix = prefix;
+    this._opts = opts;
   }
 
   info(msg) {
@@ -40,5 +36,9 @@ export default class Logger {
     } else {
       console.error(msg[color])
     }
+  }
+
+  get opts() {
+    return Object.assign({}, this._opts, defaults)
   }
 }
