@@ -74,7 +74,12 @@
     "libmain": "ZeppelinOS LIB API",
     "libstart": "ZeppelinOS Library",
     "Library": "Library",
+<<<<<<< Updated upstream
     "quickstart": "Quickstart",
+=======
+    "package": "Package files format",
+    "Package files format": "Package files format",
+>>>>>>> Stashed changes
     "reference": "Reference",
     "start": "ZeppelinOS",
     "stdlib": "ZeppelinOS stdlib",
