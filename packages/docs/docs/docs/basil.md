@@ -108,7 +108,7 @@ OK, so we finish this step by linking the standard library and pushing our appli
 We pass that `--deploy-stdlib` flag because we are using a development network that started clean. When you deploy your application to a real network where the `openzeppelin-zos` standard library has already been deployed, you won't need this flag.
 
 The first time you run this command for a specific network, a new
-`package.zos.<network>.json` will be created. This file will reflect the status
+`zos.<network>.json` will be created. This file will reflect the status
 of your project in that network.
 
 ## Upgrading a contract

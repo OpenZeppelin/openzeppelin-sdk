@@ -27,7 +27,7 @@ Finally, to initialize the `zos` application, run:
 
     zos init myproject 0.0.1
 
-This will create a `package.zos.json` file, which will contain all the information about your project. 
+This will create a `zos.json` file, which will contain all the information about your project. For information about the format of this file, please see our [Advanced topics](advanced.md) section. 
 
 You are now ready to start developing your application. To build an upgradeable application using ZeppelinOS, please follow our next guide, [Building upgradeable applications](building-upgradeable.md).
 

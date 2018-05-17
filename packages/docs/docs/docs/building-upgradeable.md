@@ -43,13 +43,15 @@ In our example, run:
 
     zos add MyContract
 
-Push your application to the desired network by running:
+If you are working in a local development network like [Ganache](http://truffleframework.com/ganache/), you will need to [configure](http://truffleframework.com/docs/getting_started/project#alternative-migrating-with-ganache) your `truffle.js` file before running the `push` command.
+
+You can now push your application to the desired network by running:
 
     zos push --network <network>
 
-which will create a `package.zos.<network>.json` file with all the information specific to the chosen network. If you are working in a local development network like [Ganache](http://truffleframework.com/ganache/), you will need to [configure](http://truffleframework.com/docs/getting_started/project#alternative-migrating-with-ganache) your `truffle.js` file before running this command.
+which will create a `zos.<network>.json` file with all the information specific to the chosen network. The format of this file is discussed in the [Advanced topics](advanced.md) section.
 
-Now you can create an upgradeable version of each of your contracts with:
+To create an upgradeable version of each of your contracts, run:
 
     zos create <contract_name_1> --network <network>
     zos create <contract_name_2> --network <network>
@@ -57,10 +59,7 @@ Now you can create an upgradeable version of each of your contracts with:
     zos create <contract_name_n> --network <network>
 
 This command takes an optional `--init` flag to call an initialization/migration
-function after you create the contract.
-
-In our simple example we want to call the initialize function, with some value
-(_e.g._: 42) thus:
+function after you create the contract. In our simple example we want to pass a value (_e.g._: 42) to the initialize function:
 
     zos create MyContract --init initialize --args 42 --network development
 
