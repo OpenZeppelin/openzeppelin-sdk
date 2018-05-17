@@ -57,6 +57,7 @@ const siteConfig = {
     'https://fonts.googleapis.com/css?family=Lato:100,200,300,400,500,700,400italic,700italic',
   ],
   repoUrl: 'https://github.com/zeppelinos/',
+  gaTrackingId: 'UA-102575245-1'
 };
 
 module.exports = siteConfig;
