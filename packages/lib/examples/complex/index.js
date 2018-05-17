@@ -21,7 +21,7 @@ async function setupApp(txParams) {
   // On-chain, single entry point of the entire application.
   log.info(`<< Setting up App >> network: ${network}`)
   const initialVersion = '0.0.1'
-  return await App.deploy(initialVersion, txParams)
+  return await App.deploy(initialVersion, 0x0, txParams)
 }
 
 async function deployVersion1(app) {

@@ -6,8 +6,8 @@ const deploy = require('../index.js');
 const validateAddress = require('./helpers/validateAddress.js');
 const shouldBehaveLikeDonations = require('./Donations.behavior.js');
 const shouldBehaveLikeDonationsWithTokens = require('./DonationsWithTokens.behavior.js');
-
 require('chai').should()
+
 contract('App', ([_, owner, donor, wallet]) => {
   const initialVersion = '0.0.1';
   const updatedVersion = '0.0.2';
