@@ -150,8 +150,9 @@ contract DonationsV1 is Ownable {
 3. Next, we need to deploy the first version of the app contracts. To do so, we register the implementation of our `DonationsV1` in the `App` and request it to create a new upgradeable proxy for it. Let's do it:
 
 ```js
-  const contractName = "Donations";
-  const DonationsV1 = Contracts.getFromLib('DonationsV1')
+  // Register the first implementation of 'Donations', and request a proxy for it.
+  log.info('<< Deploying version 1 >>')
+  const DonationsV1 = Contracts.getFromLocal('DonationsV1')
   await app.setImplementation(DonationsV1, contractName);
   return await app.createProxy(DonationsV1, contractName, 'initialize', [owner])
 ```
@@ -190,17 +191,18 @@ contract DonationsV2 is DonationsV1 {
 5. What we need to do next is link our application to the zOS standard library release containing that mintable ERC721 implementation, and set it to our upgradeable contract. To do so, we create a new version of our application in the `App`, register a new `AppDirectory` containing the new version of our contract implementation, and then set the standard library version of ERC721 to our upgradeable contract. Let's see how:
 
 ```js
-  // Address of the zOS standard library.
-  const stdlib = "0xA739d10Cc20211B973dEE09DB8F0D75736E2D817";
+  // Create a new version of the app, liked to the ZeppelinOS standard library.
+  // Register a new implementation for 'Donations' and upgrade it's proxy to use the new implementation.
+  log.info('<< Deploying version 2 >>')
   const secondVersion = '0.0.2'
   await app.newVersion(secondVersion, await getStdLib(txParams))
-  const DonationsV2 = Contracts.getFromLib('DonationsV2')
+  const DonationsV2 = Contracts.getFromLocal('DonationsV2')
   await app.setImplementation(DonationsV2, contractName);
   await app.upgradeProxy(donations.address, null, contractName)
   donations = DonationsV2.at(donations.address)
 
   // Add an ERC721 token implementation to the project, request a proxy for it,
-  // and set the token on "Donations".
+  // and set the token on 'Donations'.
   log.info(`Creating ERC721 token proxy to use in ${contractName}...`)
   const token = await app.createProxy(
     MintableERC721Token, 
@@ -209,9 +211,9 @@ contract DonationsV2 is DonationsV1 {
     [donations.address, tokenName, tokenSymbol]
   )
   log.info(`Token proxy created at ${token.address}`)
-  log.info("Setting application's token...")
+  log.info('Setting application\'s token...')
   await donations.setToken(token.address, txParams)
-  log.info("Token set succesfully")
+  log.info('Token set succesfully')
   return token;
 ```
 
