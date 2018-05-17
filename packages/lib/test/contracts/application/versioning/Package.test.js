@@ -101,8 +101,9 @@ contract('Package', ([_, owner, anotherAddress]) => {
     })
 
     describe('when the requested version was not set', function () {
-      it('reverts', async function () {
-        await assertRevert(this.package.getVersion(version))
+      it('returns the zero address', async function () {
+        const registeredDirectory = await this.package.getVersion(version)
+        assert.equal(registeredDirectory, 0x0)
       })
     })
   })

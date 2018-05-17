@@ -36,7 +36,7 @@ contract UpgradeabilityProxyFactory {
   function createProxyAndCall(address owner, address implementation, bytes data) public payable returns (AdminUpgradeabilityProxy) {
     AdminUpgradeabilityProxy proxy = _createProxy(implementation);
     proxy.changeAdmin(owner);
-    require(proxy.call.value(msg.value)(data));
+    require(address(proxy).call.value(msg.value)(data));
     return proxy;
   }
 

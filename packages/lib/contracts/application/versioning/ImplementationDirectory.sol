@@ -2,6 +2,7 @@ pragma solidity ^0.4.21;
 
 import "./ImplementationProvider.sol";
 import "zeppelin-solidity/contracts/ownership/Ownable.sol";
+import 'zeppelin-solidity/contracts/AddressUtils.sol';
 
 /**
  * @title ImplementationDirectory
@@ -33,7 +34,13 @@ contract ImplementationDirectory is ImplementationProvider, Ownable {
    * @param implementation Address of the implementation
    */
   function setImplementation(string contractName, address implementation) public onlyOwner {
+    require(AddressUtils.isContract(implementation));
     implementations[contractName] = implementation;
     emit ImplementationChanged(contractName, implementation);
+  }
+
+  function unsetImplementation(string contractName) public onlyOwner {
+    implementations[contractName] = address(0);
+    emit ImplementationChanged(contractName, address(0));
   }
 }

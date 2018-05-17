@@ -17,13 +17,19 @@ contract UpgradeabilityProxy is Proxy {
    */
   event Upgraded(address implementation);
 
-  // Storage slot of the address of the current implementation
-  bytes32 private constant IMPLEMENTATION_SLOT = keccak256("org.zeppelinos.proxy.implementation");
+  /**
+   * @dev Storage slot with the address of the current implementation.
+   * @dev This is the hash of "org.zeppelinos.proxy.implementation", and is
+   * @dev validated in the constructor.
+   */
+  bytes32 private constant IMPLEMENTATION_SLOT = 0x7050c9e0f4ca769c69bd3a8ef740bc37934f8e2c036e5a723fd8ee048ed3f8c3;
 
   /**
    * @param _implementation address of the initial implementation
    */
   function UpgradeabilityProxy(address _implementation) public {
+    assert(IMPLEMENTATION_SLOT == keccak256("org.zeppelinos.proxy.implementation"));
+
     _setImplementation(_implementation);
   }
 

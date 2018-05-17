@@ -20,8 +20,12 @@ contract AdminUpgradeabilityProxy is UpgradeabilityProxy {
    */
   event AdminChanged(address previousAdmin, address newAdmin);
 
-  // Storage slot of the admin of the contract
-  bytes32 private constant ADMIN_SLOT = keccak256("org.zeppelinos.proxy.admin");
+  /**
+   * @dev Storage slot with the admin of the contract.
+   * @dev This is the hash of "org.zeppelinos.proxy.admin", and is validated in
+   * @dev the constructor.
+   */
+  bytes32 private constant ADMIN_SLOT = 0x10d6a54a4754c8869d6886b5f5d7fbfa5b4522237ea5c60d11bc4e7a1ff9390b;
 
   /**
    * @dev Will run this function if the sender is the admin.
@@ -40,6 +44,8 @@ contract AdminUpgradeabilityProxy is UpgradeabilityProxy {
    * @param _implementation address of the initial implementation
    */
   function AdminUpgradeabilityProxy(address _implementation) UpgradeabilityProxy(_implementation) public {
+    assert(ADMIN_SLOT == keccak256("org.zeppelinos.proxy.admin"));
+
     _setAdmin(msg.sender);
   }
 
@@ -86,10 +92,11 @@ contract AdminUpgradeabilityProxy is UpgradeabilityProxy {
    */
   function upgradeToAndCall(address implementation, bytes data) payable external ifAdmin {
     _upgradeTo(implementation);
-    require(this.call.value(msg.value)(data));
+    require(address(this).call.value(msg.value)(data));
   }
 
   /**
+   * @dev Getter for the org.zeppelinos.proxy.admin slot.
    * @return address of the proxy admin
    */
   function _admin() internal returns (address admin) {
@@ -100,6 +107,7 @@ contract AdminUpgradeabilityProxy is UpgradeabilityProxy {
   }
 
   /**
+   * @dev Setter for the org.zeppelinos.proxy.admin slot.
    * @dev Sets the address of the proxy admin
    * @param newAdmin address of the new proxy admin
    */

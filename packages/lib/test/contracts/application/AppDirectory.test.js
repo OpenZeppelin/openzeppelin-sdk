@@ -7,10 +7,11 @@ const AppDirectory = artifacts.require('AppDirectory')
 const ImplementationDirectory = artifacts.require('ImplementationDirectory')
 const DummyImplementation = artifacts.require('DummyImplementation')
 
-contract('AppDirectory', ([_, owner, stdlibOwner, anotherAddress, stdlibImplementation]) => {
+contract('AppDirectory', ([_, owner, stdlibOwner, anotherAddress]) => {
   before(async function () {
     this.implementation_v0 = (await DummyImplementation.new()).address
     this.implementation_v1 = (await DummyImplementation.new()).address
+    this.stdlibImplementation = (await DummyImplementation.new()).address
   })
 
   beforeEach(async function () {
@@ -55,7 +56,7 @@ contract('AppDirectory', ([_, owner, stdlibOwner, anotherAddress, stdlibImplemen
 
         describe('when the requested contract was registered in the stdlib', function () {
           beforeEach(async function () {
-            await this.stdlib.setImplementation(contractName, stdlibImplementation, { from: stdlibOwner })
+            await this.stdlib.setImplementation(contractName, this.stdlibImplementation, { from: stdlibOwner })
           })
 
           it('returns the directory implementation', async function () {
@@ -75,12 +76,12 @@ contract('AppDirectory', ([_, owner, stdlibOwner, anotherAddress, stdlibImplemen
       describe('when the requested contract was not registered in the directory', function () {
         describe('when the requested contract was registered in the stdlib', function () {
           beforeEach(async function () {
-            await this.stdlib.setImplementation(contractName, stdlibImplementation, { from: stdlibOwner })
+            await this.stdlib.setImplementation(contractName, this.stdlibImplementation, { from: stdlibOwner })
           })
 
           it('returns the stdlib implementation', async function () {
             const implementation = await this.directory.getImplementation(contractName)
-            assert.equal(implementation, stdlibImplementation)
+            assert.equal(implementation, this.stdlibImplementation)
           })
         })
 

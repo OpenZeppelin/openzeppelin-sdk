@@ -1,9 +1,10 @@
 import assertRevert from '../../../../src/helpers/assertRevert'
 import shouldBehaveLikeImplementationDirectory from '../../../../src/test/behaviors/ImplementationDirectory'
 
+const DummyImplementation = artifacts.require('DummyImplementation');
 const Release = artifacts.require('Release');
 
-contract('Release', ([_, developer, anotherAddress, implementation_v0, implementation_v1]) => {
+contract('Release', ([_, developer, anotherAddress]) => {
 
   beforeEach("initializing a new release", async function () {
     this.release = await Release.new({ from: developer });
@@ -52,11 +53,14 @@ contract('Release', ([_, developer, anotherAddress, implementation_v0, implement
   })
 
   describe('setImplementation', function () {
+    beforeEach(async function() {
+      this.implementation_v0 = (await DummyImplementation.new()).address
+      this.implementation_v1 = (await DummyImplementation.new()).address
+    })
+
     describe('when it is not frozen', function () {
       beforeEach(function () {
         this.directory = this.release
-        this.implementation_v0 = implementation_v0
-        this.implementation_v1 = implementation_v1
       })
 
       shouldBehaveLikeImplementationDirectory(developer, anotherAddress)
@@ -68,7 +72,7 @@ contract('Release', ([_, developer, anotherAddress, implementation_v0, implement
       })
 
       it('reverts', async function () {
-        await assertRevert(this.release.setImplementation('ERC721', implementation_v1, { from: developer }))
+        await assertRevert(this.release.setImplementation('ERC721', this.implementation_v1, { from: developer }))
       })
     })
   })

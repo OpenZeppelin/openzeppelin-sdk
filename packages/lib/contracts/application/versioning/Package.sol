@@ -22,7 +22,7 @@ contract Package is Ownable {
    * @dev and their implementation providers.
    */
   mapping (string => ImplementationProvider) internal versions;
-  
+
   /**
    * @dev Gets the implementation provider for a given version
    * @param version name of the version
@@ -30,7 +30,6 @@ contract Package is Ownable {
    */
   function getVersion(string version) public view returns (ImplementationProvider) {
     ImplementationProvider provider = versions[version];
-    require(provider != address(0));
     return provider;
   }
 

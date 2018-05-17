@@ -3,8 +3,13 @@ pragma solidity ^0.4.21;
 
 /**
  * @title Migratable
+ *
  * @dev Helper contract to support migration schemes between different
  * @dev implementations of a contract in the context of upgradeability.
+ *
+ * @dev Beware! It is the developer's responsibility to ensure migrations are
+ * @dev run in a correct order, or that they are run at all.
+ *
  * @dev See Initializable for a simpler version.
  */
 contract Migratable {
