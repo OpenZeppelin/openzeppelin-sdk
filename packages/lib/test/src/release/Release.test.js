@@ -1,9 +1,7 @@
-import Release from '../../../src/release/Release'
+'use strict'
+require('../../setup')
 
-require('chai')
-  .use(require('chai-as-promised'))
-  .use(require('chai-bignumber')(web3.BigNumber))
-  .should()
+import Release from '../../../src/release/Release'
 
 contract('Release', ([_, owner]) => {
   const txParams = { from: owner }

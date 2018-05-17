@@ -1,8 +1,7 @@
 'use strict';
+require('../../setup')
 
-import assertRevert from '../../../src/helpers/assertRevert';
-
-const assert = require('chai').assert;
+import assertRevert from '../../../src/test/helpers/assertRevert';
 
 const InitializableMock = artifacts.require('InitializableMock');
 

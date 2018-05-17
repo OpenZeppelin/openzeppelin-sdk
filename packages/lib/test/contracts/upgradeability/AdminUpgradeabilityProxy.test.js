@@ -1,7 +1,8 @@
 'use strict';
+require('../../setup')
 
 import encodeCall from '../../../src/helpers/encodeCall'
-import assertRevert from '../../../src/helpers/assertRevert'
+import assertRevert from '../../../src/test/helpers/assertRevert'
 
 const MigratableMockV1 = artifacts.require('MigratableMockV1')
 const MigratableMockV2 = artifacts.require('MigratableMockV2')
@@ -9,7 +10,6 @@ const MigratableMockV3 = artifacts.require('MigratableMockV3')
 const MigratableMock = artifacts.require('MigratableMock')
 const DummyImplementation = artifacts.require('DummyImplementation')
 const ClashingImplementation = artifacts.require('ClashingImplementation')
-
 const AdminUpgradeabilityProxy = artifacts.require('AdminUpgradeabilityProxy')
 
 contract('AdminUpgradeabilityProxy', ([_, admin, anotherAccount]) => {
@@ -27,14 +27,14 @@ contract('AdminUpgradeabilityProxy', ([_, admin, anotherAccount]) => {
     it('returns the current implementation address', async function () {
       const implementation = await this.proxy.implementation({ from: admin })
 
-      assert.equal(implementation, this.implementation_v0)
+      implementation.should.be.equal(this.implementation_v0)
     })
 
     it('delegates to the implementation', async function () {
       const dummy = new DummyImplementation(this.proxyAddress);
       const value = await dummy.get();
 
-      assert.equal(value, true)
+      value.should.be.true
     })
   })
 
@@ -47,15 +47,15 @@ contract('AdminUpgradeabilityProxy', ([_, admin, anotherAccount]) => {
           await this.proxy.upgradeTo(this.implementation_v1, { from })
 
           const implementation = await this.proxy.implementation({ from: admin })
-          assert.equal(implementation, this.implementation_v1)
+          implementation.should.be.equal(this.implementation_v1)
         })
 
         it('emits an event', async function () {
           const { logs } = await this.proxy.upgradeTo(this.implementation_v1, { from })
 
-          assert.equal(logs.length, 1)
-          assert.equal(logs[0].event, 'Upgraded')
-          assert.equal(logs[0].args.implementation, this.implementation_v1)
+          logs.should.have.lengthOf(1)
+          logs[0].event.should.be.equal('Upgraded')
+          logs[0].args.implementation.should.be.equal(this.implementation_v1)
         })
       })
 
@@ -94,19 +94,19 @@ contract('AdminUpgradeabilityProxy', ([_, admin, anotherAccount]) => {
 
           it('upgrades to the requested implementation', async function () {
             const implementation = await this.proxy.implementation({ from: admin })
-            assert.equal(implementation, this.behavior.address)
+            implementation.should.be.equal(this.behavior.address)
           })
 
           it('emits an event', function () {
-            assert.equal(this.logs.length, 1)
-            assert.equal(this.logs[0].event, 'Upgraded')
-            assert.equal(this.logs[0].args.implementation, this.behavior.address)
+            this.logs.should.have.lengthOf(1)
+            this.logs[0].event.should.be.equal('Upgraded')
+            this.logs[0].args.implementation.should.be.equal(this.behavior.address)
           })
 
           it('calls the \'initialize\' function', async function() {
             const migratable = MigratableMock.at(this.proxyAddress)
             const x = await migratable.x()
-            assert.equal(x, 42)
+            x.should.be.bignumber.eq(42)
           })
 
           it('sends given value to the proxy', async function() {
@@ -117,7 +117,7 @@ contract('AdminUpgradeabilityProxy', ([_, admin, anotherAccount]) => {
           it('uses the storage of the proxy', async function () {
             // fetch the x value of Migratable at position 0 of the storage
             const storedValue = await web3.eth.getStorageAt(this.proxyAddress, 1);
-            assert.equal(storedValue, 42);
+            storedValue.should.be.bignumber.eq(42);
           })
         })
 
@@ -155,17 +155,17 @@ contract('AdminUpgradeabilityProxy', ([_, admin, anotherAccount]) => {
 
           it('upgrades to the requested version and emits an event', async function () {
             const implementation = await this.proxy.implementation({ from: admin })
-            assert.equal(implementation, this.behavior_v1.address)
-            assert.equal(this.logs.length, 1)
-            assert.equal(this.logs[0].event, 'Upgraded')
-            assert.equal(this.logs[0].args.implementation, this.behavior_v1.address)
+            implementation.should.be.equal(this.behavior_v1.address)
+            this.logs.should.have.lengthOf( 1)
+            this.logs[0].event.should.be.equal('Upgraded')
+            this.logs[0].args.implementation.should.be.equal(this.behavior_v1.address)
           })
 
           it('calls the \'initialize\' function and sends given value to the proxy', async function() {
             const migratable = MigratableMockV1.at(this.proxyAddress)
 
             const x = await migratable.x()
-            assert.equal(x, 42)
+            x.should.be.bignumber.eq(42)
 
             const balance = await web3.eth.getBalance(this.proxyAddress)
             assert(balance.eq(this.balancePrevious_v1.plus(value)))
@@ -182,23 +182,23 @@ contract('AdminUpgradeabilityProxy', ([_, admin, anotherAccount]) => {
 
             it('upgrades to the requested version and emits an event', async function () {
               const implementation = await this.proxy.implementation({ from: admin })
-              assert.equal(implementation, this.behavior_v2.address)
-              assert.equal(this.logs.length, 1)
-              assert.equal(this.logs[0].event, 'Upgraded')
-              assert.equal(this.logs[0].args.implementation, this.behavior_v2.address)
+              implementation.should.be.equal(this.behavior_v2.address)
+              this.logs.should.have.lengthOf( 1)
+              this.logs[0].event.should.be.equal('Upgraded')
+              this.logs[0].args.implementation.should.be.equal(this.behavior_v2.address)
             })
 
             it('calls the \'migrate\' function and sends given value to the proxy', async function() {
               const migratable = MigratableMockV2.at(this.proxyAddress)
 
               const x = await migratable.x()
-              assert.equal(x, 10)
+              x.should.be.bignumber.eq(10)
 
               const y = await migratable.y()
-              assert.equal(y, 42)
+              y.should.be.bignumber.eq(42)
 
               const balance = await web3.eth.getBalance(this.proxyAddress)
-              assert(balance.eq(this.balancePrevious_v2.plus(value)))
+              balance.should.be.bignumber.eq(this.balancePrevious_v2.plus(value))
             })
 
             describe('when upgrading to V3', function () {
@@ -212,23 +212,23 @@ contract('AdminUpgradeabilityProxy', ([_, admin, anotherAccount]) => {
 
               it('upgrades to the requested version and emits an event', async function () {
                 const implementation = await this.proxy.implementation({ from: admin })
-                assert.equal(implementation, this.behavior_v3.address)
-                assert.equal(this.logs.length, 1)
-                assert.equal(this.logs[0].event, 'Upgraded')
-                assert.equal(this.logs[0].args.implementation, this.behavior_v3.address)
+                implementation.should.be.equal(this.behavior_v3.address)
+                this.logs.should.have.lengthOf( 1)
+                this.logs[0].event.should.be.equal('Upgraded')
+                this.logs[0].args.implementation.should.be.equal(this.behavior_v3.address)
               })
 
               it('calls the \'migrate\' function and sends given value to the proxy', async function() {
                 const migratable = MigratableMockV3.at(this.proxyAddress)
 
                 const x = await migratable.x()
-                assert.equal(x, 42)
+                x.should.be.bignumber.eq(42)
 
                 const y = await migratable.y()
-                assert.equal(y, 10)
+                y.should.be.bignumber.eq(10)
 
                 const balance = await web3.eth.getBalance(this.proxyAddress)
-                assert(balance.eq(this.balancePrevious_v3.plus(value)))
+                balance.should.be.bignumber.eq(this.balancePrevious_v3.plus(value))
               })
             })
           })
@@ -259,14 +259,14 @@ contract('AdminUpgradeabilityProxy', ([_, admin, anotherAccount]) => {
 
         it('assigns new proxy admin', async function () {
           const proxyAdmin = await this.proxy.admin({ from: newAdmin })
-          assert.equal(proxyAdmin, anotherAccount)
+          proxyAdmin.should.be.equal(anotherAccount)
         })
 
         it('emits an event', function () {
-          assert.equal(this.logs.length, 1)
-          assert.equal(this.logs[0].event, 'AdminChanged')
-          assert.equal(this.logs[0].args.previousAdmin, admin)
-          assert.equal(this.logs[0].args.newAdmin, newAdmin)
+          this.logs.should.have.lengthOf( 1)
+          this.logs[0].event.should.be.equal('AdminChanged')
+          this.logs[0].args.previousAdmin.should.be.equal(admin)
+          this.logs[0].args.newAdmin.should.be.equal(newAdmin)
         })
       })
 
@@ -293,14 +293,14 @@ contract('AdminUpgradeabilityProxy', ([_, admin, anotherAccount]) => {
       const position = web3.sha3('org.zeppelinos.proxy.implementation');
       const implementation = await web3.eth.getStorageAt(this.proxyAddress, position);
 
-      assert.equal(implementation, this.implementation_v0);
+      implementation.should.be.equal(this.implementation_v0);
     })
 
     it('should store the admin proxy in specified location', async function () {
       const position = web3.sha3('org.zeppelinos.proxy.admin');
       const proxyAdmin = await web3.eth.getStorageAt(this.proxyAddress, position);
 
-      assert.equal(proxyAdmin, admin);
+      proxyAdmin.should.be.equal(admin);
     })
   })
 
@@ -319,12 +319,12 @@ contract('AdminUpgradeabilityProxy', ([_, admin, anotherAccount]) => {
     context('when function names clash', function () {
       it('when sender is proxy admin should run the proxy function', async function () {
         const value = await this.proxy.admin({ from: admin });
-        assert.equal(value, admin);
+        value.should.be.equal(admin);
       });
 
       it('when sender is other should delegate to implementation', async function () {
         const value = await this.proxy.admin({ from: anotherAccount });
-        assert.equal(value, '0x0000000000000000000000000000000011111142')
+        value.should.be.equal('0x0000000000000000000000000000000011111142')
       });
     });
   });

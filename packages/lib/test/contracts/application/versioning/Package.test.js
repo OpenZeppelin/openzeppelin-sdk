@@ -1,6 +1,7 @@
 'use strict';
+require('../../../setup')
 
-import assertRevert from '../../../../src/helpers/assertRevert'
+import assertRevert from '../../../../src/test/helpers/assertRevert'
 import shouldBehaveLikeOwnable from '../../../../src/test/behaviors/Ownable'
 
 const Package = artifacts.require('Package')
@@ -38,16 +39,16 @@ contract('Package', ([_, owner, anotherAddress]) => {
           await this.package.addVersion(version, this.directory_V0.address, { from })
 
           const registeredDirectory = await this.package.getVersion(version)
-          assert.equal(registeredDirectory, this.directory_V0.address)
+          registeredDirectory.should.be.equal(this.directory_V0.address)
         })
 
         it('emits an event', async function () {
           const { logs } = await this.package.addVersion(version, this.directory_V0.address, { from })
 
-          assert.equal(logs.length, 1)
-          assert.equal(logs[0].event, 'VersionAdded')
-          assert.equal(logs[0].args.version, version)
-          assert.equal(logs[0].args.provider, this.directory_V0.address)
+          logs.should.have.lengthOf(1)
+          logs[0].event.should.be.equal('VersionAdded')
+          logs[0].args.version.should.be.equal(version)
+          logs[0].args.provider.should.be.equal(this.directory_V0.address)
         })
       })
 
@@ -63,16 +64,16 @@ contract('Package', ([_, owner, anotherAddress]) => {
           await this.package.addVersion(anotherVersion, this.directory_V1.address, { from })
 
           const newRegisteredDirectory = await this.package.getVersion(anotherVersion)
-          assert.equal(newRegisteredDirectory, this.directory_V1.address)
+          newRegisteredDirectory.should.be.equal(this.directory_V1.address)
         })
 
         it('emits another event', async function () {
           const { logs } = await this.package.addVersion(anotherVersion, this.directory_V1.address, { from })
 
-          assert.equal(logs.length, 1)
-          assert.equal(logs[0].event, 'VersionAdded')
-          assert.equal(logs[0].args.version, anotherVersion)
-          assert.equal(logs[0].args.provider, this.directory_V1.address)
+          logs.should.have.lengthOf(1)
+          logs[0].event.should.be.equal('VersionAdded')
+          logs[0].args.version.should.be.equal(anotherVersion)
+          logs[0].args.provider.should.be.equal(this.directory_V1.address)
         })
       })
     })
@@ -96,14 +97,14 @@ contract('Package', ([_, owner, anotherAddress]) => {
 
       it('returns the registered directory', async function () {
         const registeredDirectory = await this.package.getVersion(version)
-        assert.equal(registeredDirectory, this.directory_V0.address)
+        registeredDirectory.should.be.equal(this.directory_V0.address)
       })
     })
 
     describe('when the requested version was not set', function () {
       it('returns the zero address', async function () {
         const registeredDirectory = await this.package.getVersion(version)
-        assert.equal(registeredDirectory, 0x0)
+        registeredDirectory.should.be.zeroAddress
       })
     })
   })
@@ -146,14 +147,14 @@ contract('Package', ([_, owner, anotherAddress]) => {
 
         it('returns the requested implementation', async function () {
           const implementation = await this.package.getImplementation(version, contractName)
-          assert.equal(implementation, this.implementation_v0)
+          implementation.should.be.equal(this.implementation_v0)
         })
       })
 
       describe('when the requested version does not hold the requested contract name', function () {
         it('returns the zero address', async function () {
           const implementation = await this.package.getImplementation(version, contractName)
-          assert.equal(implementation, 0x0)
+          implementation.should.be.zeroAddress
         })
       })
     })

@@ -1,10 +1,11 @@
 'use strict';
+require('../../../setup')
 
-import assertRevert from '../../../../src/helpers/assertRevert'
+import assertRevert from '../../../../src/test/helpers/assertRevert'
 import shouldBehaveLikeImplementationDirectory from '../../../../src/test/behaviors/ImplementationDirectory'
 
-const FreezableImplementationDirectory = artifacts.require('FreezableImplementationDirectory')
 const DummyImplementation = artifacts.require('DummyImplementation')
+const FreezableImplementationDirectory = artifacts.require('FreezableImplementationDirectory')
 
 contract('FreezableImplementationDirectory', ([_, owner, anotherAddress]) => {
   before(async function () {
@@ -18,7 +19,7 @@ contract('FreezableImplementationDirectory', ([_, owner, anotherAddress]) => {
 
   it('starts unfrozen', async function () {
     const frozen = await this.directory.frozen()
-    assert.isFalse(frozen)
+    frozen.should.be.false
   })
 
   describe('freeze', function () {
@@ -29,7 +30,7 @@ contract('FreezableImplementationDirectory', ([_, owner, anotherAddress]) => {
         it('can be frozen', async function () {
           await this.directory.freeze({ from })
           const frozen = await this.directory.frozen()
-          assert.isTrue(frozen)
+          frozen.should.be.true
         })
       })
 

@@ -1,4 +1,4 @@
-import assertRevert from '../../helpers/assertRevert'
+import assertRevert from '../helpers/assertRevert'
 
 export default function shouldBehaveLikeOwnable(owner, anotherAccount) {
   describe('owner', function () {

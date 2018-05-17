@@ -1,4 +1,5 @@
 'use strict';
+require('../../../setup')
 
 import shouldBehaveLikeImplementationDirectory from '../../../../src/test/behaviors/ImplementationDirectory'
 

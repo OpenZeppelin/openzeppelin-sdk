@@ -1,4 +1,4 @@
-import assertRevert from 'zos-lib/src/helpers/assertRevert';
+import { assertRevert } from 'zos-lib';
 
 const getBalance = require('./helpers/getBalance.js');
 const should = require('chai').should();

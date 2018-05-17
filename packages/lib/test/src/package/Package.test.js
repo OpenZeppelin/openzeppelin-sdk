@@ -1,10 +1,10 @@
-import assertRevert from '../../../src/helpers/assertRevert';
+'use strict'
+require('../../setup')
+
+import assertRevert from '../../../src/test/helpers/assertRevert';
 import Package from '../../../src/package/Package';
 
 const DummyImplementation = artifacts.require('DummyImplementation')
-
-require('chai')
-  .should()
 
 contract('Package', function ([_, owner]) {
   const txParams = { from: owner }
@@ -35,8 +35,7 @@ contract('Package', function ([_, owner]) {
 
   describe('connect', function () {
     beforeEach("connecting to existing instance", async function () {
-      const connectedPackage = await Package.fetch(this.package.address(), txParams)
-      this.package = connectedPackage
+      this.package = await Package.fetch(this.package.address(), txParams)
     })
 
     shouldInitialize()
@@ -87,7 +86,6 @@ contract('Package', function ([_, owner]) {
         const implementation = await this.package.getImplementation(initialVersion, contractName)
         implementation.should.eq(this.implementation.address)
       })
-      
     })
 
     describe('while frozen', function() {

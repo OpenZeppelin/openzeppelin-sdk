@@ -1,8 +1,9 @@
 'use strict';
+require('../../setup')
 
 import encodeCall from '../../../src/helpers/encodeCall'
 import decodeLogs from '../../../src/helpers/decodeLogs'
-import assertRevert from '../../../src/helpers/assertRevert'
+import assertRevert from '../../../src/test/helpers/assertRevert'
 import shouldBehaveLikeOwnable from '../../../src/test/behaviors/Ownable'
 
 const Package = artifacts.require('Package')
@@ -60,7 +61,7 @@ contract('PackagedApp', ([_, appOwner, packageOwner, directoryOwner, anotherAcco
       it('returns the proxy factory being used by the app', async function () {
         const factory = await this.app.factory()
 
-        assert.equal(factory, this.factory.address)
+        factory.should.be.equal(this.factory.address)
       })
     })
 
@@ -79,7 +80,7 @@ contract('PackagedApp', ([_, appOwner, packageOwner, directoryOwner, anotherAcco
             await this.app.setVersion(version, { from })
 
             const newVersion = await this.app.version()
-            assert.equal(newVersion, version_1)
+            newVersion.should.be.equal(version_1)
           })
         })
 
@@ -110,12 +111,12 @@ contract('PackagedApp', ([_, appOwner, packageOwner, directoryOwner, anotherAcco
 
         it('creates a proxy pointing to the requested implementation', async function () {
           const implementation = await this.app.getProxyImplementation(this.proxy.address)
-          assert.equal(implementation, this.implementation_v0)
+          implementation.should.be.equal(this.implementation_v0)
         })
 
         it('transfers the ownership to the app', async function () {
           const admin = await this.app.getProxyAdmin(this.proxy.address)
-          assert.equal(admin, this.app.address)
+          admin.should.be.equal(this.app.address)
         })
       })
 
@@ -146,18 +147,18 @@ contract('PackagedApp', ([_, appOwner, packageOwner, directoryOwner, anotherAcco
 
         it('creates a proxy pointing to the requested implementation', async function () {
           const implementation = await this.app.getProxyImplementation(this.proxy.address)
-          assert.equal(implementation, this.behavior.address)
+          implementation.should.be.equal(this.behavior.address)
         })
 
         it('transfers the ownership to the app', async function () {
           const admin = await this.app.getProxyAdmin(this.proxy.address)
-          assert.equal(admin, this.app.address)
+          admin.should.be.equal(this.app.address)
         })
 
         it('calls "initialize" function', async function() {
           const initializable = MigratableMock.at(this.proxyAddress)
           const x = await initializable.x()
-          assert.equal(x, 42)
+          x.should.be.bignumber.eq(42)
         })
 
         it('sends given value to the delegated implementation', async function() {
@@ -168,7 +169,7 @@ contract('PackagedApp', ([_, appOwner, packageOwner, directoryOwner, anotherAcco
         it('uses the storage of the proxy', async function () {
           // fetch the x value of Migratable at position 0 of the storage
           const storedValue = await web3.eth.getStorageAt(this.proxyAddress, 1)
-          assert.equal(storedValue, 42)
+          storedValue.should.be.bignumber.eq(42)
         })
       })
 
@@ -204,7 +205,7 @@ contract('PackagedApp', ([_, appOwner, packageOwner, directoryOwner, anotherAcco
             await this.app.upgrade(this.proxyAddress, contract, { from })
 
             const implementation = await this.app.getProxyImplementation(this.proxy.address)
-            assert.equal(implementation, this.implementation_v1)
+            implementation.should.be.equal(this.implementation_v1)
           })
         })
 
@@ -253,13 +254,13 @@ contract('PackagedApp', ([_, appOwner, packageOwner, directoryOwner, anotherAcco
 
           it('upgrades to the requested implementation', async function () {
             const implementation = await this.app.getProxyImplementation(this.proxy.address)
-            assert.equal(implementation, this.behavior.address)
+            implementation.should.be.equal(this.behavior.address)
           })
 
           it('calls the "initialize" function', async function() {
             const initializable = MigratableMock.at(this.proxyAddress)
             const x = await initializable.x()
-            assert.equal(x, 42)
+            x.should.be.bignumber.eq(42)
           })
 
           it('sends given value to the delegated implementation', async function() {
@@ -270,7 +271,7 @@ contract('PackagedApp', ([_, appOwner, packageOwner, directoryOwner, anotherAcco
           it('uses the storage of the proxy', async function () {
             // fetch the x value of Migratable at position 0 of the storage
             const storedValue = await web3.eth.getStorageAt(this.proxyAddress, 1)
-            assert.equal(storedValue, 42)
+            storedValue.should.be.bignumber.eq(42)
           })
         })
 
@@ -297,7 +298,7 @@ contract('PackagedApp', ([_, appOwner, packageOwner, directoryOwner, anotherAcco
           await this.zeroVersionDirectory.setImplementation(contract, this.implementation_v0, { from: directoryOwner })
 
           const implementation = await this.app.getImplementation(contract)
-          assert.equal(implementation, this.implementation_v0)
+          implementation.should.be.equal(this.implementation_v0)
         })
       })
 
@@ -311,7 +312,7 @@ contract('PackagedApp', ([_, appOwner, packageOwner, directoryOwner, anotherAcco
           await this.firstVersionDirectory.setImplementation(contract, this.implementation_v1, { from: directoryOwner })
 
           const implementation = await this.app.getImplementation(contract)
-          assert.equal(implementation, this.implementation_v1)
+          implementation.should.be.equal(this.implementation_v1)
         })
       })
     })

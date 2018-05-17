@@ -1,4 +1,7 @@
-import assertRevert from '../../../../src/helpers/assertRevert'
+'use strict';
+require('../../../setup')
+
+import assertRevert from '../../../../src/test/helpers/assertRevert'
 import shouldBehaveLikeImplementationDirectory from '../../../../src/test/behaviors/ImplementationDirectory'
 
 const DummyImplementation = artifacts.require('DummyImplementation');
@@ -12,7 +15,7 @@ contract('Release', ([_, developer, anotherAddress]) => {
 
   it('has a developer', async function () {
     const instanceDeveloper = await this.release.developer();
-    assert.equal(instanceDeveloper, developer);
+    instanceDeveloper.should.be.equal(developer);
   });
 
   it('starts unfrozen', async function () {

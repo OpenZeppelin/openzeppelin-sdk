@@ -1,7 +1,8 @@
 'use strict';
+require('../../setup')
 
 import encodeCall from '../../../src/helpers/encodeCall'
-import assertRevert from '../../../src/helpers/assertRevert'
+import assertRevert from '../../../src/test/helpers/assertRevert'
 
 const MigratableMock = artifacts.require('MigratableMock')
 const AdminUpgradeabilityProxy = artifacts.require('AdminUpgradeabilityProxy')
@@ -27,18 +28,18 @@ contract('UpgradeabilityProxyFactory', ([_, owner]) => {
 
     it('creates a proxy pointing to the requested implementation', async function () {
       const implementation = await this.proxy.implementation({ from: owner })
-      assert.equal(implementation, this.implementation_v0)
+      implementation.should.be.equal(this.implementation_v0)
     })
 
     it('transfers the ownership to the requested owner', async function () {
       const admin = await this.proxy.admin({ from: owner })
-      assert.equal(admin, owner)
+      admin.should.be.equal(owner)
     })
 
     it('emits an event', async function () {
-      assert.equal(this.logs.length, 1)
-      assert.equal(this.logs[0].event, 'ProxyCreated')
-      assert.equal(this.logs[0].args.proxy, this.proxyAddress)
+      this.logs.should.have.lengthOf( 1)
+      this.logs[0].event.should.be.equal('ProxyCreated')
+      this.logs[0].args.proxy.should.be.equal(this.proxyAddress)
     })
   })
 
@@ -69,24 +70,24 @@ contract('UpgradeabilityProxyFactory', ([_, owner]) => {
 
       it('creates a proxy pointing to the requested implementation', async function () {
         const implementation = await this.proxy.implementation({ from: owner })
-        assert.equal(implementation, this.behavior.address)
+        implementation.should.be.equal(this.behavior.address)
       })
 
       it('transfers the ownership to the requested owner', async function () {
         const admin = await this.proxy.admin({ from: owner })
-        assert.equal(admin, owner)
+        admin.should.be.equal(owner)
       })
 
       it('emits an event', async function () {
-        assert.equal(this.logs.length, 1)
-        assert.equal(this.logs[0].event, 'ProxyCreated')
-        assert.equal(this.logs[0].args.proxy, this.proxyAddress)
+        this.logs.should.have.lengthOf( 1)
+        this.logs[0].event.should.be.equal('ProxyCreated')
+        this.logs[0].args.proxy.should.be.equal(this.proxyAddress)
       })
 
       it('calls "initialize" function', async function() {
         const migratable = MigratableMock.at(this.proxyAddress);
         const x = await migratable.x();
-        assert.equal(x, 42);
+        x.should.be.bignumber.eq(42);
       })
 
       it('sends given value to the delegated implementation', async function() {
@@ -97,7 +98,7 @@ contract('UpgradeabilityProxyFactory', ([_, owner]) => {
       it('uses the storage of the proxy', async function () {
         // fetch the x value of Initializable at position 0 of the storage
         const storedValue = await web3.eth.getStorageAt(this.proxyAddress, 1);
-        assert.equal(storedValue, 42);
+        storedValue.should.be.bignumber.eq(42);
       })
     })
   })

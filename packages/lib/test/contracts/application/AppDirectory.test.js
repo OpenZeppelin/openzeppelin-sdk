@@ -1,6 +1,7 @@
 'use strict';
+require('../../setup')
 
-import assertRevert from '../../../src/helpers/assertRevert'
+import assertRevert from '../../../src/test/helpers/assertRevert'
 import shouldBehaveLikeImplementationDirectory from '../../../src/test/behaviors/ImplementationDirectory'
 
 const AppDirectory = artifacts.require('AppDirectory')
@@ -32,14 +33,14 @@ contract('AppDirectory', ([_, owner, stdlibOwner, anotherAddress]) => {
 
         it('returns the directory implementation', async function () {
           const implementation = await this.directory.getImplementation(contractName)
-          assert.equal(implementation, this.implementation_v0)
+          implementation.should.be.equal(this.implementation_v0)
         })
       })
 
       describe('when the requested contract was not registered in the directory', function () {
         it('returns the zero address', async function () {
           const implementation = await this.directory.getImplementation(contractName)
-          assert.equal(implementation, 0x0)
+          implementation.should.be.zeroAddress
         })
       })
     })
@@ -61,14 +62,14 @@ contract('AppDirectory', ([_, owner, stdlibOwner, anotherAddress]) => {
 
           it('returns the directory implementation', async function () {
             const implementation = await this.directory.getImplementation(contractName)
-            assert.equal(implementation, this.implementation_v0)
+            implementation.should.be.equal(this.implementation_v0)
           })
         })
 
         describe('when the requested contract was not registered in the stdlib', function () {
           it('returns the directory implementation', async function () {
             const implementation = await this.directory.getImplementation(contractName)
-            assert.equal(implementation, this.implementation_v0)
+            implementation.should.be.equal(this.implementation_v0)
           })
         })
       })
@@ -81,14 +82,14 @@ contract('AppDirectory', ([_, owner, stdlibOwner, anotherAddress]) => {
 
           it('returns the stdlib implementation', async function () {
             const implementation = await this.directory.getImplementation(contractName)
-            assert.equal(implementation, this.stdlibImplementation)
+            implementation.should.be.equal(this.stdlibImplementation)
           })
         })
 
         describe('when the requested contract was not registered in the stdlib', function () {
           it('returns the zero address', async function () {
             const implementation = await this.directory.getImplementation(contractName)
-            assert.equal(implementation, 0x0)
+            implementation.should.be.zeroAddress
           })
         })
       })
@@ -105,7 +106,7 @@ contract('AppDirectory', ([_, owner, stdlibOwner, anotherAddress]) => {
 
       it('can set a new stdlib', async function () {
         const stdlib = await this.directory.stdlib()
-        assert.equal(stdlib, this.stdlib.address)
+        stdlib.should.be.equal(this.stdlib.address)
       })
 
       it('can reset a stdlib', async function () {
@@ -113,13 +114,13 @@ contract('AppDirectory', ([_, owner, stdlibOwner, anotherAddress]) => {
         await this.directory.setStdlib(anotherStdlib.address, { from })
 
         const stdlib = await this.directory.stdlib()
-        assert.equal(stdlib, anotherStdlib.address)
+        stdlib.should.be.equal(anotherStdlib.address)
       })
 
       it('can unset a stdlib', async function () {
         await this.directory.setStdlib(0, { from })
         const stdlib = await this.directory.stdlib()
-        assert.equal(stdlib, 0x0)
+        stdlib.should.be.zeroAddress
       })
     })
 

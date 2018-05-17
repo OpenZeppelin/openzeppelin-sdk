@@ -1,7 +1,6 @@
-import assertRevert from 'zos-lib/src/helpers/assertRevert';
+import { assertRevert } from 'zos-lib';
 
 const shouldBehaveLikeDonations = require('./Donations.behavior.js');
-const getBalance = require('./helpers/getBalance.js');
 const should = require('chai').should();
 
 module.exports = function(owner, donor, wallet, tokenName, tokenSymbol) {

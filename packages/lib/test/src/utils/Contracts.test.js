@@ -1,6 +1,7 @@
-import Contracts from '../../../src/utils/Contracts'
+'use strict'
+require('../../setup')
 
-require('chai').should()
+import Contracts from '../../../src/utils/Contracts'
 
 contract('Contracts', () => {
   it('can lookup contracts from the local project', async function () {

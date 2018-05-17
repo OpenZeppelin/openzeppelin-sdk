@@ -1,6 +1,6 @@
 'use strict';
 
-import assertRevert from '../../helpers/assertRevert'
+import assertRevert from '../helpers/assertRevert'
 import shouldBehaveLikeOwnable from './Ownable'
 
 export default function shouldBehaveLikeImplementationDirectory(owner, anotherAddress) {
