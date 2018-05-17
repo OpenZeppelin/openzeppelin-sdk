@@ -62,6 +62,7 @@ export default class NetworkAppController extends NetworkBaseController {
 
   async createProxy(contractAlias, initMethod, initArgs) {
     await this.fetch();
+    
     const contractClass = this.localController.getContractClass(contractAlias);
     const proxyInstance = await this.app.createProxy(contractClass, contractAlias, initMethod, initArgs);
     const implementationAddress = await this.app.getImplementation(contractAlias);

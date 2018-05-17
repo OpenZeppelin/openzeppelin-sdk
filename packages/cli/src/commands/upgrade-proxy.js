@@ -1,5 +1,6 @@
 import upgradeProxy from '../scripts/upgrade-proxy'
 import runWithTruffle from '../utils/runWithTruffle'
+import { parseArgs } from '../utils/input'
 
 module.exports = function(program) {
   program
@@ -18,7 +19,7 @@ module.exports = function(program) {
       if(typeof initMethod === 'boolean') initMethod = 'initialize'
 
       let initArgs = options.args
-      if(typeof initArgs === 'string') initArgs = initArgs.split(",")
+      if(typeof initArgs === 'string') initArgs = parseArgs(initArgs)
       else if(typeof initArgs === 'boolean' || initMethod) initArgs = []
 
       const { from, network, all, force } = options
