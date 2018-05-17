@@ -18,13 +18,14 @@
       "libstart"
     ],
     "FURTHER REFERENCE": [
+      "apis",
       "stdlib",
       "advanced",
       "whitepaper"
     ]
   },
   "lib-api": {
-    "OVERVIEW": [
+    "WELCOME": [
       "libmain"
     ],
     "APPLICATION / MANAGEMENT": [
@@ -55,7 +56,7 @@
     ]
   },
   "cli-api": {
-    "OVERVIEW": [
+    "WELCOME": [
       "climain"
     ],
     "COMMANDS": [
