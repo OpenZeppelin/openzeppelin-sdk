@@ -2,23 +2,21 @@ import { Logger } from 'zos-lib'
 const log = new Logger('RunWithTruffle')
 
 export default function runWithTruffle(script, network, compile = false) {
+  let config
   try {
-    require('truffle-config').detect({ logger: console })
+    const TruffleConfig = require('truffle-config')
+    config = TruffleConfig.detect({ logger: console })
   } catch (error) {
     throw Error('You have to provide a truffle.js file, please remember to initialize your project running "truffle init".')
   }
 
+  if(!network) throw Error('A network name must be provided to execute the requested action.')
+  config.network = network
   if (compile) compileWithTruffle()
   initTruffle(network).then(script)
 }
 
-function initTruffle(network) {
-  if(!network) throw Error('A network name must be provided to execute the requested action.')
-
-  const TruffleConfig = require('truffle-config')
-  const config = TruffleConfig.detect({ logger: console })
-  config.network = network
-
+function initTruffle(config) {
   return new Promise((resolve, reject) => {
     const TruffleEnvironment = require('truffle-core/lib/environment')
     TruffleEnvironment.detect(config, function (error) {
