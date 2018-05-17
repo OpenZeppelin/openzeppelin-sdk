@@ -65,21 +65,19 @@ We need to install the `openzeppelin-zos` dependency and to compile the contract
 
 ## Using ZeppelinOS to link to the OpenZeppelin standard library
 
-From the last step, you might have noticed that we are reusing a contract that is part of the [OpenZeppelin](https://openzeppelin.org) framework. The traditional way to develop in Ethereum is to deploy both contracts, Basil and Ownable to the blockchain; but because we now have ZeppelinOS available, we can do more than reuse the source code of the Ownable contract. We will reuse the contract that the Zeppelin team has already deployed to the blockchain, and then we will just need to deploy our Basil contract. This will obviously make our deployments cheaper; but also safer because the OpenZeppelin community will take care of keeping the Ownable contract up-to-date and fix any vulnerabilities it might have. But more on that later.
-
 Now, to get the niceties that ZeppelinOS provides, let's install the `zos` command line interface and initialize our application with the version 1.0.0:
 
     npm install --global zos
-    zos init basil 1.0.0
+    zos init basil 0.0.1
 
-This will create a `package.zos.json` file where ZeppelinOS will keep track of
+This will create a `zos.json` file where ZeppelinOS will keep track of
 the contracts of your application.
 
 Next, let's add the implementation of our Basil contract:
 
     zos add Basil
 
-To have your `package.zos.json` file always up-to-date, run `zos add` for every
+To have your `zos.json` file always up-to-date, run `zos add` for every
 new contract you add to your project.
 
 To link our Basil contract to the OpenZeppelin standard library, we need an Ethereum network where the standard library has already been deployed. But first we want to test this in a local development network, so let's prepare truffle writing this in `truffle.js`:
@@ -195,24 +193,3 @@ We need to pass a token to the new `initialize` of our new version of Basil. Bec
 The new versions of our application's contracts were deployed to the network. However, the previously deployed proxies are still running with the old implementations. To finish the upgrade, run:
 
     zos upgrade Basil --network development
-
-
-## Zeppelin Basil
-
-This is a sample Dapp built on top of *ZOS* (ZeppelinOS). It presents a basic contract `Basil.sol` and then uses an `AppManager` from ZOS to upgrade the contract to `BasilERC721.sol` using a proxy that preserves the original contract's state, while mutating its logic. The upgraded contract also makes use of ZOS' on-chain standard library, connecting to a proxy of the `MintableERC721Token` implementation of the `openzeppelin-zos` release.
-
-As for functionality, the Dapp allows users to change the light color of a Basil plant, using an Arduino and an RGB wifi light bulb. The upgraded contract also emits an ERC721 non fungible token to the user.
-
-### Tests
-
-The truffle test suite first checks the behavior of the basic Basil contract functionality, and then the behavior of the upgraded BasilERC721 functionality. Im a manner of illustration, it then makes use of the lower level zos-lib objects to demonstrate that the proxied contracts have exactly the same behaviors as the ones without ZOS.  
-
-### ZOS cli
-
-This example makes use of [zeppelinos/zos-cli](https://github.com/zeppelinos/zos-cli). ZeppelinOS's cli is a tool for automating deployment of [zeppelinos/zos-lib](https://github.com/zeppelinos/zos-lib) contracts, as well as storing deployment information in json files. The UI reads deployment data directly from these files.
-
-For a lower level understanding of ZOS and zos-lib, please see the [complex-example](https://github.com/zeppelinos/zos-lib/tree/master/examples/complex), or the tests within this project.
-
-### RPI
-
-The code that controls the actual lighting (via a Raspberry Pi and a HUE light) is at [zeppelinos/basil-rpi](https://github.com/zeppelinos/basil-rpi).
