@@ -22,8 +22,8 @@ contract('create-proxy command', function([_, owner]) {
   const contractsData = [{ name: contractName, alias: contractAlias}, { name: anotherContractName, alias: anotherContractAlias }]
   const defaultVersion = "0.1.0";
   const network = "test";
-  const packageFileName = "test/tmp/package.zos.json";
-  const networkFileName = `test/tmp/package.zos.${network}.json`;
+  const packageFileName = "test/tmp/zos.json";
+  const networkFileName = `test/tmp/zos.${network}.json`;
 
   beforeEach('setup', async function() {
     cleanup(packageFileName)

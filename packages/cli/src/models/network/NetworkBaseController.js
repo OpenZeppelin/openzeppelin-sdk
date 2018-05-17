@@ -11,7 +11,7 @@ export default class NetworkBaseController {
     this.localController = localController;
     this.txParams = txParams;
     this.network = network;
-    this.networkFileName = networkFileName || localController.packageFileName.replace(/\.zos\.json\s*$/, `.zos.${network}.json`);
+    this.networkFileName = networkFileName || localController.packageFileName.replace(/\.json\s*$/, `.${network}.json`);
     if (this.networkFileName === localController.packageFileName) {
       throw Error(`Cannot create network file name from ${localController.packageFileName}`)
     }

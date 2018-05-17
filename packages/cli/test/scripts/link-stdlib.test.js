@@ -10,7 +10,7 @@ import { editJson } from '../helpers/json.js';
 contract('link-stdlib command', function() {
   const appName = "MyApp";
   const defaultVersion = "0.1.0";
-  const packageFileName = "test/tmp/package.zos.json";
+  const packageFileName = "test/tmp/zos.json";
 
   beforeEach('setup', async function() {
     cleanup(packageFileName)

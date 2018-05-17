@@ -15,7 +15,7 @@ const StdlibDeployer = {
   },
 
   _jsonData() {
-    const filename = `node_modules/${this.stdlibName}/package.zos.json`
+    const filename = `node_modules/${this.stdlibName}/zos.json`
     return fs.parseJson(filename)
   }
 }

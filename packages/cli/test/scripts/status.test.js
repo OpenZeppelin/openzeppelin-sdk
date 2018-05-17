@@ -23,8 +23,8 @@ contract('status command', function([_, owner]) {
   const version = "0.1.0";
   const network = "test";
   const stdlibNameVersion = 'mock-stdlib@0.1.0';
-  const packageFileName = "test/tmp/package.zos.json";
-  const networkFileName = `test/tmp/package.zos.${network}.json`;
+  const packageFileName = "test/tmp/zos.json";
+  const networkFileName = `test/tmp/zos.${network}.json`;
   
   const logger = new TestLogger();
 

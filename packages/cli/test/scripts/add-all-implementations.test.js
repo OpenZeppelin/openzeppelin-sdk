@@ -6,7 +6,7 @@ import { FileSystem as fs } from 'zos-lib';
 contract('add-all-implementations command', function() {
   const appName = "MyApp"
   const defaultVersion = "0.1.0"
-  const packageFileName = "test/tmp/package.zos.json"
+  const packageFileName = "test/tmp/zos.json"
 
   beforeEach('setup', async function() {
     cleanup(packageFileName);

@@ -40,7 +40,7 @@ truffle init
 ```
 
 #### Setup your project
-Initialize your project with ZeppelinOS. The next command will create a new `package.zos.json` file:
+Initialize your project with ZeppelinOS. The next command will create a new `zos.json` file:
 
 ```sh
 zos init <name> <version>

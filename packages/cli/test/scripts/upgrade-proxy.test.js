@@ -21,8 +21,8 @@ contract('upgrade-proxy command', function([_, owner]) {
   const v1string = "0.1.0";
   const v2string = "0.2.0";
   const network = "test";
-  const packageFileName = "test/tmp/package.zos.json";
-  const networkFileName = `test/tmp/package.zos.${network}.json`;
+  const packageFileName = "test/tmp/zos.json";
+  const networkFileName = `test/tmp/zos.${network}.json`;
 
   beforeEach(cleanupfn(packageFileName));
   beforeEach(cleanupfn(networkFileName));

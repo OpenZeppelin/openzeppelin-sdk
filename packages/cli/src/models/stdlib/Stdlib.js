@@ -30,7 +30,7 @@ export default class Stdlib {
 
   getPackage() {
     if (this._packageJson) return this._packageJson
-    const filename = `node_modules/${this.name}/package.zos.json`
+    const filename = `node_modules/${this.name}/zos.json`
     this._packageJson = fs.parseJson(filename)
     return this._packageJson
   }

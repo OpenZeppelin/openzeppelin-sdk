@@ -5,7 +5,7 @@ const log = new Logger('PackageFilesInterface')
 
 export default class PackageFilesInterface {
   constructor(packageFileName) {
-    this.packageFileName = packageFileName || 'package.zos.json'
+    this.packageFileName = packageFileName || 'zos.json'
   }
 
   exists() {
@@ -44,7 +44,7 @@ export default class PackageFilesInterface {
   */
 
   fileNameFor(network) {
-    return `package.zos.${network}.json`
+    return `zos.${network}.json`
   }
 
   writeTo(fileName, zosPackage) {

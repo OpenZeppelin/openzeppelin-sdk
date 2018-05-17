@@ -8,7 +8,7 @@ const should = require('chai')
 
 contract('init-lib command', function() {
 
-  const packageFileName = "test/tmp/package.zos.json";
+  const packageFileName = "test/tmp/zos.json";
   const appName = "MyLib";
   const appVersion = "0.3.0";
 

@@ -7,7 +7,7 @@ const log = new Logger('LocalController');
 const DEFAULT_VERSION = '0.1.0';
 
 export default class LocalBaseController {
-  constructor(packageFileName = 'package.zos.json') {
+  constructor(packageFileName = 'zos.json') {
     this.packageFileName = packageFileName;
   }
 

@@ -8,7 +8,7 @@ import { FileSystem as fs } from 'zos-lib';
 import { editJson } from '../helpers/json.js';
 
 contract('add-implementation command', function() {
-  const packageFileName = "test/tmp/package.zos.json";
+  const packageFileName = "test/tmp/zos.json";
   const appName = "MyApp";
   const contractName = "ImplV1";
   const contractAlias = "Impl";

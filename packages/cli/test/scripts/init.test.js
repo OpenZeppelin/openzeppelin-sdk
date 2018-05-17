@@ -7,7 +7,7 @@ import { cleanupfn } from "../helpers/cleanup.js";
 
 contract('init command', function() {
   const appName = "MyApp";
-  const packageFileName = "test/tmp/package.zos.json";
+  const packageFileName = "test/tmp/zos.json";
   const appVersion = "0.3.0";
 
   beforeEach(cleanupfn(packageFileName))

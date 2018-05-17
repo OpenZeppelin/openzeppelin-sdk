@@ -12,7 +12,7 @@ import addImplementation from "../../src/scripts/add-implementation.js";
 contract('new-version command', function() {
   const appName = "MyApp";
   const defaultVersion = "0.1.0";
-  const packageFileName = "test/tmp/package.zos.json";
+  const packageFileName = "test/tmp/zos.json";
 
   describe('on app', function () {
     beforeEach('setup', async function() {

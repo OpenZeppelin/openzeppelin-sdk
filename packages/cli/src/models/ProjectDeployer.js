@@ -5,7 +5,7 @@ import { Contracts, FileSystem as fs, App } from 'zos-lib'
 const ProjectDeployer = {
   async call(packageData = null, txParams = {}) {
     this.txParams = txParams
-    if(!packageData) packageData = fs.parseJson('package.zos.json')
+    if(!packageData) packageData = fs.parseJson('zos.json')
     const app = await App.deploy(packageData.version, this.txParams)
     const directory = app.currentDirectory()
     await this._deployStdlib(directory, packageData)
