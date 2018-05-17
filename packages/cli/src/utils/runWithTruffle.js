@@ -12,7 +12,7 @@ export default function runWithTruffle(script, network, compile = false) {
 
   if(!network) throw Error('A network name must be provided to execute the requested action.')
   config.network = network
-  if (compile) compileWithTruffle()
+  if (compile) compileWithTruffle(config)
   initTruffle(network).then(script)
 }
 
@@ -29,7 +29,7 @@ function initTruffle(config) {
   });
 }
 
-function compileWithTruffle() {
+function compileWithTruffle(config) {
   log.info("Compiling contracts with truffle")
   const truffleCallback = (err, abstractions, paths) => {
     if (err) log.error(err)
