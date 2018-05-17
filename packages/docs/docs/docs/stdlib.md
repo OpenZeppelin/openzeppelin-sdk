@@ -1,14 +1,14 @@
 ---
 id: stdlib
-title: ZeppelinOS stdlib
-sidebar_label: Stdlib
+title: OpenZeppelin stdlib
+sidebar_label: OpenZeppelin stdlib
 ---
 
-ZeppelinOS has an on-chain standard library with some of the most widely used contracts. These 
-contracts come from [OpenZeppelin](https://github.com/OpenZeppelin/openzeppelin-solidity), an extremely well-tested Ethereum framework, with only slight modifications 
-needed to adapt them to ZeppelinOS.  
+ZeppelinOS provides a way to link your contracts to on-chain standard libraries of reusable code. 
 
-The contracts presently included in the ZeppelinOS stdlib are:
+One such library is the OpenZeppelin stdlib, which includes some of the most widely used contracts. The code in this stdlib comes from [OpenZeppelin](https://openzeppelin.org), an extremely well-tested collection of smart contracts that were only slightly modified to adapt them to ZeppelinOS.  
+
+The contracts presently included in the OpenZeppelin stdlib are:
 
 - `DetailedMintableToken`
 - `DetailedPremintedToken`
