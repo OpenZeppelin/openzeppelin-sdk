@@ -43,6 +43,7 @@ contract('upgrade-proxy command', function([_, owner]) {
       const app = PackagedApp.at(data.app.address)
       const actualImplementation = await app.getProxyImplementation(proxyInfo.address)
       actualImplementation.should.eq(implementation);
+      proxyInfo.implementation.should.eq(implementation);
     }
 
     if (version)  {

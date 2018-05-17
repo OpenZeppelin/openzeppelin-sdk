@@ -9,6 +9,7 @@ import { editJson } from '../helpers/json.js';
 import createProxy from "../../src/scripts/create-proxy.js";
 import addImplementation from "../../src/scripts/add-implementation.js";
 import linkStdlib from "../../src/scripts/link-stdlib.js";
+import LocalAppController from '../../src/models/local/LocalAppController';
 
 const ImplV1 = artifacts.require('ImplV1');
 
@@ -36,7 +37,7 @@ contract('create-proxy command', function([_, owner]) {
   after(cleanupfn(packageFileName))
   after(cleanupfn(networkFileName))
 
-  const assertProxy = async function(proxyInfo, { version, say }) {
+  const assertProxy = async function(proxyInfo, { version, say, implementation }) {
     proxyInfo.address.should.be.nonzeroAddress;
     proxyInfo.version.should.eq(version);
 
@@ -45,12 +46,17 @@ contract('create-proxy command', function([_, owner]) {
       const said = await proxy.say();
       said.should.eq(say);
     }
+
+    if (implementation) {
+      proxyInfo.implementation.should.eq(implementation);
+    }
   }
 
   it('should create a proxy for one of its contracts', async function() {
     await createProxy({ contractAlias, packageFileName, network, txParams });
     const data = fs.parseJson(networkFileName);
-    await assertProxy(data.proxies[contractAlias][0], { version: defaultVersion, say: "V1" });
+    const implementation = data.contracts[contractAlias].address;
+    await assertProxy(data.proxies[contractAlias][0], { version: defaultVersion, say: "V1", implementation });
   });
 
   it('should refuse to create a proxy for an undefined contract', async function() {

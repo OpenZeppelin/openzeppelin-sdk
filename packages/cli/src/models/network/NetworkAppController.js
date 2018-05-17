@@ -64,10 +64,12 @@ export default class NetworkAppController extends NetworkBaseController {
     await this.fetch();
     const contractClass = this.localController.getContractClass(contractAlias);
     const proxyInstance = await this.app.createProxy(contractClass, contractAlias, initMethod, initArgs);
-    
+    const implementationAddress = await this.app.getImplementation(contractAlias);
+
     const proxyInfo = {
       address: proxyInstance.address,
-      version: this.app.version
+      version: this.app.version,
+      implementation: implementationAddress
     };
 
     const proxies = this.networkPackage.proxies;
@@ -90,7 +92,9 @@ export default class NetworkAppController extends NetworkBaseController {
       const contractClass = this.localController.getContractClass(contractAlias);
       return _.map(contractProxyInfos, async (proxyInfo) => {        
         await this.app.upgradeProxy(proxyInfo.address, contractClass, contractAlias, initMethod, initArgs);
+        const implementationAddress = await this.app.getImplementation(contractAlias);
         proxyInfo.version = newVersion;
+        proxyInfo.implementation = implementationAddress;
       });
     }));
 
