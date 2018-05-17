@@ -42,7 +42,7 @@ const ReleaseDeployer = {
   },
 
   async _deployDependencyContract(contractName) {
-    const contractClass = await Contracts.getFromNodeModules(this.dependencyName, contractName)
+    const contractClass = await Contracts.getFromNodeModules(ReleaseDeployer.dependencyName, contractName)
     return await ReleaseDeployer._deployContract(contractName, contractClass)
   },
 
