@@ -12,10 +12,6 @@ export default class NetworkLibController extends NetworkBaseController {
     return { contracts: {}, lib: true };
   }
 
-  get packageAddress() {
-    return this.networkPackage.package && this.networkPackage.package.address;
-  }
-
   isDeployed() {
     return !!this.packageAddress;
   }

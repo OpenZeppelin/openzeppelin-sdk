@@ -1,4 +1,5 @@
 import ControllerFor from "../models/local/ControllerFor";
+import stdout from '../utils/stdout';
 
 export default async function linkStdlib({ stdlibNameVersion, installDeps = false, packageFileName = undefined }) {
   if (!stdlibNameVersion) {
@@ -10,4 +11,5 @@ export default async function linkStdlib({ stdlibNameVersion, installDeps = fals
   }
   await appController.linkStdlib(stdlibNameVersion, installDeps)
   appController.writePackage()
+  stdout(stdlibNameVersion)
 }

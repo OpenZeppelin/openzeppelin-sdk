@@ -1,4 +1,6 @@
 import LocalAppController from "../models/local/LocalAppController";
+import stdout from '../utils/stdout';
+import _ from 'lodash';
 
 export default async function upgradeProxy({ contractAlias, proxyAddress, initMethod, initArgs, all, network, txParams = {}, packageFileName = undefined, networkFileName = undefined, force = false }) {
   if (!contractAlias && !all) {
@@ -7,6 +9,7 @@ export default async function upgradeProxy({ contractAlias, proxyAddress, initMe
 
   const appController = new LocalAppController(packageFileName).onNetwork(network, txParams, networkFileName);
   await appController.checkLocalContractsDeployed(!force);
-  await appController.upgradeProxies(contractAlias, proxyAddress, initMethod, initArgs);
+  const proxies = await appController.upgradeProxies(contractAlias, proxyAddress, initMethod, initArgs);
   appController.writeNetworkPackage();
+  _(proxies).values().forEach(proxy => stdout(proxy.address));
 }

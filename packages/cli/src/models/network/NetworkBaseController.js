@@ -21,6 +21,10 @@ export default class NetworkBaseController {
     throw Error("Unimplemented function isDeployed()");
   }
 
+  get packageAddress() {
+    return this.networkPackage.package && this.networkPackage.package.address;
+  }
+
   async push(reupload = false) {
     await this.init()
     await this.pushVersion()

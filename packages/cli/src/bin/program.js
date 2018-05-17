@@ -1,6 +1,7 @@
 const program = require('commander')
 const { version } = require('../../package.json')
 const registerErrorHandler = require('./errors')
+const Logger = require('zos-lib').Logger;
 
 const init = require('../commands/users/init')
 const addImplementation = require('../commands/users/add-implementation')
@@ -15,7 +16,10 @@ program
   .name('zos')
   .usage('<command> [options]')
   .version(version, '--version')
-  .option('-v, --verbose', 'Switch verbose mode on. Output errors stacktrace.')
+  .option('-v, --verbose', 'Verbose mode. Output errors stacktrace and detailed log.')
+  .option('-s, --silent', 'Silent mode. Do not output anything to stderr.')
+  .on('option:verbose', () => { Logger.verbose(true); } )
+  .on('option:silent', () => { Logger.silent(true); } )
 
 init(program)
 addImplementation(program)
