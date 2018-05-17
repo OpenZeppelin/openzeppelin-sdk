@@ -29,7 +29,7 @@ Finally, to initialize the `zos` application, run:
 
 This will create a `package.zos.json` file, which will contain all the information about your project. 
 
-You are now ready to start developing your application. If you want to build an upgradeable application using ZeppelinOS, please follow our [Building upgradeable applications](building-upgradeable.md) guide. If instead you want to build an app that uses the on-chain libraries provided by ZeppelinOS, follow instead our [Using the stdlib in your app](building-stdlib.md) guide. Of course, you can also do both, as exemplified in our [Basil](basil.md) demo. 
+You are now ready to start developing your application. To build an upgradeable application using ZeppelinOS, please follow our next guide, [Building upgradeable applications](building-upgradeable.md).
 
 
 

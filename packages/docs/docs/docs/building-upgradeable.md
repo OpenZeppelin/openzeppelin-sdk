@@ -45,9 +45,9 @@ Push your application to the desired network by running:
 
     zos push --network <network>
 
-If you are working in a local development network like [Ganache](http://truffleframework.com/ganache/), you will need to first [configure](http://truffleframework.com/docs/getting_started/project#alternative-migrating-with-ganache) your `truffle.js` file. 
+which will create a `package.zos.<network>.json` file with all the information specific to the chosen network. If you are working in a local development network like [Ganache](http://truffleframework.com/ganache/), you will need to [configure](http://truffleframework.com/docs/getting_started/project#alternative-migrating-with-ganache) your `truffle.js` file before running this command.
 
-Create an upgradeable version of each of your contracts with:
+Now you can create an upgradeable version of each of your contracts with:
 
     zos create <contract_name_1> --network <network>
     zos create <contract_name_2> --network <network>
@@ -87,6 +87,6 @@ In our simple example:
 The address of the upgraded contracts is the same as before, but the code has been changed to the new
 version.
 
-Voilà! You have deployed and upgraded an application using ZeppelinOS. 
+_Voilà!_ You have deployed and upgraded an application using ZeppelinOS. 
 
 If you want to use the ZeppelinOS standard libraries, please follow our [Using the stdlib in your app](building-stdlib.md) guide. You can also check the API reference with [all the available commands of zos](climain.md).
