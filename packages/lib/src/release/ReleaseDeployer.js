@@ -5,10 +5,18 @@ import Contracts from '../utils/Contracts'
 const log = new Logger('ReleaseDeployer')
 
 const ReleaseDeployer = {
-  async deploy(contracts, txParams = {}) {
+  async deployLocal(contracts, txParams = {}) {
     this.txParams = txParams
     await this.deployRelease()
     await this.deployAndRegisterContracts(contracts, this._deployLocalContract)
+    return new Release(this.release, txParams)
+  },
+
+  async deployDependency(contracts, dependencyName, txParams) {
+    this.txParams = txParams
+    this.dependencyName = dependencyName
+    await this.deployRelease()
+    await this.deployAndRegisterContracts(contracts, this._deployDependencyContract)
     return new Release(this.release, txParams)
   },
 
@@ -30,6 +38,11 @@ const ReleaseDeployer = {
 
   async _deployLocalContract(contractName) {
     const contractClass = Contracts.getFromLib(contractName)
+    return await ReleaseDeployer._deployContract(contractName, contractClass)
+  },
+
+  async _deployDependencyContract(contractName) {
+    const contractClass = await Contracts.getFromNodeModules(this.dependencyName, contractName)
     return await ReleaseDeployer._deployContract(contractName, contractClass)
   },
 

@@ -29,6 +29,10 @@ export default class App {
     return await AppDeployer.deploy(...arguments);
   }
 
+  static async deployWithStdlib() {
+    return await AppDeployer.deployWithStdlib(...arguments);
+  }
+
   address() {
     return this._app.address
   }

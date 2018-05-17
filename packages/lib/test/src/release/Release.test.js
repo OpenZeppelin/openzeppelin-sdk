@@ -9,9 +9,9 @@ contract('Release', ([_, owner]) => {
   const txParams = { from: owner }
   const contracts = [{ alias: 'DummyImplementation', name: 'DummyImplementation' }]
 
-  describe('deploy', function () {
+  describe('deployLocal', function () {
     beforeEach(async function () {
-      this.release = await Release.deploy(contracts, txParams)
+      this.release = await Release.deployLocal(contracts, txParams)
     })
 
     it('has an owner', async function () {

@@ -47,8 +47,7 @@ contract('App', function ([_, owner]) {
 
   describe('without stdlib', function () {
     beforeEach('deploying', async function () {
-      const noStdlib = 0x0
-      this.app = await App.deploy(initialVersion, noStdlib, txParams)
+      this.app = await App.deploy(initialVersion, txParams)
     });
 
     describe('deploy', function () {
@@ -182,7 +181,7 @@ contract('App', function ([_, owner]) {
 
   describe('with stdlib', function () {
     beforeEach('deploying', async function () {
-      this.app = await App.deploy(initialVersion, stdlibAddress, txParams);
+      this.app = await App.deployWithStdlib(initialVersion, stdlibAddress, txParams);
     });
 
     describe('deploy', function () {
@@ -203,7 +202,7 @@ contract('App', function ([_, owner]) {
 
   describe('with stdlib', function () {
     beforeEach('deploying', async function () {
-      this.app = await App.deploy(initialVersion, stdlibAddress, txParams);
+      this.app = await App.deployWithStdlib(initialVersion, stdlibAddress, txParams);
     });
 
     describe('deploy', function () {

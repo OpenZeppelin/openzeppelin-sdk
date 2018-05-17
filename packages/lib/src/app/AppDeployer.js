@@ -7,7 +7,11 @@ import App from './App'
 const log = new Logger('AppDeployer')
 
 const AppDeployer = {
-  async deploy(version, stdlibAddress = 0x0, txParams = {}) {
+  async deploy(version, txParams = {}) {
+    return this.deployWithStdlib(version, 0x0, txParams)
+  },
+
+  async deployWithStdlib(version, stdlibAddress, txParams = {}) {
     this.txParams = txParams
     await this.createFactory()
     await this.createPackage()

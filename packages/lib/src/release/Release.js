@@ -10,10 +10,13 @@ export default class Release {
     this.txParams = txParams
   }
 
-  static async deploy() {
-    return await ReleaseDeployer.deploy(...arguments);
+  static async deployLocal() {
+    return await ReleaseDeployer.deployLocal(...arguments);
   }
 
+  static async deployDependency() {
+    return await ReleaseDeployer.deployDependency(...arguments);
+  }
 
   address() {
     return this._release.address
@@ -34,5 +37,10 @@ export default class Release {
 
   async getImplementation(contractName) {
     return await this._release.getImplementation(contractName, this.txParams)
+  }
+
+  async setImplementation(contractName, implementationAddress) {
+    log.info(`Setting ${contractName} implementation ${implementationAddress}`)
+    return await this._release.setImplementation(contractName, implementationAddress, this.txParams)
   }
 }
