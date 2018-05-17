@@ -1,5 +1,5 @@
-import status from '../../scripts/status'
-import runWithTruffle from '../../utils/runWithTruffle'
+import status from '../scripts/status'
+import runWithTruffle from '../utils/runWithTruffle'
 
 module.exports = function(program) {
   program

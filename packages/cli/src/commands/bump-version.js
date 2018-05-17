@@ -1,5 +1,5 @@
 import push from './push'
-import bumpVersion from '../../scripts/bump-version'
+import bumpVersion from '../scripts/bump-version'
 
 module.exports = function(program) {
   program

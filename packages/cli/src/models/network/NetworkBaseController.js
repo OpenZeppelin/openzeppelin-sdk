@@ -1,8 +1,6 @@
 import _ from 'lodash';
-import { Logger } from 'zos-lib';
-import { Contracts, FileSystem as fs, App } from "zos-lib";
 import { bytecodeDigest } from '../../utils/digest';
-import Stdlib from '../stdlib/Stdlib';
+import { Contracts, Logger, FileSystem as fs, App } from 'zos-lib';
 
 const log = new Logger('NetworkController');
 
@@ -23,12 +21,6 @@ export default class NetworkBaseController {
 
   get packageAddress() {
     return this.networkPackage.package && this.networkPackage.package.address;
-  }
-
-  async push(reupload = false) {
-    await this.init()
-    await this.pushVersion()
-    await this.uploadContracts(reupload)
   }
 
   get packageData() {
@@ -53,6 +45,12 @@ export default class NetworkBaseController {
 
   async init() {
     return await (this.isDeployed() ? this.fetch() : this.deploy());
+  }
+
+  async push(reupload = false) {
+    await this.init()
+    await this.pushVersion()
+    await this.uploadContracts(reupload)
   }
 
   async pushVersion() {

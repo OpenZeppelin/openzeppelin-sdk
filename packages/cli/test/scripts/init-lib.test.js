@@ -1,16 +1,14 @@
+'use strict'
+require('../setup')
+
 import { FileSystem as fs } from 'zos-lib'
 import initLib from "../../src/scripts/init-lib.js"
 import { cleanupfn } from "../helpers/cleanup.js";
 
-const should = require('chai')
-      .use(require('chai-as-promised'))
-      .should();
-
 contract('init-lib command', function() {
-
-  const packageFileName = "test/tmp/zos.json";
   const appName = "MyLib";
   const appVersion = "0.3.0";
+  const packageFileName = "test/tmp/zos.json";
 
   beforeEach(cleanupfn(packageFileName))
   after(cleanupfn(packageFileName))

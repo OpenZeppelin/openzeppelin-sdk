@@ -1,7 +1,5 @@
-import { Logger, Contracts, FileSystem as fs, Package } from "zos-lib";
+import { Logger, Contracts, Package } from "zos-lib";
 import NetworkBaseController from './NetworkBaseController';
-
-const log = new Logger('NetworkLibController');
 
 export default class NetworkLibController extends NetworkBaseController {
   constructor(appController, network, txParams, networkFileName) {
@@ -9,7 +7,7 @@ export default class NetworkLibController extends NetworkBaseController {
   }
 
   get defaultNetworkPackage() {
-    return { contracts: {}, lib: true };
+    return { contracts: {}, lib: true, frozen: false };
   }
 
   isDeployed() {
@@ -32,6 +30,13 @@ export default class NetworkLibController extends NetworkBaseController {
   }
 
   newVersion(versionName) {
+    this.networkPackage.frozen = false
     return this.package.newVersion(versionName);
+  }
+
+  async freeze() {
+    await this.fetch()
+    await this.package.freeze(this.networkPackage.version)
+    this.networkPackage.frozen = true
   }
 }

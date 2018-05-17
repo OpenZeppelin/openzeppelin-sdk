@@ -1,5 +1,5 @@
-import createProxy from '../../scripts/create-proxy'
-import runWithTruffle from '../../utils/runWithTruffle'
+import createProxy from '../scripts/create-proxy'
+import runWithTruffle from '../utils/runWithTruffle'
 
 module.exports = function(program) {
   program

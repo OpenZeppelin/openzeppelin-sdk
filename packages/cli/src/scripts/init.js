@@ -4,7 +4,7 @@ export default async function init({ name, version, stdlibNameVersion = undefine
   if (name === undefined) throw Error('A project name must be provided to initialize the project.')
   
   const appController = new LocalAppController(packageFileName)
-  appController.init(name, version)  
+  appController.init(name, version)
   await appController.linkStdlib(stdlibNameVersion, installDeps)
   appController.writePackage()
 }

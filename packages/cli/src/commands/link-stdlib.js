@@ -1,5 +1,5 @@
 import push from './push'
-import linkStdlib from '../../scripts/link-stdlib'
+import linkStdlib from '../scripts/link-stdlib'
 
 module.exports = function(program) {
   program

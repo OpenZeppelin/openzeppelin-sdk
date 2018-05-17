@@ -1,5 +1,5 @@
-import push from '../../scripts/push'
-import runWithTruffle from '../../utils/runWithTruffle'
+import push from '../scripts/push'
+import runWithTruffle from '../utils/runWithTruffle'
 
 function registerPush(program) {
   program

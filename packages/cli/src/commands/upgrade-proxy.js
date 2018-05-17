@@ -1,5 +1,5 @@
-import upgradeProxy from '../../scripts/upgrade-proxy'
-import runWithTruffle from '../../utils/runWithTruffle'
+import upgradeProxy from '../scripts/upgrade-proxy'
+import runWithTruffle from '../utils/runWithTruffle'
 
 module.exports = function(program) {
   program

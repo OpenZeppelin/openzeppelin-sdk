@@ -1,6 +1,6 @@
 import push from './push'
-import init from '../../scripts/init'
-import initLib from '../../scripts/init-lib'
+import init from '../scripts/init'
+import initLib from '../scripts/init-lib'
 
 module.exports = function(program) {
   program

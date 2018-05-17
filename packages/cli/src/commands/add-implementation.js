@@ -1,6 +1,6 @@
 import push from './push'
-import addImplementation from '../../scripts/add-implementation'
-import addAllImplementations from '../../scripts/add-all-implementations'
+import addImplementation from '../scripts/add-implementation'
+import addAllImplementations from '../scripts/add-all-implementations'
 
 module.exports = function(program) {
   program
