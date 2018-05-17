@@ -15,18 +15,19 @@ applications in Ethereum.
 
 ## Getting Started
 
-For a quick tour of the features and commands of
-ZeppelinOS, go to the [Quickstart guide](quickstart.md).
+Install ZeppelinOS and setup your project as described in the [Setup guide](setup.md).
 
-For a more comprehensive look at how to build an upgradeable application using
-ZeppelinOS, follow our
-[Building upgradeable applications](building-upgradeable.md) Guide.
+If you want to use ZeppelinOS for building an upgradeable application, follow our
+[Building upgradeable applications](building-upgradeable.md) guide.
 
 If you would like to use the ZeppelinOS on-chain standard libraries in your app,
- follow our [Using the stdlib in your app](building-stdlib.md) Guide. 
+ follow our [Using the stdlib in your app](building-stdlib.md) guide. 
 
 Finally, if you are interested in deploying your own standard libraries for ZeppelinOS,
-see our [Developing a new standard library](developing.md) Guide. 
+see our [Developing a new standard library](developing.md) guide. 
+
+Two demo apps based on ZeppelinOS are described in [Basil](basil.md) and [Crafty](crafty.md).
+
 
 ## Team
 

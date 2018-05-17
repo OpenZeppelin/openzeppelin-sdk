@@ -4,7 +4,7 @@
       "start"
     ],
     "GUIDES": [
-      "quickstart",
+      "setup",
       "building-upgradeable",
       "building-stdlib",
       "developing",
@@ -17,7 +17,7 @@
     "LIBRARY": [
       "libstart"
     ],
-    "REFERENCE": [
+    "FURTHER REFERENCE": [
       "stdlib",
       "package",
       "whitepaper"
