@@ -109,7 +109,7 @@ export default class NetworkBaseController {
     } else if (!this.isContractDeployed(contractAlias)) {
       msg = `Contract ${contractAlias} is not deployed to ${this.network}.`;
     } else if (this.hasContractChanged(contractAlias)) {
-      msg = `Contract ${contractAlias} has changed locally since the last deploy, consider running "zos sync".`;
+      msg = `Contract ${contractAlias} has changed locally since the last deploy, consider running 'zos push'.`;
     }
 
     if (msg && throwIfFail) throw Error(msg);
