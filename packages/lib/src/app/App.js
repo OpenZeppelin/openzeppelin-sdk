@@ -46,6 +46,10 @@ export default class App {
     return directory.getImplementation(contractName)
   }
 
+  async getProxyImplementation(proxyAddress) {
+    return this._app.getProxyImplementation(proxyAddress, this.txParams)
+  }
+
   async setImplementation(contractClass, contractName) {
     log.info(`Setting implementation of ${contractName} in directory...`)
     const implementation = await contractClass.new(this.txParams)

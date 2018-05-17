@@ -5,7 +5,9 @@ import App from '../../../src/app/App';
 const ImplV1 = artifacts.require('DummyImplementation');
 const ImplV2 = artifacts.require('DummyImplementationV2');
 
-require('chai').should();
+require('chai')
+  .use(require('chai-as-promised'))
+  .should()
 
 contract('App', function ([_, owner]) {
   const txParams = { from: owner }
@@ -25,7 +27,7 @@ contract('App', function ([_, owner]) {
     });
 
     it('registers initial version in package', async function () {
-      (await this.app.package.hasVersion(initialVersion)).should.be.true;
+      await this.app.package.hasVersion(initialVersion).should.eventually.be.true;
     });
 
     it('initializes all app properties', async function () {
@@ -56,8 +58,7 @@ contract('App', function ([_, owner]) {
 
     describe('connect', function () {
       beforeEach('connecting to existing instance', async function () {
-        const connectedApp = await App.fetch(this.app.address(), txParams);
-        this.app = connectedApp;
+        this.app = await App.fetch(this.app.address(), txParams);
       });
 
       shouldInitialize();
@@ -77,7 +78,7 @@ contract('App', function ([_, owner]) {
       });
 
       it('registers new version on package', async function () {
-        (await this.app.package.hasVersion(newVersion)).should.be.true;
+        await this.app.package.hasVersion(newVersion).should.eventually.be.true;
       });
 
       it('returns the current directory', async function () {
@@ -87,19 +88,19 @@ contract('App', function ([_, owner]) {
     });
 
     const setImplementation = async function () {
-      this.implementation = await this.app.setImplementation(ImplV1, contractName);
+      this.implementation_v1 = await this.app.setImplementation(ImplV1, contractName);
     };
 
     describe('setImplementation', function () {
       beforeEach('setting implementation', setImplementation);
 
       it('should return implementation', async function () {
-        this.implementation.address.should.be.not.null;
+        this.implementation_v1.address.should.be.not.null;
       });
 
       it('should register implementation on directory', async function () {
         const implementation = await this.app.currentDirectory().getImplementation(contractName);
-        implementation.should.eq(this.implementation.address);
+        implementation.should.eq(this.implementation_v1.address);
       });
     });
 
@@ -113,7 +114,8 @@ contract('App', function ([_, owner]) {
       const shouldReturnProxy = function () {
         it('should return a proxy', async function () {
           this.proxy.address.should.be.not.null;
-          (await this.proxy.version()).should.eq('V1');
+          await this.proxy.version().should.eventually.be.eq('V1');
+          await this.app.getProxyImplementation(this.proxy.address).should.eventually.be.eq(this.implementation_v1.address)
         });
       };
 
@@ -140,12 +142,13 @@ contract('App', function ([_, owner]) {
       beforeEach('create proxy', createProxy);
       beforeEach('creating new version', createVersion);
       beforeEach('setting new implementation', async function () {
-        this.implementation = await this.app.setImplementation(ImplV2, contractName);
+        this.implementation_v2 = await this.app.setImplementation(ImplV2, contractName);
       });
 
       const shouldUpgradeProxy = function () {
         it('should upgrade proxy to ImplV2', async function () {
-          (await this.proxy.version()).should.eq('V2');
+          await this.proxy.version().should.eventually.be.eq('V2');
+          await this.app.getProxyImplementation(this.proxy.address).should.eventually.be.eq(this.implementation_v2.address)
         });
       };
 
@@ -191,8 +194,7 @@ contract('App', function ([_, owner]) {
 
     describe('connect', function () {
       beforeEach('connecting to existing instance', async function () {
-        const connectedApp = await App.fetch(this.app.address(), txParams);
-        this.app = connectedApp;
+        this.app = await App.fetch(this.app.address(), txParams);
       });
 
       shouldInitialize();

@@ -14,7 +14,6 @@ contract('App', ([_, owner, donor, wallet]) => {
   const contractName = 'Donations';
 
   describe('setup', function() {
-
     beforeEach(async function() {
       this.app = await deploy.setupApp({owner});
     });
@@ -38,14 +37,12 @@ contract('App', ([_, owner, donor, wallet]) => {
   });
 
   describe('version 0.0.1', function() {
-    
     beforeEach(async function() {
       this.app = await deploy.setupApp({owner});
       this.donations = await deploy.deployVersion1(this.app, {owner});
     });
     
     describe('directory', function() {
-
       describe('when queried for the implementation', function() {
 
         it('returns a valid address', async function() {
