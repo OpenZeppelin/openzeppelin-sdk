@@ -30,6 +30,12 @@ export function parseJsonIfExists(filename) {
   }
 }
 
+export function editJson(file, edit) {
+  const data = this.parseJson(file)
+  edit(data)
+  this.writeJson(file, data)
+}
+
 export function writeJson(filename, data) {
   const json = JSON.stringify(data, null, 2)
   fs.writeFileSync(filename, json)
@@ -42,6 +48,7 @@ export default {
   ifExistsThrow,
   ifNotExistsThrow,
   parseJson,
+  editJson,
   parseJsonIfExists,
   writeJson
 }
