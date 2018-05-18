@@ -5,7 +5,7 @@ doNotInstallStdlib()
 
 require('chai')
   .use(require('chai-as-promised'))
-  .use(require('./helpers/assertions'))
+  .use(require('zos-lib').assertions)
   .should()
 
 function doNotInstallStdlib() {
