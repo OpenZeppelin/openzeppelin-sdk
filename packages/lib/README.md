@@ -3,8 +3,6 @@
 [![Build Status](https://travis-ci.org/zeppelinos/zos-lib.svg?branch=master)](https://travis-ci.org/zeppelinos/zos-lib)
 [![Coverage Status](https://coveralls.io/repos/github/zeppelinos/zos-lib/badge.svg?branch=master)](https://coveralls.io/github/zeppelinos/zos-lib?branch=master)
 
-:warning: **Under heavy development: do not use in production** :warning:
-
 `zos-lib` is a library for writing upgradeable smart contracts on Ethereum. It can be used to create an upgradeable on-chain distributed application.
 
 Use this library if you want to programmatically develop, deploy or operate an upgradeable smart contract system.
