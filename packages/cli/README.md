@@ -17,6 +17,7 @@ ZeppelinOS is a platform to develop, manage and operate smart contract applicati
   - [Basic usage](#basic-usage)
 - [Examples](#examples)
 - [Links](#links)
+- [Security](#security)
 - [License](#license)
 
 ## Getting Started
@@ -71,6 +72,10 @@ zos init myproject 0.1
 
 ### Code
 - [ZeppelinOS library (`zos-lib`)](https://github.com/zeppelinos/zos-lib)
+
+## Security
+
+If you find a security issue, please contact us at security@zeppelinos.org. We give rewards for reported issues, according to impact and severity.
 
 ## License
 
