@@ -92,7 +92,7 @@ export default class NetworkAppController extends NetworkBaseController {
 
   async upgradeProxies(contractAlias, proxyAddress, initMethod, initArgs) {
     const proxyInfos = this.getProxies(contractAlias, proxyAddress);
-    if (_.isEmpty(proxyInfos)) {
+    if (_.isEmpty(proxyInfos) || (contractAlias && _.isEmpty(proxyInfos[contractAlias]))) {
       log.info("No proxies to upgrade were found");
       return;
     }
