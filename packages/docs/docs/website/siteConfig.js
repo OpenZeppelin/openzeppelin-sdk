@@ -6,8 +6,8 @@
  */
 
 const siteConfig = {
-  title: 'zeppelin_os',
-  tagline: 'zeppelin_os rocks',
+  title: 'ZeppelinOS',
+  tagline: 'ZeppelinOS, securely develop and manage any smart contract application',
   url: 'https://docs.zeppelinos.org',
   baseUrl: '/',
   organizationName: 'zeppelinos',
