@@ -4,9 +4,9 @@ import NetworkAppController from '../network/NetworkAppController';
 import LocalBaseController from './LocalBaseController';
 
 export default class LocalAppController extends LocalBaseController {
-  constructor(packageFileName) {
+  constructor(packageFileName, allowLib=false) {
     super(packageFileName);
-    if (this.packageData.lib) {
+    if (this.packageData.lib && !allowLib) {
       throw Error("Cannot create an application controller for a library");
     }
   }

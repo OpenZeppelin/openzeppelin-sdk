@@ -2,18 +2,17 @@
 require('../setup')
 
 import { FileSystem as fs } from 'zos-lib';
-import ProjectDeployer from '../../src/models/ProjectDeployer';
+import testApp from '../../src/models/TestApp';
 
 const ImplV1 = artifacts.require('ImplV1');
 const ImplV2 = artifacts.require('ImplV2');
 
-contract('ProjectDeployer', function ([_, owner]) {
+contract('TestApp', function ([_, owner]) {
   const txParams = { from: owner }
   const initialVersion = "1.0";
 
   beforeEach("deploying all contracts", async function () {
-    const packageData = fs.parseJson('test/mocks/packages/package-with-contracts-and-stdlib.zos.json')
-    this.app = await ProjectDeployer.call(packageData, txParams)
+    this.app = await testApp('test/mocks/packages/package-with-contracts-and-stdlib.zos.json', txParams)
     this.directory = this.app.currentDirectory();
   });
 
