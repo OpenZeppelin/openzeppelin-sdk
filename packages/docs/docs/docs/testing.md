@@ -4,34 +4,74 @@ title: Testing upgradeable applications
 sidebar_label: Testing
 ---
 
-To simplify the testing process, you can use the `AppManager` class to set up your entire application (including a standard library) in the test network. This class also acts as wrapper to your deployed application, and can be used to programatically create new proxies of the contracts to test:
+When working with ZeppelinOS, you can test your contracts as you usually do, or you can have ZeppelinOS automatically set up your entire application in your testing environment. This allows you to replicate the same set of contracts that manage your application for each test you run.
+
+Running `TestApp()` from `zos-cli` will retrieve your application structure from the `zos.json` file and deploy everything to the current test network. All contracts you have registered via `zos add`, plus all the contracts provided by the stdlib you have linked, will be available. The [`App`](https://github.com/zeppelinos/zos-lib/blob/master/src/app/App.js) object returned provides convenient methods for creating proxies for your contracts, which you can use for testing.
+
+**Important:** for `TestApp` to work correctly in your testing environment, you need to set the `NODE_ENV` environment variable to `test` when running your tests. For instance, if you are using truffle, run `NODE_ENV=test truffle test`.
+
+## Example
+
+Given a small application, with a `Sample` contract, linked to a stdlib that provides a `StandardToken` implementation:
+
+```json
+{
+  "name": "MyProject",
+  "version": "0.1.0",
+  "contracts": {
+    "Sample": "Sample"
+  },
+  "stdlib": {
+    "name": "openzeppelin-zos",
+    "version": "1.9.0"
+  }
+}
+```
+
+To set up the full application in a test file, first import `TestApp` from `zos`:
+```js
+import { TestApp } from 'zos';
+```
+
+Then invoke it in the test suite setup, optionally including the path to your `zos.json` file, and a set of options to be used when deploying the contracts (such as `from`, `gas`, and `gasPrice`):
+```js
+beforeEach(async function () {
+  this.app = await TestApp('zos.json', { from: owner })
+});
+```
+
+In a test, you can generate an instance for your contracts via [`App#createProxy`](https://github.com/zeppelinos/zos-lib/blob/master/src/app/App.js#L85):
 
 ```js
-import AppManager from 'zos/lib/models/AppManager';
+const Sample = artifacts.require('Sample')
+it('should create a proxy', async function () {
+  const proxy = await this.app.createProxy(Sample);
+  // Use proxy ...
+})
+```
 
-const MyContract = artifacts.require('MyContract');
-const MintableToken = artifacts.require('MintableToken');
+The full code for the sample test file is:
 
-contract('MyContract', function([owner]) {
+```js
+import { TestApp } from 'zos';
+
+const Sample = artifacts.require('Sample')
+const StandardToken = artifacts.require('StandardToken')
+
+contract('Sample', function ([_, owner]) {
+
   beforeEach(async function () {
-    this.appManager = new AppManager(owner, 'test');
-    await this.appManager.deployAll();
+    this.app = await TestApp('zos.json', { from: owner })
   });
 
-  it('should create a proxy of MyContract', async function () {
-    const proxy = await this.appManager.createProxy(MyContract, 'MyContract');
-    const result = await proxy.y();
-    result.toNumber().should.eq(1337)
+  it('should create a proxy', async function () {
+    const proxy = await this.app.createProxy(Sample);
+    const result = await proxy.greet();
+    result.should.eq('A sample')
   })
 
-  it('should create and initialize a proxy of MyContract', async function () {
-    const proxy = await this.appManager.createProxy(MyContract, 'MyContract', 'initialize', [42]);
-    const result = await proxy.x();
-    result.toNumber().should.eq(42)
-  })
-
-  it('should create a proxy from the stdlib', async function () {
-    const proxy = await this.appManager.createProxy(MintableToken, 'MintableToken');
+  it('should create a proxy for the stdlib', async function () {
+    const proxy = await this.app.createProxy(StandardToken);
     const result = await proxy.totalSupply();
     result.toNumber().should.eq(0);
   })
