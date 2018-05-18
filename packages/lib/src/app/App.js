@@ -83,6 +83,7 @@ export default class App {
   }
 
   async createProxy(contractClass, contractName, initMethodName, initArgs) {
+    if (!contractName) contractName = contractClass.contractName;
     const { receipt } = typeof(initArgs) === 'undefined'
       ? await this._createProxy(contractName)
       : await this._createProxyAndCall(contractClass, contractName, initMethodName, initArgs)
@@ -96,6 +97,7 @@ export default class App {
   }
 
   async upgradeProxy(proxyAddress, contractClass, contractName, initMethodName, initArgs) {
+    if (!contractName) contractName = contractClass.contractName;
     const { receipt } = typeof(initArgs) === 'undefined'
       ? await this._upgradeProxy(proxyAddress, contractName)
       : await this._upgradeProxyAndCall(proxyAddress, contractClass, contractName, initMethodName, initArgs)

@@ -4,6 +4,7 @@ require('../../setup')
 import App from '../../../src/app/App';
 
 const AppDirectory = artifacts.require('AppDirectory');
+const Impl = artifacts.require('Impl');
 const ImplV1 = artifacts.require('DummyImplementation');
 const ImplV2 = artifacts.require('DummyImplementationV2');
 
@@ -135,6 +136,13 @@ contract('App', function ([_, owner]) {
           (await this.proxy.value()).toNumber().should.eq(10);
         });
       });
+
+      describe('with implicit contract name', async function () {
+        beforeEach('creating a proxy', async function () {
+          this.proxy = await this.app.createProxy(Impl);
+        });
+        shouldReturnProxy();
+      });
     });
     
     describe('upgradeProxy', function () {
@@ -170,6 +178,14 @@ contract('App', function ([_, owner]) {
         it('should run migration', async function () {
           (await this.proxy.value()).toNumber().should.eq(20);
         });
+      });
+
+      describe('with implicit contract name', async function () {
+        beforeEach('upgrading the proxy', async function () {
+          await this.app.upgradeProxy(this.proxy.address, Impl);
+        });
+
+        shouldUpgradeProxy();
       });
     });
 

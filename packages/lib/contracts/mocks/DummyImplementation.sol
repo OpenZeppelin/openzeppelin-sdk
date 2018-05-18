@@ -1,5 +1,9 @@
 pragma solidity ^0.4.21;
 
+contract Impl {
+  function version() public pure returns (string); 
+}
+
 contract DummyImplementation {
   uint256 public value;
 
