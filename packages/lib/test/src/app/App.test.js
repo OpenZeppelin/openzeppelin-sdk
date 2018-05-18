@@ -2,6 +2,7 @@
 
 import App from '../../../src/app/App';
 
+const AppDirectory = artifacts.require('AppDirectory');
 const ImplV1 = artifacts.require('DummyImplementation');
 const ImplV2 = artifacts.require('DummyImplementationV2');
 
@@ -42,8 +43,10 @@ contract('App', function ([_, owner]) {
 
   const shouldConnectToStdlib = function () {
     it('should connect current directory to stdlib', async function () {
-      const directory = this.app.currentDirectory();
-      (await directory.stdlib()).should.eq(stdlibAddress);
+      const currentDirectory = AppDirectory.at(await this.app.package.getVersion(this.app.version))
+      const currentStdlib = await currentDirectory.stdlib()
+
+      await this.app.currentStdlib().should.eventually.be.eq(currentStdlib)
     });
   };
 
