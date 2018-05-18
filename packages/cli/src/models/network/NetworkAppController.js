@@ -64,6 +64,7 @@ export default class NetworkAppController extends NetworkBaseController {
     await this.fetch();
     
     const contractClass = this.localController.getContractClass(contractAlias);
+    this.checkInitialization(contractClass, initMethod, initArgs);
     const proxyInstance = await this.app.createProxy(contractClass, contractAlias, initMethod, initArgs);
     const implementationAddress = await this.app.getImplementation(contractAlias);
 
@@ -79,6 +80,16 @@ export default class NetworkAppController extends NetworkBaseController {
     return proxyInstance;
   }
 
+  checkInitialization(contractClass, calledInitMethod, calledInitArgs) {
+    // If there is an initializer called, assume it's ok
+    if (calledInitMethod) return;
+
+    // Otherwise, warn the user to invoke it
+    const initializeMethod = contractClass.abi.find(fn => fn.type === 'function' && fn.name === 'initialize');
+    if (!initializeMethod) return;
+    log.error(`Possible initialization method 'initialize' found in contract. Make sure you initialize your instance.`);
+  }
+
   async upgradeProxies(contractAlias, proxyAddress, initMethod, initArgs) {
     const proxyInfos = this.getProxies(contractAlias, proxyAddress);
     if (_.isEmpty(proxyInfos)) {
@@ -91,7 +102,8 @@ export default class NetworkAppController extends NetworkBaseController {
     
     await Promise.all(_.flatMap(proxyInfos, (contractProxyInfos, contractAlias) => {
       const contractClass = this.localController.getContractClass(contractAlias);
-      return _.map(contractProxyInfos, async (proxyInfo) => {        
+      this.checkUpgrade(contractClass, initMethod, initArgs);
+      return _.map(contractProxyInfos, async (proxyInfo) => {
         await this.app.upgradeProxy(proxyInfo.address, contractClass, contractAlias, initMethod, initArgs);
         const implementationAddress = await this.app.getImplementation(contractAlias);
         proxyInfo.version = newVersion;
@@ -119,6 +131,16 @@ export default class NetworkAppController extends NetworkBaseController {
         !proxyAddress || proxy.address === proxyAddress
       ))
     };
+  }
+
+  checkUpgrade(contractClass, calledMigrateMethod, calledMigrateArgs) {
+    // If there is a migration called, assume it's ok
+    if (calledMigrateMethod) return;
+
+    // Otherwise, warn the user to invoke it
+    const migrateMethod = contractClass.abi.find(fn => fn.type === 'function' && fn.name === 'migrate');
+    if (!migrateMethod) return;
+    log.error(`Possible migration method 'migrate' found in contract ${contractClass.contractName}. Remember running the migration after deploying it.`);
   }
 
   async linkStdlib() {

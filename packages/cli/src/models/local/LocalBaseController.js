@@ -32,6 +32,13 @@ export default class LocalBaseController {
   }
 
   addImplementation(contractAlias, contractName) {
+    // We are logging an error instead of throwing because a contract may have an empty constructor, 
+    // which is fine, but as long as it is declared we will be picking it up
+    const path = `${process.cwd()}/build/contracts/${contractName}.json`
+    if (this.hasConstructor(path)) {
+      log.error(`Contract ${contractName} has an explicit constructor. Move it to an initializer function to use it with ZeppelinOS.`)
+    }
+
     this.packageData.contracts[contractAlias] = contractName;
   }
 
@@ -64,6 +71,12 @@ export default class LocalBaseController {
     if (!fs.exists(contractDataPath)) return false
     const bytecode = fs.parseJson(contractDataPath).bytecode
     return bytecode && bytecode !== "0x"
+  }
+
+  hasConstructor(contractDataPath) {
+    if (!fs.exists(contractDataPath)) return false
+    const abi = fs.parseJson(contractDataPath).abi
+    return !!abi.find(fn => fn.type === "constructor");
   }
 
   get packageData() {

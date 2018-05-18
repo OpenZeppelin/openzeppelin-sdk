@@ -4,23 +4,31 @@ require('../setup')
 import init from "../../src/scripts/init.js";
 import push from "../../src/scripts/push.js";
 import { cleanup, cleanupfn } from "../helpers/cleanup.js";
-import { FileSystem as fs } from "zos-lib";
+import { FileSystem as fs, Logger } from "zos-lib";
 import { editJson } from '../helpers/json.js';
 import createProxy from "../../src/scripts/create-proxy.js";
 import addImplementation from "../../src/scripts/add-implementation.js";
 import linkStdlib from "../../src/scripts/link-stdlib.js";
 import LocalAppController from '../../src/models/local/LocalAppController';
+import CaptureLogs from '../helpers/captureLogs';
 
 const ImplV1 = artifacts.require('ImplV1');
 
 contract('create-proxy command', function([_, owner]) {
-  const txParams = { from: owner };
-  const appName = "MyApp";
   const contractName = "ImplV1";
   const contractAlias = "Impl";
   const anotherContractName = "AnotherImplV1";
   const anotherContractAlias = "AnotherImpl";
-  const contractsData = [{ name: contractName, alias: contractAlias}, { name: anotherContractName, alias: anotherContractAlias }]
+  const uninitializableContractName = "UninitializableImplV1";
+  const uninitializableContractAlias = "UninitializableImpl";
+  const contractsData = [
+    { name: contractName, alias: contractAlias}, 
+    { name: anotherContractName, alias: anotherContractAlias },
+    { name: uninitializableContractName, alias: uninitializableContractAlias }
+  ];
+
+  const txParams = { from: owner };
+  const appName = "MyApp";
   const defaultVersion = "0.1.0";
   const network = "test";
   const packageFileName = "test/tmp/zos.json";
@@ -88,6 +96,38 @@ contract('create-proxy command', function([_, owner]) {
     const data = fs.parseJson(networkFileName);
     await assertProxy(data.proxies[contractAlias][0], { version: defaultVersion, say: "V1" });
     await assertProxy(data.proxies[anotherContractAlias][0], { version: defaultVersion, say: "AnotherV1" });
+  });
+
+  describe('warnings', function () {
+    beforeEach('capturing log output', function () {
+      this.logs = new CaptureLogs();
+    });
+
+    afterEach(function () {
+      this.logs.restore();
+    });
+
+    it('should warn when not initializing a contract with initialize method', async function() {
+      await createProxy({ contractAlias, packageFileName, network, txParams });
+      this.logs.errors.should.have.lengthOf(1);
+      this.logs.errors[0].should.match(/make sure you initialize/i);
+    });
+
+    it('should warn when not initializing a contract that inherits from one with an initialize method', async function() {
+      await createProxy({ contractAlias: anotherContractAlias, packageFileName, network, txParams });
+      this.logs.errors.should.have.lengthOf(1);
+      this.logs.errors[0].should.match(/make sure you initialize/i);
+    });
+
+    it('should not warn when initializing a contract', async function() {
+      await createProxy({ contractAlias, packageFileName, network, txParams, initMethod: 'initialize', initArgs: [42] });
+      this.logs.errors.should.have.lengthOf(0);
+    });
+
+    it('should not warn when a contract has not initialize method', async function() {
+      await createProxy({ contractAlias: uninitializableContractAlias, packageFileName, network, txParams });
+      this.logs.errors.should.have.lengthOf(0);
+    });
   });
 
   describe('with stdlib', function () {

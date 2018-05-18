@@ -4,8 +4,9 @@ require('../setup')
 import init from "../../src/scripts/init.js";
 import addImplementation from "../../src/scripts/add-implementation.js";
 import { cleanup, cleanupfn } from "../helpers/cleanup.js";
-import { FileSystem as fs } from 'zos-lib';
+import { FileSystem as fs, Logger } from 'zos-lib';
 import { editJson } from '../helpers/json.js';
+import CaptureLogs from '../helpers/captureLogs';
 
 contract('add-implementation command', function() {
   const packageFileName = "test/tmp/zos.json";
@@ -61,21 +62,44 @@ contract('add-implementation command', function() {
   });
 
   it('should use a default alias if one is not provided', function() {
-    delete contractsData[0].alias
+    const contractsData = [{ name: contractName }]
     addImplementation({ contractsData, packageFileName });
     const data = fs.parseJson(packageFileName);
     data.contracts[contractName].should.eq(contractName);
   });
 
-  it('should fail to add a contract that does not exist', function() {
-    contractsData[0].name = 'NonExists'
-    expect(() => addImplementation({ contractsData, packageFileName })).to.throw(/not found/);
+  describe('failures', function () {
+    it('should fail to add a contract that does not exist', function() {
+      const contractsData = [{ name: 'NonExists', alias: contractAlias }]
+      expect(() => addImplementation({ contractsData, packageFileName })).to.throw(/not found/);
+    });
+
+    it('should fail to add an abstract contract', function() {
+      const contractsData = [{ name: 'Impl', alias: contractAlias }]
+      expect(() => addImplementation({ contractsData, packageFileName })).to.throw(/abstract/);
+    });
+
+    xit('should fail to add a contract with an invalid alias');
   });
 
-  it('should fail to add an abstract contract', function() {
-    contractsData[0].name = 'Impl'
-    expect(() => addImplementation({ contractsData, packageFileName })).to.throw(/abstract/);
-  });
+  describe('warnings', function () {
+    beforeEach('capturing log output', function () {
+      this.logs = new CaptureLogs();
+    });
 
-  xit('should fail to add a contract with an invalid alias');
+    afterEach(function () {
+      this.logs.restore();
+    });
+
+    it('should warn when adding a contract with a constructor', async function() {
+      addImplementation({ contractsData: [{ name: "WithConstructor", alias: "WithConstructor" }], packageFileName});
+      this.logs.errors.should.have.lengthOf(1);
+      this.logs.errors[0].should.match(/constructor/i);
+    });
+
+    it('should not warn when adding a contract without a constructor', async function() {
+      addImplementation({ contractsData, packageFileName});
+      this.logs.errors.should.have.lengthOf(0);
+    });
+  });
 });
