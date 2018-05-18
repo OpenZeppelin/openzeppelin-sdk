@@ -55,9 +55,8 @@
     "web3": "^0.18.4"
   },
   "dependencies": {
-    "fs": "0.0.1-security",
+    "openzeppelin-solidity": "~1.9.0",
     "truffle-contract": "^3.0.5",
-    "truffle-provisioner": "^0.1.0",
-    "zeppelin-solidity": "^1.8.0"
+    "truffle-provisioner": "^0.1.0"
   }
 }

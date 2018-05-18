@@ -1,8 +1,8 @@
 pragma solidity ^0.4.21;
 
 import "./ImplementationProvider.sol";
-import "zeppelin-solidity/contracts/ownership/Ownable.sol";
-import 'zeppelin-solidity/contracts/AddressUtils.sol';
+import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
+import 'openzeppelin-solidity/contracts/AddressUtils.sol';
 
 /**
  * @title ImplementationDirectory
