@@ -11,3 +11,15 @@ export function parseArgs(args) {
     throw Error(`Error parsing arguments: ${e}`);
   }
 }
+
+export function parseInit(options, defaultInit) {
+  let initMethod = options.init;
+  if (typeof initMethod === 'boolean') initMethod = defaultInit;
+  if (!initMethod && typeof options.args !== 'undefined') initMethod = defaultInit;
+
+  let initArgs = options.args;
+  if(typeof initArgs === 'string') initArgs = parseArgs(initArgs);
+  else if(typeof initArgs === 'boolean' || initMethod) initArgs = [];
+
+  return { initMethod, initArgs };
+}

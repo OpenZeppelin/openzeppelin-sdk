@@ -2,7 +2,7 @@
 
 import createProxy from '../scripts/create-proxy'
 import runWithTruffle from '../utils/runWithTruffle'
-import { parseArgs } from '../utils/input'
+import { parseInit } from '../utils/input'
 
 const signature = 'create <alias>'
 const description = 'deploys a new upgradeable contract instance. Provide the <alias> you added your contract with'
@@ -20,13 +20,7 @@ module.exports = {
       .option('-n, --network <network>', 'network to be used')
       .option('--force', 'force creation even if contracts have local modifications')
       .action(function (contractAlias, options) {
-        let initMethod = options.init
-        if(typeof initMethod === 'boolean') initMethod = 'initialize'
-
-      let initArgs = options.args
-      if(typeof initArgs === 'string') initArgs = parseArgs(initArgs)
-      else if(typeof initArgs === 'boolean' || initMethod) initArgs = []
-
+        const { initMethod, initArgs } = parseInit(options, 'initialize')
         const { from, network, force } = options
         const txParams = from ? { from } : {}
         runWithTruffle(async () => await createProxy({

@@ -2,7 +2,7 @@
 
 import upgradeProxy from '../scripts/upgrade-proxy'
 import runWithTruffle from '../utils/runWithTruffle'
-import { parseArgs } from '../utils/input'
+import { parseInit } from '../utils/input'
 
 const signature = 'upgrade [alias] [address]'
 const description = 'upgrade contract to a new implementation. Provide the [alias] you added your contract with, or use --all flag to upgrade all. If no [address] is provided, all instances of that contract class will be upgraded'
@@ -21,13 +21,7 @@ module.exports = {
       .option('-n, --network <network>', 'network to be used')
       .option('--force', 'force creation even if contracts have local modifications')
       .action(function (contractAlias, proxyAddress, options) {
-        let initMethod = options.init
-        if(typeof initMethod === 'boolean') initMethod = 'initialize'
-
-        let initArgs = options.args
-        if(typeof initArgs === 'string') initArgs = parseArgs(initArgs)
-        else if(typeof initArgs === 'boolean' || initMethod) initArgs = []
-
+        const { initMethod, initArgs } = parseInit(options, 'initialize')
         const { from, network, all, force } = options
         const txParams = from ? { from } : {}
         runWithTruffle(async () => await upgradeProxy({
