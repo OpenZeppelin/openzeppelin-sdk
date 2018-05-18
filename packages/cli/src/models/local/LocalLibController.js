@@ -10,8 +10,8 @@ export default class LocalLibController extends LocalBaseController {
     return new NetworkLibController(this, network, txParams, networkFileName);
   }
 
-  init(name, version) {
-    super.init(name, version);
+  init(name, version, force = false) {
+    super.init(name, version, force);
     this.packageData.lib = true;
   }
 

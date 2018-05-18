@@ -10,6 +10,7 @@ module.exports = function(program) {
       Provide a <project> name.
       Provide a [version] number, otherwise 0.0.1 will be used by default.`)
     .option('--lib', 'Create a standard library instead of a regular application')
+    .option('--force', 'Override existing project if there is an existing one')
     .option('--stdlib <stdlib>', 'Standard library to use')
     .option('--no-install', 'Skip installing stdlib npm dependencies')
     .option('--push <network>', 'Push your changes to the specified network')
@@ -19,8 +20,8 @@ module.exports = function(program) {
         if (options.stdlib) throw Error("Cannot set a stdlib in a library project")
         await initLib({ name, version })
       } else {
-        const { stdlib: stdlibNameVersion, install: installDeps } = options
-        await init({ name, version, stdlibNameVersion, installDeps })
+        const { force, stdlib: stdlibNameVersion, install: installDeps } = options
+        await init({ name, version, stdlibNameVersion, installDeps, force })
       }
       
       if (options.push) {

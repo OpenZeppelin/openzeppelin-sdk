@@ -49,9 +49,18 @@ contract('init-lib command', function() {
       data.contracts.should.eql({});
     });
 
-    it('should not overwrite existing file', async function () {
+    it('should not overwrite existing file by default', async function () {
       fs.writeJson(packageFileName, { app: 'previous' });
       await initLib({ name: appName, version: appVersion, packageFileName }).should.be.rejectedWith(/exist/)
+    });
+
+    it('should overwrite existing file if requested', async function () {
+      fs.writeJson(packageFileName, { app: 'previous' });
+      await initLib({ name: appName, version: appVersion, packageFileName, force: true })
+
+      const data = fs.parseJson(packageFileName);
+      data.name.should.eq(appName);
+      data.version.should.eq(appVersion);
     });
   });
 });

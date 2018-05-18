@@ -1,4 +1,3 @@
-import _ from 'lodash';
 import Stdlib from '../stdlib/Stdlib';
 import { Contracts, Logger, FileSystem as fs } from "zos-lib";
 
@@ -11,11 +10,11 @@ export default class LocalBaseController {
     this.packageFileName = packageFileName;
   }
 
-  init(name, version) {
-    if (fs.exists(this.packageFileName)) {
+  init(name, version, force = false) {
+    if (fs.exists(this.packageFileName) && !force) {
       throw Error(`Cannot overwrite existing file ${this.packageFileName}`)
     }
-    if (this.packageData.name) {
+    if (this.packageData.name && !force) {
       throw Error(`Cannot initialize already initialized package ${this.packageData.name}`)
     }
     
