@@ -12,184 +12,244 @@ However, after a few days we started having conflicts. Who gets the honor to set
 
 First we will need to [install Node.js following the instructions from their website](https://nodejs.org/en/download/package-manager/). Then, let's set up a directory for our project and bootstrap it with the Truffle development environment:
 
-    mkdir basil
-    cd basil
-    npm install --global truffle
-    truffle init
-    npm init --yes
+```
+mkdir basil
+cd basil
+npm install --global truffle
+truffle init
+npm init --yes
+```
 
-
-## The sample contract, with initialize
+## The sample contract
 
 Next, let's write the contract to control the light bulb in `contracts/Basil.sol`:
 
-    pragma solidity ^0.4.23;
+```
+pragma solidity ^0.4.18;
 
-    import "openzeppelin-zos/contracts/ownership/Ownable.sol";
+import "openzeppelin-zos/contracts/ownership/Ownable.sol";
 
+/**
+ * @title Basil
+ */
+contract Basil is Ownable {
 
-    contract Basil is Ownable {
-      // Color in RGB.
-      uint256 public red;
-      uint256 public green;
-      uint256 public blue;
+  // color
+  uint256 public r;
+  uint256 public g;
+  uint256 public b;
 
-      uint256 public highestDonation;
+  // highest donation in wei
+  uint256 public highestDonation;
 
-      event NewDonation(address indexed donor, uint256 value, uint256 red, uint256 green, uint256 blue);
+  event Withdrawal(address indexed wallet, uint256 value);
+  event NewDonation(address indexed donor, uint256 value, uint256 r, uint256 g, uint256 b);
 
-      function initialize() public isInitializer("Basil", "0") {
-        highestDonation = 10;
-      }
+  function donate(uint256 _r, uint256 _g, uint256 _b) public payable {
+    require(_r < 256);
+    require(_g < 256);
+    require(_b < 256);
+    require(msg.value > highestDonation);
 
-      function donate(uint256 _red, uint256 _green, uint256 _blue) public payable {
-        require(_red < 256);
-        require(_green < 256);
-        require(_blue < 256);
-        require(msg.value > highestDonation);
-        red = _red;
-        green = _green;
-        blue = _blue;
-        emit NewDonation(msg.sender, msg.value, red, green, blue);
-      }
-    }
+    r = _r;
+    g = _g;
+    b = _b;
+    highestDonation = msg.value;
+    NewDonation(
+      msg.sender, msg.value,
+      r, g, b);
+  }
 
-The contract is super simple. If somebody wants to set the light color, they have to make a donation that then goes to cover any plant necessities. If the donation is higher than the previous one, it is accepted, the light color changes and an event is emitted.
+  function withdraw(address wallet) public onlyOwner {
+    require(this.balance > 0);
+    require(wallet != address(0));
+    uint256 value = this.balance;
+    wallet.transfer(value);
+    Withdrawal(wallet, value);
+  }
+}
+```
 
-We set the initial donation amount to 10 wei, and here you will find the only difference to take into account when writing a contract for ZeppelinOS. Before ZeppelinOS, we would have set the initial value using a `constructor` function. In Ethereum, constructors are handled in a very different way compared to normal functions: they are executed during the deployment of the contract to initialize the state variables, and the code of the constructor is never deployed to the blockchain. In ZeppelinOS we rely on proxy contracts that will forward function calls to the contracts with the implementation. A proxy has no access to the constructor to initialize state variables, so instead we use an `initialize` function with the `isInitializer` modifier provided by the `Migratable` contract of `zos-lib`, which comes from the inheritance chain of `Ownable`. The modifier receives the name of the contract and a `migrationId` that starts in 0.
+The contract is super simple. If somebody wants to set the light color, they have to make a donation. If the donation is higher than the previous one, it is accepted, the light color changes and an event is emitted. Of course, a withdraw method allows the Zeppelin team to collect all donations, which are safely put away in the plant's own education fund.
 
 We need to install the `openzeppelin-zos` dependency and to compile the contract:
 
-    npm install --save-dev openzeppelin-zos
-    truffle compile
+```
+npm install openzeppelin-zos
+truffle compile
+```
 
-## Using ZeppelinOS to link to the OpenZeppelin standard library
+NOTE: If you're familiar with the `openzeppelin-solidty` library, not that we're not using it here. We're using `openzeppelin-zos` library, which is the OpenZeppelin version that is compatible with ZeppelinOS.
 
-Now, to get the niceties that ZeppelinOS provides, let's install the `zos` command line interface and initialize our application with the version 1.0.0:
+## Using ZeppelinOS
 
-    npm install --global zos
-    zos init basil 0.0.1
+Now, to get the niceties that ZeppelinOS provides, let's install the `zos` command line interface and initialize our application with the version 0.0.1:
+
+```
+npm install zos
+zos init basil 0.0.1
+```
 
 This will create a `zos.json` file where ZeppelinOS will keep track of
 the contracts of your application.
 
 Next, let's add the implementation of our Basil contract:
 
-    zos add Basil
+```
+zos add Basil
+```
 
 To have your `zos.json` file always up-to-date, run `zos add` for every
 new contract you add to your project.
 
-To link our Basil contract to the OpenZeppelin standard library, we need an Ethereum network where the standard library has already been deployed. But first we want to test this in a local development network, so let's prepare truffle writing this in `truffle.js`:
+By now, the json files looks like this:
 
-    module.exports = {
-      networks: {
-        development: {
-          host: "localhost",
-          port: 9545,
-          network_id: "*"
-        }
-      }
-    };
+```
+{
+  "name": "Basil",
+  "version": "0.0.1",
+  "contracts": {
+    "Basil": "Basil"
+  }
+}
+```
 
-Then, in a separate terminal, run:
+OpenZeppelin will use this file to track your project's contracts on chain, making them upgradeable and dynamically linkable to pre-deployed libraries, as well see soon.
 
-    truffle develop
+## Deploying our first version of Basil, locally
 
-Truffle develop will print 10 accounts. Copy the address of the first one, and then back into the initial terminal, export it as the `OWNER` because it will be useful for us later:
+Let's start a local ethereum network:
 
-    export OWNER=<address>
+```
+ganache-cli --deterministic
+```
 
-OK, so we finish this step by linking the standard library and pushing our application to the network:
+This will print 10 accounts. Copy the address of the first one, and then back into the initial terminal, export it as the `OWNER` because it will be useful for us later:
 
-    zos link openzeppelin-zos
-    zos push --network development --deploy-stdlib
+```
+export OWNER=<address>
+```
 
-We pass that `--deploy-stdlib` flag because we are using a development network that started clean. When you deploy your application to a real network where the `openzeppelin-zos` standard library has already been deployed, you won't need this flag.
+Then, to deploy our app:
+
+```
+zos push --network development
+```
 
 The first time you run this command for a specific network, a new
 `zos.<network>.json` will be created. This file will reflect the status
-of your project in that network.
+of your project in that specific network, including contract deployed addresses, versions, contract proxies, etc.
 
-## Upgrading a contract
+## Proxies
 
-The rules for our basil lights will now be set in stone, enforced by the immutability of the Ethereum blockchain. This sounded great... until we found an embarrassing bug: we are never updating `highestDonation`! The donations would not grow as we expect because the stakes will never be higher than 10 wei. Luckily we caught this before going to mainnet, but are we sure that our contract is bullet proof and something like this will never happen again? The same feature that makes Ethereum secure is now making us feel insecure about our programming abilities and scared of finding a security vulnerability too late.
+Notice how the file `zos.development.json` lists a series of "contracts" and "proxies". The first represent implementations for a specific contract name, while the second represent the actual proxies that people will interact with in the blockchain. 
 
-Fear not, ZeppelinOS allows us to keep the transparency and immutability of a deployed version of a contract, but also to opt for a contract in which the owner can upgrade the implementation. This is done through a proxy that forwards the calls to the latest implementation of the contract. To create a proxy for Basil, run:
+A proxy is a wrapper for an implementation, that allows it to be updated, while mainting it's state. We need to create a proxy for Basil.
 
-    zos create Basil --network development --init --args $OWNER
+```
+zos create Basil --network development --init --args $OWNER
+```
 
-Let's fix our bug. Edit `contracts/Basil.sol` to add the missing line to the `donate` function:
+Take a look at `zos.development.json` again. You will see that we now have a proxy for Basil. This is the address to use in a Dapp.
 
-    function donate(uint256 _red, uint256 _green, uint256 _blue) public payable {
-      require(_red < 256);
-      require(_green < 256);
-      require(_blue < 256);
-      require(msg.value > highestDonation);
-      red = _red;
-      green = _green;
-      blue = _blue;
-      highestDonation = msg.value;
-      emit NewDonation(msg.sender, msg.value, red, green, blue);
-    }
+## Upgrading the contract
 
-And to finish our fix, we compile the patched contract, sync with ZeppelinOS and upgrade the proxy:
-
-    zos upgrade Basil <proxy_address_1> --network development
-
-## Upgrading the Migratable initialize
+If we ever found a bug in Basil, we would need to upgrade our zos package, provide a new implementation for Basil with a fix and tell our proxy to upgrade to the new implementation. This would preserve all the previous donation history, while seamlessly patching the bug.
 
 Another common thing that happens when developing smart contracts for Ethereum is that new standards appear, all the new kids implement them in their contracts, and a very cool synergy between contracts starts to happen. The people who have immutable contracts already deployed will miss all the fun. This has just happened to us: it would be very nice to encourage donations to Basil by emitting a unique ERC721 token in exchange. Well, let's upgrade the contract with ZeppelinOS to do just that.
 
-We could modify `contracts/Basil.sol` as before. But now let's try something different. Let's make a new contract in `contracts/BasilERC721.sol`, that inherits from our initial version of Basil:
+We could modify `contracts/Basil.sol`. But now let's try something else. Let's make a new contract in `contracts/BasilERC721.sol`, that inherits from our initial version of Basil:
 
-    pragma solidity ^0.4.23;
+```
+pragma solidity ^0.4.21;
 
-    import "./Basil.sol";
-    import "openzeppelin-zos/contracts/token/ERC721/MintableERC721Token.sol";
+import "./Basil.sol";
+import "openzeppelin-zos/contracts/token/ERC721/MintableERC721Token.sol";
+import "openzeppelin-zos/contracts/math/SafeMath.sol";
 
-    contract BasilERC721 is Basil {
-      using SafeMath for uint256;
+contract BasilERC721 is Basil {
+  using SafeMath for uint256;
 
-      // ERC721 non-fungible tokens to be emitted on donations.
-      MintableERC721Token public token;
-      uint256 public numEmittedTokens;
+  // ERC721 non-fungible tokens to be emitted on donations.
+  MintableERC721Token public token;
+  uint256 public numEmittedTokens;
 
-      function initialize(MintableERC721Token _token) public isInitializer("Basil", "1") {
-        require(_token != address(0));
-        require(token == address(0));
-        token = _token;
-      }
+  function setToken(MintableERC721Token _token) external onlyOwner {
+    require(_token != address(0));
+    require(token == address(0));
+    token = _token;
+  }
 
-      function donate(uint256 _red, uint256 _green, uint256 _blue) public payable {
-        super.donate(_red, _green, _blue);
-        emitUniqueToken(tx.origin);
-      }
+  function donate(uint256 _r, uint256 _g, uint256 _b) public payable {
+    super.donate(_r, _g, _b);
+    emitUniqueToken(tx.origin);
+  }
 
-      function emitUniqueToken(address _tokenOwner) internal {
-        token.mint(_tokenOwner, numEmittedTokens);
-        numEmittedTokens = numEmittedTokens.add(1);
-      }
-    }
+  function emitUniqueToken(address _tokenOwner) internal {
+    token.mint(_tokenOwner, numEmittedTokens);
+    numEmittedTokens = numEmittedTokens.add(1);
+  }
+}
+```
 
 A few things to note:
- * This new version extends from the previous one. This is a very handy pattern, because the proxy used in ZeppelinOS requires new versions to preserve the state variables.
- * We increased the second argument of `isInitializer`. This is the `migrationId`, and is used to keep track of what initializations we need to execute. The `initialize` with `migrationId` 0 was executed when we first deployed Basil, so we set this id to 1.
- * We can add new state variables and new functions. The only thing that we can't do on a contract upgrade is to remove state variables.
+  * This new version extends from the previous one. This is a very handy pattern, because the proxy used in ZeppelinOS requires new versions to preserve the state variables.
+  * We can add new state variables and new functions. The only thing that we can't do on a contract upgrade is to remove state variables.
+
+Let's create a new version of our app, to hold the new contracts:
+
+```
+zos bump 0.0.2
+```
 
 Let's add this version to our ZeppelinOS application and push to the network again:
 
-    zos add BasilERC721 Basil
-    zos push --network development
+```
+truffle compile
+zos add BasilERC721:Basil
+zos push --network development
+```
 
 This will print the address of the deployed Basil contract. Let's export this value to use it later:
 
-    export BASIL_ADDRESS=<address>
+```
+export BASIL_ADDRESS=<address>
+```
 
-We need to pass a token to the new `initialize` of our new version of Basil. Because we previously linked to the standard library that provides a MintableERC721Token implementation, let's just use that one:
+Now, to upgrade our proxy:
 
-    zos create-proxy MintableERC721Token --from $OWNER --init --args $BASIL_ADDRESS,BasilToken,BSL --network development
+```
+zos upgrade Basil $BASIL_ADDRESS --from $OWNER --network development
+```
 
-The new versions of our application's contracts were deployed to the network. However, the previously deployed proxies are still running with the old implementations. To finish the upgrade, run:
+By now, Basil's proxy will use the new implementation, but it will revert on every donation because it's token is not set. We'll do that next.
 
-    zos upgrade Basil --network development
+## Connecting to OpenZeppelin's standard library
+
+So far, we've used ZeppelinOS to seamlessly upgrade our app's contracts. We will now use it to create a proxy for a pre-deployed ERC721 token implementation.
+
+The first thing we need to do, is tell our app to link to the `openzeppelin-zos` standard library release:
+
+```
+zos link openzeppelin-zos
+zos push --deploy-stdlib --network development
+```
+
+Notice the `--deploy-stdlib` option we've used. What this does is inject a version of the standard lib in our development network. Since we're working on a local blockchain, ZeppelinOS's contracts don't exist. This handy option solves that problem for us quite conveniently ^^
+
+Now, to create a proxy for the token:
+
+```
+zos create MintableERC721Token --from $OWNER --init --args \"$BASIL_ADDRESS\",\"BasilToken\",\"BSL\" --network development
+```
+
+This command will output the token's new proxy address. Lets use it to set it in our new BasilERC721 version:
+
+```
+export TOKEN_ADDRESS=<address>
+echo "BasilERC721.at(\"$BASIL_ADDRESS\").setToken(\"$TOKEN_ADDRESS\", {from: \"$OWNER\"})" | truffle console --network development
+```
+
+That's it! Now you know how to use ZeppelinOS to develop upgradeable apps. Have a look at the scripts `deploy/deploy_with_cli_v1.sh` and `deploy/deploy_with_cli_v2.sh` to review what we've gone over in the guide.
+
+Stay tuned for more advanced turorials!
