@@ -219,7 +219,7 @@ export BASIL_ADDRESS=<address>
 Now, to upgrade our proxy:
 
 ```
-zos upgrade Basil $BASIL_ADDRESS --from $OWNER --network development
+zos upgrade Basil --from $OWNER --network development
 ```
 
 By now, Basil's proxy will use the new implementation, but it will revert on every donation because it's token is not set. We'll do that next.
