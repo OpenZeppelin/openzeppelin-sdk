@@ -9,23 +9,31 @@ The following steps will get you started using ZeppelinOS.
 
 `zos` is the command line interface to ZeppelinOS. To install it, run:
 
-    npm install --global zos
+```
+npm install --global zos
+```
 
 ## Set up the application
 
 `zos` integrates with Truffle. To set it up, run:
 
-    npm install --global truffle
-    mkdir myproject && cd myproject
-    truffle init
+```
+npm install --global truffle
+mkdir myproject && cd myproject
+truffle init
+```
 
 You now need to initialize the `npm` project with:
 
-    npm init
+```
+npm init
+```
 
 Finally, to initialize the `zos` application, run:
 
-    zos init myproject 0.0.1
+```
+zos init myproject 0.0.1
+```
 
 This will create a `zos.json` file, which will contain all the information about your project. For information about the format of this file, please see our [Advanced topics](advanced.md) section. 
 

@@ -8,14 +8,16 @@ We expand on several advanced topics for the more intrepid users of ZeppelinOS.
 ## Preserving the storage structure
 As mentioned in the [Building upgradeable applications](building-upgradeable.md) guide, when upgrading your contracts, you need to make sure that all variables declared in prior versions are kept in the code. New variables must be declared below the previously existing ones, as such:
 
-    contract MyContract_v1 {
-      uint256 public x;
-    }
+```
+contract MyContract_v1 {
+  uint256 public x;
+}
 
-    contract MyContract_v2 {
-      uint256 public x;
-      uint256 public y;
-    }
+contract MyContract_v2 {
+  uint256 public x;
+  uint256 public y;
+}
+```
 
 Note that this must be so _even if you no longer use the variables_. There is no restriction (apart from gas limits) on including new variables in the upgraded versions of your contracts, or on removing or adding functions. 
 
@@ -25,8 +27,10 @@ This necessity is due to how [Solidity uses the storage space](https://solidity.
 As we saw in the [Building upgradeable applications](building-upgradeable.md) guide, we did not include a constructor in our contracts, but used instead an `initialize` function. The reason for this is that constructors do not work as regular functions: they are invoked once upon a contract's creation, but their code is never stored in the blockchain. This means that they cannot be called from the contract's proxy as we call other functions. Thus, if we want to initialize variables in the _proxy's storage_, we need to include a regular function for doing so. 
 
 The ZeppelinOS CLI provides a way for calling this function and passing it the necessary arguments when creating the proxy:
-    
-    zos create MyContract --init <initializingFunction> --args <arguments> --network <network>
+
+```    
+zos create MyContract --init <initializingFunction> --args <arguments> --network <network>
+```
 
 where `<initializingFunction>` is the name of the initializing function (marked with an `isInitializer` modifier in the code), and `<arguments>` is a comma-separated list of arguments to the function. 
 
@@ -35,82 +39,86 @@ ZeppelinOS's CLI generates `json` files where it stores the configuration of you
 
 ### `zos.json`
 The first file stores the general configuration and is created by the `zos init` command. It has the following structure:
-    
-    {
-      "name": <projectName>
-      "version": <version>
-      "contracts": {
-        <contract1Alias>: <contract1Name>,
-        <contract2Alias>: <contract2Name>,
-        ...
-        <contractNAlias>: <contractNName>
-      },
-      "stdlib": {
-        "name": <stdlibName>
-      }
-    }
+
+```    
+{
+  "name": <projectName>
+  "version": <version>
+  "contracts": {
+    <contract1Alias>: <contract1Name>,
+    <contract2Alias>: <contract2Name>,
+    ...
+    <contractNAlias>: <contractNName>
+  },
+  "stdlib": {
+    "name": <stdlibName>
+  }
+}
+```
 
 Here, `<projectName>` is the name of the project, and `<version>` is the current version name or number. Once you start adding your contracts via `zos add`, they will be recorded under the `"contracts"` field, with `<contractiAlias>` the aliases (which default to the contract names, and `i` goes from `1` to `N`), and `<contractiName>` the names. Finally, if you link an `stdlib` with `zos link`, this will be reflected in the `"stdlib"` field, where `<stdlibName>` is the name of the linked `stdlib`. 
 
 ### `zos.<network>.json`
 ZeppelinOS will also generate a file for each of the networks you work in (`development`, `ropsten`, `live`, ... These should be configured [in your `truffle.js` file](http://truffleframework.com/docs/advanced/configuration#networks)). These files share the same structure:
 
-    {
-      "contracts": {
-        <contract1Name>: {
-          "address": <contract1Address>,
-          "bytecodeHash": <contract1Hash>
-        },
-        <contract2Name>: {
-          "address": <contract2Address>,
-          "bytecodeHash": <contract2Hash>
-        },
-        ...
-        <contractNName>: {
-          "address": <contractNAddress>,
-          "bytecodeHash": <contractNHash>
-        }
-      },
-      "proxies": { 
-        <contract1Name>: [
-            {
-              "address": <proxy1Address>,
-              "version": <proxy1Version>,
-              "implementation": <implementation1Address>
-            }
-          ],
-          <contract2Name>: [
-            {
-              "address": <proxy2Address>,
-              "version": <proxy2Version>,
-              "implementation": <implementation2Address>
-            }
-          ],
-          ...
-          <contractNName>: [
-            {
-              "address": <proxyNAddress>,
-              "version": <proxyNVersion>,
-              "implementation": <implementationNAddress>
-            }
-          ]
-      }, 
-      "app": {
-        "address": <appAddress>
-      },
-      "version": <appVersion>,
-      "package": {
-        "address": <packageAddress>
-      },
-      "provider": {
-        "address": <providerAddress>
-      },
-      "stdlib": {
-        "address": <stdlibAddress>,
-        ["customDeploy": <customDeploy>,]
-        "name": <stdlibName>
-      }
+```
+{
+  "contracts": {
+    <contract1Name>: {
+      "address": <contract1Address>,
+      "bytecodeHash": <contract1Hash>
+    },
+    <contract2Name>: {
+      "address": <contract2Address>,
+      "bytecodeHash": <contract2Hash>
+    },
+    ...
+    <contractNName>: {
+      "address": <contractNAddress>,
+      "bytecodeHash": <contractNHash>
     }
+  },
+  "proxies": { 
+    <contract1Name>: [
+        {
+          "address": <proxy1Address>,
+          "version": <proxy1Version>,
+          "implementation": <implementation1Address>
+        }
+      ],
+      <contract2Name>: [
+        {
+          "address": <proxy2Address>,
+          "version": <proxy2Version>,
+          "implementation": <implementation2Address>
+        }
+      ],
+      ...
+      <contractNName>: [
+        {
+          "address": <proxyNAddress>,
+          "version": <proxyNVersion>,
+          "implementation": <implementationNAddress>
+        }
+      ]
+  }, 
+  "app": {
+    "address": <appAddress>
+  },
+  "version": <appVersion>,
+  "package": {
+    "address": <packageAddress>
+  },
+  "provider": {
+    "address": <providerAddress>
+  },
+  "stdlib": {
+    "address": <stdlibAddress>,
+    ["customDeploy": <customDeploy>,]
+    "name": <stdlibName>
+  }
+}
+```
 
 The most important thing to see here are the proxies and contracts' addresses, `<proxyiAddress>` and `<contractiAddress>` respectively. What will happen is that each time you upgrade your contracts, `<contractiAddress>` will change, reflecting the underlying implementation change. The proxy addresses, however, will stay the same, so you can interact seamlessly with the same addresses as if no change had taken place. Note that `<implementationiAddress>` will normally point to the current contract address `<contractiAddress>`. Finally, `<contractiHash>` stores a SHA256 hash of the contract bytecode. 
 
