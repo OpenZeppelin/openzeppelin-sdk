@@ -31,5 +31,4 @@ Two demo apps based on ZeppelinOS are described in [Basil](basil.md) and [Crafty
 
 ## Team
 
-ZeppelinOS is developed by the [Zeppelin team](https://zeppelin.solutions/),
-with contributions from the community.
+ZeppelinOS was started and is sponsored by [Zeppelin](https://zeppelin.solutions/).

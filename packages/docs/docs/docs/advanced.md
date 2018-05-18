@@ -31,4 +31,92 @@ The ZeppelinOS CLI provides a way for calling this function and passing it the n
 where `<initializingFunction>` is the name of the initializing function (marked with an `isInitializer` modifier in the code), and `<arguments>` is a comma-separated list of arguments to the function. 
 
 ## Format of `zos.json` and `zos.<network>.json` files
+ZeppelinOS's CLI generates `json` files where it stores the configuration of your project.
+
+### `zos.json`
+The first file stores the general configuration and is created by the `zos init` command. It has the following structure:
+    
+    {
+      "name": <projectName>
+      "version": <version>
+      "contracts": {
+        <contract1Alias>: <contract1Name>,
+        <contract2Alias>: <contract2Name>,
+        ...
+        <contractNAlias>: <contractNName>
+      },
+      "stdlib": {
+        "name": <stdlibName>
+      }
+    }
+
+Here, `<projectName>` is the name of the project, and `<version>` is the current version name or number. Once you start adding your contracts via `zos add`, they will be recorded under the `"contracts"` field, with `<contractiAlias>` the aliases (which default to the contract names, and `i` goes from `1` to `N`), and `<contractiName>` the names. Finally, if you link an `stdlib` with `zos link`, this will be reflected in the `"stdlib"` field, where `<stdlibName>` is the name of the linked `stdlib`. 
+
+### `zos.<network>.json`
+ZeppelinOS will also generate a file for each of the networks you work in (`development`, `ropsten`, `live`, ... These should be configured [in your `truffle.js` file](http://truffleframework.com/docs/advanced/configuration#networks)). These files share the same structure:
+
+    {
+      "contracts": {
+        <contract1Name>: {
+          "address": <contract1Address>,
+          "bytecodeHash": <contract1Hash>
+        },
+        <contract2Name>: {
+          "address": <contract2Address>,
+          "bytecodeHash": <contract2Hash>
+        },
+        ...
+        <contractNName>: {
+          "address": <contractNAddress>,
+          "bytecodeHash": <contractNHash>
+        }
+      },
+      "proxies": { 
+        <contract1Name>: [
+            {
+              "address": <proxy1Address>,
+              "version": <proxy1Version>,
+              "implementation": <implementation1Address>
+            }
+          ],
+          <contract2Name>: [
+            {
+              "address": <proxy2Address>,
+              "version": <proxy2Version>,
+              "implementation": <implementation2Address>
+            }
+          ],
+          ...
+          <contractNName>: [
+            {
+              "address": <proxyNAddress>,
+              "version": <proxyNVersion>,
+              "implementation": <implementationNAddress>
+            }
+          ]
+      }, 
+      "app": {
+        "address": <appAddress>
+      },
+      "version": <appVersion>,
+      "package": {
+        "address": <packageAddress>
+      },
+      "provider": {
+        "address": <providerAddress>
+      },
+      "stdlib": {
+        "address": <stdlibAddress>,
+        ["customDeploy": <customDeploy>,]
+        "name": <stdlibName>
+      }
+    }
+
+The most important thing to see here are the proxies and contracts' addresses, `<proxyiAddress>` and `<contractiAddress>` respectively. What will happen is that each time you upgrade your contracts, `<contractiAddress>` will change, reflecting the underlying implementation change. The proxy addresses, however, will stay the same, so you can interact seamlessly with the same addresses as if no change had taken place. Note that `<implementationiAddress>` will normally point to the current contract address `<contractiAddress>`. Finally, `<contractiHash>` stores a SHA256 hash of the contract bytecode. 
+
+The other thing to notice in these files are the version numbers (or names!). The `<appVersion>` keeps track of the latest app version, and matches `<version>` from `zos.json`. The `<proxyiVersion>`s, on the other hand, keep track of which version of the contracts the proxies are pointing to. Say you deploy a contract in your app version 0.0, and then bump the version to 0.1 and push some upgraded code for that same contract. This will be reflected in the `<contractiAddress>`, but not yet in the proxy, which will display 0.0 in `<proxyiVersion>` and the old contract implementation address in `<implementationiAddress>`. Once you run `zos upgrade` to your contract, `<proxyiVersion>` will show the new 0.1 version, and `<implementationiAddress>` will point to the new `<contractiAddress>`.
+
+Finally, the `stdlib` field stores information about a linked standard library. Its address is stored in `<stdlibAddress>`, and its name in `<stdlibName>`, matching that in `zos.json`. The `customDeploy` field will be present only when a version of the stdlib is deployed using the `--deploy-stdlib` flag of the `push` command, in which case `<customDeploy>` will be `true`. The remaining addresses, `<appAddress>`, `<packageAddress>`, and `<providerAddress>` store the addresses of the `App`, the `Package`, and the current `ContractProvider` respectively. 
+
+
 
