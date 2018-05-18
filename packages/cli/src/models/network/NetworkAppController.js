@@ -62,7 +62,7 @@ export default class NetworkAppController extends NetworkBaseController {
 
   async createProxy(contractAlias, initMethod, initArgs) {
     await this.fetch();
-    
+
     const contractClass = this.localController.getContractClass(contractAlias);
     this.checkInitialization(contractClass, initMethod, initArgs);
     const proxyInstance = await this.app.createProxy(contractClass, contractAlias, initMethod, initArgs);
@@ -104,10 +104,17 @@ export default class NetworkAppController extends NetworkBaseController {
       const contractClass = this.localController.getContractClass(contractAlias);
       this.checkUpgrade(contractClass, initMethod, initArgs);
       return _.map(contractProxyInfos, async (proxyInfo) => {
-        await this.app.upgradeProxy(proxyInfo.address, contractClass, contractAlias, initMethod, initArgs);
-        const implementationAddress = await this.app.getImplementation(contractAlias);
         proxyInfo.version = newVersion;
-        proxyInfo.implementation = implementationAddress;
+        const currentImplementation = await this.app.getProxyImplementation(proxyInfo.address)
+        const contractImplementation = await this.app.getImplementation(contractAlias)
+        if(currentImplementation !== contractImplementation) {
+          await this.app.upgradeProxy(proxyInfo.address, contractClass, contractAlias, initMethod, initArgs);
+          proxyInfo.implementation = await this.app.getImplementation(contractAlias);
+        }
+        else {
+          log.info(`Contract ${contractAlias} at ${proxyInfo.address} is up to date.`)
+          proxyInfo.implementation = currentImplementation
+        }
       });
     }));
 
