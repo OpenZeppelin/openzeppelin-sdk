@@ -83,7 +83,6 @@ export default class App {
   }
 
   async createProxy(contractClass, contractName, initMethodName, initArgs) {
-    log.info(`Creating ${contractName} proxy...`)
     const { receipt } = typeof(initArgs) === 'undefined'
       ? await this._createProxy(contractName)
       : await this._createProxyAndCall(contractClass, contractName, initMethodName, initArgs)
@@ -97,31 +96,34 @@ export default class App {
   }
 
   async upgradeProxy(proxyAddress, contractClass, contractName, initMethodName, initArgs) {
-    log.info(`Updating ${contractName} proxy...`)
     const { receipt } = typeof(initArgs) === 'undefined'
-      ? await this._updateProxy(proxyAddress, contractName)
-      : await this._updateProxyAndCall(proxyAddress, contractClass, contractName, initMethodName, initArgs)
+      ? await this._upgradeProxy(proxyAddress, contractName)
+      : await this._upgradeProxyAndCall(proxyAddress, contractClass, contractName, initMethodName, initArgs)
     log.info(` TX receipt received: ${receipt.transactionHash}`)
   }
 
   async _createProxy(contractName) {
+    log.info(`Creating ${contractName} proxy without initializing...`)
     return this._app.create(contractName, this.txParams)
   }
 
-  async _createProxyAndCall(contractClass, contractName, initMethodName, initArgs) {
+  async _createProxyAndCall(contractClass, contractName, initMethodName, initArgs) {    
     const initMethod = this._validateInitMethod(contractClass, initMethodName, initArgs)
     const initArgTypes = initMethod.inputs.map(input => input.type)
+    log.info(`Creating ${contractName} proxy and calling ${this._callInfo(initMethod, initArgs)}...`)
     const callData = encodeCall(initMethodName, initArgTypes, initArgs)
     return this._app.createAndCall(contractName, callData, this.txParams)
   }
 
-  async _updateProxy(proxyAddress, contractName) {
+  async _upgradeProxy(proxyAddress, contractName) {
+    log.info(`Upgrading ${contractName} proxy without running migrations...`)
     return this._app.upgrade(proxyAddress, contractName, this.txParams)
   }
 
-  async _updateProxyAndCall(proxyAddress, contractClass, contractName, initMethodName, initArgs) {
+  async _upgradeProxyAndCall(proxyAddress, contractClass, contractName, initMethodName, initArgs) {
     const initMethod = this._validateInitMethod(contractClass, initMethodName, initArgs)
     const initArgTypes = initMethod.inputs.map(input => input.type)
+    log.info(`Upgrading ${contractName} proxy and calling ${this._callInfo(initMethod, initArgs)}...`)
     const callData = encodeCall(initMethodName, initArgTypes, initArgs)
     return this._app.upgradeAndCall(proxyAddress, contractName, callData, this.txParams)
   }
@@ -130,5 +132,9 @@ export default class App {
     const initMethod = contractClass.abi.find(fn => fn.name === initMethodName && fn.inputs.length === initArgs.length)
     if (!initMethod) throw `Could not find initialize method '${initMethodName}' with ${initArgs.length} arguments in contract class`
     return initMethod
+  }
+
+  _callInfo(initMethod, initArgs) {
+    return `${initMethod.name}(${initMethod.inputs.map(i => i.type).join(',')}) with ${JSON.stringify(initArgs).replace(/^\[|\]$/g, "")}`;
   }
 }
