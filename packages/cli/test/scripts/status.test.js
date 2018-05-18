@@ -1,4 +1,3 @@
-
 'use strict'
 require('../setup')
 
@@ -16,13 +15,13 @@ import TestLogger from '../helpers/logger.js';
 contract('status command', function([_, owner]) {
   const txParams = { from: owner };
   const appName = "MyApp";
+  const version = "0.1.0";
+  const network = "test";
   const contractName = "ImplV1";
   const contractAlias = "Impl";
   const contractsData = [{ name: contractName, alias: contractAlias }]
   const anotherContractName = "AnotherImplV1";
-  const version = "0.1.0";
-  const network = "test";
-  const stdlibNameVersion = 'mock-stdlib@0.1.0';
+  const stdlibNameVersion = 'mock-stdlib@1.1.0';
   const packageFileName = "test/tmp/zos.json";
   const networkFileName = `test/tmp/zos.${network}.json`;
   
@@ -154,7 +153,7 @@ contract('status command', function([_, owner]) {
         await linkStdlib({ packageFileName, stdlibNameVersion, installDeps: false });
         await status({ network, packageFileName, networkFileName, logger });
 
-        logger.text.should.match(/mock-stdlib@0.1.0 required/i);
+        logger.text.should.match(/mock-stdlib@1.1.0 required/i);
         logger.text.should.match(/no stdlib is deployed/i);
       });
 
@@ -163,18 +162,18 @@ contract('status command', function([_, owner]) {
         await push({ packageFileName, network, txParams });
         await status({ network, packageFileName, networkFileName, logger });
 
-        logger.text.should.match(/mock-stdlib@0.1.0 required/i);
+        logger.text.should.match(/mock-stdlib@1.1.0 required/i);
         logger.text.should.match(/correctly connected to stdlib/i);
       });
 
       it('should log different stdlib connected', async function () {
         await init({ name: appName, stdlibNameVersion, version, packageFileName });
         await push({ packageFileName, network, txParams });
-        await linkStdlib({ packageFileName, stdlibNameVersion: 'mock-stdlib-2@0.2.0', installDeps: false });
+        await linkStdlib({ packageFileName, stdlibNameVersion: 'mock-stdlib-2@1.2.0', installDeps: false });
         await status({ network, packageFileName, networkFileName, logger });
 
-        logger.text.should.match(/mock-stdlib-2@0.2.0 required/i);
-        logger.text.should.match(/connected to different stdlib mock-stdlib@0.1.0/i);
+        logger.text.should.match(/mock-stdlib-2@1.2.0 required/i);
+        logger.text.should.match(/connected to different stdlib mock-stdlib@1.1.0/i);
       });
 
       it('should log deployed stdlib', async function () {
@@ -182,18 +181,18 @@ contract('status command', function([_, owner]) {
         await push({ packageFileName, network, txParams, deployStdlib: true });
         await status({ network, packageFileName, networkFileName, logger });
 
-        logger.text.should.match(/mock-stdlib@0.1.0 required/i);
+        logger.text.should.match(/mock-stdlib@1.1.0 required/i);
         logger.text.should.match(/custom deploy of stdlib set at 0x[0-9a-fA-F]{40}/i);
       });
 
       it('should log different stdlib connected', async function () {
         await init({ name: appName, stdlibNameVersion, version, packageFileName });
         await push({ packageFileName, network, txParams, deployStdlib: true });
-        await linkStdlib({ packageFileName, stdlibNameVersion: 'mock-stdlib-2@0.2.0', installDeps: false });
+        await linkStdlib({ packageFileName, stdlibNameVersion: 'mock-stdlib-2@1.2.0', installDeps: false });
         await status({ network, packageFileName, networkFileName, logger });
 
-        logger.text.should.match(/mock-stdlib-2@0.2.0 required/i);
-        logger.text.should.match(/custom deploy of different stdlib mock-stdlib@0.1.0 at 0x[0-9a-fA-F]{40}/i);
+        logger.text.should.match(/mock-stdlib-2@1.2.0 required/i);
+        logger.text.should.match(/custom deploy of different stdlib mock-stdlib@1.1.0 at 0x[0-9a-fA-F]{40}/i);
       });
     });
   };

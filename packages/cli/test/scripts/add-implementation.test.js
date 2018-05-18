@@ -1,12 +1,12 @@
 'use strict'
 require('../setup')
 
-import init from "../../src/scripts/init.js";
-import addImplementation from "../../src/scripts/add-implementation.js";
+import { Logger, FileSystem as fs } from 'zos-lib';
 import { cleanup, cleanupfn } from "../helpers/cleanup.js";
-import { FileSystem as fs, Logger } from 'zos-lib';
-import { editJson } from '../helpers/json.js';
+
+import init from "../../src/scripts/init.js";
 import CaptureLogs from '../helpers/captureLogs';
+import addImplementation from "../../src/scripts/add-implementation.js";
 
 contract('add-implementation command', function() {
   const packageFileName = "test/tmp/zos.json";
@@ -30,7 +30,7 @@ contract('add-implementation command', function() {
   });
 
   it('should add an implementation for a lib', function() {
-    editJson(packageFileName, p => { p.lib = true; });
+    fs.editJson(packageFileName, p => { p.lib = true; });
     addImplementation({ contractsData, packageFileName});
     const data = fs.parseJson(packageFileName);
     data.contracts[contractAlias].should.eq(contractName);

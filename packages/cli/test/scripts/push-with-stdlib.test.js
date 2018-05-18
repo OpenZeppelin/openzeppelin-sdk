@@ -2,16 +2,11 @@
 require('../setup')
 
 import push from '../../src/scripts/push.js';
-import { FileSystem as fs } from 'zos-lib'
+import { App, FileSystem as fs } from 'zos-lib'
 import { cleanup, cleanupfn } from '../helpers/cleanup';
 
-const Package = artifacts.require('Package');
-const PackagedApp = artifacts.require('PackagedApp');
-const AppDirectory = artifacts.require('AppDirectory');
-
 contract('push-with-stdlib command', function([_, owner]) {
-  const from = owner;
-  const txParams = { from };
+  const txParams = { from: owner };
   const network = "test";
   const defaultVersion = "1.0";
 
@@ -39,21 +34,17 @@ contract('push-with-stdlib command', function([_, owner]) {
     });
 
     describe('on app', function () {
-
       beforeEach('loading app', async function () {
         const address = fs.parseJson(networkFileName).app.address;
-        this.app = await PackagedApp.at(address);
+        this.app = await App.fetch(address);
       });
 
       it('should set version', async function () {
-        (await this.app.version()).should.eq(defaultVersion);
+        (await this.app.version).should.eq(defaultVersion);
       });
 
       it('should set stdlib', async function () {
-        const appPackage = await Package.at(await this.app.package());
-        const provider = await AppDirectory.at(await appPackage.getVersion(defaultVersion));
-        const stdlib = await provider.stdlib();
-
+        const stdlib = await this.app.currentStdlib();
         stdlib.should.be.nonzeroAddress;
       });
 
@@ -70,11 +61,9 @@ contract('push-with-stdlib command', function([_, owner]) {
         const address = await this.app.getImplementation('Greeter');
         address.should.be.nonzeroAddress;
       });
-
     });
 
     describe('followed by push', function () {
-
       const stdlibPackageAddress = '0x0000000000000000000000000000000000000010';
       
       beforeEach('running push', async function () {
@@ -90,18 +79,14 @@ contract('push-with-stdlib command', function([_, owner]) {
 
       it('should preserve stdlib address in provider', async function () {
         const address = fs.parseJson(networkFileName).app.address;
-        const app = await PackagedApp.at(address);
-        const appPackage = await Package.at(await app.package());
-        const provider = await AppDirectory.at(await appPackage.getVersion(defaultVersion));
-        const stdlib = await provider.stdlib();
+        const app = await App.fetch(address)
+        const stdlib = await app.currentStdlib();
 
         stdlib.should.eq(this.stdlibAddress);
       });
-
     });
 
     describe('followed by push with a different stdlib', function () {
-
       const stdlib2PackageAddress = '0x0000000000000000000000000000000000000210';
       const packageFileName = "test/mocks/packages/package-with-contracts-and-stdlib-v2.zos.json";
 
@@ -116,16 +101,11 @@ contract('push-with-stdlib command', function([_, owner]) {
 
       it('should set stdlib address in provider', async function () {
         const address = fs.parseJson(networkFileName).app.address;
-        const app = await PackagedApp.at(address);
-        const appPackage = await Package.at(await app.package());
-        const provider = await AppDirectory.at(await appPackage.getVersion(defaultVersion));
-        const stdlib = await provider.stdlib();
+        const app = await App.fetch(address)
+        const stdlib = await app.currentStdlib();
 
         stdlib.should.eq(stdlib2PackageAddress);
       });
-
     });
-    
   });
-
 });

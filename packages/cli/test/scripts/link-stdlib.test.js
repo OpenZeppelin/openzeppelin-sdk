@@ -1,11 +1,11 @@
 'use strict'
 require('../setup')
 
+import { FileSystem as fs } from 'zos-lib';
+import { cleanup, cleanupfn } from "../helpers/cleanup.js";
+
 import init from "../../src/scripts/init.js";
 import linkStdlib from "../../src/scripts/link-stdlib.js";
-import { cleanup, cleanupfn } from "../helpers/cleanup.js";
-import { FileSystem as fs } from 'zos-lib';
-import { editJson } from '../helpers/json.js';
 
 contract('link-stdlib command', function() {
   const appName = "MyApp";
@@ -27,8 +27,12 @@ contract('link-stdlib command', function() {
   });
 
   it('should refuse to set a stdlib for a lib project', async function () {
-    editJson(packageFileName, p => { p.lib = true; });
+    fs.editJson(packageFileName, p => { p.lib = true; });
     await linkStdlib({ stdlibNameVersion: 'mock-stdlib@1.1.0', packageFileName }).should.be.rejectedWith(/lib/);
   });
-  
+
+  it('should raise an error if requested version of stdlib does not match its package version', async function () {
+    await linkStdlib({ stdlibNameVersion: 'mock-stdlib-invalid@1.0.0', packageFileName })
+      .should.be.rejectedWith('Requested stdlib version 1.0.0 does not match stdlib package version 2.0.0')
+  });
 });

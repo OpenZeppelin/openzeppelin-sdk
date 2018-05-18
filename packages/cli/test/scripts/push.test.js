@@ -10,8 +10,6 @@ import bumpVersion from "../../src/scripts/bump-version";
 
 const ImplV1 = artifacts.require('ImplV1');
 const PackageContract = artifacts.require('Package');
-const PackagedApp = artifacts.require('PackagedApp');
-const AppDirectory = artifacts.require('AppDirectory');
 const ImplementationDirectory = artifacts.require('ImplementationDirectory');
 
 contract('push command', function([_, owner]) {
@@ -53,8 +51,9 @@ contract('push command', function([_, owner]) {
     it('should deploy app at specified address', async function () {
       const address = fs.parseJson(networkFileName).app.address;
       address.should.be.nonzeroAddress;
-      const app = await PackagedApp.at(address);
-      (await app.version()).should.eq(defaultVersion);
+
+      const app = await App.fetch(address);
+      app.version.should.be.eq(defaultVersion);
     });
   };
 
@@ -192,31 +191,41 @@ contract('push command', function([_, owner]) {
 
   describe('an app with stdlib', function () {
     const stdlibAddress = "0x0000000000000000000000000000000000000010";
-    const packageFileName = "test/mocks/packages/package-with-stdlib.zos.json";
-    const networkFileName = "test/mocks/packages/package-with-stdlib.zos.test.json";
 
-    beforeEach("pushing package-stdlib", async function () {
-      cleanup(networkFileName)
-      await push({ packageFileName, network, txParams })
-    });
+    describe('when using a valid stdlib', function () {
+      const packageFileName = "test/mocks/packages/package-with-stdlib.zos.json";
+      const networkFileName = "test/mocks/packages/package-with-stdlib.zos.test.json";
 
-    after(cleanupfn(networkFileName));
+      beforeEach("pushing package-stdlib", async function () {
+        cleanup(networkFileName)
+        await push({ packageFileName, network, txParams })
+      });
 
-    shouldDeployApp(networkFileName);
-    
-    it('should set stdlib in deployed app', async function () {
-      const address = fs.parseJson(networkFileName).app.address;
-      const app = await PackagedApp.at(address);
-      const appPackage = await PackageContract.at(await app.package());
-      const provider = await AppDirectory.at(await appPackage.getVersion(defaultVersion));
-      const stdlib = await provider.stdlib();
+      after(cleanupfn(networkFileName));
 
-      stdlib.should.eq(stdlibAddress);
-    });
+      shouldDeployApp(networkFileName);
 
-    it('should set address in network file', async function () {
-      fs.parseJson(networkFileName).stdlib.address.should.eq(stdlibAddress);
-    });
+      it('should set stdlib in deployed app', async function () {
+        const address = fs.parseJson(networkFileName).app.address;
+        const app = await App.fetch(address);
+        const stdlib = await app.currentStdlib();
+
+        stdlib.should.eq(stdlibAddress);
+      });
+
+      it('should set address in network file', async function () {
+        fs.parseJson(networkFileName).stdlib.address.should.eq(stdlibAddress);
+      });
+    })
+
+    describe('when using an invalid stdlib', function () {
+      const packageFileName = 'test/mocks/packages/package-with-invalid-stdlib.zos.json'
+
+      it('should set address in network file', async function () {
+        await push({ packageFileName, network, txParams })
+          .should.be.rejectedWith('Requested stdlib version 1.0.0 does not match stdlib network package version 3.0.0')
+      });
+    })
   });
 
   describe('an empty lib', function() {

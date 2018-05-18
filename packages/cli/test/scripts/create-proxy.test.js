@@ -1,15 +1,14 @@
 'use strict'
 require('../setup')
 
+import { Logger, FileSystem as fs } from "zos-lib";
+import { cleanup, cleanupfn } from "../helpers/cleanup.js";
+
 import init from "../../src/scripts/init.js";
 import push from "../../src/scripts/push.js";
-import { cleanup, cleanupfn } from "../helpers/cleanup.js";
-import { FileSystem as fs, Logger } from "zos-lib";
-import { editJson } from '../helpers/json.js';
 import createProxy from "../../src/scripts/create-proxy.js";
-import addImplementation from "../../src/scripts/add-implementation.js";
 import linkStdlib from "../../src/scripts/link-stdlib.js";
-import LocalAppController from '../../src/models/local/LocalAppController';
+import addImplementation from "../../src/scripts/add-implementation.js";
 import CaptureLogs from '../helpers/captureLogs';
 
 const ImplV1 = artifacts.require('ImplV1');
@@ -22,7 +21,7 @@ contract('create-proxy command', function([_, owner]) {
   const uninitializableContractName = "UninitializableImplV1";
   const uninitializableContractAlias = "UninitializableImpl";
   const contractsData = [
-    { name: contractName, alias: contractAlias}, 
+    { name: contractName, alias: contractAlias},
     { name: anotherContractName, alias: anotherContractAlias },
     { name: uninitializableContractName, alias: uninitializableContractAlias }
   ];
@@ -72,7 +71,7 @@ contract('create-proxy command', function([_, owner]) {
   });
 
   it('should refuse to create a proxy for a lib project', async function() {
-    editJson(packageFileName, p => { p.lib = true; });
+    fs.editJson(packageFileName, p => { p.lib = true; });
     await createProxy({ contractAlias, packageFileName, network, txParams }).should.be.rejectedWith(/lib/);
   });
 

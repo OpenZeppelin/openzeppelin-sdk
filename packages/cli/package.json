@@ -43,7 +43,7 @@
     "truffle-contract": "^3.0.5",
     "truffle-core": "^4.1.8",
     "truffle-workflow-compile": "^1.0.3",
-    "zos-lib": "^0.1.21"
+    "zos-lib": "^0.1.22"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",
@@ -57,6 +57,7 @@
     "chai-bignumber": "^2.0.2",
     "mock-stdlib": "file:./test/mocks/mock-stdlib",
     "mock-stdlib-2": "file:./test/mocks/mock-stdlib-2",
+    "mock-stdlib-invalid": "file:./test/mocks/mock-stdlib-invalid",
     "react": "^16.3.2",
     "react-dom": "^16.3.2"
   }
