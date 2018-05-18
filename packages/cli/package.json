@@ -31,6 +31,7 @@
   },
   "homepage": "https://github.com/zeppelinos/zos-cli#readme",
   "dependencies": {
+    "chalk": "^2.4.1",
     "colors": "^1.2.1",
     "commander": "^2.15.1",
     "ethereumjs-abi": "^0.6.5",
