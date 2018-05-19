@@ -5,8 +5,8 @@
     ],
     "GUIDES": [
       "setup",
-      "building-upgradeable",
-      "building-stdlib",
+      "building",
+      "using",
       "developing",
       "testing"
     ],

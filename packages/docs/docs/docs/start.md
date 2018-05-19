@@ -18,10 +18,10 @@ applications in Ethereum.
 Install ZeppelinOS and setup your project as described in the [Setup guide](setup.md).
 
 In order to use ZeppelinOS to build an upgradeable application, follow our
-[Building upgradeable applications](building-upgradeable.md) guide.
+[Building upgradeable applications](building.md) guide.
 
 If you would like to use the ZeppelinOS on-chain standard libraries in your app,
- follow our [Using the stdlib in your app](building-stdlib.md) guide. 
+ follow our [Using the stdlib in your app](using.md) guide. 
 
 Finally, if you are interested in deploying your own standard libraries for ZeppelinOS,
 see our [Developing a new standard library](developing.md) guide. 

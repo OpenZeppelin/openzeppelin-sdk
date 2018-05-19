@@ -1,5 +1,5 @@
 ---
-id: building-upgradeable
+id: building
 title: Building upgradeable applications
 sidebar_label: Building upgradeable apps
 ---
@@ -112,4 +112,4 @@ version.
 
 _Voilà!_ You have deployed and upgraded an application using ZeppelinOS. 
 
-If you want to use the ZeppelinOS standard libraries, please follow our [Using the stdlib in your app](building-stdlib.md) guide. You can also check the API reference with [all the available commands of zos](climain.md).
+If you want to use the ZeppelinOS standard libraries, please follow our [Using the stdlib in your app](using.md) guide. You can also check the API reference with [all the available commands of zos](climain.md).

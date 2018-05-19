@@ -16,11 +16,7 @@ const siteConfig = {
   headerLinks: [
     {
       href: 'https://zeppelinos.org',
-      label: 'Home',
-    },
-    {
-      doc: 'start',
-      label: 'Docs',
+      label: 'Main Site',
     },
     {
       doc: 'climain',
