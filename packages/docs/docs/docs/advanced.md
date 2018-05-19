@@ -5,6 +5,15 @@ title: Advanced topics
 
 We expand on several advanced topics for the more intrepid users of ZeppelinOS. 
 
+## The proxy system
+The upgradeability system in ZeppelinOS is based on a proxy system: for each deployed contract (the _implementation_), another, user-facing contract is deployed as well (the _proxy_). The proxy will be the one in charge of the contract's storage, but will forward all function calls to the backing implementation. The only exception to this are calls made by the owner of the proxy for administrative purposes, which will be handled by the proxy itself. 
+
+The way the proxy forwards calls to the implementation relies on [`delegatecall`](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-7.md), the mechanism the EVM provides to execute foreign code on local storage. This is normally used for libraries such as [`SafeMath`](https://github.com/OpenZeppelin/openzeppelin-solidity/blob/master/contracts/math/SafeMath.sol), which provide useful functionality but have no storage. ZeppelinOS, however, exploits this mechanism to provide upgradeability: a user only interacts with the proxy, and, when a new implementation is available, the proxy owner simply points it to the upgraded contract. All of this is achieved in a way that is transparent for the user, as the proxy address is always the same.
+
+If you want to find out more about different possible proxy patterns, be sure to check [this post](https://blog.zeppelinos.org/proxy-patterns/).
+
+
+
 ## Preserving the storage structure
 As mentioned in the [Building upgradeable applications](building.md) guide, when upgrading your contracts, you need to make sure that all variables declared in prior versions are kept in the code. New variables must be declared below the previously existing ones, as such:
 
