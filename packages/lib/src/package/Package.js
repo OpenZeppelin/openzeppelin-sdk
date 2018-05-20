@@ -66,7 +66,7 @@ export default class Package {
     const implementation = await contractClass.new(this.txParams)
     const release = await this.getRelease(version)
     await release.setImplementation(contractName, implementation.address, this.txParams)
-    log.info(' Implementation set:', implementation.address)
+    log.info(` Implementation set: ${implementation.address}`)
     return implementation
   }
 }
