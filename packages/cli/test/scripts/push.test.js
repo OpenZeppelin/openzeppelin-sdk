@@ -259,6 +259,11 @@ contract('push command', function([_, owner]) {
     shouldDeployProvider(networkFileName);
     shouldDeployContracts({ packageFileName, networkFileName });
     shouldBumpVersionAndUnfreeze({ networkFileName, packageFileName, newPackageFileName });
+
+    it('should refuse to push when frozen', async function() {
+      await freeze({ network, packageFileName, networkFileName, txParams })
+      await push({ packageFileName, network, networkFileName, txParams }).should.be.rejectedWith(/frozen/i)
+    });
   });
   
 });

@@ -39,4 +39,11 @@ export default class NetworkLibController extends NetworkBaseController {
     await this.package.freeze(this.networkPackage.version)
     this.networkPackage.frozen = true
   }
+
+  async uploadContracts(reupload) {
+    if (this.networkPackage.frozen) {
+      throw Error("Cannot upload contract implementations for a frozen release. Run zos bump first to create a new version.");
+    }
+    await super.uploadContracts(reupload);
+  }
 }
