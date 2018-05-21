@@ -5,8 +5,8 @@ title: ZeppelinOS
 
 Welcome to the ZeppelinOS Documentation Site!
 
-ZeppelinOS is a platform to develop, manage and operate smart contract
-applications in Ethereum.
+
+ZeppelinOS is a platform to develop, deploy and operate upgradeable smart contracts on Ethereum and every other EVM and eWASM-powered blockchain.
 
 ## Features
 

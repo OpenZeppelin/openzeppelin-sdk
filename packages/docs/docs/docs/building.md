@@ -1,21 +1,20 @@
 ---
 id: building
-title: Building upgradeable applications
-sidebar_label: Building upgradeable apps
+title: Building an upgradeable application
+sidebar_label: Building an upgradeable app
 ---
 
-After installing ZeppelinOS and setting up a `zos` project as described in the [Setup](setup.md) guide, you are ready to create an upgradeable application.
+After installing `zos` and setting up our ZeppelinOS project as described in the [setup](setup.md) guide, we are ready to create our upgradeable application.
 
-You can start by writing the contracts as you would normally do, but replacing constructors with
-`initialize` functions using the modifier from `zos-lib`. To install the lib:
+Let's start by installing the [ZeppelinOS lib](https://github.com/zeppelinos/zos-lib):
 
-```
+```sh
 npm install zos-lib
 ```
 
-A simple contract would look like this:
+Next, we will create a file named `MyContract.sol` in the `contracts/` folder of our app with the following Solidity code:
 
-```
+```sol
 import "zos-lib/contracts/migrations/Migratable.sol";
 
 contract MyContract is Migratable {
@@ -27,89 +26,63 @@ contract MyContract is Migratable {
 }
 ```
 
-You might have noted that our sample contract has an `initialize` function instead of the standard contstructor. This is a requirement of ZeppelinOS's upgradeabiltiy system, you can learn more about this in our [Advanced topics](advanced.md) section. 
+Notice that our sample contract has an `initialize` function instead of the standard constructor. This is a requirement of [ZeppelinOS's upgradeability system](advanced.md#initializers-vs-constructors).
 
-You can now compile the contract with:
+Let's now compile the contract:
 
-```
+```sh
 npx truffle compile
 ```
 
-## Initial Deployment
+> **Note**: bear in mind that the `push` command of the ZeppelinOS CLI also compiles the contracts, but we are compiling them explicitly here for clarity. If you want to prevent `zos push` from doing so, use the --skip-compile flag.
 
-Register all the contract implementations of the first version of your
-project running:
+## Initial deployment
 
-```
-zos add <contract_name_1>
-zos add <contract_name_2>
-...
-zos add <contract_name_n>
+To deploy our app, we need to register the first version of our contract:
+
+```sh
+zos add MyContract
 ```
 
-In our example, run:
+> **Note**: If you are working in a local development network like [Ganache](http://truffleframework.com/ganache/), you will need to [configure](http://truffleframework.com/docs/getting_started/project#alternative-migrating-with-ganache) your `truffle.js` file before running the `push` command.
 
-    zos add MyContract
+We can now push our application to the desired network by running:
 
-If you are working in a local development network like [Ganache](http://truffleframework.com/ganache/), you will need to [configure](http://truffleframework.com/docs/getting_started/project#alternative-migrating-with-ganache) your `truffle.js` file before running the `push` command.
-
-You can now push your application to the desired network by running:
-
-```
-zos push --network <network>
+```sh
+zos push --network development
 ```
 
-which will create a `zos.<network>.json` file with all the information specific to the chosen network. The format of this file is discussed in the [Advanced topics](advanced.md) section.
+This  will create a `zos.development.json` file with all the information specific to the chosen network. You can read more about this file in the [advanced topics](advanced.md#format-of-zosjson-and-zos-network-json-files) section.
 
-To create an upgradeable version of each of your contracts, run:
+To create an upgradeable version of our contract, we need to run:
 
-```
-zos create <contract_name_1> --network <network>
-zos create <contract_name_2> --network <network>
-...
-zos create <contract_name_n> --network <network>
-```
-
-This command takes an optional `--init` flag to call an initialization/migration
-function after you create the contract. In our simple example we want to pass a value (_e.g._: 42) to the initialize function:
-
-```
+```sh
 zos create MyContract --init initialize --args 42 --network development
 ```
 
-After these simple steps, your upgradeable application is now on-chain!
+The `create` command takes an optional `--init` flag to call the initialization function after creating the contract, while the `--args` flag allows us to pass arguments to it. This way, we are initializing our contract with `42` as the value of the `x` state variable.
 
-## Upgrading your contracts
 
-If, at a later stage, you want to upgrade your smart contracts' code in order to fix a bug or add a new feature, you can do it seamlessly using ZeppelinOS. 
+After these simple steps, our upgradeable application is now on-chain!
 
-Note that while ZeppelinOS supports arbitrary changes in functionality, you will need to preserve all variables that appear in prior versions of your contracts, declaring any new variables below the already existing ones. You can find details on this in the [Advanced topics](advanced.md) page. 
+## Upgrading our contract
 
-Once you've made the desired changes to your contracts, recompile them and push them to the network:
+If, at a later stage, we want to upgrade our smart contract's code in order to fix a bug or add a new feature, we can do it seamlessly using ZeppelinOS.
 
-```
-npx truffle compile
-zos push --network <network>
-```
+> **Note**: while ZeppelinOS supports arbitrary changes in functionality, you will need to preserve all variables that appear in prior versions of your contracts, declaring any new variables below the already existing ones. You can find details on this in the [advanced topics](advanced.md) page. 
 
-Then, upgrade the already deployed contracts:
+Once we have made the desired changes to our contracts, we need to push them to the network:
 
-```
-zos upgrade <contract_name_1> --network <network>
-zos upgrade <contract_name_2> --network <network>
-...
-zos upgrade <contract_name_n> --network <network>
+```sh
+zos push --network development
 ```
 
-In our simple example:
+Finally, let's upgrade the already deployed contract:
 
-```
+```sh
 zos upgrade MyContract --network development
 ```
 
-The address of the upgraded contracts is the same as before, but the code has been changed to the new
-version.
+_Voilà!_ We have deployed and upgraded an application using ZeppelinOS. The address of the upgraded contract is the same as before, but the code has been updated to the new version.
 
-_Voilà!_ You have deployed and upgraded an application using ZeppelinOS. 
-
-If you want to use the ZeppelinOS standard libraries, please follow our [Using the stdlib in your app](using.md) guide. You can also check the API reference with [all the available commands of zos](climain.md).
+In order to use the ZeppelinOS standard libraries in an upgradeable app, please follow our [next guide](using.md).

@@ -1,43 +1,41 @@
 ---
 id: setup
-title: Setup
+title: Installation and setup
 ---
 
-The following steps will get you started using ZeppelinOS.
+The following steps will get us started using ZeppelinOS.
 
 ## Installation
 
-`zos` is the command line interface to ZeppelinOS. To install it, run:
+`zos` is the [command line interface](https://github.com/zeppelinos/zos-cli) to ZeppelinOS. To install it, let's go to our terminal and run:
 
-```
+```sh
 npm install --global zos
 ```
 
-## Set up the application
+## Setting up our application
 
-`zos` integrates with Truffle. To set it up, run:
+`zos` integrates with [Truffle](http://truffleframework.com/), install it with:
 
-```
+```sh
 npm install --global truffle
-mkdir myproject && cd myproject
+```
+
+Next we set up the truffle project:
+
+```sh
+mkdir myapp
+cd myapp
 truffle init
-```
-
-You now need to initialize the `npm` project with:
-
-```
 npm init
 ```
 
-Finally, to initialize the `zos` application, run:
+Finally, we initialize our `zos` application:
 
+```sh
+zos init myapp
 ```
-zos init myproject 0.0.1
-```
 
-This will create a `zos.json` file, which will contain all the information about your project. For information about the format of this file, please see our [Advanced topics](advanced.md) section. 
+This will create a `zos.json` file, which will contain all the information about our application. For more information about this file, please see the [advanced topics](advanced.md#format-of-zosjson-and-zos-network-json-files) section. 
 
-You are now ready to start developing your application. To build an upgradeable application using ZeppelinOS, please follow our next guide, [Building upgradeable applications](building.md).
-
-
-
+We are now ready to start [developing our upgradable application](building.md).
