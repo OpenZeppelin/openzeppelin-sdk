@@ -10,6 +10,12 @@ Here at the Zeppelin headquarters we have a basil plant. She is a good mascot, a
 
 However, after a few days we started having conflicts. Who gets the honor to set the light color for our friendly plant? What if they choose their favorite color instead of the one that's best for the plant? For how long do they get to keep their chosen color? We also found that somebody kept resetting the color back to an ugly lime green every morning. We are ok with anarchy, but we want transparency, so we have just decided to control the light bulb through a contract on the Ethereum blockchain.
 
+## Creating a Dapp with ZeppelinOS
+
+In this guide, we will build a simple dapp on top of ZeppelinOS. To see the end product, please visit:
+* Source code: [zeppelinos/basil](https://github.com/zeppelinos/basil)
+* Dapp: [basil.zeppelin.solutions](https://basil.zeppelin.solutions)
+
 First we will need to [install Node.js following the instructions from their website](https://nodejs.org/en/download/package-manager/). Then, let's set up a directory for our project and bootstrap it with the Truffle development environment:
 
 ```
@@ -133,7 +139,7 @@ export OWNER=<address>
 Then, to deploy our app:
 
 ```
-zos push --network development
+zos push --from $OWNER --network development
 ```
 
 The first time you run this command for a specific network, a new
@@ -147,7 +153,7 @@ Notice how the file `zos.development.json` lists a series of "contracts" and "pr
 A proxy is a wrapper for an implementation, that allows it to be updated, while mainting it's state. We need to create a proxy for Basil.
 
 ```
-zos create Basil --network development --init --args $OWNER
+zos create Basil --from $OWNER --network development --init --args $OWNER
 ```
 
 Take a look at `zos.development.json` again. You will see that we now have a proxy for Basil. This is the address to use in a Dapp.
@@ -207,7 +213,7 @@ Let's add this version to our ZeppelinOS application and push to the network aga
 ```
 truffle compile
 zos add BasilERC721:Basil
-zos push --network development
+zos push --from $OWNER --network development
 ```
 
 This will print the address of the deployed Basil contract. Let's export this value to use it later:
@@ -232,7 +238,7 @@ The first thing we need to do, is tell our app to link to the `openzeppelin-zos`
 
 ```
 zos link openzeppelin-zos
-zos push --deploy-stdlib --network development
+zos push --from $OWNER --deploy-stdlib --network development
 ```
 
 Notice the `--deploy-stdlib` option we've used. What this does is inject a version of the standard lib in our development network. Since we're working on a local blockchain, ZeppelinOS's contracts don't exist. This handy option solves that problem for us quite conveniently ^^
