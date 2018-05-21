@@ -5,7 +5,7 @@ import init from '../scripts/init'
 import initLib from '../scripts/init-lib'
 
 const signature = 'init <project> [version]'
-const description = `initialize your ZeppelinOS project. Provide a <project> name and optionally a [version] number`
+const description = `initialize your ZeppelinOS project. Provide a <project> name and optionally an initial [version] name`
 
 module.exports = {
   signature, description,
