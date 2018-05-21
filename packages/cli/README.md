@@ -42,11 +42,11 @@ truffle init
 Initialize your project with ZeppelinOS. The next command will create a new `zos.json` file:
 
 ```sh
-zos init <name> <version>
+zos init <name> [version]
 ```
-For example:
+Where <name> is your project's name, and [version] an optional initial version. For example:
 ```sh
-zos init myproject 0.1
+zos init my-project 0.1.0
 ```
 
 
