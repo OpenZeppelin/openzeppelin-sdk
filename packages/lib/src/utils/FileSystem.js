@@ -65,4 +65,5 @@ export default {
   parseJsonIfExists,
   writeJson,
   write,
+  copy
 }
