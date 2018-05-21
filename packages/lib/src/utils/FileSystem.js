@@ -12,6 +12,10 @@ export function exists(filename) {
   return fs.existsSync(filename)
 }
 
+export function createDir(dir) {
+  fs.mkdirSync(dir)
+}
+
 export function ifExistsThrow(filename, message) {
   if(exists(filename)) throw Error(message)
 }
@@ -38,7 +42,15 @@ export function editJson(file, edit) {
 
 export function writeJson(filename, data) {
   const json = JSON.stringify(data, null, 2)
-  fs.writeFileSync(filename, json)
+  write(filename, json)
+}
+
+export function write(filename, data) {
+  fs.writeFileSync(filename, data)
+}
+
+export function copy(source, target) {
+  fs.createReadStream(source).pipe(fs.createWriteStream(target))
 }
 
 export default {
@@ -48,7 +60,9 @@ export default {
   ifExistsThrow,
   ifNotExistsThrow,
   parseJson,
+  createDir,
   editJson,
   parseJsonIfExists,
-  writeJson
+  writeJson,
+  write,
 }
