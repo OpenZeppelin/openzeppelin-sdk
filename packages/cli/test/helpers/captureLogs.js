@@ -10,8 +10,25 @@ export default class CaptureLogs {
     Logger.prototype.info = (msg) => { this.infos.push(msg); }
   }
 
+  clear() {
+    this.infos = [];
+    this.errors = [];
+  }
+
   restore() {
     Logger.prototype.error = this.origError;
     Logger.prototype.info = this.origInfo;
+  }
+
+  match(re) {
+    return _(_.concat(this.infos, this.errors)).map((msg) => msg.match(re)).compact().head();
+  }
+
+  get text() {
+    return this.toString();
+  }
+
+  toString() {
+    return _.concat(this.infos, this.errors).join("\n");
   }
 }
