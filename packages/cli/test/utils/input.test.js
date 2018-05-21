@@ -10,7 +10,12 @@ describe('input', function () {
     );
 
     it('should parse a number', testFn("42", "42"));
+    it('should parse a string', testFn("foo", 'foo'));
+    it('should parse a number+string', testFn("42pepe", "42pepe"));
     it('should parse a quoted string', testFn('"foo"', 'foo'));
+    it('should parse a quoted multiword string', testFn('"foo bar baz"', 'foo bar baz'));
+    it('should parse multiple quoted words', testFn('"foo","bar","baz"', 'foo', 'bar', 'baz'));
+    it('should parse a quoted number+string', testFn('"42foo"', '42foo'));
     it('should parse an array', testFn('[1, 2, 3]', ["1", "2", "3"]));
     it('should parse nested arrays', testFn("[1,[2,3],4]", ["1",["2","3"],"4"]));
     it('should parse multiple arguments', testFn('42,43,"foo",[1,2,"bar"]', '42', '43', 'foo', ['1', '2', 'bar']));
