@@ -18,7 +18,7 @@ In this guide, we will build a simple dapp on top of ZeppelinOS. To see the end 
 
 First we will need to [install Node.js following the instructions from their website](https://nodejs.org/en/download/package-manager/). Then, let's set up a directory for our project and bootstrap it with the Truffle development environment:
 
-```
+```sh
 mkdir basil
 cd basil
 npm install --global truffle
@@ -30,7 +30,7 @@ npm init --yes
 
 Next, let's write the contract to control the light bulb in `contracts/Basil.sol`:
 
-```
+```sol
 pragma solidity ^0.4.21;
 
 import "openzeppelin-zos/contracts/ownership/Ownable.sol";
@@ -80,7 +80,7 @@ The contract is super simple. If somebody wants to set the light color, they hav
 
 We need to install the `openzeppelin-zos` dependency and to compile the contract:
 
-```
+```sh
 npm install openzeppelin-zos
 truffle compile
 ```
@@ -91,7 +91,7 @@ NOTE: If you're familiar with the `openzeppelin-solidty` library, not that we're
 
 Now, to get the niceties that ZeppelinOS provides, let's install the `zos` command line interface and initialize our application with the version 0.0.1:
 
-```
+```sh
 npm install zos
 zos init basil 0.0.1
 ```
@@ -101,7 +101,7 @@ the contracts of your application.
 
 Next, let's add the implementation of our Basil contract:
 
-```
+```sh
 zos add Basil
 ```
 
@@ -110,7 +110,7 @@ new contract you add to your project.
 
 By now, the json files looks like this:
 
-```
+```json
 {
   "name": "Basil",
   "version": "0.0.1",
@@ -126,19 +126,19 @@ OpenZeppelin will use this file to track your project's contracts on chain, maki
 
 Let's start a local ethereum network:
 
-```
+```sh
 ganache-cli --deterministic
 ```
 
 This will print 10 accounts. Copy the address of the first one, and then back into the initial terminal, export it as the `OWNER` because it will be useful for us later:
 
-```
+```sh
 export OWNER=<address>
 ```
 
 Then, to deploy our app:
 
-```
+```sh
 zos push --from $OWNER --network development
 ```
 
@@ -152,7 +152,7 @@ Notice how the file `zos.development.json` lists a series of "contracts" and "pr
 
 A proxy is a wrapper for an implementation, that allows it to be updated, while mainting it's state. We need to create a proxy for Basil.
 
-```
+```sh
 zos create Basil --from $OWNER --network development --init --args $OWNER
 ```
 
@@ -166,7 +166,7 @@ Another common thing that happens when developing smart contracts for Ethereum i
 
 We could modify `contracts/Basil.sol`. But now let's try something else. Let's make a new contract in `contracts/BasilERC721.sol`, that inherits from our initial version of Basil:
 
-```
+```sol
 pragma solidity ^0.4.21;
 
 import "./Basil.sol";
@@ -204,13 +204,13 @@ A few things to note:
 
 Let's create a new version of our app, to hold the new contracts:
 
-```
+```sh
 zos bump 0.0.2
 ```
 
 Let's add this version to our ZeppelinOS application and push to the network again:
 
-```
+```sh
 truffle compile
 zos add BasilERC721:Basil
 zos push --from $OWNER --network development
@@ -218,13 +218,13 @@ zos push --from $OWNER --network development
 
 This will print the address of the deployed Basil contract. Let's export this value to use it later:
 
-```
+```sh
 export BASIL_ADDRESS=<address>
 ```
 
 Now, to upgrade our proxy:
 
-```
+```sh
 zos upgrade Basil --from $OWNER --network development
 ```
 
@@ -236,7 +236,7 @@ So far, we've used ZeppelinOS to seamlessly upgrade our app's contracts. We will
 
 The first thing we need to do, is tell our app to link to the `openzeppelin-zos` standard library release:
 
-```
+```sh
 zos link openzeppelin-zos
 zos push --from $OWNER --deploy-stdlib --network development
 ```
@@ -245,13 +245,13 @@ Notice the `--deploy-stdlib` option we've used. What this does is inject a versi
 
 Now, to create a proxy for the token:
 
-```
+```sh
 zos create MintableERC721Token --from $OWNER --init --args \"$BASIL_ADDRESS\",\"BasilToken\",\"BSL\" --network development
 ```
 
 This command will output the token's new proxy address. Lets use it to set it in our new BasilERC721 version:
 
-```
+```sh
 export TOKEN_ADDRESS=<address>
 echo "BasilERC721.at(\"$BASIL_ADDRESS\").setToken(\"$TOKEN_ADDRESS\", {from: \"$OWNER\"})" | truffle console --network development
 ```

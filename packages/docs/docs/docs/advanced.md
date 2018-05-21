@@ -17,7 +17,7 @@ If you want to find out more about different possible proxy patterns, be sure to
 ## Preserving the storage structure
 As mentioned in the [Building upgradeable applications](building.md) guide, when upgrading your contracts, you need to make sure that all variables declared in prior versions are kept in the code. New variables must be declared below the previously existing ones, as such:
 
-```
+```sol
 contract MyContract_v1 {
   uint256 public x;
 }
@@ -49,7 +49,7 @@ ZeppelinOS's CLI generates `json` files where it stores the configuration of you
 ### `zos.json`
 The first file stores the general configuration and is created by the `zos init` command. It has the following structure:
 
-```    
+```json    
 {
   "name": <projectName>
   "version": <version>
@@ -70,7 +70,7 @@ Here, `<projectName>` is the name of the project, and `<version>` is the current
 ### `zos.<network>.json`
 ZeppelinOS will also generate a file for each of the networks you work in (`development`, `ropsten`, `live`, ... These should be configured [in your `truffle.js` file](http://truffleframework.com/docs/advanced/configuration#networks)). These files share the same structure:
 
-```
+```json
 {
   "contracts": {
     <contract1Name>: {

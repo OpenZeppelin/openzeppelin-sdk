@@ -8,13 +8,13 @@ Apart from allowing you to build upgradeable applications, ZeppelinOS provides a
  
 To use the stdlib in your contracts, you will need to set up a `zos` project as described in the [Setup](setup.md) guide. Then, you need to run the `link` command with the name of the npm package of the stdlib you want to use. For example:
 
-```
+```sh
 zos link openzeppelin-zos
 ```
 
 Now you can safely include contracts from the stdlib in your app:
 
-```
+```sol
 import "openzeppelin-zos/contracts/token/ERC721/MintableERC721Token.sol";
 
 contract MyContract {
@@ -29,37 +29,37 @@ contract MyContract {
 
 (Note that the `link` command above will install the `zos-lib` contracts for you). Compile your code as before with:
 
-```
+```sh
 npx truffle compile
 ```
 
 and, as before, `add` your contracts to the project:
 
-```
+```sh
 zos add MyContract
 ```
 
 and push them to the desired network:
 
-```
+```sh
 zos push --network <network>
 ```
 
 Note that when working in a local network, we will need to deploy a copy of the stdlib locally too. This is achieved with the `--deploy-stdilb` flag of the `push` command:
 
-```
+```sh
 zos push --deploy-stdlib --network development
 ```
 
 Now you can, as before, create an upgradeable version of your contract simply through:
 
-```
+```sh
 zos create MyContract --network development
 ```
 
 You'll also want your instance of the `ERC721` token from the stdlib:
 
-```
+```sh
 zos create MintableERC721Token --init initialize --args <address>,MyToken,TKN --network development
 ```
 
@@ -67,7 +67,7 @@ zos create MintableERC721Token --init initialize --args <address>,MyToken,TKN --
 
 You can finally use Truffle to bind your two deployed contracts:
 
-```
+```sh
 echo "MyContract.at(<myContractAddress>).setToken(<tokenAddress>)" | truffle console --network development
 ```
 
