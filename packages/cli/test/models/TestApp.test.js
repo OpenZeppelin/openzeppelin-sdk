@@ -1,7 +1,6 @@
 'use strict'
 require('../setup')
 
-import { FileSystem as fs } from 'zos-lib';
 import testApp from '../../src/models/TestApp';
 
 const ImplV1 = artifacts.require('ImplV1');

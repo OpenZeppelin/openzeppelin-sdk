@@ -1,8 +1,10 @@
-import fs from 'fs';
+import fs from 'fs'
 
-export function cleanup(filename) {
+export function cleanup(path) {
   try {
-    fs.unlinkSync(filename);
+    const stat = fs.statSync(path)
+    if(stat.isDirectory()) fs.rmdirSync(path)
+    else fs.unlinkSync(path)
   } catch(e) { /* swallow exception */ }
 }
 

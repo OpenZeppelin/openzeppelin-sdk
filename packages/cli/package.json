@@ -43,7 +43,7 @@
     "truffle-contract": "^3.0.5",
     "truffle-core": "^4.1.8",
     "truffle-workflow-compile": "^1.0.3",
-    "zos-lib": "^0.1.25"
+    "zos-lib": "^0.1.27"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",

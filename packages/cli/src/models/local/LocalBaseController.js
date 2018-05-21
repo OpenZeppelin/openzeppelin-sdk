@@ -1,5 +1,6 @@
-import Stdlib from '../stdlib/Stdlib';
-import { Contracts, Logger, FileSystem as fs } from "zos-lib";
+import Stdlib from '../stdlib/Stdlib'
+import TruffleInitializer from '../truffle/TruffleInitializer'
+import { Contracts, Logger, FileSystem as fs } from 'zos-lib'
 
 const log = new Logger('LocalController');
 
@@ -11,13 +12,18 @@ export default class LocalBaseController {
   }
 
   init(name, version, force = false) {
+    this.initZosFile(name, version, force)
+    TruffleInitializer.call()
+  }
+
+  initZosFile(name, version, force = false) {
     if (fs.exists(this.packageFileName) && !force) {
       throw Error(`Cannot overwrite existing file ${this.packageFileName}`)
     }
     if (this.packageData.name && !force) {
       throw Error(`Cannot initialize already initialized package ${this.packageData.name}`)
     }
-    
+
     this.packageData.name = name;
     this.packageData.version = version || DEFAULT_VERSION;
     this.packageData.contracts = {};

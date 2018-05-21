@@ -21,13 +21,13 @@ module.exports = {
       .option('--push <network>', 'push changes to the specified network')
       .option('-f, --from <from>', 'specify transaction sender address for --push')
       .action(async function (name, version, options) {
+        const { force } = options
         if (options.lib) {
-          if (options.stdlib)
-            throw Error('Cannot set a stdlib in a library project')
-          await initLib({ name, version })
+          if (options.stdlib) throw Error('Cannot set a stdlib in a library project')
+          await initLib({ name, version, force })
         } else {
           const { stdlib: stdlibNameVersion, install: installDeps } = options
-          await init({ name, version, stdlibNameVersion, installDeps })
+          await init({ name, version, stdlibNameVersion, installDeps, force })
         }
         
         if (options.push) {
