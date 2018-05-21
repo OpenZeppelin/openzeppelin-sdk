@@ -31,7 +31,7 @@ npm init --yes
 Next, let's write the contract to control the light bulb in `contracts/Basil.sol`:
 
 ```
-pragma solidity ^0.4.18;
+pragma solidity ^0.4.21;
 
 import "openzeppelin-zos/contracts/ownership/Ownable.sol";
 
