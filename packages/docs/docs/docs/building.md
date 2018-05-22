@@ -62,6 +62,7 @@ zos create MyContract --init initialize --args 42 --network development
 
 The `create` command takes an optional `--init` flag to call the initialization function after creating the contract, while the `--args` flag allows us to pass arguments to it. This way, we are initializing our contract with `42` as the value of the `x` state variable.
 
+> **Note**: When calling an initializer with many variables, these should be passed as a comma-separated list, with no spaces in between. This also applies when passing arrays as arguments. 
 
 After these simple steps, our upgradeable application is now on-chain!
 
