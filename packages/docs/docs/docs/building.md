@@ -28,36 +28,35 @@ contract MyContract is Migratable {
 
 Notice that our sample contract has an `initialize` function instead of the standard constructor. This is a requirement of [ZeppelinOS's upgradeability system](advanced.md#initializers-vs-constructors).
 
-Let's now compile the contract:
-
-```sh
-npx truffle compile
-```
-
-> **Note**: bear in mind that the `push` command of the ZeppelinOS CLI also compiles the contracts, but we are compiling them explicitly here for clarity. If you want to prevent `zos push` from doing so, use the --skip-compile flag.
-
-## Initial deployment
-
-To deploy our app, we need to register the first version of our contract:
+Before deploying our app, we need to register the first version of our contract:
 
 ```sh
 zos add MyContract
 ```
 
-> **Note**: If you are working in a local development network like [Ganache](http://truffleframework.com/ganache/), you will need to [configure](http://truffleframework.com/docs/getting_started/project#alternative-migrating-with-ganache) your `truffle.js` file before running the `push` command.
+Note that the `add` command of the ZeppelinOS CLI also compiles the contracts, but you can always compile them manually using `npx truffle compile`. 
 
-We can now push our application to a development network by running:
+
+## Initial deployment
+
+The `zos init` command already sets up a [Truffle configuration file](http://truffleframework.com/docs/getting_started/project#alternative-migrating-with-ganache), so you can start a local development network simply by: 
 
 ```sh
-zos push --network development
+npx truffle develop
 ```
 
-This will create a `zos.development.json` file with all the information specific to this network. You can read more about this file in the [advanced topics](advanced.md#format-of-zosjson-and-zos-network-json-files) section. If you want to work with a different network, simply substitute the `development` parameter for `ropsten`, `rinkeby` or `mainnet`.
+We can now push our application to this network by running:
+
+```sh
+zos push --network local
+```
+
+This will create a `zos.local.json` file with all the information specific to this network. You can read more about this file in the [advanced topics](advanced.md#format-of-zosjson-and-zos-network-json-files) section. If you want to work with a different network, simply substitute the `local` parameter for `ropsten`, `rinkeby` or `mainnet`. 
 
 To create an upgradeable version of our contract, we need to run:
 
 ```sh
-zos create MyContract --init initialize --args 42 --network development
+zos create MyContract --init initialize --args 42 --network local
 ```
 
 The `create` command takes an optional `--init` flag to call the initialization function after creating the contract, while the `--args` flag allows us to pass arguments to it. This way, we are initializing our contract with `42` as the value of the `x` state variable.
@@ -75,13 +74,13 @@ If, at a later stage, we want to upgrade our smart contract's code in order to f
 Once we have made the desired changes to our contracts, we need to push them to the network:
 
 ```sh
-zos push --network development
+zos push --network local
 ```
 
 Finally, let's upgrade the already deployed contract:
 
 ```sh
-zos upgrade MyContract --network development
+zos upgrade MyContract --network local
 ```
 
 _Voilà!_ We have deployed and upgraded an application using ZeppelinOS. The address of the upgraded contract is the same as before, but the code has been updated to the new version.

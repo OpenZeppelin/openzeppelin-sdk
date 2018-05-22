@@ -15,24 +15,12 @@ npm install --global zos
 
 ## Setting up our application
 
-`zos` integrates with [Truffle](http://truffleframework.com/), install it with:
-
-```sh
-npm install --global truffle
-```
-
-Next we set up the truffle project:
+We initialize our `zos` application with:
 
 ```sh
 mkdir myapp
 cd myapp
-truffle init
 npm init
-```
-
-Finally, we initialize our `zos` application:
-
-```sh
 zos init myapp
 ```
 
