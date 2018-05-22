@@ -15,7 +15,9 @@
       "crafty"
     ],
     "LIBRARY": [
-      "libstart"
+      "libstart",
+      "low_level_contract",
+      "low_level_app"
     ],
     "FURTHER REFERENCE": [
       "apis",
