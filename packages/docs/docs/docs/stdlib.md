@@ -15,6 +15,7 @@ The contracts presently included in the OpenZeppelin stdlib are:
 - `MintableERC721Token`
 - `TokenTimelock`
 - `TokenVesting`
+- `SplitPayment`
 
 The source code for these contracts can be found in the [`zos-release`](https://github.com/OpenZeppelin/openzeppelin-solidity/tree/zos-release/contracts) branch of the `OpenZeppelin/openzeppelin-solidity` repository.
 
