@@ -66,7 +66,7 @@ contract('push command', function([_, owner]) {
     });
   };
 
-  const shouldDeployContracts = function ({ packageFileName, networkFileName }) {
+  const shouldDeployContracts = function ({ networkFileName }) {
     it('should record contracts in network file', async function () {
       const contract = fs.parseJson(networkFileName).contracts["Impl"];
       contract.address.should.be.nonzeroAddress;
@@ -87,7 +87,9 @@ contract('push command', function([_, owner]) {
       const apackage = await Package.fetch(data.package.address);
       (await apackage.getImplementation(defaultVersion, "Impl")).should.eq(address);
     });
+  };
 
+  const shouldRedeployContracts = function ({ packageFileName, networkFileName }) {
     it('should not redeploy contracts if unmodified', async function () {
       const origAddress = fs.parseJson(networkFileName).contracts["Impl"].address;
       await push({ packageFileName, network, txParams });
@@ -112,7 +114,7 @@ contract('push command', function([_, owner]) {
       const newAddress = fs.parseJson(networkFileName).contracts["Impl"].address;
       origAddress.should.not.eq(newAddress);
     });
-  };
+  }
 
   const shouldBumpVersion = function ({ newPackageFileName, networkFileName }) {
     it('should keep package address when bumping version', async function () {
@@ -185,7 +187,8 @@ contract('push command', function([_, owner]) {
 
     shouldDeployApp(networkFileName);
     shouldDeployProvider(networkFileName);
-    shouldDeployContracts({ packageFileName, networkFileName });
+    shouldDeployContracts({ networkFileName });
+    shouldRedeployContracts({ packageFileName, networkFileName });
     shouldBumpVersion({ networkFileName, newPackageFileName });
   });
 
@@ -257,7 +260,8 @@ contract('push command', function([_, owner]) {
 
     shouldDeployLib(networkFileName);
     shouldDeployProvider(networkFileName);
-    shouldDeployContracts({ packageFileName, networkFileName });
+    shouldDeployContracts({ networkFileName });
+    shouldRedeployContracts({ packageFileName, networkFileName });
     shouldBumpVersionAndUnfreeze({ networkFileName, packageFileName, newPackageFileName });
 
     it('should refuse to push when frozen', async function() {
@@ -265,5 +269,20 @@ contract('push command', function([_, owner]) {
       await push({ packageFileName, network, networkFileName, txParams }).should.be.rejectedWith(/frozen/i)
     });
   });
-  
+
+  describe('an app with invalid contracts', function() {
+    const packageFileName = "test/mocks/packages/package-with-invalid-contracts.zos.json";
+    const networkFileName = "test/mocks/packages/package-with-invalid-contracts.zos.test.json";
+
+    beforeEach("pushing package-with-contracts", async function () {
+      cleanup(networkFileName)
+      await push({ packageFileName, network, txParams }).should.be.rejectedWith(/WithFailingConstructor deployment failed /);
+    });
+
+    after(cleanupfn(networkFileName));
+
+    shouldDeployApp(networkFileName);
+    shouldDeployProvider(networkFileName);
+    shouldDeployContracts({ networkFileName });
+  });
 });

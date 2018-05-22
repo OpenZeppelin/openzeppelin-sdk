@@ -66,12 +66,20 @@ export default class NetworkBaseController {
   }
 
   async uploadContracts(reupload) {
-    return Promise.all(
+    const failures = []
+    await Promise.all(
       _(this.packageData.contracts)
         .toPairs()
         .filter(([contractAlias, contractName]) => reupload || this.hasContractChanged(contractAlias))
-        .map(([contractAlias, contractName]) => this.uploadContract(contractAlias, contractName))
+        .map(([contractAlias, contractName]) =>
+          this.uploadContract(contractAlias, contractName)
+            .catch(error => failures.push({ contractAlias, error }))
+        )
     );
+    if(!_.isEmpty(failures)) {
+      const message = failures.map(failure => `${failure.contractAlias} deployment failed with ${failure.error.message}`).join('\n')
+      throw Error(message)
+    }
   }
 
   async uploadContract(contractAlias, contractName) {

@@ -9,3 +9,9 @@ contract WithConstructor {
     return "WithConstructor";
   }
 }
+
+contract WithFailingConstructor {
+  function WithFailingConstructor() {
+    assert(false);
+  }
+}
