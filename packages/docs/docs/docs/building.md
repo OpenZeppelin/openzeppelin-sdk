@@ -46,13 +46,13 @@ zos add MyContract
 
 > **Note**: If you are working in a local development network like [Ganache](http://truffleframework.com/ganache/), you will need to [configure](http://truffleframework.com/docs/getting_started/project#alternative-migrating-with-ganache) your `truffle.js` file before running the `push` command.
 
-We can now push our application to the desired network by running:
+We can now push our application to a development network by running:
 
 ```sh
 zos push --network development
 ```
 
-This  will create a `zos.development.json` file with all the information specific to the chosen network. You can read more about this file in the [advanced topics](advanced.md#format-of-zosjson-and-zos-network-json-files) section.
+This will create a `zos.development.json` file with all the information specific to this network. You can read more about this file in the [advanced topics](advanced.md#format-of-zosjson-and-zos-network-json-files) section. If you want to work with a different network, simply substitute the `development` parameter for `ropsten`, `rinkeby` or `mainnet`.
 
 To create an upgradeable version of our contract, we need to run:
 
