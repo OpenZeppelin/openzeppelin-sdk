@@ -137,6 +137,20 @@ contract('App', function ([_, owner]) {
         });
       });
 
+      describe('with complex initializer', function () {
+        beforeEach('creating a proxy', async function () {
+          this.proxy = await this.app.createProxy(ImplV1, contractName, 'initialize', [10, "foo", []]);
+        });
+
+        shouldReturnProxy();
+
+        it('should have initialized the proxy', async function () {
+          (await this.proxy.value()).toNumber().should.eq(10);
+          (await this.proxy.text()).should.eq("foo");
+          await this.proxy.values(0).should.be.rejected;
+        });
+      });
+
       describe('with implicit contract name', async function () {
         beforeEach('creating a proxy', async function () {
           this.proxy = await this.app.createProxy(Impl);

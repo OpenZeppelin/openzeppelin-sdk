@@ -6,9 +6,17 @@ contract Impl {
 
 contract DummyImplementation {
   uint256 public value;
+  string public text;
+  uint256[] public values;
 
   function initialize(uint256 _value) public {
     value = _value;
+  }
+
+  function initialize(uint256 _value, string _text, uint256[] _values) public {
+    value = _value;
+    text = _text;
+    values = _values;
   }
 
   function get() public pure returns (bool) {
