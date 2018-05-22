@@ -52,10 +52,11 @@ zos init my-project 0.1.0
 
 ## Guides
 
-- [Quickstart guide](https://docs.zeppelinos.org/docs/quickstart.html)
-- [Building upgradeable applications](https://docs.zeppelinos.org/docs/building.html)
-- [Testing upgradeable applications](https://docs.zeppelinos.org/docs/testing.html)
+- [Installation and setup](https://docs.zeppelinos.org/docs/setup.html)
+- [Building an upgradeable application](https://docs.zeppelinos.org/docs/building.html)
+- [Using the stdlib in your app](https://docs.zeppelinos.org/docs/using.html)
 - [Developing a new standard library](https://docs.zeppelinos.org/docs/developing.html)
+- [Testing upgradeable applications](https://docs.zeppelinos.org/docs/testing.html)
 - [Extend provided standard library code in your own contracts](https://github.com/zeppelinos/labs/tree/master/extensibility-study#extensibility-study) (experimental)
 - [Migrate your non-upgradeable legacy ERC20 token into an upgradeable version with a managed approach](https://github.com/zeppelinos/labs/tree/master/migrating_legacy_token_managed#migrating-legacy-non-upgradeable-token-to-upgradeability-with-managed-strategy) (experimental)
 - [Migrate your non-upgradeable legacy ERC20 token into an upgradeable version with an opt-in approach](https://github.com/zeppelinos/labs/tree/master/migrating_legacy_token_opt_in#migrating-legacy-non-upgradeable-token-to-upgradeability-with-opt-in-strategy) (experimental)
@@ -65,10 +66,12 @@ zos init my-project 0.1.0
 
 ### Documentation
 - [ZeppelinOS](http://zeppelinos.org)
+- [Documentation site](https://docs.zeppelinos.org)
 - [ZeppelinOS Blog](https://blog.zeppelinos.org)
 - [Proxy Patterns](https://blog.zeppelinos.org/proxy-patterns)
 
 ### Code
+- [ZeppelinOS CLI (this repository)](https://github.com/zeppelinos/zos-cli)
 - [ZeppelinOS library (`zos-lib`)](https://github.com/zeppelinos/zos-lib)
 
 ## Security
