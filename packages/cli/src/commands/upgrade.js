@@ -1,6 +1,6 @@
 'use strict';
 
-import upgradeProxy from '../scripts/upgrade-proxy'
+import upgradeProxy from '../scripts/upgrade'
 import runWithTruffle from '../utils/runWithTruffle'
 import { parseInit } from '../utils/input'
 
