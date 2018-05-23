@@ -1,13 +1,14 @@
 'use strict';
 require('../../setup')
 
+import Contracts from '../../../src/utils/Contracts'
 import encodeCall from '../../../src/helpers/encodeCall'
 import assertRevert from '../../../src/test/helpers/assertRevert'
 
-const MigratableMock = artifacts.require('MigratableMock')
-const AdminUpgradeabilityProxy = artifacts.require('AdminUpgradeabilityProxy')
-const UpgradeabilityProxyFactory = artifacts.require('UpgradeabilityProxyFactory')
-const DummyImplementation = artifacts.require('DummyImplementation')
+const MigratableMock = Contracts.getFromLocal('MigratableMock')
+const AdminUpgradeabilityProxy = Contracts.getFromLocal('AdminUpgradeabilityProxy')
+const UpgradeabilityProxyFactory = Contracts.getFromLocal('UpgradeabilityProxyFactory')
+const DummyImplementation = Contracts.getFromLocal('DummyImplementation')
 
 contract('UpgradeabilityProxyFactory', ([_, owner]) => {
   before(async function () {

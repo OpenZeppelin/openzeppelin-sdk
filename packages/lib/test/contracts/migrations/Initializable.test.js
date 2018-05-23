@@ -1,9 +1,10 @@
 'use strict';
 require('../../setup')
 
+import Contracts from '../../../src/utils/Contracts'
 import assertRevert from '../../../src/test/helpers/assertRevert';
 
-const InitializableMock = artifacts.require('InitializableMock');
+const InitializableMock = Contracts.getFromLocal('InitializableMock');
 
 contract('Initializable', function () {
   beforeEach(async function () {

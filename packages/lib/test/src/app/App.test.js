@@ -2,11 +2,12 @@
 require('../../setup')
 
 import App from '../../../src/app/App';
+import Contracts from '../../../src/utils/Contracts'
 
-const AppDirectory = artifacts.require('AppDirectory');
-const Impl = artifacts.require('Impl');
-const ImplV1 = artifacts.require('DummyImplementation');
-const ImplV2 = artifacts.require('DummyImplementationV2');
+const AppDirectory = Contracts.getFromLocal('AppDirectory');
+const Impl = Contracts.getFromLocal('Impl');
+const ImplV1 = Contracts.getFromLocal('DummyImplementation');
+const ImplV2 = Contracts.getFromLocal('DummyImplementationV2');
 
 contract('App', function ([_, owner]) {
   const txParams = { from: owner }

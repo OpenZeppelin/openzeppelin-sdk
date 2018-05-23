@@ -1,12 +1,13 @@
 'use strict';
 require('../../../setup')
 
+import Contracts from '../../../../src/utils/Contracts'
 import assertRevert from '../../../../src/test/helpers/assertRevert'
 import shouldBehaveLikeOwnable from '../../../../src/test/behaviors/Ownable'
 
-const Package = artifacts.require('Package')
-const ImplementationDirectory = artifacts.require('ImplementationDirectory')
-const DummyImplementation = artifacts.require('DummyImplementation')
+const Package = Contracts.getFromLocal('Package')
+const ImplementationDirectory = Contracts.getFromLocal('ImplementationDirectory')
+const DummyImplementation = Contracts.getFromLocal('DummyImplementation')
 
 contract('Package', ([_, owner, anotherAddress]) => {
   before(async function () {

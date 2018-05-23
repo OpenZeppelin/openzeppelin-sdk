@@ -1,18 +1,19 @@
 'use strict';
 require('../../setup')
 
+import Contracts from '../../../src/utils/Contracts'
 import encodeCall from '../../../src/helpers/encodeCall'
 import decodeLogs from '../../../src/helpers/decodeLogs'
 import assertRevert from '../../../src/test/helpers/assertRevert'
 
-const Migratable = artifacts.require('Migratable');
-const SampleChildV1 = artifacts.require('SampleChildV1');
-const SampleChildV2 = artifacts.require('SampleChildV2');
-const SampleChildV3 = artifacts.require('SampleChildV3');
-const SampleChildV4 = artifacts.require('SampleChildV4');
-const SampleChildV5 = artifacts.require('SampleChildV5');
-const DummyImplementation = artifacts.require('DummyImplementation');
-const AdminUpgradeabilityProxy = artifacts.require('AdminUpgradeabilityProxy');
+const Migratable = Contracts.getFromLocal('Migratable');
+const SampleChildV1 = Contracts.getFromLocal('SampleChildV1');
+const SampleChildV2 = Contracts.getFromLocal('SampleChildV2');
+const SampleChildV3 = Contracts.getFromLocal('SampleChildV3');
+const SampleChildV4 = Contracts.getFromLocal('SampleChildV4');
+const SampleChildV5 = Contracts.getFromLocal('SampleChildV5');
+const DummyImplementation = Contracts.getFromLocal('DummyImplementation');
+const AdminUpgradeabilityProxy = Contracts.getFromLocal('AdminUpgradeabilityProxy');
 
 contract('Migratable', function ([_, owner, registrar]) {
   const from = owner;

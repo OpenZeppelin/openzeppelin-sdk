@@ -1,11 +1,12 @@
 'use strict';
 require('../../../setup')
 
+import Contracts from '../../../../src/utils/Contracts'
 import assertRevert from '../../../../src/test/helpers/assertRevert'
 import shouldBehaveLikeImplementationDirectory from '../../../../src/test/behaviors/ImplementationDirectory'
 
-const DummyImplementation = artifacts.require('DummyImplementation');
-const Release = artifacts.require('Release');
+const DummyImplementation = Contracts.getFromLocal('DummyImplementation');
+const Release = Contracts.getFromLocal('Release');
 
 contract('Release', ([_, developer, anotherAddress]) => {
 

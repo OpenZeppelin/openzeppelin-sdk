@@ -5,10 +5,11 @@ global.artifacts = artifacts;
 const args = require('minimist')(process.argv.slice(2));
 const network = args.network;
 
-const ImplementationDirectory = artifacts.require('ImplementationDirectory');
-const MintableERC721Token = artifacts.require('MintableERC721Token');
 const { Logger, App, Contracts } = require('zos-lib')
 const log = new Logger('ComplexExample')
+
+const MintableERC721Token = Contracts.getFromLocal('MintableERC721Token');
+const ImplementationDirectory = Contracts.getFromNodeModules('zos-lib', 'ImplementationDirectory');
 
 const owner = web3.eth.accounts[1];
 const contractName = 'Donations';

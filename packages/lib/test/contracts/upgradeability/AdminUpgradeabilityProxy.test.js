@@ -1,16 +1,17 @@
 'use strict';
 require('../../setup')
 
+import Contracts from '../../../src/utils/Contracts'
 import encodeCall from '../../../src/helpers/encodeCall'
 import assertRevert from '../../../src/test/helpers/assertRevert'
 
-const MigratableMockV1 = artifacts.require('MigratableMockV1')
-const MigratableMockV2 = artifacts.require('MigratableMockV2')
-const MigratableMockV3 = artifacts.require('MigratableMockV3')
-const MigratableMock = artifacts.require('MigratableMock')
-const DummyImplementation = artifacts.require('DummyImplementation')
-const ClashingImplementation = artifacts.require('ClashingImplementation')
-const AdminUpgradeabilityProxy = artifacts.require('AdminUpgradeabilityProxy')
+const MigratableMockV1 = Contracts.getFromLocal('MigratableMockV1')
+const MigratableMockV2 = Contracts.getFromLocal('MigratableMockV2')
+const MigratableMockV3 = Contracts.getFromLocal('MigratableMockV3')
+const MigratableMock = Contracts.getFromLocal('MigratableMock')
+const DummyImplementation = Contracts.getFromLocal('DummyImplementation')
+const ClashingImplementation = Contracts.getFromLocal('ClashingImplementation')
+const AdminUpgradeabilityProxy = Contracts.getFromLocal('AdminUpgradeabilityProxy')
 
 contract('AdminUpgradeabilityProxy', ([_, admin, anotherAccount]) => {
   before(async function () {

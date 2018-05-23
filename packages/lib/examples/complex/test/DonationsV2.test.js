@@ -1,7 +1,8 @@
-const DonationsV2 = artifacts.require('DonationsV2');
-const MintableERC721Token = artifacts.require('MintableERC721Token');
-
+const { Contracts } = require('zos-lib')
 const shouldBehaveLikeDonationsWithTokens = require('./DonationsWithTokens.behavior.js');
+
+const DonationsV2 = Contracts.getFromLocal('DonationsV2');
+const MintableERC721Token = Contracts.getFromLocal('MintableERC721Token');
 
 contract('DonationsV2', ([_, owner, donor, wallet]) => {
 

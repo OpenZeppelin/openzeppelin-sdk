@@ -1,11 +1,12 @@
 'use strict';
 
-const DonationsV2 = artifacts.require('DonationsV2');
-
+const { Contracts } = require('zos-lib')
 const deploy = require('../index.js');
 const validateAddress = require('./helpers/validateAddress.js');
 const shouldBehaveLikeDonations = require('./Donations.behavior.js');
 const shouldBehaveLikeDonationsWithTokens = require('./DonationsWithTokens.behavior.js');
+
+const DonationsV2 = Contracts.getFromLocal('DonationsV2');
 require('chai').should()
 
 contract('App', ([_, owner, donor, wallet]) => {

@@ -1,5 +1,7 @@
-const DonationsV1 = artifacts.require('DonationsV1');
+const { Contracts } = require('zos-lib')
 const shouldBehaveLikeDonations = require('./Donations.behavior.js');
+
+const DonationsV1 = Contracts.getFromLocal('DonationsV1');
 
 contract('DonationsV1', ([_, owner, donor, wallet]) => {
 

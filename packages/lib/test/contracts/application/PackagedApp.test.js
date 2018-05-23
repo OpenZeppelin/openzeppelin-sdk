@@ -1,18 +1,19 @@
 'use strict';
 require('../../setup')
 
+import Contracts from '../../../src/utils/Contracts'
 import encodeCall from '../../../src/helpers/encodeCall'
 import decodeLogs from '../../../src/helpers/decodeLogs'
 import assertRevert from '../../../src/test/helpers/assertRevert'
 import shouldBehaveLikeOwnable from '../../../src/test/behaviors/Ownable'
 
-const Package = artifacts.require('Package')
-const ImplementationDirectory = artifacts.require('ImplementationDirectory')
-const MigratableMock = artifacts.require('MigratableMock')
-const PackagedApp = artifacts.require('PackagedApp')
-const DummyImplementation = artifacts.require('DummyImplementation')
-const AdminUpgradeabilityProxy = artifacts.require('AdminUpgradeabilityProxy')
-const UpgradeabilityProxyFactory = artifacts.require('UpgradeabilityProxyFactory')
+const Package = Contracts.getFromLocal('Package')
+const ImplementationDirectory = Contracts.getFromLocal('ImplementationDirectory')
+const MigratableMock = Contracts.getFromLocal('MigratableMock')
+const PackagedApp = Contracts.getFromLocal('PackagedApp')
+const DummyImplementation = Contracts.getFromLocal('DummyImplementation')
+const AdminUpgradeabilityProxy = Contracts.getFromLocal('AdminUpgradeabilityProxy')
+const UpgradeabilityProxyFactory = Contracts.getFromLocal('UpgradeabilityProxyFactory')
 
 contract('PackagedApp', ([_, appOwner, packageOwner, directoryOwner, anotherAccount]) => {
   const contract = 'ERC721'

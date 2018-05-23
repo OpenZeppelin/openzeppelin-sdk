@@ -1,16 +1,17 @@
 'use strict';
 require('../../setup')
 
+import Contracts from '../../../src/utils/Contracts'
 import decodeLogs from '../../../src/helpers/decodeLogs'
 import encodeCall from '../../../src/helpers/encodeCall'
 import assertRevert from '../../../src/test/helpers/assertRevert'
 import shouldBehaveLikeOwnable from '../../../src/test/behaviors/Ownable'
 
-const MigratableMock = artifacts.require('MigratableMock')
-const ImplementationDirectory = artifacts.require('ImplementationDirectory')
-const DummyImplementation = artifacts.require('DummyImplementation')
-const UnversionedApp = artifacts.require('UnversionedApp')
-const UpgradeabilityProxyFactory = artifacts.require('UpgradeabilityProxyFactory')
+const MigratableMock = Contracts.getFromLocal('MigratableMock')
+const ImplementationDirectory = Contracts.getFromLocal('ImplementationDirectory')
+const DummyImplementation = Contracts.getFromLocal('DummyImplementation')
+const UnversionedApp = Contracts.getFromLocal('UnversionedApp')
+const UpgradeabilityProxyFactory = Contracts.getFromLocal('UpgradeabilityProxyFactory')
 
 contract('UnversionedApp', ([_, appOwner, directoryOwner, anotherAccount]) => {
   const contract = 'ERC721'

@@ -1,10 +1,11 @@
 'use strict'
 require('../../setup')
 
-import assertRevert from '../../../src/test/helpers/assertRevert';
 import Package from '../../../src/package/Package';
+import Contracts from '../../../src/utils/Contracts'
+import assertRevert from '../../../src/test/helpers/assertRevert';
 
-const DummyImplementation = artifacts.require('DummyImplementation')
+const DummyImplementation = Contracts.getFromLocal('DummyImplementation')
 
 contract('Package', function ([_, owner]) {
   const txParams = { from: owner }
