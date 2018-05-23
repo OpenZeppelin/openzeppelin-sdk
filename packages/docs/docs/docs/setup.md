@@ -24,6 +24,6 @@ npm init
 zos init myapp
 ```
 
-This will create a `zos.json` file, which will contain all the information about our application. For more information about this file, please see the [advanced topics](advanced.md#format-of-zosjson-and-zos-network-json-files) section. 
+This will create a `zos.json` file, which will contain all the information about our application. For more details about this file, please see the [advanced topics](advanced.md#format-of-zosjson-and-zos-network-json-files) section. 
 
 We are now ready to start [developing our upgradable application](building.md).
