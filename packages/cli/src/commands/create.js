@@ -1,6 +1,6 @@
 'use strict';
 
-import createProxy from '../scripts/create-proxy'
+import createProxy from '../scripts/create'
 import runWithTruffle from '../utils/runWithTruffle'
 import { parseInit } from '../utils/input'
 

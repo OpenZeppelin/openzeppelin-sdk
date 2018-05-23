@@ -1,29 +1,29 @@
 'use strict'
 require('../setup')
 
-import initApp from "../../src/scripts/init.js";
-import initLib from "../../src/scripts/init-lib.js";
-import addImplementation from "../../src/scripts/add-implementation.js";
-import push from "../../src/scripts/push.js";
-import bumpVersion from "../../src/scripts/bump-version.js";
-import createProxy from "../../src/scripts/create-proxy.js";
-import status from "../../src/scripts/status.js";
-import linkStdlib from "../../src/scripts/link-stdlib";
-import { cleanup, cleanupfn } from "../helpers/cleanup.js";
+import initApp from '../../src/scripts/init.js';
+import initLib from '../../src/scripts/init-lib.js';
+import add from '../../src/scripts/add.js';
+import push from '../../src/scripts/push.js';
+import bumpVersion from '../../src/scripts/bump.js';
+import createProxy from '../../src/scripts/create.js';
+import status from '../../src/scripts/status.js';
+import linkStdlib from '../../src/scripts/link';
+import { cleanup, cleanupfn } from '../helpers/cleanup.js';
 import ControllerFor from '../../src/models/local/ControllerFor';
 import CaptureLogs from '../helpers/captureLogs';
 
 contract('status command', function([_, owner]) {
   const txParams = { from: owner };
-  const appName = "MyApp";
-  const version = "0.1.0";
-  const network = "test";
-  const contractName = "ImplV1";
-  const contractAlias = "Impl";
+  const appName = 'MyApp';
+  const version = '0.1.0';
+  const network = 'test';
+  const contractName = 'ImplV1';
+  const contractAlias = 'Impl';
   const contractsData = [{ name: contractName, alias: contractAlias }]
-  const anotherContractName = "AnotherImplV1";
+  const anotherContractName = 'AnotherImplV1';
   const stdlibNameVersion = 'mock-stdlib@1.1.0';
-  const packageFileName = "test/tmp/zos.json";
+  const packageFileName = 'test/tmp/zos.json';
   const networkFileName = `test/tmp/zos.${network}.json`;
   
   beforeEach('cleanup', async function() {
@@ -101,7 +101,7 @@ contract('status command', function([_, owner]) {
       it('should log contract name when different to alias', async function () {
         await init({ name: appName, version, packageFileName });
         await push({ packageFileName, network, txParams });
-        await addImplementation({ contractsData, packageFileName });
+        await add({ contractsData, packageFileName });
         await status({ network, packageFileName, networkFileName });
 
         this.logs.text.should.match(/Impl/i);
@@ -111,7 +111,7 @@ contract('status command', function([_, owner]) {
       it('should not log contract name when matches alias', async function () {
         await init({ name: appName, version, packageFileName });
         await push({ packageFileName, network, txParams });
-        await addImplementation({ contractsData: [{ name: anotherContractName }], packageFileName });
+        await add({ contractsData: [{ name: anotherContractName }], packageFileName });
         await status({ network, packageFileName, networkFileName });
 
         this.logs.text.should.match(/AnotherImplV1/i);
@@ -121,7 +121,7 @@ contract('status command', function([_, owner]) {
       it('should log undeployed contract', async function () {
         await init({ name: appName, version, packageFileName });
         await push({ packageFileName, network, txParams });
-        await addImplementation({ contractsData, packageFileName });
+        await add({ contractsData, packageFileName });
         await status({ network, packageFileName, networkFileName });
 
         this.logs.text.should.match(/not deployed/i);
@@ -129,9 +129,9 @@ contract('status command', function([_, owner]) {
 
       it('should log out-of-sync contract', async function () {
         await init({ name: appName, version, packageFileName });
-        await addImplementation({ contractsData, packageFileName });
+        await add({ contractsData, packageFileName });
         await push({ packageFileName, network, txParams });
-        await addImplementation({ contractsData: [{ name: anotherContractName, alias: contractAlias }], packageFileName });
+        await add({ contractsData: [{ name: anotherContractName, alias: contractAlias }], packageFileName });
         await status({ network, packageFileName, networkFileName });
 
         this.logs.text.should.match(/out of date/i);
@@ -139,7 +139,7 @@ contract('status command', function([_, owner]) {
 
       it('should log deployed contract', async function () {
         await init({ name: appName, version, packageFileName });
-        await addImplementation({ contractsData, packageFileName });
+        await add({ contractsData, packageFileName });
         await push({ packageFileName, network, txParams });
         await status({ network, packageFileName, networkFileName });
 
@@ -204,7 +204,7 @@ contract('status command', function([_, owner]) {
     describe('proxies', function () {
       it('should log no proxies', async function () {
         await init({ name: appName, version, packageFileName });
-        await addImplementation({ contractsData, packageFileName });
+        await add({ contractsData, packageFileName });
         await push({ packageFileName, network, txParams });
         await status({ network, packageFileName, networkFileName });
 
@@ -213,7 +213,7 @@ contract('status command', function([_, owner]) {
 
       it('should log created proxies', async function () {
         await init({ name: appName, version, packageFileName });
-        await addImplementation({ contractsData, packageFileName });
+        await add({ contractsData, packageFileName });
         await push({ packageFileName, network, txParams });
         await createProxy({ contractAlias, network, txParams, packageFileName, networkFileName });
         await status({ network, packageFileName, networkFileName });

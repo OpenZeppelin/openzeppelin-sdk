@@ -1,18 +1,18 @@
 'use strict'
 require('../setup')
 
-import init from "../../src/scripts/init.js";
-import initLib from "../../src/scripts/init-lib.js";
-import bumpVersion from "../../src/scripts/bump-version.js";
-import linkStdlib from "../../src/scripts/link-stdlib.js";
+import init from '../../src/scripts/init.js';
+import initLib from '../../src/scripts/init-lib.js';
+import bumpVersion from '../../src/scripts/bump.js';
+import linkStdlib from '../../src/scripts/link.js';
 import { FileSystem as fs } from 'zos-lib';
-import { cleanup, cleanupfn } from "../helpers/cleanup.js";
-import addImplementation from "../../src/scripts/add-implementation.js";
+import { cleanup, cleanupfn } from '../helpers/cleanup.js';
+import add from '../../src/scripts/add.js';
 
 contract('new-version command', function() {
-  const appName = "MyApp";
-  const defaultVersion = "0.1.0";
-  const packageFileName = "test/tmp/zos.json";
+  const appName = 'MyApp';
+  const defaultVersion = '0.1.0';
+  const packageFileName = 'test/tmp/zos.json';
 
   describe('on app', function () {
     beforeEach('setup', async function() {
@@ -28,13 +28,13 @@ contract('new-version command', function() {
       fs.parseJson(packageFileName).version.should.eq(version);
     });
 
-    it('should preserve added implementations', async function() {
+    it('should preserve added logic contracts', async function() {
       const version = '0.2.0';
-      await addImplementation({ contractsData: [{ name: "ImplV1" }], packageFileName });
+      await add({ contractsData: [{ name: 'ImplV1' }], packageFileName });
       await bumpVersion({ version, packageFileName });
       const data = fs.parseJson(packageFileName);
       data.version.should.eq(version);
-      data.contracts["ImplV1"].should.eq("ImplV1");
+      data.contracts['ImplV1'].should.eq('ImplV1');
     });
 
     it('should set stdlib', async function () {

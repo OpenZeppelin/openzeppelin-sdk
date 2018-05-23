@@ -1,7 +1,7 @@
 'use strict';
 
 import push from './push'
-import bumpVersion from '../scripts/bump-version'
+import bumpVersion from '../scripts/bump'
 
 const signature = 'bump <version>'
 const description = 'bump your project to a new <version>'

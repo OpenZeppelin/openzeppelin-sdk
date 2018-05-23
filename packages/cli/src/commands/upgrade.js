@@ -5,7 +5,7 @@ import runWithTruffle from '../utils/runWithTruffle'
 import { parseInit } from '../utils/input'
 
 const signature = 'upgrade [alias] [address]'
-const description = 'upgrade contract to a new implementation. Provide the [alias] you added your contract with, or use --all flag to upgrade all. If no [address] is provided, all instances of that contract class will be upgraded'
+const description = 'upgrade contract to a new logic. Provide the [alias] you added your contract with, or use --all flag to upgrade all. If no [address] is provided, all instances of that contract class will be upgraded'
 
 module.exports = {
   signature, description,

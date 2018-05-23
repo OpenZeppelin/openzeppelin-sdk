@@ -1,4 +1,6 @@
-import { Logger, Contracts, Package } from "zos-lib";
+'use strict';
+
+import { Logger, Contracts, Package } from 'zos-lib';
 import NetworkBaseController from './NetworkBaseController';
 
 export default class NetworkLibController extends NetworkBaseController {
@@ -42,7 +44,7 @@ export default class NetworkLibController extends NetworkBaseController {
 
   async uploadContracts(reupload) {
     if (this.networkPackage.frozen) {
-      throw Error("Cannot upload contract implementations for a frozen release. Run zos bump first to create a new version.");
+      throw Error('Cannot upload contracts for a frozen release. Run zos bump to create a new version first.');
     }
     await super.uploadContracts(reupload);
   }

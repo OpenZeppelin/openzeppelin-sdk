@@ -1,7 +1,7 @@
 import ControllerFor from "../models/local/ControllerFor";
 
-export default function addAllImplementations({ packageFileName = undefined }) {
+export default function addAll({ packageFileName = undefined }) {
   const appController = ControllerFor(packageFileName)
-  appController.addAllImplementations()
+  appController.addAll()
   appController.writePackage()
 }

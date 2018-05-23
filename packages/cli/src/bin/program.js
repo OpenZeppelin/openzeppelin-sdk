@@ -7,12 +7,12 @@ const Logger = require('zos-lib').Logger;
 const chalk = require('chalk')
 
 const init = require('../commands/init')
-const add = require('../commands/add-implementation')
+const add = require('../commands/add')
 const push = require('../commands/push')
-const create = require('../commands/create-proxy')
-const bump = require('../commands/bump-version')
-const upgrade = require('../commands/upgrade-proxy')
-const link = require('../commands/link-stdlib')
+const create = require('../commands/create')
+const bump = require('../commands/bump')
+const upgrade = require('../commands/upgrade')
+const link = require('../commands/link')
 const status = require('../commands/status')
 const freeze = require('../commands/freeze')
 

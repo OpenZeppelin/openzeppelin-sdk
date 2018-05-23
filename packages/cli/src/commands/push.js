@@ -14,7 +14,7 @@ function registerPush(program) {
     .option('-n, --network <network>', 'network to be used')
     .option('--skip-compile', 'skips contract compilation')
     .option('-d, --deploy-stdlib', 'deploys a copy of the stdlib for development')
-    .option('--reset', 'redeploys all contract implementations (not only the ones that changed)')
+    .option('--reset', 'redeploys all contracts (not only the ones that changed)')
     .action(action)
 }
 

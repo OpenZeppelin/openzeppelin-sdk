@@ -84,7 +84,7 @@ export default class NetworkBaseController {
 
   async uploadContract(contractAlias, contractName) {
     const contractClass = Contracts.getFromLocal(contractName);
-    log.info(`Uploading ${contractName} implementation for ${contractAlias}`);
+    log.info(`Uploading ${contractName} contract as ${contractAlias}`);
     const contractInstance = await this.setImplementation(contractClass, contractAlias);
     this.networkPackage.contracts[contractAlias] = {
       address: contractInstance.address,

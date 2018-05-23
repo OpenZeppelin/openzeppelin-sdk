@@ -2,15 +2,15 @@
 require('../setup')
 
 import { FileSystem as fs } from 'zos-lib';
-import { cleanup, cleanupfn } from "../helpers/cleanup.js";
+import { cleanup, cleanupfn } from '../helpers/cleanup.js';
 
-import init from "../../src/scripts/init.js";
-import linkStdlib from "../../src/scripts/link-stdlib.js";
+import init from '../../src/scripts/init.js';
+import linkStdlib from '../../src/scripts/link.js';
 
-contract('link-stdlib command', function() {
-  const appName = "MyApp";
-  const defaultVersion = "0.1.0";
-  const packageFileName = "test/tmp/zos.json";
+contract('link command', function() {
+  const appName = 'MyApp';
+  const defaultVersion = '0.1.0';
+  const packageFileName = 'test/tmp/zos.json';
 
   beforeEach('setup', async function() {
     cleanup(packageFileName)

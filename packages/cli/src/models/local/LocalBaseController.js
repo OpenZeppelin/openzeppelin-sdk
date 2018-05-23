@@ -37,7 +37,7 @@ export default class LocalBaseController {
     return false;
   }
 
-  addImplementation(contractAlias, contractName) {
+  add(contractAlias, contractName) {
     // We are logging an error instead of throwing because a contract may have an empty constructor, 
     // which is fine, but as long as it is declared we will be picking it up
     const path = `${process.cwd()}/build/contracts/${contractName}.json`
@@ -48,14 +48,14 @@ export default class LocalBaseController {
     this.packageData.contracts[contractAlias] = contractName;
   }
 
-  addAllImplementations() {
+  addAll() {
     const folder = `${process.cwd()}/build/contracts`
     fs.readDir(folder).forEach(file => {
       const path = `${folder}/${file}`
       if(this.hasBytecode(path)) {
         const contractData = fs.parseJson(path)
         const contractName = contractData.contractName
-        this.addImplementation(contractName, contractName)
+        this.add(contractName, contractName)
       }
     })
   }
@@ -69,7 +69,7 @@ export default class LocalBaseController {
       throw Error(`Contract ${contractName} not found in folder ${folder}`)
     }
     if (!this.hasBytecode(path)) {
-      throw Error(`Contract ${contractName} is abstract and cannot be deployed as an implementation.`)
+      throw Error(`Contract ${contractName} is abstract and cannot be deployed.`)
     }
   }
 

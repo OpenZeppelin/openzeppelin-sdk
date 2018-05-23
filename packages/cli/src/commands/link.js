@@ -1,7 +1,7 @@
 'use strict';
 
 import push from './push'
-import linkStdlib from '../scripts/link-stdlib'
+import linkStdlib from '../scripts/link'
 
 const signature = 'link <stdlib>'
 const description = 'links project with a standard library located in the <stdlib> npm package'
