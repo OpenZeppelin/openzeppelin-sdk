@@ -2,6 +2,7 @@
   "name": "zos-docs",
   "version": "0.1.0",
   "description": "Documentation site for ZeppelinOS",
+  "private": true,
   "main": "index.js",
   "scripts": {
     "gen-docs": "node scripts/gen-docs.js",
