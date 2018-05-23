@@ -1,32 +1,36 @@
 import Contracts from '../utils/Contracts'
 import App from './App'
 
-const AppProvider = {
-  async from(address, txParams = {}) {
+export default class AppProvider {
+  constructor(txParams = {}) {
+    this.txParams = txParams
+  }
+
+  async from(address) {
     this._fetchPackagedApp(address)
     await this._fetchFactory()
     await this._fetchPackage()
     await this._fetchAppDirectory()
-    return new App(this.packagedApp, this.factory, this.appDirectory, this.package, this.version, txParams);
-  },
+    return new App(this.packagedApp, this.factory, this.appDirectory, this.package, this.version, this.txParams);
+  }
 
   _fetchPackagedApp(address) {
     const PackagedApp = Contracts.getFromLib('PackagedApp')
     this.packagedApp = new PackagedApp(address)
-  },
+  }
   
   async _fetchAppDirectory() {
     const AppDirectory = Contracts.getFromLib('AppDirectory')
     this.version = await this.packagedApp.version()
     const appDirectoryAddress = await this.package.getVersion(this.version)
     this.appDirectory = new AppDirectory(appDirectoryAddress)
-  },
+  }
   
   async _fetchPackage() {
     const Package = Contracts.getFromLib('Package')
     const packageAddress = await this.packagedApp.package()
     this.package = new Package(packageAddress)
-  },
+  }
 
   async _fetchFactory() {
     const UpgradeabilityProxyFactory = Contracts.getFromLib('UpgradeabilityProxyFactory')
@@ -34,5 +38,3 @@ const AppProvider = {
     this.factory = new UpgradeabilityProxyFactory(factoryAddress)
   }
 }
-
-export default AppProvider;

@@ -27,7 +27,7 @@ contract('App', function ([_, owner]) {
     });
 
     it('registers initial version in package', async function () {
-      await this.app.package.hasVersion(initialVersion).should.eventually.be.true;
+      (await this.app.package.hasVersion(initialVersion)).should.be.true;
     });
 
     it('initializes all app properties', async function () {
@@ -42,10 +42,12 @@ contract('App', function ([_, owner]) {
 
   const shouldConnectToStdlib = function () {
     it('should connect current directory to stdlib', async function () {
-      const currentDirectory = AppDirectory.at(await this.app.package.getVersion(this.app.version))
+      const address = await this.app.package.getVersion(this.app.version);
+      const currentDirectory = AppDirectory.at(address)
       const currentStdlib = await currentDirectory.stdlib()
 
-      await this.app.currentStdlib().should.eventually.be.eq(currentStdlib)
+      const stdlib = await this.app.currentStdlib();
+      stdlib.should.be.eq(currentStdlib)
     });
   };
 
@@ -80,7 +82,7 @@ contract('App', function ([_, owner]) {
       });
 
       it('registers new version on package', async function () {
-        await this.app.package.hasVersion(newVersion).should.eventually.be.true;
+        (await this.app.package.hasVersion(newVersion)).should.be.true;
       });
 
       it('returns the current directory', async function () {
@@ -116,8 +118,8 @@ contract('App', function ([_, owner]) {
       const shouldReturnProxy = function () {
         it('should return a proxy', async function () {
           this.proxy.address.should.be.not.null;
-          await this.proxy.version().should.eventually.be.eq('V1');
-          await this.app.getProxyImplementation(this.proxy.address).should.eventually.be.eq(this.implementation_v1.address)
+          (await this.proxy.version()).should.be.eq('V1');
+          (await this.app.getProxyImplementation(this.proxy.address)).should.be.eq(this.implementation_v1.address)
         });
       };
 
@@ -159,7 +161,7 @@ contract('App', function ([_, owner]) {
         shouldReturnProxy();
       });
     });
-    
+
     describe('upgradeProxy', function () {
       beforeEach('setting implementation', setImplementation);
       beforeEach('create proxy', createProxy);
@@ -170,8 +172,8 @@ contract('App', function ([_, owner]) {
 
       const shouldUpgradeProxy = function () {
         it('should upgrade proxy to ImplV2', async function () {
-          await this.proxy.version().should.eventually.be.eq('V2');
-          await this.app.getProxyImplementation(this.proxy.address).should.eventually.be.eq(this.implementation_v2.address)
+          (await this.proxy.version()).should.be.eq('V2');
+          (await this.app.getProxyImplementation(this.proxy.address)).should.be.eq(this.implementation_v2.address)
         });
       };
 
@@ -179,7 +181,7 @@ contract('App', function ([_, owner]) {
         beforeEach('upgrading the proxy', async function () {
           await this.app.upgradeProxy(this.proxy.address, ImplV2, contractName);
         });
-        
+
         shouldUpgradeProxy();
       });
 
@@ -187,9 +189,9 @@ contract('App', function ([_, owner]) {
         beforeEach('upgrading the proxy', async function () {
           await this.app.upgradeProxy(this.proxy.address, ImplV2, contractName, 'migrate', [20]);
         });
-        
+
         shouldUpgradeProxy();
-        
+
         it('should run migration', async function () {
           (await this.proxy.value()).toNumber().should.eq(20);
         });
@@ -228,17 +230,6 @@ contract('App', function ([_, owner]) {
         this.app = await App.fetch(this.app.address(), txParams);
       });
 
-      shouldInitialize();
-      shouldConnectToStdlib();
-    });
-  });
-
-  describe('with stdlib', function () {
-    beforeEach('deploying', async function () {
-      this.app = await App.deployWithStdlib(initialVersion, stdlibAddress, txParams);
-    });
-
-    describe('deploy', function () {
       shouldInitialize();
       shouldConnectToStdlib();
     });

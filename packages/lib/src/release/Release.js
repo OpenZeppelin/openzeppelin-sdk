@@ -5,17 +5,20 @@ import ReleaseDeployer from './ReleaseDeployer'
 const log = new Logger('Release')
 
 export default class Release {
+
+  static async deployLocal(contracts, txParams = {}) {
+    const deployer = new ReleaseDeployer(txParams);
+    return await deployer.deployLocal(contracts);
+  }
+
+  static async deployDependency(dependencyName, contracts, txParams = {}) {
+    const deployer = new ReleaseDeployer(txParams);
+    return await deployer.deployDependency(dependencyName, contracts);
+  }
+
   constructor(release, txParams = {}) {
     this._release = release
     this.txParams = txParams
-  }
-
-  static async deployLocal() {
-    return await ReleaseDeployer.deployLocal(...arguments);
-  }
-
-  static async deployDependency() {
-    return await ReleaseDeployer.deployDependency(...arguments);
   }
 
   address() {

@@ -5,21 +5,26 @@ import Release from '../../../src/release/Release'
 
 contract('Release', ([_, owner]) => {
   const txParams = { from: owner }
-  const contracts = [{ alias: 'DummyImplementation', name: 'DummyImplementation' }]
 
   describe('deployLocal', function () {
+    const contracts = [{ alias: 'DummyImplementation', name: 'DummyImplementation' }]
+
     beforeEach(async function () {
       this.release = await Release.deployLocal(contracts, txParams)
     })
 
     it('has an owner', async function () {
-      await this.release.owner().should.eventually.be.equal(owner)
+      (await this.release.owner()).should.be.equal(owner)
     })
 
     it('can be frozen', async function () {
-      await this.release.isFrozen().should.eventually.be.false
+      let frozen = await this.release.isFrozen();
+      frozen.should.be.false
+
       await this.release.freeze().should.eventually.be.fulfilled
-      await this.release.isFrozen().should.eventually.be.true
+
+      frozen = await this.release.isFrozen()
+      frozen.should.be.true
     })
 
     it('can tell the implementation of a contract', async function () {
@@ -27,12 +32,47 @@ contract('Release', ([_, owner]) => {
     })
 
     it('deploys a new release', async function () {
-      this.release.address().should.not.be.null
-      this.release.owner().should.eventually.be.equal(owner)
+      this.release.address().should.be.not.null;
+      (await this.release.owner()).should.be.equal(owner)
     })
 
     it('includes the given contracts', async function () {
       (await this.release.getImplementation('DummyImplementation')).should.not.be.zero
+    })
+  })
+
+  describe('deployDependency', function () {
+    const contracts = [{ alias: 'Greeter', name: 'Greeter' }]
+
+    beforeEach(async function () {
+      this.release = await Release.deployDependency('mock-dependency', contracts, txParams)
+    })
+
+    it('has an owner', async function () {
+      (await this.release.owner()).should.be.equal(owner)
+    })
+
+    it('can be frozen', async function () {
+      let frozen = await this.release.isFrozen();
+      frozen.should.be.false
+
+      await this.release.freeze().should.eventually.be.fulfilled
+
+      frozen = await this.release.isFrozen()
+      frozen.should.be.true
+    })
+
+    it('can tell the implementation of a contract', async function () {
+      (await this.release.getImplementation('Greeter')).should.not.be.zero
+    })
+
+    it('deploys a new release', async function () {
+      this.release.address().should.be.not.null;
+      (await this.release.owner()).should.be.equal(owner)
+    })
+
+    it('includes the given contracts', async function () {
+      (await this.release.getImplementation('Greeter')).should.not.be.zero
     })
   })
 })

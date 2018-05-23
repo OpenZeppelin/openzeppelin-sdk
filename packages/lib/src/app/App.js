@@ -11,6 +11,22 @@ import AppDeployer from './AppDeployer'
 const log = new Logger('App')
 
 export default class App {
+
+  static async fetch(address, txParams = {}) {
+    const provider = new AppProvider(txParams)
+    return await provider.from(address)
+  }
+
+  static async deploy(version, txParams = {}) {
+    const deployer = new AppDeployer(txParams)
+    return await deployer.deploy(version)
+  }
+
+  static async deployWithStdlib(version, stdlibAddress, txParams = {}) {
+    const deployer = new AppDeployer(txParams)
+    return await deployer.deployWithStdlib(version, stdlibAddress)
+  }
+
   constructor(_app, factory, appDirectory, _package, version, txParams = {}) {
     this._app = _app
     this.factory = factory
@@ -19,18 +35,6 @@ export default class App {
     this.directories = {}
     this.directories[version] = appDirectory
     this.txParams = txParams
-  }
-
-  static async fetch() {
-    return await AppProvider.from(...arguments);
-  }
-
-  static async deploy() {
-    return await AppDeployer.deploy(...arguments);
-  }
-
-  static async deployWithStdlib() {
-    return await AppDeployer.deployWithStdlib(...arguments);
   }
 
   address() {

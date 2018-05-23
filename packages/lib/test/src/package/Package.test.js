@@ -13,26 +13,23 @@ contract('Package', function ([_, owner]) {
   const initialVersion = "1.0"
   const newVersion = "2.0"
 
-  function shouldInitialize() {
+  const shouldInitialize = function () {
     it('instantiates the package', async function() {
       this.package.address().should.not.be.null
     })
   }
 
-  async function createRelease() {
+  const createRelease = async function () {
     await this.package.newVersion(initialVersion)
   }
-
 
   beforeEach("deploying", async function () {
     this.package = await Package.deploy(txParams)
   })
 
-
   describe('deploy', function () {
     shouldInitialize()
   })
-
 
   describe('connect', function () {
     beforeEach("connecting to existing instance", async function () {
@@ -41,7 +38,6 @@ contract('Package', function ([_, owner]) {
 
     shouldInitialize()
   })
-
 
   describe('newVersion', function () {
     beforeEach('creating a new release', createRelease)
@@ -52,7 +48,6 @@ contract('Package', function ([_, owner]) {
       hasVersion.should.be.true
     })
   })
-
 
   describe('freeze', function() {
     beforeEach('creating a new release', createRelease)
@@ -68,7 +63,6 @@ contract('Package', function ([_, owner]) {
       frozen.should.be.true
     })
   })
-
 
   describe('get and set implementation', function () {
     beforeEach('creating a new release', createRelease)

@@ -7,19 +7,21 @@ import PackageProvider from './PackageProvider'
 const log = new Logger('Package')
 
 export default class Package {
+
+  static async fetch(address, txParams = {}) {
+    const provider = new PackageProvider(txParams)
+    return await provider.from(address)
+  }
+
+  static async deploy(txParams = {}) {
+    const deployer = new PackageDeployer(txParams)
+    return await deployer.deploy()
+  }
+
   constructor(_package, txParams = {}) {
     this.package = _package
     this.txParams = txParams
   }
-
-  static async fetch() {
-    return await PackageProvider.from(...arguments);
-  }
-
-  static async deploy() {
-    return await PackageDeployer.deploy(...arguments);
-  }
-
 
   address() {
     return this.package.address
