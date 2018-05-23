@@ -14,9 +14,9 @@ module.exports = async function() {
 
   console.log('Calling initialize(42) on proxy...');
   let myContract = await MyContract_v0.at(proxy.address);
-  const x0 = 42;
-  await myContract.initialize(x0);
-	console.log('Proxy\'s storage value for x: ' + (await myContract.x()).toString());
+  const value = 42;
+  await myContract.initialize(value);
+  console.log('Proxy\'s storage value: ' + (await myContract.value()).toString());
 
   console.log('Deploying MyContract v1...');
   const myContract_v1 = await MyContract_v1.new();
@@ -25,7 +25,7 @@ module.exports = async function() {
   await proxy.upgradeTo(myContract_v1.address);
   myContract = await MyContract_v1.at(proxy.address);
 
-  console.log('Proxy\'s storage value for x: ' + (await myContract.x()).toString());
-  console.log('Proxy\'s storage value for y: ' + (await myContract.y()).toString());
-  console.log('Wohoo! We\'ve upgraded our contract\'s behavior while preserving storage.');
+  await myContract.add(1);
+  console.log('Proxy\'s storage new value: ' + (await myContract.value()).toString());
+  console.log('Wohoo! We\'ve upgraded our contract\'s behavior while preserving its storage, thus obtaining 43.');
 };
