@@ -7,11 +7,11 @@ import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 
 /**
  * @title BaseApp
- * @dev Abstract base contract for the management of upgradeable user projects
- * @dev Handles the creation and upgrading of proxies 
+ * @dev Abstract base contract for upgradeable applications.
+ * It handles the creation and upgrading of proxies.
  */
 contract BaseApp is Ownable {
-  // factory for proxy creation
+  /// @dev Factory that creates proxies.
   UpgradeabilityProxyFactory public factory;
 
   /**
@@ -24,24 +24,24 @@ contract BaseApp is Ownable {
   }
 
   /**
-   * @dev Abstract function for fetching the app's implementation provider
-   * @return The app's implementation provider
+   * @dev Abstract function to return the implementation provider.
+   * @return The implementation provider.
    */
   function getProvider() internal view returns (ImplementationProvider);
 
   /**
-   * @dev Gets the implementation address for a given contract name, provided by the implementation provider
-   * @param contractName Name of the contract whose implementation address is desired
-   * @return Address where the contract is implemented
+   * @dev Returns the implementation address for a given contract name, provided by the `ImplementationProvider`.
+   * @param contractName Name of the contract.
+   * @return Address where the contract is implemented.
    */
   function getImplementation(string contractName) public view returns (address) {
     return getProvider().getImplementation(contractName);
   }
 
   /**
-   * @dev Creates a new proxy for the given contract
-   * @param contractName Name of the contract for which a proxy is desired
-   * @return Address of the new proxy
+   * @dev Creates a new proxy for the given contract.
+   * @param contractName Name of the contract.
+   * @return Address of the new proxy.
    */
   function create(string contractName) public returns (AdminUpgradeabilityProxy) {
     address implementation = getImplementation(contractName);
@@ -49,14 +49,14 @@ contract BaseApp is Ownable {
   }
 
   /**
-   * @dev Creates a new proxy for the given contract and forwards a function call to it
-   * @dev Useful for initializing the proxied contract
-   * @param contractName Name of the contract for which a proxy is desired
-   * @param data Data to be sent as msg.data in the low level call. 
-   * It should include the signature of the function to be called in the
-   * implementation together with its parameters, as described in
+   * @dev Creates a new proxy for the given contract and forwards a function call to it.
+   * This is useful to initialize the proxied contract.
+   * @param contractName Name of the contract.
+   * @param data Data to send as msg.data in the low level call.
+   * It should include the signature and the parameters of the function to be
+   * called, as described in
    * https://solidity.readthedocs.io/en/develop/abi-spec.html#function-selector-and-argument-encoding.
-   * @return Address of the new proxy
+   * @return Address of the new proxy.
    */
    function createAndCall(string contractName, bytes data) payable public returns (AdminUpgradeabilityProxy) {
     address implementation = getImplementation(contractName);
@@ -64,9 +64,9 @@ contract BaseApp is Ownable {
   }
 
   /**
-   * @dev Upgrades a proxy to the newest implementation of a contract
-   * @param proxy Proxy to be upgraded
-   * @param contractName Name of the contract with a new implmentation
+   * @dev Upgrades a proxy to the newest implementation of a contract.
+   * @param proxy Proxy to be upgraded.
+   * @param contractName Name of the contract.
    */
   function upgrade(AdminUpgradeabilityProxy proxy, string contractName) public onlyOwner {
     address implementation = getImplementation(contractName);
@@ -74,12 +74,13 @@ contract BaseApp is Ownable {
   }
 
   /**
-   * @dev Upgrades a proxy to the newest implementation of a contract and forwards it the function call packed in data
-   * @param proxy Proxy to be upgraded
-   * @param contractName Name of the contract with a new implmentation
-   * @param data Data to be sent as msg.data in the low level call.
-   * It should include the signature of the function to be called in the
-   * implementation together with its parameters, as described in 
+   * @dev Upgrades a proxy to the newest implementation of a contract and forwards a function call to it.
+   * This is useful to initialize the proxied contract.
+   * @param proxy Proxy to be upgraded.
+   * @param contractName Name of the contract.
+   * @param data Data to send as msg.data in the low level call.
+   * It should include the signature and the parameters of the function to be
+   * called, as described in
    * https://solidity.readthedocs.io/en/develop/abi-spec.html#function-selector-and-argument-encoding.
    */
   function upgradeAndCall(AdminUpgradeabilityProxy proxy, string contractName, bytes data) payable public onlyOwner {
@@ -88,17 +89,18 @@ contract BaseApp is Ownable {
   }
 
   /**
-   * @dev Gets the implementation for one of the owned proxies.
-   * @dev It's necessary to have this here because only the proxy owner can query it.
-   * @return the address of the current implemetation of the given proxy
+   * @dev Returns the current implementation of a proxy.
+   * This is needed because only the proxy admin can query it.
+   * @return The address of the current implementation of the proxy.
    */
   function getProxyImplementation(AdminUpgradeabilityProxy proxy) public view returns (address) {
     return proxy.implementation();
   }
 
   /**
-   * @dev Gets a proxy's admin. Necessary because only the admin can query it.
-   * @return the address of the current proxy admin of the given proxy
+   * @dev Returns the admin of a proxy.
+   * Only the admin can query it.
+   * @return The address of the current admin of the proxy.
    */
   function getProxyAdmin(AdminUpgradeabilityProxy proxy) public view returns (address) {
     return proxy.admin();

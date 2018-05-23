@@ -6,18 +6,18 @@ import "../upgradeability/UpgradeabilityProxyFactory.sol";
 
 /**
  * @title UnversionedApp
- * @dev Basic implementation of an upgradable app with no versioning
+ * @dev Basic implementation of an upgradable app with no versioning.
  */
 contract UnversionedApp is BaseApp {
   /*
-   * @dev stores the contract implementation addresses
+   * @dev Provider that stores the contract implementation addresses.
    */
   ImplementationProvider internal provider;
 
   /**
-   * @dev Constructor function
-   * @param _provider Implementation provider
-   * @param _factory Proxy factory
+   * @dev Constructor function.
+   * @param _provider Implementation provider.
+   * @param _factory Proxy factory.
    */
   function UnversionedApp(ImplementationProvider _provider, UpgradeabilityProxyFactory _factory)
     BaseApp(_factory)
@@ -27,14 +27,15 @@ contract UnversionedApp is BaseApp {
   }
 
   /**
-   * @return Implementation provider used by the app
+   * @dev Returns the provider used by the app.
+   * @return The provider.
    */
   function getProvider() internal view returns (ImplementationProvider) {
     return provider;
   }
 
   /**
-   * @dev Sets a new implementation provider
+   * @dev Sets a new implementation provider.
    * @param _provider New implementation provider
    */
   function setProvider(ImplementationProvider _provider) public onlyOwner {

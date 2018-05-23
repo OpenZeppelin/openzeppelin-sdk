@@ -4,32 +4,31 @@ import './UpgradeabilityProxy.sol';
 
 /**
  * @title AdminUpgradeabilityProxy
- *
  * @dev This contract combines an upgradeability proxy with an authorization
- * @dev mechanism for administrative tasks.
- *
- * @dev All external functions in this contract must be guarded by the
- * @dev ifAdmin modifier. See ethereum/solidity#3864 for a Solidity
- * @dev feature proposal that would enable this to be done automatically.
+ * mechanism for administrative tasks.
+ * All external functions in this contract must be guarded by the
+ * `ifAdmin` modifier. See ethereum/solidity#3864 for a Solidity
+ * feature proposal that would enable this to be done automatically.
  */
 contract AdminUpgradeabilityProxy is UpgradeabilityProxy {
   /**
-   * @dev Event to show administration has been transferred
-   * @param previousAdmin the address of the previous admin
-   * @param newAdmin the address of the new admin
+   * @dev Emitted when the administration has been transferred.
+   * @param previousAdmin Address of the previous admin.
+   * @param newAdmin Address of the new admin.
    */
   event AdminChanged(address previousAdmin, address newAdmin);
 
   /**
    * @dev Storage slot with the admin of the contract.
-   * @dev This is the hash of "org.zeppelinos.proxy.admin", and is validated in
-   * @dev the constructor.
+   * This is the keccak-256 hash of "org.zeppelinos.proxy.admin", and is
+   * validated in the constructor.
    */
   bytes32 private constant ADMIN_SLOT = 0x10d6a54a4754c8869d6886b5f5d7fbfa5b4522237ea5c60d11bc4e7a1ff9390b;
 
   /**
-   * @dev Will run this function if the sender is the admin.
-   * @dev Otherwise it will fall back to the implementation.
+   * @dev Modifier to check whether the `msg.sender` is the admin.
+   * If it is, it will run the function. Otherwise, it will delegate the call
+   * to the implementation.
    */
   modifier ifAdmin() {
     if (msg.sender == _admin()) {
@@ -40,8 +39,9 @@ contract AdminUpgradeabilityProxy is UpgradeabilityProxy {
   }
 
   /**
-   * @dev The constructor assigns proxy administration to the sender account.
-   * @param _implementation address of the initial implementation
+   * Contract constructor.
+   * It sets the `msg.sender` as the proxy administrator.
+   * @param _implementation address of the initial implementation.
    */
   function AdminUpgradeabilityProxy(address _implementation) UpgradeabilityProxy(_implementation) public {
     assert(ADMIN_SLOT == keccak256("org.zeppelinos.proxy.admin"));
@@ -50,22 +50,23 @@ contract AdminUpgradeabilityProxy is UpgradeabilityProxy {
   }
 
   /**
-   * @return the address of the proxy admin
+   * @return The address of the proxy admin.
    */
   function admin() external view ifAdmin returns (address) {
     return _admin();
   }
 
   /**
-   * @return the address of the implementation
+   * @return The address of the implementation.
    */
   function implementation() external view ifAdmin returns (address) {
     return _implementation();
   }
 
   /**
-   * @dev Allows the current admin to transfer control of the proxy.
-   * @param newAdmin the address which to transfer proxy administration 
+   * @dev Changes the admin of the proxy.
+   * Only the current admin can call this function.
+   * @param newAdmin Address to transfer proxy administration to.
    */
   function changeAdmin(address newAdmin) external ifAdmin {
     require(newAdmin != address(0));
@@ -74,21 +75,23 @@ contract AdminUpgradeabilityProxy is UpgradeabilityProxy {
   }
 
   /**
-   * @dev Allows the proxy admin to upgrade the backing implementation.
-   * @param newImplementation the address of the new implementation
+   * @dev Upgrade the backing implementation of the proxy.
+   * Only the admin can call this function.
+   * @param newImplementation Address of the new implementation.
    */
   function upgradeTo(address newImplementation) external ifAdmin {
     _upgradeTo(newImplementation);
   }
 
   /**
-   * @dev Allows the proxy admin to upgrade the current version of the proxy
-   * @dev and call a function on the new implementation to initialize whatever
-   * @dev is needed.
-   *
-   * @param implementation the address of the new implementation to be set.
-   * @param data represents the msg.data to bet sent in the low level call. This parameter may include the function
-   * signature of the implementation to be called with the needed payload
+   * @dev Upgrade the backing implementation of the proxy and call a function
+   * on the new implementation.
+   * This is useful to initialize the proxied contract.
+   * @param implementation Address of the new implementation.
+   * @param data Data to send as msg.data in the low level call.
+   * It should include the signature and the parameters of the function to be
+   * called, as described in
+   * https://solidity.readthedocs.io/en/develop/abi-spec.html#function-selector-and-argument-encoding.
    */
   function upgradeToAndCall(address implementation, bytes data) payable external ifAdmin {
     _upgradeTo(implementation);
@@ -96,8 +99,7 @@ contract AdminUpgradeabilityProxy is UpgradeabilityProxy {
   }
 
   /**
-   * @dev Getter for the org.zeppelinos.proxy.admin slot.
-   * @return address of the proxy admin
+   * @return The admin slot.
    */
   function _admin() internal returns (address admin) {
     bytes32 slot = ADMIN_SLOT;
@@ -107,9 +109,8 @@ contract AdminUpgradeabilityProxy is UpgradeabilityProxy {
   }
 
   /**
-   * @dev Setter for the org.zeppelinos.proxy.admin slot.
-   * @dev Sets the address of the proxy admin
-   * @param newAdmin address of the new proxy admin
+   * @dev Sets the address of the proxy admin.
+   * @param newAdmin Address of the new proxy admin.
    */
   function _setAdmin(address newAdmin) internal {
     bytes32 slot = ADMIN_SLOT;

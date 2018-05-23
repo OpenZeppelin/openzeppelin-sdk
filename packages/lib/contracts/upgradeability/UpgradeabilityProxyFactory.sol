@@ -4,20 +4,20 @@ import './AdminUpgradeabilityProxy.sol';
 
 /**
  * @title UpgradeabilityProxyFactory
- * @dev Creates upgradeability proxies
+ * @dev Factory to create upgradeability proxies.
  */
 contract UpgradeabilityProxyFactory {
   /**
-   * @dev Emitted every time a new proxy is created
-   * @param proxy The address of the created proxy
+   * @dev Emitted when a new proxy is created.
+   * @param proxy Address of the created proxy.
    */
   event ProxyCreated(address proxy);
 
   /**
-   * @dev Creates an upgradeability proxy upgraded to an initial version
-   * @param owner the owner of the proxy to be set
-   * @param implementation the address of the initial implementation to be set
-   * @return address of the new proxy created
+   * @dev Creates an upgradeability proxy with an initial implementation.
+   * @param owner Proxy owner.
+   * @param implementation Address of the initial implementation.
+   * @return Address of the new proxy.
    */
   function createProxy(address owner, address implementation) public returns (AdminUpgradeabilityProxy) {
     AdminUpgradeabilityProxy proxy = _createProxy(implementation);
@@ -26,12 +26,15 @@ contract UpgradeabilityProxyFactory {
   }
 
   /**
-   * @dev Creates an upgradeability proxy upgraded to an initial version and call the new implementation
-   * @param owner the owner of the proxy to be set
-   * @param implementation the address of the initial implementation to be set
-   * @param data The msg.data to bet sent in the low level call. This parameter may include the function
-   * signature of the implementation to be called with the needed payload
-   * @return address of the new proxy created
+   * @dev Creates an upgradeability proxy with an initial implementation and calls it.
+   * This is useful to initialize the proxied contract.
+   * @param owner Proxy owner.
+   * @param implementation Address of the initial implementation.
+   * @param data Data to send as msg.data in the low level call.
+   * It should include the signature and the parameters of the function to be
+   * called, as described in
+   * https://solidity.readthedocs.io/en/develop/abi-spec.html#function-selector-and-argument-encoding.
+   * @return Address of the new proxy.
    */
   function createProxyAndCall(address owner, address implementation, bytes data) public payable returns (AdminUpgradeabilityProxy) {
     AdminUpgradeabilityProxy proxy = _createProxy(implementation);
@@ -41,9 +44,9 @@ contract UpgradeabilityProxyFactory {
   }
 
   /**
-   * @dev Internal function to create an upgradeable proxy
-   * @param implementation the address of the initial implementation to be set
-   * @return address of the new proxy created
+   * @dev Internal function to create an upgradeable proxy.
+   * @param implementation Address of the initial implementation.
+   * @return Address of the new proxy.
    */
   function _createProxy(address implementation) internal returns (AdminUpgradeabilityProxy) {
     AdminUpgradeabilityProxy proxy = new AdminUpgradeabilityProxy(implementation);
