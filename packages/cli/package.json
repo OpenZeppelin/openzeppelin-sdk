@@ -24,7 +24,6 @@
     "lib",
     "examples"
   ],
-  "author": "Manuel Araoz <manuel@zeppelinos.org>",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/zeppelinos/zos-cli/issues"
