@@ -18,7 +18,6 @@
     "generation",
     "soldoc"
   ],
-  "author": "zeppelin_os",
   "license": "MIT",
   "dependencies": {
     "shelljs": "^0.8.1",
