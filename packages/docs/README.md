@@ -1,21 +1,26 @@
 # ZeppelinOS documentation site
 
-Centralised documentation site for ZeppelinOS.
+Centralized documentation site for ZeppelinOS.
 
-## Writing docs
+To view this website locally, clone the repository with:
 
-Write custom documentation in Markdown in the `docs/docs` folder (see `start.md`).
+`git clone https://github.com/zeppelinos/zos-docs.git`
 
-## Generating docs
+Install Docusaurus:
 
-To generate the documentation for a new version, run:
+`npm install -g docusaurus-init`
 
-```sh
-npm run bump-docs -- <tag>
-```
+Navigate to the `docs/website` directory and run:
 
-This command will automatically:
+`npm install`
 
-* Run [solidity-docgen](https://github.com/spalladino/solidity-docgen) on the ZeppelinOS codebase at the given tag.
-* Generate a new Docusaurus version matching the ZeppelinOS release tag.
-* Build the Docusaurus project, yielding the result in `docs/website/build`.
+And finally run:
+
+`npm run start`
+
+This will deploy the site locally in your computer at `http://localhost:3000/`.
+
+
+## API Referencegeneration
+
+At present, we need to generate the API reference for `zos-cli` and `zos-lib` using [`gen-docs`](https://github.com/zeppelinos/zos-cli/blob/master/docs/bin/docs.js) and [`solidity-docgen`](https://github.com/OpenZeppelin/solidity-docgen) respectively, and then merge the outcome manually by substituting the corresponding `.md` files in the `docs/docs/` directory. 
