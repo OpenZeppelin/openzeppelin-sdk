@@ -1,10 +1,11 @@
 'use strict'
 require('../setup')
 
+import { Contracts } from 'zos-lib'
 import testApp from '../../src/models/TestApp';
 
-const ImplV1 = artifacts.require('ImplV1');
-const ImplV2 = artifacts.require('ImplV2');
+const ImplV1 = Contracts.getFromLocal('ImplV1');
+const ImplV2 = Contracts.getFromLocal('ImplV2');
 
 contract('TestApp', function ([_, owner]) {
   const txParams = { from: owner }

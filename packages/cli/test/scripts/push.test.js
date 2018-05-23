@@ -1,16 +1,17 @@
 'use strict'
 require('../setup')
 
+import { cleanup, cleanupfn } from '../helpers/cleanup'
+import { Contracts, FileSystem as fs, App, Package } from 'zos-lib'
+
 import push from '../../src/scripts/push.js';
 import freeze from '../../src/scripts/freeze';
 import add from '../../src/scripts/add';
-import { FileSystem as fs, App, Package } from 'zos-lib'
-import { cleanup, cleanupfn } from '../helpers/cleanup';
 import bumpVersion from '../../src/scripts/bump';
 
-const ImplV1 = artifacts.require('ImplV1');
-const PackageContract = artifacts.require('Package');
-const ImplementationDirectory = artifacts.require('ImplementationDirectory');
+const ImplV1 = Contracts.getFromLocal('ImplV1');
+const PackageContract = Contracts.getFromNodeModules('zos-lib', 'Package');
+const ImplementationDirectory = Contracts.getFromNodeModules('zos-lib', 'ImplementationDirectory');
 
 contract('push command', function([_, owner]) {
   const network = 'test';

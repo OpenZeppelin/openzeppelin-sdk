@@ -1,20 +1,22 @@
 'use strict'
 require('../setup')
 
+import CaptureLogs from '../helpers/captureLogs';
+import { cleanupfn } from "../helpers/cleanup.js";
+import { Contracts, FileSystem as fs, Logger } from "zos-lib";
+
 import init from '../../src/scripts/init.js';
 import add from '../../src/scripts/add.js';
 import push from '../../src/scripts/push.js';
 import bumpVersion from '../../src/scripts/bump.js';
 import createProxy from '../../src/scripts/create.js';
 import upgradeProxy from '../../src/scripts/upgrade.js';
-import { Contracts, FileSystem as fs, Logger } from 'zos-lib';
-import { cleanupfn } from '../helpers/cleanup.js';
-import CaptureLogs from '../helpers/captureLogs';
 
-const ImplV1 = artifacts.require('ImplV1');
-const ImplV2 = artifacts.require('ImplV2');
-const Greeter = artifacts.require('GreeterImpl');
-const PackagedApp = Contracts.getFromLib('PackagedApp');
+const ImplV1 = Contracts.getFromLocal('ImplV1')
+const ImplV2 = Contracts.getFromLocal('ImplV2')
+const PackagedApp = Contracts.getFromLib('PackagedApp')
+const Greeter_V1 = Contracts.getFromNodeModules('mock-stdlib', 'GreeterImpl')
+const Greeter_V2 = Contracts.getFromNodeModules('mock-stdlib-2', 'GreeterImpl')
 
 contract('upgrade-proxy command', function([_, owner]) {
   const txParams = { from: owner };
@@ -221,28 +223,28 @@ contract('upgrade-proxy command', function([_, owner]) {
       const proxyAddress = fs.parseJson(networkFileName).proxies['Greeter'][0].address;
       await upgradeProxy({ contractAlias: 'Greeter', proxyAddress, network, packageFileName, txParams });
       await assertProxyInfo('Greeter', 0, { version: v2string, address: proxyAddress });
-      const upgradedProxy = await Greeter.at(proxyAddress);
+      const upgradedProxy = await Greeter_V2.at(proxyAddress);
       (await upgradedProxy.version()).should.eq('1.2.0');
 
       const anotherProxyAddress = fs.parseJson(networkFileName).proxies['Greeter'][1].address;
-      const notUpgradedProxy = await Greeter.at(anotherProxyAddress);
+      const notUpgradedProxy = await Greeter_V1.at(anotherProxyAddress);
       (await notUpgradedProxy.version()).should.eq('1.1.0');
     });
 
     it('should upgrade the version of all proxies given their name', async function() {
       await upgradeProxy({ contractAlias: 'Greeter', network, packageFileName, txParams });
       const { address: proxyAddress } = await assertProxyInfo('Greeter', 0, { version: v2string });
-      (await Greeter.at(proxyAddress).version()).should.eq('1.2.0');
+      (await Greeter_V2.at(proxyAddress).version()).should.eq('1.2.0');
       const { address: anotherProxyAddress } = await assertProxyInfo('Greeter', 0, { version: v2string });
-      (await Greeter.at(anotherProxyAddress).version()).should.eq('1.2.0');
+      (await Greeter_V2.at(anotherProxyAddress).version()).should.eq('1.2.0');
     });
 
     it('should upgrade the version of all proxies', async function() {
       await upgradeProxy({ network, packageFileName, txParams, all: true });
       const { address: proxyAddress } = await assertProxyInfo('Greeter', 0, { version: v2string });
-      (await Greeter.at(proxyAddress).version()).should.eq('1.2.0');
+      (await Greeter_V2.at(proxyAddress).version()).should.eq('1.2.0');
       const { address: anotherProxyAddress } = await assertProxyInfo('Greeter', 0, { version: v2string });
-      (await Greeter.at(anotherProxyAddress).version()).should.eq('1.2.0');
+      (await Greeter_V2.at(anotherProxyAddress).version()).should.eq('1.2.0');
     });
   });
 });

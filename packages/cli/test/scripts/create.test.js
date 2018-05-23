@@ -1,17 +1,17 @@
 'use strict'
 require('../setup')
 
-import { Logger, FileSystem as fs } from 'zos-lib';
+import CaptureLogs from '../helpers/captureLogs';
 import { cleanup, cleanupfn } from '../helpers/cleanup.js';
+import { Contracts, Logger, FileSystem as fs } from 'zos-lib';
 
+import add from '../../src/scripts/add.js';
 import init from '../../src/scripts/init.js';
 import push from '../../src/scripts/push.js';
 import createProxy from '../../src/scripts/create.js';
 import linkStdlib from '../../src/scripts/link.js';
-import add from '../../src/scripts/add.js';
-import CaptureLogs from '../helpers/captureLogs';
 
-const ImplV1 = artifacts.require('ImplV1');
+const ImplV1 = Contracts.getFromLocal('ImplV1');
 
 contract('create command', function([_, owner]) {
   const contractName = 'ImplV1';
