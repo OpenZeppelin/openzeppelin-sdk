@@ -1,5 +1,5 @@
 import Stdlib from '../stdlib/Stdlib'
-import TruffleInitializer from '../truffle/TruffleInitializer'
+import Truffle from '../truffle/Truffle'
 import { Contracts, Logger, FileSystem as fs } from 'zos-lib'
 
 const log = new Logger('LocalController');
@@ -13,7 +13,7 @@ export default class LocalBaseController {
 
   init(name, version, force = false) {
     this.initZosFile(name, version, force)
-    TruffleInitializer.call()
+    Truffle.init()
   }
 
   initZosFile(name, version, force = false) {

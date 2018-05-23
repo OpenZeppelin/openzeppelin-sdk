@@ -21,7 +21,7 @@ function registerPush(program) {
 function action(options) {
   const { from, network, skipCompile, deployStdlib, reupload } = options
   const txParams = from ? { from } : {}
-  runWithTruffle(async () => await push({ network, deployStdlib, reupload, txParams }), network, ! skipCompile)
+  runWithTruffle(async () => await push({ network, deployStdlib, reupload, txParams }), network, !skipCompile)
 }
 
 module.exports = { signature, description, register: registerPush, action}

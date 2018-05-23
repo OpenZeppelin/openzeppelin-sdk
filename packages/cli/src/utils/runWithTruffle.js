@@ -1,18 +1,10 @@
-import { Logger } from 'zos-lib'
-const log = new Logger('RunWithTruffle')
+import Truffle from '../models/truffle/Truffle';
 
 export default function runWithTruffle(script, network, compile = false) {
-  let config
-  try {
-    const TruffleConfig = require('truffle-config')
-    config = TruffleConfig.detect({ logger: console })
-  } catch (error) {
-    throw Error('You have to provide a truffle.js file, please remember to initialize your project running "truffle init".')
-  }
-
+  const config = Truffle.config()
   if(!network) throw Error('A network name must be provided to execute the requested action.')
   config.network = network
-  if (compile) compileWithTruffle(config)
+  if (compile) Truffle.compile(config)
   initTruffle(config).then(script)
 }
 
@@ -27,14 +19,4 @@ function initTruffle(config) {
       resolve()
     })
   });
-}
-
-function compileWithTruffle(config) {
-  log.info("Compiling contracts with truffle")
-  const truffleCallback = (err, abstractions, paths) => {
-    if (err) log.error(err)
-  }
-
-  const TruffleCompile = require('truffle-workflow-compile')
-  TruffleCompile.compile(config, truffleCallback)
 }

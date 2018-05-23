@@ -10,13 +10,11 @@ export default class ErrorHandler {
   }
 
   call() {
-    const errorMessage = this.error.message || GENERIC_ERROR_MESSAGE
-    log.error(errorMessage)
-    this._printStackIfVerbose()
+    if (!this.verbose) {
+      const errorMessage = this.error.message || GENERIC_ERROR_MESSAGE
+      log.error(errorMessage)
+    }
+    else log.error(this.error.stack)
     process.exit(1)
-  }
-
-  _printStackIfVerbose() {
-    if(this.verbose) log.error(this.error.stack)
   }
 }

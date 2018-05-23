@@ -99,24 +99,33 @@ export default class NetworkAppController extends NetworkBaseController {
 
     await this.fetch();
     const newVersion = this.app.version;
-    
+    const failures = []
     await Promise.all(_.flatMap(proxyInfos, (contractProxyInfos, contractAlias) => {
       const contractClass = this.localController.getContractClass(contractAlias);
       this.checkUpgrade(contractClass, initMethod, initArgs);
       return _.map(contractProxyInfos, async (proxyInfo) => {
-        proxyInfo.version = newVersion;
-        const currentImplementation = await this.app.getProxyImplementation(proxyInfo.address)
-        const contractImplementation = await this.app.getImplementation(contractAlias)
-        if(currentImplementation !== contractImplementation) {
-          await this.app.upgradeProxy(proxyInfo.address, contractClass, contractAlias, initMethod, initArgs);
-          proxyInfo.implementation = await this.app.getImplementation(contractAlias);
-        }
-        else {
-          log.info(`Contract ${contractAlias} at ${proxyInfo.address} is up to date.`)
-          proxyInfo.implementation = currentImplementation
+        try {
+          const currentImplementation = await this.app.getProxyImplementation(proxyInfo.address)
+          const contractImplementation = await this.app.getImplementation(contractAlias)
+          if(currentImplementation !== contractImplementation) {
+            await this.app.upgradeProxy(proxyInfo.address, contractClass, contractAlias, initMethod, initArgs);
+            proxyInfo.implementation = await this.app.getImplementation(contractAlias);
+          }
+          else {
+            log.info(`Contract ${contractAlias} at ${proxyInfo.address} is up to date.`)
+            proxyInfo.implementation = currentImplementation
+          }
+          proxyInfo.version = newVersion;
+        } catch(error) {
+          failures.push({ proxyInfo, contractAlias, error })
         }
       });
     }));
+
+    if(!_.isEmpty(failures)) {
+      const message = failures.map(failure => `Proxy ${failure.contractAlias} at ${failure.proxyInfo.address} failed to upgrade with ${failure.error.message}`).join('\n')
+      throw Error(message)
+    }
 
     return proxyInfos;
   }

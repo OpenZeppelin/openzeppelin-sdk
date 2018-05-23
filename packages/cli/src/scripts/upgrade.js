@@ -8,8 +8,12 @@ export default async function upgradeProxy({ contractAlias, proxyAddress, initMe
   }
 
   const appController = new LocalAppController(packageFileName).onNetwork(network, txParams, networkFileName);
-  await appController.checkLocalContractsDeployed(!force);
-  const proxies = await appController.upgradeProxies(contractAlias, proxyAddress, initMethod, initArgs);
-  appController.writeNetworkPackage();
-  _(proxies).values().forEach(proxies => proxies.forEach(proxy => stdout(proxy.address)));
+
+  try {
+    await appController.checkLocalContractsDeployed(!force);
+    const proxies = await appController.upgradeProxies(contractAlias, proxyAddress, initMethod, initArgs);
+    _(proxies).values().forEach(proxies => proxies.forEach(proxy => stdout(proxy.address)));
+  } finally {
+    appController.writeNetworkPackage();
+  }
 }

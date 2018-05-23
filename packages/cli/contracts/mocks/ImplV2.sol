@@ -18,3 +18,13 @@ contract AnotherImplV2 is ImplV2 {
     return "AnotherV2";
   }
 }
+
+contract UnmigratableImplV2 is ImplV2 {
+  function migrate(uint256 newVal) public {
+    assert(false);
+  }
+
+  function say() public pure returns (string) {
+    return "UnmigratableImplV2";
+  }
+}

@@ -66,7 +66,7 @@ async function contractsInfo(appController) {
   _.each(appController.packageData.contracts, function (contractName, contractAlias) {
     const isDeployed = appController.isContractDeployed(contractAlias);
     const hasChanged = appController.hasContractChanged(contractAlias);
-    const fullName = contractName == contractAlias ? contractAlias : `${contractAlias} (implemented by ${contractName})`;
+    const fullName = contractName === contractAlias ? contractAlias : `${contractAlias} (implemented by ${contractName})`;
     if (!isDeployed) {
       log.info(`- ${fullName} is not deployed`);
     } else if (hasChanged) {

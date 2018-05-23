@@ -146,6 +146,17 @@ contract('upgrade-proxy command', function([_, owner]) {
       await assertProxyInfo('Impl', 1, { version: v2string, implementation: this.implV2Address, value: 42 });
     });
 
+    it('should upgrade multiple proxies and migrate them', async function() {
+      // add non-migratable implementation for AnotherImpl contract
+      await add({ contractsData: [{ name: 'UnmigratableImplV2', alias: 'AnotherImpl' }], packageFileName })
+      await push({ packageFileName, network, txParams });
+
+      await upgradeProxy({ contractAlias: undefined, proxyAddress: undefined, all: true, initMethod: "migrate", initArgs: [42], network, packageFileName, txParams }).should.be.rejectedWith(/failed to upgrade/);
+      await assertProxyInfo('Impl', 0, { version: v2string, implementation: this.implV2Address, value: 42 });
+      await assertProxyInfo('Impl', 1, { version: v2string, implementation: this.implV2Address, value: 42 });
+      await assertProxyInfo('AnotherImpl', 0, { version: v1string, implementation: this.anotherImplV1Address });
+    });
+
     it('should refuse to upgrade a proxy to an undeployed contract', async function() {
       const data = fs.parseJson(networkFileName);
       delete data.contracts['Impl'];
