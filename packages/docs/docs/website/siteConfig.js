@@ -15,16 +15,12 @@ const siteConfig = {
   initialDoc: 'start',
   headerLinks: [
     {
-      href: 'https://zeppelinos.org',
-      label: 'Main Site',
+      doc: 'start',
+      label: 'Guides',
     },
     {
-      doc: 'climain',
-      label: 'CLI API',
-    },
-    {
-      doc: 'libmain',
-      label: 'Lib API',
+      doc: 'apis',
+      label: 'Reference',
     },
     {
     href: 'https://blog.zeppelinos.org',
@@ -32,7 +28,7 @@ const siteConfig = {
     },
     {
       href: 'https://github.com/zeppelinos',
-      label: 'Github',
+      label: 'GitHub',
     },
   ],
   headerIcon: 'img/logo.svg',

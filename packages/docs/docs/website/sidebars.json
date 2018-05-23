@@ -3,7 +3,7 @@
     "OVERVIEW": [
       "start"
     ],
-    "GETTING STARTED": [
+    "GUIDES": [
       "setup",
       "building",
       "using",
@@ -14,21 +14,32 @@
       "basil",
       "crafty"
     ],
-    "LIBRARY": [
+    "ZOS-LIB": [
       "libstart",
       "low_level_contract",
       "low_level_app"
     ],
     "FURTHER REFERENCE": [
-      "apis",
       "stdlib",
       "advanced",
       "whitepaper"
     ]
   },
-  "lib-api": {
+  "reference": {
     "WELCOME": [
-      "libmain"
+      "apis"
+    ],
+    "CLI REFERENCE": [
+      "climain",
+      "init",
+      "add",
+      "push",
+      "create",
+      "bump",
+      "upgrade",
+      "link",
+      "status",
+      "freeze"
     ],
     "APPLICATION / MANAGEMENT": [
       "application_management_AppDirectory",
@@ -55,22 +66,6 @@
       "upgradeability_Proxy",
       "upgradeability_UpgradeabilityProxy",
       "upgradeability_UpgradeabilityProxyFactory"
-    ]
-  },
-  "cli-api": {
-    "WELCOME": [
-      "climain"
-    ],
-    "COMMANDS": [
-      "init",
-      "add",
-      "push",
-      "create",
-      "bump",
-      "upgrade",
-      "link",
-      "status",
-      "freeze"
     ]
   }
 }

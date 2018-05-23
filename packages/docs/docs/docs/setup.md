@@ -3,27 +3,26 @@ id: setup
 title: Installation and setup
 ---
 
-The following steps will get us started using ZeppelinOS.
+The following steps will get you started using ZeppelinOS.
 
 ## Installation
 
-`zos` is the [command line interface](https://github.com/zeppelinos/zos-cli) to ZeppelinOS. To install it, let's go to our terminal and run:
+`zos` is the [command line interface](https://github.com/zeppelinos/zos-cli) to ZeppelinOS. To install it, go to your terminal and run:
 
 ```sh
 npm install --global zos
 ```
 
-## Setting up our application
+## Setting up your application
 
-We initialize our `zos` application with:
+Initialize your `zos` application with:
 
 ```sh
-mkdir myapp
-cd myapp
+mkdir my-app && cd my-app
 npm init
-zos init myapp
+zos init my-app
 ```
 
-This will create a `zos.json` file, which will contain all the information about our application. For more details about this file, please see the [advanced topics](advanced.md#format-of-zosjson-and-zos-network-json-files) section. 
+This creates a `zos.json` file, which contains all the information about your application. For details about this file format, please see the [advanced topics](advanced.md#format-of-zosjson-and-zos-network-json-files) section. 
 
-We are now ready to start [developing our upgradable application](building.md).
+You are now ready to [start building your upgradable application](building.md).

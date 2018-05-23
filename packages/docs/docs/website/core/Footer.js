@@ -35,10 +35,10 @@ class Footer extends React.Component {
           </a>
           <div>
             <h5>Docs</h5>
-            <a href="https://docs.zeppelinos.org/docs/building.html">
+            <a href="/docs/start.html">
               Guides
             </a>
-            <a href="https://docs.zeppelinos.org/docs/clifront.html">
+            <a href="/docs/apis.html">
               Reference
             </a>
           </div>
@@ -55,8 +55,9 @@ class Footer extends React.Component {
           </div> */}
           <div>
             <h5>More</h5>
+            <a href="https://zeppelinos.org">Main Site</a>
             <a href="https://blog.zeppelinos.org">Blog</a>
-            <a href="https://github.com/zeppelinos">Github</a>
+            <a href="https://github.com/zeppelinos">GitHub</a>
           </div>
         </section>
 
@@ -72,7 +73,7 @@ class Footer extends React.Component {
           />
         </a>
         <section className="copyright">
-          Copyright &copy; 2018 zOS Global
+          Copyright &copy; 2017-present zOS Global
         </section>
       </footer>
     );

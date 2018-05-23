@@ -3,9 +3,6 @@ id: start
 title: ZeppelinOS
 ---
 
-Welcome to the ZeppelinOS Documentation Site!
-
-
 ZeppelinOS is a platform to develop, deploy and operate upgradeable smart contracts on Ethereum and every other EVM and eWASM-powered blockchain.
 
 ## Features
@@ -23,7 +20,7 @@ In order to use ZeppelinOS to build an upgradeable application, follow our
 If you would like to use the ZeppelinOS on-chain standard libraries in your app,
  follow our [Using the stdlib in your app](using.md) guide. 
 
-Finally, if you are interested in deploying your own standard libraries for ZeppelinOS,
+If you are interested in deploying your own standard libraries for ZeppelinOS,
 see our [Developing a new standard library](developing.md) guide. 
 
 Two demo apps based on ZeppelinOS are described in [Basil](basil.md) and [Crafty](crafty.md).
