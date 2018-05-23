@@ -21,6 +21,6 @@ And finally run:
 This will deploy the site locally in your computer at `http://localhost:3000/`.
 
 
-## API Referencegeneration
+## API Reference generation
 
 At present, we need to generate the API reference for `zos-cli` and `zos-lib` using [`gen-docs`](https://github.com/zeppelinos/zos-cli/blob/master/docs/bin/docs.js) and [`solidity-docgen`](https://github.com/OpenZeppelin/solidity-docgen) respectively, and then merge the outcome manually by substituting the corresponding `.md` files in the `docs/docs/` directory. 
