@@ -28,7 +28,6 @@
     "proxy",
     "evm"
   ],
-  "author": "Manuel Araoz <manuel@zeppelinos.org>",
   "main": "./lib/index.js",
   "license": "MIT",
   "bugs": {
