@@ -1,6 +1,6 @@
 'use strict';
 
-import upgradeProxy from '../scripts/upgrade'
+import upgrade from '../scripts/upgrade'
 import runWithTruffle from '../utils/runWithTruffle'
 import { parseInit } from '../utils/input'
 
@@ -24,7 +24,7 @@ module.exports = {
         const { initMethod, initArgs } = parseInit(options, 'initialize')
         const { from, network, all, force } = options
         const txParams = from ? { from } : {}
-        runWithTruffle(async () => await upgradeProxy({
+        runWithTruffle(async () => await upgrade({
           contractAlias, proxyAddress, initMethod, initArgs,
           all, network, txParams, force
         }), network)

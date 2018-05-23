@@ -1,7 +1,7 @@
 'use strict';
 
 import push from './push'
-import bumpVersion from '../scripts/bump'
+import bump from '../scripts/bump'
 
 const signature = 'bump <version>'
 const description = 'bump your project to a new <version>'
@@ -18,7 +18,7 @@ module.exports = {
       .option('-f, --from <from>', 'specify transaction sender address for --push')
       .action(async function (version, options) {
         const { link: stdlibNameVersion, install: installDeps } = options
-        await bumpVersion({ version, stdlibNameVersion, installDeps })
+        await bump({ version, stdlibNameVersion, installDeps })
         if(options.push) push.action({ network: options.push, from: options.from })
       })
   }
