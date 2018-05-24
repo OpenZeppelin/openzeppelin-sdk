@@ -1,6 +1,6 @@
 {
   "name": "zos",
-  "version": "0.8.0",
+  "version": "0.8.1",
   "description": "ZeppelinOS command line interface",
   "main": "lib/index.js",
   "scripts": {
