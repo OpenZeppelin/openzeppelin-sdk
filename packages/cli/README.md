@@ -41,7 +41,7 @@ Initialize your project with ZeppelinOS. The next command will create a new `zos
 ```sh
 zos init <name> [version]
 ```
-Where <name> is your project's name, and [version] an optional initial version name. For example:
+Where `<name>` is your project's name, and [version] an optional initial version name. For example:
 ```sh
 zos init my-project 0.1.0
 ```
