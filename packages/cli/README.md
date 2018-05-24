@@ -4,7 +4,7 @@
 
 This package provides a unified command line interface to [ZeppelinOS](https://zeppelinos.org/).
 
-ZeppelinOS is a platform to develop, manage and operate smart contract applications in Ethereum. It can be used to create smart contract systems that can be fixed and improved over time, enabling developers to opt-in to mutability for their deployed code through [upgradeability patterns](https://blog.zeppelinos.org/proxy-patterns/).`zos` also provides an interface to connect your application code to already deployed standard libraries.
+ZeppelinOS is a platform to develop, manage and operate smart contract applications in Ethereum. It can be used to create smart contract systems that can be fixed and improved over time, enabling developers to opt-in to mutability for their deployed code through [upgradeability patterns](https://blog.zeppelinos.org/proxy-patterns/). `zos` also provides an interface to connect your application code to already deployed standard libraries.
 
 If you're looking for a lower-level development experience, see [`zos-lib`](https://github.com/zeppelinos/zos-lib).
 
