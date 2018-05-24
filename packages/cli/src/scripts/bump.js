@@ -1,7 +1,7 @@
 import ControllerFor from  '../models/local/ControllerFor'
 import stdout from '../utils/stdout';
 
-export default async function bumpVersion({ version, stdlibNameVersion = undefined, installDeps = false, packageFileName = undefined }) {
+export default async function bumpVersion({ version, stdlibNameVersion = undefined, installLib = false, packageFileName = undefined }) {
   if (version === undefined || version === '') throw Error('A version name must be provided to initialize a new version.')
 
   const appController = ControllerFor(packageFileName)
@@ -11,7 +11,7 @@ export default async function bumpVersion({ version, stdlibNameVersion = undefin
 
   appController.bumpVersion(version)
   if (!appController.isLib()) {
-    await appController.linkStdlib(stdlibNameVersion, installDeps)
+    await appController.linkStdlib(stdlibNameVersion, installLib)
   }
 
   appController.writePackage()

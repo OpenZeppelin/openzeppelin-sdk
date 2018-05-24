@@ -2,20 +2,18 @@ import { Contracts, Release, FileSystem as fs } from 'zos-lib'
 
 const StdlibDeployer = {
   async deploy(stdlibName, txParams = {}) {
-    this.stdlibName = stdlibName
-    this.txParams = txParams
-    const release = await this._createRelease()
+    const release = await this._createRelease(stdlibName, txParams)
     return release.address()
   },
 
-  async _createRelease() {
-    const contractsList = this._jsonData().contracts;
+  async _createRelease(stdlibName, txParams) {
+    const contractsList = this._jsonData(stdlibName).contracts;
     const contractsData = Object.keys(contractsList).map(alias => ({ alias, name: contractsList[alias] }))
-    return await Release.deployDependency(contractsData, this.stdlibName, this.txParams)
+    return await Release.deployDependency(stdlibName, contractsData, txParams)
   },
 
-  _jsonData() {
-    const filename = `node_modules/${this.stdlibName}/zos.json`
+  _jsonData(stdlibName) {
+    const filename = `node_modules/${stdlibName}/zos.json`
     return fs.parseJson(filename)
   }
 }

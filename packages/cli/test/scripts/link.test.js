@@ -7,20 +7,27 @@ import { cleanup, cleanupfn } from '../helpers/cleanup.js';
 import init from '../../src/scripts/init.js';
 import linkStdlib from '../../src/scripts/link.js';
 
-contract('link command', function() {
+contract('link script', function() {
   const appName = 'MyApp';
   const defaultVersion = '0.1.0';
   const packageFileName = 'test/tmp/zos.json';
 
   beforeEach('setup', async function() {
     cleanup(packageFileName)
-    await init({ name: appName, version: defaultVersion, packageFileName, stdlib: 'mock-stdlib@1.0.0' });
+    await init({ name: appName, version: defaultVersion, packageFileName, stdlibNameVersion: 'mock-stdlib@1.1.0' });
   });
 
   after('cleanup', cleanupfn(packageFileName));
 
   it('should set stdlib', async function () {
     await linkStdlib({ stdlibNameVersion: 'mock-stdlib@1.1.0', packageFileName });
+    const data = fs.parseJson(packageFileName);
+    data.stdlib.name.should.eq('mock-stdlib');
+    data.stdlib.version.should.eq('1.1.0');
+  });
+
+  it('should install the stdlib if requested', async function () {
+    await linkStdlib({ stdlibNameVersion: 'mock-stdlib@1.1.0', installLib: true, packageFileName });
     const data = fs.parseJson(packageFileName);
     data.stdlib.name.should.eq('mock-stdlib');
     data.stdlib.version.should.eq('1.1.0');

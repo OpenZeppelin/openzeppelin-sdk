@@ -9,15 +9,15 @@ module.exports = {
   signature, description,
   register: function(program) {
     program
-      .command(signature, {noHelp: true})
+      .command(signature, { noHelp: true })
       .usage('<stdlib> [options]')
       .description(description)
       .option('--no-install', 'skip installing stdlib dependencies locally')
       .option('--push <network>', 'push changes to the specified network')
       .option('-f, --from <from>', 'specify transaction sender address for --push')
       .action(async function (stdlibNameVersion, options) {
-        const installDeps = options.install
-        await linkStdlib({ stdlibNameVersion, installDeps })
+        const installLib = options.install
+        await linkStdlib({ stdlibNameVersion, installLib })
         if(options.push) push.action({ network: options.push, from: options.from })
       })
   }

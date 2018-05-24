@@ -17,8 +17,8 @@ module.exports = {
       .option('--push <network>', 'push changes to the specified network after bumping version')
       .option('-f, --from <from>', 'specify transaction sender address for --push')
       .action(async function (version, options) {
-        const { link: stdlibNameVersion, install: installDeps } = options
-        await bump({ version, stdlibNameVersion, installDeps })
+        const { link: stdlibNameVersion, install: installLib } = options
+        await bump({ version, stdlibNameVersion, installLib })
         if(options.push) push.action({ network: options.push, from: options.from })
       })
   }

@@ -5,7 +5,7 @@ import { FileSystem as fs } from 'zos-lib'
 import init from "../../src/scripts/init.js"
 import { cleanupfn } from "../helpers/cleanup.js";
 
-contract('init command', function() {
+contract('init script', function() {
   const appName = "MyApp";
   const packageFileName = "test/tmp/zos.json";
   const appVersion = "0.3.0";

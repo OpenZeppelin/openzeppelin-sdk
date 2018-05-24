@@ -13,7 +13,7 @@ import { cleanup, cleanupfn } from '../helpers/cleanup.js';
 import ControllerFor from '../../src/models/local/ControllerFor';
 import CaptureLogs from '../helpers/captureLogs';
 
-contract('status command', function([_, owner]) {
+contract('status script', function([_, owner]) {
   const txParams = { from: owner };
   const appName = 'MyApp';
   const version = '0.1.0';
@@ -153,7 +153,7 @@ contract('status command', function([_, owner]) {
       it('should log missing stdlib', async function () {
         await init({ name: appName, version, packageFileName });
         await push({ packageFileName, network, txParams });
-        await linkStdlib({ packageFileName, stdlibNameVersion, installDeps: false });
+        await linkStdlib({ packageFileName, stdlibNameVersion, installLib: false });
         await status({ network, packageFileName, networkFileName });
 
         this.logs.text.should.match(/mock-stdlib@1.1.0 required/i);
@@ -172,7 +172,7 @@ contract('status command', function([_, owner]) {
       it('should log different stdlib connected', async function () {
         await init({ name: appName, stdlibNameVersion, version, packageFileName });
         await push({ packageFileName, network, txParams });
-        await linkStdlib({ packageFileName, stdlibNameVersion: 'mock-stdlib-2@1.2.0', installDeps: false });
+        await linkStdlib({ packageFileName, stdlibNameVersion: 'mock-stdlib-2@1.2.0', installLib: false });
         await status({ network, packageFileName, networkFileName });
 
         this.logs.text.should.match(/mock-stdlib-2@1.2.0 required/i);
@@ -191,7 +191,7 @@ contract('status command', function([_, owner]) {
       it('should log different stdlib connected', async function () {
         await init({ name: appName, stdlibNameVersion, version, packageFileName });
         await push({ packageFileName, network, txParams, deployStdlib: true });
-        await linkStdlib({ packageFileName, stdlibNameVersion: 'mock-stdlib-2@1.2.0', installDeps: false });
+        await linkStdlib({ packageFileName, stdlibNameVersion: 'mock-stdlib-2@1.2.0', installLib: false });
         await status({ network, packageFileName, networkFileName });
 
         this.logs.text.should.match(/mock-stdlib-2@1.2.0 required/i);

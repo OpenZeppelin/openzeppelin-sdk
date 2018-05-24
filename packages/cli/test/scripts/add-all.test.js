@@ -5,7 +5,7 @@ import addAll from '../../src/scripts/add-all'
 import { cleanup, cleanupfn } from '../helpers/cleanup.js';
 import { FileSystem as fs } from 'zos-lib';
 
-contract('add-all command', function() {
+contract('add-all script', function() {
   const appName = 'MyApp'
   const defaultVersion = '0.1.0'
   const packageFileName = 'test/tmp/zos.json'

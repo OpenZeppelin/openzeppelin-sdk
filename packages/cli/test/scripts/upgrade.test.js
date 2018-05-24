@@ -18,7 +18,7 @@ const PackagedApp = Contracts.getFromLib('PackagedApp')
 const Greeter_V1 = Contracts.getFromNodeModules('mock-stdlib', 'GreeterImpl')
 const Greeter_V2 = Contracts.getFromNodeModules('mock-stdlib-2', 'GreeterImpl')
 
-contract('upgrade-proxy command', function([_, owner]) {
+contract('upgrade-proxy script', function([_, owner]) {
   const txParams = { from: owner };
   const appName = 'MyApp';
   const v1string = '0.1.0';

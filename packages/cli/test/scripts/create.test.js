@@ -13,7 +13,7 @@ import linkStdlib from '../../src/scripts/link.js';
 
 const ImplV1 = Contracts.getFromLocal('ImplV1');
 
-contract('create command', function([_, owner]) {
+contract('create script', function([_, owner]) {
   const contractName = 'ImplV1';
   const contractAlias = 'Impl';
   const anotherContractName = 'AnotherImplV1';

@@ -26,8 +26,8 @@ module.exports = {
           if (options.stdlib) throw Error('Cannot set a stdlib in a library project')
           await initLib({ name, version, force })
         } else {
-          const { stdlib: stdlibNameVersion, install: installDeps } = options
-          await init({ name, version, stdlibNameVersion, installDeps, force })
+          const { stdlib: stdlibNameVersion, install: installLib } = options
+          await init({ name, version, stdlibNameVersion, installLib, force })
         }
         
         if (options.push) {

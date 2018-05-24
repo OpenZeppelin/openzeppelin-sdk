@@ -7,7 +7,7 @@ import push from '../../src/scripts/push.js'
 import freeze from '../../src/scripts/freeze.js'
 import { cleanup, cleanupfn } from '../helpers/cleanup'
 
-contract('freeze command', function([_, owner]) {
+contract('freeze script', function([_, owner]) {
   const network = "test"
   const txParams = { from: owner }
   const packageFileName = 'test/mocks/packages/package-lib-with-contracts.zos.json'

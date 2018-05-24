@@ -9,7 +9,7 @@ import { FileSystem as fs } from 'zos-lib';
 import { cleanup, cleanupfn } from '../helpers/cleanup.js';
 import add from '../../src/scripts/add.js';
 
-contract('new-version command', function() {
+contract('new-version script', function() {
   const appName = 'MyApp';
   const defaultVersion = '0.1.0';
   const packageFileName = 'test/tmp/zos.json';

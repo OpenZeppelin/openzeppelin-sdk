@@ -8,7 +8,7 @@ import init from '../../src/scripts/init.js';
 import CaptureLogs from '../helpers/captureLogs';
 import add from '../../src/scripts/add.js';
 
-contract('add command', function() {
+contract('add script', function() {
   const packageFileName = 'test/tmp/zos.json';
   const appName = 'MyApp';
   const contractName = 'ImplV1';

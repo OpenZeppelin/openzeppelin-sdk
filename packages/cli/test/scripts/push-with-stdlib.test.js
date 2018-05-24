@@ -5,7 +5,7 @@ import push from '../../src/scripts/push.js';
 import { App, FileSystem as fs } from 'zos-lib'
 import { cleanup, cleanupfn } from '../helpers/cleanup';
 
-contract('push-with-stdlib command', function([_, owner]) {
+contract('push-with-stdlib script', function([_, owner]) {
   const txParams = { from: owner };
   const network = "test";
   const defaultVersion = "1.0";
