@@ -30,12 +30,9 @@ npm install --global zos
 ### Basic usage
 
 #### Before you begin
-`zos` integrates with [Truffle](http://truffleframework.com/), an Ethereum development environment. Please install Truffle and initialize your project with it:
-
 ```sh
-npm install --global truffle
 mkdir myproject && cd myproject
-truffle init
+npm init
 ```
 
 #### Setup your project
@@ -44,7 +41,7 @@ Initialize your project with ZeppelinOS. The next command will create a new `zos
 ```sh
 zos init <name> [version]
 ```
-Where <name> is your project's name, and [version] an optional initial version. For example:
+Where <name> is your project's name, and [version] an optional initial version name. For example:
 ```sh
 zos init my-project 0.1.0
 ```
