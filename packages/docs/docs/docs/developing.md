@@ -17,7 +17,7 @@ zos add <contract-name-1> <contract-name-2> ... <contract-name-n>
 
 Finally, we need to deploy the `Package`, the specific `Release` of the stdlib, and the individual library contracts. All of this is accomplished by doing:
 ```sh
-zos push --lib --network=<network>
+zos push --network=<network>
 ```
 This completes the deployment of the new stdlib release to the chosen network. 
 
