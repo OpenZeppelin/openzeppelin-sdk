@@ -65,7 +65,6 @@ zos init my-project 0.1.0
 - [ZeppelinOS](http://zeppelinos.org)
 - [Documentation site](https://docs.zeppelinos.org)
 - [ZeppelinOS Blog](https://blog.zeppelinos.org)
-- [Proxy Patterns](https://blog.zeppelinos.org/proxy-patterns)
 
 ### Code
 - [ZeppelinOS CLI (this repository)](https://github.com/zeppelinos/zos-cli)
