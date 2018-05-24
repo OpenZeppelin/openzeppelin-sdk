@@ -39,7 +39,7 @@ Note that the `add` command compiles the contracts before adding them to your ap
 
 ## Initial deployment
 
-The `zos init` command creates a [Truffle configuration file](http://truffleframework.com/docs/getting_started/project#alternative-migrating-with-ganache) for you. If you want to use the provided 'local' development network, run your development node on port 9545 (For example `ganache-cli --port 9545`).
+The `zos init` command creates a [Truffle configuration file](http://truffleframework.com/docs/getting_started/project#alternative-migrating-with-ganache) for you. If you want to use the provided 'local' development network, run your development node on port 9545 (For example `npx ganache-cli --port 9545`).
 
 You can now push your application to this network:
 
