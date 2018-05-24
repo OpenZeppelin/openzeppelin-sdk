@@ -19,11 +19,11 @@ module.exports = {
       .option('-f, --from <from>', 'specify transaction sender address')
       .option('-n, --network <network>', 'network to be used')
       .option('--force', 'force creation even if contracts have local modifications')
-      .action(function (contractAlias, options) {
+      .action(async function (contractAlias, options) {
         const { initMethod, initArgs } = parseInit(options, 'initialize')
         const { from, network, force } = options
         const txParams = from ? { from } : {}
-        runWithTruffle(async () => await createProxy({
+        await runWithTruffle(async () => await createProxy({
           contractAlias, initMethod, initArgs, network, txParams, force
         }), network)
       })

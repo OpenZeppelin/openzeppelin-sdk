@@ -15,10 +15,10 @@ module.exports = {
       .description(description)
       .option('-f, --from <from>', 'specify transaction sender address')
       .option('-n, --network <network>', 'network to be used')
-      .action(function (options) {
+      .action(async function (options) {
         const { from, network } = options
         const txParams = from ? { from } : {}
-        runWithTruffle(async () => await freeze({ network, txParams }), network)
+        await runWithTruffle(async () => await freeze({ network, txParams }), network)
       })
   }
 }

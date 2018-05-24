@@ -20,11 +20,11 @@ module.exports = {
       .option('-f, --from <from>', 'specify transaction sender address')
       .option('-n, --network <network>', 'network to be used')
       .option('--force', 'force creation even if contracts have local modifications')
-      .action(function (contractAlias, proxyAddress, options) {
+      .action(async function (contractAlias, proxyAddress, options) {
         const { initMethod, initArgs } = parseInit(options, 'initialize')
         const { from, network, all, force } = options
         const txParams = from ? { from } : {}
-        runWithTruffle(async () => await upgrade({
+        await runWithTruffle(async () => await upgrade({
           contractAlias, proxyAddress, initMethod, initArgs,
           all, network, txParams, force
         }), network)

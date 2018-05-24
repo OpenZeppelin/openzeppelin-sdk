@@ -11,15 +11,15 @@ module.exports = {
   signature, description,
   register: function(program) {
     program
-      .command(signature, {noHelp: true})
+      .command(signature, { noHelp: true })
       .usage('[contractName1[:contractAlias1] ... contractNameN[:contractAliasN]] [options]')
       .description(description)
       .option('--all', 'add all contracts in your build directory')
       .option('--push <network>', 'push changes to the specified network after adding')
       .option('-f, --from <from>', 'specify the transaction sender address for --push')
       .option('--skip-compile', 'skips contract compilation')
-      .action(function (contractNames, options) {
-        if(!options.skipCompile) Truffle.compile()
+      .action(async function (contractNames, options) {
+        if(!options.skipCompile) await Truffle.compile()
         if(options.all) addAll({})
         else {
           const contractsData = contractNames.map(rawData => {

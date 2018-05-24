@@ -1,10 +1,10 @@
 import Truffle from '../models/truffle/Truffle';
 
-export default function runWithTruffle(script, network, compile = false) {
+export default async function runWithTruffle(script, network, compile = false) {
   const config = Truffle.config()
   if(!network) throw Error('A network name must be provided to execute the requested action.')
   config.network = network
-  if (compile) Truffle.compile(config)
+  if (compile) await Truffle.compile(config)
   initTruffle(config).then(script)
 }
 

@@ -13,12 +13,17 @@ const Truffle = {
     }
   },
 
-  compile(config = undefined) {
-    config = config || this.config()
+  async compile(config = undefined) {
     log.info("Compiling contracts")
+    config = config || this.config()
+    config.all = true
     const TruffleCompile = require('truffle-workflow-compile')
-    TruffleCompile.compile(config, (err, abstractions, paths) => {
-      if (err) log.error(err)
+
+    return new Promise((resolve, reject) => {
+      TruffleCompile.compile(config, (error, abstractions, paths) => {
+        if (err) reject(error)
+        else resolve(abstractions, paths)
+      })
     })
   },
 
