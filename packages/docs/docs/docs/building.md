@@ -14,7 +14,7 @@ npm install zos-lib
 
 Next, let's create a file named `MyContract.sol` in the `contracts/` folder with the following Solidity code:
 
-```sol
+```js
 import "zos-lib/contracts/migrations/Migratable.sol";
 
 contract MyContract is Migratable {
@@ -39,11 +39,7 @@ Note that the `add` command compiles the contracts before adding them to your ap
 
 ## Initial deployment
 
-The `zos init` command creates a [Truffle configuration file](http://truffleframework.com/docs/getting_started/project#alternative-migrating-with-ganache) for you, so you can start a local development network simply by running: 
-
-```sh
-npx truffle develop
-```
+The `zos init` command creates a [Truffle configuration file](http://truffleframework.com/docs/getting_started/project#alternative-migrating-with-ganache) for you. If you want to use the provided 'local' development network, run your development node on port 9545 (For example `ganache-cli --port 9545`).
 
 You can now push your application to this network:
 
@@ -67,11 +63,29 @@ After these simple steps, your upgradeable application is now on-chain! Congratu
 
 ## Upgrading your contract
 
-If, at a later stage, you want to upgrade your smart contract code in order to fix a bug or add a new feature, you can do it seamlessly using ZeppelinOS.
+If, at a later stage, you want to upgrade your smart contract code in order to fix a bug or add a new feature, you can do it seamlessly using ZeppelinOS. Remember not to restart your development node, or you will lose your previous deployment!
 
 > **Note**: while ZeppelinOS supports arbitrary changes in functionality, you will need to preserve all variables that appear in prior versions of your contracts, declaring any new variables below the already existing ones. You can find details on this in the [advanced topics](advanced.md) page. 
 
-Once you have made the desired changes to your contracts, simply push the new code to the network:
+Open `MyContract.sol` again, and add a new function:
+```js
+import "zos-lib/contracts/migrations/Migratable.sol";
+
+contract MyContract is Migratable {
+  uint256 public x;
+
+  function initialize(uint256 _x) isInitializer("MyContract", "0") public {
+    x = _x;
+  }
+
+  function increment() public {
+    x += 1;  
+  }
+}
+```
+
+
+Once you have saved the changes in your contract files, simply push the new code to the network:
 
 ```sh
 zos push --network local
@@ -82,7 +96,17 @@ Finally, let's upgrade the already deployed contract with the new code:
 ```sh
 zos upgrade MyContract --network local
 ```
+This command outputs the address of your upgradeable MyContract instance (in white).
 
 _Voilà!_ You have deployed and upgraded an application using ZeppelinOS. The address of the upgraded contract is the same as before, but the code has been updated to the new version.
+
+To try the upgraded feature we just added, run:
+```sh
+npx truffle console --network=local
+truffle(local)> myContract = MyContract.at(<your-instance-address>)
+truffle(local)> myContract.increment()
+truffle(local)> myContract.x()
+43
+```
 
 In order to learn how to use the ZeppelinOS standard libraries in an upgradeable app, please follow the [next guide](using.md).
