@@ -21,7 +21,7 @@ const Truffle = {
 
     return new Promise((resolve, reject) => {
       TruffleCompile.compile(config, (error, abstractions, paths) => {
-        if (err) reject(error)
+        if (error) reject(error)
         else resolve(abstractions, paths)
       })
     })
