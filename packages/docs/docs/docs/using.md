@@ -1,5 +1,5 @@
 ---
-id: youing
+id: using
 title: Using the stdlib in your app
 sidebar_label: Using the stdlib
 ---
