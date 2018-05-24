@@ -41,11 +41,11 @@
       "status",
       "freeze"
     ],
-    "APPLICATION / MANAGEMENT": [
-      "application_management_AppDirectory",
-      "application_management_BaseAppManager",
-      "application_management_PackagedAppManager",
-      "application_management_UnversionedAppManager"
+    "APPLICATION": [
+      "application_AppDirectory",
+      "application_BaseApp",
+      "application_PackagedApp",
+      "application_UnversionedApp"
     ],
     "APPLICATION / VERSIONING": [
       "application_versioning_FreezableImplementationDirectory",
@@ -53,9 +53,6 @@
       "application_versioning_ImplementationProvider",
       "application_versioning_Package",
       "application_versioning_Release"
-    ],
-    "LIFECYCLE": [
-      "lifecycle_Migrations"
     ],
     "MIGRATIONS": [
       "migrations_Initializable",
