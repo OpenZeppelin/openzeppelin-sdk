@@ -12,11 +12,11 @@ To develop an upgradeable smart contract, we need to create a simple [upgradeabi
 
 Let's walk through the following example to see how it works:
 
-### 1. Write the first version of the contract's logic
+### Write the first version of the contract's logic
 
 Let's start by creating the `MyContract.sol` file:
 
-```sol
+```js
 import "zos-lib/contracts/migrations/Initializable.sol";
 
 contract MyContract is Initializable {
@@ -30,7 +30,7 @@ contract MyContract is Initializable {
 
 Notice the `initialize` function. Most contracts require some sort of initialization function, but upgradeable contracts can't use constructors because the proxy won't be able to call them. This is why we need to use the [initializable pattern](advanced.md#initializers-vs-constructors) provided by `zos-lib`.
 
-### 2. Deploy it
+### Deploy it
 
 Next, we deploy it to the blockchain:
 
@@ -38,7 +38,7 @@ Next, we deploy it to the blockchain:
 const myContract_v0 = await MyContract.new()
 ```
 
-### 3. Create a proxy
+### Create a proxy
 
 Now we are going to deploy the proxy. This is the contract that will receive the calls and hold the storage, while delegating its behavior to the logic contract, enabling us to upgrade it.
 
@@ -48,7 +48,7 @@ To do so, we need to provide the logic contract address to the proxy constructor
 const proxy = await AdminUpgradeabilityProxy.new(myContract_v0.address)
 ```
 
-### 4. Initialize it
+### Initialize it
 
 Next, call `initialize` on the proxy to initialize the state variables. Notice that we have to wrap the proxy in a `MyContract` interface, since all calls will be delegated from the proxy to the logic contract.
 
@@ -59,11 +59,11 @@ await myContract.initialize(value)
 console.log(await myContract.value()) // 42
 ```
 
-### 5. Add functionality
+### Add functionality
 
 Now let's edit `MyContract.sol` to include an `add` function:
 
-```sol
+```js
 import "zos-lib/contracts/migrations/Initializable.sol";
 
 contract MyContract is Initializable {
@@ -81,7 +81,7 @@ contract MyContract is Initializable {
 
 > **Note**: when we update our logic contract's code, we can't change the proxy's [storage layout](advanced.md#preserving-the-storage-structure). This means we can't remove any previously existing state variables. We can, however, remove functions we don't want to use anymore.
 
-### 6. Upgrade it
+### Upgrade it
 
 Next, we will deploy our new logic and upgrade our proxy to use the new version:
 

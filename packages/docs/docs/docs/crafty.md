@@ -5,7 +5,7 @@ title: Crafty
 
 Have you ever wondered what may happen if you combined an Aragon token and fire? A fire-spewing eagle? Burnt chicken? What if Augur's oracles were augmented with Decentraland's tiles, would they start predicting the real estate market? Now, you no longer need to ponder at these vital questions: the Ethereum community will answer them for you!
 
-In [Crafty](https://crafty.zeppelin.solutions), users can create new ERC20 tokens, with a few added goodies (following [EIP-1046](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1046.md)): a picture, and a short description. This allows for each token to have that extra bit of personality that makes something unique. But that's not all: the only way to get these tokens is by crafting them, which requires ingredients (any ERC20!) to be spent. And since the craftable tokens themselves can also be used as ingredients, the posibilities are endless!
+In [Crafty](https://crafty.zeppelin.solutions), users can create new ERC20 tokens, with a few added goodies (following [EIP-1046](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1046.md)): a picture, and a short description. This allows for each token to have that extra bit of personality that makes something unique. But that's not all: the only way to get these tokens is by crafting them, which requires ingredients (any ERC20!) to be spent. And since the craftable tokens themselves can also be used as ingredients, the posibilities are endless! Not only that, but we'll make all of our contracts upgradeable, to be able to change the code in the future. Wohoo!
 
 ## Project setup
 
@@ -46,7 +46,7 @@ function craft(CraftableToken _craftable) public {
 
 ## Developing with ZeppelinOS
 
-So, how would we go about integrating ZeppelinOS to such a project? The process is remarkably simple: we'll cover it step by step. But before we get started, let's initialize our project with ZeppelinOS:
+So, how would we go about integrating ZeppelinOS in such a project? The process is remarkably simple: we'll cover it step by step. But before we get started, let's initialize our project with ZeppelinOS:
 
 ```sh
 zos init Crafty
@@ -54,21 +54,23 @@ zos init Crafty
 
 This will create a `zos.json` file, which will store how your project is structured in ZeppelinOS: you'll probably want to commit this file to your project's repository.
 
-### Making `Crafty` upgradeable
+
+### Making Crafty upgradeable
 
 There are multiple reasons to upgrade `Crafty`'s game logic contract: bug-fixing, adding new functionalities, adjusting to newer developments and ecosystem changes, etc. Remember how `Crafty` uses RBAC (role-based access control)? An upgrade could easily add new roles, such as a `curator` role, which would be in charge of approving new tokens before they are added to the game, or highlighting featured creations to be displayed on the front page. These simple but useful extensions would not be possible without ZeppelinOS.
 
 `Crafty` is a great example of how easy it is to add upgradeability to your project. The only change that we need to make is a minor one: the constructor must be replaced for an `initialize` function.
 
-```
+```js
 import 'openzeppelin-zos/contracts/ownership/rbac/RBAC.sol';
 import 'zos-lib/contracts/migrations/Initializable.sol';
 
 contract Crafty is RBAC, Initializable {
-  // Standard Solidity constructor - will be removed from source code
-  function Crafty() public {
-    addRole(msg.sender, ROLE_ADMIN);
-  }
+  
+  // moved standard constructor logic to initializer function
+  // function Crafty() public {
+  //   addRole(msg.sender, ROLE_ADMIN);
+  // }
 
   // Initializer for integration with ZeppelinOS
   function initialize(address _initialAdmin) isInitializer public {
@@ -82,9 +84,9 @@ The `isInitializer` modifier will make sure your `initialize` method is only cal
 
 Also, note how we are using `openzeppelin-zos`, instead of the usual `openzeppelin-solidity`. This package's contracts have been adapted for ZeppelinOS compatibility, and should be the ones used when dealing with upgradeable contracts.
 
-Both `zos-lib` (for the `Initializable` contract) and `openzeppelin-zos` can be installed using [NPM](https://www.npmjs.com/):
+Both `zos-lib` (for the `Initializable` contract) and `openzeppelin-zos` can be installed using [npm](https://www.npmjs.com/):
 
-```
+```sh
 npm install zos-lib openzeppelin-zos
 ```
 
@@ -97,16 +99,16 @@ zos push --network ropsten --from $OWNER
 
 The `from` parameter is important, since that address is the one that will be allowed to perform upgades to the contract.
 
-We can now `create` new upgradeable instances, all of which will use the same deployed bytecode, but are entirely independent otherwise. The `initialize` function can be called in this same step (with the `initialAdmin` argument), saving you the need to do it manually from a console.
+We can now `create` new upgradeable instances, all of which will use the same deployed bytecode, but are entirely independent otherwise. The `initialize` function can be called in this same step (with the `initialAdmin` argument), saving you the need to do it manually.
 
 ```sh
-zos create Crafty --init --args 0x0cbd7... --network ropsten
+zos create Crafty --init --args $OWNER --network ropsten
 > 0x31C4B...
 ```
 
-The returned value is the address of the newly `create`d `Crafty` proxy, which is already initialized and can be safely used, with the peace of mind that it can later be upgraded at any point in time.
+The returned value is the address of the newly `create`d `Crafty` upgradeable instance, which is already initialized and can be safely used, with the peace of mind that it can later be upgraded at any point in time.
 
-### Making `CraftableToken` upgradeable
+### Making CraftableToken upgradeable
 
 This scenario is a bit more complex, since multiple ZeppelinOS contracts are being combined together, but it is nonetheless fairly easy to setup. Let's first recap what a `CraftableToken` is:
 
@@ -166,7 +168,7 @@ All that remains is having our contracts interact with each other. We'll want `C
 
 First, we can have a player pass all of the arguments to a `Crafty` function, which will create a new `CraftableToken`, and add it to the list of tokens. Because this instance was not `create`d, it is not upgradeable. Note how we need to call `initialize`, since `CraftableToken` doesn't have a constructor anymore.
 
-```
+```js
 function addCraftable(string _name, string _symbol, string _tokenURI, ERC20[] _ingredients, uint256[] _ingredientAmounts) public returns (CraftableToken) {
   require(_ingredients.length == _ingredientAmounts.length);
   require(_ingredients.length > 0);
@@ -182,7 +184,7 @@ function addCraftable(string _name, string _symbol, string _tokenURI, ERC20[] _i
 }
 ```
 
-What if we wanted to use the upgradeble instances we have `created`d with the CLI? We'll let admins add them into the game by simply providing the address of the contract.
+What if we wanted to use the upgradeble instances we have `create`d with `zos`? We'll let admins add them into the game by simply providing the address of the contract.
 
 ```
 function addPrecreatedCraftable(CraftableToken _craftable) onlyRole(ROLE_ADMIN) public {
@@ -192,3 +194,5 @@ function addPrecreatedCraftable(CraftableToken _craftable) onlyRole(ROLE_ADMIN) 
 ```
 
 A key point here is that both the upgradeable and non-upgradeable instances are treated in the same manner: `Crafty`'s `craft` method makes no distinction whatsoever when calling `CraftableToken` methods, since the interface is the same. A contract being upgradeable places no extra burden on its callers.
+
+This example shows how to add upgradeability and use of on-chain standard libraries to a fairly complex smart contract app without too much work. Congratulations!

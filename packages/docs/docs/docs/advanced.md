@@ -6,9 +6,9 @@ title: Advanced topics
 We expand on several advanced topics for the more intrepid users of ZeppelinOS. 
 
 ## The proxy system
-The upgradeability system in ZeppelinOS is based on a proxy system: for each deployed contract (the _implementation_), another, user-facing contract is deployed as well (the _proxy_). The proxy will be the one in charge of the contract's storage, but will forward all function calls to the backing implementation. The only exception to this are calls made by the owner of the proxy for administrative purposes, which will be handled by the proxy itself. 
+The upgradeability system in ZeppelinOS is based on a proxy system: for each deployed contract implementation (the _logic contract_), another, user-facing contract is deployed as well (the _proxy_). The proxy will be the one in charge of the contract's storage, but will forward all function calls to the backing logic contract. The only exception to this are calls made by the owner of the proxy for administrative purposes, which will be handled by the proxy itself. 
 
-The way the proxy forwards calls to the implementation relies on [`delegatecall`](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-7.md), the mechanism the EVM provides to execute foreign code on local storage. This is normally used for libraries such as [`SafeMath`](https://github.com/OpenZeppelin/openzeppelin-solidity/blob/master/contracts/math/SafeMath.sol), which provide useful functionality but have no storage. ZeppelinOS, however, exploits this mechanism to provide upgradeability: a user only interacts with the proxy, and, when a new implementation is available, the proxy owner simply points it to the upgraded contract. All of this is achieved in a way that is transparent for the user, as the proxy address is always the same.
+The way the proxy forwards calls to the logic contract relies on [`delegatecall`](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-7.md), the mechanism the EVM provides to execute foreign code on local storage. This is normally used for libraries such as [`SafeMath`](https://github.com/OpenZeppelin/openzeppelin-solidity/blob/master/contracts/math/SafeMath.sol), which provide useful functionality but have no storage. ZeppelinOS, however, exploits this mechanism to provide upgradeability: a user only interacts with the proxy, and, when a new logic contract is available, the proxy owner simply points it to the upgraded contract. All of this is achieved in a way that is transparent for the user, as the proxy address is always the same.
 
 If you want to find out more about different possible proxy patterns, be sure to check [this post](https://blog.zeppelinos.org/proxy-patterns/).
 
@@ -30,7 +30,7 @@ contract MyContract_v2 {
 
 Note that this must be so _even if you no longer use the variables_. There is no restriction (apart from gas limits) on including new variables in the upgraded versions of your contracts, or on removing or adding functions. 
 
-This necessity is due to how [Solidity uses the storage space](https://solidity.readthedocs.io/en/v0.4.21/miscellaneous.html#layout-of-state-variables-in-storage). In short, the variables are allocated storage space in the order they appear (for the whole variable or some pointer to the actual storage slot, in the case of dynamically sized variables). When we upgrade a contract, its storage contents are preserved. This entails that if we remove variables, the new ones will be assigned storage space that is already occupied by the old variables; all we would achieve is losing the pointers to that space, with no guarantees on its content.
+This restriction is due to how [Solidity uses the storage space](https://solidity.readthedocs.io/en/v0.4.21/miscellaneous.html#layout-of-state-variables-in-storage). In short, the variables are allocated storage space in the order they appear (for the whole variable or some pointer to the actual storage slot, in the case of dynamically sized variables). When we upgrade a contract, its storage contents are preserved. This entails that if we remove variables, the new ones will be assigned storage space that is already occupied by the old variables.
 
 ## Initializers vs. constructors
 As we saw in the [Building upgradeable applications](building.md) guide, we did not include a constructor in our contracts, but used instead an `initialize` function. The reason for this is that constructors do not work as regular functions: they are invoked once upon a contract's creation, but their code is never stored in the blockchain. This means that they cannot be called from the contract's proxy as we call other functions. Thus, if we want to initialize variables in the _proxy's storage_, we need to include a regular function for doing so. 
@@ -54,10 +54,10 @@ The first file stores the general configuration and is created by the `zos init`
   "name": <projectName>
   "version": <version>
   "contracts": {
-    <contract1Alias>: <contract1Name>,
-    <contract2Alias>: <contract2Name>,
+    <contract-1-alias>: <contract-1-name>,
+    <contract-2-alias>: <contract-2-name>,
     ...
-    <contractNAlias>: <contractNName>
+    <contract-N-alias>: <contract-N-name>
   },
   "stdlib": {
     "name": <stdlibName>
@@ -65,7 +65,7 @@ The first file stores the general configuration and is created by the `zos init`
 }
 ```
 
-Here, `<projectName>` is the name of the project, and `<version>` is the current version name or number. Once you start adding your contracts via `zos add`, they will be recorded under the `"contracts"` field, with `<contractiAlias>` the aliases (which default to the contract names, and `i` goes from `1` to `N`), and `<contractiName>` the names. Finally, if you link an `stdlib` with `zos link`, this will be reflected in the `"stdlib"` field, where `<stdlibName>` is the name of the linked `stdlib`. 
+Here, `<projectName>` is the name of the project, and `<version>` is the current version name or number. Once you start adding your contracts via `zos add`, they will be recorded under the `"contracts"` field, with `<contract-i-alias>` the aliases (which default to the contract names, and `i` goes from `1` to `N`), and `<contract-i-name>` the names. Finally, if you link an `stdlib` with `zos link`, this will be reflected in the `"stdlib"` field, where `<stdlibName>` is the name of the linked `stdlib`. 
 
 ### `zos.<network>.json`
 ZeppelinOS will also generate a file for each of the networks you work in (`local`, `ropsten`, `live`, ... These should be configured [in your `truffle.js` file](http://truffleframework.com/docs/advanced/configuration#networks), but note that `zos init` already configures the `local` network, which can be run by `npx truffle develop`). These files share the same structure:
@@ -73,67 +73,67 @@ ZeppelinOS will also generate a file for each of the networks you work in (`loca
 ```json
 {
   "contracts": {
-    <contract1Name>: {
-      "address": <contract1Address>,
-      "bytecodeHash": <contract1Hash>
+    <contract-1-name>: {
+      "address": <contract-1-address>,
+      "bytecodeHash": <contract-1-hash>
     },
-    <contract2Name>: {
-      "address": <contract2Address>,
-      "bytecodeHash": <contract2Hash>
+    <contract-2-name>: {
+      "address": <contract-2-address>,
+      "bytecodeHash": <contract-2-hash>
     },
     ...
-    <contractNName>: {
-      "address": <contractNAddress>,
-      "bytecodeHash": <contractNHash>
+    <contract-N-name>: {
+      "address": <contract-N-address>,
+      "bytecodeHash": <contract-N-hash>
     }
   },
   "proxies": { 
-    <contract1Name>: [
+    <contract-1-name>: [
         {
-          "address": <proxy1Address>,
-          "version": <proxy1Version>,
-          "implementation": <implementation1Address>
+          "address": <proxy-1-address>,
+          "version": <proxy-1-version>,
+          "implementation": <implementation-1-address>
         }
       ],
-      <contract2Name>: [
+      <contract-2-name>: [
         {
-          "address": <proxy2Address>,
-          "version": <proxy2Version>,
-          "implementation": <implementation2Address>
+          "address": <proxy-2-address>,
+          "version": <proxy-2-version>,
+          "implementation": <implementation-2-address>
         }
       ],
       ...
-      <contractNName>: [
+      <contract-N-name>: [
         {
-          "address": <proxyNAddress>,
-          "version": <proxyNVersion>,
-          "implementation": <implementationNAddress>
+          "address": <proxy-N-address>,
+          "version": <proxy-N-version>,
+          "implementation": <implementation-N-address>
         }
       ]
   }, 
   "app": {
-    "address": <appAddress>
+    "address": <app-address>
   },
-  "version": <appVersion>,
+  "version": <app-version>,
   "package": {
-    "address": <packageAddress>
+    "address": <package-address>
   },
   "provider": {
-    "address": <providerAddress>
+    "address": <provider-address>
   },
   "stdlib": {
-    "address": <stdlibAddress>,
-    ["customDeploy": <customDeploy>,]
-    "name": <stdlibName>
+    "address": <stdlib-address>,
+    ["customDeploy": <custom-deploy>]
+    "name": <stdlib-name>
   }
 }
 ```
 
-The most important thing to see here are the proxies and contracts' addresses, `<proxyiAddress>` and `<contractiAddress>` respectively. What will happen is that each time you upgrade your contracts, `<contractiAddress>` will change, reflecting the underlying implementation change. The proxy addresses, however, will stay the same, so you can interact seamlessly with the same addresses as if no change had taken place. Note that `<implementationiAddress>` will normally point to the current contract address `<contractiAddress>`. Finally, `<contractiHash>` stores a SHA256 hash of the contract bytecode. 
+The most important thing to see here are the proxies and contracts' addresses, `<proxy-i-address>` and `<contract-i-address>` respectively. What will happen is that each time you upgrade your contracts, `<contract-i-address>` will change, reflecting the underlying logic contract change. The proxy addresses, however, will stay the same, so you can interact seamlessly with the same addresses as if no change had taken place. Note that `<implementation-i-address>` will normally point to the current contract address `<contract-i-address>`. Finally, `<contract-i-hash>` stores a SHA256 hash of the contract bytecode. 
 
-The other thing to notice in these files are the version numbers (or names!). The `<appVersion>` keeps track of the latest app version, and matches `<version>` from `zos.json`. The `<proxyiVersion>`s, on the other hand, keep track of which version of the contracts the proxies are pointing to. Say you deploy a contract in your app version 0.0, and then bump the version to 0.1 and push some upgraded code for that same contract. This will be reflected in the `<contractiAddress>`, but not yet in the proxy, which will display 0.0 in `<proxyiVersion>` and the old contract implementation address in `<implementationiAddress>`. Once you run `zos upgrade` to your contract, `<proxyiVersion>` will show the new 0.1 version, and `<implementationiAddress>` will point to the new `<contractiAddress>`.
+The other thing to notice in these files are the version numbers (or names!). The `<appVersion>` keeps track of the latest app version, and matches `<version>` from `zos.json`. The `<proxy-i-version>`s, on the other hand, keep track of which version of the contracts the proxies are pointing to. Say you deploy a contract in your app version 1.0, and then bump the version to 1.1 and push some upgraded code for that same contract. This will be reflected in the `<contract-i-address>`, but not yet in the proxy, which will display 1.0 in `<proxy-i-version>` and the old logic contract address in `<implementation-i-address>`. Once you run `zos upgrade` to your contract, `<proxy-i-version>` will show the new 1.1 version, and `<implementation-i-address>` will point to the new `<contract-i-address>`.
 
-Finally, the `stdlib` field stores information about a linked standard library. Its address is stored in `<stdlibAddress>`, and its name in `<stdlibName>`, matching that in `zos.json`. The `customDeploy` field will be present only when a version of the stdlib is deployed using the `--deploy-stdlib` flag of the `push` command, in which case `<customDeploy>` will be `true`. The remaining addresses, `<appAddress>`, `<packageAddress>`, and `<providerAddress>` store the addresses of the `App`, the `Package`, and the current `ContractProvider` respectively. 
+Finally, the `stdlib` field stores information about a linked standard library. Its address is stored in `<stdlib-address>`, and its name in `<stdlib-name>`, matching that in `zos.json`. The `custom-deploy` field will be present only when a version of the stdlib is deployed using the `--deploy-stdlib` flag of the `push` command, in which case `<custom-deploy>` will be `true`. The remaining addresses, `<app-address>`, `<package-address>`, and `<provider-address>` store the addresses of the `App`, the `Package`, and the current `ImplementationProvider` respectively. 
 
 
 

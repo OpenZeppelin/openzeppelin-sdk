@@ -10,7 +10,7 @@ sidebar_label: Low level upgradable app
 
 Most real-world applications require more than a single smart contract. In this guide we will explore how to build an upgradeable app with multiple smart contracts and how to use the ZeppelinOS on-chain standard library.
 
-### 1. Getting started
+### Getting started
 
 Imagine we want to build a simple donation application where we give donors some sort of recognition, and we want for it to be upgradable. First, we install the ZeppelinOS library:
 
@@ -18,7 +18,7 @@ Imagine we want to build a simple donation application where we give donors some
 npm install zos-lib
 ```
 
-### 2. Create the app
+### Create the app
 
 Next, we need the App contract of the [`ZeppelinOS Library`](https://github.com/zeppelinos/zos-lib).
 This contract will live in the blockchain and manage the different versions of our smart contracts.
@@ -29,7 +29,7 @@ const initialVersion = '0.0.1'
 await App.deploy(initialVersion)
 ```
 
-### 3. Create the contract
+### Create the contract
 
 An initial version of the Solidity contract could look like:
 
@@ -74,7 +74,7 @@ const donationsV0 = await app.createProxy(DonationsV0, contractName, 'initialize
 
 Remember that the proxy is the contract that will receive the calls and hold the storage, while delegating its behavior to the implementation contract, enabling us to upgrade it.
 
-### 4. Link a standard library
+### Link a standard library
 
 Now let's suppose we want to give some sort of retribution to the donors, so we mint new [ERC721](http://erc721.org/) cryptocollectibles for each donation. 
 
@@ -114,7 +114,7 @@ contract DonationsV1 is DonationsV0 {
 
 Notice that by doing this, our contract will interact directly with the on-chain ZeppelinOS standard library, so there is no need to deploy nor maintain the `MintableERC721Token` contract ourselves.
 
-### 5. Upgrade to the new version
+### Upgrade to the new version
 
 To upgrade our app, we need to create a new version and reference the ZeppelinOS standard library release
 

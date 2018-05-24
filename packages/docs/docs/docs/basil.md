@@ -8,13 +8,13 @@ Here at the Zeppelin headquarters we have a basil plant. She is a good mascot, a
 
 ![The Basil](https://pbs.twimg.com/media/DdL2qciX4AEMeoR.jpg "The basil")
 
-However, after a few days we started having conflicts. Who gets the honor to set the light color for our friendly plant? What if they choose their favorite color instead of the one that's best for the plant? For how long do they get to keep their chosen color? We also found that somebody kept resetting the color back to an ugly lime green every morning. We are ok with anarchy, but we want transparency, so we have just decided to control the light bulb through a contract on the Ethereum blockchain.
+However, after a few days we started having conflicts. Who gets the honor to set the light color for our friendly plant? What if they choose their favorite color instead of the one that's best for the plant? For how long do they get to keep their chosen color? We also found that somebody kept resetting the color back to an ugly lime green every morning. We are ok with anarchy, but we want transparency, so we decided to control the light bulb through a contract on the Ethereum blockchain.
 
-## Creating a Dapp with ZeppelinOS
+## Creating an app with ZeppelinOS
 
 In this guide, we will build a simple dapp on top of ZeppelinOS. To see the end product, please visit:
 * Source code: [zeppelinos/basil](https://github.com/zeppelinos/basil)
-* Dapp: [basil.zeppelin.solutions](https://basil.zeppelin.solutions)
+* App: [basil.zeppelin.solutions](https://basil.zeppelin.solutions)
 
 First we will need to [install Node.js following the instructions from their website](https://nodejs.org/en/download/package-manager/). Then, let's set up a directory for our project and initialize the npm package:
 
@@ -83,7 +83,7 @@ npm install openzeppelin-zos
 npx truffle compile
 ```
 
-NOTE: If you're familiar with the `openzeppelin-solidty` library, not that we're not using it here. We're using `openzeppelin-zos` library, which is the OpenZeppelin version that is compatible with ZeppelinOS.
+> NOTE: If you're familiar with the `openzeppelin-solidity` library, note that we're using something different here. We're using the `openzeppelin-zos` library, which is the OpenZeppelin version for ZeppelinOS.
 
 ## Using ZeppelinOS
 
@@ -142,25 +142,25 @@ zos push --from $OWNER --network local
 
 The first time you run this command for a specific network, a new
 `zos.<network>.json` will be created. This file will reflect the status
-of your project in that specific network, including contract deployed addresses, versions, contract proxies, etc.
+of your project in that specific network, including contract logic and instance addresses, etc.
 
-## Proxies
+## Contract logic and upgradeable instances
 
-Notice how the file `zos.local.json` lists a series of "contracts" and "proxies". The first represent implementations for a specific contract name, while the second represent the actual proxies that people will interact with in the blockchain. 
+Notice how the file `zos.local.json` lists a series of "contracts" and "proxies". The first are the logic contracts for a specific contract name, while the second are the actual contract instances that our users will interact with in the blockchain. 
 
-A proxy is a wrapper for an implementation, that allows it to be updated, while mainting it's state. We need to create a proxy for Basil.
+A proxy is a wrapper for a contract's logic, that allows it to be updated, while mainting its state. We need to create an upgradeable instance (proxy) for Basil.
 
 ```sh
 zos create Basil --from $OWNER --network local --init --args $OWNER
 ```
 
-Take a look at `zos.local.json` again. You will see that we now have a proxy for Basil. This is the address to use in a Dapp.
+Take a look at `zos.local.json` again. You will see that we now have a proxy for Basil. This is the address to use in our app.
 
 ## Upgrading the contract
 
 If we ever found a bug in Basil, we would need to upgrade our zos package, provide a new implementation for Basil with a fix and tell our proxy to upgrade to the new implementation. This would preserve all the previous donation history, while seamlessly patching the bug.
 
-Another common thing that happens when developing smart contracts for Ethereum is that new standards appear, all the new kids implement them in their contracts, and a very cool synergy between contracts starts to happen. The people who have immutable contracts already deployed will miss all the fun. This has just happened to us: it would be very nice to encourage donations to Basil by emitting a unique ERC721 token in exchange. Well, let's upgrade the contract with ZeppelinOS to do just that.
+Another common thing that happens when developing smart contracts for Ethereum is that new standards appear, all the new kids implement them in their contracts, and a very cool synergy between contracts starts to happen. Developers who have already deployed immutable contracts will miss all the fun. For example, it would be very nice to encourage donations to Basil by emitting a unique ERC721 token in exchange. Well, let's upgrade the contract with ZeppelinOS to do just that.
 
 We could modify `contracts/Basil.sol`. But now let's try something else. Let's make a new contract in `contracts/BasilERC721.sol`, that inherits from our initial version of Basil:
 
@@ -200,7 +200,7 @@ A few things to note:
   * This new version extends from the previous one. This is a very handy pattern, because the proxy used in ZeppelinOS requires new versions to preserve the state variables.
   * We can add new state variables and new functions. The only thing that we can't do on a contract upgrade is to remove state variables.
 
-Let's create a new version of our app, to hold the new contracts:
+Let's create a new version of our app, with the new contracts:
 
 ```sh
 zos bump 0.0.2
@@ -251,7 +251,7 @@ This command will output the token's new proxy address. Lets use it to set it in
 
 ```sh
 export TOKEN_ADDRESS=<address>
-echo "BasilERC721.at(\"$BASIL_ADDRESS\").setToken(\"$TOKEN_ADDRESS\", {from: \"$OWNER\"})" | truffle console --network local
+echo "BasilERC721.at(\"$BASIL_ADDRESS\").setToken(\"$TOKEN_ADDRESS\", {from: \"$OWNER\"})" | npx truffle console --network local
 ```
 
 That's it! Now you know how to use ZeppelinOS to develop upgradeable apps. Have a look at the scripts `deploy/deploy_with_cli_v1.sh` and `deploy/deploy_with_cli_v2.sh` to review what we've gone over in the guide.
