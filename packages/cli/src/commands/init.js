@@ -4,15 +4,15 @@ import push from './push'
 import init from '../scripts/init'
 import initLib from '../scripts/init-lib'
 
-const signature = 'init <project> [version]'
-const description = `initialize your ZeppelinOS project. Provide a <project> name and optionally an initial [version] name`
+const signature = 'init <project-name> [version]'
+const description = `initialize your ZeppelinOS project. Provide a <project-name> and optionally an initial [version] name`
 
 module.exports = {
   signature, description,
   register: function(program) {
     program
-      .command(signature, {noHelp: true})
-      .usage('<project> [version]')
+      .command(signature, { noHelp: true })
+      .usage('<project-name> [version]')
       .description(description)
       .option('--lib', 'create a standard library instead of an application')
       .option('--force', 'overwrite existing project if there is one')
