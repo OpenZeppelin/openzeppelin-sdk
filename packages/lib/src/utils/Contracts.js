@@ -7,6 +7,11 @@ const DEFAULT_TESTING_TX_PARAMS = {
   gasPrice: 100000000000
 }
 
+const DEFAULT_COVERAGE_TX_PARAMS = {
+  gas: 0xfffffffffff,
+  gasPrice: 0x01,
+}
+
 export default {
   getFromLocal(contractName) {
     const buildDir = `${process.cwd()}/build/contracts/`
@@ -37,8 +42,9 @@ export default {
   },
 
   _provideContractForTesting(contract) {
+    const defaults = process.env.SOLIDITY_COVERAGE ? DEFAULT_COVERAGE_TX_PARAMS : DEFAULT_TESTING_TX_PARAMS
     contract.setProvider(web3.currentProvider)
-    contract.defaults({ from: web3.eth.accounts[0], ... DEFAULT_TESTING_TX_PARAMS })
+    contract.defaults({ from: web3.eth.accounts[0], ... defaults })
     return contract
   },
 
