@@ -15,6 +15,7 @@ npm install zos-lib
 Next, let's create a file named `MyContract.sol` in the `contracts/` folder with the following Solidity code:
 
 ```js
+pragma solidity ^0.4.21;
 import "zos-lib/contracts/migrations/Migratable.sol";
 
 contract MyContract is Migratable {
