@@ -3,6 +3,7 @@ set -o errexit
 
 run_lib_tests() {
   echo "Testing root project..."
+  node_modules/.bin/truffle compile
   node_modules/.bin/truffle test ./test/src/app/App.test.js
 }
 
