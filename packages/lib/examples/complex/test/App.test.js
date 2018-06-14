@@ -22,7 +22,7 @@ contract('App', ([_, owner, donor, wallet]) => {
     describe('package', function() {
 
       describe('when queried for the initial version', function() {
-        it('claims to have it', async function() {
+        it.only('claims to have it', async function() {
           (await this.app.package.hasVersion(initialVersion)).should.be.true;
         });
       });
