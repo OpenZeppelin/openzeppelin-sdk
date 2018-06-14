@@ -98,7 +98,7 @@ contract('App', function ([_, owner]) {
     describe('setImplementation', function () {
       beforeEach('setting implementation', setImplementation);
 
-      it.only('should return implementation', async function () {
+      it('should return implementation', async function () {
         this.implementation_v1.address.should.be.not.null;
       });
 
