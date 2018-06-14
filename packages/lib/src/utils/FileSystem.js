@@ -1,4 +1,5 @@
 import fs from 'fs'
+import path from 'path'
 
 export function read(filename) {
   return fs.readFileSync(filename)
@@ -53,6 +54,25 @@ export function copy(source, target) {
   fs.createReadStream(source).pipe(fs.createWriteStream(target))
 }
 
+/**
+ * Remove directory recursively
+ * @param {string} dirPath
+ * @see https://stackoverflow.com/a/42505874/3027390
+ */
+export function removeTree(dirPath) {
+  if (fs.existsSync(dirPath)) {
+    fs.readdirSync(dirPath).forEach(function(entry) {
+      var entryPath = path.join(dirPath, entry);
+      if (fs.lstatSync(entryPath).isDirectory()) {
+        removeTree(entryPath);
+      } else {
+        fs.unlinkSync(entryPath);
+      }
+    });
+    fs.rmdirSync(dirPath);
+  }
+}
+
 export default {
   read,
   readDir,
@@ -65,5 +85,6 @@ export default {
   parseJsonIfExists,
   writeJson,
   write,
-  copy
+  copy,
+  removeTree
 }
