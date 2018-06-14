@@ -69,6 +69,10 @@ contract('Migratable', function ([_, owner, registrar]) {
       (await this.contract.child()).should.be.bignumber.eq(childV1);
     });
 
+    it('cannot run an initializer twice', async function () {
+      await assertRevert(initialize(this.proxy))
+    });
+
     it('should run ancestor initializers', async function () {
       (await this.contract.mother()).should.be.bignumber.eq(motherV1);
       (await this.contract.gramps()).should.be.bignumber.eq(grampsV1);
