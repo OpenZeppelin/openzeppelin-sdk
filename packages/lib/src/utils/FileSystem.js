@@ -51,7 +51,7 @@ export function write(filename, data) {
 }
 
 export function copy(source, target) {
-  fs.createReadStream(source).pipe(fs.createWriteStream(target))
+  fs.copyFileSync(source, target)
 }
 
 /**
