@@ -160,9 +160,12 @@ export default class NetworkAppController extends NetworkBaseController {
   }
 
   async linkStdlib() {
+    const currentStdlibAddress = await this.app.currentStdlib()
     if (!this.localController.hasStdlib()) {
-      await this.app.setStdlib();
-      delete this.networkPackage['stdlib'];
+      if(currentStdlibAddress !== '0x0000000000000000000000000000000000000000') {
+        await this.app.setStdlib();
+        delete this.networkPackage['stdlib'];
+      }
       return;
     }
 
@@ -180,7 +183,7 @@ export default class NetworkAppController extends NetworkBaseController {
     const stdlibName = this.packageData.stdlib.name;
     log.info(`Connecting to public deployment of ${stdlibName} in ${this.network}`);
     const stdlibAddress = Stdlib.fetch(stdlibName, this.packageData.stdlib.version, this.network);
-    const currentStdlibAddress = await this.app.currentStdlib()
+
     if(stdlibAddress !== currentStdlibAddress) {
       await this.app.setStdlib(stdlibAddress);
       this.networkPackage.stdlib = { address: stdlibAddress, ... this.packageData.stdlib };
