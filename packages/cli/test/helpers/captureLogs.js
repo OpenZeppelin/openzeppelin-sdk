@@ -2,33 +2,44 @@ import { Logger } from 'zos-lib';
 
 export default class CaptureLogs {
   constructor() {
-    this.infos = [];
-    this.errors = [];
-    this.origError = Logger.prototype.error;
-    this.origInfo = Logger.prototype.info;
-    Logger.prototype.error = (msg) => { this.errors.push(msg); }
-    Logger.prototype.info = (msg) => { this.infos.push(msg); }
-  }
+    this.clear()
+    this.originalInfo = Logger.prototype.info
+    this.originalError = Logger.prototype.error
+    Logger.prototype.info = msg => this.infos.push(msg)
+    Logger.prototype.error = msg => this.errors.push(msg)
 
-  clear() {
-    this.infos = [];
-    this.errors = [];
-  }
-
-  restore() {
-    Logger.prototype.error = this.origError;
-    Logger.prototype.info = this.origInfo;
-  }
-
-  match(re) {
-    return _(_.concat(this.infos, this.errors)).map((msg) => msg.match(re)).compact().head();
+    // TODO: Replace with new Logger warn function once released
+    this.originalLog = Logger.prototype.log
+    Logger.prototype.log = (msg, color) => {
+      if(color === 'yellow') this.warns.push(msg)
+    }
   }
 
   get text() {
     return this.toString();
   }
 
+  get logs() {
+    return this.infos.concat(this.warns, this.errors)
+  }
+
+  clear() {
+    this.infos = []
+    this.warns = []
+    this.errors = []
+  }
+
+  restore() {
+    Logger.prototype.log = this.originalLog
+    Logger.prototype.info = this.originalInfo
+    Logger.prototype.error = this.originalError
+  }
+
+  match(re) {
+    return this.logs.some(log => log.match(re))
+  }
+
   toString() {
-    return _.concat(this.infos, this.errors).join("\n");
+    return this.logs.join('\n')
   }
 }
