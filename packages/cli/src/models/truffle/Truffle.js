@@ -55,7 +55,7 @@ const Truffle = {
   _initDir(dir) {
     if (!fs.exists(dir)) {
       fs.createDir(dir)
-      fs.write(`${dir}/.gitkeep`, null)
+      fs.write(`${dir}/.gitkeep`, '')
     }
   },
 }
