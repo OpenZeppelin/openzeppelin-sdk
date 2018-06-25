@@ -9,6 +9,7 @@ import AppProvider from './AppProvider'
 import AppDeployer from './AppDeployer'
 
 const log = new Logger('App')
+const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000'
 
 export default class App {
 
@@ -49,6 +50,10 @@ export default class App {
     return this.currentDirectory().stdlib()
   }
 
+  async hasStdlib() {
+    return (await this.currentStdlib()) === ZERO_ADDRESS
+  }
+
   async getImplementation(contractName) {
     const directory = this.currentDirectory()
     return directory.getImplementation(contractName)
@@ -65,6 +70,12 @@ export default class App {
     await directory.setImplementation(contractName, implementation.address, this.txParams)
     log.info(` Implementation set: ${implementation.address}`)
     return implementation
+  }
+
+  async unsetImplementation(contractName) {
+    log.info(`Unsetting implementation of ${contractName} in directory...`)
+    await this.currentDirectory().unsetImplementation(contractName, this.txParams)
+    log.info(`Implementation unset`)
   }
 
   async setStdlib(stdlibAddress = 0x0) {
