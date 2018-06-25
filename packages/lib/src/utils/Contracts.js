@@ -13,23 +13,32 @@ const DEFAULT_COVERAGE_TX_PARAMS = {
 }
 
 export default {
+
+  getLocalPath(contractName) {
+    return `${process.cwd()}/build/contracts/${contractName}.json`
+  },
+
+  getLibPath(contractName) {
+    return path.resolve(__dirname, `../../build/contracts/${contractName}.json`)
+  },
+
+  getNodeModulesPath(dependency, contractName) {
+    return `${process.cwd()}/node_modules/${dependency}/build/contracts/${contractName}.json`
+  },
+
   getFromLocal(contractName) {
-    const buildDir = `${process.cwd()}/build/contracts/`
-    return this._getFromBuildDir(buildDir, contractName)
+    return this._getFromPath(this.getLocalPath(contractName))
   },
 
   getFromLib(contractName) {
-    const buildDir = path.resolve(__dirname, '../../build/contracts')
-    return this._getFromBuildDir(buildDir, contractName)
+    return this._getFromPath(this.getLibPath(contractName))
   },
 
   getFromNodeModules(dependency, contractName) {
-    const buildDir = `${process.cwd()}/node_modules/${dependency}/build/contracts`
-    return this._getFromBuildDir(buildDir, contractName)
+    return this._getFromPath(this.getNodeModulesPath(dependency, contractName))
   },
 
-  _getFromBuildDir(buildDir, contractName) {
-    const path = `${buildDir}/${contractName}.json`
+  _getFromPath(path) {
     const contract = truffleContract(require(path))
     return (process.env.NODE_ENV === 'test')
       ? this._provideContractForTesting(contract)
