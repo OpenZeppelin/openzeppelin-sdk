@@ -23,6 +23,10 @@ export default class Logger {
     this.log(msg, 'green')
   }
 
+  warn(msg) {
+    this.log(msg, 'yellow')
+  }
+
   error(msg) {
     this.log(msg, 'red')
   }
