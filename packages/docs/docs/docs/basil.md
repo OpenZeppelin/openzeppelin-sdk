@@ -90,7 +90,7 @@ npx truffle compile
 Now, to get the niceties that ZeppelinOS provides, let's install the `zos` command line interface and initialize our application with the version 0.0.1:
 
 ```sh
-npm install zos
+npm install -g zos
 zos init basil 0.0.1
 ```
 
