@@ -15,20 +15,20 @@ contract UpgradeabilityProxyFactory {
 
   /**
    * @dev Creates an upgradeability proxy with an initial implementation.
-   * @param owner Proxy owner.
+   * @param admin Address of the proxy admin.
    * @param implementation Address of the initial implementation.
    * @return Address of the new proxy.
    */
-  function createProxy(address owner, address implementation) public returns (AdminUpgradeabilityProxy) {
+  function createProxy(address admin, address implementation) public returns (AdminUpgradeabilityProxy) {
     AdminUpgradeabilityProxy proxy = _createProxy(implementation);
-    proxy.changeAdmin(owner);
+    proxy.changeAdmin(admin);
     return proxy;
   }
 
   /**
    * @dev Creates an upgradeability proxy with an initial implementation and calls it.
    * This is useful to initialize the proxied contract.
-   * @param owner Proxy owner.
+   * @param admin Address of the proxy admin.
    * @param implementation Address of the initial implementation.
    * @param data Data to send as msg.data in the low level call.
    * It should include the signature and the parameters of the function to be
@@ -36,9 +36,9 @@ contract UpgradeabilityProxyFactory {
    * https://solidity.readthedocs.io/en/develop/abi-spec.html#function-selector-and-argument-encoding.
    * @return Address of the new proxy.
    */
-  function createProxyAndCall(address owner, address implementation, bytes data) public payable returns (AdminUpgradeabilityProxy) {
+  function createProxyAndCall(address admin, address implementation, bytes data) public payable returns (AdminUpgradeabilityProxy) {
     AdminUpgradeabilityProxy proxy = _createProxy(implementation);
-    proxy.changeAdmin(owner);
+    proxy.changeAdmin(admin);
     require(address(proxy).call.value(msg.value)(data));
     return proxy;
   }
