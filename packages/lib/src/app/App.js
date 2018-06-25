@@ -116,7 +116,7 @@ export default class App {
   async _createProxyAndCall(contractClass, contractName, initMethodName, initArgs) {    
     const initMethod = this._validateInitMethod(contractClass, initMethodName, initArgs)
     const initArgTypes = initMethod.inputs.map(input => input.type)
-    log.info(`Creating ${contractName} proxy and calling ${this._callInfo(initMethod, initArgs)}...`)
+    log.info(`Creating ${contractName} proxy and calling ${this._callInfo(initMethod, initArgs)}`)
     const callData = encodeCall(initMethodName, initArgTypes, initArgs)
     return this._app.createAndCall(contractName, callData, this.txParams)
   }
@@ -141,6 +141,7 @@ export default class App {
   }
 
   _callInfo(initMethod, initArgs) {
-    return `${initMethod.name}(${initMethod.inputs.map(i => i.type).join(',')}) with ${JSON.stringify(initArgs).replace(/^\[|\]$/g, "")}`;
+    const args = initMethod.inputs.map((input, index) => ` - ${input.name} (${input.type}): ${JSON.stringify(initArgs[index])}`)
+    return `${initMethod.name} with: \n${args.join('\n')}`
   }
 }
