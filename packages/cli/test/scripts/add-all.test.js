@@ -1,27 +1,18 @@
-'use strict';
+'use strict'
+require('../setup')
 
-import init from '../../src/scripts/init.js'
 import addAll from '../../src/scripts/add-all'
-import { cleanup, cleanupfn } from '../helpers/cleanup.js';
-import { FileSystem as fs } from 'zos-lib';
+import ZosPackageFile from '../../src/models/files/ZosPackageFile'
 
 contract('add-all script', function() {
-  const appName = 'MyApp'
-  const defaultVersion = '0.1.0'
-  const packageFileName = 'test/tmp/zos.json'
-
   beforeEach('setup', async function() {
-    cleanup(packageFileName);
-    await init({ name: appName, version: defaultVersion, packageFileName })
+    this.packageFile = new ZosPackageFile('test/mocks/packages/package-empty.zos.json')
   })
 
-  after(cleanupfn(packageFileName))
-
   it('should add all contracts in build contracts dir', function() {
-    addAll({ packageFileName })
+    addAll({ packageFile: this.packageFile })
 
-    const data = fs.parseJson(packageFileName)
-    data.contracts.ImplV1.should.eq('ImplV1')
-    data.contracts.ImplV2.should.eq('ImplV2')
+    this.packageFile.contract('ImplV1').should.eq('ImplV1')
+    this.packageFile.contract('ImplV2').should.eq('ImplV2')
   })
 })

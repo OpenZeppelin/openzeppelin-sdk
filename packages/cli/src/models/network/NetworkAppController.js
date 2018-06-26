@@ -1,39 +1,30 @@
 import _ from 'lodash';
 import Stdlib from '../stdlib/Stdlib';
-import { Logger, Contracts, FileSystem as fs, App } from "zos-lib";
+import { Logger, Contracts, App } from "zos-lib";
 import NetworkBaseController from './NetworkBaseController';
 
 const log = new Logger('NetworkAppController');
 
 export default class NetworkAppController extends NetworkBaseController {
-  constructor(appController, network, txParams, networkFileName) {
-    super(...arguments);
-  }
-
-  get appAddress() {
-    return this.networkPackage.app && this.networkPackage.app.address;
-  }
-
-  get defaultNetworkPackage() {
-    return { contracts: {}, proxies: {} };
-  }
-
-  isDeployed() {
+  get isDeployed() {
     return !!this.appAddress;
   }
 
+  get appAddress() {
+    return this.networkFile.appAddress
+  }
+
   async deploy() {
-    this.app = await App.deploy(this.packageData.version, this.txParams);
-    this.networkPackage.app = { address: this.app.address() };
-    this.networkPackage.version = this.packageData.version;
-    this.networkPackage.package = { address: this.app.package.address };
-    this.networkPackage.provider = { address: this.app.currentDirectory().address };
+    this.app = await App.deploy(this.packageFile.version, this.txParams);
+    this.networkFile.app = { address: this.app.address() };
+    this.networkFile.version = this.app.version;
+    this.networkFile.package = { address: this.app.package.address };
+    this.networkFile.provider = { address: this.app.currentDirectory().address };
   }
 
   async fetch() {
-    const address = this.appAddress;
-    if (!address) throw Error('Your application must be deployed to interact with it.');
-    this.app = await App.fetch(address, this.txParams);
+    if (!this.isDeployed) throw Error('Your application must be deployed to interact with it.');
+    this.app = await App.fetch(this.appAddress, this.txParams);
   }
 
   async push(reupload = false) {
@@ -42,12 +33,9 @@ export default class NetworkAppController extends NetworkBaseController {
   }
 
   async deployStdlib() {
-    if (!this.localController.hasStdlib()) {
-      delete this.networkPackage['stdlib'];
-      return;
-    }
-    const stdlibAddress = await Stdlib.deploy(this.packageData.stdlib.name, this.txParams);
-    this.networkPackage.stdlib = { address: stdlibAddress, customDeploy: true, ... this.packageData.stdlib };
+    if (!this.packageFile.hasStdlib()) return this.networkFile.unsetStdlib()
+    const stdlibAddress = await Stdlib.deploy(this.packageFile.stdlibName, this.txParams);
+    this.networkFile.stdlib = { address: stdlibAddress, customDeploy: true, ... this.packageFile.stdlib };
   }
 
   async newVersion(versionName) {
@@ -62,21 +50,15 @@ export default class NetworkAppController extends NetworkBaseController {
 
   async createProxy(contractAlias, initMethod, initArgs) {
     await this.fetch();
-
     const contractClass = this.localController.getContractClass(contractAlias);
     this.checkInitialization(contractClass, initMethod, initArgs);
     const proxyInstance = await this.app.createProxy(contractClass, contractAlias, initMethod, initArgs);
     const implementationAddress = await this.app.getImplementation(contractAlias);
-
-    const proxyInfo = {
+    this.networkFile.addProxy(contractAlias, {
       address: proxyInstance.address,
       version: this.app.version,
       implementation: implementationAddress
-    };
-
-    const proxies = this.networkPackage.proxies;
-    if (!proxies[contractAlias]) proxies[contractAlias] = [];
-    proxies[contractAlias].push(proxyInfo);
+    })
     return proxyInstance;
   }
 
@@ -126,7 +108,6 @@ export default class NetworkAppController extends NetworkBaseController {
       const message = failures.map(failure => `Proxy ${failure.contractAlias} at ${failure.proxyInfo.address} failed to upgrade with ${failure.error.message}`).join('\n')
       throw Error(message)
     }
-
     return proxyInfos;
   }
 
@@ -139,11 +120,11 @@ export default class NetworkAppController extends NetworkBaseController {
   getProxies(contractAlias, proxyAddress) {
     if (!contractAlias) {
       if (proxyAddress) throw Error('Must set contract alias if filtering by proxy address.');
-      return this.networkPackage.proxies;
+      return this.networkFile.proxies;
     }
 
-    return { 
-      [contractAlias]: _.filter(this.networkPackage.proxies[contractAlias], proxy => (
+    return {
+      [contractAlias]: _.filter(this.networkFile.proxy(contractAlias), proxy => (
         !proxyAddress || proxy.address === proxyAddress
       ))
     };
@@ -161,48 +142,38 @@ export default class NetworkAppController extends NetworkBaseController {
 
   async linkStdlib() {
     const currentStdlibAddress = await this.app.currentStdlib()
-    if (!this.localController.hasStdlib()) {
+    if (!this.packageFile.hasStdlib()) {
       if(currentStdlibAddress !== '0x0000000000000000000000000000000000000000') {
         await this.app.setStdlib();
-        delete this.networkPackage['stdlib'];
+        this.networkFile.unsetStdlib()
       }
-      return;
+      return
     }
 
-    const networkStdlib = this.networkPackage.stdlib;
-    const hasNetworkStdlib = !_.isEmpty(networkStdlib);
-    const hasCustomDeploy = hasNetworkStdlib && networkStdlib.customDeploy;
-    const customDeployMatches = hasCustomDeploy && this.areSameStdlib(networkStdlib, this.packageData.stdlib);
-
+    const customDeployMatches = this.networkFile.hasCustomDeploy() && this.packageFile.hasStdlib(this.networkFile.stdlib)
     if (customDeployMatches) {
-      log.info(`Using existing custom deployment of stdlib at ${networkStdlib.address}`);
-      await this.app.setStdlib(networkStdlib.address);
-      return;
+      log.info(`Using existing custom deployment of stdlib at ${this.networkFile.stdlibAddress}`);
+      return this.app.setStdlib(this.networkFile.stdlibAddress);
     }
 
-    const stdlibName = this.packageData.stdlib.name;
-    log.info(`Connecting to public deployment of ${stdlibName} in ${this.network}`);
-    const stdlibAddress = Stdlib.fetch(stdlibName, this.packageData.stdlib.version, this.network);
+    const stdlibName = this.packageFile.stdlibName;
+    log.info(`Connecting to public deployment of ${stdlibName} in ${this.networkFile.network}`);
+    const stdlibAddress = Stdlib.fetch(stdlibName, this.packageFile.stdlibVersion, this.networkFile.network);
 
     if(stdlibAddress !== currentStdlibAddress) {
       await this.app.setStdlib(stdlibAddress);
-      this.networkPackage.stdlib = { address: stdlibAddress, ... this.packageData.stdlib };
+      this.networkFile.stdlib = { address: stdlibAddress, ... this.packageFile.stdlib };
     }
     else log.info(`Current application is already linked to stdlib ${stdlibName} at ${stdlibAddress} in ${this.network}`);
   }
 
-  areSameStdlib(aStdlib, anotherStdlib) {
-    return aStdlib.name === anotherStdlib.name && aStdlib.version === anotherStdlib.version
-  }
-
   isStdlibContract(contractAlias) {
-    if (!this.localController.hasStdlib()) return false;
-    const stdlib = new Stdlib(this.packageData.stdlib.name);
+    if (!this.packageFile.hasStdlib()) return false;
+    const stdlib = new Stdlib(this.packageFile.stdlibName);
     return stdlib.hasContract(contractAlias);
   }
 
   isContractDefined(contractAlias) {
     return super.isContractDefined(contractAlias) || this.isStdlibContract(contractAlias);
   }
-
 }

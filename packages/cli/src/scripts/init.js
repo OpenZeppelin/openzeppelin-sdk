@@ -1,10 +1,11 @@
 import LocalAppController from  '../models/local/LocalAppController'
+import ZosPackageFile from "../models/files/ZosPackageFile";
 
-export default async function init({ name, version, stdlibNameVersion = undefined, installLib = false, force = false, packageFileName = undefined }) {
+export default async function init({ name, version, stdlibNameVersion = undefined, installLib = false, force = false, packageFile = new ZosPackageFile() }) {
   if (name === undefined) throw Error('A project name must be provided to initialize the project.')
   
-  const appController = new LocalAppController(packageFileName)
-  appController.init(name, version, force)
-  await appController.linkStdlib(stdlibNameVersion, installLib)
-  appController.writePackage()
+  const controller = new LocalAppController(packageFile)
+  controller.init(name, version, force)
+  await controller.linkStdlib(stdlibNameVersion, installLib)
+  controller.writePackage()
 }

@@ -18,14 +18,6 @@ export default class Stdlib {
     this._parseNameVersion(nameAndVersion)
   }
 
-  getName() {
-    return this.name
-  }
-
-  getVersion() {
-    return this.version
-  }
-
   contracts() {
     return this.getPackage().contracts
   }

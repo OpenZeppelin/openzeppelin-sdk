@@ -1,16 +1,16 @@
-import ControllerFor from "../models/local/ControllerFor";
 import stdout from '../utils/stdout';
+import ControllerFor from "../models/network/ControllerFor";
 
-export default async function push({ network, deployStdlib, reupload = false, txParams = {}, packageFileName = undefined, networkFileName = undefined }) {
-  const appController = ControllerFor(packageFileName).onNetwork(network, txParams, networkFileName);
+export default async function push({ network, deployStdlib, reupload = false, txParams = {}, networkFile = undefined }) {
+  const controller = ControllerFor(network, txParams, networkFile);
   
   try {
-    if (deployStdlib && !appController.isLib()) {
-      await appController.deployStdlib();
+    if (deployStdlib && !controller.isLib) {
+      await controller.deployStdlib();
     }
-    await appController.push(reupload);
-    stdout(appController.isLib() ? appController.packageAddress : appController.appAddress);
+    await controller.push(reupload);
+    stdout(controller.isLib ? controller.packageAddress : controller.appAddress);
   } finally {
-    appController.writeNetworkPackage();
+    controller.writeNetworkPackage();
   }
 }

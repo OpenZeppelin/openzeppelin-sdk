@@ -1,14 +1,14 @@
-import LocalAppController from '../models/local/LocalAppController';
 import stdout from '../utils/stdout';
+import ControllerFor from '../models/network/ControllerFor';
 
-export default async function createProxy({ contractAlias, initMethod, initArgs, network, txParams = {}, packageFileName = undefined, networkFileName = undefined, force = false }) {
+export default async function createProxy({ contractAlias, initMethod, initArgs, network, txParams = {}, force = false, networkFile = undefined }) {
   if (!contractAlias) throw Error('A contract alias must be provided to create a new proxy.')
 
-  const appController = new LocalAppController(packageFileName).onNetwork(network, txParams, networkFileName);
-  await appController.checkLocalContractDeployed(contractAlias, !force);
-  const proxy = await appController.createProxy(contractAlias, initMethod, initArgs);
+  const controller = ControllerFor(network, txParams, networkFile)
+  await controller.checkLocalContractDeployed(contractAlias, !force);
+  const proxy = await controller.createProxy(contractAlias, initMethod, initArgs);
 
-  appController.writeNetworkPackage();
+  controller.writeNetworkPackage();
   stdout(proxy.address);
   return proxy;
 }

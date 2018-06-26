@@ -12,11 +12,11 @@ contract('Stdlib', function () {
   })
 
   it('should set a name', async function () {
-    this.stdlib.getName().should.eq(packageName)
+    this.stdlib.name.should.eq(packageName)
   })
   
   it('should set a version', async function () {
-    this.stdlib.getVersion().should.eq('1.1.0')
+    this.stdlib.version.should.eq('1.1.0')
   })
 
   it('should list all provided contracts', async function () {

@@ -1,40 +1,40 @@
 import Stdlib from '../stdlib/Stdlib'
 import Truffle from '../truffle/Truffle'
 import { Contracts, Logger, FileSystem as fs } from 'zos-lib'
+import ZosPackageFile from "../files/ZosPackageFile";
 
 const log = new Logger('LocalController');
 
 const DEFAULT_VERSION = '0.1.0';
 
 export default class LocalBaseController {
-  constructor(packageFileName = 'zos.json') {
-    this.packageFileName = packageFileName;
+  constructor(packageFile) {
+    this.packageFile = packageFile
+  }
+
+  get isLib() {
+    return this.packageFile.isLib
   }
 
   init(name, version, force = false) {
-    this.initZosFile(name, version, force)
+    this.initZosPackageFile(name, version, force)
     Truffle.init()
   }
 
-  initZosFile(name, version, force = false) {
-    if (fs.exists(this.packageFileName) && !force) {
-      throw Error(`Cannot overwrite existing file ${this.packageFileName}`)
+  initZosPackageFile(name, version, force = false) {
+    if (this.packageFile.exists() && !force) {
+      throw Error(`Cannot overwrite existing file ${this.packageFile.fileName}`)
     }
-    if (this.packageData.name && !force) {
-      throw Error(`Cannot initialize already initialized package ${this.packageData.name}`)
+    if (this.packageFile.name && !force) {
+      throw Error(`Cannot initialize already initialized package ${this.packageFile.name}`)
     }
-
-    this.packageData.name = name;
-    this.packageData.version = version || DEFAULT_VERSION;
-    this.packageData.contracts = {};
+    this.packageFile.name = name
+    this.packageFile.version = version || DEFAULT_VERSION
+    this.packageFile.contracts = {}
   }
 
   bumpVersion(version) {
-    this.packageData.version = version;
-  }
-
-  hasStdlib() {
-    return false;
+    this.packageFile.version = version
   }
 
   add(contractAlias, contractName) {
@@ -44,8 +44,7 @@ export default class LocalBaseController {
     if (this.hasConstructor(path)) {
       log.error(`Contract ${contractName} has an explicit constructor. Move it to an initializer function to use it with ZeppelinOS.`)
     }
-
-    this.packageData.contracts[contractAlias] = contractName;
+    this.packageFile.setContract(contractAlias, contractName)
   }
 
   addAll() {
@@ -85,19 +84,12 @@ export default class LocalBaseController {
     return !!abi.find(fn => fn.type === "constructor");
   }
 
-  get packageData() {
-    if (!this._package) {
-      this._package = fs.parseJsonIfExists(this.packageFileName) || {};
-    }
-    return this._package;
-  }
-
   getContractClass(contractAlias) {
-    const contractName = this.packageData.contracts[contractAlias];
+    const contractName = this.packageFile.contract(contractAlias);
     if (contractName) {
       return Contracts.getFromLocal(contractName);
-    } else if (this.hasStdlib()) {
-      const stdlibName = this.packageData.stdlib.name;
+    } else if (this.packageFile.hasStdlib()) {
+      const stdlibName = this.packageFile.stdlibName;
       const contractName = new Stdlib(stdlibName).contract(contractAlias)
       return Contracts.getFromNodeModules(stdlibName, contractName);
     } else {
@@ -106,7 +98,6 @@ export default class LocalBaseController {
   }
 
   writePackage() {
-    fs.writeJson(this.packageFileName, this.packageData);
-    log.info(`Successfully written ${this.packageFileName}`)
+    this.packageFile.write()
   }
 }

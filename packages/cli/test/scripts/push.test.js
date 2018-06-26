@@ -1,13 +1,13 @@
 'use strict'
 require('../setup')
 
-import { cleanup, cleanupfn } from '../helpers/cleanup'
-import { Contracts, FileSystem as fs, App, Package } from 'zos-lib'
+import { Contracts, App, Package, FileSystem as fs } from 'zos-lib'
 
 import push from '../../src/scripts/push.js';
 import freeze from '../../src/scripts/freeze';
 import add from '../../src/scripts/add';
 import bumpVersion from '../../src/scripts/bump';
+import ZosPackageFile from '../../src/models/files/ZosPackageFile';
 
 const ImplV1 = Contracts.getFromLocal('ImplV1');
 const PackageContract = Contracts.getFromNodeModules('zos-lib', 'Package');
@@ -18,39 +18,34 @@ contract('push script', function([_, owner]) {
   const txParams = { from: owner }
   const defaultVersion = '1.1.0';
 
-  const shouldDeployPackage = function (networkFileName) {
+  const shouldDeployPackage = function () {
     it('should create a network file with version info', async function() {
-      fs.exists(networkFileName).should.be.true;
-      const networkData = fs.parseJson(networkFileName);
-      networkData.version.should.eq(defaultVersion);
+      this.networkFile.isCurrentVersion(defaultVersion).should.be.true;
     });
 
     it('should include deployment addresses', async function () {
-      const networkData = fs.parseJson(networkFileName);
-      networkData.package.address.should.be.nonzeroAddress;
-      networkData.provider.address.should.be.nonzeroAddress;
+      this.networkFile.packageAddress.should.be.nonzeroAddress;
+      this.networkFile.providerAddress.should.be.nonzeroAddress;
     });
 
     it('should deploy package at specified address', async function () {
-      const address = fs.parseJson(networkFileName).package.address;
-      const apackage = await PackageContract.at(address);
-      (await apackage.hasVersion(defaultVersion)).should.be.true;
+      const _package = await PackageContract.at(this.networkFile.packageAddress);
+      (await _package.hasVersion(defaultVersion)).should.be.true;
     });
   };
 
-  const shouldDeployProvider = function (networkFileName) {
+  const shouldDeployProvider = function () {
     it('should deploy provider at specified address', async function () {
-      const address = fs.parseJson(networkFileName).provider.address;
-      const directory = await ImplementationDirectory.at(address);
+      const directory = await ImplementationDirectory.at(this.networkFile.providerAddress);
       (await directory.getImplementation('foo')).should.be.zeroAddress;
     });
   };
 
-  const shouldDeployApp = function (networkFileName) {
-    shouldDeployPackage(networkFileName);
+  const shouldDeployApp = function () {
+    shouldDeployPackage();
 
     it('should deploy app at specified address', async function () {
-      const address = fs.parseJson(networkFileName).app.address;
+      const address = this.networkFile.appAddress;
       address.should.be.nonzeroAddress;
 
       const app = await App.fetch(address);
@@ -58,18 +53,17 @@ contract('push script', function([_, owner]) {
     });
   };
 
-  const shouldDeployLib = function (networkFileName) {
-    shouldDeployPackage(networkFileName);
+  const shouldDeployLib = function () {
+    shouldDeployPackage();
 
     it('should not be frozen by default', async function() {
-      const data = fs.parseJson(networkFileName);
-      data.frozen.should.be.false;
+      this.networkFile.frozen.should.be.false;
     });
   };
 
-  const shouldDeployContracts = function ({ networkFileName }) {
+  const shouldDeployContracts = function () {
     it('should record contracts in network file', async function () {
-      const contract = fs.parseJson(networkFileName).contracts['Impl'];
+      const contract = this.networkFile.contract('Impl');
       contract.address.should.be.nonzeroAddress;
       contract.bytecodeHash.should.not.be.empty;
       const deployed = await ImplV1.at(contract.address);
@@ -77,213 +71,199 @@ contract('push script', function([_, owner]) {
     });
 
     it('should deploy contract instance', async function () {
-      const address = fs.parseJson(networkFileName).contracts['Impl'].address;
+      const address = this.networkFile.contract('Impl').address;
       const deployed = await ImplV1.at(address);
       (await deployed.say()).should.eq('V1');
     });
 
     it('should register instances in directory', async function () {
-      const data = fs.parseJson(networkFileName);
-      const address = data.contracts['Impl'].address;
-      const apackage = await Package.fetch(data.package.address);
-      (await apackage.getImplementation(defaultVersion, 'Impl')).should.eq(address);
+      const address = this.networkFile.contract('Impl').address;
+      const _package = await Package.fetch(this.networkFile.package.address);
+      (await _package.getImplementation(defaultVersion, 'Impl')).should.eq(address);
     });
   };
 
-  const shouldRedeployContracts = function ({ packageFileName, networkFileName }) {
+  const shouldRedeployContracts = function () {
     it('should not redeploy contracts if unmodified', async function () {
-      const origAddress = fs.parseJson(networkFileName).contracts['Impl'].address;
-      await push({ packageFileName, network, txParams });
-      const newAddress = fs.parseJson(networkFileName).contracts['Impl'].address;
-      origAddress.should.eq(newAddress);
+      const previousAddress = this.networkFile.contract('Impl').address
+      await push({ networkFile: this.networkFile, network, txParams });
+      this.networkFile.contract('Impl').address.should.eq(previousAddress);
     });
 
     it('should redeploy unmodified contract if forced', async function () {
-      const origAddress = fs.parseJson(networkFileName).contracts['Impl'].address;
-      await push({ packageFileName, network, txParams, reupload: true });
-      const newAddress = fs.parseJson(networkFileName).contracts['Impl'].address;
-      origAddress.should.not.eq(newAddress);
+      const previousAddress = this.networkFile.contract('Impl').address
+      await push({ networkFile: this.networkFile, network, txParams, reupload: true });
+      this.networkFile.contract('Impl').address.should.not.eq(previousAddress);
     });
 
     it('should redeploy contracts if modified', async function () {
-      const networkData = fs.parseJson(networkFileName);
-      const origAddress = networkData.contracts['Impl'].address;
-      networkData.contracts['Impl'].bytecodeHash = '0xabab';
-      fs.writeJson(networkFileName, networkData);
+      const contractData = this.networkFile.contract('Impl');
+      const previousAddress = contractData.address
+      contractData.bytecodeHash = '0xabab'
+      this.networkFile.contracts = { 'Impl': contractData }
+      this.networkFile.contracts = [contractData]
 
-      await push({ packageFileName, network, txParams });
-      const newAddress = fs.parseJson(networkFileName).contracts['Impl'].address;
-      origAddress.should.not.eq(newAddress);
+      await push({ networkFile: this.networkFile, network, txParams });
+
+      this.networkFile.contract('Impl').address.should.not.eq(previousAddress);
     });
   }
 
-  const shouldBumpVersion = function ({ newPackageFileName, networkFileName }) {
+  const shouldBumpVersion = function () {
     it('should keep package address when bumping version', async function () {
-      const origPackageAddress = fs.parseJson(networkFileName).package.address;
-      await push({ packageFileName: newPackageFileName, networkFileName, network, txParams });
-      fs.parseJson(networkFileName).package.address.should.eq(origPackageAddress)
+      const previousPackage = this.networkFile.packageAddress
+      await bumpVersion({ version: '1.2.0', packageFile: this.networkFile.packageFile });
+
+      await push({ networkFile: this.networkFile, network, txParams });
+
+      this.networkFile.packageAddress.should.eq(previousPackage)
     });
 
     it('should update provider address when bumping version', async function () {
-      await push({ packageFileName: newPackageFileName, networkFileName, network, txParams });
-      const data = fs.parseJson(networkFileName);
-      const providerAddress = data.provider.address;
-      const apackage = await Package.fetch(data.package.address);
-      (await apackage.getRelease('1.2.0')).address.should.eq(providerAddress);
+      await bumpVersion({ version: '1.2.0', packageFile: this.networkFile.packageFile });
+      await push({ networkFile: this.networkFile, network, txParams });
+
+      const _package = await Package.fetch(this.networkFile.package.address);
+      (await _package.getRelease('1.2.0')).address.should.eq(this.networkFile.providerAddress);
     });
 
     it('should upload contracts to new directory when bumping version', async function () {
-      await push({ packageFileName: newPackageFileName, networkFileName, network, txParams });
-      const data = fs.parseJson(networkFileName);
-      const implAddress = data.contracts['Impl'].address;
-      const apackage = await Package.fetch(data.package.address);
-      (await apackage.getImplementation('1.2.0', 'Impl')).should.eq(implAddress);
+      await bumpVersion({ version: '1.2.0', packageFile: this.networkFile.packageFile });
+      await push({ networkFile: this.networkFile, network, txParams });
+
+      const implementationAddreess = this.networkFile.contract('Impl').address;
+      const _package = await Package.fetch(this.networkFile.package.address);
+      (await _package.getImplementation('1.2.0', 'Impl')).should.eq(implementationAddreess);
     });
   };
 
-  const shouldBumpVersionAndUnfreeze = function ({ newPackageFileName, networkFileName }) {
-    shouldBumpVersion({ newPackageFileName, networkFileName })
+  const shouldBumpVersionAndUnfreeze = function () {
+    shouldBumpVersion()
 
     it('should set frozen back to false', async function() {
-      await bumpVersion({ version: '1.1.0', packageFileName: newPackageFileName });
-      await push({ packageFileName: newPackageFileName, networkFileName, network, txParams })
-      await freeze({ network, packageFileName: newPackageFileName, networkFileName, txParams })
-      const firstVersionData = fs.parseJson(networkFileName);
-      firstVersionData.frozen.should.be.true;
+      await bumpVersion({ version: '1.1.0', packageFile: this.newNetworkFile.packageFile  });
+      await push({ network, txParams, networkFile: this.newNetworkFile })
+      await freeze({ network, txParams, networkFile: this.newNetworkFile })
+      this.newNetworkFile.frozen.should.be.true;
 
-      await bumpVersion({ version: '1.2.0', packageFileName: newPackageFileName });
-      await add({ contractsData: [{ name: 'ImplV1', alias: 'Impl' }], packageFileName: newPackageFileName });
-      await push({ packageFileName: newPackageFileName, networkFileName, network, txParams })
-      const secondVersionData = fs.parseJson(networkFileName);
-      secondVersionData.frozen.should.be.false;
+      await bumpVersion({ version: '1.2.0', packageFile: this.newNetworkFile.packageFile });
+      await add({ contractsData: [{ name: 'ImplV1', alias: 'Impl' }], packageFile: this.newNetworkFile.packageFile });
+      await push({ network, txParams, networkFile: this.newNetworkFile })
+      this.newNetworkFile.frozen.should.be.false;
     });
   }
 
   describe('an empty app', function() {
-    const packageFileName = 'test/mocks/packages/package-empty.zos.json';
-    const networkFileName = 'test/mocks/packages/package-empty.zos.test.json';
-
     beforeEach('pushing package-empty', async function () {
-      cleanup(networkFileName)
-      await push({ packageFileName, network, txParams })
+      const packageFile = new ZosPackageFile('test/mocks/packages/package-empty.zos.json')
+      this.networkFile = packageFile.networkFile(network)
+
+      await push({ network, txParams, networkFile: this.networkFile })
     });
 
-    after(cleanupfn(networkFileName));
-
-    shouldDeployApp(networkFileName);
-    shouldDeployProvider(networkFileName);
+    shouldDeployApp();
+    shouldDeployProvider();
   });
 
   describe('an app with contracts', function() {
-    const packageFileName =    'test/mocks/packages/package-with-contracts.zos.json';
-    const newPackageFileName = 'test/mocks/packages/package-with-contracts-v2.zos.json';
-    const networkFileName =    'test/mocks/packages/package-with-contracts.zos.test.json';
 
     beforeEach('pushing package-with-contracts', async function () {
-      cleanup(networkFileName)
-      await push({ packageFileName, network, txParams })
+      const packageFile = new ZosPackageFile('test/mocks/packages/package-with-contracts.zos.json')
+      this.networkFile = packageFile.networkFile(network)
+
+      await push({ network, txParams, networkFile: this.networkFile })
     });
 
-    after(cleanupfn(networkFileName));
-
-    shouldDeployApp(networkFileName);
-    shouldDeployProvider(networkFileName);
-    shouldDeployContracts({ networkFileName });
-    shouldRedeployContracts({ packageFileName, networkFileName });
-    shouldBumpVersion({ networkFileName, newPackageFileName });
+    shouldDeployApp();
+    shouldDeployProvider();
+    shouldDeployContracts();
+    shouldRedeployContracts();
+    shouldBumpVersion();
   });
 
   describe('an app with stdlib', function () {
     const stdlibAddress = '0x0000000000000000000000000000000000000010';
 
     describe('when using a valid stdlib', function () {
-      const packageFileName = 'test/mocks/packages/package-with-stdlib.zos.json';
-      const networkFileName = 'test/mocks/packages/package-with-stdlib.zos.test.json';
-
       beforeEach('pushing package-stdlib', async function () {
-        cleanup(networkFileName)
-        await push({ packageFileName, network, txParams })
+        const packageFile = new ZosPackageFile('test/mocks/packages/package-with-stdlib.zos.json')
+        this.networkFile = packageFile.networkFile(network)
+
+        await push({ networkFile: this.networkFile, network, txParams })
       });
 
-      after(cleanupfn(networkFileName));
-
-      shouldDeployApp(networkFileName);
+      shouldDeployApp();
 
       it('should set stdlib in deployed app', async function () {
-        const address = fs.parseJson(networkFileName).app.address;
-        const app = await App.fetch(address);
+        const app = await App.fetch(this.networkFile.appAddress);
         const stdlib = await app.currentStdlib();
 
         stdlib.should.eq(stdlibAddress);
       });
 
       it('should set address in network file', async function () {
-        fs.parseJson(networkFileName).stdlib.address.should.eq(stdlibAddress);
+        this.networkFile.stdlibAddress.should.eq(stdlibAddress);
       });
     })
 
     describe('when using an invalid stdlib', function () {
-      const packageFileName = 'test/mocks/packages/package-with-invalid-stdlib.zos.json'
+      beforeEach('building network file', async function () {
+        const packageFile = new ZosPackageFile('test/mocks/packages/package-with-invalid-stdlib.zos.json')
+        this.networkFile = packageFile.networkFile(network)
+      });
 
       it('should set address in network file', async function () {
-        await push({ packageFileName, network, txParams })
+        await push({ network, txParams, networkFile: this.networkFile })
           .should.be.rejectedWith('Requested stdlib version 1.0.0 does not match stdlib network package version 3.0.0')
       });
     })
   });
 
   describe('an empty lib', function() {
-    const packageFileName = 'test/mocks/packages/package-empty-lib.zos.json';
-    const networkFileName = 'test/mocks/packages/package-empty-lib.zos.test.json';
-
     beforeEach('pushing package-empty', async function () {
-      cleanup(networkFileName)
-      await push({ packageFileName, network, txParams })
+      const packageFile = new ZosPackageFile('test/mocks/packages/package-empty-lib.zos.json')
+      this.networkFile = packageFile.networkFile(network)
+
+      await push({ network, txParams, networkFile: this.networkFile })
     });
 
-    after(cleanupfn(networkFileName));
-
-    shouldDeployLib(networkFileName);
-    shouldDeployProvider(networkFileName);
+    shouldDeployLib(this.networkFile);
+    shouldDeployProvider(this.networkFile);
   });
 
   describe('a lib with contracts', function() {
-    const packageFileName =    'test/mocks/packages/package-lib-with-contracts.zos.json';
-    const newPackageFileName = 'test/mocks/packages/package-lib-with-contracts-v2.zos.json';
-    const networkFileName =    'test/mocks/packages/package-lib-with-contracts.zos.test.json';
-
     beforeEach('pushing package-with-contracts', async function () {
-      cleanup(networkFileName)
-      await push({ packageFileName, network, txParams })
+      const packageFile = new ZosPackageFile('test/mocks/packages/package-lib-with-contracts.zos.json')
+      this.networkFile = packageFile.networkFile(network)
+
+      await push({ network, txParams, networkFile: this.networkFile })
+
+      const newPackageFile = new ZosPackageFile('test/mocks/packages/package-lib-with-contracts-v2.zos.json')
+      this.newNetworkFile = newPackageFile.networkFile(network)
     });
 
-    after(cleanupfn(networkFileName));
-
-    shouldDeployLib(networkFileName);
-    shouldDeployProvider(networkFileName);
-    shouldDeployContracts({ networkFileName });
-    shouldRedeployContracts({ packageFileName, networkFileName });
-    shouldBumpVersionAndUnfreeze({ networkFileName, packageFileName, newPackageFileName });
+    shouldDeployLib();
+    shouldDeployProvider();
+    shouldDeployContracts();
+    shouldRedeployContracts();
+    shouldBumpVersionAndUnfreeze();
 
     it('should refuse to push when frozen', async function() {
-      await freeze({ network, packageFileName, networkFileName, txParams })
-      await push({ packageFileName, network, networkFileName, txParams }).should.be.rejectedWith(/frozen/i)
+      await freeze({ network, txParams, networkFile: this.networkFile })
+      await push({ network, txParams, networkFile: this.networkFile }).should.be.rejectedWith(/frozen/i)
     });
   });
 
   describe('an app with invalid contracts', function() {
-    const packageFileName = "test/mocks/packages/package-with-invalid-contracts.zos.json";
-    const networkFileName = "test/mocks/packages/package-with-invalid-contracts.zos.test.json";
+    beforeEach('pushing package-with-contracts', async function () {
+      const packageFile = new ZosPackageFile('test/mocks/packages/package-with-invalid-contracts.zos.json')
+      this.networkFile = packageFile.networkFile(network)
 
-    beforeEach("pushing package-with-contracts", async function () {
-      cleanup(networkFileName)
-      await push({ packageFileName, network, txParams }).should.be.rejectedWith(/WithFailingConstructor deployment failed /);
+      await push({ networkFile: this.networkFile, network, txParams }).should.be.rejectedWith(/WithFailingConstructor deployment failed/);
     });
 
-    after(cleanupfn(networkFileName));
-
-    shouldDeployApp(networkFileName);
-    shouldDeployProvider(networkFileName);
-    shouldDeployContracts({ networkFileName });
+    shouldDeployApp();
+    shouldDeployProvider();
+    shouldDeployContracts();
   });
 });

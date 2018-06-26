@@ -1,7 +1,7 @@
-import LocalLibController from '../models/local/LocalLibController'
+import ControllerFor from '../models/network/ControllerFor'
 
-export default async function freeze({ network, txParams = {}, packageFileName = undefined, networkFileName = undefined }) {
-  const appController = new LocalLibController(packageFileName).onNetwork(network, txParams, networkFileName)
-  await appController.freeze();
-  appController.writeNetworkPackage();
+export default async function freeze({ network, txParams = {}, networkFile = undefined}) {
+  const controller = new ControllerFor(network, txParams, networkFile)
+  await controller.freeze();
+  controller.writeNetworkPackage();
 }

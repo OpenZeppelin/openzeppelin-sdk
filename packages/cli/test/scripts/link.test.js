@@ -1,45 +1,38 @@
 'use strict'
 require('../setup')
 
-import { FileSystem as fs } from 'zos-lib';
-import { cleanup, cleanupfn } from '../helpers/cleanup.js';
-
-import init from '../../src/scripts/init.js';
 import linkStdlib from '../../src/scripts/link.js';
+import ZosPackageFile from "../../src/models/files/ZosPackageFile";
 
 contract('link script', function() {
-  const appName = 'MyApp';
-  const defaultVersion = '0.1.0';
-  const packageFileName = 'test/tmp/zos.json';
 
   beforeEach('setup', async function() {
-    cleanup(packageFileName)
-    await init({ name: appName, version: defaultVersion, packageFileName, stdlibNameVersion: 'mock-stdlib@1.1.0' });
+    this.packageFile = new ZosPackageFile('test/mocks/packages/package-with-stdlib.zos.json')
   });
 
-  after('cleanup', cleanupfn(packageFileName));
-
   it('should set stdlib', async function () {
-    await linkStdlib({ stdlibNameVersion: 'mock-stdlib@1.1.0', packageFileName });
-    const data = fs.parseJson(packageFileName);
-    data.stdlib.name.should.eq('mock-stdlib');
-    data.stdlib.version.should.eq('1.1.0');
+    await linkStdlib({ stdlibNameVersion: 'mock-stdlib@1.1.0', packageFile: this.packageFile });
+
+    this.packageFile.stdlibName.should.eq('mock-stdlib');
+    this.packageFile.stdlibVersion.should.eq('1.1.0');
   });
 
   it('should install the stdlib if requested', async function () {
-    await linkStdlib({ stdlibNameVersion: 'mock-stdlib@1.1.0', installLib: true, packageFileName });
-    const data = fs.parseJson(packageFileName);
-    data.stdlib.name.should.eq('mock-stdlib');
-    data.stdlib.version.should.eq('1.1.0');
+    await linkStdlib({ stdlibNameVersion: 'mock-stdlib@1.1.0', installLib: true, packageFile: this.packageFile });
+
+    this.packageFile.stdlibName.should.eq('mock-stdlib');
+    this.packageFile.stdlibVersion.should.eq('1.1.0');
   });
 
   it('should refuse to set a stdlib for a lib project', async function () {
-    fs.editJson(packageFileName, p => { p.lib = true; });
-    await linkStdlib({ stdlibNameVersion: 'mock-stdlib@1.1.0', packageFileName }).should.be.rejectedWith(/lib/);
+    this.packageFile.lib = true
+
+    await linkStdlib({ stdlibNameVersion: 'mock-stdlib@1.1.0', packageFile: this.packageFile })
+      .should.be.rejectedWith('Libraries cannot use a stdlib');
   });
 
   it('should raise an error if requested version of stdlib does not match its package version', async function () {
-    await linkStdlib({ stdlibNameVersion: 'mock-stdlib-invalid@1.0.0', packageFileName })
+    await linkStdlib({ stdlibNameVersion: 'mock-stdlib-invalid@1.0.0', packageFile: this.packageFile })
       .should.be.rejectedWith('Requested stdlib version 1.0.0 does not match stdlib package version 2.0.0')
   });
 });

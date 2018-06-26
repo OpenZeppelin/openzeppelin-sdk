@@ -1,16 +1,11 @@
+import ZosPackageFile from '../files/ZosPackageFile'
 import LocalAppController from './LocalAppController';
 import LocalLibController from './LocalLibController';
-import { FileSystem as fs } from 'zos-lib';
 
-export default function(packageFileName = 'zos.json') {
-  if (!fs.exists(packageFileName)) {
-    throw Error(`Package file ${packageFileName} not found. Run 'zos init' first to initialize the project.`);
-  }
-  
-  const packageData = fs.parseJson(packageFileName);
-  if (packageData.lib) {
-    return new LocalLibController(packageFileName);
-  } else {
-    return new LocalAppController(packageFileName);
-  }
+export default function(packageFile = new ZosPackageFile()) {
+  if(!packageFile.exists()) throw Error(`zOS file ${packageFile.fileName} not found. Run 'zos init' first to initialize the project.`)
+
+  return packageFile.isLib
+    ? new LocalLibController(packageFile)
+    : new LocalAppController(packageFile)
 }

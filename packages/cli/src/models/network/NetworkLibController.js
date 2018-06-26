@@ -4,46 +4,41 @@ import { Logger, Contracts, Package } from 'zos-lib';
 import NetworkBaseController from './NetworkBaseController';
 
 export default class NetworkLibController extends NetworkBaseController {
-  constructor(appController, network, txParams, networkFileName) {
-    super(...arguments);
-  }
-
-  get defaultNetworkPackage() {
-    return { contracts: {}, lib: true, frozen: false };
-  }
-
-  isDeployed() {
+  get isDeployed() {
     return !!this.packageAddress;
+  }
+
+  async createProxy() {
+    throw Error('Cannot create proxy for stdlib')
   }
 
   async deploy() {
     this.package = await Package.deploy(this.txParams);
-    this.networkPackage.package = { address: this.package.address() };
+    this.networkFile.package = { address: this.package.address() }
   }
 
   async fetch() {
-    const address = this.packageAddress;
-    if (!address) throw Error('Your application must be deployed to interact with it.');
-    this.package = await Package.fetch(address, this.txParams);
+    if (!this.isDeployed) throw Error('Your application must be deployed to interact with it.');
+    this.package = await Package.fetch(this.packageAddress, this.txParams);
   }
 
   setImplementation(contractClass, contractAlias) {
-    return this.package.setImplementation(this.networkPackage.version, contractClass, contractAlias);
+    return this.package.setImplementation(this.networkFile.version, contractClass, contractAlias);
   }
 
   newVersion(versionName) {
-    this.networkPackage.frozen = false
-    return this.package.newVersion(versionName);
+    this.networkFile.frozen = false
+    return this.package.newVersion(versionName)
   }
 
   async freeze() {
     await this.fetch()
-    await this.package.freeze(this.networkPackage.version)
-    this.networkPackage.frozen = true
+    await this.package.freeze(this.networkFile.version)
+    this.networkFile.frozen = true
   }
 
   async uploadContracts(reupload) {
-    if (this.networkPackage.frozen) {
+    if (this.networkFile.frozen) {
       throw Error('Cannot upload contracts for a frozen release. Run zos bump to create a new version first.');
     }
     await super.uploadContracts(reupload);

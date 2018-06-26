@@ -2,65 +2,67 @@
 require('../setup')
 
 import { FileSystem as fs } from 'zos-lib'
-import initLib from "../../src/scripts/init-lib.js"
-import { cleanupfn } from "../helpers/cleanup.js";
+import { cleanup } from '../helpers/cleanup.js'
+
+import initLib from '../../src/scripts/init-lib.js'
+import ZosPackageFile from '../../src/models/files/ZosPackageFile'
 
 contract('init-lib script', function() {
-  const appName = "MyLib";
-  const appVersion = "0.3.0";
-  const packageFileName = "test/tmp/zos.json";
+  const name = 'MyLib';
+  const version = '0.3.0';
 
-  beforeEach(cleanupfn(packageFileName))
-  after(cleanupfn(packageFileName))
+  beforeEach(async function () {
+    this.packageFile = new ZosPackageFile('test/tmp/zos.json')
+  })
 
   describe('created file', function() {
-    it('should exist', async function() {
-      await initLib({ name: appName, version: appVersion, packageFileName });
-      fs.exists(packageFileName).should.be.true;
-    });
-
     it('should be marked as lib', async function () {
-      await initLib({ name: appName, version: appVersion, packageFileName });
-      const data = fs.parseJson(packageFileName);
-      data.lib.should.be.true;
+      await initLib({ name, version, packageFile: this.packageFile })
+
+      this.packageFile.isLib.should.be.true;
     });
 
     it('should have the appropriate app name', async function() {
-      await initLib({ name: appName, version: appVersion, packageFileName });
-      const data = fs.parseJson(packageFileName);
-      data.name.should.eq(appName);
+      await initLib({ name, version, packageFile: this.packageFile })
+
+      this.packageFile.hasName(name).should.be.true
     });
 
     it('should have a default version if not specified', async function() {
-      await initLib({ name: appName, version: null, packageFileName });
-      const data = fs.parseJson(packageFileName);
-      data.version.should.eq('0.1.0');
+      await initLib({ name, packageFile: this.packageFile })
+
+      this.packageFile.isCurrentVersion('0.1.0').should.be.true
     });
 
     it('should have the appropriate version', async function() {
-      await initLib({ name: appName, version: appVersion, packageFileName });
-      const data = fs.parseJson(packageFileName);
-      data.version.should.eq(appVersion);
+      await initLib({ name, version, packageFile: this.packageFile })
+
+      this.packageFile.isCurrentVersion(version).should.be.true
     });
 
     it('should have an empty contracts object', async function() {
-      await initLib({ name: appName, version: null, packageFileName });
-      const data = fs.parseJson(packageFileName);
-      data.contracts.should.eql({});
+      await initLib({ name, version, packageFile: this.packageFile })
+
+      this.packageFile.contracts.should.eql({})
     });
 
     it('should not overwrite existing file by default', async function () {
-      fs.writeJson(packageFileName, { app: 'previous' });
-      await initLib({ name: appName, version: appVersion, packageFileName }).should.be.rejectedWith(/exist/)
+      fs.writeJson(this.packageFile.fileName, { name: 'previousApp', version: '0' })
+
+      await initLib({ name, version, packageFile: this.packageFile }).should.be.rejectedWith(`Cannot overwrite existing file ${this.packageFile.fileName}`)
+
+      cleanup(this.packageFile.fileName)
     });
 
     it('should overwrite existing file if requested', async function () {
-      fs.writeJson(packageFileName, { app: 'previous' });
-      await initLib({ name: appName, version: appVersion, packageFileName, force: true })
+      fs.writeJson(this.packageFile.fileName, { name: 'previousApp', version: '0' })
 
-      const data = fs.parseJson(packageFileName);
-      data.name.should.eq(appName);
-      data.version.should.eq(appVersion);
+      await initLib({ name, version, force: true, packageFile: this.packageFile })
+
+      this.packageFile.hasName(name).should.be.true
+      this.packageFile.isCurrentVersion(version).should.be.true
+
+      cleanup(this.packageFile.fileName)
     });
   });
 });
