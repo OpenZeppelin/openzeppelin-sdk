@@ -5,9 +5,7 @@ export default async function push({ network, deployStdlib, reupload = false, tx
   const controller = ControllerFor(network, txParams, networkFile);
   
   try {
-    if (deployStdlib && !controller.isLib) {
-      await controller.deployStdlib();
-    }
+    if (deployStdlib && !controller.isLib) await controller.deployStdlib();
     await controller.push(reupload);
     stdout(controller.isLib ? controller.packageAddress : controller.appAddress);
   } finally {
