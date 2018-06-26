@@ -61,15 +61,12 @@ export function copy(source, target) {
  */
 export function removeTree(dirPath) {
   if (fs.existsSync(dirPath)) {
-    fs.readdirSync(dirPath).forEach(function(entry) {
-      var entryPath = path.join(dirPath, entry);
-      if (fs.lstatSync(entryPath).isDirectory()) {
-        removeTree(entryPath);
-      } else {
-        fs.unlinkSync(entryPath);
-      }
-    });
-    fs.rmdirSync(dirPath);
+    fs.readdirSync(dirPath).forEach(entry => {
+      const entryPath = path.join(dirPath, entry)
+      if (fs.lstatSync(entryPath).isDirectory()) removeTree(entryPath)
+      else fs.unlinkSync(entryPath)
+    })
+    fs.rmdirSync(dirPath)
   }
 }
 
