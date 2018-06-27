@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import Stdlib from '../stdlib/Stdlib';
-import { Logger, Contracts, App } from "zos-lib";
 import NetworkBaseController from './NetworkBaseController';
+import { Logger, Contracts, App, FileSystem as fs } from 'zos-lib';
 
 const log = new Logger('NetworkAppController');
 
@@ -44,7 +44,7 @@ export default class NetworkAppController extends NetworkBaseController {
     return this.app.currentDirectory();
   }
 
-  setImplementation(contractClass, contractAlias) {
+  async setImplementation(contractClass, contractAlias) {
     return this.app.setImplementation(contractClass, contractAlias);
   }
 
@@ -54,6 +54,8 @@ export default class NetworkAppController extends NetworkBaseController {
     this.checkInitialization(contractClass, initMethod, initArgs);
     const proxyInstance = await this.app.createProxy(contractClass, contractAlias, initMethod, initArgs);
     const implementationAddress = await this.app.getImplementation(contractAlias);
+    this._updateTruffleDeployedInformation(contractAlias, contractClass.at(implementationAddress))
+
     this.networkFile.addProxy(contractAlias, {
       address: proxyInstance.address,
       version: this.app.version,
@@ -175,5 +177,21 @@ export default class NetworkAppController extends NetworkBaseController {
 
   isContractDefined(contractAlias) {
     return super.isContractDefined(contractAlias) || this.isStdlibContract(contractAlias);
+  }
+
+  _updateTruffleDeployedInformation(contractAlias, implementation) {
+    const contractName = this.packageFile.contract(contractAlias)
+    if (contractName) {
+      const path = `${process.cwd()}/build/contracts/${contractName}.json`
+      const data = fs.parseJson(path)
+      data.networks = {}
+      data.networks[implementation.constructor.network_id] = {
+        links: {},
+        events: {},
+        address: implementation.address,
+        updated_at: Date.now()
+      }
+      fs.writeJson(path, data)
+    }
   }
 }
