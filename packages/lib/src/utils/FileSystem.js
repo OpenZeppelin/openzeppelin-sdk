@@ -54,6 +54,10 @@ export function write(filename, data) {
   fs.writeFileSync(filename, data)
 }
 
+export function append(filename, data) {
+  fs.appendFileSync(filename, data)
+}
+
 export function copy(source, target) {
   fs.copyFileSync(source, target)
 }
@@ -94,6 +98,7 @@ export default {
   parseJsonIfExists,
   writeJson,
   write,
+  append,
   copy,
   remove,
   removeDir,
