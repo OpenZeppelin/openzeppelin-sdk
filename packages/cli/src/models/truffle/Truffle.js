@@ -9,7 +9,11 @@ const Truffle = {
       const TruffleConfig = require('truffle-config')
       return TruffleConfig.detect({ logger: console })
     } catch (error) {
-      throw Error('You have to provide a truffle.js file, please remember to initialize your project running "zos init".')
+      if (error.message === 'Could not find suitable configuration file.') {
+        throw Error('Could not find truffle.js config file, remember to initialize your project running "zos init".')
+      } else {
+        throw Error('Could not load truffle.js config file.\n' + error);
+      }
     }
   },
 
