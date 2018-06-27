@@ -126,7 +126,7 @@ export default class NetworkAppController extends NetworkBaseController {
     }
 
     return {
-      [contractAlias]: _.filter(this.networkFile.proxy(contractAlias), proxy => (
+      [contractAlias]: _.filter(this.networkFile.proxiesOf(contractAlias), proxy => (
         !proxyAddress || proxy.address === proxyAddress
       ))
     };

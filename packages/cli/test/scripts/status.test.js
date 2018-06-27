@@ -208,9 +208,9 @@ contract('status script', function([_, owner]) {
       await push({ network, txParams, networkFile: this.networkFile });
       const packageAddress = ControllerFor(this.packageFile).onNetwork(network, txParams, this.networkFile).packageAddress;
       this.logs.clear();
-      
+
       await status({ network, networkFile: this.networkFile });
-      
+
       this.logs.text.should.not.match(/deploying new package/i);
       ControllerFor(this.packageFile).onNetwork(network, txParams, this.networkFile).packageAddress.should.eq(packageAddress);
     });
@@ -221,7 +221,7 @@ contract('status script', function([_, owner]) {
       this.packageFile = new ZosPackageFile('test/mocks/packages/package-empty.zos.json')
       this.networkFile = this.packageFile.networkFile(network)
     })
-    
+
     shouldDescribeApp();
     shouldDescribeVersion();
     shouldDescribeContracts();
@@ -244,7 +244,7 @@ contract('status script', function([_, owner]) {
       this.packageFile = new ZosPackageFile('test/mocks/packages/package-empty-lib.zos.json')
       this.networkFile = this.packageFile.networkFile(network)
     })
-    
+
     shouldDescribeLib();
     shouldDescribeVersion();
     shouldDescribeContracts();

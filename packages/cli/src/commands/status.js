@@ -4,7 +4,7 @@ import status from '../scripts/status'
 import runWithTruffle from '../utils/runWithTruffle'
 
 const signature = 'status'
-const description = 'print information about the deployment of your app in a specific network'
+const description = 'print information about the local status of your app in a specific network'
 
 module.exports = {
   signature, description,

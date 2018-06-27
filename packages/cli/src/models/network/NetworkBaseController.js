@@ -1,5 +1,6 @@
 import _ from 'lodash';
 import { Contracts, Logger, App } from 'zos-lib';
+import StatusComparator from '../status/StatusComparator'
 
 const log = new Logger('NetworkController');
 
@@ -31,8 +32,13 @@ export default class NetworkBaseController {
     return await (this.isDeployed ? this.fetch() : this.deploy());
   }
 
+  async compareCurrentStatus() {
+    const statusComparator = new StatusComparator(this.networkFile, this.txParams)
+    await statusComparator.call()
+  }
+
   async createProxy() {
-    throw Error("Unimplemented function createProxy()");
+    throw Error('Unimplemented function createProxy()')
   }
 
   async push(reupload = false) {

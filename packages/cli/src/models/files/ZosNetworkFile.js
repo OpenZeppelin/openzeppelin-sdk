@@ -1,6 +1,6 @@
 import _ from 'lodash'
-import { bytecodeDigest } from '../../utils/digest'
 import { Logger, FileSystem as fs } from 'zos-lib'
+import { bytecodeDigest, bodyCode, constructorCode } from '../../utils/contracts'
 
 const log = new Logger('ZosNetworkFile')
 
@@ -52,15 +52,15 @@ export default class ZosNetworkFile {
   }
 
   get stdlibName() {
-    return this.stdlib.name
+    return this.stdlib && this.stdlib.name
   }
 
   get stdlibVersion() {
-    return this.stdlib.version
+    return this.stdlib && this.stdlib.version
   }
 
   get stdlibAddress() {
-    return this.stdlib.address
+    return this.stdlib && this.stdlib.address
   }
 
   get proxies() {
@@ -71,12 +71,31 @@ export default class ZosNetworkFile {
     return this.data.contracts
   }
 
+  get contractAliases() {
+    return Object.keys(this.contracts)
+  }
+
+  get proxyAliases() {
+    return Object.keys(this.proxies)
+  }
+
   get isLib() {
     return this.packageFile.isLib
   }
 
-  proxy(alias) {
-    return this.proxies[alias]
+  proxiesList() {
+    return this.proxyAliases.flatMap(alias => this.proxiesOf(alias).map(info => {
+      info['alias'] = alias
+      return info
+    }))
+  }
+
+  proxy(alias, index) {
+    return this.proxiesOf(alias)[index]
+  }
+
+  proxiesOf(alias) {
+    return this.proxies[alias] || []
   }
 
   contract(alias) {
@@ -87,12 +106,12 @@ export default class ZosNetworkFile {
     return this.version === version
   }
 
-  hasProxies() {
-    return !_.isEmpty(this.proxies)
-  }
-
   hasContract(alias) {
     return !_.isEmpty(this.contract(alias))
+  }
+
+  hasProxies(alias = undefined) {
+    return alias ? !_.isEmpty(this.proxiesOf(alias)) : !_.isEmpty(this.proxies)
   }
 
   hasMatchingVersion() {
@@ -153,12 +172,18 @@ export default class ZosNetworkFile {
   setContract(alias, instance) {
     this.data.contracts[alias] = {
       address: instance.address,
-      bytecodeHash: bytecodeDigest(instance.constructor.bytecode)
+      constructorCode: constructorCode(instance),
+      bodyBytecodeHash: bytecodeDigest(bodyCode(instance)),
+      bytecodeHash: bytecodeDigest(instance.constructor.bytecode),
     }
   }
 
+  setProxies(alias, value) {
+    this.data.proxies[alias] = value
+  }
+
   addProxy(alias, info) {
-    if (!this.proxy(alias)) this.data.proxies[alias] = []
+    if (!this.hasProxies(alias)) this.setProxies(alias, [])
     this.data.proxies[alias].push(info)
   }
 

@@ -1,8 +1,8 @@
 import Stdlib from '../stdlib/Stdlib'
 import Session from '../network/Session'
 import Truffle from '../truffle/Truffle'
+import ZosPackageFile from '../files/ZosPackageFile'
 import { Contracts, Logger, FileSystem as fs } from 'zos-lib'
-import ZosPackageFile from "../files/ZosPackageFile";
 
 const log = new Logger('LocalController');
 
