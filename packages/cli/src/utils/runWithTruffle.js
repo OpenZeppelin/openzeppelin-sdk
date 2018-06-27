@@ -1,10 +1,9 @@
 import Truffle from '../models/truffle/Truffle';
-import { getNetwork as getSessionNetwork } from '../scripts/session';
+import Session from '../models/network/Session'
 
 export default async function runWithTruffle(script, network, compile = false) {
   const config = Truffle.config()
-
-  network = network || getSessionNetwork();
+  network = network || Session.getNetwork()
 
   if(!network) throw Error('A network name must be provided to execute the requested action.')
   config.network = network

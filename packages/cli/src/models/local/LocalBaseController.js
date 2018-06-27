@@ -1,4 +1,5 @@
 import Stdlib from '../stdlib/Stdlib'
+import Session from '../network/Session'
 import Truffle from '../truffle/Truffle'
 import { Contracts, Logger, FileSystem as fs } from 'zos-lib'
 import ZosPackageFile from "../files/ZosPackageFile";
@@ -18,6 +19,7 @@ export default class LocalBaseController {
 
   init(name, version, force = false) {
     this.initZosPackageFile(name, version, force)
+    Session.ignoreFile()
     Truffle.init()
   }
 
