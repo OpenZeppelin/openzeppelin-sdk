@@ -28,7 +28,7 @@ export default class ZosPackageFile {
   }
 
   get stdlib() {
-    return this.data.stdlib
+    return this.data.stdlib || {}
   }
 
   get stdlibName() {
@@ -40,7 +40,7 @@ export default class ZosPackageFile {
   }
 
   get contracts() {
-    return this.data.contracts
+    return this.data.contracts || {}
   }
 
   get contractAliases() {
@@ -92,7 +92,7 @@ export default class ZosPackageFile {
     this.data.contracts = contracts
   }
 
-  setContract(alias, name) {
+  addContract(alias, name) {
     this.data.contracts[alias] = name
   }
 

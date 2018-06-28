@@ -1,6 +1,7 @@
 import _ from 'lodash';
 import { Contracts, Logger, App } from 'zos-lib';
 import StatusComparator from '../status/StatusComparator'
+import StatusChecker from "../status/StatusChecker";
 
 const log = new Logger('NetworkController');
 
@@ -33,8 +34,13 @@ export default class NetworkBaseController {
   }
 
   async compareCurrentStatus() {
-    const statusComparator = new StatusComparator(this.networkFile, this.txParams)
+    const statusComparator = StatusChecker.compare(this.networkFile, this.txParams)
     await statusComparator.call()
+  }
+
+  async pullRemoteStatus() {
+    const statusFetcher = StatusChecker.fetch(this.networkFile, this.txParams)
+    await statusFetcher.call()
   }
 
   async createProxy() {
@@ -81,7 +87,7 @@ export default class NetworkBaseController {
     const contractClass = Contracts.getFromLocal(contractName);
     log.info(`Uploading ${contractName} contract as ${contractAlias}`);
     const contractInstance = await this.setImplementation(contractClass, contractAlias);
-    this.networkFile.setContract(contractAlias, contractInstance)
+    this.networkFile.addContract(contractAlias, contractInstance)
   }
 
   checkLocalContractsDeployed(throwIfFail = false) {
