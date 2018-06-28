@@ -1,6 +1,6 @@
 {
   "name": "zos-lib",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "ZeppelinOS library",
   "scripts": {
     "test": "NODE_ENV=test scripts/test.sh",
