@@ -71,4 +71,11 @@ export default class Package {
     log.info(` Implementation set: ${implementation.address}`)
     return implementation
   }
+
+  async unsetImplementation (version, contractName) {
+    log.info(`Unsetting implementation of ${contractName} in version ${version}...`)
+    const release = await this.getRelease(version)
+    await release.unsetImplementation(contractName, this.txParams)
+    log.info(`Implementation unset for ${contractName} in version ${version}`)
+  };
 }

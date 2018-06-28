@@ -39,6 +39,17 @@ contract('Release', ([_, owner]) => {
     it('includes the given contracts', async function () {
       (await this.release.getImplementation('DummyImplementation')).should.not.be.zero
     })
+
+    it('sets another implementation', async function() {
+      const address = await this.release.getImplementation('DummyImplementation');
+      await this.release.setImplementation('AnotherDummy', address);
+      (await this.release.getImplementation('AnotherDummy')).should.eq(address);
+    });
+
+    it('unsets an implementation', async function() {
+      await this.release.unsetImplementation('DummyImplementation')
+      parseInt(await this.release.getImplementation('DummyImplementation')).should.be.zero
+    });
   })
 
   describe('deployDependency', function () {

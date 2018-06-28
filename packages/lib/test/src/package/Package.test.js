@@ -81,6 +81,12 @@ contract('Package', function ([_, owner]) {
         const implementation = await this.package.getImplementation(initialVersion, contractName)
         implementation.should.eq(this.implementation.address)
       })
+
+      it('should unset the implementation', async function () {
+        await this.package.unsetImplementation(initialVersion, contractName)
+        const implementation = await this.package.getImplementation(initialVersion, contractName)
+        parseInt(implementation).should.eq(0)
+      });
     })
 
     describe('while frozen', function() {

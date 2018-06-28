@@ -46,4 +46,9 @@ export default class Release {
     log.info(`Setting ${contractName} implementation ${implementationAddress}`)
     return await this._release.setImplementation(contractName, implementationAddress, this.txParams)
   }
+
+  async unsetImplementation(contractName) {
+    log.info(`Unsetting ${contractName} implementation`)
+    return await this._release.unsetImplementation(contractName, this.txParams)
+  }
 }
