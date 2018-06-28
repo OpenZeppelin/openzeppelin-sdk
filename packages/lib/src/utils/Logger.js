@@ -1,4 +1,4 @@
-import colors from 'colors'
+import chalk from 'chalk'
 
 const defaults = {
   verbose: false,
@@ -35,11 +35,8 @@ export default class Logger {
     if (this.opts.silent) {
       return;
     }
-    if (this.opts.verbose) {
-      console.error(`[${this.prefix}] ${msg}`[color])
-    } else {
-      console.error(msg[color])
-    }
+    if (this.opts.verbose) msg = `[${this.prefix}] ${msg}`
+    console.error(chalk.keyword(color)(msg))
   }
 
   get opts() {
