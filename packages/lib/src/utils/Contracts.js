@@ -12,7 +12,13 @@ const DEFAULT_COVERAGE_TX_PARAMS = {
   gasPrice: 0x01,
 }
 
+// Use same default timeout as truffle
+let syncTimeout = 240000;
+
 export default {
+  setSyncTimeout(value) {
+    syncTimeout = value;
+  },
 
   getLocalPath(contractName) {
     return `${process.cwd()}/build/contracts/${contractName}.json`
@@ -47,6 +53,7 @@ export default {
 
   _provideContractForProduction(contract) {
     truffleProvision(contract, this._artifactsDefaults())
+    contract.synchronization_timeout = syncTimeout
     return contract
   },
 
@@ -54,6 +61,7 @@ export default {
     const defaults = process.env.SOLIDITY_COVERAGE ? DEFAULT_COVERAGE_TX_PARAMS : DEFAULT_TESTING_TX_PARAMS
     contract.setProvider(web3.currentProvider)
     contract.defaults({ from: web3.eth.accounts[0], ... defaults })
+    contract.synchronization_timeout = syncTimeout
     return contract
   },
 
