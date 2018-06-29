@@ -72,6 +72,10 @@ export default class ZosPackageFile {
     return !!this.contract(alias)
   }
 
+  hasContracts() {
+    return !_.isEmpty(this.contracts)
+  }
+
   set lib(lib) {
     this.data.lib = lib
   }
@@ -94,6 +98,10 @@ export default class ZosPackageFile {
 
   addContract(alias, name) {
     this.data.contracts[alias] = name
+  }
+
+  unsetContract(alias) {
+    delete this.data.contracts[alias];
   }
 
   networkFile(network) {

@@ -111,12 +111,20 @@ export default class ZosNetworkFile {
     return this.contracts[alias]
   }
 
+  contractAliasesMissingFromPackage() {
+    return _.difference(this.contractAliases, this.packageFile.contractAliases)
+  }
+
   isCurrentVersion(version) {
     return this.version === version
   }
 
   hasContract(alias) {
     return !_.isEmpty(this.contract(alias))
+  }
+
+  hasContracts() {
+    return !_.isEmpty(this.contracts)
   }
 
   hasProxies(alias = undefined) {
@@ -211,6 +219,10 @@ export default class ZosNetworkFile {
 
   setProxies(alias, value) {
     this.data.proxies[alias] = value
+  }
+
+  unsetContract(alias) {
+    delete this.data.contracts[alias];
   }
 
   addProxy(alias, info) {

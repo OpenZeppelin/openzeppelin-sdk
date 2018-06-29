@@ -5,6 +5,13 @@ import { Logger, Contracts, App, FileSystem as fs } from 'zos-lib';
 
 const log = new Logger('NetworkAppController');
 
+// TODO: Remove after upgrade to latest zos-lib version
+App.prototype.unsetImplementation = async function(contractName) {
+  // log.info(`Unsetting implementation of ${contractName} in directory...`)
+  await this.currentDirectory().unsetImplementation(contractName, this.txParams)
+  // log.info(`Implementation unset`)
+}
+
 export default class NetworkAppController extends NetworkBaseController {
   get isDeployed() {
     return !!this.appAddress;
@@ -46,6 +53,10 @@ export default class NetworkAppController extends NetworkBaseController {
 
   async setImplementation(contractClass, contractAlias) {
     return this.app.setImplementation(contractClass, contractAlias);
+  }
+
+  async unsetImplementation(contractAlias) {
+    return this.app.unsetImplementation(contractAlias);
   }
 
   async createProxy(contractAlias, initMethod, initArgs) {

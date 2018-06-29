@@ -58,11 +58,14 @@ async function versionInfo(networkFile) {
 
 async function contractsInfo(controller) {
   log.info('Application contracts:');
-  if (_.isEmpty(controller.packageFile.contracts)) {
+
+  // Bail if there are no contracts at all
+  if (!controller.packageFile.hasContracts() && !controller.networkFile.hasContracts()) {
     log.info(`- No contracts registered`);
     return;
   }
 
+  // Log status for each contract in package file
   _.each(controller.packageFile.contracts, function (contractName, contractAlias) {
     const isDeployed = controller.isContractDeployed(contractAlias);
     const hasChanged = controller.hasContractChanged(contractAlias);
@@ -75,6 +78,10 @@ async function contractsInfo(controller) {
       log.info(`- ${fullName} is deployed and up to date`);
     }
   });
+
+  // Log contracts in network file missing from package file
+  controller.networkFile.contractAliasesMissingFromPackage()
+    .forEach(contractAlias => log.warn(`- ${contractAlias} is pending to be removed`));
 }
 
 async function stdlibInfo(networkFile) {

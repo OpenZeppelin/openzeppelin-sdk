@@ -40,7 +40,7 @@ export default class LocalBaseController {
   }
 
   add(contractAlias, contractName) {
-    log.info(`Adding ${contractAlias === contractName ? contractAlias : `${contractAlias}:${contractName}`}...`)
+    log.info(`Adding ${contractAlias === contractName ? contractAlias : `${contractAlias}:${contractName}`}`)
     // We are logging an error instead of throwing because a contract may have an empty constructor,
     // which is fine, but as long as it is declared we will be picking it up
     const path = `${process.cwd()}/build/contracts/${contractName}.json`
@@ -60,6 +60,15 @@ export default class LocalBaseController {
         this.add(contractName, contractName)
       }
     })
+  }
+
+  remove(contractAlias) {
+    if (!this.packageFile.hasContract(contractAlias)) {
+      log.error(`Contract ${contractAlias} to be removed was not found`)
+    } else {
+      log.info(`Removing ${contractAlias}`)
+      this.packageFile.unsetContract(contractAlias)
+    }
   }
 
   validateImplementation(contractName) {

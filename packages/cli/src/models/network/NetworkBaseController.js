@@ -50,7 +50,7 @@ export default class NetworkBaseController {
   async push(reupload = false) {
     await this.init()
     await this.pushVersion()
-    await this.uploadContracts(reupload)
+    await Promise.all([this.uploadContracts(reupload), this.unsetContracts()])
   }
 
   async pushVersion() {
@@ -78,7 +78,7 @@ export default class NetworkBaseController {
         )
     );
     if(!_.isEmpty(failures)) {
-      const message = failures.map(failure => `${failure.contractAlias} deployment failed with ${failure.error.message}`).join('\n')
+      const message = failures.map(failure => `${failure.contractAlias} deployment failed with: ${failure.error.message}`).join('\n')
       throw Error(message)
     }
   }
@@ -88,6 +88,26 @@ export default class NetworkBaseController {
     log.info(`Uploading ${contractName} contract as ${contractAlias}`);
     const contractInstance = await this.setImplementation(contractClass, contractAlias);
     this.networkFile.addContract(contractAlias, contractInstance)
+  }
+
+  async unsetContracts() {
+    const failures = [];
+    await Promise.all(
+      this.networkFile.contractAliasesMissingFromPackage().map(contractAlias =>
+        this.unsetContract(contractAlias)
+          .catch(error => failures.push({ contractAlias, error }))
+      )
+    );
+    if(!_.isEmpty(failures)) {
+      const message = failures.map(failure => `Removal of ${failure.contractAlias} failed with: ${failure.error.message}`).join('\n')
+      throw Error(message)
+    }
+  }
+
+  async unsetContract(contractAlias) {
+    log.info(`Removing ${contractAlias} contract`);
+    await this.unsetImplementation(contractAlias);
+    this.networkFile.unsetContract(contractAlias)
   }
 
   checkLocalContractsDeployed(throwIfFail = false) {

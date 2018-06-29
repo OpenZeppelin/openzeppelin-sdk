@@ -18,6 +18,7 @@ const pull = require('../commands/pull')
 const compare = require('../commands/compare')
 const freeze = require('../commands/freeze')
 const session = require('../commands/session')
+const remove = require('../commands/remove')
 
 program
   .name('zos')
@@ -30,7 +31,7 @@ program
   .on('option:verbose', () => { Logger.verbose(true); } )
   .on('option:silent', () => { Logger.silent(true); } )
 
-const commands = [init, add, push, create, bump, upgrade, link, status, compare, pull, freeze, session]
+const commands = [init, add, remove, push, create, bump, upgrade, link, status, compare, pull, freeze, session]
 
 commands.forEach((c) => c.register(program));
 

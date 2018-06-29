@@ -8,6 +8,9 @@ import freeze from '../../src/scripts/freeze';
 import add from '../../src/scripts/add';
 import bumpVersion from '../../src/scripts/bump';
 import ZosPackageFile from '../../src/models/files/ZosPackageFile';
+import remove from '../../src/scripts/remove';
+
+const should = require('chai').should();
 
 const ImplV1 = Contracts.getFromLocal('ImplV1');
 const PackageContract = Contracts.getFromNodeModules('zos-lib', 'Package');
@@ -153,6 +156,17 @@ contract('push script', function([_, owner]) {
     });
   }
 
+  const shouldDeleteContracts = function () {
+    it('should delete contracts', async function () {
+      await remove({ contracts: ['Impl'], packageFile: this.networkFile.packageFile });
+      await push({ network, txParams, networkFile: this.networkFile });
+
+      const _package = await Package.fetch(this.networkFile.package.address);
+      (await _package.getImplementation(defaultVersion, 'Impl')).should.be.zeroAddress;
+      should.not.exist(this.networkFile.contract('Impl'));
+    });
+  };
+
   describe('an empty app', function() {
     beforeEach('pushing package-empty', async function () {
       const packageFile = new ZosPackageFile('test/mocks/packages/package-empty.zos.json')
@@ -179,6 +193,7 @@ contract('push script', function([_, owner]) {
     shouldDeployContracts();
     shouldRedeployContracts();
     shouldBumpVersion();
+    shouldDeleteContracts();
   });
 
   describe('an app with stdlib', function () {
@@ -247,6 +262,7 @@ contract('push script', function([_, owner]) {
     shouldDeployContracts();
     shouldRedeployContracts();
     shouldBumpVersionAndUnfreeze();
+    shouldDeleteContracts();
 
     it('should refuse to push when frozen', async function() {
       await freeze({ network, txParams, networkFile: this.networkFile })

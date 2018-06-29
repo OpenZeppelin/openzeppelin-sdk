@@ -10,6 +10,7 @@ import linkStdlib from '../../src/scripts/link';
 import ControllerFor from '../../src/models/local/ControllerFor';
 import CaptureLogs from '../helpers/captureLogs';
 import ZosPackageFile from "../../src/models/files/ZosPackageFile";
+import remove from '../../src/scripts/remove';
 
 contract('status script', function([_, owner]) {
   const txParams = { from: owner };
@@ -122,6 +123,15 @@ contract('status script', function([_, owner]) {
         await status({ network, networkFile: this.networkFile });
 
         this.logs.text.should.match(/is deployed and up to date/i);
+      });    
+
+      it('should log contract to be removed', async function () {
+        await add({ contractsData, packageFile: this.packageFile });
+        await push({ network, txParams, networkFile: this.networkFile });
+        await remove({ contracts: [contractAlias], packageFile: this.packageFile });
+        await status({ network, networkFile: this.networkFile });
+
+        this.logs.text.should.match(/pending to be removed/i);
       });    
     });
   };
