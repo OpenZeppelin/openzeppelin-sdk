@@ -51,7 +51,7 @@ export default class App {
   }
 
   async hasStdlib() {
-    return (await this.currentStdlib()) === ZERO_ADDRESS
+    return (await this.currentStdlib()) !== ZERO_ADDRESS
   }
 
   async getImplementation(contractName) {
