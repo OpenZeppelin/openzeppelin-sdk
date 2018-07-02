@@ -1,17 +1,7 @@
 'use strict';
 
-import { Package, Logger } from 'zos-lib';
+import { Package } from 'zos-lib';
 import NetworkBaseController from './NetworkBaseController';
-
-const log = new Logger('NetworkLibController');
-
-// TODO: Remove after upgrade to latest zos-lib version
-Package.prototype.unsetImplementation = async function(version, contractName) {
-  log.info(`Unsetting implementation of ${contractName} in version ${version}...`)
-  const release = await this.getRelease(version)
-  await release.unsetImplementation(contractName, this.txParams)
-  log.info(`Implementation unset for ${contractName} in version ${version}`)
-};
 
 export default class NetworkLibController extends NetworkBaseController {
   get isDeployed() {

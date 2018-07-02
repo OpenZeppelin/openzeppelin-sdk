@@ -242,8 +242,7 @@ contract('StatusFetcher', function([_, owner, anotherAddress]) {
       describe('when the directory of the current version has many contracts and some of them where unregistered', function () {
         beforeEach('registering two new implementations in AppDirectory', async function () {
           await this.app.setImplementation(ImplV1, 'Impl')
-          // TODO: provide unset impl method from lib
-          await this.app.currentDirectory().unsetImplementation('Impl', txParams)
+          await this.app.unsetImplementation('Impl', txParams)
           this.anotherImpl = await this.app.setImplementation(AnotherImplV1, 'AnotherImplV1')
         })
 
@@ -358,8 +357,7 @@ contract('StatusFetcher', function([_, owner, anotherAddress]) {
       describe('when the directory of the current version has many contracts and some of them where unregistered', function () {
         beforeEach('registering two new implementations in AppDirectory', async function () {
           await this.app.currentDirectory().setImplementation('Impl', this.impl.address, txParams)
-          // TODO: provide unset impl method from lib
-          await this.app.currentDirectory().unsetImplementation('Impl', txParams)
+          await this.app.unsetImplementation('Impl', txParams)
           await this.app.currentDirectory().setImplementation('AnotherImpl', this.anotherImpl.address, txParams)
         })
 

@@ -7,8 +7,7 @@ export default class StatusReport {
 
   log(logger) {
     logger.error(this.description)
-    // TODO: add warning logging level
     logger.error(` - expected: ${this.expected}`)
-    logger.log(` - actual:   ${this.observed}\n`, 'yellow')
+    logger.warn(` - actual:   ${this.observed}\n`)
   }
 }

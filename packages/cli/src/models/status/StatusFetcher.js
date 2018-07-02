@@ -40,15 +40,13 @@ export default class StatusFetcher {
   onMissingRemoteContract(expected, observed, { alias, address }) {
     const contractName = this.networkFile.packageFile.contract(alias) || alias
     log.info(`Adding contract ${contractName} at ${address}`)
-    // TODO: use new version of Contracts once released
-    const buildPath = `${process.cwd()}/build/contracts/${contractName}.json`
+    const buildPath = Contracts.getLocalPath(contractName)
     if(fs.exists(buildPath)) {
       const contract = Contracts.getFromLocal(contractName).at(address)
       const remoteBodyBytecode = web3.eth.getCode(address).replace(/^0x/, '')
       const bodyBytecodeHash = bytecodeDigest(remoteBodyBytecode)
       if(bodyCode(contract) === remoteBodyBytecode) {
-        // TODO: use new log warning level once released
-        log.log(`Assuming that constructor function of local version of ${contractName} is the one registered`, 'yellow')
+        log.warn(`Assuming that constructor function of local version of ${contractName} is the one registered`)
         const constructor = constructorCode(contract)
         const bytecodeHash = bytecodeDigest(constructor + remoteBodyBytecode)
         this.networkFile.setContract(alias, { address, bytecodeHash, bodyBytecodeHash, constructorCode: constructor })
@@ -101,7 +99,6 @@ export default class StatusFetcher {
   }
 
   onMultipleProxyImplementations(expected, observed, { implementation }) {
-    // TODO: use new log warning level once released
-    log.log(`The same implementation address ${implementation} was registered under many aliases (${observed}). Please check them in the list of registered contracts`, 'yellow')
+    log.warn(`The same implementation address ${implementation} was registered under many aliases (${observed}). Please check them in the list of registered contracts`)
   }
 }

@@ -1,16 +1,9 @@
 import _ from 'lodash';
 import Stdlib from '../stdlib/Stdlib';
 import NetworkBaseController from './NetworkBaseController';
-import { Logger, Contracts, App, FileSystem as fs } from 'zos-lib';
+import { Contracts, Logger, App, FileSystem as fs } from 'zos-lib';
 
 const log = new Logger('NetworkAppController');
-
-// TODO: Remove after upgrade to latest zos-lib version
-App.prototype.unsetImplementation = async function(contractName) {
-  // log.info(`Unsetting implementation of ${contractName} in directory...`)
-  await this.currentDirectory().unsetImplementation(contractName, this.txParams)
-  // log.info(`Implementation unset`)
-}
 
 export default class NetworkAppController extends NetworkBaseController {
   get isDeployed() {
@@ -154,9 +147,8 @@ export default class NetworkAppController extends NetworkBaseController {
   }
 
   async linkStdlib() {
-    const currentStdlibAddress = await this.app.currentStdlib()
     if (!this.packageFile.hasStdlib()) {
-      if(currentStdlibAddress !== '0x0000000000000000000000000000000000000000') {
+      if (await this.app.hasStdlib()) {
         await this.app.setStdlib();
         this.networkFile.unsetStdlib()
       }
@@ -172,6 +164,7 @@ export default class NetworkAppController extends NetworkBaseController {
     const stdlibName = this.packageFile.stdlibName;
     log.info(`Connecting to public deployment of ${stdlibName} in ${this.networkFile.network}`);
     const stdlibAddress = Stdlib.fetch(stdlibName, this.packageFile.stdlibVersion, this.networkFile.network);
+    const currentStdlibAddress = await this.app.currentStdlib()
 
     if(stdlibAddress !== currentStdlibAddress) {
       await this.app.setStdlib(stdlibAddress);
@@ -193,7 +186,7 @@ export default class NetworkAppController extends NetworkBaseController {
   _updateTruffleDeployedInformation(contractAlias, implementation) {
     const contractName = this.packageFile.contract(contractAlias)
     if (contractName) {
-      const path = `${process.cwd()}/build/contracts/${contractName}.json`
+      const path = Contracts.getLocalPath(contractName)
       const data = fs.parseJson(path)
       data.networks = {}
       data.networks[implementation.constructor.network_id] = {

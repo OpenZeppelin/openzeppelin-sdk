@@ -1,7 +1,6 @@
 import Stdlib from '../stdlib/Stdlib'
 import Session from '../network/Session'
 import Truffle from '../truffle/Truffle'
-import ZosPackageFile from '../files/ZosPackageFile'
 import { Contracts, Logger, FileSystem as fs } from 'zos-lib'
 
 const log = new Logger('LocalController');
@@ -43,15 +42,15 @@ export default class LocalBaseController {
     log.info(`Adding ${contractAlias === contractName ? contractAlias : `${contractAlias}:${contractName}`}`)
     // We are logging an error instead of throwing because a contract may have an empty constructor,
     // which is fine, but as long as it is declared we will be picking it up
-    const path = `${process.cwd()}/build/contracts/${contractName}.json`
-    if (this.hasConstructor(path)) {
+    if (this.hasConstructor(Contracts.getLocalPath(contractName))) {
       log.error(`Contract ${contractName} has an explicit constructor. Move it to an initializer function to use it with ZeppelinOS.`)
     }
     this.packageFile.addContract(contractAlias, contractName)
   }
 
   addAll() {
-    const folder = `${process.cwd()}/build/contracts`
+    // TODO: hack to get local build dir, add this info to Contracts from zos-lib
+    const folder = Contracts.getLocalPath('').replace(/\.json$/, '')
     fs.readDir(folder).forEach(file => {
       const path = `${folder}/${file}`
       if(this.hasBytecode(path)) {
@@ -72,12 +71,9 @@ export default class LocalBaseController {
   }
 
   validateImplementation(contractName) {
-    // We are manually checking the build file instead of delegating to Contracts,
-    // as Contracts requires initializing the entire truffle stack.
-    const folder = `${process.cwd()}/build/contracts`
-    const path = `${folder}/${contractName}.json`
+    const path = Contracts.getLocalPath(contractName)
     if (!fs.exists(path)) {
-      throw Error(`Contract ${contractName} not found in folder ${folder}`)
+      throw Error(`Contract ${contractName} not found in path ${path}`)
     }
     if (!this.hasBytecode(path)) {
       throw Error(`Contract ${contractName} is abstract and cannot be deployed.`)

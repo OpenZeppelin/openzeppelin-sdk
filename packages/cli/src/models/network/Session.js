@@ -1,4 +1,3 @@
-import nfs from 'fs'
 import { FileSystem as fs, Logger } from 'zos-lib'
 
 const log = new Logger('Session')
@@ -22,15 +21,14 @@ const Session = {
   },
 
   close() {
-    //TODO: use new version of zos-lib fs
-    if (fs.exists(ZOS_SESSION_PATH)) nfs.unlinkSync(ZOS_SESSION_PATH)
+    if (fs.exists(ZOS_SESSION_PATH)) fs.remove(ZOS_SESSION_PATH)
     log.info(`Closed zos session.`)
   },
 
   ignoreFile() {
     const GIT_IGNORE = '.gitignore'
     if (fs.exists(GIT_IGNORE) && fs.read(GIT_IGNORE).toString().indexOf(ZOS_SESSION_PATH) < 0) {
-      nfs.appendFileSync(GIT_IGNORE, `\n${ZOS_SESSION_PATH}\n`)
+      fs.append(GIT_IGNORE, `\n${ZOS_SESSION_PATH}\n`)
     }
   }
 }

@@ -4,15 +4,11 @@ export default class CaptureLogs {
   constructor() {
     this.clear()
     this.originalInfo = Logger.prototype.info
+    this.originalWarn = Logger.prototype.warn
     this.originalError = Logger.prototype.error
     Logger.prototype.info = msg => this.infos.push(msg)
+    Logger.prototype.warn = msg => this.warns.push(msg)
     Logger.prototype.error = msg => this.errors.push(msg)
-
-    // TODO: Replace with new Logger warn function once released
-    this.originalLog = Logger.prototype.log
-    Logger.prototype.log = (msg, color) => {
-      if(color === 'yellow') this.warns.push(msg)
-    }
   }
 
   get text() {
@@ -30,8 +26,8 @@ export default class CaptureLogs {
   }
 
   restore() {
-    Logger.prototype.log = this.originalLog
     Logger.prototype.info = this.originalInfo
+    Logger.prototype.warn = this.originalWarn
     Logger.prototype.error = this.originalError
   }
 

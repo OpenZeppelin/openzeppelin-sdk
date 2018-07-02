@@ -9,10 +9,12 @@ import add from '../../src/scripts/add';
 import bumpVersion from '../../src/scripts/bump';
 import ZosPackageFile from '../../src/models/files/ZosPackageFile';
 import remove from '../../src/scripts/remove';
+import EventsFilter from "../../src/models/status/EventsFilter";
 
 const should = require('chai').should();
 
 const ImplV1 = Contracts.getFromLocal('ImplV1');
+const AppDirectory = Contracts.getFromNodeModules('zos-lib', 'AppDirectory');
 const PackageContract = Contracts.getFromNodeModules('zos-lib', 'Package');
 const ImplementationDirectory = Contracts.getFromNodeModules('zos-lib', 'ImplementationDirectory');
 
@@ -194,6 +196,14 @@ contract('push script', function([_, owner]) {
     shouldRedeployContracts();
     shouldBumpVersion();
     shouldDeleteContracts();
+
+    it('should not unset stdlib', async function () {
+      await push({ network, txParams, networkFile: this.networkFile })
+
+      const directory = await AppDirectory.at(this.networkFile.providerAddress);
+      const events = await new EventsFilter().call(directory, 'StdlibChanged')
+      events.should.be.empty
+    })
   });
 
   describe('an app with stdlib', function () {
