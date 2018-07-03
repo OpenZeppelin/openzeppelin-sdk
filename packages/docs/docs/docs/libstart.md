@@ -14,7 +14,7 @@ sidebar_label: zos-lib quickstart
 To install `zos-lib` simply go to your project's root directory and run:
 
 ```sh
-npm i zos-lib
+npm install zos-lib
 ```
 
 Next, learn how to:

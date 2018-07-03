@@ -59,14 +59,14 @@ This will create a `zos.json` file, which will store how your project is structu
 
 There are multiple reasons to upgrade `Crafty`'s game logic contract: bug-fixing, adding new functionalities, adjusting to newer developments and ecosystem changes, etc. Remember how `Crafty` uses RBAC (role-based access control)? An upgrade could easily add new roles, such as a `curator` role, which would be in charge of approving new tokens before they are added to the game, or highlighting featured creations to be displayed on the front page. These simple but useful extensions would not be possible without ZeppelinOS.
 
-`Crafty` is a great example of how easy it is to add upgradeability to your project. The only change that we need to make is a minor one: the constructor must be replaced for an `initialize` function.
+`Crafty` is a great example of how easy it is to add upgradeability to your project. The only change that we need to make is a minor one: the constructor must be replaced with an `initialize` function.
 
 ```js
 import 'openzeppelin-zos/contracts/ownership/rbac/RBAC.sol';
 import 'zos-lib/contracts/migrations/Initializable.sol';
 
 contract Crafty is RBAC, Initializable {
-  
+
   // moved standard constructor logic to initializer function
   // function Crafty() public {
   //   addRole(msg.sender, ROLE_ADMIN);
@@ -106,7 +106,7 @@ zos create Crafty --init --args $OWNER --network ropsten
 > 0x31C4B...
 ```
 
-The returned value is the address of the newly `create`d `Crafty` upgradeable instance, which is already initialized and can be safely used, with the peace of mind that it can later be upgraded at any point in time.
+The returned value is the address of the newly created `Crafty` upgradeable instance, which is already initialized and can be safely used, with the peace of mind that it can later be upgraded at any point in time.
 
 ### Making CraftableToken upgradeable
 
@@ -166,7 +166,7 @@ zos create CraftableToken --init --args "0x0cbd7..., \"Crafty Token\", \"CRFT\",
 
 All that remains is having our contracts interact with each other. We'll want `Crafty` to store the different `CraftableToken`s so that they can be later listed by a player of the game: let's look at two different ways this could be done.
 
-First, we can have a player pass all of the arguments to a `Crafty` function, which will create a new `CraftableToken`, and add it to the list of tokens. Because this instance was not `create`d, it is not upgradeable. Note how we need to call `initialize`, since `CraftableToken` doesn't have a constructor anymore.
+First, we can have a player pass all of the arguments to a `Crafty` function, which will create a new `CraftableToken`, and add it to the list of tokens. Because we didn't create this instance with `zos create`, it is not upgradeable. Note how we need to call `initialize`, since `CraftableToken` doesn't have a constructor anymore.
 
 ```js
 function addCraftable(string _name, string _symbol, string _tokenURI, ERC20[] _ingredients, uint256[] _ingredientAmounts) public returns (CraftableToken) {
@@ -195,4 +195,4 @@ function addPrecreatedCraftable(CraftableToken _craftable) onlyRole(ROLE_ADMIN) 
 
 A key point here is that both the upgradeable and non-upgradeable instances are treated in the same manner: `Crafty`'s `craft` method makes no distinction whatsoever when calling `CraftableToken` methods, since the interface is the same. A contract being upgradeable places no extra burden on its callers.
 
-This example shows how to add upgradeability and use of on-chain standard libraries to a fairly complex smart contract app without too much work. Congratulations!
+This example shows how to add upgradeability and use on-chain standard libraries on a fairly complex smart contract app without too much work. Congratulations!

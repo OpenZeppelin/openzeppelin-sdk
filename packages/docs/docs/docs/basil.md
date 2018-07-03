@@ -146,9 +146,9 @@ of your project in that specific network, including contract logic and instance 
 
 ## Contract logic and upgradeable instances
 
-Notice how the file `zos.local.json` lists a series of "contracts" and "proxies". The first are the logic contracts for a specific contract name, while the second are the actual contract instances that our users will interact with in the blockchain. 
+Notice how the file `zos.local.json` lists a series of "contracts" and "proxies". The first are the logic contracts for a specific contract name, while the second are the actual contract instances that our users will interact with in the blockchain.
 
-A proxy is a wrapper for a contract's logic, that allows it to be updated, while mainting its state. We need to create an upgradeable instance (proxy) for Basil.
+A proxy is a wrapper for a contract's logic, that allows it to be updated, while maintaining its state. We need to create an upgradeable instance (proxy) for Basil.
 
 ```sh
 zos create Basil --from $OWNER --network local --init --args $OWNER
@@ -247,7 +247,7 @@ Now, to create a proxy for the token:
 zos create MintableERC721Token --from $OWNER --init --args \"$BASIL_ADDRESS\",\"BasilToken\",\"BSL\" --network local
 ```
 
-This command will output the token's new proxy address. Lets use it to set it in our new BasilERC721 version:
+This command will output the token's new proxy address. Let's use it in our new BasilERC721 version:
 
 ```sh
 export TOKEN_ADDRESS=<address>
@@ -256,4 +256,4 @@ echo "BasilERC721.at(\"$BASIL_ADDRESS\").setToken(\"$TOKEN_ADDRESS\", {from: \"$
 
 That's it! Now you know how to use ZeppelinOS to develop upgradeable apps. Have a look at the scripts `deploy/deploy_with_cli_v1.sh` and `deploy/deploy_with_cli_v2.sh` to review what we've gone over in the guide.
 
-Stay tuned for more advanced turorials!
+Stay tuned for more advanced tutorials!

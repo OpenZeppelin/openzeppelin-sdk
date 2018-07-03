@@ -40,7 +40,7 @@ beforeEach(async function () {
 });
 ```
 
-In a test, you can generate an instance for your contracts via [`App#createProxy`](https://github.com/zeppelinos/zos-lib/blob/master/src/app/App.js#L85):
+In a test, you can generate an instance for your contracts via the `createProxy` function of the app:
 
 ```js
 const Sample = artifacts.require('Sample')
