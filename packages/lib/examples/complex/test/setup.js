@@ -1,8 +1,7 @@
-import { Logger } from 'zos-lib'
+'use strict';
 
-function muteLogging() {
-  Logger.prototype.info = msg => {}
-  Logger.prototype.error = msg => {}
-}
+process.env.NODE_ENV = 'test'
 
-muteLogging()
+require('chai')
+  .use(require('zos-lib').assertions)
+  .should()

@@ -1,13 +1,12 @@
-'use strict';
+'use strict'
+require('./setup')
+const deploy = require('../index.js')
 
-const { Contracts } = require('zos-lib')
-const deploy = require('../index.js');
-const validateAddress = require('./helpers/validateAddress.js');
-const shouldBehaveLikeDonations = require('./Donations.behavior.js');
-const shouldBehaveLikeDonationsWithTokens = require('./DonationsWithTokens.behavior.js');
+import { Contracts } from 'zos-lib'
+import shouldBehaveLikeDonations from './behaviors/Donations.behavior'
+import shouldBehaveLikeDonationsWithTokens from './behaviors/DonationsWithTokens.behavior'
 
 const DonationsV2 = Contracts.getFromLocal('DonationsV2');
-require('chai').should()
 
 contract('App', ([_, owner, donor, wallet]) => {
   const initialVersion = '0.0.1';
@@ -32,22 +31,22 @@ contract('App', ([_, owner, donor, wallet]) => {
           (await this.app.package.hasVersion(updatedVersion)).should.be.false;
         });
       });
-
     });
-
   });
 
   describe('version 0.0.1', function() {
     beforeEach(async function() {
       this.app = await deploy.setupApp({owner});
-      this.donations = await deploy.deployVersion1(this.app, {owner});
+      this.donations = await deploy.deployVersion1(this.app, owner);
     });
     
     describe('directory', function() {
       describe('when queried for the implementation', function() {
 
         it('returns a valid address', async function() {
-          validateAddress(await this.app.directories[initialVersion].getImplementation(contractName)).should.be.true;
+          const implementation = await this.app.directories[initialVersion].getImplementation(contractName)
+
+          implementation.should.be.nonzeroAddress
         });
       });
     });
@@ -63,8 +62,8 @@ contract('App', ([_, owner, donor, wallet]) => {
 
     beforeEach(async function() {
       this.app = await deploy.setupApp({owner});
-      this.donations = await deploy.deployVersion1(this.app, {owner});
-      this.token = await deploy.deployVersion2(this.app, this.donations, {owner});
+      this.donations = await deploy.deployVersion1(this.app, owner);
+      this.token = await deploy.deployVersion2(this.app, this.donations, { owner });
       this.donations = DonationsV2.at(this.donations.address);
     });
 

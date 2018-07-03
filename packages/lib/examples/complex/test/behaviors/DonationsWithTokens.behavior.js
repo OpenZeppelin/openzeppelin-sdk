@@ -1,14 +1,13 @@
-import { assertRevert } from 'zos-lib';
+'use strict'
+require('../setup')
 
-const shouldBehaveLikeDonations = require('./Donations.behavior.js');
-const should = require('chai').should();
+import { assertRevert } from 'zos-lib'
+import shouldBehaveLikeDonations from './Donations.behavior.js'
 
-module.exports = function(owner, donor, wallet, tokenName, tokenSymbol) {
-
+export default function(owner, donor, wallet, tokenName, tokenSymbol) {
   shouldBehaveLikeDonations(owner, donor, wallet);
 
   describe('token', function() {
-
     it('is owned by the contract', async function() {
       (await this.token.owner()).should.be.eq(this.donations.address);
     });
@@ -36,7 +35,6 @@ module.exports = function(owner, donor, wallet, tokenName, tokenSymbol) {
   describe('donate', function() {
 
     describe('when receiving a donation that is greater than zero', function() {
-
       const donationValue = 1;
 
       beforeEach(async function() {
@@ -51,9 +49,6 @@ module.exports = function(owner, donor, wallet, tokenName, tokenSymbol) {
       it('mints tokens', async function() {
         (await this.token.balanceOf(donor)).toNumber().should.be.eq(donationValue);
       });
-
     });
-
   });
-
 }

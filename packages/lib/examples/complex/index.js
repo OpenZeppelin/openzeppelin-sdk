@@ -11,7 +11,6 @@ const log = new Logger('ComplexExample')
 const MintableERC721Token = Contracts.getFromLocal('MintableERC721Token');
 const ImplementationDirectory = Contracts.getFromNodeModules('zos-lib', 'ImplementationDirectory');
 
-const owner = web3.eth.accounts[1];
 const contractName = 'Donations';
 const tokenClass = 'MintableERC721Token';
 const tokenName = 'DonationToken';
@@ -25,7 +24,7 @@ async function setupApp(txParams) {
   return await App.deploy(initialVersion, txParams)
 }
 
-async function deployVersion1(app) {
+async function deployVersion1(app, owner) {
 
   // Register the first implementation of 'Donations', and request a proxy for it.
   log.info('<< Deploying version 1 >>')
@@ -75,14 +74,14 @@ async function getStdLib(txParams) {
 }
 
 module.exports = async function() {
-
+  const owner = web3.eth.accounts[1];
   const txParams = {
     from: owner,
     gas: 3000000,
     gasPrice: 100000000000
   };
   const app = await setupApp(txParams);
-  const donations = await deployVersion1(app);
+  const donations = await deployVersion1(app, owner);
   await deployVersion2(app, donations, txParams);
 };
 
