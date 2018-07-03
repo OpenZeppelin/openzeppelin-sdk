@@ -40,6 +40,8 @@
     "crafty": "Crafty",
     "developing": "Developing a new standard library",
     "Developing stdlibs": "Developing stdlibs",
+    "erc20_onboarding": "Onboarding ERC20 tokens to ZeppelinOS",
+    "ERC20 opt-in onboarding": "ERC20 opt-in onboarding",
     "libstart": "ZeppelinOS Library",
     "zos-lib quickstart": "zos-lib quickstart",
     "low_level_app": "Low level upgradeable app",

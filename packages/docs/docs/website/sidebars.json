@@ -8,7 +8,8 @@
       "building",
       "using",
       "developing",
-      "testing"
+      "testing",
+      "erc20_onboarding"
     ],
     "DEMOS": [
       "basil",
