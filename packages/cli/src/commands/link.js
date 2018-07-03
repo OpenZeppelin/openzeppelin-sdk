@@ -3,22 +3,25 @@
 import push from './push'
 import linkStdlib from '../scripts/link'
 
-const signature = 'link <stdlib>'
+const name = 'link'
+const signature = `${name} <stdlib>`
 const description = 'links project with a standard library located in the <stdlib> npm package'
-module.exports = {
-  signature, description,
-  register: function(program) {
-    program
-      .command(signature, { noHelp: true })
-      .usage('<stdlib> [options]')
-      .description(description)
-      .option('--no-install', 'skip installing stdlib dependencies locally')
-      .option('--push <network>', 'push changes to the specified network')
-      .option('-f, --from <from>', 'specify transaction sender address for --push')
-      .action(async function (stdlibNameVersion, options) {
-        const installLib = options.install
-        await linkStdlib({ stdlibNameVersion, installLib })
-        if(options.push) push.action({ network: options.push, from: options.from })
-      })
+
+const register = program => program
+  .command(signature, { noHelp: true })
+  .usage('<stdlib> [options]')
+  .description(description)
+  .option('--no-install', 'skip installing stdlib dependencies locally')
+  .option('--push <network>', 'push changes to the specified network')
+  .option('-f, --from <from>', 'specify transaction sender address for --push')
+  .action(action)
+
+async function action(stdlibNameVersion, options) {
+  const installLib = options.install
+  await linkStdlib({ stdlibNameVersion, installLib })
+  if(options.push) {
+    await push.action({ network: options.push, from: options.from })
   }
 }
+
+export default { name, signature, description, register, action }

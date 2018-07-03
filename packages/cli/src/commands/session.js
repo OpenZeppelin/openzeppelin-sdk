@@ -1,16 +1,22 @@
 'use strict';
 
-import session from '../scripts/session';
+import session from '../scripts/session'
 
-const signature = 'session'
+const name = 'session'
+const signature = name
 const description = 'by providing --network <network>, commands like create, freeze, push, status and upgrade will use <network> unless overriden. Use --close to undo.'
-const register = program =>
-  program
-    .command(signature, { noHelp: false })
-    .usage('Either --network <network> or --close')
-    .option('--network <network>')
-    .option('--close')
-    .description(description)
-    .action(session)
 
-module.exports = { signature, description, register }
+const register = program => program
+  .command(signature, { noHelp: true })
+  .usage('[options]')
+  .description(description)
+  .option('--network <network>')
+  .option('--close')
+  .action(action)
+
+function action(options) {
+  const { network, close } = options
+  session({ network, close })
+}
+
+export default { name, signature, description, register, action }

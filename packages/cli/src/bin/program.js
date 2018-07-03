@@ -1,48 +1,26 @@
 'use strict';
 
-const program = require('commander')
-const { version } = require('../../package.json')
-const registerErrorHandler = require('./errors')
-const Logger = require('zos-lib').Logger;
-const chalk = require('chalk')
+import chalk from 'chalk'
+import program from 'commander'
+import { Logger } from 'zos-lib'
+import { version } from '../../package.json'
+import commands from '../commands'
+import registerErrorHandler from './errors'
 
-const init = require('../commands/init')
-const add = require('../commands/add')
-const push = require('../commands/push')
-const create = require('../commands/create')
-const bump = require('../commands/bump')
-const upgrade = require('../commands/upgrade')
-const link = require('../commands/link')
-const status = require('../commands/status')
-const pull = require('../commands/pull')
-const compare = require('../commands/compare')
-const freeze = require('../commands/freeze')
-const session = require('../commands/session')
-const remove = require('../commands/remove')
+commands.forEach(command => command.register(program))
+const maxLength = Math.max(...commands.map(command => command.signature.length))
 
 program
   .name('zos')
   .usage('<command> [options]')
-  .description('where <command> is one of:\n' +
-          '\t add, bump, create, init, link, push, status, compare, pull, upgrade, session.')
+  .description(`where <command> is one of: ${commands.map(c => c.name).join(', ')}`)
   .version(version, '--version')
   .option('-v, --verbose', 'verbose mode on: output errors stacktrace and detailed log.')
   .option('-s, --silent', 'silent mode: no output sent to stderr.')
-  .on('option:verbose', () => { Logger.verbose(true); } )
-  .on('option:silent', () => { Logger.silent(true); } )
-
-const commands = [init, add, remove, push, create, bump, upgrade, link, status, compare, pull, freeze, session]
-
-commands.forEach((c) => c.register(program));
-
-const maxSig = Math.max(...commands.map(c => c.signature.length))
-program.on('--help', function(){
-  commands.forEach((c) => {
-    console.log(`    ${chalk.bold(c.signature.padEnd(maxSig))}\t${c.description}\n`)
-  });
-  console.log('');
-});
+  .on('option:verbose', () => Logger.verbose(true))
+  .on('option:silent', () => Logger.silent(true))
+  .on('--help', () => commands.forEach(c => console.log(`   ${chalk.bold(c.signature.padEnd(maxLength))}\t${c.description}\n`)));
 
 registerErrorHandler(program)
 
-module.exports = program;
+export default program

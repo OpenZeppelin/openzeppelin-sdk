@@ -1,5 +1,8 @@
 #! /usr/bin/env node
-require('zos-lib').Logger.silent(false)
-const program = require('./program')
+
+import { Logger } from 'zos-lib'
+import program from './program'
+
+Logger.silent(false)
 program.parse(process.argv)
 if (program.args.length === 0) program.help()
