@@ -1,3 +1,5 @@
+process.env.NODE_ENV = 'test'
+
 import Stdlib from '../src/models/stdlib/Stdlib'
 import ZosPackageFile from '../src/models/files/ZosPackageFile'
 import ZosNetworkFile from '../src/models/files/ZosNetworkFile'
