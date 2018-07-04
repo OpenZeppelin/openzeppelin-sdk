@@ -29,6 +29,11 @@ contract Migratable {
    */
   mapping (string => mapping (string => bool)) internal migrated;
 
+  /**
+   * @dev Internal migration id used to specify that a contract has already been initialized.
+   */
+  string constant private INITIALIZED_ID = "initialized";
+
 
   /**
    * @dev Modifier to use in the initialization function of a contract.
@@ -36,10 +41,12 @@ contract Migratable {
    * @param migrationId Identifier of the migration.
    */
   modifier isInitializer(string contractName, string migrationId) {
+    require(!isMigrated(contractName, INITIALIZED_ID));
     require(!isMigrated(contractName, migrationId));
     _;
     emit Migrated(contractName, migrationId);
     migrated[contractName][migrationId] = true;
+    migrated[contractName][INITIALIZED_ID] = true;
   }
 
   /**
@@ -64,5 +71,13 @@ contract Migratable {
    */
   function isMigrated(string contractName, string migrationId) public view returns(bool) {
     return migrated[contractName][migrationId];
+  }
+
+  /**
+   * @dev Initializer that marks the contract as initialized.
+   * It is important to run this if you had deployed a previous version of a Migratable contract.
+   * For more information see https://github.com/zeppelinos/zos-lib/issues/158.
+   */
+  function initialize() isInitializer("Migratable", "1.2.1") {
   }
 }

@@ -7,6 +7,7 @@ import decodeLogs from '../../../src/helpers/decodeLogs'
 import assertRevert from '../../../src/test/helpers/assertRevert'
 
 const Migratable = Contracts.getFromLocal('Migratable');
+const MigratableMock = Contracts.getFromLocal('MigratableMock');
 const SampleChildV1 = Contracts.getFromLocal('SampleChildV1');
 const SampleChildV2 = Contracts.getFromLocal('SampleChildV2');
 const SampleChildV3 = Contracts.getFromLocal('SampleChildV3');
@@ -343,6 +344,25 @@ contract('Migratable', function ([_, owner, registrar]) {
         (await this.contract.isMigrated('Gramps', 'migration_2')).should.be.true;
         (await this.contract.isMigrated('Father', 'migration_2')).should.be.true;
       });
+    });
+  });
+
+  describe('an initialized migratable', function () {
+    beforeEach('creating initialized migratable', async function () {
+      this.migratable = await MigratableMock.new();
+      sendTransaction(this.migratable, 'initialize', ['uint256'], [0]);
+    });
+
+    it('should not allow rerunning the initializer', async function () {
+      await assertRevert(
+        sendTransaction(this.migratable, 'initialize', ['uint256'], [0])
+      );
+    });
+
+    it('should not allow running another initializer', async function () {
+      await assertRevert(
+        sendTransaction(this.migratable, 'secondInitialize')
+      );
     });
   });
 });
