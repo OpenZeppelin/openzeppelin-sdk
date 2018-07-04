@@ -55,7 +55,7 @@ contract('FreezableImplementationDirectory', ([_, owner, anotherAddress]) => {
     })
   })
 
-  describe('setImplementation', function () {
+  describe('set/unset implementation', function () {
     describe('when it is not frozen', function () {
       shouldBehaveLikeImplementationDirectory(owner, anotherAddress)
     })
@@ -65,8 +65,12 @@ contract('FreezableImplementationDirectory', ([_, owner, anotherAddress]) => {
         await this.directory.freeze({ from: owner })
       })
 
-      it('reverts', async function () {
+      it('does not allow to set implementation', async function () {
         await assertRevert(this.directory.setImplementation('ERC721', this.implementation_v1, { from: owner }))
+      })
+
+      it('does not allow to unset implementation', async function () {
+        await assertRevert(this.directory.unsetImplementation('ERC721', { from: owner }))
       })
     })
   })
