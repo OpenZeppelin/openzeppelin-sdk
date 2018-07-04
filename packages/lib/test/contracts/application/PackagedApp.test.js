@@ -1,6 +1,7 @@
 'use strict';
 require('../../setup')
 
+import Proxy from '../../../src/utils/Proxy'
 import Contracts from '../../../src/utils/Contracts'
 import encodeCall from '../../../src/helpers/encodeCall'
 import decodeLogs from '../../../src/helpers/decodeLogs'
@@ -169,7 +170,7 @@ contract('PackagedApp', ([_, appOwner, packageOwner, directoryOwner, anotherAcco
 
         it('uses the storage of the proxy', async function () {
           // fetch the x value of Migratable at position 0 of the storage
-          const storedValue = await web3.eth.getStorageAt(this.proxyAddress, 1)
+          const storedValue = await Proxy.at(this.proxyAddress).getStorageAt(1)
           storedValue.should.be.bignumber.eq(42)
         })
       })
@@ -271,7 +272,7 @@ contract('PackagedApp', ([_, appOwner, packageOwner, directoryOwner, anotherAcco
 
           it('uses the storage of the proxy', async function () {
             // fetch the x value of Migratable at position 0 of the storage
-            const storedValue = await web3.eth.getStorageAt(this.proxyAddress, 1)
+            const storedValue = await Proxy.at(this.proxyAddress).getStorageAt(1)
             storedValue.should.be.bignumber.eq(42)
           })
         })

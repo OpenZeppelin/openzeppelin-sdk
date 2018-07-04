@@ -1,7 +1,7 @@
 'use strict';
 require('../../setup')
 
-import Contracts from '../../../src/utils/Contracts'
+import Proxy from '../../../src/utils/Proxy'
 import encodeCall from '../../../src/helpers/encodeCall'
 import assertRevert from '../../../src/test/helpers/assertRevert'
 
@@ -126,7 +126,7 @@ contract('AdminUpgradeabilityProxy', ([_, admin, anotherAccount]) => {
 
           it('uses the storage of the proxy', async function () {
             // fetch the x value of Migratable at position 0 of the storage
-            const storedValue = await web3.eth.getStorageAt(this.proxyAddress, 1);
+            const storedValue = await Proxy.at(this.proxyAddress).getStorageAt(1);
             storedValue.should.be.bignumber.eq(42);
           })
         })
@@ -300,16 +300,12 @@ contract('AdminUpgradeabilityProxy', ([_, admin, anotherAccount]) => {
 
   describe('storage', function () {
     it('should store the implementation address in specified location', async function () {
-      const position = web3.sha3('org.zeppelinos.proxy.implementation');
-      const implementation = await web3.eth.getStorageAt(this.proxyAddress, position);
-
+      const implementation = await Proxy.at(this.proxyAddress).implementation()
       implementation.should.be.equal(this.implementation_v0);
     })
 
     it('should store the admin proxy in specified location', async function () {
-      const position = web3.sha3('org.zeppelinos.proxy.admin');
-      const proxyAdmin = await web3.eth.getStorageAt(this.proxyAddress, position);
-
+      const proxyAdmin = await Proxy.at(this.proxyAddress).admin()
       proxyAdmin.should.be.equal(admin);
     })
   })

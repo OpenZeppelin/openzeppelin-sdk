@@ -6,6 +6,7 @@ import decodeLogs from './helpers/decodeLogs'
 import encodeCall from './helpers/encodeCall'
 
 // utils
+import Proxy from './utils/Proxy'
 import Logger from './utils/Logger'
 import FileSystem from './utils/FileSystem'
 import Contracts from './utils/Contracts'
@@ -27,6 +28,7 @@ export {
   assertRevert,
   assertions,
   behaviors,
+  Proxy,
   Logger,
   FileSystem,
   Contracts,
