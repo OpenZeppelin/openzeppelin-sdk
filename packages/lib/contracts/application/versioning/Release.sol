@@ -1,4 +1,4 @@
-pragma solidity ^0.4.21;
+pragma solidity ^0.4.24;
 
 import "./FreezableImplementationDirectory.sol";
 
@@ -19,7 +19,7 @@ contract Release is FreezableImplementationDirectory {
    * @dev Constructor function.
    * It sets the `msg.sender` as the developer of this release.
    */
-  function Release() public {
+  constructor() public {
     developer = msg.sender;
   }
 }

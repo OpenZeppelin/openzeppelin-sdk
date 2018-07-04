@@ -1,4 +1,4 @@
-pragma solidity ^0.4.21;
+pragma solidity ^0.4.24;
 
 import "./BaseApp.sol";
 import "./versioning/ImplementationProvider.sol";
@@ -19,10 +19,7 @@ contract UnversionedApp is BaseApp {
    * @param _provider Implementation provider.
    * @param _factory Proxy factory.
    */
-  function UnversionedApp(ImplementationProvider _provider, UpgradeabilityProxyFactory _factory)
-    BaseApp(_factory)
-    public
-  {
+  constructor(ImplementationProvider _provider, UpgradeabilityProxyFactory _factory) BaseApp(_factory) public {
     setProvider(_provider);
   }
 
@@ -39,7 +36,7 @@ contract UnversionedApp is BaseApp {
    * @param _provider New implementation provider
    */
   function setProvider(ImplementationProvider _provider) public onlyOwner {
-    require(address(_provider) != address(0));
+    require(address(_provider) != address(0), "Cannot set the implementation provider of an app to the zero address");
     provider = _provider;
   }
 }

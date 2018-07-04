@@ -1,4 +1,4 @@
-pragma solidity ^0.4.21;
+pragma solidity ^0.4.24;
 
 import "./BaseApp.sol";
 import "./versioning/Package.sol";
@@ -21,12 +21,9 @@ contract PackagedApp is BaseApp {
    * @param _version Initial version of the app.
    * @param _factory Proxy factory.
    */
-  function PackagedApp(Package _package, string _version, UpgradeabilityProxyFactory _factory)
-    BaseApp(_factory)
-    public
-  {
-    require(address(_package) != address(0));
-    require(_package.hasVersion(_version));
+  constructor(Package _package, string _version, UpgradeabilityProxyFactory _factory) BaseApp(_factory) public {
+    require(address(_package) != address(0), "Cannot set the package of an app to the zero address");
+    require(_package.hasVersion(_version), "The requested version must be registered in the given package");
     package = _package;
     version = _version;
   }
@@ -37,7 +34,7 @@ contract PackagedApp is BaseApp {
    * @param newVersion Name of the new version.
    */
   function setVersion(string newVersion) public onlyOwner {
-    require(package.hasVersion(newVersion));
+    require(package.hasVersion(newVersion), "The requested version must be registered in the given package");
     version = newVersion;
   }
 

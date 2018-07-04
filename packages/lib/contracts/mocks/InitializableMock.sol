@@ -1,4 +1,4 @@
-pragma solidity ^0.4.21;
+pragma solidity ^0.4.24;
 
 import "../migrations/Initializable.sol";
 
@@ -8,7 +8,6 @@ import "../migrations/Initializable.sol";
  */
 contract InitializableMock is Initializable {
 
-  function initialize() public isInitializer {
-  }
+  function initialize() public isInitializer {}
 
 }

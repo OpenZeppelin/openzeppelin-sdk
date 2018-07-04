@@ -19,16 +19,17 @@
   "license": "ISC",
   "dependencies": {
     "minimist": "^1.2.0",
-    "openzeppelin-solidity": "~1.9.0",
-    "openzeppelin-zos": "^1.9.0-beta",
-    "truffle": "^4.1.5",
+    "openzeppelin-solidity": "~1.10.0",
+    "openzeppelin-zos": "~1.9.1",
+    "truffle": "^4.1.13",
     "zos-lib": "file:../.."
   },
   "devDependencies": {
-    "babel-register": "^6.26.0",
     "babel-polyfill": "^6.23.0",
+    "babel-preset-env": "^1.7.0",
     "babel-preset-es2015": "^6.24.1",
     "babel-preset-stage-2": "^6.24.1",
-    "babel-preset-stage-3": "^6.24.1"
+    "babel-preset-stage-3": "^6.24.1",
+    "babel-register": "^6.26.0"
   }
 }

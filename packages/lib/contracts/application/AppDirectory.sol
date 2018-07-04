@@ -1,4 +1,4 @@
-pragma solidity ^0.4.21;
+pragma solidity ^0.4.24;
 
 import "./versioning/ImplementationProvider.sol";
 import "./versioning/ImplementationDirectory.sol";
@@ -26,7 +26,7 @@ contract AppDirectory is ImplementationDirectory {
    * @dev Constructor function.
    * @param _stdlib Provider for standard library implementations.
    */
-  function AppDirectory(ImplementationProvider _stdlib) public {
+  constructor(ImplementationProvider _stdlib) public {
     stdlib = _stdlib;
   }
 

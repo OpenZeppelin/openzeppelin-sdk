@@ -1,4 +1,4 @@
-pragma solidity ^0.4.21;
+pragma solidity ^0.4.24;
 
 import "./ImplementationProvider.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
@@ -38,7 +38,7 @@ contract Package is Ownable {
    * @param provider ImplementationProvider associated with the version.
    */
   function addVersion(string version, ImplementationProvider provider) public onlyOwner {
-    require(!hasVersion(version));
+    require(!hasVersion(version), "Given version is already registered in package");
     versions[version] = provider;
     emit VersionAdded(version, provider);
   }

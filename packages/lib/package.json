@@ -48,15 +48,15 @@
     "mock-dependency": "file:test/mocks/mock-dependency",
     "solidity-coverage": "^0.4.15",
     "tmp": "^0.0.33",
-    "truffle": "^4.1.5"
+    "truffle": "^4.1.13"
   },
   "dependencies": {
     "bignumber.js": "^7.2.0",
     "chalk": "^2.4.1",
     "ethereumjs-abi": "^0.6.5",
-    "openzeppelin-solidity": "~1.9.0",
-    "truffle-contract": "^3.0.5",
-    "truffle-provisioner": "^0.1.0",
+    "openzeppelin-solidity": "~1.10.0",
+    "truffle-contract": "^3.0.6",
+    "truffle-provisioner": "^0.1.1",
     "web3": "^0.18.4"
   }
 }

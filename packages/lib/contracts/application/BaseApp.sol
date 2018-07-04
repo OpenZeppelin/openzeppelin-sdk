@@ -1,4 +1,4 @@
-pragma solidity ^0.4.21;
+pragma solidity ^0.4.24;
 
 import "./versioning/ImplementationProvider.sol";
 import "../upgradeability/AdminUpgradeabilityProxy.sol";
@@ -18,8 +18,8 @@ contract BaseApp is Ownable {
    * @dev Constructor function
    * @param _factory Proxy factory
    */
-  function BaseApp(UpgradeabilityProxyFactory _factory) public {
-    require(address(_factory) != address(0));
+  constructor(UpgradeabilityProxyFactory _factory) public {
+    require(address(_factory) != address(0), "Cannot set the proxy factory of an app to the zero address");
     factory = _factory;
   }
 

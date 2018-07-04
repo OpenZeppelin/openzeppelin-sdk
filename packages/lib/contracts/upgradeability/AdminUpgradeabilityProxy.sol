@@ -1,4 +1,4 @@
-pragma solidity ^0.4.21;
+pragma solidity ^0.4.24;
 
 import './UpgradeabilityProxy.sol';
 
@@ -43,7 +43,7 @@ contract AdminUpgradeabilityProxy is UpgradeabilityProxy {
    * It sets the `msg.sender` as the proxy administrator.
    * @param _implementation address of the initial implementation.
    */
-  function AdminUpgradeabilityProxy(address _implementation) UpgradeabilityProxy(_implementation) public {
+  constructor(address _implementation) UpgradeabilityProxy(_implementation) public {
     assert(ADMIN_SLOT == keccak256("org.zeppelinos.proxy.admin"));
 
     _setAdmin(msg.sender);
@@ -69,7 +69,7 @@ contract AdminUpgradeabilityProxy is UpgradeabilityProxy {
    * @param newAdmin Address to transfer proxy administration to.
    */
   function changeAdmin(address newAdmin) external ifAdmin {
-    require(newAdmin != address(0));
+    require(newAdmin != address(0), "Cannot change the admin of a proxy to the zero address");
     emit AdminChanged(_admin(), newAdmin);
     _setAdmin(newAdmin);
   }
@@ -87,24 +87,24 @@ contract AdminUpgradeabilityProxy is UpgradeabilityProxy {
    * @dev Upgrade the backing implementation of the proxy and call a function
    * on the new implementation.
    * This is useful to initialize the proxied contract.
-   * @param implementation Address of the new implementation.
+   * @param newImplementation Address of the new implementation.
    * @param data Data to send as msg.data in the low level call.
    * It should include the signature and the parameters of the function to be
    * called, as described in
    * https://solidity.readthedocs.io/en/develop/abi-spec.html#function-selector-and-argument-encoding.
    */
-  function upgradeToAndCall(address implementation, bytes data) payable external ifAdmin {
-    _upgradeTo(implementation);
+  function upgradeToAndCall(address newImplementation, bytes data) payable external ifAdmin {
+    _upgradeTo(newImplementation);
     require(address(this).call.value(msg.value)(data));
   }
 
   /**
    * @return The admin slot.
    */
-  function _admin() internal returns (address admin) {
+  function _admin() internal view returns (address adm) {
     bytes32 slot = ADMIN_SLOT;
     assembly {
-      admin := sload(slot)
+      adm := sload(slot)
     }
   }
 
@@ -124,7 +124,7 @@ contract AdminUpgradeabilityProxy is UpgradeabilityProxy {
    * @dev Only fall back when the sender is not the admin.
    */
   function _willFallback() internal {
-    require(msg.sender != _admin());
+    require(msg.sender != _admin(), "Cannot call fallback function from the proxy admin");
     super._willFallback();
   }
 }
