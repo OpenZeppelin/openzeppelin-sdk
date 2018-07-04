@@ -17,6 +17,7 @@ const register = program => program
   .option('--link <stdlib>', 'link to a standard library')
   .option('--no-install', 'skip installing stdlib dependencies locally')
   .option('--push <network>', 'push changes to the specified network')
+  .option('--timeout <timeout>', 'timeout in seconds for blockchain transactions')
   .option('-f, --from <from>', 'specify transaction sender address for --push')
   .action(action)
 
@@ -31,7 +32,7 @@ async function action(name, version, options) {
   }
 
   if (options.push) {
-    await push.action({ network: options.push, from: options.from })
+    push.action({ network: options.push, from: options.from, timeout: options.timeout })
   }
 }
 

@@ -17,14 +17,17 @@ const register = program => program
   .option('--all', 'upgrade all contracts in the application')
   .option('-f, --from <from>', 'specify transaction sender address')
   .option('-n, --network <network>', 'network to be used')
+  .option('--timeout <timeout>', 'timeout in seconds for blockchain transactions')
   .option('--force', 'force creation even if contracts have local modifications')
   .action(action)
 
 async function action(contractAlias, proxyAddress, options) {
   const { initMethod, initArgs } = parseInit(options, 'initialize')
-  const { from, network, all, force } = options
+  const { from, network, all, force, timeout } = options
   const txParams = from ? { from } : {}
-  await runWithTruffle(async () => await upgrade({ contractAlias, proxyAddress, initMethod, initArgs, all, network, txParams, force }), network)
+  await runWithTruffle(async () => await upgrade({ 
+    contractAlias, proxyAddress, initMethod, initArgs, all, network, txParams, force 
+  }), network, { timeout })
 }
 
 export default { name, signature, description, register, action }

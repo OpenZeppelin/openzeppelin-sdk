@@ -1,12 +1,17 @@
 import Truffle from '../models/truffle/Truffle';
 import Session from '../models/network/Session'
+import Contracts from 'zos-lib/lib/utils/Contracts';
+import _ from 'lodash';
 
-export default async function runWithTruffle(script, network, compile = false) {
+const DEFAULT_TIMEOUT = 10 * 60; // 10 minutes
+
+export default async function runWithTruffle(script, network, { compile = false, timeout = null }) {
   const config = Truffle.config()
   network = network || Session.getNetwork()
 
   if(!network) throw Error('A network name must be provided to execute the requested action.')
   config.network = network
+  Contracts.setSyncTimeout((_.isNil(timeout) ? DEFAULT_TIMEOUT : timeout) * 1000)
   if (compile) await Truffle.compile(config)
   initTruffle(config).then(script)
 }

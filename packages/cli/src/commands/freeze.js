@@ -13,12 +13,13 @@ const register = program => program
   .description(description)
   .option('-f, --from <from>', 'specify transaction sender address')
   .option('-n, --network <network>', 'network to be used')
+  .option('--timeout <timeout>', 'timeout in seconds for blockchain transactions')
   .action(action)
 
 async function action(options) {
-  const { from, network } = options
+  const { from, network, timeout } = options
   const txParams = from ? { from } : {}
-  await runWithTruffle(async () => await freeze({ network, txParams }), network)
+  await runWithTruffle(async () => await freeze({ network, txParams }), network, { timeout })
 }
 
 export default { name, signature, description, register, action }
