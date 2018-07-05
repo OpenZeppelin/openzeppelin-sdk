@@ -13,6 +13,8 @@ The following steps will get you started using ZeppelinOS.
 npm install --global zos
 ```
 
+_If you get an `EACCESS` permissions error when installing, please review the [npm documentation on preventing permissions errors](https://docs.npmjs.com/getting-started/fixing-npm-permissions)._
+
 ## Setting up your application
 
 Initialize your `zos` application with:
