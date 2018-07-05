@@ -32,6 +32,7 @@
   "dependencies": {
     "chalk": "^2.4.1",
     "commander": "^2.15.1",
+    "lockfile": "^1.0.4",
     "lodash": "^4.17.5",
     "npm-programmatic": "0.0.10",
     "truffle": "^4.1.6",
