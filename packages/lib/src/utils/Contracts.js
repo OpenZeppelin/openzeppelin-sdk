@@ -21,7 +21,9 @@ export default {
   },
 
   getLocalPath(contractName) {
-    return `${process.cwd()}/build/contracts/${contractName}.json`
+    const defaultBuildDir = `${process.cwd()}/build/contracts`
+    const buildDir = this._getTruffleBuildDir() || defaultBuildDir
+    return `${buildDir}/${contractName}.json`
   },
 
   getLibPath(contractName) {
@@ -63,6 +65,16 @@ export default {
     contract.defaults({ from: web3.eth.accounts[0], ... defaults })
     contract.synchronization_timeout = syncTimeout
     return contract
+  },
+
+  _getTruffleBuildDir() {
+    try {
+      const TruffleConfig = require('truffle-config')
+      const config = TruffleConfig.detect({ logger: console })
+      return config.contracts_build_directory
+    } catch (error) {
+      return undefined
+    }
   },
 
   _artifactsDefaults() {
