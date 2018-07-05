@@ -6,9 +6,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
-### [1.1.0] - [date]
-
-#### Added
+### Added
 - Models to wrap and interact with zos package files 
 - Session command in order to specify a network session when running multiple commands
 - Compare command to compare local status with the on-chain one
@@ -20,22 +18,20 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Mechanism to ensure no more than one instance of CLI is running simultaneously
 - Changelog file
 
-#### Changed
+### Changed
 - Set testing environment in tests setup file
 - Update zos-lib to version 1.2.1
 - Rename project param to project-name for init command
 - Improve status command feedback using different logging colors
 
-#### Fixed
+### Fixed
 - Show error reason if loading truffle file fails
 - Do not set stdlib to 0x0 if not necessary when pushing changes to the chain
 - Print helper when zos is invoked without arguments
-- Create empty .gitkeep files for Truffle folders initialization
+- Create empty `.gitkeep` files for Truffle folders initialization
 - Handle error when stdlib network file is missing
 
-#### Removed
+### Removed
 - Remove shelljs dependency
 - Remove colors dependency
 - Remove ethereumjs-abi dependency
-
-## [Released]
