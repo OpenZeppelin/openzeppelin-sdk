@@ -58,7 +58,7 @@ export default class NetworkAppController extends NetworkBaseController {
     this.checkInitialization(contractClass, initMethod, initArgs);
     const proxyInstance = await this.app.createProxy(contractClass, contractAlias, initMethod, initArgs);
     const implementationAddress = await this.app.getImplementation(contractAlias);
-    this._updateTruffleDeployedInformation(contractAlias, contractClass.at(implementationAddress))
+    this._updateTruffleDeployedInformation(contractAlias, proxyInstance)
 
     this.networkFile.addProxy(contractAlias, {
       address: proxyInstance.address,
