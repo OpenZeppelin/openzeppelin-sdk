@@ -45,7 +45,7 @@ async function libInfo(controller) {
 
 async function versionInfo(networkFile) {
   if (networkFile.hasMatchingVersion()) {
-    log.error(`- Deployed version ${networkFile.version} matches the latest one defined`)
+    log.info(`- Deployed version ${networkFile.version} matches the latest one defined`)
     return true;
   } else {
     log.info(`- Deployed version ${networkFile.version} is out of date (latest is ${networkFile.packageFile.version})`)
