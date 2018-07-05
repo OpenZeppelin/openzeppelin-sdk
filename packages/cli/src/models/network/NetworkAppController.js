@@ -163,14 +163,20 @@ export default class NetworkAppController extends NetworkBaseController {
 
     const stdlibName = this.packageFile.stdlibName;
     log.info(`Connecting to public deployment of ${stdlibName} in ${this.networkFile.network}`);
-    const stdlibAddress = Stdlib.fetch(stdlibName, this.packageFile.stdlibVersion, this.networkFile.network);
+
+    const { address: stdlibAddress, version: stdlibVersion } = Stdlib.fetch(stdlibName, this.packageFile.stdlibVersion, this.networkFile.network);
     const currentStdlibAddress = await this.app.currentStdlib()
 
-    if(stdlibAddress !== currentStdlibAddress) {
+    if (stdlibAddress !== currentStdlibAddress) {
       await this.app.setStdlib(stdlibAddress);
-      this.networkFile.stdlib = { address: stdlibAddress, ... this.packageFile.stdlib };
+      this.networkFile.stdlib = { 
+         ... this.packageFile.stdlib, // name, customDeploy
+         address: stdlibAddress, 
+         version: stdlibVersion
+      };
+    } else {
+      log.info(`Current application is already linked to stdlib ${stdlibName} at ${stdlibAddress} in ${this.network}`);
     }
-    else log.info(`Current application is already linked to stdlib ${stdlibName} at ${stdlibAddress} in ${this.network}`);
   }
 
   isStdlibContract(contractAlias) {

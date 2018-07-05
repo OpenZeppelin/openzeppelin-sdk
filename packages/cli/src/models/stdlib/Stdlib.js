@@ -1,5 +1,6 @@
 import _ from 'lodash';
 import { FileSystem as fs } from 'zos-lib'
+import semver from 'semver';
 
 import StdlibProvider from './StdlibProvider';
 import StdlibDeployer from './StdlibDeployer';
@@ -12,6 +13,16 @@ export default class Stdlib {
 
   static async deploy() {
     return await StdlibDeployer.deploy(...arguments);
+  }
+
+  static satisfiesVersion(version, requirement) {
+    return !requirement || version === requirement || semver.satisfies(version, requirement);
+  }
+
+  static validateSatisfiesVersion(version, requirement) {
+    if (!Stdlib.satisfiesVersion(version, requirement)) {
+      throw Error(`Required stdlib version ${requirement} does not match stdlib package version ${version}`);
+    }
   }
 
   constructor(nameAndVersion) {
@@ -45,9 +56,16 @@ export default class Stdlib {
   _parseNameVersion(nameAndVersion) {
     const [name, version] = nameAndVersion.split('@')
     this.name = name
-    const packageVersion = this.getPackage().version;
-    this.version = version || packageVersion
     this.nameAndVersion = nameAndVersion
-    if (this.version !== packageVersion) throw Error(`Requested stdlib version ${version} does not match stdlib package version ${packageVersion}`)
+
+    const packageVersion = this.getPackage().version
+    Stdlib.validateSatisfiesVersion(packageVersion, version)
+
+    this.version = version || tryWithCaret(packageVersion)
   }
+}
+
+function tryWithCaret(version) {
+  const cleaned = semver.clean(version);
+  return cleaned ? `^${cleaned}` : version;
 }

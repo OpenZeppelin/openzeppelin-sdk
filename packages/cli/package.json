@@ -35,6 +35,7 @@
     "lockfile": "^1.0.4",
     "lodash": "^4.17.5",
     "npm-programmatic": "0.0.10",
+    "semver": "^5.5.0",
     "truffle": "^4.1.6",
     "truffle-config": "^1.0.4",
     "truffle-core": "^4.1.8",

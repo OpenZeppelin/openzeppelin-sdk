@@ -156,7 +156,7 @@ contract('push script', function([_, owner]) {
       await push({ network, txParams, networkFile: this.newNetworkFile })
       this.newNetworkFile.frozen.should.be.false;
     });
-  }
+  };
 
   const shouldDeleteContracts = function () {
     it('should delete contracts', async function () {
@@ -166,6 +166,22 @@ contract('push script', function([_, owner]) {
       const _package = await Package.fetch(this.networkFile.package.address);
       (await _package.getImplementation(defaultVersion, 'Impl')).should.be.zeroAddress;
       should.not.exist(this.networkFile.contract('Impl'));
+    });
+  };
+
+  const shouldSetStdlib = function () {
+    const stdlibAddress = '0x0000000000000000000000000000000000000010';
+
+    it('should set stdlib in deployed app', async function () {
+      const app = await App.fetch(this.networkFile.appAddress);
+      const stdlib = await app.currentStdlib();
+
+      stdlib.should.eq(stdlibAddress);
+    });
+
+    it('should set address and version in network file', async function () {
+      this.networkFile.stdlibAddress.should.eq(stdlibAddress);
+      this.networkFile.stdlibVersion.should.eq('1.1.0');
     });
   };
 
@@ -207,8 +223,6 @@ contract('push script', function([_, owner]) {
   });
 
   describe('an app with stdlib', function () {
-    const stdlibAddress = '0x0000000000000000000000000000000000000010';
-
     describe('when using a valid stdlib', function () {
       beforeEach('pushing package-stdlib', async function () {
         const packageFile = new ZosPackageFile('test/mocks/packages/package-with-stdlib.zos.json')
@@ -218,17 +232,19 @@ contract('push script', function([_, owner]) {
       });
 
       shouldDeployApp();
+      shouldSetStdlib();
+    })
 
-      it('should set stdlib in deployed app', async function () {
-        const app = await App.fetch(this.networkFile.appAddress);
-        const stdlib = await app.currentStdlib();
+    describe('when using an stdlib with a version range', function () {
+      beforeEach('pushing package-stdlib', async function () {
+        const packageFile = new ZosPackageFile('test/mocks/packages/package-with-stdlib-range.zos.json')
+        this.networkFile = packageFile.networkFile(network)
 
-        stdlib.should.eq(stdlibAddress);
+        await push({ networkFile: this.networkFile, network, txParams })
       });
 
-      it('should set address in network file', async function () {
-        this.networkFile.stdlibAddress.should.eq(stdlibAddress);
-      });
+      shouldDeployApp();
+      shouldSetStdlib();
     })
 
     describe('when using an invalid stdlib', function () {
@@ -239,7 +255,7 @@ contract('push script', function([_, owner]) {
 
       it('should set address in network file', async function () {
         await push({ network, txParams, networkFile: this.networkFile })
-          .should.be.rejectedWith('Requested stdlib version 1.0.0 does not match stdlib network package version 3.0.0')
+          .should.be.rejectedWith('Required stdlib version 1.0.0 does not match stdlib package version 3.0.0')
       });
     })
   });
