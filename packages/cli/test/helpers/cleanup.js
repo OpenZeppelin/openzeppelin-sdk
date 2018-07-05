@@ -1,15 +1,14 @@
-import fs from 'fs'
+import { FileSystem as fs } from 'zos-lib'
 
 export function cleanup(path) {
   try {
-    const stat = fs.statSync(path)
-    if(stat.isDirectory()) fs.rmdirSync(path)
-    else fs.unlinkSync(path)
+    if(fs.isDir(path)) fs.removeTree(path)
+    else fs.remove(path)
   } catch(e) { /* swallow exception */ }
 }
 
-export function cleanupfn(filename) {
+export function cleanupfn(path) {
   return function() {
-    cleanup(filename);
+    cleanup(path);
   }
 }

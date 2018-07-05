@@ -2,7 +2,7 @@
 require('../setup')
 
 import { FileSystem as fs } from 'zos-lib'
-import { cleanup } from '../helpers/cleanup.js'
+import { cleanup, cleanupfn } from '../helpers/cleanup'
 
 import init from '../../src/scripts/init.js'
 import ZosPackageFile from '../../src/models/files/ZosPackageFile'
@@ -10,9 +10,13 @@ import ZosPackageFile from '../../src/models/files/ZosPackageFile'
 contract('init script', function() {
   const name = 'MyApp';
   const version = '0.3.0';
+  const tmpDir = 'test/tmp';
 
-  beforeEach(async function() {
-    this.packageFile = new ZosPackageFile('test/tmp/zos.json')
+  before('create tmp dir', () => fs.createDir(tmpDir))
+  after('cleanup tmp dir', cleanupfn(tmpDir))
+
+  beforeEach('create package file', async function() {
+    this.packageFile = new ZosPackageFile(`${tmpDir}/zos.json`)
   })
 
   describe('created file', function() {

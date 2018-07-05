@@ -2,25 +2,18 @@
 require('../setup')
 
 import { FileSystem as fs } from 'zos-lib'
-import { cleanup } from '../helpers/cleanup.js'
-import Truffle from '../../src/models/truffle/Truffle.js'
+import { cleanupfn } from '../helpers/cleanup'
+import Truffle from '../../src/models/truffle/Truffle'
 
 contract('Truffle', function () {
-  const tmpDir = "test/tmp";
+  const tmpDir = 'test/tmp';
   const contractsDir = `${tmpDir}/contracts`
   const migrationsDir = `${tmpDir}/migrations`
   const truffleConfigFile = `${tmpDir}/truffle-config.js`
   const truffleConfigPath = `${process.cwd()}/${truffleConfigFile}`
 
-  afterEach('cleanup files & folders', function () {
-    cleanup(`${contractsDir}/.gitkeep`)
-    cleanup(`${contractsDir}/Sample.sol`)
-    cleanup(contractsDir)
-    cleanup(`${migrationsDir}/01_sample.js`)
-    cleanup(`${migrationsDir}/.gitkeep`)
-    cleanup(migrationsDir)
-    cleanup(truffleConfigFile)
-  })
+  beforeEach('create tmp dir', () => fs.createDir(tmpDir))
+  afterEach('cleanup files & folders', cleanupfn(tmpDir))
 
   it('should create an empty contracts folder if missing', async function () {
     Truffle.init(tmpDir)
