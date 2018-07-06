@@ -16,7 +16,15 @@ In this guide, we will build a simple dapp on top of ZeppelinOS. To see the end 
 * Source code: [zeppelinos/basil](https://github.com/zeppelinos/basil)
 * App: [basil.zeppelin.solutions](https://basil.zeppelin.solutions)
 
-First we will need to [install Node.js following the instructions from their website](https://nodejs.org/en/download/package-manager/). Then, let's set up a directory for our project and initialize the npm package:
+We will need to [install Node.js following the instructions from their website](https://nodejs.org/en/download/package-manager/). 
+
+First, let's install the ZeppelinOS command line interface:
+
+```sh
+npm install --global zos
+```
+
+Then, let's set up a directory for our project and initialize the npm package:
 
 ```sh
 mkdir basil
@@ -26,7 +34,7 @@ npm init --yes
 
 ## The sample contract
 
-Next, let's write the contract to control the light bulb in `contracts/Basil.sol`:
+Next, let's take a look at the `Basil` contract we will use to control the light bulb:
 
 ```sol
 pragma solidity ^0.4.21;
@@ -74,37 +82,28 @@ contract Basil is Ownable {
 }
 ```
 
-The contract is super simple. If somebody wants to set the light color, they have to make a donation. If the donation is higher than the previous one, it is accepted, the light color changes and an event is emitted. Of course, a withdraw method allows the Zeppelin team to collect all donations, which are safely put away in the plant's own education fund.
-
-We need to install the `openzeppelin-zos` dependency and to compile the contract:
-
-```sh
-npm install openzeppelin-zos
-npx truffle compile
-```
-
-> NOTE: If you're familiar with the `openzeppelin-solidity` library, note that we're using something different here. We're using the `openzeppelin-zos` library, which is the OpenZeppelin version for ZeppelinOS.
+The contract is super simple. If somebody wants to set the light color, they have to make a donation. If the donation is 
+higher than the previous one, it is accepted, the light color changes and an event is emitted. Of course, a withdraw 
+method allows the Zeppelin team to collect all donations, which are safely put away in the plant's own education fund.
 
 ## Using ZeppelinOS
 
-Now, to get the niceties that ZeppelinOS provides, let's install the `zos` command line interface and initialize our application with the version 0.0.1:
+Now, to get the niceties that ZeppelinOS provides, let's initialize our application with the version 0.0.1:
 
 ```sh
-npm install -g zos
 zos init basil 0.0.1
 ```
 
-This will create a `zos.json` file where ZeppelinOS will keep track of
-the contracts of your application.
+This will create a `zos.json` file where ZeppelinOS will keep track of the contracts of your application.
 
-Next, let's add the implementation of our Basil contract:
+Next, let's copy the sourcecode of `Basil` into `contracts/Basil.sol` and add it to the `zos` project:
 
 ```sh
 zos add Basil
 ```
 
-To have your `zos.json` file always up-to-date, run `zos add` for every
-new contract you add to your project.
+To have your `zos.json` file always up-to-date, run `zos add` for every new contract you add to your project.
+This command will also compile your contracts by default.
 
 By now, the json files looks like this:
 
