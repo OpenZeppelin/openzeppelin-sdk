@@ -17,9 +17,7 @@ const register = program => program
   .action(action)
 
 async function action(options) {
-  const { from, network, timeout } = options
-  const txParams = from ? { from } : {}
-  await runWithTruffle(async () => await freeze({ network, txParams }), network, { timeout })
+  await runWithTruffle(async (opts) => await freeze(opts), options)
 }
 
 export default { name, signature, description, register, action }

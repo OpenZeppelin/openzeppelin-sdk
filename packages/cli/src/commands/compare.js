@@ -16,9 +16,7 @@ const register = program => program
   .action(action)
 
 async function action(options) {
-  const { from, network, timeout } = options
-  const txParams = from ? { from } : {}
-  await runWithTruffle(async () => await compare({ txParams, network }), network, { timeout })
+  await runWithTruffle(async (opts) => await compare(opts), options)
 }
 
 export default { name, signature, description, register, action }

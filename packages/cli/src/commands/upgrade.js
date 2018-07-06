@@ -23,11 +23,10 @@ const register = program => program
 
 async function action(contractAlias, proxyAddress, options) {
   const { initMethod, initArgs } = parseInit(options, 'initialize')
-  const { from, network, all, force, timeout } = options
-  const txParams = from ? { from } : {}
-  await runWithTruffle(async () => await upgrade({ 
-    contractAlias, proxyAddress, initMethod, initArgs, all, network, txParams, force 
-  }), network, { timeout })
+  const { all, force } = options
+  await runWithTruffle(async (opts) => await upgrade({ 
+    contractAlias, proxyAddress, initMethod, initArgs, all, force, ... opts
+  }), options)
 }
 
 export default { name, signature, description, register, action }

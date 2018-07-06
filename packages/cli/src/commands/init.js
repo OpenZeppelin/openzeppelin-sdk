@@ -16,9 +16,9 @@ const register = program => program
   .option('--force', 'overwrite existing project if there is one')
   .option('--link <stdlib>', 'link to a standard library')
   .option('--no-install', 'skip installing stdlib dependencies locally')
-  .option('--push <network>', 'push changes to the specified network')
-  .option('--timeout <timeout>', 'timeout in seconds for blockchain transactions')
+  .option('--push [network]', 'push changes to the specified network')
   .option('-f, --from <from>', 'specify transaction sender address for --push')
+  .option('--timeout <timeout>', 'timeout in seconds for blockchain transactions')
   .action(action)
 
 async function action(name, version, options) {
@@ -30,10 +30,7 @@ async function action(name, version, options) {
     const { stdlib: stdlibNameVersion, install: installLib } = options
     await init({ name, version, stdlibNameVersion, installLib, force })
   }
-
-  if (options.push) {
-    push.action({ network: options.push, from: options.from, timeout: options.timeout })
-  }
+  await push.tryAction(options)
 }
 
 export default { name, signature, description, register, action }

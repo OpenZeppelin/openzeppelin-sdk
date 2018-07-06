@@ -8,41 +8,47 @@ describe('session script', function () {
 
   afterEach(() => Session.close())
 
+  const opts = { network: 'foo', from: '0x1', timeout: 10 }
+
   describe('opening a new session', function () {
     describe('when there was no session opened before', function () {
       describe('when the time out does not expire', function () {
-        it('sets the new network', function () {
-          session({ network: 'foo' })
-
-          Session.getNetwork().should.be.equal('foo')
+        beforeEach(function () {
+          session(opts)
+        })
+        it('sets the new options', function () {
+          Session.getOptions().should.be.deep.equal(opts)
+        })
+        it('merges given options with session defaults', function () {
+          Session.getOptions({ from: '0x2' }).should.be.deep.equal({ network: 'foo', timeout: 10, from: '0x2' })
         })
       })
 
       describe('when the time out expires', function () {
-        it('replaces the previous network', function () {
-          session({ network: 'foo', timeout: 0 })
-
-          assert(Session.getNetwork() === undefined)
+        it('clears all options', function () {
+          session({ ... opts, expires: 0 })
+          Session.getOptions().should.be.empty
+        })
+        it('returns given options', function () {
+          Session.getOptions({ from: '0x2' }).should.be.deep.equal({ from: '0x2' })
         })
       })
     })
 
-    describe('when there was no session opened before', function () {
-      beforeEach(() => session({ network: 'foo' }))
+    describe('when there was a session opened before', function () {
+      beforeEach(() => session(opts))
 
       describe('when the time out does not expire', function () {
-        it('replaces the previous network', function () {
+        it('replaces all options', function () {
           session({ network: 'bar' })
-
-          Session.getNetwork().should.be.equal('bar')
+          Session.getOptions().should.be.deep.equal({ network: 'bar' })
         })
       })
 
       describe('when the time out expires', function () {
-        it('replaces the previous network', function () {
-          session({ network: 'bar', timeout: 0 })
-
-          assert(Session.getNetwork() === undefined)
+        it('clears all options', function () {
+          session({ network: 'bar', expires: 0 })
+          Session.getOptions().should.be.empty;
         })
       })
     })
@@ -52,31 +58,31 @@ describe('session script', function () {
     describe('when there was no session opened before', function () {
       it('sets the new network', function () {
         session({ close: true })
-
-        assert(Session.getNetwork() === undefined)
+        Session.getOptions().should.be.empty
       })
     })
 
-    describe('when there was no session opened before', function () {
-      beforeEach(() => session({ network: 'foo' }))
+    describe('when there was a session opened before', function () {
+      beforeEach(() => session(opts))
 
       it('replaces the previous network', function () {
         session({ close: true })
-
-        assert(Session.getNetwork() === undefined)
+        Session.getOptions().should.be.empty
       })
     })
   })
 
-  describe('when no arguments are given', function () {
-    it('throws an error', function () {
-      expect(() => session({})).to.throw('Please provide either --network <network> or --close.')
+  describe('arguments', function () {
+    describe('when no arguments are given', function () {
+      it('throws an error', function () {
+        expect(() => session({})).to.throw('Please provide either a network option (--network, --timeout, --from) or --close.')
+      })
     })
-  })
 
-  describe('when both arguments are given', function () {
-    it('throws an error', function () {
-      expect(() => session({ network: 'boo', close: true })).to.throw('Please provide either --network <network> or --close.')
+    describe('when both arguments are given', function () {
+      it('throws an error', function () {
+        expect(() => session({ network: 'boo', close: true })).to.throw('Please provide either a network option (--network, --timeout, --from) or --close.')
+      })
     })
   })
 })

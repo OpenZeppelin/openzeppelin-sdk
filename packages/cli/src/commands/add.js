@@ -14,8 +14,9 @@ const register = program => program
   .usage('[contractName1[:contractAlias1] ... contractNameN[:contractAliasN]] [options]')
   .description(description)
   .option('--all', 'add all contracts in your build directory')
-  .option('--push <network>', 'push changes to the specified network after adding')
+  .option('--push [network]', 'push changes to the specified network after adding')
   .option('-f, --from <from>', 'specify the transaction sender address for --push')
+  .option('--timeout <timeout>', 'timeout in seconds for blockchain transactions')
   .option('--skip-compile', 'skips contract compilation')
   .action(action)
 
@@ -29,9 +30,7 @@ async function action(contractNames, options) {
     })
     add({ contractsData })
   }
-  if(options.push) {
-    await push.action({ network: options.push, from: options.from })
-  }
+  await push.tryAction(options)
 }
 
 export default { name, signature, description, register, action }

@@ -22,11 +22,10 @@ const register = program => program
 
 async function action(contractAlias, options) {
   const { initMethod, initArgs } = parseInit(options, 'initialize')
-  const { from, network, force, timeout } = options
-  const txParams = from ? { from } : {}
-  await runWithTruffle(async () => await createProxy({
-    contractAlias, initMethod, initArgs, network, txParams, force
-  }), network, { timeout })
+  const { force } = options
+  await runWithTruffle(async (opts) => await createProxy({
+    contractAlias, initMethod, initArgs, force, ... opts
+  }), options)
 }
 
 export default { name, signature, description, register, action }

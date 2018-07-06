@@ -4,19 +4,21 @@ import session from '../scripts/session'
 
 const name = 'session'
 const signature = name
-const description = 'by providing --network <network>, commands like create, freeze, push, status and upgrade will use <network> unless overriden. Use --close to undo.'
+const description = 'by providing network options, commands like create, freeze, push, status and upgrade will use them unless overriden. Use --close to undo.'
 
 const register = program => program
   .command(signature, { noHelp: true })
   .usage('[options]')
   .description(description)
-  .option('--network <network>')
+  .option('-n, --network <network>', 'network to be used')
+  .option('-f, --from <from>', 'specify transaction sender address')
+  .option('--timeout <timeout>', 'timeout in seconds for blockchain transactions')
+  .option('--expires <expires>', 'expiration of the session in seconds (defaults to 900, 15 minutes)')
   .option('--close')
   .action(action)
 
 function action(options) {
-  const { network, close } = options
-  session({ network, close })
+  session(options)
 }
 
 export default { name, signature, description, register, action }

@@ -12,7 +12,7 @@ const register = program => program
   .usage('<stdlib> [options]')
   .description(description)
   .option('--no-install', 'skip installing stdlib dependencies locally')
-  .option('--push <network>', 'push changes to the specified network')
+  .option('--push [network]', 'push changes to the specified network')
   .option('-f, --from <from>', 'specify transaction sender address for --push')
   .option('--timeout <timeout>', 'timeout in seconds for blockchain transactions')
   .action(action)
@@ -20,9 +20,7 @@ const register = program => program
 async function action(stdlibNameVersion, options) {
   const installLib = options.install
   await linkStdlib({ stdlibNameVersion, installLib })
-  if(options.push) {
-    await push.action({ network: options.push, from: options.from, timeout: options.timeout })
-  }
+  await push.tryAction(options)
 }
 
 export default { name, signature, description, register, action }
