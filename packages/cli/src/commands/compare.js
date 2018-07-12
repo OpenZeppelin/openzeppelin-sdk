@@ -12,7 +12,6 @@ const register = program => program
   .description(description)
   .usage('--network <network>')
   .option('-n, --network <network>', 'network to be used')
-  .option('--timeout <timeout>', 'timeout in seconds for blockchain transactions')
   .action(action)
 
 async function action(options) {

@@ -18,12 +18,19 @@ export default class EventsFilter {
   }
 
   async _promiseTimeout(promise) {
-    const timeout = new Promise((resolve, reject) => {
+    return new Promise((resolve, reject) => {
       const timer = setTimeout(() => {
         clearTimeout(timer)
         reject(TIMEOUT_ERROR)
       }, this.timeout)
+
+      promise.then((res) => {
+        clearTimeout(timer)
+        resolve(res)
+      }).catch((err) => {
+        clearTimeout(timeout)
+        reject(err)
+      })
     })
-    return Promise.race([promise, timeout])
   }
 }

@@ -7,7 +7,7 @@ export default class StatusReport {
 
   log(logger) {
     logger.error(this.description)
-    logger.error(` - expected: ${this.expected}`)
-    logger.warn(` - actual:   ${this.observed}\n`)
+    logger.error(` - local: ${this.expected}`)
+    logger.warn(` - on-chain:   ${this.observed}\n`)
   }
 }
