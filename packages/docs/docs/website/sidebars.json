@@ -8,12 +8,14 @@
       "building",
       "using",
       "developing",
-      "testing",
-      "erc20_onboarding"
+      "testing"
     ],
     "DEMOS": [
       "basil",
       "crafty"
+    ],
+    "ONBOARDING LEGACY CONTRACTS": [
+      "erc20_onboarding"
     ],
     "ZOS-LIB": [
       "libstart",

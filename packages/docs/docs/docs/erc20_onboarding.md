@@ -4,65 +4,68 @@ title: Onboarding ERC20 tokens to ZeppelinOS
 sidebar_label: ERC20 opt-in onboarding
 ---
 
-This guide describes how a legacy ERC20 token can be migrated to an upgradeable ERC20 through ZeppelinOS. 
-This proposal is based on the [opt-in onboarding strategy](https://github.com/zeppelinos/labs/tree/master/migrating_legacy_token_opt_in)
-we've been exploring. 
+## Intro
+This guide covers the migration of a regular ERC20 token to an upgradeable version of itself. During this process, the 
+original contract (to be called "legacy") and the new contract, which will have the ability of being upgradeable, will coexist.
+ 
+The _new upgradable contract_ will have the same functionality provided by the _legacy_ contract, but it will be 
+*upgradable*. This means that we will be able to add new functionality, store new data, fix bugs or support new 
+standards as many times as we need, without any need to perform new migrations in the future.  
  
 ## Strategy
 
 This strategy is based on an optional migration of the token balances. This migration is performed and paid by the 
-token holders. The new token contract starts with no initial supply and no balances. The only way to "mint" the new 
-tokens is for users to "turn in" their old ones. This is done by first approving the amount they want to migrate via 
-`ERC20.approve(newTokenAddress, amountToMigrate)` and then calling a function of the new token called `migrateToken`. 
-The old tokens are sent to a burn address, and the holder receives an equal amount in the new contract.
+token holders. The new upgradeable token contract starts with no initial supply and no balances. The only way to "mint" 
+the new tokens is for users to "turn in" their old ones. This is done by first approving the amount they want to migrate, 
+and then calling a function of the upgradeable token to carry out the migration. The old tokens are sent to a burn 
+address, and the holder receives an equal amount in the new token contract.
 
-This is one of the two strategies explored by the ZeppelinOS dev team. To read more about them please visit our [labs 
-repository](https://github.com/zeppelinos/labs)
+This proposal is based on one of the two strategies explored by the ZeppelinOS dev team. To read more about them please 
+visit our [labs repository](https://github.com/zeppelinos/labs).
 
-## Assumptions
+## Requirements
 
 This on-boarding plan considers the following assumptions:
 - There is an already deployed token contract that follows the ERC20 standard.
-- The token contract is not frozen or paused, so token holders can trade it.
+- The legacy token contract is not frozen or paused, so token holders can trade it.
 
-## Onboarding plan
+## Onboarding plan demo
 
-The idea of this proposal is to use the command line tool of ZeppelinOS to deploy a new upgradeable version of your 
-token contract. To do so, we will use a migration contract provided by the [OpenZeppelin standard library for ZeppelinOS](https://github.com/OpenZeppelin/openzeppelin-solidity/tree/zos-release).
+The central idea of this proposal is to deploy an upgradeable version of your token, using the ZeppelinOS command line 
+tool. To do so, we will use a migration contract provided by the [OpenZeppelin standard library for ZeppelinOS](https://github.com/OpenZeppelin/openzeppelin-solidity/tree/zos-release).
 
-We will deploy a sample old ERC20 token manually, and then we are going to start a ZeppelinOS project linked to the 
-OpenZeppelin stdlib in order to deploy our new upgradeable token.   
+To better describe this plan we will use a sample project you can follow and clone from [here](https://github.com/zeppelinos/erc20-opt-in-onboarding).
 
->**Caveat:** *The migration contract is not yet released in OpenZeppelin, but will be soon. In the meantime, this repository includes 
-such implementation to make things easier for the demonstration. You will see an `OptInERC20Migration` contract inside 
-the contracts folder.*
+>**Caveat:** *The migration contract is not yet released in the OpenZeppelin stdlib, but will be soon. In the meantime, 
+the sample repository we will use includes such implementation to make things easier for the demonstration. You will see 
+a [`MigratableERC20`](https://github.com/zeppelinos/erc20-opt-in-onboarding/blob/master/contracts/openzeppelin-zos/MigratableERC20.sol)
+contract inside the contracts folder.*
 
-## Onboarding plan demonstration
+We will now setup a local environment to demo the onboarding plan. To do this, we will deploy a 
+sample legacy token contract and mint some balances. If you wish to work with your already deployed token, you can skip 
+the following lines and jump directly to the [step 1](erc20_onboarding.html#1-initialize-your-migration-project-with-zeppelinos). 
 
-To describe this plan we will use a sample project you can follow and clone from [here](https://github.com/zeppelinos/erc20-opt-in-onboarding).
+In the sample repository you will find a contract called [`MyLegacyToken`](https://github.com/zeppelinos/erc20-opt-in-onboarding/blob/master/contracts/MyLegacyToken.sol) 
+that we will use to simulate a real scenario locally. As you can see, this token will mint 100 tokens to the owner once 
+initialized just for testing purpose.
 
-### 1. Deploy your old ERC20 token contract
+_Before we begin, remember to install the dependencies running `npm install`. Additionally, you should check everything 
+is working as expected by running the test files with `npm test`._ 
 
-In that repository you will find just one contract called `MyOldToken` which intends to be the old regular ERC20 
-token implementation. As you can see, we are using the `StandardToken` contract provided by OpenZeppelin. 
-
-Before we begin, remember to clone it and install the dependencies running `npm install`. Additionally, you could check 
-everything is working as expected by running the test files with `npm test`. 
-
-Now, let's deploy the old token. We will use a truffle development console. You can start it by running 
+Now, let's deploy the legacy token. We will use a truffle development console. You can start it by running 
 `npx truffle develop`. Then, run the following commands:
 
 ```sh
 truffle(develop)> compile
 truffle(develop)> owner = web3.eth.accounts[1]
-truffle(develop)> MyOldToken.new('MyToken', 'MTK', 18, 100, { from: owner }).then(i => legacyToken = i)
+truffle(develop)> MyLegacyToken.new('MyToken', 'MTK', 18, { from: owner }).then(i => legacyToken = i)
 truffle(develop)> legacyToken.address
 '0x...'
 ```
 
 Keep track of the `owner` and `legacyToken` addresses, we will need them in the following steps.
 
-You can check the old token balance by running:
+You can check the owner balance by running:
 ```sh
 truffle(develop)> legacyToken.balanceOf(owner)
 BigNumber { s: 1, e: 0, c: [ 100 ] }
@@ -70,104 +73,112 @@ BigNumber { s: 1, e: 0, c: [ 100 ] }
 
 Remember not to close this console, as we will be using it later.
 
-### 2. Initialize your ZeppelinOS project
+### 1. Initialize your migration project with ZeppelinOS 
 
 If you haven't installed the ZeppelinOS CLI, run the following command in your terminal:
 ```sh
 npm install --global zos
 ```
 
-To initialize a ZeppelinOS project, open a terminal and run the following lines:
+To initialize this project with ZeppelinOS, open a terminal and run the following line:
 
 ```sh
-zos init erc20-opt-in-on-boarding 1.0.0
-zos link openzeppelin-zos@1.9.1
-zos add OptInERC20Migration
+zos init my-token-migration 1.0.0
 ```
 
-We just initialized a new ZeppelinOS project linked to the OpenZeppelin stdlib and added the migration contract.
-You should see a new `zos.json` file with the following content:
+We have just initialized a new ZeppelinOS project. A new `zos.json` file should have been created. 
 
-```json
-{
-  "name": "erc20-opt-in-on-boarding",
-  "version": "1.0.0",
-  "contracts": {
-    "OptInERC20Migration": "OptInERC20Migration"
-  },
-  "stdlib": {
-    "name": "openzeppelin-zos",
-    "version": "1.9.1"
+Next, we will have to modify the legacy token contract to get the new upgradeable version of it where the current balances
+are going to be migrated. 
+
+In our sample project, you will find another contract called [`MyUpgradeableToken`](https://github.com/zeppelinos/erc20-opt-in-onboarding/blob/master/contracts/MyUpgradeableToken.sol) 
+which is the upgradeable version of the sample legacy token contract [`MyLegacyToken`](https://github.com/zeppelinos/erc20-opt-in-onboarding/blob/master/contracts/MyLegacyToken.sol):
+
+```solidity
+import "./openzeppelin-zos/MigratableERC20.sol";
+import "openzeppelin-zos/contracts/token/ERC20/DetailedERC20.sol";
+import "openzeppelin-zos/contracts/token/ERC20/StandardToken.sol";
+
+contract MyUpgradeableToken is MigratableERC20, StandardToken, DetailedERC20 {
+
+  function initialize(ERC20 _legacyToken, string _name, string _symbol, uint8 _decimals)
+  isInitializer("MyUpgradeableToken", "1.0.0")
+  public
+  {
+    MigratableERC20.initialize(_legacyToken);
+    DetailedERC20.initialize(_name, _symbol, _decimals);
+  }
+  
+  function _mint(address _to, uint256 _amount) internal {
+    require(_to != address(0));
+    totalSupply_ = totalSupply_.add(_amount);
+    balances[_to] = balances[_to].add(_amount);
+    emit Transfer(address(0), _to, _amount);
   }
 }
-``` 
+```
 
-### 3. Deploy the new upgradeable ERC20
+On one hand, we are inheriting from the `MigratableERC20` contract provided by the OpenZeppelin stdlib which provides 
+all the migration functionality we will need. The `MigratableERC20` contract requires the implementation to define an
+internal minting function. In this case we are defining one following the `StandardToken` contract. However, this 
+function will be provided built-in in the upcoming version of OpenZeppelin.     
 
-The first thing we have to do is to deploy our contracts' source code. We will also need to deploy a copy of the OpenZeppelin 
-stdlib since we will be working on a local environment. To do so, run the following command:
+On the other hand, it is very important to replicate all the information and functionality that was provided by the 
+legacy token. In this case, we are inheriting from the `StandardToken` contract provided by the OpenZeppelin stdlib to 
+replicate all the functionality of an ERC20 token. And additionally, we are defining an initializer to handle the 
+token metadata.
+
+_Initializers are the way to define constructor functionality for upgradeable contracts in ZeppelinOS. The `isInitializer` 
+modifier will make sure your `initialize` method can only be called once in the whole lifetime of your contract. To 
+read more about this, please go to the [following section](advanced.html#initializers-vs-constructors)_ 
+
+Notice that all the contracts from `openzeppelin-zos` have been adapted for ZeppelinOS compatibility, and should be the 
+ones used when dealing with upgradeable contracts.
+
+Besides allowing us to build upgradeable applications, ZeppelinOS provides on-chain standard libraries. To use an stdlib 
+in our project, we simply need to use the `link` command giving the name of the npm package of the stdlib we want to use. 
+In this case, we will link OpenZeppelin stdlib to be able to use the contracts it provides in our project: 
+
+```sh
+zos link openzeppelin-zos@1.9.1
+```
+
+Finally we can add our upgradeable token contract to the project:
+
+```sh
+zos add MyUpgradeableToken
+```
+
+Great, our project has been linked to the OpenZeppelin stdlib and our `MyUpgradeableToken` has been added.
+
+### 2. Deploy the upgradeable token
+
+The first thing we have to do is to deploy our contract source code. We will also need to deploy a copy of the 
+OpenZeppelin stdlib since we will be working on a local environment. To do so, run the following command:
+
 ```sh
 zos push -n local --deploy-stdlib
 ```
 
-_If the command above fails with `Unknown network local` error, make sure that the `local` network is defined in your `truffle-config.js` config file:_
+We have just deployed the `MyUpgradeableToken` source code and the OpenZeppelin stdlib to the `local` network. A new 
+`zos.local.json` file should have been created.
 
-```js
-// truffle.js
-module.exports = {
-  networks: {
-    local: {
-      host: 'localhost',
-      port: 9545,
-      network_id: '*',
-      gas: 5000000
-    }
-  }
-}
-```
-
-You should now see a new `zos.local.json` file with the following content:
-```json
-{
-  "contracts": {
-    "OptInERC20Migration": {
-      "address": "0x...",
-      "bytecodeHash": "[bytecode hash]"
-    }
-  },
-  "proxies": {},
-  "stdlib": {
-    "address": "0x...",
-    "customDeploy": true,
-    "name": "openzeppelin-zos",
-    "version": "1.9.1"
-  },
-  "app": {
-    "address": "0x..."
-  },
-  "version": "1.0.0",
-  "package": {
-    "address": "0x..."
-  },
-  "provider": {
-    "address": "0x.."
-  }
-}
-```
-
-Now, let's deploy our new upgradeable ERC20 token using ZeppelinOS. Run the following line, replacing `LEGACY_TOKEN_ADDRESS` with the address of `MyOldToken`: 
+Now, let's create a new instance of the upgradeable token using ZeppelinOS. Run the following line, replacing 
+`LEGACY_TOKEN_ADDRESS` with the address of the legacy token contract:
+ 
 ```sh
-zos create OptInERC20Migration --args LEGACY_TOKEN_ADDRESS -n local
+zos create MyUpgradeableToken --args LEGACY_TOKEN_ADDRESS -n local
 ```
 
-Save the new token address outputted by this command, we will need it later.
+Save the upgradeable token address outputted by this command, we will need it later.
 
-Note that the `proxies` section of `zos.local.json` should now include the following, as ZeppelinOS is tracking the proxy you have just created:
+Note that the `proxies` section of `zos.local.json` should now include the following, as ZeppelinOS is tracking the 
+proxy we have just created:
 ```json
 {
   ...,
   "proxies": {
-    "OptInERC20Migration": [
+    "MyUpgradeableToken": [
       {
         "address": "0x...",
         "version": "1.0.0",
@@ -179,18 +190,20 @@ Note that the `proxies` section of `zos.local.json` should now include the follo
 }
 ```
 
-### 4. Migrate your old ERC20 token balance 
+### 3. Migrate your old token balance 
 
-In order to migrate your balance, go back to the truffle develop console and run the following commands, replacing `UPGRADEABLE_TOKEN_ADDRESS` with the proxy address returned by `zos create` in the previous step:
+In order to migrate your balance, go back to the truffle develop console if you have deployed your legacy token locally 
+or open a new one against the network where your legacy token is deployed. Then, run the following commands, replacing 
+`UPGRADEABLE_TOKEN_ADDRESS` with the proxy address returned by `zos create` command of the previous step:
 
 ```sh
-truffle(develop)> token = OptInERC20Migration.at('UPGRADEABLE_TOKEN_ADDRESS')
+truffle(develop)> upgradeableToken = MyUpgradeableToken.at('UPGRADEABLE_TOKEN_ADDRESS')
 truffle(develop)> legacyToken.balanceOf(owner).then(b => balance = b)
-truffle(develop)> legacyToken.approve(token.address, balance, { from: owner })
-truffle(develop)> token.migrate({ from: owner })
+truffle(develop)> legacyToken.approve(upgradeableToken.address, balance, { from: owner })
+truffle(develop)> upgradeableToken.migrate({ from: owner })
 ```
 
-You can now check old token balance:
+We can now check your balance of the legacy token:
 ```sh
 truffle(develop)> legacyToken.balanceOf(owner)
 BigNumber { s: 1, e: 0, c: [ 0 ] }
@@ -203,22 +216,11 @@ truffle(develop)> legacyToken.balanceOf('0x000000000000000000000000000000000000d
 BigNumber { s: 1, e: 0, c: [ 100 ] }
 ```
 
-And the new token balance:
+And the upgradeable token balance:
 
 ```sh
-truffle(develop)> token.balanceOf(owner)
+truffle(develop)> upgradeableToken.balanceOf(owner)
 BigNumber { s: 1, e: 0, c: [ 100 ] }
 ```
 
-
-## Pros & Cons
-
-Pros:
-- Exchange of the legacy token can continue as before, so exchanges don't have to scramble to support the new token version.
-- Users (probably speculators) who don't need/aren't interested in the new functionality don't have to upgrade.
-- If the demand for the upgraded token becomes higher than the legacy token, the market will incentivize speculators to upgrade and exchanges to support the new token/drop support for the old one. Onboarding becomes a more gradual and organic process.
-
-Cons:
-- The token's supply is split amongst two contracts.
-- Requires token users pay for migration gas costs.
-- Assumes the old token contract is not buggy.
+Your legacy token has been migrated to an upgradeable token!
