@@ -1,17 +1,19 @@
+pragma solidity ^0.4.24;
+
 contract WithConstructor {
   uint256 public value;
 
-  function WithConstructor() {
+  constructor() public {
     value = 42;
   }
 
-  function say() pure returns (string) {
+  function say() public pure returns (string) {
     return "WithConstructor";
   }
 }
 
 contract WithFailingConstructor {
-  function WithFailingConstructor() {
+  constructor() public {
     assert(false);
   }
 }

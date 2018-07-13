@@ -20,7 +20,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Changed
 - Set testing environment in tests setup file
-- Update zos-lib to version 1.2.1
+- Update zos-lib to version 1.3.0
+- Update truffle to version 4.1.13
+- Update truffle-core to version 4.1.13
+- Update truffle-config to version 1.0.6
+- Update truffle-workflow-compile to version 1.0.6
 - Rename project param to project-name for init command
 - Improve status command feedback using different logging colors
 

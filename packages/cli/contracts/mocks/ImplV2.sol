@@ -1,4 +1,4 @@
-pragma solidity ^0.4.21;
+pragma solidity ^0.4.24;
 
 import "./ImplV1.sol";
 
@@ -20,7 +20,7 @@ contract AnotherImplV2 is ImplV2 {
 }
 
 contract UnmigratableImplV2 is ImplV2 {
-  function migrate(uint256 newVal) public {
+  function migrate(uint256) public {
     assert(false);
   }
 
