@@ -318,5 +318,22 @@ contract('PackagedApp', ([_, appOwner, packageOwner, directoryOwner, anotherAcco
         })
       })
     })
+
+    describe('changeAdmin', function () {
+      beforeEach(async function () {
+        await this.zeroVersionDirectory.setImplementation(contract, this.implementation_v0, { from: directoryOwner })
+        const { receipt } = await this.app.create(contract)
+        this.logs = decodeLogs(receipt.logs, UpgradeabilityProxyFactory)
+        this.proxyAddress = this.logs.find(l => l.event === 'ProxyCreated').args.proxy
+        this.proxy = await AdminUpgradeabilityProxy.at(this.proxyAddress)
+      })
+
+      it('changes admin of the proxy', async function () {
+        await this.app.changeProxyAdmin(this.proxyAddress, anotherAccount, { from: appOwner });
+        const proxy = Proxy.at(this.proxyAddress);
+        const admin = await proxy.admin();
+        admin.should.be.equal(anotherAccount);
+      });
+    })
   })
 })

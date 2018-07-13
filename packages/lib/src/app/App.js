@@ -97,6 +97,12 @@ export default class App {
     this.version = versionName
   }
 
+  async changeProxyAdmin(proxyAddress, newAdmin) {
+    log.info(`Changing admin for proxy ${proxyAddress} to ${newAdmin}...`)
+    await this._app.changeProxyAdmin(proxyAddress, newAdmin, this.txParams)
+    log.info(` Admin for proxy ${proxyAddress} set to ${newAdmin}`)
+  }
+
   async createProxy(contractClass, contractName, initMethodName, initArgs) {
     if (!contractName) contractName = contractClass.contractName;
     const { receipt } = typeof(initArgs) === 'undefined'

@@ -3,13 +3,14 @@ require('../../setup')
 
 import App from '../../../src/app/App';
 import Contracts from '../../../src/utils/Contracts'
+import Proxy from '../../../src/utils/Proxy';
 
 const AppDirectory = Contracts.getFromLocal('AppDirectory');
 const Impl = Contracts.getFromLocal('Impl');
 const ImplV1 = Contracts.getFromLocal('DummyImplementation');
 const ImplV2 = Contracts.getFromLocal('DummyImplementationV2');
 
-contract('App', function ([_, owner]) {
+contract('App', function ([_, owner, otherAdmin]) {
   const txParams = { from: owner }
   const initialVersion = '1.0';
   const contractName = 'Impl';
@@ -234,6 +235,18 @@ contract('App', function ([_, owner]) {
       });
 
       shouldConnectToStdlib();
+    });
+
+    describe('changeProxyAdmin', function () {
+      beforeEach('setting implementation', setImplementation);
+      beforeEach('create proxy', createProxy);
+
+      it('should change proxy admin', async function () {
+        await this.app.changeProxyAdmin(this.proxy.address, otherAdmin);
+        const proxyWrapper = Proxy.at(this.proxy.address);
+        const actualAdmin = await proxyWrapper.admin();
+        actualAdmin.should.be.eq(otherAdmin);
+      });
     });
   });
 
