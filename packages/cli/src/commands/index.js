@@ -6,10 +6,8 @@ import bump from './bump'
 import upgrade from './upgrade'
 import link from './link'
 import status from './status'
-import pull from './pull'
-import compare from './compare'
 import freeze from './freeze'
 import session from './session'
 import remove from './remove'
 
-export default [init, add, remove, push, create, upgrade, bump, link, status, pull, compare, freeze, session]
+export default [init, add, remove, push, create, upgrade, bump, link, status, freeze, session]

@@ -9,8 +9,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Added
 - Models to wrap and interact with zos package files 
 - Session command in order to specify a network session when running multiple commands
-- Compare command to compare local status with the on-chain one
-- Pull command to fetch remote on-chain status
+- Flag `--fetch` in `status` command retrieve app information directly from the network instead of from the local network file
+- Flag `--fix` in `status` command to update the local network file with information retrieved from the network
 - Write proxy address in contract build files on creation
 - Remove command
 - Add optional transaction timeout parameter to all commands
