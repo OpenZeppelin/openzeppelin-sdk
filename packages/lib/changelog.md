@@ -6,6 +6,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Fix
+- Mark truffle-config as a prod dependency
+
 ## [1.3.0] - 2018-07-13
 
 ### Added
