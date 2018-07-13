@@ -6,12 +6,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [1.3.0] - 2018-07-13
+
 ### Added
 - Support custom Truffle build directories
 - Reason messages to require statements
 - Proxy wrapper object to allow querying proxies' admin and implementation
-- New `changeProxyAdmin` method in App contract and associated javascript model
 - Changelog file
+- New `changeProxyAdmin` method in App contract and associated javascript model
 
 ### Changed
 - Set testing environment in tests setup file
