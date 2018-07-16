@@ -6,14 +6,16 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## v1.1.0
+
 ### Added
-- Models to wrap and interact with zos package files 
-- Session command in order to specify a network session when running multiple commands
+- New `session` command to pin a network, timeout, and sender address
+- New `remove` command to remove a logic contract from a project
 - Flag `--fetch` in `status` command retrieve app information directly from the network instead of from the local network file
 - Flag `--fix` in `status` command to update the local network file with information retrieved from the network
+- Models `ZosPackageFile` and `ZosNetworkFile` to manage zos JSON files 
 - Write proxy address in contract build files on creation
-- Remove command
-- Add optional transaction timeout parameter to all commands
+- Add optional transaction `timeout` parameter to all commands
 - Allow stdlib versions to be specified with npm range syntax
 - Mechanism to ensure no more than one instance of CLI is running simultaneously
 - Changelog file
