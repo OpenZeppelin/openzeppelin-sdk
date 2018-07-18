@@ -12,9 +12,7 @@ const register = program => program
   .alias('rm')
   .usage('[contract1 ... contractN] [options]')
   .description(description)
-  .option('--push [network]', 'push all changes to the specified network after removing')
-  .option('-f, --from <from>', 'specify the transaction sender address for --push')
-  .option('--timeout <timeout>', 'timeout in seconds for blockchain transactions')
+  .withPushOptions()
   .action(action)
 
 async function action(contracts, options) {

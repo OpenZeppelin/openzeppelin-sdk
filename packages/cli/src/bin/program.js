@@ -7,6 +7,8 @@ import { version } from '../../package.json'
 import commands from '../commands'
 import registerErrorHandler from './errors'
 
+require('./options')
+
 commands.forEach(command => command.register(program))
 const maxLength = Math.max(...commands.map(command => command.signature.length))
 

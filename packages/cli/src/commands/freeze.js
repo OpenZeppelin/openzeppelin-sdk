@@ -11,9 +11,7 @@ const register = program => program
   .command(signature, { noHelp: true })
   .usage('--network <network> [options]')
   .description(description)
-  .option('-f, --from <from>', 'specify transaction sender address')
-  .option('-n, --network <network>', 'network to be used')
-  .option('--timeout <timeout>', 'timeout in seconds for blockchain transactions')
+  .withNetworkOptions()
   .action(action)
 
 async function action(options) {

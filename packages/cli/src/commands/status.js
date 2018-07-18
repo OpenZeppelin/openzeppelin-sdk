@@ -13,11 +13,9 @@ const register = program => program
   .command(signature, { noHelp: true })
   .description(description)
   .usage('--network <network>')
-  .option('-n, --network <network>', 'network to be used')
   .option('--fetch', 'retrieve app information directly from the network instead of from the local network file')
   .option('--fix', 'update local network file with information retrieved from the network')
-  .option('--timeout <timeout>', 'timeout in seconds for blockchain transactions')
-  .option('-f, --from <from>', 'specify transaction sender address')
+  .withNetworkOptions()
   .action(action)
 
 async function action(options) {

@@ -13,9 +13,7 @@ const register = program => program
   .description(description)
   .option('--link <stdlib>', 'link to new standard library version')
   .option('--no-install', 'skip installing stdlib dependencies locally')
-  .option('--push [network]', 'push changes to the specified network after bumping version')
-  .option('--timeout <timeout>', 'timeout in seconds for blockchain transactions')
-  .option('-f, --from <from>', 'specify transaction sender address for --push')
+  .withPushOptions()
   .action(action)
 
 async function action(version, options) {

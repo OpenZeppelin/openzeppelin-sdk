@@ -12,12 +12,10 @@ const register = program => program
   .command(signature, {noHelp: true})
   .description(description)
   .usage('--network <network> [options]')
-  .option('-f, --from <from>', 'specify transaction sender address')
-  .option('-n, --network <network>', 'network to be used')
-  .option('--timeout <timeout>', 'timeout in seconds for blockchain transactions')
   .option('--skip-compile', 'skips contract compilation')
   .option('-d, --deploy-stdlib', 'deploys a copy of the stdlib for development')
   .option('--reset', 'redeploys all contracts (not only the ones that changed)')
+  .withNetworkOptions()
   .action(action)
 
 async function action(options) {

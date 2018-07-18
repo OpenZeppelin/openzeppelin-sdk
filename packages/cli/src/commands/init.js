@@ -16,9 +16,7 @@ const register = program => program
   .option('--force', 'overwrite existing project if there is one')
   .option('--link <stdlib>', 'link to a standard library')
   .option('--no-install', 'skip installing stdlib dependencies locally')
-  .option('--push [network]', 'push changes to the specified network')
-  .option('-f, --from <from>', 'specify transaction sender address for --push')
-  .option('--timeout <timeout>', 'timeout in seconds for blockchain transactions')
+  .withPushOptions()
   .action(action)
 
 async function action(name, version, options) {

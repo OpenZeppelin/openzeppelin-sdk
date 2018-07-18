@@ -14,10 +14,8 @@ const register = program => program
   .description(description)
   .option('--init [function]', `call function after creating contract. If none is given, 'initialize' will be used`)
   .option('--args <arg1, arg2, ...>', 'provide initialization arguments for your contract if required')
-  .option('-f, --from <from>', 'specify transaction sender address')
-  .option('-n, --network <network>', 'network to be used')
-  .option('--timeout <timeout>', 'timeout in seconds for blockchain transactions')
   .option('--force', 'force creation even if contracts have local modifications')
+  .withNetworkOptions()
   .action(action)
 
 async function action(contractAlias, options) {

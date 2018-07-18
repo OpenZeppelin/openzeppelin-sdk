@@ -12,9 +12,7 @@ const register = program => program
   .usage('<stdlib> [options]')
   .description(description)
   .option('--no-install', 'skip installing stdlib dependencies locally')
-  .option('--push [network]', 'push changes to the specified network')
-  .option('-f, --from <from>', 'specify transaction sender address for --push')
-  .option('--timeout <timeout>', 'timeout in seconds for blockchain transactions')
+  .withPushOptions()
   .action(action)
 
 async function action(stdlibNameVersion, options) {
