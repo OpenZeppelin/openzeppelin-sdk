@@ -29,3 +29,5 @@ function initTruffle(config) {
     })
   });
 }
+
+module.exports.DEFAULT_TIMEOUT = DEFAULT_TIMEOUT;
