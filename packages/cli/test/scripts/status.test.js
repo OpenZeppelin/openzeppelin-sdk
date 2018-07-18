@@ -164,6 +164,16 @@ contract('status script', function([_, owner]) {
         this.logs.text.should.match(/correctly connected to stdlib/i);
       });
 
+      it('should log connected stdlib when semver requirement matches', async function () {
+        await linkStdlib({ packageFile: this.packageFile, stdlibNameVersion: 'mock-stdlib@^1.0.0', installLib: false });
+        await push({ network, txParams, networkFile: this.networkFile });
+        await status({ network, networkFile: this.networkFile });
+
+        this.logs.text.should.match(/mock-stdlib@\^1\.0\.0 required/i);
+        this.logs.text.should.match(/correctly connected to stdlib/i);
+        this.logs.text.should.match(/1\.1\.0/i);
+      });
+
       it('should log different stdlib connected', async function () {
         await push({ network, txParams, networkFile: this.networkFile });
         await linkStdlib({ packageFile: this.packageFile, stdlibNameVersion: 'mock-stdlib-2@1.2.0', installLib: false });
@@ -181,7 +191,7 @@ contract('status script', function([_, owner]) {
         this.logs.text.should.match(/custom deploy of stdlib set at 0x[0-9a-fA-F]{40}/i);
       });
 
-      it('should log different stdlib connected', async function () {
+      it('should log different stdlib deployed', async function () {
         await push({ network, txParams, deployStdlib: true, networkFile: this.networkFile });
         await linkStdlib({ packageFile: this.packageFile, stdlibNameVersion: 'mock-stdlib-2@1.2.0', installLib: false });
         await status({ network, networkFile: this.networkFile });

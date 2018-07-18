@@ -1,6 +1,7 @@
 import _ from 'lodash'
 import { Logger, FileSystem as fs } from 'zos-lib'
 import { bytecodeDigest, bodyCode, constructorCode } from '../../utils/contracts'
+import Stdlib from '../stdlib/Stdlib';
 
 const log = new Logger('ZosNetworkFile')
 
@@ -140,12 +141,11 @@ export default class ZosNetworkFile {
   }
 
   hasMatchingCustomDeploy() {
-    return this.hasCustomDeploy() && this.packageFile.hasStdlib(this.stdlib)
+    return this.hasCustomDeploy() && this.packageFile.stdlibMatches(this.stdlib)
   }
 
-  hasStdlib(stdlib = undefined) {
-    if(stdlib === undefined) return !_.isEmpty(this.stdlib)
-    return this.stdlib.name === stdlib.name && this.stdlib.version === stdlib.version
+  hasStdlib() {
+    return !_.isEmpty(this.stdlib)
   }
 
   hasSameBytecode(alias, klass) {

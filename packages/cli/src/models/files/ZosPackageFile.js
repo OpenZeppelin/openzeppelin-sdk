@@ -1,6 +1,7 @@
 import _ from 'lodash'
 import ZosNetworkFile from './ZosNetworkFile'
 import { Logger, FileSystem as fs } from 'zos-lib'
+import Stdlib from '../stdlib/Stdlib';
 
 const log = new Logger('ZosPackageFile')
 
@@ -60,8 +61,14 @@ export default class ZosPackageFile {
   }
 
   hasStdlib(stdlib = undefined) {
-    if(stdlib === undefined) return !_.isEmpty(this.stdlib)
-    return this.stdlib.name === stdlib.name && this.stdlib.version === stdlib.version
+    if (stdlib !== undefined) return this.stdlibMatches(stdlib);
+    return !_.isEmpty(this.stdlib)
+  }
+
+  stdlibMatches(stdlib) {
+    return _.isEmpty(this.stdlib) === _.isEmpty(stdlib)
+      && this.stdlib.name === stdlib.name 
+      && Stdlib.satisfiesVersion(stdlib.version, this.stdlib.version)
   }
 
   isCurrentVersion(version) {

@@ -100,8 +100,8 @@ async function stdlibInfo(networkFile) {
     log.info(`- Custom deploy of stdlib set at ${networkFile.stdlibAddress}`);
   } else if (networkFile.hasCustomDeploy()) {
     log.info(`- Custom deploy of different stdlib ${networkFile.stdlibName}@${networkFile.stdlibVersion} at ${networkFile.stdlibAddress}`);
-  } else if (packageFile.hasStdlib(networkFile.stdlib)) {
-    log.info(`- Deployed application is correctly connected to stdlib`);
+  } else if (packageFile.stdlibMatches(networkFile.stdlib)) {
+    log.info(`- Deployed application is correctly connected to stdlib ${networkFile.stdlibName}@${networkFile.stdlibVersion}`);
   } else {
     log.warn(`- Deployed application is connected to different stdlib ${networkFile.stdlibName}@${networkFile.stdlibVersion}`);
   }

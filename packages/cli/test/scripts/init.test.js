@@ -55,7 +55,7 @@ contract('init script', function() {
 
       this.packageFile.stdlibName.should.eq('mock-stdlib');
       this.packageFile.stdlibVersion.should.eq('1.1.0');
-      this.packageFile.hasStdlib({ name: 'mock-stdlib', version: '1.1.0'}).should.be.true;
+      this.packageFile.stdlibMatches({ name: 'mock-stdlib', version: '1.1.0'}).should.be.true;
     });
 
     it('should not overwrite existing file by default', async function () {

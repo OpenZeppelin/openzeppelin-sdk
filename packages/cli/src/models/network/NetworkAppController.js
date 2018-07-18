@@ -155,7 +155,7 @@ export default class NetworkAppController extends NetworkBaseController {
       return
     }
 
-    const customDeployMatches = this.networkFile.hasCustomDeploy() && this.packageFile.hasStdlib(this.networkFile.stdlib)
+    const customDeployMatches = this.networkFile.hasCustomDeploy() && this.packageFile.stdlibMatches(this.networkFile.stdlib)
     if (customDeployMatches) {
       log.info(`Using existing custom deployment of stdlib at ${this.networkFile.stdlibAddress}`);
       return this.app.setStdlib(this.networkFile.stdlibAddress);
