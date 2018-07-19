@@ -95,7 +95,7 @@ zos push --network local
 Finally, let's upgrade the already deployed contract with the new code:
 
 ```sh
-zos upgrade MyContract --network local
+zos update MyContract --network local
 ```
 This command outputs the address of your upgradeable MyContract instance (in white).
 
