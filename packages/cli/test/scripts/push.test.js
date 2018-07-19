@@ -258,6 +258,18 @@ contract('push script', function([_, owner]) {
           .should.be.rejectedWith('Required stdlib version 1.0.0 does not match stdlib package version 3.0.0')
       });
     })
+
+    describe('when using an undeployed stdlib', function () {
+      beforeEach('building network file', async function () {
+        const packageFile = new ZosPackageFile('test/mocks/packages/package-with-undeployed-stdlib.zos.json')
+        this.networkFile = packageFile.networkFile(network)
+      });
+
+      it('should set address in network file', async function () {
+        await push({ network, txParams, networkFile: this.networkFile })
+          .should.be.rejectedWith(/Could not find a zos file for network 'test' for the requested stdlib/)
+      });
+    })
   });
 
   describe('an empty lib', function() {
