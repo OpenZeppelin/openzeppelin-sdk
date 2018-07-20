@@ -2,6 +2,7 @@
 
 import Logger from '../utils/Logger'
 import Contracts from '../utils/Contracts'
+import { deploy, sendTransaction } from '../utils/Transactions'
 import decodeLogs from '../helpers/decodeLogs'
 import encodeCall from '../helpers/encodeCall'
 
@@ -65,33 +66,33 @@ export default class App {
 
   async setImplementation(contractClass, contractName) {
     log.info(`Setting implementation of ${contractName} in directory...`)
-    const implementation = await contractClass.new(this.txParams)
+    const implementation = await deploy(contractClass, [], this.txParams)
     const directory = this.currentDirectory()
-    await directory.setImplementation(contractName, implementation.address, this.txParams)
+    await sendTransaction(directory.setImplementation, [contractName, implementation.address], this.txParams)
     log.info(` Implementation set: ${implementation.address}`)
     return implementation
   }
 
   async unsetImplementation(contractName) {
     log.info(`Unsetting implementation of ${contractName} in directory...`)
-    await this.currentDirectory().unsetImplementation(contractName, this.txParams)
+    await sendTransaction(this.currentDirectory().unsetImplementation, [contractName], this.txParams)
     log.info(`Implementation unset`)
   }
 
   async setStdlib(stdlibAddress = 0x0) {
     log.info(`Setting stdlib ${stdlibAddress}...`)
-    await this.currentDirectory().setStdlib(stdlibAddress, this.txParams)
+    await sendTransaction(this.currentDirectory().setStdlib, [stdlibAddress], this.txParams)
     return stdlibAddress
   }
 
   async newVersion(versionName, stdlibAddress = 0) {
     log.info(`Adding version ${versionName}...`)
     const AppDirectory = Contracts.getFromLib('AppDirectory')
-    const directory = await AppDirectory.new(stdlibAddress, this.txParams)
+    const directory = await deploy(AppDirectory, [stdlibAddress], this.txParams)
     log.info(` App directory: ${directory.address}`)
-    await this.package.addVersion(versionName, directory.address, this.txParams)
+    await sendTransaction(this.package.addVersion, [versionName, directory.address], this.txParams)
     log.info(` Added version: ${versionName}`)
-    await this._app.setVersion(versionName, this.txParams)
+    await sendTransaction(this._app.setVersion, [versionName], this.txParams)
     log.info(` Version set`)
     this.directories[versionName] = directory
     this.version = versionName
@@ -99,7 +100,7 @@ export default class App {
 
   async changeProxyAdmin(proxyAddress, newAdmin) {
     log.info(`Changing admin for proxy ${proxyAddress} to ${newAdmin}...`)
-    await this._app.changeProxyAdmin(proxyAddress, newAdmin, this.txParams)
+    await sendTransaction(this._app.changeProxyAdmin, [proxyAddress, newAdmin], this.txParams)
     log.info(` Admin for proxy ${proxyAddress} set to ${newAdmin}`)
   }
 
@@ -127,7 +128,7 @@ export default class App {
 
   async _createProxy(contractName) {
     log.info(`Creating ${contractName} proxy without initializing...`)
-    return this._app.create(contractName, this.txParams)
+    return sendTransaction(this._app.create, [contractName], this.txParams)
   }
 
   async _createProxyAndCall(contractClass, contractName, initMethodName, initArgs) {    
@@ -135,12 +136,12 @@ export default class App {
     const initArgTypes = initMethod.inputs.map(input => input.type)
     log.info(`Creating ${contractName} proxy and calling ${this._callInfo(initMethod, initArgs)}`)
     const callData = encodeCall(initMethodName, initArgTypes, initArgs)
-    return this._app.createAndCall(contractName, callData, this.txParams)
+    return sendTransaction(this._app.createAndCall, [contractName, callData], this.txParams)
   }
 
   async _upgradeProxy(proxyAddress, contractName) {
     log.info(`Upgrading ${contractName} proxy without running migrations...`)
-    return this._app.upgrade(proxyAddress, contractName, this.txParams)
+    return sendTransaction(this._app.upgrade, [proxyAddress, contractName], this.txParams)
   }
 
   async _upgradeProxyAndCall(proxyAddress, contractClass, contractName, initMethodName, initArgs) {
@@ -148,7 +149,7 @@ export default class App {
     const initArgTypes = initMethod.inputs.map(input => input.type)
     log.info(`Upgrading ${contractName} proxy and calling ${this._callInfo(initMethod, initArgs)}...`)
     const callData = encodeCall(initMethodName, initArgTypes, initArgs)
-    return this._app.upgradeAndCall(proxyAddress, contractName, callData, this.txParams)
+    return sendTransaction(this._app.upgradeAndCall, [proxyAddress, contractName, callData], this.txParams)
   }
 
   _validateInitMethod(contractClass, initMethodName, initArgs) {

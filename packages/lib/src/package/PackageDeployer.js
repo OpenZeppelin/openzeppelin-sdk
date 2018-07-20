@@ -1,5 +1,6 @@
 import Package from './Package'
 import Contracts from '../utils/Contracts'
+import { deploy, sendTransaction } from '../utils/Transactions'
 
 export default class PackageDeployer {
   constructor(txParams = {}) {
@@ -13,6 +14,6 @@ export default class PackageDeployer {
 
   async _createPackage() {
     const Package = Contracts.getFromLib('Package')
-    this.package = await Package.new(this.txParams)
+    this.package = await deploy(Package, [], this.txParams)
   }
 }

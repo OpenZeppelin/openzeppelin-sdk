@@ -10,6 +10,7 @@ import Proxy from './utils/Proxy'
 import Logger from './utils/Logger'
 import FileSystem from './utils/FileSystem'
 import Contracts from './utils/Contracts'
+import { sendTransaction, deploy } from './utils/Transactions'
 
 // test behaviors
 import { behaviors, helpers } from './test'
@@ -28,6 +29,8 @@ export {
   assertRevert,
   assertions,
   behaviors,
+  sendTransaction,
+  deploy,
   Proxy,
   Logger,
   FileSystem,

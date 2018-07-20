@@ -1,5 +1,6 @@
 import Logger from '../utils/Logger'
 import Contracts from '../utils/Contracts'
+import { deploy, sendTransaction } from '../utils/Transactions'
 
 import PackageDeployer from './PackageDeployer'
 import PackageProvider from './PackageProvider'
@@ -28,7 +29,7 @@ export default class Package {
   }
 
   async hasVersion(version) {
-    return await this.package.hasVersion(version, this.txParams)
+    return await this.package.hasVersion(version)
   }
 
   async getRelease(version) {
@@ -40,8 +41,8 @@ export default class Package {
   async newVersion(version) {
     log.info('Adding new version...')
     const Release = Contracts.getFromLib('Release')
-    const release = await Release.new(this.txParams)
-    await this.package.addVersion(version, release.address, this.txParams)
+    const release = await deploy(Release, [], this.txParams)
+    await sendTransaction(this.package.addVersion, [version, release.address], this.txParams)
     log.info(' Added version:', version)
     return release
   }
@@ -54,7 +55,7 @@ export default class Package {
   async freeze(version) {
     log.info('Freezing new version...')
     const release = await this.getRelease(version)
-    await release.freeze(this.txParams)
+    await sendTransaction(release.freeze, [], this.txParams)
     log.info(' Release frozen')
   }
 
@@ -65,9 +66,9 @@ export default class Package {
 
   async setImplementation(version, contractClass, contractName) {
     log.info(`Setting implementation of ${contractName} in version ${version}...`)
-    const implementation = await contractClass.new(this.txParams)
+    const implementation = await deploy(contractClass, [], this.txParams)
     const release = await this.getRelease(version)
-    await release.setImplementation(contractName, implementation.address, this.txParams)
+    await sendTransaction(release.setImplementation, [contractName, implementation.address], this.txParams)
     log.info(` Implementation set: ${implementation.address}`)
     return implementation
   }
@@ -75,7 +76,7 @@ export default class Package {
   async unsetImplementation (version, contractName) {
     log.info(`Unsetting implementation of ${contractName} in version ${version}...`)
     const release = await this.getRelease(version)
-    await release.unsetImplementation(contractName, this.txParams)
+    await sendTransaction(release.unsetImplementation, [contractName], this.txParams)
     log.info(`Implementation unset for ${contractName} in version ${version}`)
   };
 }
