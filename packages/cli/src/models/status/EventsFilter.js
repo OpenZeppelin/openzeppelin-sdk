@@ -28,7 +28,7 @@ export default class EventsFilter {
         clearTimeout(timer)
         resolve(res)
       }).catch((err) => {
-        clearTimeout(timeout)
+        clearTimeout(timer)
         reject(err)
       })
     })
