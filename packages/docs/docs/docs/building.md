@@ -92,7 +92,7 @@ Once you have saved the changes in your contract files, simply push the new code
 zos push --network local
 ```
 
-Finally, let's upgrade the already deployed contract with the new code:
+Finally, let's update the already deployed contract with the new code:
 
 ```sh
 zos update MyContract --network local
@@ -104,7 +104,7 @@ _Voilà!_ You have deployed and upgraded an application using ZeppelinOS. The ad
 To try the upgraded feature we just added, run:
 ```sh
 npx truffle console --network=local
-truffle(local)> myContract = MyContract.at(<your-instance-address>)
+truffle(local)> myContract = MyContract.at(<your-proxy-address>)
 truffle(local)> myContract.increment()
 truffle(local)> myContract.x()
 43

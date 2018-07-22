@@ -219,10 +219,10 @@ This will print the address of the deployed Basil contract. Let's export this va
 export BASIL_ADDRESS=<address>
 ```
 
-Now, to upgrade our proxy:
+Now, to update our proxy:
 
 ```sh
-zos upgrade Basil --from $OWNER --network local
+zos update Basil --from $OWNER --network local
 ```
 
 By now, Basil's proxy will use the new implementation, but it will revert on every donation because it's token is not set. We'll do that next.
