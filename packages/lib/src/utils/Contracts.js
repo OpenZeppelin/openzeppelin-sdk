@@ -16,6 +16,10 @@ const DEFAULT_COVERAGE_TX_PARAMS = {
 let syncTimeout = 240000;
 
 export default {
+  getSyncTimeout() {
+    return syncTimeout;
+  },
+
   setSyncTimeout(value) {
     syncTimeout = value;
   },

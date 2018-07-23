@@ -131,6 +131,60 @@ contract('App', function ([_, owner, otherAdmin]) {
       })
     })
 
+    describe('createContract', function () {
+      beforeEach('setting implementation', setImplementation);
+
+      const shouldReturnANonUpgradeableInstance = function () {
+        it('should return a non-upgradeable instance', async function () {
+          this.instance.address.should.be.not.null;
+          (await this.instance.version()).should.be.eq('V1');
+          (await web3.eth.getCode(this.instance.address)).should.be.eq(ImplV1.deployedBytecode)
+        });
+      };
+
+      describe('without initializer', function () {
+        beforeEach('creating a non-upgradeable instance', async function () {
+          this.instance = await this.app.createContract(ImplV1, contractName);
+        });
+
+        shouldReturnANonUpgradeableInstance();
+      });
+
+      describe('with initializer', function () {
+        beforeEach('creating a proxy', async function () {
+          this.instance = await this.app.createContract(ImplV1, contractName, 'initialize', [10]);
+        });
+
+        shouldReturnANonUpgradeableInstance();
+
+        it('should have initialized the instance', async function () {
+          (await this.instance.value()).toNumber().should.eq(10);
+        });
+      });
+
+      describe('with complex initializer', function () {
+        beforeEach('creating a non-upgradeable instance', async function () {
+          this.instance = await this.app.createContract(ImplV1, contractName, 'initialize', [10, "foo", []]);
+        });
+
+        shouldReturnANonUpgradeableInstance();
+
+        it('should have initialized the proxy', async function () {
+          (await this.instance.value()).toNumber().should.eq(10);
+          (await this.instance.text()).should.eq("foo");
+          await this.instance.values(0).should.be.rejected;
+        });
+      });
+
+      describe('with implicit contract name', async function () {
+        beforeEach('creating a non-upgradeable instance', async function () {
+          this.instance = await this.app.createContract(Impl);
+        });
+
+        shouldReturnANonUpgradeableInstance();
+      });
+    });
+
     const createProxy = async function () {
       this.proxy = await this.app.createProxy(ImplV1, contractName);
     };

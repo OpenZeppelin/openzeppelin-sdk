@@ -50,20 +50,23 @@ export async function deploy(contract, args = [], txParams = {}) {
   // Get raw binary transaction for creating the contract
   const txOpts = { data: contract.binary, ... txParams };
   const txData = web3.eth.contract(contract.abi).new.getData(...args, txOpts);
-  
+
+  // Deploy the contract using estimated gas
+  const estimatedGas = await estimateGas(txData, txParams)
+  const gasToUse = await calculateActualGas(estimatedGas);
+  return contract.new(...args, { gas: gasToUse, ... txParams });
+}
+
+export async function estimateGas(txData, txParams) {
   // Use json-rpc method estimateGas to retrieve estimated value
-  const estimatedGas = await new Promise((resolve, reject) => {
-    web3.eth.estimateGas({ data: txData, ... txParams }, 
+  return new Promise((resolve, reject) => {
+    web3.eth.estimateGas({ data: txData, ... txParams },
       function(err, gas) {
         if (err) reject(err);
         else resolve(gas);
       }
     );
   });
-
-  // Deploy the contract using estimated gas
-  const gasToUse = await calculateActualGas(estimatedGas);
-  return contract.new(...args, { gas: gasToUse, ... txParams });
 }
 
 function getNodeVersion () {
