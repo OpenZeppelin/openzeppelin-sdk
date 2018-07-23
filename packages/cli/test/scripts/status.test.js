@@ -131,7 +131,7 @@ contract('status script', function([_, owner]) {
         await remove({ contracts: [contractAlias], packageFile: this.packageFile });
         await status({ network, networkFile: this.networkFile });
 
-        this.logs.text.should.match(/pending to be removed/i);
+        this.logs.text.should.match(/will be removed/i);
       });    
     });
   };

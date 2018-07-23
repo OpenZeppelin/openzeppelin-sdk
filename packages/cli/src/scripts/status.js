@@ -78,7 +78,7 @@ async function contractsInfo(controller) {
 
   // Log contracts in network file missing from package file
   controller.networkFile.contractAliasesMissingFromPackage()
-    .forEach(contractAlias => log.warn(`- ${contractAlias} is pending to be removed`));
+    .forEach(contractAlias => log.warn(`- ${contractAlias} will be removed on next push`));
 }
 
 async function stdlibInfo(networkFile) {
