@@ -27,7 +27,7 @@ contract DummyImplementation {
     return "V1";
   }
 
-  function reverts() public {
+  function reverts() public pure {
     require(false);
   }
 }

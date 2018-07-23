@@ -8,7 +8,7 @@ pragma solidity ^0.4.24;
  */
 contract ClashingImplementation {
 
-  function admin() external returns (address) {
+  function admin() external pure returns (address) {
     return 0x0000000000000000000000000000000011111142;
   }
 

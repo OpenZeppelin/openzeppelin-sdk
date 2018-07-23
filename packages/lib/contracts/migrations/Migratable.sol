@@ -87,7 +87,7 @@ contract Migratable {
    * @param contractName Name of the contract.
    * @param migrationId Identifier of the migration.
    */
-  function validateMigrationIsPending(string contractName, string migrationId) private {
+  function validateMigrationIsPending(string contractName, string migrationId) private view {
     require(!isMigrated(contractName, migrationId), "Requested target migration ID has already been run");
   }
 }
