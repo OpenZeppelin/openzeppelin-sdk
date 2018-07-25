@@ -6,7 +6,6 @@ import testApp from '../../src/models/TestApp';
 import ZosPackageFile from "../../src/models/files/ZosPackageFile";
 
 const ImplV1 = Contracts.getFromLocal('ImplV1');
-const ImplV2 = Contracts.getFromLocal('ImplV2');
 
 contract('TestApp', function ([_, owner]) {
   const txParams = { from: owner }
@@ -15,7 +14,7 @@ contract('TestApp', function ([_, owner]) {
   beforeEach("deploying all contracts", async function () {
     this.packageFile = new ZosPackageFile('test/mocks/packages/package-with-contracts-and-stdlib.zos.json')
     this.networkFile = this.packageFile.networkFile('test')
-    this.app = await testApp(this.networkFile, txParams)
+    this.app = await testApp(txParams, this.networkFile)
     this.directory = this.app.currentDirectory();
   });
 
