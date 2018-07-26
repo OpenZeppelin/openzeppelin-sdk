@@ -4,6 +4,8 @@
 // but is only part of the next branch in truffle, so we are handling it manually.
 // (see https://github.com/trufflesuite/truffle-contract/pull/95/files#diff-26bcc3534c5a2e62e22643287a7d3295R145)
 
+import { promisify } from 'util'
+
 // Store last block for gasLimit information
 const state = { };
 
@@ -59,14 +61,7 @@ export async function deploy(contract, args = [], txParams = {}) {
 
 export async function estimateGas(txData, txParams) {
   // Use json-rpc method estimateGas to retrieve estimated value
-  return new Promise((resolve, reject) => {
-    web3.eth.estimateGas({ data: txData, ... txParams },
-      function(err, gas) {
-        if (err) reject(err);
-        else resolve(gas);
-      }
-    );
-  });
+  return promisify(web3.eth.estimateGas.bind(web3.eth))({ data: txData, ... txParams });
 }
 
 function getNodeVersion () {
@@ -82,16 +77,8 @@ function isGanacheNode () {
 
 async function getBlockGasLimit () {
   if (state.block) return state.block.gasLimit;
-  return new Promise((resolve, reject) => {
-    web3.eth.getBlock('latest', (err, data) => {
-      if (err) {
-        reject(err);
-      } else {
-        state.block = data;
-        resolve(state.block.gasLimit);
-      }
-    });
-  });
+  state.block = await promisify(web3.eth.getBlock.bind(web3.eth))('latest');
+  return state.block.gasLimit;
 }
 
 async function calculateActualGas(estimatedGas) {

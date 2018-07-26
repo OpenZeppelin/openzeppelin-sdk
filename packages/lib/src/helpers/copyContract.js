@@ -1,3 +1,5 @@
+import { promisify } from 'util'
+
 import Contracts from '../utils/Contracts'
 import { estimateGas } from '../utils/Transactions'
 
@@ -8,15 +10,9 @@ function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms))
 }
 
-function callback(resolve, reject) {
-  return (error, result) => error ? reject(error) : resolve(result)
-}
-
 async function sendTransaction(params) {
   if (!params.gas) params.gas = await estimateGas(params.data, params)
-  return new Promise(function (resolve, reject) {
-    web3.eth.sendTransaction(params, callback(resolve, reject))
-  })
+  return promisify(web3.eth.sendTransaction.bind(web3.eth))(params)
 }
 
 async function getTransactionReceipt(txHash) {
@@ -24,9 +20,7 @@ async function getTransactionReceipt(txHash) {
   const timer = setTimeout(() => timeout = true, Contracts.getSyncTimeout())
 
   while(!timeout) {
-    const receipt = await new Promise((resolve, reject) =>
-      web3.eth.getTransactionReceipt(txHash, callback(resolve, reject))
-    )
+    const receipt = await promisify(web3.eth.getTransactionReceipt.bind(web3.eth))(txHash)
     if (receipt) {
       clearTimeout(timer)
       return receipt

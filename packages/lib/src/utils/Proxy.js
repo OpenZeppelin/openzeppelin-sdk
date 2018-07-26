@@ -1,3 +1,5 @@
+import { promisify } from 'util'
+
 export default class Proxy {
   static at(address) {
     return new Proxy(address)
@@ -18,6 +20,6 @@ export default class Proxy {
   }
 
   async getStorageAt(position) {
-    return web3.eth.getStorageAt(this.address, position)
+    return promisify(web3.eth.getStorageAt.bind(web3.eth))(this.address, position)
   }
 }
