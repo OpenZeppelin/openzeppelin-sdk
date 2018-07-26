@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Changed
 - Contract deployments and transactions are executed with an estimate of the gas needed, instead of using the network default ([#211](https://github.com/zeppelinos/zos-lib/pull/211))
+- Promisify all web3 function calls ([#205](https://github.com/zeppelinos/zos-lib/issues/205)) 
 
 ### Fix
 - Mark truffle-config as a prod dependency
