@@ -2,9 +2,9 @@ import _ from 'lodash';
 import stdout from '../utils/stdout';
 import ControllerFor from '../models/network/ControllerFor'
 
-export default async function upgradeProxy({ contractAlias, proxyAddress, initMethod, initArgs, all, network, force = false, txParams = {}, networkFile = undefined}) {
+export default async function update({ contractAlias, proxyAddress, initMethod, initArgs, all, network, force = false, txParams = {}, networkFile = undefined}) {
   if (!contractAlias && !all) {
-    throw Error('The contract name to upgrade must be provided, or explicit upgrading all proxies in the application.')
+    throw Error('The contract name to update must be provided, or explicit upgrading all proxies in the application.')
   }
 
   const controller = new ControllerFor(network, txParams, networkFile)
