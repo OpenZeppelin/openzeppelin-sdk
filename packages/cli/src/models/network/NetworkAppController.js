@@ -189,6 +189,15 @@ export default class NetworkAppController extends NetworkBaseController {
     return super.isContractDefined(contractAlias) || this.isStdlibContract(contractAlias);
   }
 
+  _errorForLocalContractDeployed(contractAlias) {
+    const baseErr = super._errorForLocalContractDeployed(contractAlias);
+    if (baseErr) {
+      return baseErr;
+    } else if (this.isStdlibContract(contractAlias) && !this.networkFile.hasStdlib()) {
+      return `Contract ${contractAlias} is provided by ${this.packageFile.stdlibName} but it was not deployed to the network, consider running \`zos push\``;
+    }
+  }
+
   _updateTruffleDeployedInformation(contractAlias, implementation) {
     const contractName = this.packageFile.contract(contractAlias)
     if (contractName) {

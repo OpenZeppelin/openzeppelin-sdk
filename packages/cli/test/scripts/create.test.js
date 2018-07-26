@@ -71,7 +71,7 @@ contract('create script', function([_, owner]) {
 
   it('should refuse to create a proxy for an undefined contract', async function() {
     await createProxy({ contractAlias: 'NotExists', network, txParams, networkFile: this.networkFile })
-      .should.be.rejectedWith('Contract NotExists not found in application or stdlib');
+      .should.be.rejectedWith(/Contract NotExists not found/);
   });
 
   it('should refuse to create a proxy for a lib project', async function() {
@@ -148,9 +148,24 @@ contract('create script', function([_, owner]) {
 
     it('should create a proxy for a stdlib contract', async function () {
       await createProxy({ contractAlias: 'Greeter', network, txParams, networkFile: this.networkFile });
-
       await assertProxy(this.networkFile, 'Greeter', { version });
     });
+  });
+
+  describe('with unpushed stdlib link', function () {
+    beforeEach('setting stdlib', async function () {
+      await linkStdlib({ stdlibNameVersion: 'mock-stdlib@1.1.0', packageFile: this.packageFile });
+    });
+
+    it('should refuse create a proxy for a stdlib contract', async function () {
+      await createProxy({ contractAlias: 'Greeter', network, txParams, networkFile: this.networkFile })
+        .should.be.rejectedWith(/Contract Greeter is provided by mock-stdlib but it was not deployed to the network/)
+    });
+  });
+
+  it('should refuse to create a proxy for an undefined contract', async function() {
+    await createProxy({ contractAlias: 'NotExists', network, txParams, networkFile: this.networkFile })
+      .should.be.rejectedWith(/Contract NotExists not found/);
   });
 
   describe('with local modifications', function () {

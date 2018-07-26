@@ -111,40 +111,54 @@ export default class NetworkBaseController {
   }
 
   checkLocalContractsDeployed(throwIfFail = false) {
-    let msg;
+    const err = this._errorForLocalContractsDeployed();
+    if (err) this._handleErrorMessage(err, throwIfFail);
+  }
+
+  _errorForLocalContractsDeployed() {
     const [contractsDeployed, contractsMissing] = _.partition(this.packageFile.contractAliases, (alias) => this.isContractDeployed(alias));
     const contractsChanged = _.filter(contractsDeployed, (alias) => this.hasContractChanged(alias));
 
     if (!_.isEmpty(contractsMissing)) {
-      msg = `Contracts ${contractsMissing.join(', ')} are not deployed.`;
+      return `Contracts ${contractsMissing.join(', ')} are not deployed.`;
     } else if (!_.isEmpty(contractsChanged)) {
-      msg = `Contracts ${contractsChanged.join(', ')} have changed since the last deploy.`;
+      return `Contracts ${contractsChanged.join(', ')} have changed since the last deploy.`;
     }
-
-    if (msg && throwIfFail) throw Error(msg);
-    else if (msg) log.info(msg);    
   }
 
   checkLocalContractDeployed(contractAlias, throwIfFail = false) {
-    let msg;
-    if (!this.isContractDefined(contractAlias)) {
-      msg = `Contract ${contractAlias} not found in application or stdlib`;
-    } else if (!this.isContractDeployed(contractAlias)) {
-      msg = `Contract ${contractAlias} is not deployed to ${this.network}.`;
-    } else if (this.hasContractChanged(contractAlias)) {
-      msg = `Contract ${contractAlias} has changed locally since the last deploy, consider running 'zos push'.`;
-    }
+    const err = this._errorForLocalContractDeployed(contractAlias);
+    if (err) this._handleErrorMessage(err, throwIfFail);
+  }
 
-    if (msg && throwIfFail) throw Error(msg);
-    else if (msg) log.info(msg);
+  _errorForLocalContractDeployed(contractAlias) {
+    if (!this.isContractDefined(contractAlias)) {
+      return `Contract ${contractAlias} not found in this project`;
+    } else if (!this.isContractDeployed(contractAlias)) {
+      return `Contract ${contractAlias} is not deployed to ${this.network}.`;
+    } else if (this.hasContractChanged(contractAlias)) {
+      return `Contract ${contractAlias} has changed locally since the last deploy, consider running 'zos push'.`;
+    }
+  }
+
+  _handleErrorMessage(msg, throwIfFail = false) {
+    if (throwIfFail) {
+      throw Error(msg);
+    } else {
+      log.info(msg);
+    }
   }
 
   hasContractChanged(contractAlias) {
-    if (!this.packageFile.hasContract(contractAlias)) return false;
+    if (!this.isLocalContract(contractAlias)) return false;
     if (!this.isContractDeployed(contractAlias)) return true;
     const contractName = this.packageFile.contract(contractAlias);
     const contractClass = Contracts.getFromLocal(contractName);
     return !this.networkFile.hasSameBytecode(contractAlias, contractClass)
+  }
+
+  isLocalContract(contractAlias) {
+    return this.packageFile.hasContract(contractAlias)
   }
 
   isContractDefined(contractAlias) {
@@ -152,7 +166,7 @@ export default class NetworkBaseController {
   }
 
   isContractDeployed(contractAlias) {
-    return !this.packageFile.hasContract(contractAlias) || this.networkFile.hasContract(contractAlias);
+    return !this.isLocalContract(contractAlias) || this.networkFile.hasContract(contractAlias);
   }
 
   writeNetworkPackage() {
