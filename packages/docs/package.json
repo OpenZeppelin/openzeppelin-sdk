@@ -8,8 +8,7 @@
     "gen-docs": "node scripts/gen-docs.js",
     "bump-docs": "node scripts/bump-docs.js",
     "rebuild-docs": "cd docs/website && npm run build",
-    "start": "cd docs/website && npm start",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "cd docs/website && npm start"
   },
   "keywords": [
     "zeppelinos",
