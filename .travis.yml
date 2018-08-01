@@ -1,0 +1,24 @@
+language: node_js
+os:
+- linux
+- osx
+env:
+- 
+- SOLIDITY_COVERAGE=true
+node_js:
+- '8'
+cache:
+  directories:
+  - packages/lib/node_modules
+  - packages/docs/node_modules
+  - packages/cli/node_modules
+  - examples/lib-simple/node_modules
+  - examples/lib-complex/node_modules
+matrix:
+  fast_finish: true
+  allow_failures:
+  - env: SOLIDITY_COVERAGE=true
+before_script:
+  - npm install
+script:
+  - npx lerna run test --concurrency=1 --stream=true

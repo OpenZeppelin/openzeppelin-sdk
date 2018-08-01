@@ -4,8 +4,8 @@
   "description": "ZeppelinOS command line interface",
   "main": "lib/index.js",
   "scripts": {
-    "prepack": "truffle compile && rm -rf lib && babel src --out-dir lib",
-    "test": "./node_modules/.bin/truffle test",
+    "prepare": "truffle compile && rm -rf lib && babel src --out-dir lib",
+    "test": "./scripts/test.sh",
     "gen-docs": "babel-node docs/bin/docs.js"
   },
   "bin": {
@@ -13,7 +13,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@github.com/zeppelinos/zos-cli.git"
+    "url": "git+ssh://git@github.com/zeppelinos/zos.git"
   },
   "keywords": [
     "zos",
@@ -21,14 +21,13 @@
     "cli"
   ],
   "files": [
-    "lib",
-    "examples"
+    "lib"
   ],
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/zeppelinos/zos-cli/issues"
+    "url": "https://github.com/zeppelinos/zos/issues"
   },
-  "homepage": "https://github.com/zeppelinos/zos-cli#readme",
+  "homepage": "https://github.com/zeppelinos/zos/tree/master/packages/cli#readme",
   "dependencies": {
     "chalk": "^2.4.1",
     "commander": "^2.15.1",
