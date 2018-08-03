@@ -105,6 +105,17 @@ export default class LocalBaseController {
     }
   }
 
+  getContractSourcePath(contractAlias) {
+    const contractName = this.packageFile.contract(contractAlias)
+    if (contractName) {
+      const contractDataPath = Contracts.getLocalPath(contractName)
+      const { compiler, sourcePath } = fs.parseJson(contractDataPath)
+      return { sourcePath, compilerVersion: compiler.version }
+    } else {
+      throw Error(`Could not find ${contractAlias} in contracts directory.`)
+    }
+  }
+
   writePackage() {
     this.packageFile.write()
   }
