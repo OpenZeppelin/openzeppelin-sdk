@@ -2,6 +2,8 @@ import _ from 'lodash';
 import { Contracts, Logger, App } from 'zos-lib';
 import StatusComparator from '../status/StatusComparator'
 import StatusChecker from "../status/StatusChecker";
+import Verifier from '../Verifier'
+import { flattenSourceCode } from '../../utils/contracts'
 
 const log = new Logger('NetworkController');
 
@@ -167,6 +169,16 @@ export default class NetworkBaseController {
 
   isContractDeployed(contractAlias) {
     return !this.isLocalContract(contractAlias) || this.networkFile.hasContract(contractAlias);
+  }
+
+  async verifyAndPublishContract(contractAlias, optimizer, optimizerRuns, remote) {
+    const contractName = this.packageFile.contract(contractAlias)
+    const { compilerVersion, sourcePath } = this.localController.getContractSourcePath(contractAlias)
+    const contractSource = await flattenSourceCode([sourcePath])
+    const contractAddress = this.networkFile.contracts[contractAlias].address
+    log.info(`Verifying and publishing ${contractAlias} on ${remote}`)
+
+    await Verifier.verifyAndPublish(remote, { contractName, compilerVersion, optimizer, optimizerRuns, contractSource, contractAddress })
   }
 
   writeNetworkPackage() {

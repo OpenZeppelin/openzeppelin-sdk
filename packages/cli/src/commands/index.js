@@ -9,5 +9,6 @@ import status from './status'
 import freeze from './freeze'
 import session from './session'
 import remove from './remove'
+import verify from './verify'
 
-export default [init, add, remove, push, create, update, bump, link, status, freeze, session]
+export default [init, add, remove, push, create, update, bump, link, status, freeze, session, verify]
