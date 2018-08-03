@@ -10,7 +10,7 @@ export default class StatusComparator {
 
   onEndChecking() {
     this.reports.forEach(report => report.log(log))
-    if(this.reports.length === 0) log.info('Your app is up to date.')
+    if(this.reports.length === 0) log.info('Your project is up to date.')
   }
 
   onMismatchingVersion(expected, observed) {
@@ -62,7 +62,7 @@ export default class StatusComparator {
   }
 
   onUnregisteredProxyImplementation(expected, observed, { address, implementation }) {
-    this._addReport(expected, observed, `Proxy at ${address} is pointing to ${implementation} but given implementation is not registered in app`)
+    this._addReport(expected, observed, `Proxy at ${address} is pointing to ${implementation} but given implementation is not registered in project`)
   }
 
   onMultipleProxyImplementations(expected, observed, { implementation }) {
