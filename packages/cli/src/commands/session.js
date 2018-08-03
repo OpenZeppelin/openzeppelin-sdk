@@ -16,7 +16,8 @@ const register = program => program
   .action(action)
 
 function action(options) {
-  session(options)
+  const { network, from, timeout, close, expires } = options
+  session({ network, from, timeout, close, expires })
 }
 
 export default { name, signature, description, register, action }

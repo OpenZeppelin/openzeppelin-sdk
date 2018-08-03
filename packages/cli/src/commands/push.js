@@ -19,7 +19,7 @@ const register = program => program
   .action(action)
 
 async function action(options) {
-  const { skipCompile, deployStdlib, reupload } = options
+  const { skipCompile, deployStdlib, reset: reupload } = options
   await runWithTruffle(
     async (opts) => await push({ deployStdlib, reupload, ... opts }),
     { compile: !skipCompile, ... options }

@@ -11,6 +11,7 @@ doNotInstallStdlib()
 require('chai')
   .use(require('chai-as-promised'))
   .use(require('zos-lib').assertions)
+  .use(require('sinon-chai'))
   .should()
 
 function useTestZosPackageFile() {
