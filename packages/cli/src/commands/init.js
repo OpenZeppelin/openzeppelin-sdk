@@ -22,10 +22,10 @@ const register = program => program
 async function action(name, version, options) {
   const { force } = options
   if (options.lib) {
-    if (options.stdlib) throw Error('Cannot set a stdlib in a library project')
+    if (options.link) throw Error('Cannot set a stdlib in a library project')
     await initLib({ name, version, force })
   } else {
-    const { stdlib: stdlibNameVersion, install: installLib } = options
+    const { link: stdlibNameVersion, install: installLib } = options
     await init({ name, version, stdlibNameVersion, installLib, force })
   }
   await push.tryAction(options)
