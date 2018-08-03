@@ -3,6 +3,7 @@ import EventsFilter from './EventsFilter'
 import StatusFetcher from './StatusFetcher'
 import StatusComparator from './StatusComparator'
 import { bytecodeDigest } from '../../utils/contracts'
+import PackageAtVersion from '../lib/PackageAtVersion';
 
 const log = new Logger('StatusChecker')
 const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000'
@@ -27,22 +28,39 @@ export default class StatusChecker {
 
   async app() {
     try {
-      if(!this._app) this._app = await App.fetch(this.networkFile.appAddress, this.txParams)
+      if (!this._app) {
+        this._app = this.networkFile.isLib 
+          ? await PackageAtVersion.fetch(this.networkFile.packageAddress, this.networkFile.version, this.txParams)
+          : await App.fetch(this.networkFile.appAddress, this.txParams)
+      }
       return this._app
     } catch(error) {
-      throw Error(`Cannot fetch App contract from address ${this.networkFile.appAddress}.`, error)
+      throw Error(`Cannot fetch project contract from address ${this.networkFile.appAddress}.`, error)
     }
   }
 
   async call() {
-    log.info(`Comparing status of App ${(await this.app()).address()}...\n`)
+    log.info(`Comparing status of project ${(await this.app()).address()}...\n`)
+    if (this.networkFile.isLib) {
+      await this.checkLib();
+    } else {
+      await this.checkApp();
+    }
+    this.visitor.onEndChecking()
+  }
+
+  async checkApp() {
     await this.checkVersion()
     await this.checkPackage()
     await this.checkProvider()
     await this.checkStdlib()
     await this.checkImplementations()
     await this.checkProxies()
-    this.visitor.onEndChecking()
+  }
+
+  async checkLib() {
+    await this.checkProvider()
+    await this.checkImplementations()
   }
 
   async checkVersion() {

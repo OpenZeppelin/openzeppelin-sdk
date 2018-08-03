@@ -9,7 +9,7 @@ export default class StatusFetcher {
   }
 
   onEndChecking() {
-    log.info('Your app is up to date.')
+    log.info('Your project is up to date.')
   }
 
   onMismatchingVersion(expected, observed) {
@@ -95,10 +95,10 @@ export default class StatusFetcher {
   }
 
   onUnregisteredProxyImplementation(expected, observed, { address, implementation }) {
-    log.error(`Proxy at ${address} is pointing to ${implementation}, but given implementation is not registered in app`)
+    log.error(`Proxy at ${address} is pointing to ${implementation}, but given implementation is not registered in project`)
   }
 
   onMultipleProxyImplementations(expected, observed, { implementation }) {
-    log.warn(`The same implementation address ${implementation} was registered under many aliases (${observed}). Please check them in the list of registered contracts`)
+    log.warn(`The same implementation address ${implementation} was registered under many aliases (${observed}). Please check them in the list of registered contracts.`)
   }
 }
