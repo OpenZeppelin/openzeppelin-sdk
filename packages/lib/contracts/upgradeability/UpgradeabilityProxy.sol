@@ -14,7 +14,7 @@ contract UpgradeabilityProxy is Proxy {
    * @dev Emitted when the implementation is upgraded.
    * @param implementation Address of the new implementation.
    */
-  event Upgraded(address implementation);
+  event Upgraded(address indexed implementation);
 
   /**
    * @dev Storage slot with the address of the current implementation.

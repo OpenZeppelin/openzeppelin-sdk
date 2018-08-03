@@ -1,42 +1,52 @@
-import Release from './Release'
 import Logger from '../utils/Logger'
 import Contracts from '../utils/Contracts'
 import { deploy, sendTransaction } from '../utils/Transactions'
 
-const log = new Logger('ReleaseDeployer')
+const log = new Logger('ImplementationDirectoryDeployer')
 
-export default class ReleaseDeployer {
-  constructor(txParams = {}) {
+export default class ImplementationDirectoryDeployer {
+  static freezable(txParams = {}) {
+    const contractClass = Contracts.getFromLib('FreezableImplementationDirectory')
+    return new ImplementationDirectoryDeployer(contractClass, txParams)
+  }
+
+  static nonFreezable(txParams = {}) {
+    const contractClass = Contracts.getFromLib('ImplementationDirectory')
+    return new ImplementationDirectoryDeployer(contractClass, txParams)
+  }
+
+  constructor(contractClass, txParams = {}) {
+    this.contractClass = contractClass
     this.txParams = txParams
   }
 
-  async deployLocal(contracts) {
-    await this.deployRelease()
+  async deployLocal(contracts = []) {
+    await this.deployImplementationDirectory()
     const deployMethod = async contractName => this._deployLocalContract(contractName)
     await this.deployAndRegisterContracts(contracts, deployMethod)
-    return new Release(this.release, this.txParams)
+    return this.directory
   }
 
-  async deployDependency(dependencyName, contracts) {
-    await this.deployRelease()
+  async deployDependency(dependencyName, contracts = []) {
+    await this.deployImplementationDirectory()
     const deployMethod = async contractName => this._deployDependencyContract(dependencyName, contractName)
     await this.deployAndRegisterContracts(contracts, deployMethod)
-    return new Release(this.release, this.txParams)
+    return this.directory
   }
 
-  async deployRelease() {
-    log.info("Deploying a new Release...")
-    const Release = Contracts.getFromLib('Release')
-    this.release = await deploy(Release, [], this.txParams)
-    log.info(`Deployed at ${this.release.address}`)
+  async deployImplementationDirectory() {
+    log.info(`Deploying a new ${this.contractClass.contractName}...`)
+    this.directory = await deploy(this.contractClass, [], this.txParams)
+    log.info(`Deployed at ${this.directory.address}`)
   }
 
   async deployAndRegisterContracts(contracts, deployMethod) {
     await Promise.all(contracts.map(async contract => {
       const { alias: contractAlias, name: contractName } = contract
       const implementation = await deployMethod(contractName)
-      log.info('Registering implementation in release...')
-      await sendTransaction(this.release.setImplementation, [contractAlias, implementation.address], this.txParams)
+      log.info(`Registering ${contractAlias} implementation at ${implementation.address} in implementation directory...`)
+      await sendTransaction(this.directory.setImplementation, [contractAlias, implementation.address], this.txParams)
+      log.info('Implementation set')
     }))
   }
 

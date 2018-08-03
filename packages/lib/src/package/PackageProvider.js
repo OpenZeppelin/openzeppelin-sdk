@@ -6,9 +6,9 @@ export default class PackageProvider {
     this.txParams = txParams
   }
 
-  from(address) {
+  fetch(address, klass) {
     this._fetchPackage(address);
-    return new Package(this.package, this.txParams)
+    return new klass(this.package, this.txParams)
   }
 
   _fetchPackage(address) {

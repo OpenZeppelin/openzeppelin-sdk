@@ -24,7 +24,7 @@ contract('FreezableImplementationDirectory', ([_, owner, anotherAddress]) => {
   })
 
   describe('freeze', function () {
-    describe('when the sender is not the owner', function () {
+    describe('when the sender is the owner', function () {
       const from  = owner
 
       describe('when it is not frozen', function () {

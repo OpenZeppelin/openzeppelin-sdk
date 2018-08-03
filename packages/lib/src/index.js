@@ -20,7 +20,9 @@ const assertRevert = helpers.assertRevert
 // model objects
 import App from './app/App'
 import Package from './package/Package'
-import Release from './release/Release'
+import AppDirectory from './directory/AppDirectory'
+import ImplementationDirectory from './directory/ImplementationDirectory'
+import FreezableImplementationDirectory from './directory/FreezableImplementationDirectory'
 
 export {
   version,
@@ -36,6 +38,8 @@ export {
   FileSystem,
   Contracts,
   App,
+  ImplementationDirectory,
+  FreezableImplementationDirectory,
+  AppDirectory,
   Package,
-  Release,
 }

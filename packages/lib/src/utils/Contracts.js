@@ -16,6 +16,10 @@ const DEFAULT_COVERAGE_TX_PARAMS = {
 let syncTimeout = 240000;
 
 export default {
+  getSyncTimeout() {
+    return syncTimeout;
+  },
+
   setSyncTimeout(value) {
     syncTimeout = value;
   },
@@ -78,7 +82,7 @@ export default {
   },
 
   _artifactsDefaults() {
-    if(!artifacts) throw "Could not retrieve truffle defaults"
+    if(!artifacts) throw Error("Could not retrieve truffle defaults")
     return artifacts.options || {}
   },
 }

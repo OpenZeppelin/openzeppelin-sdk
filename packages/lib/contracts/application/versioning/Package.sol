@@ -15,7 +15,7 @@ contract Package is Ownable {
    * @param version Name of the added version.
    * @param provider ImplementationProvider associated with the version.
    */
-  event VersionAdded(string version, ImplementationProvider provider);
+  event VersionAdded(string version, ImplementationProvider indexed provider);
 
   /*
    * @dev Mapping associating versions and their implementation providers.

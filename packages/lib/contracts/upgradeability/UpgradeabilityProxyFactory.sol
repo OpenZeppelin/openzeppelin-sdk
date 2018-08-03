@@ -11,7 +11,7 @@ contract UpgradeabilityProxyFactory {
    * @dev Emitted when a new proxy is created.
    * @param proxy Address of the created proxy.
    */
-  event ProxyCreated(address proxy);
+  event ProxyCreated(address indexed proxy);
 
   /**
    * @dev Creates an upgradeability proxy with an initial implementation.

@@ -1,5 +1,7 @@
-import Contracts from '../utils/Contracts'
 import App from './App'
+import Package from '../package/Package'
+import Contracts from '../utils/Contracts'
+import AppDirectory from '../directory/AppDirectory'
 
 export default class AppProvider {
   constructor(txParams = {}) {
@@ -20,16 +22,14 @@ export default class AppProvider {
   }
   
   async _fetchAppDirectory() {
-    const AppDirectory = Contracts.getFromLib('AppDirectory')
     this.version = await this.packagedApp.version()
-    const appDirectoryAddress = await this.package.getVersion(this.version)
-    this.appDirectory = new AppDirectory(appDirectoryAddress)
+    const appDirectory = await this.package.getDirectory(this.version)
+    this.appDirectory = AppDirectory.fetch(appDirectory.address, this.txParams)
   }
   
   async _fetchPackage() {
-    const Package = Contracts.getFromLib('Package')
     const packageAddress = await this.packagedApp.package()
-    this.package = new Package(packageAddress)
+    this.package = Package.fetch(packageAddress, this.txParams)
   }
 
   async _fetchFactory() {

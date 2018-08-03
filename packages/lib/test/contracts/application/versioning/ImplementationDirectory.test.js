@@ -4,8 +4,8 @@ require('../../../setup')
 import Contracts from '../../../../src/utils/Contracts'
 import shouldBehaveLikeImplementationDirectory from '../../../../src/test/behaviors/ImplementationDirectory'
 
-const ImplementationDirectory = Contracts.getFromLocal('ImplementationDirectory')
 const DummyImplementation = Contracts.getFromLocal('DummyImplementation')
+const ImplementationDirectory = Contracts.getFromLocal('ImplementationDirectory')
 
 contract('ImplementationDirectory', function([_, owner, anotherAddress]) {
   beforeEach(async function () {

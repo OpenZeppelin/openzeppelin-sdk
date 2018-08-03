@@ -20,12 +20,7 @@ export default function shouldBehaveLikeImplementationDirectory(owner, anotherAd
 
       describe('when registering a contract', function () {
         beforeEach('registering the contract', async function () {
-          const { logs } = await this.directory.setImplementation(
-            contractName,
-            this.implementation_v0,
-            { from }
-          )
-
+          const { logs } = await this.directory.setImplementation(contractName, this.implementation_v0, { from })
           this.logs = logs
         })
 
@@ -78,11 +73,7 @@ export default function shouldBehaveLikeImplementationDirectory(owner, anotherAd
     const contractName = 'ERC721'
 
     beforeEach('registering the contract', async function () {
-      await this.directory.setImplementation(
-        contractName,
-        this.implementation_v0,
-        { from: owner }
-      )
+      await this.directory.setImplementation(contractName, this.implementation_v0, { from: owner })
     })
 
     describe('when the sender is the directory owner', function () {

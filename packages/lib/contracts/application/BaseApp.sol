@@ -39,6 +39,32 @@ contract BaseApp is Ownable {
   }
 
   /**
+   * @dev Returns the current implementation of a proxy.
+   * This is needed because only the proxy admin can query it.
+   * @return The address of the current implementation of the proxy.
+   */
+  function getProxyImplementation(AdminUpgradeabilityProxy proxy) public view returns (address) {
+    return proxy.implementation();
+  }
+
+  /**
+   * @dev Returns the admin of a proxy. Only the admin can query it.
+   * @return The address of the current admin of the proxy.
+   */
+  function getProxyAdmin(AdminUpgradeabilityProxy proxy) public view returns (address) {
+    return proxy.admin();
+  }
+
+  /**
+   * @dev Changes the admin of a proxy.
+   * @param proxy Proxy to change admin.
+   * @param newAdmin Address to transfer proxy administration to.
+   */
+  function changeProxyAdmin(AdminUpgradeabilityProxy proxy, address newAdmin) public onlyOwner {
+    proxy.changeAdmin(newAdmin);
+  }
+
+  /**
    * @dev Creates a new proxy for the given contract.
    * @param contractName Name of the contract.
    * @return Address of the new proxy.
@@ -53,8 +79,7 @@ contract BaseApp is Ownable {
    * This is useful to initialize the proxied contract.
    * @param contractName Name of the contract.
    * @param data Data to send as msg.data in the low level call.
-   * It should include the signature and the parameters of the function to be
-   * called, as described in
+   * It should include the signature and the parameters of the function to be called, as described in
    * https://solidity.readthedocs.io/en/develop/abi-spec.html#function-selector-and-argument-encoding.
    * @return Address of the new proxy.
    */
@@ -79,39 +104,11 @@ contract BaseApp is Ownable {
    * @param proxy Proxy to be upgraded.
    * @param contractName Name of the contract.
    * @param data Data to send as msg.data in the low level call.
-   * It should include the signature and the parameters of the function to be
-   * called, as described in
+   * It should include the signature and the parameters of the function to be called, as described in
    * https://solidity.readthedocs.io/en/develop/abi-spec.html#function-selector-and-argument-encoding.
    */
   function upgradeAndCall(AdminUpgradeabilityProxy proxy, string contractName, bytes data) payable public onlyOwner {
     address implementation = getImplementation(contractName);
     proxy.upgradeToAndCall.value(msg.value)(implementation, data);
-  }
-
-  /**
-   * @dev Returns the current implementation of a proxy.
-   * This is needed because only the proxy admin can query it.
-   * @return The address of the current implementation of the proxy.
-   */
-  function getProxyImplementation(AdminUpgradeabilityProxy proxy) public view returns (address) {
-    return proxy.implementation();
-  }
-
-  /**
-   * @dev Returns the admin of a proxy.
-   * Only the admin can query it.
-   * @return The address of the current admin of the proxy.
-   */
-  function getProxyAdmin(AdminUpgradeabilityProxy proxy) public view returns (address) {
-    return proxy.admin();
-  }
-
-  /**
-   * @dev Changes the admin of a proxy.
-   * @param proxy Proxy to change admin.
-   * @param newAdmin Address to transfer proxy administration to.
-   */
-  function changeProxyAdmin(AdminUpgradeabilityProxy proxy, address newAdmin) public onlyOwner {
-    proxy.changeAdmin(newAdmin);
   }
 }
