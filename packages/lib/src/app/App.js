@@ -4,6 +4,7 @@ import Logger from '../utils/Logger'
 import Contracts from '../utils/Contracts'
 import decodeLogs from '../helpers/decodeLogs'
 import encodeCall from '../helpers/encodeCall'
+import copyContract from '../helpers/copyContract'
 import { sendTransaction } from '../utils/Transactions'
 
 import AppProvider from './AppProvider'
@@ -84,6 +85,13 @@ export default class App {
     log.info(` Admin for proxy ${proxyAddress} set to ${newAdmin}`)
   }
 
+  async createContract(contractClass, contractName, initMethodName, initArgs) {
+    if (!contractName) contractName = contractClass.contractName;
+    const instance = await this._copyContract(contractName, contractClass)
+    await this._initNonUpgradeableInstance(instance, contractClass, contractName, initMethodName, initArgs)
+    return instance
+  }
+
   async createProxy(contractClass, contractName, initMethodName, initArgs) {
     if (!contractName) contractName = contractClass.contractName;
     const { receipt } = typeof(initArgs) === 'undefined'
@@ -128,6 +136,23 @@ export default class App {
     log.info(`Upgrading ${contractName} proxy and calling ${this._callInfo(initMethod, initArgs)}...`)
     const callData = encodeCall(initMethodName, initArgTypes, initArgs)
     return sendTransaction(this._app.upgradeAndCall, [proxyAddress, contractName, callData], this.txParams)
+  }
+
+  async _copyContract(contractName, contractClass) {
+    log.info(`Creating new non-upgradeable instance of ${contractName}...`)
+    const implementation = await this.getImplementation(contractName)
+    const instance = await copyContract(contractClass, implementation, this.txParams)
+    log.info(`${contractName} instance created at ${instance.address}`)
+    return instance;
+  }
+
+  async _initNonUpgradeableInstance(instance, contractClass, contractName, initMethodName, initArgs) {
+    if (typeof(initArgs) !== 'undefined') {
+      // this could be front-run, waiting for new initializers model
+      const {initMethod, callData} = this._buildInitCallData(contractClass, initMethodName, initArgs)
+      log.info(`Initializing ${contractName} instance at ${instance.address} by calling ${this._callInfo(initMethod, initArgs)}`)
+      await instance.sendTransaction(Object.assign({}, this.txParams, {data: callData}))
+    }
   }
 
   _buildInitCallData(contractClass, initMethodName, initArgs) {
