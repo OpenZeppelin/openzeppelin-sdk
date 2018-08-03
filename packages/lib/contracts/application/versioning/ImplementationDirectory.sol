@@ -14,7 +14,7 @@ contract ImplementationDirectory is ImplementationProvider, Ownable {
    * @param contractName Name of the contract.
    * @param implementation Address of the added implementation.
    */
-  event ImplementationChanged(string contractName, address implementation);
+  event ImplementationChanged(string contractName, address indexed implementation);
 
   /// @dev Mapping where the addresses of the implementations are stored.
   mapping (string => address) internal implementations;

@@ -7,15 +7,14 @@ import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 /**
  * @title AppDirectory
  * @dev Implementation directory with a standard library as a fallback provider.
- * If the implementation is not found in the directory, it will search in the
- * standard library.
+ * @dev If the implementation is not found in the directory, it will search in the standard library.
  */
 contract AppDirectory is ImplementationDirectory {
   /**
    * @dev Emitted when the standard library is changed.
    * @param newStdlib Address of the new standard library.
    */
-  event StdlibChanged(address newStdlib);
+  event StdlibChanged(address indexed newStdlib);
 
   /**
    * @dev Provider for standard library implementations.
@@ -32,11 +31,9 @@ contract AppDirectory is ImplementationDirectory {
 
   /**
    * @dev Returns the implementation address for a given contract name.
-   * If the implementation is not found in the directory, it will search in the
-   * standard library.
+   * @dev If the implementation is not found in the directory, it will search in the standard library.
    * @param contractName Name of the contract.
-   * @return Address where the contract is implemented, or 0 if it is not
-   * found.
+   * @return Address where the contract is implemented, or 0 if it is not found.
    */
   function getImplementation(string contractName) public view returns (address) {
     address implementation = super.getImplementation(contractName);

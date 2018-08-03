@@ -6,10 +6,10 @@ import assertRevert from '../../../src/test/helpers/assertRevert'
 import shouldBehaveLikeImplementationDirectory from '../../../src/test/behaviors/ImplementationDirectory'
 
 const AppDirectory = Contracts.getFromLocal('AppDirectory')
-const ImplementationDirectory = Contracts.getFromLocal('ImplementationDirectory')
 const DummyImplementation = Contracts.getFromLocal('DummyImplementation')
+const ImplementationDirectory = Contracts.getFromLocal('ImplementationDirectory')
 
-contract('AppDirectory', ([_, owner, stdlibOwner, anotherAddress]) => {
+contract('AppDirectory', ([_, appOwner, stdlibOwner, anotherAddress]) => {
   before(async function () {
     this.implementation_v0 = (await DummyImplementation.new()).address
     this.implementation_v1 = (await DummyImplementation.new()).address
@@ -17,11 +17,11 @@ contract('AppDirectory', ([_, owner, stdlibOwner, anotherAddress]) => {
   })
 
   beforeEach(async function () {
-    this.directory = await AppDirectory.new(0x0, { from: owner })
+    this.directory = await AppDirectory.new(0x0, { from: appOwner })
     this.stdlib = await ImplementationDirectory.new({ from: stdlibOwner })
   })
 
-  shouldBehaveLikeImplementationDirectory(owner, anotherAddress)
+  shouldBehaveLikeImplementationDirectory(appOwner, anotherAddress)
 
   describe('getImplementation', function () {
     const contractName = 'ERC721'
@@ -29,7 +29,7 @@ contract('AppDirectory', ([_, owner, stdlibOwner, anotherAddress]) => {
     describe('when no stdlib was set', function () {
       describe('when the requested contract was registered in the directory', function () {
         beforeEach(async function () {
-          await this.directory.setImplementation(contractName, this.implementation_v0, { from: owner })
+          await this.directory.setImplementation(contractName, this.implementation_v0, { from: appOwner })
         })
 
         it('returns the directory implementation', async function () {
@@ -48,12 +48,12 @@ contract('AppDirectory', ([_, owner, stdlibOwner, anotherAddress]) => {
 
     describe('when a stdlib was set', function () {
       beforeEach(async function () {
-        await this.directory.setStdlib(this.stdlib.address, { from: owner })
+        await this.directory.setStdlib(this.stdlib.address, { from: appOwner })
       })
 
       describe('when the requested contract was registered in the directory', function () {
         beforeEach(async function () {
-          await this.directory.setImplementation(contractName, this.implementation_v0, { from: owner })
+          await this.directory.setImplementation(contractName, this.implementation_v0, { from: appOwner })
         })
 
         describe('when the requested contract was registered in the stdlib', function () {
@@ -99,7 +99,7 @@ contract('AppDirectory', ([_, owner, stdlibOwner, anotherAddress]) => {
 
   describe('setStdlib', function () {
     describe('when the sender is the owner', function () {
-      const from = owner
+      const from = appOwner
 
       beforeEach(async function () {
         await this.directory.setStdlib(this.stdlib.address, { from })
