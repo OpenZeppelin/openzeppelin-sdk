@@ -97,6 +97,20 @@ zos create MyContract --init <initializingFunction> --args <arguments> --network
 
 where `<initializingFunction>` is the name of the initializing function (marked with an `isInitializer` modifier in the code), and `<arguments>` is a comma-separated list of arguments to the function.
 
+#### Calling Initialize Functions Manually in Your Unit Tests
+
+Truffle does not know how to resolve functions that have matching names but different arities. Therefore, contracts that inherit from certain `openzeppelin-zos` contracts, will revert when their `initialize` functions are called from Truffle. `zos create` handles this correctly as it encodes the parameters. However, for your unit tests you will need to call `initialize` manually.
+
+The current solution to this issue is to `npm install zos-lib` and use the same helper function `zos create` uses: `encodeCall`. `encodeCall` receives the signature of your `initialize` function, as well as its arguments and their types. It then crafts the calldata and sends it in a raw call. Here's an example:
+
+```
+data = encodeCall(
+    "initialize", 
+    ['address', 'string', 'string', 'uint8', 'address'],
+    [owner, name, symbol, decimals, tokenAddress]
+);
+```
+
 ## Format of `zos.json` and `zos.<network>.json` files
 ZeppelinOS's CLI generates `json` files where it stores the configuration of your project.
 
