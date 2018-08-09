@@ -1,0 +1,71 @@
+{
+  "version-1.0.0-docs": {
+    "OVERVIEW": [
+      "version-1.0.0-start"
+    ],
+    "GUIDES": [
+      "version-1.0.0-setup",
+      "version-1.0.0-building",
+      "version-1.0.0-using",
+      "version-1.0.0-developing",
+      "version-1.0.0-testing"
+    ],
+    "DEMOS": [
+      "version-1.0.0-basil",
+      "version-1.0.0-crafty"
+    ],
+    "ONBOARDING LEGACY CONTRACTS": [
+      "version-1.0.0-erc20_onboarding"
+    ],
+    "ZOS-LIB": [
+      "version-1.0.0-libstart",
+      "version-1.0.0-low_level_contract",
+      "version-1.0.0-low_level_app"
+    ],
+    "FURTHER REFERENCE": [
+      "version-1.0.0-stdlib",
+      "version-1.0.0-advanced",
+      "version-1.0.0-whitepaper"
+    ]
+  },
+  "version-1.0.0-reference": {
+    "WELCOME": [
+      "version-1.0.0-apis"
+    ],
+    "CLI REFERENCE": [
+      "version-1.0.0-climain",
+      "version-1.0.0-init",
+      "version-1.0.0-add",
+      "version-1.0.0-push",
+      "version-1.0.0-create",
+      "version-1.0.0-bump",
+      "version-1.0.0-upgrade",
+      "version-1.0.0-link",
+      "version-1.0.0-status",
+      "version-1.0.0-freeze"
+    ],
+    "APPLICATION": [
+      "version-1.0.0-application_AppDirectory",
+      "version-1.0.0-application_BaseApp",
+      "version-1.0.0-application_PackagedApp",
+      "version-1.0.0-application_UnversionedApp"
+    ],
+    "APPLICATION / VERSIONING": [
+      "version-1.0.0-application_versioning_FreezableImplementationDirectory",
+      "version-1.0.0-application_versioning_ImplementationDirectory",
+      "version-1.0.0-application_versioning_ImplementationProvider",
+      "version-1.0.0-application_versioning_Package",
+      "version-1.0.0-application_versioning_Release"
+    ],
+    "MIGRATIONS": [
+      "version-1.0.0-migrations_Initializable",
+      "version-1.0.0-migrations_Migratable"
+    ],
+    "UPGRADEABILITY": [
+      "version-1.0.0-upgradeability_AdminUpgradeabilityProxy",
+      "version-1.0.0-upgradeability_Proxy",
+      "version-1.0.0-upgradeability_UpgradeabilityProxy",
+      "version-1.0.0-upgradeability_UpgradeabilityProxyFactory"
+    ]
+  }
+}
