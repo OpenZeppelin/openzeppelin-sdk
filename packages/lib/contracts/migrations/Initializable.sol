@@ -3,27 +3,40 @@ pragma solidity ^0.4.24;
 
 /**
  * @title Initializable
- * @dev Simple helper contract to support initialization outside of the constructor.
- * To use it, replace the constructor with a function that has the
- * `isInitializer` modifier.
- * WARNING: This helper does not support multiple inheritance.
- * WARNING: It is the developer's responsibility to ensure that an initializer
- * is actually called.
- * Use `Migratable` for more complex migration mechanisms.
+ *
+ * @dev Helper contract to support initializer functions. To use it, replace
+ * the constructor with a function that has the `isInitializer` modifier.
+ * WARNING: Unlike constructors, initializer functions must be manually
+ * invoked. This applies both to deploying an Initializable contract, as well
+ * as extending an Initializable contract via inheritance.
+ * WARNING: When used with inheritance, manual care must be taken to not invoke
+ * a parent initializer twice, because this is not dealt with automatically as
+ * with constructors.
  */
 contract Initializable {
 
   /**
-   * @dev Indicates if the contract has been initialized.
+   * @dev Indicates that the contract has been initialized.
    */
-  bool public initialized;
+  bool private initialized;
 
   /**
-   * @dev Modifier to use in the initialization function of a contract.
+   * @dev Indicates that the contract is in the process of being initialized.
+   */
+  bool private initializing;
+
+  /**
+   * @dev Modifier to use in the initializer function of a contract.
    */
   modifier isInitializer() {
-    require(!initialized, "Contract instance has already been initialized");
-    _;
+    require(initializing || !initialized, "Contract instance has already been initialized");
+
+    bool wasInitializing = initializing;
+    initializing = true;
     initialized = true;
+
+    _;
+
+    initializing = wasInitializing;
   }
 }

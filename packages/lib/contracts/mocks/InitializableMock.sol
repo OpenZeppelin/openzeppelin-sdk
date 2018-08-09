@@ -8,6 +8,14 @@ import "../migrations/Initializable.sol";
  */
 contract InitializableMock is Initializable {
 
-  function initialize() public isInitializer {}
+  bool public initializerRan;
+
+  function initialize() public isInitializer {
+    initializerRan = true;
+  }
+
+  function initializeNested() public isInitializer {
+    initialize();
+  }
 
 }
