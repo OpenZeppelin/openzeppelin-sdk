@@ -6,7 +6,7 @@
   "main": "index.js",
   "scripts": {
     "gen-docs": "node scripts/gen-docs.js",
-    "bump-docs": "node scripts/bump-docs.js",
+    "bump-docs": "babel-node scripts/bump-docs.js",
     "rebuild-docs": "cd docs/website && npm run build",
     "start": "cd docs/website && npm start"
   },
@@ -20,8 +20,15 @@
   ],
   "license": "MIT",
   "dependencies": {
-    "shelljs": "^0.8.1",
+    "shelljs": "^0.8.2",
     "solidity-docgen": "^0.1.0",
     "tmp": "0.0.33"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-plugin-transform-export-extensions": "^6.22.0",
+    "babel-plugin-transform-object-rest-spread": "^6.26.0",
+    "babel-polyfill": "^6.26.0",
+    "babel-preset-env": "^1.7.0"
   }
 }
