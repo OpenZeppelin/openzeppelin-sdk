@@ -1,85 +1,94 @@
-const handleErrorCode = require('./util').handleErrorCode
-const path = require('path')
-const shell = require('shelljs')
-const tmp = require('tmp')
-// const fs = require('fs');
+'use strict'
 
-/**
- * Entry point.
- */
+import tmp from 'tmp'
+import path from 'path'
+import { readFileSync, writeFileSync } from 'fs'
+
+import { exec, cd, cp, rm } from './util'
+
 function main(argv) {
   if(argv.length !== 3) {
-    console.error([
-      'Missing zeppelinos repository tag.',
-      'Usage: npm run bump-docs -- <tag>',
-      'Example: npm run bump-docs -- v1.7.0'
-    ].join('\n'))
+    console.error('Missing ZeppelinOS repository tag. Usage: npm run bump-docs -- <tag>')
     process.exit(1)
   }
+
   const tag = argv[2]
   const version = tag.slice(1)
-  const tempDirObj = tmp.dirSync({dir: './'})
-  const tempDir = tempDirObj.name
-   
+  const tmpDir = tmp.dirSync().name
+
   try {
-    const parentDir = path.resolve('..')
-    const outputDir = path.resolve('docs')
-    const websiteDir = path.resolve(outputDir, 'website')
-    const apiDir = path.resolve(websiteDir, 'build', 'api')
-    
-    //kernel
-    // const kernelRepoDir = path.resolve(tempDir, 'kernel')
-    // const kernelContractsDir = path.resolve(kernelRepoDir, 'contracts')
-    // shell.cd(tempDir)
-    // handleErrorCode(shell.exec('git clone https://github.com/zeppelinos/kernel.git'))
-    // shell.cd('kernel')
-    // //handleErrorCode(shell.exec(`git checkout -b ${tag} ${tag}`))
-    // handleErrorCode(shell.exec(`npx solidity-docgen ${kernelRepoDir} ${kernelContractsDir} ${outputDir}`))
-    
-    shell.cd(tempDir)
-    const libImportsDir = path.resolve('.', 'openzeppelin-solidity')
-    handleErrorCode(shell.exec('git clone https://github.com/openzeppelin/openzeppelin-solidity.git'))
-    shell.cd('openzeppelin-solidity')
-    handleErrorCode(shell.exec(`git checkout -b v1.8.0 v1.8.0`))
-    shell.cd('..')
+    const localDocsDir = path.resolve(__dirname, '../', 'docs')
+    const localBuiltDocsDir = path.resolve(localDocsDir, 'docs')
+    const localWebsiteDir = path.resolve(localDocsDir, 'website')
+    const localSidebarFile = path.resolve(localWebsiteDir, 'sidebars.json')
+    const packagesDir = path.resolve(tmpDir, 'zos', 'packages')
+    const builtDocs = path.resolve(packagesDir, 'docs', 'docs', 'docs')
 
+    cd(tmpDir)
+    exec('git clone https://github.com/zeppelinos/zos.git')
+    cd('zos')
+    exec(`git checkout -b ${tag} ${tag}`)
+    cleanupSidebar(packagesDir)
+    const cliSections = genCliDocs(packagesDir)
+    const libSections = genLibDocs(packagesDir)
+    const { docs, reference } = JSON.parse(readFileSync(localSidebarFile, 'utf8'))
+    const updatedSidebar = { docs, reference: { ...reference, ...cliSections, ...libSections } }
 
-    //zos-lib
-    const libRepoDir = path.resolve('.', 'zos-lib')
-    const libContractsDir = path.resolve(libRepoDir, 'contracts')
-    //handleErrorCode(shell.exec('git clone https://github.com/zeppelinos/zos-lib.git'))
-    shell.cd('zos-lib')
-    //handleErrorCode(shell.exec(`git checkout -b ${tag} ${tag}`))
-    shell.cd('..')
-    // handleErrorCode(shell.exec(`npx solidity-docgen ${libRepoDir} ${libContractsDir} ${outputDir}`))
-    //handleErrorCode(shell.exec(`SOLC_ARGS=\'zeppelin-solidity=${libImportsDir}\' npx solidity-docgen ${libRepoDir} ${libContractsDir} ${outputDir}`))
-    
+    cp(`${builtDocs}/*.md`, localBuiltDocsDir)
+    writeFileSync(localSidebarFile, JSON.stringify(updatedSidebar, null, 2), { encoding:'utf8', flag:'w' })
 
-    //zos-cli
-    const cliRepoDir = path.resolve('.', 'zos-cli')
-    const cliContractsDir = path.resolve(cliRepoDir, 'contracts')
-    // const cliImportsDir = path.resolve(libRepoDir, 'node_modules/zeppelin-solidity')
-    // handleErrorCode(shell.exec('git clone https://github.com/zeppelinos/zos-cli.git'))
-    // shell.cd('zos-cli')
-    // // handleErrorCode(shell.exec(`git checkout -b ${tag} ${tag}`))
-    // handleErrorCode(shell.exec(`npx solidity-docgen ${cliRepoDir} ${cliContractsDir} ${outputDir}`))
-    
-    shell.cd(websiteDir)
-    handleErrorCode(shell.exec(`yarn install`))
-    handleErrorCode(shell.exec(`npm run version ${version}`))
-    handleErrorCode(shell.exec('npm run build'))
+    cd(localWebsiteDir)
+    exec(`npm install`)
+    exec(`npm run version ${version}`)
+    exec('npm run build')
+  } finally {
+    rm(tmpDir, '-rf')
   }
-  finally {
-    shell.rm('-rf', tempDir)
-  }
+}
+
+function cleanupSidebar (packagesDir) {
+  const sidebar = path.resolve(packagesDir, 'docs', 'docs', 'website', 'sidebars.json')
+  exec(`echo "{}" > ${sidebar}`)
+}
+
+function genCliDocs (packagesDir) {
+  const cliDir = path.resolve(packagesDir, 'cli')
+  const builtDocs = path.resolve(packagesDir, 'docs', 'docs', 'docs')
+  const cliBuiltDocs = path.resolve(cliDir, 'docs', 'build')
+  const sidebar = path.resolve(cliBuiltDocs, 'sidebars.json')
+
+  cd(cliDir)
+  exec('npm install > "/dev/null" 2>&1 && npm run gen-docs')
+  cp(`${cliBuiltDocs}/*.md`, builtDocs)
+  const { 'cli-api': { commands } } = JSON.parse(readFileSync(sidebar, 'utf8'))
+
+  return { 'CLI REFERENCE': commands }
+}
+
+function genLibDocs(packagesDir) {
+  const docsDir = path.resolve(packagesDir, 'docs', 'docs')
+  const builtDocs = path.resolve(docsDir, 'docs')
+  const libDir = path.resolve(packagesDir, 'lib')
+  const libContractsDir = path.resolve(libDir, 'contracts')
+  const ozDir = path.resolve(libDir, 'node_modules', 'openzeppelin-solidity')
+  const sidebar =  path.resolve(docsDir, 'website', 'sidebars.json')
+
+  cd(libDir)
+  exec('npm install > "/dev/null" 2>&1')
+  exec(`SOLC_ARGS='openzeppelin-solidity=${ozDir}' npx solidity-docgen ${libDir} ${libContractsDir} ${docsDir} --exclude mocks`)
+  rm(`${builtDocs}/api_mocks*`)
+  rm(`${builtDocs}/api_es_openzeppelin-solidity*`)
+  const { 'docs-api': docs } = JSON.parse(readFileSync(sidebar, 'utf8'))
+
+  return docs;
 }
 
 if (require.main === module) {
   try {
     main(process.argv)
   }
-  catch (err) {
-    console.error(err)
-    process.exit(1)
+  catch (error) {
+    throw Error(error)
   }
 }
+
