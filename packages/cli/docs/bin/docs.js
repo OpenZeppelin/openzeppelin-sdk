@@ -1,7 +1,7 @@
 #! /usr/bin/env node
-const program = require('../../src/bin/program');
 
 import React from 'react';
+import program from '../../src/bin/program';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { writeFileSync, existsSync, mkdirSync } from 'fs';
 import Main from '../components/Main';
