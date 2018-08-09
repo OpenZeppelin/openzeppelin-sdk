@@ -11,9 +11,9 @@ import process from 'process';
 
 const outputPath = 'docs/build';
 
-function formatContent(id, title, content){
+function formatContent(id, title, content) {
   return `---
-id: ${id}
+id: cli_${id}
 title: ${title}
 ---
 
@@ -27,10 +27,10 @@ function writeMd(id, title, content) {
 }
 
 function makeSidebar(program) {
+  const commands = program.commands.map(command => `cli_${command.name()}`)
   return { 
     'cli-api': {
-      'OVERVIEW': ['cli_main'],
-      'COMMANDS': program.commands.map(command => `cli_${command.name()}`)
+      'commands': ['cli_main', ...commands]
     }
   };
 }
@@ -41,7 +41,7 @@ function run() {
   }
 
   const main = renderToStaticMarkup(React.createElement(Main, { program }));
-  writeMd('main', 'Entrypoint', main);
+  writeMd('main', 'zos', main);
 
   program.commands.forEach(command => {
     const content = renderToStaticMarkup(React.createElement(Command, { command }));
