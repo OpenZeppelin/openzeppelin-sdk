@@ -108,7 +108,7 @@ contract TimedCrowdsale is Crowdsale {
     public 
     isInitializer("TimedCrowdsale", "0.0.1")
   {
-    // does something
+    Crowdsale.initialize(_rate, _wallet, _token);
   }
 }
 
