@@ -19,7 +19,7 @@ import '../Initializable.sol';
 contract SampleHuman is Initializable {
   bool public isHuman;
 
-  function initialize() isInitializer public {
+  function initialize() initializer public {
     isHuman = true;
   }
 }
@@ -30,7 +30,7 @@ contract SampleHuman is Initializable {
 contract SampleMother is Initializable, SampleHuman {
   uint256 public mother;
 
-  function initialize(uint256 value) isInitializer public {
+  function initialize(uint256 value) initializer public {
     SampleHuman.initialize();
     mother = value;
   }
@@ -42,7 +42,7 @@ contract SampleMother is Initializable, SampleHuman {
 contract SampleGramps is Initializable, SampleHuman {
   uint256 public gramps;
 
-  function initialize(uint256 value) isInitializer public {
+  function initialize(uint256 value) initializer public {
     SampleHuman.initialize();
     gramps = value;
   }
@@ -54,7 +54,7 @@ contract SampleGramps is Initializable, SampleHuman {
 contract SampleFather is Initializable, SampleGramps {
   uint256 public father;
 
-  function initialize(uint256 _gramps, uint256 _father) isInitializer public {
+  function initialize(uint256 _gramps, uint256 _father) initializer public {
     SampleGramps.initialize(_gramps);
     father = _father;
   }
@@ -66,7 +66,7 @@ contract SampleFather is Initializable, SampleGramps {
 contract SampleChild is Initializable, SampleMother, SampleFather {
   uint256 public child;
 
-  function initialize(uint256 _mother, uint256 _gramps, uint256 _father, uint256 _child) isInitializer public {
+  function initialize(uint256 _mother, uint256 _gramps, uint256 _father, uint256 _child) initializer public {
     SampleMother.initialize(_mother);
     SampleFather.initialize(_gramps, _father);
     child = _child;

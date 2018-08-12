@@ -5,7 +5,7 @@ pragma solidity ^0.4.24;
  * @title Initializable
  *
  * @dev Helper contract to support initializer functions. To use it, replace
- * the constructor with a function that has the `isInitializer` modifier.
+ * the constructor with a function that has the `initializer` modifier.
  * WARNING: Unlike constructors, initializer functions must be manually
  * invoked. This applies both to deploying an Initializable contract, as well
  * as extending an Initializable contract via inheritance.
@@ -28,7 +28,7 @@ contract Initializable {
   /**
    * @dev Modifier to use in the initializer function of a contract.
    */
-  modifier isInitializer() {
+  modifier initializer() {
     require(initializing || !initialized, "Contract instance has already been initialized");
 
     bool wasInitializing = initializing;

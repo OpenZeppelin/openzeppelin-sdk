@@ -10,11 +10,11 @@ contract InitializableMock is Initializable {
 
   bool public initializerRan;
 
-  function initialize() public isInitializer {
+  function initialize() public initializer {
     initializerRan = true;
   }
 
-  function initializeNested() public isInitializer {
+  function initializeNested() public initializer {
     initialize();
   }
 
