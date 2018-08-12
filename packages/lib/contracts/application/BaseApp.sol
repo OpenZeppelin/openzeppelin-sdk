@@ -24,18 +24,22 @@ contract BaseApp is Ownable {
   }
 
   /**
-   * @dev Abstract function to return the implementation provider.
-   * @return The implementation provider.
+   * @dev Abstract function to return the implementation provider for a given package name.
+   * @param packageName Name of the package to be retrieved.
+   * @return The implementation provider for the package.
    */
-  function getProvider() internal view returns (ImplementationProvider);
+  function getProvider(string packageName) public view returns (ImplementationProvider);
 
   /**
    * @dev Returns the implementation address for a given contract name, provided by the `ImplementationProvider`.
+   * @param packageName Name of the package where the contract is contained.
    * @param contractName Name of the contract.
    * @return Address where the contract is implemented.
    */
-  function getImplementation(string contractName) public view returns (address) {
-    return getProvider().getImplementation(contractName);
+  function getImplementation(string packageName, string contractName) public view returns (address) {
+    ImplementationProvider provider = getProvider(packageName);
+    if (address(provider) == address(0)) return address(0);
+    return provider.getImplementation(contractName);
   }
 
   /**
@@ -66,35 +70,38 @@ contract BaseApp is Ownable {
 
   /**
    * @dev Creates a new proxy for the given contract.
+   * @param packageName Name of the package where the contract is contained.
    * @param contractName Name of the contract.
    * @return Address of the new proxy.
    */
-  function create(string contractName) public returns (AdminUpgradeabilityProxy) {
-    address implementation = getImplementation(contractName);
+  function create(string packageName, string contractName) public returns (AdminUpgradeabilityProxy) {
+    address implementation = getImplementation(packageName, contractName);
     return factory.createProxy(this, implementation);
   }
 
   /**
    * @dev Creates a new proxy for the given contract and forwards a function call to it.
    * This is useful to initialize the proxied contract.
+   * @param packageName Name of the package where the contract is contained.
    * @param contractName Name of the contract.
    * @param data Data to send as msg.data in the low level call.
    * It should include the signature and the parameters of the function to be called, as described in
    * https://solidity.readthedocs.io/en/develop/abi-spec.html#function-selector-and-argument-encoding.
    * @return Address of the new proxy.
    */
-   function createAndCall(string contractName, bytes data) payable public returns (AdminUpgradeabilityProxy) {
-    address implementation = getImplementation(contractName);
+   function createAndCall(string packageName, string contractName, bytes data) payable public returns (AdminUpgradeabilityProxy) {
+    address implementation = getImplementation(packageName, contractName);
     return factory.createProxyAndCall.value(msg.value)(this, implementation, data);
   }
 
   /**
    * @dev Upgrades a proxy to the newest implementation of a contract.
    * @param proxy Proxy to be upgraded.
+   * @param packageName Name of the package where the contract is contained.
    * @param contractName Name of the contract.
    */
-  function upgrade(AdminUpgradeabilityProxy proxy, string contractName) public onlyOwner {
-    address implementation = getImplementation(contractName);
+  function upgrade(AdminUpgradeabilityProxy proxy, string packageName, string contractName) public onlyOwner {
+    address implementation = getImplementation(packageName, contractName);
     proxy.upgradeTo(implementation);
   }
 
@@ -102,13 +109,14 @@ contract BaseApp is Ownable {
    * @dev Upgrades a proxy to the newest implementation of a contract and forwards a function call to it.
    * This is useful to initialize the proxied contract.
    * @param proxy Proxy to be upgraded.
+   * @param packageName Name of the package where the contract is contained.
    * @param contractName Name of the contract.
    * @param data Data to send as msg.data in the low level call.
    * It should include the signature and the parameters of the function to be called, as described in
    * https://solidity.readthedocs.io/en/develop/abi-spec.html#function-selector-and-argument-encoding.
    */
-  function upgradeAndCall(AdminUpgradeabilityProxy proxy, string contractName, bytes data) payable public onlyOwner {
-    address implementation = getImplementation(contractName);
+  function upgradeAndCall(AdminUpgradeabilityProxy proxy, string packageName, string contractName, bytes data) payable public onlyOwner {
+    address implementation = getImplementation(packageName, contractName);
     proxy.upgradeToAndCall.value(msg.value)(implementation, data);
   }
 }
