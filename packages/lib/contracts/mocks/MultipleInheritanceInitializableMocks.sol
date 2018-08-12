@@ -12,7 +12,7 @@ import '../Initializable.sol';
 //      -- Child --
 
 /**
- * Sample base migratable contract that defines a field mother
+ * Sample base intializable contract that defines a field mother
  */
 contract SampleMother is Initializable {
   uint256 public mother;
@@ -23,7 +23,7 @@ contract SampleMother is Initializable {
 }
 
 /**
- * Sample base migratable contract that defines a field gramps
+ * Sample base intializable contract that defines a field gramps
  */
 contract SampleGramps is Initializable {
   uint256 public gramps;
@@ -34,7 +34,7 @@ contract SampleGramps is Initializable {
 }
 
 /**
- * Sample base migratable contract that defines a field father and extends from gramps
+ * Sample base intializable contract that defines a field father and extends from gramps
  */
 contract SampleFather is Initializable, SampleGramps {
   uint256 public father;
