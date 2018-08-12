@@ -5,19 +5,33 @@ import '../Initializable.sol';
 // Sample contracts showing upgradeability with multiple inheritance.
 // Child contract inherits from Father and Mother contracts, and Father extends from Gramps.
 // 
-//              Gramps
-//                |
+//         Human
+//       /       \
+//      |       Gramps
+//      |         |
 //    Mother    Father
 //      |         |
 //      -- Child --
 
 /**
+ * Sample base intializable contract that is a human
+ */
+contract SampleHuman is Initializable {
+  bool public isHuman;
+
+  function initialize() isInitializer public {
+    isHuman = true;
+  }
+}
+
+/**
  * Sample base intializable contract that defines a field mother
  */
-contract SampleMother is Initializable {
+contract SampleMother is Initializable, SampleHuman {
   uint256 public mother;
 
   function initialize(uint256 value) isInitializer public {
+    SampleHuman.initialize();
     mother = value;
   }
 }
@@ -25,10 +39,11 @@ contract SampleMother is Initializable {
 /**
  * Sample base intializable contract that defines a field gramps
  */
-contract SampleGramps is Initializable {
+contract SampleGramps is Initializable, SampleHuman {
   uint256 public gramps;
 
   function initialize(uint256 value) isInitializer public {
+    SampleHuman.initialize();
     gramps = value;
   }
 }

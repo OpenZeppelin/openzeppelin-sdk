@@ -61,6 +61,10 @@ contract('Initializable', function () {
       await this.contract.initialize(mother, gramps, father, child);
     });
 
+    it('initializes human', async function () {
+      assert.equal(await this.contract.isHuman(), true);
+    });
+
     it('initializes mother', async function () {
       assert.equal(await this.contract.mother(), mother);
     });
