@@ -4,17 +4,9 @@ import { deploy, sendTransaction } from '../utils/Transactions'
 
 const log = new Logger('ImplementationDirectoryDeployer')
 
+// TODO: Check whether the deployment with contracts is used from the CLI, and consider removing it or moving to another class (such as project)
+
 export default class ImplementationDirectoryDeployer {
-  static freezable(txParams = {}) {
-    const contractClass = Contracts.getFromLib('FreezableImplementationDirectory')
-    return new ImplementationDirectoryDeployer(contractClass, txParams)
-  }
-
-  static nonFreezable(txParams = {}) {
-    const contractClass = Contracts.getFromLib('ImplementationDirectory')
-    return new ImplementationDirectoryDeployer(contractClass, txParams)
-  }
-
   constructor(contractClass, txParams = {}) {
     this.contractClass = contractClass
     this.txParams = txParams

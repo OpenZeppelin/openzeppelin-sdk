@@ -1,35 +1,25 @@
 import Logger from '../utils/Logger'
 import { sendTransaction } from '../utils/Transactions'
+import BaseImplementationDirectory from './BaseImplementationDirectory'
+import Contracts from '../utils/Contracts';
 
-import ImplementationDirectory from './ImplementationDirectory'
-import ImplementationDirectoryDeployer from './ImplementationDirectoryDeployer'
+export default class FreezableImplementationDirectory extends BaseImplementationDirectory {
 
-export default class FreezableImplementationDirectory extends ImplementationDirectory {
-
-  static async deployLocal(contracts, txParams = {}) {
-    const deployer = ImplementationDirectoryDeployer.freezable(txParams)
-    const directory = await deployer.deployLocal(contracts)
-    return new FreezableImplementationDirectory(directory, txParams)
-  }
-
-  static async deployDependency(dependencyName, contracts, txParams = {}) {
-    const deployer = ImplementationDirectoryDeployer.freezable(txParams);
-    const directory = await deployer.deployDependency(dependencyName, contracts)
-    return new FreezableImplementationDirectory(directory, txParams)
+  static getContractClass() {
+    return Contracts.getFromLib('FreezableImplementationDirectory')
   }
 
   constructor(directory, txParams = {}) {
-    const log = new Logger('FreezableImplementationDirectory')
-    super(directory, txParams, log)
+    super(directory, txParams, new Logger('FreezableImplementationDirectory'))
   }
 
   async freeze() {
     this.log.info('Freezing implementation directory...')
-    await sendTransaction(this.directory.freeze, [], this.txParams)
+    await sendTransaction(this.directoryContract.freeze, [], this.txParams)
     this.log.info('Frozen')
   }
 
   async isFrozen() {
-    return await this.directory.frozen()
+    return await this.directoryContract.frozen()
   }
 }
