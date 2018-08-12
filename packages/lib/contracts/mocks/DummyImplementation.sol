@@ -9,7 +9,7 @@ contract DummyImplementation {
   string public text;
   uint256[] public values;
 
-  function initialize(uint256 _value) public {
+  function initialize(uint256 _value) payable public {
     value = _value;
   }
 
@@ -33,7 +33,7 @@ contract DummyImplementation {
 }
 
 contract DummyImplementationV2 is DummyImplementation {
-  function migrate(uint256 newVal) public {
+  function migrate(uint256 newVal) payable public {
     value = newVal;
   }
 

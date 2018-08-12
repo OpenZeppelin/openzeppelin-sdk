@@ -1,88 +1,86 @@
 import Logger from '../utils/Logger'
-import { deploy, sendTransaction } from '../utils/Transactions'
-
-import PackageProvider from './PackageProvider'
-import PackageDeployer from './PackageDeployer'
+import { deploy as deployContract, sendTransaction } from '../utils/Transactions'
+import FreezableImplementationDirectory from '../directory/FreezableImplementationDirectory';
+import Contracts from '../utils/Contracts';
+import { toAddress, isZeroAddress } from '../utils/Addresses';
 
 const log = new Logger('Package')
 
 export default class Package {
 
-  static fetch(address, txParams = {}, klass = require('./PackageWithAppDirectories')) {
-    const provider = new PackageProvider(txParams)
-    return provider.fetch(address, klass.default)
+  static async fetch(address, txParams = {}, directoryClass = FreezableImplementationDirectory) {
+    if (isZeroAddress(address)) return null
+    const Package = Contracts.getFromLib('Package')
+    const packageContract = await Package.at(address)
+    return new this(packageContract, txParams, directoryClass)
   }
 
-  static async deploy(txParams = {}, klass = require('./PackageWithAppDirectories')) {
-    const deployer = new PackageDeployer(txParams)
-    return deployer.deploy(klass.default)
+  static async deploy(txParams = {}, directoryClass = FreezableImplementationDirectory) {
+    log.info('Deploying new Package...')
+    const Package = Contracts.getFromLib('Package')
+    const packageContract = await deployContract(Package, [], txParams)
+    log.info(`Deployed Package ${packageContract.address}`)
+    return new this(packageContract, txParams, directoryClass)
   }
 
-  static async deployWithFreezableDirectories(txParams = {}) {
-    return this.deploy(txParams, require('./PackageWithFreezableDirectories'))
-  }
-
-  static fetchWithFreezableDirectories(address, txParams = {}) {
-    return this.fetch(address, txParams, require('./PackageWithFreezableDirectories'))
-  }
-
-  static async deployWithNonFreezableDirectories(txParams = {}) {
-    return this.deploy(txParams, require('./PackageWithNonFreezableDirectories'))
-  }
-
-  static fetchWithNonFreezableDirectories(address, txParams = {}) {
-    return this.fetch(address, txParams, require('./PackageWithNonFreezableDirectories'))
-  }
-
-  constructor(_package, txParams = {}) {
-    this.package = _package
+  constructor(packageContract, txParams = {}, directoryClass = FreezableImplementationDirectory) {
+    this.packageContract = packageContract
     this.txParams = txParams
+    this.directoryClass = directoryClass
+  }
+
+  get contract() {
+    return this.packageContract
   }
 
   get address() {
-    return this.package.address
+    return this.packageContract.address
   }
 
   async hasVersion(version) {
-    return sendTransaction(this.package.hasVersion, [version], this.txParams)
+    return sendTransaction(this.packageContract.hasVersion, [version], this.txParams)
+  }
+
+  async isFrozen(version) {
+    const directory = await this.getDirectory(version)
+    return directory.isFrozen()
+  }
+
+  async freeze(version) {
+    const directory = await this.getDirectory(version)
+    if (!directory.freeze) throw Error("Implementation directory does not support freezing")
+    return directory.freeze()
   }
 
   async getImplementation(version, contractName) {
-    return this.package.getImplementation(version, contractName)
+    return this.packageContract.getImplementation(version, contractName)
   }
 
-  async setImplementation(version, contractClass, contractName) {
-    log.info(`Setting implementation of ${contractName} in version ${version}...`)
-    const implementation = await deploy(contractClass, [], this.txParams)
+  async setImplementation(version, contractName, contractAddress) {
     const directory = await this.getDirectory(version)
-    await directory.setImplementation(contractName, implementation.address)
-    return implementation
+    await directory.setImplementation(contractName, toAddress(contractAddress))
   }
 
   async unsetImplementation (version, contractName) {
-    log.info(`Unsetting implementation of ${contractName} in version ${version}...`)
     const directory = await this.getDirectory(version)
     await directory.unsetImplementation(contractName, this.txParams)
   }
 
-  async newVersion(version, stdlibAddress) {
+  async newVersion(version) {
     log.info('Adding new version...')
-    const directory = await this.newDirectory(stdlibAddress)
-    await sendTransaction(this.package.addVersion, [version, directory.address], this.txParams)
+    const directory = await this._newDirectory()
+    await sendTransaction(this.packageContract.addVersion, [version, directory.address], this.txParams)
     log.info(`Added version ${version}`)
     return directory
   }
 
   async getDirectory(version) {
-    const directoryAddress = await this.package.getVersion(version)
-    return this.wrapImplementationDirectory(directoryAddress)
+    if (!version) throw Error("Cannot get a directory from a package without specifying a version")
+    const directoryAddress = await this.packageContract.getVersion(version)
+    return this.directoryClass.fetch(directoryAddress, this.txParams)
   }
 
-  wrapImplementationDirectory() {
-    throw Error('Cannot call abstract method wrapImplementationDirectory()')
-  }
-
-  async newDirectory() {
-    throw Error('Cannot call abstract method newDirectory()')
+  async _newDirectory() {
+    return this.directoryClass.deployLocal([], this.txParams)
   }
 }
