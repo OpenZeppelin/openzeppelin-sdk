@@ -97,6 +97,46 @@ zos create MyContract --init <initializingFunction> --args <arguments> --network
 
 where `<initializingFunction>` is the name of the initializing function (marked with an `isInitializer` modifier in the code), and `<arguments>` is a comma-separated list of arguments to the function.
 
+#### Calling Initialize Functions Manually in Your Unit Tests
+
+Truffle does not know how to resolve situations where a contract has functions that have matching names, but different arities. Here's an example of a `TimedCrowdsale` contract that inherits from `Crowdsale` which results in a contract that has two `initialize` functions with different arities:
+
+```
+contract TimedCrowdsale is Crowdsale {
+
+  initialize(uint256 _openingTime, uint256 _closingTime) 
+    public 
+    isInitializer("TimedCrowdsale", "0.0.1")
+  {
+    Crowdsale.initialize(_rate, _wallet, _token);
+  }
+}
+
+contract Crowdsale {
+
+  initialize(uint256 _rate, address _wallet, ERC20 _token) 
+    public 
+    isInitializer("Crowdsale", "0.0.1")
+  {
+    // does something
+  }
+}
+```
+
+This means that calls to contracts with more than one function named `initialize`, as is the case with some contracts from OpenZeppelin (e.g., TimedCrowdsale), may revert if you call `initialize` directly from Truffle. `zos create` handles this correctly as it encodes the parameters. However, for your unit tests you will need to call `initialize` manually.
+
+The current solution to this issue is to `npm install zos-lib` and use the same helper function `zos create` uses: `encodeCall`. `encodeCall` receives the signature of your `initialize` function, as well as its arguments and their types. It then crafts the calldata which you can send in a raw call. Here's an example:
+
+```
+data = encodeCall(
+    "initialize", 
+    ['address', 'string', 'string', 'uint8', 'address'],
+    [owner, name, symbol, decimals, exampleToken.address]
+);
+
+await exampleToken.sendTransaction( {data, from: owner} );
+```
+
 ## Format of `zos.json` and `zos.<network>.json` files
 ZeppelinOS's CLI generates `json` files where it stores the configuration of your project.
 
