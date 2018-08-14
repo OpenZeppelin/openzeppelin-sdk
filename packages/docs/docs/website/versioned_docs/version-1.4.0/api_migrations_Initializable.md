@@ -1,6 +1,7 @@
 ---
-id: migrations_Initializable
+id: version-1.4.0-migrations_Initializable
 title: Initializable
+original_id: migrations_Initializable
 ---
 
 <div class="contract-doc"><div class="contract"><h2 class="contract-header"><span class="contract-kind">contract</span> Initializable</h2><p class="description">Simple helper contract to support initialization outside of the constructor. To use it, replace the constructor with a function that has the `isInitializer` modifier. WARNING: This helper does not support multiple inheritance. WARNING: It is the developer&#x27;s responsibility to ensure that an initializer is actually called. Use `Migratable` for more complex migration mechanisms.</p><div class="source">Source: <a href="git+https://github.com/zeppelinos/zos/blob/v1.4.0/contracts/migrations/Initializable.sol" target="_blank">migrations/Initializable.sol</a></div></div><div class="index"><h2>Index</h2><ul><li><a href="migrations_Initializable.html#isInitializer">isInitializer</a></li></ul></div><div class="reference"><h2>Reference</h2><div class="modifiers"><h3>Modifiers</h3><ul><li><div class="item modifier"><span id="isInitializer" class="anchor-marker"></span><h4 class="name">isInitializer</h4><div class="body"><code class="signature">modifier <strong>isInitializer</strong><span>() </span></code><hr/><div class="description"><p>Modifier to use in the initialization function of a contract.</p></div></div></div></li></ul></div></div></div>

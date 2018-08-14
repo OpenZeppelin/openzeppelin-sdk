@@ -33,16 +33,19 @@
       "apis"
     ],
     "CLI REFERENCE": [
-      "climain",
-      "init",
-      "add",
-      "push",
-      "create",
-      "bump",
-      "upgrade",
-      "link",
-      "status",
-      "freeze"
+      "cli_main",
+      "cli_init",
+      "cli_add",
+      "cli_remove",
+      "cli_push",
+      "cli_create",
+      "cli_update",
+      "cli_bump",
+      "cli_link",
+      "cli_status",
+      "cli_freeze",
+      "cli_session",
+      "cli_verify"
     ],
     "APPLICATION": [
       "application_AppDirectory",
