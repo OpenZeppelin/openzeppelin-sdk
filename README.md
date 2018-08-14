@@ -1,4 +1,5 @@
 # ZeppelinOS
+[![Build Status](https://travis-ci.org/zeppelinos/zos.svg?branch=master)](https://travis-ci.org/zeppelinos/zos)
 [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lernajs.io/)
 
 Multi-package repository for ZeppelinOS [library](https://github.com/zeppelinos/zos/tree/master/packages/lib#readme), [CLI](https://github.com/zeppelinos/zos/tree/master/packages/cli#readme), and [docs](https://github.com/zeppelinos/zos/tree/master/packages/docs#readme).
