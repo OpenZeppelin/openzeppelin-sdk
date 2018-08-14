@@ -44,7 +44,7 @@ contract('App', ([_, owner, donor, wallet]) => {
       describe('when queried for the implementation', function() {
 
         it('returns a valid address', async function() {
-          const implementation = await this.app.directories[initialVersion].getImplementation(contractName)
+          const implementation = await this.app.directory.getImplementation(contractName)
 
           implementation.should.be.nonzeroAddress
         });
