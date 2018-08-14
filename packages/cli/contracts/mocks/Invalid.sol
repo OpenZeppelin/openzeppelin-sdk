@@ -17,3 +17,41 @@ contract WithFailingConstructor {
     assert(false);
   }
 }
+
+contract WithSelfDestruct {
+  uint256 public value;
+
+  constructor() public {
+    if (true)
+      selfdestruct(msg.sender);
+  }
+
+  function say() public pure returns (string) {
+    return "WithSelfDestruct";
+  }
+}
+
+contract WithParentWithSelfDestruct is WithSelfDestruct {
+  function say() public pure returns (string) {
+    return "WithParentWithSelfDestruct";
+  }
+}
+
+contract WithDelegateCall {
+  constructor(address _e) public {
+    require(_e.delegatecall(bytes4(keccak256("kill()"))));
+  }
+  
+  function say() public pure returns (string) {
+    return "WithDelegateCall";
+  }
+}
+
+contract WithParentWithDelegateCall is WithDelegateCall {
+  constructor(address _e) public WithDelegateCall(_e) {
+  }
+
+  function say() public pure returns (string) {
+    return "WithParentWithDelegateCall";
+  }
+}

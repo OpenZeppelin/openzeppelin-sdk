@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Added
 - New `verify` command to verify and publish a contract source code on etherchain ([#339](https://github.com/zeppelinos/zos-cli/pull/339))
+- Add check for selfdestruct calls in logic contracts that could lead to orphaned proxies ([#347](https://github.com/zeppelinos/zos-cli/pull/347)) (thanks @hardlydifficult)
 
 ### Fixed
 - Handle stdlib semver syntax in the `status` command ([#290](https://github.com/zeppelinos/zos-cli/issues/290))

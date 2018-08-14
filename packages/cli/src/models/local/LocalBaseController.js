@@ -45,6 +45,16 @@ export default class LocalBaseController {
     if (this.hasConstructor(Contracts.getLocalPath(contractName))) {
       log.error(`Contract ${contractName} has an explicit constructor. Move it to an initializer function to use it with ZeppelinOS.`)
     }
+    // Log a warning anytime `selfdestruct` is found.  This is a potential security risk, 
+    // but not an error/throw as it may be a desired feature
+    if (this.hasSelfDestruct(Contracts.getLocalPath(contractName))) {
+      log.warn(`Contract ${contractName} (or its parent class) has a selfdestruct call. This is potentially a security risk. Please review and consider removing this call.`)
+    }
+    // Log a warning anytime `delegatecall` is found.  This is a potential security risk, 
+    // but not an error/throw as it may be a desired feature
+    if (this.hasDelegateCall(Contracts.getLocalPath(contractName))) {
+      log.warn(`Contract ${contractName} (or its parent class) has a delegatecall call. This is potentially a security risk, as the logic contract could be destructed by issuing a delegatecall to another contract with a selfdestruct instruction. Please review and consider removing this call.`)
+    }
     this.packageFile.addContract(contractAlias, contractName)
   }
 
@@ -90,6 +100,35 @@ export default class LocalBaseController {
     if (!fs.exists(contractDataPath)) return false
     const abi = fs.parseJson(contractDataPath).abi
     return !!abi.find(fn => fn.type === "constructor");
+  }
+
+  hasSelfDestruct(contractDataPath) {
+    return this.hasTypeIdentifier(contractDataPath, "t_function_selfdestruct_nonpayable$_t_address_$returns$__$")
+  }
+
+  hasDelegateCall(contractDataPath) {
+    return this.hasTypeIdentifier(contractDataPath, "t_function_baredelegatecall_nonpayable$__$returns$_t_bool_$")
+  }
+
+  hasTypeIdentifier(contractDataPath, typeIdentifier) {
+    if (!fs.exists(contractDataPath)) return false
+    const contractJson = fs.parseJson(contractDataPath)
+    for (const node of contractJson.ast.nodes.filter((n) => n.name === contractJson.contractName)) {
+      if (this.hasKeyValue(node, "typeIdentifier", typeIdentifier)) return true
+      for (const baseContract of node.baseContracts || []) {
+        if (this.hasTypeIdentifier(Contracts.getLocalPath(baseContract.baseName.name), typeIdentifier)) return true
+      }
+    }
+    return false
+  }
+
+  hasKeyValue(data, key, value) {
+    if (!data) return false
+    if (data[key] === value) return true
+    for (const childKey in data) {
+      if (typeof(data[childKey]) === 'object' && this.hasKeyValue(data[childKey], key, value)) return true
+    }
+    return false
   }
 
   getContractClass(contractAlias) {

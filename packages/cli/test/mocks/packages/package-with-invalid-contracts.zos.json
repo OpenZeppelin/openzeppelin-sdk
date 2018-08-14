@@ -3,6 +3,10 @@
   "version": "1.1.0",
   "contracts": {
     "Impl": "ImplV1",
-    "WithFailingConstructor": "WithFailingConstructor"
+    "WithFailingConstructor": "WithFailingConstructor",
+    "WithSelfDestruct": "WithSelfDestruct",
+    "WithParentWithSelfDestruct": "WithParentWithSelfDestruct",
+    "WithDelegateCall": "WithDelegateCall",
+    "WithParentWithDelegateCall": "WithParentWithDelegateCall"
   }
 }
