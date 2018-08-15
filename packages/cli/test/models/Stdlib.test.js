@@ -5,7 +5,7 @@ import Stdlib from '../../src/models/stdlib/Stdlib'
 
 const should = require('chai').should()
 
-contract('Stdlib', function () {
+contract.skip('Stdlib', function () {
   const packageName = 'mock-stdlib'
 
   describe('fetch', function () {

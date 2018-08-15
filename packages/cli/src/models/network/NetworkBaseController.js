@@ -19,6 +19,10 @@ export default class NetworkBaseController {
     return this.localController.packageFile;
   }
 
+  get currentVersion() {
+    return this.packageFile.version;
+  }
+
   get packageAddress() {
     return this.networkFile.packageAddress
   }
@@ -29,10 +33,6 @@ export default class NetworkBaseController {
 
   get isLib() {
     return this.packageFile.isLib;
-  }
-
-  async init() {
-    return await (this.isDeployed ? this.fetch() : this.deploy());
   }
 
   async compareCurrentStatus() {
@@ -50,9 +50,17 @@ export default class NetworkBaseController {
   }
 
   async push(reupload = false) {
-    await this.init()
-    await this.pushVersion()
-    await Promise.all([this.uploadContracts(reupload), this.unsetContracts()])
+    if (this.isDeployed) {
+      await this.fetch();
+      await this.pushVersion();
+    } else {
+      await this.deploy();
+    }
+
+    await Promise.all([
+      this.uploadContracts(reupload), 
+      this.unsetContracts()
+    ])
   }
 
   async pushVersion() {
@@ -63,9 +71,17 @@ export default class NetworkBaseController {
       log.info(`Creating new version ${requestedVersion}`);
       const provider = await this.newVersion(requestedVersion);
       this.networkFile.contracts = {};
-      this.networkFile.provider = { address: provider.address };
+      this._registerVersion(requestedVersion, provider.address);
     }
-    this.networkFile.version = requestedVersion;
+  }
+
+  _registerVersion(version, providerAddress) {
+    this.networkFile.provider = { address: providerAddress };
+    this.networkFile.version = version;
+  }
+
+  async newVersion(versionName) {
+    return this.project.newVersion(versionName);
   }
 
   async uploadContracts(reupload) {
@@ -88,7 +104,7 @@ export default class NetworkBaseController {
   async uploadContract(contractAlias, contractName) {
     const contractClass = Contracts.getFromLocal(contractName);
     log.info(`Uploading ${contractName} contract as ${contractAlias}`);
-    const contractInstance = await this.setImplementation(contractClass, contractAlias);
+    const contractInstance = await this.project.setImplementation(contractClass, contractAlias);
     this.networkFile.addContract(contractAlias, contractInstance)
   }
 
@@ -108,7 +124,7 @@ export default class NetworkBaseController {
 
   async unsetContract(contractAlias) {
     log.info(`Removing ${contractAlias} contract`);
-    await this.unsetImplementation(contractAlias);
+    await this.project.unsetImplementation(contractAlias);
     this.networkFile.unsetContract(contractAlias)
   }
 

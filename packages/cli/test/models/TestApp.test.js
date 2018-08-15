@@ -7,7 +7,7 @@ import ZosPackageFile from "../../src/models/files/ZosPackageFile";
 
 const ImplV1 = Contracts.getFromLocal('ImplV1');
 
-contract('TestApp', function ([_, owner]) {
+contract.skip('TestApp', function ([_, owner]) {
   const txParams = { from: owner }
   const initialVersion = "1.0";
 
@@ -41,7 +41,7 @@ contract('TestApp', function ([_, owner]) {
     this.app.currentDirectory().address.should.be.not.null;
   });
     
-  it('deploys stdlib', async function () {
+  it.skip('deploys stdlib', async function () {
     (await this.directory.stdlib()).should.be.not.null;
   })
 

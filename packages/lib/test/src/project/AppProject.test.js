@@ -15,13 +15,13 @@ contract('AppProject', function (accounts) {
   }
 
   const fetch = async function () {
-    const app = await this.project.getApp()
+    const app = this.project.getApp()
     this.project = await AppProject.fetch(app.address, name, { from: owner })
   }
 
   const onNewVersion = function () {
     it('registers the new package version in the app', async function () {
-      const app = await this.project.getApp()
+      const app = this.project.getApp()
       const thepackage = await this.project.getProjectPackage()
       const packageInfo = await app.getPackage(name)
       packageInfo.version.should.eq(newVersion)

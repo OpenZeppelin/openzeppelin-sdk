@@ -2,6 +2,7 @@ import _ from 'lodash'
 import { Logger, FileSystem as fs } from 'zos-lib'
 import { bytecodeDigest, bodyCode, constructorCode } from '../../utils/contracts'
 import Stdlib from '../stdlib/Stdlib';
+import { fromContractFullName, toContractFullName } from '../../utils/naming';
 
 const log = new Logger('ZosNetworkFile')
 
@@ -13,6 +14,7 @@ export default class ZosNetworkFile {
     this.fileName = fileName
 
     const defaults = this.packageFile.isLib ? { contracts: {}, lib: true, frozen: false } : { contracts: {}, proxies: {} }
+    defaults.zosversion = '2' // TODO: Implement auto upgrade
     this.data = fs.parseJsonIfExists(this.fileName) || defaults
   }
 
@@ -48,26 +50,6 @@ export default class ZosNetworkFile {
     return this.data.frozen
   }
 
-  get stdlib() {
-    return this.data.stdlib || {}
-  }
-
-  get stdlibName() {
-    return this.stdlib.name
-  }
-
-  get stdlibVersion() {
-    return this.stdlib.version
-  }
-
-  get stdlibAddress() {
-    return this.stdlib.address
-  }
-
-  get proxies() {
-    return this.data.proxies || {}
-  }
-
   get contracts() {
     return this.data.contracts || {}
   }
@@ -75,41 +57,33 @@ export default class ZosNetworkFile {
   get contractAliases() {
     return Object.keys(this.contracts)
   }
-
-  get proxyAliases() {
-    return Object.keys(this.proxies)
-  }
-
+    
   get isLib() {
     return this.packageFile.isLib
   }
 
-  proxiesList() {
-    return _.flatMap(this.proxyAliases, alias => this.proxiesOf(alias).map(info => {
-      info['alias'] = alias
-      return info
-    }))
+  getProxies({ package: packageName, contract, address } = {}) {
+    if (_.isEmpty(this.data.proxies)) return []
+    const allProxies = _.flatMap(this.data.proxies || {}, (proxiesList, fullname) => (
+      _.map(proxiesList, proxyInfo => ({
+        ...fromContractFullName(fullname),
+        ...proxyInfo
+      }))
+    ))
+    return _.filter(allProxies, proxy => (
+      (!packageName || proxy.package === packageName) &&
+      (!contract || proxy.contract === contract) &&
+      (!address || proxy.address === address)
+    ))
   }
 
-  proxy(alias, index) {
-    return this.proxiesOf(alias)[index]
-  }
-
-  proxyByAddress(alias, address) {
-    const index = this.indexOfProxy(alias, address)
-    return this.proxiesOf(alias)[index]
-  }
-
-  proxiesOf(alias) {
-    return this.proxies[alias] || []
-  }
-
-  indexOfProxy(alias, address) {
-    return this.proxiesOf(alias).findIndex(proxy => proxy.address === address)
+  getProxy(address) {
+    const allProxies = this.getProxies()
+    return _.find(allProxies, { address })
   }
 
   contract(alias) {
-    return this.contracts[alias]
+    return this.data.contracts[alias]
   }
 
   contractAliasesMissingFromPackage() {
@@ -125,11 +99,11 @@ export default class ZosNetworkFile {
   }
 
   hasContracts() {
-    return !_.isEmpty(this.contracts)
+    return !_.isEmpty(this.data.contracts)
   }
 
-  hasProxies(alias = undefined) {
-    return alias ? !_.isEmpty(this.proxiesOf(alias)) : !_.isEmpty(this.proxies)
+  hasProxies(filter = {}) {
+    return _.isEmpty(this.getProxies(filter))
   }
 
   hasMatchingVersion() {
@@ -217,30 +191,28 @@ export default class ZosNetworkFile {
     delete this.data.contracts[alias]
   }
 
-  setProxies(alias, value) {
-    this.data.proxies[alias] = value
+  setProxies(packageName, alias, value) {
+    const fullname = toContractFullName(packageName, alias)
+    this.data.proxies[fullname] = value
   }
 
   unsetContract(alias) {
     delete this.data.contracts[alias];
   }
 
-  addProxy(alias, info) {
-    if (!this.hasProxies(alias)) this.setProxies(alias, [])
-    this.data.proxies[alias].push(info)
+  addProxy(thepackage, alias, info) {
+    const fullname = toContractFullName(thepackage, alias)
+    if(!this.data.proxies[fullname]) this.data.proxies[fullname] = []
+    this.data.proxies[fullname].push(info)
   }
 
-  setProxyImplementation(alias, address, implementation) {
-    const index = this.indexOfProxy(alias, address)
-    if(index < 0) return
-    this.data.proxies[alias][index].implementation = implementation
-  }
-
-  removeProxy(alias, address) {
-    const index = this.indexOfProxy(alias, address)
-    if(index < 0) return
-    this.data.proxies[alias].splice(index, 1)
-    if(this.proxiesOf(alias).length === 0) delete this.data.proxies[alias]
+  updateProxy(proxy) {
+    const fullname = toContractFullName(proxy.package, proxy.contract)
+    const existing = _.find(this.data.proxies[fullname], { address: proxy.address })
+    Object.assign(existing, { 
+      version: proxy.version,
+      implementation: proxy.implementation
+    })
   }
 
   write() {

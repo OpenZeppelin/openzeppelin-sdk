@@ -5,7 +5,7 @@ import { App } from 'zos-lib'
 import push from '../../src/scripts/push.js'
 import ZosPackageFile from '../../src/models/files/ZosPackageFile'
 
-contract('push-with-stdlib script', function([_, owner]) {
+contract.skip('push-with-stdlib script', function([_, owner]) {
   const network = 'test';
   const version = '1.0';
   const txParams = { from: owner };

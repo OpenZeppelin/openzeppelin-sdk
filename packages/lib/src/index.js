@@ -18,13 +18,16 @@ const assertions = helpers.assertions
 const assertRevert = helpers.assertRevert
 
 // model objects
-// import App from './app/App'
-// import Package from './package/Package'
-// import AppDirectory from './directory/AppDirectory'
-// import ImplementationDirectory from './directory/ImplementationDirectory'
-// import FreezableImplementationDirectory from './directory/FreezableImplementationDirectory'
+import UnversionedApp from './app/UnversionedApp'
+import VersionedApp from './app/VersionedApp'
+import Package from './package/Package'
+import ImplementationDirectory from './directory/ImplementationDirectory'
+import FreezableImplementationDirectory from './directory/FreezableImplementationDirectory'
+import UpgradeabilityProxyFactory from './factory/UpgradeabilityProxyFactory'
+import Project from './project/Project'
+import LibProject from './project/LibProject'
+import AppProject from './project/AppProject'
 
-// TODO: UPDATE me
 export {
   version,
   decodeLogs,
@@ -38,9 +41,13 @@ export {
   Logger,
   FileSystem,
   Contracts,
-  // App,
-  // ImplementationDirectory,
-  // FreezableImplementationDirectory,
-  // AppDirectory,
-  // Package,
+  VersionedApp,
+  UnversionedApp,
+  ImplementationDirectory,
+  FreezableImplementationDirectory,
+  UpgradeabilityProxyFactory,
+  Package,
+  Project,
+  LibProject,
+  AppProject
 }
