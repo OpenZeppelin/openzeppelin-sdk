@@ -1,6 +1,6 @@
 'use strict';
 
-import { Package } from 'zos-lib';
+import { LibProject } from 'zos-lib';
 import NetworkBaseController from './NetworkBaseController';
 
 export default class NetworkLibController extends NetworkBaseController {
@@ -13,31 +13,26 @@ export default class NetworkLibController extends NetworkBaseController {
   }
 
   async deploy() {
-    this.package = await Package.deploy(this.txParams);
-    this.networkFile.package = { address: this.package.address() }
+    this.project = await LibProject.deploy(this.currentVersion, this.txParams)
+    const thepackage = await this.project.getProjectPackage()
+    this.networkFile.package = { address: thepackage.address }
+    const provider = await this.project.getCurrentDirectory();
+    this._registerVersion(this.currentVersion, provider.address)
   }
 
   async fetch() {
     if (!this.isDeployed) throw Error('Your application must be deployed to interact with it.');
-    this.package = await Package.fetch(this.packageAddress, this.txParams);
+    this.project = await LibProject.fetch(this.packageAddress, this.currentVersion, this.txParams);
   }
 
-  async setImplementation(contractClass, contractAlias) {
-    return this.package.setImplementation(this.networkFile.version, contractClass, contractAlias);
-  }
-
-  async unsetImplementation(contractAlias) {
-    return this.package.unsetImplementation(this.networkFile.version, contractAlias);
-  }
-
-  newVersion(versionName) {
+  async newVersion(versionName) {
     this.networkFile.frozen = false
-    return this.package.newVersion(versionName)
+    return super.newVersion(versionName)
   }
 
   async freeze() {
     await this.fetch()
-    await this.package.freeze(this.networkFile.version)
+    await this.project.freeze()
     this.networkFile.frozen = true
   }
 

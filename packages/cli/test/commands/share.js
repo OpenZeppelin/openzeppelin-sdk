@@ -15,6 +15,7 @@ import * as remove from '../../src/scripts/remove';
 import * as session from '../../src/scripts/session';
 import * as status from '../../src/scripts/status';
 import * as update from '../../src/scripts/update';
+import * as verify from '../../src/scripts/verify';
 
 import * as runWithTruffle from '../../src/utils/runWithTruffle';
 import Session from '../../src/models/network/Session';
@@ -53,6 +54,7 @@ exports.stubCommands = function () {
     this.session = sinon.stub(session, 'default')
     this.status = sinon.stub(status, 'default')
     this.update = sinon.stub(update, 'default')
+    this.verify = sinon.stub(verify, 'default')
 
     this.runWithTruffle = sinon.stub(runWithTruffle, 'default').callsFake(function (script, options) {
       const { network, from, timeout } = Session.getOptions(options)
@@ -78,6 +80,7 @@ exports.stubCommands = function () {
     this.session.restore()
     this.status.restore()
     this.update.restore()
+    this.verify.restore()
     this.runWithTruffle.restore()
     program.parseReset()
   })

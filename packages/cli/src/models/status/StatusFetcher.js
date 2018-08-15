@@ -1,4 +1,4 @@
-import { Contracts, Logger, App, FileSystem as fs } from 'zos-lib'
+import { Contracts, Logger, FileSystem as fs } from 'zos-lib'
 import { bytecodeDigest, bodyCode, constructorCode } from '../../utils/contracts'
 
 const log = new Logger('StatusFetcher')

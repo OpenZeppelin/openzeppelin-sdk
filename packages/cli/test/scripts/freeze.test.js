@@ -10,7 +10,7 @@ contract('freeze script', function([_, owner]) {
   const network = 'test'
   const txParams = { from: owner }
 
-  beforeEach('init and push stdlib', async function () {
+  beforeEach('init and push lib', async function () {
     const packageFile = new ZosPackageFile('test/mocks/packages/package-lib-with-contracts.zos.json')
     this.networkFile = packageFile.networkFile(network)
     await push({ networkFile: this.networkFile, network, txParams })

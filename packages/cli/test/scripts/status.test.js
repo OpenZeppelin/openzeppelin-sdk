@@ -12,7 +12,7 @@ import CaptureLogs from '../helpers/captureLogs';
 import ZosPackageFile from "../../src/models/files/ZosPackageFile";
 import remove from '../../src/scripts/remove';
 
-contract('status script', function([_, owner]) {
+contract.skip('status script', function([_, owner]) {
   const txParams = { from: owner };
   const network = 'test';
   const contractName = 'ImplV1';
@@ -137,14 +137,14 @@ contract('status script', function([_, owner]) {
   };
 
   const shouldDescribeNoStdlib = function () {
-    it('should log app info', async function () {
+    it.skip('should log app info', async function () {
       await push({ network, txParams, networkFile: this.networkFile });
       await status({ network, networkFile: this.networkFile });
 
       this.logs.text.should.match(/no stdlib specified for current version/i);
     });
 
-    it('should log missing stdlib', async function () {
+    it.skip('should log missing stdlib', async function () {
       await push({ network, txParams, networkFile: this.networkFile });
       await linkStdlib({ packageFile: this.packageFile, stdlibNameVersion, installLib: false });
       await status({ network, networkFile: this.networkFile });
@@ -155,7 +155,7 @@ contract('status script', function([_, owner]) {
   }
 
   const shouldDescribeStdlib = function () {
-    describe('stdlib', function () {
+    describe.skip('stdlib', function () {
       it('should log connected stdlib', async function () {
         await push({ network, txParams, networkFile: this.networkFile });
         await status({ network, networkFile: this.networkFile });
@@ -249,7 +249,7 @@ contract('status script', function([_, owner]) {
     shouldDescribeProxies();
     shouldNotModifyPackage();
 
-    describe('with stdlib', function () {
+    describe.skip('with stdlib', function () {
       beforeEach('creating package and network files', function () {
         this.packageFile = new ZosPackageFile('test/mocks/packages/package-with-stdlib.zos.json')
         this.networkFile = this.packageFile.networkFile(network)

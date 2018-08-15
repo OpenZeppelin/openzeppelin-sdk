@@ -36,7 +36,7 @@ export default class AppProject extends Project {
     return directory
   } 
 
-  async getApp() {
+  getApp() {
     return this.app
   }
 
@@ -53,6 +53,10 @@ export default class AppProject extends Project {
       this.directory = await this.app.getProvider(this.name)  
     }
     return this.directory
+  }
+
+  async getCurrentVersion() {
+    return this.version
   }
 
   // TODO: Testme

@@ -15,7 +15,16 @@ export default class Project {
     this.directory = directory
     this.version = version
     return directory
-  } 
+  }
+
+  // TODO: Testme
+  async freeze() {
+    const version = await this.getCurrentVersion()
+    log.info(`Freezing version ${version}...`)
+    const directory = await this.getCurrentDirectory()
+    await directory.freeze()
+    log.info(`Version ${version} has been frozen`)
+  }
 
   async setImplementation(contractClass, contractName) {
     log.info(`Setting implementation of ${contractName} in directory...`)
@@ -38,5 +47,9 @@ export default class Project {
 
   async getProjectPackage() {
     throw Error("Unimplemented")
-  }  
+  }
+
+  async getCurrentVersion() {
+    throw Error("Unimplemented")
+  }
 }

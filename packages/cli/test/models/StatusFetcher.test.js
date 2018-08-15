@@ -14,7 +14,7 @@ import PackageAtVersion from '../../src/models/lib/PackageAtVersion';
 const ImplV1 = Contracts.getFromLocal('ImplV1')
 const AnotherImplV1 = Contracts.getFromLocal('AnotherImplV1')
 
-contract('StatusFetcher', function([_, owner, anotherAddress]) {
+contract.skip('StatusFetcher', function([_, owner, anotherAddress]) {
   const network = 'test'
   const txParams = { from: owner }
 

@@ -1,6 +1,5 @@
 import ControllerFor from '../local/ControllerFor'
 import ZosPackageFile from '../files/ZosPackageFile'
-import ZosNetworkFile from '../files/ZosNetworkFile'
 
 export default function(network, txParams, networkFile = undefined) {
   if(!networkFile) {
