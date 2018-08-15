@@ -6,7 +6,7 @@ import ZosPackageFile from "../../src/models/files/ZosPackageFile";
 
 const should = require('chai').should();
 
-contract('link script', function() {
+contract.skip('link script', function() {
 
   beforeEach('setup', async function() {
     this.packageFile = new ZosPackageFile('test/mocks/packages/package-with-stdlib.zos.json')

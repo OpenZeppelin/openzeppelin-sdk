@@ -50,7 +50,7 @@ contract('init script', function() {
       this.packageFile.contracts.should.be.eql({})
     });
 
-    it('should set stdlib', async function () {
+    it.skip('should set stdlib', async function () {
       await init({ name, version, stdlibNameVersion: 'mock-stdlib@1.1.0', packageFile: this.packageFile });
 
       this.packageFile.stdlibName.should.eq('mock-stdlib');

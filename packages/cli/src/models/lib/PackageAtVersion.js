@@ -1,5 +1,3 @@
-import PackageProvider from "zos-lib/lib/package/PackageProvider";
-
 export default class PackageAtVersion {
 
   static async fetch(address, version, txParams = {}) {

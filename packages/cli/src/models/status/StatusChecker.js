@@ -1,9 +1,8 @@
-import { Logger, App } from 'zos-lib'
+import { Logger, LibProject, AppProject } from 'zos-lib'
 import EventsFilter from './EventsFilter'
 import StatusFetcher from './StatusFetcher'
 import StatusComparator from './StatusComparator'
 import { bytecodeDigest } from '../../utils/contracts'
-import PackageAtVersion from '../lib/PackageAtVersion';
 
 const log = new Logger('StatusChecker')
 const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000'

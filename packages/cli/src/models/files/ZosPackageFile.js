@@ -9,7 +9,7 @@ export default class ZosPackageFile {
 
   constructor(fileName = 'zos.json') {
     this.fileName = fileName
-    this.data = fs.parseJsonIfExists(this.fileName) || {};
+    this.data = fs.parseJsonIfExists(this.fileName) || { zosversion: '2' };
   }
 
   exists() {
@@ -28,6 +28,8 @@ export default class ZosPackageFile {
     return this.data.version
   }
 
+
+
   get stdlib() {
     return this.data.stdlib || {}
   }
@@ -39,6 +41,9 @@ export default class ZosPackageFile {
   get stdlibVersion() {
     return this.stdlib.version
   }
+
+
+
 
   get contracts() {
     return this.data.contracts || {}

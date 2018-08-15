@@ -32,4 +32,8 @@ export default class LibProject extends Project {
     }
     return this.directory
   }
+
+  async getCurrentVersion() {
+    return this.version
+  }
 }
