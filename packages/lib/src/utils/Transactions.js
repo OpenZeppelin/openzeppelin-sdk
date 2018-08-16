@@ -68,11 +68,12 @@ function getNodeVersion () {
   if (!state.version) {
     state.version = web3.version;
   }
-  return state.version.node;
+  return promisify(state.version.getNode.bind(state.version))();
 }
 
-function isGanacheNode () {
-  return getNodeVersion().match(/TestRPC/)
+async function isGanacheNode () {
+  const nodeVersion = await getNodeVersion();
+  return nodeVersion.match(/TestRPC/);
 }
 
 async function getBlockGasLimit () {
