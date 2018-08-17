@@ -9,6 +9,7 @@ import "../Initializable.sol";
 contract InitializableMock is Initializable {
 
   bool public initializerRan;
+  uint256 public x;
 
   function initialize() public initializer {
     initializerRan = true;
@@ -16,6 +17,14 @@ contract InitializableMock is Initializable {
 
   function initializeNested() public initializer {
     initialize();
+  }
+
+  function initializeWithX(uint256 _x) public payable initializer {
+    x = _x;
+  }
+
+  function fail() public pure {
+    require(false, "InitializableMock forced failure");
   }
 
 }

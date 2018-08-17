@@ -6,7 +6,7 @@ import Contracts from '../../../src/utils/Contracts'
 import encodeCall from '../../../src/helpers/encodeCall'
 import assertRevert from '../../../src/test/helpers/assertRevert'
 
-const MigratableMock = Contracts.getFromLocal('MigratableMock')
+const InitializableMock = Contracts.getFromLocal('InitializableMock')
 const AdminUpgradeabilityProxy = Contracts.getFromLocal('AdminUpgradeabilityProxy')
 const UpgradeabilityProxyFactory = Contracts.getFromLocal('UpgradeabilityProxyFactory')
 const DummyImplementation = Contracts.getFromLocal('DummyImplementation')
@@ -47,11 +47,11 @@ contract('UpgradeabilityProxyFactory', ([_, owner]) => {
 
   describe('createProxyAndCall', function () {
     const value = 1e5
-    const initializeData = encodeCall('initialize', ['uint256'], [42])
+    const initializeData = encodeCall('initializeWithX', ['uint256'], [42])
 
     context('when it fails', function () {
       beforeEach(async function () {
-        this.behavior = await MigratableMock.new()
+        this.behavior = await InitializableMock.new()
       })
 
       it('should revert if function reverts', async function () {
@@ -63,7 +63,7 @@ contract('UpgradeabilityProxyFactory', ([_, owner]) => {
     context('when it succeeds', function () {
 
       beforeEach(async function () {
-        this.behavior = await MigratableMock.new()
+        this.behavior = await InitializableMock.new()
         const { logs } = await this.factory.createProxyAndCall(owner, this.behavior.address, initializeData, { value })
         this.logs = logs
         this.proxyAddress = logs.find(l => l.event === 'ProxyCreated').args.proxy
@@ -87,8 +87,8 @@ contract('UpgradeabilityProxyFactory', ([_, owner]) => {
       })
 
       it('calls "initialize" function', async function() {
-        const migratable = MigratableMock.at(this.proxyAddress);
-        const x = await migratable.x();
+        const initializable = InitializableMock.at(this.proxyAddress);
+        const x = await initializable.x();
         x.should.be.bignumber.eq(42);
       })
 
