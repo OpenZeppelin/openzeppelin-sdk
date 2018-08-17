@@ -4,13 +4,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Fixed
+- Promisify remaining web3 synchronous function calls
+
 ## [1.4.0] - 2018-08-14
 
 ### Changed
 - Contract deployments and transactions are executed with an estimate of the gas needed, instead of using the network default ([#211](https://github.com/zeppelinos/zos-lib/pull/211))
 - Promisify all web3 function calls ([#205](https://github.com/zeppelinos/zos-lib/issues/205)) 
 
-### Fix
+### Fixed
 - Mark truffle-config as a prod dependency
 
 ## [1.3.0] - 2018-07-13
