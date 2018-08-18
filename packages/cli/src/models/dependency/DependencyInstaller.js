@@ -1,12 +1,12 @@
-import Stdlib from "./Stdlib";
+import Dependency from "./Dependency";
 import npm from 'npm-programmatic'
 
-const StdlibInstaller = {
+const DependencyInstaller = {
   async call(stdlibNameAndVersion) {
     const params = { save: true, cwd: process.cwd() }
     await npm.install([stdlibNameAndVersion], params)
-    return new Stdlib(stdlibNameAndVersion)
+    return new Dependency(stdlibNameAndVersion)
   },
 }
 
-export default StdlibInstaller
+export default DependencyInstaller
