@@ -2,17 +2,17 @@ import _ from 'lodash';
 import { FileSystem as fs } from 'zos-lib'
 import semver from 'semver';
 
-import StdlibProvider from './StdlibProvider';
-import StdlibDeployer from './StdlibDeployer';
-import StdlibInstaller from './StdlibInstaller';
+import DependencyProvider from './DependencyProvider';
+import DependencyDeployer from './DependencyDeployer';
+import DependencyInstaller from './DependencyInstaller';
 
-export default class Stdlib {
+export default class Dependency {
   static fetch() {
-    return StdlibProvider.from(...arguments);
+    return DependencyProvider.from(...arguments);
   }
 
   static async deploy() {
-    return await StdlibDeployer.deploy(...arguments);
+    return await DependencyDeployer.deploy(...arguments);
   }
 
   static satisfiesVersion(version, requirement) {
@@ -20,7 +20,7 @@ export default class Stdlib {
   }
 
   static validateSatisfiesVersion(version, requirement) {
-    if (!Stdlib.satisfiesVersion(version, requirement)) {
+    if (!Dependency.satisfiesVersion(version, requirement)) {
       throw Error(`Required stdlib version ${requirement} does not match stdlib package version ${version}`);
     }
   }
@@ -43,7 +43,7 @@ export default class Stdlib {
   }
 
   async install() {
-    await StdlibInstaller.call(this.nameAndVersion)
+    await DependencyInstaller.call(this.nameAndVersion)
   }
 
   getPackage() {
@@ -59,7 +59,7 @@ export default class Stdlib {
     this.nameAndVersion = nameAndVersion
 
     const packageVersion = this.getPackage().version
-    Stdlib.validateSatisfiesVersion(packageVersion, version)
+    Dependency.validateSatisfiesVersion(packageVersion, version)
 
     this.version = version || tryWithCaret(packageVersion)
   }

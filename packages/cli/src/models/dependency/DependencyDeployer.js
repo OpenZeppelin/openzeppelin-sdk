@@ -1,6 +1,6 @@
 import { Contracts, Release, FileSystem as fs } from 'zos-lib'
 
-const StdlibDeployer = {
+const DependencyDeployer = {
   async deploy(stdlibName, txParams = {}) {
     const release = await this._createRelease(stdlibName, txParams)
     return release.address()
@@ -18,4 +18,4 @@ const StdlibDeployer = {
   }
 }
 
-export default StdlibDeployer;
+export default DependencyDeployer;
