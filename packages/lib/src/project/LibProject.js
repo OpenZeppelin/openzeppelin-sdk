@@ -10,7 +10,7 @@ export default class LibProject extends Project {
   static async deploy(version = '0.1.0', txParams = {}) {
     const thepackage = await Package.deploy(txParams)
     const directory = await thepackage.newVersion(version)
-    const project = new this(thepackage, txParams)
+    const project = new this(thepackage, version, txParams)
     project.directory = directory
     return project
   }

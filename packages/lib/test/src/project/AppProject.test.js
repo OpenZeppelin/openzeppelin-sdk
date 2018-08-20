@@ -19,6 +19,12 @@ contract('AppProject', function (accounts) {
     this.project = await AppProject.fetch(app.address, name, { from: owner })
   }
 
+  const onInitialize = function () {
+    it('has a name', async function () {
+      this.project.name.should.eq(name)
+    })
+  }
+
   const onNewVersion = function () {
     it('registers the new package version in the app', async function () {
       const app = this.project.getApp()

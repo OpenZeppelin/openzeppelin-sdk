@@ -79,4 +79,31 @@ export default class AppProject extends Project {
     if (!packageName) packageName = this.name
     return this.app.upgradeProxy(proxyAddress, contractClass, packageName, contractName, initMethod, initArgs)
   }
+
+  // TODO: Testme
+  async getDependencyPackage(name) {
+    const packageInfo = await this.app.getPackage(name)
+    return packageInfo.package
+  }
+
+  // TODO: Testme
+  async getDependencyVersion(name) {
+    const packageInfo = await this.app.getPackage(name)
+    return packageInfo.version
+  }
+
+  // TODO: Testme
+  async hasDependency(name) {
+    return this.app.hasPackage(name)
+  }
+
+  // TODO: Testme
+  async setDependency(name, packageAddress, version) {
+    return this.app.setPackage(name, packageAddress, version)
+  }
+
+  // TODO: Testme
+  async unsetDependency(name) {
+    return this.app.unsetPackage(name)
+  }
 }
