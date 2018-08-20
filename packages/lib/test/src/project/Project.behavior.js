@@ -5,12 +5,12 @@ import Contracts from '../../../src/utils/Contracts';
 
 const DummyImplementation = Contracts.getFromLocal('DummyImplementation')
 
-export default function shouldBehaveLikeProject(deploy, fetch, { onNewVersion } = {}) {
+export default function shouldBehaveLikeProject(deploy, fetch, { onInitialize, onNewVersion } = {}) {
   const version = '0.2.0'
   const newVersion = '0.3.0'
   const contractName = 'Dummy'
 
-  const shouldInitializePackage = function () {
+  const shouldInitialize = function () {
     it('creates a package', async function () {
       const thepackage = await this.project.getProjectPackage()
       thepackage.address.should.be.nonzeroAddress
@@ -27,17 +27,23 @@ export default function shouldBehaveLikeProject(deploy, fetch, { onNewVersion } 
       const projectDirectory = await this.project.getCurrentDirectory()
       packageDirectory.address.should.eq(projectDirectory.address)
     })
+
+    it('has an initial version', async function () {
+      this.project.version.should.eq(version)
+    })
+
+    if (onInitialize) onInitialize()
   }
 
   beforeEach('deploying project', deploy)
 
   describe('deploy', function () {
-    shouldInitializePackage()
+    shouldInitialize()
   })
 
   describe('fetch', function () {
     beforeEach('fetching project', fetch)
-    shouldInitializePackage()
+    shouldInitialize()
   })
 
   describe('newVersion', function () {
