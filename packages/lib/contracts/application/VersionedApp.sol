@@ -74,5 +74,6 @@ contract VersionedApp is BaseApp {
   function unsetPackage(string packageName) public onlyOwner {
     require(address(providers[packageName].package) != address(0), "Package to unset not found");
     delete providers[packageName];
+    emit PackageChanged(packageName, address(0), "");
   }
 }
