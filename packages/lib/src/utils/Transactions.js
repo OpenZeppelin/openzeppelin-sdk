@@ -10,7 +10,7 @@ import { promisify } from 'util'
 const state = { };
 
 // Gas estimates are multiplied by this value to allow for an extra buffer (for reference, truffle-next uses 1.25)
-const GAS_MULTIPLIER = 1.2;
+const GAS_MULTIPLIER = 1.25;
 
 // Max number of retries for deploying a contract
 const RETRY_COUNT = 3;
