@@ -1,23 +1,24 @@
 'use strict'
 require('../setup')
 
-import { Contracts } from "zos-lib";
+import _ from 'lodash';
+import { Contracts, AppProject } from "zos-lib";
 import CaptureLogs from '../helpers/captureLogs';
 
 import add from '../../src/scripts/add.js';
 import push from '../../src/scripts/push.js';
 import bumpVersion from '../../src/scripts/bump.js';
+import linkLib from '../../src/scripts/link.js';
 import createProxy from '../../src/scripts/create.js';
 import update from '../../src/scripts/update.js';
 import ZosPackageFile from "../../src/models/files/ZosPackageFile";
 
 const ImplV1 = Contracts.getFromLocal('ImplV1')
 const ImplV2 = Contracts.getFromLocal('ImplV2')
-const PackagedApp = Contracts.getFromLib('PackagedApp')
 const Greeter_V1 = Contracts.getFromNodeModules('mock-stdlib', 'GreeterImpl')
 const Greeter_V2 = Contracts.getFromNodeModules('mock-stdlib-2', 'GreeterImpl')
 
-contract('update script', function([_, owner]) {
+contract('update script', function([_skipped, owner]) {
   const network = 'test';
   const version_1 = '1.1.0';
   const version_2 = '1.2.0';
@@ -29,7 +30,8 @@ contract('update script', function([_, owner]) {
     else proxyInfo.address.should.be.nonzeroAddress;
 
     if (implementation) {
-      const app = PackagedApp.at(networkFile.appAddress)
+      const project = await AppProject.fetch(networkFile.appAddress, networkFile.packageFile.name, txParams)
+      const app = await project.getApp()
       const actualImplementation = await app.getProxyImplementation(proxyInfo.address)
       actualImplementation.should.eq(implementation);
       proxyInfo.implementation.should.eq(implementation);
@@ -98,12 +100,6 @@ contract('update script', function([_, owner]) {
       await assertProxyInfo(this.networkFile, 'Impl', 0, { version: version_2, implementation: this.implV2Address });
       await assertProxyInfo(this.networkFile, 'Impl', 1, { version: version_2, implementation: this.implV2Address });
       await assertProxyInfo(this.networkFile, 'AnotherImpl', 0, { version: version_2, implementation: this.anotherImplV2Address });
-    });
-
-    it('should require all flag to upgrade all proxies', async function() {
-      await update(
-        { contractAlias: undefined, proxyAddress: undefined, all: false, network, txParams, networkFile: this.networkFile }
-      ).should.be.rejected;
     });
 
     it('should upgrade the remaining proxies if one was already upgraded', async function() {
@@ -206,23 +202,27 @@ contract('update script', function([_, owner]) {
     });
   });
 
-  describe.skip('on stdlib contract', function () {
+  describe('on dependency contract', function () {
 
     beforeEach('setup', async function() {
-      this.packageFile = new ZosPackageFile('test/mocks/packages/package-with-stdlib.zos.json')
+      this.packageFile = new ZosPackageFile('test/mocks/packages/package-with-undeployed-stdlib.zos.json')
       this.networkFile = this.packageFile.networkFile(network)
 
-      await push({ network, txParams, deployStdlib: true, networkFile: this.networkFile });
-      await createProxy({ contractAlias: 'Greeter', network, txParams, networkFile: this.networkFile });
-      await createProxy({ contractAlias: 'Greeter', network, txParams, networkFile: this.networkFile });
+      await push({ network, txParams, deployLibs: true, networkFile: this.networkFile });
+      await createProxy({ packageName: 'mock-stdlib-undeployed', contractAlias: 'Greeter', network, txParams, networkFile: this.networkFile });
+      await createProxy({ packageName: 'mock-stdlib-undeployed', contractAlias: 'Greeter', network, txParams, networkFile: this.networkFile });
 
-      await bumpVersion({ version: version_2, txParams, stdlibNameVersion: 'mock-stdlib-2@1.2.0', packageFile: this.packageFile });
-      await push({ network, txParams, deployStdlib: true, networkFile: this.networkFile });
+      await bumpVersion({ version: version_2, txParams, packageFile: this.packageFile });
+      await linkLib({ txParams, libNameVersion: 'mock-stdlib-undeployed-2@1.2.0', packageFile: this.packageFile });
+      await push({ network, txParams, deployLibs: true, networkFile: this.networkFile });
+
+      // We modify the proxies' package to v2, so we can upgrade them, simulating an upgrade to mock-stdlib-undeployed
+      this.networkFile.data.proxies = _.mapKeys(this.networkFile.data.proxies, (value, key) => key.replace('mock-stdlib-undeployed', 'mock-stdlib-undeployed-2'))
     });
 
     it('should upgrade the version of a proxy given its address', async function() {
       const proxyAddress = this.networkFile.getProxies({ contract: 'Greeter'})[0].address;
-      await update({ contractAlias: 'Greeter', proxyAddress, network, txParams, networkFile: this.networkFile });
+      await update({ proxyAddress, network, txParams, networkFile: this.networkFile });
 
       await assertProxyInfo(this.networkFile, 'Greeter', 0, { version: version_2, address: proxyAddress });
       const upgradedProxy = await Greeter_V2.at(proxyAddress);
@@ -234,7 +234,16 @@ contract('update script', function([_, owner]) {
     });
 
     it('should upgrade the version of all proxies given their name', async function() {
-      await update({ contractAlias: 'Greeter', network, txParams, networkFile: this.networkFile });
+      await update({ packageName: 'mock-stdlib-undeployed-2', contractAlias: 'Greeter', network, txParams, networkFile: this.networkFile });
+
+      const { address: proxyAddress } = await assertProxyInfo(this.networkFile, 'Greeter', 0, { version: version_2 });
+      (await Greeter_V2.at(proxyAddress).version()).should.eq('1.2.0');
+      const { address: anotherProxyAddress } = await assertProxyInfo(this.networkFile, 'Greeter', 0, { version: version_2 });
+      (await Greeter_V2.at(anotherProxyAddress).version()).should.eq('1.2.0');
+    });
+
+    it('should upgrade the version of all proxies given their package', async function() {
+      await update({ packageName: 'mock-stdlib-undeployed-2', network, txParams, networkFile: this.networkFile });
 
       const { address: proxyAddress } = await assertProxyInfo(this.networkFile, 'Greeter', 0, { version: version_2 });
       (await Greeter_V2.at(proxyAddress).version()).should.eq('1.2.0');

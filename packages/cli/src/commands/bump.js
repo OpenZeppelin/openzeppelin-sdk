@@ -11,14 +11,11 @@ const register = program => program
   .command(signature, { noHelp: true })
   .usage('<version> [options]')
   .description(description)
-  .option('--link <stdlib>', 'link to new standard library version')
-  .option('--no-install', 'skip installing stdlib dependencies locally')
   .withPushOptions()
   .action(action)
 
 async function action(version, options) {
-  const { link: stdlibNameVersion, install: installLib } = options
-  await bump({ version, stdlibNameVersion, installLib })
+  await bump({ version })
   await push.tryAction(options)
 }
 

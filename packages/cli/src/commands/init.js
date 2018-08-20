@@ -25,8 +25,8 @@ async function action(name, version, options) {
     if (options.link) throw Error('Cannot set a stdlib in a library project')
     await initLib({ name, version, force })
   } else {
-    const { link: stdlibNameVersion, install: installLib } = options
-    await init({ name, version, stdlibNameVersion, installLib, force })
+    const { link: libNameVersion, install: installLib } = options
+    await init({ name, version, libNameVersion, installLib, force })
   }
   await push.tryAction(options)
 }

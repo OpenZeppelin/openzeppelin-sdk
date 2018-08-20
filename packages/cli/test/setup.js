@@ -1,9 +1,8 @@
 process.env.NODE_ENV = 'test'
 
-import Stdlib from '../src/models/stdlib/Stdlib'
 import ZosPackageFile from '../src/models/files/ZosPackageFile'
 import ZosNetworkFile from '../src/models/files/ZosNetworkFile'
-import StdlibInstaller from '../src/models/stdlib/StdlibInstaller'
+import Dependency from '../src/models/dependency/Dependency'
 
 useTestZosPackageFile()
 doNotInstallStdlib()
@@ -20,5 +19,5 @@ function useTestZosPackageFile() {
 }
 
 function doNotInstallStdlib() {
-  StdlibInstaller.call = stdlibNameAndVersion => new Stdlib(stdlibNameAndVersion)
+  Dependency.prototype.install = () => null
 }

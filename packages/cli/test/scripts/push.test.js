@@ -1,6 +1,8 @@
 'use strict'
 require('../setup')
 
+import sinon from 'sinon'
+
 import { Contracts, VersionedApp, Package } from 'zos-lib'
 
 import push from '../../src/scripts/push.js';
@@ -9,12 +11,11 @@ import add from '../../src/scripts/add';
 import bumpVersion from '../../src/scripts/bump';
 import ZosPackageFile from '../../src/models/files/ZosPackageFile';
 import remove from '../../src/scripts/remove';
-import EventsFilter from "../../src/models/status/EventsFilter";
+import Dependency from '../../src/models/dependency/Dependency';
 
 const should = require('chai').should();
 
 const ImplV1 = Contracts.getFromLocal('ImplV1');
-const AppDirectory = Contracts.getFromNodeModules('zos-lib', 'AppDirectory');
 const PackageContract = Contracts.getFromNodeModules('zos-lib', 'Package');
 const ImplementationDirectory = Contracts.getFromNodeModules('zos-lib', 'ImplementationDirectory');
 
@@ -170,19 +171,21 @@ contract('push script', function([_, owner]) {
     });
   };
 
-  const shouldSetStdlib = function () {
-    const stdlibAddress = '0x0000000000000000000000000000000000000010';
+  const shouldSetDependency = function () {
+    const libName = 'mock-stdlib';
+    const libVersion = '1.1.0';
 
-    it('should set stdlib in deployed app', async function () {
+    it('should set dependency in deployed app', async function () {
       const app = await VersionedApp.fetch(this.networkFile.appAddress);
-      const stdlib = await app.currentStdlib();
-
-      stdlib.should.eq(stdlibAddress);
+      const packageInfo = await app.getPackage(libName)
+      packageInfo.version.should.eq(libVersion)
+      packageInfo.package.address.should.eq(this.dependencyPackage.address)
     });
 
     it('should set address and version in network file', async function () {
-      this.networkFile.stdlibAddress.should.eq(stdlibAddress);
-      this.networkFile.stdlibVersion.should.eq('1.1.0');
+      const dependency = this.networkFile.getDependency(libName)
+      dependency.version.should.eq(libVersion)
+      dependency.package.should.eq(this.dependencyPackage.address)
     });
   };
 
@@ -199,7 +202,6 @@ contract('push script', function([_, owner]) {
   });
 
   describe('an app with contracts', function() {
-
     beforeEach('pushing package-with-contracts', async function () {
       const packageFile = new ZosPackageFile('test/mocks/packages/package-with-contracts.zos.json')
       this.networkFile = packageFile.networkFile(network)
@@ -213,18 +215,23 @@ contract('push script', function([_, owner]) {
     shouldRedeployContracts();
     shouldBumpVersion();
     shouldDeleteContracts();
-
-    it.skip('should not unset stdlib', async function () {
-      await push({ network, txParams, networkFile: this.networkFile })
-
-      const directory = await AppDirectory.at(this.networkFile.providerAddress);
-      const events = await new EventsFilter().call(directory, 'StdlibChanged')
-      events.should.be.empty
-    })
   });
 
-  describe.skip('an app with stdlib', function () {
-    describe('when using a valid stdlib', function () {
+  describe('an app with dependency', function () {
+    beforeEach('deploying dependency', async function () {
+      const dependency = Dependency.fromNameWithVersion('mock-stdlib@1.1.0')
+      this.dependencyProject = await dependency.deploy()
+      this.dependencyPackage = await this.dependencyProject.getProjectPackage()
+
+      this.dependencyNetworkFileStub = sinon.stub(Dependency.prototype, 'getNetworkFile')
+      this.dependencyNetworkFileStub.callsFake(() => ({ packageAddress: this.dependencyPackage.address, version: '1.1.0' }))
+    })
+
+    afterEach('unstub dependency network file stub', function () {
+      this.dependencyNetworkFileStub.restore()      
+    })
+
+    describe('when using a valid dependency', function () {
       beforeEach('pushing package-stdlib', async function () {
         const packageFile = new ZosPackageFile('test/mocks/packages/package-with-stdlib.zos.json')
         this.networkFile = packageFile.networkFile(network)
@@ -233,11 +240,11 @@ contract('push script', function([_, owner]) {
       });
 
       shouldDeployApp();
-      shouldSetStdlib();
+      shouldSetDependency();
     })
 
-    describe('when using an stdlib with a version range', function () {
-      beforeEach('pushing package-stdlib', async function () {
+    describe('when using a dependency with a version range', function () {
+      beforeEach('pushing package-stdlib-range', async function () {
         const packageFile = new ZosPackageFile('test/mocks/packages/package-with-stdlib-range.zos.json')
         this.networkFile = packageFile.networkFile(network)
 
@@ -245,30 +252,32 @@ contract('push script', function([_, owner]) {
       });
 
       shouldDeployApp();
-      shouldSetStdlib();
+      shouldSetDependency();
     })
+  });
 
-    describe('when using an invalid stdlib', function () {
+  describe('an app with invalid dependency', function () {
+    describe('when using an invalid dependency', function () {
       beforeEach('building network file', async function () {
         const packageFile = new ZosPackageFile('test/mocks/packages/package-with-invalid-stdlib.zos.json')
         this.networkFile = packageFile.networkFile(network)
       });
 
-      it('should set address in network file', async function () {
+      it('should fail to push', async function () {
         await push({ network, txParams, networkFile: this.networkFile })
-          .should.be.rejectedWith('Required stdlib version 1.0.0 does not match stdlib package version 3.0.0')
+          .should.be.rejectedWith(/Required dependency version 1.0.0 does not match dependency package version 2.0.0/)
       });
     })
 
-    describe('when using an undeployed stdlib', function () {
+    describe('when using an undeployed dependency', function () {
       beforeEach('building network file', async function () {
         const packageFile = new ZosPackageFile('test/mocks/packages/package-with-undeployed-stdlib.zos.json')
         this.networkFile = packageFile.networkFile(network)
       });
 
-      it('should set address in network file', async function () {
+      it('should fail to push', async function () {
         await push({ network, txParams, networkFile: this.networkFile })
-          .should.be.rejectedWith(/Could not find a zos file for network 'test' for the requested stdlib/)
+          .should.be.rejectedWith(/Could not find a zos file for network 'test' for 'mock-stdlib-undeployed'/)
       });
     })
   });

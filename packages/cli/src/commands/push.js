@@ -13,15 +13,15 @@ const register = program => program
   .description(description)
   .usage('--network <network> [options]')
   .option('--skip-compile', 'skips contract compilation')
-  .option('-d, --deploy-stdlib', 'deploys a copy of the stdlib for development')
+  .option('-d, --deploy-libs', 'deploys libraries to the network if there is no existing deployment')
   .option('--reset', 'redeploys all contracts (not only the ones that changed)')
   .withNetworkOptions()
   .action(action)
 
 async function action(options) {
-  const { skipCompile, deployStdlib, reset: reupload } = options
+  const { skipCompile, deployLibs, reset: reupload } = options
   await runWithTruffle(
-    async (opts) => await push({ deployStdlib, reupload, ... opts }),
+    async (opts) => await push({ deployLibs, reupload, ... opts }),
     { compile: !skipCompile, ... options }
   )
 }

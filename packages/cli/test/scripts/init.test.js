@@ -50,12 +50,10 @@ contract('init script', function() {
       this.packageFile.contracts.should.be.eql({})
     });
 
-    it.skip('should set stdlib', async function () {
-      await init({ name, version, stdlibNameVersion: 'mock-stdlib@1.1.0', packageFile: this.packageFile });
-
-      this.packageFile.stdlibName.should.eq('mock-stdlib');
-      this.packageFile.stdlibVersion.should.eq('1.1.0');
-      this.packageFile.stdlibMatches({ name: 'mock-stdlib', version: '1.1.0'}).should.be.true;
+    it('should set dependency', async function () {
+      await init({ name, version, libNameVersion: 'mock-stdlib@1.1.0', packageFile: this.packageFile });
+      
+      this.packageFile.getDependencyVersion('mock-stdlib').should.eq('1.1.0')
     });
 
     it('should not overwrite existing file by default', async function () {

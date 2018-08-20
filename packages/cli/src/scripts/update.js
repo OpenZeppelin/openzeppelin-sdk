@@ -3,8 +3,8 @@ import stdout from '../utils/stdout';
 import ControllerFor from '../models/network/ControllerFor'
 
 export default async function update({ packageName, contractAlias, proxyAddress, initMethod, initArgs, all, network, force = false, txParams = {}, networkFile = undefined}) {
-  if (!contractAlias && !all) {
-    throw Error('The contract name to update must be provided, or explicit upgrading all proxies in the application.')
+  if (!packageName && !contractAlias && !proxyAddress && !all) {
+    throw Error('The package name, contract name, or address to update must be provided, or set the `all` flag to update all contracts in the application.')
   }
 
   const controller = new ControllerFor(network, txParams, networkFile)

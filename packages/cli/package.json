@@ -60,6 +60,7 @@
     "mock-stdlib-2": "file:./test/mocks/mock-stdlib-2",
     "mock-stdlib-invalid": "file:./test/mocks/mock-stdlib-invalid",
     "mock-stdlib-undeployed": "file:./test/mocks/mock-stdlib-undeployed",
+    "mock-stdlib-undeployed-2": "file:./test/mocks/mock-stdlib-undeployed-2",
     "react": "^16.3.2",
     "react-dom": "^16.3.2",
     "sinon": "^6.1.4",

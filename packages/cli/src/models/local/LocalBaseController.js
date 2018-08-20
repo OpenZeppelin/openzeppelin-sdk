@@ -1,7 +1,7 @@
-import Stdlib from '../stdlib/Stdlib'
 import Session from '../network/Session'
 import Truffle from '../truffle/Truffle'
 import { Contracts, Logger, FileSystem as fs } from 'zos-lib'
+import Dependency from '../dependency/Dependency';
 
 const log = new Logger('LocalController');
 
@@ -131,16 +131,14 @@ export default class LocalBaseController {
     return false
   }
 
-  getContractClass(contractAlias) {
-    const contractName = this.packageFile.contract(contractAlias);
-    if (contractName) {
+  getContractClass(packageName, contractAlias) {
+    if (packageName === this.packageFile.name) {
+      const contractName = this.packageFile.contract(contractAlias);
       return Contracts.getFromLocal(contractName);
-    } else if (this.packageFile.hasStdlib()) {
-      const stdlibName = this.packageFile.stdlibName;
-      const contractName = new Stdlib(stdlibName).contract(contractAlias)
-      return Contracts.getFromNodeModules(stdlibName, contractName);
     } else {
-      throw Error(`Could not find ${contractAlias} contract in zOS project. Please provide one or make sure to set a stdlib that provides one.`);
+      const dependency = new Dependency(packageName)
+      const contractName = dependency.getPackageFile().contract(contractAlias)
+      return Contracts.getFromNodeModules(packageName, contractName)
     }
   }
 

@@ -1,17 +1,13 @@
-import Stdlib from '../stdlib/Stdlib';
-import StdlibInstaller from '../stdlib/StdlibInstaller';
 import LocalBaseController from './LocalBaseController';
 import NetworkAppController from '../network/NetworkAppController';
+import Dependency from '../dependency/Dependency';
 
 export default class LocalAppController extends LocalBaseController {
-  async linkStdlib(stdlibNameVersion, installLib = false) {
-    if(stdlibNameVersion) {
-      const stdlib = installLib
-        ? await StdlibInstaller.call(stdlibNameVersion)
-        : new Stdlib(stdlibNameVersion)
-
-      const { name, version } = stdlib
-      this.packageFile.stdlib = { name, version }
+  async linkLib(libNameVersion, installLib = false) {
+    if(libNameVersion) {
+      const dependency = Dependency.fromNameWithVersion(libNameVersion)
+      if (installLib) await dependency.install()
+      this.packageFile.setDependency(dependency.name, dependency.version)
     }
   }
 

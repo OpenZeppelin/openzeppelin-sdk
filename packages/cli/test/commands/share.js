@@ -19,6 +19,7 @@ import * as verify from '../../src/scripts/verify';
 
 import * as runWithTruffle from '../../src/utils/runWithTruffle';
 import Session from '../../src/models/network/Session';
+import ErrorHandler from '../../src/models/ErrorHandler';
 import program from '../../src/bin/program';
 
 program.Command.prototype.parseReset = function() {
@@ -55,7 +56,7 @@ exports.stubCommands = function () {
     this.status = sinon.stub(status, 'default')
     this.update = sinon.stub(update, 'default')
     this.verify = sinon.stub(verify, 'default')
-
+    this.errorHandler = sinon.stub(ErrorHandler.prototype, 'call').callsFake(() => null)
     this.runWithTruffle = sinon.stub(runWithTruffle, 'default').callsFake(function (script, options) {
       const { network, from, timeout } = Session.getOptions(options)
       const txParams = from ? { from } : {}
@@ -81,6 +82,7 @@ exports.stubCommands = function () {
     this.status.restore()
     this.update.restore()
     this.verify.restore()
+    this.errorHandler.restore()
     this.runWithTruffle.restore()
     program.parseReset()
   })
