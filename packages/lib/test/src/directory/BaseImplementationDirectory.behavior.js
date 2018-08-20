@@ -9,41 +9,18 @@ export default function shouldBehaveLikeImplementationDirectory(directoryClass, 
   const [_, owner] = accounts
   const txParams = { from: owner }
 
-  describe('deployLocal', function () {
-    const contractName = 'DummyImplementation'
-    const contracts = [{ alias: contractName, name: contractName }]
+  describe('like an ImplementationDirectory', function () {
     
     beforeEach('deploying implementation directory', async function () {
-      this.directory = await directoryClass.deployLocal(contracts, txParams)
+      this.directory = await directoryClass.deploy(txParams)
     })
 
-    shouldBeDeployed(contractName)
-    if (onDeployed) onDeployed()
-  })
-
-  describe('deployDependency', function () {
-    const contractName = 'Greeter'
-    const contracts = [{ alias: contractName, name: contractName }]
-    
-    beforeEach('deploying implementation directory', async function () {
-      this.directory = await directoryClass.deployDependency('mock-dependency', contracts, txParams)
-    })
-
-    shouldBeDeployed(contractName)
-    if (onDeployed) onDeployed()
-  })
-
-  function shouldBeDeployed(expectedContractName) {
     it('has an address', async function () {
       (await this.directory.address).should.not.be.null
     })
 
     it('has an owner', async function () {
       (await this.directory.owner()).should.be.equal(owner)
-    })
-
-    it('includes the given contracts', async function () {
-      (await this.directory.getImplementation(expectedContractName)).should.not.be.zero
     })
 
     it('can set new implementations', async function () {
@@ -62,5 +39,7 @@ export default function shouldBehaveLikeImplementationDirectory(directoryClass, 
       const currentImplementation = await this.directory.getImplementation('DummyImplementation')
       currentImplementation.should.be.zeroAddress
     }) 
-  }
+
+    if (onDeployed) onDeployed()
+  });
 }
