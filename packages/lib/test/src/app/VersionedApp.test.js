@@ -1,12 +1,14 @@
 'use strict';
 require('../../setup')
 
+import expectEvent from 'openzeppelin-solidity/test/helpers/expectEvent';
 import VersionedApp from '../../../src/app/VersionedApp';
 import shouldBehaveLikeApp from './BaseApp.behavior';
 import FreezableImplementationDirectory from '../../../src/directory/FreezableImplementationDirectory';
 import { deploy as deployContract } from '../../../src/utils/Transactions';
 import Contracts from '../../../src/utils/Contracts'
 import Package from '../../../src/package/Package';
+import { ZERO_ADDRESS } from '../../../src/utils/Addresses';
 
 const ImplV1 = Contracts.getFromLocal('DummyImplementation');
 const ImplV2 = Contracts.getFromLocal('DummyImplementationV2');
@@ -44,7 +46,7 @@ contract('VersionedApp', function (accounts) {
   async function setPackage() {
     this.package = await Package.deploy(txParams)
     this.directory = await this.package.newVersion(version)
-    await this.app.setPackage(packageName, this.package.address, version)
+    this.setPackageTx = await this.app.setPackage(packageName, this.package.address, version)
   }
 
   describe('getPackage', function () {
@@ -78,6 +80,16 @@ contract('VersionedApp', function (accounts) {
   })
 
   describe('setPackage', function () {
+    it('logs package set', async function () {
+      const thepackage = await Package.deploy(txParams)
+      await thepackage.newVersion(version)
+      await expectEvent.inTransaction(
+        this.app.setPackage(packageName, thepackage.address, version),
+        'PackageChanged',
+        { providerName: packageName, package: thepackage.address, version: version }
+      )
+    })
+
     it('can set multiple packages', async function () {
       const package1 = await Package.deploy(txParams)
       const package2 = await Package.deploy(txParams)
@@ -108,7 +120,11 @@ contract('VersionedApp', function (accounts) {
     beforeEach('setting package', setPackage)
 
     it('unsets a provider', async function () {
-      await this.app.unsetPackage(packageName)
+      await expectEvent.inTransaction(
+        this.app.unsetPackage(packageName),
+        'PackageChanged',
+        { providerName: packageName, package: ZERO_ADDRESS, version: "" } 
+      )
       const hasProvider = await this.app.hasProvider(packageName)
       hasProvider.should.be.false
     })
