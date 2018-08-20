@@ -1,0 +1,12 @@
+{
+  "name": "mock-stdlib-undeployed-2",
+  "version": "1.2.0",
+  "description": "Mock stdlib for tests in zos-cli that is not deployed to any network",
+  "main": "index.js",
+  "private": true,
+  "scripts": {
+    "test": "truffle test"
+  },
+  "author": "santiago@zeppelin.solutions",
+  "license": "MIT"
+}
