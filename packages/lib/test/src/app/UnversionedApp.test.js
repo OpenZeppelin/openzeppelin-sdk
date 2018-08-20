@@ -23,14 +23,14 @@ contract('UnversionedApp', function (accounts) {
 
   shouldBehaveLikeApp(UnversionedApp, accounts, {
     setImplementation: async function () {
-      this.directory = await FreezableImplementationDirectory.deployLocal([], txParams)
+      this.directory = await FreezableImplementationDirectory.deploy(txParams)
       this.implV1 = await deployContract(ImplV1)
       await this.directory.setImplementation(contractName, this.implV1.address)
       await this.app.setProvider(packageName, this.directory.address)
     },
 
     setNewImplementation: async function () {
-      this.directory = await FreezableImplementationDirectory.deployLocal([], txParams)
+      this.directory = await FreezableImplementationDirectory.deploy(txParams)
       this.implV2 = await deployContract(ImplV2)
       await this.directory.setImplementation(contractName, this.implV2.address)
       await this.app.setProvider(packageName, this.directory.address)
@@ -39,8 +39,8 @@ contract('UnversionedApp', function (accounts) {
 
   describe('setProvider', function () {
     it('can set multiple providers', async function () {
-      const directory1 = await FreezableImplementationDirectory.deployLocal([], txParams);
-      const directory2 = await FreezableImplementationDirectory.deployLocal([], txParams);
+      const directory1 = await FreezableImplementationDirectory.deploy(txParams);
+      const directory2 = await FreezableImplementationDirectory.deploy(txParams);
       
       await this.app.setProvider(packageName, directory1.address);
       await this.app.setProvider(anotherPackageName, directory2.address);
@@ -55,7 +55,7 @@ contract('UnversionedApp', function (accounts) {
 
   describe('unsetProvider', function () {
     beforeEach('setting provider', async function () {
-      this.directory = await FreezableImplementationDirectory.deployLocal([], txParams)
+      this.directory = await FreezableImplementationDirectory.deploy(txParams)
       await this.app.setProvider(packageName, this.directory.address)
     })
 

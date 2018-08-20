@@ -1,23 +1,15 @@
 import Logger from '../utils/Logger'
-import { sendTransaction } from '../utils/Transactions'
+import { sendTransaction, deploy } from '../utils/Transactions'
 
-import ImplementationDirectoryDeployer from './ImplementationDirectoryDeployer'
+const log = new Logger('ImplementationDirectory')
 
 export default class BaseImplementationDirectory {
 
-  static deployLocal(contracts = [], txParams = {}) {
-    return this.deploy(null, contracts, txParams);
-  }
-
-  static async deployDependency(dependencyName, contracts = [], txParams = {}) {
-    return this.deploy(dependencyName, contracts, txParams);
-  }
-
-  static async deploy(dependencyName, contracts = [], txParams = {}) {
-    const deployer = new ImplementationDirectoryDeployer(this.getContractClass(), txParams)
-    const directory = await (dependencyName
-      ? deployer.deployDependency(dependencyName, contracts)
-      : deployer.deployLocal(contracts))
+  static async deploy(txParams = {}) {
+    const contractClass = this.getContractClass()
+    log.info(`Deploying new ${contractClass.contractName}...`)
+    const directory = await deploy(contractClass, [], txParams)
+    log.info(`Deployed ${contractClass.contractName} at ${directory.address}`)
     return new this(directory, txParams) 
   }
 
@@ -31,7 +23,7 @@ export default class BaseImplementationDirectory {
     throw Error("Unimplemented method getContractClass()")
   }
 
-  constructor(directory, txParams = {}, log = new Logger('BaseImplementationDirectory')) {
+  constructor(directory, txParams = {}, log = log) {
     this.directoryContract = directory
     this.txParams = txParams
     this.log = log
