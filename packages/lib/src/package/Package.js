@@ -81,6 +81,6 @@ export default class Package {
   }
 
   async _newDirectory() {
-    return this.directoryClass.deployLocal([], this.txParams)
+    return this.directoryClass.deploy(this.txParams)
   }
 }
