@@ -128,6 +128,16 @@ export default class NetworkBaseController {
     this.networkFile.unsetContract(contractAlias)
   }
 
+  checkContractDeployed(packageName, contractAlias, throwIfFail = false) {
+    if (!packageName) packageName = this.packageFile.name;
+    const err = this._errorForContractDeployed(packageName, contractAlias);
+    if (err) this._handleErrorMessage(err, throwIfFail);
+  }
+
+  _errorForContractDeployed(packageName, contractAlias) {
+    return this._errorForLocalContractDeployed(contractAlias)
+  }
+
   checkLocalContractsDeployed(throwIfFail = false) {
     const err = this._errorForLocalContractsDeployed();
     if (err) this._handleErrorMessage(err, throwIfFail);
@@ -145,6 +155,7 @@ export default class NetworkBaseController {
   }
 
   checkLocalContractDeployed(contractAlias, throwIfFail = false) {
+    // if (!packageName) packageName = this.packageFile.name
     const err = this._errorForLocalContractDeployed(contractAlias);
     if (err) this._handleErrorMessage(err, throwIfFail);
   }

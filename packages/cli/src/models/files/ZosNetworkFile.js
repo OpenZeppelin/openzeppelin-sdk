@@ -1,7 +1,6 @@
 import _ from 'lodash'
 import { Logger, FileSystem as fs } from 'zos-lib'
 import { bytecodeDigest, bodyCode, constructorCode } from '../../utils/contracts'
-import Stdlib from '../stdlib/Stdlib';
 import { fromContractFullName, toContractFullName } from '../../utils/naming';
 
 const log = new Logger('ZosNetworkFile')
@@ -14,7 +13,7 @@ export default class ZosNetworkFile {
     this.fileName = fileName
 
     const defaults = this.packageFile.isLib ? { contracts: {}, lib: true, frozen: false } : { contracts: {}, proxies: {} }
-    defaults.zosversion = '2' // TODO: Implement auto upgrade
+    defaults.zosversion = '2' // TODO: Implement auto upgrade or version checks
     this.data = fs.parseJsonIfExists(this.fileName) || defaults
   }
 
@@ -60,6 +59,23 @@ export default class ZosNetworkFile {
     
   get isLib() {
     return this.packageFile.isLib
+  }
+
+  get dependencies() {
+    return this.data.dependencies || {}
+  }
+
+  get dependenciesNames() {
+    return Object.keys(this.dependencies)
+  }
+
+  getDependency(name) {
+    if (!this.data.dependencies) return null
+    return this.data.dependencies[name]
+  }
+
+  hasDependency(name) {
+    return !_.isEmpty(this.getDependency(name))
   }
 
   getProxies({ package: packageName, contract, address } = {}) {
@@ -110,16 +126,22 @@ export default class ZosNetworkFile {
     return this.packageFile.isCurrentVersion(this.version)
   }
 
-  hasCustomDeploy() {
-    return this.hasStdlib() && this.stdlib.customDeploy
+  dependenciesNamesMissingFromPackage() {
+    return _.difference(this.dependenciesNames, this.packageFile.dependenciesNames)
   }
 
-  hasMatchingCustomDeploy() {
-    return this.hasCustomDeploy() && this.packageFile.stdlibMatches(this.stdlib)
+  dependencyHasCustomDeploy(name) {
+    const dep = this.getDependency(name)
+    return dep && dep.customDeploy
   }
 
-  hasStdlib() {
-    return !_.isEmpty(this.stdlib)
+  dependencySatisfiesVersionRequirement(name) {
+    const dep = this.getDependency(name)
+    return dep && this.packageFile.dependencyMatches(name, dep.version)
+  }
+
+  dependencyHasMatchingCustomDeploy(name) {
+    return this.dependencyHasCustomDeploy(name) && this.dependencySatisfiesVersionRequirement(name)
   }
 
   hasSameBytecode(alias, klass) {
@@ -148,22 +170,18 @@ export default class ZosNetworkFile {
     this.data.provider = provider
   }
 
-  set stdlib(stdlib) {
-    this.data.stdlib = stdlib
-  }
-
   set package(_package) {
     this.data.package = _package
   }
 
-  setStdlibAddress(address) {
-    const stdlib = this.stdlib || {}
-    stdlib.address = address
-    this.data.stdlib = stdlib
+  setDependency(name, dependency) {
+    if (!this.data.dependencies) this.data.dependencies = {}
+    this.data.dependencies[name] = dependency
   }
 
-  unsetStdlib() {
-    delete this.data['stdlib']
+  unsetDependency(name) {
+    if (!this.data.dependencies) return
+    delete this.data.dependencies[name]
   }
 
   addContract(alias, instance) {

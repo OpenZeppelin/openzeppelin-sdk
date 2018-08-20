@@ -1,8 +1,8 @@
 import _ from 'lodash';
-import Stdlib from '../stdlib/Stdlib';
 import NetworkBaseController from './NetworkBaseController';
 import { Contracts, Logger, AppProject, FileSystem as fs } from 'zos-lib';
 import { toContractFullName } from '../../utils/naming';
+import Dependency from '../dependency/Dependency';
 
 const log = new Logger('NetworkAppController');
 
@@ -35,19 +35,46 @@ export default class NetworkAppController extends NetworkBaseController {
 
   async push(reupload = false) {
     await super.push(reupload);
-    // await this.linkStdlib()
+    await this.linkLibs()
   }
 
-  async deployStdlib() {
-    // if (!this.packageFile.hasStdlib()) return this.networkFile.unsetStdlib()
-    // const stdlibAddress = await Stdlib.deploy(this.packageFile.stdlibName, this.txParams);
-    // this.networkFile.stdlib = { address: stdlibAddress, customDeploy: true, ... this.packageFile.stdlib };
+  async deployLibs() {
+    // TODO: Refactor `failures` pattern
+    const failures = []
+    const handlingFailure = async (dep, promise) => {
+      try {
+        await promise
+      } catch(error) {
+        failures.push({ dep, error })
+      }
+    };
+
+    await Promise.all(
+      _.map(this.packageFile.dependencies, (version, dep) => handlingFailure(dep, this.deployLibIfNeeded(dep, version))),
+    )
+
+    if(!_.isEmpty(failures)) {
+      const message = failures.map(failure => `Failed local deployment of dependency ${failure.dep} with error ${failure.error.message}`).join('\n')
+      throw Error(message)
+    }
+  }
+
+  async deployLibIfNeeded(depName, depVersion) {
+    const dependency = new Dependency(depName, depVersion)
+    if (dependency.isDeployedOnNetwork(this.network) || this.networkFile.dependencyHasMatchingCustomDeploy(depName)) return
+    log.info(`Deploying ${depName} contracts`)
+    const deployment = await dependency.deploy(this.txParams)
+    this.networkFile.setDependency(depName, { 
+      package: (await deployment.getProjectPackage()).address,
+      version: deployment.version,
+      customDeploy: true
+    })
   }
 
   async createProxy(packageName, contractAlias, initMethod, initArgs) {
     await this.fetch();
     if (!packageName) packageName = this.packageFile.name;
-    const contractClass = this.localController.getContractClass(contractAlias);
+    const contractClass = this.localController.getContractClass(packageName, contractAlias);
     this.checkInitialization(contractClass, initMethod, initArgs);
     const proxyInstance = await this.project.createProxy(contractClass, { packageName, contractName: contractAlias, initMethod, initArgs });
     const implementationAddress = await this.project.app.getImplementation(packageName, contractAlias);
@@ -80,21 +107,24 @@ export default class NetworkAppController extends NetworkBaseController {
       return;      
     }
 
+    // Load project
     await this.fetch();
 
     // Check if there is any migrate method in the contracts and warn the user to call it
-    const contractAliases = _.uniq(_.map(proxies, 'contract'))
-    _.forEach(contractAliases, alias => 
-      this._checkUpgrade(this.localController.getContractClass(alias), initMethod, initArgs)
+    const contracts = _.uniqWith(_.map(proxies, p => [p.package, p.contract]), _.isEqual)
+    _.forEach(contracts, ([packageName, contractName]) => 
+      this._checkUpgrade(this.localController.getContractClass(packageName, contractName), initMethod, initArgs)
     )
 
     const newVersion = await this.project.getCurrentVersion();
-    const failures = []
+    
 
     // Update all proxies loaded
+    // TODO: Refactor promises with failures pattern
+    const failures = []
     await Promise.all(_.map(proxies, async proxy => {
       try {
-        const contractClass = this.localController.getContractClass(proxy.contract);
+        const contractClass = this.localController.getContractClass(proxy.package, proxy.contract);
         const currentImplementation = await this.project.app.getProxyImplementation(proxy.address)
         const contractImplementation = await this.project.app.getImplementation(proxy.package, proxy.contract)
         if (currentImplementation !== contractImplementation) {
@@ -129,55 +159,63 @@ export default class NetworkAppController extends NetworkBaseController {
     log.error(`Possible migration method 'migrate' found in contract ${contractClass.contractName}. Remember running the migration after deploying it.`);
   }
 
-  async linkStdlib() {
-    // if (!this.packageFile.hasStdlib()) {
-    //   if (await this.project.hasStdlib()) {
-    //     await this.project.setStdlib();
-    //     this.networkFile.unsetStdlib()
-    //   }
-    //   return
-    // }
+  async linkLibs() {
+    // TODO: Refactor `failures` pattern
+    const failures = []
+    const handlingFailure = async (dep, promise) => {
+      try {
+        await promise
+      } catch(error) {
+        failures.push({ dep, error })
+      }
+    };
 
-    // const customDeployMatches = this.networkFile.hasCustomDeploy() && this.packageFile.stdlibMatches(this.networkFile.stdlib)
-    // if (customDeployMatches) {
-    //   log.info(`Using existing custom deployment of stdlib at ${this.networkFile.stdlibAddress}`);
-    //   return this.project.setStdlib(this.networkFile.stdlibAddress);
-    // }
+    await Promise.all(_.concat(
+      _.map(this.packageFile.dependencies, (version, dep) => handlingFailure(dep, this.linkLib(dep, version))),
+      _.map(this.networkFile.dependenciesNamesMissingFromPackage(), dep => handlingFailure(dep, this.unlinkLib(dep)))
+    ))
 
-    // const stdlibName = this.packageFile.stdlibName;
-    // log.info(`Connecting to public deployment of ${stdlibName} in ${this.networkFile.network}`);
-
-    // const { address: stdlibAddress, version: stdlibVersion } = Stdlib.fetch(stdlibName, this.packageFile.stdlibVersion, this.networkFile.network);
-    // const currentStdlibAddress = await this.project.currentStdlib()
-
-    // if (stdlibAddress !== currentStdlibAddress) {
-    //   await this.project.setStdlib(stdlibAddress);
-    //   this.networkFile.stdlib = { 
-    //      ... this.packageFile.stdlib, // name, customDeploy
-    //      address: stdlibAddress, 
-    //      version: stdlibVersion
-    //   };
-    // } else {
-    //   log.info(`Current application is already linked to stdlib ${stdlibName} at ${stdlibAddress} in ${this.network}`);
-    // }
+    if(!_.isEmpty(failures)) {
+      const message = failures.map(failure => `Failed to link dependency ${failure.dep} with error: ${failure.error.message}`).join('\n')
+      throw Error(message)
+    }
   }
 
-  isStdlibContract(contractAlias) {
-    if (!this.packageFile.hasStdlib()) return false;
-    const stdlib = new Stdlib(this.packageFile.stdlibName);
-    return stdlib.hasContract(contractAlias);
+  async unlinkLib(depName) {
+    if (await this.project.hasDependency(depName)) {
+      log.info(`Unlinking dependency ${depName}`);
+      await this.project.unsetDependency(depName);
+    }
+    this.networkFile.unsetDependency(depName);
   }
 
-  isContractDefined(contractAlias) {
-    return super.isContractDefined(contractAlias) || this.isStdlibContract(contractAlias);
+  async linkLib(depName, depVersion) {
+    if (this.networkFile.dependencyHasMatchingCustomDeploy(depName)) {
+      log.info(`Using custom deployment of ${depName}`);
+      const depInfo = this.networkFile.getDependency(depName);
+      return await this.project.setDependency(depName, depInfo.package, depInfo.version);
+    }
+
+    const dependencyInfo = (new Dependency(depName, depVersion)).getNetworkFile(this.network)
+    const currentDependency = this.networkFile.getDependency(depName)
+
+    if (!currentDependency || currentDependency.package !== dependencyInfo.packageAddress) {
+      log.info(`Connecting to dependency ${depName} ${dependencyInfo.version}`);
+      await this.project.setDependency(depName, dependencyInfo.packageAddress, dependencyInfo.version)
+      const depInfo = { package: dependencyInfo.packageAddress, version: dependencyInfo.version }
+      this.networkFile.setDependency(depName, depInfo)
+    }
   }
 
-  _errorForLocalContractDeployed(contractAlias) {
-    const baseErr = super._errorForLocalContractDeployed(contractAlias);
-    if (baseErr) {
-      return baseErr;
-    } else if (this.isStdlibContract(contractAlias) && !this.networkFile.hasStdlib()) {
-      return `Contract ${contractAlias} is provided by ${this.packageFile.stdlibName} but it was not deployed to the network, consider running \`zos push\``;
+  _errorForContractDeployed(packageName, contractAlias) {
+    if (packageName === this.packageFile.name) {
+      return this._errorForLocalContractDeployed(contractAlias)
+    } else if (!this.packageFile.hasDependency(packageName)) {
+      return `Dependency ${packageName} not found in project.`
+    } else if (!this.networkFile.hasDependency(packageName)) {
+      return `Dependency ${packageName} has not been linked yet. Please run zos push.`
+    } else if (!(new Dependency(packageName)).getPackageFile().contract(contractAlias)) {
+      return `Contract ${contractAlias} is not provided by ${packageName}.`
     }
   }
 

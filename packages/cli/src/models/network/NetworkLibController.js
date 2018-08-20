@@ -9,7 +9,7 @@ export default class NetworkLibController extends NetworkBaseController {
   }
 
   async createProxy() {
-    throw Error('Cannot create proxy for stdlib')
+    throw Error('Cannot create proxy for library project')
   }
 
   async deploy() {
