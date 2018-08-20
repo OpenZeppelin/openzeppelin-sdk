@@ -1,8 +1,6 @@
 'use strict'
 require('../setup')
 
-import Stdlib from '../../src/models/stdlib/Stdlib'
-
 const should = require('chai').should()
 
 contract.skip('Stdlib', function () {

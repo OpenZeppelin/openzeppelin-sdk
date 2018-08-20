@@ -1,7 +1,7 @@
 import _ from 'lodash'
 import ZosNetworkFile from './ZosNetworkFile'
 import { Logger, FileSystem as fs } from 'zos-lib'
-import Stdlib from '../stdlib/Stdlib';
+import Dependency from '../dependency/Dependency';
 
 const log = new Logger('ZosPackageFile')
 
@@ -10,6 +10,7 @@ export default class ZosPackageFile {
   constructor(fileName = 'zos.json') {
     this.fileName = fileName
     this.data = fs.parseJsonIfExists(this.fileName) || { zosversion: '2' };
+    // TODO: Implement auto upgrade or version checks
   }
 
   exists() {
@@ -28,22 +29,21 @@ export default class ZosPackageFile {
     return this.data.version
   }
 
-
-
-  get stdlib() {
-    return this.data.stdlib || {}
+  get dependencies() {
+    return this.data.dependencies || {}
   }
 
-  get stdlibName() {
-    return this.stdlib.name
+  get dependenciesNames() {
+    return Object.keys(this.dependencies)
   }
 
-  get stdlibVersion() {
-    return this.stdlib.version
+  getDependencyVersion(name) {
+    return this.dependencies[name]
   }
 
-
-
+  hasDependency(name) {
+    return !!(this.dependencies[name])
+  }
 
   get contracts() {
     return this.data.contracts || {}
@@ -65,15 +65,9 @@ export default class ZosPackageFile {
     return this.name === name
   }
 
-  hasStdlib(stdlib = undefined) {
-    if (stdlib !== undefined) return this.stdlibMatches(stdlib);
-    return !_.isEmpty(this.stdlib)
-  }
-
-  stdlibMatches(stdlib) {
-    return _.isEmpty(this.stdlib) === _.isEmpty(stdlib)
-      && this.stdlib.name === stdlib.name 
-      && Stdlib.satisfiesVersion(stdlib.version, this.stdlib.version)
+  dependencyMatches(name, version) {
+    return this.hasDependency(name) && 
+      Dependency.satisfiesVersion(version, this.getDependencyVersion(name))
   }
 
   isCurrentVersion(version) {
@@ -100,12 +94,18 @@ export default class ZosPackageFile {
     this.data.version = version
   }
 
-  set stdlib(stdlib) {
-    this.data.stdlib = stdlib
-  }
-
   set contracts(contracts) {
     this.data.contracts = contracts
+  }
+
+  setDependency(name, version) {
+    if (!this.data.dependencies) this.data.dependencies = {};
+    this.data.dependencies[name] = version;
+  }
+
+  unsetDependency(name) {
+    if (!this.data.dependencies) return;
+    delete this.data.dependencies[name];
   }
 
   addContract(alias, name) {

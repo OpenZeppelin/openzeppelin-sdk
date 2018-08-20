@@ -4,20 +4,20 @@ import push from './push'
 import linkStdlib from '../scripts/link'
 
 const name = 'link'
-const signature = `${name} <stdlib>`
-const description = 'links project with a standard library located in the <stdlib> npm package'
+const signature = `${name} <library>`
+const description = 'links project with a library located in the <library> npm package'
 
 const register = program => program
   .command(signature, { noHelp: true })
-  .usage('<stdlib> [options]')
+  .usage('<library> [options]')
   .description(description)
-  .option('--no-install', 'skip installing stdlib dependencies locally')
+  .option('--no-install', 'skip installing library dependencies locally')
   .withPushOptions()
   .action(action)
 
-async function action(stdlibNameVersion, options) {
+async function action(libNameVersion, options) {
   const installLib = options.install
-  await linkStdlib({ stdlibNameVersion, installLib })
+  await linkStdlib({ libNameVersion, installLib })
   await push.tryAction(options)
 }
 

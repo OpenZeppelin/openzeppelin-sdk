@@ -3,7 +3,7 @@ require('../setup')
 
 import add from '../../src/scripts/add.js';
 import bumpVersion from '../../src/scripts/bump.js';
-import linkStdlib from '../../src/scripts/link.js';
+import linkLib from '../../src/scripts/link.js';
 import ZosPackageFile from "../../src/models/files/ZosPackageFile";
 
 contract('bump script', function() {
@@ -28,26 +28,11 @@ contract('bump script', function() {
       this.packageFile.contract('ImplV1').should.eq('ImplV1');
     });
 
-    it('should set stdlib', async function () {
-      await bumpVersion({ version: newVersion, packageFile: this.packageFile, stdlibNameVersion: 'mock-stdlib@1.1.0' });
-
-      this.packageFile.stdlibName.should.eq('mock-stdlib');
-      this.packageFile.stdlibVersion.should.eq('1.1.0');
-    });
-
-    it('should preserve stdlib if none specified', async function () {
-      await linkStdlib({ stdlibNameVersion: 'mock-stdlib@1.1.0', packageFile: this.packageFile });
+    it('should preserve dependencies', async function () {
+      await linkLib({ libNameVersion: 'mock-stdlib@1.1.0', packageFile: this.packageFile });
       await bumpVersion({ version: newVersion, packageFile: this.packageFile });
 
-      this.packageFile.stdlibName.should.eq('mock-stdlib');
-      this.packageFile.stdlibVersion.should.eq('1.1.0');
-    });
-
-    it('should set new stdlib', async function () {
-      await bumpVersion({ version: newVersion, packageFile: this.packageFile, stdlibNameVersion: 'mock-stdlib-2@1.2.0' });
-
-      this.packageFile.stdlibName.should.eq('mock-stdlib-2');
-      this.packageFile.stdlibVersion.should.eq('1.2.0');
+      this.packageFile.getDependencyVersion('mock-stdlib').should.eq('1.1.0');
     });
   });
 
@@ -58,12 +43,7 @@ contract('bump script', function() {
 
     it('should update the lib version in the main package file', async function() {
       await bumpVersion({ version: newVersion, packageFile: this.packageFile });
-
       this.packageFile.version.should.eq(newVersion);
-    });
-
-    it('should refuse to set stdlib', async function () {
-      await bumpVersion({ version: newVersion, packageFile: this.packageFile, stdlibNameVersion: 'mock-stdlib@1.1.0' }).should.be.rejectedWith(/lib/);
     });
   });
 });
