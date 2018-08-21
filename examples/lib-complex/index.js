@@ -5,11 +5,10 @@ global.artifacts = artifacts;
 const args = require('minimist')(process.argv.slice(2));
 const network = args.network;
 
-const { Logger, App, Contracts } = require('zos-lib')
+const { Logger, AppProject, Contracts, ImplementationDirectory, Package } = require('zos-lib')
 const log = new Logger('ComplexExample')
 
 const MintableERC721Token = Contracts.getFromLocal('MintableERC721Token');
-const ImplementationDirectory = Contracts.getFromNodeModules('zos-lib', 'ImplementationDirectory');
 
 const contractName = 'Donations';
 const tokenClass = 'MintableERC721Token';
@@ -21,39 +20,44 @@ async function setupApp(txParams) {
   // On-chain, single entry point of the entire application.
   log.info(`<< Setting up App >> network: ${network}`)
   const initialVersion = '0.0.1'
-  return await App.deploy(initialVersion, txParams)
+  return await AppProject.deploy('complex-example', initialVersion, txParams)
 }
 
-async function deployVersion1(app, owner) {
+async function deployVersion1(project, owner) {
 
   // Register the first implementation of 'Donations', and request a proxy for it.
   log.info('<< Deploying version 1 >>')
   const DonationsV1 = Contracts.getFromLocal('DonationsV1')
-  await app.setImplementation(DonationsV1, contractName);
-  return await app.createProxy(DonationsV1, contractName, 'initialize', [owner])
+  await project.setImplementation(DonationsV1, contractName);
+  return await project.createProxy(DonationsV1, { contractName, initMethod: 'initialize', initArgs: [owner] })
 }
 
-async function deployVersion2(app, donations, txParams) {
+async function deployVersion2(project, donations, txParams) {
 
-  // Create a new version of the app, liked to the ZeppelinOS standard library.
+  // Create a new version of the project, linked to the ZeppelinOS standard library.
   // Register a new implementation for 'Donations' and upgrade it's proxy to use the new implementation.
   log.info('<< Deploying version 2 >>')
   const secondVersion = '0.0.2'
-  await app.newVersion(secondVersion, await getStdLib(txParams))
+  await project.newVersion(secondVersion)
+  
+  const dependencyName = 'openzeppelin';
+  const [dependencyAddress, dependencyVersion] = await getLibrary(txParams)
+  await project.setDependency('openzeppelin', dependencyAddress, dependencyVersion)
+  
   const DonationsV2 = Contracts.getFromLocal('DonationsV2')
-  await app.setImplementation(DonationsV2, contractName);
-  await app.upgradeProxy(donations.address, null, contractName)
+  await project.setImplementation(DonationsV2, contractName);
+  await project.upgradeProxy(donations.address, DonationsV2, { contractName })
   donations = DonationsV2.at(donations.address)
 
   // Add an ERC721 token implementation to the project, request a proxy for it,
   // and set the token on 'Donations'.
   log.info(`Creating ERC721 token proxy to use in ${contractName}...`)
-  const token = await app.createProxy(
-    MintableERC721Token, 
-    tokenClass,
-    'initialize',
-    [donations.address, tokenName, tokenSymbol]
-  )
+  const token = await project.createProxy(MintableERC721Token, { 
+    packageName: 'openzeppelin',
+    contractName: tokenClass,
+    initMethod: 'initialize',
+    initArgs: [donations.address, tokenName, tokenSymbol]
+  })
   log.info(`Token proxy created at ${token.address}`)
   log.info('Setting application\'s token...')
   await donations.setToken(token.address, txParams)
@@ -61,16 +65,20 @@ async function deployVersion2(app, donations, txParams) {
   return token;
 }
 
-async function getStdLib(txParams) {
+async function getLibrary(txParams) {
 
   // Use deployed standard library, or simulate one in local networks.
+  // TODO: Install and link openzeppelin-zos here, instead of manually building a mock
   if(!network || network === 'local') {
-    const stdlib = await ImplementationDirectory.new(txParams);
+    const version = '1.0';
+    const thepackage = await Package.deploy(txParams);
+    const directory = await thepackage.newVersion(version);
     const tokenImplementation = await MintableERC721Token.new();
-    await stdlib.setImplementation(tokenClass, tokenImplementation.address, txParams);
-    return stdlib.address;
+    await directory.setImplementation(tokenClass, tokenImplementation.address);
+    return [thepackage.address, version];
+  } else {
+    throw Error("Unknown network " + network);
   }
-  else if(network === 'ropsten') return '0xA739d10Cc20211B973dEE09DB8F0D75736E2D817';
 }
 
 module.exports = async function() {
