@@ -14,7 +14,9 @@ export default async function runWithTruffle(script, options) {
   config.network = network
   Contracts.setSyncTimeout((_.isNil(timeout) ? DEFAULT_TIMEOUT : timeout) * 1000)
   if (options.compile) await Truffle.compile(config)
-  initTruffle(config).then(() => script({ network, txParams }))
+  await initTruffle(config)
+  await script({ network, txParams })
+  process.exit(0)
 }
 
 function initTruffle(config) {
