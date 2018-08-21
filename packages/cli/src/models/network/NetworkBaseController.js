@@ -4,6 +4,7 @@ import StatusComparator from '../status/StatusComparator'
 import StatusChecker from "../status/StatusChecker";
 import Verifier from '../Verifier'
 import { flattenSourceCode } from '../../utils/contracts'
+import { allPromisesOrError } from '../../utils/async';
 
 const log = new Logger('NetworkController');
 
@@ -85,47 +86,40 @@ export default class NetworkBaseController {
   }
 
   async uploadContracts(reupload) {
-    const failures = []
-    await Promise.all(
+    await allPromisesOrError(
       _(this.packageFile.contracts)
         .toPairs()
         .filter(([contractAlias, contractName]) => reupload || this.hasContractChanged(contractAlias))
-        .map(([contractAlias, contractName]) =>
-          this.uploadContract(contractAlias, contractName)
-            .catch(error => failures.push({ contractAlias, error }))
-        )
-    );
-    if(!_.isEmpty(failures)) {
-      const message = failures.map(failure => `${failure.contractAlias} deployment failed with: ${failure.error.message}`).join('\n')
-      throw Error(message)
-    }
+        .map(([contractAlias, contractName]) => this.uploadContract(contractAlias, contractName))
+        .value()
+    )
   }
 
   async uploadContract(contractAlias, contractName) {
-    const contractClass = Contracts.getFromLocal(contractName);
-    log.info(`Uploading ${contractName} contract as ${contractAlias}`);
-    const contractInstance = await this.project.setImplementation(contractClass, contractAlias);
-    this.networkFile.addContract(contractAlias, contractInstance)
-  }
-
-  async unsetContracts() {
-    const failures = [];
-    await Promise.all(
-      this.networkFile.contractAliasesMissingFromPackage().map(contractAlias =>
-        this.unsetContract(contractAlias)
-          .catch(error => failures.push({ contractAlias, error }))
-      )
-    );
-    if(!_.isEmpty(failures)) {
-      const message = failures.map(failure => `Removal of ${failure.contractAlias} failed with: ${failure.error.message}`).join('\n')
-      throw Error(message)
+    try {
+      const contractClass = Contracts.getFromLocal(contractName);
+      log.info(`Uploading ${contractName} contract as ${contractAlias}`);
+      const contractInstance = await this.project.setImplementation(contractClass, contractAlias);
+      this.networkFile.addContract(contractAlias, contractInstance)
+    } catch(error) {
+      throw Error(`${contractAlias} deployment failed with error: ${error.message}`)
     }
   }
 
+  async unsetContracts() {
+    await allPromisesOrError(
+      this.networkFile.contractAliasesMissingFromPackage().map(contractAlias => this.unsetContract(contractAlias))
+    )
+  }
+
   async unsetContract(contractAlias) {
-    log.info(`Removing ${contractAlias} contract`);
-    await this.project.unsetImplementation(contractAlias);
-    this.networkFile.unsetContract(contractAlias)
+    try {
+      log.info(`Removing ${contractAlias} contract`);
+      await this.project.unsetImplementation(contractAlias);
+      this.networkFile.unsetContract(contractAlias)
+    } catch(error) {
+      throw Error(`Removal of ${contractAlias} failed with error: ${error.message}`)
+    }
   }
 
   checkContractDeployed(packageName, contractAlias, throwIfFail = false) {
