@@ -3,6 +3,7 @@ import NetworkBaseController from './NetworkBaseController';
 import { Contracts, Logger, AppProject, FileSystem as fs } from 'zos-lib';
 import { toContractFullName } from '../../utils/naming';
 import Dependency from '../dependency/Dependency';
+import { allPromisesOrError } from '../../utils/async';
 
 const log = new Logger('NetworkAppController');
 
@@ -39,36 +40,25 @@ export default class NetworkAppController extends NetworkBaseController {
   }
 
   async deployLibs() {
-    // TODO: Refactor `failures` pattern
-    const failures = []
-    const handlingFailure = async (dep, promise) => {
-      try {
-        await promise
-      } catch(error) {
-        failures.push({ dep, error })
-      }
-    };
-
-    await Promise.all(
-      _.map(this.packageFile.dependencies, (version, dep) => handlingFailure(dep, this.deployLibIfNeeded(dep, version))),
+    await allPromisesOrError(
+      _.map(this.packageFile.dependencies, (version, dep) => this.deployLibIfNeeded(dep, version))
     )
-
-    if(!_.isEmpty(failures)) {
-      const message = failures.map(failure => `Failed local deployment of dependency ${failure.dep} with error ${failure.error.message}`).join('\n')
-      throw Error(message)
-    }
   }
 
   async deployLibIfNeeded(depName, depVersion) {
-    const dependency = new Dependency(depName, depVersion)
-    if (dependency.isDeployedOnNetwork(this.network) || this.networkFile.dependencyHasMatchingCustomDeploy(depName)) return
-    log.info(`Deploying ${depName} contracts`)
-    const deployment = await dependency.deploy(this.txParams)
-    this.networkFile.setDependency(depName, { 
-      package: (await deployment.getProjectPackage()).address,
-      version: deployment.version,
-      customDeploy: true
-    })
+    try {
+      const dependency = new Dependency(depName, depVersion)
+      if (dependency.isDeployedOnNetwork(this.network) || this.networkFile.dependencyHasMatchingCustomDeploy(depName)) return
+      log.info(`Deploying ${depName} contracts`)
+      const deployment = await dependency.deploy(this.txParams)
+      this.networkFile.setDependency(depName, { 
+        package: (await deployment.getProjectPackage()).address,
+        version: deployment.version,
+        customDeploy: true
+      })
+    } catch (err) {
+      throw Error(`Failed deployment of dependency ${depName} with error: ${err.message}`)
+    }
   }
 
   async createProxy(packageName, contractAlias, initMethod, initArgs) {
@@ -116,37 +106,32 @@ export default class NetworkAppController extends NetworkBaseController {
       this._checkUpgrade(this.localController.getContractClass(packageName, contractName), initMethod, initArgs)
     )
 
-    const newVersion = await this.project.getCurrentVersion();
-    
-
     // Update all proxies loaded
-    // TODO: Refactor promises with failures pattern
-    const failures = []
-    await Promise.all(_.map(proxies, async proxy => {
-      try {
-        const contractClass = this.localController.getContractClass(proxy.package, proxy.contract);
-        const currentImplementation = await this.project.app.getProxyImplementation(proxy.address)
-        const contractImplementation = await this.project.app.getImplementation(proxy.package, proxy.contract)
-        if (currentImplementation !== contractImplementation) {
-          await this.project.upgradeProxy(proxy.address, contractClass, { packageName: proxy.package, contractName: proxy.contract, initMethod, initArgs });
-          proxy.implementation = contractImplementation
-        } else {
-          log.info(`Contract ${proxy.contract} at ${proxy.address} is up to date.`)
-          proxy.implementation = currentImplementation
-        }
-        proxy.version = newVersion;
-        this.networkFile.updateProxy(proxy)
-      } catch(error) {
-        failures.push({ proxy, error })
-      }
-    }));
-
-    if(!_.isEmpty(failures)) {
-      const message = failures.map(failure => `Proxy ${toContractFullName(failure.proxy.package, failure.proxy.contract)} at ${failure.proxy.address} failed to update with ${failure.error.message}`).join('\n')
-      throw Error(message)
-    }
+    const newVersion = await this.project.getCurrentVersion();
+    await allPromisesOrError(
+      _.map(proxies, (proxy) => this._upgradeProxy(proxy, initMethod, initArgs,newVersion))
+    )
 
     return proxies;
+  }
+
+  async _upgradeProxy(proxy, initMethod, initArgs, newVersion) {
+    try {
+      const contractClass = this.localController.getContractClass(proxy.package, proxy.contract);
+      const currentImplementation = await this.project.app.getProxyImplementation(proxy.address)
+      const contractImplementation = await this.project.app.getImplementation(proxy.package, proxy.contract)
+      if (currentImplementation !== contractImplementation) {
+        await this.project.upgradeProxy(proxy.address, contractClass, { packageName: proxy.package, contractName: proxy.contract, initMethod, initArgs });
+        proxy.implementation = contractImplementation
+      } else {
+        log.info(`Contract ${proxy.contract} at ${proxy.address} is up to date.`)
+        proxy.implementation = currentImplementation
+      }
+      proxy.version = newVersion;
+      this.networkFile.updateProxy(proxy)
+    } catch(error) {
+      throw Error(`Proxy ${toContractFullName(proxy.package, proxy.contract)} at ${proxy.address} failed to update with error: ${error.message}`)
+    }
   }
 
   _checkUpgrade(contractClass, calledMigrateMethod, calledMigrateArgs) {
@@ -160,50 +145,43 @@ export default class NetworkAppController extends NetworkBaseController {
   }
 
   async linkLibs() {
-    // TODO: Refactor `failures` pattern
-    const failures = []
-    const handlingFailure = async (dep, promise) => {
-      try {
-        await promise
-      } catch(error) {
-        failures.push({ dep, error })
-      }
-    };
-
-    await Promise.all(_.concat(
-      _.map(this.packageFile.dependencies, (version, dep) => handlingFailure(dep, this.linkLib(dep, version))),
-      _.map(this.networkFile.dependenciesNamesMissingFromPackage(), dep => handlingFailure(dep, this.unlinkLib(dep)))
+    await allPromisesOrError(_.concat(
+      _.map(this.packageFile.dependencies, (version, dep) => this.linkLib(dep, version)),
+      _.map(this.networkFile.dependenciesNamesMissingFromPackage(), dep => this.unlinkLib(dep))
     ))
-
-    if(!_.isEmpty(failures)) {
-      const message = failures.map(failure => `Failed to link dependency ${failure.dep} with error: ${failure.error.message}`).join('\n')
-      throw Error(message)
-    }
   }
 
   async unlinkLib(depName) {
-    if (await this.project.hasDependency(depName)) {
-      log.info(`Unlinking dependency ${depName}`);
-      await this.project.unsetDependency(depName);
+    try {
+      if (await this.project.hasDependency(depName)) {
+        log.info(`Unlinking dependency ${depName}`);
+        await this.project.unsetDependency(depName);
+      }
+      this.networkFile.unsetDependency(depName);
+    } catch (error) {
+      throw Error(`Failed to unlink dependency ${depName} with error: ${error.message}`)
     }
-    this.networkFile.unsetDependency(depName);
   }
 
   async linkLib(depName, depVersion) {
-    if (this.networkFile.dependencyHasMatchingCustomDeploy(depName)) {
-      log.info(`Using custom deployment of ${depName}`);
-      const depInfo = this.networkFile.getDependency(depName);
-      return await this.project.setDependency(depName, depInfo.package, depInfo.version);
-    }
+    try {
+      if (this.networkFile.dependencyHasMatchingCustomDeploy(depName)) {
+        log.info(`Using custom deployment of ${depName}`);
+        const depInfo = this.networkFile.getDependency(depName);
+        return await this.project.setDependency(depName, depInfo.package, depInfo.version);
+      }
 
-    const dependencyInfo = (new Dependency(depName, depVersion)).getNetworkFile(this.network)
-    const currentDependency = this.networkFile.getDependency(depName)
+      const dependencyInfo = (new Dependency(depName, depVersion)).getNetworkFile(this.network)
+      const currentDependency = this.networkFile.getDependency(depName)
 
-    if (!currentDependency || currentDependency.package !== dependencyInfo.packageAddress) {
-      log.info(`Connecting to dependency ${depName} ${dependencyInfo.version}`);
-      await this.project.setDependency(depName, dependencyInfo.packageAddress, dependencyInfo.version)
-      const depInfo = { package: dependencyInfo.packageAddress, version: dependencyInfo.version }
-      this.networkFile.setDependency(depName, depInfo)
+      if (!currentDependency || currentDependency.package !== dependencyInfo.packageAddress) {
+        log.info(`Connecting to dependency ${depName} ${dependencyInfo.version}`);
+        await this.project.setDependency(depName, dependencyInfo.packageAddress, dependencyInfo.version)
+        const depInfo = { package: dependencyInfo.packageAddress, version: dependencyInfo.version }
+        this.networkFile.setDependency(depName, depInfo)
+      }
+    } catch(error) {
+      throw Error(`Failed to link dependency ${depName}@${depVersion} with error: ${error.message}`)
     }
   }
 
