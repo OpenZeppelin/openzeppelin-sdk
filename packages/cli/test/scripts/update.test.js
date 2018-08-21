@@ -6,8 +6,8 @@ import CaptureLogs from '../helpers/captureLogs';
 
 import add from '../../src/scripts/add.js';
 import push from '../../src/scripts/push.js';
-import bumpVersion from '../../src/scripts/bump.js';
-import createProxy from '../../src/scripts/create.js';
+import bump from '../../src/scripts/bump.js';
+import create from '../../src/scripts/create.js';
 import update from '../../src/scripts/update.js';
 import ZosPackageFile from "../../src/models/files/ZosPackageFile";
 
@@ -24,8 +24,9 @@ contract('update script', function([_, owner]) {
   const txParams = { from: owner };
 
   const assertProxyInfo = async function(networkFile, contractAlias, proxyIndex, { version, implementation, address, value }) {
-    const proxyInfo = networkFile.proxy(contractAlias, proxyIndex);
+    const proxyInfo = networkFile.instance(contractAlias, proxyIndex);
 
+    proxyInfo.upgradeable.should.be.true
     if (address) proxyInfo.address.should.eq(address);
     else proxyInfo.address.should.be.nonzeroAddress;
 
@@ -60,11 +61,12 @@ contract('update script', function([_, owner]) {
       this.implV1Address = this.networkFile.contract('Impl').address;
       this.anotherImplV1Address = this.networkFile.contract('AnotherImpl').address;
 
-      await createProxy({ contractAlias: 'Impl', network, txParams, networkFile: this.networkFile });
-      await createProxy({ contractAlias: 'Impl', network, txParams, networkFile: this.networkFile });
-      await createProxy({ contractAlias: 'AnotherImpl', network, txParams, networkFile: this.networkFile });
+      await create({ contractAlias: 'Impl', network, txParams, networkFile: this.networkFile });
+      await create({ contractAlias: 'Impl', network, txParams, networkFile: this.networkFile });
+      await create({ contractAlias: 'Impl', upgradeable: false, network, txParams, networkFile: this.networkFile })
+      await create({ contractAlias: 'AnotherImpl', network, txParams, networkFile: this.networkFile });
 
-      await bumpVersion({ version: version_2, txParams, packageFile: this.packageFile });
+      await bump({ version: version_2, txParams, packageFile: this.packageFile });
       const newContractsData = [{ name: 'ImplV2', alias: 'Impl' }, { name: 'AnotherImplV2', alias: 'AnotherImpl' }]
       await add({ contractsData: newContractsData, packageFile: this.packageFile });
       await push({ network, txParams, networkFile: this.networkFile });
@@ -75,13 +77,19 @@ contract('update script', function([_, owner]) {
 
     it('should upgrade the version of a proxy given its address', async function() {
       // Upgrade single proxy
-      const proxyAddress = this.networkFile.proxy('Impl', 0).address;
+      const proxyAddress = this.networkFile.instance('Impl', 0).address;
       await update({ contractAlias: 'Impl', proxyAddress, network, txParams, networkFile: this.networkFile });
       await assertProxyInfo(this.networkFile, 'Impl', 0, { version: version_2, implementation: this.implV2Address, address: proxyAddress });
 
       // Check other proxies were unmodified
       await assertProxyInfo(this.networkFile, 'Impl', 1, { version: version_1, implementation: this.implV1Address });
       await assertProxyInfo(this.networkFile, 'AnotherImpl', 0, { version: version_1, implementation: this.anotherImplV1Address });
+    });
+
+    it('should not upgrade a non-upgradeable instance given its address', async function() {
+      const instance = this.networkFile.instance('Impl', 2);
+      await update({ contractAlias: 'Impl', proxyAddress: instance.address, network, txParams, networkFile: this.networkFile });
+      this.networkFile.instance('Impl', 2).implementation.should.be.eq(this.implV1Address)
     });
 
     it('should upgrade the version of all proxies given the contract alias', async function() {
@@ -101,6 +109,12 @@ contract('update script', function([_, owner]) {
       await assertProxyInfo(this.networkFile, 'AnotherImpl', 0, { version: version_2, implementation: this.anotherImplV2Address });
     });
 
+    it('should not upgrade non-upgradeable instances in the app', async function() {
+      await update({ contractAlias: undefined, proxyAddress: undefined, all: true, network, txParams, networkFile: this.networkFile });
+
+      this.networkFile.instance('Impl', 2).implementation.should.be.eq(this.implV1Address)
+    });
+
     it('should require all flag to upgrade all proxies', async function() {
       await update(
         { contractAlias: undefined, proxyAddress: undefined, all: false, network, txParams, networkFile: this.networkFile }
@@ -109,7 +123,7 @@ contract('update script', function([_, owner]) {
 
     it('should upgrade the remaining proxies if one was already upgraded', async function() {
       // Upgrade a single proxy
-      const proxyAddress = this.networkFile.proxy('Impl', 0).address;
+      const proxyAddress = this.networkFile.instance('Impl', 0).address;
       await update({ contractAlias: 'Impl', proxyAddress, network, txParams, networkFile: this.networkFile });
       await assertProxyInfo(this.networkFile, 'Impl', 0, { version: version_2, implementation: this.implV2Address, address: proxyAddress });
 
@@ -120,7 +134,7 @@ contract('update script', function([_, owner]) {
     });
 
     it('should upgrade a single proxy and migrate it', async function() {
-      const proxyAddress = this.networkFile.proxy('Impl', 0).address;
+      const proxyAddress = this.networkFile.instance('Impl', 0).address;
       await update({ contractAlias: 'Impl', initMethod: 'migrate', initArgs: [42], proxyAddress, network, txParams, networkFile: this.networkFile });
       await assertProxyInfo(this.networkFile, 'Impl', 0, { version: version_2, implementation: this.implV2Address, address: proxyAddress, value: 42 });
     });
@@ -204,6 +218,14 @@ contract('update script', function([_, owner]) {
         await update({ contractAlias: 'NoMigrate', network, txParams, networkFile: this.networkFile });
         this.logs.errors.should.have.lengthOf(0);
       });
+
+      it('should warn when the instance to upgrade is non-upgradeable', async function() {
+        const instance = this.networkFile.instance('Impl', 2)
+        await update({ contractAlias: 'Impl', proxyAddress: instance.address, network, txParams, networkFile: this.networkFile })
+
+        this.logs.infos.should.have.lengthOf(1);
+        this.logs.infos[0].should.eq('No proxies to update were found');
+      })
     });
   });
 
@@ -214,22 +236,22 @@ contract('update script', function([_, owner]) {
       this.networkFile = this.packageFile.networkFile(network)
 
       await push({ network, txParams, deployStdlib: true, networkFile: this.networkFile });
-      await createProxy({ contractAlias: 'Greeter', network, txParams, networkFile: this.networkFile });
-      await createProxy({ contractAlias: 'Greeter', network, txParams, networkFile: this.networkFile });
+      await create({ contractAlias: 'Greeter', network, txParams, networkFile: this.networkFile });
+      await create({ contractAlias: 'Greeter', network, txParams, networkFile: this.networkFile });
 
-      await bumpVersion({ version: version_2, txParams, stdlibNameVersion: 'mock-stdlib-2@1.2.0', packageFile: this.packageFile });
+      await bump({ version: version_2, txParams, stdlibNameVersion: 'mock-stdlib-2@1.2.0', packageFile: this.packageFile });
       await push({ network, txParams, deployStdlib: true, networkFile: this.networkFile });
     });
 
     it('should upgrade the version of a proxy given its address', async function() {
-      const proxyAddress = this.networkFile.proxy('Greeter', 0).address;
+      const proxyAddress = this.networkFile.instance('Greeter', 0).address;
       await update({ contractAlias: 'Greeter', proxyAddress, network, txParams, networkFile: this.networkFile });
 
       await assertProxyInfo(this.networkFile, 'Greeter', 0, { version: version_2, address: proxyAddress });
       const upgradedProxy = await Greeter_V2.at(proxyAddress);
       (await upgradedProxy.version()).should.eq('1.2.0');
 
-      const anotherProxyAddress = this.networkFile.proxy('Greeter', 1).address;
+      const anotherProxyAddress = this.networkFile.instance('Greeter', 1).address;
       const notUpgradedProxy = await Greeter_V1.at(anotherProxyAddress);
       (await notUpgradedProxy.version()).should.eq('1.1.0');
     });

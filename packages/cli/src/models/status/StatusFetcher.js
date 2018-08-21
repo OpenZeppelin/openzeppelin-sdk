@@ -74,24 +74,24 @@ export default class StatusFetcher {
 
   onUnregisteredLocalProxy(expected, observed, { alias, address, implementation }) {
     log.info(`Removing unregistered local proxy of ${alias} at ${address} pointing to ${implementation}`)
-    this.networkFile.removeProxy(alias, address)
+    this.networkFile.removeInstance(alias, address)
   }
 
   onMissingRemoteProxy(expected, observed, { alias, address, implementation }) {
     log.info(`Adding missing proxy of ${alias} at ${address} pointing to ${implementation}`)
-    this.networkFile.addProxy(alias, { address, implementation, version: 'unknown' })
+    this.networkFile.addInstance(alias, { address, implementation, upgradeable: true, version: 'unknown' })
   }
 
   onMismatchingProxyAlias(expected, observed, { alias, address, implementation }) {
     log.info(`Changing alias of proxy at ${address} pointing to ${implementation} from ${expected} to ${observed}`)
-    const proxy = this.networkFile.proxyByAddress(expected, address)
-    this.networkFile.removeProxy(expected, address)
-    this.networkFile.addProxy(alias, proxy)
+    const proxy = this.networkFile.instanceByAddress(expected, address)
+    this.networkFile.removeInstance(expected, address)
+    this.networkFile.addInstance(alias, proxy)
   }
 
   onMismatchingProxyImplementation(expected, observed, { alias, address, implementation }) {
     log.info(`Changing implementation of proxy ${alias} at ${address} from ${expected} to ${observed}`)
-    this.networkFile.setProxyImplementation(alias, address, implementation)
+    this.networkFile.setInstanceImplementation(alias, address, implementation)
   }
 
   onUnregisteredProxyImplementation(expected, observed, { address, implementation }) {

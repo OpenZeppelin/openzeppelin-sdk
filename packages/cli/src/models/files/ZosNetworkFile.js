@@ -1,7 +1,7 @@
 import _ from 'lodash'
+import Stdlib from '../stdlib/Stdlib'
 import { Logger, FileSystem as fs } from 'zos-lib'
 import { bytecodeDigest, bodyCode, constructorCode } from '../../utils/contracts'
-import Stdlib from '../stdlib/Stdlib';
 
 const log = new Logger('ZosNetworkFile')
 
@@ -12,7 +12,7 @@ export default class ZosNetworkFile {
     this.network = network
     this.fileName = fileName
 
-    const defaults = this.packageFile.isLib ? { contracts: {}, lib: true, frozen: false } : { contracts: {}, proxies: {} }
+    const defaults = this.packageFile.isLib ? { contracts: {}, lib: true, frozen: false } : { contracts: {}, instances: {} }
     this.data = fs.parseJsonIfExists(this.fileName) || defaults
   }
 
@@ -65,7 +65,11 @@ export default class ZosNetworkFile {
   }
 
   get proxies() {
-    return this.data.proxies || {}
+    return _.mapValues(this.instances, instances => _.filter(instances, 'upgradeable'))
+  }
+
+  get instances() {
+    return this.data.instances || {}
   }
 
   get contracts() {
@@ -76,8 +80,8 @@ export default class ZosNetworkFile {
     return Object.keys(this.contracts)
   }
 
-  get proxyAliases() {
-    return Object.keys(this.proxies)
+  get instanceAliases() {
+    return Object.keys(this.instances)
   }
 
   get isLib() {
@@ -85,27 +89,28 @@ export default class ZosNetworkFile {
   }
 
   proxiesList() {
-    return _.flatMap(this.proxyAliases, alias => this.proxiesOf(alias).map(info => {
-      info['alias'] = alias
-      return info
-    }))
+    return _.flatMap(this.instanceAliases, alias => this.proxiesOf(alias).map(info => Object.assign(info, { alias })))
   }
 
-  proxy(alias, index) {
-    return this.proxiesOf(alias)[index]
+  instance(alias, index) {
+    return this.instancesOf(alias)[index]
   }
 
-  proxyByAddress(alias, address) {
-    const index = this.indexOfProxy(alias, address)
-    return this.proxiesOf(alias)[index]
+  instanceByAddress(alias, address) {
+    const index = this.indexOfInstance(alias, address)
+    return this.instancesOf(alias)[index]
+  }
+
+  instancesOf(alias) {
+    return this.instances[alias] || []
   }
 
   proxiesOf(alias) {
-    return this.proxies[alias] || []
+    return this.instancesOf(alias).filter(instance => instance.upgradeable)
   }
 
-  indexOfProxy(alias, address) {
-    return this.proxiesOf(alias).findIndex(proxy => proxy.address === address)
+  indexOfInstance(alias, address) {
+    return this.instancesOf(alias).findIndex(instance => instance.address === address)
   }
 
   contract(alias) {
@@ -130,6 +135,10 @@ export default class ZosNetworkFile {
 
   hasProxies(alias = undefined) {
     return alias ? !_.isEmpty(this.proxiesOf(alias)) : !_.isEmpty(this.proxies)
+  }
+
+  hasInstances(alias = undefined) {
+    return alias ? !_.isEmpty(this.instancesOf(alias)) : !_.isEmpty(this.instances)
   }
 
   hasMatchingVersion() {
@@ -217,30 +226,30 @@ export default class ZosNetworkFile {
     delete this.data.contracts[alias]
   }
 
-  setProxies(alias, value) {
-    this.data.proxies[alias] = value
+  setInstances(alias, value) {
+    this.data.instances[alias] = value
   }
 
   unsetContract(alias) {
     delete this.data.contracts[alias];
   }
 
-  addProxy(alias, info) {
-    if (!this.hasProxies(alias)) this.setProxies(alias, [])
-    this.data.proxies[alias].push(info)
+  addInstance(alias, info) {
+    if (!this.hasInstances(alias)) this.setInstances(alias, [])
+    this.data.instances[alias].push(info)
   }
 
-  setProxyImplementation(alias, address, implementation) {
-    const index = this.indexOfProxy(alias, address)
+  setInstanceImplementation(alias, address, implementation) {
+    const index = this.indexOfInstance(alias, address)
     if(index < 0) return
-    this.data.proxies[alias][index].implementation = implementation
+    this.data.instances[alias][index].implementation = implementation
   }
 
-  removeProxy(alias, address) {
-    const index = this.indexOfProxy(alias, address)
+  removeInstance(alias, address) {
+    const index = this.indexOfInstance(alias, address)
     if(index < 0) return
-    this.data.proxies[alias].splice(index, 1)
-    if(this.proxiesOf(alias).length === 0) delete this.data.proxies[alias]
+    this.data.instances[alias].splice(index, 1)
+    if(this.instancesOf(alias).length === 0) delete this.data.instances[alias]
   }
 
   write() {

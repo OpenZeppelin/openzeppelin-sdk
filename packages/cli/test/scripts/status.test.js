@@ -4,7 +4,7 @@ require('../setup')
 import add from '../../src/scripts/add.js';
 import push from '../../src/scripts/push.js';
 import bumpVersion from '../../src/scripts/bump.js';
-import createProxy from '../../src/scripts/create.js';
+import create from '../../src/scripts/create.js';
 import status from '../../src/scripts/status.js';
 import linkStdlib from '../../src/scripts/link';
 import ControllerFor from '../../src/models/local/ControllerFor';
@@ -215,7 +215,7 @@ contract('status script', function([_, owner]) {
       it('should log created proxies', async function () {
         await add({ contractsData, packageFile: this.packageFile });
         await push({ network, txParams, networkFile: this.networkFile });
-        await createProxy({ contractAlias, network, txParams, networkFile: this.networkFile });
+        await create({ contractAlias, network, txParams, networkFile: this.networkFile });
         await status({ network, networkFile: this.networkFile });
         
         this.logs.text.should.match(/Impl at 0x[0-9a-fA-F]{40} version 1.1.0/i);

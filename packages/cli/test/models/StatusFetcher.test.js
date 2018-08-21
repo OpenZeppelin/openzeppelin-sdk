@@ -434,7 +434,7 @@ contract('StatusFetcher', function([_, owner, anotherAddress]) {
           it('does not modoify the proxies list', async function () {
             await this.checker.checkProxies()
 
-            this.networkFile.proxyAliases.should.be.empty
+            this.networkFile.instanceAliases.should.be.empty
           })
         })
 
@@ -446,10 +446,10 @@ contract('StatusFetcher', function([_, owner, anotherAddress]) {
           it('adds that proxy', async function () {
             await this.checker.checkProxies()
 
-            this.networkFile.proxyAliases.should.have.lengthOf(1)
-            this.networkFile.proxy('Impl', 0).address.should.be.equal(this.proxy.address)
-            this.networkFile.proxy('Impl', 0).version.should.be.equal('unknown')
-            this.networkFile.proxy('Impl', 0).implementation.should.be.equal(this.impl.address)
+            this.networkFile.instanceAliases.should.have.lengthOf(1)
+            this.networkFile.instance('Impl', 0).address.should.be.equal(this.proxy.address)
+            this.networkFile.instance('Impl', 0).version.should.be.equal('unknown')
+            this.networkFile.instance('Impl', 0).implementation.should.be.equal(this.impl.address)
           })
         })
 
@@ -462,30 +462,28 @@ contract('StatusFetcher', function([_, owner, anotherAddress]) {
           it('adds those proxies', async function () {
             await this.checker.checkProxies()
 
-            this.networkFile.proxyAliases.should.have.lengthOf(2)
-            this.networkFile.proxy('Impl', 0).address.should.be.equal(this.implProxy.address)
-            this.networkFile.proxy('Impl', 0).version.should.be.equal('unknown')
-            this.networkFile.proxy('Impl', 0).implementation.should.be.equal(this.impl.address)
-            this.networkFile.proxy('AnotherImpl', 0).address.should.be.equal(this.anotherImplProxy.address)
-            this.networkFile.proxy('AnotherImpl', 0).version.should.be.equal('unknown')
-            this.networkFile.proxy('AnotherImpl', 0).implementation.should.be.equal(this.anotherImpl.address)
+            this.networkFile.instanceAliases.should.have.lengthOf(2)
+            this.networkFile.instance('Impl', 0).address.should.be.equal(this.implProxy.address)
+            this.networkFile.instance('Impl', 0).version.should.be.equal('unknown')
+            this.networkFile.instance('Impl', 0).implementation.should.be.equal(this.impl.address)
+            this.networkFile.instance('AnotherImpl', 0).address.should.be.equal(this.anotherImplProxy.address)
+            this.networkFile.instance('AnotherImpl', 0).version.should.be.equal('unknown')
+            this.networkFile.instance('AnotherImpl', 0).implementation.should.be.equal(this.anotherImpl.address)
           })
         })
       })
 
       describe('when the network file has two proxies', function () {
         beforeEach('adding a proxy', async function () {
-          this.networkFile.setProxies('Impl', [
-            { implementation: this.impl.address, address: '0x1', version: '1.0' },
-            { implementation: this.impl.address, address: '0x2', version: '1.0' }
-          ])
+          this.networkFile.addInstance('Impl', { implementation: this.impl.address, address: '0x1', version: '1.0', upgradeable: true })            
+          this.networkFile.addInstance('Impl', { implementation: this.impl.address, address: '0x2', version: '1.0', upgradeable: true })
         })
 
         describe('when the app does not have any proxy registered', function () {
           it('removes those proxies', async function () {
             await this.checker.checkProxies()
 
-            this.networkFile.proxyAliases.should.be.empty
+            this.networkFile.instanceAliases.should.be.empty
           })
         })
 
@@ -497,69 +495,65 @@ contract('StatusFetcher', function([_, owner, anotherAddress]) {
           describe('when it matches one proxy address', function () {
             describe('when it matches the alias and the implementation address', function () {
               beforeEach('changing network file', async function () {
-                this.networkFile.setProxies('Impl', [
-                  { implementation: this.impl.address, address: '0x1', version: '1.0' },
-                  { implementation: this.impl.address, address: this.proxy.address, version: '1.0' },
-                ])
+                this.networkFile.addInstance('Impl', { implementation: this.impl.address, address: '0x1', version: '1.0', upgradeable: true })
+                this.networkFile.addInstance('Impl', { implementation: this.impl.address, address: this.proxy.address, version: '1.0', upgradeable: true })
               })
 
               it('removes the unregistered proxy', async function () {
                 await this.checker.checkProxies()
 
-                this.networkFile.proxyAliases.should.have.lengthOf(1)
-                this.networkFile.proxy('Impl', 0).address.should.be.equal(this.proxy.address)
-                this.networkFile.proxy('Impl', 0).version.should.be.equal('1.0')
-                this.networkFile.proxy('Impl', 0).implementation.should.be.equal(this.impl.address)
+                this.networkFile.instanceAliases.should.have.lengthOf(1)
+                this.networkFile.instance('Impl', 0).address.should.be.equal(this.proxy.address)
+                this.networkFile.instance('Impl', 0).version.should.be.equal('1.0')
+                this.networkFile.instance('Impl', 0).implementation.should.be.equal(this.impl.address)
               })
             })
 
             describe('when it matches the alias but not the implementation address', function () {
               beforeEach('changing network file', async function () {
-                this.networkFile.setProxies('Impl', [
-                  { implementation: this.impl.address, address: '0x1', version: '1.0' },
-                  { implementation: this.anotherImpl.address, address: this.proxy.address, version: '1.0' },
-                ])
+                this.networkFile.addInstance('Impl', { implementation: this.impl.address, address: '0x1', version: '1.0', upgradeable: true })
+                this.networkFile.addInstance('Impl', { implementation: this.anotherImpl.address, address: this.proxy.address, version: '1.0', upgradeable: true })
               })
 
               it('removes the unregistered proxy and updates the implementation of the registered one', async function () {
                 await this.checker.checkProxies()
 
-                this.networkFile.proxyAliases.should.have.lengthOf(1)
-                this.networkFile.proxy('Impl', 0).address.should.be.equal(this.proxy.address)
-                this.networkFile.proxy('Impl', 0).version.should.be.equal('1.0')
-                this.networkFile.proxy('Impl', 0).implementation.should.be.equal(this.impl.address)
+                this.networkFile.instanceAliases.should.have.lengthOf(1)
+                this.networkFile.instance('Impl', 0).address.should.be.equal(this.proxy.address)
+                this.networkFile.instance('Impl', 0).version.should.be.equal('1.0')
+                this.networkFile.instance('Impl', 0).implementation.should.be.equal(this.impl.address)
               })
             })
 
             describe('when it matches the implementation address but not the alias', function () {
               beforeEach('changing network file', async function () {
-                this.networkFile.setProxies('Impl', [{ implementation: this.impl.address, address: '0x1', version: '1.0' }])
-                this.networkFile.setProxies('AnotherImpl', [{ implementation: this.impl.address, address: this.proxy.address, version: '1.0' }])
+                this.networkFile.addInstance('Impl', { implementation: this.impl.address, address: '0x1', version: '1.0', upgradeable: true })
+                this.networkFile.addInstance('AnotherImpl', { implementation: this.impl.address, address: this.proxy.address, version: '1.0', upgradeable: true })
               })
 
               it('removes the unregistered proxy and updates the alias of the registered one', async function () {
                 await this.checker.checkProxies()
 
-                this.networkFile.proxyAliases.should.have.lengthOf(1)
-                this.networkFile.proxy('Impl', 0).address.should.be.equal(this.proxy.address)
-                this.networkFile.proxy('Impl', 0).version.should.be.equal('1.0')
-                this.networkFile.proxy('Impl', 0).implementation.should.be.equal(this.impl.address)
+                this.networkFile.instanceAliases.should.have.lengthOf(1)
+                this.networkFile.instance('Impl', 0).address.should.be.equal(this.proxy.address)
+                this.networkFile.instance('Impl', 0).version.should.be.equal('1.0')
+                this.networkFile.instance('Impl', 0).implementation.should.be.equal(this.impl.address)
               })
             })
 
             describe('when it does not match the alias and the implementation address', function () {
               beforeEach('changing network file', async function () {
-                this.networkFile.setProxies('Impl', [{ implementation: this.impl.address, address: '0x1', version: '1.0' }])
-                this.networkFile.setProxies('AnotherImpl', [{ implementation: this.anotherImpl.address, address: this.proxy.address, version: '1.0' }])
+                this.networkFile.addInstance('Impl', { implementation: this.impl.address, address: '0x1', version: '1.0', upgradeable: true })
+                this.networkFile.addInstance('AnotherImpl', { implementation: this.anotherImpl.address, address: this.proxy.address, version: '1.0', upgradeable: true })
               })
 
               it('removes the unregistered proxy and updates the alias and implementation of the registered one', async function () {
                 await this.checker.checkProxies()
 
-                this.networkFile.proxyAliases.should.have.lengthOf(1)
-                this.networkFile.proxy('Impl', 0).address.should.be.equal(this.proxy.address)
-                this.networkFile.proxy('Impl', 0).version.should.be.equal('1.0')
-                this.networkFile.proxy('Impl', 0).implementation.should.be.equal(this.impl.address)
+                this.networkFile.instanceAliases.should.have.lengthOf(1)
+                this.networkFile.instance('Impl', 0).address.should.be.equal(this.proxy.address)
+                this.networkFile.instance('Impl', 0).version.should.be.equal('1.0')
+                this.networkFile.instance('Impl', 0).implementation.should.be.equal(this.impl.address)
               })
             })
           })
@@ -569,10 +563,10 @@ contract('StatusFetcher', function([_, owner, anotherAddress]) {
             it('removes the unregistered proxies and adds the registered onen', async function () {
               await this.checker.checkProxies()
 
-              this.networkFile.proxyAliases.should.have.lengthOf(1)
-              this.networkFile.proxy('Impl', 0).address.should.be.equal(this.proxy.address)
-              this.networkFile.proxy('Impl', 0).version.should.be.equal('unknown')
-              this.networkFile.proxy('Impl', 0).implementation.should.be.equal(this.impl.address)
+              this.networkFile.instanceAliases.should.have.lengthOf(1)
+              this.networkFile.instance('Impl', 0).address.should.be.equal(this.proxy.address)
+              this.networkFile.instance('Impl', 0).version.should.be.equal('unknown')
+              this.networkFile.instance('Impl', 0).implementation.should.be.equal(this.impl.address)
             })
           })
         })

@@ -8,8 +8,8 @@ export default class NetworkLibController extends NetworkBaseController {
     return !!this.packageAddress;
   }
 
-  async createProxy() {
-    throw Error('Cannot create proxy for stdlib')
+  async createInstance() {
+    throw Error('Cannot create contract instances for a stdlib')
   }
 
   async deploy() {

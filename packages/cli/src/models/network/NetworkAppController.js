@@ -1,9 +1,50 @@
 import _ from 'lodash';
 import Stdlib from '../stdlib/Stdlib';
 import NetworkBaseController from './NetworkBaseController';
-import { Contracts, Logger, App, FileSystem as fs } from 'zos-lib';
+import { Contracts, Logger, App, FileSystem as fs, encodeCall } from 'zos-lib';
 
 const log = new Logger('NetworkAppController');
+
+// TODO: Remove after upgrade to latest zos-lib version
+App.prototype.createNonUpgradeableInstance = async function(contractClass, contractName, initMethodName, initArgs) {
+  log.info(`Creating new non-upgradeable instance of ${contractName}...`)
+  const implementationAddress = (await this.getImplementation(contractName)).replace('0x', '');
+
+  // This is EVM assembly will return of the code of a foreign address.
+  //
+  // operation    | bytecode   | stack representation
+  // =================================================
+  // push20 ADDR  | 0x73 ADDR  | ADDR
+  // dup1         | 0x80       | ADDR ADDR
+  // extcodesize  | 0x3B       | ADDR 0xCS
+  // dup1         | 0x80       | ADDR 0xCS 0xCS
+  // swap2        | 0x91       | 0xCS 0xCS ADDR
+  // push1 00     | 0x60 0x00  | 0xCS 0xCS ADDR 0x00
+  // dup1         | 0x80       | 0xCS 0xCS ADDR 0x00 0x00
+  // swap2        | 0x91       | 0xCS 0xCS 0x00 0x00 ADDR
+  // extcodecopy  | 0x3C       | 0xCS
+  // push1 00     | 0x60 0x00  | 0xCS 0x00
+  // return       | 0xF3       |
+
+  const ASM_CODE_COPY = `0x73${implementationAddress}803b8091600080913c6000f3`;
+
+  const params = Object.assign({}, contractClass.defaults(), this.txParams, { to: 0x0, data: ASM_CODE_COPY })
+  const txHash = web3.eth.sendTransaction(params)
+  const receipt = web3.eth.getTransactionReceipt(txHash)
+  const instance = contractClass.at(receipt.contractAddress)
+  log.info(`${contractName} instance created at ${instance.address}`)
+
+  if(typeof(initArgs) !== 'undefined') {
+    // this could be front-run
+    log.info(`Initializing ${contractName} instance at ${instance.address}`)
+    const initMethod = this._validateInitMethod(contractClass, initMethodName, initArgs)
+    const initArgTypes = initMethod.inputs.map(input => input.type)
+    const callData = encodeCall(initMethodName, initArgTypes, initArgs)
+    await instance.sendTransaction(Object.assign({}, this.txParams, { data: callData }))
+  }
+
+  return instance
+}
 
 export default class NetworkAppController extends NetworkBaseController {
   get isDeployed() {
@@ -52,23 +93,23 @@ export default class NetworkAppController extends NetworkBaseController {
     return this.app.unsetImplementation(contractAlias);
   }
 
-  async createProxy(contractAlias, initMethod, initArgs) {
+  async createInstance(contractAlias, upgradeable, initMethod, initArgs) {
     await this.fetch();
     const contractClass = this.localController.getContractClass(contractAlias);
-    this.checkInitialization(contractClass, initMethod, initArgs);
-    const proxyInstance = await this.app.createProxy(contractClass, contractAlias, initMethod, initArgs);
-    const implementationAddress = await this.app.getImplementation(contractAlias);
-    this._updateTruffleDeployedInformation(contractAlias, proxyInstance)
+    this.checkInitialization(contractClass, initMethod);
+    const instance = upgradeable
+      ? await this.app.createProxy(contractClass, contractAlias, initMethod, initArgs)
+      : await this.app.createNonUpgradeableInstance(contractClass, contractAlias, initMethod, initArgs)
 
-    this.networkFile.addProxy(contractAlias, {
-      address: proxyInstance.address,
-      version: this.app.version,
-      implementation: implementationAddress
-    })
-    return proxyInstance;
+    this._updateTruffleDeployedInformation(contractAlias, instance)
+    const implementation = await this.app.getImplementation(contractAlias);
+    const info = { address: instance.address, version: this.app.version, implementation, upgradeable }
+    this.networkFile.addInstance(contractAlias, info)
+
+    return instance;
   }
 
-  checkInitialization(contractClass, calledInitMethod, calledInitArgs) {
+  checkInitialization(contractClass, calledInitMethod) {
     // If there is an initializer called, assume it's ok
     if (calledInitMethod) return;
 
@@ -130,8 +171,8 @@ export default class NetworkAppController extends NetworkBaseController {
     }
 
     return {
-      [contractAlias]: _.filter(this.networkFile.proxiesOf(contractAlias), proxy => (
-        !proxyAddress || proxy.address === proxyAddress
+      [contractAlias]: _.filter(this.networkFile.proxiesOf(contractAlias), instance => (
+        !proxyAddress || instance.address === proxyAddress
       ))
     };
   }
@@ -169,9 +210,9 @@ export default class NetworkAppController extends NetworkBaseController {
 
     if (stdlibAddress !== currentStdlibAddress) {
       await this.app.setStdlib(stdlibAddress);
-      this.networkFile.stdlib = { 
+      this.networkFile.stdlib = {
          ... this.packageFile.stdlib, // name, customDeploy
-         address: stdlibAddress, 
+         address: stdlibAddress,
          version: stdlibVersion
       };
     } else {
