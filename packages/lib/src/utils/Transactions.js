@@ -12,6 +12,41 @@ const state = { };
 // Gas estimates are multiplied by this value to allow for an extra buffer (for reference, truffle-next uses 1.25)
 const GAS_MULTIPLIER = 1.2;
 
+// Max number of retries for deploying a contract
+const RETRY_COUNT = 3;
+
+/**
+ * Wraps the _sendTransaction function and manages transaction retries
+ * @param contractFn contract function to be executed as the transaction
+ * @param args arguments of the call (if any)
+ * @param txParams other transaction parameters (from, gasPrice, etc)
+ * @param retries number of transaction retries
+ */
+export async function sendTransaction(contractFn, args = [], txParams = {}, retries = RETRY_COUNT) {
+  try {
+    return await _sendTransaction(contractFn, args, txParams)
+  } catch (error) {
+    if (retries <= 0) throw Error(error)
+    return sendTransaction(contractFn, args, txParams, retries - 1)
+  }
+}
+
+/**
+ * Wraps the _deploy and manages deploy retries
+ * @param contract truffle contract to be deployed
+ * @param args arguments of the constructor (if any)
+ * @param txParams other transaction parameters (from, gasPrice, etc)
+ * @param retries number of deploy retries
+ */
+export async function deploy(contract, args = [], txParams = {}, retries = RETRY_COUNT) {
+  try {
+    return await _deploy(contract, args, txParams)
+  } catch (error) {
+    if (retries <= 0) throw Error(error)
+    return deploy(contract, args, txParams, retries - 1)
+  }
+}
+
 /**
  * Sends a transaction to the blockchain, estimating the gas to be used.
  * Uses the node's estimateGas RPC call, and adds a 20% buffer on top of it, capped by the block gas limit.
@@ -19,7 +54,7 @@ const GAS_MULTIPLIER = 1.2;
  * @param args arguments of the call (if any)
  * @param txParams other transaction parameters (from, gasPrice, etc)
  */
-export async function sendTransaction(contractFn, args = [], txParams = {}) {
+async function _sendTransaction(contractFn, args = [], txParams = {}) {
   // If gas is set explicitly, use it
   if (txParams.gas) {
     return contractFn(...args, txParams);
@@ -40,7 +75,7 @@ export async function sendTransaction(contractFn, args = [], txParams = {}) {
  * @param args arguments of the constructor (if any)
  * @param txParams other transaction parameters (from, gasPrice, etc)
  */
-export async function deploy(contract, args = [], txParams = {}) {
+async function _deploy(contract, args = [], txParams = {}) {
   // If gas is set explicitly, use it
   if (txParams.gas) {
     return contract.new(... args, txParams);
