@@ -54,7 +54,7 @@ export async function deploy(contract, args = [], txParams = {}, retries = RETRY
  * @param args arguments of the call (if any)
  * @param txParams other transaction parameters (from, gasPrice, etc)
  */
-export async function _sendTransaction(contractFn, args = [], txParams = {}) {
+async function _sendTransaction(contractFn, args = [], txParams = {}) {
   // If gas is set explicitly, use it
   if (txParams.gas) {
     return contractFn(...args, txParams);
