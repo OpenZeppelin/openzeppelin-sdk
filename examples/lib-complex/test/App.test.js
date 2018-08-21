@@ -14,21 +14,23 @@ contract('App', ([_, owner, donor, wallet]) => {
   const contractName = 'Donations';
 
   describe('setup', function() {
-    beforeEach(async function() {
-      this.app = await deploy.setupApp({owner});
+    beforeEach('deploying project', async function() {
+      this.project = await deploy.setupApp({owner});
     });
 
     describe('package', function() {
-
+      beforeEach('loading package', async function () {
+        this.package = await this.project.getProjectPackage()
+      })
       describe('when queried for the initial version', function() {
         it('claims to have it', async function() {
-          (await this.app.package.hasVersion(initialVersion)).should.be.true;
+          (await this.package.hasVersion(initialVersion)).should.be.true;
         });
       });
 
       describe('when queried for the updated version', function() {
         it('doesnt claim to have it', async function() {
-          (await this.app.package.hasVersion(updatedVersion)).should.be.false;
+          (await this.package.hasVersion(updatedVersion)).should.be.false;
         });
       });
     });
@@ -36,16 +38,15 @@ contract('App', ([_, owner, donor, wallet]) => {
 
   describe('version 0.0.1', function() {
     beforeEach(async function() {
-      this.app = await deploy.setupApp({owner});
-      this.donations = await deploy.deployVersion1(this.app, owner);
+      this.project = await deploy.setupApp({owner});
+      this.directory = await this.project.getCurrentDirectory();
+      this.donations = await deploy.deployVersion1(this.project, owner);
     });
     
     describe('directory', function() {
       describe('when queried for the implementation', function() {
-
         it('returns a valid address', async function() {
-          const implementation = await this.app.directory.getImplementation(contractName)
-
+          const implementation = await this.directory.getImplementation(contractName)
           implementation.should.be.nonzeroAddress
         });
       });
@@ -61,9 +62,9 @@ contract('App', ([_, owner, donor, wallet]) => {
     const tokenSymbol = 'DON';
 
     beforeEach(async function() {
-      this.app = await deploy.setupApp({owner});
-      this.donations = await deploy.deployVersion1(this.app, owner);
-      this.token = await deploy.deployVersion2(this.app, this.donations, { owner });
+      this.project = await deploy.setupApp({owner});
+      this.donations = await deploy.deployVersion1(this.project, owner);
+      this.token = await deploy.deployVersion2(this.project, this.donations, { owner });
       this.donations = DonationsV2.at(this.donations.address);
     });
 

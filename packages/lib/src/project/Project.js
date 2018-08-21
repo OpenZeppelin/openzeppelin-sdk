@@ -27,6 +27,7 @@ export default class Project {
   }
 
   async setImplementation(contractClass, contractName) {
+    if (!contractName) contractName = contractClass.contractName
     log.info(`Setting implementation of ${contractName} in directory...`)
     const implementation = await deploy(contractClass, [], this.txParams)
     const directory = await this.getCurrentDirectory()
