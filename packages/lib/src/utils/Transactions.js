@@ -64,15 +64,16 @@ export async function estimateGas(txData, txParams) {
   return promisify(web3.eth.estimateGas.bind(web3.eth))({ data: txData, ... txParams });
 }
 
-function getNodeVersion () {
-  if (!state.version) {
-    state.version = web3.version;
+async function getNodeVersion () {
+  if (!state.nodeInfo) {
+    state.nodeInfo = await promisify(web3.version.getNode.bind(web3.version))();
   }
-  return state.version.node;
+  return state.nodeInfo;
 }
 
-function isGanacheNode () {
-  return getNodeVersion().match(/TestRPC/)
+async function isGanacheNode () {
+  const nodeVersion = await getNodeVersion();
+  return nodeVersion.match(/TestRPC/);
 }
 
 async function getBlockGasLimit () {
@@ -91,6 +92,6 @@ async function calculateActualGas(estimatedGas) {
   // This is a viable workaround as long as we don't have other methods that have higher refunds,
   // such as cleaning more storage positions or selfdestructing a contract. We should be able to fix
   // this once the issue is resolved.
-  if (isGanacheNode()) gasToUse += 15000;
+  if (await isGanacheNode()) gasToUse += 15000;
   return gasToUse >= blockLimit ? (blockLimit-1) : gasToUse;
 }
