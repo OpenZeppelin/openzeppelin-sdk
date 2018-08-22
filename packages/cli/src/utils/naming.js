@@ -1,4 +1,4 @@
-// TODO: Testme
+import _ from 'lodash';
 
 export function toContractFullName(packageName, contractName) {
   if (!packageName) return contractName
@@ -6,9 +6,9 @@ export function toContractFullName(packageName, contractName) {
 }
 
 export function fromContractFullName(contractFullName) {
-  // FIXME: Support package names with slash (i.e. org/name)
+  if (!contractFullName) return {}
   const fragments = contractFullName.split('/')
   const contractName = fragments.pop()
   if (fragments.length === 0) return { contract: contractName }
-  else return { contract: contractName, package: fragments.join('/') }
+  else return _.pickBy({ contract: contractName, package: fragments.join('/') })
 }

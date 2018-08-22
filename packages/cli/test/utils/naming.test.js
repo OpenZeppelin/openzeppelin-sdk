@@ -10,6 +10,7 @@ describe('naming', function () {
     );
 
     it('parses contract name', testFn('foo', { contract: 'foo' }))
+    it('parses package name', testFn('pkg/', { package: 'pkg' }))
     it('parses contract and package name', testFn('pkg/foo', { contract: 'foo', package: 'pkg' }))
     it('parses package name with slashes', testFn('org/pkg/foo', { contract: 'foo', package: 'org/pkg' }))
   });

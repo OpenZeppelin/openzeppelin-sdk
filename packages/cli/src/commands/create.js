@@ -3,10 +3,12 @@
 import createProxy from '../scripts/create'
 import runWithTruffle from '../utils/runWithTruffle'
 import { parseInit } from '../utils/input'
+import { fromContractFullName } from '../utils/naming';
+import _ from 'lodash';
 
 const name = 'create'
 const signature = `${name} <alias>`
-const description = 'deploys a new upgradeable contract instance. Provide the <alias> you added your contract with'
+const description = 'deploys a new upgradeable contract instance. Provide the <alias> you added your contract with, or <package>/<alias> to create a contract from a linked package.'
 
 const register = program => program
   .command(signature, { noHelp: true })
@@ -18,12 +20,12 @@ const register = program => program
   .withNetworkOptions()
   .action(action)
 
-async function action(contractAlias, options) {
+async function action(contractFullName, options) {
   const { initMethod, initArgs } = parseInit(options, 'initialize')
   const { force } = options
-  await runWithTruffle(async (opts) => await createProxy({
-    contractAlias, initMethod, initArgs, force, ... opts
-  }), options)
+  const { contract: contractAlias, package: packageName } = fromContractFullName(contractFullName)
+  const args = _.pickBy({ packageName, contractAlias, initMethod, initArgs, force })
+  await runWithTruffle(async (opts) => await createProxy({ ... args, ... opts }), options)
 }
 
 export default { name, signature, description, register, action }
