@@ -1,6 +1,6 @@
 {
   "name": "zos-docs",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "description": "Documentation site for ZeppelinOS",
   "private": true,
   "main": "index.js",

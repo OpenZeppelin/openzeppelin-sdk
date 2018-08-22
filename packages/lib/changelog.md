@@ -4,12 +4,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## v1.4.1 - 2018-08-22
 
 ### Fixed
-- Promisify remaining web3 synchronous function calls
+- Fix critical error when running `push` with an `HDWalletProvider` ([#23](https://github.com/zeppelinos/zos/issues/23))
+- Retry transactions up to 3 times upon "nonce too low" errors ([#334](https://github.com/zeppelinos/zos-cli/issues/334))
 
-## [1.4.0] - 2018-08-14
+## v1.4.0 - 2018-08-14
 
 ### Changed
 - Contract deployments and transactions are executed with an estimate of the gas needed, instead of using the network default ([#211](https://github.com/zeppelinos/zos-lib/pull/211))
@@ -18,7 +19,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Fixed
 - Mark truffle-config as a prod dependency
 
-## [1.3.0] - 2018-07-13
+## v1.3.0 - 2018-07-13
 
 ### Added
 - Support custom Truffle build directories
@@ -40,17 +41,17 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Fix freezable directory unset implementation method
 - Fix `AdminUpgradeabilityProxy` shadowing issues
 
-## [1.2.1] - 2018-06-29
+## v1.2.1 - 2018-06-29
 
 ### Fix
 - Fix `App` wrapper hasStdlib function
 
-## [1.2.0] - 2018-06-29
+## v1.2.0 - 2018-06-29
 
 ### Added
 - Allow customising sync timeout in truffle-wrapped contracts
 
-## [1.1.0] - 2018-06-28
+## v1.1.0 - 2018-06-28
 
 ### Added
 - New functions to work with directories with `FileSystem`
