@@ -1,0 +1,12 @@
+{
+  "zosversion": "2",
+  "name": "cli-with-deps",
+  "version": "0.1.0",
+  "contracts": {
+    "TokenExchange": "TokenExchange"
+  },
+  "dependencies": {
+    "dep-basic": "^0.1.0",
+    "openzeppelin-zos": "^1.9.1"
+  }
+}
