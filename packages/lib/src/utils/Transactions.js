@@ -26,7 +26,7 @@ export async function sendTransaction(contractFn, args = [], txParams = {}, retr
   try {
     return await _sendTransaction(contractFn, args, txParams)
   } catch (error) {
-    if (retries <= 0) throw Error(error)
+    if (!error.message.match(/nonce too low/) || retries <= 0) throw Error(error)
     return sendTransaction(contractFn, args, txParams, retries - 1)
   }
 }
@@ -42,7 +42,7 @@ export async function deploy(contract, args = [], txParams = {}, retries = RETRY
   try {
     return await _deploy(contract, args, txParams)
   } catch (error) {
-    if (retries <= 0) throw Error(error)
+    if (!error.message.match(/nonce too low/) || retries <= 0) throw Error(error)
     return deploy(contract, args, txParams, retries - 1)
   }
 }
