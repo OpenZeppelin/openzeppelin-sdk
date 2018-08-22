@@ -1,0 +1,54 @@
+{
+  "contracts": {
+    "TokenExchange": {
+      "address": "0x3c1c7ee4688acaf89bb81a432cd9aa7b144bda30",
+      "constructorCode": "608060405234801561001057600080fd5b506105b1806100206000396000f300",
+      "bodyBytecodeHash": "46000198cd9daf6efc1dd55a90ceec7d0c3ab9127e9e72a011902c73b79a3ee1",
+      "bytecodeHash": "0ab2b7913c19b7fce9f96f875ddf7083b9282f8fd68dfb276515412367a6e30d"
+    }
+  },
+  "proxies": {
+    "dep-basic/EthBox": [
+      {
+        "address": "0xc2069675fe551cae14ca3cf3ec849117e0b40342",
+        "version": "0.1.0",
+        "implementation": "0xfb27c56f720e30f0ab1822d9b9df917b4df68961"
+      }
+    ],
+    "openzeppelin-zos/DetailedPremintedToken": [
+      {
+        "address": "0x568877b70b562af298a8436b28733ed6be6aad46",
+        "version": "0.1.0",
+        "implementation": "0x7c7876e4d7d77fdedf79c7f4d4fc523192d2c0ec"
+      }
+    ],
+    "cli-with-deps/TokenExchange": [
+      {
+        "address": "0x7878793d39e04b0b45bcdfa51d8577629f5e1510",
+        "version": "0.1.0",
+        "implementation": "0x3c1c7ee4688acaf89bb81a432cd9aa7b144bda30"
+      }
+    ]
+  },
+  "zosversion": "2",
+  "app": {
+    "address": "0xb77d0766f52785c8fdc203e1d9a746e5a3ef5a00"
+  },
+  "package": {
+    "address": "0xa75f8130245da0ce127a1b2bf08519feb096f74e"
+  },
+  "provider": {
+    "address": "0x63995f80bc31c00e338c4bb03b3279075b87a98a"
+  },
+  "version": "0.1.0",
+  "dependencies": {
+    "dep-basic": {
+      "package": "0x25345c21e9d557b5ade7ab6abba53822c71a9051",
+      "version": "0.1.0"
+    },
+    "openzeppelin-zos": {
+      "package": "0x22137ecc8483e4c2a86969d867c54babf5a6a184",
+      "version": "1.9.1"
+    }
+  }
+}

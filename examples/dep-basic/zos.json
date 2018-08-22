@@ -1,0 +1,9 @@
+{
+  "zosversion": "2",
+  "name": "dep-basic",
+  "version": "0.1.0",
+  "contracts": {
+    "EthBox": "EthBox"
+  },
+  "lib": true
+}
