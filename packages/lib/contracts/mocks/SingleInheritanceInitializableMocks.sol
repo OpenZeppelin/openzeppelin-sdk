@@ -1,6 +1,6 @@
 pragma solidity ^0.4.24;
 
-import '../migrations/Initializable.sol';
+import '../Initializable.sol';
 
 /**
  * @title MigratableMockV1
