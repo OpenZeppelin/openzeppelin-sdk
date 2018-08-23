@@ -12,6 +12,10 @@ export default class Dependency {
     return new this(name, version)
   }
 
+  static satisfiesVersion(version, requirement) {
+    return !requirement || version === requirement || semver.satisfies(version, requirement);
+  }  
+
   constructor(name, version) {
     this.name = name
     this._networkFiles = {}
@@ -76,10 +80,6 @@ export default class Dependency {
       throw Error(`Required dependency version ${requirement} does not match dependency package version ${version}`);
     }
   }
-
-  static satisfiesVersion(version, requirement) {
-    return !requirement || version === requirement || semver.satisfies(version, requirement);
-  }  
 }
 
 function tryWithCaret(version) {
