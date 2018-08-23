@@ -159,7 +159,7 @@ contract('status script', function([_, owner]) {
         this.logs.text.should.match(/mock-stdlib-undeployed@1.1.0 is linked/i);
       });
 
-      it.skip('should log connected dependency when semver requirement matches', async function () {
+      it('should log connected dependency when semver requirement matches', async function () {
         await linkLib({ packageFile: this.packageFile, libNameVersion: 'mock-stdlib-undeployed@^1.0.0', installLib: false });
         await push({ network, txParams, deployLibs: true, networkFile: this.networkFile });
         this.networkFile.updateDependency('mock-stdlib-undeployed', dep => ({ ... dep, customDeploy: false }))
