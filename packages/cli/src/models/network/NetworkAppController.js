@@ -22,8 +22,8 @@ export default class NetworkAppController extends NetworkBaseController {
     const app = this.project.getApp()
     this.networkFile.app = { address: app.address };
 
-    const thepackage = await this.project.getProjectPackage()
-    this.networkFile.package = { address: thepackage.address };
+    const projectPackage = await this.project.getProjectPackage()
+    this.networkFile.package = { address: projectPackage.address };
 
     const directory = await this.project.getCurrentDirectory()    
     this._registerVersion(this.currentVersion, directory.address);
@@ -94,7 +94,7 @@ export default class NetworkAppController extends NetworkBaseController {
     const proxies = this.networkFile.getProxies({ package: packageName, contract: contractAlias, address: proxyAddress})
     if (_.isEmpty(proxies)) {
       log.info('No proxies to update were found');
-      return;      
+      return [];
     }
 
     // Load project
