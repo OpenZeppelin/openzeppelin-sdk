@@ -45,6 +45,10 @@ export default class ZosPackageFile {
     return !!(this.dependencies[name])
   }
 
+  hasDependencies() {
+    return !_.isEmpty(this.dependencies)
+  }
+
   get contracts() {
     return this.data.contracts || {}
   }

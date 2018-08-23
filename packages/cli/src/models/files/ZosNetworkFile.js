@@ -78,6 +78,10 @@ export default class ZosNetworkFile {
     return !_.isEmpty(this.getDependency(name))
   }
 
+  hasDependencies() {
+    return !_.isEmpty(this.dependencies)
+  }
+
   getProxies({ package: packageName, contract, address } = {}) {
     if (_.isEmpty(this.data.proxies)) return []
     const allProxies = _.flatMap(this.data.proxies || {}, (proxiesList, fullname) => (
@@ -119,7 +123,7 @@ export default class ZosNetworkFile {
   }
 
   hasProxies(filter = {}) {
-    return _.isEmpty(this.getProxies(filter))
+    return !_.isEmpty(this.getProxies(filter))
   }
 
   hasMatchingVersion() {
@@ -182,6 +186,10 @@ export default class ZosNetworkFile {
   unsetDependency(name) {
     if (!this.data.dependencies) return
     delete this.data.dependencies[name]
+  }
+
+  updateDependency(name, fn) {
+    this.setDependency(name, fn(this.getDependency(name)));
   }
 
   addContract(alias, instance) {
