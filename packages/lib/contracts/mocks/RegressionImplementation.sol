@@ -1,6 +1,6 @@
 pragma solidity ^0.4.24;
 
-import "../Initializable.sol";
+import "../migrations/Initializable.sol";
 
 contract Implementation1 is Initializable {
   uint value;

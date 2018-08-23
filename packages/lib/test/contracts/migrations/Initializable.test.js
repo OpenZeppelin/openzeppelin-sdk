@@ -1,8 +1,8 @@
 'use strict';
-require('../setup')
+require('../../setup')
 
-import Contracts from '../../src/utils/Contracts'
-import assertRevert from '../../src/test/helpers/assertRevert';
+import Contracts from '../../../src/utils/Contracts'
+import assertRevert from '../../../src/test/helpers/assertRevert';
 
 const InitializableMock = Contracts.getFromLocal('InitializableMock');
 const SampleMother = Contracts.getFromLocal('SampleMother');
