@@ -1,4 +1,3 @@
-import _ from 'lodash';
 import stdout from '../utils/stdout';
 import ControllerFor from '../models/network/ControllerFor'
 
@@ -12,7 +11,7 @@ export default async function update({ packageName, contractAlias, proxyAddress,
   try {
     await controller.checkLocalContractsDeployed(!force);
     const proxies = await controller.upgradeProxies(packageName, contractAlias, proxyAddress, initMethod, initArgs);
-    _.forEach(proxies, proxy => stdout(proxy.address));
+    proxies.forEach(proxy => stdout(proxy.address));
   } finally {
     controller.writeNetworkPackage();
   }
