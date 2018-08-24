@@ -1,11 +1,11 @@
 pragma solidity ^0.4.24;
 
-import "../migrations/Initializable.sol";
+import "../Initializable.sol";
 
 contract Implementation1 is Initializable {
   uint value;
 
-  function initialize() isInitializer() public {
+  function initialize() initializer public {
   }
 
   function setValue(uint _number) public {
@@ -16,7 +16,7 @@ contract Implementation1 is Initializable {
 contract Implementation2 is Initializable {
   uint value;
 
-  function initialize() isInitializer() public {
+  function initialize() initializer public {
   }
 
   function setValue(uint _number) public {
@@ -31,7 +31,7 @@ contract Implementation2 is Initializable {
 contract Implementation3 is Initializable {
   uint value;
 
-  function initialize() isInitializer() public {
+  function initialize() initializer public {
   }
 
   function setValue(uint _number) public {
@@ -46,7 +46,7 @@ contract Implementation3 is Initializable {
 contract Implementation4 is Initializable {
   uint value;
 
-  function initialize() isInitializer() public {
+  function initialize() initializer public {
   }
 
   function setValue(uint _number) public {

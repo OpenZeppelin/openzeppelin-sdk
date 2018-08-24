@@ -95,7 +95,7 @@ The ZeppelinOS CLI provides a way for calling this function and passing it the n
 zos create MyContract --init <initializingFunction> --args <arguments> --network <network>
 ```
 
-where `<initializingFunction>` is the name of the initializing function (marked with an `isInitializer` modifier in the code), and `<arguments>` is a comma-separated list of arguments to the function.
+where `<initializingFunction>` is the name of the initializing function (marked with an `initializer` modifier in the code), and `<arguments>` is a comma-separated list of arguments to the function.
 
 #### Calling Initialize Functions Manually in Your Unit Tests
 
