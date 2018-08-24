@@ -10,7 +10,7 @@ export default async function status({ network, txParams = {}, networkFile = und
 
   if (!(await rootInfo(controller))) return;
   if (!(await versionInfo(controller.networkFile))) return;
-  await depsInfo(controller.networkFile);
+  await dependenciesInfo(controller.networkFile);
   await contractsInfo(controller);
   await proxiesInfo(controller.networkFile);
 }
@@ -80,7 +80,7 @@ async function contractsInfo(controller) {
     .forEach(contractAlias => log.warn(`- ${contractAlias} will be removed on next push`));
 }
 
-async function depsInfo(networkFile) {
+async function dependenciesInfo(networkFile) {
   if (networkFile.isLib) return;
   const packageFile = networkFile.packageFile;
   if (!packageFile.hasDependencies() && !networkFile.hasDependencies()) return;
