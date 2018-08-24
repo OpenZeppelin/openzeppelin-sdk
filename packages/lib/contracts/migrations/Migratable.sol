@@ -3,6 +3,7 @@ pragma solidity ^0.4.24;
 
 /**
  * @title Migratable
+ * DEPRECATED: For initialization please Initializable instead.
  * Helper contract to support intialization and migration schemes between
  * different implementations of a contract in the context of upgradeability.
  * To use it, replace the constructor with a function that has the

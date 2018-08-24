@@ -12,7 +12,7 @@ const Implementation4 = artifacts.require('Implementation4');
 const MigratableMockV1 = artifacts.require('MigratableMockV1')
 const MigratableMockV2 = artifacts.require('MigratableMockV2')
 const MigratableMockV3 = artifacts.require('MigratableMockV3')
-const MigratableMock = artifacts.require('MigratableMock')
+const InitializableMock = artifacts.require('InitializableMock')
 const DummyImplementation = artifacts.require('DummyImplementation')
 const ClashingImplementation = artifacts.require('ClashingImplementation')
 const AdminUpgradeabilityProxy = artifacts.require('AdminUpgradeabilityProxy')
@@ -88,11 +88,11 @@ contract('AdminUpgradeabilityProxy', ([_, admin, anotherAccount]) => {
   describe('upgradeToAndCall', function () {
     describe('without migrations', function () {
       beforeEach(async function () {
-        this.behavior = await MigratableMock.new()
+        this.behavior = await InitializableMock.new()
       })
 
       describe('when the call does not fail', function () {
-        const initializeData = encodeCall('initialize', ['uint256'], [42])
+        const initializeData = encodeCall('initializeWithX', ['uint256'], [42])
 
         describe('when the sender is the admin', function () {
           const from = admin
@@ -113,8 +113,8 @@ contract('AdminUpgradeabilityProxy', ([_, admin, anotherAccount]) => {
             this.logs[0].args.implementation.should.be.equal(this.behavior.address)
           })
 
-          it('calls the \'initialize\' function', async function() {
-            const migratable = MigratableMock.at(this.proxyAddress)
+          it('calls the initializer function', async function() {
+            const migratable = InitializableMock.at(this.proxyAddress)
             const x = await migratable.x()
             x.should.be.bignumber.eq(42)
           })

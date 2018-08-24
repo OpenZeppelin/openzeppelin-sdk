@@ -16,12 +16,12 @@ Next, let's create a file named `MyContract.sol` in the `contracts/` folder with
 
 ```js
 pragma solidity ^0.4.21;
-import "zos-lib/contracts/migrations/Migratable.sol";
+import "zos-lib/contracts/migrations/Initializable.sol";
 
-contract MyContract is Migratable {
+contract MyContract is Initializable {
   uint256 public x;
 
-  function initialize(uint256 _x) isInitializer("MyContract", "0") public {
+  function initialize(uint256 _x) initializer public {
     x = _x;
   }
 }
@@ -70,12 +70,12 @@ If, at a later stage, you want to upgrade your smart contract code in order to f
 
 Open `MyContract.sol` again, and add a new function:
 ```js
-import "zos-lib/contracts/migrations/Migratable.sol";
+import "zos-lib/contracts/migrations/Initializable.sol";
 
-contract MyContract is Migratable {
+contract MyContract is Initializable {
   uint256 public x;
 
-  function initialize(uint256 _x) isInitializer("MyContract", "0") public {
+  function initialize(uint256 _x) initializer public {
     x = _x;
   }
 
