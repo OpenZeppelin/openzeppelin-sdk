@@ -4,10 +4,10 @@ import Dependency from '../dependency/Dependency';
 
 export default class LocalAppController extends LocalBaseController {
   async linkLib(libNameVersion, installLib = false) {
-    if(libNameVersion) {
+    if (libNameVersion) {
       const dependency = Dependency.fromNameWithVersion(libNameVersion)
       if (installLib) await dependency.install()
-      this.packageFile.setDependency(dependency.name, dependency.version)
+      this.packageFile.setDependency(dependency.name, dependency.requirement)
     }
   }
 

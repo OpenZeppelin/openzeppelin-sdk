@@ -6,44 +6,46 @@ import push from '../../src/scripts/push.js';
 import bumpVersion from '../../src/scripts/bump.js';
 import createProxy from '../../src/scripts/create.js';
 import status from '../../src/scripts/status.js';
-import linkStdlib from '../../src/scripts/link';
+import linkLib from '../../src/scripts/link';
 import ControllerFor from '../../src/models/local/ControllerFor';
 import CaptureLogs from '../helpers/captureLogs';
 import ZosPackageFile from "../../src/models/files/ZosPackageFile";
 import remove from '../../src/scripts/remove';
 
-contract.skip('status script', function([_, owner]) {
+contract('status script', function([_, owner]) {
   const txParams = { from: owner };
   const network = 'test';
   const contractName = 'ImplV1';
   const contractAlias = 'Impl';
   const contractsData = [{ name: contractName, alias: contractAlias }]
   const anotherContractName = 'AnotherImplV1';
-  const stdlibNameVersion = 'mock-stdlib@1.1.0';
+  const libNameVersion = 'mock-stdlib@1.1.0';
   
   beforeEach('setup', async function() {
-    this.logs = new CaptureLogs();
+    this.capturingLogs = ((promise) => {
+      this.logs = new CaptureLogs();
+      return promise;
+    }).bind(this);
   });
 
   afterEach('cleanup', function () {
-    this.logs.restore();
+    if (this.logs) this.logs.restore();
   });
 
   const shouldDescribeApp = function () {
     describe('root app', function () {
       it('should log undeployed app', async function () {
+        this.capturingLogs();
         await status({ network, networkFile: this.networkFile });
-
         this.logs.text.should.match(/not yet deployed/);
       });
 
       it('should log plain app info', async function () {
         await push({ network, txParams, networkFile: this.networkFile });
-        await status({ network, networkFile: this.networkFile });
+        await this.capturingLogs(status({ network, networkFile: this.networkFile }));
 
         this.logs.text.should.match(/deployed at 0x[0-9a-fA-F]{40}/i);
-        this.logs.text.should.match(/factory is at 0x[0-9a-fA-F]{40}/i);
-        this.logs.text.should.match(/package is at 0x[0-9a-fA-F]{40}/i);
+        this.logs.text.should.match(/package \w+ is at 0x[0-9a-fA-F]{40}/i);
         this.logs.text.should.match(/version 1.1.0 matches/i);
         this.logs.text.should.match(/no contracts registered/i);
       });
@@ -53,6 +55,7 @@ contract.skip('status script', function([_, owner]) {
   const shouldDescribeLib = function () {
     describe('root lib', function () {
       it('should log undeployed lib', async function () {
+        this.capturingLogs();
         await status({ network, networkFile: this.networkFile });
 
         this.logs.text.should.match(/not yet deployed/);
@@ -60,7 +63,7 @@ contract.skip('status script', function([_, owner]) {
 
       it('should log plain lib info', async function () {
         await push({ network, txParams, networkFile: this.networkFile });
-        await status({ network, networkFile: this.networkFile });
+        await this.capturingLogs(status({ network, networkFile: this.networkFile }));
 
         this.logs.text.should.match(/library package is deployed at 0x[0-9a-fA-F]{40}/i);
       });
@@ -72,7 +75,7 @@ contract.skip('status script', function([_, owner]) {
       it('should log version out-of-sync', async function () {
         await push({ network, txParams, networkFile: this.networkFile });
         await bumpVersion({ version: '1.2.0', packageFile: this.packageFile });
-        await status({ network, networkFile: this.networkFile });
+        await this.capturingLogs(status({ network, networkFile: this.networkFile }));
 
         this.logs.text.should.match(/version 1.1.0 is out of date/i);
         this.logs.text.should.match(/latest is 1.2.0/i);
@@ -85,7 +88,7 @@ contract.skip('status script', function([_, owner]) {
       it('should log contract name when different to alias', async function () {
         await push({ network, txParams, networkFile: this.networkFile });
         await add({ contractsData, packageFile: this.packageFile });
-        await status({ network, networkFile: this.networkFile });
+        await this.capturingLogs(status({ network, networkFile: this.networkFile }));
 
         this.logs.text.should.match(/Impl/i);
         this.logs.text.should.match(/implemented by ImplV1/i);
@@ -94,7 +97,7 @@ contract.skip('status script', function([_, owner]) {
       it('should not log contract name when matches alias', async function () {
         await push({ network, txParams, networkFile: this.networkFile });
         await add({ contractsData: [{ name: anotherContractName }], packageFile: this.packageFile });
-        await status({ network, networkFile: this.networkFile });
+        await this.capturingLogs(status({ network, networkFile: this.networkFile }));
 
         this.logs.text.should.match(/AnotherImplV1/i);
         this.logs.text.should.not.match(/implemented by/i);
@@ -103,7 +106,7 @@ contract.skip('status script', function([_, owner]) {
       it('should log undeployed contract', async function () {
         await push({ network, txParams, networkFile: this.networkFile });
         await add({ contractsData, packageFile: this.packageFile });
-        await status({ network, networkFile: this.networkFile });
+        await this.capturingLogs(status({ network, networkFile: this.networkFile }));
 
         this.logs.text.should.match(/not deployed/i);
       });
@@ -112,7 +115,7 @@ contract.skip('status script', function([_, owner]) {
         await add({ contractsData, packageFile: this.packageFile });
         await push({ network, txParams, networkFile: this.networkFile });
         await add({ contractsData: [{ name: anotherContractName, alias: contractAlias }], packageFile: this.packageFile });
-        await status({ network, networkFile: this.networkFile });
+        await this.capturingLogs(status({ network, networkFile: this.networkFile }));
 
         this.logs.text.should.match(/out of date/i);
       });
@@ -120,7 +123,7 @@ contract.skip('status script', function([_, owner]) {
       it('should log deployed contract', async function () {
         await add({ contractsData, packageFile: this.packageFile });
         await push({ network, txParams, networkFile: this.networkFile });
-        await status({ network, networkFile: this.networkFile });
+        await this.capturingLogs(status({ network, networkFile: this.networkFile }));
 
         this.logs.text.should.match(/is deployed and up to date/i);
       });    
@@ -129,75 +132,64 @@ contract.skip('status script', function([_, owner]) {
         await add({ contractsData, packageFile: this.packageFile });
         await push({ network, txParams, networkFile: this.networkFile });
         await remove({ contracts: [contractAlias], packageFile: this.packageFile });
-        await status({ network, networkFile: this.networkFile });
+        await this.capturingLogs(status({ network, networkFile: this.networkFile }));
 
         this.logs.text.should.match(/will be removed/i);
       });    
     });
   };
 
-  const shouldDescribeNoStdlib = function () {
-    it.skip('should log app info', async function () {
+  const shouldDescribeUnlinkedDependency = function () {
+    it('should log missing library', async function () {
       await push({ network, txParams, networkFile: this.networkFile });
-      await status({ network, networkFile: this.networkFile });
+      await linkLib({ packageFile: this.packageFile, libNameVersion, installLib: false });
+      await this.capturingLogs(status({ network, networkFile: this.networkFile }));
 
-      this.logs.text.should.match(/no stdlib specified for current version/i);
-    });
-
-    it.skip('should log missing stdlib', async function () {
-      await push({ network, txParams, networkFile: this.networkFile });
-      await linkStdlib({ packageFile: this.packageFile, stdlibNameVersion, installLib: false });
-      await status({ network, networkFile: this.networkFile });
-
-      this.logs.text.should.match(/mock-stdlib@1.1.0 required/i);
-      this.logs.text.should.match(/no stdlib is deployed/i);
+      this.logs.text.should.match(/mock-stdlib@1.1.0 is required but is not linked/i);
     });
   }
 
-  const shouldDescribeStdlib = function () {
-    describe.skip('stdlib', function () {
-      it('should log connected stdlib', async function () {
-        await push({ network, txParams, networkFile: this.networkFile });
-        await status({ network, networkFile: this.networkFile });
+  const shouldDescribeDependency = function () {
+    describe('dependency', function () {
+      it('should log connected dependency', async function () {
+        await push({ network, txParams, deployLibs: true, networkFile: this.networkFile });
+        this.networkFile.updateDependency('mock-stdlib-undeployed', dep => ({ ... dep, customDeploy: false }))
+        await this.capturingLogs(status({ network, networkFile: this.networkFile }));
 
-        this.logs.text.should.match(/mock-stdlib@1.1.0 required/i);
-        this.logs.text.should.match(/correctly connected to stdlib/i);
+        this.logs.text.should.match(/mock-stdlib-undeployed@1.1.0 is linked/i);
       });
 
-      it('should log connected stdlib when semver requirement matches', async function () {
-        await linkStdlib({ packageFile: this.packageFile, stdlibNameVersion: 'mock-stdlib@^1.0.0', installLib: false });
-        await push({ network, txParams, networkFile: this.networkFile });
-        await status({ network, networkFile: this.networkFile });
+      it('should log connected dependency when semver requirement matches', async function () {
+        await linkLib({ packageFile: this.packageFile, libNameVersion: 'mock-stdlib-undeployed@^1.0.0', installLib: false });
+        await push({ network, txParams, deployLibs: true, networkFile: this.networkFile });
+        this.networkFile.updateDependency('mock-stdlib-undeployed', dep => ({ ... dep, customDeploy: false }))
+        await this.capturingLogs(status({ network, networkFile: this.networkFile }));
 
-        this.logs.text.should.match(/mock-stdlib@\^1\.0\.0 required/i);
-        this.logs.text.should.match(/correctly connected to stdlib/i);
-        this.logs.text.should.match(/1\.1\.0/i);
+        this.logs.text.should.match(/mock-stdlib-undeployed@\^1\.0\.0 is linked to version 1\.1\.0/i);
       });
 
-      it('should log different stdlib connected', async function () {
-        await push({ network, txParams, networkFile: this.networkFile });
-        await linkStdlib({ packageFile: this.packageFile, stdlibNameVersion: 'mock-stdlib-2@1.2.0', installLib: false });
-        await status({ network, networkFile: this.networkFile });
+      it('should log connected dependency to incorrect version', async function () {
+        await push({ network, txParams, deployLibs: true, networkFile: this.networkFile });
+        this.networkFile.updateDependency('mock-stdlib-undeployed', dep => ({ ... dep, customDeploy: false }))
+        this.packageFile.setDependency('mock-stdlib-undeployed', '^2.0.0');
+        await this.capturingLogs(status({ network, networkFile: this.networkFile }));
 
-        this.logs.text.should.match(/mock-stdlib-2@1.2.0 required/i);
-        this.logs.text.should.match(/connected to different stdlib mock-stdlib@1.1.0/i);
+        this.logs.text.should.match(/mock-stdlib-undeployed@\^2\.0\.0 is linked to a different version \(1\.1\.0\)/i);
       });
 
-      it('should log deployed stdlib', async function () {
-        await push({ network, txParams, deployStdlib: true, networkFile: this.networkFile });
-        await status({ network, networkFile: this.networkFile });
+      it('should log deployed dependency', async function () {
+        await push({ network, txParams, deployLibs: true, networkFile: this.networkFile });
+        await this.capturingLogs(status({ network, networkFile: this.networkFile }));
 
-        this.logs.text.should.match(/mock-stdlib@1.1.0 required/i);
-        this.logs.text.should.match(/custom deploy of stdlib set at 0x[0-9a-fA-F]{40}/i);
+        this.logs.text.should.match(/mock-stdlib-undeployed@1\.1\.0 is linked to a custom deployment/i);
       });
 
-      it('should log different stdlib deployed', async function () {
-        await push({ network, txParams, deployStdlib: true, networkFile: this.networkFile });
-        await linkStdlib({ packageFile: this.packageFile, stdlibNameVersion: 'mock-stdlib-2@1.2.0', installLib: false });
-        await status({ network, networkFile: this.networkFile });
+      it('should log deployed dependency to incorrect version', async function () {
+        await push({ network, txParams, deployLibs: true, networkFile: this.networkFile });
+        this.packageFile.setDependency('mock-stdlib-undeployed', '^2.0.0');
+        await this.capturingLogs(status({ network, networkFile: this.networkFile }));
 
-        this.logs.text.should.match(/mock-stdlib-2@1.2.0 required/i);
-        this.logs.text.should.match(/custom deploy of different stdlib mock-stdlib@1.1.0 at 0x[0-9a-fA-F]{40}/i);
+        this.logs.text.should.match(/mock-stdlib-undeployed@\^2\.0\.0 is linked to a custom deployment of a different version \(1\.1\.0\)/i);
       });
     });
   };
@@ -207,7 +199,7 @@ contract.skip('status script', function([_, owner]) {
       it('should log no proxies', async function () {
         await add({ contractsData, packageFile: this.packageFile });
         await push({ network, txParams, networkFile: this.networkFile });
-        await status({ network, networkFile: this.networkFile });
+        await this.capturingLogs(status({ network, networkFile: this.networkFile }));
 
         this.logs.text.should.match(/no proxies/i);
       });
@@ -216,7 +208,7 @@ contract.skip('status script', function([_, owner]) {
         await add({ contractsData, packageFile: this.packageFile });
         await push({ network, txParams, networkFile: this.networkFile });
         await createProxy({ contractAlias, network, txParams, networkFile: this.networkFile });
-        await status({ network, networkFile: this.networkFile });
+        await this.capturingLogs(status({ network, networkFile: this.networkFile }));
         
         this.logs.text.should.match(/Impl at 0x[0-9a-fA-F]{40} version 1.1.0/i);
       });
@@ -227,9 +219,8 @@ contract.skip('status script', function([_, owner]) {
     it('should not deploy a new package', async function () {
       await push({ network, txParams, networkFile: this.networkFile });
       const packageAddress = ControllerFor(this.packageFile).onNetwork(network, txParams, this.networkFile).packageAddress;
-      this.logs.clear();
 
-      await status({ network, networkFile: this.networkFile });
+      await this.capturingLogs(status({ network, networkFile: this.networkFile }));
 
       this.logs.text.should.not.match(/deploying new package/i);
       ControllerFor(this.packageFile).onNetwork(network, txParams, this.networkFile).packageAddress.should.eq(packageAddress);
@@ -245,17 +236,17 @@ contract.skip('status script', function([_, owner]) {
     shouldDescribeApp();
     shouldDescribeVersion();
     shouldDescribeContracts();
-    shouldDescribeNoStdlib();
+    shouldDescribeUnlinkedDependency();
     shouldDescribeProxies();
     shouldNotModifyPackage();
 
-    describe.skip('with stdlib', function () {
+    describe('with dependency', function () {
       beforeEach('creating package and network files', function () {
-        this.packageFile = new ZosPackageFile('test/mocks/packages/package-with-stdlib.zos.json')
+        this.packageFile = new ZosPackageFile('test/mocks/packages/package-with-undeployed-stdlib.zos.json')
         this.networkFile = this.packageFile.networkFile(network)
       })
 
-      shouldDescribeStdlib();
+      shouldDescribeDependency();
     })
   });
 

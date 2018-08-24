@@ -16,6 +16,10 @@ export default class NetworkAppController extends NetworkBaseController {
     return this.networkFile.appAddress
   }
 
+  get app() {
+    return this.project.getApp()
+  }
+
   async deploy() {
     this.project = await AppProject.deploy(this.packageFile.name, this.currentVersion, this.txParams);
     
