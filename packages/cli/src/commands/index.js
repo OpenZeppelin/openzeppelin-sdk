@@ -5,10 +5,11 @@ import create from './create'
 import bump from './bump'
 import update from './update'
 import link from './link'
+import unlink from './unlink'
 import status from './status'
 import freeze from './freeze'
 import session from './session'
 import remove from './remove'
 import verify from './verify'
 
-export default [init, add, remove, push, create, update, bump, link, status, freeze, session, verify]
+export default [init, add, remove, push, create, update, bump, link, unlink, status, freeze, session, verify]
