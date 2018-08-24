@@ -10,7 +10,7 @@ export default async function status({ network, txParams = {}, networkFile = und
 
   if (!(await rootInfo(controller))) return;
   if (!(await versionInfo(controller.networkFile))) return;
-  await stdlibInfo(controller.networkFile);
+  await dependenciesInfo(controller.networkFile);
   await contractsInfo(controller);
   await proxiesInfo(controller.networkFile);
 }
@@ -21,14 +21,13 @@ function rootInfo(controller) {
 
 async function appInfo(controller) {
   if (!controller.appAddress) {
-    log.warn(`Application is not yet deployed`);
+    log.warn(`Application is not yet deployed to the network`);
     return false;
   }
 
   await controller.fetch();
   log.info(`Application is deployed at ${controller.appAddress}`);
-  log.info(`- Proxy factory is at ${controller.app.factory.address}`);
-  log.info(`- Package is at ${controller.app.package.address}`);
+  log.info(`- Package ${controller.packageFile.name} is at ${controller.networkFile.packageAddress}`);
   return true;
 }
 
@@ -81,44 +80,46 @@ async function contractsInfo(controller) {
     .forEach(contractAlias => log.warn(`- ${contractAlias} will be removed on next push`));
 }
 
-async function stdlibInfo(networkFile) {
+async function dependenciesInfo(networkFile) {
   if (networkFile.isLib) return;
-  const packageFile = networkFile.packageFile
-  log.info('Standard library:');
+  const packageFile = networkFile.packageFile;
+  if (!packageFile.hasDependencies() && !networkFile.hasDependencies()) return;
+  log.info('Application dependencies:');
 
-  if (!packageFile.hasStdlib()) {
-    const deployedWarn = networkFile.hasStdlib() ? `(though ${networkFile.stdlibName}@${networkFile.stdlibVersion} is currently deployed)` : '';
-    log.info(`- No stdlib specified for current version ${deployedWarn}`);
-    return;
-  }
+  _.forEach(packageFile.dependencies, (requiredVersion, dependencyName) => {
+    const msgHead = `- ${dependencyName}@${requiredVersion}`
+    if (!networkFile.hasDependency(dependencyName)) {
+      log.info(`${msgHead} is required but is not linked`)
+    } else if (networkFile.dependencyHasMatchingCustomDeploy(dependencyName)) {
+      log.info(`${msgHead} is linked to a custom deployment`)
+    } else if (networkFile.dependencyHasCustomDeploy(dependencyName)) {
+      log.info(`${msgHead} is linked to a custom deployment of a different version (${networkFile.getDependency(dependencyName).version})`)
+    } else if (networkFile.dependencySatisfiesVersionRequirement(dependencyName)) {
+      const actualVersion = networkFile.getDependency(dependencyName).version;
+      if (actualVersion === requiredVersion) {
+        log.info(`${msgHead} is linked`)
+      } else {
+        log.info(`${msgHead} is linked to version ${actualVersion}`)
+      }
+    } else {
+      log.info(`${msgHead} is linked to a different version (${networkFile.getDependency(dependencyName).version})`)
+    }
+  });
 
-  log.info(`- Stdlib ${packageFile.stdlibName}@${packageFile.stdlibVersion} required by current version`);
-
-  if (!networkFile.hasStdlib()) {
-    log.info(`- No stdlib is deployed`);
-  } else if (networkFile.hasMatchingCustomDeploy()) {
-    log.info(`- Custom deploy of stdlib set at ${networkFile.stdlibAddress}`);
-  } else if (networkFile.hasCustomDeploy()) {
-    log.info(`- Custom deploy of different stdlib ${networkFile.stdlibName}@${networkFile.stdlibVersion} at ${networkFile.stdlibAddress}`);
-  } else if (packageFile.stdlibMatches(networkFile.stdlib)) {
-    log.info(`- Deployed application is correctly connected to stdlib ${networkFile.stdlibName}@${networkFile.stdlibVersion}`);
-  } else {
-    log.warn(`- Deployed application is connected to different stdlib ${networkFile.stdlibName}@${networkFile.stdlibVersion}`);
-  }
+  _.forEach(networkFile.dependenciesNamesMissingFromPackage, (dependencyName) => {
+    log.info(`- ${dependencyName} will be unlinked on next push`)
+  })
 }
 
 async function proxiesInfo(networkFile) {
   if (networkFile.isLib) return;
   log.info('Deployed proxies:');
-
   if (!networkFile.hasProxies()) {
     log.info('- No proxies created');
     return;
   }
 
-  _.each(networkFile.proxies, (proxyInfos, alias) => {
-    _.each(proxyInfos, ({ address, version }) => {
-      log.info(`- ${alias} at ${address} version ${version}`);
-    });
-  });
+  networkFile.getProxies().forEach(proxy =>
+    log.info(`- ${proxy.package}/${proxy.contract} at ${proxy.address} version ${proxy.version}`)
+  )
 }

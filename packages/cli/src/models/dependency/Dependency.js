@@ -16,13 +16,14 @@ export default class Dependency {
     return !requirement || version === requirement || semver.satisfies(version, requirement);
   }  
 
-  constructor(name, version) {
+  constructor(name, requirement) {
     this.name = name
     this._networkFiles = {}
 
     const packageVersion = this.getPackageFile().version
-    this._validateSatisfiesVersion(packageVersion, version)
-    this.version = version || tryWithCaret(packageVersion)    
+    this._validateSatisfiesVersion(packageVersion, requirement)
+    this.version = packageVersion
+    this.requirement = requirement || tryWithCaret(packageVersion)
   }
 
   async deploy(txParams) {
@@ -60,7 +61,7 @@ export default class Dependency {
       }
       
       this._networkFiles[network] = new ZosNetworkFile(this.getPackageFile(), network, filename)
-      this._validateSatisfiesVersion(this._networkFiles[network].version, this.version)
+      this._validateSatisfiesVersion(this._networkFiles[network].version, this.requirement)
     }
     return this._networkFiles[network]
   }
