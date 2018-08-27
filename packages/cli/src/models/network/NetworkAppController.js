@@ -100,6 +100,7 @@ export default class NetworkAppController extends NetworkBaseController {
 
     await allPromisesOrError(
       _.map(proxies, async (proxy) => {
+        log.info(`Changing admin of proxy ${proxy.address} to ${newAdmin}`)
         await this.project.changeProxyAdmin(proxy.address, newAdmin)
         this.networkFile.updateProxy(proxy, proxy => ({ ... proxy, admin: newAdmin }))
       })
