@@ -7,7 +7,7 @@ import { Contracts, Logger } from 'zos-lib';
 import add from '../../src/scripts/add.js';
 import push from '../../src/scripts/push.js';
 import createProxy from '../../src/scripts/create.js';
-import linkLib from '../../src/scripts/link.js';
+import linkLibs from '../../src/scripts/link.js';
 import ZosPackageFile from "../../src/models/files/ZosPackageFile";
 
 const ImplV1 = Contracts.getFromLocal('ImplV1');
@@ -154,7 +154,7 @@ contract('create script', function([_, owner]) {
 
   describe('with dependency', function () {
     beforeEach('setting dependency', async function () {
-      await linkLib({ libNameVersion: 'mock-stdlib-undeployed@1.1.0', packageFile: this.packageFile });
+      await linkLibs({ libs: ['mock-stdlib-undeployed@1.1.0'], packageFile: this.packageFile });
       await push({ network, txParams, deployLibs: true, networkFile: this.networkFile });
     });
 
@@ -171,7 +171,7 @@ contract('create script', function([_, owner]) {
 
   describe('with unlinked dependency', function () {
     beforeEach('setting dependency', async function () {
-      await linkLib({ libNameVersion: 'mock-stdlib@1.1.0', packageFile: this.packageFile });
+      await linkLibs({ libs: ['mock-stdlib@1.1.0'], packageFile: this.packageFile });
     });
 
     it('should refuse create a proxy for unlinked dependency', async function () {
