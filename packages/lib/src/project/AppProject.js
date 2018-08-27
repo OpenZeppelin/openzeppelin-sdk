@@ -60,6 +60,11 @@ export default class AppProject extends Project {
   }
 
   // TODO: Testme
+  async changeProxyAdmin(proxyAddress, newAdmin) {
+    return this.app.changeProxyAdmin(proxyAddress, newAdmin)
+  }
+
+  // TODO: Testme
   async createContract(contractClass, { packageName, contractName, initMethod, initArgs }) {
     if (!contractName) contractName = contractClass.contractName
     if (!packageName) packageName = this.name

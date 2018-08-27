@@ -232,13 +232,11 @@ export default class ZosNetworkFile {
     this.data.proxies[fullname].push(info)
   }
 
-  updateProxy(proxy) {
-    const fullname = toContractFullName(proxy.package, proxy.contract)
-    const existing = _.find(this.data.proxies[fullname], { address: proxy.address })
-    Object.assign(existing, { 
-      version: proxy.version,
-      implementation: proxy.implementation
-    })
+  updateProxy({ package: proxyPackage, contract: proxyContract, address: proxyAddress }, fn) {
+    const fullname = toContractFullName(proxyPackage, proxyContract)
+    const index = _.findIndex(this.data.proxies[fullname], { address: proxyAddress })
+    if (index === -1) throw Error(`Proxy ${fullname} at ${proxyAddress} not found in network manifest`)    
+    this.data.proxies[fullname][index] = fn(this.data.proxies[fullname][index]);
   }
 
   write() {
