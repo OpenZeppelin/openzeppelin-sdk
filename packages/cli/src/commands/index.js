@@ -10,5 +10,6 @@ import freeze from './freeze'
 import session from './session'
 import remove from './remove'
 import verify from './verify'
+import setAdmin from './set-admin'
 
-export default [init, add, remove, push, create, update, bump, link, status, freeze, session, verify]
+export default [init, add, remove, push, create, update, bump, link, status, freeze, session, verify, setAdmin]

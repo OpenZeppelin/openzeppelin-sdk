@@ -1,7 +1,7 @@
 'use strict'
 require('../setup')
 
-import { Contracts, AppProject, Proxy } from "zos-lib";
+import { Proxy } from "zos-lib";
 
 import push from '../../src/scripts/push.js';
 import createProxy from '../../src/scripts/create.js';
@@ -59,6 +59,10 @@ contract('set-admin script', function([_skipped, owner, newAdmin, anotherNewAdmi
 
     it('refuses to update all proxies', async function () {
       await setAdmin({ newAdmin, network, txParams, networkFile: this.networkFile }).should.be.rejectedWith(/address or name of the contract/);
+    })
+
+    it('refuses to update all proxies given package name', async function () {
+      await setAdmin({ packageName: "Herbs", newAdmin, network, txParams, networkFile: this.networkFile }).should.be.rejectedWith(/address or name of the contract/);
     })
   });
 
