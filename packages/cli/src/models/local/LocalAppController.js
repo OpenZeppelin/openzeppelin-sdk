@@ -3,12 +3,12 @@ import NetworkAppController from '../network/NetworkAppController';
 import Dependency from '../dependency/Dependency';
 
 export default class LocalAppController extends LocalBaseController {
-  async linkLib(libNameVersion, installLib = false) {
-    if (libNameVersion) {
+  async linkLibs(libs, installLibs = false) {
+    await Promise.all(libs.map(async libNameVersion => {
       const dependency = Dependency.fromNameWithVersion(libNameVersion)
-      if (installLib) await dependency.install()
+      if (installLibs) await dependency.install()
       this.packageFile.setDependency(dependency.name, dependency.requirement)
-    }
+    }))
   }
 
   onNetwork(network, txParams, networkFile = undefined) {
