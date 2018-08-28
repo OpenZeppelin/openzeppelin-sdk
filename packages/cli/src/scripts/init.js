@@ -6,6 +6,6 @@ export default async function init({ name, version, libs = [], installLibs = fal
   
   const controller = new LocalAppController(packageFile)
   controller.init(name, version, force)
-  if (!libs.length) await controller.linkLibs(libs, installLibs)
+  if (libs.length !== 0) await controller.linkLibs(libs, installLibs)
   controller.writePackage()
 }
