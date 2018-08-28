@@ -2,7 +2,7 @@
 require('../setup')
 
 import _ from 'lodash';
-import { Contracts, AppProject } from "zos-lib";
+import { Contracts, AppProject, Proxy } from "zos-lib";
 import CaptureLogs from '../helpers/captureLogs';
 
 import add from '../../src/scripts/add.js';
@@ -11,6 +11,7 @@ import bumpVersion from '../../src/scripts/bump.js';
 import linkLib from '../../src/scripts/link.js';
 import createProxy from '../../src/scripts/create.js';
 import update from '../../src/scripts/update.js';
+import setAdmin from '../../src/scripts/set-admin.js';
 import ZosPackageFile from "../../src/models/files/ZosPackageFile";
 
 const ImplV1 = Contracts.getFromLocal('ImplV1')
@@ -18,7 +19,7 @@ const ImplV2 = Contracts.getFromLocal('ImplV2')
 const Greeter_V1 = Contracts.getFromNodeModules('mock-stdlib', 'GreeterImpl')
 const Greeter_V2 = Contracts.getFromNodeModules('mock-stdlib-2', 'GreeterImpl')
 
-contract('update script', function([_skipped, owner]) {
+contract('update script', function([_skipped, owner, anotherAccount]) {
   const network = 'test';
   const version_1 = '1.1.0';
   const version_2 = '1.2.0';
@@ -30,14 +31,14 @@ contract('update script', function([_skipped, owner]) {
     else proxyInfo.address.should.be.nonzeroAddress;
 
     if (implementation) {
-      const project = await AppProject.fetch(networkFile.appAddress, networkFile.packageFile.name, txParams)
-      const app = await project.getApp()
-      const actualImplementation = await app.getProxyImplementation(proxyInfo.address)
+      const actualImplementation = await Proxy.at(proxyInfo.address).implementation()
       actualImplementation.should.eq(implementation);
       proxyInfo.implementation.should.eq(implementation);
     }
 
-    if (version) proxyInfo.version.should.eq(version);
+    if (version) {
+      proxyInfo.version.should.eq(version);
+    }
     
     if (value) {
       const proxy = ImplV1.at(proxyInfo.address);
@@ -98,6 +99,15 @@ contract('update script', function([_skipped, owner]) {
     it('should upgrade the version of all proxies in the app', async function() {
       await update({ contractAlias: undefined, proxyAddress: undefined, all: true, network, txParams, networkFile: this.networkFile });
       await assertProxyInfo(this.networkFile, 'Impl', 0, { version: version_2, implementation: this.implV2Address });
+      await assertProxyInfo(this.networkFile, 'Impl', 1, { version: version_2, implementation: this.implV2Address });
+      await assertProxyInfo(this.networkFile, 'AnotherImpl', 0, { version: version_2, implementation: this.anotherImplV2Address });
+    });
+
+    it('should not attempt to upgrade a proxy not owned', async function() {
+      const proxyAddress = this.networkFile.getProxies({ contract: 'Impl'})[0].address;
+      await setAdmin({ proxyAddress, newAdmin: anotherAccount, network, txParams, networkFile: this.networkFile })
+      await update({ contractAlias: undefined, proxyAddress: undefined, all: true, network, txParams, networkFile: this.networkFile });
+      await assertProxyInfo(this.networkFile, 'Impl', 0, { version: version_1, implementation: this.implV1Address });
       await assertProxyInfo(this.networkFile, 'Impl', 1, { version: version_2, implementation: this.implV2Address });
       await assertProxyInfo(this.networkFile, 'AnotherImpl', 0, { version: version_2, implementation: this.anotherImplV2Address });
     });
