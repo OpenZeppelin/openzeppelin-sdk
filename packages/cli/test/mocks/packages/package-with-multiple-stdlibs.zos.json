@@ -4,6 +4,7 @@
   "contracts": {},
   "dependencies": {
     "mock-stdlib": "1.1.0",
-    "mock-stdlib-2": "1.2.0"
+    "mock-stdlib-2": "1.2.0",
+    "mock-stdlib-undeployed": "1.1.0"
   }
 }
