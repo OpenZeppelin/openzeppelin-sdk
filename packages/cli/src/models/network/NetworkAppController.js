@@ -93,15 +93,25 @@ export default class NetworkAppController extends NetworkBaseController {
     log.error(`Possible initialization method 'initialize' found in contract. Make sure you initialize your instance.`);
   }
 
-  async upgradeProxies(packageName, contractAlias, proxyAddress, initMethod, initArgs) {
-    // Fetch all proxies that match the filters provided
-    const proxies = this.networkFile.getProxies({ package: packageName, contract: contractAlias, address: proxyAddress})
-    if (_.isEmpty(proxies)) {
-      log.info('No proxies to update were found');
-      return [];
-    }
+  async setProxiesAdmin(packageName, contractAlias, proxyAddress, newAdmin) {
+    const proxies = this._fetchOwnedProxies(packageName, contractAlias, proxyAddress)
+    if (proxies.length === 0) return [];
+    await this.fetch();
 
-    // Load project
+    await allPromisesOrError(
+      _.map(proxies, async (proxy) => {
+        log.info(`Changing admin of proxy ${proxy.address} to ${newAdmin}`)
+        await this.project.changeProxyAdmin(proxy.address, newAdmin)
+        this.networkFile.updateProxy(proxy, proxy => ({ ... proxy, admin: newAdmin }))
+      })
+    );
+
+    return proxies;
+  }
+
+  async upgradeProxies(packageName, contractAlias, proxyAddress, initMethod, initArgs) {
+    const proxies = this._fetchOwnedProxies(packageName, contractAlias, proxyAddress)
+    if (proxies.length === 0) return [];
     await this.fetch();
 
     // Check if there is any migrate method in the contracts and warn the user to call it
@@ -113,7 +123,7 @@ export default class NetworkAppController extends NetworkBaseController {
     // Update all proxies loaded
     const newVersion = await this.project.getCurrentVersion();
     await allPromisesOrError(
-      _.map(proxies, (proxy) => this._upgradeProxy(proxy, initMethod, initArgs,newVersion))
+      _.map(proxies, (proxy) => this._upgradeProxy(proxy, initMethod, initArgs, newVersion))
     )
 
     return proxies;
@@ -124,15 +134,21 @@ export default class NetworkAppController extends NetworkBaseController {
       const contractClass = this.localController.getContractClass(proxy.package, proxy.contract);
       const currentImplementation = await this.project.app.getProxyImplementation(proxy.address)
       const contractImplementation = await this.project.app.getImplementation(proxy.package, proxy.contract)
+      let newImplementation;
+
       if (currentImplementation !== contractImplementation) {
         await this.project.upgradeProxy(proxy.address, contractClass, { packageName: proxy.package, contractName: proxy.contract, initMethod, initArgs });
-        proxy.implementation = contractImplementation
+        newImplementation = contractImplementation
       } else {
         log.info(`Contract ${proxy.contract} at ${proxy.address} is up to date.`)
-        proxy.implementation = currentImplementation
+        newImplementation = currentImplementation
       }
-      proxy.version = newVersion;
-      this.networkFile.updateProxy(proxy)
+
+      this.networkFile.updateProxy(proxy, proxy => ({
+        ... proxy,
+        implementation: newImplementation,
+        version: newVersion
+      }));
     } catch(error) {
       throw Error(`Proxy ${toContractFullName(proxy.package, proxy.contract)} at ${proxy.address} failed to update with error: ${error.message}`)
     }
@@ -146,6 +162,28 @@ export default class NetworkAppController extends NetworkBaseController {
     const migrateMethod = contractClass.abi.find(fn => fn.type === 'function' && fn.name === 'migrate');
     if (!migrateMethod) return;
     log.error(`Possible migration method 'migrate' found in contract ${contractClass.contractName}. Remember running the migration after deploying it.`);
+  }
+
+  _fetchOwnedProxies(packageName, contractAlias, proxyAddress) {
+    const proxies = this.networkFile.getProxies({ 
+      package: packageName || (contractAlias ? this.packageFile.name : undefined),
+      contract: contractAlias, 
+      address: proxyAddress
+    })
+
+    if (_.isEmpty(proxies)) {
+      log.info('No owned contract instances that match were found');
+      return [];
+    }
+
+    const ownedProxies = proxies.filter(proxy => !proxy.admin || proxy.admin === this.appAddress);
+
+    if (_.isEmpty(ownedProxies)) {
+      log.info('No matching contract instances are owned by this application');
+      return [];
+    }
+
+    return ownedProxies;
   }
 
   async linkLibs() {
