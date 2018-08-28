@@ -8,7 +8,7 @@ import CaptureLogs from '../helpers/captureLogs';
 import add from '../../src/scripts/add.js';
 import push from '../../src/scripts/push.js';
 import bumpVersion from '../../src/scripts/bump.js';
-import linkLib from '../../src/scripts/link.js';
+import linkLibs from '../../src/scripts/link.js';
 import createProxy from '../../src/scripts/create.js';
 import update from '../../src/scripts/update.js';
 import setAdmin from '../../src/scripts/set-admin.js';
@@ -223,7 +223,7 @@ contract('update script', function([_skipped, owner, anotherAccount]) {
       await createProxy({ packageName: 'mock-stdlib-undeployed', contractAlias: 'Greeter', network, txParams, networkFile: this.networkFile });
 
       await bumpVersion({ version: version_2, txParams, packageFile: this.packageFile });
-      await linkLib({ txParams, libNameVersion: 'mock-stdlib-undeployed-2@1.2.0', packageFile: this.packageFile });
+      await linkLibs({ txParams, libs: ['mock-stdlib-undeployed-2@1.2.0'], packageFile: this.packageFile });
       await push({ network, txParams, deployLibs: true, networkFile: this.networkFile });
 
       // We modify the proxies' package to v2, so we can upgrade them, simulating an upgrade to mock-stdlib-undeployed

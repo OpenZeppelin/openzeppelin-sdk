@@ -3,7 +3,7 @@ require('../setup')
 
 import add from '../../src/scripts/add.js';
 import bumpVersion from '../../src/scripts/bump.js';
-import linkLib from '../../src/scripts/link.js';
+import linkLibs from '../../src/scripts/link.js';
 import ZosPackageFile from "../../src/models/files/ZosPackageFile";
 
 contract('bump script', function() {
@@ -29,7 +29,7 @@ contract('bump script', function() {
     });
 
     it('should preserve dependencies', async function () {
-      await linkLib({ libNameVersion: 'mock-stdlib@1.1.0', packageFile: this.packageFile });
+      await linkLibs({ libs: ['mock-stdlib@1.1.0'], packageFile: this.packageFile });
       await bumpVersion({ version: newVersion, packageFile: this.packageFile });
 
       this.packageFile.getDependencyVersion('mock-stdlib').should.eq('1.1.0');

@@ -20,13 +20,14 @@ const register = program => program
   .action(action)
 
 async function action(name, version, options) {
-  const { force } = options
+  const { force, link, install: installLibs } = options
+
   if (options.lib) {
-    if (options.link) throw Error('Cannot set a stdlib in a library project')
+    if (link) throw Error('Cannot set a stdlib in a library project')
     await initLib({ name, version, force })
   } else {
-    const { link: libNameVersion, install: installLib } = options
-    await init({ name, version, libNameVersion, installLib, force })
+    const libs = link ? link.split(',') : []
+    await init({ name, version, libs, installLibs, force })
   }
   await push.tryAction(options)
 }
