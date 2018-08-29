@@ -59,7 +59,7 @@ export default class NetworkBaseController {
     const requestedVersion = this.packageFile.version;
     const currentVersion = this.networkFile.version;
     if (requestedVersion !== currentVersion) {
-      log.info(`Currennt version ${currentVersion}`);
+      log.info(`Current version ${currentVersion}`);
       log.info(`Creating new version ${requestedVersion}`);
       const provider = await this.newVersion(requestedVersion);
       this.networkFile.contracts = {};
