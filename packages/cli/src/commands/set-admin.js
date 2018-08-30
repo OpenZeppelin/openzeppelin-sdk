@@ -7,7 +7,7 @@ import _ from 'lodash'
 
 const name = 'set-admin'
 const signature = `${name} [alias-or-address] [new-admin-address]`
-const description = 'change upgradeability admin of a contract instance. Provide the [alias] or [package]/[alias] you added your contract with, or its [address]. Note that if you transfer to an incorrect address, you may irreversibly lose control over upgrading your contract.'
+const description = 'change upgradeability admin of a contract instance. Provide the [alias] or [package]/[alias] of the contract to change the ownership of all its instances, or its [address] to change a single one. Note that if you transfer to an incorrect address, you may irreversibly lose control over upgrading your contract.'
 
 const register = program => program
   .command(signature, { noHelp: true })

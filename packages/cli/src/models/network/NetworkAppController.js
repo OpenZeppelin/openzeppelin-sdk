@@ -165,6 +165,10 @@ export default class NetworkAppController extends NetworkBaseController {
   }
 
   _fetchOwnedProxies(packageName, contractAlias, proxyAddress) {
+    let criteriaDescription;
+    if (packageName || contractAlias) criteriaDescription += ` contract ${toContractFullName(packageName, contractAlias)}`
+    if (proxyAddress) criteriaDescription += ` address ${proxyAddress}`
+    
     const proxies = this.networkFile.getProxies({ 
       package: packageName || (contractAlias ? this.packageFile.name : undefined),
       contract: contractAlias, 
@@ -172,15 +176,14 @@ export default class NetworkAppController extends NetworkBaseController {
     })
 
     if (_.isEmpty(proxies)) {
-      log.info('No owned contract instances that match were found');
+      log.info(`No contract instances that match${criteriaDescription} were found`);
       return [];
     }
 
     const ownedProxies = proxies.filter(proxy => !proxy.admin || proxy.admin === this.appAddress);
 
     if (_.isEmpty(ownedProxies)) {
-      log.info('No matching contract instances are owned by this application');
-      return [];
+      log.info(`No contract instances that match${criteriaDescription} are owned by this application`);
     }
 
     return ownedProxies;
