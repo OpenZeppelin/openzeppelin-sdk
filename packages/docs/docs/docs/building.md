@@ -16,7 +16,7 @@ Next, let's create a file named `MyContract.sol` in the `contracts/` folder with
 
 ```js
 pragma solidity ^0.4.21;
-import "zos-lib/contracts/migrations/Initializable.sol";
+import "zos-lib/contracts/Initializable.sol";
 
 contract MyContract is Initializable {
   uint256 public x;
