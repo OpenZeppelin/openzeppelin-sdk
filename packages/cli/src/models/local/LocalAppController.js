@@ -11,6 +11,12 @@ export default class LocalAppController extends LocalBaseController {
     }))
   }
 
+  unlinkLibs(libNames) {
+    libNames
+      .map(dep => Dependency.fromNameWithVersion(dep))
+      .forEach(dep => this.packageFile.unsetDependency(dep.name))
+  }
+
   onNetwork(network, txParams, networkFile = undefined) {
     return new NetworkAppController(this, network, txParams, networkFile);
   }

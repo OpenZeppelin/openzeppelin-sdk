@@ -40,7 +40,7 @@ export default class NetworkAppController extends NetworkBaseController {
 
   async push(reupload = false) {
     await super.push(reupload);
-    await this.linkLibs()
+    await this.handleLibsLink()
   }
 
   async deployLibs() {
@@ -189,7 +189,7 @@ export default class NetworkAppController extends NetworkBaseController {
     return ownedProxies;
   }
 
-  async linkLibs() {
+  async handleLibsLink() {
     await allPromisesOrError(_.concat(
       _.map(this.packageFile.dependencies, (version, dep) => this.linkLib(dep, version)),
       _.map(this.networkFile.dependenciesNamesMissingFromPackage(), dep => this.unlinkLib(dep))
