@@ -1,0 +1,11 @@
+{
+  "name": "Herbs",
+  "version": "1.0.0",
+  "contracts": {
+    "Impl": "ImplV1"
+  },
+  "dependencies": {
+    "mock-stdlib": "1.1.0",
+    "mock-stdlib-2": "1.2.0"
+  }
+}
