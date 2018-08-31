@@ -43,6 +43,7 @@
     "truffle-core": "^4.1.13",
     "truffle-flattener": "github:alcuadrado/truffle-flattener#master",
     "truffle-workflow-compile": "^1.0.6",
+    "web3-provider-engine": "14.0.6",
     "zos-lib": "^1.4.1"
   },
   "devDependencies": {
