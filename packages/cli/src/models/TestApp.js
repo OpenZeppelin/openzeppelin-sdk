@@ -8,7 +8,8 @@ import ControllerFor from '../models/network/ControllerFor';
  */
 export default async function testApp(txParams = {}, networkFile = undefined) {
   const controller = new ControllerFor('test', txParams, networkFile)
-  await controller.deployStdlib();
-  await controller.push();
-  return controller.app;
+  await controller.deployLibs()
+  await controller.push()
+
+  return controller.project
 }
