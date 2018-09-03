@@ -41,9 +41,7 @@ const Truffle = {
   // the network provider as a function (that returns an HDWalletProvider instance) instead of
   // assigning the HDWalletProvider instance directly.
   // (see https://github.com/trufflesuite/truffle-hdwallet-provider/issues/65)
-  setNonceTrackerIfNeeded(config) {
-    const { resolver, provider } = config
-
+  setNonceTrackerIfNeeded({ resolver, provider }) {
     if (provider.engine && provider.engine.constructor.name === 'Web3ProviderEngine') {
       const NonceSubprovider = require('web3-provider-engine/subproviders/nonce-tracker')
       const nonceTracker = new NonceSubprovider()
