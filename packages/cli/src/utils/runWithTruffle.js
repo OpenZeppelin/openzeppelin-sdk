@@ -25,8 +25,9 @@ function initTruffle(config) {
     TruffleEnvironment.detect(config, function (error) {
       if (error) reject(error)
       const Web3 = require('web3')
-      global.web3 = new Web3(config.provider)
-      global.artifacts = config.resolver
+      const { provider, resolver } = Truffle.setNonceTrackerIfNeeded(config)
+      global.web3 = new Web3(provider)
+      global.artifacts = resolver
       resolve()
     })
   });

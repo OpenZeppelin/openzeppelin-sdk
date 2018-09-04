@@ -37,6 +37,26 @@ const Truffle = {
     this._initTruffleConfig(root)
   },
 
+  // This function fixes a truffle issue related to HDWalletProvider that occurs when assigning
+  // the network provider as a function (that returns an HDWalletProvider instance) instead of
+  // assigning the HDWalletProvider instance directly.
+  // (see https://github.com/trufflesuite/truffle-hdwallet-provider/issues/65)
+  setNonceTrackerIfNeeded({ resolver, provider }) {
+    if (provider.engine && provider.engine.constructor.name === 'Web3ProviderEngine') {
+      const NonceSubprovider = require('web3-provider-engine/subproviders/nonce-tracker')
+      const nonceTracker = new NonceSubprovider()
+      provider.engine._providers.forEach((provider, index) => {
+        if (provider.constructor.name === 'ProviderSubprovider') {
+          nonceTracker.setEngine(provider.engine)
+          provider.engine._providers.splice(index, 0, nonceTracker)
+        }
+      })
+      resolver.options = Object.assign({}, resolver.options, { provider })
+    }
+
+    return { resolver, provider }
+  },
+
   _initContractsDir(root) {
     const contractsDir = `${root}/contracts`
     this._initDir(contractsDir)
