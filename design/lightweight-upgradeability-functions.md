@@ -64,3 +64,41 @@ const MyContract = artifacts.require("MyContract")
 const myInstance = await deployUpgradeable(MyContract, initArg1, initArg2, ..., opts)
 await getUpgradeabilityAdmin(myInstance) // => 0x1234...
 ```
+
+## Implementation as lib Project
+
+The `Project` class from zos-lib provides a facade to using the App, Package, and Provider contracts. An implementation with the same interface could be used for creating proxies, though not relying on those contracts.
+
+The following `Project` methods are related to creating and managing proxies, and could be reused directly. Though the current `AppProject` require the implementation contract to be registered _before_ creating a proxy for it, we could lift this requirement, creating the implementation on the fly.
+
+```js
+async createProxy(contractClass, { packageName, contractName, initMethod, initArgs })
+async upgradeProxy(proxyAddress, contractClass, { packageName, contractName, initMethod, initArgs })
+async changeProxyAdmin(proxyAddress, newAdmin) 
+```
+
+These methods are related to version management and setting implementations, which would not be needed:
+```js
+async newVersion(version) 
+async freeze()
+async setImplementation(contractClass, contractName)
+async unsetImplementation(contractName)
+```
+
+And these are related to dependency management, which could be added on a second version:
+
+```js
+async getDependencyPackage(name)
+async getDependencyVersion(name)
+async hasDependency(name)
+async setDependency(name, packageAddress, version)
+async unsetDependency(name)
+```
+
+This way, creating an upgradeable instance would be done with the following code:
+```js
+const Project = require('zos-lib').Project
+const project = new Project()
+const MyContract = artifacts.require("MyContract")
+const myInstance = project.createProxy(MyContract, { initMethod: 'initialize', initArgs: [42] })
+```
