@@ -13,6 +13,7 @@ The functions for each framework should mimick the code for creating a new contr
 The function should accept the same options as a regular transaction (from, gas, gasPrice), plus the following:
 - `implementationAddress`: if provided, a new logic contract is not deployed, and the proxy is set to this address
 - `proxyFactory`: if provided, the factory is used to create a proxy, instead of deploying one directly
+- `initalizerMethodName`: if provided, name of the method to call for initialization (defaults to `initialize`)
 - `upgradeabilityAdmin`: if provided, the upgradeability admin of the proxy is set to this address (defaults to `from`)
 - `initializerAddress`: only to be implemented if we start working with initializer contracts
 
