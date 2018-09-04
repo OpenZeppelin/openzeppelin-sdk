@@ -10,6 +10,7 @@
     "zos": "1.4.1",
     "zos-lib": "1.4.1",
     "openzeppelin-zos": "1.9.4",
-    "bignumber.js": "^7.2.0"
+    "bignumber.js": "^7.2.0",
+    "truffle-hdwallet-provider": "0.0.6"
   }
 }

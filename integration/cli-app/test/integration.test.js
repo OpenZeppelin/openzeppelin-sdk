@@ -1,5 +1,6 @@
 'use strict'
-process.env.NODE_ENV = 'test'
+const network = process.env.NETWORK;
+if (!network) throw new Error("NETWORK environment variable is required")
 
 require('chai').should();
 const _ = require('lodash'); 
@@ -12,14 +13,7 @@ const {
   copy
 } = require('./share');
 
-const network = 'gethdev';
-
-describe(`cli-app on ${NETWORK}`, function () {
-
-  before('loading accounts', async function () {
-    this.accounts = truffleExec(`getaccounts.js --network ${network}`).split(',')
-    this.from = _.trim(this.accounts[0])
-  })
+describe(`cli-app on ${network}`, function () {
 
   before('cleaning up project folder', function () {
     run('rm build/contracts/*.json ||:')
@@ -27,14 +21,23 @@ describe(`cli-app on ${NETWORK}`, function () {
     run('rm zos.* ||:')
   });
 
-  before('setup project', function () {
+  before('setting up project', function () {
     copy('package.json.v1', 'package.json')
     copy('Samples.sol', 'contracts/Samples.sol')
     copy('WithToken.sol', 'contracts/WithToken.sol')
     run('lerna bootstrap --scope=workdir-cli-app > /dev/null')
   });
 
-  after('cleaning up project folder', function () {
+  before('loading accounts', async function () {
+    if (process.env.FROM) {
+      this.from = process.env.FROM;
+    } else {
+      const accounts = truffleExec(`getaccounts.js --network ${network}`).split(',')
+      this.from = _.trim(accounts[0])
+    }
+  })
+
+  skipAfter('cleaning up project folder', function () {
     run('rm build/contracts/*.json ||:')
     run('rm contracts/*.sol ||:')
     run('rm zos.* ||:')
@@ -54,7 +57,7 @@ describe(`cli-app on ${NETWORK}`, function () {
     run('npx zos add Foo Bar Baz WithToken --skip-compile')
   })
 
-  it('pushes to local geth network', function () {
+  it('pushes to network', function () {
     run(`npx zos push --network ${network} --from ${this.from} --deploy-stdlib --skip-compile`)
   })
 
@@ -100,3 +103,5 @@ describe(`cli-app on ${NETWORK}`, function () {
     truffleExec(`run.js WithToken 0 isERC165 --network ${network}`).should.eq('true')
   })
 });
+
+function skipAfter() { }
