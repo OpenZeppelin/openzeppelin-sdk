@@ -16,6 +16,7 @@ export default class NetworkAppController extends NetworkBaseController {
     return this.networkFile.appAddress
   }
 
+  // TODO: remove and fix tests (access to versioned app from appProject)
   get app() {
     return this.project.getApp()
   }
@@ -40,7 +41,7 @@ export default class NetworkAppController extends NetworkBaseController {
 
   async push(reupload = false) {
     await super.push(reupload);
-    await this.handleLibsLink()
+    //await this.handleLibsLink()
   }
 
   async deployLibs() {
