@@ -25,7 +25,7 @@ describe(`cli-app on ${network}`, function () {
     copy('package.json.v1', 'package.json')
     copy('Samples.sol', 'contracts/Samples.sol')
     copy('WithToken.sol', 'contracts/WithToken.sol')
-    run('lerna bootstrap --scope=workdir-cli-app > /dev/null')
+    run('lerna bootstrap --scope=cli-app-tests-workdir > /dev/null')
   });
 
   before('loading accounts', async function () {

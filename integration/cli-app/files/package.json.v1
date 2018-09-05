@@ -1,5 +1,5 @@
 {
-  "name": "workdir-cli-app",
+  "name": "cli-app-tests-workdir",
   "private": true,
   "version": "0.5.0",
   "description": "CLI app project for ZeppelinOS integration test",

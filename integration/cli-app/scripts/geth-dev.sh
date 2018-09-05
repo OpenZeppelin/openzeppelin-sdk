@@ -1,1 +1,0 @@
-geth --dev --dev.period=1 --rpc --rpcport=9955 --rpcaddr=localhost --networkid 9955

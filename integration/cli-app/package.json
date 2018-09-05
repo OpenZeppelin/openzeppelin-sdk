@@ -6,7 +6,7 @@
   "author": "santiago@zeppelin.solutions",
   "license": "MIT",
   "scripts": {
-    "test": "mocha"
+    "test": "scripts/test.sh"
   },
   "devDependencies": {
     "chai": "^4.1.2",
