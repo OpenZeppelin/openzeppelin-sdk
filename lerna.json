@@ -3,7 +3,7 @@
     "examples/*",
     "packages/*",
     "integration/*",
-    "integration/cli-app/workdir-cli-app"
+    "integration/cli-app/workdir"
   ],
   "version": "1.4.2",
   "command": {

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Exit script as soon as a command fails.
-set -o errexit
+set -eo pipefail
 
 # Executes cleanup function at script exit.
 trap cleanup EXIT
@@ -24,6 +24,7 @@ cleanup() {
 start_geth() {
   # Start a geth development instance in the background
   echo "Starting local dev geth"
+  geth version
   nohup geth --dev --dev.period=1 --rpc --rpcport=9955 --rpcaddr=localhost --networkid 9955 > /dev/null &
   geth_pid=$!
   sleep 3
