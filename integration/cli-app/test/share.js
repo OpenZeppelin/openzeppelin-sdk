@@ -4,7 +4,7 @@ const fs = require('fs');
 const _ = require('lodash');
 
 function getProxyAddress(network, name, index) {
-  const fileName = path.resolve(__dirname, `../workdir-cli-app/zos.${network}.json`)
+  const fileName = path.resolve(__dirname, `../workdir/zos.${network}.json`)
   const data = JSON.parse(fs.readFileSync(fileName))
   if (!data.proxies || !data.proxies[name] || !data.proxies[name][index]) {
     throw new Error(`Could not find proxy ${name}/${index} in data`, data)
@@ -19,7 +19,7 @@ function getProxyAddress(network, name, index) {
 }
 
 function getNetworkInfo(network) {
-  return JSON.parse(fs.readFileSync(path.resolve(__dirname, `../workdir-cli-app/zos.${network}.json`)))
+  return JSON.parse(fs.readFileSync(path.resolve(__dirname, `../workdir/zos.${network}.json`)))
 }
 
 function logOutput(out, err) {
@@ -33,7 +33,7 @@ function logCmd(cmd) {
 }
 
 function execInWorkdir(cmd) {
-  const output = spawnSync(cmd, { cwd: path.resolve(__dirname, '../workdir-cli-app'), shell: true });
+  const output = spawnSync(cmd, { cwd: path.resolve(__dirname, '../workdir'), shell: true });
   if (output.status != 0 || output.error) {
     logOutput(output.stdout, output.stderr)
     throw new Error(`Error running ${cmd} (err ${output.status}) ${output.error}`);
@@ -58,7 +58,7 @@ function run(cmd) {
 }
 
 function copy(src, target) {
-  fs.copyFileSync(path.resolve(__dirname, `../files/${src}`), path.resolve(__dirname, `../workdir-cli-app/${target}`));
+  fs.copyFileSync(path.resolve(__dirname, `../files/${src}`), path.resolve(__dirname, `../workdir/${target}`));
 }
 
 

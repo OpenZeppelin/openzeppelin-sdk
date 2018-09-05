@@ -1,8 +1,8 @@
 node_modules
 .zos.session
 zos.*
-workdir-cli-app/build/*
-workdir-cli-app/node_modules
-workdir-cli-app/zos*
-workdir-cli-app/package*
-workdir-cli-app/contracts/*
+workdir/build/*
+workdir/node_modules
+workdir/zos*
+workdir/package*
+workdir/contracts/*
