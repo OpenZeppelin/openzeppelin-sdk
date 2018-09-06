@@ -270,4 +270,25 @@ Then modifying `MyContract` by swapping the order in which the base contracts ar
 contract MyContract is B, A { }
 ```
 
-Violating any of these storage layout restrictions will cause the upgraded version of the contract to have its storage values mixed up, and can lead to critical errors in your application.
+You also cannot add new variables to base contracts, if the child has any variables of its own. Given the following scenario:
+```js
+contract Base {
+  uint256 base1;
+}
+
+contract Child is Base {
+  uint256 child;
+}
+```
+
+If `Base` is modified to add an extra variable:
+```js
+contract Base {
+  uint256 base1;
+  uint256 base2;
+}
+```
+
+Then the variable `base2` whould be assigned the slot that `child` had in the previous version. A workaround for this is to declare unused variables on base contracts that you may want to extend in the future, as a means of "reserving" those slots. Note that this trick does not involve increased gas usage.
+
+> Violating any of these storage layout restrictions will cause the upgraded version of the contract to have its storage values mixed up, and can lead to critical errors in your application.
