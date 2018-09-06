@@ -6,7 +6,6 @@ import decodeLogs from './helpers/decodeLogs'
 import encodeCall from './helpers/encodeCall'
 
 // utils
-import Proxy from './utils/Proxy'
 import Logger from './utils/Logger'
 import FileSystem from './utils/FileSystem'
 import Contracts from './utils/Contracts'
@@ -18,6 +17,7 @@ const assertions = helpers.assertions
 const assertRevert = helpers.assertRevert
 
 // model objects
+import Proxy from './proxy/Proxy'
 import UnversionedApp from './app/UnversionedApp'
 import VersionedApp from './app/VersionedApp'
 import Package from './package/Package'

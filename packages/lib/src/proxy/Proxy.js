@@ -1,8 +1,15 @@
 import { promisify } from 'util'
+import { Contracts } from '../utils/Contracts';
+import { toAddress } from '../utils/Addresses';
 
 export default class Proxy {
   static at(address) {
     return new Proxy(address)
+  }
+
+  static async create(implementation, txParams = {}) {
+    const proxyContract = await deployContract(Contracts.getFromLib('AdminUpgradeabilityProxy'), [toAddress(implementation)], txParams)
+    return new Proxy(toAddress(proxyContract))
   }
 
   constructor(address) {
