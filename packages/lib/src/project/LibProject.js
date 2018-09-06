@@ -1,7 +1,7 @@
-import Project from "./Project";
+import PackageProject from "./PackageProject";
 import Package from "../package/Package";
 
-export default class LibProject extends Project {
+export default class LibProject extends PackageProject {
   static async fetch(packageAddress, version = '0.1.0', txParams) {
     const thepackage = await Package.fetch(packageAddress, txParams)
     return new this(thepackage, version, txParams)

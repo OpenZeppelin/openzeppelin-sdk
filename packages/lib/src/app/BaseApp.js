@@ -93,6 +93,7 @@ export default class BaseApp {
       ? await this._upgradeProxy(proxyAddress, packageName, contractName)
       : await this._upgradeProxyAndCall(proxyAddress, contractClass, packageName, contractName, initMethodName, initArgs)
     log.info(`TX receipt received: ${receipt.transactionHash}`)
+    return new contractClass(proxyAddress)
   }
 
   async _createProxy(packageName, contractName) {
