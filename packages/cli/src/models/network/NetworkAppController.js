@@ -41,7 +41,7 @@ export default class NetworkAppController extends NetworkBaseController {
 
   async push(reupload = false) {
     await super.push(reupload);
-    //await this.handleLibsLink()
+    await this.handleLibsLink()
   }
 
   async deployLibs() {
