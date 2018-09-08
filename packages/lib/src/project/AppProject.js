@@ -1,9 +1,9 @@
-import PackageProject from "./PackageProject";
+import BasePackageProject from "./BasePackageProject";
 import VersionedApp from "../app/VersionedApp";
 import Package from "../package/Package";
 import _ from 'lodash';
 
-export default class AppProject extends PackageProject {
+export default class AppProject extends BasePackageProject {
   static async fetch(appAddress, name, txParams) {
     const app = await VersionedApp.fetch(appAddress, txParams)
     const packageInfo = await app.getPackage(name)

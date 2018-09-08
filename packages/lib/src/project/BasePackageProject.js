@@ -3,7 +3,7 @@ import Logger from "../utils/Logger";
 
 const log = new Logger('PackageProject')
 
-export default class PackageProject {
+export default class BasePackageProject {
 
   constructor(txParams) {
     this.txParams = txParams
