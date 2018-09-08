@@ -41,6 +41,7 @@ contract('AppProject', function (accounts) {
   });
   
   shouldManageProxies({
+    supportsNames: true,
     otherAdmin: another,
     setImplementations: async function () {
       await this.project.setImplementation(ImplV1, "DummyImplementation")

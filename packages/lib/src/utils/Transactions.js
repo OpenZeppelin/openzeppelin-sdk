@@ -23,10 +23,8 @@ export async function sendDataTransaction(contract, txParams) {
   if (txParams.gas) {
     return contract.sendTransaction(txParams)
   }
-
   // Estimate gas for the call
   const estimatedGas = await estimateGas({ to: contract.address, ... txParams });
-
   // Run the tx
   const gasToUse = await calculateActualGas(estimatedGas);
   return contract.sendTransaction({ gas: gasToUse, ... txParams });

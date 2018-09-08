@@ -9,9 +9,9 @@ const Impl = Contracts.getFromLocal('Impl');
 const DummyImplementation = Contracts.getFromLocal('DummyImplementation');
 const DummyImplementationV2 = Contracts.getFromLocal('DummyImplementationV2');
 
-export default function shouldManageProxies({ otherAdmin, setImplementations }) {
+export default function shouldManageProxies({ otherAdmin, setImplementations, supportsNames }) {
 
-  describe('like proxy managing project', function () {
+  describe('like a proxy managing project', function () {
     describe('createProxy', function () {
       beforeEach('setting implementations', setImplementations);
 
@@ -21,11 +21,13 @@ export default function shouldManageProxies({ otherAdmin, setImplementations }) 
         await assertIsProxy(instance, this.adminAddress);
       })
 
-      it('creates a proxy given contract name', async function () {
-        const instance = await this.project.createProxy(Impl, { contractName: 'DummyImplementation' });
-        await assertIsVersion(instance, 'V1');
-        await assertIsProxy(instance, this.adminAddress);
-      })
+      if (supportsNames) {
+        it('creates a proxy given contract name', async function () {
+          const instance = await this.project.createProxy(Impl, { contractName: 'DummyImplementation' });
+          await assertIsVersion(instance, 'V1');
+          await assertIsProxy(instance, this.adminAddress);
+        })
+      }
 
       it('creates and initializes a proxy', async function () {
         const instance = await this.project.createProxy(DummyImplementation, { initArgs: [10] });
@@ -45,11 +47,13 @@ export default function shouldManageProxies({ otherAdmin, setImplementations }) 
         await assertIsProxy(upgraded, this.adminAddress);
       })
 
-      it('upgrades a proxy given contract name', async function () {
-        const upgraded = await this.project.upgradeProxy(this.instance.address, Impl, { contractName: 'DummyImplementationV2' });
-        await assertIsVersion(upgraded, 'V2');
-        await assertIsProxy(upgraded, this.adminAddress);
-      })
+      if (supportsNames) {
+        it('upgrades a proxy given contract name', async function () {
+          const upgraded = await this.project.upgradeProxy(this.instance.address, Impl, { contractName: 'DummyImplementationV2' });
+          await assertIsVersion(upgraded, 'V2');
+          await assertIsProxy(upgraded, this.adminAddress);
+        })
+      }
 
       it('upgrades and migrates a proxy', async function () {
         const upgraded = await this.project.upgradeProxy(this.instance.address, DummyImplementationV2, { initMethod: 'migrate', initArgs: [20] });
