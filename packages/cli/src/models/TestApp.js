@@ -6,7 +6,7 @@ import ControllerFor from '../models/network/ControllerFor';
  * @param txParams optional txParams (from, gas, gasPrice) to use on every transaction
  * @param networkFile optional `ZosNetworkFile` object to use, instead of zos.test.json
  */
-export default async function ProjectApp(txParams = {}, networkFile = undefined) {
+export default async function TestApp(txParams = {}, networkFile = undefined) {
   const controller = new ControllerFor('test', txParams, networkFile)
   await controller.deployLibs()
   await controller.push()
