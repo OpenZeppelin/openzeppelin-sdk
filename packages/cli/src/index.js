@@ -2,7 +2,7 @@
 const version = 'v' + require('../package.json').version
 
 // model objects
-import TestApp from './models/TestApp'
+import { TestApp, LibApp }from './models/TestApp'
 import ControllerFor from './models/local/ControllerFor'
 import LocalAppController from './models/local/LocalAppController'
 import LocalLibController from './models/local/LocalLibController'
@@ -12,6 +12,7 @@ import NetworkLibController from './models/network/NetworkLibController'
 export {
   version,
   TestApp,
+  LibApp,
   ControllerFor,
   LocalAppController,
   LocalLibController,

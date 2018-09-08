@@ -2,7 +2,7 @@
 require('../setup')
 
 import { Contracts } from 'zos-lib'
-import TestApp from '../../src/models/TestApp'
+import { TestApp } from '../../src/models/Test'
 import ZosPackageFile from "../../src/models/files/ZosPackageFile"
 
 const ImplV1 = Contracts.getFromLocal('ImplV1')
@@ -42,7 +42,7 @@ contract('TestApp', function ([_, owner]) {
   })
 
   it('returns the current directory', async function () {
-    (await this.app.getCurrentDirectory()).address.should.be.not.null
+    (await this.app.getCurrentDirectory()).address.should.not.be.null
   })
 
   it('has dependencies deployed', async function () {
