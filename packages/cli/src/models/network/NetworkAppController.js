@@ -16,7 +16,6 @@ export default class NetworkAppController extends NetworkBaseController {
     return this.networkFile.appAddress
   }
 
-  // TODO: remove and fix tests (access to versioned app from appProject)
   get app() {
     return this.project.getApp()
   }
