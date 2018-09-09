@@ -14,7 +14,7 @@ export default class Dependency {
 
   static satisfiesVersion(version, requirement) {
     return !requirement || version === requirement || semver.satisfies(version, requirement);
-  }  
+  }
 
   constructor(name, requirement) {
     this.name = name
@@ -23,6 +23,7 @@ export default class Dependency {
     const packageVersion = this.getPackageFile().version
     this._validateSatisfiesVersion(packageVersion, requirement)
     this.version = packageVersion
+    this.nameAndVersion = `${name}@${packageVersion}`
     this.requirement = requirement || tryWithCaret(packageVersion)
   }
 
@@ -40,7 +41,7 @@ export default class Dependency {
 
   async install() {
     await npm.install([this.nameAndVersion], { save: true, cwd: process.cwd() })
-  }  
+  }
 
   getPackageFile() {
     if (!this._packageFile) {
@@ -59,7 +60,7 @@ export default class Dependency {
       if (!fs.exists(filename)) {
         throw Error(`Could not find a zos file for network '${network}' for '${this.name}'`)
       }
-      
+
       this._networkFiles[network] = new ZosNetworkFile(this.getPackageFile(), network, filename)
       this._validateSatisfiesVersion(this._networkFiles[network].version, this.requirement)
     }
