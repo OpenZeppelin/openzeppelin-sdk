@@ -1,8 +1,6 @@
 'use strict'
 
-require('chai')
-  .use(require('sinon-chai'))
-  .should()
+require('../setup')
 
 import sinon from 'sinon'
 import npm from 'npm-programmatic'
@@ -118,8 +116,9 @@ contract('Dependency', function() {
       it('calls npm install', async function() {
         const npmInstallStub = sinon.stub(npm, 'install')
         const nameAndVersion = 'mock-stdlib@1.1.0'
-        const npmParams = { cwd: process.cwd(), save: true }
-        await this.dependency.install()
+        const npmParams = { save: true, cwd: process.cwd() }
+
+        await this.dependency.installFn()
         npmInstallStub.should.have.been.calledWithExactly([nameAndVersion], npmParams)
         sinon.restore()
       })
