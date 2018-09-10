@@ -110,6 +110,27 @@ contract DetailedMintableToken is Initializable, DetailedERC20, MintableToken {
 
 Whether it is OpenZeppelin or another shared smart contracts library, always make sure that the library is set up to handle upgradeable contracts.
 
+### Avoid initial values in fields declarations
+
+Solidity allows defining initial values for fields when declaring them in a contract.
+
+```js
+contract MyContract {
+  uint256 public hasInitialValue = 42;
+}
+```
+
+This is equivalent to setting these values in the constructor, and as such, will not work for upgradeable contracts. Make sure that all initial values are set in an initializer function as shown above; otherwise, any upgradeable instances will not have these fields set.
+
+```js
+contract MyContract is Initializable {
+  uint256 public hasInitialValue;
+  function initialize() initializer public {
+    hasInitialValue = 42;
+  }
+}
+```
+
 ## Creating new instances from your contract code
 
 When creating a new instance of a contract from your contract's code, these creations are handled directly by Solidity and not by ZeppelinOS, which means that **these contracts will not be upgradeable**. 
