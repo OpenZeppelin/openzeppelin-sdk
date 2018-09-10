@@ -2,8 +2,8 @@
   "packages": [
     "examples/*",
     "packages/*",
-    "integration/*",
-    "integration/cli-app/workdir"
+    "tests/*",
+    "tests/cli-app/workdir"
   ],
   "version": "1.4.2",
   "command": {

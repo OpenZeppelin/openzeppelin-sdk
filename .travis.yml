@@ -14,8 +14,8 @@ cache:
   - packages/docs/node_modules
   - examples/lib-simple/node_modules
   - examples/lib-complex/node_modules
-  - integration/cli-app/node_modules
-  - integration/cli-app/workdir/node_modules
+  - tests/cli-app/node_modules
+  - tests/cli-app/workdir/node_modules
 
 stages:
   - prepare cache
@@ -45,7 +45,7 @@ jobs:
       install: npx lerna bootstrap --loglevel=debug
       script: npx lerna run test --concurrency=1 --stream=true --scope=zos
     
-    # Test stage for CLI on OSC
+    # Test stage for CLI on OSX
     - stage: tests
       name: CLI tests on OSX
       os: osx
@@ -69,7 +69,7 @@ jobs:
         - sudo apt-get update
         - sudo apt-get install -y ethereum
       install: npx lerna bootstrap --loglevel=debug
-      script: cd integration/cli-app && ./scripts/test.sh
+      script: cd tests/cli-app && ./scripts/test.sh
     
     # Integration tests on local geth with hdwallet-provider
     - stage: integration tests
@@ -80,14 +80,14 @@ jobs:
         - sudo apt-get update
         - sudo apt-get install -y ethereum
       install: npx lerna bootstrap --loglevel=debug
-      script: cd integration/cli-app && ./scripts/test.sh
+      script: cd tests/cli-app && ./scripts/test.sh
 
     # Rinkeby integration tests are temporarily disabled
     # - stage: integration tests
     #   name: HDWallet on Infura Rinkeby
     #   if: false
     #   install: npx lerna bootstrap --loglevel=debug
-    #   script: cd integration/cli-app && ./scripts/test.sh
+    #   script: cd tests/cli-app && ./scripts/test.sh
     #   env:
     #     - NETWORK=rinkeby-infura-hdwallet
     #     - FROM=0xf0a9ed2663311ce436347bb6f240181ff103ca16
