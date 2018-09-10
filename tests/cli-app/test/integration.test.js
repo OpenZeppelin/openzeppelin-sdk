@@ -37,7 +37,7 @@ describe(`cli-app on ${network}`, function () {
     }
   })
 
-  skipAfter('cleaning up project folder', function () {
+  after('cleaning up project folder', function () {
     run('rm build/contracts/*.json ||:')
     run('rm contracts/*.sol ||:')
     run('rm zos.* ||:')
@@ -103,5 +103,3 @@ describe(`cli-app on ${network}`, function () {
     truffleExec(`run.js WithToken 0 isERC165 --network ${network}`).should.eq('true')
   })
 });
-
-function skipAfter() { }
