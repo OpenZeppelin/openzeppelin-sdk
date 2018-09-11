@@ -16,8 +16,9 @@ const log = new Logger('App')
 export default class BaseApp {
 
   static async fetch(address, txParams = {}) {
-    const appContract = await this.getContractClass().at(address)    
-    return new this(appContract, txParams)
+    const appContract = await this.getContractClass().at(address)
+    const factory = await UpgradeabilityProxyFactory.fetch(await appContract.factory())
+    return new this(appContract, factory, txParams)
   }
 
   static async deploy(txParams = {}) {
@@ -25,15 +26,16 @@ export default class BaseApp {
     log.info('Deploying new App...')
     const appContract = await deployContract(this.getContractClass(), [factory.address], txParams)
     log.info(`Deployed App at ${appContract.address}`)
-    return new this(appContract, txParams)
+    return new this(appContract, factory, txParams)
   }
 
   static getContractClass() {
     throw Error("Unimplemented")
   }
 
-  constructor(appContract, txParams = {}) {
+  constructor(appContract, factory, txParams = {}) {
     this.appContract = appContract
+    this.factory = factory
     this.txParams = txParams
   }
 
