@@ -23,29 +23,28 @@ export default class StatusChecker {
     this.visitor = visitor
     this.txParams = txParams
     this.networkFile = networkFile
+    this.packageName = this.networkFile.packageFile.name
   }
 
-  async project() {
+  async setProject() {
     try {
       if (!this._project) {
         this._project = this.networkFile.isLib
           ? await LibProject.fetch(this.networkFile.packageAddress, this.networkFile.version, this.txParams)
-          : await AppProject.fetch(this.networkFile.appAddress, this.txParams)
+          : await AppProject.fetch(this.networkFile.appAddress, this.packageName, this.txParams)
       }
-
-      return this._project
     } catch(error) {
       throw Error(`Cannot fetch project contract from address ${this.networkFile.appAddress}.`, error)
     }
   }
 
   async call() {
-    const project = await this.project()
-    log.info(`Comparing status of project ${(await project.getProjectPackage()).address} ...\n`)
+    await this.setProject()
+    log.info(`Comparing status of project ${(await this._project.getProjectPackage()).address} ...\n`)
     if (this.networkFile.isLib) {
-      await this.checkLib();
+      await this.checkLib()
     } else {
-      await this.checkApp();
+      await this.checkApp()
     }
     this.visitor.onEndChecking()
   }
@@ -54,7 +53,7 @@ export default class StatusChecker {
     await this.checkVersion()
     await this.checkPackage()
     await this.checkProvider()
-    await this.checkStdlib()
+    //await this.checkStdlib()
     await this.checkImplementations()
     await this.checkProxies()
   }
@@ -65,7 +64,7 @@ export default class StatusChecker {
   }
 
   async checkVersion() {
-    const observed = (await this.project()).version
+    const observed = this._project.version
     const expected = this.networkFile.version
     if(observed !== expected) this.visitor.onMismatchingVersion(expected, observed)
   }
@@ -84,8 +83,7 @@ export default class StatusChecker {
   }
 
   async checkStdlib() {
-    const project = await this.project();
-    const currentStdlib = await project.currentStdlib();
+    const currentStdlib = await this._project.currentStdlib()
     const observed = currentStdlib === ZERO_ADDRESS ? 'none' : currentStdlib
     const expected = this.networkFile.stdlibAddress || 'none'
     if(observed !== expected) this.visitor.onMismatchingStdlib(expected, observed)
@@ -132,17 +130,18 @@ export default class StatusChecker {
       })
   }
 
-  _checkRemoteProxy({ alias, address, implementation}) {
-    const matchingProxy = this.networkFile.proxiesList().find(proxy => proxy.address === address)
+  _checkRemoteProxy({ alias, address, implementation }) {
+    const matchingProxy = this.networkFile.getProxy(address)
     if (matchingProxy) {
       this._checkProxyAlias(matchingProxy, alias, address, implementation)
       this._checkProxyImplementation(matchingProxy, alias, address, implementation)
+    } else {
+      this.visitor.onMissingRemoteProxy('none', 'one', { alias, address, implementation })
     }
-    else this.visitor.onMissingRemoteProxy('none', 'one', { alias, address, implementation })
   }
 
   _checkProxyAlias(proxy, alias, address, implementation) {
-    const expected = proxy.alias
+    const expected = proxy.contract
     if (alias !== expected) this.visitor.onMismatchingProxyAlias(expected, alias, { alias, address, implementation })
   }
 
@@ -153,7 +152,7 @@ export default class StatusChecker {
 
   _checkUnregisteredLocalProxies(proxiesInfo) {
     const foundAddresses = proxiesInfo.map(info => info.address)
-    this.networkFile.proxiesList()
+    this.networkFile.getProxies()
       .filter(proxy => !foundAddresses.includes(proxy.address))
       .forEach(proxy => {
         const { alias, address, implementation } = proxy
@@ -162,7 +161,7 @@ export default class StatusChecker {
   }
 
   async _fetchOnChainImplementations() {
-    const filter = new EventsFilter();
+    const filter = new EventsFilter()
     const directory = await this._project.getCurrentDirectory()
     const allEvents = await filter.call(directory.contract, 'ImplementationChanged')
     const contractsAlias = allEvents.map(event => event.args.contractName)
@@ -174,13 +173,14 @@ export default class StatusChecker {
 
   async _fetchOnChainProxies() {
     const implementationsInfo = await this._fetchOnChainImplementations()
-    const project = await this.project();
+    const app = this._project.getApp()
+    const factory = app.factory
     const filter = new EventsFilter()
-    const proxyEvents = await filter.call(project.factory, 'ProxyCreated')
+    const proxyEvents = await filter.call(factory.factoryContract, 'ProxyCreated')
     const proxiesInfo = []
     await Promise.all(proxyEvents.map(async event => {
       const address = event.args.proxy
-      const implementation = await project.getProxyImplementation(address)
+      const implementation = await app.getProxyImplementation(address)
       const matchingImplementations = implementationsInfo.filter(info => info.address === implementation)
       if (matchingImplementations.length > 1) {
         this.visitor.onMultipleProxyImplementations('one', matchingImplementations.length, { implementation })
@@ -191,6 +191,6 @@ export default class StatusChecker {
         proxiesInfo.push({ alias, implementation, address })
       }
     }))
-    return proxiesInfo;
+    return proxiesInfo
   }
 }
