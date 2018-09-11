@@ -13,7 +13,7 @@ class StorageLayout {
     this.artifacts = artifacts
     this.contract = contract
     this.imports = new Set() // Transitive closure of source files imported from the contract
-    this.nodes = {} // Map from ast id to node across all visited contracts
+    this.nodes = {} // Map from ast id to nodeset across all visited contracts (note that more than one node may have the same id, due to how truffle compiles artifacts)
     this.types = {} // Types info being collected for the current contract
     this.storage = [] // Storage layout for the current contract
     
@@ -45,9 +45,13 @@ class StorageLayout {
   }
 
   collectNodes(node) {
-    if (this.nodes[node.id]) return;
-    this.nodes[node.id] = node
-    if (node.nodes) node.nodes.forEach(this.collectNodes.bind(this))
+    // Return if we have already seen this node
+    if (_.some(this.nodes[node.id] || [], n => _.isEqual(n, node))) return; 
+    // Add node to collection with this id otherwise
+    if (!this.nodes[node.id]) this.nodes[node.id] = [];
+    this.nodes[node.id].push(node);
+    // Call recursively to children
+    if (node.nodes) node.nodes.forEach(this.collectNodes.bind(this));
   }
 
   visitVariables(contractNode) {
@@ -64,6 +68,16 @@ class StorageLayout {
     this.types[typeInfo.id] = typeInfo
   }
 
+  getNode(id, type) {
+    if (!this.nodes[id]) throw Error(`No AST nodes with id ${id} found`)
+    const candidates = this.nodes[id].filter(node => node.nodeType === type)
+    switch (candidates.length) {
+      case 0: throw Error(`No AST nodes of type ${type} with id ${id} found (got ${this.nodes[id].map(node => node.nodeType).join(', ')})`);
+      case 1: return candidates[0];
+      default: throw Error(`Found more than one node of type ${type} with the same id ${id}. Please try clearing your build artifacts and recompiling your contracts.`);
+    }
+  }
+
   getContractNode() {
     return this.contract.ast.nodes.find(node => 
       node.nodeType === 'ContractDefinition' && 
@@ -72,7 +86,7 @@ class StorageLayout {
   }
 
   getLinearizedBaseContracts() {
-    return _.reverse(this.getContractNode().linearizedBaseContracts.map(id => this.nodes[id]))
+    return _.reverse(this.getContractNode().linearizedBaseContracts.map(id => this.getNode(id, 'ContractDefinition')))
   }
 
   getStorageInfo(varNode, typeInfo) {
@@ -84,28 +98,28 @@ class StorageLayout {
   }
 
   getTypeInfo(node) {
-    // TODO: Handle FunctionTypeName
     switch (node.nodeType) {
       case 'ElementaryTypeName': return this.getElementaryTypeInfo(node);
       case 'ArrayTypeName': return this.getArrayTypeInfo(node);
       case 'Mapping': return this.getMappingTypeInfo(node);
       case 'UserDefinedTypeName': return this.getUserDefinedTypeInfo(node);
+      case 'FunctionTypeName': return this.getFunctionTypeInfo(node);
       default: throw Error(`Cannot get type info for unknown node type ${node.nodeType}`);
     }
   }
 
   getUserDefinedTypeInfo({ referencedDeclaration, typeDescriptions }) {
-    const referencedNode = this.nodes[referencedDeclaration];
-    if (!referencedNode) {
-      throw Error(`Could not find referenced AST node ${referencedDeclaration} for type ${typeDescriptions.typeString}`)
-    } 
-
-    switch (referencedNode.nodeType) {
-      case 'ContractDefinition': return this.getContractTypeInfo(referencedNode)
-      case 'StructDefinition': return this.getStructTypeInfo(referencedNode)
-      case 'EnumDefinition': return this.getEnumTypeInfo(referencedNode)
-      default: return { id: typeDescriptions.typeIdentifier, label: typeDescriptions.typeString }
+    const typeIdentifier = this.getTypeIdentifier(typeDescriptions);
+    switch (typeIdentifier) {
+      case 't_contract': return this.getContractTypeInfo(referencedDeclaration)
+      case 't_struct': return this.getStructTypeInfo(referencedDeclaration)
+      case 't_enum': return this.getEnumTypeInfo(referencedDeclaration)
+      default: throw Error(`Unknown type identifier ${typeIdentifier} for ${typeDescriptions.typeString}`)
     }
+  }
+
+  getTypeIdentifier({ typeIdentifier }) {
+    return typeIdentifier.split('$', 1)[0]
   }
 
   getElementaryTypeInfo({ typeDescriptions }) {
@@ -153,10 +167,19 @@ class StorageLayout {
     } 
   }
 
-  getStructTypeInfo(referencedNode) {
+  getFunctionTypeInfo() {
+    // Process a reference to a function disregarding types, since we only care how much space it takes
+    return { 
+      id: 't_function', 
+      kind: 'elementary',
+      label: 'function' 
+    } 
+  }
+
+  getStructTypeInfo(referencedDeclaration) {
     // Identify structs by contract and name
-    const contractName = this.nodes[referencedNode.scope].name
-    const id = `t_struct<${contractName}.${referencedNode.name}>`
+    const referencedNode = this.getNode(referencedDeclaration, 'StructDefinition');
+    const id = `t_struct<${referencedNode.canonicalName}>`
     if (this.types[id]) return this.types[id]
 
     // Store members info in type description
@@ -176,9 +199,9 @@ class StorageLayout {
     }
   }
 
-  getEnumTypeInfo(referencedNode) {
+  getEnumTypeInfo(referencedDeclaration) {
     // Store canonical name and members for an enum
-    // Note that enum definition nodes do not have a `scope` property we can use to retrieve the contract node
+    const referencedNode = this.getNode(referencedDeclaration, 'EnumDefinition');
     return {
       id: `t_enum<${referencedNode.canonicalName}>`,
       kind: 'enum',

@@ -34,6 +34,13 @@ contract StorageMockWithMappings {
   mapping(uint256 => bool[]) private my_mapping_with_arrays;
 }
 
+contract StorageMockWithFunctions {
+  function(uint) internal my_fun;
+  function(string, string)[] internal my_fun_dynarray;
+  function(uint) returns (address)[10] internal my_fun_staticarray;
+  mapping(uint256 => function(bool)) internal my_fun_mapping;
+}
+
 contract StorageMockWithContracts {
   SimpleStorageMock public my_contract;
   SimpleStorageMock[] private my_contract_dynarray;
