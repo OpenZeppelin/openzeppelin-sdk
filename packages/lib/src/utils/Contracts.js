@@ -1,6 +1,7 @@
 import path from 'path'
 import truffleContract from 'truffle-contract'
 import truffleProvision from 'truffle-provisioner'
+import glob from 'glob'
 
 const DEFAULT_TESTING_TX_PARAMS = {
   gas: 6721975,
@@ -25,9 +26,12 @@ export default {
   },
 
   getLocalPath(contractName) {
-    const defaultBuildDir = `${process.cwd()}/build/contracts`
-    const buildDir = this._getTruffleBuildDir() || defaultBuildDir
+    const buildDir = this.getLocalBuildDir()
     return `${buildDir}/${contractName}.json`
+  },
+
+  getLocalBuildDir() {
+    return this._getTruffleBuildDir() || `${process.cwd()}/build/contracts`
   },
 
   getLibPath(contractName) {
@@ -48,6 +52,11 @@ export default {
 
   getFromNodeModules(dependency, contractName) {
     return this._getFromPath(this.getNodeModulesPath(dependency, contractName))
+  },
+
+  listBuildArtifacts() {
+    const buildDir = this.getLocalBuildDir()
+    return glob.sync(`${buildDir}/*.json`)
   },
 
   _getFromPath(path) {

@@ -1,22 +1,47 @@
-export function getStorageLayout(contract) {
-  const layout = new StorageLayout(contract)
+import _ from 'lodash';
+import { getBuildArtifacts } from "../utils/BuildArtifacts";
+
+export function getStorageLayout(contract, artifacts) {
+  if (!artifacts) artifacts = getBuildArtifacts();
+  const layout = new StorageLayout(contract, artifacts)
   const { types, storage } = layout.run()
   return { types, storage }
 }
 
 class StorageLayout {
-  constructor (contract) {
+  constructor (contract, artifacts) {
+    this.artifacts = artifacts
     this.contract = contract
-    this.nodes = {}
-    this.types = {}
-    this.storage = []
+    this.imports = new Set() // Transitive closure of source files imported from the contract
+    this.nodes = {} // Map from ast id to node across all visited contracts
+    this.types = {} // Types info being collected for the current contract
+    this.storage = [] // Storage layout for the current contract
+    
   }
 
   run() {
+    this.collectImports(this.contract.ast)
     this.collectNodes(this.contract.ast)
-    const contractNode = this.getContractNode()
-    this.visitVariables(contractNode)
+    
+    this.getLinearizedBaseContracts().forEach(contractNode => {
+      this.visitVariables(contractNode)
+    })
+    
     return this
+  }
+
+  collectImports(ast) {
+    ast.nodes
+      .filter(node => node.nodeType === 'ImportDirective')
+      .map(node => node.absolutePath)
+      .forEach(importPath => {
+        if (this.imports.has(importPath)) return;
+        this.imports.add(importPath);
+        this.artifacts.getArtifactsFromSourcePath(importPath).forEach(importedArtifact => {
+          this.collectNodes(importedArtifact.ast)
+          this.collectImports(importedArtifact.ast)
+        })
+      })
   }
 
   collectNodes(node) {
@@ -46,6 +71,10 @@ class StorageLayout {
     )
   }
 
+  getLinearizedBaseContracts() {
+    return _.reverse(this.getContractNode().linearizedBaseContracts.map(id => this.nodes[id]))
+  }
+
   getStorageInfo(varNode, typeInfo) {
     return {
       label: varNode.name,
@@ -55,6 +84,7 @@ class StorageLayout {
   }
 
   getTypeInfo(node) {
+    // TODO: Handle FunctionTypeName
     switch (node.nodeType) {
       case 'ElementaryTypeName': return this.getElementaryTypeInfo(node);
       case 'ArrayTypeName': return this.getArrayTypeInfo(node);

@@ -1,5 +1,8 @@
 pragma solidity ^0.4.24;
 
+// Added just for having a circular reference
+import "./StorageMocks3.sol";
+
 contract SimpleStorageMock {
   uint256 public my_public_uint256;
   string internal my_internal_string;
