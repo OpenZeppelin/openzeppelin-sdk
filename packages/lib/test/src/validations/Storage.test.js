@@ -20,7 +20,7 @@ contract('Storage', () => {
     }
 
     this.assertStorage = (expectedStorage) => {
-      this.storage.should.have.lengthOf(expectedStorage.length, `storage should have:\n${expectedStorage.map(util.inspect).join('\n')}\n\n      but was:\n${this.storage.map(util.inspect).join('\n')}\n`)
+      this.storage.should.have.lengthOf(expectedStorage.length, `storage should be:\n${expectedStorage.map(util.inspect).join('\n')}\n\n      but was:\n${this.storage.map(util.inspect).join('\n')}\n\n`)
       expectedStorage.forEach((node, index) => {
         this.storage[index].should.include(node)
       })
@@ -29,7 +29,7 @@ contract('Storage', () => {
     this.assertTypes = (expectedTypes) => {
       _.forEach(expectedTypes, (value, id) => {
         should.exist(this.types[id], `expected types to include key ${id} but was:\n${util.inspect(this.types)}\n`)
-        this.types[id].should.include(value)
+        this.types[id].should.deep.include(value)
       })
     }
   })
@@ -296,4 +296,64 @@ contract('Storage', () => {
     })
   })
 
+  for (const contractName of ['StorageMockWithReferences', 'StorageMockWithRecursiveReferences']) {
+    describe(`on references to other files in ${contractName}`, function () {
+      beforeEach(function () {
+        this.getStorageLayout(contractName)
+      })
+
+      it('returns storage', function () {
+        const expectedStorage = [ 
+          { label: 'my_enum', type: 't_enum<StorageMockWithEnums.MyEnum>' },
+          { label: 'my_struct', type: 't_struct<StorageMockWithStructs.MyStruct>' },
+          { label: 'my_contract', type: 't_address' }
+        ]
+
+        this.assertStorage(expectedStorage)
+      })
+
+      it('returns types info', function () {
+        const expectedTypes = { 
+          't_struct<StorageMockWithStructs.MyStruct>': { kind: 'struct', label: 'StorageMockWithStructs.MyStruct' },
+          't_enum<StorageMockWithEnums.MyEnum>': { kind: 'enum', label: 'StorageMockWithEnums.MyEnum', members: ['State1', 'State2'] }
+        }
+
+        this.assertTypes(expectedTypes)
+      })
+    })
+  };
+
+  describe('on inheritance chain', function () {
+    beforeEach(function () {
+      this.getStorageLayout('StorageMockChainChild')
+    })
+
+    it('assigns slots according to linearization', async function () {
+      const StorageMockChainChild = Contracts.getFromLib('StorageMockChainChild')
+      const instance = await StorageMockChainChild.new();
+      const slots = await instance.slots();
+      slots.map(slot => slot.toNumber()).should.deep.eq([0, 1, 3, 5, 7])
+    })
+
+    it('returns storage', function () {
+      const expectedStorage = [ 
+        { label: 'base',  type: 't_uint256', contract: 'StorageMockChainBase' },
+        { label: 'a1',    type: 't_uint256', contract: 'StorageMockChainA1' },
+        { label: 'a2',    type: 't_uint256', contract: 'StorageMockChainA1' },
+        { label: 'a3',    type: 't_uint256', contract: 'StorageMockChainA2' },
+        { label: 'a4',    type: 't_uint256', contract: 'StorageMockChainA2' },
+        { label: 'b1',    type: 't_uint256', contract: 'StorageMockChainB' },
+        { label: 'b2',    type: 't_uint256', contract: 'StorageMockChainB' },
+        { label: 'child', type: 't_uint256', contract: 'StorageMockChainChild' }
+      ]
+
+      this.assertStorage(expectedStorage)
+    })
+
+    it('returns types info', function () {
+      const expectedTypes = { 't_uint256': { label: 'uint256' } }
+      this.assertTypes(expectedTypes)
+    })
+  })
+  
 })
