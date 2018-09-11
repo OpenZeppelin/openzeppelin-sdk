@@ -182,7 +182,11 @@ class StorageLayout {
     const id = `t_struct<${referencedNode.canonicalName}>`
     if (this.types[id]) return this.types[id]
 
-    // Store members info in type description
+    // We shortcircuit type registration in this scenario to handle recursive structs
+    const typeInfo = { id, kind: 'struct', label: referencedNode.canonicalName }
+    this.registerType(typeInfo)
+
+    // Store members info in type info
     const members = referencedNode.members
       .filter(member => member.nodeType === 'VariableDeclaration')
       .map(member => {
@@ -191,12 +195,8 @@ class StorageLayout {
         return this.getStorageInfo(member, typeInfo)
       })
 
-    return {
-      id,
-      members,
-      kind: 'struct',
-      label: referencedNode.canonicalName
-    }
+    Object.assign(typeInfo, { members })
+    return typeInfo
   }
 
   getEnumTypeInfo(referencedDeclaration) {
