@@ -134,6 +134,34 @@ contract('Storage', () => {
     })
   })
 
+  describe('on functions', function () {
+    beforeEach(function () {
+      this.getStorageLayout('StorageMockWithFunctions')
+    })
+
+    it('returns storage', function () {
+      const expectedStorage = [ 
+        { label: 'my_fun', type: 't_function' },
+        { label: 'my_fun_dynarray', type: 't_array:dyn<t_function>' },
+        { label: 'my_fun_staticarray', type: 't_array:10<t_function>' },
+        { label: 'my_fun_mapping', type: 't_mapping<t_function>' }
+      ]
+      
+      this.assertStorage(expectedStorage)
+    })
+
+    it('returns types info', function () {
+      const expectedTypes = { 
+        't_array:10<t_function>': { label: 'function[10]' },
+        't_array:dyn<t_function>': { label: 'function[]' },
+        't_mapping<t_function>': { valueType: 't_function', kind: 'mapping', label: 'mapping(key => function)' },
+        't_function': { label: 'function' }
+      }
+
+      this.assertTypes(expectedTypes)
+    })
+  })
+
   describe('on contracts', function () {
     beforeEach(function () {
       this.getStorageLayout('StorageMockWithContracts')
@@ -296,7 +324,7 @@ contract('Storage', () => {
     })
   })
 
-  for (const contractName of ['StorageMockWithReferences', 'StorageMockWithRecursiveReferences']) {
+  for (const contractName of ['StorageMockWithReferences', 'StorageMockWithTransitiveReferences']) {
     describe(`on references to other files in ${contractName}`, function () {
       beforeEach(function () {
         this.getStorageLayout(contractName)
