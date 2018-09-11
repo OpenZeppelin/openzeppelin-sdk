@@ -298,7 +298,7 @@ contract('Storage', () => {
     })
   })
 
-  describe.skip('on recursive structs', function () {
+  describe('on recursive structs', function () {
     beforeEach(function () {
       this.getStorageLayout('StorageMockWithRecursiveStructs')
     })
@@ -306,7 +306,7 @@ contract('Storage', () => {
     it('tracks struct members in type definition', function () {
       const members = this.types['t_struct<StorageMockWithRecursiveStructs.MyStruct>'].members
       members.should.have.lengthOf(1)
-      members[0].should.include({ label: 'other_stucts', type: 't_array:dyn<t_struct<StorageMockWithRecursiveStructs.OtherStruct>>' })
+      members[0].should.include({ label: 'other_structs', type: 't_array:dyn<t_struct<StorageMockWithRecursiveStructs.OtherStruct>>' })
     })
 
     it('returns storage', function () {
