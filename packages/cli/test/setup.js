@@ -19,5 +19,6 @@ function useTestZosPackageFile() {
 }
 
 function doNotInstallStdlib() {
+  Dependency.prototype.installFn = Dependency.prototype.install
   Dependency.prototype.install = () => null
 }
