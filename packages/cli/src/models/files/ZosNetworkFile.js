@@ -232,11 +232,27 @@ export default class ZosNetworkFile {
     this.data.proxies[fullname].push(info)
   }
 
-  updateProxy({ package: proxyPackage, contract: proxyContract, address: proxyAddress }, fn) {
-    const fullname = toContractFullName(proxyPackage, proxyContract)
-    const index = _.findIndex(this.data.proxies[fullname], { address: proxyAddress })
-    if (index === -1) throw Error(`Proxy ${fullname} at ${proxyAddress} not found in network file`)    
+  removeProxy(thepackage, alias, address) {
+    const fullname = toContractFullName(thepackage, alias)
+    const index = this.indexOfProxy(fullname, address)
+    if(index < 0) return
+    this.data.proxies[fullname].splice(index, 1)
+    if(this.proxiesOf(fullname).length === 0) delete this.data.proxies[fullname]
+  }
+
+  updateProxy({ package: proxyPackageName, contract: proxyContractName, address: proxyAddress }, fn) {
+    const fullname = toContractFullName(proxyPackageName, proxyContractName)
+    const index = this.indexOfProxy(fullname, proxyAddress)
+    if (index === -1) throw Error(`Proxy ${fullname} at ${proxyAddress} not found in network file`)
     this.data.proxies[fullname][index] = fn(this.data.proxies[fullname][index]);
+  }
+
+  indexOfProxy(fullname, address) {
+    return _.findIndex(this.data.proxies[fullname], { address })
+  }
+
+  proxiesOf(fullname) {
+    return this.data.proxies[fullname] || []
   }
 
   write() {
