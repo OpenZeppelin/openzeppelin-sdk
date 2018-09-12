@@ -136,18 +136,18 @@ export default class StatusChecker {
       this._checkProxyAlias(matchingProxy, alias, address, implementation)
       this._checkProxyImplementation(matchingProxy, alias, address, implementation)
     } else {
-      this.visitor.onMissingRemoteProxy('none', 'one', { alias, address, implementation })
+      this.visitor.onMissingRemoteProxy('none', 'one', { packageName: this.packageName, alias, address, implementation })
     }
   }
 
   _checkProxyAlias(proxy, alias, address, implementation) {
-    const expected = proxy.contract
-    if (alias !== expected) this.visitor.onMismatchingProxyAlias(expected, alias, { alias, address, implementation })
+    const { contract: expected } = proxy
+    if (alias !== expected) this.visitor.onMismatchingProxyAlias(expected, alias, proxy)
   }
 
   _checkProxyImplementation(proxy, alias, address, implementation) {
-    const expected = proxy.implementation
-    if (implementation !== expected) this.visitor.onMismatchingProxyImplementation(expected, implementation, { alias, address, implementation })
+    const { implementation: expected, package: packageName } = proxy
+    if (implementation !== expected) this.visitor.onMismatchingProxyImplementation(expected, implementation, proxy)
   }
 
   _checkUnregisteredLocalProxies(proxiesInfo) {
@@ -155,8 +155,8 @@ export default class StatusChecker {
     this.networkFile.getProxies()
       .filter(proxy => !foundAddresses.includes(proxy.address))
       .forEach(proxy => {
-        const { alias, address, implementation } = proxy
-        this.visitor.onUnregisteredLocalProxy('one', 'none', { alias, address, implementation })
+        const { contract: alias, package: packageName, address, implementation } = proxy
+        this.visitor.onUnregisteredLocalProxy('one', 'none', { packageName, alias, address, implementation })
       })
   }
 

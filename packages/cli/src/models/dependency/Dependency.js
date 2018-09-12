@@ -40,6 +40,7 @@ export default class Dependency {
   }
 
   async install() {
+    console.log('about to install', [this.nameAndVersion], process.cwd())
     await npm.install([this.nameAndVersion], { save: true, cwd: process.cwd() })
   }
 

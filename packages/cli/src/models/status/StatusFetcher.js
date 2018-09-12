@@ -72,26 +72,27 @@ export default class StatusFetcher {
     this.networkFile.setContractBodyBytecodeHash(alias, bodyBytecodeHash)
   }
 
-  onUnregisteredLocalProxy(expected, observed, { alias, address, implementation }) {
+  onUnregisteredLocalProxy(expected, observed, { packageName, alias, address, implementation }) {
     log.info(`Removing unregistered local proxy of ${alias} at ${address} pointing to ${implementation}`)
-    this.networkFile.removeProxy(alias, address)
+    this.networkFile.removeProxy(packageName, alias, address)
   }
 
-  onMissingRemoteProxy(expected, observed, { alias, address, implementation }) {
+  onMissingRemoteProxy(expected, observed, { packageName, alias, address, implementation }) {
     log.info(`Adding missing proxy of ${alias} at ${address} pointing to ${implementation}`)
-    this.networkFile.addProxy(alias, { address, implementation, version: 'unknown' })
+    this.networkFile.addProxy(packageName, alias, { address, version: 'unknown', implementation })
   }
 
-  onMismatchingProxyAlias(expected, observed, { alias, address, implementation }) {
+  onMismatchingProxyAlias(expected, observed, { package: packageName, contract: alias, address, version, implementation }) {
     log.info(`Changing alias of proxy at ${address} pointing to ${implementation} from ${expected} to ${observed}`)
-    const proxy = this.networkFile.proxyByAddress(expected, address)
-    this.networkFile.removeProxy(expected, address)
-    this.networkFile.addProxy(alias, proxy)
+    this.networkFile.removeProxy(packageName, expected, address)
+    this.networkFile.addProxy(packageName, observed, { address, version, implementation })
   }
 
-  onMismatchingProxyImplementation(expected, observed, { alias, address, implementation }) {
+  onMismatchingProxyImplementation(expected, observed, proxy) {
+    const { package: packageName, version, contract: alias, address, implementation } = proxy
+    const proxyInfo = { address, version, implementation }
     log.info(`Changing implementation of proxy ${alias} at ${address} from ${expected} to ${observed}`)
-    this.networkFile.setProxyImplementation(alias, address, implementation)
+    this.networkFile.updateProxy({ package: packageName, contract: alias, address }, (proxy) => ({ ...proxyInfo, implementation: observed }))
   }
 
   onUnregisteredProxyImplementation(expected, observed, { address, implementation }) {
