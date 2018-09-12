@@ -1,0 +1,96 @@
+import _ from 'lodash';
+import util from 'util';
+
+const SUBSTITUTION_COST = 3,
+      INSERTION_COST = 2,
+      DELETION_COST = 2; 
+  
+export function compareStorageLayouts(original, updated) {
+  // TODO: Check cases with empty storage (both for original and updated)
+  const areEqual = (var1, var2) => storageAreEqual(var1, var2, original.types, updated.types)
+  const distanceMatrix = levenshtein(original.storage, updated.storage, areEqual)
+  const operations = walk(distanceMatrix, original.storage, updated.storage, areEqual)
+  return { changes: operations.filter(op => op.action !== 'equal') }
+}
+
+function storageAreEqual(originalVar, updatedVar, originalTypes, updatedTypes) {
+  return originalVar.label === updatedVar.label
+    && typesAreEqual(originalTypes[originalVar.type], updatedTypes[updatedVar.type], originalTypes, updatedTypes)
+}
+
+function typesAreEqual(originalType, updatedType, originalTypes, updatedTypes) {
+  return originalType.id === updatedType.id;
+}
+
+// Adapted from https://gist.github.com/andrei-m/982927 by Andrei Mackenzie
+function levenshtein(originalStorage, updatedStorage, areEqualFn) {
+  const a = originalStorage,
+        b = updatedStorage;
+
+  if (a.length === 0) return b.length * INSERTION_COST;
+  if (b.length === 0) return a.length * DELETION_COST;
+
+  const matrix = Array(a.length + 1);
+
+  // increment along the first column of each row  
+  for (let i = 0; i <= a.length; i++) { 
+    matrix[i] = Array(b.length + 1); 
+    matrix[i][0] = i * DELETION_COST; 
+  }
+
+  // increment each column in the first row
+  for (let j = 0; j <= b.length; j++) { 
+    matrix[0][j] = j * INSERTION_COST;
+  }
+
+  // fill in the rest of the matrix
+  for (let i = 1; i <= a.length; i++) {
+    for (let j = 1; j <= b.length; j++) {
+      if (areEqualFn(a[i-1], b[j-1])) {
+        matrix[i][j] = matrix[i-1][j-1];
+      } else {
+        const insertionCost = j > a.length ? 0 : INSERTION_COST; // appending is free
+        matrix[i][j] = Math.min(matrix[i-1][j-1] + SUBSTITUTION_COST,
+                                matrix[i][j-1] + insertionCost, 
+                                matrix[i-1][j] + DELETION_COST);
+      }
+    }
+  }
+
+  return matrix;
+}
+
+// Walks an edit distance matrix, returning the sequence of operations performed
+function walk(matrix, originalStorage, updatedStorage, areEqualFn) {
+  const a = originalStorage,
+        b = updatedStorage;
+  let i = matrix.length - 1,
+      j = matrix[0].length - 1;
+  const operations = [];
+
+  while (i > 0 || j > 0) {
+    const cost = matrix[i][j];
+    const isAppend = j >= matrix.length;
+    const insertionCost = isAppend ? 0 : INSERTION_COST;
+    if (i > 0 && j > 0 && cost === matrix[i-1][j-1] && areEqualFn(a[i-1], b[j-1])) {
+      operations.unshift({ action: 'equal', updated: b[j-1], original: a[i-1] });
+      i--;
+      j--;
+    } else if (j > 0 && cost === matrix[i][j-1] + insertionCost) {
+      operations.unshift({ action: (isAppend ? 'append' : 'insertion'), updated: b[j-1] });
+      j--;
+    } else if (i > 0 && cost === matrix[i-1][j] + DELETION_COST) {
+      operations.unshift({ action: 'deletion', original: a[i-1] });
+      i--;
+    } else if (i > 0 && j > 0 && cost === matrix[i-1][j-1] + SUBSTITUTION_COST) {
+      operations.unshift({ action: 'substitution', updated: b[j-1], original: a[i-1] });
+      i--; 
+      j--;
+    } else {
+      throw Error(`Could not walk matrix at position ${i},${j}:\n${matrix.map(util.inspect).join('\n')}\n`)
+    }
+  }
+
+  // console.log(`Walked matrix at position ${i},${j}:\n${matrix.map(util.inspect).join('\n')}\n\nOperations:${operations.map(op => `${op.action}: ${(op.original || {}).label} ${(op.updated || {}).label}`).join('\n')}\n)`)
+  return operations;
+}
