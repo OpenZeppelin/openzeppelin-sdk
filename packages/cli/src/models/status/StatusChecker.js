@@ -1,3 +1,4 @@
+import _ from 'lodash'
 import { Logger, LibProject, AppProject } from 'zos-lib'
 import EventsFilter from './EventsFilter'
 import StatusFetcher from './StatusFetcher'
@@ -33,6 +34,8 @@ export default class StatusChecker {
           ? await LibProject.fetch(this.networkFile.packageAddress, this.networkFile.version, this.txParams)
           : await AppProject.fetch(this.networkFile.appAddress, this.packageName, this.txParams)
       }
+
+      return this._project
     } catch(error) {
       throw Error(`Cannot fetch project contract from address ${this.networkFile.appAddress}.`, error)
     }
@@ -53,9 +56,9 @@ export default class StatusChecker {
     await this.checkVersion()
     await this.checkPackage()
     await this.checkProvider()
-    //await this.checkStdlib()
     await this.checkImplementations()
     await this.checkProxies()
+    await this.checkDependencies()
   }
 
   async checkLib() {
@@ -82,11 +85,10 @@ export default class StatusChecker {
     if(observed !== expected) this.visitor.onMismatchingProvider(expected, observed)
   }
 
-  async checkStdlib() {
-    const currentStdlib = await this._project.currentStdlib()
-    const observed = currentStdlib === ZERO_ADDRESS ? 'none' : currentStdlib
-    const expected = this.networkFile.stdlibAddress || 'none'
-    if(observed !== expected) this.visitor.onMismatchingStdlib(expected, observed)
+  async checkDependencies() {
+    const dependenciesInfo = await this._fetchOnChainPackages()
+    dependenciesInfo.forEach(info => this._checkRemoteDependency(info))
+    this._checkUnregisteredLocalDependencies(dependenciesInfo) // borra una dependency local si no esta onchain
   }
 
   async checkImplementations() {
@@ -140,14 +142,12 @@ export default class StatusChecker {
     }
   }
 
-  _checkProxyAlias(proxy, alias, address, implementation) {
-    const { contract: expected } = proxy
-    if (alias !== expected) this.visitor.onMismatchingProxyAlias(expected, alias, proxy)
+  _checkProxyAlias({ contract: expected }, alias, address, implementation) {
+    if (alias !== expected) this.visitor.onMismatchingProxyAlias(expected, alias, { address, implementation })
   }
 
-  _checkProxyImplementation(proxy, alias, address, implementation) {
-    const { implementation: expected, package: packageName } = proxy
-    if (implementation !== expected) this.visitor.onMismatchingProxyImplementation(expected, implementation, proxy)
+  _checkProxyImplementation({ implementation: expected, package: packageName, version }, alias, address, implementation) {
+    if (implementation !== expected) this.visitor.onMismatchingProxyImplementation(expected, implementation, { alias, version, address, packageName })
   }
 
   _checkUnregisteredLocalProxies(proxiesInfo) {
@@ -157,6 +157,34 @@ export default class StatusChecker {
       .forEach(proxy => {
         const { contract: alias, package: packageName, address, implementation } = proxy
         this.visitor.onUnregisteredLocalProxy('one', 'none', { packageName, alias, address, implementation })
+      })
+  }
+
+  _checkRemoteDependency({ name, version, package: address }) {
+    if (this.networkFile.hasDependency(name)) {
+      this._checkDependencyAddress(name, address)
+      this._checkDependencyVersion(name, version)
+    }
+    else this.visitor.onMissingDependency('none', 'one', { name, address, version })
+  }
+
+  _checkDependencyAddress(name, address) {
+    const expected = this.networkFile.getDependency(name).package
+    if (address !== expected) this.visitor.onMismatchingDependencyAddress(expected, address, { name, address })
+  }
+
+  _checkDependencyVersion(name, version) {
+    const expected = this.networkFile.getDependency(name).version
+    if (version !== expected) this.visitor.onMismatchingDependencyVersion(expected, version, { name, version })
+  }
+
+  _checkUnregisteredLocalDependencies(dependenciesInfo) {
+    const foundDependencies = dependenciesInfo.map(dependency => dependency.name)
+    this.networkFile.dependenciesNames
+      .filter(name => !foundDependencies.includes(name))
+      .forEach(name => {
+        const dependency = this.networkFile.getDependency(name)
+        this.visitor.onUnregisteredDependency('one', 'none', { ...dependency, name })
       })
   }
 
@@ -192,5 +220,21 @@ export default class StatusChecker {
       }
     }))
     return proxiesInfo
+  }
+
+  async _fetchOnChainPackages() {
+    const filter = new EventsFilter()
+    const app = this._project.getApp()
+    const allEvents = await filter.call(app.contract, 'PackageChanged')
+    const filteredEvents = allEvents
+      .filter(event => event.args.package !== ZERO_ADDRESS)
+      .filter(event => event.args.providerName !== this.packageName)
+      .map(event => ({
+        name: event.args.providerName,
+        version: event.args.version,
+        package: event.args.package
+      }));
+
+      return _.uniqWith(filteredEvents, _.isEqual)
   }
 }

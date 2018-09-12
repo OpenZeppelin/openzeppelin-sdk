@@ -25,10 +25,6 @@ export default class StatusComparator {
     this._addReport(expected, observed, 'Provider address does not match')
   }
 
-  onMismatchingStdlib(expected, observed) {
-    this._addReport(expected, observed, 'Stdlib address does not match')
-  }
-
   onUnregisteredLocalContract(expected, observed, { alias, address }) {
     this._addReport(expected, observed, `A contract ${alias} at ${address} is not registered`)
   }
@@ -53,11 +49,11 @@ export default class StatusComparator {
     this._addReport(expected, observed, `Missing registered proxy of ${alias} at ${address} pointing to ${implementation}`)
   }
 
-  onMismatchingProxyAlias(expected, observed, { alias, address, implementation }) {
+  onMismatchingProxyAlias(expected, observed, { address, implementation }) {
     this._addReport(expected, observed, `Alias of proxy at ${address} pointing to ${implementation} does not match`)
 
   }
-  onMismatchingProxyImplementation(expected, observed, { alias, address, implementation }) {
+  onMismatchingProxyImplementation(expected, observed, { alias, address }) {
     this._addReport(expected, observed, `Pointed implementation of ${alias} proxy at ${address} does not match`)
   }
 
@@ -67,6 +63,22 @@ export default class StatusComparator {
 
   onMultipleProxyImplementations(expected, observed, { implementation }) {
     this._addReport(expected, observed, `The same implementation address ${implementation} was registered under many aliases`)
+  }
+
+  onMissingDependency(expected, observed, { name, address }) {
+    this._addReport(expected, observed, `Missing registered dependency ${name} at ${address}`)
+  }
+
+  onMismatchingDependencyAddress(expected, observed, { name, address }) {
+    this._addReport(expected, observed, `Package address of ${name} does not match`)
+  }
+
+  onMismatchingDependencyVersion(expected, observed, { name, version }) {
+    this._addReport(expected, observed, `Package version of ${name} does not match`)
+  }
+
+  onUnregisteredDependency(expected, observed, { name, package: packageAddress }) {
+    this._addReport(expected, observed, `Dependency with name ${name} at address ${packageAddress} is not registered`)
   }
 
   _addReport(expected, observed, description) {

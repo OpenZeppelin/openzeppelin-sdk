@@ -27,11 +27,6 @@ export default class StatusFetcher {
     this.networkFile.provider = { address: observed }
   }
 
-  onMismatchingStdlib(expected, observed) {
-    log.info(`Updating stdlib from ${expected} to ${observed}`)
-    observed === 'none' ? this.networkFile.unsetStdlib() : this.networkFile.setStdlibAddress(observed)
-  }
-
   onUnregisteredLocalContract(expected, observed, { alias, address }) {
     log.info(`Removing unregistered local contract ${alias} ${address}`)
     this.networkFile.removeContract(alias)
@@ -89,7 +84,7 @@ export default class StatusFetcher {
   }
 
   onMismatchingProxyImplementation(expected, observed, proxy) {
-    const { package: packageName, version, contract: alias, address, implementation } = proxy
+    const { packageName, version, alias, address, implementation } = proxy
     const proxyInfo = { address, version, implementation }
     log.info(`Changing implementation of proxy ${alias} at ${address} from ${expected} to ${observed}`)
     this.networkFile.updateProxy({ package: packageName, contract: alias, address }, (proxy) => ({ ...proxyInfo, implementation: observed }))
@@ -101,5 +96,25 @@ export default class StatusFetcher {
 
   onMultipleProxyImplementations(expected, observed, { implementation }) {
     log.warn(`The same implementation address ${implementation} was registered under many aliases (${observed}). Please check them in the list of registered contracts.`)
+  }
+
+  onMissingDependency(expected, observed, { name, address, version }) {
+    log.info(`Adding missing dependency ${name} at ${address} with version ${version}`)
+    this.networkFile.setDependency(name, { package: address, version: version })
+  }
+
+  onMismatchingDependencyAddress(expected, observed, { name, address }) {
+    log.info(`Changing dependency ${name} package address from ${expected} to ${observed}`)
+    this.networkFile.updateDependency(name, (dependency) => ({ ...dependency, package: observed }))
+  }
+
+  onMismatchingDependencyVersion(expected, observed, { name, version }) {
+    log.info(`Changing dependency ${name} version from ${expected} to ${observed}`)
+    this.networkFile.updateDependency(name, (dependency) =>({ ...dependency, version: observed }))
+  }
+
+  onUnregisteredDependency(expected, observed, { name, package: packageAddress }) {
+    log.info(`Removing unregistered local dependency of ${name} at ${packageAddress}`)
+    this.networkFile.unsetDependency(name)
   }
 }
