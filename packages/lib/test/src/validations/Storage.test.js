@@ -60,6 +60,22 @@ contract('Storage', () => {
       t_address: { label: 'address' } 
     })
   })
+
+  describe('on bytes', function () {
+    load('StorageMockWithBytes')
+    
+    checkStorage([ 
+      { label: 'my_bytes', contract: 'StorageMockWithBytes', type: 't_bytes' },
+      { label: 'my_bytes8', contract: 'StorageMockWithBytes', type: 't_bytes8' },
+      { label: 'my_bytes32', contract: 'StorageMockWithBytes', type: 't_bytes32' }
+    ]);
+    
+    checkTypes({ 
+      t_bytes: { label: 'bytes' },
+      t_bytes8: { label: 'bytes8' },
+      t_bytes32: { label: 'bytes32' }
+    })
+  })
   
   describe('on constants', function () {
     load('StorageMockWithConstants')

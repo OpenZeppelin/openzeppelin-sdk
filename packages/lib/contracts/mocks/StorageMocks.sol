@@ -13,6 +13,12 @@ contract SimpleStorageMock {
   address private my_private_address;
 }
 
+contract StorageMockWithBytes {
+  bytes internal my_bytes;
+  bytes8 internal my_bytes8;
+  bytes32 internal my_bytes32;
+}
+
 contract StorageMockWithConstants {
   uint256 public constant my_public_uint256 = 256;
   string internal constant my_internal_string = "foo";
