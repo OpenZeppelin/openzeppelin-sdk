@@ -217,14 +217,15 @@ export default class ZosNetworkFile {
     delete this.data.contracts[alias]
   }
 
+  unsetContract(alias) {
+    delete this.data.contracts[alias];
+  }
+
   setProxies(packageName, alias, value) {
     const fullname = toContractFullName(packageName, alias)
     this.data.proxies[fullname] = value
   }
 
-  unsetContract(alias) {
-    delete this.data.contracts[alias];
-  }
 
   addProxy(thepackage, alias, info) {
     const fullname = toContractFullName(thepackage, alias)
@@ -245,6 +246,11 @@ export default class ZosNetworkFile {
     const index = this.indexOfProxy(fullname, proxyAddress)
     if (index === -1) throw Error(`Proxy ${fullname} at ${proxyAddress} not found in network file`)
     this.data.proxies[fullname][index] = fn(this.data.proxies[fullname][index]);
+  }
+
+  proxyFromIndex(thepackage, alias, index) {
+    const fullname = toContractFullName(thepackage, alias)
+    return this.proxiesOf(fullname)[index]
   }
 
   indexOfProxy(fullname, address) {
