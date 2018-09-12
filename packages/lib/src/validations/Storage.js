@@ -123,12 +123,11 @@ class StorageLayout {
   }
 
   getElementaryTypeInfo({ typeDescriptions }) {
-    const id = typeDescriptions.typeIdentifier.startsWith('t_string')
-      ? 't_string' 
-      : typeDescriptions.typeIdentifier;
-
+    const identifier = typeDescriptions.typeIdentifier
+      .replace(/_storage(_ptr)?$/, '')
+    
     return { 
-      id,
+      id: identifier,
       kind: 'elementary',
       label: typeDescriptions.typeString
     }
