@@ -255,19 +255,22 @@ contract('Storage', () => {
     })
   })
   
-  for (const contractName of ['StorageMockWithReferences', 'StorageMockWithTransitiveReferences']) {
+  for (const contractName of ['StorageMockWithReferences', 'StorageMockWithTransitiveReferences', 'StorageMockWithNodeModulesReferences']) {
     describe(`on references to other files in ${contractName}`, function () {
       load(contractName)
+
+      const structScope = contractName === 'StorageMockWithNodeModulesReferences' ? 'DependencyStorageMock' : 'StorageMockWithStructs';
+      const enumScope = contractName === 'StorageMockWithNodeModulesReferences' ? 'DependencyStorageMock' : 'StorageMockWithEnums';
       
       checkStorage([ 
-        { label: 'my_enum', type: 't_enum<StorageMockWithEnums.MyEnum>' },
-        { label: 'my_struct', type: 't_struct<StorageMockWithStructs.MyStruct>' },
+        { label: 'my_enum', type: `t_enum<${enumScope}.MyEnum>` },
+        { label: 'my_struct', type: `t_struct<${structScope}.MyStruct>` },
         { label: 'my_contract', type: 't_address' }
       ])
       
       checkTypes({
-        't_struct<StorageMockWithStructs.MyStruct>': { kind: 'struct', label: 'StorageMockWithStructs.MyStruct' },
-        't_enum<StorageMockWithEnums.MyEnum>': { kind: 'enum', label: 'StorageMockWithEnums.MyEnum', members: ['State1', 'State2'] }
+        [`t_struct<${structScope}.MyStruct>`]: { kind: 'struct', label: `${structScope}.MyStruct` },
+        [`t_enum<${enumScope}.MyEnum>`]: { kind: 'enum', label: `${enumScope}.MyEnum`, members: ['State1', 'State2'] }
       })
     })
   }
