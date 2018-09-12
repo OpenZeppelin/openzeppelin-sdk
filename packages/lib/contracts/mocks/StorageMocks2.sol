@@ -1,11 +1,18 @@
 pragma solidity ^0.4.24;
 
 import "./StorageMocks.sol";
+import "mock-dependency/contracts/DependencyStorageMock.sol";
 
 contract StorageMockWithReferences {
   StorageMockWithEnums.MyEnum internal my_enum;
   StorageMockWithStructs.MyStruct internal my_struct;
   SimpleStorageMock internal my_contract;
+}
+
+contract StorageMockWithNodeModulesReferences {
+  DependencyStorageMock.MyEnum internal my_enum;
+  DependencyStorageMock.MyStruct internal my_struct;
+  DependencyStorageMock internal my_contract;
 }
 
 contract StorageMockChainBase {
