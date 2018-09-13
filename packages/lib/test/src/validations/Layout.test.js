@@ -72,4 +72,18 @@ contract('Layout', () => {
     ])
   });
 
+  it('reports deleted var', function () {
+    const result = compare('StorageMockSimpleOriginal', 'StorageMockSimpleWithDeletedVar');
+    assertChanges(result, [
+      { original: { label: 'a', contract: 'StorageMockSimpleOriginal', type: 't_uint256' }, action: 'delete' }
+    ])
+  });
+
+  it('reports popped var', function () {
+    const result = compare('StorageMockSimpleOriginal', 'StorageMockSimpleWithPoppedVar');
+    assertChanges(result, [
+      { original: { label: 'b', contract: 'StorageMockSimpleOriginal', type: 't_uint256' }, action: 'pop' }
+    ])
+  });
+
 })

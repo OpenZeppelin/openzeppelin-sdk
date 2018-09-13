@@ -45,3 +45,11 @@ contract StorageMockSimpleWithTypeChanged {
   uint256 a;
   string b;
 }
+
+contract StorageMockSimpleWithDeletedVar {
+  uint256 b;
+}
+
+contract StorageMockSimpleWithPoppedVar {
+  uint256 a;
+}
