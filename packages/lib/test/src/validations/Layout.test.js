@@ -36,21 +36,21 @@ contract('Layout', () => {
   it('reports inserted var', function () {
     const result = compare('StorageMockSimpleOriginal', 'StorageMockSimpleWithInsertedVar');
     assertChanges(result, [
-      { updated: { label: 'c', contract: 'StorageMockSimpleWithInsertedVar', type: 't_uint256' }, action: 'insert' }
+      { updated: { label: 'c', contract: 'StorageMockSimpleWithInsertedVar', type: 't_uint256', index: 1 }, action: 'insert' }
     ])
   });
 
   it('reports unshifted var', function () {
     const result = compare('StorageMockSimpleOriginal', 'StorageMockSimpleWithUnshiftedVar');
     assertChanges(result, [
-      { updated: { label: 'c', contract: 'StorageMockSimpleWithUnshiftedVar', type: 't_uint256' }, action: 'insert' }
+      { updated: { label: 'c', contract: 'StorageMockSimpleWithUnshiftedVar', type: 't_uint256', index: 0 }, action: 'insert' }
     ])
   });
 
   it('reports appended var', function () {
     const result = compare('StorageMockSimpleOriginal', 'StorageMockSimpleWithAddedVar');
     assertChanges(result, [
-      { updated: { label: 'c', contract: 'StorageMockSimpleWithAddedVar', type: 't_uint256' }, action: 'append' }
+      { updated: { label: 'c', contract: 'StorageMockSimpleWithAddedVar', type: 't_uint256', index: 2 }, action: 'append' }
     ])
   });
 
@@ -75,7 +75,7 @@ contract('Layout', () => {
   it('reports deleted var', function () {
     const result = compare('StorageMockSimpleOriginal', 'StorageMockSimpleWithDeletedVar');
     assertChanges(result, [
-      { original: { label: 'a', contract: 'StorageMockSimpleOriginal', type: 't_uint256' }, action: 'delete' }
+      { original: { label: 'a', contract: 'StorageMockSimpleOriginal', type: 't_uint256', index: 0 }, action: 'delete' }
     ])
   });
 

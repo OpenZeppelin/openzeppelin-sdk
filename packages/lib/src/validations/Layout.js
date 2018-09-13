@@ -85,19 +85,21 @@ function walk(matrix, originalStorage, updatedStorage, areMatchFn) {
     const isPop = i >= matrix[0].length;
     const insertionCost = isAppend ? 0 : INSERTION_COST;
     const matchResult = i > 0 && j > 0 && areMatchFn(a[i-1], b[j-1]);
+    const updated = j > 0 && { index: j-1, ...b[j-1] }
+    const original = i > 0 && { index: i-1, ...a[i-1] }
     
     if (i > 0 && j > 0 && cost === matrix[i-1][j-1] && matchResult === 'equal') {
-      operations.unshift({ action: 'equal', updated: b[j-1], original: a[i-1] });
+      operations.unshift({ action: 'equal', updated, original });
       i--;
       j--;
     } else if (j > 0 && cost === matrix[i][j-1] + insertionCost) {
-      operations.unshift({ action: (isAppend ? 'append' : 'insert'), updated: b[j-1] });
+      operations.unshift({ action: (isAppend ? 'append' : 'insert'), updated });
       j--;
     } else if (i > 0 && cost === matrix[i-1][j] + DELETION_COST) {
-      operations.unshift({ action: (isPop ? 'pop' : 'delete'), original: a[i-1] });
+      operations.unshift({ action: (isPop ? 'pop' : 'delete'), original });
       i--;
     } else if (i > 0 && j > 0 && cost === matrix[i-1][j-1] + SUBSTITUTION_COST) {
-      operations.unshift({ action: matchResult, updated: b[j-1], original: a[i-1] });
+      operations.unshift({ action: matchResult, updated, original });
       i--; 
       j--;
     } else {
