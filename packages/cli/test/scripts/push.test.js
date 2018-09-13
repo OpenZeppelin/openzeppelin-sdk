@@ -73,6 +73,8 @@ contract('push script', function([_, owner]) {
       const contract = this.networkFile.contract('Impl');
       contract.address.should.be.nonzeroAddress;
       contract.bytecodeHash.should.not.be.empty;
+      contract.storage.should.not.be.empty;
+      contract.types.should.not.be.empty;
       const deployed = await ImplV1.at(contract.address);
       (await deployed.say()).should.eq('V1');
     });
@@ -91,29 +93,51 @@ contract('push script', function([_, owner]) {
   };
 
   const shouldRedeployContracts = function () {
+    beforeEach('loading previous address', function () {
+      this.previousAddress = this.networkFile.contract('Impl').address
+    })
+
     it('should not redeploy contracts if unmodified', async function () {
-      const previousAddress = this.networkFile.contract('Impl').address
       await push({ networkFile: this.networkFile, network, txParams });
-      this.networkFile.contract('Impl').address.should.eq(previousAddress);
+      this.networkFile.contract('Impl').address.should.eq(this.previousAddress);
     });
 
     it('should redeploy unmodified contract if forced', async function () {
-      const previousAddress = this.networkFile.contract('Impl').address
       await push({ networkFile: this.networkFile, network, txParams, reupload: true });
-      this.networkFile.contract('Impl').address.should.not.eq(previousAddress);
+      this.networkFile.contract('Impl').address.should.not.eq(this.previousAddress);
     });
 
     it('should redeploy contracts if modified', async function () {
-      const contractData = this.networkFile.contract('Impl');
-      const previousAddress = contractData.address
-      contractData.bytecodeHash = '0xabab'
-      this.networkFile.contracts = { 'Impl': contractData }
-      this.networkFile.contracts = [contractData]
-
+      modifyBytecode.call(this, 'Impl');
       await push({ networkFile: this.networkFile, network, txParams });
-
-      this.networkFile.contract('Impl').address.should.not.eq(previousAddress);
+      this.networkFile.contract('Impl').address.should.not.eq(this.previousAddress);
     });
+
+    it('should refuse to redeploy a contract if storage is incompatible', async function () {
+      modifyBytecode.call(this, 'Impl');
+      modifyStorageInfo.call(this, 'Impl');
+      await push({ networkFile: this.networkFile, network, txParams }).should.be.rejectedWith(/review the warnings/)
+      this.networkFile.contract('Impl').address.should.eq(this.previousAddress);
+    });
+
+    it('should redeploy contract ignoring warnings', async function () {
+      modifyBytecode.call(this, 'Impl');
+      modifyStorageInfo.call(this, 'Impl');
+      await push({ force: true, networkFile: this.networkFile, network, txParams });
+      this.networkFile.contract('Impl').address.should.not.eq(this.previousAddress);
+    });
+
+    function modifyBytecode(contractAlias) {
+      const contractData = this.networkFile.contract(contractAlias);
+      this.networkFile.setContract(contractAlias, { ... contractData, bytecodeHash: '0xabcdef' })
+    }
+
+    function modifyStorageInfo(contractAlias) {
+      const contractData = this.networkFile.contract(contractAlias);
+      const fakeVariable = {label: 'deleted', type: 't_uint256', contract: 'ImplV1'};
+      const modifiedStorage = [fakeVariable, ... contractData.storage]
+      this.networkFile.setContract(contractAlias, { ... contractData, storage: modifiedStorage })
+    }
   }
 
   const shouldBumpVersion = function () {
@@ -137,10 +161,9 @@ contract('push script', function([_, owner]) {
     it('should upload contracts to new directory when bumping version', async function () {
       await bumpVersion({ version: '1.2.0', packageFile: this.networkFile.packageFile });
       await push({ networkFile: this.networkFile, network, txParams });
-
-      const implementationAddreess = this.networkFile.contract('Impl').address;
+      const implementationAddress = this.networkFile.contract('Impl').address;
       const _package = await Package.fetch(this.networkFile.package.address);
-      (await _package.getImplementation('1.2.0', 'Impl')).should.eq(implementationAddreess);
+      (await _package.getImplementation('1.2.0', 'Impl')).should.eq(implementationAddress);
     });
   };
 
