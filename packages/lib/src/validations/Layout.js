@@ -105,6 +105,5 @@ function walk(matrix, originalStorage, updatedStorage, areMatchFn) {
     }
   }
 
-  // console.log(`Walked matrix at position ${i},${j}:\n${matrix.map(util.inspect).join('\n')}\n\nOperations:${operations.map(op => `${op.action}: ${(op.original || {}).label} ${(op.updated || {}).label}`).join('\n')}\n)`)
   return operations;
 }
