@@ -88,7 +88,7 @@ export default class StatusChecker {
   async checkDependencies() {
     const dependenciesInfo = await this._fetchOnChainPackages()
     dependenciesInfo.forEach(info => this._checkRemoteDependency(info))
-    this._checkUnregisteredLocalDependencies(dependenciesInfo) // borra una dependency local si no esta onchain
+    this._checkUnregisteredLocalDependencies(dependenciesInfo)
   }
 
   async checkImplementations() {
@@ -132,22 +132,26 @@ export default class StatusChecker {
       })
   }
 
-  _checkRemoteProxy({ alias, address, implementation }) {
-    const matchingProxy = this.networkFile.getProxy(address)
-    if (matchingProxy) {
-      this._checkProxyAlias(matchingProxy, alias, address, implementation)
-      this._checkProxyImplementation(matchingProxy, alias, address, implementation)
+  _checkRemoteProxy(remoteProxyInfo) {
+    const localProxyInfo = this.networkFile.getProxy(remoteProxyInfo.address)
+    if (localProxyInfo) {
+      this._checkProxyAlias(localProxyInfo, remoteProxyInfo)
+      this._checkProxyImplementation(localProxyInfo, remoteProxyInfo)
     } else {
-      this.visitor.onMissingRemoteProxy('none', 'one', { packageName: this.packageName, alias, address, implementation })
+      this.visitor.onMissingRemoteProxy('none', 'one', { ...remoteProxyInfo, packageName: this.packageName })
     }
   }
 
-  _checkProxyAlias({ contract: expected }, alias, address, implementation) {
-    if (alias !== expected) this.visitor.onMismatchingProxyAlias(expected, alias, { address, implementation })
+  _checkProxyAlias(localProxyInfo, remoteProxyInfo) {
+    const { alias: observed } = remoteProxyInfo
+    const { contract: expected, version, package: packageName } = localProxyInfo
+    if (observed !== expected) this.visitor.onMismatchingProxyAlias(expected, observed, { packageName, version, ...remoteProxyInfo })
   }
 
-  _checkProxyImplementation({ implementation: expected, package: packageName, version }, alias, address, implementation) {
-    if (implementation !== expected) this.visitor.onMismatchingProxyImplementation(expected, implementation, { alias, version, address, packageName })
+  _checkProxyImplementation(localProxyInfo, remoteProxyInfo) {
+    const { implementation: observed } = remoteProxyInfo
+    const { implementation: expected, version, package: packageName } = localProxyInfo
+    if (observed !== expected) this.visitor.onMismatchingProxyImplementation(expected, observed, { packageName, version, ...remoteProxyInfo })
   }
 
   _checkUnregisteredLocalProxies(proxiesInfo) {

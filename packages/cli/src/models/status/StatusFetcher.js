@@ -77,17 +77,15 @@ export default class StatusFetcher {
     this.networkFile.addProxy(packageName, alias, { address, version: 'unknown', implementation })
   }
 
-  onMismatchingProxyAlias(expected, observed, { package: packageName, contract: alias, address, version, implementation }) {
-    log.info(`Changing alias of proxy at ${address} pointing to ${implementation} from ${expected} to ${observed}`)
+  onMismatchingProxyAlias(expected, observed, { packageName, address, version, implementation }) {
+    log.info(`Changing alias of package ${packageName} proxy at ${address} pointing to ${implementation} from ${expected} to ${observed}`)
     this.networkFile.removeProxy(packageName, expected, address)
     this.networkFile.addProxy(packageName, observed, { address, version, implementation })
   }
 
-  onMismatchingProxyImplementation(expected, observed, proxy) {
-    const { packageName, version, alias, address, implementation } = proxy
-    const proxyInfo = { address, version, implementation }
+  onMismatchingProxyImplementation(expected, observed, { packageName, address, version, implementation, alias }) {
     log.info(`Changing implementation of proxy ${alias} at ${address} from ${expected} to ${observed}`)
-    this.networkFile.updateProxy({ package: packageName, contract: alias, address }, (proxy) => ({ ...proxyInfo, implementation: observed }))
+    this.networkFile.updateProxy({ package: packageName, contract: alias, address }, (proxy) => ({ ...proxy, implementation: observed }))
   }
 
   onUnregisteredProxyImplementation(expected, observed, { address, implementation }) {
