@@ -150,14 +150,13 @@ export default class NetworkBaseController {
     if (_.isEmpty(originalStorageInfo.storage)) return true;
     const contract = Contracts.getFromLocal(contractName);
     const updatedStorageInfo = getStorageLayout(contract, buildArtifacts)
-    const diff = compareStorageLayouts(originalStorageInfo, updatedStorageInfo)
-    if (!_.isEmpty(diff)) {
-      this._logStorageLayoutDiffs(contract, diff, originalStorageInfo, updatedStorageInfo, buildArtifacts)
+    const storageDiff = compareStorageLayouts(originalStorageInfo, updatedStorageInfo)
+    if (!_.isEmpty(storageDiff)) {
+      this._logStorageLayoutDiffs(contract, storageDiff, originalStorageInfo, updatedStorageInfo, buildArtifacts)
       log.info('Read more at https://docs.zeppelinos.org/docs/advanced.html#preserving-the-storage-structure')
-      return false
     }
 
-    return true
+    return _.every(storageDiff, diff => diff.action === 'append')
   }
 
   _logStorageLayoutDiffs(contract, storageDiff, originalStorageInfo, updatedStorageInfo, buildArtifacts) {
@@ -174,8 +173,7 @@ export default class NetworkBaseController {
 
       switch (action) {
         case 'insert':
-          log.error(`New variable '${updatedVarDescription}' was added in contract ${updated.contract} in ${updatedVarSource} before ` +
-                    `variable '${updatedStorageInfo[updated.index + 1].label}'.\n`+
+          log.error(`New variable '${updatedVarDescription}' was added in contract ${updated.contract} in ${updatedVarSource}\n` +
                     `This pushes all variables after ${updated.label} to a higher position in storage, `+
                     `causing the updated contract to read incorrect initial values. Only add new variables at the `+
                     `end of your contract to prevent this issue`);
@@ -202,10 +200,18 @@ export default class NetworkBaseController {
                    `If this is not the desired behavior, add a new variable ${updated.label} at the end of your contract instead.`)
           break;
         case 'typechange':
-          log.warn(`Variable ${original.label} in contract ${original.contract} was changed from ${originalVarType.label} \n` +
-                   `to ${updatedVarType.label} in ${updatedVarSource}. If ${updatedVarType.label} is not compatible with ${originalVarType.label}, ` +
+          log.warn(`Variable '${original.label}' in contract ${original.contract} was changed from ${originalVarType.label} ` +
+                   `to ${updatedVarType.label} in ${updatedVarSource}.\nIf ${updatedVarType.label} is not compatible with ${originalVarType.label}, ` +
                    `then ${updated.label} could be initialized with an invalid value after upgrading. Avoid changing types of existing ` +
                    `variables to prevent this issue, and declare new ones at the end of your contract instead.`)
+          break;
+        case 'replace':
+          log.warn(`Variable '${originalVarDescription}' in contract ${original.contract} was replaced with '${updatedVarDescription}' ` +
+                   `in ${updatedVarSource}.\nThis will cause ${updated.label} to be initialized with the value of ${original.label}. ` +
+                   `If type ${updatedVarType.label} is not compatible with ${originalVarType.label}, then ${updated.label} could be `+
+                   `initialized with an invalid value after upgrading. Avoid changing types of existing ` +
+                   `variables to prevent this issue, and declare new ones at the end of your contract instead.`)
+          break;
         default:
           log.error(`Unexpected layout changeset: ${action}`)
       }
@@ -215,7 +221,7 @@ export default class NetworkBaseController {
   _srcToLineNumber(sourceCode, srcFragment) {
     if (!sourceCode || !srcFragment) return null;
     const [begin] = srcFragment.split(':', 1);
-    return read(sourceCode).substr(0, begin).split('\n').length
+    return sourceCode.substr(0, begin).split('\n').length
   }
 
   _tryGetSourceFragment(sourceCode, src) {
