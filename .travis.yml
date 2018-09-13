@@ -8,6 +8,7 @@ cache:
   # different artifacts on every run, causing travis to re-generate the cache every time.
   # This requires us to run lerna bootstrap on every stage, to rebuild contracts.
   directories:
+  - "$HOME/.npm"
   - node_modules
   - packages/lib/node_modules
   - packages/cli/node_modules
