@@ -25,7 +25,7 @@ describe(`cli-app on ${network}`, function () {
     copy('package.json.v1', 'package.json')
     copy('Samples.sol', 'contracts/Samples.sol')
     copy('WithToken.sol', 'contracts/WithToken.sol')
-    run('npx lerna bootstrap --scope=cli-app-tests-workdir > /dev/null')
+    run('npx lerna bootstrap --scope=cli-app-tests-workdir --no-ci > /dev/null')
   });
 
   before('loading accounts', async function () {
@@ -90,7 +90,7 @@ describe(`cli-app on ${network}`, function () {
 
   it('installs new version of a dependency', function () {
     copy('package.json.v2', 'package.json')
-    run('npx lerna bootstrap')
+    run('npx lerna bootstrap --scope=cli-app-tests-workdir --no-ci > /dev/null')
     run('npx zos link openzeppelin-zos@1.9.4 --no-install')
   })
 
