@@ -1,9 +1,9 @@
 import { deploy } from "../utils/Transactions";
 import Logger from "../utils/Logger";
 
-const log = new Logger('Project')
+const log = new Logger('PackageProject')
 
-export default class Project {
+export default class BasePackageProject {
 
   constructor(txParams) {
     this.txParams = txParams

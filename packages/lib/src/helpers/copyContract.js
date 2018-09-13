@@ -11,7 +11,7 @@ function sleep(ms) {
 }
 
 async function sendTransaction(params) {
-  if (!params.gas) params.gas = await estimateGas(params.data, params)
+  if (!params.gas) params.gas = await estimateGas(params)
   return promisify(web3.eth.sendTransaction.bind(web3.eth))(params)
 }
 

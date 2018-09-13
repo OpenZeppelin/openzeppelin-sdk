@@ -1,13 +1,13 @@
 'use strict'
 require('../../setup')
 
-import { deploy, sendTransaction } from '../../../src/utils/Transactions';
+import { deploy, sendTransaction, sendDataTransaction } from '../../../src/utils/Transactions';
 import Contracts from '../../../src/utils/Contracts';
-import { assertRevert } from '../../../src';
+import { assertRevert, encodeCall } from '../../../src';
 
 const DEFAULT_GAS = 6721975;
 
-contract('Transactions', function([account1, account2]) {
+contract('Transactions', function([_account1, account2]) {
 
   beforeEach('load contract', function () {
     this.DummyImplementation = Contracts.getFromLocal('DummyImplementation');
@@ -70,6 +70,39 @@ contract('Transactions', function([account1, account2]) {
 
     it('handles failing transactions', async function () {
       await assertRevert(sendTransaction(this.instance.reverts));
+    });
+  });
+
+  describe('sendDataTransaction', function () {
+    beforeEach('deploys contract', async function () {
+      this.instance = await deploy(this.DummyImplementation);
+      this.encodedCall = encodeCall('initialize', ['uint256', 'string', 'uint256[]'], [42, 'foo', [1,2,3]]);
+    });
+
+    it('correctly sends the transaction', async function () {      
+      await sendDataTransaction(this.instance, { data: this.encodedCall });
+      const actualValue = await this.instance.value();
+      actualValue.toNumber().should.eq(42);
+    });
+
+    it('estimates gas', async function () {
+      const { tx } = await sendDataTransaction(this.instance, { data: this.encodedCall });
+      assertGasLt(tx, 1000000);
+    });
+
+    it('uses specified gas', async function () {
+      const { tx } = await sendDataTransaction(this.instance, { data: this.encodedCall, gas: 800000 });
+      assertGas(tx, 800000);
+    });
+
+    it('honours other tx params', async function () {
+      const { tx } = await sendDataTransaction(this.instance, { data: this.encodedCall, from: account2 });
+      assertGasLt(tx, 1000000);
+      assertFrom(tx, account2);
+    });
+
+    it('handles failing transactions', async function () {
+      await assertRevert(sendDataTransaction(this.instance, { data: encodeCall('reverts') }));
     });
   });
 

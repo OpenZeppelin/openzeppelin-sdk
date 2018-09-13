@@ -4,7 +4,6 @@ require('../../setup')
 import expectEvent from 'openzeppelin-solidity/test/helpers/expectEvent';
 import VersionedApp from '../../../src/app/VersionedApp';
 import shouldBehaveLikeApp from './BaseApp.behavior';
-import FreezableImplementationDirectory from '../../../src/directory/FreezableImplementationDirectory';
 import { deploy as deployContract } from '../../../src/utils/Transactions';
 import Contracts from '../../../src/utils/Contracts'
 import Package from '../../../src/package/Package';

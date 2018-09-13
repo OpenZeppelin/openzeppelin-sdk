@@ -1,0 +1,62 @@
+import _ from 'lodash';
+import { buildCallData, callDescription } from '../utils/ABIs';
+import { deploy, sendDataTransaction } from "../utils/Transactions";
+import Proxy from '../proxy/Proxy';
+import Logger from '../utils/Logger';
+
+const log = new Logger('SimpleProject')
+
+export default class SimpleProject  {
+  constructor(name = 'main', txParamsAdmin = {}, txParamsInitializer = {}) {
+    this.txParamsAdmin = txParamsAdmin
+    this.txParamsInitializer = txParamsInitializer
+    this.name = name
+  }
+
+  async createProxy(contractClass, { initMethod, initArgs } = {}) {
+    if (!_.isEmpty(initArgs) && !initMethod) initMethod = 'initialize'
+
+    const implementation = await this._deployImplementation(contractClass);    
+    log.info(`Creating proxy to logic contract ${implementation.address}`)
+    const proxy = await Proxy.deploy(implementation, this.txParamsAdmin)
+    await this._tryInitializeProxy(proxy, contractClass, initMethod, initArgs)
+    
+    log.info(`Instance created at ${proxy.address}`)
+    return new contractClass(proxy.address);
+  }
+
+  async upgradeProxy(proxyAddress, contractClass, { initMethod, initArgs } = {}) {
+    const implementation = await this._deployImplementation(contractClass);    
+    log.info(`Upgrading proxy to new logic contract at ${implementation.address}`)
+    const proxy = Proxy.at(proxyAddress, this.txParamsAdmin)
+    await proxy.upgradeTo(implementation)    
+    await this._tryInitializeProxy(proxy, contractClass, initMethod, initArgs)
+    
+    log.info(`Instance at ${proxyAddress} upgraded`)
+    return new contractClass(proxyAddress);
+  }
+
+  async changeProxyAdmin(proxyAddress, newAdmin) {
+    const proxy = Proxy.at(proxyAddress, this.txParamsAdmin)
+    await proxy.changeAdmin(newAdmin)
+    log.info(`Proxy admin changed to ${newAdmin}`)
+    return proxy
+  }
+
+  async _deployImplementation(contractClass) {
+    log.info(`Deploying logic contract for ${contractClass.contractName}`);
+    const implementation = await deploy(contractClass, [], this.txParamsAdmin);
+    return implementation;
+  }
+
+  async _tryInitializeProxy(proxy, contractClass, initMethodName, initArgs) {
+    if (!initMethodName) return;
+    if (this.txParamsInitializer.from === this.txParamsAdmin.from) {
+      throw Error(`Cannot initialize the proxy from the same address as its admin address. Make sure you use a different 'from' account for the initialization transaction params.`)
+    }
+    
+    const { method: initMethod, callData } = buildCallData(contractClass, initMethodName, initArgs);
+    log.info(`Initializing proxy at ${proxy.address} by calling ${callDescription(initMethod, initArgs)}`);
+    await sendDataTransaction(proxy.contract, Object.assign({}, this.txParamsInitializer, { data: callData }))
+  }
+}
