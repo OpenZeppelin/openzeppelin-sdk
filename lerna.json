@@ -1,7 +1,9 @@
 {
   "packages": [
     "examples/*",
-    "packages/*"
+    "packages/*",
+    "tests/*",
+    "tests/cli-app/workdir"
   ],
   "version": "1.4.2",
   "command": {

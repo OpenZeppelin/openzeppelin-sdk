@@ -1,0 +1,17 @@
+{
+  "name": "cli-app-tests",
+  "private": true,
+  "version": "1.4.1",
+  "description": "Integration tests for CLI app",
+  "author": "santiago@zeppelin.solutions",
+  "license": "MIT",
+  "scripts": {
+    "test": "scripts/test.sh"
+  },
+  "devDependencies": {
+    "chai": "^4.1.2",
+    "lodash": "^4.17.0",
+    "mocha": "5.2.0",
+    "truffle": "^4.1.14"
+  }
+}
