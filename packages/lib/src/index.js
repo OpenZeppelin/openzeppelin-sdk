@@ -27,6 +27,7 @@ import UpgradeabilityProxyFactory from './factory/UpgradeabilityProxyFactory'
 import BasePackageProject from './project/BasePackageProject'
 import LibProject from './project/LibProject'
 import AppProject from './project/AppProject'
+import SimpleProject from './project/SimpleProject'
 
 export {
   version,
@@ -49,5 +50,6 @@ export {
   Package,
   BasePackageProject,
   LibProject,
-  AppProject
+  AppProject,
+  SimpleProject
 }
