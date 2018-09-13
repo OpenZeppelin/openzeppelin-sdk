@@ -1,4 +1,6 @@
 import _ from 'lodash';
+import path from 'path';
+import process from 'process';
 import { getBuildArtifacts } from "../utils/BuildArtifacts";
 
 export function getStorageLayout(contract, artifacts) {
@@ -55,11 +57,12 @@ class StorageLayout {
   }
 
   visitVariables(contractNode) {
+    const sourcePath = path.relative(process.cwd(), this.getNode(contractNode.scope, 'SourceUnit').absolutePath)
     const varNodes = contractNode.nodes.filter(node => node.stateVariable && !node.constant)
     varNodes.forEach(node => {
       const typeInfo = this.getTypeInfo(node.typeName)
       this.registerType(typeInfo)
-      const storageInfo = { contract: contractNode.name, ... this.getStorageInfo(node, typeInfo) }
+      const storageInfo = { contract: contractNode.name, path: sourcePath, ... this.getStorageInfo(node, typeInfo) }
       this.storage.push(storageInfo)
     })
   }
@@ -93,7 +96,8 @@ class StorageLayout {
     return {
       label: varNode.name,
       astId: varNode.id,
-      type: typeInfo.id
+      type: typeInfo.id,
+      src: varNode.src
     }
   }
 

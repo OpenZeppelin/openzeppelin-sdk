@@ -41,6 +41,12 @@ contract('Storage', () => {
   describe('on simple storage variables', function () {
     load('SimpleStorageMock')
     
+    it('tracks src and path', function () {
+      this.storage[0].src.should.eq('134:32:17')
+      this.storage[0].path.should.match(/StorageMocks\.sol$/)
+      this.storage[0].path.should.not.match(/^\//)
+    })
+
     checkStorage([ 
       { label: 'my_public_uint256', contract: 'SimpleStorageMock', type: 't_uint256' },
       { label: 'my_internal_string', contract: 'SimpleStorageMock', type: 't_string' },
