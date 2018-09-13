@@ -48,6 +48,24 @@ export async function deploy(contract, args = [], txParams = {}, retries = RETRY
 }
 
 /**
+ * Sends a transaction to the blockchain with data precalculated
+ * Uses the node's estimateGas RPC call, and adds a 20% buffer on top of it, capped by the block gas limit.
+ * @param contract contract instance to send the tx to
+ * @param txParams all transaction parameters (data, from, gasPrice, etc)
+ */
+export async function sendDataTransaction(contract, txParams) {
+  // If gas is set explicitly, use it
+  if (txParams.gas) {
+    return contract.sendTransaction(txParams)
+  }
+  // Estimate gas for the call
+  const estimatedGas = await estimateGas({ to: contract.address, ... txParams });
+  // Run the tx
+  const gasToUse = await calculateActualGas(estimatedGas);
+  return contract.sendTransaction({ gas: gasToUse, ... txParams });
+}
+
+/**
  * Sends a transaction to the blockchain, estimating the gas to be used.
  * Uses the node's estimateGas RPC call, and adds a 20% buffer on top of it, capped by the block gas limit.
  * @param contractFn contract function to be executed as the transaction
@@ -89,14 +107,14 @@ async function _deploy(contract, args = [], txParams = {}) {
   const txData = web3.eth.contract(contract.abi).new.getData(...args, txOpts);
 
   // Deploy the contract using estimated gas
-  const estimatedGas = await estimateGas(txData, txParams)
+  const estimatedGas = await estimateGas({ data: txData, ... txParams})
   const gasToUse = await calculateActualGas(estimatedGas);
   return contract.new(...args, { gas: gasToUse, ... txParams });
 }
 
-export async function estimateGas(txData, txParams) {
+export async function estimateGas(txParams) {
   // Use json-rpc method estimateGas to retrieve estimated value
-  return promisify(web3.eth.estimateGas.bind(web3.eth))({ data: txData, ... txParams });
+  return promisify(web3.eth.estimateGas.bind(web3.eth))(txParams);
 }
 
 async function getNodeVersion () {

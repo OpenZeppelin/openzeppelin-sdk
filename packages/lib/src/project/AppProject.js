@@ -1,8 +1,9 @@
-import Project from "./Project";
+import BasePackageProject from "./BasePackageProject";
 import VersionedApp from "../app/VersionedApp";
 import Package from "../package/Package";
+import _ from 'lodash';
 
-export default class AppProject extends Project {
+export default class AppProject extends BasePackageProject {
   static async fetch(appAddress, name, txParams) {
     const app = await VersionedApp.fetch(appAddress, txParams)
     const packageInfo = await app.getPackage(name)
@@ -60,29 +61,27 @@ export default class AppProject extends Project {
   }
 
   // TODO: Testme
-  async changeProxyAdmin(proxyAddress, newAdmin) {
-    return this.app.changeProxyAdmin(proxyAddress, newAdmin)
-  }
-
-  // TODO: Testme
-  async createContract(contractClass, { packageName, contractName, initMethod, initArgs }) {
+  async createContract(contractClass, { packageName, contractName, initMethod, initArgs } = {}) {
     if (!contractName) contractName = contractClass.contractName
     if (!packageName) packageName = this.name
     return this.app.createContract(contractClass, packageName, contractName, initMethod, initArgs)
   }
 
-  // TODO: Testme
-  async createProxy(contractClass, { packageName, contractName, initMethod, initArgs }) {
+  async createProxy(contractClass, { packageName, contractName, initMethod, initArgs } = {}) {
     if (!contractName) contractName = contractClass.contractName
     if (!packageName) packageName = this.name
+    if (!_.isEmpty(initArgs) && !initMethod) initMethod = 'initialize'
     return this.app.createProxy(contractClass, packageName, contractName, initMethod, initArgs)
   }
 
-  // TODO: Testme
-  async upgradeProxy(proxyAddress, contractClass, { packageName, contractName, initMethod, initArgs }) {
+  async upgradeProxy(proxyAddress, contractClass, { packageName, contractName, initMethod, initArgs } = {}) {
     if (!contractName) contractName = contractClass.contractName
     if (!packageName) packageName = this.name
     return this.app.upgradeProxy(proxyAddress, contractClass, packageName, contractName, initMethod, initArgs)
+  }
+
+  async changeProxyAdmin(proxyAddress, newAdmin) {
+    return this.app.changeProxyAdmin(proxyAddress, newAdmin)
   }
 
   // TODO: Testme

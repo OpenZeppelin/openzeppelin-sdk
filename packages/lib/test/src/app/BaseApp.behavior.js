@@ -2,7 +2,7 @@
 require('../../setup')
 
 import Contracts from '../../../src/utils/Contracts'
-import Proxy from '../../../src/utils/Proxy';
+import Proxy from '../../../src/proxy/Proxy';
 import FreezableImplementationDirectory from '../../../src/directory/FreezableImplementationDirectory';
 
 const ImplV1 = Contracts.getFromLocal('DummyImplementation');
@@ -54,7 +54,7 @@ export default function shouldBehaveLikeApp(appClass, accounts, { setImplementat
     });
 
     describe('with initializer', function () {
-      beforeEach('creating a proxy', async function () {
+      beforeEach('creating a non-upgradeable instance', async function () {
         this.instance = await this.app.createContract(ImplV1, packageName, contractName, 'initialize', [10]);
       });
 

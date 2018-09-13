@@ -3,13 +3,13 @@
 import Logger from '../utils/Logger'
 import Contracts from '../utils/Contracts'
 import decodeLogs from '../helpers/decodeLogs'
-import encodeCall from '../helpers/encodeCall'
 import copyContract from '../helpers/copyContract'
-import { deploy as deployContract, sendTransaction } from '../utils/Transactions'
+import { deploy as deployContract, sendTransaction, sendDataTransaction } from '../utils/Transactions'
 
 import UpgradeabilityProxyFactory from '../factory/UpgradeabilityProxyFactory';
 import FreezableImplementationDirectory from '../directory/FreezableImplementationDirectory';
 import { isZeroAddress } from '../utils/Addresses';
+import { buildCallData, callDescription } from '../utils/ABIs';
 
 const log = new Logger('App')
 
@@ -93,6 +93,7 @@ export default class BaseApp {
       ? await this._upgradeProxy(proxyAddress, packageName, contractName)
       : await this._upgradeProxyAndCall(proxyAddress, contractClass, packageName, contractName, initMethodName, initArgs)
     log.info(`TX receipt received: ${receipt.transactionHash}`)
+    return new contractClass(proxyAddress)
   }
 
   async _createProxy(packageName, contractName) {
@@ -101,8 +102,8 @@ export default class BaseApp {
   }
 
   async _createProxyAndCall(contractClass, packageName, contractName, initMethodName, initArgs) {
-    const { initMethod, callData } = this._buildInitCallData(contractClass, initMethodName, initArgs)
-    log.info(`Creating ${packageName} ${contractName} proxy and calling ${this._callInfo(initMethod, initArgs)}`)
+    const { method: initMethod, callData } = buildCallData(contractClass, initMethodName, initArgs)
+    log.info(`Creating ${packageName} ${contractName} proxy and calling ${callDescription(initMethod, initArgs)}`)
     return sendTransaction(this.appContract.createAndCall, [packageName, contractName, callData], this.txParams)
   }
 
@@ -112,10 +113,8 @@ export default class BaseApp {
   }
 
   async _upgradeProxyAndCall(proxyAddress, contractClass, packageName, contractName, initMethodName, initArgs) {
-    const initMethod = this._validateInitMethod(contractClass, initMethodName, initArgs)
-    const initArgTypes = initMethod.inputs.map(input => input.type)
-    log.info(`Upgrading ${packageName} ${contractName} proxy and calling ${this._callInfo(initMethod, initArgs)}...`)
-    const callData = encodeCall(initMethodName, initArgTypes, initArgs)
+    const { method: initMethod, callData } = buildCallData(contractClass, initMethodName, initArgs)
+    log.info(`Upgrading ${packageName} ${contractName} proxy and calling ${callDescription(initMethod, initArgs)}...`)    
     return sendTransaction(this.appContract.upgradeAndCall, [proxyAddress, packageName, contractName, callData], this.txParams)
   }
 
@@ -130,27 +129,9 @@ export default class BaseApp {
   async _initNonUpgradeableInstance(instance, contractClass, packageName, contractName, initMethodName, initArgs) {
     if (typeof(initArgs) !== 'undefined') {
       // this could be front-run, waiting for new initializers model
-      const {initMethod, callData} = this._buildInitCallData(contractClass, initMethodName, initArgs)
-      log.info(`Initializing ${packageName} ${contractName} instance at ${instance.address} by calling ${this._callInfo(initMethod, initArgs)}`)
-      await instance.sendTransaction(Object.assign({}, this.txParams, {data: callData}))
+      const { method: initMethod, callData } = buildCallData(contractClass, initMethodName, initArgs)
+      log.info(`Initializing ${packageName} ${contractName} instance at ${instance.address} by calling ${callDescription(initMethod, initArgs)}`)
+      await sendDataTransaction(instance, Object.assign({}, this.txParams, {data: callData}))
     }
-  }
-
-  _buildInitCallData(contractClass, initMethodName, initArgs) {
-    const initMethod = this._validateInitMethod(contractClass, initMethodName, initArgs)
-    const initArgTypes = initMethod.inputs.map(input => input.type)
-    const callData = encodeCall(initMethodName, initArgTypes, initArgs)
-    return { initMethod, callData }
-  }
-
-  _validateInitMethod(contractClass, initMethodName, initArgs) {
-    const initMethod = contractClass.abi.find(fn => fn.name === initMethodName && fn.inputs.length === initArgs.length)
-    if (!initMethod) throw Error(`Could not find initialize method '${initMethodName}' with ${initArgs.length} arguments in contract class`)
-    return initMethod
-  }
-
-  _callInfo(initMethod, initArgs) {
-    const args = initMethod.inputs.map((input, index) => ` - ${input.name} (${input.type}): ${JSON.stringify(initArgs[index])}`)
-    return `${initMethod.name} with: \n${args.join('\n')}`
   }
 }

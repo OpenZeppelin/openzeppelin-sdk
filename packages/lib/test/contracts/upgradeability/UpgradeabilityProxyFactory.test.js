@@ -1,7 +1,7 @@
 'use strict';
 require('../../setup')
 
-import Proxy from '../../../src/utils/Proxy'
+import Proxy from '../../../src/proxy/Proxy'
 import Contracts from '../../../src/utils/Contracts'
 import encodeCall from '../../../src/helpers/encodeCall'
 import assertRevert from '../../../src/test/helpers/assertRevert'

@@ -1,6 +1,6 @@
 'use strict';
 
-import Proxy from '../../../src/utils/Proxy'
+import Proxy from '../../../src/proxy/Proxy'
 import Contracts from '../../../src/utils/Contracts'
 import decodeLogs from '../../../src/helpers/decodeLogs'
 import encodeCall from '../../../src/helpers/encodeCall'
