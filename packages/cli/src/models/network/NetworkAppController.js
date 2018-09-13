@@ -38,8 +38,8 @@ export default class NetworkAppController extends NetworkBaseController {
     this.networkFile.app = { address }
   }
 
-  async push(reupload = false) {
-    await super.push(reupload);
+  async push(reupload = false, force = false) {
+    await super.push(reupload, force);
     await this.handleLibsLink()
   }
 
