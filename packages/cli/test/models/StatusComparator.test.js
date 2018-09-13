@@ -1,7 +1,7 @@
 'use strict'
 require('../setup')
 
-import { Contracts, App } from 'zos-lib'
+import { Contracts } from 'zos-lib'
 
 import push from '../../src/scripts/push'
 import linkStdlib from '../../src/scripts/link'
@@ -9,46 +9,13 @@ import { bytecodeDigest } from '../../src/utils/contracts'
 import StatusChecker from '../../src/models/status/StatusChecker'
 import ZosPackageFile from '../../src/models/files/ZosPackageFile'
 import StatusComparator from '../../src/models/status/StatusComparator'
-import PackageAtVersion from '../../src/models/lib/PackageAtVersion';
 
 const ImplV1 = Contracts.getFromLocal('ImplV1')
 const AnotherImplV1 = Contracts.getFromLocal('AnotherImplV1')
 
-contract.skip('StatusComparator', function([_, owner, anotherAddress]) {
+contract.only('StatusComparator', function([_, owner, anotherAddress]) {
   const network = 'test'
   const txParams = { from: owner }
-
-  describe('app', function () {
-    beforeEach('initializing network file and status checker', async function () {
-      init.call(this, 'test/mocks/packages/package-empty.zos.json');
-    })
-  
-    beforeEach('deploying an app', async function () {
-      await push({ network, txParams, networkFile: this.networkFile })
-      this.app = await App.fetch(this.networkFile.appAddress, txParams)
-    })
-
-    testVersion();
-    testImplementations();
-    testPackage();
-    testProvider();
-    testProxies();
-    testStdlib();
-  });
-
-  describe('lib', function () {
-    beforeEach('initializing network file and status checker', async function () {
-      init.call(this, 'test/mocks/packages/package-empty-lib.zos.json');
-    })
-  
-    beforeEach('deploying a lib', async function () {
-      await push({ network, txParams, networkFile: this.networkFile })
-      this.app = await PackageAtVersion.fetch(this.networkFile.packageAddress, "1.1.0", txParams)
-    })
-
-    testImplementations();
-    testProvider();
-  });
 
   function init(fileName) {
     this.packageFile = new ZosPackageFile(fileName)
@@ -57,13 +24,47 @@ contract.skip('StatusComparator', function([_, owner, anotherAddress]) {
     this.checker = new StatusChecker(this.comparator, this.networkFile, txParams)
   }
 
-  function testVersion () {
+  describe('app', function () {
+    beforeEach('initializing network file and status checker', async function () {
+      init.call(this, 'test/mocks/packages/package-empty.zos.json')
+    })
+
+    beforeEach('deploying an app', async function () {
+      await push({ network, txParams, networkFile: this.networkFile })
+      this.project = await this.checker.setProject()
+      this.directory = await this.project.getCurrentDirectory()
+    })
+
+    testVersion()
+    testImplementations()
+    testPackage()
+    testProvider()
+    testProxies()
+    //testStdlib()
+  })
+
+  describe('lib', function () {
+    beforeEach('initializing network file and status checker', async function () {
+      init.call(this, 'test/mocks/packages/package-empty-lib.zos.json')
+    })
+
+    beforeEach('deploying a lib', async function () {
+      await push({ network, txParams, networkFile: this.networkFile })
+      this.project = await this.checker.setProject()
+      this.directory = await this.project.getCurrentDirectory()
+    })
+
+    testImplementations()
+    testProvider()
+  })
+
+
+  function testVersion() {
     describe('version', function () {
       describe('when the network file shows a different version than the one set in the App contract', function () {
         const newVersion = '2.0.0'
-
         beforeEach(async function () {
-          await this.app.newVersion(newVersion)
+          await this.project.newVersion(newVersion)
         })
 
         it('reports that diff', async function () {
@@ -79,14 +80,13 @@ contract.skip('StatusComparator', function([_, owner, anotherAddress]) {
       describe('when the network file version matches with the one in the App contract', function () {
         it('does not report any diff', async function () {
           await this.checker.checkVersion()
-
           this.comparator.reports.should.be.empty
         })
       })
     })
-  };
+  }
 
-  function testPackage () {
+  function testPackage() {
     describe('package', function () {
       describe('when the network file shows a different package address than the one set in the App contract', function () {
         beforeEach(async function () {
@@ -98,7 +98,7 @@ contract.skip('StatusComparator', function([_, owner, anotherAddress]) {
 
           this.comparator.reports.should.have.lengthOf(1)
           this.comparator.reports[0].expected.should.be.equal(this.networkFile.packageAddress)
-          this.comparator.reports[0].observed.should.be.equal(this.app.package.address)
+          this.comparator.reports[0].observed.should.be.equal(this.project.package.address)
           this.comparator.reports[0].description.should.be.equal('Package address does not match')
         })
       })
@@ -111,13 +111,14 @@ contract.skip('StatusComparator', function([_, owner, anotherAddress]) {
         })
       })
     })
-  };
+  }
 
   function testProvider () {
     describe('provider', function () {
       describe('when the network file shows a different provider address than the one set in the App contract', function () {
         beforeEach(async function () {
-          await this.app.newVersion('2.0.0')
+          await this.project.newVersion('2.0.0')
+          this.directory = await this.project.getCurrentDirectory()
           this.networkFile.version = '2.0.0'
         })
 
@@ -126,7 +127,7 @@ contract.skip('StatusComparator', function([_, owner, anotherAddress]) {
 
           this.comparator.reports.should.have.lengthOf(1)
           this.comparator.reports[0].expected.should.be.equal(this.networkFile.providerAddress)
-          this.comparator.reports[0].observed.should.be.equal(this.app.currentDirectory().address)
+          this.comparator.reports[0].observed.should.be.equal(this.directory.address)
           this.comparator.reports[0].description.should.be.equal('Provider address does not match')
         })
       })
@@ -139,7 +140,7 @@ contract.skip('StatusComparator', function([_, owner, anotherAddress]) {
         })
       })
     })
-  };
+  }
 
   function testStdlib () {
     describe('stdlib', function () {
@@ -158,7 +159,7 @@ contract.skip('StatusComparator', function([_, owner, anotherAddress]) {
             this.comparator.reports[0].description.should.be.equal('Stdlib address does not match')
           })
         })
-        
+
         describe('when the App contract does not have a stdlib set', function () {
           it('does not report any diff', async function () {
             await this.checker.checkStdlib()
@@ -219,7 +220,7 @@ contract.skip('StatusComparator', function([_, owner, anotherAddress]) {
         })
       })
     })
-  };
+  }
 
   function testImplementations () {
     describe('implementations', function () {
@@ -234,7 +235,7 @@ contract.skip('StatusComparator', function([_, owner, anotherAddress]) {
 
         describe('when the directory of the current version has one contract', function () {
           beforeEach('registering new implementation in AppDirectory', async function () {
-            this.impl = await this.app.setImplementation(ImplV1, 'Impl')
+            this.impl = await this.project.setImplementation(ImplV1, 'Impl')
           })
 
           it('reports that diff', async function () {
@@ -249,8 +250,8 @@ contract.skip('StatusComparator', function([_, owner, anotherAddress]) {
 
         describe('when the directory of the current version has many contracts', function () {
           beforeEach('registering two new implementations in AppDirectory', async function () {
-            this.impl = await this.app.setImplementation(ImplV1, 'Impl')
-            this.anotherImpl = await this.app.setImplementation(AnotherImplV1, 'AnotherImpl')
+            this.impl = await this.project.setImplementation(ImplV1, 'Impl')
+            this.anotherImpl = await this.project.setImplementation(AnotherImplV1, 'AnotherImpl')
           })
 
           it('reports one diff per contract', async function () {
@@ -268,9 +269,9 @@ contract.skip('StatusComparator', function([_, owner, anotherAddress]) {
 
         describe('when the directory of the current version has many contracts and some of them where unregistered', function () {
           beforeEach('registering two new implementations in AppDirectory', async function () {
-            await this.app.setImplementation(ImplV1, 'Impl')
-            await this.app.unsetImplementation('Impl', txParams)
-            this.anotherImpl = await this.app.setImplementation(AnotherImplV1, 'AnotherImpl')
+            await this.project.setImplementation(ImplV1, 'Impl')
+            await this.project.unsetImplementation('Impl')
+            this.anotherImpl = await this.project.setImplementation(AnotherImplV1, 'AnotherImpl')
           })
 
           it('reports one diff per contract', async function () {
@@ -310,7 +311,7 @@ contract.skip('StatusComparator', function([_, owner, anotherAddress]) {
         describe('when the directory of the current version has one of those contract', function () {
           describe('when the directory has the same address and same bytecode for that contract', function () {
             beforeEach('registering new implementation in AppDirectory', async function () {
-              await this.app.currentDirectory().setImplementation('Impl', this.impl.address, txParams)
+              await this.directory.setImplementation('Impl', this.impl.address)
             })
 
             it('reports only the missing contract', async function () {
@@ -325,7 +326,7 @@ contract.skip('StatusComparator', function([_, owner, anotherAddress]) {
 
           describe('when the directory has another address for that contract', function () {
             beforeEach('registering new implementation in AppDirectory', async function () {
-              await this.app.currentDirectory().setImplementation('Impl', this.anotherImpl.address, txParams)
+              await this.directory.setImplementation('Impl', this.anotherImpl.address)
             })
 
             it('reports those diffs', async function () {
@@ -349,7 +350,7 @@ contract.skip('StatusComparator', function([_, owner, anotherAddress]) {
               const contracts = this.networkFile.contracts
               contracts.Impl.bodyBytecodeHash = '0x0'
               this.networkFile.contracts = contracts
-              await this.app.currentDirectory().setImplementation('Impl', this.impl.address, txParams)
+              await this.directory.setImplementation('Impl', this.impl.address)
             })
 
             it('reports both diffs', async function () {
@@ -368,8 +369,8 @@ contract.skip('StatusComparator', function([_, owner, anotherAddress]) {
 
         describe('when the directory of the current version has both contracts', function () {
           beforeEach('registering new implementation in AppDirectory', async function () {
-            await this.app.currentDirectory().setImplementation('Impl', this.impl.address, txParams)
-            await this.app.currentDirectory().setImplementation('AnotherImpl', this.anotherImpl.address, txParams)
+            await this.directory.setImplementation('Impl', this.impl.address)
+            await this.directory.setImplementation('AnotherImpl', this.anotherImpl.address)
           })
 
           it('does not report any diff ', async function () {
@@ -381,9 +382,9 @@ contract.skip('StatusComparator', function([_, owner, anotherAddress]) {
 
         describe('when the directory of the current version has many contracts and some of them where unregistered', function () {
           beforeEach('registering two new implementations in AppDirectory', async function () {
-            await this.app.currentDirectory().setImplementation('Impl', this.impl.address, txParams)
-            await this.app.unsetImplementation('Impl', txParams)
-            await this.app.currentDirectory().setImplementation('AnotherImpl', this.anotherImpl.address, txParams)
+            await this.directory.setImplementation('Impl', this.impl.address)
+            await this.directory.unsetImplementation('Impl')
+            await this.directory.setImplementation('AnotherImpl', this.anotherImpl.address)
           })
 
           it('reports one diff per contract', async function () {
@@ -397,7 +398,7 @@ contract.skip('StatusComparator', function([_, owner, anotherAddress]) {
         })
       })
     })
-  };
+  }
 
   function testProxies () {
     describe('proxies', function () {
@@ -408,10 +409,10 @@ contract.skip('StatusComparator', function([_, owner, anotherAddress]) {
         this.networkFile.addContract('Impl', this.impl)
         this.networkFile.addContract('AnotherImpl', this.anotherImpl)
 
-        await this.app.currentDirectory().setImplementation('Impl', this.impl.address, txParams)
-        await this.app.currentDirectory().unsetImplementation('Impl', txParams)
-        await this.app.currentDirectory().setImplementation('AnotherImpl', this.anotherImpl.address, txParams)
-        await this.app.currentDirectory().setImplementation('Impl', this.impl.address, txParams)
+        await this.directory.setImplementation('Impl', this.impl.address)
+        await this.directory.unsetImplementation('Impl', txParams)
+        await this.directory.setImplementation('AnotherImpl', this.anotherImpl.address)
+        await this.directory.setImplementation('Impl', this.impl.address)
       })
 
       describe('when the network file does not have any proxies', function () {
@@ -425,7 +426,7 @@ contract.skip('StatusComparator', function([_, owner, anotherAddress]) {
 
         describe('when the app has one proxy registered', function () {
           beforeEach('registering new implementation in AppDirectory', async function () {
-            this.proxy = await this.app.createProxy(ImplV1, 'Impl', 'initialize', [42])
+            this.proxy = await this.project.createProxy(ImplV1, { contractName: 'Impl', initMethod: 'initialize', initArgs: [42] })
           })
 
           it('reports that diff', async function () {
@@ -440,8 +441,8 @@ contract.skip('StatusComparator', function([_, owner, anotherAddress]) {
 
         describe('when the app has many proxies registered', function () {
           beforeEach('registering new implementation in AppDirectory', async function () {
-            this.implProxy = await this.app.createProxy(ImplV1, 'Impl', 'initialize', [42])
-            this.anotherImplProxy = await this.app.createProxy(AnotherImplV1, 'AnotherImpl', 'initialize', [1])
+            this.implProxy = await this.project.createProxy(ImplV1, { contractName: 'Impl', initMethod: 'initialize', initArgs: [42] })
+            this.anotherImplProxy = await this.project.createProxy(AnotherImplV1, { contractName: 'AnotherImpl', initMethod: 'initialize', initArgs: [1] })
           })
 
           it('reports that diff', async function () {
@@ -460,10 +461,11 @@ contract.skip('StatusComparator', function([_, owner, anotherAddress]) {
 
       describe('when the network file has two proxies', function () {
         beforeEach('adding a proxy', async function () {
-          this.networkFile.setProxies('Impl', [
-            { implementation: this.impl.address, address: '0x1', version: '1.0' },
-            { implementation: this.impl.address, address: '0x2', version: '1.0' }
-          ])
+          const implementations = [
+            { implementation: this.impl.address, address: '0x1', version: '1.0.0' },
+            { implementation: this.impl.address, address: '0x2', version: '1.0.0' }
+          ]
+          this.networkFile.setProxies(this.packageFile.name, 'Impl', implementations)
         })
 
         describe('when the app does not have any proxy registered', function () {
@@ -482,16 +484,17 @@ contract.skip('StatusComparator', function([_, owner, anotherAddress]) {
 
         describe('when the app has one proxy registered', function () {
           beforeEach('creating a proxy', async function () {
-            this.proxy = await this.app.createProxy(ImplV1, 'Impl', 'initialize', [42])
+            this.proxy = await this.project.createProxy(ImplV1, { contractName: 'Impl', initMethod: 'initialize', initArgs: [42] })
           })
 
           describe('when it matches one proxy address', function () {
             describe('when it matches the alias and the implementation address', function () {
               beforeEach('changing network file', async function () {
-                this.networkFile.setProxies('Impl', [
-                  { implementation: this.impl.address, address: '0x1', version: '1.0' },
-                  { implementation: this.impl.address, address: this.proxy.address, version: '1.0' },
-                ])
+                const implementations = [
+                  { implementation: this.impl.address, address: '0x1', version: '1.0.0' },
+                  { implementation: this.impl.address, address: this.proxy.address, version: '1.0.0' },
+                ]
+                this.networkFile.setProxies(this.packageFile.name, 'Impl', implementations)
               })
 
               it('reports that diff', async function () {
@@ -506,10 +509,11 @@ contract.skip('StatusComparator', function([_, owner, anotherAddress]) {
 
             describe('when it matches the alias but not the implementation address', function () {
               beforeEach('changing network file', async function () {
-                this.networkFile.setProxies('Impl', [
-                  { implementation: this.impl.address, address: '0x1', version: '1.0' },
-                  { implementation: this.anotherImpl.address, address: this.proxy.address, version: '1.0' },
-                ])
+                const implementations = [
+                  { implementation: this.impl.address, address: '0x1', version: '1.0.0' },
+                  { implementation: this.anotherImpl.address, address: this.proxy.address, version: '1.0.0' },
+                ]
+                this.networkFile.setProxies(this.packageFile.name, 'Impl', implementations)
               })
 
               it('reports that diff', async function () {
@@ -527,8 +531,9 @@ contract.skip('StatusComparator', function([_, owner, anotherAddress]) {
 
             describe('when it matches the implementation address but not the alias', function () {
               beforeEach('changing network file', async function () {
-                this.networkFile.setProxies('Impl', [{ implementation: this.impl.address, address: '0x1', version: '1.0' }])
-                this.networkFile.setProxies('AnotherImpl', [{ implementation: this.impl.address, address: this.proxy.address, version: '1.0' }])
+                const { name: packageName } = this.packageFile
+                this.networkFile.setProxies(packageName, 'Impl', [{ implementation: this.impl.address, address: '0x1', version: '1.0.0' }])
+                this.networkFile.setProxies(packageName, 'AnotherImpl', [{ implementation: this.impl.address, address: this.proxy.address, version: '1.0.0' }])
               })
 
               it('reports that diff', async function () {
@@ -546,8 +551,9 @@ contract.skip('StatusComparator', function([_, owner, anotherAddress]) {
 
             describe('when it does not match the alias and the implementation address', function () {
               beforeEach('changing network file', async function () {
-                this.networkFile.setProxies('Impl', [{ implementation: this.impl.address, address: '0x1', version: '1.0' }])
-                this.networkFile.setProxies('AnotherImpl', [{ implementation: this.anotherImpl.address, address: this.proxy.address, version: '1.0' }])
+                const { name: packageName } = this.packageFile
+                this.networkFile.setProxies(packageName, 'Impl', [{ implementation: this.impl.address, address: '0x1', version: '1.0.0' }])
+                this.networkFile.setProxies(packageName, 'AnotherImpl', [{ implementation: this.anotherImpl.address, address: this.proxy.address, version: '1.0.0' }])
               })
 
               it('reports that diff', async function () {
@@ -568,7 +574,6 @@ contract.skip('StatusComparator', function([_, owner, anotherAddress]) {
           })
 
           describe('when it does not match any proxy address', function () {
-
             it('reports those diffs', async function () {
               await this.checker.checkProxies()
 
@@ -587,5 +592,5 @@ contract.skip('StatusComparator', function([_, owner, anotherAddress]) {
         })
       })
     })
-  };
+  }
 })
