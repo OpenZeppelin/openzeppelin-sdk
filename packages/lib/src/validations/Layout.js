@@ -33,11 +33,6 @@ function storageEntryMatches(originalVar, updatedVar, originalTypes, updatedType
   }
 }
 
-function typeMatches(originalType, updatedType, originalTypes, updatedTypes) {
-  // TODO: Compare complex types (structs and enums)
-  return originalType.id === updatedType.id;
-}
-
 // Adapted from https://gist.github.com/andrei-m/982927 by Andrei Mackenzie
 function levenshtein(originalStorage, updatedStorage, areEqualFn) {
   const a = originalStorage,
@@ -87,8 +82,10 @@ function walk(matrix, originalStorage, updatedStorage, areMatchFn) {
   while (i > 0 || j > 0) {
     const cost = matrix[i][j];
     const isAppend = j >= matrix.length;
+    const isPop = i >= matrix[0].length;
     const insertionCost = isAppend ? 0 : INSERTION_COST;
     const matchResult = i > 0 && j > 0 && areMatchFn(a[i-1], b[j-1]);
+    
     if (i > 0 && j > 0 && cost === matrix[i-1][j-1] && matchResult === 'equal') {
       operations.unshift({ action: 'equal', updated: b[j-1], original: a[i-1] });
       i--;
@@ -97,7 +94,7 @@ function walk(matrix, originalStorage, updatedStorage, areMatchFn) {
       operations.unshift({ action: (isAppend ? 'append' : 'insert'), updated: b[j-1] });
       j--;
     } else if (i > 0 && cost === matrix[i-1][j] + DELETION_COST) {
-      operations.unshift({ action: 'delete', original: a[i-1] });
+      operations.unshift({ action: (isPop ? 'pop' : 'delete'), original: a[i-1] });
       i--;
     } else if (i > 0 && j > 0 && cost === matrix[i-1][j-1] + SUBSTITUTION_COST) {
       operations.unshift({ action: matchResult, updated: b[j-1], original: a[i-1] });
