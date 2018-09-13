@@ -18,13 +18,13 @@ contract('Layout', () => {
     )
   }
 
-  function assertChanges(result, changes) {
-    result.changes.should.have.lengthOf(changes.length)
-    result.changes.forEach((change, index) => {
-      const expected = changes[index]
-      change.action.should.eq(expected.action)
-      if (expected.updated) change.updated.should.include(expected.updated)
-      if (expected.original) change.original.should.include(expected.original)
+  function assertChanges(result, expectedChanges) {
+    result.should.have.lengthOf(expectedChanges.length)
+    result.forEach((change, index) => {
+      const expectedChange = expectedChanges[index]
+      change.action.should.eq(expectedChange.action)
+      if (expectedChange.updated) change.updated.should.include(expectedChange.updated)
+      if (expectedChange.original) change.original.should.include(expectedChange.original)
     })
   }
 
@@ -36,14 +36,14 @@ contract('Layout', () => {
   it('reports inserted var', function () {
     const result = compare('StorageMockSimpleOriginal', 'StorageMockSimpleWithInsertedVar');
     assertChanges(result, [
-      { updated: { label: 'c', contract: 'StorageMockSimpleWithInsertedVar', type: 't_uint256' }, action: 'insertion' }
+      { updated: { label: 'c', contract: 'StorageMockSimpleWithInsertedVar', type: 't_uint256' }, action: 'insert' }
     ])
   });
 
   it('reports unshifted var', function () {
     const result = compare('StorageMockSimpleOriginal', 'StorageMockSimpleWithUnshiftedVar');
     assertChanges(result, [
-      { updated: { label: 'c', contract: 'StorageMockSimpleWithUnshiftedVar', type: 't_uint256' }, action: 'insertion' }
+      { updated: { label: 'c', contract: 'StorageMockSimpleWithUnshiftedVar', type: 't_uint256' }, action: 'insert' }
     ])
   });
 
@@ -57,7 +57,7 @@ contract('Layout', () => {
   it('reports renamed var', function () {
     const result = compare('StorageMockSimpleOriginal', 'StorageMockSimpleWithRenamedVar');
     assertChanges(result, [
-      { action: 'substitution',
+      { action: 'rename',
         original: { label: 'b', type: 't_uint256' },
         updated:  { label: 'c', type: 't_uint256' }  }
     ])
@@ -66,7 +66,7 @@ contract('Layout', () => {
   it('reports type changed', function () {
     const result = compare('StorageMockSimpleOriginal', 'StorageMockSimpleWithTypeChanged');
     assertChanges(result, [
-      { action: 'substitution',
+      { action: 'typechange',
         original: { label: 'b', type: 't_uint256' },
         updated:  { label: 'b', type: 't_string' }  }
     ])
