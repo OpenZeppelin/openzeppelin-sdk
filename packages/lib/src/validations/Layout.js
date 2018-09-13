@@ -3,22 +3,38 @@ import util from 'util';
 
 const SUBSTITUTION_COST = 3,
       INSERTION_COST = 2,
-      DELETION_COST = 2; 
-  
+      DELETION_COST = 2;
+
 export function compareStorageLayouts(original, updated) {
   // TODO: Check cases with empty storage (both for original and updated)
-  const areEqual = (var1, var2) => storageAreEqual(var1, var2, original.types, updated.types)
+  const areMatch = (var1, var2) => storageEntryMatches(var1, var2, original.types, updated.types)
+  const areEqual = (var1, var2) => (areMatch(var1, var2) === 'equal')
   const distanceMatrix = levenshtein(original.storage, updated.storage, areEqual)
-  const operations = walk(distanceMatrix, original.storage, updated.storage, areEqual)
-  return { changes: operations.filter(op => op.action !== 'equal') }
+  const operations = walk(distanceMatrix, original.storage, updated.storage, areMatch)
+  return operations.filter(op => op.action !== 'equal')
 }
 
-function storageAreEqual(originalVar, updatedVar, originalTypes, updatedTypes) {
-  return originalVar.label === updatedVar.label
-    && typesAreEqual(originalTypes[originalVar.type], updatedTypes[updatedVar.type], originalTypes, updatedTypes)
+function storageEntryMatches(originalVar, updatedVar, originalTypes, updatedTypes) {
+  const originalType = originalTypes[originalVar.type],
+        updatedType = updatedTypes[updatedVar.type];
+
+  // TODO: Compare complex types (structs and enums)
+  const typeMatches = (originalType.id === updatedType.id);
+  const nameMatches = (originalVar.label === updatedVar.label);
+  
+  if (typeMatches && nameMatches) {
+    return 'equal'
+  } else if (typeMatches) {
+    return 'rename'
+  } else if (nameMatches) {
+    return 'typechange'
+  } else {
+    return 'replace'
+  }
 }
 
-function typesAreEqual(originalType, updatedType, originalTypes, updatedTypes) {
+function typeMatches(originalType, updatedType, originalTypes, updatedTypes) {
+  // TODO: Compare complex types (structs and enums)
   return originalType.id === updatedType.id;
 }
 
@@ -61,7 +77,7 @@ function levenshtein(originalStorage, updatedStorage, areEqualFn) {
 }
 
 // Walks an edit distance matrix, returning the sequence of operations performed
-function walk(matrix, originalStorage, updatedStorage, areEqualFn) {
+function walk(matrix, originalStorage, updatedStorage, areMatchFn) {
   const a = originalStorage,
         b = updatedStorage;
   let i = matrix.length - 1,
@@ -72,18 +88,19 @@ function walk(matrix, originalStorage, updatedStorage, areEqualFn) {
     const cost = matrix[i][j];
     const isAppend = j >= matrix.length;
     const insertionCost = isAppend ? 0 : INSERTION_COST;
-    if (i > 0 && j > 0 && cost === matrix[i-1][j-1] && areEqualFn(a[i-1], b[j-1])) {
+    const matchResult = i > 0 && j > 0 && areMatchFn(a[i-1], b[j-1]);
+    if (i > 0 && j > 0 && cost === matrix[i-1][j-1] && matchResult === 'equal') {
       operations.unshift({ action: 'equal', updated: b[j-1], original: a[i-1] });
       i--;
       j--;
     } else if (j > 0 && cost === matrix[i][j-1] + insertionCost) {
-      operations.unshift({ action: (isAppend ? 'append' : 'insertion'), updated: b[j-1] });
+      operations.unshift({ action: (isAppend ? 'append' : 'insert'), updated: b[j-1] });
       j--;
     } else if (i > 0 && cost === matrix[i-1][j] + DELETION_COST) {
-      operations.unshift({ action: 'deletion', original: a[i-1] });
+      operations.unshift({ action: 'delete', original: a[i-1] });
       i--;
     } else if (i > 0 && j > 0 && cost === matrix[i-1][j-1] + SUBSTITUTION_COST) {
-      operations.unshift({ action: 'substitution', updated: b[j-1], original: a[i-1] });
+      operations.unshift({ action: matchResult, updated: b[j-1], original: a[i-1] });
       i--; 
       j--;
     } else {
