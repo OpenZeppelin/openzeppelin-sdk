@@ -71,7 +71,7 @@ export default class ZosNetworkFile {
 
   getDependency(name) {
     if (!this.data.dependencies) return null
-    return this.data.dependencies[name]
+    return this.data.dependencies[name] || {}
   }
 
   hasDependency(name) {

@@ -4,7 +4,7 @@ require('../setup')
 import { Contracts } from 'zos-lib'
 
 import push from '../../src/scripts/push'
-import linkStdlib from '../../src/scripts/link'
+import link from '../../src/scripts/link'
 import StatusChecker from '../../src/models/status/StatusChecker'
 import StatusFetcher from '../../src/models/status/StatusFetcher'
 import ZosPackageFile from '../../src/models/files/ZosPackageFile'
@@ -16,13 +16,6 @@ const AnotherImplV1 = Contracts.getFromLocal('AnotherImplV1')
 contract('StatusFetcher', function([_, owner, anotherAddress]) {
   const network = 'test'
   const txParams = { from: owner }
-
-  function init(fileName) {
-    this.packageFile = new ZosPackageFile(fileName)
-    this.networkFile = this.packageFile.networkFile(network)
-    this.fetcher = new StatusFetcher(this.networkFile)
-    this.checker = new StatusChecker(this.fetcher, this.networkFile, txParams)
-  }
 
   describe('app', function () {
     beforeEach('initializing network file and status checker', async function () {
@@ -40,7 +33,7 @@ contract('StatusFetcher', function([_, owner, anotherAddress]) {
     testPackage();
     testProvider();
     testProxies();
-    //testStdlib();
+    testDependencies();
   });
 
   describe('lib', function () {
@@ -57,6 +50,13 @@ contract('StatusFetcher', function([_, owner, anotherAddress]) {
     testImplementations();
     testProvider();
   });
+
+  function init(fileName) {
+    this.packageFile = new ZosPackageFile(fileName)
+    this.networkFile = this.packageFile.networkFile(network)
+    this.fetcher = new StatusFetcher(this.networkFile)
+    this.checker = new StatusChecker(this.fetcher, this.networkFile, txParams)
+  }
 
   function testVersion () {
     describe('version', function () {
@@ -140,78 +140,102 @@ contract('StatusFetcher', function([_, owner, anotherAddress]) {
     })
   };
 
-  function testStdlib () {
-    describe('stdlib', function () {
-      describe('when the network file does not specify any stdlib', function () {
-        describe('when the App contract has a stdlib set', function () {
-          beforeEach(async function () {
-            await this.project.setStdlib(anotherAddress)
-          })
+  function testDependencies() {
+    describe('dependencies', function() {
+      beforeEach('set dependency params', async function() {
+        this.dep1 = { name: 'mock-stdlib-undeployed', version: '1.1.0' }
+        this.dep2 = { name: 'mock-stdlib-undeployed-2', version: '1.2.0' }
+      })
 
-          it('updates the address of the stdlib', async function () {
-            await this.checker.checkStdlib()
+      describe('when the app project does not have dependencies', function() {
+        describe('when the network file has dependencies', function() {
+          it('removes the local dependency', async function() {
+            this.networkFile.setDependency('an-awesome-dependency', { version: '1.0.0', package: '0x01' })
+            await this.checker.checkDependencies()
 
-            this.networkFile.stdlibAddress.should.be.equal(anotherAddress)
-          })
-        })
-        
-        describe('when the App contract does not have a stdlib set', function () {
-          it('does not update the address of the stdlib', async function () {
-            await this.checker.checkStdlib()
-
-            this.networkFile.stdlib.should.be.empty
+            this.networkFile.hasDependency('an-awesome-dependency').should.be.false
           })
         })
       })
 
-      describe('when the network file has a stdlib', function () {
-        const stdlibAddress = '0x0000000000000000000000000000000000000010'
-
-        beforeEach('set stdlib in network file', async function () {
-          await linkStdlib({stdlibNameVersion: 'mock-stdlib@1.1.0', packageFile: this.packageFile})
-          await push({ network, txParams, networkFile: this.networkFile })
+      describe('when the app project has dependencies', function () {
+        beforeEach('set project with multiple dependencies', async function () {
+          const libs = [`${this.dep1.name}@${this.dep1.version}`, `${this.dep2.name}@${this.dep2.version}`]
+          await link({ libs, packageFile: this.packageFile });
+          await push({ network, txParams, deployLibs: true, networkFile: this.networkFile });
+          this.dep1 = { ...this.dep1, address: this.networkFile.getDependency(this.dep1.name).package }
+          this.dep2 = { ...this.dep2, address: this.networkFile.getDependency(this.dep2.name).package }
         })
 
-        describe('when the App contract has the same stdlib set', function () {
-          beforeEach('set stdlib in App contract', async function () {
-            await this.project.setStdlib(stdlibAddress)
-          })
+        describe('when the network file does not have matching dependencies', function () {
+          it('adds dependencies to network file', async function () {
+            this.networkFile.unsetDependency(this.dep1.name)
+            this.networkFile.unsetDependency(this.dep2.name)
 
-          it('does not update the address of the stdlib', async function () {
-            const previousAddress = this.networkFile.stdlibAddress
+            this.networkFile.dependencies.should.be.empty
+            await this.checker.checkDependencies()
+            this.networkFile.dependencies.should.not.be.empty
+            this.networkFile.dependencies.should.have.property(this.dep1.name)
+            this.networkFile.dependencies.should.have.property(this.dep2.name)
+            this.networkFile.getDependency(this.dep1.name).version.should.eq(this.dep1.version)
+            this.networkFile.getDependency(this.dep2.name).version.should.eq(this.dep2.version)
+            this.networkFile.getDependency(this.dep1.name).package.should.eq(this.dep1.address)
+            this.networkFile.getDependency(this.dep2.name).package.should.eq(this.dep2.address)
 
-            await this.checker.checkStdlib()
-
-            this.networkFile.stdlibAddress.should.be.equal(previousAddress)
-          })
-        })
-
-        describe('when the App contract has another stdlib set', function () {
-          beforeEach('set stdlib in App contract', async function () {
-            await this.project.setStdlib(anotherAddress)
-          })
-
-          it('updates the address of the stdlib', async function () {
-            await this.checker.checkStdlib()
-
-            this.networkFile.stdlibAddress.should.be.equal(anotherAddress)
           })
         })
 
-        describe('when the App contract has no stdlib set', function () {
-          beforeEach('unset App stdlib', async function () {
-            await this.project.setStdlib(0x0)
+        describe('when the network file has only one matching dependency', function() {
+          it('adds the unregistered dependency', async function() {
+            this.networkFile.unsetDependency(this.dep1.name)
+
+            Object.keys(this.networkFile.dependencies).should.have.lengthOf(1)
+            await this.checker.checkDependencies()
+
+            Object.keys(this.networkFile.dependencies).should.have.lengthOf(2)
+            this.networkFile.dependencies.should.have.property(this.dep2.name)
+            this.networkFile.getDependency(this.dep2.name).version.should.eq(this.dep2.version)
+            this.networkFile.getDependency(this.dep2.name).package.should.eq(this.dep2.address)
+
           })
+        })
 
-          it('deletes the stdlib', async function () {
-            await this.checker.checkStdlib()
+        describe('when the network file has a dependency with wrong dependency address', function() {
+          it('fixes the dependency address', async function() {
+            const address = this.dep1.address
+            this.networkFile.updateDependency(this.dep1.name, (dependency) => ({ ...dependency, package: '0x01' }))
 
-            this.networkFile.stdlib.should.be.empty
+
+            this.networkFile.getDependency(this.dep1.name).package.should.eq('0x01')
+            await this.checker.checkDependencies()
+            this.networkFile.getDependency(this.dep1.name).package.should.eq(address)
+          })
+        })
+
+        describe('when the network file has a dependency with wrong dependency version', function() {
+          it('fixes the dependency version', async function() {
+            const version = this.dep1.version
+            this.networkFile.updateDependency(this.dep1.name, (dependency) => ({ ...dependency, version: '2.0.0' }))
+
+            this.networkFile.getDependency(this.dep1.name).version.should.eq('2.0.0')
+            await this.checker.checkDependencies()
+            this.networkFile.getDependency(this.dep1.name).version.should.eq(version)
+          })
+        })
+
+        describe('when the network file has other dependency that is not deployed', function() {
+          it('removes that dependency', async function() {
+            const dependencyName = 'non-registered-dependency'
+            this.networkFile.setDependency(dependencyName, { package: '0x01', version: '1.0.0' })
+
+            this.networkFile.getDependency(dependencyName).should.not.be.empty
+            await this.checker.checkDependencies()
+            this.networkFile.getDependency(dependencyName).should.be.empty
           })
         })
       })
     })
-  };
+  }
 
   function testImplementations () {
     describe('implementations', function () {

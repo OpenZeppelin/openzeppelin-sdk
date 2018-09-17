@@ -4,7 +4,7 @@ require('../setup')
 import { Contracts } from 'zos-lib'
 
 import push from '../../src/scripts/push'
-import linkStdlib from '../../src/scripts/link'
+import link from '../../src/scripts/link'
 import { bytecodeDigest } from '../../src/utils/contracts'
 import StatusChecker from '../../src/models/status/StatusChecker'
 import ZosPackageFile from '../../src/models/files/ZosPackageFile'
@@ -13,16 +13,9 @@ import StatusComparator from '../../src/models/status/StatusComparator'
 const ImplV1 = Contracts.getFromLocal('ImplV1')
 const AnotherImplV1 = Contracts.getFromLocal('AnotherImplV1')
 
-contract.only('StatusComparator', function([_, owner, anotherAddress]) {
+contract('StatusComparator', function([_, owner, anotherAddress]) {
   const network = 'test'
   const txParams = { from: owner }
-
-  function init(fileName) {
-    this.packageFile = new ZosPackageFile(fileName)
-    this.networkFile = this.packageFile.networkFile(network)
-    this.comparator = new StatusComparator()
-    this.checker = new StatusChecker(this.comparator, this.networkFile, txParams)
-  }
 
   describe('app', function () {
     beforeEach('initializing network file and status checker', async function () {
@@ -40,7 +33,7 @@ contract.only('StatusComparator', function([_, owner, anotherAddress]) {
     testPackage()
     testProvider()
     testProxies()
-    //testStdlib()
+    testDependencies()
   })
 
   describe('lib', function () {
@@ -57,6 +50,13 @@ contract.only('StatusComparator', function([_, owner, anotherAddress]) {
     testImplementations()
     testProvider()
   })
+
+  function init(fileName) {
+    this.packageFile = new ZosPackageFile(fileName)
+    this.networkFile = this.packageFile.networkFile(network)
+    this.comparator = new StatusComparator()
+    this.checker = new StatusChecker(this.comparator, this.networkFile, txParams)
+  }
 
 
   function testVersion() {
@@ -142,80 +142,115 @@ contract.only('StatusComparator', function([_, owner, anotherAddress]) {
     })
   }
 
-  function testStdlib () {
-    describe('stdlib', function () {
-      describe('when the network file does not specify any stdlib', function () {
-        describe('when the App contract has a stdlib set', function () {
-          beforeEach(async function () {
-            await this.app.setStdlib(anotherAddress)
-          })
+  function testDependencies() {
+    describe('dependencies', function() {
+      beforeEach('set dependency params', async function() {
+        this.dep1 = { name: 'mock-stdlib-undeployed', version: '1.1.0' }
+        this.dep2 = { name: 'mock-stdlib-undeployed-2', version: '1.2.0' }
+      })
 
-          it('reports that diff', async function () {
-            await this.checker.checkStdlib()
+      describe('when the app project does not have dependencies', function() {
+        describe('when the network file does not have any dependency', function() {
+          it('does not report diffs', async function() {
+            await this.checker.checkDependencies()
 
-            this.comparator.reports.should.have.lengthOf(1)
-            this.comparator.reports[0].expected.should.be.equal('none')
-            this.comparator.reports[0].observed.should.be.equal(anotherAddress)
-            this.comparator.reports[0].description.should.be.equal('Stdlib address does not match')
+            this.comparator.reports.should.be.empty
           })
         })
 
-        describe('when the App contract does not have a stdlib set', function () {
-          it('does not report any diff', async function () {
-            await this.checker.checkStdlib()
+        describe('when the network file has dependencies', function() {
+          it('reports that diff', async function() {
+            this.networkFile.setDependency('an-awesome-dependency', { version: '1.0.0', package: '0x01' })
+            await this.checker.checkDependencies()
 
-            this.comparator.reports.should.be.empty
+            this.comparator.reports.should.have.lengthOf(1)
+            this.comparator.reports[0].expected.should.be.equal('one')
+            this.comparator.reports[0].observed.should.be.equal('none')
+            this.comparator.reports[0].description.should.be.equal(`Dependency with name an-awesome-dependency at address 0x01 is not registered`)
           })
         })
       })
 
-      describe('when the network file has a stdlib', function () {
-        const stdlibAddress = '0x0000000000000000000000000000000000000010'
-
-        beforeEach('set stdlib in network file', async function () {
-          await linkStdlib({stdlibNameVersion: 'mock-stdlib@1.1.0', packageFile: this.packageFile})
-          await push({ network, txParams, networkFile: this.networkFile })
+      describe('when the app project has dependencies', function () {
+        beforeEach('set project with multiple dependencies', async function () {
+          const libs = [`${this.dep1.name}@${this.dep1.version}`, `${this.dep2.name}@${this.dep2.version}`]
+          await link({ libs, packageFile: this.packageFile });
+          await push({ network, txParams, deployLibs: true, networkFile: this.networkFile });
+          this.dep1 = { ...this.dep1, address: this.networkFile.getDependency(this.dep1.name).package }
+          this.dep2 = { ...this.dep2, address: this.networkFile.getDependency(this.dep2.name).package }
         })
 
-        describe('when the App contract has the same stdlib set', function () {
-          beforeEach('set stdlib in App contract', async function () {
-            await this.app.setStdlib(stdlibAddress)
-          })
-
-          it('does not report any diff', async function () {
-            await this.checker.checkStdlib()
+        describe('when the network file has all matching dependencies', function() {
+          it('does not report diffs', async function() {
+            await this.checker.checkDependencies()
 
             this.comparator.reports.should.be.empty
           })
         })
 
-        describe('when the App contract has another stdlib set', function () {
-          beforeEach('set stdlib in App contract', async function () {
-            await this.app.setStdlib(anotherAddress)
-          })
-
+        describe('when the network file does not have any matching dependency', function () {
           it('reports that diff', async function () {
-            await this.checker.checkStdlib()
+            this.networkFile.unsetDependency(this.dep1.name)
+            this.networkFile.unsetDependency(this.dep2.name)
+            await this.checker.checkDependencies()
 
-            this.comparator.reports.should.have.lengthOf(1)
-            this.comparator.reports[0].expected.should.be.equal(stdlibAddress)
-            this.comparator.reports[0].observed.should.be.equal(anotherAddress)
-            this.comparator.reports[0].description.should.be.equal('Stdlib address does not match')
+            this.comparator.reports.should.have.lengthOf(2)
+            this.comparator.reports[0].expected.should.be.equal('none')
+            this.comparator.reports[0].observed.should.be.equal('one')
+            this.comparator.reports[0].description.should.be.equal(`Missing registered dependency ${this.dep1.name} at ${this.dep1.address}`)
+            this.comparator.reports[1].expected.should.be.equal('none')
+            this.comparator.reports[1].observed.should.be.equal('one')
+            this.comparator.reports[1].description.should.be.equal(`Missing registered dependency ${this.dep2.name} at ${this.dep2.address}`)
           })
         })
 
-        describe('when the App contract has no stdlib set', function () {
-          beforeEach('unset App stdlib', async function () {
-            await this.app.setStdlib(0x0)
-          })
-
-          it('reports that diff', async function () {
-            await this.checker.checkStdlib()
+        describe('when the network file has only one matching dependency', function() {
+          it('reports that diff', async function() {
+            this.networkFile.unsetDependency(this.dep1.name)
+            await this.checker.checkDependencies()
 
             this.comparator.reports.should.have.lengthOf(1)
-            this.comparator.reports[0].expected.should.be.equal(stdlibAddress)
+            this.comparator.reports[0].expected.should.be.equal('none')
+            this.comparator.reports[0].observed.should.be.equal('one')
+            this.comparator.reports[0].description.should.be.equal(`Missing registered dependency ${this.dep1.name} at ${this.dep1.address}`)
+          })
+        })
+
+        describe('when the network file has a dependency with wrong dependency address', function() {
+          it('reports that diff', async function() {
+            const address = this.dep1.address
+            this.networkFile.updateDependency(this.dep1.name, (dependency) => ({ ...dependency, package: '0x01' }))
+            await this.checker.checkDependencies()
+
+            this.comparator.reports.should.have.lengthOf(1)
+            this.comparator.reports[0].expected.should.be.equal('0x01')
+            this.comparator.reports[0].observed.should.be.equal(address)
+            this.comparator.reports[0].description.should.be.equal(`Package address of ${this.dep1.name} does not match`)
+          })
+        })
+
+        describe('when the network file has a dependency with wrong version', function() {
+          it('reports that diff', async function() {
+            const version = this.dep1.version
+            this.networkFile.updateDependency(this.dep1.name, (dependency) => ({ ...dependency, version: '2.0.0' }))
+            await this.checker.checkDependencies()
+
+            this.comparator.reports.should.have.lengthOf(1)
+            this.comparator.reports[0].expected.should.be.equal('2.0.0')
+            this.comparator.reports[0].observed.should.be.equal(version)
+            this.comparator.reports[0].description.should.be.equal(`Package version of ${this.dep1.name} does not match`)
+          })
+        })
+
+        describe('when the network file has other dependency that is not deployed', function() {
+          it('reports that diff', async function() {
+            this.networkFile.setDependency('non-registered-dependency', { package: '0x01', version: '1.0.0' })
+            await this.checker.checkDependencies()
+
+            this.comparator.reports.should.have.lengthOf(1)
+            this.comparator.reports[0].expected.should.be.equal('one')
             this.comparator.reports[0].observed.should.be.equal('none')
-            this.comparator.reports[0].description.should.be.equal('Stdlib address does not match')
+            this.comparator.reports[0].description.should.be.equal(`Dependency with name non-registered-dependency at address 0x01 is not registered`)
           })
         })
       })
