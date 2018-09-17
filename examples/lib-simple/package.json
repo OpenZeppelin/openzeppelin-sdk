@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "truffle compile && truffle exec index.js --network local",
-    "test": "NODE_ENV=test truffle test"
+    "test": "truffle compile && NODE_ENV=test truffle test"
   },
   "license": "ISC",
   "dependencies": {
