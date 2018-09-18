@@ -1,4 +1,6 @@
 import _ from 'lodash'
+import { promisify } from 'util'
+
 import { Logger, LibProject, AppProject } from 'zos-lib'
 import EventsFilter from './EventsFilter'
 import StatusFetcher from './StatusFetcher'
@@ -93,7 +95,7 @@ export default class StatusChecker {
 
   async checkImplementations() {
     const implementationsInfo = await this._fetchOnChainImplementations()
-    implementationsInfo.forEach(info => this._checkRemoteImplementation(info))
+    await Promise.all(implementationsInfo.map(info => this._checkRemoteImplementation(info)))
     this._checkUnregisteredLocalImplementations(implementationsInfo)
   }
 
@@ -103,10 +105,10 @@ export default class StatusChecker {
     this._checkUnregisteredLocalProxies(proxiesInfo)
   }
 
-  _checkRemoteImplementation({ alias, address }) {
+  async _checkRemoteImplementation({ alias, address }) {
     if (this.networkFile.hasContract(alias)) {
       this._checkImplementationAddress(alias, address)
-      this._checkImplementationBytecode(alias, address)
+      await this._checkImplementationBytecode(alias, address)
     }
     else this.visitor.onMissingRemoteContract('none', 'one', { alias, address })
   }
@@ -116,9 +118,9 @@ export default class StatusChecker {
     if (address !== expected) this.visitor.onMismatchingContractAddress(expected, address, { alias, address })
   }
 
-  _checkImplementationBytecode(alias, address) {
+  async _checkImplementationBytecode(alias, address) {
     const expected = this.networkFile.contract(alias).bodyBytecodeHash
-    const observed = bytecodeDigest(web3.eth.getCode(address))
+    const observed = bytecodeDigest(await promisify(web3.eth.getCode.bind(web3.eth))(address))
     if (observed !== expected) this.visitor.onMismatchingContractBodyBytecode(expected, observed, { alias, address, bodyBytecodeHash: observed })
   }
 
