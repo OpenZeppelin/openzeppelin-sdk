@@ -4,21 +4,12 @@ import Proxy from '../../../src/proxy/Proxy'
 import decodeLogs from '../../../src/helpers/decodeLogs'
 import encodeCall from '../../../src/helpers/encodeCall'
 import assertRevert from '../../../src/test/helpers/assertRevert'
-import shouldBehaveLikeOwnable from '../../../src/test/behaviors/Ownable'
 
 const DummyImplementation = artifacts.require('DummyImplementation')
 const DummyImplementationV2 = artifacts.require('DummyImplementationV2')
 
-export default function shouldBehaveLikeApp([_, appOwner, directoryOwner, anotherAccount]) {
+export default function shouldManageProxies([_, appOwner, directoryOwner, anotherAccount]) {
   const EMPTY_INITIALIZATION_DATA = ''
-
-  describe('ownership', function () {
-    beforeEach("setting ownable", function () {
-      this.ownable = this.app
-    })
-
-    shouldBehaveLikeOwnable(appOwner, anotherAccount)
-  })
 
   const shouldCreateProxy = function () {
     it('sets proxy implementation', async function () {

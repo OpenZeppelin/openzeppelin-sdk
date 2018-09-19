@@ -6,12 +6,14 @@ import copyContract from '../helpers/copyContract'
 import { deploy as deployContract, sendTransaction, sendDataTransaction } from '../utils/Transactions'
 
 import FreezableImplementationDirectory from '../directory/FreezableImplementationDirectory';
-import { isZeroAddress } from '../utils/Addresses';
+import { isZeroAddress, toAddress } from '../utils/Addresses';
 import { buildCallData, callDescription } from '../utils/ABIs';
+import Contracts from '../utils/Contracts';
+import { Package } from '..';
 
 const log = new Logger('App')
 
-export default class BaseApp {
+export default class App {
 
   static async fetch(address, txParams = {}) {
     const appContract = await this.getContractClass().at(address)    
@@ -26,12 +28,31 @@ export default class BaseApp {
   }
 
   static getContractClass() {
-    throw Error("Unimplemented")
+    return Contracts.getFromLib('App')
   }
 
   constructor(appContract, txParams = {}) {
     this.appContract = appContract
     this.txParams = txParams
+  }
+
+  async getPackage(name) {
+    const [address, version] = await this.appContract.getPackage(name)
+    const thepackage = await Package.fetch(address, this.txParams)
+    return { package: thepackage, version }
+  }
+
+  async hasPackage(name) {
+    const [address, _version] = await this.appContract.getPackage(name)
+    return !isZeroAddress(address)
+  }
+
+  async setPackage(name, packageAddress, version) {
+    return await sendTransaction(this.appContract.setPackage, [name, toAddress(packageAddress), version], this.txParams)
+  }
+
+  async unsetPackage(name) {
+    return await sendTransaction(this.appContract.unsetPackage, [name], this.txParams)
   }
 
   get address() {
