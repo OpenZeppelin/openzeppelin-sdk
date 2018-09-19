@@ -3,6 +3,7 @@ import { buildCallData, callDescription } from '../utils/ABIs';
 import { deploy, sendDataTransaction } from "../utils/Transactions";
 import Proxy from '../proxy/Proxy';
 import Logger from '../utils/Logger';
+import { toAddress } from '../utils/Addresses';
 
 const log = new Logger('SimpleProject')
 
@@ -26,6 +27,7 @@ export default class SimpleProject  {
   }
 
   async upgradeProxy(proxyAddress, contractClass, { initMethod, initArgs } = {}) {
+    proxyAddress = toAddress(proxyAddress)
     const implementation = await this._deployImplementation(contractClass);    
     log.info(`Upgrading proxy to new logic contract at ${implementation.address}`)
     const proxy = Proxy.at(proxyAddress, this.txParamsAdmin)

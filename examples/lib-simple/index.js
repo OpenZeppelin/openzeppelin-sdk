@@ -1,31 +1,41 @@
 'use strict';
 
-const { Contracts } = require('zos-lib')
+// Required by zos-lib when running from truffle
+global.artifacts = artifacts;
+global.web3 = web3;
+
+const { Contracts, SimpleProject  } = require('zos-lib')
 const MyContract_v0 = Contracts.getFromLocal('MyContract_v0');
 const MyContract_v1 = Contracts.getFromLocal('MyContract_v1');
-const AdminUpgradeabilityProxy = Contracts.getFromNodeModules('zos-lib', 'AdminUpgradeabilityProxy');
 
-module.exports = async function() {
-  console.log('Deploying MyContract v0...');
-  const myContract_v0 = await MyContract_v0.new();
+async function main() {
+  const creatorAddress = web3.eth.accounts[1],
+        initializerAddress = web3.eth.accounts[2],
+        myProject = new SimpleProject('MyProject', { from: creatorAddress }, { from: initializerAddress });
 
-  console.log('Deploying a proxy pointing to v0...');
-  const proxy = await AdminUpgradeabilityProxy.new(myContract_v0.address);
+  log('Creating an upgradeable instance of v0...');
+  const instance = await myProject.createProxy(MyContract_v0, { initArgs: [42] })
+  log('Contract\'s storage value: ' + (await instance.value()).toString() + '\n');
+  
+  log('Upgrading to v1...');
+  await myProject.upgradeProxy(instance, MyContract_v1, { initMethod: 'add', initArgs: [1] })
+  log('Contract\'s storage new value: ' + (await instance.value()).toString() + '\n');
+  
+  log('Wohoo! We\'ve upgraded our contract\'s behavior while preserving its storage, thus obtaining 43.');
+  return instance
+}
 
-  console.log('Calling initialize(42) on proxy...');
-  let myContract = await MyContract_v0.at(proxy.address);
-  const value = 42;
-  await myContract.initialize(value);
-  console.log('Proxy\'s storage value: ' + (await myContract.value()).toString());
-
-  console.log('Deploying MyContract v1...');
-  const myContract_v1 = await MyContract_v1.new();
-
-  console.log('Upgrading proxy to v1...');
-  await proxy.upgradeTo(myContract_v1.address);
-  myContract = await MyContract_v1.at(proxy.address);
-
-  await myContract.add(1);
-  console.log('Proxy\'s storage new value: ' + (await myContract.value()).toString());
-  console.log('Wohoo! We\'ve upgraded our contract\'s behavior while preserving its storage, thus obtaining 43.');
+// For truffle exec
+module.exports = function(callback) {
+  main().then(() => callback()).catch(err => callback(err))
 };
+
+// Logging
+function log() {
+  if (process.env.NODE_ENV !== 'test') {
+    console.log.apply(this, arguments)
+  }
+}
+
+// Testing
+module.exports.main = main;

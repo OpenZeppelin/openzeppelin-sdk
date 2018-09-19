@@ -4,11 +4,12 @@
   "private": true,
   "main": "index.js",
   "scripts": {
-    "start": "npx truffle compile && npx truffle exec index.js"
+    "start": "truffle compile && truffle exec index.js --network local",
+    "test": "truffle compile && NODE_ENV=test truffle test"
   },
   "license": "ISC",
   "dependencies": {
-    "truffle": "^4.1.7",
+    "truffle": "^4.1.14",
     "zos-lib": "2.0.0-alpha.0"
   }
 }
