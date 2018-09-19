@@ -10,7 +10,7 @@ contract('SimpleProject', function (accounts) {
   const name = 'MyProject'
   
   beforeEach('initializing', async function () {
-    this.project = new SimpleProject(name, { from: owner }, { from: initializer })
+    this.project = new SimpleProject(name, { from: owner })
     this.adminAddress = owner
   });
   

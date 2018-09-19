@@ -56,7 +56,7 @@ export default function shouldManageProxies({ otherAdmin, setImplementations, su
       }
 
       it('upgrades and migrates a proxy', async function () {
-        const upgraded = await this.project.upgradeProxy(this.instance.address, DummyImplementationV2, { initMethod: 'migrate', initArgs: [20] });
+        const upgraded = await this.project.upgradeProxy(this.instance.address, DummyImplementationV2, { initMethod: 'migrate', initArgs: [20], initFrom: otherAdmin });
         await assertIsVersion(upgraded, 'V2');
         await assertIsProxy(upgraded, this.adminAddress);
         (await upgraded.value()).toNumber().should.eq(20)
