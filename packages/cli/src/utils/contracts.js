@@ -29,6 +29,9 @@ function splitCode(instance) {
   return { constructor, body }
 }
 
+// Removes the last 43 bytes of the bytecode, i.e., the swarm hash that the solidity compiler appends and that
+// respects the following structure: 0xa1 0x65 'b' 'z' 'z' 'r' '0' 0x58 0x20 <32 bytes swarm hash> 0x00 0x29
+// (see https://solidity.readthedocs.io/en/v0.4.24/metadata.html#encoding-of-the-metadata-hash-in-the-bytecode)
 function removeSwarmHash(bytecode) {
   return bytecode.replace(/a165627a7a72305820.*0029$/, '')
 }
