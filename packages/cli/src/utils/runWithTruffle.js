@@ -7,11 +7,13 @@ const DEFAULT_TIMEOUT = 10 * 60; // 10 minutes
 
 export default async function runWithTruffle(script, options) {
   const config = Truffle.config()
+  const { networks: networkList } = config
   const { network, from, timeout } = Session.getOptions(options)
-  const txParams = from ? { from } : {}
+  const txParams = from ? { from: from.toLowerCase() } : {}
 
   if (!network) throw Error('A network name must be provided to execute the requested action.')
   config.network = network
+  if (!from && networkList[network].from) networkList[network].from = networkList[network].from.toLowerCase()
   Contracts.setSyncTimeout((_.isNil(timeout) ? DEFAULT_TIMEOUT : timeout) * 1000)
   if (options.compile) await Truffle.compile(config)
   await initTruffle(config)
