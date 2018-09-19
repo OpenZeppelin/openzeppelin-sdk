@@ -42,8 +42,11 @@ contract AdminUpgradeabilityProxy is UpgradeabilityProxy {
    * Contract constructor.
    * It sets the `msg.sender` as the proxy administrator.
    * @param _implementation address of the initial implementation.
+   * @param _data Data to send as msg.data in the low level call.
+   * It should include the signature and the parameters of the function to be called, as described in
+   * https://solidity.readthedocs.io/en/develop/abi-spec.html#function-selector-and-argument-encoding.
    */
-  constructor(address _implementation) UpgradeabilityProxy(_implementation) public {
+  constructor(address _implementation, bytes _data) UpgradeabilityProxy(_implementation, _data) public payable {
     assert(ADMIN_SLOT == keccak256("org.zeppelinos.proxy.admin"));
 
     _setAdmin(msg.sender);
@@ -89,8 +92,7 @@ contract AdminUpgradeabilityProxy is UpgradeabilityProxy {
    * This is useful to initialize the proxied contract.
    * @param newImplementation Address of the new implementation.
    * @param data Data to send as msg.data in the low level call.
-   * It should include the signature and the parameters of the function to be
-   * called, as described in
+   * It should include the signature and the parameters of the function to be called, as described in
    * https://solidity.readthedocs.io/en/develop/abi-spec.html#function-selector-and-argument-encoding.
    */
   function upgradeToAndCall(address newImplementation, bytes data) payable external ifAdmin {

@@ -16,6 +16,7 @@ export default function shouldBehaveLikeApp([_, appOwner, directoryOwner, anothe
     beforeEach("setting ownable", function () {
       this.ownable = this.app
     })
+
     shouldBehaveLikeOwnable(appOwner, anotherAccount)
   })
 
@@ -58,7 +59,7 @@ export default function shouldBehaveLikeApp([_, appOwner, directoryOwner, anothe
 
   describe('createAndCall', function () {
     const value = 1e5
-    const initializeData = encodeCall('initialize', ['uint256'], [42])
+    const initializeData = encodeCall('initializePayable', ['uint256'], [42])
     const incorrectData = encodeCall('wrong', ['uint256'], [42])
 
     describe('successful', function () {
@@ -140,7 +141,7 @@ export default function shouldBehaveLikeApp([_, appOwner, directoryOwner, anothe
 
   describe('upgradeAndCall', function () {
     const value = 1e5
-    const initializeData = encodeCall('initialize', ['uint256'], [42])
+    const initializeData = encodeCall('initializePayable', ['uint256'], [42])
     const migrateData = encodeCall('migrate', ['uint256'], [84])
     const incorrectData = encodeCall('wrong', ['uint256'], [42])
 

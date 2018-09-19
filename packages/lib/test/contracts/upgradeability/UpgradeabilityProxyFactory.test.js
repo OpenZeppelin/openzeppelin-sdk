@@ -94,7 +94,7 @@ contract('UpgradeabilityProxyFactory', ([_, owner]) => {
 
       it('sends given value to the delegated implementation', async function() {
         const balance = await web3.eth.getBalance(this.proxyAddress)
-        assert(balance.eq(value))
+        balance.should.be.bignumber.eq(value)
       })
 
       it('uses the storage of the proxy', async function () {

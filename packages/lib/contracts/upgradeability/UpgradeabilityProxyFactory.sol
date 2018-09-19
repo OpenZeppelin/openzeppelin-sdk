@@ -20,7 +20,8 @@ contract UpgradeabilityProxyFactory {
    * @return Address of the new proxy.
    */
   function createProxy(address admin, address implementation) public returns (AdminUpgradeabilityProxy) {
-    AdminUpgradeabilityProxy proxy = _createProxy(implementation);
+    bytes memory data = "";
+    AdminUpgradeabilityProxy proxy = _createProxy(implementation, data);
     proxy.changeAdmin(admin);
     return proxy;
   }
@@ -31,25 +32,26 @@ contract UpgradeabilityProxyFactory {
    * @param admin Address of the proxy admin.
    * @param implementation Address of the initial implementation.
    * @param data Data to send as msg.data in the low level call.
-   * It should include the signature and the parameters of the function to be
-   * called, as described in
+   * It should include the signature and the parameters of the function to be called, as described in
    * https://solidity.readthedocs.io/en/develop/abi-spec.html#function-selector-and-argument-encoding.
    * @return Address of the new proxy.
    */
   function createProxyAndCall(address admin, address implementation, bytes data) public payable returns (AdminUpgradeabilityProxy) {
-    AdminUpgradeabilityProxy proxy = _createProxy(implementation);
+    AdminUpgradeabilityProxy proxy = _createProxy(implementation, data);
     proxy.changeAdmin(admin);
-    require(address(proxy).call.value(msg.value)(data));
     return proxy;
   }
 
   /**
    * @dev Internal function to create an upgradeable proxy.
    * @param implementation Address of the initial implementation.
+   * @param data Data to send as msg.data in the low level call.
+   * It should include the signature and the parameters of the function to be called, as described in
+   * https://solidity.readthedocs.io/en/develop/abi-spec.html#function-selector-and-argument-encoding.
    * @return Address of the new proxy.
    */
-  function _createProxy(address implementation) internal returns (AdminUpgradeabilityProxy) {
-    AdminUpgradeabilityProxy proxy = new AdminUpgradeabilityProxy(implementation);
+  function _createProxy(address implementation, bytes data) internal returns (AdminUpgradeabilityProxy) {
+    AdminUpgradeabilityProxy proxy = (new AdminUpgradeabilityProxy).value(msg.value)(implementation, data);
     emit ProxyCreated(proxy);
     return proxy;
   }

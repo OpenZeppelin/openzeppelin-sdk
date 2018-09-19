@@ -1,9 +1,11 @@
 'use strict';
+
 require('../../setup')
 
 import Proxy from '../../../src/proxy/Proxy'
 import encodeCall from '../../../src/helpers/encodeCall'
 import assertRevert from '../../../src/test/helpers/assertRevert'
+import shouldBehaveLikeUpgradeabilityProxy from './UpgradeabilityProxy.behaviour'
 
 const Implementation1 = artifacts.require('Implementation1');
 const Implementation2 = artifacts.require('Implementation2');
@@ -29,9 +31,12 @@ contract('AdminUpgradeabilityProxy', ([_, admin, anotherAccount]) => {
   })
 
   beforeEach(async function () {
-    this.proxy = await AdminUpgradeabilityProxy.new(this.implementation_v0, { from: admin })
+    const initializeData = ''
+    this.proxy = await AdminUpgradeabilityProxy.new(this.implementation_v0, initializeData, { from: admin })
     this.proxyAddress = this.proxy.address;
   })
+
+  shouldBehaveLikeUpgradeabilityProxy(AdminUpgradeabilityProxy, admin)
 
   describe('implementation', function () {
     it('returns the current implementation address', async function () {
@@ -312,8 +317,9 @@ contract('AdminUpgradeabilityProxy', ([_, admin, anotherAccount]) => {
 
   describe('transparent proxy', function () {
     beforeEach('creating proxy', async function () {
+      const initializeData = ''
       this.impl = await ClashingImplementation.new();
-      this.proxy = await AdminUpgradeabilityProxy.new(this.impl.address, { from: admin });
+      this.proxy = await AdminUpgradeabilityProxy.new(this.impl.address, initializeData, { from: admin });
 
       this.clashing = ClashingImplementation.at(this.proxy.address);
     });
@@ -336,9 +342,11 @@ contract('AdminUpgradeabilityProxy', ([_, admin, anotherAccount]) => {
   });
 
   describe('regression', () => {
+    const initializeData = ''
+
     it('should add new function', async () => {
       const instance1 = await Implementation1.new();
-      const proxy = await AdminUpgradeabilityProxy.new(instance1.address, { from: admin });
+      const proxy = await AdminUpgradeabilityProxy.new(instance1.address, initializeData, { from: admin });
 
       const proxyInstance1 = await Implementation1.at(proxy.address);
       await proxyInstance1.setValue(42);
@@ -353,7 +361,7 @@ contract('AdminUpgradeabilityProxy', ([_, admin, anotherAccount]) => {
 
     it('should remove function', async () => {
       const instance2 = await Implementation2.new();
-      const proxy = await AdminUpgradeabilityProxy.new(instance2.address, { from: admin });
+      const proxy = await AdminUpgradeabilityProxy.new(instance2.address, initializeData, { from: admin });
 
       const proxyInstance2 = await Implementation2.at(proxy.address);
       await proxyInstance2.setValue(42);
@@ -369,7 +377,7 @@ contract('AdminUpgradeabilityProxy', ([_, admin, anotherAccount]) => {
 
     it('should change function signature', async () => {
       const instance1 = await Implementation1.new();
-      const proxy = await AdminUpgradeabilityProxy.new(instance1.address, { from: admin });
+      const proxy = await AdminUpgradeabilityProxy.new(instance1.address, initializeData, { from: admin });
 
       const proxyInstance1 = await Implementation1.at(proxy.address);
       await proxyInstance1.setValue(42);
@@ -383,8 +391,9 @@ contract('AdminUpgradeabilityProxy', ([_, admin, anotherAccount]) => {
     });
 
     it('should add fallback function', async () => {
+      const initializeData = ''
       const instance1 = await Implementation1.new();
-      const proxy = await AdminUpgradeabilityProxy.new(instance1.address, { from: admin });
+      const proxy = await AdminUpgradeabilityProxy.new(instance1.address, initializeData, { from: admin });
 
       const instance4 = await Implementation4.new();
       await proxy.upgradeTo(instance4.address, { from: admin });
@@ -398,7 +407,7 @@ contract('AdminUpgradeabilityProxy', ([_, admin, anotherAccount]) => {
 
     it('should remove fallback function', async () => {
       const instance4 = await Implementation4.new();
-      const proxy = await AdminUpgradeabilityProxy.new(instance4.address, { from: admin });
+      const proxy = await AdminUpgradeabilityProxy.new(instance4.address, initializeData, { from: admin });
 
       const instance2 = await Implementation2.new();
       await proxy.upgradeTo(instance2.address, { from: admin });
