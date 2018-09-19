@@ -1,5 +1,7 @@
 pragma solidity ^0.4.24;
 
+import './ZepToken.sol';
+
 contract Vouching {
 
   struct Dependency {
@@ -9,16 +11,17 @@ contract Vouching {
   }
 
   mapping (string => Dependency) private _registry;
-
   uint256 private _minimumStake;
+  ZepToken private _token;
 
   modifier onlyDependencyOwner(string name) {
     require(msg.sender == _registry[name].owner);
     _;
   }
 
-  constructor(uint256 minimumStake) { 
-    _minimumStake = minimumStake; 
+  constructor(uint256 minimumStake, ZepToken token) { 
+    _minimumStake = minimumStake;
+    _token = token; 
   }
 
   function minimumStake() public view;
