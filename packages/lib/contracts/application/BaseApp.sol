@@ -2,7 +2,6 @@ pragma solidity ^0.4.24;
 
 import "./versioning/ImplementationProvider.sol";
 import "../upgradeability/AdminUpgradeabilityProxy.sol";
-import "../upgradeability/UpgradeabilityProxyFactory.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 
 /**
@@ -11,17 +10,16 @@ import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
  * It handles the creation and upgrading of proxies.
  */
 contract BaseApp is Ownable {
-  /// @dev Factory that creates proxies.
-  UpgradeabilityProxyFactory public factory;
+  /**
+   * @dev Emitted when a new proxy is created.
+   * @param proxy Address of the created proxy.
+   */
+  event ProxyCreated(address indexed proxy);
 
   /**
    * @dev Constructor function
-   * @param _factory Proxy factory
    */
-  constructor(UpgradeabilityProxyFactory _factory) public {
-    require(address(_factory) != address(0), "Cannot set the proxy factory of an app to the zero address");
-    factory = _factory;
-  }
+  constructor() public {}
 
   /**
    * @dev Abstract function to return the implementation provider for a given package name.
@@ -75,8 +73,9 @@ contract BaseApp is Ownable {
    * @return Address of the new proxy.
    */
   function create(string packageName, string contractName) public returns (AdminUpgradeabilityProxy) {
-    address implementation = getImplementation(packageName, contractName);
-    return factory.createProxy(this, implementation);
+    // TODO: should we merge this function with the createAndCall?
+    bytes memory data = "";
+    return createAndCall(packageName, contractName, data);
   }
 
   /**
@@ -91,7 +90,9 @@ contract BaseApp is Ownable {
    */
    function createAndCall(string packageName, string contractName, bytes data) payable public returns (AdminUpgradeabilityProxy) {
     address implementation = getImplementation(packageName, contractName);
-    return factory.createProxyAndCall.value(msg.value)(this, implementation, data);
+     AdminUpgradeabilityProxy proxy = (new AdminUpgradeabilityProxy).value(msg.value)(implementation, data);
+     emit ProxyCreated(proxy);
+     return proxy;
   }
 
   /**

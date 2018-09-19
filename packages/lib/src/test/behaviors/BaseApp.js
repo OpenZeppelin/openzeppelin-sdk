@@ -1,15 +1,13 @@
 'use strict';
 
 import Proxy from '../../../src/proxy/Proxy'
-import Contracts from '../../../src/utils/Contracts'
 import decodeLogs from '../../../src/helpers/decodeLogs'
 import encodeCall from '../../../src/helpers/encodeCall'
 import assertRevert from '../../../src/test/helpers/assertRevert'
 import shouldBehaveLikeOwnable from '../../../src/test/behaviors/Ownable'
 
-const DummyImplementation = Contracts.getFromLocal('DummyImplementation')
-const DummyImplementationV2 = Contracts.getFromLocal('DummyImplementationV2')
-const UpgradeabilityProxyFactory = Contracts.getFromLocal('UpgradeabilityProxyFactory')
+const DummyImplementation = artifacts.require('DummyImplementation')
+const DummyImplementationV2 = artifacts.require('DummyImplementationV2')
 
 export default function shouldBehaveLikeApp([_, appOwner, directoryOwner, anotherAccount]) {
   describe('ownership', function () {
@@ -40,9 +38,9 @@ export default function shouldBehaveLikeApp([_, appOwner, directoryOwner, anothe
   describe('create', function () {
     describe('successful', function () {
       beforeEach("creating proxy", async function () {
-        const { receipt } = await this.app.create(this.packageName, this.contractName)
-        this.logs = decodeLogs(receipt.logs, UpgradeabilityProxyFactory)
-        this.proxyAddress = this.logs.find(l => l.event === 'ProxyCreated').args.proxy
+        const { receipt } = await this.app.create(this.packageName, this.contractName);
+        const logs = decodeLogs(receipt.logs, this.app.constructor)
+        this.proxyAddress = logs.find(l => l.event === 'ProxyCreated').args.proxy
       })
 
       shouldCreateProxy();
@@ -65,8 +63,8 @@ export default function shouldBehaveLikeApp([_, appOwner, directoryOwner, anothe
     describe('successful', function () {
       beforeEach("creating proxy", async function () {
         const { receipt } = await this.app.createAndCall(this.packageName, this.contractName, initializeData, { value })
-        this.logs = decodeLogs(receipt.logs, UpgradeabilityProxyFactory)
-        this.proxyAddress = this.logs.find(l => l.event === 'ProxyCreated').args.proxy
+        const logs = decodeLogs(receipt.logs, this.app.constructor)
+        this.proxyAddress = logs.find(l => l.event === 'ProxyCreated').args.proxy
       })
 
       shouldCreateProxy();
@@ -110,8 +108,8 @@ export default function shouldBehaveLikeApp([_, appOwner, directoryOwner, anothe
   describe('upgrade', function () {
     beforeEach("creating proxy", async function () {
       const { receipt } = await this.app.create(this.packageName, this.contractName, { from: appOwner })
-      this.logs = decodeLogs(receipt.logs, UpgradeabilityProxyFactory)
-      this.proxyAddress = this.logs.find(l => l.event === 'ProxyCreated').args.proxy
+      const logs = decodeLogs(receipt.logs, this.app.constructor)
+      this.proxyAddress = logs.find(l => l.event === 'ProxyCreated').args.proxy
     })
 
     describe('successful', async function () {
@@ -147,8 +145,8 @@ export default function shouldBehaveLikeApp([_, appOwner, directoryOwner, anothe
 
     beforeEach("creating proxy", async function () {
       const { receipt } = await this.app.createAndCall(this.packageName, this.contractName, initializeData, { from: appOwner })
-      this.logs = decodeLogs(receipt.logs, UpgradeabilityProxyFactory)
-      this.proxyAddress = this.logs.find(l => l.event === 'ProxyCreated').args.proxy
+      const logs = decodeLogs(receipt.logs, this.app.constructor)
+      this.proxyAddress = logs.find(l => l.event === 'ProxyCreated').args.proxy
     })
 
     describe('successful', async function () {
@@ -210,8 +208,8 @@ export default function shouldBehaveLikeApp([_, appOwner, directoryOwner, anothe
   describe('changeAdmin', function () {
     beforeEach("creating proxy", async function () {
       const { receipt } = await this.app.create(this.packageName, this.contractName)
-      this.logs = decodeLogs(receipt.logs, UpgradeabilityProxyFactory)
-      this.proxyAddress = this.logs.find(l => l.event === 'ProxyCreated').args.proxy
+      const logs = decodeLogs(receipt.logs, this.app.constructor)
+      this.proxyAddress = logs.find(l => l.event === 'ProxyCreated').args.proxy
     })
 
     it('changes admin of the proxy', async function () {

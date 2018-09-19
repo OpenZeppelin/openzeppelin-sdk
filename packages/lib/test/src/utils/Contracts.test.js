@@ -11,8 +11,8 @@ contract('Contracts', () => {
   })
 
   it('can lookup contract from the lib project', async function () {
-    const UpgradeabilityProxyFactory = Contracts.getFromLib('UpgradeabilityProxyFactory')
-    const instance = await UpgradeabilityProxyFactory.new()
+    const Initializable = Contracts.getFromLib('Initializable')
+    const instance = await Initializable.new()
     instance.address.should.not.be.null
   })
 

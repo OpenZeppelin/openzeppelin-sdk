@@ -9,7 +9,6 @@ const ImplementationDirectory = Contracts.getFromLocal('ImplementationDirectory'
 const DummyImplementation = Contracts.getFromLocal('DummyImplementation')
 const DummyImplementationV2 = Contracts.getFromLocal('DummyImplementationV2')
 const UnversionedApp = Contracts.getFromLocal('UnversionedApp')
-const UpgradeabilityProxyFactory = Contracts.getFromLocal('UpgradeabilityProxyFactory')
 
 contract('UnversionedApp', (accounts) => {
   const [_, appOwner, directoryOwner, anotherAccount] = accounts;
@@ -24,12 +23,11 @@ contract('UnversionedApp', (accounts) => {
     this.contractNameUpdated = 'ERC721Updated';
     this.packageName = 'MyProject';
 
-    this.factory = await UpgradeabilityProxyFactory.new()
     this.directory = await ImplementationDirectory.new({ from: directoryOwner })
     await this.directory.setImplementation(this.contractName, this.implementation_v0, { from: directoryOwner })
     await this.directory.setImplementation(this.contractNameUpdated, this.implementation_v1, { from: directoryOwner })
 
-    this.app = await UnversionedApp.new(this.factory.address, { from: appOwner })
+    this.app = await UnversionedApp.new({ from: appOwner })
     await this.app.setProvider(this.packageName, this.directory.address, { from: appOwner });
   })
 
