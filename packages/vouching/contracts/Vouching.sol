@@ -1,8 +1,11 @@
 pragma solidity ^0.4.24;
 
-import './ZepToken.sol';
+
+import "./ZepToken.sol";
+import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 
 contract Vouching {
+  using SafeMath for uint256;
 
   struct Dependency {
     address owner;
@@ -70,20 +73,20 @@ contract Vouching {
 
   function vouch(string name, uint256 amount) external onlyDependencyOwner(name) {
     _token.transferFrom(msg.sender, this, amount);
-    _registry[name].stake += amount;
+    _registry[name].stake = _registry[name].stake.add(amount);
     emit Vouched(name, amount);
   }
 
   function unvouch(string name, uint256 amount) external onlyDependencyOwner(name) {
-    require(_registry[name].stake - amount >= _minimumStake);
-    _registry[name].stake -= amount;
+    require(_registry[name].stake.sub(amount) >= _minimumStake);
+    _registry[name].stake = _registry[name].stake.sub(amount);
     _token.transfer(msg.sender, amount);
     emit Unvouched(name, amount);
   }
 
   function remove(string name) external onlyDependencyOwner(name) {
     // Owner surrenders _minimumStake to the system
-    _token.transfer(msg.sender, _registry[name].stake - _minimumStake);
+    _token.transfer(msg.sender, _registry[name].stake.sub(_minimumStake));
     delete _registry[name];
     emit DependencyRemoved(name);
   }
