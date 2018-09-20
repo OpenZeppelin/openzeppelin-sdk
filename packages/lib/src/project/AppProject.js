@@ -1,6 +1,7 @@
 import BasePackageProject from "./BasePackageProject";
 import App from "../app/App";
 import Package from "../package/Package";
+import { AppDeployError } from '../utils/errors/DeployError';
 import _ from 'lodash';
 
 export default class AppProject extends BasePackageProject {
@@ -13,14 +14,20 @@ export default class AppProject extends BasePackageProject {
   }
 
   static async deploy(name = 'main', version = '0.1.0', txParams = {}) {
-    const thepackage = await Package.deploy(txParams)
-    const directory = await thepackage.newVersion(version)
-    const app = await App.deploy(txParams)
-    await app.setPackage(name, thepackage.address, version)
-    const project = new this(app, name, version, txParams)
-    project.directory = directory
-    project.package = thepackage
-    return project
+    let thepackage, directory, app
+    try {
+      thepackage = await Package.deploy(txParams)
+      directory = await thepackage.newVersion(version)
+      app = await VersionedApp.deploy(txParams)
+      await app.setPackage(name, thepackage.address, version)
+      const project = new this(app, name, version, txParams)
+      project.directory = directory
+      project.package = thepackage
+
+      return project
+    } catch(error) {
+      throw new AppDeployError(error.message, thepackage, directory, app)
+    }
   }
 
   constructor(app, name = 'main', version = '0.1.0', txParams = {}) {
