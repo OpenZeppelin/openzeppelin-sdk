@@ -67,28 +67,17 @@ contract BaseApp is Ownable {
   }
 
   /**
-   * @dev Creates a new proxy for the given contract.
-   * @param packageName Name of the package where the contract is contained.
-   * @param contractName Name of the contract.
-   * @return Address of the new proxy.
-   */
-  function create(string packageName, string contractName) public returns (AdminUpgradeabilityProxy) {
-    // TODO: should we merge this function with the createAndCall?
-    bytes memory data = "";
-    return createAndCall(packageName, contractName, data);
-  }
-
-  /**
    * @dev Creates a new proxy for the given contract and forwards a function call to it.
    * This is useful to initialize the proxied contract.
    * @param packageName Name of the package where the contract is contained.
    * @param contractName Name of the contract.
-   * @param data Data to send as msg.data in the low level call.
+   * @param data Data to send as msg.data to the corresponding implementation to initialize the proxied contract.
    * It should include the signature and the parameters of the function to be called, as described in
    * https://solidity.readthedocs.io/en/develop/abi-spec.html#function-selector-and-argument-encoding.
+   * This parameter is optional, if no data is given the initialization call to proxied contract will be skipped.
    * @return Address of the new proxy.
    */
-   function createAndCall(string packageName, string contractName, bytes data) payable public returns (AdminUpgradeabilityProxy) {
+   function create(string packageName, string contractName, bytes data) payable public returns (AdminUpgradeabilityProxy) {
     address implementation = getImplementation(packageName, contractName);
      AdminUpgradeabilityProxy proxy = (new AdminUpgradeabilityProxy).value(msg.value)(implementation, data);
      emit ProxyCreated(proxy);

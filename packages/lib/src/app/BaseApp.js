@@ -94,13 +94,14 @@ export default class BaseApp {
 
   async _createProxy(packageName, contractName) {
     log.info(`Creating ${packageName} ${contractName} proxy without initializing...`)
-    return sendTransaction(this.appContract.create, [packageName, contractName], this.txParams)
+    const initializeData = ''
+    return sendTransaction(this.appContract.create, [packageName, contractName, initializeData], this.txParams)
   }
 
   async _createProxyAndCall(contractClass, packageName, contractName, initMethodName, initArgs) {
     const { method: initMethod, callData } = buildCallData(contractClass, initMethodName, initArgs)
     log.info(`Creating ${packageName} ${contractName} proxy and calling ${callDescription(initMethod, initArgs)}`)
-    return sendTransaction(this.appContract.createAndCall, [packageName, contractName, callData], this.txParams)
+    return sendTransaction(this.appContract.create, [packageName, contractName, callData], this.txParams)
   }
 
   async _upgradeProxy(proxyAddress, packageName, contractName) {
