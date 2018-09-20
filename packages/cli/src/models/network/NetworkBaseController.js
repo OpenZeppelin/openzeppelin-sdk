@@ -72,13 +72,17 @@ export default class NetworkBaseController {
       log.info(`Creating new version ${requestedVersion}`);
       const provider = await this.newVersion(requestedVersion);
       this.networkFile.contracts = {};
-      this._registerVersion(requestedVersion, provider.address);
+      this._registerVersion(requestedVersion, provider);
     }
   }
 
-  _registerVersion(version, providerAddress) {
-    this.networkFile.provider = { address: providerAddress };
-    this.networkFile.version = version;
+  _registerPackage({ address }) {
+    this.networkFile.package = { address }
+  }
+
+  _registerVersion(version, { address }) {
+    this.networkFile.provider = { address }
+    this.networkFile.version = version
   }
 
   async newVersion(versionName) {

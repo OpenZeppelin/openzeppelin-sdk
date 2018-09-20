@@ -13,11 +13,18 @@ export default class NetworkLibController extends NetworkBaseController {
   }
 
   async deploy() {
-    this.project = await LibProject.deploy(this.currentVersion, this.txParams)
-    const thepackage = await this.project.getProjectPackage()
-    this.networkFile.package = { address: thepackage.address }
-    const provider = await this.project.getCurrentDirectory();
-    this._registerVersion(this.currentVersion, provider.address)
+    try {
+      this.project = await LibProject.deploy(this.currentVersion, this.txParams)
+      this._registerPackage(await this.project.getProjectPackage())
+      this._registerVersion(this.currentVersion, await this.project.getCurrentDirectory())
+    } catch(deployError) {
+      this._tryRegisterPartialDeploy(deployError)
+    }
+  }
+
+  _tryRegisterPartialDeploy({ thepackage, directory }) {
+    if (thepackage) this._registerPackage(thepackage)
+    if (directory) this._registerVersion(this.currentVersion, directory)
   }
 
   async fetch() {
