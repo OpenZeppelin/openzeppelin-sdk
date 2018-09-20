@@ -1,8 +1,8 @@
 pragma solidity ^0.4.24;
 
-import "./versioning/ImplementationProvider.sol";
+import "./ImplementationProvider.sol";
+import "./Package.sol";
 import "../upgradeability/AdminUpgradeabilityProxy.sol";
-import "./versioning/Package.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 
 /**
