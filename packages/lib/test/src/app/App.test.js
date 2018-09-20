@@ -7,7 +7,7 @@ import { deploy as deployContract } from '../../../src/utils/Transactions';
 import Contracts from '../../../src/utils/Contracts'
 import Package from '../../../src/package/Package';
 import { ZERO_ADDRESS } from '../../../src/utils/Addresses';
-import { FreezableImplementationDirectory, Proxy } from '../../../src';
+import { ImplementationDirectory, Proxy } from '../../../src';
 
 const ImplV1 = Contracts.getFromLocal('DummyImplementation');
 const ImplV2 = Contracts.getFromLocal('DummyImplementationV2');
@@ -213,7 +213,7 @@ contract('App', function (accounts) {
     it('returns provider', async function () {
       const provider = await this.app.getProvider(packageName)
       provider.address.should.eq(this.directory.address)
-      provider.should.be.instanceof(FreezableImplementationDirectory)
+      provider.should.be.instanceof(ImplementationDirectory)
     })
 
     it('returns null if not exists', async function () {

@@ -4,12 +4,10 @@ import Logger from '../utils/Logger'
 import decodeLogs from '../helpers/decodeLogs'
 import copyContract from '../helpers/copyContract'
 import { deploy as deployContract, sendTransaction, sendDataTransaction } from '../utils/Transactions'
-
-import FreezableImplementationDirectory from '../directory/FreezableImplementationDirectory';
 import { isZeroAddress, toAddress } from '../utils/Addresses';
 import { buildCallData, callDescription } from '../utils/ABIs';
 import Contracts from '../utils/Contracts';
-import { Package } from '..';
+import { Package, ImplementationDirectory } from '..';
 
 const log = new Logger('App')
 
@@ -75,10 +73,10 @@ export default class App {
     return (await this.getProvider(name) != null);
   }
 
-  async getProvider(name, providerClass = FreezableImplementationDirectory) {
+  async getProvider(name) {
     const address = await this.appContract.getProvider(name)
     if (isZeroAddress(address)) return null
-    return await providerClass.fetch(address, this.txParams)
+    return await ImplementationDirectory.fetch(address, this.txParams)
   }
 
   async changeProxyAdmin(proxyAddress, newAdmin) {

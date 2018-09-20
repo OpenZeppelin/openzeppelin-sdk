@@ -16,8 +16,33 @@ contract ImplementationDirectory is ImplementationProvider, Ownable {
    */
   event ImplementationChanged(string contractName, address indexed implementation);
 
+  /**
+   * @dev Emitted when the implementation directory is frozen.
+   */
+  event Frozen();
+
   /// @dev Mapping where the addresses of the implementations are stored.
   mapping (string => address) internal implementations;
+
+  /// @dev Mutability state of the directory.
+  bool public frozen;
+
+  /**
+   * @dev Modifier that allows functions to be called only before the contract is frozen.
+   */
+  modifier whenNotFrozen() {
+    require(!frozen, "Cannot perform action for a frozen implementation directory");
+    _;
+  }
+
+  /**
+   * @dev Makes the directory irreversibly immutable.
+   * It can only be called once, by the owner.
+   */
+  function freeze() onlyOwner whenNotFrozen public {
+    frozen = true;
+    emit Frozen();
+  }
 
   /**
    * @dev Returns the implementation address of a contract.
@@ -33,7 +58,7 @@ contract ImplementationDirectory is ImplementationProvider, Ownable {
    * @param contractName Name of the contract.
    * @param implementation Address of the implementation.
    */
-  function setImplementation(string contractName, address implementation) public onlyOwner {
+  function setImplementation(string contractName, address implementation) public onlyOwner whenNotFrozen {
     require(AddressUtils.isContract(implementation), "Cannot set implementation in directory with a non-contract address");
     implementations[contractName] = implementation;
     emit ImplementationChanged(contractName, implementation);
@@ -43,7 +68,7 @@ contract ImplementationDirectory is ImplementationProvider, Ownable {
    * @dev Removes the address of a contract implementation from the directory.
    * @param contractName Name of the contract.
    */
-  function unsetImplementation(string contractName) public onlyOwner {
+  function unsetImplementation(string contractName) public onlyOwner whenNotFrozen {
     implementations[contractName] = address(0);
     emit ImplementationChanged(contractName, address(0));
   }

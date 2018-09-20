@@ -21,7 +21,6 @@ import Proxy from './proxy/Proxy'
 import App from './app/App'
 import Package from './package/Package'
 import ImplementationDirectory from './directory/ImplementationDirectory'
-import FreezableImplementationDirectory from './directory/FreezableImplementationDirectory'
 import BasePackageProject from './project/BasePackageProject'
 import LibProject from './project/LibProject'
 import AppProject from './project/AppProject'
@@ -42,7 +41,6 @@ export {
   Contracts,
   App,
   ImplementationDirectory,
-  FreezableImplementationDirectory,
   Package,
   BasePackageProject,
   LibProject,

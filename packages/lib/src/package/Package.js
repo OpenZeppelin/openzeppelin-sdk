@@ -1,6 +1,6 @@
 import Logger from '../utils/Logger'
 import { deploy as deployContract, sendTransaction } from '../utils/Transactions'
-import FreezableImplementationDirectory from '../directory/FreezableImplementationDirectory';
+import ImplementationDirectory from '../directory/ImplementationDirectory';
 import Contracts from '../utils/Contracts';
 import { toAddress, isZeroAddress } from '../utils/Addresses';
 
@@ -8,25 +8,24 @@ const log = new Logger('Package')
 
 export default class Package {
 
-  static async fetch(address, txParams = {}, directoryClass = FreezableImplementationDirectory) {
+  static async fetch(address, txParams = {}) {
     if (isZeroAddress(address)) return null
     const Package = Contracts.getFromLib('Package')
     const packageContract = await Package.at(address)
-    return new this(packageContract, txParams, directoryClass)
+    return new this(packageContract, txParams)
   }
 
-  static async deploy(txParams = {}, directoryClass = FreezableImplementationDirectory) {
+  static async deploy(txParams = {}) {
     log.info('Deploying new Package...')
     const Package = Contracts.getFromLib('Package')
     const packageContract = await deployContract(Package, [], txParams)
     log.info(`Deployed Package ${packageContract.address}`)
-    return new this(packageContract, txParams, directoryClass)
+    return new this(packageContract, txParams)
   }
 
-  constructor(packageContract, txParams = {}, directoryClass = FreezableImplementationDirectory) {
+  constructor(packageContract, txParams = {}) {
     this.packageContract = packageContract
     this.txParams = txParams
-    this.directoryClass = directoryClass
   }
 
   get contract() {
@@ -77,10 +76,10 @@ export default class Package {
   async getDirectory(version) {
     if (!version) throw Error("Cannot get a directory from a package without specifying a version")
     const directoryAddress = await this.packageContract.getVersion(version)
-    return this.directoryClass.fetch(directoryAddress, this.txParams)
+    return ImplementationDirectory.fetch(directoryAddress, this.txParams)
   }
 
   async _newDirectory() {
-    return this.directoryClass.deploy(this.txParams)
+    return ImplementationDirectory.deploy(this.txParams)
   }
 }

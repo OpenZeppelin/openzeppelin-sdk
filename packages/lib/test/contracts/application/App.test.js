@@ -2,7 +2,6 @@
 require('../../setup')
 
 import Contracts from '../../../src/utils/Contracts'
-import assertRevert from '../../../src/test/helpers/assertRevert'
 import shouldManageProxies from './ManageProxies.behavior';
 import shouldManagePackages from './ManagePackages.behavior';
 import shouldBehaveLikeOwnable from '../../../src/test/behaviors/Ownable';
