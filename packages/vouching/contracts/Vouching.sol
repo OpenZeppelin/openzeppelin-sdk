@@ -25,31 +25,41 @@ contract Vouching {
   event Unvouched(string name, uint256 amount);
   event DependencyRemoved(string name);
 
-  constructor(uint256 minimumStake, ZepToken token) public { 
+  constructor(uint256 minimumStake, ZepToken token) public {
+    require(token != address(0));
     _minimumStake = minimumStake;
-    _token = token; 
+    _token = token;
   }
 
   function minimumStake() public view returns(uint256) {
     return _minimumStake;
   }
 
+  function token() public view returns(ZepToken) {
+    return _token;
+  }
+
   function getDependencyAddress(string name) public view returns(address) {
     return _registry[name].dependencyAddress;
-  } 
+  }
 
   function getDependencyOwner(string name) public view returns(address) {
     return _registry[name].owner;
-  } 
+  }
 
   function getDependencyStake(string name) public view returns(uint256) {
     return _registry[name].stake;
-  } 
+  }
 
   function create(string name, address owner, address dependencyAddress, uint256 initialStake) external {
     require(initialStake >= _minimumStake);
+    require(owner != address(0));
+    require(dependencyAddress != address(0));
+
     _token.transferFrom(owner, this, initialStake);
+
     _registry[name] = Dependency(owner, dependencyAddress, initialStake);
+
     emit DependencyCreated(name, owner, dependencyAddress, initialStake);
   }
 
