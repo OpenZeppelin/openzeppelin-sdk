@@ -55,7 +55,7 @@ export default function shouldBehaveLikeApp(appClass, accounts, { setImplementat
 
     describe('with initializer', function () {
       beforeEach('creating a non-upgradeable instance', async function () {
-        this.instance = await this.app.createContract(ImplV1, packageName, contractName, 'initialize', [10]);
+        this.instance = await this.app.createContract(ImplV1, packageName, contractName, 'initializeNonPayable', [10]);
       });
 
       shouldReturnANonUpgradeableInstance();
@@ -142,7 +142,7 @@ export default function shouldBehaveLikeApp(appClass, accounts, { setImplementat
 
     describe('with initializer', function () {
       beforeEach('creating a proxy', async function () {
-        this.proxy = await this.app.createProxy(ImplV1, packageName, contractName, 'initialize', [10]);
+        this.proxy = await this.app.createProxy(ImplV1, packageName, contractName, 'initializeNonPayable', [10]);
       });
 
       shouldReturnProxy();

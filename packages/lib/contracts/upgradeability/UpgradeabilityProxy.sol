@@ -26,11 +26,17 @@ contract UpgradeabilityProxy is Proxy {
   /**
    * @dev Contract constructor.
    * @param _implementation Address of the initial implementation.
+   * @param _data Data to send as msg.data to the implementation to initialize the proxied contract.
+   * It should include the signature and the parameters of the function to be called, as described in
+   * https://solidity.readthedocs.io/en/develop/abi-spec.html#function-selector-and-argument-encoding.
+   * This parameter is optional, if no data is given the initialization call to proxied contract will be skipped.
    */
-  constructor(address _implementation) public {
+  constructor(address _implementation, bytes _data) public payable {
     assert(IMPLEMENTATION_SLOT == keccak256("org.zeppelinos.proxy.implementation"));
-
     _setImplementation(_implementation);
+    if(_data.length > 0) {
+      require(_implementation.delegatecall(_data));
+    }
   }
 
   /**

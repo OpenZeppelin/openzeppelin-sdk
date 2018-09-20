@@ -2,7 +2,6 @@ pragma solidity ^0.4.24;
 
 import "./versioning/ImplementationProvider.sol";
 import "../upgradeability/AdminUpgradeabilityProxy.sol";
-import "../upgradeability/UpgradeabilityProxyFactory.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 
 /**
@@ -11,17 +10,16 @@ import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
  * It handles the creation and upgrading of proxies.
  */
 contract BaseApp is Ownable {
-  /// @dev Factory that creates proxies.
-  UpgradeabilityProxyFactory public factory;
+  /**
+   * @dev Emitted when a new proxy is created.
+   * @param proxy Address of the created proxy.
+   */
+  event ProxyCreated(address indexed proxy);
 
   /**
    * @dev Constructor function
-   * @param _factory Proxy factory
    */
-  constructor(UpgradeabilityProxyFactory _factory) public {
-    require(address(_factory) != address(0), "Cannot set the proxy factory of an app to the zero address");
-    factory = _factory;
-  }
+  constructor() public {}
 
   /**
    * @dev Abstract function to return the implementation provider for a given package name.
@@ -69,29 +67,21 @@ contract BaseApp is Ownable {
   }
 
   /**
-   * @dev Creates a new proxy for the given contract.
-   * @param packageName Name of the package where the contract is contained.
-   * @param contractName Name of the contract.
-   * @return Address of the new proxy.
-   */
-  function create(string packageName, string contractName) public returns (AdminUpgradeabilityProxy) {
-    address implementation = getImplementation(packageName, contractName);
-    return factory.createProxy(this, implementation);
-  }
-
-  /**
    * @dev Creates a new proxy for the given contract and forwards a function call to it.
    * This is useful to initialize the proxied contract.
    * @param packageName Name of the package where the contract is contained.
    * @param contractName Name of the contract.
-   * @param data Data to send as msg.data in the low level call.
+   * @param data Data to send as msg.data to the corresponding implementation to initialize the proxied contract.
    * It should include the signature and the parameters of the function to be called, as described in
    * https://solidity.readthedocs.io/en/develop/abi-spec.html#function-selector-and-argument-encoding.
+   * This parameter is optional, if no data is given the initialization call to proxied contract will be skipped.
    * @return Address of the new proxy.
    */
-   function createAndCall(string packageName, string contractName, bytes data) payable public returns (AdminUpgradeabilityProxy) {
+   function create(string packageName, string contractName, bytes data) payable public returns (AdminUpgradeabilityProxy) {
     address implementation = getImplementation(packageName, contractName);
-    return factory.createProxyAndCall.value(msg.value)(this, implementation, data);
+     AdminUpgradeabilityProxy proxy = (new AdminUpgradeabilityProxy).value(msg.value)(implementation, data);
+     emit ProxyCreated(proxy);
+     return proxy;
   }
 
   /**

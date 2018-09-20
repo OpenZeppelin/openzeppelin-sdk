@@ -23,7 +23,6 @@ import VersionedApp from './app/VersionedApp'
 import Package from './package/Package'
 import ImplementationDirectory from './directory/ImplementationDirectory'
 import FreezableImplementationDirectory from './directory/FreezableImplementationDirectory'
-import UpgradeabilityProxyFactory from './factory/UpgradeabilityProxyFactory'
 import BasePackageProject from './project/BasePackageProject'
 import LibProject from './project/LibProject'
 import AppProject from './project/AppProject'
@@ -46,7 +45,6 @@ export {
   UnversionedApp,
   ImplementationDirectory,
   FreezableImplementationDirectory,
-  UpgradeabilityProxyFactory,
   Package,
   BasePackageProject,
   LibProject,

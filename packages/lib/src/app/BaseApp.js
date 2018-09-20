@@ -1,12 +1,10 @@
 'use strict'
 
 import Logger from '../utils/Logger'
-import Contracts from '../utils/Contracts'
 import decodeLogs from '../helpers/decodeLogs'
 import copyContract from '../helpers/copyContract'
 import { deploy as deployContract, sendTransaction, sendDataTransaction } from '../utils/Transactions'
 
-import UpgradeabilityProxyFactory from '../factory/UpgradeabilityProxyFactory';
 import FreezableImplementationDirectory from '../directory/FreezableImplementationDirectory';
 import { isZeroAddress } from '../utils/Addresses';
 import { buildCallData, callDescription } from '../utils/ABIs';
@@ -21,9 +19,8 @@ export default class BaseApp {
   }
 
   static async deploy(txParams = {}) {
-    const factory = await UpgradeabilityProxyFactory.deploy(txParams)
     log.info('Deploying new App...')
-    const appContract = await deployContract(this.getContractClass(), [factory.address], txParams)
+    const appContract = await deployContract(this.getContractClass(), [], txParams)
     log.info(`Deployed App at ${appContract.address}`)
     return new this(appContract, txParams)
   }
@@ -81,8 +78,7 @@ export default class BaseApp {
       : await this._createProxyAndCall(contractClass, packageName, contractName, initMethodName, initArgs)
 
     log.info(`TX receipt received: ${receipt.transactionHash}`)
-    const UpgradeabilityProxyFactory = Contracts.getFromLib('UpgradeabilityProxyFactory')
-    const logs = decodeLogs(receipt.logs, UpgradeabilityProxyFactory)
+    const logs = decodeLogs(receipt.logs, this.constructor.getContractClass())
     const address = logs.find(l => l.event === 'ProxyCreated').args.proxy
     log.info(`${packageName} ${contractName} proxy: ${address}`)
     return new contractClass(address)
@@ -98,13 +94,14 @@ export default class BaseApp {
 
   async _createProxy(packageName, contractName) {
     log.info(`Creating ${packageName} ${contractName} proxy without initializing...`)
-    return sendTransaction(this.appContract.create, [packageName, contractName], this.txParams)
+    const initializeData = ''
+    return sendTransaction(this.appContract.create, [packageName, contractName, initializeData], this.txParams)
   }
 
   async _createProxyAndCall(contractClass, packageName, contractName, initMethodName, initArgs) {
     const { method: initMethod, callData } = buildCallData(contractClass, initMethodName, initArgs)
     log.info(`Creating ${packageName} ${contractName} proxy and calling ${callDescription(initMethod, initArgs)}`)
-    return sendTransaction(this.appContract.createAndCall, [packageName, contractName, callData], this.txParams)
+    return sendTransaction(this.appContract.create, [packageName, contractName, callData], this.txParams)
   }
 
   async _upgradeProxy(proxyAddress, packageName, contractName) {
