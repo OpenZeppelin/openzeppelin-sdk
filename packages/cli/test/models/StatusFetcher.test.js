@@ -471,11 +471,12 @@ contract('StatusFetcher', function([_, owner, anotherAddress]) {
 
           it('adds that proxy', async function () {
             await this.checker.checkProxies()
+            const proxyInfo = this.networkFile.getProxies({ package: this.packageFile.name, contract: 'Impl' })[0]
 
             this.networkFile.getProxies().should.have.lengthOf(1)
-            this.networkFile.proxyFromIndex(this.packageFile.name, 'Impl', 0).address.should.be.equal(this.proxy.address)
-            this.networkFile.proxyFromIndex(this.packageFile.name, 'Impl', 0).version.should.be.equal('unknown')
-            this.networkFile.proxyFromIndex(this.packageFile.name, 'Impl', 0).implementation.should.be.equal(this.impl.address)
+            proxyInfo.address.should.be.equal(this.proxy.address)
+            proxyInfo.version.should.be.equal('unknown')
+            proxyInfo.implementation.should.be.equal(this.impl.address)
           })
         })
 
@@ -487,14 +488,16 @@ contract('StatusFetcher', function([_, owner, anotherAddress]) {
 
           it('adds those proxies', async function () {
             await this.checker.checkProxies()
+            const implProxyInfo = this.networkFile.getProxies({ package: this.packageFile.name, contract: 'Impl' })[0]
+            const anotherImplProxyInfo = this.networkFile.getProxies({ package: this.packageFile.name, contract: 'AnotherImpl' })[0]
 
             this.networkFile.getProxies().should.have.lengthOf(2)
-            this.networkFile.proxyFromIndex(this.packageFile.name, 'Impl', 0).address.should.be.equal(this.implProxy.address)
-            this.networkFile.proxyFromIndex(this.packageFile.name, 'Impl', 0).version.should.be.equal('unknown')
-            this.networkFile.proxyFromIndex(this.packageFile.name, 'Impl', 0).implementation.should.be.equal(this.impl.address)
-            this.networkFile.proxyFromIndex(this.packageFile.name, 'AnotherImpl', 0).address.should.be.equal(this.anotherImplProxy.address)
-            this.networkFile.proxyFromIndex(this.packageFile.name, 'AnotherImpl', 0).version.should.be.equal('unknown')
-            this.networkFile.proxyFromIndex(this.packageFile.name, 'AnotherImpl', 0).implementation.should.be.equal(this.anotherImpl.address)
+            implProxyInfo.address.should.be.equal(this.implProxy.address)
+            implProxyInfo.version.should.be.equal('unknown')
+            implProxyInfo.implementation.should.be.equal(this.impl.address)
+            anotherImplProxyInfo.address.should.be.equal(this.anotherImplProxy.address)
+            anotherImplProxyInfo.version.should.be.equal('unknown')
+            anotherImplProxyInfo.implementation.should.be.equal(this.anotherImpl.address)
           })
         })
       })
@@ -533,11 +536,12 @@ contract('StatusFetcher', function([_, owner, anotherAddress]) {
 
               it('removes the unregistered proxy', async function () {
                 await this.checker.checkProxies()
+                const proxyInfo = this.networkFile.getProxies({ package: this.packageFile.name, contract: 'Impl' })[0]
 
                 this.networkFile.getProxies().should.have.lengthOf(1)
-                this.networkFile.proxyFromIndex(this.packageFile.name, 'Impl', 0).address.should.be.equal(this.proxy.address)
-                this.networkFile.proxyFromIndex(this.packageFile.name, 'Impl', 0).version.should.be.equal('1.0.0')
-                this.networkFile.proxyFromIndex(this.packageFile.name, 'Impl', 0).implementation.should.be.equal(this.impl.address)
+                proxyInfo.address.should.be.equal(this.proxy.address)
+                proxyInfo.version.should.be.equal('1.0.0')
+                proxyInfo.implementation.should.be.equal(this.impl.address)
               })
             })
 
@@ -552,11 +556,12 @@ contract('StatusFetcher', function([_, owner, anotherAddress]) {
 
               it('removes the unregistered proxy and updates the implementation of the registered one', async function () {
                 await this.checker.checkProxies()
+                const proxyInfo = this.networkFile.getProxies({ package: this.packageFile.name, contract: 'Impl' })[0]
 
                 this.networkFile.getProxies().should.have.lengthOf(1)
-                this.networkFile.proxyFromIndex(this.packageFile.name, 'Impl', 0).address.should.be.equal(this.proxy.address)
-                this.networkFile.proxyFromIndex(this.packageFile.name, 'Impl', 0).version.should.be.equal('1.0.0')
-                this.networkFile.proxyFromIndex(this.packageFile.name, 'Impl', 0).implementation.should.be.equal(this.impl.address)
+                proxyInfo.address.should.be.equal(this.proxy.address)
+                proxyInfo.version.should.be.equal('1.0.0')
+                proxyInfo.implementation.should.be.equal(this.impl.address)
               })
             })
 
@@ -568,11 +573,12 @@ contract('StatusFetcher', function([_, owner, anotherAddress]) {
 
               it('removes the unregistered proxy and updates the alias of the registered one', async function () {
                 await this.checker.checkProxies()
+                const proxyInfo = this.networkFile.getProxies({ package: this.packageFile.name, contract: 'Impl' })[0]
 
                 this.networkFile.getProxies().should.have.lengthOf(1)
-                this.networkFile.proxyFromIndex(this.packageFile.name, 'Impl', 0).address.should.be.equal(this.proxy.address)
-                this.networkFile.proxyFromIndex(this.packageFile.name, 'Impl', 0).version.should.be.equal('1.0.0')
-                this.networkFile.proxyFromIndex(this.packageFile.name, 'Impl', 0).implementation.should.be.equal(this.impl.address)
+                proxyInfo.address.should.be.equal(this.proxy.address)
+                proxyInfo.version.should.be.equal('1.0.0')
+                proxyInfo.implementation.should.be.equal(this.impl.address)
               })
             })
 
@@ -584,11 +590,12 @@ contract('StatusFetcher', function([_, owner, anotherAddress]) {
 
               it('removes the unregistered proxy and updates the alias and implementation of the registered one', async function () {
                 await this.checker.checkProxies()
+                const proxyInfo = this.networkFile.getProxies({ package: this.packageFile.name, contract: 'Impl' })[0]
 
                 this.networkFile.getProxies().should.have.lengthOf(1)
-                this.networkFile.proxyFromIndex(this.packageFile.name, 'Impl', 0).address.should.be.equal(this.proxy.address)
-                this.networkFile.proxyFromIndex(this.packageFile.name, 'Impl', 0).version.should.be.equal('1.0.0')
-                this.networkFile.proxyFromIndex(this.packageFile.name, 'Impl', 0).implementation.should.be.equal(this.impl.address)
+                proxyInfo.address.should.be.equal(this.proxy.address)
+                proxyInfo.version.should.be.equal('1.0.0')
+                proxyInfo.implementation.should.be.equal(this.impl.address)
               })
             })
           })
@@ -597,11 +604,12 @@ contract('StatusFetcher', function([_, owner, anotherAddress]) {
 
             it('removes the unregistered proxies and adds the registered onen', async function () {
               await this.checker.checkProxies()
+              const proxyInfo = this.networkFile.getProxies({ package: this.packageFile.name, contract: 'Impl' })[0]
 
               this.networkFile.getProxies().should.have.lengthOf(1)
-              this.networkFile.proxyFromIndex(this.packageFile.name, 'Impl', 0).address.should.be.equal(this.proxy.address)
-              this.networkFile.proxyFromIndex(this.packageFile.name, 'Impl', 0).version.should.be.equal('unknown')
-              this.networkFile.proxyFromIndex(this.packageFile.name, 'Impl', 0).implementation.should.be.equal(this.impl.address)
+              proxyInfo.address.should.be.equal(this.proxy.address)
+              proxyInfo.version.should.be.equal('unknown')
+              proxyInfo.implementation.should.be.equal(this.impl.address)
             })
           })
         })
