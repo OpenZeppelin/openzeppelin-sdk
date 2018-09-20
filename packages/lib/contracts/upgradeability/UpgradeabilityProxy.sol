@@ -32,10 +32,10 @@ contract UpgradeabilityProxy is Proxy {
    */
   constructor(address _implementation, bytes _data) public payable {
     assert(IMPLEMENTATION_SLOT == keccak256("org.zeppelinos.proxy.implementation"));
+    _setImplementation(_implementation);
     if(_data.length > 0) {
       require(_implementation.delegatecall(_data));
     }
-    _setImplementation(_implementation);
   }
 
   /**

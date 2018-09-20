@@ -9,6 +9,12 @@ const DummyImplementation = artifacts.require('DummyImplementation')
 
 export default function shouldBehaveLikeUpgradeabilityProxy(proxyClass, proxyCreator) {
 
+  it('cannot be initialized with a non-contract address', async function () {
+    const nonContractAddress = proxyCreator
+    const initializeData = ''
+    await assertRevert(proxyClass.new(nonContractAddress, initializeData, { from: proxyCreator }))
+  })
+
   before('deploy implementation', async function () {
     this.implementation = (await DummyImplementation.new()).address
   })
