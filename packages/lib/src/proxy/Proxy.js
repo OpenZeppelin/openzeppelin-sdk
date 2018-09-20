@@ -10,8 +10,8 @@ export default class Proxy {
     return new this(contract, txParams)
   }
 
-  static async deploy(implementation, txParams = {}) {
-    const contract = await deployContract(Contracts.getFromLib('AdminUpgradeabilityProxy'), [toAddress(implementation)], txParams)
+  static async deploy(implementation, initData, txParams = {}) {
+    const contract = await deployContract(Contracts.getFromLib('AdminUpgradeabilityProxy'), [toAddress(implementation), initData], txParams)
     return new this(contract, txParams)
   }
 

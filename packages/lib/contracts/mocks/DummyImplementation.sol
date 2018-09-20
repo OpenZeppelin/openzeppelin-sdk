@@ -9,7 +9,19 @@ contract DummyImplementation {
   string public text;
   uint256[] public values;
 
-  function initialize(uint256 _value) payable public {
+  function initializeNonPayable() public {
+    value = 10;
+  }
+
+  function initializePayable() payable public {
+    value = 100;
+  }
+
+  function initializeNonPayable(uint256 _value) public {
+    value = _value;
+  }
+
+  function initializePayable(uint256 _value) payable public {
     value = _value;
   }
 

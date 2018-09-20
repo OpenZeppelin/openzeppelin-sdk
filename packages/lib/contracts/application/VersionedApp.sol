@@ -2,7 +2,6 @@ pragma solidity ^0.4.24;
 
 import "./BaseApp.sol";
 import "./versioning/Package.sol";
-import "../upgradeability/UpgradeabilityProxyFactory.sol";
 
 /**
  * @title VersionedApp
@@ -28,9 +27,8 @@ contract VersionedApp is BaseApp {
 
   /**
    * @dev Constructor function.
-   * @param _factory Proxy factory.
    */
-  constructor(UpgradeabilityProxyFactory _factory) BaseApp(_factory) public { }
+  constructor() BaseApp() public { }
 
   /**
    * @dev Returns the provider for a given package name, or zero if not set.

@@ -1,21 +1,22 @@
 'use strict';
 
 import Proxy from '../../../src/proxy/Proxy'
-import Contracts from '../../../src/utils/Contracts'
 import decodeLogs from '../../../src/helpers/decodeLogs'
 import encodeCall from '../../../src/helpers/encodeCall'
 import assertRevert from '../../../src/test/helpers/assertRevert'
 import shouldBehaveLikeOwnable from '../../../src/test/behaviors/Ownable'
 
-const DummyImplementation = Contracts.getFromLocal('DummyImplementation')
-const DummyImplementationV2 = Contracts.getFromLocal('DummyImplementationV2')
-const UpgradeabilityProxyFactory = Contracts.getFromLocal('UpgradeabilityProxyFactory')
+const DummyImplementation = artifacts.require('DummyImplementation')
+const DummyImplementationV2 = artifacts.require('DummyImplementationV2')
 
 export default function shouldBehaveLikeApp([_, appOwner, directoryOwner, anotherAccount]) {
+  const EMPTY_INITIALIZATION_DATA = ''
+
   describe('ownership', function () {
     beforeEach("setting ownable", function () {
       this.ownable = this.app
     })
+
     shouldBehaveLikeOwnable(appOwner, anotherAccount)
   })
 
@@ -39,33 +40,33 @@ export default function shouldBehaveLikeApp([_, appOwner, directoryOwner, anothe
   describe('create', function () {
     describe('successful', function () {
       beforeEach("creating proxy", async function () {
-        const { receipt } = await this.app.create(this.packageName, this.contractName)
-        this.logs = decodeLogs(receipt.logs, UpgradeabilityProxyFactory)
-        this.proxyAddress = this.logs.find(l => l.event === 'ProxyCreated').args.proxy
+        const { receipt } = await this.app.create(this.packageName, this.contractName, EMPTY_INITIALIZATION_DATA);
+        const logs = decodeLogs(receipt.logs, this.app.constructor)
+        this.proxyAddress = logs.find(l => l.event === 'ProxyCreated').args.proxy
       })
 
       shouldCreateProxy();
     });
 
     it('fails to create a proxy for unregistered package', async function () {
-      await assertRevert(this.app.create("NOTEXISTS", this.contractName))
+      await assertRevert(this.app.create("NOTEXISTS", this.contractName, EMPTY_INITIALIZATION_DATA))
     });
 
     it('fails to create a proxy for unregistered contract', async function () {
-      await assertRevert(this.app.create(this.packageName, "NOTEXISTS"))
+      await assertRevert(this.app.create(this.packageName, "NOTEXISTS", EMPTY_INITIALIZATION_DATA))
     });
   });
 
   describe('createAndCall', function () {
     const value = 1e5
-    const initializeData = encodeCall('initialize', ['uint256'], [42])
+    const initializeData = encodeCall('initializePayable', ['uint256'], [42])
     const incorrectData = encodeCall('wrong', ['uint256'], [42])
 
     describe('successful', function () {
       beforeEach("creating proxy", async function () {
-        const { receipt } = await this.app.createAndCall(this.packageName, this.contractName, initializeData, { value })
-        this.logs = decodeLogs(receipt.logs, UpgradeabilityProxyFactory)
-        this.proxyAddress = this.logs.find(l => l.event === 'ProxyCreated').args.proxy
+        const { receipt } = await this.app.create(this.packageName, this.contractName, initializeData, { value })
+        const logs = decodeLogs(receipt.logs, this.app.constructor)
+        this.proxyAddress = logs.find(l => l.event === 'ProxyCreated').args.proxy
       })
 
       shouldCreateProxy();
@@ -82,15 +83,15 @@ export default function shouldBehaveLikeApp([_, appOwner, directoryOwner, anothe
     });
 
     it('fails to create a proxy for unregistered package', async function () {
-      await assertRevert(this.app.createAndCall("NOTEXISTS", this.contractName, initializeData, { value }))
+      await assertRevert(this.app.create("NOTEXISTS", this.contractName, initializeData, { value }))
     });
 
     it('fails to create a proxy for unregistered contract', async function () {
-      await assertRevert(this.app.createAndCall(this.packageName, "NOTEXISTS", initializeData, { value }))
+      await assertRevert(this.app.create(this.packageName, "NOTEXISTS", initializeData, { value }))
     });
 
     it('fails to create a proxy with invalid initialize data', async function () {
-      await assertRevert(this.app.createAndCall(this.packageName, this.contractName, incorrectData, { value }))
+      await assertRevert(this.app.create(this.packageName, this.contractName, incorrectData, { value }))
     });
   });
 
@@ -108,9 +109,9 @@ export default function shouldBehaveLikeApp([_, appOwner, directoryOwner, anothe
 
   describe('upgrade', function () {
     beforeEach("creating proxy", async function () {
-      const { receipt } = await this.app.create(this.packageName, this.contractName, { from: appOwner })
-      this.logs = decodeLogs(receipt.logs, UpgradeabilityProxyFactory)
-      this.proxyAddress = this.logs.find(l => l.event === 'ProxyCreated').args.proxy
+      const { receipt } = await this.app.create(this.packageName, this.contractName, EMPTY_INITIALIZATION_DATA, { from: appOwner })
+      const logs = decodeLogs(receipt.logs, this.app.constructor)
+      this.proxyAddress = logs.find(l => l.event === 'ProxyCreated').args.proxy
     })
 
     describe('successful', async function () {
@@ -140,14 +141,14 @@ export default function shouldBehaveLikeApp([_, appOwner, directoryOwner, anothe
 
   describe('upgradeAndCall', function () {
     const value = 1e5
-    const initializeData = encodeCall('initialize', ['uint256'], [42])
+    const initializeData = encodeCall('initializePayable', ['uint256'], [42])
     const migrateData = encodeCall('migrate', ['uint256'], [84])
     const incorrectData = encodeCall('wrong', ['uint256'], [42])
 
     beforeEach("creating proxy", async function () {
-      const { receipt } = await this.app.createAndCall(this.packageName, this.contractName, initializeData, { from: appOwner })
-      this.logs = decodeLogs(receipt.logs, UpgradeabilityProxyFactory)
-      this.proxyAddress = this.logs.find(l => l.event === 'ProxyCreated').args.proxy
+      const { receipt } = await this.app.create(this.packageName, this.contractName, initializeData, { from: appOwner })
+      const logs = decodeLogs(receipt.logs, this.app.constructor)
+      this.proxyAddress = logs.find(l => l.event === 'ProxyCreated').args.proxy
     })
 
     describe('successful', async function () {
@@ -208,9 +209,9 @@ export default function shouldBehaveLikeApp([_, appOwner, directoryOwner, anothe
 
   describe('changeAdmin', function () {
     beforeEach("creating proxy", async function () {
-      const { receipt } = await this.app.create(this.packageName, this.contractName)
-      this.logs = decodeLogs(receipt.logs, UpgradeabilityProxyFactory)
-      this.proxyAddress = this.logs.find(l => l.event === 'ProxyCreated').args.proxy
+      const { receipt } = await this.app.create(this.packageName, this.contractName, EMPTY_INITIALIZATION_DATA)
+      const logs = decodeLogs(receipt.logs, this.app.constructor)
+      this.proxyAddress = logs.find(l => l.event === 'ProxyCreated').args.proxy
     })
 
     it('changes admin of the proxy', async function () {

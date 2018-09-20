@@ -30,7 +30,7 @@ export default function shouldManageProxies({ otherAdmin, setImplementations, su
       }
 
       it('creates and initializes a proxy', async function () {
-        const instance = await this.project.createProxy(DummyImplementation, { initArgs: [10] });
+        const instance = await this.project.createProxy(DummyImplementation, { initMethod: 'initializeNonPayable', initArgs: [10] });
         await assertIsVersion(instance, 'V1');
         await assertIsProxy(instance, this.adminAddress);
         (await instance.value()).toNumber().should.eq(10)
@@ -56,7 +56,7 @@ export default function shouldManageProxies({ otherAdmin, setImplementations, su
       }
 
       it('upgrades and migrates a proxy', async function () {
-        const upgraded = await this.project.upgradeProxy(this.instance.address, DummyImplementationV2, { initMethod: 'migrate', initArgs: [20] });
+        const upgraded = await this.project.upgradeProxy(this.instance.address, DummyImplementationV2, { initMethod: 'migrate', initArgs: [20], initFrom: otherAdmin });
         await assertIsVersion(upgraded, 'V2');
         await assertIsProxy(upgraded, this.adminAddress);
         (await upgraded.value()).toNumber().should.eq(20)

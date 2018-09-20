@@ -10,7 +10,6 @@ const ImplementationDirectory = Contracts.getFromLocal('ImplementationDirectory'
 const VersionedApp = Contracts.getFromLocal('VersionedApp')
 const DummyImplementation = Contracts.getFromLocal('DummyImplementation')
 const DummyImplementationV2 = Contracts.getFromLocal('DummyImplementationV2')
-const UpgradeabilityProxyFactory = Contracts.getFromLocal('UpgradeabilityProxyFactory')
 
 contract('VersionedApp', (accounts) => {
   const [_, appOwner, packageOwner, directoryOwner, anotherAccount] = accounts;
@@ -35,8 +34,7 @@ contract('VersionedApp', (accounts) => {
     this.package = await Package.new({ from: packageOwner })
     await this.package.addVersion(version_0, this.directory.address, { from: packageOwner });
 
-    this.factory = await UpgradeabilityProxyFactory.new()
-    this.app = await VersionedApp.new(this.factory.address, { from: appOwner })
+    this.app = await VersionedApp.new({ from: appOwner })
     await this.app.setPackage(this.packageName, this.package.address, version_0, { from: appOwner });
   })
 

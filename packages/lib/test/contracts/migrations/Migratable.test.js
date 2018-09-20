@@ -30,7 +30,8 @@ contract('Migratable', function ([_, owner, registrar]) {
   });
 
   beforeEach(async function () {
-    this.proxy = await AdminUpgradeabilityProxy.new(v0.address, { from });
+    const initializeData = ''
+    this.proxy = await AdminUpgradeabilityProxy.new(v0.address, initializeData, { from });
     this.contract = SampleChildV1.at(this.proxy.address);
   });
 
