@@ -21,16 +21,24 @@ export default class NetworkAppController extends NetworkBaseController {
   }
 
   async deploy() {
-    this.project = await AppProject.deploy(this.packageFile.name, this.currentVersion, this.txParams);
-    
-    const app = this.project.getApp()
-    this.networkFile.app = { address: app.address };
+    try {
+      this.project = await AppProject.deploy(this.packageFile.name, this.currentVersion, this.txParams)
+      this._registerApp(this.project.getApp())
+      this._registerPackage(await this.project.getProjectPackage())
+      this._registerVersion(this.currentVersion, await this.project.getCurrentDirectory())
+    } catch (deployError) {
+      this._tryRegisterPartialDeploy(deployError)
+    }
+  }
 
-    const projectPackage = await this.project.getProjectPackage()
-    this.networkFile.package = { address: projectPackage.address };
+  _tryRegisterPartialDeploy({ package: thepackage, app, directory }) {
+    if (thepackage) this._registerPackage(thepackage)
+    if (app) this._registerApp(app)
+    if (directory) this._registerVersion(this.currentVersion, directory)
+  }
 
-    const directory = await this.project.getCurrentDirectory()    
-    this._registerVersion(this.currentVersion, directory.address);
+  _registerApp({ address }) {
+    this.networkFile.app = { address }
   }
 
   async fetch() {
