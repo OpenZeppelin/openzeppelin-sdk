@@ -239,8 +239,12 @@ export default class StatusChecker {
         name: event.args.providerName,
         version: event.args.version,
         package: event.args.package
-      }));
+      }))
+      .reduce((dependencies, dependency) => {
+        dependencies[dependency.name] = dependency
+        return dependencies
+      }, {})
 
-      return _.uniqWith(filteredEvents, _.isEqual)
+      return Object.values(filteredEvents)
   }
 }
