@@ -10,6 +10,18 @@ export function getStorageLayout(contract, artifacts) {
   return { types, storage }
 }
 
+const CONTRACT_TYPE_INFO =  { 
+  id: 't_address', 
+  kind: 'elementary',
+  label: 'address' 
+};
+
+const FUNCTION_TYPE_INFO = {
+  id: 't_function', 
+  kind: 'elementary',
+  label: 'function' 
+};
+
 class StorageLayout {
   constructor (contract, artifacts) {
     this.artifacts = artifacts
@@ -163,20 +175,12 @@ class StorageLayout {
 
   getContractTypeInfo() {
     // Process a reference to a contract as an address, since we only care about storage size
-    return { 
-      id: 't_address', 
-      kind: 'elementary',
-      label: 'address' 
-    } 
+    return { ... CONTRACT_TYPE_INFO }
   }
 
   getFunctionTypeInfo() {
     // Process a reference to a function disregarding types, since we only care how much space it takes
-    return { 
-      id: 't_function', 
-      kind: 'elementary',
-      label: 'function' 
-    } 
+    return { ... FUNCTION_TYPE_INFO }
   }
 
   getStructTypeInfo(referencedDeclaration) {

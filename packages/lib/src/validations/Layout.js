@@ -6,7 +6,6 @@ const SUBSTITUTION_COST = 3,
       DELETION_COST = 2;
 
 export function compareStorageLayouts(original, updated) {
-  // TODO: Check cases with empty storage (both for original and updated)
   const areMatch = (var1, var2) => storageEntryMatches(var1, var2, original.types, updated.types)
   const areEqual = (var1, var2) => (areMatch(var1, var2) === 'equal')
   const distanceMatrix = levenshtein(original.storage, updated.storage, areEqual)
@@ -18,7 +17,6 @@ function storageEntryMatches(originalVar, updatedVar, originalTypes, updatedType
   const originalType = originalTypes[originalVar.type],
         updatedType = updatedTypes[updatedVar.type];
 
-  // TODO: Compare complex types (structs and enums)
   const typeMatches = (originalType.id === updatedType.id);
   const nameMatches = (originalVar.label === updatedVar.label);
   
