@@ -2,7 +2,7 @@
 [![Build Status](https://travis-ci.org/zeppelinos/zos.svg?branch=master)](https://travis-ci.org/zeppelinos/zos)
 [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lernajs.io/)
 
-Multi-package repository for ZeppelinOS [library](https://github.com/zeppelinos/zos/tree/master/packages/lib#readme), [CLI](https://github.com/zeppelinos/zos/tree/master/packages/cli#readme), and [docs](https://github.com/zeppelinos/zos/tree/master/packages/docs#readme).
+Multi-package repository for ZeppelinOS [library](https://github.com/zeppelinos/zos/tree/master/packages/lib#readme), [CLI](https://github.com/zeppelinos/zos/tree/master/packages/cli#readme), [vouching](https://github.com/zeppelinos/zos/tree/master/packages/vouching#readme), and [docs](https://github.com/zeppelinos/zos/tree/master/packages/docs#readme).
 
 ZeppelinOS is a platform to develop, manage and operate smart contract applications in Ethereum. It can be used to create smart contract systems that can be fixed and improved over time, enabling developers to opt-in to mutability for their deployed code through [upgradeability patterns](https://blog.zeppelinos.org/proxy-patterns/).
 
