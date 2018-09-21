@@ -1,5 +1,5 @@
 {
-  "name": "vouching",
+  "name": "zos-vouching",
   "version": "1.0.0",
   "description": "",
   "main": "truffle-config.js",
@@ -19,6 +19,6 @@
     "chai": "^4.1.2",
     "chai-bignumber": "^2.0.2",
     "ganache-cli": "6.1.0",
-    "truffle": "^4.1.13"
+    "truffle": "^4.1.14"
   }
 }
