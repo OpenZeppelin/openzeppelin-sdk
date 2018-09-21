@@ -321,7 +321,7 @@ footer.nav-footer a:focus, footer.nav-footer a:hover {
 
 .reference h4{
 display:unset;
-font-size: 1.1em!important;
+font-size: 1em!important;
 border-radius: 25px;
 padding: 5px 10px !important;
 }
@@ -362,7 +362,7 @@ color: #445AA9!important;
   background-color: #dee3e9;
   padding: 6px 6px 6px 15px;
   margin-bottom: 10px;
-  font-weight: 800;
+  font-weight: 600;
 }
 
 .contract-doc .events .description,
@@ -379,7 +379,7 @@ color: #445AA9!important;
 }
 
 .label-modifiers, .label-parameters, .label-return {
-  font-weight: 800;
+  font-weight: 00;
 }
 
 article h2 {
