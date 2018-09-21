@@ -3,7 +3,7 @@ require('../setup')
 
 import sinon from 'sinon'
 
-import { Contracts, VersionedApp, Package } from 'zos-lib'
+import { Contracts, App, Package } from 'zos-lib'
 
 import push from '../../src/scripts/push.js';
 import freeze from '../../src/scripts/freeze';
@@ -54,7 +54,7 @@ contract('push script', function([_, owner]) {
       const address = this.networkFile.appAddress;
       address.should.be.nonzeroAddress;
 
-      const app = await VersionedApp.fetch(address);
+      const app = await App.fetch(address);
       const hasPackage = await app.hasPackage(this.networkFile.packageFile.name)
       hasPackage.should.be.true
     });
@@ -176,7 +176,7 @@ contract('push script', function([_, owner]) {
     const libVersion = '1.1.0';
 
     it('should set dependency in deployed app', async function () {
-      const app = await VersionedApp.fetch(this.networkFile.appAddress);
+      const app = await App.fetch(this.networkFile.appAddress);
       const packageInfo = await app.getPackage(libName)
       packageInfo.version.should.eq(libVersion)
       packageInfo.package.address.should.eq(this.dependencyPackage.address)

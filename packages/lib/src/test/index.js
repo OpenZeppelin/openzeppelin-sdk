@@ -1,7 +1,6 @@
 import assertions from './helpers/assertions'
 import assertRevert from './helpers/assertRevert'
 import shouldBehaveLikeOwnable from './behaviors/Ownable'
-import shouldBehaveLikeImplementationDirectory from './behaviors/ImplementationDirectory'
 
 const helpers = {
   assertions,
@@ -10,7 +9,6 @@ const helpers = {
 
 const behaviors = {
   shouldBehaveLikeOwnable,
-  shouldBehaveLikeImplementationDirectory,
 }
 
 export {

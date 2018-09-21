@@ -30,7 +30,7 @@ export default function shouldManageProxies({ otherAdmin, setImplementations, su
       }
 
       it('creates and initializes a proxy', async function () {
-        const instance = await this.project.createProxy(DummyImplementation, { initMethod: 'initializeNonPayable', initArgs: [10] });
+        const instance = await this.project.createProxy(DummyImplementation, { initArgs: [10, "foo", [20, 30]] });
         await assertIsVersion(instance, 'V1');
         await assertIsProxy(instance, this.adminAddress);
         (await instance.value()).toNumber().should.eq(10)

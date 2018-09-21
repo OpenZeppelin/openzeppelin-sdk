@@ -1,11 +1,11 @@
 import BasePackageProject from "./BasePackageProject";
-import VersionedApp from "../app/VersionedApp";
+import App from "../app/App";
 import Package from "../package/Package";
 import _ from 'lodash';
 
 export default class AppProject extends BasePackageProject {
   static async fetch(appAddress, name, txParams) {
-    const app = await VersionedApp.fetch(appAddress, txParams)
+    const app = await App.fetch(appAddress, txParams)
     const packageInfo = await app.getPackage(name)
     const project = new this(app, name, packageInfo.version, txParams)
     project.package = packageInfo.package
@@ -15,7 +15,7 @@ export default class AppProject extends BasePackageProject {
   static async deploy(name = 'main', version = '0.1.0', txParams = {}) {
     const thepackage = await Package.deploy(txParams)
     const directory = await thepackage.newVersion(version)
-    const app = await VersionedApp.deploy(txParams)
+    const app = await App.deploy(txParams)
     await app.setPackage(name, thepackage.address, version)
     const project = new this(app, name, version, txParams)
     project.directory = directory
