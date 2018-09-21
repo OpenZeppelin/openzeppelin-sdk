@@ -10,11 +10,11 @@ require('chai')
   .use(require('chai-bignumber')(BigNumber))
   .should();
 
-contract('Vouching', function ([_, tokenOwner, vouchingOwner, developer, transferee, dependencyAddress]) {
+contract('Vouching', function ([_, tokenOwner, vouchingOwner, developer, transferee, dependencyAddress, anotherDependencyAddress]) {
   const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000';
   const MAX_UINT256 = new BigNumber(2).pow(256).minus(1);
   const minStake = new BigNumber(10);
-  const stakeAmount = minStake * 2;
+  const stakeAmount = minStake.times(2);
 
   it('requires a non-null token', async function () {
     await assertRevert(
@@ -96,7 +96,7 @@ contract('Vouching', function ([_, tokenOwner, vouchingOwner, developer, transfe
       it('reverts when creating new dependency with existing name', async function () {
         await assertRevert(
           this.vouching.create(
-            dependencyName, developer, dependencyAddress, stakeAmount, { from: developer }
+            dependencyName, developer, anotherDependencyAddress, stakeAmount, { from: developer }
           )
         );
       });
@@ -160,7 +160,7 @@ contract('Vouching', function ([_, tokenOwner, vouchingOwner, developer, transfe
           await this.vouching.vouch(dependencyName, stakeAmount, { from: developer });
 
           (await this.vouching.getDependencyStake(dependencyName)).should.be.bignumber.equal(
-            initialStake.plus(stakeAmount * 2)
+            initialStake.plus(stakeAmount.times(2))
           );
         });
 
@@ -174,29 +174,27 @@ contract('Vouching', function ([_, tokenOwner, vouchingOwner, developer, transfe
       });
 
       describe('unvouch', function () {
-        beforeEach(async function () {
-          await this.vouching.vouch(dependencyName, stakeAmount, { from: developer });
-        });
+        const safeUnstakeAmount = stakeAmount.minus(minStake);
 
         it('reverts when caller is not the dependency\'s owner', async function () {
           await assertRevert(
-            this.vouching.unvouch(dependencyName, minStake, { from: vouchingOwner })
+            this.vouching.unvouch(dependencyName, safeUnstakeAmount, { from: vouchingOwner })
           );
         });
 
         it('reverts when the remaining stake amount is less than the minimum', async function () {
           await assertRevert(
-            this.vouching.unvouch(dependencyName, stakeAmount * 2, { from: developer })
+            this.vouching.unvouch(dependencyName, safeUnstakeAmount.plus(1), { from: developer })
           );
         });
 
         it('extracts the unvouched amount from the dependency\'s stake', async function () {
           const initDependencyStake = await this.vouching.getDependencyStake(dependencyName);
 
-          await this.vouching.unvouch(dependencyName, stakeAmount, { from: developer });
+          await this.vouching.unvouch(dependencyName, safeUnstakeAmount, { from: developer });
 
           (await this.vouching.getDependencyStake(dependencyName)).should.be.bignumber.equal(
-            initDependencyStake.minus(stakeAmount)
+            initDependencyStake.minus(safeUnstakeAmount)
           );
         });
 
@@ -204,22 +202,22 @@ contract('Vouching', function ([_, tokenOwner, vouchingOwner, developer, transfe
           const vouchingInitBalance = await this.token.balanceOf(this.vouching.address);
           const devInitBalance = await this.token.balanceOf(developer);
 
-          await this.vouching.unvouch(dependencyName, stakeAmount, { from: developer });
+          await this.vouching.unvouch(dependencyName, safeUnstakeAmount, { from: developer });
 
           (await this.token.balanceOf(this.vouching.address)).should.be.bignumber.equal(
-            vouchingInitBalance.minus(stakeAmount)
+            vouchingInitBalance.minus(safeUnstakeAmount)
           );
           (await this.token.balanceOf(developer)).should.be.bignumber.equal(
-            devInitBalance.plus(stakeAmount)
+            devInitBalance.plus(safeUnstakeAmount)
           );
         });
 
         it('emits Unvouched event', async function () {
-          const result = await this.vouching.unvouch(dependencyName, stakeAmount, { from: developer });
+          const result = await this.vouching.unvouch(dependencyName, safeUnstakeAmount, { from: developer });
           const unvouchedEvent = expectEvent.inLogs(result.logs, 'Unvouched', {
             name: dependencyName
           });
-          unvouchedEvent.args.amount.should.be.bignumber.equal(stakeAmount);
+          unvouchedEvent.args.amount.should.be.bignumber.equal(safeUnstakeAmount);
         });
       });
 
