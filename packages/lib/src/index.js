@@ -18,11 +18,9 @@ const assertRevert = helpers.assertRevert
 
 // model objects
 import Proxy from './proxy/Proxy'
-import UnversionedApp from './app/UnversionedApp'
-import VersionedApp from './app/VersionedApp'
+import App from './app/App'
 import Package from './package/Package'
 import ImplementationDirectory from './directory/ImplementationDirectory'
-import FreezableImplementationDirectory from './directory/FreezableImplementationDirectory'
 import BasePackageProject from './project/BasePackageProject'
 import LibProject from './project/LibProject'
 import AppProject from './project/AppProject'
@@ -41,10 +39,8 @@ export {
   Logger,
   FileSystem,
   Contracts,
-  VersionedApp,
-  UnversionedApp,
+  App,
   ImplementationDirectory,
-  FreezableImplementationDirectory,
   Package,
   BasePackageProject,
   LibProject,
