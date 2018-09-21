@@ -1,8 +1,10 @@
+const BigNumber = web3.BigNumber;
+
 const ZepToken = artifacts.require('ZepToken');
 
 contract('ZepToken', ([ _, owner]) => {
   beforeEach(async function () {
-    this.zepToken = await ZepToken.new(owner);
+    this.zepToken = await ZepToken.new();
   });
 
   it('has a name', async function () {
@@ -19,5 +21,10 @@ contract('ZepToken', ([ _, owner]) => {
     const decimals = await this.zepToken.decimals();
     assert.equal(decimals, 18);
   });
+
+  it('has the correct total supply', async function () {
+    const totalZEP = new BigNumber('100000000e18');
+    (await this.zepToken.totalSupply()).should.be.bignumber.equal(totalZEP);
+  })
 });
 

@@ -12,7 +12,7 @@ require('chai')
 
 contract('Vouching', function ([_, tokenOwner, vouchingOwner, developer, transferee, dependencyAddress, anotherDependencyAddress]) {
   const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000';
-  const MAX_UINT256 = new BigNumber(2).pow(256).minus(1);
+  const lotsaZEP = new BigNumber('10e18');
   const minStake = new BigNumber(10);
   const stakeAmount = minStake.times(2);
 
@@ -26,10 +26,10 @@ contract('Vouching', function ([_, tokenOwner, vouchingOwner, developer, transfe
     const dependencyName = 'dep';
 
     beforeEach(async function () {
-      this.token = await ZepToken.new(tokenOwner);
+      this.token = await ZepToken.new({ from: tokenOwner });
+      await this.token.transfer(developer, lotsaZEP, { from: tokenOwner });
       this.vouching = await Vouching.new(minStake, this.token.address, { from: vouchingOwner });
-      await this.token.mint(developer, MAX_UINT256, { from: tokenOwner });
-      await this.token.approve(this.vouching.address, MAX_UINT256, { from: developer });
+      await this.token.approve(this.vouching.address, lotsaZEP, { from: developer });
     });
 
     it('stores the token address', async function () {
