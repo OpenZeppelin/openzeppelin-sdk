@@ -58,6 +58,8 @@ contract Vouching {
     require(initialStake >= _minimumStake);
     require(owner != address(0));
     require(dependencyAddress != address(0));
+    // name should not be already registered
+    require(_registry[name].dependencyAddress == address(0));
 
     _token.transferFrom(owner, this, initialStake);
 
@@ -67,6 +69,7 @@ contract Vouching {
   }
 
   function transferOwnership(string name, address newOwner) external onlyDependencyOwner(name) {
+    require(newOwner != address(0));
     _registry[name].owner = newOwner;
     emit OwnershipTransferred(msg.sender, newOwner);
   }
@@ -78,9 +81,12 @@ contract Vouching {
   }
 
   function unvouch(string name, uint256 amount) external onlyDependencyOwner(name) {
-    require(_registry[name].stake.sub(amount) >= _minimumStake);
-    _registry[name].stake = _registry[name].stake.sub(amount);
+    uint256 remainingStake = _registry[name].stake.sub(amount);
+    require(remainingStake >= _minimumStake);
+
+    _registry[name].stake = remainingStake;
     _token.transfer(msg.sender, amount);
+
     emit Unvouched(name, amount);
   }
 
