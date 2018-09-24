@@ -5,12 +5,15 @@ const BigNumber = web3.BigNumber;
 
 const ZepToken = artifacts.require('ZepToken');
 const Vouching = artifacts.require('Vouching');
+const ZEPValidator = artifacts.require('ZEPValidator');
+const BasicJurisdiction = artifacts.require('BasicJurisdiction');
 
 require('chai')
   .use(require('chai-bignumber')(BigNumber))
   .should();
 
-contract('Vouching', function ([_, tokenOwner, vouchingOwner, developer, transferee, dependencyAddress, anotherDependencyAddress]) {
+contract('Vouching', function ([_, tokenOwner, vouchingOwner, developer, transferee, 
+        dependencyAddress, anotherDependencyAddress, jurisdictionOwner, validatorOwner, organization]) {
   const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000';
   const lotsaZEP = new BigNumber('10e18');
   const minStake = new BigNumber(10);
@@ -24,11 +27,22 @@ contract('Vouching', function ([_, tokenOwner, vouchingOwner, developer, transfe
 
   context('with token', async function () {
     const dependencyName = 'dep';
+    const attributeID = 0;
 
     beforeEach(async function () {
-      this.token = await ZepToken.new({ from: tokenOwner });
+      //TPL Setup
+      this.jurisdiction = await BasicJurisdiction.new({ from: jurisdictionOwner });
+      this.token = await ZepToken.new(this.jurisdiction.address, attributeID, { from: tokenOwner });
+      this.validator = await ZEPValidator.new(this.jurisdiction.address, attributeID, { from: validatorOwner });
+      await this.jurisdiction.addValidator(this.validator.address, "ZEP Validator", { from: jurisdictionOwner });
+      await this.jurisdiction.addAttributeType(attributeID, false, false, ZERO_ADDRESS, 0, 0, 0, "can transfer", { from: jurisdictionOwner });
+      await this.jurisdiction.addValidatorApproval(this.validator.address, attributeID, { from: jurisdictionOwner });
+      await this.validator.addOrganization(organization, 100, "ZEP Org", { from: validatorOwner });
+      await this.validator.issueAttribute(tokenOwner, { from: organization });
+      await this.validator.issueAttribute(developer, { from: organization });
       await this.token.transfer(developer, lotsaZEP, { from: tokenOwner });
       this.vouching = await Vouching.new(minStake, this.token.address, { from: vouchingOwner });
+      await this.validator.issueAttribute(this.vouching.address, { from: organization });
       await this.token.approve(this.vouching.address, lotsaZEP, { from: developer });
     });
 

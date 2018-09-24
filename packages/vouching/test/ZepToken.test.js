@@ -6,9 +6,10 @@ require('chai')
   .use(require('chai-bignumber')(BigNumber))
   .should();
 
-contract('ZepToken', ([ _, owner]) => {
+contract('ZepToken', ([ _, owner, jurisdiction]) => {
+  const attributeID = 0;
   beforeEach(async function () {
-    this.zepToken = await ZepToken.new();
+    this.zepToken = await ZepToken.new(jurisdiction, attributeID);
   });
 
   it('has a name', async function () {
