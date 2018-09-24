@@ -15,24 +15,22 @@ export default class App {
 
   static async fetch(address, txParams = {}) {
     const appContract = await this.getContractClass().at(address)
-    const factory = await UpgradeabilityProxyFactory.fetch(await appContract.factory())
-    return new this(appContract, factory, txParams)
+    return new this(appContract, txParams)
   }
 
   static async deploy(txParams = {}) {
     log.info('Deploying new App...')
     const appContract = await deployContract(this.getContractClass(), [], txParams)
     log.info(`Deployed App at ${appContract.address}`)
-    return new this(appContract, factory, txParams)
+    return new this(appContract, txParams)
   }
 
   static getContractClass() {
     return Contracts.getFromLib('App')
   }
 
-  constructor(appContract, factory, txParams = {}) {
+  constructor(appContract, txParams = {}) {
     this.appContract = appContract
-    this.factory = factory
     this.txParams = txParams
   }
 

@@ -207,10 +207,9 @@ export default class StatusChecker {
 
   async _fetchOnChainProxies() {
     const implementationsInfo = await this._fetchOnChainImplementations()
-    const app = this._project.getApp()
-    const factory = app.factory
     const filter = new EventsFilter()
-    const proxyEvents = await filter.call(factory.factoryContract, 'ProxyCreated')
+    const app = this._project.getApp()
+    const proxyEvents = await filter.call(app.appContract, 'ProxyCreated')
     const proxiesInfo = []
     await Promise.all(proxyEvents.map(async event => {
       const address = event.args.proxy
@@ -231,7 +230,7 @@ export default class StatusChecker {
   async _fetchOnChainPackages() {
     const filter = new EventsFilter()
     const app = this._project.getApp()
-    const allEvents = await filter.call(app.contract, 'PackageChanged')
+    const allEvents = await filter.call(app.appContract, 'PackageChanged')
     const filteredEvents = allEvents
       .filter(event => event.args.package !== ZERO_ADDRESS)
       .filter(event => event.args.providerName !== this.packageName)
