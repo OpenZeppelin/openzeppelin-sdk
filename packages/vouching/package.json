@@ -1,6 +1,6 @@
 {
   "name": "zos-vouching",
-  "version": "1.0.0",
+  "version": "1.4.1",
   "description": "",
   "main": "truffle-config.js",
   "directories": {
@@ -11,7 +11,7 @@
   },
   "keywords": [],
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
     "openzeppelin-solidity": "^1.12.0"
   },

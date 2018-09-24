@@ -18,7 +18,7 @@ contract Vouching {
   ZepToken private _token;
 
   modifier onlyDependencyOwner(string name) {
-    require(msg.sender == _registry[name].owner);
+    require(msg.sender == _registry[name].owner, "Not allowed");
     _;
   }
 
@@ -29,7 +29,7 @@ contract Vouching {
   event DependencyRemoved(string name);
 
   constructor(uint256 minimumStake, ZepToken token) public {
-    require(token != address(0));
+    require(token != address(0), "Token address cannot be zero");
     _minimumStake = minimumStake;
     _token = token;
   }
@@ -42,24 +42,20 @@ contract Vouching {
     return _token;
   }
 
-  function getDependencyAddress(string name) public view returns(address) {
-    return _registry[name].dependencyAddress;
-  }
-
-  function getDependencyOwner(string name) public view returns(address) {
-    return _registry[name].owner;
-  }
-
-  function getDependencyStake(string name) public view returns(uint256) {
-    return _registry[name].stake;
+  function getDependency(string name) public view returns(address, address, uint256) {
+    return (
+      _registry[name].dependencyAddress,
+      _registry[name].owner,
+      _registry[name].stake
+    );
   }
 
   function create(string name, address owner, address dependencyAddress, uint256 initialStake) external {
-    require(initialStake >= _minimumStake);
-    require(owner != address(0));
-    require(dependencyAddress != address(0));
+    require(initialStake >= _minimumStake, "Initial stake must be equal or greater than minimum stake");
+    require(owner != address(0), "Owner address cannot be zero");
+    require(dependencyAddress != address(0), "Dependency address cannot be zero");
     // name should not be already registered
-    require(_registry[name].dependencyAddress == address(0));
+    require(_registry[name].dependencyAddress == address(0), "The name has already been registered");
 
     _token.transferFrom(owner, this, initialStake);
 
@@ -69,7 +65,7 @@ contract Vouching {
   }
 
   function transferOwnership(string name, address newOwner) external onlyDependencyOwner(name) {
-    require(newOwner != address(0));
+    require(newOwner != address(0), "New owner address cannot be zero");
     _registry[name].owner = newOwner;
     emit OwnershipTransferred(msg.sender, newOwner);
   }
@@ -82,7 +78,7 @@ contract Vouching {
 
   function unvouch(string name, uint256 amount) external onlyDependencyOwner(name) {
     uint256 remainingStake = _registry[name].stake.sub(amount);
-    require(remainingStake >= _minimumStake);
+    require(remainingStake >= _minimumStake, "Remaining stake must be equal or greater than minimum stake");
 
     _registry[name].stake = remainingStake;
     _token.transfer(msg.sender, amount);
