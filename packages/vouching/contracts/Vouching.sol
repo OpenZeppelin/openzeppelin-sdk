@@ -1,10 +1,16 @@
 pragma solidity ^0.4.24;
 
 
-import "./ZepToken.sol";
+import "openzeppelin-solidity/contracts/token/ERC20/ERC20.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 
 contract Vouching {
+  event OwnershipTransferred(address indexed oldOwner, address indexed newOwner);
+  event DependencyCreated(string name, address indexed owner, address indexed dependencyAddress, uint256 initialStake);
+  event Vouched(string name, uint256 amount);
+  event Unvouched(string name, uint256 amount);
+  event DependencyRemoved(string name);
+
   using SafeMath for uint256;
 
   struct Dependency {
@@ -15,20 +21,14 @@ contract Vouching {
 
   mapping (string => Dependency) private _registry;
   uint256 private _minimumStake;
-  ZepToken private _token;
+  ERC20 private _token;
 
   modifier onlyDependencyOwner(string name) {
     require(msg.sender == _registry[name].owner, "Not allowed");
     _;
   }
 
-  event OwnershipTransferred(address indexed oldOwner, address indexed newOwner);
-  event DependencyCreated(string name, address indexed owner, address indexed dependencyAddress, uint256 initialStake);
-  event Vouched(string name, uint256 amount);
-  event Unvouched(string name, uint256 amount);
-  event DependencyRemoved(string name);
-
-  constructor(uint256 minimumStake, ZepToken token) public {
+  constructor(uint256 minimumStake, ERC20 token) public {
     require(token != address(0), "Token address cannot be zero");
     _minimumStake = minimumStake;
     _token = token;
@@ -38,7 +38,7 @@ contract Vouching {
     return _minimumStake;
   }
 
-  function token() public view returns(ZepToken) {
+  function token() public view returns(ERC20) {
     return _token;
   }
 
@@ -54,7 +54,6 @@ contract Vouching {
     require(initialStake >= _minimumStake, "Initial stake must be equal or greater than minimum stake");
     require(owner != address(0), "Owner address cannot be zero");
     require(dependencyAddress != address(0), "Dependency address cannot be zero");
-    // name should not be already registered
     require(_registry[name].dependencyAddress == address(0), "The name has already been registered");
 
     _token.transferFrom(owner, this, initialStake);
