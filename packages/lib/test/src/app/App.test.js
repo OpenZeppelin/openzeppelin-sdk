@@ -51,12 +51,12 @@ contract('App', function (accounts) {
     beforeEach('setting package', setPackage)
 
     it('returns true if exists', async function () {
-      const hasPackage = await this.app.hasPackage(packageName)
+      const hasPackage = await this.app.hasPackage(packageName, version)
       hasPackage.should.be.true
     })
 
     it('returns false if not exists', async function () {
-      const hasPackage = await this.app.hasPackage('NOTEXISTS')
+      const hasPackage = await this.app.hasPackage('NOTEXISTS', version)
       hasPackage.should.be.false
     })
   })

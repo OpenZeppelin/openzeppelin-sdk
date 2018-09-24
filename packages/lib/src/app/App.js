@@ -40,9 +40,9 @@ export default class App {
     return { package: thepackage, version }
   }
 
-  async hasPackage(name) {
+  async hasPackage(name, version = undefined) {
     const [address, _version] = await this.appContract.getPackage(name)
-    return !isZeroAddress(address)
+    return !isZeroAddress(address) && _version === version
   }
 
   async setPackage(name, packageAddress, version) {

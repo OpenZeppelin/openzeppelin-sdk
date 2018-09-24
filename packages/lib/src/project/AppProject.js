@@ -1,32 +1,35 @@
 import BasePackageProject from "./BasePackageProject";
 import App from "../app/App";
 import Package from "../package/Package";
-import { AppDeployError } from '../utils/errors/DeployError';
+import { DeployError } from '../utils/errors/DeployError';
 import _ from 'lodash';
 
 export default class AppProject extends BasePackageProject {
-  static async fetch(appAddress, name, txParams) {
-    const app = await App.fetch(appAddress, txParams)
-    const packageInfo = await app.getPackage(name)
-    const project = new this(app, name, packageInfo.version, txParams)
-    project.package = packageInfo.package
-    return project
-  }
-
-  static async deploy(name = 'main', version = '0.1.0', txParams = {}) {
+  static async fetchOrDeploy(name = 'main', version = '0.1.0', txParams = {}, { appAddress = undefined, packageAddress = undefined }) {
     let thepackage, directory, app
     try {
-      thepackage = await Package.deploy(txParams)
-      directory = await thepackage.newVersion(version)
-      app = await VersionedApp.deploy(txParams)
-      await app.setPackage(name, thepackage.address, version)
+      app = appAddress
+        ? await App.fetch(appAddress, txParams)
+        : await App.deploy(txParams)
+      if (packageAddress) {
+        thepackage = await Package.fetch(packageAddress, txParams)
+      } else if (await app.hasPackage(name, version)) {
+        thepackage = (await app.getPackage(name)).package
+      } else {
+        thepackage = await Package.deploy(txParams)
+      }
+      directory = await thepackage.hasVersion(version)
+        ? await thepackage.getDirectory(version)
+        : await thepackage.newVersion(version)
+
+      if (!await app.hasPackage(name, version)) await app.setPackage(name, thepackage.address, version)
       const project = new this(app, name, version, txParams)
       project.directory = directory
       project.package = thepackage
 
       return project
-    } catch(error) {
-      throw new AppDeployError(error.message, thepackage, directory, app)
+    } catch(deployError) {
+      throw new DeployError(deployError.message, { thepackage, directory, app })
     }
   }
 

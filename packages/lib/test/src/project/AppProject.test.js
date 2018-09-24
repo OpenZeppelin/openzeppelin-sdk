@@ -16,14 +16,15 @@ contract('AppProject', function (accounts) {
   const newVersion = '0.3.0'
 
   beforeEach('deploying', async function () {
-    this.project = await AppProject.deploy(name, version, { from: owner })
+    this.project = await AppProject.fetchOrDeploy(name, version, { from: owner }, {})
     this.adminAddress = this.project.getApp().address
   });
 
-  shouldBehaveLikePackageProject({ 
+  shouldBehaveLikePackageProject({
     fetch: async function () {
-      this.project = await AppProject.fetch(this.project.getApp().address, name, { from: owner })
-    }, 
+      this.appAddress = this.project.getApp().address
+      this.project = await AppProject.fetchOrDeploy(name, version, { from: owner }, { appAddress: this.appAddress })
+    },
     onNewVersion: function () {
       it('registers the new package version in the app', async function () {
         const app = this.project.getApp()
@@ -37,7 +38,7 @@ contract('AppProject', function (accounts) {
       it('has a name', async function () {
         this.project.name.should.eq(name)
       })
-    } 
+    }
   });
   
   shouldManageProxies({

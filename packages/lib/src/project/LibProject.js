@@ -1,6 +1,6 @@
 import BasePackageProject from "./BasePackageProject";
 import Package from "../package/Package";
-import { DeployError as LibDeployError } from '../utils/errors/DeployError';
+import { DeployError } from '../utils/errors/DeployError';
 
 export default class LibProject extends BasePackageProject {
   static async fetch(packageAddress, version = '0.1.0', txParams) {
@@ -8,17 +8,22 @@ export default class LibProject extends BasePackageProject {
     return new this(thepackage, version, txParams)
   }
 
-  static async deploy(version = '0.1.0', txParams = {}) {
+  static async fetchOrDeploy(version = '0.1.0', txParams = {}, { packageAddress = undefined }) {
     let thepackage, directory
     try {
-      thepackage = await Package.deploy(txParams)
-      directory = await thepackage.newVersion(version)
+      thepackage = packageAddress
+        ? await Package.fetch(packageAddress, txParams)
+        : await Package.deploy(txParams)
+      directory = await thepackage.hasVersion(version)
+        ? await thepackage.getDirectory(version)
+        : await thepackage.newVersion(version)
+
       const project = new this(thepackage, version, txParams)
       project.directory = directory
 
       return project
     } catch(deployError) {
-      throw new LibDeployError(error.message, thepackage, directory)
+      throw new DeployError(deployError.message, { thepackage, directory })
     }
   }
 
