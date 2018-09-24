@@ -1,7 +1,6 @@
 pragma solidity ^0.4.24;
 
 import 'openzeppelin-solidity/contracts/token/ERC20/PausableToken.sol';
-import 'openzeppelin-solidity/contracts/token/ERC20/BurnableToken.sol';
 import 'openzeppelin-solidity/contracts/token/ERC20/StandardToken.sol';
 
 /**
@@ -14,8 +13,8 @@ contract ZepToken is StandardToken, PausableToken {
   string public constant symbol = "ZEP";
   uint8 public constant decimals = 18;
 
-  uint256 public constant TOTAL_SUPPLY = 100000000 * (10 ** uint256(decimals));
-  
+  uint256 public constant TOTAL_SUPPLY = 1e8 * (10 ** uint256(decimals));
+
   /**
    * @dev Constructor that gives msg.sender all of existing tokens, and sets it as the owner
    */
@@ -26,5 +25,5 @@ contract ZepToken is StandardToken, PausableToken {
     emit Transfer(address(0), msg.sender, TOTAL_SUPPLY);
   }
 
-  
+
 }
