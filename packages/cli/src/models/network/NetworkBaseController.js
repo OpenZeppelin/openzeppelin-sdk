@@ -51,29 +51,29 @@ export default class NetworkBaseController {
   }
 
   async push(reupload = false) {
-    if (this.isDeployed) {
-      await this.fetch();
-      await this.pushVersion();
-    } else {
-      await this.deploy();
-    }
+    this._checkVersion()
+    await this.fetchOrDeploy()
 
     await Promise.all([
-      this.uploadContracts(reupload), 
+      this.uploadContracts(reupload),
       this.unsetContracts()
     ])
   }
 
-  async pushVersion() {
+  _checkVersion() {
     const requestedVersion = this.packageFile.version;
     const currentVersion = this.networkFile.version;
+
     if (requestedVersion !== currentVersion) {
       log.info(`Current version ${currentVersion}`);
       log.info(`Creating new version ${requestedVersion}`);
-      const provider = await this.newVersion(requestedVersion);
       this.networkFile.contracts = {};
-      this._registerVersion(requestedVersion, provider);
     }
+  }
+
+  _tryRegisterPartialDeploy({ thepackage, directory }) {
+    if (thepackage) this._registerPackage(thepackage)
+    if (directory) this._registerVersion(this.currentVersion, directory)
   }
 
   _registerPackage({ address }) {
@@ -83,10 +83,6 @@ export default class NetworkBaseController {
   _registerVersion(version, { address }) {
     this.networkFile.provider = { address }
     this.networkFile.version = version
-  }
-
-  async newVersion(versionName) {
-    return this.project.newVersion(versionName);
   }
 
   async uploadContracts(reupload) {

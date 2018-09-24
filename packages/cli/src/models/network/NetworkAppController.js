@@ -8,10 +8,6 @@ import { allPromisesOrError } from '../../utils/async';
 const log = new Logger('NetworkAppController');
 
 export default class NetworkAppController extends NetworkBaseController {
-  get isDeployed() {
-    return !!this.appAddress;
-  }
-
   get appAddress() {
     return this.networkFile.appAddress
   }
@@ -20,9 +16,11 @@ export default class NetworkAppController extends NetworkBaseController {
     return this.project.getApp()
   }
 
-  async deploy() {
+  async fetchOrDeploy() {
     try {
-      this.project = await AppProject.deploy(this.packageFile.name, this.currentVersion, this.txParams)
+      const { appAddress, packageAddress } = this
+
+      this.project = await AppProject.fetchOrDeploy(this.packageFile.name, this.currentVersion, this.txParams, { appAddress, packageAddress })
       this._registerApp(this.project.getApp())
       this._registerPackage(await this.project.getProjectPackage())
       this._registerVersion(this.currentVersion, await this.project.getCurrentDirectory())
@@ -31,19 +29,13 @@ export default class NetworkAppController extends NetworkBaseController {
     }
   }
 
-  _tryRegisterPartialDeploy({ package: thepackage, app, directory }) {
-    if (thepackage) this._registerPackage(thepackage)
+  _tryRegisterPartialDeploy({ thepackage, app, directory }) {
+    super._tryRegisterPartialDeploy({ thepackage, directory })
     if (app) this._registerApp(app)
-    if (directory) this._registerVersion(this.currentVersion, directory)
   }
 
   _registerApp({ address }) {
     this.networkFile.app = { address }
-  }
-
-  async fetch() {
-    if (!this.isDeployed) throw Error('Your application must be deployed to interact with it.');
-    this.project = await AppProject.fetch(this.appAddress, this.packageFile.name, this.txParams);
   }
 
   async push(reupload = false) {
@@ -74,7 +66,7 @@ export default class NetworkAppController extends NetworkBaseController {
   }
 
   async createProxy(packageName, contractAlias, initMethod, initArgs) {
-    await this.fetch();
+    await this.fetchOrDeploy()
     if (!packageName) packageName = this.packageFile.name;
     const contractClass = this.localController.getContractClass(packageName, contractAlias);
     this.checkInitialization(contractClass, initMethod, initArgs);
@@ -104,7 +96,7 @@ export default class NetworkAppController extends NetworkBaseController {
   async setProxiesAdmin(packageName, contractAlias, proxyAddress, newAdmin) {
     const proxies = this._fetchOwnedProxies(packageName, contractAlias, proxyAddress)
     if (proxies.length === 0) return [];
-    await this.fetch();
+    await this.fetchOrDeploy()
 
     await allPromisesOrError(
       _.map(proxies, async (proxy) => {
@@ -119,7 +111,7 @@ export default class NetworkAppController extends NetworkBaseController {
   async upgradeProxies(packageName, contractAlias, proxyAddress, initMethod, initArgs) {
     const proxies = this._fetchOwnedProxies(packageName, contractAlias, proxyAddress)
     if (proxies.length === 0) return [];
-    await this.fetch();
+    await this.fetchOrDeploy()
 
     // Check if there is any migrate method in the contracts and warn the user to call it
     const contracts = _.uniqWith(_.map(proxies, p => [p.package, p.contract]), _.isEqual)

@@ -25,7 +25,7 @@ async function appInfo(controller) {
     return false;
   }
 
-  await controller.fetch();
+  await controller.fetchOrDeploy();
   log.info(`Application is deployed at ${controller.appAddress}`);
   log.info(`- Package ${controller.packageFile.name} is at ${controller.networkFile.packageAddress}`);
   return true;
@@ -37,7 +37,7 @@ async function libInfo(controller) {
     return false;
   }
 
-  await controller.fetch();
+  await controller.fetchOrDeploy();
   log.info(`Library package is deployed at ${controller.packageAddress}`);
   return true;
 }
