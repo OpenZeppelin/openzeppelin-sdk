@@ -1,10 +1,11 @@
 pragma solidity ^0.4.24;
 
 
-import "openzeppelin-solidity/contracts/token/ERC20/ERC20.sol";
-import "openzeppelin-solidity/contracts/math/SafeMath.sol";
+import "openzeppelin-zos/contracts/token/ERC20/ERC20.sol";
+import "openzeppelin-zos/contracts/math/SafeMath.sol";
+import "zos-lib/contracts/Initializable.sol";
 
-contract Vouching {
+contract Vouching is Initializable {
   event OwnershipTransferred(address indexed oldOwner, address indexed newOwner);
   event DependencyCreated(string name, address indexed owner, address indexed dependencyAddress, uint256 initialStake);
   event Vouched(string name, uint256 amount);
@@ -28,7 +29,7 @@ contract Vouching {
     _;
   }
 
-  constructor(uint256 minimumStake, ERC20 token) public {
+  function initialize(uint256 minimumStake, ERC20 token) initializer public {
     require(token != address(0), "Token address cannot be zero");
     _minimumStake = minimumStake;
     _token = token;
