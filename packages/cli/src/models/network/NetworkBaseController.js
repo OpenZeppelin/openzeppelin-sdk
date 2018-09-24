@@ -155,7 +155,7 @@ export default class NetworkBaseController {
     const contract = Contracts.getFromLocal(contractName);
     const updatedStorageInfo = getStorageLayout(contract, buildArtifacts)
     const storageDiff = compareStorageLayouts(originalStorageInfo, updatedStorageInfo)
-    logStorageLayoutDiffs(storageDiff, originalStorageInfo, updatedStorageInfo, this.log)
+    logStorageLayoutDiffs(storageDiff, originalStorageInfo, updatedStorageInfo, log)
 
     // Validation passes only if all diff kinds are appends
     return _.every(storageDiff, diff => diff.action === 'append')

@@ -1,4 +1,3 @@
-import { Logger } from "zos-lib";
 import _ from 'lodash';
 
 export function logStorageLayoutDiffs(storageDiff, originalStorageInfo, updatedStorageInfo, log) {
