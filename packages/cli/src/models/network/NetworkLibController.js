@@ -4,17 +4,15 @@ import { LibProject } from 'zos-lib';
 import NetworkBaseController from './NetworkBaseController';
 
 export default class NetworkLibController extends NetworkBaseController {
-  get isDeployed() {
-    return !!this.packageAddress;
-  }
-
   async createProxy() {
     throw Error('Cannot create proxy for library project')
   }
 
-  async deploy() {
+  async fetchOrDeploy() {
     try {
-      this.project = await LibProject.deploy(this.currentVersion, this.txParams)
+      const { packageAddress } = this
+
+      this.project = await LibProject.fetchOrDeploy(this.currentVersion, this.txParams, { packageAddress })
       this._registerPackage(await this.project.getProjectPackage())
       this._registerVersion(this.currentVersion, await this.project.getCurrentDirectory())
     } catch(deployError) {
@@ -22,23 +20,21 @@ export default class NetworkLibController extends NetworkBaseController {
     }
   }
 
-  _tryRegisterPartialDeploy({ thepackage, directory }) {
-    if (thepackage) this._registerPackage(thepackage)
-    if (directory) this._registerVersion(this.currentVersion, directory)
+  _registerVersion(version, { address }) {
+    super._registerVersion(version, { address })
   }
 
-  async fetch() {
-    if (!this.isDeployed) throw Error('Your application must be deployed to interact with it.');
-    this.project = await LibProject.fetch(this.packageAddress, this.currentVersion, this.txParams);
-  }
+  _checkVersion() {
+    const requestedVersion = this.packageFile.version
+    const currentVersion = this.networkFile.version
 
-  async newVersion(versionName) {
-    this.networkFile.frozen = false
-    return super.newVersion(versionName)
+    if (requestedVersion !== currentVersion) {
+      this.networkFile.frozen = false
+    }
+    super._checkVersion()
   }
-
   async freeze() {
-    await this.fetch()
+    await this.fetchOrDeploy()
     await this.project.freeze()
     this.networkFile.frozen = true
   }

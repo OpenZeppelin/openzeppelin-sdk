@@ -72,17 +72,18 @@ contract('Dependency', function() {
     beforeEach(function() {
       this.dependency = new Dependency('mock-stdlib', '1.1.0')
       this.txParams = {}
+      this.addresses = {}
       delete this.dependency._packageFile
     })
 
     describe('#deploy', function() {
       it('deploys a dependency', function() {
         const libDeployStub = sinon
-          .stub(LibProject, 'deploy')
+          .stub(LibProject, 'fetchOrDeploy')
           .returns({ setImplementation: () => {} })
         this.dependency.deploy(this.txParams)
 
-        libDeployStub.should.have.been.calledWithExactly('1.1.0', this.txParams)
+        libDeployStub.should.have.been.calledWithExactly('1.1.0', this.txParams, this.addresses)
         sinon.restore()
       })
     })

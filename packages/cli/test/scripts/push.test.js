@@ -55,7 +55,7 @@ contract('push script', function([_, owner]) {
       address.should.be.nonzeroAddress;
 
       const app = await App.fetch(address);
-      const hasPackage = await app.hasPackage(this.networkFile.packageFile.name)
+      const hasPackage = await app.hasPackage(this.networkFile.packageFile.name, defaultVersion)
       hasPackage.should.be.true
     });
   };

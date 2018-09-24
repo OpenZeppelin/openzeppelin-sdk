@@ -29,7 +29,7 @@ export default class Dependency {
 
   async deploy(txParams) {
     const version = semver.coerce(this.version).toString()
-    const project = await LibProject.deploy(version, txParams)
+    const project = await LibProject.fetchOrDeploy(version, txParams, {})
     await Promise.all(
       _.map(this.getPackageFile().contracts, (contractName, contractAlias) => {
         const contractClass = Contracts.getFromNodeModules(this.name, contractName)
