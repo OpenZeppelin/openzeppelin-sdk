@@ -11,7 +11,7 @@ export default class Proxy {
   }
 
   static async deploy(implementation, initData, txParams = {}) {
-    const contract = await deployContract(Contracts.getFromLib('AdminUpgradeabilityProxy'), [toAddress(implementation), initData], txParams)
+    const contract = await deployContract(Contracts.getFromLib('AdminUpgradeabilityProxy'), [toAddress(implementation), initData || ""], txParams)
     return new this(contract, txParams)
   }
 
@@ -21,9 +21,11 @@ export default class Proxy {
     this.txParams = txParams
   }
 
-  async upgradeTo(address) {
+  async upgradeTo(address, migrateData) {
     await this._checkAdmin()
-    return sendTransaction(this.contract.upgradeTo, [toAddress(address)], this.txParams)
+    return migrateData
+      ? sendTransaction(this.contract.upgradeToAndCall, [toAddress(address), migrateData], this.txParams)
+      : sendTransaction(this.contract.upgradeTo, [toAddress(address)], this.txParams)
   }
 
   async changeAdmin(newAdmin) {

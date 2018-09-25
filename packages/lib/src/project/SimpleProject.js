@@ -18,29 +18,18 @@ export default class SimpleProject  {
   async createProxy(contractClass, { contractName, initMethod: initMethodName, initArgs, redeployIfChanged } = {}) {
     if (!_.isEmpty(initArgs) && !initMethodName) initMethodName = 'initialize'
     const implementation = await this._getOrDeployImplementation(contractClass, contractName, redeployIfChanged);
-    
-    let initCallData = "";
-    if (initMethodName) {
-      const { method: initMethod, callData } = buildCallData(contractClass, initMethodName, initArgs);
-      log.info(`Creating proxy to logic contract ${implementation.address} and initializing by calling ${callDescription(initMethod, initArgs)}`)
-      initCallData = callData;
-    } else {
-      log.info(`Creating proxy to logic contract ${implementation.address}`)  
-    }
-    
+    const initCallData = this._getAndLogInitCallData(contractClass, initMethodName, initArgs, implementation.address, 'Creating')
     const proxy = await Proxy.deploy(implementation, initCallData, this.txParams)
     log.info(`Instance created at ${proxy.address}`)
     return new contractClass(proxy.address);
   }
 
-  async upgradeProxy(proxyAddress, contractClass, { contractName, initMethod, initArgs, initFrom, redeployIfChanged } = {}) {
+  async upgradeProxy(proxyAddress, contractClass, { contractName, initMethod: initMethodName, initArgs, redeployIfChanged } = {}) {
     proxyAddress = toAddress(proxyAddress)
     const implementation = await this._getOrDeployImplementation(contractClass, contractName, redeployIfChanged);    
-    log.info(`Upgrading proxy to new logic contract at ${implementation.address}`)
+    const initCallData = this._getAndLogInitCallData(contractClass, initMethodName, initArgs, implementation.address, 'Upgrading')
     const proxy = Proxy.at(proxyAddress, this.txParams)
-    await proxy.upgradeTo(implementation) // TODO: Use upgradeToAndCall!
-    await this._tryInitializeProxy(proxy, contractClass, initMethod, initArgs, initFrom)
-    
+    await proxy.upgradeTo(implementation, initCallData)
     log.info(`Instance at ${proxyAddress} upgraded`)
     return new contractClass(proxyAddress);
   }
@@ -78,6 +67,17 @@ export default class SimpleProject  {
       return existing
     } else {
       return this.setImplementation(contractClass, contractName);
+    }
+  }
+
+  _getAndLogInitCallData(contractClass, initMethodName, initArgs, implementationAddress, actionLabel) {
+    if (initMethodName) {
+      const { method: initMethod, callData } = buildCallData(contractClass, initMethodName, initArgs);
+      log.info(`${actionLabel} proxy to logic contract ${implementationAddress} and initializing by calling ${callDescription(initMethod, initArgs)}`)
+      return callData;
+    } else {
+      log.info(`${actionLabel} proxy to logic contract ${implementationAddress}`)  
+      return null;
     }
   }
 
