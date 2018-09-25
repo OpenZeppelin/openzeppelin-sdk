@@ -1,9 +1,8 @@
 import _ from 'lodash';
-import { Contracts, Logger, App, FileSystem as fs } from 'zos-lib';
+import { Contracts, Logger, flattenSourceCode } from 'zos-lib';
 import StatusComparator from '../status/StatusComparator'
 import StatusChecker from "../status/StatusChecker";
 import Verifier from '../Verifier'
-import { flattenSourceCode } from '../../utils/contracts'
 import { allPromisesOrError } from '../../utils/async';
 import { getStorageLayout, getBuildArtifacts, compareStorageLayouts, getStructsOrEnums } from 'zos-lib/src';
 import { logUncheckedVars, logStorageLayoutDiffs } from '../../interface/Validations';

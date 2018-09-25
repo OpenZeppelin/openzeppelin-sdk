@@ -5,8 +5,8 @@ import { deploy as deployContract, sendTransaction } from "../utils/Transactions
 
 export default class Proxy {
   static at(address, txParams = {}) {
-    const Proxy = Contracts.getFromLib('AdminUpgradeabilityProxy')
-    const contract = new Proxy(address)
+    const ProxyContract = Contracts.getFromLib('AdminUpgradeabilityProxy')
+    const contract = new ProxyContract(toAddress(address))
     return new this(contract, txParams)
   }
 

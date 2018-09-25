@@ -1,11 +1,10 @@
 import _ from 'lodash'
 import { promisify } from 'util'
 
-import { Logger, LibProject, AppProject } from 'zos-lib'
+import { Logger, LibProject, AppProject, bytecodeDigest } from 'zos-lib'
 import EventsFilter from './EventsFilter'
 import StatusFetcher from './StatusFetcher'
 import StatusComparator from './StatusComparator'
-import { bytecodeDigest } from '../../utils/contracts'
 
 const log = new Logger('StatusChecker')
 const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000'

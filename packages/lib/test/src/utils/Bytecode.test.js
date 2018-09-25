@@ -1,8 +1,8 @@
 'use strict'
 
-require('../setup')
+require('../../setup')
 
-import { tryRemoveSwarmHash } from '../../src/utils/contracts'
+import { tryRemoveSwarmHash } from '../../../src/utils/Bytecode'
 
 describe('contracts util functions', function() {
   describe('tryRemoveSwarmHash', function() {

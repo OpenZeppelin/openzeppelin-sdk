@@ -1,6 +1,5 @@
 import _ from 'lodash'
-import { Logger, FileSystem as fs } from 'zos-lib'
-import { bytecodeDigest, bodyCode, constructorCode } from '../../utils/contracts'
+import { Logger, FileSystem as fs, bytecodeDigest, bodyCode, constructorCode } from 'zos-lib'
 import { fromContractFullName, toContractFullName } from '../../utils/naming';
 
 const log = new Logger('ZosNetworkFile')
