@@ -1,9 +1,9 @@
 'use strict';
-require('../../../setup')
+require('../../setup')
 
-import Contracts from '../../../../src/utils/Contracts'
-import assertRevert from '../../../../src/test/helpers/assertRevert'
-import shouldBehaveLikeOwnable from '../../../../src/test/behaviors/Ownable'
+import Contracts from '../../../src/utils/Contracts'
+import assertRevert from '../../../src/test/helpers/assertRevert'
+import shouldBehaveLikeOwnable from '../../../src/test/behaviors/Ownable'
 
 const Package = Contracts.getFromLocal('Package')
 const ImplementationDirectory = Contracts.getFromLocal('ImplementationDirectory')
