@@ -8,8 +8,8 @@ import './TPL/TPLToken.sol';
  */
 contract ZepToken is TPLToken {
 
-  function zepInitialize(
-    AttributeRegistry _jurisdictionAddress, 
+  function initialize(
+    AttributeRegistry _jurisdictionAddress,
     uint256 _validRecipientAttributeId
   ) 
     isInitializer("ZEPToken", "1.0.0")

@@ -1,3 +1,4 @@
+const { encodeCall } = require('zos-lib')
 const BigNumber = web3.BigNumber;
 
 const ZepToken = artifacts.require('ZepToken');
@@ -8,9 +9,11 @@ require('chai')
 
 contract('TPLToken', ([ _, owner, jurisdiction]) => {
   const attributeID = 0;
-  beforeEach(async function () {
+
+  beforeEach('deploy and initialize ZEP token', async function () {
     this.zepToken = await ZepToken.new();
-    await this.zepToken.zepInitialize(jurisdiction, attributeID);   
+    const initializeData = encodeCall('initialize', ['address', 'uint256'], [jurisdiction, attributeID]);
+    await this.zepToken.sendTransaction({ data: initializeData });
   });
 
   it('has a name', async function () {
