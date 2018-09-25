@@ -105,6 +105,7 @@ contract('Vouching', function ([_, tokenOwner, vouchingOwner, developer, transfe
           dependencyName, developer, dependencyAddress, stakeAmount, { from: developer }
         );
         const dependencyCreatedEvent = expectEvent.inLogs(result.logs, 'DependencyCreated', {
+          nameHash: web3.sha3(dependencyName),
           name: dependencyName,
           owner: developer,
           dependencyAddress: dependencyAddress
@@ -195,7 +196,7 @@ contract('Vouching', function ([_, tokenOwner, vouchingOwner, developer, transfe
         it('emits Vouched event', async function () {
           const result = await this.vouching.vouch(dependencyName, stakeAmount, { from: developer });
           const vouchedEvent = expectEvent.inLogs(result.logs, 'Vouched', {
-            name: dependencyName
+            nameHash: web3.sha3(dependencyName)
           });
           vouchedEvent.args.amount.should.be.bignumber.equal(stakeAmount);
         });
@@ -249,7 +250,7 @@ contract('Vouching', function ([_, tokenOwner, vouchingOwner, developer, transfe
         it('emits Unvouched event', async function () {
           const result = await this.vouching.unvouch(dependencyName, safeUnstakeAmount, { from: developer });
           const unvouchedEvent = expectEvent.inLogs(result.logs, 'Unvouched', {
-            name: dependencyName
+            nameHash: web3.sha3(dependencyName)
           });
           unvouchedEvent.args.amount.should.be.bignumber.equal(safeUnstakeAmount);
         });
@@ -291,7 +292,9 @@ contract('Vouching', function ([_, tokenOwner, vouchingOwner, developer, transfe
 
         it('emits a DependencyRemoved event', async function () {
           const result = await this.vouching.remove(dependencyName, { from: developer });
-          expectEvent.inLogs(result.logs, 'DependencyRemoved', { name: dependencyName });
+          expectEvent.inLogs(result.logs, 'DependencyRemoved', {
+            nameHash: web3.sha3(dependencyName)
+          });
         });
       });
     });
