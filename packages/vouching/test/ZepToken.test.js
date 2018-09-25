@@ -1,4 +1,4 @@
-const { encodeCall } = require('zos-lib')
+const { encodeCall, assertRevert } = require('zos-lib')
 const BigNumber = web3.BigNumber;
 
 const ZepToken = artifacts.require('ZepToken');
@@ -7,7 +7,7 @@ require('chai')
   .use(require('chai-bignumber')(BigNumber))
   .should();
 
-contract('TPLToken', ([ _, owner, jurisdiction]) => {
+contract('TPLToken', ([ _, owner, another, jurisdiction]) => {
   const attributeID = 0;
 
   beforeEach('deploy and initialize ZEP token', async function () {
@@ -34,6 +34,14 @@ contract('TPLToken', ([ _, owner, jurisdiction]) => {
   it('has the correct total supply', async function () {
     const totalZEP = new BigNumber('100000000e18');
     (await this.zepToken.totalSupply()).should.be.bignumber.equal(totalZEP);
+  })
+
+  it('can be paused by creator', async function () {
+    await this.zepToken.pause();
+  })
+
+  it('cannot be paused by anybody', async function () {
+    await assertRevert(this.zepToken.pause({ from: another }));
   })
 });
 
