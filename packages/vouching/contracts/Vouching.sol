@@ -27,7 +27,7 @@ contract Vouching is Initializable {
   ERC20 private _token;
 
   modifier onlyDependencyOwner(string name) {
-    require(msg.sender == _registry[name].owner, "Not allowed");
+    require(msg.sender == _registry[name].owner, "Sender must be the dependency owner");
     _;
   }
 
@@ -57,7 +57,7 @@ contract Vouching is Initializable {
     require(initialStake >= _minimumStake, "Initial stake must be equal or greater than minimum stake");
     require(owner != address(0), "Owner address cannot be zero");
     require(dependencyAddress != address(0), "Dependency address cannot be zero");
-    require(_registry[name].dependencyAddress == address(0), "The name has already been registered");
+    require(_registry[name].dependencyAddress == address(0), "Given dependency name was already registererd");
 
     _token.safeTransferFrom(owner, this, initialStake);
 
