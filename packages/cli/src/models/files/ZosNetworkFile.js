@@ -71,7 +71,7 @@ export default class ZosNetworkFile {
 
   getDependency(name) {
     if (!this.data.dependencies) return null
-    return this.data.dependencies[name]
+    return this.data.dependencies[name] || {}
   }
 
   hasDependency(name) {
@@ -213,8 +213,8 @@ export default class ZosNetworkFile {
     this.data.contracts[alias].bodyBytecodeHash = bodyBytecodeHash
   }
 
-  removeContract(alias) {
-    delete this.data.contracts[alias]
+  unsetContract(alias) {
+    delete this.data.contracts[alias];
   }
 
   setProxies(packageName, alias, value) {
@@ -222,9 +222,6 @@ export default class ZosNetworkFile {
     this.data.proxies[fullname] = value
   }
 
-  unsetContract(alias) {
-    delete this.data.contracts[alias];
-  }
 
   addProxy(thepackage, alias, info) {
     const fullname = toContractFullName(thepackage, alias)
@@ -232,11 +229,27 @@ export default class ZosNetworkFile {
     this.data.proxies[fullname].push(info)
   }
 
-  updateProxy({ package: proxyPackage, contract: proxyContract, address: proxyAddress }, fn) {
-    const fullname = toContractFullName(proxyPackage, proxyContract)
-    const index = _.findIndex(this.data.proxies[fullname], { address: proxyAddress })
-    if (index === -1) throw Error(`Proxy ${fullname} at ${proxyAddress} not found in network file`)    
+  removeProxy(thepackage, alias, address) {
+    const fullname = toContractFullName(thepackage, alias)
+    const index = this._indexOfProxy(fullname, address)
+    if(index < 0) return
+    this.data.proxies[fullname].splice(index, 1)
+    if(this._proxiesOf(fullname).length === 0) delete this.data.proxies[fullname]
+  }
+
+  updateProxy({ package: proxyPackageName, contract: proxyContractName, address: proxyAddress }, fn) {
+    const fullname = toContractFullName(proxyPackageName, proxyContractName)
+    const index = this._indexOfProxy(fullname, proxyAddress)
+    if (index === -1) throw Error(`Proxy ${fullname} at ${proxyAddress} not found in network file`)
     this.data.proxies[fullname][index] = fn(this.data.proxies[fullname][index]);
+  }
+
+  _indexOfProxy(fullname, address) {
+    return _.findIndex(this.data.proxies[fullname], { address })
+  }
+
+  _proxiesOf(fullname) {
+    return this.data.proxies[fullname] || []
   }
 
   write() {

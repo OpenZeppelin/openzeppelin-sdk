@@ -14,7 +14,7 @@ const log = new Logger('App')
 export default class App {
 
   static async fetch(address, txParams = {}) {
-    const appContract = await this.getContractClass().at(address)    
+    const appContract = await this.getContractClass().at(address)
     return new this(appContract, txParams)
   }
 
