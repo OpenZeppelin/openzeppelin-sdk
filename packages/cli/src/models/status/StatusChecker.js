@@ -31,10 +31,12 @@ export default class StatusChecker {
 
   async setProject() {
     try {
+      const { packageAddress, appAddress, version } = this.networkFile
+
       if (!this._project) {
         this._project = this.networkFile.isLib
-          ? await LibProject.fetch(this.networkFile.packageAddress, this.networkFile.version, this.txParams)
-          : await AppProject.fetch(this.networkFile.appAddress, this.packageName, this.txParams)
+          ? await LibProject.fetchOrDeploy(this.networkFile.version, this.txParams, { packageAddress })
+          : await AppProject.fetchOrDeploy(this.packageName,  this.networkFile.version, this.txParams, { appAddress, packageAddress })
       }
 
       return this._project
