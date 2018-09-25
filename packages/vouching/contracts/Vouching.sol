@@ -2,7 +2,7 @@ pragma solidity ^0.4.24;
 
 
 import "openzeppelin-zos/contracts/token/ERC20/ERC20.sol";
-import "openzeppelin-solidity/contracts/math/SafeMath.sol";
+import "openzeppelin-zos/contracts/math/SafeMath.sol";
 
 contract Vouching {
   event OwnershipTransferred(address indexed oldOwner, address indexed newOwner);

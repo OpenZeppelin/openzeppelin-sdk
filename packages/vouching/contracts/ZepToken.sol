@@ -16,18 +16,17 @@ contract ZepToken is TPLToken {
     public
   {
     uint8 decimals = 18;
-    uint256 TOTAL_SUPPLY = 1e8 * (10 ** uint256(decimals));
+    uint256 totalSupply = 1e8 * (10 ** uint256(decimals));
     TPLToken.initialize(
       msg.sender, 
       "Zep Token", 
       "ZEP",
       decimals,
-      TOTAL_SUPPLY,
+      totalSupply,
       _jurisdictionAddress,
       _validRecipientAttributeId
     );
 
-    emit Transfer(address(0), msg.sender, TOTAL_SUPPLY);
   }
 
 }
