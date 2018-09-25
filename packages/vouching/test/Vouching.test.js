@@ -17,7 +17,7 @@ contract('Vouching', function ([_, tokenOwner, vouchingOwner, developer, transfe
   const stakeAmount = minStake.times(2);
 
   it('requires a non-null token', async function () {
-    let vouching = await Vouching.new({ from: vouchingOwner });
+    const vouching = await Vouching.new({ from: vouchingOwner });
     await assertRevert(
       vouching.initialize(minStake, ZERO_ADDRESS, { from: vouchingOwner })
     );
