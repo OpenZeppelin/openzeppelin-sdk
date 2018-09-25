@@ -3,7 +3,7 @@ pragma solidity ^0.4.24;
 import "openzeppelin-zos/contracts/token/ERC20/ERC20.sol";
 import "./AttributeRegistry.sol";
 
-contract TPLToken is ERC20 {
+contract TPLToken is Initializable, ERC20 {
 
   // declare registry interface, used to request attributes from a jurisdiction
   AttributeRegistry registry;

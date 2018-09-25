@@ -7,7 +7,7 @@ import './TPL/TPLToken.sol';
  * @title ZepToken
  * @dev ZEP token contract including mintable, pausable and burnable functionalities
  */
-contract ZepToken is TPLToken, ERC20Detailed {
+contract ZepToken is Initializable, TPLToken, ERC20Detailed {
 
   function initialize(
     AttributeRegistry _jurisdictionAddress,
