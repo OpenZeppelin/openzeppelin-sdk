@@ -4,6 +4,7 @@ import { deploy, sendDataTransaction } from "../utils/Transactions";
 import Proxy from '../proxy/Proxy';
 import Logger from '../utils/Logger';
 import { toAddress } from '../utils/Addresses';
+import { bytecodeDigest } from '..';
 
 const log = new Logger('SimpleProject')
 
@@ -11,14 +12,14 @@ export default class SimpleProject  {
   constructor(name = 'main', txParams = {}) {
     this.txParams = txParams
     this.name = name
+    this.implementations = {}
   }
 
-  async createProxy(contractClass, { initMethod: initMethodName, initArgs } = {}) {
+  async createProxy(contractClass, { contractName, initMethod: initMethodName, initArgs, redeployIfChanged } = {}) {
     if (!_.isEmpty(initArgs) && !initMethodName) initMethodName = 'initialize'
-
-    const implementation = await this._deployImplementation(contractClass);
+    const implementation = await this._getOrDeployImplementation(contractClass, contractName, redeployIfChanged);
+    
     let initCallData = "";
-
     if (initMethodName) {
       const { method: initMethod, callData } = buildCallData(contractClass, initMethodName, initArgs);
       log.info(`Creating proxy to logic contract ${implementation.address} and initializing by calling ${callDescription(initMethod, initArgs)}`)
@@ -32,12 +33,12 @@ export default class SimpleProject  {
     return new contractClass(proxy.address);
   }
 
-  async upgradeProxy(proxyAddress, contractClass, { initMethod, initArgs, initFrom } = {}) {
+  async upgradeProxy(proxyAddress, contractClass, { contractName, initMethod, initArgs, initFrom, redeployIfChanged } = {}) {
     proxyAddress = toAddress(proxyAddress)
-    const implementation = await this._deployImplementation(contractClass);    
+    const implementation = await this._getOrDeployImplementation(contractClass, contractName, redeployIfChanged);    
     log.info(`Upgrading proxy to new logic contract at ${implementation.address}`)
     const proxy = Proxy.at(proxyAddress, this.txParams)
-    await proxy.upgradeTo(implementation)    
+    await proxy.upgradeTo(implementation) // TODO: Use upgradeToAndCall!
     await this._tryInitializeProxy(proxy, contractClass, initMethod, initArgs, initFrom)
     
     log.info(`Instance at ${proxyAddress} upgraded`)
@@ -51,10 +52,33 @@ export default class SimpleProject  {
     return proxy
   }
 
-  async _deployImplementation(contractClass) {
+  async setImplementation(contractClass, contractName) {
     log.info(`Deploying logic contract for ${contractClass.contractName}`);
+    if (!contractName) contractName = contractClass.contractName;
     const implementation = await deploy(contractClass, [], this.txParams);
+    this.registerImplementation(contractName, {
+      address: implementation.address,
+      bytecodeHash: bytecodeDigest(contractClass.bytecode)
+    })
     return implementation;
+  }
+
+  async unsetImplementation(contractName) {
+    delete this.implementations[contractName]
+  }
+
+  registerImplementation(contractName, { address, bytecodeHash }) {
+    this.implementations[contractName] = { address, bytecodeHash }
+  }
+
+  async _getOrDeployImplementation(contractClass, contractName, redeployIfChanged) {
+    if (!contractName) contractName = contractClass.contractName;
+    const existing = this.implementations[contractName];
+    if (existing && (!redeployIfChanged || existing.bytecodeHash === bytecodeDigest(contractClass.bytecode))) {
+      return existing
+    } else {
+      return this.setImplementation(contractClass, contractName);
+    }
   }
 
   async _tryInitializeProxy(proxy, contractClass, initMethodName, initArgs, initFrom) {

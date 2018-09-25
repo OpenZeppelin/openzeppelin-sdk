@@ -35,7 +35,7 @@ export default function shouldBehaveLikePackageProject({ fetch, onInitialize, on
     if (onInitialize) onInitialize()
   }
 
-  describe('like package based project', function () {
+  describe('package', function () {
 
     describe('deploy', function () {
       shouldInitialize()
