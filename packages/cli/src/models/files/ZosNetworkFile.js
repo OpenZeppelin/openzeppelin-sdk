@@ -213,10 +213,6 @@ export default class ZosNetworkFile {
     this.data.contracts[alias].bodyBytecodeHash = bodyBytecodeHash
   }
 
-  removeContract(alias) {
-    delete this.data.contracts[alias]
-  }
-
   unsetContract(alias) {
     delete this.data.contracts[alias];
   }

@@ -29,7 +29,7 @@ export default class StatusFetcher {
 
   onUnregisteredLocalContract(expected, observed, { alias, address }) {
     log.info(`Removing unregistered local contract ${alias} ${address}`)
-    this.networkFile.removeContract(alias)
+    this.networkFile.unsetContract(alias)
   }
 
   onMissingRemoteContract(expected, observed, { alias, address }) {
