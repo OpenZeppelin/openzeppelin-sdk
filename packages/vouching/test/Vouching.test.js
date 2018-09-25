@@ -1,4 +1,4 @@
-const { assertRevert } = require('./helpers/assertRevert');
+const { assertRevert } = require('zos-lib');
 const expectEvent = require('./helpers/expectEvent');
 
 const BigNumber = web3.BigNumber;
