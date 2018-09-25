@@ -7,7 +7,7 @@ const util = require('util')
 import _ from 'lodash'
 
 import Contracts from '../../../src/utils/Contracts'
-import { getStorageLayout } from '../../../src/validations/Storage'
+import { getStorageLayout, getStructsOrEnums } from '../../../src/validations/Storage'
 
 contract('Storage', () => {
   
@@ -304,4 +304,23 @@ contract('Storage', () => {
     
     checkTypes({ 't_uint256': { label: 'uint256' } })
   })
+
+  describe('#getStructsOrEnums', function () {
+    it('returns all structs and enums', function () {
+      const storageInfo = getStorageLayout(Contracts.getFromLib('StorageMockMixed'))
+      const result = getStructsOrEnums(storageInfo)
+      const resultVarNames = result.map(variable => variable.label)
+
+      resultVarNames.should.be.deep.eq([
+        'my_struct',
+        'my_struct_dynarray',
+        'my_struct_staticarray',
+        'my_struct_mapping',
+        'my_enum',
+        'my_enum_dynarray',
+        'my_enum_staticarray',
+        'my_enum_mapping',
+      ])
+    })
+  });
 })

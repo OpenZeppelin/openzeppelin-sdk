@@ -101,3 +101,5 @@ contract StorageMockWithRecursiveStructs {
   MyStruct internal my_struct;
 }
 
+contract StorageMockMixed is StorageMockWithStructs, StorageMockWithEnums, SimpleStorageMock {
+}

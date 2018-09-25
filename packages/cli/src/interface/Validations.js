@@ -1,4 +1,14 @@
 import _ from 'lodash';
+import { FileSystem as fs } from 'zos-lib';
+
+export function logUncheckedVars(vars, log) {
+  if (_.isEmpty(vars)) return;
+  const varList = vars.map(({ label, contract }) => `${label} (${contract})`).join(', ');
+  const variablesString = `Variable${vars.length === 1 ? '' : 's'}`;
+  log.warn(`- ${variablesString} ${varList} contain a struct or enum type, which are not being compared for layout changes in this version. ` +
+           `Double-check that the storage layout of these types was not modified in the updated contract. ` + 
+           `Read more at https://docs.zeppelinos.org/docs/advanced.html#preserving-the-storage-structure.`);
+}
 
 export function logStorageLayoutDiffs(storageDiff, originalStorageInfo, updatedStorageInfo, log) {
   if (_.isEmpty(storageDiff)) return;

@@ -10,6 +10,21 @@ export function getStorageLayout(contract, artifacts) {
   return { types, storage }
 }
 
+export function getStructsOrEnums({ storage, types }) {
+  return storage.filter(variable => containsStructOrEnum(variable.type, types))
+}
+
+function containsStructOrEnum(typeName, types) {
+  const type = types[typeName]
+  if (type.kind === 'struct' || type.kind === 'enum') {
+    return true;
+  } else if (type.valueType) {
+    return containsStructOrEnum(type.valueType, types)
+  } else {
+    return false;
+  }
+}
+
 const CONTRACT_TYPE_INFO =  { 
   id: 't_address', 
   kind: 'elementary',

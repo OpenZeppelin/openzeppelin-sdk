@@ -12,7 +12,7 @@ import Contracts from './utils/Contracts'
 import { sendTransaction, deploy } from './utils/Transactions'
 
 // validations
-import { getStorageLayout } from './validations/Storage';
+import { getStorageLayout, getStructsOrEnums } from './validations/Storage';
 import { getBuildArtifacts } from './utils/BuildArtifacts';
 import { compareStorageLayouts } from './validations/Layout';
 
@@ -43,6 +43,7 @@ export {
   getBuildArtifacts,
   getStorageLayout,
   compareStorageLayouts,
+  getStructsOrEnums,
   Proxy,
   Logger,
   FileSystem,

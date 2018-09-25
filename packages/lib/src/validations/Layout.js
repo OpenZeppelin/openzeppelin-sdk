@@ -19,7 +19,7 @@ function storageEntryMatches(originalVar, updatedVar, originalTypes, updatedType
 
   const typeMatches = (originalType.id === updatedType.id);
   const nameMatches = (originalVar.label === updatedVar.label);
-  
+
   if (typeMatches && nameMatches) {
     return 'equal'
   } else if (typeMatches) {

@@ -5,8 +5,8 @@ import StatusChecker from "../status/StatusChecker";
 import Verifier from '../Verifier'
 import { flattenSourceCode } from '../../utils/contracts'
 import { allPromisesOrError } from '../../utils/async';
-import { getStorageLayout, getBuildArtifacts, compareStorageLayouts } from 'zos-lib/src';
-import { logStorageLayoutDiffs } from '../../interface/Validations';
+import { getStorageLayout, getBuildArtifacts, compareStorageLayouts, getStructsOrEnums } from 'zos-lib/src';
+import { logUncheckedVars, logStorageLayoutDiffs } from '../../interface/Validations';
 
 const log = new Logger('NetworkController');
 
@@ -154,6 +154,8 @@ export default class NetworkBaseController {
     if (_.isEmpty(originalStorageInfo.storage)) return true;
     const contract = Contracts.getFromLocal(contractName);
     const updatedStorageInfo = getStorageLayout(contract, buildArtifacts)
+    const uncheckedVars = getStructsOrEnums(updatedStorageInfo)
+    logUncheckedVars(uncheckedVars, log)
     const storageDiff = compareStorageLayouts(originalStorageInfo, updatedStorageInfo)
     logStorageLayoutDiffs(storageDiff, originalStorageInfo, updatedStorageInfo, log)
 
