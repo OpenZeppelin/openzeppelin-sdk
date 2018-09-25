@@ -1,9 +1,9 @@
 pragma solidity ^0.4.24;
 
-import "openzeppelin-zos/contracts/token/ERC20/DetailedPremintedToken.sol";
+import "openzeppelin-zos/contracts/token/ERC20/ERC20.sol";
 import "./AttributeRegistry.sol";
 
-contract TPLToken is DetailedPremintedToken {
+contract TPLToken is ERC20 {
 
   // declare registry interface, used to request attributes from a jurisdiction
   AttributeRegistry registry;
@@ -13,25 +13,12 @@ contract TPLToken is DetailedPremintedToken {
 
   // initialize token with a jurisdiction address and an initial token balance
   function initialize(
-    address _sender,
-    string _name,
-    string _symbol,
-    uint8 _decimals,
-    uint256 _initialBalance,
     AttributeRegistry _jurisdictionAddress,
     uint256 _validRecipientAttributeId
   )
-    isInitializer("TPLToken", "1.0.0")
+    initializer
     public
   {
-    DetailedPremintedToken.initialize(
-      _sender,
-      _name,
-      _symbol,
-      _decimals,
-      _initialBalance
-    );
-
     registry = _jurisdictionAddress;
     validRecipientAttributeId = _validRecipientAttributeId;
   }
