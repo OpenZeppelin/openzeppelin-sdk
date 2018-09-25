@@ -1,34 +1,33 @@
 pragma solidity ^0.4.24;
 
-import 'openzeppelin-solidity/contracts/token/ERC20/PausableToken.sol';
 import './TPL/TPLToken.sol';
 
 /**
  * @title ZepToken
  * @dev ZEP token contract including mintable, pausable and burnable functionalities
  */
-contract ZepToken is TPLToken, PausableToken {
+contract ZepToken is TPLToken {
 
-  string public constant name = "Zep Token";
-  string public constant symbol = "ZEP";
-  uint8 public constant decimals = 18;
-
-  uint256 public constant TOTAL_SUPPLY = 1e8 * (10 ** uint256(decimals));
-  
-  /**
-   * @dev Constructor that gives msg.sender all of existing tokens, and sets it as the owner
-   */
-  constructor(
-    AttributeRegistry _jurisdictionAddress,
+  function zepInitialize(
+    AttributeRegistry _jurisdictionAddress, 
     uint256 _validRecipientAttributeId
-  ) TPLToken(
-    _jurisdictionAddress, 
-    _validRecipientAttributeId,
-    TOTAL_SUPPLY
-    ) public {
-    owner = msg.sender;
+  ) 
+    isInitializer("ZEPToken", "1.0.0")
+    public
+  {
+    uint8 decimals = 18;
+    uint256 TOTAL_SUPPLY = 1e8 * (10 ** uint256(decimals));
+    TPLToken.initialize(
+      msg.sender, 
+      "Zep Token", 
+      "ZEP",
+      decimals,
+      TOTAL_SUPPLY,
+      _jurisdictionAddress,
+      _validRecipientAttributeId
+    );
+
     emit Transfer(address(0), msg.sender, TOTAL_SUPPLY);
   }
-
 
 }

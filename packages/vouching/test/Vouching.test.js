@@ -32,7 +32,8 @@ contract('Vouching', function ([_, tokenOwner, vouchingOwner, developer, transfe
     beforeEach(async function () {
       //TPL Setup
       this.jurisdiction = await BasicJurisdiction.new({ from: jurisdictionOwner });
-      this.token = await ZepToken.new(this.jurisdiction.address, attributeID, { from: tokenOwner });
+      this.token = await ZepToken.new({ from: tokenOwner });
+      await this.token.zepInitialize(this.jurisdiction.address, attributeID, { from: tokenOwner });
       this.validator = await ZEPValidator.new(this.jurisdiction.address, attributeID, { from: validatorOwner });
       await this.jurisdiction.addValidator(this.validator.address, "ZEP Validator", { from: jurisdictionOwner });
       await this.jurisdiction.addAttributeType(attributeID, false, false, ZERO_ADDRESS, 0, 0, 0, "can transfer", { from: jurisdictionOwner });

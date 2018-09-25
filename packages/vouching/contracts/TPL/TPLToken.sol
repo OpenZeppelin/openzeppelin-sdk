@@ -1,9 +1,9 @@
 pragma solidity ^0.4.24;
 
-import "openzeppelin-solidity/contracts/token/ERC20/StandardToken.sol";
+import "openzeppelin-zos/contracts/token/ERC20/DetailedPremintedToken.sol";
 import "./AttributeRegistry.sol";
 
-contract TPLToken is StandardToken {
+contract TPLToken is DetailedPremintedToken {
 
   // declare registry interface, used to request attributes from a jurisdiction
   AttributeRegistry registry;
@@ -12,15 +12,28 @@ contract TPLToken is StandardToken {
   uint256 validRecipientAttributeId;
 
   // initialize token with a jurisdiction address and an initial token balance
-  constructor(
+  function initialize(
+    address _sender,
+    string _name,
+    string _symbol,
+    uint8 _decimals,
+    uint256 _initialBalance,
     AttributeRegistry _jurisdictionAddress,
-    uint256 _validRecipientAttributeId,
-    uint256 _initialBalance
-  ) public {
+    uint256 _validRecipientAttributeId
+  )
+    isInitializer("TPLToken", "1.0.0")
+    public
+  {
+    DetailedPremintedToken.initialize(
+      _sender,
+      _name,
+      _symbol,
+      _decimals,
+      _initialBalance
+    );
+
     registry = _jurisdictionAddress;
     validRecipientAttributeId = _validRecipientAttributeId;
-    balances[msg.sender] = _initialBalance;
-    totalSupply_ = _initialBalance;
   }
 
   // provide getter function for finding the registry address the token is using
@@ -39,7 +52,7 @@ contract TPLToken is StandardToken {
     address _from,
     address _to,
     uint256 _value
-  ) public returns (bool) {
+  ) public view returns (bool) {
     _from;
     _value;
     return registry.hasAttribute(_to, validRecipientAttributeId);
