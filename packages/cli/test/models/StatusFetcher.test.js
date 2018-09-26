@@ -1,7 +1,7 @@
 'use strict'
 require('../setup')
 
-import { Contracts } from 'zos-lib'
+import { Contracts, getStorageLayout } from 'zos-lib'
 
 import push from '../../src/scripts/push'
 import link from '../../src/scripts/link'
@@ -327,8 +327,8 @@ contract('StatusFetcher', function([_, owner, anotherAddress]) {
           this.impl = await ImplV1.new()
           this.anotherImpl = await AnotherImplV1.new()
 
-          this.networkFile.addContract('Impl', this.impl)
-          this.networkFile.addContract('AnotherImpl', this.anotherImpl)
+          this.networkFile.addContract('Impl', this.impl, getStorageLayout(ImplV1))
+          this.networkFile.addContract('AnotherImpl', this.anotherImpl, getStorageLayout(AnotherImplV1))
         })
 
         describe('when the directory of the current version does not have any contract', function () {
@@ -446,8 +446,8 @@ contract('StatusFetcher', function([_, owner, anotherAddress]) {
         this.impl = await ImplV1.new()
         this.anotherImpl = await AnotherImplV1.new()
 
-        this.networkFile.addContract('Impl', this.impl)
-        this.networkFile.addContract('AnotherImpl', this.anotherImpl)
+        this.networkFile.addContract('Impl', this.impl, getStorageLayout(ImplV1))
+        this.networkFile.addContract('AnotherImpl', this.anotherImpl, getStorageLayout(AnotherImplV1))
 
         await this.directory.setImplementation('Impl', this.impl.address)
         await this.directory.unsetImplementation('Impl')
