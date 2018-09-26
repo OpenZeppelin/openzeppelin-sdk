@@ -59,9 +59,9 @@ contract Vouching is Initializable {
     require(dependencyAddress != address(0), "Dependency address cannot be zero");
     require(_registry[name].dependencyAddress == address(0), "Given dependency name was already registererd");
 
-    _token.safeTransferFrom(owner, this, initialStake);
-
     _registry[name] = Dependency(owner, dependencyAddress, initialStake);
+
+    _token.safeTransferFrom(owner, this, initialStake);
 
     emit DependencyCreated(name, owner, dependencyAddress, initialStake);
   }
@@ -73,8 +73,8 @@ contract Vouching is Initializable {
   }
 
   function vouch(string name, uint256 amount) external onlyDependencyOwner(name) {
-    _token.safeTransferFrom(msg.sender, this, amount);
     _registry[name].stake = _registry[name].stake.add(amount);
+    _token.safeTransferFrom(msg.sender, this, amount);
     emit Vouched(name, amount);
   }
 
@@ -90,8 +90,9 @@ contract Vouching is Initializable {
 
   function remove(string name) external onlyDependencyOwner(name) {
     // Owner surrenders _minimumStake to the system
-    _token.safeTransfer(msg.sender, _registry[name].stake.sub(_minimumStake));
+    uint256 reimbursedAmount = _registry[name].stake.sub(_minimumStake);
     delete _registry[name];
+    _token.safeTransfer(msg.sender, reimbursedAmount);
     emit DependencyRemoved(name);
   }
 
