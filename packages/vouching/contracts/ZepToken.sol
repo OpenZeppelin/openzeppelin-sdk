@@ -19,7 +19,6 @@ contract ZepToken is StandardToken, PausableToken {
    * @dev Constructor that gives msg.sender all of existing tokens, and sets it as the owner
    */
   constructor() public {
-    owner = msg.sender;
     totalSupply_ = TOTAL_SUPPLY;
     balances[msg.sender] = TOTAL_SUPPLY;
     emit Transfer(address(0), msg.sender, TOTAL_SUPPLY);
