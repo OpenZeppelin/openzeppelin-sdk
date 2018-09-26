@@ -22,7 +22,6 @@ export default class ZosPackageFile {
             process.chdir("..")
         } catch (error) {
             process.chdir(cwd)
-            throw Error("Could not find zos.json")
         }
     }
         

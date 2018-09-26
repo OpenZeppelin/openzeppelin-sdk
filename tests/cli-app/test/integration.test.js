@@ -51,6 +51,14 @@ function runIntegrationTest({ lightweight }) {
     truffleExec(`run.js cli-app/GreeterWrapper 0 iteration --network ${network}`).should.eq('1')
   })
 
+  it('creates an instance from a dependency from inside a subfolder', function () {
+    run(`npx zos create mock-stdlib/Greeter --init --args "Alice" --network ${network} --from ${this.from}`, "contracts")
+    const tokenAddress = getProxyAddress(network, 'mock-stdlib/Greeter', 1)
+    run(`npx zos create GreeterWrapper --init --args "${tokenAddress}" --network ${network} --from ${this.from}`)
+    truffleExec(`run.js cli-app/GreeterWrapper 1 say --network ${network} --from ${this.from}`).should.eq('Alice')
+    truffleExec(`run.js cli-app/GreeterWrapper 1 iteration --network ${network}`).should.eq('1')
+  })
+
   it('modifies and pushes a contract', function () {
     const implementations = getNetworkInfo(network).contracts
     copy('SamplesV2.sol', 'contracts/Samples.sol')
