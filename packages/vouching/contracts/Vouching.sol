@@ -57,7 +57,7 @@ contract Vouching is Initializable {
     require(initialStake >= _minimumStake, "Initial stake must be equal or greater than minimum stake");
     require(owner != address(0), "Owner address cannot be zero");
     require(dependencyAddress != address(0), "Dependency address cannot be zero");
-    require(_registry[name].dependencyAddress == address(0), "Given dependency name was already registererd");
+    require(_registry[name].dependencyAddress == address(0), "Given dependency name is already registered");
 
     _registry[name] = Dependency(owner, dependencyAddress, initialStake);
 
