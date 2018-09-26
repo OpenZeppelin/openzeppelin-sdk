@@ -31,11 +31,21 @@ contract('Vouching', function ([_, tokenOwner, vouchingOwner, developer, transfe
     const attributeID = 0;
 
     beforeEach('TPL setup', async function () {
+      // Initialize Jurisdiction
       this.jurisdiction = await BasicJurisdiction.new({ from: jurisdictionOwner });
+      const initializeJurisdictionData = encodeCall('initialize', [], []);
+      await this.jurisdiction.sendTransaction({ data: initializeJurisdictionData, from: jurisdictionOwner });
+      
+      // Initialize ZepToken
       this.token = await ZepToken.new({ from: tokenOwner });
-      const initializeData = encodeCall('initialize', ['address', 'uint256'], [this.jurisdiction.address, attributeID]);
-      await this.token.sendTransaction({ data: initializeData, from: tokenOwner });
-      this.validator = await ZEPValidator.new(this.jurisdiction.address, attributeID, { from: validatorOwner });
+      const initializeZepData = encodeCall('initialize', ['address', 'uint256'], [this.jurisdiction.address, attributeID]);
+      await this.token.sendTransaction({ data: initializeZepData, from: tokenOwner });
+      
+      // Initialize Validator
+      this.validator = await ZEPValidator.new({ from: validatorOwner });
+      const initializeValidatorData = encodeCall('initialize', ['address', 'uint256'], [this.jurisdiction.address, attributeID]);
+      await this.validator.sendTransaction({ data: initializeValidatorData, from: validatorOwner });
+    
       await this.jurisdiction.addValidator(this.validator.address, "ZEP Validator", { from: jurisdictionOwner });
       await this.jurisdiction.addAttributeType(attributeID, false, false, ZERO_ADDRESS, 0, 0, 0, "can transfer", { from: jurisdictionOwner });
       await this.jurisdiction.addValidatorApproval(this.validator.address, attributeID, { from: jurisdictionOwner });

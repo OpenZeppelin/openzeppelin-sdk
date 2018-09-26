@@ -2,7 +2,12 @@ pragma solidity ^0.4.24;
 
 import "openzeppelin-zos/contracts/token/ERC20/ERC20Detailed.sol";
 import "openzeppelin-zos/contracts/token/ERC20/ERC20Pausable.sol";
-import './TPL/TPLToken.sol';
+import "TPL-1.0-audit/contracts/TPLToken.sol";
+
+// Temporary imports for Truffle testing until TPL is released
+import "TPL-1.0-audit/contracts/ZEPValidator.sol";
+import "TPL-1.0-audit/contracts/BasicJurisdiction.sol";
+
 
 /**
  * @title ZepToken

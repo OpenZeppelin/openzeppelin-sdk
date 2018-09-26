@@ -4,7 +4,6 @@ pragma solidity ^0.4.24;
 import "openzeppelin-zos/contracts/token/ERC20/ERC20.sol";
 import "openzeppelin-zos/contracts/token/ERC20/SafeERC20.sol";
 import "openzeppelin-zos/contracts/math/SafeMath.sol";
-//import "zos-lib/contracts/Initializable.sol";
 
 contract Vouching is Initializable {
   event OwnershipTransferred(address indexed oldOwner, address indexed newOwner);
@@ -60,7 +59,7 @@ contract Vouching is Initializable {
     require(_registry[name].dependencyAddress == address(0), "Given dependency name is already registered");
 
     _registry[name] = Dependency(owner, dependencyAddress, initialStake);
-    
+
     _token.safeTransferFrom(owner, this, initialStake);
 
     emit DependencyCreated(name, owner, dependencyAddress, initialStake);
