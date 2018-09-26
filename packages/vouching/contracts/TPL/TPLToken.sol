@@ -48,7 +48,7 @@ contract TPLToken is Initializable, ERC20 {
   // check that target is allowed to receive tokens before enabling the transfer
   function transfer(address _to, uint256 _value) public returns (bool) {
     require(registry.hasAttribute(_to, validRecipientAttributeId));
-    super.transfer(_to, _value);
+    return(super.transfer(_to, _value));
   }
 
   // check that the transfer is valid before enabling approved transfers as well
@@ -58,7 +58,7 @@ contract TPLToken is Initializable, ERC20 {
     uint256 _value
   ) public returns (bool) {
     require(registry.hasAttribute(_to, validRecipientAttributeId));
-    super.transferFrom(_from, _to, _value);
+    return(super.transferFrom(_from, _to, _value));
   }
 
 }

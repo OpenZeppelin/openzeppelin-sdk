@@ -15,12 +15,11 @@
   "dependencies": {
     "openzeppelin-solidity": "^1.12.0",
     "openzeppelin-zos": "git+https://github.com/OpenZeppelin/openzeppelin-zos.git#release-v2.0.0",
-    "zos-lib": "^1.4.1"
+    "zos-lib": "2.0.0-alpha.0"
   },
   "devDependencies": {
     "chai": "^4.1.2",
     "chai-bignumber": "^2.0.2",
-    "ganache-cli": "6.1.0",
     "truffle": "^4.1.14"
   }
 }

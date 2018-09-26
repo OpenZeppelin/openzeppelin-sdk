@@ -20,8 +20,9 @@ contract('Vouching', function ([_, tokenOwner, vouchingOwner, developer, transfe
   const stakeAmount = minStake.times(2);
 
   it('requires a non-null token', async function () {
+    const vouching = await Vouching.new({ from: vouchingOwner });
     await assertRevert(
-      Vouching.new(minStake, ZERO_ADDRESS, { from: vouchingOwner })
+      vouching.initialize(minStake, ZERO_ADDRESS, { from: vouchingOwner })
     );
   });
 
@@ -42,7 +43,8 @@ contract('Vouching', function ([_, tokenOwner, vouchingOwner, developer, transfe
       await this.validator.issueAttribute(tokenOwner, { from: organization });
       await this.validator.issueAttribute(developer, { from: organization });
       await this.token.transfer(developer, lotsaZEP, { from: tokenOwner });
-      this.vouching = await Vouching.new(minStake, this.token.address, { from: vouchingOwner });
+      this.vouching = await Vouching.new({ from: vouchingOwner });
+      await this.vouching.initialize(minStake, this.token.address, { from: vouchingOwner });
       await this.validator.issueAttribute(this.vouching.address, { from: organization });
       await this.token.approve(this.vouching.address, lotsaZEP, { from: developer });
     });
@@ -78,7 +80,7 @@ contract('Vouching', function ([_, tokenOwner, vouchingOwner, developer, transfe
 
       it('transfers the initial stake tokens to the vouching contract', async function () {
         const initialBalance = await this.token.balanceOf(this.vouching.address);
-
+        
         await this.vouching.create(
           dependencyName, developer, dependencyAddress, stakeAmount, { from: developer }
         );

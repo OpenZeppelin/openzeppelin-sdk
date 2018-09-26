@@ -2,9 +2,11 @@ pragma solidity ^0.4.24;
 
 
 import "openzeppelin-zos/contracts/token/ERC20/ERC20.sol";
+import "openzeppelin-zos/contracts/token/ERC20/SafeERC20.sol";
 import "openzeppelin-zos/contracts/math/SafeMath.sol";
+//import "zos-lib/contracts/Initializable.sol";
 
-contract Vouching {
+contract Vouching is Initializable {
   event OwnershipTransferred(address indexed oldOwner, address indexed newOwner);
   event DependencyCreated(string name, address indexed owner, address indexed dependencyAddress, uint256 initialStake);
   event Vouched(string name, uint256 amount);
@@ -12,6 +14,7 @@ contract Vouching {
   event DependencyRemoved(string name);
 
   using SafeMath for uint256;
+  using SafeERC20 for ERC20;
 
   struct Dependency {
     address owner;
@@ -24,11 +27,11 @@ contract Vouching {
   ERC20 private _token;
 
   modifier onlyDependencyOwner(string name) {
-    require(msg.sender == _registry[name].owner, "Not allowed");
+    require(msg.sender == _registry[name].owner, "Sender must be the dependency owner");
     _;
   }
 
-  constructor(uint256 minimumStake, ERC20 token) public {
+  function initialize(uint256 minimumStake, ERC20 token) initializer public {
     require(token != address(0), "Token address cannot be zero");
     _minimumStake = minimumStake;
     _token = token;
@@ -54,10 +57,9 @@ contract Vouching {
     require(initialStake >= _minimumStake, "Initial stake must be equal or greater than minimum stake");
     require(owner != address(0), "Owner address cannot be zero");
     require(dependencyAddress != address(0), "Dependency address cannot be zero");
-    require(_registry[name].dependencyAddress == address(0), "The name has already been registered");
+    require(_registry[name].dependencyAddress == address(0), "Given dependency name was already registererd");
 
-    _token.transferFrom(owner, this, initialStake);
-
+    _token.safeTransferFrom(owner, this, initialStake);
     _registry[name] = Dependency(owner, dependencyAddress, initialStake);
 
     emit DependencyCreated(name, owner, dependencyAddress, initialStake);
@@ -70,7 +72,7 @@ contract Vouching {
   }
 
   function vouch(string name, uint256 amount) external onlyDependencyOwner(name) {
-    _token.transferFrom(msg.sender, this, amount);
+    _token.safeTransferFrom(msg.sender, this, amount);
     _registry[name].stake = _registry[name].stake.add(amount);
     emit Vouched(name, amount);
   }
@@ -80,14 +82,14 @@ contract Vouching {
     require(remainingStake >= _minimumStake, "Remaining stake must be equal or greater than minimum stake");
 
     _registry[name].stake = remainingStake;
-    _token.transfer(msg.sender, amount);
+    _token.safeTransfer(msg.sender, amount);
 
     emit Unvouched(name, amount);
   }
 
   function remove(string name) external onlyDependencyOwner(name) {
     // Owner surrenders _minimumStake to the system
-    _token.transfer(msg.sender, _registry[name].stake.sub(_minimumStake));
+    _token.safeTransfer(msg.sender, _registry[name].stake.sub(_minimumStake));
     delete _registry[name];
     emit DependencyRemoved(name);
   }

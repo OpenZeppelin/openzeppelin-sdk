@@ -41,6 +41,7 @@ jobs:
     
     # Test stage for Vouching
     - stage: tests
+      name: Vouching tests
       install: npx lerna bootstrap --loglevel=debug
       script: npx lerna run test --concurrency=1 --stream=true --scope=zos-vouching
 
