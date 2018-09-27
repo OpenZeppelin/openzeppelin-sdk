@@ -39,6 +39,12 @@ jobs:
       install: npx lerna bootstrap --loglevel=debug
       script: npx lerna run test --concurrency=1 --stream=true --scope=zos-lib
     
+    # Test stage for Vouching
+    - stage: tests
+      name: Vouching tests
+      install: npx lerna bootstrap --loglevel=debug
+      script: npx lerna run test --concurrency=1 --stream=true --scope=zos-vouching
+
     # Test stage for CLI on Linux
     - stage: tests
       name: CLI tests on Linux
