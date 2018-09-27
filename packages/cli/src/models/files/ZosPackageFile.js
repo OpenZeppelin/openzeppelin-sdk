@@ -75,6 +75,10 @@ export default class ZosPackageFile {
     return Object.keys(this.contracts)
   }
 
+  get contractNames() {
+    return Object.values(this.contracts)
+  }
+
   get isLib() {
     return !!this.lib
   }
