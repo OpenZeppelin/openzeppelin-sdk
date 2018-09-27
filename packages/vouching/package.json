@@ -13,8 +13,8 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "openzeppelin-solidity": "^1.12.0",
-    "openzeppelin-zos": "^1.9.4",
+    "TPL-1.0-audit": "git+https://github.com/TPL-protocol/tpl-contracts.git#fa6b46bfce719c8301f795846eca5a3fdbcf436c",
+    "openzeppelin-zos": "git+https://github.com/OpenZeppelin/openzeppelin-zos.git#release-v2.0.0",
     "zos-lib": "2.0.0-alpha.0"
   },
   "devDependencies": {
