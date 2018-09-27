@@ -1,11 +1,10 @@
 'use strict'
 require('../setup')
 
-import { Contracts, getStorageLayout } from 'zos-lib'
+import { Contracts, getStorageLayout, bytecodeDigest } from 'zos-lib'
 
 import push from '../../src/scripts/push'
 import link from '../../src/scripts/link'
-import { bytecodeDigest } from '../../src/utils/contracts'
 import StatusChecker from '../../src/models/status/StatusChecker'
 import ZosPackageFile from '../../src/models/files/ZosPackageFile'
 import StatusComparator from '../../src/models/status/StatusComparator'

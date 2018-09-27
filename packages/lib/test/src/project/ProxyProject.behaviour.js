@@ -11,7 +11,7 @@ const DummyImplementationV2 = Contracts.getFromLocal('DummyImplementationV2');
 
 export default function shouldManageProxies({ otherAdmin, setImplementations, supportsNames }) {
 
-  describe('like a proxy managing project', function () {
+  describe('proxies', function () {
     describe('createProxy', function () {
       beforeEach('setting implementations', setImplementations);
 

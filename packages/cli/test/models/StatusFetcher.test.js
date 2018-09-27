@@ -1,14 +1,13 @@
 'use strict'
 require('../setup')
 
-import { Contracts, getStorageLayout } from 'zos-lib'
+import { Contracts, bodyCode, bytecodeDigest, constructorCode, getStorageLayout  } from 'zos-lib'
 
 import push from '../../src/scripts/push'
 import link from '../../src/scripts/link'
 import StatusChecker from '../../src/models/status/StatusChecker'
 import StatusFetcher from '../../src/models/status/StatusFetcher'
 import ZosPackageFile from '../../src/models/files/ZosPackageFile'
-import { bodyCode, bytecodeDigest, constructorCode } from '../../src/utils/contracts'
 
 const ImplV1 = Contracts.getFromLocal('ImplV1')
 const AnotherImplV1 = Contracts.getFromLocal('AnotherImplV1')
