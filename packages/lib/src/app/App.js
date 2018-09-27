@@ -7,6 +7,7 @@ import { deploy as deployContract, sendTransaction, sendDataTransaction } from '
 import { isZeroAddress, toAddress } from '../utils/Addresses';
 import { buildCallData, callDescription } from '../utils/ABIs';
 import Contracts from '../utils/Contracts';
+import { toSemanticVersion, semanticVersionEqual } from '../utils/Semver';
 import { Package, ImplementationDirectory } from '..';
 
 const log = new Logger('App')
@@ -40,13 +41,14 @@ export default class App {
     return { package: thepackage, version }
   }
 
-  async hasPackage(name, version = undefined) {
-    const [address, _version] = await this.appContract.getPackage(name)
-    return !isZeroAddress(address) && _version === version
+  async hasPackage(name, expectedVersion = undefined) {
+    const [address, version] = await this.appContract.getPackage(name)
+    return !isZeroAddress(address) && 
+      (!expectedVersion || semanticVersionEqual(expectedVersion, version))
   }
 
   async setPackage(name, packageAddress, version) {
-    return await sendTransaction(this.appContract.setPackage, [name, toAddress(packageAddress), version], this.txParams)
+    return await sendTransaction(this.appContract.setPackage, [name, toAddress(packageAddress), toSemanticVersion(version)], this.txParams)
   }
 
   async unsetPackage(name) {

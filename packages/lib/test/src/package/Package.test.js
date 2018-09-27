@@ -11,8 +11,8 @@ const DummyImplementation = Contracts.getFromLocal('DummyImplementation')
 contract('Package', function ([_, owner]) {
   const txParams = { from: owner }
   const contractName = 'DummyImplementation'
-  const version = "1.0"
-  const version2 = "2.0"
+  const version = [1, 0, 0]
+  const version2 = [2, 0, 0]
 
   const shouldInitialize = function () {
     it('instantiates the package', async function() {
@@ -67,7 +67,7 @@ contract('Package', function ([_, owner]) {
     })
   })
 
-  describe('setImplementation', function () {
+  describe.skip('setImplementation', function () {
     beforeEach('deploying package', deploy)
     
     beforeEach('setting versions', async function () {

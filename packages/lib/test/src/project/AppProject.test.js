@@ -5,6 +5,7 @@ import AppProject from '../../../src/project/AppProject'
 import shouldBehaveLikePackageProject from './PackageProject.behavior';
 import shouldManageProxies from './ProxyProject.behaviour';
 import Contracts from '../../../src/utils/Contracts';
+import { toSemanticVersion } from '../../../src/utils/Semver';
 
 const ImplV1 = Contracts.getFromLocal('DummyImplementation');
 const ImplV2 = Contracts.getFromLocal('DummyImplementationV2');
@@ -30,7 +31,7 @@ contract('AppProject', function (accounts) {
         const app = this.project.getApp()
         const thepackage = await this.project.getProjectPackage()
         const packageInfo = await app.getPackage(name)
-        packageInfo.version.should.eq(newVersion)
+        packageInfo.version.should.be.semverEqual(newVersion)
         packageInfo.package.address.should.eq(thepackage.address)
       })
     }, 

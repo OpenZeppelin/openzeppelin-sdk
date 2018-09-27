@@ -21,12 +21,10 @@ export default class AppProject extends BasePackageProject {
       directory = await thepackage.hasVersion(version)
         ? await thepackage.getDirectory(version)
         : await thepackage.newVersion(version)
-
       if (!await app.hasPackage(name, version)) await app.setPackage(name, thepackage.address, version)
       const project = new this(app, name, version, txParams)
       project.directory = directory
       project.package = thepackage
-
       return project
     } catch(deployError) {
       throw new DeployError(deployError.message, { thepackage, directory, app })

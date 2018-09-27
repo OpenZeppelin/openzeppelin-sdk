@@ -18,8 +18,8 @@ contract('App', function (accounts) {
   const contractName = 'Impl';
   const packageName = 'MyPackage';
   const anotherPackageName = 'AnotherPackage';
-  const version = '1.0';
-  const anotherVersion = '2.0';
+  const version = '1.0.0';
+  const anotherVersion = '2.0.0';
 
   beforeEach('deploying', async function deploy () {
     this.app = await App.deploy(txParams)
@@ -38,7 +38,7 @@ contract('App', function (accounts) {
       const packageInfo = await this.app.getPackage(packageName);
       packageInfo.package.address.should.eq(this.package.address)
       packageInfo.package.should.be.instanceof(Package)
-      packageInfo.version.should.eq(version)
+      packageInfo.version.should.be.semverEqual(version)
     })
 
     it('returns empty info if not exists', async function () {
@@ -94,7 +94,7 @@ contract('App', function (accounts) {
       await this.package.newVersion(anotherVersion)
       await this.app.setPackage(packageName, this.package.address, anotherVersion)
       const packageInfo = await this.app.getPackage(packageName)
-      packageInfo.version.should.eq(anotherVersion)
+      packageInfo.version.should.be.semverEqual(anotherVersion)
     })
   })
 
