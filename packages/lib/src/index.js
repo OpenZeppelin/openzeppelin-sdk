@@ -23,6 +23,7 @@ import { compareStorageLayouts } from './validations/Layout';
 import { behaviors, helpers } from './test'
 const assertions = helpers.assertions
 const assertRevert = helpers.assertRevert
+const assertEvent = helpers.assertEvent
 
 // model objects
 import Proxy from './proxy/Proxy'
@@ -39,6 +40,7 @@ export {
   decodeLogs,
   encodeCall,
   assertRevert,
+  assertEvent,
   assertions,
   behaviors,
   sendTransaction,

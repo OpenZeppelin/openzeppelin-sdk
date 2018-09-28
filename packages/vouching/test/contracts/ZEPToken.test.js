@@ -1,6 +1,6 @@
-const { encodeCall, assertRevert } = require('packages/lib/lib/index')
-const BigNumber = web3.BigNumber;
+import { encodeCall, assertRevert } from 'zos-lib'
 
+const BigNumber = web3.BigNumber;
 const ZEPToken = artifacts.require('ZEPToken');
 
 require('chai')
@@ -44,4 +44,3 @@ contract('ZEPToken', ([ _, owner, another, jurisdiction]) => {
     await assertRevert(this.zepToken.pause({ from: another }));
   })
 });
-
