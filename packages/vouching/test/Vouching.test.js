@@ -1,16 +1,19 @@
-const { assertRevert } = require('zos-lib');
+const { encodeCall, assertRevert } = require('zos-lib')
 const expectEvent = require('./helpers/expectEvent');
 
 const BigNumber = web3.BigNumber;
 
-const ZepToken = artifacts.require('ZepToken');
+const ZepToken = artifacts.require('ZEPToken');
 const Vouching = artifacts.require('Vouching');
+const ZEPValidator = artifacts.require('ZEPValidator');
+const BasicJurisdiction = artifacts.require('BasicJurisdiction');
 
 require('chai')
   .use(require('chai-bignumber')(BigNumber))
   .should();
 
-contract('Vouching', function ([_, tokenOwner, vouchingOwner, developer, transferee, dependencyAddress, anotherDependencyAddress]) {
+contract('Vouching', function ([_, tokenOwner, vouchingOwner, developer, transferee, 
+        dependencyAddress, anotherDependencyAddress, jurisdictionOwner, validatorOwner, organization]) {
   const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000';
   const lotsaZEP = new BigNumber('10e18');
   const minStake = new BigNumber(10);
@@ -25,14 +28,34 @@ contract('Vouching', function ([_, tokenOwner, vouchingOwner, developer, transfe
 
   context('with token', async function () {
     const dependencyName = 'dep';
+    const attributeID = 0;
 
-    beforeEach(async function () {
+    beforeEach('TPL setup', async function () {
+      // Initialize Jurisdiction
+      this.jurisdiction = await BasicJurisdiction.new({ from: jurisdictionOwner });
+      const initializeJurisdictionData = encodeCall('initialize', [], []);
+      await this.jurisdiction.sendTransaction({ data: initializeJurisdictionData, from: jurisdictionOwner });
+      
+      // Initialize ZepToken
       this.token = await ZepToken.new({ from: tokenOwner });
+      const initializeZepData = encodeCall('initialize', ['address', 'uint256'], [this.jurisdiction.address, attributeID]);
+      await this.token.sendTransaction({ data: initializeZepData, from: tokenOwner });
+      
+      // Initialize Validator
+      this.validator = await ZEPValidator.new({ from: validatorOwner });
+      const initializeValidatorData = encodeCall('initialize', ['address', 'uint256'], [this.jurisdiction.address, attributeID]);
+      await this.validator.sendTransaction({ data: initializeValidatorData, from: validatorOwner });
+    
+      await this.jurisdiction.addValidator(this.validator.address, "ZEP Validator", { from: jurisdictionOwner });
+      await this.jurisdiction.addAttributeType(attributeID, false, false, ZERO_ADDRESS, 0, 0, 0, "can transfer", { from: jurisdictionOwner });
+      await this.jurisdiction.addValidatorApproval(this.validator.address, attributeID, { from: jurisdictionOwner });
+      await this.validator.addOrganization(organization, 100, "ZEP Org", { from: validatorOwner });
+      await this.validator.issueAttribute(tokenOwner, { from: organization });
+      await this.validator.issueAttribute(developer, { from: organization });
       await this.token.transfer(developer, lotsaZEP, { from: tokenOwner });
-
       this.vouching = await Vouching.new({ from: vouchingOwner });
       await this.vouching.initialize(minStake, this.token.address, { from: vouchingOwner });
-
+      await this.validator.issueAttribute(this.vouching.address, { from: organization });
       await this.token.approve(this.vouching.address, lotsaZEP, { from: developer });
     });
 
@@ -67,7 +90,7 @@ contract('Vouching', function ([_, tokenOwner, vouchingOwner, developer, transfe
 
       it('transfers the initial stake tokens to the vouching contract', async function () {
         const initialBalance = await this.token.balanceOf(this.vouching.address);
-
+        
         await this.vouching.create(
           dependencyName, developer, dependencyAddress, stakeAmount, { from: developer }
         );
