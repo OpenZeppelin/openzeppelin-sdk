@@ -10,7 +10,7 @@ require('chai')
   .should();
 
 contract('ZEPToken', ([ _, tokenOwner, another, jurisdictionOwner, validatorOwner, zeppelin ]) => {
-  const receiveTokensAttributeID = 0
+  const receiveTokensAttributeID = 999
   const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000'
 
   beforeEach('initialize jurisdiction', async function () {
@@ -101,7 +101,7 @@ contract('ZEPToken', ([ _, tokenOwner, another, jurisdictionOwner, validatorOwne
       })
     }
 
-    describe('when the no one was not allowed to receive tokens', function () {
+    describe('when no one was not allowed to receive tokens', function () {
       assertTokensCannotBeTransferred()
     })
 
