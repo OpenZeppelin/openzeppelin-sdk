@@ -1,8 +1,6 @@
-const { encodeCall, assertRevert } = require('zos-lib')
-const expectEvent = require('./helpers/expectEvent');
+import { encodeCall, assertEvent, assertRevert } from 'zos-lib'
 
 const BigNumber = web3.BigNumber;
-
 const ZepToken = artifacts.require('ZEPToken');
 const Vouching = artifacts.require('Vouching');
 const ZEPValidator = artifacts.require('ZEPValidator');
@@ -104,7 +102,7 @@ contract('Vouching', function ([_, tokenOwner, vouchingOwner, developer, transfe
         const result = await this.vouching.create(
           dependencyName, developer, dependencyAddress, stakeAmount, { from: developer }
         );
-        const dependencyCreatedEvent = expectEvent.inLogs(result.logs, 'DependencyCreated', {
+        const dependencyCreatedEvent = assertEvent.inLogs(result.logs, 'DependencyCreated', {
           nameHash: web3.sha3(dependencyName),
           name: dependencyName,
           owner: developer,
@@ -155,7 +153,7 @@ contract('Vouching', function ([_, tokenOwner, vouchingOwner, developer, transfe
           );
 
           (await this.vouching.getDependency(dependencyName))[1].should.equal(transferee);
-          expectEvent.inLogs(
+          assertEvent.inLogs(
             result.logs, 'OwnershipTransferred', { oldOwner: developer, newOwner: transferee }
           );
         });
@@ -195,7 +193,7 @@ contract('Vouching', function ([_, tokenOwner, vouchingOwner, developer, transfe
 
         it('emits Vouched event', async function () {
           const result = await this.vouching.vouch(dependencyName, stakeAmount, { from: developer });
-          const vouchedEvent = expectEvent.inLogs(result.logs, 'Vouched', {
+          const vouchedEvent = assertEvent.inLogs(result.logs, 'Vouched', {
             nameHash: web3.sha3(dependencyName)
           });
           vouchedEvent.args.amount.should.be.bignumber.equal(stakeAmount);
@@ -249,7 +247,7 @@ contract('Vouching', function ([_, tokenOwner, vouchingOwner, developer, transfe
 
         it('emits Unvouched event', async function () {
           const result = await this.vouching.unvouch(dependencyName, safeUnstakeAmount, { from: developer });
-          const unvouchedEvent = expectEvent.inLogs(result.logs, 'Unvouched', {
+          const unvouchedEvent = assertEvent.inLogs(result.logs, 'Unvouched', {
             nameHash: web3.sha3(dependencyName)
           });
           unvouchedEvent.args.amount.should.be.bignumber.equal(safeUnstakeAmount);
@@ -292,7 +290,7 @@ contract('Vouching', function ([_, tokenOwner, vouchingOwner, developer, transfe
 
         it('emits a DependencyRemoved event', async function () {
           const result = await this.vouching.remove(dependencyName, { from: developer });
-          expectEvent.inLogs(result.logs, 'DependencyRemoved', {
+          assertEvent.inLogs(result.logs, 'DependencyRemoved', {
             nameHash: web3.sha3(dependencyName)
           });
         });
@@ -328,4 +326,3 @@ contract('Vouching', function ([_, tokenOwner, vouchingOwner, developer, transfe
     });
   });
 });
-
