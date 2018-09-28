@@ -1,4 +1,4 @@
-const { encodeCall, assertRevert } = require('zos-lib')
+const { encodeCall, assertRevert } = require('packages/lib/lib/index')
 const BigNumber = web3.BigNumber;
 
 const ZEPToken = artifacts.require('ZEPToken');

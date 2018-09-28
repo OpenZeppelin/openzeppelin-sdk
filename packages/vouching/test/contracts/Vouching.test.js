@@ -1,5 +1,5 @@
-const { encodeCall, assertRevert } = require('zos-lib')
-const expectEvent = require('./helpers/expectEvent');
+const { encodeCall, assertRevert } = require('packages/lib/lib/index')
+const expectEvent = require('../helpers/expectEvent');
 
 const BigNumber = web3.BigNumber;
 
