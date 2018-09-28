@@ -23,14 +23,14 @@ contract App is Ownable {
    * @param package Address of the package associated to the name.
    * @param version Version of the package in use.
    */
-  event PackageChanged(string providerName, address package, string version);
+  event PackageChanged(string providerName, address package, uint64[3] version);
 
   /**
    * @dev Tracks a package in a particular version, used for retrieving implementations
    */
   struct ProviderInfo {
     Package package;
-    string version;
+    uint64[3] version;
   }
   
   /**
@@ -48,10 +48,10 @@ contract App is Ownable {
    * @param packageName Name of the package to be retrieved.
    * @return The provider.
    */
-  function getProvider(string packageName) public view returns (ImplementationProvider) {
+  function getProvider(string packageName) public view returns (ImplementationProvider provider) {
     ProviderInfo storage info = providers[packageName];
     if (address(info.package) == address(0)) return ImplementationProvider(0);
-    return info.package.getVersion(info.version);
+    return ImplementationProvider(info.package.getContract(info.version));
   }
 
   /**
@@ -59,7 +59,7 @@ contract App is Ownable {
    * @param packageName Name of the package to be queried.
    * @return A tuple with the package address and pinned version given a package name, or zero if not set
    */
-  function getPackage(string packageName) public view returns (Package, string) {
+  function getPackage(string packageName) public view returns (Package, uint64[3]) {
     ProviderInfo storage info = providers[packageName];
     return (info.package, info.version);
   } 
@@ -71,7 +71,7 @@ contract App is Ownable {
    * @param package Address of the package to register.
    * @param version Version of the package to use in this application.
    */
-  function setPackage(string packageName, Package package, string version) public onlyOwner {
+  function setPackage(string packageName, Package package, uint64[3] version) public onlyOwner {
     require(package.hasVersion(version), "The requested version must be registered in the given package");
     providers[packageName] = ProviderInfo(package, version);
     emit PackageChanged(packageName, package, version);
@@ -85,7 +85,7 @@ contract App is Ownable {
   function unsetPackage(string packageName) public onlyOwner {
     require(address(providers[packageName].package) != address(0), "Package to unset not found");
     delete providers[packageName];
-    emit PackageChanged(packageName, address(0), "");
+    emit PackageChanged(packageName, address(0), [uint64(0), uint64(0), uint64(0)]);
   }
 
   /**

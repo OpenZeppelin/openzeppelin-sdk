@@ -1,4 +1,5 @@
 import _ from 'lodash';
+import { semanticVersionEqual, toSemanticVersion } from '../../utils/Semver';
 
 const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000';
 
@@ -26,4 +27,14 @@ module.exports = function (chai, utils) {
       , 'expected #{this} to not be a zero address'
     );
   });
+
+  Assertion.addMethod('semverEqual', function(expected) {
+    this.assert(
+      semanticVersionEqual(this._obj, expected),
+      'expected #{this} to equal #{exp} but got #{act}',
+      'expected #{this} to not equal #{exp} but got #{act}',
+      toSemanticVersion(expected).join('.'),
+      toSemanticVersion(this._obj).join('.')
+    )
+  })
 }

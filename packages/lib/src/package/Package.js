@@ -3,6 +3,8 @@ import { deploy as deployContract, sendTransaction } from '../utils/Transactions
 import ImplementationDirectory from '../directory/ImplementationDirectory';
 import Contracts from '../utils/Contracts';
 import { toAddress, isZeroAddress } from '../utils/Addresses';
+import _ from 'lodash';
+import { toSemanticVersion } from '../utils/Semver';
 
 const log = new Logger('Package')
 
@@ -37,7 +39,7 @@ export default class Package {
   }
 
   async hasVersion(version) {
-    return sendTransaction(this.packageContract.hasVersion, [version], this.txParams)
+    return this.packageContract.hasVersion(toSemanticVersion(version))
   }
 
   async isFrozen(version) {
@@ -52,34 +54,22 @@ export default class Package {
   }
 
   async getImplementation(version, contractName) {
-    return this.packageContract.getImplementation(version, contractName)
-  }
-
-  async setImplementation(version, contractName, contractAddress) {
     const directory = await this.getDirectory(version)
-    await directory.setImplementation(contractName, toAddress(contractAddress))
+    return directory.getImplementation(contractName)
   }
 
-  async unsetImplementation (version, contractName) {
-    const directory = await this.getDirectory(version)
-    await directory.unsetImplementation(contractName, this.txParams)
-  }
-
-  async newVersion(version) {
+  async newVersion(version, content = "") {
     log.info('Adding new version...')
-    const directory = await this._newDirectory()
-    await sendTransaction(this.packageContract.addVersion, [version, directory.address], this.txParams)
-    log.info(`Added version ${version}`)
+    const semver = toSemanticVersion(version)
+    const directory = await ImplementationDirectory.deploy(this.txParams)
+    await sendTransaction(this.packageContract.addVersion, [semver, directory.address, content], this.txParams)
+    log.info(`Added version ${semver.join('.')}`)
     return directory
   }
 
   async getDirectory(version) {
     if (!version) throw Error("Cannot get a directory from a package without specifying a version")
-    const directoryAddress = await this.packageContract.getVersion(version)
+    const directoryAddress = await this.packageContract.getContract(toSemanticVersion(version))
     return ImplementationDirectory.fetch(directoryAddress, this.txParams)
-  }
-
-  async _newDirectory() {
-    return ImplementationDirectory.deploy(this.txParams)
   }
 }

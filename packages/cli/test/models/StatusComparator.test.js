@@ -236,7 +236,7 @@ contract('StatusComparator', function([_, owner, anotherAddress]) {
 
             this.comparator.reports.should.have.lengthOf(1)
             this.comparator.reports[0].expected.should.be.equal('2.0.0')
-            this.comparator.reports[0].observed.should.be.equal(version)
+            this.comparator.reports[0].observed.should.be.semverEqual(version)
             this.comparator.reports[0].description.should.be.equal(`Package version of ${this.dep1.name} does not match`)
           })
         })

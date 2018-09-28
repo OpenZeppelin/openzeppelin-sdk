@@ -35,7 +35,7 @@ contract('push script', function([_, owner]) {
     });
 
     it('should deploy package at specified address', async function () {
-      const _package = await PackageContract.at(this.networkFile.packageAddress);
+      const _package = await Package.fetch(this.networkFile.packageAddress);
       (await _package.hasVersion(defaultVersion)).should.be.true;
     });
   };
@@ -201,13 +201,13 @@ contract('push script', function([_, owner]) {
     it('should set dependency in deployed app', async function () {
       const app = await App.fetch(this.networkFile.appAddress);
       const packageInfo = await app.getPackage(libName)
-      packageInfo.version.should.eq(libVersion)
+      packageInfo.version.should.be.semverEqual(libVersion)
       packageInfo.package.address.should.eq(this.dependencyPackage.address)
     });
 
     it('should set address and version in network file', async function () {
       const dependency = this.networkFile.getDependency(libName)
-      dependency.version.should.eq(libVersion)
+      dependency.version.should.be.semverEqual(libVersion)
       dependency.package.should.eq(this.dependencyPackage.address)
     });
   };
