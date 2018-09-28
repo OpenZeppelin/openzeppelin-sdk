@@ -12,7 +12,7 @@ require('chai')
   .use(require('chai-bignumber')(BigNumber))
   .should();
 
-contract('Vouching', function ([_, tokenOwner, vouchingOwner, developer, transferee, 
+contract('Vouching', function ([_, tokenOwner, vouchingOwner, developer, transferee,
         dependencyAddress, anotherDependencyAddress, jurisdictionOwner, validatorOwner, organization]) {
   const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000';
   const lotsaZEP = new BigNumber('10e18');
@@ -35,17 +35,17 @@ contract('Vouching', function ([_, tokenOwner, vouchingOwner, developer, transfe
       this.jurisdiction = await BasicJurisdiction.new({ from: jurisdictionOwner });
       const initializeJurisdictionData = encodeCall('initialize', [], []);
       await this.jurisdiction.sendTransaction({ data: initializeJurisdictionData, from: jurisdictionOwner });
-      
+
       // Initialize ZepToken
       this.token = await ZepToken.new({ from: tokenOwner });
       const initializeZepData = encodeCall('initialize', ['address', 'uint256'], [this.jurisdiction.address, attributeID]);
       await this.token.sendTransaction({ data: initializeZepData, from: tokenOwner });
-      
+
       // Initialize Validator
       this.validator = await ZEPValidator.new({ from: validatorOwner });
       const initializeValidatorData = encodeCall('initialize', ['address', 'uint256'], [this.jurisdiction.address, attributeID]);
       await this.validator.sendTransaction({ data: initializeValidatorData, from: validatorOwner });
-    
+
       await this.jurisdiction.addValidator(this.validator.address, "ZEP Validator", { from: jurisdictionOwner });
       await this.jurisdiction.addAttributeType(attributeID, false, false, ZERO_ADDRESS, 0, 0, 0, "can transfer", { from: jurisdictionOwner });
       await this.jurisdiction.addValidatorApproval(this.validator.address, attributeID, { from: jurisdictionOwner });
@@ -90,7 +90,7 @@ contract('Vouching', function ([_, tokenOwner, vouchingOwner, developer, transfe
 
       it('transfers the initial stake tokens to the vouching contract', async function () {
         const initialBalance = await this.token.balanceOf(this.vouching.address);
-        
+
         await this.vouching.create(
           dependencyName, developer, dependencyAddress, stakeAmount, { from: developer }
         );
@@ -105,6 +105,7 @@ contract('Vouching', function ([_, tokenOwner, vouchingOwner, developer, transfe
           dependencyName, developer, dependencyAddress, stakeAmount, { from: developer }
         );
         const dependencyCreatedEvent = expectEvent.inLogs(result.logs, 'DependencyCreated', {
+          nameHash: web3.sha3(dependencyName),
           name: dependencyName,
           owner: developer,
           dependencyAddress: dependencyAddress
@@ -195,7 +196,7 @@ contract('Vouching', function ([_, tokenOwner, vouchingOwner, developer, transfe
         it('emits Vouched event', async function () {
           const result = await this.vouching.vouch(dependencyName, stakeAmount, { from: developer });
           const vouchedEvent = expectEvent.inLogs(result.logs, 'Vouched', {
-            name: dependencyName
+            nameHash: web3.sha3(dependencyName)
           });
           vouchedEvent.args.amount.should.be.bignumber.equal(stakeAmount);
         });
@@ -249,7 +250,7 @@ contract('Vouching', function ([_, tokenOwner, vouchingOwner, developer, transfe
         it('emits Unvouched event', async function () {
           const result = await this.vouching.unvouch(dependencyName, safeUnstakeAmount, { from: developer });
           const unvouchedEvent = expectEvent.inLogs(result.logs, 'Unvouched', {
-            name: dependencyName
+            nameHash: web3.sha3(dependencyName)
           });
           unvouchedEvent.args.amount.should.be.bignumber.equal(safeUnstakeAmount);
         });
@@ -291,8 +292,38 @@ contract('Vouching', function ([_, tokenOwner, vouchingOwner, developer, transfe
 
         it('emits a DependencyRemoved event', async function () {
           const result = await this.vouching.remove(dependencyName, { from: developer });
-          expectEvent.inLogs(result.logs, 'DependencyRemoved', { name: dependencyName });
+          expectEvent.inLogs(result.logs, 'DependencyRemoved', {
+            nameHash: web3.sha3(dependencyName)
+          });
         });
+      });
+    });
+
+    describe('event filtering', function () {
+      it('allows filtering by dependency name', async function () {
+        const resultFirst = await this.vouching.create(
+          'dep1', developer, dependencyAddress, stakeAmount, { from: developer }
+        );
+        const resultSecond = await this.vouching.create(
+          'dep2', developer, anotherDependencyAddress, stakeAmount, { from: developer }
+        );
+
+        resultFirst.receipt.logs[1].topics[1].should.be.equal(web3.sha3('dep1'));
+        resultSecond.receipt.logs[1].topics[1].should.be.equal(web3.sha3('dep2'));
+
+        const filter = web3.eth.filter({
+          address: this.vouching.address,
+          topics: [
+            null, web3.sha3('dep1'), null, null
+          ]
+        });
+
+        filter.watch((error, log) => {
+          log.topics[1].should.be.equal(web3.sha3('dep1'))
+        })
+
+        await this.vouching.vouch('dep1', stakeAmount, { from: developer });
+        await this.vouching.vouch('dep2', stakeAmount, { from: developer });
       });
     });
   });
