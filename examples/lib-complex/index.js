@@ -70,7 +70,7 @@ async function getLibrary(txParams) {
   // Use deployed standard library, or simulate one in local networks.
   // TODO: Install and link openzeppelin-zos here, instead of manually building a mock
   if(!network || network === 'local') {
-    const version = '1.0';
+    const version = '1.0.0';
     const thepackage = await Package.deploy(txParams);
     const directory = await thepackage.newVersion(version);
     const tokenImplementation = await MintableERC721Token.new();
