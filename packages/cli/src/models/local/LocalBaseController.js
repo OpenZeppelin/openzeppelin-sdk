@@ -45,6 +45,11 @@ export default class LocalBaseController {
     if (this.hasConstructor(Contracts.getLocalPath(contractName))) {
       log.error(`Contract ${contractName} has an explicit constructor. Move it to an initializer function to use it with ZeppelinOS.`)
     }
+    // Log a warning anytime there is a base contract that wasn't initialized.
+    const uninitializedBaseContracts = this.getUninitializedBaseContracts(Contracts.getLocalPath(contractName))
+    for (const baseContractName of uninitializedBaseContracts) {
+      log.warn(`Contract ${contractName} has base contract ${baseContractName} that wasn't initialized.`)
+    }
     // Log a warning anytime `selfdestruct` is found.  This is a potential security risk, 
     // but not an error/throw as it may be a desired feature
     if (this.hasSelfDestruct(Contracts.getLocalPath(contractName))) {
@@ -108,6 +113,57 @@ export default class LocalBaseController {
 
   hasDelegateCall(contractDataPath) {
     return this.hasTypeIdentifier(contractDataPath, "t_function_baredelegatecall_nonpayable$__$returns$_t_bool_$")
+  }
+
+  getUninitializedBaseContracts(contractDataPath) {
+    if (!fs.exists(contractDataPath)) return []
+    const contractJson = fs.parseJson(contractDataPath)
+    // Check whether the contract has base contracts
+    const baseContracts = contractJson.ast.nodes.find(n => n.name === contractJson.contractName).baseContracts
+    if (baseContracts.length == 0) {
+      return []
+    }
+    // Make a dict of base contracts that have "initialize" function
+    const baseContractsWithInitialize = {}
+    for (const baseContract of baseContracts) {
+      const baseContractName = baseContract.baseName.name
+      const baseContractPath = Contracts.getLocalPath(baseContractName)
+      const baseContractAbi = fs.parseJson(baseContractPath).abi
+      if (baseContractAbi.find(fn => fn.type === "function" && fn.name === "initialize")) {
+        baseContractsWithInitialize[baseContractName] = false
+      }
+    }
+    // Find "initialize" function in the AST
+    const contractDefinition = contractJson.ast.nodes
+      .find(n => n.nodeType === "ContractDefinition" && n.name === contractJson.contractName)
+    const initializeFunction = contractDefinition.nodes
+      .find(n => n.nodeType === "FunctionDefinition" && n.name === "initialize")
+    if (initializeFunction === undefined) {
+      return []
+    }
+    const initializedContracts = {}
+    // Update map with each call of "initialize" function of the base contract
+    for (const statement of initializeFunction.body.statements) {
+      if (statement.nodeType !== "ExpressionStatement") {
+        continue
+      }
+      if (statement.expression.nodeType !== "FunctionCall") {
+        continue
+      }
+      if (statement.expression.expression.memberName !== "initialize") {
+        continue
+      }
+      const baseContractName = statement.expression.expression.expression.name
+      initializedContracts[baseContractName] = true
+    }
+    // For each base contract with "initialize" function, check that it's called in the function
+    const uninitializedBaseContracts = []
+    for (const contractName in baseContractsWithInitialize) {
+      if (!initializedContracts[contractName]) {
+        uninitializedBaseContracts.push(contractName)
+      }
+    }
+    return uninitializedBaseContracts
   }
 
   hasTypeIdentifier(contractDataPath, typeIdentifier) {
