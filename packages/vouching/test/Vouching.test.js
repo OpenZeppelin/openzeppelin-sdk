@@ -302,10 +302,10 @@ contract('Vouching', function ([_, tokenOwner, vouchingOwner, developer, transfe
     describe('event filtering', function () {
       it('allows filtering by dependency name', async function () {
         const resultFirst = await this.vouching.create(
-          'dep1', developer, anotherDependencyAddress, stakeAmount, { from: developer }
+          'dep1', developer, dependencyAddress, stakeAmount, { from: developer }
         );
         const resultSecond = await this.vouching.create(
-          'dep2', developer, thirdDependencyAddress, stakeAmount, { from: developer }
+          'dep2', developer, anotherDependencyAddress, stakeAmount, { from: developer }
         );
 
         resultFirst.receipt.logs[1].topics[1].should.be.equal(web3.sha3('dep1'));
