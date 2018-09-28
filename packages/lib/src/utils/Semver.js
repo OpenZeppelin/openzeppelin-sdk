@@ -1,4 +1,5 @@
 import semver from 'semver';
+import _ from 'lodash';
 
 export function toSemanticVersion(version) {
   if (_.isString(version)) {
@@ -9,6 +10,16 @@ export function toSemanticVersion(version) {
     return version.map(x => x.toNumber ? x.toNumber() : x)
   } else {
     throw Error(`Cannot parse version identifier ${version}`)
+  }
+}
+
+export function semanticVersionToString(version) {
+  if (_.isString(version)) {
+    return version;
+  } else if (_.isArray(version)) {
+    return version.join('.');
+  } else {
+    throw Error(`Cannot handle version identifier ${version}`)
   }
 }
 

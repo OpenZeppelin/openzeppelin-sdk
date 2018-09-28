@@ -12,6 +12,7 @@ import Contracts from './utils/Contracts'
 import { sendTransaction, deploy } from './utils/Transactions'
 import { bodyCode, constructorCode, bytecodeDigest } from './utils/Bytecode'
 import { flattenSourceCode } from './utils/Solidity'
+import { semanticVersionEqual, toSemanticVersion, semanticVersionToString } from './utils/Semver';
 
 // validations
 import { getStorageLayout, getStructsOrEnums } from './validations/Storage';
@@ -50,6 +51,9 @@ export {
   constructorCode, 
   bytecodeDigest, 
   flattenSourceCode,
+  semanticVersionEqual, 
+  toSemanticVersion,
+  semanticVersionToString,
   Proxy,
   Logger,
   FileSystem,

@@ -1,6 +1,7 @@
 import BasePackageProject from "./BasePackageProject";
 import Package from "../package/Package";
 import { DeployError } from '../utils/errors/DeployError';
+import { semanticVersionToString } from "../utils/Semver";
 
 export default class LibProject extends BasePackageProject {
   static async fetch(packageAddress, version = '0.1.0', txParams) {
@@ -10,6 +11,8 @@ export default class LibProject extends BasePackageProject {
 
   static async fetchOrDeploy(version = '0.1.0', txParams = {}, { packageAddress = undefined }) {
     let thepackage, directory
+    version = semanticVersionToString(version)
+
     try {
       thepackage = packageAddress
         ? await Package.fetch(packageAddress, txParams)
@@ -30,7 +33,7 @@ export default class LibProject extends BasePackageProject {
   constructor(thepackage, version = '0.1.0', txParams = {}) {
     super(txParams)
     this.package = thepackage
-    this.version = version
+    this.version = semanticVersionToString(version)
   }
 
   async getProjectPackage() {

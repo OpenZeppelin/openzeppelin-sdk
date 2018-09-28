@@ -69,7 +69,7 @@ contract('StatusFetcher', function([_, owner, anotherAddress]) {
         it('updates the version', async function () {
           await this.checker.checkVersion()
 
-          this.networkFile.version.should.be.equal('2.0.0')
+          this.networkFile.version.should.be.equal(newVersion)
         })
       })
 

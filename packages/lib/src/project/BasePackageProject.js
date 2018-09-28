@@ -1,5 +1,6 @@
 import { deploy } from "../utils/Transactions";
 import Logger from "../utils/Logger";
+import { semanticVersionToString } from "../utils/Semver";
 
 const log = new Logger('PackageProject')
 
@@ -13,7 +14,7 @@ export default class BasePackageProject {
     const thepackage = await this.getProjectPackage()
     const directory = await thepackage.newVersion(version)
     this.directory = directory
-    this.version = version
+    this.version = semanticVersionToString(version)
     return directory
   }
 

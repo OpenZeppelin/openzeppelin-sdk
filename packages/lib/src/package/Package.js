@@ -39,7 +39,7 @@ export default class Package {
   }
 
   async hasVersion(version) {
-    return sendTransaction(this.packageContract.hasVersion, [toSemanticVersion(version)], this.txParams)
+    return this.packageContract.hasVersion(toSemanticVersion(version))
   }
 
   async isFrozen(version) {
@@ -53,21 +53,10 @@ export default class Package {
     return directory.freeze()
   }
 
-  // TODO: Check if these methods are needed at all
-
-  // async getImplementation(version, contractName) {
-  //   return this.packageContract.getImplementation(version, contractName)
-  // }
-
-  // async setImplementation(version, contractName, contractAddress) {
-  //   const directory = await this.getDirectory(version)
-  //   await directory.setImplementation(contractName, toAddress(contractAddress))
-  // }
-
-  // async unsetImplementation (version, contractName) {
-  //   const directory = await this.getDirectory(version)
-  //   await directory.unsetImplementation(contractName, this.txParams)
-  // }
+  async getImplementation(version, contractName) {
+    const directory = await this.getDirectory(version)
+    return directory.getImplementation(contractName)
+  }
 
   async newVersion(version, content = "") {
     log.info('Adding new version...')
