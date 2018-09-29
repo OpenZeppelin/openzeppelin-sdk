@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import { Logger, FileSystem as fs, bytecodeDigest, bodyCode, constructorCode } from 'zos-lib'
+import { Logger, FileSystem as fs, bytecodeDigest, bodyCode, constructorCode, semanticVersionToString } from 'zos-lib'
 import { fromContractFullName, toContractFullName } from '../../utils/naming';
 
 const log = new Logger('ZosNetworkFile')
@@ -177,8 +177,19 @@ export default class ZosNetworkFile {
     this.data.package = _package
   }
 
-  setDependency(name, dependency) {
-    if (!this.data.dependencies) this.data.dependencies = {}
+  setDependency(name, { package: thepackage, version, customDeploy } = {}) {
+    if (!this.data.dependencies) {
+      this.data.dependencies = {}
+    }
+    
+    const dependency = {
+      package: thepackage,
+      version: semanticVersionToString(version)
+    }
+    if (customDeploy) {
+      dependency.customDeploy = customDeploy;
+    }
+    
     this.data.dependencies[name] = dependency
   }
 

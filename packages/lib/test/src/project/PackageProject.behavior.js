@@ -68,8 +68,8 @@ export default function shouldBehaveLikePackageProject({ fetch, onInitialize, on
     describe('setImplementation', function () {
       it('registers a new implementation', async function() {
         const newImplementation = await this.project.setImplementation(DummyImplementation, contractName)
-        const thepackage = await this.project.getProjectPackage()
-        const implementation = await thepackage.getImplementation(version, contractName)
+        const directory = await this.project.getCurrentDirectory()
+        const implementation = await directory.getImplementation(contractName)
         implementation.should.eq(newImplementation.address)
       })
 
@@ -77,7 +77,8 @@ export default function shouldBehaveLikePackageProject({ fetch, onInitialize, on
         await this.project.newVersion(newVersion)
         const newImplementation = await this.project.setImplementation(DummyImplementation, contractName)
         const thepackage = await this.project.getProjectPackage()
-        const implementation = await thepackage.getImplementation(newVersion, contractName)
+        const directory = await thepackage.getDirectory(newVersion)
+        const implementation = await directory.getImplementation(contractName)
         implementation.should.eq(newImplementation.address)
       })
     })
@@ -87,8 +88,8 @@ export default function shouldBehaveLikePackageProject({ fetch, onInitialize, on
         await this.project.setImplementation(DummyImplementation, contractName)
         await this.project.unsetImplementation(contractName)
 
-        const thepackage = await this.project.getCurrentDirectory()
-        const implementation = await thepackage.getImplementation(version, contractName)
+        const directory = await this.project.getCurrentDirectory()
+        const implementation = await directory.getImplementation(contractName)
         implementation.should.be.zeroAddress
       })
     })

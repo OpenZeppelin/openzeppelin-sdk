@@ -3,10 +3,13 @@ import App from "../app/App";
 import Package from "../package/Package";
 import { DeployError } from '../utils/errors/DeployError';
 import _ from 'lodash';
+import { semanticVersionToString } from "../utils/Semver";
 
 export default class AppProject extends BasePackageProject {
   static async fetchOrDeploy(name = 'main', version = '0.1.0', txParams = {}, { appAddress = undefined, packageAddress = undefined }) {
     let thepackage, directory, app
+    version = semanticVersionToString(version)
+    
     try {
       app = appAddress
         ? await App.fetch(appAddress, txParams)
@@ -21,12 +24,10 @@ export default class AppProject extends BasePackageProject {
       directory = await thepackage.hasVersion(version)
         ? await thepackage.getDirectory(version)
         : await thepackage.newVersion(version)
-
       if (!await app.hasPackage(name, version)) await app.setPackage(name, thepackage.address, version)
       const project = new this(app, name, version, txParams)
       project.directory = directory
       project.package = thepackage
-
       return project
     } catch(deployError) {
       throw new DeployError(deployError.message, { thepackage, directory, app })
@@ -37,10 +38,11 @@ export default class AppProject extends BasePackageProject {
     super(txParams)
     this.app = app
     this.name = name
-    this.version = version
+    this.version = semanticVersionToString(version)
   }
 
   async newVersion(version) {
+    version = semanticVersionToString(version)
     const directory = await super.newVersion(version)
     const thepackage = await this.getProjectPackage()
     await this.app.setPackage(this.name, thepackage.address, version)

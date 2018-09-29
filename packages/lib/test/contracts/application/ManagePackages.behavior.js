@@ -2,6 +2,7 @@
 
 import Contracts from '../../../src/utils/Contracts'
 import assertRevert from '../../../src/test/helpers/assertRevert'
+import { toSemanticVersion } from '../../../src/utils/Semver';
 
 const Package = Contracts.getFromLocal('Package')
 const ImplementationDirectory = Contracts.getFromLocal('ImplementationDirectory')
@@ -9,21 +10,22 @@ const ImplementationDirectory = Contracts.getFromLocal('ImplementationDirectory'
 export default function shouldManagePackages(accounts) {
   const [_, appOwner, packageOwner, directoryOwner, anotherAccount] = accounts;
 
-  const version_0 = 'version_0'
-  const version_1 = 'version_1'
+  const version_0 = toSemanticVersion('1.0.0')
+  const version_1 = toSemanticVersion('1.1.0')
+  const contentURI = "0x10"
 
   const assertPackage = async function(packageName, expectedAddress, expectedVersion) {
     const [address, version] = await this.app.getPackage(packageName);
-    version.should.eq(expectedVersion);
+    version.should.be.semverEqual(expectedVersion);
     address.should.eq(expectedAddress);
   }
 
   describe('setPackage', function () {  
     beforeEach(async function () {
       this.directoryV1 = await ImplementationDirectory.new({ from: directoryOwner })
-      await this.package.addVersion(version_1, this.directoryV1.address, { from: packageOwner });
+      await this.package.addVersion(version_1, this.directoryV1.address, contentURI, { from: packageOwner });
       this.anotherPackage = await Package.new({ from: packageOwner })
-      await this.anotherPackage.addVersion(version_0, this.directory.address, { from: packageOwner });
+      await this.anotherPackage.addVersion(version_0, this.directory.address, contentURI, { from: packageOwner });
       this.anotherPackageName = 'AnotherPackage';
 
       this.assertPackage = assertPackage;
@@ -46,7 +48,7 @@ export default function shouldManagePackages(accounts) {
     });
 
     it('fails if package does not have the required version', async function () {
-      await assertRevert(this.app.setPackage(this.anotherPackageName, this.anotherPackage.address, "NOTEXISTS", { from: appOwner }));
+      await assertRevert(this.app.setPackage(this.anotherPackageName, this.anotherPackage.address, [9,9,9], { from: appOwner }));
     });
 
     it('fails if called from non-owner account', async function () {
@@ -62,7 +64,7 @@ export default function shouldManagePackages(accounts) {
     it('unsets a package', async function () {
       await this.app.unsetPackage(this.packageName, { from: appOwner });
       const [address, version] = await this.app.getPackage(this.packageName);
-      version.should.be.empty;
+      version.should.be.semverEqual([0,0,0]);
       address.should.be.zeroAddress;
     })
 
@@ -79,7 +81,7 @@ export default function shouldManagePackages(accounts) {
     beforeEach(async function () {
       this.anotherDirectory = await ImplementationDirectory.new({ from: directoryOwner });
       this.anotherPackage = await Package.new({ from: packageOwner })
-      await this.anotherPackage.addVersion(version_1, this.anotherDirectory.address, { from: packageOwner });
+      await this.anotherPackage.addVersion(version_1, this.anotherDirectory.address, contentURI, { from: packageOwner });
       this.anotherPackageName = 'AnotherPackage';
       await this.app.setPackage(this.anotherPackageName, this.anotherPackage.address, version_1, { from: appOwner });
     });
@@ -101,7 +103,7 @@ export default function shouldManagePackages(accounts) {
     });
 
     it('returns provider from updated package version', async function () {
-      await this.package.addVersion(version_1, this.anotherDirectory.address, { from: packageOwner });
+      await this.package.addVersion(version_1, this.anotherDirectory.address, contentURI, { from: packageOwner });
       await this.app.setPackage(this.packageName, this.package.address, version_1, { from: appOwner });
       const provider = await this.app.getProvider(this.packageName);
       provider.should.eq(this.anotherDirectory.address);

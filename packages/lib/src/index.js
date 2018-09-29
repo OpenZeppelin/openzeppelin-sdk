@@ -12,6 +12,7 @@ import Contracts from './utils/Contracts'
 import { sendTransaction, deploy } from './utils/Transactions'
 import { bodyCode, constructorCode, bytecodeDigest } from './utils/Bytecode'
 import { flattenSourceCode } from './utils/Solidity'
+import { semanticVersionEqual, toSemanticVersion, semanticVersionToString } from './utils/Semver';
 
 // validations
 import { getStorageLayout, getStructsOrEnums } from './validations/Storage';
@@ -22,6 +23,7 @@ import { compareStorageLayouts } from './validations/Layout';
 import { behaviors, helpers } from './test'
 const assertions = helpers.assertions
 const assertRevert = helpers.assertRevert
+const assertEvent = helpers.assertEvent
 
 // model objects
 import Proxy from './proxy/Proxy'
@@ -38,6 +40,7 @@ export {
   decodeLogs,
   encodeCall,
   assertRevert,
+  assertEvent,
   assertions,
   behaviors,
   sendTransaction,
@@ -50,6 +53,9 @@ export {
   constructorCode, 
   bytecodeDigest, 
   flattenSourceCode,
+  semanticVersionEqual, 
+  toSemanticVersion,
+  semanticVersionToString,
   Proxy,
   Logger,
   FileSystem,

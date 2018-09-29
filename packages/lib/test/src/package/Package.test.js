@@ -11,8 +11,8 @@ const DummyImplementation = Contracts.getFromLocal('DummyImplementation')
 contract('Package', function ([_, owner]) {
   const txParams = { from: owner }
   const contractName = 'DummyImplementation'
-  const version = "1.0"
-  const version2 = "2.0"
+  const version = [1, 0, 0]
+  const version2 = [2, 0, 0]
 
   const shouldInitialize = function () {
     it('instantiates the package', async function() {
@@ -64,41 +64,6 @@ contract('Package', function ([_, owner]) {
       await this.package.freeze(version)
       const frozen = await this.package.isFrozen(version)
       frozen.should.be.true
-    })
-  })
-
-  describe('setImplementation', function () {
-    beforeEach('deploying package', deploy)
-    
-    beforeEach('setting versions', async function () {
-      await this.package.newVersion(version)
-      await this.package.newVersion(version2)
-    })
-
-    beforeEach('setting an implementation', async function () {
-      this.implementation = await deployContract(DummyImplementation)
-      await this.package.setImplementation(version, contractName, this.implementation)
-    })
-
-    it('gets the implementation from the correct version', async function () {
-      const implementation = await this.package.getImplementation(version, contractName)
-      implementation.should.eq(this.implementation.address)
-    })
-
-    it('returns zero when requesting from another version', async function () {
-      const implementation = await this.package.getImplementation(version2, contractName)
-      implementation.should.be.zeroAddress
-    })
-
-    it('returns zero when requesting another contract name', async function () {
-      const implementation = await this.package.getImplementation(version, 'NOTEXISTS')
-      implementation.should.be.zeroAddress
-    })
-
-    it('unsets the implementation', async function () {
-      await this.package.unsetImplementation(version, contractName)
-      const implementation = await this.package.getImplementation(version, contractName)
-      implementation.should.be.zeroAddress
     })
   })
 })

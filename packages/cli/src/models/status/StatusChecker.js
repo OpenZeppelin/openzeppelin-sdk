@@ -1,7 +1,7 @@
 import _ from 'lodash'
 import { promisify } from 'util'
 
-import { Logger, LibProject, AppProject, bytecodeDigest } from 'zos-lib'
+import { Logger, LibProject, AppProject, bytecodeDigest, semanticVersionEqual } from 'zos-lib'
 import EventsFilter from './EventsFilter'
 import StatusFetcher from './StatusFetcher'
 import StatusComparator from './StatusComparator'
@@ -72,7 +72,7 @@ export default class StatusChecker {
   async checkVersion() {
     const observed = this._project.version
     const expected = this.networkFile.version
-    if(observed !== expected) this.visitor.onMismatchingVersion(expected, observed)
+    if(!semanticVersionEqual(observed, expected)) this.visitor.onMismatchingVersion(expected, observed)
   }
 
   async checkPackage() {
@@ -182,7 +182,7 @@ export default class StatusChecker {
 
   _checkDependencyVersion(name, version) {
     const expected = this.networkFile.getDependency(name).version
-    if (version !== expected) this.visitor.onMismatchingDependencyVersion(expected, version, { name, version })
+    if (!semanticVersionEqual(version, expected)) this.visitor.onMismatchingDependencyVersion(expected, version, { name, version })
   }
 
   _checkUnregisteredLocalDependencies(dependenciesInfo) {
