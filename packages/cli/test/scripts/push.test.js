@@ -16,7 +16,6 @@ import Dependency from '../../src/models/dependency/Dependency';
 const should = require('chai').should();
 
 const ImplV1 = Contracts.getFromLocal('ImplV1');
-const PackageContract = Contracts.getFromNodeModules('zos-lib', 'Package');
 const ImplementationDirectory = Contracts.getFromNodeModules('zos-lib', 'ImplementationDirectory');
 
 contract('push script', function([_, owner]) {
@@ -84,13 +83,15 @@ contract('push script', function([_, owner]) {
       const deployed = await ImplV1.at(address);
       (await deployed.say()).should.eq('V1');
     });
+  };
 
+  const shouldRegisterContractsInDirectory = function () {
     it('should register instances in directory', async function () {
       const address = this.networkFile.contract('Impl').address;
       const _package = await Package.fetch(this.networkFile.package.address);
       (await _package.getImplementation(defaultVersion, 'Impl')).should.eq(address);
     });
-  };
+  }
 
   const shouldRedeployContracts = function () {
     beforeEach('loading previous address', function () {
@@ -183,13 +184,15 @@ contract('push script', function([_, owner]) {
     });
   };
 
-  const shouldDeleteContracts = function () {
+  const shouldDeleteContracts = function (shouldUnregisterFromDirectory = true) {
     it('should delete contracts', async function () {
       await remove({ contracts: ['Impl'], packageFile: this.networkFile.packageFile });
       await push({ network, txParams, networkFile: this.networkFile });
 
-      const _package = await Package.fetch(this.networkFile.package.address);
-      (await _package.getImplementation(defaultVersion, 'Impl')).should.be.zeroAddress;
+      if (shouldUnregisterFromDirectory) {
+        const _package = await Package.fetch(this.networkFile.package.address);
+        (await _package.getImplementation(defaultVersion, 'Impl')).should.be.zeroAddress;
+      }
       should.not.exist(this.networkFile.contract('Impl'));
     });
   };
@@ -235,9 +238,24 @@ contract('push script', function([_, owner]) {
     shouldDeployApp();
     shouldDeployProvider();
     shouldDeployContracts();
+    shouldRegisterContractsInDirectory();
     shouldRedeployContracts();
     shouldBumpVersion();
     shouldDeleteContracts();
+  });
+
+  describe('an app with invalid contracts', function() {
+    beforeEach('pushing package-with-invalid-contracts', async function () {
+      const packageFile = new ZosPackageFile('test/mocks/packages/package-with-invalid-contracts.zos.json')
+      this.networkFile = packageFile.networkFile(network)
+
+      await push({ networkFile: this.networkFile, network, txParams }).should.be.rejectedWith(/WithFailingConstructor deployment failed/);
+    });
+
+    shouldDeployApp();
+    shouldDeployProvider();
+    shouldDeployContracts();
+    shouldRegisterContractsInDirectory();
   });
 
   describe('an app with dependency', function () {
@@ -331,6 +349,7 @@ contract('push script', function([_, owner]) {
     shouldDeployLib();
     shouldDeployProvider();
     shouldDeployContracts();
+    shouldRegisterContractsInDirectory();
     shouldRedeployContracts();
     shouldBumpVersionAndUnfreeze();
     shouldDeleteContracts();
@@ -341,16 +360,48 @@ contract('push script', function([_, owner]) {
     });
   });
 
-  describe('an app with invalid contracts', function() {
+  describe('an empty lightweight app', function() {
+    beforeEach('pushing package-empty-lite', async function () {
+      const packageFile = new ZosPackageFile('test/mocks/packages/package-empty-lite.zos.json')
+      this.networkFile = packageFile.networkFile(network)
+    });
+
+    it('should run push', async function () {
+      await push({ network, txParams, networkFile: this.networkFile })
+    })
+  });
+
+  describe('a lightweight app with contracts', function() {
     beforeEach('pushing package-with-contracts', async function () {
+      const packageFile = new ZosPackageFile('test/mocks/packages/package-with-contracts.zos.json')
+      packageFile.lightweight = true
+      this.networkFile = packageFile.networkFile(network)
+
+      await push({ network, txParams, networkFile: this.networkFile })
+    });
+
+    shouldDeployContracts();
+    shouldRedeployContracts();
+    shouldDeleteContracts(false);
+
+    it('should not reupload contracts after version bump', async function () {
+      const previousAddress = this.networkFile.contract('Impl').address
+      await bumpVersion({ version: '1.2.0', packageFile: this.networkFile.packageFile });
+      await push({ networkFile: this.networkFile, network, txParams });
+      this.networkFile.version.should.eq('1.2.0')
+      this.networkFile.contract('Impl').address.should.eq(previousAddress)
+    })
+  });
+
+  describe('a lightweight app with invalid contracts', function() {
+    beforeEach('pushing package-with-invalid-contracts', async function () {
       const packageFile = new ZosPackageFile('test/mocks/packages/package-with-invalid-contracts.zos.json')
+      packageFile.lightweight = true
       this.networkFile = packageFile.networkFile(network)
 
       await push({ networkFile: this.networkFile, network, txParams }).should.be.rejectedWith(/WithFailingConstructor deployment failed/);
     });
 
-    shouldDeployApp();
-    shouldDeployProvider();
     shouldDeployContracts();
   });
 });

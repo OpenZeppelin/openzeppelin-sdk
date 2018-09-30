@@ -36,6 +36,14 @@ export default class NetworkBaseController {
     return this.packageFile.isLib;
   }
 
+  get isLightweight() {
+    return this.packageFile.isLightweight;
+  }
+
+  async fetchOrDeploy() {
+    this.project = await this.getDeployer().fetchOrDeploy();
+  }
+
   async compareCurrentStatus() {
     const statusComparator = StatusChecker.compare(this.networkFile, this.txParams)
     await statusComparator.call()
@@ -77,24 +85,10 @@ export default class NetworkBaseController {
     }
   }
 
-  _tryRegisterPartialDeploy({ thepackage, directory }) {
-    if (thepackage) this._registerPackage(thepackage)
-    if (directory) this._registerVersion(this.currentVersion, directory)
-  }
-
-  _registerPackage({ address }) {
-    this.networkFile.package = { address }
-  }
-
-  _registerVersion(version, { address }) {
-    this.networkFile.provider = { address }
-    this.networkFile.version = version
-  }
-  
   _newVersionRequired() {
     const requestedVersion = this.packageFile.version;
     const currentVersion = this.networkFile.version;
-    return (requestedVersion !== currentVersion);
+    return (requestedVersion !== currentVersion) && !this.isLightweight;
   }
 
   _contractsListForPush(onlyChanged = false) {

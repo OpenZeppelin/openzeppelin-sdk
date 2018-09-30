@@ -20,7 +20,7 @@ export default class ZosPackageFile {
   get lib() {
     return this.data.lib
   }
-
+  
   get name() {
     return this.data.name
   }
@@ -61,6 +61,10 @@ export default class ZosPackageFile {
     return !!this.lib
   }
 
+  get isLightweight() {
+    return !!this.data.light
+  }
+
   contract(alias) {
     return this.contracts[alias]
   }
@@ -88,6 +92,10 @@ export default class ZosPackageFile {
 
   set lib(lib) {
     this.data.lib = lib
+  }
+
+  set lightweight(light) {
+    this.data.light = light
   }
 
   set name(name) {
