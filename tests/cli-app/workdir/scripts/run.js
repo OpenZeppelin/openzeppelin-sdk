@@ -1,11 +1,14 @@
 const process = require('process');
 const getProxyAddress = require('./shared').getProxyAddress;
 
+// We cannot run calls from the default address since it's the proxy admin in lightweight projects
+const from = '0x0000000000000000000000000000000000000001'
+
 async function run(network, name, index, functionName) {
   const proxyAddress = getProxyAddress(network, name, index)
   const contractClass = artifacts.require(name)
   const instance = await contractClass.at(proxyAddress)
-  const said = await instance[functionName]()
+  const said = await instance[functionName].call({ from })
   console.log(said)
 }
 
