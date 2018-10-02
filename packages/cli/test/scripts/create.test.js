@@ -208,7 +208,7 @@ contract('create script', function([_, owner]) {
 
     describe('with local modifications', function () {
       beforeEach('changing local network file to have a different bytecode', async function () {
-        this.networkFile.contract(contractAlias).bytecodeHash = '0xabcd'
+        this.networkFile.contract(contractAlias).localBytecodeHash = '0xabcd'
       });
 
       it('should refuse to create a proxy for a modified contract', async function () {

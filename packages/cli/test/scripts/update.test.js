@@ -159,7 +159,7 @@ contract('update script', function([_skipped, owner, anotherAccount]) {
     describe('with local modifications', function () {
       beforeEach('changing local network file to have a different bytecode', async function () {
         const contracts = this.networkFile.contracts
-        contracts['Impl'].bytecodeHash = '0xabcd';
+        contracts['Impl'].localBytecodeHash = '0xabcd';
         this.networkFile.contracts = contracts
       });
 

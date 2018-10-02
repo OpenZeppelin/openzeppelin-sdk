@@ -72,7 +72,7 @@ contract('push script', function([_, owner]) {
     it('should record contracts in network file', async function () {
       const contract = this.networkFile.contract('Impl');
       contract.address.should.be.nonzeroAddress;
-      contract.bytecodeHash.should.not.be.empty;
+      contract.localBytecodeHash.should.not.be.empty;
       contract.storage.should.not.be.empty;
       contract.types.should.not.be.empty;
       const deployed = await ImplV1.at(contract.address);
@@ -518,7 +518,7 @@ contract('push script', function([_, owner]) {
 
   function modifyBytecode(contractAlias) {
     const contractData = this.networkFile.contract(contractAlias);
-    this.networkFile.setContract(contractAlias, { ... contractData, bytecodeHash: '0xabcdef' })
+    this.networkFile.setContract(contractAlias, { ... contractData, localBytecodeHash: '0xabcdef' })
   }
 
   async function getImplementationFromApp(contractAlias) {
@@ -529,7 +529,7 @@ contract('push script', function([_, owner]) {
 
 function modifyBytecode(contractAlias) {
   const contractData = this.networkFile.contract(contractAlias);
-  this.networkFile.setContract(contractAlias, { ... contractData, bytecodeHash: '0xabcdef' })
+  this.networkFile.setContract(contractAlias, { ... contractData, localBytecodeHash: '0xabcdef' })
 }
 
 function modifyStorageInfo(contractAlias) {
