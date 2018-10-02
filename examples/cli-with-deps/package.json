@@ -3,6 +3,7 @@
   "version": "2.0.0-alpha.0",
   "description": "Sample CLI project for ZeppelinOS",
   "author": "santiago@zeppelin.solutions",
+  "private": true,
   "license": "MIT",
   "devDependencies": {
     "dep-basic": "2.0.0-alpha.0",

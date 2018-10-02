@@ -1,5 +1,6 @@
 {
   "name": "dep-basic",
+  "private": true,
   "version": "2.0.0-alpha.0",
   "description": "Sample basic dependency library for ZeppelinOS",
   "author": "santiago@zeppelin.solutions",

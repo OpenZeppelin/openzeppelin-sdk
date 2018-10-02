@@ -3,6 +3,7 @@
   "version": "1.4.1",
   "description": "",
   "main": "truffle-config.js",
+  "private": true,
   "directories": {
     "test": "test"
   },
