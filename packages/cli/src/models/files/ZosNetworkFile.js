@@ -60,6 +60,10 @@ export default class ZosNetworkFile {
     return this.packageFile.isLib
   }
 
+  get isLightweight() {
+    return this.packageFile.isLightweight
+  }
+
   get dependencies() {
     return this.data.dependencies || {}
   }

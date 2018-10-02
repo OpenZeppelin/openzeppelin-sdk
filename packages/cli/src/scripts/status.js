@@ -20,6 +20,8 @@ function rootInfo(controller) {
 }
 
 async function appInfo(controller) {
+  if (controller.isLightweight) return true;
+
   if (!controller.appAddress) {
     log.warn(`Application is not yet deployed to the network`);
     return false;
@@ -43,6 +45,7 @@ async function libInfo(controller) {
 }
 
 async function versionInfo(networkFile) {
+  if (networkFile.isLightweight) return true;
   if (networkFile.hasMatchingVersion()) {
     log.info(`- Deployed version ${networkFile.version} matches the latest one defined`)
     return true;
@@ -81,6 +84,7 @@ async function contractsInfo(controller) {
 }
 
 async function dependenciesInfo(networkFile) {
+  if (networkFile.isLightweight) return true;
   if (networkFile.isLib) return;
   const packageFile = networkFile.packageFile;
   if (!packageFile.hasDependencies() && !networkFile.hasDependencies()) return;

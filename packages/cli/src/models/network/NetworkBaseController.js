@@ -45,11 +45,13 @@ export default class NetworkBaseController {
   }
 
   async compareCurrentStatus() {
+    if (this.isLightweight) throw Error('Command status-pull is not supported for lightweight apps' )
     const statusComparator = StatusChecker.compare(this.networkFile, this.txParams)
     await statusComparator.call()
   }
 
   async pullRemoteStatus() {
+    if (this.isLightweight) throw Error('Command status-fix is not supported for lightweight apps' )
     const statusFetcher = StatusChecker.fetch(this.networkFile, this.txParams)
     await statusFetcher.call()
   }
