@@ -2,6 +2,7 @@ import _ from 'lodash'
 import ZosNetworkFile from './ZosNetworkFile'
 import { Logger, FileSystem as fs } from 'zos-lib'
 import Dependency from '../dependency/Dependency';
+import { ZOS_VERSION, checkVersion } from './ZosVersion';
 
 const log = new Logger('ZosPackageFile')
 
@@ -9,8 +10,8 @@ export default class ZosPackageFile {
 
   constructor(fileName = 'zos.json') {
     this.fileName = fileName
-    this.data = fs.parseJsonIfExists(this.fileName) || { zosversion: '2' };
-    // TODO: Implement auto upgrade or version checks
+    this.data = fs.parseJsonIfExists(this.fileName) || { zosversion: ZOS_VERSION }
+    checkVersion(this.data.zosversion, this.fileName)
   }
 
   exists() {
