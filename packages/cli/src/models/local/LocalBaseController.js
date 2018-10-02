@@ -124,41 +124,42 @@ export default class LocalBaseController {
       return []
     }
     // Make a dict of base contracts that have "initialize" function
-    const baseContractsWithInitialize = {}
+    const baseContractsWithInitialize = []
+    const baseContractInitializers = {}
     for (const baseContract of baseContracts) {
       const baseContractName = baseContract.baseName.name
       const baseContractPath = Contracts.getLocalPath(baseContractName)
-      const baseContractAbi = fs.parseJson(baseContractPath).abi
-      if (baseContractAbi.find(fn => fn.type === "function" && fn.name === "initialize")) {
-        baseContractsWithInitialize[baseContractName] = false
+      const baseContractJson = fs.parseJson(baseContractPath)
+      const baseContractInitializer = this.getContractInitializer(baseContractJson)
+      if (baseContractInitializer !== undefined) {
+        baseContractsWithInitialize.push(baseContractName)
+        baseContractInitializers[baseContractName] = baseContractInitializer.name
       }
     }
-    // Find "initialize" function in the AST
-    const contractDefinition = contractJson.ast.nodes
-      .find(n => n.nodeType === "ContractDefinition" && n.name === contractJson.contractName)
-    const initializeFunction = contractDefinition.nodes
-      .find(n => n.nodeType === "FunctionDefinition" && n.name === "initialize")
-    if (initializeFunction === undefined) {
+    // Check that initializer exists
+    const initializer = this.getContractInitializer(contractJson)
+    if (initializer === undefined) {
+      // A contract may lack initializer as long as the base contracts don't have more than 1 initializers in total
+      // If there are 2 or more base contracts with initializers, child contract should initialize all of them
+      if (baseContractsWithInitialize.length > 1) {
+        return baseContractsWithInitialize
+      }
       return []
     }
-    const initializedContracts = {}
     // Update map with each call of "initialize" function of the base contract
-    for (const statement of initializeFunction.body.statements) {
-      if (statement.nodeType !== "ExpressionStatement") {
-        continue
+    const initializedContracts = {}
+    for (const statement of initializer.body.statements) {
+      if (statement.nodeType === "ExpressionStatement" && statement.expression.nodeType === "FunctionCall") {
+        const baseContractName = statement.expression.expression.expression.name
+        const functionName = statement.expression.expression.memberName
+        if (baseContractInitializers[baseContractName] === functionName) {
+          initializedContracts[baseContractName] = true
+        }
       }
-      if (statement.expression.nodeType !== "FunctionCall") {
-        continue
-      }
-      if (statement.expression.expression.memberName !== "initialize") {
-        continue
-      }
-      const baseContractName = statement.expression.expression.expression.name
-      initializedContracts[baseContractName] = true
     }
     // For each base contract with "initialize" function, check that it's called in the function
     const uninitializedBaseContracts = []
-    for (const contractName in baseContractsWithInitialize) {
+    for (const contractName of baseContractsWithInitialize) {
       if (!initializedContracts[contractName]) {
         uninitializedBaseContracts.push(contractName)
       }
@@ -185,6 +186,20 @@ export default class LocalBaseController {
       if (typeof(data[childKey]) === 'object' && this.hasKeyValue(data[childKey], key, value)) return true
     }
     return false
+  }
+
+  getContractInitializer(contractJson) {
+    const contractDefinition = contractJson.ast.nodes
+      .find(n => n.nodeType === "ContractDefinition" && n.name === contractJson.contractName)
+    const contractFunctions = contractDefinition.nodes.filter(n => n.nodeType === "FunctionDefinition")
+    for (const contractFunction of contractFunctions) {
+      const functionModifiers = contractFunction.modifiers
+      const initializerModifier = functionModifiers.find(m => m.modifierName.name === "initializer")
+      if (contractFunction.name === "initialize" || initializerModifier !== undefined) {
+        return contractFunction
+      }
+    }
+    return undefined
   }
 
   getContractClass(packageName, contractAlias) {
