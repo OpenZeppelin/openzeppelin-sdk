@@ -1,5 +1,7 @@
 pragma solidity ^0.4.24;
 
+import "zos-lib/contracts/Initializable.sol";
+
 contract WithInitialize {
   uint public value;
 
@@ -8,10 +10,10 @@ contract WithInitialize {
   }
 }
 
-contract AnotherWithInitialize {
+contract AnotherWithInitialize is Initializable {
   uint public anotherValue;
 
-  function initialize() public {
+  function init() initializer public {
     anotherValue = 42;
   }
 }
@@ -35,7 +37,7 @@ contract WithBaseInitialized is WithInitialize, AnotherWithInitialize {
 
   function initialize() public {
     WithInitialize.initialize();
-    AnotherWithInitialize.initialize();
+    AnotherWithInitialize.init();
     someValue = 42;
   }
 }
@@ -46,4 +48,12 @@ contract WithSimpleBaseUninitialized is WithoutInitialize {
   function initialize() public {
     someValue = 42;
   }
+}
+
+contract ShouldHaveInitialize is WithInitialize, AnotherWithInitialize {
+  uint public someValue;
+}
+
+contract DoesNotNeedAnInitialize is WithInitialize, WithoutInitialize {
+  uint public someValue;
 }
