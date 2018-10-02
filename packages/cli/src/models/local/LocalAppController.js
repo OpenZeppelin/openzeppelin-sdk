@@ -3,6 +3,11 @@ import NetworkAppController from '../network/NetworkAppController';
 import Dependency from '../dependency/Dependency';
 
 export default class LocalAppController extends LocalBaseController {
+  init(name, version, force = false, lightweight = false) {
+    super.init(name, version, force)
+    if (lightweight) this.packageFile.lightweight = lightweight
+  }
+
   async linkLibs(libs, installLibs = false) {
     await Promise.all(libs.map(async libNameVersion => {
       const dependency = Dependency.fromNameWithVersion(libNameVersion)
