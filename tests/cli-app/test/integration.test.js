@@ -58,19 +58,19 @@ describe(`cli-app on ${network}`, function () {
   })
 
   it('pushes to network', function () {
-    run(`npx zos push --network ${network} --from ${this.from} --deploy-stdlib --skip-compile`)
+    run(`npx zos push --network ${network} --from ${this.from} --deploy-libs --skip-compile`)
   })
 
   it('creates an instance', function () {
     run(`npx zos create Foo --network ${network}`)
-    truffleExec(`run.js Foo 0 say --network ${network}`).should.eq('Foo')
+    truffleExec(`run.js cli-app/Foo 0 say --network ${network}`).should.eq('Foo')
   })
 
   it('creates an instance from a dependency', function () {
-    run(`npx zos create MintableERC721Token --init --args "${this.from},MyToken,TKN" --network ${network} --from ${this.from}`)
-    const tokenAddress = getProxyAddress(network, 'MintableERC721Token', 0)
+    run(`npx zos create openzeppelin-zos/MintableERC721Token --init --args "${this.from},MyToken,TKN" --network ${network} --from ${this.from}`)
+    const tokenAddress = getProxyAddress(network, 'openzeppelin-zos/MintableERC721Token', 0)
     run(`npx zos create WithToken --init --args "${tokenAddress}" --network ${network} --from ${this.from}`)
-    truffleExec(`run.js WithToken 0 say --network ${network} --from ${this.from}`).should.eq('TKN')
+    truffleExec(`run.js cli-app/WithToken 0 say --network ${network} --from ${this.from}`).should.eq('TKN')
   })
 
   it('modifies and pushes a contract', function () {
@@ -85,7 +85,7 @@ describe(`cli-app on ${network}`, function () {
 
   it('upgrades an instance', function () {
     run(`npx zos update Foo --network ${network} --from ${this.from}`)
-    truffleExec(`run.js Foo 0 say --network ${network} --from ${this.from}`).should.eq('FooV2')
+    truffleExec(`run.js cli-app/Foo 0 say --network ${network} --from ${this.from}`).should.eq('FooV2')
   })
 
   it('installs new version of a dependency', function () {
@@ -97,9 +97,9 @@ describe(`cli-app on ${network}`, function () {
   it('upgrades a dependency', function () {
     copy('WithTokenV2.sol', 'contracts/WithToken.sol')
     run(`npx truffle compile`)
-    run(`npx zos push --deploy-stdlib --network ${network} --from ${this.from} --skip-compile`)
-    run(`npx zos update MintableERC721Token --network ${network} --from ${this.from}`)
+    run(`npx zos push --deploy-libs --network ${network} --from ${this.from} --skip-compile`)
+    run(`npx zos update openzeppelin-zos/MintableERC721Token --network ${network} --from ${this.from}`)
     run(`npx zos update WithToken --network ${network} --from ${this.from}`)
-    truffleExec(`run.js WithToken 0 isERC165 --network ${network}`).should.eq('true')
+    truffleExec(`run.js cli-app/WithToken 0 isERC165 --network ${network}`).should.eq('true')
   })
 });

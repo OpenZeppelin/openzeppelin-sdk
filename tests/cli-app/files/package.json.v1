@@ -7,8 +7,8 @@
   "license": "MIT",
   "dependencies": {
     "truffle": "^4.1.14",
-    "zos": "^1.4.2",
-    "zos-lib": "^1.4.1",
+    "zos": "2.0.0-alpha.0",
+    "zos-lib": "2.0.0-alpha.0",
     "openzeppelin-zos": "1.9.0",
     "bignumber.js": "^7.2.0",
     "truffle-hdwallet-provider": "0.0.6"
