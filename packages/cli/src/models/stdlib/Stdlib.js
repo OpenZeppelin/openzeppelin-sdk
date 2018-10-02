@@ -5,6 +5,7 @@ import semver from 'semver';
 import StdlibProvider from './StdlibProvider';
 import StdlibDeployer from './StdlibDeployer';
 import StdlibInstaller from './StdlibInstaller';
+import { checkVersion } from '../files/ZosVersion';
 
 export default class Stdlib {
   static fetch() {
@@ -50,6 +51,7 @@ export default class Stdlib {
     if (this._packageJson) return this._packageJson
     const filename = `node_modules/${this.name}/zos.json`
     this._packageJson = fs.parseJson(filename)
+    checkVersion(this._packageJson.zosversion, filename)
     return this._packageJson
   }
 

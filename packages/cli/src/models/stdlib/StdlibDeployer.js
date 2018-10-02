@@ -1,4 +1,5 @@
 import { Contracts, Release, FileSystem as fs } from 'zos-lib'
+import { checkVersion } from '../files/ZosVersion';
 
 const StdlibDeployer = {
   async deploy(stdlibName, txParams = {}) {
