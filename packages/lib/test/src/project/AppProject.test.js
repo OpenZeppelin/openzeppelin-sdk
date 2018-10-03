@@ -5,7 +5,7 @@ import AppProject from '../../../src/project/AppProject'
 import shouldBehaveLikePackageProject from './PackageProject.behavior';
 import shouldManageProxies from './ProxyProject.behaviour';
 import Contracts from '../../../src/utils/Contracts';
-import { toSemanticVersion } from '../../../src/utils/Semver';
+import shouldManageDependencies from './DependenciesProject.behaviour';
 
 const ImplV1 = Contracts.getFromLocal('DummyImplementation');
 const ImplV2 = Contracts.getFromLocal('DummyImplementationV2');
@@ -50,4 +50,6 @@ contract('AppProject', function (accounts) {
       await this.project.setImplementation(ImplV2, "DummyImplementationV2")
     }
   })
+
+  shouldManageDependencies();
 })
