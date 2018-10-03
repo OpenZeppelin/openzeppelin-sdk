@@ -19,39 +19,45 @@ contract('init script', function() {
     this.packageFile = new ZosPackageFile(`${tmpDir}/zos.json`)
   })
 
-  describe('created file', function() {
+  function testInit(lightweight) {
+    it('should have correct lightweight mark', async function () {
+      await init({ lightweight, name, version, packageFile: this.packageFile });
+
+      this.packageFile.isLightweight.should.eq(lightweight)
+    });
+
     it('should not be marked as lib', async function () {
-      await init({ name, version, packageFile: this.packageFile });
+      await init({ lightweight, name, version, packageFile: this.packageFile });
 
       this.packageFile.isLib.should.be.false
     });
 
     it('should have the appropriate app name', async function() {
-      await init({ name, version, packageFile: this.packageFile });
+      await init({ lightweight, name, version, packageFile: this.packageFile });
 
       this.packageFile.hasName(name).should.be.true
     });
 
     it('should have a default version if not specified', async function() {
-      await init({ name, packageFile: this.packageFile });
+      await init({ lightweight, name, packageFile: this.packageFile });
 
       this.packageFile.isCurrentVersion('0.1.0').should.be.true
     });
 
     it('should have the appropriate version', async function() {
-      await init({ name, version, packageFile: this.packageFile });
+      await init({ lightweight, name, version, packageFile: this.packageFile });
 
       this.packageFile.isCurrentVersion(version).should.be.true
     });
 
     it('should have an empty contracts object', async function() {
-      await init({ name, version, packageFile: this.packageFile });
+      await init({ lightweight, name, version, packageFile: this.packageFile });
 
       this.packageFile.contracts.should.be.eql({})
     });
 
     it('should set dependency', async function () {
-      await init({ name, version, libs: ['mock-stdlib@1.1.0'], packageFile: this.packageFile });
+      await init({ lightweight, name, version, libs: ['mock-stdlib@1.1.0'], packageFile: this.packageFile });
       
       this.packageFile.getDependencyVersion('mock-stdlib').should.eq('1.1.0')
     });
@@ -59,7 +65,7 @@ contract('init script', function() {
     it('should not overwrite existing file by default', async function () {
       fs.writeJson(this.packageFile.fileName, { name: 'previousApp' })
 
-      await init({ name, version, packageFile: this.packageFile }).should.be.rejectedWith(`Cannot overwrite existing file ${this.packageFile.fileName}`)
+      await init({ lightweight, name, version, packageFile: this.packageFile }).should.be.rejectedWith(`Cannot overwrite existing file ${this.packageFile.fileName}`)
 
       cleanup(this.packageFile.fileName)
     });
@@ -67,12 +73,20 @@ contract('init script', function() {
     it('should overwrite existing file if requested', async function () {
       fs.writeJson(this.packageFile.fileName, { name: 'previousApp', version: '0' })
 
-      await init({ name, version, force: true, packageFile: this.packageFile })
+      await init({ lightweight, name, version, force: true, packageFile: this.packageFile })
 
       this.packageFile.hasName(name).should.be.true
       this.packageFile.isCurrentVersion(version).should.be.true
 
       cleanup(this.packageFile.fileName)
     });
-  });
+  };
+
+  describe('for app', function () {
+    testInit(false)
+  })
+
+  describe('for lightweight', function () {
+    testInit(true)
+  })
 });

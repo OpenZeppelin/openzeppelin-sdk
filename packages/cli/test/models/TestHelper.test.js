@@ -64,6 +64,21 @@ contract('TestHelper', function ([_, owner]) {
     })
   })
 
+  describe('for lightweight app project', function() {
+    beforeEach(async function () {
+      this.packageFile = new ZosPackageFile('test/mocks/packages/package-with-contracts.zos.json')
+      this.packageFile.lightweight = true
+      this.networkFile = this.packageFile.networkFile('test')
+      this.app = await TestHelper(txParams, this.networkFile)
+    })
+
+    it('retrieves a mock from app', async function () {
+      const proxy = await this.app.createProxy(ImplV1, { contractName: 'Impl' })
+      const say = await proxy.say()
+      say.should.eq('V1')
+    })
+  })
+
   describe('for lib project', function() {
     beforeEach(async function () {
       this.packageFile = new ZosPackageFile('test/mocks/packages/package-lib-with-contracts.zos.json')

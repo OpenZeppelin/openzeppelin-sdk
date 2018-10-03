@@ -1,54 +1,37 @@
 'use strict'
-const network = process.env.NETWORK;
-if (!network) throw new Error("NETWORK environment variable is required")
-
 require('chai').should();
 const _ = require('lodash'); 
 
 const { 
   getProxyAddress,
   getNetworkInfo,
+  getNetwork,
   truffleExec,
   run,
   copy
 } = require('./share');
 
-describe(`cli-app on ${network}`, function () {
+const { 
+  registerProjectHooks
+} = require('./project');
 
-  before('cleaning up project folder', function () {
-    run('rm build/contracts/*.json ||:')
-    run('rm contracts/*.sol ||:')
-    run('rm zos.* ||:')
-  });
+const network = getNetwork();
 
-  before('setting up project', function () {
-    copy('package.json.v1', 'package.json')
-    copy('Samples.sol', 'contracts/Samples.sol')
-    copy('WithToken.sol', 'contracts/WithToken.sol')
-    run('npx lerna bootstrap --scope=cli-app-tests-workdir --no-ci > /dev/null')
-  });
+function runIntegrationTest({ lightweight }) {
+  registerProjectHooks(network);
 
-  before('loading accounts', async function () {
-    if (process.env.FROM) {
-      this.from = process.env.FROM;
-    } else {
-      const accounts = truffleExec(`getaccounts.js --network ${network}`).split(',')
-      this.from = _.trim(accounts[0])
+  function ifNotLightweight() {
+    if (!lightweight) {
+      it.apply(this, arguments)
     }
-  })
-
-  after('cleaning up project folder', function () {
-    run('rm build/contracts/*.json ||:')
-    run('rm contracts/*.sol ||:')
-    run('rm zos.* ||:')
-    run('rm package.* ||:')
-  })
+  }
 
   it('initialize zos', function () {
-    run('npx zos init cli-app 0.5.0')
+    const flags = lightweight ? '--light' : '';
+    run(`npx zos init cli-app 0.5.0 ${flags}`)
   })
 
-  it('adds dependencies', function () {
+  ifNotLightweight('adds dependencies', function () {
     run('npx zos link openzeppelin-zos@1.9.0 --no-install')
   })
 
@@ -66,7 +49,7 @@ describe(`cli-app on ${network}`, function () {
     truffleExec(`run.js cli-app/Foo 0 say --network ${network}`).should.eq('Foo')
   })
 
-  it('creates an instance from a dependency', function () {
+  ifNotLightweight('creates an instance from a dependency', function () {
     run(`npx zos create openzeppelin-zos/MintableERC721Token --init --args "${this.from},MyToken,TKN" --network ${network} --from ${this.from}`)
     const tokenAddress = getProxyAddress(network, 'openzeppelin-zos/MintableERC721Token', 0)
     run(`npx zos create WithToken --init --args "${tokenAddress}" --network ${network} --from ${this.from}`)
@@ -88,13 +71,13 @@ describe(`cli-app on ${network}`, function () {
     truffleExec(`run.js cli-app/Foo 0 say --network ${network} --from ${this.from}`).should.eq('FooV2')
   })
 
-  it('installs new version of a dependency', function () {
+  ifNotLightweight('installs new version of a dependency', function () {
     copy('package.json.v2', 'package.json')
     run('npx lerna bootstrap --scope=cli-app-tests-workdir --no-ci > /dev/null')
     run('npx zos link openzeppelin-zos@1.9.4 --no-install')
   })
 
-  it('upgrades a dependency', function () {
+  ifNotLightweight('upgrades a dependency', function () {
     copy('WithTokenV2.sol', 'contracts/WithToken.sol')
     run(`npx truffle compile`)
     run(`npx zos push --deploy-libs --network ${network} --from ${this.from} --skip-compile`)
@@ -102,4 +85,12 @@ describe(`cli-app on ${network}`, function () {
     run(`npx zos update WithToken --network ${network} --from ${this.from}`)
     truffleExec(`run.js cli-app/WithToken 0 isERC165 --network ${network}`).should.eq('true')
   })
-});
+};
+
+describe(`cli-app on ${network}`, function () {
+  runIntegrationTest({ lightweight: false })
+})
+
+describe(`cli-app lightweight on ${network}`, function () {
+  runIntegrationTest({ lightweight: true })
+})

@@ -15,3 +15,7 @@ export function toAddress(contractOrAddress) {
 export function isZeroAddress(address) {
   return !address || address === ZERO_ADDRESS
 }
+
+export function uint256ToAddress(uint256) {
+  return uint256.toString().replace('0x000000000000000000000000', '0x')
+}
