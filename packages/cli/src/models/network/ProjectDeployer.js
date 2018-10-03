@@ -56,6 +56,7 @@ export class LibProjectDeployer extends BasePackageProjectDeployer {
       return this.project
     } catch(deployError) {
       this._tryRegisterPartialDeploy(deployError)
+      if (!this.project) throw deployError
     }
   }
 }
@@ -71,6 +72,7 @@ export class AppProjectDeployer extends BasePackageProjectDeployer {
       return this.project
     } catch (deployError) {
       this._tryRegisterPartialDeploy(deployError)
+      if (!this.project) throw deployError
     }
   }
 
