@@ -98,6 +98,43 @@ contract('add script', function() {
       this.logs.errors.should.have.lengthOf(0);
       this.logs.warns.should.have.lengthOf(0);
     });
+
+    it('should warn when adding a contract with uninitialized base contracts', async function() {
+      add({ contractsData: [{ name: 'WithBaseUninitialized', alias: 'WithBaseUninitialized' }], packageFile: this.packageFile });
+
+      this.logs.warns.should.have.lengthOf(2);
+      this.logs.warns[0].should.match(/that wasn't initialized/i);
+      this.logs.warns[1].should.match(/that wasn't initialized/i);
+    });
+
+    it('should not warn when adding a contract with initialized base contracts', async function() {
+      add({ contractsData: [{ name: 'WithBaseInitialized', alias: 'WithBaseInitialized' }], packageFile: this.packageFile });
+
+      this.logs.errors.should.have.lengthOf(0);
+      this.logs.warns.should.have.lengthOf(0);
+    });
+
+    it('should not warn when adding a contract with a base contract that does not have initialize', async function() {
+      add({ contractsData: [{ name: 'WithSimpleBaseUninitialized', alias: 'WithSimpleBaseUninitialized' }], packageFile: this.packageFile });
+
+      this.logs.errors.should.have.lengthOf(0);
+      this.logs.warns.should.have.lengthOf(0);
+    });
+
+    it('should warn when adding a contract without initializer with multiple base contracts that have initialize', async function() {
+      add({ contractsData: [{ name: 'ShouldHaveInitialize', alias: 'ShouldHaveInitialize' }], packageFile: this.packageFile });
+
+      this.logs.warns.should.have.lengthOf(2);
+      this.logs.warns[0].should.match(/that wasn't initialized/i);
+      this.logs.warns[1].should.match(/that wasn't initialized/i);
+    });
+
+    it('should not warn when adding a contract without initializer with zero or one base contract that has initialize', async function() {
+      add({ contractsData: [{ name: 'DoesNotNeedAnInitialize', alias: 'DoesNotNeedAnInitialize' }], packageFile: this.packageFile });
+
+      this.logs.errors.should.have.lengthOf(0);
+      this.logs.warns.should.have.lengthOf(0);
+    });
     
     it('should warn when adding a contract with a selfdestruct call', async function() {
       add({ contractsData: [{ name: 'WithSelfDestruct', alias: 'WithSelfDestruct' }], packageFile: this.packageFile });

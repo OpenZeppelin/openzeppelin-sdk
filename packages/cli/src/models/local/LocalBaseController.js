@@ -45,6 +45,11 @@ export default class LocalBaseController {
     if (this.hasConstructor(Contracts.getLocalPath(contractName))) {
       log.error(`Contract ${contractName} has an explicit constructor. Move it to an initializer function to use it with ZeppelinOS.`)
     }
+    // Log a warning anytime there is a base contract that wasn't initialized.
+    const uninitializedBaseContracts = this.getUninitializedBaseContracts(Contracts.getLocalPath(contractName))
+    for (const baseContractName of uninitializedBaseContracts) {
+      log.warn(`Contract ${contractName} has base contract ${baseContractName} that wasn't initialized.`)
+    }
     // Log a warning anytime `selfdestruct` is found.  This is a potential security risk, 
     // but not an error/throw as it may be a desired feature
     if (this.hasSelfDestruct(Contracts.getLocalPath(contractName))) {
@@ -110,6 +115,58 @@ export default class LocalBaseController {
     return this.hasTypeIdentifier(contractDataPath, "t_function_baredelegatecall_nonpayable$__$returns$_t_bool_$")
   }
 
+  getUninitializedBaseContracts(contractDataPath) {
+    if (!fs.exists(contractDataPath)) return []
+    const contractJson = fs.parseJson(contractDataPath)
+    // Check whether the contract has base contracts
+    const baseContracts = contractJson.ast.nodes.find(n => n.name === contractJson.contractName).baseContracts
+    if (baseContracts.length == 0) {
+      return []
+    }
+    // Make a dict of base contracts that have "initialize" function
+    const baseContractsWithInitialize = []
+    const baseContractInitializers = {}
+    for (const baseContract of baseContracts) {
+      const baseContractName = baseContract.baseName.name
+      const baseContractPath = Contracts.getLocalPath(baseContractName)
+      const baseContractJson = fs.parseJson(baseContractPath)
+      const baseContractInitializer = this.getContractInitializer(baseContractJson)
+      if (baseContractInitializer !== undefined) {
+        baseContractsWithInitialize.push(baseContractName)
+        baseContractInitializers[baseContractName] = baseContractInitializer.name
+      }
+    }
+    // Check that initializer exists
+    const initializer = this.getContractInitializer(contractJson)
+    if (initializer === undefined) {
+      // A contract may lack initializer as long as the base contracts don't have more than 1 initializers in total
+      // If there are 2 or more base contracts with initializers, child contract should initialize all of them
+      if (baseContractsWithInitialize.length > 1) {
+        return baseContractsWithInitialize
+      }
+      return []
+    }
+    // Update map with each call of "initialize" function of the base contract
+    const initializedContracts = {}
+    for (const statement of initializer.body.statements) {
+      if (statement.nodeType === "ExpressionStatement" && statement.expression.nodeType === "FunctionCall") {
+        const baseContractName = statement.expression.expression.expression.name
+        const functionName = statement.expression.expression.memberName
+        if (baseContractInitializers[baseContractName] === functionName) {
+          initializedContracts[baseContractName] = true
+        }
+      }
+    }
+    // For each base contract with "initialize" function, check that it's called in the function
+    const uninitializedBaseContracts = []
+    for (const contractName of baseContractsWithInitialize) {
+      if (!initializedContracts[contractName]) {
+        uninitializedBaseContracts.push(contractName)
+      }
+    }
+    return uninitializedBaseContracts
+  }
+
   hasTypeIdentifier(contractDataPath, typeIdentifier) {
     if (!fs.exists(contractDataPath)) return false
     const contractJson = fs.parseJson(contractDataPath)
@@ -129,6 +186,20 @@ export default class LocalBaseController {
       if (typeof(data[childKey]) === 'object' && this.hasKeyValue(data[childKey], key, value)) return true
     }
     return false
+  }
+
+  getContractInitializer(contractJson) {
+    const contractDefinition = contractJson.ast.nodes
+      .find(n => n.nodeType === "ContractDefinition" && n.name === contractJson.contractName)
+    const contractFunctions = contractDefinition.nodes.filter(n => n.nodeType === "FunctionDefinition")
+    for (const contractFunction of contractFunctions) {
+      const functionModifiers = contractFunction.modifiers
+      const initializerModifier = functionModifiers.find(m => m.modifierName.name === "initializer")
+      if (contractFunction.name === "initialize" || initializerModifier !== undefined) {
+        return contractFunction
+      }
+    }
+    return undefined
   }
 
   getContractClass(packageName, contractAlias) {
