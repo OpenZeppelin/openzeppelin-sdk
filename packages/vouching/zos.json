@@ -1,0 +1,9 @@
+{
+  "zosversion": "2",
+  "name": "zos-vouching",
+  "version": "0.0.1",
+  "contracts": {},
+  "dependencies": {
+    "tpl-contracts-zos": "^0.0.1"
+  }
+}
