@@ -49,10 +49,8 @@ contract('update script', function([_skipped, owner, anotherAccount]) {
     return proxyInfo;
   };
 
-  describe('on application contract', function () {
-
+  const shouldHandleUpdateScript = function () {
     beforeEach('setup', async function() {
-      this.packageFile = new ZosPackageFile('test/mocks/packages/package-empty.zos.json')
       this.networkFile = this.packageFile.networkFile(network)
 
       const contractsData = [{ name: 'ImplV1', alias: 'Impl' }, { name: 'AnotherImplV1', alias: 'AnotherImpl' }]
@@ -210,7 +208,24 @@ contract('update script', function([_skipped, owner, anotherAccount]) {
         this.logs.errors.should.have.lengthOf(0);
       });
     });
-  });
+  };
+
+  describe('on application contract', function () {
+    beforeEach('setup package', async function() {
+      this.packageFile = new ZosPackageFile('test/mocks/packages/package-empty.zos.json')
+    });
+
+    shouldHandleUpdateScript();
+  })
+
+  describe('on lightweight application contract', function () {
+    beforeEach('setup package', async function() {
+      this.packageFile = new ZosPackageFile('test/mocks/packages/package-empty.zos.json')
+      this.packageFile.lightweight = true
+    });
+
+    shouldHandleUpdateScript();
+  })
 
   describe('on dependency contract', function () {
 

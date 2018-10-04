@@ -1,27 +1,15 @@
 'use strict';
 
-import { LibProject } from 'zos-lib';
 import NetworkBaseController from './NetworkBaseController';
+import { LibProjectDeployer } from './ProjectDeployer';
 
 export default class NetworkLibController extends NetworkBaseController {
+  getDeployer() {
+    return new LibProjectDeployer(this);
+  }
+
   async createProxy() {
     throw Error('Cannot create proxy for library project')
-  }
-
-  async fetchOrDeploy() {
-    try {
-      const { packageAddress } = this
-
-      this.project = await LibProject.fetchOrDeploy(this.currentVersion, this.txParams, { packageAddress })
-      this._registerPackage(await this.project.getProjectPackage())
-      this._registerVersion(this.currentVersion, await this.project.getCurrentDirectory())
-    } catch(deployError) {
-      this._tryRegisterPartialDeploy(deployError)
-    }
-  }
-
-  _registerVersion(version, { address }) {
-    super._registerVersion(version, { address })
   }
 
   _checkVersion() {
@@ -33,6 +21,7 @@ export default class NetworkLibController extends NetworkBaseController {
     }
     super._checkVersion()
   }
+
   async freeze() {
     await this.fetchOrDeploy()
     await this.project.freeze()

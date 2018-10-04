@@ -1,41 +1,24 @@
 import _ from 'lodash';
 import NetworkBaseController from './NetworkBaseController';
-import { Contracts, Logger, AppProject, FileSystem as fs } from 'zos-lib';
+import { Contracts, Logger, AppProject, FileSystem as fs, Proxy } from 'zos-lib';
 import { toContractFullName } from '../../utils/naming';
 import Dependency from '../dependency/Dependency';
 import { allPromisesOrError } from '../../utils/async';
+import { AppProjectDeployer, SimpleProjectDeployer } from './ProjectDeployer';
 
 const log = new Logger('NetworkAppController');
 
 export default class NetworkAppController extends NetworkBaseController {
+  getDeployer() {
+    return this.isLightweight ? new SimpleProjectDeployer(this) : new AppProjectDeployer(this);
+  }
+
   get appAddress() {
     return this.networkFile.appAddress
   }
 
   get app() {
     return this.project.getApp()
-  }
-
-  async fetchOrDeploy() {
-    try {
-      const { appAddress, packageAddress } = this
-
-      this.project = await AppProject.fetchOrDeploy(this.packageFile.name, this.currentVersion, this.txParams, { appAddress, packageAddress })
-      this._registerApp(this.project.getApp())
-      this._registerPackage(await this.project.getProjectPackage())
-      this._registerVersion(this.currentVersion, await this.project.getCurrentDirectory())
-    } catch (deployError) {
-      this._tryRegisterPartialDeploy(deployError)
-    }
-  }
-
-  _tryRegisterPartialDeploy({ thepackage, app, directory }) {
-    super._tryRegisterPartialDeploy({ thepackage, directory })
-    if (app) this._registerApp(app)
-  }
-
-  _registerApp({ address }) {
-    this.networkFile.app = { address }
   }
 
   async push(reupload = false, force = false) {
@@ -71,13 +54,13 @@ export default class NetworkAppController extends NetworkBaseController {
     const contractClass = this.localController.getContractClass(packageName, contractAlias);
     this.checkInitialization(contractClass, initMethod, initArgs);
     const proxyInstance = await this.project.createProxy(contractClass, { packageName, contractName: contractAlias, initMethod, initArgs });
-    const implementationAddress = await this.project.app.getImplementation(packageName, contractAlias);
+    const implementationAddress = await Proxy.at(proxyInstance).implementation();
     // FIXME: Shouldn't truffle deployed info correspond to the contract name, and not its alias?
     this._updateTruffleDeployedInformation(contractAlias, proxyInstance)
 
     this.networkFile.addProxy(packageName, contractAlias, {
       address: proxyInstance.address,
-      version: this.project.version,
+      version: this.currentVersion,
       implementation: implementationAddress
     })
     return proxyInstance;
@@ -120,7 +103,7 @@ export default class NetworkAppController extends NetworkBaseController {
     )
 
     // Update all proxies loaded
-    const newVersion = await this.project.getCurrentVersion();
+    const newVersion = this.currentVersion;
     await allPromisesOrError(
       _.map(proxies, (proxy) => this._upgradeProxy(proxy, initMethod, initArgs, newVersion))
     )
@@ -130,13 +113,14 @@ export default class NetworkAppController extends NetworkBaseController {
 
   async _upgradeProxy(proxy, initMethod, initArgs, newVersion) {
     try {
+      const name = { packageName: proxy.package, contractName: proxy.contract }
       const contractClass = this.localController.getContractClass(proxy.package, proxy.contract);
-      const currentImplementation = await this.project.app.getProxyImplementation(proxy.address)
-      const contractImplementation = await this.project.app.getImplementation(proxy.package, proxy.contract)
+      const currentImplementation = await Proxy.at(proxy).implementation();
+      const contractImplementation = await this.project.getImplementation(name)
       let newImplementation;
 
       if (currentImplementation !== contractImplementation) {
-        await this.project.upgradeProxy(proxy.address, contractClass, { packageName: proxy.package, contractName: proxy.contract, initMethod, initArgs });
+        await this.project.upgradeProxy(proxy.address, contractClass, { initMethod, initArgs, ... name });
         newImplementation = contractImplementation
       } else {
         log.info(`Contract ${proxy.contract} at ${proxy.address} is up to date.`)
@@ -179,9 +163,11 @@ export default class NetworkAppController extends NetworkBaseController {
       return [];
     }
 
-    const ownedProxies = proxies.filter(proxy => !proxy.admin || proxy.admin === this.appAddress);
+    // TODO: If 'from' is not explicitly set, then we need to retrieve it from the set of current accounts
+    const expectedOwner = this.isLightweight ? this.txParams.from : this.appAddress
+    const ownedProxies = proxies.filter(proxy => !proxy.admin || !expectedOwner || proxy.admin === expectedOwner);
 
-    if (_.isEmpty(ownedProxies)) {
+    if (_.isEmpty(ownedProxies)) { 
       log.info(`No contract instances that match${criteriaDescription} are owned by this application`);
     }
 

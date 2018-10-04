@@ -1,6 +1,6 @@
 import { promisify } from 'util'
 import Contracts from '../utils/Contracts';
-import { toAddress } from '../utils/Addresses';
+import { toAddress, uint256ToAddress } from '../utils/Addresses';
 import { deploy as deployContract, sendTransaction } from "../utils/Transactions";
 
 export default class Proxy {
@@ -35,12 +35,12 @@ export default class Proxy {
 
   async implementation() {
     const position = web3.sha3('org.zeppelinos.proxy.implementation')
-    return this.getStorageAt(position)
+    return uint256ToAddress(await this.getStorageAt(position))
   }
 
   async admin() {
     const position = web3.sha3('org.zeppelinos.proxy.admin')
-    return this.getStorageAt(position)
+    return uint256ToAddress(await this.getStorageAt(position))
   }
 
   async getStorageAt(position) {

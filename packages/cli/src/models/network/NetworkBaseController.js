@@ -1,10 +1,9 @@
 import _ from 'lodash';
-import { Contracts, Logger, flattenSourceCode } from 'zos-lib';
+import { Contracts, Logger, flattenSourceCode, getStorageLayout, getBuildArtifacts, compareStorageLayouts, getStructsOrEnums } from 'zos-lib';
 import StatusComparator from '../status/StatusComparator'
 import StatusChecker from "../status/StatusChecker";
 import Verifier from '../Verifier'
 import { allPromisesOrError } from '../../utils/async';
-import { getStorageLayout, getBuildArtifacts, compareStorageLayouts, getStructsOrEnums } from 'zos-lib/src';
 import { logUncheckedVars, logStorageLayoutDiffs } from '../../interface/Validations';
 
 const log = new Logger('NetworkController');
@@ -37,12 +36,22 @@ export default class NetworkBaseController {
     return this.packageFile.isLib;
   }
 
+  get isLightweight() {
+    return this.packageFile.isLightweight;
+  }
+
+  async fetchOrDeploy() {
+    this.project = await this.getDeployer().fetchOrDeploy();
+  }
+
   async compareCurrentStatus() {
+    if (this.isLightweight) throw Error('Command status-pull is not supported for lightweight apps' )
     const statusComparator = StatusChecker.compare(this.networkFile, this.txParams)
     await statusComparator.call()
   }
 
   async pullRemoteStatus() {
+    if (this.isLightweight) throw Error('Command status-fix is not supported for lightweight apps' )
     const statusFetcher = StatusChecker.fetch(this.networkFile, this.txParams)
     await statusFetcher.call()
   }
@@ -78,24 +87,10 @@ export default class NetworkBaseController {
     }
   }
 
-  _tryRegisterPartialDeploy({ thepackage, directory }) {
-    if (thepackage) this._registerPackage(thepackage)
-    if (directory) this._registerVersion(this.currentVersion, directory)
-  }
-
-  _registerPackage({ address }) {
-    this.networkFile.package = { address }
-  }
-
-  _registerVersion(version, { address }) {
-    this.networkFile.provider = { address }
-    this.networkFile.version = version
-  }
-  
   _newVersionRequired() {
     const requestedVersion = this.packageFile.version;
     const currentVersion = this.networkFile.version;
-    return (requestedVersion !== currentVersion);
+    return (requestedVersion !== currentVersion) && !this.isLightweight;
   }
 
   _contractsListForPush(onlyChanged = false) {

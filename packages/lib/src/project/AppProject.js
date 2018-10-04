@@ -6,6 +6,8 @@ import _ from 'lodash';
 import { semanticVersionToString } from "../utils/Semver";
 
 export default class AppProject extends BasePackageProject {
+
+  // REFACTOR: Evaluate merging this logic with CLI's ProjectDeployer classes
   static async fetchOrDeploy(name = 'main', version = '0.1.0', txParams = {}, { appAddress = undefined, packageAddress = undefined }) {
     let thepackage, directory, app
     version = semanticVersionToString(version)
@@ -70,6 +72,11 @@ export default class AppProject extends BasePackageProject {
 
   async getCurrentVersion() {
     return this.version
+  }
+
+  // TODO: Testme
+  async getImplementation({ packageName, contractName }) {
+    return this.app.getImplementation(packageName || this.name, contractName)
   }
 
   // TODO: Testme

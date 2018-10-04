@@ -22,7 +22,7 @@
     "openzeppelin-solidity": "~1.10.0",
     "openzeppelin-zos": "~1.9.1",
     "truffle": "^4.1.13",
-    "zos-lib": "2.0.0-alpha.0"
+    "zos-lib": "^2.0.0-alpha.0"
   },
   "devDependencies": {
     "babel-polyfill": "^6.23.0",

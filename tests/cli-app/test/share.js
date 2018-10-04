@@ -3,6 +3,12 @@ const path = require('path');
 const fs = require('fs');
 const _ = require('lodash');
 
+function getNetwork() {
+  const network = process.env.NETWORK;
+  if (!network) throw new Error("NETWORK environment variable is required")
+  return network;
+}
+
 function getProxyAddress(network, name, index) {
   const fileName = path.resolve(__dirname, `../workdir/zos.${network}.json`)
   const data = JSON.parse(fs.readFileSync(fileName))
@@ -61,10 +67,10 @@ function copy(src, target) {
   fs.copyFileSync(path.resolve(__dirname, `../files/${src}`), path.resolve(__dirname, `../workdir/${target}`));
 }
 
-
 module.exports = {
   getProxyAddress,
   getNetworkInfo,
+  getNetwork,
   truffleExec,
   run,
   copy

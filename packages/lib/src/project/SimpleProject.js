@@ -60,6 +60,11 @@ export default class SimpleProject  {
     this.implementations[contractName] = { address, bytecodeHash }
   }
 
+  async getImplementation({ contractName }) {
+    if (!this.implementations[contractName]) return null
+    return this.implementations[contractName].address
+  }
+
   async _getOrDeployImplementation(contractClass, contractName, redeployIfChanged) {
     if (!contractName) contractName = contractClass.contractName;
     const existing = this.implementations[contractName];
@@ -79,19 +84,5 @@ export default class SimpleProject  {
       log.info(`${actionLabel} proxy to logic contract ${implementationAddress}`)  
       return null;
     }
-  }
-
-  async _tryInitializeProxy(proxy, contractClass, initMethodName, initArgs, initFrom) {
-    if (!initMethodName) return;
-    
-    if (!initFrom) {
-      throw Error(`Initialization sender address is required`)
-    } else if (initFrom === this.txParams.from) {
-      throw Error(`Cannot initialize the proxy from the same address as its admin address. Make sure you use a different 'initFrom' account when calling upgrade.`)
-    }
-    
-    const { method: initMethod, callData } = buildCallData(contractClass, initMethodName, initArgs);
-    log.info(`Initializing proxy at ${proxy.address} by calling ${callDescription(initMethod, initArgs)}`);
-    await sendDataTransaction(proxy.contract, Object.assign({}, this.txParamsInitializer, { data: callData }))
   }
 }

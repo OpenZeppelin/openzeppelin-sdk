@@ -5,6 +5,7 @@ import { Logger } from 'zos-lib';
 import CaptureLogs from '../helpers/captureLogs';
 
 import add from '../../src/scripts/add.js';
+import addAll from '../../src/scripts/add-all'
 import ZosPackageFile from "../../src/models/files/ZosPackageFile";
 
 contract('add script', function() {
@@ -61,6 +62,13 @@ contract('add script', function() {
 
     this.packageFile.contract(contractName).should.eq(contractName)
   });
+
+  it('should add all contracts in build contracts dir', function() {
+    addAll({ packageFile: this.packageFile })
+
+    this.packageFile.contract('ImplV1').should.eq('ImplV1')
+    this.packageFile.contract('ImplV2').should.eq('ImplV2')
+  })
 
   describe('failures', function () {
     it('should fail to add a contract that does not exist', function() {

@@ -9,6 +9,7 @@ export default class LibProject extends BasePackageProject {
     return new this(thepackage, version, txParams)
   }
 
+  // REFACTOR: Evaluate merging this logic with CLI's ProjectDeployer classes
   static async fetchOrDeploy(version = '0.1.0', txParams = {}, { packageAddress = undefined }) {
     let thepackage, directory
     version = semanticVersionToString(version)
@@ -34,6 +35,11 @@ export default class LibProject extends BasePackageProject {
     super(txParams)
     this.package = thepackage
     this.version = semanticVersionToString(version)
+  }
+
+  async getImplementation({ contractName }) {
+    const directory = await this.getCurrentDirectory()
+    return directory.getImplementation(contractName)
   }
 
   async getProjectPackage() {
