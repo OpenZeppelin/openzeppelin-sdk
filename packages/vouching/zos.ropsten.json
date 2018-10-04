@@ -445,6 +445,20 @@
         "version": "0.0.1",
         "implementation": "0x1756aca48aabc08d10dba235a00085fb6a646f87"
       }
+    ],
+    "zos-vouching/Vouching": [
+      {
+        "address": "0x76d7bd707ebc5ec341f8a1a4f65f359cc99f6341",
+        "version": "0.0.1",
+        "implementation": "0x9574cad2fcc9ca67b106680834d1a6ccd19570b3"
+      }
+    ],
+    "zos-vouching/ZEPValidator": [
+      {
+        "address": "0x45b7776eea431231c32e8aaf94cbc60a0364a61f",
+        "version": "0.0.1",
+        "implementation": "0x907ad22519e277129afa9799ede09cf3c1e2c6d3"
+      }
     ]
   },
   "zosversion": "2",
