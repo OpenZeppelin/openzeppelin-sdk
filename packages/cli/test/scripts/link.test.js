@@ -56,4 +56,9 @@ contract('link script', function() {
     await linkStdlib({ stdlibNameVersion: 'mock-stdlib@~1.0.0', packageFile: this.packageFile })
       .should.be.rejectedWith('Required stdlib version ~1.0.0 does not match stdlib package version 1.1.0')
   });
-});
+
+  it('should raise an error if requested version of dependency has unknown zosversion identifier', async function () {
+    await linkStdlib({ stdlibNameVersion: 'mock-stdlib-unsupported@1.1.0', packageFile: this.packageFile })
+      .should.be.rejectedWith(/Unrecognized zos version identifier 3/i)
+  });
+})

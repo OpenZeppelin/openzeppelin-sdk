@@ -2,6 +2,7 @@ import _ from 'lodash'
 import ZosNetworkFile from './ZosNetworkFile'
 import { Logger, FileSystem as fs } from 'zos-lib'
 import Stdlib from '../stdlib/Stdlib';
+import { checkVersion } from './ZosVersion';
 
 const log = new Logger('ZosPackageFile')
 
@@ -10,6 +11,7 @@ export default class ZosPackageFile {
   constructor(fileName = 'zos.json') {
     this.fileName = fileName
     this.data = fs.parseJsonIfExists(this.fileName) || {};
+    checkVersion(this.data.zosversion, this.fileName)
   }
 
   exists() {
