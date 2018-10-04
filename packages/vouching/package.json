@@ -17,7 +17,8 @@
     "TPL-1.0-audit": "git+https://github.com/TPL-protocol/tpl-contracts.git#fa6b46bfce719c8301f795846eca5a3fdbcf436c",
     "openzeppelin-zos": "git+https://github.com/OpenZeppelin/openzeppelin-zos.git#3df0a786e4cfe19f22ea537f32f68c392b29a5f8",
     "tpl-contracts-zos": "0.0.3",
-    "zos-lib": "^2.0.0-alpha.0"
+    "zos-lib": "^2.0.0-alpha.0",
+    "zos": "^2.0.0-alpha.0"
   },
   "devDependencies": {
     "babel-plugin-transform-object-rest-spread": "^6.26.0",
@@ -29,7 +30,6 @@
     "babel-register": "^6.26.0",
     "chai": "^4.1.2",
     "chai-bignumber": "^2.0.2",
-    "truffle": "^4.1.14",
-    "zos": "^2.0.0-alpha.0"
+    "truffle": "^4.1.14"
   }
 }
