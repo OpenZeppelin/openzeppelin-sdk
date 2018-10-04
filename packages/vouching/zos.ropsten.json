@@ -1,7 +1,103 @@
 {
   "contracts": {
+    "Vouching": {
+      "address": "0xcb729b5e70517956243df8ff4c0f42cea44d4e5c",
+      "constructorCode": "608060405234801561001057600080fd5b50611b63806100206000396000f300",
+      "bodyBytecodeHash": "37a9521fdba0d2cddf7748051c08655ee939ec7603afc2775a5c143391971580",
+      "bytecodeHash": "7df63d6fc39e5be9db368aeddadbadd67210128f702684cd0aa6f4c895b085d5",
+      "types": {
+        "t_bool": {
+          "id": "t_bool",
+          "kind": "elementary",
+          "label": "bool"
+        },
+        "t_struct<Vouching.Dependency>": {
+          "id": "t_struct<Vouching.Dependency>",
+          "kind": "struct",
+          "label": "Vouching.Dependency",
+          "members": [
+            {
+              "label": "owner",
+              "astId": 53,
+              "type": "t_address",
+              "src": "809:13:1"
+            },
+            {
+              "label": "dependencyAddress",
+              "astId": 55,
+              "type": "t_address",
+              "src": "828:25:1"
+            },
+            {
+              "label": "stake",
+              "astId": 57,
+              "type": "t_uint256",
+              "src": "859:13:1"
+            }
+          ]
+        },
+        "t_address": {
+          "id": "t_address",
+          "kind": "elementary",
+          "label": "address"
+        },
+        "t_uint256": {
+          "id": "t_uint256",
+          "kind": "elementary",
+          "label": "uint256"
+        },
+        "t_mapping<t_struct<Vouching.Dependency>>": {
+          "id": "t_mapping<t_struct<Vouching.Dependency>>",
+          "valueType": "t_struct<Vouching.Dependency>",
+          "label": "mapping(key => Vouching.Dependency)",
+          "kind": "mapping"
+        }
+      },
+      "storage": [
+        {
+          "contract": "Initializable",
+          "path": "openzeppelin-zos/contracts/Initializable.sol",
+          "label": "initialized",
+          "astId": 2398,
+          "type": "t_bool",
+          "src": "701:24:9"
+        },
+        {
+          "contract": "Initializable",
+          "path": "openzeppelin-zos/contracts/Initializable.sol",
+          "label": "initializing",
+          "astId": 2400,
+          "type": "t_bool",
+          "src": "820:25:9"
+        },
+        {
+          "contract": "Vouching",
+          "path": "contracts/Vouching.sol",
+          "label": "_registry",
+          "astId": 62,
+          "type": "t_mapping<t_struct<Vouching.Dependency>>",
+          "src": "881:48:1"
+        },
+        {
+          "contract": "Vouching",
+          "path": "contracts/Vouching.sol",
+          "label": "_minimumStake",
+          "astId": 64,
+          "type": "t_uint256",
+          "src": "933:29:1"
+        },
+        {
+          "contract": "Vouching",
+          "path": "contracts/Vouching.sol",
+          "label": "_token",
+          "astId": 66,
+          "type": "t_address",
+          "src": "966:20:1"
+        }
+      ]
+    },
     "ZEPValidator": {
-      "address": "0x907ad22519e277129afa9799ede09cf3c1e2c6d3",
+      "address": "0xd3092009cdf60b26723d123667fc4becdf5cc208",
       "constructorCode": "60806040526000600260006101000a81548160ff02191690831515021790555034801561002b57600080fd5b5061232a8061003b6000396000f300",
       "bodyBytecodeHash": "3d92bc73924906552e7e2ddb0ba98aea44121f624f4169695a5d2f5b293d96ed",
       "bytecodeHash": "137db18f92fb5501e14514e6b13d422fba774abd6f85c5451c10e2ff9c74026f",
@@ -178,104 +274,8 @@
         }
       ]
     },
-    "Vouching": {
-      "address": "0x9574cad2fcc9ca67b106680834d1a6ccd19570b3",
-      "constructorCode": "608060405234801561001057600080fd5b50611b63806100206000396000f300",
-      "bodyBytecodeHash": "37a9521fdba0d2cddf7748051c08655ee939ec7603afc2775a5c143391971580",
-      "bytecodeHash": "7df63d6fc39e5be9db368aeddadbadd67210128f702684cd0aa6f4c895b085d5",
-      "types": {
-        "t_bool": {
-          "id": "t_bool",
-          "kind": "elementary",
-          "label": "bool"
-        },
-        "t_struct<Vouching.Dependency>": {
-          "id": "t_struct<Vouching.Dependency>",
-          "kind": "struct",
-          "label": "Vouching.Dependency",
-          "members": [
-            {
-              "label": "owner",
-              "astId": 53,
-              "type": "t_address",
-              "src": "809:13:1"
-            },
-            {
-              "label": "dependencyAddress",
-              "astId": 55,
-              "type": "t_address",
-              "src": "828:25:1"
-            },
-            {
-              "label": "stake",
-              "astId": 57,
-              "type": "t_uint256",
-              "src": "859:13:1"
-            }
-          ]
-        },
-        "t_address": {
-          "id": "t_address",
-          "kind": "elementary",
-          "label": "address"
-        },
-        "t_uint256": {
-          "id": "t_uint256",
-          "kind": "elementary",
-          "label": "uint256"
-        },
-        "t_mapping<t_struct<Vouching.Dependency>>": {
-          "id": "t_mapping<t_struct<Vouching.Dependency>>",
-          "valueType": "t_struct<Vouching.Dependency>",
-          "label": "mapping(key => Vouching.Dependency)",
-          "kind": "mapping"
-        }
-      },
-      "storage": [
-        {
-          "contract": "Initializable",
-          "path": "openzeppelin-zos/contracts/Initializable.sol",
-          "label": "initialized",
-          "astId": 2398,
-          "type": "t_bool",
-          "src": "701:24:9"
-        },
-        {
-          "contract": "Initializable",
-          "path": "openzeppelin-zos/contracts/Initializable.sol",
-          "label": "initializing",
-          "astId": 2400,
-          "type": "t_bool",
-          "src": "820:25:9"
-        },
-        {
-          "contract": "Vouching",
-          "path": "contracts/Vouching.sol",
-          "label": "_registry",
-          "astId": 62,
-          "type": "t_mapping<t_struct<Vouching.Dependency>>",
-          "src": "881:48:1"
-        },
-        {
-          "contract": "Vouching",
-          "path": "contracts/Vouching.sol",
-          "label": "_minimumStake",
-          "astId": 64,
-          "type": "t_uint256",
-          "src": "933:29:1"
-        },
-        {
-          "contract": "Vouching",
-          "path": "contracts/Vouching.sol",
-          "label": "_token",
-          "astId": 66,
-          "type": "t_address",
-          "src": "966:20:1"
-        }
-      ]
-    },
     "ZEPToken": {
-      "address": "0x1756aca48aabc08d10dba235a00085fb6a646f87",
+      "address": "0x55f82db290f1b62fd21e1a1bb808ccb07083309d",
       "constructorCode": "60806040526000600a60006101000a81548160ff02191690831515021790555034801561002b57600080fd5b50612b148061003b6000396000f300",
       "bodyBytecodeHash": "9b06bae7ce397f0892e17fb319d1f2cf258b83b56251e49a36782968a8eb7df5",
       "bytecodeHash": "ee5bb6a5a1f24c89a70d41204470d6c130b50ffec1bedc251b53f264acb88b95",
@@ -434,42 +434,42 @@
   "proxies": {
     "tpl-contracts-zos/BasicJurisdiction": [
       {
-        "address": "0x8eae84d0c9e782ef6819d3bb76df947d90d9fb59",
+        "address": "0x4ca417dd080ecbb699c9f698436891f6a69a8352",
         "version": "0.0.1",
         "implementation": "0x658262ad4d9cab4304f16fc10a9ecdac990b0d1d"
       }
     ],
     "zos-vouching/ZEPToken": [
       {
-        "address": "0x1143fd8f1be17658fdae85b80c6817905797918c",
+        "address": "0x02838b6fce94b9282232153d0f310ad78808442b",
         "version": "0.0.1",
-        "implementation": "0x1756aca48aabc08d10dba235a00085fb6a646f87"
+        "implementation": "0x55f82db290f1b62fd21e1a1bb808ccb07083309d"
       }
     ],
     "zos-vouching/Vouching": [
       {
-        "address": "0x76d7bd707ebc5ec341f8a1a4f65f359cc99f6341",
+        "address": "0x3bda5b990c0ef7f140d5e4ca3a1448ea13d9a016",
         "version": "0.0.1",
-        "implementation": "0x9574cad2fcc9ca67b106680834d1a6ccd19570b3"
+        "implementation": "0xcb729b5e70517956243df8ff4c0f42cea44d4e5c"
       }
     ],
     "zos-vouching/ZEPValidator": [
       {
-        "address": "0x45b7776eea431231c32e8aaf94cbc60a0364a61f",
+        "address": "0xb80ee420494cdced2c1b0ee4de5a562eb9b16551",
         "version": "0.0.1",
-        "implementation": "0x907ad22519e277129afa9799ede09cf3c1e2c6d3"
+        "implementation": "0xd3092009cdf60b26723d123667fc4becdf5cc208"
       }
     ]
   },
   "zosversion": "2",
   "app": {
-    "address": "0xa0b9280822d94dfe6595be241f683afcd8a1b1f8"
+    "address": "0xb86dc8c913d5273ff182b940b6b957adcb9ee1f9"
   },
   "package": {
-    "address": "0xff42250c0d0e05794becb89a467fbd2d38ca03e6"
+    "address": "0x01ffcbc35730897e44333584c10b7a3c937f9447"
   },
   "provider": {
-    "address": "0xd1fc3826460f62dc92ccefd94b643410ee145e54"
+    "address": "0x99fa2a9b8029e4e40d0e5fdea5952576da4561ce"
   },
   "version": "0.0.1",
   "dependencies": {
