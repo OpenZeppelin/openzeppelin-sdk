@@ -18,7 +18,7 @@ export default async function runWithTruffle(script, options) {
   if (options.compile) await Truffle.compile(config)
   await initTruffle(config)
   await script({ network, txParams })
-  process.exit(0)
+  if (!options.dontExitProcess) process.exit(0)
 }
 
 function initTruffle(config) {
