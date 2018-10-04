@@ -38,6 +38,9 @@ export class SimpleProjectDeployer extends BaseProjectDeployer {
     _.forEach(this.networkFile.contracts, (contractInfo, contractAlias) => {
       this.project.registerImplementation(contractAlias, contractInfo)
     })
+    _.forEach(this.networkFile.dependencies, (dependencyInfo, dependencyName) => {
+      this.project.setDependency(dependencyName, dependencyInfo.package, dependencyInfo.version)
+    })
 
     return this.project
   }

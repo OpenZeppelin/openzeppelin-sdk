@@ -20,18 +20,12 @@ const network = getNetwork();
 function runIntegrationTest({ lightweight }) {
   registerProjectHooks(network);
 
-  function ifNotLightweight() {
-    if (!lightweight) {
-      it.apply(this, arguments)
-    }
-  }
-
   it('initialize zos', function () {
     const flags = lightweight ? '--light' : '';
     run(`npx zos init cli-app 0.5.0 ${flags}`)
   })
 
-  ifNotLightweight('adds dependencies', function () {
+  it('adds dependencies', function () {
     run('npx zos link mock-stdlib@1.1.0 --no-install')
   })
 
@@ -49,7 +43,7 @@ function runIntegrationTest({ lightweight }) {
     truffleExec(`run.js cli-app/Foo 0 say --network ${network}`).should.eq('Foo')
   })
 
-  ifNotLightweight('creates an instance from a dependency', function () {
+  it('creates an instance from a dependency', function () {
     run(`npx zos create mock-stdlib/Greeter --init --args "Alice" --network ${network} --from ${this.from}`)
     const tokenAddress = getProxyAddress(network, 'mock-stdlib/Greeter', 0)
     run(`npx zos create GreeterWrapper --init --args "${tokenAddress}" --network ${network} --from ${this.from}`)
@@ -72,13 +66,13 @@ function runIntegrationTest({ lightweight }) {
     truffleExec(`run.js cli-app/Foo 0 say --network ${network} --from ${this.from}`).should.eq('FooV2')
   })
 
-  ifNotLightweight('installs new version of a dependency', function () {
+  it('installs new version of a dependency', function () {
     copy('package.json.v2', 'package.json')
     run('npx lerna bootstrap --scope=cli-app-tests-workdir --no-ci > /dev/null')
     run('npx zos link mock-stdlib@1.2.0 --no-install')
   })
 
-  ifNotLightweight('upgrades a dependency', function () {
+  it('upgrades a dependency', function () {
     copy('GreeterWrapperV2.sol', 'contracts/GreeterWrapper.sol')
     run(`npx truffle compile`)
     run(`npx zos push --deploy-libs --network ${network} --from ${this.from} --skip-compile`)
