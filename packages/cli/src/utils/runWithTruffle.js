@@ -1,6 +1,7 @@
 import Truffle from '../models/truffle/Truffle';
 import Session from '../models/network/Session'
 import Contracts from 'zos-lib/lib/utils/Contracts';
+import managerScriptCall from './managerScriptCall';
 import _ from 'lodash';
 
 const DEFAULT_TIMEOUT = 10 * 60; // 10 minutes
@@ -15,7 +16,7 @@ export default async function runWithTruffle(script, options) {
   Contracts.setSyncTimeout((_.isNil(timeout) ? DEFAULT_TIMEOUT : timeout) * 1000)
   if (options.compile) await Truffle.compile(config)
   await initTruffle(config)
-  await script({ network, txParams })
+  await managerScriptCall(async () => await script({ network, txParams }), txParams)
   process.exit(0)
 }
 
