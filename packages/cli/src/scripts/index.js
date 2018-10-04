@@ -1,9 +1,13 @@
 import add from './add'
+import addAll from './add-all'
 import bump from './bump'
+import compare from './compare'
 import create from './create'
 import freeze from './freeze'
 import init from './init'
+import initLib from './init-lib'
 import link from './link'
+import pull from './pull'
 import push from './push'
 import remove from './remove'
 import session from './session'
@@ -15,11 +19,15 @@ import verify from './verify'
 
 export default {
   add,
+  addAll,
   bump,
+  compare,
   create,
   freeze,
   init,
+  initLib,
   link,
+  pull,
   push,
   remove,
   session,
@@ -27,5 +35,5 @@ export default {
   status,
   unlink,
   update,
-  verify,
+  verify
 }
