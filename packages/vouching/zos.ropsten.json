@@ -431,7 +431,22 @@
       ]
     }
   },
-  "proxies": {},
+  "proxies": {
+    "tpl-contracts-zos/BasicJurisdiction": [
+      {
+        "address": "0x8eae84d0c9e782ef6819d3bb76df947d90d9fb59",
+        "version": "0.0.1",
+        "implementation": "0x658262ad4d9cab4304f16fc10a9ecdac990b0d1d"
+      }
+    ],
+    "zos-vouching/ZEPToken": [
+      {
+        "address": "0x1143fd8f1be17658fdae85b80c6817905797918c",
+        "version": "0.0.1",
+        "implementation": "0x1756aca48aabc08d10dba235a00085fb6a646f87"
+      }
+    ]
+  },
   "zosversion": "2",
   "app": {
     "address": "0xa0b9280822d94dfe6595be241f683afcd8a1b1f8"
