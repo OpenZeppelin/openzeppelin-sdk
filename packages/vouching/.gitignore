@@ -1,3 +1,9 @@
+# contract artifacts
 build/
 
+# zOS
+zos.local.json
 .zos.session
+
+# lol macs
+.DS_Store
