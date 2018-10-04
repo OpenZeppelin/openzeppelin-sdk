@@ -9,8 +9,8 @@ import { AppProjectDeployer, SimpleProjectDeployer } from './ProjectDeployer';
 const log = new Logger('NetworkAppController');
 
 export default class NetworkAppController extends NetworkBaseController {
-  getDeployer() {
-    return this.isLightweight ? new SimpleProjectDeployer(this) : new AppProjectDeployer(this);
+  getDeployer(requestedVersion) {
+    return this.isLightweight ? new SimpleProjectDeployer(this, requestedVersion) : new AppProjectDeployer(this, requestedVersion);
   }
 
   get appAddress() {
@@ -49,7 +49,7 @@ export default class NetworkAppController extends NetworkBaseController {
   }
 
   async createProxy(packageName, contractAlias, initMethod, initArgs) {
-    await this.fetchOrDeploy()
+    await this.fetchOrDeploy(this.currentVersion)
     if (!packageName) packageName = this.packageFile.name;
     const contractClass = this.localController.getContractClass(packageName, contractAlias);
     this.checkInitialization(contractClass, initMethod, initArgs);
@@ -79,7 +79,7 @@ export default class NetworkAppController extends NetworkBaseController {
   async setProxiesAdmin(packageName, contractAlias, proxyAddress, newAdmin) {
     const proxies = this._fetchOwnedProxies(packageName, contractAlias, proxyAddress)
     if (proxies.length === 0) return [];
-    await this.fetchOrDeploy()
+    await this.fetchOrDeploy(this.currentVersion)
 
     await allPromisesOrError(
       _.map(proxies, async (proxy) => {
@@ -94,7 +94,7 @@ export default class NetworkAppController extends NetworkBaseController {
   async upgradeProxies(packageName, contractAlias, proxyAddress, initMethod, initArgs) {
     const proxies = this._fetchOwnedProxies(packageName, contractAlias, proxyAddress)
     if (proxies.length === 0) return [];
-    await this.fetchOrDeploy()
+    await this.fetchOrDeploy(this.currentVersion)
 
     // Check if there is any migrate method in the contracts and warn the user to call it
     const contracts = _.uniqWith(_.map(proxies, p => [p.package, p.contract]), _.isEqual)

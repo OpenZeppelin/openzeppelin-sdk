@@ -4,8 +4,8 @@ import NetworkBaseController from './NetworkBaseController';
 import { LibProjectDeployer } from './ProjectDeployer';
 
 export default class NetworkLibController extends NetworkBaseController {
-  getDeployer() {
-    return new LibProjectDeployer(this);
+  getDeployer(requestedVersion) {
+    return new LibProjectDeployer(this, requestedVersion);
   }
 
   async createProxy() {
@@ -13,17 +13,14 @@ export default class NetworkLibController extends NetworkBaseController {
   }
 
   _checkVersion() {
-    const requestedVersion = this.packageFile.version
-    const currentVersion = this.networkFile.version
-
-    if (requestedVersion !== currentVersion) {
+    if (this.packageVersion !== this.currentVersion) {
       this.networkFile.frozen = false
     }
     super._checkVersion()
   }
 
   async freeze() {
-    await this.fetchOrDeploy()
+    await this.fetchOrDeploy(this.currentVersion)
     await this.project.freeze()
     this.networkFile.frozen = true
   }
