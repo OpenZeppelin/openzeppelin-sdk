@@ -7,6 +7,7 @@ import scripts from './scripts'
 import local from './models/local'
 import network from './models/network'
 import TestHelper from './models/TestHelper'
+import runWithTruffle from './utils/runWithTruffle'
 
 export {
   version,
@@ -14,5 +15,6 @@ export {
   network,
   commands,
   scripts,
+  runWithTruffle,
   TestHelper,
 }
