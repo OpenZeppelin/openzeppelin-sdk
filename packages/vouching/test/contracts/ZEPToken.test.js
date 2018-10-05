@@ -21,8 +21,8 @@ contract('ZEPToken', ([ _, tokenOwner, another, jurisdictionOwner, validatorOwne
 
   beforeEach('initialize ZEP token', async function () {
     this.zepToken = await ZEPToken.new()
-    const initializeData = encodeCall('initialize', ['address', 'uint256'], [this.jurisdiction.address, receiveTokensAttributeID])
-    await this.zepToken.sendTransaction({ data: initializeData, from: tokenOwner })
+    const initializeData = encodeCall('initialize', ['address', 'address', 'uint256'], [tokenOwner, this.jurisdiction.address, receiveTokensAttributeID])
+    await this.zepToken.sendTransaction({ data: initializeData })
   });
 
   it('has a name', async function () {

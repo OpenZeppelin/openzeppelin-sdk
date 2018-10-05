@@ -36,8 +36,8 @@ contract('Vouching', function ([_, tokenOwner, vouchingOwner, developer, transfe
 
       // Initialize ZepToken
       this.token = await ZepToken.new({ from: tokenOwner });
-      const initializeZepData = encodeCall('initialize', ['address', 'uint256'], [this.jurisdiction.address, attributeID]);
-      await this.token.sendTransaction({ data: initializeZepData, from: tokenOwner });
+      const initializeZepData = encodeCall('initialize', ['address', 'address', 'uint256'], [tokenOwner, this.jurisdiction.address, attributeID]);
+      await this.token.sendTransaction({ data: initializeZepData });
 
       // Initialize Validator
       this.validator = await ZEPValidator.new({ from: validatorOwner });
