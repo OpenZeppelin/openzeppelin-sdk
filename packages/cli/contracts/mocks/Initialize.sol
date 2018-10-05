@@ -57,3 +57,7 @@ contract ShouldHaveInitialize is WithInitialize, AnotherWithInitialize {
 contract DoesNotNeedAnInitialize is WithInitialize, WithoutInitialize {
   uint public someValue;
 }
+
+contract ExtendsFromShouldHaveInitialize is ShouldHaveInitialize {
+  uint public someOtherValue;
+}

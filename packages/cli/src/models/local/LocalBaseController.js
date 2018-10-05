@@ -47,8 +47,9 @@ export default class LocalBaseController {
     }
     // Log a warning anytime there is a base contract that wasn't initialized.
     const uninitializedBaseContracts = this.getUninitializedBaseContracts(Contracts.getLocalPath(contractName))
-    for (const baseContractName of uninitializedBaseContracts) {
-      log.warn(`Contract ${contractName} has base contract ${baseContractName} that wasn't initialized.`)
+    for (const baseContractName in uninitializedBaseContracts) {
+      const childContractName = uninitializedBaseContracts[baseContractName]
+      log.warn(`Contract ${childContractName} has base contract ${baseContractName} that wasn't initialized.`)
     }
     // Log a warning anytime `selfdestruct` is found.  This is a potential security risk, 
     // but not an error/throw as it may be a desired feature
@@ -116,12 +117,22 @@ export default class LocalBaseController {
   }
 
   getUninitializedBaseContracts(contractDataPath) {
-    if (!fs.exists(contractDataPath)) return []
+    const uninitializedBaseContracts = {}
+    this.getUninitializedDirectBaseContracts(contractDataPath,uninitializedBaseContracts)
+    return uninitializedBaseContracts
+  }
+
+  getUninitializedDirectBaseContracts(contractDataPath, uninitializedBaseContracts) {
+    if (!fs.exists(contractDataPath)) return
     const contractJson = fs.parseJson(contractDataPath)
     // Check whether the contract has base contracts
     const baseContracts = contractJson.ast.nodes.find(n => n.name === contractJson.contractName).baseContracts
-    if (baseContracts.length == 0) {
-      return []
+    if (baseContracts.length == 0) return
+    // Run check for the base contracts
+    for (const baseContract of baseContracts) {
+      const baseContractName = baseContract.baseName.name
+      const baseContractPath = Contracts.getLocalPath(baseContractName)
+      this.getUninitializedDirectBaseContracts(baseContractPath, uninitializedBaseContracts)
     }
     // Make a dict of base contracts that have "initialize" function
     const baseContractsWithInitialize = []
@@ -142,9 +153,11 @@ export default class LocalBaseController {
       // A contract may lack initializer as long as the base contracts don't have more than 1 initializers in total
       // If there are 2 or more base contracts with initializers, child contract should initialize all of them
       if (baseContractsWithInitialize.length > 1) {
-        return baseContractsWithInitialize
+        for (const baseContract of baseContractsWithInitialize) {
+          uninitializedBaseContracts[baseContract] = contractJson.contractName
+        }
       }
-      return []
+      return
     }
     // Update map with each call of "initialize" function of the base contract
     const initializedContracts = {}
@@ -158,13 +171,12 @@ export default class LocalBaseController {
       }
     }
     // For each base contract with "initialize" function, check that it's called in the function
-    const uninitializedBaseContracts = []
     for (const contractName of baseContractsWithInitialize) {
       if (!initializedContracts[contractName]) {
-        uninitializedBaseContracts.push(contractName)
+        uninitializedBaseContracts[contractName] = contractJson.contractName
       }
     }
-    return uninitializedBaseContracts
+    return
   }
 
   hasTypeIdentifier(contractDataPath, typeIdentifier) {
