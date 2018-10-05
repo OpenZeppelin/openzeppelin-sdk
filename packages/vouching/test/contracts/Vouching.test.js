@@ -40,9 +40,9 @@ contract('Vouching', function ([_, tokenOwner, vouchingOwner, developer, transfe
       await this.token.sendTransaction({ data: initializeZepData });
 
       // Initialize Validator
-      this.validator = await ZEPValidator.new({ from: validatorOwner });
-      const initializeValidatorData = encodeCall('initialize', ['address', 'uint256'], [this.jurisdiction.address, attributeID]);
-      await this.validator.sendTransaction({ data: initializeValidatorData, from: validatorOwner });
+      this.validator = await ZEPValidator.new();
+      const initializeValidatorData = encodeCall('initialize', ['address', 'address', 'uint256'], [validatorOwner, this.jurisdiction.address, attributeID]);
+      await this.validator.sendTransaction({ data: initializeValidatorData });
 
       await this.jurisdiction.addValidator(this.validator.address, "ZEP Validator", { from: jurisdictionOwner });
       await this.jurisdiction.addAttributeType(attributeID, false, false, ZERO_ADDRESS, 0, 0, 0, "can transfer", { from: jurisdictionOwner });
