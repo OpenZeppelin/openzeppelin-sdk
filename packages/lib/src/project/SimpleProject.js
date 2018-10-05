@@ -47,7 +47,7 @@ export default class SimpleProject  {
     log.info(`Deploying logic contract for ${contractClass.contractName}`);
     if (!contractName) contractName = contractClass.contractName;
     const implementation = await deploy(contractClass, [], this.txParams);
-    this.registerImplementation(contractName, {
+    await this.registerImplementation(contractName, {
       address: implementation.address,
       bytecodeHash: bytecodeDigest(contractClass.bytecode)
     })
@@ -58,7 +58,7 @@ export default class SimpleProject  {
     delete this.implementations[contractName]
   }
 
-  registerImplementation(contractName, { address, bytecodeHash }) {
+  async registerImplementation(contractName, { address, bytecodeHash }) {
     this.implementations[contractName] = { address, bytecodeHash }
   }
 
