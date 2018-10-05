@@ -1,6 +1,5 @@
 import _ from 'lodash';
 import { Contracts, Logger, flattenSourceCode, getStorageLayout, getBuildArtifacts, compareStorageLayouts, getStructsOrEnums } from 'zos-lib';
-import StatusComparator from '../status/StatusComparator'
 import StatusChecker from "../status/StatusChecker";
 import Verifier from '../Verifier'
 import { allPromisesOrError } from '../../utils/async';
@@ -20,16 +19,20 @@ export default class NetworkBaseController {
     return this.localController.packageFile;
   }
 
-  get currentVersion() {
+  get packageVersion() {
     return this.packageFile.version;
+  }
+
+  get currentVersion() {
+    return this.networkFile.version;
   }
 
   get packageAddress() {
     return this.networkFile.packageAddress
   }
 
-  get isDeployed() {
-    throw Error("Unimplemented function isDeployed()");
+  getDeployer() {
+    throw Error("Unimplemented function getDeployer()");
   }
 
   get isLib() {
@@ -40,8 +43,8 @@ export default class NetworkBaseController {
     return this.packageFile.isLightweight;
   }
 
-  async fetchOrDeploy() {
-    this.project = await this.getDeployer().fetchOrDeploy();
+  async fetchOrDeploy(requestedVersion) {
+    this.project = await this.getDeployer(requestedVersion).fetchOrDeploy()
   }
 
   async compareCurrentStatus() {
@@ -69,7 +72,7 @@ export default class NetworkBaseController {
     }
 
     this._checkVersion()
-    await this.fetchOrDeploy()
+    await this.fetchOrDeploy(this.packageVersion)
 
     await Promise.all([
       this.uploadContracts(contracts, buildArtifacts), 
@@ -79,18 +82,14 @@ export default class NetworkBaseController {
 
   _checkVersion() {
     if (this._newVersionRequired()) {
-      const requestedVersion = this.packageFile.version;
-      const currentVersion = this.networkFile.version;
-      log.info(`Current version ${currentVersion}`);
-      log.info(`Creating new version ${requestedVersion}`);
+      log.info(`Current version ${this.currentVersion}`);
+      log.info(`Creating new version ${this.packageVersion}`);
       this.networkFile.contracts = {};
     }
   }
 
   _newVersionRequired() {
-    const requestedVersion = this.packageFile.version;
-    const currentVersion = this.networkFile.version;
-    return (requestedVersion !== currentVersion) && !this.isLightweight;
+    return (this.packageVersion !== this.currentVersion) && !this.isLightweight;
   }
 
   _contractsListForPush(onlyChanged = false) {

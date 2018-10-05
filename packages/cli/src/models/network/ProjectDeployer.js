@@ -2,15 +2,12 @@ import { AppProject, LibProject, SimpleProject } from "zos-lib";
 import _ from 'lodash';
 
 class BaseProjectDeployer {
-  constructor(controller) {
+  constructor(controller, requestedVersion) {
     this.controller = controller
     this.packageFile = controller.packageFile
     this.networkFile = controller.networkFile
     this.txParams = controller.txParams
-  }
-
-  get currentVersion() {
-    return this.controller.currentVersion
+    this.requestedVersion = requestedVersion
   }
 }
 
@@ -21,7 +18,7 @@ class BasePackageProjectDeployer extends BaseProjectDeployer {
 
   _tryRegisterPartialDeploy({ thepackage, directory }) {
     if (thepackage) this._registerPackage(thepackage)
-    if (directory) this._registerVersion(this.currentVersion, directory)
+    if (directory) this._registerVersion(this.requestedVersion, directory)
   }
 
   _registerPackage({ address }) {
@@ -37,7 +34,7 @@ class BasePackageProjectDeployer extends BaseProjectDeployer {
 export class SimpleProjectDeployer extends BaseProjectDeployer {
   async fetchOrDeploy() {
     this.project = new SimpleProject(this.packageFile.name, this.txParams)
-    this.networkFile.version = this.currentVersion
+    this.networkFile.version = this.requestedVersion
     _.forEach(this.networkFile.contracts, (contractInfo, contractAlias) => {
       this.project.registerImplementation(contractAlias, contractInfo)
     })
@@ -50,12 +47,13 @@ export class LibProjectDeployer extends BasePackageProjectDeployer {
   async fetchOrDeploy() {
     try {
       const packageAddress = this.packageAddress
-      this.project = await LibProject.fetchOrDeploy(this.currentVersion, this.txParams, { packageAddress })
+      this.project = await LibProject.fetchOrDeploy(this.requestedVersion, this.txParams, { packageAddress })
       this._registerPackage(await this.project.getProjectPackage())
-      this._registerVersion(this.currentVersion, await this.project.getCurrentDirectory())
+      this._registerVersion(this.requestedVersion, await this.project.getCurrentDirectory())
       return this.project
     } catch(deployError) {
       this._tryRegisterPartialDeploy(deployError)
+      if (!this.project) throw deployError
     }
   }
 }
@@ -64,13 +62,14 @@ export class AppProjectDeployer extends BasePackageProjectDeployer {
   async fetchOrDeploy() {
     try {
       const { appAddress, packageAddress } = this
-      this.project = await AppProject.fetchOrDeploy(this.packageFile.name, this.currentVersion, this.txParams, { appAddress, packageAddress })
+      this.project = await AppProject.fetchOrDeploy(this.packageFile.name, this.requestedVersion, this.txParams, { appAddress, packageAddress })
       this._registerApp(this.project.getApp())
       this._registerPackage(await this.project.getProjectPackage())
-      this._registerVersion(this.currentVersion, await this.project.getCurrentDirectory())
+      this._registerVersion(this.requestedVersion, await this.project.getCurrentDirectory())
       return this.project
     } catch (deployError) {
       this._tryRegisterPartialDeploy(deployError)
+      if (!this.project) throw deployError
     }
   }
 
