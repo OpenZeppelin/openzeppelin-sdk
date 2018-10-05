@@ -1,12 +1,12 @@
-require('babel-register')
-require('babel-polyfill')
-
 module.exports = {
   networks: {
-    local: {
+    local: { // Use `ganache-cli --deterministic`
       host: 'localhost',
       port: 8545,
-      network_id: '*'
+      network_id: '*',
+      gasPrice: 2e9, // 2 Gwei
+      gas: 6000000,
+      from: '0x90f8bf6a479f320ead074411a4b0e7944ea8c9c1'
     },
     ropsten: {
       host: 'localhost',
@@ -18,4 +18,3 @@ module.exports = {
     }
   }
 }
-
