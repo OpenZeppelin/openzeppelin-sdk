@@ -3,10 +3,15 @@
 import truffleConfig from '../truffle-config.js';
 import create from '../scripts/create';
 import runWithTruffle from 'zos/lib/utils/runWithTruffle';
+import parseArgs from 'minimist';
 
-// TODO turn into args
-const network = 'local';
-const from = truffleConfig.networks[network].from;
+const params = parseArgs(process.argv.slice(2), {
+  string: 'from'
+});
+const network = params.network;
+const from = params.from;
+if(!network) throw new Error('Please specify a network using --network=<network>.');
+if(!from) throw new Error('Please specify a sender address using --from=<addr>.');
 
 runWithTruffle(options => create(options), { network, from })
   .then(console.log)

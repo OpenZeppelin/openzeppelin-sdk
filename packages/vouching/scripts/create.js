@@ -21,7 +21,6 @@ export default async function create(options) {
   const minimumStake = 10;
   const vouchingProxy = await createVouchingInstance(minimumStake, zepTokenProxy.address, options);
   
-  // TODO create ZEPValidator instance.
   // Instantiate ZEPValidator.initialize(basicJurisdictionAddress, attributeID).
   const zepValidatorProxy = await createZEPValidatorInstance(basicJurisdictionProxy.address, attributeID, options);
 
