@@ -1,6 +1,6 @@
 {
   "name": "zos-docs",
-  "version": "2.0.0-alpha.0",
+  "version": "2.0.0-alpha.1",
   "description": "Documentation site for ZeppelinOS",
   "private": true,
   "main": "index.js",
