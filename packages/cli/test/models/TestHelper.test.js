@@ -16,7 +16,7 @@ contract('TestHelper', function ([_, owner]) {
 
   describe('for app project', function() {
     beforeEach(async function () {
-      this.packageFile = new ZosPackageFile('test/mocks/packages/package-with-contracts-and-multiple-stdlibs.json')
+      this.packageFile = new ZosPackageFile('test/mocks/packages/package-with-contracts-and-multiple-stdlibs.zos.json')
       this.networkFile = this.packageFile.networkFile('test')
       this.app = await TestHelper(txParams, this.networkFile)
     })

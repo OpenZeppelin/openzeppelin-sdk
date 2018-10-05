@@ -11,7 +11,7 @@ function registerProjectHooks (network) {
   before('setting up project', function () {
     copy('package.json.v1', 'package.json')
     copy('Samples.sol', 'contracts/Samples.sol')
-    copy('WithToken.sol', 'contracts/WithToken.sol')
+    copy('GreeterWrapper.sol', 'contracts/GreeterWrapper.sol')
     run('npx lerna bootstrap --scope=cli-app-tests-workdir --no-ci > /dev/null')
   });
 
@@ -23,7 +23,7 @@ function registerProjectHooks (network) {
       this.from = _.trim(accounts[0])
     }
   })
-
+  
   after('cleaning up project folder', function () {
     run('rm build/contracts/*.json ||:')
     run('rm contracts/*.sol ||:')

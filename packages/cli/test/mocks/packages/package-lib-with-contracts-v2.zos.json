@@ -1,5 +1,6 @@
 {
   "name": "Herbs",
+  "zosversion": "2",
   "version": "1.2.0",
   "lib": true,
   "contracts": {
