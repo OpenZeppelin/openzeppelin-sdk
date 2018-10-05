@@ -10,7 +10,7 @@ export default class LibProject extends BasePackageProject {
   }
 
   // REFACTOR: Evaluate merging this logic with CLI's ProjectDeployer classes
-  static async fetchOrDeploy(version = '0.1.0', txParams = {}, { packageAddress = undefined }) {
+  static async fetchOrDeploy(version = '0.1.0', txParams = {}, { packageAddress = undefined } = {}) {
     let thepackage, directory
     version = semanticVersionToString(version)
 

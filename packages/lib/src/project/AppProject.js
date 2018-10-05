@@ -8,7 +8,7 @@ import { semanticVersionToString } from "../utils/Semver";
 export default class AppProject extends BasePackageProject {
 
   // REFACTOR: Evaluate merging this logic with CLI's ProjectDeployer classes
-  static async fetchOrDeploy(name = 'main', version = '0.1.0', txParams = {}, { appAddress = undefined, packageAddress = undefined }) {
+  static async fetchOrDeploy(name = 'main', version = '0.1.0', txParams = {}, { appAddress = undefined, packageAddress = undefined } = {}) {
     let thepackage, directory, app
     version = semanticVersionToString(version)
     
@@ -103,29 +103,24 @@ export default class AppProject extends BasePackageProject {
     return this.app.changeProxyAdmin(proxyAddress, newAdmin)
   }
 
-  // TODO: Testme
   async getDependencyPackage(name) {
     const packageInfo = await this.app.getPackage(name)
     return packageInfo.package
   }
 
-  // TODO: Testme
   async getDependencyVersion(name) {
     const packageInfo = await this.app.getPackage(name)
     return packageInfo.version
   }
 
-  // TODO: Testme
   async hasDependency(name) {
     return this.app.hasPackage(name)
   }
 
-  // TODO: Testme
   async setDependency(name, packageAddress, version) {
     return this.app.setPackage(name, packageAddress, version)
   }
 
-  // TODO: Testme
   async unsetDependency(name) {
     return this.app.unsetPackage(name)
   }

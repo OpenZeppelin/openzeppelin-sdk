@@ -36,5 +36,5 @@ module.exports = function (chai, utils) {
       toSemanticVersion(expected).join('.'),
       toSemanticVersion(this._obj).join('.')
     )
-  })
+  });
 }
