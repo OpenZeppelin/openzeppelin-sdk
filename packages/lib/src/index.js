@@ -6,6 +6,7 @@ import decodeLogs from './helpers/decodeLogs'
 import encodeCall from './helpers/encodeCall'
 
 // utils
+import ABI from './utils/ABIs'
 import Logger from './utils/Logger'
 import FileSystem from './utils/FileSystem'
 import Contracts from './utils/Contracts'
@@ -58,6 +59,7 @@ export {
   semanticVersionToString,
   Proxy,
   Logger,
+  ABI,
   FileSystem,
   Contracts,
   App,
