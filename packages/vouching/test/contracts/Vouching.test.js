@@ -31,8 +31,8 @@ contract('Vouching', function ([_, tokenOwner, vouchingOwner, developer, transfe
     beforeEach('TPL setup', async function () {
       // Initialize Jurisdiction
       this.jurisdiction = await BasicJurisdiction.new({ from: jurisdictionOwner });
-      const initializeJurisdictionData = encodeCall('initialize', [], []);
-      await this.jurisdiction.sendTransaction({ data: initializeJurisdictionData, from: jurisdictionOwner });
+      const initializeJurisdictionData = encodeCall('initialize', ['address'], [jurisdictionOwner])
+      await this.jurisdiction.sendTransaction({ data: initializeJurisdictionData })
 
       // Initialize ZepToken
       this.token = await ZepToken.new({ from: tokenOwner });

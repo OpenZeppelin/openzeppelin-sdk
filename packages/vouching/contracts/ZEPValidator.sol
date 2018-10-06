@@ -3,8 +3,8 @@ pragma solidity ^0.4.24;
 import "openzeppelin-zos/contracts/Initializable.sol";
 import "openzeppelin-zos/contracts/ownership/Ownable.sol";
 import "openzeppelin-zos/contracts/lifecycle/Pausable.sol";
-import "TPL-1.0-audit/contracts/AttributeRegistry.sol";
-import "TPL-1.0-audit/contracts/BasicJurisdictionInterface.sol";
+import "tpl-contracts-zos/contracts/AttributeRegistry.sol";
+import "tpl-contracts-zos/contracts/BasicJurisdictionInterface.sol";
 
 contract ZEPValidator is Initializable, Ownable, Pausable {
 

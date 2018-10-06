@@ -15,8 +15,8 @@ contract('ZEPToken', ([ _, tokenOwner, another, jurisdictionOwner, validatorOwne
 
   beforeEach('initialize jurisdiction', async function () {
     this.jurisdiction = await BasicJurisdiction.new()
-    const initializeJurisdictionData = encodeCall('initialize', [], [])
-    await this.jurisdiction.sendTransaction({ data: initializeJurisdictionData, from: jurisdictionOwner })
+    const initializeJurisdictionData = encodeCall('initialize', ['address'], [jurisdictionOwner])
+    await this.jurisdiction.sendTransaction({ data: initializeJurisdictionData })
   })
 
   beforeEach('initialize ZEP token', async function () {
