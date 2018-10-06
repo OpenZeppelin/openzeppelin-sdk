@@ -69,7 +69,7 @@ contract Vouching is Initializable {
 
     _token.safeTransferFrom(owner, this, initialStake);
 
-    emit DependencyCreated(keccak256(name), name, owner, dependencyAddress, initialStake);
+    emit DependencyCreated(keccak256(abi.encodePacked(name)), name, owner, dependencyAddress, initialStake);
   }
 
   function transferOwnership(string name, address newOwner) external onlyDependencyOwner(name) {
@@ -81,7 +81,7 @@ contract Vouching is Initializable {
   function vouch(string name, uint256 amount) external onlyDependencyOwner(name) {
     _registry[name].stake = _registry[name].stake.add(amount);
     _token.safeTransferFrom(msg.sender, this, amount);
-    emit Vouched(keccak256(name), amount);
+    emit Vouched(keccak256(abi.encodePacked(name)), amount);
   }
 
   function unvouch(string name, uint256 amount) external onlyDependencyOwner(name) {
@@ -91,7 +91,7 @@ contract Vouching is Initializable {
     _registry[name].stake = remainingStake;
     _token.safeTransfer(msg.sender, amount);
 
-    emit Unvouched(keccak256(name), amount);
+    emit Unvouched(keccak256(abi.encodePacked(name)), amount);
   }
 
   function remove(string name) external onlyDependencyOwner(name) {
@@ -99,7 +99,7 @@ contract Vouching is Initializable {
     uint256 reimbursedAmount = _registry[name].stake.sub(_minimumStake);
     delete _registry[name];
     _token.safeTransfer(msg.sender, reimbursedAmount);
-    emit DependencyRemoved(keccak256(name));
+    emit DependencyRemoved(keccak256(abi.encodePacked(name)));
   }
 
 }
