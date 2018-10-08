@@ -11,7 +11,7 @@
     "test": "scripts/test.sh",
     "start-local": "ganache-cli --deterministic",
     "compile-contracts": "rm -rf build && npx truffle compile",
-    "prepare": "npm run compile-contracts && rm -rf lib && babel src --out-dir lib",
+    "prepare": "rm -rf lib && babel src --out-dir lib",
     "deploy-local": "node ./lib/bin/deploy.js --network=local --from=0x90f8bf6a479f320ead074411a4b0e7944ea8c9c1",
     "deploy-ropsten": "node ./lib/bin/deploy.js --network=ropsten --from=0x09902a56d04a9446601a0d451e07459dc5af0820",
     "create-local": "node ./lib/bin/create.js --network=local --from=0x90f8bf6a479f320ead074411a4b0e7944ea8c9c1",
