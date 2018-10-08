@@ -1,4 +1,5 @@
 import colors from 'colors';
+import * as constants from './constants';
 
 // zOS commands.
 import createProxy from 'zos/lib/scripts/create';
@@ -16,7 +17,7 @@ export default async function create(options) {
   const basicJurisdictionProxy = await createBasicJurisdictionInstance(owner, options);
 
   // Instantiate ZEPToken.initialize(address owner, address basicJurisdiction, uint256 attributeID).
-  const attributeID = '1665201538125898990930';
+  const attributeID = constants.ZEPTOKEN_ATTRIBUTE_ID;
   const zepTokenProxy = await createZEPTokenInstance(owner, basicJurisdictionProxy.address, attributeID, options);
   
   // Instantiate Vouching.initialize(uint267 minimumStake, address zepTokenAddress).
