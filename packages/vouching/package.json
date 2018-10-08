@@ -9,12 +9,12 @@
   },
   "scripts": {
     "test": "scripts/test.sh",
-    "deploy-local": "npx babel-node ./bin/deploy.js --network=local --from=0x90f8bf6a479f320ead074411a4b0e7944ea8c9c1",
-    "deploy-ropsten": "npx babel-node ./bin/deploy.js --network=ropsten --from=0x09902a56d04a9446601a0d451e07459dc5af0820",
-    "create-local": "npx babel-node ./bin/create.js --network=local --from=0x90f8bf6a479f320ead074411a4b0e7944ea8c9c1",
-    "create-ropsten": "npx babel-node ./bin/create.js --network=ropsten --from=0x09902a56d04a9446601a0d451e07459dc5af0820",
-    "validate-local": "npx babel-node ./bin/validate.js --network=local --from=0x90f8bf6a479f320ead074411a4b0e7944ea8c9c1",
-    "validate-ropsten": "npx babel-node ./bin/validate.js --network=ropsten --from=0x09902a56d04a9446601a0d451e07459dc5af0820"
+    "deploy-local": "npx babel-node ./src/bin/deploy.js --network=local --from=0x90f8bf6a479f320ead074411a4b0e7944ea8c9c1",
+    "deploy-ropsten": "npx babel-node ./src/bin/deploy.js --network=ropsten --from=0x09902a56d04a9446601a0d451e07459dc5af0820",
+    "create-local": "npx babel-node ./src/bin/create.js --network=local --from=0x90f8bf6a479f320ead074411a4b0e7944ea8c9c1",
+    "create-ropsten": "npx babel-node ./src/bin/create.js --network=ropsten --from=0x09902a56d04a9446601a0d451e07459dc5af0820",
+    "validate-local": "npx babel-node ./src/bin/validate.js --network=local --from=0x90f8bf6a479f320ead074411a4b0e7944ea8c9c1",
+    "validate-ropsten": "npx babel-node ./src/bin/validate.js --network=ropsten --from=0x09902a56d04a9446601a0d451e07459dc5af0820"
   },
   "keywords": [],
   "author": "",
