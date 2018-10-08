@@ -1,4 +1,5 @@
 import colors from 'colors';
+import * as constants from './constants';
 
 // zOS commands.
 import status from 'zos/lib/scripts/status';
@@ -13,6 +14,7 @@ Logger.silent(false);
 let networkData;
 let jurisdictionAddress;
 let zepTokenAddress;
+let jurisdictionContract;
 
 // *****************
 // COMBINED
@@ -64,12 +66,19 @@ async function checkJurisdiction(options) {
 
   // Retrieve contract object.
   const BasicJurisdiction = Contracts.getFromLocal('BasicJurisdiction');
-  const contract = BasicJurisdiction.at(proxyAddress);
+  jurisdictionContract = BasicJurisdiction.at(proxyAddress);
 
   // Jurisdiction owner is the specified address.
-  const owner = await contract.owner(); 
+  const owner = await jurisdictionContract.owner(); 
   console.log(`BasicJurisdiction owner: ${owner}`);
   if(owner != options.txParams.from) throw new Error('Unexpected BasicJurisdiction owner!');
+
+  // Jurisdiction has the ZEPToken attribute type set.
+  const info = await jurisdictionContract.getAttributeInformation(constants.ZEPTOKEN_ATTRIBUTE_ID);
+  const description = info[0];
+  console.log(`Jurisdiction attribute description for id ${constants.ZEPTOKEN_ATTRIBUTE_ID}: ${description}`);
+  if(!description || description !== constants.ZEPTOKEN_ATTRIBUTE_DESCRIPTION) throw new Error('ZEPToken attribute is incorrectly set on the jurisdiction.');
+  console.log(`ZEPToken attribute is correctly set on the jurisdiction.`);
 
   // TODO: consider performing addition tests for jurisdiction, i.e. checking interface, etc
 
@@ -177,6 +186,23 @@ async function checkZEPValidator(options) {
   const jurisdiction = await contract.getJurisdictionAddress();
   console.log(`ZEPValidator jurisdiction address: ${jurisdiction}`);
   if(jurisdiction != jurisdictionAddress) throw new Error('Invalid jurisdiction set for ZEPValidaotr instance.');
+
+  // Check that the validator is correctly set on the jurisdiction.
+  const isValidator = jurisdictionContract.isValidator(proxyAddress);
+  if(!isValidator) throw new Error('ZEPValidator is not set as a validator on the jurisdiction.');
+  console.log(`ZEPValidator is correctly set as a validator on the jurisdiction.`);
+  
+  // Verify that ZEPValidator can validate ZEPToken's attribute id.
+  const canValidate = await jurisdictionContract.isApproved(contract.address, constants.ZEPTOKEN_ATTRIBUTE_ID);
+  if(!canValidate) throw new Error(`ZEPValidator is not cleared for approval of ZEPToken attribute id: ${constants.ZEPTOKEN_ATTRIBUTE_ID}`);
+  console.log(`ZEPValidator is cleared for approval of ZEPToken attribute id: ${constants.ZEPTOKEN_ATTRIBUTE_ID}`);
+
+  // Verify that ZEPValidator is added as an organization in the jurisdiction.
+  const info = await contract.getOrganization(owner);
+  const exists = info[0];
+  const name = info[2];
+  if(!exists || name !== constants.ZEPPELIN_ORG_NAME) throw new Error(`${constants.ZEPPELIN_ORG_NAME} is not set as an organization in the validator.`);
+  console.log(`${constants.ZEPPELIN_ORG_NAME} correctly set as an organization in ZEPValidator.`);
 
   // TODO: more tests?
 

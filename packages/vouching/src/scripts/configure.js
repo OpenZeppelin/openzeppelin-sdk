@@ -23,23 +23,23 @@ export default async function configure(options) {
   // Add ZEPToken's attributes to the jurisdiction.
   console.log(`Adding ZEPToken attributes to the jurisdiction: ${constants.ZEPTOKEN_ATTRIBUTE_ID}`);
   await jurisdiction.addAttributeType(
-    constants.ZEPTOKEN_ATTRIBUTE_ID, // id
+    constants.ZEPTOKEN_ATTRIBUTE_ID,
     false, // restrictedAccess
     false, // onlyPersonal
     0, // secondarySource
     0, // secondaryId
     0, // minimumStake
     0, // jurisdictionFee
-    "can transfer" // description
+    constants.ZEPTOKEN_ATTRIBUTE_DESCRIPTION
   );
 
-  // Have the validator approve the attributes.
-  console.log(`Approving attribute...`);
+  // Approve ZEPValidator for validation of the ZEPToken attribute.
+  console.log(`Approving ZEPValidator for control of the ZEPToken attribute...`);
   jurisdiction.addValidatorApproval(validator.address, constants.ZEPTOKEN_ATTRIBUTE_ID);
 
   // Add an organization to the validator.
-  const maxAddresses = 100000;
-  const orgName = 'ZEP Org';
+  const maxAddresses = constants.ZEPPELIN_ORG_ACCOUNTS;
+  const orgName = constants.ZEPPELIN_ORG_NAME;
   console.log(`Adding organization to the validator: address ${owner}, addresses: ${maxAddresses}, name: ${orgName}`);
   await validator.addOrganization(
     owner, // org. address
