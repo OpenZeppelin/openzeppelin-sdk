@@ -36,6 +36,7 @@ contract ZEPValidator is Initializable, Ownable, Pausable {
 
   // the initializer will attach the validator to a jurisdiction & set attribute
   function initialize(
+    address _sender,
     address _jurisdiction,
     uint256 _validAttributeID
   )
@@ -50,6 +51,11 @@ contract ZEPValidator is Initializable, Ownable, Pausable {
     // NOTE: we can require that the jurisdiction implements the right interface
     // using EIP-165 or that the contract is designated as a validator and has
     // authority to issue attributes of the specified type here if desired
+
+    // TODO: Provisional fix. Until OZ initializable works with a parametrized msg.sender
+    transferOwnership(_sender);
+    _removePauser(msg.sender);
+    _addPauser(_sender);
   }
 
   // the contract owner may add new organizations

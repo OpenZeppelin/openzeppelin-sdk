@@ -60,8 +60,8 @@ contract('ZEPToken', ([ _, tokenOwner, another, jurisdictionOwner, validatorOwne
 
     beforeEach('initialize and approve validator', async function () {
       this.validator = await ZEPValidator.new()
-      const initializeValidatorData = encodeCall('initialize', ['address', 'uint256'], [this.jurisdiction.address, receiveTokensAttributeID])
-      await this.validator.sendTransaction({ data: initializeValidatorData, from: validatorOwner })
+      const initializeValidatorData = encodeCall('initialize', ['address', 'address', 'uint256'], [validatorOwner, this.jurisdiction.address, receiveTokensAttributeID])
+      await this.validator.sendTransaction({ data: initializeValidatorData })
 
       await this.jurisdiction.addValidator(this.validator.address, "ZEP Validator", { from: jurisdictionOwner })
       await this.jurisdiction.addAttributeType(receiveTokensAttributeID, false, false, ZERO_ADDRESS, 0, 0, 0, "can transfer", { from: jurisdictionOwner })
