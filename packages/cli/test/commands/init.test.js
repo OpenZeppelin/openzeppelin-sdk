@@ -17,7 +17,7 @@ contract('init command', function() {
   })
 
   itShouldParse('should call push script when passing --push option', 'push', 'zos init MyApp 0.2.0 --push test', function(push) {
-    push.should.have.been.calledWithExactly({ deployLibs: undefined, force: undefined, reupload: undefined, network: 'test', txParams: {} })
+    push.should.have.been.calledWithExactly({ fullApp: undefined, deployLibs: undefined, force: undefined, reupload: undefined, network: 'test', txParams: {} })
   })
 
   itShouldParse('should call init script with light flag', 'init', 'zos init MyApp 0.2.0 --light', function(init) {
