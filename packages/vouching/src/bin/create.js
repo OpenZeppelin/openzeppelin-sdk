@@ -1,7 +1,7 @@
 #! /usr/bin/env node
 
 import truffleConfig from '../../truffle-config.js';
-import create from '../../scripts/create';
+import create from '../scripts/create';
 import runWithTruffle from 'zos/lib/utils/runWithTruffle';
 import parseArgs from 'minimist';
 

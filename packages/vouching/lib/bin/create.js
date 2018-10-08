@@ -5,7 +5,7 @@ var _truffleConfig = require('../../truffle-config.js');
 
 var _truffleConfig2 = _interopRequireDefault(_truffleConfig);
 
-var _create = require('../../scripts/create');
+var _create = require('../scripts/create');
 
 var _create2 = _interopRequireDefault(_create);
 

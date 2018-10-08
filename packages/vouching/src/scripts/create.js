@@ -1,7 +1,7 @@
 import colors from 'colors';
 
 // zOS commands.
-import createProxy from '../node_modules/zos/lib/scripts/create';
+import createProxy from 'zos/lib/scripts/create';
 
 // Enable zOS logging.
 import { Logger } from 'zos-lib';

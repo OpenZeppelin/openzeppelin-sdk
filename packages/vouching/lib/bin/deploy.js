@@ -5,7 +5,7 @@ var _truffleConfig = require('../../truffle-config.js');
 
 var _truffleConfig2 = _interopRequireDefault(_truffleConfig);
 
-var _deploy = require('../../scripts/deploy');
+var _deploy = require('../scripts/deploy');
 
 var _deploy2 = _interopRequireDefault(_deploy);
 

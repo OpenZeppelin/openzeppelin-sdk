@@ -2,7 +2,7 @@ import colors from 'colors';
 import fs from 'fs';
 
 // zOS commands.
-import push from '../node_modules/zos/lib/scripts/push';
+import push from 'zos/lib/scripts/push';
 
 // Enable zOS logging.
 import { Logger } from 'zos-lib';
