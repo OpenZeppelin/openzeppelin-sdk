@@ -10,19 +10,21 @@ Logger.silent(false);
 export default async function create(options) {
   console.log(colors.cyan(`creating instances with options ${ JSON.stringify(options, null, 2) }`).inverse);
 
-  // Instantiate BasicJurisdiction.initialize(address owner).
-  const basicJurisdictionProxy = await createBasicJurisdictionInstance(options.txParams.from, options);
+  const owner = options.txParams.from;
 
-  // Instantiate ZEPToken.initialize(address basicJurisdiction, uint256 attributeID).
-  const attributeID = '1665201538125898990930';
-  const zepTokenProxy = await createZEPTokenInstance(basicJurisdictionProxy.address, attributeID, options);
+  // Instantiate BasicJurisdiction.initialize(address owner).
+  const basicJurisdictionProxy = await createBasicJurisdictionInstance(owner, options);
+
+  // Instantiate ZEPToken.initialize(address owner, address basicJurisdiction, uint256 attributeID).
+  const attributeID = 1665201538125898990930;
+  const zepTokenProxy = await createZEPTokenInstance(owner, basicJurisdictionProxy.address, attributeID, options);
   
   // Instantiate Vouching.initialize(uint267 minimumStake, address zepTokenAddress).
   const minimumStake = 10;
   const vouchingProxy = await createVouchingInstance(minimumStake, zepTokenProxy.address, options);
   
-  // Instantiate ZEPValidator.initialize(basicJurisdictionAddress, attributeID).
-  const zepValidatorProxy = await createZEPValidatorInstance(basicJurisdictionProxy.address, attributeID, options);
+  // Instantiate ZEPValidator.initialize(ownerAddress, basicJurisdictionAddress, attributeID).
+  const zepValidatorProxy = await createZEPValidatorInstance(owner, basicJurisdictionProxy.address, attributeID, options);
 
   console.log(colors.cyan(`all instances created!!`).inverse);
 }
@@ -44,15 +46,15 @@ async function createBasicJurisdictionInstance(owner, options) {
   return proxy;
 }
 
-async function createZEPTokenInstance(basicJurisdictionAddress, attributeID, options) {
-  console.log(colors.gray(`creating instance for ZEPToken with basicJurisdictionAddress: ${basicJurisdictionAddress} and attributeID: ${attributeID}`).inverse);
+async function createZEPTokenInstance(owner, basicJurisdictionAddress, attributeID, options) {
+  console.log(colors.gray(`creating instance for ZEPToken with owner: ${owner} basicJurisdictionAddress: ${basicJurisdictionAddress} and attributeID: ${attributeID}`).inverse);
   
   // Run script.
   const proxy = await createProxy({
     packageName: 'zos-vouching',
     contractAlias: 'ZEPToken',
     initMethod: 'initialize',
-    initArgs: [basicJurisdictionAddress, attributeID],
+    initArgs: [owner, basicJurisdictionAddress, attributeID],
     ...options
   });
 
@@ -78,15 +80,15 @@ async function createVouchingInstance(minimumStake, zepTokenAddress, options) {
   return proxy;
 }
 
-async function createZEPValidatorInstance(basicJurisdictionAddress, attributeID, options) {
-  console.log(colors.gray(`creating instance for ZEPValidator with basicJurisdictionAddress: ${basicJurisdictionAddress} and attributeID: ${attributeID}`).inverse);
+async function createZEPValidatorInstance(owner, basicJurisdictionAddress, attributeID, options) {
+  console.log(colors.gray(`creating instance for ZEPValidator with owner: ${owner} basicJurisdictionAddress: ${basicJurisdictionAddress} and attributeID: ${attributeID}`).inverse);
   
   // Run script.
   const proxy = await createProxy({
     packageName: 'zos-vouching',
     contractAlias: 'ZEPValidator',
     initMethod: 'initialize',
-    initArgs: [basicJurisdictionAddress, attributeID],
+    initArgs: [owner, basicJurisdictionAddress, attributeID],
     ...options
   });
 

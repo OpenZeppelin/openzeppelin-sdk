@@ -168,6 +168,11 @@ async function checkZEPValidator(options) {
   const ZEPValidator = Contracts.getFromLocal('ZEPValidator');
   const contract = ZEPValidator.at(proxyAddress);
 
+  // Jurisdiction owner is the specified address.
+  const owner = await contract.owner(); 
+  console.log(`ZEPValidator owner: ${owner}`);
+  if(owner != options.txParams.from) throw new Error('Unexpected ZEPValidator owner!');
+
   // Check that the jurisdiction is set correctly.
   const jurisdiction = await contract.getJurisdictionAddress();
   console.log(`ZEPValidator jurisdiction address: ${jurisdiction}`);
