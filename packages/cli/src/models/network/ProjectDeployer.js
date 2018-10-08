@@ -63,21 +63,37 @@ export class LibProjectDeployer extends BasePackageProjectDeployer {
 
 export class AppProjectDeployer extends BasePackageProjectDeployer {
   async fetchOrDeploy() {
+    return this._run(existingAddresses => (
+      AppProject.fetchOrDeploy(this.packageFile.name, this.requestedVersion, this.txParams, existingAddresses)
+    ))
+  }
+
+  async fromSimpleProject(simpleProject) {
+    return this._run(existingAddresses => (
+      AppProject.fromSimpleProject(simpleProject, this.requestedVersion, this.txParams, existingAddresses)
+    ))
+  }
+
+  get appAddress() {
+    return this.controller.appAddress
+  }
+
+  async _run(createProjectFn) {
     try {
       const { appAddress, packageAddress } = this
-      this.project = await AppProject.fetchOrDeploy(this.packageFile.name, this.requestedVersion, this.txParams, { appAddress, packageAddress })
-      this._registerApp(this.project.getApp())
-      this._registerPackage(await this.project.getProjectPackage())
-      this._registerVersion(this.requestedVersion, await this.project.getCurrentDirectory())
+      this.project = await createProjectFn({ appAddress, packageAddress })
+      await this._registerDeploy()
       return this.project
     } catch (deployError) {
       this._tryRegisterPartialDeploy(deployError)
       if (!this.project) throw deployError
     }
-  }
+  } 
 
-  get appAddress() {
-    return this.controller.appAddress
+  async _registerDeploy() {
+    this._registerApp(this.project.getApp())
+    this._registerPackage(await this.project.getProjectPackage())
+    this._registerVersion(this.requestedVersion, await this.project.getCurrentDirectory())
   }
 
   _tryRegisterPartialDeploy({ thepackage, app, directory }) {
