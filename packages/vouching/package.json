@@ -1,6 +1,6 @@
 {
   "name": "zos-vouching",
-  "version": "2.0.0-alpha.1",
+  "version": "2.0.0-alpha.2",
   "description": "",
   "main": "truffle-config.js",
   "private": false,
@@ -16,8 +16,8 @@
   "dependencies": {
     "openzeppelin-zos": "git+https://github.com/OpenZeppelin/openzeppelin-zos.git#3df0a786e4cfe19f22ea537f32f68c392b29a5f8",
     "tpl-contracts-zos": "0.0.3",
-    "zos": "^2.0.0-alpha.1",
-    "zos-lib": "^2.0.0-alpha.1"
+    "zos": "^2.0.0-alpha.2",
+    "zos-lib": "^2.0.0-alpha.2"
   },
   "devDependencies": {
     "babel-plugin-transform-object-rest-spread": "^6.26.0",
