@@ -16,7 +16,7 @@ export default async function create(options) {
   const basicJurisdictionProxy = await createBasicJurisdictionInstance(owner, options);
 
   // Instantiate ZEPToken.initialize(address owner, address basicJurisdiction, uint256 attributeID).
-  const attributeID = 1665201538125898990930;
+  const attributeID = '1665201538125898990930';
   const zepTokenProxy = await createZEPTokenInstance(owner, basicJurisdictionProxy.address, attributeID, options);
   
   // Instantiate Vouching.initialize(uint267 minimumStake, address zepTokenAddress).
