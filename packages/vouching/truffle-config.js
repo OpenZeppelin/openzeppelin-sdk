@@ -3,7 +3,7 @@ require('babel-polyfill');
 
 module.exports = {
   networks: {
-    local: { // Use `ganache-cli --deterministic`
+    local: {
       host: 'localhost',
       port: 8545,
       network_id: '*',
