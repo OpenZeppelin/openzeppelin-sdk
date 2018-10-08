@@ -210,27 +210,8 @@ contract('update script', function([_skipped, owner, anotherAccount]) {
     });
   };
 
-  describe('on application contract', function () {
-    beforeEach('setup package', async function() {
-      this.packageFile = new ZosPackageFile('test/mocks/packages/package-empty.zos.json')
-    });
-
-    shouldHandleUpdateScript();
-  })
-
-  describe('on lightweight application contract', function () {
-    beforeEach('setup package', async function() {
-      this.packageFile = new ZosPackageFile('test/mocks/packages/package-empty.zos.json')
-      this.packageFile.lightweight = true
-    });
-
-    shouldHandleUpdateScript();
-  })
-
-  describe('on dependency contract', function () {
-
+  const shouldHandleUpdateOnDependency = function () {
     beforeEach('setup', async function() {
-      this.packageFile = new ZosPackageFile('test/mocks/packages/package-with-undeployed-stdlib.zos.json')
       this.networkFile = this.packageFile.networkFile(network)
 
       await push({ network, txParams, deployLibs: true, networkFile: this.networkFile });
@@ -284,5 +265,39 @@ contract('update script', function([_skipped, owner, anotherAccount]) {
       const { address: anotherProxyAddress } = await assertProxyInfo(this.networkFile, 'Greeter', 0, { version: version_2 });
       (await Greeter_V2.at(anotherProxyAddress).version()).should.eq('1.2.0');
     });
-  });
+  };
+
+  describe('on application contract', function () {
+    beforeEach('setup package', async function() {
+      this.packageFile = new ZosPackageFile('test/mocks/packages/package-empty.zos.json')
+    });
+
+    shouldHandleUpdateScript();
+  })
+
+  describe('on application contract in lightweight mode', function () {
+    beforeEach('setup package', async function() {
+      this.packageFile = new ZosPackageFile('test/mocks/packages/package-empty.zos.json')
+      this.packageFile.lightweight = true
+    });
+
+    shouldHandleUpdateScript();
+  })
+
+  describe('on dependency contract', function () {
+    beforeEach('setup package', async function() {
+      this.packageFile = new ZosPackageFile('test/mocks/packages/package-with-undeployed-stdlib.zos.json')
+    });
+
+    shouldHandleUpdateOnDependency();
+  })
+
+  describe('on dependency contract in lightweight mode', function () {
+    beforeEach('setup package', async function() {
+      this.packageFile = new ZosPackageFile('test/mocks/packages/package-with-undeployed-stdlib.zos.json')
+      this.packageFile.lightweight = true
+    });
+
+    shouldHandleUpdateOnDependency();
+  })
 });
