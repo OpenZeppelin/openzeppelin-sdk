@@ -102,12 +102,12 @@ async function checkZEPToken(options) {
   // Verify that the token name is correct.
   const name = await contract.name();
   console.log(`ZEPToken name: ${name}`);
-  if(name != 'ZeppelinOS Token') throw new Error('Invalid ZEPToken name.');
+  if(name != constants.ZEPTOKEN_NAME) throw new Error('Invalid ZEPToken name.');
   
   // Verify that the token symbol is correct.
   const symbol = await contract.symbol();
   console.log(`ZEPToken symbol: ${symbol}`);
-  if(symbol != 'ZEP') throw new Error('Invalid ZEPToken symbol.');
+  if(symbol != constants.ZEPTOKEN_SYMBOL) throw new Error('Invalid ZEPToken symbol.');
 
   // TODO: more tests?
 
