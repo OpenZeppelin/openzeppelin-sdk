@@ -13,7 +13,8 @@ export default async function deploy(options) {
 
   // If network is local, remove existing file.
   const zosLocalPath = './zos.local.json';
-  if(options.network === 'local' && fs.existsSync(zosLocalPath)) {
+  const isLocal = options.network === 'local';
+  if(isLocal && fs.existsSync(zosLocalPath)) {
     console.log(colors.yellow(`Deleting old zos.local.json (this is only done for the local network).`));
     fs.unlinkSync(zosLocalPath);
   }
@@ -23,6 +24,7 @@ export default async function deploy(options) {
 
   // Run script.
   await push({
+    deployLibs: isLocal,
     ...options
   });
 
