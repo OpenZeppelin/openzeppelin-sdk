@@ -16,6 +16,8 @@ let networkData;
 let jurisdictionAddress;
 let zepTokenAddress;
 let jurisdictionContract;
+let zepValidatorAddress;
+let zepValidatorContract;
 
 // *****************
 // COMBINED
@@ -33,8 +35,9 @@ export default async function validate(options) {
   await checkZEPToken(options);
   await checkVouching(options);
   await checkZEPValidator(options);
+  await checkConfig(options);
 
-  console.log(colors.cyan(`vouching app looks good!!`).inverse);
+  console.log(colors.green(`vouching app looks good!!`).inverse);
 }
 
 async function printStatus(options) {
@@ -47,7 +50,7 @@ async function printStatus(options) {
 }
 
 // *****************
-// APP
+// App
 // *****************
 
 async function checkApp(options) {
@@ -77,11 +80,11 @@ async function checkApp(options) {
   const versionMatch = await packageContract.hasVersion(localVersion.split('.'));
   if(!versionMatch) throw new Error('Invalid onchain app version');
 
-  console.log(colors.gray(`app looks good!!`).inverse);
+  console.log(colors.cyan(`app looks good!!`).inverse);
 }
 
 // *****************
-// JURISDICTION
+// Jurisdiction
 // *****************
 
 async function checkJurisdiction(options) {
@@ -108,16 +111,9 @@ async function checkJurisdiction(options) {
   console.log(`BasicJurisdiction owner: ${owner}`);
   if(owner != options.txParams.from) throw new Error('Unexpected BasicJurisdiction owner!');
 
-  // Jurisdiction has the ZEPToken attribute type set.
-  const info = await jurisdictionContract.getAttributeInformation(constants.ZEPTOKEN_ATTRIBUTE_ID);
-  const description = info[0];
-  console.log(`Jurisdiction attribute description for id ${constants.ZEPTOKEN_ATTRIBUTE_ID}: ${description}`);
-  if(!description || description !== constants.ZEPTOKEN_ATTRIBUTE_DESCRIPTION) throw new Error('ZEPToken attribute is incorrectly set on the jurisdiction.');
-  console.log(`ZEPToken attribute is correctly set on the jurisdiction.`);
-
   // TODO: consider performing addition tests for jurisdiction, i.e. checking interface, etc
 
-  console.log(colors.gray(`jurisdiction looks good!!`).inverse);
+  console.log(colors.cyan(`jurisdiction looks good!!`).inverse);
 }
 
 // *****************
@@ -155,7 +151,7 @@ async function checkZEPToken(options) {
 
   // TODO: more tests?
 
-  console.log(colors.gray(`ZEPToken looks good!!`).inverse);
+  console.log(colors.cyan(`ZEPToken looks good!!`).inverse);
 }
 
 // *****************
@@ -187,7 +183,7 @@ async function checkVouching(options) {
 
   // TODO: more tests?
 
-  console.log(colors.gray(`Vouching looks good!!`).inverse);
+  console.log(colors.cyan(`vouching looks good!!`).inverse);
 }
 
 // *****************
@@ -205,12 +201,14 @@ async function checkZEPValidator(options) {
 
   // Proxy is valid.
   const proxyAddress = lastProxy.address;
+  zepValidatorAddress = proxyAddress; // Used for upcoming tests beyond the scope of this test.
   if(!validateAddress(proxyAddress)) throw new Error('Invalid ZEPValidator instance address.');
   console.log(`ZEPValidator instance address: ${proxyAddress}`);
 
   // Retrieve contract object.
   const ZEPValidator = Contracts.getFromLocal('ZEPValidator');
   const contract = ZEPValidator.at(proxyAddress);
+  zepValidatorContract = contract; // Used for upcoming tests beyond the scope of this test.
 
   // Jurisdiction owner is the specified address.
   const owner = await contract.owner(); 
@@ -222,26 +220,44 @@ async function checkZEPValidator(options) {
   console.log(`ZEPValidator jurisdiction address: ${jurisdiction}`);
   if(jurisdiction != jurisdictionAddress) throw new Error('Invalid jurisdiction set for ZEPValidaotr instance.');
 
+  // TODO: more tests?
+
+  console.log(colors.cyan(`ZEPValidator looks good!!`).inverse);
+}
+
+// *****************
+// TPL Config
+// *****************
+
+async function checkConfig(options) {
+  console.log(colors.gray(`validating TPL configuration`).inverse);
+
+  // Jurisdiction has the ZEPToken attribute type set.
+  const attrInfo = await jurisdictionContract.getAttributeInformation(constants.ZEPTOKEN_ATTRIBUTE_ID);
+  const description = attrInfo[0];
+  console.log(`Jurisdiction attribute description for id ${constants.ZEPTOKEN_ATTRIBUTE_ID}: ${description}`);
+  if(!description || description !== constants.ZEPTOKEN_ATTRIBUTE_DESCRIPTION) throw new Error('ZEPToken attribute is incorrectly set on the jurisdiction.');
+  console.log(`ZEPToken attribute is correctly set on the jurisdiction.`);
+
   // Check that the validator is correctly set on the jurisdiction.
-  const isValidator = jurisdictionContract.isValidator(proxyAddress);
+  const isValidator = jurisdictionContract.isValidator(zepValidatorAddress);
   if(!isValidator) throw new Error('ZEPValidator is not set as a validator on the jurisdiction.');
   console.log(`ZEPValidator is correctly set as a validator on the jurisdiction.`);
   
   // Verify that ZEPValidator can validate ZEPToken's attribute id.
-  const canValidate = await jurisdictionContract.isApproved(contract.address, constants.ZEPTOKEN_ATTRIBUTE_ID);
+  const canValidate = await jurisdictionContract.isApproved(zepValidatorContract.address, constants.ZEPTOKEN_ATTRIBUTE_ID);
   if(!canValidate) throw new Error(`ZEPValidator is not cleared for approval of ZEPToken attribute id: ${constants.ZEPTOKEN_ATTRIBUTE_ID}`);
   console.log(`ZEPValidator is cleared for approval of ZEPToken attribute id: ${constants.ZEPTOKEN_ATTRIBUTE_ID}`);
 
   // Verify that ZEPValidator is added as an organization in the jurisdiction.
-  const info = await contract.getOrganization(owner);
-  const exists = info[0];
-  const name = info[2];
+  const owner = await  zepValidatorContract.owner(); 
+  const orgInfo = await zepValidatorContract.getOrganization(owner);
+  const exists = orgInfo[0];
+  const name = orgInfo[2];
   if(!exists || name !== constants.ZEPPELIN_ORG_NAME) throw new Error(`${constants.ZEPPELIN_ORG_NAME} is not set as an organization in the validator.`);
   console.log(`${constants.ZEPPELIN_ORG_NAME} correctly set as an organization in ZEPValidator.`);
 
-  // TODO: more tests?
-
-  console.log(colors.gray(`Vouching looks good!!`).inverse);
+  console.log(colors.cyan(`TPL configuration looks good!!`).inverse);
 }
 
 // *****************
