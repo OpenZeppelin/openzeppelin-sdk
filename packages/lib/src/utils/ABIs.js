@@ -36,7 +36,7 @@ function getFunctionNodeFromMostDerivedContract(contractClass, methodName, args)
     node.parameters.parameters.length === args.length
   );
 
-  for (contract of ast.getLinearizedBaseContracts(true)) {
+  for (const contract of ast.getLinearizedBaseContracts(true)) {
     const funs = contract.nodes.filter(nodeMatches);    
     switch (funs.length) {
       case 0: continue;
