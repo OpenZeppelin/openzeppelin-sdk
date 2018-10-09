@@ -59,6 +59,13 @@ contract('Transactions', function([_account1, account2]) {
       actualValue.toNumber().should.eq(42);
     });
 
+    it('refuses to send tx with truffle default gas price', async function () {
+      // Gas price check is skipped in test env, so we trick the Transactions module into thinking it's actually on a real run
+      process.env.NODE_ENV = 'not-test';
+      await sendTransaction(this.instance.initialize, [42, 'foo', [1,2,3]]).should.be.rejectedWith(/cowardly refusing/i);
+      process.env.NODE_ENV = 'test';
+    });
+
     it('estimates gas', async function () {
       const { tx } = await sendTransaction(this.instance.initialize, [42, 'foo', [1,2,3]]);
       assertGasLt(tx, 1000000);

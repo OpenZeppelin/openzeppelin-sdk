@@ -6,6 +6,8 @@
 
 import { promisify } from 'util'
 import sleep from '../helpers/sleep';
+import Contracts from './Contracts'
+import BN from 'bignumber.js'
 
 // Store last block for gasLimit information
 const state = { };
@@ -19,6 +21,9 @@ const RETRY_COUNT = 3;
 // Time to sleep between retries for query operations
 const RETRY_SLEEP_TIME = process.env.NODE_ENV === 'test' ? 1 : 3000;
 
+// Truffle defaults gas price to 100gwei
+const TRUFFLE_DEFAULT_GAS_PRICE = BN(100000000000);
+
 /**
  * Wraps the _sendTransaction function and manages transaction retries
  * @param contractFn contract function to be executed as the transaction
@@ -27,6 +32,8 @@ const RETRY_SLEEP_TIME = process.env.NODE_ENV === 'test' ? 1 : 3000;
  * @param retries number of transaction retries
  */
 export async function sendTransaction(contractFn, args = [], txParams = {}, retries = RETRY_COUNT) {
+  checkGasPrice(txParams)
+
   try {
     return await _sendTransaction(contractFn, args, txParams)
   } catch (error) {
@@ -43,6 +50,8 @@ export async function sendTransaction(contractFn, args = [], txParams = {}, retr
  * @param retries number of deploy retries
  */
 export async function deploy(contract, args = [], txParams = {}, retries = RETRY_COUNT) {
+  checkGasPrice(txParams)
+
   try {
     return await _deploy(contract, args, txParams)
   } catch (error) {
@@ -58,6 +67,9 @@ export async function deploy(contract, args = [], txParams = {}, retries = RETRY
  * @param txParams all transaction parameters (data, from, gasPrice, etc)
  */
 export async function sendDataTransaction(contract, txParams) {
+  // TODO: Add retries similar to sendTransaction
+  checkGasPrice(txParams)
+
   // If gas is set explicitly, use it
   if (txParams.gas) {
     return contract.sendTransaction(txParams)
@@ -138,6 +150,14 @@ async function getNodeVersion () {
     state.nodeInfo = await promisify(web3.version.getNode.bind(web3.version))();
   }
   return state.nodeInfo;
+}
+
+function checkGasPrice(txParams) {
+  if (process.env.NODE_ENV === 'test') return;
+  const gasPrice = txParams.gasPrice || Contracts.artifactsDefaults().gasPrice;
+  if (TRUFFLE_DEFAULT_GAS_PRICE.eq(gasPrice) || !gasPrice) {
+    throw new Error(`Cowardly refusing to execute transaction with gas price set to Truffle's default of 100 gwei. Consider explicitly setting a different value in your truffle.js file.`);
+  }
 }
 
 async function isGanacheNode () {
