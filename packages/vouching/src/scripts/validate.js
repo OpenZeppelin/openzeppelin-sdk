@@ -1,4 +1,5 @@
 import colors from 'colors';
+import fs from 'fs';
 import * as constants from './constants';
 
 // zOS commands.
@@ -27,7 +28,7 @@ export default async function validate(options) {
   networkData = require(`../../zos.${options.network}.json`);
 
   await printStatus(options);
-  // TODO: check if app was pushed?
+  await checkApp(options);
   await checkJurisdiction(options);
   await checkZEPToken(options);
   await checkVouching(options);
@@ -43,6 +44,40 @@ async function printStatus(options) {
   await status({
     ...options
   });
+}
+
+// *****************
+// APP
+// *****************
+
+async function checkApp(options) {
+  console.log(colors.gray(`validating app`).inverse);
+
+  // Check that the network file exists.
+  const zosFilePath = `./zos.${options.network}.json`;
+  if(!fs.existsSync(zosFilePath)) throw new Error('Network file for app not found.');
+
+  // Check that the network file has a valid app address.
+  const appAddress = networkData.app['address'];
+  if(!validateAddress(appAddress)) throw new Error('Invalid app address.');
+
+  // Check that the network file has a valid package address.
+  const packageAddress = networkData.package['address'];
+  if(!validateAddress(packageAddress)) throw new Error('Invalid package address.');
+  
+  // Check for a valid local version.
+  const localVersion = networkData.version;
+  if(!localVersion || localVersion === '') throw new Error('Invalid app version');
+  
+  // Verify that the onchain version matches the local version.
+  const App = Contracts.getFromNodeModules('zos-lib', 'App');
+  const appContract = App.at(appAddress);
+  const Package = Contracts.getFromNodeModules('zos-lib', 'Package');
+  const packageContract = Package.at(packageAddress);
+  const versionMatch = await packageContract.hasVersion(localVersion.split('.'));
+  if(!versionMatch) throw new Error('Invalid onchain app version');
+
+  console.log(colors.gray(`app looks good!!`).inverse);
 }
 
 // *****************
