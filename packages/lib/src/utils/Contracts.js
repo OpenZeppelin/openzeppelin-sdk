@@ -16,6 +16,9 @@ const DEFAULT_COVERAGE_TX_PARAMS = {
 // Use same default timeout as truffle
 let syncTimeout = 240000;
 
+// Cache truffle config
+let truffleConfig = null;
+
 export default {
   getSyncTimeout() {
     return syncTimeout;
@@ -31,7 +34,7 @@ export default {
   },
 
   getLocalBuildDir() {
-    return this._getTruffleBuildDir() || `${process.cwd()}/build/contracts`
+    return this.getTruffleConfig().contracts_build_directory || `${process.cwd()}/build/contracts`
   },
 
   getLibPath(contractName) {
@@ -52,6 +55,18 @@ export default {
 
   getFromNodeModules(dependency, contractName) {
     return this._getFromPath(this.getNodeModulesPath(dependency, contractName))
+  },
+
+  getTruffleConfig() {
+    if (!truffleConfig) {
+      try {
+        const TruffleConfig = require('truffle-config')
+        truffleConfig = TruffleConfig.detect({ logger: console })
+      } catch(_err) {
+        return { }
+      }
+    }
+    return truffleConfig;
   },
 
   listBuildArtifacts() {
@@ -78,16 +93,6 @@ export default {
     contract.defaults({ from: web3.eth.accounts[0], ... defaults })
     contract.synchronization_timeout = syncTimeout
     return contract
-  },
-
-  _getTruffleBuildDir() {
-    try {
-      const TruffleConfig = require('truffle-config')
-      const config = TruffleConfig.detect({ logger: console })
-      return config.contracts_build_directory
-    } catch (error) {
-      return undefined
-    }
   },
 
   _artifactsDefaults() {
