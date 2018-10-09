@@ -27,7 +27,7 @@ export default async function create(options) {
   // Instantiate ZEPValidator.initialize(ownerAddress, basicJurisdictionAddress, attributeID).
   const zepValidatorProxy = await createZEPValidatorInstance(owner, basicJurisdictionProxy.address, attributeID, options);
 
-  console.log(colors.cyan(`all instances created!!`).inverse);
+  console.log(colors.green(`all instances created`).inverse);
 }
 
 async function createBasicJurisdictionInstance(owner, options) {

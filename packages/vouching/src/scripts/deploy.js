@@ -32,5 +32,5 @@ export default async function deploy(options) {
     ...options
   });
 
-  console.log(colors.cyan(`app pushed.`).inverse);
+  console.log(colors.green(`app pushed`).inverse);
 }

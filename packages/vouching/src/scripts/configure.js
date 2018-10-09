@@ -47,7 +47,7 @@ export default async function configure(options) {
     orgName
   );
 
-  console.log(colors.cyan(`vouching application configured`).inverse);
+  console.log(colors.green(`TPL configured`).inverse);
 }
 
 function getJurisdictionProxy(networkData) {
