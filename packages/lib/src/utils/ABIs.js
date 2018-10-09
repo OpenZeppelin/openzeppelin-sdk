@@ -1,35 +1,50 @@
 import encodeCall from '../helpers/encodeCall'
+import ContractAST from './ContractAST';
 
 export function buildCallData(contractClass, methodName, args) {
-  const method = getFunction(contractClass, methodName, args)
+  const method = getFunctionFromMostDerivedContract(contractClass, methodName, args)
   const argTypes = method.inputs.map(input => input.type)
   const callData = encodeCall(methodName, argTypes, args)
   return { method, callData }
 }
 
-export function getFunction(contractClass, methodName, args) {
-  const baseMethod = findFunctionInBaseContract(contractClass, methodName)
-  const matchArgsTypes = fn => fn.inputs.every((input, index) => baseMethod.inputs[index] && baseMethod.inputs[index].type === input.type)
-  const matchNameAndArgsLength = fn => fn.name === methodName && fn.inputs.length === args.length
-  let method
-  if (baseMethod) method = contractClass.abi.find(fn => matchNameAndArgsLength(fn) && matchArgsTypes(fn))
-  if (!method) method = contractClass.abi.find(fn => matchNameAndArgsLength(fn))
-  if (!method) throw Error(`Could not find method '${methodName}' with ${args.length} arguments in contract class`)
-  return method
+export function getFunctionFromMostDerivedContract(contractClass, methodName, args) {
+  const methodNode = getFunctionNodeFromMostDerivedContract(contractClass, methodName, args);
+  const inputs = methodNode.parameters.parameters.map(parameter => {
+    const typeString = parameter.typeDescriptions.typeString
+    const type = typeString.includes('contract') ? 'address' : typeString
+    return { name: parameter.name , type }
+  })
+  
+  const targetMethod = { name: methodName, inputs }
+  const matchArgsTypes = fn => fn.inputs.every((input, index) => targetMethod.inputs[index] && targetMethod.inputs[index].type === input.type);
+  const matchNameAndArgsLength = fn => fn.name === methodName && fn.inputs.length === args.length;
+  
+  const abiMethod = 
+    contractClass.abi.find(fn => matchNameAndArgsLength(fn) && matchArgsTypes(fn)) ||
+    contractClass.abi.find(fn => matchNameAndArgsLength(fn));
+  
+  if (!abiMethod) throw Error(`Could not find method ${methodName} with ${args.length} arguments in contract ${contractClass.contractName}`)
+  return abiMethod;
 }
 
-export function findFunctionInBaseContract(contractClass, methodName) {
-  const astContractNode = contractClass.ast.nodes.find(node => node.name === contractClass.contractName)
-  const initMethodNode = astContractNode.nodes.find(node => node.nodeType === "FunctionDefinition" && node.name === methodName)
-  if (initMethodNode) {
-    const parameters = initMethodNode.parameters.parameters
-    const inputs = parameters.map(parameter => {
-      const typeString = parameter.typeDescriptions.typeString
-      const type = typeString.includes('contract') ? 'address' : typeString
-      return { name: parameter.name , type }
-    })
-    return { name: methodName, inputs }
+function getFunctionNodeFromMostDerivedContract(contractClass, methodName, args) {
+  const ast = new ContractAST(contractClass, null, { nodesFilter: ['ContractDefinition', 'FunctionDefinition'] });
+  const nodeMatches = (node) => (
+    node.nodeType === 'FunctionDefinition' &&
+    node.name === methodName &&
+    node.parameters.parameters.length === args.length
+  );
+
+  for (contract of ast.getLinearizedBaseContracts(true)) {
+    const funs = contract.nodes.filter(nodeMatches);    
+    switch (funs.length) {
+      case 0: continue;
+      case 1: return funs[0];
+      default: throw Error(`Found more than one match for function ${methodName} with ${args.length} arguments in contract ${contractClass.contractName}`);
+    }
   }
+  throw Error(`Could not find method ${methodName} with ${args.length} arguments in contract ${contractClass.contractName}`)
 }
 
 export function callDescription(method, args) {
