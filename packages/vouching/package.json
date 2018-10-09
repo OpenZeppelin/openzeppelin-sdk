@@ -8,14 +8,30 @@
     "test": "test"
   },
   "scripts": {
-    "test": "scripts/test.sh"
+    "test": "scripts/test.sh",
+    "start-local": "ganache-cli --deterministic",
+    "compile-contracts": "rm -rf build && npx truffle compile",
+    "prepare": "rm -rf lib && babel src --out-dir lib",
+    "deploy-local": "node ./lib/bin/deploy.js --network=local --from=0x90f8bf6a479f320ead074411a4b0e7944ea8c9c1",
+    "deploy-ropsten": "node ./lib/bin/deploy.js --network=ropsten --from=0x09902a56d04a9446601a0d451e07459dc5af0820",
+    "create-local": "node ./lib/bin/create.js --network=local --from=0x90f8bf6a479f320ead074411a4b0e7944ea8c9c1",
+    "create-ropsten": "node ./lib/bin/create.js --network=ropsten --from=0x09902a56d04a9446601a0d451e07459dc5af0820",
+    "validate-local": "node ./lib/bin/validate.js --network=local --from=0x90f8bf6a479f320ead074411a4b0e7944ea8c9c1",
+    "validate-ropsten": "node ./lib/bin/validate.js --network=ropsten --from=0x09902a56d04a9446601a0d451e07459dc5af0820",
+    "configure-local": "node ./lib/bin/configure.js --network=local --from=0x90f8bf6a479f320ead074411a4b0e7944ea8c9c1",
+    "configure-ropsten": "node ./lib/bin/configure.js --network=ropsten --from=0x09902a56d04a9446601a0d451e07459dc5af0820",
+    "dodathing-local": "npm run prepare && npm run deploy-local && npm run create-local && npm run configure-local && npm run validate-local",
+    "dodathing-ropsten": "npm run prepare && npm run deploy-ropsten && npm run create-ropsten && npm run configure-ropsten && npm run validate-ropsten"
+    
   },
   "keywords": [],
   "author": "",
   "license": "MIT",
   "dependencies": {
+    "colors": "^1.3.2",
+    "minimist": "^1.2.0",
     "openzeppelin-zos": "git+https://github.com/OpenZeppelin/openzeppelin-zos.git#3df0a786e4cfe19f22ea537f32f68c392b29a5f8",
-    "tpl-contracts-zos": "0.0.3",
+    "tpl-contracts-zos": "0.0.4",
     "zos": "^2.0.0-alpha.3",
     "zos-lib": "^2.0.0-alpha.3"
   },

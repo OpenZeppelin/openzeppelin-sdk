@@ -1,10 +1,10 @@
 {
   "contracts": {
     "Vouching": {
-      "address": "0xcb729b5e70517956243df8ff4c0f42cea44d4e5c",
-      "constructorCode": "608060405234801561001057600080fd5b50611b63806100206000396000f300",
-      "bodyBytecodeHash": "37a9521fdba0d2cddf7748051c08655ee939ec7603afc2775a5c143391971580",
-      "bytecodeHash": "7df63d6fc39e5be9db368aeddadbadd67210128f702684cd0aa6f4c895b085d5",
+      "address": "0xaed3e76782242e3832c8bf2c2fe693bfb47761f1",
+      "constructorCode": "608060405234801561001057600080fd5b50611d13806100206000396000f300",
+      "bodyBytecodeHash": "be5cc931ea907f2cecf8ca08f0fb79dcfe96494f47b8c2bf693f4d16352cfc14",
+      "bytecodeHash": "26ff7a54a4b4d2f78f310f0574fac01ac8b7f9ce2091b6dd002ef64bc72badfb",
       "types": {
         "t_bool": {
           "id": "t_bool",
@@ -18,19 +18,19 @@
           "members": [
             {
               "label": "owner",
-              "astId": 53,
+              "astId": 52,
               "type": "t_address",
               "src": "809:13:1"
             },
             {
               "label": "dependencyAddress",
-              "astId": 55,
+              "astId": 54,
               "type": "t_address",
               "src": "828:25:1"
             },
             {
               "label": "stake",
-              "astId": 57,
+              "astId": 56,
               "type": "t_uint256",
               "src": "859:13:1"
             }
@@ -58,23 +58,23 @@
           "contract": "Initializable",
           "path": "openzeppelin-zos/contracts/Initializable.sol",
           "label": "initialized",
-          "astId": 2398,
+          "astId": 807,
           "type": "t_bool",
-          "src": "701:24:9"
+          "src": "701:24:4"
         },
         {
           "contract": "Initializable",
           "path": "openzeppelin-zos/contracts/Initializable.sol",
           "label": "initializing",
-          "astId": 2400,
+          "astId": 809,
           "type": "t_bool",
-          "src": "820:25:9"
+          "src": "820:25:4"
         },
         {
           "contract": "Vouching",
           "path": "contracts/Vouching.sol",
           "label": "_registry",
-          "astId": 62,
+          "astId": 61,
           "type": "t_mapping<t_struct<Vouching.Dependency>>",
           "src": "881:48:1"
         },
@@ -82,7 +82,7 @@
           "contract": "Vouching",
           "path": "contracts/Vouching.sol",
           "label": "_minimumStake",
-          "astId": 64,
+          "astId": 63,
           "type": "t_uint256",
           "src": "933:29:1"
         },
@@ -90,195 +90,17 @@
           "contract": "Vouching",
           "path": "contracts/Vouching.sol",
           "label": "_token",
-          "astId": 66,
+          "astId": 65,
           "type": "t_address",
           "src": "966:20:1"
         }
       ]
     },
-    "ZEPValidator": {
-      "address": "0xd3092009cdf60b26723d123667fc4becdf5cc208",
-      "constructorCode": "60806040526000600260006101000a81548160ff02191690831515021790555034801561002b57600080fd5b5061232a8061003b6000396000f300",
-      "bodyBytecodeHash": "3d92bc73924906552e7e2ddb0ba98aea44121f624f4169695a5d2f5b293d96ed",
-      "bytecodeHash": "137db18f92fb5501e14514e6b13d422fba774abd6f85c5451c10e2ff9c74026f",
-      "types": {
-        "t_bool": {
-          "id": "t_bool",
-          "kind": "elementary",
-          "label": "bool"
-        },
-        "t_address": {
-          "id": "t_address",
-          "kind": "elementary",
-          "label": "address"
-        },
-        "t_struct<Roles.Role>": {
-          "id": "t_struct<Roles.Role>",
-          "kind": "struct",
-          "label": "Roles.Role",
-          "members": [
-            {
-              "label": "bearer",
-              "astId": 2452,
-              "type": "t_mapping<t_bool>",
-              "src": "146:32:10"
-            }
-          ]
-        },
-        "t_mapping<t_bool>": {
-          "id": "t_mapping<t_bool>",
-          "valueType": "t_bool",
-          "label": "mapping(key => bool)",
-          "kind": "mapping"
-        },
-        "t_uint256": {
-          "id": "t_uint256",
-          "kind": "elementary",
-          "label": "uint256"
-        },
-        "t_array:dyn<t_address>": {
-          "id": "t_array:dyn<t_address>",
-          "valueType": "t_address",
-          "length": "dyn",
-          "kind": "array",
-          "label": "address[]"
-        },
-        "t_struct<ZEPValidator.Organization>": {
-          "id": "t_struct<ZEPValidator.Organization>",
-          "kind": "struct",
-          "label": "ZEPValidator.Organization",
-          "members": [
-            {
-              "label": "exists",
-              "astId": 2116,
-              "type": "t_bool",
-              "src": "929:11:8"
-            },
-            {
-              "label": "maximumAddresses",
-              "astId": 2118,
-              "type": "t_uint248",
-              "src": "946:24:8"
-            },
-            {
-              "label": "name",
-              "astId": 2120,
-              "type": "t_string",
-              "src": "976:11:8"
-            },
-            {
-              "label": "addresses",
-              "astId": 2123,
-              "type": "t_array:dyn<t_address>",
-              "src": "993:19:8"
-            }
-          ]
-        },
-        "t_uint248": {
-          "id": "t_uint248",
-          "kind": "elementary",
-          "label": "uint248"
-        },
-        "t_string": {
-          "id": "t_string",
-          "kind": "elementary",
-          "label": "string"
-        },
-        "t_mapping<t_struct<ZEPValidator.Organization>>": {
-          "id": "t_mapping<t_struct<ZEPValidator.Organization>>",
-          "valueType": "t_struct<ZEPValidator.Organization>",
-          "label": "mapping(key => ZEPValidator.Organization)",
-          "kind": "mapping"
-        }
-      },
-      "storage": [
-        {
-          "contract": "Initializable",
-          "path": "openzeppelin-zos/contracts/Initializable.sol",
-          "label": "initialized",
-          "astId": 2398,
-          "type": "t_bool",
-          "src": "701:24:9"
-        },
-        {
-          "contract": "Initializable",
-          "path": "openzeppelin-zos/contracts/Initializable.sol",
-          "label": "initializing",
-          "astId": 2400,
-          "type": "t_bool",
-          "src": "820:25:9"
-        },
-        {
-          "contract": "Ownable",
-          "path": "openzeppelin-zos/contracts/ownership/Ownable.sol",
-          "label": "_owner",
-          "astId": 2857,
-          "type": "t_address",
-          "src": "286:22:14"
-        },
-        {
-          "contract": "PauserRole",
-          "path": "openzeppelin-zos/contracts/access/roles/PauserRole.sol",
-          "label": "pausers",
-          "astId": 2544,
-          "type": "t_struct<Roles.Role>",
-          "src": "252:26:11"
-        },
-        {
-          "contract": "Pausable",
-          "path": "openzeppelin-zos/contracts/lifecycle/Pausable.sol",
-          "label": "_paused",
-          "astId": 2655,
-          "type": "t_bool",
-          "src": "303:28:12"
-        },
-        {
-          "contract": "ZEPValidator",
-          "path": "TPL-1.0-audit/contracts/ZEPValidator.sol",
-          "label": "registry",
-          "astId": 2110,
-          "type": "t_address",
-          "src": "566:26:8"
-        },
-        {
-          "contract": "ZEPValidator",
-          "path": "TPL-1.0-audit/contracts/ZEPValidator.sol",
-          "label": "jurisdiction",
-          "astId": 2112,
-          "type": "t_address",
-          "src": "677:39:8"
-        },
-        {
-          "contract": "ZEPValidator",
-          "path": "TPL-1.0-audit/contracts/ZEPValidator.sol",
-          "label": "validAttributeID",
-          "astId": 2114,
-          "type": "t_uint256",
-          "src": "795:24:8"
-        },
-        {
-          "contract": "ZEPValidator",
-          "path": "TPL-1.0-audit/contracts/ZEPValidator.sol",
-          "label": "organizationAddresses",
-          "astId": 2127,
-          "type": "t_array:dyn<t_address>",
-          "src": "1100:39:8"
-        },
-        {
-          "contract": "ZEPValidator",
-          "path": "TPL-1.0-audit/contracts/ZEPValidator.sol",
-          "label": "organizations",
-          "astId": 2131,
-          "type": "t_mapping<t_struct<ZEPValidator.Organization>>",
-          "src": "1225:54:8"
-        }
-      ]
-    },
     "ZEPToken": {
-      "address": "0x55f82db290f1b62fd21e1a1bb808ccb07083309d",
-      "constructorCode": "60806040526000600a60006101000a81548160ff02191690831515021790555034801561002b57600080fd5b50612b148061003b6000396000f300",
-      "bodyBytecodeHash": "9b06bae7ce397f0892e17fb319d1f2cf258b83b56251e49a36782968a8eb7df5",
-      "bytecodeHash": "ee5bb6a5a1f24c89a70d41204470d6c130b50ffec1bedc251b53f264acb88b95",
+      "address": "0x244175dd16479ca41f14f5acdee1118bd3fa72d5",
+      "constructorCode": "60806040526000600a60006101000a81548160ff02191690831515021790555034801561002b57600080fd5b50612b9f8061003b6000396000f300",
+      "bodyBytecodeHash": "c7eba64d1374d0d37012071c5eefabf77ca1e9cc79a1490fbbfc5606a5f90619",
+      "bytecodeHash": "a9593cf3c5280b68304ee664f7a10c52f1c89aaacacdadb9f359d4430e92a893",
       "types": {
         "t_bool": {
           "id": "t_bool",
@@ -318,9 +140,9 @@
           "members": [
             {
               "label": "bearer",
-              "astId": 2452,
+              "astId": 861,
               "type": "t_mapping<t_bool>",
-              "src": "146:32:10"
+              "src": "146:32:5"
             }
           ]
         },
@@ -336,97 +158,275 @@
           "contract": "Initializable",
           "path": "openzeppelin-zos/contracts/Initializable.sol",
           "label": "initialized",
-          "astId": 2398,
+          "astId": 807,
           "type": "t_bool",
-          "src": "701:24:9"
+          "src": "701:24:4"
         },
         {
           "contract": "Initializable",
           "path": "openzeppelin-zos/contracts/Initializable.sol",
           "label": "initializing",
-          "astId": 2400,
+          "astId": 809,
           "type": "t_bool",
-          "src": "820:25:9"
+          "src": "820:25:4"
         },
         {
           "contract": "ERC20",
           "path": "openzeppelin-zos/contracts/token/ERC20/ERC20.sol",
           "label": "_balances",
-          "astId": 2974,
+          "astId": 1383,
           "type": "t_mapping<t_uint256>",
-          "src": "479:46:15"
+          "src": "479:46:10"
         },
         {
           "contract": "ERC20",
           "path": "openzeppelin-zos/contracts/token/ERC20/ERC20.sol",
           "label": "_allowed",
-          "astId": 2980,
+          "astId": 1389,
           "type": "t_mapping<t_uint256>",
-          "src": "530:66:15"
+          "src": "530:66:10"
         },
         {
           "contract": "ERC20",
           "path": "openzeppelin-zos/contracts/token/ERC20/ERC20.sol",
           "label": "_totalSupply",
-          "astId": 2982,
+          "astId": 1391,
           "type": "t_uint256",
-          "src": "601:28:15"
+          "src": "601:28:10"
         },
         {
           "contract": "TPLToken",
-          "path": "TPL-1.0-audit/contracts/TPLToken.sol",
+          "path": "tpl-contracts-zos/contracts/TPLToken.sol",
           "label": "registry",
-          "astId": 1959,
+          "astId": 3347,
           "type": "t_address",
-          "src": "247:26:7"
+          "src": "247:26:18"
         },
         {
           "contract": "TPLToken",
-          "path": "TPL-1.0-audit/contracts/TPLToken.sol",
+          "path": "tpl-contracts-zos/contracts/TPLToken.sol",
           "label": "validRecipientAttributeId",
-          "astId": 1961,
+          "astId": 3349,
           "type": "t_uint256",
-          "src": "352:33:7"
+          "src": "352:33:18"
         },
         {
           "contract": "ERC20Detailed",
           "path": "openzeppelin-zos/contracts/token/ERC20/ERC20Detailed.sol",
           "label": "_name",
-          "astId": 3440,
+          "astId": 1849,
           "type": "t_string",
-          "src": "370:20:16"
+          "src": "370:20:11"
         },
         {
           "contract": "ERC20Detailed",
           "path": "openzeppelin-zos/contracts/token/ERC20/ERC20Detailed.sol",
           "label": "_symbol",
-          "astId": 3442,
+          "astId": 1851,
           "type": "t_string",
-          "src": "394:22:16"
+          "src": "394:22:11"
         },
         {
           "contract": "ERC20Detailed",
           "path": "openzeppelin-zos/contracts/token/ERC20/ERC20Detailed.sol",
           "label": "_decimals",
-          "astId": 3444,
+          "astId": 1853,
           "type": "t_uint8",
-          "src": "420:23:16"
+          "src": "420:23:11"
         },
         {
           "contract": "PauserRole",
           "path": "openzeppelin-zos/contracts/access/roles/PauserRole.sol",
           "label": "pausers",
-          "astId": 2544,
+          "astId": 953,
           "type": "t_struct<Roles.Role>",
-          "src": "252:26:11"
+          "src": "252:26:6"
         },
         {
           "contract": "Pausable",
           "path": "openzeppelin-zos/contracts/lifecycle/Pausable.sol",
           "label": "_paused",
-          "astId": 2655,
+          "astId": 1064,
           "type": "t_bool",
-          "src": "303:28:12"
+          "src": "303:28:7"
+        }
+      ]
+    },
+    "ZEPValidator": {
+      "address": "0xf4761204bcfd67c36aa13b36a8556a216497fc19",
+      "constructorCode": "60806040526000600260006101000a81548160ff02191690831515021790555034801561002b57600080fd5b506123668061003b6000396000f300",
+      "bodyBytecodeHash": "b48c7f828f40cc1c56d7b781aed489cdf79d6dd8d383cb55f28e9eda5ed620ec",
+      "bytecodeHash": "272ac796247d5fd06bd861079e8202f806fff376ced765538bc5c213991b496c",
+      "types": {
+        "t_bool": {
+          "id": "t_bool",
+          "kind": "elementary",
+          "label": "bool"
+        },
+        "t_address": {
+          "id": "t_address",
+          "kind": "elementary",
+          "label": "address"
+        },
+        "t_struct<Roles.Role>": {
+          "id": "t_struct<Roles.Role>",
+          "kind": "struct",
+          "label": "Roles.Role",
+          "members": [
+            {
+              "label": "bearer",
+              "astId": 861,
+              "type": "t_mapping<t_bool>",
+              "src": "146:32:5"
+            }
+          ]
+        },
+        "t_mapping<t_bool>": {
+          "id": "t_mapping<t_bool>",
+          "valueType": "t_bool",
+          "label": "mapping(key => bool)",
+          "kind": "mapping"
+        },
+        "t_uint256": {
+          "id": "t_uint256",
+          "kind": "elementary",
+          "label": "uint256"
+        },
+        "t_array:dyn<t_address>": {
+          "id": "t_array:dyn<t_address>",
+          "valueType": "t_address",
+          "length": "dyn",
+          "kind": "array",
+          "label": "address[]"
+        },
+        "t_struct<ZEPValidator.Organization>": {
+          "id": "t_struct<ZEPValidator.Organization>",
+          "kind": "struct",
+          "label": "ZEPValidator.Organization",
+          "members": [
+            {
+              "label": "exists",
+              "astId": 510,
+              "type": "t_bool",
+              "src": "981:11:3"
+            },
+            {
+              "label": "maximumAddresses",
+              "astId": 512,
+              "type": "t_uint248",
+              "src": "998:24:3"
+            },
+            {
+              "label": "name",
+              "astId": 514,
+              "type": "t_string",
+              "src": "1028:11:3"
+            },
+            {
+              "label": "addresses",
+              "astId": 517,
+              "type": "t_array:dyn<t_address>",
+              "src": "1045:19:3"
+            }
+          ]
+        },
+        "t_uint248": {
+          "id": "t_uint248",
+          "kind": "elementary",
+          "label": "uint248"
+        },
+        "t_string": {
+          "id": "t_string",
+          "kind": "elementary",
+          "label": "string"
+        },
+        "t_mapping<t_struct<ZEPValidator.Organization>>": {
+          "id": "t_mapping<t_struct<ZEPValidator.Organization>>",
+          "valueType": "t_struct<ZEPValidator.Organization>",
+          "label": "mapping(key => ZEPValidator.Organization)",
+          "kind": "mapping"
+        }
+      },
+      "storage": [
+        {
+          "contract": "Initializable",
+          "path": "openzeppelin-zos/contracts/Initializable.sol",
+          "label": "initialized",
+          "astId": 807,
+          "type": "t_bool",
+          "src": "701:24:4"
+        },
+        {
+          "contract": "Initializable",
+          "path": "openzeppelin-zos/contracts/Initializable.sol",
+          "label": "initializing",
+          "astId": 809,
+          "type": "t_bool",
+          "src": "820:25:4"
+        },
+        {
+          "contract": "Ownable",
+          "path": "openzeppelin-zos/contracts/ownership/Ownable.sol",
+          "label": "_owner",
+          "astId": 1266,
+          "type": "t_address",
+          "src": "286:22:9"
+        },
+        {
+          "contract": "PauserRole",
+          "path": "openzeppelin-zos/contracts/access/roles/PauserRole.sol",
+          "label": "pausers",
+          "astId": 953,
+          "type": "t_struct<Roles.Role>",
+          "src": "252:26:6"
+        },
+        {
+          "contract": "Pausable",
+          "path": "openzeppelin-zos/contracts/lifecycle/Pausable.sol",
+          "label": "_paused",
+          "astId": 1064,
+          "type": "t_bool",
+          "src": "303:28:7"
+        },
+        {
+          "contract": "ZEPValidator",
+          "path": "contracts/ZEPValidator.sol",
+          "label": "registry",
+          "astId": 504,
+          "type": "t_address",
+          "src": "618:26:3"
+        },
+        {
+          "contract": "ZEPValidator",
+          "path": "contracts/ZEPValidator.sol",
+          "label": "jurisdiction",
+          "astId": 506,
+          "type": "t_address",
+          "src": "729:39:3"
+        },
+        {
+          "contract": "ZEPValidator",
+          "path": "contracts/ZEPValidator.sol",
+          "label": "validAttributeID",
+          "astId": 508,
+          "type": "t_uint256",
+          "src": "847:24:3"
+        },
+        {
+          "contract": "ZEPValidator",
+          "path": "contracts/ZEPValidator.sol",
+          "label": "organizationAddresses",
+          "astId": 521,
+          "type": "t_array:dyn<t_address>",
+          "src": "1152:39:3"
+        },
+        {
+          "contract": "ZEPValidator",
+          "path": "contracts/ZEPValidator.sol",
+          "label": "organizations",
+          "astId": 525,
+          "type": "t_mapping<t_struct<ZEPValidator.Organization>>",
+          "src": "1277:54:3"
         }
       ]
     }
@@ -434,42 +434,62 @@
   "proxies": {
     "tpl-contracts-zos/BasicJurisdiction": [
       {
-        "address": "0x4ca417dd080ecbb699c9f698436891f6a69a8352",
+        "address": "0xbc74d15f23d118dfd885671c559fff9662964496",
+        "version": "0.0.1",
+        "implementation": "0x658262ad4d9cab4304f16fc10a9ecdac990b0d1d"
+      },
+      {
+        "address": "0x82671e0872547040fb80e2cc701829c4f98a2080",
         "version": "0.0.1",
         "implementation": "0x658262ad4d9cab4304f16fc10a9ecdac990b0d1d"
       }
     ],
     "zos-vouching/ZEPToken": [
       {
-        "address": "0x02838b6fce94b9282232153d0f310ad78808442b",
+        "address": "0xfe15e5ffa131513e3a207f6fc4309c205514d2fb",
         "version": "0.0.1",
-        "implementation": "0x55f82db290f1b62fd21e1a1bb808ccb07083309d"
+        "implementation": "0xe75f2453c82399200f037e4543da8c398329bf96"
+      },
+      {
+        "address": "0xc1757e5af57c4da0c92098db34ccdde098196934",
+        "version": "0.0.1",
+        "implementation": "0x244175dd16479ca41f14f5acdee1118bd3fa72d5"
       }
     ],
     "zos-vouching/Vouching": [
       {
-        "address": "0x3bda5b990c0ef7f140d5e4ca3a1448ea13d9a016",
+        "address": "0xe97cee48b6dc47c4fc254c61675aef2ef4b65f1b",
         "version": "0.0.1",
-        "implementation": "0xcb729b5e70517956243df8ff4c0f42cea44d4e5c"
+        "implementation": "0x319e02f4fc465df71b09f1138412fe8f36618844"
+      },
+      {
+        "address": "0xa9b39192e4f384aec2cd8e64f941cf141efb6cdb",
+        "version": "0.0.1",
+        "implementation": "0xaed3e76782242e3832c8bf2c2fe693bfb47761f1"
       }
     ],
     "zos-vouching/ZEPValidator": [
       {
-        "address": "0xb80ee420494cdced2c1b0ee4de5a562eb9b16551",
+        "address": "0xddd2c7eaa2e242371b16c4a97f72e8a9c360939f",
         "version": "0.0.1",
-        "implementation": "0xd3092009cdf60b26723d123667fc4becdf5cc208"
+        "implementation": "0xb306fd4a38c0e171986e0f4497edc4ce47ae84ff"
+      },
+      {
+        "address": "0xaf9278366c25a3ef8c686f8d1f93e14d44b0fb65",
+        "version": "0.0.1",
+        "implementation": "0xf4761204bcfd67c36aa13b36a8556a216497fc19"
       }
     ]
   },
   "zosversion": "2",
   "app": {
-    "address": "0xb86dc8c913d5273ff182b940b6b957adcb9ee1f9"
+    "address": "0x69a74068b4e69fc2801a42cad06e2312c5ea63c8"
   },
   "package": {
-    "address": "0x01ffcbc35730897e44333584c10b7a3c937f9447"
+    "address": "0xb65dd5d68d8f11cc4487380ed53c3988468eff20"
   },
   "provider": {
-    "address": "0x99fa2a9b8029e4e40d0e5fdea5952576da4561ce"
+    "address": "0xc950fa92abb877624a879e13fb6b86afebf0e3a8"
   },
   "version": "0.0.1",
   "dependencies": {
