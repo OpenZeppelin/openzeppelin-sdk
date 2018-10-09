@@ -74,6 +74,11 @@ export default {
     return glob.sync(`${buildDir}/*.json`)
   },
 
+  artifactsDefaults() {
+    if (!artifacts) throw Error("Could not retrieve truffle defaults")
+    return artifacts.options || {}
+  },
+
   _getFromPath(path) {
     const contract = truffleContract(require(path))
     return (process.env.NODE_ENV === 'test')
@@ -82,7 +87,7 @@ export default {
   },
 
   _provideContractForProduction(contract) {
-    truffleProvision(contract, this._artifactsDefaults())
+    truffleProvision(contract, this.artifactsDefaults())
     contract.synchronization_timeout = syncTimeout
     return contract
   },
@@ -93,10 +98,5 @@ export default {
     contract.defaults({ from: web3.eth.accounts[0], ... defaults })
     contract.synchronization_timeout = syncTimeout
     return contract
-  },
-
-  _artifactsDefaults() {
-    if(!artifacts) throw Error("Could not retrieve truffle defaults")
-    return artifacts.options || {}
-  },
+  }
 }

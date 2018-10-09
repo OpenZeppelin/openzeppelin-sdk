@@ -154,8 +154,8 @@ async function getNodeVersion () {
 
 function checkGasPrice(txParams) {
   if (process.env.NODE_ENV === 'test') return;
-  const gasPrice = txParams.gasPrice || Contracts.getTruffleConfig().gasPrice;
-  if (TRUFFLE_DEFAULT_GAS_PRICE.eq(gasPrice)) {
+  const gasPrice = txParams.gasPrice || Contracts.artifactsDefaults().gasPrice;
+  if (TRUFFLE_DEFAULT_GAS_PRICE.eq(gasPrice) || !gasPrice) {
     throw new Error(`Cowardly refusing to execute transaction with gas price set to Truffle's default of 100 gwei. Consider explicitly setting a different value in your truffle.js file.`);
   }
 }
