@@ -46,6 +46,7 @@
     "chai-bignumber": "^2.0.2",
     "coveralls": "^3.0.0",
     "mock-dependency": "file:test/mocks/mock-dependency",
+    "sinon": "^6.1.4",
     "solidity-coverage": "^0.4.15",
     "tmp": "^0.0.33",
     "truffle": "^4.1.13"
