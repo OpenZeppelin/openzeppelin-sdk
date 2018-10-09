@@ -8,7 +8,7 @@
     "test": "test"
   },
   "scripts": {
-    "test": "scripts/test.sh && npm run dodathing-local",
+    "test": "scripts/test.sh",
     "start-local": "ganache-cli --deterministic",
     "compile-contracts": "rm -rf build && npx truffle compile",
     "prepare": "rm -rf lib && babel src --out-dir lib",
