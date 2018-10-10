@@ -15,7 +15,7 @@ contract App is Ownable {
    * @dev Emitted when a new proxy is created.
    * @param proxy Address of the created proxy.
    */
-  event ProxyCreated(address indexed proxy);
+  event ProxyCreated(address proxy);
 
   /**
    * @dev Emitted when a package dependency is changed in the application.
@@ -32,7 +32,7 @@ contract App is Ownable {
     Package package;
     uint64[3] version;
   }
-  
+
   /**
    * @dev Maps from dependency name to a tuple of package and version
    */
@@ -62,10 +62,10 @@ contract App is Ownable {
   function getPackage(string packageName) public view returns (Package, uint64[3]) {
     ProviderInfo storage info = providers[packageName];
     return (info.package, info.version);
-  } 
+  }
 
   /**
-   * @dev Sets a package in a specific version as a dependency for this application. 
+   * @dev Sets a package in a specific version as a dependency for this application.
    * Requires the version to be present in the package.
    * @param packageName Name of the package to set or overwrite.
    * @param package Address of the package to register.
