@@ -12,6 +12,7 @@ import bumpVersion from '../../src/scripts/bump';
 import ZosPackageFile from '../../src/models/files/ZosPackageFile';
 import remove from '../../src/scripts/remove';
 import Dependency from '../../src/models/dependency/Dependency';
+import CaptureLogs from '../helpers/captureLogs';
 
 const should = require('chai').should();
 
@@ -117,7 +118,7 @@ contract('push script', function([_, owner]) {
     it('should refuse to redeploy a contract if storage is incompatible', async function () {
       modifyBytecode.call(this, 'Impl');
       modifyStorageInfo.call(this, 'Impl');
-      await push({ networkFile: this.networkFile, network, txParams }).should.be.rejectedWith(/review the warnings/)
+      await push({ networkFile: this.networkFile, network, txParams }).should.be.rejectedWith(/have validation errors/)
       this.networkFile.contract('Impl').address.should.eq(this.previousAddress);
     });
 
@@ -126,14 +127,65 @@ contract('push script', function([_, owner]) {
       modifyStorageInfo.call(this, 'Impl');
       await push({ force: true, networkFile: this.networkFile, network, txParams });
       this.networkFile.contract('Impl').address.should.not.eq(this.previousAddress);
-    });
+    });    
+  }
 
-    function modifyStorageInfo(contractAlias) {
-      const contractData = this.networkFile.contract(contractAlias);
-      const fakeVariable = {label: 'deleted', type: 't_uint256', contract: 'ImplV1'};
-      const modifiedStorage = [fakeVariable, ... contractData.storage]
-      this.networkFile.setContract(contractAlias, { ... contractData, storage: modifiedStorage })
-    }
+  const shouldValidateContracts = function () {
+    describe('validations', function () {
+      beforeEach('capturing log output', function () {
+        this.logs = new CaptureLogs();
+      });
+
+      afterEach(function () {
+        this.logs.restore();
+      });
+
+      it('should refuse to push a contract with validation error', async function () {
+        add({ contractsData: ['WithConstructor'], packageFile: this.networkFile.packageFile });
+        await push({ networkFile: this.networkFile, network, txParams }).should.be.rejectedWith(/One or more contracts have validation errors/i)
+        
+        this.logs.errors.should.have.lengthOf(1);
+        this.logs.errors[0].should.match(/constructor/i);
+      })
+      
+      it('should push a contract with validation error if forced', async function () {
+        add({ contractsData: ['WithConstructor'], packageFile: this.networkFile.packageFile });
+        await push({ networkFile: this.networkFile, network, txParams, force: true });
+        
+        this.logs.errors.should.have.lengthOf(1);
+        this.logs.errors[0].should.match(/constructor/i);
+
+        const contract = this.networkFile.contract('WithConstructor');
+        contract.address.should.be.nonzeroAddress;
+      })
+
+      it('should only report new validation errors', async function () {
+        add({ contractsData: ['WithConstructor'], packageFile: this.networkFile.packageFile });
+        await push({ networkFile: this.networkFile, network, txParams, force: true });
+        const previousAddress = this.networkFile.contract('WithConstructor').address;
+        
+        this.logs.clear();
+        modifyBytecode.call(this, 'WithConstructor');
+        await push({ networkFile: this.networkFile, network, txParams});
+        
+        this.logs.errors.should.have.lengthOf(0);
+        const contract = this.networkFile.contract('WithConstructor');
+        contract.address.should.not.eq(previousAddress);
+      })
+
+      it('should only validate modified contracts', async function () {
+        add({ contractsData: ['WithConstructor'], packageFile: this.networkFile.packageFile });
+        await push({ networkFile: this.networkFile, network, txParams, force: true });
+        const previousAddress = this.networkFile.contract('Impl').address;
+
+        this.logs.clear();
+        modifyBytecode.call(this, 'Impl');
+        await push({ networkFile: this.networkFile, network, txParams});
+        
+        this.logs.errors.should.have.lengthOf(0);
+        this.networkFile.contract('Impl').address.should.not.eq(previousAddress);
+      })
+    });
   }
 
   const shouldBumpVersion = function () {
@@ -280,6 +332,7 @@ contract('push script', function([_, owner]) {
     shouldDeployContracts();
     shouldRegisterContractsInDirectory();
     shouldRedeployContracts();
+    shouldValidateContracts();
     shouldBumpVersion();
     shouldDeleteContracts({ unregisterFromDirectory: true });
   });
@@ -289,7 +342,7 @@ contract('push script', function([_, owner]) {
       const packageFile = new ZosPackageFile('test/mocks/packages/package-with-invalid-contracts.zos.json')
       this.networkFile = packageFile.networkFile(network)
 
-      await push({ networkFile: this.networkFile, network, txParams }).should.be.rejectedWith(/WithFailingConstructor deployment failed/);
+      await push({ networkFile: this.networkFile, network, txParams, force: true }).should.be.rejectedWith(/WithFailingConstructor deployment failed/);
     });
 
     shouldDeployApp();
@@ -390,6 +443,7 @@ contract('push script', function([_, owner]) {
     shouldDeployProvider();
     shouldDeployContracts();
     shouldRegisterContractsInDirectory();
+    shouldValidateContracts();
     shouldRedeployContracts();
     shouldBumpVersionAndUnfreeze();
     shouldDeleteContracts({ unregisterFromDirectory: true });
@@ -436,6 +490,7 @@ contract('push script', function([_, owner]) {
     });
 
     shouldDeployContracts();
+    shouldValidateContracts();
     shouldRedeployContracts();
     shouldDeleteContracts({ unregisterFromDirectory: false });
     shouldMigrateToFullApp();
@@ -455,7 +510,7 @@ contract('push script', function([_, owner]) {
       packageFile.full = false
       this.networkFile = packageFile.networkFile(network)
 
-      await push({ networkFile: this.networkFile, network, txParams }).should.be.rejectedWith(/WithFailingConstructor deployment failed/);
+      await push({ networkFile: this.networkFile, network, txParams, force: true }).should.be.rejectedWith(/WithFailingConstructor deployment failed/);
     });
 
     shouldDeployContracts();
@@ -471,3 +526,15 @@ contract('push script', function([_, owner]) {
     return await app.getImplementation(this.networkFile.packageFile.name, contractAlias);
   }
 });
+
+function modifyBytecode(contractAlias) {
+  const contractData = this.networkFile.contract(contractAlias);
+  this.networkFile.setContract(contractAlias, { ... contractData, bytecodeHash: '0xabcdef' })
+}
+
+function modifyStorageInfo(contractAlias) {
+  const contractData = this.networkFile.contract(contractAlias);
+  const fakeVariable = {label: 'deleted', type: 't_uint256', contract: 'ImplV1'};
+  const modifiedStorage = [fakeVariable, ... contractData.storage]
+  this.networkFile.setContract(contractAlias, { ... contractData, storage: modifiedStorage })
+}

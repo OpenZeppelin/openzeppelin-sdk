@@ -210,14 +210,15 @@ export default class ZosNetworkFile {
     this.setDependency(name, fn(this.getDependency(name)));
   }
 
-  addContract(alias, instance, { types, storage } = {}) {
+  addContract(alias, instance, { warnings, types, storage } = {}) {
     this.setContract(alias, {
       address: instance.address,
       constructorCode: constructorCode(instance),
       bodyBytecodeHash: bytecodeDigest(bodyCode(instance)),
       bytecodeHash: bytecodeDigest(instance.constructor.bytecode),
       types,
-      storage
+      storage,
+      warnings
     })
   }
 
