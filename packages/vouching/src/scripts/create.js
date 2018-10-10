@@ -1,15 +1,10 @@
-import colors from 'colors';
-import * as constants from './constants';
+import * as constants from './constants'
 
 // zOS commands.
 import createProxy from 'zos/lib/scripts/create';
 
-// Enable zOS logging.
-import { Logger } from 'zos-lib';
-Logger.silent(false);
-
 export default async function create(options) {
-  console.log(colors.cyan(`creating instances with options ${ JSON.stringify(options, null, 2) }`).inverse);
+  log.info(`creating instances with options ${ JSON.stringify(options, null, 2) }`)
 
   const owner = options.txParams.from;
 
@@ -27,11 +22,11 @@ export default async function create(options) {
   // Instantiate ZEPValidator.initialize(ownerAddress, basicJurisdictionAddress, attributeID).
   const zepValidatorProxy = await createZEPValidatorInstance(owner, basicJurisdictionProxy.address, attributeID, options);
 
-  console.log(colors.green(`all instances created`).inverse);
+  log.info(`all instances created`)
 }
 
 async function createBasicJurisdictionInstance(owner, options) {
-  console.log(colors.gray(`creating instance for BasicJurisdiction with owner: ${owner}`).inverse);
+  log.base(`creating instance for BasicJurisdiction with owner: ${owner}`)
   
   // Run script.
   const proxy = await createProxy({
@@ -42,13 +37,13 @@ async function createBasicJurisdictionInstance(owner, options) {
     ...options
   });
 
-  console.log(colors.gray(`BasicJurisdiction instance created at: ${proxy.address}`).inverse);
+  log.base(`BasicJurisdiction instance created at: ${proxy.address}`)
 
   return proxy;
 }
 
 async function createZEPTokenInstance(owner, basicJurisdictionAddress, attributeID, options) {
-  console.log(colors.gray(`creating instance for ZEPToken with owner: ${owner} basicJurisdictionAddress: ${basicJurisdictionAddress} and attributeID: ${attributeID}`).inverse);
+  log.base(`creating instance for ZEPToken with owner: ${owner} basicJurisdictionAddress: ${basicJurisdictionAddress} and attributeID: ${attributeID}`)
   
   // Run script.
   const proxy = await createProxy({
@@ -59,13 +54,13 @@ async function createZEPTokenInstance(owner, basicJurisdictionAddress, attribute
     ...options
   });
 
-  console.log(colors.gray(`ZEPToken instance created at: ${proxy.address}`).inverse);
+  log.base(`ZEPToken instance created at: ${proxy.address}`)
 
   return proxy;
 }
 
 async function createVouchingInstance(minimumStake, zepTokenAddress, options) {
-  console.log(colors.gray(`creating instance for Vouching with minimumStake: ${minimumStake} and zepTokenAddress: ${zepTokenAddress}`).inverse);
+  log.base(`creating instance for Vouching with minimumStake: ${minimumStake} and zepTokenAddress: ${zepTokenAddress}`)
   
   // Run script.
   const proxy = await createProxy({
@@ -76,13 +71,13 @@ async function createVouchingInstance(minimumStake, zepTokenAddress, options) {
     ...options
   });
 
-  console.log(colors.gray(`Vouching instance created at: ${proxy.address}`).inverse);
+  log.base(`Vouching instance created at: ${proxy.address}`)
 
   return proxy;
 }
 
 async function createZEPValidatorInstance(owner, basicJurisdictionAddress, attributeID, options) {
-  console.log(colors.gray(`creating instance for ZEPValidator with owner: ${owner} basicJurisdictionAddress: ${basicJurisdictionAddress} and attributeID: ${attributeID}`).inverse);
+  log.base(`creating instance for ZEPValidator with owner: ${owner} basicJurisdictionAddress: ${basicJurisdictionAddress} and attributeID: ${attributeID}`)
   
   // Run script.
   const proxy = await createProxy({
@@ -93,7 +88,7 @@ async function createZEPValidatorInstance(owner, basicJurisdictionAddress, attri
     ...options
   });
 
-  console.log(colors.gray(`ZEPValidator instance created at: ${proxy.address}`).inverse);
+  log.base(`ZEPValidator instance created at: ${proxy.address}`)
 
   return proxy;
 }

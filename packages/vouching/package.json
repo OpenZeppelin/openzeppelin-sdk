@@ -22,13 +22,12 @@
     "configure-ropsten": "node ./lib/bin/configure.js --network=ropsten --from=0x09902a56d04a9446601a0d451e07459dc5af0820",
     "dodathing-local": "npm run prepare && npm run deploy-local && npm run create-local && npm run configure-local && npm run validate-local",
     "dodathing-ropsten": "npm run prepare && npm run deploy-ropsten && npm run create-ropsten && npm run configure-ropsten && npm run validate-ropsten"
-    
   },
   "keywords": [],
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "colors": "^1.3.2",
+    "chalk": "^2.4.1",
     "minimist": "^1.2.0",
     "openzeppelin-zos": "git+https://github.com/OpenZeppelin/openzeppelin-zos.git#3df0a786e4cfe19f22ea537f32f68c392b29a5f8",
     "tpl-contracts-zos": "0.0.4",

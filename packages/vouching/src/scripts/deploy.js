@@ -1,21 +1,17 @@
-import colors from 'colors';
 import fs from 'fs';
+import log from '../helpers/log'
 
 // zOS commands.
 import push from 'zos/lib/scripts/push';
 
-// Enable zOS logging.
-import { Logger } from 'zos-lib';
-Logger.silent(false);
-
 export default async function deploy(options) {
-  console.log(colors.cyan(`pushing app with options ${ JSON.stringify(options, null, 2) }`).inverse);
+  log.info(`pushing app with options ${ JSON.stringify(options, null, 2) }`)
 
   // If network is local, remove existing zos.local.json files.
   let zosLocalPath = `./zos.${options.network}.json`;
   const isLocal = options.network === 'local' || options.network === 'test';
   if(isLocal && fs.existsSync(zosLocalPath)) {
-    console.log(colors.yellow(`Deleting old zos.${options.network}.json files (this is only done for local networks).`));
+    log.warn(`Deleting old zos.${options.network}.json files (this is only done for local networks).`)
     fs.unlinkSync(zosLocalPath);
 
     // Delete dependency files also.
@@ -29,5 +25,5 @@ export default async function deploy(options) {
     ...options
   });
 
-  console.log(colors.green(`app pushed`).inverse);
+  log.info(`app pushed`)
 }
