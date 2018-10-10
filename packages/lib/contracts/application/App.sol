@@ -133,7 +133,7 @@ contract App is Ownable {
    * @param contractName Name of the contract.
    * @param data Data to send as msg.data to the corresponding implementation to initialize the proxied contract.
    * It should include the signature and the parameters of the function to be called, as described in
-   * https://solidity.readthedocs.io/en/develop/abi-spec.html#function-selector-and-argument-encoding.
+   * https://solidity.readthedocs.io/en/v0.4.24/abi-spec.html#function-selector-and-argument-encoding.
    * This parameter is optional, if no data is given the initialization call to proxied contract will be skipped.
    * @return Address of the new proxy.
    */
@@ -163,7 +163,7 @@ contract App is Ownable {
    * @param contractName Name of the contract.
    * @param data Data to send as msg.data in the low level call.
    * It should include the signature and the parameters of the function to be called, as described in
-   * https://solidity.readthedocs.io/en/develop/abi-spec.html#function-selector-and-argument-encoding.
+   * https://solidity.readthedocs.io/en/v0.4.24/abi-spec.html#function-selector-and-argument-encoding.
    */
   function upgradeAndCall(AdminUpgradeabilityProxy proxy, string packageName, string contractName, bytes data) payable public onlyOwner {
     address implementation = getImplementation(packageName, contractName);
