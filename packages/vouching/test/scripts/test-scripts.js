@@ -1,7 +1,7 @@
 import deploy from '../../src/scripts/deploy';
 import create from '../../src/scripts/create';
 import configure from '../../src/scripts/configure';
-import validate from '../../src/scripts/validate';
+import validate from '../../src/scripts/verify';
 
 contract.only('deploy', function([_, owner]) {
 
@@ -24,7 +24,7 @@ contract.only('deploy', function([_, owner]) {
     await configure(options);
   });
 
-  it('runs the validate script correctly', async function() {
+  it('runs the verify script correctly', async function() {
     await validate(options);
   });
 });

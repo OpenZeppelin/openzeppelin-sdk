@@ -23,7 +23,7 @@ let zepValidatorContract;
 // COMBINED
 // *****************
 
-export default async function validate(options) {
+export default async function verify(options) {
   console.log(colors.cyan(`validating vouching app on network ${ options.network }`).inverse);
 
   // Retrieve network data.
@@ -244,7 +244,7 @@ async function checkConfig(options) {
   if(!isValidator) throw new Error('ZEPValidator is not set as a validator on the jurisdiction.');
   console.log(`ZEPValidator is correctly set as a validator on the jurisdiction.`);
   
-  // Verify that ZEPValidator can validate ZEPToken's attribute id.
+  // Verify that ZEPValidator can verify ZEPToken's attribute id.
   const canValidate = await jurisdictionContract.isApproved(zepValidatorContract.address, constants.ZEPTOKEN_ATTRIBUTE_ID);
   if(!canValidate) throw new Error(`ZEPValidator is not cleared for approval of ZEPToken attribute id: ${constants.ZEPTOKEN_ATTRIBUTE_ID}`);
   console.log(`ZEPValidator is cleared for approval of ZEPToken attribute id: ${constants.ZEPTOKEN_ATTRIBUTE_ID}`);
