@@ -6,7 +6,7 @@ export default function add({ contractsData, packageFile = undefined }) {
 
   const controller = ControllerFor(packageFile)
   contractsData.forEach(({ name, alias }) => {
-    controller.validateImplementation(name)
+    controller.checkCanAdd(name)
     controller.add(alias || name, name)
   })
   controller.writePackage()

@@ -1,7 +1,9 @@
+import _ from 'lodash'
 import Session from '../network/Session'
 import Truffle from '../truffle/Truffle'
-import { Contracts, Logger, FileSystem as fs } from 'zos-lib'
+import { Contracts, Logger, FileSystem as fs, getBuildArtifacts, validate as validateContract, validationPasses} from 'zos-lib'
 import Dependency from '../dependency/Dependency';
+import ValidationLogger from '../../interface/ValidationLogger';
 
 const log = new Logger('LocalController');
 
@@ -65,7 +67,7 @@ export default class LocalBaseController {
     }
   }
 
-  validateImplementation(contractName) {
+  checkCanAdd(contractName) {
     const path = Contracts.getLocalPath(contractName)
     if (!fs.exists(path)) {
       throw Error(`Contract ${contractName} not found in path ${path}`)
@@ -75,6 +77,21 @@ export default class LocalBaseController {
     }
   }
 
+  validateAll() {
+    const buildArtifacts = getBuildArtifacts();
+    return _.every(_.map(this.packageFile.contractAliases, (contractAlias) => (
+      this.validate(contractAlias, buildArtifacts)
+    )));
+  }
+
+  validate(contractAlias, buildArtifacts) {
+    const contractName = this.packageFile.contract(contractAlias);
+    const contractClass = Contracts.getFromLocal(contractName || contractAlias);
+    const warnings = validateContract(contractClass, {}, buildArtifacts);
+    new ValidationLogger(contractClass).log(warnings, buildArtifacts);
+    return validationPasses(warnings);
+  }
+
   hasBytecode(contractDataPath) {
     if (!fs.exists(contractDataPath)) return false
     const bytecode = fs.parseJson(contractDataPath).bytecode
@@ -82,7 +99,7 @@ export default class LocalBaseController {
   }
 
   getContractClass(packageName, contractAlias) {
-    if (packageName === this.packageFile.name) {
+    if (!packageName || packageName === this.packageFile.name) {
       const contractName = this.packageFile.contract(contractAlias);
       return Contracts.getFromLocal(contractName);
     } else {
