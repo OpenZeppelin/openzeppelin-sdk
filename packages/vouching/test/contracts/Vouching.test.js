@@ -217,7 +217,7 @@ contract('Vouching', function ([_, tokenOwner, vouchingOwner, developer, transfe
 
         it('reverts when the unvouched amount is greater than current stake', async function () {
           await assertRevert(
-            this.vouching.unvouch(dependencyName, minStake.plus(1), { from: developer })
+            this.vouching.unvouch(dependencyName, stakeAmount.plus(1), { from: developer })
           );
         });
 
