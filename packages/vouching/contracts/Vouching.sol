@@ -4,6 +4,7 @@ pragma solidity ^0.4.24;
 import "openzeppelin-zos/contracts/token/ERC20/ERC20.sol";
 import "openzeppelin-zos/contracts/token/ERC20/SafeERC20.sol";
 import "openzeppelin-zos/contracts/math/SafeMath.sol";
+import "openzeppelin-zos/contracts/utils/Address.sol";
 import "openzeppelin-zos/contracts/Initializable.sol";
 
 contract Vouching is Initializable {
@@ -21,6 +22,7 @@ contract Vouching is Initializable {
 
   using SafeMath for uint256;
   using SafeERC20 for ERC20;
+  using Address for address;
 
   struct Dependency {
     address owner;
@@ -64,6 +66,7 @@ contract Vouching is Initializable {
     require(initialStake >= _minimumStake, "Initial stake must be equal or greater than minimum stake");
     require(owner != address(0), "Owner address cannot be zero");
     require(dependencyAddress != address(0), "Dependency address cannot be zero");
+    require(dependencyAddress.isContract(), "Dependencies must be contracts");
     require(!_takenDependencyNames[name], "Given dependency name is already registered");
 
     _takenDependencyNames[name] = true;

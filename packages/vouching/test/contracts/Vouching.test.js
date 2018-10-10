@@ -3,6 +3,7 @@ import { encodeCall, assertEvent, assertRevert } from 'zos-lib'
 const BigNumber = web3.BigNumber;
 const ZepToken = artifacts.require('ZEPToken');
 const Vouching = artifacts.require('Vouching');
+const DependencyMock = artifacts.require('DependencyMock');
 const ZEPValidator = artifacts.require('ZEPValidator');
 const BasicJurisdiction = artifacts.require('BasicJurisdiction');
 
@@ -11,7 +12,7 @@ require('chai')
   .should();
 
 contract('Vouching', function ([_, tokenOwner, vouchingOwner, developer, transferee,
-        dependencyAddress, anotherDependencyAddress, jurisdictionOwner, validatorOwner, organization]) {
+        nonContractAddress, jurisdictionOwner, validatorOwner, organization]) {
   const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000';
   const lotsaZEP = new BigNumber('10e18');
   const minStake = new BigNumber(10);
@@ -57,6 +58,11 @@ contract('Vouching', function ([_, tokenOwner, vouchingOwner, developer, transfe
       await this.token.approve(this.vouching.address, lotsaZEP, { from: developer });
     });
 
+    beforeEach('dependencies setup', async function () {
+      this.dependencyAddress = (await DependencyMock.new()).address;
+      this.anotherDependencyAddress = (await DependencyMock.new()).address;
+    });
+
     it('stores the token address', async function () {
       (await this.vouching.token()).should.equal(this.token.address);
     });
@@ -69,7 +75,7 @@ contract('Vouching', function ([_, tokenOwner, vouchingOwner, developer, transfe
       it('reverts when initial stake is less than the minimum', async function () {
         await assertRevert(
           this.vouching.create(
-            dependencyName, developer, dependencyAddress, minStake.minus(1), { from: developer }
+            dependencyName, developer, this.dependencyAddress, minStake.minus(1), { from: developer }
           )
         );
       });
@@ -80,9 +86,15 @@ contract('Vouching', function ([_, tokenOwner, vouchingOwner, developer, transfe
         );
       });
 
+      it('reverts for a non-contract dependency address', async function () {
+        await assertRevert(
+          this.vouching.create(dependencyName, developer, nonContractAddress, minStake, { from: developer })
+        );
+      });
+
       it('reverts for null owner address', async function () {
         await assertRevert(
-          this.vouching.create(dependencyName, ZERO_ADDRESS, dependencyAddress, stakeAmount, { from: developer })
+          this.vouching.create(dependencyName, ZERO_ADDRESS, this.dependencyAddress, stakeAmount, { from: developer })
         );
       });
 
@@ -90,7 +102,7 @@ contract('Vouching', function ([_, tokenOwner, vouchingOwner, developer, transfe
         const initialBalance = await this.token.balanceOf(this.vouching.address);
 
         await this.vouching.create(
-          dependencyName, developer, dependencyAddress, stakeAmount, { from: developer }
+          dependencyName, developer, this.dependencyAddress, stakeAmount, { from: developer }
         );
 
         (await this.token.balanceOf(this.vouching.address)).should.be.bignumber.equal(
@@ -100,13 +112,13 @@ contract('Vouching', function ([_, tokenOwner, vouchingOwner, developer, transfe
 
       it('emits a DependencyCreated event', async function () {
         const result = await this.vouching.create(
-          dependencyName, developer, dependencyAddress, stakeAmount, { from: developer }
+          dependencyName, developer, this.dependencyAddress, stakeAmount, { from: developer }
         );
         const dependencyCreatedEvent = assertEvent.inLogs(result.logs, 'DependencyCreated', {
           nameHash: web3.sha3(dependencyName),
           name: dependencyName,
           owner: developer,
-          dependencyAddress: dependencyAddress
+          dependencyAddress: this.dependencyAddress
         });
         dependencyCreatedEvent.args.initialStake.should.be.bignumber.equal(stakeAmount);
       });
@@ -115,21 +127,21 @@ contract('Vouching', function ([_, tokenOwner, vouchingOwner, developer, transfe
     context('with a dependency created', function () {
       beforeEach(async function () {
         await this.vouching.create(
-          dependencyName, developer, dependencyAddress, stakeAmount, { from: developer }
+          dependencyName, developer, this.dependencyAddress, stakeAmount, { from: developer }
         );
       });
 
       it('reverts when creating new dependency with existing name', async function () {
         await assertRevert(
           this.vouching.create(
-            dependencyName, developer, anotherDependencyAddress, stakeAmount, { from: developer }
+            dependencyName, developer, this.anotherDependencyAddress, stakeAmount, { from: developer }
           )
         );
       });
 
       it('stores the created dependency', async function () {
         let [addr, dev, amount] = await this.vouching.getDependency(dependencyName);
-        addr.should.equal(dependencyAddress);
+        addr.should.equal(this.dependencyAddress);
         dev.should.equal(developer);
         amount.should.be.bignumber.equal(stakeAmount);
       });
@@ -292,7 +304,7 @@ contract('Vouching', function ([_, tokenOwner, vouchingOwner, developer, transfe
           await this.vouching.remove(dependencyName, { from: developer });
           await assertRevert(
             this.vouching.create(
-              dependencyName, developer, anotherDependencyAddress, stakeAmount, { from: developer }
+              dependencyName, developer, this.anotherDependencyAddress, stakeAmount, { from: developer }
             )
           );
         });
@@ -309,10 +321,10 @@ contract('Vouching', function ([_, tokenOwner, vouchingOwner, developer, transfe
     describe('event filtering', function () {
       it('allows filtering by dependency name', async function () {
         const resultFirst = await this.vouching.create(
-          'dep1', developer, dependencyAddress, stakeAmount, { from: developer }
+          'dep1', developer, this.dependencyAddress, stakeAmount, { from: developer }
         );
         const resultSecond = await this.vouching.create(
-          'dep2', developer, anotherDependencyAddress, stakeAmount, { from: developer }
+          'dep2', developer, this.anotherDependencyAddress, stakeAmount, { from: developer }
         );
 
         resultFirst.receipt.logs[1].topics[1].should.be.equal(web3.sha3('dep1'));
