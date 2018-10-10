@@ -23,7 +23,7 @@
     "chalk": "^2.4.1",
     "minimist": "^1.2.0",
     "openzeppelin-zos": "git+https://github.com/OpenZeppelin/openzeppelin-zos.git#3df0a786e4cfe19f22ea537f32f68c392b29a5f8",
-    "tpl-contracts-zos": "0.0.4",
+    "tpl-contracts-zos": "0.0.3",
     "zos": "^2.0.0-alpha.3",
     "zos-lib": "^2.0.0-alpha.3"
   },
