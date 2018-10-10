@@ -1,5 +1,9 @@
 import stdout from '../utils/stdout';
 import ControllerFor from '../models/network/ControllerFor'
+import { Logger } from 'zos-lib'
+
+const log = new Logger('scripts/set-admin')
+
 
 export default async function setAdmin({ newAdmin, packageName, contractAlias, proxyAddress, network, txParams = {}, networkFile = undefined}) {
   if (!contractAlias && !proxyAddress) {
@@ -11,7 +15,9 @@ export default async function setAdmin({ newAdmin, packageName, contractAlias, p
   try {
     const proxies = await controller.setProxiesAdmin(packageName, contractAlias, proxyAddress, newAdmin);
     proxies.forEach(proxy => stdout(proxy.address));
+  } catch(error) {
+    log.error(error.message)
   } finally {
-    controller.writeNetworkPackage();
+    controller.writeNetworkPackageIfNeeded()
   }
 }
