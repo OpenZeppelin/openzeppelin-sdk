@@ -1,284 +1,287 @@
-import fs from 'fs'
-import * as constants from './constants'
+import log from '../helpers/log'
+import status from 'zos/lib/scripts/status'
+import { FileSystem as fs, Contracts } from 'zos-lib'
+import validateAddress from '../helpers/validateAddress'
+import ZosPackageFile from 'zos/lib/models/files/ZosPackageFile'
+import {
+  VOUCHING_MIN_STAKE,
+  ZEPPELIN_ORG_NAME,
+  ZEPTOKEN_NAME,
+  ZEPTOKEN_SUPPLY,
+  ZEPTOKEN_SYMBOL,
+  ZEPTOKEN_DECIMALS,
+  ZEPTOKEN_ATTRIBUTE_ID,
+  ZEPTOKEN_ATTRIBUTE_DESCRIPTION,
+} from '../constants'
 
-// zOS commands.
-import status from 'zos/lib/scripts/status';
+export default async function verify({ network, txParams }) {
+  log.info(`Verifying vouching app on network ${ network }...`)
+  const networkFile = (new ZosPackageFile()).networkFile(network)
 
-// zOS utils.
-import { Contracts } from 'zos-lib';
-
-// zos.<network>.json
-let networkData;
-let jurisdictionAddress;
-let zepTokenAddress;
-let jurisdictionContract;
-let zepValidatorAddress;
-let zepValidatorContract;
-
-// *****************
-// COMBINED
-// *****************
-
-export default async function verify(options) {
-  log.info(`validating vouching app on network ${ options.network }`)
-
-  // Retrieve network data.
-  networkData = require(`../../zos.${options.network}.json`);
-
-  await printStatus(options);
-  await checkApp(options);
-  await checkJurisdiction(options);
-  await checkZEPToken(options);
-  await checkVouching(options);
-  await checkZEPValidator(options);
-  await checkConfig(options);
-
-  log.info(`vouching app looks good!!`)
+  await printStatus(networkFile, { network, txParams })
+  const successfulApp = await verifyAppSetup(networkFile)
+  const successfulJurisdiction = successfulApp && await verifyJurisdiction(networkFile, txParams)
+  const successfulZepToken = successfulJurisdiction && await verifyZEPToken(networkFile, txParams)
+  const successfulVouching = successfulZepToken && await verifyVouching(networkFile, txParams)
+  const successfulValidator = successfulVouching && await verifyZEPValidator(networkFile, txParams)
+  const successfulConfiguration = successfulValidator && await verifyTPLConfiguration(networkFile, txParams)
+  if (successfulConfiguration) log.info('\n\nVouching app was deployed and configured successfully!')
+  else log.error('\n\nCould not complete verification process since there are required previous steps not completed.')
 }
 
-async function printStatus(options) {
-  log.base(`printing app status`)
-  
-  // Run script.
-  await status({
-    ...options
-  });
+export async function printStatus(options) {
+  log.base('Printing app status...')
+  await status({ ...options })
 }
 
-// *****************
-// App
-// *****************
+export async function verifyAppSetup(networkFile) {
+  log.base('\n--------------------------------------------------------------------\n\n')
+  log.base('Verifying ZeppelinOS app...')
 
-async function checkApp(options) {
-  log.base(`validating app`)
+  if (fs.exists(networkFile.fileName)) {
+    const validAppAddress = validateAddress(networkFile.appAddress)
+    const validPackageAddress = validateAddress(networkFile.packageAddress)
+    const validVersion = networkFile.version && networkFile.version !== ''
 
-  // Check that the network file exists.
-  const zosFilePath = `./zos.${options.network}.json`;
-  if(!fs.existsSync(zosFilePath)) log.error('Network file for app not found.');
+    validAppAddress
+      ? log.info (' ✔ App address is valid')
+      : log.error(` ✘ App address ${networkFile.appAddress} is not valid`)
 
-  // Check that the network file has a valid app address.
-  const appAddress = networkData.app['address'];
-  if(!validateAddress(appAddress)) log.error('Invalid app address.');
+    validPackageAddress
+      ? log.info (' ✔ Package address is valid')
+      : log.error(` ✘ Package address ${networkFile.packageAddress} is not valid`)
 
-  // Check that the network file has a valid package address.
-  const packageAddress = networkData.package['address'];
-  if(!validateAddress(packageAddress)) log.error('Invalid package address.');
-  
-  // Check for a valid local version.
-  const localVersion = networkData.version;
-  if(!localVersion || localVersion === '') log.error('Invalid app version');
-  
-  // Verify that the onchain version matches the local version.
-  const App = Contracts.getFromNodeModules('zos-lib', 'App');
-  const appContract = App.at(appAddress);
-  const Package = Contracts.getFromNodeModules('zos-lib', 'Package');
-  const packageContract = Package.at(packageAddress);
-  const versionMatch = await packageContract.hasVersion(localVersion.split('.'));
-  if(!versionMatch) log.error('Invalid onchain app version');
+    validVersion
+      ? log.info (' ✔ Version name is valid')
+      : log.error(` ✘ Version name "${networkFile.version}" is not valid`)
 
-  log.info(`app looks good!!`)
-}
+    if (validAppAddress && validPackageAddress && validVersion) {
+      const App = Contracts.getFromNodeModules('zos-lib', 'App')
+      const app = App.at(networkFile.appAddress)
+      const [packageAddress, version] = await app.getPackage('zos-vouching')
+      const registeredPackage = packageAddress === networkFile.packageAddress
+      const registeredVersion = version === networkFile.version
 
-// *****************
-// Jurisdiction
-// *****************
+      registeredPackage
+        ? log.info (' ✔ Package address is registered on the app')
+        : log.error(` ✘ Package address ${networkFile.packageAddress} is not registered on the app ${networkFile.appAddress}`)
 
-async function checkJurisdiction(options) {
-  log.base(`validating jurisdiction`)
+      registeredVersion
+        ? log.info (' ✔ Requested version is registered on-chain')
+        : log.error(' ✘ Requested version is not registered on-chain')
 
-  // Find instance.
-  const proxies = networkData.proxies['tpl-contracts-zos/BasicJurisdiction'];
-  if(proxies.length === 0) log.error('Instance for BasicJurisdiction not created!');
-  log.base(`proxies found: ${proxies.length}`);
-  const lastProxy = proxies[proxies.length - 1];
-
-  // Proxy is valid.
-  const proxyAddress = lastProxy.address;
-  jurisdictionAddress = proxyAddress; // Used for upcoming tests beyond the scope of this test.
-  if(!validateAddress(proxyAddress)) log.error('Invalid BasicJurisdiction instance address.');
-  log.base(`BasicJurisdiction instance address: ${proxyAddress}`);
-
-  // Retrieve contract object.
-  const BasicJurisdiction = Contracts.getFromLocal('BasicJurisdiction');
-  jurisdictionContract = BasicJurisdiction.at(proxyAddress);
-
-  // Jurisdiction owner is the specified address.
-  const owner = await jurisdictionContract.owner();
-  log.base(`BasicJurisdiction owner: ${owner}`);
-  if(owner != options.txParams.from) log.error('Unexpected BasicJurisdiction owner!');
-
-  // TODO: consider performing addition tests for jurisdiction, i.e. checking interface, etc
-
-  log.info(`jurisdiction looks good!!`)
-}
-
-// *****************
-// ZEPToken
-// *****************
-
-async function checkZEPToken(options) {
-  log.base(`validating ZEPToken`)
-
-  // Find instance.
-  const proxies = networkData.proxies['zos-vouching/ZEPToken'];
-  if(proxies.length === 0) log.error('Instance for ZEPToken not created!');
-  log.base(`proxies found: ${proxies.length}`);
-  const lastProxy = proxies[proxies.length - 1];
-
-  // Proxy is valid.
-  const proxyAddress = lastProxy.address;
-  zepTokenAddress = proxyAddress; // Used for upcoming tests beyond the scope of this test.
-  if(!validateAddress(proxyAddress)) log.error('Invalid ZEPToken instance address.');
-  log.base(`ZEPToken instance address: ${proxyAddress}`);
-
-  // Retrieve contract object.
-  const ZEPToken = Contracts.getFromLocal('ZEPToken');
-  const contract = ZEPToken.at(proxyAddress);
-
-  // Verify that the token name is correct.
-  const name = await contract.name();
-  log.base(`ZEPToken name: ${name}`);
-  if(name != constants.ZEPTOKEN_NAME) log.error('Invalid ZEPToken name.');
-  
-  // Verify that the token symbol is correct.
-  const symbol = await contract.symbol();
-  log.base(`ZEPToken symbol: ${symbol}`);
-  if(symbol != constants.ZEPTOKEN_SYMBOL) log.error('Invalid ZEPToken symbol.');
-
-  // TODO: more tests?
-
-  log.info(`ZEPToken looks good!!`)
-}
-
-// *****************
-// Vouching
-// *****************
-
-async function checkVouching(options) {
-  log.base(`validating Vouching`)
-
-  // Find instance.
-  const proxies = networkData.proxies['zos-vouching/Vouching'];
-  if(proxies.length === 0) log.error('Instance for Vouching not created!');
-  log.base(`proxies found: ${proxies.length}`);
-  const lastProxy = proxies[proxies.length - 1];
-
-  // Proxy is valid.
-  const proxyAddress = lastProxy.address;
-  if(!validateAddress(proxyAddress)) log.error('Invalid Vouching instance address.');
-  log.base(`Vouching instance address: ${proxyAddress}`);
-
-  // Retrieve contract object.
-  const Vouching = Contracts.getFromLocal('Vouching');
-  const contract = Vouching.at(proxyAddress);
-
-  // Check that the token is set correctly.
-  const token = await contract.token();
-  log.base(`Vouching token address: ${token}`);
-  if(token != zepTokenAddress) log.error('Invalid token set for Vouching instance.');
-
-  // TODO: more tests?
-
-  log.info(`vouching looks good!!`)
-}
-
-// *****************
-// ZEPValidator
-// *****************
-
-async function checkZEPValidator(options) {
-  log.base(`validating ZEPValidator`)
-
-  // Find instance.
-  const proxies = networkData.proxies['zos-vouching/ZEPValidator'];
-  if(proxies.length === 0) log.error('Instance for ZEPValidator not created!');
-  log.base(`proxies found: ${proxies.length}`);
-  const lastProxy = proxies[proxies.length - 1];
-
-  // Proxy is valid.
-  const proxyAddress = lastProxy.address;
-  zepValidatorAddress = proxyAddress; // Used for upcoming tests beyond the scope of this test.
-  if(!validateAddress(proxyAddress)) log.error('Invalid ZEPValidator instance address.');
-  log.base(`ZEPValidator instance address: ${proxyAddress}`);
-
-  // Retrieve contract object.
-  const ZEPValidator = Contracts.getFromLocal('ZEPValidator');
-  const contract = ZEPValidator.at(proxyAddress);
-  zepValidatorContract = contract; // Used for upcoming tests beyond the scope of this test.
-
-  // Jurisdiction owner is the specified address.
-  const owner = await contract.owner(); 
-  log.base(`ZEPValidator owner: ${owner}`);
-  if(owner != options.txParams.from) log.error('Unexpected ZEPValidator owner!');
-
-  // Check that the jurisdiction is set correctly.
-  const jurisdiction = await contract.getJurisdictionAddress();
-  log.base(`ZEPValidator jurisdiction address: ${jurisdiction}`);
-  if(jurisdiction != jurisdictionAddress) log.error('Invalid jurisdiction set for ZEPValidaotr instance.');
-
-  // TODO: more tests?
-
-  log.info(`ZEPValidator looks good!!`)
-}
-
-// *****************
-// TPL Config
-// *****************
-
-async function checkConfig(options) {
-  log.base(`validating TPL configuration`)
-
-  // Jurisdiction has the ZEPToken attribute type set.
-  const attrInfo = await jurisdictionContract.getAttributeInformation(constants.ZEPTOKEN_ATTRIBUTE_ID);
-  const description = attrInfo[0];
-  log.base(`Jurisdiction attribute description for id ${constants.ZEPTOKEN_ATTRIBUTE_ID}: ${description}`);
-  if(!description || description !== constants.ZEPTOKEN_ATTRIBUTE_DESCRIPTION) log.error('ZEPToken attribute is incorrectly set on the jurisdiction.');
-  log.info(`ZEPToken attribute is correctly set on the jurisdiction.`);
-
-  // Check that the validator is correctly set on the jurisdiction.
-  const isValidator = jurisdictionContract.isValidator(zepValidatorAddress);
-  if(!isValidator) log.error('ZEPValidator is not set as a validator on the jurisdiction.');
-  log.info(`ZEPValidator is correctly set as a validator on the jurisdiction.`);
-  
-  // Verify that ZEPValidator can verify ZEPToken's attribute id.
-  const canValidate = await jurisdictionContract.isApproved(zepValidatorContract.address, constants.ZEPTOKEN_ATTRIBUTE_ID);
-  if(!canValidate) log.error(`ZEPValidator is not cleared for approval of ZEPToken attribute id: ${constants.ZEPTOKEN_ATTRIBUTE_ID}`);
-  log.info(`ZEPValidator is cleared for approval of ZEPToken attribute id: ${constants.ZEPTOKEN_ATTRIBUTE_ID}`);
-
-  // Verify that ZEPValidator is added as an organization in the jurisdiction.
-  const owner = await  zepValidatorContract.owner(); 
-  const orgInfo = await zepValidatorContract.getOrganization(owner);
-  const exists = orgInfo[0];
-  const name = orgInfo[2];
-  if(!exists || name !== constants.ZEPPELIN_ORG_NAME) log.error(`${constants.ZEPPELIN_ORG_NAME} is not set as an organization in the validator.`);
-  log.info(`${constants.ZEPPELIN_ORG_NAME} correctly set as an organization in ZEPValidator.`);
-
-  log.info(`TPL configuration looks good!!`)
-}
-
-// *****************
-// UTILS
-// *****************
-
-function validateAddress(address) {
-  if(!address) return false;
-  if(address === '0x0000000000000000000000000000000000000000') return false;
-  if(address.substring(0, 2) !== "0x") return false;
-
-  // Basic validation: length, valid characters, etc
-  if(!/^(0x)?[0-9a-f]{40}$/i.test(address)) return false;
-
-  // Checksum validation.
-  const raw = address.replace('0x','');
-  const allLowerCase = raw.toLowerCase() === raw;
-  const allUppercase = raw.toUpperCase() === raw;
-  if(allLowerCase || allUppercase) {
-    return true; // accepts addreses with no checksum data
+      return registeredPackage && registeredVersion
+    }
+    else return false
   }
   else {
-    const checksum = ethjs.toChecksumAddress(address);
-    if(address !== checksum) return false;
+    log.error(` ✘ Cannot find ZeppelinOS ${networkFile.network} file.`)
+    return false
   }
+}
 
-  return true;
+export async function verifyJurisdiction(networkFile, txParams) {
+  log.base('\n--------------------------------------------------------------------\n\n')
+  log.base('Verifying basic jurisdiction...')
+
+  const jurisdictionProxies = networkFile._proxiesOf('tpl-contracts-zos/BasicJurisdiction')
+  if (jurisdictionProxies.length > 0) {
+    const jurisdictionAddress = jurisdictionProxies[jurisdictionProxies.length - 1].address
+    if (validateAddress(jurisdictionAddress)) {
+      log.info (' ✔ Jurisdiction address is valid')
+      const BasicJurisdiction = Contracts.getFromLocal('BasicJurisdiction')
+      const jurisdiction = BasicJurisdiction.at(jurisdictionAddress)
+      const jurisdictionOwner = await jurisdiction.owner()
+      const ownerMatches = jurisdictionOwner === txParams.from
+      ownerMatches
+        ? log.info (' ✔ Jurisdiction owner matches requested owner')
+        : log.error(` ✘ Jurisdiction owner ${jurisdictionOwner} does not match requested owner, it was expected ${txParams.from}`)
+      return ownerMatches
+    }
+    else {
+      log.error(` ✘ BasicJurisdiction instance address ${jurisdictionAddress} is not valid`)
+      return false
+    }
+  } 
+  else {
+    log.error(' ✘ Missing instance of BasicJurisdiction')
+    return false
+  }
+}
+
+export async function verifyZEPToken(networkFile, txParams) {
+  log.base('\n--------------------------------------------------------------------\n\n')
+  log.base('Verifying ZEP Token...')
+
+  const zepTokenProxies = networkFile._proxiesOf('zos-vouching/ZEPToken')
+  if (zepTokenProxies.length > 0) {
+    const zepTokenAddress = zepTokenProxies[zepTokenProxies.length - 1].address
+    if (validateAddress(zepTokenAddress)) {
+      log.info (' ✔ ZEP Token address is valid')
+      const ZEPToken = Contracts.getFromLocal('ZEPToken')
+      const zepToken = ZEPToken.at(zepTokenAddress)
+      const name = await zepToken.name()
+      const owner = await zepToken.owner()
+      const symbol = await zepToken.symbol()
+      const decimals = await zepToken.decimals()
+      const totalSupply = await zepToken.totalSupply()
+      
+      const nameMatches = name === ZEPTOKEN_NAME
+      const ownerMatches = owner === txParams.from
+      const symbolMatches = symbol === ZEPTOKEN_SYMBOL
+      const decimalsMatches = decimals === ZEPTOKEN_DECIMALS
+      const totalSupplyMatches = totalSupply === ZEPTOKEN_SUPPLY
+      
+      ownerMatches
+        ? log.info (' ✔ ZEP Token owner matches requested value')
+        : log.error(` ✘ ZEP Token owner ${owner} does not match requested value, it was expected ${txParams.from}`)
+      
+      nameMatches
+        ? log.info (' ✔ ZEP Token name matches requested value')
+        : log.error(` ✘ ZEP Token name ${name} does not match expected value ${ZEPTOKEN_NAME}`)
+      
+      symbolMatches
+        ? log.info (' ✔ ZEP Token symbol matches requested value')
+        : log.error(` ✘ ZEP Token symbol ${symbol} does not match expected value ${ZEPTOKEN_SYMBOL}`)
+      
+      decimalsMatches
+        ? log.info (' ✔ ZEP Token decimals matches the requested value')
+        : log.error(` ✘ ZEP Token decimals ${decimals} does not match expected value ${ZEPTOKEN_DECIMALS}`)
+      
+      totalSupplyMatches
+        ? log.info (' ✔ ZEP Token total supply matches the requested value')
+        : log.error(` ✘ ZEP Token total supply ${totalSupplyMatches} does not match expected value ${ZEPTOKEN_SUPPLY}`)
+      
+      return ownerMatches && nameMatches && symbolMatches && decimalsMatches && totalSupplyMatches
+    }
+    else {
+      log.error(` ✘ ZEP Token instance address ${zepTokenAddress} is not valid`)
+      return false
+    }
+  }
+  else {
+    log.error(' ✘ Missing instance of ZEP Token')
+    return false
+  }
+}
+
+export async function verifyVouching(networkFile, txParams) {
+  log.base('\n--------------------------------------------------------------------\n\n')
+  log.base('Verifying Vouching contract...')
+
+  const zepTokenProxies = networkFile._proxiesOf('zos-vouching/ZEPToken')
+  const zepTokenAddress = zepTokenProxies[zepTokenProxies.length - 1].address
+  const vouchingProxies = networkFile._proxiesOf('zos-vouching/Vouching')
+  if (vouchingProxies.length > 0) {
+    const vouchingAddress = vouchingProxies[vouchingProxies.length - 1].address
+    if (validateAddress(vouchingAddress)) {
+      log.info (' ✔ Vouching address is valid')
+      const Vouching = Contracts.getFromLocal('Vouching')
+      const vouching = Vouching.at(vouchingAddress)
+      const token = await vouching.token()
+      const minimumStake = await vouching.minimumStake()
+      
+      const tokenMatches = token === zepTokenAddress
+      const minimumStakeMatches = minimumStake === VOUCHING_MIN_STAKE
+
+      tokenMatches
+        ? log.info (' ✔ Vouching token matches ZEP Token deployed instance')
+        : log.error(` ✘ Vouching token ${token} does not match ZEP Token deployed instance ${zepTokenAddress}`)
+
+      minimumStakeMatches
+        ? log.info (' ✔ Vouching minimum stake matches requested value')
+        : log.error(` ✘ Vouching minimum stake ${minimumStake} does not match requested value, it was expected ${VOUCHING_MIN_STAKE}`)
+
+      return tokenMatches && minimumStakeMatches
+    }
+    else {
+      log.error(` ✘ Vouching address ${vouchingAddress} is not valid`)
+      return false
+    }
+  }
+  else {
+    log.error(' ✘ Missing instance of Vouching')
+    return false
+  }
+}
+
+export async function verifyZEPValidator(networkFile, txParams) {
+  log.base('\n--------------------------------------------------------------------\n\n')
+  log.base('Verifying ZEP validator...')
+
+  const jurisdictionProxies = networkFile._proxiesOf('tpl-contracts-zos/BasicJurisdiction')
+  const jurisdictionAddress = jurisdictionProxies[jurisdictionProxies.length - 1].address
+  const validatorProxies = networkFile._proxiesOf('zos-vouching/ZEPValidator')
+  if (validatorProxies.length > 0) {
+    const validatorAddress = validatorProxies[validatorProxies.length - 1].address
+    if (validateAddress(validatorAddress)) {
+      log.info (' ✔ ZEP validator address is valid')
+      const ZEPValidator = Contracts.getFromLocal('ZEPValidator')
+      const validator = ZEPValidator.at(validatorAddress)
+      const owner = await validator.owner()
+      const jurisdiction = await validator.getJurisdictionAddress()
+
+      const ownerMatches = owner === txParams.from
+      const jurisdictionMatches = jurisdiction === jurisdictionAddress
+
+      ownerMatches
+        ? log.info (' ✔ ZEP validator owner matches requested value')
+        : log.error(` ✘ ZEP validator owner ${owner} does not match requested value, it was expected ${txParams.from}`)
+
+      jurisdictionMatches
+        ? log.info (' ✔ ZEP validator jurisdiction matches BasicJurisdiction deployed instance')
+        : log.error(` ✘ ZEP validator jurisdiction ${jurisdiction} does not match BasicJurisdiction deployed instance ${jurisdictionAddress}`)
+
+      return ownerMatches && jurisdictionMatches
+    }
+    else {
+      log.error(` ✘ ZEP validator address ${validatorAddress} is not valid`)
+      return false
+    }
+  }
+  else {
+    log.error(' ✘ Missing instance of ZEPValidator')
+    return false
+  }
+}
+
+export async function verifyTPLConfiguration(networkFile, txParams) {
+  log.base('\n--------------------------------------------------------------------\n\n')
+  log.base('Verifying TPL configuration...')
+
+  const BasicJurisdiction = Contracts.getFromLocal('BasicJurisdiction')
+  const jurisdictionProxies = networkFile._proxiesOf('tpl-contracts-zos/BasicJurisdiction')
+  const jurisdictionAddress = jurisdictionProxies[jurisdictionProxies.length - 1].address
+  const jurisdiction = BasicJurisdiction.at(jurisdictionAddress)
+
+  const ZEPValdiator = Contracts.getFromLocal('ZEPValidator')
+  const validatorProxies = networkFile._proxiesOf('zos-vouching/ZEPValidator')
+  const validatorAddress = validatorProxies[validatorProxies.length - 1].address
+  const validator = ZEPValdiator.at(validatorAddress)
+
+  const [description] = await jurisdiction.getAttributeInformation(ZEPTOKEN_ATTRIBUTE_ID)
+  const [exists, _, name] = await validator.getOrganization(txParams.from)
+
+  const descriptionMatches = description !== ZEPTOKEN_ATTRIBUTE_DESCRIPTION
+  const isValidator = await jurisdiction.isValidator(validatorAddress)
+  const canValidate = await jurisdiction.isApproved(validatorAddress, ZEPTOKEN_ATTRIBUTE_ID)
+  const organizationMatches = exists && name === ZEPPELIN_ORG_NAME
+
+  descriptionMatches
+    ? log.info (` ✔ Jurisdiction attribute description matches requested value`)
+    : log.error(` ✘ Jurisdiction attribute description ${description} does not match requested value, it was expected ${ZEPTOKEN_ATTRIBUTE_DESCRIPTION}`)
+
+  isValidator
+    ? log.info (' ✔ ZEP Validator is correctly set as a validator on the jurisdiction')
+    : log.error(` ✘ ZEP Validator ${validatorAddress} is not set as a validator on the jurisdiction ${jurisdictionAddress}`)
+
+  canValidate
+    ? log.info (' ✔ ZEP Validator is cleared for approval of ZEP Token attribute ID on the jurisdiction')
+    : log.error(` ✘ ZEP Validator ${validatorAddress} is not cleared for approval of ZEP Token attribute ID ${ZEPTOKEN_ATTRIBUTE_ID} on the jurisdiction ${jurisdictionAddress}`)
+
+  organizationMatches
+    ? log.info (' ✔ Zeppelin organization was properly set in the ZEP validator')
+    : log.error(` ✘ Zeppelin organization "${ZEPPELIN_ORG_NAME}" is not set in the ZEP Validator`)
+
+  return descriptionMatches && isValidator && canValidate && organizationMatches
 }
