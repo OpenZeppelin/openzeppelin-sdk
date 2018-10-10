@@ -5,10 +5,13 @@ import { DeployError } from '../utils/errors/DeployError';
 import _ from 'lodash';
 import { semanticVersionToString } from "../utils/Semver";
 
+const DEFAULT_NAME = 'main';
+const DEFAULT_VERSION = '0.1.0';
+
 export default class AppProject extends BasePackageProject {
 
   // REFACTOR: Evaluate merging this logic with CLI's ProjectDeployer classes
-  static async fetchOrDeploy(name = 'main', version = '0.1.0', txParams = {}, { appAddress = undefined, packageAddress = undefined } = {}) {
+  static async fetchOrDeploy(name = DEFAULT_NAME, version = DEFAULT_VERSION, txParams = {}, { appAddress = undefined, packageAddress = undefined } = {}) {
     let thepackage, directory, app
     version = semanticVersionToString(version)
     
@@ -36,7 +39,23 @@ export default class AppProject extends BasePackageProject {
     }
   }
 
-  constructor(app, name = 'main', version = '0.1.0', txParams = {}) {
+  // REFACTOR: This code is similar to the SimpleProjectDeployer, consider unifying them
+  static async fromSimpleProject(simpleProject, version = DEFAULT_VERSION, existingAddresses = {}) {
+    const appProject = await this.fetchOrDeploy(simpleProject.name, version, simpleProject.txParams, existingAddresses);
+    
+    await Promise.all(
+      _.concat(
+        _.map(simpleProject.implementations, (contractInfo, contractAlias) => (
+          appProject.registerImplementation(contractAlias, contractInfo)
+        )),
+        _.map(simpleProject.dependencies, (dependencyInfo, dependencyName) => (
+          appProject.setDependency(dependencyName, dependencyInfo.package, dependencyInfo.version)
+        ))
+      ));
+    return appProject;
+  }
+
+  constructor(app, name = DEFAULT_NAME, version = DEFAULT_VERSION, txParams = {}) {
     super(txParams)
     this.app = app
     this.name = name

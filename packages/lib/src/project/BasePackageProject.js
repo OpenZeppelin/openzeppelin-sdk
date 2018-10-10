@@ -43,6 +43,12 @@ export default class BasePackageProject {
     await directory.unsetImplementation(contractName)
   }
 
+  async registerImplementation(contractName, { address }) {
+    log.info(`Registering implementation of ${contractName} at ${address} in directory...`)
+    const directory = await this.getCurrentDirectory()
+    await directory.setImplementation(contractName, address)
+  }
+
   async getCurrentDirectory() {
     throw Error("Unimplemented")
   }
