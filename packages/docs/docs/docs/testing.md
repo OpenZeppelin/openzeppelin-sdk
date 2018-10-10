@@ -6,13 +6,13 @@ sidebar_label: Testing
 
 When working with ZeppelinOS, you can test your contracts as you usually do, or you can have ZeppelinOS automatically set up your entire application in your testing environment. This allows you to replicate the same set of contracts that manage your application for each test you run.
 
-The `zos` package provides a `TestApp()` function to retrieve your application structure from the `zos.json` file and deploy everything to the current test network. All contracts you have registered via `zos add`, plus all the contracts provided by the stdlib you have linked, will be available. The returned [`App`](https://github.com/zeppelinos/zos-lib/blob/master/src/app/App.js) object provides convenient methods for creating upgradeable instances of your contracts, which you can use for testing.
+The `zos` package provides a `TestApp()` function to retrieve your application structure from the `zos.json` file and deploy everything to the current test network. All contracts you have registered via `zos add`, plus all the contracts provided by the EVM package you have linked, will be available. The returned [`App`](https://github.com/zeppelinos/zos-lib/blob/master/src/app/App.js) object provides convenient methods for creating upgradeable instances of your contracts, which you can use for testing.
 
 > **Important:** for `TestApp` to work correctly in your testing environment, you need to set the `NODE_ENV` environment variable to `test` when running your tests. For instance, if you are using truffle, run `NODE_ENV=test truffle test`.
 
 ## Example
 
-Given a small application, with a `Sample` contract, linked to a stdlib that provides a `StandardToken` implementation:
+Given a small application, with a `Sample` contract, linked to an EVM package that provides a `StandardToken` implementation:
 
 ```json
 {
@@ -70,7 +70,7 @@ contract('Sample', function ([_, owner]) {
     result.should.eq('A sample')
   })
 
-  it('should create a proxy for the stdlib', async function () {
+  it('should create a proxy for the EVM package', async function () {
     const proxy = await this.app.createProxy(StandardToken);
     const result = await proxy.totalSupply();
     result.toNumber().should.eq(0);
