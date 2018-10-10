@@ -38,8 +38,8 @@ function logCmd(cmd) {
   console.log("    $", cmd)
 }
 
-function execInWorkdir(cmd) {
-  const output = spawnSync(cmd, { cwd: path.resolve(__dirname, '../workdir'), shell: true });
+function execInWorkdir(cmd, wd = "") {
+  const output = spawnSync(cmd, { cwd: path.resolve(__dirname, '../workdir', wd), shell: true });
   if (output.status != 0 || output.error) {
     logOutput(output.stdout, output.stderr)
     throw new Error(`Error running ${cmd} (err ${output.status}) ${output.error}`);
@@ -56,9 +56,9 @@ function truffleExec(truffleCmd) {
   return _.trim(outputWithoutUsingNetwork)
 }
 
-function run(cmd) {
+function run(cmd, cwd = "") {
   logCmd(cmd)
-  const [out, err] = execInWorkdir(cmd)
+  const [out, err] = execInWorkdir(cmd, cwd)
   logOutput(out, err)
   return _.trim(out)
 }
