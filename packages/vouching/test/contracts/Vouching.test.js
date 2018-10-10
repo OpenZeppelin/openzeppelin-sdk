@@ -288,6 +288,15 @@ contract('Vouching', function ([_, tokenOwner, vouchingOwner, developer, transfe
           amount.should.be.bignumber.equal(0);
         });
 
+        it('reverts when a removed dependency\'s name is reutilized', async function () {
+          await this.vouching.remove(dependencyName, { from: developer });
+          await assertRevert(
+            this.vouching.create(
+              dependencyName, developer, anotherDependencyAddress, stakeAmount, { from: developer }
+            )
+          );
+        });
+
         it('emits a DependencyRemoved event', async function () {
           const result = await this.vouching.remove(dependencyName, { from: developer });
           assertEvent.inLogs(result.logs, 'DependencyRemoved', {
