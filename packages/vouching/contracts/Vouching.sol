@@ -23,13 +23,13 @@ contract Vouching is Initializable {
   using SafeERC20 for ERC20;
 
   struct Dependency {
-    bool used;
     address owner;
     address dependencyAddress;
     uint256 stake;
   }
 
   mapping (string => Dependency) private _registry;
+  mapping (string => bool) private _takenDependencyNames;
   uint256 private _minimumStake;
   ERC20 private _token;
 
@@ -64,9 +64,10 @@ contract Vouching is Initializable {
     require(initialStake >= _minimumStake, "Initial stake must be equal or greater than minimum stake");
     require(owner != address(0), "Owner address cannot be zero");
     require(dependencyAddress != address(0), "Dependency address cannot be zero");
-    require(!_registry[name].used, "Given dependency name is already registered");
+    require(!_takenDependencyNames[name], "Given dependency name is already registered");
 
-    _registry[name] = Dependency(true, owner, dependencyAddress, initialStake);
+    _takenDependencyNames[name] = true;
+    _registry[name] = Dependency(owner, dependencyAddress, initialStake);
 
     _token.safeTransferFrom(owner, this, initialStake);
 
@@ -99,11 +100,9 @@ contract Vouching is Initializable {
     // Owner surrenders _minimumStake to the system
     uint256 reimbursedAmount = _registry[name].stake.sub(_minimumStake);
 
-    // The 'used' field is not deleted, to mark this name as taken and
-    // prevent future dependencies from being created reusing it
-    delete _registry[name].owner;
-    delete _registry[name].dependencyAddress;
-    delete _registry[name].stake;
+    // The entry is not removed from _takenDependencyNames, to prevent a new dependecy
+    // from reusing the same name
+    delete _registry[name];
 
     _token.safeTransfer(msg.sender, reimbursedAmount);
     emit DependencyRemoved(keccak256(abi.encodePacked(name)));
