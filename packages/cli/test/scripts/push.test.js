@@ -12,6 +12,7 @@ import bumpVersion from '../../src/scripts/bump';
 import ZosPackageFile from '../../src/models/files/ZosPackageFile';
 import remove from '../../src/scripts/remove';
 import Dependency from '../../src/models/dependency/Dependency';
+import CaptureLogs from '../helpers/captureLogs'
 
 const should = require('chai').should();
 
@@ -22,6 +23,14 @@ contract('push script', function([_, owner]) {
   const network = 'test';
   const txParams = { from: owner }
   const defaultVersion = '1.1.0';
+
+  beforeEach('init capture logs', function() {
+    this.logs = new CaptureLogs()
+  })
+
+  afterEach(function() {
+    this.logs.restore()
+  })
 
   const shouldDeployPackage = function () {
     it('should create a network file with version info', async function() {
@@ -117,7 +126,10 @@ contract('push script', function([_, owner]) {
     it('should refuse to redeploy a contract if storage is incompatible', async function () {
       modifyBytecode.call(this, 'Impl');
       modifyStorageInfo.call(this, 'Impl');
-      await push({ networkFile: this.networkFile, network, txParams }).should.be.rejectedWith(/review the warnings/)
+      await push({ networkFile: this.networkFile, network, txParams })
+      this.logs.errors.should.have.lengthOf(2)
+      this.logs.errors[0].should.match(/was removed from contract ImplV1/)
+      this.logs.errors[1].should.match(/review the warnings/)
       this.networkFile.contract('Impl').address.should.eq(this.previousAddress);
     });
 
@@ -249,7 +261,9 @@ contract('push script', function([_, owner]) {
       const packageFile = new ZosPackageFile('test/mocks/packages/package-with-invalid-contracts.zos.json')
       this.networkFile = packageFile.networkFile(network)
 
-      await push({ networkFile: this.networkFile, network, txParams }).should.be.rejectedWith(/WithFailingConstructor deployment failed/);
+      await push({ networkFile: this.networkFile, network, txParams })
+      this.logs.errors.should.have.lengthOf(1)
+      this.logs.errors[0].should.match(/WithFailingConstructor deployment failed/)
     });
 
     shouldDeployApp();
@@ -306,7 +320,8 @@ contract('push script', function([_, owner]) {
 
       it('should fail to push', async function () {
         await push({ network, txParams, networkFile: this.networkFile })
-          .should.be.rejectedWith(/Required dependency version 1.0.0 does not match dependency package version 2.0.0/)
+        this.logs.errors.should.have.lengthOf(1)
+        this.logs.errors[0].should.match(/Required dependency version 1.0.0 does not match dependency package version 2.0.0/)
       });
     })
 
@@ -318,7 +333,8 @@ contract('push script', function([_, owner]) {
 
       it('should fail to push', async function () {
         await push({ network, txParams, networkFile: this.networkFile })
-          .should.be.rejectedWith(/Could not find a zos file for network 'test' for 'mock-stdlib-undeployed'/)
+        this.logs.errors.should.have.lengthOf(1)
+        this.logs.errors[0].should.match(/Could not find a zos file for network 'test' for 'mock-stdlib-undeployed'/)
       });
     })
   });
@@ -356,7 +372,9 @@ contract('push script', function([_, owner]) {
 
     it('should refuse to push when frozen', async function() {
       await freeze({ network, txParams, networkFile: this.networkFile })
-      await push({ network, txParams, networkFile: this.networkFile }).should.be.rejectedWith(/frozen/i)
+      await push({ network, txParams, networkFile: this.networkFile })
+      this.logs.errors.should.have.lengthOf(1)
+      this.logs.errors[0].should.match(/frozen/i)
     });
   });
 
@@ -398,8 +416,9 @@ contract('push script', function([_, owner]) {
       const packageFile = new ZosPackageFile('test/mocks/packages/package-with-invalid-contracts.zos.json')
       packageFile.lightweight = true
       this.networkFile = packageFile.networkFile(network)
-
-      await push({ networkFile: this.networkFile, network, txParams }).should.be.rejectedWith(/WithFailingConstructor deployment failed/);
+      await push({ networkFile: this.networkFile, network, txParams })
+      this.logs.errors.should.have.lengthOf(1)
+      this.logs.errors[0].should.match(/WithFailingConstructor deployment failed/);
     });
 
     shouldDeployContracts();

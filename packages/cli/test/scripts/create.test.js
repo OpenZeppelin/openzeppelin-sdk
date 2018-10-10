@@ -81,25 +81,6 @@ contract('create script', function([_, owner]) {
       networks.filter(network => network.address === proxyAddress).should.be.have.lengthOf(1)
     });
 
-    it('should refuse to create a proxy for an undefined contract', async function() {
-      await createProxy({ contractAlias: 'NotExists', network, txParams, networkFile: this.networkFile })
-        .should.be.rejectedWith(/Contract NotExists not found/);
-    });
-
-    it('should refuse to create a proxy for a lib project', async function() {
-      this.packageFile.lib = true
-      await createProxy({ contractAlias, network, txParams, networkFile: this.networkFile })
-        .should.be.rejectedWith('Cannot create a proxy for a library project');
-    });
-
-    it('should refuse to create a proxy for an undeployed contract', async function() {
-      const customContractsData = [{ name: contractName, alias: 'NotDeployed' }]
-      await add({ contractsData: customContractsData, packageFile: this.packageFile });
-
-      await createProxy({ contractAlias: 'NotDeployed', network, txParams, networkFile: this.networkFile })
-        .should.be.rejectedWith('Contract NotDeployed is not deployed to test.');
-    });
-
     it('should be able to have multiple proxies for one of its contracts', async function() {
       await createProxy({ contractAlias, network, txParams, networkFile: this.networkFile });
       await createProxy({ contractAlias, network, txParams, networkFile: this.networkFile });
@@ -116,7 +97,7 @@ contract('create script', function([_, owner]) {
       await assertProxy(this.networkFile, anotherContractAlias, { version, say: 'AnotherV1' });
     });
 
-    describe('warnings', function () {
+    describe('warnings and errors', function () {
       beforeEach('capturing log output', function () {
         this.logs = new CaptureLogs();
       });
@@ -150,6 +131,28 @@ contract('create script', function([_, owner]) {
 
         this.logs.errors.should.have.lengthOf(0);
       });
+
+      it('should refuse to create a proxy for an undefined contract', async function() {
+        await createProxy({ contractAlias: 'NotExists', network, txParams, networkFile: this.networkFile })
+        this.logs.errors.should.have.lengthOf(1)
+        this.logs.errors[0].should.match(/Contract NotExists not found/)
+      });
+
+      it('should refuse to create a proxy for a lib project', async function() {
+        this.packageFile.lib = true
+        await createProxy({ contractAlias, network, txParams, networkFile: this.networkFile })
+          .should.be.rejectedWith('Cannot create a proxy for a library project')
+      });
+
+      it('should refuse to create a proxy for an undeployed contract', async function() {
+        const customContractsData = [{ name: contractName, alias: 'NotDeployed' }]
+        await add({ contractsData: customContractsData, packageFile: this.packageFile });
+
+        await createProxy({ contractAlias: 'NotDeployed', network, txParams, networkFile: this.networkFile })
+        this.logs.errors.should.have.lengthOf(1)
+        this.logs.errors[0].should.eq('Contract NotDeployed is not deployed to test.')
+      });
+
     });
 
     describe('with dependency', function () {
@@ -158,46 +161,84 @@ contract('create script', function([_, owner]) {
         await push({ network, txParams, deployLibs: true, networkFile: this.networkFile });
       });
 
-      it('should fail to create a proxy from a dependency without specifying package name', async function () {
-        await createProxy({ contractAlias: 'Greeter', network, txParams, networkFile: this.networkFile })
-          .should.be.rejectedWith(/not found/)
-      });
-
       it('should create a proxy from a dependency', async function () {
         await createProxy({ packageName: 'mock-stdlib-undeployed', contractAlias: 'Greeter', network, txParams, networkFile: this.networkFile });
         await assertProxy(this.networkFile, 'Greeter', { version, packageName: 'mock-stdlib-undeployed' });
       });
+
+      describe('errors', function() {
+        beforeEach('capturing log output', function() {
+          this.logs = new CaptureLogs()
+        })
+
+        afterEach(function() {
+          this.logs.restore()
+        })
+
+        it('should fail to create a proxy from a dependency without specifying package name', async function () {
+          await createProxy({ contractAlias: 'Greeter', network, txParams, networkFile: this.networkFile })
+          this.logs.errors.should.have.lengthOf(1)
+          this.logs.errors[0].should.match(/not found/)
+        });
+      })
     });
 
     describe('with unlinked dependency', function () {
       beforeEach('setting dependency', async function () {
+        this.logs = new CaptureLogs()
         await linkLibs({ libs: ['mock-stdlib@1.1.0'], packageFile: this.packageFile });
       });
 
+      afterEach(function() {
+        this.logs.restore()
+      })
+
       it('should refuse create a proxy for unlinked dependency', async function () {
         await createProxy({ packageName: 'mock-stdlib', contractAlias: 'Greeter', network, txParams, networkFile: this.networkFile })
-          .should.be.rejectedWith(/Dependency mock-stdlib has not been linked yet/)
+        this.logs.errors.should.have.lengthOf(1)
+        this.logs.errors[0].should.match(/Dependency mock-stdlib has not been linked yet/)
       });
     });
 
-    it('should refuse to create a proxy for an undefined contract', async function() {
-      await createProxy({ contractAlias: 'NotExists', network, txParams, networkFile: this.networkFile })
-        .should.be.rejectedWith(/Contract NotExists not found/);
-    });
+    describe('errors', function() {
+      beforeEach('capturing log output', function () {
+        this.logs = new CaptureLogs()
+      });
 
-    it('should refuse to create a proxy for an undefined dependency', async function() {
-      await createProxy({ packageName: 'NotExists', contractAlias, network, txParams, networkFile: this.networkFile })
-        .should.be.rejectedWith(/Dependency NotExists not found/);
-    });
+      afterEach(function() {
+        this.logs.restore()
+      })
+
+      it('should refuse to create a proxy for an undefined contract', async function() {
+        await createProxy({ contractAlias: 'NotExists', network, txParams, networkFile: this.networkFile })
+
+        this.logs.errors.should.have.lengthOf(1)
+        this.logs.errors.should.match(/Contract NotExists not found/);
+      });
+
+      it('should refuse to create a proxy for an undefined dependency', async function() {
+        await createProxy({ packageName: 'NotExists', contractAlias, network, txParams, networkFile: this.networkFile })
+
+        this.logs.errors.should.have.lengthOf(1)
+        this.logs.errors.should.match(/Dependency NotExists not found/);
+      });
+    })
 
     describe('with local modifications', function () {
-      beforeEach('changing local network file to have a different bytecode', async function () {
+      beforeEach('changing local network file to have a different bytecode', function () {
+        this.logs = new CaptureLogs()
         this.networkFile.contract(contractAlias).bytecodeHash = '0xabcd'
       });
 
+      afterEach(function() {
+        this.logs.restore()
+      })
+
       it('should refuse to create a proxy for a modified contract', async function () {
         await createProxy({ contractAlias,network, txParams, networkFile: this.networkFile })
-          .should.be.rejectedWith('Contract Impl has changed locally since the last deploy, consider running \'zos push\'.');
+
+        this.logs.errors.should.have.lengthOf(1)
+        this.logs.errors[0].should.eq('Contract Impl has changed locally since the last deploy, consider running \'zos push\'.');
       });
 
       it('should create a proxy for an unmodified contract', async function () {
@@ -215,7 +256,7 @@ contract('create script', function([_, owner]) {
   }
   
   describe('on lightweight app', function () {
-    beforeEach('setup', async function() {
+    beforeEach('setup', function() {
       this.packageFile = new ZosPackageFile('test/mocks/packages/package-empty.zos.json')
       this.packageFile.lightweight = true
     });
@@ -224,7 +265,7 @@ contract('create script', function([_, owner]) {
   })
 
   describe('on full app', function () {
-    beforeEach('setup', async function() {
+    beforeEach('setup', function() {
       this.packageFile = new ZosPackageFile('test/mocks/packages/package-empty.zos.json')
     });
 
