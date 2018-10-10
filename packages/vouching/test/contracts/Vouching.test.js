@@ -304,7 +304,7 @@ contract('Vouching', function ([_, tokenOwner, vouchingOwner, developer, transfe
           await this.vouching.remove(dependencyName, { from: developer });
           await assertRevert(
             this.vouching.create(
-              dependencyName, developer, anotherDependencyAddress, stakeAmount, { from: developer }
+              dependencyName, developer, this.anotherDependencyAddress, stakeAmount, { from: developer }
             )
           );
         });
