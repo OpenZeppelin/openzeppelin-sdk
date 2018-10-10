@@ -29,6 +29,7 @@ contract Vouching is Initializable {
   }
 
   mapping (string => Dependency) private _registry;
+  mapping (string => bool) private _takenDependencyNames;
   uint256 private _minimumStake;
   ERC20 private _token;
 
@@ -63,8 +64,9 @@ contract Vouching is Initializable {
     require(initialStake >= _minimumStake, "Initial stake must be equal or greater than minimum stake");
     require(owner != address(0), "Owner address cannot be zero");
     require(dependencyAddress != address(0), "Dependency address cannot be zero");
-    require(_registry[name].dependencyAddress == address(0), "Given dependency name is already registered");
+    require(!_takenDependencyNames[name], "Given dependency name is already registered");
 
+    _takenDependencyNames[name] = true;
     _registry[name] = Dependency(owner, dependencyAddress, initialStake);
 
     _token.safeTransferFrom(owner, this, initialStake);
@@ -97,7 +99,11 @@ contract Vouching is Initializable {
   function remove(string name) external onlyDependencyOwner(name) {
     // Owner surrenders _minimumStake to the system
     uint256 reimbursedAmount = _registry[name].stake.sub(_minimumStake);
+
+    // The entry is not removed from _takenDependencyNames, to prevent a new dependecy
+    // from reusing the same name
     delete _registry[name];
+
     _token.safeTransfer(msg.sender, reimbursedAmount);
     emit DependencyRemoved(keccak256(abi.encodePacked(name)));
   }
