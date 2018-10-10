@@ -1,5 +1,6 @@
 {
   "zosversion": "2",
+  "full": true,
   "name": "zos-vouching",
   "version": "0.0.1",
   "contracts": {

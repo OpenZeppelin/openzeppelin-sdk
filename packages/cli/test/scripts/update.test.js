@@ -278,7 +278,7 @@ contract('update script', function([_skipped, owner, anotherAccount]) {
   describe('on application contract in lightweight mode', function () {
     beforeEach('setup package', async function() {
       this.packageFile = new ZosPackageFile('test/mocks/packages/package-empty.zos.json')
-      this.packageFile.lightweight = true
+      this.packageFile.full = false
     });
 
     shouldHandleUpdateScript();
@@ -295,7 +295,7 @@ contract('update script', function([_skipped, owner, anotherAccount]) {
   describe('on dependency contract in lightweight mode', function () {
     beforeEach('setup package', async function() {
       this.packageFile = new ZosPackageFile('test/mocks/packages/package-with-undeployed-stdlib.zos.json')
-      this.packageFile.lightweight = true
+      this.packageFile.full = false
     });
 
     shouldHandleUpdateOnDependency();

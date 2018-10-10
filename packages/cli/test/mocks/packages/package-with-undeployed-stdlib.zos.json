@@ -1,6 +1,7 @@
 {
   "name": "Herbs",
   "zosversion": "2",
+  "full": true,
   "version": "1.1.0",
   "dependencies": {
     "mock-stdlib-undeployed": "1.1.0"

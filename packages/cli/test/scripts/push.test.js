@@ -429,7 +429,7 @@ contract('push script', function([_, owner]) {
   describe('a lightweight app with contracts', function() {
     beforeEach('pushing package-with-contracts', async function () {
       const packageFile = new ZosPackageFile('test/mocks/packages/package-with-contracts.zos.json')
-      packageFile.lightweight = true
+      packageFile.full = false
       this.networkFile = packageFile.networkFile(network)
 
       await push({ network, txParams, networkFile: this.networkFile })
@@ -452,7 +452,7 @@ contract('push script', function([_, owner]) {
   describe('a lightweight app with invalid contracts', function() {
     beforeEach('pushing package-with-invalid-contracts', async function () {
       const packageFile = new ZosPackageFile('test/mocks/packages/package-with-invalid-contracts.zos.json')
-      packageFile.lightweight = true
+      packageFile.full = false
       this.networkFile = packageFile.networkFile(network)
 
       await push({ networkFile: this.networkFile, network, txParams }).should.be.rejectedWith(/WithFailingConstructor deployment failed/);
