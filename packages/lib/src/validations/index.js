@@ -1,16 +1,19 @@
 import _ from 'lodash';
 
+import Logger from '../utils/Logger'
 import { hasConstructor } from "./Constructors";
 import { hasSelfDestruct, hasDelegateCall } from "./Instructions";
 import { getUninitializedBaseContracts } from "./Initializers";
 import { getStorageLayout, getStructsOrEnums } from './Storage';
 import { compareStorageLayouts } from './Layout';
 
+const log = new Logger('validate')
+
 // TODO: Add unit tests for this module. It is tested only from the CLI.
 
 export function validate(contractClass, existingContractInfo = {}, buildArtifacts = null) {
   const storageValidation = validateStorage(contractClass, existingContractInfo, buildArtifacts);
-  const uninitializedBaseContracts = _(getUninitializedBaseContracts(contractClass)).values().flatten().uniq().value();
+  const uninitializedBaseContracts = tryGetUninitializedBaseContracts(contractClass);
 
   return {
     hasConstructor: hasConstructor(contractClass),
@@ -68,5 +71,14 @@ function validateStorage(contractClass, existingContractInfo = {}, buildArtifact
   return {
     storageUncheckedVars,
     storageDiff
+  }
+}
+
+function tryGetUninitializedBaseContracts(contractClass) {
+  try {
+    return _(getUninitializedBaseContracts(contractClass)).values().flatten().uniq().value()
+  } catch (error) {
+    log.error(`Skipping uninitialized base contracts validation due to error: ${error.message}`)
+    return []
   }
 }
