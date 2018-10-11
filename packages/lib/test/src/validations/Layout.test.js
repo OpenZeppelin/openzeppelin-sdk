@@ -86,4 +86,13 @@ contract('Layout', () => {
     ])
   });
 
+  it('reports replaced var', function () {
+    const result = compare('StorageMockSimpleOriginal', 'StorageMockSimpleWithReplacedVar');
+    assertChanges(result, [
+      { action: 'replace',
+        original: { label: 'b', type: 't_uint256' },
+        updated:  { label: 'c', type: 't_string' }  }
+    ]);
+  });
+
 })

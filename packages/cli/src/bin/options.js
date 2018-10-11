@@ -16,6 +16,7 @@ program.Command.prototype.withNetworkOptions = function () {
 program.Command.prototype.withPushOptions = function () {
   return this
     .option('--push [network]', 'push all changes to the specified network')
+    .option('--skip-compile', 'skips contract compilation')
     .option('-f, --from <from>', 'specify the transaction sender address for --push')
     .withNetworkTimeoutOption()
 };
