@@ -7,7 +7,9 @@ import "openzeppelin-zos/contracts/token/ERC20/ERC20Pausable.sol";
 
 /**
  * @title ZepToken
- * @dev ZEP token contract including mintable, pausable and burnable functionalities
+ * @dev ZEP token contract, a detailed ERC20 including pausable functionality.
+ * The TPLToken integration causes tokens to only be transferrable to addresses
+ * which have the validRecipient attribute in the jurisdiction.
  */
 contract ZEPToken is Initializable, TPLToken, ERC20Detailed, ERC20Pausable {
 
@@ -15,7 +17,7 @@ contract ZEPToken is Initializable, TPLToken, ERC20Detailed, ERC20Pausable {
     address _sender,
     AttributeRegistry _jurisdictionAddress,
     uint256 _validRecipientAttributeId
-  ) 
+  )
     initializer
     public
   {
