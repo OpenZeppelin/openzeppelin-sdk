@@ -9,7 +9,7 @@ require('chai')
   .use(require('chai-bignumber')(BigNumber))
   .should();
 
-contract('ZEPToken', ([ _, tokenOwner, another, jurisdictionOwner, validatorOwner, zeppelin ]) => {
+contract('ZEPToken', ([ _, tokenOwner, another, jurisdictionOwner, validatorOwner, zeppelin, sender, recipient ]) => {
   const receiveTokensAttributeID = 999
   const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000'
 
@@ -55,8 +55,6 @@ contract('ZEPToken', ([ _, tokenOwner, another, jurisdictionOwner, validatorOwne
 
   describe('TPL', function () {
     const amount = '5e18'
-    const sender = tokenOwner
-    const recipient = another
 
     beforeEach('initialize and approve validator', async function () {
       this.validator = await ZEPValidator.new()
@@ -67,6 +65,78 @@ contract('ZEPToken', ([ _, tokenOwner, another, jurisdictionOwner, validatorOwne
       await this.jurisdiction.addAttributeType(receiveTokensAttributeID, false, false, ZERO_ADDRESS, 0, 0, 0, "can transfer", { from: jurisdictionOwner })
       await this.jurisdiction.addValidatorApproval(this.validator.address, receiveTokensAttributeID, { from: jurisdictionOwner })
       await this.validator.addOrganization(zeppelin, 100, "ZEP Org", { from: validatorOwner })
+    })
+
+    describe('when the sender is allowed to receive tokens', function () {
+      beforeEach(async function () {
+        await this.validator.issueAttribute(sender, { from: zeppelin })
+      })
+
+      describe('when the sender has tokens', function () {
+        beforeEach(async function () {
+          await this.zepToken.transfer(sender, amount, { from: tokenOwner })
+        })
+
+        describe('when the recipient is not allowed to receive tokens', function () {
+          assertTokensCannotBeTransferred()
+        })
+
+        describe('when the recipient is allowed to receive tokens', function () {
+          beforeEach(async function () {
+            await this.validator.issueAttribute(recipient, { from: zeppelin })
+          })
+
+          assertTokensCanBeTransferred()
+
+          describe('when the recipient\'s permission to receive tokens is revoked', function () {
+            beforeEach(async function () {
+              // TODO: this should be allowed to be done through the validator
+              await this.jurisdiction.removeAttributeFrom(recipient, receiveTokensAttributeID, { from: jurisdictionOwner })
+            })
+
+            assertTokensCannotBeTransferred()
+          })
+
+          describe('when the validator approval is removed', function () {
+            beforeEach(async function () {
+              await this.jurisdiction.removeValidatorApproval(this.validator.address, receiveTokensAttributeID, { from: jurisdictionOwner })
+            })
+
+            assertTokensCannotBeTransferred()
+          })
+        })
+
+        describe('when the sender\'s permission to receive tokens is revoked', function () {
+          describe('when the recipient is not allowed to receive tokens', function () {
+            assertTokensCannotBeTransferred()
+          })
+
+          describe('when the recipient is allowed to receive tokens', function () {
+            beforeEach(async function () {
+              await this.validator.issueAttribute(recipient, { from: zeppelin })
+            })
+
+            assertTokensCanBeTransferred()
+
+            describe('when the recipient\'s permission to receive tokens is revoked', function () {
+              beforeEach(async function () {
+                // TODO: this should be allowed to be done through the validator
+                await this.jurisdiction.removeAttributeFrom(recipient, receiveTokensAttributeID, { from: jurisdictionOwner })
+              })
+
+              assertTokensCannotBeTransferred()
+            })
+
+            describe('when the validator approval is removed', function () {
+              beforeEach(async function () {
+                await this.jurisdiction.removeValidatorApproval(this.validator.address, receiveTokensAttributeID, { from: jurisdictionOwner })
+              })
+
+              assertTokensCannotBeTransferred()
+            })
+          })
+        })
+      })
     })
 
     function assertTokensCannotBeTransferred() {
@@ -100,68 +170,5 @@ contract('ZEPToken', ([ _, tokenOwner, another, jurisdictionOwner, validatorOwne
         assert((await this.zepToken.balanceOf(recipient)).eq(amount))
       })
     }
-
-    describe('when no one was not allowed to receive tokens', function () {
-      assertTokensCannotBeTransferred()
-    })
-
-    describe('when the sender was allowed to receive tokens', function () {
-      beforeEach('allow sender to transfer', async function () {
-        await this.validator.issueAttribute(sender, { from: zeppelin })
-      })
-
-      assertTokensCannotBeTransferred()
-    })
-
-    describe('when the recipient was allowed to receive tokens', function () {
-      beforeEach('allow recipiennt to transfer', async function () {
-        await this.validator.issueAttribute(recipient, { from: zeppelin })
-      })
-
-      assertTokensCanBeTransferred()
-
-      describe('when the recipient attribute was revoked', function () {
-        beforeEach('revoke recipient attribute', async function () {
-          // TODO: this should be allowed to be done through the validator
-          await this.jurisdiction.removeAttributeFrom(recipient, receiveTokensAttributeID, { from: jurisdictionOwner })
-        })
-
-        assertTokensCannotBeTransferred()
-      })
-
-      describe('when the validator approval is removed', function () {
-        beforeEach('remove validator approval', async function () {
-          await this.jurisdiction.removeValidatorApproval(this.validator.address, receiveTokensAttributeID, { from: jurisdictionOwner })
-        })
-
-        assertTokensCannotBeTransferred()
-      })
-    })
-
-    describe('when the sender and recipient were allowed to receive tokens', function () {
-      beforeEach('allow sender and recipient to transfer', async function () {
-        await this.validator.issueAttribute(sender, { from: zeppelin })
-        await this.validator.issueAttribute(recipient, { from: zeppelin })
-      })
-
-      assertTokensCanBeTransferred()
-
-      describe('when the recipient attribute was revoked', function () {
-        beforeEach('revoke recipient attribute', async function () {
-          // TODO: this should be allowed to be done through the validator
-          await this.jurisdiction.removeAttributeFrom(recipient, receiveTokensAttributeID, { from: jurisdictionOwner })
-        })
-
-        assertTokensCannotBeTransferred()
-      })
-
-      describe('when the validator approval is removed', function () {
-        beforeEach('remove validator approval', async function () {
-          await this.jurisdiction.removeValidatorApproval(this.validator.address, receiveTokensAttributeID, { from: jurisdictionOwner })
-        })
-
-        assertTokensCannotBeTransferred()
-      })
-    })
   })
 });
