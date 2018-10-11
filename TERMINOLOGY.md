@@ -22,6 +22,6 @@
 * ZEP Token (ZEP for short): token of value used to back the quality of an
   EVM package.
   Avoid: token.
-* admin: account in control of an application or EVM package, that can
-  upgrade them and transfer to a different admin.
+* administrator (admin for short): account in control of an application or EVM
+  package, that can upgrade them and transfer to a different admin.
   Avoid: upgradeability admin, owner, developer.
