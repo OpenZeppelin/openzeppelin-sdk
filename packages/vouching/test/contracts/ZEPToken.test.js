@@ -27,7 +27,7 @@ contract('ZEPToken', ([ _, tokenOwner, another, jurisdictionOwner, validatorOwne
 
   it('has a name', async function () {
     const name = await this.zepToken.name({ from: another });
-    name.should.be.equal('ZeppelinOS Token');
+    name.should.be.equal('ZEP Token');
   });
 
   it('has a symbol', async function () {
