@@ -1,6 +1,6 @@
 pragma solidity ^0.4.24;
 
-import "zos-lib/contracts/Initializable.sol";
+import "../Initializable.sol";
 
 contract WithInitialize {
   uint public value;

@@ -1,9 +1,10 @@
 import _ from 'lodash';
-import { Contracts, Logger, flattenSourceCode, getStorageLayout, getBuildArtifacts, compareStorageLayouts, getStructsOrEnums } from 'zos-lib';
+import { Contracts, Logger, flattenSourceCode, getStorageLayout, getBuildArtifacts } from 'zos-lib';
+import { validate, newValidationErrors, validationPasses } from 'zos-lib';
 import StatusChecker from "../status/StatusChecker";
 import Verifier from '../Verifier'
 import { allPromisesOrError } from '../../utils/async';
-import { logUncheckedVars, logStorageLayoutDiffs } from '../../interface/Validations';
+import ValidationLogger from '../../interface/ValidationLogger';
 
 const log = new Logger('NetworkController');
 
@@ -67,15 +68,16 @@ export default class NetworkBaseController {
     const contracts = this._contractsListForPush(!reupload)
     const buildArtifacts = getBuildArtifacts();
 
+    // ValidateContracts also extends each contract class with validation errors and storage info
     if (!this.validateContracts(contracts, buildArtifacts) && !force) {
-      throw Error('Please review the warnings listed above and fix them, or run the command again with the --force option.')
+      throw Error('One or more contracts have validation errors. Please review the items listed above and fix them, or run this command again with the --force option.')
     }
 
     this._checkVersion()
     await this.fetchOrDeploy(this.packageVersion)
 
     await Promise.all([
-      this.uploadContracts(contracts, buildArtifacts), 
+      this.uploadContracts(contracts), 
       this.unsetContracts()
     ])
   }
@@ -96,7 +98,8 @@ export default class NetworkBaseController {
     const newVersion = this._newVersionRequired()
     return _(this.packageFile.contracts)
       .toPairs()
-      .filter(([contractAlias, _contractName]) => newVersion || !onlyChanged || this.hasContractChanged(contractAlias))
+      .map(([contractAlias, contractName]) => [contractAlias, Contracts.getFromLocal(contractName)])
+      .filter(([contractAlias, contractClass]) => newVersion || !onlyChanged || this.hasContractChanged(contractAlias, contractClass))
       .value()
   }
 
@@ -104,18 +107,21 @@ export default class NetworkBaseController {
     return this.project.newVersion(versionName);
   }
 
-  async uploadContracts(contracts, buildArtifacts) {
+  async uploadContracts(contracts) {
     await allPromisesOrError(
-      contracts.map(([contractAlias, contractName]) => this.uploadContract(contractAlias, contractName, buildArtifacts))
+      contracts.map(([contractAlias, contractClass]) => this.uploadContract(contractAlias, contractClass))
     )
   }
 
-  async uploadContract(contractAlias, contractName, buildArtifacts) {
+  async uploadContract(contractAlias, contractClass) {
     try {
-      const contractClass = Contracts.getFromLocal(contractName);
-      log.info(`Uploading ${contractName} contract as ${contractAlias}`);
+      log.info(`Uploading ${contractClass.contractName} contract as ${contractAlias}`);
       const contractInstance = await this.project.setImplementation(contractClass, contractAlias);
-      this.networkFile.addContract(contractAlias, contractInstance, getStorageLayout(contractClass, buildArtifacts))
+      this.networkFile.addContract(contractAlias, contractInstance, {
+        warnings: contractClass.warnings,
+        types: contractClass.storageInfo.types,
+        storage: contractClass.storageInfo.storage
+      })
     } catch(error) {
       throw Error(`${contractAlias} deployment failed with error: ${error.message}`)
     }
@@ -138,22 +144,23 @@ export default class NetworkBaseController {
   }
 
   validateContracts(contracts, buildArtifacts) {
-    return _.every(contracts.map(([contractAlias, contractName]) => this.validateContract(contractAlias, contractName, buildArtifacts)))
+    return _.every(contracts.map(([contractAlias, contractClass]) => 
+      this.validateContract(contractAlias, contractClass, buildArtifacts))
+    )
   }
 
-  validateContract(contractAlias, contractName, buildArtifacts) {
-    log.info(`Validating contract ${contractName} before push`)
-    const originalStorageInfo = _.pick(this.networkFile.contract(contractAlias), 'storage', 'types')
-    if (_.isEmpty(originalStorageInfo.storage)) return true;
-    const contract = Contracts.getFromLocal(contractName);
-    const updatedStorageInfo = getStorageLayout(contract, buildArtifacts)
-    const uncheckedVars = getStructsOrEnums(updatedStorageInfo)
-    logUncheckedVars(uncheckedVars, log)
-    const storageDiff = compareStorageLayouts(originalStorageInfo, updatedStorageInfo)
-    logStorageLayoutDiffs(storageDiff, originalStorageInfo, updatedStorageInfo, log)
+  validateContract(contractAlias, contractClass, buildArtifacts) {
+    log.info(`Validating contract ${contractClass.contractName}`);
+    const existingContractInfo = this.networkFile.contract(contractAlias) || {};
+    const warnings = validate(contractClass, existingContractInfo, buildArtifacts);
+    const newWarnings = newValidationErrors(warnings, existingContractInfo.warnings);
 
-    // Validation passes only if all diff kinds are appends
-    return _.every(storageDiff, diff => diff.action === 'append')
+    const validationLogger = new ValidationLogger(contractClass, existingContractInfo);
+    validationLogger.log(newWarnings, buildArtifacts);
+    
+    contractClass.warnings = warnings;
+    contractClass.storageInfo = getStorageLayout(contractClass, buildArtifacts);
+    return validationPasses(newWarnings);
   }
 
   checkContractDeployed(packageName, contractAlias, throwIfFail = false) {
@@ -206,11 +213,14 @@ export default class NetworkBaseController {
     }
   }
 
-  hasContractChanged(contractAlias) {
+  hasContractChanged(contractAlias, contractClass = undefined) {
     if (!this.isLocalContract(contractAlias)) return false;
     if (!this.isContractDeployed(contractAlias)) return true;
-    const contractName = this.packageFile.contract(contractAlias);
-    const contractClass = Contracts.getFromLocal(contractName);
+    
+    if (!contractClass) {
+      const contractName = this.packageFile.contract(contractAlias);
+      contractClass = Contracts.getFromLocal(contractName);
+    }
     return !this.networkFile.hasSameBytecode(contractAlias, contractClass)
   }
 

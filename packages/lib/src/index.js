@@ -19,6 +19,7 @@ import { semanticVersionEqual, toSemanticVersion, semanticVersionToString } from
 import { getStorageLayout, getStructsOrEnums } from './validations/Storage';
 import { getBuildArtifacts } from './utils/BuildArtifacts';
 import { compareStorageLayouts } from './validations/Layout';
+import { validate, newValidationErrors, validationPasses } from './validations';
 
 // test behaviors
 import { behaviors, helpers } from './test'
@@ -50,6 +51,9 @@ export {
   getStorageLayout,
   compareStorageLayouts,
   getStructsOrEnums,
+  validate,
+  newValidationErrors,
+  validationPasses,
   bodyCode, 
   constructorCode, 
   bytecodeDigest, 
