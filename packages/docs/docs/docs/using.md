@@ -1,7 +1,7 @@
 ---
 id: using
-title: Using the EVM package in your app
-sidebar_label: Using the EVM package
+title: Using EVM packages in your app
+sidebar_label: Using EVM packages
 ---
 
 Besides allowing you to build upgradeable applications, ZeppelinOS provides EVM packages that you can use in your app.
@@ -39,7 +39,7 @@ and push them to a local network (which can be started by `npx truffle develop`)
 zos push --deploy-libs --network local
 ```
 
-Here, the `--deploy-libs` flag deploys an instance of the EVM package locally. This is only needed because we're using a development network. You won't need this flag when working with a network where the EVM package is already deployed, like `ropsten` or `mainnet`.
+Here, the `--deploy-libs` flag deploys all instance of linked EVM packages locally. This is only needed because we're using a development network. You won't need this flag when working with a network where the EVM packages are already deployed, like `ropsten` or `mainnet`.
 
 You can now create an upgradeable instance of your contract simply through:
 

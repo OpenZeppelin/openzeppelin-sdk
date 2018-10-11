@@ -18,7 +18,7 @@ In order to build an upgradeable application with ZeppelinOS, follow our
 [Building upgradeable applications](building.md) guide.
 
 If you would like to use the ZeppelinOS EVM packages in your app,
- follow our [Using the EVM package in your app](using.md) guide.
+ follow our [Using EVM packages in your app](using.md) guide.
 
 If you are interested in deploying your own EVM packages for ZeppelinOS,
 see our [Developing a new EVM package](developing.md) guide.
