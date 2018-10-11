@@ -1,31 +1,29 @@
-import colors from 'colors';
-import fs from 'fs';
+import log from '../helpers/log'
+import { scripts } from 'zos'
+import { OUTPUT_FILE } from '../constants'
+import { FileSystem as fs } from 'zos-lib'
+import configureTPL from '../kernel/configureTPL'
+import exportKernelData from '../kernel/exportKernelData'
+import createKernelContracts from '../kernel/createKernelContracts'
 
-// zOS commands.
-import push from 'zos/lib/scripts/push';
-
-// Enable zOS logging.
-import { Logger } from 'zos-lib';
-Logger.silent(false);
+const { push, session } = scripts
 
 export default async function deploy(options) {
-  console.log(colors.cyan(`pushing app with options ${ JSON.stringify(options, null, 2) }`).inverse);
+  const oneDay = 60 * 60 * 24
+  session({ expires: oneDay, ...options })
+  log.base(`Pushing ZeppelinOS app with options ${JSON.stringify(options, null, 2)}...`)
+  const isLocalOrTest = options.network === 'local' || options.network === 'test'
+  if (isLocalOrTest) removeZosFiles(options)
+  await push({ deployLibs: isLocalOrTest, ...options })
+  const { jurisdiction, validator, zepToken, vouching } = await createKernelContracts(options)
+  await configureTPL(jurisdiction, validator, options)
+  exportKernelData(OUTPUT_FILE(options.network), jurisdiction, zepToken, validator, vouching)
+}
 
-  // If network is local, remove existing file.
-  const zosLocalPath = './zos.local.json';
-  if(options.network === 'local' && fs.existsSync(zosLocalPath)) {
-    console.log(colors.yellow(`Deleting old zos.local.json (this is only done for the local network).`));
-    fs.unlinkSync(zosLocalPath);
-  }
+function removeZosFiles({ network }) {
+  const rootZosNetworkFile = `./zos.${network}.json`
+  if(fs.exists(rootZosNetworkFile)) fs.remove(rootZosNetworkFile)
 
-  // Warn about the need for tpl-contracts-zos to already be deployed in the network.
-  console.log(colors.yellow(`Note: this assumes that tpl-contracts-zos is already deployed in ${options.network}.`));
-
-  // Run script.
-  await push({
-    ...options
-  });
-
-  console.log(colors.cyan(`app pushed.`).inverse);
-
+  const tplZosNetworkFile = `./node_modules/tpl-contracts-zos/zos.${network}.json`
+  if(fs.exists(tplZosNetworkFile)) fs.remove(tplZosNetworkFile)
 }

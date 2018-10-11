@@ -30,3 +30,9 @@ export function semanticVersionEqual(v1, v2) {
       && semver1[1] === semver2[1]
       && semver1[2] === semver2[2];
 }
+
+export default {
+  toSemanticVersion,
+  semanticVersionToString,
+  semanticVersionEqual
+}

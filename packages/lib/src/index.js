@@ -7,6 +7,7 @@ import encodeCall from './helpers/encodeCall'
 
 // utils
 import ABI from './utils/ABIs'
+import Semver from './utils/Semver'
 import Logger from './utils/Logger'
 import FileSystem from './utils/FileSystem'
 import Contracts from './utils/Contracts'
@@ -64,6 +65,7 @@ export {
   Proxy,
   Logger,
   ABI,
+  Semver,
   FileSystem,
   Contracts,
   App,

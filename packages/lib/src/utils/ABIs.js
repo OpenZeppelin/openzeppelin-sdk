@@ -81,3 +81,9 @@ export function callDescription(method, args) {
   const argsDescriptions = method.inputs.map((input, index) => ` - ${input.name} (${input.type}): ${JSON.stringify(args[index])}`)
   return `${method.name} with: \n${argsDescriptions.join('\n')}`
 }
+
+export default {
+  buildCallData,
+  getABIFunction,
+  callDescription,
+}
