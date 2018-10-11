@@ -37,7 +37,7 @@ export default class StatusFetcher {
     const buildPath = Contracts.getLocalPath(contractName)
     if(fs.exists(buildPath)) {
       const contract = Contracts.getFromLocal(contractName).at(address)
-      const remoteBodyBytecode = web3.eth.getCode(address).replace(/^0x/, '')
+      const remoteBodyBytecode = web3.eth.getCode(address).replace(/^0x/, '') // TODO: PROMISIFY
       const bodyBytecodeHash = bytecodeDigest(remoteBodyBytecode)
       if(bodyCode(contract) === remoteBodyBytecode) {
         log.warn(`Assuming that constructor function of local version of ${contractName} is the one registered`)
