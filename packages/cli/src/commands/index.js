@@ -1,5 +1,6 @@
 import add from './add'
 import bump from './bump'
+import check from './check'
 import create from './create'
 import freeze from './freeze'
 import init from './init'
@@ -16,6 +17,7 @@ import verify from './verify'
 export default {
   add,
   bump,
+  check,
   create,
   freeze,
   init,

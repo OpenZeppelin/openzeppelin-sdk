@@ -142,8 +142,8 @@ export default class ZosPackageFile {
     delete this.data.dependencies[name];
   }
 
-  addContract(alias, name) {
-    this.data.contracts[alias] = name
+  addContract(alias, name = undefined) {
+    this.data.contracts[alias] = name || alias;
   }
 
   unsetContract(alias) {

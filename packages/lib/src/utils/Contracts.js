@@ -75,8 +75,10 @@ export default {
   },
 
   artifactsDefaults() {
-    if (!artifacts) throw Error("Could not retrieve truffle defaults")
-    return artifacts.options || {}
+    if (typeof(artifacts) === 'undefined' || !artifacts) {
+      return {};
+    }
+    return artifacts.options || {};
   },
 
   _getFromPath(path) {
@@ -98,5 +100,5 @@ export default {
     contract.defaults({ from: web3.eth.accounts[0], ... defaults })
     contract.synchronization_timeout = syncTimeout
     return contract
-  }
+  },
 }
