@@ -27,12 +27,8 @@ export default class BasePackageProject {
     log.info(`Version ${version} has been frozen`)
   }
 
-  async setImplementation(contractClass, contractName, libraries) {
+  async setImplementation(contractClass, contractName) {
     if (!contractName) contractName = contractClass.contractName
-    if (libraries) {
-      log.info(`Linking ${Object.keys(libraries).join(', ')} to ${contractName}...`)
-      await contractClass.link(libraries)
-    }
     log.info(`Setting implementation of ${contractName} in directory...`)
     const implementation = await deploy(contractClass, [], this.txParams)
     const directory = await this.getCurrentDirectory()

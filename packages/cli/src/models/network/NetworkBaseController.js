@@ -1,9 +1,8 @@
 import _ from 'lodash';
-import { Contracts, Logger, flattenSourceCode, getStorageLayout, getBuildArtifacts } from 'zos-lib';
+import { Contracts, Logger, flattenSourceCode, getStorageLayout, getBuildArtifacts, getSolidityLibNames } from 'zos-lib';
 import { validate, newValidationErrors, validationPasses } from 'zos-lib';
 import StatusChecker from "../status/StatusChecker";
 import Verifier from '../Verifier'
-import { flattenSourceCode, getSolidityLibNames } from '../../utils/contracts'
 import { allPromisesOrError } from '../../utils/async';
 import ValidationLogger from '../../interface/ValidationLogger';
 
@@ -66,7 +65,7 @@ export default class NetworkBaseController {
   }
 
   async push(reupload = false, force = false) {
-    const changedLibraries = await this._uploadSolidityLibs() // TODO: Get libs first, then deploy them
+    const changedLibraries = this._solidityLibsForPush(!reupload)
     const contracts = this._contractsListForPush(!reupload, changedLibraries)
     const buildArtifacts = getBuildArtifacts();
 
@@ -77,12 +76,18 @@ export default class NetworkBaseController {
 
     this._checkVersion()
     await this.fetchOrDeploy(this.packageVersion)
+    await this.uploadSolidityLibs(changedLibraries);
     
     await Promise.all([
       this.uploadContracts(contracts), 
       this.unsetContracts()
     ])
+
     await this._unsetSolidityLibs()
+  }
+
+  async newVersion(versionName) {
+    return this.project.newVersion(versionName);
   }
 
   _checkVersion() {
@@ -97,46 +102,44 @@ export default class NetworkBaseController {
     return (this.packageVersion !== this.currentVersion) && !this.isLightweight;
   }
 
-  _contractsListForPush(onlyChanged = false, changedLibraries = {}) {
+  _contractsListForPush(onlyChanged = false, changedLibraries = []) {
     const newVersion = this._newVersionRequired()
     return _(this.packageFile.contracts)
       .toPairs()
       .map(([contractAlias, contractName]) => [contractAlias, Contracts.getFromLocal(contractName)])
-      .filter(([contractAlias, contractClass]) => newVersion || !onlyChanged || this.hasContractChanged(contractAlias, contractClass) || this._hasChangedLibraries(contractName, Object.keys(changedLibraries)))
+      .filter(([contractAlias, contractClass]) => newVersion || !onlyChanged || this.hasContractChanged(contractAlias, contractClass) || this._hasChangedLibraries(contractClass, changedLibraries))
       .value()
   }
 
-  async newVersion(versionName) {
-    return this.project.newVersion(versionName);
-  }
-
-  async _uploadSolidityLibs() {
+  _solidityLibsForPush(onlyChanged = false) {
     const { contractNames, contractAliases } = this.packageFile
-    const libNames = this.getAllSolidityLibNames(contractNames)
+    const libNames = this._getAllSolidityLibNames(contractNames)
+    
     const clashes = _.intersection(libNames, contractAliases)
-
     if(!_.isEmpty(clashes)) {
       throw new Error(`Cannot upload libraries with the same name as a contract alias: ${clashes.join(', ')}`)
     }
 
-    const changedLibNames = await allPromisesOrError(
-      libNames.map(libName => this._uploadSolidityLib(libName))
-    )
-
-    return _.without(changedLibNames, undefined)
+    return libNames
+      .map(libName => Contracts.getFromLocal(libName))
+      .filter(libClass => {
+        const hasSolidityLib = this.networkFile.hasSolidityLib(libClass.contractName)
+        const hasChanged = this._hasSolidityLibChanged(libClass)
+        return (!hasSolidityLib || !onlyChanged || hasChanged);
+      });
   }
 
-  async _uploadSolidityLib(libName) {
-    const libClass = Contracts.getFromLocal(libName)
-    const hasSolidityLib = this.networkFile.hasSolidityLib(libName)
+  async uploadSolidityLibs(libs) {
+    await allPromisesOrError(
+      libs.map(lib => this._uploadSolidityLib(lib))
+    )
+  }
 
-    if (!hasSolidityLib || this.hasSolidityLibChanged(libName, libClass)) {
-      log.info(`Uploading ${libName} library...`)
-      const libInstance = await this.project.setImplementation(libClass, libName)
-      this.networkFile.addSolidityLib(libName, libInstance)
-
-      return { [libName]: hasSolidityLib }
-    }
+  async _uploadSolidityLib(libClass) {
+    const libName = libClass.contractName
+    log.info(`Uploading ${libName} library...`)
+    const libInstance = await this.project.setImplementation(libClass, libName)
+    this.networkFile.addSolidityLib(libName, libInstance)
   }
 
   async uploadContracts(contracts) {
@@ -150,7 +153,8 @@ export default class NetworkBaseController {
       const currentContractLibs = getSolidityLibNames(contractClass.bytecode)
       const libraries = this.networkFile.getSolidityLibs(currentContractLibs)
       log.info(`Uploading ${contractClass.contractName} contract as ${contractAlias}`);
-      const contractInstance = await this.project.setImplementation(contractClass, contractAlias, libraries);
+      await contractClass.link(libraries);
+      const contractInstance = await this.project.setImplementation(contractClass, contractAlias);
       this.networkFile.addContract(contractAlias, contractInstance, {
         warnings: contractClass.warnings,
         types: contractClass.storageInfo.types,
@@ -163,7 +167,7 @@ export default class NetworkBaseController {
 
   async _unsetSolidityLibs() {
     const { contractNames } = this.packageFile
-    const libNames = this.getAllSolidityLibNames(contractNames)
+    const libNames = this._getAllSolidityLibNames(contractNames)
     await allPromisesOrError(
       this.networkFile.solidityLibsMissing(libNames).map(libName => this._unsetSolidityLib(libName))
     )
@@ -184,7 +188,7 @@ export default class NetworkBaseController {
     return !_.isEmpty(_.intersection(changedLibraries, libNames))
   }
 
-  getAllSolidityLibNames(contractNames) {
+  _getAllSolidityLibNames(contractNames) {
     const libNames = contractNames.map(contractName => {
       const contractClass = Contracts.getFromLocal(contractName)
       return getSolidityLibNames(contractClass.bytecode)
@@ -279,8 +283,8 @@ export default class NetworkBaseController {
     }
   }
 
-  hasSolidityLibChanged(libName, libClass) {
-    return !this.networkFile.hasSameBytecode(libName, libClass)
+  _hasSolidityLibChanged(libClass) {
+    return !this.networkFile.hasSameBytecode(libClass.contractName, libClass)
   }
 
   hasContractChanged(contractAlias, contractClass = undefined) {

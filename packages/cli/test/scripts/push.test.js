@@ -87,14 +87,6 @@ contract('push script', function([_, owner]) {
       const deployed = await ImplV1.at(address);
       (await deployed.say()).should.eq('V1');
     });
-  };
-
-  const shouldRegisterContractsInDirectory = function () {
-    it('should register instances in directory', async function () {
-      const address = this.networkFile.contract('Impl').address;
-      const _package = await Package.fetch(this.networkFile.package.address);
-      (await _package.getImplementation(defaultVersion, 'Impl')).should.eq(address);
-    });
 
     it('should deploy required libraries', async function () {
       const address = this.networkFile.solidityLib('UintLib').address;
@@ -108,6 +100,14 @@ contract('push script', function([_, owner]) {
       const deployed = await AnotherImplV1.at(address);
       const result = await deployed.double(10);
       result.toNumber().should.eq(20);
+    });
+  };
+
+  const shouldRegisterContractsInDirectory = function () {
+    it('should register instances in directory', async function () {
+      const address = this.networkFile.contract('Impl').address;
+      const _package = await Package.fetch(this.networkFile.package.address);
+      (await _package.getImplementation(defaultVersion, 'Impl')).should.eq(address);
     });
   };
 
@@ -364,8 +364,6 @@ contract('push script', function([_, owner]) {
 
     shouldDeployApp();
     shouldDeployProvider();
-    shouldDeployContracts();
-    shouldRegisterContractsInDirectory();
   });
 
   describe('an app with dependency', function () {
@@ -520,18 +518,6 @@ contract('push script', function([_, owner]) {
       this.networkFile.contract('Impl').address.should.eq(previousAddress)
     })
   });
-
-  describe('a lightweight app with invalid contracts', function() {
-    beforeEach('pushing package-with-invalid-contracts', async function () {
-      const packageFile = new ZosPackageFile('test/mocks/packages/package-with-invalid-contracts.zos.json')
-      packageFile.full = false
-      this.networkFile = packageFile.networkFile(network)
-
-      await push({ networkFile: this.networkFile, network, txParams, force: true }).should.be.rejectedWith(/WithFailingConstructor deployment failed/);
-    });
-
-    shouldDeployContracts();
-  });  
 });
 
 async function getImplementationFromApp(contractAlias) {

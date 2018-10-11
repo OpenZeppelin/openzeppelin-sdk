@@ -11,7 +11,7 @@ import Logger from './utils/Logger'
 import FileSystem from './utils/FileSystem'
 import Contracts from './utils/Contracts'
 import { sendTransaction, deploy } from './utils/Transactions'
-import { bodyCode, constructorCode, bytecodeDigest } from './utils/Bytecode'
+import { bodyCode, constructorCode, bytecodeDigest, replaceSolidityLibAddress, isSolidityLib, getSolidityLibNames } from './utils/Bytecode'
 import { flattenSourceCode } from './utils/Solidity'
 import { semanticVersionEqual, toSemanticVersion, semanticVersionToString } from './utils/Semver';
 
@@ -61,6 +61,9 @@ export {
   semanticVersionEqual, 
   toSemanticVersion,
   semanticVersionToString,
+  replaceSolidityLibAddress, 
+  getSolidityLibNames,
+  isSolidityLib,
   Proxy,
   Logger,
   ABI,

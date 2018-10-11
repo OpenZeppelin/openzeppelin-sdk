@@ -1,11 +1,10 @@
 import _ from 'lodash'
 import { promisify } from 'util'
 
-import { Logger, LibProject, AppProject, bytecodeDigest, semanticVersionEqual } from 'zos-lib'
+import { Logger, LibProject, AppProject, bytecodeDigest, semanticVersionEqual, replaceSolidityLibAddress, isSolidityLib } from 'zos-lib'
 import EventsFilter from './EventsFilter'
 import StatusFetcher from './StatusFetcher'
 import StatusComparator from './StatusComparator'
-import { bytecodeDigest, replaceSolidityLibAddress, isSolidityLib } from '../../utils/contracts'
 
 const log = new Logger('StatusChecker')
 const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000'
@@ -99,9 +98,11 @@ export default class StatusChecker {
     const implementationsInfo = await this._fetchOnChainImplementations()
     await Promise.all(
       implementationsInfo.map(async info => {
-        const { address } = info
-        const bytecode = await promisify(web3.eth.getCode.bind(web3.eth))(address)
-        isSolidityLib(bytecode) ? this._checkRemoteSolidityLibImplementation(info, bytecode) : this._checkRemoteContractImplementation(info, bytecode)
+        const { address } = info;
+        const bytecode = await promisify(web3.eth.getCode.bind(web3.eth))(address);
+        return isSolidityLib(bytecode) 
+          ? this._checkRemoteSolidityLibImplementation(info, bytecode) 
+          : this._checkRemoteContractImplementation(info, bytecode);
       })
     )
     this._checkUnregisteredLocalImplementations(implementationsInfo)
