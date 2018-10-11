@@ -80,7 +80,11 @@ export default class ZosPackageFile {
   }
 
   get isLightweight() {
-    return !!this.data.light
+    return !this.isFull
+  }
+
+  get isFull() {
+    return this.isLib || !!this.data.full
   }
 
   contract(alias) {
@@ -112,8 +116,8 @@ export default class ZosPackageFile {
     this.data.lib = lib
   }
 
-  set lightweight(light) {
-    this.data.light = light
+  set full(full) {
+    this.data.full = !!full
   }
 
   set name(name) {

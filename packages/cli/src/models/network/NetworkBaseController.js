@@ -40,7 +40,7 @@ export default class NetworkBaseController {
   }
 
   get isLightweight() {
-    return this.packageFile.isLightweight;
+    return false;
   }
 
   async fetchOrDeploy(requestedVersion) {
