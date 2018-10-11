@@ -1,9 +1,9 @@
-import { encodeCall, assertRevert } from 'zos-lib'
+import { Contracts, encodeCall, assertRevert } from 'zos-lib'
 
 const BigNumber = web3.BigNumber;
 const ZEPToken = artifacts.require('ZEPToken');
 const ZEPValidator = artifacts.require('ZEPValidator');
-const BasicJurisdiction = artifacts.require('BasicJurisdiction');
+const BasicJurisdiction = Contracts.getFromNodeModules('tpl-contracts-zos', 'BasicJurisdiction')
 
 require('chai')
   .use(require('chai-bignumber')(BigNumber))

@@ -84,7 +84,7 @@ export async function verifyJurisdiction(networkFile, txParams) {
     const jurisdictionAddress = jurisdictionProxies[jurisdictionProxies.length - 1].address
     if (validateAddress(jurisdictionAddress)) {
       log.info (' ✔ Jurisdiction address is valid')
-      const BasicJurisdiction = Contracts.getFromLocal('BasicJurisdiction')
+      const BasicJurisdiction = Contracts.getFromNodeModules('tpl-contracts-zos', 'BasicJurisdiction')
       const jurisdiction = BasicJurisdiction.at(jurisdictionAddress)
       const jurisdictionOwner = await jurisdiction.owner()
       const ownerMatches = jurisdictionOwner === txParams.from
@@ -243,7 +243,7 @@ export async function verifyTPLConfiguration(networkFile, txParams) {
   log.base('\n--------------------------------------------------------------------\n')
   log.base('Verifying TPL configuration...')
 
-  const BasicJurisdiction = Contracts.getFromLocal('BasicJurisdiction')
+  const BasicJurisdiction = Contracts.getFromNodeModules('tpl-contracts-zos', 'BasicJurisdiction')
   const jurisdictionProxies = networkFile._proxiesOf('tpl-contracts-zos/BasicJurisdiction')
   const jurisdictionAddress = jurisdictionProxies[jurisdictionProxies.length - 1].address
   const jurisdiction = BasicJurisdiction.at(jurisdictionAddress)
