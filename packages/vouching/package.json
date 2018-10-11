@@ -1,6 +1,6 @@
 {
   "name": "zos-vouching",
-  "version": "2.0.0-alpha.3",
+  "version": "2.0.0-alpha.4",
   "description": "",
   "main": "truffle-config.js",
   "private": false,
@@ -22,7 +22,6 @@
     "configure-ropsten": "node ./lib/bin/configure.js --network=ropsten --from=0x09902a56d04a9446601a0d451e07459dc5af0820",
     "dodathing-local": "npm run prepare && npm run deploy-local && npm run create-local && npm run configure-local && npm run validate-local",
     "dodathing-ropsten": "npm run prepare && npm run deploy-ropsten && npm run create-ropsten && npm run configure-ropsten && npm run validate-ropsten"
-    
   },
   "keywords": [],
   "author": "",
@@ -32,8 +31,8 @@
     "minimist": "^1.2.0",
     "openzeppelin-zos": "git+https://github.com/OpenZeppelin/openzeppelin-zos.git#3df0a786e4cfe19f22ea537f32f68c392b29a5f8",
     "tpl-contracts-zos": "0.0.4",
-    "zos": "^2.0.0-alpha.3",
-    "zos-lib": "^2.0.0-alpha.3"
+    "zos": "^2.0.0-alpha.4",
+    "zos-lib": "^2.0.0-alpha.4"
   },
   "devDependencies": {
     "babel-plugin-transform-object-rest-spread": "^6.26.0",
