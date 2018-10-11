@@ -130,8 +130,12 @@ contract('AdminUpgradeabilityProxy', ([_, admin, anotherAccount]) => {
           })
 
           it('uses the storage of the proxy', async function () {
-            // fetch the x value of Migratable at position 0 of the storage
-            const storedValue = await Proxy.at(this.proxyAddress).getStorageAt(1);
+            // storage layout should look as follows:
+            //  - 0: Initializable storage
+            //  - 1-50: Initailizable reserved storage (50 slots)
+            //  - 51: initializerRan
+            //  - 52: x
+            const storedValue = await Proxy.at(this.proxyAddress).getStorageAt(52);
             storedValue.should.be.bignumber.eq(42);
           })
         })

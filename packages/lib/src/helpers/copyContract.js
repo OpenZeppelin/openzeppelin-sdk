@@ -2,13 +2,10 @@ import { promisify } from 'util'
 
 import Contracts from '../utils/Contracts'
 import { estimateGas } from '../utils/Transactions'
+import sleep from './sleep'
 
 const RECEIPT_CHECK_TIMEBOX = 1000
 const DEPLOYMENT_TIMEOUT_ERROR = 'Contract deployment timed out'
-
-function sleep(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms))
-}
 
 async function sendTransaction(params) {
   if (!params.gas) params.gas = await estimateGas(params)

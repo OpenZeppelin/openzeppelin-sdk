@@ -1,0 +1,286 @@
+{
+  "contractName": "Parent",
+  "abi": [
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "extendsParent",
+      "outputs": [
+        {
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "pure",
+      "type": "function"
+    }
+  ],
+  "bytecode": "0x6080604052348015600f57600080fd5b5060a58061001e6000396000f300608060405260043610603f576000357c0100000000000000000000000000000000000000000000000000000000900463ffffffff1680631ffdaabd146044575b600080fd5b348015604f57600080fd5b5060566070565b604051808215151515815260200191505060405180910390f35b600060019050905600a165627a7a7230582085b91732692669c5a0279dd53b9512e9506c88509b4fdd01e663d9ce2a2b312e0029",
+  "deployedBytecode": "0x608060405260043610603f576000357c0100000000000000000000000000000000000000000000000000000000900463ffffffff1680631ffdaabd146044575b600080fd5b348015604f57600080fd5b5060566070565b604051808215151515815260200191505060405180910390f35b600060019050905600a165627a7a7230582085b91732692669c5a0279dd53b9512e9506c88509b4fdd01e663d9ce2a2b312e0029",
+  "sourceMap": "26:96:1:-;;;;8:9:-1;5:2;;;30:1;27;20:12;5:2;26:96:1;;;;;;;",
+  "deployedSourceMap": "26:96:1:-;;;;;;;;;;;;;;;;;;;;;;;;46:74;;8:9:-1;5:2;;;30:1;27;20:12;5:2;46:74:1;;;;;;;;;;;;;;;;;;;;;;;;;;;;92:4;111;104:11;;46:74;:::o",
+  "source": "pragma solidity ^0.4.24;\n\ncontract Parent {\n  function extendsParent() public pure returns (bool) {\n    return true;\n  }\n}\n",
+  "sourcePath": "/home/spalladino/Projects/zeppelinos/zos/tests/cli-app/dependencies/mock-stdlib-1.2.0/contracts/Parent.sol",
+  "ast": {
+    "absolutePath": "/home/spalladino/Projects/zeppelinos/zos/tests/cli-app/dependencies/mock-stdlib-1.2.0/contracts/Parent.sol",
+    "exportedSymbols": {
+      "Parent": [
+        44
+      ]
+    },
+    "id": 45,
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 35,
+        "literals": [
+          "solidity",
+          "^",
+          "0.4",
+          ".24"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "0:24:1"
+      },
+      {
+        "baseContracts": [],
+        "contractDependencies": [],
+        "contractKind": "contract",
+        "documentation": null,
+        "fullyImplemented": true,
+        "id": 44,
+        "linearizedBaseContracts": [
+          44
+        ],
+        "name": "Parent",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "body": {
+              "id": 42,
+              "nodeType": "Block",
+              "src": "98:22:1",
+              "statements": [
+                {
+                  "expression": {
+                    "argumentTypes": null,
+                    "hexValue": "74727565",
+                    "id": 40,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": true,
+                    "kind": "bool",
+                    "lValueRequested": false,
+                    "nodeType": "Literal",
+                    "src": "111:4:1",
+                    "subdenomination": null,
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    },
+                    "value": "true"
+                  },
+                  "functionReturnParameters": 39,
+                  "id": 41,
+                  "nodeType": "Return",
+                  "src": "104:11:1"
+                }
+              ]
+            },
+            "documentation": null,
+            "id": 43,
+            "implemented": true,
+            "isConstructor": false,
+            "isDeclaredConst": true,
+            "modifiers": [],
+            "name": "extendsParent",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 36,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "68:2:1"
+            },
+            "payable": false,
+            "returnParameters": {
+              "id": 39,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 38,
+                  "name": "",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 43,
+                  "src": "92:4:1",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bool",
+                    "typeString": "bool"
+                  },
+                  "typeName": {
+                    "id": 37,
+                    "name": "bool",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "92:4:1",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "91:6:1"
+            },
+            "scope": 44,
+            "src": "46:74:1",
+            "stateMutability": "pure",
+            "superFunction": null,
+            "visibility": "public"
+          }
+        ],
+        "scope": 45,
+        "src": "26:96:1"
+      }
+    ],
+    "src": "0:123:1"
+  },
+  "legacyAST": {
+    "absolutePath": "/home/spalladino/Projects/zeppelinos/zos/tests/cli-app/dependencies/mock-stdlib-1.2.0/contracts/Parent.sol",
+    "exportedSymbols": {
+      "Parent": [
+        44
+      ]
+    },
+    "id": 45,
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 35,
+        "literals": [
+          "solidity",
+          "^",
+          "0.4",
+          ".24"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "0:24:1"
+      },
+      {
+        "baseContracts": [],
+        "contractDependencies": [],
+        "contractKind": "contract",
+        "documentation": null,
+        "fullyImplemented": true,
+        "id": 44,
+        "linearizedBaseContracts": [
+          44
+        ],
+        "name": "Parent",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "body": {
+              "id": 42,
+              "nodeType": "Block",
+              "src": "98:22:1",
+              "statements": [
+                {
+                  "expression": {
+                    "argumentTypes": null,
+                    "hexValue": "74727565",
+                    "id": 40,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": true,
+                    "kind": "bool",
+                    "lValueRequested": false,
+                    "nodeType": "Literal",
+                    "src": "111:4:1",
+                    "subdenomination": null,
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    },
+                    "value": "true"
+                  },
+                  "functionReturnParameters": 39,
+                  "id": 41,
+                  "nodeType": "Return",
+                  "src": "104:11:1"
+                }
+              ]
+            },
+            "documentation": null,
+            "id": 43,
+            "implemented": true,
+            "isConstructor": false,
+            "isDeclaredConst": true,
+            "modifiers": [],
+            "name": "extendsParent",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 36,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "68:2:1"
+            },
+            "payable": false,
+            "returnParameters": {
+              "id": 39,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 38,
+                  "name": "",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 43,
+                  "src": "92:4:1",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bool",
+                    "typeString": "bool"
+                  },
+                  "typeName": {
+                    "id": 37,
+                    "name": "bool",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "92:4:1",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "91:6:1"
+            },
+            "scope": 44,
+            "src": "46:74:1",
+            "stateMutability": "pure",
+            "superFunction": null,
+            "visibility": "public"
+          }
+        ],
+        "scope": 45,
+        "src": "26:96:1"
+      }
+    ],
+    "src": "0:123:1"
+  },
+  "compiler": {
+    "name": "solc",
+    "version": "0.4.24+commit.e67f0147.Emscripten.clang"
+  },
+  "networks": {},
+  "schemaVersion": "2.0.1",
+  "updatedAt": "2018-10-09T15:33:16.092Z"
+}

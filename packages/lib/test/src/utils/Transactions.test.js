@@ -1,6 +1,9 @@
 'use strict'
 require('../../setup')
 
+import sinon from 'sinon';
+import _ from 'lodash';
+
 import { deploy, sendTransaction, sendDataTransaction } from '../../../src/utils/Transactions';
 import Contracts from '../../../src/utils/Contracts';
 import { assertRevert, encodeCall } from '../../../src';
@@ -46,10 +49,21 @@ contract('Transactions', function([_account1, account2]) {
       this.instance = await deploy(this.DummyImplementation);
     });
 
+    afterEach('restore stubs', function () {
+      sinon.restore();
+    })
+
     it('correctly sends the transaction', async function () {
       await sendTransaction(this.instance.initialize, [42, 'foo', [1,2,3]]);
       const actualValue = await this.instance.value();
       actualValue.toNumber().should.eq(42);
+    });
+
+    it('refuses to send tx with truffle default gas price', async function () {
+      // Gas price check is skipped in test env, so we trick the Transactions module into thinking it's actually on a real run
+      process.env.NODE_ENV = 'not-test';
+      await sendTransaction(this.instance.initialize, [42, 'foo', [1,2,3]]).should.be.rejectedWith(/cowardly refusing/i);
+      process.env.NODE_ENV = 'test';
     });
 
     it('estimates gas', async function () {
@@ -70,6 +84,23 @@ contract('Transactions', function([_account1, account2]) {
 
     it('handles failing transactions', async function () {
       await assertRevert(sendTransaction(this.instance.reverts));
+    });
+
+    it('retries estimating gas', async function () {
+      sinon.stub(web3.eth, 'estimateGas')
+        .onFirstCall().yields(new Error('gas required exceeds allowance or always failing transaction'), null)
+        .yields(null, 800000)
+
+      const { tx } = await sendTransaction(this.instance.initialize, [42, 'foo', [1,2,3]]);
+      assertGas(tx, 800000 * 1.25 + 15000);
+    });
+
+    it('retries estimating gas up to 3 times', async function () {
+      const stub = sinon.stub(web3.eth, 'estimateGas')
+      _.times(4, i => stub.onCall(i).yields(new Error('gas required exceeds allowance or always failing transaction'), null))
+      stub.yields(null, 800000)
+
+      await sendTransaction(this.instance.initialize, [42, 'foo', [1,2,3]]).should.be.rejectedWith(/always failing transaction/);
     });
   });
 

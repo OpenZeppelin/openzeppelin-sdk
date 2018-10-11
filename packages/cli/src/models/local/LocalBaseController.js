@@ -200,6 +200,7 @@ export default class LocalBaseController {
     return false
   }
 
+  // TODO: Use ABIs.getFunction here
   getContractInitializer(contractJson) {
     const contractDefinition = contractJson.ast.nodes
       .find(n => n.nodeType === "ContractDefinition" && n.name === contractJson.contractName)

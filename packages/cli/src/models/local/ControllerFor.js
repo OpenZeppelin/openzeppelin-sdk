@@ -3,7 +3,7 @@ import LocalAppController from './LocalAppController';
 import LocalLibController from './LocalLibController';
 
 export default function(packageFile = new ZosPackageFile()) {
-  if(!packageFile.exists()) throw Error(`zOS file ${packageFile.fileName} not found. Run 'zos init' first to initialize the project.`)
+    if(!packageFile.exists()) throw Error(`zOS file ${packageFile.fileName} not found. Run 'zos init' first to initialize the project.`)
 
   return packageFile.isLib
     ? new LocalLibController(packageFile)

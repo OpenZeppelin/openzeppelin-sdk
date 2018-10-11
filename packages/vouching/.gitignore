@@ -1,5 +1,6 @@
 # contract artifacts
 build/
+lib/
 
 # zOS
 zos.local.json

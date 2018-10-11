@@ -1,10 +1,10 @@
 {
   "name": "zos-lib",
-  "version": "2.0.0-alpha.1",
+  "version": "2.0.0-alpha.3",
   "description": "ZeppelinOS library",
   "scripts": {
     "test": "scripts/test.sh",
-    "prepare": "truffle compile && rm -rf lib && babel src --out-dir lib"
+    "prepare": "rm -rf build/contracts && truffle compile && rm -rf lib && babel src --out-dir lib"
   },
   "repository": {
     "type": "git",
@@ -46,6 +46,7 @@
     "chai-bignumber": "^2.0.2",
     "coveralls": "^3.0.0",
     "mock-dependency": "file:test/mocks/mock-dependency",
+    "sinon": "^6.1.4",
     "solidity-coverage": "^0.4.15",
     "tmp": "^0.0.33",
     "truffle": "^4.1.13"
