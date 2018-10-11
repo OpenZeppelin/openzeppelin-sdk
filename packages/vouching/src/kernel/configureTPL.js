@@ -25,7 +25,7 @@ export async function addValidator(jurisdiction, validator, { txParams }) {
   log.base(`Adding ZEP validator ${validator.address} to the jurisdiction...`)
   try {
     await jurisdiction.addValidator(validator.address, VALIDATOR_NAME, txParams)
-    log.info(` ✔ ZEP validator added`);
+    log.info(` ✔ ZEP validator added`)
   } catch (error) {
     log.error(` ✘ Could not add ZEP validator to the jurisdiction`)
     throw error
@@ -64,10 +64,10 @@ export async function addValidatorApproval(jurisdiction, validator, { txParams }
   }
 }
 
-export async function createZeppelinOrganization(validator, { txPrams }) {
+export async function createZeppelinOrganization(validator, { txParams }) {
   log.base(`Creating Zeppelin organization for the ZEP validator...`)
   try {
-    await validator.addOrganization(txPrams.from, ZEPPELIN_ORG_MAX_ADDRESSES, ZEPPELIN_ORG_NAME, txPrams)
+    await validator.addOrganization(txParams.from, ZEPPELIN_ORG_MAX_ADDRESSES, ZEPPELIN_ORG_NAME, txParams)
     log.info(` ✔ TPL Zeppelin organization created`)
   } catch (error) {
     log.error(` ✘ Could create Zeppelin organization for TPL`)

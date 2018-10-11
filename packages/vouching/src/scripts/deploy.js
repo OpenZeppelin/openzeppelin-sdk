@@ -1,9 +1,12 @@
 import log from '../helpers/log'
-import push from 'zos/lib/scripts/push'
-import session from 'zos/lib/scripts/session'
+import { scripts } from 'zos'
+import { OUTPUT_FILE } from '../constants'
 import { FileSystem as fs } from 'zos-lib'
 import configureTPL from '../kernel/configureTPL'
+import exportKernelData from '../kernel/exportKernelData'
 import createKernelContracts from '../kernel/createKernelContracts'
+
+const { push, session } = scripts
 
 export default async function deploy(options) {
   const oneDay = 60 * 60 * 24
@@ -12,8 +15,9 @@ export default async function deploy(options) {
   const isLocalOrTest = options.network === 'local' || options.network === 'test'
   if (isLocalOrTest) removeZosFiles(options)
   await push({ deployLibs: isLocalOrTest, ...options })
-  const { validator, jurisdiction } = await createKernelContracts(options)
-  await configureTPL(validator, jurisdiction, options)
+  const { jurisdiction, validator, zepToken, vouching } = await createKernelContracts(options)
+  await configureTPL(jurisdiction, validator, options)
+  exportKernelData(OUTPUT_FILE(options.network), jurisdiction, zepToken, validator, vouching)
 }
 
 function removeZosFiles({ network }) {

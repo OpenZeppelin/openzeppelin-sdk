@@ -1,6 +1,6 @@
 import log from '../helpers/log'
 import { files, scripts } from 'zos'
-import { FileSystem as fs, Contracts } from 'zos-lib'
+import { FileSystem as fs, Semver, Contracts } from 'zos-lib'
 import validateAddress from '../helpers/validateAddress'
 import {
   VOUCHING_MIN_STAKE,
@@ -19,8 +19,6 @@ const { ZosPackageFile } = files
 export default async function verify({ network, txParams }) {
   log.info(`Verifying vouching app on network ${ network }...`)
   const networkFile = (new ZosPackageFile()).networkFile(network)
-
-  await printStatus(networkFile, { network, txParams })
   const successfulApp = await verifyAppSetup(networkFile)
   const successfulJurisdiction = successfulApp && await verifyJurisdiction(networkFile, txParams)
   const successfulZepToken = successfulJurisdiction && await verifyZEPToken(networkFile, txParams)
@@ -31,13 +29,8 @@ export default async function verify({ network, txParams }) {
   else log.error('\n\nCould not complete verification process since there are required previous steps not completed.')
 }
 
-export async function printStatus(options) {
-  log.base('Printing app status...')
-  await status({ ...options })
-}
-
 export async function verifyAppSetup(networkFile) {
-  log.base('\n--------------------------------------------------------------------\n\n')
+  log.base('\n--------------------------------------------------------------------\n')
   log.base('Verifying ZeppelinOS app...')
 
   if (fs.exists(networkFile.fileName)) {
@@ -62,7 +55,7 @@ export async function verifyAppSetup(networkFile) {
       const app = App.at(networkFile.appAddress)
       const [packageAddress, version] = await app.getPackage('zos-vouching')
       const registeredPackage = packageAddress === networkFile.packageAddress
-      const registeredVersion = version === networkFile.version
+      const registeredVersion = Semver.semanticVersionEqual(version, networkFile.version)
 
       registeredPackage
         ? log.info (' ✔ Package address is registered on the app')
@@ -70,7 +63,7 @@ export async function verifyAppSetup(networkFile) {
 
       registeredVersion
         ? log.info (' ✔ Requested version is registered on-chain')
-        : log.error(' ✘ Requested version is not registered on-chain')
+        : log.error(` ✘ Requested version ${networkFile.version} is not registered on-chain, it was expected ${version}`)
 
       return registeredPackage && registeredVersion
     }
@@ -83,7 +76,7 @@ export async function verifyAppSetup(networkFile) {
 }
 
 export async function verifyJurisdiction(networkFile, txParams) {
-  log.base('\n--------------------------------------------------------------------\n\n')
+  log.base('\n--------------------------------------------------------------------\n')
   log.base('Verifying basic jurisdiction...')
 
   const jurisdictionProxies = networkFile._proxiesOf('tpl-contracts-zos/BasicJurisdiction')
@@ -112,7 +105,7 @@ export async function verifyJurisdiction(networkFile, txParams) {
 }
 
 export async function verifyZEPToken(networkFile, txParams) {
-  log.base('\n--------------------------------------------------------------------\n\n')
+  log.base('\n--------------------------------------------------------------------\n')
   log.base('Verifying ZEP Token...')
 
   const zepTokenProxies = networkFile._proxiesOf('zos-vouching/ZEPToken')
@@ -123,28 +116,27 @@ export async function verifyZEPToken(networkFile, txParams) {
       const ZEPToken = Contracts.getFromLocal('ZEPToken')
       const zepToken = ZEPToken.at(zepTokenAddress)
       const name = await zepToken.name()
-      const owner = await zepToken.owner()
       const symbol = await zepToken.symbol()
       const decimals = await zepToken.decimals()
       const totalSupply = await zepToken.totalSupply()
-      
+
+      const isPauser = await zepToken.isPauser(txParams.from)
       const nameMatches = name === ZEPTOKEN_NAME
-      const ownerMatches = owner === txParams.from
       const symbolMatches = symbol === ZEPTOKEN_SYMBOL
-      const decimalsMatches = decimals === ZEPTOKEN_DECIMALS
-      const totalSupplyMatches = totalSupply === ZEPTOKEN_SUPPLY
-      
-      ownerMatches
-        ? log.info (' ✔ ZEP Token owner matches requested value')
-        : log.error(` ✘ ZEP Token owner ${owner} does not match requested value, it was expected ${txParams.from}`)
-      
+      const decimalsMatches = decimals.eq(ZEPTOKEN_DECIMALS)
+      const totalSupplyMatches = totalSupply.eq(new web3.BigNumber(`${ZEPTOKEN_SUPPLY}e${decimals}`))
+
+      isPauser
+        ? log.info (' ✔ ZEP Token deployer has pauser role')
+        : log.error(` ✘ ZEP Token deployer ${txParams.from} does not have pauser role`)
+
       nameMatches
         ? log.info (' ✔ ZEP Token name matches requested value')
-        : log.error(` ✘ ZEP Token name ${name} does not match expected value ${ZEPTOKEN_NAME}`)
+        : log.error(` ✘ ZEP Token name "${name}" does not match expected value "${ZEPTOKEN_NAME}"`)
       
       symbolMatches
         ? log.info (' ✔ ZEP Token symbol matches requested value')
-        : log.error(` ✘ ZEP Token symbol ${symbol} does not match expected value ${ZEPTOKEN_SYMBOL}`)
+        : log.error(` ✘ ZEP Token symbol "${symbol}" does not match expected value "${ZEPTOKEN_SYMBOL}"`)
       
       decimalsMatches
         ? log.info (' ✔ ZEP Token decimals matches the requested value')
@@ -152,9 +144,9 @@ export async function verifyZEPToken(networkFile, txParams) {
       
       totalSupplyMatches
         ? log.info (' ✔ ZEP Token total supply matches the requested value')
-        : log.error(` ✘ ZEP Token total supply ${totalSupplyMatches} does not match expected value ${ZEPTOKEN_SUPPLY}`)
+        : log.error(` ✘ ZEP Token total supply ${totalSupply} does not match expected value ${ZEPTOKEN_SUPPLY}`)
       
-      return ownerMatches && nameMatches && symbolMatches && decimalsMatches && totalSupplyMatches
+      return isPauser && nameMatches && symbolMatches && decimalsMatches && totalSupplyMatches
     }
     else {
       log.error(` ✘ ZEP Token instance address ${zepTokenAddress} is not valid`)
@@ -168,7 +160,7 @@ export async function verifyZEPToken(networkFile, txParams) {
 }
 
 export async function verifyVouching(networkFile, txParams) {
-  log.base('\n--------------------------------------------------------------------\n\n')
+  log.base('\n--------------------------------------------------------------------\n')
   log.base('Verifying Vouching contract...')
 
   const zepTokenProxies = networkFile._proxiesOf('zos-vouching/ZEPToken')
@@ -184,7 +176,7 @@ export async function verifyVouching(networkFile, txParams) {
       const minimumStake = await vouching.minimumStake()
       
       const tokenMatches = token === zepTokenAddress
-      const minimumStakeMatches = minimumStake === VOUCHING_MIN_STAKE
+      const minimumStakeMatches = minimumStake.eq(VOUCHING_MIN_STAKE)
 
       tokenMatches
         ? log.info (' ✔ Vouching token matches ZEP Token deployed instance')
@@ -208,7 +200,7 @@ export async function verifyVouching(networkFile, txParams) {
 }
 
 export async function verifyZEPValidator(networkFile, txParams) {
-  log.base('\n--------------------------------------------------------------------\n\n')
+  log.base('\n--------------------------------------------------------------------\n')
   log.base('Verifying ZEP validator...')
 
   const jurisdictionProxies = networkFile._proxiesOf('tpl-contracts-zos/BasicJurisdiction')
@@ -248,7 +240,7 @@ export async function verifyZEPValidator(networkFile, txParams) {
 }
 
 export async function verifyTPLConfiguration(networkFile, txParams) {
-  log.base('\n--------------------------------------------------------------------\n\n')
+  log.base('\n--------------------------------------------------------------------\n')
   log.base('Verifying TPL configuration...')
 
   const BasicJurisdiction = Contracts.getFromLocal('BasicJurisdiction')
@@ -264,14 +256,14 @@ export async function verifyTPLConfiguration(networkFile, txParams) {
   const [description] = await jurisdiction.getAttributeInformation(ZEPTOKEN_ATTRIBUTE_ID)
   const [exists, _, name] = await validator.getOrganization(txParams.from)
 
-  const descriptionMatches = description !== ZEPTOKEN_ATTRIBUTE_DESCRIPTION
+  const descriptionMatches = description === ZEPTOKEN_ATTRIBUTE_DESCRIPTION
   const isValidator = await jurisdiction.isValidator(validatorAddress)
   const canValidate = await jurisdiction.isApproved(validatorAddress, ZEPTOKEN_ATTRIBUTE_ID)
   const organizationMatches = exists && name === ZEPPELIN_ORG_NAME
 
   descriptionMatches
     ? log.info (` ✔ Jurisdiction attribute description matches requested value`)
-    : log.error(` ✘ Jurisdiction attribute description ${description} does not match requested value, it was expected ${ZEPTOKEN_ATTRIBUTE_DESCRIPTION}`)
+    : log.error(` ✘ Jurisdiction attribute description "${description}" does not match requested value, it was expected "${ZEPTOKEN_ATTRIBUTE_DESCRIPTION}"`)
 
   isValidator
     ? log.info (' ✔ ZEP Validator is correctly set as a validator on the jurisdiction')

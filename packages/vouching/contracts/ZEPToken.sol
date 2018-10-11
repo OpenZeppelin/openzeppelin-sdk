@@ -23,7 +23,7 @@ contract ZEPToken is Initializable, TPLToken, ERC20Detailed, ERC20Pausable {
     uint256 totalSupply = 1e8 * (10 ** uint256(decimals));
 
     ERC20Pausable.initialize();
-    ERC20Detailed.initialize("ZeppelinOS Token", "ZEP", decimals);
+    ERC20Detailed.initialize("ZEP Token", "ZEP", decimals);
     TPLToken.initialize(_jurisdictionAddress, _validRecipientAttributeId);
 
     // TODO: Provisional fix. Until OZ initializable works with a parametrized msg.sender

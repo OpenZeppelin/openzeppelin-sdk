@@ -24,7 +24,7 @@ export async function createBasicJurisdiction(owner, options) {
   const initArgs = [owner]
   try {
     const basicJurisdiction = await create({ packageName, contractAlias, initMethod, initArgs, ...options})
-    log.base(` ✔ BasicJurisdiction created at ${basicJurisdiction.address}`)
+    log.info(` ✔ BasicJurisdiction created at ${basicJurisdiction.address}`)
     return basicJurisdiction
   } catch (error) {
     const BasicJurisdiction = Contracts.getFromNodeModules(packageName, contractAlias)
@@ -42,7 +42,7 @@ export async function createZEPToken(owner, basicJurisdiction, options) {
   const initArgs = [owner, basicJurisdiction.address, ZEPTOKEN_ATTRIBUTE_ID]
   try {
     const zepToken = await create({ packageName, contractAlias, initMethod, initArgs, ...options })
-    log.base(` ✔ ZEPToken created at ${zepToken.address}`)
+    log.info(` ✔ ZEPToken created at ${zepToken.address}`)
     return zepToken
   } catch (error) {
     const ZEPToken = Contracts.getFromLocal(contractAlias)
@@ -60,7 +60,7 @@ export async function createZEPValidator(owner, basicJurisdiction, options) {
   const initArgs = [owner, basicJurisdiction.address, ZEPTOKEN_ATTRIBUTE_ID]
   try {
     const zepValidator = await create({ packageName, contractAlias, initMethod, initArgs, ...options })
-    log.base(` ✔ ZEPValidator created at ${zepValidator.address}`)
+    log.info(` ✔ ZEPValidator created at ${zepValidator.address}`)
     return zepValidator
   } catch (error) {
     const ZEPValidator = Contracts.getFromLocal(contractAlias)
@@ -78,7 +78,7 @@ export async function createVouching(zepToken, options) {
   const initArgs = [VOUCHING_MIN_STAKE, zepToken.address]
   try {
     const vouching = await create({packageName, contractAlias, initMethod, initArgs, ...options})
-    log.base(` ✔ Vouching created at ${vouching.address}`)
+    log.info(` ✔ Vouching created at ${vouching.address}`)
     return vouching
   } catch (error) {
     const Vouching = Contracts.getFromLocal(contractAlias)

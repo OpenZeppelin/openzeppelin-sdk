@@ -61,6 +61,7 @@ export {
   Proxy,
   Logger,
   ABI,
+  Semver,
   FileSystem,
   Contracts,
   App,

@@ -9,34 +9,36 @@ contract('deploy', function([_, owner]) {
   const network = 'test'
   const txParams = { from: owner }
   const options = { network, txParams }
-  const networkFile = (new ZosPackageFile()).networkFile(network)
 
-  xdescribe('skip until can deploy lib locally for testing', function () {
-    beforeEach('deploy', async () => await deploy(options))
-    afterEach('remove zos test json', () => fs.remove('zos.test.json'))
-
-    it('setups a zeppelin os app', async function() {
-      assert(await verifyAppSetup(networkFile))
-    })
-
-    it('deploys a basic jurisdiction', async function() {
-      assert(await verifyJurisdiction(networkFile, txParams))
-    })
-
-    it('deploys a ZEP token', async function() {
-      assert(await verifyZEPToken(networkFile, txParams))
-    })
-
-    it('deploys a vouching contract', async function() {
-      assert(await verifyVouching(networkFile, txParams))
-    })
-
-    it('deploys a ZEP validator', async function() {
-      assert(await verifyZEPValidator(networkFile, txParams))
-    })
-
-    it('configures TPL', async function() {
-      assert(await verifyTPLConfiguration(networkFile, txParams))
-    })
+  before('deploy', async function () {
+    await deploy(options)
+    this.networkFile = (new ZosPackageFile()).networkFile(network)
   })
+
+  it('setups a zeppelin os app', async function() {
+    assert(await verifyAppSetup(this.networkFile))
+  })
+
+  it('deploys a basic jurisdiction', async function() {
+    assert(await verifyJurisdiction(this.networkFile, txParams))
+  })
+
+  it('deploys a ZEP token', async function() {
+    assert(await verifyZEPToken(this.networkFile, txParams))
+  })
+
+  it('deploys a vouching contract', async function() {
+    assert(await verifyVouching(this.networkFile, txParams))
+  })
+
+  it('deploys a ZEP validator', async function() {
+    assert(await verifyZEPValidator(this.networkFile, txParams))
+  })
+
+  it('configures TPL', async function() {
+    assert(await verifyTPLConfiguration(this.networkFile, txParams))
+  })
+
+  after('remove zos test json', () => fs.remove('zos.test.json'))
+  after('remove zos test summary json', () => fs.remove('zos.summary.test.json'))
 })
