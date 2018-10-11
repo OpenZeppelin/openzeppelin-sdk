@@ -29,7 +29,7 @@ contract('create script', function([_, owner]) {
   const version = '1.1.0';
   const txParams = { from: owner };
 
-  const assertProxy = async function(networkFile, alias, { version, say, implementation, packageName }) {
+  const assertProxy = async function(networkFile, alias, { version, say, implementation, packageName, value }) {
     const proxyInfo = networkFile.getProxies({ contract: alias })[0]
     proxyInfo.contract.should.eq(alias)
     proxyInfo.address.should.be.nonzeroAddress;
@@ -39,6 +39,12 @@ contract('create script', function([_, owner]) {
       const proxy = await ImplV1.at(proxyInfo.address);
       const said = await proxy.say();
       said.should.eq(say);
+    }
+
+    if (value) {
+      const proxy = await ImplV1.at(proxyInfo.address);
+      const actualValue = await proxy.value();
+      actualValue.toNumber().should.eq(value);
     }
 
     if (implementation) {
@@ -166,6 +172,16 @@ contract('create script', function([_, owner]) {
       it('should create a proxy from a dependency', async function () {
         await createProxy({ packageName: 'mock-stdlib-undeployed', contractAlias: 'Greeter', network, txParams, networkFile: this.networkFile });
         await assertProxy(this.networkFile, 'Greeter', { version, packageName: 'mock-stdlib-undeployed' });
+      });
+
+      it('should initialize a proxy from a dependency', async function () {
+        await createProxy({ packageName: 'mock-stdlib-undeployed', contractAlias: 'Greeter', network, txParams, networkFile: this.networkFile, initMethod: 'initialize', initArgs: ["42"] });
+        await assertProxy(this.networkFile, 'Greeter', { version, packageName: 'mock-stdlib-undeployed', value: 42 });
+      });
+
+      it('should initialize a proxy from a dependency using explicit function', async function () {
+        await createProxy({ packageName: 'mock-stdlib-undeployed', contractAlias: 'Greeter', network, txParams, networkFile: this.networkFile, initMethod: 'clashingInitialize(uint256)', initArgs: ["42"] });
+        await assertProxy(this.networkFile, 'Greeter', { version, packageName: 'mock-stdlib-undeployed', value: 42 });
       });
     });
 

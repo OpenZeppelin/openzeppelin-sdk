@@ -2,13 +2,13 @@
 
 require('../../setup')
 
-import { getFunctionFromMostDerivedContract as getFunction } from '../../../src/utils/ABIs'
+import { getABIFunction as getFunction } from '../../../src/utils/ABIs'
 import Contracts from '../../../src/utils/Contracts'
 
 const should = require('chai').should()
 
 describe('ABIs', function() {
-  describe('getFunctionFromMostDerivedContract', function () {
+  describe('getABIFunction', function () {
     it('matches number of arguments', async function () {
       testGetFunction('GetFunctionBase', [1,2], ['uint256', 'uint256']);
     });
@@ -25,6 +25,10 @@ describe('ABIs', function() {
       testGetFunction('GetFunctionOtherGrandchild', ['1'], ['bytes']);
     });
 
+    it('chooses function based on explicit types', async function () {
+      testGetFunction('GetFunctionGrandchild', ['1'], ['uint256'], 'initialize(uint256)');
+    });
+
     it('throws if not found', async function () {
       expect(() => testGetFunction('GetFunctionBase', [1,2,3])).to.throw("Could not find method initialize with 3 arguments in contract GetFunctionBase")
     });
@@ -35,9 +39,9 @@ describe('ABIs', function() {
   });
 })
 
-function testGetFunction(contractName, args, expectedTypes) {
+function testGetFunction(contractName, args, expectedTypes, funName = 'initialize') {
   const contractClass = Contracts.getFromLocal(contractName);
-  const method = getFunction(contractClass, 'initialize', args);
+  const method = getFunction(contractClass, funName, args);
   should.exist(method)
   method.inputs.map(m => m.type).should.be.deep.eq(expectedTypes);
 }

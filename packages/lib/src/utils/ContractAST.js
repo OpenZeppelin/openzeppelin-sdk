@@ -43,7 +43,6 @@ export default class ContractAST {
       .forEach(importPath => {
         if (this.imports.has(importPath)) return;
         this.imports.add(importPath);
-        console.log(`Adding ${importPath}`)
         this.artifacts.getArtifactsFromSourcePath(importPath).forEach(importedArtifact => {
           this._collectNodes(importedArtifact.ast)
           this._collectImports(importedArtifact.ast)
