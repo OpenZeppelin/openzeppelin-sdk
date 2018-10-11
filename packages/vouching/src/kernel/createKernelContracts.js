@@ -1,9 +1,11 @@
 import log from '../helpers/log'
-import create from 'zos/lib/scripts/create'
-import { Contracts } from 'zos-lib'
-import { buildCallData, callDescription } from 'zos-lib/lib/utils/ABIs'
+import { scripts } from 'zos'
+import { Contracts, ABI } from 'zos-lib'
 import { ZEPTOKEN_ATTRIBUTE_ID, VOUCHING_MIN_STAKE } from '../constants'
 import { printJurisdictionInformation, printVouchingInformation, printZepTokenInformation, printZepValidatorInformation } from './printKernelInformation'
+
+const { create } = scripts
+const { buildCallData, callDescription } = ABI
 
 export default async function createKernelContracts(options) {
   const owner = options.txParams.from

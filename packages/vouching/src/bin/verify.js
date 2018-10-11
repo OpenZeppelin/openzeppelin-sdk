@@ -3,7 +3,7 @@
 import log from '../helpers/log'
 import parseArgs from 'minimist'
 import verify from '../scripts/verify'
-import runWithTruffle from 'zos/lib/utils/runWithTruffle'
+import { runWithTruffle } from 'zos'
 
 const params = parseArgs(process.argv.slice(2), { string: 'from' })
 const { network, from } = params

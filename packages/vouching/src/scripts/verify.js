@@ -1,8 +1,7 @@
 import log from '../helpers/log'
-import status from 'zos/lib/scripts/status'
+import { files, scripts } from 'zos'
 import { FileSystem as fs, Contracts } from 'zos-lib'
 import validateAddress from '../helpers/validateAddress'
-import ZosPackageFile from 'zos/lib/models/files/ZosPackageFile'
 import {
   VOUCHING_MIN_STAKE,
   ZEPPELIN_ORG_NAME,
@@ -13,6 +12,9 @@ import {
   ZEPTOKEN_ATTRIBUTE_ID,
   ZEPTOKEN_ATTRIBUTE_DESCRIPTION,
 } from '../constants'
+
+const { status } = scripts
+const { ZosPackageFile } = files
 
 export default async function verify({ network, txParams }) {
   log.info(`Verifying vouching app on network ${ network }...`)
