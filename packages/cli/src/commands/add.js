@@ -14,7 +14,6 @@ const register = program => program
   .usage('[contractName1[:contractAlias1] ... contractNameN[:contractAliasN]] [options]')
   .description(description)
   .option('--all', 'add all contracts in your build directory')
-  .option('--skip-compile', 'skips contract compilation')
   .withPushOptions()
   .action(action)
 
