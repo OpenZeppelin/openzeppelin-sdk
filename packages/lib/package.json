@@ -4,7 +4,8 @@
   "description": "ZeppelinOS library",
   "scripts": {
     "test": "scripts/test.sh",
-    "prepare": "rm -rf build/contracts && truffle compile && rm -rf lib && babel src --out-dir lib"
+    "prepare": "rm -rf build/contracts && truffle compile && rm -rf lib && babel src --out-dir lib",
+    "watch": "babel src -w -d lib"
   },
   "repository": {
     "type": "git",
