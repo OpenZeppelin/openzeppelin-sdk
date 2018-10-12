@@ -8,7 +8,7 @@ export const VOUCHING_MIN_STAKE = 10
 
 export const VALIDATOR_NAME = 'ZEP Validator'
 export const ZEPPELIN_ORG_NAME = 'ZEP Org'
-export const ZEPPELIN_ORG_MAX_ADDRESSES = 100000
+export const ZEPPELIN_ORG_MAX_ADDRESSES = 100
 
 export const JURISDICTION_RESTRICTED_ACCESS = false
 export const JURISDICTION_ONLY_PERSONAL = false
