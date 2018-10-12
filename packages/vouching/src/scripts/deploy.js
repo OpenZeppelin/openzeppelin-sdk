@@ -14,7 +14,7 @@ export default async function deploy(options) {
   log.base(`Pushing ZeppelinOS app with options ${JSON.stringify(options, null, 2)}...`)
   const isLocalOrTest = options.network === 'local' || options.network === 'test'
   if (isLocalOrTest) removeZosFiles(options)
-  await push({ deployLibs: isLocalOrTest, ...options })
+  await push({ deployLibs: isLocalOrTest, full: true, ...options })
   const { jurisdiction, validator, zepToken, vouching } = await createKernelContracts(options)
   await configureTPL(jurisdiction, validator, options)
   exportKernelData(OUTPUT_FILE(options.network), jurisdiction, zepToken, validator, vouching)
