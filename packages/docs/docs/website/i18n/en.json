@@ -23,7 +23,7 @@
     "upgradeability_UpgradeabilityProxyFactory": "UpgradeabilityProxyFactory",
     "apis": "Reference",
     "Start here": "Start here",
-    "architecture": "On-chain Architecture",
+    "architecture": "Contract Architecture",
     "basil": "Zeppelin's Basil",
     "Basil": "Basil",
     "building": "Building an upgradeable application",
