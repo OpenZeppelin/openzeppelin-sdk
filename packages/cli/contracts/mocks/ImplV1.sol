@@ -14,6 +14,12 @@ contract ImplV1 {
   }
 }
 
+contract ChildImplV1 is ImplV1 {
+  function say() public pure returns (string) {
+    return "ChildV1";
+  }
+}
+
 contract WithLibraryImplV1 is ImplV1 {
   using UintLib for uint256;
 
