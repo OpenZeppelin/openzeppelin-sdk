@@ -22,7 +22,7 @@
   "dependencies": {
     "chalk": "^2.4.1",
     "minimist": "^1.2.0",
-    "openzeppelin-zos": "git+https://github.com/OpenZeppelin/openzeppelin-zos.git#3df0a786e4cfe19f22ea537f32f68c392b29a5f8",
+    "openzeppelin-zos": "git+https://github.com/OpenZeppelin/openzeppelin-zos.git#19610325924e03f008bb57dd8868f196bb7e3c98",
     "tpl-contracts-zos": "0.0.3",
     "zos": "^2.0.0-alpha.4",
     "zos-lib": "^2.0.0-alpha.4"
