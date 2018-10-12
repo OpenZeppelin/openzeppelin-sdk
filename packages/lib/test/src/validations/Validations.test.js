@@ -49,6 +49,19 @@ contract('Validations', function () {
   it('should warn when adding a contract whose parent has a delegatecall call', async function() {
     validate('WithParentWithDelegateCall').hasDelegateCall.should.be.true;
   });
+
+  it('should not warn when adding a contract without initial values in fields declarations', async function() {
+    validate('WithoutInitialValuesInFieldsDeclarations').hasInitialValuesInDeclarations.should.be.false
+  })
+
+  it('should warn when adding a contract with initial values in fields declarations', async function() {
+    validate('WithInitialValuesInFieldsDeclarations').hasInitialValuesInDeclarations.should.be.true
+
+  })
+
+  it('should warn when adding a contract whose parent has initial values in fields declarations', async function() {
+    validate('WithParentWithInitialValuesInFieldsDeclarations').hasInitialValuesInDeclarations.should.be.true
+  })
 });
   
 function validate(contractName) {
