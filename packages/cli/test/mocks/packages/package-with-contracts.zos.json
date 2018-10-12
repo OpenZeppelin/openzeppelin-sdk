@@ -8,6 +8,6 @@
   },
   "contracts": {
     "Impl": "ImplV1",
-    "AnotherImpl": "AnotherImplV1"
+    "WithLibraryImpl": "WithLibraryImplV1"
   }
 }

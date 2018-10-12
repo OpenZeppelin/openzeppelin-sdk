@@ -5,6 +5,6 @@
   "version": "1.2.0",
   "contracts": {
     "Impl": "ImplV1",
-    "AnotherImpl": "AnotherImplV1"
+    "WithLibraryImpl": "WithLibraryImplV1"
   }
 }

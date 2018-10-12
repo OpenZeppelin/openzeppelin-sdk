@@ -14,7 +14,7 @@ contract ImplV1 {
   }
 }
 
-contract AnotherImplV1 is ImplV1 {
+contract WithLibraryImplV1 is ImplV1 {
   using UintLib for uint256;
 
   function double(uint256 x) public pure returns (uint256) {
@@ -22,7 +22,7 @@ contract AnotherImplV1 is ImplV1 {
   }
 
   function say() public pure returns (string) {
-    return "AnotherV1";
+    return "WithLibraryV1";
   }
 }
 

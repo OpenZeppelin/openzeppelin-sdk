@@ -18,7 +18,7 @@ import { promisify } from 'util';
 const should = require('chai').should();
 
 const ImplV1 = Contracts.getFromLocal('ImplV1');
-const AnotherImplV1 = Contracts.getFromLocal('AnotherImplV1');
+const WithLibraryImplV1 = Contracts.getFromLocal('WithLibraryImplV1');
 const PackageContract = Contracts.getFromNodeModules('zos-lib', 'Package');
 const ImplementationDirectory = Contracts.getFromNodeModules('zos-lib', 'ImplementationDirectory');
 
@@ -96,8 +96,8 @@ contract('push script', function([_, owner]) {
     });
 
     it('should deploy and link contracts that require libraries', async function () {
-      const address = this.networkFile.contract('AnotherImpl').address;
-      const deployed = await AnotherImplV1.at(address);
+      const address = this.networkFile.contract('WithLibraryImpl').address;
+      const deployed = await WithLibraryImplV1.at(address);
       const result = await deployed.double(10);
       result.toNumber().should.eq(20);
     });

@@ -13,9 +13,9 @@ contract ImplV2 is ImplV1 {
   }
 }
 
-contract AnotherImplV2 is ImplV2 {
+contract WithLibraryImplV2 is ImplV2 {
   function say() public pure returns (string) {
-    return "AnotherV2";
+    return "WithLibraryV2";
   }
 }
 
