@@ -13,8 +13,8 @@ const register = program => program
   .description(description)
   .option('--publish', 'automatically publishes your project upon pushing it to a network')
   .option('--force', 'overwrite existing project if there is one')
-  .option('--link <stdlib>', 'link to a standard library')
-  .option('--no-install', 'skip installing stdlib dependencies locally')
+  .option('--link <dependency>', 'link to a dependency')
+  .option('--no-install', 'skip installing packages dependencies locally')
   .withPushOptions()
   .action(action)
 

@@ -65,7 +65,7 @@ contract('status script', function([_, owner]) {
         await push({ network, txParams, networkFile: this.networkFile });
         await this.capturingLogs(status({ network, networkFile: this.networkFile }));
 
-        this.logs.text.should.match(/library package is deployed at 0x[0-9a-fA-F]{40}/i);
+        this.logs.text.should.match(/Dependency package is deployed at 0x[0-9a-fA-F]{40}/i);
       });
     });
   };

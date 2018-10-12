@@ -41,7 +41,7 @@ contract('Dependency', function([_, from]) {
   describe('#constructor', function() {
     context('with invalid version', function() {
       it('throws an error',function() {
-        assertErrorMessage(() => new Dependency('mock-stdlib', '1.2.0'), /does not match dependency package version/)
+        assertErrorMessage(() => new Dependency('mock-stdlib', '1.2.0'), /does not match version/)
       })
     })
 
