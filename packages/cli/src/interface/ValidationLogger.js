@@ -2,6 +2,8 @@ import _ from 'lodash';
 import { FileSystem as fs, Logger, getStorageLayout } from 'zos-lib';
 
 const log = new Logger('Validations');
+const safetyChecksLink = "Read more at https://docs.zeppelinos.org/docs/advanced.html#safety-checks";
+const preserveStorageLink = "Read more at https://docs.zeppelinos.org/docs/advanced.html#preserving-the-storage-structure";
 
 export default class ValidationLogger {
   constructor(contract, existingContractInfo = {}) {
@@ -35,31 +37,31 @@ export default class ValidationLogger {
 
   logHasSelfDestruct(hasSelfDestruct) {
     if (hasSelfDestruct) {
-      log.warn(`- Contract ${this.contractName} or one of its ancestors has a selfdestruct call. This is potentially a security risk, as could have the logic contract being destructed, breaking all instances that depend on it. Please review and consider removing this call.`);
+      log.warn(`- Contract ${this.contractName} or one of its ancestors has a selfdestruct call. This is potentially a security risk, as could have the logic contract being destructed, breaking all instances that depend on it. Please review and consider removing this call. ${safetyChecksLink}`);
     }
   }
 
   logHasDelegateCall(hasDelegateCall) {
     if (hasDelegateCall) {
-      log.warn(`- Contract ${this.contractName} or one of its ancestors has a delegatecall call. This is potentially a security risk, as the logic contract could be destructed by issuing a delegatecall to another contract with a selfdestruct instruction. Please review and consider removing this call.`);
+      log.warn(`- Contract ${this.contractName} or one of its ancestors has a delegatecall call. This is potentially a security risk, as the logic contract could be destructed by issuing a delegatecall to another contract with a selfdestruct instruction. Please review and consider removing this call. ${safetyChecksLink}`);
     }
   }
 
   logHasInitialValuesInDeclarations(hasInitialValuesInDeclarations) {
     if (hasInitialValuesInDeclarations) {
-      log.warn(` - Contract ${this.contractName} or one of its ancestors has an initial value setted in a field declaration. Setting an initial value for a field when declaring it does not work for proxies, since the value is set in the constructor. Please consider moving all field initializations to an initializer function.`)
+      log.warn(` - Contract ${this.contractName} or one of its ancestors has an initial value setted in a field declaration. Setting an initial value for a field when declaring it does not work for proxies, since the value is set in the constructor. Please consider moving all field initializations to an initializer function. ${safetyChecksLink}`)
     }
   }
 
   logHasConstructor(hasConstructor) {
     if (hasConstructor) {
-      log.error(`- Contract ${this.contractName} has an explicit constructor. Change it to an initializer function.`);
+      log.error(`- Contract ${this.contractName} has an explicit constructor. Change it to an initializer function. ${safetyChecksLink}`);
     }
   }
 
   logUninitializedBaseContracts(uninitializedBaseContracts) {
     if (!_.isEmpty(uninitializedBaseContracts)) {
-      log.warn(`- Contract ${this.contractName} has base contracts ${uninitializedBaseContracts.join(', ')} which are initializable, but their initialize methods are not called from ${this.contractName}.initialize.`);
+      log.warn(`- Contract ${this.contractName} has base contracts ${uninitializedBaseContracts.join(', ')} which are initializable, but their initialize methods are not called from ${this.contractName}.initialize. ${safetyChecksLink}`);
     }
   }
 
@@ -69,8 +71,7 @@ export default class ValidationLogger {
     const varList = vars.map(({ label, contract }) => `${label} (${contract})`).join(', ');
     const variablesString = `Variable${vars.length === 1 ? '' : 's'}`;
     log.warn(`- ${variablesString} ${varList} contain a struct or enum type, which are not being compared for layout changes in this version. ` +
-             `Double-check that the storage layout of these types was not modified in the updated contract. ` + 
-             `Read more at https://docs.zeppelinos.org/docs/advanced.html#preserving-the-storage-structure.`);
+             `Double-check that the storage layout of these types was not modified in the updated contract. ${preserveStorageLink}`);
   }
 
   logStorageLayoutDiffs(storageDiff, updatedStorageInfo) {
@@ -136,7 +137,7 @@ export default class ValidationLogger {
       }
     });
   
-    log.info('- Read more at https://docs.zeppelinos.org/docs/advanced.html#preserving-the-storage-structure')
+    log.info(`${preserveStorageLink}`)
   }
 }
 
