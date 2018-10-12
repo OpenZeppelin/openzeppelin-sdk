@@ -9,6 +9,6 @@
     "ZEPValidator": "ZEPValidator"
   },
   "dependencies": {
-    "tpl-contracts-zos": "^0.0.1"
+    "tpl-contracts-zos": "0.0.6"
   }
 }
