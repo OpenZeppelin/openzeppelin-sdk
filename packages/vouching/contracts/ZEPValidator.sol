@@ -1,6 +1,6 @@
 pragma solidity ^0.4.24;
 
-import "openzeppelin-zos/contracts/Initializable.sol";
+import "zos-lib/contracts/Initializable.sol";
 import "openzeppelin-zos/contracts/ownership/Ownable.sol";
 import "openzeppelin-zos/contracts/lifecycle/Pausable.sol";
 import "tpl-contracts-zos/contracts/AttributeRegistry.sol";

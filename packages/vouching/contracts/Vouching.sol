@@ -1,11 +1,11 @@
 pragma solidity ^0.4.24;
 
 
+import "zos-lib/contracts/Initializable.sol";
 import "openzeppelin-zos/contracts/token/ERC20/ERC20.sol";
 import "openzeppelin-zos/contracts/token/ERC20/SafeERC20.sol";
 import "openzeppelin-zos/contracts/math/SafeMath.sol";
 import "openzeppelin-zos/contracts/utils/Address.sol";
-import "openzeppelin-zos/contracts/Initializable.sol";
 
 contract Vouching is Initializable {
   event OwnershipTransferred(address indexed oldOwner, address indexed newOwner);
