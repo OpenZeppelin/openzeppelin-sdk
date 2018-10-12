@@ -6,6 +6,7 @@ import { hasSelfDestruct, hasDelegateCall } from "./Instructions";
 import { getUninitializedBaseContracts } from "./Initializers";
 import { getStorageLayout, getStructsOrEnums } from './Storage';
 import { compareStorageLayouts } from './Layout';
+import { hasInitialValuesInDeclarations } from './InitialValues';
 
 const log = new Logger('validate')
 
@@ -19,6 +20,7 @@ export function validate(contractClass, existingContractInfo = {}, buildArtifact
     hasConstructor: hasConstructor(contractClass),
     hasSelfDestruct: hasSelfDestruct(contractClass),
     hasDelegateCall: hasDelegateCall(contractClass),
+    hasInitialValuesInDeclarations: hasInitialValuesInDeclarations(contractClass),
     uninitializedBaseContracts,
     ... storageValidation
   }
@@ -29,6 +31,7 @@ export function newValidationErrors(validations, existingValidations = {}) {
     hasConstructor,
     hasSelfDestruct,
     hasDelegateCall,
+    hasInitialValuesInDeclarations,
     uninitializedBaseContracts,
     storageDiff,
     storageUncheckedVars
@@ -38,6 +41,7 @@ export function newValidationErrors(validations, existingValidations = {}) {
     hasConstructor: hasConstructor && !existingValidations.hasConstructor,
     hasSelfDestruct: hasSelfDestruct && !existingValidations.hasSelfDestruct,
     hasDelegateCall: hasDelegateCall && !existingValidations.hasDelegateCall,
+    hasInitialValuesInDeclarations: hasInitialValuesInDeclarations && !existingValidations.hasInitialValuesInDeclarations,
     uninitializedBaseContracts: _.difference(uninitializedBaseContracts, existingValidations.uninitializedBaseContracts),
     storageUncheckedVars: _.difference(storageUncheckedVars, existingValidations.storageUncheckedVars),
     storageDiff
@@ -49,6 +53,7 @@ export function validationPasses(validations) {
     hasConstructor,
     hasSelfDestruct,
     hasDelegateCall,
+    hasInitialValuesInDeclarations,
     uninitializedBaseContracts,
     storageDiff
   } = validations;
@@ -57,6 +62,7 @@ export function validationPasses(validations) {
     && !hasConstructor
     && !hasSelfDestruct
     && !hasDelegateCall
+    && !hasInitialValuesInDeclarations
     && _.isEmpty(uninitializedBaseContracts);
 }
 

@@ -18,6 +18,7 @@ export default class ValidationLogger {
       hasConstructor,
       hasSelfDestruct,
       hasDelegateCall,
+      hasInitialValuesInDeclarations,
       uninitializedBaseContracts,
       storageDiff,
       storageUncheckedVars
@@ -26,6 +27,7 @@ export default class ValidationLogger {
     this.logHasConstructor(hasConstructor);
     this.logHasSelfDestruct(hasSelfDestruct);
     this.logHasDelegateCall(hasDelegateCall);
+    this.logHasInitialValuesInDeclarations(hasInitialValuesInDeclarations);
     this.logUncheckedVars(storageUncheckedVars);
     this.logUninitializedBaseContracts(uninitializedBaseContracts);
     this.logStorageLayoutDiffs(storageDiff, getStorageLayout(this.contract, buildArtifacts));
@@ -40,6 +42,12 @@ export default class ValidationLogger {
   logHasDelegateCall(hasDelegateCall) {
     if (hasDelegateCall) {
       log.warn(`- Contract ${this.contractName} or one of its ancestors has a delegatecall call. This is potentially a security risk, as the logic contract could be destructed by issuing a delegatecall to another contract with a selfdestruct instruction. Please review and consider removing this call.`);
+    }
+  }
+
+  logHasInitialValuesInDeclarations(hasInitialValuesInDeclarations) {
+    if (hasInitialValuesInDeclarations) {
+      log.warn(` - Contract ${this.contractName} or one of its ancestors has an initial value setted in a field declaration. Setting an initial value for a field when declaring it does not work for proxies, since the value is set in the constructor. Please consider moving all field initializations to an initializer function.`)
     }
   }
 

@@ -41,6 +41,11 @@ contract('ValidationLogger', function() {
       validationLogger().log({ storageUncheckedVars: [{ label: 'foo', contract: 'MyContract' }] });
       this.logs.warns[0].should.match(/foo \(MyContract\) contain a struct or enum/);
     });
+
+    it('logs when detecting initial values in fields declarations', async function () {
+      validationLogger().log({ hasInitialValuesInDeclarations: true });
+      this.logs.warns[0].should.match(/has an initial value/);
+    });
   });
 
   describe('storage', function () {
