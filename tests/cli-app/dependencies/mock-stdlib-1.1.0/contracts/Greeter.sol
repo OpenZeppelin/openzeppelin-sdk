@@ -1,6 +1,10 @@
 pragma solidity ^0.4.24;
 
+import "./InternalLibrary.sol";
+
 contract Greeter {
+  using Numbers for uint256;
+
   bool private isInitialized;
   string public who;
 
@@ -12,5 +16,9 @@ contract Greeter {
 
   function minor() public pure returns (uint256) {
     return 1;
+  }
+
+  function doubles(uint256 x) public pure returns (uint256) {
+    return x.double();
   }
 }
