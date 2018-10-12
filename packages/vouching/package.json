@@ -7,6 +7,11 @@
   "directories": {
     "test": "test"
   },
+  "files": [
+    "lib",
+    "build",
+    "contracts"
+  ],
   "scripts": {
     "test": "NODE_ENV=test scripts/test.sh",
     "prepare": "rm -rf build && npx truffle compile && rm -rf lib && npx babel src --out-dir lib",
