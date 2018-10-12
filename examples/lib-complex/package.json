@@ -1,6 +1,6 @@
 {
   "name": "zos-lib-complex-example",
-  "version": "2.0.0-alpha.5",
+  "version": "2.0.0-alpha.6",
   "private": true,
   "description": "Example of using the upgradeability-lib's App",
   "main": "index.js",
@@ -22,7 +22,7 @@
     "openzeppelin-solidity": "~1.10.0",
     "openzeppelin-zos": "~1.9.1",
     "truffle": "^4.1.13",
-    "zos-lib": "^2.0.0-alpha.5"
+    "zos-lib": "^2.0.0-alpha.6"
   },
   "devDependencies": {
     "babel-polyfill": "^6.23.0",
