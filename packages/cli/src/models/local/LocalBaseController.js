@@ -42,30 +42,6 @@ export default class LocalBaseController {
 
   add(contractAlias, contractName) {
     log.info(`Adding ${contractAlias === contractName ? contractAlias : `${contractAlias}:${contractName}`}`)
-<<<<<<< HEAD
-    // We are logging an error instead of throwing because a contract may have an empty constructor,
-    // which is fine, but as long as it is declared we will be picking it up
-    if (this.hasConstructor(Contracts.getLocalPath(contractName))) {
-      log.error(`Contract ${contractName} has an explicit constructor. Move it to an initializer function to use it with ZeppelinOS.`)
-    }
-    // Log a warning anytime there is a base contract that wasn't initialized.
-    const uninitializedBaseContracts = this.getUninitializedBaseContracts(Contracts.getLocalPath(contractName))
-    for (const baseContractName in uninitializedBaseContracts) {
-      const childContractName = uninitializedBaseContracts[baseContractName]
-      log.warn(`Contract ${childContractName} has base contract ${baseContractName} that wasn't initialized.`)
-    }
-    // Log a warning anytime `selfdestruct` is found.  This is a potential security risk, 
-    // but not an error/throw as it may be a desired feature
-    if (this.hasSelfDestruct(Contracts.getLocalPath(contractName))) {
-      log.warn(`Contract ${contractName} (or its parent class) has a selfdestruct call. This is potentially a security risk. Please review and consider removing this call.`)
-    }
-    // Log a warning anytime `delegatecall` is found.  This is a potential security risk, 
-    // but not an error/throw as it may be a desired feature
-    if (this.hasDelegateCall(Contracts.getLocalPath(contractName))) {
-      log.warn(`Contract ${contractName} (or its parent class) has a delegatecall call. This is potentially a security risk, as the logic contract could be destructed by issuing a delegatecall to another contract with a selfdestruct instruction. Please review and consider removing this call.`)
-    }
-=======
->>>>>>> upstream/master
     this.packageFile.addContract(contractAlias, contractName)
   }
 
