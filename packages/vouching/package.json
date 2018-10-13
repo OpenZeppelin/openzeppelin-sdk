@@ -16,10 +16,12 @@
     "test": "NODE_ENV=test scripts/test.sh",
     "prepare": "rm -rf build && npx truffle compile && rm -rf lib && npx babel src --out-dir lib",
     "start-local": "npx ganache-cli --deterministic",
-    "deploy-local": "node ./lib/bin/deploy.js --network=local --from=0x90f8bf6a479f320ead074411a4b0e7944ea8c9c1",
+    "deploy-local": "rm zos.local.json && node ./lib/bin/deploy.js --network=local --from=0x90f8bf6a479f320ead074411a4b0e7944ea8c9c1",
     "verify-local": "node ./lib/bin/verify.js --network=local --from=0x90f8bf6a479f320ead074411a4b0e7944ea8c9c1",
     "deploy-ropsten": "node ./lib/bin/deploy.js --network=ropsten --from=0x09902a56d04a9446601a0d451e07459dc5af0820",
-    "verify-ropsten": "node ./lib/bin/verify.js --network=ropsten --from=0x09902a56d04a9446601a0d451e07459dc5af0820"
+    "verify-ropsten": "node ./lib/bin/verify.js --network=ropsten --from=0x09902a56d04a9446601a0d451e07459dc5af0820",
+    "deploy-mainnet": "node ./lib/bin/deploy.js --network=mainnet --from=0xe373e9855dadeb9ce76d2c5f5484d93699acb735",
+    "verify-mainnet": "node ./lib/bin/verify.js --network=mainnet --from=0xe373e9855dadeb9ce76d2c5f5484d93699acb735"
   },
   "keywords": [],
   "author": "",

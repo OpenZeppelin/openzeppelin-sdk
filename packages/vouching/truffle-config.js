@@ -14,10 +14,10 @@ module.exports = {
       host: 'localhost',
       port: 8565,
       network_id: 3,
-      gas: 50000,
+      gas: 500000,
       gasPrice: 10e9, // 10 Gwei
     },
-    "mainnet-zos": {
+    mainnet: {
       host: 'localhost',
       port: 8545,
       network_id: '1',
