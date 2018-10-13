@@ -8,12 +8,10 @@ const network = args.network;
 const { Logger, AppProject, Contracts, ImplementationDirectory, Package } = require('zos-lib')
 const log = new Logger('ComplexExample')
 
-const MintableERC721Token = Contracts.getFromLocal('MintableERC721Token');
+const ERC721Mintable = Contracts.getFromLocal('ERC721Mintable');
 
 const contractName = 'Donations';
-const tokenClass = 'MintableERC721Token';
-const tokenName = 'DonationToken';
-const tokenSymbol = 'DON';
+const tokenClass = 'ERC721Mintable';
 
 async function setupApp(txParams) {
 
@@ -39,11 +37,11 @@ async function deployVersion2(project, donations, txParams) {
   log.info('<< Deploying version 2 >>')
   const secondVersion = '0.0.2'
   await project.newVersion(secondVersion)
-  
+
   const dependencyName = 'openzeppelin';
   const [dependencyAddress, dependencyVersion] = await getLibrary(txParams)
   await project.setDependency('openzeppelin', dependencyAddress, dependencyVersion)
-  
+
   const DonationsV2 = Contracts.getFromLocal('DonationsV2')
   await project.setImplementation(DonationsV2, contractName);
   await project.upgradeProxy(donations.address, DonationsV2, { contractName })
@@ -52,11 +50,11 @@ async function deployVersion2(project, donations, txParams) {
   // Add an ERC721 token implementation to the project, request a proxy for it,
   // and set the token on 'Donations'.
   log.info(`Creating ERC721 token proxy to use in ${contractName}...`)
-  const token = await project.createProxy(MintableERC721Token, { 
+  const token = await project.createProxy(ERC721Mintable, {
     packageName: 'openzeppelin',
     contractName: tokenClass,
     initMethod: 'initialize',
-    initArgs: [donations.address, tokenName, tokenSymbol]
+    initArgs: [donations.address]
   })
   log.info(`Token proxy created at ${token.address}`)
   log.info('Setting application\'s token...')
@@ -73,7 +71,7 @@ async function getLibrary(txParams) {
     const version = '1.0.0';
     const thepackage = await Package.deploy(txParams);
     const directory = await thepackage.newVersion(version);
-    const tokenImplementation = await MintableERC721Token.new();
+    const tokenImplementation = await ERC721Mintable.new();
     await directory.setImplementation(tokenClass, tokenImplementation.address);
     return [thepackage.address, version];
   } else {
