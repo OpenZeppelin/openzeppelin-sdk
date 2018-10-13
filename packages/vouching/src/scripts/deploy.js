@@ -1,5 +1,5 @@
 import log from '../helpers/log'
-import { scripts } from 'zos'
+import { scripts, stdout } from 'zos'
 import { OUTPUT_FILE } from '../constants'
 import { FileSystem as fs } from 'zos-lib'
 import configureTPL from '../kernel/configureTPL'
@@ -15,6 +15,7 @@ export default async function deploy(options) {
   const isLocalOrTest = options.network === 'local' || options.network === 'test'
   if (isLocalOrTest) removeZosFiles(options)
   await push({ deployLibs: isLocalOrTest, full: true, ...options })
+  stdout.silent(true)
   const { jurisdiction, validator, zepToken, vouching } = await createKernelContracts(options)
   await configureTPL(jurisdiction, validator, options)
   exportKernelData(OUTPUT_FILE(options.network), jurisdiction, zepToken, validator, vouching)

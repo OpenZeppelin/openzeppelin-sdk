@@ -12,7 +12,7 @@ export function printZepTokenInformation(owner, basicJurisdiction = undefined) {
   log.base(`Creating ZEPToken instance for: `)
   log.base(` - Owner:              ${owner}`)
   log.base(` - Attribute ID:       ${ZEPTOKEN_ATTRIBUTE_ID}`)
-  log.base(` - Basic Jurisdiction: [${basicJurisdiction ? basicJurisdiction.address : 'a new instance to be created'}]\n`)
+  log.base(` - Basic Jurisdiction: ${basicJurisdiction ? basicJurisdiction.address : '[a new instance to be created]'}\n`)
 }
 
 export function printZepValidatorInformation(owner, basicJurisdiction = undefined) {
@@ -20,12 +20,12 @@ export function printZepValidatorInformation(owner, basicJurisdiction = undefine
   log.base(`Creating ZEPValidator instance for: `)
   log.base(` - Owner:              ${owner}`)
   log.base(` - Attribute ID:       ${ZEPTOKEN_ATTRIBUTE_ID}`)
-  log.base(` - Basic Jurisdiction: [${basicJurisdiction ? basicJurisdiction.address : 'a new instance to be created'}]\n`)
+  log.base(` - Basic Jurisdiction: ${basicJurisdiction ? basicJurisdiction.address : '[a new instance to be created]'}\n`)
 }
 
 export function printVouchingInformation(zepToken = undefined) {
   log.base('\n--------------------------------------------------------------------\n\n')
   log.base(`Creating Vouching instance for: `)
   log.base(` - Minimum stake:  ${VOUCHING_MIN_STAKE}`)
-  log.base(` - ZEP token:      [${zepToken ? zepToken.address : 'a new instance to be created'}]\n`)
+  log.base(` - ZEP token:      ${zepToken ? zepToken.address : '[a new instance to be created]'}\n`)
 }
