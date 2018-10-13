@@ -16,7 +16,8 @@ export default async function createKernelContracts(options) {
   const zepToken = await createZEPToken(owner, jurisdiction, options, networkFile)
   const vouching = await createVouching(zepToken, options, networkFile)
   const validator = await createZEPValidator(owner, jurisdiction, options, networkFile)
-  return { jurisdiction, validator, zepToken, vouching }
+  const app = networkFile.app
+  return { app, jurisdiction, validator, zepToken, vouching }
 }
 
 export async function createBasicJurisdiction(owner, options, networkFile) {
