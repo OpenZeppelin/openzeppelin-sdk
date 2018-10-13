@@ -2,6 +2,7 @@ const { spawnSync } = require('child_process');
 const path = require('path');
 const fs = require('fs');
 const _ = require('lodash');
+const truffleConfig = require('../workdir/truffle')
 
 function getNetwork() {
   const network = process.env.NETWORK;
@@ -10,8 +11,10 @@ function getNetwork() {
 }
 
 function getProxyAddress(network, name, index) {
-  const fileName = path.resolve(__dirname, `../workdir/zos.${network}.json`)
+  const currentNetwork = truffleConfig.networks[network]
+  const fileName = path.resolve(__dirname, `../workdir/${getNetworkFileName(currentNetwork)}`)
   const data = JSON.parse(fs.readFileSync(fileName))
+
   if (!data.proxies || !data.proxies[name] || !data.proxies[name][index]) {
     throw new Error(`Could not find proxy ${name}/${index} in data`, data)
   }
@@ -25,7 +28,8 @@ function getProxyAddress(network, name, index) {
 }
 
 function getNetworkInfo(network) {
-  return JSON.parse(fs.readFileSync(path.resolve(__dirname, `../workdir/zos.${network}.json`)))
+  const currentNetwork = truffleConfig.networks[network]
+  return JSON.parse(fs.readFileSync(path.resolve(__dirname, `../workdir/${getNetworkFileName(currentNetwork)}`)))
 }
 
 function logOutput(out, err) {
@@ -65,6 +69,13 @@ function run(cmd, cwd = "") {
 
 function copy(src, target) {
   fs.copyFileSync(path.resolve(__dirname, `../files/${src}`), path.resolve(__dirname, `../workdir/${target}`));
+}
+
+function getNetworkFileName(currentNetwork) {
+  const { network_id: networkId } = currentNetwork
+  const name = networkId === '4' ? 'rinkeby' : `dev-${networkId}`
+
+  return `zos.${name}.json`
 }
 
 module.exports = {

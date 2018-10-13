@@ -1,9 +1,12 @@
 const fs = require('fs')
 const path = require('path')
+const truffleConfig = require('../truffle')
 
 function getProxyAddress(network, name, index) {
-  const fileName = path.resolve(__dirname, `../zos.${network}.json`)
+  const currentNetwork = truffleConfig.networks[network]
+  const fileName = path.resolve(__dirname, `../${getNetworkFileName(currentNetwork)}`)
   const data = JSON.parse(fs.readFileSync(fileName))
+
   if (!data.proxies || !data.proxies[name] || !data.proxies[name][index]) {
     throw new Error(`Could not find proxy ${name}/${index} in data`, data)
   }
@@ -14,6 +17,13 @@ function getProxyAddress(network, name, index) {
   }
 
   return proxyAddress
+}
+
+function getNetworkFileName(currentNetwork) {
+  const { network_id: networkId } = currentNetwork
+  const name = networkId === '4' ? 'rinkeby' : `dev-${networkId}`
+
+  return `zos.${name}.json`
 }
 
 module.exports = {
