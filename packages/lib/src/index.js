@@ -6,6 +6,8 @@ import decodeLogs from './helpers/decodeLogs'
 import encodeCall from './helpers/encodeCall'
 
 // utils
+import ABI from './utils/ABIs'
+import Semver from './utils/Semver'
 import Logger from './utils/Logger'
 import FileSystem from './utils/FileSystem'
 import Contracts from './utils/Contracts'
@@ -18,6 +20,7 @@ import { semanticVersionEqual, toSemanticVersion, semanticVersionToString } from
 import { getStorageLayout, getStructsOrEnums } from './validations/Storage';
 import { getBuildArtifacts } from './utils/BuildArtifacts';
 import { compareStorageLayouts } from './validations/Layout';
+import { validate, newValidationErrors, validationPasses } from './validations';
 
 // test behaviors
 import { behaviors, helpers } from './test'
@@ -49,6 +52,9 @@ export {
   getStorageLayout,
   compareStorageLayouts,
   getStructsOrEnums,
+  validate,
+  newValidationErrors,
+  validationPasses,
   bodyCode, 
   constructorCode, 
   bytecodeDigest, 
@@ -58,6 +64,8 @@ export {
   semanticVersionToString,
   Proxy,
   Logger,
+  ABI,
+  Semver,
   FileSystem,
   Contracts,
   App,

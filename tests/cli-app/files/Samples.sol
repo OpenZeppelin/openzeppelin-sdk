@@ -1,6 +1,8 @@
 pragma solidity ^0.4.24;
 
-contract Foo {
+import "mock-stdlib/contracts/Parent.sol";
+
+contract Foo is Parent {
   function say() pure returns(string) {
     return "Foo";
   }

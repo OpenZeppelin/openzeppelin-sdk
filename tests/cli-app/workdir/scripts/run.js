@@ -9,7 +9,7 @@ async function run(network, name, index, functionName) {
   const contractClass = artifacts.require(name)
   const instance = await contractClass.at(proxyAddress)
   const said = await instance[functionName].call({ from })
-  console.log(said)
+  console.log(said.toNumber ? said.toNumber() : said)
 }
 
 module.exports = function(cb) {

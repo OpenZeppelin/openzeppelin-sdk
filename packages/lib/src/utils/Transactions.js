@@ -5,6 +5,9 @@
 // (see https://github.com/trufflesuite/truffle-contract/pull/95/files#diff-26bcc3534c5a2e62e22643287a7d3295R145)
 
 import { promisify } from 'util'
+import sleep from '../helpers/sleep';
+import Contracts from './Contracts'
+import BN from 'bignumber.js'
 
 // Store last block for gasLimit information
 const state = { };
@@ -12,8 +15,14 @@ const state = { };
 // Gas estimates are multiplied by this value to allow for an extra buffer (for reference, truffle-next uses 1.25)
 const GAS_MULTIPLIER = 1.25;
 
-// Max number of retries for deploying a contract
+// Max number of retries for transactions or queries
 const RETRY_COUNT = 3;
+
+// Time to sleep between retries for query operations
+const RETRY_SLEEP_TIME = process.env.NODE_ENV === 'test' ? 1 : 3000;
+
+// Truffle defaults gas price to 100gwei
+const TRUFFLE_DEFAULT_GAS_PRICE = BN(100000000000);
 
 /**
  * Wraps the _sendTransaction function and manages transaction retries
@@ -23,6 +32,8 @@ const RETRY_COUNT = 3;
  * @param retries number of transaction retries
  */
 export async function sendTransaction(contractFn, args = [], txParams = {}, retries = RETRY_COUNT) {
+  checkGasPrice(txParams)
+
   try {
     return await _sendTransaction(contractFn, args, txParams)
   } catch (error) {
@@ -39,6 +50,8 @@ export async function sendTransaction(contractFn, args = [], txParams = {}, retr
  * @param retries number of deploy retries
  */
 export async function deploy(contract, args = [], txParams = {}, retries = RETRY_COUNT) {
+  checkGasPrice(txParams)
+
   try {
     return await _deploy(contract, args, txParams)
   } catch (error) {
@@ -54,15 +67,16 @@ export async function deploy(contract, args = [], txParams = {}, retries = RETRY
  * @param txParams all transaction parameters (data, from, gasPrice, etc)
  */
 export async function sendDataTransaction(contract, txParams) {
+  // TODO: Add retries similar to sendTransaction
+  checkGasPrice(txParams)
+
   // If gas is set explicitly, use it
   if (txParams.gas) {
     return contract.sendTransaction(txParams)
   }
-  // Estimate gas for the call
-  const estimatedGas = await estimateGas({ to: contract.address, ... txParams });
-  // Run the tx
-  const gasToUse = await calculateActualGas(estimatedGas);
-  return contract.sendTransaction({ gas: gasToUse, ... txParams });
+  // Estimate gas for the call and run the tx
+  const gas = await estimateActualGas({ to: contract.address, ... txParams });
+  return contract.sendTransaction({ gas, ... txParams });
 }
 
 /**
@@ -79,11 +93,9 @@ async function _sendTransaction(contractFn, args = [], txParams = {}) {
   }
 
   // Estimate gas for the call
-  const estimatedGas = await contractFn.estimateGas(...args, txParams);
-
-  // Run the tx
-  const gasToUse = await calculateActualGas(estimatedGas);
-  return contractFn(...args, { gas: gasToUse, ... txParams });
+  const estimateGasTxParams = { ... txParams, ... contractFn.request(...args).params[0] };
+  const gas = await estimateActualGas(estimateGasTxParams);
+  return contractFn(...args, { gas, ... txParams });
 }
 
 /**
@@ -107,14 +119,30 @@ async function _deploy(contract, args = [], txParams = {}) {
   const txData = web3.eth.contract(contract.abi).new.getData(...args, txOpts);
 
   // Deploy the contract using estimated gas
-  const estimatedGas = await estimateGas({ data: txData, ... txParams})
-  const gasToUse = await calculateActualGas(estimatedGas);
-  return contract.new(...args, { gas: gasToUse, ... txParams });
+  const gas = await estimateActualGas({ data: txData, ... txParams})
+  return contract.new(...args, { gas, ... txParams });
 }
 
-export async function estimateGas(txParams) {
+export async function estimateGas(txParams, retries = RETRY_COUNT) {
   // Use json-rpc method estimateGas to retrieve estimated value
-  return promisify(web3.eth.estimateGas.bind(web3.eth))(txParams);
+  const estimateFn = promisify(web3.eth.estimateGas.bind(web3.eth));
+  
+  // Retry if estimate fails. This could happen because we are depending
+  // on a previous transaction being mined that still hasn't reach the node
+  // we are working with, if the txs are routed to different nodes.
+  // See https://github.com/zeppelinos/zos/issues/192 for more info.
+  try {
+    return await estimateFn(txParams);
+  } catch (error) {
+    if (retries <= 0) throw Error(error);
+    await sleep(RETRY_SLEEP_TIME);
+    return await estimateGas(txParams, retries - 1);
+  }
+}
+
+export async function estimateActualGas(txParams) {
+  const estimatedGas = await estimateGas(txParams);
+  return await calculateActualGas(estimatedGas);
 }
 
 async function getNodeVersion () {
@@ -122,6 +150,14 @@ async function getNodeVersion () {
     state.nodeInfo = await promisify(web3.version.getNode.bind(web3.version))();
   }
   return state.nodeInfo;
+}
+
+function checkGasPrice(txParams) {
+  if (process.env.NODE_ENV === 'test') return;
+  const gasPrice = txParams.gasPrice || Contracts.artifactsDefaults().gasPrice;
+  if (TRUFFLE_DEFAULT_GAS_PRICE.eq(gasPrice) || !gasPrice) {
+    throw new Error(`Cowardly refusing to execute transaction with gas price set to Truffle's default of 100 gwei. Consider explicitly setting a different value in your truffle.js file.`);
+  }
 }
 
 async function isGanacheNode () {

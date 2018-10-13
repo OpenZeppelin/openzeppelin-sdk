@@ -12,6 +12,7 @@ import bumpVersion from '../../src/scripts/bump';
 import ZosPackageFile from '../../src/models/files/ZosPackageFile';
 import remove from '../../src/scripts/remove';
 import Dependency from '../../src/models/dependency/Dependency';
+import CaptureLogs from '../helpers/captureLogs';
 
 const should = require('chai').should();
 
@@ -117,7 +118,7 @@ contract('push script', function([_, owner]) {
     it('should refuse to redeploy a contract if storage is incompatible', async function () {
       modifyBytecode.call(this, 'Impl');
       modifyStorageInfo.call(this, 'Impl');
-      await push({ networkFile: this.networkFile, network, txParams }).should.be.rejectedWith(/review the warnings/)
+      await push({ networkFile: this.networkFile, network, txParams }).should.be.rejectedWith(/have validation errors/)
       this.networkFile.contract('Impl').address.should.eq(this.previousAddress);
     });
 
@@ -126,19 +127,65 @@ contract('push script', function([_, owner]) {
       modifyStorageInfo.call(this, 'Impl');
       await push({ force: true, networkFile: this.networkFile, network, txParams });
       this.networkFile.contract('Impl').address.should.not.eq(this.previousAddress);
+    });    
+  }
+
+  const shouldValidateContracts = function () {
+    describe('validations', function () {
+      beforeEach('capturing log output', function () {
+        this.logs = new CaptureLogs();
+      });
+
+      afterEach(function () {
+        this.logs.restore();
+      });
+
+      it('should refuse to push a contract with validation error', async function () {
+        add({ contractsData: ['WithConstructor'], packageFile: this.networkFile.packageFile });
+        await push({ networkFile: this.networkFile, network, txParams }).should.be.rejectedWith(/One or more contracts have validation errors/i)
+        
+        this.logs.errors.should.have.lengthOf(1);
+        this.logs.errors[0].should.match(/constructor/i);
+      })
+      
+      it('should push a contract with validation error if forced', async function () {
+        add({ contractsData: ['WithConstructor'], packageFile: this.networkFile.packageFile });
+        await push({ networkFile: this.networkFile, network, txParams, force: true });
+        
+        this.logs.errors.should.have.lengthOf(1);
+        this.logs.errors[0].should.match(/constructor/i);
+
+        const contract = this.networkFile.contract('WithConstructor');
+        contract.address.should.be.nonzeroAddress;
+      })
+
+      it('should only report new validation errors', async function () {
+        add({ contractsData: ['WithConstructor'], packageFile: this.networkFile.packageFile });
+        await push({ networkFile: this.networkFile, network, txParams, force: true });
+        const previousAddress = this.networkFile.contract('WithConstructor').address;
+        
+        this.logs.clear();
+        modifyBytecode.call(this, 'WithConstructor');
+        await push({ networkFile: this.networkFile, network, txParams});
+        
+        this.logs.errors.should.have.lengthOf(0);
+        const contract = this.networkFile.contract('WithConstructor');
+        contract.address.should.not.eq(previousAddress);
+      })
+
+      it('should only validate modified contracts', async function () {
+        add({ contractsData: ['WithConstructor'], packageFile: this.networkFile.packageFile });
+        await push({ networkFile: this.networkFile, network, txParams, force: true });
+        const previousAddress = this.networkFile.contract('Impl').address;
+
+        this.logs.clear();
+        modifyBytecode.call(this, 'Impl');
+        await push({ networkFile: this.networkFile, network, txParams});
+        
+        this.logs.errors.should.have.lengthOf(0);
+        this.networkFile.contract('Impl').address.should.not.eq(previousAddress);
+      })
     });
-
-    function modifyBytecode(contractAlias) {
-      const contractData = this.networkFile.contract(contractAlias);
-      this.networkFile.setContract(contractAlias, { ... contractData, bytecodeHash: '0xabcdef' })
-    }
-
-    function modifyStorageInfo(contractAlias) {
-      const contractData = this.networkFile.contract(contractAlias);
-      const fakeVariable = {label: 'deleted', type: 't_uint256', contract: 'ImplV1'};
-      const modifiedStorage = [fakeVariable, ... contractData.storage]
-      this.networkFile.setContract(contractAlias, { ... contractData, storage: modifiedStorage })
-    }
   }
 
   const shouldBumpVersion = function () {
@@ -184,12 +231,12 @@ contract('push script', function([_, owner]) {
     });
   };
 
-  const shouldDeleteContracts = function (shouldUnregisterFromDirectory = true) {
+  const shouldDeleteContracts = function ({ unregisterFromDirectory }) {
     it('should delete contracts', async function () {
       await remove({ contracts: ['Impl'], packageFile: this.networkFile.packageFile });
       await push({ network, txParams, networkFile: this.networkFile });
 
-      if (shouldUnregisterFromDirectory) {
+      if (unregisterFromDirectory) {
         const _package = await Package.fetch(this.networkFile.package.address);
         (await _package.getImplementation(defaultVersion, 'Impl')).should.be.zeroAddress;
       }
@@ -214,6 +261,51 @@ contract('push script', function([_, owner]) {
       dependency.package.should.eq(this.dependencyPackage.address)
     });
   };
+
+  const shouldMigrateToFullApp = function () {
+    beforeEach('loading previous address', function () {
+      this.previousAddress = this.networkFile.contract('Impl').address
+    })
+
+    describe('migration to full app', function () {
+      beforeEach('migrating', async function () {
+        await push({ full: true, network, txParams, networkFile: this.networkFile })
+      })
+  
+      shouldDeployApp();
+
+      it('should reuse contract implementations', async function () {
+        const newImpl = await getImplementationFromApp.call(this, 'Impl');
+        newImpl.should.eq(this.previousAddress);
+      });
+
+      it('should redeploy modified contract on app', async function () {
+        modifyBytecode.call(this, 'Impl');
+        await push({ networkFile: this.networkFile, network, txParams });
+
+        const newImplFromApp = await getImplementationFromApp.call(this, 'Impl');
+        const newImplFromFile = this.networkFile.contract('Impl').address;
+        
+        newImplFromApp.should.eq(newImplFromFile);
+        newImplFromApp.should.not.eq(this.previousAddress);
+      });
+    })
+
+    describe('migration with modified contracts', async function () {
+      beforeEach('migrating', async function () {
+        modifyBytecode.call(this, 'Impl');
+        await push({ full: true, network, txParams, networkFile: this.networkFile });
+      })
+
+      it('should redeploy modified contract on app', async function () {
+        const newImplFromApp = await getImplementationFromApp.call(this, 'Impl');
+        const newImplFromFile = this.networkFile.contract('Impl').address;
+        
+        newImplFromApp.should.eq(newImplFromFile);
+        newImplFromApp.should.not.eq(this.previousAddress);
+      });
+    })
+  }
 
   describe('an empty app', function() {
     beforeEach('pushing package-empty', async function () {
@@ -240,8 +332,9 @@ contract('push script', function([_, owner]) {
     shouldDeployContracts();
     shouldRegisterContractsInDirectory();
     shouldRedeployContracts();
+    shouldValidateContracts();
     shouldBumpVersion();
-    shouldDeleteContracts();
+    shouldDeleteContracts({ unregisterFromDirectory: true });
   });
 
   describe('an app with invalid contracts', function() {
@@ -249,7 +342,7 @@ contract('push script', function([_, owner]) {
       const packageFile = new ZosPackageFile('test/mocks/packages/package-with-invalid-contracts.zos.json')
       this.networkFile = packageFile.networkFile(network)
 
-      await push({ networkFile: this.networkFile, network, txParams }).should.be.rejectedWith(/WithFailingConstructor deployment failed/);
+      await push({ networkFile: this.networkFile, network, txParams, force: true }).should.be.rejectedWith(/WithFailingConstructor deployment failed/);
     });
 
     shouldDeployApp();
@@ -350,9 +443,10 @@ contract('push script', function([_, owner]) {
     shouldDeployProvider();
     shouldDeployContracts();
     shouldRegisterContractsInDirectory();
+    shouldValidateContracts();
     shouldRedeployContracts();
     shouldBumpVersionAndUnfreeze();
-    shouldDeleteContracts();
+    shouldDeleteContracts({ unregisterFromDirectory: true });
 
     it('should refuse to push when frozen', async function() {
       await freeze({ network, txParams, networkFile: this.networkFile })
@@ -368,21 +462,38 @@ contract('push script', function([_, owner]) {
 
     it('should run push', async function () {
       await push({ network, txParams, networkFile: this.networkFile })
-    })
+    });
+
+    describe('migration to full app', function () {
+      beforeEach('migrating', async function () {
+        await push({ network, txParams, networkFile: this.networkFile })
+        await push({ full: true, network, txParams, networkFile: this.networkFile })
+      });
+      shouldDeployApp();
+    });
+
+    describe('migration from scratch', function () {
+      beforeEach('migrating', async function () {
+        await push({ full: true, network, txParams, networkFile: this.networkFile })
+      });
+      shouldDeployApp();
+    });
   });
 
   describe('a lightweight app with contracts', function() {
     beforeEach('pushing package-with-contracts', async function () {
       const packageFile = new ZosPackageFile('test/mocks/packages/package-with-contracts.zos.json')
-      packageFile.lightweight = true
+      packageFile.full = false
       this.networkFile = packageFile.networkFile(network)
 
       await push({ network, txParams, networkFile: this.networkFile })
     });
 
     shouldDeployContracts();
+    shouldValidateContracts();
     shouldRedeployContracts();
-    shouldDeleteContracts(false);
+    shouldDeleteContracts({ unregisterFromDirectory: false });
+    shouldMigrateToFullApp();
 
     it('should not reupload contracts after version bump', async function () {
       const previousAddress = this.networkFile.contract('Impl').address
@@ -396,12 +507,34 @@ contract('push script', function([_, owner]) {
   describe('a lightweight app with invalid contracts', function() {
     beforeEach('pushing package-with-invalid-contracts', async function () {
       const packageFile = new ZosPackageFile('test/mocks/packages/package-with-invalid-contracts.zos.json')
-      packageFile.lightweight = true
+      packageFile.full = false
       this.networkFile = packageFile.networkFile(network)
 
-      await push({ networkFile: this.networkFile, network, txParams }).should.be.rejectedWith(/WithFailingConstructor deployment failed/);
+      await push({ networkFile: this.networkFile, network, txParams, force: true }).should.be.rejectedWith(/WithFailingConstructor deployment failed/);
     });
 
     shouldDeployContracts();
   });
+
+  function modifyBytecode(contractAlias) {
+    const contractData = this.networkFile.contract(contractAlias);
+    this.networkFile.setContract(contractAlias, { ... contractData, bytecodeHash: '0xabcdef' })
+  }
+
+  async function getImplementationFromApp(contractAlias) {
+    const app = await App.fetch(this.networkFile.appAddress);
+    return await app.getImplementation(this.networkFile.packageFile.name, contractAlias);
+  }
 });
+
+function modifyBytecode(contractAlias) {
+  const contractData = this.networkFile.contract(contractAlias);
+  this.networkFile.setContract(contractAlias, { ... contractData, bytecodeHash: '0xabcdef' })
+}
+
+function modifyStorageInfo(contractAlias) {
+  const contractData = this.networkFile.contract(contractAlias);
+  const fakeVariable = {label: 'deleted', type: 't_uint256', contract: 'ImplV1'};
+  const modifiedStorage = [fakeVariable, ... contractData.storage]
+  this.networkFile.setContract(contractAlias, { ... contractData, storage: modifiedStorage })
+}

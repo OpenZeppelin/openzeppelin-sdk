@@ -3,6 +3,7 @@ require('../../setup')
 
 import SimpleProject from '../../../src/project/SimpleProject'
 import shouldManageProxies from './ProxyProject.behaviour';
+import shouldManageDependencies from './DependenciesProject.behaviour';
 import { noop } from 'lodash';
 import Contracts from '../../../src/utils/Contracts';
 import { Proxy } from '../../../src';
@@ -35,6 +36,12 @@ contract('SimpleProject', function (accounts) {
         await this.project.setImplementation(ImplV1, "DummyImplementation")
         await this.project.setImplementation(ImplV2, "DummyImplementationV2")
       }
+    })
+
+    it('unsets an implementation', async function () {
+      await this.project.setImplementation(ImplV1, 'DummyImplementation')
+      this.project.unsetImplementation('DummyImplementation')
+      this.project.implementations.should.not.have.key('DummyImplementation')
     })
   })
 
@@ -73,11 +80,5 @@ contract('SimpleProject', function (accounts) {
     })
   })
 
-  describe('unsetImplementation', function () {
-    it('unsets an implementation', async function () {
-      await this.project.setImplementation(ImplV1, 'DummyImplementation')
-      this.project.unsetImplementation('DummyImplementation')
-      this.project.implementations.should.not.have.key('DummyImplementation')
-    })
-  })
+  shouldManageDependencies();
 })

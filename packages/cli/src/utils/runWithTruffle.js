@@ -12,13 +12,15 @@ export default async function runWithTruffle(script, options) {
   const txParams = from ? { from: from.toLowerCase() } : {}
 
   if (!network) throw Error('A network name must be provided to execute the requested action.')
+  if (!networkList[network]) throw Error('Given network is not defined in your truffle-config file')
+
   config.network = network
   if (!from && networkList[network].from) networkList[network].from = networkList[network].from.toLowerCase()
   Contracts.setSyncTimeout((_.isNil(timeout) ? DEFAULT_TIMEOUT : timeout) * 1000)
   if (options.compile) await Truffle.compile(config)
   await initTruffle(config)
-  await script({ network, txParams })
-  process.exit(0)
+  await script({ network: await Truffle.getNetworkName(), txParams })
+  if (!options.dontExitProcess) process.exit(0)
 }
 
 function initTruffle(config) {

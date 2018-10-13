@@ -1,6 +1,7 @@
 import _ from 'lodash'
 import { Logger, FileSystem as fs, bytecodeDigest, bodyCode, constructorCode, semanticVersionToString } from 'zos-lib'
 import { fromContractFullName, toContractFullName } from '../../utils/naming';
+import { ZOS_VERSION, checkVersion } from './ZosVersion';
 
 const log = new Logger('ZosNetworkFile')
 
@@ -11,9 +12,12 @@ export default class ZosNetworkFile {
     this.network = network
     this.fileName = fileName
 
-    const defaults = this.packageFile.isLib ? { contracts: {}, lib: true, frozen: false } : { contracts: {}, proxies: {} }
-    defaults.zosversion = '2' // TODO: Implement auto upgrade or version checks
+    const defaults = this.packageFile.isLib 
+      ? { contracts: {}, lib: true, frozen: false, zosversion: ZOS_VERSION } 
+      : { contracts: {}, proxies: {}, zosversion: ZOS_VERSION }
+    
     this.data = fs.parseJsonIfExists(this.fileName) || defaults
+    checkVersion(this.data.zosversion, this.fileName)
   }
 
   get app() {
@@ -206,14 +210,15 @@ export default class ZosNetworkFile {
     this.setDependency(name, fn(this.getDependency(name)));
   }
 
-  addContract(alias, instance, { types, storage } = {}) {
+  addContract(alias, instance, { warnings, types, storage } = {}) {
     this.setContract(alias, {
       address: instance.address,
       constructorCode: constructorCode(instance),
       bodyBytecodeHash: bytecodeDigest(bodyCode(instance)),
       bytecodeHash: bytecodeDigest(instance.constructor.bytecode),
       types,
-      storage
+      storage,
+      warnings
     })
   }
 

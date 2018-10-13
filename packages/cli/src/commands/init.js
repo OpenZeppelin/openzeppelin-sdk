@@ -12,7 +12,7 @@ const register = program => program
   .command(signature, { noHelp: true })
   .usage('<project-name> [version]')
   .description(description)
-  .option('--light', 'create a lightweight application, which will cause the contracts directory and application package to be managed entirely off-chain instead of published to the network')
+  .option('--full', 'create an application, package, and implementation directory contracts to manage your project (always true for libs)')
   .option('--lib', 'create a standard library instead of an application')
   .option('--force', 'overwrite existing project if there is one')
   .option('--link <stdlib>', 'link to a standard library')
@@ -21,15 +21,14 @@ const register = program => program
   .action(action)
 
 async function action(name, version, options) {
-  const { light: lightweight, force, link, install: installLibs } = options
+  const { full, force, link, install: installLibs } = options
 
   if (options.lib) {
     if (link) throw Error('Cannot set a stdlib in a library project')
-    if (lightweight) throw Error('Cannot create a lightweight library project')
     await initLib({ name, version, force })
   } else {
     const libs = link ? link.split(',') : []
-    await init({ name, version, libs, installLibs, force, lightweight })
+    await init({ name, version, libs, installLibs, force, full })
   }
   await push.tryAction(options)
 }

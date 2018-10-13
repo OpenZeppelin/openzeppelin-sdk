@@ -3,9 +3,9 @@ import NetworkAppController from '../network/NetworkAppController';
 import Dependency from '../dependency/Dependency';
 
 export default class LocalAppController extends LocalBaseController {
-  init(name, version, force = false, lightweight = false) {
+  init(name, version, force = false, full = false) {
     super.init(name, version, force)
-    if (lightweight) this.packageFile.lightweight = lightweight
+    if (full) this.packageFile.full = full
   }
 
   async linkLibs(libs, installLibs = false) {

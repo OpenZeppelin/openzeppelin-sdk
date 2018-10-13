@@ -3,6 +3,7 @@ import sinon from 'sinon';
 import * as addAll from '../../src/scripts/add-all';
 import * as add from '../../src/scripts/add';
 import * as bump from '../../src/scripts/bump';
+import * as check from '../../src/scripts/check';
 import * as compare from '../../src/scripts/compare';
 import * as create from '../../src/scripts/create';
 import * as freeze from '../../src/scripts/freeze';
@@ -47,6 +48,7 @@ exports.stubCommands = function () {
     this.addAll = sinon.stub(addAll, 'default')
     this.add = sinon.stub(add, 'default')
     this.bump = sinon.stub(bump, 'default')
+    this.check = sinon.stub(check, 'default')
     this.compare = sinon.stub(compare, 'default')
     this.create = sinon.stub(create, 'default')
     this.freeze = sinon.stub(freeze, 'default')
@@ -75,6 +77,7 @@ exports.stubCommands = function () {
     this.addAll.restore()
     this.add.restore()
     this.bump.restore()
+    this.check.restore()
     this.compare.restore()
     this.create.restore()
     this.freeze.restore()

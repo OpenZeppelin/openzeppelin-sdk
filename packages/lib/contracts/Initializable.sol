@@ -10,7 +10,7 @@ pragma solidity ^0.4.24;
  * invoked. This applies both to deploying an Initializable contract, as well
  * as extending an Initializable contract via inheritance.
  * WARNING: When used with inheritance, manual care must be taken to not invoke
- * a parent initializer twice, or ensure that all initializers are idempotent, 
+ * a parent initializer twice, or ensure that all initializers are idempotent,
  * because this is not dealt with automatically as with constructors.
  */
 contract Initializable {
@@ -42,7 +42,7 @@ contract Initializable {
 
   /// @dev Returns true if and only if the function is running in the constructor
   function isConstructor() private view returns (bool) {
-    // extcodesize checks the size of the code stored in an address, and 
+    // extcodesize checks the size of the code stored in an address, and
     // address returns the current address. Since the code is still not
     // deployed when running a constructor, any checks on its code size will
     // yield zero, making it an effective way to detect if a contract is
@@ -51,4 +51,7 @@ contract Initializable {
     assembly { cs := extcodesize(address) }
     return cs == 0;
   }
+
+  // Reserved storage space to allow for layout changes in the future.
+  uint256[50] private ______gap;
 }

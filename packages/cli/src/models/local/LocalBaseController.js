@@ -1,7 +1,9 @@
+import _ from 'lodash'
 import Session from '../network/Session'
 import Truffle from '../truffle/Truffle'
-import { Contracts, Logger, FileSystem as fs } from 'zos-lib'
+import { Contracts, Logger, FileSystem as fs, getBuildArtifacts, validate as validateContract, validationPasses} from 'zos-lib'
 import Dependency from '../dependency/Dependency';
+import ValidationLogger from '../../interface/ValidationLogger';
 
 const log = new Logger('LocalController');
 
@@ -40,6 +42,7 @@ export default class LocalBaseController {
 
   add(contractAlias, contractName) {
     log.info(`Adding ${contractAlias === contractName ? contractAlias : `${contractAlias}:${contractName}`}`)
+<<<<<<< HEAD
     // We are logging an error instead of throwing because a contract may have an empty constructor,
     // which is fine, but as long as it is declared we will be picking it up
     if (this.hasConstructor(Contracts.getLocalPath(contractName))) {
@@ -61,6 +64,8 @@ export default class LocalBaseController {
     if (this.hasDelegateCall(Contracts.getLocalPath(contractName))) {
       log.warn(`Contract ${contractName} (or its parent class) has a delegatecall call. This is potentially a security risk, as the logic contract could be destructed by issuing a delegatecall to another contract with a selfdestruct instruction. Please review and consider removing this call.`)
     }
+=======
+>>>>>>> upstream/master
     this.packageFile.addContract(contractAlias, contractName)
   }
 
@@ -86,7 +91,7 @@ export default class LocalBaseController {
     }
   }
 
-  validateImplementation(contractName) {
+  checkCanAdd(contractName) {
     const path = Contracts.getLocalPath(contractName)
     if (!fs.exists(path)) {
       throw Error(`Contract ${contractName} not found in path ${path}`)
@@ -96,126 +101,29 @@ export default class LocalBaseController {
     }
   }
 
+  validateAll() {
+    const buildArtifacts = getBuildArtifacts();
+    return _.every(_.map(this.packageFile.contractAliases, (contractAlias) => (
+      this.validate(contractAlias, buildArtifacts)
+    )));
+  }
+
+  validate(contractAlias, buildArtifacts) {
+    const contractName = this.packageFile.contract(contractAlias);
+    const contractClass = Contracts.getFromLocal(contractName || contractAlias);
+    const warnings = validateContract(contractClass, {}, buildArtifacts);
+    new ValidationLogger(contractClass).log(warnings, buildArtifacts);
+    return validationPasses(warnings);
+  }
+
   hasBytecode(contractDataPath) {
     if (!fs.exists(contractDataPath)) return false
     const bytecode = fs.parseJson(contractDataPath).bytecode
     return bytecode && bytecode !== "0x"
   }
 
-  hasConstructor(contractDataPath) {
-    if (!fs.exists(contractDataPath)) return false
-    const abi = fs.parseJson(contractDataPath).abi
-    return !!abi.find(fn => fn.type === "constructor");
-  }
-
-  hasSelfDestruct(contractDataPath) {
-    return this.hasTypeIdentifier(contractDataPath, "t_function_selfdestruct_nonpayable$_t_address_$returns$__$")
-  }
-
-  hasDelegateCall(contractDataPath) {
-    return this.hasTypeIdentifier(contractDataPath, "t_function_baredelegatecall_nonpayable$__$returns$_t_bool_$")
-  }
-
-  getUninitializedBaseContracts(contractDataPath) {
-    const uninitializedBaseContracts = {}
-    this.getUninitializedDirectBaseContracts(contractDataPath,uninitializedBaseContracts)
-    return uninitializedBaseContracts
-  }
-
-  getUninitializedDirectBaseContracts(contractDataPath, uninitializedBaseContracts) {
-    if (!fs.exists(contractDataPath)) return
-    const contractJson = fs.parseJson(contractDataPath)
-    // Check whether the contract has base contracts
-    const baseContracts = contractJson.ast.nodes.find(n => n.name === contractJson.contractName).baseContracts
-    if (baseContracts.length == 0) return
-    // Run check for the base contracts
-    for (const baseContract of baseContracts) {
-      const baseContractName = baseContract.baseName.name
-      const baseContractPath = Contracts.getLocalPath(baseContractName)
-      this.getUninitializedDirectBaseContracts(baseContractPath, uninitializedBaseContracts)
-    }
-    // Make a dict of base contracts that have "initialize" function
-    const baseContractsWithInitialize = []
-    const baseContractInitializers = {}
-    for (const baseContract of baseContracts) {
-      const baseContractName = baseContract.baseName.name
-      const baseContractPath = Contracts.getLocalPath(baseContractName)
-      const baseContractJson = fs.parseJson(baseContractPath)
-      const baseContractInitializer = this.getContractInitializer(baseContractJson)
-      if (baseContractInitializer !== undefined) {
-        baseContractsWithInitialize.push(baseContractName)
-        baseContractInitializers[baseContractName] = baseContractInitializer.name
-      }
-    }
-    // Check that initializer exists
-    const initializer = this.getContractInitializer(contractJson)
-    if (initializer === undefined) {
-      // A contract may lack initializer as long as the base contracts don't have more than 1 initializers in total
-      // If there are 2 or more base contracts with initializers, child contract should initialize all of them
-      if (baseContractsWithInitialize.length > 1) {
-        for (const baseContract of baseContractsWithInitialize) {
-          uninitializedBaseContracts[baseContract] = contractJson.contractName
-        }
-      }
-      return
-    }
-    // Update map with each call of "initialize" function of the base contract
-    const initializedContracts = {}
-    for (const statement of initializer.body.statements) {
-      if (statement.nodeType === "ExpressionStatement" && statement.expression.nodeType === "FunctionCall") {
-        const baseContractName = statement.expression.expression.expression.name
-        const functionName = statement.expression.expression.memberName
-        if (baseContractInitializers[baseContractName] === functionName) {
-          initializedContracts[baseContractName] = true
-        }
-      }
-    }
-    // For each base contract with "initialize" function, check that it's called in the function
-    for (const contractName of baseContractsWithInitialize) {
-      if (!initializedContracts[contractName]) {
-        uninitializedBaseContracts[contractName] = contractJson.contractName
-      }
-    }
-    return
-  }
-
-  hasTypeIdentifier(contractDataPath, typeIdentifier) {
-    if (!fs.exists(contractDataPath)) return false
-    const contractJson = fs.parseJson(contractDataPath)
-    for (const node of contractJson.ast.nodes.filter((n) => n.name === contractJson.contractName)) {
-      if (this.hasKeyValue(node, "typeIdentifier", typeIdentifier)) return true
-      for (const baseContract of node.baseContracts || []) {
-        if (this.hasTypeIdentifier(Contracts.getLocalPath(baseContract.baseName.name), typeIdentifier)) return true
-      }
-    }
-    return false
-  }
-
-  hasKeyValue(data, key, value) {
-    if (!data) return false
-    if (data[key] === value) return true
-    for (const childKey in data) {
-      if (typeof(data[childKey]) === 'object' && this.hasKeyValue(data[childKey], key, value)) return true
-    }
-    return false
-  }
-
-  getContractInitializer(contractJson) {
-    const contractDefinition = contractJson.ast.nodes
-      .find(n => n.nodeType === "ContractDefinition" && n.name === contractJson.contractName)
-    const contractFunctions = contractDefinition.nodes.filter(n => n.nodeType === "FunctionDefinition")
-    for (const contractFunction of contractFunctions) {
-      const functionModifiers = contractFunction.modifiers
-      const initializerModifier = functionModifiers.find(m => m.modifierName.name === "initializer")
-      if (contractFunction.name === "initialize" || initializerModifier !== undefined) {
-        return contractFunction
-      }
-    }
-    return undefined
-  }
-
   getContractClass(packageName, contractAlias) {
-    if (packageName === this.packageFile.name) {
+    if (!packageName || packageName === this.packageFile.name) {
       const contractName = this.packageFile.contract(contractAlias);
       return Contracts.getFromLocal(contractName);
     } else {

@@ -2,14 +2,32 @@ import _ from 'lodash'
 import ZosNetworkFile from './ZosNetworkFile'
 import { Logger, FileSystem as fs } from 'zos-lib'
 import Dependency from '../dependency/Dependency';
+import { ZOS_VERSION, checkVersion } from './ZosVersion';
 
 const log = new Logger('ZosPackageFile')
 
 export default class ZosPackageFile {
 
-  constructor(fileName = 'zos.json') {
+  constructor(fileName = 'zos.json', searchUp = true) {
     this.fileName = fileName
-    this.data = fs.parseJsonIfExists(this.fileName) || { zosversion: '2' };
+    let cwd = process.cwd()
+
+    while(!fs.exists(this.fileName) && searchUp) {
+        if(process.cwd() === "/") {
+            process.chdir(cwd)
+            break
+        }
+
+        try {
+            process.chdir("..")
+        } catch (error) {
+            process.chdir(cwd)
+        }
+    }
+        
+    this.data = fs.parseJsonIfExists(this.fileName) || { zosversion: ZOS_VERSION };
+    checkVersion(this.data.zosversion, this.fileName)
+
     // TODO: Implement auto upgrade or version checks
   }
 
@@ -62,7 +80,11 @@ export default class ZosPackageFile {
   }
 
   get isLightweight() {
-    return !!this.data.light
+    return !this.isFull
+  }
+
+  get isFull() {
+    return this.isLib || !!this.data.full
   }
 
   contract(alias) {
@@ -94,8 +116,8 @@ export default class ZosPackageFile {
     this.data.lib = lib
   }
 
-  set lightweight(light) {
-    this.data.light = light
+  set full(full) {
+    this.data.full = !!full
   }
 
   set name(name) {
@@ -120,8 +142,8 @@ export default class ZosPackageFile {
     delete this.data.dependencies[name];
   }
 
-  addContract(alias, name) {
-    this.data.contracts[alias] = name
+  addContract(alias, name = undefined) {
+    this.data.contracts[alias] = name || alias;
   }
 
   unsetContract(alias) {

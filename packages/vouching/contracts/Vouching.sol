@@ -1,10 +1,11 @@
 pragma solidity ^0.4.24;
 
 
+import "zos-lib/contracts/Initializable.sol";
 import "openzeppelin-zos/contracts/token/ERC20/ERC20.sol";
 import "openzeppelin-zos/contracts/token/ERC20/SafeERC20.sol";
 import "openzeppelin-zos/contracts/math/SafeMath.sol";
-import "openzeppelin-zos/contracts/Initializable.sol";
+import "openzeppelin-zos/contracts/utils/Address.sol";
 
 contract Vouching is Initializable {
   event OwnershipTransferred(address indexed oldOwner, address indexed newOwner);
@@ -21,6 +22,7 @@ contract Vouching is Initializable {
 
   using SafeMath for uint256;
   using SafeERC20 for ERC20;
+  using Address for address;
 
   struct Dependency {
     address owner;
@@ -29,6 +31,7 @@ contract Vouching is Initializable {
   }
 
   mapping (string => Dependency) private _registry;
+  mapping (string => bool) private _takenDependencyNames;
   uint256 private _minimumStake;
   ERC20 private _token;
 
@@ -63,13 +66,15 @@ contract Vouching is Initializable {
     require(initialStake >= _minimumStake, "Initial stake must be equal or greater than minimum stake");
     require(owner != address(0), "Owner address cannot be zero");
     require(dependencyAddress != address(0), "Dependency address cannot be zero");
-    require(_registry[name].dependencyAddress == address(0), "Given dependency name is already registered");
+    require(dependencyAddress.isContract(), "Dependencies must be contracts");
+    require(!_takenDependencyNames[name], "Given dependency name is already registered");
 
+    _takenDependencyNames[name] = true;
     _registry[name] = Dependency(owner, dependencyAddress, initialStake);
 
     _token.safeTransferFrom(owner, this, initialStake);
 
-    emit DependencyCreated(keccak256(name), name, owner, dependencyAddress, initialStake);
+    emit DependencyCreated(keccak256(abi.encodePacked(name)), name, owner, dependencyAddress, initialStake);
   }
 
   function transferOwnership(string name, address newOwner) external onlyDependencyOwner(name) {
@@ -81,7 +86,7 @@ contract Vouching is Initializable {
   function vouch(string name, uint256 amount) external onlyDependencyOwner(name) {
     _registry[name].stake = _registry[name].stake.add(amount);
     _token.safeTransferFrom(msg.sender, this, amount);
-    emit Vouched(keccak256(name), amount);
+    emit Vouched(keccak256(abi.encodePacked(name)), amount);
   }
 
   function unvouch(string name, uint256 amount) external onlyDependencyOwner(name) {
@@ -91,15 +96,19 @@ contract Vouching is Initializable {
     _registry[name].stake = remainingStake;
     _token.safeTransfer(msg.sender, amount);
 
-    emit Unvouched(keccak256(name), amount);
+    emit Unvouched(keccak256(abi.encodePacked(name)), amount);
   }
 
   function remove(string name) external onlyDependencyOwner(name) {
     // Owner surrenders _minimumStake to the system
     uint256 reimbursedAmount = _registry[name].stake.sub(_minimumStake);
+
+    // The entry is not removed from _takenDependencyNames, to prevent a new dependecy
+    // from reusing the same name
     delete _registry[name];
+
     _token.safeTransfer(msg.sender, reimbursedAmount);
-    emit DependencyRemoved(keccak256(name));
+    emit DependencyRemoved(keccak256(abi.encodePacked(name)));
   }
 
 }

@@ -1,0 +1,7 @@
+{
+  "name": "mock-stdlib-unsupported",
+  "version": "1.1.0",
+  "contracts": {
+    "Greeter": "GreeterImpl"
+  }
+}

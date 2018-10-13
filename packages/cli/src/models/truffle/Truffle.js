@@ -1,5 +1,6 @@
 import path from 'path'
 import { Logger, FileSystem as fs } from 'zos-lib'
+import { promisify } from 'util'
 
 const log = new Logger('Truffle')
 
@@ -55,6 +56,25 @@ const Truffle = {
     }
 
     return { resolver, provider }
+  },
+
+  async getNetworkName() {
+    const version = await promisify(global.web3.version.getNetwork.bind(global.web3.version))()
+    // Reference: see https://github.com/ethereum/EIPs/blob/master/EIPS/eip-155.md#list-of-chain-ids
+    switch (version) {
+      case "1":
+        return 'mainnet'
+      case "2":
+        return 'morden'
+      case "3":
+        return 'ropsten'
+      case "4":
+        return 'rinkeby'
+      case "42":
+        return 'kovan'
+      default:
+        return `dev-${version}`
+    }
   },
 
   _initContractsDir(root) {

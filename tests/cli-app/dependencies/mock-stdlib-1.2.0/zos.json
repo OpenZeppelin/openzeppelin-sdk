@@ -1,0 +1,8 @@
+{
+  "name": "mock-stdlib",
+  "zosversion": "2",
+  "version": "1.2.0",
+  "contracts": {
+    "Greeter": "Greeter"
+  }
+}

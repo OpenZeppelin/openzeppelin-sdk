@@ -9,8 +9,14 @@ import { AppProjectDeployer, SimpleProjectDeployer } from './ProjectDeployer';
 const log = new Logger('NetworkAppController');
 
 export default class NetworkAppController extends NetworkBaseController {
+  get isLightweight() {
+    return this.packageFile.isLightweight && !this.appAddress;
+  }
+
   getDeployer(requestedVersion) {
-    return this.isLightweight ? new SimpleProjectDeployer(this, requestedVersion) : new AppProjectDeployer(this, requestedVersion);
+    return this.isLightweight 
+      ? new SimpleProjectDeployer(this, requestedVersion) 
+      : new AppProjectDeployer(this, requestedVersion);
   }
 
   get appAddress() {
@@ -19,6 +25,15 @@ export default class NetworkAppController extends NetworkBaseController {
 
   get app() {
     return this.project.getApp()
+  }
+
+  async toFullApp() {
+    if (this.appAddress) return;
+    log.info(`Publishing App and Package contracts to ${this.network}...`);
+    await this.fetchOrDeploy(this.currentVersion); // loads a SimpleProject as this.project
+    const deployer = new AppProjectDeployer(this, this.packageVersion);
+    this.project = await deployer.fromSimpleProject(this.project);
+    log.info(`Publish to ${this.network} successful`);
   }
 
   async push(reupload = false, force = false) {
