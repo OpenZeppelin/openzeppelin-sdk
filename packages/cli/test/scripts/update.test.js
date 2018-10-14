@@ -134,39 +134,27 @@ contract('update script', function([_skipped, owner, anotherAccount]) {
       await assertProxyInfo(this.networkFile, 'Impl', 1, { version: version_2, implementation: this.implV2Address, value: 42 });
     });
 
-    describe('errors', function(){
-      beforeEach('capturing log output', function() {
-        this.logs = new CaptureLogs()
-      })
+    it('should upgrade multiple proxies and migrate them', async function() {
+      // add non-migratable implementation for AnotherImpl contract
+      await add({ contractsData: [{ name: 'UnmigratableImplV2', alias: 'AnotherImpl' }], packageFile: this.packageFile })
+      await push({ network, txParams, networkFile: this.networkFile });
 
-      afterEach(function() {
-        this.logs.restore()
-      })
+      await update({ contractAlias: undefined, proxyAddress: undefined, all: true, initMethod: "migrate", initArgs: [42], network, txParams, networkFile: this.networkFile })
+        .should.be.rejectedWith(/failed to update/);
 
-      it('should upgrade multiple proxies and migrate them', async function() {
-        // add non-migratable implementation for AnotherImpl contract
-        await add({ contractsData: [{ name: 'UnmigratableImplV2', alias: 'AnotherImpl' }], packageFile: this.packageFile })
-        await push({ network, txParams, networkFile: this.networkFile });
+      await assertProxyInfo(this.networkFile, 'Impl', 0, { version: version_2, implementation: this.implV2Address, value: 42 });
+      await assertProxyInfo(this.networkFile, 'Impl', 1, { version: version_2, implementation: this.implV2Address, value: 42 });
+      await assertProxyInfo(this.networkFile, 'AnotherImpl', 0, { version: version_1, implementation: this.anotherImplV1Address });
+    });
 
-        await update({ contractAlias: undefined, proxyAddress: undefined, all: true, initMethod: "migrate", initArgs: [42], network, txParams, networkFile: this.networkFile })
-        this.logs.errors.should.have.lengthOf(1)
-        this.logs.errors[0].should.match(/failed to update/)
+    it('should refuse to upgrade a proxy to an undeployed contract', async function() {
+      const contracts = this.networkFile.contracts
+      delete contracts['Impl'];
+      this.networkFile.contracts = contracts
 
-        await assertProxyInfo(this.networkFile, 'Impl', 0, { version: version_2, implementation: this.implV2Address, value: 42 });
-        await assertProxyInfo(this.networkFile, 'Impl', 1, { version: version_2, implementation: this.implV2Address, value: 42 });
-        await assertProxyInfo(this.networkFile, 'AnotherImpl', 0, { version: version_1, implementation: this.anotherImplV1Address });
-      });
-
-      it('should refuse to upgrade a proxy to an undeployed contract', async function() {
-        const contracts = this.networkFile.contracts
-        delete contracts['Impl'];
-        this.networkFile.contracts = contracts
-
-        await update({ contractAlias: 'Impl', proxyAddress: null, network, txParams, networkFile: this.networkFile })
-        this.logs.errors.should.have.lengthOf(1)
-        this.logs.errors[0].should.eq('Contracts Impl are not deployed.')
-      });
-    })
+      await update({ contractAlias: 'Impl', proxyAddress: null, network, txParams, networkFile: this.networkFile })
+        .should.be.rejectedWith('Contracts Impl are not deployed.')
+    });
 
     describe('with local modifications', function () {
       beforeEach('changing local network file to have a different bytecode', async function () {
@@ -175,27 +163,15 @@ contract('update script', function([_skipped, owner, anotherAccount]) {
         this.networkFile.contracts = contracts
       });
 
+      it('should refuse to upgrade a proxy for a modified contract', async function () {
+        await update({ contractAlias: 'Impl', network, txParams, networkFile: this.networkFile })
+          .should.be.rejectedWith('Contracts Impl have changed since the last deploy.');
+      });
+
       it('should upgrade a proxy for a modified contract if force is set', async function () {
         await update({ contractAlias: 'Impl', network, txParams, force: true, networkFile: this.networkFile });
         await assertProxyInfo(this.networkFile, 'Impl', 0, { version: version_2, implementation: this.implV2Address })
       });
-
-      describe('errors', function() {
-        beforeEach('capturing log output', function() {
-          this.logs = new CaptureLogs()
-        })
-
-        afterEach(function() {
-          this.logs.restore()
-        })
-
-        it('should refuse to upgrade a proxy for a modified contract', async function () {
-          await update({ contractAlias: 'Impl', network, txParams, networkFile: this.networkFile })
-
-          this.logs.errors.should.have.lengthOf(1)
-          this.logs.errors[0].should.eq('Contracts Impl have changed since the last deploy.')
-        });
-      })
     });
 
     describe('warnings', function () {
