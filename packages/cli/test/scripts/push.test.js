@@ -213,10 +213,6 @@ contract('push script', function([_, owner]) {
       const _package = await Package.fetch(this.networkFile.package.address);
       (await _package.getImplementation('1.2.0', 'Impl')).should.eq(implementationAddress);
     });
-  };
-
-  const shouldBumpVersionAndUnfreeze = function () {
-    shouldBumpVersion()
 
     it('should set frozen back to false', async function() {
       await bumpVersion({ version: '1.1.0', packageFile: this.newNetworkFile.packageFile  });
@@ -307,6 +303,13 @@ contract('push script', function([_, owner]) {
     })
   }
 
+  const shouldNotPushWhileFrozen = function () {
+    it('should refuse to push when frozen', async function() {
+      await freeze({ network, txParams, networkFile: this.networkFile })
+      await push({ network, txParams, networkFile: this.networkFile }).should.be.rejectedWith(/frozen/i)
+    });
+  };
+
   describe('an empty app', function() {
     beforeEach('pushing package-empty', async function () {
       const packageFile = new ZosPackageFile('test/mocks/packages/package-empty.zos.json')
@@ -325,6 +328,9 @@ contract('push script', function([_, owner]) {
       this.networkFile = packageFile.networkFile(network)
 
       await push({ network, txParams, networkFile: this.networkFile })
+
+      const newPackageFile = new ZosPackageFile('test/mocks/packages/package-lib-with-contracts-v2.zos.json')
+      this.newNetworkFile = newPackageFile.networkFile(network)
     });
 
     shouldDeployApp();
@@ -334,6 +340,7 @@ contract('push script', function([_, owner]) {
     shouldRedeployContracts();
     shouldValidateContracts();
     shouldBumpVersion();
+    shouldNotPushWhileFrozen();
     shouldDeleteContracts({ unregisterFromDirectory: true });
   });
 
@@ -445,13 +452,9 @@ contract('push script', function([_, owner]) {
     shouldRegisterContractsInDirectory();
     shouldValidateContracts();
     shouldRedeployContracts();
-    shouldBumpVersionAndUnfreeze();
+    shouldBumpVersion();
+    shouldNotPushWhileFrozen();
     shouldDeleteContracts({ unregisterFromDirectory: true });
-
-    it('should refuse to push when frozen', async function() {
-      await freeze({ network, txParams, networkFile: this.networkFile })
-      await push({ network, txParams, networkFile: this.networkFile }).should.be.rejectedWith(/frozen/i)
-    });
   });
 
   describe('an empty lightweight app', function() {

@@ -86,6 +86,7 @@ export default class NetworkBaseController {
     if (this._newVersionRequired()) {
       log.info(`Current version ${this.currentVersion}`);
       log.info(`Creating new version ${this.packageVersion}`);
+      this.networkFile.frozen = false;
       this.networkFile.contracts = {};
     }
   }
@@ -108,6 +109,10 @@ export default class NetworkBaseController {
   }
 
   async uploadContracts(contracts) {
+    if (this.networkFile.frozen) {
+      throw Error('Cannot upload contracts for a frozen version. Run zos bump to create a new version first.');
+    }
+
     await allPromisesOrError(
       contracts.map(([contractAlias, contractClass]) => this.uploadContract(contractAlias, contractClass))
     )
