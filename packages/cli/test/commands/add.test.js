@@ -16,7 +16,7 @@ contract('add command', function() {
   })
 
   itShouldParse('should call push script when passing --push option', 'push', 'zos add --all --push test --skip-compile', function(push) {
-    push.should.have.been.calledWithExactly({ full: undefined, deployLibs: undefined, force: undefined, reupload: undefined, network: 'test', txParams: {} })
+    push.should.have.been.calledWithExactly({  deployLibs: undefined, force: undefined, reupload: undefined, network: 'test', txParams: {} })
   })
 
 })

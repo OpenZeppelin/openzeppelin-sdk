@@ -5,6 +5,7 @@ import create from './create'
 import freeze from './freeze'
 import init from './init'
 import link from './link'
+import publish from './publish'
 import push from './push'
 import remove from './remove'
 import session from './session'
@@ -22,6 +23,7 @@ export default {
   freeze,
   init,
   link,
+  publish,
   push,
   remove,
   session,

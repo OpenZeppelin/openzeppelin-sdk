@@ -28,8 +28,11 @@ export default class NetworkAppController extends NetworkBaseController {
   }
 
   async toFullApp() {
-    if (this.appAddress) return;
-    log.info(`Publishing App and Package contracts to ${this.network}...`);
+    if (this.appAddress) {
+      log.info(`Project is already published to ${this.network}`);
+      return;
+    }
+    log.info(`Publishing project to ${this.network}...`);
     await this.fetchOrDeploy(this.currentVersion); // loads a SimpleProject as this.project
     const deployer = new AppProjectDeployer(this, this.packageVersion);
     this.project = await deployer.fromSimpleProject(this.project);

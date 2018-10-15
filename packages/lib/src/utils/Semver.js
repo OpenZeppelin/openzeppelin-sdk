@@ -1,5 +1,6 @@
 import semver from 'semver';
 import _ from 'lodash';
+import util from 'util';
 
 export function toSemanticVersion(version) {
   if (_.isString(version)) {
@@ -19,7 +20,7 @@ export function semanticVersionToString(version) {
   } else if (_.isArray(version)) {
     return version.join('.');
   } else {
-    throw Error(`Cannot handle version identifier ${version}`)
+    throw Error(`Cannot handle version identifier ${util.inspect(version)}`)
   }
 }
 
