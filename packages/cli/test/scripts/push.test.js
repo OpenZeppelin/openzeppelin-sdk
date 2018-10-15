@@ -282,13 +282,6 @@ contract('push script', function([_, owner]) {
     });
   };
 
-  const shouldNotPushWhileFrozen = function () {
-    it('should refuse to push when frozen', async function() {
-      await freeze({ network, txParams, networkFile: this.networkFile })
-      await push({ network, txParams, networkFile: this.networkFile }).should.be.rejectedWith(/frozen/i)
-    });
-  };
-
   describe('an empty app', function() {
     beforeEach('pushing package-empty', async function () {
       const packageFile = new ZosPackageFile('test/mocks/packages/package-empty.zos.json')
