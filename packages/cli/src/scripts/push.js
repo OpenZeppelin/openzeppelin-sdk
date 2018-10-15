@@ -1,8 +1,6 @@
 import stdout from '../utils/stdout';
 import ControllerFor from "../models/network/ControllerFor";
-import { Logger } from 'zos-lib'
-
-const log = new Logger('scripts/push')
+import ScriptError from '../models/errors/ScriptError'
 
 export default async function push({ network, deployLibs, reupload = false, force = false, txParams = {}, networkFile = undefined }) {
   const controller = ControllerFor(network, txParams, networkFile);
@@ -11,9 +9,9 @@ export default async function push({ network, deployLibs, reupload = false, forc
     if (deployLibs && !controller.isLib) await controller.deployLibs();
     await controller.push(reupload, force);
     stdout(controller.isLib ? controller.packageAddress : controller.appAddress);
-  } catch(error) {
-    log.error(error.message)
-  } finally {
     controller.writeNetworkPackageIfNeeded()
+  } catch(error) {
+    const cb = () => controller.writeNetworkPackageIfNeeded()
+    throw new ScriptError(error.message, cb)
   }
 }

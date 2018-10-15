@@ -1,8 +1,6 @@
 import stdout from '../utils/stdout';
 import ControllerFor from '../models/network/ControllerFor';
-import { Logger } from 'zos-lib'
-
-const log = new Logger('scripts/create')
+import ScriptError from '../models/errors/ScriptError'
 
 export default async function createProxy({ packageName, contractAlias, initMethod, initArgs, network, txParams = {}, force = false, networkFile = undefined }) {
   if (!contractAlias) throw Error('A contract alias must be provided to create a new proxy.')
@@ -14,12 +12,11 @@ export default async function createProxy({ packageName, contractAlias, initMeth
     await controller.checkContractDeployed(packageName, contractAlias, !force);
     const proxy = await controller.createProxy(packageName, contractAlias, initMethod, initArgs);
     stdout(proxy.address);
+    controller.writeNetworkPackageIfNeeded()
 
     return proxy;
   } catch(error) {
-    log.error(error.message)
-  } finally {
-    controller.writeNetworkPackageIfNeeded()
+    const cb = () => controller.writeNetworkPackageIfNeeded()
+    throw new ScriptError(error.message, cb)
   }
-
 }
