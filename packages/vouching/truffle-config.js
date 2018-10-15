@@ -17,6 +17,13 @@ module.exports = {
       gas: 500000,
       gasPrice: 10e9, // 10 Gwei
     },
+    rinkeby: {
+      host: 'localhost',
+      port: 8565,
+      network_id: 4,
+      gas: 500000,
+      gasPrice: 10e9, // 10 Gwei
+    },
     mainnet: {
       host: 'localhost',
       port: 8545,
