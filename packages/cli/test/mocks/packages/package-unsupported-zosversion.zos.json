@@ -3,5 +3,5 @@
   "version": "1.1.0",
   "contracts": {},
   "zosversion": "3",
-  "full": true
+  "publish": true
 }

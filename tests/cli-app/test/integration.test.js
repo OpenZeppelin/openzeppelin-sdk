@@ -21,7 +21,7 @@ function runIntegrationTest({ lightweight }) {
   registerProjectHooks(network);
 
   it('initialize zos', function () {
-    const flags = lightweight ? '' : '--full';
+    const flags = lightweight ? '' : '--publish';
     run(`npx zos init cli-app 0.5.0 ${flags}`)
   })
 

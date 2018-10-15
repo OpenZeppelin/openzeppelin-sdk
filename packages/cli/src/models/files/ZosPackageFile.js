@@ -67,11 +67,7 @@ export default class ZosPackageFile {
   }
 
   get isLightweight() {
-    return !this.isFull
-  }
-
-  get isFull() {
-    return this.isLib || !!this.data.full
+    return !this.data.publish && !this.isLib
   }
 
   contract(alias) {
@@ -103,8 +99,8 @@ export default class ZosPackageFile {
     this.data.lib = lib
   }
 
-  set full(full) {
-    this.data.full = !!full
+  set publish(publish) {
+    this.data.publish = !!publish
   }
 
   set name(name) {
