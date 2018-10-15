@@ -9,8 +9,8 @@ import sleep from '../helpers/sleep';
 import Contracts from './Contracts'
 import BN from 'bignumber.js'
 
-// Store last block for gasLimit information
-const state = { };
+// Cache, exported for testing
+export const state = { };
 
 // Gas estimates are multiplied by this value to allow for an extra buffer (for reference, truffle-next uses 1.25)
 const GAS_MULTIPLIER = 1.25;
