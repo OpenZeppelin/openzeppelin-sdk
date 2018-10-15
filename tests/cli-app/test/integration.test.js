@@ -87,7 +87,7 @@ function runIntegrationTest({ lightweight }) {
     run(`npx zos update mock-stdlib/Greeter --network ${network} --from ${this.from}`)
     truffleExec(`run.js cli-app/GreeterWrapper 0 iteration --network ${network}`).should.eq('2')
     run(`npx zos update GreeterWrapper --network ${network} --from ${this.from}`)
-    truffleExec(`run.js cli-app/GreeterWrapper 0 iteration --network ${network}`).should.eq('12')
+    truffleExec(`run.js cli-app/GreeterWrapper 0 iteration --network ${network}`).should.eq('17') // 2 (minor) * 3 (triple) + 1 (triple v2) + 10 (wrapper v2)
   })
 };
 

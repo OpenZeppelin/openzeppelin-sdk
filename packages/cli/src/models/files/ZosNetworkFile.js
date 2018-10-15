@@ -13,8 +13,8 @@ export default class ZosNetworkFile {
     this.fileName = fileName
 
     const defaults = this.packageFile.isLib 
-      ? { contracts: {}, lib: true, frozen: false, zosversion: ZOS_VERSION } 
-      : { contracts: {}, proxies: {}, zosversion: ZOS_VERSION }
+      ? { contracts: {}, solidityLibs: {}, lib: true, frozen: false, zosversion: ZOS_VERSION } 
+      : { contracts: {}, solidityLibs: {}, proxies: {}, zosversion: ZOS_VERSION }
     
     this.data = fs.parseJsonIfExists(this.fileName) || defaults
     checkVersion(this.data.zosversion, this.fileName)
@@ -66,6 +66,67 @@ export default class ZosNetworkFile {
 
   get isLightweight() {
     return this.packageFile.isLightweight
+  }
+
+  get solidityLibs() {
+    return this.data.solidityLibs || {}
+  }
+
+  addSolidityLib(libName, instance) {
+    this.data.solidityLibs[libName] = {
+      address: instance.address,
+      constructorCode: constructorCode(instance),
+      bodyBytecodeHash: bytecodeDigest(bodyCode(instance)),
+      localBytecodeHash: bytecodeDigest(instance.constructor.bytecode),
+      deployedBytecodeHash: bytecodeDigest(instance.constructor.binary)
+    }
+  }
+
+  unsetSolidityLib(libName) {
+    delete this.data.solidityLibs[libName]
+  }
+
+  solidityLib(libName) {
+    return this.data.solidityLibs[libName]
+  }
+
+  getSolidityLibs(libs) {
+    const { solidityLibs } = this.data
+
+    return Object
+      .keys(solidityLibs)
+      .filter(libName => libs.includes(libName))
+      .map(libName => ({ libName, address: solidityLibs[libName].address }))
+      .reduce((libs, currentLib) => {
+        libs[currentLib.libName] = currentLib.address
+        return libs
+      }, {})
+  }
+
+  hasSolidityLib(libName) {
+    return !_.isEmpty(this.solidityLib(libName))
+  }
+
+  solidityLibsMissing(libs) {
+    return _.difference(Object.keys(this.solidityLibs), libs)
+  }
+
+  getSolidityLibOrContract(aliasOrName) {
+    return this.data.solidityLibs[aliasOrName] || this.data.contracts[aliasOrName]
+  }
+
+  hasSolidityLibOrContract(aliasOrName) {
+    return this.hasSolidityLib(aliasOrName) || this.hasContract(aliasOrName)
+  }
+
+  updateImplementation(aliasOrName, fn) {
+    if (this.hasContract(aliasOrName)) {
+      this.data.contracts[aliasOrName] = fn(this.data.contracts[aliasOrName])
+    } else if (this.hasSolidityLib(aliasOrName)) {
+      this.data.solidityLibs[aliasOrName] = fn(this.data.solidityLibs[aliasOrName])
+    } else {
+      return
+    }
   }
 
   get dependencies() {
@@ -156,9 +217,12 @@ export default class ZosNetworkFile {
   }
 
   hasSameBytecode(alias, klass) {
-    const deployedBytecode = this.contract(alias).bytecodeHash
-    const currentBytecode = bytecodeDigest(klass.bytecode)
-    return currentBytecode === deployedBytecode
+    const contract = this.contract(alias) || this.solidityLib(alias)
+    if (contract) {
+      const localBytecode = contract.localBytecodeHash
+      const currentBytecode = bytecodeDigest(klass.bytecode)
+      return currentBytecode === localBytecode
+    }
   }
 
   set version(version) {
@@ -167,6 +231,10 @@ export default class ZosNetworkFile {
 
   set contracts(contracts) {
     this.data.contracts = contracts
+  }
+
+  set solidityLibs(solidityLibs) {
+    this.data.solidityLibs = solidityLibs
   }
 
   set frozen(frozen) {
@@ -215,7 +283,8 @@ export default class ZosNetworkFile {
       address: instance.address,
       constructorCode: constructorCode(instance),
       bodyBytecodeHash: bytecodeDigest(bodyCode(instance)),
-      bytecodeHash: bytecodeDigest(instance.constructor.bytecode),
+      localBytecodeHash: bytecodeDigest(instance.constructor.bytecode),
+      deployedBytecodeHash: bytecodeDigest(instance.constructor.binary),
       types,
       storage,
       warnings
@@ -224,14 +293,6 @@ export default class ZosNetworkFile {
 
   setContract(alias, value) {
     this.data.contracts[alias] = value
-  }
-
-  setContractAddress(alias, address) {
-    this.data.contracts[alias].address = address
-  }
-
-  setContractBodyBytecodeHash(alias, bodyBytecodeHash) {
-    this.data.contracts[alias].bodyBytecodeHash = bodyBytecodeHash
   }
 
   unsetContract(alias) {

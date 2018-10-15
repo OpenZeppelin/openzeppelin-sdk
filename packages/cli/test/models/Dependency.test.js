@@ -7,7 +7,7 @@ import npm from 'npm-programmatic'
 import { LibProject } from 'zos-lib'
 import Dependency from '../../src/models/dependency/Dependency'
 
-contract('Dependency', function() {
+contract('Dependency', function([_, from]) {
   const assertErrorMessage = (fn, errorMessage) => {
     try {
       fn()
@@ -77,14 +77,10 @@ contract('Dependency', function() {
     })
 
     describe('#deploy', function() {
-      it('deploys a dependency', function() {
-        const libDeployStub = sinon
-          .stub(LibProject, 'fetchOrDeploy')
-          .returns({ setImplementation: () => {} })
-        this.dependency.deploy(this.txParams)
-
-        libDeployStub.should.have.been.calledWithExactly('1.1.0', this.txParams, this.addresses)
-        sinon.restore()
+      it('deploys a dependency', async function() {
+        const project = await this.dependency.deploy({ from });
+        const address = await project.getImplementation({ contractName: 'Greeter' });
+        address.should.be.nonzeroAddress;
       })
     })
 

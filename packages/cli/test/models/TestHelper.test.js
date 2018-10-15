@@ -7,7 +7,7 @@ import TestHelper from '../../src/models/TestHelper'
 import ZosPackageFile from "../../src/models/files/ZosPackageFile"
 
 const ImplV1 = Contracts.getFromLocal('ImplV1')
-const AnotherImpl = Contracts.getFromLocal('AnotherImplV1')
+const WithLibraryImpl = Contracts.getFromLocal('WithLibraryImplV1')
 
 contract('TestHelper', function ([_, owner]) {
   const txParams = { from: owner }
@@ -109,22 +109,22 @@ contract('TestHelper', function ([_, owner]) {
 
     it('retrieves contracts in directory', async function() {
       const impl = await this.directory.getImplementation('Impl')
-      const anotherImpl = await this.directory.getImplementation('AnotherImpl')
+      const withLibraryImpl = await this.directory.getImplementation('WithLibraryImpl')
 
       impl.should.not.be.null
-      anotherImpl.should.not.be.null
+      withLibraryImpl.should.not.be.null
     })
 
     it('retrieves mocks from directory', async function() {
       const impl = await this.directory.getImplementation('Impl')
-      const anotherImpl = await this.directory.getImplementation('AnotherImpl')
+      const withLibraryImpl = await this.directory.getImplementation('WithLibraryImpl')
       const implContract = ImplV1.at(impl)
-      const anotherImplContract = AnotherImpl.at(anotherImpl)
+      const withLibraryImplContract = WithLibraryImpl.at(withLibraryImpl)
       const implSay = await implContract.say()
-      const anotherImplSay = await anotherImplContract.say()
+      const withLibraryImplSay = await withLibraryImplContract.say()
 
       implSay.should.eq('V1')
-      anotherImplSay.should.eq('AnotherV1')
+      withLibraryImplSay.should.eq('WithLibraryV1')
     })
   })
 })

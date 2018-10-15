@@ -13,10 +13,13 @@ import ZosPackageFile from '../../src/models/files/ZosPackageFile';
 import remove from '../../src/scripts/remove';
 import Dependency from '../../src/models/dependency/Dependency';
 import CaptureLogs from '../helpers/captureLogs';
+import { promisify } from 'util';
 
 const should = require('chai').should();
 
 const ImplV1 = Contracts.getFromLocal('ImplV1');
+const WithLibraryImplV1 = Contracts.getFromLocal('WithLibraryImplV1');
+const PackageContract = Contracts.getFromNodeModules('zos-lib', 'Package');
 const ImplementationDirectory = Contracts.getFromNodeModules('zos-lib', 'ImplementationDirectory');
 
 contract('push script', function([_, owner]) {
@@ -72,7 +75,7 @@ contract('push script', function([_, owner]) {
     it('should record contracts in network file', async function () {
       const contract = this.networkFile.contract('Impl');
       contract.address.should.be.nonzeroAddress;
-      contract.bytecodeHash.should.not.be.empty;
+      contract.localBytecodeHash.should.not.be.empty;
       contract.storage.should.not.be.empty;
       contract.types.should.not.be.empty;
       const deployed = await ImplV1.at(contract.address);
@@ -84,6 +87,20 @@ contract('push script', function([_, owner]) {
       const deployed = await ImplV1.at(address);
       (await deployed.say()).should.eq('V1');
     });
+
+    it('should deploy required libraries', async function () {
+      const address = this.networkFile.solidityLib('UintLib').address;
+      const code = await promisify(web3.eth.getCode.bind(web3.eth))(address);
+      const uintLib = Contracts.getFromLocal('UintLib');
+      code.length.should.eq(uintLib.deployedBytecode.length).and.be.greaterThan(40);
+    });
+
+    it('should deploy and link contracts that require libraries', async function () {
+      const address = this.networkFile.contract('WithLibraryImpl').address;
+      const deployed = await WithLibraryImplV1.at(address);
+      const result = await deployed.double(10);
+      result.toNumber().should.eq(20);
+    });
   };
 
   const shouldRegisterContractsInDirectory = function () {
@@ -92,7 +109,7 @@ contract('push script', function([_, owner]) {
       const _package = await Package.fetch(this.networkFile.package.address);
       (await _package.getImplementation(defaultVersion, 'Impl')).should.eq(address);
     });
-  }
+  };
 
   const shouldRedeployContracts = function () {
     beforeEach('loading previous address', function () {
@@ -354,8 +371,6 @@ contract('push script', function([_, owner]) {
 
     shouldDeployApp();
     shouldDeployProvider();
-    shouldDeployContracts();
-    shouldRegisterContractsInDirectory();
   });
 
   describe('an app with dependency', function () {
@@ -506,33 +521,16 @@ contract('push script', function([_, owner]) {
       this.networkFile.contract('Impl').address.should.eq(previousAddress)
     })
   });
-
-  describe('a lightweight app with invalid contracts', function() {
-    beforeEach('pushing package-with-invalid-contracts', async function () {
-      const packageFile = new ZosPackageFile('test/mocks/packages/package-with-invalid-contracts.zos.json')
-      packageFile.full = false
-      this.networkFile = packageFile.networkFile(network)
-
-      await push({ networkFile: this.networkFile, network, txParams, force: true }).should.be.rejectedWith(/WithFailingConstructor deployment failed/);
-    });
-
-    shouldDeployContracts();
-  });
-
-  function modifyBytecode(contractAlias) {
-    const contractData = this.networkFile.contract(contractAlias);
-    this.networkFile.setContract(contractAlias, { ... contractData, bytecodeHash: '0xabcdef' })
-  }
-
-  async function getImplementationFromApp(contractAlias) {
-    const app = await App.fetch(this.networkFile.appAddress);
-    return await app.getImplementation(this.networkFile.packageFile.name, contractAlias);
-  }
 });
+
+async function getImplementationFromApp(contractAlias) {
+  const app = await App.fetch(this.networkFile.appAddress);
+  return await app.getImplementation(this.networkFile.packageFile.name, contractAlias);
+}
 
 function modifyBytecode(contractAlias) {
   const contractData = this.networkFile.contract(contractAlias);
-  this.networkFile.setContract(contractAlias, { ... contractData, bytecodeHash: '0xabcdef' })
+  this.networkFile.setContract(contractAlias, { ... contractData, localBytecodeHash: '0xabcdef' })
 }
 
 function modifyStorageInfo(contractAlias) {

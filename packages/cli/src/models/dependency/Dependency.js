@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import { FileSystem as fs, LibProject, Contracts } from 'zos-lib'
+import { FileSystem as fs, LibProject, Contracts, getSolidityLibNames } from 'zos-lib'
 import semver from 'semver';
 import npm from 'npm-programmatic'
 
@@ -30,12 +30,29 @@ export default class Dependency {
   async deploy(txParams) {
     const version = semver.coerce(this.version).toString()
     const project = await LibProject.fetchOrDeploy(version, txParams, {})
-    await Promise.all(
-      _.map(this.getPackageFile().contracts, (contractName, contractAlias) => {
-        const contractClass = Contracts.getFromNodeModules(this.name, contractName)
-        return project.setImplementation(contractClass, contractAlias)
-      })
+    
+    // REFACTOR: Logic for filling in solidity libraries is partially duplicated from network base controller,
+    // this should all be handled at the Project level. Consider adding a setImplementations (plural) method
+    // to Projects, which handle library deployment and linking for a set of contracts altogether.
+
+    const contracts = _.map(this.getPackageFile().contracts, (contractName, contractAlias) => 
+      [Contracts.getFromNodeModules(this.name, contractName), contractAlias]
     );
+    
+    const libraryNames = _(contracts).map(([contractClass]) => (
+      getSolidityLibNames(contractClass.bytecode)
+    )).flatten().uniq().value();
+
+    const libraries = _.fromPairs(await Promise.all(_.map(libraryNames, async (libraryName) => {
+      const implementation = await project.setImplementation(Contracts.getFromNodeModules(this.name, libraryName), libraryName)
+      return [libraryName, implementation.address];
+    })));
+
+    await Promise.all(_.map(contracts, async ([contractClass, contractAlias]) => {
+      contractClass.link(libraries);
+      await project.setImplementation(contractClass, contractAlias);
+    }));
+
     return project
   }
 

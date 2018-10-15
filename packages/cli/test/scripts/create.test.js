@@ -15,8 +15,8 @@ const ImplV1 = Contracts.getFromLocal('ImplV1');
 contract('create script', function([_, owner]) {
   const contractName = 'ImplV1';
   const contractAlias = 'Impl';
-  const anotherContractName = 'AnotherImplV1';
-  const anotherContractAlias = 'AnotherImpl';
+  const anotherContractName = 'WithLibraryImplV1';
+  const anotherContractAlias = 'WithLibraryImpl';
   const uninitializableContractName = 'UninitializableImplV1';
   const uninitializableContractAlias = 'UninitializableImpl';
   const contractsData = [
@@ -119,7 +119,7 @@ contract('create script', function([_, owner]) {
       await createProxy({ contractAlias: anotherContractAlias, network, txParams, networkFile: this.networkFile });
 
       await assertProxy(this.networkFile, contractAlias, { version, say: 'V1' });
-      await assertProxy(this.networkFile, anotherContractAlias, { version, say: 'AnotherV1' });
+      await assertProxy(this.networkFile, anotherContractAlias, { version, say: 'WithLibraryV1' });
     });
 
     describe('warnings', function () {
@@ -208,7 +208,7 @@ contract('create script', function([_, owner]) {
 
     describe('with local modifications', function () {
       beforeEach('changing local network file to have a different bytecode', async function () {
-        this.networkFile.contract(contractAlias).bytecodeHash = '0xabcd'
+        this.networkFile.contract(contractAlias).localBytecodeHash = '0xabcd'
       });
 
       it('should refuse to create a proxy for a modified contract', async function () {
@@ -219,7 +219,7 @@ contract('create script', function([_, owner]) {
       it('should create a proxy for an unmodified contract', async function () {
         await createProxy({ contractAlias: anotherContractAlias, network, txParams, networkFile: this.networkFile });
 
-        await assertProxy(this.networkFile, anotherContractAlias, { version, say: 'AnotherV1' });
+        await assertProxy(this.networkFile, anotherContractAlias, { version, say: 'WithLibraryV1' });
       });
 
       it('should create a proxy for a modified contract if force is set', async function () {

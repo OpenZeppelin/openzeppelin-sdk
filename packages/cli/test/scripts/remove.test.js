@@ -9,7 +9,7 @@ const should = require('chai').should();
 
 contract('remove script', function() {
   const contractAlias = 'Impl';
-  const anotherContractAlias = 'AnotherImpl';
+  const anotherContractAlias = 'WithLibraryImpl';
 
   beforeEach('setup', async function() {
     this.packageFile = new ZosPackageFile('test/mocks/packages/package-with-contracts.zos.json')
@@ -26,7 +26,7 @@ contract('remove script', function() {
   it('should remove a contract', function() {
     remove({ contracts: [contractAlias], packageFile: this.packageFile })
     should.not.exist(this.packageFile.contract(contractAlias));
-    this.packageFile.contract(anotherContractAlias).should.eq('AnotherImplV1');
+    this.packageFile.contract(anotherContractAlias).should.eq('WithLibraryImplV1');
   });
 
   it('should remove multiple contracts', function() {
