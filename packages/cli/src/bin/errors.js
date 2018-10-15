@@ -1,4 +1,4 @@
-import ErrorHandler from '../models/ErrorHandler'
+import ErrorHandler from '../models/errors/ErrorHandler'
 
 export default function registerErrorHandler(program) {
   process.on('unhandledRejection', reason => new ErrorHandler(reason, program).call())

@@ -325,7 +325,8 @@ export default class NetworkBaseController {
     await Verifier.verifyAndPublish(remote, { contractName, compilerVersion, optimizer, optimizerRuns, contractSource, contractAddress })
   }
 
-  writeNetworkPackage() {
+  writeNetworkPackageIfNeeded() {
     this.networkFile.write()
   }
+
 }

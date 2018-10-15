@@ -335,7 +335,19 @@ export default class ZosNetworkFile {
   }
 
   write() {
-    fs.writeJson(this.fileName, this.data)
-    log.info(`Successfully written ${this.fileName}`)
+    if(this._hasChanged()) {
+      const exists = this._exists()
+      fs.writeJson(this.fileName, this.data)
+      exists ? log.info(`Updated ${this.fileName}`) : log.info(`Created ${this.fileName}`)
+    }
+  }
+
+  _hasChanged() {
+    const currentNetworkFile = fs.parseJsonIfExists(this.fileName)
+    return !_.isEqual(this.data, currentNetworkFile)
+  }
+
+  _exists() {
+    return !!fs.parseJsonIfExists(this.fileName)
   }
 }

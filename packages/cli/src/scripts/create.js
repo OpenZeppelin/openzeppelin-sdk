@@ -1,5 +1,6 @@
 import stdout from '../utils/stdout';
 import ControllerFor from '../models/network/ControllerFor';
+import ScriptError from '../models/errors/ScriptError'
 
 export default async function createProxy({ packageName, contractAlias, initMethod, initArgs, network, txParams = {}, force = false, networkFile = undefined }) {
   if (!contractAlias) throw Error('A contract alias must be provided to create a new proxy.')
@@ -7,10 +8,15 @@ export default async function createProxy({ packageName, contractAlias, initMeth
   const controller = ControllerFor(network, txParams, networkFile)
   if (controller.isLib) throw Error('Cannot create a proxy for a library project')
   
-  await controller.checkContractDeployed(packageName, contractAlias, !force);
-  const proxy = await controller.createProxy(packageName, contractAlias, initMethod, initArgs);
+  try {
+    await controller.checkContractDeployed(packageName, contractAlias, !force);
+    const proxy = await controller.createProxy(packageName, contractAlias, initMethod, initArgs);
+    stdout(proxy.address);
+    controller.writeNetworkPackageIfNeeded()
 
-  controller.writeNetworkPackage();
-  stdout(proxy.address);
-  return proxy;
+    return proxy;
+  } catch(error) {
+    const cb = () => controller.writeNetworkPackageIfNeeded()
+    throw new ScriptError(error.message, cb)
+  }
 }

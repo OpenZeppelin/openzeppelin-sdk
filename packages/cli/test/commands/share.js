@@ -22,7 +22,7 @@ import * as setAdmin from '../../src/scripts/set-admin';
 
 import * as runWithTruffle from '../../src/utils/runWithTruffle';
 import Session from '../../src/models/network/Session';
-import ErrorHandler from '../../src/models/ErrorHandler';
+import ErrorHandler from '../../src/models/errors/ErrorHandler';
 import program from '../../src/bin/program';
 
 const assert = require('chai').assert
