@@ -24,12 +24,12 @@ function registerProjectHooks (network) {
     }
   })
   
-  // after('cleaning up project folder', function () {
-  //   run('rm build/contracts/*.json ||:')
-  //   run('rm contracts/*.sol ||:')
-  //   run('rm zos.* ||:')
-  //   run('rm package.* ||:')
-  // })
+  after('cleaning up project folder', function () {
+    run('rm build/contracts/*.json ||:')
+    run('rm contracts/*.sol ||:')
+    run('rm zos.* ||:')
+    run('rm package.* ||:')
+  })
 };
 
 module.exports = {
