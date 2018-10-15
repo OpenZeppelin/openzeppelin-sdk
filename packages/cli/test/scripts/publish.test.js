@@ -1,15 +1,17 @@
 'use strict'
 require('../setup')
 
-import { App, Package, ImplementationDirectory } from 'zos-lib'
+import { App, Package, ImplementationDirectory, Proxy } from 'zos-lib'
 
 import publish from '../../src/scripts/publish.js';
 import push from '../../src/scripts/push.js';
+import create from '../../src/scripts/create.js';
+import setAdmin from '../../src/scripts/set-admin.js';
 import ZosPackageFile from '../../src/models/files/ZosPackageFile';
 
 const should = require('chai').should();
 
-contract('publish script', function([_, owner]) {
+contract('publish script', function([_, owner, otherAddress]) {
   const network = 'test';
   const txParams = { from: owner };
   const defaultVersion = '1.1.0';
@@ -84,5 +86,26 @@ contract('publish script', function([_, owner]) {
       newImplFromApp.should.eq(newImplFromFile);
       newImplFromApp.should.eq(this.previousContractAddress);
     });
-  })
+  });
+
+  describe('publishing with proxies', async function () {
+    it('should transfer ownership of own proxy to app', async function () {
+      this.ownProxy = await create({ contractAlias: 'Impl', network, txParams, networkFile: this.networkFile });
+      await publish({ network, txParams, networkFile: this.networkFile });
+      (await Proxy.at(this.ownProxy.address).admin()).should.eq(this.networkFile.appAddress);
+    });
+
+    it('should transfer ownership of dependency proxy to app', async function () {
+      this.dependencyProxy = await create({ packageName: 'mock-stdlib-undeployed', contractAlias: 'Greeter', network, txParams, networkFile: this.networkFile });
+      await publish({ network, txParams, networkFile: this.networkFile });
+      (await Proxy.at(this.dependencyProxy.address).admin()).should.eq(this.networkFile.appAddress);
+    });
+
+    it('should not transfer ownership of transferred proxy to app', async function () {
+      this.transferredProxy = await create({ contractAlias: 'Impl', network, txParams, networkFile: this.networkFile });
+      await setAdmin({ newAdmin: otherAddress, contractAlias: 'Impl', packageName: 'Herbs', network, txParams, networkFile: this.networkFile })
+      await publish({ network, txParams, networkFile: this.networkFile });
+      (await Proxy.at(this.transferredProxy.address).admin()).should.eq(otherAddress);
+    });
+  });
 });

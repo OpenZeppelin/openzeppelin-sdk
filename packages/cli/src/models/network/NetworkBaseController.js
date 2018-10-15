@@ -46,6 +46,7 @@ export default class NetworkBaseController {
 
   async fetchOrDeploy(requestedVersion) {
     this.project = await this.getDeployer(requestedVersion).fetchOrDeploy()
+    return this.project
   }
 
   async compareCurrentStatus() {
