@@ -260,10 +260,4 @@ export default class NetworkAppController extends NetworkBaseController {
       fs.writeJson(path, data)
     }
   }
-
-  async freeze() {
-    await this.fetchOrDeploy(this.currentVersion)
-    await this.project.freeze()
-    this.networkFile.frozen = true
-  }
 }
