@@ -8,27 +8,10 @@ const log = new Logger('ZosPackageFile')
 
 export default class ZosPackageFile {
 
-  constructor(fileName = 'zos.json', searchUp = true) {
+  constructor(fileName = 'zos.json') {
     this.fileName = fileName
-    let cwd = process.cwd()
-
-    while(!fs.exists(this.fileName) && searchUp) {
-        if(process.cwd() === "/") {
-            process.chdir(cwd)
-            break
-        }
-
-        try {
-            process.chdir("..")
-        } catch (error) {
-            process.chdir(cwd)
-        }
-    }
-        
-    this.data = fs.parseJsonIfExists(this.fileName) || { zosversion: ZOS_VERSION };
+    this.data = fs.parseJsonIfExists(this.fileName) || { zosversion: ZOS_VERSION }
     checkVersion(this.data.zosversion, this.fileName)
-
-    // TODO: Implement auto upgrade or version checks
   }
 
   exists() {
