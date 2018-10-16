@@ -117,7 +117,7 @@ By now, the json files looks like this:
 }
 ```
 
-OpenZeppelin will use this file to track your project's contracts on chain, making them upgradeable and dynamically linkable to pre-deployed libraries, as well see soon.
+OpenZeppelin will use this file to track your project's contracts on chain, making them upgradeable and dynamically linkable to pre-deployed EVM packages, as well see soon.
 
 ## Deploying our first version of Basil, locally
 
@@ -227,18 +227,18 @@ zos update Basil --from $OWNER --network local
 
 By now, Basil's proxy will use the new implementation, but it will revert on every donation because it's token is not set. We'll do that next.
 
-## Connecting to OpenZeppelin's standard library
+## Connecting to OpenZeppelin's EVM package
 
 So far, we've used ZeppelinOS to seamlessly upgrade our app's contracts. We will now use it to create a proxy for a pre-deployed ERC721 token implementation.
 
-The first thing we need to do, is tell our app to link to the `openzeppelin-zos` standard library release:
+The first thing we need to do, is tell our app to link to the `openzeppelin-zos` EVM package release:
 
 ```sh
 zos link openzeppelin-zos
-zos push --from $OWNER --deploy-stdlib --network local
+zos push --from $OWNER --deploy-libs --network local
 ```
 
-Notice the `--deploy-stdlib` option we've used. What this does is inject a version of the standard lib in our development network. Since we're working on a local blockchain, ZeppelinOS's contracts don't exist. This handy option solves that problem for us quite conveniently ^^
+Notice the `--deploy-libs` option we've used. What this does is inject a version of the EVM package in our development network. Since we're working on a local blockchain, ZeppelinOS's contracts don't exist. This handy option solves that problem for us quite conveniently ^^
 
 Now, to create a proxy for the token:
 

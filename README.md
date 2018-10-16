@@ -13,11 +13,11 @@ Install ZeppelinOS and setup your project as described in the [Setup guide](http
 In order to build an upgradeable application with ZeppelinOS, follow our
 [Building upgradeable applications](https://docs.zeppelinos.org/docs/building.html) guide.
 
-If you would like to use the ZeppelinOS on-chain standard libraries in your app,
+If you would like to use the ZeppelinOS EVM packages in your app,
  follow our [Using the stdlib in your app](https://docs.zeppelinos.org/docs/using.html) guide.
 
-If you are interested in deploying your own standard libraries for ZeppelinOS,
-see our [Developing a new standard library](https://docs.zeppelinos.org/docs/developing.html) guide.
+If you are interested in deploying your own EVM packages for ZeppelinOS,
+see our [Developing a new EVM package](https://docs.zeppelinos.org/docs/developing.html) guide.
 
 Two demo apps based on ZeppelinOS are described in [Basil](https://docs.zeppelinos.org/docs/basil.html) and [Crafty](https://docs.zeppelinos.org/docs/crafty.html).
 
@@ -45,9 +45,9 @@ zos update MyContract
 - [Installation and setup](https://docs.zeppelinos.org/docs/setup.html)
 - [Building an upgradeable application](https://docs.zeppelinos.org/docs/building.html)
 - [Using the stdlib in your app](https://docs.zeppelinos.org/docs/using.html)
-- [Developing a new standard library](https://docs.zeppelinos.org/docs/developing.html)
+- [Developing a new EVM package](https://docs.zeppelinos.org/docs/developing.html)
 - [Testing upgradeable applications](https://docs.zeppelinos.org/docs/testing.html)
-- [Extend provided standard library code in your own contracts](https://github.com/zeppelinos/labs/tree/master/extensibility-study#extensibility-study) (experimental)
+- [Extend provided EVM package code in your own contracts](https://github.com/zeppelinos/labs/tree/master/extensibility-study#extensibility-study) (experimental)
 - [Migrate your non-upgradeable legacy ERC20 token into an upgradeable version with an opt-in approach](https://docs.zeppelinos.org/docs/erc20_onboarding.html)
 - [Migrate your non-upgradeable legacy ERC20 token into an upgradeable version with a managed approach](https://github.com/zeppelinos/labs/tree/master/migrating_legacy_token_managed#migrating-legacy-non-upgradeable-token-to-upgradeability-with-managed-strategy) (experimental)
 

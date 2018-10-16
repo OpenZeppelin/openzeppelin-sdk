@@ -8,7 +8,7 @@ sidebar_label: Low level upgradable app
 
 > **Note**: for a fully working project with this example, see the [`examples/complex`](https://github.com/zeppelinos/zos-lib/tree/master/examples/complex) folder of the `zos-lib` repository.
 
-Most real-world applications require more than a single smart contract. In this guide we will explore how to build an upgradeable app with multiple smart contracts and how to use the ZeppelinOS on-chain standard library.
+Most real-world applications require more than a single smart contract. In this guide we will explore how to build an upgradeable app with multiple smart contracts and how to use the ZeppelinOS EVM package.
 
 ### Getting started
 
@@ -74,11 +74,11 @@ const donationsV0 = await app.createProxy(DonationsV0, contractName, 'initialize
 
 Remember that the proxy is the contract that will receive the calls and hold the storage, while delegating its behavior to the implementation contract, enabling us to upgrade it.
 
-### Link a standard library
+### Link an EVM package
 
 Now let's suppose we want to give some sort of retribution to the donors, so we mint new [ERC721](http://erc721.org/) cryptocollectibles for each donation. 
 
-In order to do this, we link the [ZeppelinOS standard library](stdlib.md) to our application by running:
+In order to do this, we link the [ZeppelinOS EVM package](stdlib.md) to our application by running:
 
 ```sh
 npm install openzeppelin-zos
@@ -112,11 +112,11 @@ contract DonationsV1 is DonationsV0 {
 }
 ```
 
-Notice that by doing this, our contract will interact directly with the on-chain ZeppelinOS standard library, so there is no need to deploy nor maintain the `MintableERC721Token` contract ourselves.
+Notice that by doing this, our contract will interact directly with the on-chain ZeppelinOS EVM package, so there is no need to deploy nor maintain the `MintableERC721Token` contract ourselves.
 
 ### Upgrade to the new version
 
-To upgrade our app, we need to create a new version and reference the ZeppelinOS standard library release
+To upgrade our app, we need to create a new version and reference the ZeppelinOS EVM package release
 
 ```js
 const stdlibAddress = "0x3bd95b5a003481b801010bcde4f7e0a32a925deb" // mainnet release
@@ -139,7 +139,7 @@ await app.upgradeProxy(donationsV0.address, null, contractName)
 donationsV1 = DonationsV1.at(donationsV0.address)
 ```
 
-Then we create a proxy to the standard library version of the ERC721 contract, declaring our `donationV1` proxy address as the owner:
+Then we create a proxy to the EVM package version of the ERC721 contract, declaring our `donationV1` proxy address as the owner:
 
 ```js
 const token = await app.createProxy(
@@ -156,4 +156,4 @@ Finally, we set it as the token of our upgradeable contract
 await donationsV1.setToken(token.address)
 ```
 
-That's it! We have upgraded our ZeppelinOS app behavior while preserving its original balance and storage. This new version is also using a proxy contract of the the on-chain ZeppelinOS standard library implementation of a mintable ERC721 token.
+That's it! We have upgraded our ZeppelinOS app behavior while preserving its original balance and storage. This new version is also using a proxy contract of the the on-chain ZeppelinOS EVM package implementation of a mintable ERC721 token.

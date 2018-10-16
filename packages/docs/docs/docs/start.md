@@ -8,7 +8,7 @@ ZeppelinOS is a platform to develop, deploy and operate upgradeable smart contra
 ## Features
 
 * Upgrades: fix and improve your contracts over time.
-* Standard libraries: link your contracts to standard libraries already deployed on the blockchain.
+* EVM packages: link your contracts to EVM packages already deployed on the blockchain.
 
 ## Getting Started
 
@@ -17,11 +17,11 @@ Install ZeppelinOS and setup your project as described in the [Setup guide](setu
 In order to build an upgradeable application with ZeppelinOS, follow our
 [Building upgradeable applications](building.md) guide.
 
-If you would like to use the ZeppelinOS on-chain standard libraries in your app,
- follow our [Using the stdlib in your app](using.md) guide.
+If you would like to use the ZeppelinOS EVM packages in your app,
+ follow our [Using EVM packages in your app](using.md) guide.
 
-If you are interested in deploying your own standard libraries for ZeppelinOS,
-see our [Developing a new standard library](developing.md) guide.
+If you are interested in deploying your own EVM packages for ZeppelinOS,
+see our [Developing a new EVM package](developing.md) guide.
 
 Two demo apps based on ZeppelinOS are described in [Basil](basil.md) and [Crafty](crafty.md).
 

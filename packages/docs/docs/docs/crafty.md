@@ -195,4 +195,4 @@ function addPrecreatedCraftable(CraftableToken _craftable) onlyRole(ROLE_ADMIN) 
 
 A key point here is that both the upgradeable and non-upgradeable instances are treated in the same manner: `Crafty`'s `craft` method makes no distinction whatsoever when calling `CraftableToken` methods, since the interface is the same. A contract being upgradeable places no extra burden on its callers.
 
-This example shows how to add upgradeability and use on-chain standard libraries on a fairly complex smart contract app without too much work. Congratulations!
+This example shows how to add upgradeability and use EVM packages on a fairly complex smart contract app without too much work. Congratulations!
