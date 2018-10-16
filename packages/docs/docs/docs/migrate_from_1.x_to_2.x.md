@@ -16,7 +16,33 @@ Similarly, as we realized what an EVM package was, we realized what it's not. In
 By default, your zOS project will not use any of its App or Package on-chain architecture unless you explicitly state that your code is meant to be reusable as an EVM package. When you init a zOS project, there is no architecture other than your project's architecture. ZeppelinOS simply uses the CLI to manage proxies for you. Now, if you intend your project to be a reusable EVM package, you can `publish` your code, and the CLI will seamlessly deploy the necessary App and Package architecture which will allow your code to exist as a discoverable deployed EVM package.
 
 ## New Commands
-TODO
+
+2.x introduces a few new commands to its CLI:
+
+* `zos publish`
+* `zos check`
+* `zos set-admin`
+* `zos unlink`
+
+#### Publish
+
+```
+Usage: publish --network <network> [options]
+
+publishes your project to the selected network
+
+Options:
+  -n, --network <network>  network to be used
+  -f, --from <from>        specify transaction sender address
+  --timeout <timeout>      timeout in seconds for each blockchain transaction (defaults to 600s)
+  -h, --help               output usage information
+```
+
+As explained in the "Terminology and Fundamentals" section (TODO add link), this command is what transforms your project to a reusable EVM package. It introduces deploys the App and Package architecture and ensures that your code is discoverable as an EVM package.
+
+Once a project is published, it can be treated as a regular zOS project, i.e. you can still add/remove contracts to it, make updates, push your changes to the blockchain, etc, the only difference is that you can now use the `bump` command to update your EVM package as a whole.
+
+NOTE: Despite the similarities between EVM packages and NPM packages, in zOS you just need to publish your packages once, after that, bumping a package is enough to update it. In NPM, a package needs to be bumped locally and then published each time the changes are to become public.
 
 ## Modified Commands
 TODO
