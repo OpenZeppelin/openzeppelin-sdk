@@ -178,7 +178,7 @@ export default class NetworkAppController extends NetworkBaseController {
   }
 
   _fetchOwnedProxies(packageName, contractAlias, proxyAddress) {
-    let criteriaDescription;
+    let criteriaDescription = '';
     if (packageName || contractAlias) criteriaDescription += ` contract ${toContractFullName(packageName, contractAlias)}`
     if (proxyAddress) criteriaDescription += ` address ${proxyAddress}`
     
