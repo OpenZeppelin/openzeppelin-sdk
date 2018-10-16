@@ -44,8 +44,24 @@ Once a project is published, it can be treated as a regular zOS project, i.e. yo
 
 NOTE: Despite the similarities between EVM packages and NPM packages, in zOS you just need to publish your packages once, after that, bumping a package is enough to update it. In NPM, a package needs to be bumped locally and then published each time the changes are to become public.
 
-## Modified Commands
+#### Check
 TODO
+
+#### Set-admin
+TODO
+
+#### Unlink
+TODO
+
+## Modified Commands
+
+In 2.x, there are minor changes to the commands from 1.x, like some of them now having options like `--skip-compile`, but there are also more signiffcant changes.
+
+*`bump`* is now only relevant for published EVM packages, and is no longer applicable to projects that are not intended for reusability.
+
+*`link`* can now be called for multiple EVM packages.
+
+*`init`* no longer has the `--lib` option.
 
 ## Compatibility
 TODO
