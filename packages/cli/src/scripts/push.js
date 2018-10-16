@@ -9,7 +9,8 @@ export default async function push({ network, deployLibs, full = false, reupload
     if (deployLibs && !controller.isLib) await controller.deployLibs();
     if (full) await controller.toFullApp();
     await controller.push(reupload, force);
-    stdout(controller.isLib ? controller.packageAddress : controller.appAddress);
+    const address = controller.isLib ? controller.packageAddress : controller.appAddress;
+    if (address) stdout(address);
     controller.writeNetworkPackageIfNeeded()
   } catch(error) {
     const cb = () => controller.writeNetworkPackageIfNeeded()
