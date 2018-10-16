@@ -6,7 +6,8 @@
   "scripts": {
     "prepare": "rm -rf lib && babel src --out-dir lib",
     "test": "./scripts/test.sh",
-    "gen-docs": "babel-node docs/bin/docs.js"
+    "gen-docs": "babel-node docs/bin/docs.js",
+    "watch": "babel src -w -d lib"
   },
   "bin": {
     "zos": "./lib/bin/zos-cli.js"

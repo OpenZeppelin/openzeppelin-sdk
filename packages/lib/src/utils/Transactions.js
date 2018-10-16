@@ -9,8 +9,8 @@ import sleep from '../helpers/sleep';
 import Contracts from './Contracts'
 import BN from 'bignumber.js'
 
-// Store last block for gasLimit information
-const state = { };
+// Cache, exported for testing
+export const state = { };
 
 // Gas estimates are multiplied by this value to allow for an extra buffer (for reference, truffle-next uses 1.25)
 const GAS_MULTIPLIER = 1.25;
@@ -160,7 +160,7 @@ function checkGasPrice(txParams) {
   }
 }
 
-async function isGanacheNode () {
+export async function isGanacheNode () {
   const nodeVersion = await getNodeVersion();
   return nodeVersion.match(/TestRPC/);
 }
@@ -183,4 +183,26 @@ async function calculateActualGas(estimatedGas) {
   // this once the issue is resolved.
   if (await isGanacheNode()) gasToUse += 15000;
   return gasToUse >= blockLimit ? (blockLimit-1) : gasToUse;
+}
+
+export async function awaitConfirmations(transactionHash, confirmations = 12, interval = 1000, timeout = (10 * 60 * 1000)) {
+  if (await isGanacheNode()) return;
+  const getTxBlock = () => (promisify(web3.eth.getTransactionReceipt.bind(web3.eth))(transactionHash).then(r => r.blockNumber));
+  const getCurrentBlock = () => (promisify(web3.eth.getBlock.bind(web3.eth))('latest').then(b => b.number));
+  const now = +(new Date());
+
+  while (true) {
+    if ((new Date() - now) > timeout) {
+      throw new Error(`Exceeded timeout of ${timeout / 1000} seconds awaiting confirmations for transaction ${transactionHash}`)
+    }
+    const currentBlock = await getCurrentBlock();
+    const txBlock = await getTxBlock();
+    if (currentBlock - txBlock >= confirmations) return true;
+    await sleep(interval);
+  }
+}
+
+export async function hasBytecode(address) {
+  const bytecode = await promisify(web3.eth.getCode.bind(web3.eth))(address);
+  return bytecode.length > 2;
 }

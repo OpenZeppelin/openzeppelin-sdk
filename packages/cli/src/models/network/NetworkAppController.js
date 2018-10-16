@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import NetworkBaseController from './NetworkBaseController';
-import { Contracts, Logger, AppProject, FileSystem as fs, Proxy } from 'zos-lib';
+import { Contracts, Logger, AppProject, FileSystem as fs, Proxy, awaitConfirmations, hasBytecode } from 'zos-lib';
 import { toContractFullName } from '../../utils/naming';
 import Dependency from '../dependency/Dependency';
 import { allPromisesOrError } from '../../utils/async';
@@ -28,12 +28,26 @@ export default class NetworkAppController extends NetworkBaseController {
   }
 
   async toFullApp() {
-    if (this.appAddress) return;
-    log.info(`Publishing App and Package contracts to ${this.network}...`);
-    await this.fetchOrDeploy(this.currentVersion); // loads a SimpleProject as this.project
+    if (this.appAddress) {
+      log.info(`Project is already published to ${this.network}`);
+      return;
+    }
+    
+    log.info(`Publishing project to ${this.network}...`);
+    const simpleProject = await this.fetchOrDeploy(this.currentVersion);
     const deployer = new AppProjectDeployer(this, this.packageVersion);
-    this.project = await deployer.fromSimpleProject(this.project);
+    this.project = await deployer.fromSimpleProject(simpleProject);
     log.info(`Publish to ${this.network} successful`);
+
+    const proxies = this._fetchOwnedProxies();
+    if (proxies.length !== 0) {
+      log.info(`Awaiting confirmations before transferring proxies to published project (this may take a few minutes)`);
+      const app = this.project.getApp();
+      await awaitConfirmations(app.contract.transactionHash);
+      await hasBytecode(app.address);
+      await this._changeProxiesAdmin(proxies, app.address, simpleProject);
+      log.info(`${proxies.length} proxies have been successfully transferred`);
+    }
   }
 
   async push(reupload = false, force = false) {
@@ -94,16 +108,17 @@ export default class NetworkAppController extends NetworkBaseController {
   async setProxiesAdmin(packageName, contractAlias, proxyAddress, newAdmin) {
     const proxies = this._fetchOwnedProxies(packageName, contractAlias, proxyAddress)
     if (proxies.length === 0) return [];
-    await this.fetchOrDeploy(this.currentVersion)
-
-    await allPromisesOrError(
-      _.map(proxies, async (proxy) => {
-        await this.project.changeProxyAdmin(proxy.address, newAdmin)
-        this.networkFile.updateProxy(proxy, proxy => ({ ... proxy, admin: newAdmin }))
-      })
-    );
-
+    await this.fetchOrDeploy(this.currentVersion);
+    await this._changeProxiesAdmin(proxies, newAdmin);
     return proxies;
+  }
+
+  async _changeProxiesAdmin(proxies, newAdmin, project = null) {
+    if (!project) project = this.project;
+    await allPromisesOrError(_.map(proxies, async (proxy) => {
+      await project.changeProxyAdmin(proxy.address, newAdmin);
+      this.networkFile.updateProxy(proxy, proxy => ({ ...proxy, admin: newAdmin }));
+    }));
   }
 
   async upgradeProxies(packageName, contractAlias, proxyAddress, initMethod, initArgs) {
@@ -256,11 +271,5 @@ export default class NetworkAppController extends NetworkBaseController {
       }
       fs.writeJson(path, data)
     }
-  }
-
-  async freeze() {
-    await this.fetchOrDeploy(this.currentVersion)
-    await this.project.freeze()
-    this.networkFile.frozen = true
   }
 }

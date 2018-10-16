@@ -275,51 +275,6 @@ contract('push script', function([_, owner]) {
     });
   };
 
-  const shouldMigrateToFullApp = function () {
-    beforeEach('loading previous address', function () {
-      this.previousAddress = this.networkFile.contract('Impl').address
-    })
-
-    describe('migration to full app', function () {
-      beforeEach('migrating', async function () {
-        await push({ full: true, network, txParams, networkFile: this.networkFile })
-      })
-  
-      shouldDeployApp();
-
-      it('should reuse contract implementations', async function () {
-        const newImpl = await getImplementationFromApp.call(this, 'Impl');
-        newImpl.should.eq(this.previousAddress);
-      });
-
-      it('should redeploy modified contract on app', async function () {
-        modifyBytecode.call(this, 'Impl');
-        await push({ networkFile: this.networkFile, network, txParams });
-
-        const newImplFromApp = await getImplementationFromApp.call(this, 'Impl');
-        const newImplFromFile = this.networkFile.contract('Impl').address;
-        
-        newImplFromApp.should.eq(newImplFromFile);
-        newImplFromApp.should.not.eq(this.previousAddress);
-      });
-    })
-
-    describe('migration with modified contracts', async function () {
-      beforeEach('migrating', async function () {
-        modifyBytecode.call(this, 'Impl');
-        await push({ full: true, network, txParams, networkFile: this.networkFile });
-      })
-
-      it('should redeploy modified contract on app', async function () {
-        const newImplFromApp = await getImplementationFromApp.call(this, 'Impl');
-        const newImplFromFile = this.networkFile.contract('Impl').address;
-        
-        newImplFromApp.should.eq(newImplFromFile);
-        newImplFromApp.should.not.eq(this.previousAddress);
-      });
-    })
-  }
-
   const shouldNotPushWhileFrozen = function () {
     it('should refuse to push when frozen', async function() {
       await freeze({ network, txParams, networkFile: this.networkFile })
@@ -481,27 +436,12 @@ contract('push script', function([_, owner]) {
     it('should run push', async function () {
       await push({ network, txParams, networkFile: this.networkFile })
     });
-
-    describe('migration to full app', function () {
-      beforeEach('migrating', async function () {
-        await push({ network, txParams, networkFile: this.networkFile })
-        await push({ full: true, network, txParams, networkFile: this.networkFile })
-      });
-      shouldDeployApp();
-    });
-
-    describe('migration from scratch', function () {
-      beforeEach('migrating', async function () {
-        await push({ full: true, network, txParams, networkFile: this.networkFile })
-      });
-      shouldDeployApp();
-    });
   });
 
   describe('a lightweight app with contracts', function() {
     beforeEach('pushing package-with-contracts', async function () {
       const packageFile = new ZosPackageFile('test/mocks/packages/package-with-contracts.zos.json')
-      packageFile.full = false
+      packageFile.publish = false
       this.networkFile = packageFile.networkFile(network)
 
       await push({ network, txParams, networkFile: this.networkFile })
@@ -511,7 +451,6 @@ contract('push script', function([_, owner]) {
     shouldValidateContracts();
     shouldRedeployContracts();
     shouldDeleteContracts({ unregisterFromDirectory: false });
-    shouldMigrateToFullApp();
 
     it('should not reupload contracts after version bump', async function () {
       const previousAddress = this.networkFile.contract('Impl').address

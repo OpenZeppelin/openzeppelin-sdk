@@ -67,7 +67,7 @@ contract('TestHelper', function ([_, owner]) {
   describe('for lightweight app project', function() {
     beforeEach(async function () {
       this.packageFile = new ZosPackageFile('test/mocks/packages/package-with-contracts.zos.json')
-      this.packageFile.full = false
+      this.packageFile.publish = false
       this.networkFile = this.packageFile.networkFile('test')
       this.app = await TestHelper(txParams, this.networkFile)
     })

@@ -11,7 +11,7 @@ const register = program => program
   .command(signature, { noHelp: true })
   .usage('<project-name> [version]')
   .description(description)
-  .option('--full', 'create an application, package, and implementation directory contracts to manage your project')
+  .option('--publish', 'automatically publishes your project upon pushing it to a network')
   .option('--force', 'overwrite existing project if there is one')
   .option('--link <stdlib>', 'link to a standard library')
   .option('--no-install', 'skip installing stdlib dependencies locally')
@@ -19,10 +19,10 @@ const register = program => program
   .action(action)
 
 async function action(name, version, options) {
-  const { full, force, link, install: installLibs } = options
+  const { publish, force, link, install: installLibs } = options
 
   const libs = link ? link.split(',') : []
-  await init({ name, version, libs, installLibs, force, full })
+  await init({ name, version, libs, installLibs, force, publish })
   await push.tryAction(options)
 }
 

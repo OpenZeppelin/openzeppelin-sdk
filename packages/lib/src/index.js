@@ -4,6 +4,7 @@ const version = 'v' + require('../package.json').version
 // helpers
 import decodeLogs from './helpers/decodeLogs'
 import encodeCall from './helpers/encodeCall'
+import sleep from './helpers/sleep'
 
 // utils
 import ABI from './utils/ABIs'
@@ -11,8 +12,8 @@ import Semver from './utils/Semver'
 import Logger from './utils/Logger'
 import FileSystem from './utils/FileSystem'
 import Contracts from './utils/Contracts'
-import { sendTransaction, deploy } from './utils/Transactions'
 import { bodyCode, constructorCode, bytecodeDigest, replaceSolidityLibAddress, isSolidityLib, getSolidityLibNames } from './utils/Bytecode'
+import { sendTransaction, deploy, isGanacheNode, awaitConfirmations, hasBytecode } from './utils/Transactions'
 import { flattenSourceCode } from './utils/Solidity'
 import { semanticVersionEqual, toSemanticVersion, semanticVersionToString } from './utils/Semver';
 
@@ -65,6 +66,10 @@ export {
   replaceSolidityLibAddress, 
   getSolidityLibNames,
   isSolidityLib,
+  sleep,
+  isGanacheNode,
+  awaitConfirmations,
+  hasBytecode,
   Proxy,
   Logger,
   ABI,

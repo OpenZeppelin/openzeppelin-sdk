@@ -253,7 +253,7 @@ contract('status script', function([_, owner]) {
   describe('on lightweight app project', function () {
     beforeEach('creating package and network files', function () {
       this.packageFile = new ZosPackageFile('test/mocks/packages/package-empty.zos.json')
-      this.packageFile.full = false
+      this.packageFile.publish = false
       this.networkFile = this.packageFile.networkFile(network)
     })
 

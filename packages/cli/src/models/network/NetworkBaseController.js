@@ -46,6 +46,7 @@ export default class NetworkBaseController {
 
   async fetchOrDeploy(requestedVersion) {
     this.project = await this.getDeployer(requestedVersion).fetchOrDeploy()
+    return this.project
   }
 
   async compareCurrentStatus() {
@@ -329,4 +330,9 @@ export default class NetworkBaseController {
     this.networkFile.write()
   }
 
+  async freeze() {
+    await this.fetchOrDeploy(this.currentVersion)
+    await this.project.freeze()
+    this.networkFile.frozen = true
+  }
 }

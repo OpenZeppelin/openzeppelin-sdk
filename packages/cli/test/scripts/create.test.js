@@ -233,7 +233,7 @@ contract('create script', function([_, owner]) {
   describe('on lightweight app', function () {
     beforeEach('setup', async function() {
       this.packageFile = new ZosPackageFile('test/mocks/packages/package-empty.zos.json')
-      this.packageFile.full = false
+      this.packageFile.publish = false
     });
 
     shouldHandleCreateScript();
