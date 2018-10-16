@@ -39,7 +39,7 @@ export default class SimpleProject  {
   async changeProxyAdmin(proxyAddress, newAdmin) {
     const proxy = Proxy.at(proxyAddress, this.txParams)
     await proxy.changeAdmin(newAdmin)
-    log.info(`Proxy admin changed to ${newAdmin}`)
+    log.info(`Proxy ${proxyAddress} admin changed to ${newAdmin}`)
     return proxy
   }
 
