@@ -4,14 +4,14 @@ import push from './push'
 import linkStdlib from '../scripts/link'
 
 const name = 'link'
-const signature = `${name} [libraries...]`
-const description = 'links project with a list of libraries located in each library npm package'
+const signature = `${name} [dependencies...]`
+const description = 'links project with a list of dependencies each located in its npm package'
 
 const register = program => program
   .command(signature, { noHelp: true })
-  .usage('[libraryName1 ... libraryNameN] [options]')
+  .usage('[dependencyName1 ... dependencyNameN] [options]')
   .description(description)
-  .option('--no-install', 'skip installing library dependencies locally')
+  .option('--no-install', 'skip installing packages dependencies locally')
   .withPushOptions()
   .action(action)
 

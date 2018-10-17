@@ -429,7 +429,7 @@ contract('push script', function([_, owner]) {
 
       it('should fail to push', async function () {
         await push({ network, txParams, networkFile: this.networkFile })
-          .should.be.rejectedWith(/Required dependency version 1.0.0 does not match dependency package version 2.0.0/)
+          .should.be.rejectedWith(/Required dependency version 1.0.0 does not match version 2.0.0/)
       });
     })
 

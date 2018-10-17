@@ -35,12 +35,12 @@ async function appInfo(controller) {
 
 async function libInfo(controller) {
   if (!controller.packageAddress) {
-    log.warn(`Library is not yet deployed`);
+    log.warn(`Dependency is not yet deployed`);
     return false;
   }
 
   await controller.fetchOrDeploy(controller.currentVersion);
-  log.info(`Library package is deployed at ${controller.packageAddress}`);
+  log.info(`Dependency package is deployed at ${controller.packageAddress}`);
   return true;
 }
 
