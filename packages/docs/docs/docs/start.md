@@ -23,8 +23,6 @@ If you would like to use the ZeppelinOS EVM packages in your app,
 If you are interested in deploying your own EVM packages for ZeppelinOS,
 see our [Developing a new EVM package](developing.md) guide.
 
-Two demo apps based on ZeppelinOS are described in [Basil](basil.md) and [Crafty](crafty.md).
-
 ## Security
 
 If you find a security issue, please contact us at security@zeppelinos.org. We
