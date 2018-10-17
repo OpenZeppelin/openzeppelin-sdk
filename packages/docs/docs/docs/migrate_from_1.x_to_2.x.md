@@ -64,10 +64,15 @@ In 2.x, there are minor changes to the commands from 1.x, like some of them now 
 *`init`* no longer has the `--lib` option.
 
 ## Compatibility
-TODO
 
-### Changes to your Contracts
-TODO
+Unfortunately, 2.x introduces breaking changes, so a project that was started with 1.x cannot be upgraded to 2.x. This means that if you upgrade your global `zos` NPM package to 2.x, it won't be compatible with projects that were created using the old version of `zos`. In such cases, the CLI will detect the incompatibility and warn you. This is one of the reasons why `npx zos` is recommended over `zos` usage, so that each NPM project can target its own `zos` version.
 
-### Compatible EVM Packages
-TODO
+#### Changes to your Contracts
+
+When it comes to Solidity code, there is nothing special you need to consider when using zOS 2.x other than using initializers instead of constructors. For more info on this, see the "Initializers vs Constructors" section of the documentation (TODO add link).
+
+As with 1.x, zOS 2.x will manage all upgradeability and package linking features without you having to any use of special Solidity syntax. In this sense, zOS is language agnostic.
+
+#### Compatible EVM Packages
+
+Also, note that EVM packages created with 1.x cannot be linked to projects using 2.x. All EVM package providers will need to create new packages so that they can be used in zOS 2.x projects.
