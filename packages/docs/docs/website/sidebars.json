@@ -11,10 +11,6 @@
       "writing_contracts",
       "testing"
     ],
-    "DEMOS": [
-      "basil",
-      "crafty"
-    ],
     "ADVANCED GUIDES": [
       "erc20_onboarding",
       "upgradeability_governance"
