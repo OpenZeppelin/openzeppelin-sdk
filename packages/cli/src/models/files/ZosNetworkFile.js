@@ -86,6 +86,11 @@ export default class ZosNetworkFile {
     delete this.data.solidityLibs[libName]
   }
 
+  setSolidityLib(alias, value) {
+    if (!this.data.solidityLibs) this.data.solidityLibs = {};
+    this.data.solidityLibs[alias] = value
+  }
+
   solidityLib(libName) {
     return this.data.solidityLibs[libName]
   }
