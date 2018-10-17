@@ -24,6 +24,13 @@ module.exports = {
       gas: 500000,
       gasPrice: 10e9, // 10 Gwei
     },
+    kovan: {
+      host: 'localhost',
+      port: 8555,
+      network_id: 42,
+      gas: 2000000,
+      gasPrice: 10e9, // 10 Gwei
+    },
     mainnet: {
       host: 'localhost',
       port: 8545,
