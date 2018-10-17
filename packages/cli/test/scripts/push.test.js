@@ -262,6 +262,7 @@ contract('push script', function([_, owner]) {
     const libVersion = '1.1.0';
 
     it('should set dependency in deployed app', async function () {
+      if (!this.networkFile.appAddress) return;
       const app = await App.fetch(this.networkFile.appAddress);
       const packageInfo = await app.getPackage(libName)
       packageInfo.version.should.be.semverEqual(libVersion)
@@ -275,11 +276,60 @@ contract('push script', function([_, owner]) {
     });
   };
 
+  const shouldUpdateDependency = function () {
+    describe('updating dependency', function () {
+      const newVersion = '1.2.0';
+      
+      beforeEach('deploying new dependency version', async function () {
+        const mockStdlibPackage = new ZosPackageFile('test/mocks/mock-stdlib/zos.json');
+        mockStdlibPackage.version = newVersion;
+        sinon.stub(Dependency.prototype, 'getPackageFile').callsFake(() => mockStdlibPackage);
+
+        await this.dependencyPackage.newVersion(newVersion)
+        this.dependencyGetNetworkFileStub.callsFake(() => ({ packageAddress: this.dependencyPackage.address, version: newVersion }));
+        
+        this.networkFile.packageFile.setDependency('mock-stdlib', newVersion);
+      })
+      
+      beforeEach('running new push', async function () {
+        await push({ networkFile: this.networkFile, network, txParams });
+      })
+
+      it('should update dependency to new version in network file', async function () {
+        const dependency = this.networkFile.getDependency('mock-stdlib');
+        dependency.package.should.eq(this.dependencyPackage.address);
+        dependency.version.should.be.semverEqual(newVersion);
+      });
+
+      it('should update dependency to new version in app', async function () {
+        if (!this.networkFile.appAddress) return;
+        const app = await App.fetch(this.networkFile.appAddress);
+        const packageInfo = await app.getPackage('mock-stdlib');
+        packageInfo.package.address.should.eq(this.dependencyPackage.address);
+        packageInfo.version.should.be.semverEqual(newVersion);
+      });
+    });
+  };
+
   const shouldNotPushWhileFrozen = function () {
     it('should refuse to push when frozen', async function() {
       await freeze({ network, txParams, networkFile: this.networkFile })
       await push({ network, txParams, networkFile: this.networkFile }).should.be.rejectedWith(/frozen/i)
     });
+  };
+
+  const deployingDependency = function () {
+    beforeEach('deploying dependency', async function () {
+      const dependency = Dependency.fromNameWithVersion('mock-stdlib@1.1.0')
+      this.dependencyProject = await dependency.deploy()
+      this.dependencyPackage = await this.dependencyProject.getProjectPackage()
+      this.dependencyGetNetworkFileStub = sinon.stub(Dependency.prototype, 'getNetworkFile');
+      this.dependencyGetNetworkFileStub.callsFake(() => ({ packageAddress: this.dependencyPackage.address, version: '1.1.0' }))
+    })
+
+    afterEach('unstub dependency network file stub', function () {
+      sinon.restore()      
+    })
   };
 
   describe('an empty app', function() {
@@ -329,18 +379,7 @@ contract('push script', function([_, owner]) {
   });
 
   describe('an app with dependency', function () {
-    beforeEach('deploying dependency', async function () {
-      const dependency = Dependency.fromNameWithVersion('mock-stdlib@1.1.0')
-      this.dependencyProject = await dependency.deploy()
-      this.dependencyPackage = await this.dependencyProject.getProjectPackage()
-
-      this.dependencyNetworkFileStub = sinon.stub(Dependency.prototype, 'getNetworkFile')
-      this.dependencyNetworkFileStub.callsFake(() => ({ packageAddress: this.dependencyPackage.address, version: '1.1.0' }))
-    })
-
-    afterEach('unstub dependency network file stub', function () {
-      this.dependencyNetworkFileStub.restore()      
-    })
+    deployingDependency();
 
     describe('when using a valid dependency', function () {
       beforeEach('pushing package-stdlib', async function () {
@@ -352,6 +391,7 @@ contract('push script', function([_, owner]) {
 
       shouldDeployApp();
       shouldSetDependency();
+      shouldUpdateDependency();
     })
 
     describe('when using a dependency with a version range', function () {
@@ -364,6 +404,7 @@ contract('push script', function([_, owner]) {
 
       shouldDeployApp();
       shouldSetDependency();
+      shouldUpdateDependency();
     })
   });
 
@@ -459,6 +500,21 @@ contract('push script', function([_, owner]) {
       this.networkFile.version.should.eq('1.2.0')
       this.networkFile.contract('Impl').address.should.eq(previousAddress)
     })
+  });
+
+  describe('a lightweight app with dependencies', function() {
+    deployingDependency();
+
+    beforeEach('pushing package-with-stdlib', async function () {
+      const packageFile = new ZosPackageFile('test/mocks/packages/package-with-stdlib.zos.json')
+      packageFile.publish = false
+      this.networkFile = packageFile.networkFile(network)
+
+      await push({ network, txParams, networkFile: this.networkFile })
+    });
+
+    shouldSetDependency();
+    shouldUpdateDependency();
   });
 });
 
