@@ -276,8 +276,15 @@ contract('push script', function([_, owner]) {
   };
 
   const shouldNotPushWhileFrozen = function () {
-    it('should refuse to push when frozen', async function() {
+    it('should refuse to push when frozen upon modified contracts', async function() {
       await freeze({ network, txParams, networkFile: this.networkFile })
+      modifyBytecode.call(this, 'Impl');
+      await push({ network, txParams, networkFile: this.networkFile }).should.be.rejectedWith(/frozen/i)
+    });
+
+    it('should refuse to push when frozen upon modified libraries', async function() {
+      await freeze({ network, txParams, networkFile: this.networkFile })
+      modifyLibraryBytecode.call(this, 'UintLib');
       await push({ network, txParams, networkFile: this.networkFile }).should.be.rejectedWith(/frozen/i)
     });
   };
@@ -301,7 +308,7 @@ contract('push script', function([_, owner]) {
 
       await push({ network, txParams, networkFile: this.networkFile })
 
-      const newPackageFile = new ZosPackageFile('test/mocks/packages/package-lib-with-contracts-v2.zos.json')
+      const newPackageFile = new ZosPackageFile('test/mocks/packages/package-with-contracts-v2.zos.json')
       this.newNetworkFile = newPackageFile.networkFile(network)
     });
 
@@ -470,6 +477,11 @@ async function getImplementationFromApp(contractAlias) {
 function modifyBytecode(contractAlias) {
   const contractData = this.networkFile.contract(contractAlias);
   this.networkFile.setContract(contractAlias, { ... contractData, localBytecodeHash: '0xabcdef' })
+}
+
+function modifyLibraryBytecode(contractAlias) {
+  const contractData = this.networkFile.solidityLib(contractAlias);
+  this.networkFile.setSolidityLib(contractAlias, { ... contractData, localBytecodeHash: '0xabcdef' })
 }
 
 function modifyStorageInfo(contractAlias) {

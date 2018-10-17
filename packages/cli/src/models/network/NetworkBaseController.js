@@ -77,14 +77,26 @@ export default class NetworkBaseController {
 
     this._checkVersion()
     await this.fetchOrDeploy(this.packageVersion)
-    await this.uploadSolidityLibs(changedLibraries);
+    await this.handleLibsLink();
     
+    this.checkNotFrozen();
+    await this.uploadSolidityLibs(changedLibraries);
     await Promise.all([
       this.uploadContracts(contracts), 
       this.unsetContracts()
     ])
 
     await this._unsetSolidityLibs()
+  }
+
+  async handleLibsLink() {
+    return;
+  }
+
+  checkNotFrozen() {
+    if (this.networkFile.frozen) {
+      throw Error('Cannot modify contracts in a frozen version. Run zos bump to create a new version first.');
+    }
   }
 
   async newVersion(versionName) {
@@ -145,10 +157,6 @@ export default class NetworkBaseController {
   }
 
   async uploadContracts(contracts) {
-    if (this.networkFile.frozen) {
-      throw Error('Cannot upload contracts for a frozen version. Run zos bump to create a new version first.');
-    }
-
     await allPromisesOrError(
       contracts.map(([contractAlias, contractClass]) => this.uploadContract(contractAlias, contractClass))
     )
