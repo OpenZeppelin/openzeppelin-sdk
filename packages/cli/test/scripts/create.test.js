@@ -26,7 +26,7 @@ contract('create script', function([_, owner]) {
   ];
 
   const network = 'test';
-  const version = '1.1.0';
+  const version = '0.4.0';
   const txParams = { from: owner };
 
   const assertProxy = async function(networkFile, alias, { version, say, implementation, packageName, value }) {
@@ -159,6 +159,8 @@ contract('create script', function([_, owner]) {
     });
 
     describe('with dependency', function () {
+      const dependencyVersion = '1.1.0';
+
       beforeEach('setting dependency', async function () {
         await linkLibs({ libs: ['mock-stdlib-undeployed@1.1.0'], packageFile: this.packageFile });
         await push({ network, txParams, deployLibs: true, networkFile: this.networkFile });
@@ -171,17 +173,17 @@ contract('create script', function([_, owner]) {
 
       it('should create a proxy from a dependency', async function () {
         await createProxy({ packageName: 'mock-stdlib-undeployed', contractAlias: 'Greeter', network, txParams, networkFile: this.networkFile });
-        await assertProxy(this.networkFile, 'Greeter', { version, packageName: 'mock-stdlib-undeployed' });
+        await assertProxy(this.networkFile, 'Greeter', { version: dependencyVersion, packageName: 'mock-stdlib-undeployed' });
       });
 
       it('should initialize a proxy from a dependency', async function () {
         await createProxy({ packageName: 'mock-stdlib-undeployed', contractAlias: 'Greeter', network, txParams, networkFile: this.networkFile, initMethod: 'initialize', initArgs: ["42"] });
-        await assertProxy(this.networkFile, 'Greeter', { version, packageName: 'mock-stdlib-undeployed', value: 42 });
+        await assertProxy(this.networkFile, 'Greeter', { version: dependencyVersion, packageName: 'mock-stdlib-undeployed', value: 42 });
       });
 
       it('should initialize a proxy from a dependency using explicit function', async function () {
         await createProxy({ packageName: 'mock-stdlib-undeployed', contractAlias: 'Greeter', network, txParams, networkFile: this.networkFile, initMethod: 'clashingInitialize(uint256)', initArgs: ["42"] });
-        await assertProxy(this.networkFile, 'Greeter', { version, packageName: 'mock-stdlib-undeployed', value: 42 });
+        await assertProxy(this.networkFile, 'Greeter', { version: dependencyVersion, packageName: 'mock-stdlib-undeployed', value: 42 });
       });
     });
 
@@ -233,6 +235,7 @@ contract('create script', function([_, owner]) {
   describe('on lightweight app', function () {
     beforeEach('setup', async function() {
       this.packageFile = new ZosPackageFile('test/mocks/packages/package-empty.zos.json')
+      this.packageFile.version = version
       this.packageFile.publish = false
     });
 
@@ -242,6 +245,7 @@ contract('create script', function([_, owner]) {
   describe('on full app', function () {
     beforeEach('setup', async function() {
       this.packageFile = new ZosPackageFile('test/mocks/packages/package-empty.zos.json')
+      this.packageFile.version = version
     });
 
     shouldHandleCreateScript();
