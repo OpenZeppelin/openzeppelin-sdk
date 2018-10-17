@@ -14,7 +14,7 @@ contract('freeze script', function([_, owner]) {
     this.packageFile = new ZosPackageFile('test/mocks/packages/package-with-contracts.zos.json')
   })
 
-  describe('for a unpublished app', function () {
+  describe('for an unpublished app', function () {
     beforeEach('push lib', async function () {
       this.packageFile.publish = false
       this.networkFile = this.packageFile.networkFile(network)

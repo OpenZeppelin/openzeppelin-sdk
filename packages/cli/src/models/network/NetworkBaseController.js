@@ -331,7 +331,7 @@ export default class NetworkBaseController {
   }
 
   async freeze() {
-    if (!this.appAddress) throw Error('Cannot freeze an unpublished project')
+    if (!this.packageAddress) throw Error('Cannot freeze an unpublished project')
     await this.fetchOrDeploy(this.currentVersion)
     await this.project.freeze()
     this.networkFile.frozen = true
