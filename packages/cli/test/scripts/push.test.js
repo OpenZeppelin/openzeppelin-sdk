@@ -112,8 +112,9 @@ contract('push script', function([_, owner]) {
   };
 
   const shouldRedeployContracts = function () {
-    beforeEach('loading previous address', function () {
+    beforeEach('loading previous addresses', function () {
       this.previousAddress = this.networkFile.contract('Impl').address
+      this.withLibraryPreviousAddress = this.networkFile.contract('WithLibraryImpl').address
     })
 
     it('should not redeploy contracts if unmodified', async function () {
@@ -130,6 +131,17 @@ contract('push script', function([_, owner]) {
       modifyBytecode.call(this, 'Impl');
       await push({ networkFile: this.networkFile, network, txParams });
       this.networkFile.contract('Impl').address.should.not.eq(this.previousAddress);
+    });
+
+    it('should redeploy contracts if library is modified', async function () {
+      modifyLibraryBytecode.call(this, 'UintLib');
+      await push({ networkFile: this.networkFile, network, txParams });
+      this.networkFile.contract('WithLibraryImpl').address.should.not.eq(this.withLibraryPreviousAddress);
+    });
+
+    it('should not redeploy contracts if library is unmodified', async function () {
+      await push({ networkFile: this.networkFile, network, txParams });
+      this.networkFile.contract('WithLibraryImpl').address.should.eq(this.withLibraryPreviousAddress);
     });
 
     it('should refuse to redeploy a contract if storage is incompatible', async function () {
@@ -526,6 +538,11 @@ async function getImplementationFromApp(contractAlias) {
 function modifyBytecode(contractAlias) {
   const contractData = this.networkFile.contract(contractAlias);
   this.networkFile.setContract(contractAlias, { ... contractData, localBytecodeHash: '0xabcdef' })
+}
+
+function modifyLibraryBytecode(contractAlias) {
+  const contractData = this.networkFile.solidityLib(contractAlias);
+  this.networkFile.setSolidityLib(contractAlias, { ... contractData, localBytecodeHash: '0xabcdef' })
 }
 
 function modifyStorageInfo(contractAlias) {
