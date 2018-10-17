@@ -4,12 +4,12 @@ import unlink from '../scripts/unlink'
 import push from './push'
 
 const name = 'unlink'
-const signature = `${name} [packages...]`
-const description = 'unlinks packages from the project. Provide a list of whitespace-separated package names'
+const signature = `${name} [dependencies...]`
+const description = 'unlinks dependencies from the project. Provide a list of whitespace-separated dependency names'
 
 const register = program => program
   .command(signature, { noHelp: true })
-  .usage('[packageName1 ... packageNameN]')
+  .usage('[dependencyName1... dependencyNameN]')
   .description(description)
   .withPushOptions()
   .action(action)

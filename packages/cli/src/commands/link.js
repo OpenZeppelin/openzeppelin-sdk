@@ -5,11 +5,11 @@ import linkStdlib from '../scripts/link'
 
 const name = 'link'
 const signature = `${name} [dependencies...]`
-const description = 'links project with a list of dependencies located in its npm package'
+const description = 'links project with a list of dependencies each located in its npm package'
 
 const register = program => program
   .command(signature, { noHelp: true })
-  .usage('[dependencyName1... dependencyNameN] [options]')
+  .usage('[dependencyName1 ... dependencyNameN] [options]')
   .description(description)
   .option('--no-install', 'skip installing packages dependencies locally')
   .withPushOptions()
