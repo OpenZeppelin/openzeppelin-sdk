@@ -50,3 +50,11 @@ contract StorageMockSimpleWithReplacedVar {
   uint256 a;
   string c;
 }
+
+contract StorageMockComplexOriginal {
+  mapping(address => uint256) a;
+}
+
+contract StorageMockComplexWithChangedVar {
+  mapping(address => address) a;
+}

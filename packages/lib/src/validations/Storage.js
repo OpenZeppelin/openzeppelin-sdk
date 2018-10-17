@@ -87,7 +87,7 @@ class StorageLayout {
     const sourcePath = path.relative(process.cwd(), this.getNode(contractNode.scope, 'SourceUnit').absolutePath)
     const varNodes = contractNode.nodes.filter(node => node.stateVariable && !node.constant)
     varNodes.forEach(node => {
-      const typeInfo = this.getTypeInfo(node.typeName)
+      const typeInfo = this.getAndRegisterTypeInfo(node.typeName)
       this.registerType(typeInfo)
       const storageInfo = { contract: contractNode.name, path: sourcePath, ... this.getStorageInfo(node, typeInfo) }
       this.storage.push(storageInfo)
@@ -128,6 +128,12 @@ class StorageLayout {
     }
   }
 
+  getAndRegisterTypeInfo(node) {
+    const typeInfo = this.getTypeInfo(node);
+    this.registerType(typeInfo);
+    return typeInfo;
+  }
+
   getTypeInfo(node) {
     switch (node.nodeType) {
       case 'ElementaryTypeName': return this.getElementaryTypeInfo(node);
@@ -165,7 +171,7 @@ class StorageLayout {
   }
   
   getArrayTypeInfo({ baseType, length, }) {
-    const { id: baseTypeId, label: baseTypeLabel } = this.getTypeInfo(baseType)
+    const { id: baseTypeId, label: baseTypeLabel } = this.getAndRegisterTypeInfo(baseType)
     const lengthDescriptor = length ? length.value : 'dyn'
     const lengthLabel = length ? length.value : ''
     return { 
@@ -212,8 +218,7 @@ class StorageLayout {
     const members = referencedNode.members
       .filter(member => member.nodeType === 'VariableDeclaration')
       .map(member => {
-        const typeInfo = this.getTypeInfo(member.typeName)
-        this.registerType(typeInfo)
+        const typeInfo = this.getAndRegisterTypeInfo(member.typeName)
         return this.getStorageInfo(member, typeInfo)
       })
 
@@ -235,6 +240,6 @@ class StorageLayout {
   getValueTypeInfo(node) {
     return (node.nodeType === 'Mapping')
       ? this.getValueTypeInfo(node.valueType)
-      : this.getTypeInfo(node)
+      : this.getAndRegisterTypeInfo(node)
   }  
 }
