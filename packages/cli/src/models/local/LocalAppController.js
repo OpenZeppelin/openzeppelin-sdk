@@ -10,9 +10,10 @@ export default class LocalAppController extends LocalBaseController {
 
   async linkLibs(libs, installLibs = false) {
     await Promise.all(libs.map(async libNameVersion => {
-      const dependency = Dependency.fromNameWithVersion(libNameVersion)
-      if (installLibs) await dependency.install()
-      this.packageFile.setDependency(dependency.name, dependency.requirement)
+      const dependency = installLibs
+        ? await Dependency.install(libNameVersion)
+        : Dependency.fromNameWithVersion(libNameVersion);
+      this.packageFile.setDependency(dependency.name, dependency.requirement);
     }))
   }
 
