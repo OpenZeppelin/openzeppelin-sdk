@@ -231,10 +231,8 @@ export default class NetworkAppController extends NetworkBaseController {
         return await this.project.setDependency(depName, depInfo.package, depInfo.version);
       }
 
-      const dependencyInfo = (new Dependency(depName, depVersion)).getNetworkFile(this.network)
-      const currentDependency = this.networkFile.getDependency(depName)
-
-      if (!currentDependency || currentDependency.package !== dependencyInfo.packageAddress) {
+      if (!this.networkFile.dependencySatisfiesVersionRequirement(depName)) {
+        const dependencyInfo = (new Dependency(depName, depVersion)).getNetworkFile(this.network)
         log.info(`Connecting to dependency ${depName} ${dependencyInfo.version}`);
         await this.project.setDependency(depName, dependencyInfo.packageAddress, dependencyInfo.version)
         const depInfo = { package: dependencyInfo.packageAddress, version: dependencyInfo.version }
