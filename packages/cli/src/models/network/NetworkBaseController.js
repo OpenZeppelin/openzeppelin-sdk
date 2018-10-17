@@ -191,7 +191,7 @@ export default class NetworkBaseController {
 
   _hasChangedLibraries(contractClass, changedLibraries) {
     const libNames = getSolidityLibNames(contractClass.bytecode)
-    return !_.isEmpty(_.intersection(changedLibraries, libNames))
+    return !_.isEmpty(_.intersection(changedLibraries.map(c => c.contractName), libNames))
   }
 
   _getAllSolidityLibNames(contractNames) {
