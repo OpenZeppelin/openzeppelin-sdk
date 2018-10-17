@@ -21,8 +21,8 @@ const Greeter_V2 = Contracts.getFromNodeModules('mock-stdlib-2', 'GreeterImpl')
 
 contract('update script', function([_skipped, owner, anotherAccount]) {
   const network = 'test';
-  const version_1 = '1.1.0';
-  const version_2 = '1.2.0';
+  const version_1 = '0.1.0';
+  const version_2 = '0.2.0';
   const txParams = { from: owner };
 
   const assertProxyInfo = async function(networkFile, contractAlias, proxyIndex, { version, implementation, address, value }) {
@@ -230,7 +230,7 @@ contract('update script', function([_skipped, owner, anotherAccount]) {
       const proxyAddress = this.networkFile.getProxies({ contract: 'Greeter'})[0].address;
       await update({ proxyAddress, network, txParams, networkFile: this.networkFile });
 
-      await assertProxyInfo(this.networkFile, 'Greeter', 0, { version: version_2, address: proxyAddress });
+      await assertProxyInfo(this.networkFile, 'Greeter', 0, { version: '1.2.0', address: proxyAddress });
       const upgradedProxy = await Greeter_V2.at(proxyAddress);
       (await upgradedProxy.version()).should.eq('1.2.0');
 
@@ -242,27 +242,27 @@ contract('update script', function([_skipped, owner, anotherAccount]) {
     it('should upgrade the version of all proxies given their name', async function() {
       await update({ packageName: 'mock-stdlib-undeployed-2', contractAlias: 'Greeter', network, txParams, networkFile: this.networkFile });
 
-      const { address: proxyAddress } = await assertProxyInfo(this.networkFile, 'Greeter', 0, { version: version_2 });
+      const { address: proxyAddress } = await assertProxyInfo(this.networkFile, 'Greeter', 0, { version: '1.2.0' });
       (await Greeter_V2.at(proxyAddress).version()).should.eq('1.2.0');
-      const { address: anotherProxyAddress } = await assertProxyInfo(this.networkFile, 'Greeter', 0, { version: version_2 });
+      const { address: anotherProxyAddress } = await assertProxyInfo(this.networkFile, 'Greeter', 0, { version: '1.2.0' });
       (await Greeter_V2.at(anotherProxyAddress).version()).should.eq('1.2.0');
     });
 
     it('should upgrade the version of all proxies given their package', async function() {
       await update({ packageName: 'mock-stdlib-undeployed-2', network, txParams, networkFile: this.networkFile });
 
-      const { address: proxyAddress } = await assertProxyInfo(this.networkFile, 'Greeter', 0, { version: version_2 });
+      const { address: proxyAddress } = await assertProxyInfo(this.networkFile, 'Greeter', 0, { version: '1.2.0' });
       (await Greeter_V2.at(proxyAddress).version()).should.eq('1.2.0');
-      const { address: anotherProxyAddress } = await assertProxyInfo(this.networkFile, 'Greeter', 0, { version: version_2 });
+      const { address: anotherProxyAddress } = await assertProxyInfo(this.networkFile, 'Greeter', 0, { version: '1.2.0' });
       (await Greeter_V2.at(anotherProxyAddress).version()).should.eq('1.2.0');
     });
 
     it('should upgrade the version of all proxies', async function() {
       await update({ network, txParams, all: true, networkFile: this.networkFile });
 
-      const { address: proxyAddress } = await assertProxyInfo(this.networkFile, 'Greeter', 0, { version: version_2 });
+      const { address: proxyAddress } = await assertProxyInfo(this.networkFile, 'Greeter', 0, { version: '1.2.0' });
       (await Greeter_V2.at(proxyAddress).version()).should.eq('1.2.0');
-      const { address: anotherProxyAddress } = await assertProxyInfo(this.networkFile, 'Greeter', 0, { version: version_2 });
+      const { address: anotherProxyAddress } = await assertProxyInfo(this.networkFile, 'Greeter', 0, { version: '1.2.0' });
       (await Greeter_V2.at(anotherProxyAddress).version()).should.eq('1.2.0');
     });
   };
@@ -270,6 +270,7 @@ contract('update script', function([_skipped, owner, anotherAccount]) {
   describe('on application contract', function () {
     beforeEach('setup package', async function() {
       this.packageFile = new ZosPackageFile('test/mocks/packages/package-empty.zos.json')
+      this.packageFile.version = version_1
     });
 
     shouldHandleUpdateScript();
@@ -279,6 +280,7 @@ contract('update script', function([_skipped, owner, anotherAccount]) {
     beforeEach('setup package', async function() {
       this.packageFile = new ZosPackageFile('test/mocks/packages/package-empty.zos.json')
       this.packageFile.publish = false
+      this.packageFile.version = version_1
     });
 
     shouldHandleUpdateScript();
@@ -287,6 +289,7 @@ contract('update script', function([_skipped, owner, anotherAccount]) {
   describe('on dependency contract', function () {
     beforeEach('setup package', async function() {
       this.packageFile = new ZosPackageFile('test/mocks/packages/package-with-undeployed-stdlib.zos.json')
+      this.packageFile.version = version_1;
     });
 
     shouldHandleUpdateOnDependency();
@@ -296,6 +299,7 @@ contract('update script', function([_skipped, owner, anotherAccount]) {
     beforeEach('setup package', async function() {
       this.packageFile = new ZosPackageFile('test/mocks/packages/package-with-undeployed-stdlib.zos.json')
       this.packageFile.publish = false
+      this.packageFile.version = version_1;
     });
 
     shouldHandleUpdateOnDependency();
