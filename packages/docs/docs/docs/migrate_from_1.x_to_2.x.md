@@ -45,13 +45,52 @@ Once a project is published, it can be treated as a regular zOS project, i.e. yo
 NOTE: Despite the similarities between EVM packages and NPM packages, in zOS you just need to publish your packages once, after that, bumping a package is enough to update it. In NPM, a package needs to be bumped locally and then published each time the changes are to become public.
 
 #### Check
-TODO
+
+```
+Usage: check [contract] [options]
+
+checks your contracts for potential issues
+
+Options:
+  --skip-compile  skips contract compilation
+  -h, --help      output usage information
+```
+
+As discussed in the "Safety checks" part of the documentation (TODO add link), the zOS CLI performs a series of safety checks on your contracts as sub-routines of some of it's commands. the new `check` command allows you to perform this checks in a standalone manner.
 
 #### Set-admin
-TODO
+
+```
+Usage: set-admin [alias-or-address] [new-admin-address] --network <network> [options]
+
+change upgradeability admin of a contract instance. Provide the [alias] or [package]/[alias] of the contract to change the ownership of all its instances, or its [address] to change a single one. Note that if you transfer to an incorrect address, you may irreversibly lose control over upgrading your contract.
+
+Options:
+  -y, --yes                accept transferring admin rights (required)
+  -n, --network <network>  network to be used
+  -f, --from <from>        specify transaction sender address
+  --timeout <timeout>      timeout in seconds for each blockchain transaction (defaults to 600s)
+  -h, --help               output usage information
+```
+
+Convenience command that allows you to change the address that can perform upgrades on a proxy.
 
 #### Unlink
-TODO
+
+```
+Usage: unlink [dependencyName1 ... dependencyNameN]
+
+unlinks libraries from the project. Provide a list of whitespace-separated library names
+
+Options:
+  --push [network]     push all changes to the specified network
+  --skip-compile       skips contract compilation
+  -f, --from <from>    specify the transaction sender address for --push
+  --timeout <timeout>  timeout in seconds for each blockchain transaction (defaults to 600s)
+  -h, --help           output usage information
+```
+
+Opposite to the `link` command.
 
 ## Modified Commands
 
