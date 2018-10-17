@@ -100,7 +100,7 @@ export default class Dependency {
 
   _validateSatisfiesVersion(version, requirement) {
     if (!Dependency.satisfiesVersion(version, requirement)) {
-      throw Error(`Required dependency version ${requirement} does not match dependency package version ${version}`);
+      throw Error(`Required dependency version ${requirement} does not match version ${version}`);
     }
   }
 }

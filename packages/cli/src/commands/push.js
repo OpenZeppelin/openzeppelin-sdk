@@ -13,14 +13,14 @@ const register = program => program
   .description(description)
   .usage('--network <network> [options]')
   .option('--skip-compile', 'skips contract compilation')
-  .option('-d, --deploy-libs', 'deploys libraries to the network if there is no existing deployment')
+  .option('-d, --deploy-dependencies', 'deploys dependencies to the network if there is no existing deployment')
   .option('--reset', 'redeploys all contracts (not only the ones that changed)')
   .option('-f, --force', 'ignores validation errors and deploys contracts')
   .withNetworkOptions()
   .action(action)
 
 async function action(options) {
-  const { skipCompile, deployLibs, force, reset: reupload } = options
+  const { skipCompile, deployDependencies: deployLibs, force, reset: reupload } = options
   await runWithTruffle(
     async (opts) => await push({ force, deployLibs, reupload, ... opts }),
     { compile: !skipCompile, ... options }

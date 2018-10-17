@@ -5,7 +5,7 @@ import runWithTruffle from '../utils/runWithTruffle'
 
 const name = 'freeze'
 const signature = name
-const description = 'freeze current release version of your stdlib project'
+const description = 'freeze current release version of your published project'
 
 const register = program => program
   .command(signature, { noHelp: true })
