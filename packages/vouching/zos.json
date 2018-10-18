@@ -2,7 +2,7 @@
   "zosversion": "2",
   "publish": true,
   "name": "zos-vouching",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "contracts": {
     "ZEPToken": "ZEPToken",
     "Vouching": "Vouching"
