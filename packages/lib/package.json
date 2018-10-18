@@ -8,6 +8,7 @@
   "scripts": {
     "test": "scripts/test.sh",
     "prepare": "rm -rf build/contracts && truffle compile && rm -rf lib && babel src --out-dir lib",
+    "prepublishOnly": "echo 'Removing mock contracts...' && grep -hoP '^\\s*contract \\K(\\w+)' contracts/mocks/*.sol | sort | uniq | xargs -t -I% rm build/contracts/%.json",
     "watch": "babel src -w -d lib"
   },
   "files": [
