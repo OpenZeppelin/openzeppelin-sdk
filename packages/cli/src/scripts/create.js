@@ -17,6 +17,6 @@ export default async function createProxy({ packageName, contractAlias, initMeth
     return proxy;
   } catch(error) {
     const cb = () => controller.writeNetworkPackageIfNeeded()
-    throw new ScriptError(error.message, cb)
+    throw new ScriptError(error, cb)
   }
 }
