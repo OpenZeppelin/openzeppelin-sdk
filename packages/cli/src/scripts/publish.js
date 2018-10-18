@@ -9,6 +9,6 @@ export default async function publish({ network, txParams = {}, networkFile = un
     controller.writeNetworkPackageIfNeeded();
   } catch(error) {
     const cb = () => controller.writeNetworkPackageIfNeeded();
-    throw new ScriptError(error.message, cb);
+    throw new ScriptError(error, cb);
   }
 }

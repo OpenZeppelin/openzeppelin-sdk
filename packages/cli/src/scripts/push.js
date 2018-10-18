@@ -11,8 +11,8 @@ export default async function push({ network, deployLibs, reupload = false, forc
     const address = controller.isLib ? controller.packageAddress : controller.appAddress;
     if (address) stdout(address);
     controller.writeNetworkPackageIfNeeded()
-  } catch(error) {
+  } catch (error) {
     const cb = () => controller.writeNetworkPackageIfNeeded()
-    throw new ScriptError(error.message, cb)
+    throw new ScriptError(error, cb)
   }
 }
