@@ -48,7 +48,7 @@ contract Vouching is Initializable {
   event Unvouched(bytes32 indexed nameHash, uint256 amount);
   /**
    * @dev Emitted when a dependency has been removed from the registry.
-   * @param bytes32 nameHash hash of the name of the dependency.
+   * @param nameHash bytes32 nameHash hash of the name of the dependency.
    */
   event DependencyRemoved(bytes32 indexed nameHash);
 
@@ -104,7 +104,7 @@ contract Vouching is Initializable {
 
   /**
    * @dev Returns the minimumStake value that represents the minimum stake that a new dependency can have.
-   * @returns A uint256 number with the minimumStake value.
+   * @return A uint256 number with the minimumStake value.
    */
   function minimumStake() public view returns(uint256) {
     return _minimumStake;
@@ -112,7 +112,7 @@ contract Vouching is Initializable {
 
   /**
    * @dev Getter for _token being used for staking.
-   * @returns The address of the ERC20 token being used for staking.
+   * @return The address of the ERC20 token being used for staking.
    */
   function token() public view returns(ERC20) {
     return _token;
@@ -121,7 +121,7 @@ contract Vouching is Initializable {
   /**
    * @dev Returns the dependency associated to a given name.
    * @param name String representing the depedency.
-   * @returns Tuple representing the elements of a Dependency struct.
+   * @return Tuple representing the elements of a Dependency struct.
    */
   function getDependency(string name) public view returns(address, address, uint256) {
     return (

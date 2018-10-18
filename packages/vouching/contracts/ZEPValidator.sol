@@ -88,7 +88,7 @@ contract ZEPValidator is Initializable, Ownable, Pausable {
    * @dev Adds new organizations to the validator. Can only be performed by the owner of the validator.
    * @param _organization Address of the organization being added.
    * @param _maximumAddresses uint248 representing the maximum number of addresses a given organization can issue for ZEPToken recipient validation.
-   * @param name String representing the name of the organization.
+   * @param _name String representing the name of the organization.
    */
   function addOrganization(
     address _organization,
@@ -176,7 +176,7 @@ contract ZEPValidator is Initializable, Ownable, Pausable {
 
   /**
    * @dev Returns the address of the associated TPL jurisdiction for the validator.
-   * @returns The address of the jurisdiction.
+   * @return The address of the jurisdiction.
    */
   function getJurisdictionAddress() external view returns (address) {
     return address(jurisdiction);
@@ -185,7 +185,7 @@ contract ZEPValidator is Initializable, Ownable, Pausable {
   /**
    * @dev External interface for getting a list of organization addresses.
    * @dev Returns the addresses of all the organizations registered in the validator.
-   * @returns An array with all the addresses.
+   * @return An array with all the addresses.
    */
   function getOrganizations() external view returns (address[] addresses) {
     return organizationAddresses;
@@ -194,7 +194,7 @@ contract ZEPValidator is Initializable, Ownable, Pausable {
   /**
    * @dev Returns a tuple representing the Organization struct for a given organization.
    * @param _organization Address of the organization whose information is being queried.
-   * @returns a tuple containing the information of the organization.
+   * @return a tuple containing the information of the organization.
    */
   function getOrganization(address _organization) external view returns (
     bool exists,
