@@ -23,7 +23,9 @@
   "files": [
     "lib",
     "build",
-    "contracts"
+    "contracts",
+    "zos.json",
+    "zos.*.json"
   ],
   "keywords": [
     "zeppelinos",
