@@ -8,9 +8,13 @@ import { promisify } from 'util'
 import sleep from '../helpers/sleep';
 import Contracts from './Contracts'
 import BN from 'bignumber.js'
+import axios from 'axios'
 
 // Cache, exported for testing
 export const state = { };
+
+// API for gas price guesses
+const GAS_API_URL = "https://ethgasstation.info/json/ethgasAPI.json"
 
 // Gas estimates are multiplied by this value to allow for an extra buffer (for reference, truffle-next uses 1.25)
 const GAS_MULTIPLIER = 1.25;
@@ -32,7 +36,11 @@ const TRUFFLE_DEFAULT_GAS_PRICE = BN(100000000000);
  * @param retries number of transaction retries
  */
 export async function sendTransaction(contractFn, args = [], txParams = {}, retries = RETRY_COUNT) {
-  await checkGasPrice(txParams);
+  let fixedGasPrice = checkGasPrice(txParams)
+
+  if (fixedGasPrice) {
+      txParams.gasPrice = fixedGasPrice
+  }
 
   try {
     return await _sendTransaction(contractFn, args, txParams)
@@ -50,7 +58,11 @@ export async function sendTransaction(contractFn, args = [], txParams = {}, retr
  * @param retries number of deploy retries
  */
 export async function deploy(contract, args = [], txParams = {}, retries = RETRY_COUNT) {
-  await checkGasPrice(txParams);
+  let fixedGasPrice = checkGasPrice(txParams)
+
+  if (fixedGasPrice) {
+      txParams.gasPrice = fixedGasPrice
+  }
 
   try {
     return await _deploy(contract, args, txParams)
@@ -68,7 +80,11 @@ export async function deploy(contract, args = [], txParams = {}, retries = RETRY
  */
 export async function sendDataTransaction(contract, txParams) {
   // TODO: Add retries similar to sendTransaction
-  await checkGasPrice(txParams)
+  let fixedGasPrice = checkGasPrice(txParams)
+
+  if (fixedGasPrice) {
+      txParams.gasPrice = fixedGasPrice
+  }
 
   // If gas is set explicitly, use it
   if (txParams.gas) {
@@ -153,10 +169,15 @@ async function getNodeVersion () {
 }
 
 async function checkGasPrice(txParams) {
-  if (await isGanacheNode()) return;
+  if (process.env.NODE_ENV === 'test') return;
   const gasPrice = txParams.gasPrice || Contracts.artifactsDefaults().gasPrice;
   if (TRUFFLE_DEFAULT_GAS_PRICE.eq(gasPrice) || !gasPrice) {
-    throw new Error(`Cowardly refusing to execute transaction with excessively high default gas price of 100 gwei. Consider explicitly setting a different gasPrice value in your truffle.js config file. You can check reasonable values for gas price in https://ethgasstation.info/.`);
+    try {
+      let apiResponse = await axios.get(GAS_API_URL);
+      return apiResponse.safeLow / 10;
+    } catch (err) {
+      throw new Error(`Could not query gas price API to determine reasonable gas price, please provide one.`)
+    }
   }
 }
 
