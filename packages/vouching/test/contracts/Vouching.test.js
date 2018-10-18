@@ -1,11 +1,11 @@
 import { Contracts, encodeCall, assertEvent, assertRevert } from 'zos-lib'
 
 const BigNumber = web3.BigNumber;
-const ZepToken = artifacts.require('ZEPToken');
+const ZEPToken = artifacts.require('ZEPToken');
 const Vouching = artifacts.require('Vouching');
 const DependencyMock = artifacts.require('DependencyMock');
-const ZEPValidator = artifacts.require('ZEPValidator');
-const BasicJurisdiction = Contracts.getFromNodeModules('tpl-contracts-zos', 'BasicJurisdiction')
+const BasicJurisdiction = Contracts.getFromNodeModules('tpl-contracts-eth', 'BasicJurisdiction')
+const OrganizationsValidator = Contracts.getFromNodeModules('tpl-contracts-eth', 'OrganizationsValidator')
 
 require('chai')
   .use(require('chai-bignumber')(BigNumber))
@@ -35,18 +35,18 @@ contract('Vouching', function ([_, tokenOwner, vouchingOwner, developer, transfe
       const initializeJurisdictionData = encodeCall('initialize', ['address'], [jurisdictionOwner])
       await this.jurisdiction.sendTransaction({ data: initializeJurisdictionData })
 
-      // Initialize ZepToken
-      this.token = await ZepToken.new({ from: tokenOwner });
+      // Initialize ZEPToken
+      this.token = await ZEPToken.new();
       const initializeZepData = encodeCall('initialize', ['address', 'address', 'uint256'], [tokenOwner, this.jurisdiction.address, attributeID]);
       await this.token.sendTransaction({ data: initializeZepData });
 
       // Initialize Validator
-      this.validator = await ZEPValidator.new();
-      const initializeValidatorData = encodeCall('initialize', ['address', 'address', 'uint256'], [validatorOwner, this.jurisdiction.address, attributeID]);
+      this.validator = await OrganizationsValidator.new();
+      const initializeValidatorData = encodeCall('initialize', ['address', 'uint256', 'address'], [this.jurisdiction.address, attributeID, validatorOwner]);
       await this.validator.sendTransaction({ data: initializeValidatorData });
 
       await this.jurisdiction.addValidator(this.validator.address, "ZEP Validator", { from: jurisdictionOwner });
-      await this.jurisdiction.addAttributeType(attributeID, false, false, ZERO_ADDRESS, 0, 0, 0, "can transfer", { from: jurisdictionOwner });
+      await this.jurisdiction.addAttributeType(attributeID, "can receive", { from: jurisdictionOwner });
       await this.jurisdiction.addValidatorApproval(this.validator.address, attributeID, { from: jurisdictionOwner });
       await this.validator.addOrganization(organization, 100, "ZEP Org", { from: validatorOwner });
       await this.validator.issueAttribute(tokenOwner, { from: organization });

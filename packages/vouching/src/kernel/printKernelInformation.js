@@ -15,9 +15,9 @@ export function printZepTokenInformation(owner, basicJurisdiction = undefined) {
   log.base(` - Basic Jurisdiction: ${basicJurisdiction ? basicJurisdiction.address : '[a new instance to be created]'}\n`)
 }
 
-export function printZepValidatorInformation(owner, basicJurisdiction = undefined) {
+export function printOrganizationsValidatorInformation(owner, basicJurisdiction = undefined) {
   log.base('\n--------------------------------------------------------------------\n\n')
-  log.base(`Creating ZEPValidator instance for: `)
+  log.base(`Creating OrganizationsValidator instance for: `)
   log.base(` - Owner:              ${owner}`)
   log.base(` - Attribute ID:       ${ZEPTOKEN_ATTRIBUTE_ID}`)
   log.base(` - Basic Jurisdiction: ${basicJurisdiction ? basicJurisdiction.address : '[a new instance to be created]'}\n`)
