@@ -9,7 +9,7 @@ Note: For a more in depth read, please see [blog.zeppelinos.org/proxy-patterns](
 
 ## Why upgrade a contract?
 
-By design, smart contracts are immutable. On the other hand, software quality heavily depends on the ability to upgrade and patch source code in order to produce iterative releases. Even though blockchain based software profits signifficantly from the technology's immutability, still a certain degree of mutability is needed for bugfixing and potential product improvements. ZeppelinOS solves this apparent contradiction by providing an easy to use, simple, robust, and opt-in upgrade mechanism for smart contracts that can be controlled by any type of governance, be it a multi-sig wallet, a simple address or a complex DAO.
+By design, smart contracts are immutable. On the other hand, software quality heavily depends on the ability to upgrade and patch source code in order to produce iterative releases. Even though blockchain based software profits significantly from the technology's immutability, still a certain degree of mutability is needed for bug fixing and potential product improvements. ZeppelinOS solves this apparent contradiction by providing an easy to use, simple, robust, and opt-in upgrade mechanism for smart contracts that can be controlled by any type of governance, be it a multi-sig wallet, a simple address or a complex DAO.
 
 ## Upgrading via the proxy pattern
 
@@ -51,7 +51,7 @@ An example of how the randomized storage is achieved:
 bytes32 private constant implementationPosition = keccak256("org.zeppelinos.proxy.implementation");
 ```
 
-As a result, a logic contract doesn't need to care about overwritting any of the proxy's variables. Other proxy implementations that face this problem usually imply having the proxy know about the logic contract's storage structure and adapt to it, or instead having the logic contract know about the proxy's storage structure and adapt to it. This is why this approach is called "unstructured storage"; neither of the contracts needs to care about the structure of the other.
+As a result, a logic contract doesn't need to care about overwriting any of the proxy's variables. Other proxy implementations that face this problem usually imply having the proxy know about the logic contract's storage structure and adapt to it, or instead having the logic contract know about the proxy's storage structure and adapt to it. This is why this approach is called "unstructured storage"; neither of the contracts needs to care about the structure of the other.
 
 TODO: add diagrams 
 
