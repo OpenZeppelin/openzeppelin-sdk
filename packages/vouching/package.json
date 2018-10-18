@@ -1,6 +1,6 @@
 {
   "name": "zos-vouching",
-  "version": "2.0.0-alpha.9",
+  "version": "2.0.0-rc.0",
   "description": "Vouching logic for the EVM packages of the ZeppelinOS smart contract platform",
   "main": "truffle-config.js",
   "private": false,
@@ -41,8 +41,8 @@
     "minimist": "^1.2.0",
     "openzeppelin-zos": "git+https://github.com/OpenZeppelin/openzeppelin-zos.git#19610325924e03f008bb57dd8868f196bb7e3c98",
     "tpl-contracts-zos": "0.0.6",
-    "zos": "^2.0.0-alpha.9",
-    "zos-lib": "^2.0.0-alpha.9"
+    "zos": "^2.0.0-rc.0",
+    "zos-lib": "^2.0.0-rc.0"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",
