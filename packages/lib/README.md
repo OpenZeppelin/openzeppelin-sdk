@@ -1,50 +1,83 @@
-# ZeppelinOS library
+# ZeppelinOS JavaScript Library _(zos-lib)_
+
+[![standard-readme compliant](https://img.shields.io/badge/readme%20style-standard-brightgreen.svg)](https://github.com/RichardLitt/standard-readme)
 [![NPM Package](https://img.shields.io/npm/v/zos-lib.svg?style=flat-square)](https://www.npmjs.org/package/zos-lib)
 [![Build Status](https://travis-ci.org/zeppelinos/zos-lib.svg?branch=master)](https://travis-ci.org/zeppelinos/zos-lib)
 [![Coverage Status](https://coveralls.io/repos/github/zeppelinos/zos-lib/badge.svg?branch=master)](https://coveralls.io/github/zeppelinos/zos-lib?branch=master)
 
-This package provides a library to develop, deploy and operate upgradeable smart contracts on Ethereum and every other EVM and eWASM-powered blockchain.
+> JavaScript library for the ZeppelinOS smart contract platform.
 
-This library is considered low level. For regular development, we recommend the CLI-aided development experience with the [ZeppelinOS CLI](https://github.com/zeppelinos/zos-cli).
+ZeppelinOS is a platform to develop, deploy and operate smart contract
+projects on Ethereum and every other EVM and eWASM-powered blockchain.
 
-## Table of Contents
+This is the repository for the ZeppelinOS JavaScript library. It is mainly used
+by the
+[`zos` command-line interface](https://github.com/zeppelinos/zos/tree/master/packages/cli#zeppelinos-command-line-interface),
+which is the recommended way to use ZeppelinOS; but this library can also be
+used directly to operate ZeppelinOS projects when a programmatic interface is
+preferred or more flexibility and lower-level access is required.
 
-- [Getting Started](#getting-started)
-  - [Install](#install)
-  - [Examples](#examples)
-- [Links](#links)
-- [Security](#security)
-- [License](#license)
+## Install
 
-## Getting Started
+First, install [Node.js](http://nodejs.org/) and [npm](https://npmjs.com/).
+Then, install the ZeppelinOS JavaScript Library running:
 
-### Install
-
-To install `zos-lib` simply go to your project's root directory and execute:
 ```sh
 npm install zos-lib
 ```
 
-### Examples
+## Usage
 
-- [Develop and deploy a single upgradeable smart contract](https://docs.zeppelinos.org/docs/low_level_contract.html) (for bugfixing or adding new features)
-- [Develop and operate a complex upgradeable app](https://docs.zeppelinos.org/docs/low_level_app.html) with multiple smart contracts which are connected to the ZeppelinOS upgradeable standard library
+Suppose there is a contract called `MyContract` in the file
+`contracts/MyContract.sol`, already compiled to
+`build/contracts/MyContract.json`, and that there is a development blockchain
+network running locally in port 9545.
 
-## Links
+Open a Node.js console:
 
-### Documentation
-- [ZeppelinOS](http://zeppelinos.org)
-- [Documentation site](https://docs.zeppelinos.org/)
-- [ZeppelinOS Blog](https://blog.zeppelinos.org)
-- [Proxy Patterns](https://blog.zeppelinos.org/proxy-patterns)
+```sh
+node
+```
 
-### Code
-- [ZeppelinOS Library (this repository)](https://github.com/zeppelinos/zos-lib)
-- [ZeppelinOS Command Line Interface (`zos-cli`)](https://github.com/zeppelinos/zos-cli)
+```js
+> // Connect web3 to the local provider.
+> var Web3 = require('web3')
+> web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:9545"))
+> // Load the contract.
+> const { Contracts, SimpleProject } = require('zos-lib')
+> const MyContract = Contracts.getFromLocal('MyContract')
+> // Instantiate a project.
+> myProject = new SimpleProject('MyProject', { from: web3.eth.accounts[0] });
+> // Create a proxy for the contract.
+> myProject.createProxy(MyContract).then(proxy => myProxy = proxy)
+> // Make a change on the contract, and compile it.
+> const MyContractV1 = Contracts.getFromLocal('MyContract')
+> myProject.upgradeProxy(proxy, MyContractV1)
 
 ## Security
-If you find a security issue, please contact us at security@zeppelinos.org. We give rewards for reported issues, according to impact and severity.
+
+If you find a security issue, please contact us at security@zeppelinos.org. We
+give rewards for reported issues, according to impact and severity.
+
+## API
+
+TODO.
+
+## Maintainers
+
+* [@facuspagnuolo](https://github.com/facuspagnuolo/)
+* [@spalladino](https://github.com/spalladino)
+
+## Contribute
+
+To contribute, join our
+[community channel on Telegram](https://t.me/zeppelinos) where you can talk to
+all the ZeppelinOS developers, contributors, partners and users.
+
+You can also follow the recent developments of the project in our
+[blog](https://blog.zeppelin.solutions/) and
+[Twitter account](https://twitter.com/zeppelinorg).
 
 ## License
 
-Code released under the [MIT License](LICENSE)
+[MIT](LICENSE.md) © Zeppelin

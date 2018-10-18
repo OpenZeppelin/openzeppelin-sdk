@@ -1,78 +1,87 @@
-# ZeppelinOS
+# ZeppelinOS _(zos)_
+
+[![standard-readme compliant](https://img.shields.io/badge/readme%20style-standard-brightgreen.svg)](https://github.com/RichardLitt/standard-readme)
 [![Build Status](https://travis-ci.org/zeppelinos/zos.svg?branch=master)](https://travis-ci.org/zeppelinos/zos)
 [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lernajs.io/)
 
-Multi-package repository for ZeppelinOS [library](https://github.com/zeppelinos/zos/tree/master/packages/lib#readme), [CLI](https://github.com/zeppelinos/zos/tree/master/packages/cli#readme), [vouching](https://github.com/zeppelinos/zos/tree/master/packages/vouching#readme), and [docs](https://github.com/zeppelinos/zos/tree/master/packages/docs#readme).
+> ZeppelinOS smart contract platform.
 
-ZeppelinOS is a platform to develop, manage and operate smart contract applications in Ethereum. It can be used to create smart contract systems that can be fixed and improved over time, enabling developers to opt-in to mutability for their deployed code through [upgradeability patterns](https://blog.zeppelinos.org/proxy-patterns/).
+ZeppelinOS is a platform to develop, deploy and operate smart contract
+projects on Ethereum and every other EVM and eWASM-powered blockchain.
 
-## Getting started
+This repository includes the ZeppelinOS
+[Command-Line Interface](https://github.com/zeppelinos/zos/tree/master/packages/cli#readme),
+[JavaScript Library](https://github.com/zeppelinos/zos/tree/master/packages/lib#readme),
+[Vouching Smart Contracts](https://github.com/zeppelinos/zos/tree/master/packages/vouching#readme),
+and [the sources for the Documentation Website](https://github.com/zeppelinos/zos/tree/master/packages/docs#readme).
 
-Install ZeppelinOS and setup your project as described in the [Setup guide](https://docs.zeppelinos.org/docs/setup.html).
+## Install
 
-In order to build an upgradeable application with ZeppelinOS, follow our
-[Building upgradeable applications](https://docs.zeppelinos.org/docs/building.html) guide.
-
-If you would like to use the ZeppelinOS EVM packages in your app,
- follow our [Using the stdlib in your app](https://docs.zeppelinos.org/docs/using.html) guide.
-
-If you are interested in deploying your own EVM packages for ZeppelinOS,
-see our [Developing a new EVM package](https://docs.zeppelinos.org/docs/developing.html) guide.
-
-Two demo apps based on ZeppelinOS are described in [Basil](https://docs.zeppelinos.org/docs/basil.html) and [Crafty](https://docs.zeppelinos.org/docs/crafty.html).
-
-## Sample
-
-Quick sample on `zos` usage for initializing a project, registering a contract, creating an instance, and upgrading it after changing the original code. 
+First, install [Node.js](http://nodejs.org/) and [npm](https://npmjs.com/).
+Then, install ZeppelinOS running:
 
 ```sh
 npm install --global zos
-zos init my-project 0.1.0
-
-vim contracts/MyContract.sol
-zos add MyContract
-zos session --network ropsten
-zos push
-zos create MyContract
-
-vim contracts/MyContract.sol
-zos push
-zos update MyContract
 ```
 
-## Guides
+## Usage
 
-- [Installation and setup](https://docs.zeppelinos.org/docs/setup.html)
-- [Building an upgradeable application](https://docs.zeppelinos.org/docs/building.html)
-- [Using the stdlib in your app](https://docs.zeppelinos.org/docs/using.html)
-- [Developing a new EVM package](https://docs.zeppelinos.org/docs/developing.html)
-- [Testing upgradeable applications](https://docs.zeppelinos.org/docs/testing.html)
-- [Extend provided EVM package code in your own contracts](https://github.com/zeppelinos/labs/tree/master/extensibility-study#extensibility-study) (experimental)
-- [Migrate your non-upgradeable legacy ERC20 token into an upgradeable version with an opt-in approach](https://docs.zeppelinos.org/docs/erc20_onboarding.html)
-- [Migrate your non-upgradeable legacy ERC20 token into an upgradeable version with a managed approach](https://github.com/zeppelinos/labs/tree/master/migrating_legacy_token_managed#migrating-legacy-non-upgradeable-token-to-upgradeability-with-managed-strategy) (experimental)
+We recommend to use ZeppelinOS through the `zos` command-line interface.
 
+To start, create a directory for the project and access it:
 
-## Links
+```sh
+mkdir my-project
+cd my-project
+```
 
-### Documentation
-- [ZeppelinOS](http://zeppelinos.org)
-- [Documentation site](https://docs.zeppelinos.org)
-- [ZeppelinOS Blog](https://blog.zeppelinos.org)
+Use `npm` to create a `package.json` file:
 
-### Code
-- [ZeppelinOS CLI (`zos`)](https://github.com/zeppelinos/zos/tree/master/packages/cli#readme)
-- [ZeppelinOS library (`zos-lib`)](https://github.com/zeppelinos/zos/tree/master/packages/lib#readme)
+```sh
+npm init
+```
+
+And initialize the ZeppelinOS project:
+
+```sh
+zos init my-project
+```
+
+Now it is possible to add contracts to the project with the `zos add` command,
+push these contracts to a blockchain network with `zos push`, use
+`zos create` to create instances for these contracts that later can be
+upgraded, and many more things.
+
+Run `zos --help` for more details about thes and all the other functions of
+ZeppelinOS.
+
+The
+[ZeppelinOS documentation](https://docs.zeppelinos.org/)
+explains how to build a project using our platform, how to upgrade contracts,
+how to share packages for other projects to reuse, how to vouch for the quality
+of a package, how to use the JavaScript libraries to operate the project, and
+it explains details of the platform and some advanced topics.
 
 ## Security
 
-If you find a security issue, please contact us at security@zeppelinos.org. We give rewards for reported issues, according to impact and severity.
+If you find a security issue, please contact us at security@zeppelinos.org. We
+give rewards for reported issues, according to impact and severity.
 
-## Development setup
+## Maintainers
 
-This monorepo is managed via [lerna](https://lernajs.io/). To get everything up and running, install lerna 3.x (either globally or locally from the root of the repository), and run `lerna bootstrap`. This will compile all packages, install all dependencies, and create symlinks for local dependencies (for instance, `packages/cli/node_modules/zos-lib` will be symlinked to `packages/lib`).
+* [@facuspagnuolo](https://github.com/facuspagnuolo/)
+* [@spalladino](https://github.com/spalladino)
 
-Note that, since `cli` and `lib` packages need to be precompiled, for any change in `lib` to impact `cli` you'll need to run a new `lerna bootstrap`.
+## Contribute
+
+To contribute, join our
+[community channel on Telegram](https://t.me/zeppelinos) where you can talk to
+all the ZeppelinOS developers, contributors, partners and users.
+
+You can also follow the recent developments of the project in our
+[blog](https://blog.zeppelin.solutions/) and
+[Twitter account](https://twitter.com/zeppelinorg).
 
 ## License
 
-Code released under the [MIT License](LICENSE.md)
+[MIT](LICENSE.md) © Zeppelin
