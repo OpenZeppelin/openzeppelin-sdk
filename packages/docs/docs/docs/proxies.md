@@ -3,21 +3,21 @@ id: proxies
 title: Proxy Pattern
 ---
 
-This article describes the "unstructured storage" proxy pattern, the fundamental building block of ZeppelinOS's contract upgradeability feature.
+This article describes the "unstructured storage" proxy pattern, the fundamental building block of ZeppelinOS's upgrades.
 
 Note: For a more in depth read, please see [blog.zeppelinos.org/proxy-patterns](https://blog.zeppelinos.org/proxy-patterns/), which discusses the need for proxies, goes into more technical detail on the subject, elaborates on other possible proxy patterns that were considered for zOS, and more.
 
-## Why upgradeability?
+## Why upgrade a contract?
 
-By design, smart contracts are immutable. On the other hand, software quality heavily depends on the ability to upgrade and patch source code in order to produce iterative releases. Even though blockchain based software profits signifficantly from the technology's immutability, still a certain degree of mutability is needed for bugfixing and potential product improvements. ZeppelinOS solves this apparent contradiction by providing an easy to use, simple and robust upgrade mechanism for smart contracts that can be controlled by any type of governance, be it a multi-sig wallet, a simple address or a complex DAO.
+By design, smart contracts are immutable. On the other hand, software quality heavily depends on the ability to upgrade and patch source code in order to produce iterative releases. Even though blockchain based software profits signifficantly from the technology's immutability, still a certain degree of mutability is needed for bugfixing and potential product improvements. ZeppelinOS solves this apparent contradiction by providing an easy to use, simple, robust, and opt-in upgrade mechanism for smart contracts that can be controlled by any type of governance, be it a multi-sig wallet, a simple address or a complex DAO.
 
-## Upgradeability via the proxy pattern
+## Upgrading via the proxy pattern
 
-The basic idea behind using a proxy to solve the problem of upgradeability, is to use two contracts instead of one. The first contract is a simple wrapper or "proxy" which users interact with directly and is in charge of forwarding transactions to and from the second contract, which contains the logic. The key concept to understand is that the logic contract can be replaced while the proxy, or the access point is never changed. Both contracts are still immutable in the sense that their code cannot be changed, but the logic contract can simply be swapped by another contract. The wrapper can thus point to a different logic implementation and in doing so, the software is "upgraded".
+The basic idea behind using a proxy for upgrades. The first contract is a simple wrapper or "proxy" which users interact with directly and is in charge of forwarding transactions to and from the second contract, which contains the logic. The key concept to understand is that the logic contract can be replaced while the proxy, or the access point is never changed. Both contracts are still immutable in the sense that their code cannot be changed, but the logic contract can simply be swapped by another contract. The wrapper can thus point to a different logic implementation and in doing so, the software is "upgraded".
 
 ## Proxy forwarding
 
-The most immediate problem that proxies need to solve is how the proxy exposes the entire interface of the logic contract without requiring a one to one mapping of the entire logic contract's interface. This would be difficult to maintain, prone to errors, and would make the interface itself not upgradeable. Hence, a dynamic forwarding mechanism is required. The basics of such mechanism are presented in the code below:
+The most immediate problem that proxies need to solve is how the proxy exposes the entire interface of the logic contract without requiring a one to one mapping of the entire logic contract's interface. That would be difficult to maintain, prone to errors, and would make the interface itself not upgradeable. Hence, a dynamic forwarding mechanism is required. The basics of such mechanism are presented in the code below:
 
 ```solidity
 assembly {
@@ -33,9 +33,9 @@ assembly {
 }
 ```
 
-This code can be put in the fallback function of a proxy, and will forward any call to any function with any set of parameters to the logic contract without it needing to know anything in particular of the logic contract's interface. In essence, (1) the `calldata` is copied to memory, (2) the call is forwarded to the logic contract, (3) the return data from the call to the logic contract is retrieved, and (4) the returned data is forwarded back to the caller.
+This code can be put in the [fallback function](https://solidity.readthedocs.io/en/v0.4.21/contracts.html#fallback-function) of a proxy, and will forward any call to any function with any set of parameters to the logic contract without it needing to know anything in particular of the logic contract's interface. In essence, (1) the `calldata` is copied to memory, (2) the call is forwarded to the logic contract, (3) the return data from the call to the logic contract is retrieved, and (4) the returned data is forwarded back to the caller. The technique needs to be implemented using Yul because [Solidity's `delegatecall`](https://solidity.readthedocs.io/en/v0.4.21/introduction-to-smart-contracts.html#delegatecall-callcode-and-libraries) returns a boolean instead of the callee's return data. 
 
-A very important thing to note is that the code makes use of `delegatecall` which executes the callee's code in the context of the caller's state. That is, the logic contract controls the proxy's state and the logic contract's state is meaningless. Thus, the proxy doesn't only forward transactions to and from the logic contract, but also represents the pair's state. The state is in the proxy and the logic is in the particular implementation that the proxy points to. To put it in yet another way, the "what" is in the proxy contract and the "how" is in the logic contract.
+A very important thing to note is that the code makes use of the EVM's `delegatecall` opcode which executes the callee's code in the context of the caller's state. That is, the logic contract controls the proxy's state and the logic contract's state is meaningless. Thus, the proxy doesn't only forward transactions to and from the logic contract, but also represents the pair's state. The state is in the proxy and the logic is in the particular implementation that the proxy points to.
 
 TODO: add diagram
 
