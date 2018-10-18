@@ -5,6 +5,10 @@
   "main": "index.js",
   "private": true,
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zeppelinos/zos.git"
+  },
   "scripts": {
     "gen-docs": "node scripts/gen-docs.js",
     "bump-docs": "babel-node scripts/bump-docs.js",
