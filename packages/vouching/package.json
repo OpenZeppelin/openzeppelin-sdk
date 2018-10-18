@@ -1,17 +1,10 @@
 {
   "name": "zos-vouching",
   "version": "2.0.0-alpha.9",
-  "description": "",
+  "description": "Vouching logic for the EVM packages of the ZeppelinOS smart contract platform",
   "main": "truffle-config.js",
   "private": false,
-  "directories": {
-    "test": "test"
-  },
-  "files": [
-    "lib",
-    "build",
-    "contracts"
-  ],
+  "license": "MIT",
   "scripts": {
     "test": "NODE_ENV=test scripts/test.sh",
     "prepare": "rm -rf build && npx truffle compile && rm -rf lib && npx babel src --out-dir lib",
@@ -27,9 +20,22 @@
     "deploy-mainnet": "node ./lib/bin/deploy.js --network=mainnet --from=0xe373e9855dadeb9ce76d2c5f5484d93699acb735",
     "verify-mainnet": "node ./lib/bin/verify.js --network=mainnet --from=0xe373e9855dadeb9ce76d2c5f5484d93699acb735"
   },
-  "keywords": [],
-  "author": "",
-  "license": "MIT",
+  "files": [
+    "lib",
+    "build",
+    "contracts"
+  ],
+  "keywords": [
+    "zeppelinos",
+    "zeppelin",
+    "ethereum",
+    "smartcontracts",
+    "solidity",
+    "zeptoken",
+    "zep",
+    "vouching",
+    "evm"
+  ],
   "dependencies": {
     "chalk": "^2.4.1",
     "minimist": "^1.2.0",
