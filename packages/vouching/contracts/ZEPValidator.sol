@@ -6,21 +6,43 @@ import "openzeppelin-zos/contracts/lifecycle/Pausable.sol";
 import "tpl-contracts-zos/contracts/AttributeRegistry.sol";
 import "tpl-contracts-zos/contracts/BasicJurisdictionInterface.sol";
 
+/**
+ * @title ZEPValidator
+ * @dev TPL validating entity for the ZEPToken. Defines a series of organizations which can define a limited set of addresses that can receive ZEPTokens.
+ */
 contract ZEPValidator is Initializable, Ownable, Pausable {
 
+  /**
+   * @dev Emitted when an organization has been added to the validator.
+   * @param organization Address of the organization that has been added.
+   * @param name String representing the name of the organization that has been added.
+   */
   event OrganizationAdded(address organization, string name);
+  /**
+   * @dev Emitted when an organization has issued the valid recipient attribute to an address.
+   * @param organization Address of the organization that issued the attribute validation.
+   * @param attributedAddress Address that received the attribute validation.
+   */
   event AttributeIssued(address indexed organization, address attributedAddress);
 
-  // declare registry interface, used to request attributes from a jurisdiction
+  /**
+   * @dev Registry interface, used to request attributes from a jurisdiction.
+   */
   AttributeRegistry registry;
 
-  // declare jurisdiction interface, used to set attributes in the jurisdiction
+  /**
+   * @dev jurisdiction interface, used to set attributes in the jurisdiction.
+   */
   BasicJurisdictionInterface jurisdiction;
 
-  // declare the attribute ID required by ZEP in order to transfer tokens
+  /**
+   * @dev Attribute id required by the ZEPToken in order to transfer tokens.
+   */
   uint256 validAttributeID;
 
-  // organizations are entities who can add attibutes to a number of addresses
+  /**
+   * @dev Struct that represents organizations. Organizations are entities that can add attibutes to a limited number of addresses.
+   */
   struct Organization {
     bool exists;
     uint248 maximumAddresses;
@@ -28,13 +50,22 @@ contract ZEPValidator is Initializable, Ownable, Pausable {
     address[] addresses;
   }
 
-  // addresses of all organizations are held in an array (enables enumeration)
+  /**
+   * @dev Addresses of all organizations that have been added to the validator.
+   */
   address[] private organizationAddresses;
 
-  // organization data & issued attribute addresses are held in a struct mapping
+  /**
+   * @dev Maps organization addresses to Organization structs.
+   */
   mapping(address => Organization) private organizations;
 
-  // the initializer will attach the validator to a jurisdiction & set attribute
+  /**
+   * @dev Initializer function. Called only once when a proxy for the contract is created. The initializer will attach the validator to a jurisdiction & set attribute.
+   * @param _sender Address that will own the validator.
+   * @param _jurisdiction Address of the TPL jurisdiction that the validator will act upon.
+   * @param _validAttributeID uint256 of the TPL attribute id of the ZEPToken that will be controlled by the validator.
+   */
   function initialize(
     address _sender,
     address _jurisdiction,
@@ -53,7 +84,12 @@ contract ZEPValidator is Initializable, Ownable, Pausable {
     // authority to issue attributes of the specified type here if desired
   }
 
-  // the contract owner may add new organizations
+  /**
+   * @dev Adds new organizations to the validator. Can only be performed by the owner of the validator.
+   * @param _organization Address of the organization being added.
+   * @param _maximumAddresses uint248 representing the maximum number of addresses a given organization can issue for ZEPToken recipient validation.
+   * @param name String representing the name of the organization.
+   */
   function addOrganization(
     address _organization,
     uint248 _maximumAddresses,
@@ -80,7 +116,11 @@ contract ZEPValidator is Initializable, Ownable, Pausable {
     emit OrganizationAdded(_organization, _name);
   }
 
-  // the owner may modify the max number addresses a organization can issue
+  /**
+   * @dev The owner may modify the max number addresses a organization can issue. Can only be performed by the owner of the validator.
+   * @param _organization Address of the organization whose maximum number of addresses is being modified.
+   * @param _maximum uint248 New value being set for the maximum number of addresses that the organization in question can issue.
+   */
   function setMaximumAddresses(
     address _organization,
     uint248 _maximum
@@ -95,7 +135,10 @@ contract ZEPValidator is Initializable, Ownable, Pausable {
     organizations[_organization].maximumAddresses = _maximum;
   }
 
-  // an organization can add an attibute to an address if maximum isn't exceeded
+  /**
+   * @dev An organization can add an attibute to an address if maximum isn't exceeded.
+   * @param _who Address that the organization is validating for ZEPToken usage.
+   */
   // (NOTE: this function would need to be payable if a jurisdiction fee is set)
   function issueAttribute(address _who) external whenNotPaused {
 
@@ -131,17 +174,28 @@ contract ZEPValidator is Initializable, Ownable, Pausable {
     emit AttributeIssued(msg.sender, _who);
   }
 
-  // external interface for checking address of the jurisdiction validator uses
+  /**
+   * @dev Returns the address of the associated TPL jurisdiction for the validator.
+   * @returns The address of the jurisdiction.
+   */
   function getJurisdictionAddress() external view returns (address) {
     return address(jurisdiction);
   }
 
-  // external interface for getting a list of organization addresses
+  /**
+   * @dev External interface for getting a list of organization addresses.
+   * @dev Returns the addresses of all the organizations registered in the validator.
+   * @returns An array with all the addresses.
+   */
   function getOrganizations() external view returns (address[] addresses) {
     return organizationAddresses;
   }
 
-  // external interface for getting all the details of a particular organization
+  /**
+   * @dev Returns a tuple representing the Organization struct for a given organization.
+   * @param _organization Address of the organization whose information is being queried.
+   * @returns a tuple containing the information of the organization.
+   */
   function getOrganization(address _organization) external view returns (
     bool exists,
     uint248 maximumAddresses,
