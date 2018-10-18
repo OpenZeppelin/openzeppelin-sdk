@@ -21,9 +21,10 @@ Install Docusaurus:
 npm install --global docusaurus-init
 ```
 
-Navigate to the `docs/website` directory and run:
+Navigate to the `docs/website` directory and install the dependencies:
 
 ```sh
+cd docs/website
 npm install
 ```
 
