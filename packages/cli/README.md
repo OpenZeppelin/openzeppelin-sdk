@@ -1,79 +1,82 @@
-# ZeppelinOS Command Line Interface
+# ZeppelinOS Command-Line Interface _(zos)_
+
+[![standard-readme compliant](https://img.shields.io/badge/readme%20style-standard-brightgreen.svg)](https://github.com/RichardLitt/standard-readme)
 [![NPM Package](https://img.shields.io/npm/v/zos.svg?style=flat-square)](https://www.npmjs.org/package/zos)
 [![Build Status](https://travis-ci.org/zeppelinos/zos-cli.svg?branch=master)](https://travis-ci.org/zeppelinos/zos-cli)
 
-This package provides a unified command line interface to [ZeppelinOS](https://zeppelinos.org/).
+> Command-line interface for the ZeppelinOS smart contract platform.
 
-ZeppelinOS is a platform to develop, manage and operate smart contract applications in Ethereum. It can be used to create smart contract systems that can be fixed and improved over time, enabling developers to opt-in to mutability for their deployed code through [upgradeability patterns](https://blog.zeppelinos.org/proxy-patterns/). `zos` also provides an interface to connect your application code to already deployed standard libraries.
+ZeppelinOS is a platform to develop, deploy and operate smart contract
+projects on Ethereum and every other EVM and eWASM-powered blockchain.
 
-If you're looking for a lower-level development experience, see [`zos-lib`](https://github.com/zeppelinos/zos-lib).
+This is the repository for the ZeppelinOS commmand-line interface, the
+recommended way to use ZeppelinOS.
 
-## Table of Contents
+## Install
 
-- [Getting Started](#getting-started)
-  - [Install](#install)
-  - [Basic usage](#basic-usage)
-- [Examples](#examples)
-- [Links](#links)
-- [Security](#security)
-- [License](#license)
+First, install [Node.js](http://nodejs.org/) and [npm](https://npmjs.com/).
+Then, install ZeppelinOS running:
 
-## Getting Started
-
-### Install
-
-To install `zos` simply run:
 ```sh
 npm install --global zos
 ```
 
-### Basic usage
+## Usage
 
-#### Before you begin
+To start, create a directory for the project and access it:
+
 ```sh
-mkdir myproject && cd myproject
+mkdir my-project
+cd my-project
+```
+
+Use `npm` to create a `package.json` file:
+
+```sh
 npm init
 ```
 
-#### Setup your project
-Initialize your project with ZeppelinOS. The next command will create a new `zos.json` file:
+And initialize the ZeppelinOS project:
 
 ```sh
-zos init <name> [version]
-```
-Where `<name>` is your project's name, and `[version]` an optional initial version name. For example:
-```sh
-zos init my-project 0.1.0
+zos init my-project
 ```
 
+Now it is possible to add contracts to the project with the `zos add` command,
+push these contracts to a blockchain network with `zos push`, use
+`zos create` to create instances for these contracts that later can be
+upgraded, and many more things.
 
-## Guides
+Run `zos --help` for more details about thes and all the other functions of
+ZeppelinOS.
 
-- [Installation and setup](https://docs.zeppelinos.org/docs/setup.html)
-- [Building an upgradeable application](https://docs.zeppelinos.org/docs/building.html)
-- [Using the stdlib in your app](https://docs.zeppelinos.org/docs/using.html)
-- [Developing a new standard library](https://docs.zeppelinos.org/docs/developing.html)
-- [Testing upgradeable applications](https://docs.zeppelinos.org/docs/testing.html)
-- [Extend provided standard library code in your own contracts](https://github.com/zeppelinos/labs/tree/master/extensibility-study#extensibility-study) (experimental)
-- [Migrate your non-upgradeable legacy ERC20 token into an upgradeable version with a managed approach](https://github.com/zeppelinos/labs/tree/master/migrating_legacy_token_managed#migrating-legacy-non-upgradeable-token-to-upgradeability-with-managed-strategy) (experimental)
-- [Migrate your non-upgradeable legacy ERC20 token into an upgradeable version with an opt-in approach](https://github.com/zeppelinos/labs/tree/master/migrating_legacy_token_opt_in#migrating-legacy-non-upgradeable-token-to-upgradeability-with-opt-in-strategy) (experimental)
-
-
-## Links
-
-### Documentation
-- [ZeppelinOS](http://zeppelinos.org)
-- [Documentation site](https://docs.zeppelinos.org)
-- [ZeppelinOS Blog](https://blog.zeppelinos.org)
-
-### Code
-- [ZeppelinOS CLI (this repository)](https://github.com/zeppelinos/zos-cli)
-- [ZeppelinOS library (`zos-lib`)](https://github.com/zeppelinos/zos-lib)
+The
+[ZeppelinOS documentation](https://docs.zeppelinos.org/)
+explains how to use the `zos` command-line interface to build a project, to
+upgrade contracts and to share packages for other projects to reuse. It also
+explains how to operate the project with the ZeppelinOS JavaScript libraries
+instead of this `zos` command.
 
 ## Security
 
-If you find a security issue, please contact us at security@zeppelinos.org. We give rewards for reported issues, according to impact and severity.
+If you find a security issue, please contact us at security@zeppelinos.org. We
+give rewards for reported issues, according to impact and severity.
+
+## Maintainers
+
+* [@facuspagnuolo](https://github.com/facuspagnuolo/)
+* [@spalladino](https://github.com/spalladino)
+
+## Contribute
+
+To contribute, join our
+[community channel on Telegram](https://t.me/zeppelinos) where you can talk to
+all the ZeppelinOS developers, contributors, partners and users.
+
+You can also follow the recent developments of the project in our
+[blog](https://blog.zeppelin.solutions/) and
+[Twitter account](https://twitter.com/zeppelinorg).
 
 ## License
 
-Code released under the [MIT License](LICENSE)
+[MIT](LICENSE.md) © Zeppelin
