@@ -9,10 +9,11 @@
 First, install [Node.js](http://nodejs.org/), [npm](https://npmjs.com/) and
 [git](https://git-scm.com/).
 
-Then, clone the repository:
+Then, clone the repository and navigate to the docs package:
 
 ```sh
-git clone https://github.com/zeppelinos/zos-docs.git
+git clone https://github.com/zeppelinos/zos.git
+cd zos/packages/docs
 ```
 
 Install Docusaurus:
