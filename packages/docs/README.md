@@ -55,6 +55,10 @@ To contribute, join our
 [community channel on Telegram](https://t.me/zeppelinos) where you can talk to
 all the ZeppelinOS developers, contributors, partners and users.
 
+You can also follow the recent developments of the project in our
+[blog](https://blog.zeppelin.solutions/) and
+[Twitter account](https://twitter.com/zeppelinorg).
+
 ## License
 
 [MIT](LICENSE.md) © Zeppelin
