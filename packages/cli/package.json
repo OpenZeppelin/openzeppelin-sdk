@@ -1,8 +1,10 @@
 {
   "name": "zos",
   "version": "2.0.0-alpha.9",
-  "description": "ZeppelinOS command line interface",
-  "main": "lib/index.js",
+  "description": "Command-line interface for the ZeppelinOS smart contract platform",
+  "main": "./lib/index.js",
+  "private": false,
+  "license": "MIT",
   "scripts": {
     "prepare": "rm -rf lib && babel src --out-dir lib",
     "test": "./scripts/test.sh",
@@ -12,19 +14,18 @@
   "bin": {
     "zos": "./lib/bin/zos-cli.js"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+ssh://git@github.com/zeppelinos/zos.git"
-  },
+  "files": [
+    "lib"
+  ],
   "keywords": [
     "zos",
     "zeppelinos",
     "cli"
   ],
-  "files": [
-    "lib"
-  ],
-  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/zeppelinos/zos.git"
+  },
   "bugs": {
     "url": "https://github.com/zeppelinos/zos/issues"
   },

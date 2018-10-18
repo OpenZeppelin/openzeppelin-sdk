@@ -1,15 +1,17 @@
 {
   "name": "zos-docs",
   "version": "2.0.0-alpha.9",
-  "description": "Documentation site for ZeppelinOS",
-  "private": true,
+  "description": "Documentation for the ZeppelinOS smart contract platform",
   "main": "index.js",
+  "private": true,
+  "license": "MIT",
   "scripts": {
     "gen-docs": "node scripts/gen-docs.js",
     "bump-docs": "babel-node scripts/bump-docs.js",
     "rebuild-docs": "cd docs/website && npm run build",
     "start": "cd docs/website && npm start"
   },
+  "files": [],
   "keywords": [
     "zeppelinos",
     "zeppelin",
@@ -18,7 +20,6 @@
     "generation",
     "soldoc"
   ],
-  "license": "MIT",
   "dependencies": {
     "shelljs": "^0.8.2",
     "solidity-docgen": "^0.1.0",

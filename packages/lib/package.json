@@ -1,15 +1,14 @@
 {
   "name": "zos-lib",
   "version": "2.0.0-alpha.9",
-  "description": "ZeppelinOS library",
+  "description": "JavaScript library for the ZeppelinOS smart contract platform",
+  "main": "./lib/index.js",
+  "private": false,
+  "license": "MIT",
   "scripts": {
     "test": "scripts/test.sh",
     "prepare": "rm -rf build/contracts && truffle compile && rm -rf lib && babel src --out-dir lib",
     "watch": "babel src -w -d lib"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/zeppelinos/zos.git"
   },
   "files": [
     "lib",
@@ -27,12 +26,27 @@
     "proxy",
     "evm"
   ],
-  "main": "./lib/index.js",
-  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zeppelinos/zos.git"
+  },
   "bugs": {
     "url": "https://github.com/zeppelinos/zos/issues"
   },
   "homepage": "https://github.com/zeppelinos/zos/tree/master/packages/lib#readme",
+  "dependencies": {
+    "bignumber.js": "^7.2.0",
+    "chalk": "^2.4.1",
+    "ethereumjs-abi": "^0.6.5",
+    "glob": "^7.1.3",
+    "openzeppelin-solidity": "~1.10.0",
+    "semver": "^5.5.1",
+    "truffle-config": "^1.0.6",
+    "truffle-contract": "^3.0.6",
+    "truffle-flattener": "^1.2.8",
+    "truffle-provisioner": "^0.1.1",
+    "web3": "^0.18.4"
+  },
   "devDependencies": {
     "babel-cli": "^6.26.0",
     "babel-plugin-transform-object-rest-spread": "^6.26.0",
@@ -51,18 +65,5 @@
     "solidity-coverage": "^0.4.15",
     "tmp": "^0.0.33",
     "truffle": "^4.1.13"
-  },
-  "dependencies": {
-    "bignumber.js": "^7.2.0",
-    "chalk": "^2.4.1",
-    "ethereumjs-abi": "^0.6.5",
-    "glob": "^7.1.3",
-    "openzeppelin-solidity": "~1.10.0",
-    "semver": "^5.5.1",
-    "truffle-config": "^1.0.6",
-    "truffle-contract": "^3.0.6",
-    "truffle-flattener": "^1.2.8",
-    "truffle-provisioner": "^0.1.1",
-    "web3": "^0.18.4"
   }
 }
