@@ -15,6 +15,12 @@ By design, smart contracts are immutable. On the other hand, software quality he
 
 The basic idea behind using a proxy for upgrades. The first contract is a simple wrapper or "proxy" which users interact with directly and is in charge of forwarding transactions to and from the second contract, which contains the logic. The key concept to understand is that the logic contract can be replaced while the proxy, or the access point is never changed. Both contracts are still immutable in the sense that their code cannot be changed, but the logic contract can simply be swapped by another contract. The wrapper can thus point to a different logic implementation and in doing so, the software is "upgraded".
 
+User ---- tx ---> Proxy ----------> Implementation_v0
+                     |
+                      ------------> Implementation_v1
+                     |
+                      ------------> Implementation_v2
+
 ## Proxy forwarding
 
 The most immediate problem that proxies need to solve is how the proxy exposes the entire interface of the logic contract without requiring a one to one mapping of the entire logic contract's interface. That would be difficult to maintain, prone to errors, and would make the interface itself not upgradeable. Hence, a dynamic forwarding mechanism is required. The basics of such mechanism are presented in the code below:
@@ -37,14 +43,33 @@ This code can be put in the [fallback function](https://solidity.readthedocs.io/
 
 A very important thing to note is that the code makes use of the EVM's `delegatecall` opcode which executes the callee's code in the context of the caller's state. That is, the logic contract controls the proxy's state and the logic contract's state is meaningless. Thus, the proxy doesn't only forward transactions to and from the logic contract, but also represents the pair's state. The state is in the proxy and the logic is in the particular implementation that the proxy points to.
 
-TODO: add diagram
-
 ## Unstructured storage proxies
 
 A problem that quickly comes up when using proxies has to do with the way in which variables are stored in the proxy contract. Suppose that the proxy stores the logic contract's address in it's only variable `address public _implementation;`. Now, suppose that the logic contract is a basic token whose first variable is `address public _owner`. Both variables are 32 byte in size, and as far as the EVM knows, occupy the first slot of the resulting execution flow of a proxied call. When the logic contract writes to `_owner`, it does so in the scope of the proxy's state, and thus really writes to `_implementation`. This problem can be referred to as a "storage collision".
 
+|Proxy                     |Implementation           |
+|--------------------------|-------------------------|
+|address _implementation   |address _owner           | <=== Storage collision!
+|...                       |mapping _balances        |
+|                          |uint256 _supply          |
+|                          |...                      |
+
 There are many ways to overcome this problem, and the "unstructured storage" approach which ZeppelinOS implements works as follows. Instead of storing the `_implementation` address at the proxy's first storage slot, it chooses a pseudo random slot instead. This slot is sufficiently random, that the probability of a logic contract declaring a variable at the same slot is negligible. The same principle of randomizing slot positions in the proxy's storage is used in any other variables the proxy may have, such as an admin address (that is allowed to update the value of `_implementation`), etc.
 
+|Proxy                     |Implementation           |
+|--------------------------|-------------------------|
+|...                       |address _owner           |
+|...                       |mapping _balances        |
+|...                       |uint256 _supply          |
+|...                       |...                      |
+|...                       |                         |
+|...                       |                         |
+|...                       |                         |
+|...                       |                         |
+|address _implementation   |                         | <=== Randomized slot.
+|...                       |                         |
+|...                       |                         |
+   
 An example of how the randomized storage is achieved:
 
 ```
@@ -52,8 +77,6 @@ bytes32 private constant implementationPosition = keccak256("org.zeppelinos.prox
 ```
 
 As a result, a logic contract doesn't need to care about overwriting any of the proxy's variables. Other proxy implementations that face this problem usually imply having the proxy know about the logic contract's storage structure and adapt to it, or instead having the logic contract know about the proxy's storage structure and adapt to it. This is why this approach is called "unstructured storage"; neither of the contracts needs to care about the structure of the other.
-
-TODO: add diagrams 
 
 ## Storage collisions between implementation versions
 
