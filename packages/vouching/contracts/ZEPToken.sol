@@ -1,21 +1,22 @@
 pragma solidity ^0.4.24;
 
-import "tpl-contracts-zos/contracts/TPLToken.sol";
-import "openzeppelin-zos/contracts/token/ERC20/ERC20Detailed.sol";
-import "openzeppelin-zos/contracts/token/ERC20/ERC20Pausable.sol";
 
+import "zos-lib/contracts/Initializable.sol";
+import "openzeppelin-eth/contracts/token/ERC20/ERC20Detailed.sol";
+import "openzeppelin-eth/contracts/token/ERC20/ERC20Pausable.sol";
+import "tpl-contracts-eth/contracts/token/TPLRestrictedReceiverToken.sol";
 
 /**
- * @title ZepToken
+ * @title ZEPToken
  * @dev ZEP token contract, a detailed ERC20 including pausable functionality.
  * The TPLToken integration causes tokens to only be transferrable to addresses
  * which have the validRecipient attribute in the jurisdiction.
  */
-contract ZEPToken is Initializable, TPLToken, ERC20Detailed, ERC20Pausable {
+contract ZEPToken is Initializable, TPLRestrictedReceiverToken, ERC20Detailed, ERC20Pausable {
 
   function initialize(
     address _sender,
-    AttributeRegistry _jurisdictionAddress,
+    AttributeRegistryInterface _jurisdictionAddress,
     uint256 _validRecipientAttributeId
   )
     initializer
@@ -26,7 +27,7 @@ contract ZEPToken is Initializable, TPLToken, ERC20Detailed, ERC20Pausable {
 
     ERC20Pausable.initialize(_sender);
     ERC20Detailed.initialize("ZEP Token", "ZEP", decimals);
-    TPLToken.initialize(_jurisdictionAddress, _validRecipientAttributeId);
+    TPLRestrictedReceiverToken.initialize(_jurisdictionAddress, _validRecipientAttributeId);
     _mint(_sender, totalSupply);
   }
 

@@ -11,7 +11,7 @@ import {
   ZEPTOKEN_SYMBOL,
   ZEPTOKEN_DECIMALS,
   ZEPTOKEN_ATTRIBUTE_ID,
-  ZEPTOKEN_ATTRIBUTE_DESCRIPTION,
+  ZEPPELIN_ORG_MAX_ADDRESSES,
 } from '../constants'
 
 const { ZosPackageFile } = files
@@ -23,7 +23,7 @@ export default async function verify({ network, txParams }) {
   const successfulJurisdiction = successfulApp && await verifyJurisdiction(networkFile, txParams)
   const successfulZepToken = successfulJurisdiction && await verifyZEPToken(networkFile, txParams)
   const successfulVouching = successfulZepToken && await verifyVouching(networkFile, txParams)
-  const successfulValidator = successfulVouching && await verifyZEPValidator(networkFile, txParams)
+  const successfulValidator = successfulVouching && await verifyOrganizationsValidator(networkFile, txParams)
   const successfulConfiguration = successfulValidator && await verifyTPLConfiguration(networkFile, txParams)
   if (successfulConfiguration) log.info('\n\nVouching app was deployed and configured successfully!')
   else log.error('\n\nCould not complete verification process since there are required previous steps not completed.')
@@ -170,31 +170,31 @@ export async function verifyVouching(networkFile, txParams) {
   }
 }
 
-export async function verifyZEPValidator(networkFile, txParams) {
+export async function verifyOrganizationsValidator(networkFile, txParams) {
   log.base('\n--------------------------------------------------------------------\n')
-  log.base('Verifying ZEP validator...')
+  log.base('Verifying Organizations validator...')
 
   const validator = fetchValidator(networkFile)
   if (validator) {
     const owner = await validator.owner()
-    const jurisdiction = await validator.getJurisdictionAddress()
+    const jurisdiction = await validator.getJurisdiction()
 
     const jurisdictionAddress = fetchJurisdiction(networkFile).address
     const ownerMatches = owner === txParams.from
     const jurisdictionMatches = jurisdiction === jurisdictionAddress
 
     ownerMatches
-      ? log.info (' ✔ ZEP validator owner matches requested value')
-      : log.error(` ✘ ZEP validator owner ${owner} does not match requested value, it was expected ${txParams.from}`)
+      ? log.info (' ✔ Organizations validator owner matches requested value')
+      : log.error(` ✘ Organizations validator owner ${owner} does not match requested value, it was expected ${txParams.from}`)
 
     jurisdictionMatches
-      ? log.info (' ✔ ZEP validator jurisdiction matches BasicJurisdiction deployed instance')
-      : log.error(` ✘ ZEP validator jurisdiction ${jurisdiction} does not match BasicJurisdiction deployed instance ${jurisdictionAddress}`)
+      ? log.info (' ✔ Organizations validator jurisdiction matches BasicJurisdiction deployed instance')
+      : log.error(` ✘ Organizations validator jurisdiction ${jurisdiction} does not match BasicJurisdiction deployed instance ${jurisdictionAddress}`)
 
     return ownerMatches && jurisdictionMatches
   }
   else {
-    log.error(' ✘ Missing valid instance of ZEPValidator')
+    log.error(' ✘ Missing valid instance of OrganizationsValidator')
     return false
   }
 }
@@ -203,39 +203,38 @@ export async function verifyTPLConfiguration(networkFile, txParams) {
   log.base('\n--------------------------------------------------------------------\n')
   log.base('Verifying TPL configuration...')
 
-  const BasicJurisdiction = Contracts.getFromNodeModules('tpl-contracts-zos', 'BasicJurisdiction')
-  const jurisdictionProxies = networkFile._proxiesOf('tpl-contracts-zos/BasicJurisdiction')
+  const BasicJurisdiction = Contracts.getFromNodeModules('tpl-contracts-eth', 'BasicJurisdiction')
+  const jurisdictionProxies = networkFile._proxiesOf('tpl-contracts-eth/BasicJurisdiction')
   const jurisdictionAddress = jurisdictionProxies[jurisdictionProxies.length - 1].address
   const jurisdiction = BasicJurisdiction.at(jurisdictionAddress)
 
-  const ZEPValdiator = Contracts.getFromLocal('ZEPValidator')
-  const validatorProxies = networkFile._proxiesOf('zos-vouching/ZEPValidator')
+  const OrganizationsValidator = Contracts.getFromNodeModules('tpl-contracts-eth', 'OrganizationsValidator')
+  const validatorProxies = networkFile._proxiesOf('tpl-contracts-eth/OrganizationsValidator')
   const validatorAddress = validatorProxies[validatorProxies.length - 1].address
-  const validator = ZEPValdiator.at(validatorAddress)
+  const validator = OrganizationsValidator.at(validatorAddress)
 
-  const [description] = await jurisdiction.getAttributeInformation(ZEPTOKEN_ATTRIBUTE_ID)
-  const [exists, _, name] = await validator.getOrganization(txParams.from)
+  const [exists, maximumAccounts, name] = await validator.getOrganizationInformation(txParams.from)
 
-  const descriptionMatches = description === ZEPTOKEN_ATTRIBUTE_DESCRIPTION
   const isValidator = await jurisdiction.isValidator(validatorAddress)
-  const canValidate = await jurisdiction.isApproved(validatorAddress, ZEPTOKEN_ATTRIBUTE_ID)
+  const canIssueAttributeType = await jurisdiction.canIssueAttributeType(validatorAddress, ZEPTOKEN_ATTRIBUTE_ID)
   const organizationMatches = exists && name === ZEPPELIN_ORG_NAME
-
-  descriptionMatches
-    ? log.info (` ✔ Jurisdiction attribute description matches requested value`)
-    : log.error(` ✘ Jurisdiction attribute description "${description}" does not match requested value, it was expected "${ZEPTOKEN_ATTRIBUTE_DESCRIPTION}"`)
+  const maximumAccountsMatches = maximumAccounts.eq(ZEPPELIN_ORG_MAX_ADDRESSES)
 
   isValidator
-    ? log.info (' ✔ ZEP Validator is correctly set as a validator on the jurisdiction')
-    : log.error(` ✘ ZEP Validator ${validatorAddress} is not set as a validator on the jurisdiction ${jurisdictionAddress}`)
+    ? log.info (' ✔ Organizations validator is correctly set as a validator on the jurisdiction')
+    : log.error(` ✘ Organizations validator ${validatorAddress} is not set as a validator on the jurisdiction ${jurisdictionAddress}`)
 
-  canValidate
-    ? log.info (' ✔ ZEP Validator is cleared for approval of ZEP Token attribute ID on the jurisdiction')
-    : log.error(` ✘ ZEP Validator ${validatorAddress} is not cleared for approval of ZEP Token attribute ID ${ZEPTOKEN_ATTRIBUTE_ID} on the jurisdiction ${jurisdictionAddress}`)
+  canIssueAttributeType
+    ? log.info (' ✔ Organizations validator is cleared for approval of ZEP Token attribute ID on the jurisdiction')
+    : log.error(` ✘ Organizations validator ${validatorAddress} is not cleared for approval of ZEP Token attribute ID ${ZEPTOKEN_ATTRIBUTE_ID} on the jurisdiction ${jurisdictionAddress}`)
 
   organizationMatches
-    ? log.info (' ✔ Zeppelin organization was properly set in the ZEP validator')
-    : log.error(` ✘ Zeppelin organization "${ZEPPELIN_ORG_NAME}" is not set in the ZEP Validator`)
+    ? log.info (' ✔ Zeppelin organization was properly set in the OrganizationsValidator')
+    : log.error(` ✘ Zeppelin organization "${ZEPPELIN_ORG_NAME}" is not set in the OrganizationsValidator`)
 
-  return descriptionMatches && isValidator && canValidate && organizationMatches
+  maximumAccountsMatches
+    ? log.info (' ✔ Zeppelin organization number of maximum accounts was properly set')
+    : log.error(` ✘ Zeppelin organization number of maximum accounts "${maximumAccounts}" does not match, it was expected ${ZEPPELIN_ORG_MAX_ADDRESSES}`)
+
+  return isValidator && canIssueAttributeType && organizationMatches && maximumAccountsMatches
 }

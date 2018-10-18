@@ -2,7 +2,7 @@ import { FileSystem as fs } from 'zos-lib'
 import log from '../../../src/helpers/log'
 import deploy from '../../../src/scripts/deploy'
 import ZosPackageFile from 'zos/lib/models/files/ZosPackageFile'
-import { verifyAppSetup, verifyJurisdiction, verifyTPLConfiguration, verifyVouching, verifyZEPToken, verifyZEPValidator } from '../../../src/scripts/verify'
+import { verifyAppSetup, verifyJurisdiction, verifyTPLConfiguration, verifyVouching, verifyZEPToken, verifyOrganizationsValidator } from '../../../src/scripts/verify'
 
 contract('deploy', function([_, owner]) {
   log.silent(true)
@@ -31,8 +31,8 @@ contract('deploy', function([_, owner]) {
     assert(await verifyVouching(this.networkFile, txParams))
   })
 
-  it('deploys a ZEP validator', async function() {
-    assert(await verifyZEPValidator(this.networkFile, txParams))
+  it('deploys an Organizations Validator', async function() {
+    assert(await verifyOrganizationsValidator(this.networkFile, txParams))
   })
 
   it('configures TPL', async function() {

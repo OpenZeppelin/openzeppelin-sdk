@@ -3,7 +3,7 @@ import { files, scripts } from 'zos'
 import { Contracts, ABI } from 'zos-lib'
 import { ZEPTOKEN_ATTRIBUTE_ID, VOUCHING_MIN_STAKE } from '../constants'
 import { fetchJurisdiction, fetchValidator, fetchVouching, fetchZepToken } from './fetchKernelContracts'
-import { printJurisdictionInformation, printVouchingInformation, printZepTokenInformation, printZepValidatorInformation } from './printKernelInformation'
+import { printJurisdictionInformation, printVouchingInformation, printZepTokenInformation, printOrganizationsValidatorInformation } from './printKernelInformation'
 
 const { create } = scripts
 const { ZosPackageFile } = files
@@ -15,7 +15,7 @@ export default async function createKernelContracts(options) {
   const jurisdiction = await createBasicJurisdiction(owner, options, networkFile)
   const zepToken = await createZEPToken(owner, jurisdiction, options, networkFile)
   const vouching = await createVouching(zepToken, options, networkFile)
-  const validator = await createZEPValidator(owner, jurisdiction, options, networkFile)
+  const validator = await createOrganizationsValidator(owner, jurisdiction, options, networkFile)
   const app = networkFile.app
   return { app, jurisdiction, validator, zepToken, vouching }
 }
@@ -28,7 +28,7 @@ export async function createBasicJurisdiction(owner, options, networkFile) {
     return jurisdiction
   }
 
-  const packageName = 'tpl-contracts-zos'
+  const packageName = 'tpl-contracts-eth'
   const contractAlias = 'BasicJurisdiction'
   const initMethod = 'initialize'
   const initArgs = [owner]
@@ -68,26 +68,26 @@ export async function createZEPToken(owner, basicJurisdiction, options, networkF
   }
 }
 
-export async function createZEPValidator(owner, basicJurisdiction, options, networkFile) {
-  printZepValidatorInformation(owner, basicJurisdiction)
+export async function createOrganizationsValidator(owner, basicJurisdiction, options, networkFile) {
+  printOrganizationsValidatorInformation(owner, basicJurisdiction)
   const validator = fetchValidator(networkFile)
   if (validator) {
-    log.warn(` -  Reusing ZEPValidator instance at ${validator.address}`)
+    log.warn(` -  Reusing Organizations validator instance at ${validator.address}`)
     return validator
   }
 
-  const packageName = 'zos-vouching'
-  const contractAlias = 'ZEPValidator'
+  const packageName = 'tpl-contracts-eth'
+  const contractAlias = 'OrganizationsValidator'
   const initMethod = 'initialize'
-  const initArgs = [owner, basicJurisdiction.address, ZEPTOKEN_ATTRIBUTE_ID]
+  const initArgs = [basicJurisdiction.address, ZEPTOKEN_ATTRIBUTE_ID, owner]
   try {
-    const zepValidator = await create({ packageName, contractAlias, initMethod, initArgs, ...options })
-    log.info(` ✔ ZEPValidator created at ${zepValidator.address}`)
-    return zepValidator
+    const validator = await create({ packageName, contractAlias, initMethod, initArgs, ...options })
+    log.info(` ✔ Organizations validator created at ${validator.address}`)
+    return validator
   } catch (error) {
-    const ZEPValidator = Contracts.getFromLocal(contractAlias)
-    const { method } = buildCallData(ZEPValidator, initMethod, initArgs);
-    log.error(` ✘ Could not create ZEP validator by calling ${callDescription(method, initArgs)}`)
+    const OrganizationsValidator = Contracts.getFromNodeModules(packageName, contractAlias)
+    const { method } = buildCallData(OrganizationsValidator, initMethod, initArgs);
+    log.error(` ✘ Could not create Organizations validator by calling ${callDescription(method, initArgs)}`)
     throw error
   }
 }
