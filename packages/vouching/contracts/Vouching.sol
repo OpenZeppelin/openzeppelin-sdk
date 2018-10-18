@@ -20,7 +20,12 @@ contract Vouching is Initializable {
    */
   event OwnershipTransferred(address indexed oldOwner, address indexed newOwner);
   /**
-   * @dev Emitted when ...
+   * @dev Emitted when a new dependency has been created.
+   * @param nameHash bytes32 hash of the name of the dependency.
+   * @param name String representing the name of the dependency.
+   * @param owner Address that owns the created dependency.
+   * @param dependencyAddress Address of the created dependency.
+   * @param initialStake uint256 representing the amount staked in the creation of the dependency.
    */
   event DependencyCreated(
     bytes32 indexed nameHash,
@@ -30,15 +35,20 @@ contract Vouching is Initializable {
     uint256 initialStake
   );
   /**
-   * @dev Emitted when ...
+   * @dev Emitted when the owner of a dependency adds stake to it.
+   * @param nameHash bytes32 hash of the name of the dependency.
+   * @param amount uint256 with the amount of stake that has been added to the dependency.
    */
   event Vouched(bytes32 indexed nameHash, uint256 amount);
   /**
-   * @dev Emitted when ...
+   * @dev Emitted when the owner of a dependency removes stake from it.
+   * @param nameHash bytes32 hash of the name of the dependency.
+   * @param amount uint256 with the amount of stake that has been removed from the dependency.
    */
   event Unvouched(bytes32 indexed nameHash, uint256 amount);
   /**
-   * @dev Emitted when ...
+   * @dev Emitted when a dependency has been removed from the registry.
+   * @param bytes32 nameHash hash of the name of the dependency.
    */
   event DependencyRemoved(bytes32 indexed nameHash);
 
@@ -47,7 +57,7 @@ contract Vouching is Initializable {
   using Address for address;
 
   /**
-   * @dev Represents a particular dependency, with it's address, owner and amount of tokens staked.
+   * @dev Struct that represents a particular dependency, with it's address, owner and amount of tokens staked.
    */
   struct Dependency {
     address owner;
@@ -94,13 +104,15 @@ contract Vouching is Initializable {
 
   /**
    * @dev Returns the minimumStake value that represents the minimum stake that a new dependency can have.
+   * @returns A uint256 number with the minimumStake value.
    */
   function minimumStake() public view returns(uint256) {
     return _minimumStake;
   }
 
   /**
-   * @dev Returns the address of the ERC20 token being used for staking.
+   * @dev Getter for _token being used for staking.
+   * @returns The address of the ERC20 token being used for staking.
    */
   function token() public view returns(ERC20) {
     return _token;
