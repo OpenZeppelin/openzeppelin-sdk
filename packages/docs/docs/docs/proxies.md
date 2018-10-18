@@ -55,13 +55,34 @@ As a result, a logic contract doesn't need to care about overwritting any of the
 
 TODO: add diagrams 
 
-## Storage collisions
+## Storage collisions between implementation versions
 
 As discussed, the unstructured approach avoids storage collisions between the logic contract and the proxy. However, storage collisions between different versions of the logic contract can occur. In this case, imagine that the first implementation of the logic contract stores `address public _owner` at the first storage slot and an upgraded logic contract stores `address public _lastContributor` at the same first slot. When the updated logic contract attempts to write to the `_lastContributor` variable, it will be using the same storage position where the previous value for `_owner` was being stored, and overwrite it!
 
-The unstructured storage proxy mechanism doesn't safeguard against this situation. It is up to the user to have new versions of a logic contract extend previous versions, or otherwise guarantee that the storage hierarchy is always appended to but not modified. ZeppelinOS' CLI does however detect such collisions, and warns the developer appropriate.
+#### Incorrect storage preservation:
 
-TODO: add diagrams 
+|Implementation_v0   |Implementation_v1        |
+|--------------------|-------------------------|
+|address _owner      |address _lastContributor | <=== Storage collision!
+|mapping _balances   |address _owner           |
+|uint256 _supply     |mapping _balances        |
+|...                 |uint256 _supply          |
+|                    |...                      |
+
+#### Correct storage preservation:
+
+|Implementation_v0   |Implementation_v1        |
+|--------------------|-------------------------|
+|address _owner      |address _owner           | 
+|mapping _balances   |mapping _balances        |
+|uint256 _supply     |uint256 _supply          |
+|...                 |address _lastContributor | <=== Storage extension.
+|                    |...                      |
+
+The unstructured storage proxy mechanism doesn't safeguard against this situation. It is up to the user to have new versions of a logic contract extend previous versions, or otherwise guarantee that the storage hierarchy is always appended to but not modified. ZeppelinOS' CLI does however| Tables        | Are           | Cool  |
+| ------------- |:-------------:| -----:|
+| col 3 is      | right-aligned | $1600 |
+| col 2 is      | centered      |   $12 | detect such collisions, and warns the developer appropriate.
 
 ## The constructor caveat
 
