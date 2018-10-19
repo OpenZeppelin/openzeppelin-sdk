@@ -1,6 +1,6 @@
 {
   "name": "zos-vouching",
-  "version": "2.0.0-rc.1",
+  "version": "2.0.0-rc.2",
   "description": "Vouching logic for the EVM packages of the ZeppelinOS smart contract platform",
   "main": "truffle-config.js",
   "private": false,
