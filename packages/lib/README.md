@@ -33,10 +33,10 @@ Suppose there is a contract called `MyContract` in the file
 `build/contracts/MyContract.json`, and that there is a development blockchain
 network running locally in port 9545.
 
-Open a Node.js console:
+Open a Node.js test console:
 
 ```sh
-node
+NODE_ENV=test node
 ```
 
 ```js
@@ -52,7 +52,14 @@ node
 > myProject.createProxy(MyContract).then(proxy => myProxy = proxy)
 > // Make a change on the contract, and compile it.
 > const MyContractV1 = Contracts.getFromLocal('MyContract')
-> myProject.upgradeProxy(proxy, MyContractV1)
+> myProject.upgradeProxy(myProxy, MyContractV1)
+
+The
+[ZeppelinOS documentation](https://docs.zeppelinos.org/)
+explains how to use the ZeppelinOS library to write a custom program that
+can upgrade contracts. It also explains how to operate a ZeppelinOS project
+using the `zos` command-line interface, which we recommend on most cases
+instead of using the library directly.
 
 ## Security
 
