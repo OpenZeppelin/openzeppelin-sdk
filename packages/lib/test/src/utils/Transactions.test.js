@@ -4,9 +4,12 @@ require('../../setup')
 import sinon from 'sinon';
 import _ from 'lodash';
 
-import { deploy, sendTransaction, sendDataTransaction } from '../../../src/utils/Transactions';
+import { deploy, sendTransaction, sendDataTransaction, awaitConfirmations, hasBytecode, state } from '../../../src/utils/Transactions';
 import Contracts from '../../../src/utils/Contracts';
-import { assertRevert, encodeCall } from '../../../src';
+import { assertRevert, encodeCall, sleep } from '../../../src';
+import advanceBlock from '../../../src/helpers/advanceBlock';
+import { promisify } from 'util';
+import { setInterval } from 'timers';
 
 const DEFAULT_GAS = 6721975;
 
@@ -193,4 +196,41 @@ contract('Transactions', function([_account1, account2]) {
       });
     });
   });
+
+  describe('awaitConfirmations', function () {
+    beforeEach('stub node information', function () {
+      state.nodeInfo = 'NotGanache';
+    })
+
+    beforeEach('enable mining', async function () {
+      this.mineInterval = setInterval(advanceBlock, 100);
+    })
+
+    afterEach('disable mining', async function () {
+      if (this.mineInterval) clearInterval(this.mineInterval);
+      await sleep(100);
+    })
+
+    afterEach('restore node info', function () {
+      delete state.nodeInfo;
+    })
+
+    it('awaits required confirmations', async function () {
+      const initialBlock = await getCurrentBlock();
+      const instance = await deploy(this.DummyImplementation);
+      await awaitConfirmations(instance.transactionHash, 5);
+      (await hasBytecode(instance.address)).should.be.true;
+      const endBlock = await getCurrentBlock();
+      (endBlock - 5).should.be.greaterThan(initialBlock);
+    });
+
+    it('times out if fails to reach confirmations', async function () {
+      const instance = await deploy(this.DummyImplementation);
+      await awaitConfirmations(instance.transactionHash, 20, 100, 300).should.be.rejectedWith(/Exceeded timeout/);
+    });
+  });
 })
+
+async function getCurrentBlock() {
+  return (promisify(web3.eth.getBlock.bind(web3.eth))('latest').then(b => b.number));
+}

@@ -44,8 +44,8 @@ contract('add script', function() {
   it('should handle multiple contracts', function() {
     const customContractAlias = 'Impl'
     const customContractName = 'ImplV1'
-    const anotherCustomContractAlias = 'AnotherImpl'
-    const anotherCustomContractName = 'AnotherImplV1'
+    const anotherCustomContractAlias = 'WithLibraryImpl'
+    const anotherCustomContractName = 'WithLibraryImplV1'
     const customContractsData = [
       { name: customContractName, alias: customContractAlias },
       { name: anotherCustomContractName, alias: anotherCustomContractAlias },

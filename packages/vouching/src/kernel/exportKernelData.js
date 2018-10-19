@@ -1,10 +1,11 @@
 import { FileSystem as fs } from 'zos-lib'
 
-export default function exportKernelData(outputFile, jurisdiction, zepToken, validator, vouching) {
+export default function exportKernelData(outputFile, app, jurisdiction, zepToken, validator, vouching) {
   fs.writeJson(outputFile, {
-    jurisdiction: jurisdiction.address,
+    app: app.address,
     zepToken: zepToken.address,
+    vouching: vouching.address,
     validator: validator.address,
-    vouching: vouching.address
+    jurisdiction: jurisdiction.address,
   })
 }

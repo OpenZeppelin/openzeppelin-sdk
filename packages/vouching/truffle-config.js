@@ -14,10 +14,24 @@ module.exports = {
       host: 'localhost',
       port: 8565,
       network_id: 3,
-      gas: 50000,
+      gas: 500000,
       gasPrice: 10e9, // 10 Gwei
     },
-    "mainnet-zos": {
+    rinkeby: {
+      host: 'localhost',
+      port: 8565,
+      network_id: 4,
+      gas: 500000,
+      gasPrice: 10e9, // 10 Gwei
+    },
+    kovan: {
+      host: 'localhost',
+      port: 8555,
+      network_id: 42,
+      gas: 2000000,
+      gasPrice: 10e9, // 10 Gwei
+    },
+    mainnet: {
       host: 'localhost',
       port: 8545,
       network_id: '1',

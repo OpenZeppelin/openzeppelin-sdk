@@ -10,7 +10,7 @@ import ZosPackageFile from '../../src/models/files/ZosPackageFile'
 import StatusComparator from '../../src/models/status/StatusComparator'
 
 const ImplV1 = Contracts.getFromLocal('ImplV1')
-const AnotherImplV1 = Contracts.getFromLocal('AnotherImplV1')
+const ChildImplV1 = Contracts.getFromLocal('ChildImplV1')
 
 contract('StatusComparator', function([_, owner, anotherAddress]) {
   const network = 'test'
@@ -285,7 +285,7 @@ contract('StatusComparator', function([_, owner, anotherAddress]) {
         describe('when the directory of the current version has many contracts', function () {
           beforeEach('registering two new implementations in AppDirectory', async function () {
             this.impl = await this.project.setImplementation(ImplV1, 'Impl')
-            this.anotherImpl = await this.project.setImplementation(AnotherImplV1, 'AnotherImpl')
+            this.childImpl = await this.project.setImplementation(ChildImplV1, 'ChildImpl')
           })
 
           it('reports one diff per contract', async function () {
@@ -297,7 +297,7 @@ contract('StatusComparator', function([_, owner, anotherAddress]) {
             this.comparator.reports[0].description.should.be.equal(`Missing registered contract Impl at ${this.impl.address}`)
             this.comparator.reports[1].expected.should.be.equal('none')
             this.comparator.reports[1].observed.should.be.equal('one')
-            this.comparator.reports[1].description.should.be.equal(`Missing registered contract AnotherImpl at ${this.anotherImpl.address}`)
+            this.comparator.reports[1].description.should.be.equal(`Missing registered contract ChildImpl at ${this.childImpl.address}`)
           })
         })
 
@@ -305,7 +305,7 @@ contract('StatusComparator', function([_, owner, anotherAddress]) {
           beforeEach('registering two new implementations in AppDirectory', async function () {
             await this.project.setImplementation(ImplV1, 'Impl')
             await this.project.unsetImplementation('Impl')
-            this.anotherImpl = await this.project.setImplementation(AnotherImplV1, 'AnotherImpl')
+            this.childImpl = await this.project.setImplementation(ChildImplV1, 'ChildImpl')
           })
 
           it('reports one diff per contract', async function () {
@@ -314,7 +314,7 @@ contract('StatusComparator', function([_, owner, anotherAddress]) {
             this.comparator.reports.should.have.lengthOf(1)
             this.comparator.reports[0].expected.should.be.equal('none')
             this.comparator.reports[0].observed.should.be.equal('one')
-            this.comparator.reports[0].description.should.be.equal(`Missing registered contract AnotherImpl at ${this.anotherImpl.address}`)
+            this.comparator.reports[0].description.should.be.equal(`Missing registered contract ChildImpl at ${this.childImpl.address}`)
           })
         })
       })
@@ -322,10 +322,10 @@ contract('StatusComparator', function([_, owner, anotherAddress]) {
       describe('when the network file has some contracts', function () {
         beforeEach('adding some contracts', async function () {
           this.impl = await ImplV1.new()
-          this.anotherImpl = await AnotherImplV1.new()
+          this.childImpl = await ChildImplV1.new()
 
           this.networkFile.addContract('Impl', this.impl, getStorageLayout(ImplV1))
-          this.networkFile.addContract('AnotherImpl', this.anotherImpl, getStorageLayout(AnotherImplV1))
+          this.networkFile.addContract('ChildImpl', this.childImpl, getStorageLayout(ChildImplV1))
         })
 
         describe('when the directory of the current version does not have any contract', function () {
@@ -338,7 +338,7 @@ contract('StatusComparator', function([_, owner, anotherAddress]) {
             this.comparator.reports[0].description.should.be.equal(`A contract Impl at ${this.impl.address} is not registered`)
             this.comparator.reports[1].expected.should.be.equal('one')
             this.comparator.reports[1].observed.should.be.equal('none')
-            this.comparator.reports[1].description.should.be.equal(`A contract AnotherImpl at ${this.anotherImpl.address} is not registered`)
+            this.comparator.reports[1].description.should.be.equal(`A contract ChildImpl at ${this.childImpl.address} is not registered`)
           })
         })
 
@@ -354,13 +354,13 @@ contract('StatusComparator', function([_, owner, anotherAddress]) {
               this.comparator.reports.should.have.lengthOf(1)
               this.comparator.reports[0].expected.should.be.equal('one')
               this.comparator.reports[0].observed.should.be.equal('none')
-              this.comparator.reports[0].description.should.be.equal(`A contract AnotherImpl at ${this.anotherImpl.address} is not registered`)
+              this.comparator.reports[0].description.should.be.equal(`A contract ChildImpl at ${this.childImpl.address} is not registered`)
             })
           })
 
           describe('when the directory has another address for that contract', function () {
             beforeEach('registering new implementation in AppDirectory', async function () {
-              await this.directory.setImplementation('Impl', this.anotherImpl.address)
+              await this.directory.setImplementation('Impl', this.childImpl.address)
             })
 
             it('reports those diffs', async function () {
@@ -368,14 +368,14 @@ contract('StatusComparator', function([_, owner, anotherAddress]) {
 
               this.comparator.reports.should.have.lengthOf(3)
               this.comparator.reports[0].expected.should.be.equal(this.impl.address)
-              this.comparator.reports[0].observed.should.be.equal(this.anotherImpl.address)
+              this.comparator.reports[0].observed.should.be.equal(this.childImpl.address)
               this.comparator.reports[0].description.should.be.equal('Address for contract Impl does not match')
               this.comparator.reports[1].expected.should.be.equal(bytecodeDigest(ImplV1.deployedBytecode))
-              this.comparator.reports[1].observed.should.be.equal(bytecodeDigest(AnotherImplV1.deployedBytecode))
-              this.comparator.reports[1].description.should.be.equal(`Bytecode at ${this.anotherImpl.address} for contract Impl does not match`)
+              this.comparator.reports[1].observed.should.be.equal(bytecodeDigest(ChildImplV1.deployedBytecode))
+              this.comparator.reports[1].description.should.be.equal(`Bytecode at ${this.childImpl.address} for contract Impl does not match`)
               this.comparator.reports[2].expected.should.be.equal('one')
               this.comparator.reports[2].observed.should.be.equal('none')
-              this.comparator.reports[2].description.should.be.equal(`A contract AnotherImpl at ${this.anotherImpl.address} is not registered`)
+              this.comparator.reports[2].description.should.be.equal(`A contract ChildImpl at ${this.childImpl.address} is not registered`)
             })
           })
 
@@ -396,7 +396,7 @@ contract('StatusComparator', function([_, owner, anotherAddress]) {
               this.comparator.reports[0].description.should.be.equal(`Bytecode at ${this.impl.address} for contract Impl does not match`)
               this.comparator.reports[1].expected.should.be.equal('one')
               this.comparator.reports[1].observed.should.be.equal('none')
-              this.comparator.reports[1].description.should.be.equal(`A contract AnotherImpl at ${this.anotherImpl.address} is not registered`)
+              this.comparator.reports[1].description.should.be.equal(`A contract ChildImpl at ${this.childImpl.address} is not registered`)
             })
           })
         })
@@ -404,7 +404,7 @@ contract('StatusComparator', function([_, owner, anotherAddress]) {
         describe('when the directory of the current version has both contracts', function () {
           beforeEach('registering new implementation in AppDirectory', async function () {
             await this.directory.setImplementation('Impl', this.impl.address)
-            await this.directory.setImplementation('AnotherImpl', this.anotherImpl.address)
+            await this.directory.setImplementation('ChildImpl', this.childImpl.address)
           })
 
           it('does not report any diff ', async function () {
@@ -418,7 +418,7 @@ contract('StatusComparator', function([_, owner, anotherAddress]) {
           beforeEach('registering two new implementations in AppDirectory', async function () {
             await this.directory.setImplementation('Impl', this.impl.address)
             await this.directory.unsetImplementation('Impl')
-            await this.directory.setImplementation('AnotherImpl', this.anotherImpl.address)
+            await this.directory.setImplementation('ChildImpl', this.childImpl.address)
           })
 
           it('reports one diff per contract', async function () {
@@ -438,14 +438,14 @@ contract('StatusComparator', function([_, owner, anotherAddress]) {
     describe('proxies', function () {
       beforeEach('adding some contracts', async function () {
         this.impl = await ImplV1.new()
-        this.anotherImpl = await AnotherImplV1.new()
+        this.childImpl = await ChildImplV1.new()
 
         this.networkFile.addContract('Impl', this.impl, getStorageLayout(ImplV1))
-        this.networkFile.addContract('AnotherImpl', this.anotherImpl, getStorageLayout(AnotherImplV1))
+        this.networkFile.addContract('ChildImpl', this.childImpl, getStorageLayout(ChildImplV1))
 
         await this.directory.setImplementation('Impl', this.impl.address)
         await this.directory.unsetImplementation('Impl', txParams)
-        await this.directory.setImplementation('AnotherImpl', this.anotherImpl.address)
+        await this.directory.setImplementation('ChildImpl', this.childImpl.address)
         await this.directory.setImplementation('Impl', this.impl.address)
       })
 
@@ -476,7 +476,7 @@ contract('StatusComparator', function([_, owner, anotherAddress]) {
         describe('when the app has many proxies registered', function () {
           beforeEach('registering new implementation in AppDirectory', async function () {
             this.implProxy = await this.project.createProxy(ImplV1, { contractName: 'Impl', initMethod: 'initialize', initArgs: [42] })
-            this.anotherImplProxy = await this.project.createProxy(AnotherImplV1, { contractName: 'AnotherImpl', initMethod: 'initialize', initArgs: [1] })
+            this.childImplProxy = await this.project.createProxy(ChildImplV1, { contractName: 'ChildImpl', initMethod: 'initialize', initArgs: [1] })
           })
 
           it('reports that diff', async function () {
@@ -488,7 +488,7 @@ contract('StatusComparator', function([_, owner, anotherAddress]) {
             this.comparator.reports[0].description.should.be.equal(`Missing registered proxy of Impl at ${this.implProxy.address} pointing to ${this.impl.address}`)
             this.comparator.reports[1].expected.should.be.equal('none')
             this.comparator.reports[1].observed.should.be.equal('one')
-            this.comparator.reports[1].description.should.be.equal(`Missing registered proxy of AnotherImpl at ${this.anotherImplProxy.address} pointing to ${this.anotherImpl.address}`)
+            this.comparator.reports[1].description.should.be.equal(`Missing registered proxy of ChildImpl at ${this.childImplProxy.address} pointing to ${this.childImpl.address}`)
           })
         })
       })
@@ -545,7 +545,7 @@ contract('StatusComparator', function([_, owner, anotherAddress]) {
               beforeEach('changing network file', async function () {
                 const implementations = [
                   { implementation: this.impl.address, address: '0x1', version: '1.0.0' },
-                  { implementation: this.anotherImpl.address, address: this.proxy.address, version: '1.0.0' },
+                  { implementation: this.childImpl.address, address: this.proxy.address, version: '1.0.0' },
                 ]
                 this.networkFile.setProxies(this.packageFile.name, 'Impl', implementations)
               })
@@ -554,7 +554,7 @@ contract('StatusComparator', function([_, owner, anotherAddress]) {
                 await this.checker.checkProxies()
 
                 this.comparator.reports.should.have.lengthOf(2)
-                this.comparator.reports[0].expected.should.be.equal(this.anotherImpl.address)
+                this.comparator.reports[0].expected.should.be.equal(this.childImpl.address)
                 this.comparator.reports[0].observed.should.be.equal(this.impl.address)
                 this.comparator.reports[0].description.should.be.equal(`Pointed implementation of Impl proxy at ${this.proxy.address} does not match`)
                 this.comparator.reports[1].expected.should.be.equal('one')
@@ -567,14 +567,14 @@ contract('StatusComparator', function([_, owner, anotherAddress]) {
               beforeEach('changing network file', async function () {
                 const { name: packageName } = this.packageFile
                 this.networkFile.setProxies(packageName, 'Impl', [{ implementation: this.impl.address, address: '0x1', version: '1.0.0' }])
-                this.networkFile.setProxies(packageName, 'AnotherImpl', [{ implementation: this.impl.address, address: this.proxy.address, version: '1.0.0' }])
+                this.networkFile.setProxies(packageName, 'ChildImpl', [{ implementation: this.impl.address, address: this.proxy.address, version: '1.0.0' }])
               })
 
               it('reports that diff', async function () {
                 await this.checker.checkProxies()
 
                 this.comparator.reports.should.have.lengthOf(2)
-                this.comparator.reports[0].expected.should.be.equal('AnotherImpl')
+                this.comparator.reports[0].expected.should.be.equal('ChildImpl')
                 this.comparator.reports[0].observed.should.be.equal('Impl')
                 this.comparator.reports[0].description.should.be.equal(`Alias of proxy at ${this.proxy.address} pointing to ${this.impl.address} does not match`)
                 this.comparator.reports[1].expected.should.be.equal('one')
@@ -587,17 +587,17 @@ contract('StatusComparator', function([_, owner, anotherAddress]) {
               beforeEach('changing network file', async function () {
                 const { name: packageName } = this.packageFile
                 this.networkFile.setProxies(packageName, 'Impl', [{ implementation: this.impl.address, address: '0x1', version: '1.0.0' }])
-                this.networkFile.setProxies(packageName, 'AnotherImpl', [{ implementation: this.anotherImpl.address, address: this.proxy.address, version: '1.0.0' }])
+                this.networkFile.setProxies(packageName, 'ChildImpl', [{ implementation: this.childImpl.address, address: this.proxy.address, version: '1.0.0' }])
               })
 
               it('reports that diff', async function () {
                 await this.checker.checkProxies()
 
                 this.comparator.reports.should.have.lengthOf(3)
-                this.comparator.reports[0].expected.should.be.equal('AnotherImpl')
+                this.comparator.reports[0].expected.should.be.equal('ChildImpl')
                 this.comparator.reports[0].observed.should.be.equal('Impl')
                 this.comparator.reports[0].description.should.be.equal(`Alias of proxy at ${this.proxy.address} pointing to ${this.impl.address} does not match`)
-                this.comparator.reports[1].expected.should.be.equal(this.anotherImpl.address)
+                this.comparator.reports[1].expected.should.be.equal(this.childImpl.address)
                 this.comparator.reports[1].observed.should.be.equal(this.impl.address)
                 this.comparator.reports[1].description.should.be.equal(`Pointed implementation of Impl proxy at ${this.proxy.address} does not match`)
                 this.comparator.reports[2].expected.should.be.equal('one')

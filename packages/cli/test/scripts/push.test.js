@@ -13,10 +13,13 @@ import ZosPackageFile from '../../src/models/files/ZosPackageFile';
 import remove from '../../src/scripts/remove';
 import Dependency from '../../src/models/dependency/Dependency';
 import CaptureLogs from '../helpers/captureLogs';
+import { promisify } from 'util';
 
 const should = require('chai').should();
 
 const ImplV1 = Contracts.getFromLocal('ImplV1');
+const WithLibraryImplV1 = Contracts.getFromLocal('WithLibraryImplV1');
+const PackageContract = Contracts.getFromNodeModules('zos-lib', 'Package');
 const ImplementationDirectory = Contracts.getFromNodeModules('zos-lib', 'ImplementationDirectory');
 
 contract('push script', function([_, owner]) {
@@ -72,7 +75,7 @@ contract('push script', function([_, owner]) {
     it('should record contracts in network file', async function () {
       const contract = this.networkFile.contract('Impl');
       contract.address.should.be.nonzeroAddress;
-      contract.bytecodeHash.should.not.be.empty;
+      contract.localBytecodeHash.should.not.be.empty;
       contract.storage.should.not.be.empty;
       contract.types.should.not.be.empty;
       const deployed = await ImplV1.at(contract.address);
@@ -84,6 +87,20 @@ contract('push script', function([_, owner]) {
       const deployed = await ImplV1.at(address);
       (await deployed.say()).should.eq('V1');
     });
+
+    it('should deploy required libraries', async function () {
+      const address = this.networkFile.solidityLib('UintLib').address;
+      const code = await promisify(web3.eth.getCode.bind(web3.eth))(address);
+      const uintLib = Contracts.getFromLocal('UintLib');
+      code.length.should.eq(uintLib.deployedBytecode.length).and.be.greaterThan(40);
+    });
+
+    it('should deploy and link contracts that require libraries', async function () {
+      const address = this.networkFile.contract('WithLibraryImpl').address;
+      const deployed = await WithLibraryImplV1.at(address);
+      const result = await deployed.double(10);
+      result.toNumber().should.eq(20);
+    });
   };
 
   const shouldRegisterContractsInDirectory = function () {
@@ -92,11 +109,12 @@ contract('push script', function([_, owner]) {
       const _package = await Package.fetch(this.networkFile.package.address);
       (await _package.getImplementation(defaultVersion, 'Impl')).should.eq(address);
     });
-  }
+  };
 
   const shouldRedeployContracts = function () {
-    beforeEach('loading previous address', function () {
+    beforeEach('loading previous addresses', function () {
       this.previousAddress = this.networkFile.contract('Impl').address
+      this.withLibraryPreviousAddress = this.networkFile.contract('WithLibraryImpl').address
     })
 
     it('should not redeploy contracts if unmodified', async function () {
@@ -113,6 +131,17 @@ contract('push script', function([_, owner]) {
       modifyBytecode.call(this, 'Impl');
       await push({ networkFile: this.networkFile, network, txParams });
       this.networkFile.contract('Impl').address.should.not.eq(this.previousAddress);
+    });
+
+    it('should redeploy contracts if library is modified', async function () {
+      modifyLibraryBytecode.call(this, 'UintLib');
+      await push({ networkFile: this.networkFile, network, txParams });
+      this.networkFile.contract('WithLibraryImpl').address.should.not.eq(this.withLibraryPreviousAddress);
+    });
+
+    it('should not redeploy contracts if library is unmodified', async function () {
+      await push({ networkFile: this.networkFile, network, txParams });
+      this.networkFile.contract('WithLibraryImpl').address.should.eq(this.withLibraryPreviousAddress);
     });
 
     it('should refuse to redeploy a contract if storage is incompatible', async function () {
@@ -213,10 +242,6 @@ contract('push script', function([_, owner]) {
       const _package = await Package.fetch(this.networkFile.package.address);
       (await _package.getImplementation('1.2.0', 'Impl')).should.eq(implementationAddress);
     });
-  };
-
-  const shouldBumpVersionAndUnfreeze = function () {
-    shouldBumpVersion()
 
     it('should set frozen back to false', async function() {
       await bumpVersion({ version: '1.1.0', packageFile: this.newNetworkFile.packageFile  });
@@ -249,6 +274,7 @@ contract('push script', function([_, owner]) {
     const libVersion = '1.1.0';
 
     it('should set dependency in deployed app', async function () {
+      if (!this.networkFile.appAddress) return;
       const app = await App.fetch(this.networkFile.appAddress);
       const packageInfo = await app.getPackage(libName)
       packageInfo.version.should.be.semverEqual(libVersion)
@@ -262,50 +288,68 @@ contract('push script', function([_, owner]) {
     });
   };
 
-  const shouldMigrateToFullApp = function () {
-    beforeEach('loading previous address', function () {
-      this.previousAddress = this.networkFile.contract('Impl').address
-    })
+  const shouldUpdateDependency = function () {
+    describe('updating dependency', function () {
+      const newVersion = '1.2.0';
+      
+      beforeEach('deploying new dependency version', async function () {
+        const mockStdlibPackage = new ZosPackageFile('test/mocks/mock-stdlib/zos.json');
+        mockStdlibPackage.version = newVersion;
+        sinon.stub(Dependency.prototype, 'getPackageFile').callsFake(() => mockStdlibPackage);
 
-    describe('migration to full app', function () {
-      beforeEach('migrating', async function () {
-        await push({ full: true, network, txParams, networkFile: this.networkFile })
+        await this.dependencyPackage.newVersion(newVersion)
+        this.dependencyGetNetworkFileStub.callsFake(() => ({ packageAddress: this.dependencyPackage.address, version: newVersion }));
+        
+        this.networkFile.packageFile.setDependency('mock-stdlib', newVersion);
       })
-  
-      shouldDeployApp();
-
-      it('should reuse contract implementations', async function () {
-        const newImpl = await getImplementationFromApp.call(this, 'Impl');
-        newImpl.should.eq(this.previousAddress);
-      });
-
-      it('should redeploy modified contract on app', async function () {
-        modifyBytecode.call(this, 'Impl');
+      
+      beforeEach('running new push', async function () {
         await push({ networkFile: this.networkFile, network, txParams });
-
-        const newImplFromApp = await getImplementationFromApp.call(this, 'Impl');
-        const newImplFromFile = this.networkFile.contract('Impl').address;
-        
-        newImplFromApp.should.eq(newImplFromFile);
-        newImplFromApp.should.not.eq(this.previousAddress);
-      });
-    })
-
-    describe('migration with modified contracts', async function () {
-      beforeEach('migrating', async function () {
-        modifyBytecode.call(this, 'Impl');
-        await push({ full: true, network, txParams, networkFile: this.networkFile });
       })
 
-      it('should redeploy modified contract on app', async function () {
-        const newImplFromApp = await getImplementationFromApp.call(this, 'Impl');
-        const newImplFromFile = this.networkFile.contract('Impl').address;
-        
-        newImplFromApp.should.eq(newImplFromFile);
-        newImplFromApp.should.not.eq(this.previousAddress);
+      it('should update dependency to new version in network file', async function () {
+        const dependency = this.networkFile.getDependency('mock-stdlib');
+        dependency.package.should.eq(this.dependencyPackage.address);
+        dependency.version.should.be.semverEqual(newVersion);
       });
+
+      it('should update dependency to new version in app', async function () {
+        if (!this.networkFile.appAddress) return;
+        const app = await App.fetch(this.networkFile.appAddress);
+        const packageInfo = await app.getPackage('mock-stdlib');
+        packageInfo.package.address.should.eq(this.dependencyPackage.address);
+        packageInfo.version.should.be.semverEqual(newVersion);
+      });
+    });
+  };
+
+  const shouldNotPushWhileFrozen = function () {
+    it('should refuse to push when frozen upon modified contracts', async function() {
+      await freeze({ network, txParams, networkFile: this.networkFile })
+      modifyBytecode.call(this, 'Impl');
+      await push({ network, txParams, networkFile: this.networkFile }).should.be.rejectedWith(/frozen/i)
+    });
+
+    it('should refuse to push when frozen upon modified libraries', async function() {
+      await freeze({ network, txParams, networkFile: this.networkFile })
+      modifyLibraryBytecode.call(this, 'UintLib');
+      await push({ network, txParams, networkFile: this.networkFile }).should.be.rejectedWith(/frozen/i)
+    });
+  };
+
+  const deployingDependency = function () {
+    beforeEach('deploying dependency', async function () {
+      const dependency = Dependency.fromNameWithVersion('mock-stdlib@1.1.0')
+      this.dependencyProject = await dependency.deploy()
+      this.dependencyPackage = await this.dependencyProject.getProjectPackage()
+      this.dependencyGetNetworkFileStub = sinon.stub(Dependency.prototype, 'getNetworkFile');
+      this.dependencyGetNetworkFileStub.callsFake(() => ({ packageAddress: this.dependencyPackage.address, version: '1.1.0' }))
     })
-  }
+
+    afterEach('unstub dependency network file stub', function () {
+      sinon.restore()      
+    })
+  };
 
   describe('an empty app', function() {
     beforeEach('pushing package-empty', async function () {
@@ -325,6 +369,9 @@ contract('push script', function([_, owner]) {
       this.networkFile = packageFile.networkFile(network)
 
       await push({ network, txParams, networkFile: this.networkFile })
+
+      const newPackageFile = new ZosPackageFile('test/mocks/packages/package-with-contracts-v2.zos.json')
+      this.newNetworkFile = newPackageFile.networkFile(network)
     });
 
     shouldDeployApp();
@@ -334,6 +381,7 @@ contract('push script', function([_, owner]) {
     shouldRedeployContracts();
     shouldValidateContracts();
     shouldBumpVersion();
+    shouldNotPushWhileFrozen();
     shouldDeleteContracts({ unregisterFromDirectory: true });
   });
 
@@ -347,23 +395,10 @@ contract('push script', function([_, owner]) {
 
     shouldDeployApp();
     shouldDeployProvider();
-    shouldDeployContracts();
-    shouldRegisterContractsInDirectory();
   });
 
   describe('an app with dependency', function () {
-    beforeEach('deploying dependency', async function () {
-      const dependency = Dependency.fromNameWithVersion('mock-stdlib@1.1.0')
-      this.dependencyProject = await dependency.deploy()
-      this.dependencyPackage = await this.dependencyProject.getProjectPackage()
-
-      this.dependencyNetworkFileStub = sinon.stub(Dependency.prototype, 'getNetworkFile')
-      this.dependencyNetworkFileStub.callsFake(() => ({ packageAddress: this.dependencyPackage.address, version: '1.1.0' }))
-    })
-
-    afterEach('unstub dependency network file stub', function () {
-      this.dependencyNetworkFileStub.restore()      
-    })
+    deployingDependency();
 
     describe('when using a valid dependency', function () {
       beforeEach('pushing package-stdlib', async function () {
@@ -375,6 +410,7 @@ contract('push script', function([_, owner]) {
 
       shouldDeployApp();
       shouldSetDependency();
+      shouldUpdateDependency();
     })
 
     describe('when using a dependency with a version range', function () {
@@ -387,6 +423,7 @@ contract('push script', function([_, owner]) {
 
       shouldDeployApp();
       shouldSetDependency();
+      shouldUpdateDependency();
     })
   });
 
@@ -399,7 +436,7 @@ contract('push script', function([_, owner]) {
 
       it('should fail to push', async function () {
         await push({ network, txParams, networkFile: this.networkFile })
-          .should.be.rejectedWith(/Required dependency version 1.0.0 does not match dependency package version 2.0.0/)
+          .should.be.rejectedWith(/Required dependency version 1.0.0 does not match version 2.0.0/)
       });
     })
 
@@ -445,13 +482,9 @@ contract('push script', function([_, owner]) {
     shouldRegisterContractsInDirectory();
     shouldValidateContracts();
     shouldRedeployContracts();
-    shouldBumpVersionAndUnfreeze();
+    shouldBumpVersion();
+    shouldNotPushWhileFrozen();
     shouldDeleteContracts({ unregisterFromDirectory: true });
-
-    it('should refuse to push when frozen', async function() {
-      await freeze({ network, txParams, networkFile: this.networkFile })
-      await push({ network, txParams, networkFile: this.networkFile }).should.be.rejectedWith(/frozen/i)
-    });
   });
 
   describe('an empty lightweight app', function() {
@@ -463,27 +496,12 @@ contract('push script', function([_, owner]) {
     it('should run push', async function () {
       await push({ network, txParams, networkFile: this.networkFile })
     });
-
-    describe('migration to full app', function () {
-      beforeEach('migrating', async function () {
-        await push({ network, txParams, networkFile: this.networkFile })
-        await push({ full: true, network, txParams, networkFile: this.networkFile })
-      });
-      shouldDeployApp();
-    });
-
-    describe('migration from scratch', function () {
-      beforeEach('migrating', async function () {
-        await push({ full: true, network, txParams, networkFile: this.networkFile })
-      });
-      shouldDeployApp();
-    });
   });
 
   describe('a lightweight app with contracts', function() {
     beforeEach('pushing package-with-contracts', async function () {
       const packageFile = new ZosPackageFile('test/mocks/packages/package-with-contracts.zos.json')
-      packageFile.full = false
+      packageFile.publish = false
       this.networkFile = packageFile.networkFile(network)
 
       await push({ network, txParams, networkFile: this.networkFile })
@@ -493,7 +511,6 @@ contract('push script', function([_, owner]) {
     shouldValidateContracts();
     shouldRedeployContracts();
     shouldDeleteContracts({ unregisterFromDirectory: false });
-    shouldMigrateToFullApp();
 
     it('should not reupload contracts after version bump', async function () {
       const previousAddress = this.networkFile.contract('Impl').address
@@ -504,32 +521,35 @@ contract('push script', function([_, owner]) {
     })
   });
 
-  describe('a lightweight app with invalid contracts', function() {
-    beforeEach('pushing package-with-invalid-contracts', async function () {
-      const packageFile = new ZosPackageFile('test/mocks/packages/package-with-invalid-contracts.zos.json')
-      packageFile.full = false
+  describe('a lightweight app with dependencies', function() {
+    deployingDependency();
+
+    beforeEach('pushing package-with-stdlib', async function () {
+      const packageFile = new ZosPackageFile('test/mocks/packages/package-with-stdlib.zos.json')
+      packageFile.publish = false
       this.networkFile = packageFile.networkFile(network)
 
-      await push({ networkFile: this.networkFile, network, txParams, force: true }).should.be.rejectedWith(/WithFailingConstructor deployment failed/);
+      await push({ network, txParams, networkFile: this.networkFile })
     });
 
-    shouldDeployContracts();
+    shouldSetDependency();
+    shouldUpdateDependency();
   });
-
-  function modifyBytecode(contractAlias) {
-    const contractData = this.networkFile.contract(contractAlias);
-    this.networkFile.setContract(contractAlias, { ... contractData, bytecodeHash: '0xabcdef' })
-  }
-
-  async function getImplementationFromApp(contractAlias) {
-    const app = await App.fetch(this.networkFile.appAddress);
-    return await app.getImplementation(this.networkFile.packageFile.name, contractAlias);
-  }
 });
+
+async function getImplementationFromApp(contractAlias) {
+  const app = await App.fetch(this.networkFile.appAddress);
+  return await app.getImplementation(this.networkFile.packageFile.name, contractAlias);
+}
 
 function modifyBytecode(contractAlias) {
   const contractData = this.networkFile.contract(contractAlias);
-  this.networkFile.setContract(contractAlias, { ... contractData, bytecodeHash: '0xabcdef' })
+  this.networkFile.setContract(contractAlias, { ... contractData, localBytecodeHash: '0xabcdef' })
+}
+
+function modifyLibraryBytecode(contractAlias) {
+  const contractData = this.networkFile.solidityLib(contractAlias);
+  this.networkFile.setSolidityLib(contractAlias, { ... contractData, localBytecodeHash: '0xabcdef' })
 }
 
 function modifyStorageInfo(contractAlias) {

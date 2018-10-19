@@ -7,6 +7,7 @@ import freeze from './freeze'
 import init from './init'
 import initLib from './init-lib'
 import link from './link'
+import publish from './publish'
 import pull from './pull'
 import push from './push'
 import remove from './remove'
@@ -27,6 +28,7 @@ export default {
   init,
   initLib,
   link,
+  publish,
   pull,
   push,
   remove,

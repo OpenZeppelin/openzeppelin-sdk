@@ -49,7 +49,12 @@ const siteConfig = {
     'https://fonts.googleapis.com/css?family=Lato:100,200,300,400,500,700,400italic,700italic',
   ],
   repoUrl: 'https://github.com/zeppelinos/',
-  gaTrackingId: 'UA-102575245-1'
+  gaTrackingId: 'UA-102575245-1',
+  algolia: {
+    apiKey: '8d0b5afbba49947d9efb5659d1b08df7',
+    indexName: 'zeppelinos',
+    algoliaOptions: {} // Optional, if provided by Algolia
+  }
 };
 
 module.exports = siteConfig;

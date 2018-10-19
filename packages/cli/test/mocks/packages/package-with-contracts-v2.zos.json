@@ -1,10 +1,10 @@
 {
   "name": "Herbs",
   "zosversion": "2",
-  "full": true,
+  "publish": true,
   "version": "1.2.0",
   "contracts": {
     "Impl": "ImplV1",
-    "AnotherImpl": "AnotherImplV1"
+    "WithLibraryImpl": "WithLibraryImplV1"
   }
 }

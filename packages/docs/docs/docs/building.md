@@ -6,7 +6,7 @@ sidebar_label: Building an upgradeable app
 
 After installing `zos` and setting up your ZeppelinOS project as described in the [setup](setup.md) guide, you are now ready to create your upgradeable application.
 
-Let's start by installing the [ZeppelinOS lib](https://github.com/zeppelinos/zos-lib), which you will need to make your contract code upgradeable.
+Let's start by installing the [ZeppelinOS lib](https://github.com/zeppelinos/zos-lib), which you will needs to make your contract code upgradeable.
 
 ```sh
 npm install zos-lib
@@ -110,4 +110,4 @@ truffle(local)> myContract.x()
 43
 ```
 
-In order to learn how to use the ZeppelinOS standard libraries in an upgradeable app, please follow the [next guide](using.md).
+In order to learn how to use the ZeppelinOS EVM packages in an upgradeable app, please follow the [next guide](using.md).

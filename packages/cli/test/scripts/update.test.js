@@ -21,8 +21,8 @@ const Greeter_V2 = Contracts.getFromNodeModules('mock-stdlib-2', 'GreeterImpl')
 
 contract('update script', function([_skipped, owner, anotherAccount]) {
   const network = 'test';
-  const version_1 = '1.1.0';
-  const version_2 = '1.2.0';
+  const version_1 = '0.1.0';
+  const version_2 = '0.2.0';
   const txParams = { from: owner };
 
   const assertProxyInfo = async function(networkFile, contractAlias, proxyIndex, { version, implementation, address, value }) {
@@ -53,24 +53,24 @@ contract('update script', function([_skipped, owner, anotherAccount]) {
     beforeEach('setup', async function() {
       this.networkFile = this.packageFile.networkFile(network)
 
-      const contractsData = [{ name: 'ImplV1', alias: 'Impl' }, { name: 'AnotherImplV1', alias: 'AnotherImpl' }]
+      const contractsData = [{ name: 'ImplV1', alias: 'Impl' }, { name: 'WithLibraryImplV1', alias: 'WithLibraryImpl' }]
       await add({ contractsData, packageFile: this.packageFile });
       await push({ network, txParams, networkFile: this.networkFile });
 
       this.implV1Address = this.networkFile.contract('Impl').address;
-      this.anotherImplV1Address = this.networkFile.contract('AnotherImpl').address;
+      this.withLibraryImplV1Address = this.networkFile.contract('WithLibraryImpl').address;
 
       await createProxy({ contractAlias: 'Impl', network, txParams, networkFile: this.networkFile });
       await createProxy({ contractAlias: 'Impl', network, txParams, networkFile: this.networkFile });
-      await createProxy({ contractAlias: 'AnotherImpl', network, txParams, networkFile: this.networkFile });
+      await createProxy({ contractAlias: 'WithLibraryImpl', network, txParams, networkFile: this.networkFile });
 
       await bumpVersion({ version: version_2, txParams, packageFile: this.packageFile });
-      const newContractsData = [{ name: 'ImplV2', alias: 'Impl' }, { name: 'AnotherImplV2', alias: 'AnotherImpl' }]
+      const newContractsData = [{ name: 'ImplV2', alias: 'Impl' }, { name: 'WithLibraryImplV2', alias: 'WithLibraryImpl' }]
       await add({ contractsData: newContractsData, packageFile: this.packageFile });
       await push({ network, txParams, networkFile: this.networkFile });
 
       this.implV2Address = this.networkFile.contract('Impl').address;
-      this.anotherImplV2Address = this.networkFile.contract('AnotherImpl').address;
+      this.withLibraryImplV2Address = this.networkFile.contract('WithLibraryImpl').address;
     });
 
     it('should upgrade the version of a proxy given its address', async function() {
@@ -81,7 +81,7 @@ contract('update script', function([_skipped, owner, anotherAccount]) {
 
       // Check other proxies were unmodified
       await assertProxyInfo(this.networkFile, 'Impl', 1, { version: version_1, implementation: this.implV1Address });
-      await assertProxyInfo(this.networkFile, 'AnotherImpl', 0, { version: version_1, implementation: this.anotherImplV1Address });
+      await assertProxyInfo(this.networkFile, 'WithLibraryImpl', 0, { version: version_1, implementation: this.withLibraryImplV1Address });
     });
 
     it('should upgrade the version of all proxies given the contract alias', async function() {
@@ -90,15 +90,15 @@ contract('update script', function([_skipped, owner, anotherAccount]) {
       await assertProxyInfo(this.networkFile, 'Impl', 0, { version: version_2, implementation: this.implV2Address });
       await assertProxyInfo(this.networkFile, 'Impl', 1, { version: version_2, implementation: this.implV2Address });
 
-      // Keep AnotherImpl unmodified
-      await assertProxyInfo(this.networkFile, 'AnotherImpl', 0, { version: version_1, implementation: this.anotherImplV1Address });
+      // Keep WithLibraryImpl unmodified
+      await assertProxyInfo(this.networkFile, 'WithLibraryImpl', 0, { version: version_1, implementation: this.withLibraryImplV1Address });
     });
 
     it('should upgrade the version of all proxies in the app', async function() {
       await update({ contractAlias: undefined, proxyAddress: undefined, all: true, network, txParams, networkFile: this.networkFile });
       await assertProxyInfo(this.networkFile, 'Impl', 0, { version: version_2, implementation: this.implV2Address });
       await assertProxyInfo(this.networkFile, 'Impl', 1, { version: version_2, implementation: this.implV2Address });
-      await assertProxyInfo(this.networkFile, 'AnotherImpl', 0, { version: version_2, implementation: this.anotherImplV2Address });
+      await assertProxyInfo(this.networkFile, 'WithLibraryImpl', 0, { version: version_2, implementation: this.withLibraryImplV2Address });
     });
 
     it('should not attempt to upgrade a proxy not owned', async function() {
@@ -107,7 +107,7 @@ contract('update script', function([_skipped, owner, anotherAccount]) {
       await update({ contractAlias: undefined, proxyAddress: undefined, all: true, network, txParams, networkFile: this.networkFile });
       await assertProxyInfo(this.networkFile, 'Impl', 0, { version: version_1, implementation: this.implV1Address });
       await assertProxyInfo(this.networkFile, 'Impl', 1, { version: version_2, implementation: this.implV2Address });
-      await assertProxyInfo(this.networkFile, 'AnotherImpl', 0, { version: version_2, implementation: this.anotherImplV2Address });
+      await assertProxyInfo(this.networkFile, 'WithLibraryImpl', 0, { version: version_2, implementation: this.withLibraryImplV2Address });
     });
 
     it('should upgrade the remaining proxies if one was already upgraded', async function() {
@@ -119,7 +119,7 @@ contract('update script', function([_skipped, owner, anotherAccount]) {
       // Upgrade all
       await update({ contractAlias: undefined, proxyAddress: undefined, all: true, network, txParams, networkFile: this.networkFile });
       await assertProxyInfo(this.networkFile, 'Impl', 1, { version: version_2, implementation: this.implV2Address });
-      await assertProxyInfo(this.networkFile, 'AnotherImpl', 0, { version: version_2, implementation: this.anotherImplV2Address });
+      await assertProxyInfo(this.networkFile, 'WithLibraryImpl', 0, { version: version_2, implementation: this.withLibraryImplV2Address });
     });
 
     it('should upgrade a single proxy and migrate it', async function() {
@@ -135,8 +135,8 @@ contract('update script', function([_skipped, owner, anotherAccount]) {
     });
 
     it('should upgrade multiple proxies and migrate them', async function() {
-      // add non-migratable implementation for AnotherImpl contract
-      await add({ contractsData: [{ name: 'UnmigratableImplV2', alias: 'AnotherImpl' }], packageFile: this.packageFile })
+      // add non-migratable implementation for WithLibraryImpl contract
+      await add({ contractsData: [{ name: 'UnmigratableImplV2', alias: 'WithLibraryImpl' }], packageFile: this.packageFile })
       await push({ network, txParams, networkFile: this.networkFile });
 
       await update({ contractAlias: undefined, proxyAddress: undefined, all: true, initMethod: "migrate", initArgs: [42], network, txParams, networkFile: this.networkFile })
@@ -144,7 +144,7 @@ contract('update script', function([_skipped, owner, anotherAccount]) {
 
       await assertProxyInfo(this.networkFile, 'Impl', 0, { version: version_2, implementation: this.implV2Address, value: 42 });
       await assertProxyInfo(this.networkFile, 'Impl', 1, { version: version_2, implementation: this.implV2Address, value: 42 });
-      await assertProxyInfo(this.networkFile, 'AnotherImpl', 0, { version: version_1, implementation: this.anotherImplV1Address });
+      await assertProxyInfo(this.networkFile, 'WithLibraryImpl', 0, { version: version_1, implementation: this.withLibraryImplV1Address });
     });
 
     it('should refuse to upgrade a proxy to an undeployed contract', async function() {
@@ -159,7 +159,7 @@ contract('update script', function([_skipped, owner, anotherAccount]) {
     describe('with local modifications', function () {
       beforeEach('changing local network file to have a different bytecode', async function () {
         const contracts = this.networkFile.contracts
-        contracts['Impl'].bytecodeHash = '0xabcd';
+        contracts['Impl'].localBytecodeHash = '0xabcd';
         this.networkFile.contracts = contracts
       });
 
@@ -190,7 +190,7 @@ contract('update script', function([_skipped, owner, anotherAccount]) {
       });
   
       it('should warn when not migrating a contract that inherits from one with a migrate method', async function() {
-        await update({ contractAlias: 'AnotherImpl', network, txParams, networkFile: this.networkFile });
+        await update({ contractAlias: 'WithLibraryImpl', network, txParams, networkFile: this.networkFile });
         this.logs.errors.should.have.lengthOf(1);
         this.logs.errors[0].should.match(/remember running the migration/i);
       });
@@ -201,7 +201,7 @@ contract('update script', function([_skipped, owner, anotherAccount]) {
       });
   
       it('should not warn when a contract has no migrate method', async function() {
-        await add({ contractsData: [{ name: 'AnotherImplV1', alias: 'NoMigrate' }], packageFile: this.packageFile });
+        await add({ contractsData: [{ name: 'WithLibraryImplV1', alias: 'NoMigrate' }], packageFile: this.packageFile });
         await push({ network, txParams, networkFile: this.networkFile });
 
         await update({ contractAlias: 'NoMigrate', network, txParams, networkFile: this.networkFile });
@@ -230,7 +230,7 @@ contract('update script', function([_skipped, owner, anotherAccount]) {
       const proxyAddress = this.networkFile.getProxies({ contract: 'Greeter'})[0].address;
       await update({ proxyAddress, network, txParams, networkFile: this.networkFile });
 
-      await assertProxyInfo(this.networkFile, 'Greeter', 0, { version: version_2, address: proxyAddress });
+      await assertProxyInfo(this.networkFile, 'Greeter', 0, { version: '1.2.0', address: proxyAddress });
       const upgradedProxy = await Greeter_V2.at(proxyAddress);
       (await upgradedProxy.version()).should.eq('1.2.0');
 
@@ -242,27 +242,27 @@ contract('update script', function([_skipped, owner, anotherAccount]) {
     it('should upgrade the version of all proxies given their name', async function() {
       await update({ packageName: 'mock-stdlib-undeployed-2', contractAlias: 'Greeter', network, txParams, networkFile: this.networkFile });
 
-      const { address: proxyAddress } = await assertProxyInfo(this.networkFile, 'Greeter', 0, { version: version_2 });
+      const { address: proxyAddress } = await assertProxyInfo(this.networkFile, 'Greeter', 0, { version: '1.2.0' });
       (await Greeter_V2.at(proxyAddress).version()).should.eq('1.2.0');
-      const { address: anotherProxyAddress } = await assertProxyInfo(this.networkFile, 'Greeter', 0, { version: version_2 });
+      const { address: anotherProxyAddress } = await assertProxyInfo(this.networkFile, 'Greeter', 0, { version: '1.2.0' });
       (await Greeter_V2.at(anotherProxyAddress).version()).should.eq('1.2.0');
     });
 
     it('should upgrade the version of all proxies given their package', async function() {
       await update({ packageName: 'mock-stdlib-undeployed-2', network, txParams, networkFile: this.networkFile });
 
-      const { address: proxyAddress } = await assertProxyInfo(this.networkFile, 'Greeter', 0, { version: version_2 });
+      const { address: proxyAddress } = await assertProxyInfo(this.networkFile, 'Greeter', 0, { version: '1.2.0' });
       (await Greeter_V2.at(proxyAddress).version()).should.eq('1.2.0');
-      const { address: anotherProxyAddress } = await assertProxyInfo(this.networkFile, 'Greeter', 0, { version: version_2 });
+      const { address: anotherProxyAddress } = await assertProxyInfo(this.networkFile, 'Greeter', 0, { version: '1.2.0' });
       (await Greeter_V2.at(anotherProxyAddress).version()).should.eq('1.2.0');
     });
 
     it('should upgrade the version of all proxies', async function() {
       await update({ network, txParams, all: true, networkFile: this.networkFile });
 
-      const { address: proxyAddress } = await assertProxyInfo(this.networkFile, 'Greeter', 0, { version: version_2 });
+      const { address: proxyAddress } = await assertProxyInfo(this.networkFile, 'Greeter', 0, { version: '1.2.0' });
       (await Greeter_V2.at(proxyAddress).version()).should.eq('1.2.0');
-      const { address: anotherProxyAddress } = await assertProxyInfo(this.networkFile, 'Greeter', 0, { version: version_2 });
+      const { address: anotherProxyAddress } = await assertProxyInfo(this.networkFile, 'Greeter', 0, { version: '1.2.0' });
       (await Greeter_V2.at(anotherProxyAddress).version()).should.eq('1.2.0');
     });
   };
@@ -270,6 +270,7 @@ contract('update script', function([_skipped, owner, anotherAccount]) {
   describe('on application contract', function () {
     beforeEach('setup package', async function() {
       this.packageFile = new ZosPackageFile('test/mocks/packages/package-empty.zos.json')
+      this.packageFile.version = version_1
     });
 
     shouldHandleUpdateScript();
@@ -278,7 +279,8 @@ contract('update script', function([_skipped, owner, anotherAccount]) {
   describe('on application contract in lightweight mode', function () {
     beforeEach('setup package', async function() {
       this.packageFile = new ZosPackageFile('test/mocks/packages/package-empty.zos.json')
-      this.packageFile.full = false
+      this.packageFile.publish = false
+      this.packageFile.version = version_1
     });
 
     shouldHandleUpdateScript();
@@ -287,6 +289,7 @@ contract('update script', function([_skipped, owner, anotherAccount]) {
   describe('on dependency contract', function () {
     beforeEach('setup package', async function() {
       this.packageFile = new ZosPackageFile('test/mocks/packages/package-with-undeployed-stdlib.zos.json')
+      this.packageFile.version = version_1;
     });
 
     shouldHandleUpdateOnDependency();
@@ -295,7 +298,8 @@ contract('update script', function([_skipped, owner, anotherAccount]) {
   describe('on dependency contract in lightweight mode', function () {
     beforeEach('setup package', async function() {
       this.packageFile = new ZosPackageFile('test/mocks/packages/package-with-undeployed-stdlib.zos.json')
-      this.packageFile.full = false
+      this.packageFile.publish = false
+      this.packageFile.version = version_1;
     });
 
     shouldHandleUpdateOnDependency();

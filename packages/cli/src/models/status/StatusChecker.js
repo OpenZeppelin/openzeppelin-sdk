@@ -1,7 +1,7 @@
 import _ from 'lodash'
 import { promisify } from 'util'
 
-import { Logger, LibProject, AppProject, bytecodeDigest, semanticVersionEqual } from 'zos-lib'
+import { Logger, LibProject, AppProject, bytecodeDigest, semanticVersionEqual, replaceSolidityLibAddress, isSolidityLib } from 'zos-lib'
 import EventsFilter from './EventsFilter'
 import StatusFetcher from './StatusFetcher'
 import StatusComparator from './StatusComparator'
@@ -96,7 +96,15 @@ export default class StatusChecker {
 
   async checkImplementations() {
     const implementationsInfo = await this._fetchOnChainImplementations()
-    await Promise.all(implementationsInfo.map(info => this._checkRemoteImplementation(info)))
+    await Promise.all(
+      implementationsInfo.map(async info => {
+        const { address } = info;
+        const bytecode = await promisify(web3.eth.getCode.bind(web3.eth))(address);
+        return isSolidityLib(bytecode) 
+          ? this._checkRemoteSolidityLibImplementation(info, bytecode) 
+          : this._checkRemoteContractImplementation(info, bytecode);
+      })
+    )
     this._checkUnregisteredLocalImplementations(implementationsInfo)
   }
 
@@ -106,23 +114,43 @@ export default class StatusChecker {
     this._checkUnregisteredLocalProxies(proxiesInfo)
   }
 
-  async _checkRemoteImplementation({ alias, address }) {
+  _checkRemoteContractImplementation({ alias, address }, bytecode) {
     if (this.networkFile.hasContract(alias)) {
-      this._checkImplementationAddress(alias, address)
-      await this._checkImplementationBytecode(alias, address)
+      this._checkContractImplementationAddress(alias, address)
+      this._checkContractImplementationBytecode(alias, address, bytecode)
     }
-    else this.visitor.onMissingRemoteContract('none', 'one', { alias, address })
+    else this.visitor.onMissingRemoteImplementation('none', 'one', { alias, address })
   }
 
-  _checkImplementationAddress(alias, address) {
+  _checkContractImplementationAddress(alias, address) {
     const expected = this.networkFile.contract(alias).address
-    if (address !== expected) this.visitor.onMismatchingContractAddress(expected, address, { alias, address })
+    if (address !== expected) this.visitor.onMismatchingImplementationAddress(expected, address, { alias, address })
   }
 
-  async _checkImplementationBytecode(alias, address) {
+  _checkContractImplementationBytecode(alias, address, bytecode) {
     const expected = this.networkFile.contract(alias).bodyBytecodeHash
-    const observed = bytecodeDigest(await promisify(web3.eth.getCode.bind(web3.eth))(address))
-    if (observed !== expected) this.visitor.onMismatchingContractBodyBytecode(expected, observed, { alias, address, bodyBytecodeHash: observed })
+    const observed = bytecodeDigest(bytecode)
+    if (observed !== expected) this.visitor.onMismatchingImplementationBodyBytecode(expected, observed, { alias, address, bodyBytecodeHash: observed })
+  }
+
+  _checkRemoteSolidityLibImplementation({ alias, address }, bytecode) {
+    if (this.networkFile.hasSolidityLib(alias)) {
+      this._checkSolidityLibImplementationAddress(alias, address)
+      this._checkSolidityLibImplementationBytecode(alias, address, bytecode)
+    }
+    //TODO: implement missing remote solidity libs validation
+    //else this.visitor.onMissingRemoteImplementation('none', 'one', { alias, address })
+  }
+
+  _checkSolidityLibImplementationAddress(alias, address) {
+    const expected = this.networkFile.solidityLib(alias).address
+    if (address !== expected) this.visitor.onMismatchingImplementationAddress(expected, address, { alias, address })
+  }
+
+  _checkSolidityLibImplementationBytecode(alias, address, bytecode) {
+    const expected = this.networkFile.solidityLib(alias).bodyBytecodeHash
+    const observed = bytecodeDigest(replaceSolidityLibAddress(bytecode, address))
+    if (observed !== expected) this.visitor.onMismatchingImplementationBodyBytecode(expected, observed, { alias, address, bodyBytecodeHash: observed })
   }
 
   _checkUnregisteredLocalImplementations(implementationsInfo) {
@@ -131,7 +159,7 @@ export default class StatusChecker {
       .filter(alias => !foundAliases.includes(alias))
       .forEach(alias => {
         const { address } = this.networkFile.contract(alias)
-        this.visitor.onUnregisteredLocalContract('one', 'none', { alias, address })
+        this.visitor.onUnregisteredLocalImplementation('one', 'none', { alias, address })
       })
   }
 
@@ -200,10 +228,12 @@ export default class StatusChecker {
     const directory = await this._project.getCurrentDirectory()
     const allEvents = await filter.call(directory.contract, 'ImplementationChanged')
     const contractsAlias = allEvents.map(event => event.args.contractName)
-    return allEvents
+    const events = allEvents
       .filter((event, index) => contractsAlias.lastIndexOf(event.args.contractName) === index)
       .filter(event => event.args.implementation !== ZERO_ADDRESS)
       .map(event => ({ alias: event.args.contractName, address: event.args.implementation }))
+
+    return events;
   }
 
   async _fetchOnChainProxies() {

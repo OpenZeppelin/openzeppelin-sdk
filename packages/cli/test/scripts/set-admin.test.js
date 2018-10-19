@@ -30,7 +30,7 @@ contract('set-admin script', function([_skipped, owner, newAdmin, anotherNewAdmi
 
       this.impl1 = await createProxy({ contractAlias: 'Impl', network, txParams, networkFile: this.networkFile });
       this.impl2 = await createProxy({ contractAlias: 'Impl', network, txParams, networkFile: this.networkFile });
-      this.anotherImpl = await createProxy({ contractAlias: 'AnotherImpl', network, txParams, networkFile: this.networkFile });
+      this.withLibraryImpl = await createProxy({ contractAlias: 'WithLibraryImpl', network, txParams, networkFile: this.networkFile });
     });
 
     it('changes admin of a proxy given its address', async function() {
@@ -38,7 +38,7 @@ contract('set-admin script', function([_skipped, owner, newAdmin, anotherNewAdmi
 
       await assertAdmin(this.impl1.address, newAdmin, this.networkFile)
       await assertAdmin(this.impl2.address, this.networkFile.appAddress, this.networkFile)
-      await assertAdmin(this.anotherImpl.address, this.networkFile.appAddress, this.networkFile)
+      await assertAdmin(this.withLibraryImpl.address, this.networkFile.appAddress, this.networkFile)
     });
 
     it('changes admin of several proxies given name', async function() {
@@ -46,7 +46,7 @@ contract('set-admin script', function([_skipped, owner, newAdmin, anotherNewAdmi
       
       await assertAdmin(this.impl1.address, newAdmin, this.networkFile)
       await assertAdmin(this.impl2.address, newAdmin, this.networkFile)
-      await assertAdmin(this.anotherImpl.address, this.networkFile.appAddress, this.networkFile)
+      await assertAdmin(this.withLibraryImpl.address, this.networkFile.appAddress, this.networkFile)
     });
 
     it('does not attempt to change admin of unowned proxy', async function() {
@@ -54,7 +54,7 @@ contract('set-admin script', function([_skipped, owner, newAdmin, anotherNewAdmi
       await setAdmin({ contractAlias: 'Impl', newAdmin: anotherNewAdmin, network, txParams, networkFile: this.networkFile });
       await assertAdmin(this.impl1.address, newAdmin, this.networkFile)
       await assertAdmin(this.impl2.address, anotherNewAdmin, this.networkFile)
-      await assertAdmin(this.anotherImpl.address, this.networkFile.appAddress, this.networkFile)
+      await assertAdmin(this.withLibraryImpl.address, this.networkFile.appAddress, this.networkFile)
     });
 
     it('refuses to update all proxies', async function () {

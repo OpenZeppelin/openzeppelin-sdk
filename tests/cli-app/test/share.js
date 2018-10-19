@@ -2,6 +2,7 @@ const { spawnSync } = require('child_process');
 const path = require('path');
 const fs = require('fs');
 const _ = require('lodash');
+const truffleConfig = require('../workdir/truffle')
 
 function getNetwork() {
   const network = process.env.NETWORK;
@@ -10,8 +11,10 @@ function getNetwork() {
 }
 
 function getProxyAddress(network, name, index) {
-  const fileName = path.resolve(__dirname, `../workdir/zos.${network}.json`)
+  const currentNetwork = truffleConfig.networks[network]
+  const fileName = path.resolve(__dirname, `../workdir/${getNetworkFileName(currentNetwork)}`)
   const data = JSON.parse(fs.readFileSync(fileName))
+
   if (!data.proxies || !data.proxies[name] || !data.proxies[name][index]) {
     throw new Error(`Could not find proxy ${name}/${index} in data`, data)
   }
@@ -25,7 +28,8 @@ function getProxyAddress(network, name, index) {
 }
 
 function getNetworkInfo(network) {
-  return JSON.parse(fs.readFileSync(path.resolve(__dirname, `../workdir/zos.${network}.json`)))
+  const currentNetwork = truffleConfig.networks[network]
+  return JSON.parse(fs.readFileSync(path.resolve(__dirname, `../workdir/${getNetworkFileName(currentNetwork)}`)))
 }
 
 function logOutput(out, err) {
@@ -38,8 +42,8 @@ function logCmd(cmd) {
   console.log("    $", cmd)
 }
 
-function execInWorkdir(cmd, wd = "") {
-  const output = spawnSync(cmd, { cwd: path.resolve(__dirname, '../workdir', wd), shell: true });
+function execInWorkdir(cmd) {
+  const output = spawnSync(cmd, { cwd: path.resolve(__dirname, '../workdir'), shell: true });
   if (output.status != 0 || output.error) {
     logOutput(output.stdout, output.stderr)
     throw new Error(`Error running ${cmd} (err ${output.status}) ${output.error}`);
@@ -56,15 +60,22 @@ function truffleExec(truffleCmd) {
   return _.trim(outputWithoutUsingNetwork)
 }
 
-function run(cmd, cwd = "") {
+function run(cmd) {
   logCmd(cmd)
-  const [out, err] = execInWorkdir(cmd, cwd)
+  const [out, err] = execInWorkdir(cmd)
   logOutput(out, err)
   return _.trim(out)
 }
 
 function copy(src, target) {
   fs.copyFileSync(path.resolve(__dirname, `../files/${src}`), path.resolve(__dirname, `../workdir/${target}`));
+}
+
+function getNetworkFileName(currentNetwork) {
+  const { network_id: networkId } = currentNetwork
+  const name = networkId === '4' ? 'rinkeby' : `dev-${networkId}`
+
+  return `zos.${name}.json`
 }
 
 module.exports = {

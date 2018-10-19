@@ -3,16 +3,17 @@ import NetworkAppController from '../network/NetworkAppController';
 import Dependency from '../dependency/Dependency';
 
 export default class LocalAppController extends LocalBaseController {
-  init(name, version, force = false, full = false) {
+  init(name, version, force = false, publish = false) {
     super.init(name, version, force)
-    if (full) this.packageFile.full = full
+    if (publish) this.packageFile.publish = publish
   }
 
   async linkLibs(libs, installLibs = false) {
     await Promise.all(libs.map(async libNameVersion => {
-      const dependency = Dependency.fromNameWithVersion(libNameVersion)
-      if (installLibs) await dependency.install()
-      this.packageFile.setDependency(dependency.name, dependency.requirement)
+      const dependency = installLibs
+        ? await Dependency.install(libNameVersion)
+        : Dependency.fromNameWithVersion(libNameVersion);
+      this.packageFile.setDependency(dependency.name, dependency.requirement);
     }))
   }
 

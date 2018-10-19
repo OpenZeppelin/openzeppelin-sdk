@@ -13,14 +13,14 @@ contract('unlink script', function() {
     it('throws an error if no libs are provided', async function () {
       const libNames = []
       await unlink({ libNames, packageFile: this.packageFile })
-        .should.be.rejectedWith('At least one library name must be provided.')
+        .should.be.rejectedWith('At least one dependency name must be provided.')
     })
 
     it('throws an error if project is a library', async function () {
       this.packageFile.lib = true
       const libNames = ['mock-stdlib', 'mock-stdlib-2']
       await unlink({ libNames, packageFile: this.packageFile })
-        .should.be.rejectedWith('Libraries do not use stdlibs.')
+        .should.be.rejectedWith('Package projects cannot use other packages.')
     })
 
     it('throws an error if project library does not exist', async function () {

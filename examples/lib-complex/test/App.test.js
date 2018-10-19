@@ -42,7 +42,7 @@ contract('App', ([_, owner, donor, wallet]) => {
       this.directory = await this.project.getCurrentDirectory();
       this.donations = await deploy.deployVersion1(this.project, owner);
     });
-    
+
     describe('directory', function() {
       describe('when queried for the implementation', function() {
         it('returns a valid address', async function() {
@@ -58,9 +58,6 @@ contract('App', ([_, owner, donor, wallet]) => {
   });
 
   describe('version 0.0.2', function() {
-    const tokenName = 'DonationToken';
-    const tokenSymbol = 'DON';
-
     beforeEach(async function() {
       this.project = await deploy.setupApp({owner});
       this.donations = await deploy.deployVersion1(this.project, owner);
@@ -71,7 +68,7 @@ contract('App', ([_, owner, donor, wallet]) => {
     // TODO: check that token owner is donations
 
     describe('implementation', function() {
-      shouldBehaveLikeDonationsWithTokens(owner, donor, wallet, tokenName, tokenSymbol);
+      shouldBehaveLikeDonationsWithTokens(owner, donor, wallet);
     });
   });
 });

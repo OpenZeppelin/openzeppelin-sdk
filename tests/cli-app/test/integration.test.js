@@ -21,7 +21,7 @@ function runIntegrationTest({ lightweight }) {
   registerProjectHooks(network);
 
   it('initialize zos', function () {
-    const flags = lightweight ? '' : '--full';
+    const flags = lightweight ? '' : '--publish';
     run(`npx zos init cli-app 0.5.0 ${flags}`)
   })
 
@@ -35,7 +35,7 @@ function runIntegrationTest({ lightweight }) {
   })
 
   it('pushes to network', function () {
-    run(`npx zos push --network ${network} --from ${this.from} --deploy-libs --skip-compile`)
+    run(`npx zos push --network ${network} --from ${this.from} --deploy-dependencies --skip-compile`)
   })
 
   it('creates an instance', function () {
@@ -49,14 +49,6 @@ function runIntegrationTest({ lightweight }) {
     run(`npx zos create GreeterWrapper --init --args "${tokenAddress}" --network ${network} --from ${this.from}`)
     truffleExec(`run.js cli-app/GreeterWrapper 0 say --network ${network} --from ${this.from}`).should.eq('Alice')
     truffleExec(`run.js cli-app/GreeterWrapper 0 iteration --network ${network}`).should.eq('1')
-  })
-
-  it('creates an instance from a dependency from inside a subfolder', function () {
-    run(`npx zos create mock-stdlib/Greeter --init --args "Alice" --network ${network} --from ${this.from}`, "contracts")
-    const tokenAddress = getProxyAddress(network, 'mock-stdlib/Greeter', 1)
-    run(`npx zos create GreeterWrapper --init --args "${tokenAddress}" --network ${network} --from ${this.from}`)
-    truffleExec(`run.js cli-app/GreeterWrapper 1 say --network ${network} --from ${this.from}`).should.eq('Alice')
-    truffleExec(`run.js cli-app/GreeterWrapper 1 iteration --network ${network}`).should.eq('1')
   })
 
   it('modifies and pushes a contract', function () {
@@ -83,11 +75,11 @@ function runIntegrationTest({ lightweight }) {
   it('upgrades a dependency', function () {
     copy('GreeterWrapperV2.sol', 'contracts/GreeterWrapper.sol')
     run(`npx truffle compile`)
-    run(`npx zos push --deploy-libs --network ${network} --from ${this.from} --skip-compile`)
+    run(`npx zos push --deploy-dependencies --network ${network} --from ${this.from} --skip-compile`)
     run(`npx zos update mock-stdlib/Greeter --network ${network} --from ${this.from}`)
     truffleExec(`run.js cli-app/GreeterWrapper 0 iteration --network ${network}`).should.eq('2')
     run(`npx zos update GreeterWrapper --network ${network} --from ${this.from}`)
-    truffleExec(`run.js cli-app/GreeterWrapper 0 iteration --network ${network}`).should.eq('12')
+    truffleExec(`run.js cli-app/GreeterWrapper 0 iteration --network ${network}`).should.eq('17') // 2 (minor) * 3 (triple) + 1 (triple v2) + 10 (wrapper v2)
   })
 };
 
