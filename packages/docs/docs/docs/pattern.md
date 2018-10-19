@@ -1,11 +1,11 @@
 ---
-id: proxies
-title: Proxy Pattern
+id: pattern
+title: The ZeppelinOS Upgrades Pattern
 ---
 
 This article describes the "unstructured storage" proxy pattern, the fundamental building block of ZeppelinOS's upgrades.
 
-Note: For a more in depth read, please see [blog.zeppelinos.org/proxy-patterns](https://blog.zeppelinos.org/proxy-patterns/), which discusses the need for proxies, goes into more technical detail on the subject, elaborates on other possible proxy patterns that were considered for zOS, and more.
+> Note: For a more in depth read, please see [blog.zeppelinos.org/proxy-patterns](https://blog.zeppelinos.org/proxy-patterns/), which discusses the need for proxies, goes into more technical detail on the subject, elaborates on other possible proxy patterns that were considered for zOS, and more.
 
 ## Why upgrade a contract?
 
@@ -39,7 +39,7 @@ assembly {
 }
 ```
 
-This code can be put in the [fallback function](https://solidity.readthedocs.io/en/v0.4.21/contracts.html#fallback-function) of a proxy, and will forward any call to any function with any set of parameters to the logic contract without it needing to know anything in particular of the logic contract's interface. In essence, (1) the `calldata` is copied to memory, (2) the call is forwarded to the logic contract, (3) the return data from the call to the logic contract is retrieved, and (4) the returned data is forwarded back to the caller. The technique needs to be implemented using Yul because [Solidity's `delegatecall`](https://solidity.readthedocs.io/en/v0.4.21/introduction-to-smart-contracts.html#delegatecall-callcode-and-libraries) returns a boolean instead of the callee's return data. 
+This code can be put in the [fallback function](https://solidity.readthedocs.io/en/v0.4.21/contracts.html#fallback-function) of a proxy, and will forward any call to any function with any set of parameters to the logic contract without it needing to know anything in particular of the logic contract's interface. In essence, (1) the `calldata` is copied to memory, (2) the call is forwarded to the logic contract, (3) the return data from the call to the logic contract is retrieved, and (4) the returned data is forwarded back to the caller. The technique needs to be implemented using Yul because [Solidity's `delegatecall`](https://solidity.readthedocs.io/en/v0.4.21/introduction-to-smart-contracts.html#delegatecall-callcode-and-libraries) returns a boolean instead of the callee's return data.
 
 A very important thing to note is that the code makes use of the EVM's `delegatecall` opcode which executes the callee's code in the context of the caller's state. That is, the logic contract controls the proxy's state and the logic contract's state is meaningless. Thus, the proxy doesn't only forward transactions to and from the logic contract, but also represents the pair's state. The state is in the proxy and the logic is in the particular implementation that the proxy points to.
 
@@ -69,7 +69,7 @@ There are many ways to overcome this problem, and the "unstructured storage" app
 |address _implementation   |                         | <=== Randomized slot.
 |...                       |                         |
 |...                       |                         |
-   
+
 An example of how the randomized storage is achieved:
 
 ```
@@ -96,7 +96,7 @@ As discussed, the unstructured approach avoids storage collisions between the lo
 
 |Implementation_v0   |Implementation_v1        |
 |--------------------|-------------------------|
-|address _owner      |address _owner           | 
+|address _owner      |address _owner           |
 |mapping _balances   |mapping _balances        |
 |uint256 _supply     |uint256 _supply          |
 |...                 |address _lastContributor | <=== Storage extension.

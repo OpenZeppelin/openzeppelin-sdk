@@ -1,119 +1,12 @@
 ---
-id: advanced
-title: Advanced topics
+id: configuration
+title: Configuration Files
 ---
 
-We expand on several advanced topics for the more intrepid users of ZeppelinOS.
-
-## Deploying to mainnet
-The [Building upgradeable applications](building.md) guide explains how to
-deploy an application to a local network, which is very good for testing.
-Once you are happy with your initial contracts, you can deploy them to mainnet
-using the `--network` flag.
-
-This flag takes the network details from the Truffle configuration file. You
-can use Infura to connect to mainnet, with a `truffle-config.js` like this one:
-
-```
-'use strict';
-
-var HDWalletProvider = require("truffle-hdwallet-provider");
-
-var mnemonic = "orange apple banana ... ";
-
-module.exports = {
-  networks: {
-    mainnet: {
-      provider: function() {
-        return new HDWalletProvider(mnemonic, "https://mainnet.infura.io/<INFURA_Access_Token>")
-      },
-      network_id: 1
-    }
-  }
-};
-```
-
-Make sure to replace the `mnemonic` with the one you used to generate your
-accounts, and change `<INFURA_Access_Token>` to your token.
-
-Install the `truffle-hdwallet-provider` module with:
-
-```
-npm install truffle-hdwallet-provider
-```
-
-And now you can run `zos` commands in mainnet. For example:
-
-```
-zos push --network mainnet
-```
-
-This will use your first account generated from the mnemonic. If you want to
-specify a different account, use the `--from` flag.
-
-Here you will find a
-[guide with more details about configuring Truffle to use Infura](http://truffleframework.com/tutorials/using-infura-custom-provider).
-You can use other test networks like ropsten to further test your contracts
-before pushing them to mainnet. But remember that now your contracts are
-upgradeable! Even if you find a bug after deploying them to mainnet, you will
-be able to fix it without losing the contract state and in a way that's
-transparent for your users.
-
-#### Calling Initialize Functions Manually in Your Unit Tests
-
-Truffle does not know how to resolve situations where a contract has functions that have matching names, but different arities. Here's an example of a `TimedCrowdsale` contract that inherits from `Crowdsale` which results in a contract that has two `initialize` functions with different arities:
-
-```
-contract TimedCrowdsale is Crowdsale {
-
-  initialize(uint256 _openingTime, uint256 _closingTime)
-    public
-    isInitializer("TimedCrowdsale", "0.0.1")
-  {
-    Crowdsale.initialize(_rate, _wallet, _token);
-  }
-}
-
-contract Crowdsale {
-
-  initialize(uint256 _rate, address _wallet, ERC20 _token)
-    public
-    isInitializer("Crowdsale", "0.0.1")
-  {
-    // does something
-  }
-}
-```
-
-This means that calls to contracts with more than one function named `initialize`, as is the case with some contracts from OpenZeppelin (e.g., TimedCrowdsale), may revert if you call `initialize` directly from Truffle. `zos create` handles this correctly as it encodes the parameters. However, for your unit tests you will need to call `initialize` manually.
-
-The current solution to this issue is to `npm install zos-lib` and use the same helper function `zos create` uses: `encodeCall`. `encodeCall` receives the signature of your `initialize` function, as well as its arguments and their types. It then crafts the calldata which you can send in a raw call. Here's an example:
-
-```
-data = encodeCall(
-    "initialize",
-    ['address', 'string', 'string', 'uint8', 'address'],
-    [owner, name, symbol, decimals, exampleToken.address]
-);
-
-await exampleToken.sendTransaction( {data, from: owner} );
-```
-## Safety checks
-
-The ZeppelinOS CLI performs a series of safety checks in some of its commands with the purpose of strengthening the security of your projects. For example, the `zos add` command can detect if a contract has a `constructor`, or contains usages of `selfdestruct` or `delegatecall`. Below is a list of some of the checks made, along with the reasoning behind why they are considered to be security risks.
-
-**Some validation examples:**
-* constructor check: Proxied contracts should use initializer functions instead of constructors. For more info, see [Initializers vs. constructors](https://docs.zeppelinos.org/docs/advanced.html#initializers-vs-constructors) in this page.
-* selfdestruct check: Solidity's `selfdestruct` keyword ends the execution of a contract, destroys it, and sends all of its funds to a specified account. This is a very delicate action to take, and can expose a contract to vulnerabilities such as the [second Parity Wallet hack](https://blog.zeppelinos.org/parity-wallet-hack-reloaded/). It should be used with extreme care.
-* delegatecall check: The `delegatecall` keyword fully exposes a contract's state to a 3rd party contract. Such a contract has complete control on the calling contract. It should only be used if you really know [hat you're doing.
-
-When such validation checks fail, the ZeppelinOS CLI will not performs any actions unless the `--force` option is used. If so, the CLI will perform the actions and try to remember your choice in future occasions.
-
-## Format of `zos.json` and `zos.<network>.json` files
 ZeppelinOS's CLI generates `json` files where it stores the configuration of your project.
 
 
-### `zos.json`
+## `zos.json`
 The first file stores the general configuration and is created by the `zos init` command. It has the following structure:
 
 ```json
@@ -135,7 +28,7 @@ The first file stores the general configuration and is created by the `zos init`
 Here, `<projectName>` is the name of the project, and `<version>` is the current version number. Once you start adding your contracts via `zos add`, they will be recorded under the `"contracts"` field, with the contract aliases as the keys (which default to the contract names), and the contract names as the values. Finally, if you link an `stdlib` with `zos link`, this will be reflected in the `"stdlib"` field, where `<stdlibName>` is the name of the linked `EVM Package`.
 
 
-### `zos.<network>.json`
+## `zos.<network>.json`
 ZeppelinOS will also generate a file for each of the networks you work on (`local`, `ropsten`, `live`, ... These should be configured [in your `truffle.js` file](http://truffleframework.com/docs/advanced/configuration#networks), but note that `zos init` already configures the `local` network, which can be run by `npx truffle develop`). These files share the same structure:
 
 ```json

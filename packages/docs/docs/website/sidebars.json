@@ -3,26 +3,22 @@
     "OVERVIEW": [
       "start"
     ],
+    "QUICKSTART": [
+      "deploying",
+      "upgrading",
+      "linking",
+      "publishing",
+    ],
     "GUIDES": [
-      "setup",
-      "building",
-      "using",
-      "developing",
       "writing_contracts",
-      "testing"
-    ],
-    "ADVANCED GUIDES": [
+      "testing",
       "erc20_onboarding",
-      "upgradeability_governance"
+      "upgradeability_governance",
+      "zos_lib"
     ],
-    "ZOS-LIB": [
-      "libstart",
-      "low_level_contract",
-      "low_level_app"
-    ],
-    "FURTHER REFERENCE": [
-      "stdlib",
-      "advanced",
+    "Advanced Topics": [
+      "pattern",
+      "configuration",
       "whitepaper"
     ]
   },
