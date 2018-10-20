@@ -19,14 +19,23 @@ const { ZosPackageFile } = files
 export default async function verify({ network, txParams }) {
   log.info(`Verifying vouching app on network ${ network }...`)
   const networkFile = (new ZosPackageFile()).networkFile(network)
-  const successfulApp = await verifyAppSetup(networkFile)
-  const successfulJurisdiction = successfulApp && await verifyJurisdiction(networkFile, txParams)
-  const successfulZepToken = successfulJurisdiction && await verifyZEPToken(networkFile, txParams)
-  const successfulVouching = successfulZepToken && await verifyVouching(networkFile, txParams)
-  const successfulValidator = successfulVouching && await verifyOrganizationsValidator(networkFile, txParams)
-  const successfulConfiguration = successfulValidator && await verifyTPLConfiguration(networkFile, txParams)
-  if (successfulConfiguration) log.info('\n\nVouching app was deployed and configured successfully!')
-  else log.error('\n\nCould not complete verification process since there are required previous steps not completed.')
+  if (await verifyAppSetup(networkFile)) {
+    const successfulJurisdiction = await verifyJurisdiction(networkFile, txParams)
+    const successfulZepToken = await verifyZEPToken(networkFile, txParams)
+    const successfulVouching = await verifyVouching(networkFile, txParams)
+    const successfulValidator = await verifyOrganizationsValidator(networkFile, txParams)
+    const successfulConfiguration = await verifyTPLConfiguration(networkFile, txParams)
+
+    if (successfulJurisdiction && successfulZepToken && successfulVouching && successfulValidator && successfulConfiguration) {
+      log.info('\n\nVouching app was deployed and configured successfully!')
+    }
+    else {
+      log.error('\n\nCould not complete verification process since there are required previous steps not completed.')
+    }
+  }
+  else {
+    log.error('\n\nCould not complete verification process since there are required previous steps not completed.')
+  }
 }
 
 export async function verifyAppSetup(networkFile) {
