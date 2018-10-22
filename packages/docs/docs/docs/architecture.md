@@ -3,21 +3,13 @@ id: architecture
 title: Contract Architecture
 ---
 
-ZeppelinOS's features such as upgrades, EVM package linking, and vouching, can all be used independently as standalone components using the CLI. However, they can all be tied together when using the CLI with the `--full` option:
+ZeppelinOS's features such as upgrades, EVM package linking, and vouching, can all be used through the `zos` CLI without extra contracts. However, some additional smart contracts get into play when you want to publish your EVM package for others to reuse, calling:
 
 ```bash
-zos init --full
+zos publish
 ```
 
-or
-
-```bash
-zos push --full
-```
-
-When this option is used, your ZeppelinOS project is managed by a set of smart contracts that can be found in [zos/packages/lib/contracts/application](https://github.com/zeppelinos/zos/tree/master/packages/lib/contracts/application). It is important to understand that these contracts are not strictly necessary to work with ZeppelinOS, however, they provide a lot of convenience for projects that intend to become EVM packages or base their entire architecture on ZeppelinOS.
-
-In the following sections, we describe the general architecture of a ZeppelinOS full project's contracts.
+When publishing, your ZeppelinOS project will be backed by a set of smart contracts that can be found in [zos/packages/lib/contracts/application](https://github.com/zeppelinos/zos/tree/master/packages/lib/contracts/application). In the following sections, we describe the general architecture of a ZeppelinOS published EVM package.
 
 ## [App.sol](https://github.com/zeppelinos/zos/blob/master/packages/lib/contracts/application/App.sol)
 
@@ -29,11 +21,11 @@ The providers are mapped by name to `ProviderInfo` structs:
 ```solidity
 
   //...
-  
+
   mapping(string => ProviderInfo) internal providers;
-  
+
   // ...
-  
+
   struct ProviderInfo {
     Package package;
     uint64[3] version;
@@ -57,16 +49,16 @@ The versions are mapped by a semver hash to `Version` structs:
 #### Package.sol
 ```solidity
 
-  // .. 
+  // ..
 
   mapping (bytes32 => Version) internal versions;
 
-  // .. 
+  // ..
 
   struct Version {
     uint64[3] semanticVersion;
     address contractAddress;
-    bytes contentURI; 
+    bytes contentURI;
   }
 
   // ..
@@ -77,13 +69,13 @@ The versions are mapped by a semver hash to `Version` structs:
 A version's `contractAddress` is an instance of the `ImplementationDirectory` contract, which is basically a mapping of contract aliases (or names) to deployed implementation instances. Continuing the example, your project's "my-application" package for version "0.0.1" could contain a directory with the following contracts:
 
 **Directory for version "0.0.1" of the "my-application" package**
-* Alias: "MainContract", Implementation: "0x0B06339ad63A875D4874dB7B7C921012BbFfe943" 
+* Alias: "MainContract", Implementation: "0x0B06339ad63A875D4874dB7B7C921012BbFfe943"
 * Alias: "MyToken", Implementation: "0x1b9a62585255981c85Acec022cDaC701132884f7"
 
 While version "0.0.2" of the "my-application" package could look like this:
 
 **Directory for version "0.0.2" of the "my-application" package**
-* Alias: "MainContract", Implementation: "0x0B06339ad63A875D4874dB7B7C921012BbFfe943" 
+* Alias: "MainContract", Implementation: "0x0B06339ad63A875D4874dB7B7C921012BbFfe943"
 * Alias: "MyToken", Implementation: "0x724a43099d375e36c07be60c967b8bbbec985dc8" <--- this changed
 
 Notice how version "0.0.2" uses a new implementation for the "MyToken" contract.
@@ -97,6 +89,6 @@ Other implementations of the interface could provide contracts without such a li
 
 ## Overview
 
-The following diagram illustrates the interface of the application contracts:
+The following diagram illustrates the interface of the contracts of published EVM packages:
 
 ![zOS 2.x UML](img/zos2.png)
