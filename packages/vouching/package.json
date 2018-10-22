@@ -17,8 +17,8 @@
     "verify-ropsten": "node ./lib/bin/verify.js --network=ropsten --from=0x09902a56d04a9446601a0d451e07459dc5af0820",
     "deploy-rinkeby": "node ./lib/bin/deploy.js --network=rinkeby --from=0xd97709745693eac4bb09b20ee1cf8a78dca53be5",
     "verify-rinkeby": "node ./lib/bin/verify.js --network=rinkeby --from=0xd97709745693eac4bb09b20ee1cf8a78dca53be5",
-    "deploy-mainnet": "node ./lib/bin/deploy.js --network=mainnet --from=0xe373e9855dadeb9ce76d2c5f5484d93699acb735",
-    "verify-mainnet": "node ./lib/bin/verify.js --network=mainnet --from=0xe373e9855dadeb9ce76d2c5f5484d93699acb735"
+    "deploy-mainnet": "node ./lib/bin/deploy.js --network=mainnet --from=0xb048fb85aee554d26d11f65a67412923fafce082",
+    "verify-mainnet": "node ./lib/bin/verify.js --network=mainnet --from=0xb048fb85aee554d26d11f65a67412923fafce082"
   },
   "files": [
     "lib",
