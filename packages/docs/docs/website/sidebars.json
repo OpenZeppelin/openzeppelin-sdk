@@ -10,6 +10,7 @@
       "publishing",
     ],
     "GUIDES": [
+      "new_2.x",
       "writing_contracts",
       "testing",
       "erc20_onboarding",
