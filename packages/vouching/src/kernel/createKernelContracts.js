@@ -105,7 +105,7 @@ export async function createVouching(zepToken, options, networkFile) {
   const initMethod = 'initialize'
   const initArgs = [VOUCHING_MIN_STAKE, zepToken.address]
   try {
-    const vouching = await create({packageName, contractAlias, initMethod, initArgs, ...options})
+    const vouching = await create({ packageName, contractAlias, initMethod, initArgs, ...options })
     log.info(` ✔ Vouching created at ${vouching.address}`)
     return vouching
   } catch (error) {

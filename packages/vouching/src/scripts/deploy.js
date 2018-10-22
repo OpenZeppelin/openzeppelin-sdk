@@ -10,7 +10,7 @@ const { push, session } = scripts
 export default async function deploy(options) {
   const oneDay = 60 * 60 * 24
   session({ expires: oneDay, ...options })
-  log.base(`Pushing ZeppelinOS app with options ${JSON.stringify(options, null, 2)}...`)
+  log.base(`Pushing vouching app with options ${JSON.stringify(options, null, 2)}...`)
   const deployLibs = true // ZeppelinOS only deploys requested packages if those are not deployed
   await push({ deployLibs, ...options })
   stdout.silent(true)

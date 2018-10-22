@@ -35,7 +35,7 @@ export default class AppProject extends BasePackageProject {
       project.package = thepackage
       return project
     } catch(deployError) {
-      throw new DeployError(deployError.message, { thepackage, directory, app })
+      throw new DeployError(deployError, { thepackage, directory, app })
     }
   }
 
