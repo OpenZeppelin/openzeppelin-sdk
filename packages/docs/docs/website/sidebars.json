@@ -1,25 +1,26 @@
 {
   "docs": {
     "OVERVIEW": [
-      "start"
+      "start",
+      "new_2.x"
     ],
     "QUICKSTART": [
       "deploying",
       "upgrading",
       "linking",
-      "publishing",
+      "publishing"
     ],
     "GUIDES": [
-      "new_2.x",
       "writing_contracts",
       "testing",
       "erc20_onboarding",
       "upgradeability_governance",
       "zos_lib"
     ],
-    "Advanced Topics": [
-      "pattern",
+    "ADVANCED TOPICS": [
       "configuration",
+      "architecture",
+      "pattern",
       "whitepaper"
     ]
   },

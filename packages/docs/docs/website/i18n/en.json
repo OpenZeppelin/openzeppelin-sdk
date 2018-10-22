@@ -23,6 +23,7 @@
     "upgradeability_UpgradeabilityProxyFactory": "UpgradeabilityProxyFactory",
     "apis": "Reference",
     "Start here": "Start here",
+    "architecture": "Contract Architecture",
     "building": "Building an upgradeable application",
     "Building an upgradeable app": "Building an upgradeable app",
     "cli_add": "add",
@@ -86,9 +87,7 @@
     "APPLICATION / VERSIONING": "APPLICATION / VERSIONING",
     "MIGRATIONS": "MIGRATIONS",
     "UPGRADEABILITY": "UPGRADEABILITY",
-    "DEMOS": "DEMOS",
-    "ONBOARDING LEGACY CONTRACTS": "ONBOARDING LEGACY CONTRACTS",
-    "FURTHER REFERENCE": "FURTHER REFERENCE"
+    "ONBOARDING LEGACY CONTRACTS": "ONBOARDING LEGACY CONTRACTS"
   },
   "pages-strings": {
     "Help Translate|recruit community translators for your project": "Help Translate",
