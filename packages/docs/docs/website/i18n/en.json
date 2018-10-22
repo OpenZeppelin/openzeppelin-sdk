@@ -5,7 +5,6 @@
     "previous": "Previous",
     "tagline": "ZeppelinOS, securely develop and manage any smart contract application",
     "advanced": "Advanced topics",
-    "migrate_from_1.x_to_2.x": "Migrating to 2.x",
     "application_AppDirectory": "AppDirectory",
     "application_BaseApp": "BaseApp",
     "application_PackagedApp": "PackagedApp",
