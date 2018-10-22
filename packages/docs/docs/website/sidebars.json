@@ -9,7 +9,8 @@
       "using",
       "developing",
       "writing_contracts",
-      "testing"
+      "testing",
+      "new_2.x"
     ],
     "ADVANCED GUIDES": [
       "erc20_onboarding",
