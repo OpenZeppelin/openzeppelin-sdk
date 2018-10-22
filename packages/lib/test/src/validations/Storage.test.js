@@ -306,7 +306,7 @@ contract('Storage', () => {
   })
 
   describe('#getStructsOrEnums', function () {
-    it('returns all structs and enums', function () {
+    it('returns all structs and enums from complex contract', function () {
       const storageInfo = getStorageLayout(Contracts.getFromLib('StorageMockMixed'))
       const result = getStructsOrEnums(storageInfo)
       const resultVarNames = result.map(variable => variable.label)
@@ -322,5 +322,36 @@ contract('Storage', () => {
         'my_enum_mapping',
       ])
     })
+
+    it('returns none from mappings contract', function () {
+      const storageInfo = getStorageLayout(Contracts.getFromLib('StorageMockWithMappings'))
+      const result = getStructsOrEnums(storageInfo)
+      const resultVarNames = result.map(variable => variable.label)
+
+      resultVarNames.should.be.deep.eq([])
+    })
+
+    it('returns none from arrays contract', function () {
+      const storageInfo = getStorageLayout(Contracts.getFromLib('StorageMockWithArrays'))
+      const result = getStructsOrEnums(storageInfo)
+      const resultVarNames = result.map(variable => variable.label)
+
+      resultVarNames.should.be.deep.eq([])
+    })
+
+    it('returns struct from structs contract', function () {
+      const storageInfo = getStorageLayout(Contracts.getFromLib('StorageMockWithStructs'))
+      const result = getStructsOrEnums(storageInfo)
+      const resultVarNames = result.map(variable => variable.label)
+
+      resultVarNames.should.be.deep.eq([
+        "my_struct",
+        "my_struct_dynarray",
+        "my_struct_staticarray",
+        "my_struct_mapping"
+      ])
+    })
   });
 })
+
+

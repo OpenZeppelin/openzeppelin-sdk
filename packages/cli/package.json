@@ -1,29 +1,31 @@
 {
   "name": "zos",
-  "version": "2.0.0-alpha.8",
-  "description": "ZeppelinOS command line interface",
-  "main": "lib/index.js",
+  "version": "2.0.0",
+  "description": "Command-line interface for the ZeppelinOS smart contract platform",
+  "main": "./lib/index.js",
+  "private": false,
+  "license": "MIT",
   "scripts": {
     "prepare": "rm -rf lib && babel src --out-dir lib",
     "test": "./scripts/test.sh",
-    "gen-docs": "babel-node docs/bin/docs.js"
+    "gen-docs": "babel-node docs/bin/docs.js",
+    "watch": "babel src -w -d lib"
   },
   "bin": {
     "zos": "./lib/bin/zos-cli.js"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+ssh://git@github.com/zeppelinos/zos.git"
-  },
+  "files": [
+    "lib"
+  ],
   "keywords": [
     "zos",
     "zeppelinos",
     "cli"
   ],
-  "files": [
-    "lib"
-  ],
-  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/zeppelinos/zos.git"
+  },
   "bugs": {
     "url": "https://github.com/zeppelinos/zos/issues"
   },
@@ -43,7 +45,7 @@
     "truffle-core": "^4.1.13",
     "truffle-workflow-compile": "^1.0.6",
     "web3-provider-engine": "14.0.6",
-    "zos-lib": "^2.0.0-alpha.8"
+    "zos-lib": "^2.0.0"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",

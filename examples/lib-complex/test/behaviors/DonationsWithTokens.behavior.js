@@ -8,16 +8,8 @@ export default function(owner, donor, wallet, tokenName, tokenSymbol) {
   shouldBehaveLikeDonations(owner, donor, wallet);
 
   describe('token', function() {
-    it('is owned by the contract', async function() {
-      (await this.token.owner()).should.be.eq(this.donations.address);
-    });
-
-    it('has the correct token name', async function() {
-      (await this.token.name()).should.be.eq(tokenName);
-    });
-
-    it('has the correct token symbol', async function() {
-      (await this.token.symbol()).should.be.eq(tokenSymbol);
+    it('is mintable by the contract', async function() {
+      (await this.token.isMinter(this.donations.address)).should.equal(true);
     });
 
     it('cannot be set a second time', async function() {

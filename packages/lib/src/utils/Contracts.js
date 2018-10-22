@@ -99,6 +99,7 @@ export default {
     contract.setProvider(web3.currentProvider)
     contract.defaults({ from: web3.eth.accounts[0], ... defaults })
     contract.synchronization_timeout = syncTimeout
+    contract.setNetwork('test')
     return contract
   },
 }

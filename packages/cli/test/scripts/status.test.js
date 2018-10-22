@@ -18,7 +18,7 @@ contract('status script', function([_, owner]) {
   const contractName = 'ImplV1';
   const contractAlias = 'Impl';
   const contractsData = [{ name: contractName, alias: contractAlias }]
-  const anotherContractName = 'AnotherImplV1';
+  const anotherContractName = 'WithLibraryImplV1';
   const libs = ['mock-stdlib@1.1.0'];
   
   beforeEach('setup', async function() {
@@ -65,7 +65,7 @@ contract('status script', function([_, owner]) {
         await push({ network, txParams, networkFile: this.networkFile });
         await this.capturingLogs(status({ network, networkFile: this.networkFile }));
 
-        this.logs.text.should.match(/library package is deployed at 0x[0-9a-fA-F]{40}/i);
+        this.logs.text.should.match(/Dependency package is deployed at 0x[0-9a-fA-F]{40}/i);
       });
     });
   };
@@ -99,7 +99,7 @@ contract('status script', function([_, owner]) {
         await add({ contractsData: [{ name: anotherContractName }], packageFile: this.packageFile });
         await this.capturingLogs(status({ network, networkFile: this.networkFile }));
 
-        this.logs.text.should.match(/AnotherImplV1/i);
+        this.logs.text.should.match(/WithLibraryImplV1/i);
         this.logs.text.should.not.match(/implemented by/i);
       });  
 
@@ -253,7 +253,7 @@ contract('status script', function([_, owner]) {
   describe('on lightweight app project', function () {
     beforeEach('creating package and network files', function () {
       this.packageFile = new ZosPackageFile('test/mocks/packages/package-empty.zos.json')
-      this.packageFile.full = false
+      this.packageFile.publish = false
       this.networkFile = this.packageFile.networkFile(network)
     })
 

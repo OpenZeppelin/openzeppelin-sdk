@@ -10,11 +10,9 @@ import { hasInitialValuesInDeclarations } from './InitialValues';
 
 const log = new Logger('validate')
 
-// TODO: Add unit tests for this module. It is tested only from the CLI.
-
 export function validate(contractClass, existingContractInfo = {}, buildArtifacts = null) {
   const storageValidation = validateStorage(contractClass, existingContractInfo, buildArtifacts);
-  const uninitializedBaseContracts = tryGetUninitializedBaseContracts(contractClass);
+  const uninitializedBaseContracts = [];
 
   return {
     hasConstructor: hasConstructor(contractClass),
@@ -84,7 +82,7 @@ function tryGetUninitializedBaseContracts(contractClass) {
   try {
     return _(getUninitializedBaseContracts(contractClass)).values().flatten().uniq().value()
   } catch (error) {
-    log.error(`Skipping uninitialized base contracts validation due to error: ${error.message}`)
+    log.error(`- Skipping uninitialized base contracts validation due to error: ${error.message}`)
     return []
   }
 }

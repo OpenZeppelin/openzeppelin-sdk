@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import { Contracts, Logger, flattenSourceCode, getStorageLayout, getBuildArtifacts } from 'zos-lib';
+import { Contracts, Logger, flattenSourceCode, getStorageLayout, getBuildArtifacts, getSolidityLibNames } from 'zos-lib';
 import { validate, newValidationErrors, validationPasses } from 'zos-lib';
 import StatusChecker from "../status/StatusChecker";
 import Verifier from '../Verifier'
@@ -46,16 +46,17 @@ export default class NetworkBaseController {
 
   async fetchOrDeploy(requestedVersion) {
     this.project = await this.getDeployer(requestedVersion).fetchOrDeploy()
+    return this.project
   }
 
   async compareCurrentStatus() {
-    if (this.isLightweight) throw Error('Command status-pull is not supported for lightweight apps' )
+    if (this.isLightweight) throw Error('Command status-pull is not supported for unpublished projects' )
     const statusComparator = StatusChecker.compare(this.networkFile, this.txParams)
     await statusComparator.call()
   }
 
   async pullRemoteStatus() {
-    if (this.isLightweight) throw Error('Command status-fix is not supported for lightweight apps' )
+    if (this.isLightweight) throw Error('Command status-fix is not supported for unpublished projects' )
     const statusFetcher = StatusChecker.fetch(this.networkFile, this.txParams)
     await statusFetcher.call()
   }
@@ -65,7 +66,8 @@ export default class NetworkBaseController {
   }
 
   async push(reupload = false, force = false) {
-    const contracts = this._contractsListForPush(!reupload)
+    const changedLibraries = this._solidityLibsForPush(!reupload)
+    const contracts = this._contractsListForPush(!reupload, changedLibraries)
     const buildArtifacts = getBuildArtifacts();
 
     // ValidateContracts also extends each contract class with validation errors and storage info
@@ -75,17 +77,37 @@ export default class NetworkBaseController {
 
     this._checkVersion()
     await this.fetchOrDeploy(this.packageVersion)
-
+    await this.handleLibsLink();
+    
+    this.checkNotFrozen();
+    await this.uploadSolidityLibs(changedLibraries);
     await Promise.all([
       this.uploadContracts(contracts), 
       this.unsetContracts()
     ])
+
+    await this._unsetSolidityLibs()
+  }
+
+  async handleLibsLink() {
+    return;
+  }
+
+  checkNotFrozen() {
+    if (this.networkFile.frozen) {
+      throw Error('Cannot modify contracts in a frozen version. Run zos bump to create a new version first.');
+    }
+  }
+
+  async newVersion(versionName) {
+    return this.project.newVersion(versionName);
   }
 
   _checkVersion() {
     if (this._newVersionRequired()) {
       log.info(`Current version ${this.currentVersion}`);
       log.info(`Creating new version ${this.packageVersion}`);
+      this.networkFile.frozen = false;
       this.networkFile.contracts = {};
     }
   }
@@ -94,17 +116,44 @@ export default class NetworkBaseController {
     return (this.packageVersion !== this.currentVersion) && !this.isLightweight;
   }
 
-  _contractsListForPush(onlyChanged = false) {
+  _contractsListForPush(onlyChanged = false, changedLibraries = []) {
     const newVersion = this._newVersionRequired()
     return _(this.packageFile.contracts)
       .toPairs()
       .map(([contractAlias, contractName]) => [contractAlias, Contracts.getFromLocal(contractName)])
-      .filter(([contractAlias, contractClass]) => newVersion || !onlyChanged || this.hasContractChanged(contractAlias, contractClass))
+      .filter(([contractAlias, contractClass]) => newVersion || !onlyChanged || this.hasContractChanged(contractAlias, contractClass) || this._hasChangedLibraries(contractClass, changedLibraries))
       .value()
   }
 
-  async newVersion(versionName) {
-    return this.project.newVersion(versionName);
+  _solidityLibsForPush(onlyChanged = false) {
+    const { contractNames, contractAliases } = this.packageFile
+    const libNames = this._getAllSolidityLibNames(contractNames)
+    
+    const clashes = _.intersection(libNames, contractAliases)
+    if(!_.isEmpty(clashes)) {
+      throw new Error(`Cannot upload libraries with the same name as a contract alias: ${clashes.join(', ')}`)
+    }
+
+    return libNames
+      .map(libName => Contracts.getFromLocal(libName))
+      .filter(libClass => {
+        const hasSolidityLib = this.networkFile.hasSolidityLib(libClass.contractName)
+        const hasChanged = this._hasSolidityLibChanged(libClass)
+        return (!hasSolidityLib || !onlyChanged || hasChanged);
+      });
+  }
+
+  async uploadSolidityLibs(libs) {
+    await allPromisesOrError(
+      libs.map(lib => this._uploadSolidityLib(lib))
+    )
+  }
+
+  async _uploadSolidityLib(libClass) {
+    const libName = libClass.contractName
+    log.info(`Uploading ${libName} library...`)
+    const libInstance = await this.project.setImplementation(libClass, libName)
+    this.networkFile.addSolidityLib(libName, libInstance)
   }
 
   async uploadContracts(contracts) {
@@ -115,7 +164,10 @@ export default class NetworkBaseController {
 
   async uploadContract(contractAlias, contractClass) {
     try {
+      const currentContractLibs = getSolidityLibNames(contractClass.bytecode)
+      const libraries = this.networkFile.getSolidityLibs(currentContractLibs)
       log.info(`Uploading ${contractClass.contractName} contract as ${contractAlias}`);
+      await contractClass.link(libraries);
       const contractInstance = await this.project.setImplementation(contractClass, contractAlias);
       this.networkFile.addContract(contractAlias, contractInstance, {
         warnings: contractClass.warnings,
@@ -125,6 +177,38 @@ export default class NetworkBaseController {
     } catch(error) {
       throw Error(`${contractAlias} deployment failed with error: ${error.message}`)
     }
+  }
+
+  async _unsetSolidityLibs() {
+    const { contractNames } = this.packageFile
+    const libNames = this._getAllSolidityLibNames(contractNames)
+    await allPromisesOrError(
+      this.networkFile.solidityLibsMissing(libNames).map(libName => this._unsetSolidityLib(libName))
+    )
+  }
+
+  async _unsetSolidityLib(libName) {
+    try {
+      log.info(`Removing ${libName} library`);
+      await this.project.unsetImplementation(libName);
+      this.networkFile.unsetSolidityLib(libName)
+    } catch(error) {
+      throw Error(`Removal of ${libName} failed with error: ${error.message}`)
+    }
+  }
+
+  _hasChangedLibraries(contractClass, changedLibraries) {
+    const libNames = getSolidityLibNames(contractClass.bytecode)
+    return !_.isEmpty(_.intersection(changedLibraries.map(c => c.contractName), libNames))
+  }
+
+  _getAllSolidityLibNames(contractNames) {
+    const libNames = contractNames.map(contractName => {
+      const contractClass = Contracts.getFromLocal(contractName)
+      return getSolidityLibNames(contractClass.bytecode)
+    })
+
+    return _.uniq(_.flatten(libNames))
   }
 
   async unsetContracts() {
@@ -213,6 +297,10 @@ export default class NetworkBaseController {
     }
   }
 
+  _hasSolidityLibChanged(libClass) {
+    return !this.networkFile.hasSameBytecode(libClass.contractName, libClass)
+  }
+
   hasContractChanged(contractAlias, contractClass = undefined) {
     if (!this.isLocalContract(contractAlias)) return false;
     if (!this.isContractDeployed(contractAlias)) return true;
@@ -246,7 +334,14 @@ export default class NetworkBaseController {
     await Verifier.verifyAndPublish(remote, { contractName, compilerVersion, optimizer, optimizerRuns, contractSource, contractAddress })
   }
 
-  writeNetworkPackage() {
+  writeNetworkPackageIfNeeded() {
     this.networkFile.write()
+  }
+
+  async freeze() {
+    if (!this.packageAddress) throw Error('Cannot freeze an unpublished project')
+    await this.fetchOrDeploy(this.currentVersion)
+    await this.project.freeze()
+    this.networkFile.frozen = true
   }
 }

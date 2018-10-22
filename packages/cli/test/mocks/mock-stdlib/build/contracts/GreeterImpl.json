@@ -61,20 +61,20 @@
       "type": "function"
     }
   ],
-  "bytecode": "0x6060604052341561000f57600080fd5b6103578061001e6000396000f300606060405260043610610057576000357c0100000000000000000000000000000000000000000000000000000000900463ffffffff16806354fd4d501461005c578063ead710c4146100ea578063f8194e4814610147575b600080fd5b341561006757600080fd5b61006f61021d565b6040518080602001828103825283818151815260200191508051906020019080838360005b838110156100af578082015181840152602081019050610094565b50505050905090810190601f1680156100dc5780820380516001836020036101000a031916815260200191505b509250505060405180910390f35b34156100f557600080fd5b610145600480803590602001908201803590602001908080601f01602080910402602001604051908101604052809392919081815260200183838082843782019150505050505091905050610260565b005b341561015257600080fd5b6101a2600480803590602001908201803590602001908080601f01602080910402602001604051908101604052809392919081815260200183838082843782019150505050505091905050610307565b6040518080602001828103825283818151815260200191508051906020019080838360005b838110156101e25780820151818401526020810190506101c7565b50505050905090810190601f16801561020f5780820380516001836020036101000a031916815260200191505b509250505060405180910390f35b610225610317565b6040805190810160405280600581526020017f312e312e30000000000000000000000000000000000000000000000000000000815250905090565b7fa5263230ff6fc3abbbad333e24faf0f402b4e050b83a1d30ad4051f4e5d0f72761028a82610307565b6040518080602001828103825283818151815260200191508051906020019080838360005b838110156102ca5780820151818401526020810190506102af565b50505050905090810190601f1680156102f75780820380516001836020036101000a031916815260200191505b509250505060405180910390a150565b61030f610317565b819050919050565b6020604051908101604052806000815250905600a165627a7a723058207fcf239e0612f597b42a2e494d91b7ad65e3652de74a1ce292af7855e5504eea0029",
-  "deployedBytecode": "0x606060405260043610610057576000357c0100000000000000000000000000000000000000000000000000000000900463ffffffff16806354fd4d501461005c578063ead710c4146100ea578063f8194e4814610147575b600080fd5b341561006757600080fd5b61006f61021d565b6040518080602001828103825283818151815260200191508051906020019080838360005b838110156100af578082015181840152602081019050610094565b50505050905090810190601f1680156100dc5780820380516001836020036101000a031916815260200191505b509250505060405180910390f35b34156100f557600080fd5b610145600480803590602001908201803590602001908080601f01602080910402602001604051908101604052809392919081815260200183838082843782019150505050505091905050610260565b005b341561015257600080fd5b6101a2600480803590602001908201803590602001908080601f01602080910402602001604051908101604052809392919081815260200183838082843782019150505050505091905050610307565b6040518080602001828103825283818151815260200191508051906020019080838360005b838110156101e25780820151818401526020810190506101c7565b50505050905090810190601f16801561020f5780820380516001836020036101000a031916815260200191505b509250505060405180910390f35b610225610317565b6040805190810160405280600581526020017f312e312e30000000000000000000000000000000000000000000000000000000815250905090565b7fa5263230ff6fc3abbbad333e24faf0f402b4e050b83a1d30ad4051f4e5d0f72761028a82610307565b6040518080602001828103825283818151815260200191508051906020019080838360005b838110156102ca5780820151818401526020810190506102af565b50505050905090810190601f1680156102f75780820380516001836020036101000a031916815260200191505b509250505060405180910390a150565b61030f610317565b819050919050565b6020604051908101604052806000815250905600a165627a7a723058207fcf239e0612f597b42a2e494d91b7ad65e3652de74a1ce292af7855e5504eea0029",
-  "sourceMap": "26:297:0:-;;;;;;;;;;;;;;;;;",
-  "deployedSourceMap": "26:297:0:-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;248:73;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;23:1:-1;8:100;33:3;30:1;27:10;8:100;;;99:1;94:3;90:11;84:18;80:1;75:3;71:11;64:39;52:2;49:1;45:10;40:15;;8:100;;;12:14;248:73:0;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;87;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;164:80;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;23:1:-1;8:100;33:3;30:1;27:10;8:100;;;99:1;94:3;90:11;84:18;80:1;75:3;71:11;64:39;52:2;49:1;45:10;40:15;;8:100;;;12:14;164:80:0;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;248:73;288:6;;:::i;:::-;302:14;;;;;;;;;;;;;;;;;;;;248:73;:::o;87:::-;132:23;141:13;150:3;141:8;:13::i;:::-;132:23;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;23:1:-1;8:100;33:3;30:1;27:10;8:100;;;99:1;94:3;90:11;84:18;80:1;75:3;71:11;64:39;52:2;49:1;45:10;40:15;;8:100;;;12:14;132:23:0;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;87:73;:::o;164:80::-;215:6;;:::i;:::-;236:3;229:10;;164:80;;;:::o;26:297::-;;;;;;;;;;;;;;;:::o",
-  "source": "pragma solidity ^0.4.21;\n\ncontract GreeterImpl {\n  event Greeting(string greeting);\n\n  function greet(string who) public {\n    emit Greeting(greeting(who));\n  }\n\n  function greeting(string who) public pure returns (string) {\n    return who;\n  }\n\n  function version() public pure returns (string) {\n    return \"1.1.0\";\n  }\n}\n",
-  "sourcePath": "/home/spalladino/Projects/zeppelinos/cli/test/mocks/mock-stdlib/contracts/GreeterImpl.sol",
+  "bytecode": "0x608060405234801561001057600080fd5b506104b3806100206000396000f300608060405260043610610057576000357c0100000000000000000000000000000000000000000000000000000000900463ffffffff16806354fd4d501461005c578063ead710c4146100ec578063f8194e4814610155575b600080fd5b34801561006857600080fd5b50610071610237565b6040518080602001828103825283818151815260200191508051906020019080838360005b838110156100b1578082015181840152602081019050610096565b50505050905090810190601f1680156100de5780820380516001836020036101000a031916815260200191505b509250505060405180910390f35b3480156100f857600080fd5b50610153600480360381019080803590602001908201803590602001908080601f0160208091040260200160405190810160405280939291908181526020018383808284378201915050505050509192919290505050610274565b005b34801561016157600080fd5b506101bc600480360381019080803590602001908201803590602001908080601f016020809104026020016040519081016040528093929190818152602001838380828437820191505050505050919291929050505061031b565b6040518080602001828103825283818151815260200191508051906020019080838360005b838110156101fc5780820151818401526020810190506101e1565b50505050905090810190601f1680156102295780820380516001836020036101000a031916815260200191505b509250505060405180910390f35b60606040805190810160405280600581526020017f312e312e30000000000000000000000000000000000000000000000000000000815250905090565b7fa5263230ff6fc3abbbad333e24faf0f402b4e050b83a1d30ad4051f4e5d0f72761029e8261031b565b6040518080602001828103825283818151815260200191508051906020019080838360005b838110156102de5780820151818401526020810190506102c3565b50505050905090810190601f16801561030b5780820380516001836020036101000a031916815260200191505b509250505060405180910390a150565b60608173__GreeterLib____________________________637689b21f90916040518263ffffffff167c01000000000000000000000000000000000000000000000000000000000281526004018080602001828103825283818151815260200191508051906020019080838360005b838110156103a557808201518184015260208101905061038a565b50505050905090810190601f1680156103d25780820380516001836020036101000a031916815260200191505b509250505060006040518083038186803b1580156103ef57600080fd5b505af4158015610403573d6000803e3d6000fd5b505050506040513d6000823e3d601f19601f82011682018060405250602081101561042d57600080fd5b81019080805164010000000081111561044557600080fd5b8281019050602081018481111561045b57600080fd5b815185600182028301116401000000008211171561047857600080fd5b505092919050505090509190505600a165627a7a72305820b393bc2563c2d6adbf1c9bf56cb5918dc4faf10c2058bb1040f5cddb1a7589e80029",
+  "deployedBytecode": "0x608060405260043610610057576000357c0100000000000000000000000000000000000000000000000000000000900463ffffffff16806354fd4d501461005c578063ead710c4146100ec578063f8194e4814610155575b600080fd5b34801561006857600080fd5b50610071610237565b6040518080602001828103825283818151815260200191508051906020019080838360005b838110156100b1578082015181840152602081019050610096565b50505050905090810190601f1680156100de5780820380516001836020036101000a031916815260200191505b509250505060405180910390f35b3480156100f857600080fd5b50610153600480360381019080803590602001908201803590602001908080601f0160208091040260200160405190810160405280939291908181526020018383808284378201915050505050509192919290505050610274565b005b34801561016157600080fd5b506101bc600480360381019080803590602001908201803590602001908080601f016020809104026020016040519081016040528093929190818152602001838380828437820191505050505050919291929050505061031b565b6040518080602001828103825283818151815260200191508051906020019080838360005b838110156101fc5780820151818401526020810190506101e1565b50505050905090810190601f1680156102295780820380516001836020036101000a031916815260200191505b509250505060405180910390f35b60606040805190810160405280600581526020017f312e312e30000000000000000000000000000000000000000000000000000000815250905090565b7fa5263230ff6fc3abbbad333e24faf0f402b4e050b83a1d30ad4051f4e5d0f72761029e8261031b565b6040518080602001828103825283818151815260200191508051906020019080838360005b838110156102de5780820151818401526020810190506102c3565b50505050905090810190601f16801561030b5780820380516001836020036101000a031916815260200191505b509250505060405180910390a150565b60608173__GreeterLib____________________________637689b21f90916040518263ffffffff167c01000000000000000000000000000000000000000000000000000000000281526004018080602001828103825283818151815260200191508051906020019080838360005b838110156103a557808201518184015260208101905061038a565b50505050905090810190601f1680156103d25780820380516001836020036101000a031916815260200191505b509250505060006040518083038186803b1580156103ef57600080fd5b505af4158015610403573d6000803e3d6000fd5b505050506040513d6000823e3d601f19601f82011682018060405250602081101561042d57600080fd5b81019080805164010000000081111561044557600080fd5b8281019050602081018481111561045b57600080fd5b815185600182028301116401000000008211171561047857600080fd5b505092919050505090509190505600a165627a7a72305820b393bc2563c2d6adbf1c9bf56cb5918dc4faf10c2058bb1040f5cddb1a7589e80029",
+  "sourceMap": "54:335:0:-;;;;8:9:-1;5:2;;;30:1;27;20:12;5:2;54:335:0;;;;;;;",
+  "deployedSourceMap": "54:335:0:-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;314:73;;8:9:-1;5:2;;;30:1;27;20:12;5:2;314:73:0;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;23:1:-1;8:100;33:3;30:1;27:10;8:100;;;99:1;94:3;90:11;84:18;80:1;75:3;71:11;64:39;52:2;49:1;45:10;40:15;;8:100;;;12:14;314:73:0;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;146;;8:9:-1;5:2;;;30:1;27;20:12;5:2;146:73:0;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;223:87;;8:9:-1;5:2;;;30:1;27;20:12;5:2;223:87:0;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;23:1:-1;8:100;33:3;30:1;27:10;8:100;;;99:1;94:3;90:11;84:18;80:1;75:3;71:11;64:39;52:2;49:1;45:10;40:15;;8:100;;;12:14;223:87:0;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;314:73;354:6;368:14;;;;;;;;;;;;;;;;;;;;314:73;:::o;146:::-;191:23;200:13;209:3;200:8;:13::i;:::-;191:23;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;23:1:-1;8:100;33:3;30:1;27:10;8:100;;;99:1;94:3;90:11;84:18;80:1;75:3;71:11;64:39;52:2;49:1;45:10;40:15;;8:100;;;12:14;191:23:0;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;146:73;:::o;223:87::-;274:6;295:3;:8;;;;:10;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;23:1:-1;8:100;33:3;30:1;27:10;8:100;;;99:1;94:3;90:11;84:18;80:1;75:3;71:11;64:39;52:2;49:1;45:10;40:15;;8:100;;;12:14;295:10:0;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;8:9:-1;5:2;;;30:1;27;20:12;5:2;295:10:0;;;;8:9:-1;5:2;;;45:16;42:1;39;24:38;77:16;74:1;67:27;5:2;295:10:0;;;;;;39:16:-1;36:1;17:17;2:54;295:10:0;101:4:-1;97:9;90:4;84;80:15;76:31;69:5;65:43;126:6;120:4;113:20;0:138;13:2;8:3;5:11;2:2;;;29:1;26;19:12;2:2;295:10:0;;;;;;20:11:-1;15:3;12:20;9:2;;;45:1;42;35:12;9:2;73:11;68:3;64:21;57:28;;126:4;121:3;117:14;163:9;145:16;142:31;139:2;;;186:1;183;176:12;139:2;224:3;218:10;338:9;333:1;319:12;315:20;297:16;293:43;290:58;268:11;254:12;251:29;239:118;236:2;;;370:1;367;360:12;236:2;0:382;;295:10:0;;;;;;288:17;;223:87;;;:::o",
+  "source": "pragma solidity ^0.4.24;\n\nimport \"./GreeterLib.sol\";\n\ncontract GreeterImpl {\n  using GreeterLib for string;\n  event Greeting(string greeting);\n\n  function greet(string who) public {\n    emit Greeting(greeting(who));\n  }\n\n  function greeting(string who) public pure returns (string) {\n    return who.wrap();\n  }\n\n  function version() public pure returns (string) {\n    return \"1.1.0\";\n  }\n}\n",
+  "sourcePath": "/home/spalladino/Projects/zeppelinos/zos/packages/cli/test/mocks/mock-stdlib/contracts/GreeterImpl.sol",
   "ast": {
-    "absolutePath": "/home/spalladino/Projects/zeppelinos/cli/test/mocks/mock-stdlib/contracts/GreeterImpl.sol",
+    "absolutePath": "/home/spalladino/Projects/zeppelinos/zos/packages/cli/test/mocks/mock-stdlib/contracts/GreeterImpl.sol",
     "exportedSymbols": {
       "GreeterImpl": [
-        36
+        42
       ]
     },
-    "id": 37,
+    "id": 43,
     "nodeType": "SourceUnit",
     "nodes": [
       {
@@ -83,10 +83,21 @@
           "solidity",
           "^",
           "0.4",
-          ".21"
+          ".24"
         ],
         "nodeType": "PragmaDirective",
         "src": "0:24:0"
+      },
+      {
+        "absolutePath": "/home/spalladino/Projects/zeppelinos/zos/packages/cli/test/mocks/mock-stdlib/contracts/GreeterLib.sol",
+        "file": "./GreeterLib.sol",
+        "id": 2,
+        "nodeType": "ImportDirective",
+        "scope": 43,
+        "sourceUnit": 56,
+        "src": "26:26:0",
+        "symbolAliases": [],
+        "unitAlias": ""
       },
       {
         "baseContracts": [],
@@ -94,60 +105,87 @@
         "contractKind": "contract",
         "documentation": null,
         "fullyImplemented": true,
-        "id": 36,
+        "id": 42,
         "linearizedBaseContracts": [
-          36
+          42
         ],
         "name": "GreeterImpl",
         "nodeType": "ContractDefinition",
         "nodes": [
           {
+            "id": 5,
+            "libraryName": {
+              "contractScope": null,
+              "id": 3,
+              "name": "GreeterLib",
+              "nodeType": "UserDefinedTypeName",
+              "referencedDeclaration": 55,
+              "src": "85:10:0",
+              "typeDescriptions": {
+                "typeIdentifier": "t_contract$_GreeterLib_$55",
+                "typeString": "library GreeterLib"
+              }
+            },
+            "nodeType": "UsingForDirective",
+            "src": "79:28:0",
+            "typeName": {
+              "id": 4,
+              "name": "string",
+              "nodeType": "ElementaryTypeName",
+              "src": "100:6:0",
+              "typeDescriptions": {
+                "typeIdentifier": "t_string_storage_ptr",
+                "typeString": "string"
+              }
+            }
+          },
+          {
             "anonymous": false,
             "documentation": null,
-            "id": 5,
+            "id": 9,
             "name": "Greeting",
             "nodeType": "EventDefinition",
             "parameters": {
-              "id": 4,
+              "id": 8,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 3,
+                  "id": 7,
                   "indexed": false,
                   "name": "greeting",
                   "nodeType": "VariableDeclaration",
-                  "scope": 5,
-                  "src": "66:15:0",
+                  "scope": 9,
+                  "src": "125:15:0",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
                     "typeIdentifier": "t_string_memory_ptr",
-                    "typeString": "string memory"
+                    "typeString": "string"
                   },
                   "typeName": {
-                    "id": 2,
+                    "id": 6,
                     "name": "string",
                     "nodeType": "ElementaryTypeName",
-                    "src": "66:6:0",
+                    "src": "125:6:0",
                     "typeDescriptions": {
                       "typeIdentifier": "t_string_storage_ptr",
-                      "typeString": "string storage pointer"
+                      "typeString": "string"
                     }
                   },
                   "value": null,
                   "visibility": "internal"
                 }
               ],
-              "src": "65:17:0"
+              "src": "124:17:0"
             },
-            "src": "51:32:0"
+            "src": "110:32:0"
           },
           {
             "body": {
-              "id": 16,
+              "id": 20,
               "nodeType": "Block",
-              "src": "121:39:0",
+              "src": "180:39:0",
               "statements": [
                 {
                   "eventCall": {
@@ -158,12 +196,12 @@
                         "arguments": [
                           {
                             "argumentTypes": null,
-                            "id": 12,
+                            "id": 16,
                             "name": "who",
                             "nodeType": "Identifier",
                             "overloadedDeclarations": [],
-                            "referencedDeclaration": 7,
-                            "src": "150:3:0",
+                            "referencedDeclaration": 11,
+                            "src": "209:3:0",
                             "typeDescriptions": {
                               "typeIdentifier": "t_string_memory_ptr",
                               "typeString": "string memory"
@@ -177,18 +215,18 @@
                               "typeString": "string memory"
                             }
                           ],
-                          "id": 11,
+                          "id": 15,
                           "name": "greeting",
                           "nodeType": "Identifier",
                           "overloadedDeclarations": [],
-                          "referencedDeclaration": 27,
-                          "src": "141:8:0",
+                          "referencedDeclaration": 33,
+                          "src": "200:8:0",
                           "typeDescriptions": {
                             "typeIdentifier": "t_function_internal_pure$_t_string_memory_ptr_$returns$_t_string_memory_ptr_$",
                             "typeString": "function (string memory) pure returns (string memory)"
                           }
                         },
-                        "id": 13,
+                        "id": 17,
                         "isConstant": false,
                         "isLValue": false,
                         "isPure": false,
@@ -196,7 +234,7 @@
                         "lValueRequested": false,
                         "names": [],
                         "nodeType": "FunctionCall",
-                        "src": "141:13:0",
+                        "src": "200:13:0",
                         "typeDescriptions": {
                           "typeIdentifier": "t_string_memory_ptr",
                           "typeString": "string memory"
@@ -210,18 +248,18 @@
                           "typeString": "string memory"
                         }
                       ],
-                      "id": 10,
+                      "id": 14,
                       "name": "Greeting",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 5,
-                      "src": "132:8:0",
+                      "referencedDeclaration": 9,
+                      "src": "191:8:0",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_event_nonpayable$_t_string_memory_ptr_$returns$__$",
                         "typeString": "function (string memory)"
                       }
                     },
-                    "id": 14,
+                    "id": 18,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -229,20 +267,20 @@
                     "lValueRequested": false,
                     "names": [],
                     "nodeType": "FunctionCall",
-                    "src": "132:23:0",
+                    "src": "191:23:0",
                     "typeDescriptions": {
                       "typeIdentifier": "t_tuple$__$",
                       "typeString": "tuple()"
                     }
                   },
-                  "id": 15,
+                  "id": 19,
                   "nodeType": "EmitStatement",
-                  "src": "127:28:0"
+                  "src": "186:28:0"
                 }
               ]
             },
             "documentation": null,
-            "id": 17,
+            "id": 21,
             "implemented": true,
             "isConstructor": false,
             "isDeclaredConst": false,
@@ -250,80 +288,113 @@
             "name": "greet",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 8,
+              "id": 12,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 7,
+                  "id": 11,
                   "name": "who",
                   "nodeType": "VariableDeclaration",
-                  "scope": 17,
-                  "src": "102:10:0",
+                  "scope": 21,
+                  "src": "161:10:0",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
                     "typeIdentifier": "t_string_memory_ptr",
-                    "typeString": "string memory"
+                    "typeString": "string"
                   },
                   "typeName": {
-                    "id": 6,
+                    "id": 10,
                     "name": "string",
                     "nodeType": "ElementaryTypeName",
-                    "src": "102:6:0",
+                    "src": "161:6:0",
                     "typeDescriptions": {
                       "typeIdentifier": "t_string_storage_ptr",
-                      "typeString": "string storage pointer"
+                      "typeString": "string"
                     }
                   },
                   "value": null,
                   "visibility": "internal"
                 }
               ],
-              "src": "101:12:0"
+              "src": "160:12:0"
             },
             "payable": false,
             "returnParameters": {
-              "id": 9,
+              "id": 13,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "121:0:0"
+              "src": "180:0:0"
             },
-            "scope": 36,
-            "src": "87:73:0",
+            "scope": 42,
+            "src": "146:73:0",
             "stateMutability": "nonpayable",
             "superFunction": null,
             "visibility": "public"
           },
           {
             "body": {
-              "id": 26,
+              "id": 32,
               "nodeType": "Block",
-              "src": "223:21:0",
+              "src": "282:28:0",
               "statements": [
                 {
                   "expression": {
                     "argumentTypes": null,
-                    "id": 24,
-                    "name": "who",
-                    "nodeType": "Identifier",
-                    "overloadedDeclarations": [],
-                    "referencedDeclaration": 19,
-                    "src": "236:3:0",
+                    "arguments": [],
+                    "expression": {
+                      "argumentTypes": [],
+                      "expression": {
+                        "argumentTypes": null,
+                        "id": 28,
+                        "name": "who",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 23,
+                        "src": "295:3:0",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_string_memory_ptr",
+                          "typeString": "string memory"
+                        }
+                      },
+                      "id": 29,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": false,
+                      "lValueRequested": false,
+                      "memberName": "wrap",
+                      "nodeType": "MemberAccess",
+                      "referencedDeclaration": 54,
+                      "src": "295:8:0",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_delegatecall_pure$_t_string_memory_ptr_$returns$_t_string_memory_ptr_$bound_to$_t_string_memory_ptr_$",
+                        "typeString": "function (string memory) pure returns (string memory)"
+                      }
+                    },
+                    "id": 30,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "295:10:0",
                     "typeDescriptions": {
                       "typeIdentifier": "t_string_memory_ptr",
                       "typeString": "string memory"
                     }
                   },
-                  "functionReturnParameters": 23,
-                  "id": 25,
+                  "functionReturnParameters": 27,
+                  "id": 31,
                   "nodeType": "Return",
-                  "src": "229:10:0"
+                  "src": "288:17:0"
                 }
               ]
             },
             "documentation": null,
-            "id": 27,
+            "id": 33,
             "implemented": true,
             "isConstructor": false,
             "isDeclaredConst": true,
@@ -331,96 +402,96 @@
             "name": "greeting",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 20,
+              "id": 24,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 19,
+                  "id": 23,
                   "name": "who",
                   "nodeType": "VariableDeclaration",
-                  "scope": 27,
-                  "src": "182:10:0",
+                  "scope": 33,
+                  "src": "241:10:0",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
                     "typeIdentifier": "t_string_memory_ptr",
-                    "typeString": "string memory"
+                    "typeString": "string"
                   },
                   "typeName": {
-                    "id": 18,
+                    "id": 22,
                     "name": "string",
                     "nodeType": "ElementaryTypeName",
-                    "src": "182:6:0",
+                    "src": "241:6:0",
                     "typeDescriptions": {
                       "typeIdentifier": "t_string_storage_ptr",
-                      "typeString": "string storage pointer"
+                      "typeString": "string"
                     }
                   },
                   "value": null,
                   "visibility": "internal"
                 }
               ],
-              "src": "181:12:0"
+              "src": "240:12:0"
             },
             "payable": false,
             "returnParameters": {
-              "id": 23,
+              "id": 27,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 22,
+                  "id": 26,
                   "name": "",
                   "nodeType": "VariableDeclaration",
-                  "scope": 27,
-                  "src": "215:6:0",
+                  "scope": 33,
+                  "src": "274:6:0",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
                     "typeIdentifier": "t_string_memory_ptr",
-                    "typeString": "string memory"
+                    "typeString": "string"
                   },
                   "typeName": {
-                    "id": 21,
+                    "id": 25,
                     "name": "string",
                     "nodeType": "ElementaryTypeName",
-                    "src": "215:6:0",
+                    "src": "274:6:0",
                     "typeDescriptions": {
                       "typeIdentifier": "t_string_storage_ptr",
-                      "typeString": "string storage pointer"
+                      "typeString": "string"
                     }
                   },
                   "value": null,
                   "visibility": "internal"
                 }
               ],
-              "src": "214:8:0"
+              "src": "273:8:0"
             },
-            "scope": 36,
-            "src": "164:80:0",
+            "scope": 42,
+            "src": "223:87:0",
             "stateMutability": "pure",
             "superFunction": null,
             "visibility": "public"
           },
           {
             "body": {
-              "id": 34,
+              "id": 40,
               "nodeType": "Block",
-              "src": "296:25:0",
+              "src": "362:25:0",
               "statements": [
                 {
                   "expression": {
                     "argumentTypes": null,
                     "hexValue": "312e312e30",
-                    "id": 32,
+                    "id": 38,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": true,
                     "kind": "string",
                     "lValueRequested": false,
                     "nodeType": "Literal",
-                    "src": "309:7:0",
+                    "src": "375:7:0",
                     "subdenomination": null,
                     "typeDescriptions": {
                       "typeIdentifier": "t_stringliteral_6815ba53416ba06aff1932cc76b3832272bafab9bc8e066be382e32b06ba5546",
@@ -428,15 +499,15 @@
                     },
                     "value": "1.1.0"
                   },
-                  "functionReturnParameters": 31,
-                  "id": 33,
+                  "functionReturnParameters": 37,
+                  "id": 39,
                   "nodeType": "Return",
-                  "src": "302:14:0"
+                  "src": "368:14:0"
                 }
               ]
             },
             "documentation": null,
-            "id": 35,
+            "id": 41,
             "implemented": true,
             "isConstructor": false,
             "isDeclaredConst": true,
@@ -444,66 +515,66 @@
             "name": "version",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 28,
+              "id": 34,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "264:2:0"
+              "src": "330:2:0"
             },
             "payable": false,
             "returnParameters": {
-              "id": 31,
+              "id": 37,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 30,
+                  "id": 36,
                   "name": "",
                   "nodeType": "VariableDeclaration",
-                  "scope": 35,
-                  "src": "288:6:0",
+                  "scope": 41,
+                  "src": "354:6:0",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
                     "typeIdentifier": "t_string_memory_ptr",
-                    "typeString": "string memory"
+                    "typeString": "string"
                   },
                   "typeName": {
-                    "id": 29,
+                    "id": 35,
                     "name": "string",
                     "nodeType": "ElementaryTypeName",
-                    "src": "288:6:0",
+                    "src": "354:6:0",
                     "typeDescriptions": {
                       "typeIdentifier": "t_string_storage_ptr",
-                      "typeString": "string storage pointer"
+                      "typeString": "string"
                     }
                   },
                   "value": null,
                   "visibility": "internal"
                 }
               ],
-              "src": "287:8:0"
+              "src": "353:8:0"
             },
-            "scope": 36,
-            "src": "248:73:0",
+            "scope": 42,
+            "src": "314:73:0",
             "stateMutability": "pure",
             "superFunction": null,
             "visibility": "public"
           }
         ],
-        "scope": 37,
-        "src": "26:297:0"
+        "scope": 43,
+        "src": "54:335:0"
       }
     ],
-    "src": "0:324:0"
+    "src": "0:390:0"
   },
   "legacyAST": {
-    "absolutePath": "/home/spalladino/Projects/zeppelinos/cli/test/mocks/mock-stdlib/contracts/GreeterImpl.sol",
+    "absolutePath": "/home/spalladino/Projects/zeppelinos/zos/packages/cli/test/mocks/mock-stdlib/contracts/GreeterImpl.sol",
     "exportedSymbols": {
       "GreeterImpl": [
-        36
+        42
       ]
     },
-    "id": 37,
+    "id": 43,
     "nodeType": "SourceUnit",
     "nodes": [
       {
@@ -512,10 +583,21 @@
           "solidity",
           "^",
           "0.4",
-          ".21"
+          ".24"
         ],
         "nodeType": "PragmaDirective",
         "src": "0:24:0"
+      },
+      {
+        "absolutePath": "/home/spalladino/Projects/zeppelinos/zos/packages/cli/test/mocks/mock-stdlib/contracts/GreeterLib.sol",
+        "file": "./GreeterLib.sol",
+        "id": 2,
+        "nodeType": "ImportDirective",
+        "scope": 43,
+        "sourceUnit": 56,
+        "src": "26:26:0",
+        "symbolAliases": [],
+        "unitAlias": ""
       },
       {
         "baseContracts": [],
@@ -523,60 +605,87 @@
         "contractKind": "contract",
         "documentation": null,
         "fullyImplemented": true,
-        "id": 36,
+        "id": 42,
         "linearizedBaseContracts": [
-          36
+          42
         ],
         "name": "GreeterImpl",
         "nodeType": "ContractDefinition",
         "nodes": [
           {
+            "id": 5,
+            "libraryName": {
+              "contractScope": null,
+              "id": 3,
+              "name": "GreeterLib",
+              "nodeType": "UserDefinedTypeName",
+              "referencedDeclaration": 55,
+              "src": "85:10:0",
+              "typeDescriptions": {
+                "typeIdentifier": "t_contract$_GreeterLib_$55",
+                "typeString": "library GreeterLib"
+              }
+            },
+            "nodeType": "UsingForDirective",
+            "src": "79:28:0",
+            "typeName": {
+              "id": 4,
+              "name": "string",
+              "nodeType": "ElementaryTypeName",
+              "src": "100:6:0",
+              "typeDescriptions": {
+                "typeIdentifier": "t_string_storage_ptr",
+                "typeString": "string"
+              }
+            }
+          },
+          {
             "anonymous": false,
             "documentation": null,
-            "id": 5,
+            "id": 9,
             "name": "Greeting",
             "nodeType": "EventDefinition",
             "parameters": {
-              "id": 4,
+              "id": 8,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 3,
+                  "id": 7,
                   "indexed": false,
                   "name": "greeting",
                   "nodeType": "VariableDeclaration",
-                  "scope": 5,
-                  "src": "66:15:0",
+                  "scope": 9,
+                  "src": "125:15:0",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
                     "typeIdentifier": "t_string_memory_ptr",
-                    "typeString": "string memory"
+                    "typeString": "string"
                   },
                   "typeName": {
-                    "id": 2,
+                    "id": 6,
                     "name": "string",
                     "nodeType": "ElementaryTypeName",
-                    "src": "66:6:0",
+                    "src": "125:6:0",
                     "typeDescriptions": {
                       "typeIdentifier": "t_string_storage_ptr",
-                      "typeString": "string storage pointer"
+                      "typeString": "string"
                     }
                   },
                   "value": null,
                   "visibility": "internal"
                 }
               ],
-              "src": "65:17:0"
+              "src": "124:17:0"
             },
-            "src": "51:32:0"
+            "src": "110:32:0"
           },
           {
             "body": {
-              "id": 16,
+              "id": 20,
               "nodeType": "Block",
-              "src": "121:39:0",
+              "src": "180:39:0",
               "statements": [
                 {
                   "eventCall": {
@@ -587,12 +696,12 @@
                         "arguments": [
                           {
                             "argumentTypes": null,
-                            "id": 12,
+                            "id": 16,
                             "name": "who",
                             "nodeType": "Identifier",
                             "overloadedDeclarations": [],
-                            "referencedDeclaration": 7,
-                            "src": "150:3:0",
+                            "referencedDeclaration": 11,
+                            "src": "209:3:0",
                             "typeDescriptions": {
                               "typeIdentifier": "t_string_memory_ptr",
                               "typeString": "string memory"
@@ -606,18 +715,18 @@
                               "typeString": "string memory"
                             }
                           ],
-                          "id": 11,
+                          "id": 15,
                           "name": "greeting",
                           "nodeType": "Identifier",
                           "overloadedDeclarations": [],
-                          "referencedDeclaration": 27,
-                          "src": "141:8:0",
+                          "referencedDeclaration": 33,
+                          "src": "200:8:0",
                           "typeDescriptions": {
                             "typeIdentifier": "t_function_internal_pure$_t_string_memory_ptr_$returns$_t_string_memory_ptr_$",
                             "typeString": "function (string memory) pure returns (string memory)"
                           }
                         },
-                        "id": 13,
+                        "id": 17,
                         "isConstant": false,
                         "isLValue": false,
                         "isPure": false,
@@ -625,7 +734,7 @@
                         "lValueRequested": false,
                         "names": [],
                         "nodeType": "FunctionCall",
-                        "src": "141:13:0",
+                        "src": "200:13:0",
                         "typeDescriptions": {
                           "typeIdentifier": "t_string_memory_ptr",
                           "typeString": "string memory"
@@ -639,18 +748,18 @@
                           "typeString": "string memory"
                         }
                       ],
-                      "id": 10,
+                      "id": 14,
                       "name": "Greeting",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 5,
-                      "src": "132:8:0",
+                      "referencedDeclaration": 9,
+                      "src": "191:8:0",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_event_nonpayable$_t_string_memory_ptr_$returns$__$",
                         "typeString": "function (string memory)"
                       }
                     },
-                    "id": 14,
+                    "id": 18,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -658,20 +767,20 @@
                     "lValueRequested": false,
                     "names": [],
                     "nodeType": "FunctionCall",
-                    "src": "132:23:0",
+                    "src": "191:23:0",
                     "typeDescriptions": {
                       "typeIdentifier": "t_tuple$__$",
                       "typeString": "tuple()"
                     }
                   },
-                  "id": 15,
+                  "id": 19,
                   "nodeType": "EmitStatement",
-                  "src": "127:28:0"
+                  "src": "186:28:0"
                 }
               ]
             },
             "documentation": null,
-            "id": 17,
+            "id": 21,
             "implemented": true,
             "isConstructor": false,
             "isDeclaredConst": false,
@@ -679,80 +788,113 @@
             "name": "greet",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 8,
+              "id": 12,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 7,
+                  "id": 11,
                   "name": "who",
                   "nodeType": "VariableDeclaration",
-                  "scope": 17,
-                  "src": "102:10:0",
+                  "scope": 21,
+                  "src": "161:10:0",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
                     "typeIdentifier": "t_string_memory_ptr",
-                    "typeString": "string memory"
+                    "typeString": "string"
                   },
                   "typeName": {
-                    "id": 6,
+                    "id": 10,
                     "name": "string",
                     "nodeType": "ElementaryTypeName",
-                    "src": "102:6:0",
+                    "src": "161:6:0",
                     "typeDescriptions": {
                       "typeIdentifier": "t_string_storage_ptr",
-                      "typeString": "string storage pointer"
+                      "typeString": "string"
                     }
                   },
                   "value": null,
                   "visibility": "internal"
                 }
               ],
-              "src": "101:12:0"
+              "src": "160:12:0"
             },
             "payable": false,
             "returnParameters": {
-              "id": 9,
+              "id": 13,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "121:0:0"
+              "src": "180:0:0"
             },
-            "scope": 36,
-            "src": "87:73:0",
+            "scope": 42,
+            "src": "146:73:0",
             "stateMutability": "nonpayable",
             "superFunction": null,
             "visibility": "public"
           },
           {
             "body": {
-              "id": 26,
+              "id": 32,
               "nodeType": "Block",
-              "src": "223:21:0",
+              "src": "282:28:0",
               "statements": [
                 {
                   "expression": {
                     "argumentTypes": null,
-                    "id": 24,
-                    "name": "who",
-                    "nodeType": "Identifier",
-                    "overloadedDeclarations": [],
-                    "referencedDeclaration": 19,
-                    "src": "236:3:0",
+                    "arguments": [],
+                    "expression": {
+                      "argumentTypes": [],
+                      "expression": {
+                        "argumentTypes": null,
+                        "id": 28,
+                        "name": "who",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 23,
+                        "src": "295:3:0",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_string_memory_ptr",
+                          "typeString": "string memory"
+                        }
+                      },
+                      "id": 29,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": false,
+                      "lValueRequested": false,
+                      "memberName": "wrap",
+                      "nodeType": "MemberAccess",
+                      "referencedDeclaration": 54,
+                      "src": "295:8:0",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_delegatecall_pure$_t_string_memory_ptr_$returns$_t_string_memory_ptr_$bound_to$_t_string_memory_ptr_$",
+                        "typeString": "function (string memory) pure returns (string memory)"
+                      }
+                    },
+                    "id": 30,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "295:10:0",
                     "typeDescriptions": {
                       "typeIdentifier": "t_string_memory_ptr",
                       "typeString": "string memory"
                     }
                   },
-                  "functionReturnParameters": 23,
-                  "id": 25,
+                  "functionReturnParameters": 27,
+                  "id": 31,
                   "nodeType": "Return",
-                  "src": "229:10:0"
+                  "src": "288:17:0"
                 }
               ]
             },
             "documentation": null,
-            "id": 27,
+            "id": 33,
             "implemented": true,
             "isConstructor": false,
             "isDeclaredConst": true,
@@ -760,96 +902,96 @@
             "name": "greeting",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 20,
+              "id": 24,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 19,
+                  "id": 23,
                   "name": "who",
                   "nodeType": "VariableDeclaration",
-                  "scope": 27,
-                  "src": "182:10:0",
+                  "scope": 33,
+                  "src": "241:10:0",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
                     "typeIdentifier": "t_string_memory_ptr",
-                    "typeString": "string memory"
+                    "typeString": "string"
                   },
                   "typeName": {
-                    "id": 18,
+                    "id": 22,
                     "name": "string",
                     "nodeType": "ElementaryTypeName",
-                    "src": "182:6:0",
+                    "src": "241:6:0",
                     "typeDescriptions": {
                       "typeIdentifier": "t_string_storage_ptr",
-                      "typeString": "string storage pointer"
+                      "typeString": "string"
                     }
                   },
                   "value": null,
                   "visibility": "internal"
                 }
               ],
-              "src": "181:12:0"
+              "src": "240:12:0"
             },
             "payable": false,
             "returnParameters": {
-              "id": 23,
+              "id": 27,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 22,
+                  "id": 26,
                   "name": "",
                   "nodeType": "VariableDeclaration",
-                  "scope": 27,
-                  "src": "215:6:0",
+                  "scope": 33,
+                  "src": "274:6:0",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
                     "typeIdentifier": "t_string_memory_ptr",
-                    "typeString": "string memory"
+                    "typeString": "string"
                   },
                   "typeName": {
-                    "id": 21,
+                    "id": 25,
                     "name": "string",
                     "nodeType": "ElementaryTypeName",
-                    "src": "215:6:0",
+                    "src": "274:6:0",
                     "typeDescriptions": {
                       "typeIdentifier": "t_string_storage_ptr",
-                      "typeString": "string storage pointer"
+                      "typeString": "string"
                     }
                   },
                   "value": null,
                   "visibility": "internal"
                 }
               ],
-              "src": "214:8:0"
+              "src": "273:8:0"
             },
-            "scope": 36,
-            "src": "164:80:0",
+            "scope": 42,
+            "src": "223:87:0",
             "stateMutability": "pure",
             "superFunction": null,
             "visibility": "public"
           },
           {
             "body": {
-              "id": 34,
+              "id": 40,
               "nodeType": "Block",
-              "src": "296:25:0",
+              "src": "362:25:0",
               "statements": [
                 {
                   "expression": {
                     "argumentTypes": null,
                     "hexValue": "312e312e30",
-                    "id": 32,
+                    "id": 38,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": true,
                     "kind": "string",
                     "lValueRequested": false,
                     "nodeType": "Literal",
-                    "src": "309:7:0",
+                    "src": "375:7:0",
                     "subdenomination": null,
                     "typeDescriptions": {
                       "typeIdentifier": "t_stringliteral_6815ba53416ba06aff1932cc76b3832272bafab9bc8e066be382e32b06ba5546",
@@ -857,15 +999,15 @@
                     },
                     "value": "1.1.0"
                   },
-                  "functionReturnParameters": 31,
-                  "id": 33,
+                  "functionReturnParameters": 37,
+                  "id": 39,
                   "nodeType": "Return",
-                  "src": "302:14:0"
+                  "src": "368:14:0"
                 }
               ]
             },
             "documentation": null,
-            "id": 35,
+            "id": 41,
             "implemented": true,
             "isConstructor": false,
             "isDeclaredConst": true,
@@ -873,63 +1015,63 @@
             "name": "version",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 28,
+              "id": 34,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "264:2:0"
+              "src": "330:2:0"
             },
             "payable": false,
             "returnParameters": {
-              "id": 31,
+              "id": 37,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 30,
+                  "id": 36,
                   "name": "",
                   "nodeType": "VariableDeclaration",
-                  "scope": 35,
-                  "src": "288:6:0",
+                  "scope": 41,
+                  "src": "354:6:0",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
                     "typeIdentifier": "t_string_memory_ptr",
-                    "typeString": "string memory"
+                    "typeString": "string"
                   },
                   "typeName": {
-                    "id": 29,
+                    "id": 35,
                     "name": "string",
                     "nodeType": "ElementaryTypeName",
-                    "src": "288:6:0",
+                    "src": "354:6:0",
                     "typeDescriptions": {
                       "typeIdentifier": "t_string_storage_ptr",
-                      "typeString": "string storage pointer"
+                      "typeString": "string"
                     }
                   },
                   "value": null,
                   "visibility": "internal"
                 }
               ],
-              "src": "287:8:0"
+              "src": "353:8:0"
             },
-            "scope": 36,
-            "src": "248:73:0",
+            "scope": 42,
+            "src": "314:73:0",
             "stateMutability": "pure",
             "superFunction": null,
             "visibility": "public"
           }
         ],
-        "scope": 37,
-        "src": "26:297:0"
+        "scope": 43,
+        "src": "54:335:0"
       }
     ],
-    "src": "0:324:0"
+    "src": "0:390:0"
   },
   "compiler": {
     "name": "solc",
-    "version": "0.4.21+commit.dfe3193c.Emscripten.clang"
+    "version": "0.4.24+commit.e67f0147.Emscripten.clang"
   },
   "networks": {},
-  "schemaVersion": "2.0.0",
-  "updatedAt": "2018-05-14T20:04:59.746Z"
+  "schemaVersion": "2.0.1",
+  "updatedAt": "2018-10-12T10:51:50.530Z"
 }

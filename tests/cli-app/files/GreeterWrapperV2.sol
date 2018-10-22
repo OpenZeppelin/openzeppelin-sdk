@@ -1,8 +1,10 @@
 pragma solidity ^0.4.24;
 
 import "mock-stdlib/contracts/Greeter.sol";
+import "mock-stdlib/contracts/SharedLibrary.sol";
 
 contract GreeterWrapper {
+  using SharedNumbers for uint256;
   Greeter public greeter;
 
   function initialize(Greeter _greeter) public {
@@ -15,6 +17,6 @@ contract GreeterWrapper {
   }
 
   function iteration() public view returns (uint256) {
-    return greeter.minor() + 10;
+    return greeter.minor().triple() + 10;
   }
 }

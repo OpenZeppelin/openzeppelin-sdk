@@ -1,17 +1,5 @@
 import log from '../helpers/log'
-import {
-  ZEPTOKEN_ATTRIBUTE_ID,
-  ZEPTOKEN_ATTRIBUTE_DESCRIPTION,
-  VALIDATOR_NAME,
-  ZEPPELIN_ORG_NAME,
-  ZEPPELIN_ORG_MAX_ADDRESSES,
-  JURISDICTION_RESTRICTED_ACCESS,
-  JURISDICTION_ONLY_PERSONAL,
-  JURISDICTION_SECONDARY_SOURCE,
-  JURISDICTION_SECONDARY_ID,
-  JURISDICTION_MINIMUM_STAKE,
-  JURISDICTION_FEE
-} from '../constants'
+import { ZEPTOKEN_ATTRIBUTE_ID, ZEPTOKEN_ATTRIBUTE_DESCRIPTION, VALIDATOR_NAME, ZEPPELIN_ORG_NAME, ZEPPELIN_ORG_MAX_ADDRESSES } from '../constants'
 
 export default async function configureTPL(jurisdiction, validator, options) {
   log.base('\n--------------------------------------------------------------------\n\n')
@@ -22,12 +10,12 @@ export default async function configureTPL(jurisdiction, validator, options) {
 }
 
 export async function addValidator(jurisdiction, validator, { txParams }) {
-  log.base(`Adding ZEP validator ${validator.address} to the jurisdiction...`)
+  log.base(`Adding Organizations validator ${validator.address} to the jurisdiction...`)
   try {
     await jurisdiction.addValidator(validator.address, VALIDATOR_NAME, txParams)
-    log.info(` ✔ ZEP validator added`)
+    log.info(` ✔ Organizations validator added`)
   } catch (error) {
-    log.error(` ✘ Could not add ZEP validator to the jurisdiction`)
+    log.error(` ✘ Could not add Organizations validator to the jurisdiction`)
     throw error
   }
 }
@@ -37,12 +25,6 @@ export async function addAttributeType(jurisdiction, { txParams }) {
   try {
     await jurisdiction.addAttributeType(
       ZEPTOKEN_ATTRIBUTE_ID,
-      JURISDICTION_RESTRICTED_ACCESS,
-      JURISDICTION_ONLY_PERSONAL,
-      JURISDICTION_SECONDARY_SOURCE,
-      JURISDICTION_SECONDARY_ID,
-      JURISDICTION_MINIMUM_STAKE,
-      JURISDICTION_FEE,
       ZEPTOKEN_ATTRIBUTE_DESCRIPTION,
       txParams
     )
@@ -54,18 +36,18 @@ export async function addAttributeType(jurisdiction, { txParams }) {
 }
 
 export async function addValidatorApproval(jurisdiction, validator, { txParams }) {
-  log.base(`Adding ZEP validator approval to the jurisdiction...`);
+  log.base(`Adding Organizations validator approval to the jurisdiction...`);
   try {
     await jurisdiction.addValidatorApproval(validator.address, ZEPTOKEN_ATTRIBUTE_ID, txParams)
-    log.info(` ✔ ZEP validator approval added`);
+    log.info(` ✔ Organizations validator approval added`);
   } catch (error) {
-    log.error(` ✘ Could not add ZEP validator approval to the jurisdiction`)
+    log.error(` ✘ Could not add Organizations validator approval to the jurisdiction`)
     throw error
   }
 }
 
 export async function createZeppelinOrganization(validator, { txParams }) {
-  log.base(`Creating Zeppelin organization for the ZEP validator...`)
+  log.base(`Creating Zeppelin organization for the OrganizationsValidator...`)
   try {
     await validator.addOrganization(txParams.from, ZEPPELIN_ORG_MAX_ADDRESSES, ZEPPELIN_ORG_NAME, txParams)
     log.info(` ✔ TPL Zeppelin organization created`)

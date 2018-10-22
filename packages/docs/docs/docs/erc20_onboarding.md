@@ -32,11 +32,11 @@ This on-boarding plan considers the following assumptions:
 ## Onboarding plan demo
 
 The central idea of this proposal is to deploy an upgradeable version of your token, using the ZeppelinOS command line 
-tool. To do so, we will use a migration contract provided by the [OpenZeppelin standard library for ZeppelinOS](https://github.com/OpenZeppelin/openzeppelin-solidity/tree/zos-release).
+tool. To do so, we will use a migration contract provided by the [OpenZeppelin EVM package for ZeppelinOS](https://github.com/OpenZeppelin/openzeppelin-solidity/tree/zos-release).
 
 To better describe this plan we will use a sample project you can follow and clone from [here](https://github.com/zeppelinos/erc20-opt-in-onboarding).
 
->**Caveat:** *The migration contract is not yet released in the OpenZeppelin stdlib, but will be soon. In the meantime, 
+>**Caveat:** *The migration contract is not yet released in the OpenZeppelin EVM package, but will be soon. In the meantime, 
 the sample repository we will use includes such implementation to make things easier for the demonstration. You will see 
 a [`MigratableERC20`](https://github.com/zeppelinos/erc20-opt-in-onboarding/blob/master/contracts/openzeppelin-zos/MigratableERC20.sol)
 contract inside the contracts folder.*
@@ -118,13 +118,13 @@ contract MyUpgradeableToken is MigratableERC20, StandardToken, DetailedERC20 {
 }
 ```
 
-On one hand, we are inheriting from the `MigratableERC20` contract provided by the OpenZeppelin stdlib which provides 
+On one hand, we are inheriting from the `MigratableERC20` contract provided by the OpenZeppelin EVM package which provides 
 all the migration functionality we will need. The `MigratableERC20` contract requires the implementation to define an
 internal minting function. In this case we are defining one following the `StandardToken` contract. However, this 
 function will be provided built-in in the upcoming version of OpenZeppelin.     
 
 On the other hand, it is very important to replicate all the information and functionality that was provided by the 
-legacy token. In this case, we are inheriting from the `StandardToken` contract provided by the OpenZeppelin stdlib to 
+legacy token. In this case, we are inheriting from the `StandardToken` contract provided by the OpenZeppelin EVM package to 
 replicate all the functionality of an ERC20 token. And additionally, we are defining an initializer to handle the 
 token metadata.
 
@@ -135,9 +135,9 @@ read more about this, please go to the [following section](advanced.html#initial
 Notice that all the contracts from `openzeppelin-zos` have been adapted for ZeppelinOS compatibility, and should be the 
 ones used when dealing with upgradeable contracts.
 
-Besides allowing us to build upgradeable applications, ZeppelinOS provides on-chain standard libraries. To use an stdlib 
-in our project, we simply need to use the `link` command giving the name of the npm package of the stdlib we want to use. 
-In this case, we will link OpenZeppelin stdlib to be able to use the contracts it provides in our project: 
+Besides allowing us to build upgradeable applications, ZeppelinOS provides EVM packages. To use an EVM package
+in our project, we simply need to use the `link` command giving the name of the npm package of the EVM package we want to use. 
+In this case, we will link OpenZeppelin EVM package to be able to use the contracts it provides in our project: 
 
 ```sh
 zos link openzeppelin-zos@1.9.1
@@ -149,18 +149,18 @@ Finally we can add our upgradeable token contract to the project:
 zos add MyUpgradeableToken
 ```
 
-Great, our project has been linked to the OpenZeppelin stdlib and our `MyUpgradeableToken` has been added.
+Great, our project has been linked to the OpenZeppelin EVM package and our `MyUpgradeableToken` has been added.
 
 ### 2. Deploy the upgradeable token
 
 The first thing we have to do is to deploy our contract source code. We will also need to deploy a copy of the 
-OpenZeppelin stdlib since we will be working on a local environment. To do so, run the following command:
+OpenZeppelin EVM package since we will be working on a local environment. To do so, run the following command:
 
 ```sh
-zos push -n local --deploy-stdlib
+zos push -n local --deploy-libs
 ```
 
-We have just deployed the `MyUpgradeableToken` source code and the OpenZeppelin stdlib to the `local` network. A new 
+We have just deployed the `MyUpgradeableToken` source code and the OpenZeppelin EVM package to the `local` network. A new 
 `zos.local.json` file should have been created.
 
 Now, let's create a new instance of the upgradeable token using ZeppelinOS. Run the following line, replacing 

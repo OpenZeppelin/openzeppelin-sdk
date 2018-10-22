@@ -18,22 +18,22 @@
   ],
   "bytecode": "0x6080604052348015600f57600080fd5b5060a58061001e6000396000f300608060405260043610603f576000357c0100000000000000000000000000000000000000000000000000000000900463ffffffff1680631ffdaabd146044575b600080fd5b348015604f57600080fd5b5060566070565b604051808215151515815260200191505060405180910390f35b600060019050905600a165627a7a7230582085b91732692669c5a0279dd53b9512e9506c88509b4fdd01e663d9ce2a2b312e0029",
   "deployedBytecode": "0x608060405260043610603f576000357c0100000000000000000000000000000000000000000000000000000000900463ffffffff1680631ffdaabd146044575b600080fd5b348015604f57600080fd5b5060566070565b604051808215151515815260200191505060405180910390f35b600060019050905600a165627a7a7230582085b91732692669c5a0279dd53b9512e9506c88509b4fdd01e663d9ce2a2b312e0029",
-  "sourceMap": "26:96:1:-;;;;8:9:-1;5:2;;;30:1;27;20:12;5:2;26:96:1;;;;;;;",
-  "deployedSourceMap": "26:96:1:-;;;;;;;;;;;;;;;;;;;;;;;;46:74;;8:9:-1;5:2;;;30:1;27;20:12;5:2;46:74:1;;;;;;;;;;;;;;;;;;;;;;;;;;;;92:4;111;104:11;;46:74;:::o",
+  "sourceMap": "26:96:2:-;;;;8:9:-1;5:2;;;30:1;27;20:12;5:2;26:96:2;;;;;;;",
+  "deployedSourceMap": "26:96:2:-;;;;;;;;;;;;;;;;;;;;;;;;46:74;;8:9:-1;5:2;;;30:1;27;20:12;5:2;46:74:2;;;;;;;;;;;;;;;;;;;;;;;;;;;;92:4;111;104:11;;46:74;:::o",
   "source": "pragma solidity ^0.4.24;\n\ncontract Parent {\n  function extendsParent() public pure returns (bool) {\n    return true;\n  }\n}\n",
   "sourcePath": "/home/spalladino/Projects/zeppelinos/zos/tests/cli-app/dependencies/mock-stdlib-1.2.0/contracts/Parent.sol",
   "ast": {
     "absolutePath": "/home/spalladino/Projects/zeppelinos/zos/tests/cli-app/dependencies/mock-stdlib-1.2.0/contracts/Parent.sol",
     "exportedSymbols": {
       "Parent": [
-        44
+        77
       ]
     },
-    "id": 45,
+    "id": 78,
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 35,
+        "id": 68,
         "literals": [
           "solidity",
           "^",
@@ -41,7 +41,7 @@
           ".24"
         ],
         "nodeType": "PragmaDirective",
-        "src": "0:24:1"
+        "src": "0:24:2"
       },
       {
         "baseContracts": [],
@@ -49,31 +49,31 @@
         "contractKind": "contract",
         "documentation": null,
         "fullyImplemented": true,
-        "id": 44,
+        "id": 77,
         "linearizedBaseContracts": [
-          44
+          77
         ],
         "name": "Parent",
         "nodeType": "ContractDefinition",
         "nodes": [
           {
             "body": {
-              "id": 42,
+              "id": 75,
               "nodeType": "Block",
-              "src": "98:22:1",
+              "src": "98:22:2",
               "statements": [
                 {
                   "expression": {
                     "argumentTypes": null,
                     "hexValue": "74727565",
-                    "id": 40,
+                    "id": 73,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": true,
                     "kind": "bool",
                     "lValueRequested": false,
                     "nodeType": "Literal",
-                    "src": "111:4:1",
+                    "src": "111:4:2",
                     "subdenomination": null,
                     "typeDescriptions": {
                       "typeIdentifier": "t_bool",
@@ -81,15 +81,15 @@
                     },
                     "value": "true"
                   },
-                  "functionReturnParameters": 39,
-                  "id": 41,
+                  "functionReturnParameters": 72,
+                  "id": 74,
                   "nodeType": "Return",
-                  "src": "104:11:1"
+                  "src": "104:11:2"
                 }
               ]
             },
             "documentation": null,
-            "id": 43,
+            "id": 76,
             "implemented": true,
             "isConstructor": false,
             "isDeclaredConst": true,
@@ -97,23 +97,23 @@
             "name": "extendsParent",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 36,
+              "id": 69,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "68:2:1"
+              "src": "68:2:2"
             },
             "payable": false,
             "returnParameters": {
-              "id": 39,
+              "id": 72,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 38,
+                  "id": 71,
                   "name": "",
                   "nodeType": "VariableDeclaration",
-                  "scope": 43,
-                  "src": "92:4:1",
+                  "scope": 76,
+                  "src": "92:4:2",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -121,10 +121,10 @@
                     "typeString": "bool"
                   },
                   "typeName": {
-                    "id": 37,
+                    "id": 70,
                     "name": "bool",
                     "nodeType": "ElementaryTypeName",
-                    "src": "92:4:1",
+                    "src": "92:4:2",
                     "typeDescriptions": {
                       "typeIdentifier": "t_bool",
                       "typeString": "bool"
@@ -134,33 +134,33 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "91:6:1"
+              "src": "91:6:2"
             },
-            "scope": 44,
-            "src": "46:74:1",
+            "scope": 77,
+            "src": "46:74:2",
             "stateMutability": "pure",
             "superFunction": null,
             "visibility": "public"
           }
         ],
-        "scope": 45,
-        "src": "26:96:1"
+        "scope": 78,
+        "src": "26:96:2"
       }
     ],
-    "src": "0:123:1"
+    "src": "0:123:2"
   },
   "legacyAST": {
     "absolutePath": "/home/spalladino/Projects/zeppelinos/zos/tests/cli-app/dependencies/mock-stdlib-1.2.0/contracts/Parent.sol",
     "exportedSymbols": {
       "Parent": [
-        44
+        77
       ]
     },
-    "id": 45,
+    "id": 78,
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 35,
+        "id": 68,
         "literals": [
           "solidity",
           "^",
@@ -168,7 +168,7 @@
           ".24"
         ],
         "nodeType": "PragmaDirective",
-        "src": "0:24:1"
+        "src": "0:24:2"
       },
       {
         "baseContracts": [],
@@ -176,31 +176,31 @@
         "contractKind": "contract",
         "documentation": null,
         "fullyImplemented": true,
-        "id": 44,
+        "id": 77,
         "linearizedBaseContracts": [
-          44
+          77
         ],
         "name": "Parent",
         "nodeType": "ContractDefinition",
         "nodes": [
           {
             "body": {
-              "id": 42,
+              "id": 75,
               "nodeType": "Block",
-              "src": "98:22:1",
+              "src": "98:22:2",
               "statements": [
                 {
                   "expression": {
                     "argumentTypes": null,
                     "hexValue": "74727565",
-                    "id": 40,
+                    "id": 73,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": true,
                     "kind": "bool",
                     "lValueRequested": false,
                     "nodeType": "Literal",
-                    "src": "111:4:1",
+                    "src": "111:4:2",
                     "subdenomination": null,
                     "typeDescriptions": {
                       "typeIdentifier": "t_bool",
@@ -208,15 +208,15 @@
                     },
                     "value": "true"
                   },
-                  "functionReturnParameters": 39,
-                  "id": 41,
+                  "functionReturnParameters": 72,
+                  "id": 74,
                   "nodeType": "Return",
-                  "src": "104:11:1"
+                  "src": "104:11:2"
                 }
               ]
             },
             "documentation": null,
-            "id": 43,
+            "id": 76,
             "implemented": true,
             "isConstructor": false,
             "isDeclaredConst": true,
@@ -224,23 +224,23 @@
             "name": "extendsParent",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 36,
+              "id": 69,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "68:2:1"
+              "src": "68:2:2"
             },
             "payable": false,
             "returnParameters": {
-              "id": 39,
+              "id": 72,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 38,
+                  "id": 71,
                   "name": "",
                   "nodeType": "VariableDeclaration",
-                  "scope": 43,
-                  "src": "92:4:1",
+                  "scope": 76,
+                  "src": "92:4:2",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -248,10 +248,10 @@
                     "typeString": "bool"
                   },
                   "typeName": {
-                    "id": 37,
+                    "id": 70,
                     "name": "bool",
                     "nodeType": "ElementaryTypeName",
-                    "src": "92:4:1",
+                    "src": "92:4:2",
                     "typeDescriptions": {
                       "typeIdentifier": "t_bool",
                       "typeString": "bool"
@@ -261,20 +261,20 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "91:6:1"
+              "src": "91:6:2"
             },
-            "scope": 44,
-            "src": "46:74:1",
+            "scope": 77,
+            "src": "46:74:2",
             "stateMutability": "pure",
             "superFunction": null,
             "visibility": "public"
           }
         ],
-        "scope": 45,
-        "src": "26:96:1"
+        "scope": 78,
+        "src": "26:96:2"
       }
     ],
-    "src": "0:123:1"
+    "src": "0:123:2"
   },
   "compiler": {
     "name": "solc",
@@ -282,5 +282,5 @@
   },
   "networks": {},
   "schemaVersion": "2.0.1",
-  "updatedAt": "2018-10-09T15:33:16.092Z"
+  "updatedAt": "2018-10-12T10:21:38.887Z"
 }

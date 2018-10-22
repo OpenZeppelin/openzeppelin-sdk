@@ -15,6 +15,8 @@ export default class ErrorHandler {
       log.error(errorMessage)
     }
     else log.error(this.error.stack)
+    if (this.error.cb) this.error.cb()
+
     process.exit(1)
   }
 }

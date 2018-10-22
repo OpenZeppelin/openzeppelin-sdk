@@ -1,5 +1,6 @@
 import stdout from '../utils/stdout';
 import ControllerFor from '../models/network/ControllerFor'
+import ScriptError from '../models/errors/ScriptError'
 
 export default async function setAdmin({ newAdmin, packageName, contractAlias, proxyAddress, network, txParams = {}, networkFile = undefined}) {
   if (!contractAlias && !proxyAddress) {
@@ -11,7 +12,9 @@ export default async function setAdmin({ newAdmin, packageName, contractAlias, p
   try {
     const proxies = await controller.setProxiesAdmin(packageName, contractAlias, proxyAddress, newAdmin);
     proxies.forEach(proxy => stdout(proxy.address));
-  } finally {
-    controller.writeNetworkPackage();
+    controller.writeNetworkPackageIfNeeded()
+  } catch(error) {
+    const cb = () => controller.writeNetworkPackageIfNeeded()
+    throw new ScriptError(error, cb)
   }
 }

@@ -11,6 +11,7 @@ import * as initLib from '../../src/scripts/init-lib';
 import * as init from '../../src/scripts/init';
 import * as link from '../../src/scripts/link';
 import * as unlink from '../../src/scripts/unlink';
+import * as publish from '../../src/scripts/publish';
 import * as pull from '../../src/scripts/pull';
 import * as push from '../../src/scripts/push';
 import * as remove from '../../src/scripts/remove';
@@ -22,7 +23,7 @@ import * as setAdmin from '../../src/scripts/set-admin';
 
 import * as runWithTruffle from '../../src/utils/runWithTruffle';
 import Session from '../../src/models/network/Session';
-import ErrorHandler from '../../src/models/ErrorHandler';
+import ErrorHandler from '../../src/models/errors/ErrorHandler';
 import program from '../../src/bin/program';
 
 const assert = require('chai').assert
@@ -56,6 +57,7 @@ exports.stubCommands = function () {
     this.init = sinon.stub(init, 'default')
     this.link = sinon.stub(link, 'default')
     this.unlink = sinon.stub(unlink, 'default')
+    this.publish = sinon.stub(publish, 'default')
     this.pull = sinon.stub(pull, 'default')
     this.push = sinon.stub(push, 'default')
     this.remove = sinon.stub(remove, 'default')
@@ -85,6 +87,7 @@ exports.stubCommands = function () {
     this.init.restore()
     this.link.restore()
     this.unlink.restore()
+    this.publish.restore()
     this.pull.restore()
     this.push.restore()
     this.remove.restore()

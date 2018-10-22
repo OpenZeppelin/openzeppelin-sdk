@@ -26,44 +26,44 @@ export default class StatusFetcher {
     this.networkFile.provider = { address: observed }
   }
 
-  onUnregisteredLocalContract(expected, observed, { alias, address }) {
+  onUnregisteredLocalImplementation(expected, observed, { alias, address }) {
     log.info(`Removing unregistered local contract ${alias} ${address}`)
     this.networkFile.unsetContract(alias)
   }
 
-  onMissingRemoteContract(expected, observed, { alias, address }) {
+  onMissingRemoteImplementation(expected, observed, { alias, address }) {
     const contractName = this.networkFile.packageFile.contract(alias) || alias
     log.info(`Adding contract ${contractName} at ${address}`)
     const buildPath = Contracts.getLocalPath(contractName)
     if(fs.exists(buildPath)) {
       const contract = Contracts.getFromLocal(contractName).at(address)
-      const remoteBodyBytecode = web3.eth.getCode(address).replace(/^0x/, '')
+      const remoteBodyBytecode = web3.eth.getCode(address).replace(/^0x/, '') // TODO: PROMISIFY
       const bodyBytecodeHash = bytecodeDigest(remoteBodyBytecode)
       if(bodyCode(contract) === remoteBodyBytecode) {
         log.warn(`Assuming that constructor function of local version of ${contractName} is the one registered`)
         const constructor = constructorCode(contract)
-        const bytecodeHash = bytecodeDigest(constructor + remoteBodyBytecode)
-        this.networkFile.setContract(alias, { address, bytecodeHash, bodyBytecodeHash, constructorCode: constructor })
+        const bytecodeHash = bytecodeDigest(`${constructor}${remoteBodyBytecode}`)
+        this.networkFile.setContract(alias, { address, localBytecodeHash: bytecodeHash, deployedBytecodeHash: bytecodeHash, bodyBytecodeHash, constructorCode: constructor })
       }
       else {
         log.error(`Local version of ${contractName} has a different bytecode than the one stored at ${address}`)
-        this.networkFile.setContract(alias, { address, bodyBytecodeHash, bytecodeHash: 'unknown', constructorCode: 'unknown' })
+        this.networkFile.setContract(alias, { address, bodyBytecodeHash, localBytecodeHash: 'unknown', deployedBytecodeHash: 'unknown', constructorCode: 'unknown' })
       }
     }
     else {
       log.error(`Cannot find a contract build file for ${contractName}`)
-      this.networkFile.setContract(alias, { address, bytecodeHash: 'unknown', constructorCode: 'unknown' })
+      this.networkFile.setContract(alias, { address, localBytecodeHash: 'unknown', deployedBytecodeHash: 'unknown', constructorCode: 'unknown' })
     }
   }
 
-  onMismatchingContractAddress(expected, observed, { alias, address }) {
+  onMismatchingImplementationAddress(expected, observed, { alias, address }) {
     log.info(`Updating address of contract ${alias} from ${expected} to ${observed}`)
-    this.networkFile.setContractAddress(alias, address)
+    this.networkFile.updateImplementation(alias, (implementation) => ({ ...implementation, address }))
   }
 
-  onMismatchingContractBodyBytecode(expected, observed, { alias, address, bodyBytecodeHash }) {
+  onMismatchingImplementationBodyBytecode(expected, observed, { alias, address, bodyBytecodeHash }) {
     log.info(`Updating bytecodeHash of contract ${alias} from ${expected} to ${observed}`)
-    this.networkFile.setContractBodyBytecodeHash(alias, bodyBytecodeHash)
+    this.networkFile.updateImplementation(alias, (implementation) => ({ ...implementation, bodyBytecodeHash }))
   }
 
   onUnregisteredLocalProxy(expected, observed, { packageName, alias, address, implementation }) {

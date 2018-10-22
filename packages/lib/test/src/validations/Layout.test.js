@@ -95,4 +95,9 @@ contract('Layout', () => {
     ]);
   });
 
+  it('reports no changes on complex contract', function () {
+    const result = compare('StorageMockComplexOriginal', 'StorageMockComplexOriginal');
+    assertChanges(result, []);
+  });
+
 })

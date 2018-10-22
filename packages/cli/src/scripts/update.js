@@ -1,5 +1,6 @@
 import stdout from '../utils/stdout';
 import ControllerFor from '../models/network/ControllerFor'
+import ScriptError from '../models/errors/ScriptError'
 
 export default async function update({ packageName, contractAlias, proxyAddress, initMethod, initArgs, all, network, force = false, txParams = {}, networkFile = undefined}) {
   if (!packageName && !contractAlias && !proxyAddress && !all) {
@@ -12,7 +13,9 @@ export default async function update({ packageName, contractAlias, proxyAddress,
     await controller.checkLocalContractsDeployed(!force);
     const proxies = await controller.upgradeProxies(packageName, contractAlias, proxyAddress, initMethod, initArgs);
     proxies.forEach(proxy => stdout(proxy.address));
-  } finally {
-    controller.writeNetworkPackage();
+    controller.writeNetworkPackageIfNeeded()
+  } catch(error) {
+    const cb = () => controller.writeNetworkPackageIfNeeded()
+    throw new ScriptError(error, cb)
   }
 }

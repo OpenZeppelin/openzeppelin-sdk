@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import NetworkBaseController from './NetworkBaseController';
-import { Contracts, Logger, AppProject, FileSystem as fs, Proxy } from 'zos-lib';
+import { Contracts, Logger, AppProject, FileSystem as fs, Proxy, awaitConfirmations, hasBytecode, semanticVersionToString } from 'zos-lib';
 import { toContractFullName } from '../../utils/naming';
 import Dependency from '../dependency/Dependency';
 import { allPromisesOrError } from '../../utils/async';
@@ -28,17 +28,26 @@ export default class NetworkAppController extends NetworkBaseController {
   }
 
   async toFullApp() {
-    if (this.appAddress) return;
-    log.info(`Publishing App and Package contracts to ${this.network}...`);
-    await this.fetchOrDeploy(this.currentVersion); // loads a SimpleProject as this.project
+    if (this.appAddress) {
+      log.info(`Project is already published to ${this.network}`);
+      return;
+    }
+    
+    log.info(`Publishing project to ${this.network}...`);
+    const simpleProject = await this.fetchOrDeploy(this.currentVersion);
     const deployer = new AppProjectDeployer(this, this.packageVersion);
-    this.project = await deployer.fromSimpleProject(this.project);
+    this.project = await deployer.fromSimpleProject(simpleProject);
     log.info(`Publish to ${this.network} successful`);
-  }
 
-  async push(reupload = false, force = false) {
-    await super.push(reupload, force);
-    await this.handleLibsLink()
+    const proxies = this._fetchOwnedProxies();
+    if (proxies.length !== 0) {
+      log.info(`Awaiting confirmations before transferring proxies to published project (this may take a few minutes)`);
+      const app = this.project.getApp();
+      await awaitConfirmations(app.contract.transactionHash);
+      await hasBytecode(app.address);
+      await this._changeProxiesAdmin(proxies, app.address, simpleProject);
+      log.info(`${proxies.length} proxies have been successfully transferred`);
+    }
   }
 
   async deployLibs() {
@@ -70,12 +79,13 @@ export default class NetworkAppController extends NetworkBaseController {
     this.checkInitialization(contractClass, initMethod, initArgs);
     const proxyInstance = await this.project.createProxy(contractClass, { packageName, contractName: contractAlias, initMethod, initArgs });
     const implementationAddress = await Proxy.at(proxyInstance).implementation();
+    const packageVersion = packageName === this.packageFile.name ? this.currentVersion : (await this.project.getDependencyVersion(packageName));
     // FIXME: Shouldn't truffle deployed info correspond to the contract name, and not its alias?
     this._updateTruffleDeployedInformation(contractAlias, proxyInstance)
 
     this.networkFile.addProxy(packageName, contractAlias, {
       address: proxyInstance.address,
-      version: this.currentVersion,
+      version: semanticVersionToString(packageVersion),
       implementation: implementationAddress
     })
     return proxyInstance;
@@ -94,16 +104,17 @@ export default class NetworkAppController extends NetworkBaseController {
   async setProxiesAdmin(packageName, contractAlias, proxyAddress, newAdmin) {
     const proxies = this._fetchOwnedProxies(packageName, contractAlias, proxyAddress)
     if (proxies.length === 0) return [];
-    await this.fetchOrDeploy(this.currentVersion)
-
-    await allPromisesOrError(
-      _.map(proxies, async (proxy) => {
-        await this.project.changeProxyAdmin(proxy.address, newAdmin)
-        this.networkFile.updateProxy(proxy, proxy => ({ ... proxy, admin: newAdmin }))
-      })
-    );
-
+    await this.fetchOrDeploy(this.currentVersion);
+    await this._changeProxiesAdmin(proxies, newAdmin);
     return proxies;
+  }
+
+  async _changeProxiesAdmin(proxies, newAdmin, project = null) {
+    if (!project) project = this.project;
+    await allPromisesOrError(_.map(proxies, async (proxy) => {
+      await project.changeProxyAdmin(proxy.address, newAdmin);
+      this.networkFile.updateProxy(proxy, proxy => ({ ...proxy, admin: newAdmin }));
+    }));
   }
 
   async upgradeProxies(packageName, contractAlias, proxyAddress, initMethod, initArgs) {
@@ -118,22 +129,22 @@ export default class NetworkAppController extends NetworkBaseController {
     )
 
     // Update all proxies loaded
-    const newVersion = this.currentVersion;
     await allPromisesOrError(
-      _.map(proxies, (proxy) => this._upgradeProxy(proxy, initMethod, initArgs, newVersion))
+      _.map(proxies, (proxy) => this._upgradeProxy(proxy, initMethod, initArgs))
     )
 
     return proxies;
   }
 
-  async _upgradeProxy(proxy, initMethod, initArgs, newVersion) {
+  async _upgradeProxy(proxy, initMethod, initArgs) {
     try {
       const name = { packageName: proxy.package, contractName: proxy.contract }
       const contractClass = this.localController.getContractClass(proxy.package, proxy.contract);
       const currentImplementation = await Proxy.at(proxy).implementation();
       const contractImplementation = await this.project.getImplementation(name)
+      const packageVersion = proxy.package === this.packageFile.name ? this.currentVersion : (await this.project.getDependencyVersion(proxy.package));
+      
       let newImplementation;
-
       if (currentImplementation !== contractImplementation) {
         await this.project.upgradeProxy(proxy.address, contractClass, { initMethod, initArgs, ... name });
         newImplementation = contractImplementation
@@ -145,7 +156,7 @@ export default class NetworkAppController extends NetworkBaseController {
       this.networkFile.updateProxy(proxy, proxy => ({
         ... proxy,
         implementation: newImplementation,
-        version: newVersion
+        version: semanticVersionToString(packageVersion)
       }));
     } catch(error) {
       throw Error(`Proxy ${toContractFullName(proxy.package, proxy.contract)} at ${proxy.address} failed to update with error: ${error.message}`)
@@ -163,7 +174,7 @@ export default class NetworkAppController extends NetworkBaseController {
   }
 
   _fetchOwnedProxies(packageName, contractAlias, proxyAddress) {
-    let criteriaDescription;
+    let criteriaDescription = '';
     if (packageName || contractAlias) criteriaDescription += ` contract ${toContractFullName(packageName, contractAlias)}`
     if (proxyAddress) criteriaDescription += ` address ${proxyAddress}`
     
@@ -216,10 +227,8 @@ export default class NetworkAppController extends NetworkBaseController {
         return await this.project.setDependency(depName, depInfo.package, depInfo.version);
       }
 
-      const dependencyInfo = (new Dependency(depName, depVersion)).getNetworkFile(this.network)
-      const currentDependency = this.networkFile.getDependency(depName)
-
-      if (!currentDependency || currentDependency.package !== dependencyInfo.packageAddress) {
+      if (!this.networkFile.dependencySatisfiesVersionRequirement(depName)) {
+        const dependencyInfo = (new Dependency(depName, depVersion)).getNetworkFile(this.network)
         log.info(`Connecting to dependency ${depName} ${dependencyInfo.version}`);
         await this.project.setDependency(depName, dependencyInfo.packageAddress, dependencyInfo.version)
         const depInfo = { package: dependencyInfo.packageAddress, version: dependencyInfo.version }

@@ -1,14 +1,13 @@
 {
   "zosversion": "2",
-  "full": true,
+  "publish": true,
   "name": "zos-vouching",
-  "version": "0.0.1",
+  "version": "2.0.0",
   "contracts": {
     "ZEPToken": "ZEPToken",
-    "Vouching": "Vouching",
-    "ZEPValidator": "ZEPValidator"
+    "Vouching": "Vouching"
   },
   "dependencies": {
-    "tpl-contracts-zos": "0.0.6"
+    "tpl-contracts-eth": "1.0.0"
   }
 }

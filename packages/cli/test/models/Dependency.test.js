@@ -7,7 +7,7 @@ import npm from 'npm-programmatic'
 import { LibProject } from 'zos-lib'
 import Dependency from '../../src/models/dependency/Dependency'
 
-contract('Dependency', function() {
+contract('Dependency', function([_, from]) {
   const assertErrorMessage = (fn, errorMessage) => {
     try {
       fn()
@@ -36,12 +36,25 @@ contract('Dependency', function() {
         dependency.should.not.be.null
       })
     })
+
+    describe('#install', function() {
+      it('calls npm install', async function() {
+        const npmInstallStub = sinon.stub(npm, 'install')
+        const nameAndVersion = 'mock-stdlib@1.1.0'
+        const npmParams = { save: true, cwd: process.cwd() }
+
+        await Dependency.installFn(nameAndVersion)
+        npmInstallStub.should.have.been.calledWithExactly([nameAndVersion], npmParams)
+        sinon.restore()
+      })
+    })
+
   })
 
   describe('#constructor', function() {
     context('with invalid version', function() {
       it('throws an error',function() {
-        assertErrorMessage(() => new Dependency('mock-stdlib', '1.2.0'), /does not match dependency package version/)
+        assertErrorMessage(() => new Dependency('mock-stdlib', '1.2.0'), /does not match version/)
       })
     })
 
@@ -77,14 +90,10 @@ contract('Dependency', function() {
     })
 
     describe('#deploy', function() {
-      it('deploys a dependency', function() {
-        const libDeployStub = sinon
-          .stub(LibProject, 'fetchOrDeploy')
-          .returns({ setImplementation: () => {} })
-        this.dependency.deploy(this.txParams)
-
-        libDeployStub.should.have.been.calledWithExactly('1.1.0', this.txParams, this.addresses)
-        sinon.restore()
+      it('deploys a dependency', async function() {
+        const project = await this.dependency.deploy({ from });
+        const address = await project.getImplementation({ contractName: 'Greeter' });
+        address.should.be.nonzeroAddress;
       })
     })
 
@@ -110,18 +119,6 @@ contract('Dependency', function() {
           const networkFile = this.dependency.getNetworkFile('test')
           networkFile.fileName.should.eq('node_modules/mock-stdlib/zos.test.json')
         })
-      })
-    })
-
-    describe('#install', function() {
-      it('calls npm install', async function() {
-        const npmInstallStub = sinon.stub(npm, 'install')
-        const nameAndVersion = 'mock-stdlib@1.1.0'
-        const npmParams = { save: true, cwd: process.cwd() }
-
-        await this.dependency.installFn()
-        npmInstallStub.should.have.been.calledWithExactly([nameAndVersion], npmParams)
-        sinon.restore()
       })
     })
   })

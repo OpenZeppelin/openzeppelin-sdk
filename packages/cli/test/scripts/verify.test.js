@@ -52,7 +52,7 @@ contract('verify script', function () {
       it('throws error if contract source code has changed locally since last deploy', async function () {
         await push({ network, networkFile: this.networkFile, txParams })
         const contracts = this.networkFile.contracts
-        contracts[contractAlias].bytecodeHash = '0x0303456'
+        contracts[contractAlias].localBytecodeHash = '0x0303456'
         this.networkFile.contracts = contracts
         await assertVerify(contractAlias, { network, networkFile: this.networkFile }, /has changed locally since the last deploy/)
       })

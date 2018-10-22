@@ -25,19 +25,19 @@ export default class StatusComparator {
     this._addReport(expected, observed, 'Provider address does not match')
   }
 
-  onUnregisteredLocalContract(expected, observed, { alias, address }) {
+  onUnregisteredLocalImplementation(expected, observed, { alias, address }) {
     this._addReport(expected, observed, `A contract ${alias} at ${address} is not registered`)
   }
 
-  onMissingRemoteContract(expected, observed, { alias, address }) {
+  onMissingRemoteImplementation(expected, observed, { alias, address }) {
     this._addReport(expected, observed, `Missing registered contract ${alias} at ${address}`)
   }
 
-  onMismatchingContractAddress(expected, observed, { alias, address }) {
+  onMismatchingImplementationAddress(expected, observed, { alias, address }) {
     this._addReport(expected, address, `Address for contract ${alias} does not match`)
   }
 
-  onMismatchingContractBodyBytecode(expected, observed, { alias, address, bodyBytecodeHash }) {
+  onMismatchingImplementationBodyBytecode(expected, observed, { alias, address, bodyBytecodeHash }) {
     this._addReport(expected, observed, `Bytecode at ${address} for contract ${alias} does not match`)
   }
 
