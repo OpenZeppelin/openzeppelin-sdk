@@ -59,46 +59,6 @@ upgradeable! Even if you find a bug after deploying them to mainnet, you will
 be able to fix it without losing the contract state and in a way that's
 transparent for your users.
 
-## The proxy system
-The upgradeability system in ZeppelinOS is based on a proxy system: for each deployed contract implementation (the _logic contract_), another, user-facing contract is deployed as well (the _proxy_). The proxy will be the one in charge of the contract's storage, but will forward all function calls to the backing logic contract. The only exception to this are calls made by the owner of the proxy for administrative purposes, which will be handled by the proxy itself.
-
-The way the proxy forwards calls to the logic contract relies on [`delegatecall`](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-7.md), the mechanism the EVM provides to execute foreign code on local storage. This is normally used for libraries such as [`SafeMath`](https://github.com/OpenZeppelin/openzeppelin-solidity/blob/master/contracts/math/SafeMath.sol), which provide useful functionality but have no storage. ZeppelinOS, however, exploits this mechanism to provide upgradeability: a user only interacts with the proxy, and, when a new logic contract is available, the proxy owner simply points it to the upgraded contract. All of this is achieved in a way that is transparent for the user, as the proxy address is always the same.
-
-If you want to find out more about different possible proxy patterns, be sure to check [this post](https://blog.zeppelinos.org/proxy-patterns/).
-
-
-
-## Preserving the storage structure
-As mentioned in the [Building upgradeable applications](building.md) guide, when upgrading your contracts, you need to make sure that all variables declared in prior versions are kept in the code. New variables must be declared below the previously existing ones, as such:
-
-```sol
-contract MyContract_v1 {
-  uint256 public x;
-}
-
-contract MyContract_v2 {
-  uint256 public x;
-  uint256 public y;
-}
-```
-
-Note that this must be so _even if you no longer use the variables_. There is no restriction (apart from gas limits) on including new variables in the upgraded versions of your contracts, or on removing or adding functions.
-
-This restriction is due to how [Solidity uses the storage space](https://solidity.readthedocs.io/en/v0.4.21/miscellaneous.html#layout-of-state-variables-in-storage). In short, the variables are allocated storage space in the order they appear (for the whole variable or some pointer to the actual storage slot, in the case of dynamically sized variables). When we upgrade a contract, its storage contents are preserved. This entails that if we remove variables, the new ones will be assigned storage space that is already occupied by the old variables.
-
-We are working to automatically detect any incompatible modifications to the storage structure, but for the time being, you need to perform this check manually whenever you introduce a new change.
-
-## Initializers vs. constructors
-As we saw in the [Building upgradeable applications](building.md) guide, we did not include a constructor in our contracts, but used instead an `initialize` function. The reason for this is that constructors do not work as regular functions: they are invoked once upon a contract's creation, but their code is never stored in the blockchain. This means that they cannot be called from the contract's proxy as we call other functions. Thus, if we want to initialize variables in the _proxy's storage_, we need to include a regular function for doing so.
-
-The ZeppelinOS CLI provides a way for calling this function and passing it the necessary arguments when creating the proxy:
-
-```
-zos create MyContract --init <initializingFunction> --args <arguments> --network <network>
-```
-
-where `<initializingFunction>` is the name of the initializing function (marked with an `initializer` modifier in the code), and `<arguments>` is a comma-separated list of arguments to the function.
-
 #### Calling Initialize Functions Manually in Your Unit Tests
 
 Truffle does not know how to resolve situations where a contract has functions that have matching names, but different arities. Here's an example of a `TimedCrowdsale` contract that inherits from `Crowdsale` which results in a contract that has two `initialize` functions with different arities:
