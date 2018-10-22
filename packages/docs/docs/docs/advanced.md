@@ -84,7 +84,7 @@ contract MyContract_v2 {
 
 Note that this must be so _even if you no longer use the variables_. There is no restriction (apart from gas limits) on including new variables in the upgraded versions of your contracts, or on removing or adding functions.
 
-This restriction is due to how [Solidity uses the storage space](https://solidity.readthedocs.io/en/v0.4.21/miscellaneous.html#layout-of-state-variables-in-storage). In short, the variables are allocated storage space in the order they appear (for the whole variable or some pointer to the actual storage slot, in the case of dynamically sized variables). When we upgrade a contract, its storage contents are preserved. This entails that if we remove variables, the new ones will be assigned storage space that is already occupied by the old variables. 
+This restriction is due to how [Solidity uses the storage space](https://solidity.readthedocs.io/en/v0.4.21/miscellaneous.html#layout-of-state-variables-in-storage). In short, the variables are allocated storage space in the order they appear (for the whole variable or some pointer to the actual storage slot, in the case of dynamically sized variables). When we upgrade a contract, its storage contents are preserved. This entails that if we remove variables, the new ones will be assigned storage space that is already occupied by the old variables.
 
 We are working to automatically detect any incompatible modifications to the storage structure, but for the time being, you need to perform this check manually whenever you introduce a new change.
 
@@ -106,8 +106,8 @@ Truffle does not know how to resolve situations where a contract has functions t
 ```
 contract TimedCrowdsale is Crowdsale {
 
-  initialize(uint256 _openingTime, uint256 _closingTime) 
-    public 
+  initialize(uint256 _openingTime, uint256 _closingTime)
+    public
     isInitializer("TimedCrowdsale", "0.0.1")
   {
     Crowdsale.initialize(_rate, _wallet, _token);
@@ -116,8 +116,8 @@ contract TimedCrowdsale is Crowdsale {
 
 contract Crowdsale {
 
-  initialize(uint256 _rate, address _wallet, ERC20 _token) 
-    public 
+  initialize(uint256 _rate, address _wallet, ERC20 _token)
+    public
     isInitializer("Crowdsale", "0.0.1")
   {
     // does something
@@ -131,7 +131,7 @@ The current solution to this issue is to `npm install zos-lib` and use the same 
 
 ```
 data = encodeCall(
-    "initialize", 
+    "initialize",
     ['address', 'string', 'string', 'uint8', 'address'],
     [owner, name, symbol, decimals, exampleToken.address]
 );
@@ -152,6 +152,7 @@ When such validation checks fail, the ZeppelinOS CLI will not performs any actio
 ## Format of `zos.json` and `zos.<network>.json` files
 ZeppelinOS's CLI generates `json` files where it stores the configuration of your project.
 
+
 ### `zos.json`
 The first file stores the general configuration and is created by the `zos init` command. It has the following structure:
 
@@ -171,7 +172,8 @@ The first file stores the general configuration and is created by the `zos init`
 }
 ```
 
-Here, `<projectName>` is the name of the project, and `<version>` is the current version name or number. Once you start adding your contracts via `zos add`, they will be recorded under the `"contracts"` field, with the contract aliases as the keys (which default to the contract names), and the contract names as the values. Finally, if you link an `stdlib` with `zos link`, this will be reflected in the `"stdlib"` field, where `<stdlibName>` is the name of the linked `EVM package`.
+Here, `<projectName>` is the name of the project, and `<version>` is the current version number. Once you start adding your contracts via `zos add`, they will be recorded under the `"contracts"` field, with the contract aliases as the keys (which default to the contract names), and the contract names as the values. Finally, if you link an `stdlib` with `zos link`, this will be reflected in the `"stdlib"` field, where `<stdlibName>` is the name of the linked `EVM package`.
+
 
 ### `zos.<network>.json`
 ZeppelinOS will also generate a file for each of the networks you work on (`local`, `ropsten`, `live`, ... These should be configured [in your `truffle.js` file](http://truffleframework.com/docs/advanced/configuration#networks), but note that `zos init` already configures the `local` network, which can be run by `npx truffle develop`). These files share the same structure:
@@ -237,6 +239,8 @@ ZeppelinOS will also generate a file for each of the networks you work on (`loca
 
 The most important thing to see here are the proxies and contracts' addresses, `<proxy-i-address>` and `<contract-i-address>` respectively. What will happen is that each time you upgrade your contracts, `<contract-i-address>` will change, reflecting the underlying logic contract change. The proxy addresses, however, will stay the same, so you can interact seamlessly with the same addresses as if no change had taken place. Note that `<implementation-i-address>` will normally point to the current contract address `<contract-i-address>`. Finally, `<contract-i-hash>` stores a SHA256 hash of the contract bytecode.
 
-The other thing to notice in these files are the version numbers (or names!). The `<appVersion>` keeps track of the latest app version, and matches `<version>` from `zos.json`. The `<proxy-i-version>`s, on the other hand, keep track of which version of the contracts the proxies are pointing to. Say you deploy a contract in your app version 1.0, and then bump the version to 1.1 and push some upgraded code for that same contract. This will be reflected in the `<contract-i-address>`, but not yet in the proxy, which will display 1.0 in `<proxy-i-version>` and the old logic contract address in `<implementation-i-address>`. Once you run `zos update` to your contract, `<proxy-i-version>` will show the new 1.1 version, and `<implementation-i-address>` will point to the new `<contract-i-address>`.
+Another thing to notice in these files are the version numbers. The `<appVersion>` keeps track of the latest app version, and matches `<version>` from `zos.json`. The `<proxy-i-version>`s, on the other hand, keep track of which version of the contracts the proxies are pointing to. Say you deploy a contract in your app version 1.0, and then bump the version to 1.1 and push some upgraded code for that same contract. This will be reflected in the `<contract-i-address>`, but not yet in the proxy, which will display 1.0 in `<proxy-i-version>` and the old logic contract address in `<implementation-i-address>`. Once you run `zos update` to your contract, `<proxy-i-version>` will show the new 1.1 version, and `<implementation-i-address>` will point to the new `<contract-i-address>`.
+
+Also, notice the fields `<app>` and `<package>`. These contain the addresses of contracts that ZeppelinOS uses to facilitate the creation of proxies and the management of different versions of your contracts. These contracts will only be deployed once you publish your project to a desired network. That is, your project will not have an `app` or `package` unless explicitly running the `publish` command. Note that this step is required for projects that produce an EVM package. To read more about the architecture of contracts we are using to publish your project on-chain please refer to the [Contract Architecture](https://docs.zeppelinos.org/docs/architecture.html) section.
 
 Finally, the `stdlib` field stores information about linked EVM packages. Its address is stored in `<stdlib-address>`, and its name in `<stdlib-name>`, matching that in `zos.json`. The `custom-deploy` field will be present only when a version of the EVM package is deployed using the `--deploy-libs` flag of the `push` command, in which case `<custom-deploy>` will be `true`. The remaining addresses, `<app-address>`, `<package-address>`, and `<provider-address>` store the addresses of the `App`, the `Package`, and the current `ImplementationProvider` respectively.
