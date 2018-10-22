@@ -54,7 +54,7 @@ contract('Dependency', function([_, from]) {
   describe('#constructor', function() {
     context('with invalid version', function() {
       it('throws an error',function() {
-        assertErrorMessage(() => new Dependency('mock-stdlib', '1.2.0'), /does not match version/)
+        assertErrorMessage(() => new Dependency('mock-stdlib', '1.2.0'), /requires package version 1\.2\.0/)
       })
     })
 
@@ -115,9 +115,15 @@ contract('Dependency', function([_, from]) {
       })
 
       context('for an existent network', function() {
-        it ('generates network file', function() {
+        it ('returns network file', function() {
           const networkFile = this.dependency.getNetworkFile('test')
           networkFile.fileName.should.eq('node_modules/mock-stdlib/zos.test.json')
+        })
+      })
+
+      context('on a mismatching version', function() {
+        it('throws an error', function() {
+          assertErrorMessage(() => this.dependency.getNetworkFile('invalid'), /defines version 1\.1\.0/)
         })
       })
     })

@@ -15,7 +15,9 @@ export default class Dependency {
   }
 
   static satisfiesVersion(version, requirement) {
-    return !requirement || version === requirement || semver.satisfies(version, requirement);
+    return !requirement 
+      || version === requirement 
+      || semver.satisfies(version, requirement);
   }
 
   static async install(nameAndVersion) {
@@ -28,11 +30,17 @@ export default class Dependency {
     this.name = name
     this._networkFiles = {}
 
-    const packageVersion = this.getPackageFile().version
-    this._validateSatisfiesVersion(packageVersion, requirement)
-    this.version = packageVersion
-    this.nameAndVersion = `${name}@${packageVersion}`
-    this.requirement = requirement || tryWithCaret(packageVersion)
+    const zosVersion = this.getPackageFile().version
+    const npmVersion = this.getNpmFile().version
+    this._validateSatisfiesNpmVersion(npmVersion, requirement)
+    
+    this.version = npmVersion
+    this.npmRequirement = requirement || tryWithCaret(npmVersion)
+    this.zosRequirement = tryWithCaret(zosVersion)
+  }
+
+  get requirement() {
+    return this.npmRequirement
   }
 
   async deploy(txParams) {
@@ -64,6 +72,17 @@ export default class Dependency {
     return project
   }
 
+  getNpmFile() {
+    if (!this._npmFile) {
+      const filename = `node_modules/${this.name}/package.json`
+      if (!fs.exists(filename)) {
+        throw Error(`Could not find a package.json file for '${this.name}'.`)
+      }
+      this._npmFile = fs.parseJson(filename);
+    }
+    return this._npmFile
+  }
+
   getPackageFile() {
     if (!this._packageFile) {
       const filename = `node_modules/${this.name}/zos.json`
@@ -83,7 +102,7 @@ export default class Dependency {
       }
 
       this._networkFiles[network] = new ZosNetworkFile(this.getPackageFile(), network, filename)
-      this._validateSatisfiesVersion(this._networkFiles[network].version, this.requirement)
+      this._validateSatisfiesNetworkVersion(this._networkFiles[network].version, this.zosRequirement, network)
     }
     return this._networkFiles[network]
   }
@@ -98,9 +117,15 @@ export default class Dependency {
     return `node_modules/${this.name}/zos.${network}.json`
   }
 
-  _validateSatisfiesVersion(version, requirement) {
+  _validateSatisfiesNpmVersion(version, requirement) {
     if (!Dependency.satisfiesVersion(version, requirement)) {
-      throw Error(`Required dependency version ${requirement} does not match version ${version}`);
+      throw Error(`Dependency ${this.name} requires package version ${requirement}, but ${version} was found. Please update ${this.name} package to the required version.`);
+    }
+  }
+
+  _validateSatisfiesNetworkVersion(version, requirement, network) {
+    if (!Dependency.satisfiesVersion(version, requirement)) {
+      throw Error(`Dependency ${this.name} defines version ${semver.coerce(requirement)}, but ${version} was found for network ${network}.`);
     }
   }
 }
