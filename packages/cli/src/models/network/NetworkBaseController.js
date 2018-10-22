@@ -50,13 +50,13 @@ export default class NetworkBaseController {
   }
 
   async compareCurrentStatus() {
-    if (this.isLightweight) throw Error('Command status-pull is not supported for lightweight apps' )
+    if (this.isLightweight) throw Error('Command status-pull is not supported for unpublished projects' )
     const statusComparator = StatusChecker.compare(this.networkFile, this.txParams)
     await statusComparator.call()
   }
 
   async pullRemoteStatus() {
-    if (this.isLightweight) throw Error('Command status-fix is not supported for lightweight apps' )
+    if (this.isLightweight) throw Error('Command status-fix is not supported for unpublished projects' )
     const statusFetcher = StatusChecker.fetch(this.networkFile, this.txParams)
     await statusFetcher.call()
   }
@@ -77,14 +77,26 @@ export default class NetworkBaseController {
 
     this._checkVersion()
     await this.fetchOrDeploy(this.packageVersion)
-    await this.uploadSolidityLibs(changedLibraries);
+    await this.handleLibsLink();
     
+    this.checkNotFrozen();
+    await this.uploadSolidityLibs(changedLibraries);
     await Promise.all([
       this.uploadContracts(contracts), 
       this.unsetContracts()
     ])
 
     await this._unsetSolidityLibs()
+  }
+
+  async handleLibsLink() {
+    return;
+  }
+
+  checkNotFrozen() {
+    if (this.networkFile.frozen) {
+      throw Error('Cannot modify contracts in a frozen version. Run zos bump to create a new version first.');
+    }
   }
 
   async newVersion(versionName) {
@@ -145,10 +157,6 @@ export default class NetworkBaseController {
   }
 
   async uploadContracts(contracts) {
-    if (this.networkFile.frozen) {
-      throw Error('Cannot upload contracts for a frozen version. Run zos bump to create a new version first.');
-    }
-
     await allPromisesOrError(
       contracts.map(([contractAlias, contractClass]) => this.uploadContract(contractAlias, contractClass))
     )
@@ -191,7 +199,7 @@ export default class NetworkBaseController {
 
   _hasChangedLibraries(contractClass, changedLibraries) {
     const libNames = getSolidityLibNames(contractClass.bytecode)
-    return !_.isEmpty(_.intersection(changedLibraries, libNames))
+    return !_.isEmpty(_.intersection(changedLibraries.map(c => c.contractName), libNames))
   }
 
   _getAllSolidityLibNames(contractNames) {
@@ -331,6 +339,7 @@ export default class NetworkBaseController {
   }
 
   async freeze() {
+    if (!this.packageAddress) throw Error('Cannot freeze an unpublished project')
     await this.fetchOrDeploy(this.currentVersion)
     await this.project.freeze()
     this.networkFile.frozen = true

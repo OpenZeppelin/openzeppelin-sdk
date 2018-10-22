@@ -2,11 +2,11 @@ import { Contracts } from 'zos-lib'
 import validateAddress from '../helpers/validateAddress'
 
 export function fetchJurisdiction(networkFile) {
-  const jurisdictionProxies = networkFile._proxiesOf('tpl-contracts-zos/BasicJurisdiction')
+  const jurisdictionProxies = networkFile._proxiesOf('tpl-contracts-eth/BasicJurisdiction')
   if (jurisdictionProxies.length > 0) {
     const jurisdictionAddress = jurisdictionProxies[jurisdictionProxies.length - 1].address
     if (validateAddress(jurisdictionAddress)) {
-      const BasicJurisdiction = Contracts.getFromNodeModules('tpl-contracts-zos', 'BasicJurisdiction')
+      const BasicJurisdiction = Contracts.getFromNodeModules('tpl-contracts-eth', 'BasicJurisdiction')
       return BasicJurisdiction.at(jurisdictionAddress)
     }
   }
@@ -35,12 +35,12 @@ export function fetchVouching(networkFile) {
 }
 
 export function fetchValidator(networkFile) {
-  const validatorProxies = networkFile._proxiesOf('zos-vouching/ZEPValidator')
+  const validatorProxies = networkFile._proxiesOf('tpl-contracts-eth/OrganizationsValidator')
   if (validatorProxies.length > 0) {
     const validatorAddress = validatorProxies[validatorProxies.length - 1].address
     if (validateAddress(validatorAddress)) {
-      const ZEPValidator = Contracts.getFromLocal('ZEPValidator')
-      return ZEPValidator.at(validatorAddress)
+      const OrganizationsValidator = Contracts.getFromNodeModules('tpl-contracts-eth', 'OrganizationsValidator')
+      return OrganizationsValidator.at(validatorAddress)
     }
   }
 }

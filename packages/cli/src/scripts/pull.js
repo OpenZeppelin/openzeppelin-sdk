@@ -8,6 +8,6 @@ export default async function pull({ network, txParams = {}, networkFile = undef
     controller.writeNetworkPackageIfNeeded()
   } catch(error) {
     const cb = () => controller.writeNetworkPackageIfNeeded()
-    throw new ScriptError(error.message, cb)
+    throw new ScriptError(error, cb)
   }
 }

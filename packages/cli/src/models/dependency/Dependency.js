@@ -1,10 +1,12 @@
 import _ from 'lodash';
-import { FileSystem as fs, LibProject, Contracts, getSolidityLibNames } from 'zos-lib'
+import { FileSystem as fs, LibProject, Contracts, getSolidityLibNames, Logger } from 'zos-lib'
 import semver from 'semver';
 import npm from 'npm-programmatic'
 
 import ZosPackageFile from '../files/ZosPackageFile';
 import ZosNetworkFile from '../files/ZosNetworkFile';
+
+const log = new Logger('Dependency');
 
 export default class Dependency {
   static fromNameWithVersion(nameAndVersion) {
@@ -14,6 +16,12 @@ export default class Dependency {
 
   static satisfiesVersion(version, requirement) {
     return !requirement || version === requirement || semver.satisfies(version, requirement);
+  }
+
+  static async install(nameAndVersion) {
+    log.info(`Installing ${nameAndVersion} via npm...`);
+    await npm.install([nameAndVersion], { save: true, cwd: process.cwd() });
+    return this.fromNameWithVersion(nameAndVersion);
   }
 
   constructor(name, requirement) {
@@ -56,10 +64,6 @@ export default class Dependency {
     return project
   }
 
-  async install() {
-    await npm.install([this.nameAndVersion], { save: true, cwd: process.cwd() })
-  }
-
   getPackageFile() {
     if (!this._packageFile) {
       const filename = `node_modules/${this.name}/zos.json`
@@ -96,7 +100,7 @@ export default class Dependency {
 
   _validateSatisfiesVersion(version, requirement) {
     if (!Dependency.satisfiesVersion(version, requirement)) {
-      throw Error(`Required dependency version ${requirement} does not match dependency package version ${version}`);
+      throw Error(`Required dependency version ${requirement} does not match version ${version}`);
     }
   }
 }

@@ -35,7 +35,7 @@ function runIntegrationTest({ lightweight }) {
   })
 
   it('pushes to network', function () {
-    run(`npx zos push --network ${network} --from ${this.from} --deploy-libs --skip-compile`)
+    run(`npx zos push --network ${network} --from ${this.from} --deploy-dependencies --skip-compile`)
   })
 
   it('creates an instance', function () {
@@ -75,7 +75,7 @@ function runIntegrationTest({ lightweight }) {
   it('upgrades a dependency', function () {
     copy('GreeterWrapperV2.sol', 'contracts/GreeterWrapper.sol')
     run(`npx truffle compile`)
-    run(`npx zos push --deploy-libs --network ${network} --from ${this.from} --skip-compile`)
+    run(`npx zos push --deploy-dependencies --network ${network} --from ${this.from} --skip-compile`)
     run(`npx zos update mock-stdlib/Greeter --network ${network} --from ${this.from}`)
     truffleExec(`run.js cli-app/GreeterWrapper 0 iteration --network ${network}`).should.eq('2')
     run(`npx zos update GreeterWrapper --network ${network} --from ${this.from}`)

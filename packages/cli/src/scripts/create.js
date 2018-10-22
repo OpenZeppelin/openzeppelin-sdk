@@ -6,7 +6,7 @@ export default async function createProxy({ packageName, contractAlias, initMeth
   if (!contractAlias) throw Error('A contract alias must be provided to create a new proxy.')
   
   const controller = ControllerFor(network, txParams, networkFile)
-  if (controller.isLib) throw Error('Cannot create a proxy for a library project')
+  if (controller.isLib) throw Error('Cannot create a proxy for a package project')
   
   try {
     await controller.checkContractDeployed(packageName, contractAlias, !force);
@@ -17,6 +17,6 @@ export default async function createProxy({ packageName, contractAlias, initMeth
     return proxy;
   } catch(error) {
     const cb = () => controller.writeNetworkPackageIfNeeded()
-    throw new ScriptError(error.message, cb)
+    throw new ScriptError(error, cb)
   }
 }

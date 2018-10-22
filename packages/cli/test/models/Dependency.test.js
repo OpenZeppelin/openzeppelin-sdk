@@ -36,12 +36,25 @@ contract('Dependency', function([_, from]) {
         dependency.should.not.be.null
       })
     })
+
+    describe('#install', function() {
+      it('calls npm install', async function() {
+        const npmInstallStub = sinon.stub(npm, 'install')
+        const nameAndVersion = 'mock-stdlib@1.1.0'
+        const npmParams = { save: true, cwd: process.cwd() }
+
+        await Dependency.installFn(nameAndVersion)
+        npmInstallStub.should.have.been.calledWithExactly([nameAndVersion], npmParams)
+        sinon.restore()
+      })
+    })
+
   })
 
   describe('#constructor', function() {
     context('with invalid version', function() {
       it('throws an error',function() {
-        assertErrorMessage(() => new Dependency('mock-stdlib', '1.2.0'), /does not match dependency package version/)
+        assertErrorMessage(() => new Dependency('mock-stdlib', '1.2.0'), /does not match version/)
       })
     })
 
@@ -106,18 +119,6 @@ contract('Dependency', function([_, from]) {
           const networkFile = this.dependency.getNetworkFile('test')
           networkFile.fileName.should.eq('node_modules/mock-stdlib/zos.test.json')
         })
-      })
-    })
-
-    describe('#install', function() {
-      it('calls npm install', async function() {
-        const npmInstallStub = sinon.stub(npm, 'install')
-        const nameAndVersion = 'mock-stdlib@1.1.0'
-        const npmParams = { save: true, cwd: process.cwd() }
-
-        await this.dependency.installFn()
-        npmInstallStub.should.have.been.calledWithExactly([nameAndVersion], npmParams)
-        sinon.restore()
       })
     })
   })
