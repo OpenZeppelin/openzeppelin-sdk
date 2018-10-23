@@ -10,7 +10,7 @@ const Verifier = {
     if (remote === 'etherchain') {
       await publishToEtherchain(params)
     } else {
-      throw new Error('Invalid remote. Currently, zOS contract verifier only supports etherchain as remote verification application.')
+      throw new Error('Invalid remote. Currently, ZeppelinOS contract verifier only supports etherchain as remote verification application.')
     }
   }
 }
