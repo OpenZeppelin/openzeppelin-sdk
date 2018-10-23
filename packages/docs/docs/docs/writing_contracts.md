@@ -77,38 +77,35 @@ contract MyContract is BaseContract {
 }
 ```
 
-### Use upgradeable libraries
+### Use upgradeable packages
 
-Keep in mind that this restriction affects not only your contracts, but also the contracts you import from a library. For instance, if you use the [`DetailedERC20` token implementation](https://github.com/OpenZeppelin/openzeppelin-solidity/blob/v1.12.0/contracts/token/ERC20/DetailedERC20.sol) from OpenZeppelin, the contract initializes the token's name, symbol and decimals in its constructor:
+Keep in mind that this restriction affects not only your contracts, but also the contracts you import from a library. For instance, if you use the [`ERC20Detailed` token implementation](https://github.com/OpenZeppelin/openzeppelin-solidity/blob/v2.0.0/contracts/token/ERC20/ERC20Detailed.sol) from OpenZeppelin, the contract initializes the token's name, symbol and decimals in its constructor:
 
 ```js
-contract DetailedERC20 is ERC20 {
-  string public name;
-  string public symbol;
-  uint8 public decimals;
+ontract ERC20Detailed is IERC20 {
+  string private _name;
+  string private _symbol;
+  uint8 private _decimals;
 
-  constructor(string _name, string _symbol, uint8 _decimals) public {
-    name = _name;
-    symbol = _symbol;
-    decimals = _decimals;
-  }
+  constructor(string name, string symbol, uint8 decimals) public {
+    _name = name;
+    _symbol = symbol;
+    _decimals = decimals;
 }
 ```
 
-This means that you should not be using these contracts in your ZeppelinOS project. Instead, make sure to use `openzeppelin-zos`, which is an official fork of OpenZeppelin, which has been modified to use initializers instead of constructors. For instance, an ERC20 implementation provided by `openzeppelin-zos` is the [`DetailedMintableToken`](https://github.com/OpenZeppelin/openzeppelin-zos/blob/v1.9.4/contracts/token/ERC20/DetailedMintableToken.sol):
+This means that you should not be using these contracts in your ZeppelinOS project. Instead, make sure to use `openzeppelin-eth`, which is an official fork of OpenZeppelin, which has been modified to use initializers instead of constructors. For instance, an ERC20 implementation provided by `openzeppelin-eth` is the [`ERC20Mintable`](hhttps://github.com/OpenZeppelin/openzeppelin-eth/blob/v2.0.2/contracts/token/ERC20/ERC20Mintable.sol):
 
 ```js
-contract DetailedMintableToken is Initializable, DetailedERC20, MintableToken {
-  function initialize(address _sender, string _name, string _symbol, uint8 _decimals)
-    initializer public
-  {
-    DetailedERC20.initialize(_name, _symbol, _decimals);
-    MintableToken.initialize(_sender);
+contract ERC20Mintable is Initializable, ERC20, MinterRole {
+  function initialize(address sender) public initializer {
+    MinterRole.initialize(sender);
   }
+  [...]
 }
 ```
 
-Whether it is OpenZeppelin or another shared smart contracts library, always make sure that the library is set up to handle upgradeable contracts.
+Whether it is OpenZeppelin or another EVM package, always make sure that the package is set up to handle upgradeable contracts.
 
 ### Avoid initial values in fields declarations
 
