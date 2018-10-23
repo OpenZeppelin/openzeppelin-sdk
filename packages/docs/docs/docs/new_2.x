@@ -17,7 +17,7 @@ In 2.x by default, your zOS project will not use any of its App or Package on-ch
 
 ## New commands
 
-2.x introduces a few new commands to its CLI which are described below:
+2.x introduces a few new commands to its CLI:
 
 * `zos publish`
 * `zos check`
