@@ -7,6 +7,7 @@
     "advanced": "Advanced topics",
     "application_AppDirectory": "AppDirectory",
     "application_BaseApp": "BaseApp",
+    "application_Package": "Package",
     "application_PackagedApp": "PackagedApp",
     "application_UnversionedApp": "UnversionedApp",
     "application_versioning_FreezableImplementationDirectory": "FreezableImplementationDirectory",
@@ -22,6 +23,7 @@
     "upgradeability_UpgradeabilityProxyFactory": "UpgradeabilityProxyFactory",
     "apis": "Reference",
     "Start here": "Start here",
+    "architecture": "Contract Architecture",
     "basil": "Zeppelin's Basil",
     "Basil": "Basil",
     "building": "Building an upgradeable application",
@@ -81,7 +83,8 @@
     "APPLICATION": "APPLICATION",
     "APPLICATION / VERSIONING": "APPLICATION / VERSIONING",
     "MIGRATIONS": "MIGRATIONS",
-    "UPGRADEABILITY": "UPGRADEABILITY"
+    "UPGRADEABILITY": "UPGRADEABILITY",
+    "ONBOARDING LEGACY CONTRACTS": "ONBOARDING LEGACY CONTRACTS"
   },
   "pages-strings": {
     "Help Translate|recruit community translators for your project": "Help Translate",
