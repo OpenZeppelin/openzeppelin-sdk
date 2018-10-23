@@ -256,6 +256,10 @@ footer.nav-footer a:focus, footer.nav-footer a:hover {
   color: rgb(50, 50, 50);
 }
 
+footer .report-bugs {
+  text-align: center;
+}
+
 .contract-doc .contract .base-contracts {
   padding-top: 0;
   padding-bottom: 15px;
