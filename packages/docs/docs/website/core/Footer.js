@@ -73,7 +73,7 @@ class Footer extends React.Component {
           />
         </a>
         <section className="copyright">
-          Copyright &copy; 2017-present zOS Global
+          Copyright &copy; 2017-present ZeppelinOS Global
         </section>
       </footer>
     );
