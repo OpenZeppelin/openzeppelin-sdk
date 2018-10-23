@@ -141,10 +141,10 @@ import "openzeppelin-eth/contracts/token/ERC20/ERC20.sol";
 import "openzeppelin-eth/contracts/token/ERC20/RC20Detailed.sol";
 
 contract MyContract is Initializable {
-  StandardToken public token;
+  ERC20 public token;
 
   function initialize() initializer public {
-    token = new RC20Detailed("Test", "TST", 18); // This contract will not be upgradeable
+    token = new ERC20Detailed("Test", "TST", 18); // This contract will not be upgradeable
   }
 }
 ```
