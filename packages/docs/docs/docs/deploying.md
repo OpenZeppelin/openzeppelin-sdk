@@ -37,7 +37,7 @@ Use `npm` to create a `package.json` file:
 npm init
 ```
 
-This command will ask you for details about your project. For this very basic
+This command will ask you for details about the project. For this very basic
 guide you can just press enter to accept the default values of each field.
 
 Now, we can initialize the ZeppelinOS project:
@@ -47,8 +47,8 @@ zos init my-project
 ```
 
 This command will create a `zos.json` file, which contains all the information
-about your application. For details about this file format, please see the
-[configuration files](configuration.md#zosjson) section.
+about the project. For details about this file format, please see the
+[configuration files](configuration.md#zosjson) page.
 
 The command will also initialize [Truffle](https://truffleframework.com/), so
 by now, inside the `my-project` directory you should have a `package.json` file
@@ -58,7 +58,7 @@ a file `truffle-config.js` (created by `zos` for Truffle), and a file
 
 ## Adding a contract
 
-Let's create a very simple contract as an example to be added to our project.
+Let's create a very simple contract as an example to be added to the project.
 Name it `MyContract.sol`, and put it in the `contracts/` folder with the
 following Solidity code:
 
@@ -100,7 +100,7 @@ project writing it in the `zos.json` configuration file.
 
 ## Deploying your project
 
-And just like that, we are now ready to make the initial deployment of our
+And just like that, we are now ready to make the initial deployment of the
 project. We are just missing a blockchain network where it will be deployed.
 For this example, let's use Truffle's local development network. To start it,
 open a separate terminal and run:
