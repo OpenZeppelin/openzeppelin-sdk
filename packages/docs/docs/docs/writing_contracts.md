@@ -91,6 +91,7 @@ ontract ERC20Detailed is IERC20 {
     _name = name;
     _symbol = symbol;
     _decimals = decimals;
+  }
 }
 ```
 
