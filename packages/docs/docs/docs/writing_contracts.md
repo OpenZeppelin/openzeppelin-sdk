@@ -52,8 +52,6 @@ contract MyContract is Initializable {
 }
 ```
 
-> **Note**: If you have a parameterless constructor in any of your contracts, ZeppelinOS will be able to use it without any errors, but the constructor will not be executed in your contract instances.
-
 Another difference between a `constructor` and a regular function is that Solidity takes care of automatically invoking the constructors of all ancestors of a contract. When writing an initializer, you need to take spacial care to manually call the initializers of all parent contracts:
 
 ```js
