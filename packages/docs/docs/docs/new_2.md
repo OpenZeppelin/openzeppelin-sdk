@@ -1,5 +1,5 @@
 ---
-id: new_2.x
+id: new_2
 title: What's new in ZeppelinOS 2.0
 ---
 

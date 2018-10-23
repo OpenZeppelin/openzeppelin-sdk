@@ -1,6 +1,6 @@
 ---
-id: proxies
-title: Proxy Pattern
+id: pattern
+title: The ZeppelinOS Upgrades Pattern
 ---
 
 This article describes the "unstructured storage" proxy pattern, the fundamental building block of ZeppelinOS's upgrades.
@@ -56,7 +56,7 @@ A problem that quickly comes up when using proxies has to do with the way in whi
 |                          |uint256 _supply          |
 |                          |...                      |
 
-There are many ways to overcome this problem, and the "unstructured storage" approach which ZeppelinOS implements works as follows. Instead of storing the `_implementation` address at the proxy's first storage slot, it chooses a fixed slot instead. This slot is sufficiently random, that the probability of a logic contract declaring a variable at the same slot is negligible. The same principle of fixed slot positions in the proxy's storage is used in any other variables the proxy may have, such as an admin address (that is allowed to update the value of `_implementation`), etc.
+There are many ways to overcome this problem, and the "unstructured storage" approach which ZeppelinOS implements works as follows. Instead of storing the `_implementation` address at the proxy's first storage slot, it chooses a pseudo random slot instead. This slot is sufficiently random, that the probability of a logic contract declaring a variable at the same slot is negligible. The same principle of randomizing slot positions in the proxy's storage is used in any other variables the proxy may have, such as an admin address (that is allowed to update the value of `_implementation`), etc.
 
 |Proxy                     |Implementation           |
 |--------------------------|-------------------------|
@@ -68,11 +68,11 @@ There are many ways to overcome this problem, and the "unstructured storage" app
 |...                       |                         |
 |...                       |                         |
 |...                       |                         |
-|address _implementation   |                         | <=== Fixed slot.
+|address _implementation   |                         | <=== Randomized slot.
 |...                       |                         |
 |...                       |                         |
 
-An example of how the fixed storage is achieved:
+An example of how the randomized storage is achieved:
 
 ```
 bytes32 private constant implementationPosition = keccak256("org.zeppelinos.proxy.implementation");
