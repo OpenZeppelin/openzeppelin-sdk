@@ -49,7 +49,7 @@ You can now push your application to this network:
 zos push --network local
 ```
 
-This creates a `zos.local.json` file with all the information about your app in this specific network. You can read more about this file format in the [advanced topics](advanced.md#format-of-zosjson-and-zos-network-json-files) section. If you want to work with a different network, simply substitute the `local` parameter for `ropsten`, `rinkeby` or `mainnet` in the `zos push` command.
+This creates a `zos.dev-<some_network_id>.json` file with all the information about your app in this specific network. You can read more about this file format in the [advanced topics](advanced.md#format-of-zosjson-and-zos-network-json-files) section. If you want to work with a different network, simply substitute the `local` parameter for `ropsten`, `rinkeby` or `mainnet` in the `zos push` command.
 
 To create an upgradeable instance of your contract, you can run:
 

@@ -54,7 +54,7 @@ You'll also want to create an instance of the `ERC721` token from the stdlib:
 zos create MintableERC721Token --init initialize --args <address>,MyToken,TKN --network local
 ```
 
-`<address>` will be the owner of the token. For local development you can use one of those provided by your client, or you can extract your app's contract addresses from your `zos.local.json` network configuration file.
+`<address>` will be the owner of the token. For local development you can use one of those provided by your client, or you can extract your app's contract addresses from your `zos.dev-<some_network_id>.json` network configuration file.
 
 Finally, use Truffle to connect your two deployed contracts:
 
@@ -63,6 +63,6 @@ $ npx truffle console --network local
 truffle(local)> MyContract.at(<myContractAddress>).setToken(<tokenAddress>)
 ```
 
-Remember that the addresses of both your contract and the token can be found in the `zos.local.json` network configuration file.
+Remember that the addresses of both your contract and the token can be found in the `zos.dev-<some_network_id>.json` network configuration file.
 
 This completes the setup and deployment of an upgradable application that uses an stdlib provided by ZeppelinOS. If you would like to contribute your own stdlib to ZeppelinOS, please see the [Developing a new standard library](developing.md) guide.
