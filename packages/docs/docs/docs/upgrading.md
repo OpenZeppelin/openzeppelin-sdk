@@ -46,8 +46,8 @@ and the `--args` parameter allows you to pass arguments to it. This way, you
 are initializing your contract with `42` as the value of the `x` state
 variable.
 
-This command will print the address of your contract, and it will updated it
-in the `zos.local.json` file.
+This command will print the address of your contract, and it will update the
+`zos.local.json` file.
 
 > **Note**: When calling an initializer with many variables, these should be
 > passed as a comma-separated list, with no spaces in between.
@@ -86,7 +86,7 @@ contract MyContract is Initializable {
 > you will need to preserve all variables that appear in prior versions of
 > your contracts, declaring any new variables below the already existing ones.
 > All the considerations and some recommendations for your upgrades are
-> explained in the [Writing upgradeable contracts](writing_contracts) page.
+> explained in the [Writing upgradeable contracts](writing_contracts.md) page.
 
 Once you have saved the changes, push the new code to the network:
 
@@ -100,8 +100,7 @@ Finally, let's update the already deployed contract with the new code:
 NODE_ENV=test zos update MyContract --network local
 ```
 
-You will see that this command prints the same contract address as before, and
-that a logic contract address that is new. This is all the magic behind
+You will see that this command prints the same contract address as before, and a logic contract address that is new. This is all the magic behind
 upgrades: we have two contracts, one has an address that we will never change, but it just serves as a proxy to the other contract that we can replace with
 new versions.
 
@@ -115,6 +114,6 @@ truffle(local)> myContract.x()
 43
 ```
 
-Upgrades are only one of the features of ZeppelinOS. The next one we will look
-is very interesting, because it allows us to reuse packages that have been
+Upgrades are only one of the features of ZeppelinOS. Next, we will see another
+very interesting feature, because it allows us to reuse packages that have been
 already deployed to the blockchain.
