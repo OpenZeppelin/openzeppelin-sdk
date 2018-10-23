@@ -151,7 +151,7 @@ contract MyContract is Initializable {
 }
 ```
 
-The easiest way around this issue is to avoid creating contracts from your own altogether: instead of creating a contract in an `initialize` function, simply accept an instance of that contract as a parameter, and inject it after creating it from ZeppelinOS:
+The easiest way around this issue is to avoid creating contracts on your own altogether: instead of creating a contract in an `initialize` function, simply accept an instance of that contract as a parameter, and inject it after creating it from ZeppelinOS:
 
 ```js
 import "zos-lib/contracts/Initializable.sol";
