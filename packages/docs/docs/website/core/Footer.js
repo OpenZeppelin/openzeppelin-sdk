@@ -75,6 +75,9 @@ class Footer extends React.Component {
         <section className="copyright">
           Copyright &copy; 2017-present zOS Global
         </section>
+        <section className="report-bugs">
+          <a href="https://github.com/zeppelinos/zos/issues/new?labels=kind:documentation">Report a bug on this site</a>
+        </section>
       </footer>
     );
   }
