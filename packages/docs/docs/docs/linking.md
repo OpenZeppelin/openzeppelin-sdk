@@ -3,7 +3,7 @@ id: linking
 title: Linking to EVM packages
 ---
 
-ZeppelinOS allows us to link to reuse packages that have been already deployed
+ZeppelinOS allows us to link to packages that have been already deployed
 to the blockchain, instead of wasting resources deploying them again every time
 we need them in a project. And of course, developers can upgrade their
 packages and we can update our links to point to the newest versions, so we are
@@ -64,10 +64,10 @@ and push them to a local network:
 NODE_ENV=test zos push --deploy-dependencies --network local
 ```
 
-There is one caveat here with the `--deploy-dependencies`. We mentioned that
-this feature is about reusing packages that were already deployed, and we do
-have already deployed versions of openzeppelin-eth and many other packages to
-mainnet, ropsten, rinkeby and kovan. However, on this guide we are not using
+There is one caveat here with the `--deploy-dependencies` flag. We mentioned
+that this feature is about reusing packages that were already deployed, and we
+do have already deployed versions of openzeppelin-eth and many other packages
+to mainnet, ropsten, rinkeby and kovan. However, on this guide we are not using
 any of those networks, instead we started a local development network with
 Truffle that is empty. So, `--deploy-dependencies` tells ZeppelinOS to deploy
 to the network the EVM packages we depend on. This has to be done only once,
@@ -91,7 +91,7 @@ NODE_ENV=test zos create openzeppelin-eth/StandaloneERC721 --init initialize --a
 you can use one of the 10 addresses that `truffle deploy` printed.
 
 Finally, jump to that terminal where the Truffle console is open and connect
-your two deployed contracts:
+the two deployed contracts:
 
 ```sh
 truffle(local)> MyLinkedContract.at(<myLinkedContractAddress>).setToken(<tokenAddress>)
@@ -100,12 +100,12 @@ truffle(local)> MyLinkedContract.at(<myLinkedContractAddress>).setToken(<tokenAd
 Remember that the addresses of both your contract and the token were printed by
 `zos`, and they can also be found in the `zos.local.json` configuration file.
 
-This is the beginning of a better blockchain ecosystem, where developers share
-their knowledge and their cool ideas in EVM packages, and we all contribute by
-using and improving those packages. This soon will be a swarm of packages that
-implement crazy new ways for a society to work, and they will all be available
-for you to just link into your project and build on top of them.
+This is just the beginning of a better blockchain ecosystem, where developers
+share their knowledge and their cool ideas in EVM packages, and we all
+contribute by using and improving those packages. This soon will be a swarm of
+packages that implement crazy new ways for a society to work, and they will all
+be available for you to just link into your project and build on top of them.
 
-But so far we have only seen the side of the user of EVM packages. I'm sure
-your are now asking yourself how can you publish all the packages that you are
+But so far we have only seen the side of the users of EVM packages. I'm sure
+you are now asking yourself how can you publish all the packages that you are
 developing. That's what we'll explore next.
