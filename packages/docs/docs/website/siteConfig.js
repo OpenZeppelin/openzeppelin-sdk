@@ -15,8 +15,8 @@ const siteConfig = {
   initialDoc: 'start',
   headerLinks: [
     {
-      doc: 'start',
-      label: 'Guides',
+      doc: 'developing',
+      label: 'Quickstart',
     },
     {
       doc: 'apis',
@@ -38,7 +38,7 @@ const siteConfig = {
     primaryColor: '#5CB6E4',
     secondaryColor: 'white',
   },
-  copyright: 'Copyright © 2018 zOS Global',
+  copyright: 'Copyright © 2018 ZeppelinOS Global',
   // gaTrackingId: 'UA-85043059-1',
   highlight: {
     theme: 'default',

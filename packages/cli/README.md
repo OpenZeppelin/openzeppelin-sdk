@@ -47,7 +47,7 @@ push these contracts to a blockchain network with `zos push`, use
 `zos create` to create instances for these contracts that later can be
 upgraded, and many more things.
 
-Run `zos --help` for more details about thes and all the other functions of
+Run `zos --help` for more details about this and all the other functions of
 ZeppelinOS.
 
 The

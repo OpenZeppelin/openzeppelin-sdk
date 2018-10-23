@@ -3,25 +3,21 @@ id: start
 title: ZeppelinOS
 ---
 
-ZeppelinOS is a platform to develop, deploy and operate upgradeable smart contracts on Ethereum and every other EVM and eWASM-powered blockchain.
+ZeppelinOS is a platform to develop, deploy and operate smart contract projects
+on Ethereum and every other EVM and eWASM-powered blockchain.
 
 ## Features
 
-* Upgrades: fix and improve your contracts over time.
-* EVM packages: link your contracts to EVM packages already deployed on the blockchain.
+* Upgrades: deploy new versions of packages to the blockchain.
+* Publish EVM packages: deploy packages to the blockchain to allow others
+  projects to reuse them.
+* Link EVM packages: link your project to EVM packages already deployed on the
+  blockchain.
+* Vouching: use ZEP tokens to back the quality of an EVM package.
 
 ## Getting Started
 
-Install ZeppelinOS and setup your project as described in the [Setup guide](setup.md).
-
-In order to build an upgradeable application with ZeppelinOS, follow our
-[Building upgradeable applications](building.md) guide.
-
-If you would like to use the ZeppelinOS EVM packages in your app,
- follow our [Using EVM packages in your app](using.md) guide.
-
-If you are interested in deploying your own EVM packages for ZeppelinOS,
-see our [Developing a new EVM package](developing.md) guide.
+Start by [deploying your first ZeppelinOS project](deploying.md).
 
 ## Security
 

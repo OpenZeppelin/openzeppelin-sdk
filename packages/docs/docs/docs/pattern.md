@@ -1,11 +1,11 @@
 ---
-id: proxies
-title: Proxy Pattern
+id: pattern
+title: The ZeppelinOS Upgrades Pattern
 ---
 
 This article describes the "unstructured storage" proxy pattern, the fundamental building block of ZeppelinOS's upgrades.
 
-Note: For a more in depth read, please see [blog.zeppelinos.org/proxy-patterns](https://blog.zeppelinos.org/proxy-patterns/), which discusses the need for proxies, goes into more technical detail on the subject, elaborates on other possible proxy patterns that were considered for zOS, and more.
+Note: For a more in depth read, please see [blog.zeppelinos.org/proxy-patterns](https://blog.zeppelinos.org/proxy-patterns/), which discusses the need for proxies, goes into more technical detail on the subject, elaborates on other possible proxy patterns that were considered for ZeppelinOS, and more.
 
 ## Why upgrade a contract?
 
@@ -15,11 +15,13 @@ By design, smart contracts are immutable. On the other hand, software quality he
 
 The basic idea behind using a proxy for upgrades. The first contract is a simple wrapper or "proxy" which users interact with directly and is in charge of forwarding transactions to and from the second contract, which contains the logic. The key concept to understand is that the logic contract can be replaced while the proxy, or the access point is never changed. Both contracts are still immutable in the sense that their code cannot be changed, but the logic contract can simply be swapped by another contract. The wrapper can thus point to a different logic implementation and in doing so, the software is "upgraded".
 
+```
 User ---- tx ---> Proxy ----------> Implementation_v0
                      |
                       ------------> Implementation_v1
                      |
                       ------------> Implementation_v2
+```
 
 ## Proxy forwarding
 
@@ -54,7 +56,7 @@ A problem that quickly comes up when using proxies has to do with the way in whi
 |                          |uint256 _supply          |
 |                          |...                      |
 
-There are many ways to overcome this problem, and the "unstructured storage" approach which ZeppelinOS implements works as follows. Instead of storing the `_implementation` address at the proxy's first storage slot, it chooses a fixed slot instead. This slot is sufficiently random, that the probability of a logic contract declaring a variable at the same slot is negligible. The same principle of fixed slot positions in the proxy's storage is used in any other variables the proxy may have, such as an admin address (that is allowed to update the value of `_implementation`), etc.
+There are many ways to overcome this problem, and the "unstructured storage" approach which ZeppelinOS implements works as follows. Instead of storing the `_implementation` address at the proxy's first storage slot, it chooses a pseudo random slot instead. This slot is sufficiently random, that the probability of a logic contract declaring a variable at the same slot is negligible. The same principle of randomizing slot positions in the proxy's storage is used in any other variables the proxy may have, such as an admin address (that is allowed to update the value of `_implementation`), etc.
 
 |Proxy                     |Implementation           |
 |--------------------------|-------------------------|
@@ -66,11 +68,11 @@ There are many ways to overcome this problem, and the "unstructured storage" app
 |...                       |                         |
 |...                       |                         |
 |...                       |                         |
-|address _implementation   |                         | <=== Fixed slot.
+|address _implementation   |                         | <=== Randomized slot.
 |...                       |                         |
 |...                       |                         |
 
-An example of how the fixed storage is achieved:
+An example of how the randomized storage is achieved:
 
 ```
 bytes32 private constant implementationPosition = keccak256("org.zeppelinos.proxy.implementation");
@@ -113,7 +115,7 @@ In Solidity, code that is inside a constructure or part of a global variable dec
 
 The problem is easily solved though. Logic contracts should move the code within the constructor to a regular 'initializer' function, and have this function be called whenever the proxy links to this logic contract. Special care needs to be taken with this initializer function so that it can only be called once, which is one of the properties of constructors in general programming.
 
-This is why when the zOS CLI creates a proxy, it allows you to indicate an initializer function:
+This is why when the ZeppelinOS CLI creates a proxy, it allows you to indicate an initializer function:
 
 ```bash
 npx zos create MyLogicContract --init initialize --args arg1,arg2,arg3
@@ -141,10 +143,10 @@ Notice how the contract extends `Initializable` and implements the `initializer`
 
 ## Summary
 
-Any developer using zOS should be familiar with proxies in the ways that are described in this article. In the end, the concept is very simple, and zOS is designed to encapsulate all the proxy mechanics in a way that the amount of things you need to keep in mind when developing upgradeable applications are reduced to an absolute minimum. It all comes down to a 3 item list:
+Any developer using ZeppelinOS should be familiar with proxies in the ways that are described in this article. In the end, the concept is very simple, and ZeppelinOS is designed to encapsulate all the proxy mechanics in a way that the amount of things you need to keep in mind when developing upgradeable applications are reduced to an absolute minimum. It all comes down to a 3 item list:
 
 * Have a basic understanding of what a proxy is
 * Always extend storage instead of modifying it
 * Make sure your contracts use initializer functions instead of constructors
 
-Furthermore, ZeppelinOS will let you know when something goes wrong with one of the items in this list. So, seat back, enjoy, code, and let zOS take care of the rest.
+Furthermore, ZeppelinOS will let you know when something goes wrong with one of the items in this list. So, seat back, enjoy, code, and let ZeppelinOS take care of the rest.
