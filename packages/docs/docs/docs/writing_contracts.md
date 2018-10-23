@@ -8,7 +8,7 @@ When working with upgradeable contracts in ZeppelinOS, there are a few minor cav
 
 ## Initializers
 
-You can use your Solidity contracts in ZeppelinOS without any modifications, except for their _constructors_. Due to a requirement of the proxy-based upgradeability system, no constructors can be used in upgradeable contracts. You can read in-depth about the reasons behind this restriction [in the advanced topics section](advanced.md#initializers-vs-constructors).
+You can use your Solidity contracts in ZeppelinOS without any modifications, except for their _constructors_. Due to a requirement of the proxy-based upgradeability system, no constructors can be used in upgradeable contracts. You can read in-depth about the reasons behind this restriction [in the advanced topics section](proxies.md#the-constructor-caveat).
 
 This means that, when using a contract within ZeppelinOS, you need to change its constructor into a regular function, typically named `initialize`, where you run all the setup logic:
 
@@ -188,7 +188,7 @@ contract MyContract is Initializable {
 
 ## Modifying your contracts
 
-When writing new versions of your contracts, either due to new features or bugfixing, there is an additional restriction to observe: you cannot change the order in which the contract state variables are declared, nor their type. You can read more about the reasons behind this restriction [in the advanced topics section](advanced.md#preserving-the-storage-structure).
+When writing new versions of your contracts, either due to new features or bugfixing, there is an additional restriction to observe: you cannot change the order in which the contract state variables are declared, nor their type. You can read more about the reasons behind this restriction [in the proxies section](proxies.md).
 
 This means that if you have an initial contract that looks like this:
 
