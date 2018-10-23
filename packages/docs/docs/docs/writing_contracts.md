@@ -136,14 +136,14 @@ For instance, in the following example, even if `MyContract` is upgradeable (if 
 
 ```js
 import "zos-lib/contracts/Initializable.sol";
-import "openzeppelin-solidity/contracts/token/ERC20/StandardToken.sol";
-import "openzeppelin-solidity/contracts/token/ERC20/DetailedERC20.sol";
+import "openzeppelin-eth/contracts/token/ERC20/ERC20.sol";
+import "openzeppelin-eth/contracts/token/ERC20/RC20Detailed.sol";
 
 contract MyContract is Initializable {
   StandardToken public token;
 
   function initialize() initializer public {
-    token = new DetailedERC20("Test", "TST", 18); // This contract will not be upgradeable
+    token = new RC20Detailed("Test", "TST", 18); // This contract will not be upgradeable
   }
 }
 ```
@@ -152,12 +152,12 @@ The easiest way around this issue is to avoid creating contracts from your own a
 
 ```js
 import "zos-lib/contracts/Initializable.sol";
-import "openzeppelin-solidity/contracts/token/ERC20/StandardToken.sol";
+import "openzeppelin-eth/contracts/token/ERC20/ERC20.sol";
 
 contract MyContract is Initializable {
-  StandardToken public token;
+  ERC20 public token;
 
-  function initialize(StandardToken _token) initializer public {
+  function initialize(ERC20 _token) initializer public {
     token = _token; // This contract will be upgradeable if it was created via ZeppelinOS
   }
 }
@@ -182,7 +182,7 @@ contract MyContract is Initializable {
   }
 
   function createNewToken() public returns(address) {
-    return app.create("openzeppelin-zos", "DetailedPremintedToken");
+    return app.create("openzeppelin-eth", "StandaloneERC20");
   }
 }
 ```
