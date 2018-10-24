@@ -27,7 +27,7 @@ User ---- tx ---> Proxy ----------> Implementation_v0
 
 The most immediate problem that proxies need to solve is how the proxy exposes the entire interface of the logic contract without requiring a one to one mapping of the entire logic contract's interface. That would be difficult to maintain, prone to errors, and would make the interface itself not upgradeable. Hence, a dynamic forwarding mechanism is required. The basics of such mechanism are presented in the code below:
 
-```solidityidity
+```solidity
 assembly {
   let ptr := mload(0x40)
   calldatacopy(ptr, 0, calldatasize) // (1) copy incoming call data
