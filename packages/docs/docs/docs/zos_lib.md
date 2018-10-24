@@ -18,7 +18,7 @@ respective websites you will find specific instructions for your machine.
 Truffle is also required, so let's install it and initialize a directory for
 our project:
 
-```
+```console
 npm install --global truffle
 mkdir my-project
 cd my-project
@@ -27,14 +27,14 @@ truffle init
 
 Then, install the ZeppelinOS JavaScript Library running:
 
-```sh
+```console
 npm install zos-lib
 ```
 
 Now, let's write two simple contracts. The first in `contracts/MyContractV0`
 with the following contents:
 
-```sol
+```solidity
 pragma solidity ^0.4.24;
 
 import "zos-lib/contracts/Initializable.sol";
@@ -51,7 +51,7 @@ contract MyContractV0 is Initializable {
 The second in `contracts/MyContractV1`, and it will be almost the same as the
 first one but with one extra function:
 
-```sol
+```solidity
 pragma solidity ^0.4.24;
 
 import "zos-lib/contracts/Initializable.sol";
@@ -73,7 +73,7 @@ The V1 contract is an upgrade for the V0 contract, so let's see how we can
 use the ZeppelinOS library to apply this upgrade. For this, we need to
 compile the contracts:
 
-```sh
+```console
 truffle compile
 ```
 
@@ -111,13 +111,13 @@ module.exports = function(callback) {
 As you can see on the code, this script was prepared to be executed with
 Truffle. So let's start a Truffle local development network and console:
 
-```
+```console
 truffle develop
 ```
 
 And execute the script in the truffle console:
 
-```
+```console
 truffle(develop)> exec index.js
 ```
 

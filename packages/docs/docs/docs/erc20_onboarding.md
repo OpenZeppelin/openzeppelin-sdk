@@ -54,7 +54,7 @@ is working as expected by running the test files with `npm test`._
 Now, let's deploy the legacy token. We will use a truffle development console. You can start it by running
 `npx truffle develop`. Then, run the following commands:
 
-```sh
+```console
 truffle(develop)> compile
 truffle(develop)> owner = web3.eth.accounts[1]
 truffle(develop)> MyLegacyToken.new('MyToken', 'MTK', 18, { from: owner }).then(i => legacyToken = i)
@@ -65,7 +65,7 @@ truffle(develop)> legacyToken.address
 Keep track of the `owner` and `legacyToken` addresses, we will need them in the following steps.
 
 You can check the owner balance by running:
-```sh
+```console
 truffle(develop)> legacyToken.balanceOf(owner)
 BigNumber { s: 1, e: 0, c: [ 100 ] }
 ```
@@ -75,13 +75,13 @@ Remember not to close this console, as we will be using it later.
 ### 1. Initialize your migration project with ZeppelinOS
 
 If you haven't installed the ZeppelinOS CLI, run the following command in your terminal:
-```sh
+```console
 npm install --global zos
 ```
 
 To initialize this project with ZeppelinOS, open a terminal and run the following line:
 
-```sh
+```console
 zos init my-token-migration 1.0.0
 ```
 
@@ -138,13 +138,13 @@ Besides allowing us to build upgradeable applications, ZeppelinOS provides EVM p
 in our project, we simply need to use the `link` command giving the name of the npm package of the EVM package we want to use.
 In this case, we will link OpenZeppelin EVM package to be able to use the contracts it provides in our project:
 
-```sh
+```console
 zos link openzeppelin-zos@1.9.1
 ```
 
 Finally we can add our upgradeable token contract to the project:
 
-```sh
+```console
 zos add MyUpgradeableToken
 ```
 
@@ -155,7 +155,7 @@ Great, our project has been linked to the OpenZeppelin EVM package and our `MyUp
 The first thing we have to do is to deploy our contract source code. We will also need to deploy a copy of the
 OpenZeppelin EVM package since we will be working on a local environment. To do so, run the following command:
 
-```sh
+```console
 zos push -n local --deploy-libs
 ```
 
@@ -165,7 +165,7 @@ We have just deployed the `MyUpgradeableToken` source code and the OpenZeppelin 
 Now, let's create a new instance of the upgradeable token using ZeppelinOS. Run the following line, replacing
 `LEGACY_TOKEN_ADDRESS` with the address of the legacy token contract:
 
-```sh
+```console
 zos create MyUpgradeableToken --args LEGACY_TOKEN_ADDRESS -n local
 ```
 
@@ -195,7 +195,7 @@ In order to migrate your balance, go back to the truffle develop console if you 
 or open a new one against the network where your legacy token is deployed. Then, run the following commands, replacing
 `UPGRADEABLE_TOKEN_ADDRESS` with the proxy address returned by `zos create` command of the previous step:
 
-```sh
+```console
 truffle(develop)> upgradeableToken = MyUpgradeableToken.at('UPGRADEABLE_TOKEN_ADDRESS')
 truffle(develop)> legacyToken.balanceOf(owner).then(b => balance = b)
 truffle(develop)> legacyToken.approve(upgradeableToken.address, balance, { from: owner })
@@ -203,21 +203,21 @@ truffle(develop)> upgradeableToken.migrate({ from: owner })
 ```
 
 We can now check your balance of the legacy token:
-```sh
+```console
 truffle(develop)> legacyToken.balanceOf(owner)
 BigNumber { s: 1, e: 0, c: [ 0 ] }
 ```
 
 Also the burned balance:
 
-```sh
+```console
 truffle(develop)> legacyToken.balanceOf('0x000000000000000000000000000000000000dead')
 BigNumber { s: 1, e: 0, c: [ 100 ] }
 ```
 
 And the upgradeable token balance:
 
-```sh
+```console
 truffle(develop)> upgradeableToken.balanceOf(owner)
 BigNumber { s: 1, e: 0, c: [ 100 ] }
 ```

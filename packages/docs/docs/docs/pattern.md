@@ -27,7 +27,7 @@ User ---- tx ---> Proxy ----------> Implementation_v0
 
 The most immediate problem that proxies need to solve is how the proxy exposes the entire interface of the logic contract without requiring a one to one mapping of the entire logic contract's interface. That would be difficult to maintain, prone to errors, and would make the interface itself not upgradeable. Hence, a dynamic forwarding mechanism is required. The basics of such mechanism are presented in the code below:
 
-```solidity
+```solidityidity
 assembly {
   let ptr := mload(0x40)
   calldatacopy(ptr, 0, calldatasize) // (1) copy incoming call data
@@ -74,7 +74,7 @@ There are many ways to overcome this problem, and the "unstructured storage" app
 
 An example of how the randomized storage is achieved:
 
-```
+```solidity
 bytes32 private constant implementationPosition = keccak256("org.zeppelinos.proxy.implementation");
 ```
 
@@ -117,7 +117,7 @@ The problem is easily solved though. Logic contracts should move the code within
 
 This is why when the ZeppelinOS CLI creates a proxy, it allows you to indicate an initializer function:
 
-```bash
+```console
 npx zos create MyLogicContract --init initialize --args arg1,arg2,arg3
 ```
 
