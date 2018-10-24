@@ -323,6 +323,19 @@ contract('push script', function([_, owner]) {
     });
   };
 
+  const shouldSaveOwner = function () {
+    it('should save owner when not specifying "from"', async function () {
+      const txParams = {};
+      await push({ networkFile: this.networkFile, network, txParams });
+      should.exist(this.networkFile.owner);
+    });
+
+    it('should save owner from txParams when specifying "from"', async function () {
+      await push({ networkFile: this.networkFile, network, txParams });
+      this.networkFile.owner.should.be.eq(txParams.from);
+    });
+  }
+
   const shouldNotPushWhileFrozen = function () {
     it('should refuse to push when frozen upon modified contracts', async function() {
       await freeze({ network, txParams, networkFile: this.networkFile })
@@ -361,6 +374,7 @@ contract('push script', function([_, owner]) {
 
     shouldDeployApp();
     shouldDeployProvider();
+    shouldSaveOwner();
   });
 
   describe('an app with contracts', function() {
@@ -383,6 +397,7 @@ contract('push script', function([_, owner]) {
     shouldBumpVersion();
     shouldNotPushWhileFrozen();
     shouldDeleteContracts({ unregisterFromDirectory: true });
+    shouldSaveOwner();
   });
 
   describe('an app with invalid contracts', function() {
@@ -411,6 +426,7 @@ contract('push script', function([_, owner]) {
       shouldDeployApp();
       shouldSetDependency();
       shouldUpdateDependency();
+      shouldSaveOwner();
     })
 
     describe('when using a dependency with a version range', function () {
@@ -424,6 +440,7 @@ contract('push script', function([_, owner]) {
       shouldDeployApp();
       shouldSetDependency();
       shouldUpdateDependency();
+      shouldSaveOwner();
     })
   });
 
@@ -485,6 +502,7 @@ contract('push script', function([_, owner]) {
     shouldBumpVersion();
     shouldNotPushWhileFrozen();
     shouldDeleteContracts({ unregisterFromDirectory: true });
+    shouldSaveOwner();
   });
 
   describe('an empty lightweight app', function() {
@@ -511,6 +529,7 @@ contract('push script', function([_, owner]) {
     shouldValidateContracts();
     shouldRedeployContracts();
     shouldDeleteContracts({ unregisterFromDirectory: false });
+    shouldSaveOwner();
 
     it('should not reupload contracts after version bump', async function () {
       const previousAddress = this.networkFile.contract('Impl').address
@@ -534,6 +553,7 @@ contract('push script', function([_, owner]) {
 
     shouldSetDependency();
     shouldUpdateDependency();
+    shouldSaveOwner();
   });
 });
 

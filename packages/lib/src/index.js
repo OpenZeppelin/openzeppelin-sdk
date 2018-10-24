@@ -13,7 +13,7 @@ import Logger from './utils/Logger'
 import FileSystem from './utils/FileSystem'
 import Contracts from './utils/Contracts'
 import { bodyCode, constructorCode, bytecodeDigest, replaceSolidityLibAddress, isSolidityLib, getSolidityLibNames } from './utils/Bytecode'
-import { sendTransaction, deploy, isGanacheNode, awaitConfirmations, hasBytecode } from './utils/Transactions'
+import { sendTransaction, deploy, isGanacheNode, awaitConfirmations, hasBytecode, getCoinbase } from './utils/Transactions'
 import { flattenSourceCode } from './utils/Solidity'
 import { semanticVersionEqual, toSemanticVersion, semanticVersionToString } from './utils/Semver';
 
@@ -70,6 +70,7 @@ export {
   isGanacheNode,
   awaitConfirmations,
   hasBytecode,
+  getCoinbase,
   Proxy,
   Logger,
   ABI,

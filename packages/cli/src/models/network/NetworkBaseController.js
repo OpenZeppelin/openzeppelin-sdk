@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import { Contracts, Logger, flattenSourceCode, getStorageLayout, getBuildArtifacts, getSolidityLibNames } from 'zos-lib';
+import { Contracts, Logger, flattenSourceCode, getStorageLayout, getBuildArtifacts, getSolidityLibNames, getCoinbase } from 'zos-lib';
 import { validate, newValidationErrors, validationPasses } from 'zos-lib';
 import StatusChecker from "../status/StatusChecker";
 import Verifier from '../Verifier'
@@ -86,6 +86,7 @@ export default class NetworkBaseController {
       this.unsetContracts()
     ])
 
+    this._saveOwner();
     await this._unsetSolidityLibs()
   }
 
@@ -343,5 +344,12 @@ export default class NetworkBaseController {
     await this.fetchOrDeploy(this.currentVersion)
     await this.project.freeze()
     this.networkFile.frozen = true
+  }
+
+  async _saveOwner() {
+    if (this.networkFile.owner == null) {
+      const owner = this.txParams.from || await getCoinbase();
+      this.networkFile.owner = owner;
+    }
   }
 }
