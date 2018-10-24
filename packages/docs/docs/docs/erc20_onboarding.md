@@ -171,11 +171,8 @@ zos create MyUpgradeableToken --args LEGACY_TOKEN_ADDRESS -n local
 
 Save the upgradeable token address outputted by this command, we will need it later.
 
-<<<<<<< HEAD
-Note that the `proxies` section of `zos.local.json` should now include the following, as ZeppelinOS is tracking the
-=======
 Note that the `proxies` section of `zos.dev-<some_network_id>.json` should now include the following, as ZeppelinOS is tracking the 
->>>>>>> [CI skip] Replaced usages of zos.local.json with zos.dev-<...>.json
+
 proxy we have just created:
 ```json
 {
