@@ -8,7 +8,8 @@
       "deploying",
       "upgrading",
       "linking",
-      "publishing"
+      "publishing",
+      "zeptoken"
     ],
     "GUIDES": [
       "writing_contracts",
