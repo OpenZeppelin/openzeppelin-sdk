@@ -33,7 +33,7 @@ just as with any other contract on the blockchain, we can define governance
 mechanisms to decide when and how to upgrade the contracts, that can be manual,
 automated, or any combination of both that will earn the trust of our users.
 
-Let's make an upgradeable instance of this contract so you can experiment what
+Let's create an upgradeable instance of this contract so you can experiment what
 this is all about:
 
 ```console
@@ -82,13 +82,13 @@ contract MyContract is Initializable {
 }
 ```
 
-> **Note**: while ZeppelinOS supports arbitrary changes in functionality,
-> you will need to preserve all variables that appear in prior versions of
+> **Note**: While ZeppelinOS supports arbitrary changes regarding functionality,
+> you will need to preserve all the variables that appeared in previous versions of
 > your contracts, declaring any new variables below the already existing ones.
 > All the considerations and some recommendations for your upgrades are
 > explained in the [Writing upgradeable contracts](writing_contracts.md) page.
 
-Once you have saved the changes, push the new code to the network:
+Once you have saved these changes, push the new code to the network:
 
 ```console
 zos push --network local
@@ -101,14 +101,14 @@ zos update MyContract --network local
 ```
 
 You will see that this command prints the same contract address as before, and a logic contract address that is new. This is all the magic behind
-upgrades: we have two contracts, one has an address that we will never change, but it just serves as a proxy to the other contract that we can replace with
+upgrades: we have two contracts, one is the contract address that we will never change, but it just serves as a proxy to the logic contract that we can replace with
 new versions.
 
-To try the new function we just added, jump to the terminal where the Truffle
+To try the new function we've just added, jump to the terminal where the Truffle
 command is running and execute the following instructions:
 
 ```console
-truffle(local)> myContract = MyContract.at(<your-contract-address>)
+truffle(local)> myContract = MyContract.at('<your-contract-address>')
 truffle(local)> myContract.increment()
 truffle(local)> myContract.x()
 43

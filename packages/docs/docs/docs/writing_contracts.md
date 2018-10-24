@@ -14,6 +14,7 @@ This means that, when using a contract within ZeppelinOS, you need to change its
 
 ```solidity
 // NOTE: Do not use this code snippet, it's incomplete and has a critical vulnerability!
+
 contract MyContract {
   uint256 public x;
 

@@ -52,14 +52,14 @@ about the project. For details about this file format, please see the
 
 The command will also initialize [Truffle](https://truffleframework.com/), so
 by now, inside the `my-project` directory you should have a `package.json` file
-(create by `npm`), two empty directories named `contracts` and `migrations` and
-a file `truffle-config.js` (created by `zos` for Truffle), and a file
-`zos.json` (created by `zos` for ZeppelinOS).
+(created by `npm`), two empty directories named `contracts` and `migrations`, 
+a `truffle-config.js` file (created by `zos` for Truffle), and a 
+`zos.json` file (created by `zos` for ZeppelinOS).
 
 ## Adding a contract
 
 Let's create a very simple contract as an example to be added to the project.
-Name it `MyContract.sol`, and put it in the `contracts/` folder with the
+Name it `MyContract.sol`, and put it in the `contracts` folder with the
 following Solidity code:
 
 ```solidity
@@ -106,7 +106,7 @@ For this example, let's use Truffle's local development network. To start it,
 open a separate terminal and run:
 
 ```console
-truffle develop --network local
+npx truffle develop --network local
 ```
 
 And back in the original terminal:
@@ -115,7 +115,7 @@ And back in the original terminal:
 zos push --network local
 ```
 
-This creates a `zos.local.json` file with all the information about your
+This command creates a `zos.local.json` file with all the information about your
 project in this specific network. You can read more about this file format
 in the [configuration files](configuration.md#zos-network-json) section.
 

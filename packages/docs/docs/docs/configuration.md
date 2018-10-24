@@ -29,7 +29,8 @@ Here, `<projectName>` is the name of the project, and `<version>` is the current
 
 
 ## `zos.<network>.json`
-ZeppelinOS will also generate a file for each of the networks you work on (`local`, `ropsten`, `live`, ... These should be configured [in your `truffle.js` file](http://truffleframework.com/docs/advanced/configuration#networks), but note that `zos init` already configures the `local` network, which can be run by `npx truffle develop`). These files share the same structure:
+ZeppelinOS will also generate a file for each of the networks you work on (`local`, `ropsten`, `mainnet`, etc).
+These should be configured [in your `truffle.js` file](http://truffleframework.com/docs/advanced/configuration#networks), but note that `zos init` already configures a `local` network, which can be run by `npx truffle develop`). These files share the same structure:
 
 ```json
 {
