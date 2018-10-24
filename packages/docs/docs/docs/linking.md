@@ -17,7 +17,7 @@ To continue with this exploration, let's write a new contract in
 `contracts/MyLinkedContract.sol`, and let's make it import a very common
 contract from the [OpenZeppelin](https://openzeppelin.org/) package:
 
-```sol
+```solidity
 pragma solidity ^0.4.24;
 
 import "openzeppelin-eth/contracts/token/ERC721/ERC721Mintable.sol";
@@ -41,7 +41,7 @@ the one we have to use if we want to reuse the package already deployed.
 
 Now, let's link our project to the openzeppelin-eth package:
 
-```sh
+```console
 zos link openzeppelin-eth
 ```
 
@@ -54,14 +54,14 @@ blockchain.
 The following commands will be familiar to you. Just as we did before, we have
 to add the contract to the project:
 
-```sh
+```console
 zos add MyLinkedContract
 ```
 
 and push them to a local network:
 
-```sh
-NODE_ENV=test zos push --deploy-dependencies --network local
+```console
+zos push --deploy-dependencies --network local
 ```
 
 There is one caveat here with the `--deploy-dependencies` flag. We mentioned
@@ -77,14 +77,14 @@ running the command again on the local network, this flag won't be needed.
 Repeating ourselves from before, let's make an upgradeable instance of the
 contract:
 
-```sh
-NODE_ENV=test zos create MyLinkedContract --network local
+```console
+zos create MyLinkedContract --network local
 ```
 
 We also need an instance of the `ERC721` token from the EVM package:
 
-```sh
-NODE_ENV=test zos create openzeppelin-eth/StandaloneERC721 --init initialize --args MyToken,TKN,[<address>],[<address>] --network local
+```console
+zos create openzeppelin-eth/StandaloneERC721 --init initialize --args MyToken,TKN,[<address>],[<address>] --network local
 ```
 
 `<address>` will be the minter and pauser of the token. For local development
@@ -93,7 +93,7 @@ you can use one of the 10 addresses that `truffle deploy` printed.
 Finally, jump to that terminal where the Truffle console is open and connect
 the two deployed contracts:
 
-```sh
+```console
 truffle(local)> MyLinkedContract.at(<myLinkedContractAddress>).setToken(<tokenAddress>)
 ```
 

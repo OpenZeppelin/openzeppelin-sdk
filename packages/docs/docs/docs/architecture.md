@@ -5,7 +5,7 @@ title: Contracts Architecture
 
 ZeppelinOS's features such as upgrades, EVM package linking, and vouching, can all be used through the `zos` CLI without extra contracts. However, some additional smart contracts get into play when you want to publish your EVM package for others to reuse, calling:
 
-```bash
+```console
 zos publish
 ```
 

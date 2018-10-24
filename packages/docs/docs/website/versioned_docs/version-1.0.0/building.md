@@ -28,7 +28,7 @@ contract MyContract is Migratable {
 }
 ```
 
-Notice that your sample contract has an `initialize` function instead of the standard constructor. This is a requirement of [the ZeppelinOS upgradeability system](advanced.md#initializers-vs-constructors).
+Notice that your sample contract has an `initialize` function instead of the standard constructor. This is a requirement of [ZeppelinOS initializer functions](proxies.md#the-constructor-caveat).
 
 Before deploying your upgradeable app to the network, you need to add your contract:
 
