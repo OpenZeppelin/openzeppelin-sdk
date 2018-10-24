@@ -1,10 +1,9 @@
 'use strict'
 
-import tmp from 'tmp'
 import path from 'path'
 import { readFileSync, writeFileSync } from 'fs'
 
-import { exec, cd, cp, rm } from './util'
+import { exec, cd, cp, rm, mkdir } from './util'
 
 function main(argv) {
   if(argv.length !== 3) {
@@ -14,7 +13,7 @@ function main(argv) {
 
   const tag = argv[2]
   const version = tag.slice(1)
-  const tmpDir = tmp.dirSync().name
+  const tmpDir = path.resolve(__dirname, '../tmp')
 
   try {
     const localDocsDir = path.resolve(__dirname, '../', 'docs')
@@ -24,6 +23,7 @@ function main(argv) {
     const packagesDir = path.resolve(tmpDir, 'zos', 'packages')
     const builtDocs = path.resolve(packagesDir, 'docs', 'docs', 'docs')
 
+    mkdir(tmpDir)
     cd(tmpDir)
     exec('git clone https://github.com/zeppelinos/zos.git')
     cd('zos')
@@ -35,7 +35,7 @@ function main(argv) {
     const updatedSidebar = { docs, reference: { ...reference, ...cliSections, ...libSections } }
 
     cp(`${builtDocs}/*.md`, localBuiltDocsDir)
-    writeFileSync(localSidebarFile, JSON.stringify(updatedSidebar, null, 2), { encoding:'utf8', flag:'w' })
+    writeFileSync(localSidebarFile, JSON.stringify(updatedSidebar, null, 2), { encoding:'utf8', flag: 'w' })
 
     cd(localWebsiteDir)
     exec(`npm install`)
@@ -70,13 +70,17 @@ function genLibDocs(packagesDir) {
   const builtDocs = path.resolve(docsDir, 'docs')
   const libDir = path.resolve(packagesDir, 'lib')
   const libContractsDir = path.resolve(libDir, 'contracts')
+  const mocks = path.resolve(libContractsDir, 'mocks')
   const ozDir = path.resolve(libDir, 'node_modules', 'openzeppelin-solidity')
+  const mockDependencyDir = path.resolve(libDir, 'node_modules', 'mock-dependency')
   const sidebar =  path.resolve(docsDir, 'website', 'sidebars.json')
 
   cd(libDir)
+  console.log('Removing mocks contracts manually...')
+  rm(`${mocks}`, '-rf')
   exec('npm install > "/dev/null" 2>&1')
-  exec(`SOLC_ARGS='openzeppelin-solidity=${ozDir}' npx solidity-docgen ${libDir} ${libContractsDir} ${docsDir} --exclude mocks`)
-  rm(`${builtDocs}/api_mocks*`)
+  console.log('Generating lib solidity docs...')
+  exec(`SOLC_ARGS='openzeppelin-solidity=${ozDir}' npx solidity-docgen ${libDir} ${libContractsDir} ${docsDir}`)
   rm(`${builtDocs}/api_es_openzeppelin-solidity*`)
   const { 'docs-api': docs } = JSON.parse(readFileSync(sidebar, 'utf8'))
 
@@ -91,4 +95,3 @@ if (require.main === module) {
     throw Error(error)
   }
 }
-
