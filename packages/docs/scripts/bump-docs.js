@@ -31,8 +31,9 @@ function main(argv) {
     cleanupSidebar(packagesDir)
     const cliSections = genCliDocs(packagesDir)
     const libSections = genLibDocs(packagesDir)
+    const vouchSections = genVouchDocs(packagesDir)
     const { docs, reference } = JSON.parse(readFileSync(localSidebarFile, 'utf8'))
-    const updatedSidebar = { docs, reference: { ...reference, ...cliSections, ...libSections } }
+    const updatedSidebar = { docs, reference: { ...reference, ...cliSections, ...libSections, ...vouchSections } }
 
     cp(`${builtDocs}/*.md`, localBuiltDocsDir)
     writeFileSync(localSidebarFile, JSON.stringify(updatedSidebar, null, 2), { encoding:'utf8', flag: 'w' })
@@ -63,6 +64,27 @@ function genCliDocs (packagesDir) {
   const { 'cli-api': { commands } } = JSON.parse(readFileSync(sidebar, 'utf8'))
 
   return { 'CLI REFERENCE': commands }
+}
+
+function genVouchDocs(packagesDir) {
+  const docsDir = path.resolve(packagesDir, 'docs', 'docs')
+  const builtDocs = path.resolve(docsDir, 'docs')
+  const vouchDir = path.resolve(packagesDir, 'vouching')
+  const vouchContractsDir = path.resolve(vouchDir, 'contracts')
+  const libDir = path.resolve(vouchDir, 'node_modules', 'zos-lib')
+  const tplDir = path.resolve(vouchDir, 'node_modules', 'tpl-contracts-eth')
+  const ozeDir = path.resolve(vouchDir, 'node_modules', 'openzeppelin-eth')
+  const sidebar =  path.resolve(docsDir, 'website', 'sidebars.json')
+
+  cd(vouchDir)
+  exec('npm install > "/dev/null" 2>&1')
+  exec(`SOLC_ARGS='openzeppelin-eth=${ozeDir} zos-lib=${libDir} tpl-contracts-eth=${tplDir}' npx solidity-docgen ${vouchDir} ${vouchContractsDir} ${docsDir} --exclude mocks`)
+  rm(`${builtDocs}/api_mocks*`)
+  rm(`${builtDocs}/api_es_tpl-contracts-eth*`)
+  rm(`${builtDocs}/api_es_openzeppelin-eth*`)
+  const { 'docs-api': docs } = JSON.parse(readFileSync(sidebar, 'utf8'))
+
+  return docs;
 }
 
 function genLibDocs(packagesDir) {
