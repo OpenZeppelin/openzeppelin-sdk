@@ -129,7 +129,7 @@ token metadata.
 
 _Initializers are the way to define constructor functionality for upgradeable contracts in ZeppelinOS. The `isInitializer`
 modifier will make sure your `initialize` method can only be called once in the whole lifetime of your contract. To
-read more about this, please go to the [following section](advanced.html#initializers-vs-constructors)_
+read more about this, please go to the [following section](proxies.md#the-constructor-caveat)_
 
 Notice that all the contracts from `openzeppelin-zos` have been adapted for ZeppelinOS compatibility, and should be the
 ones used when dealing with upgradeable contracts.
