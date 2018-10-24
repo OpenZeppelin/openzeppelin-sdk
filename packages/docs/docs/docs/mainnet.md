@@ -16,7 +16,7 @@ can use Infura to connect to mainnet, with a `truffle-config.js` like this one:
 
 var HDWalletProvider = require("truffle-hdwallet-provider");
 
-var mnemonic = "orange orange banana ... ";
+var mnemonic = "orange apple banana ... ";
 
 module.exports = {
   networks: {
