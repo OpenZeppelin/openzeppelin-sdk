@@ -7,7 +7,7 @@ At the end of the [previous guide](deploying) we deployed a ZeppelinOS
 project with one contract. Here is the code of the contract, to keep it fresh
 on our minds:
 
-```sol
+```solidity
 pragma solidity ^0.4.24;
 
 import "zos-lib/contracts/Initializable.sol";
@@ -36,7 +36,7 @@ automated, or any combination of both that will earn the trust of our users.
 Let's make an upgradeable instance of this contract so you can experiment what
 this is all about:
 
-```sh
+```console
 NODE_ENV=test zos create MyContract --init initialize --args 42 --network local
 ```
 
@@ -63,7 +63,7 @@ extend its functionalities.
 
 Open `contracts/MyContract.sol`, and add a new function:
 
-```sol
+```solidity
 pragma solidity ^0.4.24;
 
 import "zos-lib/contracts/Initializable.sol";
@@ -90,13 +90,13 @@ contract MyContract is Initializable {
 
 Once you have saved the changes, push the new code to the network:
 
-```sh
+```console
 NODE_ENV=test zos push --network local
 ```
 
 Finally, let's update the already deployed contract with the new code:
 
-```sh
+```console
 NODE_ENV=test zos update MyContract --network local
 ```
 
@@ -107,7 +107,7 @@ new versions.
 To try the new function we just added, jump to the terminal where the Truffle
 command is running and execute the following instructions:
 
-```sh
+```console
 truffle(local)> myContract = MyContract.at(<your-contract-address>)
 truffle(local)> myContract.increment()
 truffle(local)> myContract.x()

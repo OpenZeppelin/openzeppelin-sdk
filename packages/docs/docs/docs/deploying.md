@@ -13,7 +13,7 @@ respective websites you will find specific instructions for your machine.
 
 Then, install ZeppelinOS running:
 
-```sh
+```console
 npm install --global zos
 ```
 
@@ -26,14 +26,14 @@ its arguments.
 
 We'll need to create a directory for our project and access it:
 
-```sh
+```console
 mkdir my-project
 cd my-project
 ```
 
 Use `npm` to create a `package.json` file:
 
-```sh
+```console
 npm init
 ```
 
@@ -42,7 +42,7 @@ guide you can just press enter to accept the default values of each field.
 
 Now, we can initialize the ZeppelinOS project:
 
-```
+```console
 zos init my-project
 ```
 
@@ -62,7 +62,7 @@ Let's create a very simple contract as an example to be added to the project.
 Name it `MyContract.sol`, and put it in the `contracts/` folder with the
 following Solidity code:
 
-```sol
+```solidity
 pragma solidity ^0.4.24;
 
 import "zos-lib/contracts/Initializable.sol";
@@ -85,13 +85,13 @@ guide.
 But before we get there, we still need a couple of steps. This contract
 imports another contract from the `zos-lib` package, so we have to install it:
 
-```
+```console
 npm install zos-lib
 ```
 
 Now we can add the contract to the project:
 
-```sh
+```console
 zos add MyContract
 ```
 
@@ -105,13 +105,13 @@ project. We are just missing a blockchain network where it will be deployed.
 For this example, let's use Truffle's local development network. To start it,
 open a separate terminal and run:
 
-```sh
+```console
 truffle develop --network local
 ```
 
 And back in the original terminal:
 
-```sh
+```console
 NODE_ENV=test zos push --network local
 ```
 
