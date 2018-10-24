@@ -37,7 +37,7 @@ Let's make an upgradeable instance of this contract so you can experiment what
 this is all about:
 
 ```console
-NODE_ENV=test zos create MyContract --init initialize --args 42 --network local
+zos create MyContract --init initialize --args 42 --network local
 ```
 
 The `zos create` command receives an optional `--init [function-name]`
@@ -91,13 +91,13 @@ contract MyContract is Initializable {
 Once you have saved the changes, push the new code to the network:
 
 ```console
-NODE_ENV=test zos push --network local
+zos push --network local
 ```
 
 Finally, let's update the already deployed contract with the new code:
 
 ```console
-NODE_ENV=test zos update MyContract --network local
+zos update MyContract --network local
 ```
 
 You will see that this command prints the same contract address as before, and a logic contract address that is new. This is all the magic behind

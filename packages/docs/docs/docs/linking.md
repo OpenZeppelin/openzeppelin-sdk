@@ -61,7 +61,7 @@ zos add MyLinkedContract
 and push them to a local network:
 
 ```console
-NODE_ENV=test zos push --deploy-dependencies --network local
+zos push --deploy-dependencies --network local
 ```
 
 There is one caveat here with the `--deploy-dependencies` flag. We mentioned
@@ -78,13 +78,13 @@ Repeating ourselves from before, let's make an upgradeable instance of the
 contract:
 
 ```console
-NODE_ENV=test zos create MyLinkedContract --network local
+zos create MyLinkedContract --network local
 ```
 
 We also need an instance of the `ERC721` token from the EVM package:
 
 ```console
-NODE_ENV=test zos create openzeppelin-eth/StandaloneERC721 --init initialize --args MyToken,TKN,[<address>],[<address>] --network local
+zos create openzeppelin-eth/StandaloneERC721 --init initialize --args MyToken,TKN,[<address>],[<address>] --network local
 ```
 
 `<address>` will be the minter and pauser of the token. For local development

@@ -112,7 +112,7 @@ truffle develop --network local
 And back in the original terminal:
 
 ```console
-NODE_ENV=test zos push --network local
+zos push --network local
 ```
 
 This creates a `zos.local.json` file with all the information about your
@@ -121,8 +121,8 @@ in the [configuration files](configuration.md#zos-network-json) section.
 
 You can follow the same steps to deploy your project to mainnet or other test
 networks by just replacing `local` with the network name from your
-`truffle-config.js` file, and removing the `NODE_ENV=test` flag. This is
-further explained in the [Deploying to mainnet](mainnet) guide.
+`truffle-config.js` file. This is further explained in the
+[Deploying to mainnet](mainnet) guide.
 
 But for now, let's continue exploring the ZeppelinOS features! The initial
 version of our project exists in the blockchain. Next, we will learn how to
