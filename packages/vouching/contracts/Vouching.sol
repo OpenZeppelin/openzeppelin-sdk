@@ -10,7 +10,6 @@ import "openzeppelin-eth/contracts/utils/Address.sol";
 /**
  * @title Vouching
  * @dev Contract for staking tokens against dependencies.
- * TODO
  */
 contract Vouching is Initializable {
   /**
@@ -35,9 +34,9 @@ contract Vouching is Initializable {
     uint256 initialStake
   );
   /**
-   * @dev Emitted when the owner of a dependency adds stake to it.
+   * @dev Emitted when the owner of a dependency vouches for it.
    * @param nameHash bytes32 hash of the name of the dependency.
-   * @param amount uint256 with the amount of stake that has been added to the dependency.
+   * @param amount uint256 with the amount vouched on the dependency.
    */
   event Vouched(bytes32 indexed nameHash, uint256 amount);
   /**
@@ -57,7 +56,7 @@ contract Vouching is Initializable {
   using Address for address;
 
   /**
-   * @dev Struct that represents a particular dependency, with it's address, owner and amount of tokens staked.
+   * @dev Struct that represents a particular dependency, with its address, owner and amount of tokens staked.
    */
   struct Dependency {
     address owner;
@@ -78,7 +77,7 @@ contract Vouching is Initializable {
    */
   uint256 private _minimumStake;
   /**
-   * @dev The token used for staking against dependencies.
+   * @dev The token used for vouching on dependencies.
    */
   ERC20 private _token;
 
@@ -94,7 +93,7 @@ contract Vouching is Initializable {
   /**
    * @dev Initializer function. Called only once when a proxy for the contract is created.
    * @param minimumStake uint256 that defines the minimum initial stake that a dependency can have when being created.
-   * @param token ERC20 token to be used for staking against dependencies.
+   * @param token ERC20 token to be used for vouching on dependencies.
    */
   function initialize(uint256 minimumStake, ERC20 token) initializer public {
     require(token != address(0), "Token address cannot be zero");
@@ -111,8 +110,8 @@ contract Vouching is Initializable {
   }
 
   /**
-   * @dev Getter for _token being used for staking.
-   * @return The address of the ERC20 token being used for staking.
+   * @dev Getter for _token being used for vouching.
+   * @return The address of the ERC20 token being used for vouching.
    */
   function token() public view returns(ERC20) {
     return _token;
@@ -132,7 +131,7 @@ contract Vouching is Initializable {
   }
 
   /**
-   * @dev Creates a new dependency and performs the initial staking for it.
+   * @dev Creates a new dependency and performs an initial vouch.
    * @param name String that will represent the dependency. Must be unique.
    * @param owner Address that will own the depedency.
    * @param dependencyAddress Address of the dependency.
@@ -167,7 +166,7 @@ contract Vouching is Initializable {
   /**
    * @dev Stakes tokens for a given dependency. Can only be performed by the dependency owner.
    * @param name String that represents the dependency.
-   * @param amount uint256 with the amount that is to be added to the stake.
+   * @param amount uint256 with the amount that is to be vouched.
    */
   function vouch(string name, uint256 amount) external onlyDependencyOwner(name) {
     _registry[name].stake = _registry[name].stake.add(amount);
@@ -176,7 +175,7 @@ contract Vouching is Initializable {
   }
 
   /**
-   * @dev Unstakes tokens from a given dependency. Can only be performed by the dependency owner.
+   * @dev Removes vouched tokens from a given dependency. Can only be performed by the dependency owner.
    * @param name String that represents the dependency.
    * @param amount uint256 with the amount that is to be removed from the stake.
    */
