@@ -40,7 +40,7 @@ contract Vouching is Initializable {
    */
   event Vouched(bytes32 indexed nameHash, uint256 amount);
   /**
-   * @dev Emitted when the owner of a dependency removes stake from it.
+   * @dev Emitted when the owner of a dependency removes their vouch.
    * @param nameHash bytes32 hash of the name of the dependency.
    * @param amount uint256 with the amount of stake that has been removed from the dependency.
    */
@@ -177,7 +177,7 @@ contract Vouching is Initializable {
   /**
    * @dev Removes vouched tokens from a given dependency. Can only be performed by the dependency owner.
    * @param name String that represents the dependency.
-   * @param amount uint256 with the amount that is to be removed from the stake.
+   * @param amount uint256 with the amount that is to be removed from the vouch.
    */
   function unvouch(string name, uint256 amount) external onlyDependencyOwner(name) {
     uint256 remainingStake = _registry[name].stake.sub(amount);
