@@ -72,16 +72,16 @@ function genVouchDocs(packagesDir) {
   const vouchDir = path.resolve(packagesDir, 'vouching')
   const vouchContractsDir = path.resolve(vouchDir, 'contracts')
   const libDir = path.resolve(vouchDir, 'node_modules', 'zos-lib')
-  const tplDir = path.resolve(vouchDir, 'node_modules', 'tpl-contracts-zos')
-  const ozeDir = path.resolve(vouchDir, 'node_modules', 'openzeppelin-zos')
+  const tplDir = path.resolve(vouchDir, 'node_modules', 'tpl-contracts-eth')
+  const ozeDir = path.resolve(vouchDir, 'node_modules', 'openzeppelin-eth')
   const sidebar =  path.resolve(docsDir, 'website', 'sidebars.json')
 
   cd(vouchDir)
   exec('npm install > "/dev/null" 2>&1')
-  exec(`SOLC_ARGS='openzeppelin-zos=${ozeDir},zos-lib=${libDir},tpl-contracts-zos=${tplDir}' npx solidity-docgen ${vouchDir} ${vouchContractsDir} ${docsDir} --exclude mocks`)
+  exec(`SOLC_ARGS='openzeppelin-eth=${ozeDir} zos-lib=${libDir} tpl-contracts-eth=${tplDir}' npx solidity-docgen ${vouchDir} ${vouchContractsDir} ${docsDir} --exclude mocks`)
   rm(`${builtDocs}/api_mocks*`)
-  rm(`${builtDocs}/api_es_tpl-contracts-zos*`)
-  rm(`${builtDocs}/api_es_openzeppelin-zos*`)
+  rm(`${builtDocs}/api_es_tpl-contracts-eth*`)
+  rm(`${builtDocs}/api_es_openzeppelin-eth*`)
   const { 'docs-api': docs } = JSON.parse(readFileSync(sidebar, 'utf8'))
 
   return docs;
