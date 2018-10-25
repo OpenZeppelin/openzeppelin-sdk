@@ -32,7 +32,7 @@ const TRUFFLE_DEFAULT_GAS_PRICE = BN(100000000000);
  * @param retries number of transaction retries
  */
 export async function sendTransaction(contractFn, args = [], txParams = {}, retries = RETRY_COUNT) {
-  checkGasPrice(txParams)
+  await checkGasPrice(txParams);
 
   try {
     return await _sendTransaction(contractFn, args, txParams)
@@ -50,7 +50,7 @@ export async function sendTransaction(contractFn, args = [], txParams = {}, retr
  * @param retries number of deploy retries
  */
 export async function deploy(contract, args = [], txParams = {}, retries = RETRY_COUNT) {
-  checkGasPrice(txParams)
+  await checkGasPrice(txParams);
 
   try {
     return await _deploy(contract, args, txParams)
@@ -68,7 +68,7 @@ export async function deploy(contract, args = [], txParams = {}, retries = RETRY
  */
 export async function sendDataTransaction(contract, txParams) {
   // TODO: Add retries similar to sendTransaction
-  checkGasPrice(txParams)
+  await checkGasPrice(txParams)
 
   // If gas is set explicitly, use it
   if (txParams.gas) {
@@ -152,11 +152,11 @@ async function getNodeVersion () {
   return state.nodeInfo;
 }
 
-function checkGasPrice(txParams) {
-  if (process.env.NODE_ENV === 'test') return;
+async function checkGasPrice(txParams) {
+  if (await isGanacheNode()) return;
   const gasPrice = txParams.gasPrice || Contracts.artifactsDefaults().gasPrice;
   if (TRUFFLE_DEFAULT_GAS_PRICE.eq(gasPrice) || !gasPrice) {
-    throw new Error(`Cowardly refusing to execute transaction with gas price set to Truffle's default of 100 gwei. Consider explicitly setting a different value in your truffle.js file.`);
+    throw new Error(`Cowardly refusing to execute transaction with excessively high default gas price of 100 gwei. Consider explicitly setting a different gasPrice value in your truffle.js config file. You can check reasonable values for gas price in https://ethgasstation.info/.`);
   }
 }
 
