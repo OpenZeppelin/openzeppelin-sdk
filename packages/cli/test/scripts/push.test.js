@@ -3,7 +3,7 @@ require('../setup')
 
 import sinon from 'sinon'
 
-import { Contracts, App, Package } from 'zos-lib'
+import { Contracts, App, Package, getAccount } from 'zos-lib'
 
 import push from '../../src/scripts/push.js';
 import freeze from '../../src/scripts/freeze';
@@ -324,15 +324,11 @@ contract('push script', function([_, owner]) {
   };
 
   const shouldSaveOwner = function () {
-    it('should save owner when not specifying "from"', async function () {
-      const txParams = {};
-      await push({ networkFile: this.networkFile, network, txParams });
-      should.exist(this.networkFile.owner);
-    });
-
-    it('should save owner from txParams when specifying "from"', async function () {
-      await push({ networkFile: this.networkFile, network, txParams });
-      this.networkFile.owner.should.be.eq(txParams.from);
+    it('should save owner', async function () {
+      const owner = txParams.from || await getAccount(0);
+      this.networkFile.app.owner.should.be.eq(owner);
+      this.networkFile.package.owner.should.be.eq(owner);
+      this.networkFile.provider.owner.should.be.eq(owner);
     });
   }
 

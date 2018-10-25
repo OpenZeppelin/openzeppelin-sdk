@@ -44,10 +44,6 @@ export default class ZosNetworkFile {
     return this.provider.address
   }
 
-  get owner() {
-    return this.data.owner
-  }
-
   get version() {
     return this.data.version
   }
@@ -236,10 +232,6 @@ export default class ZosNetworkFile {
 
   set version(version) {
     this.data.version = version
-  }
-
-  set owner(owner) {
-    this.data.owner = owner
   }
 
   set contracts(contracts) {

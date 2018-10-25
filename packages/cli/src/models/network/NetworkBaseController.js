@@ -347,9 +347,23 @@ export default class NetworkBaseController {
   }
 
   async _saveOwner() {
-    if (this.networkFile.owner == null) {
-      const owner = this.txParams.from || await getAccount();
-      this.networkFile.owner = owner;
+    const app = this.networkFile.app;
+    if (app.owner == null) {
+      const owner = this.txParams.from || await getAccount(0);
+      app.owner = owner;
+      this.networkFile.app = app;
+    }
+    const appPackage = this.networkFile.package;
+    if (appPackage.owner == null) {
+      const owner = this.txParams.from || await getAccount(0);
+      appPackage.owner = owner;
+      this.networkFile.package = appPackage;
+    }
+    const provider = this.networkFile.provider;
+    if (provider.owner == null) {
+      const owner = this.txParams.from || await getAccount(0);
+      provider.owner = owner;
+      this.networkFile.provider = provider;
     }
   }
 }
