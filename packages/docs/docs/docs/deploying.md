@@ -13,7 +13,7 @@ respective websites you will find specific instructions for your machine.
 
 Then, install ZeppelinOS running:
 
-```sh
+```console
 npm install --global zos
 ```
 
@@ -26,14 +26,14 @@ its arguments.
 
 We'll need to create a directory for our project and access it:
 
-```sh
+```console
 mkdir my-project
 cd my-project
 ```
 
 Use `npm` to create a `package.json` file:
 
-```sh
+```console
 npm init
 ```
 
@@ -42,7 +42,7 @@ guide you can just press enter to accept the default values of each field.
 
 Now, we can initialize the ZeppelinOS project:
 
-```
+```console
 zos init my-project
 ```
 
@@ -62,7 +62,7 @@ Let's create a very simple contract as an example to be added to the project.
 Name it `MyContract.sol`, and put it in the `contracts/` folder with the
 following Solidity code:
 
-```sol
+```solidity
 pragma solidity ^0.4.24;
 
 import "zos-lib/contracts/Initializable.sol";
@@ -85,13 +85,13 @@ guide.
 But before we get there, we still need a couple of steps. This contract
 imports another contract from the `zos-lib` package, so we have to install it:
 
-```
+```console
 npm install zos-lib
 ```
 
 Now we can add the contract to the project:
 
-```sh
+```console
 zos add MyContract
 ```
 
@@ -105,19 +105,23 @@ project. We are just missing a blockchain network where it will be deployed.
 For this example, let's use Truffle's local development network. To start it,
 open a separate terminal and run:
 
-```sh
+```console
 truffle develop --network local
 ```
 
 And back in the original terminal:
 
-```sh
+```console
 zos push --network local
 ```
 
-This creates a `zos.local.json` file with all the information about your
-project in this specific network. You can read more about this file format
+This deploys `MyContract` to the specified network. If your project added other contracts (using the `add` command) they would be deployed as well. An important thing to understand is that the contracts deployed by the `push` command are implementation or logic contracts and are not intended to be used directly, rather to be used by upgradeable instances, as we will see later in the [Upgrading your project](https://docs.zeppelinos.org/docs/upgrading.html) section.
+
+Calling `push` creates a `zos.dev-<network_id>.json` file with all the information about your
+project in this specific network, including the addresses of the deployed contract implementations in `contracts["MyContract"].address`. You can read more about this file format
 in the [configuration files](configuration.md#zos-network-json) section.
+
+Note that if you change the source of `MyContract` and call `zos push` again, ZeppelinOS will deploy a new version of the contract implementation for `MyContract` and replace the entry in the json file's `contracts["MyContract"].address`.
 
 You can follow the same steps to deploy your project to mainnet or other test
 networks by just replacing `local` with the network name from your

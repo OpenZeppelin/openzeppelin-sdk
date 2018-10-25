@@ -74,7 +74,7 @@ There are many ways to overcome this problem, and the "unstructured storage" app
 
 An example of how the randomized storage is achieved:
 
-```
+```solidity
 bytes32 private constant implementationPosition = keccak256("org.zeppelinos.proxy.implementation");
 ```
 
@@ -117,7 +117,7 @@ The problem is easily solved though. Logic contracts should move the code within
 
 This is why when the ZeppelinOS CLI creates a proxy, it allows you to indicate an initializer function:
 
-```bash
+```console
 npx zos create MyLogicContract --init initialize --args arg1,arg2,arg3
 ```
 

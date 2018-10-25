@@ -11,6 +11,7 @@ whether a contract should be upgraded or not, instead of having an unilateral de
 
 Given that there are many projects already working on really good solutions to achieve decentralized governance,
 we've been exploring some of them to study how they can be integrated with ZeppelinOS to manage contract upgrades.
+
 In this case, we will use a multisignature wallet.
 
 ## Getting started
@@ -28,7 +29,7 @@ we can create an upgradeable instance of it being handled by a multisig wallet. 
 to register this contract, push it to the network and create a new upgradeable instance of it as we explained in the
 previous sections:
 
-```sh
+```console
 zos add MyContract
 zos push -n ropsten
 zos create MyContract -n ropsten
@@ -43,7 +44,7 @@ decide when to upgrade any of its contracts.
 Since we want to avoid having a single account with full control over our `MyContract` instance, we’ll transfer control
 of it to our multisig contract. To do this, we’ll use the `set-admin` command to yield control to the multisig account.
 
-```sh
+```console
 zos set-admin [MYCONTRACT_ADDRESS] [MULTISIG_ADDRESS] -y
 ```
 
@@ -65,7 +66,7 @@ instances or registering new logic contracts, as we’ll be doing in the next st
 Let’s suppose we extend the functionality somehow. The first step is to upload this new logic contract to the blockchain.
 Since the whole project is still managed by our deployer account, we can easily do that from the CLI by running:
 
-```sh
+```console
 zos add MyContract
 zos push
 ```

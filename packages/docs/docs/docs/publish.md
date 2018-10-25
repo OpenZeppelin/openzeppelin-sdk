@@ -14,7 +14,7 @@ Let's first remember some of the things we've learned so far.
 
 In the directory of our project, we initialize it:
 
-```sh
+```console
 npm init
 zos init <project-name>
 cd <project-name>
@@ -23,13 +23,13 @@ cd <project-name>
 Then, we can add to our project all the contracts that we have in the
 `contracts` directory:
 
-```sh
+```console
 zos add <contract-name-1> <contract-name-2> ... <contract-name-n>
 ```
 
 Next, we push the project to the network:
 
-```sh
+```console
 zos push --network <network>
 ```
 
@@ -40,7 +40,7 @@ network instead of your local development one. We have a guide about
 All known commands so far. Here comes what's new. If you want to share your
 package in ZeppelinOS, do it running the `publish` command:
 
-```sh
+```console
 zos publish --network <network>
 ```
 
@@ -73,25 +73,25 @@ ZeppelinOS configuration files, so add the following top-level field to the
 Make sure to check that the rest of the fields describe your package
 accurately. It could be a good idea to remove the `main` field, if present,
 because it doesn't make sense for EVM packages. Also, if you have a
-`zos.local.json` file, you can remove it now because it is specific for your
+`zos.dev-<network_id>.json` file, you can remove it now because it is specific for your
 local test environment.
 
 With that, we should be ready. Log in to npm with:
 
-```sh
+```console
 npm login
 ```
 
 And finally, publish to npm:
 
-```sh
+```console
 npm publish
 ```
 
 Now we are done for real. Other developers will be able to link to your
 package by using:
 
-```sh
+```console
 zos link <your-project-name>
 ```
 

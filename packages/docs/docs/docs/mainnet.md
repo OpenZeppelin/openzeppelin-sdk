@@ -11,7 +11,7 @@ using the `--network` flag.
 This flag takes the network details from the Truffle configuration file. You
 can use Infura to connect to mainnet, with a `truffle-config.js` like this one:
 
-```
+```js
 'use strict';
 
 var HDWalletProvider = require("truffle-hdwallet-provider");
@@ -35,13 +35,13 @@ accounts, and change `<INFURA_Access_Token>` to your token.
 
 Install the `truffle-hdwallet-provider` module with:
 
-```
+```console
 npm install truffle-hdwallet-provider
 ```
 
 And now you can run `zos` commands in mainnet. For example:
 
-```
+```console
 zos push --network mainnet
 ```
 

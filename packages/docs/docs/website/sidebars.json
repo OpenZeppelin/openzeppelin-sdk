@@ -30,24 +30,28 @@
     ],
     "CLI REFERENCE": [
       "cli_main",
-      "cli_init",
       "cli_add",
-      "cli_remove",
-      "cli_push",
-      "cli_create",
-      "cli_update",
       "cli_bump",
-      "cli_link",
-      "cli_status",
+      "cli_check",
+      "cli_create",
       "cli_freeze",
+      "cli_init",
+      "cli_link",
+      "cli_publish",
+      "cli_push",
+      "cli_remove",
       "cli_session",
+      "cli_set-admin",
+      "cli_status",
+      "cli_unlink",
+      "cli_update",
       "cli_verify"
     ],
     "APPLICATION": [
-      "application_AppDirectory",
-      "application_BaseApp",
-      "application_PackagedApp",
-      "application_UnversionedApp"
+      "application_App",
+      "application_ImplementationDirectory",
+      "application_ImplementationProvider",
+      "application_Package"
     ],
     "APPLICATION / VERSIONING": [
       "application_versioning_FreezableImplementationDirectory",
@@ -63,8 +67,10 @@
     "UPGRADEABILITY": [
       "upgradeability_AdminUpgradeabilityProxy",
       "upgradeability_Proxy",
-      "upgradeability_UpgradeabilityProxy",
-      "upgradeability_UpgradeabilityProxyFactory"
+      "upgradeability_UpgradeabilityProxy"
+    ],
+    "UNCATEGORIZED": [
+      "Initializable"
     ]
   }
 }
