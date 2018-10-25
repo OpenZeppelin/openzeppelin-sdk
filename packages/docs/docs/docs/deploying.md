@@ -115,7 +115,7 @@ And back in the original terminal:
 zos push --network local
 ```
 
-This deploys `MyContract` to the specified network. If your project added other contracts (using the `add` command) they would be deployed as well. An important thing to understand is that the contracts deployed by the `push` command are implementation or logic contracts and are not intended to be used directly, rather to be linked to a proxy as we will see later in the [Upgrading your project](https://docs.zeppelinos.org/docs/upgrading.html) section.
+This deploys `MyContract` to the specified network. If your project added other contracts (using the `add` command) they would be deployed as well. An important thing to understand is that the contracts deployed by the `push` command are implementation or logic contracts and are not intended to be used directly, rather to be used by upgradeable instances, as we will see later in the [Upgrading your project](https://docs.zeppelinos.org/docs/upgrading.html) section.
 
 Calling `push` creates a `zos.dev-<network_id>.json` file with all the information about your
 project in this specific network, including the addresses of the deployed contract implementations in `contracts["MyContract"].address`. You can read more about this file format
