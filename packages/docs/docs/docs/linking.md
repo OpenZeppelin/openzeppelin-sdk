@@ -3,7 +3,7 @@ id: linking
 title: Linking to EVM packages
 ---
 
-ZeppelinOS allows us to link to packages that have been already deployed
+ZeppelinOS allows us to link packages that have been already deployed
 to the blockchain, instead of wasting resources deploying them again every time
 we need them in a project. And of course, developers can upgrade their
 packages and we can update our links to point to the newest versions, so we are
@@ -13,8 +13,9 @@ To use EVM packages we need first to initialize a ZeppelinOS project. Luckily,
 we already have one after following the guide about
 [Deploying your first project](deploying.md).
 
-To continue with this exploration, let's write a new contract in
-`contracts/MyLinkedContract.sol`, and let's make it import a very common
+To continue with this exploration, let's write a new contract called 
+`MyLinkedContract.sol` and place it in the `contracts` folder. Then,
+let's make it import a very common
 contract from the [OpenZeppelin](https://openzeppelin.org/) package:
 
 ```solidity
@@ -39,7 +40,7 @@ the one we have to use if we want to reuse the package already deployed.
 // TODO link to difference between openzeppelin-eth and openzeppelin-solidity.
 // https://github.com/OpenZeppelin/openzeppelin-eth/issues/16
 
-Now, let's link our project to the openzeppelin-eth package:
+Now, let's link our project to the openzeppelin-eth package by running:
 
 ```console
 zos link openzeppelin-eth
@@ -94,11 +95,12 @@ Finally, jump to that terminal where the Truffle console is open and connect
 the two deployed contracts:
 
 ```console
-truffle(local)> MyLinkedContract.at(<myLinkedContractAddress>).setToken(<tokenAddress>)
+truffle(local)> MyLinkedContract.at('<myLinkedContractAddress>').setToken('<tokenAddress>')
 ```
 
-Remember that the addresses of both your contract and the token were printed by
-`zos`, and they can also be found in the `zos.dev-<network_id>.json` configuration file.
+Remember that the addresses of both, your contract and the token, were printed 
+by the `zos create` command and they can also be found in the `zos.dev-<network_id>.json` 
+configuration file.
 
 This is just the beginning of a better blockchain ecosystem, where developers
 share their knowledge and their cool ideas in EVM packages, and we all

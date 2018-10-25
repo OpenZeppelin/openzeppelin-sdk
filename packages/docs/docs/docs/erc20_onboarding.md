@@ -1,6 +1,6 @@
 > ---
 id: erc20_onboarding
-title: Onboarding legacy contracts
+title: Onboarding ERC20 tokens
 ---
 
 ## Intro
@@ -19,9 +19,6 @@ the new tokens is for users to "turn in" their old ones. This is done by first a
 and then calling a function of the upgradeable token to carry out the migration. The old tokens are sent to a burn
 address, and the holder receives an equal amount in the new token contract.
 
-This proposal is based on one of the two strategies explored by the ZeppelinOS dev team. To read more about them please
-visit our [labs repository](https://github.com/zeppelinos/labs).
-
 ## Requirements
 
 This on-boarding plan considers the following assumptions:
@@ -31,20 +28,16 @@ This on-boarding plan considers the following assumptions:
 ## Onboarding plan demo
 
 The central idea of this proposal is to deploy an upgradeable version of your token, using the ZeppelinOS command line
-tool. To do so, we will use a migration contract provided by the [OpenZeppelin EVM package for ZeppelinOS](https://github.com/OpenZeppelin/openzeppelin-solidity/tree/zos-release).
+tool. Additionally, we will use the [`ERC20Migrator`](https://github.com/OpenZeppelin/openzeppelin-eth/blob/v2.0.0/contracts/drafts/ERC20Migrator.sol) 
+contract provided by `openzeppelin-eth`, the [OpenZeppelin EVM package for ZeppelinOS](https://github.com/OpenZeppelin/openzeppelin-eth/).
 
-To better describe this plan we will use a sample project you can follow and clone from [here](https://github.com/zeppelinos/erc20-opt-in-onboarding).
+To better describe this plan we will use a sample project you can follow and clone from [here](https://github.com/zeppelinos/erc20-onboarding).
 
->**Caveat:** *The migration contract is not yet released in the OpenZeppelin EVM package, but will be soon. In the meantime,
-the sample repository we will use includes such implementation to make things easier for the demonstration. You will see
-a [`MigratableERC20`](https://github.com/zeppelinos/erc20-opt-in-onboarding/blob/master/contracts/openzeppelin-zos/MigratableERC20.sol)
-contract inside the contracts folder.*
+We will now setup a local environment to demo the onboarding plan. To do this, we will deploy a sample legacy token 
+contract and mint some balances. If you wish to work with your already deployed token, you can skip the following lines 
+and jump directly to the [step 1](erc20_onboarding.html#1-initialize-your-migration-project-with-zeppelinos).
 
-We will now setup a local environment to demo the onboarding plan. To do this, we will deploy a
-sample legacy token contract and mint some balances. If you wish to work with your already deployed token, you can skip
-the following lines and jump directly to the [step 1](erc20_onboarding.html#1-initialize-your-migration-project-with-zeppelinos).
-
-In the sample repository you will find a contract called [`MyLegacyToken`](https://github.com/zeppelinos/erc20-opt-in-onboarding/blob/master/contracts/MyLegacyToken.sol)
+In the sample repository you will find a contract called [`MyLegacyToken`](https://github.com/zeppelinos/erc20-onboarding/blob/master/contracts/MyLegacyToken.sol)
 that we will use to simulate a real scenario locally. As you can see, this token will mint 100 tokens to the owner once
 initialized just for testing purpose.
 
@@ -57,7 +50,7 @@ Now, let's deploy the legacy token. We will use a truffle development console. Y
 ```console
 truffle(develop)> compile
 truffle(develop)> owner = web3.eth.accounts[1]
-truffle(develop)> MyLegacyToken.new('MyToken', 'MTK', 18, { from: owner }).then(i => legacyToken = i)
+truffle(develop)> MyLegacyToken.new({ from: owner }).then(i => legacyToken = i)
 truffle(develop)> legacyToken.address
 '0x...'
 ```
@@ -67,7 +60,7 @@ Keep track of the `owner` and `legacyToken` addresses, we will need them in the 
 You can check the owner balance by running:
 ```console
 truffle(develop)> legacyToken.balanceOf(owner)
-BigNumber { s: 1, e: 0, c: [ 100 ] }
+BigNumber { s: 1, e: 22, c: [ 100000000 ] }
 ```
 
 Remember not to close this console, as we will be using it later.
@@ -90,56 +83,48 @@ We have just initialized a new ZeppelinOS project. A new `zos.json` file should 
 Next, we will have to modify the legacy token contract to get the new upgradeable version of it where the current balances
 are going to be migrated.
 
-In our sample project, you will find another contract called [`MyUpgradeableToken`](https://github.com/zeppelinos/erc20-opt-in-onboarding/blob/master/contracts/MyUpgradeableToken.sol)
-which is the upgradeable version of the sample legacy token contract [`MyLegacyToken`](https://github.com/zeppelinos/erc20-opt-in-onboarding/blob/master/contracts/MyLegacyToken.sol):
+In our sample project, you will find another contract called [`MyUpgradeableToken`](https://github.com/zeppelinos/erc20-onboarding/blob/master/contracts/MyUpgradeableToken.sol)
+which will be the upgradeable version of the sample legacy token contract [`MyLegacyToken`](https://github.com/zeppelinos/erc20-onboarding/blob/master/contracts/MyLegacyToken.sol):
 
 ```solidity
-import "./openzeppelin-zos/MigratableERC20.sol";
-import "openzeppelin-zos/contracts/token/ERC20/DetailedERC20.sol";
-import "openzeppelin-zos/contracts/token/ERC20/StandardToken.sol";
+import "zos-lib/contracts/Initializable.sol";
+import "openzeppelin-eth/contracts/token/ERC20/IERC20.sol";
+import "openzeppelin-eth/contracts/drafts/ERC20Migrator.sol";
+import "openzeppelin-eth/contracts/token/ERC20/ERC20Mintable.sol";
+import "openzeppelin-eth/contracts/token/ERC20/ERC20Detailed.sol";
 
-contract MyUpgradeableToken is MigratableERC20, StandardToken, DetailedERC20 {
+contract MyUpgradeableToken is Initializable, ERC20, ERC20Detailed, ERC20Mintable {
 
-  function initialize(ERC20 _legacyToken, string _name, string _symbol, uint8 _decimals)
-  isInitializer("MyUpgradeableToken", "1.0.0")
-  public
-  {
-    MigratableERC20.initialize(_legacyToken);
-    DetailedERC20.initialize(_name, _symbol, _decimals);
+  function initialize(ERC20Detailed _legacyToken, ERC20Migrator _migrator) initializer public {
+    ERC20Mintable.initialize(_migrator);
+    ERC20Detailed.initialize(_legacyToken.name(), _legacyToken.symbol(), _legacyToken.decimals());
+    _migrator.beginMigration(this);
   }
 
-  function _mint(address _to, uint256 _amount) internal {
-    require(_to != address(0));
-    totalSupply_ = totalSupply_.add(_amount);
-    balances[_to] = balances[_to].add(_amount);
-    emit Transfer(address(0), _to, _amount);
-  }
 }
 ```
 
-On one hand, we are inheriting from the `MigratableERC20` contract provided by the OpenZeppelin EVM package which provides
-all the migration functionality we will need. The `MigratableERC20` contract requires the implementation to define an
-internal minting function. In this case we are defining one following the `StandardToken` contract. However, this
-function will be provided built-in in the upcoming version of OpenZeppelin.
+On one hand, it is very important to replicate all the information and functionality that was provided by the
+legacy token. In this case, we are inheriting from the `ERC20` and `ERC20Detailed` contracts provided by the 
+OpenZeppelin EVM package to replicate all the functionality of an ERC20 token. 
 
-On the other hand, it is very important to replicate all the information and functionality that was provided by the
-legacy token. In this case, we are inheriting from the `StandardToken` contract provided by the OpenZeppelin EVM package to
-replicate all the functionality of an ERC20 token. And additionally, we are defining an initializer to handle the
-token metadata.
+On the other hand, we are defining an `initialize` method that receives an `ERC20Migrator` instance that will take care
+of all the migration functionality we will need. To work with `ERC20Migrator`, your upgradeable token has to be
+mintable, that's why we are also inheriting from the `ERC20Mintable` contract provided by the OpenZeppelin EVM 
+package as well.
 
-_Initializers are the way to define constructor functionality for upgradeable contracts in ZeppelinOS. The `isInitializer`
-modifier will make sure your `initialize` method can only be called once in the whole lifetime of your contract. To
-read more about this, please go to the [following section](proxies.md#the-constructor-caveat)_
+_Initializers are the way to define constructor functionality for upgradeable contracts in ZeppelinOS. The `initializer`
+modifier will make sure your `initialize` method can only be called once in the whole lifetime of your contract._
 
-Notice that all the contracts from `openzeppelin-zos` have been adapted for ZeppelinOS compatibility, and should be the
+Notice that all the contracts from `openzeppelin-eth` have been adapted for ZeppelinOS compatibility, and should be the
 ones used when dealing with upgradeable contracts.
 
 Besides allowing us to build upgradeable applications, ZeppelinOS provides EVM packages. To use an EVM package
-in our project, we simply need to use the `link` command giving the name of the npm package of the EVM package we want to use.
-In this case, we will link OpenZeppelin EVM package to be able to use the contracts it provides in our project:
+in our project, we simply need to use the `link` command giving the name of the npm package of the EVM package we want 
+to use. In this case, we will link OpenZeppelin EVM package to be able to use the contracts it provides in our project:
 
 ```console
-zos link openzeppelin-zos@1.9.1
+zos link openzeppelin-eth@^2.0.0
 ```
 
 Finally we can add our upgradeable token contract to the project:
@@ -156,28 +141,51 @@ The first thing we have to do is to deploy our contract source code. We will als
 OpenZeppelin EVM package since we will be working on a local environment. To do so, run the following command:
 
 ```console
-zos push -n local --deploy-libs
+zos push -n local --deploy-dependencies
 ```
 
-We have just deployed the `MyUpgradeableToken` source code and the OpenZeppelin EVM package to the `local` network. A new
-`zos.dev-<network_id>.json` file should have been created.
+_Note that we are using the `--deploy-dependencies` to deploy the OpenZeppelin EVM package locally, since it is not 
+deployed in our local blockchain yet._ 
 
-Now, let's create a new instance of the upgradeable token using ZeppelinOS. Run the following line, replacing
-`LEGACY_TOKEN_ADDRESS` with the address of the legacy token contract:
+We have just deployed the `MyUpgradeableToken` source code and the OpenZeppelin EVM package to the `local` network. A 
+new `zos.dev-<network_id>.json` file should have been created.
+
+Now, let's create a new instance of the upgradeable token using ZeppelinOS. To do so, we will need to create an 
+instance of an `ERC20Migrator` first, but given it is not yet provided by the OpenZeppelin EVM package, we will have 
+to add it manually. Then, please run the following commands: 
+replacing `LEGACY_TOKEN_ADDRESS` with the address of the legacy token contract:
+```console
+zos add ERC20Migrator
+zos push -n local --deploy-dependencies
+zos create ERC20Migrator --args LEGACY_TOKEN_ADDRESS -n local
+```
+
+Great! We have created a new upgradeable instance using the `ERC20Migrator` contract provided by the OpenZeppelin EVM 
+package. Now, we can create a new upgradeable instance of our `MyUpgradeableToken` running the following command. Please 
+make sure you replace `LEGACY_TOKEN_ADDRESS` with the address of the legacy token contract and `ERC20_MIGRATOR_ADDRESS`
+with the address of the instance you created above:
 
 ```console
-zos create MyUpgradeableToken --args LEGACY_TOKEN_ADDRESS -n local
+zos create MyUpgradeableToken --args LEGACY_TOKEN_ADDRESS,ERC20_MIGRATOR_ADDRESS -n local
 ```
 
 Save the upgradeable token address outputted by this command, we will need it later.
 
-Note that the `proxies` section of `zos.dev-<network_id>.json` should now include the following, as ZeppelinOS is tracking the
-proxy we have just created:
+Note that the `proxies` section of `zos.dev-<network_id>.json` should now include the following, as ZeppelinOS is 
+tracking the upgradeable instances we have just created:
+
 ```json
 {
   ...,
   "proxies": {
-    "MyUpgradeableToken": [
+    "erc20-onboarding/ERC20Migrator": [
+      {
+        "address": "0x...",
+        "version": "1.0.0",
+        "implementation": "0x..."
+      }
+    ],
+    "erc20-onboarding/MyUpgradeableToken": [
       {
         "address": "0x...",
         "version": "1.0.0",
@@ -193,13 +201,16 @@ proxy we have just created:
 
 In order to migrate your balance, go back to the truffle develop console if you have deployed your legacy token locally
 or open a new one against the network where your legacy token is deployed. Then, run the following commands, replacing
-`UPGRADEABLE_TOKEN_ADDRESS` with the proxy address returned by `zos create` command of the previous step:
+`ERC20_MIGRATOR_ADDRESS` and `UPGRADEABLE_TOKEN_ADDRESS` with their corresponding proxy address returned by `zos create` 
+commands of the previous step:
 
 ```console
+truffle(develop)> erc20Migrator = ERC20Migrator.at('ERC20_MIGRATOR_ADDRESS')
 truffle(develop)> upgradeableToken = MyUpgradeableToken.at('UPGRADEABLE_TOKEN_ADDRESS')
+truffle(develop)> erc20Migrator.beginMigration(upgradeableToken.address, { from: owner })
 truffle(develop)> legacyToken.balanceOf(owner).then(b => balance = b)
-truffle(develop)> legacyToken.approve(upgradeableToken.address, balance, { from: owner })
-truffle(develop)> upgradeableToken.migrate({ from: owner })
+truffle(develop)> legacyToken.approve(erc20Migrator.address, balance, { from: owner })
+truffle(develop)> erc20Migrator.migrateAll(owner, { from: owner })
 ```
 
 We can now check your balance of the legacy token:
@@ -211,15 +222,15 @@ BigNumber { s: 1, e: 0, c: [ 0 ] }
 Also the burned balance:
 
 ```console
-truffle(develop)> legacyToken.balanceOf('0x000000000000000000000000000000000000dead')
-BigNumber { s: 1, e: 0, c: [ 100 ] }
+truffle(develop)> legacyToken.balanceOf(erc20Migrator.address)
+BigNumber { s: 1, e: 22, c: [ 100000000 ] }
 ```
 
 And the upgradeable token balance:
 
 ```console
-truffle(develop)> upgradeableToken.balanceOf(owner)
-BigNumber { s: 1, e: 0, c: [ 100 ] }
+truffle(develop)> upgradeableToken.balanceOf(owner, { from: owner })
+BigNumber { s: 1, e: 22, c: [ 100000000 ] }
 ```
 
 Your legacy token has been migrated to an upgradeable token!

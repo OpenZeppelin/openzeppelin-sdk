@@ -1,6 +1,6 @@
 ---
 id: pattern
-title: The ZeppelinOS Upgrades Pattern
+title: ZeppelinOS Upgrades Pattern
 ---
 
 This article describes the "unstructured storage" proxy pattern, the fundamental building block of ZeppelinOS's upgrades.
@@ -30,14 +30,21 @@ The most immediate problem that proxies need to solve is how the proxy exposes t
 ```solidity
 assembly {
   let ptr := mload(0x40)
-  calldatacopy(ptr, 0, calldatasize) // (1) copy incoming call data
-  let result := delegatecall(gas, _impl, ptr, calldatasize, 0, 0) // (2) forward call to logic contract
+  
+  // (1) copy incoming call data
+  calldatacopy(ptr, 0, calldatasize) 
+  
+  // (2) forward call to logic contract
+  let result := delegatecall(gas, _impl, ptr, calldatasize, 0, 0) 
   let size := returndatasize
-  returndatacopy(ptr, 0, size) // (3) retrieve return data
+  
+  // (3) retrieve return data
+  returndatacopy(ptr, 0, size) 
 
+  // (4) forward return data back to caller
   switch result
   case 0 { revert(ptr, size) }
-  default { return(ptr, size) } // (4) forward return data back to caller
+  default { return(ptr, size) } 
 }
 ```
 
@@ -49,6 +56,7 @@ A very important thing to note is that the code makes use of the EVM's `delegate
 
 A problem that quickly comes up when using proxies has to do with the way in which variables are stored in the proxy contract. Suppose that the proxy stores the logic contract's address in it's only variable `address public _implementation;`. Now, suppose that the logic contract is a basic token whose first variable is `address public _owner`. Both variables are 32 byte in size, and as far as the EVM knows, occupy the first slot of the resulting execution flow of a proxied call. When the logic contract writes to `_owner`, it does so in the scope of the proxy's state, and thus really writes to `_implementation`. This problem can be referred to as a "storage collision".
 
+```
 |Proxy                     |Implementation           |
 |--------------------------|-------------------------|
 |address _implementation   |address _owner           | <=== Storage collision!
@@ -71,6 +79,7 @@ There are many ways to overcome this problem, and the "unstructured storage" app
 |address _implementation   |                         | <=== Randomized slot.
 |...                       |                         |
 |...                       |                         |
+```
 
 An example of how the randomized storage is achieved:
 
@@ -85,7 +94,7 @@ As a result, a logic contract doesn't need to care about overwriting any of the 
 As discussed, the unstructured approach avoids storage collisions between the logic contract and the proxy. However, storage collisions between different versions of the logic contract can occur. In this case, imagine that the first implementation of the logic contract stores `address public _owner` at the first storage slot and an upgraded logic contract stores `address public _lastContributor` at the same first slot. When the updated logic contract attempts to write to the `_lastContributor` variable, it will be using the same storage position where the previous value for `_owner` was being stored, and overwrite it!
 
 #### Incorrect storage preservation:
-
+```
 |Implementation_v0   |Implementation_v1        |
 |--------------------|-------------------------|
 |address _owner      |address _lastContributor | <=== Storage collision!
@@ -93,9 +102,10 @@ As discussed, the unstructured approach avoids storage collisions between the lo
 |uint256 _supply     |mapping _balances        |
 |...                 |uint256 _supply          |
 |                    |...                      |
+```
 
 #### Correct storage preservation:
-
+```
 |Implementation_v0   |Implementation_v1        |
 |--------------------|-------------------------|
 |address _owner      |address _owner           |
@@ -103,11 +113,11 @@ As discussed, the unstructured approach avoids storage collisions between the lo
 |uint256 _supply     |uint256 _supply          |
 |...                 |address _lastContributor | <=== Storage extension.
 |                    |...                      |
+```
 
-The unstructured storage proxy mechanism doesn't safeguard against this situation. It is up to the user to have new versions of a logic contract extend previous versions, or otherwise guarantee that the storage hierarchy is always appended to but not modified. ZeppelinOS' CLI does however| Tables        | Are           | Cool  |
-| ------------- |:-------------:| -----:|
-| col 3 is      | right-aligned | $1600 |
-| col 2 is      | centered      |   $12 | detect such collisions, and warns the developer appropriate.
+The unstructured storage proxy mechanism doesn't safeguard against this situation. 
+It is up to the user to have new versions of a logic contract extend previous versions, or otherwise guarantee that the storage hierarchy is always appended to but not modified. 
+However, ZeppelinOS CLI does detect such collisions, and warns the developer appropriate.
 
 ## The constructor caveat
 

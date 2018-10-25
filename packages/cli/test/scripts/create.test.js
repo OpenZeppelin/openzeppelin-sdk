@@ -122,6 +122,16 @@ contract('create script', function([_, owner]) {
       await assertProxy(this.networkFile, anotherContractAlias, { version, say: 'WithLibraryV1' });
     });
 
+    it('should initialize a proxy using scientific notation', async function() {
+      const proxy = await createProxy({ contractAlias, network, txParams, initMethod: 'initialize', initArgs: ["20e10"], networkFile: this.networkFile });
+      (await proxy.value()).toString().should.be.eq('200000000000');
+    });
+
+    it('should initialize a proxy using large number on scientific notation', async function() {
+      const proxy = await createProxy({ contractAlias, network, txParams, initMethod: 'initialize', initArgs: ["20e70"], networkFile: this.networkFile });
+      (await proxy.value()).toString().should.be.eq('2e+71');
+    });
+
     describe('warnings', function () {
       beforeEach('capturing log output', function () {
         this.logs = new CaptureLogs();

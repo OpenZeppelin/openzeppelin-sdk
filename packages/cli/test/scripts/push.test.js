@@ -451,6 +451,26 @@ contract('push script', function([_, owner]) {
           .should.be.rejectedWith(/Could not find a zos file for network 'test' for 'mock-stdlib-undeployed'/)
       });
     })
+
+    describe('when using an unpublished dependency', function () {
+      beforeEach('building network file', async function () {
+        const packageFile = new ZosPackageFile('test/mocks/packages/package-with-unpublished-stdlib.zos.json')
+        this.networkFile = packageFile.networkFile(network)
+      });
+
+      it('should fail to push', async function () {
+        await push({ network, txParams, networkFile: this.networkFile })
+          .should.be.rejectedWith(/Dependency 'mock-stdlib-unpublished' has not been published to network 'test', so it cannot be linked/)
+      });
+
+      it('should create custom deployment', async function () {
+        await push({ network, txParams, networkFile: this.networkFile, deployLibs: true });
+        const app = await App.fetch(this.networkFile.appAddress);
+        const packageInfo = await app.getPackage('mock-stdlib-unpublished');
+        packageInfo.version.should.be.semverEqual('1.1.0');
+        packageInfo.package.address.should.be.nonzeroAddress;
+      });
+    })
   });
 
   describe('an empty lib', function() {
