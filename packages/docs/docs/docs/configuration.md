@@ -120,4 +120,4 @@ networks: {
  }
 ```
  Using `zos push --network geth_ropsten` or `zos push --network parity_ropsten` will both produce a file named `zos.ropsten.json` no matter which method was used to connect to the ropsten network. ZeppelinOS will automatically detect which public network is being referred to (using web3.network.getVersion()) and use this information for determining the file name.
- When dealing with local networks, zOS will generate files with `dev-<some_network_id>`, given that these networks are not public and don't have a cannonical name. Using `zos push --network local` will produce a file named `zos.dev-1540303312049.json` (or some other number representing the network id of the local network).
+ When dealing with local networks, zOS will generate files with `dev-<network_id>`, given that these networks are not public and don't have a cannonical name. Using `zos push --network local` will produce a file named `zos.dev-1540303312049.json` (or some other number representing the network id of the local network).
