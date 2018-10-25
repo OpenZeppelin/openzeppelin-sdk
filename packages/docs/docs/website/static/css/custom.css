@@ -24,8 +24,12 @@
     background-color: #1d2327 !important;
   }
 
-  header > a > img {
-    width: 100%;
+  .headerWrapper {
+    padding-left:0!important;
+  }
+
+  .headerWrapper > header {
+    padding-left: 2px!important;
   }
 
   .fixedHeaderContainer header h2 {
@@ -40,6 +44,7 @@
   .navPusher {
     padding-top: 110px!important;
   }
+
 }
 
 * {
@@ -72,13 +77,12 @@ header > a {
 
 header > a > h3 {
   color: #67EAEC !important;
-  margin-bottom: -4px;
 }
 
 pre code {
   display: block;
   margin: 2em 0;
-  padding: 30px!important;
+  padding: 25px!important;
   font-size: 0.95em;
   overflow-x: auto;
 }
@@ -94,6 +98,8 @@ h2.headerTitleWithLogo {
   color: #1d2327!important;
 }
 
+
+
 .headerTitle {
   width: 0px;
 }
@@ -104,8 +110,6 @@ h2.headerTitleWithLogo {
 }
 
 .logo {
-  margin: auto -66px;
-  width: 225px;
   height: 22px!important;
 }
 
@@ -422,3 +426,4 @@ article p img, article iframe {
   margin-top: 40px;
   padding: 20px 0 ;
 }
+

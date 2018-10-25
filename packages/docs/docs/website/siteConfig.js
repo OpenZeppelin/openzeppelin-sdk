@@ -32,6 +32,7 @@ const siteConfig = {
     },
   ],
   headerIcon: 'img/logo.svg',
+  disableHeaderTitle: true,
   footerIcon: 'img/symbol-zeppelin.png',
   favicon: 'img/favicon.png',
   colors: {
