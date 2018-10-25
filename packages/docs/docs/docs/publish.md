@@ -15,9 +15,10 @@ Let's first remember some of the things we've learned so far.
 In the directory of our project, we initialize it:
 
 ```console
+mkdir <project-name>
+cd <project-name>
 npm init
 zos init <project-name>
-cd <project-name>
 ```
 
 Then, we can add to our project all the contracts that we have in the
