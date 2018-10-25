@@ -62,13 +62,6 @@ contract('Transactions', function([_account1, account2]) {
       actualValue.toNumber().should.eq(42);
     });
 
-    it('refuses to send tx with truffle default gas price', async function () {
-      // Gas price check is skipped in test env, so we trick the Transactions module into thinking it's actually on a real run
-      process.env.NODE_ENV = 'not-test';
-      await sendTransaction(this.instance.initialize, [42, 'foo', [1,2,3]]).should.be.rejectedWith(/cowardly refusing/i);
-      process.env.NODE_ENV = 'test';
-    });
-
     it('estimates gas', async function () {
       const { tx } = await sendTransaction(this.instance.initialize, [42, 'foo', [1,2,3]]);
       assertGasLt(tx, 1000000);
@@ -105,6 +98,14 @@ contract('Transactions', function([_account1, account2]) {
 
       await sendTransaction(this.instance.initialize, [42, 'foo', [1,2,3]]).should.be.rejectedWith(/always failing transaction/);
     });
+
+    describe('on non ganache node', function () {
+      onNotGanache();
+      
+      it('refuses to send tx with truffle default gas price', async function () {
+        await sendTransaction(this.instance.initialize, [42, 'foo', [1,2,3]]).should.be.rejectedWith(/cowardly refusing/i);
+      });
+    })
   });
 
   describe('sendDataTransaction', function () {
@@ -198,9 +199,7 @@ contract('Transactions', function([_account1, account2]) {
   });
 
   describe('awaitConfirmations', function () {
-    beforeEach('stub node information', function () {
-      state.nodeInfo = 'NotGanache';
-    })
+    onNotGanache();
 
     beforeEach('enable mining', async function () {
       this.mineInterval = setInterval(advanceBlock, 100);
@@ -211,13 +210,9 @@ contract('Transactions', function([_account1, account2]) {
       await sleep(100);
     })
 
-    afterEach('restore node info', function () {
-      delete state.nodeInfo;
-    })
-
     it('awaits required confirmations', async function () {
       const initialBlock = await getCurrentBlock();
-      const instance = await deploy(this.DummyImplementation);
+      const instance = await deploy(this.DummyImplementation, [], { gasPrice: 1e9 });
       await awaitConfirmations(instance.transactionHash, 5);
       (await hasBytecode(instance.address)).should.be.true;
       const endBlock = await getCurrentBlock();
@@ -225,7 +220,7 @@ contract('Transactions', function([_account1, account2]) {
     });
 
     it('times out if fails to reach confirmations', async function () {
-      const instance = await deploy(this.DummyImplementation);
+      const instance = await deploy(this.DummyImplementation, [], { gasPrice: 1e9 });
       await awaitConfirmations(instance.transactionHash, 20, 100, 300).should.be.rejectedWith(/Exceeded timeout/);
     });
   });
@@ -233,4 +228,14 @@ contract('Transactions', function([_account1, account2]) {
 
 async function getCurrentBlock() {
   return (promisify(web3.eth.getBlock.bind(web3.eth))('latest').then(b => b.number));
+}
+
+function onNotGanache() {
+  beforeEach('stub node information', function () {
+    state.nodeInfo = 'NotGanache';
+  })
+
+  afterEach('restore node info', function () {
+    delete state.nodeInfo;
+  })
 }
