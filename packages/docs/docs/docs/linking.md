@@ -98,7 +98,7 @@ truffle(local)> MyLinkedContract.at(<myLinkedContractAddress>).setToken(<tokenAd
 ```
 
 Remember that the addresses of both your contract and the token were printed by
-`zos`, and they can also be found in the `zos.local.json` configuration file.
+`zos`, and they can also be found in the `zos.dev-<network_id>.json` configuration file.
 
 This is just the beginning of a better blockchain ecosystem, where developers
 share their knowledge and their cool ideas in EVM packages, and we all

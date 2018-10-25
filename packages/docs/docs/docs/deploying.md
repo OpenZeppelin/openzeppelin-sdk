@@ -115,7 +115,7 @@ And back in the original terminal:
 zos push --network local
 ```
 
-This creates a `zos.local.json` file with all the information about your
+This creates a `zos.dev-<network_id>.json` file with all the information about your
 project in this specific network. You can read more about this file format
 in the [configuration files](configuration.md#zos-network-json) section.
 

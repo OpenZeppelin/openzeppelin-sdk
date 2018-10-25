@@ -4,19 +4,74 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
-## v1.4.2
+## v2.0.0 - 2018-10-25
+
+### Added
+
+#### Commands
+
+- **[major]** Command `push` now automatically discovers, pushes, and links any Solidity libraries used by the project contracts ([#208](https://github.com/zeppelinos/zos/issues/208))
+- **[major]** Command `link` can now link multiple dependencies (formerly named `stdlib`) into a project ([#17](https://github.com/zeppelinos/zos/issues/17), [#39](https://github.com/zeppelinos/zos/issues/39), [#50](https://github.com/zeppelinos/zos/issues/50), [#99](https://github.com/zeppelinos/zos/issues/99), [#82](https://github.com/zeppelinos/zos/issues/82), [#125](https://github.com/zeppelinos/zos/issues/125)).
+- **[major]** New `publish` command, that creates a set of `App`, `Package`, and `Directory` contracts for managing the project on-chain, allowing it to be used as a dependency by another project, and transfers upgradeability ownership of all proxies to the created `App` ([#257](https://github.com/zeppelinos/zos/issues/257))
+- New `set-admin` command for changing the upgradeability admin of a proxy, allowing to implement upgradeability governance via more complex structures ([#47](https://github.com/zeppelinos/zos/issues/47))
+- New `unlink` command for removing a previously linked dependency ([#49](https://github.com/zeppelinos/zos/issues/49))
+- New `check` command for validating a contract for upgradeability errors (such as no `selfdestruct`, no default values for variables, and no `constructor`) ([#230](https://github.com/zeppelinos/zos/issues/230))
+- New `--skip-compile` option in `push` command to skip automatic recompilation of contracts ([#214](https://github.com/zeppelinos/zos/issues/214))
+- New `--publish` flag in `init`, that will cause the first `push` of a project to any network to automatically `publish` it as well ([#257](https://github.com/zeppelinos/zos/issues/257))
+
+#### Validations
+
+- Validate storage layout changes between subsequent `push` operations, to verify that changes in a contract will not corrupt storage when upgrading ([#117](https://github.com/zeppelinos/zos/issues/117))
+- Validate that there are no initial values set in fields declarations, since these are not set when initializing a contract instance ([#241](https://github.com/zeppelinos/zos/issues/241))
+
+#### Other
+
+- Export `commands` and `scripts` functions, allowing the CLI commands to be used from javascript code ([#177](https://github.com/zeppelinos/zos/issues/177))
+
+
+### Changed
+
+- **[major]** Do not create `App`, `Package`, and `Directory` contracts by default, and use a `SimpleProject` model instead to create proxies and track logic contracts off-chain ([#146](https://github.com/zeppelinos/zos/issues/146), [#231](https://github.com/zeppelinos/zos/issues/231))
+- Use canonical network names (`ropsten`, `mainnet`, etc; or `dev-NETWORK_ID` for development networks) for naming zos network files, instead of the custom identifier used for the truffle network connection name ([#213](https://github.com/zeppelinos/zos/issues/213))
+- Enforce version check of `zosversion` to be equal to `2` in all json manifest files ([#162](https://github.com/zeppelinos/zos/pull/162))
+- Contracts are now validated for errors when `push`ing them instead on `add`, to ensure that any changes performed after initially `add`ing them are also checked ([#224](https://github.com/zeppelinos/zos/issues/224))
+- Rename `TestApp` to `TestHelper` ([#82](https://github.com/zeppelinos/zos/issues/82))
+- Rename all references to stdlib or lib to dependency or EVM package ([#240](https://github.com/zeppelinos/zos/issues/240))
+
+### Fixed
+
+- Store `App`, `Package`, and `Directory` addresses in failed deployments, and resume from last deployed contract, instead of redeploying all of them from scratch ([#120](https://github.com/zeppelinos/zos/issues/120))
+- Throw proper error message when trying to run a command with an undefined network ([#209](https://github.com/zeppelinos/zos/issues/209))
+- Improve CLI output on errors, removing confusing _successful_ messages when not appropriate ([#229](https://github.com/zeppelinos/zos/issues/229))
+- When creating a proxy from a dependency contract, use the version of the dependency for identifying the proxy in the network json file, instead of the version of the project ([#281](https://github.com/zeppelinos/zos/issues/281))
+
+### Removed
+
+- **[major]** Remove `--lib` flag when creating a new project via `init`, as any project can now be used as a dependency from another project, as long as it has been `publish`ed ([#253](https://github.com/zeppelinos/zos/issues/253))
+
+## v1.4.3 - 2018-10-04
+
+### Fixed
+
+- Fix error when using `--from` flag with `truffle-hdwallet-provider` ([#98](https://github.com/zeppelinos/zos/issues/98))
+
+### Changed
+
+- Detect `zosversion` field in `zos.json` and `zos.network.json` files, and aborts execution if it's greater than `1`, to prevent working with `Package`s from version 2.0 using version 1.x of the CLI ([#163](https://github.com/zeppelinos/zos/pull/163))
+
+## v1.4.2 - 2018-09-08
 
 ### Fixed
 
 - Fix for `replacement transaction underpriced` and `nonce too low` errors when using `truffle-hdwallet-provider` in the CLI ([#63](https://github.com/zeppelinos/zos/pull/63))
 
-## v1.4.1
+## v1.4.1 - 2018-08-22
 
 ### Fixed
 
 - CLI failed to exit process when using `HDWalletProvider` ([#20](https://github.com/zeppelinos/zos/issues/20))
 
-## v1.4.0
+## v1.4.0 - 2018-08-14
 
 ### Added
 - New `verify` command to verify and publish a contract source code on etherchain ([#339](https://github.com/zeppelinos/zos-cli/pull/339))
@@ -33,7 +88,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Changed
 - Swapped `TestApp` initializer parameters, it now accepts `txParams` first and an optional `ZosNetworkFile` object as a last argument.
 
-## v1.1.0
+## v1.1.0 - 2018-06-28
 
 ### Added
 - New `session` command to pin a network, timeout, and sender address

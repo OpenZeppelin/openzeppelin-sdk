@@ -1,4 +1,4 @@
----
+> ---
 id: erc20_onboarding
 title: Onboarding ERC20 tokens
 ---
@@ -173,6 +173,7 @@ Save the upgradeable token address outputted by this command, we will need it la
 
 Note that the `proxies` section of `zos.dev-<network_id>.json` should now include the following, as ZeppelinOS is 
 tracking the upgradeable instances we have just created:
+
 ```json
 {
   ...,
