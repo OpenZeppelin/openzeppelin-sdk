@@ -72,7 +72,7 @@ ZeppelinOS will also generate a file for each of the networks you work on (`loca
         }
       ]
   },
-  #"app": {
+  "app": {
     "address": <app-address>
   },
   "version": <app-version>,
@@ -135,5 +135,5 @@ An example `.gitignore` file could contain the following entries for ZeppelinOS 
 ```
 # ZeppelinOS
 zos.dev-*.json
-.session.zos
+.zos.session
 ```
