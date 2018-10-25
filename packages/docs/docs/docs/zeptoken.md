@@ -35,4 +35,4 @@ The current version of this contract currently supports the following features:
 
 ## ZEP token private beta
 
-Zeppelin is currently distributing mainnet ZEP to projects interested in adopting ZeppelinOS. This is not a sale, but beta testing for the aforementioned token dynamics. To apply to the private beta distribution, please submit your project's details in the [ZEP Token's private beta submission form](https://google.com)(TODO add link).
+Zeppelin is currently distributing mainnet ZEP to projects interested in adopting ZeppelinOS. This is not a sale, but beta testing for the aforementioned token dynamics. To apply to the private beta distribution, please submit your project's details in the [ZEP Token's private beta submission form](https://beta-registration.zeppelinos.org).
