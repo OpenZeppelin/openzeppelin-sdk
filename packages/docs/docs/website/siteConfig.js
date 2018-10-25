@@ -15,7 +15,7 @@ const siteConfig = {
   initialDoc: 'start',
   headerLinks: [
     {
-      doc: 'developing',
+      doc: 'start',
       label: 'Quickstart',
     },
     {
