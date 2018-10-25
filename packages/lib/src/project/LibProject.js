@@ -27,7 +27,7 @@ export default class LibProject extends BasePackageProject {
 
       return project
     } catch(deployError) {
-      throw new DeployError(deployError, { thepackage, directory })
+      throw new DeployError(deployError.message, { thepackage, directory })
     }
   }
 

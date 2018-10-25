@@ -14,6 +14,10 @@ export function cp(source, destination) {
   handleCommandOutput(shell.cp(source, destination))
 }
 
+export function mkdir(directory) {
+  handleCommandOutput(shell.mkdir('-p', directory))
+}
+
 export function rm(filename, options) {
   if (options) {
     handleCommandOutput(shell.rm(options, filename))
