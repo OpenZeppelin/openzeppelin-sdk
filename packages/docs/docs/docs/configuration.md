@@ -121,3 +121,19 @@ networks: {
 ```
  Using `zos push --network geth_ropsten` or `zos push --network parity_ropsten` will both produce a file named `zos.ropsten.json` no matter which method was used to connect to the ropsten network. ZeppelinOS will automatically detect which public network is being referred to (using web3.network.getVersion()) and use this information for determining the file name.
  When dealing with local networks, ZeppelinOS will generate files with `dev-<network_id>`, given that these networks are not public and don't have a cannonical name. Using `zos push --network local` will produce a file named `zos.dev-1540303312049.json` (or some other number representing the network id of the local network).
+
+## `zos.json` files in version control
+
+`zos.json` files should be tracked in version control. This file represents a project's ZeppelinOS configuration; the contracts and EVM packages that compose it, its name and version, the version of the ZeppelinOS CLI it uses, etc. The file should be identical for all the contributors of a project.
+
+Public network files like `zos.mainnet.json` or `zos.ropsten.json` should also be tracked in version control. These contain valuable information about your project's status in the corresponding network; the addresses of the contract implementations that have been deployed, the addresses of the proxies that have been deployed, etc. Such files should also be identical for all the contributors of a project.
+
+However, local network files like `zos.dev-<netowrk_id>.json` only represent a project's deployment in a temporary local network such as `ganache-cli` that are only relevant to a single contributor of the project and should not be tracked in version control.
+
+An example `.gitignore` file could contain the following entries for ZeppelinOS :
+
+```
+# ZeppelinOS
+zos.dev-*.json
+.zos.session
+```
