@@ -153,7 +153,7 @@ Notice how the contract extends `Initializable` and implements the `initializer`
 
 ## Summary
 
-Any developer using ZeppelinOS should be familiar with proxies in the ways that are described in this article. In the end, the concept is very simple, and ZeppelinOS is designed to encapsulate all the proxy mechanics in a way that the amount of things you need to keep in mind when developing upgradeable applications are reduced to an absolute minimum. It all comes down to a 3 item list:
+Any developer using ZeppelinOS should be familiar with proxies in the ways that are described in this article. In the end, the concept is very simple, and ZeppelinOS is designed to encapsulate all the proxy mechanics in a way that the amount of things you need to keep in mind when developing projects are reduced to an absolute minimum. It all comes down to a 3 item list:
 
 * Have a basic understanding of what a proxy is
 * Always extend storage instead of modifying it

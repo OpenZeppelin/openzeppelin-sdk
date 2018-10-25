@@ -15,7 +15,7 @@
       "writing_contracts",
       "testing",
       "erc20_onboarding",
-      "upgradeability_governance",
+      "upgrades_governance",
       "zos_lib"
     ],
     "ADVANCED TOPICS": [

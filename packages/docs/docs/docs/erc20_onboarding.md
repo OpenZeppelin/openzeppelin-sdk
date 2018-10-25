@@ -5,7 +5,7 @@ title: Onboarding ERC20 tokens
 
 ## Intro
 This guide covers the migration of a regular ERC20 token to an upgradeable version of itself. During this process, the
-original contract (to be called "legacy") and the new contract, which will have the ability of being upgradeable, will coexist.
+original contract (to be called "legacy") and the new contract, which will have the ability of being upgraded, will coexist.
 
 The _new upgradable contract_ will have the same functionality provided by the _legacy_ contract, but it will be
 *upgradable*. This means that we will be able to add new functionality, store new data, fix bugs or support new

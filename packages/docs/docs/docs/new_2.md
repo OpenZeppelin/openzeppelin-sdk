@@ -11,7 +11,7 @@ In this section, you'll find everything you need to know if you're coming from Z
 
 What is an EVM package? It is basically a piece of reusable code that has been deployed to the blockchain in the form of EVM bytecode. Anyone can create an EVM package, and your ZeppelinOS projects will be able to connect to a vast ecosystem of pre-compiled, pre-deployed reusable code in the form of EVM packages.
 
-Similarly, as we realized what an EVM package was, we realized what it's not. In 1.x, your ZeppelinOS project's contracts were always managed by a package contract. This made your contracts upgradeable and gave them the ability to link to EVM packages (see [Contract architecture](architecture.md) for more info). We realized that this made sense when it came to EVM packages, but didn't when it came to parts of your project that weren't meant to be reusable code, i.e. code that just needed to be upgradeable but not reusable. And so, in 2.x, upgradeability, and the ability to link to EVM packages were completely separated.
+Similarly, as we realized what an EVM package was, we realized what it's not. In 1.x, your ZeppelinOS project's contracts were always managed by a package contract. This made your contracts upgradeable and gave them the ability to link to EVM packages (see [Contract architecture](architecture.md) for more info). We realized that this made sense when it came to EVM packages, but didn't when it came to parts of your project that weren't meant to be reusable code, i.e. code that just needed to be upgradeable but not reusable. And so, in 2.x, upgrades, and the ability to link to EVM packages were completely separated.
 
 In 2.x by default, your ZeppelinOS project will not use any of its App or Package on-chain architecture unless you explicitly state that your code is meant to be reusable as an EVM package. When you init a ZeppelinOS project, there is no architecture other than your project's code. ZeppelinOS simply uses the CLI to manage proxies for you. Now, if you intend your project to be a reusable EVM package, you can run `zos publish` on your project, and the CLI will seamlessly deploy the necessary contracts which will allow your code to exist as an EVM package.
 
@@ -44,7 +44,7 @@ Unfortunately, 2.x introduces breaking changes, so a project that was created us
 
 When it comes to Solidity code, there is nothing special you need to consider when using ZeppelinOS 2.x other than using initializers instead of constructors. For more info on this, see the ["the constructor caveat"](proxies.md#the-constructor-caveat) section of the documentation.
 
-As with 1.x, ZeppelinOS 2.x will manage all upgradeability and package linking features without you having to use special Solidity syntax.
+As with 1.x, ZeppelinOS 2.x will manage upgrades and package linking without you having to use special Solidity syntax.
 
 On 2.x, the `Migratable` contract has been deprecated, and we are shifting to a much simpler flavour of `Initializable`.
 
