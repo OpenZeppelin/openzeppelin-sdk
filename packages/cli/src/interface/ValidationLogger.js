@@ -2,8 +2,11 @@ import _ from 'lodash';
 import { FileSystem as fs, Logger, getStorageLayout } from 'zos-lib';
 
 const log = new Logger('Validations');
-const safetyChecksLink = "Read more at https://docs.zeppelinos.org/docs/advanced.html#safety-checks";
-const preserveStorageLink = "Read more at https://docs.zeppelinos.org/docs/advanced.html#preserving-the-storage-structure";
+const DOCS_HOME = 'https://docs.zeppelinos.org/docs';
+const DANGEROUS_OPERATIONS_LINK = `${DOCS_HOME}/writing_contracts.html#potentially-unsafe-operations`;
+const AVOID_INITIAL_VALUES_LINK = `${DOCS_HOME}/writing_contracts.html#avoid-initial-values-in-fields-declarations`;
+const INITIALIZERS_LINK = `${DOCS_HOME}/writing_contracts.html#initializers`;
+const STORAGE_CHECKS_LINK = `${DOCS_HOME}/writing_contracts.html#modifying-your-contracts`;
 
 export default class ValidationLogger {
   constructor(contract, existingContractInfo = {}) {
@@ -37,31 +40,31 @@ export default class ValidationLogger {
 
   logHasSelfDestruct(hasSelfDestruct) {
     if (hasSelfDestruct) {
-      log.warn(`- Contract ${this.contractName} or one of its ancestors has a selfdestruct call. This is potentially a security risk, as could have the logic contract being destructed, breaking all instances that depend on it. Please review and consider removing this call. ${safetyChecksLink}`);
+      log.warn(`- Contract ${this.contractName} or one of its ancestors has a potentially unsafe selfdestruct operation. See ${DANGEROUS_OPERATIONS_LINK}.`);
     }
   }
 
   logHasDelegateCall(hasDelegateCall) {
     if (hasDelegateCall) {
-      log.warn(`- Contract ${this.contractName} or one of its ancestors has a delegatecall call. This is potentially a security risk, as the logic contract could be destructed by issuing a delegatecall to another contract with a selfdestruct instruction. Please review and consider removing this call. ${safetyChecksLink}`);
+      log.warn(`- Contract ${this.contractName} or one of its ancestors has a potentially unsafe delegatecall operation. See ${DANGEROUS_OPERATIONS_LINK}.`);
     }
   }
 
   logHasInitialValuesInDeclarations(hasInitialValuesInDeclarations) {
     if (hasInitialValuesInDeclarations) {
-      log.warn(` - Contract ${this.contractName} or one of its ancestors has an initial value setted in a field declaration. Setting an initial value for a field when declaring it does not work for proxies, since the value is set in the constructor. Please consider moving all field initializations to an initializer function. ${safetyChecksLink}`)
+      log.warn(`- Contract ${this.contractName} or one of its ancestors sets an initial value in a field declaration. Consider moving all field initializations to an initializer function. See ${AVOID_INITIAL_VALUES_LINK}.`)
     }
   }
 
   logHasConstructor(hasConstructor) {
     if (hasConstructor) {
-      log.error(`- Contract ${this.contractName} has an explicit constructor. Change it to an initializer function. ${safetyChecksLink}`);
+      log.error(`- Contract ${this.contractName} has an explicit constructor. Change it to an initializer function. See ${INITIALIZERS_LINK}.`);
     }
   }
 
   logUninitializedBaseContracts(uninitializedBaseContracts) {
     if (!_.isEmpty(uninitializedBaseContracts)) {
-      log.warn(`- Contract ${this.contractName} has base contracts ${uninitializedBaseContracts.join(', ')} which are initializable, but their initialize methods are not called from ${this.contractName}.initialize. ${safetyChecksLink}`);
+      log.warn(`- Contract ${this.contractName} has base contracts ${uninitializedBaseContracts.join(', ')} which are initializable, but their initialize methods are not called from ${this.contractName}.initialize. See ${INITIALIZERS_LINK}.`);
     }
   }
 
@@ -70,8 +73,9 @@ export default class ValidationLogger {
 
     const varList = vars.map(({ label, contract }) => `${label} (${contract})`).join(', ');
     const variablesString = `Variable${vars.length === 1 ? '' : 's'}`;
-    log.warn(`- ${variablesString} ${varList} contain a struct or enum type, which are not being compared for layout changes in this version. ` +
-             `Double-check that the storage layout of these types was not modified in the updated contract. ${preserveStorageLink}`);
+    const containsString = `contain${vars.length === 1 ? 's' : ''}`;
+    log.warn(`- ${variablesString} ${varList} ${containsString} a struct or enum. These are not automatically checked for storage compatibility in the current version. ` +
+             `See ${STORAGE_CHECKS_LINK} for more info.`);
   }
 
   logStorageLayoutDiffs(storageDiff, updatedStorageInfo) {
@@ -91,53 +95,40 @@ export default class ValidationLogger {
   
       switch (action) {
         case 'insert':
-          log.error(`- New variable '${updatedVarDescription}' was added in contract ${updated.contract} in ${updatedVarSource}. ` +
-                    `This pushes all variables after ${updated.label} to a higher position in storage, `+
-                    `causing the updated contract to read incorrect initial values. Only add new variables at the `+
-                    `end of your contract to prevent this issue.`);
+          log.error(`- New variable '${updatedVarDescription}' was inserted in contract ${updated.contract} in ${updatedVarSource}. ` +
+                    `You should only add new variables at the end of your contract.`);
+                    
           break;
         case 'delete':
           log.error(`- Variable '${originalVarDescription}' was removed from contract ${original.contract}. `+
-                    `This will move all variables after ${original.label} to a lower position in storage, `+
-                    `causing the updated contract to read incorrect initial values. Avoid deleting existing ` +
-                    `variables to prevent this issue, and rename them to communicate that they are not to be used.`);
+                    `You should avoid deleting variables from your contracts.`);
           break;
         case 'append':
           log.info(`- New variable '${updatedVarDescription}' was added in contract ${updated.contract} in ${updatedVarSource} `+
-                   `at the end of the contract. ` +
-                   `This does not alter the original storage, and should be a safe change.`)
+                   `at the end of the contract.`);
           break;
         case 'pop':
           log.warn(`- Variable '${originalVarDescription}' was removed from the end of contract ${original.contract}. `+
-                   `Though this will not alter the positions in storage of other variables, if a new variable is added ` +
-                   `at the end of the contract, it will have the initial value of ${original.label} when upgrading. ` +
-                   `Avoid deleting existing variables to prevent this issue, and rename them to communicate that they are not to be used.`);
+                   `You should avoid deleting variables from your contracts.`);
           break;
         case 'rename':
           log.warn(`- Variable '${originalVarDescription}' in contract ${original.contract} was renamed to ${updated.label} in ${updatedVarSource}.` +
-                   `Note that the new variable ${updated.label} will have the value of ${original.label} after upgrading. ` +
-                   `If this is not the desired behavior, add a new variable ${updated.label} at the end of your contract instead.`)
+                   `${updated.label} will have the value of ${original.label} after upgrading.`);
           break;
         case 'typechange':
           log.warn(`- Variable '${original.label}' in contract ${original.contract} was changed from ${originalVarType.label} ` +
-                   `to ${updatedVarType.label} in ${updatedVarSource}. ` + 
-                   `If ${updatedVarType.label} is not compatible with ${originalVarType.label}, ` +
-                   `then ${updated.label} could be initialized with an invalid value after upgrading. Avoid changing types of existing ` +
-                   `variables to prevent this issue, and declare new ones at the end of your contract instead.`)
+                   `to ${updatedVarType.label} in ${updatedVarSource}. Avoid changing types of existing variables.`)
           break;
         case 'replace':
           log.warn(`- Variable '${originalVarDescription}' in contract ${original.contract} was replaced with '${updatedVarDescription}' ` +
-                   `in ${updatedVarSource}. This will cause ${updated.label} to be initialized with the value of ${original.label}. ` +
-                   `If type ${updatedVarType.label} is not compatible with ${originalVarType.label}, then ${updated.label} could be `+
-                   `initialized with an invalid value after upgrading. Avoid changing types of existing ` +
-                   `variables to prevent this issue, and declare new ones at the end of your contract instead.`)
+                   `in ${updatedVarSource}. Avoid changing existing variables.`)
           break;
         default:
-          log.error(`- Unexpected layout changeset: ${action}`)
+          log.error(`- Unexpected layout change: ${action}`)
       }
     });
   
-    log.info(`${preserveStorageLink}`)
+    log.info(`See ${STORAGE_CHECKS_LINK} for more info.`)
   }
 }
 
