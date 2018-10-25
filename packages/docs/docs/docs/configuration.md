@@ -96,5 +96,28 @@ Another thing to notice in these files are the version numbers. The `<appVersion
 
 Also, notice the fields `<app>` and `<package>`. These contain the addresses of contracts that ZeppelinOS uses to facilitate the creation of proxies and the management of different versions of your contracts. These contracts will only be deployed once you publish your project to a desired network. That is, your project will not have an `app` or `package` unless explicitly running the `publish` command. Note that this step is required for projects that produce an EVM package. To read more about the architecture of contracts we are using to publish your project on-chain please refer to the [Contract Architecture](https://docs.zeppelinos.org/docs/architecture.html) section.
 
-
 Finally, the `stdlib` field stores information about linked EVM packages. Its address is stored in `<stdlib-address>`, and its name in `<stdlib-name>`, matching that in `zos.json`. The `custom-deploy` field will be present only when a version of the EVM package is deployed using the `--deploy-libs` flag of the `push` command, in which case `<custom-deploy>` will be `true`. The remaining addresses, `<app-address>`, `<package-address>`, and `<provider-address>` store the addresses of the `App`, the `Package`, and the current `ImplementationProvider` respectively.
+
+The naming of the file will be `zos.<network>.json`, but note that `<network>` is not taken from the name of the network's entry in the Truffle configuration file, but is instead inferred from the cannonical network id associated to the entry. For example, if the Truffle cofiguration file defines the following networks:
+
+```json
+networks: {
+   geth_ropsten: {
+    host: 'localhost',
+    port: 8555,
+    network_id: 3
+  },
+   parity_ropsten: {
+    host: 'localhost',
+    port: 8565,
+    network_id: 3
+  },
+   local: {
+    host: 'localhost',
+    port: 8545,
+    network_id: *
+  }
+ }
+```
+ Using `zos push --network geth_ropsten` or `zos push --network parity_ropsten` will both produce a file named `zos.ropsten.json` no matter which method was used to connect to the ropsten network. ZeppelinOS will automatically detect which public network is being referred to (using web3.network.getVersion()) and use this information for determining the file name.
+ When dealing with local networks, ZeppelinOS will generate files with `dev-<network_id>`, given that these networks are not public and don't have a cannonical name. Using `zos push --network local` will produce a file named `zos.dev-1540303312049.json` (or some other number representing the network id of the local network).

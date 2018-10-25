@@ -73,7 +73,7 @@ ZeppelinOS configuration files, so add the following top-level field to the
 Make sure to check that the rest of the fields describe your package
 accurately. It could be a good idea to remove the `main` field, if present,
 because it doesn't make sense for EVM packages. Also, if you have a
-`zos.local.json` file, you can remove it now because it is specific for your
+`zos.dev-<network_id>.json` file, you can remove it now because it is specific for your
 local test environment.
 
 With that, we should be ready. Log in to npm with:
