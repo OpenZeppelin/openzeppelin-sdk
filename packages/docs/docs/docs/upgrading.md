@@ -47,7 +47,7 @@ are initializing your contract with `42` as the value of the `x` state
 variable.
 
 This command will print the address of your contract, and it will update the
-`zos.local.json` file.
+`zos.dev-<network_id>.json` file.
 
 > **Note**: When calling an initializer with many variables, these should be
 > passed as a comma-separated list, with no spaces in between.

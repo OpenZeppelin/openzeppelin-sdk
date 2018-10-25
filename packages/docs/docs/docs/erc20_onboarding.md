@@ -1,4 +1,4 @@
----
+> ---
 id: erc20_onboarding
 title: Onboarding legacy contracts
 ---
@@ -129,7 +129,7 @@ token metadata.
 
 _Initializers are the way to define constructor functionality for upgradeable contracts in ZeppelinOS. The `isInitializer`
 modifier will make sure your `initialize` method can only be called once in the whole lifetime of your contract. To
-read more about this, please go to the [following section](advanced.html#initializers-vs-constructors)_
+read more about this, please go to the [following section](proxies.md#the-constructor-caveat)_
 
 Notice that all the contracts from `openzeppelin-zos` have been adapted for ZeppelinOS compatibility, and should be the
 ones used when dealing with upgradeable contracts.
@@ -160,7 +160,7 @@ zos push -n local --deploy-libs
 ```
 
 We have just deployed the `MyUpgradeableToken` source code and the OpenZeppelin EVM package to the `local` network. A new
-`zos.local.json` file should have been created.
+`zos.dev-<network_id>.json` file should have been created.
 
 Now, let's create a new instance of the upgradeable token using ZeppelinOS. Run the following line, replacing
 `LEGACY_TOKEN_ADDRESS` with the address of the legacy token contract:
@@ -171,7 +171,7 @@ zos create MyUpgradeableToken --args LEGACY_TOKEN_ADDRESS -n local
 
 Save the upgradeable token address outputted by this command, we will need it later.
 
-Note that the `proxies` section of `zos.local.json` should now include the following, as ZeppelinOS is tracking the
+Note that the `proxies` section of `zos.dev-<network_id>.json` should now include the following, as ZeppelinOS is tracking the
 proxy we have just created:
 ```json
 {

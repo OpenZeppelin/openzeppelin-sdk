@@ -9,7 +9,7 @@ original_id: low_level_contract
 
 > **Note**: for a fully working project with this example, see the [`examples/simple`](https://github.com/zeppelinos/zos-lib/tree/master/examples/simple) folder of the `zos-lib` repository.
 
-To develop an upgradeable smart contract, we need to create a simple [upgradeability proxy](https://blog.zeppelinos.org/proxy-patterns/). This is a [special contract](advanced.md#the-proxy-system) that will hold the storage of our upgradeable contract and redirect function calls to a `logic` contract, which we can update.
+To develop an upgradeable smart contract, we need to create a simple [upgradeability proxy](https://blog.zeppelinos.org/proxy-patterns/). This is a [special contract](proxies.md) that will hold the storage of our upgradeable contract and redirect function calls to a `logic` contract, which we can update.
 
 Let's walk through the following example to see how it works:
 
@@ -29,7 +29,7 @@ contract MyContract is Initializable {
 }
 ```
 
-Notice the `initialize` function. Most contracts require some sort of initialization function, but upgradeable contracts can't use constructors because the proxy won't be able to call them. This is why we need to use the [initializable pattern](advanced.md#initializers-vs-constructors) provided by `zos-lib`.
+Notice the `initialize` function. Most contracts require some sort of initialization function, but upgradeable contracts can't use constructors because the proxy won't be able to call them. This is why we need to use the [initializable pattern](proxies.md#the-constructor-caveat) provided by `zos-lib`.
 
 ### Deploy it
 
@@ -80,7 +80,7 @@ contract MyContract is Initializable {
 }
 ```
 
-> **Note**: when we update our logic contract's code, we can't change the proxy's [storage layout](advanced.md#preserving-the-storage-structure). This means we can't remove any previously existing state variables. We can, however, remove functions we don't want to use anymore.
+> **Note**: when we update our logic contract's code, we can't change the proxy's [storage layout](proxies.md#unstructured-storage-proxies). This means we can't remove any previously existing state variables. We can, however, remove functions we don't want to use anymore.
 
 ### Upgrade it
 
