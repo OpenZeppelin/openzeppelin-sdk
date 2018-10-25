@@ -79,8 +79,8 @@ export async function sendDataTransaction(contract, txParams) {
   return contract.sendTransaction({ gas, ... txParams });
 }
 
-export async function getCoinbase() {
-  return web3.eth.coinbase;
+export async function getAccount(index) {
+  return web3.eth.accounts[index];
 }
 
 /**
