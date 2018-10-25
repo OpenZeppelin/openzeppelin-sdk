@@ -4,11 +4,7 @@ title: The ZEPToken
 sidebar_label: The ZEPToken
 ---
 
-ZeppelinOS' native ZEP token is used to incentivize the creation and maintenance of a healthy ecosystem of EVM packages. It does so via a series of mechanisms that are detailed in the following sections of this article.
-
-## Compatibility standards
-
-ZEP is an ERC20 token, controlled by a [TPL](https://github.com/TPL-protocol) (Transaction Permission Layer) jurisdiction. This allows regional jurisdictions to control which addresses can hold or exchange ZEP using KYC, or whatever other validation process are found to be adequate for the region.
+ZeppelinOS' native ZEP token is not required to use ZeppelinOS, but is used to incentivize the creation and maintenance of a healthy ecosystem of EVM packages. It does so via a series of opt-in mechanisms that are detailed in the following sections of this article.
 
 The ZEP token's source code can be found at [`zos/packages/vouching/contracts/ZEPToken.sol`](https://github.com/zeppelinos/zos/blob/master/packages/vouching/contracts/ZEPToken.sol).
 
@@ -18,7 +14,7 @@ Anyone can create ZeppelinOS EVM packages for free. More precisely, you don't ne
 
 However, ZeppelinOS provides a mechanism in which an EVM package can be registered and vouched for using ZEP. The collected stake of an EVM package can be challenged by other ZEP holders whenever a deficiency in the EVM package is presented for evaluation. In such a situation, the package's stake could be slashed in favor of the challenger.
 
-This simple mechanism allows ZEP that is vouched for an EVM package to represent:
+The end goal is that this simple mechanism will allow ZEP that is vouched for an EVM package to represent:
 
 - *A measure of the quality of the code of the EVM package*. An EVM package with a large amount of stake will attract challengers and subject its code to peer review. If the package's stake survives such scrutiny, then the presence of the unslashed ZEP signals that the code doesn't have significant vulnerabilities or deficiencies.
 - *A measure of the support that the EVM package has from the community*. An EVM package with a lot of adoption will receive vouching from ZEP holders who may want to participate in the package's governance as well as revenue model.
@@ -34,5 +30,7 @@ The current version of this contract currently supports the following features:
 - Removing an EVM package from the registry.
 
 ## ZEP token private beta
+
+ZEP is an ERC20 token, controlled by a [TPL](https://github.com/TPL-protocol) (Transaction Permission Layer) jurisdiction. This allows regional jurisdictions to control which addresses can hold or exchange ZEP using KYC, or whatever other validation process are found to be adequate for the region.
 
 Zeppelin is currently distributing mainnet ZEP to projects interested in adopting ZeppelinOS. This is not a sale, but beta testing for the aforementioned token dynamics. To apply to the private beta distribution, please submit your project's details in the [ZEP Token's private beta submission form](https://google.com)(TODO add link).
