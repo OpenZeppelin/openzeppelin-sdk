@@ -1,4 +1,4 @@
----
+> ---
 id: erc20_onboarding
 title: Onboarding legacy contracts
 ---
@@ -160,7 +160,7 @@ zos push -n local --deploy-libs
 ```
 
 We have just deployed the `MyUpgradeableToken` source code and the OpenZeppelin EVM package to the `local` network. A new
-`zos.local.json` file should have been created.
+`zos.dev-<network_id>.json` file should have been created.
 
 Now, let's create a new instance of the upgradeable token using ZeppelinOS. Run the following line, replacing
 `LEGACY_TOKEN_ADDRESS` with the address of the legacy token contract:
@@ -171,7 +171,7 @@ zos create MyUpgradeableToken --args LEGACY_TOKEN_ADDRESS -n local
 
 Save the upgradeable token address outputted by this command, we will need it later.
 
-Note that the `proxies` section of `zos.local.json` should now include the following, as ZeppelinOS is tracking the
+Note that the `proxies` section of `zos.dev-<network_id>.json` should now include the following, as ZeppelinOS is tracking the
 proxy we have just created:
 ```json
 {

@@ -14,6 +14,12 @@ import "tpl-contracts-eth/contracts/token/TPLRestrictedReceiverToken.sol";
  */
 contract ZEPToken is Initializable, TPLRestrictedReceiverToken, ERC20Detailed, ERC20Pausable {
 
+  /**
+   * @dev Initializer function. Called only once when a proxy for the contract is created.
+   * @param _sender Address that will control the token and receive it's initial supply.
+   * @param _jurisdictionAddress AttributeRegistry used for the TPL jurisdiction of the token.
+   * @param _validRecipientAttributeId uint256 id that the TPL jurisdiction uses to control which addresses can receive the token.
+   */
   function initialize(
     address _sender,
     AttributeRegistryInterface _jurisdictionAddress,
