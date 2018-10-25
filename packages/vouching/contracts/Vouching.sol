@@ -18,13 +18,14 @@ contract Vouching is Initializable {
    * @param newOwner Address of the new owner.
    */
   event OwnershipTransferred(address indexed oldOwner, address indexed newOwner);
+
   /**
    * @dev Emitted when a new dependency has been created.
    * @param nameHash bytes32 hash of the name of the dependency.
    * @param name String representing the name of the dependency.
    * @param owner Address that owns the created dependency.
    * @param dependencyAddress Address of the created dependency.
-   * @param initialStake uint256 representing the amount staked in the creation of the dependency.
+   * @param initialStake uint256 representing the amount vouched in the creation of the dependency.
    */
   event DependencyCreated(
     bytes32 indexed nameHash,
@@ -33,18 +34,21 @@ contract Vouching is Initializable {
     address indexed dependencyAddress,
     uint256 initialStake
   );
+
   /**
    * @dev Emitted when the owner of a dependency vouches for it.
    * @param nameHash bytes32 hash of the name of the dependency.
    * @param amount uint256 with the amount vouched on the dependency.
    */
   event Vouched(bytes32 indexed nameHash, uint256 amount);
+
   /**
    * @dev Emitted when the owner of a dependency removes their vouch.
    * @param nameHash bytes32 hash of the name of the dependency.
    * @param amount uint256 with the amount of stake that has been removed from the dependency.
    */
   event Unvouched(bytes32 indexed nameHash, uint256 amount);
+
   /**
    * @dev Emitted when a dependency has been removed from the registry.
    * @param nameHash bytes32 nameHash hash of the name of the dependency.
@@ -56,7 +60,7 @@ contract Vouching is Initializable {
   using Address for address;
 
   /**
-   * @dev Struct that represents a particular dependency, with its address, owner and amount of tokens staked.
+   * @dev Struct that represents a particular dependency, with its address, owner and amount of tokens vouched.
    */
   struct Dependency {
     address owner;
@@ -68,14 +72,17 @@ contract Vouching is Initializable {
    * @dev Maps dependency Dependency structs by name.
    */
   mapping (string => Dependency) private _registry;
+
   /**
    * @dev Tracks taken dependency names.
    */
   mapping (string => bool) private _takenDependencyNames;
+
   /**
-   * @dev Defines the minimum initial stake that a dependency can have when being created.
+   * @dev Defines the minimum initial amount of vouched tokens a dependency can have when being created.
    */
   uint256 private _minimumStake;
+
   /**
    * @dev The token used for vouching on dependencies.
    */
@@ -92,7 +99,7 @@ contract Vouching is Initializable {
 
   /**
    * @dev Initializer function. Called only once when a proxy for the contract is created.
-   * @param minimumStake uint256 that defines the minimum initial stake that a dependency can have when being created.
+   * @param minimumStake uint256 that defines the minimum initial amount of vouched tokens a dependency can have when being created.
    * @param token ERC20 token to be used for vouching on dependencies.
    */
   function initialize(uint256 minimumStake, ERC20 token) initializer public {
@@ -102,7 +109,7 @@ contract Vouching is Initializable {
   }
 
   /**
-   * @dev Returns the minimumStake value that represents the minimum stake that a new dependency can have.
+   * @dev Tells the the initial minimum amount of vouched tokens a dependency can have when being created.
    * @return A uint256 number with the minimumStake value.
    */
   function minimumStake() public view returns(uint256) {
@@ -110,7 +117,7 @@ contract Vouching is Initializable {
   }
 
   /**
-   * @dev Getter for _token being used for vouching.
+   * @dev Tells the ERC20 token being used for vouching.
    * @return The address of the ERC20 token being used for vouching.
    */
   function token() public view returns(ERC20) {
@@ -118,8 +125,8 @@ contract Vouching is Initializable {
   }
 
   /**
-   * @dev Returns the dependency associated to a given name.
-   * @param name String representing the depedency.
+   * @dev Tells the dependency associated to a given name.
+   * @param name String representing the dependency.
    * @return Tuple representing the elements of a Dependency struct.
    */
   function getDependency(string name) public view returns(address, address, uint256) {
@@ -133,7 +140,7 @@ contract Vouching is Initializable {
   /**
    * @dev Creates a new dependency and performs an initial vouch.
    * @param name String that will represent the dependency. Must be unique.
-   * @param owner Address that will own the depedency.
+   * @param owner Address that will own the dependency.
    * @param dependencyAddress Address of the dependency.
    * @param initialStake uint256 to be staked initially. Must be larger than or equal to minimumStake.
    */
@@ -197,7 +204,7 @@ contract Vouching is Initializable {
     // Owner surrenders _minimumStake to the system
     uint256 reimbursedAmount = _registry[name].stake.sub(_minimumStake);
 
-    // The entry is not removed from _takenDependencyNames, to prevent a new dependecy
+    // The entry is not removed from _takenDependencyNames, to prevent a new dependency
     // from reusing the same name
     delete _registry[name];
 
