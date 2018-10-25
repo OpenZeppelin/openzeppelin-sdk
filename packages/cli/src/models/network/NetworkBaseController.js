@@ -86,7 +86,7 @@ export default class NetworkBaseController {
       this.unsetContracts()
     ])
 
-    this._saveOwner();
+    await this._saveOwner();
     await this._unsetSolidityLibs()
   }
 
