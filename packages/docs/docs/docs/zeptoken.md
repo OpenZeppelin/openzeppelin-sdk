@@ -6,7 +6,7 @@ sidebar_label: The ZEPToken
 
 ZeppelinOS' native ZEP token is not required to use ZeppelinOS, but is used to incentivize the creation and maintenance of a healthy ecosystem of EVM packages. It does so via a series of opt-in mechanisms that are detailed in the following sections of this article.
 
-The ZEP token's source code can be found at [`zos/packages/vouching/contracts/ZEPToken.sol`](https://github.com/zeppelinos/zos/blob/master/packages/vouching/contracts/ZEPToken.sol).
+The ZEP token's source code can be found at [`zos/packages/vouching/contracts/ZEPToken.sol`](https://github.com/zeppelinos/zos/blob/v2.0.0/packages/vouching/contracts/ZEPToken.sol).
 
 ## EVM package vouching
 
@@ -21,7 +21,7 @@ The end goal is that this simple mechanism will allow ZEP that is vouched for an
 - *A financial buffer for the development of new features in the EVM package*. Contributors will be able to claim rewards in ZEP from the package's vouched tokens whenever a contribution is accepted by the package's developers.
 - *A financial buffer for the auditing of the code of the EVM package*. Auditors will be able to receive ZEP whenever a package is successfully challenged.
 
-Vouching is controlled by the contract [`zos/packages/vouching/contracts/Vouching.sol`](https://github.com/zeppelinos/zos/blob/master/packages/vouching/contracts/Vouching.sol).
+Vouching is controlled by the contract [`zos/packages/vouching/contracts/Vouching.sol`](https://github.com/zeppelinos/zos/blob/v2.0.0/packages/vouching/contracts/Vouching.sol).
 
 The current version of this contract currently supports the following features:
 - Registering a new EVM package.
