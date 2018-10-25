@@ -81,6 +81,7 @@ export default class SimpleProject  {
   }
 
   async setDependency(name, packageAddress, version) {
+    // TODO: Validate that the package exists and has thatversion
     this.dependencies[name] = { package: packageAddress, version }
   }
 

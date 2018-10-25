@@ -229,6 +229,7 @@ export default class NetworkAppController extends NetworkBaseController {
 
       if (!this.networkFile.dependencySatisfiesVersionRequirement(depName)) {
         const dependencyInfo = (new Dependency(depName, depVersion)).getNetworkFile(this.network)
+        if (!dependencyInfo.packageAddress) throw Error(`Dependency '${depName}' has not been published to network '${this.network}', so it cannot be linked. Hint: you can create a custom deployment of all unpublished dependencies by running 'zos push' with the '--deploy-dependencies' option.`);
         log.info(`Connecting to dependency ${depName} ${dependencyInfo.version}`);
         await this.project.setDependency(depName, dependencyInfo.packageAddress, dependencyInfo.version)
         const depInfo = { package: dependencyInfo.packageAddress, version: dependencyInfo.version }
