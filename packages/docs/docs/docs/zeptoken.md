@@ -4,13 +4,13 @@ title: The ZEPToken
 sidebar_label: The ZEPToken
 ---
 
-ZeppelinOS' native ZEP token is not required to use ZeppelinOS, but is used to incentivize the creation and maintenance of a healthy ecosystem of EVM packages. It does so via a series of opt-in mechanisms that are detailed in the following sections of this article.
+ZeppelinOS's native ZEP token is not required to use ZeppelinOS, but is used to incentivize the creation and maintenance of a healthy ecosystem of EVM packages. It does so via a series of opt-in mechanisms that are detailed in the following sections of this article.
 
 The ZEP token's source code can be found at [`zos/packages/vouching/contracts/ZEPToken.sol`](https://github.com/zeppelinos/zos/blob/v2.0.0/packages/vouching/contracts/ZEPToken.sol).
 
 ## EVM package vouching
 
-Anyone can create ZeppelinOS EVM packages for free. More precisely, you don't need to hold or spend ZEP to create an EVM package. 
+Anyone can create ZeppelinOS EVM packages for free. More precisely, you don't need to hold or spend ZEP to create an EVM package.
 
 However, ZeppelinOS provides a mechanism in which an EVM package can be registered and vouched for using ZEP. The tokens vouched for an EVM package can be challenged by other ZEP holders whenever a deficiency in the EVM package is presented for evaluation. In such a situation, the package's vouched tokens could be slashed in favor of the challenger.
 
