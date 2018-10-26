@@ -187,6 +187,16 @@ contract MyContract is Initializable {
 }
 ```
 
+## Potentially unsafe operations
+
+When working with upgradeable smart contracts, you will always interact with the contract instance, and never with the underlying logic contract. However, nothing prevents a malicious actor from sending transactions to the logic contract directly. This does not pose a threat, since any changes to the state of the logic contracts do not affect your contract instances, as the storage of the logic contracts is never used in your project.
+
+There is, however, an exception. If the direct call to the logic contract triggers a `selfdestruct` operation, then the logic contract will be destroyed, and all your contract instances will end up delegating all calls to an address without any code. This would effectively break all contract instances in your project.
+
+A similar effect can be achieved if the logic contract contains a `delegatecall` operation. If the contract can be made to `delegatecall` into a malicious contract that contains a `selfdestruct`, then the calling contract will be destroyed.
+
+As such, it is strongly recommended to avoid any usage of either `selfdestruct` or `delegatecall` in your contracts. If you need to include them, make absolutely sure they cannot be called by an attacker on an uninitialized logic contract.
+
 ## Modifying your contracts
 
 When writing new versions of your contracts, either due to new features or bugfixing, there is an additional restriction to observe: you cannot change the order in which the contract state variables are declared, nor their type. You can read more about the reasons behind this restriction [in the pattern section](pattern.md).
@@ -246,6 +256,29 @@ contract MyContract {
 }
 ```
 
+Keep in mind that if you rename a variable, then it will keep the same value as before after upgrading. This may be the desired behaviour if the new variable is semantically the same as the old one:
+
+```solidity
+contract MyContract {
+  uint256 private x;
+  string private z; // starts with the value from `y`
+}
+```
+
+And if you remove a variable from the end of the contract, note that the storage will not be cleared. A subsequent update that adds a new variable will cause that variable to read the leftover value from the deleted one.
+
+```solidity
+contract MyContract {
+  uint256 private x;
+}
+
+// Then upgraded to...
+
+contract MyContract {
+  uint256 private x;
+  string private z; // starts with the value from `y`
+}
+```
 
 Note that you may also be inadvertently changing the storage variables of your contract by changing its parent contracts. For instance, if you have the following contracts:
 
@@ -287,5 +320,6 @@ contract Base {
 ```
 
 Then the variable `base2` whould be assigned the slot that `child` had in the previous version. A workaround for this is to declare unused variables on base contracts that you may want to extend in the future, as a means of "reserving" those slots. Note that this trick does not involve increased gas usage.
+
 
 > Violating any of these storage layout restrictions will cause the upgraded version of the contract to have its storage values mixed up, and can lead to critical errors in your application.

@@ -24,12 +24,12 @@ contract('ValidationLogger', function() {
   describe('warnings', function () {
     it('logs delegate call', async function () {
       validationLogger().log({ hasDelegateCall: true });
-      this.logs.warns[0].should.match(/has a delegatecall/);
+      this.logs.warns[0].should.match(/delegatecall/);
     });
 
     it('logs selfdestruct', async function () {
       validationLogger().log({ hasSelfDestruct: true });
-      this.logs.warns[0].should.match(/has a selfdestruct/);
+      this.logs.warns[0].should.match(/selfdestruct/);
     });
 
     it('logs uninitialized contracts', async function () {
@@ -39,12 +39,12 @@ contract('ValidationLogger', function() {
     
     it('logs vars unchecked for storage layout', async function () {
       validationLogger().log({ storageUncheckedVars: [{ label: 'foo', contract: 'MyContract' }] });
-      this.logs.warns[0].should.match(/foo \(MyContract\) contain a struct or enum/);
+      this.logs.warns[0].should.match(/foo \(MyContract\) contains a struct or enum/);
     });
 
     it('logs when detecting initial values in fields declarations', async function () {
       validationLogger().log({ hasInitialValuesInDeclarations: true });
-      this.logs.warns[0].should.match(/has an initial value/);
+      this.logs.warns[0].should.match(/sets an initial value/);
     });
   });
 
@@ -56,12 +56,12 @@ contract('ValidationLogger', function() {
   
     it('reports inserted var', function () {
       compare('StorageMockSimpleOriginal', 'StorageMockSimpleWithInsertedVar');
-      this.logs.errors[0].should.match(/New variable 'uint256 c' was added in contract StorageMockSimpleWithInsertedVar/);
+      this.logs.errors[0].should.match(/New variable 'uint256 c' was inserted in contract StorageMockSimpleWithInsertedVar/);
     });
   
     it('reports unshifted var', function () {
       compare('StorageMockSimpleOriginal', 'StorageMockSimpleWithUnshiftedVar');
-      this.logs.errors[0].should.match(/New variable 'uint256 c' was added in contract StorageMockSimpleWithUnshiftedVar/);
+      this.logs.errors[0].should.match(/New variable 'uint256 c' was inserted in contract StorageMockSimpleWithUnshiftedVar/);
     });
   
     it('reports appended var', function () {
