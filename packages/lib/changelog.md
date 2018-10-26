@@ -4,6 +4,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## v2.0.1 - 2018-10-26
+
+### Changes
+
+- Skip gas price checks if working on a local ganache instance ([#359](https://github.com/zeppelinos/zos/issues/359)).
+
+### Fixed
+
+- Fetch correct address when initializing a proxy that spawns a new proxy as part of its initialization ([#367](https://github.com/zeppelinos/zos/issues/367)).
+- Properly handle scientific notation (such as `5e10`) in proxies initialization arguments on `encodeCall` function ([#355](https://github.com/zeppelinos/zos/issues/355)).
+
 ## v2.0.0 - 2018-10-25
 
 ### Added
