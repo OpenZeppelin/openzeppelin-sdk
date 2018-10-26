@@ -102,7 +102,8 @@ project writing it in the `zos.json` configuration file.
 
 And just like that, we are now ready to make the initial deployment of the
 project. We are just missing a blockchain network where it will be deployed.
-For this example, let's use [ganache](https://truffleframework.com/docs/ganache/quickstart). To start working with it, open a separate terminal and run:
+For this example, let's use [ganache](https://truffleframework.com/docs/ganache/quickstart), a
+personal blockchain for Ethereum development that you can use to develop your contracts. To start working with it, open a separate terminal and run:
 
 ```console
 npm install -g ganache-cli
