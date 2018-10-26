@@ -63,9 +63,11 @@ A problem that quickly comes up when using proxies has to do with the way in whi
 |...                       |mapping _balances        |
 |                          |uint256 _supply          |
 |                          |...                      |
+```
 
 There are many ways to overcome this problem, and the "unstructured storage" approach which ZeppelinOS implements works as follows. Instead of storing the `_implementation` address at the proxy's first storage slot, it chooses a pseudo random slot instead. This slot is sufficiently random, that the probability of a logic contract declaring a variable at the same slot is negligible. The same principle of randomizing slot positions in the proxy's storage is used in any other variables the proxy may have, such as an admin address (that is allowed to update the value of `_implementation`), etc.
 
+```
 |Proxy                     |Implementation           |
 |--------------------------|-------------------------|
 |...                       |address _owner           |
