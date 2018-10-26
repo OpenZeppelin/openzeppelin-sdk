@@ -319,7 +319,7 @@ contract Base {
 }
 ```
 
-Then the variable `base2` whould be assigned the slot that `child` had in the previous version. A workaround for this is to declare unused variables on base contracts that you may want to extend in the future, as a means of "reserving" those slots. Note that this trick does not involve increased gas usage.
+Then the variable `base2` would be assigned the slot that `child` had in the previous version. A workaround for this is to declare unused variables on base contracts that you may want to extend in the future, as a means of "reserving" those slots. Note that this trick does not involve increased gas usage.
 
 
 > Violating any of these storage layout restrictions will cause the upgraded version of the contract to have its storage values mixed up, and can lead to critical errors in your application.
