@@ -15,9 +15,11 @@ import "zos-lib/contracts/Initializable.sol";
 contract MyContract is Initializable {
 
   uint256 public x;
+  string public s;
 
-  function initialize(uint256 _x) initializer public {
+  function initialize(uint256 _x, string _s) initializer public {
     x = _x;
+    s = _s;
   }
 }
 ```
@@ -37,14 +39,14 @@ Let's create an upgradeable instance of this contract so you can experiment what
 this is all about:
 
 ```console
-zos create MyContract --init initialize --args 42 --network local
+zos create MyContract --init initialize --args 42,hitchhiker --network local
 ```
 
 The `zos create` command receives an optional `--init [function-name]`
 parameter to call the initialization function after creating the contract,
 and the `--args` parameter allows you to pass arguments to it. This way, you
 are initializing your contract with `42` as the value of the `x` state
-variable.
+variable and `hitchhiker` as the value of the `s` state variable.
 
 This command will print the address of your contract, and it will update the
 `zos.dev-<network_id>.json` file.
@@ -71,9 +73,11 @@ import "zos-lib/contracts/Initializable.sol";
 contract MyContract is Initializable {
 
   uint256 public x;
+  string public s;
 
-  function initialize(uint256 _x) initializer public {
+  function initialize(uint256 _x, string _s) initializer public {
     x = _x;
+    s = _s;
   }
 
   function increment() public {
