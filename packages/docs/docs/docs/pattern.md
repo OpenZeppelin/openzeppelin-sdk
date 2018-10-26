@@ -30,21 +30,21 @@ The most immediate problem that proxies need to solve is how the proxy exposes t
 ```solidity
 assembly {
   let ptr := mload(0x40)
-  
+
   // (1) copy incoming call data
-  calldatacopy(ptr, 0, calldatasize) 
-  
+  calldatacopy(ptr, 0, calldatasize)
+
   // (2) forward call to logic contract
-  let result := delegatecall(gas, _impl, ptr, calldatasize, 0, 0) 
+  let result := delegatecall(gas, _impl, ptr, calldatasize, 0, 0)
   let size := returndatasize
-  
+
   // (3) retrieve return data
-  returndatacopy(ptr, 0, size) 
+  returndatacopy(ptr, 0, size)
 
   // (4) forward return data back to caller
   switch result
   case 0 { revert(ptr, size) }
-  default { return(ptr, size) } 
+  default { return(ptr, size) }
 }
 ```
 
@@ -93,7 +93,7 @@ As a result, a logic contract doesn't need to care about overwriting any of the 
 
 As discussed, the unstructured approach avoids storage collisions between the logic contract and the proxy. However, storage collisions between different versions of the logic contract can occur. In this case, imagine that the first implementation of the logic contract stores `address public _owner` at the first storage slot and an upgraded logic contract stores `address public _lastContributor` at the same first slot. When the updated logic contract attempts to write to the `_lastContributor` variable, it will be using the same storage position where the previous value for `_owner` was being stored, and overwrite it!
 
-#### Incorrect storage preservation:
+### Incorrect storage preservation:
 ```
 |Implementation_v0   |Implementation_v1        |
 |--------------------|-------------------------|
@@ -104,7 +104,7 @@ As discussed, the unstructured approach avoids storage collisions between the lo
 |                    |...                      |
 ```
 
-#### Correct storage preservation:
+### Correct storage preservation:
 ```
 |Implementation_v0   |Implementation_v1        |
 |--------------------|-------------------------|
@@ -115,8 +115,8 @@ As discussed, the unstructured approach avoids storage collisions between the lo
 |                    |...                      |
 ```
 
-The unstructured storage proxy mechanism doesn't safeguard against this situation. 
-It is up to the user to have new versions of a logic contract extend previous versions, or otherwise guarantee that the storage hierarchy is always appended to but not modified. 
+The unstructured storage proxy mechanism doesn't safeguard against this situation.
+It is up to the user to have new versions of a logic contract extend previous versions, or otherwise guarantee that the storage hierarchy is always appended to but not modified.
 However, ZeppelinOS CLI does detect such collisions, and warns the developer appropriate.
 
 ## The constructor caveat
