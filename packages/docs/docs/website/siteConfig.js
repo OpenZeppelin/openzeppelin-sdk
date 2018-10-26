@@ -43,6 +43,9 @@ const siteConfig = {
   // gaTrackingId: 'UA-85043059-1',
   highlight: {
     theme: 'default',
+    hljs: function(hljs) {
+      require('highlightjs-solidity')(hljs);
+    }
   },
   scripts: ['https://buttons.github.io/buttons.js'],
   stylesheets: [
