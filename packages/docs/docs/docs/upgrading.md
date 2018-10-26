@@ -54,8 +54,8 @@ This command will print the address of your contract, and it will update the
 
 ## Upgrading the contract
 
-Remember that for this guide we are using a local development network. Do not
-stop the `truffle develop` command that we ran before, or you will lose your
+Remember that for this guide we are using a [ganache](https://truffleframework.com/docs/ganache/quickstart) local development network. Do not
+stop the `ganache-cli` command that we ran before, or you will lose your
 previous deployment!
 
 Now, let's say we found an issue on our contract, or maybe we just want to
@@ -104,8 +104,13 @@ You will see that this command prints the same contract address as before, and a
 upgrades: we have two contracts, one is the contract address that we will never change, but it just serves as a proxy to the logic contract that we can replace with
 new versions.
 
-To try the new function we've just added, jump to the terminal where the Truffle
-command is running and execute the following instructions:
+To try the new function we've just added, open a new terminal and run:
+
+```console
+npx truffle console --network local
+```
+
+and execute the following instructions:
 
 ```console
 truffle(local)> myContract = MyContract.at('<your-contract-address>')

@@ -15,10 +15,11 @@ Let's install [Node.js](http://nodejs.org/) and
 [npm](https://npmjs.com/), which are the dependencies to get started. On their
 respective websites you will find specific instructions for your machine.
 
-Truffle is also required, so let's install it and initialize a directory for
+Truffle and ganache are also required, so let's install them and initialize a directory for
 our project:
 
 ```console
+npm install --global ganache-cli
 npm install --global truffle
 mkdir my-project
 cd my-project
@@ -109,16 +110,30 @@ module.exports = function(callback) {
 ```
 
 As you can see on the code, this script was prepared to be executed with
-Truffle. So let's start a Truffle local development network and console:
+Truffle. So let's open a new terminal and start a ganache network by running:
 
 ```console
-truffle develop
+ganache-cli --port 9545
+```
+We also need to configure a local network inside our `truffle.js` by adding the following:
+
+```javascript
+module.exports = {
+  networks: {
+    local: {
+      host: 'localhost',
+      port: 9545,
+      network_id: '*'
+    }
+  }
+};
 ```
 
-And execute the script in the truffle console:
+And then, start a truffle console and execute the script inside it:
 
 ```console
-truffle(develop)> exec index.js
+truffle console --network local
+truffle(local)> exec index.js
 ```
 
 This is just a very simple example to show the basic functions of the
