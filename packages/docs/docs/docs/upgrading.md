@@ -54,6 +54,20 @@ This command will print the address of your contract, and it will update the
 > **Note**: When calling an initializer with many variables, these should be
 > passed as a comma-separated list, with no spaces in between.
 
+We can start a console to interact with our contract and check it has been properly initialized:
+
+```console
+npx truffle console --network local
+```
+
+```console
+truffle(local)> myContract = MyContract.at('<your-contract-address>')
+truffle(local)> myContract.x()
+42
+truffle(local)> myContract.s()
+"hitchhiker"
+```
+
 ## Upgrading the contract
 
 Remember that for this guide we are using a [ganache](https://truffleframework.com/docs/ganache/quickstart) local development network. Do not
@@ -108,7 +122,7 @@ You will see that this command prints the same contract address as before, and a
 upgrades: we have two contracts, one is the contract address that we will never change, but it just serves as a proxy to the logic contract that we can replace with
 new versions.
 
-Since `zos` is using truffle, we can open a new terminal and run:
+We can open a new terminal and start a console:
 
 ```console
 npx truffle console --network local
