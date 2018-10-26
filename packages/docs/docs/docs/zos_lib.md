@@ -129,11 +129,10 @@ module.exports = {
 };
 ```
 
-And then, start a truffle console and execute the script inside it:
+Adnd then, execute the script using `truffle exec`:
 
 ```console
-truffle console --network local
-truffle(local)> exec index.js
+truffle exec index.js --network local
 ```
 
 This is just a very simple example to show the basic functions of the
