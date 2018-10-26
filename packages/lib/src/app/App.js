@@ -1,5 +1,7 @@
 'use strict'
 
+import _ from 'lodash'
+
 import Logger from '../utils/Logger'
 import decodeLogs from '../helpers/decodeLogs'
 import copyContract from '../helpers/copyContract'
@@ -100,7 +102,7 @@ export default class App {
 
     log.info(`TX receipt received: ${receipt.transactionHash}`)
     const logs = decodeLogs(receipt.logs, this.constructor.getContractClass())
-    const address = logs.find(l => l.event === 'ProxyCreated').args.proxy
+    const address = _.findLast(logs, l => l.event === 'ProxyCreated').args.proxy
     log.info(`${packageName} ${contractName} proxy: ${address}`)
     return new contractClass(address)
   }

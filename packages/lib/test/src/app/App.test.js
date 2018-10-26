@@ -11,6 +11,7 @@ import { ImplementationDirectory, Proxy } from '../../../src';
 
 const ImplV1 = Contracts.getFromLocal('DummyImplementation');
 const ImplV2 = Contracts.getFromLocal('DummyImplementationV2');
+const ProxyCreator = Contracts.getFromLocal('ProxyCreator');
 
 contract('App', function (accounts) {
   const [_unused, owner, otherAdmin] = accounts;
@@ -280,6 +281,20 @@ contract('App', function (accounts) {
         (await this.proxy.value()).toNumber().should.eq(10);
         (await this.proxy.text()).should.eq("foo");
         await this.proxy.values(0).should.be.rejected;
+      });
+    });
+
+    describe('with initializer that spawns additional proxies', function () {
+      beforeEach('setting proxy creator implementation', async function () {
+        this.proxyCreator = await deployContract(ProxyCreator);
+        await this.directory.setImplementation('ProxyCreator', this.proxyCreator.address);
+      });
+
+      it('should return proxy creator instance', async function () {
+        const proxy = await this.app.createProxy(ProxyCreator, packageName, 'ProxyCreator', 'initialize', [this.app.address, packageName, contractName, '']);
+        (await proxy.name()).should.eq('ProxyCreator');
+        const created = await proxy.created();
+        (await ImplV1.at(created).version()).should.eq('V1');
       });
     });
   });
