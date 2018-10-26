@@ -8,13 +8,14 @@
       "version-2.0.0-deploying",
       "version-2.0.0-upgrading",
       "version-2.0.0-linking",
-      "version-2.0.0-publishing"
+      "version-2.0.0-publishing",
+      "version-2.0.0-vouching"
     ],
     "GUIDES": [
       "version-2.0.0-writing_contracts",
       "version-2.0.0-testing",
       "version-2.0.0-erc20_onboarding",
-      "version-2.0.0-upgradeability_governance",
+      "version-2.0.0-upgrades_governance",
       "version-2.0.0-zos_lib"
     ],
     "ADVANCED TOPICS": [
@@ -53,24 +54,17 @@
       "version-2.0.0-application_ImplementationProvider",
       "version-2.0.0-application_Package"
     ],
-    "APPLICATION / VERSIONING": [
-      "version-2.0.0-application_versioning_FreezableImplementationDirectory",
-      "version-2.0.0-application_versioning_ImplementationDirectory",
-      "version-2.0.0-application_versioning_ImplementationProvider",
-      "version-2.0.0-application_versioning_Package",
-      "version-2.0.0-application_versioning_Release"
-    ],
-    "MIGRATIONS": [
-      "version-2.0.0-migrations_Initializable",
-      "version-2.0.0-migrations_Migratable"
-    ],
     "UPGRADEABILITY": [
       "version-2.0.0-upgradeability_AdminUpgradeabilityProxy",
       "version-2.0.0-upgradeability_Proxy",
       "version-2.0.0-upgradeability_UpgradeabilityProxy"
     ],
-    "UNCATEGORIZED": [
+    "INITIALIZE": [
       "version-2.0.0-Initializable"
+    ],
+    "VOUCHING": [
+      "version-2.0.0-Vouching",
+      "version-2.0.0-ZEPToken"
     ]
   }
 }
