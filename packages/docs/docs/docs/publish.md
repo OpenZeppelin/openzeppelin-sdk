@@ -71,6 +71,11 @@ ZeppelinOS configuration files, so add the following top-level field to the
 }
 ```
 
+Remember the `zos` configuration files are where ZeppelinOS keep track of 
+your contracts, the addresses of the instances you have created, and in this
+case the address of the EVM package you have published. This is how ZeppelinOS 
+solves the link of foreign projects that depend on yours.
+
 Make sure to check that the rest of the fields describe your package
 accurately. It could be a good idea to remove the `main` field, if present,
 because it doesn't make sense for EVM packages. Also, if you have a
