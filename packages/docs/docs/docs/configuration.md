@@ -99,7 +99,7 @@ Also, notice the fields `<app>` and `<package>`. These contain the addresses of 
 
 Finally, the `stdlib` field stores information about linked EVM packages. Its address is stored in `<stdlib-address>`, and its name in `<stdlib-name>`, matching that in `zos.json`. The `custom-deploy` field will be present only when a version of the EVM package is deployed using the `--deploy-dependencies` flag of the `push` command, in which case `<custom-deploy>` will be `true`. The remaining addresses, `<app-address>`, `<package-address>`, and `<provider-address>` store the addresses of the `App`, the `Package`, and the current `ImplementationProvider` respectively.
 
-The naming of the file will be `zos.<network>.json`, but note that `<network>` is not taken from the name of the network's entry in the Truffle configuration file, but is instead inferred from the cannonical network id associated to the entry. For example, if the Truffle cofiguration file defines the following networks:
+The naming of the file will be `zos.<network>.json`, but note that `<network>` is not taken from the name of the network's entry in the Truffle configuration file, but is instead inferred from the canonical network id associated to the entry. For example, if the Truffle configuration file defines the following networks:
 
 ```json
 networks: {
@@ -121,7 +121,7 @@ networks: {
  }
 ```
  Using `zos push --network geth_ropsten` or `zos push --network parity_ropsten` will both produce a file named `zos.ropsten.json` no matter which method was used to connect to the ropsten network. ZeppelinOS will automatically detect which public network is being referred to (using web3.network.getVersion()) and use this information for determining the file name.
- When dealing with local networks, ZeppelinOS will generate files with `dev-<network_id>`, given that these networks are not public and don't have a cannonical name. Using `zos push --network local` will produce a file named `zos.dev-1540303312049.json` (or some other number representing the network id of the local network).
+ When dealing with local networks, ZeppelinOS will generate files with `dev-<network_id>`, given that these networks are not public and don't have a canonical name. Using `zos push --network local` will produce a file named `zos.dev-1540303312049.json` (or some other number representing the network id of the local network).
 
 ## `zos.json` files in version control
 

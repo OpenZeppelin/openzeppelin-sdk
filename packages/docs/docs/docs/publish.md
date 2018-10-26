@@ -3,7 +3,7 @@ id: publishing
 title: Publishing an EVM package
 ---
 
-On the previous guides we have explored how to initilize a ZeppelinOS project,
+On the previous guides we have explored how to initialize a ZeppelinOS project,
 how to add contracts to it, how to upgrade those contracts and how to link to
 existing EVM packages. At this point we have a simple project that uses various
 ZeppelinOS functionalities. On this guide we will instead add new
