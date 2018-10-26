@@ -29,7 +29,7 @@ export default class StatusComparator {
     this._addReport(expected, observed, `A contract ${alias} at ${address} is not registered`)
   }
 
-  onMissingRemoteImplementation(expected, observed, { alias, address }) {
+  async onMissingRemoteImplementation(expected, observed, { alias, address }) {
     this._addReport(expected, observed, `Missing registered contract ${alias} at ${address}`)
   }
 

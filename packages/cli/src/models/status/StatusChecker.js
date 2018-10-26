@@ -100,9 +100,9 @@ export default class StatusChecker {
       implementationsInfo.map(async info => {
         const { address } = info;
         const bytecode = await promisify(web3.eth.getCode.bind(web3.eth))(address);
-        return isSolidityLib(bytecode) 
+        return await (isSolidityLib(bytecode) 
           ? this._checkRemoteSolidityLibImplementation(info, bytecode) 
-          : this._checkRemoteContractImplementation(info, bytecode);
+          : this._checkRemoteContractImplementation(info, bytecode));
       })
     )
     this._checkUnregisteredLocalImplementations(implementationsInfo)
@@ -114,12 +114,14 @@ export default class StatusChecker {
     this._checkUnregisteredLocalProxies(proxiesInfo)
   }
 
-  _checkRemoteContractImplementation({ alias, address }, bytecode) {
+  async _checkRemoteContractImplementation({ alias, address }, bytecode) {
     if (this.networkFile.hasContract(alias)) {
       this._checkContractImplementationAddress(alias, address)
       this._checkContractImplementationBytecode(alias, address, bytecode)
     }
-    else this.visitor.onMissingRemoteImplementation('none', 'one', { alias, address })
+    else {
+      await this.visitor.onMissingRemoteImplementation('none', 'one', { alias, address })
+    }
   }
 
   _checkContractImplementationAddress(alias, address) {
@@ -133,7 +135,7 @@ export default class StatusChecker {
     if (observed !== expected) this.visitor.onMismatchingImplementationBodyBytecode(expected, observed, { alias, address, bodyBytecodeHash: observed })
   }
 
-  _checkRemoteSolidityLibImplementation({ alias, address }, bytecode) {
+  async _checkRemoteSolidityLibImplementation({ alias, address }, bytecode) {
     if (this.networkFile.hasSolidityLib(alias)) {
       this._checkSolidityLibImplementationAddress(alias, address)
       this._checkSolidityLibImplementationBytecode(alias, address, bytecode)
