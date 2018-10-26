@@ -28,7 +28,7 @@ Run `zos <command> --help` for more information about the commands.
 
 ## Modified commands
 
-In 2.x, there are minor changes to the commands from 1.x, like some of them now having options like `--skip-compile`, but there are also more signiffcant changes.
+In 2.x, there are minor changes to the commands from 1.x, like some of them now having options like `--skip-compile`, but there are also more significant changes.
 
 *`bump`* is now only relevant for published EVM packages, and is no longer applicable to projects that are not intended for reusability.
 
