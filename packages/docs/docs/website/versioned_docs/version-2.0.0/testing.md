@@ -1,52 +1,51 @@
 ---
 id: version-2.0.0-testing
-title: Testing upgradeable applications
-sidebar_label: Testing
+title: Testing upgradeable projects
 original_id: testing
 ---
 
-When working with ZeppelinOS, you can test your contracts as you usually do, or you can have ZeppelinOS automatically set up your entire application in your testing environment. This allows you to replicate the same set of contracts that manage your application for each test you run.
+When working with ZeppelinOS, you can test your contracts as you usually do, or you can have ZeppelinOS automatically set up your entire project in your testing environment. This allows you to replicate the same set of contracts that manage your project for each test you run.
 
-The `zos` package provides a `TestApp()` function to retrieve your application structure from the `zos.json` file and deploy everything to the current test network. All contracts you have registered via `zos add`, plus all the contracts provided by the EVM package you have linked, will be available. The returned [`App`](https://github.com/zeppelinos/zos-lib/blob/master/src/app/App.js) object provides convenient methods for creating upgradeable instances of your contracts, which you can use for testing.
+The `zos` package provides a `TestHelper()` function to retrieve your project structure from the `zos.json` file and deploy everything to the current test network. All contracts you have registered via `zos add`, plus all the contracts provided by the EVM packages you have linked, will be available. The returned project object (either a [`SimpleProject`](https://github.com/zeppelinos/zos/blob/v2.0.0/packages/lib/src/project/SimpleProject.js) or an [`AppProject`](https://github.com/zeppelinos/zos/blob/v2.0.0/packages/lib/src/project/AppProject.js)) provides convenient methods for creating upgradeable instances of your contracts, which you can use for testing.
 
-> **Important:** for `TestApp` to work correctly in your testing environment, you need to set the `NODE_ENV` environment variable to `test` when running your tests. For instance, if you are using truffle, run `NODE_ENV=test truffle test`.
+> **Important:** for `TestHelper` to work correctly in your testing environment, you need to set the `NODE_ENV` environment variable to `test` when running your tests. For instance, if you are using truffle, run `NODE_ENV=test truffle test`.
 
 ## Example
 
-Given a small application, with a `Sample` contract, linked to an EVM package that provides a `StandardToken` implementation:
+Given a small project, with a `Sample` contract, linked to an EVM package that provides a `ERC20` token implementation:
 
 ```json
 {
-  "name": "MyProject",
+  "zosversion": "2",
+  "name": "my-project",
   "version": "0.1.0",
   "contracts": {
     "Sample": "Sample"
   },
-  "stdlib": {
-    "name": "openzeppelin-zos",
-    "version": "1.9.0"
+  "dependencies": {
+    "openzeppelin-eth": "2.0.2"
   }
 }
 ```
 
-To set up the full application in a test file, first import `TestApp` from `zos`:
+To set up the full project in a test file, first import `TestHelper` from `zos`:
 ```js
-import { TestApp } from 'zos';
+import { TestHelper } from 'zos';
 ```
 
 Then invoke it in the test suite setup, optionally including a set of options to be used when deploying the contracts (such as `from`, `gas`, and `gasPrice`):
 ```js
 beforeEach(async function () {
-  this.app = await TestApp({ from: owner })
+  this.project = await TestHelper({ from: owner })
 });
 ```
 
-In a test, you can generate an instance for your contracts via the `createProxy` function of the app:
+In a test, you can generate an instance for your contracts via the `createProxy` function of the project:
 
 ```js
 const Sample = artifacts.require('Sample')
 it('should create a proxy', async function () {
-  const proxy = await this.app.createProxy(Sample);
+  const proxy = await this.project.createProxy(Sample);
   // Use proxy ...
 })
 ```
@@ -54,25 +53,25 @@ it('should create a proxy', async function () {
 The full code for the sample test file is:
 
 ```js
-import { TestApp } from 'zos';
+import { TestHelper } from 'zos';
 
 const Sample = artifacts.require('Sample')
-const StandardToken = artifacts.require('StandardToken')
+const ERC20 = artifacts.require('ERC20')
 
 contract('Sample', function ([_, owner]) {
 
   beforeEach(async function () {
-    this.app = await TestApp({ from: owner })
+    this.project = await TestHelper({ from: owner })
   });
 
   it('should create a proxy', async function () {
-    const proxy = await this.app.createProxy(Sample);
+    const proxy = await this.project.createProxy(Sample);
     const result = await proxy.greet();
     result.should.eq('A sample')
   })
 
   it('should create a proxy for the EVM package', async function () {
-    const proxy = await this.app.createProxy(StandardToken);
+    const proxy = await this.project.createProxy(ERC20, { contractName: 'StandaloneERC20', packageName: 'openzeppelin-eth' });
     const result = await proxy.totalSupply();
     result.toNumber().should.eq(0);
   })

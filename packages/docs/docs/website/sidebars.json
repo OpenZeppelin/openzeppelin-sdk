@@ -54,24 +54,17 @@
       "application_ImplementationProvider",
       "application_Package"
     ],
-    "APPLICATION / VERSIONING": [
-      "application_versioning_FreezableImplementationDirectory",
-      "application_versioning_ImplementationDirectory",
-      "application_versioning_ImplementationProvider",
-      "application_versioning_Package",
-      "application_versioning_Release"
-    ],
-    "MIGRATIONS": [
-      "migrations_Initializable",
-      "migrations_Migratable"
-    ],
     "UPGRADEABILITY": [
       "upgradeability_AdminUpgradeabilityProxy",
       "upgradeability_Proxy",
       "upgradeability_UpgradeabilityProxy"
     ],
-    "UNCATEGORIZED": [
+    "INITIALIZE": [
       "Initializable"
+    ],
+    "VOUCHING": [
+      "Vouching",
+      "ZEPToken"
     ]
   }
 }

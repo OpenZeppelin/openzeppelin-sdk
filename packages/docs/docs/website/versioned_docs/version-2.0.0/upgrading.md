@@ -16,9 +16,11 @@ import "zos-lib/contracts/Initializable.sol";
 contract MyContract is Initializable {
 
   uint256 public x;
+  string public s;
 
-  function initialize(uint256 _x) initializer public {
+  function initialize(uint256 _x, string _s) initializer public {
     x = _x;
+    s = _s;
   }
 }
 ```
@@ -34,30 +36,58 @@ just as with any other contract on the blockchain, we can define governance
 mechanisms to decide when and how to upgrade the contracts, that can be manual,
 automated, or any combination of both that will earn the trust of our users.
 
-Let's make an upgradeable instance of this contract so you can experiment what
-this is all about:
+> If any of the following commands fail with an `A network name must be provided 
+to execute the requested action` error, it means our session has expired. 
+In that case, renew it by running the command `zos session --network local 
+--from 0x1df62f291b2e969fb0849d99d9ce41e2f137006e --expires 3600` again.
+
+Now let's create an upgradeable instance of this contract so you can 
+experiment what this is all about:
 
 ```console
-NODE_ENV=test zos create MyContract --init initialize --args 42 --network local
+zos create MyContract --init initialize --args 42,hitchhiker
 ```
 
 The `zos create` command receives an optional `--init [function-name]`
 parameter to call the initialization function after creating the contract,
 and the `--args` parameter allows you to pass arguments to it. This way, you
 are initializing your contract with `42` as the value of the `x` state
-variable.
+variable and `hitchhiker` as the value of the `s` state variable.
 
 This command will print the address of your contract, and it will update the
-`zos.local.json` file.
+`zos.dev-<network_id>.json` file.
 
 > **Note**: When calling an initializer with many variables, these should be
 > passed as a comma-separated list, with no spaces in between.
 
+We can start a console to interact with our contract and check it has been properly initialized:
+
+```console
+npx truffle console --network local
+```
+
+Once in the Truffle console, execute the following instructions to test 
+our instance is working as expected:
+
+> _Make sure you replace <your-contract-address> with the address returned 
+by the `create` command we ran above._
+
+```console
+truffle(local)> myContract = MyContract.at('<your-contract-address>')
+truffle(local)> myContract.x().toString()
+42
+
+truffle(local)> myContract.s()
+"hitchhiker"
+```
+
+You can now exit the Truffle console and continue with the following steps.
+
 ## Upgrading the contract
 
-Remember that for this guide we are using a local development network. Do not
-stop the `truffle develop` command that we ran before, or you will lose your
-previous deployment!
+Remember that for this guide we are using a [ganache](https://truffleframework.com/docs/ganache/quickstart) 
+local development network. Do not stop the `ganache-cli` command that [we ran before](deploying.md#deploying-your-project), 
+or you will lose your previous deployment!
 
 Now, let's say we found an issue on our contract, or maybe we just want to
 extend its functionalities.
@@ -72,9 +102,11 @@ import "zos-lib/contracts/Initializable.sol";
 contract MyContract is Initializable {
 
   uint256 public x;
+  string public s;
 
-  function initialize(uint256 _x) initializer public {
+  function initialize(uint256 _x, string _s) initializer public {
     x = _x;
+    s = _s;
   }
 
   function increment() public {
@@ -83,33 +115,47 @@ contract MyContract is Initializable {
 }
 ```
 
-> **Note**: while ZeppelinOS supports arbitrary changes in functionality,
-> you will need to preserve all variables that appear in prior versions of
+> **Note**: While ZeppelinOS supports arbitrary changes regarding functionality,
+> you will need to preserve all the variables that appeared in previous versions of
 > your contracts, declaring any new variables below the already existing ones.
 > All the considerations and some recommendations for your upgrades are
 > explained in the [Writing upgradeable contracts](writing_contracts.md) page.
 
-Once you have saved the changes, push the new code to the network:
+Once you have saved these changes, push the new code to the network:
 
 ```console
-NODE_ENV=test zos push --network local
+zos push
 ```
 
 Finally, let's update the already deployed contract with the new code:
 
 ```console
-NODE_ENV=test zos update MyContract --network local
+zos update MyContract
 ```
 
-You will see that this command prints the same contract address as before, and a logic contract address that is new. This is all the magic behind
-upgrades: we have two contracts, one has an address that we will never change, but it just serves as a proxy to the other contract that we can replace with
-new versions.
+You will see that this command prints the same contract address as before, 
+and a logic contract address that is new. This is all the magic behind
+upgrades: we have two contracts, one is the contract address that we will 
+never change, but it just serves as a proxy to the logic contract that we 
+can replace with new versions.
 
-To try the new function we just added, jump to the terminal where the Truffle
-command is running and execute the following instructions:
+We can start a new Truffle console to interact with our contract and check 
+it has been properly upgraded:
 
 ```console
-truffle(local)> myContract = MyContract.at(<your-contract-address>)
+npx truffle console --network local
+```
+
+Once in the Truffle console, execute the following instructions to try 
+the new functionality we've just added:
+
+> _Make sure you replace <your-contract-address> with the address of the 
+upgradeable instance your created of `MyContract`. This address was 
+returned by the `create` command we ran in the previous section, which
+is the same as the one returned by the `update` command we ran above._
+
+```console
+truffle(local)> myContract = MyContract.at('<your-contract-address>')
 truffle(local)> myContract.increment()
 truffle(local)> myContract.x()
 43

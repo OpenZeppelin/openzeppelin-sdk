@@ -1,8 +1,7 @@
 ---
-id: version-2.0.0-upgradeability_governance
-title: Upgradeability Governance in ZeppelinOS
-sidebar_label: Upgradeability governance
-original_id: upgradeability_governance
+id: version-2.0.0-upgrades_governance
+title: Upgrades governance
+original_id: upgrades_governance
 ---
 
 ## Introduction
@@ -12,7 +11,8 @@ the Ethereum blockchain. However, it is desirable to have a mechanism that allow
 whether a contract should be upgraded or not, instead of having an unilateral decision.
 
 Given that there are many projects already working on really good solutions to achieve decentralized governance,
-we've been exploring some of them to study how they can be integrated with ZeppelinOS to manage contracts upgradeability.
+we've been exploring some of them to study how they can be integrated with ZeppelinOS to manage contract upgrades.
+
 In this case, we will use a multisignature wallet.
 
 ## Getting started
@@ -77,7 +77,7 @@ Now that our new logic contract is uploaded to the network, we can proceed to up
 ## Upgrading our contract instance
 
 At this point, if we attempt to upgrade our `MyContract` instance to the new version through the CLI, we’ll get an error
-since the deployer account no longer has upgradeability rights over the contract instance. We need to go through the
+since the deployer account no longer has upgrade rights over the contract instance. We need to go through the
 multisig to perform this operation, as the CLI’s account.
 
 Let’s submit a transaction to the multisig wallet for our contract instance to be upgraded. We can do this from the
