@@ -104,13 +104,13 @@ You will see that this command prints the same contract address as before, and a
 upgrades: we have two contracts, one is the contract address that we will never change, but it just serves as a proxy to the logic contract that we can replace with
 new versions.
 
-To try the new function we've just added, open a new terminal and run:
+Since `zos` is using truffle, we can open a new terminal and run:
 
 ```console
 npx truffle console --network local
 ```
 
-and execute the following instructions:
+and execute the following instructions to try the new function we've just added:
 
 ```console
 truffle(local)> myContract = MyContract.at('<your-contract-address>')
