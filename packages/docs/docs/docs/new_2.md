@@ -19,22 +19,23 @@ In 2.x by default, your ZeppelinOS project will not use any of its App or Packag
 
 2.x introduces a few new commands to its CLI:
 
-* `zos publish`
-* `zos check`
-* `zos set-admin`
-* `zos unlink`
+* [`zos publish`](cli_publish.md)
+* [`zos check`](cli_check.md)
+* [`zos set-admin`](cli_set-admin.md)
+* [`zos unlink`](cli_unlink.md)
 
-Run `zos <command> --help` for more information about the commands.
+In order to read more information about the commands, please run `zos <command> --help` or go to the 
+[commands reference](apis.md) section.
 
 ## Modified commands
 
 In 2.x, there are minor changes to the commands from 1.x, like some of them now having options like `--skip-compile`, but there are also more significant changes.
 
-*`bump`* is now only relevant for published EVM packages, and is no longer applicable to projects that are not intended for reusability.
+*[`bump`](cli_bump.md)* is now only relevant for published EVM packages, and is no longer applicable to projects that are not intended for reusability.
 
-*`link`* can now be called with multiple EVM packages as arguments.
+*[`link`](cli_link.md)* can now be called with multiple EVM packages as arguments.
 
-*`init`* no longer has the `--lib` option. Now all the ZeppelinOS projects are packages, and you can call the `zos publish` command to make your EVM package reusable by others.
+*[`init`](cli_init.md)* no longer has the `--lib` option. Now all the ZeppelinOS projects are packages, and you can call the `zos publish` command to make your EVM package reusable by others.
 
 ## Compatibility
 
