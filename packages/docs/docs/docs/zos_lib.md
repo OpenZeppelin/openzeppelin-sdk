@@ -136,5 +136,3 @@ truffle exec index.js --network local
 This is just a very simple example to show the basic functions of the
 ZeppelinOS JavaScript library. You can find more examples in the
 [ZeppelinOS repository](https://github.com/zeppelinos/zos/tree/master/examples).
-
-// TODO add link to the API docs.
