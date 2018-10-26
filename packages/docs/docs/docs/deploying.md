@@ -137,7 +137,7 @@ You can read more about this file format in the
 If a previous `zos.dev-<network_id>.json` was already created, the `push`
 command will just update said file with your last changes. For example, if you
 change the source of `MyContract` and call `zos push` again,
-ZeppelinOS will deploy a new version of the contract implementation for `MyContract`
+ZeppelinOS will deploy a new version of `MyContract`
 and replace the entry in the json file's `contracts["MyContract"].address`.
 
 An important thing
