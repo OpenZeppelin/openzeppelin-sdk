@@ -42,7 +42,7 @@ Unfortunately, 2.x introduces breaking changes, so a project that was created us
 
 ## Changes to your contracts
 
-When it comes to Solidity code, there is nothing special you need to consider when using ZeppelinOS 2.x other than using initializers instead of constructors. For more info on this, see the ["the constructor caveat"](proxies.md#the-constructor-caveat) section of the documentation.
+When it comes to Solidity code, there is nothing special you need to consider when using ZeppelinOS 2.x other than using initializers instead of constructors. For more info on this, see the ["the constructor caveat"](pattern.md#the-constructor-caveat) section of the documentation.
 
 As with 1.x, ZeppelinOS 2.x will manage upgrades and package linking without you having to use special Solidity syntax.
 
