@@ -113,23 +113,38 @@ project writing it in the `zos.json` configuration file.
 
 And just like that, we are now ready to make the initial deployment of the
 project. We are just missing a blockchain network where it will be deployed.
-For this example, let's use [ganache](https://truffleframework.com/docs/ganache/quickstart), a
-personal blockchain for Ethereum development that you can use to develop your contracts. To start working with it, open a separate terminal and run:
+For this example, let's use [ganache](https://truffleframework.com/docs/ganache/quickstart), 
+a personal blockchain for Ethereum development that you can use to develop 
+your contracts. To install it please run:
 
 ```console
 npm install -g ganache-cli
 ```
 
-and then, run:
+To start working with it, open a separate terminal and run:
 
 ```console
-ganache-cli --port 9545
+ganache-cli --port 9545 --deterministic
 ```
 
-And back in the original terminal:
+Once we have done that, let's go back to the original terminal and 
+run the following command:
 
 ```console
-zos push --network local
+zos session -n local -f 0x1df62f291b2e969fb0849d99d9ce41e2f137006e --expires 3600 
+``` 
+
+The `session` command starts a session to work with a desired network.
+In this case, we are telling to work with the `local` network with the 
+`-n` option, and also setting a default sender address for the transactions 
+we will run with the `-f` option. Additionally, the `expires` flag allows 
+us to indicate the session expiration time in seconds. 
+
+Now that everything has been setup, we are ready to deploy the project. 
+To do so simply run:
+
+```console
+zos push
 ```
 
 This command deploys `MyContract` to the specified network and prints its
