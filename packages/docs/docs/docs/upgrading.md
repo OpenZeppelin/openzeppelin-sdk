@@ -55,7 +55,7 @@ This command will print the address of your contract, and it will update the
 ## Upgrading the contract
 
 Remember that for this guide we are using a [ganache](https://truffleframework.com/docs/ganache/quickstart) local development network. Do not
-stop the `ganache-cli` command that we ran before, or you will lose your
+stop the `ganache-cli` command that [we ran before](deploying.md#deploying-your-project), or you will lose your
 previous deployment!
 
 Now, let's say we found an issue on our contract, or maybe we just want to
