@@ -44,22 +44,37 @@ initialized just for testing purpose.
 _Before we begin, remember to install the dependencies running `npm install`. Additionally, you should check everything
 is working as expected by running the test files with `npm test`._
 
-Now, let's deploy the legacy token. We will use a truffle development console. You can start it by running
-`npx truffle develop`. Then, run the following commands:
+Now, let's deploy the legacy token. We will use [ganache-cli](https://truffleframework.com/docs/ganache/quickstart), a
+personal blockchain for Ethereum development that you can use to deploy your contracts and develop your applications.
+To start using it, run the following command:
 
 ```console
-truffle(develop)> compile
-truffle(develop)> owner = web3.eth.accounts[1]
-truffle(develop)> MyLegacyToken.new({ from: owner }).then(i => legacyToken = i)
-truffle(develop)> legacyToken.address
+npx ganache-cli --port 9545
+```
+
+After that, you will be able to attach a truffle console to an already configured network inside the `truffle-config.js` 
+by running:
+
+```console
+npx truffle console --network local
+```
+
+Then, run the following commands:
+
+```console
+truffle(local)> compile
+truffle(local)> owner = web3.eth.accounts[1]
+truffle(local)> MyLegacyToken.new({ from: owner }).then(i => legacyToken = i)
+truffle(local)> legacyToken.address
 '0x...'
 ```
 
 Keep track of the `owner` and `legacyToken` addresses, we will need them in the following steps.
 
 You can check the owner balance by running:
+
 ```console
-truffle(develop)> legacyToken.balanceOf(owner)
+truffle(local)> legacyToken.balanceOf(owner)
 BigNumber { s: 1, e: 22, c: [ 100000000 ] }
 ```
 
@@ -199,37 +214,37 @@ tracking the upgradeable instances we have just created:
 
 ### 3. Migrate your old token balance
 
-In order to migrate your balance, go back to the truffle develop console if you have deployed your legacy token locally
+In order to migrate your balance, go back to the truffle console if you have deployed your legacy token locally
 or open a new one against the network where your legacy token is deployed. Then, run the following commands, replacing
 `ERC20_MIGRATOR_ADDRESS` and `UPGRADEABLE_TOKEN_ADDRESS` with their corresponding proxy address returned by `zos create`
 commands of the previous step:
 
 ```console
-truffle(develop)> erc20Migrator = ERC20Migrator.at('ERC20_MIGRATOR_ADDRESS')
-truffle(develop)> upgradeableToken = MyUpgradeableToken.at('UPGRADEABLE_TOKEN_ADDRESS')
-truffle(develop)> erc20Migrator.beginMigration(upgradeableToken.address, { from: owner })
-truffle(develop)> legacyToken.balanceOf(owner).then(b => balance = b)
-truffle(develop)> legacyToken.approve(erc20Migrator.address, balance, { from: owner })
-truffle(develop)> erc20Migrator.migrateAll(owner, { from: owner })
+truffle(local)> erc20Migrator = ERC20Migrator.at('ERC20_MIGRATOR_ADDRESS')
+truffle(local)> upgradeableToken = MyUpgradeableToken.at('UPGRADEABLE_TOKEN_ADDRESS')
+truffle(local)> erc20Migrator.beginMigration(upgradeableToken.address, { from: owner })
+truffle(local)> legacyToken.balanceOf(owner).then(b => balance = b)
+truffle(local)> legacyToken.approve(erc20Migrator.address, balance, { from: owner })
+truffle(local)> erc20Migrator.migrateAll(owner, { from: owner })
 ```
 
 We can now check your balance of the legacy token:
 ```console
-truffle(develop)> legacyToken.balanceOf(owner)
+truffle(local)> legacyToken.balanceOf(owner)
 BigNumber { s: 1, e: 0, c: [ 0 ] }
 ```
 
 Also the burned balance:
 
 ```console
-truffle(develop)> legacyToken.balanceOf(erc20Migrator.address)
+truffle(local)> legacyToken.balanceOf(erc20Migrator.address)
 BigNumber { s: 1, e: 22, c: [ 100000000 ] }
 ```
 
 And the upgradeable token balance:
 
 ```console
-truffle(develop)> upgradeableToken.balanceOf(owner, { from: owner })
+truffle(local)> upgradeableToken.balanceOf(owner, { from: owner })
 BigNumber { s: 1, e: 22, c: [ 100000000 ] }
 ```
 
