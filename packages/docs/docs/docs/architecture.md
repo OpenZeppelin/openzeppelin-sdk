@@ -91,4 +91,4 @@ Other implementations of the interface could provide contracts without such a li
 
 The following diagram illustrates the interface of the contracts of published EVM packages:
 
-![ZeppelinOS 2.x UML](img/zos2.png)
+![ZeppelinOS 2.x UML](/img/zos2.png)
