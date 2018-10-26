@@ -53,6 +53,7 @@ node
 > // Make a change on the contract, and compile it.
 > const MyContractV1 = Contracts.getFromLocal('MyContract')
 > myProject.upgradeProxy(proxy, MyContractV1)
+```
 
 ## Security
 
