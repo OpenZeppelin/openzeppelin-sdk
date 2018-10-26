@@ -35,14 +35,12 @@ just as with any other contract on the blockchain, we can define governance
 mechanisms to decide when and how to upgrade the contracts, that can be manual,
 automated, or any combination of both that will earn the trust of our users.
 
-We also started a session to work with the `local` network, before we continue, 
-let's renew the session to ensure it is not expired:
+> If any of the following commands fail with an `A network name must be provided 
+to execute the requested action` error, it means our session has expired. 
+In that case, renew it by running the command `zos session --network local 
+--from 0x1df62f291b2e969fb0849d99d9ce41e2f137006e --expires 3600` again.
 
-```console
-zos session -n local -f 0x1df62f291b2e969fb0849d99d9ce41e2f137006e --expires 3600
-```
-
-Great, now let's create an upgradeable instance of this contract so you can 
+Now let's create an upgradeable instance of this contract so you can 
 experiment what this is all about:
 
 ```console
@@ -82,7 +80,7 @@ truffle(local)> myContract.s()
 "hitchhiker"
 ```
 
-You can now close the Truffle console and continue with the following steps.
+You can now exit the Truffle console and continue with the following steps.
 
 ## Upgrading the contract
 

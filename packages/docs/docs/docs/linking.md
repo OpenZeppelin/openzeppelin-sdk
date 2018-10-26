@@ -58,14 +58,12 @@ to add the contract to the project:
 zos add MyLinkedContract
 ```
 
-Before we push our changes to the blockchain, let's renew the session of 
-the `local` network to ensure it is not expired:
+> If any of the following commands fail with an `A network name must be provided 
+to execute the requested action` error, it means our session has expired. 
+In that case, renew it by running the command `zos session --network local 
+--from 0x1df62f291b2e969fb0849d99d9ce41e2f137006e --expires 3600` again.
 
-```console
-zos session -n local -f 0x1df62f291b2e969fb0849d99d9ce41e2f137006e --expires 3600
-```
-
-We can now run: 
+Now, let's push our changes to the blockchain:
 
 ```console
 zos push --deploy-dependencies

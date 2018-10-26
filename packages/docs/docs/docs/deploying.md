@@ -47,7 +47,7 @@ zos init my-project
 ```
 
 This command will create a `zos.json` file, which contains all the information
-about the project. For details about this file format, please see the
+about the project. For details about this file format see the
 [configuration files](configuration.md#zosjson) page.
 
 The command will also initialize [Truffle](https://truffleframework.com/), so
@@ -115,7 +115,7 @@ And just like that, we are now ready to make the initial deployment of the
 project. We are just missing a blockchain network where it will be deployed.
 For this example, let's use [ganache](https://truffleframework.com/docs/ganache/quickstart), 
 a personal blockchain for Ethereum development that you can use to develop 
-your contracts. To install it please run:
+your contracts. To install it run:
 
 ```console
 npm install -g ganache-cli
@@ -131,14 +131,21 @@ Once we have done that, let's go back to the original terminal and
 run the following command:
 
 ```console
-zos session -n local -f 0x1df62f291b2e969fb0849d99d9ce41e2f137006e --expires 3600 
+zos session --network local --from 0x1df62f291b2e969fb0849d99d9ce41e2f137006e --expires 3600 
 ``` 
 
 The `session` command starts a session to work with a desired network.
-In this case, we are telling to work with the `local` network with the 
-`-n` option, and also setting a default sender address for the transactions 
-we will run with the `-f` option. Additionally, the `expires` flag allows 
-us to indicate the session expiration time in seconds. 
+In this case, we are telling it to work with the `local` network with the 
+`--network` option, and also setting a default sender address for the 
+transactions we will run with the `--from` option. Additionally, the 
+`expires` flag allows us to indicate the session expiration time in seconds. 
+
+> Note that we are using an specific address for the `--from` option which 
+is different to the default address that `ganache-cli` would use by default. 
+This is because we need to use different addresses in order to create 
+upgradeable contracts and to query them. This problem is know as the  
+"transparent proxy issue" and you can read more about it in the 
+[ZeppelinOS upgrades pattern section](pattern.md). 
 
 Now that everything has been setup, we are ready to deploy the project. 
 To do so simply run:
