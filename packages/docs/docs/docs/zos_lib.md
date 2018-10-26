@@ -15,12 +15,10 @@ Let's install [Node.js](http://nodejs.org/) and
 [npm](https://npmjs.com/), which are the dependencies to get started. On their
 respective websites you will find specific instructions for your machine.
 
-Truffle and ganache are also required, so let's install them and initialize a directory for
-our project:
+Truffle is also required, and we'll be using [ganache](https://truffleframework.com/docs/ganache/quickstart) for local deployment, so let's install them and initialize a directory for our project:
 
 ```console
-npm install --global ganache-cli
-npm install --global truffle
+npm install --global truffle ganache-cli
 mkdir my-project
 cd my-project
 truffle init
