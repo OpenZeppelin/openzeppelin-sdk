@@ -24,7 +24,7 @@ In 2.x by default, your ZeppelinOS project will not use any of its App or Packag
 * [`zos set-admin`](cli_set-admin.md)
 * [`zos unlink`](cli_unlink.md)
 
-In order to ream more information about the commands, please run `zos <command> --help` or go to the 
+In order to read more information about the commands, please run `zos <command> --help` or go to the 
 [commands reference](apis.md) section.
 
 ## Modified commands
