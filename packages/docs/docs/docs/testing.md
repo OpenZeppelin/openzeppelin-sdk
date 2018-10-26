@@ -54,6 +54,9 @@ The full code for the sample test file is:
 ```js
 import { TestHelper } from 'zos';
 
+require('chai')
+  .should()
+
 const Sample = artifacts.require('Sample')
 const ERC20 = artifacts.require('ERC20')
 
