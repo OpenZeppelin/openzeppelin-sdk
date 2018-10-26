@@ -151,6 +151,28 @@ contract MyContract is Initializable {
 
 Notice how the contract extends `Initializable` and implements the `initializer` provided by it.
 
+## Transparent proxies and function clashes
+
+As described in the previous sections, upgradeable contract instances (or proxies) work by delegating all calls to a logic contract. However, the proxies need some functions of their own, such as `upgradeTo(address)` to upgrade to a new implementation. This begs the question of how to proceed if the logic contract also has a function named `upgradeTo(address)`: upon a call to that function, did the caller intend to call the proxy or the logic contract?
+
+> Clashing can also happen among functions with different names. Every function that is part of a contract's public ABI is identified, at the bytecode level, by a 4-byte identifier. This identifier depends on the name and arity of the function, but since it's only 4 bytes, there is a possibility that two different functions with different names may end up having the same identifier. The Solidity compiler tracks when this happens within the same contract, but not when the collision happens across different ones, such as between a proxy and its logic contract. Read [this article](https://medium.com/nomic-labs-blog/malicious-backdoors-in-ethereum-proxies-62629adf3357) for more info on this.
+
+The way ZeppelinOS deals with this problem is via the _transparent proxy_ pattern. A transparent proxy will decide which calls are delegated to the underlying logic contract based on the caller address (ie the `msg.sender`):
+- If the caller is the admin of the proxy (the address with rights to upgrade the proxy), then the proxy will **not** delegate any calls, and only answer any messages it understands.
+- If the caller is any other address, the proxy will **always** delegate a call, no matter if it matches one of the proxy's functions.
+
+Assuming a proxy with an `owner()` and an `upgradeTo()` function, that delegates calls to an ERC0 contract with an `owner()` and a  `transfer()` function, the following table covers all scenarios:
+
+| msg.sender | owner() | upgradeTo() | transfer() |
+|---------------|---------|-------------|------------|
+| Owner         | returns proxy.owner() | returns proxy.upgradeTo() | fails |
+| Other         | returns erc20.owner() | fails | returns erc20.transfer() |
+
+
+While this is the safest approach, it may lead to some confusing situations. For instance, if you create a proxy from the default account in your node, and then try to interact with it, you'll get a nasty `revert` error. An easy way to avoid this problem is to configure a `zos session` using a `from` address different to the default one in your node.
+
+Another way around this situation is by `publish`ing your project. This will create an `App` contract that will act as the owner of all your proxies, letting you interact directly with them from any account without issues.
+
 ## Summary
 
 Any developer using ZeppelinOS should be familiar with proxies in the ways that are described in this article. In the end, the concept is very simple, and ZeppelinOS is designed to encapsulate all the proxy mechanics in a way that the amount of things you need to keep in mind when developing projects are reduced to an absolute minimum. It all comes down to a 3 item list:
@@ -158,5 +180,6 @@ Any developer using ZeppelinOS should be familiar with proxies in the ways that 
 * Have a basic understanding of what a proxy is
 * Always extend storage instead of modifying it
 * Make sure your contracts use initializer functions instead of constructors
+* Do not interact with a proxy from the same address that created it (except for upgrading it)
 
 Furthermore, ZeppelinOS will let you know when something goes wrong with one of the items in this list. So, seat back, enjoy, code, and let ZeppelinOS take care of the rest.
