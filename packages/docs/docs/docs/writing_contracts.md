@@ -192,7 +192,7 @@ When working with upgradeable smart contracts, you will always interact with the
 
 There is, however, an exception. If the direct call to the logic contract triggers a `selfdestruct` operation, then the logic contract will be destroyed, and all your contract instances will end up delegating all calls to an address without any code. This would effectively break all contract instances in your project.
 
-A similar effect can be achieved is the logic contract contains a `delegatecall` operation. If the contract can be made to `delegatecall` into a malicious contract that contains a `selfdestruct`, then the calling contract will be destroyed.
+A similar effect can be achieved if the logic contract contains a `delegatecall` operation. If the contract can be made to `delegatecall` into a malicious contract that contains a `selfdestruct`, then the calling contract will be destroyed.
 
 As such, it is strongly recommended to avoid any usage of either `selfdestruct` or `delegatecall` in your contracts. If you need to include them, make absolutely sure they cannot be called by an attacker on an uninitialized logic contract.
 
