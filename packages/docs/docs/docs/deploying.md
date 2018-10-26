@@ -7,8 +7,8 @@ The following steps will get you started using ZeppelinOS.
 
 ## Installation
 
-Let's install [Node.js](http://nodejs.org/) and
-[npm](https://npmjs.com/), which are the dependencies to get started. On their
+First, let's install [Node.js](http://nodejs.org/) and
+[npm](https://npmjs.com/). On their
 respective websites you will find specific instructions for your machine.
 
 Then, install ZeppelinOS running:
