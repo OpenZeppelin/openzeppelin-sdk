@@ -141,7 +141,7 @@ transactions we will run with the `--from` option. Additionally, the
 `expires` flag allows us to indicate the session expiration time in seconds. 
 
 > Note that we are using an specific address for the `--from` option which 
-is different to the default address that `ganache-cli` would use by default. 
+is different to the default address that `ganache-cli` would use. 
 This is because we need to use different addresses in order to create 
 upgradeable contracts and to query them. This problem is know as the  
 "transparent proxy issue" and you can read more about it in the 
