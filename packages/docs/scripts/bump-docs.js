@@ -28,7 +28,7 @@ function main(argv) {
     cd(tmpDir)
     exec('git clone https://github.com/zeppelinos/zos.git')
     cd('zos')
-    //exec(`git checkout -b ${tag} ${tag}`)
+    exec(`git checkout -b ${tag} ${tag}`)
 
     cleanupSidebar(packagesDir)
     const cliSections = genCliDocs(packagesDir)
