@@ -97,4 +97,6 @@ zos link <your-project-name>
 ```
 
 Spread the word! Tell others to reuse your work, and to help you improving it
-with more crazy ideas of how a decentralized society should be.
+with more crazy ideas of how a decentralized society should be. Now, to
+finish this quick exploration of the ZeppelinOS features we will see how you
+can vouch to back the quality of your EVM packages.

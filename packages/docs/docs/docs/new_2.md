@@ -7,7 +7,7 @@ In this section, you'll find everything you need to know if you're coming from Z
 
 ## Terminology and fundamentals
 
-2.x's most fundamental change is that it expands on ZeppelinOS' linking features. In 1.x, you were able to link your projects to what used to be called an "on-chain standard library". This "stdlib" was basically a pre-deployed version of a set of common reusable contracts, like OpenZeppelin, which gave your projects instant access to hundreds of standard implementations without having to compile or deploy any code whatsoever. This proved to be a very powerful, innovative concept, but we realized that it could be taken much further. In 1.x, you could connect to different versions of this "standard library" but there was just this ONE "standard library" that your application could link to. 2.x takes this to a whole new level; you can now connect your project to multiple "standard libraries", but that's not all, this makes the entire concept of what used to be a "standard library" evolve to the concept of an "EVM package".
+2.x's most fundamental change is that it expands on ZeppelinOS's linking features. In 1.x, you were able to link your projects to what used to be called an "on-chain standard library". This "stdlib" was basically a pre-deployed version of a set of common reusable contracts, like OpenZeppelin, which gave your projects instant access to hundreds of standard implementations without having to compile or deploy any code whatsoever. This proved to be a very powerful, innovative concept, but we realized that it could be taken much further. In 1.x, you could connect to different versions of this "standard library" but there was just this ONE "standard library" that your application could link to. 2.x takes this to a whole new level; you can now connect your project to multiple "standard libraries", but that's not all, this makes the entire concept of what used to be a "standard library" evolve to the concept of an "EVM package".
 
 What is an EVM package? It is basically a piece of reusable code that has been deployed to the blockchain in the form of EVM bytecode. Anyone can create an EVM package, and your ZeppelinOS projects will be able to connect to a vast ecosystem of pre-compiled, pre-deployed reusable code in the form of EVM packages.
 
@@ -42,7 +42,7 @@ Unfortunately, 2.x introduces breaking changes, so a project that was created us
 
 ## Changes to your contracts
 
-When it comes to Solidity code, there is nothing special you need to consider when using ZeppelinOS 2.x other than using initializers instead of constructors. For more info on this, see the ["the constructor caveat"](proxies.md#the-constructor-caveat) section of the documentation.
+When it comes to Solidity code, there is nothing special you need to consider when using ZeppelinOS 2.x other than using initializers instead of constructors. For more info on this, see the ["the constructor caveat"](pattern.md#the-constructor-caveat) section of the documentation.
 
 As with 1.x, ZeppelinOS 2.x will manage upgrades and package linking without you having to use special Solidity syntax.
 
