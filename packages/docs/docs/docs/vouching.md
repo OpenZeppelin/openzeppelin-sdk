@@ -1,7 +1,6 @@
 ---
-id: zeptoken
-title: The ZEPToken
-sidebar_label: The ZEPToken
+id: vouching
+title: Vouching for EVM packages
 ---
 
 ZeppelinOS's native ZEP token is not required to use ZeppelinOS, but is used to incentivize the creation and maintenance of a healthy ecosystem of EVM packages. It does so via a series of opt-in mechanisms that are detailed in the following sections of this article.
