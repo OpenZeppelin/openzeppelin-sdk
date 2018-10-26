@@ -4,6 +4,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## v2.0.1 - 2018-10-26
+
+### Changes
+
+- Improve validation messages for security verifications (such as storage layout checks, no-constructor checks, or fields with initial values in their declaration) ([#362](https://github.com/zeppelinos/zos/issues/362)).
+- Add default gas price of 5 gwei to `truffle.js` template file created on `zos init` ([#354](https://github.com/zeppelinos/zos/issues/354)).
+
+
+### Fixed
+
+- Fix `Web3ProviderEngine does not support synchronous requests` error when running `zos status --fix` with an async web3 provider ([#388](https://github.com/zeppelinos/zos/issues/388)).
+- Throw a meaningful error when attempting to push a project with a link to an unpublished dependency ([#356](https://github.com/zeppelinos/zos/issues/356)).
+
 ## v2.0.0 - 2018-10-25
 
 ### Added
