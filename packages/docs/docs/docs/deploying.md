@@ -78,9 +78,9 @@ contract MyContract is Initializable {
 ```
 
 Notice that our sample contract has an `initialize` function instead of the
-standard Solidity constructor. This is the way to initialize variables on
-ZeppelinOS in order to allow a proxy to call this function and thus make the
-contract upgradeable, which we'll see in more detail in the next guide.
+standard Solidity constructor. This is the way to define constructor 
+functionality for upgradeable contracts in ZeppelinOS, which we'll see in 
+more detail in the next guide.
 
 But before we get there, we still need a couple of steps. This contract
 imports another contract from the `zos-lib` package, so we have to install it:
