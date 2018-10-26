@@ -71,6 +71,9 @@ ZeppelinOS configuration files, so add the following top-level field to the
 }
 ```
 
+The `zos` configuration files is where ZeppelinOS will search for the address
+of the EVM package when it is linked by other projects that depend on it.
+
 Make sure to check that the rest of the fields describe your package
 accurately. It could be a good idea to remove the `main` field, if present,
 because it doesn't make sense for EVM packages. Also, if you have a
