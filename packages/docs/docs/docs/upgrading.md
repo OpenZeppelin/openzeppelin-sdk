@@ -35,11 +35,16 @@ just as with any other contract on the blockchain, we can define governance
 mechanisms to decide when and how to upgrade the contracts, that can be manual,
 automated, or any combination of both that will earn the trust of our users.
 
-Let's create an upgradeable instance of this contract so you can experiment what
-this is all about:
+> If any of the following commands fail with an `A network name must be provided 
+to execute the requested action` error, it means our session has expired. 
+In that case, renew it by running the command `zos session --network local 
+--from 0x1df62f291b2e969fb0849d99d9ce41e2f137006e --expires 3600` again.
+
+Now let's create an upgradeable instance of this contract so you can 
+experiment what this is all about:
 
 ```console
-zos create MyContract --init initialize --args 42,hitchhiker --network local
+zos create MyContract --init initialize --args 42,hitchhiker
 ```
 
 The `zos create` command receives an optional `--init [function-name]`
@@ -60,19 +65,28 @@ We can start a console to interact with our contract and check it has been prope
 npx truffle console --network local
 ```
 
+Once in the Truffle console, execute the following instructions to test 
+our instance is working as expected:
+
+> _Make sure you replace <your-contract-address> with the address returned 
+by the `create` command we ran above._
+
 ```console
 truffle(local)> myContract = MyContract.at('<your-contract-address>')
-truffle(local)> myContract.x()
+truffle(local)> myContract.x().toString()
 42
+
 truffle(local)> myContract.s()
 "hitchhiker"
 ```
 
+You can now exit the Truffle console and continue with the following steps.
+
 ## Upgrading the contract
 
-Remember that for this guide we are using a [ganache](https://truffleframework.com/docs/ganache/quickstart) local development network. Do not
-stop the `ganache-cli` command that [we ran before](deploying.md#deploying-your-project), or you will lose your
-previous deployment!
+Remember that for this guide we are using a [ganache](https://truffleframework.com/docs/ganache/quickstart) 
+local development network. Do not stop the `ganache-cli` command that [we ran before](deploying.md#deploying-your-project), 
+or you will lose your previous deployment!
 
 Now, let's say we found an issue on our contract, or maybe we just want to
 extend its functionalities.
@@ -109,26 +123,35 @@ contract MyContract is Initializable {
 Once you have saved these changes, push the new code to the network:
 
 ```console
-zos push --network local
+zos push
 ```
 
 Finally, let's update the already deployed contract with the new code:
 
 ```console
-zos update MyContract --network local
+zos update MyContract
 ```
 
-You will see that this command prints the same contract address as before, and a logic contract address that is new. This is all the magic behind
-upgrades: we have two contracts, one is the contract address that we will never change, but it just serves as a proxy to the logic contract that we can replace with
-new versions.
+You will see that this command prints the same contract address as before, 
+and a logic contract address that is new. This is all the magic behind
+upgrades: we have two contracts, one is the contract address that we will 
+never change, but it just serves as a proxy to the logic contract that we 
+can replace with new versions.
 
-We can open a new terminal and start a console:
+We can start a new Truffle console to interact with our contract and check 
+it has been properly upgraded:
 
 ```console
 npx truffle console --network local
 ```
 
-and execute the following instructions to try the new function we've just added:
+Once in the Truffle console, execute the following instructions to try 
+the new functionality we've just added:
+
+> _Make sure you replace <your-contract-address> with the address of the 
+upgradeable instance your created of `MyContract`. This address was 
+returned by the `create` command we ran in the previous section, which
+is the same as the one returned by the `update` command we ran above._
 
 ```console
 truffle(local)> myContract = MyContract.at('<your-contract-address>')

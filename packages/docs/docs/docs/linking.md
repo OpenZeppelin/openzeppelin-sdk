@@ -58,10 +58,15 @@ to add the contract to the project:
 zos add MyLinkedContract
 ```
 
-and push them to a local network:
+> If any of the following commands fail with an `A network name must be provided 
+to execute the requested action` error, it means our session has expired. 
+In that case, renew it by running the command `zos session --network local 
+--from 0x1df62f291b2e969fb0849d99d9ce41e2f137006e --expires 3600` again.
+
+Now, let's push our changes to the blockchain:
 
 ```console
-zos push --deploy-dependencies --network local
+zos push --deploy-dependencies
 ```
 
 There is one caveat here with the `--deploy-dependencies` flag. We mentioned
@@ -78,28 +83,37 @@ Repeating ourselves from before, let's make an upgradeable instance of the
 contract:
 
 ```console
-zos create MyLinkedContract --network local
+zos create MyLinkedContract
 ```
 
 We also need an instance of the `ERC721` token from the EVM package:
 
 ```console
-zos create openzeppelin-eth/StandaloneERC721 --init initialize --args MyToken,TKN,[<address>],[<address>] --network local
+zos create openzeppelin-eth/StandaloneERC721 --init initialize --args MyToken,TKN,[<address>],[<address>]
 ```
 
 `<address>` will be the minter and pauser of the token. For local development
-you can use one of the 10 addresses that `truffle deploy` printed.
+you can use one of the 10 addresses that `ganache-cli` created by default.
 
-Finally, jump to that terminal where the Truffle console is open and connect
-the two deployed contracts:
+Finally, we can start a new Truffle console to interact with our contract by running:
 
 ```console
-truffle(local)> MyLinkedContract.at('<myLinkedContractAddress>').setToken('<tokenAddress>')
+npx truffle console --network local
 ```
 
-Remember that the addresses of both, your contract and the token, were printed
-by the `zos create` command and they can also be found in the `zos.dev-<network_id>.json`
-configuration file.
+Now, let's jump to that Truffle console and connect our two deployed upgradeable contracts:
+
+> _Make sure you replace <my-linked-contract-address> and <my-erc721-address> 
+with the addresses of the upgradeable instances your created of `MyLinkedContract` 
+and `StandaloneERC721` respectively. Both addresses were returned by the `create` 
+commands we ran above._
+
+```console
+truffle(local)> MyLinkedContract.at('<my-linked-contract-address>').setToken('<my-erc721-address>')
+```
+
+Remember that the addresses of both, your contract and the token, can also be 
+found in the `zos.dev-<network_id>.json` configuration file.
 
 This is just the beginning of a better blockchain ecosystem, where developers
 share their knowledge and their cool ideas in EVM packages, and we all
