@@ -1,4 +1,5 @@
 import { Contracts, Logger, FileSystem as fs, bytecodeDigest, bodyCode, constructorCode } from 'zos-lib'
+import { promisify } from 'util';
 
 const log = new Logger('StatusFetcher')
 
@@ -31,13 +32,13 @@ export default class StatusFetcher {
     this.networkFile.unsetContract(alias)
   }
 
-  onMissingRemoteImplementation(expected, observed, { alias, address }) {
+  async onMissingRemoteImplementation(expected, observed, { alias, address }) {
     const contractName = this.networkFile.packageFile.contract(alias) || alias
     log.info(`Adding contract ${contractName} at ${address}`)
     const buildPath = Contracts.getLocalPath(contractName)
     if(fs.exists(buildPath)) {
       const contract = Contracts.getFromLocal(contractName).at(address)
-      const remoteBodyBytecode = web3.eth.getCode(address).replace(/^0x/, '') // TODO: PROMISIFY
+      const remoteBodyBytecode = (await promisify(web3.eth.getCode.bind(web3.eth))(address)).replace(/^0x/, '')
       const bodyBytecodeHash = bytecodeDigest(remoteBodyBytecode)
       if(bodyCode(contract) === remoteBodyBytecode) {
         log.warn(`Assuming that constructor function of local version of ${contractName} is the one registered`)
