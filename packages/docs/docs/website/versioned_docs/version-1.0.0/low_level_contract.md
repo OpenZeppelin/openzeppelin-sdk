@@ -5,11 +5,11 @@ sidebar_label: Low level upgradeable contract
 original_id: low_level_contract
 ---
 
-> **Note**: this guide shows a low-level method for operating a single upgradeable smart contract. For a CLI-aided developer experience, use the [higher-level CLI guide](setup.md).
+> **Note**: this guide shows a low-level method for operating a single upgradeable smart contract. For a CLI-aided developer experience, use the [higher-level CLI guide](setup.html).
 
 > **Note**: for a fully working project with this example, see the [`examples/simple`](https://github.com/zeppelinos/zos-lib/tree/master/examples/simple) folder of the `zos-lib` repository.
 
-To develop an upgradeable smart contract, we need to create a simple [upgradeability proxy](https://blog.zeppelinos.org/proxy-patterns/). This is a [special contract](proxies.md) that will hold the storage of our upgradeable contract and redirect function calls to a `logic` contract, which we can update.
+To develop an upgradeable smart contract, we need to create a simple [upgradeability proxy](https://blog.zeppelinos.org/proxy-patterns/). This is a [special contract](proxies.html) that will hold the storage of our upgradeable contract and redirect function calls to a `logic` contract, which we can update.
 
 Let's walk through the following example to see how it works:
 
