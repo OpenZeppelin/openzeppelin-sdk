@@ -61,7 +61,7 @@ contract('Sample', function ([_, owner]) {
 
   beforeEach(async function () {
     this.project = await TestHelper({ from: owner })
-  });
+  })
 
   it('should create a proxy', async function () {
     const proxy = await this.project.createProxy(Sample);
@@ -74,47 +74,53 @@ contract('Sample', function ([_, owner]) {
     const result = await proxy.totalSupply();
     result.toNumber().should.eq(0);
   })
-});
+})
 ```
 
 Use this convenient tool to write tests for your code and storage migrations before executing them in production.
 
 ## Calling Initialize Functions Manually in Your Unit Tests
 
-Truffle does not know how to resolve situations where a contract has functions that have matching names, but different arities. Here's an example of a `TimedCrowdsale` contract that inherits from `Crowdsale` which results in a contract that has two `initialize` functions with different arities:
+Truffle does not know how to resolve situations where a contract 
+has functions that have matching names, but different arities. 
+Here's an example of a `TimedCrowdsale` contract that inherits 
+from `Crowdsale` which results in a contract that has two 
+`initialize` functions with different arities:
 
 ```solidity
 contract TimedCrowdsale is Crowdsale {
 
-  initialize(uint256 _openingTime, uint256 _closingTime)
-    public
-    isInitializer("TimedCrowdsale", "0.0.1")
-  {
+  initialize(uint256 _openingTime, uint256 _closingTime) public initializer {
     Crowdsale.initialize(_rate, _wallet, _token);
   }
 }
 
 contract Crowdsale {
 
-  initialize(uint256 _rate, address _wallet, ERC20 _token)
-    public
-    isInitializer("Crowdsale", "0.0.1")
-  {
+  initialize(uint256 _rate, address _wallet, ERC20 _token) public initializer {
     // does something
   }
 }
 ```
 
-This means that calls to contracts with more than one function named `initialize`, as is the case with some contracts from OpenZeppelin (e.g., TimedCrowdsale), may revert if you call `initialize` directly from Truffle. `zos create` handles this correctly as it encodes the parameters. However, for your unit tests you will need to call `initialize` manually.
+This means that calls to contracts with more than one function named `initialize`, 
+as is the case with some contracts from OpenZeppelin (e.g., TimedCrowdsale), 
+may revert if you call `initialize` directly from Truffle. `zos create` handles 
+this correctly as it encodes the parameters. However, for your unit tests you will 
+need to call `initialize` manually.
 
-The current solution to this issue is to `npm install zos-lib` and use the same helper function `zos create` uses: `encodeCall`. `encodeCall` receives the signature of your `initialize` function, as well as its arguments and their types. It then crafts the calldata which you can send in a raw call. Here's an example:
+The current solution to this issue is to `npm install zos-lib` and use the same 
+helper function used by the `zos create` command: `encodeCall`. This helper 
+receives the signature of your `initialize` function, as well as its arguments 
+and their types. `encodeCall` crafts the calldata which you can send in a 
+raw call. For example you can now call the `TimedCrowdsale#initialize` doing as follows:
 
 ```js
 data = encodeCall(
-    "initialize",
-    ['address', 'string', 'string', 'uint8', 'address'],
-    [owner, name, symbol, decimals, exampleToken.address]
-);
-
-await exampleToken.sendTransaction( {data, from: owner} );
+  'initialize',
+  ['uint256', 'uint256'],
+  [openingTime, closingTime]
+)
+const timeCrowdsale = await TimeCrowdsale.new()
+await timeCrowdsale.sendTransaction({ data, from: owner })
 ```
