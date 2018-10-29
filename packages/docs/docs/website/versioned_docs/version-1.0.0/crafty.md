@@ -6,7 +6,7 @@ original_id: crafty
 
 Have you ever wondered what may happen if you combined an Aragon token and fire? A fire-spewing eagle? Burnt chicken? What if Augur's oracles were augmented with Decentraland's tiles, would they start predicting the real estate market? Now, you no longer need to ponder at these vital questions: the Ethereum community will answer them for you!
 
-In [Crafty](https://crafty.zeppelin.solutions), users can create new ERC20 tokens, with a few added goodies (following [EIP-1046](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1046.md)): a picture, and a short description. This allows for each token to have that extra bit of personality that makes something unique. But that's not all: the only way to get these tokens is by crafting them, which requires ingredients (any ERC20!) to be spent. And since the craftable tokens themselves can also be used as ingredients, the posibilities are endless! Not only that, but we'll make all of our contracts upgradeable, to be able to change the code in the future. Wohoo!
+In [Crafty](https://crafty.zeppelin.solutions), users can create new ERC20 tokens, with a few added goodies (following [EIP-1046](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1046.html)): a picture, and a short description. This allows for each token to have that extra bit of personality that makes something unique. But that's not all: the only way to get these tokens is by crafting them, which requires ingredients (any ERC20!) to be spent. And since the craftable tokens themselves can also be used as ingredients, the posibilities are endless! Not only that, but we'll make all of our contracts upgradeable, to be able to change the code in the future. Wohoo!
 
 ## Project setup
 
@@ -16,7 +16,7 @@ This guide will show you the process of making the contracts in the Crafty game 
 npm install --global zos
 ```
 
-See [here](setup.md) for more detailed setup info.
+See [here](setup.html) for more detailed setup info.
 
 All snippets here were extracted from the public [Crafty repository](https://github.com/zeppelinos/crafty).
 
@@ -114,7 +114,7 @@ The returned value is the address of the newly created `Crafty` upgradeable inst
 This scenario is a bit more complex, since multiple ZeppelinOS contracts are being combined together, but it is nonetheless fairly easy to setup. Let's first recap what a `CraftableToken` is:
 
 1. It is detailed ERC20 token (i.e. has name and symbol)
-1. It supports the [EIP-1046](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1046.md) extension of the ERC20 standard (i.e. we'll add a `tokenURI` parameter and variable)
+1. It supports the [EIP-1046](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1046.html) extension of the ERC20 standard (i.e. we'll add a `tokenURI` parameter and variable)
 1. It is mintable
 1. It has additional storage of the token's ingredients, which require some validation
 

@@ -5,7 +5,7 @@ sidebar_label: zos-lib quickstart
 original_id: libstart
 ---
 
-> **Note**: this section describes a low-level method for using ZeppelinOS. To follow the recommended development experience, use the [higher-level CLI guide](setup.md).
+> **Note**: this section describes a low-level method for using ZeppelinOS. To follow the recommended development experience, use the [higher-level CLI guide](setup.html).
 
 
 `zos-lib` is a library to develop, deploy and operate upgradeable smart contracts on Ethereum and every other EVM and eWASM-powered blockchain.
@@ -19,5 +19,5 @@ npm install zos-lib
 ```
 
 Next, learn how to:
-- [Programmatically develop and deploy a single upgradeable smart contract](low_level_contract.md) (for fixing bugs or adding new features)
-- [Programmatically develop and operate a complex upgradeable app](low_level_app.md) with multiple smart contracts which are connected to the [ZeppelinOS upgradeable standard library](stdlib.md)
+- [Programmatically develop and deploy a single upgradeable smart contract](low_level_contract.html) (for fixing bugs or adding new features)
+- [Programmatically develop and operate a complex upgradeable app](low_level_app.html) with multiple smart contracts which are connected to the [ZeppelinOS upgradeable standard library](stdlib.html)

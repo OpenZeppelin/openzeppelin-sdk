@@ -7,13 +7,13 @@ original_id: using
 
 Besides allowing you to build upgradeable applications, ZeppelinOS provides on-chain standard libraries that you can use in your app.
 
-To use an stdlib in your contracts, you will need to set up a `zos` project as described in the [Setup](setup.md) guide. Then, you need to run the `link` command with the name of the npm package of the stdlib you want to use. For example:
+To use an stdlib in your contracts, you will need to set up a `zos` project as described in the [Setup](setup.html) guide. Then, you need to run the `link` command with the name of the npm package of the stdlib you want to use. For example:
 
 ```sh
 zos link openzeppelin-zos
 ```
 
-`openzeppelin-zos` is [a ZeppelinOS standard library provided by the OpenZeppelin community](stdlib.md), in which you can find many useful contracts. You can now include contracts from the stdlib in your app:
+`openzeppelin-zos` is [a ZeppelinOS standard library provided by the OpenZeppelin community](stdlib.html), in which you can find many useful contracts. You can now include contracts from the stdlib in your app:
 
 ```sol
 import "openzeppelin-zos/contracts/token/ERC721/MintableERC721Token.sol";
@@ -65,4 +65,4 @@ truffle(local)> MyContract.at(<myContractAddress>).setToken(<tokenAddress>)
 
 Remember that the addresses of both your contract and the token can be found in the `zos.local.json` network configuration file.
 
-This completes the setup and deployment of an upgradable application that uses an stdlib provided by ZeppelinOS. If you would like to contribute your own stdlib to ZeppelinOS, please see the [Developing a new standard library](developing.md) guide.
+This completes the setup and deployment of an upgradable application that uses an stdlib provided by ZeppelinOS. If you would like to contribute your own stdlib to ZeppelinOS, please see the [Developing a new standard library](developing.html) guide.

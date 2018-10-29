@@ -5,7 +5,7 @@ sidebar_label: Low level upgradable app
 original_id: low_level_app
 ---
 
-> **Note**: this guide shows a low-level method for operating a complex upgradeable decentralized application. For a CLI-aided developer experience, use the [higher-level CLI guide](setup.md).
+> **Note**: this guide shows a low-level method for operating a complex upgradeable decentralized application. For a CLI-aided developer experience, use the [higher-level CLI guide](setup.html).
 
 > **Note**: for a fully working project with this example, see the [`examples/complex`](https://github.com/zeppelinos/zos-lib/tree/master/examples/complex) folder of the `zos-lib` repository.
 
@@ -79,7 +79,7 @@ Remember that the proxy is the contract that will receive the calls and hold the
 
 Now let's suppose we want to give some sort of retribution to the donors, so we mint new [ERC721](http://erc721.org/) cryptocollectibles for each donation. 
 
-In order to do this, we link the [ZeppelinOS standard library](stdlib.md) to our application by running:
+In order to do this, we link the [ZeppelinOS standard library](stdlib.html) to our application by running:
 
 ```sh
 npm install openzeppelin-zos
