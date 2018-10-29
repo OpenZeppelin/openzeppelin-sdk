@@ -13,18 +13,18 @@ ZeppelinOS is a platform to develop, deploy and operate upgradeable smart contra
 
 ## Getting Started
 
-Install ZeppelinOS and setup your project as described in the [Setup guide](setup.md).
+Install ZeppelinOS and setup your project as described in the [Setup guide](setup.html).
 
 In order to build an upgradeable application with ZeppelinOS, follow our
-[Building upgradeable applications](building.md) guide.
+[Building upgradeable applications](building.html) guide.
 
 If you would like to use the ZeppelinOS on-chain standard libraries in your app,
- follow our [Using the stdlib in your app](using.md) guide.
+ follow our [Using the stdlib in your app](using.html) guide.
 
 If you are interested in deploying your own standard libraries for ZeppelinOS,
-see our [Developing a new standard library](developing.md) guide.
+see our [Developing a new standard library](developing.html) guide.
 
-Two demo apps based on ZeppelinOS are described in [Basil](basil.md) and [Crafty](crafty.md).
+Two demo apps based on ZeppelinOS are described in [Basil](basil.html) and [Crafty](crafty.html).
 
 ## Security
 
