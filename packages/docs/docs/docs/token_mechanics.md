@@ -3,7 +3,7 @@ id: token_mechanics
 title: ZEP Token Mechanics
 ---
 
-ZeppelinOS a platform to develop, deploy and operate smart contract projects 
+ZeppelinOS is a platform to develop, deploy and operate smart contract projects 
 on Ethereum and every other EVM and eWASM-powered blockchain. Its native token, 
 ZEP, aligns incentives where required to create a healthy ecosystem of secure 
 smart contract projects. Here, we present a summary of ZeppelinOS’s token 
