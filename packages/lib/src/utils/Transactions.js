@@ -170,11 +170,16 @@ async function getNodeVersion () {
 
 async function checkGasPrice(txParams) {
   if (process.env.NODE_ENV === 'test') return;
+
+  if (state.gasPrice) return state.gasPrice;
+
   const gasPrice = txParams.gasPrice || Contracts.artifactsDefaults().gasPrice;
   if (TRUFFLE_DEFAULT_GAS_PRICE.eq(gasPrice) || !gasPrice) {
     try {
       let apiResponse = await axios.get(GAS_API_URL);
-      return apiResponse.safeLow / 10;
+      let gasPrice = apiResponse.safeLow / 10;
+      state.gasPrice = gasPrice;
+      return gasPrice;
     } catch (err) {
       throw new Error(`Could not query gas price API to determine reasonable gas price, please provide one.`)
     }
