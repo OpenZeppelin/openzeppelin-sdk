@@ -1,0 +1,17 @@
+{
+  "name": "example-truffle-migrate",
+  "version": "2.0.1",
+  "description": "Sample project for using ZeppelinOS within truffle migrations",
+  "main": "index.js",
+  "scripts": {
+    "check": "truffle exec index.js --network local",
+    "test": "truffle test"
+  },
+  "author": "santiago@zeppelin.solutions",
+  "license": "MIT",
+  "devDependencies": {
+    "truffle": "^4.1.13",
+    "zos": "2.0.1",
+    "zos-lib": "2.0.1"
+  }
+}
