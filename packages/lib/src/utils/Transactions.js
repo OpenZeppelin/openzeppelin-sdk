@@ -36,11 +36,7 @@ const TRUFFLE_DEFAULT_GAS_PRICE = BN(100000000000);
  * @param retries number of transaction retries
  */
 export async function sendTransaction(contractFn, args = [], txParams = {}, retries = RETRY_COUNT) {
-  let fixedGasPrice = checkGasPrice(txParams)
-
-  if (fixedGasPrice) {
-      txParams.gasPrice = fixedGasPrice
-  }
+  txParams = await fixGasPrice(txParams)
 
   try {
     return await _sendTransaction(contractFn, args, txParams)
@@ -58,11 +54,7 @@ export async function sendTransaction(contractFn, args = [], txParams = {}, retr
  * @param retries number of deploy retries
  */
 export async function deploy(contract, args = [], txParams = {}, retries = RETRY_COUNT) {
-  let fixedGasPrice = checkGasPrice(txParams)
-
-  if (fixedGasPrice) {
-      txParams.gasPrice = fixedGasPrice
-  }
+  txParams = await fixGasPrice(txParams)
 
   try {
     return await _deploy(contract, args, txParams)
@@ -80,11 +72,7 @@ export async function deploy(contract, args = [], txParams = {}, retries = RETRY
  */
 export async function sendDataTransaction(contract, txParams) {
   // TODO: Add retries similar to sendTransaction
-  let fixedGasPrice = checkGasPrice(txParams)
-
-  if (fixedGasPrice) {
-      txParams.gasPrice = fixedGasPrice
-  }
+  txParams = await fixGasPrice(txParams)
 
   // If gas is set explicitly, use it
   if (txParams.gas) {
@@ -168,18 +156,25 @@ async function getNodeVersion () {
   return state.nodeInfo;
 }
 
-async function checkGasPrice(txParams) {
-  if (process.env.NODE_ENV === 'test') return;
+async function fixGasPrice(txParams) {
+  if (process.env.NODE_ENV === 'test') return txParams;
 
-  if (state.gasPrice) return state.gasPrice;
 
   const gasPrice = txParams.gasPrice || Contracts.artifactsDefaults().gasPrice;
   if (TRUFFLE_DEFAULT_GAS_PRICE.eq(gasPrice) || !gasPrice) {
+    if (state.gasPrice) {
+        txParams.gasPrice = state.gasPrice;
+        return txParams;
+    }
+
     try {
       let apiResponse = await axios.get(GAS_API_URL);
-      let gasPrice = apiResponse.safeLow / 10;
+      let gasPriceGwei = apiResponse.safeLow / 10;
+      let gasPrice = BN(gasPriceGwei * 1000000000)
+
       state.gasPrice = gasPrice;
-      return gasPrice;
+      txParams.gasPrice = state.gasPrice;
+      return txParams;
     } catch (err) {
       throw new Error(`Could not query gas price API to determine reasonable gas price, please provide one.`)
     }

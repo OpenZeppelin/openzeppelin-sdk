@@ -98,14 +98,6 @@ contract('Transactions', function([_account1, account2]) {
 
       await sendTransaction(this.instance.initialize, [42, 'foo', [1,2,3]]).should.be.rejectedWith(/always failing transaction/);
     });
-
-    describe('on non ganache node', function () {
-      onNotGanache();
-      
-      it('refuses to send tx with truffle default gas price', async function () {
-        await sendTransaction(this.instance.initialize, [42, 'foo', [1,2,3]]).should.be.rejectedWith(/cowardly refusing/i);
-      });
-    })
   });
 
   describe('sendDataTransaction', function () {
