@@ -1,7 +1,7 @@
 import ControllerFor from '../models/network/ControllerFor'
 
-export default async function verify(contractAlias, { network = 'mainnet', txParams = {}, networkFile = undefined, optimizer = false, optimizerRuns = 200, remote = 'etherchain' }) {
+export default async function verify(contractAlias, { network = 'mainnet', txParams = {}, networkFile = undefined, optimizer = false, optimizerRuns = 200, remote = 'etherchain', apiKey = undefined }) {
   const controller = ControllerFor(network, txParams, networkFile)
   controller.checkLocalContractDeployed(contractAlias, true)
-  await controller.verifyAndPublishContract(contractAlias, optimizer, optimizerRuns, remote)
+  await controller.verifyAndPublishContract(contractAlias, optimizer, optimizerRuns, remote, apiKey)
 }

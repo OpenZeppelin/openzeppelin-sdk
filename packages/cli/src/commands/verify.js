@@ -14,6 +14,7 @@ const register = program => program
   .option('-o, --optimizer', 'enables optimizer option')
   .option('--optimizer-runs <runs>', 'specify number of runs if optimizer enabled.')
   .option('--remote <remote>', 'specify remote endpoint to use for verification')
+  .option('--api-key <key>', 'specify etherscan API key')
   .action(action);
 
 
