@@ -168,9 +168,9 @@ async function fixGasPrice(txParams) {
     }
 
     try {
-      let apiResponse = await axios.get(GAS_API_URL);
-      let gasPriceGwei = apiResponse.safeLow / 10;
-      let gasPrice = BN(gasPriceGwei * 1000000000)
+      const apiResponse = await axios.get(GAS_API_URL);
+      const gasPriceGwei = apiResponse.average / 10;
+      const gasPrice = BN(gasPriceGwei * 1000000000)
 
       state.gasPrice = gasPrice;
       txParams.gasPrice = state.gasPrice;
