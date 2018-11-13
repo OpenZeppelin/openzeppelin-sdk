@@ -174,10 +174,15 @@ async function fixGasPrice(txParams) {
 
       state.gasPrice = gasPrice;
       txParams.gasPrice = state.gasPrice;
-      return txParams;
     } catch (err) {
       throw new Error(`Could not query gas price API to determine reasonable gas price, please provide one.`)
     }
+
+    if (txParams.gasPrice.gte(TRUFFLE_DEFAULT_GAS_PRICE) {
+        throw new Error(`Gas price API gave very high value (>100gwei), please manually provide a gas price.`)
+    }
+
+    return txParams;
   }
 }
 
