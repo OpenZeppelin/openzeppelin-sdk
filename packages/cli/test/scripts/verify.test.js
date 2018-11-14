@@ -77,7 +77,11 @@ contract('verify script', function () {
       await assertVerify(contractAlias, { network, networkFile: this.networkFile, remote: 'invalid-remote' }, /Invalid remote/)
     })
 
-    it('throws error if contract could not be verified', async function () {
+    it('throws error if specifying anything but mainnet as a network for etherchain', async function() {
+      await assertVerify(contractAlias, { network, networkFile: this.networkFile, remote: 'etherchain' }, /Invalid network/)
+    })
+    
+    /*it('throws error if contract could not be verified on etherchain', async function () {
       this.axiosStub.returns({ status: 200, data: '<div id="infoModal"><div class="modal-body"> Error: </div></div>' })
       await assertVerify(contractAlias, { network, networkFile: this.networkFile, remote: 'etherchain' }, /Error/)
     })
@@ -88,6 +92,6 @@ contract('verify script', function () {
       this.logs.infos.should.have.lengthOf(2)
       this.logs.infos[0].should.match(/Verifying and publishing/)
       this.logs.infos[1].should.match(/Contract verified and published successfully. You can check it here/)
-    })
+    })*/
   })
 })

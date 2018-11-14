@@ -12,7 +12,7 @@ const Verifier = {
     } else if (remote === 'etherscan') {
       await publishToEtherscan(params)
     } else {
-      throw new Error('Invalid remote. Currently, ZeppelinOS contract verifier supports etherchain(mainnet only) and etherscan as remote verification applications.')
+      throw new Error('Invalid remote. Currently, ZeppelinOS contract verifier supports etherchain (mainnet only) and etherscan as remote verification applications.')
     }
   }
 }
@@ -54,7 +54,7 @@ async function publishToEtherchain(params) {
 
 async function publishToEtherscan(params) {
   if (params.apiKey === undefined) {
-    throw new Error('API key not specified.')
+    throw new Error('Etherscan API key not specified. To get one, follow this link: https://etherscancom.freshdesk.com/support/solutions/articles/35000022163-i-need-an-api-key')
   }
 
   const { network, compilerVersion, optimizer, contractAddress } = params
@@ -78,33 +78,6 @@ async function publishToEtherscan(params) {
   const etherscanApiUrl = `https://${apiSubdomain}.etherscan.io/api`
   const etherscanContractUrl = `https://${network}.etherscan.io/address`
 
-  const checkVerificationStatus = async (guid) => {
-    const queryParams = querystring.stringify({
-      guid,
-      action: 'checkverifystatus',
-      module: 'contract',
-    })
-
-    try {
-      const response = await axios.request({
-        method: 'GET',
-        url: `${etherscanApiUrl}?${queryParams}`,
-      })
-
-      if (response.status === 200) {
-        if (response.data.status === '1') {
-          return true
-        } else {
-          return false
-        }
-      } else {
-        throw new Error(`Error while trying to verify contract; ${response.data.status}; ${response.data.message}; ${response.data.result}`)
-      }
-    } catch(error) {
-      throw new Error(error.message || 'Error while trying to check verification status')
-    } 
-  }
-
   try {
     const response = await axios.request({
       method: 'POST',
@@ -125,13 +98,13 @@ async function publishToEtherscan(params) {
       }
     })
     if (response.status === 200 && response.data.status === '1') {
-      log.info(`Contract verification in process(this is usually under 30 seconds)...\nGUID: ${response.data.result}`)
+      log.info('Contract verification in process (this usually takes under 30 seconds)...')
 
       await new Promise((resolve, reject) => {
         const checkIntervalId = setInterval(async () => {
-          const verificationStatus = await checkVerificationStatus(response.data.result)
+          const verificationStatus = await checkEtherscanVerification(response.data.result, etherscanApiUrl)
 
-          if (verificationStatus === false) {
+          if (!verificationStatus) {
             return
           }
 
@@ -143,12 +116,39 @@ async function publishToEtherscan(params) {
         }, 3000)
       })
     } else {
-      throw new Error(`Error while trying to verify contract; ${response.data.status}; ${response.data.message}; ${response.data.result}`)
+      throw new Error(`Error while trying to verify contract: ${response.data.result}`)
     }
 
   } catch(error) {
     throw new Error(error.message || 'Error while trying to verify contract')
   }
+}
+
+async function checkEtherscanVerification(guid, etherscanApiUrl) {
+  const queryParams = querystring.stringify({
+    guid,
+    action: 'checkverifystatus',
+    module: 'contract',
+  })
+
+  try {
+    const response = await axios.request({
+      method: 'GET',
+      url: `${etherscanApiUrl}?${queryParams}`,
+    })
+
+    if (response.status === 200) {
+      if (response.data.status === '1') {
+        return true
+      } else {
+        return false
+      }
+    } else {
+      throw new Error(`Error while trying to verify contract: ${response.data.result}`)
+    }
+  } catch(error) {
+    throw new Error(error.message || 'Error while trying to check verification status')
+  } 
 }
 
 export default Verifier
