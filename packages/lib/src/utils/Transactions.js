@@ -159,7 +159,15 @@ async function getNodeVersion () {
 async function fixGasPrice(txParams) {
   if (process.env.NODE_ENV === 'test') return txParams;
 
+  // If we aren't on mainnet, just use default price
+  const network = await promisify(web3.version.getNetwork.bind(global.web3.version))();
 
+  if (network != '1') {
+    txParams.gasPrice = TRUFFLE_DEFAULT_GAS_PRICE;
+    return txParams;
+  }
+
+  // If we are on mainnet, don't use the default price
   const gasPrice = txParams.gasPrice || Contracts.artifactsDefaults().gasPrice;
   if (TRUFFLE_DEFAULT_GAS_PRICE.eq(gasPrice) || !gasPrice) {
     if (state.gasPrice) {
