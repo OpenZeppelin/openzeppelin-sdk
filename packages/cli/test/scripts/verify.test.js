@@ -92,7 +92,7 @@ contract('verify script', function () {
       it('logs a success info message when contract is verified', async function() {
         this.axiosStub.onCall(0).returns({ status: 200, data: { status: '1', result: 'GU1D_NUMB3R' } })
         this.axiosStub.onCall(1).returns({ status: 200, data: { status: '1' } })
-        await verify(contractAlias, { network, networkFile: this.networkFile, remote: 'etherchain' })
+        await verify(contractAlias, { network, networkFile: this.networkFile, remote: 'etherscan', apiKey: 'AP1_k3Y' })
         this.logs.infos.should.have.lengthOf(3)
         this.logs.infos[0].should.match(/Verifying and publishing/)
         this.logs.infos[1].should.match(/Contract verification in process/)
