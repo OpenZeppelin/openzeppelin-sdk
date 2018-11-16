@@ -1,0 +1,10 @@
+module.exports = {
+  networks: {
+    local: {
+      host: 'localhost',
+      port: 9545,
+      network_id: '*',
+      gasPrice: 10e9
+    }
+  }
+};
