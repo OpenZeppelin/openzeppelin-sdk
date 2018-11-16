@@ -80,7 +80,6 @@ export default class NetworkAppController extends NetworkBaseController {
     const proxyInstance = await this.project.createProxy(contractClass, { packageName, contractName: contractAlias, initMethod, initArgs });
     const implementationAddress = await Proxy.at(proxyInstance).implementation();
     const packageVersion = packageName === this.packageFile.name ? this.currentVersion : (await this.project.getDependencyVersion(packageName));
-    // FIXME: Shouldn't truffle deployed info correspond to the contract name, and not its alias?
     this._updateTruffleDeployedInformation(contractAlias, proxyInstance)
 
     this.networkFile.addProxy(packageName, contractAlias, {
@@ -257,7 +256,9 @@ export default class NetworkAppController extends NetworkBaseController {
     if (contractName) {
       const path = Contracts.getLocalPath(contractName)
       const data = fs.parseJson(path)
-      data.networks = {}
+      if (!data.networks) {
+        data.networks = {}
+      }
       data.networks[implementation.constructor.network_id] = {
         links: {},
         events: {},
