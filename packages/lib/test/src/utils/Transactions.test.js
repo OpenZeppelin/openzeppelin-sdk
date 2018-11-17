@@ -173,6 +173,25 @@ contract('Transactions', function([_account1, account2]) {
         assertGasLt(instance.transactionHash, 1000000);
       });
 
+      it('uses gas price API when gas not specified', async function () {
+          this.xhr = sinon.useFakeXMLHttpRequest();
+          var requests = this.requests = [];
+
+          this.xhr.onCreate = function(xhr) {
+              requests.push(xhr);
+          }
+
+          assertEquals(1, this.requests.length);
+
+          this.requests[0].respond(200, { "Content-Type": "application/json" },
+                                        '{"average": 3141"}');
+        
+          const instance = await deploy(this.WithConstructorImplementation, [42, "foo"]);
+          assertGasEq(instance.transactionHash, 3141 * 10);
+
+          this.xhr.restore();
+      });
+
       it('uses specified gas', async function () {
         const instance = await deploy(this.WithConstructorImplementation, [42, "foo"], { gas: 800000 });
         assertGas(instance.transactionHash, 800000);

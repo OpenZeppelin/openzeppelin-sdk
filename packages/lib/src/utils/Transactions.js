@@ -163,6 +163,21 @@ async function getNetwork() {
   return state.network;
 }
 
+async function getETHGasStationPrice() {
+    if (state.gasPrice) return state.gasPrice;
+
+    try {
+      const apiResponse = await axios.get(GAS_API_URL);
+      const gasPriceGwei = apiResponse.average / 10;
+      const gasPrice = BN(gasPriceGwei * 1000000000)
+
+      state.gasPrice = gasPrice;
+      return state.gasPrice;
+    } catch (err) {
+      throw new Error(`Could not query gas price API to determine reasonable gas price, please provide one.`)
+    }
+}
+
 async function fixGasPrice(txParams) {
   if (process.env.NODE_ENV === 'test') return txParams;
 
@@ -177,21 +192,8 @@ async function fixGasPrice(txParams) {
   // If we are on mainnet, don't use the default price
   const gasPrice = txParams.gasPrice || Contracts.artifactsDefaults().gasPrice;
   if (TRUFFLE_DEFAULT_GAS_PRICE.eq(gasPrice) || !gasPrice) {
-    if (state.gasPrice) {
-        txParams.gasPrice = state.gasPrice;
-        return txParams;
-    }
-
-    try {
-      const apiResponse = await axios.get(GAS_API_URL);
-      const gasPriceGwei = apiResponse.average / 10;
-      const gasPrice = BN(gasPriceGwei * 1000000000)
-
-      state.gasPrice = gasPrice;
-      txParams.gasPrice = state.gasPrice;
-    } catch (err) {
-      throw new Error(`Could not query gas price API to determine reasonable gas price, please provide one.`)
-    }
+    txParams.gasPrice = await getETHGasStationPrice()
+    console.log(txParams.gasPrice)
 
     if (txParams.gasPrice.gte(TRUFFLE_DEFAULT_GAS_PRICE)) {
         throw new Error(`Gas price API gave very high value (>100gwei), please manually provide a gas price.`)
