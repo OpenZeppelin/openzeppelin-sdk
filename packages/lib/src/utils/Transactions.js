@@ -179,21 +179,18 @@ async function getETHGasStationPrice() {
 }
 
 async function fixGasPrice(txParams) {
-  if (process.env.NODE_ENV === 'test') return txParams;
-
-  // If we aren't on mainnet, just use default price
   const network = getNetwork();
 
+  // If we aren't on mainnet, just use default price
   if (network != '1') {
-    txParams.gasPrice = TRUFFLE_DEFAULT_GAS_PRICE;
+    txParams.gas = TRUFFLE_DEFAULT_GAS_PRICE;
     return txParams;
   }
 
   // If we are on mainnet, don't use the default price
-  const gasPrice = txParams.gasPrice || Contracts.artifactsDefaults().gasPrice;
+  const gasPrice = txParams.gas || Contracts.artifactsDefaults().gasPrice;
   if (TRUFFLE_DEFAULT_GAS_PRICE.eq(gasPrice) || !gasPrice) {
     txParams.gasPrice = await getETHGasStationPrice()
-    console.log(txParams.gasPrice)
 
     if (txParams.gasPrice.gte(TRUFFLE_DEFAULT_GAS_PRICE)) {
         throw new Error(`Gas price API gave very high value (>100gwei), please manually provide a gas price.`)

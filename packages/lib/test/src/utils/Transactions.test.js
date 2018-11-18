@@ -10,6 +10,7 @@ import { assertRevert, encodeCall, sleep } from '../../../src';
 import advanceBlock from '../../../src/helpers/advanceBlock';
 import { promisify } from 'util';
 import { setInterval } from 'timers';
+import axios from 'axios';
 
 const DEFAULT_GAS = 6721975;
 
@@ -174,22 +175,15 @@ contract('Transactions', function([_account1, account2]) {
       });
 
       it('uses gas price API when gas not specified', async function () {
-          this.xhr = sinon.useFakeXMLHttpRequest();
-          var requests = this.requests = [];
+          state.network = "1";
+          sinon.stub(axios, 'get').yields({ average: 141 })
 
-          this.xhr.onCreate = function(xhr) {
-              requests.push(xhr);
-          }
-
-          assertEquals(1, this.requests.length);
-
-          this.requests[0].respond(200, { "Content-Type": "application/json" },
-                                        '{"average": 3141"}');
-        
           const instance = await deploy(this.WithConstructorImplementation, [42, "foo"]);
-          assertGasEq(instance.transactionHash, 3141 * 10);
 
-          this.xhr.restore();
+          assertGas(instance.transactionHash, 3141 * 10);
+
+          sinon.restore()
+          delete state.network
       });
 
       it('uses specified gas', async function () {
