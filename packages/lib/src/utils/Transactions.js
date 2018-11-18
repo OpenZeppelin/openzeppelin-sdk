@@ -6,6 +6,7 @@
 
 import { promisify } from 'util'
 import sleep from '../helpers/sleep';
+import BN from 'bignumber.js';
 import Contracts from './Contracts'
 import axios from 'axios'
 
@@ -25,7 +26,7 @@ const RETRY_COUNT = 3;
 const RETRY_SLEEP_TIME = process.env.NODE_ENV === 'test' ? 1 : 3000;
 
 // Truffle defaults gas price to 100gwei
-const TRUFFLE_DEFAULT_GAS_PRICE = 100000000000;
+const TRUFFLE_DEFAULT_GAS_PRICE = BN(100000000000);
 
 /**
  * Wraps the _sendTransaction function and manages transaction retries
@@ -58,7 +59,6 @@ export async function deploy(contract, args = [], txParams = {}, retries = RETRY
   try {
     return await _deploy(contract, args, txParams)
   } catch (error) {
-      console.log(error)
     if (!error.message.match(/nonce too low/) || retries <= 0) throw Error(error)
     return deploy(contract, args, txParams, retries - 1)
   }
@@ -169,7 +169,7 @@ async function getETHGasStationPrice() {
     try {
       const apiResponse = await axios.get(GAS_API_URL);
       const gasPriceGwei = apiResponse.average / 10;
-      const gasPrice = gasPriceGwei * 1000000000;
+      const gasPrice = gasPriceGwei * 1e9;
 
       state.gasPrice = gasPrice;
       return state.gasPrice;
@@ -179,25 +179,25 @@ async function getETHGasStationPrice() {
 }
 
 async function fixGasPrice(txParams) {
-  const network = getNetwork();
+  const network = await getNetwork();
 
-  // If we aren't on mainnet, just use default price
-  if (network != '1') {
-    txParams.gas = TRUFFLE_DEFAULT_GAS_PRICE;
-    return txParams;
-  }
+  const gasPrice = txParams.gasPrice || Contracts.artifactsDefaults().gasPrice;
 
-  // If we are on mainnet, don't use the default price
-  const gasPrice = txParams.gas || Contracts.artifactsDefaults().gasPrice;
-  if (TRUFFLE_DEFAULT_GAS_PRICE.eq(gasPrice) || !gasPrice) {
+  if (TRUFFLE_DEFAULT_GAS_PRICE == gasPrice || !gasPrice) {
+    if (network != '1') {
+      txParams.gasPrice = TRUFFLE_DEFAULT_GAS_PRICE.toNumber();
+      return txParams;
+    }
+
     txParams.gasPrice = await getETHGasStationPrice()
 
-    if (txParams.gasPrice.gte(TRUFFLE_DEFAULT_GAS_PRICE)) {
+    if (txParams.gasPrice >= TRUFFLE_DEFAULT_GAS_PRICE) {
         throw new Error(`Gas price API gave very high value (>100gwei), please manually provide a gas price.`)
     }
 
-    return txParams;
   }
+
+  return txParams;
 }
 
 export async function isGanacheNode () {

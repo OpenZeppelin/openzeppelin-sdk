@@ -30,6 +30,11 @@ contract('Transactions', function([_account1, account2]) {
     gas.should.be.eq(parseInt(expected));
   };
 
+  const assertGasPrice = (txHash, expected) => {
+    const { gasPrice } = web3.eth.getTransaction(txHash);
+    gasPrice.toNumber().should.be.eq(parseInt(expected));
+  };
+
   const assertFrom = (txHash, expected) => {
     const { from } = web3.eth.getTransaction(txHash);
     from.should.be.eq(expected);
@@ -66,6 +71,34 @@ contract('Transactions', function([_account1, account2]) {
     it('estimates gas', async function () {
       const { tx } = await sendTransaction(this.instance.initialize, [42, 'foo', [1,2,3]]);
       assertGasLt(tx, 1000000);
+    });
+
+    it('uses gas price API when gas not specified', async function () {
+        const oldNetwork = state.network
+
+        state.network = "1";
+        const stub = sinon.stub(axios, 'get').resolves({ average: 49 })
+
+        const { tx } = await sendTransaction(this.instance.initialize, [42, 'foo', [1,2,3]]);
+      
+        assertGasPrice(tx, 49 * 1e8);
+
+        stub.restore()
+        state.network = oldNetwork
+    });
+
+    it('does not use gas price API when gasPrice specified', async function () {
+        const oldNetwork = state.network
+
+        state.network = "1";
+        const stub = sinon.stub(axios, 'get').resolves({ average: 49 })
+
+        const { tx } = await sendTransaction(this.instance.initialize, [42, 'foo', [1,2,3]], { gasPrice: 1234 });
+      
+        assertGasPrice(tx, 1234);
+
+        stub.restore()
+        state.network = oldNetwork
     });
 
     it('uses specified gas', async function () {
@@ -118,6 +151,34 @@ contract('Transactions', function([_account1, account2]) {
       assertGasLt(tx, 1000000);
     });
 
+    it('uses gas price API when gas not specified', async function () {
+        const oldNetwork = state.network
+
+        state.network = "1";
+        const stub = sinon.stub(axios, 'get').resolves({ average: 49 })
+
+        const { tx } = await sendDataTransaction(this.instance, { data: this.encodedCall });
+      
+        assertGasPrice(tx, 49 * 1e8);
+
+        stub.restore()
+        state.network = oldNetwork
+    });
+
+    it('does not use gas price API when gasPrice specified', async function () {
+        const oldNetwork = state.network
+
+        state.network = "1";
+        const stub = sinon.stub(axios, 'get').resolves({ average: 49 })
+
+        const { tx } = await sendDataTransaction(this.instance, { data: this.encodedCall,  gasPrice: 1234 });
+      
+        assertGasPrice(tx, 1234);
+
+        stub.restore()
+        state.network = oldNetwork
+    });
+
     it('uses specified gas', async function () {
       const { tx } = await sendDataTransaction(this.instance, { data: this.encodedCall, gas: 800000 });
       assertGas(tx, 800000);
@@ -146,6 +207,34 @@ contract('Transactions', function([_account1, account2]) {
         assertGasLt(instance.transactionHash, 1000000);
       });
   
+      it('uses gas price API when gas not specified', async function () {
+          const oldNetwork = state.network
+
+          state.network = "1";
+          const stub = sinon.stub(axios, 'get').resolves({ average: 49 })
+
+          const instance = await deploy(this.DummyImplementation);
+        
+          assertGasPrice(instance.transactionHash, 49 * 1e8);
+
+          stub.restore()
+          state.network = oldNetwork
+      });
+
+      it('does not use gas price API when gasPrice specified', async function () {
+          const oldNetwork = state.network
+
+          state.network = "1";
+          const stub = sinon.stub(axios, 'get').resolves({ average: 49 })
+
+          const instance = await deploy(this.DummyImplementation, [], { gasPrice: 1234 });
+        
+          assertGasPrice(instance.transactionHash, 1234);
+
+          stub.restore()
+          state.network = oldNetwork
+      });
+
       it('uses specified gas', async function () {
         const instance = await deploy(this.DummyImplementation, [], { gas: 800000 });
         assertGas(instance.transactionHash, 800000);
@@ -175,15 +264,31 @@ contract('Transactions', function([_account1, account2]) {
       });
 
       it('uses gas price API when gas not specified', async function () {
+          const oldNetwork = state.network
+
           state.network = "1";
-          sinon.stub(axios, 'get').yields({ average: 141 })
+          const stub = sinon.stub(axios, 'get').resolves({ average: 49 })
 
           const instance = await deploy(this.WithConstructorImplementation, [42, "foo"]);
+        
+          assertGasPrice(instance.transactionHash, 49 * 1e8);
 
-          assertGas(instance.transactionHash, 3141 * 10);
+          stub.restore()
+          state.network = oldNetwork
+      });
 
-          sinon.restore()
-          delete state.network
+      it('does not use gas price API when gasPrice specified', async function () {
+          const oldNetwork = state.network
+
+          state.network = "1";
+          const stub = sinon.stub(axios, 'get').resolves({ average: 49 })
+
+          const instance = await deploy(this.WithConstructorImplementation, [42, "foo"], { gasPrice: 1234 });
+        
+          assertGasPrice(instance.transactionHash, 1234);
+
+          stub.restore()
+          state.network = oldNetwork
       });
 
       it('uses specified gas', async function () {
