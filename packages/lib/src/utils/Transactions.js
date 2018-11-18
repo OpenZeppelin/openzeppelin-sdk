@@ -7,7 +7,6 @@
 import { promisify } from 'util'
 import sleep from '../helpers/sleep';
 import Contracts from './Contracts'
-import BN from 'bignumber.js'
 import axios from 'axios'
 
 // Cache, exported for testing
@@ -26,7 +25,7 @@ const RETRY_COUNT = 3;
 const RETRY_SLEEP_TIME = process.env.NODE_ENV === 'test' ? 1 : 3000;
 
 // Truffle defaults gas price to 100gwei
-const TRUFFLE_DEFAULT_GAS_PRICE = BN(100000000000);
+const TRUFFLE_DEFAULT_GAS_PRICE = 100000000000;
 
 /**
  * Wraps the _sendTransaction function and manages transaction retries
@@ -59,6 +58,7 @@ export async function deploy(contract, args = [], txParams = {}, retries = RETRY
   try {
     return await _deploy(contract, args, txParams)
   } catch (error) {
+      console.log(error)
     if (!error.message.match(/nonce too low/) || retries <= 0) throw Error(error)
     return deploy(contract, args, txParams, retries - 1)
   }
@@ -169,7 +169,7 @@ async function getETHGasStationPrice() {
     try {
       const apiResponse = await axios.get(GAS_API_URL);
       const gasPriceGwei = apiResponse.average / 10;
-      const gasPrice = BN(gasPriceGwei * 1000000000)
+      const gasPrice = gasPriceGwei * 1000000000;
 
       state.gasPrice = gasPrice;
       return state.gasPrice;
