@@ -3,8 +3,5 @@
   "private": true,
   "devDependencies": {
     "lerna": "~3.3.2"
-  },
-  "dependencies": {
-    "8": "0.0.1"
   }
 }
