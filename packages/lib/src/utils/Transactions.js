@@ -164,18 +164,18 @@ async function getNetwork() {
 }
 
 async function getETHGasStationPrice() {
-    if (state.gasPrice) return state.gasPrice;
+  if (state.gasPrice) return state.gasPrice;
 
-    try {
-      const apiResponse = await axios.get(GAS_API_URL);
-      const gasPriceGwei = apiResponse.average / 10;
-      const gasPrice = gasPriceGwei * 1e9;
+  try {
+    const apiResponse = await axios.get(GAS_API_URL);
+    const gasPriceGwei = apiResponse.average / 10;
+    const gasPrice = gasPriceGwei * 1e9;
 
-      state.gasPrice = gasPrice;
-      return state.gasPrice;
-    } catch (err) {
-      throw new Error(`Could not query gas price API to determine reasonable gas price, please provide one.`)
-    }
+    state.gasPrice = gasPrice;
+    return state.gasPrice;
+  } catch (err) {
+    throw new Error(`Could not query gas price API to determine reasonable gas price, please provide one.`)
+  }
 }
 
 async function fixGasPrice(txParams) {
