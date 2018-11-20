@@ -36,7 +36,7 @@ const TRUFFLE_DEFAULT_GAS_PRICE = BN(100000000000);
  * @param retries number of transaction retries
  */
 export async function sendTransaction(contractFn, args = [], txParams = {}, retries = RETRY_COUNT) {
-  txParams = await fixGasPrice(txParams)
+  await fixGasPrice(txParams)
 
   try {
     return await _sendTransaction(contractFn, args, txParams)
@@ -54,7 +54,7 @@ export async function sendTransaction(contractFn, args = [], txParams = {}, retr
  * @param retries number of deploy retries
  */
 export async function deploy(contract, args = [], txParams = {}, retries = RETRY_COUNT) {
-  txParams = await fixGasPrice(txParams)
+  await fixGasPrice(txParams)
 
   try {
     return await _deploy(contract, args, txParams)
@@ -72,7 +72,7 @@ export async function deploy(contract, args = [], txParams = {}, retries = RETRY
  */
 export async function sendDataTransaction(contract, txParams) {
   // TODO: Add retries similar to sendTransaction
-  txParams = await fixGasPrice(txParams)
+  await fixGasPrice(txParams)
 
   // If gas is set explicitly, use it
   if (txParams.gas) {
@@ -183,21 +183,20 @@ async function fixGasPrice(txParams) {
 
   const gasPrice = txParams.gasPrice || Contracts.artifactsDefaults().gasPrice;
 
-  if (TRUFFLE_DEFAULT_GAS_PRICE == gasPrice || !gasPrice) {
+  if (TRUFFLE_DEFAULT_GAS_PRICE.eq(gasPrice) || !gasPrice) {
     if (network != '1') {
-      txParams.gasPrice = TRUFFLE_DEFAULT_GAS_PRICE.toNumber();
-      return txParams;
+      return;
     }
 
     txParams.gasPrice = await getETHGasStationPrice()
 
-    if (txParams.gasPrice >= TRUFFLE_DEFAULT_GAS_PRICE) {
-        throw new Error(`Gas price API gave very high value (>100gwei), please manually provide a gas price.`)
+    if (TRUFFLE_DEFAULT_GAS_PRICE.lte(txParams.gasPrice)) {
+        throw new Error("The current gas price estimate from ethgasstation.info is over 100 gwei. If you do want to send a transaction with a gas price this high, please set it manually in your truffle.js configuration file.")
     }
 
   }
 
-  return txParams;
+  return;
 }
 
 export async function isGanacheNode () {
