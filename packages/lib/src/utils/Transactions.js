@@ -6,11 +6,15 @@
 
 import { promisify } from 'util'
 import sleep from '../helpers/sleep';
+import BN from 'bignumber.js';
 import Contracts from './Contracts'
-import BN from 'bignumber.js'
+import axios from 'axios'
 
 // Cache, exported for testing
 export const state = { };
+
+// API for gas price guesses
+const GAS_API_URL = "https://ethgasstation.info/json/ethgasAPI.json"
 
 // Gas estimates are multiplied by this value to allow for an extra buffer (for reference, truffle-next uses 1.25)
 const GAS_MULTIPLIER = 1.25;
@@ -32,7 +36,7 @@ const TRUFFLE_DEFAULT_GAS_PRICE = BN(100000000000);
  * @param retries number of transaction retries
  */
 export async function sendTransaction(contractFn, args = [], txParams = {}, retries = RETRY_COUNT) {
-  await checkGasPrice(txParams);
+  await fixGasPrice(txParams)
 
   try {
     return await _sendTransaction(contractFn, args, txParams)
@@ -50,7 +54,7 @@ export async function sendTransaction(contractFn, args = [], txParams = {}, retr
  * @param retries number of deploy retries
  */
 export async function deploy(contract, args = [], txParams = {}, retries = RETRY_COUNT) {
-  await checkGasPrice(txParams);
+  await fixGasPrice(txParams)
 
   try {
     return await _deploy(contract, args, txParams)
@@ -68,7 +72,7 @@ export async function deploy(contract, args = [], txParams = {}, retries = RETRY
  */
 export async function sendDataTransaction(contract, txParams) {
   // TODO: Add retries similar to sendTransaction
-  await checkGasPrice(txParams)
+  await fixGasPrice(txParams)
 
   // If gas is set explicitly, use it
   if (txParams.gas) {
@@ -152,12 +156,47 @@ async function getNodeVersion () {
   return state.nodeInfo;
 }
 
-async function checkGasPrice(txParams) {
-  if (await isGanacheNode()) return;
-  const gasPrice = txParams.gasPrice || Contracts.artifactsDefaults().gasPrice;
-  if (TRUFFLE_DEFAULT_GAS_PRICE.eq(gasPrice) || !gasPrice) {
-    throw new Error(`Cowardly refusing to execute transaction with excessively high default gas price of 100 gwei. Consider explicitly setting a different gasPrice value in your truffle.js config file. You can check reasonable values for gas price in https://ethgasstation.info/.`);
+async function getNetwork() {
+  if (!state.network) {
+    state.network = await promisify(web3.version.getNetwork.bind(global.web3.version))();
   }
+  return state.network;
+}
+
+async function getETHGasStationPrice() {
+  if (state.gasPrice) return state.gasPrice;
+
+  try {
+    const apiResponse = await axios.get(GAS_API_URL);
+    const gasPriceGwei = apiResponse.average / 10;
+    const gasPrice = gasPriceGwei * 1e9;
+
+    state.gasPrice = gasPrice;
+    return state.gasPrice;
+  } catch (err) {
+    throw new Error(`Could not query gas price API to determine reasonable gas price, please provide one.`)
+  }
+}
+
+async function fixGasPrice(txParams) {
+  const network = await getNetwork();
+
+  const gasPrice = txParams.gasPrice || Contracts.artifactsDefaults().gasPrice;
+
+  if (TRUFFLE_DEFAULT_GAS_PRICE.eq(gasPrice) || !gasPrice) {
+    if (network != '1') {
+      return;
+    }
+
+    txParams.gasPrice = await getETHGasStationPrice()
+
+    if (TRUFFLE_DEFAULT_GAS_PRICE.lte(txParams.gasPrice)) {
+        throw new Error("The current gas price estimate from ethgasstation.info is over 100 gwei. If you do want to send a transaction with a gas price this high, please set it manually in your truffle.js configuration file.")
+    }
+
+  }
+
+  return;
 }
 
 export async function isGanacheNode () {
