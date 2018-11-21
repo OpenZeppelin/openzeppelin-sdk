@@ -10,6 +10,7 @@ import { assertRevert, encodeCall, sleep } from '../../../src';
 import advanceBlock from '../../../src/helpers/advanceBlock';
 import { promisify } from 'util';
 import { setInterval } from 'timers';
+import axios from 'axios';
 
 const DEFAULT_GAS = 6721975;
 
@@ -27,6 +28,11 @@ contract('Transactions', function([_account1, account2]) {
   const assertGas = (txHash, expected) => {
     const { gas } = web3.eth.getTransaction(txHash);
     gas.should.be.eq(parseInt(expected));
+  };
+
+  const assertGasPrice = (txHash, expected) => {
+    const { gasPrice } = web3.eth.getTransaction(txHash);
+    gasPrice.toNumber().should.be.eq(parseInt(expected));
   };
 
   const assertFrom = (txHash, expected) => {
@@ -67,6 +73,48 @@ contract('Transactions', function([_account1, account2]) {
       assertGasLt(tx, 1000000);
     });
 
+    describe('Uses an API to determine gas price', async function() {
+      beforeEach('Stub API reply and simulate mainnet', async function() {
+        state.network = "1";
+        sinon.stub(axios, 'get').resolves({ average: 49 })
+      });
+
+      afterEach('Return to testnet and undo stub', async function() {
+        delete state.network;
+        delete state.gasPrice;
+        sinon.restore();
+      });
+
+      it('uses gas price API when gas not specified', async function () {
+        const { tx } = await sendTransaction(this.instance.initialize, [42, 'foo', [1,2,3]]);
+      
+        assertGasPrice(tx, 49 * 1e8);
+      });
+
+      it('does not use gas price API when gasPrice specified', async function () {
+        const { tx } = await sendTransaction(this.instance.initialize, [42, 'foo', [1,2,3]], { gasPrice: 1234 });
+      
+        assertGasPrice(tx, 1234);
+      });
+    });
+
+    describe('Does not blindly trust API', async function() {
+      beforeEach('Stub API reply and simulate mainnet', async function() {
+        state.network = "1";
+        sinon.stub(axios, 'get').resolves({ average: 1234123412341234 })
+      });
+
+      afterEach('Return to testnet and undo stub', async function() {
+        delete state.network;
+        delete state.gasPrice;
+        sinon.restore();
+      });
+
+      it('Produces an error when gas price API gives giant value', async function () {
+        await sendTransaction(this.instance.initialize, [42, 'foo', [1,2,3]]).should.be.rejectedWith(/is over 100 gwei/);
+      });
+    });
+
     it('uses specified gas', async function () {
       const { tx } = await sendTransaction(this.instance.initialize, [42, 'foo', [1,2,3]], { gas: 800000});
       assertGas(tx, 800000);
@@ -98,14 +146,6 @@ contract('Transactions', function([_account1, account2]) {
 
       await sendTransaction(this.instance.initialize, [42, 'foo', [1,2,3]]).should.be.rejectedWith(/always failing transaction/);
     });
-
-    describe('on non ganache node', function () {
-      onNotGanache();
-      
-      it('refuses to send tx with truffle default gas price', async function () {
-        await sendTransaction(this.instance.initialize, [42, 'foo', [1,2,3]]).should.be.rejectedWith(/cowardly refusing/i);
-      });
-    })
   });
 
   describe('sendDataTransaction', function () {
@@ -123,6 +163,48 @@ contract('Transactions', function([_account1, account2]) {
     it('estimates gas', async function () {
       const { tx } = await sendDataTransaction(this.instance, { data: this.encodedCall });
       assertGasLt(tx, 1000000);
+    });
+
+    describe('Uses an API to determine gas price', async function() {
+      beforeEach('Stub API reply and simulate mainnet', async function() {
+        state.network = "1";
+        sinon.stub(axios, 'get').resolves({ average: 49 })
+      });
+
+      afterEach('Return to testnet and undo stub', async function() {
+        delete state.network;
+        delete state.gasPrice;
+        sinon.restore();
+      });
+
+      it('uses gas price API when gas not specified', async function () {
+        const { tx } = await sendDataTransaction(this.instance, { data: this.encodedCall });
+      
+        assertGasPrice(tx, 49 * 1e8);
+      });
+
+      it('does not use gas price API when gasPrice specified', async function () {
+        const { tx } = await sendDataTransaction(this.instance, { gasPrice: 1234, data: this.encodedCall });
+      
+        assertGasPrice(tx, 1234);
+      });
+    });
+
+    describe('Does not blindly trust API', async function() {
+      beforeEach('Stub API reply and simulate mainnet', async function() {
+        state.network = "1";
+        sinon.stub(axios, 'get').resolves({ average: 1234123412341234 })
+      });
+
+      afterEach('Return to testnet and undo stub', async function() {
+        delete state.network;
+        delete state.gasPrice;
+        sinon.restore();
+      });
+
+      it('Produces an error when gas price API gives giant value', async function () {
+        await sendDataTransaction(this.instance, { data: this.encodedCall }).should.be.rejectedWith(/is over 100 gwei/);
+      });
     });
 
     it('uses specified gas', async function () {
@@ -152,7 +234,49 @@ contract('Transactions', function([_account1, account2]) {
         const instance = await deploy(this.DummyImplementation);
         assertGasLt(instance.transactionHash, 1000000);
       });
-  
+
+      describe('Uses an API to determine gas price', async function() {
+        beforeEach('Stub API reply and simulate mainnet', async function() {
+          state.network = "1";
+          sinon.stub(axios, 'get').resolves({ average: 49 })
+        });
+
+        afterEach('Return to testnet and undo stub', async function() {
+          delete state.network;
+          delete state.gasPrice;
+          sinon.restore();
+        });
+
+        it('uses gas price API when gas not specified', async function () {
+          const instance = await deploy(this.DummyImplementation);
+        
+          assertGasPrice(instance.transactionHash, 49 * 1e8);
+        });
+
+        it('does not use gas price API when gasPrice specified', async function () {
+          const instance = await deploy(this.DummyImplementation, [], { gasPrice: 1234 });
+        
+          assertGasPrice(instance.transactionHash, 1234);
+        });
+      });
+
+      describe('Does not blindly trust API', async function() {
+        beforeEach('Stub API reply and simulate mainnet', async function() {
+          state.network = "1";
+          sinon.stub(axios, 'get').resolves({ average: 1234123412341234 })
+        });
+
+        afterEach('Return to testnet and undo stub', async function() {
+          delete state.network;
+          delete state.gasPrice;
+          sinon.restore();
+        });
+
+        it('Produces an error when gas price API gives giant value', async function () {
+          await deploy(this.DummyImplementation).should.be.rejectedWith(/is over 100 gwei/);
+        });
+      });
+
       it('uses specified gas', async function () {
         const instance = await deploy(this.DummyImplementation, [], { gas: 800000 });
         assertGas(instance.transactionHash, 800000);
@@ -179,6 +303,48 @@ contract('Transactions', function([_account1, account2]) {
       it('estimates gas', async function () {
         const instance = await deploy(this.WithConstructorImplementation, [42, "foo"]);
         assertGasLt(instance.transactionHash, 1000000);
+      });
+
+      describe('Uses an API to determine gas price', async function() {
+        beforeEach('Stub API reply and simulate mainnet', async function() {
+          state.network = "1";
+          sinon.stub(axios, 'get').resolves({ average: 49 })
+        });
+
+        afterEach('Return to testnet and undo stub', async function() {
+          delete state.network;
+          delete state.gasPrice;
+          sinon.restore();
+        });
+
+        it('uses gas price API when gas not specified', async function () {
+          const instance = await deploy(this.WithConstructorImplementation, [42, 'foo']);
+        
+          assertGasPrice(instance.transactionHash, 49 * 1e8);
+        });
+
+        it('does not use gas price API when gasPrice specified', async function () {
+          const instance = await deploy(this.WithConstructorImplementation, [42, 'foo'], { gasPrice: 1234 });
+        
+          assertGasPrice(instance.transactionHash, 1234);
+        });
+      });
+
+      describe('Does not blindly trust API', async function() {
+        beforeEach('Stub API reply and simulate mainnet', async function() {
+          state.network = "1";
+          sinon.stub(axios, 'get').resolves({ average: 1234123412341234 })
+        });
+
+        afterEach('Return to testnet and undo stub', async function() {
+          delete state.network;
+          delete state.gasPrice;
+          sinon.restore();
+        });
+
+        it('Produces an error when gas price API gives giant value', async function () {
+          await deploy(this.WithConstructorImplementation, [42, 'foo']).should.be.rejectedWith(/is over 100 gwei/);
+        });
       });
 
       it('uses specified gas', async function () {
