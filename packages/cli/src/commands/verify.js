@@ -14,6 +14,7 @@ const register = program => program
   .option('-o, --optimizer', 'enables optimizer option')
   .option('--optimizer-runs <runs>', 'specify number of runs if optimizer enabled.')
   .option('--remote <remote>', 'specify remote endpoint to use for verification')
+  .option('--api-key <key>', 'specify etherscan API key. To get one, go to: https://etherscancom.freshdesk.com/support/solutions/articles/35000022163-i-need-an-api-key')
   .action(action);
 
 

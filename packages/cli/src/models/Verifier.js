@@ -1,21 +1,34 @@
 import querystring from 'querystring'
 import axios from 'axios'
 import cheerio from 'cheerio'
+
 import { Logger } from 'zos-lib'
+import sleep from '../utils/sleep'
 
 const log = new Logger('Verifier')
+
+// Max number of API request retries on error
+const RETRY_COUNT = 3;
+
+// Time to sleep between retries for API requests
+const RETRY_SLEEP_TIME = 5000;
 
 const Verifier = {
   async verifyAndPublish(remote, params) {
     if (remote === 'etherchain') {
       await publishToEtherchain(params)
+    } else if (remote === 'etherscan') {
+      await publishToEtherscan(params)
     } else {
-      throw new Error('Invalid remote. Currently, ZeppelinOS contract verifier only supports etherchain as remote verification application.')
+      throw new Error('Invalid remote. Currently, ZeppelinOS contract verifier supports etherchain and etherscan as remote verification applications.')
     }
   }
 }
 
 async function publishToEtherchain(params) {
+  if(params.network !== 'mainnet')
+    throw new Error('Invalid network. Currently, etherchain supports only mainnet')
+  
   const etherchainVerificationUrl = 'https://www.etherchain.org/tools/verifyContract'
   const etherchainContractUrl = 'https://www.etherchain.org/account'
   const { compilerVersion, optimizer, contractAddress } = params
@@ -44,6 +57,86 @@ async function publishToEtherchain(params) {
     }
   } catch(error) {
     throw Error(error.message || 'Error while trying to publish contract')
+  }
+}
+
+async function publishToEtherscan(params) {
+  const { network, compilerVersion, optimizer, contractAddress } = params
+  const compiler = `v${compilerVersion.replace('.Emscripten.clang', '')}`
+  const optimizerStatus = optimizer ? 1 : 0
+
+  const apiSubdomain = setEtherscanApiSubdomain(network)
+  const etherscanApiUrl = `https://${apiSubdomain}.etherscan.io/api`
+  const etherscanContractUrl = `https://${network}.etherscan.io/address`
+
+  try {
+    const response = await axios.request({
+      method: 'POST',
+      url: etherscanApiUrl,
+      data: querystring.stringify({
+        apikey: params.apiKey,
+        module: 'contract',
+        action: 'verifysourcecode',
+        contractaddress: contractAddress,
+        sourceCode: params.contractSource,
+        contractname: params.contractName,
+        compilerversion: compiler,
+        optimizationUsed: optimizerStatus,
+        runs: params.optimizerRuns,
+      }),
+      headers: {
+        'Content-type': 'application/x-www-form-urlencoded'
+      }
+    })
+
+    if (response.status === 200 && response.data.status === '1') {
+      log.info('Contract verification in process (this usually takes under 30 seconds)...')
+      await checkEtherscanVerificationStatus(response.data.result, etherscanApiUrl, RETRY_COUNT)
+      log.info(`Contract verified successfully. You can check it here: ${etherscanContractUrl}/${contractAddress}#code`)
+    } else {
+      throw new Error(`Error while trying to verify contract: ${response.data.result}`)
+    }
+
+  } catch(error) {
+    throw new Error(error.message || 'Error while trying to verify contract')
+  }
+}
+
+async function checkEtherscanVerificationStatus(guid, etherscanApiUrl, retries = RETRY_COUNT) {
+  const queryParams = querystring.stringify({
+    guid,
+    action: 'checkverifystatus',
+    module: 'contract',
+  })
+
+  try {
+    const response = await axios.request({
+      method: 'GET',
+      url: `${etherscanApiUrl}?${queryParams}`,
+    })
+
+    if (response.data.status !== '1') {
+      throw new Error(`Error while trying to verify contract: ${response.data.result}`)
+    }
+  } catch(error) {
+    if (retries === 0) throw new Error(error.message || 'Error while trying to check verification status')
+    await sleep(RETRY_SLEEP_TIME)
+    await checkEtherscanVerificationStatus(guid, etherscanApiUrl, retries - 1)
+  }
+}
+
+function setEtherscanApiSubdomain(network) {
+  switch(network) {
+    case 'mainnet':
+      return 'api'
+    case 'rinkeby':
+      return 'api-rinkeby'
+    case 'ropsten':
+      return 'api-ropsten'
+    case 'kovan':
+      return 'api-kovan'
+    default:
+      throw new Error('Invalid network. Currently, etherscan supports mainnet, rinkeby, ropsten and kovan')
   }
 }
 
