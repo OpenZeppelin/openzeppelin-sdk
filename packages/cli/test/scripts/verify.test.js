@@ -60,6 +60,8 @@ contract('verify script', function () {
   })
 
   describe('contract verification', function () {
+    const network = 'mainnet'
+
     beforeEach(async function () {
       this.packageFile = new ZosPackageFile('test/mocks/packages/package-with-contracts.zos.json')
       this.networkFile = this.packageFile.networkFile(network)
@@ -77,17 +79,44 @@ contract('verify script', function () {
       await assertVerify(contractAlias, { network, networkFile: this.networkFile, remote: 'invalid-remote' }, /Invalid remote/)
     })
 
-    it('throws error if contract could not be verified', async function () {
-      this.axiosStub.returns({ status: 200, data: '<div id="infoModal"><div class="modal-body"> Error: </div></div>' })
-      await assertVerify(contractAlias, { network, networkFile: this.networkFile, remote: 'etherchain' }, /Error/)
+    describe('against etherscan', function() {
+      it('throws error if not specifying api key option', async function() {
+        await assertVerify(contractAlias, { network, networkFile: this.networkFile, remote: 'etherscan' }, /Etherscan API key not specified/)
+      })
+
+      it('throws error if contract could not be verified', async function() {
+        this.axiosStub.returns({ status: 200, data: { status: '0', result: 'Something went wrong' } })
+        await assertVerify(contractAlias, { network, networkFile: this.networkFile, remote: 'etherscan', apiKey: 'AP1_k3Y' }, /Error/)
+      })
+
+      it('logs a success info message when contract is verified', async function() {
+        this.axiosStub.onCall(0).returns({ status: 200, data: { status: '1', result: 'GU1D_NUMB3R' } })
+        this.axiosStub.onCall(1).returns({ status: 200, data: { status: '1' } })
+        await verify(contractAlias, { network, networkFile: this.networkFile, remote: 'etherscan', apiKey: 'AP1_k3Y' })
+        this.logs.infos.should.have.lengthOf(3)
+        this.logs.infos[0].should.match(/Verifying and publishing/)
+        this.logs.infos[1].should.match(/Contract verification in process/)
+        this.logs.infos[2].should.match(/Contract verified successfully/)
+      })
     })
 
-    it('logs a success info message when contract is verified', async function () {
-      this.axiosStub.returns({ status: 200, data: '<div id="infoModal"><div class="modal-body"> successful </div></div>' })
-      await verify(contractAlias, { network, networkFile: this.networkFile, remote: 'etherchain' })
-      this.logs.infos.should.have.lengthOf(2)
-      this.logs.infos[0].should.match(/Verifying and publishing/)
-      this.logs.infos[1].should.match(/Contract verified and published successfully. You can check it here/)
+    describe('against etherchain', function() {
+      it('throws error if specifying anything but mainnet as a network', async function() {
+        await assertVerify(contractAlias, { network: 'test', networkFile: this.networkFile, remote: 'etherchain' }, /Invalid network/)
+      })
+
+      it('throws error if contract could not be verified', async function () {
+        this.axiosStub.returns({ status: 200, data: '<div id="infoModal"><div class="modal-body"> Error: </div></div>' })
+        await assertVerify(contractAlias, { network, networkFile: this.networkFile, remote: 'etherchain' }, /Error/)
+      })
+
+      it('logs a success info message when contract is verified', async function () {
+        this.axiosStub.returns({ status: 200, data: '<div id="infoModal"><div class="modal-body"> successful </div></div>' })
+        await verify(contractAlias, { network, networkFile: this.networkFile, remote: 'etherchain' })
+        this.logs.infos.should.have.lengthOf(2)
+        this.logs.infos[0].should.match(/Verifying and publishing/)
+        this.logs.infos[1].should.match(/Contract verified and published successfully. You can check it here/)
+      })
     })
   })
 })
