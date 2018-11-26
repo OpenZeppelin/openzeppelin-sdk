@@ -5,7 +5,6 @@ import compare from './compare'
 import create from './create'
 import freeze from './freeze'
 import init from './init'
-import initLib from './init-lib'
 import link from './link'
 import publish from './publish'
 import pull from './pull'
@@ -26,7 +25,6 @@ export default {
   create,
   freeze,
   init,
-  initLib,
   link,
   publish,
   pull,

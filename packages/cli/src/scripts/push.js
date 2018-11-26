@@ -6,10 +6,10 @@ export default async function push({ network, deployLibs, reupload = false, forc
   const controller = ControllerFor(network, txParams, networkFile);
 
   try {
-    if (deployLibs && !controller.isLib) await controller.deployLibs();
+    if (deployLibs) await controller.deployLibs();
     await controller.push(reupload, force);
-    const address = controller.isLib ? controller.packageAddress : controller.appAddress;
-    if (address) stdout(address);
+    const { appAddress } = controller
+    if (appAddress) stdout(appAddress);
     controller.writeNetworkPackageIfNeeded()
   } catch (error) {
     const cb = () => controller.writeNetworkPackageIfNeeded()
