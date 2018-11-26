@@ -36,14 +36,4 @@ contract('bump script', function() {
     });
   });
 
-  describe('on lib', function () {
-    beforeEach(function () {
-      this.packageFile = new ZosPackageFile('test/mocks/packages/package-empty-lib.zos.json')
-    })
-
-    it('should update the lib version in the main package file', async function() {
-      await bumpVersion({ version: newVersion, packageFile: this.packageFile });
-      this.packageFile.version.should.eq(newVersion);
-    });
-  });
 });

@@ -52,24 +52,6 @@ contract('status script', function([_, owner]) {
     });
   };
 
-  const shouldDescribeLib = function () {
-    describe('root lib', function () {
-      it('should log undeployed lib', async function () {
-        this.capturingLogs();
-        await status({ network, networkFile: this.networkFile });
-
-        this.logs.text.should.match(/not yet deployed/);
-      });
-
-      it('should log plain lib info', async function () {
-        await push({ network, txParams, networkFile: this.networkFile });
-        await this.capturingLogs(status({ network, networkFile: this.networkFile }));
-
-        this.logs.text.should.match(/Dependency package is deployed at 0x[0-9a-fA-F]{40}/i);
-      });
-    });
-  };
-
   const shouldDescribeVersion = function () {
     describe('version', function () {
       it('should log version out-of-sync', async function () {
@@ -261,15 +243,4 @@ contract('status script', function([_, owner]) {
     shouldDescribeProxies();
   });
 
-  describe('on lib project', function () {
-    beforeEach('creating package and network files', function () {
-      this.packageFile = new ZosPackageFile('test/mocks/packages/package-empty-lib.zos.json')
-      this.networkFile = this.packageFile.networkFile(network)
-    })
-
-    shouldDescribeLib();
-    shouldDescribeVersion();
-    shouldDescribeContracts();
-    shouldNotModifyPackage();
-  });
 });

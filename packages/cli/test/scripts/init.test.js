@@ -30,11 +30,6 @@ contract('init script', function() {
       this.packageFile.isLightweight.should.eq(!publish)
     });
 
-    it('should not be marked as lib', async function () {
-      await init({ publish, name, version, packageFile: this.packageFile });
-      this.packageFile.isLib.should.be.false
-    });
-
     it('should have the appropriate app name', async function() {
       await init({ publish, name, version, packageFile: this.packageFile });
       this.packageFile.hasName(name).should.be.true

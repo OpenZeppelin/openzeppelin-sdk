@@ -92,12 +92,6 @@ contract('create script', function([_, owner]) {
         .should.be.rejectedWith(/Contract NotExists not found/);
     });
 
-    it('should refuse to create a proxy for a lib project', async function() {
-      this.packageFile.lib = true
-      await createProxy({ contractAlias, network, txParams, networkFile: this.networkFile })
-        .should.be.rejectedWith('Cannot create a proxy for a package project');
-    });
-
     it('should refuse to create a proxy for an undeployed contract', async function() {
       const customContractsData = [{ name: contractName, alias: 'NotDeployed' }]
       await add({ contractsData: customContractsData, packageFile: this.packageFile });

@@ -50,12 +50,6 @@ contract('link script', function() {
     this.shouldHaveDependency('mock-stdlib-2', '1.2.0');
   });
 
-  it('should refuse to set a dependency for a lib project', async function () {
-    this.packageFile.lib = true
-    await linkLibs({ libs: ['mock-stdlib@1.1.0'], packageFile: this.packageFile })
-      .should.be.rejectedWith('Package projects cannot use other packages.');
-  });
-
   it('should raise an error if requested version of dependency does not match its package version', async function () {
     await linkLibs({ libs: ['mock-stdlib-invalid@1.0.0'], packageFile: this.packageFile })
       .should.be.rejectedWith('Required dependency version 1.0.0 does not match version 2.0.0')

@@ -16,13 +16,6 @@ contract('unlink script', function() {
         .should.be.rejectedWith('At least one dependency name must be provided.')
     })
 
-    it('throws an error if project is a library', async function () {
-      this.packageFile.lib = true
-      const libNames = ['mock-stdlib', 'mock-stdlib-2']
-      await unlink({ libNames, packageFile: this.packageFile })
-        .should.be.rejectedWith('Package projects cannot use other packages.')
-    })
-
     it('throws an error if project library does not exist', async function () {
       const libName = 'bulbasaur-lib2'
       await unlink({ libNames: [libName], packageFile: this.packageFile })
