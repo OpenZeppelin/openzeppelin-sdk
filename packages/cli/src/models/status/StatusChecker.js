@@ -1,7 +1,7 @@
 import _ from 'lodash'
 import { promisify } from 'util'
 
-import { Logger, LibProject, AppProject, bytecodeDigest, semanticVersionEqual, replaceSolidityLibAddress, isSolidityLib } from 'zos-lib'
+import { Logger, AppProject, bytecodeDigest, semanticVersionEqual, replaceSolidityLibAddress, isSolidityLib } from 'zos-lib'
 import EventsFilter from './EventsFilter'
 import StatusFetcher from './StatusFetcher'
 import StatusComparator from './StatusComparator'
@@ -33,9 +33,7 @@ export default class StatusChecker {
       const { packageAddress, appAddress, version } = this.networkFile
 
       if (!this._project) {
-        this._project = this.networkFile.isLib
-          ? await LibProject.fetchOrDeploy(this.networkFile.version, this.txParams, { packageAddress })
-          : await AppProject.fetchOrDeploy(this.packageName,  this.networkFile.version, this.txParams, { appAddress, packageAddress })
+        this._project = await AppProject.fetchOrDeploy(this.packageName,  this.networkFile.version, this.txParams, { appAddress, packageAddress })
       }
 
       return this._project
@@ -47,11 +45,7 @@ export default class StatusChecker {
   async call() {
     await this.setProject()
     log.info(`Comparing status of project ${(await this._project.getProjectPackage()).address} ...\n`)
-    if (this.networkFile.isLib) {
-      await this.checkLib()
-    } else {
-      await this.checkApp()
-    }
+    await this.checkApp()
     this.visitor.onEndChecking()
   }
 
@@ -62,11 +56,6 @@ export default class StatusChecker {
     await this.checkImplementations()
     await this.checkProxies()
     await this.checkDependencies()
-  }
-
-  async checkLib() {
-    await this.checkProvider()
-    await this.checkImplementations()
   }
 
   async checkVersion() {
@@ -100,8 +89,8 @@ export default class StatusChecker {
       implementationsInfo.map(async info => {
         const { address } = info;
         const bytecode = await promisify(web3.eth.getCode.bind(web3.eth))(address);
-        return await (isSolidityLib(bytecode) 
-          ? this._checkRemoteSolidityLibImplementation(info, bytecode) 
+        return await (isSolidityLib(bytecode)
+          ? this._checkRemoteSolidityLibImplementation(info, bytecode)
           : this._checkRemoteContractImplementation(info, bytecode));
       })
     )

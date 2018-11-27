@@ -1,4 +1,4 @@
-import { AppProject, LibProject, SimpleProject } from "zos-lib";
+import { AppProject, SimpleProject } from "zos-lib";
 import _ from 'lodash';
 
 class BaseProjectDeployer {
@@ -43,21 +43,6 @@ export class SimpleProjectDeployer extends BaseProjectDeployer {
     })
 
     return this.project
-  }
-}
-
-export class LibProjectDeployer extends BasePackageProjectDeployer {
-  async fetchOrDeploy() {
-    try {
-      const packageAddress = this.packageAddress
-      this.project = await LibProject.fetchOrDeploy(this.requestedVersion, this.txParams, { packageAddress })
-      this._registerPackage(await this.project.getProjectPackage())
-      this._registerVersion(this.requestedVersion, await this.project.getCurrentDirectory())
-      return this.project
-    } catch(deployError) {
-      this._tryRegisterPartialDeploy(deployError)
-      if (!this.project) throw deployError
-    }
   }
 }
 

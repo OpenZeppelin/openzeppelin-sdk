@@ -8,7 +8,7 @@ import ControllerFor from '../models/network/ControllerFor';
  */
 export default async function(txParams = {}, networkFile = undefined) {
   const controller = new ControllerFor('test', txParams, networkFile)
-  if (!controller.isLib) await controller.deployLibs()
+  await controller.deployLibs()
   await controller.push()
 
   return controller.project
