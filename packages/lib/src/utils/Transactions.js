@@ -97,8 +97,8 @@ async function _sendTransaction(contractFn, args = [], txParams = {}) {
   }
 
   // Estimate gas for the call
-  const estimateGasTxParams = { ... txParams, ... contractFn.request(...args).params[0] };
-  const gas = await estimateActualGas(estimateGasTxParams);
+  const gas = await estimateActualGasFnCall(contractFn, args, txParams)
+
   return contractFn(...args, { gas, ... txParams });
 }
 
@@ -141,6 +141,20 @@ export async function estimateGas(txParams, retries = RETRY_COUNT) {
     if (retries <= 0) throw Error(error);
     await sleep(RETRY_SLEEP_TIME);
     return await estimateGas(txParams, retries - 1);
+  }
+}
+
+export async function estimateActualGasFnCall(contractFn, args, txParams, retries = RETRY_COUNT) {
+  // Retry if estimate fails. This could happen because we are depending
+  // on a previous transaction being mined that still hasn't reach the node
+  // we are working with, if the txs are routed to different nodes.
+  // See https://github.com/zeppelinos/zos/issues/192 for more info.
+  try {
+    return await calculateActualGas(await contractFn.estimateGas(...args, txParams))
+  } catch(error) {
+    if (retries <= 0) throw Error(error);
+    await sleep(RETRY_SLEEP_TIME);
+    return estimateActualGasFnCall(contractFn, args, txParams, retries - 1);
   }
 }
 

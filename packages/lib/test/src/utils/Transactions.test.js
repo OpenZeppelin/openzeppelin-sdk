@@ -131,18 +131,18 @@ contract('Transactions', function([_account1, account2]) {
     });
 
     it('retries estimating gas', async function () {
-      sinon.stub(web3.eth, 'estimateGas')
-        .onFirstCall().yields(new Error('gas required exceeds allowance or always failing transaction'), null)
-        .yields(null, 800000)
+      const stub = sinon.stub(this.instance.initialize, 'estimateGas')
+      _.times(3, i => stub.onCall(i).throws('Error', 'gas required exceeds allowance or always failing transaction'))
+      stub.returns(800000)
 
       const { tx } = await sendTransaction(this.instance.initialize, [42, 'foo', [1,2,3]]);
       assertGas(tx, 800000 * 1.25 + 15000);
     });
 
     it('retries estimating gas up to 3 times', async function () {
-      const stub = sinon.stub(web3.eth, 'estimateGas')
-      _.times(4, i => stub.onCall(i).yields(new Error('gas required exceeds allowance or always failing transaction'), null))
-      stub.yields(null, 800000)
+      const stub = sinon.stub(this.instance.initialize, 'estimateGas')
+      _.times(4, i => stub.onCall(i).throws('Error', 'gas required exceeds allowance or always failing transaction'))
+      stub.returns(800000)
 
       await sendTransaction(this.instance.initialize, [42, 'foo', [1,2,3]]).should.be.rejectedWith(/always failing transaction/);
     });
