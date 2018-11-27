@@ -296,6 +296,7 @@ contract('push script', function([_, owner]) {
         const mockStdlibPackage = new ZosPackageFile('test/mocks/mock-stdlib/zos.json');
         mockStdlibPackage.version = newVersion;
         sinon.stub(Dependency.prototype, 'getPackageFile').callsFake(() => mockStdlibPackage);
+        sinon.stub(Dependency.prototype, 'getNpmFile').callsFake(() => ({ version: '1.2.0' }));
 
         await this.dependencyPackage.newVersion(newVersion)
         this.dependencyGetNetworkFileStub.callsFake(() => ({ packageAddress: this.dependencyPackage.address, version: newVersion }));
@@ -436,7 +437,7 @@ contract('push script', function([_, owner]) {
 
       it('should fail to push', async function () {
         await push({ network, txParams, networkFile: this.networkFile })
-          .should.be.rejectedWith(/Required dependency version 1.0.0 does not match version 2.0.0/)
+          .should.be.rejectedWith(/requires package version 1.0.0, but 1.1.0 was found/)
       });
     })
 

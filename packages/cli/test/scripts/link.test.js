@@ -56,9 +56,10 @@ contract('link script', function() {
       .should.be.rejectedWith('Package projects cannot use other packages.');
   });
 
-  it('should raise an error if requested version of dependency does not match its package version', async function () {
-    await linkLibs({ libs: ['mock-stdlib-invalid@1.0.0'], packageFile: this.packageFile })
-      .should.be.rejectedWith('Required dependency version 1.0.0 does not match version 2.0.0')
+  it('should allow mismatching npm and zos versions', async function () {
+    // mock-stdlib-invalid has npm version 1.1.0 but zos version 2.0.0
+    await linkLibs({ libs: ['mock-stdlib-invalid@1.1.0'], packageFile: this.packageFile });
+    this.shouldHaveDependency('mock-stdlib', '1.1.0');
   });
 
   it('should install the dependency if a valid version range is requested', async function () {
@@ -73,7 +74,7 @@ contract('link script', function() {
 
   it('should raise an error if requested version range does not match its package version', async function () {
     await linkLibs({ libs: ['mock-stdlib@~1.0.0'], packageFile: this.packageFile })
-      .should.be.rejectedWith('Required dependency version ~1.0.0 does not match version 1.1.0')
+      .should.be.rejectedWith('mock-stdlib requires package version ~1.0.0, but 1.1.0 was found.')
   });
 
   it('should raise an error if requested version of dependency lacks zosversion identifier', async function () {
