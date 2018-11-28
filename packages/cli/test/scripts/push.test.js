@@ -22,7 +22,7 @@ const WithLibraryImplV1 = Contracts.getFromLocal('WithLibraryImplV1');
 const PackageContract = Contracts.getFromNodeModules('zos-lib', 'Package');
 const ImplementationDirectory = Contracts.getFromNodeModules('zos-lib', 'ImplementationDirectory');
 
-contract.only('push script', function([_, owner]) {
+contract('push script', function([_, owner]) {
   const network = 'test';
   const txParams = { from: owner }
   const defaultVersion = '1.1.0';

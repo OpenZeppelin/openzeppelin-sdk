@@ -7,7 +7,6 @@ import * as check from '../../src/scripts/check';
 import * as compare from '../../src/scripts/compare';
 import * as create from '../../src/scripts/create';
 import * as freeze from '../../src/scripts/freeze';
-import * as initLib from '../../src/scripts/init-lib';
 import * as init from '../../src/scripts/init';
 import * as link from '../../src/scripts/link';
 import * as unlink from '../../src/scripts/unlink';
@@ -53,7 +52,6 @@ exports.stubCommands = function () {
     this.compare = sinon.stub(compare, 'default')
     this.create = sinon.stub(create, 'default')
     this.freeze = sinon.stub(freeze, 'default')
-    this.initLib = sinon.stub(initLib, 'default')
     this.init = sinon.stub(init, 'default')
     this.link = sinon.stub(link, 'default')
     this.unlink = sinon.stub(unlink, 'default')
@@ -83,7 +81,6 @@ exports.stubCommands = function () {
     this.compare.restore()
     this.create.restore()
     this.freeze.restore()
-    this.initLib.restore()
     this.init.restore()
     this.link.restore()
     this.unlink.restore()

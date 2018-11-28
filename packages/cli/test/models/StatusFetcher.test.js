@@ -36,21 +36,6 @@ contract('StatusFetcher', async function([_, owner, anotherAddress]) {
     testDependencies();
   });
 
-  describe('lib', function () {
-    beforeEach('initializing network file and status checker', async function () {
-      init.call(this, 'test/mocks/packages/package-empty-lib.zos.json');
-    })
-  
-    beforeEach('deploying a lib', async function () {
-      await push({ network, txParams, networkFile: this.networkFile })
-      this.project = await this.checker.setProject()
-      this.directory = await this.project.getCurrentDirectory()
-    })
-  
-    testImplementations();
-    testProvider();
-  });
-
   function init(fileName) {
     this.packageFile = new ZosPackageFile(fileName)
     this.networkFile = this.packageFile.networkFile(network)
