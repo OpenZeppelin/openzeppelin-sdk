@@ -4,8 +4,10 @@
     "target": "es5",
     "allowJs": true,
     "checkJs": false,
+    "strict": false,
+    "esModuleInterop": true,
     "lib": [
-      "es6"
+      "es2015"
     ]
   },
   "exclude": [
