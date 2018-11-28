@@ -7,9 +7,12 @@
   "license": "MIT",
   "scripts": {
     "test": "scripts/test.sh",
-    "prepare": "rm -rf build/contracts && truffle compile && rm -rf lib && babel src --out-dir lib",
     "prepublishOnly": "echo 'Removing mock contracts...' && grep -hoP '^\\s*contract \\K(\\w+)' contracts/mocks/*.sol | sort | uniq | xargs -t -I% rm build/contracts/%.json",
-    "watch": "babel src -w -d lib"
+    "compile-contracts": "rm -rf build/contracts && truffle compile",
+    "compile-babel": "rm -rf lib && babel src --out-dir lib",
+    "compile-ts": "rm -rf lib && tsc",
+    "prepare": "npm run compile-contracts && npm run compile-ts",
+    "watch": "tsc -w"
   },
   "files": [
     "lib",

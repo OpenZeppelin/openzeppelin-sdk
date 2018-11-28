@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "target": "es5",
+    "allowJs": true,
+    "checkJs": false,
+    "lib": [
+      "es6"
+    ]
+  },
+  "exclude": [
+     "node_modules",
+     "**/*.spec.ts"
+  ]
+}
