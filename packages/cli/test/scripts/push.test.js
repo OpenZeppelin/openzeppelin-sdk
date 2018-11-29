@@ -456,7 +456,7 @@ contract('push script', function([_, owner]) {
       });
 
       it('should create custom deployment', async function () {
-        await push({ network, txParams, networkFile: this.networkFile, deployLibs: true });
+        await push({ network, txParams, networkFile: this.networkFile, deployDependencies: true });
         const app = await App.fetch(this.networkFile.appAddress);
         const packageInfo = await app.getPackage('mock-stdlib-unpublished');
         packageInfo.version.should.be.semverEqual('1.1.0');

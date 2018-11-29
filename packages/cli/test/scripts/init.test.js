@@ -51,7 +51,7 @@ contract('init script', function() {
     });
 
     it('should set dependency', async function () {
-      await init({ publish, name, version, libs: ['mock-stdlib@1.1.0'], packageFile: this.packageFile });     
+      await init({ publish, name, version, dependencies: ['mock-stdlib@1.1.0'], packageFile: this.packageFile });
       this.packageFile.getDependencyVersion('mock-stdlib').should.eq('1.1.0')
     });
 

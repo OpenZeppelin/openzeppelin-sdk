@@ -70,7 +70,7 @@ contract('set-admin script', function([_skipped, owner, newAdmin, anotherNewAdmi
     beforeEach('setup', async function() {
       this.packageFile = new ZosPackageFile('test/mocks/packages/package-with-undeployed-stdlib.zos.json')
       this.networkFile = this.packageFile.networkFile(network)
-      await push({ network, txParams, deployLibs: true, networkFile: this.networkFile })
+      await push({ network, txParams, deployDependencies: true, networkFile: this.networkFile })
 
       this.greeter1 = await createProxy({ packageName: 'mock-stdlib-undeployed', contractAlias: 'Greeter', network, txParams, networkFile: this.networkFile });
       this.greeter2 = await createProxy({ packageName: 'mock-stdlib-undeployed', contractAlias: 'Greeter', network, txParams, networkFile: this.networkFile });

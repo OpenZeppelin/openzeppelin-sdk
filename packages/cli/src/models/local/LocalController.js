@@ -18,6 +18,13 @@ export default class LocalController {
     this.packageFile = packageFile
   }
 
+  init(name, version, force = false, publish = false) {
+    this.initZosPackageFile(name, version, force)
+    Session.ignoreFile()
+    Truffle.init()
+    if (publish) this.packageFile.publish = publish
+  }
+
   initZosPackageFile(name, version, force = false) {
     if (this.packageFile.exists() && !force) {
       throw Error(`Cannot overwrite existing file ${this.packageFile.fileName}`)
@@ -71,6 +78,7 @@ export default class LocalController {
     }
   }
 
+  //Contract model
   validateAll() {
     const buildArtifacts = getBuildArtifacts();
     return _.every(_.map(this.packageFile.contractAliases, (contractAlias) => (
@@ -122,24 +130,19 @@ export default class LocalController {
     this.packageFile.write()
   }
 
-  init(name, version, force = false, publish = false) {
-    this.initZosPackageFile(name, version, force)
-    Session.ignoreFile()
-    Truffle.init()
-    if (publish) this.packageFile.publish = publish
-  }
-
-  async linkLibs(libs, installLibs = false) {
-    await Promise.all(libs.map(async libNameVersion => {
-      const dependency = installLibs
-        ? await Dependency.install(libNameVersion)
-        : Dependency.fromNameWithVersion(libNameVersion);
+  //DependencyController
+  async linkDependencies(dependencies, installDependencies = false) {
+    await Promise.all(dependencies.map(async depNameVersion => {
+      const dependency = installDependencies
+        ? await Dependency.install(depNameVersion)
+        : Dependency.fromNameWithVersion(depNameVersion);
       this.packageFile.setDependency(dependency.name, dependency.requirement);
     }))
   }
 
-  unlinkLibs(libNames) {
-    libNames
+  //DependencyController
+  unlinkDependencies(dependenciesNames) {
+    dependenciesNames
       .map(dep => Dependency.fromNameWithVersion(dep))
       .forEach(dep => this.packageFile.unsetDependency(dep.name))
   }

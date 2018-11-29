@@ -145,9 +145,9 @@ contract('StatusFetcher', async function([_, owner, anotherAddress]) {
 
       describe('when the app project has dependencies', function () {
         beforeEach('set project with multiple dependencies', async function () {
-          const libs = [`${this.dep1.name}@${this.dep1.version}`, `${this.dep2.name}@${this.dep2.version}`]
-          await link({ libs, packageFile: this.packageFile });
-          await push({ network, txParams, deployLibs: true, networkFile: this.networkFile });
+          const dependencies = [`${this.dep1.name}@${this.dep1.version}`, `${this.dep2.name}@${this.dep2.version}`]
+          await link({ dependencies, packageFile: this.packageFile });
+          await push({ network, txParams, deployDependencies: true, networkFile: this.networkFile });
           this.dep1 = { ...this.dep1, address: this.networkFile.getDependency(this.dep1.name).package }
           this.dep2 = { ...this.dep2, address: this.networkFile.getDependency(this.dep2.name).package }
         })

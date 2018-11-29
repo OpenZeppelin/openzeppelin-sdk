@@ -1,7 +1,7 @@
 'use strict';
 
 import _ from 'lodash';
-import { Contracts, Logger, AppProject, FileSystem as fs, Proxy, awaitConfirmations, hasBytecode, semanticVersionToString } from 'zos-lib';
+import { Contracts, Logger, FileSystem as fs, Proxy, awaitConfirmations, hasBytecode, semanticVersionToString } from 'zos-lib';
 import { flattenSourceCode, getStorageLayout, getBuildArtifacts, getSolidityLibNames } from 'zos-lib';
 import { validate, newValidationErrors, validationPasses } from 'zos-lib';
 
@@ -16,7 +16,6 @@ import Verifier from '../Verifier'
 const log = new Logger('NetworkAppController');
 
 export default class NetworkController {
-  //NetworkController
   constructor(localController, network, txParams, networkFile = undefined) {
     this.localController = localController;
     this.txParams = txParams;
@@ -65,7 +64,7 @@ export default class NetworkController {
     await statusFetcher.call()
   }
 
-  //DeployerController || Deployer model
+  //DeployerController
   async fetchOrDeploy(requestedVersion) {
     this.project = await this.getDeployer(requestedVersion).fetchOrDeploy()
     return this.project
@@ -84,12 +83,12 @@ export default class NetworkController {
 
     this._checkVersion()
     await this.fetchOrDeploy(this.packageVersion)
-    await this.handleLibsLink();
+    await this.handleDependenciesLink();
     
     this.checkNotFrozen();
     await this.uploadSolidityLibs(changedLibraries);
     await Promise.all([
-      this.uploadContracts(contracts), 
+      this.uploadContracts(contracts),
       this.unsetContracts()
     ])
 
@@ -111,7 +110,7 @@ export default class NetworkController {
     return (this.packageVersion !== this.currentVersion) && !this.isLightweight;
   }
 
-  //DeployerController
+  //Contract model
   _contractsListForPush(onlyChanged = false, changedLibraries = []) {
     const newVersion = this._newVersionRequired()
     return _(this.packageFile.contracts)
@@ -121,7 +120,7 @@ export default class NetworkController {
       .value()
   }
 
-  //DeployerController
+  //Contract model || SolidityLib model
   _solidityLibsForPush(onlyChanged = false) {
     const { contractNames, contractAliases } = this.packageFile
     const libNames = this._getAllSolidityLibNames(contractNames)
@@ -140,14 +139,14 @@ export default class NetworkController {
       });
   }
 
-  //DeployerController
+  //Contract model || SolidityLib model
   async uploadSolidityLibs(libs) {
     await allPromisesOrError(
       libs.map(lib => this._uploadSolidityLib(lib))
     )
   }
 
-  //DeployerController
+  //Contract model || SolidityLib model
   async _uploadSolidityLib(libClass) {
     const libName = libClass.contractName
     log.info(`Uploading ${libName} library...`)
@@ -155,14 +154,14 @@ export default class NetworkController {
     this.networkFile.addSolidityLib(libName, libInstance)
   }
 
-  //DeployerController
+  //Contract model
   async uploadContracts(contracts) {
     await allPromisesOrError(
       contracts.map(([contractAlias, contractClass]) => this.uploadContract(contractAlias, contractClass))
     )
   }
 
-  //DeployerController
+  //Contract model
   async uploadContract(contractAlias, contractClass) {
     try {
       const currentContractLibs = getSolidityLibNames(contractClass.bytecode)
@@ -180,7 +179,7 @@ export default class NetworkController {
     }
   }
 
-  //DeployerController
+  //Contract model || SolidityLib model
   async _unsetSolidityLibs() {
     const { contractNames } = this.packageFile
     const libNames = this._getAllSolidityLibNames(contractNames)
@@ -189,7 +188,7 @@ export default class NetworkController {
     )
   }
 
-  //DeployerController
+  //Contract model || SolidityLib model
   async _unsetSolidityLib(libName) {
     try {
       log.info(`Removing ${libName} library`);
@@ -200,13 +199,13 @@ export default class NetworkController {
     }
   }
 
-  //DeployerController
+  //Contract model || SolidityLib model
   _hasChangedLibraries(contractClass, changedLibraries) {
     const libNames = getSolidityLibNames(contractClass.bytecode)
     return !_.isEmpty(_.intersection(changedLibraries.map(c => c.contractName), libNames))
   }
 
-  //DeployerController
+  //Contract model || SolidityLib model
   _getAllSolidityLibNames(contractNames) {
     const libNames = contractNames.map(contractName => {
       const contractClass = Contracts.getFromLocal(contractName)
@@ -216,14 +215,14 @@ export default class NetworkController {
     return _.uniq(_.flatten(libNames))
   }
 
-  //DeployerController
+  //Contract model
   async unsetContracts() {
     await allPromisesOrError(
       this.networkFile.contractAliasesMissingFromPackage().map(contractAlias => this.unsetContract(contractAlias))
     )
   }
 
-  //DeployerController
+  //Contract model
   async unsetContract(contractAlias) {
     try {
       log.info(`Removing ${contractAlias} contract`);
@@ -304,7 +303,7 @@ export default class NetworkController {
     }
   }
 
-  // TODO: move to utils folder or sth
+  // TODO: move to utils folder or somewhere else
   _handleErrorMessage(msg, throwIfFail = false) {
     if (throwIfFail) {
       throw Error(msg);
@@ -345,7 +344,7 @@ export default class NetworkController {
     return !this.isLocalContract(contractAlias) || this.networkFile.hasContract(contractAlias);
   }
 
-  //NetworkController || ContractController
+  //VerifierController
   async verifyAndPublishContract(contractAlias, optimizer, optimizerRuns, remote, apiKey) {
     const contractName = this.packageFile.contract(contractAlias)
     const { compilerVersion, sourcePath } = this.localController.getContractSourcePath(contractAlias)
@@ -368,12 +367,13 @@ export default class NetworkController {
     await this.project.freeze()
     this.networkFile.frozen = true
   }
-  //NetworkController
+
+  //DeployerController
   get isLightweight() {
     return this.packageFile.isLightweight && !this.appAddress;
   }
 
-  //NetworkController
+  //DeployerController
   getDeployer(requestedVersion) {
     return this.isLightweight
       ? new SimpleProjectDeployer(this, requestedVersion) 
@@ -390,7 +390,7 @@ export default class NetworkController {
     return this.project.getApp()
   }
 
-  //NetworkController
+  //DeployerController
   async toFullApp() {
     if (this.appAddress) {
       log.info(`Project is already published to ${this.network}`);
@@ -568,15 +568,15 @@ export default class NetworkController {
     return ownedProxies;
   }
 
-  //DependencyController
-  async deployLibs() {
+  //Dependency Controller
+  async deployDependencies() {
     await allPromisesOrError(
-      _.map(this.packageFile.dependencies, (version, dep) => this.deployLibIfNeeded(dep, version))
+      _.map(this.packageFile.dependencies, (version, dep) => this.deployDependencyIfNeeded(dep, version))
     )
   }
 
   //DependencyController
-  async deployLibIfNeeded(depName, depVersion) {
+  async deployDependencyIfNeeded(depName, depVersion) {
     try {
       const dependency = new Dependency(depName, depVersion)
       if (dependency.isDeployedOnNetwork(this.network) || this.networkFile.dependencyHasMatchingCustomDeploy(depName)) return
@@ -593,15 +593,15 @@ export default class NetworkController {
   }
 
   //DependencyController
-  async handleLibsLink() {
+  async handleDependenciesLink() {
     await allPromisesOrError(_.concat(
-      _.map(this.packageFile.dependencies, (version, dep) => this.linkLib(dep, version)),
-      _.map(this.networkFile.dependenciesNamesMissingFromPackage(), dep => this.unlinkLib(dep))
+      _.map(this.packageFile.dependencies, (version, dep) => this.linkDependency(dep, version)),
+      _.map(this.networkFile.dependenciesNamesMissingFromPackage(), dep => this.unlinkDependency(dep))
     ))
   }
 
   //DependencyController
-  async unlinkLib(depName) {
+  async unlinkDependency(depName) {
     try {
       if (await this.project.hasDependency(depName)) {
         log.info(`Unlinking dependency ${depName}`);
@@ -614,7 +614,7 @@ export default class NetworkController {
   }
 
   //DependencyController
-  async linkLib(depName, depVersion) {
+  async linkDependency(depName, depVersion) {
     try {
       if (this.networkFile.dependencyHasMatchingCustomDeploy(depName)) {
         log.info(`Using custom deployment of ${depName}`);
@@ -635,6 +635,7 @@ export default class NetworkController {
     }
   }
 
+  // Contract model
   _errorForContractDeployed(packageName, contractAlias) {
     if (packageName === this.packageFile.name) {
       return this._errorForLocalContractDeployed(contractAlias)

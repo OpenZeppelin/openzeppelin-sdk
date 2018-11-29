@@ -14,8 +14,8 @@ const register = program => program
   .withPushOptions()
   .action(action)
 
-async function action(libNames, options) {
-  await unlink({ libNames })
+async function action(dependenciesNames, options) {
+  await unlink({ dependenciesNames })
   await push.tryAction(options)
 }
 

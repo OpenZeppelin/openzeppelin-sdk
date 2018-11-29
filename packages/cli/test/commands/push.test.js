@@ -8,7 +8,7 @@ contract('push command', function() {
   stubCommands()
 
   itShouldParse('should call push script with options', 'push', 'zos push --network test --skip-compile -d --reset -f', function(push) {
-    push.should.have.been.calledWithExactly({ force: true, deployLibs: true, reupload: true, network: 'test', txParams: {} })
+    push.should.have.been.calledWithExactly({ force: true, deployDependencies: true, reupload: true, network: 'test', txParams: {} })
   })
 
 })

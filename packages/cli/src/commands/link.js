@@ -15,9 +15,9 @@ const register = program => program
   .withPushOptions()
   .action(action)
 
-async function action(libs, options) {
-  const installLibs = options.install
-  await linkStdlib({ libs, installLibs })
+async function action(dependencies, options) {
+  const installDependencies = options.install
+  await linkStdlib({ dependencies, installDependencies })
   await push.tryAction(options)
 }
 
