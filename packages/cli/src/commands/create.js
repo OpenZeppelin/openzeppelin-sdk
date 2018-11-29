@@ -1,7 +1,7 @@
 'use strict';
 
 import createProxy from '../scripts/create'
-import runWithTruffle from '../utils/runWithTruffle'
+import runWithZWeb3 from '../utils/runWithZWeb3'
 import { parseInit } from '../utils/input'
 import { fromContractFullName } from '../utils/naming';
 import _ from 'lodash';
@@ -25,7 +25,7 @@ async function action(contractFullName, options) {
   const { force } = options
   const { contract: contractAlias, package: packageName } = fromContractFullName(contractFullName)
   const args = _.pickBy({ packageName, contractAlias, initMethod, initArgs, force })
-  await runWithTruffle(async (opts) => await createProxy({ ... args, ... opts }), options)
+  await runWithZWeb3(async (opts) => await createProxy({ ... args, ... opts }), options)
 }
 
 export default { name, signature, description, register, action }

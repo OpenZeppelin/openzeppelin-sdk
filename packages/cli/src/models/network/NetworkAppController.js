@@ -158,7 +158,8 @@ export default class NetworkAppController extends NetworkBaseController {
         version: semanticVersionToString(packageVersion)
       }));
     } catch(error) {
-      throw Error(`Proxy ${toContractFullName(proxy.package, proxy.contract)} at ${proxy.address} failed to update with error: ${error.message}`)
+      error.message = `Proxy ${toContractFullName(proxy.package, proxy.contract)} at ${proxy.address} failed to update with error: ${error.message}`
+      throw error
     }
   }
 
@@ -235,7 +236,8 @@ export default class NetworkAppController extends NetworkBaseController {
         this.networkFile.setDependency(depName, depInfo)
       }
     } catch(error) {
-      throw Error(`Failed to link dependency ${depName}@${depVersion} with error: ${error.message}`)
+      error.message = `Failed to link dependency ${depName}@${depVersion} with error: ${error.message}`
+      throw error
     }
   }
 

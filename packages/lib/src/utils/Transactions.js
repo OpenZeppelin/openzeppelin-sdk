@@ -4,11 +4,11 @@
 // but is only part of the next branch in truffle, so we are handling it manually.
 // (see https://github.com/trufflesuite/truffle-contract/pull/95/files#diff-26bcc3534c5a2e62e22643287a7d3295R145)
 
-import { promisify } from 'util'
-import sleep from '../helpers/sleep';
-import BN from 'bignumber.js';
-import Contracts from './Contracts'
 import axios from 'axios'
+import BN from 'bignumber.js'
+import sleep from '../helpers/sleep'
+import ZWeb3 from '../artifacts/ZWeb3'
+import Contracts from './Contracts'
 
 // Cache, exported for testing
 export const state = { };
@@ -41,7 +41,7 @@ export async function sendTransaction(contractFn, args = [], txParams = {}, retr
   try {
     return await _sendTransaction(contractFn, args, txParams)
   } catch (error) {
-    if (!error.message.match(/nonce too low/) || retries <= 0) throw Error(error)
+    if (!error.message.match(/nonce too low/) || retries <= 0) throw error
     return sendTransaction(contractFn, args, txParams, retries - 1)
   }
 }
@@ -59,7 +59,7 @@ export async function deploy(contract, args = [], txParams = {}, retries = RETRY
   try {
     return await _deploy(contract, args, txParams)
   } catch (error) {
-    if (!error.message.match(/nonce too low/) || retries <= 0) throw Error(error)
+    if (!error.message.match(/nonce too low/) || retries <= 0) throw error
     return deploy(contract, args, txParams, retries - 1)
   }
 }
@@ -79,8 +79,8 @@ export async function sendDataTransaction(contract, txParams) {
     return contract.sendTransaction(txParams)
   }
   // Estimate gas for the call and run the tx
-  const gas = await estimateActualGas({ to: contract.address, ... txParams });
-  return contract.sendTransaction({ gas, ... txParams });
+  const gas = await estimateActualGas({ to: contract.address, ...txParams });
+  return contract.sendTransaction({ gas, ...txParams });
 }
 
 /**
@@ -99,7 +99,7 @@ async function _sendTransaction(contractFn, args = [], txParams = {}) {
   // Estimate gas for the call
   const gas = await estimateActualGasFnCall(contractFn, args, txParams)
 
-  return contractFn(...args, { gas, ... txParams });
+  return contractFn(...args, { gas, ...txParams });
 }
 
 /**
@@ -112,31 +112,22 @@ async function _sendTransaction(contractFn, args = [], txParams = {}) {
 async function _deploy(contract, args = [], txParams = {}) {
   // If gas is set explicitly, use it
   if (txParams.gas) {
-    return contract.new(... args, txParams);
+    return contract.new(...args, txParams)
   }
 
-  // Required by truffle
-  await contract.detectNetwork();
-
-  // Get raw binary transaction for creating the contract
-  const txOpts = { data: contract.binary, ... txParams };
-  const txData = web3.eth.contract(contract.abi).new.getData(...args, txOpts);
-
-  // Deploy the contract using estimated gas
-  const gas = await estimateActualGas({ data: txData, ... txParams})
-  return contract.new(...args, { gas, ... txParams });
+  const data = contract.getData(args, txParams)
+  const gas = await estimateActualGas({ data, ...txParams })
+  return contract.new(...args, { gas, ...txParams })
 }
 
 export async function estimateGas(txParams, retries = RETRY_COUNT) {
-  // Use json-rpc method estimateGas to retrieve estimated value
-  const estimateFn = promisify(web3.eth.estimateGas.bind(web3.eth));
-  
   // Retry if estimate fails. This could happen because we are depending
   // on a previous transaction being mined that still hasn't reach the node
   // we are working with, if the txs are routed to different nodes.
   // See https://github.com/zeppelinos/zos/issues/192 for more info.
   try {
-    return await estimateFn(txParams);
+    // Use json-rpc method estimateGas to retrieve estimated value
+    return await ZWeb3.estimateGas(txParams)
   } catch (error) {
     if (retries <= 0) throw Error(error);
     await sleep(RETRY_SLEEP_TIME);
@@ -159,22 +150,16 @@ export async function estimateActualGasFnCall(contractFn, args, txParams, retrie
 }
 
 export async function estimateActualGas(txParams) {
-  const estimatedGas = await estimateGas(txParams);
-  return await calculateActualGas(estimatedGas);
+  const estimatedGas = await estimateGas(txParams)
+  return calculateActualGas(estimatedGas)
 }
 
-async function getNodeVersion () {
+
+async function getNodeVersion() {
   if (!state.nodeInfo) {
-    state.nodeInfo = await promisify(web3.version.getNode.bind(web3.version))();
+    state.nodeInfo = await ZWeb3.getNode()
   }
   return state.nodeInfo;
-}
-
-async function getNetwork() {
-  if (!state.network) {
-    state.network = await promisify(web3.version.getNetwork.bind(global.web3.version))();
-  }
-  return state.network;
 }
 
 async function getETHGasStationPrice() {
@@ -193,24 +178,14 @@ async function getETHGasStationPrice() {
 }
 
 async function fixGasPrice(txParams) {
-  const network = await getNetwork();
+  const gasPrice = txParams.gasPrice || Contracts.getArtifactsDefaults().gasPrice
 
-  const gasPrice = txParams.gasPrice || Contracts.artifactsDefaults().gasPrice;
-
-  if (TRUFFLE_DEFAULT_GAS_PRICE.eq(gasPrice) || !gasPrice) {
-    if (network != '1') {
-      return;
-    }
-
+  if ((TRUFFLE_DEFAULT_GAS_PRICE.eq(gasPrice) || !gasPrice) && await ZWeb3.isMainnet()) {
     txParams.gasPrice = await getETHGasStationPrice()
-
     if (TRUFFLE_DEFAULT_GAS_PRICE.lte(txParams.gasPrice)) {
-        throw new Error("The current gas price estimate from ethgasstation.info is over 100 gwei. If you do want to send a transaction with a gas price this high, please set it manually in your truffle.js configuration file.")
+      throw new Error("The current gas price estimate from ethgasstation.info is over 100 gwei. If you do want to send a transaction with a gas price this high, please set it manually in your truffle.js configuration file.")
     }
-
   }
-
-  return;
 }
 
 export async function isGanacheNode () {
@@ -220,14 +195,14 @@ export async function isGanacheNode () {
 
 async function getBlockGasLimit () {
   if (state.block) return state.block.gasLimit;
-  state.block = await promisify(web3.eth.getBlock.bind(web3.eth))('latest');
+  state.block = await ZWeb3.getLatestBlock()
   return state.block.gasLimit;
 }
 
 async function calculateActualGas(estimatedGas) {
   const blockLimit = await getBlockGasLimit();
   let gasToUse = parseInt(estimatedGas * GAS_MULTIPLIER);
-  // Ganache has a bug (https://github.com/trufflesuite/ganache-core/issues/26) that causes gas 
+  // Ganache has a bug (https://github.com/trufflesuite/ganache-core/issues/26) that causes gas
   // refunds to be included in the gas estimation; but the transaction needs to send the total
   // amount of gas to work. Geth and Parity return the correct value, so here we are adding the
   // value of the refund of setting a storage position to zero (which we do on unsetImplementation).
@@ -235,20 +210,19 @@ async function calculateActualGas(estimatedGas) {
   // such as cleaning more storage positions or selfdestructing a contract. We should be able to fix
   // this once the issue is resolved.
   if (await isGanacheNode()) gasToUse += 15000;
-  return gasToUse >= blockLimit ? (blockLimit-1) : gasToUse;
+  return gasToUse >= blockLimit ? (blockLimit - 1) : gasToUse;
 }
 
 export async function awaitConfirmations(transactionHash, confirmations = 12, interval = 1000, timeout = (10 * 60 * 1000)) {
   if (await isGanacheNode()) return;
-  const getTxBlock = () => (promisify(web3.eth.getTransactionReceipt.bind(web3.eth))(transactionHash).then(r => r.blockNumber));
-  const getCurrentBlock = () => (promisify(web3.eth.getBlock.bind(web3.eth))('latest').then(b => b.number));
+  const getTxBlock = () => (ZWeb3.getTransactionReceipt(transactionHash).then(r => r.blockNumber));
   const now = +(new Date());
 
   while (true) {
     if ((new Date() - now) > timeout) {
       throw new Error(`Exceeded timeout of ${timeout / 1000} seconds awaiting confirmations for transaction ${transactionHash}`)
     }
-    const currentBlock = await getCurrentBlock();
+    const currentBlock = await ZWeb3.getLatestBlockNumber()
     const txBlock = await getTxBlock();
     if (currentBlock - txBlock >= confirmations) return true;
     await sleep(interval);
@@ -256,6 +230,6 @@ export async function awaitConfirmations(transactionHash, confirmations = 12, in
 }
 
 export async function hasBytecode(address) {
-  const bytecode = await promisify(web3.eth.getCode.bind(web3.eth))(address);
+  const bytecode = await ZWeb3.getCode(address)
   return bytecode.length > 2;
 }

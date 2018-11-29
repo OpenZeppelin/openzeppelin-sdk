@@ -1,17 +1,17 @@
-import { promisify } from 'util'
-import Contracts from '../utils/Contracts';
-import { toAddress, uint256ToAddress } from '../utils/Addresses';
-import { deploy as deployContract, sendTransaction } from "../utils/Transactions";
+import ZWeb3 from '../artifacts/ZWeb3'
+import Contracts from '../utils/Contracts'
+import { toAddress, uint256ToAddress } from '../utils/Addresses'
+import { deploy as deployContract, sendTransaction } from '../utils/Transactions'
 
 export default class Proxy {
   static at(address, txParams = {}) {
     const ProxyContract = Contracts.getFromLib('AdminUpgradeabilityProxy')
-    const contract = new ProxyContract(toAddress(address))
+    const contract = ProxyContract.at(toAddress(address))
     return new this(contract, txParams)
   }
 
   static async deploy(implementation, initData, txParams = {}) {
-    const contract = await deployContract(Contracts.getFromLib('AdminUpgradeabilityProxy'), [toAddress(implementation), initData || ""], txParams)
+    const contract = await deployContract(Contracts.getFromLib('AdminUpgradeabilityProxy'), [toAddress(implementation), initData || ''], txParams)
     return new this(contract, txParams)
   }
 
@@ -34,17 +34,17 @@ export default class Proxy {
   }
 
   async implementation() {
-    const position = web3.sha3('org.zeppelinos.proxy.implementation')
+    const position = ZWeb3.sha3('org.zeppelinos.proxy.implementation')
     return uint256ToAddress(await this.getStorageAt(position))
   }
 
   async admin() {
-    const position = web3.sha3('org.zeppelinos.proxy.admin')
+    const position = ZWeb3.sha3('org.zeppelinos.proxy.admin')
     return uint256ToAddress(await this.getStorageAt(position))
   }
 
   async getStorageAt(position) {
-    return promisify(web3.eth.getStorageAt.bind(web3.eth))(this.address, position)
+    return ZWeb3.getStorageAt(this.address, position)
   }
 
   async _checkAdmin() {

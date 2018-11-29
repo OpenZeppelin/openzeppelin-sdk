@@ -1,10 +1,7 @@
-import _ from 'lodash'
-import { promisify } from 'util'
-
-import { Logger, LibProject, AppProject, bytecodeDigest, semanticVersionEqual, replaceSolidityLibAddress, isSolidityLib } from 'zos-lib'
 import EventsFilter from './EventsFilter'
 import StatusFetcher from './StatusFetcher'
 import StatusComparator from './StatusComparator'
+import { ZWeb3, Logger, LibProject, AppProject, bytecodeDigest, semanticVersionEqual, replaceSolidityLibAddress, isSolidityLib } from 'zos-lib'
 
 const log = new Logger('StatusChecker')
 const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000'
@@ -40,7 +37,8 @@ export default class StatusChecker {
 
       return this._project
     } catch(error) {
-      throw Error(`Cannot fetch project contract from address ${this.networkFile.appAddress}.`, error)
+      error.message = `Cannot fetch project contract from address ${this.networkFile.appAddress}: ${error.message}`
+      throw error
     }
   }
 
@@ -99,7 +97,7 @@ export default class StatusChecker {
     await Promise.all(
       implementationsInfo.map(async info => {
         const { address } = info;
-        const bytecode = await promisify(web3.eth.getCode.bind(web3.eth))(address);
+        const bytecode = await ZWeb3.getCode(address)
         return await (isSolidityLib(bytecode) 
           ? this._checkRemoteSolidityLibImplementation(info, bytecode) 
           : this._checkRemoteContractImplementation(info, bytecode));

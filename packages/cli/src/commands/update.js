@@ -1,7 +1,7 @@
 'use strict';
 
 import update from '../scripts/update'
-import runWithTruffle from '../utils/runWithTruffle'
+import runWithZWeb3 from '../utils/runWithZWeb3'
 import { parseInit } from '../utils/input'
 import { fromContractFullName } from '../utils/naming'
 import _ from 'lodash'
@@ -33,7 +33,7 @@ async function action(contractFullNameOrAddress, options) {
   }
   
   const args = _.pickBy({ contractAlias, packageName, proxyAddress, initMethod, initArgs, all, force })
-  await runWithTruffle(async (opts) => await update({ ... args, ... opts }), options)
+  await runWithZWeb3(async (opts) => await update({ ... args, ... opts }), options)
 }
 
 export default { name, signature, description, register, action }

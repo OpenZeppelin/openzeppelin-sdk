@@ -13,7 +13,7 @@ import TestHelper from './models/TestHelper'
 
 // utils
 import naming from './utils/naming'
-import runWithTruffle from './utils/runWithTruffle'
+import runWithZWeb3 from './utils/runWithZWeb3'
 import log, { silent } from './utils/stdout'
 const stdout = { log, silent }
 
@@ -26,6 +26,6 @@ export {
   scripts,
   naming,
   stdout,
-  runWithTruffle,
+  runWithZWeb3,
   TestHelper,
 }

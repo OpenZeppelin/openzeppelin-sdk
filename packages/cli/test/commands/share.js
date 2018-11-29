@@ -21,7 +21,7 @@ import * as update from '../../src/scripts/update';
 import * as verify from '../../src/scripts/verify';
 import * as setAdmin from '../../src/scripts/set-admin';
 
-import * as runWithTruffle from '../../src/utils/runWithTruffle';
+import * as runWithZWeb3 from '../../src/utils/runWithZWeb3';
 import Session from '../../src/models/network/Session';
 import ErrorHandler from '../../src/models/errors/ErrorHandler';
 import program from '../../src/bin/program';
@@ -67,7 +67,7 @@ exports.stubCommands = function () {
     this.verify = sinon.stub(verify, 'default')
     this.setAdmin = sinon.stub(setAdmin, 'default')
     this.errorHandler = sinon.stub(ErrorHandler.prototype, 'call').callsFake(() => null)
-    this.runWithTruffle = sinon.stub(runWithTruffle, 'default').callsFake(function (script, options) {
+    this.runWithZWeb3 = sinon.stub(runWithZWeb3, 'default').callsFake(function (script, options) {
       const { network, from, timeout } = Session.getOptions(options)
       const txParams = from ? { from } : {}
       if (!network) throw Error('A network name must be provided to execute the requested action.')
@@ -97,7 +97,7 @@ exports.stubCommands = function () {
     this.verify.restore()
     this.setAdmin.restore()
     this.errorHandler.restore()
-    this.runWithTruffle.restore()
+    this.runWithZWeb3.restore()
     program.parseReset()
   })
 }

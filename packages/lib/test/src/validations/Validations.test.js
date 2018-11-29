@@ -64,7 +64,6 @@ contract('Validations', function () {
       validate('ExtendsFromShouldHaveInitialize').uninitializedBaseContracts.should.be.deep.eq(['WithInitialize', 'AnotherWithInitialize']);
     });    
   });
-
   
 });
   

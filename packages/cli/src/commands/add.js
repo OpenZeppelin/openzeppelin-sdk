@@ -3,7 +3,7 @@
 import push from './push'
 import add from '../scripts/add'
 import addAll from '../scripts/add-all'
-import Truffle from '../models/truffle/Truffle'
+import compile from '../models/compiler/compile'
 
 const name = 'add'
 const signature = `${name} [contractNames...]`
@@ -18,7 +18,7 @@ const register = program => program
   .action(action)
 
 async function action(contractNames, options) {
-  if(!options.skipCompile) await Truffle.compile()
+  if(!options.skipCompile) await compile()
   if(options.all) addAll({})
   else {
     const contractsData = contractNames.map(rawData => {

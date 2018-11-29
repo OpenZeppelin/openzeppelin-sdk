@@ -1,5 +1,5 @@
 import program from 'commander'
-import { DEFAULT_TIMEOUT } from '../utils/runWithTruffle';
+import { DEFAULT_TIMEOUT } from '../utils/runWithZWeb3';
 
 program.Command.prototype.withNetworkTimeoutOption = function () {
   return this

@@ -1,9 +1,9 @@
 import _ from 'lodash'
 import Session from '../network/Session'
-import Truffle from '../truffle/Truffle'
+import Dependency from '../dependency/Dependency'
+import ValidationLogger from '../../interface/ValidationLogger'
+import TruffleProjectInitializer from '../truffle/TruffleProjectInitializer'
 import { Contracts, Logger, FileSystem as fs, getBuildArtifacts, validate as validateContract, validationPasses} from 'zos-lib'
-import Dependency from '../dependency/Dependency';
-import ValidationLogger from '../../interface/ValidationLogger';
 
 const log = new Logger('LocalController');
 
@@ -21,7 +21,7 @@ export default class LocalBaseController {
   init(name, version, force = false) {
     this.initZosPackageFile(name, version, force)
     Session.ignoreFile()
-    Truffle.init()
+    TruffleProjectInitializer.call()
   }
 
   initZosPackageFile(name, version, force = false) {

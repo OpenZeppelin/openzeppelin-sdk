@@ -1,7 +1,7 @@
 'use strict';
 
 import verify from '../scripts/verify'
-import runWithTruffle from '../utils/runWithTruffle'
+import runWithZWeb3 from '../utils/runWithZWeb3'
 
 const name = 'verify'
 const signature = `${name} <contract-alias>`
@@ -23,7 +23,7 @@ function action(contractAlias, options) {
   if (optimizer && !optimizerRuns) {
     throw new Error('Cannot verify contract without defining optimizer runs')
   }
-  runWithTruffle(opts => verify(contractAlias, { ...options, ...opts }), options)
+  runWithZWeb3(opts => verify(contractAlias, { ...options, ...opts }), options)
 }
 
 export default { name, signature, description, register, action }

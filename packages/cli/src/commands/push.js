@@ -1,8 +1,9 @@
 'use strict';
 
 import push from '../scripts/push'
-import runWithTruffle from '../utils/runWithTruffle'
+import runWithZWeb3 from '../utils/runWithZWeb3'
 import _ from 'lodash'
+import compile from "../models/compiler/compile";
 
 const name = 'push'
 const signature = name
@@ -21,7 +22,8 @@ const register = program => program
 
 async function action(options) {
   const { skipCompile, deployDependencies: deployLibs, force, reset: reupload } = options
-  await runWithTruffle(
+  if(!options.skipCompile) await compile()
+  await runWithZWeb3(
     async (opts) => await push({ force, deployLibs, reupload, ... opts }),
     { compile: !skipCompile, ... options }
   )

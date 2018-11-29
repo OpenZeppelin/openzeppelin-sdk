@@ -1,7 +1,7 @@
 'use strict';
 
 import setAdmin from '../scripts/set-admin'
-import runWithTruffle from '../utils/runWithTruffle'
+import runWithZWeb3 from '../utils/runWithZWeb3'
 import { fromContractFullName } from '../utils/naming'
 import _ from 'lodash'
 
@@ -31,7 +31,7 @@ async function action(contractFullNameOrAddress, newAdmin, options) {
   }
   
   const args = _.pickBy({ contractAlias, packageName, proxyAddress, newAdmin })
-  await runWithTruffle(async (opts) => await setAdmin({ ... args, ... opts }), options)
+  await runWithZWeb3(async (opts) => await setAdmin({ ... args, ... opts }), options)
 }
 
 export default { name, signature, description, register, action }

@@ -1,7 +1,7 @@
 'use strict';
 
 import publish from '../scripts/publish'
-import runWithTruffle from '../utils/runWithTruffle'
+import runWithZWeb3 from '../utils/runWithZWeb3'
 import _ from 'lodash';
 
 const name = 'publish'
@@ -16,7 +16,7 @@ const register = program => program
   .action(action)
 
 async function action(options) {
-  await runWithTruffle(async (opts) => await publish(opts), options)
+  await runWithZWeb3(async (opts) => await publish(opts), options)
 }
 
 export default { name, signature, description, register, action }

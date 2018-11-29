@@ -166,16 +166,17 @@ export default class NetworkBaseController {
     try {
       const currentContractLibs = getSolidityLibNames(contractClass.bytecode)
       const libraries = this.networkFile.getSolidityLibs(currentContractLibs)
-      log.info(`Uploading ${contractClass.contractName} contract as ${contractAlias}`);
-      await contractClass.link(libraries);
-      const contractInstance = await this.project.setImplementation(contractClass, contractAlias);
+      log.info(`Uploading ${contractClass.contractName} contract as ${contractAlias}`)
+      contractClass.link(libraries)
+      const contractInstance = await this.project.setImplementation(contractClass, contractAlias)
       this.networkFile.addContract(contractAlias, contractInstance, {
         warnings: contractClass.warnings,
         types: contractClass.storageInfo.types,
         storage: contractClass.storageInfo.storage
       })
     } catch(error) {
-      throw Error(`${contractAlias} deployment failed with error: ${error.message}`)
+      error.message = `${contractAlias} deployment failed with error: ${error.message}`
+      throw error
     }
   }
 
@@ -193,7 +194,8 @@ export default class NetworkBaseController {
       await this.project.unsetImplementation(libName);
       this.networkFile.unsetSolidityLib(libName)
     } catch(error) {
-      throw Error(`Removal of ${libName} failed with error: ${error.message}`)
+      error.message = `Removal of ${libName} failed with error: ${error.message}`
+      throw error
     }
   }
 
@@ -223,7 +225,8 @@ export default class NetworkBaseController {
       await this.project.unsetImplementation(contractAlias);
       this.networkFile.unsetContract(contractAlias)
     } catch(error) {
-      throw Error(`Removal of ${contractAlias} failed with error: ${error.message}`)
+      error.message = `Removal of ${contractAlias} failed with error: ${error.message}`
+      throw error
     }
   }
 

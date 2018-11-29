@@ -1,7 +1,7 @@
 'use strict';
 
-import Truffle from '../models/truffle/Truffle'
-import check from '../scripts/check';
+import check from '../scripts/check'
+import compile from '../models/compiler/compile'
 
 const name = 'check'
 const signature = `${name} [contract]`
@@ -15,8 +15,8 @@ const register = program => program
   .action(action)
 
 async function action(contractAlias, options) {
-  if (!options.skipCompile) await Truffle.compile();
-  check({ contractAlias });
+  if (!options.skipCompile) await compile()
+  check({ contractAlias })
 }
 
 export default { name, signature, description, register, action }

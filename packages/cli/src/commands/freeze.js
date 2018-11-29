@@ -1,7 +1,7 @@
 'use strict'
 
 import freeze from '../scripts/freeze'
-import runWithTruffle from '../utils/runWithTruffle'
+import runWithZWeb3 from '../utils/runWithZWeb3'
 
 const name = 'freeze'
 const signature = name
@@ -15,7 +15,7 @@ const register = program => program
   .action(action)
 
 async function action(options) {
-  await runWithTruffle(async (opts) => await freeze(opts), options)
+  await runWithZWeb3(async (opts) => await freeze(opts), options)
 }
 
 export default { name, signature, description, register, action }

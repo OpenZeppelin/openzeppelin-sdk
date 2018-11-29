@@ -3,7 +3,7 @@
 import status from '../scripts/status'
 import pull from '../scripts/pull'
 import compare from '../scripts/compare'
-import runWithTruffle from '../utils/runWithTruffle'
+import runWithZWeb3 from '../utils/runWithZWeb3'
 
 const name = 'status'
 const signature = name
@@ -19,7 +19,7 @@ const register = program => program
   .action(action)
 
 async function action(options) {
-  await runWithTruffle(async (opts) => {
+  await runWithZWeb3(async (opts) => {
     if (options.fix) {
       await pull(opts)
     } else if (options.fetch) {

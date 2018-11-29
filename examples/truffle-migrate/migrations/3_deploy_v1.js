@@ -1,6 +1,6 @@
 // Load zos scripts and truffle wrapper function
 const { add, push, update } = require('zos').scripts;
-const runWithTruffle = require('zos').runWithTruffle;
+const runWithZWeb3 = require('zos').runWithZWeb3;
 
 async function deploy(options) {
   // Register v1 of MyContract in the zos project as MyContract
@@ -15,6 +15,6 @@ async function deploy(options) {
 
 module.exports = function(deployer, network, accounts) {
   deployer.then(() => 
-    runWithTruffle(deploy, { network, from: accounts[1], dontExitProcess: true })
+    runWithZWeb3(deploy, { network, from: accounts[1], dontExitProcess: true })
   );
 }

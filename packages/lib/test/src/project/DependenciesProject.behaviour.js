@@ -2,10 +2,10 @@
 require('../../setup')
 
 import Proxy from '../../../src/proxy/Proxy';
+import Package from '../../../src/package/Package';
 import Contracts from '../../../src/utils/Contracts';
-import { toAddress } from '../../../src/utils/Addresses';
-import { Package } from '../../../lib';
 import { LibProject } from '../../../src';
+import { toAddress } from '../../../src/utils/Addresses';
 
 const Impl = Contracts.getFromLocal('Impl');
 const DummyImplementation = Contracts.getFromLocal('DummyImplementation');
