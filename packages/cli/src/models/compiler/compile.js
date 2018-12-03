@@ -1,10 +1,11 @@
 import { Logger } from 'zos-lib'
+import TruffleConfig from '../truffle/TruffleConfig'
 
 const log = new Logger('compile')
 
 export default async function compile(config = undefined) {
-  log.info("Compiling contracts")
-  config = config || this.config()
+  log.info('Compiling contracts')
+  config = config || TruffleConfig.init()
   config.all = true
   const TruffleCompile = require('truffle-workflow-compile')
 
