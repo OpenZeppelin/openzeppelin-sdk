@@ -106,7 +106,7 @@ export default {
 
   async _getTransactionReceiptWithTimeout(tx, timeout, startTime) {
     try {
-      const receipt = await ZWeb3.getTransactionReceipt(tx)
+      const receipt = await this.getTransactionReceipt(tx)
       if (parseInt(receipt.status, 16) !== 0) return receipt
       throw new Error(`Transaction: ${tx} exited with an error (status 0).`)
     } catch (error) {
@@ -114,7 +114,7 @@ export default {
       else {
         await sleep(1000)
         const timeoutReached = timeout > 0 && new Date().getTime() - start > timeout
-        if (!timeoutReached) return await ZWeb3._getTransactionReceiptWithTimeout(tx, timeout, startTime)
+        if (!timeoutReached) return await this._getTransactionReceiptWithTimeout(tx, timeout, startTime)
         throw new Error(`Transaction ${tx} wasn't processed in ${timeout / 1000} seconds!`)
       }
     }
