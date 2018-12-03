@@ -1,7 +1,7 @@
 'use strict';
 
 import push from './push'
-import linkStdlib from '../scripts/link'
+import link from '../scripts/link'
 
 const name = 'link'
 const signature = `${name} [dependencies...]`
@@ -17,7 +17,7 @@ const register = program => program
 
 async function action(dependencies, options) {
   const installDependencies = options.install
-  await linkStdlib({ dependencies, installDependencies })
+  await link({ dependencies, installDependencies })
   await push.tryAction(options)
 }
 
