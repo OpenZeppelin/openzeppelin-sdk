@@ -107,7 +107,7 @@ contract ERC20Mintable is Initializable, ERC20, MinterRole {
 
 Whether it is OpenZeppelin or another EVM package, always make sure that the package is set up to handle upgradeable contracts.
 
-### Avoid initial values in fields declarations
+### Avoid initial values in field declarations
 
 Solidity allows defining initial values for fields when declaring them in a contract.
 

@@ -24,7 +24,7 @@ cd my-project
 truffle init
 ```
 
-Then, install the ZeppelinOS JavaScript Library running:
+Then, install the ZeppelinOS JavaScript library running:
 
 ```console
 npm install zos-lib

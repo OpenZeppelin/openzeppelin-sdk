@@ -39,7 +39,7 @@ network instead of your local development one. We have a guide about
 [Deploying to mainnet](mainnet) which can be useful.
 
 All known commands so far. Here comes what's new. If you want to share your
-package in ZeppelinOS, do it running the `publish` command:
+package in ZeppelinOS, do it by running the `publish` command:
 
 ```console
 zos publish --network <network>
@@ -51,7 +51,7 @@ half of the story, because for the package to be discovered and linked by
 other projects, you will also need to publish it to
 [npm](https://www.npmjs.com).
 
-If you haven't publish a package before, you will need to
+If you haven't published a package before, you will need to
 [sign up for an npm account](https://www.npmjs.com/signup).
 
 The npm package should include all the source and compiled contracts and the
@@ -71,7 +71,7 @@ ZeppelinOS configuration files, so add the following top-level field to the
 }
 ```
 
-Remember the `zos` configuration files are where ZeppelinOS keep track of 
+Remember that the `zos` configuration files are where ZeppelinOS keep track of 
 your contracts, the addresses of the instances you have created, and in this
 case the address of the EVM package you have published. This is how ZeppelinOS 
 solves the link of foreign projects that depend on yours.
@@ -80,7 +80,7 @@ Make sure to check that the rest of the fields describe your package
 accurately. It could be a good idea to remove the `main` field, if present,
 because it doesn't make sense for EVM packages. Also, if you have a
 `zos.dev-<network_id>.json` file, you can remove it now because it is specific for your
-local test environment.
+local test environment. You can also add this file pattern to your `.gitignore` file.
 
 With that, we should be ready. Log in to npm with:
 
