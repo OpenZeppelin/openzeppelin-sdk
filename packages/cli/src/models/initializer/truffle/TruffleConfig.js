@@ -21,10 +21,7 @@ const TruffleConfig = {
 
     config.network = network
     if (networkList[network].from) networkList[network].from = networkList[network].from.toLowerCase()
-
-    const TruffleConfig = require('truffle-config')
-    TruffleConfig.setNonceTrackerIfNeeded(config)
-
+    this.setNonceTrackerIfNeeded(config)
     const TruffleResolver = require('truffle-resolver')
     config.resolver = new TruffleResolver(config)
 
