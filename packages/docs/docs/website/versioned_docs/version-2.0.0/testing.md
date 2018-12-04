@@ -111,6 +111,8 @@ This means that calls to contracts with more than one function named `initialize
 The current solution to this issue is to `npm install zos-lib` and use the same helper function `zos create` uses: `encodeCall`. `encodeCall` receives the signature of your `initialize` function, as well as its arguments and their types. It then crafts the calldata which you can send in a raw call. Here's an example:
 
 ```js
+const { encodeCall } = require('zos-lib')
+
 data = encodeCall(
     "initialize",
     ['address', 'string', 'string', 'uint8', 'address'],

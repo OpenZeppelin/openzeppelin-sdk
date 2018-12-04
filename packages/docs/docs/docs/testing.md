@@ -119,6 +119,8 @@ and their types. `encodeCall` crafts the calldata which you can send in a
 raw call. For example you can now call the `TimedCrowdsale#initialize` doing as follows:
 
 ```js
+const { encodeCall } = require('zos-lib')
+
 data = encodeCall(
   'initialize',
   ['uint256', 'uint256'],
