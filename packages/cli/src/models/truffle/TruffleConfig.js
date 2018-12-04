@@ -14,6 +14,24 @@ const TruffleConfig = {
     }
   },
 
+  load(network) {
+    const config = this.init()
+    const { networks: networkList } = config
+    if (!networkList[network]) throw Error('Given network is not defined in your truffle-config file')
+
+    config.network = network
+    if (networkList[network].from) networkList[network].from = networkList[network].from.toLowerCase()
+
+    const TruffleConfig = require('truffle-config')
+    TruffleConfig.setNonceTrackerIfNeeded(config)
+
+    const TruffleResolver = require('truffle-resolver')
+    config.resolver = new TruffleResolver(config)
+
+    const { provider, contracts_build_directory: buildDir, resolver: { options: artifactDefaults } } = config
+    return { provider, buildDir, artifactDefaults }
+  },
+
   // This function fixes a truffle issue related to HDWalletProvider that occurs when assigning
   // the network provider as a function (that returns an HDWalletProvider instance) instead of
   // assigning the HDWalletProvider instance directly.
