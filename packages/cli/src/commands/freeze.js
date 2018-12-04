@@ -17,7 +17,6 @@ const register = program => program
 async function action(options) {
   const { network, txParams } = await Initializer.call(options)
   await freeze({ network, txParams })
-  if (!options.dontExitProcess) process.exit(0)
 }
 
 export default { name, signature, description, register, action }

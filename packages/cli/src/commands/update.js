@@ -35,7 +35,6 @@ async function action(contractFullNameOrAddress, options) {
   const args = _.pickBy({ contractAlias, packageName, proxyAddress, initMethod, initArgs, all, force })
   const { network, txParams } = await Initializer.call(options)
   await update({ ...args, network, txParams })
-  if (!options.dontExitProcess) process.exit(0)
 }
 
 export default { name, signature, description, register, action }

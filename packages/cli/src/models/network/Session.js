@@ -11,7 +11,7 @@ const Session = {
 
   getOptions(overrides = {}) {
     const session = this._parseSession()
-    if (!session) return overrides
+    if (!session) return this._setDefaults(overrides)
     log.info(`Using session with ${describe(_.omitBy(session, (v, key) => overrides[key]))}`)
     return { ...session, ...overrides }
   },
@@ -40,10 +40,14 @@ const Session = {
     const expires = new Date(session.expires)
     if (expires <= new Date()) return undefined
     const parsedSession = _.pick(session, 'network', 'timeout', 'from')
-    if (parsedSession.from) parsedSession.from = parsedSession.from.toLowerCase()
-    if (!parsedSession.timeout) parsedSession.timeout = DEFAULT_TX_TIMEOUT
-    return parsedSession
+    return this._setDefaults(parsedSession)
   },
+
+  _setDefaults(session) {
+    if (session.from) session.from = session.from.toLowerCase()
+    if (!session.timeout) session.timeout = DEFAULT_TX_TIMEOUT
+    return session
+  }
 }
 
 function describe(session) {

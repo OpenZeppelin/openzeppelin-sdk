@@ -33,7 +33,6 @@ async function action(contractFullNameOrAddress, newAdmin, options) {
   const args = _.pickBy({ contractAlias, packageName, proxyAddress, newAdmin })
   const { network, txParams } = await Initializer.call(options)
   await setAdmin({ ...args, network, txParams })
-  if (!options.dontExitProcess) process.exit(0)
 }
 
 export default { name, signature, description, register, action }

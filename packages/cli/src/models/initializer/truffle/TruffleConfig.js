@@ -1,3 +1,4 @@
+import _ from 'lodash'
 import { promisify } from 'util'
 
 const TruffleConfig = {
@@ -21,11 +22,14 @@ const TruffleConfig = {
 
     config.network = network
     if (networkList[network].from) networkList[network].from = networkList[network].from.toLowerCase()
-    this.setNonceTrackerIfNeeded(config)
+
     const TruffleResolver = require('truffle-resolver')
     config.resolver = new TruffleResolver(config)
+    this._setNonceTrackerIfNeeded(config)
 
-    const { provider, contracts_build_directory: buildDir, resolver: { options: artifactDefaults } } = config
+    const { provider, contracts_build_directory: buildDir, resolver } = config
+    const artifactDefaults = _.pickBy(_.pick(resolver.options, 'from', 'gas', 'gasPrice'))
+    if (artifactDefaults.from) artifactDefaults.from = artifactDefaults.from.toLowerCase()
     return { provider, buildDir, artifactDefaults }
   },
 
@@ -33,7 +37,7 @@ const TruffleConfig = {
   // the network provider as a function (that returns an HDWalletProvider instance) instead of
   // assigning the HDWalletProvider instance directly.
   // (see https://github.com/trufflesuite/truffle-hdwallet-provider/issues/65)
-  setNonceTrackerIfNeeded({ resolver, provider }) {
+  _setNonceTrackerIfNeeded({ resolver, provider }) {
     if (provider.engine && provider.engine.constructor.name === 'Web3ProviderEngine') {
       const NonceSubprovider = require('web3-provider-engine/subproviders/nonce-tracker')
       const nonceTracker = new NonceSubprovider()
