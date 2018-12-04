@@ -5,10 +5,10 @@
     ],
     "jsRules": {},
     "rules": {
-      "quotemark": [false],
-      "semicolon": [false],
+      "quotemark": [true, "single"],
+      "semicolon": [true],
       "whitespace": [false],
-      "typedef-whitespace": [false]
+      "typedef-whitespace": [true, "no-space"]
     },
     "rulesDirectory": []
 }
