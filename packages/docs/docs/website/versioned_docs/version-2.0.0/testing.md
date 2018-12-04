@@ -53,7 +53,8 @@ it('should create a proxy', async function () {
 The full code for the sample test file is:
 
 ```js
-import { TestHelper } from 'zos';
+import { TestHelper } from 'zos'
+require('chai').should()
 
 const Sample = artifacts.require('Sample')
 const ERC20 = artifacts.require('ERC20')
@@ -65,8 +66,8 @@ contract('Sample', function ([_, owner]) {
   });
 
   it('should create a proxy', async function () {
-    const proxy = await this.project.createProxy(Sample);
-    const result = await proxy.greet();
+    const proxy = await this.project.createProxy(Sample)
+    const result = await proxy.greet()
     result.should.eq('A sample')
   })
 
