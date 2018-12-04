@@ -46,8 +46,7 @@ export default class LocalBaseController {
   }
 
   addAll() {
-    // TODO: hack to get local build dir, add this info to Contracts from zos-lib
-    const folder = Contracts.getLocalPath('').replace(/\.json$/, '')
+    const folder = Contracts.getLocalBuildDir()
     fs.readDir(folder).forEach(file => {
       const path = `${folder}/${file}`
       if(this.hasBytecode(path)) {
