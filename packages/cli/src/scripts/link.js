@@ -1,12 +1,14 @@
 import stdout from '../utils/stdout';
 import ControllerFor from "../models/local/ControllerFor";
 
-export default async function linkStdlib({ libs = [], installLibs = false, packageFile = undefined }) {
-  const controller = ControllerFor(packageFile)
-  if (!libs.length) throw Error('At least one dependency name and version to be linked must be provided.')
-  if (controller.isLib) throw Error('Package projects cannot use other packages.')
+export default async function link({ libs = [], dependencies = [], installDependencies = false, installLibs = false, packageFile = undefined }) {
+  dependencies = dependencies.length === 0 && libs.length !== 0 ? libs : dependencies
+  installDependencies = !installDependencies && installLibs ? installLibs : installDependencies
 
-  await controller.linkLibs(libs, installLibs)
+  if (!dependencies.length) throw Error('At least one dependency name and version to be linked must be provided.')
+  const controller = ControllerFor(packageFile)
+
+  await controller.linkDependencies(dependencies, installDependencies)
   controller.writePackage()
-  libs.forEach(libNameVersion => stdout(libNameVersion))
+  dependencies.forEach(depNameVersion => stdout(depNameVersion))
 }

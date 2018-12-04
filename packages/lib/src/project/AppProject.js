@@ -1,8 +1,9 @@
+import _ from 'lodash';
+
 import BasePackageProject from "./BasePackageProject";
 import App from "../app/App";
 import Package from "../package/Package";
 import { DeployError } from '../utils/errors/DeployError';
-import _ from 'lodash';
 import { semanticVersionToString } from "../utils/Semver";
 
 const DEFAULT_NAME = 'main';

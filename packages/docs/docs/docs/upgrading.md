@@ -73,8 +73,8 @@ by the `create` command we ran above._
 
 ```console
 truffle(local)> myContract = MyContract.at('<your-contract-address>')
-truffle(local)> myContract.x().toString()
-42
+truffle(local)> myContract.x().then(x => x.toString())
+'42'
 
 truffle(local)> myContract.s()
 "hitchhiker"

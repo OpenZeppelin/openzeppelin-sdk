@@ -21,10 +21,10 @@ const register = program => program
   .action(action)
 
 async function action(options) {
-  const { deployDependencies: deployLibs, force, reset: reupload } = options
+  const {  deployDependencies, force, reset: reupload } = options
   if (!options.skipCompile) await compile()
   const { network, txParams } = await Initializer.call(options)
-  await push({ force, deployLibs, reupload, network, txParams })
+  await push({ force, deployDependencies, reupload, network, txParams })
 }
 
 async function tryAction(externalOptions) {

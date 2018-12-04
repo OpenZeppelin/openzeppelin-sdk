@@ -8,15 +8,11 @@ export default async function status({ network, txParams = {}, networkFile = und
   const controller = ControllerFor(network, txParams, networkFile)
   log.info(`Project status for network ${network}`);
 
-  if (!(await rootInfo(controller))) return;
+  if (!(await appInfo(controller))) return;
   if (!(await versionInfo(controller.networkFile))) return;
   await dependenciesInfo(controller.networkFile);
   await contractsInfo(controller);
   await proxiesInfo(controller.networkFile);
-}
-
-function rootInfo(controller) {
-  return controller.isLib ? libInfo(controller) : appInfo(controller);
 }
 
 async function appInfo(controller) {
@@ -30,17 +26,6 @@ async function appInfo(controller) {
   await controller.fetchOrDeploy(controller.currentVersion);
   log.info(`Application is deployed at ${controller.appAddress}`);
   log.info(`- Package ${controller.packageFile.name} is at ${controller.networkFile.packageAddress}`);
-  return true;
-}
-
-async function libInfo(controller) {
-  if (!controller.packageAddress) {
-    log.warn(`Dependency is not yet deployed`);
-    return false;
-  }
-
-  await controller.fetchOrDeploy(controller.currentVersion);
-  log.info(`Dependency package is deployed at ${controller.packageAddress}`);
   return true;
 }
 
@@ -85,7 +70,6 @@ async function contractsInfo(controller) {
 
 async function dependenciesInfo(networkFile) {
   if (networkFile.isLightweight) return true;
-  if (networkFile.isLib) return;
   const packageFile = networkFile.packageFile;
   if (!packageFile.hasDependencies() && !networkFile.hasDependencies()) return;
   log.info('Application dependencies:');
@@ -116,7 +100,6 @@ async function dependenciesInfo(networkFile) {
 }
 
 async function proxiesInfo(networkFile) {
-  if (networkFile.isLib) return;
   log.info('Deployed proxies:');
   if (!networkFile.hasProxies()) {
     log.info('- No proxies created');

@@ -4,7 +4,6 @@ require('../setup')
 
 import sinon from 'sinon'
 import npm from 'npm-programmatic'
-import { LibProject } from 'zos-lib'
 import Dependency from '../../src/models/dependency/Dependency'
 
 contract('Dependency', function([_, from]) {

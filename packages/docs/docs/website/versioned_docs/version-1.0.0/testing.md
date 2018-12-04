@@ -54,7 +54,8 @@ it('should create a proxy', async function () {
 The full code for the sample test file is:
 
 ```js
-import { TestApp } from 'zos';
+import { TestApp } from 'zos'
+require('chai').should()
 
 const Sample = artifacts.require('Sample')
 const StandardToken = artifacts.require('StandardToken')
@@ -66,17 +67,17 @@ contract('Sample', function ([_, owner]) {
   });
 
   it('should create a proxy', async function () {
-    const proxy = await this.app.createProxy(Sample);
-    const result = await proxy.greet();
+    const proxy = await this.app.createProxy(Sample)
+    const result = await proxy.greet()
     result.should.eq('A sample')
   })
 
   it('should create a proxy for the stdlib', async function () {
-    const proxy = await this.app.createProxy(StandardToken);
-    const result = await proxy.totalSupply();
-    result.toNumber().should.eq(0);
+    const proxy = await this.app.createProxy(StandardToken)
+    const result = await proxy.totalSupply()
+    result.toNumber().should.eq(0)
   })
-});
+})
 ```
 
 Use this convenient tool to write tests for your code and storage migrations before executing them in production.

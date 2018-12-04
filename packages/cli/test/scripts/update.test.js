@@ -2,13 +2,13 @@
 require('../setup')
 
 import _ from 'lodash';
-import { Contracts, AppProject, Proxy } from "zos-lib";
+import { Contracts, Proxy } from "zos-lib";
 import CaptureLogs from '../helpers/captureLogs';
 
 import add from '../../src/scripts/add.js';
 import push from '../../src/scripts/push.js';
 import bumpVersion from '../../src/scripts/bump.js';
-import linkLibs from '../../src/scripts/link.js';
+import link from '../../src/scripts/link.js';
 import createProxy from '../../src/scripts/create.js';
 import update from '../../src/scripts/update.js';
 import setAdmin from '../../src/scripts/set-admin.js';
@@ -214,13 +214,13 @@ contract('update script', function([_skipped, owner, anotherAccount]) {
     beforeEach('setup', async function() {
       this.networkFile = this.packageFile.networkFile(network)
 
-      await push({ network, txParams, deployLibs: true, networkFile: this.networkFile });
+      await push({ network, txParams, deployDependencies: true, networkFile: this.networkFile });
       await createProxy({ packageName: 'mock-stdlib-undeployed', contractAlias: 'Greeter', network, txParams, networkFile: this.networkFile });
       await createProxy({ packageName: 'mock-stdlib-undeployed', contractAlias: 'Greeter', network, txParams, networkFile: this.networkFile });
 
       await bumpVersion({ version: version_2, txParams, packageFile: this.packageFile });
-      await linkLibs({ txParams, libs: ['mock-stdlib-undeployed-2@1.2.0'], packageFile: this.packageFile });
-      await push({ network, txParams, deployLibs: true, networkFile: this.networkFile });
+      await link({ txParams, dependencies: ['mock-stdlib-undeployed-2@1.2.0'], packageFile: this.packageFile });
+      await push({ network, txParams, deployDependencies: true, networkFile: this.networkFile });
 
       // We modify the proxies' package to v2, so we can upgrade them, simulating an upgrade to mock-stdlib-undeployed
       this.networkFile.data.proxies = _.mapKeys(this.networkFile.data.proxies, (value, key) => key.replace('mock-stdlib-undeployed', 'mock-stdlib-undeployed-2'))

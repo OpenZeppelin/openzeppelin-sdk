@@ -1,7 +1,10 @@
+import _ from 'lodash'
+import { promisify } from 'util'
+
 import EventsFilter from './EventsFilter'
 import StatusFetcher from './StatusFetcher'
 import StatusComparator from './StatusComparator'
-import { ZWeb3, Logger, LibProject, AppProject, bytecodeDigest, semanticVersionEqual, replaceSolidityLibAddress, isSolidityLib } from 'zos-lib'
+import { ZWeb3, Logger, AppProject, bytecodeDigest, semanticVersionEqual, replaceSolidityLibAddress, isSolidityLib } from 'zos-lib'
 
 const log = new Logger('StatusChecker')
 const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000'
@@ -30,9 +33,7 @@ export default class StatusChecker {
       const { packageAddress, appAddress, version } = this.networkFile
 
       if (!this._project) {
-        this._project = this.networkFile.isLib
-          ? await LibProject.fetchOrDeploy(this.networkFile.version, this.txParams, { packageAddress })
-          : await AppProject.fetchOrDeploy(this.packageName,  this.networkFile.version, this.txParams, { appAddress, packageAddress })
+        this._project = await AppProject.fetchOrDeploy(this.packageName,  this.networkFile.version, this.txParams, { appAddress, packageAddress })
       }
 
       return this._project
@@ -45,11 +46,7 @@ export default class StatusChecker {
   async call() {
     await this.setProject()
     log.info(`Comparing status of project ${(await this._project.getProjectPackage()).address} ...\n`)
-    if (this.networkFile.isLib) {
-      await this.checkLib()
-    } else {
-      await this.checkApp()
-    }
+    await this.checkApp()
     this.visitor.onEndChecking()
   }
 
@@ -60,11 +57,6 @@ export default class StatusChecker {
     await this.checkImplementations()
     await this.checkProxies()
     await this.checkDependencies()
-  }
-
-  async checkLib() {
-    await this.checkProvider()
-    await this.checkImplementations()
   }
 
   async checkVersion() {
@@ -96,11 +88,11 @@ export default class StatusChecker {
     const implementationsInfo = await this._fetchOnChainImplementations()
     await Promise.all(
       implementationsInfo.map(async info => {
-        const { address } = info;
+        const { address } = info
         const bytecode = await ZWeb3.getCode(address)
-        return await (isSolidityLib(bytecode) 
-          ? this._checkRemoteSolidityLibImplementation(info, bytecode) 
-          : this._checkRemoteContractImplementation(info, bytecode));
+        return await (isSolidityLib(bytecode)
+          ? this._checkRemoteSolidityLibImplementation(info, bytecode)
+          : this._checkRemoteContractImplementation(info, bytecode))
       })
     )
     this._checkUnregisteredLocalImplementations(implementationsInfo)

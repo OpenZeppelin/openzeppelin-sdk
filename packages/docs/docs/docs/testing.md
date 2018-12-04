@@ -52,7 +52,9 @@ it('should create a proxy', async function () {
 The full code for the sample test file is:
 
 ```js
-import { TestHelper } from 'zos';
+import { TestHelper } from 'zos'
+
+require('chai').should()
 
 const Sample = artifacts.require('Sample')
 const ERC20 = artifacts.require('ERC20')
@@ -65,7 +67,7 @@ contract('Sample', function ([_, owner]) {
 
   it('should create a proxy', async function () {
     const proxy = await this.project.createProxy(Sample);
-    const result = await proxy.greet();
+    const result = await proxy.greet()
     result.should.eq('A sample')
   })
 
@@ -116,6 +118,8 @@ and their types. `encodeCall` crafts the calldata which you can send in a
 raw call. For example you can now call the `TimedCrowdsale#initialize` doing as follows:
 
 ```js
+const { encodeCall } = require('zos-lib')
+
 data = encodeCall(
   'initialize',
   ['uint256', 'uint256'],

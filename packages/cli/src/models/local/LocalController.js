@@ -1,27 +1,28 @@
+'use strict'
+
 import _ from 'lodash'
+import { Contracts, Logger, FileSystem as fs, getBuildArtifacts, validate as validateContract, validationPasses} from 'zos-lib'
+
 import Session from '../network/Session'
 import Dependency from '../dependency/Dependency'
+import NetworkController from '../network/NetworkController'
 import ValidationLogger from '../../interface/ValidationLogger'
 import TruffleProjectInitializer from '../initializer/truffle/TruffleProjectInitializer'
-import { Contracts, Logger, FileSystem as fs, getBuildArtifacts, validate as validateContract, validationPasses} from 'zos-lib'
 
 const log = new Logger('LocalController');
 
 const DEFAULT_VERSION = '0.1.0';
 
-export default class LocalBaseController {
+export default class LocalController {
   constructor(packageFile) {
     this.packageFile = packageFile
   }
 
-  get isLib() {
-    return this.packageFile.isLib
-  }
-
-  init(name, version, force = false) {
+  init(name, version, force = false, publish = false) {
     this.initZosPackageFile(name, version, force)
     Session.ignoreFile()
     TruffleProjectInitializer.call()
+    if (publish) this.packageFile.publish = publish
   }
 
   initZosPackageFile(name, version, force = false) {
@@ -76,6 +77,7 @@ export default class LocalBaseController {
     }
   }
 
+  //Contract model
   validateAll() {
     const buildArtifacts = getBuildArtifacts();
     return _.every(_.map(this.packageFile.contractAliases, (contractAlias) => (
@@ -83,6 +85,7 @@ export default class LocalBaseController {
     )));
   }
 
+  //Contract model
   validate(contractAlias, buildArtifacts) {
     const contractName = this.packageFile.contract(contractAlias);
     const contractClass = Contracts.getFromLocal(contractName || contractAlias);
@@ -91,12 +94,14 @@ export default class LocalBaseController {
     return validationPasses(warnings);
   }
 
+  //Contract model
   hasBytecode(contractDataPath) {
     if (!fs.exists(contractDataPath)) return false
     const bytecode = fs.parseJson(contractDataPath).bytecode
     return bytecode && bytecode !== "0x"
   }
 
+  //Contract model
   getContractClass(packageName, contractAlias) {
     if (!packageName || packageName === this.packageFile.name) {
       const contractName = this.packageFile.contract(contractAlias);
@@ -108,6 +113,7 @@ export default class LocalBaseController {
     }
   }
 
+  //Contract model
   getContractSourcePath(contractAlias) {
     const contractName = this.packageFile.contract(contractAlias)
     if (contractName) {
@@ -121,5 +127,26 @@ export default class LocalBaseController {
 
   writePackage() {
     this.packageFile.write()
+  }
+
+  //DependencyController
+  async linkDependencies(dependencies, installDependencies = false) {
+    await Promise.all(dependencies.map(async depNameVersion => {
+      const dependency = installDependencies
+        ? await Dependency.install(depNameVersion)
+        : Dependency.fromNameWithVersion(depNameVersion);
+      this.packageFile.setDependency(dependency.name, dependency.requirement);
+    }))
+  }
+
+  //DependencyController
+  unlinkDependencies(dependenciesNames) {
+    dependenciesNames
+      .map(dep => Dependency.fromNameWithVersion(dep))
+      .forEach(dep => this.packageFile.unsetDependency(dep.name))
+  }
+
+  onNetwork(network, txParams, networkFile = undefined) {
+    return new NetworkController(this, network, txParams, networkFile);
   }
 }

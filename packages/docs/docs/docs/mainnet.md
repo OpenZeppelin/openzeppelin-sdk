@@ -23,7 +23,9 @@ module.exports = {
     mainnet: {
       provider: function() {
         return new HDWalletProvider(mnemonic, "https://mainnet.infura.io/<INFURA_Access_Token>")
-      },
+      },      
+      gas: 5000000,
+      gasPrice: 5e9,
       network_id: 1
     }
   }
@@ -44,6 +46,7 @@ And now you can run `zos` commands in mainnet. For example:
 ```console
 zos push --network mainnet
 ```
+
 
 This will use your first account generated from the mnemonic. If you want to
 specify a different account, use the `--from` flag.
