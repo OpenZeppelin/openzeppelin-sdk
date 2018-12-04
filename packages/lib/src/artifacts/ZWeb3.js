@@ -1,7 +1,7 @@
 import { promisify } from 'util'
 import sleep from '../helpers/sleep'
 
-export default {
+const ZWeb3 = {
   initialize(provider) {
     this.provider = provider
   },
@@ -129,3 +129,5 @@ const NETWORKS = {
   4:  'rinkeby',
   42: 'kovan'
 }
+
+export default ZWeb3
