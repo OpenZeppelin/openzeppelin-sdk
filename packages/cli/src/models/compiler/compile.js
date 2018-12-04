@@ -1,5 +1,5 @@
 import { Logger } from 'zos-lib'
-import TruffleConfig from '../truffle/TruffleConfig'
+import TruffleConfig from '../initializer/truffle/TruffleConfig'
 
 const log = new Logger('compile')
 

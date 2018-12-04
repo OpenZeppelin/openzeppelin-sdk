@@ -1,9 +1,9 @@
 'use strict';
 
-import status from '../scripts/status'
 import pull from '../scripts/pull'
+import status from '../scripts/status'
 import compare from '../scripts/compare'
-import runWithZWeb3 from '../utils/runWithZWeb3'
+import Initializer from '../models/initializer/Initializer'
 
 const name = 'status'
 const signature = name
@@ -19,15 +19,13 @@ const register = program => program
   .action(action)
 
 async function action(options) {
-  await runWithZWeb3(async (opts) => {
-    if (options.fix) {
-      await pull(opts)
-    } else if (options.fetch) {
-      await compare(opts)
-    } else {
-      await status(opts)
-    }
-  }, options)
+  const { network, txParams } = await Initializer.call(options)
+
+  if (options.fix) await pull({ network, txParams })
+  else if (options.fetch) await compare({ network, txParams })
+  else await status({ network, txParams })
+
+  if (!options.dontExitProcess) process.exit(0)
 }
 
 export default { name, signature, description, register, action }

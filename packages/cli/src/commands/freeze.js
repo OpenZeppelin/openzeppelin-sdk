@@ -1,7 +1,7 @@
 'use strict'
 
 import freeze from '../scripts/freeze'
-import runWithZWeb3 from '../utils/runWithZWeb3'
+import Initializer from '../models/initializer/Initializer'
 
 const name = 'freeze'
 const signature = name
@@ -15,7 +15,9 @@ const register = program => program
   .action(action)
 
 async function action(options) {
-  await runWithZWeb3(async (opts) => await freeze(opts), options)
+  const { network, txParams } = await Initializer.call(options)
+  await freeze({ network, txParams })
+  if (!options.dontExitProcess) process.exit(0)
 }
 
 export default { name, signature, description, register, action }

@@ -3,7 +3,7 @@ require('../setup')
 
 import { FileSystem as fs } from 'zos-lib'
 import { cleanupfn } from '../helpers/cleanup'
-import TruffleProjectInitializer from '../../src/models/truffle/TruffleProjectInitializer'
+import TruffleProjectInitializer from '../../src/models/initializer/truffle/TruffleProjectInitializer'
 
 contract('Truffle', function () {
   const tmpDir = 'test/tmp';

@@ -1,8 +1,7 @@
 'use strict';
 
 import publish from '../scripts/publish'
-import runWithZWeb3 from '../utils/runWithZWeb3'
-import _ from 'lodash';
+import Initializer from '../models/initializer/Initializer'
 
 const name = 'publish'
 const signature = `${name}`
@@ -16,7 +15,9 @@ const register = program => program
   .action(action)
 
 async function action(options) {
-  await runWithZWeb3(async (opts) => await publish(opts), options)
+  const { network, txParams } = await Initializer.call(options)
+  await await publish({ network, txParams })
+  if (!options.dontExitProcess) process.exit(0)
 }
 
 export default { name, signature, description, register, action }

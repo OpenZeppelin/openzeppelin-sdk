@@ -39,8 +39,10 @@ const Session = {
     if (_.isEmpty(session)) return undefined
     const expires = new Date(session.expires)
     if (expires <= new Date()) return undefined
-    const { network, timeout, from } = session
-    return { network, timeout: timeout || DEFAULT_TX_TIMEOUT, from: from.toLowerCase() }
+    const parsedSession = _.pick(session, 'network', 'timeout', 'from')
+    if (parsedSession.from) parsedSession.from = parsedSession.from.toLowerCase()
+    if (!parsedSession.timeout) parsedSession.timeout = DEFAULT_TX_TIMEOUT
+    return parsedSession
   },
 }
 

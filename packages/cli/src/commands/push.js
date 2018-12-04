@@ -1,9 +1,9 @@
 'use strict';
 
-import push from '../scripts/push'
-import runWithZWeb3 from '../utils/runWithZWeb3'
 import _ from 'lodash'
-import compile from "../models/compiler/compile";
+import push from '../scripts/push'
+import compile from '../models/compiler/compile'
+import Initializer from '../models/initializer/Initializer'
 
 const name = 'push'
 const signature = name
@@ -21,12 +21,11 @@ const register = program => program
   .action(action)
 
 async function action(options) {
-  const { skipCompile, deployDependencies: deployLibs, force, reset: reupload } = options
-  if(!options.skipCompile) await compile()
-  await runWithZWeb3(
-    async (opts) => await push({ force, deployLibs, reupload, ... opts }),
-    { compile: !skipCompile, ... options }
-  )
+  const { deployDependencies: deployLibs, force, reset: reupload } = options
+  if (!options.skipCompile) await compile()
+  const { network, txParams } = await Initializer.call(options)
+  await push({ force, deployLibs, reupload, network, txParams })
+  if (!options.dontExitProcess) process.exit(0)
 }
 
 async function tryAction(externalOptions) {
