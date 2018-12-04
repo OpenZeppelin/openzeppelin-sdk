@@ -9,7 +9,6 @@ import ZosPackageFile from '../../src/models/files/ZosPackageFile';
 contract('ZosNetworkFile', function() {
   beforeEach('loads parent package file', function () {
     this.appPackageFile = new ZosPackageFile('test/mocks/packages/package-empty.zos.json')
-    this.libPackageFile = new ZosPackageFile('test/mocks/packages/package-empty-lib.zos.json')
   })
   
   describe('constructor', function () {
@@ -19,7 +18,7 @@ contract('ZosNetworkFile', function() {
     })
 
     it('loads existing file', function () {
-      const file = new ZosNetworkFile(this.libPackageFile, 'test', 'test/mocks/networks/network-lib-with-contract.zos.test.json')
+      const file = new ZosNetworkFile(this.appPackageFile, 'test', 'test/mocks/networks/network-app-with-contract.zos.test.json')
       file.data.zosversion.should.eq('2')
       file.packageAddress.should.eq('0x0000000000000000000000000000000000000080')
       file.providerAddress.should.eq('0x0000000000000000000000000000000000000010')

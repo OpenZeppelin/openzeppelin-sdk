@@ -35,21 +35,6 @@ contract('StatusComparator', function([_, owner, anotherAddress]) {
     testDependencies()
   })
 
-  describe('lib', function () {
-    beforeEach('initializing network file and status checker', async function () {
-      init.call(this, 'test/mocks/packages/package-empty-lib.zos.json')
-    })
-
-    beforeEach('deploying a lib', async function () {
-      await push({ network, txParams, networkFile: this.networkFile })
-      this.project = await this.checker.setProject()
-      this.directory = await this.project.getCurrentDirectory()
-    })
-
-    testImplementations()
-    testProvider()
-  })
-
   function init(fileName) {
     this.packageFile = new ZosPackageFile(fileName)
     this.networkFile = this.packageFile.networkFile(network)
@@ -172,9 +157,9 @@ contract('StatusComparator', function([_, owner, anotherAddress]) {
 
       describe('when the app project has dependencies', function () {
         beforeEach('set project with multiple dependencies', async function () {
-          const libs = [`${this.dep1.name}@${this.dep1.version}`, `${this.dep2.name}@${this.dep2.version}`]
-          await link({ libs, packageFile: this.packageFile });
-          await push({ network, txParams, deployLibs: true, networkFile: this.networkFile });
+          const dependencies = [`${this.dep1.name}@${this.dep1.version}`, `${this.dep2.name}@${this.dep2.version}`]
+          await link({ dependencies, packageFile: this.packageFile });
+          await push({ network, txParams, deployDependencies: true, networkFile: this.networkFile });
           this.dep1 = { ...this.dep1, address: this.networkFile.getDependency(this.dep1.name).package }
           this.dep2 = { ...this.dep2, address: this.networkFile.getDependency(this.dep2.name).package }
         })

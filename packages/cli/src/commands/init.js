@@ -19,10 +19,10 @@ const register = program => program
   .action(action)
 
 async function action(name, version, options) {
-  const { publish, force, link, install: installLibs } = options
+  const { publish, force, link, install: installDependencies } = options
 
-  const libs = link ? link.split(',') : []
-  await init({ name, version, libs, installLibs, force, publish })
+  const dependencies = link ? link.split(',') : []
+  await init({ name, version, dependencies, installDependencies, force, publish })
   await push.tryAction(options)
 }
 

@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import { FileSystem as fs, LibProject, Contracts, getSolidityLibNames, Logger } from 'zos-lib'
+import { FileSystem as fs, PackageProject, Contracts, getSolidityLibNames, Logger } from 'zos-lib'
 import semver from 'semver';
 import npm from 'npm-programmatic'
 
@@ -37,7 +37,7 @@ export default class Dependency {
 
   async deploy(txParams) {
     const version = semver.coerce(this.version).toString()
-    const project = await LibProject.fetchOrDeploy(version, txParams, {})
+    const project = await PackageProject.fetchOrDeploy(version, txParams, {})
     
     // REFACTOR: Logic for filling in solidity libraries is partially duplicated from network base controller,
     // this should all be handled at the Project level. Consider adding a setImplementations (plural) method

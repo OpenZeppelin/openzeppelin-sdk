@@ -35,7 +35,7 @@ import App from './app/App'
 import Package from './package/Package'
 import ImplementationDirectory from './directory/ImplementationDirectory'
 import BasePackageProject from './project/BasePackageProject'
-import LibProject from './project/LibProject'
+import PackageProject from './project/PackageProject'
 import AppProject from './project/AppProject'
 import SimpleProject from './project/SimpleProject'
 
@@ -80,7 +80,7 @@ export {
   ImplementationDirectory,
   Package,
   BasePackageProject,
-  LibProject,
+  PackageProject,
   AppProject,
   SimpleProject
 }

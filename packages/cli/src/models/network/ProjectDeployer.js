@@ -1,4 +1,4 @@
-import { AppProject, LibProject, SimpleProject } from "zos-lib";
+import { AppProject, PackageProject, SimpleProject } from "zos-lib";
 import _ from 'lodash';
 
 class BaseProjectDeployer {
@@ -46,11 +46,11 @@ export class SimpleProjectDeployer extends BaseProjectDeployer {
   }
 }
 
-export class LibProjectDeployer extends BasePackageProjectDeployer {
+export class PackageProjectDeployer extends BasePackageProjectDeployer {
   async fetchOrDeploy() {
     try {
       const packageAddress = this.packageAddress
-      this.project = await LibProject.fetchOrDeploy(this.requestedVersion, this.txParams, { packageAddress })
+      this.project = await PackageProject.fetchOrDeploy(this.requestedVersion, this.txParams, { packageAddress })
       this._registerPackage(await this.project.getProjectPackage())
       this._registerVersion(this.requestedVersion, await this.project.getCurrentDirectory())
       return this.project
@@ -105,4 +105,3 @@ export class AppProjectDeployer extends BasePackageProjectDeployer {
     this.networkFile.app = { address }
   }
 }
-

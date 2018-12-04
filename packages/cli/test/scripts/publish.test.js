@@ -24,7 +24,7 @@ contract('publish script', function([_, owner, otherAddress]) {
     packageFile.publish = false;
     this.networkFile = packageFile.networkFile(network);
 
-    await push({ network, txParams, networkFile: this.networkFile, deployLibs: true });
+    await push({ network, txParams, networkFile: this.networkFile, deployDependencies: true });
     this.previousContractAddress = this.networkFile.contract(contractAlias).address;
     this.previousDependencyAddress = this.networkFile.getDependency(dependencyName).package;
   })
