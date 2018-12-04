@@ -25,6 +25,8 @@ module.exports = {
       provider: function() {
         return new HDWalletProvider(mnemonic, "https://mainnet.infura.io/<INFURA_Access_Token>")
       },
+      gas: 5000000,
+      gasPrice: 5e9,
       network_id: 1
     }
   }
