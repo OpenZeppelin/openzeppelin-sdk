@@ -69,7 +69,8 @@ exports.stubCommands = function () {
     this.errorHandler = sinon.stub(ErrorHandler.prototype, 'call').callsFake(() => null)
     this.initializer = sinon.stub(Initializer, 'call').callsFake(function (options) {
       const { network, from } = Session.getOptions(options)
-      return { network, txParams: { from } }
+      const txParams = from ? { from } : {}
+      return { network, txParams }
     })
   })
 

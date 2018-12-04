@@ -17,7 +17,7 @@ const TruffleConfig = {
   load(network) {
     const config = this.init()
     const { networks: networkList } = config
-    if (!networkList[network]) throw Error('Given network is not defined in your truffle-config file')
+    if (!networkList[network]) throw Error(`Given network '${network}' is not defined in your truffle-config file`)
 
     config.network = network
     if (networkList[network].from) networkList[network].from = networkList[network].from.toLowerCase()
