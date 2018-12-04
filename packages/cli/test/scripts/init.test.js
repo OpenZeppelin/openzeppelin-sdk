@@ -30,11 +30,6 @@ contract('init script', function() {
       this.packageFile.isLightweight.should.eq(!publish)
     });
 
-    it('should not be marked as lib', async function () {
-      await init({ publish, name, version, packageFile: this.packageFile });
-      this.packageFile.isLib.should.be.false
-    });
-
     it('should have the appropriate app name', async function() {
       await init({ publish, name, version, packageFile: this.packageFile });
       this.packageFile.hasName(name).should.be.true
@@ -56,7 +51,7 @@ contract('init script', function() {
     });
 
     it('should set dependency', async function () {
-      await init({ publish, name, version, libs: ['mock-stdlib@1.1.0'], packageFile: this.packageFile });     
+      await init({ publish, name, version, dependencies: ['mock-stdlib@1.1.0'], packageFile: this.packageFile });
       this.packageFile.getDependencyVersion('mock-stdlib').should.eq('1.1.0')
     });
 

@@ -63,14 +63,6 @@ contract('push script', function([_, owner]) {
     });
   };
 
-  const shouldDeployLib = function () {
-    shouldDeployPackage();
-
-    it('should not be frozen by default', async function() {
-      this.networkFile.frozen.should.be.false;
-    });
-  };
-
   const shouldDeployContracts = function () {
     it('should record contracts in network file', async function () {
       const contract = this.networkFile.contract('Impl');
@@ -464,47 +456,13 @@ contract('push script', function([_, owner]) {
       });
 
       it('should create custom deployment', async function () {
-        await push({ network, txParams, networkFile: this.networkFile, deployLibs: true });
+        await push({ network, txParams, networkFile: this.networkFile, deployDependencies: true });
         const app = await App.fetch(this.networkFile.appAddress);
         const packageInfo = await app.getPackage('mock-stdlib-unpublished');
         packageInfo.version.should.be.semverEqual('1.1.0');
         packageInfo.package.address.should.be.nonzeroAddress;
       });
     })
-  });
-
-  describe('an empty lib', function() {
-    beforeEach('pushing package-empty', async function () {
-      const packageFile = new ZosPackageFile('test/mocks/packages/package-empty-lib.zos.json')
-      this.networkFile = packageFile.networkFile(network)
-
-      await push({ network, txParams, networkFile: this.networkFile })
-    });
-
-    shouldDeployLib(this.networkFile);
-    shouldDeployProvider(this.networkFile);
-  });
-
-  describe('a lib with contracts', function() {
-    beforeEach('pushing package-with-contracts', async function () {
-      const packageFile = new ZosPackageFile('test/mocks/packages/package-lib-with-contracts.zos.json')
-      this.networkFile = packageFile.networkFile(network)
-
-      await push({ network, txParams, networkFile: this.networkFile })
-
-      const newPackageFile = new ZosPackageFile('test/mocks/packages/package-lib-with-contracts-v2.zos.json')
-      this.newNetworkFile = newPackageFile.networkFile(network)
-    });
-
-    shouldDeployLib();
-    shouldDeployProvider();
-    shouldDeployContracts();
-    shouldRegisterContractsInDirectory();
-    shouldValidateContracts();
-    shouldRedeployContracts();
-    shouldBumpVersion();
-    shouldNotPushWhileFrozen();
-    shouldDeleteContracts({ unregisterFromDirectory: true });
   });
 
   describe('an empty lightweight app', function() {

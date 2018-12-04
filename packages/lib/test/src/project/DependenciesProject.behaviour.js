@@ -1,11 +1,11 @@
 'use strict'
 require('../../setup')
 
-import Proxy from '../../../src/proxy/Proxy';
 import Contracts from '../../../src/utils/Contracts';
+import Proxy from '../../../src/proxy/Proxy';
+import Package from '../../../src/package/Package';
+import PackageProject from '../../../src/project/PackageProject';
 import { toAddress } from '../../../src/utils/Addresses';
-import { Package } from '../../../lib';
-import { LibProject } from '../../../src';
 
 const Impl = Contracts.getFromLocal('Impl');
 const DummyImplementation = Contracts.getFromLocal('DummyImplementation');
@@ -36,7 +36,7 @@ export default function shouldManageDependencies() {
 
   describe('proxies on dependencies', async function () {
     beforeEach('setting dependency', async function () {
-      this.dependency = await LibProject.fetchOrDeploy(packageVersion)
+      this.dependency = await PackageProject.fetchOrDeploy(packageVersion)
       await this.dependency.setImplementation(DummyImplementation)
       await this.dependency.setImplementation(DummyImplementationV2)
       this.package = await this.dependency.getProjectPackage()

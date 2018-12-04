@@ -10,47 +10,40 @@ contract('unlink script', function() {
   })
 
   describe('without valid parameters', function() {
-    it('throws an error if no libs are provided', async function () {
-      const libNames = []
-      await unlink({ libNames, packageFile: this.packageFile })
+    it('throws an error if no dependencies are provided', async function () {
+      const dependencies = []
+      await unlink({ dependencies, packageFile: this.packageFile })
         .should.be.rejectedWith('At least one dependency name must be provided.')
     })
 
-    it('throws an error if project is a library', async function () {
-      this.packageFile.lib = true
-      const libNames = ['mock-stdlib', 'mock-stdlib-2']
-      await unlink({ libNames, packageFile: this.packageFile })
-        .should.be.rejectedWith('Package projects cannot use other packages.')
-    })
-
-    it('throws an error if project library does not exist', async function () {
-      const libName = 'bulbasaur-lib2'
-      await unlink({ libNames: [libName], packageFile: this.packageFile })
-        .should.be.rejectedWith(`Could not find a zos.json file for '${libName}'. Make sure it is provided by the npm package.`)
+    it('throws an error if project dependency does not exist', async function () {
+      const dependencyName = 'bulbasaur-lib2'
+      await unlink({ dependencies: [dependencyName], packageFile: this.packageFile })
+        .should.be.rejectedWith(`Could not find a zos.json file for '${dependencyName}'. Make sure it is provided by the npm package.`)
     })
   })
 
   describe('with valid parameters', function() {
     it('unlinks a dependency', async function () {
       const { dependencies } = this.packageFile
-      const libToUnlink = 'mock-stdlib'
-      const remainingLibs = ['mock-stdlib-2', 'mock-stdlib-undeployed']
+      const dependencyToUnlink = 'mock-stdlib'
+      const remainingDependencies = ['mock-stdlib-2', 'mock-stdlib-undeployed']
 
-      await unlink({ libNames: [libToUnlink], packageFile: this.packageFile })
+      await unlink({ dependencies: [dependencyToUnlink], packageFile: this.packageFile })
 
-      dependencies.should.not.have.all.keys(libToUnlink)
-      dependencies.should.have.all.keys(remainingLibs)
+      dependencies.should.not.have.all.keys(dependencyToUnlink)
+      dependencies.should.have.all.keys(remainingDependencies)
     })
 
     it('unlinks multiple dependencies', async function () {
       const { dependencies } = this.packageFile
-      const libNames = ['mock-stdlib', 'mock-stdlib-2']
-      const remainingLib = 'mock-stdlib-undeployed'
+      const dependenciesToUnlink = ['mock-stdlib', 'mock-stdlib-2']
+      const remainingDependency = 'mock-stdlib-undeployed'
 
-      await unlink({ libNames, packageFile: this.packageFile })
+      await unlink({ dependencies: dependenciesToUnlink, packageFile: this.packageFile })
 
-      dependencies.should.not.have.all.keys(libNames)
-      dependencies.should.have.all.keys(remainingLib)
+      dependencies.should.not.have.all.keys(dependenciesToUnlink)
+      dependencies.should.have.all.keys(remainingDependency)
     })
   })
 

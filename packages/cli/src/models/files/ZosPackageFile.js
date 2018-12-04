@@ -17,10 +17,6 @@ export default class ZosPackageFile {
   exists() {
     return fs.exists(this.fileName)
   }
-
-  get lib() {
-    return this.data.lib
-  }
   
   get name() {
     return this.data.name
@@ -62,12 +58,8 @@ export default class ZosPackageFile {
     return Object.values(this.contracts)
   }
 
-  get isLib() {
-    return !!this.lib
-  }
-
   get isLightweight() {
-    return !this.data.publish && !this.isLib
+    return !this.data.publish
   }
 
   contract(alias) {
@@ -93,10 +85,6 @@ export default class ZosPackageFile {
 
   hasContracts() {
     return !_.isEmpty(this.contracts)
-  }
-
-  set lib(lib) {
-    this.data.lib = lib
   }
 
   set publish(publish) {
