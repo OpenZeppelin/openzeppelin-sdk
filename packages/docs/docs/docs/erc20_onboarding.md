@@ -39,9 +39,9 @@ and jump directly to the [step 1](erc20_onboarding.html#1-initialize-your-migrat
 
 In the sample repository you will find a contract called [`MyLegacyToken`](https://github.com/zeppelinos/erc20-onboarding/blob/master/contracts/MyLegacyToken.sol)
 that we will use to simulate a real scenario locally. As you can see, this token will mint 100 tokens to the owner once
-initialized just for testing purpose.
+initialized just for testing purposes.
 
-_Before we begin, remember to install the dependencies running `npm install`. Additionally, you should check everything
+_Before we begin, remember to install the dependencies running `npm install`. Additionally, you should check that everything
 is working as expected by running the test files with `npm test`._
 
 Now, let's deploy the legacy token. We will use [ganache-cli](https://truffleframework.com/docs/ganache/quickstart), a
@@ -167,7 +167,7 @@ new `zos.dev-<network_id>.json` file should have been created.
 
 Now, let's create a new instance of the upgradeable token using ZeppelinOS. To do so, we will need to create an
 instance of an `ERC20Migrator` first, but given it is not yet provided by the OpenZeppelin EVM package, we will have
-to add it manually. Then, please run the following commands:
+to add it manually. Then, run the following commands:
 replacing `LEGACY_TOKEN_ADDRESS` with the address of the legacy token contract:
 ```console
 zos add ERC20Migrator
@@ -228,7 +228,7 @@ truffle(local)> legacyToken.approve(erc20Migrator.address, balance, { from: owne
 truffle(local)> erc20Migrator.migrateAll(owner, { from: owner })
 ```
 
-We can now check your balance of the legacy token:
+We can now check your balance in the legacy token:
 ```console
 truffle(local)> legacyToken.balanceOf(owner)
 BigNumber { s: 1, e: 0, c: [ 0 ] }

@@ -13,7 +13,7 @@ By design, smart contracts are immutable. On the other hand, software quality he
 
 ## Upgrading via the proxy pattern
 
-The basic idea behind using a proxy for upgrades. The first contract is a simple wrapper or "proxy" which users interact with directly and is in charge of forwarding transactions to and from the second contract, which contains the logic. The key concept to understand is that the logic contract can be replaced while the proxy, or the access point is never changed. Both contracts are still immutable in the sense that their code cannot be changed, but the logic contract can simply be swapped by another contract. The wrapper can thus point to a different logic implementation and in doing so, the software is "upgraded".
+The basic idea is using a proxy for upgrades. The first contract is a simple wrapper or "proxy" which users interact with directly and is in charge of forwarding transactions to and from the second contract, which contains the logic. The key concept to understand is that the logic contract can be replaced while the proxy, or the access point is never changed. Both contracts are still immutable in the sense that their code cannot be changed, but the logic contract can simply be swapped by another contract. The wrapper can thus point to a different logic implementation and in doing so, the software is "upgraded".
 
 ```
 User ---- tx ---> Proxy ----------> Implementation_v0
@@ -25,7 +25,7 @@ User ---- tx ---> Proxy ----------> Implementation_v0
 
 ## Proxy forwarding
 
-The most immediate problem that proxies need to solve is how the proxy exposes the entire interface of the logic contract without requiring a one to one mapping of the entire logic contract's interface. That would be difficult to maintain, prone to errors, and would make the interface itself not upgradeable. Hence, a dynamic forwarding mechanism is required. The basics of such mechanism are presented in the code below:
+The most immediate problem that proxies need to solve is how the proxy exposes the entire interface of the logic contract without requiring a one to one mapping of the entire logic contract's interface. That would be difficult to maintain, prone to errors, and would make the interface itself not upgradeable. Hence, a dynamic forwarding mechanism is required. The basics of such a mechanism are presented in the code below:
 
 ```solidity
 assembly {
@@ -54,7 +54,7 @@ A very important thing to note is that the code makes use of the EVM's `delegate
 
 ## Unstructured storage proxies
 
-A problem that quickly comes up when using proxies has to do with the way in which variables are stored in the proxy contract. Suppose that the proxy stores the logic contract's address in it's only variable `address public _implementation;`. Now, suppose that the logic contract is a basic token whose first variable is `address public _owner`. Both variables are 32 byte in size, and as far as the EVM knows, occupy the first slot of the resulting execution flow of a proxied call. When the logic contract writes to `_owner`, it does so in the scope of the proxy's state, and thus really writes to `_implementation`. This problem can be referred to as a "storage collision".
+A problem that quickly comes up when using proxies has to do with the way in which variables are stored in the proxy contract. Suppose that the proxy stores the logic contract's address in it's only variable `address public _implementation;`. Now, suppose that the logic contract is a basic token whose first variable is `address public _owner`. Both variables are 32 byte in size, and as far as the EVM knows, occupy the first slot of the resulting execution flow of a proxied call. When the logic contract writes to `_owner`, it does so in the scope of the proxy's state, and in reality writes to `_implementation`. This problem can be referred to as a "storage collision".
 
 ```
 |Proxy                     |Implementation           |
@@ -119,7 +119,7 @@ As discussed, the unstructured approach avoids storage collisions between the lo
 
 The unstructured storage proxy mechanism doesn't safeguard against this situation.
 It is up to the user to have new versions of a logic contract extend previous versions, or otherwise guarantee that the storage hierarchy is always appended to but not modified.
-However, ZeppelinOS CLI does detect such collisions, and warns the developer appropriate.
+However, ZeppelinOS CLI does detect such collisions, and warns the developer appropriately.
 
 ## The constructor caveat
 
@@ -163,7 +163,7 @@ The way ZeppelinOS deals with this problem is via the _transparent proxy_ patter
 - If the caller is the admin of the proxy (the address with rights to upgrade the proxy), then the proxy will **not** delegate any calls, and only answer any messages it understands.
 - If the caller is any other address, the proxy will **always** delegate a call, no matter if it matches one of the proxy's functions.
 
-Assuming a proxy with an `owner()` and an `upgradeTo()` function, that delegates calls to an ERC0 contract with an `owner()` and a  `transfer()` function, the following table covers all scenarios:
+Assuming a proxy with an `owner()` and an `upgradeTo()` function, that delegates calls to an ERC20 contract with an `owner()` and a  `transfer()` function, the following table covers all scenarios:
 
 | msg.sender | owner() | upgradeTo() | transfer() |
 |---------------|---------|-------------|------------|
@@ -177,11 +177,11 @@ Another way around this situation is by `publish`ing your project. This will cre
 
 ## Summary
 
-Any developer using ZeppelinOS should be familiar with proxies in the ways that are described in this article. In the end, the concept is very simple, and ZeppelinOS is designed to encapsulate all the proxy mechanics in a way that the amount of things you need to keep in mind when developing projects are reduced to an absolute minimum. It all comes down to a 3 item list:
+Any developer using ZeppelinOS should be familiar with proxies in the ways that are described in this article. In the end, the concept is very simple, and ZeppelinOS is designed to encapsulate all the proxy mechanics in a way that the amount of things you need to keep in mind when developing projects are reduced to an absolute minimum. It all comes down to a 4 item list:
 
 * Have a basic understanding of what a proxy is
 * Always extend storage instead of modifying it
 * Make sure your contracts use initializer functions instead of constructors
 * Do not interact with a proxy from the same address that created it (except for upgrading it)
 
-Furthermore, ZeppelinOS will let you know when something goes wrong with one of the items in this list. So, seat back, enjoy, code, and let ZeppelinOS take care of the rest.
+Furthermore, ZeppelinOS will let you know when something goes wrong with one of the items in this list.
