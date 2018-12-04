@@ -1,9 +1,8 @@
-import querystring from 'querystring'
 import axios from 'axios'
 import cheerio from 'cheerio'
+import querystring from 'querystring'
 
-import { Logger } from 'zos-lib'
-import sleep from '../utils/sleep'
+import { sleep, Logger } from 'zos-lib'
 
 const log = new Logger('Verifier')
 

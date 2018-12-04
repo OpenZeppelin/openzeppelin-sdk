@@ -1,5 +1,5 @@
 import { promisify } from 'util'
-import sleep from '../../../cli/src/utils/sleep'
+import sleep from '../helpers/sleep'
 
 export default {
   initialize(provider) {
