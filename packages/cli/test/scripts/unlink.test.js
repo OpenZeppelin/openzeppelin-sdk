@@ -11,14 +11,14 @@ contract('unlink script', function() {
 
   describe('without valid parameters', function() {
     it('throws an error if no dependencies are provided', async function () {
-      const dependenciesNames = []
-      await unlink({ dependenciesNames, packageFile: this.packageFile })
+      const dependencies = []
+      await unlink({ dependencies, packageFile: this.packageFile })
         .should.be.rejectedWith('At least one dependency name must be provided.')
     })
 
     it('throws an error if project dependency does not exist', async function () {
       const dependencyName = 'bulbasaur-lib2'
-      await unlink({ dependenciesNames: [dependencyName], packageFile: this.packageFile })
+      await unlink({ dependencies: [dependencyName], packageFile: this.packageFile })
         .should.be.rejectedWith(`Could not find a zos.json file for '${dependencyName}'. Make sure it is provided by the npm package.`)
     })
   })
@@ -29,7 +29,7 @@ contract('unlink script', function() {
       const dependencyToUnlink = 'mock-stdlib'
       const remainingDependencies = ['mock-stdlib-2', 'mock-stdlib-undeployed']
 
-      await unlink({ dependenciesNames: [dependencyToUnlink], packageFile: this.packageFile })
+      await unlink({ dependencies: [dependencyToUnlink], packageFile: this.packageFile })
 
       dependencies.should.not.have.all.keys(dependencyToUnlink)
       dependencies.should.have.all.keys(remainingDependencies)
@@ -37,12 +37,12 @@ contract('unlink script', function() {
 
     it('unlinks multiple dependencies', async function () {
       const { dependencies } = this.packageFile
-      const dependenciesNames = ['mock-stdlib', 'mock-stdlib-2']
+      const dependenciesToUnlink = ['mock-stdlib', 'mock-stdlib-2']
       const remainingDependency = 'mock-stdlib-undeployed'
 
-      await unlink({ dependenciesNames, packageFile: this.packageFile })
+      await unlink({ dependencies: dependenciesToUnlink, packageFile: this.packageFile })
 
-      dependencies.should.not.have.all.keys(dependenciesNames)
+      dependencies.should.not.have.all.keys(dependenciesToUnlink)
       dependencies.should.have.all.keys(remainingDependency)
     })
   })

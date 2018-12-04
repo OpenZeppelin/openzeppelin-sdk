@@ -7,8 +7,8 @@ contract('unlink command', function() {
   stubCommands()
 
   itShouldParse('calls unlink script with a dependency name as parameter', 'unlink', 'zos unlink mock-stdlib@1.1.0 mock-stdlib2@1.1.0', function(unlink) {
-    const dependenciesNames = ['mock-stdlib@1.1.0', 'mock-stdlib2@1.1.0']
-    unlink.should.have.been.calledWithExactly({ dependenciesNames })
+    const dependencies = ['mock-stdlib@1.1.0', 'mock-stdlib2@1.1.0']
+    unlink.should.have.been.calledWithExactly({ dependencies })
   })
 
   itShouldParse('should call push script when passing --push option', 'push', 'zos unlink mock-stdlib@1.1.0 --push test', function(push) {
