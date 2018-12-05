@@ -105,20 +105,27 @@ const ZWeb3 = {
   },
 
   async _getTransactionReceiptWithTimeout(tx, timeout, startTime) {
-    try {
-      const receipt = await this.getTransactionReceipt(tx)
+    const receipt = await this._tryGettingTransactionReceipt(tx)
+
+    if (receipt) {
       if (parseInt(receipt.status, 16) !== 0) return receipt
       throw new Error(`Transaction: ${tx} exited with an error (status 0).`)
-    } catch (error) {
-      if (!error.message.includes('unknown transaction')) throw error
-      else {
-        await sleep(1000)
-        const timeoutReached = timeout > 0 && new Date().getTime() - start > timeout
-        if (!timeoutReached) return await this._getTransactionReceiptWithTimeout(tx, timeout, startTime)
-        throw new Error(`Transaction ${tx} wasn't processed in ${timeout / 1000} seconds!`)
-      }
     }
+
+    await sleep(1000)
+    const timeoutReached = timeout > 0 && new Date().getTime() - startTime > timeout
+    if (!timeoutReached) return await this._getTransactionReceiptWithTimeout(tx, timeout, startTime)
+    throw new Error(`Transaction ${tx} wasn't processed in ${timeout / 1000} seconds!`)
   },
+
+  async _tryGettingTransactionReceipt(tx) {
+    try {
+      return await this.getTransactionReceipt(tx)
+    } catch (error) {
+      if (error.message.includes('unknown transaction')) return null
+      else throw error
+    }
+  }
 }
 
 // Reference: see https://github.com/ethereum/EIPs/blob/master/EIPS/eip-155.md#list-of-chain-ids
