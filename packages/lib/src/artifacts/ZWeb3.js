@@ -40,7 +40,7 @@ const ZWeb3 = {
   },
 
   async defaultAccount() {
-    return (await accounts())[0]
+    return (await this.accounts())[0]
   },
 
   async estimateGas(params) {
