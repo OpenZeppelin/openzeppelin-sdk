@@ -1,10 +1,9 @@
 'use strict'
 require('../setup')
 
+import { ZWeb3, Contracts, App, Package } from 'zos-lib'
+
 import sinon from 'sinon'
-
-import { Contracts, App, Package } from 'zos-lib'
-
 import push from '../../src/scripts/push.js';
 import freeze from '../../src/scripts/freeze';
 import add from '../../src/scripts/add';
@@ -13,13 +12,11 @@ import ZosPackageFile from '../../src/models/files/ZosPackageFile';
 import remove from '../../src/scripts/remove';
 import Dependency from '../../src/models/dependency/Dependency';
 import CaptureLogs from '../helpers/captureLogs';
-import { promisify } from 'util';
 
 const should = require('chai').should();
 
 const ImplV1 = Contracts.getFromLocal('ImplV1');
 const WithLibraryImplV1 = Contracts.getFromLocal('WithLibraryImplV1');
-const PackageContract = Contracts.getFromNodeModules('zos-lib', 'Package');
 const ImplementationDirectory = Contracts.getFromNodeModules('zos-lib', 'ImplementationDirectory');
 
 contract('push script', function([_, owner]) {
@@ -82,7 +79,7 @@ contract('push script', function([_, owner]) {
 
     it('should deploy required libraries', async function () {
       const address = this.networkFile.solidityLib('UintLib').address;
-      const code = await promisify(web3.eth.getCode.bind(web3.eth))(address);
+      const code = await ZWeb3.getCode(address)
       const uintLib = Contracts.getFromLocal('UintLib');
       code.length.should.eq(uintLib.deployedBytecode.length).and.be.greaterThan(40);
     });

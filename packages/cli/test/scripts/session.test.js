@@ -1,8 +1,8 @@
-'use strict';
-require('../setup');
+'use strict'
+require('../setup')
 
-import session from '../../src/scripts/session';
-import Session from "../../src/models/network/Session";
+import session from '../../src/scripts/session'
+import Session, { DEFAULT_TX_TIMEOUT } from '../../src/models/network/Session'
 
 describe('session script', function () {
 
@@ -16,9 +16,11 @@ describe('session script', function () {
         beforeEach(function () {
           session(opts)
         })
+
         it('sets the new options', function () {
           Session.getOptions().should.be.deep.equal(opts)
         })
+
         it('merges given options with session defaults', function () {
           Session.getOptions({ from: '0x2' }).should.be.deep.equal({ network: 'foo', timeout: 10, from: '0x2' })
         })
@@ -27,10 +29,11 @@ describe('session script', function () {
       describe('when the time out expires', function () {
         it('clears all options', function () {
           session({ ... opts, expires: 0 })
-          Session.getOptions().should.be.empty
+          Session.getOptions().should.be.deep.equal({ timeout: DEFAULT_TX_TIMEOUT })
         })
+
         it('returns given options', function () {
-          Session.getOptions({ from: '0x2' }).should.be.deep.equal({ from: '0x2' })
+          Session.getOptions({ from: '0x2' }).should.be.deep.equal({ from: '0x2', timeout: DEFAULT_TX_TIMEOUT })
         })
       })
     })
@@ -41,14 +44,14 @@ describe('session script', function () {
       describe('when the time out does not expire', function () {
         it('replaces all options', function () {
           session({ network: 'bar' })
-          Session.getOptions().should.be.deep.equal({ network: 'bar' })
+          Session.getOptions().should.be.deep.equal({ network: 'bar', timeout: DEFAULT_TX_TIMEOUT })
         })
       })
 
       describe('when the time out expires', function () {
         it('clears all options', function () {
           session({ network: 'bar', expires: 0 })
-          Session.getOptions().should.be.empty;
+          Session.getOptions().should.be.deep.equal({ timeout: DEFAULT_TX_TIMEOUT })
         })
       })
     })
@@ -58,7 +61,7 @@ describe('session script', function () {
     describe('when there was no session opened before', function () {
       it('sets the new network', function () {
         session({ close: true })
-        Session.getOptions().should.be.empty
+        Session.getOptions().should.be.deep.equal({ timeout: DEFAULT_TX_TIMEOUT })
       })
     })
 
@@ -67,7 +70,7 @@ describe('session script', function () {
 
       it('replaces the previous network', function () {
         session({ close: true })
-        Session.getOptions().should.be.empty
+        Session.getOptions().should.be.deep.equal({ timeout: DEFAULT_TX_TIMEOUT })
       })
     })
   })

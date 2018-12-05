@@ -101,10 +101,9 @@ export default class App {
       : await this._createProxyAndCall(contractClass, packageName, contractName, initMethodName, initArgs)
 
     log.info(`TX receipt received: ${receipt.transactionHash}`)
-    const logs = decodeLogs(receipt.logs, this.constructor.getContractClass())
-    const address = _.findLast(logs, l => l.event === 'ProxyCreated').args.proxy
+    const address = _.findLast(receipt.logs, l => l.event === 'ProxyCreated').args.proxy
     log.info(`${packageName} ${contractName} proxy: ${address}`)
-    return new contractClass(address)
+    return contractClass.at(address)
   }
 
   async upgradeProxy(proxyAddress, contractClass, packageName, contractName, initMethodName, initArgs) {
@@ -112,7 +111,7 @@ export default class App {
       ? await this._upgradeProxy(proxyAddress, packageName, contractName)
       : await this._upgradeProxyAndCall(proxyAddress, contractClass, packageName, contractName, initMethodName, initArgs)
     log.info(`TX receipt received: ${receipt.transactionHash}`)
-    return new contractClass(proxyAddress)
+    return contractClass.at(proxyAddress)
   }
 
   async _createProxy(packageName, contractName) {

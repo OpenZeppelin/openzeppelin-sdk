@@ -1,3 +1,5 @@
+require('../setup')
+
 import { Contracts, encodeCall, assertRevert } from 'zos-lib'
 
 const BigNumber = web3.BigNumber;
@@ -5,13 +7,8 @@ const ZEPToken = artifacts.require('ZEPToken');
 const BasicJurisdiction = Contracts.getFromNodeModules('tpl-contracts-eth', 'BasicJurisdiction')
 const OrganizationsValidator = Contracts.getFromNodeModules('tpl-contracts-eth', 'OrganizationsValidator')
 
-require('chai')
-  .use(require('chai-bignumber')(BigNumber))
-  .should();
-
 contract('ZEPToken', ([ _, tokenOwner, another, jurisdictionOwner, validatorOwner, zeppelin, sender, recipient ]) => {
   const receiveTokensAttributeID = 999
-  const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000'
 
   beforeEach('initialize jurisdiction', async function () {
     this.jurisdiction = await BasicJurisdiction.new()

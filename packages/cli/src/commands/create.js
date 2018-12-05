@@ -1,10 +1,10 @@
 'use strict';
 
-import createProxy from '../scripts/create'
-import runWithTruffle from '../utils/runWithTruffle'
+import _ from 'lodash'
+import create from '../scripts/create'
 import { parseInit } from '../utils/input'
-import { fromContractFullName } from '../utils/naming';
-import _ from 'lodash';
+import { fromContractFullName } from '../utils/naming'
+import Initializer from '../models/initializer/Initializer'
 
 const name = 'create'
 const signature = `${name} <alias>`
@@ -21,11 +21,14 @@ const register = program => program
   .action(action)
 
 async function action(contractFullName, options) {
-  const { initMethod, initArgs } = parseInit(options, 'initialize')
   const { force } = options
+  const { initMethod, initArgs } = parseInit(options, 'initialize')
   const { contract: contractAlias, package: packageName } = fromContractFullName(contractFullName)
+  const { network, txParams } = await Initializer.call(options)
   const args = _.pickBy({ packageName, contractAlias, initMethod, initArgs, force })
-  await runWithTruffle(async (opts) => await createProxy({ ... args, ... opts }), options)
+
+  await create({ ...args, network, txParams })
+  if (!options.dontExitProcess && process.env.NODE_ENV !== 'test') process.exit(0)
 }
 
 export default { name, signature, description, register, action }

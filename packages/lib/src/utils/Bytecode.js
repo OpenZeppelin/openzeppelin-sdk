@@ -1,8 +1,7 @@
 'use strict'
 
 import crypto from 'crypto'
-
-const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000'
+import { ZERO_ADDRESS } from './Addresses'
 
 export function bodyCode(instance) {
   return splitCode(instance).body
@@ -24,6 +23,11 @@ export function bytecodeDigest(rawBytecode) {
 export function getSolidityLibNames(bytecode) {
   const libs = bytecode.match(/__[A-Za-z0-9_]{36}__/g)
   return libs ? libs.map(lib => lib.replace(/^__/, '').replace(/_*$/, '')) : []
+}
+
+// Tells whether a bytecode has unlinked libraries or not
+export function hasUnlinkedVariables(bytecode) {
+  return getSolidityLibNames(bytecode).length > 0
 }
 
 // Removes the last 43 bytes of the bytecode, i.e., the swarm hash that the solidity compiler appends and that

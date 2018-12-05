@@ -2,6 +2,7 @@
 require('../../setup')
 
 import Proxy from '../../../src/proxy/Proxy'
+import ZWeb3 from '../../../src/artifacts/ZWeb3'
 import encodeCall from '../../../src/helpers/encodeCall'
 import assertRevert from '../../../src/test/helpers/assertRevert'
 
@@ -31,7 +32,7 @@ export default function shouldBehaveLikeUpgradeabilityProxy(proxyClass, proxyCre
     })
 
     it('has expected balance', async function () {
-      (await web3.eth.getBalance(this.proxy)).should.be.bignumber.eq(balance)
+      (await ZWeb3.getBalance(this.proxy)).should.be.bignumber.eq(balance)
     })
   }
 

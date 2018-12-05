@@ -1,7 +1,7 @@
 'use strict'
 
 import freeze from '../scripts/freeze'
-import runWithTruffle from '../utils/runWithTruffle'
+import Initializer from '../models/initializer/Initializer'
 
 const name = 'freeze'
 const signature = name
@@ -15,7 +15,9 @@ const register = program => program
   .action(action)
 
 async function action(options) {
-  await runWithTruffle(async (opts) => await freeze(opts), options)
+  const { network, txParams } = await Initializer.call(options)
+  await freeze({ network, txParams })
+  if (!options.dontExitProcess && process.env.NODE_ENV !== 'test') process.exit(0)
 }
 
 export default { name, signature, description, register, action }

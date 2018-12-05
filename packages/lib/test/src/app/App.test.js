@@ -1,13 +1,15 @@
 'use strict';
+
 require('../../setup')
 
-import expectEvent from 'openzeppelin-solidity/test/helpers/expectEvent';
 import App from '../../../src/app/App';
-import { deploy as deployContract } from '../../../src/utils/Transactions';
+import ZWeb3 from '../../../src/artifacts/ZWeb3'
+import Package from '../../../src/package/Package'
 import Contracts from '../../../src/utils/Contracts'
-import Package from '../../../src/package/Package';
+import expectEvent from 'openzeppelin-solidity/test/helpers/expectEvent'
 import { ZERO_ADDRESS } from '../../../src/utils/Addresses';
 import { ImplementationDirectory, Proxy } from '../../../src';
+import { deploy as deployContract } from '../../../src/utils/Transactions';
 
 const ImplV1 = Contracts.getFromLocal('DummyImplementation');
 const ImplV2 = Contracts.getFromLocal('DummyImplementationV2');
@@ -155,7 +157,7 @@ contract('App', function (accounts) {
       it('should return a non-upgradeable instance', async function () {
         this.instance.address.should.be.not.null;
         (await this.instance.version()).should.be.eq('V1');
-        (await web3.eth.getCode(this.instance.address)).should.be.eq(ImplV1.deployedBytecode)
+        (await ZWeb3.getCode(this.instance.address)).should.be.eq(ImplV1.deployedBytecode)
       });
     };
 

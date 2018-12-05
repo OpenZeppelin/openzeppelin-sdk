@@ -25,7 +25,6 @@ contract('freeze script', function([_, owner]) {
       await freeze({ networkFile: this.networkFile, network, txParams })
         .should.be.rejectedWith('Cannot freeze an unpublished project')
     })
-
   })
 
   describe('for a published app', function () {

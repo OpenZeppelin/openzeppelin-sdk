@@ -10,10 +10,10 @@ import files from './models/files'
 import local from './models/local'
 import network from './models/network'
 import TestHelper from './models/TestHelper'
+import Initializer from './models/initializer/Initializer'
 
 // utils
 import naming from './utils/naming'
-import runWithTruffle from './utils/runWithTruffle'
 import log, { silent } from './utils/stdout'
 const stdout = { log, silent }
 
@@ -26,6 +26,6 @@ export {
   scripts,
   naming,
   stdout,
-  runWithTruffle,
+  Initializer,
   TestHelper,
 }

@@ -1,11 +1,11 @@
-import _ from 'lodash';
-import { buildCallData, callDescription } from '../utils/ABIs';
-import { deploy, sendDataTransaction } from "../utils/Transactions";
-import Proxy from '../proxy/Proxy';
-import Logger from '../utils/Logger';
-import { toAddress } from '../utils/Addresses';
-import { bytecodeDigest } from '..';
-import { Package } from '../../lib';
+import _ from 'lodash'
+import Proxy from '../proxy/Proxy'
+import Logger from '../utils/Logger'
+import Package from '../package/Package'
+import { deploy } from '../utils/Transactions'
+import { toAddress } from '../utils/Addresses'
+import { bytecodeDigest } from '..'
+import { buildCallData, callDescription } from '../utils/ABIs'
 
 const log = new Logger('SimpleProject')
 
@@ -23,7 +23,7 @@ export default class SimpleProject  {
     const initCallData = this._getAndLogInitCallData(contractClass, initMethodName, initArgs, implementationAddress, 'Creating')
     const proxy = await Proxy.deploy(implementationAddress, initCallData, this.txParams)
     log.info(`Instance created at ${proxy.address}`)
-    return new contractClass(proxy.address);
+    return contractClass.at(proxy.address);
   }
 
   async upgradeProxy(proxyAddress, contractClass, { packageName, contractName, initMethod: initMethodName, initArgs, redeployIfChanged } = {}) {
@@ -33,7 +33,7 @@ export default class SimpleProject  {
     const proxy = Proxy.at(proxyAddress, this.txParams)
     await proxy.upgradeTo(implementationAddress, initCallData)
     log.info(`Instance at ${proxyAddress} upgraded`)
-    return new contractClass(proxyAddress);
+    return contractClass.at(proxyAddress);
   }
 
   async changeProxyAdmin(proxyAddress, newAdmin) {
@@ -104,10 +104,9 @@ export default class SimpleProject  {
     const existing = this.implementations[contractName];
     const contractChanged = existing && existing.bytecodeHash !== bytecodeDigest(contractClass.bytecode)
     const shouldRedeploy = !existing || (redeployIfChanged && contractChanged)
-
-    return shouldRedeploy
-      ? (await this.setImplementation(contractClass, contractName)).address
-      : existing.address;
+    if (!shouldRedeploy) return existing.address
+    const newInstance = await this.setImplementation(contractClass, contractName)
+    return newInstance.address
   }
 
   async _getDependencyImplementation(packageName, contractName) {

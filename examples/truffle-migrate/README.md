@@ -38,4 +38,4 @@ await update(Object.assign({ contractAlias: 'MyContract', initMethod: 'add', ini
 
 ### Boilerplate
 
-Due to limitations on how global variables are managed within truffle scripts, both deployment functions need to be wrapped in a `runWithTruffle` helper function exported by `zos` CLI. We have ongoing efforts to remove this restriction in the near future.
+Due to limitations on how global variables are managed within truffle scripts, both deployment functions need to be run after the `Initializer` object exported by `zos` CLI is called. We have ongoing efforts to remove this restriction in the near future.

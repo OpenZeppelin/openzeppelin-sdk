@@ -1,4 +1,4 @@
-import Contracts from "../utils/Contracts";
+import Contracts from "./Contracts";
 import { parseJson } from "../utils/FileSystem";
 import _ from 'lodash';
 

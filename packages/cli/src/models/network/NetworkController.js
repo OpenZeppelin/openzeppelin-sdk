@@ -175,7 +175,8 @@ export default class NetworkController {
         storage: contractClass.storageInfo.storage
       })
     } catch(error) {
-      throw Error(`${contractAlias} deployment failed with error: ${error.message}`)
+      error.message = `${contractAlias} deployment failed with error: ${error.message}`
+      throw error
     }
   }
 
@@ -195,7 +196,8 @@ export default class NetworkController {
       await this.project.unsetImplementation(libName);
       this.networkFile.unsetSolidityLib(libName)
     } catch(error) {
-      throw Error(`Removal of ${libName} failed with error: ${error.message}`)
+      error.message = `Removal of ${libName} failed with error: ${error.message}`
+      throw error
     }
   }
 
@@ -229,7 +231,8 @@ export default class NetworkController {
       await this.project.unsetImplementation(contractAlias);
       this.networkFile.unsetContract(contractAlias)
     } catch(error) {
-      throw Error(`Removal of ${contractAlias} failed with error: ${error.message}`)
+      error.message = `Removal of ${contractAlias} failed with error: ${error.message}`
+      throw error
     }
   }
 
@@ -525,7 +528,8 @@ export default class NetworkController {
         version: semanticVersionToString(packageVersion)
       }));
     } catch(error) {
-      throw Error(`Proxy ${toContractFullName(proxy.package, proxy.contract)} at ${proxy.address} failed to update with error: ${error.message}`)
+      error.message = `Proxy ${toContractFullName(proxy.package, proxy.contract)} at ${proxy.address} failed to update with error: ${error.message}`
+      throw error
     }
   }
 
@@ -587,8 +591,9 @@ export default class NetworkController {
         version: deployment.version,
         customDeploy: true
       })
-    } catch (err) {
-      throw Error(`Failed deployment of dependency ${depName} with error: ${err.message}`)
+    } catch (error) {
+      error.message = `Failed deployment of dependency ${depName} with error: ${error.message}`
+      throw error
     }
   }
 
@@ -631,7 +636,8 @@ export default class NetworkController {
         this.networkFile.setDependency(depName, depInfo)
       }
     } catch(error) {
-      throw Error(`Failed to link dependency ${depName}@${depVersion} with error: ${error.message}`)
+      error.message = `Failed to link dependency ${depName}@${depVersion} with error: ${error.message}`
+      throw error
     }
   }
 

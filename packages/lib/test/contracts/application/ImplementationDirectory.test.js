@@ -1,7 +1,9 @@
 'use strict';
+
 require('../../setup')
 
 import Contracts from '../../../src/utils/Contracts'
+import { ZERO_ADDRESS } from '../../../src/utils/Addresses'
 import assertRevert from '../../../src/test/helpers/assertRevert'
 import shouldBehaveLikeOwnable from '../../../src/test/behaviors/Ownable'
 
@@ -79,7 +81,6 @@ contract('ImplementationDirectory', function([_, owner, anotherAddress]) {
   })
 
   describe('unsetImplementation', function () {
-    const ZERO_ADDRESS = 0x0
     const contractName = 'ERC721'
 
     beforeEach('registering the contract', async function () {

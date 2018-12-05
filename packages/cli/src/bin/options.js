@@ -1,9 +1,9 @@
 import program from 'commander'
-import { DEFAULT_TIMEOUT } from '../utils/runWithTruffle';
+import { DEFAULT_TX_TIMEOUT } from '../models/network/Session'
 
 program.Command.prototype.withNetworkTimeoutOption = function () {
   return this
-    .option('--timeout <timeout>', `timeout in seconds for each blockchain transaction (defaults to ${DEFAULT_TIMEOUT}s)`);
+    .option('--timeout <timeout>', `timeout in seconds for each blockchain transaction (defaults to ${DEFAULT_TX_TIMEOUT}s)`);
 };
 
 program.Command.prototype.withNetworkOptions = function () {

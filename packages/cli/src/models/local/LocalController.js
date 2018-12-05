@@ -1,13 +1,13 @@
 'use strict'
 
 import _ from 'lodash'
-import { Contracts, Logger, FileSystem as fs, getBuildArtifacts, validate as validateContract, validationPasses } from 'zos-lib'
+import { Contracts, Logger, FileSystem as fs, getBuildArtifacts, validate as validateContract, validationPasses} from 'zos-lib'
 
-import Dependency from '../dependency/Dependency';
-import NetworkController from '../network/NetworkController';
 import Session from '../network/Session'
-import Truffle from '../truffle/Truffle'
-import ValidationLogger from '../../interface/ValidationLogger';
+import Dependency from '../dependency/Dependency'
+import NetworkController from '../network/NetworkController'
+import ValidationLogger from '../../interface/ValidationLogger'
+import TruffleProjectInitializer from '../initializer/truffle/TruffleProjectInitializer'
 
 const log = new Logger('LocalController');
 
@@ -21,7 +21,7 @@ export default class LocalController {
   init(name, version, force = false, publish = false) {
     this.initZosPackageFile(name, version, force)
     Session.ignoreFile()
-    Truffle.init()
+    TruffleProjectInitializer.call()
     if (publish) this.packageFile.publish = publish
   }
 
@@ -47,8 +47,7 @@ export default class LocalController {
   }
 
   addAll() {
-    // TODO: hack to get local build dir, add this info to Contracts from zos-lib
-    const folder = Contracts.getLocalPath('').replace(/\.json$/, '')
+    const folder = Contracts.getLocalBuildDir()
     fs.readDir(folder).forEach(file => {
       const path = `${folder}/${file}`
       if(this.hasBytecode(path)) {

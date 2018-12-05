@@ -1,31 +1,12 @@
 import { promisify } from 'util'
 
+import ZWeb3 from '../artifacts/ZWeb3'
 import Contracts from '../utils/Contracts'
 import { estimateGas } from '../utils/Transactions'
-import sleep from './sleep'
-
-const RECEIPT_CHECK_TIMEBOX = 1000
-const DEPLOYMENT_TIMEOUT_ERROR = 'Contract deployment timed out'
 
 async function sendTransaction(params) {
   if (!params.gas) params.gas = await estimateGas(params)
-  return promisify(web3.eth.sendTransaction.bind(web3.eth))(params)
-}
-
-async function getTransactionReceipt(txHash) {
-  let timeout = false
-  const timer = setTimeout(() => timeout = true, Contracts.getSyncTimeout())
-
-  while(!timeout) {
-    const receipt = await promisify(web3.eth.getTransactionReceipt.bind(web3.eth))(txHash)
-    if (receipt) {
-      clearTimeout(timer)
-      return receipt
-    }
-    await sleep(RECEIPT_CHECK_TIMEBOX)
-  }
-
-  throw Error(DEPLOYMENT_TIMEOUT_ERROR)
+  return ZWeb3.sendTransaction(params)
 }
 
 export default async function copyContract(contractClass, address, txParams = {}) {
@@ -49,8 +30,8 @@ export default async function copyContract(contractClass, address, txParams = {}
 
   const ASM_CODE_COPY = `0x73${address}803b8091600080913c6000f3`
 
-  const params = Object.assign({}, contractClass.defaults(), txParams, { to: null, data: ASM_CODE_COPY })
+  const params = Object.assign({}, contractClass.txParams, txParams, { to: null, data: ASM_CODE_COPY })
   const txHash = await sendTransaction(params)
-  const receipt = await getTransactionReceipt(txHash)
+  const receipt = await ZWeb3.getTransactionReceiptWithTimeout(txHash, Contracts.getSyncTimeout())
   return contractClass.at(receipt.contractAddress)
 }

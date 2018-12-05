@@ -1,8 +1,9 @@
 'use strict';
 
-import push from '../scripts/push'
-import runWithTruffle from '../utils/runWithTruffle'
 import _ from 'lodash'
+import push from '../scripts/push'
+import compile from '../models/compiler/compile'
+import Initializer from '../models/initializer/Initializer'
 
 const name = 'push'
 const signature = name
@@ -20,11 +21,11 @@ const register = program => program
   .action(action)
 
 async function action(options) {
-  const { skipCompile, deployDependencies, force, reset: reupload } = options
-  await runWithTruffle(
-    async (opts) => await push({ force, deployDependencies, reupload, ...opts }),
-    { compile: !skipCompile, ... options }
-  )
+  const {  deployDependencies, force, reset: reupload } = options
+  if (!options.skipCompile) await compile()
+  const { network, txParams } = await Initializer.call(options)
+  await push({ force, deployDependencies, reupload, network, txParams })
+  if (!options.dontExitProcess && process.env.NODE_ENV !== 'test') process.exit(0)
 }
 
 async function tryAction(externalOptions) {

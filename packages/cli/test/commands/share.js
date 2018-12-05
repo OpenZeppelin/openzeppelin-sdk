@@ -20,10 +20,10 @@ import * as update from '../../src/scripts/update';
 import * as verify from '../../src/scripts/verify';
 import * as setAdmin from '../../src/scripts/set-admin';
 
-import * as runWithTruffle from '../../src/utils/runWithTruffle';
+import program from '../../src/bin/program';
 import Session from '../../src/models/network/Session';
 import ErrorHandler from '../../src/models/errors/ErrorHandler';
-import program from '../../src/bin/program';
+import Initializer from '../../src/models/initializer/Initializer';
 
 const assert = require('chai').assert
 
@@ -65,11 +65,10 @@ exports.stubCommands = function () {
     this.verify = sinon.stub(verify, 'default')
     this.setAdmin = sinon.stub(setAdmin, 'default')
     this.errorHandler = sinon.stub(ErrorHandler.prototype, 'call').callsFake(() => null)
-    this.runWithTruffle = sinon.stub(runWithTruffle, 'default').callsFake(function (script, options) {
-      const { network, from, timeout } = Session.getOptions(options)
+    this.initializer = sinon.stub(Initializer, 'call').callsFake(function (options) {
+      const { network, from } = Session.getOptions(options)
       const txParams = from ? { from } : {}
-      if (!network) throw Error('A network name must be provided to execute the requested action.')
-      script({ network, txParams })
+      return { network, txParams }
     })
   })
 
@@ -94,7 +93,7 @@ exports.stubCommands = function () {
     this.verify.restore()
     this.setAdmin.restore()
     this.errorHandler.restore()
-    this.runWithTruffle.restore()
+    this.initializer.restore()
     program.parseReset()
   })
 }

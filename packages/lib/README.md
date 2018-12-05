@@ -40,19 +40,18 @@ node
 ```
 
 ```js
-> // Connect web3 to the local provider.
-> var Web3 = require('web3')
-> web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:9545"))
+> const { ZWeb3, Contracts, SimpleProject } = require('zos-lib')
+> // Initialize a web3 provider.
+> ZWeb3.initialize("http://localhost:9545")
 > // Load the contract.
-> const { Contracts, SimpleProject } = require('zos-lib')
 > const MyContract = Contracts.getFromLocal('MyContract')
 > // Instantiate a project.
-> myProject = new SimpleProject('MyProject', { from: web3.eth.accounts[0] });
+> myProject = new SimpleProject('MyProject', { from: await ZWeb3.defaultAccount() })
 > // Create a proxy for the contract.
 > myProject.createProxy(MyContract).then(proxy => myProxy = proxy)
 > // Make a change on the contract, and compile it.
-> const MyContractV1 = Contracts.getFromLocal('MyContract')
-> myProject.upgradeProxy(proxy, MyContractV1)
+> const MyContractUpgraded = Contracts.getFromLocal('MyContract')
+> myProject.upgradeProxy(proxy, MyContractUpgraded)
 ```
 
 ## Security

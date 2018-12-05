@@ -1,17 +1,13 @@
-'use strict'
 process.env.NODE_ENV = 'test'
 
-import ZWeb3 from '../src/artifacts/ZWeb3'
-import Contracts from '../src/utils/Contracts'
+import { Contracts, ZWeb3 } from 'zos-lib'
 
 ZWeb3.initialize(web3.currentProvider)
 setArtifactDefaults()
 
 require('chai')
-  .use(require('chai-as-promised')) // TODO: Remove this dependency
   .use(require('chai-bignumber')(web3.BigNumber))
-  .use(require('../src/test/helpers/assertions'))
-  .should()
+  .should();
 
 function setArtifactDefaults() {
   const from = ZWeb3.eth().accounts[0]

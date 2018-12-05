@@ -3,7 +3,7 @@ require('../setup')
 
 import { FileSystem as fs } from 'zos-lib'
 import { cleanupfn } from '../helpers/cleanup'
-import Truffle from '../../src/models/truffle/Truffle'
+import TruffleProjectInitializer from '../../src/models/initializer/truffle/TruffleProjectInitializer'
 
 contract('Truffle', function () {
   const tmpDir = 'test/tmp';
@@ -16,7 +16,7 @@ contract('Truffle', function () {
   afterEach('cleanup files & folders', cleanupfn(tmpDir))
 
   it('should create an empty contracts folder if missing', async function () {
-    Truffle.init(tmpDir)
+    TruffleProjectInitializer.call(tmpDir)
 
     fs.exists(contractsDir).should.be.true
     fs.readDir(contractsDir).should.have.lengthOf(1)
@@ -26,7 +26,7 @@ contract('Truffle', function () {
   it('should not create an empty contracts folder if present', async function () {
     fs.createDir(contractsDir)
     fs.write(`${contractsDir}/Sample.sol`)
-    Truffle.init(tmpDir)
+    TruffleProjectInitializer.call(tmpDir)
 
     fs.exists(contractsDir).should.be.true
     fs.readDir(contractsDir).should.have.lengthOf(1)
@@ -34,7 +34,7 @@ contract('Truffle', function () {
   })
 
   it('should create an empty migrations folder if missing', async function () {
-    Truffle.init(tmpDir)
+    TruffleProjectInitializer.call(tmpDir)
 
     fs.exists(migrationsDir).should.be.true
     fs.readDir(migrationsDir).should.have.lengthOf(1)
@@ -44,7 +44,7 @@ contract('Truffle', function () {
   it('should not create an empty migrations folder if present', async function () {
     fs.createDir(migrationsDir)
     fs.write(`${migrationsDir}/01_sample.js`)
-    Truffle.init(tmpDir)
+    TruffleProjectInitializer.call(tmpDir)
 
     fs.exists(migrationsDir).should.be.true
     fs.readDir(migrationsDir).should.have.lengthOf(1)
@@ -52,14 +52,14 @@ contract('Truffle', function () {
   })
 
   it('should create a truffle config file if missing', async function () {
-    Truffle.init(tmpDir)
+    TruffleProjectInitializer.call(tmpDir)
 
     fs.exists(truffleConfigPath).should.be.true
   })
 
   it('should not create a truffle config file if present', async function () {
     fs.write(truffleConfigFile, '')
-    Truffle.init(tmpDir)
+    TruffleProjectInitializer.call(tmpDir)
 
     fs.read(truffleConfigPath).should.have.lengthOf(0)
   })

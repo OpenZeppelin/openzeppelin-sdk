@@ -1,7 +1,5 @@
-import _ from 'lodash';
-import { semanticVersionEqual, toSemanticVersion } from '../../utils/Semver';
-
-const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000';
+import { ZERO_ADDRESS } from '../../utils/Addresses'
+import { semanticVersionEqual, toSemanticVersion } from '../../utils/Semver'
 
 module.exports = function (chai, utils) {
   const Assertion = chai.Assertion

@@ -26,8 +26,8 @@ export default class PackageProject extends BasePackageProject {
       project.directory = directory
 
       return project
-    } catch(deployError) {
-      throw new DeployError(deployError.message, { thepackage, directory })
+    } catch(error) {
+      throw new DeployError(error, { thepackage, directory })
     }
   }
 

@@ -1,10 +1,10 @@
 'use strict';
 
+import _ from 'lodash'
 import update from '../scripts/update'
-import runWithTruffle from '../utils/runWithTruffle'
 import { parseInit } from '../utils/input'
 import { fromContractFullName } from '../utils/naming'
-import _ from 'lodash'
+import Initializer from '../models/initializer/Initializer'
 
 const name = 'update'
 const signature = `${name} [alias-or-address]`
@@ -33,7 +33,9 @@ async function action(contractFullNameOrAddress, options) {
   }
   
   const args = _.pickBy({ contractAlias, packageName, proxyAddress, initMethod, initArgs, all, force })
-  await runWithTruffle(async (opts) => await update({ ... args, ... opts }), options)
+  const { network, txParams } = await Initializer.call(options)
+  await update({ ...args, network, txParams })
+  if (!options.dontExitProcess && process.env.NODE_ENV !== 'test') process.exit(0)
 }
 
 export default { name, signature, description, register, action }
