@@ -46,7 +46,7 @@ node
 > // Load the contract.
 > const MyContract = Contracts.getFromLocal('MyContract')
 > // Instantiate a project.
-> myProject = new SimpleProject('MyProject', { from: ZWeb3.defaultAccount() })
+> myProject = new SimpleProject('MyProject', { from: await ZWeb3.defaultAccount() })
 > // Create a proxy for the contract.
 > myProject.createProxy(MyContract).then(proxy => myProxy = proxy)
 > // Make a change on the contract, and compile it.

@@ -35,12 +35,12 @@ const ZWeb3 = {
     return this.eth().contract(abi)
   },
 
-  accounts() {
-    return this.eth().accounts
+  async accounts() {
+    return promisify(this.eth().getAccounts.bind(this.eth()))()
   },
 
-  defaultAccount() {
-    return this.accounts()[0]
+  async defaultAccount() {
+    return (await accounts())[0]
   },
 
   async estimateGas(params) {

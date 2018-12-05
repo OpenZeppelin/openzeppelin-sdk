@@ -15,7 +15,7 @@ export default {
     Contracts.setLocalBuildDir(buildDir)
     Contracts.setArtifactsDefaults(artifactDefaults)
 
-    const txParams = from ? { from } : {}
+    const txParams = from ? { from } : { from: await ZWeb3.defaultAccount() }
     return { network: await ZWeb3.getNetworkName(), txParams }
   }
 }

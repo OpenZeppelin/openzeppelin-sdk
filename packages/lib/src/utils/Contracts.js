@@ -17,7 +17,7 @@ export default {
   },
 
   getArtifactsDefaults() {
-    return this.artifactDefaults || { from: ZWeb3.defaultAccount() }
+    return this.artifactDefaults || {}
   },
 
   getLocalPath(contractName) {
@@ -57,12 +57,7 @@ export default {
   },
 
   setArtifactsDefaults(defaults) {
-    try {
-      this.artifactDefaults = { ...this.getArtifactsDefaults(), ...defaults }
-    } catch(error) {
-      // assuming that ZWeb3 is not initialized
-      this.artifactDefaults = defaults
-    }
+    this.artifactDefaults = { ...this.getArtifactsDefaults(), ...defaults }
   },
 
   _getFromPath(path) {
