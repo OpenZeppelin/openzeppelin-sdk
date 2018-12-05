@@ -24,6 +24,7 @@ async function action(options) {
   if (options.fix) await pull({ network, txParams })
   else if (options.fetch) await compare({ network, txParams })
   else await status({ network, txParams })
+  if (!options.dontExitProcess && process.env.NODE_ENV !== 'test') process.exit(0)
 }
 
 export default { name, signature, description, register, action }

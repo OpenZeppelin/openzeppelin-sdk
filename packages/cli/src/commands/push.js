@@ -25,6 +25,7 @@ async function action(options) {
   if (!options.skipCompile) await compile()
   const { network, txParams } = await Initializer.call(options)
   await push({ force, deployDependencies, reupload, network, txParams })
+  if (!options.dontExitProcess && process.env.NODE_ENV !== 'test') process.exit(0)
 }
 
 async function tryAction(externalOptions) {

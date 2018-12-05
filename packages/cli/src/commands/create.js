@@ -28,6 +28,7 @@ async function action(contractFullName, options) {
   const args = _.pickBy({ packageName, contractAlias, initMethod, initArgs, force })
 
   await create({ ...args, network, txParams })
+  if (!options.dontExitProcess && process.env.NODE_ENV !== 'test') process.exit(0)
 }
 
 export default { name, signature, description, register, action }

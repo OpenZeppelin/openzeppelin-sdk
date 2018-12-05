@@ -17,6 +17,7 @@ const register = program => program
 async function action(options) {
   const { network, txParams } = await Initializer.call(options)
   await await publish({ network, txParams })
+  if (!options.dontExitProcess && process.env.NODE_ENV !== 'test') process.exit(0)
 }
 
 export default { name, signature, description, register, action }

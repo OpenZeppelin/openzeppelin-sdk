@@ -25,6 +25,7 @@ async function action(contractAlias, options) {
   }
   const { network, txParams } = await Initializer.init(options)
   await verify(contractAlias, { ...options, network, txParams })
+  if (!options.dontExitProcess && process.env.NODE_ENV !== 'test') process.exit(0)
 }
 
 export default { name, signature, description, register, action }
