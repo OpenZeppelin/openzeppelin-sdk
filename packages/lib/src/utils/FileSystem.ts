@@ -2,7 +2,6 @@ import * as fs from 'fs'
 import * as path from 'path'
 
 // TS-TODO: Analyze which of these functions could be encapsulated.
-// TS-TODO: Make this a class with static methods?
 
 export function read(filename:string):string {
   return fs.readFileSync(filename, {encoding: 'utf8'})
