@@ -25,9 +25,9 @@ const TruffleConfig = {
 
     const TruffleResolver = require('truffle-resolver')
     config.resolver = new TruffleResolver(config)
-    this._setNonceTrackerIfNeeded(config)
+    const { provider, resolver } = this._setNonceTrackerIfNeeded(config)
 
-    const { provider, contracts_build_directory: buildDir, resolver } = config
+    const buildDir = config.contracts_build_directory
     const artifactDefaults = _.pickBy(_.pick(resolver.options, 'from', 'gas', 'gasPrice'))
     if (artifactDefaults.from) artifactDefaults.from = artifactDefaults.from.toLowerCase()
     return { provider, buildDir, artifactDefaults }
@@ -38,18 +38,20 @@ const TruffleConfig = {
   // assigning the HDWalletProvider instance directly.
   // (see https://github.com/trufflesuite/truffle-hdwallet-provider/issues/65)
   _setNonceTrackerIfNeeded({ resolver, provider }) {
-    if (provider.engine && provider.engine.constructor.name === 'Web3ProviderEngine') {
+    const { engine } = provider
+    if (engine && engine.constructor.name === 'Web3ProviderEngine') {
       const NonceSubprovider = require('web3-provider-engine/subproviders/nonce-tracker')
       const nonceTracker = new NonceSubprovider()
-      provider.engine._providers.forEach((provider, index) => {
+      engine._providers.forEach((provider, index) => {
         if (provider.constructor.name === 'ProviderSubprovider') {
-          nonceTracker.setEngine(provider.engine)
-          provider.engine._providers.splice(index, 0, nonceTracker)
+          nonceTracker.setEngine(engine)
+          engine._providers.splice(index, 0, nonceTracker)
         }
       })
       resolver.options = Object.assign({}, resolver.options, { provider })
     }
-  }
+    return { resolver, provider }
+  },
 }
 
 export default TruffleConfig
