@@ -1,5 +1,4 @@
-require('babel-register')
-require('babel-polyfill')
+require('ts-node/register')
 
 module.exports = {
   networks: {

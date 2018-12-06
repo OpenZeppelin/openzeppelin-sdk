@@ -5,6 +5,7 @@
     "@types/node": "^10.12.10",
     "lerna": "~3.3.2",
     "tslint": "^5.11.0",
-    "typescript": "^3.1.6"
+    "typescript": "^3.1.6",
+    "ts-node": "^7.0.1"
   }
 }
