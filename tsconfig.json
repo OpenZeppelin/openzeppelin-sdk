@@ -2,7 +2,8 @@
   "compilerOptions": {
     "pretty": true,
     "module": "commonjs",
-    "target": "es5",
+    "moduleResolution": "Node",
+    "target": "es6",
     "allowJs": true,
     "checkJs": false,
     "strict": false,
