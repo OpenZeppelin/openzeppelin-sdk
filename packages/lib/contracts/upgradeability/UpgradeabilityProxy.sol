@@ -1,7 +1,7 @@
 pragma solidity ^0.4.24;
 
 import './Proxy.sol';
-import 'openzeppelin-solidity/contracts/AddressUtils.sol';
+import 'openzeppelin-solidity/contracts/utils/Address.sol';
 
 /**
  * @title UpgradeabilityProxy
@@ -10,6 +10,8 @@ import 'openzeppelin-solidity/contracts/AddressUtils.sol';
  * Such a change is called an implementation upgrade.
  */
 contract UpgradeabilityProxy is Proxy {
+  using Address for address;
+
   /**
    * @dev Emitted when the implementation is upgraded.
    * @param implementation Address of the new implementation.
@@ -64,7 +66,7 @@ contract UpgradeabilityProxy is Proxy {
    * @param newImplementation Address of the new implementation.
    */
   function _setImplementation(address newImplementation) private {
-    require(AddressUtils.isContract(newImplementation), "Cannot set a proxy implementation to a non-contract address");
+    require(newImplementation.isContract(), "Cannot set a proxy implementation to a non-contract address");
 
     bytes32 slot = IMPLEMENTATION_SLOT;
 
