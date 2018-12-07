@@ -6,8 +6,9 @@ import util from 'util';
 // return a custom object.
 
 type SemanticVersion = [number, number, number];
+type RawSemanticVersion = [any, any, any];
 
-export function toSemanticVersion(version:string | any[]):SemanticVersion | never {
+export function toSemanticVersion(version:string | RawSemanticVersion):SemanticVersion | never {
 
   if (_.isString(version)) {
 
@@ -22,7 +23,7 @@ export function toSemanticVersion(version:string | any[]):SemanticVersion | neve
   }
   else if (_.isArray(version) && version.length === 3) {
 
-    const semverGenericArray:any[] = <any[]>version;
+    const semverGenericArray:RawSemanticVersion = <RawSemanticVersion>version;
 
     const semverTyped:number[] = semverGenericArray.map( ( x:any ) => {
       return x.toNumber ? x.toNumber() : x;
@@ -37,13 +38,13 @@ export function toSemanticVersion(version:string | any[]):SemanticVersion | neve
 
 }
 
-export function semanticVersionToString(version:string | any[]):string | never {
+export function semanticVersionToString(version:string | RawSemanticVersion):string | never {
   if (_.isString(version)) {
     return <string>version;
   }
   else if (_.isArray(version)) {
 
-    const semverGenericArray:any[] = <any[]>version;
+    const semverGenericArray:RawSemanticVersion = <RawSemanticVersion>version;
 
     return <string>(semverGenericArray.join('.'));
 
@@ -53,7 +54,7 @@ export function semanticVersionToString(version:string | any[]):string | never {
   }
 }
 
-export function semanticVersionEqual(v1:string | any[], v2:string | any[]):boolean {
+export function semanticVersionEqual(v1:string | RawSemanticVersion, v2:string | RawSemanticVersion):boolean {
 
   const semver1:SemanticVersion = toSemanticVersion(v1);
   const semver2:SemanticVersion = toSemanticVersion(v2);

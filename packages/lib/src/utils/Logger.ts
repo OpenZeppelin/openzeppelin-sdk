@@ -1,6 +1,6 @@
 import chalk from 'chalk';
 
-type LoggerOptions = {
+interface LoggerOptions {
   verbose:boolean;
   silent:boolean;
 }
