@@ -7,10 +7,29 @@
     "rules": {
       "one-line": [false],
       "quotemark": [true, "single"],
+      "semicolon": [true, "always"],
       "whitespace": [false],
       "object-literal-sort-keys": [false],
       "typedef-whitespace": [true, "no-space"],
-      "trailing-comma": [false]
+      "trailing-comma": [false],
+      "ordered-imports": [false],
+      "no-angle-bracket-type-assertion": [false],
+      "member-ordering": [
+        true,
+        {
+          "order": [
+            "private-static-field",
+            "private-instance-field",
+            "private-constructor",
+            "private-instance-method",
+            "public-static-field",
+            "public-instance-field",
+            "public-constructor",
+            "public-instance-method",
+            "protected-instance-method"
+          ]
+        }
+      ]
     },
     "rulesDirectory": []
 }

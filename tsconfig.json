@@ -9,7 +9,7 @@
     "strict": false,
     "esModuleInterop": true,
     "lib": [
-      "es2015"
+      "es2017"
     ]
   },
   "exclude": [
