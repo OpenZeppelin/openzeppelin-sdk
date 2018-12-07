@@ -2,18 +2,18 @@ import crypto from 'crypto';
 import { ZERO_ADDRESS } from './Addresses';
 
 // TS-TODO: instance could probably be typed to some sort of web3 object - seems to be a contract.
-export function bodyCode(instance) {
+export function bodyCode(instance:any):string {
   return splitCode(instance).body;
 }
 
-export function constructorCode(instance):string {
+export function constructorCode(instance:any):string {
   return splitCode(instance).constructor;
 }
 
 export function bytecodeDigest(rawBytecode:string):string {
   const bytecode:string = tryRemoveSwarmHash(rawBytecode.replace(/^0x/, ''));
   const buffer:Buffer = Buffer.from(bytecode, 'hex');
-  const hash = crypto.createHash('sha256');
+  const hash:any = crypto.createHash('sha256');
   return hash.update(buffer).digest('hex');
 }
 
@@ -47,7 +47,8 @@ export function isSolidityLib(bytecode:string):boolean {
   return matches == null ? false : matches.length > 0;
 }
 
-function splitCode(instance):{constructor:string, body:string} {
+// TS-TODO: Define interface for returned object.
+function splitCode(instance:any):{constructor:string, body:string} {
   const binary:string = instance.constructor.binary.replace(/^0x/, '');
   const bytecode:string = instance.constructor.bytecode.replace(/^0x/, '');
   const deployedBytecode:string = instance.constructor.deployedBytecode.replace(/^0x/, '');
