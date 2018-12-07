@@ -166,8 +166,8 @@ async function getETHGasStationPrice() {
   if (state.gasPrice) return state.gasPrice;
 
   try {
-    const apiResponse = await axios.get(GAS_API_URL);
-    const gasPriceGwei = apiResponse.average / 10;
+    const { data: responseData } = await axios.get(GAS_API_URL);
+    const gasPriceGwei = responseData.average / 10;
     const gasPrice = gasPriceGwei * 1e9;
 
     state.gasPrice = gasPrice;
