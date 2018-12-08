@@ -14,22 +14,10 @@
       "trailing-comma": [false],
       "ordered-imports": [false],
       "no-angle-bracket-type-assertion": [false],
-      "member-ordering": [
-        true,
-        {
-          "order": [
-            "private-static-field",
-            "private-instance-field",
-            "private-constructor",
-            "private-instance-method",
-            "public-static-field",
-            "public-instance-field",
-            "public-constructor",
-            "public-instance-method",
-            "protected-instance-method"
-          ]
-        }
-      ]
+      "interface-name": [false],
+      "variable-name": [false],
+      "member-ordering": [false],
+      "no-console": [false]
     },
     "rulesDirectory": []
 }
