@@ -74,13 +74,13 @@ contract('Transactions', function([_account1, account2]) {
       await assertGasLt(tx, 1000000);
     });
 
-    describe('Uses an API to determine gas price', async function() {
-      beforeEach('Stub API reply and simulate mainnet', async function() {
+    describe('uses an API to determine gas price', async function() {
+      beforeEach('stub API reply and simulate mainnet', async function() {
         sinon.stub(ZWeb3, 'isMainnet').resolves(true)
         sinon.stub(axios, 'get').resolves({ data: { average: 49 } })
       });
 
-      afterEach('Return to testnet and undo stub', async function() {
+      afterEach('return to testnet and undo stub', async function() {
         delete state.gasPrice;
         sinon.restore();
       });
@@ -98,18 +98,18 @@ contract('Transactions', function([_account1, account2]) {
       });
     });
 
-    describe('Does not blindly trust API', async function() {
+    describe('does not blindly trust API', async function() {
       beforeEach('Stub API reply and simulate mainnet', async function() {
         sinon.stub(ZWeb3, 'isMainnet').resolves(true)
         sinon.stub(axios, 'get').resolves({ data: { average: 1234123412341234 } })
       });
 
-      afterEach('Return to testnet and undo stub', async function() {
+      afterEach('return to testnet and undo stub', async function() {
         delete state.gasPrice;
         sinon.restore();
       });
 
-      it('Produces an error when gas price API gives giant value', async function () {
+      it('produces an error when gas price API gives giant value', async function () {
         await sendTransaction(this.instance.initialize, [42, 'foo', [1,2,3]]).should.be.rejectedWith(/is over 100 gwei/);
       });
     });
@@ -164,13 +164,13 @@ contract('Transactions', function([_account1, account2]) {
       await assertGasLt(tx, 1000000);
     });
 
-    describe('Uses an API to determine gas price', async function() {
+    describe('uses an API to determine gas price', async function() {
       beforeEach('Stub API reply and simulate mainnet', async function() {
         sinon.stub(ZWeb3, 'isMainnet').resolves(true)
         sinon.stub(axios, 'get').resolves({ data: { average: 49 } })
       });
 
-      afterEach('Return to testnet and undo stub', async function() {
+      afterEach('return to testnet and undo stub', async function() {
         delete state.gasPrice;
         sinon.restore();
       });
@@ -188,8 +188,8 @@ contract('Transactions', function([_account1, account2]) {
       });
     });
 
-    describe('Does not blindly trust API', async function() {
-      beforeEach('Stub API reply and simulate mainnet', async function() {
+    describe('does not blindly trust API', async function() {
+      beforeEach('stub API reply and simulate mainnet', async function() {
         sinon.stub(ZWeb3, 'isMainnet').resolves(true)
         sinon.stub(axios, 'get').resolves({ data: { average: 1234123412341234 } })
       });
@@ -199,7 +199,7 @@ contract('Transactions', function([_account1, account2]) {
         sinon.restore();
       });
 
-      it('Produces an error when gas price API gives giant value', async function () {
+      it('produces an error when gas price API gives giant value', async function () {
         await sendDataTransaction(this.instance, { data: this.encodedCall }).should.be.rejectedWith(/is over 100 gwei/);
       });
     });
@@ -232,8 +232,8 @@ contract('Transactions', function([_account1, account2]) {
         await assertGasLt(instance.transactionHash, 1000000);
       });
 
-      describe('Uses an API to determine gas price', async function() {
-        beforeEach('Stub API reply and simulate mainnet', async function() {
+      describe('uses an API to determine gas price', async function() {
+        beforeEach('stub API reply and simulate mainnet', async function() {
           sinon.stub(ZWeb3, 'isMainnet').resolves(true)
           sinon.stub(axios, 'get').resolves({ data: { average: 49 } })
         });
@@ -256,8 +256,8 @@ contract('Transactions', function([_account1, account2]) {
         });
       });
 
-      describe('Does not blindly trust API', async function() {
-        beforeEach('Stub API reply and simulate mainnet', async function() {
+      describe('does not blindly trust API', async function() {
+        beforeEach('stub API reply and simulate mainnet', async function() {
           sinon.stub(ZWeb3, 'isMainnet').resolves(true)
           sinon.stub(axios, 'get').resolves({ data: { average: 1234123412341234 } })
         });
@@ -300,8 +300,8 @@ contract('Transactions', function([_account1, account2]) {
         await assertGasLt(instance.transactionHash, 1000000);
       });
 
-      describe('Uses an API to determine gas price', async function() {
-        beforeEach('Stub API reply and simulate mainnet', async function() {
+      describe('uses an API to determine gas price', async function() {
+        beforeEach('stub API reply and simulate mainnet', async function() {
           sinon.stub(ZWeb3, 'isMainnet').resolves(true)
           sinon.stub(axios, 'get').resolves({ data: { average: 49 } })
         });
@@ -324,8 +324,8 @@ contract('Transactions', function([_account1, account2]) {
         });
       });
 
-      describe('Does not blindly trust API', async function() {
-        beforeEach('Stub API reply and simulate mainnet', async function() {
+      describe('does not blindly trust API', async function() {
+        beforeEach('stub API reply and simulate mainnet', async function() {
           sinon.stub(ZWeb3, 'isMainnet').resolves(true)
           sinon.stub(axios, 'get').resolves({ data: { average: 1234123412341234 } })
         });
