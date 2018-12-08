@@ -49,6 +49,7 @@
     "web3": "^0.18.4"
   },
   "devDependencies": {
+    "@types/node": "^10.12.12",
     "chai": "^4.1.2",
     "chai-as-promised": "^7.1.1",
     "chai-bignumber": "^2.0.2",
@@ -58,6 +59,7 @@
     "solidity-coverage": "^0.4.15",
     "tmp": "^0.0.33",
     "truffle": "^4.1.13",
-    "ts-node": "^7.0.1"
+    "ts-node": "^7.0.1",
+    "typescript": "^3.2.2"
   }
 }
