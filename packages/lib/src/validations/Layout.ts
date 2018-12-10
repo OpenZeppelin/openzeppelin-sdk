@@ -1,6 +1,7 @@
 import _ from 'lodash';
 import util from 'util';
-import { StorageLayoutInfo, StorageInfo, TypeInfo, TypeInfoMapping } from './Storage';
+import { StorageLayoutInfo } from './Storage';
+import { StorageInfo, TypeInfo, TypeInfoMapping } from '../utils/ContractAST';
 
 const SUBSTITUTION_COST:number = 3;
 const INSERTION_COST:number = 2;

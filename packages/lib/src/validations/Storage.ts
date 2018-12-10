@@ -4,6 +4,13 @@ import process from 'process';
 import { getBuildArtifacts } from '../utils/BuildArtifacts';
 import ContractFactory from '../artifacts/ContractFactory.js';
 import { BuildArtifacts } from '../utils/BuildArtifacts.js';
+import {
+  Node,
+  NodeMapping,
+  TypeInfo,
+  TypeInfoMapping,
+  StorageInfo
+} from '../utils/ContractAST';
 
 // TS-TODO: define return type after typing class members below.
 export function getStorageLayout(contract:ContractFactory, artifacts:BuildArtifacts):StorageLayoutInfo {
@@ -49,32 +56,6 @@ const FUNCTION_TYPE_INFO:TypeInfo = {
   label: 'function'
 };
 
-// TS-TODO: define Node type.
-type Node = any;
-interface NodeMapping {
-  [id:number]:Node[];
-}
-
-export interface TypeInfo {
-  id:string;
-  kind:string;
-  label:string;
-  valueType?:string;
-  length?: number;
-  members?:StorageInfo[];
-}
-
-export interface StorageInfo {
-  label:string;
-  astId:number;
-  type:string;
-  src:string;
-}
-
-export interface TypeInfoMapping {
-  [id:string]:TypeInfo;
-}
-
 export interface StorageLayoutInfo {
   types:TypeInfoMapping;
   storage:StorageInfo[];
@@ -89,9 +70,7 @@ class StorageLayout {
   private nodes:NodeMapping;
 
   // TS-TODO: types and storage could be private and exposed via a readonly getter.
-  // TS-TODO: define type.
-  public types:{[id:string]:TypeInfo};
-  // TS-TODO: define type.
+  public types:TypeInfoMapping;
   public storage:StorageInfo[];
 
   constructor(contract:ContractFactory, artifacts:BuildArtifacts) {
