@@ -22,7 +22,7 @@ export class BuildArtifacts {
 
     this.sourcesToArtifacts = {};
 
-    artifactsPaths.forEach(( path ) => {
+    artifactsPaths.forEach((path) => {
       const artifact: any = parseJson(path);
       const sourcePath: string = this.getSourcePathFromArtifact(artifact);
       this.registerArtifactForSourcePath(sourcePath, artifact);

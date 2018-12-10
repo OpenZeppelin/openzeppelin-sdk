@@ -95,7 +95,7 @@ export default class ContractFactory {
   }
 
   public link(libraries: any[]): void {
-    Object.keys(libraries).forEach(( name: string ) => {
+    Object.keys(libraries).forEach((name: string) => {
       const address: string = libraries[name].replace(/^0x/, '');
       const regex: RegExp = new RegExp(`__${name}_+`, 'g');
       this.binary = this.bytecode.replace(regex, address);
@@ -127,8 +127,8 @@ export default class ContractFactory {
   }
 
   private _promisifyABI(instance: any, wrapper: ContractWrapper): void {
-    instance.abi.filter(( item: any ) => item.type === 'event').forEach(( item: any ) => wrapper[item.name] = instance[item.name]);
-    instance.abi.filter(( item: any ) => item.type === 'function').forEach(( item: any ) => {
+    instance.abi.filter((item: any) => item.type === 'event').forEach((item: any) => wrapper[item.name] = instance[item.name]);
+    instance.abi.filter((item: any) => item.type === 'function').forEach((item: any) => {
       wrapper[item.name] = item.constant
         ? this._promisifyFunction(instance[item.name], instance)
         : this._promisifyFunctionWithTimeout(instance[item.name], instance);
@@ -159,7 +159,7 @@ export default class ContractFactory {
       return new Promise(function(resolve, reject) {
         args.push(txParams, function(error, tx) {
           return error ? reject(error) : ZWeb3.getTransactionReceiptWithTimeout(tx, self.timeout)
-            .then(( receipt ) => resolve({ tx, receipt, logs: decodeLogs(receipt.logs, self) }))
+            .then((receipt) => resolve({ tx, receipt, logs: decodeLogs(receipt.logs, self) }))
             .catch(reject);
         });
         fn.apply(instance, args);
@@ -183,9 +183,9 @@ export default class ContractFactory {
   private _parseEvents(): void {
     this.events = {};
     this.abi
-      .filter(( item ) => item.type === 'event')
-      .forEach(( event ) => {
-        const signature = `${event.name}(${event.inputs.map(( input ) => input.type).join(',')})`;
+      .filter((item) => item.type === 'event')
+      .forEach((event) => {
+        const signature = `${event.name}(${event.inputs.map((input) => input.type).join(',')})`;
         const topic = ZWeb3.sha3(signature);
         this.events[topic] = event;
       });

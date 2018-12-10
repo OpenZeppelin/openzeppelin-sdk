@@ -23,8 +23,8 @@ function detectInitialValues(contractClass: ContractFactory): boolean {
 
 function hasInitialValues(node: Node): boolean {
   const initializedVariables = node.nodes
-    .filter(( nodeItem ) => !nodeItem.constant && nodeItem.nodeType === 'VariableDeclaration')
-    .filter(( nodeItem ) => nodeItem.value != null);
+    .filter((nodeItem) => !nodeItem.constant && nodeItem.nodeType === 'VariableDeclaration')
+    .filter((nodeItem) => nodeItem.value != null);
 
   return !_.isEmpty(initializedVariables);
 }

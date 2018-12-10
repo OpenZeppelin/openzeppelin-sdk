@@ -21,7 +21,7 @@ export function bytecodeDigest(rawBytecode: string): string {
 // the format: __LibName__(...)__ it will fail to get the library names.
 export function getSolidityLibNames(bytecode: string): string[] {
   const libs: string[] = bytecode.match(/__[A-Za-z0-9_]{36}__/g);
-  return libs ? libs.map(( lib: string ) => lib.replace(/^__/, '').replace(/_*$/, '')) : [];
+  return libs ? libs.map((lib: string) => lib.replace(/^__/, '').replace(/_*$/, '')) : [];
 }
 
 // Tells whether a bytecode has unlinked libraries or not

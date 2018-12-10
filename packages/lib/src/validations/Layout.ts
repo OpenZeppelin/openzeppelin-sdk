@@ -26,7 +26,7 @@ export function compareStorageLayouts(original: StorageLayoutInfo, updated: Stor
   const distanceMatrix: number[][] = levenshtein(original.storage, updated.storage, areEqual);
   const operations: Operation[] = walk(distanceMatrix, original.storage, updated.storage, areMatch);
 
-  return operations.filter(( op: Operation ) => op.action !== 'equal');
+  return operations.filter((op: Operation) => op.action !== 'equal');
 }
 
 function storageEntryMatches(originalVar: StorageInfo, updatedVar: StorageInfo, originalTypes: TypeInfoMapping, updatedTypes: TypeInfoMapping): StorageEntryComparison {
@@ -122,7 +122,7 @@ function walk(matrix: number[][], originalStorage: StorageInfo[], updatedStorage
       i--;
       j--;
     } else {
-      throw Error(`Could not walk matrix at position ${i},${j}:\n${( <any> matrix ).map(util.inspect).join('\n')}\n`);
+      throw Error(`Could not walk matrix at position ${i},${j}:\n${(<any> matrix).map(util.inspect).join('\n')}\n`);
     }
   }
 

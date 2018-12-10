@@ -18,7 +18,7 @@ export function getUninitializedBaseContracts(contractClass: ContractFactory): s
 // TS-TODO: define return type
 function getUninitializedDirectBaseContracts(contractClass: ContractFactory, uninitializedBaseContracts: any): void {
   // Check whether the contract has base contracts
-  const baseContracts: any = contractClass.ast.nodes.find(( n ) => n.name === contractClass.contractName).baseContracts;
+  const baseContracts: any = contractClass.ast.nodes.find((n) => n.name === contractClass.contractName).baseContracts;
   if (baseContracts.length === 0) { return; }
 
   // Run check for the base contracts
@@ -79,11 +79,11 @@ function getUninitializedDirectBaseContracts(contractClass: ContractFactory, uni
 
 function getContractInitializer(contractClass: ContractFactory): Node | undefined {
   const contractDefinition: Node = contractClass.ast.nodes
-    .find(( n: Node ) => n.nodeType === 'ContractDefinition' && n.name === contractClass.contractName);
-  const contractFunctions: Node[] = contractDefinition.nodes.filter(( n ) => n.nodeType === 'FunctionDefinition');
+    .find((n: Node) => n.nodeType === 'ContractDefinition' && n.name === contractClass.contractName);
+  const contractFunctions: Node[] = contractDefinition.nodes.filter((n) => n.nodeType === 'FunctionDefinition');
   for (const contractFunction of contractFunctions) {
     const functionModifiers: any = contractFunction.modifiers;
-    const initializerModifier: any = functionModifiers.find(( m ) => m.modifierName.name === 'initializer');
+    const initializerModifier: any = functionModifiers.find((m) => m.modifierName.name === 'initializer');
     if (contractFunction.name === 'initialize' || initializerModifier !== undefined) {
       return contractFunction;
     }

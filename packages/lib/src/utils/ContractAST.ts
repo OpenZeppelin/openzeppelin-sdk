@@ -67,7 +67,7 @@ export default class ContractAST {
   }
 
   public getContractNode(): Node {
-    return this.contract.ast.nodes.find(( node: Node ) =>
+    return this.contract.ast.nodes.find((node: Node) =>
       node.nodeType === 'ContractDefinition' &&
       node.name === this.contract.contractName
     );
@@ -75,7 +75,7 @@ export default class ContractAST {
 
   // TS-TODO: define return type
   public getLinearizedBaseContracts(mostDerivedFirst: boolean = false) {
-    const contracts = this.getContractNode().linearizedBaseContracts.map(( id ) => this.getNode(id, 'ContractDefinition'));
+    const contracts = this.getContractNode().linearizedBaseContracts.map((id) => this.getNode(id, 'ContractDefinition'));
     return mostDerivedFirst ? contracts : _.reverse(contracts);
   }
 
@@ -85,10 +85,10 @@ export default class ContractAST {
       throw Error(`No AST nodes with id ${id} found`);
     }
 
-    const candidates = this.nodes[id].filter(( node: Node ) => node.nodeType === type);
+    const candidates = this.nodes[id].filter((node: Node) => node.nodeType === type);
     switch (candidates.length) {
       case 0:
-        throw Error(`No AST nodes of type ${type} with id ${id} found (got ${this.nodes[id].map(( node: Node ) => node.nodeType).join(', ')})`);
+        throw Error(`No AST nodes of type ${type} with id ${id} found (got ${this.nodes[id].map((node: Node) => node.nodeType).join(', ')})`);
       case 1:
         return candidates[0];
       default:
@@ -98,12 +98,12 @@ export default class ContractAST {
 
   private _collectImports(ast: any): void {
     ast.nodes
-      .filter(( node ) => node.nodeType === 'ImportDirective')
-      .map(( node ) => node.absolutePath)
-      .forEach(( importPath ) => {
+      .filter((node) => node.nodeType === 'ImportDirective')
+      .map((node) => node.absolutePath)
+      .forEach((importPath) => {
         if (this.imports.has(importPath)) { return; }
         this.imports.add(importPath);
-        this.artifacts.getArtifactsFromSourcePath(importPath).forEach(( importedArtifact ) => {
+        this.artifacts.getArtifactsFromSourcePath(importPath).forEach((importedArtifact) => {
           this._collectNodes(importedArtifact.ast);
           this._collectImports(importedArtifact.ast);
         });
@@ -113,7 +113,7 @@ export default class ContractAST {
   private _collectNodes(node: Node): void {
 
     // Return if we have already seen this node
-    if (_.some(this.nodes[node.id] || [], ( n ) => _.isEqual(n, node))) { return; }
+    if (_.some(this.nodes[node.id] || [], (n) => _.isEqual(n, node))) { return; }
 
     // Only process nodes of the filtered types (or SourceUnits)
     if (node.nodeType !== 'SourceUnit' && this.nodesFilter && !_.includes(this.nodesFilter, node.nodeType)) { return; }

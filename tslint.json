@@ -17,6 +17,7 @@
       "object-literal-sort-keys": [false],
       "typedef-whitespace": [true, "onespace"],
       "trailing-comma": [false],
+      "space-within-parens": [true, 0],
       "ordered-imports": [false],
       "no-angle-bracket-type-assertion": [false],
       "interface-name": [false],

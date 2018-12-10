@@ -25,7 +25,7 @@ export function toSemanticVersion(version: string | RawSemanticVersion): Semanti
 
     const semverGenericArray: RawSemanticVersion = <RawSemanticVersion> version;
 
-    const semverTyped: number[] = semverGenericArray.map( ( x: any ) => {
+    const semverTyped: number[] = semverGenericArray.map((x: any) => {
       return x.toNumber ? x.toNumber() : x;
     });
 

@@ -3,7 +3,7 @@
 import assert from 'assert';
 
 function inLogs(logs: any, eventName: string, eventArgs: any = {}): any {
-  const event: any = logs.find(( e: any ) =>
+  const event: any = logs.find((e: any) =>
     e.event === eventName &&
     Object.entries(eventArgs).every(([k, v]) => e.args[k] === v));
 
