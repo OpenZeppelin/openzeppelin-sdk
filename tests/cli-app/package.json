@@ -12,6 +12,7 @@
     "chai": "^4.1.2",
     "lodash": "^4.17.0",
     "mocha": "5.2.0",
-    "truffle": "^4.1.14"
+    "truffle": "^4.1.14",
+    "truffle-hdwallet-provider": "0.0.6"
   }
 }
