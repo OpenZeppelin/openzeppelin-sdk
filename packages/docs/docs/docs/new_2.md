@@ -24,7 +24,7 @@ In 2.x by default, your ZeppelinOS project will not use any of its App or Packag
 * [`zos set-admin`](cli_set-admin.md)
 * [`zos unlink`](cli_unlink.md)
 
-In order to read more information about the commands, please run `zos <command> --help` or go to the 
+In order to read more information about these commands, please run `zos <command> --help` or go to the 
 [commands reference](apis.md) section.
 
 ## Modified commands
@@ -39,16 +39,16 @@ In 2.x, there are minor changes to the commands from 1.x, like some of them now 
 
 ## Compatibility
 
-Unfortunately, 2.x introduces breaking changes, so a project that was created using 1.x cannot be automatically upgraded to 2.x. This means that if you upgrade your global `zos` NPM package to 2.x, it won't be compatible with projects that were created using the old version of `zos`. In such cases, the CLI will detect the incompatibility and warn you. This is one of the reasons why `npx zos` is recommended over `zos` usage, so that each NPM project can target its own `zos` version.
+Unfortunately, 2.x introduces breaking changes, so a project that was created using 1.x cannot be automatically upgraded to 2.x. This means that if you upgrade your global `zos` npm package to 2.x, it won't be compatible with projects that were created using the old version of `zos`. In such cases, the CLI will detect the incompatibility and warn you. This is one of the reasons why `npx zos` is recommended over `zos` usage, so that each npm project can target its own `zos` version.
 
 ## Changes to your contracts
 
 When it comes to Solidity code, there is nothing special you need to consider when using ZeppelinOS 2.x other than using initializers instead of constructors. For more info on this, see the ["the constructor caveat"](pattern.md#the-constructor-caveat) section of the documentation.
 
-As with 1.x, ZeppelinOS 2.x will manage upgrades and package linking without you having to use special Solidity syntax.
+As with 1.x, ZeppelinOS 2.x will manage upgrades and package linking without you having to use any special Solidity syntax.
 
 On 2.x, the `Migratable` contract has been deprecated, and we are shifting to a much simpler flavour of `Initializable`.
 
 ## Compatible EVM packages
 
-Also, note that EVM packages created with 1.x cannot be linked to projects using 2.x. All EVM package providers will need to create new packages with 2.x so that they can be used in ZeppelinOS 2.x projects.
+Also, note that EVM packages created with 1.x cannot be linked to projects using 2.x. All EVM package providers will need to create new packages with 2.x so that they can be used in ZeppelinOS 2.x projects. Again, the CLI will warn you when you attempt to link an incompatible package.

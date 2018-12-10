@@ -11,14 +11,14 @@ First, let's install [Node.js](http://nodejs.org/) and
 [npm](https://npmjs.com/). On their
 respective websites you will find specific instructions for your machine.
 
-Then, install ZeppelinOS running:
+Then, install ZeppelinOS by running:
 
 ```console
 npm install --global zos
 ```
 
-Run `zos --help` to get a list of all the ZeppelinOS commands. At any time
-during this guides when we introduce a new command, run
+Run `zos --help` to get a list of all the ZeppelinOS commands available. At any time
+during these guides, when we introduce a new command, run
 `zos <command-name> --help` to get more information about that command and
 its arguments.
 
@@ -47,13 +47,13 @@ zos init my-project
 ```
 
 This command will create a `zos.json` file, which contains all the information
-about the project. For details about this file format see the
+about the project related to ZeppelinOS. For details about this file format see the
 [configuration files](configuration.md#zosjson) page.
 
 The command will also initialize [Truffle](https://truffleframework.com/), so
 by now, inside the `my-project` directory you should have a `package.json` file
 (created by `npm`), two empty directories named `contracts` and `migrations`,
-a `truffle-config.js` file (created by `zos` for Truffle), and a
+a `truffle-config.js` file (created by the `zos` CLI for Truffle), and a
 `zos.json` file (created by `zos` for ZeppelinOS).
 
 ## Adding a contract
@@ -92,9 +92,9 @@ npm install zos-lib
 ```
 
 `zos-lib` is the ZeppelinOS library, which includes contracts to help with the
-development of smart contracts. In this case, we are importing
+development of ZeppelinOS compatible smart contracts. In this case, we are importing
 `Initializable.sol` in order to use the `initializer` modifier, which will
-prevent the `initialize` function to be called more than once.
+prevent the `initialize` function from be called more than once.
 
 Now we can add the contract to the project:
 
@@ -103,7 +103,7 @@ zos add MyContract
 ```
 
 This command will first compile `MyContract`, and then it will add it to the
-project writing it in the `zos.json` configuration file.
+project registering it in the `zos.json` configuration file.
 
 > **Note**: The current version of ZeppelinOS uses Solidity 0.4.24. If you
 > want to use a different version you will have to use the `--skip-compile`
@@ -180,6 +180,6 @@ networks by just replacing `local` with the network name from your
 `truffle-config.js` file. This is further explained in the
 [Deploying to mainnet](mainnet) guide.
 
-But for now, let's continue exploring the ZeppelinOS features! The initial
+But for now, let's continue exploring all the features that ZeppelinOS has to offer! The initial
 version of our project exists in the blockchain. Next, we will learn how to
 upgrade it.

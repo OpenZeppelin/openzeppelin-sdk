@@ -16,7 +16,7 @@ we already have one after following the guide about
 To continue with this exploration, let's write a new contract called
 `MyLinkedContract.sol` and place it in the `contracts` folder. Then,
 let's make it import a very common
-contract from the [OpenZeppelin](https://openzeppelin.org/) package:
+contract from the [OpenZeppelin](https://openzeppelin.org/) EVM package:
 
 ```solidity
 pragma solidity ^0.4.24;
@@ -112,7 +112,7 @@ commands we ran above._
 truffle(local)> MyLinkedContract.at('<my-linked-contract-address>').setToken('<my-erc721-address>')
 ```
 
-Remember that the addresses of both, your contract and the token, can also be 
+Remember that the addresses of both your contract and the token, can also be 
 found in the `zos.dev-<network_id>.json` configuration file.
 
 This is just the beginning of a better blockchain ecosystem, where developers

@@ -90,7 +90,7 @@ These should be configured [in your `truffle.js` file](http://truffleframework.c
 }
 ```
 
-The most important thing to see here are the proxies and contracts' addresses, `<proxy-i-address>` and `<contract-i-address>` respectively. What will happen is that each time you upload new versions of your logic contracts, `<contract-i-address>` will change. The proxy addresses, however, will stay the same, so you can interact seamlessly with the same addresses as if no change had taken place. Note that `<implementation-i-address>` will always point to the current contract address `<contract-i-address>` if the proxies are `update`d. Proxies are grouped by the name of the package and contract they are backed by.
+The most important things to see here are the proxies and contracts' addresses, `<proxy-i-address>` and `<contract-i-address>` respectively. What will happen is that each time you upload new versions of your logic contracts, `<contract-i-address>` will change. The proxy addresses, however, will stay the same, so you can interact seamlessly with the same addresses as if no change has taken place. Note that `<implementation-i-address>` will always point to the current contract address `<contract-i-address>` if the proxies are `update`d. Proxies are grouped by the name of the package and contract they are backed by.
 
 For every logic contract, besides the deployment address, the following info is also tracked:
 - `constructorCode` is the SHA256 hash of the bytecode used to `CREATE` the logic contract
@@ -98,7 +98,7 @@ For every logic contract, besides the deployment address, the following info is 
 - `localBytecodeHash` is the SHA256 hash of the bytecode, including any Solidity library placeholders
 - `deployedBytecodeHash` is the SHA256 hash of the bytecode, with all Solidity library placeholders replaced by their corresponding addresses
 - `types` keeps track of all the types used in the contract or its ancestors, from basic types like `uint256` to custom `struct`s
-- `storage` tracks the storage layout of the linearized contract, referencing the types defined in the `types` section, and is used for verifying that any storage layuot changes between subsequent versions are compatible
+- `storage` tracks the storage layout of the linearized contract, referencing the types defined in the `types` section, and is used for verifying that any storage layout changes between subsequent versions are compatible
 - `warnings` tracks any existing warnings for the contract, such as whether it has a constructor or `selfdestruct` operations
 
 Any Solidity libraries used by the project's contracts are tracked in the `solidityLibs` node, which has the same structure as the `contracts` item.
@@ -135,7 +135,7 @@ networks: {
 
 ## `zos.json` files in version control
 
-`zos.json` files should be tracked in version control. This file represents a project's ZeppelinOS configuration; the contracts and EVM packages that compose it, its name and version, the version of the ZeppelinOS CLI it uses, etc. The file should be identical for all the contributors of a project.
+The `zos.json` file should be tracked in version control. This file represents a project's ZeppelinOS configuration; the contracts and EVM packages that compose it, its name and version, the version of the ZeppelinOS CLI it uses, etc. The file should be identical for all the contributors of a project.
 
 Public network files like `zos.mainnet.json` or `zos.ropsten.json` should also be tracked in version control. These contain valuable information about your project's status in the corresponding network; the addresses of the contract implementations that have been deployed, the addresses of the proxies that have been deployed, etc. Such files should also be identical for all the contributors of a project.
 

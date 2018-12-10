@@ -41,7 +41,7 @@ In that case, renew it by running the command `zos session --network local
 --from 0x1df62f291b2e969fb0849d99d9ce41e2f137006e --expires 3600` again.
 
 Now let's create an upgradeable instance of this contract so you can 
-experiment what this is all about:
+experiment with what this is all about:
 
 ```console
 zos create MyContract --init initialize --args 42,hitchhiker
@@ -59,14 +59,14 @@ This command will print the address of your contract, and it will update the
 > **Note**: When calling an initializer with many variables, these should be
 > passed as a comma-separated list, with no spaces in between.
 
-We can start a console to interact with our contract and check it has been properly initialized:
+We can start a console to interact with our contract and check that it has been properly initialized:
 
 ```console
 npx truffle console --network local
 ```
 
 Once in the Truffle console, execute the following instructions to test 
-our instance is working as expected:
+that our instance is working as expected:
 
 > _Make sure you replace <your-contract-address> with the address returned 
 by the `create` command we ran above._
@@ -139,7 +139,7 @@ never change, but it just serves as a proxy to the logic contract that we
 can replace with new versions.
 
 We can start a new Truffle console to interact with our contract and check 
-it has been properly upgraded:
+that it has been properly upgraded:
 
 ```console
 npx truffle console --network local

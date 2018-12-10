@@ -9,7 +9,7 @@ ZeppelinOS's features such as upgrades, EVM package linking, and vouching, can a
 zos publish
 ```
 
-When publishing, your ZeppelinOS project will be backed by a set of smart contracts that can be found in [zos/packages/lib/contracts/application](https://github.com/zeppelinos/zos/tree/master/packages/lib/contracts/application). In the following sections, we describe the general architecture of a ZeppelinOS published EVM package.
+When publishing, your ZeppelinOS project will be backed by a set of smart contracts whose source can be found in [zos/packages/lib/contracts/application](https://github.com/zeppelinos/zos/tree/master/packages/lib/contracts/application). In the following sections, we describe the general architecture of a ZeppelinOS published EVM package.
 
 ## [App.sol](https://github.com/zeppelinos/zos/blob/v2.0.0/packages/lib/contracts/application/App.sol)
 
@@ -42,7 +42,7 @@ NOTE: Additionally the `App` contract also facilitates the creation of proxies, 
 
 ## [Package.sol](https://github.com/zeppelinos/zos/blob/v2.0.0/packages/lib/contracts/application/Package.sol)
 
-A `Package` contract tracks all the versions of a given EVM package. Following the example above, one package could be the "application package" associated to the name "my-application" containing all the contracts for version "0.0.1" of your application, and all the contracts for version "0.0.2" as well. Alternatively, another package could be an "EVM package" associated to the name "openzeppelin-eth" which contains a large number of versions "x.y.z" each of which contains a given set of contracts.
+A `Package` contract tracks all the versions of a given EVM package. Following the example above, one package could be the "application package" associated to the name "my-application" containing all the contracts for version "0.0.1" of your application, and all the contracts for version "0.0.2" as well. Alternatively, another package could be an EVM package associated to the name "openzeppelin-eth" which contains a large number of versions "x.y.z" each of which contains a given set of contracts.
 
 The versions are mapped by a semver hash to `Version` structs:
 
