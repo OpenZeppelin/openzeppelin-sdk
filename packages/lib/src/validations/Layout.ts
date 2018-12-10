@@ -9,7 +9,6 @@ const DELETION_COST:number = 2;
 type ComparisonFn = (var1:StorageInfo, var2:StorageInfo) => StorageEntryComparison;
 type EqualFn = (var1:StorageInfo, var2:StorageInfo) => boolean;
 
-// TS-TODO: return string type could be typed, exported and used elsewhere.
 export type StorageEntryComparison = 'equal' | 'rename' | 'typechange' | 'replace';
 
 interface Operation {
@@ -18,8 +17,7 @@ interface Operation {
   original:string;
 }
 
-// TS-TODO: type return value
-export function compareStorageLayouts(original:StorageLayoutInfo, updated:StorageLayoutInfo) {
+export function compareStorageLayouts(original:StorageLayoutInfo, updated:StorageLayoutInfo):Operation[] {
 
   const areMatch:ComparisonFn = (var1:StorageInfo, var2:StorageInfo) => storageEntryMatches(var1, var2, original.types, updated.types);
   const areEqual:EqualFn = (var1:StorageInfo, var2:StorageInfo) => (areMatch(var1, var2) === 'equal');
