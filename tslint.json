@@ -18,7 +18,8 @@
       "variable-name": [false],
       "member-ordering": [false],
       "no-console": [false],
-      "max-line-length": [false]
+      "max-line-length": [false],
+      "only-arrow-functions": [false]
     },
     "rulesDirectory": []
 }
