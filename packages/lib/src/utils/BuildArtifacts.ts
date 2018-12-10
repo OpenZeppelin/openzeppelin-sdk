@@ -14,7 +14,7 @@ interface SourcePathMapping {
 }
 
 // TS-TODO: Review which members of this class could be private.
-class BuildArtifacts {
+export class BuildArtifacts {
 
   private sourcesToArtifacts:SourcePathMapping;
 

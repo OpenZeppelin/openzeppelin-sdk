@@ -29,16 +29,16 @@ interface TransactionReceiptWrapper {
 // TS-TODO: Review which members could be private.
 export default class ContractFactory {
 
-  private abi:any;
-  private ast:any;
-  private bytecode:string;
-  private deployedBytecode:string;
-  private contractName:string;
-  private timeout:number;
-  private txParams:any;
-  private binary:string;
-  private deployedBinary:string;
-  private events:any;
+  public abi:any;
+  public ast:any;
+  public bytecode:string;
+  public deployedBytecode:string;
+  public contractName:string;
+  public timeout:number;
+  public txParams:any;
+  public binary:string;
+  public deployedBinary:string;
+  public events:any;
 
   constructor(schema:ContractSchema, timeout, txParams) {
     this.abi = schema.abi;
