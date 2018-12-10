@@ -6,7 +6,7 @@ import ContractFactory from '../artifacts/ContractFactory.js';
 import { BuildArtifacts } from '../utils/BuildArtifacts.js';
 
 // TS-TODO: define return type after typing class members below.
-export function getStorageLayout(contract:ContractFactory, artifacts:BuildArtifacts) {
+export function getStorageLayout(contract:ContractFactory, artifacts:BuildArtifacts):StorageLayoutInfo {
 
   if(!artifacts) {
     artifacts = getBuildArtifacts();
@@ -20,8 +20,9 @@ export function getStorageLayout(contract:ContractFactory, artifacts:BuildArtifa
 
 // TS-TODO: Define parameter after typing class members below.
 // TS-TODO: define return type after typing class members below.
-export function getStructsOrEnums({ storage, types }) {
-  return storage.filter(( variable ) => containsStructOrEnum(variable.type, types));
+
+export function getStructsOrEnums(info:StorageLayoutInfo):StorageInfo[] {
+  return info.storage.filter(( variable:any ) => containsStructOrEnum(variable.type, info.types));
 }
 
 // TS-TODO: Define parameter types type after typing class members below.
@@ -54,34 +55,29 @@ interface NodeMapping {
   [id:number]:Node[];
 }
 
-interface TypeInfo {
+export interface TypeInfo {
   id:string;
   kind:string;
   label:string;
+  valueType?:string;
+  length?: number;
+  members?:StorageInfo[];
 }
 
-interface ArrayTypeInfo extends TypeInfo {
-  valueType:string;
-  length: number;
-}
-
-interface StructTypeInfo extends TypeInfo {
-  members:StorageInfo[];
-}
-
-interface EnumTypeInfo extends TypeInfo {
-  members:StorageInfo[];
-}
-
-interface MappingTypeInfo extends TypeInfo {
-  valueType:string;
-}
-
-interface StorageInfo {
+export interface StorageInfo {
   label:string;
   astId:number;
   type:string;
   src:string;
+}
+
+export interface TypeInfoMapping {
+  [id:string]:TypeInfo;
+}
+
+export interface StorageLayoutInfo {
+  types:TypeInfoMapping;
+  storage:StorageInfo[];
 }
 
 class StorageLayout {
@@ -94,9 +90,9 @@ class StorageLayout {
 
   // TS-TODO: types and storage could be private and exposed via a readonly getter.
   // TS-TODO: define type.
-  public types;
+  public types:{[id:string]:TypeInfo};
   // TS-TODO: define type.
-  public storage;
+  public storage:StorageInfo[];
 
   constructor(contract:ContractFactory, artifacts:BuildArtifacts) {
 
@@ -179,7 +175,7 @@ class StorageLayout {
     });
   }
 
-  private registerType(typeInfo:any):void {
+  private registerType(typeInfo:TypeInfo):void {
     this.types[typeInfo.id] = typeInfo;
   }
 
@@ -272,7 +268,7 @@ class StorageLayout {
     };
   }
 
-  private getArrayTypeInfo({ baseType, length, }):ArrayTypeInfo {
+  private getArrayTypeInfo({ baseType, length, }):TypeInfo {
     const { id: baseTypeId, label: baseTypeLabel } = this.getAndRegisterTypeInfo(baseType);
     const lengthDescriptor = length ? length.value : 'dyn';
     const lengthLabel = length ? length.value : '';
@@ -285,7 +281,7 @@ class StorageLayout {
     };
   }
 
-  private getMappingTypeInfo({ valueType }):MappingTypeInfo {
+  private getMappingTypeInfo({ valueType }):TypeInfo {
     // We ignore the keyTypeId, since it's always hashed and takes up the same amount of space; we only care about the last value type
     const { id: valueTypeId, label: valueTypeLabel } = this.getValueTypeInfo(valueType);
     return {
@@ -306,7 +302,7 @@ class StorageLayout {
     return { ... FUNCTION_TYPE_INFO };
   }
 
-  private getStructTypeInfo(referencedDeclaration):StructTypeInfo {
+  private getStructTypeInfo(referencedDeclaration):TypeInfo {
 
     // Identify structs by contract and name
     const referencedNode = this.getNode(referencedDeclaration, 'StructDefinition');
@@ -332,7 +328,7 @@ class StorageLayout {
     return typeInfo;
   }
 
-  private getEnumTypeInfo(referencedDeclaration):EnumTypeInfo {
+  private getEnumTypeInfo(referencedDeclaration):TypeInfo {
     // Store canonical name and members for an enum
     const referencedNode = this.getNode(referencedDeclaration, 'EnumDefinition');
     return {
