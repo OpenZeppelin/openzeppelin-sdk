@@ -19,7 +19,8 @@
       "member-ordering": [false],
       "no-console": [false],
       "max-line-length": [false],
-      "only-arrow-functions": [false]
+      "only-arrow-functions": [false],
+      "no-empty": [true, "allow-empty-functions"]
     },
     "rulesDirectory": []
 }
