@@ -3,6 +3,12 @@
     "extends": [
         "tslint:recommended"
     ],
+    "linterOptions": {
+      "exclude": [
+        "**/*.js",
+        "**/*.jsx"
+      ]
+    },
     "jsRules": {},
     "rules": {
       "one-line": [false],
