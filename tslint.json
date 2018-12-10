@@ -17,7 +17,8 @@
       "interface-name": [false],
       "variable-name": [false],
       "member-ordering": [false],
-      "no-console": [false]
+      "no-console": [false],
+      "max-line-length": [false]
     },
     "rulesDirectory": []
 }
