@@ -8,11 +8,11 @@ import util from 'util';
 type SemanticVersion = [number, number, number];
 type RawSemanticVersion = [any, any, any];
 
-export function toSemanticVersion(version:string | RawSemanticVersion):SemanticVersion | never {
+export function toSemanticVersion(version: string | RawSemanticVersion): SemanticVersion | never {
 
   if (_.isString(version)) {
 
-    const semanticVersion:any = semver.parse(version);
+    const semanticVersion: any = semver.parse(version);
 
     if (!semanticVersion) {
       throw Error(`Cannot parse version identifier ${version}`);
@@ -23,13 +23,13 @@ export function toSemanticVersion(version:string | RawSemanticVersion):SemanticV
   }
   else if (_.isArray(version) && version.length === 3) {
 
-    const semverGenericArray:RawSemanticVersion = <RawSemanticVersion>version;
+    const semverGenericArray: RawSemanticVersion = <RawSemanticVersion> version;
 
-    const semverTyped:number[] = semverGenericArray.map( ( x:any ) => {
+    const semverTyped: number[] = semverGenericArray.map( ( x: any ) => {
       return x.toNumber ? x.toNumber() : x;
     });
 
-    return <SemanticVersion>semverTyped;
+    return <SemanticVersion> semverTyped;
 
   }
   else {
@@ -38,15 +38,15 @@ export function toSemanticVersion(version:string | RawSemanticVersion):SemanticV
 
 }
 
-export function semanticVersionToString(version:string | RawSemanticVersion):string | never {
+export function semanticVersionToString(version: string | RawSemanticVersion): string | never {
   if (_.isString(version)) {
-    return <string>version;
+    return <string> version;
   }
   else if (_.isArray(version)) {
 
-    const semverGenericArray:RawSemanticVersion = <RawSemanticVersion>version;
+    const semverGenericArray: RawSemanticVersion = <RawSemanticVersion> version;
 
-    return <string>(semverGenericArray.join('.'));
+    return <string> (semverGenericArray.join('.'));
 
   }
   else {
@@ -54,10 +54,10 @@ export function semanticVersionToString(version:string | RawSemanticVersion):str
   }
 }
 
-export function semanticVersionEqual(v1:string | RawSemanticVersion, v2:string | RawSemanticVersion):boolean {
+export function semanticVersionEqual(v1: string | RawSemanticVersion, v2: string | RawSemanticVersion): boolean {
 
-  const semver1:SemanticVersion = toSemanticVersion(v1);
-  const semver2:SemanticVersion = toSemanticVersion(v2);
+  const semver1: SemanticVersion = toSemanticVersion(v1);
+  const semver2: SemanticVersion = toSemanticVersion(v2);
 
   return semver1[0] === semver2[0]
       && semver1[1] === semver2[1]

@@ -2,11 +2,11 @@ import assertRevert from '../helpers/assertRevert';
 import assert from 'assert';
 
 // TS-TODO: should this be in test/behaviors/ instead of src/test/behaviors/?
-export default function shouldBehaveLikeOwnable(owner:string, anotherAccount:string) {
+export default function shouldBehaveLikeOwnable(owner: string, anotherAccount: string) {
 
   describe('owner', function() {
     it('sets the creator as the owner of the contract', async function() {
-      const contractOwner:string = await this.ownable.owner();
+      const contractOwner: string = await this.ownable.owner();
       assert.equal(contractOwner, owner);
     });
   });
@@ -22,7 +22,7 @@ export default function shouldBehaveLikeOwnable(owner:string, anotherAccount:str
 
           await this.ownable.transferOwnership(newOwner, { from });
 
-          const contractOwner:string = await this.ownable.owner();
+          const contractOwner: string = await this.ownable.owner();
           assert.equal(contractOwner, anotherAccount);
         });
 
@@ -39,7 +39,7 @@ export default function shouldBehaveLikeOwnable(owner:string, anotherAccount:str
 
       describe('when the sender is not the owner', function() {
 
-        const from:string = anotherAccount;
+        const from: string = anotherAccount;
 
         it('reverts', async function() {
           await assertRevert(this.ownable.transferOwnership(newOwner, { from }));
@@ -49,7 +49,7 @@ export default function shouldBehaveLikeOwnable(owner:string, anotherAccount:str
 
     describe('when the new proposed owner is the zero address', function() {
 
-      const newOwner:number = 0x0;
+      const newOwner: number = 0x0;
 
       it('reverts', async function() {
         await assertRevert(this.ownable.transferOwnership(newOwner, { from: owner }));

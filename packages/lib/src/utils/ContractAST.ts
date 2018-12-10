@@ -8,43 +8,43 @@ import ContractFactory from '../artifacts/ContractFactory';
 export type Node = any;
 
 export interface NodeMapping {
-  [id:number]:Node[];
+  [id: number]: Node[];
 }
 
 export interface TypeInfo {
-  id:string;
-  kind:string;
-  label:string;
-  valueType?:string;
+  id: string;
+  kind: string;
+  label: string;
+  valueType?: string;
   length?: number;
-  members?:StorageInfo[];
+  members?: StorageInfo[];
 }
 
 export interface TypeInfoMapping {
-  [id:string]:TypeInfo;
+  [id: string]: TypeInfo;
 }
 
 export interface StorageInfo {
-  label:string;
-  astId:number;
-  type:string;
-  src:string;
+  label: string;
+  astId: number;
+  type: string;
+  src: string;
 }
 
 interface ContractASTProps {
-  nodesFilter:string[];
+  nodesFilter: string[];
 }
 
 export default class ContractAST {
 
-  private artifacts:BuildArtifacts;
-  private contract:ContractFactory;
-  private imports:Set<any>;
-  private nodes:NodeMapping;
-  private types:TypeInfoMapping;
-  private nodesFilter:string[];
+  private artifacts: BuildArtifacts;
+  private contract: ContractFactory;
+  private imports: Set<any>;
+  private nodes: NodeMapping;
+  private types: TypeInfoMapping;
+  private nodesFilter: string[];
 
-  constructor(contract:ContractFactory, artifacts?:BuildArtifacts, props?:ContractASTProps) {
+  constructor(contract: ContractFactory, artifacts?: BuildArtifacts, props?: ContractASTProps) {
 
     this.artifacts = artifacts || getBuildArtifacts();
     this.contract = contract;
@@ -66,29 +66,29 @@ export default class ContractAST {
     this._collectNodes(this.contract.ast);
   }
 
-  public getContractNode():Node {
-    return this.contract.ast.nodes.find(( node:Node ) =>
+  public getContractNode(): Node {
+    return this.contract.ast.nodes.find(( node: Node ) =>
       node.nodeType === 'ContractDefinition' &&
       node.name === this.contract.contractName
     );
   }
 
   // TS-TODO: define return type
-  public getLinearizedBaseContracts(mostDerivedFirst:boolean = false) {
+  public getLinearizedBaseContracts(mostDerivedFirst: boolean = false) {
     const contracts = this.getContractNode().linearizedBaseContracts.map(( id ) => this.getNode(id, 'ContractDefinition'));
     return mostDerivedFirst ? contracts : _.reverse(contracts);
   }
 
-  public getNode(id:string, type:string):Node | never {
+  public getNode(id: string, type: string): Node | never {
 
     if (!this.nodes[id]) {
       throw Error(`No AST nodes with id ${id} found`);
     }
 
-    const candidates = this.nodes[id].filter(( node:Node ) => node.nodeType === type);
+    const candidates = this.nodes[id].filter(( node: Node ) => node.nodeType === type);
     switch (candidates.length) {
       case 0:
-        throw Error(`No AST nodes of type ${type} with id ${id} found (got ${this.nodes[id].map(( node:Node ) => node.nodeType).join(', ')})`);
+        throw Error(`No AST nodes of type ${type} with id ${id} found (got ${this.nodes[id].map(( node: Node ) => node.nodeType).join(', ')})`);
       case 1:
         return candidates[0];
       default:
@@ -96,7 +96,7 @@ export default class ContractAST {
     }
   }
 
-  private _collectImports(ast:any):void {
+  private _collectImports(ast: any): void {
     ast.nodes
       .filter(( node ) => node.nodeType === 'ImportDirective')
       .map(( node ) => node.absolutePath)
@@ -110,7 +110,7 @@ export default class ContractAST {
       });
   }
 
-  private _collectNodes(node:Node):void {
+  private _collectNodes(node: Node): void {
 
     // Return if we have already seen this node
     if (_.some(this.nodes[node.id] || [], ( n ) => _.isEqual(n, node))) { return; }

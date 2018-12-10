@@ -13,9 +13,9 @@ import {
 } from '../utils/ContractAST';
 
 // TS-TODO: define return type after typing class members below.
-export function getStorageLayout(contract:ContractFactory, artifacts:BuildArtifacts):StorageLayoutInfo {
+export function getStorageLayout(contract: ContractFactory, artifacts: BuildArtifacts): StorageLayoutInfo {
 
-  if(!artifacts) {
+  if (!artifacts) {
     artifacts = getBuildArtifacts();
   }
 
@@ -28,12 +28,12 @@ export function getStorageLayout(contract:ContractFactory, artifacts:BuildArtifa
 // TS-TODO: Define parameter after typing class members below.
 // TS-TODO: define return type after typing class members below.
 
-export function getStructsOrEnums(info:StorageLayoutInfo):StorageInfo[] {
-  return info.storage.filter(( variable:any ) => containsStructOrEnum(variable.type, info.types));
+export function getStructsOrEnums(info: StorageLayoutInfo): StorageInfo[] {
+  return info.storage.filter(( variable: any ) => containsStructOrEnum(variable.type, info.types));
 }
 
 // TS-TODO: Define parameter types type after typing class members below.
-function containsStructOrEnum(typeName:string, types):boolean {
+function containsStructOrEnum(typeName: string, types): boolean {
   const type = types[typeName];
   if (type.kind === 'struct' || type.kind === 'enum') {
     return true;
@@ -44,36 +44,36 @@ function containsStructOrEnum(typeName:string, types):boolean {
   }
 }
 
-const CONTRACT_TYPE_INFO:TypeInfo = {
+const CONTRACT_TYPE_INFO: TypeInfo = {
   id: 't_address',
   kind: 'elementary',
   label: 'address'
 };
 
-const FUNCTION_TYPE_INFO:TypeInfo = {
+const FUNCTION_TYPE_INFO: TypeInfo = {
   id: 't_function',
   kind: 'elementary',
   label: 'function'
 };
 
 export interface StorageLayoutInfo {
-  types:TypeInfoMapping;
-  storage:StorageInfo[];
+  types: TypeInfoMapping;
+  storage: StorageInfo[];
 }
 
 class StorageLayout {
 
-  private artifacts:BuildArtifacts;
-  private contract:ContractFactory;
-  private imports:Set<any>;
+  private artifacts: BuildArtifacts;
+  private contract: ContractFactory;
+  private imports: Set<any>;
 
-  private nodes:NodeMapping;
+  private nodes: NodeMapping;
 
   // TS-TODO: types and storage could be private and exposed via a readonly getter.
-  public types:TypeInfoMapping;
-  public storage:StorageInfo[];
+  public types: TypeInfoMapping;
+  public storage: StorageInfo[];
 
-  constructor(contract:ContractFactory, artifacts:BuildArtifacts) {
+  constructor(contract: ContractFactory, artifacts: BuildArtifacts) {
 
     this.artifacts = artifacts;
     this.contract = contract;
@@ -93,13 +93,13 @@ class StorageLayout {
 
   }
 
-  public run():StorageLayout {
+  public run(): StorageLayout {
 
     this.collectImports(this.contract.ast);
     this.collectNodes(this.contract.ast);
 
     // TS-TODO: define contractNode type.
-    this.getLinearizedBaseContracts().forEach(( contractNode:Node ) => {
+    this.getLinearizedBaseContracts().forEach(( contractNode: Node ) => {
       this.visitVariables(contractNode);
     });
 
@@ -107,12 +107,12 @@ class StorageLayout {
   }
 
   // TS-TODO: could type ast from artifacts/web3.
-  private collectImports(ast:any):void {
+  private collectImports(ast: any): void {
     ast.nodes
       .filter(( node ) => node.nodeType === 'ImportDirective')
       .map(( node ) => node.absolutePath)
       .forEach(( importPath ) => {
-        if(this.imports.has(importPath)) { return; }
+        if (this.imports.has(importPath)) { return; }
         this.imports.add(importPath);
         this.artifacts.getArtifactsFromSourcePath(importPath).forEach(( importedArtifact ) => {
           this.collectNodes(importedArtifact.ast);
@@ -121,27 +121,27 @@ class StorageLayout {
       });
   }
 
-  private collectNodes(node:Node):void {
+  private collectNodes(node: Node): void {
 
     // Return if we have already seen this node.
-    if(_.some(this.nodes[node.id] || [], ( n ) => _.isEqual(n, node))) { return; }
+    if (_.some(this.nodes[node.id] || [], ( n ) => _.isEqual(n, node))) { return; }
 
     // Add node to collection with this id otherwise.
-    if(!this.nodes[node.id]) { this.nodes[node.id] = []; }
+    if (!this.nodes[node.id]) { this.nodes[node.id] = []; }
     this.nodes[node.id].push(node);
 
     // Call recursively to children.
-    if(node.nodes) { node.nodes.forEach(this.collectNodes.bind(this)); }
+    if (node.nodes) { node.nodes.forEach(this.collectNodes.bind(this)); }
   }
 
-  private visitVariables(contractNode:Node):void {
+  private visitVariables(contractNode: Node): void {
 
     const sourcePath = path.relative(
       process.cwd(),
       this.getNode(contractNode.scope, 'SourceUnit'
     ).absolutePath);
 
-    const varNodes = contractNode.nodes.filter(( node:Node ) => node.stateVariable && !node.constant);
+    const varNodes = contractNode.nodes.filter(( node: Node ) => node.stateVariable && !node.constant);
     varNodes.forEach(( node ) => {
       const typeInfo = this.getAndRegisterTypeInfo(node.typeName);
       this.registerType(typeInfo);
@@ -154,20 +154,20 @@ class StorageLayout {
     });
   }
 
-  private registerType(typeInfo:TypeInfo):void {
+  private registerType(typeInfo: TypeInfo): void {
     this.types[typeInfo.id] = typeInfo;
   }
 
-  private getNode(id:number, nodeType:string):Node | never {
+  private getNode(id: number, nodeType: string): Node | never {
 
-    if(!this.nodes[id]) {
+    if (!this.nodes[id]) {
       throw Error(`No AST nodes with id ${id} found`);
     }
 
     const candidates = this.nodes[id].filter(( node ) => node.nodeType === nodeType);
     switch (candidates.length) {
       case 0:
-        throw Error(`No AST nodes of type ${nodeType} with id ${id} found (got ${this.nodes[id].map(( node:any ) => node.nodeType).join(', ')})`);
+        throw Error(`No AST nodes of type ${nodeType} with id ${id} found (got ${this.nodes[id].map(( node: any ) => node.nodeType).join(', ')})`);
       case 1:
         return candidates[0];
       default:
@@ -175,17 +175,17 @@ class StorageLayout {
     }
   }
 
-  private getContractNode():Node {
+  private getContractNode(): Node {
     return this.contract.ast.nodes.find(( node ) =>
       node.nodeType === 'ContractDefinition' && node.name === this.contract.contractName
     );
   }
 
-  private getLinearizedBaseContracts():number[] {
-    return _.reverse(this.getContractNode().linearizedBaseContracts.map(( id:number) => this.getNode(id, 'ContractDefinition')));
+  private getLinearizedBaseContracts(): number[] {
+    return _.reverse(this.getContractNode().linearizedBaseContracts.map(( id: number) => this.getNode(id, 'ContractDefinition')));
   }
 
-  private getStorageInfo(varNode, typeInfo):StorageInfo {
+  private getStorageInfo(varNode, typeInfo): StorageInfo {
     return {
       label: varNode.name,
       astId: varNode.id,
@@ -194,13 +194,13 @@ class StorageLayout {
     };
   }
 
-  private getAndRegisterTypeInfo(node:Node):TypeInfo {
+  private getAndRegisterTypeInfo(node: Node): TypeInfo {
     const typeInfo = this.getTypeInfo(node);
     this.registerType(typeInfo);
     return typeInfo;
   }
 
-  private getTypeInfo(node):TypeInfo {
+  private getTypeInfo(node): TypeInfo {
     switch (node.nodeType) {
       case 'ElementaryTypeName':
         return this.getElementaryTypeInfo(node);
@@ -235,7 +235,7 @@ class StorageLayout {
     return typeIdentifier.split('$', 1)[0];
   }
 
-  private getElementaryTypeInfo({ typeDescriptions }):TypeInfo {
+  private getElementaryTypeInfo({ typeDescriptions }): TypeInfo {
 
     const identifier = typeDescriptions.typeIdentifier
       .replace(/_storage(_ptr)?$/, '');
@@ -247,7 +247,7 @@ class StorageLayout {
     };
   }
 
-  private getArrayTypeInfo({ baseType, length, }):TypeInfo {
+  private getArrayTypeInfo({ baseType, length, }): TypeInfo {
     const { id: baseTypeId, label: baseTypeLabel } = this.getAndRegisterTypeInfo(baseType);
     const lengthDescriptor = length ? length.value : 'dyn';
     const lengthLabel = length ? length.value : '';
@@ -260,7 +260,7 @@ class StorageLayout {
     };
   }
 
-  private getMappingTypeInfo({ valueType }):TypeInfo {
+  private getMappingTypeInfo({ valueType }): TypeInfo {
     // We ignore the keyTypeId, since it's always hashed and takes up the same amount of space; we only care about the last value type
     const { id: valueTypeId, label: valueTypeLabel } = this.getValueTypeInfo(valueType);
     return {
@@ -271,17 +271,17 @@ class StorageLayout {
     };
   }
 
-  private getContractTypeInfo():TypeInfo {
+  private getContractTypeInfo(): TypeInfo {
     // Process a reference to a contract as an address, since we only care about storage size
     return { ... CONTRACT_TYPE_INFO };
   }
 
-  private getFunctionTypeInfo():TypeInfo {
+  private getFunctionTypeInfo(): TypeInfo {
     // Process a reference to a function disregarding types, since we only care how much space it takes
     return { ... FUNCTION_TYPE_INFO };
   }
 
-  private getStructTypeInfo(referencedDeclaration):TypeInfo {
+  private getStructTypeInfo(referencedDeclaration): TypeInfo {
 
     // Identify structs by contract and name
     const referencedNode = this.getNode(referencedDeclaration, 'StructDefinition');
@@ -307,7 +307,7 @@ class StorageLayout {
     return typeInfo;
   }
 
-  private getEnumTypeInfo(referencedDeclaration):TypeInfo {
+  private getEnumTypeInfo(referencedDeclaration): TypeInfo {
     // Store canonical name and members for an enum
     const referencedNode = this.getNode(referencedDeclaration, 'EnumDefinition');
     return {
@@ -318,7 +318,7 @@ class StorageLayout {
     };
   }
 
-  private getValueTypeInfo(node):TypeInfo {
+  private getValueTypeInfo(node): TypeInfo {
     return (node.nodeType === 'Mapping')
       ? this.getValueTypeInfo(node.valueType)
       : this.getAndRegisterTypeInfo(node);
