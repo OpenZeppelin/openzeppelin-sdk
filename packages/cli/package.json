@@ -6,7 +6,8 @@
   "private": false,
   "license": "MIT",
   "scripts": {
-    "prepare": "rm -rf lib && babel src --out-dir lib",
+    "compile-babel": "rm -rf lib && babel src --out-dir lib",
+    "prepare": "npm run compile-babel",
     "test": "./scripts/test.sh",
     "gen-docs": "babel-node docs/bin/docs.js",
     "watch": "babel src -w -d lib"

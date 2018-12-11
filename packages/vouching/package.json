@@ -7,7 +7,9 @@
   "license": "MIT",
   "scripts": {
     "test": "scripts/test.sh",
-    "prepare": "rm -rf build && npx truffle compile && rm -rf lib && npx babel src --out-dir lib",
+    "compile-contracts": "rm -rf build && truffle compile",
+    "compile-babel": "rm -rf lib && babel src --out-dir lib",
+    "prepare": "npm run compile-contracts && npm run compile-babel",
     "start-local": "npx ganache-cli --deterministic",
     "deploy-local": "node ./lib/bin/deploy.js --network=local --from=0x90f8bf6a479f320ead074411a4b0e7944ea8c9c1",
     "verify-local": "node ./lib/bin/verify.js --network=local --from=0x90f8bf6a479f320ead074411a4b0e7944ea8c9c1",

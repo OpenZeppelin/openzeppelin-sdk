@@ -7,9 +7,13 @@
   "license": "MIT",
   "scripts": {
     "test": "scripts/test.sh",
-    "prepare": "rm -rf build/contracts && truffle compile && rm -rf lib && babel src --out-dir lib",
     "prepublishOnly": "echo 'Removing mock contracts...' && grep -hoP '^\\s*contract \\K(\\w+)' contracts/mocks/*.sol | sort | uniq | xargs -t -I% rm build/contracts/%.json",
-    "watch": "babel src -w -d lib"
+    "compile-contracts": "rm -rf build/contracts && truffle compile",
+    "compile-ts": "rm -rf lib && tsc",
+    "prepare": "npm run compile-contracts && npm run compile-ts",
+    "watch": "tsc -w",
+    "lint": "npx tslint --project tsconfig.json --config ../../tslint.json",
+    "lintfix": "npx tslint --project tsconfig.json --config ../../tslint.json --fix"
   },
   "files": [
     "lib",
@@ -47,14 +51,8 @@
     "web3": "^0.18.4"
   },
   "devDependencies": {
-    "babel-cli": "^6.26.0",
-    "babel-plugin-transform-object-rest-spread": "^6.26.0",
-    "babel-polyfill": "^6.26.0",
-    "babel-preset-env": "^1.7.0",
-    "babel-preset-es2015": "^6.24.1",
-    "babel-preset-stage-2": "^6.24.1",
-    "babel-preset-stage-3": "^6.24.1",
-    "babel-register": "^6.26.0",
+    "@types/mocha": "^5.2.5",
+    "@types/node": "^10.12.12",
     "chai": "^4.1.2",
     "chai-as-promised": "^7.1.1",
     "chai-bignumber": "^2.0.2",
@@ -63,6 +61,8 @@
     "sinon": "^6.1.4",
     "solidity-coverage": "^0.4.15",
     "tmp": "^0.0.33",
-    "truffle": "^4.1.13"
+    "truffle": "^4.1.13",
+    "ts-node": "^7.0.1",
+    "typescript": "^3.2.2"
   }
 }
