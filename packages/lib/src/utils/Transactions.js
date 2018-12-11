@@ -80,7 +80,7 @@ export async function sendDataTransaction(contract, txParams) {
 }
 
 export async function getAccount(index) {
-  return web3.eth.accounts[index];
+  return await promisify(web3.eth.getAccounts.bind(web3.eth))(index);
 }
 
 /**
