@@ -84,7 +84,8 @@ export async function sendDataTransaction(contract, txParams) {
 }
 
 export async function getAccount(index) {
-  return await promisify(web3.eth.getAccounts.bind(web3.eth))(index);
+  const accounts = await ZWeb3.accounts();
+  return accounts[index];
 }
 
 /**
