@@ -23,7 +23,7 @@ export default class Logger {
     Logger._defaults.verbose = value;
   }
 
-  constructor(prefix: string, opts: LoggerOptions) {
+  constructor(prefix: string, opts?: LoggerOptions) {
     this._prefix = prefix;
     this._opts = opts;
   }

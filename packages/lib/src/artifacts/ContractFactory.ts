@@ -11,7 +11,7 @@ interface ContractSchema {
   deployedBytecode: string;
 }
 
-interface ContractWrapper {
+export interface ContractWrapper {
   address: string;
   transactionHash: string;
   allEvents: any;
