@@ -1,5 +1,6 @@
 'use strict';
 
+import _ from 'lodash'
 import verify from '../scripts/verify'
 import Initializer from '../models/initializer/Initializer'
 
@@ -19,12 +20,13 @@ const register = program => program
 
 
 async function action(contractAlias, options) {
-  const { optimizer, optimizerRuns } = options
+  const { optimizer, optimizerRuns, remote, apiKey } = options
   if (optimizer && !optimizerRuns) {
     throw new Error('Cannot verify contract without defining optimizer runs')
   }
-  const { network, txParams } = await Initializer.init(options)
-  await verify(contractAlias, { ...options, network, txParams })
+  const { network, txParams } = await Initializer.call(options)
+  const opts = _.pickBy({ optimizer, optimizerRuns, remote, apiKey, network, txParams })
+  await verify(contractAlias, { optimizer, optimizerRuns, remote, apiKey, network, txParams })
   if (!options.dontExitProcess && process.env.NODE_ENV !== 'test') process.exit(0)
 }
 
