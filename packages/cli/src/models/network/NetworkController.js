@@ -1,8 +1,8 @@
 'use strict';
 
 import _ from 'lodash';
-import { Contracts, Logger, FileSystem as fs, Proxy, awaitConfirmations, hasBytecode, semanticVersionToString } from 'zos-lib';
-import { flattenSourceCode, getStorageLayout, getBuildArtifacts, getSolidityLibNames, getAccount } from 'zos-lib';
+import { ZWeb3, Contracts, Logger, FileSystem as fs, Proxy, awaitConfirmations, hasBytecode, semanticVersionToString } from 'zos-lib';
+import { flattenSourceCode, getStorageLayout, getBuildArtifacts, getSolidityLibNames } from 'zos-lib';
 import { validate, newValidationErrors, validationPasses } from 'zos-lib';
 
 import { allPromisesOrError } from '../../utils/async';
@@ -657,7 +657,7 @@ export default class NetworkController {
   }
 
   async _saveOwner() {
-    const owner = this.txParams.from || await getAccount(0);
+    const owner = this.txParams.from || await ZWeb3.defaultAccount();
     const app = this.networkFile.app;
     if (app.owner == null) {
       app.owner = owner;
