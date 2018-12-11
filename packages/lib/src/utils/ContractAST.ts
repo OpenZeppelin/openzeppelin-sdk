@@ -73,8 +73,7 @@ export default class ContractAST {
     );
   }
 
-  // TS-TODO: define return type
-  public getLinearizedBaseContracts(mostDerivedFirst: boolean = false) {
+  public getLinearizedBaseContracts(mostDerivedFirst: boolean = false):Node[] {
     const contracts = this.getContractNode().linearizedBaseContracts.map((id) => this.getNode(id, 'ContractDefinition'));
     return mostDerivedFirst ? contracts : _.reverse(contracts);
   }
