@@ -2,7 +2,7 @@ import encodeCall from '../helpers/encodeCall';
 import ContractAST, { Node } from './ContractAST';
 import ContractFactory from '../artifacts/ContractFactory';
 
-interface CalldataInfo {
+export interface CalldataInfo {
   method: FunctionInfo;
   callData: string;
 }
