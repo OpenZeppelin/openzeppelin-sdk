@@ -1,7 +1,7 @@
 'use strict'
 require('../setup')
 
-import { App, Package, ImplementationDirectory, Proxy } from 'zos-lib'
+import { App, Package, ImplementationDirectory, Proxy, getAccount } from 'zos-lib'
 
 import publish from '../../src/scripts/publish.js';
 import push from '../../src/scripts/push.js';
@@ -57,6 +57,13 @@ contract('publish script', function([_, owner, otherAddress]) {
 
       const provider = await ImplementationDirectory.fetch(this.networkFile.providerAddress);
       (await provider.getImplementation(contractAlias)).should.be.nonzeroAddress;
+    });
+
+    it('should log owner address in network file', async function () {
+      const owner = txParams.from || await getAccount(0);
+      this.networkFile.app.owner.should.be.eq(owner);
+      this.networkFile.package.owner.should.be.eq(owner);
+      this.networkFile.provider.owner.should.be.eq(owner);
     });
 
     it('should reuse deployed implementations', async function () {

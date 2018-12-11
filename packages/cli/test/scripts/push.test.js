@@ -1,7 +1,7 @@
 'use strict'
 require('../setup')
 
-import { ZWeb3, Contracts, App, Package, getAccount } from 'zos-lib'
+import { ZWeb3, Contracts, App, Package } from 'zos-lib'
 
 import sinon from 'sinon'
 import push from '../../src/scripts/push.js';
@@ -312,15 +312,6 @@ contract('push script', function([_, owner]) {
     });
   };
 
-  const shouldSaveOwner = function () {
-    it('should save owner', async function () {
-      const owner = txParams.from || await getAccount(0);
-      this.networkFile.app.owner.should.be.eq(owner);
-      this.networkFile.package.owner.should.be.eq(owner);
-      this.networkFile.provider.owner.should.be.eq(owner);
-    });
-  }
-
   const shouldNotPushWhileFrozen = function () {
     it('should refuse to push when frozen upon modified contracts', async function() {
       await freeze({ network, txParams, networkFile: this.networkFile })
@@ -359,7 +350,6 @@ contract('push script', function([_, owner]) {
 
     shouldDeployApp();
     shouldDeployProvider();
-    shouldSaveOwner();
   });
 
   describe('an app with contracts', function() {
@@ -382,7 +372,6 @@ contract('push script', function([_, owner]) {
     shouldBumpVersion();
     shouldNotPushWhileFrozen();
     shouldDeleteContracts({ unregisterFromDirectory: true });
-    shouldSaveOwner();
   });
 
   describe('an app with invalid contracts', function() {
@@ -411,7 +400,6 @@ contract('push script', function([_, owner]) {
       shouldDeployApp();
       shouldSetDependency();
       shouldUpdateDependency();
-      shouldSaveOwner();
     })
 
     describe('when using a dependency with a version range', function () {
@@ -425,7 +413,6 @@ contract('push script', function([_, owner]) {
       shouldDeployApp();
       shouldSetDependency();
       shouldUpdateDependency();
-      shouldSaveOwner();
     })
   });
 
@@ -499,7 +486,6 @@ contract('push script', function([_, owner]) {
     shouldValidateContracts();
     shouldRedeployContracts();
     shouldDeleteContracts({ unregisterFromDirectory: false });
-    shouldSaveOwner();
 
     it('should not reupload contracts after version bump', async function () {
       const previousAddress = this.networkFile.contract('Impl').address
@@ -523,7 +509,6 @@ contract('push script', function([_, owner]) {
 
     shouldSetDependency();
     shouldUpdateDependency();
-    shouldSaveOwner();
   });
 });
 
