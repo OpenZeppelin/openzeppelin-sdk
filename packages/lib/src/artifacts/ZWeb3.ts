@@ -1,5 +1,6 @@
 import { promisify } from 'util';
 import sleep from '../helpers/sleep';
+import BN from 'bignumber.js';
 
 // Reference: see https://github.com/ethereum/EIPs/blob/master/EIPS/eip-155.md#list-of-chain-ids
 const NETWORKS = {
@@ -9,6 +10,34 @@ const NETWORKS = {
   4:  'rinkeby',
   42: 'kovan'
 };
+
+export interface Web3Transaction {
+  hash: string;
+  nonce: number;
+  blockHash: string;
+  blockNumber: number;
+  transactionIndex: number;
+  from: string;
+  to: string;
+  value: BN;
+  gasPrice: BN;
+  gas: number;
+  input: string;
+}
+
+export interface Web3TransactionReceipt {
+  blockHash: string;
+  blockNumber: number;
+  transactionHash: string;
+  transactionIndex: number;
+  from: string;
+  to: string;
+  cumulativeGasUsed: number;
+  gasUsed: number;
+  contractAddress: string;
+  logs: any[];
+  status: string;
+}
 
 // TS-TODO: Type Web3.
 // TS-TODO: Review what could be private in this class.
@@ -65,7 +94,7 @@ export default class ZWeb3 {
     return (await ZWeb3.accounts())[0];
   }
 
-  public static async estimateGas(params: any): Promise<number> {
+  public static async estimateGas(params: any): Promise<any> {
     return promisify(
       ZWeb3.eth().estimateGas.bind(ZWeb3.eth())
     )(params);
@@ -134,25 +163,25 @@ export default class ZWeb3 {
     return NETWORKS[networkId] || `dev-${networkId}`;
   }
 
-  public static async sendTransaction(params: any): Promise<any> {
+  public static async sendTransaction(params: any): Promise<string> {
     return promisify(
       ZWeb3.eth().sendTransaction.bind(ZWeb3.eth())
     )(params);
   }
 
-  public static async getTransaction(txHash: string): Promise<any> {
+  public static async getTransaction(txHash: string): Promise<Web3Transaction> {
     return promisify(
       ZWeb3.eth().getTransaction.bind(ZWeb3.eth())
     )(txHash);
   }
 
-  public static async getTransactionReceipt(txHash: string): Promise<any> {
+  public static async getTransactionReceipt(txHash: string): Promise<Web3TransactionReceipt> {
     return promisify(
       ZWeb3.eth().getTransactionReceipt.bind(ZWeb3.eth())
     )(txHash);
   }
 
-  public static async getTransactionReceiptWithTimeout(tx: string, timeout: number): Promise<any> {
+  public static async getTransactionReceiptWithTimeout(tx: string, timeout: number): Promise<Web3TransactionReceipt> {
     return ZWeb3._getTransactionReceiptWithTimeout(tx, timeout, new Date().getTime());
   }
 
