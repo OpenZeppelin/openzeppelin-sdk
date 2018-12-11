@@ -1,4 +1,4 @@
-# Token Mechanics V2
+# Token Mechanics V2.1
 
 ### Assumptions
 - Users will register/deprecate versions of a package. 
@@ -6,7 +6,7 @@
 - Users will be able to move their vouch through different versions of the same package. 
 - Challengers will challenge a specific version of a package.
 - The minimum stake is validated against the summation of the amount vouched by the package owner for each of its version.
-- There is no penalization for unvouching/moving tokens
+- For non-owner users, there is no penalization for unvouching/moving tokens. Package owners will have to make sure the minimum stake is reached.
 - Packages reputation could be calculated based on total vouch amount weighted by the registered versions
 
 ### Issues
@@ -17,18 +17,21 @@
   if the payout formula depends on the total stake. OTOH, windows may no be the ideal solution for critical challenges
 
 2- Challenges front-running?
-> We won't tackle this issue for this version.
+> A simple way to solve this issue for the following version, is to can handle front-running scenarios manually checking both challenges and deciding 
+  which is the real one.
 
 3- Challenges payout formula
   3.1- Severity
-  > Each challenge can have a severity label given by the challenger. 
+  > Each challenge can have a severity label given by the challenger. The severity may affect the payout received by each challenger.
 
   3.2- How we can make sure challenges payout cannot be manipulated based on their resolution order? 
-  > An obvious approach would be to solve challenges in a FIFO order.
+  > An obvious approach would be to solve challenges in a FIFO order. Note that this blocks solving a challenge until all previous ones have been 
+    solved as well. Therefore, if each challenge receives a percentage of the tokens staked, then the order in which challenges are resolved 
+    actually alters how much of a reward each challenge gets.
 
   3.3- How we can make sure there is enough tokens to pay successful challenges?
-  > We should decide whether we want to accept defaults or not.
-    If not, we should pay a proportional amount of tokens based on the severity, the challenge amount and the total stake. 
+  > We should decide whether we want to accept defaults or not, i.e. do we want to consider an scenario where a package does not have enough 
+    tokens staked to pay a challenge? If not, we should pay a proportional amount of tokens based on the severity and the total stake.
     
   3.4- How we will handle a huge list of vouchers during a payout?
   > We can have a rate per version in ZEP that will be adjust each time a challenge is solved.  
@@ -41,8 +44,8 @@
 
 #### Types
 ```
-[packages]   = string (name) => { package, owner (address), ownerTotalVouch (uint) }
-[package]    = string (version ID) => { vouch, totalVouch (uint), rate (fraction), deprecated (bool) } 
+[packages]   = string (name) => package
+[package]    = string (version ID) => { vouch, address, owner (address), ownerTotalVouch (uint), totalVouch (uint), rate (fraction), deprecated (bool) } 
 [vouch]      = address (user) => amount (uint)
 
 [challenges] = uint (id) => { uint (id), string (name), string (version ID), uint (amount), string (issueURL), address (sender), answer, (bool) closed }
