@@ -1,10 +1,11 @@
-import { isZeroAddress } from '../utils/Addresses';
-import { toSemanticVersion } from '../utils/Semver';
-import { deploy as deployContract, sendTransaction } from '../utils/Transactions'
+import _ from 'lodash';
 
 import Logger from '../utils/Logger'
-import Contracts from '../artifacts/Contracts';
-import ImplementationDirectory from './ImplementationDirectory';
+import { deploy as deployContract, sendTransaction } from '../utils/Transactions'
+import ImplementationDirectory from '../directory/ImplementationDirectory';
+import Contracts from '../utils/Contracts';
+import { toAddress, isZeroAddress } from '../utils/Addresses';
+import { toSemanticVersion } from '../utils/Semver';
 
 const log = new Logger('Package')
 
