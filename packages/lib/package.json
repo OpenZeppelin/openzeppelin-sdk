@@ -51,6 +51,7 @@
     "web3": "^0.18.4"
   },
   "devDependencies": {
+    "@types/mocha": "^5.2.5",
     "@types/node": "^10.12.12",
     "chai": "^4.1.2",
     "chai-as-promised": "^7.1.1",
