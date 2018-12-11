@@ -1,3 +1,5 @@
+import ethjs from 'ethjs-util';
+
 export default function validateAddress(address) {
   if (!address) return false
   if (address === '0x0000000000000000000000000000000000000000') return false

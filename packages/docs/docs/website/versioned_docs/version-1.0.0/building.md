@@ -5,7 +5,7 @@ sidebar_label: Building an upgradeable app
 original_id: building
 ---
 
-After installing `zos` and setting up your ZeppelinOS project as described in the [setup](setup.md) guide, you are now ready to create your upgradeable application.
+After installing `zos` and setting up your ZeppelinOS project as described in the [setup](setup.html) guide, you are now ready to create your upgradeable application.
 
 Let's start by installing the [ZeppelinOS lib](https://github.com/zeppelinos/zos-lib), which you will need to make your contract code upgradeable.
 
@@ -28,7 +28,7 @@ contract MyContract is Migratable {
 }
 ```
 
-Notice that your sample contract has an `initialize` function instead of the standard constructor. This is a requirement of [the ZeppelinOS upgradeability system](advanced.md#initializers-vs-constructors).
+Notice that your sample contract has an `initialize` function instead of the standard constructor. This is a requirement of [ZeppelinOS initializer functions](proxies.md#the-constructor-caveat).
 
 Before deploying your upgradeable app to the network, you need to add your contract:
 
@@ -67,7 +67,7 @@ After these simple steps, your upgradeable application is now on-chain! Congratu
 
 If, at a later stage, you want to upgrade your smart contract code in order to fix a bug or add a new feature, you can do it seamlessly using ZeppelinOS. Remember not to restart your development node, or you will lose your previous deployment!
 
-> **Note**: while ZeppelinOS supports arbitrary changes in functionality, you will need to preserve all variables that appear in prior versions of your contracts, declaring any new variables below the already existing ones. You can find more details in the [advanced topics](advanced.md) page.
+> **Note**: while ZeppelinOS supports arbitrary changes in functionality, you will need to preserve all variables that appear in prior versions of your contracts, declaring any new variables below the already existing ones. You can find more details in the [advanced topics](advanced.html) page.
 
 Open `MyContract.sol` again, and add a new function:
 ```js
@@ -111,4 +111,4 @@ truffle(local)> myContract.x()
 43
 ```
 
-In order to learn how to use the ZeppelinOS standard libraries in an upgradeable app, please follow the [next guide](using.md).
+In order to learn how to use the ZeppelinOS standard libraries in an upgradeable app, please follow the [next guide](using.html).

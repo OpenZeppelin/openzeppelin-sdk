@@ -1,3 +1,5 @@
+require('../../setup')
+
 import { FileSystem as fs } from 'zos-lib'
 import log from '../../../src/helpers/log'
 import deploy from '../../../src/scripts/deploy'

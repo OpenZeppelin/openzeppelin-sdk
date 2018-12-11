@@ -7,7 +7,15 @@ contract('create command', function() {
 
   stubCommands()
 
-  itShouldParse('should call create script with options', 'create', 'zos create Impl --network test --init initialize --args 42 --force --from 0x40', function(create) {
+  itShouldParse('should call create script with options', 'create', 'zos create Impl --network test --init setup --args 42 --force --from 0x40', function(create) {
+    create.should.have.been.calledWithExactly( { contractAlias: 'Impl', initMethod: 'setup', initArgs: ['42'], force: true, network: 'test', txParams: { from: '0x40'} })
+  })
+
+  itShouldParse('should call create script with default init method', 'create', 'zos create Impl --network test --init --args 42 --force --from 0x40', function(create) {
+    create.should.have.been.calledWithExactly( { contractAlias: 'Impl', initMethod: 'initialize', initArgs: ['42'], force: true, network: 'test', txParams: { from: '0x40'} })
+  })
+
+  itShouldParse('should call create script with init if only args is provided', 'create', 'zos create Impl --network test --args 42 --force --from 0x40', function(create) {
     create.should.have.been.calledWithExactly( { contractAlias: 'Impl', initMethod: 'initialize', initArgs: ['42'], force: true, network: 'test', txParams: { from: '0x40'} })
   })
 

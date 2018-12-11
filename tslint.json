@@ -1,0 +1,34 @@
+{
+    "defaultSeverity": "error",
+    "extends": [
+        "tslint:recommended"
+    ],
+    "linterOptions": {
+      "exclude": [
+        "**/*.js",
+        "**/*.jsx"
+      ]
+    },
+    "jsRules": {},
+    "rules": {
+      "one-line": [false],
+      "quotemark": [true, "single"],
+      "semicolon": [true, "always"],
+      "object-literal-sort-keys": [false],
+      "typedef-whitespace": [true, "onespace"],
+      "whitespace": [true],
+      "trailing-comma": [false],
+      "space-within-parens": [true, 0],
+      "ordered-imports": [false],
+      "no-angle-bracket-type-assertion": [false],
+      "interface-name": [false],
+      "variable-name": [false],
+      "member-ordering": [false],
+      "no-console": [false],
+      "max-line-length": [false],
+      "only-arrow-functions": [false],
+      "no-empty": [true, "allow-empty-functions"],
+      "no-consecutive-blank-lines": [true, 1]
+    },
+    "rulesDirectory": []
+}

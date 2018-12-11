@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "pretty": true,
+    "module": "commonjs",
+    "moduleResolution": "Node",
+    "target": "es6",
+    "allowJs": true,
+    "checkJs": false,
+    "strict": false,
+    "esModuleInterop": true,
+    "lib": [
+      "es2017"
+    ]
+  },
+  "exclude": [
+     "node_modules",
+     "**/*.spec.ts"
+  ]
+}

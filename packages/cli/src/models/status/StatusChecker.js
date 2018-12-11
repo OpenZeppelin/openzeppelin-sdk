@@ -1,10 +1,10 @@
 import _ from 'lodash'
 import { promisify } from 'util'
 
-import { Logger, LibProject, AppProject, bytecodeDigest, semanticVersionEqual, replaceSolidityLibAddress, isSolidityLib } from 'zos-lib'
 import EventsFilter from './EventsFilter'
 import StatusFetcher from './StatusFetcher'
 import StatusComparator from './StatusComparator'
+import { ZWeb3, Logger, AppProject, bytecodeDigest, semanticVersionEqual, replaceSolidityLibAddress, isSolidityLib } from 'zos-lib'
 
 const log = new Logger('StatusChecker')
 const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000'
@@ -33,25 +33,20 @@ export default class StatusChecker {
       const { packageAddress, appAddress, version } = this.networkFile
 
       if (!this._project) {
-        this._project = this.networkFile.isLib
-          ? await LibProject.fetchOrDeploy(this.networkFile.version, this.txParams, { packageAddress })
-          : await AppProject.fetchOrDeploy(this.packageName,  this.networkFile.version, this.txParams, { appAddress, packageAddress })
+        this._project = await AppProject.fetchOrDeploy(this.packageName,  this.networkFile.version, this.txParams, { appAddress, packageAddress })
       }
 
       return this._project
     } catch(error) {
-      throw Error(`Cannot fetch project contract from address ${this.networkFile.appAddress}.`, error)
+      error.message = `Cannot fetch project contract from address ${this.networkFile.appAddress}: ${error.message}`
+      throw error
     }
   }
 
   async call() {
     await this.setProject()
     log.info(`Comparing status of project ${(await this._project.getProjectPackage()).address} ...\n`)
-    if (this.networkFile.isLib) {
-      await this.checkLib()
-    } else {
-      await this.checkApp()
-    }
+    await this.checkApp()
     this.visitor.onEndChecking()
   }
 
@@ -62,11 +57,6 @@ export default class StatusChecker {
     await this.checkImplementations()
     await this.checkProxies()
     await this.checkDependencies()
-  }
-
-  async checkLib() {
-    await this.checkProvider()
-    await this.checkImplementations()
   }
 
   async checkVersion() {
@@ -98,11 +88,11 @@ export default class StatusChecker {
     const implementationsInfo = await this._fetchOnChainImplementations()
     await Promise.all(
       implementationsInfo.map(async info => {
-        const { address } = info;
-        const bytecode = await promisify(web3.eth.getCode.bind(web3.eth))(address);
-        return isSolidityLib(bytecode) 
-          ? this._checkRemoteSolidityLibImplementation(info, bytecode) 
-          : this._checkRemoteContractImplementation(info, bytecode);
+        const { address } = info
+        const bytecode = await ZWeb3.getCode(address)
+        return await (isSolidityLib(bytecode)
+          ? this._checkRemoteSolidityLibImplementation(info, bytecode)
+          : this._checkRemoteContractImplementation(info, bytecode))
       })
     )
     this._checkUnregisteredLocalImplementations(implementationsInfo)
@@ -114,12 +104,14 @@ export default class StatusChecker {
     this._checkUnregisteredLocalProxies(proxiesInfo)
   }
 
-  _checkRemoteContractImplementation({ alias, address }, bytecode) {
+  async _checkRemoteContractImplementation({ alias, address }, bytecode) {
     if (this.networkFile.hasContract(alias)) {
       this._checkContractImplementationAddress(alias, address)
       this._checkContractImplementationBytecode(alias, address, bytecode)
     }
-    else this.visitor.onMissingRemoteImplementation('none', 'one', { alias, address })
+    else {
+      await this.visitor.onMissingRemoteImplementation('none', 'one', { alias, address })
+    }
   }
 
   _checkContractImplementationAddress(alias, address) {
@@ -133,7 +125,7 @@ export default class StatusChecker {
     if (observed !== expected) this.visitor.onMismatchingImplementationBodyBytecode(expected, observed, { alias, address, bodyBytecodeHash: observed })
   }
 
-  _checkRemoteSolidityLibImplementation({ alias, address }, bytecode) {
+  async _checkRemoteSolidityLibImplementation({ alias, address }, bytecode) {
     if (this.networkFile.hasSolidityLib(alias)) {
       this._checkSolidityLibImplementationAddress(alias, address)
       this._checkSolidityLibImplementationBytecode(alias, address, bytecode)

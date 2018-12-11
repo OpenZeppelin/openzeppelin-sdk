@@ -1,12 +1,13 @@
 {
   "name": "zos",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Command-line interface for the ZeppelinOS smart contract platform",
   "main": "./lib/index.js",
   "private": false,
   "license": "MIT",
   "scripts": {
-    "prepare": "rm -rf lib && babel src --out-dir lib",
+    "compile-babel": "rm -rf lib && babel src --out-dir lib",
+    "prepare": "npm run compile-babel",
     "test": "./scripts/test.sh",
     "gen-docs": "babel-node docs/bin/docs.js",
     "watch": "babel src -w -d lib"
@@ -39,13 +40,11 @@
     "lodash": "^4.17.5",
     "npm-programmatic": "0.0.10",
     "semver": "^5.5.0",
-    "sinon": "^6.1.4",
-    "truffle": "^4.1.13",
     "truffle-config": "^1.0.6",
-    "truffle-core": "^4.1.13",
+    "truffle-resolver": "^4.0.4",
     "truffle-workflow-compile": "^1.0.6",
     "web3-provider-engine": "14.0.6",
-    "zos-lib": "^2.0.0"
+    "zos-lib": "^2.0.1"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",
@@ -62,10 +61,12 @@
     "mock-stdlib-invalid": "file:./test/mocks/mock-stdlib-invalid",
     "mock-stdlib-undeployed": "file:./test/mocks/mock-stdlib-undeployed",
     "mock-stdlib-undeployed-2": "file:./test/mocks/mock-stdlib-undeployed-2",
+    "mock-stdlib-unpublished": "file:./test/mocks/mock-stdlib-unpublished",
     "mock-stdlib-unsupported": "file:./test/mocks/mock-stdlib-unsupported",
     "react": "^16.3.2",
     "react-dom": "^16.3.2",
     "sinon": "^6.1.4",
-    "sinon-chai": "^3.2.0"
+    "sinon-chai": "^3.2.0",
+    "truffle": "^4.1.13"
   }
 }

@@ -12,9 +12,7 @@ export default class ZosNetworkFile {
     this.network = network
     this.fileName = fileName
 
-    const defaults = this.packageFile.isLib 
-      ? { contracts: {}, solidityLibs: {}, lib: true, frozen: false, zosversion: ZOS_VERSION } 
-      : { contracts: {}, solidityLibs: {}, proxies: {}, zosversion: ZOS_VERSION }
+    const defaults = { contracts: {}, solidityLibs: {}, proxies: {}, zosversion: ZOS_VERSION }
     
     this.data = fs.parseJsonIfExists(this.fileName) || defaults
     checkVersion(this.data.zosversion, this.fileName)
@@ -58,10 +56,6 @@ export default class ZosNetworkFile {
 
   get contractAliases() {
     return Object.keys(this.contracts)
-  }
-    
-  get isLib() {
-    return this.packageFile.isLib
   }
 
   get isLightweight() {

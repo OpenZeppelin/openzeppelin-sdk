@@ -15,26 +15,25 @@ Let's install [Node.js](http://nodejs.org/) and
 [npm](https://npmjs.com/), which are the dependencies to get started. On their
 respective websites you will find specific instructions for your machine.
 
-Truffle is also required, so let's install it and initialize a directory for
-our project:
+Truffle is also required, and we'll be using [ganache](https://truffleframework.com/docs/ganache/quickstart) for local deployment, so let's install them and initialize a directory for our project:
 
-```
-npm install --global truffle
+```console
+npm install --global truffle ganache-cli
 mkdir my-project
 cd my-project
 truffle init
 ```
 
-Then, install the ZeppelinOS JavaScript Library running:
+Then, install the ZeppelinOS JavaScript library running:
 
-```sh
+```console
 npm install zos-lib
 ```
 
 Now, let's write two simple contracts. The first in `contracts/MyContractV0`
 with the following contents:
 
-```sol
+```solidity
 pragma solidity ^0.4.24;
 
 import "zos-lib/contracts/Initializable.sol";
@@ -51,7 +50,7 @@ contract MyContractV0 is Initializable {
 The second in `contracts/MyContractV1`, and it will be almost the same as the
 first one but with one extra function:
 
-```sol
+```solidity
 pragma solidity ^0.4.24;
 
 import "zos-lib/contracts/Initializable.sol";
@@ -73,7 +72,7 @@ The V1 contract is an upgrade for the V0 contract, so let's see how we can
 use the ZeppelinOS library to apply this upgrade. For this, we need to
 compile the contracts:
 
-```sh
+```console
 truffle compile
 ```
 
@@ -109,20 +108,31 @@ module.exports = function(callback) {
 ```
 
 As you can see on the code, this script was prepared to be executed with
-Truffle. So let's start a Truffle local development network and console:
+Truffle. So let's open a new terminal and start a ganache network by running:
 
+```console
+ganache-cli --port 9545
 ```
-truffle develop
+We also need to configure a local network inside our `truffle.js` by adding the following:
+
+```javascript
+module.exports = {
+  networks: {
+    local: {
+      host: 'localhost',
+      port: 9545,
+      network_id: '*'
+    }
+  }
+};
 ```
 
-And execute the script in the truffle console:
+Adnd then, execute the script using `truffle exec`:
 
-```
-truffle(develop)> exec index.js
+```console
+truffle exec index.js --network local
 ```
 
 This is just a very simple example to show the basic functions of the
 ZeppelinOS JavaScript library. You can find more examples in the
 [ZeppelinOS repository](https://github.com/zeppelinos/zos/tree/master/examples).
-
-// TODO add link to the API docs.

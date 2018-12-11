@@ -12,17 +12,18 @@ export async function allPromisesOrError(promisesWithObjects, toErrorMessage) {
       }
       return await promise
     } catch(error) {
-      failures.push([ error, object ])
+      failures.push({ error, object })
       return null
     }
-  };
+  }
 
   const results = await Promise.all(
     _.map(promisesWithObjects, handlingFailure)
   )
 
   if(!_.isEmpty(failures)) {
-    const message = failures.map(([err, obj]) => toErrorMessage ? toErrorMessage(err, obj) : (err.message || err)).join('\n')
+    if (failures.length === 1) throw failures[0].error
+    const message = failures.map(({ error, object }) => toErrorMessage ? toErrorMessage(error, object) : (error.message || error)).join('\n')
     throw Error(message)
   }
 

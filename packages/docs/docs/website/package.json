@@ -9,6 +9,7 @@
     "rename-version": "docusaurus-rename-version"
   },
   "devDependencies": {
-    "docusaurus": "^1.0.7"
+    "docusaurus": "^1.0.7",
+    "highlightjs-solidity": "^1.0.6"
   }
 }

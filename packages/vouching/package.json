@@ -1,13 +1,15 @@
 {
   "name": "zos-vouching",
-  "version": "2.0.0-rc.3",
+  "version": "2.0.1",
   "description": "Vouching logic for the EVM packages of the ZeppelinOS smart contract platform",
   "main": "truffle-config.js",
   "private": false,
   "license": "MIT",
   "scripts": {
-    "test": "NODE_ENV=test scripts/test.sh",
-    "prepare": "rm -rf build && npx truffle compile && rm -rf lib && npx babel src --out-dir lib",
+    "test": "scripts/test.sh",
+    "compile-contracts": "rm -rf build && truffle compile",
+    "compile-babel": "rm -rf lib && babel src --out-dir lib",
+    "prepare": "npm run compile-contracts && npm run compile-babel",
     "start-local": "npx ganache-cli --deterministic",
     "deploy-local": "node ./lib/bin/deploy.js --network=local --from=0x90f8bf6a479f320ead074411a4b0e7944ea8c9c1",
     "verify-local": "node ./lib/bin/verify.js --network=local --from=0x90f8bf6a479f320ead074411a4b0e7944ea8c9c1",
@@ -38,13 +40,17 @@
     "vouching",
     "evm"
   ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zeppelinos/zos.git"
+  },
   "dependencies": {
     "chalk": "^2.4.1",
     "minimist": "^1.2.0",
     "openzeppelin-eth": "^2.0.0",
     "tpl-contracts-eth": "^1.0.0",
-    "zos": "^2.0.0",
-    "zos-lib": "^2.0.0"
+    "zos": "^2.0.1",
+    "zos-lib": "^2.0.1"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",

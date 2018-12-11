@@ -6,7 +6,7 @@ import push from '../../src/scripts/push.js';
 import bumpVersion from '../../src/scripts/bump.js';
 import createProxy from '../../src/scripts/create.js';
 import status from '../../src/scripts/status.js';
-import linkLibs from '../../src/scripts/link';
+import link from '../../src/scripts/link';
 import ControllerFor from '../../src/models/local/ControllerFor';
 import CaptureLogs from '../helpers/captureLogs';
 import ZosPackageFile from "../../src/models/files/ZosPackageFile";
@@ -19,7 +19,7 @@ contract('status script', function([_, owner]) {
   const contractAlias = 'Impl';
   const contractsData = [{ name: contractName, alias: contractAlias }]
   const anotherContractName = 'WithLibraryImplV1';
-  const libs = ['mock-stdlib@1.1.0'];
+  const dependencies = ['mock-stdlib@1.1.0'];
   
   beforeEach('setup', async function() {
     this.capturingLogs = ((promise) => {
@@ -48,24 +48,6 @@ contract('status script', function([_, owner]) {
         this.logs.text.should.match(/package \w+ is at 0x[0-9a-fA-F]{40}/i);
         this.logs.text.should.match(/version 1.1.0 matches/i);
         this.logs.text.should.match(/no contracts registered/i);
-      });
-    });
-  };
-
-  const shouldDescribeLib = function () {
-    describe('root lib', function () {
-      it('should log undeployed lib', async function () {
-        this.capturingLogs();
-        await status({ network, networkFile: this.networkFile });
-
-        this.logs.text.should.match(/not yet deployed/);
-      });
-
-      it('should log plain lib info', async function () {
-        await push({ network, txParams, networkFile: this.networkFile });
-        await this.capturingLogs(status({ network, networkFile: this.networkFile }));
-
-        this.logs.text.should.match(/Dependency package is deployed at 0x[0-9a-fA-F]{40}/i);
       });
     });
   };
@@ -142,7 +124,7 @@ contract('status script', function([_, owner]) {
   const shouldDescribeUnlinkedDependency = function () {
     it('should log missing library', async function () {
       await push({ network, txParams, networkFile: this.networkFile });
-      await linkLibs({ packageFile: this.packageFile, libs, installLib: false });
+      await link({ packageFile: this.packageFile, dependencies, installLib: false });
       await this.capturingLogs(status({ network, networkFile: this.networkFile }));
 
       this.logs.text.should.match(/mock-stdlib@1.1.0 is required but is not linked/i);
@@ -152,7 +134,7 @@ contract('status script', function([_, owner]) {
   const shouldDescribeDependency = function () {
     describe('dependency', function () {
       it('should log connected dependency', async function () {
-        await push({ network, txParams, deployLibs: true, networkFile: this.networkFile });
+        await push({ network, txParams, deployDependencies: true, networkFile: this.networkFile });
         this.networkFile.updateDependency('mock-stdlib-undeployed', dep => ({ ... dep, customDeploy: false }))
         await this.capturingLogs(status({ network, networkFile: this.networkFile }));
 
@@ -160,8 +142,8 @@ contract('status script', function([_, owner]) {
       });
 
       it('should log connected dependency when semver requirement matches', async function () {
-        await linkLibs({ packageFile: this.packageFile, libs: ['mock-stdlib-undeployed@^1.0.0'], installLib: false });
-        await push({ network, txParams, deployLibs: true, networkFile: this.networkFile });
+        await link({ packageFile: this.packageFile, dependencies: ['mock-stdlib-undeployed@^1.0.0'], installLib: false });
+        await push({ network, txParams, deployDependencies: true, networkFile: this.networkFile });
         this.networkFile.updateDependency('mock-stdlib-undeployed', dep => ({ ... dep, customDeploy: false }))
         await this.capturingLogs(status({ network, networkFile: this.networkFile }));
 
@@ -169,7 +151,7 @@ contract('status script', function([_, owner]) {
       });
 
       it('should log connected dependency to incorrect version', async function () {
-        await push({ network, txParams, deployLibs: true, networkFile: this.networkFile });
+        await push({ network, txParams, deployDependencies: true, networkFile: this.networkFile });
         this.networkFile.updateDependency('mock-stdlib-undeployed', dep => ({ ... dep, customDeploy: false }))
         this.packageFile.setDependency('mock-stdlib-undeployed', '^2.0.0');
         await this.capturingLogs(status({ network, networkFile: this.networkFile }));
@@ -178,14 +160,14 @@ contract('status script', function([_, owner]) {
       });
 
       it('should log deployed dependency', async function () {
-        await push({ network, txParams, deployLibs: true, networkFile: this.networkFile });
+        await push({ network, txParams, deployDependencies: true, networkFile: this.networkFile });
         await this.capturingLogs(status({ network, networkFile: this.networkFile }));
 
         this.logs.text.should.match(/mock-stdlib-undeployed@1\.1\.0 is linked to a custom deployment/i);
       });
 
       it('should log deployed dependency to incorrect version', async function () {
-        await push({ network, txParams, deployLibs: true, networkFile: this.networkFile });
+        await push({ network, txParams, deployDependencies: true, networkFile: this.networkFile });
         this.packageFile.setDependency('mock-stdlib-undeployed', '^2.0.0');
         await this.capturingLogs(status({ network, networkFile: this.networkFile }));
 
@@ -261,15 +243,4 @@ contract('status script', function([_, owner]) {
     shouldDescribeProxies();
   });
 
-  describe('on lib project', function () {
-    beforeEach('creating package and network files', function () {
-      this.packageFile = new ZosPackageFile('test/mocks/packages/package-empty-lib.zos.json')
-      this.networkFile = this.packageFile.networkFile(network)
-    })
-
-    shouldDescribeLib();
-    shouldDescribeVersion();
-    shouldDescribeContracts();
-    shouldNotModifyPackage();
-  });
 });

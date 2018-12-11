@@ -28,4 +28,4 @@ zos init my-app
 
 This creates a `zos.json` file, which contains all the information about your application. For details about this file format, please see the [advanced topics](advanced.md#format-of-zosjson-and-zos-network-json-files) section. 
 
-You are now ready to [start building your upgradable application](building.md).
+You are now ready to [start building your upgradable application](building.html).

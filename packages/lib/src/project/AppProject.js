@@ -1,8 +1,9 @@
+import _ from 'lodash';
+
 import BasePackageProject from "./BasePackageProject";
 import App from "../app/App";
 import Package from "../package/Package";
 import { DeployError } from '../utils/errors/DeployError';
-import _ from 'lodash';
 import { semanticVersionToString } from "../utils/Semver";
 
 const DEFAULT_NAME = 'main';
@@ -34,8 +35,8 @@ export default class AppProject extends BasePackageProject {
       project.directory = directory
       project.package = thepackage
       return project
-    } catch(deployError) {
-      throw new DeployError(deployError, { thepackage, directory, app })
+    } catch(error) {
+      throw new DeployError(error, { thepackage, directory, app })
     }
   }
 

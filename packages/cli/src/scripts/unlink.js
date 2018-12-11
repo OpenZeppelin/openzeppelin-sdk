@@ -3,13 +3,14 @@
 import stdout from '../utils/stdout'
 import ControllerFor from "../models/local/ControllerFor"
 
-export default async function unlink({ libNames = [], packageFile = undefined }) {
-  if (!libNames.length) throw Error('At least one dependency name must be provided.')
-  const controller = ControllerFor(packageFile)
-  if (controller.isLib) throw Error('Package projects cannot use other packages.')
+export default async function unlink({ libNames = [], dependencies = [], packageFile = undefined }) {
+  dependencies = dependencies.length === 0 && libNames.length !== 0 ? libNames : dependencies
 
-  controller.unlinkLibs(libNames)
+  if (!dependencies.length) throw Error('At least one dependency name must be provided.')
+  const controller = ControllerFor(packageFile)
+
+  controller.unlinkDependencies(dependencies)
   controller.writePackage()
-  libNames.forEach(libName => stdout(libName))
+  dependencies.forEach(dependencyName => stdout(dependencyName))
 }
 

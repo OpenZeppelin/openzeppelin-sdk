@@ -15,7 +15,7 @@ const siteConfig = {
   initialDoc: 'start',
   headerLinks: [
     {
-      doc: 'developing',
+      doc: 'start',
       label: 'Quickstart',
     },
     {
@@ -32,6 +32,7 @@ const siteConfig = {
     },
   ],
   headerIcon: 'img/logo.svg',
+  disableHeaderTitle: true,
   footerIcon: 'img/symbol-zeppelin.png',
   favicon: 'img/favicon.png',
   colors: {
@@ -42,6 +43,9 @@ const siteConfig = {
   // gaTrackingId: 'UA-85043059-1',
   highlight: {
     theme: 'default',
+    hljs: function(hljs) {
+      require('highlightjs-solidity')(hljs);
+    }
   },
   scripts: ['https://buttons.github.io/buttons.js'],
   stylesheets: [

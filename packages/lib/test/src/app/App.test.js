@@ -1,16 +1,19 @@
 'use strict';
+
 require('../../setup')
 
-import expectEvent from 'openzeppelin-solidity/test/helpers/expectEvent';
 import App from '../../../src/app/App';
-import { deploy as deployContract } from '../../../src/utils/Transactions';
+import ZWeb3 from '../../../src/artifacts/ZWeb3'
+import Package from '../../../src/package/Package'
 import Contracts from '../../../src/utils/Contracts'
-import Package from '../../../src/package/Package';
+import expectEvent from 'openzeppelin-solidity/test/helpers/expectEvent'
 import { ZERO_ADDRESS } from '../../../src/utils/Addresses';
 import { ImplementationDirectory, Proxy } from '../../../src';
+import { deploy as deployContract } from '../../../src/utils/Transactions';
 
 const ImplV1 = Contracts.getFromLocal('DummyImplementation');
 const ImplV2 = Contracts.getFromLocal('DummyImplementationV2');
+const ProxyCreator = Contracts.getFromLocal('ProxyCreator');
 
 contract('App', function (accounts) {
   const [_unused, owner, otherAdmin] = accounts;
@@ -154,7 +157,7 @@ contract('App', function (accounts) {
       it('should return a non-upgradeable instance', async function () {
         this.instance.address.should.be.not.null;
         (await this.instance.version()).should.be.eq('V1');
-        (await web3.eth.getCode(this.instance.address)).should.be.eq(ImplV1.deployedBytecode)
+        (await ZWeb3.getCode(this.instance.address)).should.be.eq(ImplV1.deployedBytecode)
       });
     };
 
@@ -280,6 +283,20 @@ contract('App', function (accounts) {
         (await this.proxy.value()).toNumber().should.eq(10);
         (await this.proxy.text()).should.eq("foo");
         await this.proxy.values(0).should.be.rejected;
+      });
+    });
+
+    describe('with initializer that spawns additional proxies', function () {
+      beforeEach('setting proxy creator implementation', async function () {
+        this.proxyCreator = await deployContract(ProxyCreator);
+        await this.directory.setImplementation('ProxyCreator', this.proxyCreator.address);
+      });
+
+      it('should return proxy creator instance', async function () {
+        const proxy = await this.app.createProxy(ProxyCreator, packageName, 'ProxyCreator', 'initialize', [this.app.address, packageName, contractName, '']);
+        (await proxy.name()).should.eq('ProxyCreator');
+        const created = await proxy.created();
+        (await ImplV1.at(created).version()).should.eq('V1');
       });
     });
   });

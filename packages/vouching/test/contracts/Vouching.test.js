@@ -1,3 +1,5 @@
+require('../setup')
+
 import { Contracts, encodeCall, assertEvent, assertRevert } from 'zos-lib'
 
 const BigNumber = web3.BigNumber;
@@ -6,10 +8,6 @@ const Vouching = artifacts.require('Vouching');
 const DependencyMock = artifacts.require('DependencyMock');
 const BasicJurisdiction = Contracts.getFromNodeModules('tpl-contracts-eth', 'BasicJurisdiction')
 const OrganizationsValidator = Contracts.getFromNodeModules('tpl-contracts-eth', 'OrganizationsValidator')
-
-require('chai')
-  .use(require('chai-bignumber')(BigNumber))
-  .should();
 
 contract('Vouching', function ([_, tokenOwner, vouchingOwner, developer, transferee,
         nonContractAddress, jurisdictionOwner, validatorOwner, organization]) {

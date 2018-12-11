@@ -1,10 +1,9 @@
 'use strict'
 require('../setup')
 
+import { ZWeb3, Contracts, App, Package, getAccount } from 'zos-lib'
+
 import sinon from 'sinon'
-
-import { Contracts, App, Package, getAccount } from 'zos-lib'
-
 import push from '../../src/scripts/push.js';
 import freeze from '../../src/scripts/freeze';
 import add from '../../src/scripts/add';
@@ -13,13 +12,11 @@ import ZosPackageFile from '../../src/models/files/ZosPackageFile';
 import remove from '../../src/scripts/remove';
 import Dependency from '../../src/models/dependency/Dependency';
 import CaptureLogs from '../helpers/captureLogs';
-import { promisify } from 'util';
 
 const should = require('chai').should();
 
 const ImplV1 = Contracts.getFromLocal('ImplV1');
 const WithLibraryImplV1 = Contracts.getFromLocal('WithLibraryImplV1');
-const PackageContract = Contracts.getFromNodeModules('zos-lib', 'Package');
 const ImplementationDirectory = Contracts.getFromNodeModules('zos-lib', 'ImplementationDirectory');
 
 contract('push script', function([_, owner]) {
@@ -63,14 +60,6 @@ contract('push script', function([_, owner]) {
     });
   };
 
-  const shouldDeployLib = function () {
-    shouldDeployPackage();
-
-    it('should not be frozen by default', async function() {
-      this.networkFile.frozen.should.be.false;
-    });
-  };
-
   const shouldDeployContracts = function () {
     it('should record contracts in network file', async function () {
       const contract = this.networkFile.contract('Impl');
@@ -90,7 +79,7 @@ contract('push script', function([_, owner]) {
 
     it('should deploy required libraries', async function () {
       const address = this.networkFile.solidityLib('UintLib').address;
-      const code = await promisify(web3.eth.getCode.bind(web3.eth))(address);
+      const code = await ZWeb3.getCode(address)
       const uintLib = Contracts.getFromLocal('UintLib');
       code.length.should.eq(uintLib.deployedBytecode.length).and.be.greaterThan(40);
     });
@@ -464,41 +453,26 @@ contract('push script', function([_, owner]) {
           .should.be.rejectedWith(/Could not find a zos file for network 'test' for 'mock-stdlib-undeployed'/)
       });
     })
-  });
 
-  describe('an empty lib', function() {
-    beforeEach('pushing package-empty', async function () {
-      const packageFile = new ZosPackageFile('test/mocks/packages/package-empty-lib.zos.json')
-      this.networkFile = packageFile.networkFile(network)
+    describe('when using an unpublished dependency', function () {
+      beforeEach('building network file', async function () {
+        const packageFile = new ZosPackageFile('test/mocks/packages/package-with-unpublished-stdlib.zos.json')
+        this.networkFile = packageFile.networkFile(network)
+      });
 
-      await push({ network, txParams, networkFile: this.networkFile })
-    });
+      it('should fail to push', async function () {
+        await push({ network, txParams, networkFile: this.networkFile })
+          .should.be.rejectedWith(/Dependency 'mock-stdlib-unpublished' has not been published to network 'test', so it cannot be linked/)
+      });
 
-    shouldDeployLib(this.networkFile);
-    shouldDeployProvider(this.networkFile);
-  });
-
-  describe('a lib with contracts', function() {
-    beforeEach('pushing package-with-contracts', async function () {
-      const packageFile = new ZosPackageFile('test/mocks/packages/package-lib-with-contracts.zos.json')
-      this.networkFile = packageFile.networkFile(network)
-
-      await push({ network, txParams, networkFile: this.networkFile })
-
-      const newPackageFile = new ZosPackageFile('test/mocks/packages/package-lib-with-contracts-v2.zos.json')
-      this.newNetworkFile = newPackageFile.networkFile(network)
-    });
-
-    shouldDeployLib();
-    shouldDeployProvider();
-    shouldDeployContracts();
-    shouldRegisterContractsInDirectory();
-    shouldValidateContracts();
-    shouldRedeployContracts();
-    shouldBumpVersion();
-    shouldNotPushWhileFrozen();
-    shouldDeleteContracts({ unregisterFromDirectory: true });
-    shouldSaveOwner();
+      it('should create custom deployment', async function () {
+        await push({ network, txParams, networkFile: this.networkFile, deployDependencies: true });
+        const app = await App.fetch(this.networkFile.appAddress);
+        const packageInfo = await app.getPackage('mock-stdlib-unpublished');
+        packageInfo.version.should.be.semverEqual('1.1.0');
+        packageInfo.package.address.should.be.nonzeroAddress;
+      });
+    })
   });
 
   describe('an empty lightweight app', function() {

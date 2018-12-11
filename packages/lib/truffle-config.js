@@ -1,5 +1,4 @@
-require('babel-register')
-require('babel-polyfill')
+require('ts-node/register')
 
 module.exports = {
   networks: {
@@ -7,6 +6,6 @@ module.exports = {
       host: 'localhost',
       network_id: '*',
       port: 8555
-    },
+    }
   }
 }

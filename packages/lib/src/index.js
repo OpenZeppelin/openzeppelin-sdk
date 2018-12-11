@@ -12,6 +12,7 @@ import Semver from './utils/Semver'
 import Logger from './utils/Logger'
 import FileSystem from './utils/FileSystem'
 import Contracts from './utils/Contracts'
+import ZWeb3 from './artifacts/ZWeb3'
 import { bodyCode, constructorCode, bytecodeDigest, replaceSolidityLibAddress, isSolidityLib, getSolidityLibNames } from './utils/Bytecode'
 import { sendTransaction, deploy, isGanacheNode, awaitConfirmations, hasBytecode, getAccount } from './utils/Transactions'
 import { flattenSourceCode } from './utils/Solidity'
@@ -35,7 +36,7 @@ import App from './app/App'
 import Package from './package/Package'
 import ImplementationDirectory from './directory/ImplementationDirectory'
 import BasePackageProject from './project/BasePackageProject'
-import LibProject from './project/LibProject'
+import PackageProject from './project/PackageProject'
 import AppProject from './project/AppProject'
 import SimpleProject from './project/SimpleProject'
 
@@ -76,12 +77,13 @@ export {
   ABI,
   Semver,
   FileSystem,
+  ZWeb3,
   Contracts,
   App,
   ImplementationDirectory,
   Package,
   BasePackageProject,
-  LibProject,
+  PackageProject,
   AppProject,
   SimpleProject
 }

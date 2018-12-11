@@ -9,7 +9,7 @@ on Ethereum and every other EVM and eWASM-powered blockchain.
 ## Features
 
 * Upgrades: deploy new versions of packages to the blockchain.
-* Publish EVM packages: deploy packages to the blockchain to allow others
+* Publish EVM packages: deploy packages to the blockchain to allow other
   projects to reuse them.
 * Link EVM packages: link your project to EVM packages already deployed on the
   blockchain.
