@@ -1,7 +1,7 @@
 'use strict'
 require('../setup')
 
-import { App, Package, ImplementationDirectory, Proxy, getAccount } from 'zos-lib'
+import { ZWeb3, App, Package, ImplementationDirectory, Proxy } from 'zos-lib'
 
 import publish from '../../src/scripts/publish.js';
 import push from '../../src/scripts/push.js';
@@ -60,7 +60,7 @@ contract('publish script', function([_, owner, otherAddress]) {
     });
 
     it('should log owner address in network file', async function () {
-      const owner = txParams.from || await getAccount(0);
+      const owner = txParams.from || await ZWeb3.defaultAccount();
       this.networkFile.app.owner.should.be.eq(owner);
       this.networkFile.package.owner.should.be.eq(owner);
       this.networkFile.provider.owner.should.be.eq(owner);

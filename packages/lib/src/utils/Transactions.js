@@ -83,11 +83,6 @@ export async function sendDataTransaction(contract, txParams) {
   return contract.sendTransaction({ gas, ...txParams });
 }
 
-export async function getAccount(index) {
-  const accounts = await ZWeb3.accounts();
-  return accounts[index];
-}
-
 /**
  * Sends a transaction to the blockchain, estimating the gas to be used.
  * Uses the node's estimateGas RPC call, and adds a 20% buffer on top of it, capped by the block gas limit.
