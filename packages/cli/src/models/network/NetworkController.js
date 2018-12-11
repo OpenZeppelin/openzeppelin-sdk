@@ -92,7 +92,6 @@ export default class NetworkController {
       this.unsetContracts()
     ])
 
-    await this._saveOwner();
     await this._unsetSolidityLibs()
   }
 
@@ -416,6 +415,8 @@ export default class NetworkController {
       await this._changeProxiesAdmin(proxies, app.address, simpleProject);
       log.info(`${proxies.length} proxies have been successfully transferred`);
     }
+
+    await this._saveOwner();
   }
 
   //Proxy model
