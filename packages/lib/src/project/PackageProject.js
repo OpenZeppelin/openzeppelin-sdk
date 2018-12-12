@@ -1,5 +1,5 @@
 import BasePackageProject from "./BasePackageProject";
-import Package from "../package/Package";
+import Package from "../application/Package";
 import { DeployError } from '../utils/errors/DeployError';
 import { semanticVersionToString } from "../utils/Semver";
 

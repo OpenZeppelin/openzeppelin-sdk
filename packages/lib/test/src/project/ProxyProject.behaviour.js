@@ -2,7 +2,7 @@
 require('../../setup')
 
 import Proxy from '../../../src/proxy/Proxy';
-import Contracts from '../../../src/utils/Contracts';
+import Contracts from '../../../src/artifacts/Contracts';
 import { toAddress } from '../../../src/utils/Addresses';
 
 const Impl = Contracts.getFromLocal('Impl');

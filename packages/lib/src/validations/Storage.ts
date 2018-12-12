@@ -1,9 +1,9 @@
 import _ from 'lodash';
 import path from 'path';
 import process from 'process';
-import { getBuildArtifacts } from '../utils/BuildArtifacts';
+import { getBuildArtifacts } from '../artifacts/BuildArtifacts';
 import ContractFactory from '../artifacts/ContractFactory.js';
-import { BuildArtifacts } from '../utils/BuildArtifacts.js';
+import { BuildArtifacts } from '../artifacts/BuildArtifacts.js';
 import {
   Node,
   NodeMapping,

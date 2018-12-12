@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import Contracts from '../utils/Contracts';
+import Contracts from '../artifacts/Contracts';
 import ContractFactory from '../artifacts/ContractFactory.js';
 import { Node } from '../utils/ContractAST';
 

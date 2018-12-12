@@ -1,5 +1,5 @@
 import ZWeb3 from '../artifacts/ZWeb3'
-import Contracts from '../utils/Contracts'
+import Contracts from '../artifacts/Contracts'
 import { toAddress, uint256ToAddress } from '../utils/Addresses'
 import { deploy as deployContract, sendTransaction } from '../utils/Transactions'
 

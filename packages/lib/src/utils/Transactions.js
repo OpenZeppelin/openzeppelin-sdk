@@ -8,7 +8,7 @@ import axios from 'axios'
 import BN from 'bignumber.js'
 import sleep from '../helpers/sleep'
 import ZWeb3 from '../artifacts/ZWeb3'
-import Contracts from './Contracts'
+import Contracts from '../artifacts/Contracts'
 
 // Cache, exported for testing
 export const state = { };

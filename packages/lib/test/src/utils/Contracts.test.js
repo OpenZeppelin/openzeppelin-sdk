@@ -1,7 +1,7 @@
 'use strict'
 require('../../setup')
 
-import Contracts from '../../../src/utils/Contracts'
+import Contracts from '../../../src/artifacts/Contracts'
 
 contract('Contracts', () => {
   it('can lookup contracts from the local project', async function () {

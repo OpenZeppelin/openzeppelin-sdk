@@ -4,7 +4,7 @@ require('../../setup')
 import AppProject from '../../../src/project/AppProject'
 import shouldBehaveLikePackageProject from './PackageProject.behavior';
 import shouldManageProxies from './ProxyProject.behaviour';
-import Contracts from '../../../src/utils/Contracts';
+import Contracts from '../../../src/artifacts/Contracts';
 import shouldManageDependencies from './DependenciesProject.behaviour';
 import SimpleProject from '../../../src/project/SimpleProject';
 import { toAddress } from '../../../src/utils/Addresses';

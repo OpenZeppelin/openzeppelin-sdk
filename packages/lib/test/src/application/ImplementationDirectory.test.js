@@ -1,8 +1,8 @@
 'use strict'
 require('../../setup')
 
-import ImplementationDirectory from '../../../src/directory/ImplementationDirectory'
-import Contracts from '../../../src/utils/Contracts'
+import Contracts from '../../../src/artifacts/Contracts'
+import ImplementationDirectory from '../../../src/application/ImplementationDirectory'
 
 const DummyImplementationV2 = Contracts.getFromLocal('DummyImplementationV2')
 

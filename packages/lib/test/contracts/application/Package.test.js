@@ -1,7 +1,7 @@
 'use strict';
 require('../../setup')
 
-import Contracts from '../../../src/utils/Contracts'
+import Contracts from '../../../src/artifacts/Contracts'
 import assertRevert from '../../../src/test/helpers/assertRevert'
 import shouldBehaveLikeOwnable from '../../../src/test/behaviors/Ownable'
 import { ZERO_ADDRESS } from '../../../src/utils/Addresses';

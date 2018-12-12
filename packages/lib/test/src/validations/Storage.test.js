@@ -6,7 +6,7 @@ const util = require('util')
 
 import _ from 'lodash'
 
-import Contracts from '../../../src/utils/Contracts'
+import Contracts from '../../../src/artifacts/Contracts'
 import { getStorageLayout, getStructsOrEnums } from '../../../src/validations/Storage'
 
 contract('Storage', () => {
