@@ -1,5 +1,6 @@
 import path from 'path'
 import { FileSystem as fs } from 'zos-lib'
+import TruffleConfig from './TruffleConfig'
 
 const TruffleProjectInitializer = {
   call(root = process.cwd()) {
@@ -19,11 +20,9 @@ const TruffleProjectInitializer = {
   },
 
   _initTruffleConfig(root) {
-    const truffleFile = `${root}/truffle.js`
-    const truffleConfigFile = `${root}/truffle-config.js`
-    if (!fs.exists(truffleFile) && !fs.exists(truffleConfigFile)) {
+    if (TruffleConfig.exists(root)) {
       const blueprint = path.resolve(__dirname, './blueprint.truffle.js')
-      fs.copy(blueprint, truffleConfigFile)
+      fs.copy(blueprint, `${root}/truffle-config.js`)
     }
   },
 

@@ -10,7 +10,7 @@ import files from './models/files'
 import local from './models/local'
 import network from './models/network'
 import TestHelper from './models/TestHelper'
-import Initializer from './models/initializer/Initializer'
+import ConfigVariablesInitializer from './models/initializer/ConfigVariablesInitializer'
 
 // utils
 import naming from './utils/naming'
@@ -26,6 +26,6 @@ export {
   scripts,
   naming,
   stdout,
-  Initializer,
+  ConfigVariablesInitializer,
   TestHelper,
 }

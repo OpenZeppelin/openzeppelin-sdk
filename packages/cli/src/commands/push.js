@@ -3,7 +3,7 @@
 import _ from 'lodash'
 import push from '../scripts/push'
 import compile from '../models/compiler/compile'
-import Initializer from '../models/initializer/Initializer'
+import ConfigVariablesInitializer from '../models/initializer/ConfigVariablesInitializer'
 
 const name = 'push'
 const signature = name
@@ -23,7 +23,7 @@ const register = program => program
 async function action(options) {
   const {  deployDependencies, force, reset: reupload } = options
   if (!options.skipCompile) await compile()
-  const { network, txParams } = await Initializer.call(options)
+  const { network, txParams } = await ConfigVariablesInitializer.initNetworkConfiguration(options)
   await push({ force, deployDependencies, reupload, network, txParams })
   if (!options.dontExitProcess && process.env.NODE_ENV !== 'test') process.exit(0)
 }

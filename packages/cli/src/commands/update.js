@@ -4,7 +4,7 @@ import _ from 'lodash'
 import update from '../scripts/update'
 import { parseInit } from '../utils/input'
 import { fromContractFullName } from '../utils/naming'
-import Initializer from '../models/initializer/Initializer'
+import ConfigVariablesInitializer from '../models/initializer/ConfigVariablesInitializer'
 
 const name = 'update'
 const signature = `${name} [alias-or-address]`
@@ -33,7 +33,7 @@ async function action(contractFullNameOrAddress, options) {
   }
   
   const args = _.pickBy({ contractAlias, packageName, proxyAddress, initMethod, initArgs, all, force })
-  const { network, txParams } = await Initializer.call(options)
+  const { network, txParams } = await ConfigVariablesInitializer.initNetworkConfiguration(options)
   await update({ ...args, network, txParams })
   if (!options.dontExitProcess && process.env.NODE_ENV !== 'test') process.exit(0)
 }

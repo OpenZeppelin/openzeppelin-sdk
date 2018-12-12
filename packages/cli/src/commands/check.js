@@ -2,6 +2,7 @@
 
 import check from '../scripts/check'
 import compile from '../models/compiler/compile'
+import ConfigVariablesInitializer from '../models/initializer/ConfigVariablesInitializer'
 
 const name = 'check'
 const signature = `${name} [contract]`
@@ -15,6 +16,7 @@ const register = program => program
   .action(action)
 
 async function action(contractAlias, options) {
+  ConfigVariablesInitializer.initStaticConfiguration()
   if (!options.skipCompile) await compile()
   check({ contractAlias })
 }

@@ -23,7 +23,7 @@ import * as setAdmin from '../../src/scripts/set-admin';
 import program from '../../src/bin/program';
 import Session from '../../src/models/network/Session';
 import ErrorHandler from '../../src/models/errors/ErrorHandler';
-import Initializer from '../../src/models/initializer/Initializer';
+import ConfigVariablesInitializer from '../../src/models/initializer/ConfigVariablesInitializer';
 
 const assert = require('chai').assert
 
@@ -65,7 +65,8 @@ exports.stubCommands = function () {
     this.verify = sinon.stub(verify, 'default')
     this.setAdmin = sinon.stub(setAdmin, 'default')
     this.errorHandler = sinon.stub(ErrorHandler.prototype, 'call').callsFake(() => null)
-    this.initializer = sinon.stub(Initializer, 'call').callsFake(function (options) {
+    this.initializer = sinon.stub(ConfigVariablesInitializer, 'initNetworkConfiguration').callsFake(function (options) {
+      ConfigVariablesInitializer.initStaticConfiguration()
       const { network, from } = Session.getOptions(options)
       const txParams = from ? { from } : {}
       return { network, txParams }

@@ -2,13 +2,18 @@ import { ZWeb3, Contracts } from 'zos-lib'
 import Session from '../network/Session'
 import TruffleConfig from './truffle/TruffleConfig'
 
-export default {
-  async call(options) {
+const ConfigVariablesInitializer = {
+  initStaticConfiguration() {
+    const buildDir = TruffleConfig.buildDir()
+    Contracts.setLocalBuildDir(buildDir)
+  },
+
+  async initNetworkConfiguration(options) {
     const { network, from, timeout } = Session.getOptions(options)
     if (!network) throw Error('A network name must be provided to execute the requested action.')
 
     // this line could be expanded to support different libraries like embark, ethjs, buidler, etc
-    const { provider, buildDir, artifactDefaults } = TruffleConfig.load(network)
+    const { provider, buildDir, artifactDefaults } = TruffleConfig.loadProviderAndDefaults(network)
 
     ZWeb3.initialize(provider)
     Contracts.setSyncTimeout(timeout * 1000)
@@ -19,3 +24,5 @@ export default {
     return { network: await ZWeb3.getNetworkName(), txParams }
   }
 }
+
+export default ConfigVariablesInitializer
