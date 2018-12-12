@@ -1,6 +1,6 @@
+import _ from 'lodash';
 import Contracts from './Contracts';
 import { parseJson } from '../utils/FileSystem';
-import _ from 'lodash';
 
 export function getBuildArtifacts(): BuildArtifacts {
   return new BuildArtifacts(Contracts.listBuildArtifacts());

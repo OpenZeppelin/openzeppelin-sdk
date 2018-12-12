@@ -14,7 +14,7 @@ import FileSystem from './utils/FileSystem'
 import Contracts from './artifacts/Contracts'
 import ZWeb3 from './artifacts/ZWeb3'
 import { bodyCode, constructorCode, bytecodeDigest, replaceSolidityLibAddress, isSolidityLib, getSolidityLibNames } from './utils/Bytecode'
-import { sendTransaction, deploy, isGanacheNode, awaitConfirmations, hasBytecode } from './utils/Transactions'
+import { sendTransaction, deploy, awaitConfirmations } from './utils/Transactions'
 import { flattenSourceCode } from './utils/Solidity'
 import { semanticVersionEqual, toSemanticVersion, semanticVersionToString } from './utils/Semver';
 
@@ -68,9 +68,7 @@ export {
   getSolidityLibNames,
   isSolidityLib,
   sleep,
-  isGanacheNode,
   awaitConfirmations,
-  hasBytecode,
   Proxy,
   Logger,
   ABI,
