@@ -83,10 +83,26 @@ export default class ZWeb3 {
     )(address);
   }
 
+  public static async hasBytecode(address) {
+    const bytecode = await ZWeb3.getCode(address)
+    return bytecode.length > 2;
+  }
+
+  public static async getStorageAt(address: string, position: number): Promise<string> {
+    return promisify(
+      ZWeb3.eth().getStorageAt.bind(ZWeb3.eth())
+    )(address, position);
+  }
+
   public static async getNode(): Promise<string> {
     return promisify(
       ZWeb3.version().getNode.bind(ZWeb3.version())
     )();
+  }
+
+  public static async isGanacheNode(): Promise<any> {
+    const nodeVersion = await ZWeb3.getNode();
+    return nodeVersion.match(/TestRPC/);
   }
 
   public static async getBlock(filter: string | number): Promise<any> {
@@ -103,10 +119,19 @@ export default class ZWeb3 {
     return (await ZWeb3.getLatestBlock()).number;
   }
 
-  public static async getStorageAt(address: string, position: number): Promise<string> {
+  public static async isMainnet(): Promise<boolean> {
+    return (await ZWeb3.getNetworkName()) === 'mainnet';
+  }
+
+  public static async getNetwork(): Promise<string> {
     return promisify(
-      ZWeb3.eth().getStorageAt.bind(ZWeb3.eth())
-    )(address, position);
+      ZWeb3.version().getNetwork.bind(ZWeb3.version())
+    )();
+  }
+
+  public static async getNetworkName(): Promise<string> {
+    const networkId = await ZWeb3.getNetwork();
+    return NETWORKS[networkId] || `dev-${networkId}`;
   }
 
   public static async sendTransaction(params: any): Promise<any> {
@@ -129,21 +154,6 @@ export default class ZWeb3 {
 
   public static async getTransactionReceiptWithTimeout(tx: string, timeout: number): Promise<any> {
     return ZWeb3._getTransactionReceiptWithTimeout(tx, timeout, new Date().getTime());
-  }
-
-  public static async isMainnet(): Promise<boolean> {
-    return (await ZWeb3.getNetworkName()) === 'mainnet';
-  }
-
-  public static async getNetwork(): Promise<string> {
-    return promisify(
-      ZWeb3.version().getNetwork.bind(ZWeb3.version())
-    )();
-  }
-
-  public static async getNetworkName(): Promise<string> {
-    const networkId = await ZWeb3.getNetwork();
-    return NETWORKS[networkId] || `dev-${networkId}`;
   }
 
   private static async _getTransactionReceiptWithTimeout(tx: string, timeout: number, startTime: number): Promise<any> | never {

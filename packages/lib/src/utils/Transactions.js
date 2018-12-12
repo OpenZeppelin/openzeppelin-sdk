@@ -154,14 +154,6 @@ export async function estimateActualGas(txParams) {
   return calculateActualGas(estimatedGas)
 }
 
-
-async function getNodeVersion() {
-  if (!state.nodeInfo) {
-    state.nodeInfo = await ZWeb3.getNode()
-  }
-  return state.nodeInfo;
-}
-
 async function getETHGasStationPrice() {
   if (state.gasPrice) return state.gasPrice;
 
@@ -188,11 +180,6 @@ async function fixGasPrice(txParams) {
   }
 }
 
-export async function isGanacheNode () {
-  const nodeVersion = await getNodeVersion();
-  return nodeVersion.match(/TestRPC/);
-}
-
 async function getBlockGasLimit () {
   if (state.block) return state.block.gasLimit;
   state.block = await ZWeb3.getLatestBlock()
@@ -209,12 +196,12 @@ async function calculateActualGas(estimatedGas) {
   // This is a viable workaround as long as we don't have other methods that have higher refunds,
   // such as cleaning more storage positions or selfdestructing a contract. We should be able to fix
   // this once the issue is resolved.
-  if (await isGanacheNode()) gasToUse += 15000;
+  if (await ZWeb3.isGanacheNode()) gasToUse += 15000;
   return gasToUse >= blockLimit ? (blockLimit - 1) : gasToUse;
 }
 
 export async function awaitConfirmations(transactionHash, confirmations = 12, interval = 1000, timeout = (10 * 60 * 1000)) {
-  if (await isGanacheNode()) return;
+  if (await ZWeb3.isGanacheNode()) return;
   const getTxBlock = () => (ZWeb3.getTransactionReceipt(transactionHash).then(r => r.blockNumber));
   const now = +(new Date());
 
@@ -227,9 +214,4 @@ export async function awaitConfirmations(transactionHash, confirmations = 12, in
     if (currentBlock - txBlock >= confirmations) return true;
     await sleep(interval);
   }
-}
-
-export async function hasBytecode(address) {
-  const bytecode = await ZWeb3.getCode(address)
-  return bytecode.length > 2;
 }

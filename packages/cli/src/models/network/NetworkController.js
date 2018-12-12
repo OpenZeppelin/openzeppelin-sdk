@@ -1,7 +1,7 @@
 'use strict';
 
 import _ from 'lodash';
-import { Contracts, Logger, FileSystem as fs, Proxy, awaitConfirmations, hasBytecode, semanticVersionToString } from 'zos-lib';
+import { Contracts, Logger, FileSystem as fs, Proxy, awaitConfirmations, semanticVersionToString } from 'zos-lib';
 import { flattenSourceCode, getStorageLayout, getBuildArtifacts, getSolidityLibNames } from 'zos-lib';
 import { validate, newValidationErrors, validationPasses } from 'zos-lib';
 
@@ -411,7 +411,6 @@ export default class NetworkController {
       log.info(`Awaiting confirmations before transferring proxies to published project (this may take a few minutes)`);
       const app = this.project.getApp();
       await awaitConfirmations(app.contract.transactionHash);
-      await hasBytecode(app.address);
       await this._changeProxiesAdmin(proxies, app.address, simpleProject);
       log.info(`${proxies.length} proxies have been successfully transferred`);
     }

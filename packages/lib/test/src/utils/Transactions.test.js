@@ -358,23 +358,23 @@ contract('Transactions', function([_account1, account2]) {
   });
 
   describe('awaitConfirmations', function () {
-    onNotGanache();
-
-    beforeEach('enable mining', async function () {
+    beforeEach('stub node information and enable mining', function () {
+      sinon.stub(ZWeb3, 'isGanacheNode').resolves(false)
       this.mineInterval = setInterval(advanceBlock, 100);
     })
 
-    afterEach('disable mining', async function () {
+    afterEach('undo stub and disable mining', async function () {
+      sinon.restore()
       if (this.mineInterval) clearInterval(this.mineInterval);
       await sleep(100);
     })
 
     it('awaits required confirmations', async function () {
-      const initialBlock = await getCurrentBlock();
+      const initialBlock = await ZWeb3.getLatestBlockNumber();
       const instance = await deploy(this.DummyImplementation, [], { gasPrice: 1e9 });
       await awaitConfirmations(instance.transactionHash, 5);
-      (await hasBytecode(instance.address)).should.be.true;
-      const endBlock = await getCurrentBlock();
+      (await ZWeb3.hasBytecode(instance.address)).should.be.true;
+      const endBlock = await ZWeb3.getLatestBlockNumber();
       (endBlock - 5).should.be.greaterThan(initialBlock);
     });
 
@@ -384,17 +384,3 @@ contract('Transactions', function([_account1, account2]) {
     });
   });
 })
-
-async function getCurrentBlock() {
-  return ZWeb3.getLatestBlockNumber()
-}
-
-function onNotGanache() {
-  beforeEach('stub node information', function () {
-    state.nodeInfo = 'NotGanache';
-  })
-
-  afterEach('restore node info', function () {
-    delete state.nodeInfo;
-  })
-}
