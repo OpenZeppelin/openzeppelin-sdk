@@ -10,6 +10,7 @@ const log: any = new Logger('PackageProject');
 export default class BasePackageProject {
   protected txParams: any;
   protected version: string;
+  protected package: Package;
   protected directory: ImplementationDirectory;
 
   constructor(txParams) {
