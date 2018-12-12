@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import { getBuildArtifacts, BuildArtifacts } from './BuildArtifacts';
+import { getBuildArtifacts, BuildArtifacts } from '../artifacts/BuildArtifacts';
 import ContractFactory from '../artifacts/ContractFactory';
 
 // TS-TODO: Reuse in Storage.ts

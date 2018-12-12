@@ -5,7 +5,7 @@ require('../../setup')
 import App from '../../../src/application/App';
 import ZWeb3 from '../../../src/artifacts/ZWeb3'
 import Package from '../../../src/application/Package'
-import Contracts from '../../../src/utils/Contracts'
+import Contracts from '../../../src/artifacts/Contracts'
 import expectEvent from 'openzeppelin-solidity/test/helpers/expectEvent'
 import { ZERO_ADDRESS } from '../../../src/utils/Addresses';
 import { ImplementationDirectory, Proxy } from '../../../src';

@@ -1,7 +1,7 @@
 import { promisify } from 'util'
 
 import ZWeb3 from '../artifacts/ZWeb3'
-import Contracts from '../utils/Contracts'
+import Contracts from '../artifacts/Contracts'
 import { estimateGas } from '../utils/Transactions'
 
 async function sendTransaction(params) {

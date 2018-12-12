@@ -11,7 +11,7 @@ import ABI from './utils/ABIs'
 import Semver from './utils/Semver'
 import Logger from './utils/Logger'
 import FileSystem from './utils/FileSystem'
-import Contracts from './utils/Contracts'
+import Contracts from './artifacts/Contracts'
 import ZWeb3 from './artifacts/ZWeb3'
 import { bodyCode, constructorCode, bytecodeDigest, replaceSolidityLibAddress, isSolidityLib, getSolidityLibNames } from './utils/Bytecode'
 import { sendTransaction, deploy, isGanacheNode, awaitConfirmations, hasBytecode } from './utils/Transactions'
@@ -20,7 +20,7 @@ import { semanticVersionEqual, toSemanticVersion, semanticVersionToString } from
 
 // validations
 import { getStorageLayout, getStructsOrEnums } from './validations/Storage';
-import { getBuildArtifacts } from './utils/BuildArtifacts';
+import { getBuildArtifacts } from './artifacts/BuildArtifacts';
 import { compareStorageLayouts } from './validations/Layout';
 import { validate, newValidationErrors, validationPasses } from './validations';
 

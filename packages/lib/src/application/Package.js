@@ -3,7 +3,7 @@ import { toSemanticVersion } from '../utils/Semver';
 import { deploy as deployContract, sendTransaction } from '../utils/Transactions'
 
 import Logger from '../utils/Logger'
-import Contracts from '../utils/Contracts';
+import Contracts from '../artifacts/Contracts';
 import ImplementationDirectory from './ImplementationDirectory';
 
 const log = new Logger('Package')

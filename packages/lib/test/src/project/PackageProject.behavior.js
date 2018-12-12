@@ -1,7 +1,7 @@
 'use strict'
 require('../../setup')
 
-import Contracts from '../../../src/utils/Contracts';
+import Contracts from '../../../src/artifacts/Contracts';
 
 const DummyImplementation = Contracts.getFromLocal('DummyImplementation')
 

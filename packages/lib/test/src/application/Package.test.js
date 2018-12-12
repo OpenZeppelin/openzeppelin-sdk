@@ -2,7 +2,7 @@
 require('../../setup')
 
 import Package from '../../../src/application/Package'
-import Contracts from '../../../src/utils/Contracts'
+import Contracts from '../../../src/artifacts/Contracts'
 import ImplementationDirectory from '../../../src/application/ImplementationDirectory';
 
 const DummyImplementation = Contracts.getFromLocal('DummyImplementation')

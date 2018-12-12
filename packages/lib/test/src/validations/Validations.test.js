@@ -3,7 +3,7 @@ require('../../setup')
 
 import _ from 'lodash'
 import { validate as validateContract } from '../../../src/validations';
-import Contracts from '../../../src/utils/Contracts';
+import Contracts from '../../../src/artifacts/Contracts';
 
 contract('Validations', function () {
   it('should warn when adding a contract with a constructor', async function() {

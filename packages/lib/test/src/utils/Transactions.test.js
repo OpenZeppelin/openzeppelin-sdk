@@ -8,7 +8,7 @@ import { promisify } from 'util';
 import { setInterval } from 'timers';
 
 import ZWeb3 from '../../../src/artifacts/ZWeb3'
-import Contracts from '../../../src/utils/Contracts';
+import Contracts from '../../../src/artifacts/Contracts';
 import advanceBlock from '../../../src/helpers/advanceBlock';
 import { assertRevert, encodeCall, sleep } from '../../../src';
 import { deploy, sendTransaction, sendDataTransaction, awaitConfirmations, hasBytecode, state } from '../../../src/utils/Transactions';

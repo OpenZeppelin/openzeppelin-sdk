@@ -3,7 +3,7 @@
 require('../../setup')
 
 import { getABIFunction as getFunction } from '../../../src/utils/ABIs'
-import Contracts from '../../../src/utils/Contracts'
+import Contracts from '../../../src/artifacts/Contracts'
 
 const should = require('chai').should()
 

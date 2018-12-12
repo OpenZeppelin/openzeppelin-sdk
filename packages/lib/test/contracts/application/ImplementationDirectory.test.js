@@ -2,7 +2,7 @@
 
 require('../../setup')
 
-import Contracts from '../../../src/utils/Contracts'
+import Contracts from '../../../src/artifacts/Contracts'
 import { ZERO_ADDRESS } from '../../../src/utils/Addresses'
 import assertRevert from '../../../src/test/helpers/assertRevert'
 import shouldBehaveLikeOwnable from '../../../src/test/behaviors/Ownable'

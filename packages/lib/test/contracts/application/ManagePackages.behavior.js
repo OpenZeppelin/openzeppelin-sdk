@@ -1,6 +1,6 @@
 'use strict';
 
-import Contracts from '../../../src/utils/Contracts'
+import Contracts from '../../../src/artifacts/Contracts'
 import assertRevert from '../../../src/test/helpers/assertRevert'
 import { toSemanticVersion } from '../../../src/utils/Semver';
 

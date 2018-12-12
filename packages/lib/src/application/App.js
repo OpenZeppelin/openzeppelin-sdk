@@ -8,7 +8,7 @@ import copyContract from '../helpers/copyContract'
 import { deploy as deployContract, sendTransaction, sendDataTransaction } from '../utils/Transactions'
 import { isZeroAddress, toAddress } from '../utils/Addresses';
 import { buildCallData, callDescription } from '../utils/ABIs';
-import Contracts from '../utils/Contracts';
+import Contracts from '../artifacts/Contracts';
 import { toSemanticVersion, semanticVersionEqual } from '../utils/Semver';
 import { Package, ImplementationDirectory } from '..';
 
