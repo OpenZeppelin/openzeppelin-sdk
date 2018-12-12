@@ -1,5 +1,6 @@
 import _ from 'lodash'
 import { promisify } from 'util'
+import { FileSystem as fs } from 'zos-lib'
 
 const TruffleConfig = {
   init() {
