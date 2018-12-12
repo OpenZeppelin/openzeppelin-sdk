@@ -73,7 +73,7 @@ export default class ContractAST {
     );
   }
 
-  public getLinearizedBaseContracts(mostDerivedFirst: boolean = false):Node[] {
+  public getLinearizedBaseContracts(mostDerivedFirst: boolean = false): Node[] {
     const contracts = this.getContractNode().linearizedBaseContracts.map((id) => this.getNode(id, 'ContractDefinition'));
     return mostDerivedFirst ? contracts : _.reverse(contracts);
   }

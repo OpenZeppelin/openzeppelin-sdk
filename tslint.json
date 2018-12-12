@@ -15,7 +15,21 @@
       "quotemark": [true, "single"],
       "semicolon": [true, "always"],
       "object-literal-sort-keys": [false],
-      "typedef-whitespace": [true, "onespace"],
+      "typedef-whitespace": [
+        true, {
+          "call-signature": "nospace",
+          "index-signature": "nospace",
+          "parameter": "nospace",
+          "property-declaration": "nospace",
+          "variable-declaration": "nospace"
+        }, {
+          "call-signature": "onespace",
+          "index-signature": "onespace",
+          "parameter": "onespace",
+          "property-declaration": "onespace",
+          "variable-declaration": "onespace"
+        }
+      ],
       "whitespace": [true],
       "trailing-comma": [false],
       "space-within-parens": [true, 0],
