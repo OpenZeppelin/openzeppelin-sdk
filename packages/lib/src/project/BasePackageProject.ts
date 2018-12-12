@@ -8,9 +8,9 @@ import Package from '../application/Package';
 const log: any = new Logger('PackageProject');
 
 export default class BasePackageProject {
-  private txParams: any;
-  private version: string;
-  private directory: ImplementationDirectory;
+  protected txParams: any;
+  protected version: string;
+  protected directory: ImplementationDirectory;
 
   constructor(txParams) {
     this.txParams = txParams;
