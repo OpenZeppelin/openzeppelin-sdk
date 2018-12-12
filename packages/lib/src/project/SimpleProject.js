@@ -1,7 +1,7 @@
 import _ from 'lodash'
 import Proxy from '../proxy/Proxy'
 import Logger from '../utils/Logger'
-import Package from '../package/Package'
+import Package from '../application/Package'
 import { deploy } from '../utils/Transactions'
 import { toAddress } from '../utils/Addresses'
 import { bytecodeDigest } from '..'

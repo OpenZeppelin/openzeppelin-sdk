@@ -2,7 +2,7 @@
 require('../../setup')
 
 import Proxy from '../../../src/proxy/Proxy';
-import Package from '../../../src/package/Package';
+import Package from '../../../src/application/Package';
 import Contracts from '../../../src/utils/Contracts';
 import PackageProject from '../../../src/project/PackageProject';
 import { toAddress } from '../../../src/utils/Addresses';

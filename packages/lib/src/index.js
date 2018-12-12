@@ -32,9 +32,9 @@ const assertEvent = helpers.assertEvent
 
 // model objects
 import Proxy from './proxy/Proxy'
-import App from './app/App'
-import Package from './package/Package'
-import ImplementationDirectory from './directory/ImplementationDirectory'
+import App from './application/App'
+import Package from './application/Package'
+import ImplementationDirectory from './application/ImplementationDirectory'
 import BasePackageProject from './project/BasePackageProject'
 import PackageProject from './project/PackageProject'
 import AppProject from './project/AppProject'

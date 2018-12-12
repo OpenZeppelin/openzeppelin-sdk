@@ -1,8 +1,8 @@
 import _ from 'lodash';
 
+import App from "../application/App";
+import Package from "../application/Package";
 import BasePackageProject from "./BasePackageProject";
-import App from "../app/App";
-import Package from "../package/Package";
 import { DeployError } from '../utils/errors/DeployError';
 import { semanticVersionToString } from "../utils/Semver";
 

@@ -2,9 +2,9 @@
 
 require('../../setup')
 
-import App from '../../../src/app/App';
+import App from '../../../src/application/App';
 import ZWeb3 from '../../../src/artifacts/ZWeb3'
-import Package from '../../../src/package/Package'
+import Package from '../../../src/application/Package'
 import Contracts from '../../../src/utils/Contracts'
 import expectEvent from 'openzeppelin-solidity/test/helpers/expectEvent'
 import { ZERO_ADDRESS } from '../../../src/utils/Addresses';
