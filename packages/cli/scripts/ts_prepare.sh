@@ -1,0 +1,1 @@
+/home/ajs/zos/packages/lib/scripts/ts_prepare.sh
