@@ -1,11 +1,7 @@
 import { promisify } from 'util';
 
 import ZWeb3 from '../artifacts/ZWeb3';
-<<<<<<< HEAD
 import Contracts from '../artifacts/Contracts';
-=======
-import Contracts from '../utils/Contracts';
->>>>>>> Port copyContract to typescript
 import ContractFactory, { ContractWrapper } from '../artifacts/ContractFactory';
 import { estimateGas } from '../utils/Transactions';
 
