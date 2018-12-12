@@ -116,30 +116,30 @@ export default class App {
     return contractClass.at(proxyAddress);
   }
 
-  public async _createProxy(packageName: string, contractName: string): Promise<any> {
+  private async _createProxy(packageName: string, contractName: string): Promise<any> {
     log.info(`Creating ${packageName} ${contractName} proxy without initializing...`);
     const initializeData: string = '';
     return sendTransaction(this.appContract.create, [packageName, contractName, initializeData], this.txParams);
   }
 
-  public async _createProxyAndCall(contractClass: ContractFactory, packageName: string, contractName: string, initMethodName: string, initArgs: any): Promise<any> {
+  private async _createProxyAndCall(contractClass: ContractFactory, packageName: string, contractName: string, initMethodName: string, initArgs: any): Promise<any> {
     const { method: initMethod, callData }: CalldataInfo = buildCallData(contractClass, initMethodName, initArgs);
     log.info(`Creating ${packageName} ${contractName} proxy and calling ${callDescription(initMethod, initArgs)}`);
     return sendTransaction(this.appContract.create, [packageName, contractName, callData], this.txParams);
   }
 
-  public async _upgradeProxy(proxyAddress: string, packageName: string, contractName: string): Promise<any> {
+  private async _upgradeProxy(proxyAddress: string, packageName: string, contractName: string): Promise<any> {
     log.info(`Upgrading ${packageName} ${contractName} proxy without running migrations...`);
     return sendTransaction(this.appContract.upgrade, [proxyAddress, packageName, contractName], this.txParams);
   }
 
-  public async _upgradeProxyAndCall(proxyAddress: string, contractClass: ContractFactory, packageName: string, contractName: string, initMethodName: string, initArgs: any): Promise<any> {
+  private async _upgradeProxyAndCall(proxyAddress: string, contractClass: ContractFactory, packageName: string, contractName: string, initMethodName: string, initArgs: any): Promise<any> {
     const { method: initMethod, callData }: CalldataInfo = buildCallData(contractClass, initMethodName, initArgs);
     log.info(`Upgrading ${packageName} ${contractName} proxy and calling ${callDescription(initMethod, initArgs)}...`);
     return sendTransaction(this.appContract.upgradeAndCall, [proxyAddress, packageName, contractName, callData], this.txParams);
   }
 
-  public async _copyContract(packageName: string, contractName: string, contractClass: ContractFactory): Promise<ContractWrapper> {
+  private async _copyContract(packageName: string, contractName: string, contractClass: ContractFactory): Promise<ContractWrapper> {
     log.info(`Creating new non-upgradeable instance of ${packageName} ${contractName}...`);
     const implementation: string = await this.getImplementation(packageName, contractName);
     const instance: ContractWrapper = await copyContract(contractClass, implementation, this.txParams);
@@ -147,7 +147,7 @@ export default class App {
     return instance;
   }
 
-  public async _initNonUpgradeableInstance(instance: ContractWrapper, contractClass: ContractFactory, packageName: string, contractName: string, initMethodName: string, initArgs?: string[]): Promise<any> {
+  private async _initNonUpgradeableInstance(instance: ContractWrapper, contractClass: ContractFactory, packageName: string, contractName: string, initMethodName: string, initArgs?: string[]): Promise<any> {
     if (typeof(initArgs) !== 'undefined') {
       // this could be front-run, waiting for new initializers model
       const { method: initMethod, callData }: CalldataInfo = buildCallData(contractClass, initMethodName, initArgs);
