@@ -4,6 +4,7 @@ import push from './push'
 import add from '../scripts/add'
 import addAll from '../scripts/add-all'
 import compile from '../models/compiler/compile'
+import ConfigVariablesInitializer from '../models/initializer/ConfigVariablesInitializer'
 
 const name = 'add'
 const signature = `${name} [contractNames...]`
@@ -18,6 +19,7 @@ const register = program => program
   .action(action)
 
 async function action(contractNames, options) {
+  ConfigVariablesInitializer.initStaticConfiguration()
   if(!options.skipCompile) await compile()
   if(options.all) addAll({})
   else {

@@ -2,7 +2,7 @@
 
 import _ from 'lodash'
 import verify from '../scripts/verify'
-import Initializer from '../models/initializer/Initializer'
+import ConfigVariablesInitializer from '../models/initializer/ConfigVariablesInitializer'
 
 const name = 'verify'
 const signature = `${name} <contract-alias>`
@@ -24,7 +24,7 @@ async function action(contractAlias, options) {
   if (optimizer && !optimizerRuns) {
     throw new Error('Cannot verify contract without defining optimizer runs')
   }
-  const { network, txParams } = await Initializer.call(options)
+  const { network, txParams } = await ConfigVariablesInitializer.initNetworkConfiguration(options)
   const opts = _.pickBy({ optimizer, optimizerRuns, remote, apiKey, network, txParams })
   await verify(contractAlias, { optimizer, optimizerRuns, remote, apiKey, network, txParams })
   if (!options.dontExitProcess && process.env.NODE_ENV !== 'test') process.exit(0)

@@ -4,7 +4,7 @@ import _ from 'lodash'
 import create from '../scripts/create'
 import { parseInit } from '../utils/input'
 import { fromContractFullName } from '../utils/naming'
-import Initializer from '../models/initializer/Initializer'
+import ConfigVariablesInitializer from '../models/initializer/ConfigVariablesInitializer'
 
 const name = 'create'
 const signature = `${name} <alias>`
@@ -24,7 +24,7 @@ async function action(contractFullName, options) {
   const { force } = options
   const { initMethod, initArgs } = parseInit(options, 'initialize')
   const { contract: contractAlias, package: packageName } = fromContractFullName(contractFullName)
-  const { network, txParams } = await Initializer.call(options)
+  const { network, txParams } = await ConfigVariablesInitializer.initNetworkConfiguration(options)
   const args = _.pickBy({ packageName, contractAlias, initMethod, initArgs, force })
 
   await create({ ...args, network, txParams })

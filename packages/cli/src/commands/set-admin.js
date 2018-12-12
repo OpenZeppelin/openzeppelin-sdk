@@ -3,7 +3,7 @@
 import _ from 'lodash'
 import setAdmin from '../scripts/set-admin'
 import { fromContractFullName } from '../utils/naming'
-import Initializer from '../models/initializer/Initializer'
+import ConfigVariablesInitializer from '../models/initializer/ConfigVariablesInitializer'
 
 const name = 'set-admin'
 const signature = `${name} [alias-or-address] [new-admin-address]`
@@ -31,7 +31,7 @@ async function action(contractFullNameOrAddress, newAdmin, options) {
   }
   
   const args = _.pickBy({ contractAlias, packageName, proxyAddress, newAdmin })
-  const { network, txParams } = await Initializer.call(options)
+  const { network, txParams } = await ConfigVariablesInitializer.initNetworkConfiguration(options)
   await setAdmin({ ...args, network, txParams })
   if (!options.dontExitProcess && process.env.NODE_ENV !== 'test') process.exit(0)
 }

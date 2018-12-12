@@ -3,7 +3,7 @@
 import pull from '../scripts/pull'
 import status from '../scripts/status'
 import compare from '../scripts/compare'
-import Initializer from '../models/initializer/Initializer'
+import ConfigVariablesInitializer from '../models/initializer/ConfigVariablesInitializer'
 
 const name = 'status'
 const signature = name
@@ -19,7 +19,7 @@ const register = program => program
   .action(action)
 
 async function action(options) {
-  const { network, txParams } = await Initializer.call(options)
+  const { network, txParams } = await ConfigVariablesInitializer.initNetworkConfiguration(options)
 
   if (options.fix) await pull({ network, txParams })
   else if (options.fetch) await compare({ network, txParams })

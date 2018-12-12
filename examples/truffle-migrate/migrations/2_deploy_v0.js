@@ -1,6 +1,6 @@
 // Load zos scripts and truffle wrapper function
-const { add, push, create } = require('zos').scripts;
-const Initializer = require('zos').Initializer;
+const { scripts, ConfigVariablesInitializer } = require('zos');
+const { add, push, create } = scripts;
 
 async function deploy(options) {
   // Register v0 of MyContract in the zos project
@@ -15,7 +15,7 @@ async function deploy(options) {
 
 module.exports = function(deployer, network, accounts) {
   deployer.then(async () => {
-    const { network, txParams } = await Initializer.call({ network, from: accounts[1] })
+    const { network, txParams } = await ConfigVariablesInitializer.initNetworkConfiguration()({ network, from: accounts[1] })
     await deploy({ network, txParams })
   })
 }
