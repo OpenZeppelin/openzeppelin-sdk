@@ -1,8 +1,8 @@
 import _ from 'lodash';
 
 import Logger from '../utils/Logger';
-import Contracts from '../utils/Contracts';
-import ImplementationDirectory from '../directory/ImplementationDirectory';
+import Contracts from '../artifacts/Contracts';
+import ImplementationDirectory from '../application/ImplementationDirectory';
 import { toSemanticVersion, SemanticVersion } from '../utils/Semver';
 import { toAddress, isZeroAddress } from '../utils/Addresses';
 import ContractFactory, { ContractWrapper } from '../artifacts/ContractFactory';

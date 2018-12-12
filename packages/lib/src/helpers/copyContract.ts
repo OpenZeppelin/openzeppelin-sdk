@@ -1,7 +1,7 @@
 import { promisify } from 'util';
 
 import ZWeb3 from '../artifacts/ZWeb3';
-import Contracts from '../utils/Contracts';
+import Contracts from '../artifacts/Contracts';
 import ContractFactory, { ContractWrapper } from '../artifacts/ContractFactory';
 import { estimateGas } from '../utils/Transactions';
 
