@@ -1,49 +1,55 @@
 import _ from 'lodash';
 
-import App from "../application/App";
-import Package from "../application/Package";
-import BasePackageProject from "./BasePackageProject";
+import App from '../application/App';
+import Package from '../application/Package';
+import ImplementationDirectory from '../application/ImplementationDirectory';
+import BasePackageProject from './BasePackageProject';
+import SimpleProject from './SimpleProject';
 import { DeployError } from '../utils/errors/DeployError';
-import { semanticVersionToString } from "../utils/Semver";
+import { semanticVersionToString } from '../utils/Semver';
 
-const DEFAULT_NAME = 'main';
-const DEFAULT_VERSION = '0.1.0';
+const DEFAULT_NAME: string = 'main';
+const DEFAULT_VERSION: string = '0.1.0';
 
 export default class AppProject extends BasePackageProject {
+  private name: string;
+  private app: App;
 
   // REFACTOR: Evaluate merging this logic with CLI's ProjectDeployer classes
-  static async fetchOrDeploy(name = DEFAULT_NAME, version = DEFAULT_VERSION, txParams = {}, { appAddress = undefined, packageAddress = undefined } = {}) {
-    let thepackage, directory, app
-    version = semanticVersionToString(version)
-    
+  public static async fetchOrDeploy(name = DEFAULT_NAME, version = DEFAULT_VERSION, txParams = {}, { appAddress, packageAddress }: { appAddress?: string, packageAddress?: string } = {}): Promise<AppProject> | never {
+    let thepackage: Package;
+    let directory: ImplementationDirectory;
+    let app: App;
+    version = semanticVersionToString(version);
+
     try {
       app = appAddress
         ? await App.fetch(appAddress, txParams)
-        : await App.deploy(txParams)
+        : await App.deploy(txParams);
       if (packageAddress) {
-        thepackage = await Package.fetch(packageAddress, txParams)
+        thepackage = await Package.fetch(packageAddress, txParams);
       } else if (await app.hasPackage(name, version)) {
-        thepackage = (await app.getPackage(name)).package
+        thepackage = (await app.getPackage(name)).package;
       } else {
-        thepackage = await Package.deploy(txParams)
+        thepackage = await Package.deploy(txParams);
       }
       directory = await thepackage.hasVersion(version)
         ? await thepackage.getDirectory(version)
-        : await thepackage.newVersion(version)
-      if (!await app.hasPackage(name, version)) await app.setPackage(name, thepackage.address, version)
-      const project = new this(app, name, version, txParams)
-      project.directory = directory
-      project.package = thepackage
-      return project
+        : await thepackage.newVersion(version);
+      if (!await app.hasPackage(name, version)) await app.setPackage(name, thepackage.address, version);
+      const project = new this(app, name, version, txParams);
+      project.directory = directory;
+      project.package = thepackage;
+      return project;
     } catch(error) {
-      throw new DeployError(error, { thepackage, directory, app })
+      throw new DeployError(error, { thepackage, directory, app });
     }
   }
 
   // REFACTOR: This code is similar to the SimpleProjectDeployer, consider unifying them
-  static async fromSimpleProject(simpleProject, version = DEFAULT_VERSION, existingAddresses = {}) {
-    const appProject = await this.fetchOrDeploy(simpleProject.name, version, simpleProject.txParams, existingAddresses);
-    
+  public static async fromSimpleProject(simpleProject: SimpleProject, version: string = DEFAULT_VERSION, existingAddresses: any = {}): Promise<AppProject> {
+    const appProject: AppProject = await this.fetchOrDeploy(simpleProject.name, version, simpleProject.txParams, existingAddresses);
+
     await Promise.all(
       _.concat(
         _.map(simpleProject.implementations, (contractInfo, contractAlias) => (
@@ -56,92 +62,93 @@ export default class AppProject extends BasePackageProject {
     return appProject;
   }
 
-  constructor(app, name = DEFAULT_NAME, version = DEFAULT_VERSION, txParams = {}) {
-    super(txParams)
-    this.app = app
-    this.name = name
-    this.version = semanticVersionToString(version)
+  constructor(app: App, name: string = DEFAULT_NAME, version: string = DEFAULT_VERSION, txParams: any = {}) {
+    super(txParams);
+    this.app = app;
+    this.name = name;
+    this.version = semanticVersionToString(version);
   }
 
-  async newVersion(version) {
-    version = semanticVersionToString(version)
-    const directory = await super.newVersion(version)
-    const thepackage = await this.getProjectPackage()
-    await this.app.setPackage(this.name, thepackage.address, version)
-    return directory
-  } 
-
-  getApp() {
-    return this.app
+  // TODO: review version type
+  public async newVersion(version: any): Promise<ImplementationDirectory> {
+    version = semanticVersionToString(version);
+    const directory: ImplementationDirectory = await super.newVersion(version);
+    const thepackage: Package = await this.getProjectPackage();
+    await this.app.setPackage(this.name, thepackage.address, version);
+    return directory;
   }
 
-  async getProjectPackage() {
+  public getApp(): App {
+    return this.app;
+  }
+
+  public async getProjectPackage(): Promise<Package> {
     if (!this.package) {
-      const packageInfo = await this.app.getPackage(this.name)
-      this.package = packageInfo.package
+      const packageInfo: { package: Package, version: any } = await this.app.getPackage(this.name);
+      this.package = packageInfo.package;
     }
-    return this.package
+    return this.package;
   }
 
-  async getCurrentDirectory() {
+  public async getCurrentDirectory(): Promise<ImplementationDirectory> {
     if (!this.directory) {
-      this.directory = await this.app.getProvider(this.name)  
+      this.directory = await this.app.getProvider(this.name);
     }
-    return this.directory
+    return this.directory;
   }
 
-  async getCurrentVersion() {
-    return this.version
-  }
-
-  // TODO: Testme
-  async getImplementation({ packageName, contractName }) {
-    return this.app.getImplementation(packageName || this.name, contractName)
+  public async getCurrentVersion(): Promise<string> {
+    return this.version;
   }
 
   // TODO: Testme
-  async createContract(contractClass, { packageName, contractName, initMethod, initArgs } = {}) {
-    if (!contractName) contractName = contractClass.contractName
-    if (!packageName) packageName = this.name
-    return this.app.createContract(contractClass, packageName, contractName, initMethod, initArgs)
+  public async getImplementation({ packageName, contractName }: { packageName?: string, contractName: string }): Promise<string> {
+    return this.app.getImplementation(packageName || this.name, contractName);
   }
 
-  async createProxy(contractClass, { packageName, contractName, initMethod, initArgs } = {}) {
-    if (!contractName) contractName = contractClass.contractName
-    if (!packageName) packageName = this.name
-    if (!_.isEmpty(initArgs) && !initMethod) initMethod = 'initialize'
-    return this.app.createProxy(contractClass, packageName, contractName, initMethod, initArgs)
+  // TODO: Testme
+  public async createContract(contractClass, { packageName, contractName, initMethod, initArgs } = {}) {
+    if (!contractName) contractName = contractClass.contractName;
+    if (!packageName) packageName = this.name;
+    return this.app.createContract(contractClass, packageName, contractName, initMethod, initArgs);
   }
 
-  async upgradeProxy(proxyAddress, contractClass, { packageName, contractName, initMethod, initArgs } = {}) {
-    if (!contractName) contractName = contractClass.contractName
-    if (!packageName) packageName = this.name
-    return this.app.upgradeProxy(proxyAddress, contractClass, packageName, contractName, initMethod, initArgs)
+  public async createProxy(contractClass, { packageName, contractName, initMethod, initArgs } = {}) {
+    if (!contractName) contractName = contractClass.contractName;
+    if (!packageName) packageName = this.name;
+    if (!_.isEmpty(initArgs) && !initMethod) initMethod = 'initialize';
+    return this.app.createProxy(contractClass, packageName, contractName, initMethod, initArgs);
   }
 
-  async changeProxyAdmin(proxyAddress, newAdmin) {
-    return this.app.changeProxyAdmin(proxyAddress, newAdmin)
+  public async upgradeProxy(proxyAddress, contractClass, { packageName, contractName, initMethod, initArgs } = {}) {
+    if (!contractName) contractName = contractClass.contractName;
+    if (!packageName) packageName = this.name;
+    return this.app.upgradeProxy(proxyAddress, contractClass, packageName, contractName, initMethod, initArgs);
   }
 
-  async getDependencyPackage(name) {
-    const packageInfo = await this.app.getPackage(name)
-    return packageInfo.package
+  public async changeProxyAdmin(proxyAddress: string, newAdmin: string): Promise<void> {
+    return this.app.changeProxyAdmin(proxyAddress, newAdmin);
   }
 
-  async getDependencyVersion(name) {
-    const packageInfo = await this.app.getPackage(name)
-    return packageInfo.version
+  public async getDependencyPackage(name: string): Promise<Package> {
+    const packageInfo = await this.app.getPackage(name);
+    return packageInfo.package;
   }
 
-  async hasDependency(name) {
-    return this.app.hasPackage(name)
+  public async getDependencyVersion(name: string): Promise<string> {
+    const packageInfo = await this.app.getPackage(name);
+    return packageInfo.version;
   }
 
-  async setDependency(name, packageAddress, version) {
-    return this.app.setPackage(name, packageAddress, version)
+  public async hasDependency(name): Promise<boolean> {
+    return this.app.hasPackage(name);
   }
 
-  async unsetDependency(name) {
-    return this.app.unsetPackage(name)
+  public async setDependency(name: string, packageAddress: string, version: string): Promise<boolean> {
+    return this.app.setPackage(name, packageAddress, version);
+  }
+
+  public async unsetDependency(name: string): Promise<any> {
+    return this.app.unsetPackage(name);
   }
 }
