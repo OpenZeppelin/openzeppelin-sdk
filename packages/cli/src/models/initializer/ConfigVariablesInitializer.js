@@ -1,11 +1,14 @@
 import { ZWeb3, Contracts } from 'zos-lib'
 import Session from '../network/Session'
+import Compiler from '../compiler/Compiler'
 import TruffleConfig from './truffle/TruffleConfig'
 
 const ConfigVariablesInitializer = {
   initStaticConfiguration() {
     const buildDir = TruffleConfig.buildDir()
     Contracts.setLocalBuildDir(buildDir)
+    const solcSettings = TruffleConfig.solcSettings()
+    Compiler.setSettings(solcSettings)
   },
 
   async initNetworkConfiguration(options) {

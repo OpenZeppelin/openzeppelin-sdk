@@ -1,14 +1,14 @@
-import * as fs from 'fs';
-import * as path from 'path';
+import fs from 'fs';
+import path from 'path';
 
 // TS-TODO: Analyze which of these functions could be encapsulated.
 
 export function read(filename: string): string {
-  return fs.readFileSync(filename, {encoding: 'utf8'});
+  return fs.readFileSync(filename, { encoding: 'utf8' });
 }
 
 export function readDir(dir: string): string[] {
-  return fs.readdirSync(dir, {encoding: 'utf8'});
+  return fs.readdirSync(dir, { encoding: 'utf8' });
 }
 
 export function exists(filename: string): boolean {
@@ -17,6 +17,15 @@ export function exists(filename: string): boolean {
 
 export function createDir(dir: string): void {
   fs.mkdirSync(dir);
+}
+
+export function createDirPath(dirPath: string): void {
+  const folders = dirPath.split('/')
+  folders.reduce((subDir, folder) => {
+    const subFolderPath = `${subDir}/${folder}`
+    if (folder && !exists(subFolderPath)) createDir(subFolderPath)
+    return subFolderPath
+  }, '')
 }
 
 export function isDir(targetPath: string): boolean {
@@ -104,6 +113,7 @@ export default {
   ifNotExistsThrow,
   parseJson,
   createDir,
+  createDirPath,
   editJson,
   parseJsonIfExists,
   writeJson,

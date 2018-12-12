@@ -19,7 +19,7 @@ const TruffleConfig = {
   exists(root = process.cwd()) {
     const truffleFile = `${root}/truffle.js`
     const truffleConfigFile = `${root}/truffle-config.js`
-    return fs.exists(truffleFile) || !fs.exists(truffleConfigFile)
+    return fs.exists(truffleFile) || fs.exists(truffleConfigFile)
   },
 
   buildDir() {
