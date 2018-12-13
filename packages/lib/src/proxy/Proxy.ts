@@ -1,6 +1,5 @@
 import ZWeb3 from '../artifacts/ZWeb3';
 import Contracts from '../artifacts/Contracts';
-import { CalldataInfo } from '../utils/ABIs';
 import { toAddress, uint256ToAddress } from '../utils/Addresses';
 import ContractFactory, { ContractWrapper } from '../artifacts/ContractFactory';
 import { deploy as deployContract, sendTransaction } from '../utils/Transactions';
@@ -22,7 +21,7 @@ export default class Proxy {
     return new this(contract, txParams);
   }
 
-  public static async deploy(implementation: string, initData: CalldataInfo | null, txParams: any = {}): Promise<Proxy> {
+  public static async deploy(implementation: string, initData: string | null, txParams: any = {}): Promise<Proxy> {
     const ProxyContract: ContractFactory = Contracts.getFromLib('AdminUpgradeabilityProxy');
     const contract: ProxyInterface = await deployContract(ProxyContract, [toAddress(implementation), initData || ''], txParams);
     return new this(contract, txParams);
@@ -34,7 +33,7 @@ export default class Proxy {
     this.txParams = txParams;
   }
 
-  public async upgradeTo(address: string, migrateData: CalldataInfo | null): Promise<any> {
+  public async upgradeTo(address: string, migrateData: string | null): Promise<any> {
     await this.checkAdmin();
     return migrateData
       ? sendTransaction(this.contract.upgradeToAndCall, [toAddress(address), migrateData], this.txParams)
