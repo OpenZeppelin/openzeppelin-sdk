@@ -9,9 +9,11 @@ export default class Contracts {
 
   private static DEFAULT_SYNC_TIMEOUT: number = 240000;
   private static DEFAULT_BUILD_DIR: string = `${process.cwd()}/build/contracts`;
+  private static DEFAULT_CONTRACTS_DIR: string = `${process.cwd()}/contracts`;
 
   private static timeout: number = Contracts.DEFAULT_SYNC_TIMEOUT;
   private static buildDir: string = Contracts.DEFAULT_BUILD_DIR;
+  private static contractsDir: string = Contracts.DEFAULT_CONTRACTS_DIR;
   private static artifactDefaults: any = {};
 
   public static getSyncTimeout(): number {
@@ -20,6 +22,10 @@ export default class Contracts {
 
   public static getLocalBuildDir(): string {
     return Contracts.buildDir || Contracts.DEFAULT_BUILD_DIR;
+  }
+
+  public static getLocalContractsDir(): string {
+    return Contracts.contractsDir || Contracts.DEFAULT_CONTRACTS_DIR;
   }
 
   public static getArtifactsDefaults(): any {
@@ -59,6 +65,10 @@ export default class Contracts {
   }
 
   public static setLocalBuildDir(dir: string): void {
+    Contracts.buildDir = dir;
+  }
+
+  public static setLocalContractsDir(dir: string): void {
     Contracts.buildDir = dir;
   }
 

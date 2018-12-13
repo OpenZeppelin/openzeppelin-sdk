@@ -1,5 +1,6 @@
 import { promisify } from 'util';
 import sleep from '../helpers/sleep';
+import BN from 'bignumber.js';
 
 // Reference: see https://github.com/ethereum/EIPs/blob/master/EIPS/eip-155.md#list-of-chain-ids
 const NETWORKS = {
@@ -22,11 +23,7 @@ export default class ZWeb3 {
 
   // TODO: this.web3 could be cached and initialized lazily?
   public static web3(): any {
-
-    if (!ZWeb3.provider) {
-      throw new Error('ZWeb3 must be initialized with a web3 provider');
-    }
-
+    if (!ZWeb3.provider) { throw new Error('ZWeb3 must be initialized with a web3 provider'); }
     const Web3 = require('web3');
 
     // TODO: improve provider validation for HttpProvider scenarios
@@ -65,7 +62,7 @@ export default class ZWeb3 {
     return (await ZWeb3.accounts())[0];
   }
 
-  public static async estimateGas(params: any): Promise<number> {
+  public static async estimateGas(params: any): Promise<any> {
     return promisify(
       ZWeb3.eth().estimateGas.bind(ZWeb3.eth())
     )(params);
@@ -84,7 +81,7 @@ export default class ZWeb3 {
   }
 
   public static async hasBytecode(address) {
-    const bytecode = await ZWeb3.getCode(address)
+    const bytecode = await ZWeb3.getCode(address);
     return bytecode.length > 2;
   }
 
@@ -134,7 +131,7 @@ export default class ZWeb3 {
     return NETWORKS[networkId] || `dev-${networkId}`;
   }
 
-  public static async sendTransaction(params: any): Promise<any> {
+  public static async sendTransaction(params: any): Promise<string> {
     return promisify(
       ZWeb3.eth().sendTransaction.bind(ZWeb3.eth())
     )(params);
@@ -157,22 +154,15 @@ export default class ZWeb3 {
   }
 
   private static async _getTransactionReceiptWithTimeout(tx: string, timeout: number, startTime: number): Promise<any> | never {
-
     const receipt: any = await ZWeb3._tryGettingTransactionReceipt(tx);
-
     if (receipt) {
-      if (parseInt(receipt.status, 16) !== 0) {
-        return receipt;
-      }
+      if (parseInt(receipt.status, 16) !== 0) { return receipt; }
       throw new Error(`Transaction: ${tx} exited with an error (status 0).`);
     }
 
     await sleep(1000);
-
     const timeoutReached = timeout > 0 && new Date().getTime() - startTime > timeout;
-    if (!timeoutReached) {
-      return await ZWeb3._getTransactionReceiptWithTimeout(tx, timeout, startTime);
-    }
+    if (!timeoutReached) { return await ZWeb3._getTransactionReceiptWithTimeout(tx, timeout, startTime); }
     throw new Error(`Transaction ${tx} wasn't processed in ${timeout / 1000} seconds!`);
   }
 

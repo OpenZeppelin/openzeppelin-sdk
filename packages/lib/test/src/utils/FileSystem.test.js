@@ -33,6 +33,26 @@ contract('FileSystem', () => {
     })
   })
 
+  describe('create dir path', function () {
+    it('can create a simple dir', async function () {
+      const simpleDir = `${process.cwd()}/test/tmp`
+      FileSystem.exists(simpleDir).should.be.false
+
+      FileSystem.createDirPath(simpleDir)
+      FileSystem.exists(simpleDir).should.be.true
+      FileSystem.removeTree(`${process.cwd()}/test/tmp/`)
+    })
+
+    it('can create a nested dir', async function () {
+      const nestedDir = `${process.cwd()}/test/tmp/nested`
+      FileSystem.exists(nestedDir).should.be.false
+
+      FileSystem.createDirPath(nestedDir)
+      FileSystem.exists(nestedDir).should.be.true
+      FileSystem.removeTree(`${process.cwd()}/test/tmp/`)
+    })
+  })
+
   describe('copy', function () {
     it('can copy a file when the destination does not exist', function() {
       const testDir = tmp.dirSync()
