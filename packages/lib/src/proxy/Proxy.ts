@@ -12,8 +12,8 @@ interface ProxyInterface extends ContractWrapper {
 
 export default class Proxy {
   private contract: ProxyInterface;
-  private address: string;
   private txParams: any;
+  public address: string;
 
   public static at(address: string, txParams: any = {}): Proxy {
     const ProxyContract: ContractFactory = Contracts.getFromLib('AdminUpgradeabilityProxy');
