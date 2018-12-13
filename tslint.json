@@ -43,6 +43,7 @@
       "only-arrow-functions": [false],
       "no-empty": [true, "allow-empty-functions"],
       "no-consecutive-blank-lines": [true, 1],
+      "no-var-requires": [false],
       "curly": [true, "ignore-same-line"]
     },
     "rulesDirectory": []

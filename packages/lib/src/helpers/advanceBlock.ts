@@ -1,6 +1,6 @@
-import ZWeb3 from '../artifacts/ZWeb3'
+import ZWeb3 from '../artifacts/ZWeb3';
 
-export default function advanceBlock () {
+export default function advanceBlock():Promise<any> {
   return new Promise((resolve, reject) => {
     ZWeb3.provider.sendAsync({
       jsonrpc: '2.0',

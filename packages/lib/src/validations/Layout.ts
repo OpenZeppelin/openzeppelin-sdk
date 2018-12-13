@@ -12,7 +12,7 @@ type EqualFn = (var1: StorageInfo, var2: StorageInfo) => boolean;
 
 export type StorageEntryComparison = 'equal' | 'rename' | 'typechange' | 'replace';
 
-interface Operation {
+export interface Operation {
   action: string;
   update: boolean;
   original: string;
