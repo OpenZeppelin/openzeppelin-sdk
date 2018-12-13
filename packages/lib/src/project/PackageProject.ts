@@ -12,7 +12,7 @@ export default class PackageProject extends BasePackageProject {
   }
 
   // REFACTOR: Evaluate merging this logic with CLI's ProjectDeployer classes
-  public static async fetchOrDeploy(version: string = '0.1.0', txParams: any = {}, { packageAddress }: { packageAddress?: string } = {}): Promise<PackageProject> | never {
+  public static async fetchOrDeploy(version: string = '0.1.0', txParams: any = {}, { packageAddress }: { packageAddress?: string } = {}): Promise<PackageProject | never> {
     let thepackage: Package;
     let directory: ImplementationDirectory;
     version = semanticVersionToString(version);

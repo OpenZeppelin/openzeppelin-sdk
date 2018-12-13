@@ -5,9 +5,9 @@ import ContractFactory, { ContractWrapper } from '../artifacts/ContractFactory';
 import ImplementationDirectory from '../application/ImplementationDirectory';
 import Package from '../application/Package';
 
-const log: any = new Logger('PackageProject');
+const log: Logger = new Logger('PackageProject');
 
-export default class BasePackageProject {
+export default abstract class BasePackageProject {
   protected txParams: any;
   protected version: string;
   protected package: Package;
@@ -56,15 +56,9 @@ export default class BasePackageProject {
     await directory.setImplementation(contractName, address);
   }
 
-  public async getCurrentDirectory(): Promise<any> {
-    throw Error('Unimplemented');
-  }
+  public abstract async getCurrentDirectory(): Promise<any>;
 
-  public async getProjectPackage(): Promise<any> {
-    throw Error('Unimplemented');
-  }
+  public abstract async getProjectPackage(): Promise<any>;
 
-  public async getCurrentVersion(): Promise<any> {
-    throw Error('Unimplemented');
-  }
+  public abstract async getCurrentVersion(): Promise<any>;
 }

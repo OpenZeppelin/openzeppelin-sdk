@@ -12,12 +12,24 @@ import { semanticVersionToString } from '../utils/Semver';
 const DEFAULT_NAME: string = 'main';
 const DEFAULT_VERSION: string = '0.1.0';
 
+interface ContractInterface {
+  packageName?: string;
+  contractName?: string;
+  initMethod?: string;
+  initArgs?: string[];
+}
+
+interface ExistingAddresses {
+  appAddress?: string;
+  packageAddress?: string;
+}
+
 export default class AppProject extends BasePackageProject {
   private name: string;
   private app: App;
 
   // REFACTOR: Evaluate merging this logic with CLI's ProjectDeployer classes
-  public static async fetchOrDeploy(name = DEFAULT_NAME, version = DEFAULT_VERSION, txParams = {}, { appAddress, packageAddress }: { appAddress?: string, packageAddress?: string } = {}): Promise<AppProject> | never {
+  public static async fetchOrDeploy(name: string = DEFAULT_NAME, version: string = DEFAULT_VERSION, txParams: any = {}, { appAddress, packageAddress }: ExistingAddresses = {}): Promise<AppProject | never> {
     let thepackage: Package;
     let directory: ImplementationDirectory;
     let app: App;
@@ -38,7 +50,7 @@ export default class AppProject extends BasePackageProject {
         ? await thepackage.getDirectory(version)
         : await thepackage.newVersion(version);
       if (!await app.hasPackage(name, version)) await app.setPackage(name, thepackage.address, version);
-      const project = new this(app, name, version, txParams);
+      const project: AppProject = new this(app, name, version, txParams);
       project.directory = directory;
       project.package = thepackage;
       return project;
@@ -48,7 +60,7 @@ export default class AppProject extends BasePackageProject {
   }
 
   // REFACTOR: This code is similar to the SimpleProjectDeployer, consider unifying them
-  public static async fromSimpleProject(simpleProject: SimpleProject, version: string = DEFAULT_VERSION, existingAddresses: any = {}): Promise<AppProject> {
+  public static async fromSimpleProject(simpleProject: SimpleProject, version: string = DEFAULT_VERSION, existingAddresses: ExistingAddresses = {}): Promise<AppProject> {
     const appProject: AppProject = await this.fetchOrDeploy(simpleProject.name, version, simpleProject.txParams, existingAddresses);
 
     await Promise.all(
@@ -107,20 +119,20 @@ export default class AppProject extends BasePackageProject {
   }
 
   // TODO: Testme
-  public async createContract(contractClass: ContractFactory, { packageName, contractName, initMethod, initArgs }: { packageName?: string, contractName?: string, initMethod?: string, initArgs?: string[] } = {}): Promise<ContractWrapper> {
+  public async createContract(contractClass: ContractFactory, { packageName, contractName, initMethod, initArgs }: ContractInterface = {}): Promise<ContractWrapper> {
     if (!contractName) contractName = contractClass.contractName;
     if (!packageName) packageName = this.name;
     return this.app.createContract(contractClass, packageName, contractName, initMethod, initArgs);
   }
 
-  public async createProxy(contractClass: ContractFactory, { packageName, contractName, initMethod, initArgs }: { packageName?: string, contractName?: string, initMethod?: string, initArgs?: string[] } = {}): Promise<ContractWrapper> {
+  public async createProxy(contractClass: ContractFactory, { packageName, contractName, initMethod, initArgs }: ContractInterface = {}): Promise<ContractWrapper> {
     if (!contractName) contractName = contractClass.contractName;
     if (!packageName) packageName = this.name;
     if (!_.isEmpty(initArgs) && !initMethod) initMethod = 'initialize';
     return this.app.createProxy(contractClass, packageName, contractName, initMethod, initArgs);
   }
 
-  public async upgradeProxy(proxyAddress: string, contractClass: ContractFactory, { packageName, contractName, initMethod, initArgs }: { packageName?: string, contractName?: string, initMethod?: string, initArgs?: string[] } = {}): Promise<ContractWrapper> {
+  public async upgradeProxy(proxyAddress: string, contractClass: ContractFactory, { packageName, contractName, initMethod, initArgs }: ContractInterface = {}): Promise<ContractWrapper> {
     if (!contractName) contractName = contractClass.contractName;
     if (!packageName) packageName = this.name;
     return this.app.upgradeProxy(proxyAddress, contractClass, packageName, contractName, initMethod, initArgs);

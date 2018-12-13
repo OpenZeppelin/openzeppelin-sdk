@@ -27,7 +27,7 @@ interface Dependency {
   version: string;
 }
 
-const log: any = new Logger('SimpleProject');
+const log: Logger = new Logger('SimpleProject');
 
 export default class SimpleProject  {
   public implementations: Implementations;
