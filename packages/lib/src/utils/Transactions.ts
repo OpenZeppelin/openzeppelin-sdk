@@ -7,7 +7,7 @@
 import axios from 'axios';
 import BN from 'bignumber.js';
 import sleep from '../helpers/sleep';
-import ZWeb3, { Web3TransactionReceipt } from '../artifacts/ZWeb3';
+import ZWeb3 from '../artifacts/ZWeb3';
 import Contracts from '../artifacts/Contracts';
 import ContractFactory, { ContractWrapper, TransactionReceiptWrapper } from '../artifacts/ContractFactory';
 
@@ -42,7 +42,7 @@ interface GenericFunction {
  * @param txParams other transaction parameters (from, gasPrice, etc)
  * @param retries number of transaction retries
  */
-export async function sendTransaction(contractFn: GenericFunction, args: any[] = [], txParams: any = {}, retries: number = RETRY_COUNT) {
+export async function sendTransaction(contractFn: GenericFunction, args: string[] = [], txParams: any = {}, retries: number = RETRY_COUNT): Promise<any> {
   await fixGasPrice(txParams);
 
   try {
@@ -60,7 +60,7 @@ export async function sendTransaction(contractFn: GenericFunction, args: any[] =
  * @param txParams other transaction parameters (from, gasPrice, etc)
  * @param retries number of deploy retries
  */
-export async function deploy(contract: ContractFactory, args: any[] = [], txParams: any = {}, retries: number = RETRY_COUNT) {
+export async function deploy(contract: ContractFactory, args: any[] = [], txParams: any = {}, retries: number = RETRY_COUNT): Promise<any> {
   await fixGasPrice(txParams);
 
   try {

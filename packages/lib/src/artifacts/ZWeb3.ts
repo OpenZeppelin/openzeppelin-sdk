@@ -11,34 +11,6 @@ const NETWORKS = {
   42: 'kovan'
 };
 
-export interface Web3Transaction {
-  hash: string;
-  nonce: number;
-  blockHash: string;
-  blockNumber: number;
-  transactionIndex: number;
-  from: string;
-  to: string;
-  value: BN;
-  gasPrice: BN;
-  gas: number;
-  input: string;
-}
-
-export interface Web3TransactionReceipt {
-  blockHash: string;
-  blockNumber: number;
-  transactionHash: string;
-  transactionIndex: number;
-  from: string;
-  to: string;
-  cumulativeGasUsed: number;
-  gasUsed: number;
-  contractAddress: string;
-  logs: any[];
-  status: string;
-}
-
 // TS-TODO: Type Web3.
 // TS-TODO: Review what could be private in this class.
 export default class ZWeb3 {
@@ -113,7 +85,7 @@ export default class ZWeb3 {
   }
 
   public static async hasBytecode(address) {
-    const bytecode = await ZWeb3.getCode(address)
+    const bytecode = await ZWeb3.getCode(address);
     return bytecode.length > 2;
   }
 
@@ -169,19 +141,19 @@ export default class ZWeb3 {
     )(params);
   }
 
-  public static async getTransaction(txHash: string): Promise<Web3Transaction> {
+  public static async getTransaction(txHash: string): Promise<any> {
     return promisify(
       ZWeb3.eth().getTransaction.bind(ZWeb3.eth())
     )(txHash);
   }
 
-  public static async getTransactionReceipt(txHash: string): Promise<Web3TransactionReceipt> {
+  public static async getTransactionReceipt(txHash: string): Promise<any> {
     return promisify(
       ZWeb3.eth().getTransactionReceipt.bind(ZWeb3.eth())
     )(txHash);
   }
 
-  public static async getTransactionReceiptWithTimeout(tx: string, timeout: number): Promise<Web3TransactionReceipt> {
+  public static async getTransactionReceiptWithTimeout(tx: string, timeout: number): Promise<any> {
     return ZWeb3._getTransactionReceiptWithTimeout(tx, timeout, new Date().getTime());
   }
 

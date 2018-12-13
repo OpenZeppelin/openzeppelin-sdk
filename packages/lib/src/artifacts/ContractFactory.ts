@@ -2,7 +2,6 @@ import BN from 'bignumber.js';
 import ZWeb3 from './ZWeb3';
 import decodeLogs from '../helpers/decodeLogs';
 import { getSolidityLibNames, hasUnlinkedVariables } from '../utils/Bytecode';
-import { Web3TransactionReceipt } from './ZWeb3';
 
 interface ContractSchema {
   contractName: string;
@@ -24,7 +23,7 @@ export interface ContractWrapper {
 export interface TransactionReceiptWrapper {
   logs: any[];
   tx: string;
-  receipt: Web3TransactionReceipt;
+  receipt: any;
 }
 
 // TS-TODO: Review which members could be private.
