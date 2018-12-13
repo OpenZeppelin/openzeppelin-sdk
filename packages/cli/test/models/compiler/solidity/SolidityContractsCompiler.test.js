@@ -5,7 +5,7 @@ require('../../../setup')
 import { FileSystem } from 'zos-lib'
 import SolidityContractsCompiler from '../../../../src/models/compiler/solidity/SolidityContractsCompiler'
 
-describe.only('SolidityContractsCompiler', function () {
+describe('SolidityContractsCompiler', function () {
 
   const contract_Solc04 = {
     fileName: 'Example04.sol',
