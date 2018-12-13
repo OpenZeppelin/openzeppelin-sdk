@@ -6,55 +6,6 @@ import { FileSystem } from 'zos-lib'
 import SolidityContractsCompiler from '../../../../src/models/compiler/solidity/SolidityContractsCompiler'
 
 describe('SolidityContractsCompiler', function () {
-
-  const contract_Solc04 = {
-    fileName: 'Example04.sol',
-    filePath: '/test/Example04.sol',
-    source: 'pragma solidity ^0.4.24; contract Example04 { function f() public pure returns (string memory) { return "bla"; } }'
-  }
-
-  const anotherContract_Solc04 = {
-    fileName: 'AnotherExample04.sol',
-    filePath: '/test/AnotherExample04.sol',
-    source: 'pragma solidity ^0.4.24; contract AnotherExample04 { function f() public pure returns (uint) { return 2; } }'
-  }
-
-  const contractWithWarnings_Solc04 = {
-    fileName: 'ExampleWithWarnings04.sol',
-    filePath: '/test/ExampleWithWarnings04.sol',
-    source: 'pragma solidity ^0.4.24; contract ExampleWithWarnings04 { function f() public returns (uint) { return 2; } }'
-  }
-
-  const contractWithErrors_Solc04 = {
-    fileName: 'ExampleWithErrors04.sol',
-    filePath: '/test/ExampleWithErrors04.sol',
-    source: 'pragma solidity ^0.4.24; contract ExampleWithErrors04 { function f() public { return 2; } }'
-  }
-
-  const contract_Solc05 = {
-    fileName: 'Example05.sol',
-    filePath: '/test/Example05.sol',
-    source: 'pragma solidity ^0.5.0; contract Example05 { function f() public pure returns (string memory) { return "bla"; } }'
-  }
-
-  const anotherContract_Solc05 = {
-    fileName: 'AnotherExample05.sol',
-    filePath: '/test/AnotherExample05.sol',
-    source: 'pragma solidity ^0.5.0; contract AnotherExample05 { function f() public pure returns (uint) { return 2; } }'
-  }
-
-  const contractWithWarnings_Solc05 = {
-    fileName: 'ExampleWithWarnings05.sol',
-    filePath: '/test/ExampleWithWarnings05.sol',
-    source: 'pragma solidity ^0.5.0; contract ExampleWithWarnings05 { function f() public { } }'
-  }
-
-  const contractWithErrors_Solc05 = {
-    fileName: 'ExampleWithErrors05.sol',
-    filePath: '/test/ExampleWithErrors.sol',
-    source: 'pragma solidity ^0.5.0; contract ExampleWithErrors05 { function f() public { return 2; } }'
-  }
-
   beforeEach('capturing logging', function () {
     this.logs = new CaptureLogs();
   })
@@ -92,7 +43,7 @@ describe('SolidityContractsCompiler', function () {
               data.deployedBytecode.should.not.be.null
               data.compiler.name.should.be.eq('solc')
               data.compiler.version.should.be.eq('0.5.1+commit.c8a2cb62.Emscripten.clang')
-              data.compiler.optimizer.should.be.deep.equal({ enabled: false, runs: 200 })
+              data.compiler.optimizer.should.be.deep.equal({ enabled: false })
               data.compiler.evmVersion.should.be.eq('byzantium')
             })
 
@@ -102,7 +53,7 @@ describe('SolidityContractsCompiler', function () {
         })
 
         describe('when some options are given', function () {
-          const options = { version: '0.5.0', optimizer: { enabled: true, runs: 190 }}
+          const options = { version: '0.5.0', optimizer: { enabled: true, runs: 200 }}
 
           it('compiles the given contracts using the requested options', async function () {
             const compiler = new SolidityContractsCompiler(contracts, options)
@@ -125,7 +76,7 @@ describe('SolidityContractsCompiler', function () {
               data.deployedBytecode.should.not.be.null
               data.compiler.name.should.be.eq('solc')
               data.compiler.version.should.be.eq('0.5.0')
-              data.compiler.optimizer.should.be.deep.equal({ enabled: true, runs: 190 })
+              data.compiler.optimizer.should.be.deep.equal({ enabled: true, runs: 200 })
               data.compiler.evmVersion.should.be.eq('byzantium')
             })
 
@@ -160,7 +111,7 @@ describe('SolidityContractsCompiler', function () {
             data.deployedBytecode.should.not.be.null
             data.compiler.name.should.be.eq('solc')
             data.compiler.version.should.be.eq('0.5.0')
-            data.compiler.optimizer.should.be.deep.equal({ enabled: false, runs: 200 })
+            data.compiler.optimizer.should.be.deep.equal({ enabled: false })
             data.compiler.evmVersion.should.be.eq('byzantium')
           })
 
@@ -231,7 +182,7 @@ describe('SolidityContractsCompiler', function () {
               data.deployedBytecode.should.not.be.null
               data.compiler.name.should.be.eq('solc')
               data.compiler.version.should.be.eq('0.4.24')
-              data.compiler.optimizer.should.be.deep.equal({ enabled: false, runs: 200 })
+              data.compiler.optimizer.should.be.deep.equal({ enabled: false })
               data.compiler.evmVersion.should.be.eq('byzantium')
             })
 
@@ -241,7 +192,7 @@ describe('SolidityContractsCompiler', function () {
         })
 
         describe('when some options are given', function () {
-          const options = { version: '0.4.24', optimizer: { enabled: true, runs: 190 }}
+          const options = { version: '0.4.24', optimizer: { enabled: true, runs: 200 }}
 
           it('compiles the given contracts using the requested options', async function () {
             const compiler = new SolidityContractsCompiler(contracts, options)
@@ -264,7 +215,7 @@ describe('SolidityContractsCompiler', function () {
               data.deployedBytecode.should.not.be.null
               data.compiler.name.should.be.eq('solc')
               data.compiler.version.should.be.eq('0.4.24')
-              data.compiler.optimizer.should.be.deep.equal({ enabled: true, runs: 190 })
+              data.compiler.optimizer.should.be.deep.equal({ enabled: true, runs: 200 })
               data.compiler.evmVersion.should.be.eq('byzantium')
             })
 
@@ -299,7 +250,7 @@ describe('SolidityContractsCompiler', function () {
             data.deployedBytecode.should.not.be.null
             data.compiler.name.should.be.eq('solc')
             data.compiler.version.should.be.eq('0.4.24')
-            data.compiler.optimizer.should.be.deep.equal({ enabled: false, runs: 200 })
+            data.compiler.optimizer.should.be.deep.equal({ enabled: false })
             data.compiler.evmVersion.should.be.eq('byzantium')
           })
 
@@ -342,3 +293,51 @@ describe('SolidityContractsCompiler', function () {
     })
   })
 })
+
+const contract_Solc04 = {
+  fileName: 'Example04.sol',
+  filePath: '/test/Example04.sol',
+  source: 'pragma solidity ^0.4.24; contract Example04 { function f() public pure returns (string memory) { return "bla"; } }'
+}
+
+const anotherContract_Solc04 = {
+  fileName: 'AnotherExample04.sol',
+  filePath: '/test/AnotherExample04.sol',
+  source: 'pragma solidity ^0.4.24; contract AnotherExample04 { function f() public pure returns (uint) { return 2; } }'
+}
+
+const contractWithWarnings_Solc04 = {
+  fileName: 'ExampleWithWarnings04.sol',
+  filePath: '/test/ExampleWithWarnings04.sol',
+  source: 'pragma solidity ^0.4.24; contract ExampleWithWarnings04 { function f() public returns (uint) { return 2; } }'
+}
+
+const contractWithErrors_Solc04 = {
+  fileName: 'ExampleWithErrors04.sol',
+  filePath: '/test/ExampleWithErrors04.sol',
+  source: 'pragma solidity ^0.4.24; contract ExampleWithErrors04 { function f() public { return 2; } }'
+}
+
+const contract_Solc05 = {
+  fileName: 'Example05.sol',
+  filePath: '/test/Example05.sol',
+  source: 'pragma solidity ^0.5.0; contract Example05 { function f() public pure returns (string memory) { return "bla"; } }'
+}
+
+const anotherContract_Solc05 = {
+  fileName: 'AnotherExample05.sol',
+  filePath: '/test/AnotherExample05.sol',
+  source: 'pragma solidity ^0.5.0; contract AnotherExample05 { function f() public pure returns (uint) { return 2; } }'
+}
+
+const contractWithWarnings_Solc05 = {
+  fileName: 'ExampleWithWarnings05.sol',
+  filePath: '/test/ExampleWithWarnings05.sol',
+  source: 'pragma solidity ^0.5.0; contract ExampleWithWarnings05 { function f() public { } }'
+}
+
+const contractWithErrors_Solc05 = {
+  fileName: 'ExampleWithErrors05.sol',
+  filePath: '/test/ExampleWithErrors.sol',
+  source: 'pragma solidity ^0.5.0; contract ExampleWithErrors05 { function f() public { return 2; } }'
+}

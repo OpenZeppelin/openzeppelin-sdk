@@ -32,7 +32,7 @@ describe('SolidityProjectCompiler', function () {
       schema.deployedBytecode.should.not.be.null
       schema.compiler.name.should.be.eq('solc')
       schema.compiler.version.should.be.eq('0.4.24')
-      schema.compiler.optimizer.should.be.deep.equal({ enabled: false, runs: 200 })
+      schema.compiler.optimizer.should.be.deep.equal({ enabled: false })
       schema.compiler.evmVersion.should.be.eq('byzantium')
     })
   }).timeout(180000)

@@ -6,7 +6,7 @@ import SolidityDependenciesFinder from './SolidityDependenciesFinder'
 
 const log = new Logger('SolidityContractsCompiler')
 
-const DEFAULT_OPTIMIZER = { runs: 200, enabled: false }
+const DEFAULT_OPTIMIZER = { enabled: false }
 const DEFAULT_EVM_VERSION = 'byzantium'
 const VERSIONS_URL = 'https://solc-bin.ethereum.org/bin/list.json'
 const OUTPUT_SELECTION = {
