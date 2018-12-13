@@ -1,5 +1,6 @@
 import { promisify } from 'util';
 import sleep from '../helpers/sleep';
+import BN from 'bignumber.js';
 
 // Reference: see https://github.com/ethereum/EIPs/blob/master/EIPS/eip-155.md#list-of-chain-ids
 const NETWORKS = {
@@ -61,7 +62,7 @@ export default class ZWeb3 {
     return (await ZWeb3.accounts())[0];
   }
 
-  public static async estimateGas(params: any): Promise<number> {
+  public static async estimateGas(params: any): Promise<any> {
     return promisify(
       ZWeb3.eth().estimateGas.bind(ZWeb3.eth())
     )(params);
@@ -80,7 +81,7 @@ export default class ZWeb3 {
   }
 
   public static async hasBytecode(address) {
-    const bytecode = await ZWeb3.getCode(address)
+    const bytecode = await ZWeb3.getCode(address);
     return bytecode.length > 2;
   }
 
@@ -130,7 +131,7 @@ export default class ZWeb3 {
     return NETWORKS[networkId] || `dev-${networkId}`;
   }
 
-  public static async sendTransaction(params: any): Promise<any> {
+  public static async sendTransaction(params: any): Promise<string> {
     return promisify(
       ZWeb3.eth().sendTransaction.bind(ZWeb3.eth())
     )(params);

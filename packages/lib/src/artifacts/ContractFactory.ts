@@ -20,10 +20,10 @@ export interface ContractWrapper {
   constructor: ContractFactory;
 }
 
-interface TransactionReceiptWrapper {
+export interface TransactionReceiptWrapper {
+  logs: any[];
   tx: string;
   receipt: any;
-  logs: any[];
 }
 
 // TS-TODO: Review which members could be private.
