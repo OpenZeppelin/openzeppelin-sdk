@@ -5,6 +5,7 @@ import Package from '../application/Package';
 import ImplementationDirectory from '../application/ImplementationDirectory';
 import BasePackageProject from './BasePackageProject';
 import SimpleProject from './SimpleProject';
+import ContractFactory, { ContractWrapper }  from '../artifacts/ContractFactory';
 import { DeployError } from '../utils/errors/DeployError';
 import { semanticVersionToString } from '../utils/Semver';
 
@@ -69,7 +70,6 @@ export default class AppProject extends BasePackageProject {
     this.version = semanticVersionToString(version);
   }
 
-  // TODO: review version type
   public async newVersion(version: any): Promise<ImplementationDirectory> {
     version = semanticVersionToString(version);
     const directory: ImplementationDirectory = await super.newVersion(version);
@@ -102,25 +102,25 @@ export default class AppProject extends BasePackageProject {
   }
 
   // TODO: Testme
-  public async getImplementation({ packageName, contractName }: { packageName?: string, contractName: string }): Promise<string> {
+  public async getImplementation({ packageName, contractName }: { contractName: string, packageName?: string }): Promise<string> {
     return this.app.getImplementation(packageName || this.name, contractName);
   }
 
   // TODO: Testme
-  public async createContract(contractClass, { packageName, contractName, initMethod, initArgs } = {}) {
+  public async createContract(contractClass: ContractFactory, { packageName, contractName, initMethod, initArgs }: { packageName?: string, contractName?: string, initMethod?: string, initArgs?: string[] } = {}): Promise<ContractWrapper> {
     if (!contractName) contractName = contractClass.contractName;
     if (!packageName) packageName = this.name;
     return this.app.createContract(contractClass, packageName, contractName, initMethod, initArgs);
   }
 
-  public async createProxy(contractClass, { packageName, contractName, initMethod, initArgs } = {}) {
+  public async createProxy(contractClass: ContractFactory, { packageName, contractName, initMethod, initArgs }: { packageName?: string, contractName?: string, initMethod?: string, initArgs?: string[] } = {}): Promise<ContractWrapper> {
     if (!contractName) contractName = contractClass.contractName;
     if (!packageName) packageName = this.name;
     if (!_.isEmpty(initArgs) && !initMethod) initMethod = 'initialize';
     return this.app.createProxy(contractClass, packageName, contractName, initMethod, initArgs);
   }
 
-  public async upgradeProxy(proxyAddress, contractClass, { packageName, contractName, initMethod, initArgs } = {}) {
+  public async upgradeProxy(proxyAddress: string, contractClass: ContractFactory, { packageName, contractName, initMethod, initArgs }: { packageName?: string, contractName?: string, initMethod?: string, initArgs?: string[] } = {}): Promise<ContractWrapper> {
     if (!contractName) contractName = contractClass.contractName;
     if (!packageName) packageName = this.name;
     return this.app.upgradeProxy(proxyAddress, contractClass, packageName, contractName, initMethod, initArgs);
