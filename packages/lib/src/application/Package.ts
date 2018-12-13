@@ -8,7 +8,7 @@ import { toAddress, isZeroAddress } from '../utils/Addresses';
 import ContractFactory, { ContractWrapper } from '../artifacts/ContractFactory';
 import { deploy as deployContract, sendTransaction } from '../utils/Transactions';
 
-const log: any = new Logger('Package');
+const log: Logger = new Logger('Package');
 
 interface PackageInterface extends ContractWrapper {
   address: string;
@@ -53,12 +53,12 @@ export default class Package {
     return this.packageContract.hasVersion(toSemanticVersion(version));
   }
 
-  public async isFrozen(version: string): Promise<boolean> {
+  public async isFrozen(version: string): Promise<boolean> | never {
     const directory = await this.getDirectory(version);
     return directory.isFrozen();
   }
 
-  public async freeze(version: string): Promise<any> {
+  public async freeze(version: string): Promise<any> | never {
     const directory = await this.getDirectory(version);
     if (!directory.freeze) throw Error('Implementation directory does not support freezing');
     return directory.freeze();

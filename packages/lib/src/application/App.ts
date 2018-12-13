@@ -12,7 +12,7 @@ import ContractFactory, { ContractWrapper } from '../artifacts/ContractFactory';
 import { toSemanticVersion, semanticVersionEqual } from '../utils/Semver';
 import { deploy as deployContract, sendTransaction, sendDataTransaction } from '../utils/Transactions';
 
-const log: any = new Logger('App');
+const log: Logger = new Logger('App');
 
 export default class App {
   private appContract: any;
@@ -39,7 +39,7 @@ export default class App {
     this.txParams = txParams;
   }
 
-  public async getPackage(name): Promise<{ package: Package, version: any }> {
+  public async getPackage(name): Promise<{ package: Package, version: string }> {
     const [address, version] = await this.appContract.getPackage(name);
     const thepackage = await Package.fetch(address, this.txParams);
     return { package: thepackage, version };
@@ -152,7 +152,7 @@ export default class App {
       // this could be front-run, waiting for new initializers model
       const { method: initMethod, callData }: CalldataInfo = buildCallData(contractClass, initMethodName, initArgs);
       log.info(`Initializing ${packageName} ${contractName} instance at ${instance.address} by calling ${callDescription(initMethod, initArgs)}`);
-      await sendDataTransaction(instance, Object.assign({}, this.txParams, {data: callData}));
+      await sendDataTransaction(instance, Object.assign({}, this.txParams, { data: callData }));
     }
   }
 }
