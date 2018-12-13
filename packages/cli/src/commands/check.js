@@ -1,7 +1,7 @@
 'use strict';
 
 import check from '../scripts/check'
-import compile from '../models/compiler/compile'
+import Compiler from '../models/compiler/Compiler'
 import ConfigVariablesInitializer from '../models/initializer/ConfigVariablesInitializer'
 
 const name = 'check'
@@ -17,7 +17,7 @@ const register = program => program
 
 async function action(contractAlias, options) {
   ConfigVariablesInitializer.initStaticConfiguration()
-  if (!options.skipCompile) await compile()
+  if (!options.skipCompile) await Compiler.call()
   check({ contractAlias })
 }
 

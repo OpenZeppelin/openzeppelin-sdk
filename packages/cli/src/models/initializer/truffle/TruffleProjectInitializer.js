@@ -20,7 +20,7 @@ const TruffleProjectInitializer = {
   },
 
   _initTruffleConfig(root) {
-    if (TruffleConfig.exists(root)) {
+    if (!TruffleConfig.exists(root)) {
       const blueprint = path.resolve(__dirname, './blueprint.truffle.js')
       fs.copy(blueprint, `${root}/truffle-config.js`)
     }
