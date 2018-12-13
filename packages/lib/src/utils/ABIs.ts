@@ -41,7 +41,7 @@ export function getABIFunction(contractClass: ContractFactory, methodName: strin
   }
 }
 
-function tryGetTargetFunction(contractClass: ContractFactory, methodName: string, args: any[]): FunctionInfo {
+function tryGetTargetFunction(contractClass: ContractFactory, methodName: string, args: string[] | undefined): FunctionInfo {
   // Match foo(uint256,string) as method name, and look for that in the ABI
   const match: string[] = methodName.match(/^\s*(.+)\((.*)\)\s*$/);
   if (match) {
@@ -93,7 +93,7 @@ function tryGetLinearizedBaseContracts(contractClass: ContractFactory): Node[] |
   }
 }
 
-export function callDescription(method: any, args: any): string {
+export function callDescription(method: any, args: string[]): string {
   const argsDescriptions: any = method.inputs.map((input: any, index: number) => ` - ${input.name} (${input.type}): ${JSON.stringify(args[index])}`);
   return `${method.name} with: \n${argsDescriptions.join('\n')}`;
 }
