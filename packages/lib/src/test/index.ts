@@ -1,5 +1,4 @@
-// TS-TODO: see why assertions needs to be imported differently.
-import * as assertions from './helpers/assertions';
+import assertions from './helpers/assertions';
 import assertEvent from './helpers/assertEvent';
 import assertRevert from './helpers/assertRevert';
 import shouldBehaveLikeOwnable from './behaviors/Ownable';

@@ -3,6 +3,7 @@ process.env.NODE_ENV = 'test'
 
 import ZWeb3 from '../src/artifacts/ZWeb3'
 import Contracts from '../src/artifacts/Contracts'
+import { helpers } from '../src/test'
 
 ZWeb3.initialize(web3.currentProvider)
 setArtifactDefaults()
@@ -10,7 +11,7 @@ setArtifactDefaults()
 require('chai')
   .use(require('chai-as-promised')) // TODO: Remove this dependency
   .use(require('chai-bignumber')(web3.BigNumber))
-  .use(require('../src/test/helpers/assertions'))
+  .use(helpers.assertions)
   .should()
 
 function setArtifactDefaults() {
