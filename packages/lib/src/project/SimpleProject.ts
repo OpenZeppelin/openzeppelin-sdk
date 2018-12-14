@@ -7,10 +7,10 @@ import { deploy } from '../utils/Transactions';
 import { toAddress } from '../utils/Addresses';
 import { bytecodeDigest } from '..';
 import { buildCallData, callDescription, CalldataInfo } from '../utils/ABIs';
-import ContractFactory  from '../artifacts/ContractFactory';
+import ContractFactory from '../artifacts/ContractFactory';
 
 interface Implementations {
-  [contractName: string]: Implementation
+  [contractName: string]: Implementation;
 }
 
 interface Implementation {
@@ -23,7 +23,7 @@ interface Dependencies {
 }
 
 interface Dependency {
-  package: string,
+  package: string;
   version: string;
 }
 

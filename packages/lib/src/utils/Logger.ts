@@ -41,12 +41,8 @@ export default class Logger {
   }
 
   public log(msg: string, color: string = ''): void {
-    if (this.opts.silent) {
-      return;
-    }
-    if (this.opts.verbose) {
-      msg = `[${this._prefix}] ${msg}`;
-    }
+    if (this.opts.silent) return;
+    if (this.opts.verbose) msg = `[${this._prefix}] ${msg}`;
     console.error(chalk.keyword(color)(msg));
   }
 

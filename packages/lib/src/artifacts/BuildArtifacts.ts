@@ -47,11 +47,7 @@ export class BuildArtifacts {
   }
 
   public registerArtifactForSourcePath(sourcePath: string, artifact: Artifact): void {
-
-    if (!this.sourcesToArtifacts[sourcePath]) {
-      this.sourcesToArtifacts[sourcePath] = [];
-    }
-
+    if (!this.sourcesToArtifacts[sourcePath]) this.sourcesToArtifacts[sourcePath] = [];
     this.sourcesToArtifacts[sourcePath].push(artifact);
   }
 }
