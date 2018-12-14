@@ -42,7 +42,7 @@ interface GenericFunction {
  * @param txParams other transaction parameters (from, gasPrice, etc)
  * @param retries number of transaction retries
  */
-export async function sendTransaction(contractFn: GenericFunction, args: string[] = [], txParams: any = {}, retries: number = RETRY_COUNT): Promise<any> {
+export async function sendTransaction(contractFn: GenericFunction, args: any[] = [], txParams: any = {}, retries: number = RETRY_COUNT): Promise<any> {
   await fixGasPrice(txParams);
 
   try {
