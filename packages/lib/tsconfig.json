@@ -4,8 +4,7 @@
     "outDir": "./lib",
     "allowJs": false,
     "noEmitOnError": true,
-    "declaration": true,
-    "noEmitOnError": true
+    "declaration": true
   },
   "include": [
     "./src"
