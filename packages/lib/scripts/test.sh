@@ -9,5 +9,5 @@ if [ "$SOLIDITY_COVERAGE" = true ]; then
   fi
 else
   node_modules/.bin/truffle compile
-  node_modules/.bin/truffle test "$@"
+  TS_NODE_PROJECT="tsconfig.test.json" node_modules/.bin/truffle test "$@"
 fi
