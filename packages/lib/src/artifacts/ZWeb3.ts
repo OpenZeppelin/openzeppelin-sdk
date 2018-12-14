@@ -153,7 +153,7 @@ export default class ZWeb3 {
     return ZWeb3._getTransactionReceiptWithTimeout(tx, timeout, new Date().getTime());
   }
 
-  private static async _getTransactionReceiptWithTimeout(tx: string, timeout: number, startTime: number): Promise<any> | never {
+  private static async _getTransactionReceiptWithTimeout(tx: string, timeout: number, startTime: number): Promise<any | never> {
     const receipt: any = await ZWeb3._tryGettingTransactionReceipt(tx);
     if (receipt) {
       if (parseInt(receipt.status, 16) !== 0) return receipt;
@@ -166,7 +166,7 @@ export default class ZWeb3 {
     throw new Error(`Transaction ${tx} wasn't processed in ${timeout / 1000} seconds!`);
   }
 
-  private static async _tryGettingTransactionReceipt(tx: string): Promise<any> | never {
+  private static async _tryGettingTransactionReceipt(tx: string): Promise<any | never> {
     try {
       return await ZWeb3.getTransactionReceipt(tx);
     } catch (error) {

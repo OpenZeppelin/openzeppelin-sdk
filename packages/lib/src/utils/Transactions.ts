@@ -155,7 +155,7 @@ export async function estimateActualGas(txParams: any): Promise<any> {
   return calculateActualGas(estimatedGas);
 }
 
-async function getETHGasStationPrice(): Promise<any> | never {
+async function getETHGasStationPrice(): Promise<any | never> {
   if (state.gasPrice) return state.gasPrice;
 
   try {
@@ -199,7 +199,7 @@ async function calculateActualGas(estimatedGas): Promise<any> {
   return gasToUse >= blockLimit ? (blockLimit - 1) : gasToUse;
 }
 
-export async function awaitConfirmations(transactionHash: string, confirmations: number = 12, interval: number = 1000, timeout: number = (10 * 60 * 1000)): Promise<any> | never {
+export async function awaitConfirmations(transactionHash: string, confirmations: number = 12, interval: number = 1000, timeout: number = (10 * 60 * 1000)): Promise<any | never> {
   if (await ZWeb3.isGanacheNode()) return;
   const getTxBlock = () => (ZWeb3.getTransactionReceipt(transactionHash).then((r) => r.blockNumber));
   const now = +(new Date());

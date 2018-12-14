@@ -115,7 +115,7 @@ export default class SimpleProject  {
     delete this.dependencies[name];
   }
 
-  public async _getOrDeployImplementation(contractClass: ContractFactory, packageName: string, contractName?: string, redeployIfChanged?: boolean): Promise<string> | never {
+  public async _getOrDeployImplementation(contractClass: ContractFactory, packageName: string, contractName?: string, redeployIfChanged?: boolean): Promise<string | never> {
     if (!contractName) contractName = contractClass.contractName;
 
     const implementation = await (!packageName || packageName === this.name
