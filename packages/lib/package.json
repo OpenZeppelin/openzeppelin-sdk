@@ -63,6 +63,7 @@
     "tmp": "^0.0.33",
     "truffle": "^4.1.13",
     "ts-node": "^7.0.1",
-    "typescript": "^3.2.2"
+    "typescript": "^3.2.2",
+    "web3-typescript-typings": "^0.10.2"
   }
 }

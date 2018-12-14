@@ -1,6 +1,7 @@
 import { promisify } from 'util';
 import sleep from '../helpers/sleep';
 import BN from 'bignumber.js';
+import Web3 from 'web3';
 
 // Reference: see https://github.com/ethereum/EIPs/blob/master/EIPS/eip-155.md#list-of-chain-ids
 const NETWORKS = {
@@ -15,21 +16,22 @@ const NETWORKS = {
 // TS-TODO: Review what could be private in this class.
 export default class ZWeb3 {
 
-  public static provider;
+  public static provider: Web3.Provider | string;
 
-  public static initialize(provider: any): void {
+  public static initialize(provider: Web3.Provider | string): void {
     ZWeb3.provider = provider;
   }
 
   // TODO: this.web3 could be cached and initialized lazily?
-  public static web3(): any {
+  public static web3(): Web3 {
     if (!ZWeb3.provider) throw new Error('ZWeb3 must be initialized with a web3 provider');
-    const Web3 = require('web3');
 
     // TODO: improve provider validation for HttpProvider scenarios
-    return (typeof ZWeb3.provider === 'string')
-      ? new Web3.providers.HttpProvider(ZWeb3.provider)
-      : new Web3(ZWeb3.provider);
+    if (typeof ZWeb3.provider === 'string') {
+      const provider = new Web3.providers.HttpProvider(ZWeb3.provider);
+      return new Web3(provider);
+    }
+    return new Web3(ZWeb3.provider);
   }
 
   public static sha3(value: string): string {
@@ -40,15 +42,15 @@ export default class ZWeb3 {
     return ZWeb3.web3().isAddress(address);
   }
 
-  public static eth(): any {
+  public static eth(): Web3.EthApi {
     return ZWeb3.web3().eth;
   }
 
-  public static version(): any {
+  public static version(): Web3.VersionApi {
     return ZWeb3.web3().version;
   }
 
-  public static contract(abi: any): any {
+  public static contract(abi: Web3.AbiDefinition[]): Web3.Contract<any> {
     return ZWeb3.eth().contract(abi);
   }
 
@@ -62,7 +64,7 @@ export default class ZWeb3 {
     return (await ZWeb3.accounts())[0];
   }
 
-  public static async estimateGas(params: any): Promise<any> {
+  public static async estimateGas(params: Web3.CallData): Promise<number> {
     return promisify(
       ZWeb3.eth().estimateGas.bind(ZWeb3.eth())
     )(params);
@@ -80,7 +82,7 @@ export default class ZWeb3 {
     )(address);
   }
 
-  public static async hasBytecode(address) {
+  public static async hasBytecode(address): Promise<boolean> {
     const bytecode = await ZWeb3.getCode(address);
     return bytecode.length > 2;
   }
@@ -97,18 +99,18 @@ export default class ZWeb3 {
     )();
   }
 
-  public static async isGanacheNode(): Promise<any> {
+  public static async isGanacheNode(): Promise<RegExpMatchArray> {
     const nodeVersion = await ZWeb3.getNode();
     return nodeVersion.match(/TestRPC/);
   }
 
-  public static async getBlock(filter: string | number): Promise<any> {
+  public static async getBlock(filter: string | number): Promise<Web3.BlockWithoutTransactionData> {
     return promisify(
       ZWeb3.eth().getBlock.bind(ZWeb3.eth())
     )(filter);
   }
 
-  public static async getLatestBlock(): Promise<any> {
+  public static async getLatestBlock(): Promise<Web3.BlockWithoutTransactionData> {
     return ZWeb3.getBlock('latest');
   }
 
@@ -131,29 +133,29 @@ export default class ZWeb3 {
     return NETWORKS[networkId] || `dev-${networkId}`;
   }
 
-  public static async sendTransaction(params: any): Promise<string> {
+  public static async sendTransaction(params: Web3.TxData): Promise<string> {
     return promisify(
       ZWeb3.eth().sendTransaction.bind(ZWeb3.eth())
     )(params);
   }
 
-  public static async getTransaction(txHash: string): Promise<any> {
+  public static async getTransaction(txHash: string): Promise<Web3.Transaction> {
     return promisify(
       ZWeb3.eth().getTransaction.bind(ZWeb3.eth())
     )(txHash);
   }
 
-  public static async getTransactionReceipt(txHash: string): Promise<any> {
+  public static async getTransactionReceipt(txHash: string): Promise<Web3.TransactionReceipt | null> {
     return promisify(
       ZWeb3.eth().getTransactionReceipt.bind(ZWeb3.eth())
     )(txHash);
   }
 
-  public static async getTransactionReceiptWithTimeout(tx: string, timeout: number): Promise<any> {
+  public static async getTransactionReceiptWithTimeout(tx: string, timeout: number): Promise<Web3.TransactionReceipt | null> {
     return ZWeb3._getTransactionReceiptWithTimeout(tx, timeout, new Date().getTime());
   }
 
-  private static async _getTransactionReceiptWithTimeout(tx: string, timeout: number, startTime: number): Promise<any | never> {
+  private static async _getTransactionReceiptWithTimeout(tx: string, timeout: number, startTime: number): Promise<Web3.TransactionReceipt | null | never> {
     const receipt: any = await ZWeb3._tryGettingTransactionReceipt(tx);
     if (receipt) {
       if (parseInt(receipt.status, 16) !== 0) return receipt;
@@ -166,7 +168,7 @@ export default class ZWeb3 {
     throw new Error(`Transaction ${tx} wasn't processed in ${timeout / 1000} seconds!`);
   }
 
-  private static async _tryGettingTransactionReceipt(tx: string): Promise<any | never> {
+  private static async _tryGettingTransactionReceipt(tx: string): Promise<Web3.TransactionReceipt | null | never> {
     try {
       return await ZWeb3.getTransactionReceipt(tx);
     } catch (error) {
