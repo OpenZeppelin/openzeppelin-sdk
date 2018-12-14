@@ -8,8 +8,8 @@ function formatValue(value: any): string {
 }
 
 export default function encodeCall(name: string, args: string[] = [], rawValues: any[] = []): string {
-  const values: string[] = rawValues.map(formatValue);
-  const methodId: string = abi.methodID(name, args).toString('hex');
-  const params: Buffer = abi.rawEncode(args, values).toString('hex');
+  const values = rawValues.map(formatValue);
+  const methodId = abi.methodID(name, args).toString('hex');
+  const params = abi.rawEncode(args, values).toString('hex');
   return '0x' + methodId + params;
 }
