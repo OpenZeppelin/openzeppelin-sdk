@@ -6,6 +6,7 @@ export default function advanceBlock(): Promise<any> {
       jsonrpc: '2.0',
       method: 'evm_mine',
       id: Date.now(),
+      params: []
     }, (err, res) => {
       return err ? reject(err) : resolve(res);
     });

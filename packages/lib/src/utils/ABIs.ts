@@ -1,37 +1,33 @@
 import encodeCall from '../helpers/encodeCall';
 import ContractAST, { Node } from './ContractAST';
 import ContractFactory from '../artifacts/ContractFactory';
+import Web3 from 'web3';
 
 export interface CalldataInfo {
-  method: FunctionInfo;
+  method: Web3.AbiDefinition;
   callData: string;
-}
-
-interface InputInfo {
-  name?: string;
-  type: string;
 }
 
 interface FunctionInfo {
   name: string;
-  inputs: InputInfo[];
+  inputs: Web3.DataItem[];
 }
 
 export function buildCallData(contractClass: ContractFactory, methodName: string, args: any[]): CalldataInfo {
-  const method = getABIFunction(contractClass, methodName, args);
-  const argTypes = method.inputs.map((input) => input.type);
+  const method: Web3.MethodAbi = <Web3.MethodAbi>getABIFunction(contractClass, methodName, args);
+  const argTypes: string[] = method.inputs.map((input) => input.type);
   const callData = encodeCall(method.name, argTypes, args);
   return { method, callData };
 }
 
-export function getABIFunction(contractClass: ContractFactory, methodName: string, args: any[]): FunctionInfo {
+export function getABIFunction(contractClass: ContractFactory, methodName: string, args: any[]): Web3.AbiDefinition {
   const targetMethod: FunctionInfo = tryGetTargetFunction(contractClass, methodName, args);
   if (targetMethod) methodName = targetMethod.name;
 
   const matchArgsTypes = (fn) => targetMethod && fn.inputs.every((input, index) => targetMethod.inputs[index] && targetMethod.inputs[index].type === input.type);
   const matchNameAndArgsLength = (fn) => fn.name === methodName && fn.inputs.length === args.length;
 
-  let abiMethods: FunctionInfo[] = contractClass.abi.filter((fn) => matchNameAndArgsLength(fn) && matchArgsTypes(fn));
+  let abiMethods: Web3.AbiDefinition[] = contractClass.abi.filter((fn) => matchNameAndArgsLength(fn) && matchArgsTypes(fn));
   if (abiMethods.length === 0) abiMethods = contractClass.abi.filter((fn) => matchNameAndArgsLength(fn));
 
   switch (abiMethods.length) {
@@ -46,7 +42,7 @@ function tryGetTargetFunction(contractClass: ContractFactory, methodName: string
   const match: string[] = methodName.match(/^\s*(.+)\((.*)\)\s*$/);
   if (match) {
     const name = match[1];
-    const inputs = match[2].split(',').map((arg) => ({ type: arg }));
+    const inputs = match[2].split(',').map((arg) => ({ name: '', type: arg, components: [] }));
     return { name, inputs };
   }
 

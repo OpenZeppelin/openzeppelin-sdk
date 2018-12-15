@@ -5,7 +5,7 @@ import Contracts from '../artifacts/Contracts';
 import ContractFactory, { ContractWrapper } from '../artifacts/ContractFactory';
 import { estimateGas } from '../utils/Transactions';
 
-async function sendTransaction(params: any): Promise<any> {
+async function sendTransaction(params: any): Promise<string> {
   if (!params.gas) params.gas = await estimateGas(params);
   return ZWeb3.sendTransaction(params);
 }

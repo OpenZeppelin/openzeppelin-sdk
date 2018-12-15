@@ -1,9 +1,8 @@
 import glob from 'glob';
 import path from 'path';
-import ZWeb3 from './ZWeb3';
 import ContractFactory from './ContractFactory';
 
-// TODO: rename to Artifacts and move to /artifacts
+// TODO: rename to Artifacts
 
 export default class Contracts {
 

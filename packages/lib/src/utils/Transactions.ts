@@ -121,7 +121,7 @@ async function _deploy(contract: ContractFactory, args: any[] = [], txParams: an
   return contract.new(...args, { gas, ...txParams });
 }
 
-export async function estimateGas(txParams: any, retries: number = RETRY_COUNT): Promise<any> {
+export async function estimateGas(txParams: any, retries: number = RETRY_COUNT): Promise<number> {
   // Retry if estimate fails. This could happen because we are depending
   // on a previous transaction being mined that still hasn't reach the node
   // we are working with, if the txs are routed to different nodes.
@@ -170,7 +170,7 @@ async function getETHGasStationPrice(): Promise<any | never> {
   }
 }
 
-async function fixGasPrice(txParams: any): Promise<any> {
+async function fixGasPrice(txParams: any): Promise<void | never> {
   const gasPrice = txParams.gasPrice || Contracts.getArtifactsDefaults().gasPrice;
 
   if ((TRUFFLE_DEFAULT_GAS_PRICE.eq(gasPrice) || !gasPrice) && await ZWeb3.isMainnet()) {
@@ -179,13 +179,13 @@ async function fixGasPrice(txParams: any): Promise<any> {
   }
 }
 
-async function getBlockGasLimit(): Promise<any> {
+async function getBlockGasLimit(): Promise<number> {
   if (state.block) return state.block.gasLimit;
   state.block = await ZWeb3.getLatestBlock();
   return state.block.gasLimit;
 }
 
-async function calculateActualGas(estimatedGas): Promise<any> {
+async function calculateActualGas(estimatedGas): Promise<number> {
   const blockLimit: number = await getBlockGasLimit();
   let gasToUse = parseInt(`${estimatedGas * GAS_MULTIPLIER}`, 10);
   // Ganache has a bug (https://github.com/trufflesuite/ganache-core/issues/26) that causes gas
@@ -199,7 +199,7 @@ async function calculateActualGas(estimatedGas): Promise<any> {
   return gasToUse >= blockLimit ? (blockLimit - 1) : gasToUse;
 }
 
-export async function awaitConfirmations(transactionHash: string, confirmations: number = 12, interval: number = 1000, timeout: number = (10 * 60 * 1000)): Promise<any | never> {
+export async function awaitConfirmations(transactionHash: string, confirmations: number = 12, interval: number = 1000, timeout: number = (10 * 60 * 1000)): Promise<boolean | never> {
   if (await ZWeb3.isGanacheNode()) return;
   const getTxBlock = () => (ZWeb3.getTransactionReceipt(transactionHash).then((r) => r.blockNumber));
   const now = +(new Date());

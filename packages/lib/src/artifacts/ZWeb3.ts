@@ -12,13 +12,13 @@ const NETWORKS = {
   42: 'kovan'
 };
 
-// TS-TODO: Type Web3.
 // TS-TODO: Review what could be private in this class.
 export default class ZWeb3 {
 
-  public static provider: Web3.Provider | string;
+  public static provider: Web3.Provider;
 
   public static initialize(provider: Web3.Provider | string): void {
+    if (typeof provider === 'string') provider = ZWeb3.getProviderFromString(provider);
     ZWeb3.provider = provider;
   }
 
@@ -27,11 +27,12 @@ export default class ZWeb3 {
     if (!ZWeb3.provider) throw new Error('ZWeb3 must be initialized with a web3 provider');
 
     // TODO: improve provider validation for HttpProvider scenarios
-    if (typeof ZWeb3.provider === 'string') {
-      const provider = new Web3.providers.HttpProvider(ZWeb3.provider);
-      return new Web3(provider);
-    }
+    if(typeof ZWeb3.provider === 'string') ZWeb3.initialize(ZWeb3.provider);
     return new Web3(ZWeb3.provider);
+  }
+
+  private static getProviderFromString(provider: string): Web3.Provider {
+    return new Web3.providers.HttpProvider(provider);
   }
 
   public static sha3(value: string): string {
@@ -50,13 +51,13 @@ export default class ZWeb3 {
     return ZWeb3.web3().version;
   }
 
-  public static contract(abi: Web3.AbiDefinition[]): Web3.Contract<any> {
+  public static contract(abi: Web3.AbiDefinition[]): Web3.Contract<Web3.ContractInstance> {
     return ZWeb3.eth().contract(abi);
   }
 
   public static async accounts(): Promise<string[]> {
-    return promisify(
-      ZWeb3.eth().getAccounts.bind(ZWeb3.eth())
+    return promisify<string[]>(
+      (callback) => ZWeb3.eth().getAccounts(callback)
     )();
   }
 
@@ -65,20 +66,20 @@ export default class ZWeb3 {
   }
 
   public static async estimateGas(params: Web3.CallData): Promise<number> {
-    return promisify(
-      ZWeb3.eth().estimateGas.bind(ZWeb3.eth())
+    return promisify<Web3.CallData, number>(
+      (param, callback) => ZWeb3.eth().estimateGas(param, callback)
     )(params);
   }
 
-  public static async getBalance(address: string): Promise<string> {
-    return promisify(
-      ZWeb3.eth().getBalance.bind(ZWeb3.eth())
+  public static async getBalance(address: string): Promise<BN> {
+    return promisify<string, BN>(
+      (param, callback) => ZWeb3.eth().getBalance(param, callback)
     )(address);
   }
 
   public static async getCode(address: string): Promise<string> {
-    return promisify(
-      ZWeb3.eth().getCode.bind(ZWeb3.eth())
+    return promisify<string, string>(
+      (param, callback) => ZWeb3.eth().getCode(param, callback)
     )(address);
   }
 
@@ -88,14 +89,14 @@ export default class ZWeb3 {
   }
 
   public static async getStorageAt(address: string, position: string): Promise<string> {
-    return promisify(
-      ZWeb3.eth().getStorageAt.bind(ZWeb3.eth())
+    return promisify<string, string, string>(
+      (param1, param2, callback) => ZWeb3.eth().getStorageAt(param1, param2, callback)
     )(address, position);
   }
 
   public static async getNode(): Promise<string> {
-    return promisify(
-      ZWeb3.version().getNode.bind(ZWeb3.version())
+    return promisify<string>(
+      (callback) => ZWeb3.version().getNode(callback)
     )();
   }
 
@@ -104,9 +105,9 @@ export default class ZWeb3 {
     return nodeVersion.match(/TestRPC/);
   }
 
-  public static async getBlock(filter: string | number): Promise<Web3.BlockWithoutTransactionData> {
-    return promisify(
-      ZWeb3.eth().getBlock.bind(ZWeb3.eth())
+  public static async getBlock(filter: string | Web3.BlockParam): Promise<Web3.BlockWithoutTransactionData> {
+    return promisify<string | Web3.BlockParam, Web3.BlockWithoutTransactionData>(
+      (param, callback) => ZWeb3.eth().getBlock(param, callback)
     )(filter);
   }
 
@@ -123,8 +124,8 @@ export default class ZWeb3 {
   }
 
   public static async getNetwork(): Promise<string> {
-    return promisify(
-      ZWeb3.version().getNetwork.bind(ZWeb3.version())
+    return promisify<string>(
+      (callback) => ZWeb3.version().getNetwork(callback)
     )();
   }
 
@@ -134,20 +135,20 @@ export default class ZWeb3 {
   }
 
   public static async sendTransaction(params: Web3.TxData): Promise<string> {
-    return promisify(
-      ZWeb3.eth().sendTransaction.bind(ZWeb3.eth())
+    return promisify<Web3.TxData, string>(
+      (param, callback) => ZWeb3.eth().sendTransaction(param, callback)
     )(params);
   }
 
   public static async getTransaction(txHash: string): Promise<Web3.Transaction> {
-    return promisify(
-      ZWeb3.eth().getTransaction.bind(ZWeb3.eth())
+    return promisify<string, Web3.Transaction>(
+      (param, callback) => ZWeb3.eth().getTransaction(param, callback)
     )(txHash);
   }
 
   public static async getTransactionReceipt(txHash: string): Promise<Web3.TransactionReceipt | null> {
-    return promisify(
-      ZWeb3.eth().getTransactionReceipt.bind(ZWeb3.eth())
+    return promisify<string, Web3.TransactionReceipt | null>(
+      (param, callback) => ZWeb3.eth().getTransactionReceipt(param, callback)
     )(txHash);
   }
 

@@ -1,11 +1,12 @@
 import BN from 'bignumber.js';
 import ZWeb3 from './ZWeb3';
+import Web3 from 'web3';
 import decodeLogs from '../helpers/decodeLogs';
 import { getSolidityLibNames, hasUnlinkedVariables } from '../utils/Bytecode';
 
 interface ContractSchema {
   contractName: string;
-  abi: any;
+  abi: Web3.AbiDefinition[];
   ast: any;
   bytecode: string;
   deployedBytecode: string;
@@ -23,13 +24,13 @@ export interface ContractWrapper {
 export interface TransactionReceiptWrapper {
   logs: any[];
   tx: string;
-  receipt: any;
+  receipt: Web3.TransactionReceipt;
 }
 
 // TS-TODO: Review which members could be private.
 export default class ContractFactory {
 
-  public abi: any;
+  public abi: Web3.AbiDefinition[];
   public ast: any;
   public bytecode: string;
   public deployedBytecode: string;
@@ -38,7 +39,7 @@ export default class ContractFactory {
   public txParams: any;
   public binary: string;
   public deployedBinary: string;
-  public events: any;
+  public events: { [id: string]: Web3.EventAbi };
 
   constructor(schema: ContractSchema, timeout, txParams) {
     this.abi = schema.abi;
@@ -87,7 +88,7 @@ export default class ContractFactory {
     this._validateNonEmptyBinary();
     this._validateNonUnlinkedLibraries();
     const contractClass = ZWeb3.contract(this.abi);
-    return contractClass.new.getData(...constructorArgs, { ...txParams, data: this.binary });
+    return contractClass.getData(...constructorArgs, { ...txParams, data: this.binary });
   }
 
   public link(libraries: any[]): void {
@@ -177,8 +178,8 @@ export default class ContractFactory {
   private _parseEvents(): void {
     this.events = {};
     this.abi
-      .filter((item) => item.type === 'event')
-      .forEach((event) => {
+      .filter((item: Web3.AbiDefinition) => item.type === 'event')
+      .forEach((event: Web3.EventAbi) => {
         const signature = `${event.name}(${event.inputs.map((input) => input.type).join(',')})`;
         const topic = ZWeb3.sha3(signature);
         this.events[topic] = event;
