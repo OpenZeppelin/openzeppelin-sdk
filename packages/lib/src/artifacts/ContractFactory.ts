@@ -53,14 +53,11 @@ export default class ContractFactory {
   }
 
   public async new(...passedArguments): Promise<ContractWrapper> {
-
     this._validateNonEmptyBinary();
     this._validateNonUnlinkedLibraries();
 
     const [args, txParams] = this._parseArguments(passedArguments);
-    if (!txParams.data) {
-      txParams.data = this.binary;
-    }
+    if (!txParams.data) { txParams.data = this.binary; }
     const self = this;
 
     return new Promise(function(resolve, reject) {
@@ -76,11 +73,7 @@ export default class ContractFactory {
   }
 
   public at(address: string): ContractWrapper | never {
-
-    if (!ZWeb3.isAddress(address)) {
-      throw new Error('Given address is not valid: ' + address);
-    }
-
+    if (!ZWeb3.isAddress(address)) { throw new Error('Given address is not valid: ' + address); }
     const contractClass: any = ZWeb3.contract(this.abi);
     const contract: any = contractClass.at(address);
 
@@ -112,7 +105,6 @@ export default class ContractFactory {
   }
 
   private _setSendFunctions(instance, wrapper) {
-
     const self = this;
 
     wrapper.sendTransaction = async function(txParams: any): Promise<TransactionReceiptWrapper> {

@@ -1,46 +1,41 @@
 import _ from 'lodash'
 import { promisify } from 'util'
-import { FileSystem as fs } from 'zos-lib'
+import { FileSystem } from 'zos-lib'
 
-const TruffleConfig = {
-  init() {
-    try {
-      const TruffleConfig = require('truffle-config')
-      return TruffleConfig.detect({ logger: console })
-    } catch (error) {
-      if (error.message === 'Could not find suitable configuration file.') {
-        throw Error('Could not find truffle.js config file, remember to initialize your project running "zos init".')
-      } else {
-        throw Error('Could not load truffle.js config file.\n' + error);
-      }
-    }
-  },
-
-  exists(root = process.cwd()) {
+const Truffle = {
+  existsTruffleConfig(root = process.cwd()) {
     const truffleFile = `${root}/truffle.js`
     const truffleConfigFile = `${root}/truffle-config.js`
-    return fs.exists(truffleFile) || fs.exists(truffleConfigFile)
+    return FileSystem.exists(truffleFile) || FileSystem.exists(truffleConfigFile)
   },
 
-  buildDir() {
-    const config = this.init()
+  isTruffleProject(root = process.cwd()) {
+    const truffleDir = `${root}/node_modules/truffle`
+    const existsTruffleDependency = FileSystem.exists(truffleDir)
+    return Truffle.existsTruffleConfig(root) && existsTruffleDependency
+  },
+
+  validateAndLoadNetworkConfig(network) {
+    const config = this.getConfig()
+    const { networks: networkList } = config
+    if (!networkList[network]) throw Error(`Given network '${network}' is not defined in your truffle-config file`)
+    config.network = network
+    if (networkList[network].from) networkList[network].from = networkList[network].from.toLowerCase()
+  },
+
+  getBuildDir() {
+    const config = this.getConfig()
     return config.contracts_build_directory
   },
 
-  solcSettings() {
-    const config = this.init()
+  getSolcSettings() {
+    const config = this.getConfig()
     const compilerSettings = config.compilers || {}
     return compilerSettings.solc
   },
 
-  loadProviderAndDefaults(network) {
-    const config = this.init()
-    const { networks: networkList } = config
-    if (!networkList[network]) throw Error(`Given network '${network}' is not defined in your truffle-config file`)
-
-    config.network = network
-    if (networkList[network].from) networkList[network].from = networkList[network].from.toLowerCase()
-
+  getProviderAndDefaults() {
+    const config = this.getConfig()
     const TruffleResolver = require('truffle-resolver')
     config.resolver = new TruffleResolver(config)
     const { provider, resolver } = this._setNonceTrackerIfNeeded(config)
@@ -48,6 +43,21 @@ const TruffleConfig = {
     const artifactDefaults = _.pickBy(_.pick(resolver.options, 'from', 'gas', 'gasPrice'))
     if (artifactDefaults.from) artifactDefaults.from = artifactDefaults.from.toLowerCase()
     return { provider, artifactDefaults }
+  },
+
+  getConfig() {
+    if (this.config) return this.config
+    try {
+      const TruffleConfig = require('truffle-config')
+      this.config = TruffleConfig.detect({ logger: console });
+      return this.config
+    } catch (error) {
+      if (error.message === 'Could not find suitable configuration file.') {
+        throw Error('Could not find truffle.js config file, remember to initialize your project.')
+      } else {
+        throw Error('Could not load truffle.js config file.\n' + error);
+      }
+    }
   },
 
   // This function fixes a truffle issue related to HDWalletProvider that occurs when assigning
@@ -71,4 +81,4 @@ const TruffleConfig = {
   },
 }
 
-export default TruffleConfig
+export default Truffle

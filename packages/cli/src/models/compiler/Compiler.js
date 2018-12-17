@@ -1,13 +1,13 @@
 import { exec } from 'child_process'
 import { FileSystem, Contracts, Logger } from 'zos-lib'
-import TruffleConfig from '../initializer/truffle/TruffleConfig'
+import Truffle from '../initializer/truffle/Truffle'
 import SolidityProjectCompiler from './solidity/SolidityProjectCompiler'
 
 const log = new Logger('Compiler')
 
 export default {
   async call() {
-    return this._isTruffleProject()
+    return Truffle.isTruffleProject()
       ? this.compileWithTruffle()
       : this.compileWithSolc()
   },
@@ -38,9 +38,4 @@ export default {
       })
     })
   },
-
-  _isTruffleProject() {
-    const truffleDir = `${process.cwd()}/node_modules/truffle`
-    return TruffleConfig.exists() && FileSystem.exists(truffleDir)
-  }
 }

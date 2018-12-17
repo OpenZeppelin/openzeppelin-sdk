@@ -1,13 +1,14 @@
 import { ZWeb3, Contracts } from 'zos-lib'
+import Truffle from './truffle/Truffle'
 import Session from '../network/Session'
 import Compiler from '../compiler/Compiler'
-import TruffleConfig from './truffle/TruffleConfig'
 
 const ConfigVariablesInitializer = {
   initStaticConfiguration() {
-    const buildDir = TruffleConfig.buildDir()
+    const buildDir = Truffle.getBuildDir()
     Contracts.setLocalBuildDir(buildDir)
-    const solcSettings = TruffleConfig.solcSettings()
+
+    const solcSettings = Truffle.getSolcSettings()
     Compiler.setSettings(solcSettings)
   },
 
@@ -15,8 +16,9 @@ const ConfigVariablesInitializer = {
     const { network, from, timeout } = Session.getOptions(options)
     if (!network) throw Error('A network name must be provided to execute the requested action.')
 
-    // this line could be expanded to support different libraries like embark, ethjs, buidler, etc
-    const { provider, buildDir, artifactDefaults } = TruffleConfig.loadProviderAndDefaults(network)
+    // these lines could be expanded to support different libraries like embark, ethjs, buidler, etc
+    Truffle.validateAndLoadNetworkConfig(network)
+    const { provider, artifactDefaults } = Truffle.getProviderAndDefaults()
 
     ZWeb3.initialize(provider)
     Contracts.setSyncTimeout(timeout * 1000)
