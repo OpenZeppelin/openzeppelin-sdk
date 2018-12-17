@@ -54,8 +54,8 @@ export default class ImplementationDirectory {
     return this.directoryContract.owner(this.txParams);
   }
 
-  public async getImplementation(contractName: string): Promise<string> | never {
-    if (!contractName) { throw Error('Contract name is required to retrieve an implementation'); }
+  public async getImplementation(contractName: string): Promise<string | never> {
+    if (!contractName) throw Error('Contract name is required to retrieve an implementation');
     return await this.directoryContract.getImplementation(contractName, this.txParams);
   }
 

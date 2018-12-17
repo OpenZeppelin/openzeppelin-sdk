@@ -11,9 +11,7 @@ type RawSemanticVersion = [any, any, any];
 export function toSemanticVersion(version: string | RawSemanticVersion): SemanticVersion | never {
   if (_.isString(version)) {
     const semanticVersion: any = semver.parse(version);
-    if (!semanticVersion) {
-      throw Error(`Cannot parse version identifier ${version}`);
-    }
+    if (!semanticVersion) throw Error(`Cannot parse version identifier ${version}`);
     return [semanticVersion.major, semanticVersion.minor, semanticVersion.patch];
   } else if (_.isArray(version) && version.length === 3) {
     const semverGenericArray: RawSemanticVersion = <RawSemanticVersion> version;
@@ -21,21 +19,16 @@ export function toSemanticVersion(version: string | RawSemanticVersion): Semanti
       return x.toNumber ? x.toNumber() : x;
     });
     return <SemanticVersion> semverTyped;
-  } else {
-    throw Error(`Cannot parse version identifier ${version}`);
-  }
+  } else throw Error(`Cannot parse version identifier ${version}`);
 
 }
 
 export function semanticVersionToString(version: string | RawSemanticVersion): string | never {
-  if (_.isString(version)) {
-    return <string> version;
-  } else if (_.isArray(version)) {
+  if (_.isString(version)) return <string> version;
+    else if (_.isArray(version)) {
     const semverGenericArray: RawSemanticVersion = <RawSemanticVersion> version;
     return <string> (semverGenericArray.join('.'));
-  } else {
-    throw Error(`Cannot handle version identifier ${util.inspect(version)}`);
-  }
+  } else throw Error(`Cannot handle version identifier ${util.inspect(version)}`);
 }
 
 export function semanticVersionEqual(v1: string | RawSemanticVersion, v2: string | RawSemanticVersion): boolean {

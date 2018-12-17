@@ -48,7 +48,7 @@ export async function sendTransaction(contractFn: GenericFunction, args: any[] =
   try {
     return await _sendTransaction(contractFn, args, txParams);
   } catch (error) {
-    if (!error.message.match(/nonce too low/) || retries <= 0) { throw error; }
+    if (!error.message.match(/nonce too low/) || retries <= 0) throw error;
     return sendTransaction(contractFn, args, txParams, retries - 1);
   }
 }
@@ -66,7 +66,7 @@ export async function deploy(contract: ContractFactory, args: any[] = [], txPara
   try {
     return await _deploy(contract, args, txParams);
   } catch (error) {
-    if (!error.message.match(/nonce too low/) || retries <= 0) { throw error; }
+    if (!error.message.match(/nonce too low/) || retries <= 0) throw error;
     return deploy(contract, args, txParams, retries - 1);
   }
 }
@@ -82,9 +82,7 @@ export async function sendDataTransaction(contract: ContractWrapper, txParams: a
   await fixGasPrice(txParams);
 
   // If gas is set explicitly, use it
-  if (txParams.gas) {
-    return contract.sendTransaction(txParams);
-  }
+  if (txParams.gas) return contract.sendTransaction(txParams);
   // Estimate gas for the call and run the tx
   const gas = await estimateActualGas({ to: contract.address, ...txParams });
   return contract.sendTransaction({ gas, ...txParams });
@@ -99,9 +97,7 @@ export async function sendDataTransaction(contract: ContractWrapper, txParams: a
  */
 async function _sendTransaction(contractFn: GenericFunction, args: any[] = [], txParams: any = {}) {
   // If gas is set explicitly, use it
-  if (txParams.gas) {
-    return contractFn(...args, txParams);
-  }
+  if (txParams.gas) return contractFn(...args, txParams);
 
   // Estimate gas for the call
   const gas = await estimateActualGasFnCall(contractFn, args, txParams);
@@ -118,9 +114,7 @@ async function _sendTransaction(contractFn: GenericFunction, args: any[] = [], t
  */
 async function _deploy(contract: ContractFactory, args: any[] = [], txParams: any = {}): Promise<ContractWrapper> {
   // If gas is set explicitly, use it
-  if (txParams.gas) {
-    return contract.new(...args, txParams);
-  }
+  if (txParams.gas) return contract.new(...args, txParams);
 
   const data: string = contract.getData(args, txParams);
   const gas: number = await estimateActualGas({ data, ...txParams });
@@ -136,7 +130,7 @@ export async function estimateGas(txParams: any, retries: number = RETRY_COUNT):
     // Use json-rpc method estimateGas to retrieve estimated value
     return await ZWeb3.estimateGas(txParams);
   } catch (error) {
-    if (retries <= 0) { throw Error(error); }
+    if (retries <= 0) throw Error(error);
     await sleep(RETRY_SLEEP_TIME);
     return await estimateGas(txParams, retries - 1);
   }
@@ -150,7 +144,7 @@ export async function estimateActualGasFnCall(contractFn: GenericFunction, args:
   try {
     return await calculateActualGas(await contractFn.estimateGas(...args, txParams));
   } catch(error) {
-    if (retries <= 0) { throw Error(error); }
+    if (retries <= 0) throw Error(error);
     await sleep(RETRY_SLEEP_TIME);
     return estimateActualGasFnCall(contractFn, args, txParams, retries - 1);
   }
@@ -161,7 +155,7 @@ export async function estimateActualGas(txParams: any): Promise<any> {
   return calculateActualGas(estimatedGas);
 }
 
-async function getETHGasStationPrice(): Promise<any> | never {
+async function getETHGasStationPrice(): Promise<any | never> {
   if (state.gasPrice) return state.gasPrice;
 
   try {
@@ -181,14 +175,12 @@ async function fixGasPrice(txParams: any): Promise<any> {
 
   if ((TRUFFLE_DEFAULT_GAS_PRICE.eq(gasPrice) || !gasPrice) && await ZWeb3.isMainnet()) {
     txParams.gasPrice = await getETHGasStationPrice();
-    if (TRUFFLE_DEFAULT_GAS_PRICE.lte(txParams.gasPrice)) {
-      throw new Error('The current gas price estimate from ethgasstation.info is over 100 gwei. If you do want to send a transaction with a gas price this high, please set it manually in your truffle.js configuration file.');
-    }
+    if (TRUFFLE_DEFAULT_GAS_PRICE.lte(txParams.gasPrice)) throw new Error('The current gas price estimate from ethgasstation.info is over 100 gwei. If you do want to send a transaction with a gas price this high, please set it manually in your truffle.js configuration file.');
   }
 }
 
 async function getBlockGasLimit(): Promise<any> {
-  if (state.block) { return state.block.gasLimit; }
+  if (state.block) return state.block.gasLimit;
   state.block = await ZWeb3.getLatestBlock();
   return state.block.gasLimit;
 }
@@ -203,22 +195,20 @@ async function calculateActualGas(estimatedGas): Promise<any> {
   // This is a viable workaround as long as we don't have other methods that have higher refunds,
   // such as cleaning more storage positions or selfdestructing a contract. We should be able to fix
   // this once the issue is resolved.
-  if (await ZWeb3.isGanacheNode()) { gasToUse += 15000; }
+  if (await ZWeb3.isGanacheNode()) gasToUse += 15000;
   return gasToUse >= blockLimit ? (blockLimit - 1) : gasToUse;
 }
 
-export async function awaitConfirmations(transactionHash: string, confirmations: number = 12, interval: number = 1000, timeout: number = (10 * 60 * 1000)): Promise<any> | never {
-  if (await ZWeb3.isGanacheNode()) { return; }
+export async function awaitConfirmations(transactionHash: string, confirmations: number = 12, interval: number = 1000, timeout: number = (10 * 60 * 1000)): Promise<any | never> {
+  if (await ZWeb3.isGanacheNode()) return;
   const getTxBlock = () => (ZWeb3.getTransactionReceipt(transactionHash).then((r) => r.blockNumber));
   const now = +(new Date());
 
   while (true) {
-    if ((+(new Date()) - now) > timeout) {
-      throw new Error(`Exceeded timeout of ${timeout / 1000} seconds awaiting confirmations for transaction ${transactionHash}`);
-    }
+    if ((+(new Date()) - now) > timeout) throw new Error(`Exceeded timeout of ${timeout / 1000} seconds awaiting confirmations for transaction ${transactionHash}`);
     const currentBlock: number = await ZWeb3.getLatestBlockNumber();
     const txBlock: number = await getTxBlock();
-    if (currentBlock - txBlock >= confirmations) { return true; }
+    if (currentBlock - txBlock >= confirmations) return true;
     await sleep(interval);
   }
 }

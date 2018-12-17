@@ -15,9 +15,7 @@ import {
 // TS-TODO: define return type after typing class members below.
 export function getStorageLayout(contract: ContractFactory, artifacts: BuildArtifacts): StorageLayoutInfo {
 
-  if (!artifacts) {
-    artifacts = getBuildArtifacts();
-  }
+  if (!artifacts) artifacts = getBuildArtifacts();
 
   const layout = new StorageLayout(contract, artifacts);
   const { types, storage } = layout.run();
@@ -35,13 +33,9 @@ export function getStructsOrEnums(info: StorageLayoutInfo): StorageInfo[] {
 // TS-TODO: Define parameter types type after typing class members below.
 function containsStructOrEnum(typeName: string, types): boolean {
   const type = types[typeName];
-  if (type.kind === 'struct' || type.kind === 'enum') {
-    return true;
-  } else if (type.valueType) {
-    return containsStructOrEnum(type.valueType, types);
-  } else {
-    return false;
-  }
+  if (type.kind === 'struct' || type.kind === 'enum') return true;
+  else if (type.valueType) return containsStructOrEnum(type.valueType, types);
+  else return false;
 }
 
 const CONTRACT_TYPE_INFO: TypeInfo = {
@@ -112,7 +106,7 @@ class StorageLayout {
       .filter((node) => node.nodeType === 'ImportDirective')
       .map((node) => node.absolutePath)
       .forEach((importPath) => {
-        if (this.imports.has(importPath)) { return; }
+        if (this.imports.has(importPath)) return;
         this.imports.add(importPath);
         this.artifacts.getArtifactsFromSourcePath(importPath).forEach((importedArtifact) => {
           this.collectNodes(importedArtifact.ast);
@@ -124,14 +118,14 @@ class StorageLayout {
   private collectNodes(node: Node): void {
 
     // Return if we have already seen this node.
-    if (_.some(this.nodes[node.id] || [], (n) => _.isEqual(n, node))) { return; }
+    if (_.some(this.nodes[node.id] || [], (n) => _.isEqual(n, node))) return;
 
     // Add node to collection with this id otherwise.
-    if (!this.nodes[node.id]) { this.nodes[node.id] = []; }
+    if (!this.nodes[node.id]) this.nodes[node.id] = [];
     this.nodes[node.id].push(node);
 
     // Call recursively to children.
-    if (node.nodes) { node.nodes.forEach(this.collectNodes.bind(this)); }
+    if (node.nodes) node.nodes.forEach(this.collectNodes.bind(this));
   }
 
   private visitVariables(contractNode: Node): void {
@@ -160,9 +154,7 @@ class StorageLayout {
 
   private getNode(id: number, nodeType: string): Node | never {
 
-    if (!this.nodes[id]) {
-      throw Error(`No AST nodes with id ${id} found`);
-    }
+    if (!this.nodes[id]) throw Error(`No AST nodes with id ${id} found`);
 
     const candidates = this.nodes[id].filter((node) => node.nodeType === nodeType);
     switch (candidates.length) {
@@ -286,9 +278,7 @@ class StorageLayout {
     // Identify structs by contract and name
     const referencedNode = this.getNode(referencedDeclaration, 'StructDefinition');
     const id = `t_struct<${referencedNode.canonicalName}>`;
-    if (this.types[id]) {
-      return this.types[id];
-    }
+    if (this.types[id]) return this.types[id];
 
     // We shortcircuit type registration in this scenario to handle recursive structs
     const typeInfo = { id, kind: 'struct', label: referencedNode.canonicalName, members: [] };
