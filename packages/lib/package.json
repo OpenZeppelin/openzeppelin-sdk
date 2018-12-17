@@ -9,8 +9,9 @@
     "test": "scripts/test.sh",
     "prepublishOnly": "echo 'Removing mock contracts...' && grep -hoP '^\\s*contract \\K(\\w+)' contracts/mocks/*.sol | sort | uniq | xargs -t -I% rm build/contracts/%.json",
     "compile-contracts": "rm -rf build/contracts && truffle compile",
+    "type-contracts": "npx typechain --target legacy './build/**/*.json' --outDir ./build_types/contracts",
     "compile-ts": "rm -rf lib && tsc",
-    "prepare": "npm run compile-contracts && npm run compile-ts",
+    "prepare": "npm run compile-contracts && npm run type-contracts && npm run compile-ts",
     "watch": "tsc -w",
     "lint": "npx tslint --project tsconfig.json --config ../../tslint.json",
     "lintfix": "npx tslint --project tsconfig.json --config ../../tslint.json --fix"
@@ -63,6 +64,7 @@
     "tmp": "^0.0.33",
     "truffle": "^4.1.13",
     "ts-node": "^7.0.1",
+    "typechain": "^0.3.9",
     "typescript": "^3.2.2"
   }
 }

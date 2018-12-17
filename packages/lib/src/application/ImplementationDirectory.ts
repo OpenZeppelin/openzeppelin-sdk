@@ -5,6 +5,8 @@ import ContractFactory, { ContractWrapper } from '../artifacts/ContractFactory';
 
 const log = new Logger('ImplementationDirectory');
 
+import { ImplementationDirectory as ImplementationDirectoryContract } from '../../build_types/contracts/ImplementationDirectory';
+
 // TS-TODO: This is the ABI of ImplementationDirectory.sol.
 // These could be collected at a common location in the package.
 interface DirectoryContract extends ContractWrapper {
@@ -20,6 +22,9 @@ export default class ImplementationDirectory {
   public txParams: any;
 
   public static async deploy(txParams: any = {}): Promise<ImplementationDirectory> {
+    const dir = new ImplementationDirectoryContract({}, '');
+    const own = await dir.owner;
+
     const contractClass: ContractFactory = this.getContractClass();
     log.info(`Deploying new ${contractClass.contractName}...`);
     const directory: DirectoryContract = await deploy(contractClass, [], txParams);
