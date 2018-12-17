@@ -48,27 +48,33 @@ function getUninitializedDirectBaseContracts(contractClass: ContractFactory, uni
   if (initializer === undefined) {
     // A contract may lack initializer as long as the base contracts don't have more than 1 initializers in total
     // If there are 2 or more base contracts with initializers, child contract should initialize all of them
-    if (baseContractsWithInitialize.length > 1)
-      for (const baseContract of baseContractsWithInitialize)
+    if (baseContractsWithInitialize.length > 1) {
+      for (const baseContract of baseContractsWithInitialize) {
         uninitializedBaseContracts[baseContract] = contractClass.contractName;
+      }
+    }
 
     return;
   }
 
   // Update map with each call of "initialize" function of the base contract
   const initializedContracts: any = {};
-  for (const statement of initializer.body.statements)
+  for (const statement of initializer.body.statements) {
     if (statement.nodeType === 'ExpressionStatement' && statement.expression.nodeType === 'FunctionCall') {
       const baseContractName: string = statement.expression.expression.expression.name;
       const functionName: string = statement.expression.expression.memberName;
-      if (baseContractInitializers[baseContractName] === functionName)
+      if (baseContractInitializers[baseContractName] === functionName) {
         initializedContracts[baseContractName] = true;
+      }
     }
+  }
 
   // For each base contract with "initialize" function, check that it's called in the function
-  for (const contractName of baseContractsWithInitialize)
-    if (!initializedContracts[contractName])
+  for (const contractName of baseContractsWithInitialize) {
+    if (!initializedContracts[contractName]) {
       uninitializedBaseContracts[contractName] = contractClass.contractName;
+  }
+    }
   return;
 }
 
@@ -79,8 +85,9 @@ function getContractInitializer(contractClass: ContractFactory): Node | undefine
   for (const contractFunction of contractFunctions) {
     const functionModifiers: any = contractFunction.modifiers;
     const initializerModifier: any = functionModifiers.find((m) => m.modifierName.name === 'initializer');
-    if (contractFunction.name === 'initialize' || initializerModifier !== undefined)
+    if (contractFunction.name === 'initialize' || initializerModifier !== undefined) {
       return contractFunction;
+    }
   }
   return undefined;
 }

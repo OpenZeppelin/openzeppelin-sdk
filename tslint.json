@@ -44,7 +44,7 @@
       "no-empty": [true, "allow-empty-functions"],
       "no-consecutive-blank-lines": [true, 1],
       "no-var-requires": [false],
-      "curly": [true, "ignore-same-line", "as-needed"]
+      "curly": [true, "ignore-same-line"]
     },
     "rulesDirectory": []
 }
