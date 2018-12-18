@@ -7,12 +7,52 @@ import { ContractWrapper } from 'zos-lib';
 
 const log = new Logger('ZosNetworkFile');
 
+interface ContractInterface {
+  address: string;
+  constructorCode: string;
+  localBytecodeHash: string;
+  types: any;
+  storage: any[];
+  [id: string]: any;
+}
+
+interface SolidityLibInterface {
+  address: string;
+  constructorCode: string;
+  bodyBytecodeHash: string;
+  localBytecodeHash: string;
+  deployedBytecodeHash: string;
+}
+
+interface ProxyInterface {
+  package?: string;
+  contract?: any;
+  address?: string;
+}
+
+interface DependencyInterface {
+  package?: string;
+  version?: string;
+  customDeploy?: boolean;
+}
+
 export default class ZosNetworkFile {
 
   public packageFile: ZosPackageFile;
   public network: any;
   public fileName: string;
-  public data: any;
+  public data: {
+    contracts: { [contractAlias: string]: ContractInterface };
+    solidityLibs: { [libAlias: string]: SolidityLibInterface };
+    proxies: { [contractName: string]: ProxyInterface[] };
+    zosversion: string;
+    app: any;
+    package: any;
+    provider: any;
+    version: string;
+    frozen: boolean;
+    dependencies: { [dependencyName: string]: DependencyInterface };
+  };
 
   // TS-TODO: type for network parameter (and class member too).
   constructor(packageFile: ZosPackageFile, network: any, fileName: string) {
@@ -58,7 +98,7 @@ export default class ZosNetworkFile {
     return this.data.frozen;
   }
 
-  get contracts(): any[] {
+  get contracts(): { [contractAlias: string]: ContractInterface } {
     return this.data.contracts || {};
   }
 
@@ -70,7 +110,7 @@ export default class ZosNetworkFile {
     return this.packageFile.isLightweight;
   }
 
-  get solidityLibs(): any[] {
+  get solidityLibs(): { [libAlias: string]: SolidityLibInterface } {
     return this.data.solidityLibs || {};
   }
 
@@ -88,25 +128,25 @@ export default class ZosNetworkFile {
     delete this.data.solidityLibs[libName];
   }
 
-  public setSolidityLib(alias: string, value: any): void {
+  public setSolidityLib(alias: string, value: SolidityLibInterface): void {
     if (!this.data.solidityLibs) this.data.solidityLibs = {};
     this.data.solidityLibs[alias] = value;
   }
 
-  public solidityLib(libName: string): any {
+  public solidityLib(libName: string): SolidityLibInterface {
     return this.data.solidityLibs[libName];
   }
 
-  public getSolidityLibs(libs: any): any {
+  public getSolidityLibs(libs: string[]): { [libAlias: string]: string } {
     const { solidityLibs } = this.data;
 
     return Object
       .keys(solidityLibs)
       .filter((libName) => libs.includes(libName))
       .map((libName) => ({ libName, address: solidityLibs[libName].address }))
-      .reduce((someLibs, currentLib) => {
-        someLibs[currentLib.libName] = currentLib.address;
-        return someLibs;
+      .reduce((someLib, currentLib) => {
+        someLib[currentLib.libName] = currentLib.address;
+        return someLib;
       }, {});
   }
 
@@ -118,7 +158,7 @@ export default class ZosNetworkFile {
     return _.difference(Object.keys(this.solidityLibs), libs);
   }
 
-  public getSolidityLibOrContract(aliasOrName: string): any {
+  public getSolidityLibOrContract(aliasOrName: string): ContractInterface | SolidityLibInterface {
     return this.data.solidityLibs[aliasOrName] || this.data.contracts[aliasOrName];
   }
 
@@ -126,13 +166,13 @@ export default class ZosNetworkFile {
     return this.hasSolidityLib(aliasOrName) || this.hasContract(aliasOrName);
   }
 
-  public updateImplementation(aliasOrName: string, fn: (...args: any[]) => any): void {
-    if (this.hasContract(aliasOrName)) this.data.contracts[aliasOrName] = fn(this.data.contracts[aliasOrName]);
-    else if (this.hasSolidityLib(aliasOrName)) this.data.solidityLibs[aliasOrName] = fn(this.data.solidityLibs[aliasOrName]);
+  public updateImplementation(aliasOrName: string, fn: (source: ContractInterface | SolidityLibInterface) => ContractInterface | SolidityLibInterface): void {
+    if (this.hasContract(aliasOrName)) this.data.contracts[aliasOrName] = <ContractInterface>fn(this.data.contracts[aliasOrName]);
+    else if (this.hasSolidityLib(aliasOrName)) this.data.solidityLibs[aliasOrName] = <SolidityLibInterface>fn(this.data.solidityLibs[aliasOrName]);
     else return;
   }
 
-  get dependencies(): any[] {
+  get dependencies(): { [dependencyName: string]: DependencyInterface } {
     return this.data.dependencies || {};
   }
 
@@ -140,7 +180,7 @@ export default class ZosNetworkFile {
     return Object.keys(this.dependencies);
   }
 
-  public getDependency(name: string): any | null {
+  public getDependency(name: string): DependencyInterface | null {
     if (!this.data.dependencies) return null;
     return this.data.dependencies[name] || {};
   }
@@ -153,7 +193,7 @@ export default class ZosNetworkFile {
     return !_.isEmpty(this.dependencies);
   }
 
-  public getProxies({ package: packageName, contract, address }: {package?: string, contract?: any, address?: string} = {}): any[] {
+  public getProxies({ package: packageName, contract, address }: ProxyInterface = {}): ProxyInterface[] {
     if (_.isEmpty(this.data.proxies)) return [];
     const allProxies = _.flatMap(this.data.proxies || {}, (proxiesList, fullname) => (
       _.map(proxiesList, (proxyInfo) => ({
@@ -174,7 +214,7 @@ export default class ZosNetworkFile {
     return _.find(allProxies, { address });
   }
 
-  public contract(alias: string): any {
+  public contract(alias: string): ContractInterface {
     return this.data.contracts[alias];
   }
 
@@ -233,11 +273,11 @@ export default class ZosNetworkFile {
     this.data.version = version;
   }
 
-  set contracts(contracts: any[]) {
+  set contracts(contracts: { [contractAlias: string]: ContractInterface }) {
     this.data.contracts = contracts;
   }
 
-  set solidityLibs(solidityLibs: any[]) {
+  set solidityLibs(solidityLibs: { [libAlias: string]: SolidityLibInterface }) {
     this.data.solidityLibs = solidityLibs;
   }
 
@@ -257,7 +297,7 @@ export default class ZosNetworkFile {
     this.data.package = _package;
   }
 
-  public setDependency(name: string, { package: thepackage, version, customDeploy }: {package?: string, version?: string, customDeploy?: any} = {}) {
+  public setDependency(name: string, { package: thepackage, version, customDeploy }: DependencyInterface = {}) {
     if (!this.data.dependencies) this.data.dependencies = {};
 
     const dependency = {
@@ -293,7 +333,7 @@ export default class ZosNetworkFile {
     });
   }
 
-  public setContract(alias: string, value: any): void {
+  public setContract(alias: string, value: ContractInterface): void {
     this.data.contracts[alias] = value;
   }
 
@@ -301,12 +341,12 @@ export default class ZosNetworkFile {
     delete this.data.contracts[alias];
   }
 
-  public setProxies(packageName: string, alias: string, value: any): void {
+  public setProxies(packageName: string, alias: string, value: ProxyInterface[]): void {
     const fullname = toContractFullName(packageName, alias);
     this.data.proxies[fullname] = value;
   }
 
-  public addProxy(thepackage: string, alias: string, info: any): void {
+  public addProxy(thepackage: string, alias: string, info: ProxyInterface): void {
     const fullname = toContractFullName(thepackage, alias);
     if(!this.data.proxies[fullname]) this.data.proxies[fullname] = [];
     this.data.proxies[fullname].push(info);
@@ -342,7 +382,7 @@ export default class ZosNetworkFile {
     return _.findIndex(this.data.proxies[fullname], { address });
   }
 
-  public _proxiesOf(fullname: string): string[] {
+  public _proxiesOf(fullname: string): ProxyInterface[] {
     return this.data.proxies[fullname] || [];
   }
 
