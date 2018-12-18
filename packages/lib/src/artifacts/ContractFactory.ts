@@ -57,13 +57,13 @@ export default class ContractFactory {
     this._validateNonUnlinkedLibraries();
 
     const [args, txParams] = this._parseArguments(passedArguments);
-    if (!txParams.data) { txParams.data = this.binary; }
+    if (!txParams.data) txParams.data = this.binary;
     const self = this;
 
     return new Promise(function(resolve, reject) {
       const contractClass: any = ZWeb3.contract(self.abi);
       contractClass.new(...args, txParams, function(error, instance) {
-        if (error) { reject(error); }
+        if (error) reject(error);
         else if (instance && instance.address) {
           const wrapper: ContractWrapper = self._wrapContract(instance);
           resolve(wrapper);
@@ -73,7 +73,7 @@ export default class ContractFactory {
   }
 
   public at(address: string): ContractWrapper | never {
-    if (!ZWeb3.isAddress(address)) { throw new Error('Given address is not valid: ' + address); }
+    if (!ZWeb3.isAddress(address)) throw new Error('Given address is not valid: ' + address);
     const contractClass: any = ZWeb3.contract(this.abi);
     const contract: any = contractClass.at(address);
 
@@ -164,9 +164,7 @@ export default class ContractFactory {
     let givenTxParams = {};
     if (params.length > 0) {
       const lastArg = params[params.length - 1];
-      if (typeof(lastArg) === 'object' && !Array.isArray(lastArg) && !BN.isBigNumber(lastArg)) {
-        givenTxParams = params.pop();
-      }
+      if (typeof(lastArg) === 'object' && !Array.isArray(lastArg) && !BN.isBigNumber(lastArg)) givenTxParams = params.pop();
     }
     const txParams = { ...this.txParams, ...givenTxParams };
     return [params, txParams];
@@ -191,9 +189,7 @@ export default class ContractFactory {
   }
 
   private _validateNonEmptyBinary(): void | never {
-    if (this.bytecode === '') {
-      throw new Error(`A bytecode must be provided for contract ${this.contractName}.`);
-    }
+    if (this.bytecode === '') throw new Error(`A bytecode must be provided for contract ${this.contractName}.`);
   }
 
   private _validateNonUnlinkedLibraries(): void | never {

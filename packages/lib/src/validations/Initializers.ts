@@ -19,7 +19,7 @@ export function getUninitializedBaseContracts(contractClass: ContractFactory): s
 function getUninitializedDirectBaseContracts(contractClass: ContractFactory, uninitializedBaseContracts: any): void {
   // Check whether the contract has base contracts
   const baseContracts: any = contractClass.ast.nodes.find((n) => n.name === contractClass.contractName).baseContracts;
-  if (baseContracts.length === 0) { return; }
+  if (baseContracts.length === 0) return;
 
   // Run check for the base contracts
   for (const baseContract of baseContracts) {
@@ -53,6 +53,7 @@ function getUninitializedDirectBaseContracts(contractClass: ContractFactory, uni
         uninitializedBaseContracts[baseContract] = contractClass.contractName;
       }
     }
+
     return;
   }
 
@@ -72,8 +73,8 @@ function getUninitializedDirectBaseContracts(contractClass: ContractFactory, uni
   for (const contractName of baseContractsWithInitialize) {
     if (!initializedContracts[contractName]) {
       uninitializedBaseContracts[contractName] = contractClass.contractName;
-    }
   }
+    }
   return;
 }
 

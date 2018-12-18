@@ -37,15 +37,10 @@ function storageEntryMatches(originalVar: StorageInfo, updatedVar: StorageInfo, 
   const typeMatches = (originalType.id === updatedType.id);
   const nameMatches = (originalVar.label === updatedVar.label);
 
-  if (typeMatches && nameMatches) {
-    return 'equal';
-  } else if (typeMatches) {
-    return 'rename';
-  } else if (nameMatches) {
-    return 'typechange';
-  } else {
-    return 'replace';
-  }
+  if (typeMatches && nameMatches) return 'equal';
+  else if (typeMatches) return 'rename';
+  else if (nameMatches) return 'typechange';
+  else return 'replace';
 }
 
 // Adapted from https://gist.github.com/andrei-m/982927 by Andrei Mackenzie
@@ -54,8 +49,8 @@ function levenshtein(originalStorage: StorageInfo[], updatedStorage: StorageInfo
   const a = originalStorage;
   const b = updatedStorage;
 
-  if (a.length === 0) { return [[b.length * INSERTION_COST]]; }
-  if (b.length === 0) { return [[a.length * DELETION_COST]]; }
+  if (a.length === 0) return [[b.length * INSERTION_COST]];
+  if (b.length === 0) return [[a.length * DELETION_COST]];
 
   const matrix: any[] = Array(a.length + 1);
 
@@ -66,16 +61,15 @@ function levenshtein(originalStorage: StorageInfo[], updatedStorage: StorageInfo
   }
 
   // increment each column in the first row
-  for (let j = 0; j <= b.length; j++) {
-    matrix[0][j] = j * INSERTION_COST;
-  }
+  for (let j = 0; j <= b.length; j++) matrix[0][j] = j * INSERTION_COST;
 
   // fill in the rest of the matrix
   for (let i = 1; i <= a.length; i++) {
     for (let j = 1; j <= b.length; j++) {
       if (areEqualFn(a[i - 1], b[j - 1])) {
         matrix[i][j] = matrix[i - 1][j - 1];
-      } else {
+      }
+      else {
         const insertionCost = j > a.length ? 0 : INSERTION_COST; // appending is free
         matrix[i][j] = Math.min(matrix[i - 1][j - 1] + SUBSTITUTION_COST,
                                 matrix[i][j - 1] + insertionCost,
@@ -121,9 +115,8 @@ function walk(matrix: number[][], originalStorage: StorageInfo[], updatedStorage
       operations.unshift({ action: matchResult, updated, original });
       i--;
       j--;
-    } else {
-      throw Error(`Could not walk matrix at position ${i},${j}:\n${(<any> matrix).map(util.inspect).join('\n')}\n`);
     }
+    else throw Error(`Could not walk matrix at position ${i},${j}:\n${(<any> matrix).map(util.inspect).join('\n')}\n`);
   }
 
   return operations;

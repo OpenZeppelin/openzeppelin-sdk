@@ -5,7 +5,7 @@ import Package from '../application/Package';
 import ImplementationDirectory from '../application/ImplementationDirectory';
 import BasePackageProject from './BasePackageProject';
 import SimpleProject from './SimpleProject';
-import ContractFactory, { ContractWrapper }  from '../artifacts/ContractFactory';
+import ContractFactory, { ContractWrapper } from '../artifacts/ContractFactory';
 import { DeployError } from '../utils/errors/DeployError';
 import { semanticVersionToString } from '../utils/Semver';
 
@@ -39,13 +39,9 @@ export default class AppProject extends BasePackageProject {
       app = appAddress
         ? await App.fetch(appAddress, txParams)
         : await App.deploy(txParams);
-      if (packageAddress) {
-        thepackage = await Package.fetch(packageAddress, txParams);
-      } else if (await app.hasPackage(name, version)) {
-        thepackage = (await app.getPackage(name)).package;
-      } else {
-        thepackage = await Package.deploy(txParams);
-      }
+      if (packageAddress) thepackage = await Package.fetch(packageAddress, txParams);
+      else if (await app.hasPackage(name, version)) thepackage = (await app.getPackage(name)).package;
+      else thepackage = await Package.deploy(txParams);
       directory = await thepackage.hasVersion(version)
         ? await thepackage.getDirectory(version)
         : await thepackage.newVersion(version);
@@ -103,9 +99,7 @@ export default class AppProject extends BasePackageProject {
   }
 
   public async getCurrentDirectory(): Promise<ImplementationDirectory> {
-    if (!this.directory) {
-      this.directory = await this.app.getProvider(this.name);
-    }
+    if (!this.directory) this.directory = await this.app.getProvider(this.name);
     return this.directory;
   }
 

@@ -20,12 +20,12 @@ export function createDir(dir: string): void {
 }
 
 export function createDirPath(dirPath: string): void {
-  const folders = dirPath.split('/')
+  const folders = dirPath.split('/');
   folders.reduce((subDir, folder) => {
-    const subFolderPath = `${subDir}/${folder}`
-    if (folder && !exists(subFolderPath)) createDir(subFolderPath)
-    return subFolderPath
-  }, '')
+    const subFolderPath = `${subDir}/${folder}`;
+    if (folder && !exists(subFolderPath)) createDir(subFolderPath);
+    return subFolderPath;
+  }, '');
 }
 
 export function isDir(targetPath: string): boolean {
@@ -33,15 +33,11 @@ export function isDir(targetPath: string): boolean {
 }
 
 export function ifExistsThrow(filename: string, message: string): void {
-  if (exists(filename)) {
-    throw Error(message);
-  }
+  if (exists(filename)) throw Error(message);
 }
 
 export function ifNotExistsThrow(filename: string, message: string): void {
-  if (!exists(filename)) {
-    throw Error(message);
-  }
+  if (!exists(filename)) throw Error(message);
 }
 
 // TS-TODO: Returned object could be of a more specific type
@@ -50,12 +46,8 @@ export function parseJson(filename: string): {} {
 }
 
 export function parseJsonIfExists(filename: string): {} | null {
-  if (exists(filename)) {
-    return JSON.parse(read(filename));
-  }
-  else {
-    return null;
-  }
+  if (exists(filename)) return JSON.parse(read(filename));
+  else return null;
 }
 
 export function editJson(file: string, edit: ({}) => void): void {

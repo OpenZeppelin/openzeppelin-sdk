@@ -53,18 +53,18 @@ export default class Package {
     return this.packageContract.hasVersion(toSemanticVersion(version));
   }
 
-  public async isFrozen(version: string): Promise<boolean> | never {
+  public async isFrozen(version: string): Promise<boolean | never> {
     const directory = await this.getDirectory(version);
     return directory.isFrozen();
   }
 
-  public async freeze(version: string): Promise<any> | never {
+  public async freeze(version: string): Promise<any | never> {
     const directory = await this.getDirectory(version);
     if (!directory.freeze) throw Error('Implementation directory does not support freezing');
     return directory.freeze();
   }
 
-  public async getImplementation(version: string, contractName: string): Promise<string> | never {
+  public async getImplementation(version: string, contractName: string): Promise<string | never> {
     const directory = await this.getDirectory(version);
     return directory.getImplementation(contractName);
   }
@@ -78,7 +78,7 @@ export default class Package {
     return directory;
   }
 
-  public async getDirectory(version: string): Promise<ImplementationDirectory> | never {
+  public async getDirectory(version: string): Promise<ImplementationDirectory | never> {
     if (!version) throw Error('Cannot get a directory from a package without specifying a version');
     const directoryAddress = await this.packageContract.getContract(toSemanticVersion(version));
     return ImplementationDirectory.fetch(directoryAddress, this.txParams);

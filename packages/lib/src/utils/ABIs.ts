@@ -26,13 +26,13 @@ export function buildCallData(contractClass: ContractFactory, methodName: string
 
 export function getABIFunction(contractClass: ContractFactory, methodName: string, args: any[]): FunctionInfo {
   const targetMethod: FunctionInfo = tryGetTargetFunction(contractClass, methodName, args);
-  if (targetMethod) { methodName = targetMethod.name; }
+  if (targetMethod) methodName = targetMethod.name;
 
   const matchArgsTypes = (fn) => targetMethod && fn.inputs.every((input, index) => targetMethod.inputs[index] && targetMethod.inputs[index].type === input.type);
   const matchNameAndArgsLength = (fn) => fn.name === methodName && fn.inputs.length === args.length;
 
   let abiMethods: FunctionInfo[] = contractClass.abi.filter((fn) => matchNameAndArgsLength(fn) && matchArgsTypes(fn));
-  if (abiMethods.length === 0) { abiMethods = contractClass.abi.filter((fn) => matchNameAndArgsLength(fn)); }
+  if (abiMethods.length === 0) abiMethods = contractClass.abi.filter((fn) => matchNameAndArgsLength(fn));
 
   switch (abiMethods.length) {
     case 0: throw Error(`Could not find method ${methodName} with ${args.length} arguments in contract ${contractClass.contractName}`);
@@ -64,7 +64,7 @@ function tryGetTargetFunction(contractClass: ContractFactory, methodName: string
 
 function tryGetFunctionNodeFromMostDerivedContract(contractClass: ContractFactory, methodName: string, args: any[]): Node | null {
   const linearizedBaseContracts: Node[] | null = tryGetLinearizedBaseContracts(contractClass);
-  if (!linearizedBaseContracts) { return null; }
+  if (!linearizedBaseContracts) return null;
 
   const nodeMatches = (node: Node) => (
     node.nodeType === 'FunctionDefinition' &&

@@ -10,9 +10,7 @@ export function hasInitialValuesInDeclarations(contractClass: ContractFactory): 
 function detectInitialValues(contractClass: ContractFactory): boolean {
   const nodes = contractClass.ast.nodes.filter((n) => n.name === contractClass.contractName);
   for (const node of nodes) {
-    if (hasInitialValues(node)) {
-      return true;
-    }
+    if (hasInitialValues(node)) return true;
     for (const baseContract of node.baseContracts || []) {
       const parentContract: ContractFactory = Contracts.getFromLocal(baseContract.baseName.name);
       return detectInitialValues(parentContract);

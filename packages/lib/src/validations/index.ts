@@ -48,7 +48,7 @@ export function validationPasses(validations: any): boolean {
 
 function validateStorage(contractClass: ContractFactory, existingContractInfo: any = {}, buildArtifacts: any = null): any {
   const originalStorageInfo = _.pick(existingContractInfo, 'storage', 'types');
-  if (_.isEmpty(originalStorageInfo.storage)) { return { }; }
+  if (_.isEmpty(originalStorageInfo.storage)) return {};
 
   const updatedStorageInfo = getStorageLayout(contractClass, buildArtifacts);
   const storageUncheckedVars = getStructsOrEnums(updatedStorageInfo);

@@ -63,8 +63,6 @@ export default class Proxy {
     const currentAdmin: string = await this.admin();
     const { from }: { from?: string } = this.txParams;
     // TODO: If no `from` is set, load which is the default account and use it to compare against the current admin
-    if (from && currentAdmin !== from) {
-      throw new Error(`Cannot modify proxy from non-admin account: current admin is ${currentAdmin} and sender is ${from}`);
-    }
+    if (from && currentAdmin !== from) throw new Error(`Cannot modify proxy from non-admin account: current admin is ${currentAdmin} and sender is ${from}`);
   }
 }
