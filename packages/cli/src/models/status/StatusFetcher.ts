@@ -1,40 +1,52 @@
 import { ZWeb3, Contracts, Logger, FileSystem as fs, bytecodeDigest, bodyCode, constructorCode } from 'zos-lib';
+import ZosNetworkFile from '../files/ZosNetworkFile';
 
 const log = new Logger('StatusFetcher');
 
+interface ComparedObject {
+  name?: string;
+  address?: string;
+  alias?: string;
+  bodyBytecodeHash?: string;
+  packageName?: string;
+  package?: string;
+  implementation?: string;
+  version?: string;
+}
+
 export default class StatusFetcher {
 
-  public networkFile: any;
+  public networkFile: ZosNetworkFile;
 
   constructor(networkFile) {
     this.networkFile = networkFile;
   }
 
-  public onEndChecking() {
+  public onEndChecking(): void {
     log.info('Your project is up to date.');
   }
 
-  public onMismatchingVersion(expected, observed) {
+  public onMismatchingVersion(expected: string, observed: string): void {
     log.info(`Updating version from ${expected} to ${observed}`);
     this.networkFile.version = observed;
   }
 
-  public onMismatchingPackage(expected, observed) {
+  public onMismatchingPackage(expected: string, observed: string): void {
     log.info(`Updating package from ${expected} to ${observed}`);
     this.networkFile.package = { address: observed };
   }
 
-  public onMismatchingProvider(expected, observed) {
+  public onMismatchingProvider(expected: string, observed: string): void {
     log.info(`Updating provider from ${expected} to ${observed}`);
     this.networkFile.provider = { address: observed };
   }
 
-  public onUnregisteredLocalImplementation(expected, observed, { alias, address }) {
+  public onUnregisteredLocalImplementation(expected: string, observed: string, { alias, address }: ComparedObject): void {
     log.info(`Removing unregistered local contract ${alias} ${address}`);
     this.networkFile.unsetContract(alias);
   }
 
-  public async onMissingRemoteImplementation(expected, observed, { alias, address }) {
+  public async onMissingRemoteImplementation(expected: string, observed: string, { alias, address }: ComparedObject): Promise<void> {
     const contractName = this.networkFile.packageFile.contract(alias) || alias;
     log.info(`Adding contract ${contractName} at ${address}`);
     const buildPath = Contracts.getLocalPath(contractName);
@@ -59,61 +71,61 @@ export default class StatusFetcher {
     }
   }
 
-  public onMismatchingImplementationAddress(expected, observed, { alias, address }) {
+  public onMismatchingImplementationAddress(expected: string, observed: string, { alias, address }: ComparedObject): void {
     log.info(`Updating address of contract ${alias} from ${expected} to ${observed}`);
     this.networkFile.updateImplementation(alias, (implementation) => ({ ...implementation, address }));
   }
 
-  public onMismatchingImplementationBodyBytecode(expected, observed, { alias, address, bodyBytecodeHash }) {
+  public onMismatchingImplementationBodyBytecode(expected: string, observed: string, { alias, address, bodyBytecodeHash }: ComparedObject): void {
     log.info(`Updating bytecodeHash of contract ${alias} from ${expected} to ${observed}`);
     this.networkFile.updateImplementation(alias, (implementation) => ({ ...implementation, bodyBytecodeHash }));
   }
 
-  public onUnregisteredLocalProxy(expected, observed, { packageName, alias, address, implementation }) {
+  public onUnregisteredLocalProxy(expected: string, observed: string, { packageName, alias, address, implementation }: ComparedObject): void {
     log.info(`Removing unregistered local proxy of ${alias} at ${address} pointing to ${implementation}`);
     this.networkFile.removeProxy(packageName, alias, address);
   }
 
-  public onMissingRemoteProxy(expected, observed, { packageName, alias, address, implementation }) {
+  public onMissingRemoteProxy(expected: string, observed: string, { packageName, alias, address, implementation }: ComparedObject): void {
     log.info(`Adding missing proxy of ${alias} at ${address} pointing to ${implementation}`);
     this.networkFile.addProxy(packageName, alias, { address, version: 'unknown', implementation });
   }
 
-  public onMismatchingProxyAlias(expected, observed, { packageName, address, version, implementation }) {
+  public onMismatchingProxyAlias(expected: string, observed: string, { packageName, address, version, implementation }: ComparedObject): void {
     log.info(`Changing alias of package ${packageName} proxy at ${address} pointing to ${implementation} from ${expected} to ${observed}`);
     this.networkFile.removeProxy(packageName, expected, address);
     this.networkFile.addProxy(packageName, observed, { address, version, implementation });
   }
 
-  public onMismatchingProxyImplementation(expected, observed, { packageName, address, version, implementation, alias }) {
+  public onMismatchingProxyImplementation(expected: string, observed: string, { packageName, address, version, implementation, alias }: ComparedObject): void {
     log.info(`Changing implementation of proxy ${alias} at ${address} from ${expected} to ${observed}`);
     this.networkFile.updateProxy({ package: packageName, contract: alias, address }, (proxy) => ({ ...proxy, implementation: observed }));
   }
 
-  public onUnregisteredProxyImplementation(expected, observed, { address, implementation }) {
+  public onUnregisteredProxyImplementation(expected: string, observed: string, { address, implementation }: ComparedObject): void {
     log.error(`Proxy at ${address} is pointing to ${implementation}, but given implementation is not registered in project`);
   }
 
-  public onMultipleProxyImplementations(expected, observed, { implementation }) {
+  public onMultipleProxyImplementations(expected: string, observed: string, { implementation }: ComparedObject): void {
     log.warn(`The same implementation address ${implementation} was registered under many aliases (${observed}). Please check them in the list of registered contracts.`);
   }
 
-  public onMissingDependency(expected, observed, { name, address, version }) {
+  public onMissingDependency(expected: string, observed: string, { name, address, version }: ComparedObject): void {
     log.info(`Adding missing dependency ${name} at ${address} with version ${version}`);
     this.networkFile.setDependency(name, { package: address, version });
   }
 
-  public onMismatchingDependencyAddress(expected, observed, { name, address }) {
+  public onMismatchingDependencyAddress(expected: string, observed: string, { name, address }: ComparedObject): void {
     log.info(`Changing dependency ${name} package address from ${expected} to ${observed}`);
     this.networkFile.updateDependency(name, (dependency) => ({ ...dependency, package: observed }));
   }
 
-  public onMismatchingDependencyVersion(expected, observed, { name, version }) {
+  public onMismatchingDependencyVersion(expected: string, observed: string, { name, version }: ComparedObject): void {
     log.info(`Changing dependency ${name} version from ${expected} to ${observed}`);
     this.networkFile.updateDependency(name, (dependency) =>({ ...dependency, version: observed }));
   }
 
-  public onUnregisteredDependency(expected, observed, { name, package: packageAddress }) {
+  public onUnregisteredDependency(expected: string, observed: string, { name, package: packageAddress }: ComparedObject): void {
     log.info(`Removing unregistered local dependency of ${name} at ${packageAddress}`);
     this.networkFile.unsetDependency(name);
   }

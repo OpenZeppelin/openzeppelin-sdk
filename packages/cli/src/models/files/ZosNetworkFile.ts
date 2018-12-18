@@ -7,16 +7,18 @@ import { ContractWrapper } from 'zos-lib';
 
 const log = new Logger('ZosNetworkFile');
 
-export interface ContractInterface {
+interface ContractInterface {
   address: string;
   constructorCode: string;
   localBytecodeHash: string;
-  types: any;
-  storage: any[];
-  [id: string]: any;
+  deployedBytecodeHash: string;
+  bodyBytecodeHash?: string;
+  types?: any;
+  storage?: any;
+  warnings?: any;
 }
 
-export interface SolidityLibInterface {
+interface SolidityLibInterface {
   address: string;
   constructorCode: string;
   bodyBytecodeHash: string;
@@ -24,16 +26,26 @@ export interface SolidityLibInterface {
   deployedBytecodeHash: string;
 }
 
-export interface ProxyInterface {
+interface ProxyInterface {
   package?: string;
   contract?: any;
   address?: string;
+  version?: string;
+  implementation?: string;
 }
 
-export interface DependencyInterface {
+interface DependencyInterface {
   package?: string;
   version?: string;
   customDeploy?: boolean;
+}
+
+interface PackageInterface {
+  address?: string;
+}
+
+interface ProviderInterface {
+  address?: string;
 }
 
 export default class ZosNetworkFile {
@@ -47,8 +59,8 @@ export default class ZosNetworkFile {
     proxies: { [contractName: string]: ProxyInterface[] };
     zosversion: string;
     app: any;
-    package: any;
-    provider: any;
+    package: PackageInterface;
+    provider: ProviderInterface;
     version: string;
     frozen: boolean;
     dependencies: { [dependencyName: string]: DependencyInterface };
@@ -74,7 +86,7 @@ export default class ZosNetworkFile {
     return this.app.address;
   }
 
-  get package(): any {
+  get package(): PackageInterface {
     return this.data.package || {};
   }
 
@@ -82,7 +94,7 @@ export default class ZosNetworkFile {
     return this.package.address;
   }
 
-  get provider(): any {
+  get provider(): ProviderInterface {
     return this.data.provider || {};
   }
 
@@ -289,11 +301,11 @@ export default class ZosNetworkFile {
     this.data.app = app;
   }
 
-  set provider(provider: any) {
+  set provider(provider: ProviderInterface) {
     this.data.provider = provider;
   }
 
-  set package(_package: any) {
+  set package(_package: PackageInterface) {
     this.data.package = _package;
   }
 
