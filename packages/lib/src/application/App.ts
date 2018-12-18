@@ -15,7 +15,8 @@ import { deploy as deployContract, sendTransaction, sendDataTransaction } from '
 const log: Logger = new Logger('App');
 
 export default class App {
-  private appContract: any;
+
+  public appContract: any;
   private txParams: any;
 
   public static async fetch(address: string, txParams: any = {}): Promise<App> {

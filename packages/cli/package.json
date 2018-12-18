@@ -6,11 +6,13 @@
   "private": false,
   "license": "MIT",
   "scripts": {
-    "compile-babel": "rm -rf lib && babel src --out-dir lib",
-    "prepare": "npm run compile-babel",
+    "compile-ts": "rm -rf lib && tsc",
+    "prepare": "npm run compile-ts",
     "test": "./scripts/test.sh",
     "gen-docs": "babel-node docs/bin/docs.js",
-    "watch": "babel src -w -d lib"
+    "watch": "tsc -w",
+    "lint": "npx tslint --project tsconfig.json --config ../../tslint.json",
+    "lintfix": "npx tslint --project tsconfig.json --config ../../tslint.json --fix"
   },
   "bin": {
     "zos": "./lib/bin/zos-cli.js"
@@ -46,12 +48,8 @@
     "zos-lib": "^2.0.1"
   },
   "devDependencies": {
-    "babel-cli": "^6.26.0",
-    "babel-plugin-transform-object-rest-spread": "^6.26.0",
-    "babel-polyfill": "^6.26.0",
-    "babel-preset-env": "^1.7.0",
-    "babel-preset-react": "^6.24.1",
-    "babel-register": "^6.26.0",
+    "@types/mocha": "^5.2.5",
+    "@types/node": "^10.12.12",
     "chai": "^4.1.2",
     "chai-as-promised": "^7.1.1",
     "chai-bignumber": "^2.0.2",
@@ -67,6 +65,8 @@
     "sinon": "^6.1.4",
     "sinon-chai": "^3.2.0",
     "solc": "^0.5.1",
-    "truffle": "^4.1.13"
+    "truffle": "^4.1.13",
+    "ts-node": "^7.0.1",
+    "typescript": "^3.2.2"
   }
 }
