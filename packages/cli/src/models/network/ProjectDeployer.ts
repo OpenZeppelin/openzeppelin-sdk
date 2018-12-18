@@ -1,107 +1,137 @@
-import { AppProject, PackageProject, SimpleProject } from "zos-lib";
 import _ from 'lodash';
+import { AppProject, PackageProject, SimpleProject, App, Package, ImplementationDirectory } from 'zos-lib';
+
+import NetworkController from './NetworkController';
+import { ZosPackageFile, ZosNetworkFile } from '../files/index';
+
+interface PartialDeploy {
+  app?: App;
+  thepackage?: Package;
+  directory?: ImplementationDirectory;
+}
+
+interface ExistingAddresses {
+  appAddress?: string;
+  packageAddress?: string;
+}
+
+interface CreateProjectFn {
+  (addresses: ExistingAddresses): Promise<AppProject>;
+}
 
 class BaseProjectDeployer {
-  constructor(controller, requestedVersion) {
-    this.controller = controller
-    this.packageFile = controller.packageFile
-    this.networkFile = controller.networkFile
-    this.txParams = controller.txParams
-    this.requestedVersion = requestedVersion
+  protected controller: NetworkController;
+  protected packageFile: ZosPackageFile;
+  protected networkFile: ZosNetworkFile;
+  protected txParams: any;
+  protected requestedVersion: string;
+
+  constructor(controller: NetworkController, requestedVersion: string) {
+    this.controller = controller;
+    this.packageFile = controller.packageFile;
+    this.networkFile = controller.networkFile;
+    this.txParams = controller.txParams;
+    this.requestedVersion = requestedVersion;
   }
 }
 
 class BasePackageProjectDeployer extends BaseProjectDeployer {
-  get packageAddress() {
-    return this.controller.packageAddress
+  get packageAddress(): string {
+    return this.controller.packageAddress;
   }
 
-  _tryRegisterPartialDeploy({ thepackage, directory }) {
-    if (thepackage) this._registerPackage(thepackage)
-    if (directory) this._registerVersion(this.requestedVersion, directory)
+  protected _tryRegisterPartialDeploy({ thepackage, directory }: PartialDeploy): void {
+    if (thepackage) this._registerPackage(thepackage);
+    if (directory) this._registerVersion(this.requestedVersion, directory);
   }
 
-  _registerPackage({ address }) {
-    this.networkFile.package = { address }
+  protected _registerPackage({ address }: { address: string }): void {
+    this.networkFile.package = { address };
   }
 
-  _registerVersion(version, { address }) {
-    this.networkFile.provider = { address }
-    this.networkFile.version = version
+  protected _registerVersion(version: string, { address }: { address: string }): void {
+    this.networkFile.provider = { address };
+    this.networkFile.version = version;
   }
 }
 
 export class SimpleProjectDeployer extends BaseProjectDeployer {
-  async fetchOrDeploy() {
-    this.project = new SimpleProject(this.packageFile.name, this.txParams)
-    this.networkFile.version = this.requestedVersion
-    _.forEach(this.networkFile.contracts, (contractInfo, contractAlias) => {
-      this.project.registerImplementation(contractAlias, contractInfo)
-    })
-    _.forEach(this.networkFile.dependencies, (dependencyInfo, dependencyName) => {
-      this.project.setDependency(dependencyName, dependencyInfo.package, dependencyInfo.version)
-    })
+  public project: SimpleProject;
 
-    return this.project
+  public async fetchOrDeploy(): Promise<SimpleProject> {
+    this.project = new SimpleProject(this.packageFile.name, this.txParams);
+    this.networkFile.version = this.requestedVersion;
+    _.forEach(this.networkFile.contracts, (contractInfo, contractAlias) => {
+      this.project.registerImplementation(contractAlias, contractInfo);
+    });
+    _.forEach(this.networkFile.dependencies, (dependencyInfo, dependencyName) => {
+      this.project.setDependency(dependencyName, dependencyInfo.package, dependencyInfo.version);
+    });
+
+    return this.project;
   }
 }
 
 export class PackageProjectDeployer extends BasePackageProjectDeployer {
-  async fetchOrDeploy() {
+  public project: PackageProject;
+
+  public async fetchOrDeploy(): Promise<PackageProject> {
     try {
-      const packageAddress = this.packageAddress
-      this.project = await PackageProject.fetchOrDeploy(this.requestedVersion, this.txParams, { packageAddress })
-      this._registerPackage(await this.project.getProjectPackage())
-      this._registerVersion(this.requestedVersion, await this.project.getCurrentDirectory())
-      return this.project
+      const packageAddress: string = this.packageAddress;
+      this.project = await PackageProject.fetchOrDeploy(this.requestedVersion, this.txParams, { packageAddress });
+      this._registerPackage(await this.project.getProjectPackage());
+      this._registerVersion(this.requestedVersion, await this.project.getCurrentDirectory());
+      return this.project;
     } catch(deployError) {
-      this._tryRegisterPartialDeploy(deployError)
-      if (!this.project) throw deployError
+      this._tryRegisterPartialDeploy(deployError);
+      if (!this.project) throw deployError;
     }
   }
 }
 
 export class AppProjectDeployer extends BasePackageProjectDeployer {
-  async fetchOrDeploy() {
-    return this._run(existingAddresses => (
+  public project: AppProject;
+
+  public async fetchOrDeploy(): Promise<AppProject> {
+    return this._run((existingAddresses: ExistingAddresses) => (
       AppProject.fetchOrDeploy(this.packageFile.name, this.requestedVersion, this.txParams, existingAddresses)
-    ))
+    ));
   }
 
-  async fromSimpleProject(simpleProject) {
-    return this._run(existingAddresses => (
-      AppProject.fromSimpleProject(simpleProject, this.requestedVersion, this.txParams, existingAddresses)
-    ))
+  public async fromSimpleProject(simpleProject: SimpleProject): Promise<AppProject> {
+    return this._run((existingAddresses: ExistingAddresses) => (
+      AppProject.fromSimpleProject(simpleProject, this.requestedVersion, existingAddresses)
+    ));
   }
 
-  get appAddress() {
-    return this.controller.appAddress
+  get appAddress(): string {
+    return this.controller.appAddress;
   }
 
-  async _run(createProjectFn) {
+  public async _run(createProjectFn: CreateProjectFn): Promise<AppProject | never> {
     try {
-      const { appAddress, packageAddress } = this
-      this.project = await createProjectFn({ appAddress, packageAddress })
-      await this._registerDeploy()
-      return this.project
+      const { appAddress, packageAddress }: ExistingAddresses = this;
+      this.project = await createProjectFn({ appAddress, packageAddress });
+      await this._registerDeploy();
+      return this.project;
     } catch (deployError) {
-      this._tryRegisterPartialDeploy(deployError)
-      if (!this.project) throw deployError
+      this._tryRegisterPartialDeploy(deployError);
+      if (!this.project) throw deployError;
     }
-  } 
-
-  async _registerDeploy() {
-    this._registerApp(this.project.getApp())
-    this._registerPackage(await this.project.getProjectPackage())
-    this._registerVersion(this.requestedVersion, await this.project.getCurrentDirectory())
   }
 
-  _tryRegisterPartialDeploy({ thepackage, app, directory }) {
-    super._tryRegisterPartialDeploy({ thepackage, directory })
-    if (app) this._registerApp(app)
+  protected _tryRegisterPartialDeploy({ thepackage, app, directory }: PartialDeploy): void {
+    super._tryRegisterPartialDeploy({ thepackage, directory });
+    if (app) this._registerApp(app);
   }
 
-  _registerApp({ address }) {
-    this.networkFile.app = { address }
+  private async _registerDeploy(): Promise<void> {
+    this._registerApp(this.project.getApp());
+    this._registerPackage(await this.project.getProjectPackage());
+    this._registerVersion(this.requestedVersion, await this.project.getCurrentDirectory());
+  }
+
+  private _registerApp({ address }: { address: string }): void {
+    this.networkFile.app = { address };
   }
 }
