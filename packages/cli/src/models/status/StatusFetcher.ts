@@ -1,18 +1,8 @@
 import { ZWeb3, Contracts, Logger, FileSystem as fs, bytecodeDigest, bodyCode, constructorCode } from 'zos-lib';
 import ZosNetworkFile from '../files/ZosNetworkFile';
+import { ComparedObject } from './StatusComparator';
 
 const log = new Logger('StatusFetcher');
-
-interface ComparedObject {
-  name?: string;
-  address?: string;
-  alias?: string;
-  bodyBytecodeHash?: string;
-  packageName?: string;
-  package?: string;
-  implementation?: string;
-  version?: string;
-}
 
 export default class StatusFetcher {
 
