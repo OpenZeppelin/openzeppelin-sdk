@@ -95,7 +95,7 @@ export default class StatusComparator {
     this._addReport(expected, observed, `Dependency with name ${name} at address ${packageAddress} is not registered`);
   }
 
-  public _addReport(expected: string, observed: string, description: string): void {
+  private _addReport(expected: string, observed: string, description: string): void {
     const report = new StatusReport(expected, observed, description);
     this.reports.push(report);
   }
