@@ -7,7 +7,7 @@ import { ContractWrapper } from 'zos-lib';
 
 const log = new Logger('ZosNetworkFile');
 
-interface ContractInterface {
+export interface ContractInterface {
   address: string;
   constructorCode: string;
   localBytecodeHash: string;
@@ -16,7 +16,7 @@ interface ContractInterface {
   [id: string]: any;
 }
 
-interface SolidityLibInterface {
+export interface SolidityLibInterface {
   address: string;
   constructorCode: string;
   bodyBytecodeHash: string;
@@ -24,13 +24,13 @@ interface SolidityLibInterface {
   deployedBytecodeHash: string;
 }
 
-interface ProxyInterface {
+export interface ProxyInterface {
   package?: string;
   contract?: any;
   address?: string;
 }
 
-interface DependencyInterface {
+export interface DependencyInterface {
   package?: string;
   version?: string;
   customDeploy?: boolean;
