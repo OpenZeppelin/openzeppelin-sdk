@@ -8,7 +8,7 @@ export default class EventsFilter {
 
   public timeout: number;
 
-  constructor(timeout: number) {
+  constructor(timeout?: number) {
     this.timeout = timeout || (process.env.NODE_ENV === 'test' ? 2000 : 60000);
   }
 

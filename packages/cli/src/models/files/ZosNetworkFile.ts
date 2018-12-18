@@ -26,7 +26,8 @@ interface SolidityLibInterface {
   deployedBytecodeHash: string;
 }
 
-interface ProxyInterface {
+export interface ProxyInterface {
+  alias?: string;
   package?: string;
   contract?: any;
   address?: string;
@@ -34,7 +35,8 @@ interface ProxyInterface {
   implementation?: string;
 }
 
-interface DependencyInterface {
+export interface DependencyInterface {
+  name?: string;
   package?: string;
   version?: string;
   customDeploy?: boolean;
@@ -220,8 +222,7 @@ export default class ZosNetworkFile {
     ));
   }
 
-  // TS-TODO: return type can probably be typed to Proxy.ts from lib?
-  public getProxy(address: string): any {
+  public getProxy(address: string): ProxyInterface {
     const allProxies = this.getProxies();
     return _.find(allProxies, { address });
   }
