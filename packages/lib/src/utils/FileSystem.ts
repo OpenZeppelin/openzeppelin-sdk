@@ -41,13 +41,17 @@ export function ifNotExistsThrow(filename: string, message: string): void {
 }
 
 // TS-TODO: Returned object could be of a more specific type
-export function parseJson(filename: string): {} {
+export function parseJson(filename: string): any {
   return JSON.parse(read(filename));
 }
 
-export function parseJsonIfExists(filename: string): {} | null {
-  if (exists(filename)) return JSON.parse(read(filename));
-  else return null;
+export function parseJsonIfExists(filename: string): any | null {
+  if (exists(filename)) {
+    return JSON.parse(read(filename));
+  }
+  else {
+    return null;
+  }
 }
 
 export function editJson(file: string, edit: ({}) => void): void {
