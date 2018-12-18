@@ -13,7 +13,7 @@ const ConfigVariablesInitializer = {
     Compiler.setSettings(solcSettings);
   },
 
-  async initNetworkConfiguration(options: any): any {
+  async initNetworkConfiguration(options: any): Promise<any> {
     const { network, from, timeout } = Session.getOptions(options);
     if (!network) throw Error('A network name must be provided to execute the requested action.');
 
@@ -23,6 +23,8 @@ const ConfigVariablesInitializer = {
 
     ZWeb3.initialize(provider);
     Contracts.setSyncTimeout(timeout * 1000);
+
+    const buildDir = Truffle.getBuildDir();
     Contracts.setLocalBuildDir(buildDir);
     Contracts.setArtifactsDefaults(artifactDefaults);
 
