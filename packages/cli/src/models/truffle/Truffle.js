@@ -1,6 +1,7 @@
 import path from 'path'
-import { Logger, FileSystem as fs } from 'zos-lib'
+import { exec } from 'child_process'
 import { promisify } from 'util'
+import { Logger, FileSystem as fs } from 'zos-lib'
 
 const log = new Logger('Truffle')
 
@@ -18,16 +19,13 @@ const Truffle = {
     }
   },
 
-  async compile(config = undefined) {
-    log.info("Compiling contracts")
-    config = config || this.config()
-    config.all = true
-    const TruffleCompile = require('truffle-workflow-compile')
-
+  async compile() {
+    log.info('Compiling contracts with Truffle...')
     return new Promise((resolve, reject) => {
-      TruffleCompile.compile(config, (error, abstractions, paths) => {
-        if (error) reject(error)
-        else resolve(abstractions, paths)
+      exec(`${process.cwd()}/node_modules/.bin/truffle compile`, (error, stdout, stderr) => {
+        if (stdout) console.log(stdout)
+        if (stderr) console.error(stderr)
+        error ? reject(error) : resolve({ stdout, stderr })
       })
     })
   },
