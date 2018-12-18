@@ -1,8 +1,7 @@
-import CaptureLogs from "../../../helpers/captureLogs";
-
 require('../../../setup')
 
 import { FileSystem } from 'zos-lib'
+import CaptureLogs from '../../../helpers/captureLogs'
 import SolidityContractsCompiler from '../../../../src/models/compiler/solidity/SolidityContractsCompiler'
 
 describe('SolidityContractsCompiler', function () {

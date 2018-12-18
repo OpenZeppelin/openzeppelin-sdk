@@ -1,12 +1,8 @@
 import glob from 'glob';
 import path from 'path';
-import ZWeb3 from './ZWeb3';
 import ContractFactory from './ContractFactory';
 
-// TODO: rename to Artifacts and move to /artifacts
-
 export default class Contracts {
-
   private static DEFAULT_SYNC_TIMEOUT: number = 240000;
   private static DEFAULT_BUILD_DIR: string = `${process.cwd()}/build/contracts`;
   private static DEFAULT_CONTRACTS_DIR: string = `${process.cwd()}/contracts`;
@@ -69,7 +65,7 @@ export default class Contracts {
   }
 
   public static setLocalContractsDir(dir: string): void {
-    Contracts.buildDir = dir;
+    Contracts.contractsDir = dir;
   }
 
   public static setArtifactsDefaults(defaults: any): void {

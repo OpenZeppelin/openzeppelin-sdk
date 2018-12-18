@@ -1,11 +1,11 @@
 'use strict'
-require('../setup')
+require('../../setup')
 
 import { FileSystem as fs } from 'zos-lib'
-import { cleanupfn } from '../helpers/cleanup'
-import TruffleProjectInitializer from '../../src/models/initializer/truffle/TruffleProjectInitializer'
+import { cleanupfn } from '../../helpers/cleanup'
+import TruffleProjectInitializer from '../../../src/models/initializer/truffle/TruffleProjectInitializer'
 
-contract('Truffle', function () {
+contract('TruffleProjectInitializer', function () {
   const tmpDir = 'test/tmp';
   const contractsDir = `${tmpDir}/contracts`
   const migrationsDir = `${tmpDir}/migrations`
