@@ -34,6 +34,8 @@
   },
   "homepage": "https://github.com/zeppelinos/zos/tree/master/packages/cli#readme",
   "dependencies": {
+    "@types/npm": "^2.0.29",
+    "@types/semver": "^5.5.0",
     "axios": "^0.18.0",
     "chalk": "^2.4.1",
     "cheerio": "^1.0.0-rc.2",
