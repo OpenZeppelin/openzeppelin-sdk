@@ -1,21 +1,21 @@
 import _ from 'lodash';
-import { Logger, FileSystem as fs, bytecodeDigest, bodyCode, constructorCode, semanticVersionToString } from 'zos-lib';
+import { Logger, FileSystem as fs, bytecodeDigest, bodyCode, constructorCode, semanticVersionToString, ContractWrapper } from 'zos-lib';
 import { fromContractFullName, toContractFullName } from '../../utils/naming';
 import { ZOS_VERSION, checkVersion } from './ZosVersion';
 import ZosPackageFile from './ZosPackageFile.js';
-import { ContractWrapper } from 'zos-lib';
 
 const log = new Logger('ZosNetworkFile');
 
-interface ContractInterface {
-  address: string;
-  constructorCode: string;
-  localBytecodeHash: string;
-  deployedBytecodeHash: string;
+export interface ContractInterface {
+  address?: string;
+  constructorCode?: string;
+  localBytecodeHash?: string;
+  deployedBytecodeHash?: string;
   bodyBytecodeHash?: string;
   types?: any;
   storage?: any;
   warnings?: any;
+  [id: string]: any;
 }
 
 interface SolidityLibInterface {
