@@ -23,7 +23,6 @@ const Session = {
   },
 
   open({ network, from, timeout }: SessionOptions, expires: number = DEFAULT_EXPIRATION_TIMEOUT): void {
-    console.log('expires', expires, typeof expires);
     const expirationTimestamp = new Date(new Date().getTime() + expires * 1000);
     fs.writeJson(ZOS_SESSION_PATH, { network, from, timeout, expires: expirationTimestamp });
     log.info(`Using ${describe({ network, from, timeout })} by default.`);
