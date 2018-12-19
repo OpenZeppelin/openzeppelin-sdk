@@ -18,7 +18,7 @@ interface Command {
   tryAction?: any;
 }
 
-const { version } = require('../../package.json')
+const { version } = require('../../package.json');
 
 const commandsList: Command[] = Object.values(commands);
 commandsList.forEach((command: Command): void => command.register(program));
