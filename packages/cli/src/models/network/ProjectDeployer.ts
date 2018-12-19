@@ -108,7 +108,7 @@ export class AppProjectDeployer extends BasePackageProjectDeployer {
     return this.controller.appAddress;
   }
 
-  public async _run(createProjectFn: CreateProjectFn): Promise<AppProject | never> {
+  private async _run(createProjectFn: CreateProjectFn): Promise<AppProject | never> {
     try {
       const { appAddress, packageAddress }: ExistingAddresses = this;
       this.project = await createProjectFn({ appAddress, packageAddress });
