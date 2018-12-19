@@ -28,11 +28,13 @@ function initTruffle(config) {
     const TruffleEnvironment = require('truffle-core/lib/environment')
     TruffleEnvironment.detect(config, function (error) {
       if (error) reject(error)
-      const Web3 = require('web3')
-      const { provider, resolver } = Truffle.setNonceTrackerIfNeeded(config)
-      global.web3 = new Web3(provider)
-      global.artifacts = resolver
-      resolve()
+      else {
+        const Web3 = require('web3')
+        const { provider, resolver } = Truffle.setNonceTrackerIfNeeded(config)
+        global.web3 = new Web3(provider)
+        global.artifacts = resolver
+        resolve()
+      }
     })
   });
 }
