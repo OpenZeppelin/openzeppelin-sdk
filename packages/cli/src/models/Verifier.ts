@@ -19,8 +19,8 @@ interface VerifierOptions {
   optimizerRuns: string;
   contractSource: string;
   contractAddress: string;
-  apiKey: string;
   network: string;
+  apiKey?: string;
 }
 
 const Verifier = {
