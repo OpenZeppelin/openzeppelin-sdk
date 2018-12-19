@@ -2,7 +2,8 @@ import _ from 'lodash';
 import { AppProject, PackageProject, SimpleProject, App, Package, ImplementationDirectory } from 'zos-lib';
 
 import NetworkController from './NetworkController';
-import { ZosPackageFile, ZosNetworkFile } from '../files/index';
+import ZosPackageFile from '../files/ZosPackageFile';
+import ZosNetworkFile from '../files/ZosNetworkFile';
 
 interface PartialDeploy {
   app?: App;
