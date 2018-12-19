@@ -374,15 +374,7 @@ export default class ZosNetworkFile {
   }
 
   public updateProxy(
-    {
-      package: proxyPackageName,
-      contract: proxyContractName,
-      address: proxyAddress
-    }: {
-        package: string,
-        contract: string,
-        address: string
-      },
+    { package: proxyPackageName, contract: proxyContractName, address: proxyAddress }: ProxyInterface,
     fn: (...args: any[]) => any
   ): void {
     const fullname = toContractFullName(proxyPackageName, proxyContractName);
