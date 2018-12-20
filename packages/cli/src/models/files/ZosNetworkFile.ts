@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import { Logger, FileSystem as fs, bytecodeDigest, bodyCode, constructorCode, semanticVersionToString, ContractWrapper } from 'zos-lib';
 import { fromContractFullName, toContractFullName } from '../../utils/naming';
-import checkVersion, { ZOS_VERSION } from './ZosVersion';
+import { ZOS_VERSION, checkVersion } from './ZosVersion';
 import ZosPackageFile from './ZosPackageFile.js';
 
 const log = new Logger('ZosNetworkFile');
