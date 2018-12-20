@@ -9,7 +9,7 @@ import registerErrorHandler from './errors';
 require('./options');
 
 // TS-TODO: Decide whether this should be an interface or a type
-interface Command {
+interface CommandInterface {
   name: string;
   signature: string;
   description: string;
@@ -20,8 +20,8 @@ interface Command {
 
 const { version } = require('../../package.json');
 
-const commandsList: Command[] = Object.values(commands);
-commandsList.forEach((command: Command): void => command.register(program));
+const commandsList: CommandInterface[] = Object.values(commands);
+commandsList.forEach((command: CommandInterface): void => command.register(program));
 const maxLength: number = Math.max(...commandsList.map((command) => command.signature.length));
 
 program

@@ -1,3 +1,4 @@
+import { Command } from 'commander';
 import { Logger } from 'zos-lib';
 import ScriptError from './ScriptError';
 
@@ -5,11 +6,10 @@ const log = new Logger('Error');
 const GENERIC_ERROR_MESSAGE = 'There was an undefined error. Please execute the same command again in verbose mode if necessary.';
 
 export default class ErrorHandler {
-
   public error: ScriptError | any;
   public verbose: boolean;
 
-  constructor(error: ScriptError | any, { verbose }: { verbose: boolean }) {
+  constructor(error: ScriptError | any, { verbose }: Command) {
     this.error = error;
     this.verbose = verbose;
   }
