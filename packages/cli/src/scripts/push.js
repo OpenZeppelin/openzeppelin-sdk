@@ -4,7 +4,6 @@ import ScriptError from '../models/errors/ScriptError'
 
 export default async function push({ network, deployDependencies, reupload = false, force = false, txParams = {}, networkFile = undefined }) {
   const controller = ControllerFor(network, txParams, networkFile);
-  deployDependencies = !deployDependencies && deployLibs ? deployLibs : deployDependencies
 
   try {
     if (deployDependencies) await controller.deployDependencies();
