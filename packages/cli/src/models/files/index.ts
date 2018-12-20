@@ -1,9 +1,10 @@
-import ZosVersion from './ZosVersion';
+import { ZOS_VERSION, checkVersion } from './ZosVersion';
 import ZosNetworkFile from './ZosNetworkFile';
 import ZosPackageFile from './ZosPackageFile';
 
 export default {
-  ZosVersion,
+  ZOS_VERSION,
+  checkVersion,
   ZosNetworkFile,
   ZosPackageFile,
 };
