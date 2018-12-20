@@ -1,22 +1,22 @@
-import program from 'commander'
-import { DEFAULT_TX_TIMEOUT } from '../models/network/Session'
+import program, { Command } from 'commander';
+import { DEFAULT_TX_TIMEOUT } from '../models/network/Session';
 
-program.Command.prototype.withNetworkTimeoutOption = function () {
+program.Command.prototype.withNetworkTimeoutOption = function(): Command {
   return this
     .option('--timeout <timeout>', `timeout in seconds for each blockchain transaction (defaults to ${DEFAULT_TX_TIMEOUT}s)`);
 };
 
-program.Command.prototype.withNetworkOptions = function () {
+program.Command.prototype.withNetworkOptions = function(): Command {
   return this
-    .option('-n, --network <network>', 'network to be used')  
+    .option('-n, --network <network>', 'network to be used')
     .option('-f, --from <from>', 'specify transaction sender address')
-    .withNetworkTimeoutOption()
+    .withNetworkTimeoutOption();
 };
 
-program.Command.prototype.withPushOptions = function () {
+program.Command.prototype.withPushOptions = function(): Command {
   return this
     .option('--push [network]', 'push all changes to the specified network')
     .option('--skip-compile', 'skips contract compilation')
     .option('-f, --from <from>', 'specify the transaction sender address for --push')
-    .withNetworkTimeoutOption()
+    .withNetworkTimeoutOption();
 };
