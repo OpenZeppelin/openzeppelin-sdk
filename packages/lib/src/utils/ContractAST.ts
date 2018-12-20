@@ -2,7 +2,9 @@ import _ from 'lodash';
 import { getBuildArtifacts, BuildArtifacts } from '../artifacts/BuildArtifacts';
 import ContractFactory from '../artifacts/ContractFactory';
 
-// TS-TODO: Reuse in Storage.ts
+// TS-TODO: Many of the interfaces defined here come from Solidity's AST output schema.
+// cli has Solidity schema definitions in @types/solc.d.ts. If such file was moved to the lib
+// package, these interfaces would not be needed, and all the AST definitions could live within solc.d.ts.
 
 // TS-TODO: define Node type.
 export type Node = any;
@@ -18,6 +20,7 @@ export interface TypeInfo {
   valueType?: string;
   length?: number;
   members?: StorageInfo[];
+  src?: any;
 }
 
 export interface TypeInfoMapping {
@@ -27,8 +30,10 @@ export interface TypeInfoMapping {
 export interface StorageInfo {
   label: string;
   astId: number;
-  type: string;
+  type: any;
   src: string;
+  path?: string;
+  contract?: string;
 }
 
 interface ContractASTProps {

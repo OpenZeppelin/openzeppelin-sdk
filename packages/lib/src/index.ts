@@ -12,7 +12,7 @@ import Semver from './utils/Semver';
 import Logger from './utils/Logger';
 import FileSystem from './utils/FileSystem';
 import Contracts from './artifacts/Contracts';
-import { ContractWrapper } from './artifacts/ContractFactory';
+import ContractFactory, { ContractWrapper } from './artifacts/ContractFactory';
 import ZWeb3 from './artifacts/ZWeb3';
 import { bodyCode, constructorCode, bytecodeDigest, replaceSolidityLibAddress, isSolidityLib, getSolidityLibNames } from './utils/Bytecode';
 import { sendTransaction, deploy, awaitConfirmations } from './utils/Transactions';
@@ -20,10 +20,10 @@ import { flattenSourceCode } from './utils/Solidity';
 import { semanticVersionEqual, toSemanticVersion, semanticVersionToString } from './utils/Semver';
 
 // validations
-import { getStorageLayout, getStructsOrEnums } from './validations/Storage';
-import { getBuildArtifacts } from './artifacts/BuildArtifacts';
-import { compareStorageLayouts } from './validations/Layout';
-import { validate, newValidationErrors, validationPasses } from './validations';
+import { getStorageLayout, getStructsOrEnums, StorageLayoutInfo } from './validations/Storage';
+import { getBuildArtifacts, BuildArtifacts } from './artifacts/BuildArtifacts';
+import { compareStorageLayouts, Operation } from './validations/Layout';
+import { validate, newValidationErrors, validationPasses, ValidationInfo } from './validations';
 
 // test behaviors
 import { behaviors, helpers } from './test';
@@ -52,8 +52,11 @@ export {
   sendTransaction,
   deploy,
   getBuildArtifacts,
+  BuildArtifacts,
   getStorageLayout,
+  StorageLayoutInfo,
   compareStorageLayouts,
+  Operation,
   getStructsOrEnums,
   validate,
   newValidationErrors,
@@ -84,5 +87,7 @@ export {
   PackageProject,
   AppProject,
   SimpleProject,
-  ContractWrapper
+  ContractFactory,
+  ContractWrapper,
+  ValidationInfo
 };

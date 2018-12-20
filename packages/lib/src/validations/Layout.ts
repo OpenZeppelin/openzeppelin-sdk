@@ -13,9 +13,10 @@ type EqualFn = (var1: StorageInfo, var2: StorageInfo) => boolean;
 export type StorageEntryComparison = 'equal' | 'rename' | 'typechange' | 'replace';
 
 export interface Operation {
+  contract: string;
   action: string;
-  update: boolean;
-  original: string;
+  updated: StorageInfo;
+  original: StorageInfo;
 }
 
 export function compareStorageLayouts(original: StorageLayoutInfo, updated: StorageLayoutInfo): Operation[] {

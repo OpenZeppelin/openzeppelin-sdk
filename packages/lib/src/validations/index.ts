@@ -5,11 +5,22 @@ import { hasConstructor } from './Constructors';
 import { hasSelfDestruct, hasDelegateCall } from './Instructions';
 import { getUninitializedBaseContracts } from './Initializers';
 import { getStorageLayout, getStructsOrEnums } from './Storage';
-import { compareStorageLayouts } from './Layout';
+import { compareStorageLayouts, Operation } from './Layout';
 import { hasInitialValuesInDeclarations } from './InitialValues';
 import ContractFactory from '../artifacts/ContractFactory.js';
+import { StorageInfo } from '../utils/ContractAST';
 
 const log = new Logger('validate');
+
+export interface ValidationInfo {
+  hasConstructor: boolean;
+  hasSelfDestruct: boolean;
+  hasDelegateCall: boolean;
+  hasInitialValuesInDeclarations: boolean;
+  uninitializedBaseContracts: any[];
+  storageUncheckedVars?: StorageInfo[];
+  storageDiff?: Operation[];
+}
 
 export function validate(contractClass: ContractFactory, existingContractInfo: any = {}, buildArtifacts: any = null): any {
   const storageValidation = validateStorage(contractClass, existingContractInfo, buildArtifacts);
@@ -46,7 +57,7 @@ export function validationPasses(validations: any): boolean {
     && _.isEmpty(validations.uninitializedBaseContracts);
 }
 
-function validateStorage(contractClass: ContractFactory, existingContractInfo: any = {}, buildArtifacts: any = null): any {
+function validateStorage(contractClass: ContractFactory, existingContractInfo: any = {}, buildArtifacts: any = null): { storageUncheckedVars?: StorageInfo[], storageDiff?: Operation[] } {
   const originalStorageInfo = _.pick(existingContractInfo, 'storage', 'types');
   if (_.isEmpty(originalStorageInfo.storage)) return {};
 
