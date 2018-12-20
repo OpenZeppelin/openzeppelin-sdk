@@ -16,9 +16,7 @@ interface ExistingAddresses {
   packageAddress?: string;
 }
 
-interface CreateProjectFn {
-  (addresses: ExistingAddresses): Promise<AppProject>;
-}
+type CreateProjectFn = (addresses: ExistingAddresses) => Promise<AppProject>;
 
 class BaseProjectDeployer {
   protected controller: NetworkController;
