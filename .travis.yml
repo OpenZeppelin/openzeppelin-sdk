@@ -26,19 +26,19 @@ stages:
 
 jobs:
   include:
-    
+
     # Install all dependencies and cache them
     - stage: prepare cache
       script: true
       install:
         - npm install
         - npx lerna bootstrap --loglevel=debug
-    
+
     # Initial stage with lib tests
     - stage: lib tests
       install: npx lerna bootstrap --loglevel=debug
       script: npx lerna run test --concurrency=1 --stream=true --scope=zos-lib
-    
+
     # Test stage for Vouching
     - stage: tests
       name: Vouching tests
@@ -51,7 +51,7 @@ jobs:
       os: linux
       install: npx lerna bootstrap --loglevel=debug
       script: npx lerna run test --concurrency=1 --stream=true --scope=zos
-    
+
     # Test stage for CLI on OSX
     - stage: tests
       name: CLI tests on OSX
@@ -60,13 +60,13 @@ jobs:
         - npm install
         - npx lerna bootstrap --loglevel=debug
       script: npx lerna run test --concurrency=1 --stream=true --scope=zos
-    
+
     # Test stage for complex-example
     - stage: tests
       name: Complex example tests
       install: npx lerna bootstrap --loglevel=debug
       script: npx lerna run test --concurrency=1 --stream=true --scope=zos-lib-complex-example
-    
+
     # Integration tests on local geth
     - stage: integration tests
       name: Local geth node
@@ -75,9 +75,9 @@ jobs:
         - sudo add-apt-repository -y ppa:ethereum/ethereum
         - sudo apt-get update
         - sudo apt-get install -y ethereum
-      install: npx lerna bootstrap --loglevel=debug
+      install: npx lerna bootstrap --loglevel=debug && npm --prefix tests/cli-app install tests/cli-app
       script: cd tests/cli-app && ./scripts/test.sh
-    
+
     # Integration tests on local geth with hdwallet-provider
     - stage: integration tests
       name: HDWallet on local geth node
@@ -86,7 +86,7 @@ jobs:
         - sudo add-apt-repository -y ppa:ethereum/ethereum
         - sudo apt-get update
         - sudo apt-get install -y ethereum
-      install: npx lerna bootstrap --loglevel=debug
+      install: npx lerna bootstrap --loglevel=debug && npm --prefix tests/cli-app install tests/cli-app
       script: cd tests/cli-app && ./scripts/test.sh
 
     # Rinkeby integration tests are temporarily disabled
