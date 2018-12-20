@@ -17,7 +17,7 @@ const register: (program: Command) => Command = (program) => program
   .withNetworkOptions()
   .action(action);
 
-async function action(contractFullNameOrAddress: string, newAdmin: string, options: Command): Promise<void> {
+async function action(contractFullNameOrAddress: string, newAdmin: string, options: Command): Promise<void | never> {
   const { yes } = options;
   if (!yes) {
     throw Error('This is a potentially irreversible operation: if you specify an incorrect admin address, you may lose the ability to upgrade your contract forever.\nPlease double check all parameters, and run the same command with --yes.');
