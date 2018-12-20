@@ -15,9 +15,9 @@ export default class Proxy {
   private txParams: any;
   public address: string;
 
-  public static at(address: string, txParams: any = {}): Proxy {
+  public static at(contractOrAddress: string | any, txParams: any = {}): Proxy {
     const ProxyContract: ContractFactory = Contracts.getFromLib('AdminUpgradeabilityProxy');
-    const contract: ProxyInterface = ProxyContract.at(toAddress(address));
+    const contract: ProxyInterface = ProxyContract.at(toAddress(contractOrAddress));
     return new this(contract, txParams);
   }
 

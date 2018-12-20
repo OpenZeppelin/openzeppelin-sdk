@@ -431,7 +431,7 @@ export default class NetworkController {
     const contractClass = this.localController.getContractClass(packageName, contractAlias);
     this.checkInitialization(contractClass, initMethod, initArgs);
     const proxyInstance = await this.project.createProxy(contractClass, { packageName, contractName: contractAlias, initMethod, initArgs });
-    const implementationAddress = await Proxy.at(proxyInstance.address).implementation();
+    const implementationAddress = await Proxy.at(proxyInstance).implementation();
     const packageVersion = packageName === this.packageFile.name ? this.currentVersion : (await this.project.getDependencyVersion(packageName));
     this._updateTruffleDeployedInformation(contractAlias, proxyInstance);
 
@@ -516,7 +516,7 @@ export default class NetworkController {
     try {
       const name = { packageName: proxy.package, contractName: proxy.contract };
       const contractClass = this.localController.getContractClass(proxy.package, proxy.contract);
-      const currentImplementation = await Proxy.at(proxy.address).implementation();
+      const currentImplementation = await Proxy.at(proxy).implementation();
       const contractImplementation = await this.project.getImplementation(name);
       const packageVersion = proxy.package === this.packageFile.name ? this.currentVersion : (await this.project.getDependencyVersion(proxy.package));
 
