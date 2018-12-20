@@ -1,46 +1,55 @@
-# Token Mechanics V2.1
+# Token Mechanics v2.1
 
-### Assumptions
-- Users will register/deprecate versions of a package. 
-- Users will vouch/unvouch for an specific version of a package. 
-- Users will be able to move their vouch through different versions of the same package. 
-- Challengers will challenge a specific version of a package.
-- The minimum stake is validated against the summation of the amount vouched by the package owner for each of its version.
-- For non-owner users, there is no penalization for unvouching/moving tokens. Package owners will have to make sure the minimum stake is reached.
-- Packages reputation could be calculated based on total vouch amount weighted by the registered versions
+## Protocol
 
-### Issues
-1- How we can avoid users unvouching their tokens given a new critical challenge yet unsolved?
-> We can either use cyclic windows to state when users can challenge, when users can vouch/unvouch, and when challenges 
-  will be solved. Or, we can lock a fraction of the vouched tokens of each user to ensure we can pay successful 
-  challenges. Both options have their downsides: locking may not be possible if there is a large list of challenges 
-  if the payout formula depends on the total stake. OTOH, windows may no be the ideal solution for critical challenges
+### Vouching
 
-2- Challenges front-running?
-> A simple way to solve this issue for the following version, is to can handle front-running scenarios manually checking both challenges and deciding 
-  which is the real one.
+- Developers will register plain addresses. These addresses may represent anything: an EVM package, an EVM package version, a logic contract from a package, a contract instance, or a mock address representing something off-chain. 
+- Registering a new entry requires a minimum stake that cannot be removed, and is used for spam prevention. The minimum stake can only be moved to another entry owned by the same developer, but never withdrawn from the vouching system.
+- Any user can vouch for an entry, and withdraw or move their vouching without penalizations.
 
-3- Challenges payout formula
-  3.1- Severity
-  > Each challenge can have a severity label given by the challenger. The severity may affect the payout received by each challenger.
+### Challenging
 
-  3.2- How we can make sure challenges payout cannot be manipulated based on their resolution order? 
-  > An obvious approach would be to solve challenges in a FIFO order. Note that this blocks solving a challenge until all previous ones have been 
-    solved as well. Therefore, if each challenge receives a percentage of the tokens staked, then the order in which challenges are resolved 
-    actually alters how much of a reward each challenge gets.
+- Any user can challenge an entry, staking an amount of tokens behind the challenge. The amount of tokens associated to the challenge should be proportional to the vouching of the entry and the severity of the challenge, and these values should be tabulated off-chain.
+- A challenge can be accepted or rejected by the owner of the challenged entry. Regardless of the result, it enters a period of N days during which it can be appealed. If not appealed, it is then confirmed and executed. Appeals allow challengers to have their rejected challengers reviewed, and prevent dishonest developers from colluding with a challenger to drain funds from the other vouchers of an entry.
+- Any user can appeal a resolution of a challenge (during the appealing period) by staking tokens behind it. Resolution of appeals will be centralized initially, and then solved via a PLCR voting by all ZEP token holders.
 
-  3.3- How we can make sure there is enough tokens to pay successful challenges?
-  > We should decide whether we want to accept defaults or not, i.e. do we want to consider an scenario where a package does not have enough 
-    tokens staked to pay a challenge? If not, we should pay a proportional amount of tokens based on the severity and the total stake.
+## Issues
+
+1- How we can avoid users unvouching their tokens given a new challenge yet unsolved?
+  
+  We can lock all funds that are needed to pay for all open challenges, and allow users to unvouch the rest. Note that this may not be implementable due to gas constraints. Another simple option is to outright lock all funds on a challenged entry. 
+  
+  We may also allow users to signal their willingness to retreat from a package, in which case new challenges do not apply to them, and once the last challenge to their funds ends, then they are allowed to retreat.ges
+
+2- How can we prevent a user from grabbing an off-chain challenge and submitting it under their name before the original auditor?
+
+  We can handle front-running scenarios by manually checking both challenges and deciding which is the real one based on off-chain information.
+
+3- How we can make sure challenges payout cannot be manipulated based on their resolution order? 
+  
+  An obvious approach would be to solve challenges in a FIFO order. Note that this blocks solving a challenge until all previous ones have been solved as well. A challenge will then _lock_ a certain amount of tokens to make sure it can be paid, and new challenges will then take a percentage of the _free_ tokens on an entry.
+  
+4- How we can make sure there are enough tokens to pay successful challenges?
+
+  If every challenge takes a percentage of the _free_ tokens of an entry, then we should always have enough tokens to pay, even if the payout for challenges that occur later in time is lower.
+
+5- What would happen if the tokens vouched reaches an amount lower than the minimum stake due to challenges payout?
+
+  We can leave the min stake out of the number of _free_ tokens. This way, the min stake is exclusively used for spam prevention, and not for paying out challenges.
+
+6- How can we handle a huge list of vouchers during a payout?
+  
+  We can have a rate per entry in ZEP that will be adjust each time a challenge is solved. We generate a fictional token per each entry, and the rate between that token and ZEP is modified on each challenge. When the users withdraw their vouching, then that exchange rate is applied to the withdrawal.
+
+7- How can we decide the number of tokens for a challenge?
+
+  We can publish a mapping from severity to percentage. The amount of tokens for a challenge should then be that percentage of the free tokens vouched for the challenged entry at the time of the challenge creation.
+
     
-  3.4- How we will handle a huge list of vouchers during a payout?
-  > We can have a rate per version in ZEP that will be adjust each time a challenge is solved.  
+## Proof of concept
 
-4- What would happen if package registrars' vouch reaches an amount lower than the minimum stake due to challenges payout?
-> Users will have to provide a certain amount of tokens the next time they register a version to reach the minimum stake.
-  We should make sure this is an edge scenario since we will be forcing package registrars to buy more tokens.
-
-### Proof of concept
+**Deprecated**
 
 #### Types
 ```
