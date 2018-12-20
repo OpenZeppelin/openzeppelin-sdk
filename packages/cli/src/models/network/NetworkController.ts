@@ -2,8 +2,8 @@
 
 import _ from 'lodash';
 import { Contracts, ContractFactory, Logger, FileSystem as fs, Proxy, awaitConfirmations, semanticVersionToString } from 'zos-lib';
-import { flattenSourceCode, getStorageLayout, getBuildArtifacts, getSolidityLibNames } from 'zos-lib';
-import { validate, newValidationErrors, validationPasses } from 'zos-lib';
+import { SimpleProject, AppProject, flattenSourceCode, getStorageLayout, BuildArtifacts, getBuildArtifacts, getSolidityLibNames } from 'zos-lib';
+import { validate, newValidationErrors, validationPasses, App, ContractWrapper } from 'zos-lib';
 
 import { allPromisesOrError } from '../../utils/async';
 import { toContractFullName } from '../../utils/naming';
@@ -13,7 +13,7 @@ import StatusChecker from '../status/StatusChecker';
 import ValidationLogger from '../../interface/ValidationLogger';
 import Verifier from '../Verifier';
 import LocalController from '../local/LocalController';
-import ZosNetworkFile from '../files/ZosNetworkFile';
+import ZosNetworkFile, { ProxyInterface } from '../files/ZosNetworkFile';
 import ZosPackageFile from '../files/ZosPackageFile';
 
 const log = new Logger('NetworkAppController');
@@ -24,7 +24,7 @@ export default class NetworkController {
   public txParams: any;
   public network: string;
   public networkFile: ZosNetworkFile;
-  public project: T1;
+  public project: SimpleProject | AppProject;
 
   constructor(localController: LocalController, network: string, txParams: any, networkFile?: ZosNetworkFile) {
     this.localController = localController;
@@ -75,7 +75,7 @@ export default class NetworkController {
   }
 
   // DeployerController
-  public async fetchOrDeploy(requestedVersion: T0): T1 {
+  public async fetchOrDeploy(requestedVersion: string): Promise<SimpleProject | AppProject> {
     this.project = await this.getDeployer(requestedVersion).fetchOrDeploy();
     return this.project;
   }
@@ -121,7 +121,7 @@ export default class NetworkController {
   }
 
   // Contract model
-  private _contractsListForPush(onlyChanged: boolean = false, changedLibraries: T2[] = []): ContractFactory[] {
+  private _contractsListForPush(onlyChanged: boolean = false, changedLibraries: ContractFactory[] = []): Array<[string, ContractFactory]> {
     const newVersion = this._newVersionRequired();
     return _(this.packageFile.contracts)
       .toPairs()
@@ -131,7 +131,7 @@ export default class NetworkController {
   }
 
   // Contract model || SolidityLib model
-  private _solidityLibsForPush(onlyChanged: boolean = false): string[] | never {
+  private _solidityLibsForPush(onlyChanged: boolean = false): ContractFactory[] | never {
     const { contractNames, contractAliases } = this.packageFile;
     const libNames = this._getAllSolidityLibNames(contractNames);
 
@@ -150,14 +150,14 @@ export default class NetworkController {
   }
 
   // Contract model || SolidityLib model
-  public async uploadSolidityLibs(libs: T3[]): Promise<void> {
+  public async uploadSolidityLibs(libs: ContractFactory[]): Promise<void> {
     await allPromisesOrError(
       libs.map((lib) => this._uploadSolidityLib(lib))
     );
   }
 
   // Contract model || SolidityLib model
-  private async _uploadSolidityLib(libClass: T3): Promise<void> {
+  private async _uploadSolidityLib(libClass: ContractFactory): Promise<void> {
     const libName = libClass.contractName;
     log.info(`Uploading ${libName} library...`);
     const libInstance = await this.project.setImplementation(libClass, libName);
@@ -165,14 +165,16 @@ export default class NetworkController {
   }
 
   // Contract model
-  public async uploadContracts(contracts: ContractFactory[]): Promise<void> {
+  public async uploadContracts(contracts: Array<[string, ContractFactory]>): Promise<void> {
     await allPromisesOrError(
-      contracts.map(([contractAlias, contractClass]) => this.uploadContract(contractAlias, contractClass))
+      contracts.map(
+        ([contractAlias, contractClass]) => this.uploadContract(contractAlias, contractClass)
+      )
     );
   }
 
   // Contract model
-  public async uploadContract(contractAlias: string, contractClass: T4): Promise<void | never> {
+  public async uploadContract(contractAlias: string, contractClass: ContractFactory): Promise<void | never> {
     try {
       const currentContractLibs = getSolidityLibNames(contractClass.bytecode);
       const libraries = this.networkFile.getSolidityLibs(currentContractLibs);
@@ -212,7 +214,7 @@ export default class NetworkController {
   }
 
   // Contract model || SolidityLib model
-  private _hasChangedLibraries(contractClass: ContractFactory, changedLibraries: T2): boolean {
+  private _hasChangedLibraries(contractClass: ContractFactory, changedLibraries: ContractFactory[]): boolean {
     const libNames = getSolidityLibNames(contractClass.bytecode);
     return !_.isEmpty(_.intersection(changedLibraries.map((c) => c.contractName), libNames));
   }
@@ -247,16 +249,16 @@ export default class NetworkController {
   }
 
   // DeployerController || Contract model
-  public validateContracts(contracts: T4, buildArtifacts: BuildArtifacts): boolean {
+  public validateContracts(contracts: Array<[string, ContractFactory]>, buildArtifacts: BuildArtifacts): boolean {
     return _.every(contracts.map(([contractAlias, contractClass]) =>
       this.validateContract(contractAlias, contractClass, buildArtifacts))
     );
   }
 
   // DeployerController || Contract model
-  public validateContract(contractAlias: string, contractClass: T4, buildArtifacts: BuildArtifacts): boolean {
+  public validateContract(contractAlias: string, contractClass: ContractFactory, buildArtifacts: BuildArtifacts): boolean {
     log.info(`Validating contract ${contractClass.contractName}`);
-    const existingContractInfo = this.networkFile.contract(contractAlias) || {};
+    const existingContractInfo: any = this.networkFile.contract(contractAlias) || {};
     const warnings = validate(contractClass, existingContractInfo, buildArtifacts);
     const newWarnings = newValidationErrors(warnings, existingContractInfo.warnings);
 
@@ -276,18 +278,13 @@ export default class NetworkController {
   }
 
   // Contract model
-  private _errorForContractDeployed(packageName: string, contractAlias: string): string {
-    return this._errorForLocalContractDeployed(contractAlias);
-  }
-
-  // Contract model
-  public checkLocalContractsDeployed(throwIfFail = false) {
+  public checkLocalContractsDeployed(throwIfFail: boolean = false): void {
     const err = this._errorForLocalContractsDeployed();
     if (err) this._handleErrorMessage(err, throwIfFail);
   }
 
   // Contract model
-  private _errorForLocalContractsDeployed() {
+  private _errorForLocalContractsDeployed(): string {
     const [contractsDeployed, contractsMissing] = _.partition(this.packageFile.contractAliases, (alias) => this.isContractDeployed(alias));
     const contractsChanged = _.filter(contractsDeployed, (alias) => this.hasContractChanged(alias));
 
@@ -299,14 +296,14 @@ export default class NetworkController {
   }
 
   // Contract model
-  public checkLocalContractDeployed(contractAlias, throwIfFail = false) {
+  public checkLocalContractDeployed(contractAlias: string, throwIfFail: boolean = false): void {
     // if (!packageName) packageName = this.packageFile.name
     const err = this._errorForLocalContractDeployed(contractAlias);
     if (err) this._handleErrorMessage(err, throwIfFail);
   }
 
   // Contract model
-  private _errorForLocalContractDeployed(contractAlias) {
+  private _errorForLocalContractDeployed(contractAlias: string): string {
     if (!this.isContractDefined(contractAlias)) {
       return `Contract ${contractAlias} not found in this project`;
     } else if (!this.isContractDeployed(contractAlias)) {
@@ -317,7 +314,7 @@ export default class NetworkController {
   }
 
   // TODO: move to utils folder or somewhere else
-  private _handleErrorMessage(msg, throwIfFail = false) {
+  private _handleErrorMessage(msg: string, throwIfFail: boolean = false): void | never {
     if (throwIfFail) {
       throw Error(msg);
     } else {
@@ -326,12 +323,12 @@ export default class NetworkController {
   }
 
   // Contract model || SolidityLib model
-  private _hasSolidityLibChanged(libClass) {
+  private _hasSolidityLibChanged(libClass: ContractFactory): boolean {
     return !this.networkFile.hasSameBytecode(libClass.contractName, libClass);
   }
 
   // Contract model
-  public hasContractChanged(contractAlias, contractClass = undefined) {
+  public hasContractChanged(contractAlias: string, contractClass?: ContractFactory): boolean {
     if (!this.isLocalContract(contractAlias)) return false;
     if (!this.isContractDeployed(contractAlias)) return true;
 
@@ -343,22 +340,22 @@ export default class NetworkController {
   }
 
   // Contract model
-  public isLocalContract(contractAlias) {
+  public isLocalContract(contractAlias: string): boolean {
     return this.packageFile.hasContract(contractAlias);
   }
 
   // Contract model
-  public isContractDefined(contractAlias) {
+  public isContractDefined(contractAlias: string): boolean {
     return this.packageFile.hasContract(contractAlias);
   }
 
   // Contract model
-  public isContractDeployed(contractAlias) {
+  public isContractDeployed(contractAlias: string): boolean {
     return !this.isLocalContract(contractAlias) || this.networkFile.hasContract(contractAlias);
   }
 
   // VerifierController
-  public async verifyAndPublishContract(contractAlias, optimizer, optimizerRuns, remote, apiKey) {
+  public async verifyAndPublishContract(contractAlias: string, optimizer: boolean, optimizerRuns: string, remote: string, apiKey: string): Promise<void> {
     const contractName = this.packageFile.contract(contractAlias);
     const { compilerVersion, sourcePath } = this.localController.getContractSourcePath(contractAlias);
     const contractSource = await flattenSourceCode([sourcePath]);
@@ -369,49 +366,50 @@ export default class NetworkController {
   }
 
   // NetworkController
-  public writeNetworkPackageIfNeeded() {
+  public writeNetworkPackageIfNeeded(): void {
     this.networkFile.write();
   }
 
   // DeployerController
-  public async freeze() {
+  public async freeze(): Promise<void | never> {
     if (!this.packageAddress) throw Error('Cannot freeze an unpublished project');
     await this.fetchOrDeploy(this.currentVersion);
-    await this.project.freeze();
+    if(this.project instanceof AppProject) await this.project.freeze();
     this.networkFile.frozen = true;
   }
 
   // DeployerController
-  get isLightweight() {
+  get isLightweight(): boolean {
     return this.packageFile.isLightweight && !this.appAddress;
   }
 
   // DeployerController
-  public getDeployer(requestedVersion) {
+  public getDeployer(requestedVersion: string): SimpleProjectDeployer | AppProjectDeployer {
     return this.isLightweight
       ? new SimpleProjectDeployer(this, requestedVersion)
       : new AppProjectDeployer(this, requestedVersion);
   }
 
   // NetworkController
-  get appAddress() {
+  get appAddress(): string {
     return this.networkFile.appAddress;
   }
 
   // NetworkController
-  get app() {
-    return this.project.getApp();
+  get app(): App | null {
+    if(this.project instanceof AppProject) return this.project.getApp();
+    else return null;
   }
 
   // DeployerController
-  public async toFullApp() {
+  public async toFullApp(): Promise<void> {
     if (this.appAddress) {
       log.info(`Project is already published to ${this.network}`);
       return;
     }
 
     log.info(`Publishing project to ${this.network}...`);
-    const simpleProject = await this.fetchOrDeploy(this.currentVersion);
+    const simpleProject = <SimpleProject>(await this.fetchOrDeploy(this.currentVersion));
     const deployer = new AppProjectDeployer(this, this.packageVersion);
     this.project = await deployer.fromSimpleProject(simpleProject);
     log.info(`Publish to ${this.network} successful`);
@@ -427,13 +425,13 @@ export default class NetworkController {
   }
 
   // Proxy model
-  public async createProxy(packageName, contractAlias, initMethod, initArgs) {
+  public async createProxy(packageName: string, contractAlias: string, initMethod: string, initArgs: string[]): Promise<ContractWrapper> {
     await this.fetchOrDeploy(this.currentVersion);
     if (!packageName) packageName = this.packageFile.name;
     const contractClass = this.localController.getContractClass(packageName, contractAlias);
     this.checkInitialization(contractClass, initMethod, initArgs);
     const proxyInstance = await this.project.createProxy(contractClass, { packageName, contractName: contractAlias, initMethod, initArgs });
-    const implementationAddress = await Proxy.at(proxyInstance).implementation();
+    const implementationAddress = await Proxy.at(proxyInstance.address).implementation();
     const packageVersion = packageName === this.packageFile.name ? this.currentVersion : (await this.project.getDependencyVersion(packageName));
     this._updateTruffleDeployedInformation(contractAlias, proxyInstance);
 
@@ -446,7 +444,7 @@ export default class NetworkController {
   }
 
   // Proxy model
-  public checkInitialization(contractClass, calledInitMethod, calledInitArgs) {
+  public checkInitialization(contractClass: ContractFactory, calledInitMethod: string, calledInitArgs: string[]): void {
     // If there is an initializer called, assume it's ok
     if (calledInitMethod) return;
 
@@ -457,7 +455,7 @@ export default class NetworkController {
   }
 
   // Proxy model
-  private _updateTruffleDeployedInformation(contractAlias, implementation) {
+  private _updateTruffleDeployedInformation(contractAlias: string, implementation: ContractWrapper): void {
     const contractName = this.packageFile.contract(contractAlias);
     if (contractName) {
       const path = Contracts.getLocalPath(contractName);
@@ -476,7 +474,7 @@ export default class NetworkController {
   }
 
   // Proxy model
-  public async setProxiesAdmin(packageName, contractAlias, proxyAddress, newAdmin) {
+  public async setProxiesAdmin(packageName: string, contractAlias: string, proxyAddress: string, newAdmin: string): Promise<ProxyInterface[]> {
     const proxies = this._fetchOwnedProxies(packageName, contractAlias, proxyAddress);
     if (proxies.length === 0) return [];
     await this.fetchOrDeploy(this.currentVersion);
@@ -485,24 +483,24 @@ export default class NetworkController {
   }
 
   // Proxy model
-  private async _changeProxiesAdmin(proxies, newAdmin, project = null) {
+  private async _changeProxiesAdmin(proxies: ProxyInterface[], newAdmin: string, project: SimpleProject | AppProject = null): Promise<void> {
     if (!project) project = this.project;
-    await allPromisesOrError(_.map(proxies, async (proxy) => {
-      await project.changeProxyAdmin(proxy.address, newAdmin);
-      this.networkFile.updateProxy(proxy, (proxy) => ({ ...proxy, admin: newAdmin }));
+    await allPromisesOrError(_.map(proxies, async (aProxy) => {
+      await project.changeProxyAdmin(aProxy.address, newAdmin);
+      this.networkFile.updateProxy(aProxy, (anotherProxy) => ({ ...anotherProxy, admin: newAdmin }));
     }));
   }
 
   // Proxy model
-  public async upgradeProxies(packageName, contractAlias, proxyAddress, initMethod, initArgs) {
+  public async upgradeProxies(packageName: string, contractAlias: string, proxyAddress: string, initMethod: string, initArgs: string[]): Promise<ProxyInterface[]> {
     const proxies = this._fetchOwnedProxies(packageName, contractAlias, proxyAddress);
     if (proxies.length === 0) return [];
     await this.fetchOrDeploy(this.currentVersion);
 
     // Check if there is any migrate method in the contracts and warn the user to call it
     const contracts = _.uniqWith(_.map(proxies, (p) => [p.package, p.contract]), _.isEqual);
-    _.forEach(contracts, ([packageName, contractName]) =>
-      this._checkUpgrade(this.localController.getContractClass(packageName, contractName), initMethod, initArgs)
+    _.forEach(contracts, ([aPackageName, contractName]) =>
+      this._checkUpgrade(this.localController.getContractClass(aPackageName, contractName), initMethod, initArgs)
     );
 
     // Update all proxies loaded
@@ -514,11 +512,11 @@ export default class NetworkController {
   }
 
   // Proxy model
-  private async _upgradeProxy(proxy, initMethod, initArgs) {
+  private async _upgradeProxy(proxy: ProxyInterface, initMethod: string, initArgs: string[]): Promise<void | never> {
     try {
       const name = { packageName: proxy.package, contractName: proxy.contract };
       const contractClass = this.localController.getContractClass(proxy.package, proxy.contract);
-      const currentImplementation = await Proxy.at(proxy).implementation();
+      const currentImplementation = await Proxy.at(proxy.address).implementation();
       const contractImplementation = await this.project.getImplementation(name);
       const packageVersion = proxy.package === this.packageFile.name ? this.currentVersion : (await this.project.getDependencyVersion(proxy.package));
 
@@ -531,8 +529,8 @@ export default class NetworkController {
         newImplementation = currentImplementation;
       }
 
-      this.networkFile.updateProxy(proxy, (proxy) => ({
-        ... proxy,
+      this.networkFile.updateProxy(proxy, (aProxy) => ({
+        ... aProxy,
         implementation: newImplementation,
         version: semanticVersionToString(packageVersion)
       }));
@@ -543,7 +541,7 @@ export default class NetworkController {
   }
 
   // Proxy model
-  private _checkUpgrade(contractClass, calledMigrateMethod, calledMigrateArgs) {
+  private _checkUpgrade(contractClass: ContractFactory, calledMigrateMethod: string, calledMigrateArgs: string[]): void {
     // If there is a migration called, assume it's ok
     if (calledMigrateMethod) return;
 
@@ -554,7 +552,7 @@ export default class NetworkController {
   }
 
   // Proxy model
-  private _fetchOwnedProxies(packageName, contractAlias, proxyAddress) {
+  private _fetchOwnedProxies(packageName?: string, contractAlias?: string, proxyAddress?: string): ProxyInterface[] {
     let criteriaDescription = '';
     if (packageName || contractAlias) criteriaDescription += ` contract ${toContractFullName(packageName, contractAlias)}`;
     if (proxyAddress) criteriaDescription += ` address ${proxyAddress}`;
@@ -582,14 +580,14 @@ export default class NetworkController {
   }
 
   // Dependency Controller
-  public async deployDependencies() {
+  public async deployDependencies(): Promise<void> {
     await allPromisesOrError(
       _.map(this.packageFile.dependencies, (version, dep) => this.deployDependencyIfNeeded(dep, version))
     );
   }
 
   // DependencyController
-  public async deployDependencyIfNeeded(depName, depVersion) {
+  public async deployDependencyIfNeeded(depName: string, depVersion: string): Promise<void | never> {
     try {
       const dependency = new Dependency(depName, depVersion);
       if (dependency.isDeployedOnNetwork(this.network) || this.networkFile.dependencyHasMatchingCustomDeploy(depName)) return;
@@ -607,7 +605,7 @@ export default class NetworkController {
   }
 
   // DependencyController
-  public async handleDependenciesLink() {
+  public async handleDependenciesLink(): Promise<void> {
     await allPromisesOrError(_.concat(
       _.map(this.packageFile.dependencies, (version, dep) => this.linkDependency(dep, version)),
       _.map(this.networkFile.dependenciesNamesMissingFromPackage(), (dep) => this.unlinkDependency(dep))
@@ -615,7 +613,7 @@ export default class NetworkController {
   }
 
   // DependencyController
-  public async unlinkDependency(depName) {
+  public async unlinkDependency(depName: string): Promise<void | never> {
     try {
       if (await this.project.hasDependency(depName)) {
         log.info(`Unlinking dependency ${depName}`);
@@ -628,12 +626,12 @@ export default class NetworkController {
   }
 
   // DependencyController
-  public async linkDependency(depName, depVersion) {
+  public async linkDependency(depName: string, depVersion: string): Promise<boolean | never> {
     try {
       if (this.networkFile.dependencyHasMatchingCustomDeploy(depName)) {
         log.info(`Using custom deployment of ${depName}`);
         const depInfo = this.networkFile.getDependency(depName);
-        return await this.project.setDependency(depName, depInfo.package, depInfo.version);
+        return await (<AppProject>this.project).setDependency(depName, depInfo.package, depInfo.version);
       }
 
       if (!this.networkFile.dependencySatisfiesVersionRequirement(depName)) {
@@ -651,7 +649,7 @@ export default class NetworkController {
   }
 
   // Contract model
-  private _errorForContractDeployed(packageName, contractAlias) {
+  private _errorForContractDeployed(packageName: string, contractAlias: string): string {
     if (packageName === this.packageFile.name) {
       return this._errorForLocalContractDeployed(contractAlias);
     } else if (!this.packageFile.hasDependency(packageName)) {

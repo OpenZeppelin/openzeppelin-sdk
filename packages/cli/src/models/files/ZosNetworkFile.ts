@@ -33,6 +33,7 @@ export interface ProxyInterface {
   address?: string;
   version?: string;
   implementation?: string;
+  admin?: string;
 }
 
 export interface DependencyInterface {
