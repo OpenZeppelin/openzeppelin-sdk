@@ -18,7 +18,7 @@ const register: (program: Command) => Command = (program) => program
   .withPushOptions()
   .action(action);
 
-async function action(contractNames: string[], options: Command) {
+async function action(contractNames: string[], options: Command): Promise<void> {
   ConfigVariablesInitializer.initStaticConfiguration();
   if(!options.skipCompile) await Compiler.call();
   if(options.all) addAll({});
