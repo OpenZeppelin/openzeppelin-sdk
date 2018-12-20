@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import { Logger, FileSystem as fs } from 'zos-lib';
 import Dependency from '../dependency/Dependency';
-import { ZOS_VERSION, checkVersion } from './ZosVersion';
+import checkVersion, { ZOS_VERSION} from './ZosVersion';
 import ZosNetworkFile from './ZosNetworkFile';
 const log = new Logger('ZosPackageFile');
 
