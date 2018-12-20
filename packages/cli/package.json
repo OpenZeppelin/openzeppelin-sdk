@@ -7,7 +7,7 @@
   "license": "MIT",
   "scripts": {
     "compile-ts": "rm -rf lib && tsc",
-    "prepare": "npm run compile-ts",
+    "prepare": "npm run compile-ts && chmod 755 ./lib/bin/zos-cli.js",
     "test": "./scripts/test.sh",
     "gen-docs": "babel-node docs/bin/docs.js",
     "watch": "tsc -w",
