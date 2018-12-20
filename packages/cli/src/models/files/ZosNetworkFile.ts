@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import { Logger, FileSystem as fs, bytecodeDigest, bodyCode, constructorCode, semanticVersionToString } from 'zos-lib';
 import { fromContractFullName, toContractFullName } from '../../utils/naming';
-import checkVersion, { ZOS_VERSION } from './ZosVersion';
+import { ZOS_VERSION, checkVersion } from './ZosVersion';
 import ZosPackageFile from './ZosPackageFile.js';
 import { ContractWrapper } from 'zos-lib';
 
