@@ -87,7 +87,7 @@ export default class ContractFactory {
     return contractClass.new.getData(...constructorArgs, { ...txParams, data: this.binary });
   }
 
-  public link(libraries: any[]): void {
+  public link(libraries: { [libAlias: string]: string }): void {
     Object.keys(libraries).forEach((name: string) => {
       const address: string = libraries[name].replace(/^0x/, '');
       const regex: RegExp = new RegExp(`__${name}_+`, 'g');
