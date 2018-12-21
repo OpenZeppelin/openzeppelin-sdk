@@ -66,6 +66,12 @@ export interface VerifyParams {
   apiKey?: string;
 }
 
+export interface StatusParams {
+  network?: string;
+  txParams?: any
+  networkFile?: ZosNetworkFile;
+}
+
 interface ContractData {
   name: string;
   alias: string;
