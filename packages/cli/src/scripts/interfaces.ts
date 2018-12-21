@@ -51,6 +51,11 @@ export interface LinkParams {
   packageFile?: ZosPackageFile;
 }
 
+export interface UnlinkParams {
+  dependencies?: string[];
+  packageFile?: ZosPackageFile;
+}
+
 interface ContractData {
   name: string;
   alias: string;
