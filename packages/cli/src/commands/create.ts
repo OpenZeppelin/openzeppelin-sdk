@@ -1,5 +1,4 @@
 import _ from 'lodash';
-import { Command } from 'commander';
 
 import create from '../scripts/create';
 import { parseInit } from '../utils/input';
@@ -10,7 +9,7 @@ const name: string = 'create';
 const signature: string = `${name} <alias>`;
 const description: string = 'deploys a new upgradeable contract instance. Provide the <alias> you added your contract with, or <package>/<alias> to create a contract from a linked package.';
 
-const register: (program: Command) => Command = (program) => program
+const register: (program: any) => any = (program) => program
   .command(signature, undefined, { noHelp: true })
   .usage('<alias> --network <network> [options]')
   .description(description)
@@ -20,7 +19,7 @@ const register: (program: Command) => Command = (program) => program
   .withNetworkOptions()
   .action(action);
 
-async function action(contractFullName: string, options: Command): Promise<void> {
+async function action(contractFullName: string, options: any): Promise<void> {
   const { force } = options;
   const { initMethod, initArgs } = parseInit(options, 'initialize');
   const { contract: contractAlias, package: packageName } = fromContractFullName(contractFullName);

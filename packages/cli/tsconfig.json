@@ -1,9 +1,15 @@
 {
   "extends": "../../tsconfig.json",
   "compilerOptions": {
-    "outDir": "./lib"
+    "outDir": "./lib",
+    "allowJs": false,
+    "noEmitOnError": true,
+    "declaration": true
   },
   "include": [
     "./src"
+  ],
+  "exclude": [
+    "./src/models/initializer/truffle/blueprint.truffle.js"
   ]
 }

@@ -1,6 +1,4 @@
 import _ from 'lodash';
-import { Command } from 'commander';
-
 import push from '../scripts/push';
 import Compiler from '../models/compiler/Compiler';
 import ConfigVariablesInitializer from '../models/initializer/ConfigVariablesInitializer';
@@ -9,7 +7,7 @@ const name: string = 'push';
 const signature: string = name;
 const description: string = 'deploys your project to the specified <network>';
 
-const register: (program: Command) => Command = (program) => program
+const register: (program: any) => any = (program) => program
   .command(signature, undefined, { noHelp: true })
   .description(description)
   .usage('--network <network> [options]')
@@ -20,7 +18,7 @@ const register: (program: Command) => Command = (program) => program
   .withNetworkOptions()
   .action(action);
 
-async function action(options: Command): Promise<void> {
+async function action(options: any): Promise<void> {
   const {  deployDependencies, force, reset: reupload } = options;
   if (!options.skipCompile) await Compiler.call();
   const { network, txParams } = await ConfigVariablesInitializer.initNetworkConfiguration(options);
@@ -28,7 +26,7 @@ async function action(options: Command): Promise<void> {
   if (!options.dontExitProcess && process.env.NODE_ENV !== 'test') process.exit(0);
 }
 
-async function tryAction(externalOptions: Command): Promise<void> {
+async function tryAction(externalOptions: any): Promise<void> {
   if (!externalOptions.push) return;
   const options = _.omit(externalOptions, 'push');
   const network = _.isString(externalOptions.push) ? externalOptions.push : undefined;

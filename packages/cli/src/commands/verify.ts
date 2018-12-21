@@ -1,4 +1,3 @@
-import { Command } from 'commander';
 import _ from 'lodash';
 
 import verify from '../scripts/verify';
@@ -8,7 +7,7 @@ const name: string = 'verify';
 const signature: string = `${name} <contract-alias>`;
 const description: string = 'verify a contract with etherchain. Provide a contract name.';
 
-const register: (program: Command) => Command = (program) => program
+const register: (program: any) => any = (program) => program
   .command(signature, undefined, { noHelp: true })
   .description(description)
   .option('-n, --network <network>', 'network where to verify the contract')
@@ -18,7 +17,7 @@ const register: (program: Command) => Command = (program) => program
   .option('--api-key <key>', 'specify etherscan API key. To get one, go to: https://etherscan.io/myapikey')
   .action(action);
 
-async function action(contractAlias: string, options: Command): Promise<void | never> {
+async function action(contractAlias: string, options: any): Promise<void | never> {
   const { optimizer, optimizerRuns, remote, apiKey } = options;
   if (optimizer && !optimizerRuns) {
     throw new Error('Cannot verify contract without defining optimizer runs');

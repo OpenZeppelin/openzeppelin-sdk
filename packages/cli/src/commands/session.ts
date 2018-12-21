@@ -1,11 +1,10 @@
-import { Command } from 'commander';
 import session from '../scripts/session';
 
 const name: string = 'session';
 const signature: string = name;
 const description: string = 'by providing network options, commands like create, freeze, push, status and update will use them unless overridden. Use --close to undo.';
 
-const register: (program: Command) => Command = (program) => program
+const register: (program: any) => any = (program) => program
   .command(signature, undefined, { noHelp: true })
   .usage('[options]')
   .description(description)
@@ -14,7 +13,7 @@ const register: (program: Command) => Command = (program) => program
   .withNetworkOptions()
   .action(action);
 
-function action(options: Command): void {
+function action(options: any): void {
   const { network, from, timeout, close, expires } = options;
   session({ network, from, timeout: <number> timeout, close, expires: <number> expires });
 }

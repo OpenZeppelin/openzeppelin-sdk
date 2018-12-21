@@ -31,12 +31,15 @@ interface Proxy extends Network, PackageArgs {
 
 export interface CreateParams extends Proxy {}
 
+export interface CompareParams extends Network {}
+
+export interface PullParams extends Network {}
+
 export interface StatusParams extends Network {}
 
 export interface FreezeParams extends Network {}
 
 export interface PublishParams extends Network {}
-
 
 export interface UpdateParams extends Proxy {
   all?: boolean;
