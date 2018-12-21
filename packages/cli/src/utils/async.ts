@@ -1,6 +1,6 @@
 import _ from 'lodash';
 
-export async function allPromisesOrError(promisesWithObjects: any[], toErrorMessage: (error: any, object: any) => string): Promise<any[] | null | never> {
+export async function allPromisesOrError(promisesWithObjects: any[], toErrorMessage?: (error: any, object: any) => string): Promise<any[] | null | never> {
   const failures = [];
   const handlingFailure = async (item: any) => {
     let promise;

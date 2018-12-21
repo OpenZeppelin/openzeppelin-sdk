@@ -33,7 +33,7 @@ export default class Dependency {
     return this.fromNameWithVersion(nameAndVersion);
   }
 
-  constructor(name: string, requirement: string | semver.Range) {
+  constructor(name: string, requirement?: string | semver.Range) {
     this.name = name;
     this._networkFiles = {};
 

@@ -140,7 +140,7 @@ export default class LocalController {
       const dependency = installDependencies
         ? await Dependency.install(depNameVersion)
         : Dependency.fromNameWithVersion(depNameVersion);
-      this.packageFile.setDependency(dependency.name, dependency.requirement);
+      this.packageFile.setDependency(dependency.name, <string>dependency.requirement);
     }));
   }
 
