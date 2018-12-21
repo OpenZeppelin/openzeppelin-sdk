@@ -1,11 +1,15 @@
 import _ from 'lodash';
 import { Logger } from 'zos-lib';
-import ControllerFor from "../models/network/ControllerFor";
 
-const log = new Logger('scripts/status');
+import ControllerFor from '../models/network/ControllerFor';
+import NetworkController from '../models/network/NetworkController';
+import ZosNetworkFile from '../models/files/ZosNetworkFile';
+import { StatusParams }from './interfaces';
 
-export default async function status({ network, txParams = {}, networkFile = undefined }) {
-  const controller = ControllerFor(network, txParams, networkFile)
+const log: Logger = new Logger('scripts/status');
+
+export default async function status({ network, txParams = {}, networkFile }: StatusParams): Promise<void> {
+  const controller = ControllerFor(network, txParams, networkFile);
   log.info(`Project status for network ${network}`);
 
   if (!(await appInfo(controller))) return;
@@ -15,7 +19,8 @@ export default async function status({ network, txParams = {}, networkFile = und
   await proxiesInfo(controller.networkFile);
 }
 
-async function appInfo(controller) {
+// TODO: Find a nice home for all these functions :)
+async function appInfo(controller: NetworkController): Promise<boolean> {
   if (controller.isLightweight) return true;
 
   if (!controller.appAddress) {
@@ -29,18 +34,18 @@ async function appInfo(controller) {
   return true;
 }
 
-async function versionInfo(networkFile) {
+async function versionInfo(networkFile: ZosNetworkFile): Promise<boolean> {
   if (networkFile.isLightweight) return true;
   if (networkFile.hasMatchingVersion()) {
-    log.info(`- Deployed version ${networkFile.version} matches the latest one defined`)
+    log.info(`- Deployed version ${networkFile.version} matches the latest one defined`);
     return true;
   } else {
-    log.info(`- Deployed version ${networkFile.version} is out of date (latest is ${networkFile.packageFile.version})`)
+    log.info(`- Deployed version ${networkFile.version} is out of date (latest is ${networkFile.packageFile.version})`);
     return false;
   }
 }
 
-async function contractsInfo(controller) {
+async function contractsInfo(controller: NetworkController): Promise<void> {
   log.info('Application contracts:');
 
   // Bail if there are no contracts at all
@@ -50,7 +55,7 @@ async function contractsInfo(controller) {
   }
 
   // Log status for each contract in package file
-  _.each(controller.packageFile.contracts, function (contractName, contractAlias) {
+  _.each(controller.packageFile.contracts, function(contractName, contractAlias) {
     const isDeployed = controller.isContractDeployed(contractAlias);
     const hasChanged = controller.hasContractChanged(contractAlias);
     const fullName = contractName === contractAlias ? contractAlias : `${contractAlias} (implemented by ${contractName})`;
@@ -65,48 +70,48 @@ async function contractsInfo(controller) {
 
   // Log contracts in network file missing from package file
   controller.networkFile.contractAliasesMissingFromPackage()
-    .forEach(contractAlias => log.warn(`- ${contractAlias} will be removed on next push`));
+    .forEach((contractAlias) => log.warn(`- ${contractAlias} will be removed on next push`));
 }
 
-async function dependenciesInfo(networkFile) {
-  if (networkFile.isLightweight) return true;
+async function dependenciesInfo(networkFile: ZosNetworkFile): Promise<void> {
+  if (networkFile.isLightweight) return;
   const packageFile = networkFile.packageFile;
   if (!packageFile.hasDependencies() && !networkFile.hasDependencies()) return;
   log.info('Application dependencies:');
 
   _.forEach(packageFile.dependencies, (requiredVersion, dependencyName) => {
-    const msgHead = `- ${dependencyName}@${requiredVersion}`
+    const msgHead = `- ${dependencyName}@${requiredVersion}`;
     if (!networkFile.hasDependency(dependencyName)) {
-      log.info(`${msgHead} is required but is not linked`)
+      log.info(`${msgHead} is required but is not linked`);
     } else if (networkFile.dependencyHasMatchingCustomDeploy(dependencyName)) {
-      log.info(`${msgHead} is linked to a custom deployment`)
+      log.info(`${msgHead} is linked to a custom deployment`);
     } else if (networkFile.dependencyHasCustomDeploy(dependencyName)) {
-      log.info(`${msgHead} is linked to a custom deployment of a different version (${networkFile.getDependency(dependencyName).version})`)
+      log.info(`${msgHead} is linked to a custom deployment of a different version (${networkFile.getDependency(dependencyName).version})`);
     } else if (networkFile.dependencySatisfiesVersionRequirement(dependencyName)) {
       const actualVersion = networkFile.getDependency(dependencyName).version;
       if (actualVersion === requiredVersion) {
-        log.info(`${msgHead} is linked`)
+        log.info(`${msgHead} is linked`);
       } else {
-        log.info(`${msgHead} is linked to version ${actualVersion}`)
+        log.info(`${msgHead} is linked to version ${actualVersion}`);
       }
     } else {
-      log.info(`${msgHead} is linked to a different version (${networkFile.getDependency(dependencyName).version})`)
+      log.info(`${msgHead} is linked to a different version (${networkFile.getDependency(dependencyName).version})`);
     }
   });
 
   _.forEach(networkFile.dependenciesNamesMissingFromPackage, (dependencyName) => {
-    log.info(`- ${dependencyName} will be unlinked on next push`)
-  })
+    log.info(`- ${dependencyName} will be unlinked on next push`);
+  });
 }
 
-async function proxiesInfo(networkFile) {
+async function proxiesInfo(networkFile: ZosNetworkFile): Promise<void> {
   log.info('Deployed proxies:');
   if (!networkFile.hasProxies()) {
     log.info('- No proxies created');
     return;
   }
 
-  networkFile.getProxies().forEach(proxy =>
+  networkFile.getProxies().forEach((proxy) =>
     log.info(`- ${proxy.package}/${proxy.contract} at ${proxy.address} version ${proxy.version}`)
-  )
+  );
 }

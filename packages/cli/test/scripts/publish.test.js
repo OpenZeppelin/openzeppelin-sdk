@@ -3,10 +3,10 @@ require('../setup')
 
 import { App, Package, ImplementationDirectory, Proxy } from 'zos-lib'
 
-import publish from '../../src/scripts/publish.js';
-import push from '../../src/scripts/push.js';
-import create from '../../src/scripts/create.js';
-import setAdmin from '../../src/scripts/set-admin.js';
+import publish from '../../src/scripts/publish';
+import push from '../../src/scripts/push';
+import create from '../../src/scripts/create';
+import setAdmin from '../../src/scripts/set-admin';
 import ZosPackageFile from '../../src/models/files/ZosPackageFile';
 
 const should = require('chai').should();

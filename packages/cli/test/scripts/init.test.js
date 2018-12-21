@@ -4,7 +4,7 @@ require('../setup')
 import { FileSystem as fs } from 'zos-lib'
 import { cleanup, cleanupfn } from '../helpers/cleanup'
 
-import init from '../../src/scripts/init.js'
+import init from '../../src/scripts/init'
 import ZosPackageFile from '../../src/models/files/ZosPackageFile'
 
 contract('init script', function() {

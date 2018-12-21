@@ -1,7 +1,7 @@
 'use strict'
 require('../setup')
 
-import remove from '../../src/scripts/remove.js';
+import remove from '../../src/scripts/remove';
 import ZosPackageFile from "../../src/models/files/ZosPackageFile";
 import CaptureLogs from '../helpers/captureLogs';
 

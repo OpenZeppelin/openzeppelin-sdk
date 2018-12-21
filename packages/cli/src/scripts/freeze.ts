@@ -1,11 +1,11 @@
-import ControllerFor from "../models/network/ControllerFor";
+import ControllerFor from '../models/network/ControllerFor';
 import ScriptError from '../models/errors/ScriptError';
+import { FreezeParams } from './interfaces';
 
-export default async function publish({ network, txParams = {}, networkFile = undefined }) {
+export default async function freeze({ network, txParams = {}, networkFile }: FreezeParams): Promise<void | never> {
   const controller = ControllerFor(network, txParams, networkFile);
-  
   try {
-    await controller.toFullApp();
+    await controller.freeze();
     controller.writeNetworkPackageIfNeeded();
   } catch(error) {
     const cb = () => controller.writeNetworkPackageIfNeeded();

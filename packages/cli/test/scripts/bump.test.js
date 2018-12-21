@@ -1,9 +1,9 @@
 'use strict'
 require('../setup')
 
-import add from '../../src/scripts/add.js';
-import bumpVersion from '../../src/scripts/bump.js';
-import link from '../../src/scripts/link.js';
+import add from '../../src/scripts/add';
+import bumpVersion from '../../src/scripts/bump';
+import link from '../../src/scripts/link';
 import ZosPackageFile from "../../src/models/files/ZosPackageFile";
 
 contract('bump script', function() {

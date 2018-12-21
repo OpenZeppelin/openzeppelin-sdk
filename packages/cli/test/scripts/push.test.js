@@ -4,7 +4,7 @@ require('../setup')
 import { ZWeb3, Contracts, App, Package } from 'zos-lib'
 
 import sinon from 'sinon'
-import push from '../../src/scripts/push.js';
+import push from '../../src/scripts/push';
 import freeze from '../../src/scripts/freeze';
 import add from '../../src/scripts/add';
 import bumpVersion from '../../src/scripts/bump';

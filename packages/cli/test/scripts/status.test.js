@@ -1,11 +1,11 @@
 'use strict'
 require('../setup')
 
-import add from '../../src/scripts/add.js';
-import push from '../../src/scripts/push.js';
-import bumpVersion from '../../src/scripts/bump.js';
-import createProxy from '../../src/scripts/create.js';
-import status from '../../src/scripts/status.js';
+import add from '../../src/scripts/add';
+import push from '../../src/scripts/push';
+import bumpVersion from '../../src/scripts/bump';
+import createProxy from '../../src/scripts/create';
+import status from '../../src/scripts/status';
 import link from '../../src/scripts/link';
 import ControllerFor from '../../src/models/local/ControllerFor';
 import CaptureLogs from '../helpers/captureLogs';

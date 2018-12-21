@@ -8,7 +8,6 @@ const name: string = 'verify';
 const signature: string = `${name} <contract-alias>`;
 const description: string = 'verify a contract with etherchain. Provide a contract name.';
 
-
 const register: (program: Command) => Command = (program) => program
   .command(signature, undefined, { noHelp: true })
   .description(description)

@@ -1,7 +1,7 @@
 'use strict'
 require('../setup')
 
-import link from '../../src/scripts/link.js';
+import link from '../../src/scripts/link';
 import ZosPackageFile from "../../src/models/files/ZosPackageFile";
 
 const should = require('chai').should();

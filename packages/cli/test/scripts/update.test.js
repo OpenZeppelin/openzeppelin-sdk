@@ -5,13 +5,13 @@ import _ from 'lodash';
 import { Contracts, Proxy } from "zos-lib";
 import CaptureLogs from '../helpers/captureLogs';
 
-import add from '../../src/scripts/add.js';
-import push from '../../src/scripts/push.js';
-import bumpVersion from '../../src/scripts/bump.js';
-import link from '../../src/scripts/link.js';
-import createProxy from '../../src/scripts/create.js';
-import update from '../../src/scripts/update.js';
-import setAdmin from '../../src/scripts/set-admin.js';
+import add from '../../src/scripts/add';
+import push from '../../src/scripts/push';
+import bumpVersion from '../../src/scripts/bump';
+import link from '../../src/scripts/link';
+import createProxy from '../../src/scripts/create';
+import update from '../../src/scripts/update';
+import setAdmin from '../../src/scripts/set-admin';
 import ZosPackageFile from "../../src/models/files/ZosPackageFile";
 
 const ImplV1 = Contracts.getFromLocal('ImplV1')

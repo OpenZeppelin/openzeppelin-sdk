@@ -3,9 +3,9 @@ require('../setup')
 
 import { Proxy } from "zos-lib";
 
-import push from '../../src/scripts/push.js';
-import createProxy from '../../src/scripts/create.js';
-import setAdmin from '../../src/scripts/set-admin.js';
+import push from '../../src/scripts/push';
+import createProxy from '../../src/scripts/create';
+import setAdmin from '../../src/scripts/set-admin';
 import ZosPackageFile from "../../src/models/files/ZosPackageFile";
 
 contract('set-admin script', function([_skipped, owner, newAdmin, anotherNewAdmin]) {
