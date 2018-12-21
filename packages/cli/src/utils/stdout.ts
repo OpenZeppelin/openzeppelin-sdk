@@ -2,9 +2,9 @@ const state: { silent: boolean } = {
   silent: false
 };
 
-export default function log(): void {
+export default function log(...args: any[]): void {
   if (!state.silent && process.env.NODE_ENV !== 'test') {
-    console.log(...arguments);
+    console.log(...args);
   }
 }
 
