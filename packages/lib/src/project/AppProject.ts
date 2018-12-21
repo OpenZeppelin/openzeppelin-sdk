@@ -12,11 +12,12 @@ import { semanticVersionToString } from '../utils/Semver';
 const DEFAULT_NAME: string = 'main';
 const DEFAULT_VERSION: string = '0.1.0';
 
-interface ContractInterface {
+export interface ContractInterface {
   packageName?: string;
   contractName?: string;
   initMethod?: string;
   initArgs?: string[];
+  redeployIfChanged?: boolean;
 }
 
 interface ExistingAddresses {

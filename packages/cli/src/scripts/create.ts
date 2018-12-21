@@ -2,8 +2,9 @@ import stdout from '../utils/stdout';
 import ControllerFor from '../models/network/ControllerFor';
 import ScriptError from '../models/errors/ScriptError';
 import { CreateParams } from './interfaces';
+import { ContractWrapper } from 'zos-lib';
 
-export default async function createProxy({ packageName, contractAlias, initMethod, initArgs, network, txParams = {}, force = false, networkFile }: CreateParams): Promise<void | never> {
+export default async function createProxy({ packageName, contractAlias, initMethod, initArgs, network, txParams = {}, force = false, networkFile }: CreateParams): Promise<ContractWrapper | never> {
   if (!contractAlias) throw Error('A contract alias must be provided to create a new proxy.');
 
   const controller = ControllerFor(network, txParams, networkFile);

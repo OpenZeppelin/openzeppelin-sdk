@@ -7,7 +7,8 @@ import { deploy } from '../utils/Transactions';
 import { toAddress } from '../utils/Addresses';
 import { bytecodeDigest } from '..';
 import { buildCallData, callDescription, CalldataInfo } from '../utils/ABIs';
-import ContractFactory from '../artifacts/ContractFactory';
+import ContractFactory, { ContractWrapper } from '../artifacts/ContractFactory';
+import { ContractInterface } from './AppProject';
 
 interface Implementations {
   [contractName: string]: Implementation;
@@ -42,7 +43,7 @@ export default class SimpleProject  {
     this.dependencies = {};
   }
 
-  public async createProxy(contractClass, { packageName, contractName, initMethod: initMethodName, initArgs, redeployIfChanged }: { packageName?: string, contractName?: string, initMethod?: string, initArgs?: string[], redeployIfChanged?: boolean } = {}) {
+  public async createProxy(contractClass, { packageName, contractName, initMethod: initMethodName, initArgs, redeployIfChanged }: ContractInterface = {}): Promise<ContractWrapper> {
     if (!_.isEmpty(initArgs) && !initMethodName) initMethodName = 'initialize';
     const implementationAddress = await this._getOrDeployImplementation(contractClass, packageName, contractName, redeployIfChanged);
     const initCallData = this._getAndLogInitCallData(contractClass, initMethodName, initArgs, implementationAddress, 'Creating');
@@ -51,7 +52,7 @@ export default class SimpleProject  {
     return contractClass.at(proxy.address);
   }
 
-  public async upgradeProxy(proxyAddress: string, contractClass: ContractFactory, { packageName, contractName, initMethod: initMethodName, initArgs, redeployIfChanged }: { packageName?: string, contractName?: string, initMethod?: string, initArgs?: string[], redeployIfChanged?: boolean } = {}) {
+  public async upgradeProxy(proxyAddress: string, contractClass: ContractFactory, { packageName, contractName, initMethod: initMethodName, initArgs, redeployIfChanged }: ContractInterface = {}): Promise<ContractWrapper> {
     proxyAddress = toAddress(proxyAddress);
     const implementationAddress = await this._getOrDeployImplementation(contractClass, packageName, contractName, redeployIfChanged);
     const initCallData = this._getAndLogInitCallData(contractClass, initMethodName, initArgs, implementationAddress, 'Upgrading');

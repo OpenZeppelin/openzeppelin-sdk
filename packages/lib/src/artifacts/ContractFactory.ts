@@ -2,6 +2,7 @@ import BN from 'bignumber.js';
 import ZWeb3 from './ZWeb3';
 import decodeLogs from '../helpers/decodeLogs';
 import { getSolidityLibNames, hasUnlinkedVariables } from '../utils/Bytecode';
+import { StorageLayoutInfo } from '../validations/Storage';
 
 interface ContractSchema {
   contractName: string;
@@ -17,7 +18,7 @@ export interface ContractWrapper {
   allEvents: any;
   sendTransaction?: (txParams: any) => Promise<TransactionReceiptWrapper>;
   send?: (value: any) => Promise<string>;
-  constructor: ContractFactory;
+  constructor: any;
 }
 
 export interface TransactionReceiptWrapper {
@@ -39,6 +40,8 @@ export default class ContractFactory {
   public binary: string;
   public deployedBinary: string;
   public events: any;
+  public storageInfo: StorageLayoutInfo;
+  public warnings: any;
 
   constructor(schema: ContractSchema, timeout, txParams) {
     this.abi = schema.abi;
@@ -87,7 +90,7 @@ export default class ContractFactory {
     return contractClass.new.getData(...constructorArgs, { ...txParams, data: this.binary });
   }
 
-  public link(libraries: any[]): void {
+  public link(libraries: { [libAlias: string]: string }): void {
     Object.keys(libraries).forEach((name: string) => {
       const address: string = libraries[name].replace(/^0x/, '');
       const regex: RegExp = new RegExp(`__${name}_+`, 'g');
