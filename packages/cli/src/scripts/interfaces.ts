@@ -33,6 +33,11 @@ export interface RemoveParams {
   packageFile?: ZosPackageFile;
 }
 
+export interface CheckParams {
+  contractAlias: string;
+  packageFile?: ZosPackageFile;
+}
+
 interface ContractData {
   name: string;
   alias: string;
