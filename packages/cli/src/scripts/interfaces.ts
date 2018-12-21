@@ -60,6 +60,8 @@ export interface PushParams {
   networkFile?: ZosNetworkFile;
 }
 
+export interface CreateParams extends UpdateParams {};
+
 export interface UpdateParams {
   packageName?: string;
   contractAlias?: string;
