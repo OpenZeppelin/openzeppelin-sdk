@@ -42,7 +42,7 @@ export interface LinkParams extends Dependencies {
 }
 
 export interface InitParams extends Dependencies {
-  name?: string;
+  name: string;
   version?: string;
   force?: boolean;
   publish?: boolean;
@@ -50,16 +50,16 @@ export interface InitParams extends Dependencies {
 }
 
 export interface PushParams extends Network {
-  deployDependencies?: boolean;
-  reupload?: boolean;
   force?: boolean;
+  reupload?: boolean;
+  deployDependencies?: boolean;
 }
 
 export interface VerifyParams extends Network {
+  apiKey: string;
+  remote: string;
   optimizer?: boolean;
-  optimizerRuns: string | number;
-  remote?: string;
-  apiKey?: string;
+  optimizerRuns?: string | number;
 }
 
 export interface SetAdminParams extends Network, PackageArgs {
@@ -68,7 +68,7 @@ export interface SetAdminParams extends Network, PackageArgs {
 }
 
 export interface AddParams {
-  contractsData?: ContractData[];
+  contractsData: ContractData[];
   packageFile?: ZosPackageFile;
 }
 
@@ -81,12 +81,12 @@ export interface SessionParams {
 }
 
 export interface BumpParams {
-  version?: string;
+  version: string;
   packageFile?: ZosPackageFile;
 }
 
 export interface RemoveParams {
-  contracts?: string[];
+  contracts: string[];
   packageFile?: ZosPackageFile;
 }
 
@@ -96,7 +96,7 @@ export interface CheckParams {
 }
 
 export interface UnlinkParams {
-  dependencies?: string[];
+  dependencies: string[];
   packageFile?: ZosPackageFile;
 }
 
