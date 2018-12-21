@@ -1,4 +1,5 @@
 import ZosPackageFile from '../models/files/ZosPackageFile';
+import ZosNetworkFile from '../models/files/ZosNetworkFile';
 
 export interface InitParams {
   name?: string;
@@ -38,7 +39,14 @@ export interface CheckParams {
   packageFile?: ZosPackageFile;
 }
 
+export interface FreezeParams {
+  network: string;
+  networkFile?: ZosNetworkFile;
+  txParams?: any;
+}
+
 interface ContractData {
   name: string;
   alias: string;
 }
+
