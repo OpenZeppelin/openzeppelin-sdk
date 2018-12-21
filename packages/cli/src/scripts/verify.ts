@@ -6,5 +6,5 @@ export default async function verify(contractAlias, { network = 'mainnet', txPar
 
   const controller = ControllerFor(network, txParams, networkFile);
   controller.checkLocalContractDeployed(contractAlias, true);
-  await controller.verifyAndPublishContract(contractAlias, optimizer, optimizerRuns, remote, apiKey);
+  await controller.verifyAndPublishContract(contractAlias, optimizer, <string>optimizerRuns, remote, apiKey);
 }

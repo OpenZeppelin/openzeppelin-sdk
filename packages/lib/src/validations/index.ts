@@ -22,7 +22,7 @@ export interface ValidationInfo {
   storageDiff?: Operation[];
 }
 
-export function validate(contractClass: ContractFactory, existingContractInfo: any = {}, buildArtifacts: any = null): any {
+export function validate(contractClass: ContractFactory, existingContractInfo: any = {}, buildArtifacts?: any): any {
   const storageValidation = validateStorage(contractClass, existingContractInfo, buildArtifacts);
   const uninitializedBaseContracts = [];
 
