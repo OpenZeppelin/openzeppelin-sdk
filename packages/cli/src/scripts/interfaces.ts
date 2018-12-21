@@ -56,7 +56,20 @@ export interface PushParams {
   deployDependencies?: boolean;
   reupload?: boolean;
   force?: boolean;
-  txParams?: any
+  txParams?: any;
+  networkFile?: ZosNetworkFile;
+}
+
+export interface UpdateParams {
+  packageName?: string;
+  contractAlias?: string;
+  proxyAddress?: string;
+  initMethod?: string;
+  initArgs?: string[];
+  all?: boolean;
+  force?: boolean;
+  txParams?: any;
+  network?: string;
   networkFile?: ZosNetworkFile;
 }
 
@@ -77,7 +90,7 @@ export interface VerifyParams {
 
 export interface StatusParams {
   network?: string;
-  txParams?: any
+  txParams?: any;
   networkFile?: ZosNetworkFile;
 }
 
@@ -95,4 +108,3 @@ interface ContractData {
   name: string;
   alias: string;
 }
-
