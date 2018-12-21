@@ -626,12 +626,12 @@ export default class NetworkController {
   }
 
   // DependencyController
-  public async linkDependency(depName: string, depVersion: string): Promise<boolean | never> {
+  public async linkDependency(depName: string, depVersion: string): Promise<boolean | void | never> {
     try {
       if (this.networkFile.dependencyHasMatchingCustomDeploy(depName)) {
         log.info(`Using custom deployment of ${depName}`);
         const depInfo = this.networkFile.getDependency(depName);
-        return await (<AppProject>this.project).setDependency(depName, depInfo.package, depInfo.version);
+        return await this.project.setDependency(depName, depInfo.package, depInfo.version);
       }
 
       if (!this.networkFile.dependencySatisfiesVersionRequirement(depName)) {
