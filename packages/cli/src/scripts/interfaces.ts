@@ -51,6 +51,15 @@ export interface LinkParams {
   packageFile?: ZosPackageFile;
 }
 
+export interface PushParams {
+  network?: string;
+  deployDependencies?: boolean;
+  reupload?: boolean;
+  force?: boolean;
+  txParams?: any
+  networkFile?: ZosNetworkFile;
+}
+
 export interface UnlinkParams {
   dependencies?: string[];
   packageFile?: ZosPackageFile;
