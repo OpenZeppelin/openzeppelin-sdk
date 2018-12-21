@@ -28,8 +28,12 @@ export interface BumpParams {
   packageFile?: ZosPackageFile;
 }
 
+export interface RemoveParams {
+  contracts?: string[];
+  packageFile?: ZosPackageFile;
+}
+
 interface ContractData {
   name: string;
   alias: string;
 }
-

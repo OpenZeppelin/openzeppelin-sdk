@@ -1,6 +1,6 @@
 import stdout from '../utils/stdout';
 import ControllerFor from '../models/local/ControllerFor';
-import { BumpParams } from './interfaces'
+import { BumpParams } from './interfaces';
 
 export default async function bumpVersion({ version, packageFile }: BumpParams): Promise<void | never> {
   const controller = ControllerFor(packageFile);
