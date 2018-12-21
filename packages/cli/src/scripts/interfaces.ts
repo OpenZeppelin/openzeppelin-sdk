@@ -104,6 +104,12 @@ export interface SetAdminParams {
   networkFile?: ZosNetworkFile;
 }
 
+export interface PublishParams {
+  network?: string;
+  networkFile?: ZosNetworkFile;
+  txParams?: any;
+}
+
 interface ContractData {
   name: string;
   alias: string;
