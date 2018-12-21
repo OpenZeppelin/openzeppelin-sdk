@@ -8,7 +8,7 @@ const log = new Logger('Compiler');
 
 export default {
   async call(): Promise<void> {
-    return Truffle.isTruffleProject()
+    Truffle.isTruffleProject()
       ? this.compileWithTruffle()
       : this.compileWithSolc();
   },
