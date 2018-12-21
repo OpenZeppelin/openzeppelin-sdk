@@ -16,7 +16,7 @@ const register: (program: Command) => Command = (program) => program
 
 function action(options: Command): void {
   const { network, from, timeout, close, expires } = options;
-  session({ network, from, timeout, close, expires });
+  session({ network, from, timeout: <number> timeout, close, expires: <number> expires });
 }
 
 export default { name, signature, description, register, action };
