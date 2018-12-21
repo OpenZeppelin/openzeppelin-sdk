@@ -1,7 +1,7 @@
 'use strict'
 require('../setup')
 
-import unlink from '../../src/scripts/unlink.js'
+import unlink from '../../src/scripts/unlink'
 import ZosPackageFile from "../../src/models/files/ZosPackageFile"
 
 contract('unlink script', function() {

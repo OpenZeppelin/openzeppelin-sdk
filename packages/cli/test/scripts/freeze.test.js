@@ -2,8 +2,8 @@
 require('../setup')
 
 import { Package } from 'zos-lib'
-import push from '../../src/scripts/push.js'
-import freeze from '../../src/scripts/freeze.js'
+import push from '../../src/scripts/push'
+import freeze from '../../src/scripts/freeze'
 import ZosPackageFile from '../../src/models/files/ZosPackageFile'
 
 contract('freeze script', function([_, owner]) {
