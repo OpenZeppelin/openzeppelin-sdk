@@ -45,6 +45,12 @@ export interface FreezeParams {
   txParams?: any;
 }
 
+export interface LinkParams {
+  dependencies?: string[];
+  installDependencies?: boolean
+  packageFile?: ZosPackageFile;
+}
+
 interface ContractData {
   name: string;
   alias: string;
