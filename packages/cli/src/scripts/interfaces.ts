@@ -47,13 +47,23 @@ export interface FreezeParams {
 
 export interface LinkParams {
   dependencies?: string[];
-  installDependencies?: boolean
+  installDependencies?: boolean;
   packageFile?: ZosPackageFile;
 }
 
 export interface UnlinkParams {
   dependencies?: string[];
   packageFile?: ZosPackageFile;
+}
+
+export interface VerifyParams {
+  network?: string;
+  txParams: any;
+  networkFile?: ZosNetworkFile;
+  optimizer?: boolean;
+  optimizerRuns: string | number;
+  remote?: string;
+  apiKey?: string;
 }
 
 interface ContractData {
