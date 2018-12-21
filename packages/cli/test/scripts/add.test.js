@@ -4,8 +4,8 @@ require('../setup')
 import { Logger } from 'zos-lib';
 import CaptureLogs from '../helpers/captureLogs';
 
-import add from '../../src/scripts/add.js';
-import addAll from '../../src/scripts/add-all'
+import add from '../../src/scripts/add';
+import addAll from '../../src/scripts/add-all';
 import ZosPackageFile from "../../src/models/files/ZosPackageFile";
 
 contract('add script', function() {
