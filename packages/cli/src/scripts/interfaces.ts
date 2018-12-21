@@ -1,6 +1,11 @@
 import ZosPackageFile from '../models/files/ZosPackageFile';
 import ZosNetworkFile from '../models/files/ZosNetworkFile';
 
+interface ContractData {
+  name: string;
+  alias: string;
+}
+
 interface Dependencies {
   dependencies?: string[];
   installDependencies?: boolean;
@@ -98,9 +103,4 @@ export interface CheckParams {
 export interface UnlinkParams {
   dependencies: string[];
   packageFile?: ZosPackageFile;
-}
-
-interface ContractData {
-  name: string;
-  alias: string;
 }
