@@ -1,5 +1,3 @@
-import { Command } from 'commander';
-
 import pull from '../scripts/pull';
 import status from '../scripts/status';
 import compare from '../scripts/compare';
@@ -9,7 +7,7 @@ const name: string = 'status';
 const signature: string = name;
 const description: string = 'print information about the local status of your app in a specific network';
 
-const register: (program: Command) => Command = (program) => program
+const register: (program: any) => any = (program) => program
   .command(signature, undefined, { noHelp: true })
   .description(description)
   .usage('--network <network>')
@@ -18,7 +16,7 @@ const register: (program: Command) => Command = (program) => program
   .withNetworkOptions()
   .action(action);
 
-async function action(options: Command): Promise<void> {
+async function action(options: any): Promise<void> {
   const { network, txParams } = await ConfigVariablesInitializer.initNetworkConfiguration(options);
 
   if (options.fix) await pull({ network, txParams });

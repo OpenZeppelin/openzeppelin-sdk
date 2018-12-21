@@ -1,5 +1,3 @@
-import { Command } from 'commander';
-
 import push from './push';
 import link from '../scripts/link';
 
@@ -7,7 +5,7 @@ const name: string = 'link';
 const signature: string = `${name} [dependencies...]`;
 const description: string = 'links project with a list of dependencies each located in its npm package';
 
-const register: (program: Command) => Command = (program) => program
+const register: (program: any) => any = (program) => program
   .command(signature, undefined, { noHelp: true })
   .usage('[dependencyName1 ... dependencyNameN] [options]')
   .description(description)
@@ -15,7 +13,7 @@ const register: (program: Command) => Command = (program) => program
   .withPushOptions()
   .action(action);
 
-async function action(dependencies: string[], options: Command): Promise<void> {
+async function action(dependencies: string[], options: any): Promise<void> {
   const installDependencies = options.install;
   await link({ dependencies, installDependencies });
   await push.tryAction(options);

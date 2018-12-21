@@ -1,6 +1,4 @@
 import _ from 'lodash';
-import { Command } from 'commander';
-
 import update from '../scripts/update';
 import { parseInit } from '../utils/input';
 import { fromContractFullName } from '../utils/naming';
@@ -10,7 +8,7 @@ const name: string = 'update';
 const signature: string = `${name} [alias-or-address]`;
 const description: string = 'update contract to a new logic. Provide the [alias] or [package]/[alias] you added your contract with, its [address], or use --all flag to update all contracts in your project.';
 
-const register: (program: Command) => Command = (program) => program
+const register: (program: any) => any = (program) => program
   .command(signature, undefined, { noHelp: true })
   .usage('[alias-or-address] --network <network> [options]')
   .description(description)
@@ -21,11 +19,14 @@ const register: (program: Command) => Command = (program) => program
   .withNetworkOptions()
   .action(action);
 
-async function action(contractFullNameOrAddress: string, options: Command): Promise<void> {
+async function action(contractFullNameOrAddress: string, options: any): Promise<void> {
   const { initMethod, initArgs } = parseInit(options, 'initialize');
   const { all, force } = options;
 
-  let proxyAddress, contractAlias, packageName;
+  let proxyAddress;
+  let contractAlias;
+  let packageName;
+
   if (contractFullNameOrAddress && contractFullNameOrAddress.startsWith('0x')) {
     proxyAddress = contractFullNameOrAddress;
   } else if (contractFullNameOrAddress) {

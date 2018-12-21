@@ -42,6 +42,7 @@
       "max-line-length": [false],
       "only-arrow-functions": [false],
       "no-empty": [true, "allow-empty-functions"],
+      "no-empty-interface": [false],
       "no-consecutive-blank-lines": [true, 1],
       "no-var-requires": [false],
       "curly": [true, "ignore-same-line"],

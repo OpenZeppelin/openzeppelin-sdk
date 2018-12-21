@@ -8,5 +8,8 @@
   },
   "include": [
     "./src"
+  ],
+  "exclude": [
+    "./src/models/initializer/truffle/blueprint.truffle.js"
   ]
 }

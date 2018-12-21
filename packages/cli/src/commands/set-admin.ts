@@ -1,6 +1,4 @@
 import _ from 'lodash';
-import { Command } from 'commander';
-
 import setAdmin from '../scripts/set-admin';
 import { fromContractFullName } from '../utils/naming';
 import ConfigVariablesInitializer from '../models/initializer/ConfigVariablesInitializer';
@@ -9,7 +7,7 @@ const name: string = 'set-admin';
 const signature: string = `${name} [alias-or-address] [new-admin-address]`;
 const description: string = 'change upgradeability admin of a contract instance. Provide the [alias] or [package]/[alias] of the contract to change the ownership of all its instances, or its [address] to change a single one. Note that if you transfer to an incorrect address, you may irreversibly lose control over upgrading your contract.';
 
-const register: (program: Command) => Command = (program) => program
+const register: (program: any) => any = (program) => program
   .command(signature, undefined, { noHelp: true })
   .usage('[alias-or-address] [new-admin-address] --network <network> [options]')
   .description(description)
@@ -17,13 +15,16 @@ const register: (program: Command) => Command = (program) => program
   .withNetworkOptions()
   .action(action);
 
-async function action(contractFullNameOrAddress: string, newAdmin: string, options: Command): Promise<void | never> {
+async function action(contractFullNameOrAddress: string, newAdmin: string, options: any): Promise<void | never> {
   const { yes } = options;
   if (!yes) {
     throw Error('This is a potentially irreversible operation: if you specify an incorrect admin address, you may lose the ability to upgrade your contract forever.\nPlease double check all parameters, and run the same command with --yes.');
   }
 
-  let proxyAddress, contractAlias, packageName;
+  let proxyAddress;
+  let contractAlias;
+  let packageName;
+
   if (contractFullNameOrAddress && contractFullNameOrAddress.startsWith('0x')) {
     proxyAddress = contractFullNameOrAddress;
   } else if (contractFullNameOrAddress) {
