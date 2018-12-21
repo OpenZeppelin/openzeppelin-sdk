@@ -72,6 +72,16 @@ export interface StatusParams {
   networkFile?: ZosNetworkFile;
 }
 
+export interface SetAdminParams {
+  newAdmin?: string;
+  packageName?: string;
+  contractAlias?: string;
+  proxyAddress?: string;
+  network?: string;
+  txParams?: any;
+  networkFile?: ZosNetworkFile;
+}
+
 interface ContractData {
   name: string;
   alias: string;

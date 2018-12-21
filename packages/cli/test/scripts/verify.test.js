@@ -6,8 +6,8 @@ import axios from 'axios'
 
 import CaptureLogs from '../helpers/captureLogs'
 
-import verify from '../../src/scripts/verify.js'
-import push from '../../src/scripts/push.js'
+import verify from '../../src/scripts/verify'
+import push from '../../src/scripts/push'
 import ZosPackageFile from '../../src/models/files/ZosPackageFile'
 
 contract('verify script', function () {
