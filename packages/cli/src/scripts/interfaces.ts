@@ -1,14 +1,70 @@
 import ZosPackageFile from '../models/files/ZosPackageFile';
 import ZosNetworkFile from '../models/files/ZosNetworkFile';
 
-export interface InitParams {
+interface Dependencies {
+  dependencies?: string[];
+  installDependencies?: boolean;
+}
+
+interface PackageArgs {
+  packageName?: string;
+  contractAlias?: string;
+}
+
+interface Network {
+  network: string;
+  txParams?: any;
+  networkFile?: ZosNetworkFile;
+}
+
+interface Proxy extends Network, PackageArgs {
+  proxyAddress?: string;
+  initMethod?: string;
+  initArgs?: string[];
+  force?: boolean;
+}
+
+export interface CreateParams extends Proxy {}
+
+export interface StatusParams extends Network {}
+
+export interface FreezeParams extends Network {}
+
+export interface PublishParams extends Network {}
+
+
+export interface UpdateParams extends Proxy {
+  all?: boolean;
+}
+
+export interface LinkParams extends Dependencies {
+  packageFile?: ZosPackageFile;
+}
+
+export interface InitParams extends Dependencies {
   name?: string;
   version?: string;
-  dependencies?: string[];
   force?: boolean;
   publish?: boolean;
-  installDependencies?: boolean;
   packageFile?: ZosPackageFile;
+}
+
+export interface PushParams extends Network {
+  deployDependencies?: boolean;
+  reupload?: boolean;
+  force?: boolean;
+}
+
+export interface VerifyParams extends Network {
+  optimizer?: boolean;
+  optimizerRuns: string | number;
+  remote?: string;
+  apiKey?: string;
+}
+
+export interface SetAdminParams extends Network, PackageArgs {
+  proxyAddress?: string;
+  newAdmin?: string;
 }
 
 export interface AddParams {
@@ -39,77 +95,9 @@ export interface CheckParams {
   packageFile?: ZosPackageFile;
 }
 
-export interface FreezeParams {
-  network: string;
-  networkFile?: ZosNetworkFile;
-  txParams?: any;
-}
-
-export interface LinkParams {
-  dependencies?: string[];
-  installDependencies?: boolean;
-  packageFile?: ZosPackageFile;
-}
-
-export interface PushParams {
-  network?: string;
-  deployDependencies?: boolean;
-  reupload?: boolean;
-  force?: boolean;
-  txParams?: any;
-  networkFile?: ZosNetworkFile;
-}
-
-export interface CreateParams extends UpdateParams {};
-
-export interface UpdateParams {
-  packageName?: string;
-  contractAlias?: string;
-  proxyAddress?: string;
-  initMethod?: string;
-  initArgs?: string[];
-  all?: boolean;
-  force?: boolean;
-  txParams?: any;
-  network?: string;
-  networkFile?: ZosNetworkFile;
-}
-
 export interface UnlinkParams {
   dependencies?: string[];
   packageFile?: ZosPackageFile;
-}
-
-export interface VerifyParams {
-  network?: string;
-  txParams: any;
-  networkFile?: ZosNetworkFile;
-  optimizer?: boolean;
-  optimizerRuns: string | number;
-  remote?: string;
-  apiKey?: string;
-}
-
-export interface StatusParams {
-  network?: string;
-  txParams?: any;
-  networkFile?: ZosNetworkFile;
-}
-
-export interface SetAdminParams {
-  newAdmin?: string;
-  packageName?: string;
-  contractAlias?: string;
-  proxyAddress?: string;
-  network?: string;
-  txParams?: any;
-  networkFile?: ZosNetworkFile;
-}
-
-export interface PublishParams {
-  network?: string;
-  networkFile?: ZosNetworkFile;
-  txParams?: any;
 }
 
 interface ContractData {
