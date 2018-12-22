@@ -7,8 +7,8 @@ import { CompilerOptions } from './solidity/SolidityContractsCompiler';
 const log = new Logger('Compiler');
 
 export default {
-  async call(): Promise<void> {
-    Truffle.isTruffleProject()
+  async call(): Promise<{ stdout: string, stderr: string } | void> {
+    return Truffle.isTruffleProject()
       ? this.compileWithTruffle()
       : this.compileWithSolc();
   },
