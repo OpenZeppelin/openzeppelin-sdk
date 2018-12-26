@@ -4,7 +4,7 @@ import { Logger } from 'zos-lib';
 import ControllerFor from '../models/network/ControllerFor';
 import NetworkController from '../models/network/NetworkController';
 import ZosNetworkFile from '../models/files/ZosNetworkFile';
-import { StatusParams }from './interfaces';
+import { StatusParams } from './interfaces';
 
 const log: Logger = new Logger('scripts/status');
 
