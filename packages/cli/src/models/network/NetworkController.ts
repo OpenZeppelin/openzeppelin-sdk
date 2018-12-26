@@ -125,7 +125,7 @@ export default class NetworkController {
     const newVersion = this._newVersionRequired();
     return _(this.packageFile.contracts)
       .toPairs()
-      .map(([contractAlias, contractName]) => [contractAlias, Contracts.getFromLocal(contractName)])
+      .map(([contractAlias, contractName]): [string, ContractFactory] => [contractAlias, Contracts.getFromLocal(contractName)])
       .filter(([contractAlias, contractClass]) => newVersion || !onlyChanged || this.hasContractChanged(contractAlias, contractClass) || this._hasChangedLibraries(contractClass, changedLibraries))
       .value();
   }

@@ -46,7 +46,8 @@
       "no-consecutive-blank-lines": [true, 1],
       "no-var-requires": [false],
       "curly": [true, "ignore-same-line"],
-      "adjacent-overload-signatures": [false]
+      "adjacent-overload-signatures": [false],
+      "max-classes-per-file": [false]
     },
     "rulesDirectory": []
 }
