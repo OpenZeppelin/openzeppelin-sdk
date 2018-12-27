@@ -84,4 +84,4 @@ You can also follow the recent developments of the project in our
 
 ## License
 
-[MIT](LICENSE.md) © Zeppelin
+[MIT](LICENSE) © Zeppelin
