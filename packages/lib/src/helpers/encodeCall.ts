@@ -47,6 +47,7 @@ export function parseTypeValuePair(type: string, rawValue: any): string | never 
 
 function parseBytes(value: any): string | never {
   if(typeof(value) !== 'string') throw new Error(ERROR_MESSAGE_BYTES(value));
+  if(value.toString().length === 0) return value;
   if(!/^(0x)?[0-9a-f]$/i.test(value)) throw new Error(ERROR_MESSAGE_BYTES(value));
   return value;
 }
