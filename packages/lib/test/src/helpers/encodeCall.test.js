@@ -5,7 +5,7 @@ require('../../setup');
 import encodeCall, { parseTypeValuePair } from '../../../src/helpers/encodeCall';
 import BN from 'bignumber.js';
 
-describe.only('encodeCall helper', function() {
+describe('encodeCall helper', function() {
   describe('encodeCall function', function() {
     it('should return a string with the 0x radix', function() {
       const enc = encodeCall('myFunction', ['uint256'], [123]);
