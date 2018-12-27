@@ -30,18 +30,18 @@ export function parseTypeValuePair(type: string, rawValue: any): string | never 
   else if(type === 'string') {
     return rawValue; // Validated by ethereumjs-abi.
   }
-  else if(type.startsWith('bytes')) {
+  else if(type.startsWith('bytes') && !type.includes('[]')) {
     return parseBytes(rawValue);
   }
-  else if(type.startsWith('uint')) {
+  else if(type.startsWith('uint') && !type.includes('[]')) {
     return parseNumber(rawValue, true);
   }
-  else if(type.startsWith('int')) {
+  else if(type.startsWith('int') && !type.includes('[]')) {
     return parseNumber(rawValue, false);
   }
   else {
     // TODO: parse remianing types: fixed, arrays, etc.
-    return rawValue.toString();
+    return rawValue;
   }
 }
 
