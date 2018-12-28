@@ -161,17 +161,18 @@ describe('encodeCall helper', function() {
     });
     
     describe('on hexadecimal numbers', function() {
-      it('should handle addresses', function() {
-        expect(parseTypeValuePair('uint', 0xEB1020C2BfA170489fca37068F9c857CDCd5f19F)).to.equal(parseInt('0xEB1020C2BfA170489fca37068F9c857CDCd5f19F', 16).toString());
+      it('should handle other hexadecimal numbers as strings', function() {
+        expect(parseTypeValuePair('int', '0x2a')).to.equal(new BN('0x2a').toString(10));
+        expect(parseTypeValuePair('uint', '0x39af')).to.equal(new BN('0x39af').toString(10));
+        expect(parseTypeValuePair('int', '0x39afabcAbc')).to.equal(new BN('0x39afabcabc').toString(10));
+        expect(parseTypeValuePair('uint', '0x39af68cf04abb0e1')).to.equal(new BN('0x39af68cf04abb0e1').toString(10));
       });
 
-      it('should not mistake addresses with "e" characters as exponentials', function() {
-        expect(parseTypeValuePair('int', 0x39af68cF04Abb0eF8f9d8191E1bD9c041E80e18e)).to.equal(parseInt('0x39af68cF04Abb0eF8f9d8191E1bD9c041E80e18e', 16).toString());
-      });
-
-      it('should handle other hexadecimal numbers', function() {
-        expect(parseTypeValuePair('uint', 0x39af68cF04Abb0e18e)).to.equal(parseInt('0x39af68cF04Abb0e18e', 16).toString());
-        expect(parseTypeValuePair('int', 0x2A)).to.equal(parseInt('0x2A', 16).toString());
+      it('should handle other hexadecimal numbers as literals', function() {
+        expect(parseTypeValuePair('int', 0x2a)).to.equal(new BN(0x2a).toString(10));
+        expect(parseTypeValuePair('uint', 0x39af)).to.equal(new BN(0x39af).toString(10));
+        expect(parseTypeValuePair('int', 0x39afabcAbc)).to.equal(new BN(0x39afabcabc).toString(10));
+        expect(parseTypeValuePair('uint', 0x39af68cf04abb0e1)).to.equal(new BN(0x39af68cf04abb0e1).toString(10));
       });
     });
   });

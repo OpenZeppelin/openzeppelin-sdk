@@ -14,10 +14,7 @@ const ERROR_MESSAGE_STRING = (value) => `${ERROR_MESSAGE_PREFIX} string "${value
 
 export default function encodeCall(name: string, types: string[] = [], rawValues: any[] = []): string {
   if(types.length !== rawValues.length) throw new Error('Supplied number of types and values do not match.');
-  const values = [];
-  _.zipWith(types, rawValues, function(type: string, value: any) {
-    values.push(parseTypeValuePair(type, value));
-  });
+  const values =_.zipWith(types, rawValues, (type: string, value: any) => parseTypeValuePair(type, value));
   const methodId = abi.methodID(name, types).toString('hex');
   const params = abi.rawEncode(types, values).toString('hex');
   return '0x' + methodId + params;
@@ -45,55 +42,32 @@ export function parseTypeValuePair(type: string, rawValue: any): string | never 
   }
 }
 
-function parseBytes(value: any): string | never {
-  if(typeof(value) !== 'string') throw new Error(ERROR_MESSAGE_BYTES(value));
-  if(value.toString().length === 0) return value;
-  if(!/^(0x)?[0-9a-f]$/i.test(value)) throw new Error(ERROR_MESSAGE_BYTES(value));
-  return value;
+function parseBytes(rawValue: any): string | never {
+  if(typeof(rawValue) !== 'string') throw new Error(ERROR_MESSAGE_BYTES(rawValue));
+  if(rawValue.toString().length === 0) return rawValue;
+  if(!/^(0x)?[0-9a-f]$/i.test(rawValue)) throw new Error(ERROR_MESSAGE_BYTES(rawValue));
+  return rawValue;
 }
 
-function parseAddress(value: any): string | never {
-  if(typeof(value) !== 'string') throw new Error(ERROR_MESSAGE_ADDRESS(value));
-  if(!/^(0x)?[0-9a-f]{40}$/i.test(value)) throw new Error(ERROR_MESSAGE_ADDRESS(value));
+function parseAddress(rawValue: any): string | never {
+  if(typeof(rawValue) !== 'string') throw new Error(ERROR_MESSAGE_ADDRESS(rawValue));
+  if(!/^(0x)?[0-9a-f]{40}$/i.test(rawValue)) throw new Error(ERROR_MESSAGE_ADDRESS(rawValue));
   // TODO: It'd be nice to perform a checksum validation here.
-  return value;
+  return rawValue;
 }
 
-function parseNumber(value: any, mustBePositive: boolean): string | never {
-  if(typeof(value) === 'number') return parseNumberFromLiteral(value, mustBePositive);
-  else if(typeof(value) === 'string') return parseNumberFromString(value, mustBePositive);
-  else if(BN.isBigNumber(value)) return parseNumberFromBigNumber(new BN(value), mustBePositive);
-  throw new Error(ERROR_MESSAGE_NUMBER(value));
-}
-
-function parseNumberFromBigNumber(value: BN, mustBePositive: boolean): string | never {
-  if(mustBePositive && value.isNegative()) throw new Error(ERROR_MESSAGE_POSITIVE_NUMBER(value));
-  if(!value.isInteger()) throw new Error(ERROR_MESSAGE_INTEGER_NUMBER(value));
-  return value.toString(10);
-}
-
-function parseNumberFromString(value: string, mustBePositive: boolean): string | never {
-  if(isNaN(<any>value)) throw new Error(ERROR_MESSAGE_NUMBER(value));
-  if(value.startsWith('0x') || value.startsWith('0X')) { // Hex.
-    if(!isNaN(parseInt(value, 16))) throw new Error(ERROR_MESSAGE_NUMBER(value));
-    if(mustBePositive && parseInt(value, 16) < 0) throw new Error(ERROR_MESSAGE_POSITIVE_NUMBER(value));
-    return value;
+function parseNumber(rawValue: any, mustBePositive: boolean): string | never {
+  // Convert to lower case if type is string. Required by BN to properly interpret hexadecimals.
+  if(typeof(rawValue) === 'string') rawValue = <string>rawValue.toLowerCase();
+  if(isNaN(rawValue)) throw new Error(ERROR_MESSAGE_NUMBER(rawValue));
+  // Funnel everything through bignumber.js.
+  if(typeof(rawValue) === 'number' || typeof(rawValue) === 'string' || BN.isBigNumber(rawValue)) {
+    const bn = BN.isBigNumber(rawValue) ? rawValue : new BN(rawValue);
+    if(bn.isNaN()) throw new Error(ERROR_MESSAGE_NUMBER(rawValue));
+    if(mustBePositive && bn.isNegative()) throw new Error(ERROR_MESSAGE_POSITIVE_NUMBER(rawValue));
+    if(!bn.isInteger()) throw new Error(ERROR_MESSAGE_INTEGER_NUMBER(rawValue));
+    return bn.toString(10);
   }
-  else { // Not hex.
-    if(value.match(/\d+(\.\d+)?e(\+)?\d+/)) { // Numeric strings with exponents, e.g. '1.5e9'.
-      return parseNumberFromBigNumber(new BN(value), mustBePositive);
-    }
-    else { // Not exponential.
-      if(value.indexOf('.') !== -1) throw new Error(ERROR_MESSAGE_INTEGER_NUMBER(value));
-      const valueNum = parseInt(value, 10);
-      if(valueNum < 0) throw new Error(ERROR_MESSAGE_POSITIVE_NUMBER(value));
-      return value;
-    }
-  }
-}
-
-function parseNumberFromLiteral(value: number, mustBePositive: boolean): string | never {
-  if(value % 1 !== 0) throw new Error(ERROR_MESSAGE_INTEGER_NUMBER(value));
-  if(mustBePositive && value < 0) throw new Error(ERROR_MESSAGE_POSITIVE_NUMBER(value));
-  return value.toString();
+  // Throw on other cases, if any.
+  throw new Error(ERROR_MESSAGE_NUMBER(rawValue));
 }
