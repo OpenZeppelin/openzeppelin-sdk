@@ -38,9 +38,9 @@ describe('encodeCall helper', () => {
         expect(() => encodeCall('myFunction', ['uint'], ['-42'])).to.throw(/Invalid parameter/);
         expect(() => encodeCall('myFunction', ['int'], ['3.14'])).to.throw(/Invalid parameter/);
         expect(() => encodeCall('myFunction', ['int'], ['-3.14'])).to.throw(/Invalid parameter/);
-        expect(() => encodeCall('myFunction', ['string'], [32])).to.throw(/argument must be of type/);
+        expect(() => encodeCall('myFunction', ['string'], [32])).to.throw();
         expect(() => encodeCall('myFunction', ['address'], ['0x0fd60495d7057689fbe8b3'])).to.throw(/Invalid parameter/);
-        expect(() => encodeCall('myFunction', ['bytes'], [32])).to.throw(/The first argument must be one of type/);
+        expect(() => encodeCall('myFunction', ['bytes'], [32])).to.throw();
       });
     });
   });
