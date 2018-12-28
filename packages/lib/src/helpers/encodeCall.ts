@@ -21,25 +21,12 @@ export default function encodeCall(name: string, types: string[] = [], rawValues
 }
 
 export function parseTypeValuePair(type: string, rawValue: any): string | never {
-  if(type === 'address') {
-    return parseAddress(rawValue);
-  }
-  else if(type === 'string') {
-    return rawValue; // Validated by ethereumjs-abi.
-  }
-  else if(type.startsWith('bytes') && !type.includes('[]')) {
-    return parseBytes(rawValue);
-  }
-  else if(type.startsWith('uint') && !type.includes('[]')) {
-    return parseNumber(rawValue, true);
-  }
-  else if(type.startsWith('int') && !type.includes('[]')) {
-    return parseNumber(rawValue, false);
-  }
-  else {
-    // TODO: parse remianing types: fixed, arrays, etc.
-    return rawValue;
-  }
+  if(type === 'address') return parseAddress(rawValue);
+  else if(type === 'string') return rawValue; // Validated by ethereumjs-abi.
+  else if(type.startsWith('bytes') && !type.includes('[]')) return parseBytes(rawValue);
+  else if(type.startsWith('uint') && !type.includes('[]')) return parseNumber(rawValue, true);
+  else if(type.startsWith('int') && !type.includes('[]')) return parseNumber(rawValue, false);
+  else return rawValue; // TODO: parse remianing types: fixed, arrays, etc.
 }
 
 function parseBytes(rawValue: string | Buffer): string | never {
