@@ -69,7 +69,7 @@ function parseNumber(value: any, mustBePositive: boolean): string | never {
 function parseNumberFromBigNumber(value: BN, mustBePositive: boolean): string | never {
   if(mustBePositive && value.isNegative()) throw new Error(ERROR_MESSAGE_POSITIVE_NUMBER(value));
   if(!value.isInteger()) throw new Error(ERROR_MESSAGE_INTEGER_NUMBER(value));
-  return value.toString();
+  return value.toString(10);
 }
 
 function parseNumberFromString(value: string, mustBePositive: boolean): string | never {

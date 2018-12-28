@@ -70,7 +70,25 @@ describe('encodeCall helper', function() {
         encodeCall('myFunction', ['address'], ['0x0fd60495d7057689fbe8b3']);
       }).to.throw(/Invalid parameter/);
     });
-    
+
+    it('should accept array parameters', function() {
+      expect(function() {
+        encodeCall('myFunction', ['uint256[]'], [[20, 30]]);
+      }).to.not.throw();
+    });
+
+    it('should accept empty bytes', function() {
+      expect(function() {
+        encodeCall('myFunction', ['bytes'], ['']);
+      }).to.not.throw();
+    });
+
+    it('should understand scientific notation numbers', function() {
+      expect(function() {
+        encodeCall('myFunction', ['uint256'], ['20e70']);
+      }).to.not.throw();
+    });
+
   });
 
   describe('parseValuePair function', function() {
@@ -83,6 +101,11 @@ describe('encodeCall helper', function() {
       it('should return a large integer as a string', function() {
         expect(parseTypeValuePair('uint', Number.MAX_SAFE_INTEGER)).to.equal(Number.MAX_SAFE_INTEGER.toString());
       });
+
+      it('should understand scientific notation numbers', function() {
+        expect(parseTypeValuePair('int', '20e70')).to.equal(new BN('2e+71').toString(10));
+      });
+      
     });
 
     describe('on floats', function() {
@@ -100,6 +123,12 @@ describe('encodeCall helper', function() {
 
       it('should return a large bignumber as a string', function() {
         expect(parseTypeValuePair('int', new BN(Number.MAX_SAFE_INTEGER))).to.equal(Number.MAX_SAFE_INTEGER.toString());
+      });
+    });
+
+    describe('on arrays', function() {
+      it('should not parse the array in any way', function() {
+        expect(parseTypeValuePair('uint256[]', [20, 30])).to.deep.equal([20, 30]);
       });
     });
 
