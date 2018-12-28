@@ -6,7 +6,7 @@ Specification for the vouching contracts for ZeppelinOS, corresponding to the to
 
 The contracts need to support:
 
-- Registering a version of an EVM package with associated metadata
+- Registering an entry to be vouched for, with associated metadata
 - Vouching and unvouching for a registered entry
 
 ## Architecture
