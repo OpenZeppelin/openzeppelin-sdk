@@ -42,32 +42,36 @@ export function parseTypeValuePair(type: string, rawValue: any): string | never 
   }
 }
 
-function parseBytes(rawValue: any): string | never {
-  if(typeof(rawValue) !== 'string') throw new Error(ERROR_MESSAGE_BYTES(rawValue));
-  if(rawValue.toString().length === 0) return rawValue;
-  if(!/^(0x)?[0-9a-f]$/i.test(rawValue)) throw new Error(ERROR_MESSAGE_BYTES(rawValue));
-  return rawValue;
-}
-
-function parseAddress(rawValue: any): string | never {
-  if(typeof(rawValue) !== 'string') throw new Error(ERROR_MESSAGE_ADDRESS(rawValue));
-  if(!/^(0x)?[0-9a-f]{40}$/i.test(rawValue)) throw new Error(ERROR_MESSAGE_ADDRESS(rawValue));
-  // TODO: It'd be nice to perform a checksum validation here.
-  return rawValue;
-}
-
-function parseNumber(rawValue: any, mustBePositive: boolean): string | never {
-  // Convert to lower case if type is string. Required by BN to properly interpret hexadecimals.
-  if(typeof(rawValue) === 'string') rawValue = <string>rawValue.toLowerCase();
-  if(isNaN(rawValue)) throw new Error(ERROR_MESSAGE_NUMBER(rawValue));
-  // Funnel everything through bignumber.js.
-  if(typeof(rawValue) === 'number' || typeof(rawValue) === 'string' || BN.isBigNumber(rawValue)) {
-    const bn = BN.isBigNumber(rawValue) ? rawValue : new BN(rawValue);
-    if(bn.isNaN()) throw new Error(ERROR_MESSAGE_NUMBER(rawValue));
-    if(mustBePositive && bn.isNegative()) throw new Error(ERROR_MESSAGE_POSITIVE_NUMBER(rawValue));
-    if(!bn.isInteger()) throw new Error(ERROR_MESSAGE_INTEGER_NUMBER(rawValue));
-    return bn.toString(10);
+function parseBytes(rawValue: string | Buffer): string | never {
+  if(Buffer.isBuffer(rawValue)) return rawValue.toString();
+  else if(typeof(rawValue) === 'string') {
+    if(rawValue.toString().length === 0) return rawValue;
+    // Require buffers expressed as strings to be valid hexadecimals.
+    if(!/^(0x)[0-9a-f]+$/i.test(rawValue)) throw new Error(ERROR_MESSAGE_BYTES(rawValue));
+    // Test the validity of the buffer.
+    if(Buffer.from(rawValue.substring(2), 'hex').length === 0) throw new Error(ERROR_MESSAGE_BYTES(rawValue));
+    return rawValue;
   }
-  // Throw on other cases, if any.
-  throw new Error(ERROR_MESSAGE_NUMBER(rawValue));
+}
+
+function parseAddress(rawValue: string | Buffer): string | never {
+  const strAddress = rawValue.toString();
+  if(!util.isValidAddress(strAddress)) throw new Error(ERROR_MESSAGE_ADDRESS(rawValue));
+  // If the address' characters are not all uppercase or lowercase, assume that there is checksum to validate.
+  if(/[a-f]/.test(strAddress.substring(2)) && /[A-F]/.test(strAddress.substring(2))) {
+    if(!util.isValidChecksumAddress(strAddress)) throw new Error(ERROR_MESSAGE_CHECKSUM_ADDRESS(rawValue));
+  }
+  return strAddress;
+}
+
+function parseNumber(rawValue: number | string | BN, mustBePositive: boolean): string | never {
+  if(isNaN(<any>rawValue)) throw new Error(ERROR_MESSAGE_NUMBER(rawValue));
+  if(typeof(rawValue === 'number') && !isFinite(<any>rawValue)) throw new Error(ERROR_MESSAGE_NUMBER(rawValue));
+  if(typeof(rawValue) === 'string') rawValue = (<string>rawValue).toLowerCase();
+  // Funnel everything through bignumber.js.
+  const bn = BN.isBigNumber(rawValue) ? <BN>rawValue : new BN(rawValue);
+  if(bn.isNaN()) throw new Error(ERROR_MESSAGE_NUMBER(rawValue));
+  if(mustBePositive && bn.isNegative()) throw new Error(ERROR_MESSAGE_POSITIVE_NUMBER(rawValue));
+  if(!bn.isInteger()) throw new Error(ERROR_MESSAGE_INTEGER_NUMBER(rawValue));
+  return bn.toString(10);
 }
