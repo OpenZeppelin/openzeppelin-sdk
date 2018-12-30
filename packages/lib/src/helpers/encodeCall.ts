@@ -19,6 +19,8 @@ export function parseTypeValuePair(type: string, rawValue: any): string | string
   if(/^[^\[]+\[.*\]$/.test(type)) {
     if(typeof(rawValue) === 'string') rawValue = rawValue.split(',');
     if(rawValue.length === 0) return [];
+    const size = type.match(/(.*)\[(.*?)\]$/)[2];
+    if(size !== '' && parseInt(size, 10) !== rawValue.length) throw new Error(ERROR_MESSAGE(type, rawValue) + '. Invalid array length.');
     const baseType = type.slice(0, type.lastIndexOf('[')); // Remove array part.
     // TODO: validate length on fixed size arrays.
     return _.map(rawValue, (rawValueElement) => parseTypeValuePair(baseType, rawValueElement));

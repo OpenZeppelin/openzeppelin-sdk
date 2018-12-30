@@ -170,6 +170,8 @@ describe.only('encodeCall helper', () => {
       it('should handle arrays', () => {
         expect(parseTypeValuePair('uint256[]', '20,30')).to.deep.equal(['20', '30']);
         expect(parseTypeValuePair('uint256[]', [20, 30])).to.deep.equal(['20', '30']);
+        expect(parseTypeValuePair('address[]', ['0x90f8bf6a479f320ead074411a4b0e7944ea8c9c1', '0xffcf8fdee72ac11b5c542428b35eef5769c409f0'])).to.deep.equal(['0x90f8bf6a479f320ead074411a4b0e7944ea8c9c1', '0xffcf8fdee72ac11b5c542428b35eef5769c409f0']);
+        expect(parseTypeValuePair('string[]', ['one', 'two'])).to.deep.equal(['one', 'two']);
       });
 
       it('should handle empty arrays', () => {
@@ -182,11 +184,16 @@ describe.only('encodeCall helper', () => {
         expect(() => parseTypeValuePair('uint256[]', '20,-30')).to.throw(/Encoding error/);
       });
 
-      it('should throw when array fixed size and number of elements do not match');
-      it('should parse number array elements');
-      it('should parse address elements');
-      it('should parse bytes elements');
-      it('should parse string elements');
+      it('should handle fixed sized arrays', () => {
+        expect(parseTypeValuePair('uint256[1]', [1])).to.deep.equal(['1']);
+        expect(parseTypeValuePair('uint256[2]', [1, 2])).to.deep.equal(['1', '2']);
+        expect(parseTypeValuePair('uint256[3]', [1, 2, 3])).to.deep.equal(['1', '2', '3']);
+      });
+
+      it('should throw when array fixed size and number of elements do not match', () => {
+        expect(() => parseTypeValuePair('uint[2]', [1])).to.throw(/Invalid array length/);
+        expect(() => parseTypeValuePair('uint[2]', [1, 2, 3])).to.throw(/Invalid array length/);
+      });
     });
   });
 })
