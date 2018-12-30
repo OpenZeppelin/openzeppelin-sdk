@@ -15,7 +15,7 @@ export default function encodeCall(name: string, types: string[] = [], rawValues
 }
 
 export function parseTypeValuePair(type: string, rawValue: any): string | string[] | never {
-  // Deal with arrays recursively.
+  // Array type (recurse).
   if(/^[^\[]+\[.*\]$/.test(type)) {
     if(typeof(rawValue) === 'string') rawValue = rawValue.split(',');
     if(rawValue.length === 0) return [];
@@ -23,15 +23,15 @@ export function parseTypeValuePair(type: string, rawValue: any): string | string
     // TODO: validate length on fixed size arrays.
     return _.map(rawValue, (rawValueElement) => parseTypeValuePair(baseType, rawValueElement));
   }
-  // Singles.
+  // Single type.
   if(type === 'address') return parseAddress(type, rawValue);
+  else if(type === 'bool') return rawValue; // TODO
   else if(type === 'string') return rawValue; // Validated by ethereumjs-abi.
   else if(type.startsWith('bytes')) return parseBytes(type, rawValue);
   else if(type.startsWith('uint')) return parseNumber(type, rawValue, true, true);
   else if(type.startsWith('int')) return parseNumber(type, rawValue, false, true);
   else if(type.startsWith('ufixed')) return parseNumber(type, rawValue, true, false);
   else if(type.startsWith('fixed')) return parseNumber(type, rawValue, false, false);
-  else if(type.startsWith('bool')) return rawValue; // TODO
   else throw new Error(ERROR_MESSAGE(type, rawValue) + '. Unsupported or invalid type.');
 }
 
