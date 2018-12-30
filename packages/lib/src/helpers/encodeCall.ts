@@ -16,13 +16,12 @@ export default function encodeCall(name: string, types: string[] = [], rawValues
 
 export function parseTypeValuePair(type: string, rawValue: any): string | string[] | boolean | never {
   // Array type (recurse).
-  if(/^[^\[]+\[.*\]$/.test(type)) {
+  if(/^[^\[]+\[.*\]$/.test(type)) { // Test for '[*]' in type.
     if(typeof(rawValue) === 'string') rawValue = rawValue.split(',');
     if(rawValue.length === 0) return [];
-    const size = type.match(/(.*)\[(.*?)\]$/)[2];
+    const size = type.match(/(.*)\[(.*?)\]$/)[2]; // Find number between '[]'.
     if(size !== '' && parseInt(size, 10) !== rawValue.length) throw new Error(ERROR_MESSAGE(type, rawValue) + '. Invalid array length.');
     const baseType = type.slice(0, type.lastIndexOf('[')); // Remove array part.
-    // TODO: validate length on fixed size arrays.
     return _.map(rawValue, (rawValueElement) => parseTypeValuePair(baseType, rawValueElement));
   }
   // Single type.
@@ -38,7 +37,7 @@ export function parseTypeValuePair(type: string, rawValue: any): string | string
 }
 
 function parseBool(type: string, rawValue: string | boolean): boolean | never {
-  if(typeof(rawValue) === 'boolean') return <boolean>rawValue;
+  if(typeof(rawValue) === 'boolean') return rawValue;
   else if(typeof(rawValue) === 'string') {
     if(rawValue === 'true') return true;
     else if(rawValue === 'false') return false;
