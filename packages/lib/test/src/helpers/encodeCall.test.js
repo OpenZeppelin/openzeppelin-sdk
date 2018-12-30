@@ -34,22 +34,27 @@ describe('encodeCall helper', () => {
       });
 
       it('should fail with invalid type/value pairs', () => {
-        expect(() => encodeCall('myFunction', ['uint'], ['hello'])).to.throw(/Invalid parameter/);
-        expect(() => encodeCall('myFunction', ['uint'], ['-42'])).to.throw(/Invalid parameter/);
-        expect(() => encodeCall('myFunction', ['int'], ['3.14'])).to.throw(/Invalid parameter/);
-        expect(() => encodeCall('myFunction', ['int'], ['-3.14'])).to.throw(/Invalid parameter/);
+        expect(() => encodeCall('myFunction', ['uint'], ['hello'])).to.throw(/Encoding error/);
+        expect(() => encodeCall('myFunction', ['uint'], ['-42'])).to.throw(/Encoding error/);
+        expect(() => encodeCall('myFunction', ['int'], ['3.14'])).to.throw(/Encoding error/);
+        expect(() => encodeCall('myFunction', ['int'], ['-3.14'])).to.throw(/Encoding error/);
         expect(() => encodeCall('myFunction', ['string'], [32])).to.throw();
-        expect(() => encodeCall('myFunction', ['address'], ['0x0fd60495d7057689fbe8b3'])).to.throw(/Invalid parameter/);
+        expect(() => encodeCall('myFunction', ['address'], ['0x0fd60495d7057689fbe8b3'])).to.throw(/Encoding error/);
         expect(() => encodeCall('myFunction', ['bytes'], [32])).to.throw();
       });
     });
   });
 
   describe('parseValuePair function', () => {
+
+    it('should throw when the specified type is not recognized', () => {
+      expect(() => parseTypeValuePair('schnitzel', '42')).to.throw(/Unsupported or invalid type/);
+    });
+
     describe('when the specified type is a number (int, uint, etc)', () => {
       it('should throw on NaN', () => {
-        expect(() => parseTypeValuePair('uint', 'schnitzel')).to.throw(/Invalid parameter/);
-        expect(() => parseTypeValuePair('uint', new BN('hello'))).to.throw(/Invalid parameter/);
+        expect(() => parseTypeValuePair('uint', 'schnitzel')).to.throw(/Encoding error/);
+        expect(() => parseTypeValuePair('uint', new BN('hello'))).to.throw(/Encoding error/);
       });
       
       it('should understand numeric literals and return them as strings', () => {
@@ -68,15 +73,15 @@ describe('encodeCall helper', () => {
       });
 
       it('should throw on negative numbers when specified type is unsigned', () => {
-        expect(() => parseTypeValuePair('uint', -42)).to.throw(/Invalid parameter/);
-        expect(() => parseTypeValuePair('uint', new BN(-42))).to.throw(/Invalid parameter/);
-        expect(() => parseTypeValuePair('uint', '-42')).to.throw(/Invalid parameter/);
+        expect(() => parseTypeValuePair('uint', -42)).to.throw(/Encoding error/);
+        expect(() => parseTypeValuePair('uint', new BN(-42))).to.throw(/Encoding error/);
+        expect(() => parseTypeValuePair('uint', '-42')).to.throw(/Encoding error/);
       });
 
       it('should throw on non integer numbers', () => {
-        expect(() => parseTypeValuePair('uint', 3.14)).to.throw(/Invalid parameter/);
-        expect(() => parseTypeValuePair('int', -3.14)).to.throw(/Invalid parameter/);
-        expect(() => parseTypeValuePair('uint', new BN(3.14))).to.throw(/Invalid parameter/);
+        expect(() => parseTypeValuePair('uint', 3.14)).to.throw(/Encoding error/);
+        expect(() => parseTypeValuePair('int', -3.14)).to.throw(/Encoding error/);
+        expect(() => parseTypeValuePair('uint', new BN(3.14))).to.throw(/Encoding error/);
       });
 
       it('should understand scientific notation numbers expressed as strings', () => {
@@ -84,7 +89,7 @@ describe('encodeCall helper', () => {
       });
 
       it('should throw when the specified numeric literal is not finite', () => {
-        expect(() => parseTypeValuePair('uint', 2**2000)).to.throw(/Invalid parameter/);
+        expect(() => parseTypeValuePair('uint', 2**2000)).to.throw(/Encoding error/);
       });
     });
 
@@ -103,7 +108,7 @@ describe('encodeCall helper', () => {
       });
 
       it('should throw when a byte array expressed in hexadecimal form is invalid', () => {
-        expect(() => parseTypeValuePair('bytes', '0xabcqqq')).to.throw(/Invalid parameter/);
+        expect(() => parseTypeValuePair('bytes', '0xabcqqq')).to.throw(/Encoding error/);
       });
 
       it('should interpret empty strings as valid empty bytes', () => {
@@ -122,17 +127,17 @@ describe('encodeCall helper', () => {
       });
 
       it('should throw when an invalid address is passed', () => {
-        expect(() => parseTypeValuePair('address', '0x39af68cF04Abb8f9d8191E1bD9ce18e')).to.throw(/Invalid parameter/);
-        expect(() => parseTypeValuePair('address', '0x00000000000000000000000000000000000000000000000000000000f8a8fd6d')).to.throw(/Invalid parameter/);
+        expect(() => parseTypeValuePair('address', '0x39af68cF04Abb8f9d8191E1bD9ce18e')).to.throw(/Encoding error/);
+        expect(() => parseTypeValuePair('address', '0x00000000000000000000000000000000000000000000000000000000f8a8fd6d')).to.throw(/Encoding error/);
       });
 
       it('should throw when an address with upper and lower case chars and an invalid checksum is passed', () => {
-        expect(() => parseTypeValuePair('address', '0xCF5609B003b2776699eeA1233F7C82d5695CC9AA')).to.throw(/Invalid parameter/);
+        expect(() => parseTypeValuePair('address', '0xCF5609B003b2776699eeA1233F7C82d5695CC9AA')).to.throw(/Encoding error/);
       });
 
       it('should not throw when an address with an invalid checksum is passed, if the address contains all upper or lower case strings', () => {
-        expect(() => parseTypeValuePair('address', '0xCF5609B003B2776699EEA1233F7C82D5695CC9AA')).to.not.throw;
-        expect(() => parseTypeValuePair('address', '0xcf5609b003b2776699eea1233f7c82d5695cc9aa')).to.not.throw;
+        expect(() => parseTypeValuePair('address', '0xCF5609B003B2776699EEA1233F7C82D5695CC9AA')).to.not.throw();
+        expect(() => parseTypeValuePair('address', '0xcf5609b003b2776699eea1233f7c82d5695cc9aa')).to.not.throw();
       });
 
       it('should accept addresses passed as buffers', () => {
@@ -140,14 +145,38 @@ describe('encodeCall helper', () => {
       });
     });
 
-    describe('when the specified type is an array', () => {
-      it('should simply pass them along', () => {
-        expect(parseTypeValuePair('uint256[]', '20,30')).to.equal('20,30');
-        expect(parseTypeValuePair('uint256[]', [20, 30])).to.deep.equal([20,30]);
+    describe('when the specified type is a fixed non integer number', () => {
+      it('should accept non integers', () => {
+        expect(parseTypeValuePair('ufixed', 3.14)).to.equal('3.14');
+        expect(parseTypeValuePair('fixed', -3.14)).to.equal('-3.14');
       });
-      it('should parse uint array elements');
-      it('should parse uint address elements');
-      it('should parse uint bytes elements');
+    });
+
+    describe('when the specified type is boolean', () => {
+      it('should accept boolean');
+    });
+
+    describe('when the specified type is an array', () => {
+      it('should handle arrays', () => {
+        expect(parseTypeValuePair('uint256[]', '20,30')).to.deep.equal(['20', '30']);
+        expect(parseTypeValuePair('uint256[]', [20, 30])).to.deep.equal(['20', '30']);
+      });
+
+      it('should handle empty arrays', () => {
+        expect(parseTypeValuePair('uint256[]', [])).to.deep.equal([]);
+      });
+
+      it('should throw when the values do not match the type', function() {
+        expect(() => parseTypeValuePair('address[]', 'one,two')).to.throw(/Encoding error/);
+        expect(() => parseTypeValuePair('uint256[]', '20,30,hello')).to.throw(/Encoding error/);
+        expect(() => parseTypeValuePair('uint256[]', '20,-30')).to.throw(/Encoding error/);
+      });
+
+      it('should throw when array fixed size and number of elements do not match');
+      it('should parse number array elements');
+      it('should parse address elements');
+      it('should parse bytes elements');
+      it('should parse string elements');
     });
   });
 })
