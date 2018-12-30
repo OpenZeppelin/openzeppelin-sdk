@@ -14,7 +14,7 @@ export default function encodeCall(name: string, types: string[] = [], rawValues
   return '0x' + methodId + params;
 }
 
-export function parseTypeValuePair(type: string, rawValue: any): string | string[] | never {
+export function parseTypeValuePair(type: string, rawValue: any): string | string[] | boolean | never {
   // Array type (recurse).
   if(/^[^\[]+\[.*\]$/.test(type)) {
     if(typeof(rawValue) === 'string') rawValue = rawValue.split(',');
@@ -25,7 +25,7 @@ export function parseTypeValuePair(type: string, rawValue: any): string | string
   }
   // Single type.
   if(type === 'address') return parseAddress(type, rawValue);
-  else if(type === 'bool') return rawValue; // TODO
+  else if(type === 'bool') return parseBool(type, rawValue);
   else if(type === 'string') return rawValue; // Validated by ethereumjs-abi.
   else if(type.startsWith('bytes')) return parseBytes(type, rawValue);
   else if(type.startsWith('uint')) return parseNumber(type, rawValue, true, true);
@@ -33,6 +33,16 @@ export function parseTypeValuePair(type: string, rawValue: any): string | string
   else if(type.startsWith('ufixed')) return parseNumber(type, rawValue, true, false);
   else if(type.startsWith('fixed')) return parseNumber(type, rawValue, false, false);
   else throw new Error(ERROR_MESSAGE(type, rawValue) + '. Unsupported or invalid type.');
+}
+
+function parseBool(type: string, rawValue: string | boolean): boolean | never {
+  if(typeof(rawValue) === 'boolean') return <boolean>rawValue;
+  else if(typeof(rawValue) === 'string') {
+    if(rawValue === 'true') return true;
+    else if(rawValue === 'false') return false;
+    else throw new Error(ERROR_MESSAGE(type, rawValue));
+  }
+  throw new Error(ERROR_MESSAGE(type, rawValue));
 }
 
 function parseBytes(type: string, rawValue: string | Buffer): string | never {

@@ -5,7 +5,7 @@ require('../../setup');
 import encodeCall, { parseTypeValuePair } from '../../../src/helpers/encodeCall';
 import BN from 'bignumber.js';
 
-describe('encodeCall helper', () => {
+describe.only('encodeCall helper', () => {
   describe('encodeCall function', () => {
     describe('regarding output', function() {
       it('should return a string with the 0x radix', () => {
@@ -153,7 +153,17 @@ describe('encodeCall helper', () => {
     });
 
     describe('when the specified type is boolean', () => {
-      it('should accept boolean');
+      it('should accept boolean values', () => {
+        expect(parseTypeValuePair('bool', false)).to.equal(false);
+        expect(parseTypeValuePair('bool', true)).to.equal(true);
+        expect(parseTypeValuePair('bool', 'false')).to.equal(false);
+        expect(parseTypeValuePair('bool', 'true')).to.equal(true);
+      });
+
+      it('should reject invalid boolean values', () => {
+        expect(() => parseTypeValuePair('bool', 'falsy')).to.throw();
+        expect(() => parseTypeValuePair('bool', 32)).to.throw();
+      });
     });
 
     describe('when the specified type is an array', () => {
