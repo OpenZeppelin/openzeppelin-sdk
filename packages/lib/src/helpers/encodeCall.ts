@@ -21,14 +21,14 @@ export default function encodeCall(name: string, types: string[] = [], rawValues
 
 export function parseTypeValuePair(type: string, rawValue: any): any | never {
   // Typle type (recurse by calling this function with the individual elements).
-  if(/^\(.*\)$/.test(type)) {
+  if(/^\(.*\)$/.test(type)) { // Test for '(type1,type2)' in type.
     if(typeof rawValue === 'string') rawValue = rawValue.split(',');
     if(rawValue.length === 0) return [];
     const types = type.replace(/[{()}]/g, '').split(','); // Remove the parenthesis and split the tuple into types.
     return _.zipWith(types, rawValue, (typeElement, rawValueElement) => parseTypeValuePair(typeElement, rawValueElement));
   }
   // Array type (also recurse).
-  if(/^[^\[]+\[.*\]$/.test(type)) { // Test for '[]' in type.
+  if(/^[^\[]+\[.*\]$/.test(type)) { // Test for 'type[*]' in type.
     if(typeof rawValue === 'string') rawValue = rawValue.split(',');
     if(rawValue.length === 0) return [];
     const size = type.match(/(.*)\[(.*?)\]$/)[2]; // Find number between '[*]'.
