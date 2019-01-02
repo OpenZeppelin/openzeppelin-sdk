@@ -32,7 +32,7 @@ export function parseTypeValuePair(type: string, rawValue: any): any | never {
   // Single type.
   if(type === 'address') return parseAddress(type, rawValue);
   else if(type === 'bool') return parseBool(type, rawValue);
-  else if(type === 'string') return rawValue; // Validated by ethereumjs-abi.
+  else if(type === 'string') return parseString(type, rawValue);
   else if(type.startsWith('bytes')) return parseBytes(type, rawValue);
   else if(type.startsWith('uint')) return parseNumber(type, rawValue, true, true);
   else if(type.startsWith('int')) return parseNumber(type, rawValue, false, true);
@@ -41,7 +41,13 @@ export function parseTypeValuePair(type: string, rawValue: any): any | never {
   else throw new Error(ERROR_MESSAGE(type, rawValue) + '. Unsupported or invalid type.');
 }
 
+function parseString(type: string, rawValue: string): string | never {
+  if(typeof(rawValue) !== 'string') throw new Error(ERROR_MESSAGE(type, rawValue)); // Runtime type check.
+  return rawValue;
+}
+
 function parseBool(type: string, rawValue: string | boolean): boolean | never {
+  if(typeof(rawValue) !== 'string' && typeof(rawValue) !== 'boolean') throw new Error(ERROR_MESSAGE(type, rawValue)); // Runtime type check.
   if(typeof(rawValue) === 'boolean') return rawValue;
   else if(typeof(rawValue) === 'string') {
     if(rawValue === 'true') return true;
@@ -53,6 +59,7 @@ function parseBool(type: string, rawValue: string | boolean): boolean | never {
 
 // TODO: Validate data for fixed size byte arrays (bytes1, bytes2, etc).
 function parseBytes(type: string, rawValue: string | Buffer): Buffer | never {
+  if(typeof(rawValue) !== 'string' && !Buffer.isBuffer(rawValue)) throw new Error(ERROR_MESSAGE(type, rawValue)); // Runtime type check.
   if(Buffer.isBuffer(rawValue)) return rawValue;
   else if(typeof(rawValue) === 'string') {
     if(rawValue.length === 0) return Buffer.from(''); // Allow buffers from empty strings.
@@ -66,6 +73,7 @@ function parseBytes(type: string, rawValue: string | Buffer): Buffer | never {
 }
 
 function parseAddress(type: string, rawValue: string | Buffer): string | never {
+  if(typeof(rawValue) !== 'string' && !Buffer.isBuffer(rawValue)) throw new Error(ERROR_MESSAGE(type, rawValue)); // Runtime type check.
   const strAddress = rawValue.toString();
   if(!util.isValidAddress(strAddress)) throw new Error(ERROR_MESSAGE(type, rawValue));
   // If the address' characters are not all uppercase or lowercase, assume that there is checksum to validate.
@@ -76,6 +84,7 @@ function parseAddress(type: string, rawValue: string | Buffer): string | never {
 }
 
 function parseNumber(type: string, rawValue: number | string | BN, mustBePositive: boolean, mustBeInteger: boolean): string | never {
+  if(typeof(rawValue) !== 'number' && typeof(rawValue) !== 'string' && !BN.isBigNumber(rawValue)) throw new Error(ERROR_MESSAGE(type, rawValue)); // Runtime type check.
   if(isNaN(<any>rawValue)) throw new Error(ERROR_MESSAGE(type, rawValue));
   if(typeof(rawValue === 'number') && !isFinite(<any>rawValue)) throw new Error(ERROR_MESSAGE(type, rawValue));
   if(typeof(rawValue) === 'string') rawValue = (<string>rawValue).toLowerCase();

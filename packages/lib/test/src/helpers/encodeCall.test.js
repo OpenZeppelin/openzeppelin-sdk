@@ -25,8 +25,8 @@ describe('encodeCall helper', () => {
       });
 
       it('should fail with invalid type widths', () => {
-        expect(() => encodeCall('myFunction', ['uint956'], [123])).to.throw(/Invalid/);
-        expect(() => encodeCall('myFunction', ['bytes0'], [123])).to.throw(/Invalid/);
+        expect(() => encodeCall('myFunction', ['uint512'], [123])).to.throw(/Invalid/);
+        expect(() => encodeCall('myFunction', ['bytes0'], [Buffer.from('0xab', 'hex')])).to.throw(/Invalid/);
       });
     
       it('should fail with invalid non matching number of types and values', () => {
@@ -40,7 +40,7 @@ describe('encodeCall helper', () => {
         expect(() => encodeCall('myFunction', ['int'], ['-3.14'])).to.throw(/Encoding error/);
         expect(() => encodeCall('myFunction', ['string'], [32])).to.throw();
         expect(() => encodeCall('myFunction', ['address'], ['0x0fd60495d7057689fbe8b3'])).to.throw(/Encoding error/);
-        expect(() => encodeCall('myFunction', ['bytes'], [32])).to.throw();
+        expect(() => encodeCall('myFunction', ['bytes'], [32])).to.throw(/Encoding error/);
       });
     });
   });
@@ -91,6 +91,10 @@ describe('encodeCall helper', () => {
       it('should throw when the specified numeric literal is not finite', () => {
         expect(() => parseTypeValuePair('uint', 2**2000)).to.throw(/Encoding error/);
       });
+
+      it('should throw when the passed value is not a string, not a number nor a big number', () => {
+        expect(() => parseTypeValuePair('int', {})).to.throw(/Encoding error/);
+      });
     });
 
     describe('when the specified type is a string', () => {
@@ -99,6 +103,11 @@ describe('encodeCall helper', () => {
         expect(parseTypeValuePair('string', '0x123')).to.equal('0x123');
         expect(parseTypeValuePair('string', '42')).to.equal('42');
         expect(parseTypeValuePair('string', '0x39af68cF04Abb0eF8f9d8191E1bD9c041E80e18e')).to.equal('0x39af68cF04Abb0eF8f9d8191E1bD9c041E80e18e');
+      });
+
+      it('should throw when the passed value is not a string nor a Buffer', () => {
+        expect(() => parseTypeValuePair('string', 42)).to.throw(/Encoding error/);
+        expect(() => parseTypeValuePair('string', {})).to.throw(/Encoding error/);
       });
     });
 
@@ -111,6 +120,11 @@ describe('encodeCall helper', () => {
 
       it('should throw when a byte array expressed as a hexadecimal string is invalid', () => {
         expect(() => parseTypeValuePair('bytes', '0xabcqqq')).to.throw(/Encoding error/);
+      });
+
+      it('should throw when the passed value is not a string nor a Buffer', () => {
+        expect(() => parseTypeValuePair('bytes', 42)).to.throw(/Encoding error/);
+        expect(() => parseTypeValuePair('bytes', {})).to.throw(/Encoding error/);
       });
 
       it('should accept Buffer objects', function() {
@@ -145,6 +159,11 @@ describe('encodeCall helper', () => {
       it('should accept addresses passed as buffers', () => {
         expect(parseTypeValuePair('address', Buffer.from('0x39af68cF04Abb0eF8f9d8191E1bD9c041E80e18e', 'utf8'))).to.equal('0x39af68cF04Abb0eF8f9d8191E1bD9c041E80e18e');
       });
+
+      it('should throw when the passed value is not a string nor a Buffer', () => {
+        expect(() => parseTypeValuePair('address', 42)).to.throw(/Encoding error/);
+        expect(() => parseTypeValuePair('address', {})).to.throw(/Encoding error/);
+      });
     });
 
     describe('when the specified type is a fixed non integer number', () => {
@@ -164,7 +183,11 @@ describe('encodeCall helper', () => {
 
       it('should reject invalid boolean values', () => {
         expect(() => parseTypeValuePair('bool', 'falsy')).to.throw();
-        expect(() => parseTypeValuePair('bool', 32)).to.throw();
+      });
+
+      it('should throw when the passed value is not a string nor a boolean', () => {
+        expect(() => parseTypeValuePair('bool', 42)).to.throw(/Encoding error/);
+        expect(() => parseTypeValuePair('bool', {})).to.throw(/Encoding error/);
       });
     });
 
@@ -174,6 +197,8 @@ describe('encodeCall helper', () => {
         expect(parseTypeValuePair('uint256[]', [20, 30])).to.deep.equal(['20', '30']);
         expect(parseTypeValuePair('address[]', ['0x90f8bf6a479f320ead074411a4b0e7944ea8c9c1', '0xffcf8fdee72ac11b5c542428b35eef5769c409f0'])).to.deep.equal(['0x90f8bf6a479f320ead074411a4b0e7944ea8c9c1', '0xffcf8fdee72ac11b5c542428b35eef5769c409f0']);
         expect(parseTypeValuePair('string[]', ['one', 'two'])).to.deep.equal(['one', 'two']);
+        expect(parseTypeValuePair('bool[]', ['true', 'false'])).to.deep.equal([true, false]);
+        expect(parseTypeValuePair('bool[]', [true, false])).to.deep.equal([true, false]);
       });
 
       it('should handle empty arrays', () => {
