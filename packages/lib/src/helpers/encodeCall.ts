@@ -20,13 +20,13 @@ export default function encodeCall(name: string, types: string[] = [], rawValues
 }
 
 export function parseTypeValuePair(type: string, rawValue: any): any | never {
-  // Array type (recurse).
-  if(/^[^\[]+\[.*\]$/.test(type)) { // Test for '[*]' in type.
+  // Array type (recurse by calling this function with the individual elements).
+  if(/^[^\[]+\[.*\]$/.test(type)) { // Test for '[]' in type.
     if(typeof rawValue === 'string') rawValue = rawValue.split(',');
     if(rawValue.length === 0) return [];
-    const size = type.match(/(.*)\[(.*?)\]$/)[2]; // Find number between '[]'.
+    const size = type.match(/(.*)\[(.*?)\]$/)[2]; // Find number between '[*]'.
     if(size !== '' && parseInt(size, 10) !== rawValue.length) throw new Error(ERROR_MESSAGE(type, rawValue) + '. Invalid array length.');
-    const baseType = type.slice(0, type.lastIndexOf('[')); // Remove array part.
+    const baseType = type.slice(0, type.lastIndexOf('[')); // Remove array part '[*]'.
     return _.map(rawValue, (rawValueElement) => parseTypeValuePair(baseType, rawValueElement));
   }
   // Single type.
@@ -86,9 +86,9 @@ function parseAddress(type: string, rawValue: string | Buffer): string | never {
 function parseNumber(type: string, rawValue: number | string | BN, mustBePositive: boolean, mustBeInteger: boolean): string | never {
   if(typeof rawValue !== 'number' && typeof rawValue !== 'string' && !BN.isBigNumber(rawValue)) throw new Error(ERROR_MESSAGE(type, rawValue)); // Runtime type check.
   if(isNaN(<any>rawValue)) throw new Error(ERROR_MESSAGE(type, rawValue));
-  if(typeof(rawValue === 'number') && !isFinite(<any>rawValue)) throw new Error(ERROR_MESSAGE(type, rawValue));
+  if(typeof rawValue === 'number' && !isFinite(<any>rawValue)) throw new Error(ERROR_MESSAGE(type, rawValue));
   if(typeof rawValue === 'string') rawValue = (<string>rawValue).toLowerCase();
-  // Funnel everything through bignumber.js.
+  // Funnel everything through bignumber.js, into a string.
   const bn = BN.isBigNumber(rawValue) ? <BN>rawValue : new BN(rawValue);
   if(bn.isNaN()) throw new Error(ERROR_MESSAGE(type, rawValue));
   if(mustBePositive && bn.isNegative()) throw new Error(ERROR_MESSAGE(type, rawValue));

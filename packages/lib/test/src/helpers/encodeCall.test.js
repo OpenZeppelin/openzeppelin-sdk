@@ -5,7 +5,7 @@ require('../../setup');
 import encodeCall, { parseTypeValuePair } from '../../../src/helpers/encodeCall';
 import BN from 'bignumber.js';
 
-describe.only('encodeCall helper', () => {
+describe('encodeCall helper', () => {
   describe('encodeCall function', () => {
     describe('regarding output', function() {
       it('should return a string with the 0x radix', () => {
@@ -193,12 +193,15 @@ describe.only('encodeCall helper', () => {
 
     describe('when the specified type is an array', () => {
       it('should handle arrays', () => {
-        expect(parseTypeValuePair('uint256[]', '20,30')).to.deep.equal(['20', '30']);
         expect(parseTypeValuePair('uint256[]', [20, 30])).to.deep.equal(['20', '30']);
         expect(parseTypeValuePair('address[]', ['0x90f8bf6a479f320ead074411a4b0e7944ea8c9c1', '0xffcf8fdee72ac11b5c542428b35eef5769c409f0'])).to.deep.equal(['0x90f8bf6a479f320ead074411a4b0e7944ea8c9c1', '0xffcf8fdee72ac11b5c542428b35eef5769c409f0']);
         expect(parseTypeValuePair('string[]', ['one', 'two'])).to.deep.equal(['one', 'two']);
         expect(parseTypeValuePair('bool[]', ['true', 'false'])).to.deep.equal([true, false]);
         expect(parseTypeValuePair('bool[]', [true, false])).to.deep.equal([true, false]);
+      });
+
+      it('should be able to understand a comma separated list as an array', function() {
+        expect(parseTypeValuePair('uint256[]', '20,30')).to.deep.equal(['20', '30']);
       });
 
       it('should handle empty arrays', () => {
