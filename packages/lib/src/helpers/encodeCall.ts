@@ -1,3 +1,8 @@
+/*
+ * Utility that wraps around ethereumjs-abi, providing additional validation
+ * on passed type/value pair parameters.
+ */
+
 import abi from 'ethereumjs-abi';
 import * as util from 'ethereumjs-util';
 import BN from 'bignumber.js';
@@ -14,7 +19,7 @@ export default function encodeCall(name: string, types: string[] = [], rawValues
   return '0x' + methodId + params;
 }
 
-export function parseTypeValuePair(type: string, rawValue: any): string | string[] | boolean | never {
+export function parseTypeValuePair(type: string, rawValue: any): any | never {
   // Array type (recurse).
   if(/^[^\[]+\[.*\]$/.test(type)) { // Test for '[*]' in type.
     if(typeof(rawValue) === 'string') rawValue = rawValue.split(',');
@@ -46,15 +51,17 @@ function parseBool(type: string, rawValue: string | boolean): boolean | never {
   throw new Error(ERROR_MESSAGE(type, rawValue));
 }
 
-function parseBytes(type: string, rawValue: string | Buffer): string | never {
-  if(Buffer.isBuffer(rawValue)) return rawValue.toString();
+// TODO: Validate data for fixed size byte arrays (bytes1, bytes2, etc).
+function parseBytes(type: string, rawValue: string | Buffer): Buffer | never {
+  if(Buffer.isBuffer(rawValue)) return rawValue;
   else if(typeof(rawValue) === 'string') {
-    if(rawValue.toString().length === 0) return rawValue;
+    if(rawValue.length === 0) return Buffer.from(''); // Allow buffers from empty strings.
     // Require buffers expressed as strings to be valid hexadecimals.
     if(!/^(0x)[0-9a-f]+$/i.test(rawValue)) throw new Error(ERROR_MESSAGE(type, rawValue));
+    const buf = Buffer.from(rawValue.substring(2), 'hex');
     // Test the validity of the buffer.
-    if(Buffer.from(rawValue.substring(2), 'hex').length === 0) throw new Error(ERROR_MESSAGE(type, rawValue));
-    return rawValue;
+    if(buf.length === 0) throw new Error(ERROR_MESSAGE(type, rawValue));
+    return buf;
   }
 }
 

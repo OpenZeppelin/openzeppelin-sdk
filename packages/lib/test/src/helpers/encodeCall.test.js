@@ -103,21 +103,23 @@ describe('encodeCall helper', () => {
     });
 
     describe('when the specified type is bytes (includes bytes1, bytes2, etc)', () => {
-      it('should accept byte arrays expressed in hexadecimal form', () => {
-        expect(parseTypeValuePair('bytes', '0xabc')).to.equal('0xabc');
+      it('should accept bytes expressed as hexadecimal strings', () => {
+        expect(parseTypeValuePair('bytes', '0x2a')).to.deep.equal(Buffer.from('2a', 'hex'));
+        expect(parseTypeValuePair('bytes', '0xabc')).to.deep.equal(Buffer.from('abc', 'hex'));
+        expect(parseTypeValuePair('bytes', '0xabcdef')).to.deep.equal(Buffer.from('abcdef', 'hex'));
       });
 
-      it('should throw when a byte array expressed in hexadecimal form is invalid', () => {
+      it('should throw when a byte array expressed as a hexadecimal string is invalid', () => {
         expect(() => parseTypeValuePair('bytes', '0xabcqqq')).to.throw(/Encoding error/);
       });
 
-      it('should interpret empty strings as valid empty bytes', () => {
-        expect(parseTypeValuePair('bytes', '')).to.equal('');
+      it('should accept Buffer objects', function() {
+        expect(parseTypeValuePair('bytes', Buffer.from('heya'))).to.deep.equal(Buffer.from('heya'));
+        expect(parseTypeValuePair('bytes', Buffer.from('abcdef', 'hex'))).to.deep.equal(Buffer.from('abcdef', 'hex'));
       });
-      
-      it('should accept Buffer values', () => {
-        expect(parseTypeValuePair('bytes', Buffer.from('hello', 'utf8'))).to.equal('hello');
-        expect(parseTypeValuePair('bytes', Buffer.from('123abc', 'hex'))).to.equal('\u0012:�');
+
+      it('should interpret empty strings as valid empty bytes', () => {
+        expect(parseTypeValuePair('bytes', '')).to.deep.equal(Buffer.from(''));
       });
     });
 
