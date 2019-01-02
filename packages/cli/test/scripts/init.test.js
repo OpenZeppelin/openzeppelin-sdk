@@ -73,11 +73,11 @@ contract('init script', function() {
     });
   };
 
-  describe('for app', function () {
+  describe('when not publishing the project', function () {
     testInit(false)
   })
 
-  describe('for full', function () {
+  describe('when publishing the project', function () {
     testInit(true)
   })
 });

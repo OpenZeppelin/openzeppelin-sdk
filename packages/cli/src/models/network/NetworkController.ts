@@ -402,7 +402,7 @@ export default class NetworkController {
   }
 
   // DeployerController
-  public async toFullApp(): Promise<void> {
+  public async publish(): Promise<void> {
     if (this.appAddress) {
       log.info(`Project is already published to ${this.network}`);
       return;
