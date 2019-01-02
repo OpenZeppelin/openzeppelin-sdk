@@ -173,6 +173,35 @@ describe('encodeCall helper', () => {
       });
     });
 
+    describe('when the specified type is a function', () => {
+      it('treats the type as a bytes24 (address + function selector)', () => {
+        expect(parseTypeValuePair('function', '0x90f8bf6a479f320ead074411a4b0e7944ea8c9c1abcdef')).to.equal('0x90f8bf6a479f320ead074411a4b0e7944ea8c9c1abcdef');
+      });
+
+      it('should throw when the passed value is not a valid bytes24 hex', () => {
+        expect(() => parseTypeValuePair('function', '0x123')).to.throw(/Encoding error/);
+        expect(() => parseTypeValuePair('function', '0x90f8bf6a479f320ead074411a4b0e7944ea8c9c1')).to.throw(/Encoding error/);
+        expect(() => parseTypeValuePair('function', '0x90f8bf6a479f320ead074411a4b0e7944ea8c9c1abcdefabc')).to.throw(/Encoding error/);
+      });
+
+    describe('when the specified type is a tuple', () => {
+      it('identifies the individual types and treats them recursively', () => {
+        expect(parseTypeValuePair('(uint256,string)', '42,hello')).to.deep.equal(['42', 'hello']);
+        expect(parseTypeValuePair('(uint256,string)', [42, 'hello'])).to.deep.equal(['42', 'hello']);
+      });
+
+      it('supports nested tuples/arrays', function() {
+        expect(parseTypeValuePair('(uint256,string[])', [42, ['one', 'two', 'three']])).to.deep.equal(['42', ['one', 'two', 'three']]);
+        expect(parseTypeValuePair('(uint256,string)[]', [[42, 'hello'], ['42', 'bye']])).to.deep.equal([['42', 'hello'], ['42', 'bye']]);
+      });
+
+      it('should throw when the passed tuple types do not match', () => {
+        expect(() => parseTypeValuePair('(uint256,string)', 'hello,42')).to.throw();
+        expect(() => parseTypeValuePair('(uint256,string)', '42')).to.throw();
+      });
+    });
+    });
+
     describe('when the specified type is boolean', () => {
       it('should accept boolean values', () => {
         expect(parseTypeValuePair('bool', false)).to.equal(false);

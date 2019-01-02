@@ -20,7 +20,14 @@ export default function encodeCall(name: string, types: string[] = [], rawValues
 }
 
 export function parseTypeValuePair(type: string, rawValue: any): any | never {
-  // Array type (recurse by calling this function with the individual elements).
+  // Typle type (recurse by calling this function with the individual elements).
+  if(/^\(.*\)$/.test(type)) {
+    if(typeof rawValue === 'string') rawValue = rawValue.split(',');
+    if(rawValue.length === 0) return [];
+    const types = type.replace(/[{()}]/g, '').split(','); // Remove the parenthesis and split the tuple into types.
+    return _.zipWith(types, rawValue, (typeElement, rawValueElement) => parseTypeValuePair(typeElement, rawValueElement));
+  }
+  // Array type (also recurse).
   if(/^[^\[]+\[.*\]$/.test(type)) { // Test for '[]' in type.
     if(typeof rawValue === 'string') rawValue = rawValue.split(',');
     if(rawValue.length === 0) return [];
@@ -39,7 +46,6 @@ export function parseTypeValuePair(type: string, rawValue: any): any | never {
   else if(type.startsWith('ufixed')) return parseNumber(type, rawValue, true, false);
   else if(type.startsWith('fixed')) return parseNumber(type, rawValue, false, false);
   else if(type.startsWith('function')) return parseFunction(type, rawValue);
-  // TODO: Handle tuple types
   else throw new Error(ERROR_MESSAGE(type, rawValue) + '. Unsupported or invalid type.');
 }
 
