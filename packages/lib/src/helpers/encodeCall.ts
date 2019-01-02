@@ -13,7 +13,7 @@ const ERROR_MESSAGE = (type: string, value: any) => `${ERROR_MESSAGE_PREFIX} for
 
 export default function encodeCall(name: string, types: string[] = [], rawValues: any[] = []): string {
   if(types.length !== rawValues.length) throw new Error(ERROR_MESSAGE_PREFIX + '. Supplied number of types and values do not match.');
-  const values =_.zipWith(types, rawValues, (type: string, value: any) => parseTypeValuePair(type, value));
+  const values =_.zipWith(types, rawValues, parseTypeValuePair);
   const methodId = abi.methodID(name, types).toString('hex');
   const params = abi.rawEncode(types, values).toString('hex');
   return '0x' + methodId + params;
@@ -38,7 +38,15 @@ export function parseTypeValuePair(type: string, rawValue: any): any | never {
   else if(type.startsWith('int')) return parseNumber(type, rawValue, false, true);
   else if(type.startsWith('ufixed')) return parseNumber(type, rawValue, true, false);
   else if(type.startsWith('fixed')) return parseNumber(type, rawValue, false, false);
+  else if(type.startsWith('function')) return parseFunction(type, rawValue);
+  // TODO: Handle tuple types
   else throw new Error(ERROR_MESSAGE(type, rawValue) + '. Unsupported or invalid type.');
+}
+
+function parseFunction(type: string, rawValue: string): string | never {
+  if(typeof rawValue !== 'string') throw new Error(ERROR_MESSAGE(type, rawValue)); // Runtime type check.
+  if(!/^(0x)[0-9a-f]{46}$/i.test(rawValue)) throw new Error(ERROR_MESSAGE(type, rawValue));
+  return rawValue;
 }
 
 function parseString(type: string, rawValue: string): string | never {
