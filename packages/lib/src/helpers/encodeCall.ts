@@ -40,12 +40,12 @@ export function parseTypeValuePair(type: string, rawValue: any): any | never {
   if(type === 'address') return parseAddress(type, rawValue);
   else if(type === 'bool') return parseBool(type, rawValue);
   else if(type === 'string') return parseString(type, rawValue);
+  else if(type === 'function') return parseFunction(type, rawValue);
   else if(type.startsWith('bytes')) return parseBytes(type, rawValue);
   else if(type.startsWith('uint')) return parseNumber(type, rawValue, true, true);
   else if(type.startsWith('int')) return parseNumber(type, rawValue, false, true);
   else if(type.startsWith('ufixed')) return parseNumber(type, rawValue, true, false);
   else if(type.startsWith('fixed')) return parseNumber(type, rawValue, false, false);
-  else if(type.startsWith('function')) return parseFunction(type, rawValue);
   else throw new Error(ERROR_MESSAGE(type, rawValue) + '. Unsupported or invalid type.');
 }
 
