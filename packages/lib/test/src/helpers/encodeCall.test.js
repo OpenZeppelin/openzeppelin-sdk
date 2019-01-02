@@ -5,7 +5,7 @@ require('../../setup');
 import encodeCall, { parseTypeValuePair } from '../../../src/helpers/encodeCall';
 import BN from 'bignumber.js';
 
-describe('encodeCall helper', () => {
+describe.only('encodeCall helper', () => {
   describe('encodeCall function', () => {
     describe('regarding output', function() {
       it('should return a string with the 0x radix', () => {

@@ -22,7 +22,7 @@ export default function encodeCall(name: string, types: string[] = [], rawValues
 export function parseTypeValuePair(type: string, rawValue: any): any | never {
   // Array type (recurse).
   if(/^[^\[]+\[.*\]$/.test(type)) { // Test for '[*]' in type.
-    if(typeof(rawValue) === 'string') rawValue = rawValue.split(',');
+    if(typeof rawValue === 'string') rawValue = rawValue.split(',');
     if(rawValue.length === 0) return [];
     const size = type.match(/(.*)\[(.*?)\]$/)[2]; // Find number between '[]'.
     if(size !== '' && parseInt(size, 10) !== rawValue.length) throw new Error(ERROR_MESSAGE(type, rawValue) + '. Invalid array length.');
@@ -42,14 +42,14 @@ export function parseTypeValuePair(type: string, rawValue: any): any | never {
 }
 
 function parseString(type: string, rawValue: string): string | never {
-  if(typeof(rawValue) !== 'string') throw new Error(ERROR_MESSAGE(type, rawValue)); // Runtime type check.
+  if(typeof rawValue !== 'string') throw new Error(ERROR_MESSAGE(type, rawValue)); // Runtime type check.
   return rawValue;
 }
 
 function parseBool(type: string, rawValue: string | boolean): boolean | never {
-  if(typeof(rawValue) !== 'string' && typeof(rawValue) !== 'boolean') throw new Error(ERROR_MESSAGE(type, rawValue)); // Runtime type check.
-  if(typeof(rawValue) === 'boolean') return rawValue;
-  else if(typeof(rawValue) === 'string') {
+  if(typeof rawValue !== 'string' && typeof rawValue !== 'boolean') throw new Error(ERROR_MESSAGE(type, rawValue)); // Runtime type check.
+  if(typeof rawValue === 'boolean') return rawValue;
+  else if(typeof rawValue === 'string') {
     if(rawValue === 'true') return true;
     else if(rawValue === 'false') return false;
     else throw new Error(ERROR_MESSAGE(type, rawValue));
@@ -59,9 +59,9 @@ function parseBool(type: string, rawValue: string | boolean): boolean | never {
 
 // TODO: Validate data for fixed size byte arrays (bytes1, bytes2, etc).
 function parseBytes(type: string, rawValue: string | Buffer): Buffer | never {
-  if(typeof(rawValue) !== 'string' && !Buffer.isBuffer(rawValue)) throw new Error(ERROR_MESSAGE(type, rawValue)); // Runtime type check.
+  if(typeof rawValue !== 'string' && !Buffer.isBuffer(rawValue)) throw new Error(ERROR_MESSAGE(type, rawValue)); // Runtime type check.
   if(Buffer.isBuffer(rawValue)) return rawValue;
-  else if(typeof(rawValue) === 'string') {
+  else if(typeof rawValue === 'string') {
     if(rawValue.length === 0) return Buffer.from(''); // Allow buffers from empty strings.
     // Require buffers expressed as strings to be valid hexadecimals.
     if(!/^(0x)[0-9a-f]+$/i.test(rawValue)) throw new Error(ERROR_MESSAGE(type, rawValue));
@@ -73,7 +73,7 @@ function parseBytes(type: string, rawValue: string | Buffer): Buffer | never {
 }
 
 function parseAddress(type: string, rawValue: string | Buffer): string | never {
-  if(typeof(rawValue) !== 'string' && !Buffer.isBuffer(rawValue)) throw new Error(ERROR_MESSAGE(type, rawValue)); // Runtime type check.
+  if(typeof rawValue !== 'string' && !Buffer.isBuffer(rawValue)) throw new Error(ERROR_MESSAGE(type, rawValue)); // Runtime type check.
   const strAddress = rawValue.toString();
   if(!util.isValidAddress(strAddress)) throw new Error(ERROR_MESSAGE(type, rawValue));
   // If the address' characters are not all uppercase or lowercase, assume that there is checksum to validate.
@@ -84,10 +84,10 @@ function parseAddress(type: string, rawValue: string | Buffer): string | never {
 }
 
 function parseNumber(type: string, rawValue: number | string | BN, mustBePositive: boolean, mustBeInteger: boolean): string | never {
-  if(typeof(rawValue) !== 'number' && typeof(rawValue) !== 'string' && !BN.isBigNumber(rawValue)) throw new Error(ERROR_MESSAGE(type, rawValue)); // Runtime type check.
+  if(typeof rawValue !== 'number' && typeof rawValue !== 'string' && !BN.isBigNumber(rawValue)) throw new Error(ERROR_MESSAGE(type, rawValue)); // Runtime type check.
   if(isNaN(<any>rawValue)) throw new Error(ERROR_MESSAGE(type, rawValue));
   if(typeof(rawValue === 'number') && !isFinite(<any>rawValue)) throw new Error(ERROR_MESSAGE(type, rawValue));
-  if(typeof(rawValue) === 'string') rawValue = (<string>rawValue).toLowerCase();
+  if(typeof rawValue === 'string') rawValue = (<string>rawValue).toLowerCase();
   // Funnel everything through bignumber.js.
   const bn = BN.isBigNumber(rawValue) ? <BN>rawValue : new BN(rawValue);
   if(bn.isNaN()) throw new Error(ERROR_MESSAGE(type, rawValue));
