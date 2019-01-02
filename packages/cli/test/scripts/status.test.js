@@ -232,7 +232,7 @@ contract('status script', function([_, owner]) {
     })
   });
 
-  describe('on lightweight app project', function () {
+  describe('on unpublished project', function () {
     beforeEach('creating package and network files', function () {
       this.packageFile = new ZosPackageFile('test/mocks/packages/package-empty.zos.json')
       this.packageFile.publish = false

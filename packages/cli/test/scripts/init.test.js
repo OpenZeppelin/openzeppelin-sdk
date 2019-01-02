@@ -19,15 +19,15 @@ contract('init script', function() {
     this.packageFile = new ZosPackageFile(`${tmpDir}/zos.json`)
   })
 
-  it('should default to lightweight apps', async function () {
+  it('should default to unpublished apps', async function () {
     await init({ name, version, packageFile: this.packageFile });
-    this.packageFile.isLightweight.should.eq(true)
+    this.packageFile.isPublished.should.eq(false)
   });
 
   function testInit(publish) {
     it('should have correct publish mark', async function () {
       await init({ publish, name, version, packageFile: this.packageFile });
-      this.packageFile.isLightweight.should.eq(!publish)
+      this.packageFile.isPublished.should.eq(publish)
     });
 
     it('should have the appropriate app name', async function() {

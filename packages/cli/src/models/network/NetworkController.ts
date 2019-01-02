@@ -62,14 +62,14 @@ export default class NetworkController {
 
   // StatusController
   public async compareCurrentStatus(): Promise<void | never> {
-    if (this.isLightweight) throw Error('Command status-pull is not supported for unpublished projects');
+    if (!this.isPublished) throw Error('Command status-pull is not supported for unpublished projects');
     const statusComparator = StatusChecker.compare(this.networkFile, this.txParams);
     await statusComparator.call();
   }
 
   // StatusController
   public async pullRemoteStatus(): Promise<void | never> {
-    if (this.isLightweight) throw Error('Command status-fix is not supported for unpublished projects');
+    if (!this.isPublished) throw Error('Command status-fix is not supported for unpublished projects');
     const statusFetcher = StatusChecker.fetch(this.networkFile, this.txParams);
     await statusFetcher.call();
   }
@@ -117,7 +117,7 @@ export default class NetworkController {
 
   // DeployerController
   private _newVersionRequired(): boolean {
-    return (this.packageVersion !== this.currentVersion) && !this.isLightweight;
+    return (this.packageVersion !== this.currentVersion) && this.isPublished;
   }
 
   // Contract model
@@ -379,15 +379,15 @@ export default class NetworkController {
   }
 
   // DeployerController
-  get isLightweight(): boolean {
-    return this.packageFile.isLightweight && !this.appAddress;
+  get isPublished(): boolean {
+    return this.packageFile.isPublished || this.appAddress !== undefined
   }
 
   // DeployerController
   public getDeployer(requestedVersion: string): SimpleProjectDeployer | AppProjectDeployer {
-    return this.isLightweight
-      ? new SimpleProjectDeployer(this, requestedVersion)
-      : new AppProjectDeployer(this, requestedVersion);
+    return this.isPublished
+      ? new AppProjectDeployer(this, requestedVersion)
+      : new SimpleProjectDeployer(this, requestedVersion);
   }
 
   // NetworkController
@@ -569,7 +569,7 @@ export default class NetworkController {
     }
 
     // TODO: If 'from' is not explicitly set, then we need to retrieve it from the set of current accounts
-    const expectedOwner = this.isLightweight ? this.txParams.from : this.appAddress;
+    const expectedOwner = this.isPublished ? this.appAddress : this.txParams.from;
     const ownedProxies = proxies.filter((proxy) => !proxy.admin || !expectedOwner || proxy.admin === expectedOwner);
 
     if (_.isEmpty(ownedProxies)) {
