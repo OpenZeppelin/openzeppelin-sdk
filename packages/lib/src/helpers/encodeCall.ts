@@ -11,12 +11,15 @@ import _ from 'lodash';
 const ERROR_MESSAGE_PREFIX = 'Encoding error';
 const ERROR_MESSAGE = (type: string, value: any) => `${ERROR_MESSAGE_PREFIX} for type ${type} and value ${value.toString()}`;
 
-export default function encodeCall(name: string, types: string[] = [], rawValues: any[] = []): string {
-  if(types.length !== rawValues.length) throw new Error(ERROR_MESSAGE_PREFIX + '. Supplied number of types and values do not match.');
-  const values = _.zipWith(types, rawValues, parseTypeValuePair);
+export default function encodeCall(name: string, types: string[] = [], values: any[] = []): string {
   const methodId = abi.methodID(name, types).toString('hex');
   const params = abi.rawEncode(types, values).toString('hex');
   return '0x' + methodId + params;
+}
+
+export function parseCallValues(types: string[] = [], rawValues: any[] = []): any[] | never {
+  if(types.length !== rawValues.length) throw new Error(ERROR_MESSAGE_PREFIX + '. Supplied number of types and values do not match.');
+  return _.zipWith(types, rawValues, parseTypeValuePair);
 }
 
 export function parseTypeValuePair(type: string, rawValue: any): any | never {

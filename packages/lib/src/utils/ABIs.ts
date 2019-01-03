@@ -1,4 +1,4 @@
-import encodeCall from '../helpers/encodeCall';
+import encodeCall, { parseCallValues } from '../helpers/encodeCall';
 import ContractAST, { Node } from './ContractAST';
 import ContractFactory from '../artifacts/ContractFactory';
 
@@ -20,7 +20,7 @@ interface FunctionInfo {
 export function buildCallData(contractClass: ContractFactory, methodName: string, args: any[]): CalldataInfo {
   const method = getABIFunction(contractClass, methodName, args);
   const argTypes = method.inputs.map((input) => input.type);
-  const callData = encodeCall(method.name, argTypes, args);
+  const callData = encodeCall(method.name, argTypes, parseCallValues(argTypes, args));
   return { method, callData };
 }
 

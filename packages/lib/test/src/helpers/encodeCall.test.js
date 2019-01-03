@@ -2,49 +2,47 @@
 
 require('../../setup');
 
-import encodeCall, { parseTypeValuePair } from '../../../src/helpers/encodeCall';
+import encodeCall, { parseCallValues, parseTypeValuePair } from '../../../src/helpers/encodeCall';
 import BN from 'bignumber.js';
 
 describe('encodeCall helper', () => {
   describe('encodeCall function', () => {
-    describe('regarding output', function() {
-      it('should return a string with the 0x radix', () => {
-        assert(encodeCall('myFunction', ['uint256'], [123]).startsWith('0x'));
-      });
-
-      it('should be a valid hexadecimal', () => {
-        expect(encodeCall('myFunction', ['uint256'], [123]).match(/0[xX][0-9a-fA-F]+/)).to.not.be.empty;
-      });
-
-      // TODO: We're relying on ethereumjs-abi's tests here. We might do a bit of verification on the actual output.
+    it('should return a string with the 0x radix', () => {
+      assert(encodeCall('myFunction', ['uint256'], [123]).startsWith('0x'));
     });
 
-    describe('regarding input', function() {
-      it('should throw with invalid types', () => {
-        expect(() => encodeCall('myFunction', ['schnitzel'], [123])).to.throw(/Unsupported or invalid type/);
-      });
-
-      it('should fail with invalid type widths', () => {
-        expect(() => encodeCall('myFunction', ['uint512'], [123])).to.throw(/Invalid/);
-        expect(() => encodeCall('myFunction', ['bytes0'], [Buffer.from('0xab', 'hex')])).to.throw(/Invalid/);
-      });
-    
-      it('should fail with invalid non matching number of types and values', () => {
-        expect(() => encodeCall('myFunction', ['uint', 'address'], [123])).to.throw(/Supplied number of types and values do not match./);
-      });
-
-      it('should fail with invalid type/value pairs', () => {
-        expect(() => encodeCall('myFunction', ['uint'], ['hello'])).to.throw(/Encoding error/);
-        expect(() => encodeCall('myFunction', ['uint'], ['-42'])).to.throw(/Encoding error/);
-        expect(() => encodeCall('myFunction', ['int'], ['3.14'])).to.throw(/Encoding error/);
-        expect(() => encodeCall('myFunction', ['int'], ['-3.14'])).to.throw(/Encoding error/);
-        expect(() => encodeCall('myFunction', ['string'], [32])).to.throw();
-        expect(() => encodeCall('myFunction', ['address'], ['0x0fd60495d7057689fbe8b3'])).to.throw(/Encoding error/);
-        expect(() => encodeCall('myFunction', ['bytes'], [32])).to.throw(/Encoding error/);
-      });
+    it('should be a valid hexadecimal', () => {
+      expect(encodeCall('myFunction', ['uint256'], [123]).match(/0[xX][0-9a-fA-F]+/)).to.not.be.empty;
     });
+
+    // TODO: We're relying on ethereumjs-abi's tests here. We might do a bit of verification on the actual output.
   });
 
+  describe('encodeCall + parseCallValues functions', function() {
+    it('should throw with invalid types', () => {
+      expect(() => encodeCall('myFunction', parseCallValues(['schnitzel'], [123]))).to.throw(/Unsupported or invalid type/);
+    });
+
+    it('should fail with invalid type widths', () => {
+      expect(() => encodeCall('myFunction', parseCallValues(['uint512'], [123]))).to.throw();
+      expect(() => encodeCall('myFunction', parseCallValues(['bytes0'], [Buffer.from('0xab', 'hex')]))).to.throw();
+    });
+  
+    it('should fail with invalid non matching number of types and values', () => {
+      expect(() => encodeCall('myFunction', parseCallValues(['uint', 'address'], [123]))).to.throw(/Supplied number of types and values do not match./);
+    });
+
+    it('should fail with invalid type/value pairs', () => {
+      expect(() => encodeCall('myFunction', parseCallValues(['uint'], ['hello']))).to.throw(/Encoding error/);
+      expect(() => encodeCall('myFunction', parseCallValues(['uint'], ['-42']))).to.throw(/Encoding error/);
+      expect(() => encodeCall('myFunction', parseCallValues(['int'], ['3.14']))).to.throw(/Encoding error/);
+      expect(() => encodeCall('myFunction', parseCallValues(['int'], ['-3.14']))).to.throw(/Encoding error/);
+      expect(() => encodeCall('myFunction', parseCallValues(['string'], [32]))).to.throw();
+      expect(() => encodeCall('myFunction', parseCallValues(['address'], ['0x0fd60495d7057689fbe8b3']))).to.throw(/Encoding error/);
+      expect(() => encodeCall('myFunction', parseCallValues(['bytes'], [32]))).to.throw(/Encoding error/);
+    });
+  });
+  
   describe('parseValuePair function', () => {
 
     it('should throw when the specified type is not recognized', () => {
