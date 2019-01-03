@@ -11,7 +11,7 @@ import _ from 'lodash';
 const ERROR_MESSAGE_PREFIX = 'Encoding error';
 const ERROR_MESSAGE = (type: string, value: any) => `${ERROR_MESSAGE_PREFIX} for type ${type} and value ${value.toString()}`;
 
-export default function encodeCall(name: string, types: string[] = [], values: any[] = []): string {
+export default function encodeCall(name: string, types: any[] = [], values: any[] = []): string {
   const methodId = abi.methodID(name, types).toString('hex');
   const params = abi.rawEncode(types, values).toString('hex');
   return '0x' + methodId + params;
@@ -40,9 +40,32 @@ export function parseTypeValuePair(type: string, rawValue: any): any | never {
 function parseTuple(type: string, rawValue: any): any | never {
   if(typeof rawValue === 'string') rawValue = rawValue.split(',');
   if(rawValue.length === 0) return [];
-  const types = type.replace(/[{()}]/g, '').split(','); // Remove the parenthesis and split the tuple into types.
+  const types = splitTupleTypes(type);
   if(types.length !== rawValue.length) throw new Error(ERROR_MESSAGE(type, rawValue) + '. Invalid tuple length.');
   return _.zipWith(types, rawValue, (typeElement, rawValueElement) => parseTypeValuePair(typeElement, rawValueElement));
+}
+
+function splitTupleTypes(type: string): string[] {
+  if(type.length === 0) return [];
+  type = type.substring(1, type.length - 1); // Remove main pair of parenthesis.
+  const types = [];
+  let balance = 0; // Add 1 on ('s and -1 on )'s.
+  let buffer = ''; // Accumulate tokens here.
+  for(let i = 0; i < type.length; i++) {
+    const char = type.charAt(i);
+    if(char === ',' && balance === 0) {
+      types.push(buffer);
+      buffer = '';
+      balance = 0;
+    }
+    else {
+      buffer += char;
+      if(char === '(') balance += 1;
+      else if(char === ')') balance -= 1;
+    }
+  }
+  if(buffer.length !== 0) types.push(buffer);
+  return types;
 }
 
 function parseArray(type: string, rawValue: any): any | never {
@@ -69,8 +92,8 @@ function parseBool(type: string, rawValue: string | boolean): boolean | never {
   if(typeof rawValue !== 'string' && typeof rawValue !== 'boolean') throw new Error(ERROR_MESSAGE(type, rawValue)); // Runtime type check.
   if(typeof rawValue === 'boolean') return rawValue;
   else if(typeof rawValue === 'string') {
-    if(rawValue === 'true') return true;
-    else if(rawValue === 'false') return false;
+    if(rawValue.toLowerCase() === 'true') return true;
+    else if(rawValue.toLowerCase() === 'false') return false;
     else throw new Error(ERROR_MESSAGE(type, rawValue));
   }
   throw new Error(ERROR_MESSAGE(type, rawValue));
