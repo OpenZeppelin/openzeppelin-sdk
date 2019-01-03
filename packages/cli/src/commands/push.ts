@@ -1,4 +1,6 @@
-import _ from 'lodash';
+import omit from 'lodash.omit';
+import isString from 'lodash.isstring';
+
 import push from '../scripts/push';
 import Compiler from '../models/compiler/Compiler';
 import ConfigVariablesInitializer from '../models/initializer/ConfigVariablesInitializer';
@@ -28,8 +30,8 @@ async function action(options: any): Promise<void> {
 
 async function tryAction(externalOptions: any): Promise<void> {
   if (!externalOptions.push) return;
-  const options = _.omit(externalOptions, 'push');
-  const network = _.isString(externalOptions.push) ? externalOptions.push : undefined;
+  const options = omit(externalOptions, 'push');
+  const network = isString(externalOptions.push) ? externalOptions.push : undefined;
   if (network) options.network = network;
   return action(options);
 }

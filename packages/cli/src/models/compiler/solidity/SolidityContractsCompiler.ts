@@ -1,4 +1,4 @@
-import _ from 'lodash';
+import flatMap from 'lodash.flatmap';
 import axios from 'axios';
 import { Logger, FileSystem } from 'zos-lib';
 import SolidityDependenciesFinder from './SolidityDependenciesFinder';
@@ -157,7 +157,7 @@ export default class SolidityContractsCompiler {
 
   private _buildContractsSchemas(solcOutput: solc.CompilerOutput): CompiledContract[] {
     const paths = Object.keys(solcOutput.contracts);
-    return _.flatMap(paths, (fileName) => {
+    return flatMap(paths, (fileName) => {
       const contractNames = Object.keys(solcOutput.contracts[fileName]);
       return contractNames.map((contractName) => this._buildContractSchema(solcOutput, fileName, contractName));
     });

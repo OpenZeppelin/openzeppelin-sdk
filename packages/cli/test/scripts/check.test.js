@@ -1,8 +1,6 @@
 'use strict'
 require('../setup')
 
-import _ from 'lodash';
-
 import CaptureLogs from '../helpers/captureLogs';
 import check from '../../src/scripts/check';
 import ZosPackageFile from "../../src/models/files/ZosPackageFile";
