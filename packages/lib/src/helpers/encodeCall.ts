@@ -20,7 +20,7 @@ export default function encodeCall(name: string, types: string[] = [], rawValues
 }
 
 export function parseTypeValuePair(type: string, rawValue: any): any | never {
-  // Typle type (recurse by calling this function with the individual elements).
+  // Tuple type (recurse by calling this function with the individual elements).
   if(/^\(.*\)$/.test(type)) { // Test for '(type1,type2)' in type.
     if(typeof rawValue === 'string') rawValue = rawValue.split(',');
     if(rawValue.length === 0) return [];
