@@ -193,6 +193,7 @@ describe('encodeCall helper', () => {
       it('supports nested tuples/arrays', function() {
         expect(parseTypeValuePair('(uint256,string[])', [42, ['one', 'two', 'three']])).to.deep.equal(['42', ['one', 'two', 'three']]);
         expect(parseTypeValuePair('(uint256,string)[]', [[42, 'hello'], ['42', 'bye']])).to.deep.equal([['42', 'hello'], ['42', 'bye']]);
+        expect(parseTypeValuePair('(uint256,(uint256,string))', [42, 42, 'hello'])).to.deep.equal(['42', '42', 'hello']);
       });
 
       it('should throw when the passed tuple types do not match', () => {

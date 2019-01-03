@@ -13,30 +13,15 @@ const ERROR_MESSAGE = (type: string, value: any) => `${ERROR_MESSAGE_PREFIX} for
 
 export default function encodeCall(name: string, types: string[] = [], rawValues: any[] = []): string {
   if(types.length !== rawValues.length) throw new Error(ERROR_MESSAGE_PREFIX + '. Supplied number of types and values do not match.');
-  const values =_.zipWith(types, rawValues, parseTypeValuePair);
+  const values = _.zipWith(types, rawValues, parseTypeValuePair);
   const methodId = abi.methodID(name, types).toString('hex');
   const params = abi.rawEncode(types, values).toString('hex');
   return '0x' + methodId + params;
 }
 
 export function parseTypeValuePair(type: string, rawValue: any): any | never {
-  // Tuple type (recurse by calling this function with the individual elements).
-  if(/^\(.*\)$/.test(type)) { // Test for '(type1,type2)' in type.
-    if(typeof rawValue === 'string') rawValue = rawValue.split(',');
-    if(rawValue.length === 0) return [];
-    const types = type.replace(/[{()}]/g, '').split(','); // Remove the parenthesis and split the tuple into types.
-    return _.zipWith(types, rawValue, (typeElement, rawValueElement) => parseTypeValuePair(typeElement, rawValueElement));
-  }
-  // Array type (also recurse).
-  if(/^[^\[]+\[.*\]$/.test(type)) { // Test for 'type[*]' in type.
-    if(typeof rawValue === 'string') rawValue = rawValue.split(',');
-    if(rawValue.length === 0) return [];
-    const size = type.match(/(.*)\[(.*?)\]$/)[2]; // Find number between '[*]'.
-    if(size !== '' && parseInt(size, 10) !== rawValue.length) throw new Error(ERROR_MESSAGE(type, rawValue) + '. Invalid array length.');
-    const baseType = type.slice(0, type.lastIndexOf('[')); // Remove array part '[*]'.
-    return _.map(rawValue, (rawValueElement) => parseTypeValuePair(baseType, rawValueElement));
-  }
-  // Single type.
+  if(/^\(.*\)$/.test(type)) return parseTuple(type, rawValue);
+  if(/^[^\[]+\[.*\]$/.test(type)) return parseArray(type, rawValue);
   if(type === 'address') return parseAddress(type, rawValue);
   else if(type === 'bool') return parseBool(type, rawValue);
   else if(type === 'string') return parseString(type, rawValue);
@@ -47,6 +32,23 @@ export function parseTypeValuePair(type: string, rawValue: any): any | never {
   else if(type.startsWith('ufixed')) return parseNumber(type, rawValue, true, false);
   else if(type.startsWith('fixed')) return parseNumber(type, rawValue, false, false);
   else throw new Error(ERROR_MESSAGE(type, rawValue) + '. Unsupported or invalid type.');
+}
+
+function parseTuple(type: string, rawValue: any): any | never {
+  if(typeof rawValue === 'string') rawValue = rawValue.split(',');
+  if(rawValue.length === 0) return [];
+  const types = type.replace(/[{()}]/g, '').split(','); // Remove the parenthesis and split the tuple into types.
+  if(types.length !== rawValue.length) throw new Error(ERROR_MESSAGE(type, rawValue) + '. Invalid tuple length.');
+  return _.zipWith(types, rawValue, (typeElement, rawValueElement) => parseTypeValuePair(typeElement, rawValueElement));
+}
+
+function parseArray(type: string, rawValue: any): any | never {
+  if(typeof rawValue === 'string') rawValue = rawValue.split(',');
+  if(rawValue.length === 0) return [];
+  const size = type.match(/(.*)\[(.*?)\]$/)[2]; // Find number between '[*]'.
+  if(size !== '' && parseInt(size, 10) !== rawValue.length) throw new Error(ERROR_MESSAGE(type, rawValue) + '. Invalid array length.');
+  const baseType = type.slice(0, type.lastIndexOf('[')); // Remove array part '[*]'.
+  return _.map(rawValue, (rawValueElement) => parseTypeValuePair(baseType, rawValueElement));
 }
 
 function parseFunction(type: string, rawValue: string): string | never {
