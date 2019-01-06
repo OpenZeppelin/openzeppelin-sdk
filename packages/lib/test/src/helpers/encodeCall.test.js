@@ -128,8 +128,22 @@ describe.only('encodeCall helper', () => {
   // TODO: ethers.js/abi-coder does not support function types?
   // describe('when the specified type is a function', () => {});
   
-  // TODO: ethers.js/abi-coder does not support tuple types?
-  // describe('when the specified type is a tuple', () => {});
+  describe('when the specified type is a tuple', function() {
+    it('identifies the individual types and treats them recursively', () => {
+      expect(() => encodeCall(NAME, ['tuple(uint256,string)'], [[42, 'hello']])).to.not.throw();
+    });
+    
+    it('should throw when the passed tuple types do not match', () => {
+      expect(() => encodeCall(['tuple(uint256,string)'], [['hello', 42]])).to.throw();
+      expect(() => encodeCall(['tuple(uint256,string)'], [['42']])).to.throw();
+    });
+    
+    it('supports nested tuples', function() {
+      expect(() => encodeCall(NAME, ['tuple(uint256,string[])'], [[42, ['one', 'two', 'three']]])).to.not.throw();
+      expect(() => encodeCall(NAME, ['tuple(uint256,tuple(uint256,string))'], [[42, [42, 'hello']]])).to.not.throw();
+      // 
+    });
+  });
 
   // TODO: ethers.js/abi-coder does not perform any validation on booleans, do we want to do it ourselves?
   // describe('when the specified type is a boolean', () => {});
