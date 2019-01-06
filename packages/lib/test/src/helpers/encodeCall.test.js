@@ -7,7 +7,7 @@ import BN from 'bignumber.js';
 
 const NAME = 'myFunction';
 
-describe.only('encodeCall helper', () => {
+describe('encodeCall helper', () => {
   it('should throw with invalid types', () => {
     expect(() => encodeCall(NAME, ['schnitzel'], [123])).to.throw(/invalid type/);
   });
