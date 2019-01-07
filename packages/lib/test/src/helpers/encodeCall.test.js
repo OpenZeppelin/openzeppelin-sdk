@@ -14,6 +14,7 @@ function goodEncoding(types, values) {
   const decoded = decodeCall(types, `0x${encoded}`);
   if(values.length !== decoded.length) throw new Error('Invalid ecoding/decoding: Mismatch in number of encoded and decoded values.');
   _.zipWith(values, decoded, (value, decodedValue) => {
+    console.log(`encoded: ${value}, decoded: ${decodedValue}`);
     if(Buffer.isBuffer(value)) value = `0x${value.toString('hex')}`;
     if(value.toString() != decodedValue.toString()) throw new Error(`Invalid encoding/decoding. Encoded: ${value}, Decoded: ${decodedValue}`);
   });
@@ -164,9 +165,9 @@ describe.only('encodeCall helper', () => {
   });
 
   describe('when the specified type is a boolean', () => {
-    it('should understand boolean types', function() {
+    it.only('should understand boolean types', function() {
       goodEncoding(['bool'], [true]);
-      // TODO: handle the case where a user passes "false" into a boolean type, which gets parsed to true.
+      goodEncoding(['bool'], ['false']);
     });
   });
 
