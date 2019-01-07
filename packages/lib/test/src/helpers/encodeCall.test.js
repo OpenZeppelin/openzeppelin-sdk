@@ -8,13 +8,11 @@ import _ from 'lodash';
 
 const NAME = 'myFunction';
 
-function goodEncoding(types, values) {
-  expect(() => encodeCall(NAME, types, values)).to.not.throw();
-  const encoded = encodeCall(NAME, types, values).substring(10); // Remove signature hash.
+function goodEncoding(types, values, parseValues = false) {
+  const encoded = encodeCall(NAME, types, values, parseValues).substring(10); // Remove signature hash.
   const decoded = decodeCall(types, `0x${encoded}`);
   if(values.length !== decoded.length) throw new Error('Invalid ecoding/decoding: Mismatch in number of encoded and decoded values.');
   _.zipWith(values, decoded, (value, decodedValue) => {
-    console.log(`encoded: ${value}, decoded: ${decodedValue}`);
     if(Buffer.isBuffer(value)) value = `0x${value.toString('hex')}`;
     if(value.toString() != decodedValue.toString()) throw new Error(`Invalid encoding/decoding. Encoded: ${value}, Decoded: ${decodedValue}`);
   });
@@ -24,7 +22,7 @@ function badEncoding(types, values, errorRegex) {
   expect(() => encodeCall(NAME, types, values)).to.throw(errorRegex);
 }
 
-describe.only('encodeCall helper', () => {
+describe('encodeCall helper', () => {
   it('should throw with invalid types', () => {
     badEncoding(['shnitzel'], [123], /invalid type/);
   });
@@ -165,9 +163,10 @@ describe.only('encodeCall helper', () => {
   });
 
   describe('when the specified type is a boolean', () => {
-    it.only('should understand boolean types', function() {
+    it('should understand boolean types', function() {
       goodEncoding(['bool'], [true]);
-      goodEncoding(['bool'], ['false']);
+      goodEncoding(['bool'], ['false'], true);
+      goodEncoding(['bool[]'], [['false', 'false']], true);
     });
   });
 
