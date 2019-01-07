@@ -40,6 +40,7 @@ describe('encodeCall helper', () => {
       expect(() => encodeCall(NAME, ['int'], [1e2])).to.not.throw();
       expect(() => encodeCall(NAME, ['uint'], [Number.MAX_SAFE_INTEGER])).to.not.throw();
       expect(() => encodeCall(NAME, ['uint'], [new BN(5).toString()])).to.not.throw();
+      expect(() => encodeCall(NAME, ['int'], ['5'])).to.not.throw();
     });
 
     it('should throw on NaN', () => {
@@ -131,6 +132,7 @@ describe('encodeCall helper', () => {
   describe('when the specified type is a tuple', function() {
     it('identifies the individual types and treats them recursively', () => {
       expect(() => encodeCall(NAME, ['tuple(uint256,string)'], [[42, 'hello']])).to.not.throw();
+      expect(() => encodeCall(NAME, ['tuple(uint256,string)'], [['42', 'hello']])).to.not.throw();
     });
     
     it('should throw when the passed tuple types do not match', () => {
@@ -145,8 +147,12 @@ describe('encodeCall helper', () => {
     });
   });
 
-  // TODO: ethers.js/abi-coder does not perform any validation on booleans, do we want to do it ourselves?
-  // describe('when the specified type is a boolean', () => {});
+  describe('when the specified type is a boolean', () => {
+    it('should understand boolean types', function() {
+      expect(() => encodeCall(NAME, ['bool'], [true])).to.not.throw();
+      // TODO: handle the case where a user passes "false" into a boolean type, which gets parsed to true.
+    });
+  });
 
   describe('when the specified type is an array', () => {
     it('should accept valid values', () => {
