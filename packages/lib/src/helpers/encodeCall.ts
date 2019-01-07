@@ -7,3 +7,7 @@ export default function encodeCall(name: string, types: Array<string | ParamType
   const signatureHash = sha3(`${name}(${types.join(',')})`).substring(2, 10);
   return `0x${signatureHash}${encodedParameters}`;
 }
+
+export function decodeCall(types: Array<string | ParamType> = [], data: any[] = []): any[] {
+  return defaultAbiCoder.decode(types, data);
+}
