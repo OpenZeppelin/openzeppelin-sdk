@@ -1,5 +1,5 @@
 import omitBy from 'lodash.omitby';
-import isEmpty from 'lodash.isEmpty';
+import isEmpty from 'lodash.isempty';
 import pick from 'lodash.pick';
 import compact from 'lodash.compact';
 import { FileSystem as fs, Logger } from 'zos-lib';
