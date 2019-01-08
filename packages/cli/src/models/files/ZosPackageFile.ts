@@ -67,8 +67,8 @@ export default class ZosPackageFile {
     return Object.values(this.contracts);
   }
 
-  get isLightweight(): boolean {
-    return !this.data.publish;
+  get isPublished(): boolean {
+    return !!this.data.publish;
   }
 
   public contract(alias: string): string {

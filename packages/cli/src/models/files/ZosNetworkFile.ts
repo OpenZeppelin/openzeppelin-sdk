@@ -121,8 +121,8 @@ export default class ZosNetworkFile {
     return Object.keys(this.contracts);
   }
 
-  get isLightweight(): boolean {
-    return this.packageFile.isLightweight;
+  get isPublished(): boolean {
+    return this.packageFile.isPublished;
   }
 
   get solidityLibs(): { [libAlias: string]: SolidityLibInterface } {

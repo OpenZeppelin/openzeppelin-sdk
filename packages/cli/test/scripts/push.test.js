@@ -462,7 +462,7 @@ contract('push script', function([_, owner]) {
     })
   });
 
-  describe('an empty lightweight app', function() {
+  describe('an empty unpublished project', function() {
     beforeEach('pushing package-empty-lite', async function () {
       const packageFile = new ZosPackageFile('test/mocks/packages/package-empty-lite.zos.json')
       this.networkFile = packageFile.networkFile(network)
@@ -473,7 +473,7 @@ contract('push script', function([_, owner]) {
     });
   });
 
-  describe('a lightweight app with contracts', function() {
+  describe('an unpublished project with contracts', function() {
     beforeEach('pushing package-with-contracts', async function () {
       const packageFile = new ZosPackageFile('test/mocks/packages/package-with-contracts.zos.json')
       packageFile.publish = false
@@ -496,7 +496,7 @@ contract('push script', function([_, owner]) {
     })
   });
 
-  describe('a lightweight app with dependencies', function() {
+  describe('an unpublished project with dependencies', function() {
     deployingDependency();
 
     beforeEach('pushing package-with-stdlib', async function () {

@@ -236,7 +236,7 @@ contract('create script', function([_, owner]) {
     });
   }
   
-  describe('on lightweight app', function () {
+  describe('on unpublished project', function () {
     beforeEach('setup', async function() {
       this.packageFile = new ZosPackageFile('test/mocks/packages/package-empty.zos.json')
       this.packageFile.version = version
@@ -246,7 +246,7 @@ contract('create script', function([_, owner]) {
     shouldHandleCreateScript();
   })
 
-  describe('on full app', function () {
+  describe('on published project', function () {
     beforeEach('setup', async function() {
       this.packageFile = new ZosPackageFile('test/mocks/packages/package-empty.zos.json')
       this.packageFile.version = version

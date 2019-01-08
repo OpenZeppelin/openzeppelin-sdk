@@ -276,7 +276,7 @@ contract('update script', function([_skipped, owner, anotherAccount]) {
     shouldHandleUpdateScript();
   })
 
-  describe('on application contract in lightweight mode', function () {
+  describe('on application contract in unpublished mode', function () {
     beforeEach('setup package', async function() {
       this.packageFile = new ZosPackageFile('test/mocks/packages/package-empty.zos.json')
       this.packageFile.publish = false
@@ -295,7 +295,7 @@ contract('update script', function([_skipped, owner, anotherAccount]) {
     shouldHandleUpdateOnDependency();
   })
 
-  describe('on dependency contract in lightweight mode', function () {
+  describe('on dependency contract in unpublished mode', function () {
     beforeEach('setup package', async function() {
       this.packageFile = new ZosPackageFile('test/mocks/packages/package-with-undeployed-stdlib.zos.json')
       this.packageFile.publish = false
