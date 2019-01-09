@@ -1,6 +1,7 @@
 import { promisify } from 'util';
 import sleep from '../helpers/sleep';
 import BN from 'bignumber.js';
+import Web3 from 'web3';
 
 // Reference: see https://github.com/ethereum/EIPs/blob/master/EIPS/eip-155.md#list-of-chain-ids
 const NETWORKS = {
@@ -24,7 +25,6 @@ export default class ZWeb3 {
   // TODO: this.web3 could be cached and initialized lazily?
   public static web3(): any {
     if (!ZWeb3.provider) throw new Error('ZWeb3 must be initialized with a web3 provider');
-    const Web3 = require('web3');
 
     // TODO: improve provider validation for HttpProvider scenarios
     return (typeof ZWeb3.provider === 'string')
@@ -33,7 +33,7 @@ export default class ZWeb3 {
   }
 
   public static sha3(value: string): string {
-    return ZWeb3.web3().sha3(value);
+    return ZWeb3.web3().utils.sha3(value);
   }
 
   public static isAddress(address: string): boolean {
@@ -49,7 +49,7 @@ export default class ZWeb3 {
   }
 
   public static contract(abi: any): any {
-    return ZWeb3.eth().contract(abi);
+    return new (ZWeb3.eth().Contract)(abi);
   }
 
   public static async accounts(): Promise<string[]> {

@@ -65,7 +65,7 @@ export default class ContractFactory {
 
     return new Promise(function(resolve, reject) {
       const contractClass: any = ZWeb3.contract(self.abi);
-      contractClass.new(...args, txParams, function(error, instance) {
+      contractClass.deploy(...args, txParams, function(error, instance) {
         if (error) reject(error);
         else if (instance && instance.address) {
           const wrapper: ContractWrapper = self._wrapContract(instance);

@@ -5,7 +5,7 @@ import ZWeb3 from '../../../src/artifacts/ZWeb3'
 import Contracts from '../../../src/artifacts/Contracts'
 import { ZERO_ADDRESS } from '../../../src/utils/Addresses'
 
-contract('ZWeb3', accounts => {
+contract.only('ZWeb3', accounts => {
   before('deploy dummy instance', async function () {
     const DummyImplementation = Contracts.getFromLocal('DummyImplementation')
     this.impl = await DummyImplementation.new()
