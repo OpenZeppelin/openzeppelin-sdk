@@ -23,9 +23,7 @@ cache:
 
 stages:
   - prepare cache
-  - lib tests
   - tests
-  - integration tests
 
 jobs:
   include:
@@ -38,7 +36,8 @@ jobs:
         - npx lerna bootstrap --loglevel=debug
 
     # Initial stage with lib tests
-    - stage: lib tests
+    - stage: tests
+      name: Lib tests
       install: pwd # Override to avoid npm install.
       script: npx lerna run test --concurrency=1 --stream=true --scope=zos-lib
 
@@ -73,7 +72,7 @@ jobs:
       script: npx lerna run test --concurrency=1 --stream=true --scope=zos-lib-complex-example
 
     # Integration tests on local geth
-    - stage: integration tests
+    - stage: tests
       name: Local geth node
       env: NETWORK=geth-dev
       before_install:
@@ -86,7 +85,7 @@ jobs:
       script: cd tests/cli-app && ./scripts/test.sh
 
     # Integration tests on local geth with hdwallet-provider
-    - stage: integration tests
+    - stage: tests
       name: HDWallet on local geth node
       env: NETWORK=geth-dev-hdwallet
       before_install:
