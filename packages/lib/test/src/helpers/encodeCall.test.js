@@ -1,26 +1,10 @@
-'use strict';
-
 require('../../setup');
 
 import encodeCall, { decodeCall } from '../../../src/helpers/encodeCall';
 import BN from 'bignumber.js';
 import _ from 'lodash';
 
-const NAME = 'myFunction';
-
-function assertGoodEncoding(types, values) {
-  const encoded = encodeCall(NAME, types, values).substring(10); // Remove signature hash.
-  const decoded = decodeCall(types, `0x${encoded}`);
-  if(values.length !== decoded.length) throw new Error('Invalid ecoding/decoding: Mismatch in number of encoded and decoded values.');
-  _.zipWith(values, decoded, (value, decodedValue) => {
-    if(Buffer.isBuffer(value)) value = `0x${value.toString('hex')}`;
-    if(value.toString() != decodedValue.toString()) throw new Error(`Invalid encoding/decoding. Encoded: ${value}, Decoded: ${decodedValue}`);
-  });
-}
-
-function assertBadEncoding(types, values, errorRegex) {
-  expect(() => encodeCall(NAME, types, values)).to.throw(errorRegex);
-}
+const FUNCTION_NAME = 'myFunction';
 
 describe('encodeCall helper', () => {
   it('should throw with invalid types', () => {
@@ -129,8 +113,8 @@ describe('encodeCall helper', () => {
     });
 
     it('should not throw when an address with an invalid checksum is passed, if the address contains all upper or lower case strings', () => {
-      expect(() => encodeCall(NAME, ['address'], ['0xCF5609B003B2776699EEA1233F7C82D5695CC9AA'])).to.not.throw();
-      expect(() => encodeCall(NAME, ['address'], ['0xcf5609b003b2776699eea1233f7c82d5695cc9aa'])).to.not.throw();
+      expect(() => encodeCall(FUNCTION_NAME, ['address'], ['0xCF5609B003B2776699EEA1233F7C82D5695CC9AA'])).to.not.throw();
+      expect(() => encodeCall(FUNCTION_NAME, ['address'], ['0xcf5609b003b2776699eea1233f7c82d5695cc9aa'])).to.not.throw();
     });
 
     it('should throw when the passed value is not a string nor a Buffer', () => {
@@ -138,12 +122,6 @@ describe('encodeCall helper', () => {
       assertBadEncoding(['address'], [{}], /invalid address/);
     });
   });
-  
-  // TODO: ethers.js/abi-coder does not support ufixed and fixed types?
-  // describe('when the specified type is a function', () => {});
-
-  // TODO: ethers.js/abi-coder does not support function types?
-  // describe('when the specified type is a function', () => {});
   
   describe('when the specified type is a tuple', function() {
     it('identifies the individual types and treats them recursively', () => {
@@ -159,7 +137,6 @@ describe('encodeCall helper', () => {
     it('supports nested tuples', function() {
       assertGoodEncoding(['tuple(uint256,string[])'], [[42, ['one', 'two', 'three']]]);
       assertGoodEncoding(['tuple(uint256,tuple(uint256,string))'], [[42, [42, 'hello']]]);
-      // 
     });
   });
 
@@ -190,3 +167,18 @@ describe('encodeCall helper', () => {
     });
   });
 });
+
+function assertGoodEncoding(types, values) {
+  const encoded = encodeCall(FUNCTION_NAME, types, values).substring(10); // Remove signature hash.
+  const decoded = decodeCall(types, `0x${encoded}`);
+  if(values.length !== decoded.length) throw new Error('Invalid encoding/decoding: Mismatch in number of encoded and decoded values.');
+  _.zipWith(values, decoded, (value, decodedValue) => {
+    if(Buffer.isBuffer(value)) value = `0x${value.toString('hex')}`;
+    if(value.toString() != decodedValue.toString()) throw new Error(`Invalid encoding/decoding. Encoded: ${value}, Decoded: ${decodedValue}`);
+  });
+}
+
+function assertBadEncoding(types, values, errorRegex) {
+  expect(() => encodeCall(FUNCTION_NAME, types, values)).to.throw(errorRegex);
+}
+
