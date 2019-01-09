@@ -11,12 +11,12 @@ export function parseArgs(args: string): string[] | never {
     args = args.replace(MATCH_HEX, '$2"$3"');
 
     // replace scientific notation numbers by regular numbers
-    const MATCH_SCIENTIFIC = /(^|([,[]\s*))(\s*\d+(\.\d+)?e(\+)?\d+\s*)/g;
+    const MATCH_SCIENTIFIC = /(^|([,[]\s*))(\s*[-]?\d+(\.\d+)?e(\+)?\d+\s*)/g;
     args = args.replace(MATCH_SCIENTIFIC, (val) => {
       const firstChar = val.charAt(0);
       const firstCharEscaped = firstChar === ',' || firstChar === '[';
       if(firstCharEscaped) val = val.substring(1);
-      return `${firstCharEscaped ? firstChar : ''}${(new BN(val)).toString(10)}`;
+      return `${firstCharEscaped ? firstChar : ''}"${(new BN(val)).toString(10)}"`;
     });
 
      // replace non quoted number by quoted number

@@ -10,7 +10,8 @@ describe('input', function () {
     );
 
     it('should parse a number', testFn("42", "42"));
-    it('should parse a scientific notation number', testFn("1e2", "100"));
+    it('should parse a positive scientific notation number', testFn("1e2", "100"));
+    it('should parse a negative scientific notation number', testFn("-1e2", "-100"));
     it('should parse another scientific notation number', testFn("1.5e20", "150000000000000000000"));
     it('should parse a string', testFn("foo", 'foo'));
     it('should parse a number+string', testFn("42pepe", "42pepe"));
