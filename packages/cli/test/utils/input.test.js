@@ -10,6 +10,8 @@ describe('input', function () {
     );
 
     it('should parse a number', testFn("42", "42"));
+    it('should parse a scientific notation number', testFn("1e2", "100"));
+    it('should parse another scientific notation number', testFn("1.5e20", "150000000000000000000"));
     it('should parse a string', testFn("foo", 'foo'));
     it('should parse a number+string', testFn("42pepe", "42pepe"));
     it('should parse a quoted string', testFn('"foo"', 'foo'));
@@ -18,10 +20,12 @@ describe('input', function () {
     it('should parse a quoted number+string', testFn('"42foo"', '42foo'));
     it('should parse an array', testFn('[1, 2, 3]', ["1", "2", "3"]));
     it('should parse nested arrays', testFn("[1,[2,3],4]", ["1",["2","3"],"4"]));
-    it('should parse multiple arguments', testFn('42,43,"foo",[1,2,"bar"]', '42', '43', 'foo', ['1', '2', 'bar']));
-    it('should parse an address', testFn("0x1234", "0x1234"));
-    it('should parse a quoted address', testFn('"0x1234"', "0x1234"));
-    it('should parse multiple addresses', testFn('0x1234,0x1235', "0x1234", "0x1235"));
+    it('should parse a hex string', testFn("0x1234", "0x1234"));
+    it('should parse an address', testFn("0x39af68cF04Abb0eF8f9d8191E1bD9c041E80e18e", "0x39af68cF04Abb0eF8f9d8191E1bD9c041E80e18e"));
+    it('should parse a quoted address', testFn('"0x39af68cF04Abb0eF8f9d8191E1bD9c041E80e18e"', "0x39af68cF04Abb0eF8f9d8191E1bD9c041E80e18e"));
+    it('should parse multiple addresses', testFn('0x39af68cF04Abb0eF8f9d8191E1bD9c041E80e18e,0x39af68cF04Abb0eF8f9d8191E1bD9c041E80e18e', "0x39af68cF04Abb0eF8f9d8191E1bD9c041E80e18e", "0x39af68cF04Abb0eF8f9d8191E1bD9c041E80e18e"));
+    it('should parse an array of non quoted addresses', testFn('[0x39af68cF04Abb0eF8f9d8191E1bD9c041E80e18e,0x39af68cF04Abb0eF8f9d8191E1bD9c041E80e18e]', ["0x39af68cF04Abb0eF8f9d8191E1bD9c041E80e18e", "0x39af68cF04Abb0eF8f9d8191E1bD9c041E80e18e"]));
+    it('should parse multiple arguments', testFn('1e2,42,0x39af68cF04Abb0eF8f9d8191E1bD9c041E80e18e,43,1.5e20,"foo",[1e2,1,2,"bar",1e3]', '100', '42', '0x39af68cF04Abb0eF8f9d8191E1bD9c041E80e18e', '43', '150000000000000000000', 'foo', ['100', '1', '2', 'bar', '1000']));
   });
 
   describe('parseInit', function () {
