@@ -115,7 +115,7 @@ contract('Transactions', function([_account1, account2]) {
     });
 
     it('uses specified gas', async function () {
-      const { tx } = await sendTransaction(this.instance.initialize, [42, 'foo', [1,2,3]], { gas: 800000});
+      const { tx } = await sendTransaction(this.instance.initialize, [42, 'foo', [1,2,3]], { gas: 800000 });
       await assertGas(tx, 800000);
     });
 
