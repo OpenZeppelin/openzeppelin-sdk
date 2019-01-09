@@ -7,7 +7,7 @@ import encodeCall, { decodeCall, SCIENTIFIC_NOTATION_PATTERN } from '../../../sr
 
 const FUNCTION_NAME = 'myFunction'
 
-describe.only('encodeCall', () => {
+describe('encodeCall', () => {
   it('should throw with invalid types', () => {
     assertBadEncoding(['shnitzel'], [123], /invalid type/)
   })

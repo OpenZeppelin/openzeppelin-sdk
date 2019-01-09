@@ -11,7 +11,7 @@ export default function encodeCall(name, args = [], rawValues = []) {
 }
 
 export function decodeCall(types, data) {
-  if (typeof data === 'string') data = new Buffer(data, 'hex')
+  if (typeof data === 'string') data = Buffer.from(data, 'hex')
   const values = abi.rawDecode(types, data)
 
   types.filter(type => type.startsWith('address')).forEach((type, index) => {
