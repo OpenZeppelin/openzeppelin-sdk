@@ -61,7 +61,7 @@ export class SimpleProjectDeployer extends BaseProjectDeployer {
     this.project = new SimpleProject(this.packageFile.name, this.txParams);
     this.networkFile.version = this.requestedVersion;
     _.forEach(this.networkFile.contracts, (contractInfo, contractAlias) => {
-      this.project.registerImplementation(contractAlias, { address: contractInfo.address, bytecodeHash: contractInfo.localBytecodeHash });
+      this.project.registerImplementation(contractAlias, { address: contractInfo.address, bytecodeHash: contractInfo.bodyBytecodeHash });
     });
     _.forEach(this.networkFile.dependencies, (dependencyInfo, dependencyName) => {
       this.project.setDependency(dependencyName, dependencyInfo.package, dependencyInfo.version);

@@ -75,7 +75,7 @@ export default class SimpleProject  {
     const implementation: any = await deploy(contractClass, [], this.txParams);
     await this.registerImplementation(contractName, {
       address: implementation.address,
-      bytecodeHash: bytecodeDigest(contractClass.bytecode)
+      bytecodeHash: bytecodeDigest(contractClass.deployedBinary)
     });
     return implementation;
   }
@@ -129,7 +129,7 @@ export default class SimpleProject  {
 
   public async _getOrDeployOwnImplementation(contractClass: ContractFactory, contractName: string, redeployIfChanged?: boolean): Promise<string> {
     const existing: Implementation = this.implementations[contractName];
-    const contractChanged: boolean = existing && existing.bytecodeHash !== bytecodeDigest(contractClass.bytecode);
+    const contractChanged: boolean = existing && existing.bytecodeHash !== bytecodeDigest(contractClass.deployedBinary);
     const shouldRedeploy: boolean = !existing || (redeployIfChanged && contractChanged);
     if (!shouldRedeploy) return existing.address;
     const newInstance: any = await this.setImplementation(contractClass, contractName);
