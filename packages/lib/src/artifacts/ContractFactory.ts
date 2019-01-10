@@ -3,6 +3,7 @@ import ZWeb3 from './ZWeb3';
 import decodeLogs from '../helpers/decodeLogs';
 import { getSolidityLibNames, hasUnlinkedVariables } from '../utils/Bytecode';
 import { StorageLayoutInfo } from '../validations/Storage';
+import { Contract, TransactionObject } from 'web3-eth-contract';
 
 interface ContractSchema {
   contractName: string;
@@ -18,6 +19,7 @@ export interface ContractWrapper {
   allEvents: any;
   sendTransaction?: (txParams: any) => Promise<TransactionReceiptWrapper>;
   send?: (value: any) => Promise<string>;
+  methods: { [fnName: string]: (...args: any[]) => TransactionObject<any> };
   constructor: any;
 }
 
@@ -64,14 +66,17 @@ export default class ContractFactory {
     const self = this;
 
     return new Promise(function(resolve, reject) {
-      const contractClass: any = ZWeb3.contract(self.abi);
-      contractClass.deploy(...args, txParams, function(error, instance) {
-        if (error) reject(error);
-        else if (instance && instance.address) {
-          const wrapper: ContractWrapper = self._wrapContract(instance);
+      const contractClass: Contract = ZWeb3.contract(self.abi);
+      contractClass.options = {...contractClass.options, txParams};
+      const tx = contractClass.deploy({data: txParams.data, arguments: args});
+      let transactionHash;
+      tx.send(txParams)
+        .on('error', (error) => reject(error))
+        .on('transactionHash', (txHash) => transactionHash = txHash)
+        .then((instance) => {
+          const wrapper: ContractWrapper = self._wrapContract(instance, transactionHash);
           resolve(wrapper);
-        }
-      });
+        });
     });
   }
 
@@ -99,10 +104,11 @@ export default class ContractFactory {
     });
   }
 
-  private _wrapContract(contract): ContractWrapper {
-    const { address, transactionHash, allEvents } = contract;
-    const wrapper: ContractWrapper = { address, transactionHash, allEvents, constructor: this };
-    this._promisifyABI(contract, wrapper);
+  private _wrapContract(contract: any, transactionHash?: string): ContractWrapper {
+    const address = contract.options.address;
+    const allEvents = contract.events.allEvents;
+    const wrapper: ContractWrapper = { address, transactionHash, allEvents, constructor: this, methods: contract.methods };
+    // this._promisifyABI(contract, wrapper);
     this._setSendFunctions(contract, wrapper);
     return wrapper;
   }
@@ -111,8 +117,9 @@ export default class ContractFactory {
     const self = this;
 
     wrapper.sendTransaction = async function(txParams: any): Promise<TransactionReceiptWrapper> {
-      const tx = await ZWeb3.sendTransaction({ to: instance.address, ...self.txParams, ...txParams });
-      const receipt = await ZWeb3.getTransactionReceiptWithTimeout(tx, self.timeout);
+      const tx = { to: instance.address, ...self.txParams, ...txParams };
+      const receipt = await ZWeb3.sendTransaction(tx);
+      // const receipt = await ZWeb3.getTransactionReceiptWithTimeout(tx, self.timeout);
       return { tx, receipt, logs: decodeLogs(receipt.logs, self) };
     };
 
@@ -121,46 +128,46 @@ export default class ContractFactory {
     };
   }
 
-  private _promisifyABI(instance: any, wrapper: ContractWrapper): void {
-    instance.abi.filter((item: any) => item.type === 'event').forEach((item: any) => wrapper[item.name] = instance[item.name]);
-    instance.abi.filter((item: any) => item.type === 'function').forEach((item: any) => {
-      wrapper[item.name] = item.constant
-        ? this._promisifyFunction(instance[item.name], instance)
-        : this._promisifyFunctionWithTimeout(instance[item.name], instance);
-      wrapper[item.name].request = instance[item.name].request;
-      wrapper[item.name].call = this._promisifyFunction(instance[item.name].call, instance);
-      wrapper[item.name].sendTransaction = this._promisifyFunction(instance[item.name].sendTransaction, instance);
-      wrapper[item.name].estimateGas = this._promisifyFunction(instance[item.name].estimateGas, instance);
-    });
-  }
+  // private _promisifyABI(instance: any, wrapper: ContractWrapper): void {
+  //   instance.abi.filter((item: any) => item.type === 'event').forEach((item: any) => wrapper[item.name] = instance[item.name]);
+  //   instance.abi.filter((item: any) => item.type === 'function').forEach((item: any) => {
+  //     wrapper[item.name] = item.constant
+  //       ? this._promisifyFunction(instance[item.name], instance)
+  //       : this._promisifyFunctionWithTimeout(instance[item.name], instance);
+  //     wrapper[item.name].request = instance[item.name].request;
+  //     wrapper[item.name].call = this._promisifyFunction(instance[item.name].call, instance);
+  //     wrapper[item.name].sendTransaction = this._promisifyFunction(instance[item.name].sendTransaction, instance);
+  //     wrapper[item.name].estimateGas = this._promisifyFunction(instance[item.name].estimateGas, instance);
+  //   });
+  // }
 
-  private _promisifyFunction(fn: (...passedArguments) => void, instance: any): (passedArguments: any[]) => Promise<any> {
-    const self = this;
-    return async function(...passedArguments): Promise<any> {
-      const [args, txParams] = self._parseArguments(passedArguments);
-      return new Promise(function(resolve, reject) {
-        args.push(txParams, function(error, result) {
-          return error ? reject(error) : resolve(result);
-        });
-        fn.apply(instance, args);
-      });
-    };
-  }
+  // private _promisifyFunction(fn: (...passedArguments) => void, instance: any): (passedArguments: any[]) => Promise<any> {
+  //   const self = this;
+  //   return async function(...passedArguments): Promise<any> {
+  //     const [args, txParams] = self._parseArguments(passedArguments);
+  //     return new Promise(function(resolve, reject) {
+  //       args.push(txParams, function(error, result) {
+  //         return error ? reject(error) : resolve(result);
+  //       });
+  //       fn.apply(instance, args);
+  //     });
+  //   };
+  // }
 
-  private _promisifyFunctionWithTimeout(fn: (...passedArguments) => void, instance: any): (passedArguments: any[]) => Promise<any> {
-    const self = this;
-    return async function(...passedArguments): Promise<any> {
-      const [args, txParams] = self._parseArguments(passedArguments);
-      return new Promise(function(resolve, reject) {
-        args.push(txParams, function(error, tx) {
-          return error ? reject(error) : ZWeb3.getTransactionReceiptWithTimeout(tx, self.timeout)
-            .then((receipt) => resolve({ tx, receipt, logs: decodeLogs(receipt.logs, self) }))
-            .catch(reject);
-        });
-        fn.apply(instance, args);
-      });
-    };
-  }
+  // private _promisifyFunctionWithTimeout(fn: (...passedArguments) => void, instance: any): (passedArguments: any[]) => Promise<any> {
+  //   const self = this;
+  //   return async function(...passedArguments): Promise<any> {
+  //     const [args, txParams] = self._parseArguments(passedArguments);
+  //     return new Promise(function(resolve, reject) {
+  //       args.push(txParams, function(error, tx) {
+  //         return error ? reject(error) : ZWeb3.getTransactionReceiptWithTimeout(tx, self.timeout)
+  //           .then((receipt) => resolve({ tx, receipt, logs: decodeLogs(receipt.logs, self) }))
+  //           .catch(reject);
+  //       });
+  //       fn.apply(instance, args);
+  //     });
+  //   };
+  // }
 
   private _parseArguments(args: any[]): [any[], any] {
     const params = Array.prototype.slice.call(args);

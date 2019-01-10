@@ -2,6 +2,8 @@ import { promisify } from 'util';
 import sleep from '../helpers/sleep';
 import BN from 'bignumber.js';
 import Web3 from 'web3';
+import { TransactionReceipt } from 'web3/types';
+import { Contract } from 'web3-eth-contract';
 
 // Reference: see https://github.com/ethereum/EIPs/blob/master/EIPS/eip-155.md#list-of-chain-ids
 const NETWORKS = {
@@ -37,7 +39,7 @@ export default class ZWeb3 {
   }
 
   public static isAddress(address: string): boolean {
-    return ZWeb3.web3().isAddress(address);
+    return ZWeb3.web3().utils.isAddress(address);
   }
 
   public static eth(): any {
@@ -48,14 +50,12 @@ export default class ZWeb3 {
     return ZWeb3.web3().version;
   }
 
-  public static contract(abi: any): any {
+  public static contract(abi: any): Contract {
     return new (ZWeb3.eth().Contract)(abi);
   }
 
   public static async accounts(): Promise<string[]> {
-    return promisify(
-      ZWeb3.eth().getAccounts.bind(ZWeb3.eth())
-    )();
+    return await ZWeb3.eth().personal.getAccounts();
   }
 
   public static async defaultAccount(): Promise<string> {
@@ -69,15 +69,11 @@ export default class ZWeb3 {
   }
 
   public static async getBalance(address: string): Promise<string> {
-    return promisify(
-      ZWeb3.eth().getBalance.bind(ZWeb3.eth())
-    )(address);
+    return ZWeb3.eth().getBalance(address);
   }
 
   public static async getCode(address: string): Promise<string> {
-    return promisify(
-      ZWeb3.eth().getCode.bind(ZWeb3.eth())
-    )(address);
+    return ZWeb3.eth().getCode(address);
   }
 
   public static async hasBytecode(address) {
@@ -86,15 +82,11 @@ export default class ZWeb3 {
   }
 
   public static async getStorageAt(address: string, position: string): Promise<string> {
-    return promisify(
-      ZWeb3.eth().getStorageAt.bind(ZWeb3.eth())
-    )(address, position);
+    return ZWeb3.eth().getStorageAt(address, position);
   }
 
   public static async getNode(): Promise<string> {
-    return promisify(
-      ZWeb3.version().getNode.bind(ZWeb3.version())
-    )();
+    return ZWeb3.eth().getNodeInfo();
   }
 
   public static async isGanacheNode(): Promise<any> {
@@ -121,9 +113,7 @@ export default class ZWeb3 {
   }
 
   public static async getNetwork(): Promise<string> {
-    return promisify(
-      ZWeb3.version().getNetwork.bind(ZWeb3.version())
-    )();
+    return ZWeb3.eth().net.getId();
   }
 
   public static async getNetworkName(): Promise<string> {
@@ -131,10 +121,8 @@ export default class ZWeb3 {
     return NETWORKS[networkId] || `dev-${networkId}`;
   }
 
-  public static async sendTransaction(params: any): Promise<string> {
-    return promisify(
-      ZWeb3.eth().sendTransaction.bind(ZWeb3.eth())
-    )(params);
+  public static async sendTransaction(params: any): Promise<TransactionReceipt> {
+    return ZWeb3.eth().sendTransaction(params);
   }
 
   public static async getTransaction(txHash: string): Promise<any> {
