@@ -1,5 +1,7 @@
 import semver from 'semver';
-import _ from 'lodash';
+import isString from 'lodash.isstring';
+import isArray from 'lodash.isarray';
+
 import util from 'util';
 
 // TS-TODO: use typed SemVer dependency, some of these methods may actually
@@ -9,11 +11,11 @@ export type SemanticVersion = [number, number, number];
 type RawSemanticVersion = [any, any, any];
 
 export function toSemanticVersion(version: string | RawSemanticVersion): SemanticVersion | never {
-  if (_.isString(version)) {
+  if (isString(version)) {
     const semanticVersion: any = semver.parse(version);
     if (!semanticVersion) throw Error(`Cannot parse version identifier ${version}`);
     return [semanticVersion.major, semanticVersion.minor, semanticVersion.patch];
-  } else if (_.isArray(version) && version.length === 3) {
+  } else if (isArray(version) && version.length === 3) {
     const semverGenericArray: RawSemanticVersion = <RawSemanticVersion> version;
     const semverTyped: number[] = semverGenericArray.map((x: any) => {
       return x.toNumber ? x.toNumber() : x;
@@ -24,8 +26,8 @@ export function toSemanticVersion(version: string | RawSemanticVersion): Semanti
 }
 
 export function semanticVersionToString(version: string | RawSemanticVersion): string | never {
-  if (_.isString(version)) return <string> version;
-    else if (_.isArray(version)) {
+  if (isString(version)) return <string> version;
+    else if (isArray(version)) {
     const semverGenericArray: RawSemanticVersion = <RawSemanticVersion> version;
     return <string> (semverGenericArray.join('.'));
   } else throw Error(`Cannot handle version identifier ${util.inspect(version)}`);

@@ -1,4 +1,4 @@
-import _ from 'lodash';
+import findLast from 'lodash.findlast';
 
 import Logger from '../utils/Logger';
 import decodeLogs from '../helpers/decodeLogs';
@@ -104,7 +104,7 @@ export default class App {
       : await this._createProxyAndCall(contractClass, packageName, contractName, initMethodName, initArgs);
 
     log.info(`TX receipt received: ${receipt.transactionHash}`);
-    const address: string = _.findLast(receipt.logs, (l) => l.event === 'ProxyCreated').args.proxy;
+    const address: string = findLast(receipt.logs, (l) => l.event === 'ProxyCreated').args.proxy;
     log.info(`${packageName} ${contractName} proxy: ${address}`);
     return contractClass.at(address);
   }

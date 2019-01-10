@@ -1,7 +1,7 @@
 'use strict'
 require('../../setup')
 
-import _ from 'lodash';
+import times from 'lodash.times';
 import sinon from 'sinon';
 import axios from 'axios';
 import { promisify } from 'util';
@@ -131,7 +131,7 @@ contract('Transactions', function([_account1, account2]) {
 
     it('retries estimating gas', async function () {
       const stub = sinon.stub(this.instance.initialize, 'estimateGas')
-      _.times(3, i => stub.onCall(i).throws('Error', 'gas required exceeds allowance or always failing transaction'))
+      times(3, i => stub.onCall(i).throws('Error', 'gas required exceeds allowance or always failing transaction'))
       stub.returns(800000)
 
       const { tx } = await sendTransaction(this.instance.initialize, [42, 'foo', [1, 2, 3]]);
@@ -140,7 +140,7 @@ contract('Transactions', function([_account1, account2]) {
 
     it('retries estimating gas up to 3 times', async function () {
       const stub = sinon.stub(this.instance.initialize, 'estimateGas')
-      _.times(4, i => stub.onCall(i).throws('Error', 'gas required exceeds allowance or always failing transaction'))
+      times(4, i => stub.onCall(i).throws('Error', 'gas required exceeds allowance or always failing transaction'))
       stub.returns(800000)
 
       await sendTransaction(this.instance.initialize, [42, 'foo', [1,2,3]]).should.be.rejectedWith(/always failing transaction/);

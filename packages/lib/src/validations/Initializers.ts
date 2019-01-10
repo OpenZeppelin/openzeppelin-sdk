@@ -1,4 +1,4 @@
-import _ from 'lodash';
+import invertBy from 'lodash.invertby';
 import Contracts from '../artifacts/Contracts';
 import ContractFactory from '../artifacts/ContractFactory.js';
 import { Node } from '../utils/ContractAST';
@@ -12,7 +12,7 @@ import { Node } from '../utils/ContractAST';
 export function getUninitializedBaseContracts(contractClass: ContractFactory): string[] {
   const uninitializedBaseContracts = {};
   getUninitializedDirectBaseContracts(contractClass, uninitializedBaseContracts);
-  return _.invertBy(uninitializedBaseContracts);
+  return invertBy(uninitializedBaseContracts);
 }
 
 // TS-TODO: define return type

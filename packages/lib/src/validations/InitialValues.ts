@@ -1,4 +1,4 @@
-import _ from 'lodash';
+import isEmpty from 'lodash.isempty';
 import Contracts from '../artifacts/Contracts';
 import ContractFactory from '../artifacts/ContractFactory.js';
 import { Node } from '../utils/ContractAST';
@@ -24,5 +24,5 @@ function hasInitialValues(node: Node): boolean {
     .filter((nodeItem) => !nodeItem.constant && nodeItem.nodeType === 'VariableDeclaration')
     .filter((nodeItem) => nodeItem.value != null);
 
-  return !_.isEmpty(initializedVariables);
+  return !isEmpty(initializedVariables);
 }

@@ -1,4 +1,3 @@
-import _ from 'lodash';
 import util from 'util';
 import { StorageLayoutInfo } from './Storage';
 import { StorageInfo, TypeInfo, TypeInfoMapping } from '../utils/ContractAST';
