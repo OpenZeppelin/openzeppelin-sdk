@@ -66,7 +66,6 @@ contract('Transactions', function([_account1, account2]) {
 
     it('honours other tx params', async function () {
       const { tx } = await sendTransaction(this.instance.initialize, [42, 'foo', [1, 2, 3]], { from: account2 });
-      await assertGasLt(tx, 1000000);
       await assertFrom(tx, account2);
     });
 
@@ -79,32 +78,58 @@ contract('Transactions', function([_account1, account2]) {
         sinon.restore();
       })
 
-      it('uses specified gas', async function () {
-        const { tx } = await sendTransaction(this.instance.initialize, [42, 'foo', [1, 2, 3]], { gas: 800000 });
-        await assertGas(tx, 800000);
-      });
-
-      it('estimates gas', async function () {
-        const { tx } = await sendTransaction(this.instance.initialize, [42, 'foo', [1, 2, 3]]);
-        await assertGasLt(tx, 1000000);
-      });
-
-      it('retries estimating gas', async function () {
-        const stub = sinon.stub(this.instance.initialize, 'estimateGas')
-        _.times(3, i => stub.onCall(i).throws('Error', 'gas required exceeds allowance or always failing transaction'))
-        stub.returns(800000)
-
-        const { tx } = await sendTransaction(this.instance.initialize, [42, 'foo', [1, 2, 3]]);
-        await assertGas(tx, 800000 * 1.25 + 15000);
-      });
-
-      it('retries estimating gas up to 3 times', async function () {
-          const stub = sinon.stub(this.instance.initialize, 'estimateGas')
-          _.times(4, i => stub.onCall(i).throws('Error', 'gas required exceeds allowance or always failing transaction'))
-          stub.returns(800000)
-
-          await sendTransaction(this.instance.initialize, [42, 'foo', [1, 2, 3]]).should.be.rejectedWith(/always failing transaction/);
+      describe('when there is a default gas amount defined', function () {
+        describe('when a gas amount is given', function () {
+          it('uses specified gas', async function () {
+            const { tx } = await sendTransaction(this.instance.initialize, [42, 'foo', [1, 2, 3]], { gas: 800000 });
+            await assertGas(tx, 800000);
+          });
         });
+
+        describe('when no gas amount is given', function () {
+          it('uses the default gas amount', async function () {
+            const { tx } = await sendTransaction(this.instance.initialize, [42, 'foo', [1, 2, 3]]);
+            await assertGas(tx, DEFAULT_GAS);
+          });
+        });
+      });
+
+      describe('when there is no default gas defined', function () {
+        beforeEach('stub default gas amount', function () {
+          sinon.stub(Contracts, 'getArtifactsDefaults').resolves({ from: _account1, gas: undefined, gasPrice: 100000000000 })
+        });
+
+        describe('when a gas amount is given', function () {
+          it('uses the specified gas amount', async function () {
+            const { tx } = await sendTransaction(this.instance.initialize, [42, 'foo', [1, 2, 3]], { gas: 800000 });
+            await assertGas(tx, 800000);
+          });
+        });
+
+        describe('when no gas amount is given', function () {
+          it('estimates gas', async function () {
+            const { tx } = await sendTransaction(this.instance.initialize, [42, 'foo', [1, 2, 3]]);
+            await assertGasLt(tx, 1000000);
+          });
+
+          it('retries estimating gas', async function () {
+            const stub = sinon.stub(this.instance.initialize, 'estimateGas')
+            _.times(3, i => stub.onCall(i).throws('Error', 'gas required exceeds allowance or always failing transaction'))
+            stub.returns(800000)
+
+            const { tx } = await sendTransaction(this.instance.initialize, [42, 'foo', [1, 2, 3]]);
+            await assertGas(tx, 800000 * 1.25 + 15000);
+          });
+
+          it('retries estimating gas up to 3 times', async function () {
+            const stub = sinon.stub(this.instance.initialize, 'estimateGas')
+            _.times(4, i => stub.onCall(i).throws('Error', 'gas required exceeds allowance or always failing transaction'))
+            stub.returns(800000)
+
+            await sendTransaction(this.instance.initialize, [42, 'foo', [1, 2, 3]]).should.be.rejectedWith(/always failing transaction/);
+          });
+        });
+      });
     });
 
     describe('gas price', function () {
@@ -159,7 +184,6 @@ contract('Transactions', function([_account1, account2]) {
 
     it('honours other tx params', async function () {
       const { tx } = await sendDataTransaction(this.instance, { data: this.encodedCall, from: account2 });
-      await assertGasLt(tx, 1000000);
       await assertFrom(tx, account2);
     });
 
@@ -172,31 +196,57 @@ contract('Transactions', function([_account1, account2]) {
         sinon.restore();
       })
 
-      it('uses specified gas', async function () {
-        const { tx } = await sendDataTransaction(this.instance, { data: this.encodedCall, gas: 800000 });
-        await assertGas(tx, 800000);
+      describe('when there is a default gas amount defined', function () {
+        describe('when a gas amount is given', function () {
+          it('uses specified gas', async function () {
+            const { tx } = await sendDataTransaction(this.instance, { data: this.encodedCall, gas: 800000 });
+            await assertGas(tx, 800000);
+          });
+        });
+
+        describe('when no gas amount is given', function () {
+          it('uses the default gas amount', async function () {
+            const { tx } = await sendTransaction(this.instance.initialize, [42, 'foo', [1, 2, 3]]);
+            await assertGas(tx, DEFAULT_GAS);
+          });
+        });
       });
 
-      it('estimates gas', async function () {
-        const { tx } = await sendDataTransaction(this.instance, { data: this.encodedCall });
-        await assertGasLt(tx, 1000000);
-      });
+      describe('when there is no default gas defined', function () {
+        beforeEach('stub default gas amount', function () {
+          sinon.stub(Contracts, 'getArtifactsDefaults').resolves({ from: _account1, gas: undefined, gasPrice: 100000000000 })
+        });
 
-      it('retries estimating gas', async function () {
-        const stub = sinon.stub(ZWeb3, 'estimateGas')
-        _.times(3, i => stub.onCall(i).throws('Error', 'gas required exceeds allowance or always failing transaction'));
-        stub.returns(800000)
+        describe('when a gas amount is given', function () {
+          it('uses specified gas', async function () {
+            const { tx } = await sendDataTransaction(this.instance, { data: this.encodedCall, gas: 800000 });
+            await assertGas(tx, 800000);
+          });
+        });
 
-        const { tx } = await sendDataTransaction(this.instance, { data: this.encodedCall });
-        await assertGas(tx, 800000 * 1.25 + 15000);
-      });
+        describe('when no gas amount is given', function () {
+          it('estimates gas', async function () {
+            const { tx } = await sendDataTransaction(this.instance, { data: this.encodedCall });
+            await assertGasLt(tx, 1000000);
+          });
 
-      it('retries estimating gas up to 3 times', async function () {
-        const stub = sinon.stub(ZWeb3, 'estimateGas')
-        _.times(4, i => stub.onCall(i).throws('Error', 'gas required exceeds allowance or always failing transaction'));
-        stub.returns(800000)
+          it('retries estimating gas', async function () {
+            const stub = sinon.stub(ZWeb3, 'estimateGas')
+            _.times(3, i => stub.onCall(i).throws('Error', 'gas required exceeds allowance or always failing transaction'));
+            stub.returns(800000)
 
-        await sendDataTransaction(this.instance, { data: this.encodedCall }).should.be.rejectedWith(/always failing transaction/);
+            const { tx } = await sendDataTransaction(this.instance, { data: this.encodedCall });
+            await assertGas(tx, 800000 * 1.25 + 15000);
+          });
+
+          it('retries estimating gas up to 3 times', async function () {
+            const stub = sinon.stub(ZWeb3, 'estimateGas')
+            _.times(4, i => stub.onCall(i).throws('Error', 'gas required exceeds allowance or always failing transaction'));
+            stub.returns(800000)
+
+            await sendDataTransaction(this.instance, { data: this.encodedCall }).should.be.rejectedWith(/always failing transaction/);
+          });
+        });
       });
     });
 
@@ -252,7 +302,6 @@ contract('Transactions', function([_account1, account2]) {
 
       it('honours other tx params', async function () {
         const instance = await deploy(this.DummyImplementation, [], { from: account2 });
-        await assertGasLt(instance.transactionHash, 1000000);
         await assertFrom(instance.transactionHash, account2);
       });
 
@@ -261,14 +310,44 @@ contract('Transactions', function([_account1, account2]) {
       });
 
       describe('gas', function () {
-        it('uses specified gas', async function () {
-          const instance = await deploy(this.DummyImplementation, [], { gas: 800000 });
-          await assertGas(instance.transactionHash, 800000);
+        afterEach('restore stubs', function () {
+          sinon.restore();
         });
 
-        it('estimates gas', async function () {
-          const instance = await deploy(this.DummyImplementation);
-          await assertGasLt(instance.transactionHash, 1000000);
+        describe('when there is a default gas amount defined', function () {
+          describe('when a gas amount is given', function () {
+            it('uses specified gas', async function () {
+              const instance = await deploy(this.DummyImplementation, [], { gas: 800000 });
+              await assertGas(instance.transactionHash, 800000);
+            });
+          });
+
+          describe('when no gas amount is given', function () {
+            it('uses the default gas amount', async function () {
+              const instance = await deploy(this.DummyImplementation, []);
+              await assertGas(instance.transactionHash, DEFAULT_GAS);
+            });
+          });
+        });
+
+        describe('when there is no default gas defined', function () {
+          beforeEach('stub default gas amount', function () {
+            sinon.stub(Contracts, 'getArtifactsDefaults').resolves({ from: _account1, gas: undefined, gasPrice: 100000000000 })
+          });
+
+          describe('when a gas amount is given', function () {
+            it('uses specified gas', async function () {
+              const instance = await deploy(this.DummyImplementation, [], { gas: 800000 });
+              await assertGas(instance.transactionHash, 800000);
+            });
+          });
+
+          describe('when no gas amount is given', function () {
+            it('estimates gas', async function () {
+              const instance = await deploy(this.DummyImplementation);
+              await assertGasLt(instance.transactionHash, 1000000);
+            });
+          });
         });
       });
 
@@ -328,7 +407,6 @@ contract('Transactions', function([_account1, account2]) {
 
       it('honours other tx params', async function () {
         const instance = await deploy(this.WithConstructorImplementation, [42, "foo"], { from: account2 });
-        await assertGasLt(instance.transactionHash, 1000000);
         await assertFrom(instance.transactionHash, account2);
       });
 
@@ -341,31 +419,57 @@ contract('Transactions', function([_account1, account2]) {
           sinon.restore();
         })
 
-        it('uses specified gas', async function () {
-          const instance = await deploy(this.WithConstructorImplementation, [42, "foo"], { gas: 800000 });
-          await assertGas(instance.transactionHash, 800000);
+        describe('when there is a default gas amount defined', function () {
+          describe('when a gas amount is given', function () {
+            it('uses specified gas', async function () {
+              const instance = await deploy(this.WithConstructorImplementation, [42, "foo"], { gas: 800000 });
+              await assertGas(instance.transactionHash, 800000);
+            });
+          });
+
+          describe('when no gas amount is given', function () {
+            it('uses the default gas amount', async function () {
+              const instance = await deploy(this.WithConstructorImplementation, [42, "foo"]);
+              await assertGas(instance.transactionHash, DEFAULT_GAS);
+            });
+          });
         });
 
-        it('estimates gas', async function () {
-          const instance = await deploy(this.WithConstructorImplementation, [42, "foo"]);
-          await assertGasLt(instance.transactionHash, 1000000);
-        });
+        describe('when there is no default gas defined', function () {
+          beforeEach('stub default gas amount', function () {
+            sinon.stub(Contracts, 'getArtifactsDefaults').resolves({ from: _account1, gas: undefined, gasPrice: 100000000000 })
+          });
 
-        it('retries estimating gas', async function () {
-          const stub = sinon.stub(ZWeb3, 'estimateGas')
-          _.times(3, i => stub.onCall(i).throws('Error', 'gas required exceeds allowance or always failing transaction'))
-          stub.returns(800000)
+          describe('when a gas amount is given', function () {
+            it('uses specified gas', async function () {
+              const instance = await deploy(this.WithConstructorImplementation, [42, "foo"], { gas: 800000 });
+              await assertGas(instance.transactionHash, 800000);
+            });
+          });
 
-          const instance = await deploy(this.WithConstructorImplementation, [42, "foo"]);
-          await assertGasLt(instance.transactionHash, 800000 * 1.25 + 15000);
-        });
+          describe('when no gas amount is given', function () {
+            it('estimates gas', async function () {
+              const instance = await deploy(this.WithConstructorImplementation, [42, "foo"]);
+              await assertGasLt(instance.transactionHash, 1000000);
+            });
 
-        it('retries estimating gas up to 3 times', async function () {
-          const stub = sinon.stub(ZWeb3, 'estimateGas')
-          _.times(4, i => stub.onCall(i).throws('Error', 'gas required exceeds allowance or always failing transaction'))
-          stub.returns(800000)
+            it('retries estimating gas', async function () {
+              const stub = sinon.stub(ZWeb3, 'estimateGas')
+              _.times(3, i => stub.onCall(i).throws('Error', 'gas required exceeds allowance or always failing transaction'))
+              stub.returns(800000)
 
-          await deploy(this.WithConstructorImplementation, [42, "foo"]).should.be.rejectedWith(/always failing transaction/);
+              const instance = await deploy(this.WithConstructorImplementation, [42, "foo"]);
+              await assertGas(instance.transactionHash, 800000 * 1.25 + 15000);
+            });
+
+            it('retries estimating gas up to 3 times', async function () {
+              const stub = sinon.stub(ZWeb3, 'estimateGas')
+              _.times(4, i => stub.onCall(i).throws('Error', 'gas required exceeds allowance or always failing transaction'))
+              stub.returns(800000)
+
+              await deploy(this.WithConstructorImplementation, [42, "foo"]).should.be.rejectedWith(/always failing transaction/);
+            });
+          });
         });
       });
 

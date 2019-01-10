@@ -98,7 +98,7 @@ export async function sendDataTransaction(contract: ContractWrapper, txParams: a
  */
 async function _sendTransaction(contractFn: GenericFunction, args: any[] = [], txParams: any = {}) {
   // If gas is set explicitly, use it
-  if (txParams.gas) return contractFn(...args, txParams);
+  if (txParams.gas || Contracts.getArtifactsDefaults().gas) return contractFn(...args, txParams);
 
   // Estimate gas for the call
   const gas = await estimateActualGasFnCall(contractFn, args, txParams);
@@ -108,7 +108,7 @@ async function _sendTransaction(contractFn: GenericFunction, args: any[] = [], t
 
 async function _sendDataTransaction(contract: ContractWrapper, txParams: any = {}) {
   // If gas is set explicitly, use it
-  if (txParams.gas) return contract.sendTransaction(txParams);
+  if (txParams.gas || Contracts.getArtifactsDefaults().gas) return contract.sendTransaction(txParams);
 
   // Estimate gas for the call and run the tx
   const gas = await estimateActualGas({ to: contract.address, ...txParams });
@@ -124,7 +124,7 @@ async function _sendDataTransaction(contract: ContractWrapper, txParams: any = {
  */
 async function _deploy(contract: ContractFactory, args: any[] = [], txParams: any = {}): Promise<ContractWrapper> {
   // If gas is set explicitly, use it
-  if (txParams.gas) return contract.new(...args, txParams);
+  if (txParams.gas || Contracts.getArtifactsDefaults().gas) return contract.new(...args, txParams);
 
   const data: string = contract.getData(args, txParams);
   const gas: number = await estimateActualGas({ data, ...txParams });
