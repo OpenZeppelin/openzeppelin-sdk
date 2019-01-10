@@ -1,4 +1,6 @@
-import _ from 'lodash';
+import concat from 'lodash.concat';
+import map from 'lodash.map';
+import isEmpty from 'lodash.isempty';
 
 import App from '../application/App';
 import Package from '../application/Package';
@@ -61,11 +63,11 @@ export default class AppProject extends BasePackageProject {
     const appProject: AppProject = await this.fetchOrDeploy(simpleProject.name, version, simpleProject.txParams, existingAddresses);
 
     await Promise.all(
-      _.concat(
-        _.map(simpleProject.implementations, (contractInfo, contractAlias) => (
+      concat(
+        map(simpleProject.implementations, (contractInfo, contractAlias) => (
           appProject.registerImplementation(contractAlias, contractInfo)
         )),
-        _.map(simpleProject.dependencies, (dependencyInfo, dependencyName) => (
+        map(simpleProject.dependencies, (dependencyInfo, dependencyName) => (
           appProject.setDependency(dependencyName, dependencyInfo.package, dependencyInfo.version)
         ))
       ));
@@ -123,7 +125,7 @@ export default class AppProject extends BasePackageProject {
   public async createProxy(contractClass: ContractFactory, { packageName, contractName, initMethod, initArgs }: ContractInterface = {}): Promise<ContractWrapper> {
     if (!contractName) contractName = contractClass.contractName;
     if (!packageName) packageName = this.name;
-    if (!_.isEmpty(initArgs) && !initMethod) initMethod = 'initialize';
+    if (!isEmpty(initArgs) && !initMethod) initMethod = 'initialize';
     return this.app.createProxy(contractClass, packageName, contractName, initMethod, initArgs);
   }
 

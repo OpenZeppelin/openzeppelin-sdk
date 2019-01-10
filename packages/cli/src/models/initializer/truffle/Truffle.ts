@@ -1,4 +1,5 @@
-import _ from 'lodash';
+import pickBy from 'lodash.pickby';
+import pick from 'lodash.pick';
 import { promisify } from 'util';
 import { FileSystem } from 'zos-lib';
 
@@ -41,7 +42,7 @@ const Truffle = {
     config.resolver = new TruffleResolver(config);
     const { provider, resolver } = this._setNonceTrackerIfNeeded(config);
 
-    const artifactDefaults = _.pickBy(_.pick(resolver.options, 'from', 'gas', 'gasPrice'));
+    const artifactDefaults = pickBy(pick(resolver.options, 'from', 'gas', 'gasPrice'));
     if (artifactDefaults.from) artifactDefaults.from = artifactDefaults.from.toLowerCase();
     return { provider, artifactDefaults };
   },

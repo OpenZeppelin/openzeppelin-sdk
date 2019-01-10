@@ -1,4 +1,3 @@
-import _ from 'lodash';
 import { promisify } from 'util';
 
 import EventsFilter from './EventsFilter';

@@ -1,8 +1,8 @@
 require('../../setup');
 
-import encodeCall, { decodeCall } from '../../../src/helpers/encodeCall';
+import zipWith from 'lodash.zipwith';
 import BN from 'bignumber.js';
-import _ from 'lodash';
+import encodeCall, { decodeCall } from '../../../src/helpers/encodeCall';
 
 const FUNCTION_NAME = 'myFunction';
 
@@ -19,7 +19,7 @@ describe('encodeCall helper', () => {
   it('should fail with invalid non matching number of types and values', () => {
     assertBadEncoding(['uint', 'address'], [123], /types\/values length mismatch/);
   });
-  
+
   it('should fail with invalid type/value pairs', () => {
     assertBadEncoding(['uint'], ['hello'], /invalid number value/);
     assertBadEncoding(['uint'], ['-42'], /invalid number value/);
@@ -30,7 +30,7 @@ describe('encodeCall helper', () => {
     assertBadEncoding(['address'], ['0x0fd60495d7057689fbe8b3'], /invalid address/);
     assertBadEncoding(['bytes'], [32], /invalid bytes value/);
   });
-  
+
   describe('when the specified type is a number (int, uint, etc)', () => {
     it('should accept valid values', () => {
       assertGoodEncoding(['int', 'string'], [5, 'hello']);
@@ -47,7 +47,7 @@ describe('encodeCall helper', () => {
       assertBadEncoding(['uint'], ['schnitzel'], /invalid number value/);
       assertBadEncoding(['uint'], [new BN('hello')], /invalid number value/);
     });
-    
+
     it('should throw on negative numbers when specified type is unsigned', () => {
       assertBadEncoding(['uint'], [-42], /invalid number value/);
       assertBadEncoding(['uint'], [new BN(-42)], /invalid number value/);
@@ -64,7 +64,7 @@ describe('encodeCall helper', () => {
       assertBadEncoding(['int'], [{}], /invalid number value/);
     });
   });
-  
+
   describe('when the specified type is a string', () => {
     it('should accept valid values', () => {
       assertGoodEncoding(['string'], ['hello']);
@@ -78,7 +78,7 @@ describe('encodeCall helper', () => {
       assertBadEncoding(['string'], [{}], /invalid string value/);
     });
   });
-  
+
   describe('when the specified type is bytes (includes bytes1, bytes2, etc)', () => {
     it('should accept valid values', () => {
       assertGoodEncoding(['bytes'], ['0x2a']);
@@ -97,7 +97,7 @@ describe('encodeCall helper', () => {
       assertBadEncoding(['bytes'], [{}], /invalid bytes value/);
     });
   });
-  
+
   describe('when the specified type is an address', () => {
     it('should accept valid values', () => {
       assertGoodEncoding(['address'], ['0x39af68cF04Abb0eF8f9d8191E1bD9c041E80e18e']);
@@ -122,18 +122,18 @@ describe('encodeCall helper', () => {
       assertBadEncoding(['address'], [{}], /invalid address/);
     });
   });
-  
+
   describe('when the specified type is a tuple', function() {
     it('identifies the individual types and treats them recursively', () => {
       assertGoodEncoding(['tuple(uint256,string)'], [[42, 'hello']]);
       assertGoodEncoding(['tuple(uint256,string)'], [['42', 'hello']]);
     });
-    
+
     it('should throw when the passed tuple types do not match', () => {
       assertBadEncoding(['tuple(uint256,string)'], [['hello', 42]], null);
       assertBadEncoding(['tuple(uint256,string)'], [['42']], null);
     });
-    
+
     it('supports nested tuples', function() {
       assertGoodEncoding(['tuple(uint256,string[])'], [[42, ['one', 'two', 'three']]]);
       assertGoodEncoding(['tuple(uint256,tuple(uint256,string))'], [[42, [42, 'hello']]]);
@@ -172,7 +172,7 @@ function assertGoodEncoding(types, values) {
   const encoded = encodeCall(FUNCTION_NAME, types, values).substring(10); // Remove signature hash.
   const decoded = decodeCall(types, `0x${encoded}`);
   if(values.length !== decoded.length) throw new Error('Invalid encoding/decoding: Mismatch in number of encoded and decoded values.');
-  _.zipWith(values, decoded, (value, decodedValue) => {
+    zipWith(values, decoded, (value, decodedValue) => {
     if(Buffer.isBuffer(value)) value = `0x${value.toString('hex')}`;
     if(value.toString() != decodedValue.toString()) throw new Error(`Invalid encoding/decoding. Encoded: ${value}, Decoded: ${decodedValue}`);
   });

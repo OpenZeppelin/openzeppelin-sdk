@@ -1,6 +1,7 @@
 'use strict';
 
-import _ from 'lodash';
+import every from 'lodash.every';
+import map from 'lodash.map';
 import { Contracts, ContractFactory, Logger, FileSystem as fs, getBuildArtifacts, BuildArtifacts, validate as validateContract, validationPasses} from 'zos-lib';
 
 import Session from '../network/Session';
@@ -85,7 +86,7 @@ export default class LocalController {
   // Contract model
   public validateAll(): boolean {
     const buildArtifacts = getBuildArtifacts();
-    return _.every(_.map(this.packageFile.contractAliases, (contractAlias) => (
+    return every(map(this.packageFile.contractAliases, (contractAlias) => (
       this.validate(contractAlias, buildArtifacts)
     )));
   }
