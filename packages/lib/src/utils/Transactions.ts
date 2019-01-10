@@ -76,16 +76,17 @@ export async function deploy(contract: ContractFactory, args: any[] = [], txPara
  * Uses the node's estimateGas RPC call, and adds a 20% buffer on top of it, capped by the block gas limit.
  * @param contract contract instance to send the tx to
  * @param txParams all transaction parameters (data, from, gasPrice, etc)
+ * @param retries number of deploy retries
  */
-export async function sendDataTransaction(contract: ContractWrapper, txParams: any): Promise<TransactionReceiptWrapper> {
-  // TODO: Add retries similar to sendTransaction
+export async function sendDataTransaction(contract: ContractWrapper, txParams: any, retries: number = RETRY_COUNT): Promise<TransactionReceiptWrapper> {
   await fixGasPrice(txParams);
 
-  // If gas is set explicitly, use it
-  if (txParams.gas) return contract.sendTransaction(txParams);
-  // Estimate gas for the call and run the tx
-  const gas = await estimateActualGas({ to: contract.address, ...txParams });
-  return contract.sendTransaction({ gas, ...txParams });
+  try {
+    return await _sendDataTransaction(contract, txParams);
+  } catch (error) {
+    if (!error.message.match(/nonce too low/) || retries <= 0) throw error;
+    return sendDataTransaction(contract, txParams, retries - 1);
+  }
 }
 
 /**
@@ -103,6 +104,15 @@ async function _sendTransaction(contractFn: GenericFunction, args: any[] = [], t
   const gas = await estimateActualGasFnCall(contractFn, args, txParams);
 
   return contractFn(...args, { gas, ...txParams });
+}
+
+async function _sendDataTransaction(contract: ContractWrapper, txParams: any = {}) {
+  // If gas is set explicitly, use it
+  if (txParams.gas) return contract.sendTransaction(txParams);
+
+  // Estimate gas for the call and run the tx
+  const gas = await estimateActualGas({ to: contract.address, ...txParams });
+  return contract.sendTransaction({ gas, ...txParams });
 }
 
 /**

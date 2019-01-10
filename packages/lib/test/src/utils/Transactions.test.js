@@ -14,7 +14,7 @@ import { deploy, sendTransaction, sendDataTransaction, awaitConfirmations, state
 
 const DEFAULT_GAS = 6721975;
 
-contract.only('Transactions', function([_account1, account2]) {
+contract('Transactions', function([_account1, account2]) {
 
   beforeEach('load contract', function () {
     this.DummyImplementation = Contracts.getFromLocal('DummyImplementation');
@@ -84,12 +84,7 @@ contract.only('Transactions', function([_account1, account2]) {
         await assertGas(tx, 800000);
       });
 
-      it('uses specified gas', async function () {
-        const { tx } = await sendTransaction(this.instance.initialize, [42, 'foo', [1, 2, 3]], { gas: 800000 });
-        await assertGas(tx, 800000);
-      });
-
-      it('estimates gas when there is no default present', async function () {
+      it('estimates gas', async function () {
         const { tx } = await sendTransaction(this.instance.initialize, [42, 'foo', [1, 2, 3]]);
         await assertGasLt(tx, 1000000);
       });
@@ -173,6 +168,10 @@ contract.only('Transactions', function([_account1, account2]) {
     });
 
     describe('gas', function () {
+      afterEach('restore stubs', function () {
+        sinon.restore();
+      })
+
       it('uses specified gas', async function () {
         const { tx } = await sendDataTransaction(this.instance, { data: this.encodedCall, gas: 800000 });
         await assertGas(tx, 800000);
@@ -181,6 +180,23 @@ contract.only('Transactions', function([_account1, account2]) {
       it('estimates gas', async function () {
         const { tx } = await sendDataTransaction(this.instance, { data: this.encodedCall });
         await assertGasLt(tx, 1000000);
+      });
+
+      it('retries estimating gas', async function () {
+        const stub = sinon.stub(ZWeb3, 'estimateGas')
+        _.times(3, i => stub.onCall(i).throws('Error', 'gas required exceeds allowance or always failing transaction'));
+        stub.returns(800000)
+
+        const { tx } = await sendDataTransaction(this.instance, { data: this.encodedCall });
+        await assertGas(tx, 800000 * 1.25 + 15000);
+      });
+
+      it('retries estimating gas up to 3 times', async function () {
+        const stub = sinon.stub(ZWeb3, 'estimateGas')
+        _.times(4, i => stub.onCall(i).throws('Error', 'gas required exceeds allowance or always failing transaction'));
+        stub.returns(800000)
+
+        await sendDataTransaction(this.instance, { data: this.encodedCall }).should.be.rejectedWith(/always failing transaction/);
       });
     });
 
