@@ -1,4 +1,7 @@
-import _ from 'lodash';
+import keys from 'lodash.keys';
+import flatten from 'lodash.flatten';
+import values from 'lodash.values';
+
 import Contracts from './Contracts';
 import { parseJson } from '../utils/FileSystem';
 
@@ -31,11 +34,11 @@ export class BuildArtifacts {
   }
 
   public listSourcePaths(): string[] {
-    return _.keys(this.sourcesToArtifacts);
+    return keys(this.sourcesToArtifacts);
   }
 
   public listArtifacts(): Artifact[] {
-    return _.flatten(_.values(this.sourcesToArtifacts));
+    return flatten(values(this.sourcesToArtifacts));
   }
 
   public getArtifactsFromSourcePath(sourcePath: string): Artifact[] {

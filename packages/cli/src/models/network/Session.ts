@@ -1,4 +1,7 @@
-import _ from 'lodash';
+import omitBy from 'lodash.omitby';
+import isEmpty from 'lodash.isempty';
+import pick from 'lodash.pick';
+import compact from 'lodash.compact';
 import { FileSystem as fs, Logger } from 'zos-lib';
 
 const log: Logger = new Logger('Session');
@@ -18,7 +21,7 @@ const Session = {
   getOptions(overrides: SessionOptions = {}): SessionOptions {
     const session = this._parseSession();
     if (!session) return this._setDefaults(overrides);
-    log.info(`Using session with ${describe(_.omitBy(session, (v, key) => overrides[key]))}`);
+    log.info(`Using session with ${describe(omitBy(session, (v, key) => overrides[key]))}`);
     return { ...session, ...overrides };
   },
 
@@ -42,10 +45,10 @@ const Session = {
 
   _parseSession(): SessionOptions | undefined {
     const session = fs.parseJsonIfExists(ZOS_SESSION_PATH);
-    if (_.isEmpty(session)) return undefined;
+    if (isEmpty(session)) return undefined;
     const expires = new Date(session.expires);
     if (expires <= new Date()) return undefined;
-    const parsedSession = _.pick(session, 'network', 'timeout', 'from');
+    const parsedSession = pick(session, 'network', 'timeout', 'from');
     return this._setDefaults(parsedSession);
   },
 
@@ -57,7 +60,7 @@ const Session = {
 };
 
 function describe(session: SessionOptions): string {
-  return _.compact([
+  return compact([
     session.network && `network ${session.network}`,
     session.from && `sender address ${session.from}`,
     session.timeout && `timeout ${session.timeout} seconds`

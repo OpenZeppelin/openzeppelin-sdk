@@ -1,4 +1,10 @@
-import _ from 'lodash';
+import difference from 'lodash.difference';
+import every from 'lodash.every';
+import isEmpty from 'lodash.isempty';
+import pick from 'lodash.pick';
+import values from 'lodash.values';
+import flatten from 'lodash.flatten';
+import uniq from 'lodash.uniq';
 
 import Logger from '../utils/Logger';
 import { hasConstructor } from './Constructors';
@@ -42,24 +48,24 @@ export function newValidationErrors(validations: any, existingValidations: any =
     hasSelfDestruct: validations.hasSelfDestruct && !existingValidations.hasSelfDestruct,
     hasDelegateCall: validations.hasDelegateCall && !existingValidations.hasDelegateCall,
     hasInitialValuesInDeclarations: validations.hasInitialValuesInDeclarations && !existingValidations.hasInitialValuesInDeclarations,
-    uninitializedBaseContracts: _.difference(validations.uninitializedBaseContracts, existingValidations.uninitializedBaseContracts),
-    storageUncheckedVars: _.difference(validations.storageUncheckedVars, existingValidations.storageUncheckedVars),
+    uninitializedBaseContracts: difference(validations.uninitializedBaseContracts, existingValidations.uninitializedBaseContracts),
+    storageUncheckedVars: difference(validations.storageUncheckedVars, existingValidations.storageUncheckedVars),
     storageDiff: validations.storageDiff
   };
 }
 
 export function validationPasses(validations: any): boolean {
-  return _.every(validations.storageDiff, (diff) => diff.action === 'append')
+  return every(validations.storageDiff, (diff) => diff.action === 'append')
     && !validations.hasConstructor
     && !validations.hasSelfDestruct
     && !validations.hasDelegateCall
     && !validations.hasInitialValuesInDeclarations
-    && _.isEmpty(validations.uninitializedBaseContracts);
+    && isEmpty(validations.uninitializedBaseContracts);
 }
 
 function validateStorage(contractClass: ContractFactory, existingContractInfo: any = {}, buildArtifacts: any = null): { storageUncheckedVars?: StorageInfo[], storageDiff?: Operation[] } {
-  const originalStorageInfo = _.pick(existingContractInfo, 'storage', 'types');
-  if (_.isEmpty(originalStorageInfo.storage)) return {};
+  const originalStorageInfo = pick(existingContractInfo, 'storage', 'types');
+  if (isEmpty(originalStorageInfo.storage)) return {};
 
   const updatedStorageInfo = getStorageLayout(contractClass, buildArtifacts);
   const storageUncheckedVars = getStructsOrEnums(updatedStorageInfo);
@@ -73,7 +79,13 @@ function validateStorage(contractClass: ContractFactory, existingContractInfo: a
 
 function tryGetUninitializedBaseContracts(contractClass: ContractFactory): string[] {
   try {
-    return _(getUninitializedBaseContracts(contractClass)).values().flatten().uniq().value();
+    const pipeline = [
+      contracts => values(contracts),
+      contracts => flatten(contracts),
+      contracts => uniq(contracts),
+    ];
+
+    return pipeline.reduce((xs, f) => f(xs), getUninitializedBaseContracts(contractClass));
   } catch (error) {
     log.error(`- Skipping uninitialized base contracts validation due to error: ${error.message}`);
     return [];

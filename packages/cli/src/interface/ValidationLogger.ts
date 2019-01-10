@@ -1,4 +1,4 @@
-import _ from 'lodash';
+import isEmpty from 'lodash.isempty';
 import {
   FileSystem as fs,
   Logger,
@@ -77,13 +77,13 @@ export default class ValidationLogger {
   }
 
   public logUninitializedBaseContracts(uninitializedBaseContracts: any): void {
-    if (!_.isEmpty(uninitializedBaseContracts)) {
+    if (!isEmpty(uninitializedBaseContracts)) {
       log.warn(`- Contract ${this.contractName} has base contracts ${uninitializedBaseContracts.join(', ')} which are initializable, but their initialize methods are not called from ${this.contractName}.initialize. See ${INITIALIZERS_LINK}.`);
     }
   }
 
   public logUncheckedVars(vars: any): void {
-    if (_.isEmpty(vars)) return;
+    if (isEmpty(vars)) return;
 
     const varList = vars.map(({ label, contract }) => `${label} (${contract})`).join(', ');
     const variablesString = `Variable${vars.length === 1 ? '' : 's'}`;
@@ -93,7 +93,7 @@ export default class ValidationLogger {
   }
 
   public logStorageLayoutDiffs(storageDiff: Operation[], updatedStorageInfo: StorageLayoutInfo): void {
-    if (_.isEmpty(storageDiff)) return;
+    if (isEmpty(storageDiff)) return;
     const originalTypesInfo = this.existingContractInfo.types || {};
 
     storageDiff.forEach(({ updated, original, action }) => {

@@ -1,4 +1,4 @@
-import _ from 'lodash';
+import pickBy from 'lodash.pickby';
 
 import create from '../scripts/create';
 import { parseInit } from '../utils/input';
@@ -24,7 +24,7 @@ async function action(contractFullName: string, options: any): Promise<void> {
   const { initMethod, initArgs } = parseInit(options, 'initialize');
   const { contract: contractAlias, package: packageName } = fromContractFullName(contractFullName);
   const { network, txParams } = await ConfigVariablesInitializer.initNetworkConfiguration(options);
-  const args = _.pickBy({ packageName, contractAlias, initMethod, initArgs, force });
+  const args = pickBy({ packageName, contractAlias, initMethod, initArgs, force });
 
   await create({ ...args, network, txParams });
   if (!options.dontExitProcess && process.env.NODE_ENV !== 'test') process.exit(0);

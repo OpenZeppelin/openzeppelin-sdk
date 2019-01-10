@@ -1,4 +1,6 @@
-import _ from 'lodash';
+import some from 'lodash.some';
+import isEqual from 'lodash.isequal';
+import reverse from 'lodash.reverse';
 import path from 'path';
 import process from 'process';
 import { getBuildArtifacts } from '../artifacts/BuildArtifacts';
@@ -118,7 +120,7 @@ class StorageLayout {
   private collectNodes(node: Node): void {
 
     // Return if we have already seen this node.
-    if (_.some(this.nodes[node.id] || [], (n) => _.isEqual(n, node))) return;
+    if (some(this.nodes[node.id] || [], (n) => isEqual(n, node))) return;
 
     // Add node to collection with this id otherwise.
     if (!this.nodes[node.id]) this.nodes[node.id] = [];
@@ -174,7 +176,7 @@ class StorageLayout {
   }
 
   private getLinearizedBaseContracts(): number[] {
-    return _.reverse(this.getContractNode().linearizedBaseContracts.map((id: number) => this.getNode(id, 'ContractDefinition')));
+    return reverse(this.getContractNode().linearizedBaseContracts.map((id: number) => this.getNode(id, 'ContractDefinition')));
   }
 
   private getStorageInfo(varNode, typeInfo): StorageInfo {
