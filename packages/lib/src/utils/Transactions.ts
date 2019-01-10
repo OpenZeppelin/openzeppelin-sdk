@@ -36,7 +36,7 @@ interface GenericFunction {
 }
 
 /**
- * Wraps the _sendTransaction function and manages transaction retries
+ * Wraps the _sendTransaction function and manages transaction retries.
  * @param contractFn contract function to be executed as the transaction
  * @param args arguments of the call (if any)
  * @param txParams other transaction parameters (from, gasPrice, etc)
@@ -54,7 +54,7 @@ export async function sendTransaction(contractFn: GenericFunction, args: any[] =
 }
 
 /**
- * Wraps the _deploy and manages deploy retries
+ * Wraps the _deploy and manages deploy retries.
  * @param contract truffle contract to be deployed
  * @param args arguments of the constructor (if any)
  * @param txParams other transaction parameters (from, gasPrice, etc)
@@ -72,11 +72,10 @@ export async function deploy(contract: ContractFactory, args: any[] = [], txPara
 }
 
 /**
- * Sends a transaction to the blockchain with data precalculated
- * Uses the node's estimateGas RPC call, and adds a 20% buffer on top of it, capped by the block gas limit.
+ * Wraps the _sendDataTransaction function and manages transaction retries.
  * @param contract contract instance to send the tx to
  * @param txParams all transaction parameters (data, from, gasPrice, etc)
- * @param retries number of deploy retries
+ * @param retries number of data transaction retries
  */
 export async function sendDataTransaction(contract: ContractWrapper, txParams: any, retries: number = RETRY_COUNT): Promise<TransactionReceiptWrapper> {
   await fixGasPrice(txParams);
@@ -106,6 +105,12 @@ async function _sendTransaction(contractFn: GenericFunction, args: any[] = [], t
   return contractFn(...args, { gas, ...txParams });
 }
 
+/**
+ * Sends a transaction to the blockchain with data precalculated, estimating the gas to be used.
+ * Uses the node's estimateGas RPC call, and adds a 20% buffer on top of it, capped by the block gas limit.
+ * @param contract contract instance to send the tx to
+ * @param txParams all transaction parameters (data, from, gasPrice, etc)
+ */
 async function _sendDataTransaction(contract: ContractWrapper, txParams: any = {}) {
   // If gas is set explicitly, use it
   if (txParams.gas || Contracts.getArtifactsDefaults().gas) return contract.sendTransaction(txParams);
