@@ -1,6 +1,18 @@
 'use strict';
 
-import _ from 'lodash';
+import isEmpty from 'lodash.isempty';
+import intersection from 'lodash.intersection';
+import uniqWith from 'lodash.uniqwith';
+import uniq from 'lodash.uniq';
+import flatten from 'lodash.flatten';
+import filter from 'lodash.filter';
+import every from 'lodash.every';
+import partition from 'lodash.partition';
+import map from 'lodash.map';
+import forEach from 'lodash.foreach';
+import isEqual from 'lodash.isequal';
+import concat from 'lodash.concat';
+import toPairs from 'lodash.topairs';
 import { Contracts, ContractFactory, Logger, FileSystem as fs, Proxy, awaitConfirmations, semanticVersionToString } from 'zos-lib';
 import { SimpleProject, AppProject, flattenSourceCode, getStorageLayout, BuildArtifacts, getBuildArtifacts, getSolidityLibNames } from 'zos-lib';
 import { validate, newValidationErrors, validationPasses, App, ContractWrapper } from 'zos-lib';
@@ -123,11 +135,14 @@ export default class NetworkController {
   // Contract model
   private _contractsListForPush(onlyChanged: boolean = false, changedLibraries: ContractFactory[] = []): Array<[string, ContractFactory]> {
     const newVersion = this._newVersionRequired();
-    return _(this.packageFile.contracts)
-      .toPairs()
-      .map(([contractAlias, contractName]) => [contractAlias, Contracts.getFromLocal(contractName)])
-      .filter(([contractAlias, contractClass]) => newVersion || !onlyChanged || this.hasContractChanged(contractAlias, contractClass) || this._hasChangedLibraries(contractClass, changedLibraries))
-      .value();
+
+    const pipeline = [
+      contracts => toPairs(contracts),
+      contracts => map(contracts, ([contractAlias, contractName]) => [contractAlias, Contracts.getFromLocal(contractName)]),
+      contracts => filter(contracts, ([contractAlias, contractClass]) => newVersion || !onlyChanged || this.hasContractChanged(contractAlias, contractClass) || this._hasChangedLibraries(contractClass, changedLibraries))
+    ];
+
+    return pipeline.reduce((xs, f) => f(xs), this.packageFile.contracts);
   }
 
   // Contract model || SolidityLib model
@@ -135,8 +150,8 @@ export default class NetworkController {
     const { contractNames, contractAliases } = this.packageFile;
     const libNames = this._getAllSolidityLibNames(contractNames);
 
-    const clashes = _.intersection(libNames, contractAliases);
-    if(!_.isEmpty(clashes)) {
+    const clashes = intersection(libNames, contractAliases);
+    if(!isEmpty(clashes)) {
       throw new Error(`Cannot upload libraries with the same name as a contract alias: ${clashes.join(', ')}`);
     }
 
@@ -216,7 +231,7 @@ export default class NetworkController {
   // Contract model || SolidityLib model
   private _hasChangedLibraries(contractClass: ContractFactory, changedLibraries: ContractFactory[]): boolean {
     const libNames = getSolidityLibNames(contractClass.bytecode);
-    return !_.isEmpty(_.intersection(changedLibraries.map((c) => c.contractName), libNames));
+    return !isEmpty(intersection(changedLibraries.map((c) => c.contractName), libNames));
   }
 
   // Contract model || SolidityLib model
@@ -226,7 +241,7 @@ export default class NetworkController {
       return getSolidityLibNames(contractClass.bytecode);
     });
 
-    return _.uniq(_.flatten(libNames));
+    return uniq(flatten(libNames));
   }
 
   // Contract model
@@ -250,7 +265,7 @@ export default class NetworkController {
 
   // DeployerController || Contract model
   public validateContracts(contracts: Array<[string, ContractFactory]>, buildArtifacts: BuildArtifacts): boolean {
-    return _.every(contracts.map(([contractAlias, contractClass]) =>
+    return every(contracts.map(([contractAlias, contractClass]) =>
       this.validateContract(contractAlias, contractClass, buildArtifacts))
     );
   }
@@ -285,12 +300,12 @@ export default class NetworkController {
 
   // Contract model
   private _errorForLocalContractsDeployed(): string {
-    const [contractsDeployed, contractsMissing] = _.partition(this.packageFile.contractAliases, (alias) => this.isContractDeployed(alias));
-    const contractsChanged = _.filter(contractsDeployed, (alias) => this.hasContractChanged(alias));
+    const [contractsDeployed, contractsMissing] = partition(this.packageFile.contractAliases, (alias) => this.isContractDeployed(alias));
+    const contractsChanged = filter(contractsDeployed, (alias) => this.hasContractChanged(alias));
 
-    if (!_.isEmpty(contractsMissing)) {
+    if (!isEmpty(contractsMissing)) {
       return `Contracts ${contractsMissing.join(', ')} are not deployed.`;
-    } else if (!_.isEmpty(contractsChanged)) {
+    } else if (!isEmpty(contractsChanged)) {
       return `Contracts ${contractsChanged.join(', ')} have changed since the last deploy.`;
     }
   }
@@ -485,7 +500,7 @@ export default class NetworkController {
   // Proxy model
   private async _changeProxiesAdmin(proxies: ProxyInterface[], newAdmin: string, project: SimpleProject | AppProject = null): Promise<void> {
     if (!project) project = this.project;
-    await allPromisesOrError(_.map(proxies, async (aProxy) => {
+    await allPromisesOrError(map(proxies, async (aProxy) => {
       await project.changeProxyAdmin(aProxy.address, newAdmin);
       this.networkFile.updateProxy(aProxy, (anotherProxy) => ({ ...anotherProxy, admin: newAdmin }));
     }));
@@ -498,14 +513,14 @@ export default class NetworkController {
     await this.fetchOrDeploy(this.currentVersion);
 
     // Check if there is any migrate method in the contracts and warn the user to call it
-    const contracts = _.uniqWith(_.map(proxies, (p) => [p.package, p.contract]), _.isEqual);
-    _.forEach(contracts, ([aPackageName, contractName]) =>
+    const contracts = uniqWith(map(proxies, (p) => [p.package, p.contract]), isEqual);
+    forEach(contracts, ([aPackageName, contractName]) =>
       this._checkUpgrade(this.localController.getContractClass(aPackageName, contractName), initMethod, initArgs)
     );
 
     // Update all proxies loaded
     await allPromisesOrError(
-      _.map(proxies, (proxy) => this._upgradeProxy(proxy, initMethod, initArgs))
+      map(proxies, (proxy) => this._upgradeProxy(proxy, initMethod, initArgs))
     );
 
     return proxies;
@@ -563,7 +578,7 @@ export default class NetworkController {
       address: proxyAddress
     });
 
-    if (_.isEmpty(proxies)) {
+    if (isEmpty(proxies)) {
       log.info(`No contract instances that match${criteriaDescription} were found`);
       return [];
     }
@@ -572,7 +587,7 @@ export default class NetworkController {
     const expectedOwner = this.isPublished ? this.appAddress : this.txParams.from;
     const ownedProxies = proxies.filter((proxy) => !proxy.admin || !expectedOwner || proxy.admin === expectedOwner);
 
-    if (_.isEmpty(ownedProxies)) {
+    if (isEmpty(ownedProxies)) {
       log.info(`No contract instances that match${criteriaDescription} are owned by this application`);
     }
 
@@ -582,7 +597,7 @@ export default class NetworkController {
   // Dependency Controller
   public async deployDependencies(): Promise<void> {
     await allPromisesOrError(
-      _.map(this.packageFile.dependencies, (version, dep) => this.deployDependencyIfNeeded(dep, version))
+      map(this.packageFile.dependencies, (version, dep) => this.deployDependencyIfNeeded(dep, version))
     );
   }
 
@@ -606,9 +621,9 @@ export default class NetworkController {
 
   // DependencyController
   public async handleDependenciesLink(): Promise<void> {
-    await allPromisesOrError(_.concat(
-      _.map(this.packageFile.dependencies, (version, dep) => this.linkDependency(dep, version)),
-      _.map(this.networkFile.dependenciesNamesMissingFromPackage(), (dep) => this.unlinkDependency(dep))
+    await allPromisesOrError(concat(
+      map(this.packageFile.dependencies, (version, dep) => this.linkDependency(dep, version)),
+      map(this.networkFile.dependenciesNamesMissingFromPackage(), (dep) => this.unlinkDependency(dep))
     ));
   }
 

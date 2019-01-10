@@ -1,4 +1,8 @@
-import _ from 'lodash';
+import some from 'lodash.some';
+import reverse from 'lodash.reverse';
+import includes from 'lodash.includes';
+import isEqual from 'lodash.isequal';
+
 import { getBuildArtifacts, BuildArtifacts } from '../artifacts/BuildArtifacts';
 import ContractFactory from '../artifacts/ContractFactory';
 
@@ -80,7 +84,7 @@ export default class ContractAST {
 
   public getLinearizedBaseContracts(mostDerivedFirst: boolean = false): Node[] {
     const contracts = this.getContractNode().linearizedBaseContracts.map((id) => this.getNode(id, 'ContractDefinition'));
-    return mostDerivedFirst ? contracts : _.reverse(contracts);
+    return mostDerivedFirst ? contracts : reverse(contracts);
   }
 
   public getNode(id: string, type: string): Node | never {
@@ -115,10 +119,10 @@ export default class ContractAST {
   private _collectNodes(node: Node): void {
 
     // Return if we have already seen this node
-    if (_.some(this.nodes[node.id] || [], (n) => _.isEqual(n, node))) return;
+    if (some(this.nodes[node.id] || [], (n) => isEqual(n, node))) return;
 
     // Only process nodes of the filtered types (or SourceUnits)
-    if (node.nodeType !== 'SourceUnit' && this.nodesFilter && !_.includes(this.nodesFilter, node.nodeType))  return;
+    if (node.nodeType !== 'SourceUnit' && this.nodesFilter && !includes(this.nodesFilter, node.nodeType))  return;
 
     // Add node to collection with this id otherwise
     if (!this.nodes[node.id]) this.nodes[node.id] = [];

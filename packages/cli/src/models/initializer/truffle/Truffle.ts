@@ -1,4 +1,5 @@
-import _ from 'lodash';
+import pickBy from 'lodash.pickby';
+import pick from 'lodash.pick';
 import { promisify } from 'util';
 import { FileSystem } from 'zos-lib';
 
@@ -29,19 +30,13 @@ const Truffle = {
     return config.contracts_build_directory;
   },
 
-  getSolcSettings(): any {
-    const config = this.getConfig();
-    const compilerSettings = config.compilers || {};
-    return compilerSettings.solc;
-  },
-
   getProviderAndDefaults(): any {
     const config = this.getConfig();
     const TruffleResolver = require('truffle-resolver');
     config.resolver = new TruffleResolver(config);
     const { provider, resolver } = this._setNonceTrackerIfNeeded(config);
 
-    const artifactDefaults = _.pickBy(_.pick(resolver.options, 'from', 'gas', 'gasPrice'));
+    const artifactDefaults = pickBy(pick(resolver.options, 'from', 'gas', 'gasPrice'));
     if (artifactDefaults.from) artifactDefaults.from = artifactDefaults.from.toLowerCase();
     return { provider, artifactDefaults };
   },

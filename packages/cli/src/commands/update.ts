@@ -1,4 +1,5 @@
-import _ from 'lodash';
+import pickBy from 'lodash.pickby';
+
 import update from '../scripts/update';
 import { parseInit } from '../utils/input';
 import { fromContractFullName } from '../utils/naming';
@@ -33,7 +34,7 @@ async function action(contractFullNameOrAddress: string, options: any): Promise<
     ({ contract: contractAlias, package: packageName } = fromContractFullName(contractFullNameOrAddress));
   }
 
-  const args = _.pickBy({ contractAlias, packageName, proxyAddress, initMethod, initArgs, all, force });
+  const args = pickBy({ contractAlias, packageName, proxyAddress, initMethod, initArgs, all, force });
   const { network, txParams } = await ConfigVariablesInitializer.initNetworkConfiguration(options);
   await update({ ...args, network, txParams });
   if (!options.dontExitProcess && process.env.NODE_ENV !== 'test') process.exit(0);

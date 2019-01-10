@@ -1,4 +1,4 @@
-import _ from 'lodash';
+import isEmpty from 'lodash.isempty';
 
 import Proxy from '../proxy/Proxy';
 import Logger from '../utils/Logger';
@@ -44,7 +44,7 @@ export default class SimpleProject  {
   }
 
   public async createProxy(contractClass, { packageName, contractName, initMethod: initMethodName, initArgs, redeployIfChanged }: ContractInterface = {}): Promise<ContractWrapper> {
-    if (!_.isEmpty(initArgs) && !initMethodName) initMethodName = 'initialize';
+    if (!isEmpty(initArgs) && !initMethodName) initMethodName = 'initialize';
     const implementationAddress = await this._getOrDeployImplementation(contractClass, packageName, contractName, redeployIfChanged);
     const initCallData = this._getAndLogInitCallData(contractClass, initMethodName, initArgs, implementationAddress, 'Creating');
     const proxy = await Proxy.deploy(implementationAddress, initCallData, this.txParams);

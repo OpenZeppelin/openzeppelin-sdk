@@ -1,7 +1,7 @@
 'use strict'
 require('../../setup')
 
-import _ from 'lodash';
+import times from 'lodash.times';
 import sinon from 'sinon';
 import axios from 'axios';
 import { setInterval } from 'timers';

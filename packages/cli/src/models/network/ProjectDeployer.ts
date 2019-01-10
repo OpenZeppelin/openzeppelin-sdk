@@ -1,4 +1,4 @@
-import _ from 'lodash';
+import forEach from 'lodash.foreach';
 import { AppProject, PackageProject, SimpleProject, App, Package, ImplementationDirectory } from 'zos-lib';
 
 import NetworkController from './NetworkController';
@@ -60,10 +60,10 @@ export class SimpleProjectDeployer extends BaseProjectDeployer {
   public async fetchOrDeploy(): Promise<SimpleProject> {
     this.project = new SimpleProject(this.packageFile.name, this.txParams);
     this.networkFile.version = this.requestedVersion;
-    _.forEach(this.networkFile.contracts, (contractInfo, contractAlias) => {
+    forEach(this.networkFile.contracts, (contractInfo, contractAlias) => {
       this.project.registerImplementation(contractAlias, contractInfo);
     });
-    _.forEach(this.networkFile.dependencies, (dependencyInfo, dependencyName) => {
+    forEach(this.networkFile.dependencies, (dependencyInfo, dependencyName) => {
       this.project.setDependency(dependencyName, dependencyInfo.package, dependencyInfo.version);
     });
 

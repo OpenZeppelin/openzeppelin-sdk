@@ -1,4 +1,5 @@
-import _ from 'lodash';
+import pickBy from 'lodash.pickby';
+
 import setAdmin from '../scripts/set-admin';
 import { fromContractFullName } from '../utils/naming';
 import ConfigVariablesInitializer from '../models/initializer/ConfigVariablesInitializer';
@@ -31,7 +32,7 @@ async function action(contractFullNameOrAddress: string, newAdmin: string, optio
     ({ contract: contractAlias, package: packageName } = fromContractFullName(contractFullNameOrAddress));
   }
 
-  const args = _.pickBy({ contractAlias, packageName, proxyAddress, newAdmin });
+  const args = pickBy({ contractAlias, packageName, proxyAddress, newAdmin });
   const { network, txParams } = await ConfigVariablesInitializer.initNetworkConfiguration(options);
   await setAdmin({ ...args, network, txParams });
   if (!options.dontExitProcess && process.env.NODE_ENV !== 'test') process.exit(0);

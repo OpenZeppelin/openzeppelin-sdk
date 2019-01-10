@@ -1,4 +1,12 @@
-import _ from 'lodash';
+import findIndex from 'lodash.findindex';
+import isEmpty from 'lodash.isempty';
+import isEqual from 'lodash.isequal';
+import difference from 'lodash.difference';
+import flatMap from 'lodash.flatmap';
+import map from 'lodash.map';
+import filter from 'lodash.filter';
+import find from 'lodash.find';
+
 import { Logger, FileSystem as fs, bytecodeDigest, bodyCode, constructorCode, semanticVersionToString, ContractWrapper } from 'zos-lib';
 import { fromContractFullName, toContractFullName } from '../../utils/naming';
 import { ZOS_VERSION, checkVersion } from './ZosVersion';
@@ -166,11 +174,11 @@ export default class ZosNetworkFile {
   }
 
   public hasSolidityLib(libName: string): boolean {
-    return !_.isEmpty(this.solidityLib(libName));
+    return !isEmpty(this.solidityLib(libName));
   }
 
   public solidityLibsMissing(libs: any): string[] {
-    return _.difference(Object.keys(this.solidityLibs), libs);
+    return difference(Object.keys(this.solidityLibs), libs);
   }
 
   public getSolidityLibOrContract(aliasOrName: string): ContractInterface | SolidityLibInterface {
@@ -201,22 +209,22 @@ export default class ZosNetworkFile {
   }
 
   public hasDependency(name: string): boolean {
-    return !_.isEmpty(this.getDependency(name));
+    return !isEmpty(this.getDependency(name));
   }
 
   public hasDependencies(): boolean {
-    return !_.isEmpty(this.dependencies);
+    return !isEmpty(this.dependencies);
   }
 
   public getProxies({ package: packageName, contract, address }: ProxyInterface = {}): ProxyInterface[] {
-    if (_.isEmpty(this.data.proxies)) return [];
-    const allProxies = _.flatMap(this.data.proxies || {}, (proxiesList, fullname) => (
-      _.map(proxiesList, (proxyInfo) => ({
+    if (isEmpty(this.data.proxies)) return [];
+    const allProxies = flatMap(this.data.proxies || {}, (proxiesList, fullname) => (
+      map(proxiesList, (proxyInfo) => ({
         ...fromContractFullName(fullname),
         ...proxyInfo
       }))
     ));
-    return _.filter(allProxies, (proxy) => (
+    return filter(allProxies, (proxy) => (
       (!packageName || proxy.package === packageName) &&
       (!contract || proxy.contract === contract) &&
       (!address || proxy.address === address)
@@ -225,7 +233,7 @@ export default class ZosNetworkFile {
 
   public getProxy(address: string): ProxyInterface {
     const allProxies = this.getProxies();
-    return _.find(allProxies, { address });
+    return find(allProxies, { address });
   }
 
   public contract(alias: string): ContractInterface {
@@ -233,7 +241,7 @@ export default class ZosNetworkFile {
   }
 
   public contractAliasesMissingFromPackage(): any[] {
-    return _.difference(this.contractAliases, this.packageFile.contractAliases);
+    return difference(this.contractAliases, this.packageFile.contractAliases);
   }
 
   public isCurrentVersion(version: string): boolean {
@@ -241,15 +249,15 @@ export default class ZosNetworkFile {
   }
 
   public hasContract(alias: string): boolean {
-    return !_.isEmpty(this.contract(alias));
+    return !isEmpty(this.contract(alias));
   }
 
   public hasContracts(): boolean {
-    return !_.isEmpty(this.data.contracts);
+    return !isEmpty(this.data.contracts);
   }
 
   public hasProxies(filter: any = {}): boolean {
-    return !_.isEmpty(this.getProxies(filter));
+    return !isEmpty(this.getProxies(filter));
   }
 
   public hasMatchingVersion(): boolean {
@@ -257,7 +265,7 @@ export default class ZosNetworkFile {
   }
 
   public dependenciesNamesMissingFromPackage(): any[] {
-    return _.difference(this.dependenciesNames, this.packageFile.dependenciesNames);
+    return difference(this.dependenciesNames, this.packageFile.dependenciesNames);
   }
 
   public dependencyHasCustomDeploy(name: string): boolean {
@@ -385,7 +393,7 @@ export default class ZosNetworkFile {
   }
 
   public _indexOfProxy(fullname: string, address: string): number {
-    return _.findIndex(this.data.proxies[fullname], { address });
+    return findIndex(this.data.proxies[fullname], { address });
   }
 
   public _proxiesOf(fullname: string): ProxyInterface[] {
@@ -402,7 +410,7 @@ export default class ZosNetworkFile {
 
   public _hasChanged(): boolean {
     const currentNetworkFile = fs.parseJsonIfExists(this.fileName);
-    return !_.isEqual(this.data, currentNetworkFile);
+    return !isEqual(this.data, currentNetworkFile);
   }
 
   public _exists(): boolean {

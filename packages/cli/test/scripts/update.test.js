@@ -1,7 +1,7 @@
 'use strict'
 require('../setup')
 
-import _ from 'lodash';
+import mapKeys from 'lodash.mapkeys';
 import { Contracts, Proxy } from "zos-lib";
 import CaptureLogs from '../helpers/captureLogs';
 
@@ -39,7 +39,7 @@ contract('update script', function([_skipped, owner, anotherAccount]) {
     if (version) {
       proxyInfo.version.should.eq(version);
     }
-    
+
     if (value) {
       const proxy = ImplV1.at(proxyInfo.address);
       const actualValue = await proxy.value();
@@ -178,28 +178,28 @@ contract('update script', function([_skipped, owner, anotherAccount]) {
       beforeEach('capturing log output', function () {
         this.logs = new CaptureLogs();
       });
-  
+
       afterEach(function () {
         this.logs.restore();
       });
-  
+
       it('should warn when not migrating a contract with migrate method', async function() {
         await update({ contractAlias: 'Impl', network, txParams, networkFile: this.networkFile });
         this.logs.errors.should.have.lengthOf(1);
         this.logs.errors[0].should.match(/remember running the migration/i);
       });
-  
+
       it('should warn when not migrating a contract that inherits from one with a migrate method', async function() {
         await update({ contractAlias: 'WithLibraryImpl', network, txParams, networkFile: this.networkFile });
         this.logs.errors.should.have.lengthOf(1);
         this.logs.errors[0].should.match(/remember running the migration/i);
       });
-  
+
       it('should not warn when migrating a contract', async function() {
         await update({ contractAlias: 'Impl', network, txParams, initMethod: 'migrate', initArgs: [42], networkFile: this.networkFile });
         this.logs.errors.should.have.lengthOf(0);
       });
-  
+
       it('should not warn when a contract has no migrate method', async function() {
         await add({ contractsData: [{ name: 'WithLibraryImplV1', alias: 'NoMigrate' }], packageFile: this.packageFile });
         await push({ network, txParams, networkFile: this.networkFile });
@@ -223,7 +223,7 @@ contract('update script', function([_skipped, owner, anotherAccount]) {
       await push({ network, txParams, deployDependencies: true, networkFile: this.networkFile });
 
       // We modify the proxies' package to v2, so we can upgrade them, simulating an upgrade to mock-stdlib-undeployed
-      this.networkFile.data.proxies = _.mapKeys(this.networkFile.data.proxies, (value, key) => key.replace('mock-stdlib-undeployed', 'mock-stdlib-undeployed-2'))
+      this.networkFile.data.proxies = mapKeys(this.networkFile.data.proxies, (value, key) => key.replace('mock-stdlib-undeployed', 'mock-stdlib-undeployed-2'))
     });
 
     it('should upgrade the version of a proxy given its address', async function() {
