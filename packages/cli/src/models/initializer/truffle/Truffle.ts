@@ -30,12 +30,6 @@ const Truffle = {
     return config.contracts_build_directory;
   },
 
-  getSolcSettings(): any {
-    const config = this.getConfig();
-    const compilerSettings = config.compilers || {};
-    return compilerSettings.solc;
-  },
-
   getProviderAndDefaults(): any {
     const config = this.getConfig();
     const TruffleResolver = require('truffle-resolver');

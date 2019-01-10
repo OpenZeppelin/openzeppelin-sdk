@@ -1,7 +1,7 @@
 require('../../setup');
 
-import zipWith from 'lodash.zipwith';
 import BN from 'bignumber.js';
+import zipWith from 'lodash.zipwith';
 import encodeCall, { decodeCall } from '../../../src/helpers/encodeCall';
 
 const FUNCTION_NAME = 'myFunction';
@@ -172,7 +172,8 @@ function assertGoodEncoding(types, values) {
   const encoded = encodeCall(FUNCTION_NAME, types, values).substring(10); // Remove signature hash.
   const decoded = decodeCall(types, `0x${encoded}`);
   if(values.length !== decoded.length) throw new Error('Invalid encoding/decoding: Mismatch in number of encoded and decoded values.');
-    zipWith(values, decoded, (value, decodedValue) => {
+
+  zipWith(values, decoded, (value, decodedValue) => {
     if(Buffer.isBuffer(value)) value = `0x${value.toString('hex')}`;
     if(value.toString() != decodedValue.toString()) throw new Error(`Invalid encoding/decoding. Encoded: ${value}, Decoded: ${decodedValue}`);
   });
