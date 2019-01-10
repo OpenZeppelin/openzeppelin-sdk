@@ -81,7 +81,6 @@
     "chai-as-promised": "^7.1.1",
     "chai-bignumber": "^2.0.2",
     "lodash.mapkeys": "^4.6.0",
-    "lodash.zipwith": "^4.2.0",
     "mock-stdlib": "file:./test/mocks/mock-stdlib",
     "mock-stdlib-2": "file:./test/mocks/mock-stdlib-2",
     "mock-stdlib-invalid": "file:./test/mocks/mock-stdlib-invalid",
