@@ -21,7 +21,7 @@ export default async function status({ network, txParams = {}, networkFile }: St
 
 // TODO: Find a nice home for all these functions :)
 async function appInfo(controller: NetworkController): Promise<boolean> {
-  if (controller.isLightweight) return true;
+  if (!controller.isPublished) return true;
 
   if (!controller.appAddress) {
     log.warn(`Application is not yet deployed to the network`);
@@ -35,7 +35,7 @@ async function appInfo(controller: NetworkController): Promise<boolean> {
 }
 
 async function versionInfo(networkFile: ZosNetworkFile): Promise<boolean> {
-  if (networkFile.isLightweight) return true;
+  if (!networkFile.isPublished) return true;
   if (networkFile.hasMatchingVersion()) {
     log.info(`- Deployed version ${networkFile.version} matches the latest one defined`);
     return true;
@@ -74,7 +74,7 @@ async function contractsInfo(controller: NetworkController): Promise<void> {
 }
 
 async function dependenciesInfo(networkFile: ZosNetworkFile): Promise<void> {
-  if (networkFile.isLightweight) return;
+  if (!networkFile.isPublished) return;
   const packageFile = networkFile.packageFile;
   if (!packageFile.hasDependencies() && !networkFile.hasDependencies()) return;
   log.info('Application dependencies:');

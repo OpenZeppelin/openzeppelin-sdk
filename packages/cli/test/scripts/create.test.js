@@ -117,13 +117,8 @@ contract('create script', function([_, owner]) {
     });
 
     it('should initialize a proxy using scientific notation', async function() {
-      const proxy = await createProxy({ contractAlias, network, txParams, initMethod: 'initialize', initArgs: ["20e10"], networkFile: this.networkFile });
+      const proxy = await createProxy({ contractAlias, network, txParams, initMethod: 'initialize', initArgs: [Number("20e10")], networkFile: this.networkFile });
       (await proxy.value()).toString().should.be.eq('200000000000');
-    });
-
-    it('should initialize a proxy using large number on scientific notation', async function() {
-      const proxy = await createProxy({ contractAlias, network, txParams, initMethod: 'initialize', initArgs: ["20e70"], networkFile: this.networkFile });
-      (await proxy.value()).toString().should.be.eq('2e+71');
     });
 
     describe('warnings', function () {
@@ -236,7 +231,7 @@ contract('create script', function([_, owner]) {
     });
   }
   
-  describe('on lightweight app', function () {
+  describe('on unpublished project', function () {
     beforeEach('setup', async function() {
       this.packageFile = new ZosPackageFile('test/mocks/packages/package-empty.zos.json')
       this.packageFile.version = version
@@ -246,7 +241,7 @@ contract('create script', function([_, owner]) {
     shouldHandleCreateScript();
   })
 
-  describe('on full app', function () {
+  describe('on published project', function () {
     beforeEach('setup', async function() {
       this.packageFile = new ZosPackageFile('test/mocks/packages/package-empty.zos.json')
       this.packageFile.version = version

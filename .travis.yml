@@ -11,7 +11,10 @@ cache:
   - "$HOME/.npm"
   - node_modules
   - packages/lib/node_modules
+  - packages/lib/lib
   - packages/cli/node_modules
+  - packages/cli/lib
+  - packages/vouching/node_modules
   - packages/docs/node_modules
   - examples/lib-simple/node_modules
   - examples/lib-complex/node_modules
@@ -20,9 +23,7 @@ cache:
 
 stages:
   - prepare cache
-  - lib tests
   - tests
-  - integration tests
 
 jobs:
   include:
@@ -35,58 +36,65 @@ jobs:
         - npx lerna bootstrap --loglevel=debug
 
     # Initial stage with lib tests
-    - stage: lib tests
-      install: npx lerna bootstrap --loglevel=debug
+    - stage: tests
+      name: Lib tests
+      install: pwd # Override to avoid npm install.
       script: npx lerna run test --concurrency=1 --stream=true --scope=zos-lib
 
     # Test stage for Vouching
     - stage: tests
       name: Vouching tests
-      install: npx lerna bootstrap --loglevel=debug
+      install: npx lerna run compile-contracts
       script: npx lerna run test --concurrency=1 --stream=true --scope=zos-vouching
 
     # Test stage for CLI on Linux
     - stage: tests
       name: CLI tests on Linux
       os: linux
-      install: npx lerna bootstrap --loglevel=debug
+      install:
+        - npx lerna run compile-contracts --scope zos-lib
+        - npx lerna run compile-ts --scope zos-lib
       script: npx lerna run test --concurrency=1 --stream=true --scope=zos
 
     # Test stage for CLI on OSX
     - stage: tests
       name: CLI tests on OSX
       os: osx
-      install:
-        - npm install
-        - npx lerna bootstrap --loglevel=debug
+      install: 
+        - npx lerna run compile-contracts --scope zos-lib
+        - npx lerna run compile-ts --scope zos-lib
       script: npx lerna run test --concurrency=1 --stream=true --scope=zos
 
     # Test stage for complex-example
     - stage: tests
       name: Complex example tests
-      install: npx lerna bootstrap --loglevel=debug
+      install: npx lerna run compile-contracts
       script: npx lerna run test --concurrency=1 --stream=true --scope=zos-lib-complex-example
 
     # Integration tests on local geth
-    - stage: integration tests
+    - stage: tests
       name: Local geth node
       env: NETWORK=geth-dev
       before_install:
         - sudo add-apt-repository -y ppa:ethereum/ethereum
         - sudo apt-get update
         - sudo apt-get install -y ethereum
-      install: npx lerna bootstrap --loglevel=debug && npm --prefix tests/cli-app install tests/cli-app
+      install: 
+        - npx lerna run compile-contracts --scope zos-lib
+        - npm --prefix tests/cli-app install tests/cli-app
       script: cd tests/cli-app && ./scripts/test.sh
 
     # Integration tests on local geth with hdwallet-provider
-    - stage: integration tests
+    - stage: tests
       name: HDWallet on local geth node
       env: NETWORK=geth-dev-hdwallet
       before_install:
         - sudo add-apt-repository -y ppa:ethereum/ethereum
         - sudo apt-get update
         - sudo apt-get install -y ethereum
-      install: npx lerna bootstrap --loglevel=debug && npm --prefix tests/cli-app install tests/cli-app
+      install: 
+        - npx lerna run compile-contracts --scope zos-lib
+        - npm --prefix tests/cli-app install tests/cli-app
       script: cd tests/cli-app && ./scripts/test.sh
 
     # Rinkeby integration tests are temporarily disabled
