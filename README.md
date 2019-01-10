@@ -12,7 +12,6 @@ projects on Ethereum and every other EVM and eWASM-powered blockchain.
 This repository includes the ZeppelinOS
 [Command-Line Interface](https://github.com/zeppelinos/zos/tree/master/packages/cli#readme),
 [JavaScript Library](https://github.com/zeppelinos/zos/tree/master/packages/lib#readme),
-[Vouching Smart Contracts](https://github.com/zeppelinos/zos/tree/master/packages/vouching#readme),
 and [the sources for the Documentation Website](https://github.com/zeppelinos/zos/tree/master/packages/docs#readme).
 
 ## Install

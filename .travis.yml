@@ -14,7 +14,6 @@ cache:
   - packages/lib/lib
   - packages/cli/node_modules
   - packages/cli/lib
-  - packages/vouching/node_modules
   - packages/docs/node_modules
   - examples/lib-simple/node_modules
   - examples/lib-complex/node_modules
@@ -40,12 +39,6 @@ jobs:
       name: Lib tests
       install: pwd # Override to avoid npm install.
       script: npx lerna run test --concurrency=1 --stream=true --scope=zos-lib
-
-    # Test stage for Vouching
-    - stage: tests
-      name: Vouching tests
-      install: npx lerna run compile-contracts
-      script: npx lerna run test --concurrency=1 --stream=true --scope=zos-vouching
 
     # Test stage for CLI on Linux
     - stage: tests
