@@ -35,11 +35,11 @@ export default class ZWeb3 {
   }
 
   public static sha3(value: string): string {
-    return ZWeb3.web3().utils.sha3(value);
+    return Web3.utils.sha3(value);
   }
 
   public static isAddress(address: string): boolean {
-    return ZWeb3.web3().utils.isAddress(address);
+    return Web3.utils.isAddress(address);
   }
 
   public static eth(): any {
