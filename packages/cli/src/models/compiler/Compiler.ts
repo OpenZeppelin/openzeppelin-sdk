@@ -10,7 +10,7 @@ const Compiler = {
     if (!FileSystem.exists(truffleBin)) throw new Error(`Could not find truffle in ${truffleBin}. Please make sure you're placed in the right directory.`);
 
     return new Promise((resolve, reject) => {
-      exec(`${truffleBin} compile`, (error, stdout, stderr) => {
+      exec(`${truffleBin} compile --all`, (error, stdout, stderr) => {
         if (stdout) console.log(stdout)
         if (stderr) console.error(stderr)
         error ? reject(error) : resolve({ stdout, stderr })
