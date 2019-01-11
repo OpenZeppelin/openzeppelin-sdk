@@ -9,17 +9,11 @@ import utils from 'web3-utils';
 import BN from 'bignumber.js';
 
 contract.only('ZWeb3', accounts => {
-
-  // Web3 v1 operates with checksumed addresses and Truffle doesn't,
-  // so we need to convert them.
-  accounts = _.map(accounts, utils.toChecksumAddress);
+  accounts = _.map(accounts, utils.toChecksumAddress); // Required by Web3 v1.x.
   
-  let opts; 
-
   before('deploy dummy instance', async function () {
     const DummyImplementation = Contracts.getFromLocal('DummyImplementation')
     this.impl = await DummyImplementation.new({from: accounts[0]})
-    opts = { ...this.impl.constructor.txParams, from: accounts[0] };
   })
 
   describe('when it is not initialized', function () {
@@ -105,7 +99,7 @@ contract.only('ZWeb3', accounts => {
 
     describe('get storage', function () {
       it('tells the value stored at a certain storage slot', async function () {
-        await this.impl.methods.initialize(32, 'hello', [1, 2, 3]).send(opts)
+        await this.impl.methods.initialize(32, 'hello', [1, 2, 3]).send({from: accounts[0]})
         const storage = await ZWeb3.getStorageAt(this.impl.address, 0)
         storage.should.be.equal('0x20')
       })

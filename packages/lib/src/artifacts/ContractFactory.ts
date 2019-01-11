@@ -66,8 +66,7 @@ export default class ContractFactory {
     const self = this;
 
     return new Promise(function(resolve, reject) {
-      const contractClass: Contract = ZWeb3.contract(self.abi);
-      contractClass.options = {...contractClass.options, txParams};
+      const contractClass: Contract = ZWeb3.contract(self.abi, null, txParams);
       const tx = contractClass.deploy({data: txParams.data, arguments: args});
       let transactionHash;
       tx.send(txParams)
