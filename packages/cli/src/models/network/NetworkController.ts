@@ -176,10 +176,8 @@ export default class NetworkController {
   // Contract model
   public async uploadContract(contractAlias: string, contractClass: ContractFactory): Promise<void | never> {
     try {
-      const currentContractLibs = getSolidityLibNames(contractClass.bytecode);
-      const libraries = this.networkFile.getSolidityLibs(currentContractLibs);
+      await this._setSolidityLibs(contractClass);
       log.info(`Uploading ${contractClass.contractName} contract as ${contractAlias}`);
-      await contractClass.link(libraries);
       const contractInstance = await this.project.setImplementation(contractClass, contractAlias);
       this.networkFile.addContract(contractAlias, contractInstance, {
         warnings: contractClass.warnings,
@@ -190,6 +188,13 @@ export default class NetworkController {
       error.message = `${contractAlias} deployment failed with error: ${error.message}`;
       throw error;
     }
+  }
+
+  // Contract model || SolidityLib model
+  private async _setSolidityLibs(contractClass: ContractFactory): Promise<void> {
+    const currentContractLibs = getSolidityLibNames(contractClass.bytecode);
+    const libraries = this.networkFile.getSolidityLibs(currentContractLibs);
+    await contractClass.link(libraries);
   }
 
   // Contract model || SolidityLib model
@@ -429,6 +434,7 @@ export default class NetworkController {
     await this.fetchOrDeploy(this.currentVersion);
     if (!packageName) packageName = this.packageFile.name;
     const contractClass = this.localController.getContractClass(packageName, contractAlias);
+    await this._setSolidityLibs(contractClass);
     this.checkInitialization(contractClass, initMethod, initArgs);
     const proxyInstance = await this.project.createProxy(contractClass, { packageName, contractName: contractAlias, initMethod, initArgs });
     const implementationAddress = await Proxy.at(proxyInstance).implementation();
@@ -516,6 +522,7 @@ export default class NetworkController {
     try {
       const name = { packageName: proxy.package, contractName: proxy.contract };
       const contractClass = this.localController.getContractClass(proxy.package, proxy.contract);
+      await this._setSolidityLibs(contractClass);
       const currentImplementation = await Proxy.at(proxy).implementation();
       const contractImplementation = await this.project.getImplementation(name);
       const packageVersion = proxy.package === this.packageFile.name ? this.currentVersion : (await this.project.getDependencyVersion(proxy.package));

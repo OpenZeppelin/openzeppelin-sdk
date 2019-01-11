@@ -119,9 +119,9 @@ export default class SimpleProject  {
   public async _getOrDeployImplementation(contractClass: ContractFactory, packageName: string, contractName?: string, redeployIfChanged?: boolean): Promise<string | never> {
     if (!contractName) contractName = contractClass.contractName;
 
-    const implementation = await (!packageName || packageName === this.name
-      ? this._getOrDeployOwnImplementation(contractClass, contractName, redeployIfChanged)
-      : this._getDependencyImplementation(packageName, contractName));
+    const implementation = !packageName || packageName === this.name
+      ? await this._getOrDeployOwnImplementation(contractClass, contractName, redeployIfChanged)
+      : await this._getDependencyImplementation(packageName, contractName);
 
     if (!implementation) throw Error(`Could not retrieve or deploy contract ${packageName}/${contractName}`);
     return implementation;
