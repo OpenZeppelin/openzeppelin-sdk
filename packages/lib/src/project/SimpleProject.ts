@@ -75,7 +75,7 @@ export default class SimpleProject  {
     const implementation: any = await deploy(contractClass, [], this.txParams);
     await this.registerImplementation(contractName, {
       address: implementation.address,
-      bytecodeHash: bytecodeDigest(contractClass.bytecode)
+      bytecodeHash: bytecodeDigest(contractClass.deployedBinary)
     });
     return implementation;
   }
@@ -119,9 +119,9 @@ export default class SimpleProject  {
   public async _getOrDeployImplementation(contractClass: ContractFactory, packageName: string, contractName?: string, redeployIfChanged?: boolean): Promise<string | never> {
     if (!contractName) contractName = contractClass.contractName;
 
-    const implementation = await (!packageName || packageName === this.name
-      ? this._getOrDeployOwnImplementation(contractClass, contractName, redeployIfChanged)
-      : this._getDependencyImplementation(packageName, contractName));
+    const implementation = !packageName || packageName === this.name
+      ? await this._getOrDeployOwnImplementation(contractClass, contractName, redeployIfChanged)
+      : await this._getDependencyImplementation(packageName, contractName);
 
     if (!implementation) throw Error(`Could not retrieve or deploy contract ${packageName}/${contractName}`);
     return implementation;
@@ -129,7 +129,7 @@ export default class SimpleProject  {
 
   public async _getOrDeployOwnImplementation(contractClass: ContractFactory, contractName: string, redeployIfChanged?: boolean): Promise<string> {
     const existing: Implementation = this.implementations[contractName];
-    const contractChanged: boolean = existing && existing.bytecodeHash !== bytecodeDigest(contractClass.bytecode);
+    const contractChanged: boolean = existing && existing.bytecodeHash !== bytecodeDigest(contractClass.deployedBinary);
     const shouldRedeploy: boolean = !existing || (redeployIfChanged && contractChanged);
     if (!shouldRedeploy) return existing.address;
     const newInstance: any = await this.setImplementation(contractClass, contractName);

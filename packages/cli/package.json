@@ -76,6 +76,7 @@
     "zos-lib": "^2.1.0"
   },
   "devDependencies": {
+    "@types/lodash": "^4.14.119",
     "@types/mocha": "^5.2.5",
     "@types/node": "^10.12.12",
     "chai": "^4.1.2",

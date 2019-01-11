@@ -2,8 +2,7 @@ import fromPairs from 'lodash.frompairs';
 import map from 'lodash.map';
 import flatten from 'lodash.flatten';
 import uniq from 'lodash.uniq';
-
-import { FileSystem as fs, PackageProject, Contracts, getSolidityLibNames, Logger } from 'zos-lib';
+import { FileSystem as fs, PackageProject, Contracts, ContractFactory, getSolidityLibNames, Logger } from 'zos-lib';
 import semver from 'semver';
 import npm from 'npm-programmatic';
 
@@ -56,7 +55,7 @@ export default class Dependency {
     // this should all be handled at the Project level. Consider adding a setImplementations (plural) method
     // to Projects, which handle library deployment and linking for a set of contracts altogether.
 
-    const contracts = map(this.getPackageFile().contracts, (contractName, contractAlias) =>
+    const contracts = <Array<[ContractFactory, string]>>map(this.getPackageFile().contracts, (contractName, contractAlias) =>
       [Contracts.getFromNodeModules(this.name, contractName), contractAlias]
     );
 
