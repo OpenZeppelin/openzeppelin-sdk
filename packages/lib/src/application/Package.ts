@@ -1,5 +1,3 @@
-import _ from 'lodash';
-
 import Logger from '../utils/Logger';
 import Contracts from '../artifacts/Contracts';
 import ImplementationDirectory from '../application/ImplementationDirectory';

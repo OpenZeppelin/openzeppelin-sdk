@@ -109,7 +109,8 @@ and `StandaloneERC721` respectively. Both addresses were returned by the `create
 commands we ran above._
 
 ```console
-truffle(local)> MyLinkedContract.at('<my-linked-contract-address>').setToken('<my-erc721-address>')
+truffle(local)> MyLinkedContract.at('<my-linked-contract-address>').then(i => myLinkedContract = i)
+truffle(local)> myLinkedContract.setToken('<my-erc721-address>')
 ```
 
 Remember that the addresses of both your contract and the token, can also be 

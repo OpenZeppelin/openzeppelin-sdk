@@ -72,7 +72,7 @@ that our instance is working as expected:
 by the `create` command we ran above._
 
 ```console
-truffle(local)> myContract = MyContract.at('<your-contract-address>')
+truffle(local)> MyContract.at('<your-contract-address>').then(i => myContract = i)
 truffle(local)> myContract.x().then(x => x.toString())
 '42'
 
@@ -154,9 +154,9 @@ returned by the `create` command we ran in the previous section, which
 is the same as the one returned by the `update` command we ran above._
 
 ```console
-truffle(local)> myContract = MyContract.at('<your-contract-address>')
+truffle(local)> MyContract.at('<your-contract-address>').then(i => myContract = i)
 truffle(local)> myContract.increment()
-truffle(local)> myContract.x()
+truffle(local)> myContract.x().then(x => x.toString())
 43
 ```
 

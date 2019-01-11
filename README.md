@@ -1,7 +1,7 @@
 # ZeppelinOS _(zos)_
 
 [![standard-readme compliant](https://img.shields.io/badge/readme%20style-standard-brightgreen.svg)](https://github.com/RichardLitt/standard-readme)
-[![Build Status](https://travis-ci.org/zeppelinos/zos.svg?branch=master)](https://travis-ci.org/zeppelinos/zos)
+[![Build Status](https://travis-ci.com/zeppelinos/zos.svg?branch=master)](https://travis-ci.com/zeppelinos/zos)
 [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lernajs.io/)
 
 > ZeppelinOS smart contract platform.
@@ -12,7 +12,6 @@ projects on Ethereum and every other EVM and eWASM-powered blockchain.
 This repository includes the ZeppelinOS
 [Command-Line Interface](https://github.com/zeppelinos/zos/tree/master/packages/cli#readme),
 [JavaScript Library](https://github.com/zeppelinos/zos/tree/master/packages/lib#readme),
-[Vouching Smart Contracts](https://github.com/zeppelinos/zos/tree/master/packages/vouching#readme),
 and [the sources for the Documentation Website](https://github.com/zeppelinos/zos/tree/master/packages/docs#readme).
 
 ## Install
@@ -84,4 +83,4 @@ You can also follow the recent developments of the project in our
 
 ## License
 
-[MIT](LICENSE.md) © Zeppelin
+[MIT](LICENSE) © Zeppelin

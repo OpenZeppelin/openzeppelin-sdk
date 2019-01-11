@@ -36,7 +36,7 @@ interface GenericFunction {
 }
 
 /**
- * Wraps the _sendTransaction function and manages transaction retries
+ * Wraps the _sendTransaction function and manages transaction retries.
  * @param contractFn contract function to be executed as the transaction
  * @param args arguments of the call (if any)
  * @param txParams other transaction parameters (from, gasPrice, etc)
@@ -54,7 +54,7 @@ export async function sendTransaction(contractFn: GenericFunction, args: any[] =
 }
 
 /**
- * Wraps the _deploy and manages deploy retries
+ * Wraps the _deploy and manages deploy retries.
  * @param contract truffle contract to be deployed
  * @param args arguments of the constructor (if any)
  * @param txParams other transaction parameters (from, gasPrice, etc)
@@ -72,20 +72,20 @@ export async function deploy(contract: ContractFactory, args: any[] = [], txPara
 }
 
 /**
- * Sends a transaction to the blockchain with data precalculated
- * Uses the node's estimateGas RPC call, and adds a 20% buffer on top of it, capped by the block gas limit.
+ * Wraps the _sendDataTransaction function and manages transaction retries.
  * @param contract contract instance to send the tx to
  * @param txParams all transaction parameters (data, from, gasPrice, etc)
+ * @param retries number of data transaction retries
  */
-export async function sendDataTransaction(contract: ContractWrapper, txParams: any): Promise<TransactionReceiptWrapper> {
-  // TODO: Add retries similar to sendTransaction
+export async function sendDataTransaction(contract: ContractWrapper, txParams: any, retries: number = RETRY_COUNT): Promise<TransactionReceiptWrapper> {
   await fixGasPrice(txParams);
 
-  // If gas is set explicitly, use it
-  if (txParams.gas) return contract.sendTransaction(txParams);
-  // Estimate gas for the call and run the tx
-  const gas = await estimateActualGas({ to: contract.address, ...txParams });
-  return contract.sendTransaction({ gas, ...txParams });
+  try {
+    return await _sendDataTransaction(contract, txParams);
+  } catch (error) {
+    if (!error.message.match(/nonce too low/) || retries <= 0) throw error;
+    return sendDataTransaction(contract, txParams, retries - 1);
+  }
 }
 
 /**
@@ -97,12 +97,27 @@ export async function sendDataTransaction(contract: ContractWrapper, txParams: a
  */
 async function _sendTransaction(contractFn: GenericFunction, args: any[] = [], txParams: any = {}) {
   // If gas is set explicitly, use it
-  if (txParams.gas) return contractFn(...args, txParams);
+  if (txParams.gas || Contracts.getArtifactsDefaults().gas) return contractFn(...args, txParams);
 
   // Estimate gas for the call
   const gas = await estimateActualGasFnCall(contractFn, args, txParams);
 
   return contractFn(...args, { gas, ...txParams });
+}
+
+/**
+ * Sends a transaction to the blockchain with data precalculated, estimating the gas to be used.
+ * Uses the node's estimateGas RPC call, and adds a 20% buffer on top of it, capped by the block gas limit.
+ * @param contract contract instance to send the tx to
+ * @param txParams all transaction parameters (data, from, gasPrice, etc)
+ */
+async function _sendDataTransaction(contract: ContractWrapper, txParams: any = {}) {
+  // If gas is set explicitly, use it
+  if (txParams.gas || Contracts.getArtifactsDefaults().gas) return contract.sendTransaction(txParams);
+
+  // Estimate gas for the call and run the tx
+  const gas = await estimateActualGas({ to: contract.address, ...txParams });
+  return contract.sendTransaction({ gas, ...txParams });
 }
 
 /**
@@ -114,7 +129,7 @@ async function _sendTransaction(contractFn: GenericFunction, args: any[] = [], t
  */
 async function _deploy(contract: ContractFactory, args: any[] = [], txParams: any = {}): Promise<ContractWrapper> {
   // If gas is set explicitly, use it
-  if (txParams.gas) return contract.new(...args, txParams);
+  if (txParams.gas || Contracts.getArtifactsDefaults().gas) return contract.new(...args, txParams);
 
   const data: string = contract.getData(args, txParams);
   const gas: number = await estimateActualGas({ data, ...txParams });

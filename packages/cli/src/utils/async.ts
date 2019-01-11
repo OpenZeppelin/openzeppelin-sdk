@@ -1,4 +1,6 @@
-import _ from 'lodash';
+import map from 'lodash.map';
+import isEmpty from 'lodash.isempty';
+import isArray from 'lodash.isarray';
 
 export async function allPromisesOrError(promisesWithObjects: any[], toErrorMessage?: (error: any, object: any) => string): Promise<any[] | null | never> {
   const failures = [];
@@ -6,7 +8,7 @@ export async function allPromisesOrError(promisesWithObjects: any[], toErrorMess
     let promise;
     let object = null;
     try {
-      if (_.isArray(item)) {
+      if (isArray(item)) {
         [promise, object] = item;
       } else {
         promise = item;
@@ -19,10 +21,10 @@ export async function allPromisesOrError(promisesWithObjects: any[], toErrorMess
   };
 
   const results = await Promise.all(
-    _.map(promisesWithObjects, handlingFailure)
+    map(promisesWithObjects, handlingFailure)
   );
 
-  if(!_.isEmpty(failures)) {
+  if(!isEmpty(failures)) {
     if (failures.length === 1) throw failures[0].error;
     const message = failures.map(({ error, object }) => toErrorMessage ? toErrorMessage(error, object) : (error.message || error)).join('\n');
     throw Error(message);

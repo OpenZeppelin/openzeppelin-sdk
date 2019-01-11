@@ -220,8 +220,8 @@ or open a new one against the network where your legacy token is deployed. Then,
 commands of the previous step:
 
 ```console
-truffle(local)> erc20Migrator = ERC20Migrator.at('ERC20_MIGRATOR_ADDRESS')
-truffle(local)> upgradeableToken = MyUpgradeableToken.at('UPGRADEABLE_TOKEN_ADDRESS')
+truffle(local)> ERC20Migrator.at('ERC20_MIGRATOR_ADDRESS').then(i => erc20Migrator = i)
+truffle(local)> MyUpgradeableToken.at('UPGRADEABLE_TOKEN_ADDRESS').then(i => upgradeableToken = i)
 truffle(local)> erc20Migrator.beginMigration(upgradeableToken.address, { from: owner })
 truffle(local)> legacyToken.balanceOf(owner).then(b => balance = b)
 truffle(local)> legacyToken.approve(erc20Migrator.address, balance, { from: owner })

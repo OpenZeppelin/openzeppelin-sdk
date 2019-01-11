@@ -6,7 +6,7 @@ export default async function publish({ network, txParams = {}, networkFile }: P
   const controller = ControllerFor(network, txParams, networkFile);
 
   try {
-    await controller.toFullApp();
+    await controller.publish();
     controller.writeNetworkPackageIfNeeded();
   } catch(error) {
     const cb = () => controller.writeNetworkPackageIfNeeded();

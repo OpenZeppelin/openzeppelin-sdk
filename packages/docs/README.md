@@ -49,7 +49,7 @@ corresponding `.md` files in the `docs/docs/` directory.
 ## Maintainers
 
 * [@jcarpanelli](https://github.com/jcarpanelli/)
-* [@elopio](https://github.com/elopio/)
+* [@ajsantander](https://github.com/ajsantander/)
 
 ## Contribute
 

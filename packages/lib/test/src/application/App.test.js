@@ -293,7 +293,7 @@ contract('App', function (accounts) {
       });
 
       it('should return proxy creator instance', async function () {
-        const proxy = await this.app.createProxy(ProxyCreator, packageName, 'ProxyCreator', 'initialize', [this.app.address, packageName, contractName, '']);
+        const proxy = await this.app.createProxy(ProxyCreator, packageName, 'ProxyCreator', 'initialize', [this.app.address, packageName, contractName, Buffer.from('')]);
         (await proxy.name()).should.eq('ProxyCreator');
         const created = await proxy.created();
         (await ImplV1.at(created).version()).should.eq('V1');
