@@ -1,6 +1,7 @@
 pragma solidity ^0.4.24;
 
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
+import "./AdminUpgradeabilityProxy.sol";
 
 contract ProxyAdmin is Ownable {
   /**
@@ -32,8 +33,7 @@ contract ProxyAdmin is Ownable {
   /**
    * @dev Upgrades a proxy to the newest implementation of a contract.
    * @param proxy Proxy to be upgraded.
-   * @param packageName Name of the package where the contract is contained.
-   * @param contractName Name of the contract.
+   * @param implementation the address of the Implementation.
    */
   function upgrade(AdminUpgradeabilityProxy proxy, address implementation) public onlyOwner {
     proxy.upgradeTo(implementation);
@@ -43,7 +43,7 @@ contract ProxyAdmin is Ownable {
    * @dev Upgrades a proxy to the newest implementation of a contract and forwards a function call to it.
    * This is useful to initialize the proxied contract.
    * @param proxy Proxy to be upgraded.
-   * @param address Implementation contract address.
+   * @param implementation the address of the Implementation.
    * @param data Data to send as msg.data in the low level call.
    * It should include the signature and the parameters of the function to be called, as described in
    * https://solidity.readthedocs.io/en/v0.4.24/abi-spec.html#function-selector-and-argument-encoding.

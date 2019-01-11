@@ -105,7 +105,7 @@ contract App is Ownable {
    * This is useful to initialize the proxied contract.
    * @param packageName Name of the package where the contract is contained.
    * @param contractName Name of the contract.
-   * @param admin
+   * @param admin address of the proxy administrator.
    * @param data Data to send as msg.data to the corresponding implementation to initialize the proxied contract.
    * It should include the signature and the parameters of the function to be called, as described in
    * https://solidity.readthedocs.io/en/v0.4.24/abi-spec.html#function-selector-and-argument-encoding.
@@ -114,7 +114,7 @@ contract App is Ownable {
    */
    function create(string packageName, string contractName, address admin, bytes data) payable public returns (AdminUpgradeabilityProxy) {
      address implementation = getImplementation(packageName, contractName);
-     AdminUpgradeabilityProxy proxy = (new AdminUpgradeabilityProxy).value(msg.value)(implementation, data, admin);
+     AdminUpgradeabilityProxy proxy = (new AdminUpgradeabilityProxy).value(msg.value)(implementation, admin, data);
      emit ProxyCreated(proxy);
      return proxy;
   }
