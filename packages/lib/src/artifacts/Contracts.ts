@@ -31,7 +31,7 @@ export default class Contracts {
     return { ...Contracts.getArtifactsDefaults(), from: defaultFrom };
   }
 
-  public static getArtifactsDefaults(): Promise<any> {
+  public static getArtifactsDefaults(): any {
     return Contracts.artifactDefaults || {};
   }
 
