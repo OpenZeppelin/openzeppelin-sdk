@@ -13,7 +13,7 @@ contract.only('ZWeb3', accounts => {
   
   before('deploy dummy instance', async function () {
     const DummyImplementation = Contracts.getFromLocal('DummyImplementation')
-    this.impl = await DummyImplementation.new({from: accounts[0]})
+    this.impl = await DummyImplementation.new()
   })
 
   describe('when it is not initialized', function () {
@@ -99,7 +99,7 @@ contract.only('ZWeb3', accounts => {
 
     describe('get storage', function () {
       it('tells the value stored at a certain storage slot', async function () {
-        await this.impl.methods.initialize(32, 'hello', [1, 2, 3]).send({from: accounts[0]})
+        await this.impl.methods.initialize(32, 'hello', [1, 2, 3]).send()
         const storage = await ZWeb3.getStorageAt(this.impl.address, 0)
         storage.should.be.equal('0x20')
       })

@@ -14,8 +14,8 @@ require('chai')
   .use(helpers.assertions)
   .should()
 
-function setArtifactDefaults() {
-  const from = ZWeb3.eth().accounts[0]
+async function setArtifactDefaults() {
+  const from = await ZWeb3.defaultAccount();
 
   const DEFAULT_TESTING_TX_PARAMS = {
     from,
