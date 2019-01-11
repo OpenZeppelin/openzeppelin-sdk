@@ -1,6 +1,7 @@
 import glob from 'glob';
 import path from 'path';
 import ContractFactory from './ContractFactory';
+import ZWeb3 from './ZWeb3';
 
 export default class Contracts {
   private static DEFAULT_SYNC_TIMEOUT: number = 240000;
@@ -11,6 +12,7 @@ export default class Contracts {
   private static buildDir: string = Contracts.DEFAULT_BUILD_DIR;
   private static contractsDir: string = Contracts.DEFAULT_CONTRACTS_DIR;
   private static artifactDefaults: any = {};
+  private static defaultFromAddress: string;
 
   public static getSyncTimeout(): number {
     return Contracts.timeout || Contracts.DEFAULT_SYNC_TIMEOUT;
@@ -24,7 +26,12 @@ export default class Contracts {
     return Contracts.contractsDir || Contracts.DEFAULT_CONTRACTS_DIR;
   }
 
-  public static getArtifactsDefaults(): any {
+  public static async getDefaultTxParams(): Promise<any> {
+    const defaultFrom = Contracts.defaultFromAddress ? Contracts.defaultFromAddress : await ZWeb3.defaultAccount();
+    return { ...Contracts.getArtifactsDefaults(), from: defaultFrom };
+  }
+
+  public static getArtifactsDefaults(): Promise<any> {
     return Contracts.artifactDefaults || {};
   }
 
@@ -74,6 +81,6 @@ export default class Contracts {
 
   private static _getFromPath(targetPath: string): ContractFactory {
     const schema: any = require(targetPath);
-    return new ContractFactory(schema, Contracts.getSyncTimeout(), Contracts.getArtifactsDefaults());
+    return new ContractFactory(schema, Contracts.getSyncTimeout());
   }
 }

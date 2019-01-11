@@ -8,7 +8,7 @@ import _ from 'lodash';
 import utils from 'web3-utils';
 import BN from 'bignumber.js';
 
-contract.only('ZWeb3', accounts => {
+contract('ZWeb3', accounts => {
   accounts = _.map(accounts, utils.toChecksumAddress); // Required by Web3 v1.x.
   
   before('deploy dummy instance', async function () {

@@ -4,6 +4,7 @@ import decodeLogs from '../helpers/decodeLogs';
 import { getSolidityLibNames, hasUnlinkedVariables } from '../utils/Bytecode';
 import { StorageLayoutInfo } from '../validations/Storage';
 import { Contract, TransactionObject } from 'web3-eth-contract';
+import Contracts from './Contracts';
 
 interface ContractSchema {
   contractName: string;
@@ -45,14 +46,13 @@ export default class ContractFactory {
   public storageInfo: StorageLayoutInfo;
   public warnings: any;
 
-  constructor(schema: ContractSchema, timeout, txParams) {
+  constructor(schema: ContractSchema, timeout) {
     this.abi = schema.abi;
     this.ast = schema.ast;
     this.bytecode = schema.bytecode;
     this.deployedBytecode = schema.deployedBytecode;
     this.contractName = schema.contractName;
     this.timeout = timeout;
-    this.txParams = txParams;
     this._parseEvents();
     this._setBinaryIfPossible();
   }
@@ -61,7 +61,7 @@ export default class ContractFactory {
     this._validateNonEmptyBinary();
     this._validateNonUnlinkedLibraries();
 
-    const [args, txParams] = this._parseArguments(passedArguments);
+    const [args, txParams] = await this._parseArguments(passedArguments);
     if (!txParams.data) txParams.data = this.binary;
     const self = this;
 
@@ -108,24 +108,24 @@ export default class ContractFactory {
     const allEvents = contract.events.allEvents;
     const wrapper: ContractWrapper = { address, transactionHash, allEvents, constructor: this, methods: contract.methods };
     // this._promisifyABI(contract, wrapper);
-    this._setSendFunctions(contract, wrapper);
+    // this._setSendFunctions(contract, wrapper);
     return wrapper;
   }
 
-  private _setSendFunctions(instance, wrapper) {
-    const self = this;
+  // private _setSendFunctions(instance, wrapper) {
+  //   const self = this;
 
-    wrapper.sendTransaction = async function(txParams: any): Promise<TransactionReceiptWrapper> {
-      const tx = { to: instance.address, ...self.txParams, ...txParams };
-      const receipt = await ZWeb3.sendTransaction(tx);
-      // const receipt = await ZWeb3.getTransactionReceiptWithTimeout(tx, self.timeout);
-      return { tx, receipt, logs: decodeLogs(receipt.logs, self) };
-    };
+  //   wrapper.sendTransaction = async function(txParams: any): Promise<TransactionReceiptWrapper> {
+  //     const tx = { to: instance.address, ...self.txParams, ...txParams };
+  //     const receipt = await ZWeb3.sendTransaction(tx);
+  //     // const receipt = await ZWeb3.getTransactionReceiptWithTimeout(tx, self.timeout);
+  //     return { tx, receipt, logs: decodeLogs(receipt.logs, self) };
+  //   };
 
-    wrapper.send = async function(value: any): Promise<string> {
-      return wrapper.sendTransaction({ value });
-    };
-  }
+  //   wrapper.send = async function(value: any): Promise<string> {
+  //     return wrapper.sendTransaction({ value });
+  //   };
+  // }
 
   // private _promisifyABI(instance: any, wrapper: ContractWrapper): void {
   //   instance.abi.filter((item: any) => item.type === 'event').forEach((item: any) => wrapper[item.name] = instance[item.name]);
@@ -168,14 +168,15 @@ export default class ContractFactory {
   //   };
   // }
 
-  private _parseArguments(args: any[]): [any[], any] {
+  private async _parseArguments(args: any[]): Promise<[any[], any]> {
     const params = Array.prototype.slice.call(args);
     let givenTxParams = {};
     if (params.length > 0) {
       const lastArg = params[params.length - 1];
       if (typeof(lastArg) === 'object' && !Array.isArray(lastArg) && !BN.isBigNumber(lastArg)) givenTxParams = params.pop();
     }
-    const txParams = { ...this.txParams, ...givenTxParams };
+    const defaults = await Contracts.getDefaultTxParams();
+    const txParams = { ...defaults, ...givenTxParams };
     return [params, txParams];
   }
 
