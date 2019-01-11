@@ -10,7 +10,7 @@ const SampleGramps = Contracts.getFromLocal('SampleGramps');
 const SampleFather = Contracts.getFromLocal('SampleFather');
 const SampleChild = Contracts.getFromLocal('SampleChild');
 
-contract.only('Initializable', function () {
+contract('Initializable', function () {
   describe('basic testing without inheritance', function () {
     beforeEach('deploying', async function () {
       this.contract = await InitializableMock.new();
