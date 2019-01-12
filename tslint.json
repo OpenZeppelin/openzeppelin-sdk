@@ -47,7 +47,8 @@
       "no-var-requires": [false],
       "curly": [true, "ignore-same-line"],
       "adjacent-overload-signatures": [false],
-      "max-classes-per-file": [false]
+      "max-classes-per-file": [false],
+      "no-string-literal": [false]
     },
     "rulesDirectory": []
 }

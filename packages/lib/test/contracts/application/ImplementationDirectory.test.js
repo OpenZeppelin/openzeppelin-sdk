@@ -6,11 +6,17 @@ import Contracts from '../../../src/artifacts/Contracts'
 import { ZERO_ADDRESS } from '../../../src/utils/Addresses'
 import assertRevert from '../../../src/test/helpers/assertRevert'
 import shouldBehaveLikeOwnable from '../../../src/test/behaviors/Ownable'
+import utils from 'web3-utils';
+import lodash from 'lodash';
 
 const DummyImplementation = Contracts.getFromLocal('DummyImplementation')
 const ImplementationDirectory = Contracts.getFromLocal('ImplementationDirectory')
 
-contract('ImplementationDirectory', function([_, owner, anotherAddress]) {
+contract('ImplementationDirectory', function(accounts) {
+  accounts = lodash.map(accounts, utils.toChecksumAddress); // Required by Web3 v1.x.
+
+  const [_, owner, anotherAddress] = accounts;
+
   beforeEach(async function () {
     this.implementation_v0 = (await DummyImplementation.new()).address
     this.implementation_v1 = (await DummyImplementation.new()).address

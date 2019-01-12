@@ -5,10 +5,16 @@ import Contracts from '../../../src/artifacts/Contracts'
 import assertRevert from '../../../src/test/helpers/assertRevert'
 import shouldBehaveLikeOwnable from '../../../src/test/behaviors/Ownable'
 import { ZERO_ADDRESS } from '../../../src/utils/Addresses';
+import utils from 'web3-utils';
+import lodash from 'lodash';
 
 const Package = Contracts.getFromLocal('Package')
 
-contract('Package', ([_, owner, anotherAddress, contractAddress, anotherContractAddress]) => {
+contract('Package', (accounts) => {
+  accounts = lodash.map(accounts, utils.toChecksumAddress); // Required by Web3 v1.x.
+
+  const [_, owner, anotherAddress, contractAddress, anotherContractAddress] = accounts;
+
   const version = [1,0,0]
   const anotherVersion = [2,0,0]
   const contentURI = "0x102030"

@@ -15,7 +15,8 @@ export default function shouldManagePackages(accounts) {
   const contentURI = "0x10"
 
   const assertPackage = async function(packageName, expectedAddress, expectedVersion) {
-    const [address, version] = await this.app.methods.getPackage(packageName).call();
+    let { ['0']: address, ['1']: version } = await this.app.methods.getPackage(packageName).call();
+    version = version.map(Number)
     version.should.be.semverEqual(expectedVersion);
     address.should.eq(expectedAddress);
   }
@@ -63,8 +64,9 @@ export default function shouldManagePackages(accounts) {
 
     it('unsets a package', async function () {
       await this.app.methods.unsetPackage(this.packageName).send({ from: appOwner });
-      const [address, version] = await this.app.methods.getPackage(this.packageName).call();
-      version.should.be.semverEqual([0,0,0]);
+      let { ['0']: address, ['1']: version } = await this.app.methods.getPackage(this.packageName).call();
+      version = version.map(Number)
+      version.should.be.semverEqual([0, 0, 0]);
       address.should.be.zeroAddress;
     })
 
