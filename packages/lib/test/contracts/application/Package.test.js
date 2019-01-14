@@ -35,150 +35,150 @@ contract('Package', (accounts) => {
 
   describe('addVersion', function () {
     it('registers given implementation directory', async function () {
-      const { logs } = await this.package.addVersion(version, contractAddress, contentURI, { from })
+      const { events } = await this.package.methods.addVersion(version, contractAddress, contentURI).send({ from })
 
-      const [registeredDirectory, registeredContentURI] = await this.package.getVersion(version)
+      const { ['0']: registeredDirectory, ['1']: registeredContentURI } = await this.package.methods.getVersion(version).call()
       registeredDirectory.should.be.equal(contractAddress)
       registeredContentURI.should.eq(contentURI)
 
-      logs.should.have.lengthOf(1)
-      logs[0].event.should.be.equal('VersionAdded')
-      logs[0].args.semanticVersion.map(x => x.toNumber()).should.be.deep.equal(version)
-      logs[0].args.contractAddress.should.be.equal(contractAddress)
-      logs[0].args.contentURI.should.be.equal(contentURI)
+      const event = events['VersionAdded']
+      expect(event).to.be.an('object')
+      event.returnValues.semanticVersion.map(Number).should.be.deep.equal(version)
+      event.returnValues.contractAddress.should.be.equal(contractAddress)
+      event.returnValues.contentURI.should.be.equal(contentURI)
     })
 
     it('registers multiple versions', async function () {
-      await this.package.addVersion(version, contractAddress, contentURI, { from })
-      await this.package.addVersion(anotherVersion, anotherContractAddress, anotherContentURI, { from })
+      await this.package.methods.addVersion(version, contractAddress, contentURI).send({ from })
+      await this.package.methods.addVersion(anotherVersion, anotherContractAddress, anotherContentURI).send({ from })
 
-      const [newRegisteredDirectory, newRegisteredContentURI] = await this.package.getVersion(anotherVersion)
+      const { ['0']: newRegisteredDirectory, ['1']: newRegisteredContentURI } = await this.package.methods.getVersion(anotherVersion).call()
       newRegisteredDirectory.should.be.equal(anotherContractAddress)
       newRegisteredContentURI.should.eq(anotherContentURI)
     })
 
     it('accepts empty content URI', async function () {
-      await this.package.addVersion(version, contractAddress, "", { from })
-      const [_registeredDirectory, registeredContentURI] = await this.package.getVersion(version)
-      registeredContentURI.should.eq('0x')
+      await this.package.methods.addVersion(version, contractAddress, Buffer.from('')).send({ from })
+      const { ['0']: _registeredDirectory, ['1']: registeredContentURI } = await this.package.methods.getVersion(version).call()
+      assert.equal(registeredContentURI, null)
     })
 
     it('reverts if contract address is zero', async function () {
-      await assertRevert(this.package.addVersion(version, ZERO_ADDRESS, contentURI, { from }))
+      await assertRevert(this.package.methods.addVersion(version, ZERO_ADDRESS, contentURI).send({ from }))
     })
 
     it('reverts if version is zero', async function () {
-      await assertRevert(this.package.addVersion([0,0,0], contractAddress, contentURI, { from }))
+      await assertRevert(this.package.methods.addVersion([0,0,0], contractAddress, contentURI).send({ from }))
     })
 
     it('reverts if re-registering version', async function () {
-      await this.package.addVersion(version, contractAddress, contentURI, { from })
-      await assertRevert(this.package.addVersion(version, anotherContractAddress, contentURI, { from }))
+      await this.package.methods.addVersion(version, contractAddress, contentURI).send({ from })
+      await assertRevert(this.package.methods.addVersion(version, anotherContractAddress, contentURI).send({ from }))
     })
 
     it('reverts if called from another address', async function () {
-      await assertRevert(this.package.addVersion(version, contractAddress, contentURI, { from: anotherAddress }))
+      await assertRevert(this.package.methods.addVersion(version, contractAddress, contentURI).send({ from: anotherAddress }))
     })
   })
 
   describe('getVersion', function () {
     it('returns the registered version', async function () {
-      await this.package.addVersion(version, contractAddress, contentURI, { from: owner })
-      const [registeredDirectory, registeredContentURI] = await this.package.getVersion(version)
+      await this.package.methods.addVersion(version, contractAddress, contentURI).send({ from: owner })
+      const { ['0']: registeredDirectory, ['1']: registeredContentURI } = await this.package.methods.getVersion(version).call()
       registeredDirectory.should.be.equal(contractAddress)
       registeredContentURI.should.be.equal(contentURI)
     })
 
     it('returns zero if version is not registered', async function () {
-      const [registeredDirectory, registeredContentURI] = await this.package.getVersion(version)
+      const { ['0']: registeredDirectory, ['1']: registeredContentURI } = await this.package.methods.getVersion(version).call()
       registeredDirectory.should.be.zeroAddress
-      registeredContentURI.should.eq("0x")
+      assert.equal(registeredContentURI, null)
     })
   })
 
   describe('getContract', function () {
     it('returns the registered contract', async function () {
-      await this.package.addVersion(version, contractAddress, contentURI, { from: owner })
-      const registeredDirectory = await this.package.getContract(version)
+      await this.package.methods.addVersion(version, contractAddress, contentURI).send({ from: owner })
+      const registeredDirectory = await this.package.methods.getContract(version).call()
       registeredDirectory.should.be.equal(contractAddress)
     })
 
     it('returns zero address if version is not registered', async function () {
-      const registeredDirectory = await this.package.getContract(version)
+      const registeredDirectory = await this.package.methods.getContract(version).call()
       registeredDirectory.should.be.zeroAddress
     })
   })
 
   describe('hasVersion', function () {
     it('returns true if version is registered', async function () {
-      await this.package.addVersion(version, contractAddress, contentURI, { from: owner })
-      const hasVersion = await this.package.hasVersion(version)
+      await this.package.methods.addVersion(version, contractAddress, contentURI).send({ from: owner })
+      const hasVersion = await this.package.methods.hasVersion(version).call()
       hasVersion.should.be.true;
     })
 
     it('returns false if version is not registered', async function () {
-      const hasVersion = await this.package.hasVersion(version)
+      const hasVersion = await this.package.methods.hasVersion(version).call()
       hasVersion.should.be.false;
     })
   })
 
   describe('getLatest', function () {
     it('returns zero if no versions registered', async function () {
-      const [registeredVersion, registeredDirectory, registeredContentURI] = await this.package.getLatest();
-      registeredVersion.map(x => x.toNumber()).should.be.deep.eq([0,0,0])
+      const { ['0']: registeredVersion, ['1']: registeredDirectory, ['2']: registeredContentURI } = await this.package.methods.getLatest().call()
+      registeredVersion.map(Number).should.be.deep.eq([0,0,0])
       registeredDirectory.should.be.zeroAddress
-      registeredContentURI.should.be.eq('0x')
+      assert.equal(registeredContentURI, null)
     })
 
     it('returns full version info', async function () {
-      await this.package.addVersion(version, contractAddress, contentURI, { from })
-      const [registeredVersion, registeredDirectory, registeredContentURI] = await this.package.getLatest();
-      registeredVersion.map(x => x.toNumber()).should.be.deep.eq(version);
+      await this.package.methods.addVersion(version, contractAddress, contentURI).send({ from })
+      const { ['0']: registeredVersion, ['1']: registeredDirectory, ['2']: registeredContentURI } = await this.package.methods.getLatest().call()
+      registeredVersion.map(Number).should.be.deep.eq(version);
       registeredDirectory.should.be.equal(contractAddress)
       registeredContentURI.should.be.equal(contentURI)
     })
 
     for (const latestVersion of [[2,1,5], [2,2,3], [3,0,3]]) {
       it(`returns latest version ${latestVersion}`, async function () {
-        await this.package.addVersion(latestVersion, contractAddress, contentURI, { from })
-        await this.package.addVersion([1,0,0], contractAddress, contentURI, { from })
-        await this.package.addVersion([2,1,4], contractAddress, contentURI, { from })
-        const [registeredVersion] = await this.package.getLatest();
-        registeredVersion.map(x => x.toNumber()).should.be.deep.eq(latestVersion);
+        await this.package.methods.addVersion(latestVersion, contractAddress, contentURI).send({ from })
+        await this.package.methods.addVersion([1,0,0], contractAddress, contentURI).send({ from })
+        await this.package.methods.addVersion([2,1,4], contractAddress, contentURI).send({ from })
+        const { ['0']: registeredVersion } = await this.package.methods.getLatest().call()
+        registeredVersion.map(Number).should.be.deep.eq(latestVersion);
       })
     }
   })
 
   describe('getLatestByMajor', function () {
     it('returns zero if no version for that major is registered', async function () {
-      await this.package.addVersion(version, contractAddress, contentURI, { from })
-      const [registeredVersion, registeredDirectory, registeredContentURI] = await this.package.getLatestByMajor(3);
-      registeredVersion.map(x => x.toNumber()).should.be.deep.eq([0,0,0])
+      await this.package.methods.addVersion(version, contractAddress, contentURI).send({ from })
+      const { ['0']: registeredVersion, ['1']: registeredDirectory, ['2']: registeredContentURI } = await this.package.methods.getLatestByMajor(3).call()
+      registeredVersion.map(Number).should.be.deep.eq([0,0,0])
       registeredDirectory.should.be.zeroAddress
-      registeredContentURI.should.be.eq('0x')
+      assert.equal(registeredContentURI, null)
     })
 
     it('returns full version info', async function () {
-      await this.package.addVersion(version, contractAddress, contentURI, { from })
-      const [registeredVersion, registeredDirectory, registeredContentURI] = await this.package.getLatestByMajor(1);
-      registeredVersion.map(x => x.toNumber()).should.be.deep.eq(version);
+      await this.package.methods.addVersion(version, contractAddress, contentURI).send({ from })
+      const { ['0']: registeredVersion, ['1']: registeredDirectory, ['2']: registeredContentURI } = await this.package.methods.getLatestByMajor(1).call()
+      registeredVersion.map(Number).should.be.deep.eq(version);
       registeredDirectory.should.be.equal(contractAddress)
       registeredContentURI.should.be.equal(contentURI)
     })
 
     it('returns latest version by major', async function () {
-      await this.package.addVersion([3,0,0], contractAddress, contentURI, { from })
-      await this.package.addVersion([1,0,0], contractAddress, contentURI, { from })
-      await this.package.addVersion([1,2,0], contractAddress, contentURI, { from })
-      await this.package.addVersion([2,4,0], contractAddress, contentURI, { from })
-      await this.package.addVersion([2,1,0], contractAddress, contentURI, { from })
+      await this.package.methods.addVersion([3,0,0], contractAddress, contentURI).send({ from })
+      await this.package.methods.addVersion([1,0,0], contractAddress, contentURI).send({ from })
+      await this.package.methods.addVersion([1,2,0], contractAddress, contentURI).send({ from })
+      await this.package.methods.addVersion([2,4,0], contractAddress, contentURI).send({ from })
+      await this.package.methods.addVersion([2,1,0], contractAddress, contentURI).send({ from })
       
-      const [registeredVersionFor1] = await this.package.getLatestByMajor(1);
-      registeredVersionFor1.map(x => x.toNumber()).should.be.deep.eq([1,2,0])
-      const [registeredVersionFor2] = await this.package.getLatestByMajor(2);
-      registeredVersionFor2.map(x => x.toNumber()).should.be.deep.eq([2,4,0])
-      const [registeredVersionFor3] = await this.package.getLatestByMajor(3);
-      registeredVersionFor3.map(x => x.toNumber()).should.be.deep.eq([3,0,0])
+      const { ['0']: registeredVersionFor1 } = await this.package.methods.getLatestByMajor(1).call()
+      registeredVersionFor1.map(Number).should.be.deep.eq([1,2,0])
+      const { ['0']: registeredVersionFor2 } = await this.package.methods.getLatestByMajor(2).call()
+      registeredVersionFor2.map(Number).should.be.deep.eq([2,4,0])
+      const { ['0']: registeredVersionFor3 } = await this.package.methods.getLatestByMajor(3).call()
+      registeredVersionFor3.map(Number).should.be.deep.eq([3,0,0])
     })
   })
 })
