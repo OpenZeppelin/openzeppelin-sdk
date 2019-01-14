@@ -36,7 +36,7 @@ export default class Package {
 
   constructor(packageContract: PackageInterface, txParams: any = {}) {
     this.packageContract = packageContract;
-    this.txParams = txParams;
+    this.txParams = { ...txParams };
   }
 
   get contract(): ContractWrapper {
@@ -70,8 +70,8 @@ export default class Package {
   public async newVersion(version: string, content: string = ''): Promise<ImplementationDirectory> {
     log.info('Adding new version...');
     const semver: SemanticVersion = toSemanticVersion(version);
-    const directory: ImplementationDirectory = await ImplementationDirectory.deploy(this.txParams);
-    await sendTransaction(this.packageContract.addVersion, [semver, directory.address, content], this.txParams);
+    const directory: ImplementationDirectory = await ImplementationDirectory.deploy({ ...this.txParams });
+    await sendTransaction(this.packageContract.methods.addVersion, [semver, directory.address, Buffer.from(content)], { ...this.txParams});
     log.info(`Added version ${semver.join('.')}`);
     return directory;
   }
@@ -79,6 +79,6 @@ export default class Package {
   public async getDirectory(version: string): Promise<ImplementationDirectory | never> {
     if (!version) throw Error('Cannot get a directory from a package without specifying a version');
     const directoryAddress = await this.packageContract.getContract(toSemanticVersion(version));
-    return ImplementationDirectory.fetch(directoryAddress, this.txParams);
+    return ImplementationDirectory.fetch(directoryAddress, { ...this.txParams });
   }
 }

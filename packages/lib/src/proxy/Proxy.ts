@@ -30,19 +30,19 @@ export default class Proxy {
   constructor(contract: ProxyInterface, txParams: any = {}) {
     this.address = toAddress(contract);
     this.contract = contract;
-    this.txParams = txParams;
+    this.txParams = { ...txParams };
   }
 
   public async upgradeTo(address: string, migrateData: string | null): Promise<any> {
     await this.checkAdmin();
     return migrateData
-      ? sendTransaction(this.contract.upgradeToAndCall, [toAddress(address), migrateData], this.txParams)
-      : sendTransaction(this.contract.upgradeTo, [toAddress(address)], this.txParams);
+      ? sendTransaction(this.contract.methods.upgradeToAndCall, [toAddress(address), migrateData], this.txParams)
+      : sendTransaction(this.contract.methods.upgradeTo, [toAddress(address)], this.txParams);
   }
 
   public async changeAdmin(newAdmin: string): Promise<any> {
     await this.checkAdmin();
-    return sendTransaction(this.contract.changeAdmin, [newAdmin], this.txParams);
+    return sendTransaction(this.contract.methods.changeAdmin, [newAdmin], this.txParams);
   }
 
   public async implementation(): Promise<string> {

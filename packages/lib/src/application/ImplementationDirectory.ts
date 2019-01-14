@@ -39,7 +39,7 @@ export default class ImplementationDirectory {
 
   constructor(directory: DirectoryContract, txParams: any = {}) {
     this.directoryContract = directory;
-    this.txParams = txParams;
+    this.txParams = { ...txParams };
   }
 
   get contract(): DirectoryContract {
@@ -51,29 +51,29 @@ export default class ImplementationDirectory {
   }
 
   public async owner(): Promise<string> {
-    return this.directoryContract.owner(this.txParams);
+    return this.directoryContract.owner({ ...this.txParams });
   }
 
   public async getImplementation(contractName: string): Promise<string | never> {
     if (!contractName) throw Error('Contract name is required to retrieve an implementation');
-    return await this.directoryContract.getImplementation(contractName, this.txParams);
+    return await this.directoryContract.getImplementation(contractName, { ...this.txParams });
   }
 
   public async setImplementation(contractName: string, implementationAddress: string): Promise<any> {
     log.info(`Setting ${contractName} implementation ${implementationAddress}...`);
-    await sendTransaction(this.directoryContract.setImplementation, [contractName, implementationAddress], this.txParams);
+    await sendTransaction(this.directoryContract.methods.setImplementation, [contractName, implementationAddress], { ...this.txParams });
     log.info(`Implementation set ${implementationAddress}`);
   }
 
   public async unsetImplementation(contractName: string): Promise<any> {
     log.info(`Unsetting ${contractName} implementation...`);
-    await sendTransaction(this.directoryContract.unsetImplementation, [contractName], this.txParams);
+    await sendTransaction(this.directoryContract.methods.unsetImplementation, [contractName], { ...this.txParams });
     log.info(`${contractName} implementation unset`);
   }
 
   public async freeze(): Promise<any> {
     log.info('Freezing implementation directory...');
-    await sendTransaction(this.directoryContract.freeze, [], this.txParams);
+    await sendTransaction(this.directoryContract.methods.freeze, [], { ...this.txParams });
     log.info('Frozen');
   }
 

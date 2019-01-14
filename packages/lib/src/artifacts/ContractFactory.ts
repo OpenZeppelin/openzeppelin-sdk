@@ -63,6 +63,7 @@ export default class ContractFactory {
 
     const [args, txParams] = await this._parseArguments(passedArguments);
     if (!txParams.data) txParams.data = this.binary;
+
     const self = this;
 
     return new Promise(function(resolve, reject) {
@@ -89,7 +90,7 @@ export default class ContractFactory {
     this._validateNonEmptyBinary();
     this._validateNonUnlinkedLibraries();
     const contractClass = ZWeb3.contract(this.abi);
-    return contractClass.new.getData(...constructorArgs, { ...txParams, data: this.binary });
+    return contractClass.deploy({data: this.binary, arguments: constructorArgs}).encodeABI()
   }
 
   public link(libraries: { [libAlias: string]: string }): void {

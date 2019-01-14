@@ -6,7 +6,6 @@ import App from '../../../src/application/App';
 import ZWeb3 from '../../../src/artifacts/ZWeb3'
 import Package from '../../../src/application/Package'
 import Contracts from '../../../src/artifacts/Contracts'
-import expectEvent from 'openzeppelin-solidity/test/helpers/expectEvent'
 import { ZERO_ADDRESS } from '../../../src/utils/Addresses';
 import { ImplementationDirectory, Proxy } from '../../../src';
 import { deploy as deployContract } from '../../../src/utils/Transactions';
@@ -15,7 +14,7 @@ const ImplV1 = Contracts.getFromLocal('DummyImplementation');
 const ImplV2 = Contracts.getFromLocal('DummyImplementationV2');
 const ProxyCreator = Contracts.getFromLocal('ProxyCreator');
 
-contract('App', function (accounts) {
+contract.only('App', function (accounts) {
   const [_unused, owner, otherAdmin] = accounts;
   const txParams = { from: owner };
   const contractName = 'Impl';
@@ -38,10 +37,10 @@ contract('App', function (accounts) {
     beforeEach('setting package', setPackage)
 
     it('returns package info', async function () {
-      const packageInfo = await this.app.getPackage(packageName);
+      const packageInfo = await this.app.getPackage(packageName)
       packageInfo.package.address.should.eq(this.package.address)
       packageInfo.package.should.be.instanceof(Package)
-      packageInfo.version.should.be.semverEqual(version)
+      packageInfo.version.map(Number).should.be.semverEqual(version)
     })
 
     it('returns empty info if not exists', async function () {
@@ -64,15 +63,17 @@ contract('App', function (accounts) {
     })
   })
 
-  describe('setPackage', function () {
+  describe.only('setPackage', function () {
     it('logs package set', async function () {
       const thepackage = await Package.deploy(txParams)
       await thepackage.newVersion(version)
-      await expectEvent.inTransaction(
-        this.app.setPackage(packageName, thepackage.address, version),
-        'PackageChanged',
-        { providerName: packageName, package: thepackage.address, version: version }
-      )
+
+      const { events } = await this.app.setPackage(packageName, thepackage.address, version);
+      const event = events['PackageChanged'];
+      expect(event).to.be.an('object');
+      event.returnValues.providerName.should.be.equal(packageName);
+      event.returnValues.package.should.be.equal(thepackage.address);
+      event.returnValues.version.map(Number).should.be.semverEqual(version);
     })
 
     it('can set multiple packages', async function () {
@@ -92,12 +93,12 @@ contract('App', function (accounts) {
       provider2.address.should.eq(directory2.address);
     })
 
-    it('can overwrite package version', async function () {
+    it.only('can overwrite package version', async function () {
       await setPackage.apply(this)
       await this.package.newVersion(anotherVersion)
       await this.app.setPackage(packageName, this.package.address, anotherVersion)
       const packageInfo = await this.app.getPackage(packageName)
-      packageInfo.version.should.be.semverEqual(anotherVersion)
+      packageInfo.version.map(Number).should.be.semverEqual(anotherVersion)
     })
   })
 

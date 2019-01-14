@@ -97,12 +97,12 @@ export async function sendDataTransaction(contract: ContractWrapper, txParams: a
  */
 async function _sendTransaction(contractFn: GenericFunction, args: any[] = [], txParams: any = {}) {
   // If gas is set explicitly, use it
-  if (txParams.gas || Contracts.getArtifactsDefaults().gas) return contractFn(...args, txParams);
+  if (txParams.gas || Contracts.getArtifactsDefaults().gas) return contractFn(...args).send(txParams);
 
   // Estimate gas for the call
   const gas = await estimateActualGasFnCall(contractFn, args, txParams);
 
-  return contractFn(...args, { gas, ...txParams });
+  return contractFn(...args).send({ gas, ...txParams });
 }
 
 /**
@@ -131,8 +131,8 @@ async function _deploy(contract: ContractFactory, args: any[] = [], txParams: an
   // If gas is set explicitly, use it
   if (txParams.gas || Contracts.getArtifactsDefaults().gas) return contract.new(...args, txParams);
 
-  const data: string = contract.getData(args, txParams);
-  const gas: number = await estimateActualGas({ data, ...txParams });
+  const data = contract.getData(args, txParams);
+  const gas = await estimateActualGas({ data, ...txParams });
   return contract.new(...args, { gas, ...txParams });
 }
 
@@ -157,7 +157,7 @@ export async function estimateActualGasFnCall(contractFn: GenericFunction, args:
   // we are working with, if the txs are routed to different nodes.
   // See https://github.com/zeppelinos/zos/issues/192 for more info.
   try {
-    return await calculateActualGas(await contractFn.estimateGas(...args, txParams));
+    return await calculateActualGas(await contractFn(...args).estimateGas(txParams));
   } catch(error) {
     if (retries <= 0) throw Error(error);
     await sleep(RETRY_SLEEP_TIME);
@@ -194,13 +194,13 @@ async function fixGasPrice(txParams: any): Promise<any> {
   }
 }
 
-async function getBlockGasLimit(): Promise<any> {
+async function getBlockGasLimit(): Promise<number> {
   if (state.block) return state.block.gasLimit;
   state.block = await ZWeb3.getLatestBlock();
   return state.block.gasLimit;
 }
 
-async function calculateActualGas(estimatedGas): Promise<any> {
+async function calculateActualGas(estimatedGas: number): Promise<number> {
   const blockLimit: number = await getBlockGasLimit();
   let gasToUse = parseInt(`${estimatedGas * GAS_MULTIPLIER}`, 10);
   // Ganache has a bug (https://github.com/trufflesuite/ganache-core/issues/26) that causes gas
