@@ -15,7 +15,7 @@ const AppContract = Contracts.getFromLocal('App')
 const DummyImplementation = Contracts.getFromLocal('DummyImplementation')
 const DummyImplementationV2 = Contracts.getFromLocal('DummyImplementationV2')
 
-contract.only('App', (accounts) => {
+contract('App', (accounts) => {
   accounts = lodash.map(accounts, utils.toChecksumAddress); // Required by Web3 v1.x.
 
   const [_, appOwner, packageOwner, directoryOwner, anotherAccount] = accounts;
