@@ -15,7 +15,7 @@ const ImplV1 = Contracts.getFromLocal('DummyImplementation');
 const ImplV2 = Contracts.getFromLocal('DummyImplementationV2');
 const ProxyCreator = Contracts.getFromLocal('ProxyCreator');
 
-contract.only('App', function (accounts) {
+contract('App', function (accounts) {
   accounts = accounts.map(utils.toChecksumAddress); // Required by Web3 v1.x.
 
   const [_unused, owner, otherAdmin] = accounts;

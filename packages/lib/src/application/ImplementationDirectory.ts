@@ -51,12 +51,12 @@ export default class ImplementationDirectory {
   }
 
   public async owner(): Promise<string> {
-    return this.directoryContract.owner({ ...this.txParams });
+    return this.directoryContract.methods.owner().call({ ...this.txParams });
   }
 
   public async getImplementation(contractName: string): Promise<string | never> {
     if (!contractName) throw Error('Contract name is required to retrieve an implementation');
-    return await this.directoryContract.getImplementation(contractName, { ...this.txParams });
+    return await this.directoryContract.methods.getImplementation(contractName).call({ ...this.txParams });
   }
 
   public async setImplementation(contractName: string, implementationAddress: string): Promise<any> {
@@ -78,6 +78,6 @@ export default class ImplementationDirectory {
   }
 
   public async isFrozen(): Promise<boolean> {
-    return await this.directoryContract.frozen();
+    return await this.directoryContract.methods.frozen().call();
   }
 }
