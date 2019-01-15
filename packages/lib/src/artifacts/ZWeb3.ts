@@ -120,6 +120,15 @@ export default class ZWeb3 {
     return ZWeb3.eth().sendTransaction(params);
   }
 
+  public static sendTransactionWithoutReceipt(params: any): Promise<string> {
+    return new Promise((resolve, reject) => {
+      ZWeb3.eth().sendTransaction(params, (error, txHash) => {
+        if(error) reject(error.message);
+        else resolve(txHash);
+      });
+    });
+  }
+
   public static async getTransaction(txHash: string): Promise<Transaction> {
     return ZWeb3.eth().getTransaction(txHash);
   }
@@ -135,7 +144,7 @@ export default class ZWeb3 {
   private static async _getTransactionReceiptWithTimeout(tx: string, timeout: number, startTime: number): Promise<TransactionReceipt | never> {
     const receipt: any = await ZWeb3._tryGettingTransactionReceipt(tx);
     if (receipt) {
-      if (parseInt(receipt.status, 16) !== 0) return receipt;
+      if (receipt.status) return receipt;
       throw new Error(`Transaction: ${tx} exited with an error (status 0).`);
     }
 

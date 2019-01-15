@@ -7,7 +7,7 @@ import { estimateGas } from '../utils/Transactions';
 
 async function sendTransaction(params: any): Promise<any> {
   if (!params.gas) params.gas = await estimateGas(params);
-  return ZWeb3.sendTransaction(params);
+  return ZWeb3.sendTransactionWithoutReceipt(params);
 }
 
 export default async function copyContract(contractClass: ContractFactory, address: string, txParams: any = {}): Promise<ContractWrapper> {
@@ -31,8 +31,8 @@ export default async function copyContract(contractClass: ContractFactory, addre
 
   const ASM_CODE_COPY: string = `0x73${trimmedAddress}803b8091600080913c6000f3`;
 
-  const params: any = Object.assign({}, contractClass.txParams, txParams, { to: null, data: ASM_CODE_COPY });
-  const txHash: string = await sendTransaction(params);
-  const receipt: any = await ZWeb3.getTransactionReceiptWithTimeout(txHash, Contracts.getSyncTimeout());
+  const params = Object.assign({}, contractClass.txParams, txParams, { to: null, data: ASM_CODE_COPY });
+  const txHash = await sendTransaction(params);
+  const receipt = await ZWeb3.getTransactionReceiptWithTimeout(txHash, Contracts.getSyncTimeout());
   return contractClass.at(receipt.contractAddress);
 }

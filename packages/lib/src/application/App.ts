@@ -62,7 +62,7 @@ export default class App {
   }
 
   get address(): string {
-    return this.appContract.methods.address().call();
+    return this.appContract.address;
   }
 
   get contract(): ContractWrapper {

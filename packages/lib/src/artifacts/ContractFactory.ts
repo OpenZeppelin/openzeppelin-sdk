@@ -90,7 +90,7 @@ export default class ContractFactory {
     this._validateNonEmptyBinary();
     this._validateNonUnlinkedLibraries();
     const contractClass = ZWeb3.contract(this.abi);
-    return contractClass.deploy({data: this.binary, arguments: constructorArgs}).encodeABI()
+    return contractClass.deploy({data: this.binary, arguments: constructorArgs}).encodeABI();
   }
 
   public link(libraries: { [libAlias: string]: string }): void {
@@ -107,24 +107,26 @@ export default class ContractFactory {
     const allEvents = contract.events.allEvents;
     const wrapper: ContractWrapper = { address, transactionHash, allEvents, constructor: this, methods: contract.methods };
     // this._promisifyABI(contract, wrapper);
-    // this._setSendFunctions(contract, wrapper);
+    this._setSendFunctions(contract, wrapper);
     return wrapper;
   }
 
-  // private _setSendFunctions(instance, wrapper) {
-  //   const self = this;
+  private _setSendFunctions(instance, wrapper) {
+    const self = this;
 
-  //   wrapper.sendTransaction = async function(txParams: any): Promise<TransactionReceiptWrapper> {
-  //     const tx = { to: instance.address, ...self.txParams, ...txParams };
-  //     const receipt = await ZWeb3.sendTransaction(tx);
-  //     // const receipt = await ZWeb3.getTransactionReceiptWithTimeout(tx, self.timeout);
-  //     return { tx, receipt, logs: decodeLogs(receipt.logs, self) };
-  //   };
+    wrapper.sendTransaction = async function(txParams: any): Promise<TransactionReceiptWrapper> {
+      // TODO: self.txParams doesn't exist anymore
+      const tx = { to: instance.options.address, ...self.txParams, ...txParams };
+      const txHash = await ZWeb3.sendTransactionWithoutReceipt(tx);
+      const receiptWithTimeout = await ZWeb3.getTransactionReceiptWithTimeout(txHash, self.timeout);
+      // console.log(`receiptWithTimeout`, receiptWithTimeout);
+      return { tx, receipt: receiptWithTimeout, logs: decodeLogs(receiptWithTimeout.logs, self) };
+    };
 
-  //   wrapper.send = async function(value: any): Promise<string> {
-  //     return wrapper.sendTransaction({ value });
-  //   };
-  // }
+    wrapper.send = async function(value: any): Promise<string> {
+      return wrapper.sendTransaction({ value });
+    };
+  }
 
   // private _promisifyABI(instance: any, wrapper: ContractWrapper): void {
   //   instance.abi.filter((item: any) => item.type === 'event').forEach((item: any) => wrapper[item.name] = instance[item.name]);
