@@ -24,7 +24,7 @@ const sendTransaction = (target, method, args, values, opts) => {
   return target.sendTransaction(Object.assign({ data }, opts));
 };
 
-contract('AdminUpgradeabilityProxy', ([_, admin, anotherAccount]) => {
+contract('AdminUpgradeabilityProxy', ([_, proxyAdminAddress, proxyAdminOwner, anotherAccount]) => {
   before(async function () {
     this.implementation_v0 = (await DummyImplementation.new()).address
     this.implementation_v1 = (await DummyImplementation.new()).address
@@ -32,15 +32,15 @@ contract('AdminUpgradeabilityProxy', ([_, admin, anotherAccount]) => {
 
   beforeEach(async function () {
     const initializeData = ''
-    this.proxy = await AdminUpgradeabilityProxy.new(this.implementation_v0, initializeData, { from: admin })
+    this.proxy = await AdminUpgradeabilityProxy.new(this.implementation_v0, proxyAdminAddress, initializeData, { from: proxyAdminOwner })
     this.proxyAddress = this.proxy.address;
   })
 
-  shouldBehaveLikeUpgradeabilityProxy(AdminUpgradeabilityProxy, admin)
+  shouldBehaveLikeUpgradeabilityProxy(AdminUpgradeabilityProxy, proxyAdminAddress, proxyAdminOwner)
 
   describe('implementation', function () {
     it('returns the current implementation address', async function () {
-      const implementation = await this.proxy.implementation({ from: admin })
+      const implementation = await this.proxy.implementation({ from: proxyAdminAddress })
 
       implementation.should.be.equal(this.implementation_v0)
     })
@@ -55,13 +55,13 @@ contract('AdminUpgradeabilityProxy', ([_, admin, anotherAccount]) => {
 
   describe('upgradeTo', function () {
     describe('when the sender is the admin', function () {
-      const from = admin
+      const from = proxyAdminAddress
 
       describe('when the given implementation is different from the current one', function () {
         it('upgrades to the requested implementation', async function () {
           await this.proxy.upgradeTo(this.implementation_v1, { from })
 
-          const implementation = await this.proxy.implementation({ from: admin })
+          const implementation = await this.proxy.implementation({ from: proxyAdminAddress })
           implementation.should.be.equal(this.implementation_v1)
         })
 
@@ -100,7 +100,7 @@ contract('AdminUpgradeabilityProxy', ([_, admin, anotherAccount]) => {
         const initializeData = encodeCall('initializeWithX', ['uint256'], [42])
 
         describe('when the sender is the admin', function () {
-          const from = admin
+          const from = proxyAdminAddress
           const value = 1e5
 
           beforeEach(async function () {
@@ -108,7 +108,7 @@ contract('AdminUpgradeabilityProxy', ([_, admin, anotherAccount]) => {
           })
 
           it('upgrades to the requested implementation', async function () {
-            const implementation = await this.proxy.implementation({ from: admin })
+            const implementation = await this.proxy.implementation({ from: proxyAdminAddress })
             implementation.should.be.equal(this.behavior.address)
           })
 
@@ -153,14 +153,14 @@ contract('AdminUpgradeabilityProxy', ([_, admin, anotherAccount]) => {
         const initializeData = encodeCall('fail')
 
         it('reverts', async function () {
-          await assertRevert(this.proxy.upgradeToAndCall(this.behavior.address, initializeData, { from: admin }))
+          await assertRevert(this.proxy.upgradeToAndCall(this.behavior.address, initializeData, { from: proxyAdminAddress }))
         })
       })
     })
 
     describe('with migrations', function () {
       describe('when the sender is the admin', function () {
-        const from = admin
+        const from = proxyAdminAddress
         const value = 1e5
 
         describe('when upgrading to V1', function () {
@@ -173,7 +173,7 @@ contract('AdminUpgradeabilityProxy', ([_, admin, anotherAccount]) => {
           })
 
           it('upgrades to the requested version and emits an event', async function () {
-            const implementation = await this.proxy.implementation({ from: admin })
+            const implementation = await this.proxy.implementation({ from: proxyAdminAddress })
             implementation.should.be.equal(this.behavior_v1.address)
             this.logs.should.have.lengthOf( 1)
             this.logs[0].event.should.be.equal('Upgraded')
@@ -200,7 +200,7 @@ contract('AdminUpgradeabilityProxy', ([_, admin, anotherAccount]) => {
             })
 
             it('upgrades to the requested version and emits an event', async function () {
-              const implementation = await this.proxy.implementation({ from: admin })
+              const implementation = await this.proxy.implementation({ from: proxyAdminAddress })
               implementation.should.be.equal(this.behavior_v2.address)
               this.logs.should.have.lengthOf( 1)
               this.logs[0].event.should.be.equal('Upgraded')
@@ -230,7 +230,7 @@ contract('AdminUpgradeabilityProxy', ([_, admin, anotherAccount]) => {
               })
 
               it('upgrades to the requested version and emits an event', async function () {
-                const implementation = await this.proxy.implementation({ from: admin })
+                const implementation = await this.proxy.implementation({ from: proxyAdminAddress })
                 implementation.should.be.equal(this.behavior_v3.address)
                 this.logs.should.have.lengthOf( 1)
                 this.logs[0].event.should.be.equal('Upgraded')
@@ -272,19 +272,19 @@ contract('AdminUpgradeabilityProxy', ([_, admin, anotherAccount]) => {
 
       describe('when the sender is the admin', function () {
         beforeEach('transferring', async function () {
-          const { logs } = await this.proxy.changeAdmin(newAdmin, { from: admin })
+          const { logs } = await this.proxy.changeAdmin(newAdmin, { from: proxyAdminAddress })
           this.logs = logs
         })
 
         it('assigns new proxy admin', async function () {
-          const proxyAdmin = await this.proxy.admin({ from: newAdmin })
-          proxyAdmin.should.be.equal(anotherAccount)
+          const newProxyAdmin = await this.proxy.admin({ from: newAdmin })
+          newProxyAdmin.should.be.equal(anotherAccount)
         })
 
         it('emits an event', function () {
           this.logs.should.have.lengthOf( 1)
           this.logs[0].event.should.be.equal('AdminChanged')
-          this.logs[0].args.previousAdmin.should.be.equal(admin)
+          this.logs[0].args.previousAdmin.should.be.equal(proxyAdminAddress)
           this.logs[0].args.newAdmin.should.be.equal(newAdmin)
         })
       })
@@ -302,7 +302,7 @@ contract('AdminUpgradeabilityProxy', ([_, admin, anotherAccount]) => {
       const newAdmin = 0x0
 
       it('reverts', async function () {
-        await assertRevert(this.proxy.changeAdmin(newAdmin, { from: admin }))
+        await assertRevert(this.proxy.changeAdmin(newAdmin, { from: proxyAdminAddress }))
       })
     })
   })
@@ -315,48 +315,49 @@ contract('AdminUpgradeabilityProxy', ([_, admin, anotherAccount]) => {
 
     it('should store the admin proxy in specified location', async function () {
       const proxyAdmin = await Proxy.at(this.proxyAddress).admin()
-      proxyAdmin.should.be.equal(admin);
+      proxyAdmin.should.be.equal(proxyAdminAddress);
     })
   })
 
-  describe('transparent proxy', function () {
-    beforeEach('creating proxy', async function () {
-      const initializeData = ''
-      this.impl = await ClashingImplementation.new();
-      this.proxy = await AdminUpgradeabilityProxy.new(this.impl.address, initializeData, { from: admin });
+  // TODO: remove this commented tests. transparent proxies should be only tested in SimpleProject
+  // describe('transparent proxy', function () {
+  //   beforeEach('creating proxy', async function () {
+  //     const initializeData = ''
+  //     this.impl = await ClashingImplementation.new();
+  //     this.proxy = await AdminUpgradeabilityProxy.new(this.impl.address, initializeData, { from: proxyAdminAddress });
 
-      this.clashing = ClashingImplementation.at(this.proxy.address);
-    });
+  //     this.clashing = ClashingImplementation.at(this.proxy.address);
+  //   });
 
-    it('proxy admin cannot call delegated functions', async function () {
-      await assertRevert(this.clashing.delegatedFunction({ from: admin }));
-    });
+  //   it('proxy admin cannot call delegated functions', async function () {
+  //     await assertRevert(this.clashing.delegatedFunction({ from: proxyAdminAddress }));
+  //   });
 
-    context('when function names clash', function () {
-      it('when sender is proxy admin should run the proxy function', async function () {
-        const value = await this.proxy.admin({ from: admin });
-        value.should.be.equal(admin);
-      });
+  //   context('when function names clash', function () {
+  //     it('when sender is proxy admin should run the proxy function', async function () {
+  //       const value = await this.proxy.admin({ from: proxyAdminAddress });
+  //       value.should.be.equal(proxyAdminAddress);
+  //     });
 
-      it('when sender is other should delegate to implementation', async function () {
-        const value = await this.proxy.admin({ from: anotherAccount });
-        value.should.be.equal('0x0000000000000000000000000000000011111142')
-      });
-    });
-  });
+  //     it('when sender is other should delegate to implementation', async function () {
+  //       const value = await this.proxy.admin({ from: anotherAccount });
+  //       value.should.be.equal('0x0000000000000000000000000000000011111142')
+  //     });
+  //   });
+  // });
 
   describe('regression', () => {
     const initializeData = ''
 
     it('should add new function', async () => {
       const instance1 = await Implementation1.new();
-      const proxy = await AdminUpgradeabilityProxy.new(instance1.address, initializeData, { from: admin });
+      const proxy = await AdminUpgradeabilityProxy.new(instance1.address, proxyAdminAddress, initializeData, { from: proxyAdminOwner });
 
       const proxyInstance1 = await Implementation1.at(proxy.address);
       await proxyInstance1.setValue(42);
 
       const instance2 = await Implementation2.new();
-      await proxy.upgradeTo(instance2.address, { from: admin });
+      await proxy.upgradeTo(instance2.address, { from: proxyAdminAddress });
 
       const proxyInstance2 = Implementation2.at(proxy.address);
       const res = await proxyInstance2.getValue();
@@ -365,7 +366,7 @@ contract('AdminUpgradeabilityProxy', ([_, admin, anotherAccount]) => {
 
     it('should remove function', async () => {
       const instance2 = await Implementation2.new();
-      const proxy = await AdminUpgradeabilityProxy.new(instance2.address, initializeData, { from: admin });
+      const proxy = await AdminUpgradeabilityProxy.new(instance2.address, proxyAdminAddress, initializeData, { from: proxyAdminOwner });
 
       const proxyInstance2 = await Implementation2.at(proxy.address);
       await proxyInstance2.setValue(42);
@@ -373,7 +374,7 @@ contract('AdminUpgradeabilityProxy', ([_, admin, anotherAccount]) => {
       assert.equal(res.toString(), "42");
 
       const instance1 = await Implementation1.new();
-      await proxy.upgradeTo(instance1.address, { from: admin });
+      await proxy.upgradeTo(instance1.address, { from: proxyAdminAddress });
 
       const proxyInstance1 = await Implementation2.at(proxy.address);
       await assertRevert(proxyInstance1.getValue());
@@ -381,13 +382,13 @@ contract('AdminUpgradeabilityProxy', ([_, admin, anotherAccount]) => {
 
     it('should change function signature', async () => {
       const instance1 = await Implementation1.new();
-      const proxy = await AdminUpgradeabilityProxy.new(instance1.address, initializeData, { from: admin });
+      const proxy = await AdminUpgradeabilityProxy.new(instance1.address, proxyAdminAddress, initializeData, { from: proxyAdminOwner });
 
       const proxyInstance1 = await Implementation1.at(proxy.address);
       await proxyInstance1.setValue(42);
 
       const instance3 = await Implementation3.new();
-      await proxy.upgradeTo(instance3.address, { from: admin });
+      await proxy.upgradeTo(instance3.address, { from: proxyAdminAddress });
       const proxyInstance3 = Implementation3.at(proxy.address);
 
       const res = await proxyInstance3.getValue(8);
@@ -397,10 +398,10 @@ contract('AdminUpgradeabilityProxy', ([_, admin, anotherAccount]) => {
     it('should add fallback function', async () => {
       const initializeData = ''
       const instance1 = await Implementation1.new();
-      const proxy = await AdminUpgradeabilityProxy.new(instance1.address, initializeData, { from: admin });
+      const proxy = await AdminUpgradeabilityProxy.new(instance1.address, proxyAdminAddress, initializeData, { from: proxyAdminOwner });
 
       const instance4 = await Implementation4.new();
-      await proxy.upgradeTo(instance4.address, { from: admin });
+      await proxy.upgradeTo(instance4.address, { from: proxyAdminAddress });
       const proxyInstance4 = await Implementation4.at(proxy.address);
 
       await sendTransaction(proxy, '', [], [], { from: anotherAccount });
@@ -411,10 +412,10 @@ contract('AdminUpgradeabilityProxy', ([_, admin, anotherAccount]) => {
 
     it('should remove fallback function', async () => {
       const instance4 = await Implementation4.new();
-      const proxy = await AdminUpgradeabilityProxy.new(instance4.address, initializeData, { from: admin });
+      const proxy = await AdminUpgradeabilityProxy.new(instance4.address, proxyAdminAddress, initializeData, { from: proxyAdminOwner });
 
       const instance2 = await Implementation2.new();
-      await proxy.upgradeTo(instance2.address, { from: admin });
+      await proxy.upgradeTo(instance2.address, { from: proxyAdminAddress });
 
       await assertRevert(sendTransaction(proxy, '', [], [], { from: anotherAccount }));
 

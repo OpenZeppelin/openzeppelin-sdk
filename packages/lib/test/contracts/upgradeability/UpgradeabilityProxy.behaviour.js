@@ -1,4 +1,5 @@
 'use strict';
+import without from 'lodash.without';
 require('../../setup')
 
 import Proxy from '../../../src/proxy/Proxy'
@@ -8,12 +9,13 @@ import assertRevert from '../../../src/test/helpers/assertRevert'
 
 const DummyImplementation = artifacts.require('DummyImplementation')
 
-export default function shouldBehaveLikeUpgradeabilityProxy(proxyClass, proxyCreator) {
+export default function shouldBehaveLikeUpgradeabilityProxy(proxyClass, proxyAdminAddress, proxyCreator) {
 
   it('cannot be initialized with a non-contract address', async function () {
     const nonContractAddress = proxyCreator
     const initializeData = ''
-    await assertRevert(proxyClass.new(nonContractAddress, initializeData, { from: proxyCreator }))
+    const proxyParams = without([nonContractAddress, proxyAdminAddress, initializeData, { from: proxyCreator }], undefined)
+    await assertRevert(proxyClass.new(...proxyParams))
   })
 
   before('deploy implementation', async function () {
@@ -41,7 +43,8 @@ export default function shouldBehaveLikeUpgradeabilityProxy(proxyClass, proxyCre
 
     describe('when not sending balance', function () {
       beforeEach('creating proxy', async function () {
-        this.proxy = (await proxyClass.new(this.implementation, initializeData, { from: proxyCreator })).address
+        const proxyParams = without([this.implementation, proxyAdminAddress, initializeData, { from: proxyCreator }], undefined)
+        this.proxy = (await proxyClass.new(...proxyParams)).address
       })
 
       assertProxyInitialization({ value: 0, balance: 0 })
@@ -51,7 +54,8 @@ export default function shouldBehaveLikeUpgradeabilityProxy(proxyClass, proxyCre
       const value = 10e5
 
       beforeEach('creating proxy', async function () {
-        this.proxy = (await proxyClass.new(this.implementation, initializeData, { from: proxyCreator, value })).address
+        const proxyParams = without([this.implementation, proxyAdminAddress, initializeData, { from: proxyCreator, value }], undefined);
+        this.proxy = (await proxyClass.new(...proxyParams)).address
       })
 
       assertProxyInitialization({ value: 0, balance: value })
@@ -66,7 +70,8 @@ export default function shouldBehaveLikeUpgradeabilityProxy(proxyClass, proxyCre
 
       describe('when not sending balance', function () {
         beforeEach('creating proxy', async function () {
-          this.proxy = (await proxyClass.new(this.implementation, initializeData, { from: proxyCreator })).address
+          const proxyParams = without([this.implementation, proxyAdminAddress, initializeData, { from: proxyCreator }], undefined);
+          this.proxy = (await proxyClass.new(...proxyParams)).address
         })
 
         assertProxyInitialization({ value: expectedInitializedValue, balance: 0 })
@@ -76,7 +81,8 @@ export default function shouldBehaveLikeUpgradeabilityProxy(proxyClass, proxyCre
         const value = 10e5
 
         it('reverts', async function () {
-          await assertRevert(proxyClass.new(this.implementation, initializeData, { from: proxyCreator, value }))
+          const proxyParams = without([this.implementation, proxyAdminAddress, initializeData, { from: proxyCreator, value }], undefined);
+          await assertRevert(proxyClass.new(...proxyParams))
         })
       })
     })
@@ -87,7 +93,8 @@ export default function shouldBehaveLikeUpgradeabilityProxy(proxyClass, proxyCre
 
       describe('when not sending balance', function () {
         beforeEach('creating proxy', async function () {
-          this.proxy = (await proxyClass.new(this.implementation, initializeData, { from: proxyCreator })).address
+          const proxyParams = without([this.implementation, proxyAdminAddress, initializeData, { from: proxyCreator }], undefined)
+          this.proxy = (await proxyClass.new(...proxyParams)).address
         })
 
         assertProxyInitialization({ value: expectedInitializedValue, balance: 0 })
@@ -97,7 +104,8 @@ export default function shouldBehaveLikeUpgradeabilityProxy(proxyClass, proxyCre
         const value = 10e5
 
         beforeEach('creating proxy', async function () {
-          this.proxy = (await proxyClass.new(this.implementation, initializeData, { from: proxyCreator, value })).address
+          const proxyParams = without([this.implementation, proxyAdminAddress, initializeData, { from: proxyCreator, value }], undefined);
+          this.proxy = (await proxyClass.new(...proxyParams)).address
         })
 
         assertProxyInitialization({ value: expectedInitializedValue, balance: value })
@@ -113,7 +121,8 @@ export default function shouldBehaveLikeUpgradeabilityProxy(proxyClass, proxyCre
 
       describe('when not sending balance', function () {
         beforeEach('creating proxy', async function () {
-          this.proxy = (await proxyClass.new(this.implementation, initializeData, { from: proxyCreator })).address
+          const proxyParams = without([this.implementation, proxyAdminAddress, initializeData, { from: proxyCreator }], undefined);
+          this.proxy = (await proxyClass.new(...proxyParams)).address
         })
 
         assertProxyInitialization({ value: expectedInitializedValue, balance: 0 })
@@ -123,7 +132,8 @@ export default function shouldBehaveLikeUpgradeabilityProxy(proxyClass, proxyCre
         const value = 10e5
 
         it('reverts', async function () {
-          await assertRevert(proxyClass.new(this.implementation, initializeData, { from: proxyCreator, value }))
+          const proxyParams = without([this.implementation, proxyAdminAddress, initializeData, { from: proxyCreator, value }], undefined)
+          await assertRevert(proxyClass.new(...proxyParams))
         })
       })
     })
@@ -134,7 +144,8 @@ export default function shouldBehaveLikeUpgradeabilityProxy(proxyClass, proxyCre
 
       describe('when not sending balance', function () {
         beforeEach('creating proxy', async function () {
-          this.proxy = (await proxyClass.new(this.implementation, initializeData, { from: proxyCreator })).address
+          const proxyParams = without([this.implementation, proxyAdminAddress, initializeData, { from: proxyCreator }], undefined)
+          this.proxy = (await proxyClass.new(...proxyParams)).address
         })
 
         assertProxyInitialization({ value: expectedInitializedValue, balance: 0 })
@@ -144,7 +155,8 @@ export default function shouldBehaveLikeUpgradeabilityProxy(proxyClass, proxyCre
         const value = 10e5
 
         beforeEach('creating proxy', async function () {
-          this.proxy = (await proxyClass.new(this.implementation, initializeData, { from: proxyCreator, value })).address
+          const proxyParams = without([this.implementation, proxyAdminAddress, initializeData, { from: proxyCreator, value }], undefined)
+          this.proxy = (await proxyClass.new(...proxyParams)).address
         })
 
         assertProxyInitialization({ value: expectedInitializedValue, balance: value })
