@@ -11,6 +11,7 @@ import { buildCallData, callDescription, CalldataInfo } from '../utils/ABIs';
 import ContractFactory, { ContractWrapper } from '../artifacts/ContractFactory';
 import { toSemanticVersion, semanticVersionEqual } from '../utils/Semver';
 import { deploy as deployContract, sendTransaction, sendDataTransaction } from '../utils/Transactions';
+import { TransactionReceipt } from 'web3/types';
 
 const log: Logger = new Logger('App');
 
@@ -74,7 +75,7 @@ export default class App {
   }
 
   public async getProxyImplementation(proxyAddress: string): Promise<string> {
-    return this.appContract.methods.getProxyImplementation(proxyAddress, { ...this.txParams }).call();
+    return this.appContract.methods.getProxyImplementation(proxyAddress).call({ ...this.txParams });
   }
 
   public async hasProvider(name: string): Promise<boolean> {
@@ -100,31 +101,32 @@ export default class App {
   }
 
   public async createProxy(contractClass: ContractFactory, packageName: string, contractName: string, initMethodName: string, initArgs?: string[]): Promise<ContractWrapper> {
-    const { receipt } = typeof(initArgs) === 'undefined'
+    const receipt = typeof(initArgs) === 'undefined'
       ? await this._createProxy(packageName, contractName)
       : await this._createProxyAndCall(contractClass, packageName, contractName, initMethodName, initArgs);
 
     log.info(`TX receipt received: ${receipt.transactionHash}`);
-    const address: string = findLast(receipt.logs, (l) => l.event === 'ProxyCreated').args.proxy;
+    const event = receipt.events['ProxyCreated'];
+    const address = Array.isArray(event) ? event[event.length - 1].returnValues.proxy : event.returnValues.proxy;
     log.info(`${packageName} ${contractName} proxy: ${address}`);
     return contractClass.at(address);
   }
 
   public async upgradeProxy(proxyAddress: string, contractClass: ContractFactory, packageName: string, contractName: string, initMethodName: string, initArgs: any): Promise<ContractWrapper> {
-    const { receipt }: any = typeof(initArgs) === 'undefined'
+    const receipt = typeof(initArgs) === 'undefined'
       ? await this._upgradeProxy(proxyAddress, packageName, contractName)
       : await this._upgradeProxyAndCall(proxyAddress, contractClass, packageName, contractName, initMethodName, initArgs);
     log.info(`TX receipt received: ${receipt.transactionHash}`);
     return contractClass.at(proxyAddress);
   }
 
-  private async _createProxy(packageName: string, contractName: string): Promise<any> {
+  private async _createProxy(packageName: string, contractName: string): Promise<TransactionReceipt> {
     log.info(`Creating ${packageName} ${contractName} proxy without initializing...`);
-    const initializeData: string = '';
+    const initializeData: Buffer = Buffer.from('');
     return sendTransaction(this.appContract.methods.create, [packageName, contractName, initializeData], { ...this.txParams });
   }
 
-  private async _createProxyAndCall(contractClass: ContractFactory, packageName: string, contractName: string, initMethodName: string, initArgs: any): Promise<any> {
+  private async _createProxyAndCall(contractClass: ContractFactory, packageName: string, contractName: string, initMethodName: string, initArgs: any): Promise<TransactionReceipt> {
     const { method: initMethod, callData }: CalldataInfo = buildCallData(contractClass, initMethodName, initArgs);
     log.info(`Creating ${packageName} ${contractName} proxy and calling ${callDescription(initMethod, initArgs)}`);
     return sendTransaction(this.appContract.methods.create, [packageName, contractName, callData], { ...this.txParams });

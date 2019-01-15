@@ -9,12 +9,15 @@ import Contracts from '../../../src/artifacts/Contracts'
 import { ZERO_ADDRESS } from '../../../src/utils/Addresses';
 import { ImplementationDirectory, Proxy } from '../../../src';
 import { deploy as deployContract } from '../../../src/utils/Transactions';
+import utils from 'web3-utils';
 
 const ImplV1 = Contracts.getFromLocal('DummyImplementation');
 const ImplV2 = Contracts.getFromLocal('DummyImplementationV2');
 const ProxyCreator = Contracts.getFromLocal('ProxyCreator');
 
 contract.only('App', function (accounts) {
+  accounts = accounts.map(utils.toChecksumAddress); // Required by Web3 v1.x.
+
   const [_unused, owner, otherAdmin] = accounts;
   const txParams = { from: owner };
   const contractName = 'Impl';
@@ -249,14 +252,14 @@ contract.only('App', function (accounts) {
     this.proxy = await this.app.createProxy(ImplV1, packageName, contractName);
   };
 
-  describe.only('createProxy', function () {
+  describe('createProxy', function () {
     beforeEach('setting implementation', setImplementation);
 
     const shouldReturnProxy = function () {
       it('should return a proxy', async function () {
         this.proxy.address.should.be.not.null;
-        // (await this.proxy.version()).should.be.eq('V1');
-        // (await this.app.getProxyImplementation(this.proxy.address)).should.be.eq(this.implV1.address)
+        (await this.proxy.methods.version().call()).should.be.eq('V1');
+        (await this.app.getProxyImplementation(this.proxy.address)).should.be.eq(this.implV1.address)
       });
     };
 
@@ -273,7 +276,8 @@ contract.only('App', function (accounts) {
       shouldReturnProxy();
 
       it('should have initialized the proxy', async function () {
-        (await this.proxy.value()).toNumber().should.eq(10);
+        const value = await this.proxy.methods.value().call();
+        parseInt(value, 10).should.eq(10);
       });
     });
 
@@ -285,9 +289,11 @@ contract.only('App', function (accounts) {
       shouldReturnProxy();
 
       it('should have initialized the proxy', async function () {
-        (await this.proxy.value()).toNumber().should.eq(10);
-        (await this.proxy.text()).should.eq("foo");
-        await this.proxy.values(0).should.be.rejected;
+        const value = await this.proxy.methods.value().call();
+        parseInt(value, 10).should.eq(10);
+        const text = await this.proxy.methods.text().call();
+        text.should.eq("foo");
+        (this.proxy.methods.values(0).call()).should.be.rejected;
       });
     });
 
@@ -299,9 +305,9 @@ contract.only('App', function (accounts) {
 
       it('should return proxy creator instance', async function () {
         const proxy = await this.app.createProxy(ProxyCreator, packageName, 'ProxyCreator', 'initialize', [this.app.address, packageName, contractName, Buffer.from('')]);
-        (await proxy.name()).should.eq('ProxyCreator');
-        const created = await proxy.created();
-        (await ImplV1.at(created).version()).should.eq('V1');
+        (await proxy.methods.name().call()).should.eq('ProxyCreator');
+        const created = await proxy.methods.created().call();
+        (await ImplV1.at(created).methods.version().call()).should.eq('V1');
       });
     });
   });
@@ -313,7 +319,7 @@ contract.only('App', function (accounts) {
 
     const shouldUpgradeProxy = function () {
       it('should upgrade proxy to ImplV2', async function () {
-        (await this.proxy.version()).should.be.eq('V2');
+        (await this.proxy.methods.version().call()).should.be.eq('V2');
         (await this.app.getProxyImplementation(this.proxy.address)).should.be.eq(this.implV2.address)
       });
     };
@@ -334,7 +340,8 @@ contract.only('App', function (accounts) {
       shouldUpgradeProxy();
 
       it('should run migration', async function () {
-        (await this.proxy.value()).toNumber().should.eq(20);
+        const value = await this.proxy.methods.value().call();
+        parseInt(value, 10).should.eq(20);
       });
     });
   });
@@ -346,7 +353,7 @@ contract.only('App', function (accounts) {
     it('should change proxy admin', async function () {
       await this.app.changeProxyAdmin(this.proxy.address, otherAdmin);
       const proxyWrapper = Proxy.at(this.proxy.address);
-      const actualAdmin = await proxyWrapper.admin();
+      const actualAdmin = await proxyWrapper.contract.methods.admin().call({from: otherAdmin});
       actualAdmin.should.be.eq(otherAdmin);
     });
   });  

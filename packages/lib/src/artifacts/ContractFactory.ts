@@ -116,10 +116,10 @@ export default class ContractFactory {
 
     wrapper.sendTransaction = async function(txParams: any): Promise<TransactionReceiptWrapper> {
       // TODO: self.txParams doesn't exist anymore
-      const tx = { to: instance.options.address, ...self.txParams, ...txParams };
+      const defaults = await Contracts.getDefaultTxParams();
+      const tx = { to: instance.options.address, defaults, ...txParams };
       const txHash = await ZWeb3.sendTransactionWithoutReceipt(tx);
       const receiptWithTimeout = await ZWeb3.getTransactionReceiptWithTimeout(txHash, self.timeout);
-      // console.log(`receiptWithTimeout`, receiptWithTimeout);
       return { tx, receipt: receiptWithTimeout, logs: decodeLogs(receiptWithTimeout.logs, self) };
     };
 

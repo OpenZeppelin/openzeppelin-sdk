@@ -10,6 +10,7 @@ import sleep from '../helpers/sleep';
 import ZWeb3 from '../artifacts/ZWeb3';
 import Contracts from '../artifacts/Contracts';
 import ContractFactory, { ContractWrapper, TransactionReceiptWrapper } from '../artifacts/ContractFactory';
+import { TransactionReceipt } from 'web3/types';
 
 // Cache, exported for testing
 export const state: any = {};
@@ -95,7 +96,7 @@ export async function sendDataTransaction(contract: ContractWrapper, txParams: a
  * @param args arguments of the call (if any)
  * @param txParams other transaction parameters (from, gasPrice, etc)
  */
-async function _sendTransaction(contractFn: GenericFunction, args: any[] = [], txParams: any = {}) {
+async function _sendTransaction(contractFn: GenericFunction, args: any[] = [], txParams: any = {}): Promise<TransactionReceipt> {
   // If gas is set explicitly, use it
   if (txParams.gas || Contracts.getArtifactsDefaults().gas) return contractFn(...args).send(txParams);
 
