@@ -48,7 +48,7 @@ export default class Package {
   }
 
   public async hasVersion(version: string): Promise<boolean> {
-    return this.packageContract.hasVersion(toSemanticVersion(version));
+    return this.packageContract.methods.hasVersion(toSemanticVersion(version)).call();
   }
 
   public async isFrozen(version: string): Promise<boolean | never> {
@@ -78,7 +78,7 @@ export default class Package {
 
   public async getDirectory(version: string): Promise<ImplementationDirectory | never> {
     if (!version) throw Error('Cannot get a directory from a package without specifying a version');
-    const directoryAddress = await this.packageContract.getContract(toSemanticVersion(version));
+    const directoryAddress = await this.packageContract.methods.getContract(toSemanticVersion(version)).call();
     return ImplementationDirectory.fetch(directoryAddress, { ...this.txParams });
   }
 }

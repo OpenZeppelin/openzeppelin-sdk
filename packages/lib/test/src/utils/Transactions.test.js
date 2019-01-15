@@ -5,6 +5,7 @@ import times from 'lodash.times';
 import sinon from 'sinon';
 import axios from 'axios';
 import { setInterval } from 'timers';
+import utils from 'web3-utils';
 
 import ZWeb3 from '../../../src/artifacts/ZWeb3'
 import Contracts from '../../../src/artifacts/Contracts';
@@ -13,8 +14,12 @@ import { assertRevert, encodeCall, sleep } from '../../../src';
 import { deploy, sendTransaction, sendDataTransaction, awaitConfirmations, state } from '../../../src/utils/Transactions';
 
 const DEFAULT_GAS = 6721975;
+const DEFAULT_PARAMS = [42, 'foo', [1, 2, 3]];
 
-contract('Transactions', function([_account1, account2]) {
+contract.only('Transactions', function(accounts) {
+  accounts = accounts.map(utils.toChecksumAddress);
+  
+  const [_account1, account2] = accounts;
 
   beforeEach('load contract', function () {
     this.DummyImplementation = Contracts.getFromLocal('DummyImplementation');
@@ -32,7 +37,7 @@ contract('Transactions', function([_account1, account2]) {
 
   const assertGasPrice = async (txHash, expected) => {
     const { gasPrice } = await ZWeb3.getTransaction(txHash);
-    gasPrice.toNumber().should.be.eq(parseInt(expected));
+    parseInt(gasPrice, 10).should.be.eq(parseInt(expected));
   };
 
   const assertFrom = async (txHash, expected) => {
@@ -48,8 +53,8 @@ contract('Transactions', function([_account1, account2]) {
 
     it('uses default gas for sending transaction', async function () {
       const instance = await this.DummyImplementation.new();
-      const { tx } = await instance.initialize(42, 'foo', [1, 2, 3]);
-      await assertGas(tx, DEFAULT_GAS);
+      const receipt = await instance.methods.initialize(42, 'foo', [1,2,3]).send();
+      await assertGas(receipt.transactionHash, DEFAULT_GAS);
     });
   });
 
@@ -59,14 +64,14 @@ contract('Transactions', function([_account1, account2]) {
     });
 
     it('correctly sends the transaction', async function () {
-      await sendTransaction(this.instance.initialize, [42, 'foo', [1, 2, 3]]);
-      const actualValue = await this.instance.value();
-      actualValue.toNumber().should.eq(42);
+      await sendTransaction(this.instance.methods.initialize, DEFAULT_PARAMS);
+      const actualValue = await this.instance.methods.value().call();
+      parseInt(actualValue, 10).should.eq(42);
     });
 
     it('honours other tx params', async function () {
-      const { tx } = await sendTransaction(this.instance.initialize, [42, 'foo', [1, 2, 3]], { from: account2 });
-      await assertFrom(tx, account2);
+      const receipt = await sendTransaction(this.instance.initialize, DEFAULT_PARAMS, { from: account2 });
+      await assertFrom(receipt.transactionHash, account2);
     });
 
     it('handles failing transactions', async function () {
@@ -173,13 +178,13 @@ contract('Transactions', function([_account1, account2]) {
   describe('sendDataTransaction', function () {
     beforeEach('deploys contract', async function () {
       this.instance = await deploy(this.DummyImplementation);
-      this.encodedCall = encodeCall('initialize', ['uint256', 'string', 'uint256[]'], [42, 'foo', [1, 2, 3]]);
+      this.encodedCall = encodeCall('initialize', ['uint256', 'string', 'uint256[]'], DEFAULT_PARAMS);
     });
 
     it('correctly sends the transaction', async function () {
       await sendDataTransaction(this.instance, { data: this.encodedCall });
-      const actualValue = await this.instance.value();
-      actualValue.toNumber().should.eq(42);
+      const actualValue = await this.instance.methods.value().call();
+      parseInt(actualValue, 10).should.eq(42);
     });
 
     it('honours other tx params', async function () {
@@ -401,8 +406,8 @@ contract('Transactions', function([_account1, account2]) {
 
       it('correctly deploys an instance', async function () {
         const instance = await deploy(this.WithConstructorImplementation, [42, "foo"]);
-        (await instance.value()).toNumber().should.eq(42);
-        (await instance.text()).should.eq("foo");
+        parseInt(await instance.methods.value().call(), 10).should.eq(42);
+        (await instance.methods.text().call()).should.eq("foo");
       });
 
       it('honours other tx params', async function () {
