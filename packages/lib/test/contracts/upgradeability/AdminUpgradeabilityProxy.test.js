@@ -25,7 +25,7 @@ const sendTransaction = (target, method, args, values, opts) => {
   return target.sendTransaction(Object.assign({ data }, opts));
 };
 
-contract.only('AdminUpgradeabilityProxy', (accounts) => {
+contract('AdminUpgradeabilityProxy', (accounts) => {
   const [_, admin, anotherAccount] = accounts;
 
   before(async function () {
