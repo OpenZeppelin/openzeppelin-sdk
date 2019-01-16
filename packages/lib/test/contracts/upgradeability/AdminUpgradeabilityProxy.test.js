@@ -25,7 +25,9 @@ const sendTransaction = (target, method, args, values, opts) => {
   return target.sendTransaction(Object.assign({ data }, opts));
 };
 
-contract('AdminUpgradeabilityProxy', ([_, admin, anotherAccount]) => {
+contract.only('AdminUpgradeabilityProxy', (accounts) => {
+  const [_, admin, anotherAccount] = accounts;
+
   before(async function () {
     this.implementation_v0 = (await DummyImplementation.new()).address
     this.implementation_v1 = (await DummyImplementation.new()).address
@@ -311,12 +313,12 @@ contract('AdminUpgradeabilityProxy', ([_, admin, anotherAccount]) => {
   describe('storage', function () {
     it('should store the implementation address in specified location', async function () {
       const implementation = await Proxy.at(this.proxyAddress).implementation()
-      implementation.should.be.equal(this.implementation_v0);
+      implementation.toLowerCase().should.be.equal(this.implementation_v0);
     })
 
     it('should store the admin proxy in specified location', async function () {
       const proxyAdmin = await Proxy.at(this.proxyAddress).admin()
-      proxyAdmin.should.be.equal(admin);
+      proxyAdmin.toLowerCase().should.be.equal(admin);
     })
   })
 
