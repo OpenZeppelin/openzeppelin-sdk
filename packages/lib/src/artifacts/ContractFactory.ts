@@ -15,6 +15,7 @@ interface ContractSchema {
 }
 
 export interface ContractWrapper {
+  instance: any;
   address: string;
   transactionHash: string;
   allEvents: any;
@@ -104,8 +105,10 @@ export default class ContractFactory {
 
   private _wrapContract(contract: any, transactionHash?: string): ContractWrapper {
     const address = contract.options.address;
+    const events = contract.events;
     const allEvents = contract.events.allEvents;
-    const wrapper: ContractWrapper = { address, transactionHash, allEvents, constructor: this, methods: contract.methods };
+    const instance = contract;
+    const wrapper: ContractWrapper = { instance, address, transactionHash, allEvents, constructor: this, methods: contract.methods };
     // this._promisifyABI(contract, wrapper);
     this._setSendFunctions(contract, wrapper);
     return wrapper;

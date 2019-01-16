@@ -98,7 +98,7 @@ export async function sendDataTransaction(contract: ContractWrapper, txParams: a
  */
 async function _sendTransaction(contractFn: GenericFunction, args: any[] = [], txParams: any = {}): Promise<TransactionReceipt> {
   // If gas is set explicitly, use it
-  if (txParams.gas || Contracts.getArtifactsDefaults().gas) return contractFn(...args).send(txParams);
+  if (txParams.gas || Contracts.getArtifactsDefaults().gas) return contractFn(...args).send({ ...txParams });
 
   // Estimate gas for the call
   const gas = await estimateActualGasFnCall(contractFn, args, txParams);
@@ -158,7 +158,7 @@ export async function estimateActualGasFnCall(contractFn: GenericFunction, args:
   // we are working with, if the txs are routed to different nodes.
   // See https://github.com/zeppelinos/zos/issues/192 for more info.
   try {
-    return await calculateActualGas(await contractFn(...args).estimateGas(txParams));
+    return await calculateActualGas(await contractFn(...args).estimateGas({ ...txParams }));
   } catch(error) {
     if (retries <= 0) throw Error(error);
     await sleep(RETRY_SLEEP_TIME);

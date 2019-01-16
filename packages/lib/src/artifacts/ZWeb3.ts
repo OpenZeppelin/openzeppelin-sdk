@@ -62,7 +62,7 @@ export default class ZWeb3 {
   }
 
   public static async estimateGas(params: any): Promise<number> {
-    return ZWeb3.eth().estimateGas(params);
+    return ZWeb3.eth().estimateGas({ ...params });
   }
 
   public static async getBalance(address: string): Promise<string> {

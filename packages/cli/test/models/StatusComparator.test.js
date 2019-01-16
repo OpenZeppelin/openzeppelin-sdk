@@ -12,7 +12,7 @@ import StatusComparator from '../../src/models/status/StatusComparator'
 const ImplV1 = Contracts.getFromLocal('ImplV1')
 const ChildImplV1 = Contracts.getFromLocal('ChildImplV1')
 
-contract('StatusComparator', function([_, owner, anotherAddress]) {
+contract.only('StatusComparator', function([_, owner, anotherAddress]) {
   const network = 'test'
   const txParams = { from: owner }
 
@@ -127,7 +127,7 @@ contract('StatusComparator', function([_, owner, anotherAddress]) {
   }
 
   function testDependencies() {
-    describe('dependencies', function() {
+    describe.only('dependencies', function() {
       beforeEach('set dependency params', async function() {
         this.dep1 = { name: 'mock-stdlib-undeployed', version: '1.1.0' }
         this.dep2 = { name: 'mock-stdlib-undeployed-2', version: '1.2.0' }
@@ -167,6 +167,7 @@ contract('StatusComparator', function([_, owner, anotherAddress]) {
         describe('when the network file has all matching dependencies', function() {
           it('does not report diffs', async function() {
             await this.checker.checkDependencies()
+            console.log(`reports`, this.comparator.reports);
 
             this.comparator.reports.should.be.empty
           })
