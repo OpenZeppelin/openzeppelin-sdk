@@ -12,7 +12,7 @@ export default class Logger {
 
   private static _defaults: LoggerOptions = {
     verbose: false,
-    silent: true
+    silent: false
   };
 
   public static silent(value): void {

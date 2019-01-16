@@ -23,7 +23,7 @@ export default class Proxy {
 
   public static async deploy(implementation: string, initData: string | null, txParams: any = {}): Promise<Proxy> {
     const ProxyContract: ContractFactory = Contracts.getFromLib('AdminUpgradeabilityProxy');
-    const contract: ProxyInterface = await deployContract(ProxyContract, [toAddress(implementation), initData || ''], txParams);
+    const contract: ProxyInterface = await deployContract(ProxyContract, [toAddress(implementation), initData || Buffer.from('')], txParams);
     return new this(contract, txParams);
   }
 

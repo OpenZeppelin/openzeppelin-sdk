@@ -16,7 +16,7 @@ import { deploy, sendTransaction, sendDataTransaction, awaitConfirmations, state
 const DEFAULT_GAS = 6721975;
 const DEFAULT_PARAMS = [42, 'foo', [1, 2, 3]];
 
-contract.only('Transactions', function(accounts) {
+contract('Transactions', function(accounts) {
   accounts = accounts.map(utils.toChecksumAddress);
   
   const [_account1, account2] = accounts;
@@ -168,11 +168,37 @@ contract.only('Transactions', function(accounts) {
           sinon.stub(axios, 'get').resolves({ data: { average: 1234123412341234 } })
         });
 
+<<<<<<< HEAD
         it('produces an error when gas price API gives giant value', async function () {
           await sendTransaction(this.instance.initialize, [42, 'foo', [1, 2, 3]]).should.be.rejectedWith(/is over 100 gwei/);
         });
       });
     });
+=======
+    // TODO: (STUB estimateGas problem) the tests below are disabled because
+    // stub is not working with Web3 v1's estimateGas via methods.
+    // In Web3 v1, calling a method function with parameters returns a transaction object,
+    // and it is this object which has an estimateGas function. Transactions' sendTransaction
+    // will create its own transaction object, which cannot be intercepted here as it
+    // was done in Web3 v0.
+
+    // it('retries estimating gas', async function () {
+    //   const stub = sinon.stub(this.instance.methods.initialize, 'estimateGas')
+    //   _.times(3, i => stub.onCall(i).throws('Error', 'gas required exceeds allowance or always failing transaction'))
+    //   stub.returns(800000)
+
+    //   const receipt = await ransactions.sendTransaction(this.instance.methods.initialize, DEFAULT_PARAMS);
+    //   await assertGas(receipt.transactionHash, 800000 * 1.25 + 15000);
+    // });
+
+    // it('retries estimating gas up to 3 times', async function () {
+    //   const stub = sinon.stub(this.instance.methods.initialize, 'estimateGas')
+    //   _.times(3, i => stub.onCall(i).throws('Error', 'gas required exceeds allowance or always failing transaction'))
+    //   stub.returns(800000)
+
+    //   await sendTransaction(this.instance.methods.initialize, DEFAULT_PARAMS).should.be.rejectedWith(/always failing transaction/);
+    // });
+>>>>>>> lib's AppProject and SimpleProject tests passing with Web3 v1.
   });
 
   describe('sendDataTransaction', function () {

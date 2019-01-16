@@ -9,11 +9,14 @@ import shouldManageDependencies from './DependenciesProject.behaviour';
 import SimpleProject from '../../../src/project/SimpleProject';
 import { toAddress } from '../../../src/utils/Addresses';
 import { Package } from '../../../src';
+import utils from 'web3-utils';
 
 const ImplV1 = Contracts.getFromLocal('DummyImplementation');
 const ImplV2 = Contracts.getFromLocal('DummyImplementationV2');
 
 contract('AppProject', function (accounts) {
+  accounts = accounts.map(utils.toChecksumAddress);
+  
   const [_, owner, another] = accounts
   const name = 'MyProject'
   const version = '0.2.0'
@@ -35,7 +38,7 @@ contract('AppProject', function (accounts) {
           const app = this.project.getApp()
           const thepackage = await this.project.getProjectPackage()
           const packageInfo = await app.getPackage(name)
-          packageInfo.version.should.be.semverEqual(newVersion)
+          packageInfo.version.map(Number).should.be.semverEqual(newVersion)
           packageInfo.package.address.should.eq(thepackage.address)
         })
       }, 
@@ -79,7 +82,7 @@ contract('AppProject', function (accounts) {
     it('creates a new app project from a simple project', async function () {
       this.project = await AppProject.fromSimpleProject(this.simple);
       (await this.project.getImplementation({ contractName })).should.eq(toAddress(this.implementation));
-      (await this.project.getDependencyVersion(dependencyName)).should.be.semverEqual(dependencyVersion);
+      (await this.project.getDependencyVersion(dependencyName)).map(Number).should.be.semverEqual(dependencyVersion);
       (await this.project.getDependencyPackage(dependencyName)).address.should.be.eq(this.dependency.address);
     })
   })

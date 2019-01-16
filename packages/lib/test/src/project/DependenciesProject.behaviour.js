@@ -24,7 +24,7 @@ export default function shouldManageDependencies() {
 
     it('retrieves dependency info', async function () {
       (await this.project.hasDependency(packageName)).should.be.true;
-      (await this.project.getDependencyVersion(packageName)).should.be.semverEqual(packageVersion);
+      (await this.project.getDependencyVersion(packageName)).map(Number).should.be.semverEqual(packageVersion);
       (await this.project.getDependencyPackage(packageName)).address.should.eq(this.package.address);
     })
 
@@ -54,7 +54,7 @@ export default function shouldManageDependencies() {
         const instance = await this.project.createProxy(DummyImplementation, { packageName,  initArgs: [10, "foo", [20, 30]] });
         await assertIsVersion(instance, 'V1');
         await assertIsProxy(instance, this.adminAddress);
-        (await instance.value()).toNumber().should.eq(10)
+        parseInt(await instance.methods.value().call(), 10).should.eq(10)
       })
 
       it('fails to create a proxy from non-existing contract in a package', async function () {
@@ -77,7 +77,7 @@ export default function shouldManageDependencies() {
         const upgraded = await this.project.upgradeProxy(this.instance.address, DummyImplementationV2, { packageName, initMethod: 'migrate', initArgs: [20] });
         await assertIsVersion(upgraded, 'V2');
         await assertIsProxy(upgraded, this.adminAddress);
-        (await upgraded.value()).toNumber().should.eq(20)
+        parseInt(await upgraded.methods.value().call(), 10).should.eq(20)
       })
     })
   });
@@ -89,7 +89,7 @@ export default function shouldManageDependencies() {
   }
   
   async function assertIsVersion(instance, expected) {
-    const actual = await instance.version();
+    const actual = await instance.methods.version().call();
     actual.should.eq(expected);
   }
 }
