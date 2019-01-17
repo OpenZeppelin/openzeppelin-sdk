@@ -1,4 +1,3 @@
-import ZWeb3 from '../artifacts/ZWeb3';
 import Proxy from '../proxy/Proxy';
 import Logger from '../utils/Logger';
 import Package from '../application/Package';
@@ -27,10 +26,10 @@ interface Dependency {
   version: string;
 }
 
-export default class BaseSimpleProject {
+export default abstract class BaseSimpleProject {
   public implementations: Implementations;
   public dependencies: Dependencies;
-  protected txParams: any;
+  public txParams: any;
   public name: string;
 
   constructor(name, txParams) {
@@ -39,6 +38,8 @@ export default class BaseSimpleProject {
     this.implementations = {};
     this.dependencies = {};
   }
+
+  public abstract async getAdminAddress(): Promise<string>;
 
   public async setImplementation(contractClass: ContractFactory, contractName?: string): Promise<any> {
     log.info(`Deploying logic contract for ${contractClass.contractName}`);
@@ -87,7 +88,23 @@ export default class BaseSimpleProject {
     delete this.dependencies[name];
   }
 
-  public async _getOrDeployImplementation(contractClass: ContractFactory, packageName: string, contractName?: string, redeployIfChanged?: boolean): Promise<string | never> {
+  private async _getOrDeployOwnImplementation(contractClass: ContractFactory, contractName: string, redeployIfChanged?: boolean): Promise<string> {
+    const existing: Implementation = this.implementations[contractName];
+    const contractChanged: boolean = existing && existing.bytecodeHash !== bytecodeDigest(contractClass.deployedBinary);
+    const shouldRedeploy: boolean = !existing || (redeployIfChanged && contractChanged);
+    if (!shouldRedeploy) return existing.address;
+    const newInstance: any = await this.setImplementation(contractClass, contractName);
+    return newInstance.address;
+  }
+
+  private async _getDependencyImplementation(packageName: string, contractName: string): Promise<string | null> {
+    if (!this.hasDependency(packageName)) return null;
+    const { package: packageAddress, version }: Dependency = this.dependencies[packageName];
+    const thepackage: Package = await Package.fetch(packageAddress, this.txParams);
+    return thepackage.getImplementation(version, contractName);
+  }
+
+  protected async _getOrDeployImplementation(contractClass: ContractFactory, packageName: string, contractName?: string, redeployIfChanged?: boolean): Promise<string | never> {
     if (!contractName) contractName = contractClass.contractName;
 
     const implementation = !packageName || packageName === this.name
@@ -98,27 +115,7 @@ export default class BaseSimpleProject {
     return implementation;
   }
 
-  public async _getOrDeployOwnImplementation(contractClass: ContractFactory, contractName: string, redeployIfChanged?: boolean): Promise<string> {
-    const existing: Implementation = this.implementations[contractName];
-    const contractChanged: boolean = existing && existing.bytecodeHash !== bytecodeDigest(contractClass.deployedBinary);
-    const shouldRedeploy: boolean = !existing || (redeployIfChanged && contractChanged);
-    if (!shouldRedeploy) return existing.address;
-    const newInstance: any = await this.setImplementation(contractClass, contractName);
-    return newInstance.address;
-  }
-
-  public async _getDependencyImplementation(packageName: string, contractName: string): Promise<string | null> {
-    if (!this.hasDependency(packageName)) return null;
-    const { package: packageAddress, version }: Dependency = this.dependencies[packageName];
-    const thepackage: Package = await Package.fetch(packageAddress, this.txParams);
-    return thepackage.getImplementation(version, contractName);
-  }
-
-  protected async getAdminAddress(): Promise<string> {
-    return this.txParams.from || ZWeb3.defaultAccount()
-  }
-
-  protected getAndLogInitCallData(contractClass: ContractFactory, initMethodName?: string, initArgs?: string[], implementationAddress?: string, actionLabel?: string): string | null {
+  protected _getAndLogInitCallData(contractClass: ContractFactory, initMethodName?: string, initArgs?: string[], implementationAddress?: string, actionLabel?: string): string | null {
     if (initMethodName) {
       const { method: initMethod, callData }: CalldataInfo = buildCallData(contractClass, initMethodName, initArgs);
       log.info(`${actionLabel} proxy to logic contract ${implementationAddress} and initializing by calling ${callDescription(initMethod, initArgs)}`);
