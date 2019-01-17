@@ -11,8 +11,7 @@ import { Proxy } from '../../../src';
 const ImplV1 = Contracts.getFromLocal('DummyImplementation');
 const ImplV2 = Contracts.getFromLocal('DummyImplementationV2');
 
-contract('SimpleProject', function (accounts) {
-  const [_, owner, another] = accounts
+contract('SimpleProject', function ([_, owner, another]) {
   const name = 'MyProject'
   
   beforeEach('initializing', async function () {
