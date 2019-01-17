@@ -4,6 +4,7 @@ require('../../setup')
 import SimpleProject from '../../../src/project/SimpleProject'
 import shouldManageProxies from './ProxyProject.behaviour';
 import shouldManageDependencies from './DependenciesProject.behaviour';
+import shouldManageImplementations from './Implementations.behaviour';
 import { noop } from 'lodash';
 import Contracts from '../../../src/artifacts/Contracts';
 import { Proxy } from '../../../src';
@@ -43,41 +44,7 @@ contract('SimpleProject', function ([_, owner, another]) {
       this.project.implementations.should.not.have.key('DummyImplementation')
     })
   })
-
-  describe('implementation reuse', function () {
-    it('uses the same implementation for two proxies', async function () {
-      const proxy1 = await this.project.createProxy(ImplV1, { contractName: 'DummyImplementation' })
-      const proxy2 = await this.project.createProxy(ImplV1, { contractName: 'DummyImplementation' })
-      const impl1 = await Proxy.at(proxy1).implementation()
-      const impl2 = await Proxy.at(proxy2).implementation()
-      impl1.should.eq(impl2)
-    })
-
-    it('uses different implementations if bytecode does not match', async function () {
-      const proxy1 = await this.project.createProxy(ImplV1, { contractName: 'DummyImplementation', redeployIfChanged: true })
-      const proxy2 = await this.project.createProxy(ImplV2, { contractName: 'DummyImplementation', redeployIfChanged: true })
-      const impl1 = await Proxy.at(proxy1).implementation()
-      const impl2 = await Proxy.at(proxy2).implementation()
-      impl1.should.not.eq(impl2)
-    })
-
-    it('does not redeploy by default if bytecode does not match', async function () {
-      const proxy1 = await this.project.createProxy(ImplV1, { contractName: 'DummyImplementation' })
-      const proxy2 = await this.project.createProxy(ImplV2, { contractName: 'DummyImplementation' })
-      const impl1 = await Proxy.at(proxy1).implementation()
-      const impl2 = await Proxy.at(proxy2).implementation()
-      impl1.should.eq(impl2)
-    })
-
-    it('redeploys if implementation is unset', async function () {
-      const proxy1 = await this.project.createProxy(ImplV1, { contractName: 'DummyImplementation' })
-      this.project.unsetImplementation('DummyImplementation')
-      const proxy2 = await this.project.createProxy(ImplV2, { contractName: 'DummyImplementation' })
-      const impl1 = await Proxy.at(proxy1).implementation()
-      const impl2 = await Proxy.at(proxy2).implementation()
-      impl1.should.not.eq(impl2)
-    })
-  })
-
+  
   shouldManageDependencies();
+  shouldManageImplementations();
 })
