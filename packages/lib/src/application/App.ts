@@ -72,10 +72,6 @@ export default class App {
     return this.appContract.getImplementation(packageName, contractName);
   }
 
-  public async getProxyImplementation(proxyAddress: string): Promise<string> {
-    return this.appContract.getProxyImplementation(proxyAddress, this.txParams);
-  }
-
   public async hasProvider(name: string): Promise<boolean> {
     return (await this.getProvider(name) != null);
   }
@@ -86,22 +82,16 @@ export default class App {
     return await ImplementationDirectory.fetch(address, this.txParams);
   }
 
-  public async changeProxyAdmin(proxyAddress: string, newAdmin: string): Promise<void> {
-    log.info(`Changing admin for proxy ${proxyAddress} to ${newAdmin}...`);
-    await sendTransaction(this.appContract.changeProxyAdmin, [proxyAddress, newAdmin], this.txParams);
-    log.info(`Admin for proxy ${proxyAddress} set to ${newAdmin}`);
-  }
-
   public async createContract(contractClass: ContractFactory, packageName: string, contractName: string, initMethodName: string, initArgs: string[]): Promise<ContractWrapper> {
     const instance: ContractWrapper = await this._copyContract(packageName, contractName, contractClass);
     await this._initNonUpgradeableInstance(instance, contractClass, packageName, contractName, initMethodName, initArgs);
     return instance;
   }
 
-  public async createProxy(contractClass: ContractFactory, packageName: string, contractName: string, initMethodName: string, initArgs?: string[]): Promise<ContractWrapper> {
+  public async createProxy(contractClass: ContractFactory, packageName: string, contractName: string, proxyAdmin: string, initMethodName: string, initArgs?: string[]): Promise<ContractWrapper> {
     const { receipt } = typeof(initArgs) === 'undefined'
-      ? await this._createProxy(packageName, contractName)
-      : await this._createProxyAndCall(contractClass, packageName, contractName, initMethodName, initArgs);
+      ? await this._createProxy(packageName, contractName, proxyAdmin)
+      : await this._createProxyAndCall(contractClass, packageName, contractName, proxyAdmin, initMethodName, initArgs);
 
     log.info(`TX receipt received: ${receipt.transactionHash}`);
     const address: string = findLast(receipt.logs, (l) => l.event === 'ProxyCreated').args.proxy;
@@ -109,35 +99,16 @@ export default class App {
     return contractClass.at(address);
   }
 
-  public async upgradeProxy(proxyAddress: string, contractClass: ContractFactory, packageName: string, contractName: string, initMethodName: string, initArgs: any): Promise<ContractWrapper> {
-    const { receipt }: any = typeof(initArgs) === 'undefined'
-      ? await this._upgradeProxy(proxyAddress, packageName, contractName)
-      : await this._upgradeProxyAndCall(proxyAddress, contractClass, packageName, contractName, initMethodName, initArgs);
-    log.info(`TX receipt received: ${receipt.transactionHash}`);
-    return contractClass.at(proxyAddress);
-  }
-
-  private async _createProxy(packageName: string, contractName: string): Promise<any> {
+  private async _createProxy(packageName: string, contractName: string, proxyAdmin: string): Promise<any> {
     log.info(`Creating ${packageName} ${contractName} proxy without initializing...`);
     const initializeData: string = '';
-    return sendTransaction(this.appContract.create, [packageName, contractName, initializeData], this.txParams);
+    return sendTransaction(this.appContract.create, [packageName, contractName, proxyAdmin, initializeData], this.txParams);
   }
 
-  private async _createProxyAndCall(contractClass: ContractFactory, packageName: string, contractName: string, initMethodName: string, initArgs: any): Promise<any> {
+  private async _createProxyAndCall(contractClass: ContractFactory, packageName: string, contractName: string, proxyAdmin: string, initMethodName: string, initArgs: any): Promise<any> {
     const { method: initMethod, callData }: CalldataInfo = buildCallData(contractClass, initMethodName, initArgs);
     log.info(`Creating ${packageName} ${contractName} proxy and calling ${callDescription(initMethod, initArgs)}`);
-    return sendTransaction(this.appContract.create, [packageName, contractName, callData], this.txParams);
-  }
-
-  private async _upgradeProxy(proxyAddress: string, packageName: string, contractName: string): Promise<any> {
-    log.info(`Upgrading ${packageName} ${contractName} proxy without running migrations...`);
-    return sendTransaction(this.appContract.upgrade, [proxyAddress, packageName, contractName], this.txParams);
-  }
-
-  private async _upgradeProxyAndCall(proxyAddress: string, contractClass: ContractFactory, packageName: string, contractName: string, initMethodName: string, initArgs: any): Promise<any> {
-    const { method: initMethod, callData }: CalldataInfo = buildCallData(contractClass, initMethodName, initArgs);
-    log.info(`Upgrading ${packageName} ${contractName} proxy and calling ${callDescription(initMethod, initArgs)}...`);
-    return sendTransaction(this.appContract.upgradeAndCall, [proxyAddress, packageName, contractName, callData], this.txParams);
+    return sendTransaction(this.appContract.create, [packageName, contractName, proxyAdmin, callData], this.txParams);
   }
 
   private async _copyContract(packageName: string, contractName: string, contractClass: ContractFactory): Promise<ContractWrapper> {
@@ -156,4 +127,35 @@ export default class App {
       await sendDataTransaction(instance, Object.assign({}, this.txParams, { data: callData }));
     }
   }
+
+  // TODO: This logic has been moved to ProxyAdmin
+  // public async getProxyImplementation(proxyAddress: string): Promise<string> {
+  //   return this.appContract.getProxyImplementation(proxyAddress, this.txParams);
+  // }
+
+  // public async changeProxyAdmin(proxyAddress: string, newAdmin: string): Promise<void> {
+  //   log.info(`Changing admin for proxy ${proxyAddress} to ${newAdmin}...`);
+  //   await sendTransaction(this.appContract.changeProxyAdmin, [proxyAddress, newAdmin], this.txParams);
+  //   log.info(`Admin for proxy ${proxyAddress} set to ${newAdmin}`);
+  // }
+  // 
+  // public async upgradeProxy(proxyAddress: string, contractClass: ContractFactory, packageName: string, contractName: string, initMethodName: string, initArgs: any): Promise<ContractWrapper> {
+  //   const { receipt }: any = typeof(initArgs) === 'undefined'
+  //     ? await this._upgradeProxy(proxyAddress, packageName, contractName)
+  //     : await this._upgradeProxyAndCall(proxyAddress, contractClass, packageName, contractName, initMethodName, initArgs);
+  //   log.info(`TX receipt received: ${receipt.transactionHash}`);
+  //   return contractClass.at(proxyAddress);
+  // }
+
+  // private async _upgradeProxy(proxyAddress: string, packageName: string, contractName: string): Promise<any> {
+  //   log.info(`Upgrading ${packageName} ${contractName} proxy without running migrations...`);
+  //   return sendTransaction(this.appContract.upgrade, [proxyAddress, packageName, contractName], this.txParams);
+  // }
+
+  // private async _upgradeProxyAndCall(proxyAddress: string, contractClass: ContractFactory, packageName: string, contractName: string, initMethodName: string, initArgs: any): Promise<any> {
+  //   const { method: initMethod, callData }: CalldataInfo = buildCallData(contractClass, initMethodName, initArgs);
+  //   log.info(`Upgrading ${packageName} ${contractName} proxy and calling ${callDescription(initMethod, initArgs)}...`);
+  //   return sendTransaction(this.appContract.upgradeAndCall, [proxyAddress, packageName, contractName, callData], this.txParams);
+  // }
+
 }
