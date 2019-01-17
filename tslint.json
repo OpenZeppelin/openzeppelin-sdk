@@ -47,8 +47,13 @@
       "no-var-requires": [false],
       "curly": [true, "ignore-same-line"],
       "adjacent-overload-signatures": [false],
+<<<<<<< HEAD
       "max-classes-per-file": [false],
       "no-string-literal": [false]
+=======
+      "no-string-literal": [false],
+      "max-classes-per-file": [false]
+>>>>>>> All cli tests passing with Web3 v1.
     },
     "rulesDirectory": []
 }

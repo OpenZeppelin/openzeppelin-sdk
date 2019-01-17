@@ -1,6 +1,5 @@
 import BN from 'bignumber.js';
 import ZWeb3 from './ZWeb3';
-import decodeLogs from '../helpers/decodeLogs';
 import { getSolidityLibNames, hasUnlinkedVariables } from '../utils/Bytecode';
 import { StorageLayoutInfo } from '../validations/Storage';
 import { Contract, TransactionObject } from 'web3-eth-contract';
@@ -26,7 +25,6 @@ export interface ContractWrapper {
 }
 
 export interface TransactionReceiptWrapper {
-  logs: any[];
   tx: string;
   receipt: any;
 }
@@ -122,8 +120,7 @@ export default class ContractFactory {
       const tx = { to: instance.options.address, ...defaults, ...txParams };
       const txHash = await ZWeb3.sendTransactionWithoutReceipt(tx);
       const receiptWithTimeout = await ZWeb3.getTransactionReceiptWithTimeout(txHash, self.timeout);
-      console.log(`logs`, receiptWithTimeout);
-      return { tx, receipt: receiptWithTimeout, logs: decodeLogs(receiptWithTimeout.logs, self) };
+      return { tx, receipt: receiptWithTimeout };
     };
 
     wrapper.send = async function(value: any): Promise<string> {
