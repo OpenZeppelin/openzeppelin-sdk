@@ -12,7 +12,7 @@ import StatusComparator from '../../src/models/status/StatusComparator'
 const ImplV1 = Contracts.getFromLocal('ImplV1')
 const ChildImplV1 = Contracts.getFromLocal('ChildImplV1')
 
-contract.only('StatusComparator', function([_, owner, anotherAddress]) {
+contract('StatusComparator', function([_, owner, anotherAddress]) {
   const network = 'test'
   const txParams = { from: owner }
 

@@ -9,7 +9,7 @@ import ZosPackageFile from "../../src/models/files/ZosPackageFile"
 const ImplV1 = Contracts.getFromLocal('ImplV1')
 const WithLibraryImpl = Contracts.getFromLocal('WithLibraryImplV1')
 
-contract('TestHelper', function ([_, owner]) {
+contract.only('TestHelper', function ([_, owner]) {
   const txParams = { from: owner }
   const projectName = 'Herbs'
   const initialVersion = "1.1.0"
@@ -58,7 +58,7 @@ contract('TestHelper', function ([_, owner]) {
 
     it('retrieves a mock from app', async function () {
       const proxy = await this.project.createProxy(ImplV1, { contractName: 'Impl' })
-      const say = await proxy.say()
+      const say = await proxy.methods.say().call()
 
       say.should.eq('V1')
     })
@@ -74,7 +74,7 @@ contract('TestHelper', function ([_, owner]) {
 
     it('retrieves a mock from app', async function () {
       const proxy = await this.project.createProxy(ImplV1, { contractName: 'Impl' })
-      const say = await proxy.say()
+      const say = await proxy.methods.say().call()
       say.should.eq('V1')
     })
   })
