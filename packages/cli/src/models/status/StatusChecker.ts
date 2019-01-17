@@ -3,7 +3,7 @@ import { promisify } from 'util';
 import EventsFilter from './EventsFilter';
 import StatusFetcher from './StatusFetcher';
 import StatusComparator from './StatusComparator';
-import { ZWeb3, Logger, AppProject, bytecodeDigest, semanticVersionEqual, replaceSolidityLibAddress, isSolidityLib } from 'zos-lib';
+import { ZWeb3, Logger, AppProject, bytecodeDigest, semanticVersionToString, semanticVersionEqual, replaceSolidityLibAddress, isSolidityLib } from 'zos-lib';
 import ZosNetworkFile, {
   ProxyInterface,
   DependencyInterface
@@ -271,7 +271,7 @@ export default class StatusChecker {
       .filter((event) => event.returnValues.providerName !== this.packageName)
       .map((event) => ({
         name: event.returnValues.providerName,
-        version: event.returnValues.version,
+        version: semanticVersionToString(event.returnValues.version),
         package: event.returnValues.package
       }))
       .reduce((dependencies, dependency) => {

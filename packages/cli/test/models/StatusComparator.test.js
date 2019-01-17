@@ -127,7 +127,7 @@ contract.only('StatusComparator', function([_, owner, anotherAddress]) {
   }
 
   function testDependencies() {
-    describe.only('dependencies', function() {
+    describe('dependencies', function() {
       beforeEach('set dependency params', async function() {
         this.dep1 = { name: 'mock-stdlib-undeployed', version: '1.1.0' }
         this.dep2 = { name: 'mock-stdlib-undeployed-2', version: '1.2.0' }
@@ -167,7 +167,6 @@ contract.only('StatusComparator', function([_, owner, anotherAddress]) {
         describe('when the network file has all matching dependencies', function() {
           it('does not report diffs', async function() {
             await this.checker.checkDependencies()
-            console.log(`reports`, this.comparator.reports);
 
             this.comparator.reports.should.be.empty
           })
