@@ -122,6 +122,7 @@ export default class ContractFactory {
       const tx = { to: instance.options.address, ...defaults, ...txParams };
       const txHash = await ZWeb3.sendTransactionWithoutReceipt(tx);
       const receiptWithTimeout = await ZWeb3.getTransactionReceiptWithTimeout(txHash, self.timeout);
+      console.log(`logs`, receiptWithTimeout);
       return { tx, receipt: receiptWithTimeout, logs: decodeLogs(receiptWithTimeout.logs, self) };
     };
 
