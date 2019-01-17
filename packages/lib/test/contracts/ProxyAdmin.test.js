@@ -6,21 +6,21 @@ import encodeCall from '../../src/helpers/encodeCall'
 import assertRevert from '../../src/test/helpers/assertRevert';
 import shouldBehaveLikeOwnable from '../../src/test/behaviors/Ownable';
 
+const ImplV1 = Contracts.getFromLocal('DummyImplementation');
+const ImplV2 = Contracts.getFromLocal('DummyImplementationV2');
 const ProxyAdmin = Contracts.getFromLocal('ProxyAdmin');
 const AdminUpgradeabilityProxy = Contracts.getFromLocal('AdminUpgradeabilityProxy');
-const DummyImplementationV1 = Contracts.getFromLocal('DummyImplementation');
-const DummyImplementationV2 = Contracts.getFromLocal('DummyImplementationV2');
 
 contract('ProxyAdmin', function([_, proxyAdminOwner, newAdmin, anotherAccount]) {
   before('set implementations', async function() {
-    this.implementation_v1 = await DummyImplementationV1.new();
-    this.implementation_v2 = await DummyImplementationV2.new();
+    this.implementationV1 = await ImplV1.new();
+    this.implementationV2 = await ImplV2.new();
   });
 
   beforeEach(async function() {
     const initializeData = '';
     this.proxyAdmin = await ProxyAdmin.new({ from: proxyAdminOwner });
-    this.proxy = await AdminUpgradeabilityProxy.new(this.implementation_v1.address, this.proxyAdmin.address, initializeData, { from: proxyAdminOwner });
+    this.proxy = await AdminUpgradeabilityProxy.new(this.implementationV1.address, this.proxyAdmin.address, initializeData, { from: proxyAdminOwner });
   });
 
   describe('verifies ownership', function() {
@@ -51,22 +51,22 @@ contract('ProxyAdmin', function([_, proxyAdminOwner, newAdmin, anotherAccount]) 
   describe('#getProxyImplementation', function() {
     it('returns proxy implementation address', async function() {
       const implementationAddress = await this.proxyAdmin.getProxyImplementation(this.proxy.address);
-      implementationAddress.should.be.equal(this.implementation_v1.address);
+      implementationAddress.should.be.equal(this.implementationV1.address);
     });
   });
 
   describe('#upgrade', function() {
     context('with unauthorized account', function() {
       it('fails to upgrade', async function() {
-        await assertRevert(this.proxyAdmin.upgrade(this.proxy.address, this.implementation_v2.address, { from: anotherAccount }))
+        await assertRevert(this.proxyAdmin.upgrade(this.proxy.address, this.implementationV2.address, { from: anotherAccount }))
       });
     })
 
     context('with authorized account', function() {
       it('upgrades implementation', async function() {
-        await this.proxyAdmin.upgrade(this.proxy.address, this.implementation_v2.address, { from: proxyAdminOwner })
+        await this.proxyAdmin.upgrade(this.proxy.address, this.implementationV2.address, { from: proxyAdminOwner })
         const implementationAddress = await this.proxyAdmin.getProxyImplementation(this.proxy.address);
-        implementationAddress.should.be.equal(this.implementation_v2.address);
+        implementationAddress.should.be.equal(this.implementationV2.address);
       });
     });
   });
@@ -75,7 +75,7 @@ contract('ProxyAdmin', function([_, proxyAdminOwner, newAdmin, anotherAccount]) 
     context('with unauthorized account', function() {
       it('fails to upgrade', async function(){
         const callData = encodeCall('initializeNonPayable', ['uint256'], [1337])
-        await assertRevert(this.proxyAdmin.upgradeAndCall(this.proxy.address, this.implementation_v2.address, callData, { from: anotherAccount }))
+        await assertRevert(this.proxyAdmin.upgradeAndCall(this.proxy.address, this.implementationV2.address, callData, { from: anotherAccount }))
       });
     });
 
@@ -83,16 +83,16 @@ contract('ProxyAdmin', function([_, proxyAdminOwner, newAdmin, anotherAccount]) 
       context('with invalid callData', function() {
         it('fails to upgrade', async function() {
           const callData = encodeCall('meesaNoExist', ['uint256'], [1337])
-          await assertRevert(this.proxyAdmin.upgradeAndCall(this.proxy.address, this.implementation_v2.address, callData, { from: proxyAdminOwner }));
+          await assertRevert(this.proxyAdmin.upgradeAndCall(this.proxy.address, this.implementationV2.address, callData, { from: proxyAdminOwner }));
         });
       })
 
       context('with valid callData', function() {
         it('fails to upgrade', async function() {
           const callData = encodeCall('initializeNonPayable', ['uint256'], [1337])
-          await this.proxyAdmin.upgradeAndCall(this.proxy.address, this.implementation_v2.address, callData, { from: proxyAdminOwner });
+          await this.proxyAdmin.upgradeAndCall(this.proxy.address, this.implementationV2.address, callData, { from: proxyAdminOwner });
           const implementationAddress = await this.proxyAdmin.getProxyImplementation(this.proxy.address);
-          implementationAddress.should.be.equal(this.implementation_v2.address);
+          implementationAddress.should.be.equal(this.implementationV2.address);
         });
       })
     });
