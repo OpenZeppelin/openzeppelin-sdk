@@ -80,9 +80,9 @@ function validateStorage(contractClass: ContractFactory, existingContractInfo: a
 function tryGetUninitializedBaseContracts(contractClass: ContractFactory): string[] {
   try {
     const pipeline = [
-      contracts => values(contracts),
-      contracts => flatten(contracts),
-      contracts => uniq(contracts),
+      (contracts) => values(contracts),
+      (contracts) => flatten(contracts),
+      (contracts) => uniq(contracts),
     ];
 
     return pipeline.reduce((xs, f) => f(xs), getUninitializedBaseContracts(contractClass));
