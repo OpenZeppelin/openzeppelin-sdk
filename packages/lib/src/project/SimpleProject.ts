@@ -4,7 +4,6 @@ import Proxy from '../proxy/Proxy';
 import Logger from '../utils/Logger';
 import { deploy } from '../utils/Transactions';
 import { toAddress } from '../utils/Addresses';
-import { buildCallData, callDescription, CalldataInfo } from '../utils/ABIs';
 import ContractFactory, { ContractWrapper } from '../artifacts/ContractFactory';
 import { ContractInterface } from './AppProject';
 import BaseSimpleProject from './BaseSimpleProject';
