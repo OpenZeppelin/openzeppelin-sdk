@@ -12,7 +12,7 @@ import utils from 'web3-utils';
 
 const should = require('chai').should();
 
-contract.only('publish script', function(accounts) {
+contract('publish script', function(accounts) {
   accounts = accounts.map(utils.toChecksumAddress);
   const [_, owner, otherAddress] = accounts;
 

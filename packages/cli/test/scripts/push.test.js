@@ -19,7 +19,7 @@ const ImplV1 = Contracts.getFromLocal('ImplV1');
 const WithLibraryImplV1 = Contracts.getFromLocal('WithLibraryImplV1');
 const ImplementationDirectory = Contracts.getFromNodeModules('zos-lib', 'ImplementationDirectory');
 
-contract('push script', function([_, owner]) {
+contract.only('push script', function([_, owner]) {
   const network = 'test';
   const txParams = { from: owner }
   const defaultVersion = '1.1.0';
@@ -43,7 +43,7 @@ contract('push script', function([_, owner]) {
   const shouldDeployProvider = function () {
     it('should deploy provider at specified address', async function () {
       const directory = await ImplementationDirectory.at(this.networkFile.providerAddress);
-      (await directory.getImplementation('foo')).should.be.zeroAddress;
+      (await directory.methods.getImplementation('foo').call()).should.be.zeroAddress;
     });
   };
 
@@ -68,13 +68,13 @@ contract('push script', function([_, owner]) {
       contract.storage.should.not.be.empty;
       contract.types.should.not.be.empty;
       const deployed = await ImplV1.at(contract.address);
-      (await deployed.say()).should.eq('V1');
+      (await deployed.methods.say().call()).should.eq('V1');
     });
 
     it('should deploy contract instance', async function () {
       const address = this.networkFile.contract('Impl').address;
       const deployed = await ImplV1.at(address);
-      (await deployed.say()).should.eq('V1');
+      (await deployed.methods.say().call()).should.eq('V1');
     });
 
     it('should deploy required libraries', async function () {
@@ -87,8 +87,8 @@ contract('push script', function([_, owner]) {
     it('should deploy and link contracts that require libraries', async function () {
       const address = this.networkFile.contract('WithLibraryImpl').address;
       const deployed = await WithLibraryImplV1.at(address);
-      const result = await deployed.double(10);
-      result.toNumber().should.eq(20);
+      const result = await deployed.methods.double(10).call();
+      parseInt(result, 10).should.eq(20);
     });
   };
 
@@ -266,7 +266,7 @@ contract('push script', function([_, owner]) {
       if (!this.networkFile.appAddress) return;
       const app = await App.fetch(this.networkFile.appAddress);
       const packageInfo = await app.getPackage(libName)
-      packageInfo.version.should.be.semverEqual(libVersion)
+      packageInfo.version.map(Number).should.be.semverEqual(libVersion)
       packageInfo.package.address.should.eq(this.dependencyPackage.address)
     });
 
@@ -307,7 +307,7 @@ contract('push script', function([_, owner]) {
         const app = await App.fetch(this.networkFile.appAddress);
         const packageInfo = await app.getPackage('mock-stdlib');
         packageInfo.package.address.should.eq(this.dependencyPackage.address);
-        packageInfo.version.should.be.semverEqual(newVersion);
+        packageInfo.version.map(Number).should.be.semverEqual(newVersion);
       });
     });
   };
@@ -456,7 +456,7 @@ contract('push script', function([_, owner]) {
         await push({ network, txParams, networkFile: this.networkFile, deployDependencies: true });
         const app = await App.fetch(this.networkFile.appAddress);
         const packageInfo = await app.getPackage('mock-stdlib-unpublished');
-        packageInfo.version.should.be.semverEqual('1.1.0');
+        packageInfo.version.map(Number).should.be.semverEqual('1.1.0');
         packageInfo.package.address.should.be.nonzeroAddress;
       });
     })
