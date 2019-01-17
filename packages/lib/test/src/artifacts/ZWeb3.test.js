@@ -4,12 +4,11 @@ import sinon from 'sinon'
 import ZWeb3 from '../../../src/artifacts/ZWeb3'
 import Contracts from '../../../src/artifacts/Contracts'
 import { ZERO_ADDRESS } from '../../../src/utils/Addresses'
-import _ from 'lodash';
 import utils from 'web3-utils';
 import BN from 'bignumber.js';
 
 contract('ZWeb3', accounts => {
-  accounts = _.map(accounts, utils.toChecksumAddress); // Required by Web3 v1.x.
+  accounts = accounts.map(utils.toChecksumAddress); // Required by Web3 v1.x.
   
   before('deploy dummy instance', async function () {
     const DummyImplementation = Contracts.getFromLocal('DummyImplementation')

@@ -47,10 +47,9 @@ export default class App {
   }
 
   public async hasPackage(name: string, expectedVersion?: string): Promise<boolean> {
-    let { ['0']: address, ['1']: version } = await this.appContract.methods.getPackage(name).call();
-    version = version.map(Number)
+    const { ['0']: address, ['1']: version } = await this.appContract.methods.getPackage(name).call();
     return !isZeroAddress(address) &&
-      (!expectedVersion || semanticVersionEqual(expectedVersion, version));
+      (!expectedVersion || semanticVersionEqual(expectedVersion, version.map(Number)));
   }
 
   public async setPackage(name: string, packageAddress: string, version: string): Promise<any> {
