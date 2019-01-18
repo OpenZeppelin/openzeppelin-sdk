@@ -151,7 +151,7 @@ export async function estimateGas(txParams: any, retries: number = RETRY_COUNT):
   // See https://github.com/zeppelinos/zos/issues/192 for more info.
   try {
     // Use json-rpc method estimateGas to retrieve estimated value
-    return await ZWeb3.estimateGas({ ...txParams });
+    return await ZWeb3.estimateGas(txParams);
   } catch (error) {
     if (retries <= 0) throw Error(error);
     await sleep(RETRY_SLEEP_TIME);

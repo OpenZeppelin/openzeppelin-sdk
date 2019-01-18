@@ -117,12 +117,12 @@ export default class ZWeb3 {
   }
 
   public static async sendTransaction(params: any): Promise<TransactionReceipt> {
-    return ZWeb3.eth().sendTransaction(params);
+    return ZWeb3.eth().sendTransaction({ ...params });
   }
 
   public static sendTransactionWithoutReceipt(params: any): Promise<string> {
     return new Promise((resolve, reject) => {
-      ZWeb3.eth().sendTransaction(params, (error, txHash) => {
+      ZWeb3.eth().sendTransaction({ ...params }, (error, txHash) => {
         if(error) reject(error.message);
         else resolve(txHash);
       });

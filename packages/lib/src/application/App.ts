@@ -37,7 +37,7 @@ export default class App {
 
   constructor(appContract: ContractWrapper, txParams: any = {}) {
     this.appContract = appContract;
-    this.txParams = { ...txParams };
+    this.txParams = txParams;
   }
 
   public async getPackage(name): Promise<{ package: Package, version: string }> {

@@ -30,7 +30,7 @@ export default class Proxy {
   constructor(contract: ProxyInterface, txParams: any = {}) {
     this.address = toAddress(contract);
     this.contract = contract;
-    this.txParams = { ...txParams };
+    this.txParams = txParams;
   }
 
   public async upgradeTo(address: string, migrateData: string | null): Promise<any> {

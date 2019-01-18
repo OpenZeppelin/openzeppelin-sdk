@@ -36,7 +36,7 @@ export default class Package {
 
   constructor(packageContract: PackageInterface, txParams: any = {}) {
     this.packageContract = packageContract;
-    this.txParams = { ...txParams };
+    this.txParams = txParams;
   }
 
   get contract(): ContractWrapper {

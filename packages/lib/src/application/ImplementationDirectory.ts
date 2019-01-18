@@ -39,7 +39,7 @@ export default class ImplementationDirectory {
 
   constructor(directory: DirectoryContract, txParams: any = {}) {
     this.directoryContract = directory;
-    this.txParams = { ...txParams };
+    this.txParams = txParams;
   }
 
   get contract(): DirectoryContract {
