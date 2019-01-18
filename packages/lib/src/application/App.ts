@@ -127,35 +127,4 @@ export default class App {
       await sendDataTransaction(instance, Object.assign({}, this.txParams, { data: callData }));
     }
   }
-
-  // TODO: This logic has been moved to ProxyAdmin
-  // public async getProxyImplementation(proxyAddress: string): Promise<string> {
-  //   return this.appContract.getProxyImplementation(proxyAddress, this.txParams);
-  // }
-
-  // public async changeProxyAdmin(proxyAddress: string, newAdmin: string): Promise<void> {
-  //   log.info(`Changing admin for proxy ${proxyAddress} to ${newAdmin}...`);
-  //   await sendTransaction(this.appContract.changeProxyAdmin, [proxyAddress, newAdmin], this.txParams);
-  //   log.info(`Admin for proxy ${proxyAddress} set to ${newAdmin}`);
-  // }
-  // 
-  // public async upgradeProxy(proxyAddress: string, contractClass: ContractFactory, packageName: string, contractName: string, initMethodName: string, initArgs: any): Promise<ContractWrapper> {
-  //   const { receipt }: any = typeof(initArgs) === 'undefined'
-  //     ? await this._upgradeProxy(proxyAddress, packageName, contractName)
-  //     : await this._upgradeProxyAndCall(proxyAddress, contractClass, packageName, contractName, initMethodName, initArgs);
-  //   log.info(`TX receipt received: ${receipt.transactionHash}`);
-  //   return contractClass.at(proxyAddress);
-  // }
-
-  // private async _upgradeProxy(proxyAddress: string, packageName: string, contractName: string): Promise<any> {
-  //   log.info(`Upgrading ${packageName} ${contractName} proxy without running migrations...`);
-  //   return sendTransaction(this.appContract.upgrade, [proxyAddress, packageName, contractName], this.txParams);
-  // }
-
-  // private async _upgradeProxyAndCall(proxyAddress: string, contractClass: ContractFactory, packageName: string, contractName: string, initMethodName: string, initArgs: any): Promise<any> {
-  //   const { method: initMethod, callData }: CalldataInfo = buildCallData(contractClass, initMethodName, initArgs);
-  //   log.info(`Upgrading ${packageName} ${contractName} proxy and calling ${callDescription(initMethod, initArgs)}...`);
-  //   return sendTransaction(this.appContract.upgradeAndCall, [proxyAddress, packageName, contractName, callData], this.txParams);
-  // }
-
 }
