@@ -96,6 +96,10 @@ export default class AppProject extends BasePackageProject {
     return directory;
   }
 
+  public getProxyAdmin(): ProxyAdmin {
+    return this.proxyAdmin;
+  }
+
   public getApp(): App {
     return this.app;
   }
