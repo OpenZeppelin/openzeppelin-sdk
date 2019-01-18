@@ -17,6 +17,7 @@ export function isZeroAddress(address: string): boolean {
 
 // TS-TODO: if uint256 is a string, then why are we doing uint256.toString()?
 export function uint256ToAddress(uint256: string): string {
-  const address = uint256.toString().replace('0x000000000000000000000000', '0x');
+  const padded = utils.leftPad(uint256.toString(), 64);
+  const address = padded.replace('0x000000000000000000000000', '0x');
   return utils.toChecksumAddress(address);
 }

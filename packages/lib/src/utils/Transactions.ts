@@ -84,7 +84,8 @@ export async function sendDataTransaction(contract: ContractWrapper, txParams: a
   try {
     return await _sendDataTransaction(contract, txParams);
   } catch (error) {
-    if (!error.message.match(/nonce too low/) || retries <= 0) throw error;
+    const msg = typeof error === 'string' ? error : error.message;
+    if (!msg.match(/nonce too low/) || retries <= 0) throw error;
     return sendDataTransaction(contract, txParams, retries - 1);
   }
 }
@@ -98,7 +99,9 @@ export async function sendDataTransaction(contract: ContractWrapper, txParams: a
  */
 async function _sendTransaction(contractFn: GenericFunction, args: any[] = [], txParams: any = {}): Promise<TransactionReceipt> {
   // If gas is set explicitly, use it
-  if (txParams.gas || Contracts.getArtifactsDefaults().gas) return contractFn(...args).send({ ...txParams });
+  const defaultGas = Contracts.getArtifactsDefaults().gas;
+  if (!txParams.gas && defaultGas) txParams.gas = defaultGas;
+  if (txParams.gas) return contractFn(...args).send({ ...txParams });
 
   // Estimate gas for the call
   const gas = await estimateActualGasFnCall(contractFn, args, txParams);
@@ -114,7 +117,9 @@ async function _sendTransaction(contractFn: GenericFunction, args: any[] = [], t
  */
 async function _sendDataTransaction(contract: ContractWrapper, txParams: any = {}) {
   // If gas is set explicitly, use it
-  if (txParams.gas || Contracts.getArtifactsDefaults().gas) return contract.sendTransaction(txParams);
+  const defaultGas = Contracts.getArtifactsDefaults().gas;
+  if (!txParams.gas && defaultGas) txParams.gas = defaultGas;
+  if (txParams.gas) return contract.sendTransaction(txParams);
 
   // Estimate gas for the call and run the tx
   const gas = await estimateActualGas({ to: contract.address, ...txParams });
@@ -130,7 +135,9 @@ async function _sendDataTransaction(contract: ContractWrapper, txParams: any = {
  */
 async function _deploy(contract: ContractFactory, args: any[] = [], txParams: any = {}): Promise<ContractWrapper> {
   // If gas is set explicitly, use it
-  if (txParams.gas || Contracts.getArtifactsDefaults().gas) return contract.new(...args, txParams);
+  const defaultGas = Contracts.getArtifactsDefaults().gas;
+  if (!txParams.gas && defaultGas) txParams.gas = defaultGas;
+  if (txParams.gas) return contract.new(...args, txParams);
 
   const data = contract.getData(args, txParams);
   const gas = await estimateActualGas({ data, ...txParams });
@@ -144,7 +151,7 @@ export async function estimateGas(txParams: any, retries: number = RETRY_COUNT):
   // See https://github.com/zeppelinos/zos/issues/192 for more info.
   try {
     // Use json-rpc method estimateGas to retrieve estimated value
-    return await ZWeb3.estimateGas(txParams);
+    return await ZWeb3.estimateGas({ ...txParams });
   } catch (error) {
     if (retries <= 0) throw Error(error);
     await sleep(RETRY_SLEEP_TIME);

@@ -62,7 +62,7 @@ export default class ImplementationDirectory {
   public async setImplementation(contractName: string, implementationAddress: string): Promise<any> {
     log.info(`Setting ${contractName} implementation ${implementationAddress}...`);
     await sendTransaction(this.directoryContract.methods.setImplementation, [contractName, implementationAddress], { ...this.txParams });
-    log.info(`Implementation set ${implementationAddress}`);
+    log.info(`Implementation set: ${implementationAddress}`);
   }
 
   public async unsetImplementation(contractName: string): Promise<any> {

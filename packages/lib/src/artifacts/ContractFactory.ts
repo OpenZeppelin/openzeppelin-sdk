@@ -4,6 +4,7 @@ import { getSolidityLibNames, hasUnlinkedVariables } from '../utils/Bytecode';
 import { StorageLayoutInfo } from '../validations/Storage';
 import { Contract, TransactionObject } from 'web3-eth-contract';
 import Contracts from './Contracts';
+import _ from 'lodash';
 
 interface ContractSchema {
   contractName: string;
@@ -75,7 +76,8 @@ export default class ContractFactory {
         .then((instance) => {
           const wrapper: ContractWrapper = self._wrapContract(instance, transactionHash);
           resolve(wrapper);
-        });
+        })
+        .catch((error) => reject(error));
     });
   }
 
