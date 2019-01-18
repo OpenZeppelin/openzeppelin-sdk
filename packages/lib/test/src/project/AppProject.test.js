@@ -8,6 +8,7 @@ import SimpleProject from '../../../src/project/SimpleProject';
 import shouldManageProxies from './ProxyProject.behaviour';
 import shouldManageDependencies from './DependenciesProject.behaviour';
 import shouldBehaveLikePackageProject from './PackageProject.behavior';
+import assertRevert from '../../../src/test/helpers/assertRevert'
 import { toAddress } from '../../../src/utils/Addresses';
 import { Package } from '../../../src';
 
@@ -28,6 +29,27 @@ contract('AppProject', function ([_, owner, another]) {
 
     it('should have a proxyAdmin initialized', function() {
       this.project.proxyAdmin.should.be.an.instanceof(ProxyAdmin);
+    });
+
+    describe('instance methods', function() {
+      beforeEach('deploy implementations', async function() {
+        this.implementation = await this.project.setImplementation(ImplV1, "DummyImplementation")
+        this.proxy = await this.project.createProxy(ImplV1);
+      });
+
+      describe('#upgradeProxy', function() {
+        it('fails to upgrade a proxy for unregistered package', async function () {
+          await assertRevert(this.project.upgradeProxy(this.proxy.address, ImplV1, { contractName: 'NOTEXISTS' }));
+        });
+
+        it('fails to upgrade a proxy for unregistered contract', async function () {
+          await assertRevert(this.project.upgradeProxy(this.proxy.address, ImplV1, { packageName: 'NOTEXISTS' }))
+        });
+
+        it('fails to upgrade a non-proxy contract', async function () {
+          await assertRevert(this.project.upgradeProxy(this.implementation.address, ImplV1))
+        });
+      });
     });
 
     shouldBehaveLikePackageProject({

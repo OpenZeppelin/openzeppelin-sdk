@@ -118,24 +118,6 @@ export default function shouldManageProxies([_, appOwner, directoryOwner, anothe
 
         shouldUpgradeProxy();
       });
-
-      // TODO: remove these tests should be deprecated, since upgrade() is not part of App anymore, and
-      // also because this revers if getImplementation fails.
-      it.skip('fails to upgrade a proxy for unregistered package', async function () {
-        await assertRevert(this.app.upgrade(this.proxyAddress, "NOTEXISTS", this.contractNameUpdated))
-      });
-
-      it.skip('fails to upgrade a proxy for unregistered contract', async function () {
-        await assertRevert(this.app.upgrade(this.proxyAddress, this.packageName, "NOTEXISTS"))
-      });
-
-      it.skip('fails to upgrade a non-proxy contract', async function () {
-        await assertRevert(this.app.upgrade(this.implementation_v0, this.packageName, this.contractNameUpdated))
-      });
-
-      it.skip('fails to upgrade from another account', async function () {
-        await assertRevert(this.app.upgrade(this.proxyAddress, this.packageName, this.contractNameUpdated, { from: anotherAccount }))
-      });
     });
 
     describe('upgradeAndCall', function () {
@@ -165,29 +147,6 @@ export default function shouldManageProxies([_, appOwner, directoryOwner, anothe
           const balance = await ZWeb3.getBalance(this.proxyAddress)
           balance.should.be.bignumber.eq(value)
         })
-      });
-
-
-      // TODO: remove these tests should be deprecated, since upgradeAndCall() is not part of App anymore, and
-      // also because this revers if getImplementation fails.
-      it.skip('fails to upgrade a proxy for unregistered package', async function () {
-        await assertRevert(this.app.upgradeAndCall(this.proxyAddress, "NOTEXISTS", this.contractNameUpdated, migrateData, { from: appOwner }))
-      });
-
-      it.skip('fails to upgrade a proxy for unregistered contract', async function () {
-        await assertRevert(this.app.upgradeAndCall(this.proxyAddress, this.packageName, "NOTEXISTS", migrateData, { from: appOwner }))
-      });
-
-      it.skip('fails to upgrade a non-proxy contract', async function () {
-        await assertRevert(this.app.upgradeAndCall(this.implementation_v0, this.packageName, this.contractNameUpdated, migrateData, { from: appOwner }))
-      });
-
-      it.skip('fails to upgrade from another account', async function () {
-        await assertRevert(this.app.upgradeAndCall(this.proxyAddress, this.packageName, this.contractNameUpdated, migrateData, { from: anotherAccount }))
-      });
-
-      it.skip('fails to upgrade with incorrect migrate data', async function () {
-        await assertRevert(this.app.upgradeAndCall(this.proxyAddress, this.packageName, this.contractNameUpdated, incorrectData, { from: appOwner }))
       });
     });
 
