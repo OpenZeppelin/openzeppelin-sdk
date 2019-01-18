@@ -40,7 +40,6 @@ export default class ProxyAdmin {
     log.info(`Admin for proxy ${proxyAddress} set to ${newAdmin}`);
   }
 
-  // TODO: update logs
   public async upgradeProxy(proxyAddress: string, implementationAddress: string, contractClass: any, initMethodName: string, initArgs: any): Promise<any> {
     const { receipt }: any = typeof(initArgs) === 'undefined'
       ? await this._upgradeProxy(proxyAddress, implementationAddress)
@@ -57,7 +56,7 @@ export default class ProxyAdmin {
   // TODO: update logs
   private async _upgradeProxyAndCall(proxyAddress: string, implementationAddress: string, contractClass: any, initMethodName: string, initArgs: any): Promise<any> {
     const { method: initMethod, callData }: CalldataInfo = buildCallData(contractClass, initMethodName, initArgs);
-    log.info(`Upgrading ${'packageName'} ${'contractName'} proxy and calling ${callDescription(initMethod, initArgs)}...`);
+    log.info(`Upgrading  ${contractClass.contractName} proxy and calling ${callDescription(initMethod, initArgs)}...`);
     return sendTransaction(this.contract.upgradeAndCall, [proxyAddress, implementationAddress, callData], this.txParams);
   }
 }

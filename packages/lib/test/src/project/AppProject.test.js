@@ -1,28 +1,33 @@
 'use strict'
 require('../../setup')
 
-import AppProject from '../../../src/project/AppProject'
-import shouldBehaveLikePackageProject from './PackageProject.behavior';
-import shouldManageProxies from './ProxyProject.behaviour';
 import Contracts from '../../../src/artifacts/Contracts';
-import shouldManageDependencies from './DependenciesProject.behaviour';
+import ProxyAdmin from '../../../src/proxy/ProxyAdmin';
+import AppProject from '../../../src/project/AppProject'
 import SimpleProject from '../../../src/project/SimpleProject';
+import shouldManageProxies from './ProxyProject.behaviour';
+import shouldManageDependencies from './DependenciesProject.behaviour';
+import shouldBehaveLikePackageProject from './PackageProject.behavior';
 import { toAddress } from '../../../src/utils/Addresses';
 import { Package } from '../../../src';
 
 const ImplV1 = Contracts.getFromLocal('DummyImplementation');
 const ImplV2 = Contracts.getFromLocal('DummyImplementationV2');
 
-contract('AppProject', function (accounts) {
-  const [_, owner, another] = accounts
+contract('AppProject', function ([_, owner, another]) {
   const name = 'MyProject'
   const version = '0.2.0'
   const newVersion = '0.3.0'
 
   describe('new AppProject', function () {
     beforeEach('deploying', async function () {
-      this.project = await AppProject.fetchOrDeploy(name, version, { from: owner }, {})
-      this.adminAddress = this.project.getApp().address
+      this.proxyAdmin = await ProxyAdmin.deploy({ from: owner });
+      this.project = await AppProject.fetchOrDeploy(name, version, { from: owner }, { proxyAdminAddress: this.proxyAdmin.address });
+      this.adminAddress = this.project.proxyAdmin.address;
+    });
+
+    it('should have a proxyAdmin initialized', function() {
+      this.project.proxyAdmin.should.be.an.instanceof(ProxyAdmin);
     });
 
     shouldBehaveLikePackageProject({
