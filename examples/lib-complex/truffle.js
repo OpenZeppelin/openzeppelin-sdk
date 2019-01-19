@@ -13,5 +13,8 @@ module.exports = {
       network_id: '*', // eslint-disable-line camelcase
       port: 8545
     }
+  },
+  mocha: {
+    bail: true
   }
 }

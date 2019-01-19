@@ -58,7 +58,7 @@ async function deployVersion2(project, donations, txParams) {
   })
   log.info(`Token proxy created at ${token.address}`)
   log.info('Setting application\'s token...')
-  await donations.setToken(token.address, txParams)
+  await donations.methods.setToken(token.address).send(txParams)
   log.info('Token set succesfully')
   return token;
 }

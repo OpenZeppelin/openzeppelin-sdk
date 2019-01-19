@@ -8,7 +8,7 @@ import shouldBehaveLikeDonationsWithTokens from './behaviors/DonationsWithTokens
 
 const DonationsV2 = Contracts.getFromLocal('DonationsV2');
 
-contract('App', ([_, owner, donor, wallet]) => {
+contract.only('App', ([_, owner, donor, wallet]) => {
   const initialVersion = '0.0.1';
   const updatedVersion = '0.0.2';
   const contractName = 'Donations';
@@ -61,7 +61,7 @@ contract('App', ([_, owner, donor, wallet]) => {
     beforeEach(async function() {
       this.project = await deploy.setupApp({owner});
       this.donations = await deploy.deployVersion1(this.project, owner);
-      this.token = await deploy.deployVersion2(this.project, this.donations, { owner });
+      this.token = await deploy.deployVersion2(this.project, this.donations, { from: owner });
       this.donations = DonationsV2.at(this.donations.address);
     });
 
