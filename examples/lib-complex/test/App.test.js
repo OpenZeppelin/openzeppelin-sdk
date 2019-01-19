@@ -57,7 +57,7 @@ contract.only('App', ([_, owner, donor, wallet]) => {
     });
   });
 
-  describe('version 0.0.2', function() {
+  describe.only('version 0.0.2', function() {
     beforeEach(async function() {
       this.project = await deploy.setupApp({owner});
       this.donations = await deploy.deployVersion1(this.project, owner);

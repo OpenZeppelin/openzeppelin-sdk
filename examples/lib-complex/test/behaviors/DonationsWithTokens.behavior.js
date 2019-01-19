@@ -35,11 +35,11 @@ export default function(owner, donor, wallet, tokenName, tokenSymbol) {
       });
 
       it('increments token id', async function() {
-        parseInt(await this.donations.numEmittedTokens().call(), 10).should.be.eq(donationValue);
+        parseInt(await this.donations.methods.numEmittedTokens().call(), 10).should.be.eq(donationValue);
       });
 
       it('mints tokens', async function() {
-        parseInt(await this.token.balanceOf(donor).call()).should.be.eq(donationValue);
+        parseInt(await this.token.methods.balanceOf(donor).call(), 10).should.be.eq(donationValue);
       });
     });
   });
