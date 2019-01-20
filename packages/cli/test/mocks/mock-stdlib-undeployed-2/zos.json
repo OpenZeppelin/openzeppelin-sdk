@@ -1,6 +1,6 @@
 {
   "name": "mock-stdlib-undeployed-2",
-  "zosversion": "2",
+  "zosversion": "2.2",
   "version": "1.2.0",
   "contracts": {
     "Greeter": "GreeterImpl"
