@@ -1,5 +1,5 @@
 import forEach from 'lodash.foreach';
-import { AppProject, PackageProject, SimpleProject, ProxyAdminProject, App, Package, ImplementationDirectory } from 'zos-lib';
+import { AppProject, PackageProject, ProxyAdminProject, App, Package, ImplementationDirectory } from 'zos-lib';
 
 import NetworkController from './NetworkController';
 import ZosPackageFile from '../files/ZosPackageFile';
@@ -84,13 +84,6 @@ export class AppProjectDeployer extends BasePackageProjectDeployer {
   public async fromProxyAdminProject(proxyAdminProject: ProxyAdminProject): Promise<AppProject> {
     return this._run((existingAddresses: ExistingAddresses) => (
       AppProject.fromProxyAdminProject(proxyAdminProject, this.requestedVersion, existingAddresses)
-    ));
-  }
-
-  // TODO: deprecated, remove.
-  public async fromSimpleProject(simpleProject: SimpleProject): Promise<AppProject> {
-    return this._run((existingAddresses: ExistingAddresses) => (
-      AppProject.fromSimpleProject(simpleProject, this.requestedVersion, existingAddresses)
     ));
   }
 

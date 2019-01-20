@@ -14,12 +14,12 @@ import isEqual from 'lodash.isequal';
 import concat from 'lodash.concat';
 import toPairs from 'lodash.topairs';
 import { Contracts, ContractFactory, Logger, FileSystem as fs, Proxy, awaitConfirmations, semanticVersionToString } from 'zos-lib';
-import { SimpleProject, ProxyAdminProject, AppProject, flattenSourceCode, getStorageLayout, BuildArtifacts, getBuildArtifacts, getSolidityLibNames } from 'zos-lib';
+import { ProxyAdminProject, AppProject, flattenSourceCode, getStorageLayout, BuildArtifacts, getBuildArtifacts, getSolidityLibNames } from 'zos-lib';
 import { validate, newValidationErrors, validationPasses, App, ContractWrapper } from 'zos-lib';
 
 import { allPromisesOrError } from '../../utils/async';
 import { toContractFullName } from '../../utils/naming';
-import { AppProjectDeployer, SimpleProjectDeployer, ProxyAdminProjectDeployer } from './ProjectDeployer';
+import { AppProjectDeployer, ProxyAdminProjectDeployer } from './ProjectDeployer';
 import Dependency from '../dependency/Dependency';
 import StatusChecker from '../status/StatusChecker';
 import ValidationLogger from '../../interface/ValidationLogger';
