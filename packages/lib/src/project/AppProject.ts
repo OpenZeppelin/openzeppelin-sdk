@@ -78,6 +78,7 @@ export default class AppProject extends BasePackageProject {
       ));
     return appProject;
   }
+
   // REFACTOR: This code is similar to the SimpleProjectDeployer, consider unifying them
   public static async fromSimpleProject(simpleProject: SimpleProject, version: string = DEFAULT_VERSION, existingAddresses: ExistingAddresses = {}): Promise<AppProject> {
     const appProject: AppProject = await this.fetchOrDeploy(simpleProject.name, version, simpleProject.txParams, existingAddresses);

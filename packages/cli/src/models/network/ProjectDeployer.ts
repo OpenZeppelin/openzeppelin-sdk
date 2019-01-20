@@ -147,22 +147,3 @@ export class ProxyAdminProjectDeployer extends BaseProjectDeployer {
   }
 }
 
-// TODO: as we are not going to mantain SimpleProject in the cli, this code
-// should be removed, as it's deprecated
-export class SimpleProjectDeployer extends BaseProjectDeployer {
-  public project: SimpleProject;
-
-  public async fetchOrDeploy(): Promise<SimpleProject> {
-    this.project = new SimpleProject(this.packageFile.name, this.txParams);
-    this.networkFile.version = this.requestedVersion;
-    forEach(this.networkFile.contracts, (contractInfo, contractAlias) => {
-      this.project.registerImplementation(contractAlias, { address: contractInfo.address, bytecodeHash: contractInfo.bodyBytecodeHash });
-    });
-    forEach(this.networkFile.dependencies, (dependencyInfo, dependencyName) => {
-      this.project.setDependency(dependencyName, dependencyInfo.package, dependencyInfo.version);
-    });
-
-    return this.project;
-  }
-}
-
