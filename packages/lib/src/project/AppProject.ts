@@ -96,12 +96,16 @@ export default class AppProject extends BasePackageProject {
     return directory;
   }
 
-  public getProxyAdmin(): ProxyAdmin {
-    return this.proxyAdmin;
+  public getAdminAddress(): string {
+    return this.proxyAdmin.address;
   }
 
   public getApp(): App {
     return this.app;
+  }
+
+  public getProxyAdmin(): ProxyAdmin {
+    return this.proxyAdmin;
   }
 
   public async getProjectPackage(): Promise<Package> {
