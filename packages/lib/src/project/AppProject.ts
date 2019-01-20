@@ -63,6 +63,21 @@ export default class AppProject extends BasePackageProject {
     }
   }
 
+  // REFACTOR: This code is similar to the ProxyAdminProjectDeployer, consider unifying them
+  public static async fromProxyAdminProject(proxyAdminProject: ProxyAdminProject, version: string = DEFAULT_VERSION, existingAddresses: ExistingAddresses = {}): Promise<AppProject> {
+    const appProject: AppProject = await this.fetchOrDeploy(proxyAdminProject.name, version, proxyAdminProject.txParams, existingAddresses);
+
+    await Promise.all(
+      concat(
+        map(proxyAdminProject.implementations, (contractInfo, contractAlias) => (
+          appProject.registerImplementation(contractAlias, contractInfo)
+        )),
+        map(proxyAdminProject.dependencies, (dependencyInfo, dependencyName) => (
+          appProject.setDependency(dependencyName, dependencyInfo.package, dependencyInfo.version)
+        ))
+      ));
+    return appProject;
+  }
   // REFACTOR: This code is similar to the SimpleProjectDeployer, consider unifying them
   public static async fromSimpleProject(simpleProject: SimpleProject, version: string = DEFAULT_VERSION, existingAddresses: ExistingAddresses = {}): Promise<AppProject> {
     const appProject: AppProject = await this.fetchOrDeploy(simpleProject.name, version, simpleProject.txParams, existingAddresses);

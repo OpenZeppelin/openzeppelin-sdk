@@ -1,5 +1,5 @@
 import forEach from 'lodash.foreach';
-import { AppProject, PackageProject, SimpleProject, App, Package, ImplementationDirectory } from 'zos-lib';
+import { AppProject, PackageProject, SimpleProject, ProxyAdminProject, App, Package, ImplementationDirectory } from 'zos-lib';
 
 import NetworkController from './NetworkController';
 import ZosPackageFile from '../files/ZosPackageFile';
@@ -54,23 +54,6 @@ class BasePackageProjectDeployer extends BaseProjectDeployer {
   }
 }
 
-export class SimpleProjectDeployer extends BaseProjectDeployer {
-  public project: SimpleProject;
-
-  public async fetchOrDeploy(): Promise<SimpleProject> {
-    this.project = new SimpleProject(this.packageFile.name, this.txParams);
-    this.networkFile.version = this.requestedVersion;
-    forEach(this.networkFile.contracts, (contractInfo, contractAlias) => {
-      this.project.registerImplementation(contractAlias, { address: contractInfo.address, bytecodeHash: contractInfo.bodyBytecodeHash });
-    });
-    forEach(this.networkFile.dependencies, (dependencyInfo, dependencyName) => {
-      this.project.setDependency(dependencyName, dependencyInfo.package, dependencyInfo.version);
-    });
-
-    return this.project;
-  }
-}
-
 export class PackageProjectDeployer extends BasePackageProjectDeployer {
   public project: PackageProject;
 
@@ -97,6 +80,13 @@ export class AppProjectDeployer extends BasePackageProjectDeployer {
     ));
   }
 
+  public async fromProxyAdminProject(proxyAdminProject: ProxyAdminProject): Promise<AppProject> {
+    return this._run((existingAddresses: ExistingAddresses) => (
+      AppProject.fromProxyAdminProject(proxyAdminProject, this.requestedVersion, existingAddresses)
+    ));
+  }
+
+  // TODO: deprecated, remove.
   public async fromSimpleProject(simpleProject: SimpleProject): Promise<AppProject> {
     return this._run((existingAddresses: ExistingAddresses) => (
       AppProject.fromSimpleProject(simpleProject, this.requestedVersion, existingAddresses)
@@ -134,3 +124,40 @@ export class AppProjectDeployer extends BasePackageProjectDeployer {
     this.networkFile.app = { address };
   }
 }
+
+export class ProxyAdminProjectDeployer extends BaseProjectDeployer {
+  public project: ProxyAdminProject;
+
+  public async fetchOrDeploy(): Promise<ProxyAdminProject> {
+    this.project = await ProxyAdminProject.fetchOrDeploy(this.packageFile.name, this.txParams);
+    this.networkFile.version = this.requestedVersion;
+    forEach(this.networkFile.contracts, (contractInfo, contractAlias) => {
+      this.project.registerImplementation(contractAlias, { address: contractInfo.address, bytecodeHash: contractInfo.bodyBytecodeHash });
+    });
+    forEach(this.networkFile.dependencies, (dependencyInfo, dependencyName) => {
+      this.project.setDependency(dependencyName, dependencyInfo.package, dependencyInfo.version);
+    });
+
+    return this.project;
+  }
+}
+
+// TODO: as we are not going to mantain SimpleProject in the cli, this code
+// should be removed, as it's deprecated
+export class SimpleProjectDeployer extends BaseProjectDeployer {
+  public project: SimpleProject;
+
+  public async fetchOrDeploy(): Promise<SimpleProject> {
+    this.project = new SimpleProject(this.packageFile.name, this.txParams);
+    this.networkFile.version = this.requestedVersion;
+    forEach(this.networkFile.contracts, (contractInfo, contractAlias) => {
+      this.project.registerImplementation(contractAlias, { address: contractInfo.address, bytecodeHash: contractInfo.bodyBytecodeHash });
+    });
+    forEach(this.networkFile.dependencies, (dependencyInfo, dependencyName) => {
+      this.project.setDependency(dependencyName, dependencyInfo.package, dependencyInfo.version);
+    });
+
+    return this.project;
+  }
+}
+
