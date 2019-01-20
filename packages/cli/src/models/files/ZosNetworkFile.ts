@@ -59,6 +59,11 @@ interface ProviderInterface {
   address?: string;
 }
 
+interface ProxyAdminInterface {
+  address?: string;
+}
+
+
 export default class ZosNetworkFile {
 
   public packageFile: ZosPackageFile;
@@ -69,6 +74,7 @@ export default class ZosNetworkFile {
     solidityLibs: { [libAlias: string]: SolidityLibInterface };
     proxies: { [contractName: string]: ProxyInterface[] };
     zosversion: string;
+    proxyAdmin: ProxyAdminInterface;
     app: any;
     package: PackageInterface;
     provider: ProviderInterface;
@@ -87,6 +93,14 @@ export default class ZosNetworkFile {
 
     this.data = fs.parseJsonIfExists(this.fileName) || defaults;
     checkVersion(this.data.zosversion, this.fileName);
+  }
+
+  get proxyAdmin(): any {
+    return this.data.proxyAdmin || {};
+  }
+
+  get proxyAdminAddress(): string {
+    return this.proxyAdmin.address
   }
 
   get app(): any {
@@ -307,6 +321,10 @@ export default class ZosNetworkFile {
     this.data.frozen = frozen;
   }
 
+  set proxyAdmin(admin: any) {
+    this.data.proxyAdmin = admin;
+
+  }
   set app(app: any) {
     this.data.app = app;
   }
