@@ -20,7 +20,7 @@ export default class StatusChecker {
   public networkFile: any;
   public packageName: any;
 
-  private _project: AppProject;
+  private project: AppProject;
 
   public static fetch(networkFile: ZosNetworkFile, txParams: any = {}): StatusChecker {
     const fetcher = new StatusFetcher(networkFile);
@@ -43,11 +43,11 @@ export default class StatusChecker {
     try {
       const { packageAddress, appAddress, version } = this.networkFile;
 
-      if (!this._project) {
-        this._project = await AppProject.fetchOrDeploy(this.packageName,  this.networkFile.version, this.txParams, { appAddress, packageAddress });
+      if (!this.project) {
+        this.project = await AppProject.fetchOrDeploy(this.packageName,  this.networkFile.version, this.txParams, { appAddress, packageAddress });
       }
 
-      return this._project;
+      return this.project;
     } catch(error) {
       error.message = `Cannot fetch project contract from address ${this.networkFile.appAddress}: ${error.message}`;
       throw error;
@@ -56,7 +56,7 @@ export default class StatusChecker {
 
   public async call(): Promise<void> {
     await this.setProject();
-    log.info(`Comparing status of project ${(await this._project.getProjectPackage()).address} ...\n`);
+    log.info(`Comparing status of project ${(await this.project.getProjectPackage()).address} ...\n`);
     await this.checkApp();
     this.visitor.onEndChecking();
   }
@@ -71,19 +71,19 @@ export default class StatusChecker {
   }
 
   public async checkVersion(): Promise<void> {
-    const observed = this._project.version;
+    const observed = this.project.version;
     const expected = this.networkFile.version;
     if(!semanticVersionEqual(observed, expected)) this.visitor.onMismatchingVersion(expected, observed);
   }
 
   public async checkPackage(): Promise<void> {
-    const observed = this._project.package.address;
+    const observed = this.project.package.address;
     const expected = this.networkFile.packageAddress;
     if(observed !== expected) this.visitor.onMismatchingPackage(expected, observed);
   }
 
   public async checkProvider(): Promise<void> {
-    const currentDirectory = await this._project.getCurrentDirectory();
+    const currentDirectory = await this.project.getCurrentDirectory();
     const observed = currentDirectory.address;
     const expected = this.networkFile.providerAddress;
     if(observed !== expected) this.visitor.onMismatchingProvider(expected, observed);
@@ -229,7 +229,7 @@ export default class StatusChecker {
   // TS-TODO: type for event?
   private async _fetchOnChainImplementations(): Promise<any> {
     const filter = new EventsFilter();
-    const directory = await this._project.getCurrentDirectory();
+    const directory = await this.project.getCurrentDirectory();
     const allEvents = await filter.call(directory.contract, 'ImplementationChanged');
     const contractsAlias = allEvents.map((event) => event.args.contractName);
     const events = allEvents
@@ -243,12 +243,13 @@ export default class StatusChecker {
   private async _fetchOnChainProxies(): Promise<ProxyInterface[]> {
     const implementationsInfo = await this._fetchOnChainImplementations();
     const filter = new EventsFilter();
-    const app = this._project.getApp();
+    const app = this.project.getApp();
+    const proxyAdmin = await this.project.getProxyAdmin()
     const proxyEvents = await filter.call(app.appContract, 'ProxyCreated');
     const proxiesInfo = [];
     await Promise.all(proxyEvents.map(async (event) => {
       const address = event.args.proxy;
-      const implementation = await app.getProxyImplementation(address);
+      const implementation = await proxyAdmin.getProxyImplementation(address);
       const matchingImplementations = implementationsInfo.filter((info) => info.address === implementation);
       if (matchingImplementations.length > 1) {
         this.visitor.onMultipleProxyImplementations('one', matchingImplementations.length, { implementation });
@@ -264,7 +265,7 @@ export default class StatusChecker {
 
   private async _fetchOnChainPackages(): Promise<any[]> {
     const filter = new EventsFilter();
-    const app = this._project.getApp();
+    const app = this.project.getApp();
     const allEvents = await filter.call(app.appContract, 'PackageChanged');
     const filteredEvents = allEvents
       .filter((event) => event.args.package !== ZERO_ADDRESS)
