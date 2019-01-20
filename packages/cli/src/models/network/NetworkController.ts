@@ -434,7 +434,6 @@ export default class NetworkController {
     log.info(`Publish to ${this.network} successful`);
 
     const proxies = this._fetchOwnedProxies();
-    console.log(3, proxies)
     if (proxies.length !== 0) {
       log.info(`Awaiting confirmations before transferring proxies to published project (this may take a few minutes)`);
       const app = this.project.getApp();
@@ -454,6 +453,10 @@ export default class NetworkController {
     const proxyInstance = await this.project.createProxy(contractClass, { packageName, contractName: contractAlias, initMethod, initArgs });
     const implementationAddress = await Proxy.at(proxyInstance).implementation();
     const packageVersion = packageName === this.packageFile.name ? this.currentVersion : (await this.project.getDependencyVersion(packageName));
+    if (!this.networkFile.proxyAdminAddress) {
+      const proxyAdminAddress = await this.project.getAdminAddress();
+      this.networkFile.proxyAdmin = { address:  proxyAdminAddress };
+    }
     this._updateTruffleDeployedInformation(contractAlias, proxyInstance);
 
     this.networkFile.addProxy(packageName, contractAlias, {
