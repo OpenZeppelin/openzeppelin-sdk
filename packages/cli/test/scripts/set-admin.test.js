@@ -18,7 +18,7 @@ contract('set-admin script', function([_skipped, owner, newAdmin, anotherNewAdmi
     actualAdmin.should.eq(expectedAdmin, "Admin property in deployed proxy does not match")
     
     const proxyInfo = networkFile.getProxies({}).find(p => p.address === address)
-    if (!proxyInfo.admin) expectedAdmin.should.eq(networkFile.appAddress, "Expected admin should be app address as proxy admin is missing")
+    if (!proxyInfo.admin) expectedAdmin.should.eq(networkFile.proxyAdminAddress, "Expected admin should be app address as proxy admin is missing")
     else proxyInfo.admin.should.eq(expectedAdmin, "Admin field in network json file does not match")
   }
 
@@ -37,8 +37,8 @@ contract('set-admin script', function([_skipped, owner, newAdmin, anotherNewAdmi
       await setAdmin({ proxyAddress: this.impl1.address, newAdmin, network, txParams, networkFile: this.networkFile });
 
       await assertAdmin(this.impl1.address, newAdmin, this.networkFile)
-      await assertAdmin(this.impl2.address, this.networkFile.appAddress, this.networkFile)
-      await assertAdmin(this.withLibraryImpl.address, this.networkFile.appAddress, this.networkFile)
+      await assertAdmin(this.impl2.address, this.networkFile.proxyAdminAddress, this.networkFile)
+      await assertAdmin(this.withLibraryImpl.address, this.networkFile.proxyAdminAddress, this.networkFile)
     });
 
     it('changes admin of several proxies given name', async function() {
@@ -46,7 +46,7 @@ contract('set-admin script', function([_skipped, owner, newAdmin, anotherNewAdmi
       
       await assertAdmin(this.impl1.address, newAdmin, this.networkFile)
       await assertAdmin(this.impl2.address, newAdmin, this.networkFile)
-      await assertAdmin(this.withLibraryImpl.address, this.networkFile.appAddress, this.networkFile)
+      await assertAdmin(this.withLibraryImpl.address, this.networkFile.proxyAdminAddress, this.networkFile)
     });
 
     it('does not attempt to change admin of unowned proxy', async function() {
@@ -54,7 +54,7 @@ contract('set-admin script', function([_skipped, owner, newAdmin, anotherNewAdmi
       await setAdmin({ contractAlias: 'Impl', newAdmin: anotherNewAdmin, network, txParams, networkFile: this.networkFile });
       await assertAdmin(this.impl1.address, newAdmin, this.networkFile)
       await assertAdmin(this.impl2.address, anotherNewAdmin, this.networkFile)
-      await assertAdmin(this.withLibraryImpl.address, this.networkFile.appAddress, this.networkFile)
+      await assertAdmin(this.withLibraryImpl.address, this.networkFile.proxyAdminAddress, this.networkFile)
     });
 
     it('refuses to update all proxies', async function () {
@@ -80,7 +80,7 @@ contract('set-admin script', function([_skipped, owner, newAdmin, anotherNewAdmi
       await setAdmin({ proxyAddress: this.greeter1.address, newAdmin, network, txParams, networkFile: this.networkFile });
       
       await assertAdmin(this.greeter1.address, newAdmin, this.networkFile)
-      await assertAdmin(this.greeter2.address, this.networkFile.appAddress, this.networkFile)
+      await assertAdmin(this.greeter2.address, this.networkFile.proxyAdminAddress, this.networkFile)
     });
 
     it('changes admin of several proxies given package and name', async function() {
@@ -93,8 +93,8 @@ contract('set-admin script', function([_skipped, owner, newAdmin, anotherNewAdmi
     it('changes no admins if package is missing', async function() {
       await setAdmin({ contractAlias: 'Greeter', newAdmin, network, txParams, networkFile: this.networkFile });
       
-      await assertAdmin(this.greeter1.address, this.networkFile.appAddress, this.networkFile)
-      await assertAdmin(this.greeter2.address, this.networkFile.appAddress, this.networkFile)
+      await assertAdmin(this.greeter1.address, this.networkFile.proxyAdminAddress, this.networkFile)
+      await assertAdmin(this.greeter2.address, this.networkFile.proxyAdminAddress, this.networkFile)
     });
   });
 });
