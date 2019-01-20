@@ -14,6 +14,7 @@ interface PartialDeploy {
 interface ExistingAddresses {
   appAddress?: string;
   packageAddress?: string;
+  proxyAdminAddress?: string;
 }
 
 type CreateProjectFn = (addresses: ExistingAddresses) => Promise<AppProject>;
@@ -97,10 +98,14 @@ export class AppProjectDeployer extends BasePackageProjectDeployer {
     return this.controller.appAddress;
   }
 
+  get proxyAdminAddress(): string {
+    return this.networkFile.proxyAdminAddress;
+  }
+
   private async _run(createProjectFn: CreateProjectFn): Promise<AppProject | never> {
     try {
-      const { appAddress, packageAddress }: ExistingAddresses = this;
-      this.project = await createProjectFn({ appAddress, packageAddress });
+      const { appAddress, packageAddress, proxyAdminAddress }: ExistingAddresses = this;
+      this.project = await createProjectFn({ appAddress, packageAddress, proxyAdminAddress });
       await this._registerDeploy();
       return this.project;
     } catch (deployError) {
@@ -129,7 +134,7 @@ export class ProxyAdminProjectDeployer extends BaseProjectDeployer {
   public project: ProxyAdminProject;
 
   public async fetchOrDeploy(): Promise<ProxyAdminProject> {
-    this.project = await ProxyAdminProject.fetchOrDeploy(this.packageFile.name, this.txParams);
+    this.project = await ProxyAdminProject.fetch(this.packageFile.name, this.txParams, this.networkFile.proxyAdminAddress);
     this.networkFile.version = this.requestedVersion;
     forEach(this.networkFile.contracts, (contractInfo, contractAlias) => {
       this.project.registerImplementation(contractAlias, { address: contractInfo.address, bytecodeHash: contractInfo.bodyBytecodeHash });
