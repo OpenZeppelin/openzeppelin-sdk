@@ -29,6 +29,8 @@ import ZosNetworkFile, { ProxyInterface } from '../files/ZosNetworkFile';
 import ZosPackageFile from '../files/ZosPackageFile';
 
 const log = new Logger('NetworkAppController');
+type Project = ProxyAdminProject | AppProject;
+type ProjectDeployer = ProxyAdminProjectDeployer | AppProjectDeployer;
 
 export default class NetworkController {
 
@@ -36,7 +38,7 @@ export default class NetworkController {
   public txParams: any;
   public network: string;
   public networkFile: ZosNetworkFile;
-  public project: ProxyAdminProject | AppProject;
+  public project: Project;
 
   constructor(localController: LocalController, network: string, txParams: any, networkFile?: ZosNetworkFile) {
     this.localController = localController;
@@ -87,7 +89,7 @@ export default class NetworkController {
   }
 
   // DeployerController
-  public async fetchOrDeploy(requestedVersion: string): Promise<ProxyAdminProject | AppProject> {
+  public async fetchOrDeploy(requestedVersion: string): Promise<Project> {
     this.project = await this.getDeployer(requestedVersion).fetchOrDeploy();
     return this.project;
   }
@@ -403,7 +405,7 @@ export default class NetworkController {
   }
 
   // DeployerController
-  public getDeployer(requestedVersion: string): ProxyAdminProjectDeployer | AppProjectDeployer {
+  public getDeployer(requestedVersion: string): ProjectDeployer {
     return this.isPublished
       ? new AppProjectDeployer(this, requestedVersion)
       : new ProxyAdminProjectDeployer(this, requestedVersion);
@@ -507,7 +509,7 @@ export default class NetworkController {
   }
 
   // Proxy model
-  private async _changeProxiesAdmin(proxies: ProxyInterface[], newAdmin: string, project: ProxyAdminProject | AppProject = null): Promise<void> {
+  private async _changeProxiesAdmin(proxies: ProxyInterface[], newAdmin: string, project: Project = null): Promise<void> {
     if (!project) project = this.project;
     await allPromisesOrError(map(proxies, async (aProxy) => {
       await project.changeProxyAdmin(aProxy.address, newAdmin);
