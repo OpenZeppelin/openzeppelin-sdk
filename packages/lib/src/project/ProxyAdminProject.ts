@@ -13,11 +13,8 @@ const log: Logger = new Logger('ProxyAdminProject');
 export default class ProxyAdminProject extends BaseSimpleProject {
   public proxyAdmin: ProxyAdmin;
 
-  public static async fetchOrDeploy(name: string = 'main', txParams: any = {}, proxyAdminAddress?: string) {
-    const proxyAdmin = proxyAdminAddress
-      ? await ProxyAdmin.fetch(proxyAdminAddress)
-      : await ProxyAdmin.deploy(txParams);
-
+  public static async fetch(name: string = 'main', txParams: any = {}, proxyAdminAddress?: string) {
+    const proxyAdmin = proxyAdminAddress ? await ProxyAdmin.fetch(proxyAdminAddress, txParams) : null;
     return new this(name, proxyAdmin, txParams);
   }
 
@@ -27,6 +24,7 @@ export default class ProxyAdminProject extends BaseSimpleProject {
   }
 
   public async createProxy(contractClass, { packageName, contractName, initMethod, initArgs, redeployIfChanged }: ContractInterface = {}): Promise<ContractWrapper> {
+    if(!this.proxyAdmin) this.proxyAdmin = await ProxyAdmin.deploy(this.txParams)
     if (!isEmpty(initArgs) && !initMethod) initMethod = 'initialize';
     const implementationAddress = await this._getOrDeployImplementation(contractClass, packageName, contractName, redeployIfChanged);
     const initCallData = this._getAndLogInitCallData(contractClass, initMethod, initArgs, implementationAddress, 'Creating');
@@ -49,7 +47,7 @@ export default class ProxyAdminProject extends BaseSimpleProject {
     log.info(`Proxy ${proxyAddress} admin changed to ${newAdmin}`);
   }
 
-  public async getAdminAddress(): Promise<string> {
+  public getAdminAddress(): Promise<string> {
     return this.proxyAdmin.address;
   }
 }
