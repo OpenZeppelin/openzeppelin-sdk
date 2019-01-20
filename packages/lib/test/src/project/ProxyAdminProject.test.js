@@ -24,9 +24,9 @@ contract('ProxyAdminProject', function([_, proxyAdminOwner, another]) {
   });
 
   describe('class methods', function() {
-    describe('#fetchOrDeploy', function() {
+    describe('#fetch', function() {
       it('returns ProxyAdminProject instance', async function() {
-        const project = await ProxyAdminProject.fetchOrDeploy(name, txParams, this.adminAddress);
+        const project = await ProxyAdminProject.fetch(name, txParams, this.adminAddress);
         project.should.be.instanceof(ProxyAdminProject)
       });
     });
