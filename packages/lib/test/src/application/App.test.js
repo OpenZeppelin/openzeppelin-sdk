@@ -43,7 +43,7 @@ contract('App', function (accounts) {
       const packageInfo = await this.app.getPackage(packageName)
       packageInfo.package.address.should.eq(this.package.address)
       packageInfo.package.should.be.instanceof(Package)
-      packageInfo.version.map(Number).should.be.semverEqual(version)
+      packageInfo.version.should.be.semverEqual(version)
     })
 
     it('returns empty info if not exists', async function () {
@@ -76,7 +76,7 @@ contract('App', function (accounts) {
       expect(event).to.be.an('object');
       event.returnValues.providerName.should.be.equal(packageName);
       event.returnValues.package.should.be.equal(thepackage.address);
-      event.returnValues.version.map(Number).should.be.semverEqual(version);
+      event.returnValues.version.should.be.semverEqual(version);
     })
 
     it('can set multiple packages', async function () {
@@ -101,7 +101,7 @@ contract('App', function (accounts) {
       await this.package.newVersion(anotherVersion)
       await this.app.setPackage(packageName, this.package.address, anotherVersion)
       const packageInfo = await this.app.getPackage(packageName)
-      packageInfo.version.map(Number).should.be.semverEqual(anotherVersion)
+      packageInfo.version.should.be.semverEqual(anotherVersion)
     })
   })
 
@@ -114,7 +114,7 @@ contract('App', function (accounts) {
       expect(event).to.be.an('object');
       event.returnValues.providerName.should.be.equal(packageName);
       event.returnValues.package.should.be.equal(ZERO_ADDRESS);
-      event.returnValues.version.map(Number).should.be.semverEqual('0.0.0');
+      event.returnValues.version.should.be.semverEqual('0.0.0');
       const hasProvider = await this.app.hasProvider(packageName)
       hasProvider.should.be.false
     })

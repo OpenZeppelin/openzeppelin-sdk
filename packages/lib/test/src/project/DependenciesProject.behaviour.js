@@ -24,7 +24,7 @@ export default function shouldManageDependencies() {
 
     it('retrieves dependency info', async function () {
       (await this.project.hasDependency(packageName)).should.be.true;
-      (await this.project.getDependencyVersion(packageName)).map(Number).should.be.semverEqual(packageVersion);
+      (await this.project.getDependencyVersion(packageName)).should.be.semverEqual(packageVersion);
       (await this.project.getDependencyPackage(packageName)).address.should.eq(this.package.address);
     })
 

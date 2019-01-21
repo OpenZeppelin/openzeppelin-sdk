@@ -49,7 +49,7 @@ export default class App {
   public async hasPackage(name: string, expectedVersion?: string): Promise<boolean> {
     const { ['0']: address, ['1']: version } = await this.appContract.methods.getPackage(name).call();
     return !isZeroAddress(address) &&
-      (!expectedVersion || semanticVersionEqual(expectedVersion, version.map(Number)));
+      (!expectedVersion || semanticVersionEqual(expectedVersion, version));
   }
 
   public async setPackage(name: string, packageAddress: string, version: string): Promise<any> {

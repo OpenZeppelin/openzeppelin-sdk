@@ -16,6 +16,7 @@ export function toSemanticVersion(version: string | RawSemanticVersion): Semanti
     if (!semanticVersion) throw Error(`Cannot parse version identifier ${version}`);
     return [semanticVersion.major, semanticVersion.minor, semanticVersion.patch];
   } else if (isArray(version) && version.length === 3) {
+    version = <[number, number, number]>(<RawSemanticVersion>version).map(Number);
     const semverGenericArray: RawSemanticVersion = <RawSemanticVersion> version;
     const semverTyped: number[] = semverGenericArray.map((x: any) => {
       return x.toNumber ? x.toNumber() : x;

@@ -38,7 +38,7 @@ contract('AppProject', function (accounts) {
           const app = this.project.getApp()
           const thepackage = await this.project.getProjectPackage()
           const packageInfo = await app.getPackage(name)
-          packageInfo.version.map(Number).should.be.semverEqual(newVersion)
+          packageInfo.version.should.be.semverEqual(newVersion)
           packageInfo.package.address.should.eq(thepackage.address)
         })
       }, 
@@ -82,7 +82,7 @@ contract('AppProject', function (accounts) {
     it('creates a new app project from a simple project', async function () {
       this.project = await AppProject.fromSimpleProject(this.simple);
       (await this.project.getImplementation({ contractName })).should.eq(toAddress(this.implementation));
-      (await this.project.getDependencyVersion(dependencyName)).map(Number).should.be.semverEqual(dependencyVersion);
+      (await this.project.getDependencyVersion(dependencyName)).should.be.semverEqual(dependencyVersion);
       (await this.project.getDependencyPackage(dependencyName)).address.should.be.eq(this.dependency.address);
     })
   })

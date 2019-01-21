@@ -42,7 +42,7 @@ contract('Package', (accounts) => {
 
       const event = events['VersionAdded']
       expect(event).to.be.an('object')
-      event.returnValues.semanticVersion.map(Number).should.be.deep.equal(version)
+      event.returnValues.semanticVersion.should.be.semverEqual(version)
       event.returnValues.contractAddress.should.be.equal(contractAddress)
       event.returnValues.contentURI.should.be.equal(contentURI)
     })
@@ -124,7 +124,7 @@ contract('Package', (accounts) => {
   describe('getLatest', function () {
     it('returns zero if no versions registered', async function () {
       const { semanticVersion: registeredVersion, contractAddress: registeredDirectory, contentURI: registeredContentURI } = await this.package.methods.getLatest().call()
-      registeredVersion.map(Number).should.be.deep.eq([0,0,0])
+      registeredVersion.should.be.semverEqual([0,0,0])
       registeredDirectory.should.be.zeroAddress
       assert.equal(registeredContentURI, null)
     })
@@ -132,7 +132,7 @@ contract('Package', (accounts) => {
     it('returns full version info', async function () {
       await this.package.methods.addVersion(version, contractAddress, contentURI).send({ from })
       const { semanticVersion: registeredVersion, contractAddress: registeredDirectory, contentURI: registeredContentURI } = await this.package.methods.getLatest().call()
-      registeredVersion.map(Number).should.be.deep.eq(version);
+      registeredVersion.should.be.semverEqual(version);
       registeredDirectory.should.be.equal(contractAddress)
       registeredContentURI.should.be.equal(contentURI)
     })
@@ -143,7 +143,7 @@ contract('Package', (accounts) => {
         await this.package.methods.addVersion([1,0,0], contractAddress, contentURI).send({ from })
         await this.package.methods.addVersion([2,1,4], contractAddress, contentURI).send({ from })
         const { semanticVersion: registeredVersion } = await this.package.methods.getLatest().call()
-        registeredVersion.map(Number).should.be.deep.eq(latestVersion);
+        registeredVersion.should.be.semverEqual(latestVersion);
       })
     }
   })
@@ -152,7 +152,7 @@ contract('Package', (accounts) => {
     it('returns zero if no version for that major is registered', async function () {
       await this.package.methods.addVersion(version, contractAddress, contentURI).send({ from })
       const { semanticVersion: registeredVersion, contractAddress: registeredDirectory, contentURI: registeredContentURI } = await this.package.methods.getLatestByMajor(3).call()
-      registeredVersion.map(Number).should.be.deep.eq([0,0,0])
+      registeredVersion.should.be.semverEqual([0,0,0])
       registeredDirectory.should.be.zeroAddress
       assert.equal(registeredContentURI, null)
     })
@@ -160,7 +160,7 @@ contract('Package', (accounts) => {
     it('returns full version info', async function () {
       await this.package.methods.addVersion(version, contractAddress, contentURI).send({ from })
       const { semanticVersion: registeredVersion, contractAddress: registeredDirectory, contentURI: registeredContentURI } = await this.package.methods.getLatestByMajor(1).call()
-      registeredVersion.map(Number).should.be.deep.eq(version);
+      registeredVersion.should.be.semverEqual(version);
       registeredDirectory.should.be.equal(contractAddress)
       registeredContentURI.should.be.equal(contentURI)
     })
@@ -173,11 +173,11 @@ contract('Package', (accounts) => {
       await this.package.methods.addVersion([2,1,0], contractAddress, contentURI).send({ from })
       
       const { semanticVersion: registeredVersionFor1 } = await this.package.methods.getLatestByMajor(1).call()
-      registeredVersionFor1.map(Number).should.be.deep.eq([1,2,0])
+      registeredVersionFor1.should.be.semverEqual([1,2,0])
       const { semanticVersion: registeredVersionFor2 } = await this.package.methods.getLatestByMajor(2).call()
-      registeredVersionFor2.map(Number).should.be.deep.eq([2,4,0])
+      registeredVersionFor2.should.be.semverEqual([2,4,0])
       const { semanticVersion: registeredVersionFor3 } = await this.package.methods.getLatestByMajor(3).call()
-      registeredVersionFor3.map(Number).should.be.deep.eq([3,0,0])
+      registeredVersionFor3.should.be.semverEqual([3,0,0])
     })
   })
 })

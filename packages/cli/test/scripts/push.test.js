@@ -266,7 +266,7 @@ contract('push script', function([_, owner]) {
       if (!this.networkFile.appAddress) return;
       const app = await App.fetch(this.networkFile.appAddress);
       const packageInfo = await app.getPackage(libName)
-      packageInfo.version.map(Number).should.be.semverEqual(libVersion)
+      packageInfo.version.should.be.semverEqual(libVersion)
       packageInfo.package.address.should.eq(this.dependencyPackage.address)
     });
 
@@ -307,7 +307,7 @@ contract('push script', function([_, owner]) {
         const app = await App.fetch(this.networkFile.appAddress);
         const packageInfo = await app.getPackage('mock-stdlib');
         packageInfo.package.address.should.eq(this.dependencyPackage.address);
-        packageInfo.version.map(Number).should.be.semverEqual(newVersion);
+        packageInfo.version.should.be.semverEqual(newVersion);
       });
     });
   };
@@ -456,7 +456,7 @@ contract('push script', function([_, owner]) {
         await push({ network, txParams, networkFile: this.networkFile, deployDependencies: true });
         const app = await App.fetch(this.networkFile.appAddress);
         const packageInfo = await app.getPackage('mock-stdlib-unpublished');
-        packageInfo.version.map(Number).should.be.semverEqual('1.1.0');
+        packageInfo.version.should.be.semverEqual('1.1.0');
         packageInfo.package.address.should.be.nonzeroAddress;
       });
     })
