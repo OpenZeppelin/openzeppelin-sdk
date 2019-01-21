@@ -66,7 +66,6 @@ export default class StatusChecker {
     await this.checkPackage();
     await this.checkProvider();
     await this.checkImplementations();
-    await this.checkProxies();
     await this.checkDependencies();
   }
 
@@ -107,12 +106,6 @@ export default class StatusChecker {
       })
     );
     this._checkUnregisteredLocalImplementations(implementationsInfo);
-  }
-
-  public async checkProxies(): Promise<void> {
-    const proxiesInfo = await this._fetchOnChainProxies();
-    proxiesInfo.forEach((info) => this._checkRemoteProxy(info));
-    this._checkUnregisteredLocalProxies(proxiesInfo);
   }
 
   private async _checkRemoteContractImplementation({ alias, address }: ComparedObject, bytecode: string): Promise<void> {
@@ -166,38 +159,6 @@ export default class StatusChecker {
       });
   }
 
-  private _checkRemoteProxy(remoteProxyInfo: ProxyInterface): void {
-    const localProxyInfo = this.networkFile.getProxy(remoteProxyInfo.address);
-    if (localProxyInfo) {
-      this._checkProxyAlias(localProxyInfo, remoteProxyInfo);
-      this._checkProxyImplementation(localProxyInfo, remoteProxyInfo);
-    } else {
-      this.visitor.onMissingRemoteProxy('none', 'one', { ...remoteProxyInfo, packageName: this.packageName });
-    }
-  }
-
-  private _checkProxyAlias(localProxyInfo: ProxyInterface, remoteProxyInfo: ProxyInterface): void {
-    const { alias: observed } = remoteProxyInfo;
-    const { contract: expected, version, package: packageName } = localProxyInfo;
-    if (observed !== expected) this.visitor.onMismatchingProxyAlias(expected, observed, { packageName, version, ...remoteProxyInfo });
-  }
-
-  private _checkProxyImplementation(localProxyInfo: ProxyInterface, remoteProxyInfo: ProxyInterface): void {
-    const { implementation: observed } = remoteProxyInfo;
-    const { implementation: expected, version, package: packageName } = localProxyInfo;
-    if (observed !== expected) this.visitor.onMismatchingProxyImplementation(expected, observed, { packageName, version, ...remoteProxyInfo });
-  }
-
-  private _checkUnregisteredLocalProxies(proxiesInfo: ProxyInterface[]): void {
-    const foundAddresses = proxiesInfo.map((info) => info.address);
-    this.networkFile.getProxies()
-      .filter((proxy) => !foundAddresses.includes(proxy.address))
-      .forEach((proxy) => {
-        const { contract: alias, package: packageName, address, implementation } = proxy;
-        this.visitor.onUnregisteredLocalProxy('one', 'none', { packageName, alias, address, implementation });
-      });
-  }
-
   private _checkRemoteDependency({ name, version, package: address }: ComparedObject): void {
     if (this.networkFile.hasDependency(name)) {
       this._checkDependencyAddress(name, address);
@@ -238,29 +199,6 @@ export default class StatusChecker {
       .map((event) => ({ alias: event.args.contractName, address: event.args.implementation }));
 
     return events;
-  }
-
-  private async _fetchOnChainProxies(): Promise<ProxyInterface[]> {
-    const implementationsInfo = await this._fetchOnChainImplementations();
-    const filter = new EventsFilter();
-    const app = this.project.getApp();
-    const proxyAdmin = await this.project.getProxyAdmin();
-    const proxyEvents = await filter.call(app.appContract, 'ProxyCreated');
-    const proxiesInfo = [];
-    await Promise.all(proxyEvents.map(async (event) => {
-      const address = event.args.proxy;
-      const implementation = await proxyAdmin.getProxyImplementation(address);
-      const matchingImplementations = implementationsInfo.filter((info) => info.address === implementation);
-      if (matchingImplementations.length > 1) {
-        this.visitor.onMultipleProxyImplementations('one', matchingImplementations.length, { implementation });
-      } else if (matchingImplementations.length === 0) {
-        this.visitor.onUnregisteredProxyImplementation('one', 'none', { address, implementation });
-      } else {
-        const alias = matchingImplementations[0].alias;
-        proxiesInfo.push({ alias, implementation, address });
-      }
-    }));
-    return proxiesInfo;
   }
 
   private async _fetchOnChainPackages(): Promise<any[]> {
