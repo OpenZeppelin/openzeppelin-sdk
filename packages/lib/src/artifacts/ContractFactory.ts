@@ -83,7 +83,8 @@ export default class ContractFactory {
 
   public at(address: string): ContractWrapper | never {
     if (!ZWeb3.isAddress(address)) throw new Error('Given address is not valid: ' + address);
-    const contractClass: any = ZWeb3.contract(this.abi, address);
+    const defaults = Contracts.getArtifactsDefaults();
+    const contractClass: any = ZWeb3.contract(this.abi, address, defaults);
     return this._wrapContract(contractClass);
   }
 

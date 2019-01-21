@@ -19,7 +19,7 @@ export default function(owner, donor, wallet) {
       const value = ETH_1
 
       it('increases contract balance', async function() {
-        await this.donations.methods.donate().send({ from, value })
+        const receipt = await this.donations.methods.donate().send({ from, value })
 
         const balance = await getBalance(this.donations.address);
         balance.should.be.above(0)
