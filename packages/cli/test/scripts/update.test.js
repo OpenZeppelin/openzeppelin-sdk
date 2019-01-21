@@ -47,7 +47,7 @@ contract('update script', function(accounts) {
     if (value) {
       const proxy = ImplV1.at(proxyInfo.address);
       const actualValue = await proxy.methods.value().call();
-      parseInt(actualValue, 10).should.eq(value);
+      actualValue.should.eq(`${value}`);
     }
 
     return proxyInfo;

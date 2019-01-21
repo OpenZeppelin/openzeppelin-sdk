@@ -37,7 +37,7 @@ contract('Transactions', function(accounts) {
 
   const assertGasPrice = async (txHash, expected) => {
     const { gasPrice } = await ZWeb3.getTransaction(txHash);
-    parseInt(gasPrice, 10).should.be.eq(parseInt(expected));
+    parseInt(gasPrice, 10).should.be.eq(expected);
   };
 
   const assertFrom = async (txHash, expected) => {
@@ -66,7 +66,7 @@ contract('Transactions', function(accounts) {
     it('correctly sends the transaction', async function () {
       await sendTransaction(this.instance.methods.initialize, DEFAULT_PARAMS);
       const actualValue = await this.instance.methods.value().call();
-      parseInt(actualValue, 10).should.eq(42);
+      actualValue.should.eq('42');
     });
 
     it('honours other tx params', async function () {
@@ -191,7 +191,7 @@ contract('Transactions', function(accounts) {
     it('correctly sends the transaction', async function () {
       await sendDataTransaction(this.instance, { data: this.encodedCall });
       const actualValue = await this.instance.methods.value().call();
-      parseInt(actualValue, 10).should.eq(42);
+      actualValue.should.eq('42');
     });
 
     it('honours other tx params', async function () {
@@ -413,7 +413,7 @@ contract('Transactions', function(accounts) {
 
       it('correctly deploys an instance', async function () {
         const instance = await deploy(this.WithConstructorImplementation, [42, "foo"]);
-        parseInt(await instance.methods.value().call(), 10).should.eq(42);
+        (await instance.methods.value().call()).should.eq('42');
         (await instance.methods.text().call()).should.eq("foo");
       });
 

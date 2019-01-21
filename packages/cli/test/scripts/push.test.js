@@ -88,7 +88,7 @@ contract('push script', function([_, owner]) {
       const address = this.networkFile.contract('WithLibraryImpl').address;
       const deployed = await WithLibraryImplV1.at(address);
       const result = await deployed.methods.double(10).call();
-      parseInt(result, 10).should.eq(20);
+      result.should.eq('20');
     });
   };
 

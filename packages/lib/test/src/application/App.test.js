@@ -183,7 +183,7 @@ contract('App', function (accounts) {
 
       it('should have initialized the instance', async function () {
         const value = await this.instance.methods.value().call();
-        parseInt(value, 10).should.eq(10);
+        value.should.eq('10');
       });
     });
 
@@ -196,7 +196,7 @@ contract('App', function (accounts) {
 
       it('should have initialized the proxy', async function () {
         const value = await this.instance.methods.value().call();
-        parseInt(value, 10).should.eq(10);
+        value.should.eq('10');
         const text = await this.instance.methods.text().call();
         text.should.eq("foo");
         (this.instance.methods.values(0).call()).should.be.rejected;
@@ -277,7 +277,7 @@ contract('App', function (accounts) {
 
       it('should have initialized the proxy', async function () {
         const value = await this.proxy.methods.value().call();
-        parseInt(value, 10).should.eq(10);
+        value.should.eq('10');
       });
     });
 
@@ -290,7 +290,7 @@ contract('App', function (accounts) {
 
       it('should have initialized the proxy', async function () {
         const value = await this.proxy.methods.value().call();
-        parseInt(value, 10).should.eq(10);
+        value.should.eq('10');
         const text = await this.proxy.methods.text().call();
         text.should.eq("foo");
         (this.proxy.methods.values(0).call()).should.be.rejected;
@@ -341,7 +341,7 @@ contract('App', function (accounts) {
 
       it('should run migration', async function () {
         const value = await this.proxy.methods.value().call();
-        parseInt(value, 10).should.eq(20);
+        value.should.eq('20');
       });
     });
   });
