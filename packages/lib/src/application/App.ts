@@ -1,8 +1,5 @@
-import findLast from 'lodash.findlast';
-
 import Logger from '../utils/Logger';
 import Proxy from '../proxy/Proxy';
-import decodeLogs from '../helpers/decodeLogs';
 import copyContract from '../helpers/copyContract';
 import Contracts from '../artifacts/Contracts';
 import Package from '../application/Package';
