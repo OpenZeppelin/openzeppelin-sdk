@@ -8,9 +8,9 @@ const Compiler = {
     log.info('Compiling contracts with Truffle...');
     return new Promise((resolve, reject) => {
       exec(`${process.cwd()}/node_modules/.bin/truffle compile`, (error, stdout, stderr) => {
-        if (stdout) console.log(stdout)
-        if (stderr) console.error(stderr)
-        error ? reject(error) : resolve({ stdout, stderr })
+        if (stdout) console.log(stdout);
+        if (stderr) console.error(stderr);
+        error ? reject(error) : resolve({ stdout, stderr });
       });
     });
   }

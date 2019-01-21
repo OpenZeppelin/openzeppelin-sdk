@@ -60,9 +60,9 @@ export default class Dependency {
     );
 
     const pipeline = [
-      contracts => map(contracts, ([contractClass]) => getSolidityLibNames(contractClass.bytecode)),
-      contracts => flatten(contracts),
-      contracts => uniq(contracts),
+      (contracts) => map(contracts, ([contractClass]) => getSolidityLibNames(contractClass.bytecode)),
+      (contracts) => flatten(contracts),
+      (contracts) => uniq(contracts),
     ];
 
     const libraryNames = pipeline.reduce((xs, f) => f(xs), contracts);

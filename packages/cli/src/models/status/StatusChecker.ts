@@ -244,7 +244,7 @@ export default class StatusChecker {
     const implementationsInfo = await this._fetchOnChainImplementations();
     const filter = new EventsFilter();
     const app = this.project.getApp();
-    const proxyAdmin = await this.project.getProxyAdmin()
+    const proxyAdmin = await this.project.getProxyAdmin();
     const proxyEvents = await filter.call(app.appContract, 'ProxyCreated');
     const proxiesInfo = [];
     await Promise.all(proxyEvents.map(async (event) => {

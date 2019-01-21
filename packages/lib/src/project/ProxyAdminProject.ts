@@ -18,13 +18,13 @@ export default class ProxyAdminProject extends BaseSimpleProject {
     return new this(name, proxyAdmin, txParams);
   }
 
-  constructor(name, proxyAdmin, txParams) { 
+  constructor(name, proxyAdmin, txParams) {
     super(name, txParams);
     this.proxyAdmin = proxyAdmin;
   }
 
   public async createProxy(contractClass, { packageName, contractName, initMethod, initArgs, redeployIfChanged }: ContractInterface = {}): Promise<ContractWrapper> {
-    if(!this.proxyAdmin) this.proxyAdmin = await ProxyAdmin.deploy(this.txParams)
+    if(!this.proxyAdmin) this.proxyAdmin = await ProxyAdmin.deploy(this.txParams);
     if (!isEmpty(initArgs) && !initMethod) initMethod = 'initialize';
     const implementationAddress = await this._getOrDeployImplementation(contractClass, packageName, contractName, redeployIfChanged);
     const initCallData = this._getAndLogInitCallData(contractClass, initMethod, initArgs, implementationAddress, 'Creating');

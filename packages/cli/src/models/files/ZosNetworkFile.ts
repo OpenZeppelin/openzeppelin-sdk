@@ -63,7 +63,6 @@ interface ProxyAdminInterface {
   address?: string;
 }
 
-
 export default class ZosNetworkFile {
 
   public packageFile: ZosPackageFile;
@@ -100,7 +99,7 @@ export default class ZosNetworkFile {
   }
 
   get proxyAdminAddress(): string {
-    return this.proxyAdmin.address
+    return this.proxyAdmin.address;
   }
 
   get app(): any {
