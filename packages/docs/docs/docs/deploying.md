@@ -56,10 +56,10 @@ by now, inside the `my-project` directory you should have a `package.json` file
 a `truffle-config.js` file (created by the `zos` CLI for Truffle), and a
 `zos.json` file (created by `zos` for ZeppelinOS).
 
-Note: if you haven't installed Truffle, run the following command:
+Note: if you haven't installed Truffle, run the following command to add it to your project:
 
 ```console
-npm install -g truffle
+npm install truffle --save
 ```
 
 ## Adding a contract
@@ -119,8 +119,8 @@ project registering it in the `zos.json` configuration file.
 
 And just like that, we are now ready to make the initial deployment of the
 project. We are just missing a blockchain network where it will be deployed.
-For this example, let's use [ganache](https://truffleframework.com/docs/ganache/quickstart), 
-a personal blockchain for Ethereum development that you can use to develop 
+For this example, let's use [ganache](https://truffleframework.com/docs/ganache/quickstart),
+a personal blockchain for Ethereum development that you can use to develop
 your contracts. To install it run:
 
 ```console
@@ -149,8 +149,7 @@ transactions we will run with the `--from` option. Additionally, the
 > Note that we are using a specific address for the `--from` option which
 is different to the default address that `ganache-cli` would use.
 This is because we need to use different addresses in order to create
-upgradeable contracts and to query them. This problem is
-known as the "transparent proxy issue" and you can read more about it in the
+upgradeable contracts and to query them. You can read more about it in the
 [ZeppelinOS upgrades pattern section](pattern.md).
 
 Now that everything has been setup, we are ready to deploy the project.
