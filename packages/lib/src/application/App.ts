@@ -1,6 +1,7 @@
 import findLast from 'lodash.findlast';
 
 import Logger from '../utils/Logger';
+import Proxy from '../proxy/Proxy';
 import decodeLogs from '../helpers/decodeLogs';
 import copyContract from '../helpers/copyContract';
 import Contracts from '../artifacts/Contracts';
@@ -89,26 +90,25 @@ export default class App {
   }
 
   public async createProxy(contractClass: ContractFactory, packageName: string, contractName: string, proxyAdmin: string, initMethodName: string, initArgs?: string[]): Promise<ContractWrapper> {
-    const { receipt } = typeof(initArgs) === 'undefined'
+    const proxy = typeof(initArgs) === 'undefined'
       ? await this._createProxy(packageName, contractName, proxyAdmin)
       : await this._createProxyAndCall(contractClass, packageName, contractName, proxyAdmin, initMethodName, initArgs);
-
-    log.info(`TX receipt received: ${receipt.transactionHash}`);
-    const address: string = findLast(receipt.logs, (l) => l.event === 'ProxyCreated').args.proxy;
-    log.info(`${packageName} ${contractName} proxy: ${address}`);
-    return contractClass.at(address);
+    log.info(`${packageName} ${contractName} proxy: ${proxy.address}`);
+    return contractClass.at(proxy.address);
   }
 
   private async _createProxy(packageName: string, contractName: string, proxyAdmin: string): Promise<any> {
     log.info(`Creating ${packageName} ${contractName} proxy without initializing...`);
     const initializeData: string = '';
-    return sendTransaction(this.appContract.create, [packageName, contractName, proxyAdmin, initializeData], this.txParams);
+    const implementation = await this.getImplementation(packageName, contractName);
+    return Proxy.deploy(implementation, proxyAdmin, initializeData, this.txParams);
   }
 
   private async _createProxyAndCall(contractClass: ContractFactory, packageName: string, contractName: string, proxyAdmin: string, initMethodName: string, initArgs: any): Promise<any> {
     const { method: initMethod, callData }: CalldataInfo = buildCallData(contractClass, initMethodName, initArgs);
     log.info(`Creating ${packageName} ${contractName} proxy and calling ${callDescription(initMethod, initArgs)}`);
-    return sendTransaction(this.appContract.create, [packageName, contractName, proxyAdmin, callData], this.txParams);
+    const implementation = await this.getImplementation(packageName, contractName);
+    return Proxy.deploy(implementation, proxyAdmin, callData, this.txParams);
   }
 
   private async _copyContract(packageName: string, contractName: string, contractClass: ContractFactory): Promise<ContractWrapper> {
