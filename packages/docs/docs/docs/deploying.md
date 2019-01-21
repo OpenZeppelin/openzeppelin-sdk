@@ -56,6 +56,12 @@ by now, inside the `my-project` directory you should have a `package.json` file
 a `truffle-config.js` file (created by the `zos` CLI for Truffle), and a
 `zos.json` file (created by `zos` for ZeppelinOS).
 
+Note: if you haven't installed Truffle, run the following command:
+
+```console
+npm install -g truffle
+```
+
 ## Adding a contract
 
 Let's create a very simple contract as an example to be added to the project.
@@ -63,7 +69,7 @@ Name it `MyContract.sol`, and put it in the `contracts` folder with the
 following Solidity code:
 
 ```solidity
-pragma solidity ^0.4.24;
+pragma solidity ^0.5.0;
 
 import "zos-lib/contracts/Initializable.sol";
 
@@ -72,7 +78,7 @@ contract MyContract is Initializable {
   uint256 public x;
   string public s;
 
-  function initialize(uint256 _x, string _s) initializer public {
+  function initialize(uint256 _x, string memory _s) initializer public {
     x = _x;
     s = _s;
   }
@@ -80,8 +86,8 @@ contract MyContract is Initializable {
 ```
 
 Notice that our sample contract has an `initialize` function instead of the
-standard Solidity constructor. This is the way to define constructor 
-functionality for upgradeable contracts in ZeppelinOS, which we'll see in 
+standard Solidity constructor. This is the way to define constructor
+functionality for upgradeable contracts in ZeppelinOS, which we'll see in
 more detail in the next guide.
 
 But before we get there, we still need a couple of steps. This contract
