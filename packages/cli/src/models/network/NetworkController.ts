@@ -455,10 +455,7 @@ export default class NetworkController {
     const proxyInstance = await this.project.createProxy(contractClass, { packageName, contractName: contractAlias, initMethod, initArgs });
     const implementationAddress = await Proxy.at(proxyInstance).implementation();
     const packageVersion = packageName === this.packageFile.name ? this.currentVersion : (await this.project.getDependencyVersion(packageName));
-    if (!this.networkFile.proxyAdminAddress) {
-      const proxyAdminAddress = await this.project.getAdminAddress();
-      this.networkFile.proxyAdmin = { address:  proxyAdminAddress };
-    }
+    await this._tryRegisterProxyAdmin();
     this._updateTruffleDeployedInformation(contractAlias, proxyInstance);
 
     this.networkFile.addProxy(packageName, contractAlias, {
@@ -467,6 +464,14 @@ export default class NetworkController {
       implementation: implementationAddress
     });
     return proxyInstance;
+  }
+
+  // Proxy model
+  private async _tryRegisterProxyAdmin() {
+    if (!this.networkFile.proxyAdminAddress) {
+      const proxyAdminAddress = await this.project.getAdminAddress();
+      this.networkFile.proxyAdmin = { address:  proxyAdminAddress };
+    }
   }
 
   // Proxy model
