@@ -48,6 +48,7 @@ export default class ProxyAdmin {
     return contractClass.at(proxyAddress);
   }
 
+  // TODO: update logs
   private async _upgradeProxy(proxyAddress: string, implementation: any): Promise<any> {
     log.info(`Upgrading ${'contract name'} proxy without running migrations...`);
     return sendTransaction(this.contract.upgrade, [proxyAddress, implementation], this.txParams);

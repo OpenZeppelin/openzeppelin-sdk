@@ -319,32 +319,31 @@ contract('AdminUpgradeabilityProxy', ([_, proxyAdminAddress, proxyAdminOwner, an
     })
   })
 
-  // TODO: remove this commented tests. transparent proxies should be only tested in SimpleProject
-  // describe('transparent proxy', function () {
-  //   beforeEach('creating proxy', async function () {
-  //     const initializeData = ''
-  //     this.impl = await ClashingImplementation.new();
-  //     this.proxy = await AdminUpgradeabilityProxy.new(this.impl.address, initializeData, { from: proxyAdminAddress });
+  describe('transparent proxy', function () {
+    beforeEach('creating proxy', async function () {
+      const initializeData = ''
+      this.impl = await ClashingImplementation.new();
+      this.proxy = await AdminUpgradeabilityProxy.new(this.impl.address, proxyAdminAddress, initializeData, { from: proxyAdminOwner });
 
-  //     this.clashing = ClashingImplementation.at(this.proxy.address);
-  //   });
+      this.clashing = ClashingImplementation.at(this.proxy.address);
+    });
 
-  //   it('proxy admin cannot call delegated functions', async function () {
-  //     await assertRevert(this.clashing.delegatedFunction({ from: proxyAdminAddress }));
-  //   });
+    it('proxy admin cannot call delegated functions', async function () {
+      await assertRevert(this.clashing.delegatedFunction({ from: proxyAdminAddress }));
+    });
 
-  //   context('when function names clash', function () {
-  //     it('when sender is proxy admin should run the proxy function', async function () {
-  //       const value = await this.proxy.admin({ from: proxyAdminAddress });
-  //       value.should.be.equal(proxyAdminAddress);
-  //     });
+    context('when function names clash', function () {
+      it('when sender is proxy admin should run the proxy function', async function () {
+        const value = await this.proxy.admin({ from: proxyAdminAddress });
+        value.should.be.equal(proxyAdminAddress);
+      });
 
-  //     it('when sender is other should delegate to implementation', async function () {
-  //       const value = await this.proxy.admin({ from: anotherAccount });
-  //       value.should.be.equal('0x0000000000000000000000000000000011111142')
-  //     });
-  //   });
-  // });
+      it('when sender is other should delegate to implementation', async function () {
+        const value = await this.proxy.admin({ from: anotherAccount });
+        value.should.be.equal('0x0000000000000000000000000000000011111142')
+      });
+    });
+  });
 
   describe('regression', () => {
     const initializeData = ''
