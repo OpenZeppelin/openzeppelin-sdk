@@ -59,9 +59,9 @@ contract('App', ([_, owner, donor, wallet]) => {
 
   describe('version 0.0.2', function() {
     beforeEach(async function() {
-      this.project = await deploy.setupApp({owner});
+      this.project = await deploy.setupApp({from: owner});
       this.donations = await deploy.deployVersion1(this.project, owner);
-      this.token = await deploy.deployVersion2(this.project, this.donations, { owner });
+      this.token = await deploy.deployVersion2(this.project, this.donations, { from: owner });
       this.donations = DonationsV2.at(this.donations.address);
     });
 

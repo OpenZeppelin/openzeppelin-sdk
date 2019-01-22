@@ -4,21 +4,22 @@ import Proxy from '../../../src/proxy/Proxy'
 import ZWeb3 from '../../../src/artifacts/ZWeb3'
 import encodeCall from '../../../src/helpers/encodeCall'
 import assertRevert from '../../../src/test/helpers/assertRevert'
+import utils from 'web3-utils';
 
 const DummyImplementation = artifacts.require('DummyImplementation')
 const DummyImplementationV2 = artifacts.require('DummyImplementationV2')
 
 export default function shouldManageProxies([_, appOwner, directoryOwner, anotherAccount]) {
-  const EMPTY_INITIALIZATION_DATA = ''
+  const EMPTY_INITIALIZATION_DATA = Buffer.from('')
 
   const shouldCreateProxy = function () {
     it('sets proxy implementation', async function () {
-      const implementation = await this.app.getProxyImplementation(this.proxyAddress)
+      const implementation = await this.app.methods.getProxyImplementation(this.proxyAddress).call()
       implementation.should.be.equal(this.implementation_v0)
     });
 
     it('sets proxy admin', async function () {
-      const admin = await this.app.getProxyAdmin(this.proxyAddress)
+      const admin = await this.app.methods.getProxyAdmin(this.proxyAddress).call()
       admin.should.be.equal(this.app.address)
     });
 
@@ -31,19 +32,19 @@ export default function shouldManageProxies([_, appOwner, directoryOwner, anothe
   describe('create', function () {
     describe('successful', function () {
       beforeEach("creating proxy", async function () {
-        const { receipt } = await this.app.create(this.packageName, this.contractName, EMPTY_INITIALIZATION_DATA);
-        this.proxyAddress = receipt.logs.find(l => l.event === 'ProxyCreated').args.proxy
+        const { events } = await this.app.methods.create(this.packageName, this.contractName, EMPTY_INITIALIZATION_DATA).send();
+        this.proxyAddress = events['ProxyCreated'].returnValues.proxy
       })
 
       shouldCreateProxy();
     });
 
     it('fails to create a proxy for unregistered package', async function () {
-      await assertRevert(this.app.create("NOTEXISTS", this.contractName, EMPTY_INITIALIZATION_DATA))
+      await assertRevert(this.app.methods.create("NOTEXISTS", this.contractName, EMPTY_INITIALIZATION_DATA).send())
     });
 
     it('fails to create a proxy for unregistered contract', async function () {
-      await assertRevert(this.app.create(this.packageName, "NOTEXISTS", EMPTY_INITIALIZATION_DATA))
+      await assertRevert(this.app.methods.create(this.packageName, "NOTEXISTS", EMPTY_INITIALIZATION_DATA).send())
     });
   });
 
@@ -54,8 +55,8 @@ export default function shouldManageProxies([_, appOwner, directoryOwner, anothe
 
     describe('successful', function () {
       beforeEach("creating proxy", async function () {
-        const { receipt } = await this.app.create(this.packageName, this.contractName, initializeData, { value })
-        this.proxyAddress = receipt.logs.find(l => l.event === 'ProxyCreated').args.proxy
+        const { events } = await this.app.methods.create(this.packageName, this.contractName, initializeData).send({ value })
+        this.proxyAddress = events['ProxyCreated'].returnValues.proxy
       })
 
       shouldCreateProxy();
@@ -72,21 +73,21 @@ export default function shouldManageProxies([_, appOwner, directoryOwner, anothe
     });
 
     it('fails to create a proxy for unregistered package', async function () {
-      await assertRevert(this.app.create("NOTEXISTS", this.contractName, initializeData, { value }))
+      await assertRevert(this.app.methods.create("NOTEXISTS", this.contractName, initializeData).send({ value }))
     });
 
     it('fails to create a proxy for unregistered contract', async function () {
-      await assertRevert(this.app.create(this.packageName, "NOTEXISTS", initializeData, { value }))
+      await assertRevert(this.app.methods.create(this.packageName, "NOTEXISTS", initializeData).send({ value }))
     });
 
     it('fails to create a proxy with invalid initialize data', async function () {
-      await assertRevert(this.app.create(this.packageName, this.contractName, incorrectData, { value }))
+      await assertRevert(this.app.methods.create(this.packageName, this.contractName, incorrectData).send({ value }))
     });
   });
 
   const shouldUpgradeProxy = function () {
     it('upgrades to the requested implementation', async function () {
-      const implementation = await this.app.getProxyImplementation(this.proxyAddress)
+      const implementation = await this.app.methods.getProxyImplementation(this.proxyAddress).call()
       implementation.should.be.equal(this.implementation_v1)
     })
 
@@ -98,32 +99,32 @@ export default function shouldManageProxies([_, appOwner, directoryOwner, anothe
 
   describe('upgrade', function () {
     beforeEach("creating proxy", async function () {
-      const { receipt } = await this.app.create(this.packageName, this.contractName, EMPTY_INITIALIZATION_DATA, { from: appOwner })
-      this.proxyAddress = receipt.logs.find(l => l.event === 'ProxyCreated').args.proxy
+      const { events } = await this.app.methods.create(this.packageName, this.contractName, EMPTY_INITIALIZATION_DATA).send({ from: appOwner })
+      this.proxyAddress = events['ProxyCreated'].returnValues.proxy
     })
 
     describe('successful', async function () {
       beforeEach("upgrading proxy", async function () {
-        await this.app.upgrade(this.proxyAddress, this.packageName, this.contractNameUpdated, { from: appOwner })
+        await this.app.methods.upgrade(this.proxyAddress, this.packageName, this.contractNameUpdated).send({ from: appOwner })
       });
 
       shouldUpgradeProxy();
     });
 
     it('fails to upgrade a proxy for unregistered package', async function () {
-      await assertRevert(this.app.upgrade(this.proxyAddress, "NOTEXISTS", this.contractNameUpdated))
+      await assertRevert(this.app.methods.upgrade(this.proxyAddress, "NOTEXISTS", this.contractNameUpdated).send())
     });
 
     it('fails to upgrade a proxy for unregistered contract', async function () {
-      await assertRevert(this.app.upgrade(this.proxyAddress, this.packageName, "NOTEXISTS"))
+      await assertRevert(this.app.methods.upgrade(this.proxyAddress, this.packageName, "NOTEXISTS").send())
     });
 
     it('fails to upgrade a non-proxy contract', async function () {
-      await assertRevert(this.app.upgrade(this.implementation_v0, this.packageName, this.contractNameUpdated))
+      await assertRevert(this.app.methods.upgrade(this.implementation_v0, this.packageName, this.contractNameUpdated).send())
     });
 
     it('fails to upgrade from another account', async function () {
-      await assertRevert(this.app.upgrade(this.proxyAddress, this.packageName, this.contractNameUpdated, { from: anotherAccount }))
+      await assertRevert(this.app.methods.upgrade(this.proxyAddress, this.packageName, this.contractNameUpdated).send({ from: anotherAccount }))
     });
   })
 
@@ -134,13 +135,13 @@ export default function shouldManageProxies([_, appOwner, directoryOwner, anothe
     const incorrectData = encodeCall('wrong', ['uint256'], [42])
 
     beforeEach("creating proxy", async function () {
-      const { receipt } = await this.app.create(this.packageName, this.contractName, initializeData, { from: appOwner })
-      this.proxyAddress = receipt.logs.find(l => l.event === 'ProxyCreated').args.proxy
+      const { events } = await this.app.methods.create(this.packageName, this.contractName, initializeData).send({ from: appOwner })
+      this.proxyAddress = events['ProxyCreated'].returnValues.proxy
     })
 
     describe('successful', async function () {
       beforeEach("upgrading proxy", async function () {
-        await this.app.upgradeAndCall(this.proxyAddress, this.packageName, this.contractNameUpdated, migrateData, { value, from: appOwner })
+        await this.app.methods.upgradeAndCall(this.proxyAddress, this.packageName, this.contractNameUpdated, migrateData).send({ value, from: appOwner })
       });
 
       shouldUpgradeProxy()
@@ -157,53 +158,53 @@ export default function shouldManageProxies([_, appOwner, directoryOwner, anothe
     });
 
     it('fails to upgrade a proxy for unregistered package', async function () {
-      await assertRevert(this.app.upgradeAndCall(this.proxyAddress, "NOTEXISTS", this.contractNameUpdated, migrateData, { from: appOwner }))
+      await assertRevert(this.app.methods.upgradeAndCall(this.proxyAddress, "NOTEXISTS", this.contractNameUpdated, migrateData).send({ from: appOwner }))
     });
 
     it('fails to upgrade a proxy for unregistered contract', async function () {
-      await assertRevert(this.app.upgradeAndCall(this.proxyAddress, this.packageName, "NOTEXISTS", migrateData, { from: appOwner }))
+      await assertRevert(this.app.methods.upgradeAndCall(this.proxyAddress, this.packageName, "NOTEXISTS", migrateData).send({ from: appOwner }))
     });
 
     it('fails to upgrade a non-proxy contract', async function () {
-      await assertRevert(this.app.upgradeAndCall(this.implementation_v0, this.packageName, this.contractNameUpdated, migrateData, { from: appOwner }))
+      await assertRevert(this.app.methods.upgradeAndCall(this.implementation_v0, this.packageName, this.contractNameUpdated, migrateData).send({ from: appOwner }))
     });
 
     it('fails to upgrade from another account', async function () {
-      await assertRevert(this.app.upgradeAndCall(this.proxyAddress, this.packageName, this.contractNameUpdated, migrateData, { from: anotherAccount }))
+      await assertRevert(this.app.methods.upgradeAndCall(this.proxyAddress, this.packageName, this.contractNameUpdated, migrateData).send({ from: anotherAccount }))
     });
 
     it('fails to upgrade with incorrect migrate data', async function () {
-      await assertRevert(this.app.upgradeAndCall(this.proxyAddress, this.packageName, this.contractNameUpdated, incorrectData, { from: appOwner }))
+      await assertRevert(this.app.methods.upgradeAndCall(this.proxyAddress, this.packageName, this.contractNameUpdated, incorrectData).send({ from: appOwner }))
     });
   })
 
   describe('getImplementation', function () {
     it('fetches the requested implementation from the directory', async function () {
-      const implementation = await this.app.getImplementation(this.packageName, this.contractName)
+      const implementation = await this.app.methods.getImplementation(this.packageName, this.contractName).call()
       implementation.should.be.equal(this.implementation_v0)
     })
 
     it('returns zero if implementation does not exist', async function () {
-      const implementation = await this.app.getImplementation(this.packageName, "NOTEXISTS")
+      const implementation = await this.app.methods.getImplementation(this.packageName, "NOTEXISTS").call()
       implementation.should.be.zeroAddress
     })
 
     it('returns zero if package name does not exist', async function () {
-      const implementation = await this.app.getImplementation("NOTEXISTS", this.contractName)
+      const implementation = await this.app.methods.getImplementation("NOTEXISTS", this.contractName).call()
       implementation.should.be.zeroAddress
     })
   })
 
   describe('changeAdmin', function () {
     beforeEach("creating proxy", async function () {
-      const { receipt } = await this.app.create(this.packageName, this.contractName, EMPTY_INITIALIZATION_DATA)
-      this.proxyAddress = receipt.logs.find(l => l.event === 'ProxyCreated').args.proxy
+      const { events } = await this.app.methods.create(this.packageName, this.contractName, EMPTY_INITIALIZATION_DATA).send()
+      this.proxyAddress = events['ProxyCreated'].returnValues.proxy
     })
 
     it('changes admin of the proxy', async function () {
-      await this.app.changeProxyAdmin(this.proxyAddress, anotherAccount, { from: appOwner });
+      await this.app.methods.changeProxyAdmin(this.proxyAddress, anotherAccount).send({ from: appOwner });
       const proxy = Proxy.at(this.proxyAddress);
-      const admin = await proxy.admin();
+      const admin = utils.toChecksumAddress(await proxy.admin());
       admin.should.be.equal(anotherAccount);
     });
   })

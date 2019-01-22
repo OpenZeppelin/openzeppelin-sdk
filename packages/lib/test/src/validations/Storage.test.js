@@ -287,8 +287,12 @@ contract('Storage', () => {
     it('assigns slots according to linearization', async function () {
       const StorageMockChainChild = Contracts.getFromLib('StorageMockChainChild')
       const instance = await StorageMockChainChild.new();
-      const slots = await instance.slots();
-      slots.map(slot => slot.toNumber()).should.deep.eq([0, 1, 3, 5, 7])
+      const slots = await instance.methods.slots().call();
+      const mappedSlots = [];
+      _.mapKeys(slots, (value, key) => { 
+        if(isNaN(parseInt(key, 10))) mappedSlots.push(parseInt(value, 10));
+      });
+      mappedSlots.should.deep.eq([0, 1, 3, 5, 7])
     })
 
     checkStorage([

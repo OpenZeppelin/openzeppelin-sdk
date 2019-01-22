@@ -5,7 +5,7 @@ export default async function assertRevert(promise: Promise<any>, invariants = (
     await promise;
     assert.fail('Expected revert not received');
   } catch (error) {
-    const revertFound = error.message.search('revert') >= 0;
+    const revertFound = error.toString().search('revert') >= 0;
     assert(revertFound, `Expected "revert", got ${error} instead`);
     invariants();
   }

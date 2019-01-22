@@ -6,6 +6,8 @@ import shouldManageProxies from './ManageProxies.behavior';
 import shouldManagePackages from './ManagePackages.behavior';
 import shouldBehaveLikeOwnable from '../../../src/test/behaviors/Ownable';
 import { toSemanticVersion } from '../../../src/utils/Semver';
+import lodash from 'lodash';
+import utils from 'web3-utils';
 
 const Package = Contracts.getFromLocal('Package')
 const ImplementationDirectory = Contracts.getFromLocal('ImplementationDirectory')
@@ -14,6 +16,8 @@ const DummyImplementation = Contracts.getFromLocal('DummyImplementation')
 const DummyImplementationV2 = Contracts.getFromLocal('DummyImplementationV2')
 
 contract('App', (accounts) => {
+  accounts = lodash.map(accounts, utils.toChecksumAddress); // Required by Web3 v1.x.
+
   const [_, appOwner, packageOwner, directoryOwner, anotherAccount] = accounts;
 
   const version_0 = '1.0.0'
@@ -30,12 +34,12 @@ contract('App', (accounts) => {
     this.contractNameUpdated = 'ERC721Updated';
     this.packageName = 'MyProject';
     this.directory = await ImplementationDirectory.new({ from: directoryOwner })
-    await this.directory.setImplementation(this.contractName, this.implementation_v0, { from: directoryOwner })
-    await this.directory.setImplementation(this.contractNameUpdated, this.implementation_v1, { from: directoryOwner })
+    await this.directory.methods.setImplementation(this.contractName, this.implementation_v0).send({ from: directoryOwner })
+    await this.directory.methods.setImplementation(this.contractNameUpdated, this.implementation_v1).send({ from: directoryOwner })
     this.package = await Package.new({ from: packageOwner })
-    await this.package.addVersion(toSemanticVersion(version_0), this.directory.address, contentURI, { from: packageOwner });
+    await this.package.methods.addVersion(toSemanticVersion(version_0), this.directory.address, contentURI).send({ from: packageOwner });
     this.app = await AppContract.new({ from: appOwner })
-    await this.app.setPackage(this.packageName, this.package.address, toSemanticVersion(version_0), { from: appOwner });
+    await this.app.methods.setPackage(this.packageName, this.package.address, toSemanticVersion(version_0)).send({ from: appOwner });
   })
 
   describe('ownership', function () {

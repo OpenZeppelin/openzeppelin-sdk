@@ -4,8 +4,12 @@ import sinon from 'sinon'
 import ZWeb3 from '../../../src/artifacts/ZWeb3'
 import Contracts from '../../../src/artifacts/Contracts'
 import { ZERO_ADDRESS } from '../../../src/utils/Addresses'
+import utils from 'web3-utils';
+import BN from 'bignumber.js';
 
 contract('ZWeb3', accounts => {
+  accounts = accounts.map(utils.toChecksumAddress); // Required by Web3 v1.x.
+  
   before('deploy dummy instance', async function () {
     const DummyImplementation = Contracts.getFromLocal('DummyImplementation')
     this.impl = await DummyImplementation.new()
@@ -54,7 +58,7 @@ contract('ZWeb3', accounts => {
 
     it('tells the balanace of a given account', async function () {
       const balance = await ZWeb3.getBalance(accounts[1])
-      balance.should.be.an('object')
+      balance.should.be.an('string')
       balance.should.be.bignumber.equal('100e18')
     })
 
@@ -65,7 +69,7 @@ contract('ZWeb3', accounts => {
 
     it('tells the name of the current network ID', async function () {
       const network = await ZWeb3.getNetwork()
-      network.should.be.eq('4447')
+      network.should.be.eq(4447)
     })
 
     it('tells the name of the current network', async function () {
@@ -86,7 +90,7 @@ contract('ZWeb3', accounts => {
     })
 
     describe('get code', function () {
-      it('can tells the deployed bytecode of a certain address', async function () {
+      it('can tell the deployed bytecode of a certain address', async function () {
         const bytecode = await ZWeb3.getCode(this.impl.address)
         bytecode.should.be.equal(this.impl.constructor.deployedBytecode)
       })
@@ -94,9 +98,8 @@ contract('ZWeb3', accounts => {
 
     describe('get storage', function () {
       it('tells the value stored at a certain storage slot', async function () {
-        await this.impl.initialize(32, 'hello', [1, 2, 3])
+        await this.impl.methods.initialize(32, 'hello', [1, 2, 3]).send()
         const storage = await ZWeb3.getStorageAt(this.impl.address, 0)
-
         storage.should.be.equal('0x20')
       })
     })
@@ -113,7 +116,9 @@ contract('ZWeb3', accounts => {
 
     describe('transactions', function () {
       beforeEach('sending transaction', async function () {
-        this.txHash = await ZWeb3.sendTransaction({ from: accounts[0], to: accounts[2], value: '1e18' })
+        const value = (new BN(1e18)).toString(10);
+        const receipt = await ZWeb3.sendTransaction({ from: accounts[0], to: accounts[2], value })
+        this.txHash = receipt.transactionHash;
       })
 
       describe('send transaction', function () {

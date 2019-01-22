@@ -6,6 +6,7 @@ import ZWeb3 from '../../../src/artifacts/ZWeb3'
 import encodeCall from '../../../src/helpers/encodeCall'
 import assertRevert from '../../../src/test/helpers/assertRevert'
 import shouldBehaveLikeUpgradeabilityProxy from './UpgradeabilityProxy.behaviour'
+import BN from 'bignumber.js'
 
 const Implementation1 = artifacts.require('Implementation1');
 const Implementation2 = artifacts.require('Implementation2');
@@ -24,7 +25,9 @@ const sendTransaction = (target, method, args, values, opts) => {
   return target.sendTransaction(Object.assign({ data }, opts));
 };
 
-contract('AdminUpgradeabilityProxy', ([_, admin, anotherAccount]) => {
+contract('AdminUpgradeabilityProxy', (accounts) => {
+  const [_, admin, anotherAccount] = accounts;
+
   before(async function () {
     this.implementation_v0 = (await DummyImplementation.new()).address
     this.implementation_v1 = (await DummyImplementation.new()).address
@@ -126,7 +129,7 @@ contract('AdminUpgradeabilityProxy', ([_, admin, anotherAccount]) => {
 
           it('sends given value to the proxy', async function() {
             const balance = await ZWeb3.getBalance(this.proxyAddress)
-            assert(balance.eq(value))
+            assert.equal(balance, value)
           })
 
           it('uses the storage of the proxy', async function () {
@@ -168,7 +171,7 @@ contract('AdminUpgradeabilityProxy', ([_, admin, anotherAccount]) => {
 
           beforeEach(async function () {
             this.behavior_v1 = await MigratableMockV1.new()
-            this.balancePrevious_v1 = await ZWeb3.getBalance(this.proxyAddress)
+            this.balancePrevious_v1 = new BN(await ZWeb3.getBalance(this.proxyAddress))
             this.logs = (await this.proxy.upgradeToAndCall(this.behavior_v1.address, v1MigrationData, { from, value })).logs
           })
 
@@ -187,7 +190,7 @@ contract('AdminUpgradeabilityProxy', ([_, admin, anotherAccount]) => {
             x.should.be.bignumber.eq(42)
 
             const balance = await ZWeb3.getBalance(this.proxyAddress)
-            assert(balance.eq(this.balancePrevious_v1.plus(value)))
+            assert((new BN(balance)).eq(this.balancePrevious_v1.plus(value)))
           })
 
           describe('when upgrading to V2', function () {
@@ -195,7 +198,7 @@ contract('AdminUpgradeabilityProxy', ([_, admin, anotherAccount]) => {
 
             beforeEach(async function () {
               this.behavior_v2 = await MigratableMockV2.new()
-              this.balancePrevious_v2 = await ZWeb3.getBalance(this.proxyAddress)
+              this.balancePrevious_v2 = new BN(await ZWeb3.getBalance(this.proxyAddress))
               this.logs = (await this.proxy.upgradeToAndCall(this.behavior_v2.address, v2MigrationData, { from, value })).logs
             })
 
@@ -216,8 +219,8 @@ contract('AdminUpgradeabilityProxy', ([_, admin, anotherAccount]) => {
               const y = await migratable.y()
               y.should.be.bignumber.eq(42)
 
-              const balance = await ZWeb3.getBalance(this.proxyAddress)
-              balance.should.be.bignumber.eq(this.balancePrevious_v2.plus(value))
+              const balance = new BN(await ZWeb3.getBalance(this.proxyAddress))
+              expect(balance).to.eql(this.balancePrevious_v2.plus(value))
             })
 
             describe('when upgrading to V3', function () {
@@ -225,7 +228,7 @@ contract('AdminUpgradeabilityProxy', ([_, admin, anotherAccount]) => {
 
               beforeEach(async function () {
                 this.behavior_v3 = await MigratableMockV3.new()
-                this.balancePrevious_v3 = await ZWeb3.getBalance(this.proxyAddress)
+                this.balancePrevious_v3 = new BN(await ZWeb3.getBalance(this.proxyAddress))
                 this.logs = (await this.proxy.upgradeToAndCall(this.behavior_v3.address, v3MigrationData, { from, value })).logs
               })
 
@@ -246,8 +249,8 @@ contract('AdminUpgradeabilityProxy', ([_, admin, anotherAccount]) => {
                 const y = await migratable.y()
                 y.should.be.bignumber.eq(10)
 
-                const balance = await ZWeb3.getBalance(this.proxyAddress)
-                balance.should.be.bignumber.eq(this.balancePrevious_v3.plus(value))
+                const balance = new BN(await ZWeb3.getBalance(this.proxyAddress))
+                expect(balance).to.eql(this.balancePrevious_v3.plus(value))
               })
             })
           })
@@ -310,12 +313,12 @@ contract('AdminUpgradeabilityProxy', ([_, admin, anotherAccount]) => {
   describe('storage', function () {
     it('should store the implementation address in specified location', async function () {
       const implementation = await Proxy.at(this.proxyAddress).implementation()
-      implementation.should.be.equal(this.implementation_v0);
+      implementation.toLowerCase().should.be.equal(this.implementation_v0);
     })
 
     it('should store the admin proxy in specified location', async function () {
       const proxyAdmin = await Proxy.at(this.proxyAddress).admin()
-      proxyAdmin.should.be.equal(admin);
+      proxyAdmin.toLowerCase().should.be.equal(admin);
     })
   })
 

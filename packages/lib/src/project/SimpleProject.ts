@@ -9,6 +9,7 @@ import { bytecodeDigest } from '..';
 import { buildCallData, callDescription, CalldataInfo } from '../utils/ABIs';
 import ContractFactory, { ContractWrapper } from '../artifacts/ContractFactory';
 import { ContractInterface } from './AppProject';
+import { toSemanticVersion } from '../utils/Semver';
 
 interface Implementations {
   [contractName: string]: Implementation;
@@ -99,8 +100,8 @@ export default class SimpleProject  {
     return Package.fetch(this.dependencies[name].package);
   }
 
-  public getDependencyVersion(name: string): string {
-    return this.dependencies[name].version;
+  public getDependencyVersion(name: string): [number, number, number] {
+    return toSemanticVersion(this.dependencies[name].version);
   }
 
   public hasDependency(name: string): boolean {

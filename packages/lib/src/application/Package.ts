@@ -48,7 +48,7 @@ export default class Package {
   }
 
   public async hasVersion(version: string): Promise<boolean> {
-    return this.packageContract.hasVersion(toSemanticVersion(version));
+    return this.packageContract.methods.hasVersion(toSemanticVersion(version)).call();
   }
 
   public async isFrozen(version: string): Promise<boolean | never> {
@@ -70,15 +70,15 @@ export default class Package {
   public async newVersion(version: string, content: string = ''): Promise<ImplementationDirectory> {
     log.info('Adding new version...');
     const semver: SemanticVersion = toSemanticVersion(version);
-    const directory: ImplementationDirectory = await ImplementationDirectory.deploy(this.txParams);
-    await sendTransaction(this.packageContract.addVersion, [semver, directory.address, content], this.txParams);
+    const directory: ImplementationDirectory = await ImplementationDirectory.deploy({ ...this.txParams });
+    await sendTransaction(this.packageContract.methods.addVersion, [semver, directory.address, Buffer.from(content)], { ...this.txParams });
     log.info(`Added version ${semver.join('.')}`);
     return directory;
   }
 
   public async getDirectory(version: string): Promise<ImplementationDirectory | never> {
     if (!version) throw Error('Cannot get a directory from a package without specifying a version');
-    const directoryAddress = await this.packageContract.getContract(toSemanticVersion(version));
-    return ImplementationDirectory.fetch(directoryAddress, this.txParams);
+    const directoryAddress = await this.packageContract.methods.getContract(toSemanticVersion(version)).call();
+    return ImplementationDirectory.fetch(directoryAddress, { ...this.txParams });
   }
 }

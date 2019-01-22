@@ -11,9 +11,9 @@ const Compiler = {
 
     return new Promise((resolve, reject) => {
       exec(`${truffleBin} compile --all`, (error, stdout, stderr) => {
-        if (stdout) console.log(stdout)
-        if (stderr) console.error(stderr)
-        error ? reject(error) : resolve({ stdout, stderr })
+        if (stdout) console.log(stdout);
+        if (stderr) console.error(stderr);
+        error ? reject(error) : resolve({ stdout, stderr });
       });
     });
   }

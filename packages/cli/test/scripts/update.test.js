@@ -13,13 +13,17 @@ import createProxy from '../../src/scripts/create';
 import update from '../../src/scripts/update';
 import setAdmin from '../../src/scripts/set-admin';
 import ZosPackageFile from "../../src/models/files/ZosPackageFile";
+import utils from 'web3-utils';
 
 const ImplV1 = Contracts.getFromLocal('ImplV1')
 const ImplV2 = Contracts.getFromLocal('ImplV2')
 const Greeter_V1 = Contracts.getFromNodeModules('mock-stdlib', 'GreeterImpl')
 const Greeter_V2 = Contracts.getFromNodeModules('mock-stdlib-2', 'GreeterImpl')
 
-contract('update script', function([_skipped, owner, anotherAccount]) {
+contract('update script', function(accounts) {
+  accounts = accounts.map(utils.toChecksumAddress);
+  const [_skipped, owner, anotherAccount] = accounts;
+
   const network = 'test';
   const version_1 = '0.1.0';
   const version_2 = '0.2.0';
@@ -42,8 +46,8 @@ contract('update script', function([_skipped, owner, anotherAccount]) {
 
     if (value) {
       const proxy = ImplV1.at(proxyInfo.address);
-      const actualValue = await proxy.value();
-      actualValue.toNumber().should.eq(value);
+      const actualValue = await proxy.methods.value().call();
+      actualValue.should.eq(`${value}`);
     }
 
     return proxyInfo;
@@ -232,38 +236,38 @@ contract('update script', function([_skipped, owner, anotherAccount]) {
 
       await assertProxyInfo(this.networkFile, 'Greeter', 0, { version: '1.2.0', address: proxyAddress });
       const upgradedProxy = await Greeter_V2.at(proxyAddress);
-      (await upgradedProxy.version()).should.eq('1.2.0');
+      (await upgradedProxy.methods.version().call()).should.eq('1.2.0');
 
       const anotherProxyAddress = this.networkFile.getProxies({ contract: 'Greeter'})[1].address;
       const notUpgradedProxy = await Greeter_V1.at(anotherProxyAddress);
-      (await notUpgradedProxy.version()).should.eq('1.1.0');
+      (await notUpgradedProxy.methods.version().call()).should.eq('1.1.0');
     });
 
     it('should upgrade the version of all proxies given their name', async function() {
       await update({ packageName: 'mock-stdlib-undeployed-2', contractAlias: 'Greeter', network, txParams, networkFile: this.networkFile });
 
       const { address: proxyAddress } = await assertProxyInfo(this.networkFile, 'Greeter', 0, { version: '1.2.0' });
-      (await Greeter_V2.at(proxyAddress).version()).should.eq('1.2.0');
+      (await Greeter_V2.at(proxyAddress).methods.version().call()).should.eq('1.2.0');
       const { address: anotherProxyAddress } = await assertProxyInfo(this.networkFile, 'Greeter', 0, { version: '1.2.0' });
-      (await Greeter_V2.at(anotherProxyAddress).version()).should.eq('1.2.0');
+      (await Greeter_V2.at(anotherProxyAddress).methods.version().call()).should.eq('1.2.0');
     });
 
     it('should upgrade the version of all proxies given their package', async function() {
       await update({ packageName: 'mock-stdlib-undeployed-2', network, txParams, networkFile: this.networkFile });
 
       const { address: proxyAddress } = await assertProxyInfo(this.networkFile, 'Greeter', 0, { version: '1.2.0' });
-      (await Greeter_V2.at(proxyAddress).version()).should.eq('1.2.0');
+      (await Greeter_V2.at(proxyAddress).methods.version().call()).should.eq('1.2.0');
       const { address: anotherProxyAddress } = await assertProxyInfo(this.networkFile, 'Greeter', 0, { version: '1.2.0' });
-      (await Greeter_V2.at(anotherProxyAddress).version()).should.eq('1.2.0');
+      (await Greeter_V2.at(anotherProxyAddress).methods.version().call()).should.eq('1.2.0');
     });
 
     it('should upgrade the version of all proxies', async function() {
       await update({ network, txParams, all: true, networkFile: this.networkFile });
 
       const { address: proxyAddress } = await assertProxyInfo(this.networkFile, 'Greeter', 0, { version: '1.2.0' });
-      (await Greeter_V2.at(proxyAddress).version()).should.eq('1.2.0');
+      (await Greeter_V2.at(proxyAddress).methods.version().call()).should.eq('1.2.0');
       const { address: anotherProxyAddress } = await assertProxyInfo(this.networkFile, 'Greeter', 0, { version: '1.2.0' });
-      (await Greeter_V2.at(anotherProxyAddress).version()).should.eq('1.2.0');
+      (await Greeter_V2.at(anotherProxyAddress).methods.version().call()).should.eq('1.2.0');
     });
   };
 

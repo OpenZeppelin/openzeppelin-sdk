@@ -256,8 +256,8 @@ export default class ZosNetworkFile {
     return !isEmpty(this.data.contracts);
   }
 
-  public hasProxies(filter: any = {}): boolean {
-    return !isEmpty(this.getProxies(filter));
+  public hasProxies(aFilter: any = {}): boolean {
+    return !isEmpty(this.getProxies(aFilter));
   }
 
   public hasMatchingVersion(): boolean {

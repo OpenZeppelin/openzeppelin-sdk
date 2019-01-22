@@ -15,8 +15,10 @@ export default class EventsFilter {
   public async call(contract: ContractWrapper, eventName: string = 'allEvents'): Promise<any> {
     log.info(`Looking for all the '${eventName}' events for contract ${contract.address}`);
     const promise = new Promise((resolve, reject) => {
-      const event = contract[eventName]({}, { fromBlock: 0, toBlock: 'latest' });
-      event.get((error, result) => error ? reject(error) : resolve(result));
+      contract.instance.getPastEvents(eventName, {fromBlock: 0, toBlock: 'latest'}, (error, events) => {
+        if(error) reject(error);
+        else resolve(events);
+      });
     });
     return this._promiseTimeout(promise);
   }

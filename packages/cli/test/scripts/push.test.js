@@ -43,7 +43,7 @@ contract('push script', function([_, owner]) {
   const shouldDeployProvider = function () {
     it('should deploy provider at specified address', async function () {
       const directory = await ImplementationDirectory.at(this.networkFile.providerAddress);
-      (await directory.getImplementation('foo')).should.be.zeroAddress;
+      (await directory.methods.getImplementation('foo').call()).should.be.zeroAddress;
     });
   };
 
@@ -68,13 +68,13 @@ contract('push script', function([_, owner]) {
       contract.storage.should.not.be.empty;
       contract.types.should.not.be.empty;
       const deployed = await ImplV1.at(contract.address);
-      (await deployed.say()).should.eq('V1');
+      (await deployed.methods.say().call()).should.eq('V1');
     });
 
     it('should deploy contract instance', async function () {
       const address = this.networkFile.contract('Impl').address;
       const deployed = await ImplV1.at(address);
-      (await deployed.say()).should.eq('V1');
+      (await deployed.methods.say().call()).should.eq('V1');
     });
 
     it('should deploy required libraries', async function () {
@@ -87,8 +87,8 @@ contract('push script', function([_, owner]) {
     it('should deploy and link contracts that require libraries', async function () {
       const address = this.networkFile.contract('WithLibraryImpl').address;
       const deployed = await WithLibraryImplV1.at(address);
-      const result = await deployed.double(10);
-      result.toNumber().should.eq(20);
+      const result = await deployed.methods.double(10).call();
+      result.should.eq('20');
     });
   };
 

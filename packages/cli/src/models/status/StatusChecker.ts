@@ -3,7 +3,7 @@ import { promisify } from 'util';
 import EventsFilter from './EventsFilter';
 import StatusFetcher from './StatusFetcher';
 import StatusComparator from './StatusComparator';
-import { ZWeb3, Logger, AppProject, bytecodeDigest, semanticVersionEqual, replaceSolidityLibAddress, isSolidityLib } from 'zos-lib';
+import { ZWeb3, Logger, AppProject, bytecodeDigest, semanticVersionToString, semanticVersionEqual, replaceSolidityLibAddress, isSolidityLib } from 'zos-lib';
 import ZosNetworkFile, {
   ProxyInterface,
   DependencyInterface
@@ -231,11 +231,11 @@ export default class StatusChecker {
     const filter = new EventsFilter();
     const directory = await this._project.getCurrentDirectory();
     const allEvents = await filter.call(directory.contract, 'ImplementationChanged');
-    const contractsAlias = allEvents.map((event) => event.args.contractName);
+    const contractsAlias = allEvents.map((event) => event.returnValues.contractName);
     const events = allEvents
-      .filter((event, index) => contractsAlias.lastIndexOf(event.args.contractName) === index)
-      .filter((event) => event.args.implementation !== ZERO_ADDRESS)
-      .map((event) => ({ alias: event.args.contractName, address: event.args.implementation }));
+      .filter((event, index) => contractsAlias.lastIndexOf(event.returnValues.contractName) === index)
+      .filter((event) => event.returnValues.implementation !== ZERO_ADDRESS)
+      .map((event) => ({ alias: event.returnValues.contractName, address: event.returnValues.implementation }));
 
     return events;
   }
@@ -247,7 +247,7 @@ export default class StatusChecker {
     const proxyEvents = await filter.call(app.appContract, 'ProxyCreated');
     const proxiesInfo = [];
     await Promise.all(proxyEvents.map(async (event) => {
-      const address = event.args.proxy;
+      const address = event.returnValues.proxy;
       const implementation = await app.getProxyImplementation(address);
       const matchingImplementations = implementationsInfo.filter((info) => info.address === implementation);
       if (matchingImplementations.length > 1) {
@@ -267,12 +267,12 @@ export default class StatusChecker {
     const app = this._project.getApp();
     const allEvents = await filter.call(app.appContract, 'PackageChanged');
     const filteredEvents = allEvents
-      .filter((event) => event.args.package !== ZERO_ADDRESS)
-      .filter((event) => event.args.providerName !== this.packageName)
+      .filter((event) => event.returnValues.package !== ZERO_ADDRESS)
+      .filter((event) => event.returnValues.providerName !== this.packageName)
       .map((event) => ({
-        name: event.args.providerName,
-        version: event.args.version,
-        package: event.args.package
+        name: event.returnValues.providerName,
+        version: semanticVersionToString(event.returnValues.version),
+        package: event.returnValues.package
       }))
       .reduce((dependencies, dependency) => {
         dependencies[dependency.name] = dependency;

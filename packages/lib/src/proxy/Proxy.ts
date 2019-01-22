@@ -23,7 +23,7 @@ export default class Proxy {
 
   public static async deploy(implementation: string, initData: string | null, txParams: any = {}): Promise<Proxy> {
     const ProxyContract: ContractFactory = Contracts.getFromLib('AdminUpgradeabilityProxy');
-    const contract: ProxyInterface = await deployContract(ProxyContract, [toAddress(implementation), initData || ''], txParams);
+    const contract: ProxyInterface = await deployContract(ProxyContract, [toAddress(implementation), initData || Buffer.from('')], txParams);
     return new this(contract, txParams);
   }
 
@@ -36,13 +36,13 @@ export default class Proxy {
   public async upgradeTo(address: string, migrateData: string | null): Promise<any> {
     await this.checkAdmin();
     return migrateData
-      ? sendTransaction(this.contract.upgradeToAndCall, [toAddress(address), migrateData], this.txParams)
-      : sendTransaction(this.contract.upgradeTo, [toAddress(address)], this.txParams);
+      ? sendTransaction(this.contract.methods.upgradeToAndCall, [toAddress(address), migrateData], this.txParams)
+      : sendTransaction(this.contract.methods.upgradeTo, [toAddress(address)], this.txParams);
   }
 
   public async changeAdmin(newAdmin: string): Promise<any> {
     await this.checkAdmin();
-    return sendTransaction(this.contract.changeAdmin, [newAdmin], this.txParams);
+    return sendTransaction(this.contract.methods.changeAdmin, [newAdmin], this.txParams);
   }
 
   public async implementation(): Promise<string> {

@@ -7,8 +7,12 @@ import push from '../../src/scripts/push';
 import createProxy from '../../src/scripts/create';
 import setAdmin from '../../src/scripts/set-admin';
 import ZosPackageFile from "../../src/models/files/ZosPackageFile";
+import utils from 'web3-utils';
 
-contract('set-admin script', function([_skipped, owner, newAdmin, anotherNewAdmin]) {
+contract('set-admin script', function(accounts) {
+  accounts = accounts.map(utils.toChecksumAddress);
+  const [_skipped, owner, newAdmin, anotherNewAdmin] = accounts;
+
   const network = 'test';
   const version_1 = '1.1.0';
   const txParams = { from: owner };

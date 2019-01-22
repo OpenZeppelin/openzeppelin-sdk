@@ -136,9 +136,9 @@ export default class NetworkController {
   private _contractsListForPush(onlyChanged: boolean = false, changedLibraries: ContractFactory[] = []): Array<[string, ContractFactory]> {
     const newVersion = this._newVersionRequired();
     const pipeline = [
-      contracts => toPairs(contracts),
-      contracts => map(contracts, ([contractAlias, contractName]): [string, ContractFactory] => [contractAlias, Contracts.getFromLocal(contractName)]),
-      contracts => filter(contracts, ([contractAlias, contractClass]) => newVersion || !onlyChanged || this.hasContractChanged(contractAlias, contractClass) || this._hasChangedLibraries(contractClass, changedLibraries))
+      (contracts) => toPairs(contracts),
+      (contracts) => map(contracts, ([contractAlias, contractName]): [string, ContractFactory] => [contractAlias, Contracts.getFromLocal(contractName)]),
+      (contracts) => filter(contracts, ([contractAlias, contractClass]) => newVersion || !onlyChanged || this.hasContractChanged(contractAlias, contractClass) || this._hasChangedLibraries(contractClass, changedLibraries))
     ];
 
     return pipeline.reduce((xs, f) => f(xs), this.packageFile.contracts);
@@ -399,7 +399,7 @@ export default class NetworkController {
 
   // DeployerController
   get isPublished(): boolean {
-    return this.packageFile.isPublished || this.appAddress !== undefined
+    return this.packageFile.isPublished || this.appAddress !== undefined;
   }
 
   // DeployerController

@@ -6,16 +6,18 @@ import App from '../../../src/application/App';
 import ZWeb3 from '../../../src/artifacts/ZWeb3'
 import Package from '../../../src/application/Package'
 import Contracts from '../../../src/artifacts/Contracts'
-import expectEvent from 'openzeppelin-solidity/test/helpers/expectEvent'
 import { ZERO_ADDRESS } from '../../../src/utils/Addresses';
 import { ImplementationDirectory, Proxy } from '../../../src';
 import { deploy as deployContract } from '../../../src/utils/Transactions';
+import utils from 'web3-utils';
 
 const ImplV1 = Contracts.getFromLocal('DummyImplementation');
 const ImplV2 = Contracts.getFromLocal('DummyImplementationV2');
 const ProxyCreator = Contracts.getFromLocal('ProxyCreator');
 
 contract('App', function (accounts) {
+  accounts = accounts.map(utils.toChecksumAddress); // Required by Web3 v1.x.
+
   const [_unused, owner, otherAdmin] = accounts;
   const txParams = { from: owner };
   const contractName = 'Impl';
@@ -38,7 +40,7 @@ contract('App', function (accounts) {
     beforeEach('setting package', setPackage)
 
     it('returns package info', async function () {
-      const packageInfo = await this.app.getPackage(packageName);
+      const packageInfo = await this.app.getPackage(packageName)
       packageInfo.package.address.should.eq(this.package.address)
       packageInfo.package.should.be.instanceof(Package)
       packageInfo.version.should.be.semverEqual(version)
@@ -68,11 +70,13 @@ contract('App', function (accounts) {
     it('logs package set', async function () {
       const thepackage = await Package.deploy(txParams)
       await thepackage.newVersion(version)
-      await expectEvent.inTransaction(
-        this.app.setPackage(packageName, thepackage.address, version),
-        'PackageChanged',
-        { providerName: packageName, package: thepackage.address, version: version }
-      )
+
+      const { events } = await this.app.setPackage(packageName, thepackage.address, version);
+      const event = events['PackageChanged'];
+      expect(event).to.be.an('object');
+      event.returnValues.providerName.should.be.equal(packageName);
+      event.returnValues.package.should.be.equal(thepackage.address);
+      event.returnValues.version.should.be.semverEqual(version);
     })
 
     it('can set multiple packages', async function () {
@@ -105,11 +109,12 @@ contract('App', function (accounts) {
     beforeEach('setting package', setPackage)
 
     it('unsets a provider', async function () {
-      await expectEvent.inTransaction(
-        this.app.unsetPackage(packageName),
-        'PackageChanged',
-        { providerName: packageName, package: ZERO_ADDRESS, version: "" } 
-      )
+      const { events } = await this.app.unsetPackage(packageName);
+      const event = events['PackageChanged'];
+      expect(event).to.be.an('object');
+      event.returnValues.providerName.should.be.equal(packageName);
+      event.returnValues.package.should.be.equal(ZERO_ADDRESS);
+      event.returnValues.version.should.be.semverEqual('0.0.0');
       const hasProvider = await this.app.hasProvider(packageName)
       hasProvider.should.be.false
     })
@@ -156,7 +161,7 @@ contract('App', function (accounts) {
     const shouldReturnANonUpgradeableInstance = function () {
       it('should return a non-upgradeable instance', async function () {
         this.instance.address.should.be.not.null;
-        (await this.instance.version()).should.be.eq('V1');
+        (await this.instance.methods.version().call()).should.be.eq('V1');
         (await ZWeb3.getCode(this.instance.address)).should.be.eq(ImplV1.deployedBytecode)
       });
     };
@@ -177,7 +182,8 @@ contract('App', function (accounts) {
       shouldReturnANonUpgradeableInstance();
 
       it('should have initialized the instance', async function () {
-        (await this.instance.value()).toNumber().should.eq(10);
+        const value = await this.instance.methods.value().call();
+        value.should.eq('10');
       });
     });
 
@@ -189,9 +195,11 @@ contract('App', function (accounts) {
       shouldReturnANonUpgradeableInstance();
 
       it('should have initialized the proxy', async function () {
-        (await this.instance.value()).toNumber().should.eq(10);
-        (await this.instance.text()).should.eq("foo");
-        await this.instance.values(0).should.be.rejected;
+        const value = await this.instance.methods.value().call();
+        value.should.eq('10');
+        const text = await this.instance.methods.text().call();
+        text.should.eq("foo");
+        (this.instance.methods.values(0).call()).should.be.rejected;
       });
     });
   });
@@ -250,7 +258,7 @@ contract('App', function (accounts) {
     const shouldReturnProxy = function () {
       it('should return a proxy', async function () {
         this.proxy.address.should.be.not.null;
-        (await this.proxy.version()).should.be.eq('V1');
+        (await this.proxy.methods.version().call()).should.be.eq('V1');
         (await this.app.getProxyImplementation(this.proxy.address)).should.be.eq(this.implV1.address)
       });
     };
@@ -268,7 +276,8 @@ contract('App', function (accounts) {
       shouldReturnProxy();
 
       it('should have initialized the proxy', async function () {
-        (await this.proxy.value()).toNumber().should.eq(10);
+        const value = await this.proxy.methods.value().call();
+        value.should.eq('10');
       });
     });
 
@@ -280,9 +289,11 @@ contract('App', function (accounts) {
       shouldReturnProxy();
 
       it('should have initialized the proxy', async function () {
-        (await this.proxy.value()).toNumber().should.eq(10);
-        (await this.proxy.text()).should.eq("foo");
-        await this.proxy.values(0).should.be.rejected;
+        const value = await this.proxy.methods.value().call();
+        value.should.eq('10');
+        const text = await this.proxy.methods.text().call();
+        text.should.eq("foo");
+        (this.proxy.methods.values(0).call()).should.be.rejected;
       });
     });
 
@@ -294,9 +305,9 @@ contract('App', function (accounts) {
 
       it('should return proxy creator instance', async function () {
         const proxy = await this.app.createProxy(ProxyCreator, packageName, 'ProxyCreator', 'initialize', [this.app.address, packageName, contractName, Buffer.from('')]);
-        (await proxy.name()).should.eq('ProxyCreator');
-        const created = await proxy.created();
-        (await ImplV1.at(created).version()).should.eq('V1');
+        (await proxy.methods.name().call()).should.eq('ProxyCreator');
+        const created = await proxy.methods.created().call();
+        (await ImplV1.at(created).methods.version().call()).should.eq('V1');
       });
     });
   });
@@ -308,7 +319,7 @@ contract('App', function (accounts) {
 
     const shouldUpgradeProxy = function () {
       it('should upgrade proxy to ImplV2', async function () {
-        (await this.proxy.version()).should.be.eq('V2');
+        (await this.proxy.methods.version().call()).should.be.eq('V2');
         (await this.app.getProxyImplementation(this.proxy.address)).should.be.eq(this.implV2.address)
       });
     };
@@ -329,7 +340,8 @@ contract('App', function (accounts) {
       shouldUpgradeProxy();
 
       it('should run migration', async function () {
-        (await this.proxy.value()).toNumber().should.eq(20);
+        const value = await this.proxy.methods.value().call();
+        value.should.eq('20');
       });
     });
   });
@@ -341,7 +353,7 @@ contract('App', function (accounts) {
     it('should change proxy admin', async function () {
       await this.app.changeProxyAdmin(this.proxy.address, otherAdmin);
       const proxyWrapper = Proxy.at(this.proxy.address);
-      const actualAdmin = await proxyWrapper.admin();
+      const actualAdmin = await proxyWrapper.contract.methods.admin().call({from: otherAdmin});
       actualAdmin.should.be.eq(otherAdmin);
     });
   });  

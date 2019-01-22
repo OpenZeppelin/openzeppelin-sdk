@@ -5,6 +5,7 @@ import Proxy from '../../../src/proxy/Proxy'
 import ZWeb3 from '../../../src/artifacts/ZWeb3'
 import encodeCall from '../../../src/helpers/encodeCall'
 import assertRevert from '../../../src/test/helpers/assertRevert'
+import utils from 'web3-utils';
 
 const DummyImplementation = artifacts.require('DummyImplementation')
 
@@ -17,7 +18,7 @@ export default function shouldBehaveLikeUpgradeabilityProxy(proxyClass, proxyCre
   })
 
   before('deploy implementation', async function () {
-    this.implementation = (await DummyImplementation.new()).address
+    this.implementation = utils.toChecksumAddress((await DummyImplementation.new()).address);
   })
 
   const assertProxyInitialization = function ({ value, balance }) {
