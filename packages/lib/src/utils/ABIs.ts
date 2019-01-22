@@ -1,6 +1,8 @@
 import encodeCall from '../helpers/encodeCall';
 import ContractAST, { Node } from './ContractAST';
 import ContractFactory from '../artifacts/ContractFactory';
+import { hasUnlinkedVariables, getSolidityLibNames } from './Bytecode';
+import ZWeb3 from '../artifacts/ZWeb3';
 
 export interface CalldataInfo {
   method: FunctionInfo;
@@ -15,6 +17,12 @@ interface InputInfo {
 interface FunctionInfo {
   name: string;
   inputs: InputInfo[];
+}
+
+export function buildDeploymentCallData(contract: ContractFactory, args: any[], txParams: any): string {
+  if(contract.bytecode === '') throw new Error(`A bytecode must be provided for contract ${contract.contractName}`);
+  if(hasUnlinkedVariables(contract.binary)) throw new Error(`${contract.contractName} bytecode contains unlinked libraries: ${getSolidityLibNames(contract.binary).join(', ')}`);
+  return ZWeb3.contract(contract.abi).deploy({data: contract.binary, arguments: args}).encodeABI();
 }
 
 export function buildCallData(contractClass: ContractFactory, methodName: string, args: any[]): CalldataInfo {

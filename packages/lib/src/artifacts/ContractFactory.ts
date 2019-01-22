@@ -88,13 +88,6 @@ export default class ContractFactory {
     return this._wrapContract(contractClass);
   }
 
-  public getData(constructorArgs: any, txParams: any): string {
-    this._validateNonEmptyBinary();
-    this._validateNonUnlinkedLibraries();
-    const contractClass = ZWeb3.contract(this.abi);
-    return contractClass.deploy({data: this.binary, arguments: constructorArgs}).encodeABI();
-  }
-
   public link(libraries: { [libAlias: string]: string }): void {
     Object.keys(libraries).forEach((name: string) => {
       const address: string = libraries[name].replace(/^0x/, '');
@@ -104,7 +97,7 @@ export default class ContractFactory {
     });
   }
 
-  private _wrapContract(contract: any, transactionHash?: string): ContractWrapper {
+  private _wrapContract(contract: Contract, transactionHash?: string): ContractWrapper {
     const address = contract.options.address;
     const events = contract.events;
     const allEvents = contract.events.allEvents;

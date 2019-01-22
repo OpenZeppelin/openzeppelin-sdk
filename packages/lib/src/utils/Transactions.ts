@@ -11,6 +11,7 @@ import ZWeb3 from '../artifacts/ZWeb3';
 import Contracts from '../artifacts/Contracts';
 import ContractFactory, { ContractWrapper, TransactionReceiptWrapper } from '../artifacts/ContractFactory';
 import { TransactionReceipt } from 'web3/types';
+import { buildDeploymentCallData } from './ABIs';
 
 // Cache, exported for testing
 export const state: any = {};
@@ -147,7 +148,7 @@ async function _deploy(contract: ContractFactory, args: any[] = [], txParams: an
   if (!txParams.gas && defaultGas) txParams.gas = defaultGas;
   if (txParams.gas) return contract.new(...args, txParams);
 
-  const data = contract.getData(args, txParams);
+  const data = buildDeploymentCallData(contract, args, txParams);
   const gas = await estimateActualGas({ data, ...txParams });
   return contract.new(...args, { gas, ...txParams });
 }
