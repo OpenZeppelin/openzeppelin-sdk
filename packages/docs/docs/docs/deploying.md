@@ -56,6 +56,12 @@ by now, inside the `my-project` directory you should have a `package.json` file
 a `truffle-config.js` file (created by the `zos` CLI for Truffle), and a
 `zos.json` file (created by `zos` for ZeppelinOS).
 
+Note: if you haven't installed Truffle, run the following command to add it to your project:
+
+```console
+npm install truffle --save
+```
+
 ## Adding a contract
 
 Let's create a very simple contract as an example to be added to the project.
@@ -63,7 +69,7 @@ Name it `MyContract.sol`, and put it in the `contracts` folder with the
 following Solidity code:
 
 ```solidity
-pragma solidity ^0.4.24;
+pragma solidity ^0.5.0;
 
 import "zos-lib/contracts/Initializable.sol";
 
@@ -72,7 +78,7 @@ contract MyContract is Initializable {
   uint256 public x;
   string public s;
 
-  function initialize(uint256 _x, string _s) initializer public {
+  function initialize(uint256 _x, string memory _s) initializer public {
     x = _x;
     s = _s;
   }
@@ -80,8 +86,8 @@ contract MyContract is Initializable {
 ```
 
 Notice that our sample contract has an `initialize` function instead of the
-standard Solidity constructor. This is the way to define constructor 
-functionality for upgradeable contracts in ZeppelinOS, which we'll see in 
+standard Solidity constructor. This is the way to define constructor
+functionality for upgradeable contracts in ZeppelinOS, which we'll see in
 more detail in the next guide.
 
 But before we get there, we still need a couple of steps. This contract
@@ -113,8 +119,8 @@ project registering it in the `zos.json` configuration file.
 
 And just like that, we are now ready to make the initial deployment of the
 project. We are just missing a blockchain network where it will be deployed.
-For this example, let's use [ganache](https://truffleframework.com/docs/ganache/quickstart), 
-a personal blockchain for Ethereum development that you can use to develop 
+For this example, let's use [ganache](https://truffleframework.com/docs/ganache/quickstart),
+a personal blockchain for Ethereum development that you can use to develop
 your contracts. To install it run:
 
 ```console
@@ -127,27 +133,26 @@ To start working with it, open a separate terminal and run:
 ganache-cli --port 9545 --deterministic
 ```
 
-Once we have done that, let's go back to the original terminal and 
+Once we have done that, let's go back to the original terminal and
 run the following command:
 
 ```console
-zos session --network local --from 0x1df62f291b2e969fb0849d99d9ce41e2f137006e --expires 3600 
-``` 
+zos session --network local --from 0x1df62f291b2e969fb0849d99d9ce41e2f137006e --expires 3600
+```
 
 The `session` command starts a session to work with a desired network.
-In this case, we are telling it to work with the `local` network with the 
-`--network` option, and also setting a default sender address for the 
-transactions we will run with the `--from` option. Additionally, the 
-`expires` flag allows us to indicate the session expiration time in seconds. 
+In this case, we are telling it to work with the `local` network with the
+`--network` option, and also setting a default sender address for the
+transactions we will run with the `--from` option. Additionally, the
+`expires` flag allows us to indicate the session expiration time in seconds.
 
-> Note that we are using a specific address for the `--from` option which 
-is different to the default address that `ganache-cli` would use. 
-This is because we need to use different addresses in order to create 
-upgradeable contracts and to query them. This problem is know as the  
-"transparent proxy issue" and you can read more about it in the 
-[ZeppelinOS upgrades pattern section](pattern.md). 
+> Note that we are using a specific address for the `--from` option which
+is different to the default address that `ganache-cli` would use.
+This is because we need to use different addresses in order to create
+upgradeable contracts and to query them. You can read more about it in the
+[ZeppelinOS upgrades pattern section](pattern.md).
 
-Now that everything has been setup, we are ready to deploy the project. 
+Now that everything has been setup, we are ready to deploy the project.
 To do so simply run:
 
 ```console

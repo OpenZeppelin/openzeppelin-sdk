@@ -8,7 +8,7 @@ project with one contract. Here is the code of the contract, to keep it fresh
 on our minds:
 
 ```solidity
-pragma solidity ^0.4.24;
+pragma solidity ^0.5.0;
 
 import "zos-lib/contracts/Initializable.sol";
 
@@ -17,7 +17,7 @@ contract MyContract is Initializable {
   uint256 public x;
   string public s;
 
-  function initialize(uint256 _x, string _s) initializer public {
+  function initialize(uint256 _x, string memory _s) initializer public {
     x = _x;
     s = _s;
   }
@@ -94,7 +94,7 @@ extend its functionalities.
 Open `contracts/MyContract.sol`, and add a new function:
 
 ```solidity
-pragma solidity ^0.4.24;
+pragma solidity ^0.5.0;
 
 import "zos-lib/contracts/Initializable.sol";
 
@@ -103,7 +103,7 @@ contract MyContract is Initializable {
   uint256 public x;
   string public s;
 
-  function initialize(uint256 _x, string _s) initializer public {
+  function initialize(uint256 _x, string memory _s) initializer public {
     x = _x;
     s = _s;
   }
