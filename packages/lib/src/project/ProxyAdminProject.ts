@@ -1,10 +1,7 @@
-import isEmpty from 'lodash.isempty';
-
 import Proxy from '../proxy/Proxy';
 import Logger from '../utils/Logger';
 import ProxyAdmin from '../proxy/ProxyAdmin';
 import BaseSimpleProject from './BaseSimpleProject';
-import { toAddress } from '../utils/Addresses';
 import { ContractInterface } from './AppProject';
 import ContractFactory, { ContractWrapper } from '../artifacts/ContractFactory';
 
@@ -23,23 +20,17 @@ export default class ProxyAdminProject extends BaseSimpleProject {
     this.proxyAdmin = proxyAdmin;
   }
 
-  public async createProxy(contractClass, { packageName, contractName, initMethod, initArgs, redeployIfChanged }: ContractInterface = {}): Promise<ContractWrapper> {
+  public async createProxy(contractClass: ContractFactory, contractParams: ContractInterface = {}): Promise<ContractWrapper> {
     if(!this.proxyAdmin) this.proxyAdmin = await ProxyAdmin.deploy(this.txParams);
-    if (!isEmpty(initArgs) && !initMethod) initMethod = 'initialize';
-    const implementationAddress = await this._getOrDeployImplementation(contractClass, packageName, contractName, redeployIfChanged);
-    const initCallData = this._getAndLogInitCallData(contractClass, initMethod, initArgs, implementationAddress, 'Creating');
-    const proxy = await Proxy.deploy(implementationAddress, await this.getAdminAddress(), initCallData, this.txParams);
-    log.info(`Instance created at ${proxy.address}`);
-    return contractClass.at(proxy.address);
+    return super.createProxy(contractClass, contractParams);
   }
 
-  public async upgradeProxy(proxyAddress: string, contractClass: ContractFactory, { packageName, contractName, initMethod: initMethodName, initArgs, redeployIfChanged }: ContractInterface = {}): Promise<ContractWrapper> {
-    proxyAddress = toAddress(proxyAddress);
-    const implementationAddress = await this._getOrDeployImplementation(contractClass, packageName, contractName, redeployIfChanged);
-    const initCallData = this._getAndLogInitCallData(contractClass, initMethodName, initArgs, implementationAddress, 'Upgrading');
-    await this.proxyAdmin.upgradeProxy(proxyAddress, implementationAddress, contractClass, initMethodName, initArgs);
-    log.info(`Instance at ${proxyAddress} upgraded`);
-    return contractClass.at(proxyAddress);
+  public async upgradeProxy(proxyAddress: string, contractClass: ContractFactory, contractParams: ContractInterface = {}): Promise<ContractWrapper> {
+    const { initMethod: initMethodName, initArgs } = contractParams;
+    const { implementationAddress, pAddress, initCallData } = await this._setUpgradeParams(proxyAddress, contractClass, contractParams)
+    await this.proxyAdmin.upgradeProxy(pAddress, implementationAddress, contractClass, initMethodName, initArgs);
+    log.info(`Instance at ${pAddress} upgraded`);
+    return contractClass.at(pAddress);
   }
 
   public async changeProxyAdmin(proxyAddress: string, newAdmin: string): Promise<void> {

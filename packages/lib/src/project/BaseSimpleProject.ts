@@ -1,10 +1,14 @@
+import isEmpty from 'lodash.isempty';
+
 import Proxy from '../proxy/Proxy';
 import Logger from '../utils/Logger';
 import Package from '../application/Package';
 import { deploy } from '../utils/Transactions';
+import { toAddress } from '../utils/Addresses';
 import { bytecodeDigest } from '..';
 import { buildCallData, callDescription, CalldataInfo } from '../utils/ABIs';
-import ContractFactory from '../artifacts/ContractFactory';
+import { ContractInterface } from './AppProject';
+import ContractFactory, { ContractWrapper } from '../artifacts/ContractFactory';
 
 const log: Logger = new Logger('BaseSimpleProject');
 
@@ -88,6 +92,15 @@ export default abstract class BaseSimpleProject {
     delete this.dependencies[name];
   }
 
+  public async createProxy(contractClass, { packageName, contractName, initMethod, initArgs, redeployIfChanged }: ContractInterface = {}): Promise<ContractWrapper> {
+    if (!isEmpty(initArgs) && !initMethod) initMethod = 'initialize';
+    const implementationAddress = await this._getOrDeployImplementation(contractClass, packageName, contractName, redeployIfChanged);
+    const initCallData = this._getAndLogInitCallData(contractClass, initMethod, initArgs, implementationAddress, 'Creating');
+    const proxy = await Proxy.deploy(implementationAddress, await this.getAdminAddress(), initCallData, this.txParams);
+    log.info(`Instance created at ${proxy.address}`);
+    return contractClass.at(proxy.address);
+  }
+
   private async _getOrDeployOwnImplementation(contractClass: ContractFactory, contractName: string, redeployIfChanged?: boolean): Promise<string> {
     const existing: Implementation = this.implementations[contractName];
     const contractChanged: boolean = existing && existing.bytecodeHash !== bytecodeDigest(contractClass.deployedBinary);
@@ -104,6 +117,11 @@ export default abstract class BaseSimpleProject {
     return thepackage.getImplementation(version, contractName);
   }
 
+  protected async _setUpgradeParams(proxyAddress: string, contractClass: ContractFactory, { packageName, contractName, initMethod: initMethodName, initArgs, redeployIfChanged }: ContractInterface = {}): Promise<any> {
+    const implementationAddress = await this._getOrDeployImplementation(contractClass, packageName, contractName, redeployIfChanged);
+    const initCallData = this._getAndLogInitCallData(contractClass, initMethodName, initArgs, implementationAddress, 'Upgrading');
+    return { initCallData, implementationAddress, pAddress: toAddress(proxyAddress) };
+  }
   protected async _getOrDeployImplementation(contractClass: ContractFactory, packageName: string, contractName?: string, redeployIfChanged?: boolean): Promise<string | never> {
     if (!contractName) contractName = contractClass.contractName;
 
