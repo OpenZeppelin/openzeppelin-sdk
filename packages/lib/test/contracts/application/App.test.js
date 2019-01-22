@@ -25,8 +25,8 @@ contract('App', (accounts) => {
   const contentURI = '0x10'
 
   before("initializing dummy implementations", async function () {
-    this.implementation_v0 = (await DummyImplementation.new()).address
-    this.implementation_v1 = (await DummyImplementationV2.new()).address
+    this.implementation_v0 = (await DummyImplementation.new())._address
+    this.implementation_v1 = (await DummyImplementationV2.new())._address
   })
 
   beforeEach("initializing app", async function () {
@@ -37,9 +37,9 @@ contract('App', (accounts) => {
     await this.directory.methods.setImplementation(this.contractName, this.implementation_v0).send({ from: directoryOwner })
     await this.directory.methods.setImplementation(this.contractNameUpdated, this.implementation_v1).send({ from: directoryOwner })
     this.package = await Package.new({ from: packageOwner })
-    await this.package.methods.addVersion(toSemanticVersion(version_0), this.directory.address, contentURI).send({ from: packageOwner });
+    await this.package.methods.addVersion(toSemanticVersion(version_0), this.directory._address, contentURI).send({ from: packageOwner });
     this.app = await AppContract.new({ from: appOwner })
-    await this.app.methods.setPackage(this.packageName, this.package.address, toSemanticVersion(version_0)).send({ from: appOwner });
+    await this.app.methods.setPackage(this.packageName, this.package._address, toSemanticVersion(version_0)).send({ from: appOwner });
   })
 
   describe('ownership', function () {

@@ -1,7 +1,7 @@
 import { deploy } from '../utils/Transactions';
 import Logger from '../utils/Logger';
 import { semanticVersionToString } from '../utils/Semver';
-import ContractFactory, { ContractWrapper } from '../artifacts/ContractFactory';
+import ContractFactory from '../artifacts/ContractFactory';
 import ImplementationDirectory from '../application/ImplementationDirectory';
 import Package from '../application/Package';
 

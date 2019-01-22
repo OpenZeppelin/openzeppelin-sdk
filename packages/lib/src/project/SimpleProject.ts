@@ -7,7 +7,8 @@ import { deploy } from '../utils/Transactions';
 import { toAddress } from '../utils/Addresses';
 import { bytecodeDigest } from '..';
 import { buildCallData, callDescription, CalldataInfo } from '../utils/ABIs';
-import ContractFactory, { ContractWrapper } from '../artifacts/ContractFactory';
+import ContractFactory from '../artifacts/ContractFactory';
+import { Contract } from 'web3-eth-contract';
 import { ContractInterface } from './AppProject';
 import { toSemanticVersion } from '../utils/Semver';
 
@@ -44,7 +45,7 @@ export default class SimpleProject  {
     this.dependencies = {};
   }
 
-  public async createProxy(contractClass, { packageName, contractName, initMethod: initMethodName, initArgs, redeployIfChanged }: ContractInterface = {}): Promise<ContractWrapper> {
+  public async createProxy(contractClass, { packageName, contractName, initMethod: initMethodName, initArgs, redeployIfChanged }: ContractInterface = {}): Promise<Contract> {
     if (!isEmpty(initArgs) && !initMethodName) initMethodName = 'initialize';
     const implementationAddress = await this._getOrDeployImplementation(contractClass, packageName, contractName, redeployIfChanged);
     const initCallData = this._getAndLogInitCallData(contractClass, initMethodName, initArgs, implementationAddress, 'Creating');
@@ -53,7 +54,7 @@ export default class SimpleProject  {
     return contractClass.at(proxy.address);
   }
 
-  public async upgradeProxy(proxyAddress: string, contractClass: ContractFactory, { packageName, contractName, initMethod: initMethodName, initArgs, redeployIfChanged }: ContractInterface = {}): Promise<ContractWrapper> {
+  public async upgradeProxy(proxyAddress: string, contractClass: ContractFactory, { packageName, contractName, initMethod: initMethodName, initArgs, redeployIfChanged }: ContractInterface = {}): Promise<Contract> {
     proxyAddress = toAddress(proxyAddress);
     const implementationAddress = await this._getOrDeployImplementation(contractClass, packageName, contractName, redeployIfChanged);
     const initCallData = this._getAndLogInitCallData(contractClass, initMethodName, initArgs, implementationAddress, 'Upgrading');

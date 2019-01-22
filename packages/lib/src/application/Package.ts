@@ -3,26 +3,20 @@ import Contracts from '../artifacts/Contracts';
 import ImplementationDirectory from '../application/ImplementationDirectory';
 import { toSemanticVersion, SemanticVersion } from '../utils/Semver';
 import { toAddress, isZeroAddress } from '../utils/Addresses';
-import ContractFactory, { ContractWrapper } from '../artifacts/ContractFactory';
+import ContractFactory from '../artifacts/ContractFactory';
 import { deploy as deployContract, sendTransaction } from '../utils/Transactions';
+import { Contract } from 'web3-eth-contract';
 
 const log: Logger = new Logger('Package');
 
-interface PackageInterface extends ContractWrapper {
-  address: string;
-  hasVersion?;
-  addVersion?;
-  getContract?;
-}
-
 export default class Package {
-  private packageContract: PackageInterface;
+  private packageContract: Contract;
   private txParams: any;
 
   public static async fetch(address: string, txParams: any = {}): Promise<Package | null> {
     if (isZeroAddress(address)) return null;
-    const PackageContact: ContractFactory = Contracts.getFromLib('Package');
-    const packageContract: ContractWrapper = await PackageContact.at(address);
+    const PackageContact = Contracts.getFromLib('Package');
+    const packageContract = await PackageContact.at(address);
     return new this(packageContract, txParams);
   }
 
@@ -34,17 +28,17 @@ export default class Package {
     return new this(packageContract, txParams);
   }
 
-  constructor(packageContract: PackageInterface, txParams: any = {}) {
+  constructor(packageContract: Contract, txParams: any = {}) {
     this.packageContract = packageContract;
     this.txParams = txParams;
   }
 
-  get contract(): ContractWrapper {
+  get contract(): Contract {
     return this.packageContract;
   }
 
   get address(): string {
-    return this.packageContract.address;
+    return this.packageContract._address;
   }
 
   public async hasVersion(version: string): Promise<boolean> {

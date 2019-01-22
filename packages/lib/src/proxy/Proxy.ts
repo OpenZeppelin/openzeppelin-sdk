@@ -1,33 +1,28 @@
 import ZWeb3 from '../artifacts/ZWeb3';
 import Contracts from '../artifacts/Contracts';
 import { toAddress, uint256ToAddress } from '../utils/Addresses';
-import ContractFactory, { ContractWrapper } from '../artifacts/ContractFactory';
+import ContractFactory from '../artifacts/ContractFactory';
+import { Contract } from 'web3-eth-contract';
 import { deploy as deployContract, sendTransaction } from '../utils/Transactions';
 
-interface ProxyInterface extends ContractWrapper {
-  upgradeTo?;
-  upgradeToAndCall?;
-  changeAdmin?;
-}
-
 export default class Proxy {
-  private contract: ProxyInterface;
+  private contract: Contract;
   private txParams: any;
   public address: string;
 
   public static at(contractOrAddress: string | any, txParams: any = {}): Proxy {
-    const ProxyContract: ContractFactory = Contracts.getFromLib('AdminUpgradeabilityProxy');
-    const contract: ProxyInterface = ProxyContract.at(toAddress(contractOrAddress));
+    const ProxyContract = Contracts.getFromLib('AdminUpgradeabilityProxy');
+    const contract = ProxyContract.at(toAddress(contractOrAddress));
     return new this(contract, txParams);
   }
 
   public static async deploy(implementation: string, initData: string | null, txParams: any = {}): Promise<Proxy> {
-    const ProxyContract: ContractFactory = Contracts.getFromLib('AdminUpgradeabilityProxy');
-    const contract: ProxyInterface = await deployContract(ProxyContract, [toAddress(implementation), initData || Buffer.from('')], txParams);
+    const ProxyContract = Contracts.getFromLib('AdminUpgradeabilityProxy');
+    const contract = await deployContract(ProxyContract, [toAddress(implementation), initData || Buffer.from('')], txParams);
     return new this(contract, txParams);
   }
 
-  constructor(contract: ProxyInterface, txParams: any = {}) {
+  constructor(contract: Contract, txParams: any = {}) {
     this.address = toAddress(contract);
     this.contract = contract;
     this.txParams = txParams;

@@ -144,14 +144,14 @@ contract('App', function (accounts) {
     this.package = await Package.deploy(txParams)
     this.directory = await this.package.newVersion(version)
     this.implV1 = await deployContract(ImplV1)
-    await this.directory.setImplementation(contractName, this.implV1.address)
+    await this.directory.setImplementation(contractName, this.implV1._address)
     await this.app.setPackage(packageName, this.package.address, version)
   }
 
   async function setNewImplementation () {
     this.directory = await this.package.newVersion(anotherVersion)
     this.implV2 = await deployContract(ImplV2)
-    await this.directory.setImplementation(contractName, this.implV2.address)
+    await this.directory.setImplementation(contractName, this.implV2._address)
     await this.app.setPackage(packageName, this.package.address, anotherVersion)
   }
 
@@ -160,9 +160,9 @@ contract('App', function (accounts) {
 
     const shouldReturnANonUpgradeableInstance = function () {
       it('should return a non-upgradeable instance', async function () {
-        this.instance.address.should.be.not.null;
+        this.instance._address.should.be.not.null;
         (await this.instance.methods.version().call()).should.be.eq('V1');
-        (await ZWeb3.getCode(this.instance.address)).should.be.eq(ImplV1.deployedBytecode)
+        (await ZWeb3.getCode(this.instance._address)).should.be.eq(ImplV1.deployedBytecode)
       });
     };
 
@@ -209,7 +209,7 @@ contract('App', function (accounts) {
 
     it('returns implementation address', async function () {
       const implementation = await this.app.getImplementation(packageName, contractName)
-      implementation.should.eq(this.implV1.address)
+      implementation.should.eq(this.implV1._address)
     })
 
     it('returns zero if not exists', async function () {
@@ -257,9 +257,9 @@ contract('App', function (accounts) {
 
     const shouldReturnProxy = function () {
       it('should return a proxy', async function () {
-        this.proxy.address.should.be.not.null;
+        this.proxy._address.should.be.not.null;
         (await this.proxy.methods.version().call()).should.be.eq('V1');
-        (await this.app.getProxyImplementation(this.proxy.address)).should.be.eq(this.implV1.address)
+        (await this.app.getProxyImplementation(this.proxy._address)).should.be.eq(this.implV1._address)
       });
     };
 
@@ -300,7 +300,7 @@ contract('App', function (accounts) {
     describe('with initializer that spawns additional proxies', function () {
       beforeEach('setting proxy creator implementation', async function () {
         this.proxyCreator = await deployContract(ProxyCreator);
-        await this.directory.setImplementation('ProxyCreator', this.proxyCreator.address);
+        await this.directory.setImplementation('ProxyCreator', this.proxyCreator._address);
       });
 
       it('should return proxy creator instance', async function () {
@@ -320,13 +320,13 @@ contract('App', function (accounts) {
     const shouldUpgradeProxy = function () {
       it('should upgrade proxy to ImplV2', async function () {
         (await this.proxy.methods.version().call()).should.be.eq('V2');
-        (await this.app.getProxyImplementation(this.proxy.address)).should.be.eq(this.implV2.address)
+        (await this.app.getProxyImplementation(this.proxy._address)).should.be.eq(this.implV2._address)
       });
     };
 
     describe('without call', function () {
       beforeEach('upgrading the proxy', async function () {
-        await this.app.upgradeProxy(this.proxy.address, ImplV2, packageName, contractName);
+        await this.app.upgradeProxy(this.proxy._address, ImplV2, packageName, contractName);
       });
 
       shouldUpgradeProxy();
@@ -334,7 +334,7 @@ contract('App', function (accounts) {
 
     describe('with call', function () {
       beforeEach('upgrading the proxy', async function () {
-        await this.app.upgradeProxy(this.proxy.address, ImplV2, packageName, contractName, 'migrate', [20]);
+        await this.app.upgradeProxy(this.proxy._address, ImplV2, packageName, contractName, 'migrate', [20]);
       });
 
       shouldUpgradeProxy();
@@ -351,8 +351,8 @@ contract('App', function (accounts) {
     beforeEach('create proxy', createProxy);
 
     it('should change proxy admin', async function () {
-      await this.app.changeProxyAdmin(this.proxy.address, otherAdmin);
-      const proxyWrapper = Proxy.at(this.proxy.address);
+      await this.app.changeProxyAdmin(this.proxy._address, otherAdmin);
+      const proxyWrapper = Proxy.at(this.proxy._address);
       const actualAdmin = await proxyWrapper.contract.methods.admin().call({from: otherAdmin});
       actualAdmin.should.be.eq(otherAdmin);
     });

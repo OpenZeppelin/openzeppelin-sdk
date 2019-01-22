@@ -3,6 +3,7 @@ import ZWeb3 from './ZWeb3';
 import { getSolidityLibNames, hasUnlinkedVariables } from '../utils/Bytecode';
 import { StorageLayoutInfo } from '../validations/Storage';
 import { Contract, TransactionObject } from 'web3-eth-contract';
+import { TransactionReceipt } from 'web3/types';
 import Contracts from './Contracts';
 import _ from 'lodash';
 
@@ -14,16 +15,16 @@ interface ContractSchema {
   deployedBytecode: string;
 }
 
-export interface ContractWrapper {
-  instance: any;
-  address: string;
-  transactionHash: string;
-  allEvents: any;
-  sendTransaction?: (txParams: any) => Promise<TransactionReceiptWrapper>;
-  send?: (value: any) => Promise<string>;
-  methods: { [fnName: string]: (...args: any[]) => TransactionObject<any> };
-  constructor: any;
-}
+// export interface ContractWrapper {
+//   instance: any;
+//   address: string;
+//   transactionHash: string;
+//   allEvents: any;
+//   sendTransaction?: (txParams: any) => Promise<TransactionReceiptWrapper>;
+//   send?: (value: any) => Promise<string>;
+//   methods: { [fnName: string]: (...args: any[]) => TransactionObject<any> };
+//   constructor: any;
+// }
 
 export interface TransactionReceiptWrapper {
   tx: string;
@@ -33,6 +34,7 @@ export interface TransactionReceiptWrapper {
 // TS-TODO: Review which members could be private.
 export default class ContractFactory {
 
+  public schema: any;
   public abi: any;
   public ast: any;
   public bytecode: string;
@@ -47,6 +49,7 @@ export default class ContractFactory {
   public warnings: any;
 
   constructor(schema: ContractSchema, timeout) {
+    this.schema = schema;
     this.abi = schema.abi;
     this.ast = schema.ast;
     this.bytecode = schema.bytecode;
@@ -57,7 +60,7 @@ export default class ContractFactory {
     this._setBinaryIfPossible();
   }
 
-  public async new(...passedArguments): Promise<ContractWrapper> {
+  public async new(...passedArguments): Promise<Contract> {
     this._validateNonEmptyBinary();
     this._validateNonUnlinkedLibraries();
 
@@ -70,22 +73,29 @@ export default class ContractFactory {
       const contractClass: Contract = ZWeb3.contract(self.abi, null, txParams);
       const tx = contractClass.deploy({data: txParams.data, arguments: args});
       let transactionHash;
+      let receipt;
       tx.send(txParams)
         .on('error', (error) => reject(error))
+        .on('receipt', (deploymentReceipt) => receipt = deploymentReceipt)
         .on('transactionHash', (txHash) => transactionHash = txHash)
         .then((instance) => {
-          const wrapper: ContractWrapper = self._wrapContract(instance, transactionHash);
-          resolve(wrapper);
+          // const wrapper: ContractWrapper = self._wrapContract(instance, transactionHash);
+          instance.zosInjections = {
+            jsonInterface: self.schema,
+            deploymentTransactionReceipt: receipt,
+            deploymentTransactionHash: transactionHash
+          };
+          resolve(instance);
         })
         .catch((error) => reject(error));
     });
   }
 
-  public at(address: string): ContractWrapper | never {
+  public at(address: string): Contract | never {
     if (!ZWeb3.isAddress(address)) throw new Error('Given address is not valid: ' + address);
     const defaults = Contracts.getArtifactsDefaults();
     const contractClass: any = ZWeb3.contract(this.abi, address, defaults);
-    return this._wrapContract(contractClass);
+    return contractClass;
   }
 
   public link(libraries: { [libAlias: string]: string }): void {
@@ -97,14 +107,14 @@ export default class ContractFactory {
     });
   }
 
-  private _wrapContract(contract: Contract, transactionHash?: string): ContractWrapper {
-    const address = contract.options.address;
-    const events = contract.events;
-    const allEvents = contract.events.allEvents;
-    const instance = contract;
-    const wrapper: ContractWrapper = { instance, address, transactionHash, allEvents, constructor: this, methods: contract.methods };
-    return wrapper;
-  }
+  // private _wrapContract(contract: Contract, transactionHash?: string): ContractWrapper {
+  //   const address = contract.options.address;
+  //   const events = contract.events;
+  //   const allEvents = contract.events.allEvents;
+  //   const instance = contract;
+  //   const wrapper: ContractWrapper = { instance, address, transactionHash, allEvents, constructor: this, methods: contract.methods };
+  //   return wrapper;
+  // }
 
   private async _parseArguments(args: any[]): Promise<[any[], any]> {
     const params = Array.prototype.slice.call(args);

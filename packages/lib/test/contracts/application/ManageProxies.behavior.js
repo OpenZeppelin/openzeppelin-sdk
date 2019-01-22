@@ -20,7 +20,7 @@ export default function shouldManageProxies([_, appOwner, directoryOwner, anothe
 
     it('sets proxy admin', async function () {
       const admin = await this.app.methods.getProxyAdmin(this.proxyAddress).call()
-      admin.should.be.equal(this.app.address)
+      admin.should.be.equal(this.app._address)
     });
 
     it('delegates to implementation', async function () {
