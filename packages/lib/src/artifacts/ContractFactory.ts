@@ -110,25 +110,7 @@ export default class ContractFactory {
     const allEvents = contract.events.allEvents;
     const instance = contract;
     const wrapper: ContractWrapper = { instance, address, transactionHash, allEvents, constructor: this, methods: contract.methods };
-    // this._promisifyABI(contract, wrapper);
-    this._setSendFunctions(contract, wrapper);
     return wrapper;
-  }
-
-  private _setSendFunctions(instance, wrapper) {
-    const self = this;
-
-    wrapper.sendTransaction = async function(txParams: any): Promise<TransactionReceiptWrapper> {
-      const defaults = await Contracts.getDefaultTxParams();
-      const tx = { to: instance.options.address, ...defaults, ...txParams };
-      const txHash = await ZWeb3.sendTransactionWithoutReceipt(tx);
-      const receiptWithTimeout = await ZWeb3.getTransactionReceiptWithTimeout(txHash, self.timeout);
-      return { tx, receipt: receiptWithTimeout };
-    };
-
-    wrapper.send = async function(value: any): Promise<string> {
-      return wrapper.sendTransaction({ value });
-    };
   }
 
   private async _parseArguments(args: any[]): Promise<[any[], any]> {

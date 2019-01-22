@@ -115,15 +115,23 @@ async function _sendTransaction(contractFn: GenericFunction, args: any[] = [], t
  * @param contract contract instance to send the tx to
  * @param txParams all transaction parameters (data, from, gasPrice, etc)
  */
-async function _sendDataTransaction(contract: ContractWrapper, txParams: any = {}) {
+async function _sendDataTransaction(contract: ContractWrapper, txParams: any = {}): Promise<TransactionReceiptWrapper> {
   // If gas is set explicitly, use it
   const defaultGas = Contracts.getArtifactsDefaults().gas;
   if (!txParams.gas && defaultGas) txParams.gas = defaultGas;
-  if (txParams.gas) return contract.sendTransaction(txParams);
+  if (txParams.gas) return _sendContractDataTransaction(contract, txParams);
 
   // Estimate gas for the call and run the tx
   const gas = await estimateActualGas({ to: contract.address, ...txParams });
-  return contract.sendTransaction({ gas, ...txParams });
+  return _sendContractDataTransaction(contract, { gas, ...txParams });
+}
+
+async function _sendContractDataTransaction(contract: ContractWrapper, txParams: any): Promise<TransactionReceiptWrapper> {
+  const defaults = await Contracts.getDefaultTxParams();
+  const tx = { to: contract.instance.options.address, ...defaults, ...txParams };
+  const txHash = await ZWeb3.sendTransactionWithoutReceipt(tx);
+  const receiptWithTimeout = await ZWeb3.getTransactionReceiptWithTimeout(txHash, Contracts.getSyncTimeout());
+  return { tx, receipt: receiptWithTimeout };
 }
 
 /**
