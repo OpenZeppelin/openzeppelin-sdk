@@ -48,16 +48,14 @@ export default class ProxyAdmin {
     return contractClass.at(proxyAddress);
   }
 
-  // TODO: update logs
   private async _upgradeProxy(proxyAddress: string, implementation: any): Promise<any> {
-    log.info(`Upgrading ${'contract name'} proxy without running migrations...`);
+    log.info(`Upgrading proxy at ${proxyAddress} without running migrations...`);
     return sendTransaction(this.contract.upgrade, [proxyAddress, implementation], this.txParams);
   }
 
-  // TODO: update logs
   private async _upgradeProxyAndCall(proxyAddress: string, implementationAddress: string, contractClass: any, initMethodName: string, initArgs: any): Promise<any> {
     const { method: initMethod, callData }: CalldataInfo = buildCallData(contractClass, initMethodName, initArgs);
-    log.info(`Upgrading  ${contractClass.contractName} proxy and calling ${callDescription(initMethod, initArgs)}...`);
+    log.info(`Upgrading proxy at ${proxyAddress} and calling ${callDescription(initMethod, initArgs)}...`);
     return sendTransaction(this.contract.upgradeAndCall, [proxyAddress, implementationAddress, callData], this.txParams);
   }
 }
