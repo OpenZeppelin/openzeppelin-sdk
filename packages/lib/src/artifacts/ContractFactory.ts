@@ -88,7 +88,6 @@ export default class ContractFactory {
         .on('receipt', (deploymentReceipt) => receipt = deploymentReceipt)
         .on('transactionHash', (txHash) => transactionHash = txHash)
         .then((instance) => {
-          // const wrapper: ContractWrapper = self._wrapContract(instance, transactionHash);
           self._inject(instance, receipt, transactionHash);
           resolve(instance);
         })
@@ -112,15 +111,6 @@ export default class ContractFactory {
       this.deployedBinary = this.deployedBytecode.replace(regex, address);
     });
   }
-
-  // private _wrapContract(contract: Contract, transactionHash?: string): ContractWrapper {
-  //   const address = contract.options.address;
-  //   const events = contract.events;
-  //   const allEvents = contract.events.allEvents;
-  //   const instance = contract;
-  //   const wrapper: ContractWrapper = { instance, address, transactionHash, allEvents, constructor: this, methods: contract.methods };
-  //   return wrapper;
-  // }
 
   private async _parseArguments(args: any[]): Promise<[any[], any]> {
     const params = Array.prototype.slice.call(args);
