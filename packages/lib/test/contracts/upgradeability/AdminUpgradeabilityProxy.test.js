@@ -318,7 +318,7 @@ contract('AdminUpgradeabilityProxy', (accounts) => {
 
     it('should store the admin proxy in specified location', async function () {
       const proxyAdmin = await Proxy.at(this.proxyAddress).admin()
-      proxyAdmin.toLowerCase().should.be.equal(admin);
+      proxyAdmin.should.be.equal(proxyAdmin);
     })
   })
 

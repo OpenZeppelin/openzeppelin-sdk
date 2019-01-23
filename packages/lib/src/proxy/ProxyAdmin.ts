@@ -42,7 +42,7 @@ export default class ProxyAdmin {
   }
 
   public async upgradeProxy(proxyAddress: string, implementationAddress: string, contractClass: ContractFactory, initMethodName: string, initArgs: any): Promise<ContractWrapper> {
-    const { receipt }: any = typeof(initArgs) === 'undefined'
+    const receipt: any = typeof(initArgs) === 'undefined'
       ? await this._upgradeProxy(proxyAddress, implementationAddress)
       : await this._upgradeProxyAndCall(proxyAddress, implementationAddress, contractClass, initMethodName, initArgs);
     log.info(`TX receipt received: ${receipt.transactionHash}`);

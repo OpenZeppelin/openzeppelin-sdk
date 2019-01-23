@@ -266,7 +266,6 @@ contract('App', function (accounts) {
       it('should return a proxy', async function() {
         this.proxy.address.should.be.not.null;
         (await this.proxy.methods.version().call()).should.be.eq('V1');
-        (await this.proxy.version()).should.be.eq('V1');
         (await this.proxyAdmin.getProxyImplementation(this.proxy.address)).should.be.eq(this.implV1.address)
       });
     };
@@ -309,7 +308,7 @@ contract('App', function (accounts) {
         this.proxyAdmin = await ProxyAdmin.deploy(txParams);
         const fnArgs = [this.app.address, packageName, contractName, this.proxyAdmin.address, Buffer.from('')];
         const proxy = await this.app.createProxy(ProxyCreator, packageName, 'ProxyCreator', this.proxyAdmin.address, 'initialize', fnArgs);
-        (await proxy.name()).should.eq('ProxyCreator');
+        (await proxy.methods.name().call()).should.eq('ProxyCreator');
         const created = await proxy.methods.created().call();
         (await ImplV1.at(created).methods.version().call()).should.eq('V1');
       });

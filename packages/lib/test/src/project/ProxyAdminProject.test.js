@@ -1,5 +1,6 @@
 'use strict';
 require('../../setup');
+import utils from 'web3-utils';
 
 import ProxyAdmin from '../../../src/proxy/ProxyAdmin';
 import ProxyAdminProject from '../../../src/project/ProxyAdminProject';
@@ -12,7 +13,8 @@ import { noop } from 'lodash';
 const ImplV1 = Contracts.getFromLocal('DummyImplementation');
 const ImplV2 = Contracts.getFromLocal('DummyImplementationV2');
 
-contract('ProxyAdminProject', function([_, proxyAdminOwner, another]) {
+contract('ProxyAdminProject', function(accounts) {
+  const [_, proxyAdminOwner, another] = accounts.map(utils.toChecksumAddress);
   const name = 'MyProxyAdminProject'
   const txParams = { from: proxyAdminOwner };
 

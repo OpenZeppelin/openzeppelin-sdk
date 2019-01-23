@@ -1,6 +1,7 @@
 'use strict';
 
 require('../setup')
+import utils from 'web3-utils';
 import ProxyAdmin from '../../src/proxy/ProxyAdmin';
 import Proxy from '../../src/proxy/Proxy';
 import Contracts from '../../src/artifacts/Contracts';
@@ -10,7 +11,9 @@ const ImplV1 = Contracts.getFromLocal('DummyImplementation');
 const ImplV2 = Contracts.getFromLocal('DummyImplementationV2');
 const ProxyAdminContract = Contracts.getFromLocal('ProxyAdmin');
 
-contract('ProxyAdmin class', function([_, proxyAdminOwner, newAdmin, otherAccount]) {
+contract('ProxyAdmin class', function(accounts) {
+  const [_, proxyAdminOwner, newAdmin, otherAccount] = accounts.map(utils.toChecksumAddress);
+
   before(async function() {
     this.txParams = { from: proxyAdminOwner };
     this.implementationV1 = await ImplV1.new();
