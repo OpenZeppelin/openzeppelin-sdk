@@ -38,27 +38,27 @@ contract('set-admin script', function(accounts) {
     });
 
     it('changes admin of a proxy given its address', async function() {
-      await setAdmin({ proxyAddress: this.impl1.address, newAdmin, network, txParams, networkFile: this.networkFile });
+      await setAdmin({ proxyAddress: this.impl1._address, newAdmin, network, txParams, networkFile: this.networkFile });
 
-      await assertAdmin(this.impl1.address, newAdmin, this.networkFile)
-      await assertAdmin(this.impl2.address, this.networkFile.appAddress, this.networkFile)
-      await assertAdmin(this.withLibraryImpl.address, this.networkFile.appAddress, this.networkFile)
+      await assertAdmin(this.impl1._address, newAdmin, this.networkFile)
+      await assertAdmin(this.impl2._address, this.networkFile.appAddress, this.networkFile)
+      await assertAdmin(this.withLibraryImpl._address, this.networkFile.appAddress, this.networkFile)
     });
 
     it('changes admin of several proxies given name', async function() {
       await setAdmin({ contractAlias: 'Impl', newAdmin, network, txParams, networkFile: this.networkFile });
       
-      await assertAdmin(this.impl1.address, newAdmin, this.networkFile)
-      await assertAdmin(this.impl2.address, newAdmin, this.networkFile)
-      await assertAdmin(this.withLibraryImpl.address, this.networkFile.appAddress, this.networkFile)
+      await assertAdmin(this.impl1._address, newAdmin, this.networkFile)
+      await assertAdmin(this.impl2._address, newAdmin, this.networkFile)
+      await assertAdmin(this.withLibraryImpl._address, this.networkFile.appAddress, this.networkFile)
     });
 
     it('does not attempt to change admin of unowned proxy', async function() {
-      await setAdmin({ proxyAddress: this.impl1.address, newAdmin, network, txParams, networkFile: this.networkFile });
+      await setAdmin({ proxyAddress: this.impl1._address, newAdmin, network, txParams, networkFile: this.networkFile });
       await setAdmin({ contractAlias: 'Impl', newAdmin: anotherNewAdmin, network, txParams, networkFile: this.networkFile });
-      await assertAdmin(this.impl1.address, newAdmin, this.networkFile)
-      await assertAdmin(this.impl2.address, anotherNewAdmin, this.networkFile)
-      await assertAdmin(this.withLibraryImpl.address, this.networkFile.appAddress, this.networkFile)
+      await assertAdmin(this.impl1._address, newAdmin, this.networkFile)
+      await assertAdmin(this.impl2._address, anotherNewAdmin, this.networkFile)
+      await assertAdmin(this.withLibraryImpl._address, this.networkFile.appAddress, this.networkFile)
     });
 
     it('refuses to update all proxies', async function () {
@@ -81,24 +81,24 @@ contract('set-admin script', function(accounts) {
     });
 
     it('changes admin of a proxy given its address', async function() {
-      await setAdmin({ proxyAddress: this.greeter1.address, newAdmin, network, txParams, networkFile: this.networkFile });
+      await setAdmin({ proxyAddress: this.greeter1._address, newAdmin, network, txParams, networkFile: this.networkFile });
       
-      await assertAdmin(this.greeter1.address, newAdmin, this.networkFile)
-      await assertAdmin(this.greeter2.address, this.networkFile.appAddress, this.networkFile)
+      await assertAdmin(this.greeter1._address, newAdmin, this.networkFile)
+      await assertAdmin(this.greeter2._address, this.networkFile.appAddress, this.networkFile)
     });
 
     it('changes admin of several proxies given package and name', async function() {
       await setAdmin({ packageName: 'mock-stdlib-undeployed', contractAlias: 'Greeter', newAdmin, network, txParams, networkFile: this.networkFile });
       
-      await assertAdmin(this.greeter1.address, newAdmin, this.networkFile)
-      await assertAdmin(this.greeter2.address, newAdmin, this.networkFile)
+      await assertAdmin(this.greeter1._address, newAdmin, this.networkFile)
+      await assertAdmin(this.greeter2._address, newAdmin, this.networkFile)
     });
 
     it('changes no admins if package is missing', async function() {
       await setAdmin({ contractAlias: 'Greeter', newAdmin, network, txParams, networkFile: this.networkFile });
       
-      await assertAdmin(this.greeter1.address, this.networkFile.appAddress, this.networkFile)
-      await assertAdmin(this.greeter2.address, this.networkFile.appAddress, this.networkFile)
+      await assertAdmin(this.greeter1._address, this.networkFile.appAddress, this.networkFile)
+      await assertAdmin(this.greeter2._address, this.networkFile.appAddress, this.networkFile)
     });
   });
 });
