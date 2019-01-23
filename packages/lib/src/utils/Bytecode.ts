@@ -49,8 +49,7 @@ export function isSolidityLib(bytecode: string): boolean {
 
 // TS-TODO: Define interface for returned object.
 function splitCode(instance: any): {constructor: string, body: string} {
-  const binaryOrBytecode = instance.zosInjections.binary || instance.zosInjections.jsonInterface.bytecode;
-  const binary = binaryOrBytecode.replace(/^0x/, '');
+  const binary = instance.zosInjections.factory.binary.replace(/^0x/, '');
   const bytecode = instance.zosInjections.jsonInterface.bytecode.replace(/^0x/, '');
   const deployedBytecode = instance.zosInjections.jsonInterface.deployedBytecode.replace(/^0x/, '');
   const constructor = bytecode.substr(0, bytecode.indexOf(deployedBytecode));

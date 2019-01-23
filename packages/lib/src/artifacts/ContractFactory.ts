@@ -47,7 +47,6 @@ export default class ContractFactory {
   public events: any;
   public storageInfo: StorageLayoutInfo;
   public warnings: any;
-  public instance: Contract;
 
   constructor(schema: ContractSchema, timeout) {
     this.schema = schema;
@@ -59,6 +58,15 @@ export default class ContractFactory {
     this.timeout = timeout;
     this._parseEvents();
     this._setBinaryIfPossible();
+  }
+
+  private _inject(instance: Contract, receipt?: TransactionReceipt, transactionHash?: string): void {
+    instance.zosInjections = {
+      jsonInterface: this.schema,
+      deploymentTransactionReceipt: receipt,
+      deploymentTransactionHash: transactionHash,
+      factory: this
+    };
   }
 
   public async new(...passedArguments): Promise<Contract> {
@@ -81,12 +89,7 @@ export default class ContractFactory {
         .on('transactionHash', (txHash) => transactionHash = txHash)
         .then((instance) => {
           // const wrapper: ContractWrapper = self._wrapContract(instance, transactionHash);
-          self.instance = instance;
-          instance.zosInjections = {
-            jsonInterface: self.schema,
-            deploymentTransactionReceipt: receipt,
-            deploymentTransactionHash: transactionHash
-          };
+          self._inject(instance, receipt, transactionHash);
           resolve(instance);
         })
         .catch((error) => reject(error));
@@ -97,6 +100,7 @@ export default class ContractFactory {
     if (!ZWeb3.isAddress(address)) throw new Error('Given address is not valid: ' + address);
     const defaults = Contracts.getArtifactsDefaults();
     const contractClass: any = ZWeb3.contract(this.abi, address, defaults);
+    this._inject(contractClass);
     return contractClass;
   }
 
@@ -106,8 +110,6 @@ export default class ContractFactory {
       const regex: RegExp = new RegExp(`__${name}_+`, 'g');
       this.binary = this.bytecode.replace(regex, address);
       this.deployedBinary = this.deployedBytecode.replace(regex, address);
-      this.instance.zosInjections.binary = this.binary;
-      this.instance.zosInjections.deployedBinary = this.deployedBinary;
     });
   }
 

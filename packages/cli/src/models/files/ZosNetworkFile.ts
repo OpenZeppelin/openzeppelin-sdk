@@ -138,13 +138,12 @@ export default class ZosNetworkFile {
   }
 
   public addSolidityLib(libName: string, instance: any): void {
-    const binaryOrBytecode = instance.zosInjections.binary || instance.zosInjections.jsonInterface.bytecode;
     this.data.solidityLibs[libName] = {
       address: instance.address,
       constructorCode: constructorCode(instance),
       bodyBytecodeHash: bytecodeDigest(bodyCode(instance)),
       localBytecodeHash: bytecodeDigest(instance.zosInjections.jsonInterface.bytecode),
-      deployedBytecodeHash: bytecodeDigest(binaryOrBytecode)
+      deployedBytecodeHash: bytecodeDigest(instance.zosInjections.factory.binary)
     };
   }
 
@@ -344,13 +343,12 @@ export default class ZosNetworkFile {
 
   // TS-TODO: instance can probably be typed to something interesting.
   public addContract(alias: string, instance: any, { warnings, types, storage }: { warnings?: any, types?: any, storage?: any } = {}): void {
-    const binaryOrBytecode = instance.zosInjections.binary || instance.zosInjections.jsonInterface.bytecode;
     this.setContract(alias, {
       address: instance._address,
       constructorCode: constructorCode(instance),
       bodyBytecodeHash: bytecodeDigest(bodyCode(instance)),
       localBytecodeHash: bytecodeDigest(instance.zosInjections.jsonInterface.bytecode),
-      deployedBytecodeHash: bytecodeDigest(binaryOrBytecode),
+      deployedBytecodeHash: bytecodeDigest(instance.zosInjections.factory.binary),
       types,
       storage,
       warnings
