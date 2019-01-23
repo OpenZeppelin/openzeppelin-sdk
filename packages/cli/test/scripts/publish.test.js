@@ -96,20 +96,20 @@ contract('publish script', function(accounts) {
     it('should transfer ownership of own proxy to app', async function () {
       this.ownProxy = await create({ contractAlias: 'Impl', network, txParams, networkFile: this.networkFile });
       await publish({ network, txParams, networkFile: this.networkFile });
-      (await Proxy.at(this.ownProxy.address).admin()).should.eq(this.networkFile.appAddress);
+      (await Proxy.at(this.ownProxy._address).admin()).should.eq(this.networkFile.appAddress);
     });
 
     it('should transfer ownership of dependency proxy to app', async function () {
       this.dependencyProxy = await create({ packageName: 'mock-stdlib-undeployed', contractAlias: 'Greeter', network, txParams, networkFile: this.networkFile });
       await publish({ network, txParams, networkFile: this.networkFile });
-      (await Proxy.at(this.dependencyProxy.address).admin()).should.eq(this.networkFile.appAddress);
+      (await Proxy.at(this.dependencyProxy._address).admin()).should.eq(this.networkFile.appAddress);
     });
 
     it('should not transfer ownership of transferred proxy to app', async function () {
       this.transferredProxy = await create({ contractAlias: 'Impl', network, txParams, networkFile: this.networkFile });
       await setAdmin({ newAdmin: otherAddress, contractAlias: 'Impl', packageName: 'Herbs', network, txParams, networkFile: this.networkFile })
       await publish({ network, txParams, networkFile: this.networkFile });
-      (await Proxy.at(this.transferredProxy.address).admin()).should.eq(otherAddress);
+      (await Proxy.at(this.transferredProxy._address).admin()).should.eq(otherAddress);
     });
   });
 });
