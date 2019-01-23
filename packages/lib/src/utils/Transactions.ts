@@ -9,7 +9,7 @@ import BN from 'bignumber.js';
 import sleep from '../helpers/sleep';
 import ZWeb3 from '../artifacts/ZWeb3';
 import Contracts from '../artifacts/Contracts';
-import ContractFactory, { TransactionReceiptWrapper } from '../artifacts/ContractFactory';
+import ContractFactory from '../artifacts/ContractFactory';
 import { Contract } from 'web3-eth-contract';
 import { TransactionReceipt } from 'web3/types';
 import { buildDeploymentCallData } from './ABIs';
@@ -80,7 +80,7 @@ export async function deploy(contract: ContractFactory, args: any[] = [], txPara
  * @param txParams all transaction parameters (data, from, gasPrice, etc)
  * @param retries number of data transaction retries
  */
-export async function sendDataTransaction(contract: Contract, txParams: any, retries: number = RETRY_COUNT): Promise<TransactionReceiptWrapper> {
+export async function sendDataTransaction(contract: Contract, txParams: any, retries: number = RETRY_COUNT): Promise<TransactionReceipt> {
   await fixGasPrice(txParams);
 
   try {
@@ -117,7 +117,7 @@ async function _sendTransaction(contractFn: GenericFunction, args: any[] = [], t
  * @param contract contract instance to send the tx to
  * @param txParams all transaction parameters (data, from, gasPrice, etc)
  */
-async function _sendDataTransaction(contract: Contract, txParams: any = {}): Promise<TransactionReceiptWrapper> {
+async function _sendDataTransaction(contract: Contract, txParams: any = {}): Promise<TransactionReceipt> {
   // If gas is set explicitly, use it
   const defaultGas = Contracts.getArtifactsDefaults().gas;
   if (!txParams.gas && defaultGas) txParams.gas = defaultGas;
@@ -128,12 +128,11 @@ async function _sendDataTransaction(contract: Contract, txParams: any = {}): Pro
   return _sendContractDataTransaction(contract, { gas, ...txParams });
 }
 
-async function _sendContractDataTransaction(contract: Contract, txParams: any): Promise<TransactionReceiptWrapper> {
+async function _sendContractDataTransaction(contract: Contract, txParams: any): Promise<TransactionReceipt> {
   const defaults = await Contracts.getDefaultTxParams();
   const tx = { to: contract._address, ...defaults, ...txParams };
   const txHash = await ZWeb3.sendTransactionWithoutReceipt(tx);
-  const receiptWithTimeout = await ZWeb3.getTransactionReceiptWithTimeout(txHash, Contracts.getSyncTimeout());
-  return { tx, receipt: receiptWithTimeout };
+  return await ZWeb3.getTransactionReceiptWithTimeout(txHash, Contracts.getSyncTimeout());
 }
 
 /**

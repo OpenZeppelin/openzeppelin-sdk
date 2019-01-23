@@ -15,22 +15,6 @@ interface ContractSchema {
   deployedBytecode: string;
 }
 
-// export interface ContractWrapper {
-//   instance: any;
-//   address: string;
-//   transactionHash: string;
-//   allEvents: any;
-//   sendTransaction?: (txParams: any) => Promise<TransactionReceiptWrapper>;
-//   send?: (value: any) => Promise<string>;
-//   methods: { [fnName: string]: (...args: any[]) => TransactionObject<any> };
-//   constructor: any;
-// }
-
-export interface TransactionReceiptWrapper {
-  tx: string;
-  receipt: any;
-}
-
 // TS-TODO: Review which members could be private.
 export default class ContractFactory {
 

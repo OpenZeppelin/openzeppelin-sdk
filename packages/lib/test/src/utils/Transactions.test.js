@@ -195,8 +195,8 @@ contract('Transactions', function(accounts) {
     });
 
     it('honours other tx params', async function () {
-      const txWrapper = await sendDataTransaction(this.instance, { data: this.encodedCall, from: account2 });
-      await assertFrom(txWrapper.receipt.transactionHash, account2);
+      const receipt = await sendDataTransaction(this.instance, { data: this.encodedCall, from: account2 });
+      await assertFrom(receipt.transactionHash, account2);
     });
 
     it('handles failing transactions', async function () {
@@ -211,8 +211,8 @@ contract('Transactions', function(accounts) {
       describe('when there is a default gas amount defined', function () {
         describe('when a gas amount is given', function () {
           it('uses specified gas', async function () {
-            const txWrapper = await sendDataTransaction(this.instance, { data: this.encodedCall, gas: 800000 });
-            await assertGas(txWrapper.receipt.transactionHash, 800000);
+            const receipt = await sendDataTransaction(this.instance, { data: this.encodedCall, gas: 800000 });
+            await assertGas(receipt.transactionHash, 800000);
           });
         });
 
@@ -231,15 +231,15 @@ contract('Transactions', function(accounts) {
 
         describe('when a gas amount is given', function () {
           it('uses specified gas', async function () {
-            const txWrapper = await sendDataTransaction(this.instance, { data: this.encodedCall, gas: 800000 });
-            await assertGas(txWrapper.receipt.transactionHash, 800000);
+            const receipt = await sendDataTransaction(this.instance, { data: this.encodedCall, gas: 800000 });
+            await assertGas(receipt.transactionHash, 800000);
           });
         });
 
         describe('when no gas amount is given', function () {
           it('estimates gas', async function () {
-            const txWrapper = await sendDataTransaction(this.instance, { data: this.encodedCall });
-            await assertGasLt(txWrapper.receipt.transactionHash, 1000000);
+            const receipt = await sendDataTransaction(this.instance, { data: this.encodedCall });
+            await assertGasLt(receipt.transactionHash, 1000000);
           });
 
           it('retries estimating gas', async function () {
@@ -247,8 +247,8 @@ contract('Transactions', function(accounts) {
             _.times(3, i => stub.onCall(i).throws('Error', 'gas required exceeds allowance or always failing transaction'));
             stub.returns(800000)
 
-            const txWrapper = await sendDataTransaction(this.instance, { data: this.encodedCall });
-            await assertGas(txWrapper.receipt.transactionHash, 800000 * 1.25 + 15000);
+            const receipt = await sendDataTransaction(this.instance, { data: this.encodedCall });
+            await assertGas(receipt.transactionHash, 800000 * 1.25 + 15000);
           });
 
           it('retries estimating gas up to 3 times', async function () {
@@ -275,15 +275,13 @@ contract('Transactions', function(accounts) {
         });
 
         it('uses gas price API when gas not specified', async function () {
-          const txWrapper = await sendDataTransaction(this.instance, { data: this.encodedCall });
-
-          await await assertGasPrice(txWrapper.receipt.transactionHash, 49 * 1e8);
+          const receipt = await sendDataTransaction(this.instance, { data: this.encodedCall });
+          await await assertGasPrice(receipt.transactionHash, 49 * 1e8);
         });
 
         it('does not use gas price API when gasPrice specified', async function () {
-          const txWrapper = await sendDataTransaction(this.instance, { gasPrice: 1234, data: this.encodedCall });
-
-          await await assertGasPrice(txWrapper.receipt.transactionHash, 1234);
+          const receipt = await sendDataTransaction(this.instance, { gasPrice: 1234, data: this.encodedCall });
+          await await assertGasPrice(receipt.transactionHash, 1234);
         });
       });
 
