@@ -135,7 +135,7 @@ export default class SimpleProject  {
     const shouldRedeploy: boolean = !existing || (redeployIfChanged && contractChanged);
     if (!shouldRedeploy) return existing.address;
     const newInstance: any = await this.setImplementation(contractClass, contractName);
-    return newInstance.address;
+    return newInstance._address;
   }
 
   public async _getDependencyImplementation(packageName: string, contractName: string): Promise<string | null> {
