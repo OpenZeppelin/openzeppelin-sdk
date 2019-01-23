@@ -124,7 +124,7 @@ async function _sendDataTransaction(contract: Contract, txParams: any = {}): Pro
   if (txParams.gas) return _sendContractDataTransaction(contract, txParams);
 
   // Estimate gas for the call and run the tx
-  const gas = await estimateActualGas({ to: contract.address, ...txParams });
+  const gas = await estimateActualGas({ to: contract._address, ...txParams });
   return _sendContractDataTransaction(contract, { gas, ...txParams });
 }
 
