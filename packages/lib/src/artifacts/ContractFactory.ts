@@ -106,8 +106,8 @@ export default class ContractFactory {
 
   public link(libraries: { [libAlias: string]: string }): void {
     Object.keys(libraries).forEach((name: string) => {
-      const address: string = libraries[name].replace(/^0x/, '');
-      const regex: RegExp = new RegExp(`__${name}_+`, 'g');
+      const address = libraries[name].replace(/^0x/, '');
+      const regex = new RegExp(`__${name}_+`, 'g');
       this.binary = this.bytecode.replace(regex, address);
       this.deployedBinary = this.deployedBytecode.replace(regex, address);
     });

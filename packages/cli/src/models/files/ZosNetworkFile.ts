@@ -6,6 +6,7 @@ import flatMap from 'lodash.flatmap';
 import map from 'lodash.map';
 import filter from 'lodash.filter';
 import find from 'lodash.find';
+import { Contract } from 'web3-eth-contract';
 
 import { Logger, FileSystem as fs, bytecodeDigest, bodyCode, constructorCode, semanticVersionToString } from 'zos-lib';
 import { fromContractFullName, toContractFullName } from '../../utils/naming';
@@ -137,9 +138,9 @@ export default class ZosNetworkFile {
     return this.data.solidityLibs || {};
   }
 
-  public addSolidityLib(libName: string, instance: any): void {
+  public addSolidityLib(libName: string, instance: Contract): void {
     this.data.solidityLibs[libName] = {
-      address: instance.address,
+      address: instance._address,
       constructorCode: constructorCode(instance),
       bodyBytecodeHash: bytecodeDigest(bodyCode(instance)),
       localBytecodeHash: bytecodeDigest(instance.zosInjections.jsonInterface.bytecode),
