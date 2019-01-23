@@ -9,7 +9,7 @@ import ZosPackageFile from "../../src/models/files/ZosPackageFile"
 const ImplV1 = Contracts.getFromLocal('ImplV1')
 const WithLibraryImpl = Contracts.getFromLocal('WithLibraryImplV1')
 
-contract.only('TestHelper', function ([_, owner]) {
+contract('TestHelper', function ([_, owner]) {
   const txParams = { from: owner }
   const projectName = 'Herbs'
   const initialVersion = "1.1.0"
