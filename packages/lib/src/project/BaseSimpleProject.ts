@@ -5,7 +5,8 @@ import Logger from '../utils/Logger';
 import Package from '../application/Package';
 import { deploy } from '../utils/Transactions';
 import { toAddress } from '../utils/Addresses';
-import { bytecodeDigest } from '..';
+import { bytecodeDigest } from '../utils/Bytecode';
+import { toSemanticVersion }from '../utils/Semver';
 import { buildCallData, callDescription, CalldataInfo } from '../utils/ABIs';
 import { ContractInterface } from './AppProject';
 import ContractFactory, { ContractWrapper } from '../artifacts/ContractFactory';
@@ -75,8 +76,8 @@ export default abstract class BaseSimpleProject {
     return Package.fetch(this.dependencies[name].package);
   }
 
-  public getDependencyVersion(name: string): string {
-    return this.dependencies[name].version;
+  public getDependencyVersion(name: string): [number, number, number] {
+    return toSemanticVersion(this.dependencies[name].version);
   }
 
   public hasDependency(name: string): boolean {
@@ -122,6 +123,7 @@ export default abstract class BaseSimpleProject {
     const initCallData = this._getAndLogInitCallData(contractClass, initMethodName, initArgs, implementationAddress, 'Upgrading');
     return { initCallData, implementationAddress, pAddress: toAddress(proxyAddress) };
   }
+
   protected async _getOrDeployImplementation(contractClass: ContractFactory, packageName: string, contractName?: string, redeployIfChanged?: boolean): Promise<string | never> {
     if (!contractName) contractName = contractClass.contractName;
 

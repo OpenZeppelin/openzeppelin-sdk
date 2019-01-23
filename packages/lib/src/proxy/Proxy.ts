@@ -21,9 +21,9 @@ export default class Proxy {
     return new this(contract, txParams);
   }
 
-  public static async deploy(implementation: string, admin: string, initData: string | null, txParams: any = {}): Promise<Proxy> {
+  public static async deploy(implementation: string, admin: string, initData: string | Buffer | null, txParams: any = {}): Promise<Proxy> {
     const ProxyContract: ContractFactory = Contracts.getFromLib('AdminUpgradeabilityProxy');
-    const contractParams = [toAddress(implementation), toAddress(admin), initData || ''];
+    const contractParams = [toAddress(implementation), toAddress(admin), initData || Buffer.from('')];
     const contract: ProxyInterface = await deployContract(ProxyContract, contractParams, txParams);
     return new this(contract, txParams);
   }
@@ -37,13 +37,13 @@ export default class Proxy {
   public async upgradeTo(address: string, migrateData: string | null): Promise<any> {
     await this.checkAdmin();
     return migrateData
-      ? sendTransaction(this.contract.upgradeToAndCall, [toAddress(address), migrateData], this.txParams)
-      : sendTransaction(this.contract.upgradeTo, [toAddress(address)], this.txParams);
+      ? sendTransaction(this.contract.methods.upgradeToAndCall, [toAddress(address), migrateData], this.txParams)
+      : sendTransaction(this.contract.methods.upgradeTo, [toAddress(address)], this.txParams);
   }
 
   public async changeAdmin(newAdmin: string): Promise<any> {
     await this.checkAdmin();
-    return sendTransaction(this.contract.changeAdmin, [newAdmin], this.txParams);
+    return sendTransaction(this.contract.methods.changeAdmin, [newAdmin], this.txParams);
   }
 
   public async implementation(): Promise<string> {

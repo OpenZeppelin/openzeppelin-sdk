@@ -37,14 +37,14 @@ contract('create script', function([_, owner]) {
 
     if (say) {
       const proxy = await ImplV1.at(proxyInfo.address);
-      const said = await proxy.say();
+      const said = await proxy.methods.say().call();
       said.should.eq(say);
     }
 
     if (value) {
       const proxy = await ImplV1.at(proxyInfo.address);
-      const actualValue = await proxy.value();
-      actualValue.toNumber().should.eq(value);
+      const actualValue = await proxy.methods.value().call();
+      actualValue.should.eq(`${value}`);
     }
 
     if (implementation) {

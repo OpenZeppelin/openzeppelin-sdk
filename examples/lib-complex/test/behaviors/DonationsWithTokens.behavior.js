@@ -9,17 +9,17 @@ export default function(owner, donor, wallet, tokenName, tokenSymbol) {
 
   describe('token', function() {
     it('is mintable by the contract', async function() {
-      (await this.token.isMinter(this.donations.address)).should.equal(true);
+      (await this.token.methods.isMinter(this.donations.address).call()).should.equal(true);
     });
 
     it('cannot be set a second time', async function() {
       await assertRevert(
-        this.donations.setToken(this.token.address, {from: owner})
+        this.donations.methods.setToken(this.token.address).send({from: owner})
       );
     });
 
     it('is the token set in the donations contract', async function() {
-      (await this.donations.token()).should.be.eq(this.token.address);
+      (await this.donations.methods.token().call()).should.be.eq(this.token.address);
     });
 
   });
@@ -31,15 +31,15 @@ export default function(owner, donor, wallet, tokenName, tokenSymbol) {
 
       beforeEach(async function() {
         const donation = {from: donor, value: web3.toWei(donationValue, 'ether')};
-        await this.donations.donate(donation);
+        await this.donations.methods.donate().send(donation);
       });
 
       it('increments token id', async function() {
-        (await this.donations.numEmittedTokens()).toNumber().should.be.eq(donationValue);
+        (await this.donations.methods.numEmittedTokens().call()).should.be.eq(`${donationValue}`);
       });
 
       it('mints tokens', async function() {
-        (await this.token.balanceOf(donor)).toNumber().should.be.eq(donationValue);
+        (await this.token.methods.balanceOf(donor).call()).should.be.eq(`${donationValue}`);
       });
     });
   });

@@ -18,31 +18,31 @@ contract('Initializable', function () {
 
     context('before initialize', function () {
       it('initializer has not run', async function () {
-        assert.isFalse(await this.contract.initializerRan());
+        assert.isFalse(await this.contract.methods.initializerRan().call());
       });
     });
 
     context('after initialize', function () {
       beforeEach('initializing', async function () {
-        await this.contract.initialize();
+        await this.contract.methods.initialize().send();
       });
 
       it('initializer has run', async function () {
-        assert.isTrue(await this.contract.initializerRan());
+        assert.isTrue(await this.contract.methods.initializerRan().call());
       });
 
       it('initializer does not run again', async function () {
-        await assertRevert(this.contract.initialize());
+        await assertRevert(this.contract.methods.initialize().send());
       });
     });
 
     context('after nested initialize', function () {
       beforeEach('initializing', async function () {
-        await this.contract.initializeNested();
+        await this.contract.methods.initializeNested().send();
       });
 
       it('initializer has run', async function () {
-        assert.isTrue(await this.contract.initializerRan());
+        assert.isTrue(await this.contract.methods.initializerRan().call());
       });
     });
   });
@@ -58,27 +58,27 @@ contract('Initializable', function () {
     });
 
     beforeEach('initializing', async function () {
-      await this.contract.initialize(mother, gramps, father, child);
+      await this.contract.methods.initialize(mother, gramps, father, child).send();
     });
 
     it('initializes human', async function () {
-      assert.equal(await this.contract.isHuman(), true);
+      assert.equal(await this.contract.methods.isHuman().call(), true);
     });
 
     it('initializes mother', async function () {
-      assert.equal(await this.contract.mother(), mother);
+      assert.equal(await this.contract.methods.mother().call(), mother);
     });
 
     it('initializes gramps', async function () {
-      assert.equal(await this.contract.gramps(), gramps);
+      assert.equal(await this.contract.methods.gramps().call(), gramps);
     });
 
     it('initializes father', async function () {
-      assert.equal(await this.contract.father(), father);
+      assert.equal(await this.contract.methods.father().call(), father);
     });
 
     it('initializes child', async function () {
-      assert.equal(await this.contract.child(), child);
+      assert.equal(await this.contract.methods.child().call(), child);
     });
   });
 });

@@ -11,12 +11,15 @@ import expectEvent from 'openzeppelin-solidity/test/helpers/expectEvent'
 import { ZERO_ADDRESS } from '../../../src/utils/Addresses';
 import { ImplementationDirectory, Proxy } from '../../../src';
 import { deploy as deployContract } from '../../../src/utils/Transactions';
+import utils from 'web3-utils';
 
 const ImplV1 = Contracts.getFromLocal('DummyImplementation');
 const ImplV2 = Contracts.getFromLocal('DummyImplementationV2');
 const ProxyCreator = Contracts.getFromLocal('ProxyCreator');
 
 contract('App', function (accounts) {
+  accounts = accounts.map(utils.toChecksumAddress); // Required by Web3 v1.x.
+
   const [_unused, owner, otherAdmin] = accounts;
   const txParams = { from: owner };
   const contractName = 'Impl';
@@ -69,11 +72,13 @@ contract('App', function (accounts) {
     it('logs package set', async function() {
       const thepackage = await Package.deploy(txParams)
       await thepackage.newVersion(version)
-      await expectEvent.inTransaction(
-        this.app.setPackage(packageName, thepackage.address, version),
-        'PackageChanged',
-        { providerName: packageName, package: thepackage.address, version: version }
-      )
+
+      const { events } = await this.app.setPackage(packageName, thepackage.address, version);
+      const event = events['PackageChanged'];
+      expect(event).to.be.an('object');
+      event.returnValues.providerName.should.be.equal(packageName);
+      event.returnValues.package.should.be.equal(thepackage.address);
+      event.returnValues.version.should.be.semverEqual(version);
     })
 
     it('can set multiple packages', async function() {
@@ -105,12 +110,13 @@ contract('App', function (accounts) {
   describe('unsetPackage', function() {
     beforeEach('setting package', setPackage)
 
-    it('unsets a provider', async function() {
-      await expectEvent.inTransaction(
-        this.app.unsetPackage(packageName),
-        'PackageChanged',
-        { providerName: packageName, package: ZERO_ADDRESS, version: "" } 
-      )
+    it('unsets a provider', async function () {
+      const { events } = await this.app.unsetPackage(packageName);
+      const event = events['PackageChanged'];
+      expect(event).to.be.an('object');
+      event.returnValues.providerName.should.be.equal(packageName);
+      event.returnValues.package.should.be.equal(ZERO_ADDRESS);
+      event.returnValues.version.should.be.semverEqual('0.0.0');
       const hasProvider = await this.app.hasProvider(packageName)
       hasProvider.should.be.false
     })
@@ -157,7 +163,7 @@ contract('App', function (accounts) {
     const shouldReturnANonUpgradeableInstance = function() {
       it('should return a non-upgradeable instance', async function() {
         this.instance.address.should.be.not.null;
-        (await this.instance.version()).should.be.eq('V1');
+        (await this.instance.methods.version().call()).should.be.eq('V1');
         (await ZWeb3.getCode(this.instance.address)).should.be.eq(ImplV1.deployedBytecode)
       });
     };
@@ -177,8 +183,9 @@ contract('App', function (accounts) {
 
       shouldReturnANonUpgradeableInstance();
 
-      it('should have initialized the instance', async function() {
-        (await this.instance.value()).toNumber().should.eq(10);
+      it('should have initialized the instance', async function () {
+        const value = await this.instance.methods.value().call();
+        value.should.eq('10');
       });
     });
 
@@ -189,10 +196,12 @@ contract('App', function (accounts) {
 
       shouldReturnANonUpgradeableInstance();
 
-      it('should have initialized the proxy', async function() {
-        (await this.instance.value()).toNumber().should.eq(10);
-        (await this.instance.text()).should.eq("foo");
-        await this.instance.values(0).should.be.rejected;
+      it('should have initialized the proxy', async function () {
+        const value = await this.instance.methods.value().call();
+        value.should.eq('10');
+        const text = await this.instance.methods.text().call();
+        text.should.eq("foo");
+        (this.instance.methods.values(0).call()).should.be.rejected;
       });
     });
   });
@@ -256,6 +265,7 @@ contract('App', function (accounts) {
     const shouldReturnProxy = function() {
       it('should return a proxy', async function() {
         this.proxy.address.should.be.not.null;
+        (await this.proxy.methods.version().call()).should.be.eq('V1');
         (await this.proxy.version()).should.be.eq('V1');
         (await this.proxyAdmin.getProxyImplementation(this.proxy.address)).should.be.eq(this.implV1.address)
       });
@@ -270,8 +280,9 @@ contract('App', function (accounts) {
       beforeEach('creating a proxy', createProxy(ImplV1, packageName, contractName, 'initializeNonPayable', [10]));
       shouldReturnProxy();
 
-      it('should have initialized the proxy', async function() {
-        (await this.proxy.value()).toNumber().should.eq(10);
+      it('should have initialized the proxy', async function () {
+        const value = await this.proxy.methods.value().call();
+        value.should.eq('10');
       });
     });
 
@@ -279,10 +290,12 @@ contract('App', function (accounts) {
       beforeEach('creating a proxy', createProxy(ImplV1, packageName, contractName, 'initialize', [10, "foo", []]));
       shouldReturnProxy();
 
-      it('should have initialized the proxy', async function() {
-        (await this.proxy.value()).toNumber().should.eq(10);
-        (await this.proxy.text()).should.eq("foo");
-        await this.proxy.values(0).should.be.rejected;
+      it('should have initialized the proxy', async function () {
+        const value = await this.proxy.methods.value().call();
+        value.should.eq('10');
+        const text = await this.proxy.methods.text().call();
+        text.should.eq("foo");
+        (this.proxy.methods.values(0).call()).should.be.rejected;
       });
     });
 
@@ -297,8 +310,8 @@ contract('App', function (accounts) {
         const fnArgs = [this.app.address, packageName, contractName, this.proxyAdmin.address, Buffer.from('')];
         const proxy = await this.app.createProxy(ProxyCreator, packageName, 'ProxyCreator', this.proxyAdmin.address, 'initialize', fnArgs);
         (await proxy.name()).should.eq('ProxyCreator');
-        const created = await proxy.created();
-        (await ImplV1.at(created).version()).should.eq('V1');
+        const created = await proxy.methods.created().call();
+        (await ImplV1.at(created).methods.version().call()).should.eq('V1');
       });
     });
   });

@@ -24,7 +24,7 @@ contract('DonationsV2', ([_, owner, donor, wallet]) => {
       ['address'],
       [this.donations.address]
     );
-    await this.donations.setToken(this.token.address, { from: owner });
+    await this.donations.methods.setToken(this.token.address).send({ from: owner });
   });
 
   shouldBehaveLikeDonationsWithTokens(owner, donor, wallet);

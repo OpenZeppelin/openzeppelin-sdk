@@ -34,7 +34,7 @@ Now, let's write two simple contracts. The first in `contracts/MyContractV0`
 with the following contents:
 
 ```solidity
-pragma solidity ^0.4.24;
+pragma solidity ^0.5.0;
 
 import "zos-lib/contracts/Initializable.sol";
 
@@ -51,7 +51,7 @@ The second in `contracts/MyContractV1`, and it will be almost the same as the
 first one but with one extra function:
 
 ```solidity
-pragma solidity ^0.4.24;
+pragma solidity ^0.5.0;
 
 import "zos-lib/contracts/Initializable.sol";
 

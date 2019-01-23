@@ -3,10 +3,13 @@ require('../../setup')
 
 import Contracts from '../../../src/artifacts/Contracts'
 import ImplementationDirectory from '../../../src/application/ImplementationDirectory'
+import utils from 'web3-utils';
 
 const DummyImplementationV2 = Contracts.getFromLocal('DummyImplementationV2')
 
 contract('ImplementationDirectory', function(accounts) {
+  accounts = accounts.map(utils.toChecksumAddress);
+  
   const [_, owner] = accounts
   const txParams = { from: owner }
 
@@ -19,7 +22,7 @@ contract('ImplementationDirectory', function(accounts) {
   })
 
   it('has an owner', async function () {
-    (await this.directory.owner()).should.be.equal(owner)
+    (await this.directory.directoryContract.methods.owner().call()).should.be.equal(owner)
   })
 
   it('can set new implementations', async function () {

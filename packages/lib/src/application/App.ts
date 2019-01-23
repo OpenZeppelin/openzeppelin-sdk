@@ -9,6 +9,7 @@ import { buildCallData, callDescription, CalldataInfo } from '../utils/ABIs';
 import ContractFactory, { ContractWrapper } from '../artifacts/ContractFactory';
 import { toSemanticVersion, semanticVersionEqual } from '../utils/Semver';
 import { deploy as deployContract, sendTransaction, sendDataTransaction } from '../utils/Transactions';
+import { TransactionReceipt } from 'web3/types';
 
 const log: Logger = new Logger('App');
 
@@ -39,23 +40,23 @@ export default class App {
   }
 
   public async getPackage(name): Promise<{ package: Package, version: string }> {
-    const [address, version] = await this.appContract.getPackage(name);
-    const thepackage = await Package.fetch(address, this.txParams);
+    const { ['0']: address, ['1']: version } = await this.appContract.methods.getPackage(name).call();
+    const thepackage = await Package.fetch(address, { ...this.txParams });
     return { package: thepackage, version };
   }
 
   public async hasPackage(name: string, expectedVersion?: string): Promise<boolean> {
-    const [address, version]: [string, string] = await this.appContract.getPackage(name);
+    const { ['0']: address, ['1']: version } = await this.appContract.methods.getPackage(name).call();
     return !isZeroAddress(address) &&
       (!expectedVersion || semanticVersionEqual(expectedVersion, version));
   }
 
   public async setPackage(name: string, packageAddress: string, version: string): Promise<any> {
-    return await sendTransaction(this.appContract.setPackage, [name, toAddress(packageAddress), toSemanticVersion(version)], this.txParams);
+    return await sendTransaction(this.appContract.methods.setPackage, [name, toAddress(packageAddress), toSemanticVersion(version)], { ...this.txParams });
   }
 
   public async unsetPackage(name: string): Promise<any> {
-    return await sendTransaction(this.appContract.unsetPackage, [name], this.txParams);
+    return await sendTransaction(this.appContract.methods.unsetPackage, [name], { ...this.txParams });
   }
 
   get address(): string {
@@ -67,7 +68,7 @@ export default class App {
   }
 
   public async getImplementation(packageName: string, contractName: string): Promise<string> {
-    return this.appContract.getImplementation(packageName, contractName);
+    return this.appContract.methods.getImplementation(packageName, contractName).call();
   }
 
   public async hasProvider(name: string): Promise<boolean> {
@@ -75,13 +76,13 @@ export default class App {
   }
 
   public async getProvider(name: string): Promise<ImplementationDirectory> {
-    const address: string = await this.appContract.getProvider(name);
+    const address: string = await this.appContract.methods.getProvider(name).call();
     if (isZeroAddress(address)) return null;
-    return await ImplementationDirectory.fetch(address, this.txParams);
+    return await ImplementationDirectory.fetch(address, { ...this.txParams });
   }
 
   public async createContract(contractClass: ContractFactory, packageName: string, contractName: string, initMethodName: string, initArgs: string[]): Promise<ContractWrapper> {
-    const instance: ContractWrapper = await this._copyContract(packageName, contractName, contractClass);
+    const instance = await this._copyContract(packageName, contractName, contractClass);
     await this._initNonUpgradeableInstance(instance, contractClass, packageName, contractName, initMethodName, initArgs);
     return instance;
   }
@@ -94,14 +95,14 @@ export default class App {
     return contractClass.at(proxy.address);
   }
 
-  private async _createProxy(packageName: string, contractName: string, proxyAdmin: string): Promise<any> {
+  private async _createProxy(packageName: string, contractName: string, proxyAdmin: string): Promise<Proxy> {
     log.info(`Creating ${packageName} ${contractName} proxy without initializing...`);
-    const initializeData: string = '';
+    const initializeData: Buffer = Buffer.from('');
     const implementation = await this.getImplementation(packageName, contractName);
     return Proxy.deploy(implementation, proxyAdmin, initializeData, this.txParams);
   }
 
-  private async _createProxyAndCall(contractClass: ContractFactory, packageName: string, contractName: string, proxyAdmin: string, initMethodName: string, initArgs: any): Promise<any> {
+  private async _createProxyAndCall(contractClass: ContractFactory, packageName: string, contractName: string, proxyAdmin: string, initMethodName: string, initArgs: any): Promise<Proxy> {
     const { method: initMethod, callData }: CalldataInfo = buildCallData(contractClass, initMethodName, initArgs);
     log.info(`Creating ${packageName} ${contractName} proxy and calling ${callDescription(initMethod, initArgs)}`);
     const implementation = await this.getImplementation(packageName, contractName);
@@ -111,7 +112,7 @@ export default class App {
   private async _copyContract(packageName: string, contractName: string, contractClass: ContractFactory): Promise<ContractWrapper> {
     log.info(`Creating new non-upgradeable instance of ${packageName} ${contractName}...`);
     const implementation: string = await this.getImplementation(packageName, contractName);
-    const instance: ContractWrapper = await copyContract(contractClass, implementation, this.txParams);
+    const instance: ContractWrapper = await copyContract(contractClass, implementation, { ...this.txParams });
     log.info(`${packageName} ${contractName} instance created at ${instance.address}`);
     return instance;
   }
@@ -121,7 +122,7 @@ export default class App {
       // this could be front-run, waiting for new initializers model
       const { method: initMethod, callData }: CalldataInfo = buildCallData(contractClass, initMethodName, initArgs);
       log.info(`Initializing ${packageName} ${contractName} instance at ${instance.address} by calling ${callDescription(initMethod, initArgs)}`);
-      await sendDataTransaction(instance, Object.assign({}, this.txParams, { data: callData }));
+      await sendDataTransaction(instance, Object.assign({}, { ...this.txParams }, { data: callData }));
     }
   }
 }

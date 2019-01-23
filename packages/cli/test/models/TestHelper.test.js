@@ -58,7 +58,7 @@ contract('TestHelper', function ([_, owner]) {
 
     it('retrieves a mock from app', async function () {
       const proxy = await this.project.createProxy(ImplV1, { contractName: 'Impl' })
-      const say = await proxy.say()
+      const say = await proxy.methods.say().call()
 
       say.should.eq('V1')
     })
@@ -74,7 +74,7 @@ contract('TestHelper', function ([_, owner]) {
 
     it('retrieves a mock from app', async function () {
       const proxy = await this.project.createProxy(ImplV1, { contractName: 'Impl' })
-      const say = await proxy.say()
+      const say = await proxy.methods.say().call()
       say.should.eq('V1')
     })
   })

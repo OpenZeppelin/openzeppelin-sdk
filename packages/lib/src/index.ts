@@ -2,7 +2,6 @@
 const version = 'v' + require('../package.json').version;
 
 // helpers
-import decodeLogs from './helpers/decodeLogs';
 import encodeCall from './helpers/encodeCall';
 import sleep from './helpers/sleep';
 
@@ -44,7 +43,6 @@ import ProxyAdminProject from './project/ProxyAdminProject';
 
 export {
   version,
-  decodeLogs,
   encodeCall,
   assertRevert,
   assertEvent,

@@ -8,10 +8,14 @@ import push from '../../src/scripts/push';
 import create from '../../src/scripts/create';
 import setAdmin from '../../src/scripts/set-admin';
 import ZosPackageFile from '../../src/models/files/ZosPackageFile';
+import utils from 'web3-utils';
 
 const should = require('chai').should();
 
-contract('publish script', function([_, owner, otherAddress]) {
+contract('publish script', function(accounts) {
+  accounts = accounts.map(utils.toChecksumAddress);
+  const [_, owner, otherAddress] = accounts;
+
   const network = 'test';
   const txParams = { from: owner };
   const defaultVersion = '1.1.0';

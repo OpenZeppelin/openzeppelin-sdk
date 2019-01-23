@@ -3,13 +3,11 @@ rules:
     protection:
       required_status_checks:
         contexts:
-          - continuous-integration/travis-ci
+          - Travis CI - Branch
+          - Travis CI - Pull Request
       required_pull_request_reviews:
         required_approving_review_count: 1
         dismiss_stale_reviews: false
     enabling_label: "status:ready-to-merge"
     merge_strategy:
       method: squash
-
-
-
