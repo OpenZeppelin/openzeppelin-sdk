@@ -47,6 +47,7 @@ export default class ContractFactory {
   public events: any;
   public storageInfo: StorageLayoutInfo;
   public warnings: any;
+  public instance: Contract;
 
   constructor(schema: ContractSchema, timeout) {
     this.schema = schema;
@@ -80,6 +81,7 @@ export default class ContractFactory {
         .on('transactionHash', (txHash) => transactionHash = txHash)
         .then((instance) => {
           // const wrapper: ContractWrapper = self._wrapContract(instance, transactionHash);
+          self.instance = instance;
           instance.zosInjections = {
             jsonInterface: self.schema,
             deploymentTransactionReceipt: receipt,
@@ -104,6 +106,8 @@ export default class ContractFactory {
       const regex: RegExp = new RegExp(`__${name}_+`, 'g');
       this.binary = this.bytecode.replace(regex, address);
       this.deployedBinary = this.deployedBytecode.replace(regex, address);
+      this.instance.zosInjections.binary = this.binary;
+      this.instance.zosInjections.deployedBinary = this.deployedBinary;
     });
   }
 

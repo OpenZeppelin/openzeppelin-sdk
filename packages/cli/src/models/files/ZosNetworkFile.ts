@@ -7,7 +7,7 @@ import map from 'lodash.map';
 import filter from 'lodash.filter';
 import find from 'lodash.find';
 
-import { Logger, FileSystem as fs, bytecodeDigest, bodyCode, constructorCode, semanticVersionToString, ContractWrapper } from 'zos-lib';
+import { Logger, FileSystem as fs, bytecodeDigest, bodyCode, constructorCode, semanticVersionToString } from 'zos-lib';
 import { fromContractFullName, toContractFullName } from '../../utils/naming';
 import { ZOS_VERSION, checkVersion } from './ZosVersion';
 import ZosPackageFile from './ZosPackageFile.js';
@@ -138,12 +138,13 @@ export default class ZosNetworkFile {
   }
 
   public addSolidityLib(libName: string, instance: any): void {
+    const binaryOrBytecode = instance.zosInjections.binary || instance.zosInjections.jsonInterface.bytecode;
     this.data.solidityLibs[libName] = {
       address: instance.address,
       constructorCode: constructorCode(instance),
       bodyBytecodeHash: bytecodeDigest(bodyCode(instance)),
-      localBytecodeHash: bytecodeDigest(instance.constructor.bytecode),
-      deployedBytecodeHash: bytecodeDigest(instance.constructor.binary)
+      localBytecodeHash: bytecodeDigest(instance.zosInjections.jsonInterface.bytecode),
+      deployedBytecodeHash: bytecodeDigest(binaryOrBytecode)
     };
   }
 
@@ -343,12 +344,13 @@ export default class ZosNetworkFile {
 
   // TS-TODO: instance can probably be typed to something interesting.
   public addContract(alias: string, instance: any, { warnings, types, storage }: { warnings?: any, types?: any, storage?: any } = {}): void {
+    const binaryOrBytecode = instance.zosInjections.binary || instance.zosInjections.jsonInterface.bytecode;
     this.setContract(alias, {
-      address: instance.address,
+      address: instance._address,
       constructorCode: constructorCode(instance),
       bodyBytecodeHash: bytecodeDigest(bodyCode(instance)),
-      localBytecodeHash: bytecodeDigest(instance.constructor.bytecode),
-      deployedBytecodeHash: bytecodeDigest(instance.constructor.binary),
+      localBytecodeHash: bytecodeDigest(instance.zosInjections.jsonInterface.bytecode),
+      deployedBytecodeHash: bytecodeDigest(binaryOrBytecode),
       types,
       storage,
       warnings

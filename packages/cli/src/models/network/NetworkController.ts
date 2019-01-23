@@ -15,7 +15,8 @@ import concat from 'lodash.concat';
 import toPairs from 'lodash.topairs';
 import { Contracts, ContractFactory, Logger, FileSystem as fs, Proxy, awaitConfirmations, semanticVersionToString } from 'zos-lib';
 import { SimpleProject, AppProject, flattenSourceCode, getStorageLayout, BuildArtifacts, getBuildArtifacts, getSolidityLibNames } from 'zos-lib';
-import { validate, newValidationErrors, validationPasses, App, ContractWrapper } from 'zos-lib';
+import { validate, newValidationErrors, validationPasses, App } from 'zos-lib';
+import { Contract } from 'web3-eth-contract';
 
 import { allPromisesOrError } from '../../utils/async';
 import { toContractFullName } from '../../utils/naming';
@@ -444,7 +445,7 @@ export default class NetworkController {
   }
 
   // Proxy model
-  public async createProxy(packageName: string, contractAlias: string, initMethod: string, initArgs: string[]): Promise<ContractWrapper> {
+  public async createProxy(packageName: string, contractAlias: string, initMethod: string, initArgs: string[]): Promise<Contract> {
     await this.fetchOrDeploy(this.currentVersion);
     if (!packageName) packageName = this.packageFile.name;
     const contractClass = this.localController.getContractClass(packageName, contractAlias);
@@ -475,7 +476,7 @@ export default class NetworkController {
   }
 
   // Proxy model
-  private _updateTruffleDeployedInformation(contractAlias: string, implementation: ContractWrapper): void {
+  private _updateTruffleDeployedInformation(contractAlias: string, implementation: Contract): void {
     const contractName = this.packageFile.contract(contractAlias);
     if (contractName) {
       const path = Contracts.getLocalPath(contractName);

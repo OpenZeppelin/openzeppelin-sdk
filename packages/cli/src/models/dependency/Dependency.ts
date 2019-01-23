@@ -69,7 +69,7 @@ export default class Dependency {
 
     const libraries = fromPairs(await Promise.all(map(libraryNames, async (libraryName) => {
       const implementation = await project.setImplementation(Contracts.getFromNodeModules(this.name, libraryName), libraryName);
-      return [libraryName, implementation.address];
+      return [libraryName, implementation._address];
     })));
 
     await Promise.all(map(contracts, async ([contractClass, contractAlias]) => {
