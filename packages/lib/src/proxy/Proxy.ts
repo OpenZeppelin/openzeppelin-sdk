@@ -10,7 +10,7 @@ export default class Proxy {
   private txParams: any;
   public address: string;
 
-  public static at(contractOrAddress: string | any, txParams: any = {}): Proxy {
+  public static at(contractOrAddress: string | Contract, txParams: any = {}): Proxy {
     const ProxyContract = Contracts.getFromLib('AdminUpgradeabilityProxy');
     const contract = ProxyContract.at(toAddress(contractOrAddress));
     return new this(contract, txParams);
@@ -41,12 +41,12 @@ export default class Proxy {
   }
 
   public async implementation(): Promise<string> {
-    const position: string = ZWeb3.sha3('org.zeppelinos.proxy.implementation');
+    const position = ZWeb3.sha3('org.zeppelinos.proxy.implementation');
     return uint256ToAddress(await this.getStorageAt(position));
   }
 
   public async admin(): Promise<string> {
-    const position: string = ZWeb3.sha3('org.zeppelinos.proxy.admin');
+    const position = ZWeb3.sha3('org.zeppelinos.proxy.admin');
     return uint256ToAddress(await this.getStorageAt(position));
   }
 

@@ -538,7 +538,7 @@ export default class NetworkController {
       const name = { packageName: proxy.package, contractName: proxy.contract };
       const contractClass = this.localController.getContractClass(proxy.package, proxy.contract);
       await this._setSolidityLibs(contractClass);
-      const currentImplementation = await Proxy.at(proxy).implementation();
+      const currentImplementation = await Proxy.at(proxy.address).implementation();
       const contractImplementation = await this.project.getImplementation(name);
       const packageVersion = proxy.package === this.packageFile.name ? this.currentVersion : (await this.project.getDependencyVersion(proxy.package));
 
