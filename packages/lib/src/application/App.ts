@@ -28,7 +28,7 @@ export default class App {
   public static async deploy(txParams: any = {}): Promise<App> {
     log.info('Deploying new App...');
     const appContract = await deployContract(this.getContractClass(), [], txParams);
-    log.info(`Deployed App at ${appContract.address}`);
+    log.info(`Deployed App at ${appContract._address}`);
     return new this(appContract, txParams);
   }
 

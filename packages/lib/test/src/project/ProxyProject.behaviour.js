@@ -42,21 +42,21 @@ export default function shouldManageProxies({ otherAdmin, setImplementations, su
       beforeEach('create proxy', createProxy);
 
       it('upgrades a proxy given contract class', async function () {
-        const upgraded = await this.project.upgradeProxy(this.instance.address, DummyImplementationV2);
+        const upgraded = await this.project.upgradeProxy(this.instance._address, DummyImplementationV2);
         await assertIsVersion(upgraded, 'V2');
         await assertIsProxy(upgraded, this.adminAddress);
       })
 
       if (supportsNames) {
         it('upgrades a proxy given contract name', async function () {
-          const upgraded = await this.project.upgradeProxy(this.instance.address, Impl, { contractName: 'DummyImplementationV2' });
+          const upgraded = await this.project.upgradeProxy(this.instance._address, Impl, { contractName: 'DummyImplementationV2' });
           await assertIsVersion(upgraded, 'V2');
           await assertIsProxy(upgraded, this.adminAddress);
         })
       }
 
       it('upgrades and migrates a proxy', async function () {
-        const upgraded = await this.project.upgradeProxy(this.instance.address, DummyImplementationV2, { initMethod: 'migrate', initArgs: [20], initFrom: otherAdmin });
+        const upgraded = await this.project.upgradeProxy(this.instance._address, DummyImplementationV2, { initMethod: 'migrate', initArgs: [20], initFrom: otherAdmin });
         await assertIsVersion(upgraded, 'V2');
         await assertIsProxy(upgraded, this.adminAddress);
         (await upgraded.methods.value().call()).should.eq('20')
@@ -68,7 +68,7 @@ export default function shouldManageProxies({ otherAdmin, setImplementations, su
       beforeEach('create proxy', createProxy);
 
       it('changes admin of a proxy', async function () {
-        await this.project.changeProxyAdmin(this.instance.address, otherAdmin);
+        await this.project.changeProxyAdmin(this.instance._address, otherAdmin);
         await assertIsProxy(this.instance, otherAdmin)
       })
     });

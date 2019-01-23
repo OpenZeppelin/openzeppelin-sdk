@@ -24,7 +24,7 @@ export default class Package {
     log.info('Deploying new Package...');
     const PackageContract: ContractFactory = Contracts.getFromLib('Package');
     const packageContract = await deployContract(PackageContract, [], txParams);
-    log.info(`Deployed Package ${packageContract.address}`);
+    log.info(`Deployed Package ${packageContract._address}`);
     return new this(packageContract, txParams);
   }
 

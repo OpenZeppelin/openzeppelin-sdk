@@ -76,7 +76,7 @@ export default class SimpleProject  {
     if (!contractName) contractName = contractClass.contractName;
     const implementation: any = await deploy(contractClass, [], this.txParams);
     await this.registerImplementation(contractName, {
-      address: implementation.address,
+      address: implementation._address,
       bytecodeHash: bytecodeDigest(contractClass.deployedBinary)
     });
     return implementation;

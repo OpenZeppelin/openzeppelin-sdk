@@ -68,13 +68,13 @@ export default function shouldManageDependencies() {
       })
 
       it('upgrades a proxy given contract and package', async function () {
-        const upgraded = await this.project.upgradeProxy(this.instance.address, Impl, { packageName, contractName: 'DummyImplementationV2' });
+        const upgraded = await this.project.upgradeProxy(this.instance._address, Impl, { packageName, contractName: 'DummyImplementationV2' });
         await assertIsVersion(upgraded, 'V2');
         await assertIsProxy(upgraded, this.adminAddress);
       })
   
       it('upgrades and migrates a proxy', async function () {
-        const upgraded = await this.project.upgradeProxy(this.instance.address, DummyImplementationV2, { packageName, initMethod: 'migrate', initArgs: [20] });
+        const upgraded = await this.project.upgradeProxy(this.instance._address, DummyImplementationV2, { packageName, initMethod: 'migrate', initArgs: [20] });
         await assertIsVersion(upgraded, 'V2');
         await assertIsProxy(upgraded, this.adminAddress);
         (await upgraded.methods.value().call()).should.eq('20')
