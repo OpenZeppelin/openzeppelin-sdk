@@ -1,5 +1,5 @@
 import forEach from 'lodash.foreach';
-import { AppProject, PackageProject, SimpleProject, App, Package, ImplementationDirectory } from 'zos-lib';
+import { AppProject, PackageProject, ProxyAdminProject, App, Package, ImplementationDirectory } from 'zos-lib';
 
 import NetworkController from './NetworkController';
 import ZosPackageFile from '../files/ZosPackageFile';
@@ -14,6 +14,7 @@ interface PartialDeploy {
 interface ExistingAddresses {
   appAddress?: string;
   packageAddress?: string;
+  proxyAdminAddress?: string;
 }
 
 type CreateProjectFn = (addresses: ExistingAddresses) => Promise<AppProject>;
@@ -54,23 +55,6 @@ class BasePackageProjectDeployer extends BaseProjectDeployer {
   }
 }
 
-export class SimpleProjectDeployer extends BaseProjectDeployer {
-  public project: SimpleProject;
-
-  public async fetchOrDeploy(): Promise<SimpleProject> {
-    this.project = new SimpleProject(this.packageFile.name, this.txParams);
-    this.networkFile.version = this.requestedVersion;
-    forEach(this.networkFile.contracts, (contractInfo, contractAlias) => {
-      this.project.registerImplementation(contractAlias, { address: contractInfo.address, bytecodeHash: contractInfo.bodyBytecodeHash });
-    });
-    forEach(this.networkFile.dependencies, (dependencyInfo, dependencyName) => {
-      this.project.setDependency(dependencyName, dependencyInfo.package, dependencyInfo.version);
-    });
-
-    return this.project;
-  }
-}
-
 export class PackageProjectDeployer extends BasePackageProjectDeployer {
   public project: PackageProject;
 
@@ -97,9 +81,9 @@ export class AppProjectDeployer extends BasePackageProjectDeployer {
     ));
   }
 
-  public async fromSimpleProject(simpleProject: SimpleProject): Promise<AppProject> {
+  public async fromProxyAdminProject(proxyAdminProject: ProxyAdminProject): Promise<AppProject> {
     return this._run((existingAddresses: ExistingAddresses) => (
-      AppProject.fromSimpleProject(simpleProject, this.requestedVersion, existingAddresses)
+      AppProject.fromProxyAdminProject(proxyAdminProject, this.requestedVersion, existingAddresses)
     ));
   }
 
@@ -107,10 +91,14 @@ export class AppProjectDeployer extends BasePackageProjectDeployer {
     return this.controller.appAddress;
   }
 
+  get proxyAdminAddress(): string {
+    return this.networkFile.proxyAdminAddress;
+  }
+
   private async _run(createProjectFn: CreateProjectFn): Promise<AppProject | never> {
     try {
-      const { appAddress, packageAddress }: ExistingAddresses = this;
-      this.project = await createProjectFn({ appAddress, packageAddress });
+      const { appAddress, packageAddress, proxyAdminAddress }: ExistingAddresses = this;
+      this.project = await createProjectFn({ appAddress, packageAddress, proxyAdminAddress });
       await this._registerDeploy();
       return this.project;
     } catch (deployError) {
@@ -132,5 +120,22 @@ export class AppProjectDeployer extends BasePackageProjectDeployer {
 
   private _registerApp({ address }: { address: string }): void {
     this.networkFile.app = { address };
+  }
+}
+
+export class ProxyAdminProjectDeployer extends BaseProjectDeployer {
+  public project: ProxyAdminProject;
+
+  public async fetchOrDeploy(): Promise<ProxyAdminProject> {
+    this.project = await ProxyAdminProject.fetch(this.packageFile.name, this.txParams, this.networkFile.proxyAdminAddress);
+    this.networkFile.version = this.requestedVersion;
+    forEach(this.networkFile.contracts, (contractInfo, contractAlias) => {
+      this.project.registerImplementation(contractAlias, { address: contractInfo.address, bytecodeHash: contractInfo.bodyBytecodeHash });
+    });
+    forEach(this.networkFile.dependencies, (dependencyInfo, dependencyName) => {
+      this.project.setDependency(dependencyName, dependencyInfo.package, dependencyInfo.version);
+    });
+
+    return this.project;
   }
 }

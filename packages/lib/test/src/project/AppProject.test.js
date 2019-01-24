@@ -1,12 +1,14 @@
 'use strict'
 require('../../setup')
 
-import AppProject from '../../../src/project/AppProject'
-import shouldBehaveLikePackageProject from './PackageProject.behavior';
-import shouldManageProxies from './ProxyProject.behaviour';
 import Contracts from '../../../src/artifacts/Contracts';
-import shouldManageDependencies from './DependenciesProject.behaviour';
+import ProxyAdmin from '../../../src/proxy/ProxyAdmin';
+import AppProject from '../../../src/project/AppProject'
 import SimpleProject from '../../../src/project/SimpleProject';
+import shouldManageProxies from './ProxyProject.behaviour';
+import shouldManageDependencies from './DependenciesProject.behaviour';
+import shouldBehaveLikePackageProject from './PackageProject.behavior';
+import assertRevert from '../../../src/test/helpers/assertRevert'
 import { toAddress } from '../../../src/utils/Addresses';
 import { Package } from '../../../src';
 import utils from 'web3-utils';
@@ -24,8 +26,34 @@ contract('AppProject', function (accounts) {
 
   describe('new AppProject', function () {
     beforeEach('deploying', async function () {
-      this.project = await AppProject.fetchOrDeploy(name, version, { from: owner }, {})
-      this.adminAddress = this.project.getApp().address
+      this.proxyAdmin = await ProxyAdmin.deploy({ from: owner });
+      this.project = await AppProject.fetchOrDeploy(name, version, { from: owner }, { proxyAdminAddress: this.proxyAdmin.address });
+      this.adminAddress = this.project.proxyAdmin.address;
+    });
+
+    it('should have a proxyAdmin initialized', function() {
+      this.project.proxyAdmin.should.be.an.instanceof(ProxyAdmin);
+    });
+
+    describe('instance methods', function() {
+      beforeEach('deploy implementations', async function() {
+        this.implementation = await this.project.setImplementation(ImplV1, "DummyImplementation")
+        this.proxy = await this.project.createProxy(ImplV1);
+      });
+
+      describe('#upgradeProxy', function() {
+        it('fails to upgrade a proxy for unregistered package', async function () {
+          await assertRevert(this.project.upgradeProxy(this.proxy.address, ImplV1, { contractName: 'NOTEXISTS' }));
+        });
+
+        it('fails to upgrade a proxy for unregistered contract', async function () {
+          await assertRevert(this.project.upgradeProxy(this.proxy.address, ImplV1, { packageName: 'NOTEXISTS' }))
+        });
+
+        it('fails to upgrade a non-proxy contract', async function () {
+          await assertRevert(this.project.upgradeProxy(this.implementation.address, ImplV1))
+        });
+      });
     });
 
     shouldBehaveLikePackageProject({

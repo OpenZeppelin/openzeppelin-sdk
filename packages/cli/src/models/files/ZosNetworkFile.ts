@@ -51,13 +51,7 @@ export interface DependencyInterface {
   customDeploy?: boolean;
 }
 
-interface PackageInterface {
-  address?: string;
-}
-
-interface ProviderInterface {
-  address?: string;
-}
+type addressWrapper = { address?: string };
 
 export default class ZosNetworkFile {
 
@@ -69,9 +63,10 @@ export default class ZosNetworkFile {
     solidityLibs: { [libAlias: string]: SolidityLibInterface };
     proxies: { [contractName: string]: ProxyInterface[] };
     zosversion: string;
-    app: any;
-    package: PackageInterface;
-    provider: ProviderInterface;
+    proxyAdmin: addressWrapper;
+    app: addressWrapper;
+    package: addressWrapper;
+    provider: addressWrapper;
     version: string;
     frozen: boolean;
     dependencies: { [dependencyName: string]: DependencyInterface };
@@ -89,7 +84,15 @@ export default class ZosNetworkFile {
     checkVersion(this.data.zosversion, this.fileName);
   }
 
-  get app(): any {
+  get proxyAdmin(): addressWrapper {
+    return this.data.proxyAdmin || {};
+  }
+
+  get proxyAdminAddress(): string {
+    return this.proxyAdmin.address;
+  }
+
+  get app(): addressWrapper {
     return this.data.app || {};
   }
 
@@ -97,7 +100,7 @@ export default class ZosNetworkFile {
     return this.app.address;
   }
 
-  get package(): PackageInterface {
+  get package(): addressWrapper {
     return this.data.package || {};
   }
 
@@ -105,7 +108,7 @@ export default class ZosNetworkFile {
     return this.package.address;
   }
 
-  get provider(): ProviderInterface {
+  get provider(): addressWrapper {
     return this.data.provider || {};
   }
 
@@ -307,15 +310,20 @@ export default class ZosNetworkFile {
     this.data.frozen = frozen;
   }
 
-  set app(app: any) {
+  set proxyAdmin(admin: addressWrapper) {
+    this.data.proxyAdmin = admin;
+
+  }
+
+  set app(app: addressWrapper) {
     this.data.app = app;
   }
 
-  set provider(provider: ProviderInterface) {
+  set provider(provider: addressWrapper) {
     this.data.provider = provider;
   }
 
-  set package(_package: PackageInterface) {
+  set package(_package: addressWrapper) {
     this.data.package = _package;
   }
 

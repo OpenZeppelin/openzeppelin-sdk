@@ -4,9 +4,11 @@ import isEmpty from 'lodash.isempty';
 
 import App from '../application/App';
 import Package from '../application/Package';
+import ProxyAdmin from '../proxy/ProxyAdmin';
 import ImplementationDirectory from '../application/ImplementationDirectory';
 import BasePackageProject from './BasePackageProject';
 import SimpleProject from './SimpleProject';
+import ProxyAdminProject from './ProxyAdminProject';
 import ContractFactory, { ContractWrapper } from '../artifacts/ContractFactory';
 import { DeployError } from '../utils/errors/DeployError';
 import { semanticVersionToString } from '../utils/Semver';
@@ -25,14 +27,16 @@ export interface ContractInterface {
 interface ExistingAddresses {
   appAddress?: string;
   packageAddress?: string;
+  proxyAdminAddress?: string;
 }
 
 export default class AppProject extends BasePackageProject {
   private name: string;
   private app: App;
+  private proxyAdmin: ProxyAdmin;
 
   // REFACTOR: Evaluate merging this logic with CLI's ProjectDeployer classes
-  public static async fetchOrDeploy(name: string = DEFAULT_NAME, version: string = DEFAULT_VERSION, txParams: any = {}, { appAddress, packageAddress }: ExistingAddresses = {}): Promise<AppProject | never> {
+  public static async fetchOrDeploy(name: string = DEFAULT_NAME, version: string = DEFAULT_VERSION, txParams: any = {}, { appAddress, packageAddress, proxyAdminAddress }: ExistingAddresses = {}): Promise<AppProject | never> {
     let thepackage: Package;
     let directory: ImplementationDirectory;
     let app: App;
@@ -49,13 +53,30 @@ export default class AppProject extends BasePackageProject {
         ? await thepackage.getDirectory(version)
         : await thepackage.newVersion(version);
       if (!await app.hasPackage(name, version)) await app.setPackage(name, thepackage.address, version);
-      const project: AppProject = new this(app, name, version, txParams);
+      const proxyAdmin: ProxyAdmin | null = proxyAdminAddress ? await ProxyAdmin.fetch(proxyAdminAddress, txParams) : null;
+      const project: AppProject = new this(app, name, version, proxyAdmin, txParams);
       project.directory = directory;
       project.package = thepackage;
       return project;
     } catch(error) {
       throw new DeployError(error, { thepackage, directory, app });
     }
+  }
+
+  // REFACTOR: This code is similar to the ProxyAdminProjectDeployer, consider unifying them
+  public static async fromProxyAdminProject(proxyAdminProject: ProxyAdminProject, version: string = DEFAULT_VERSION, existingAddresses: ExistingAddresses = {}): Promise<AppProject> {
+    const appProject: AppProject = await this.fetchOrDeploy(proxyAdminProject.name, version, proxyAdminProject.txParams, existingAddresses);
+
+    await Promise.all(
+      concat(
+        map(proxyAdminProject.implementations, (contractInfo, contractAlias) => (
+          appProject.registerImplementation(contractAlias, contractInfo)
+        )),
+        map(proxyAdminProject.dependencies, (dependencyInfo, dependencyName) => (
+          appProject.setDependency(dependencyName, dependencyInfo.package, dependencyInfo.version)
+        ))
+      ));
+    return appProject;
   }
 
   // REFACTOR: This code is similar to the SimpleProjectDeployer, consider unifying them
@@ -74,11 +95,13 @@ export default class AppProject extends BasePackageProject {
     return appProject;
   }
 
-  constructor(app: App, name: string = DEFAULT_NAME, version: string = DEFAULT_VERSION, txParams: any = {}) {
+  constructor(app: App, name: string = DEFAULT_NAME, version: string = DEFAULT_VERSION, proxyAdmin: ProxyAdmin, txParams: any = {}) {
     super(txParams);
     this.app = app;
     this.name = name;
+    this.proxyAdmin = proxyAdmin;
     this.version = semanticVersionToString(version);
+    this.txParams = txParams;
   }
 
   public async newVersion(version: any): Promise<ImplementationDirectory> {
@@ -89,8 +112,16 @@ export default class AppProject extends BasePackageProject {
     return directory;
   }
 
+  public getAdminAddress(): string {
+    return this.proxyAdmin.address;
+  }
+
   public getApp(): App {
     return this.app;
+  }
+
+  public getProxyAdmin(): ProxyAdmin {
+    return this.proxyAdmin;
   }
 
   public async getProjectPackage(): Promise<Package> {
@@ -123,20 +154,22 @@ export default class AppProject extends BasePackageProject {
   }
 
   public async createProxy(contractClass: ContractFactory, { packageName, contractName, initMethod, initArgs }: ContractInterface = {}): Promise<ContractWrapper> {
+    if (!this.proxyAdmin) this.proxyAdmin = await ProxyAdmin.deploy(this.txParams);
     if (!contractName) contractName = contractClass.contractName;
     if (!packageName) packageName = this.name;
     if (!isEmpty(initArgs) && !initMethod) initMethod = 'initialize';
-    return this.app.createProxy(contractClass, packageName, contractName, initMethod, initArgs);
+    return this.app.createProxy(contractClass, packageName, contractName, this.proxyAdmin.address, initMethod, initArgs);
   }
 
   public async upgradeProxy(proxyAddress: string, contractClass: ContractFactory, { packageName, contractName, initMethod, initArgs }: ContractInterface = {}): Promise<ContractWrapper> {
     if (!contractName) contractName = contractClass.contractName;
     if (!packageName) packageName = this.name;
-    return this.app.upgradeProxy(proxyAddress, contractClass, packageName, contractName, initMethod, initArgs);
+    const implementationAddress = await this.getImplementation({ packageName, contractName });
+    return this.proxyAdmin.upgradeProxy(proxyAddress, implementationAddress, contractClass, initMethod, initArgs);
   }
 
   public async changeProxyAdmin(proxyAddress: string, newAdmin: string): Promise<void> {
-    return this.app.changeProxyAdmin(proxyAddress, newAdmin);
+    return this.proxyAdmin.changeProxyAdmin(proxyAddress, newAdmin);
   }
 
   public async getDependencyPackage(name: string): Promise<Package> {

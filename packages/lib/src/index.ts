@@ -39,6 +39,7 @@ import BasePackageProject from './project/BasePackageProject';
 import PackageProject from './project/PackageProject';
 import AppProject from './project/AppProject';
 import SimpleProject from './project/SimpleProject';
+import ProxyAdminProject from './project/ProxyAdminProject';
 
 export {
   version,
@@ -85,6 +86,7 @@ export {
   PackageProject,
   AppProject,
   SimpleProject,
+  ProxyAdminProject,
   ContractFactory,
   ContractWrapper,
   ValidationInfo

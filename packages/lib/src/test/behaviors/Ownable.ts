@@ -1,6 +1,7 @@
-import assertRevert from '../helpers/assertRevert';
+import utils from 'web3-utils';
 import assert from 'assert';
 import { expect } from 'chai';
+import assertRevert from '../helpers/assertRevert';
 
 // TS-TODO: should this be in test/behaviors/ instead of src/test/behaviors/?
 export default function shouldBehaveLikeOwnable(owner: string, anotherAccount: string) {

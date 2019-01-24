@@ -14,12 +14,12 @@ import isEqual from 'lodash.isequal';
 import concat from 'lodash.concat';
 import toPairs from 'lodash.topairs';
 import { Contracts, ContractFactory, Logger, FileSystem as fs, Proxy, awaitConfirmations, semanticVersionToString } from 'zos-lib';
-import { SimpleProject, AppProject, flattenSourceCode, getStorageLayout, BuildArtifacts, getBuildArtifacts, getSolidityLibNames } from 'zos-lib';
+import { ProxyAdminProject, AppProject, flattenSourceCode, getStorageLayout, BuildArtifacts, getBuildArtifacts, getSolidityLibNames } from 'zos-lib';
 import { validate, newValidationErrors, validationPasses, App, ContractWrapper } from 'zos-lib';
 
 import { allPromisesOrError } from '../../utils/async';
 import { toContractFullName } from '../../utils/naming';
-import { AppProjectDeployer, SimpleProjectDeployer } from './ProjectDeployer';
+import { AppProjectDeployer, ProxyAdminProjectDeployer } from './ProjectDeployer';
 import Dependency from '../dependency/Dependency';
 import StatusChecker from '../status/StatusChecker';
 import ValidationLogger from '../../interface/ValidationLogger';
@@ -29,6 +29,8 @@ import ZosNetworkFile, { ProxyInterface } from '../files/ZosNetworkFile';
 import ZosPackageFile from '../files/ZosPackageFile';
 
 const log = new Logger('NetworkAppController');
+type Project = ProxyAdminProject | AppProject;
+type ProjectDeployer = ProxyAdminProjectDeployer | AppProjectDeployer;
 
 export default class NetworkController {
 
@@ -36,7 +38,7 @@ export default class NetworkController {
   public txParams: any;
   public network: string;
   public networkFile: ZosNetworkFile;
-  public project: SimpleProject | AppProject;
+  public project: Project;
 
   constructor(localController: LocalController, network: string, txParams: any, networkFile?: ZosNetworkFile) {
     this.localController = localController;
@@ -87,7 +89,7 @@ export default class NetworkController {
   }
 
   // DeployerController
-  public async fetchOrDeploy(requestedVersion: string): Promise<SimpleProject | AppProject> {
+  public async fetchOrDeploy(requestedVersion: string): Promise<Project> {
     this.project = await this.getDeployer(requestedVersion).fetchOrDeploy();
     return this.project;
   }
@@ -403,10 +405,10 @@ export default class NetworkController {
   }
 
   // DeployerController
-  public getDeployer(requestedVersion: string): SimpleProjectDeployer | AppProjectDeployer {
+  public getDeployer(requestedVersion: string): ProjectDeployer {
     return this.isPublished
       ? new AppProjectDeployer(this, requestedVersion)
-      : new SimpleProjectDeployer(this, requestedVersion);
+      : new ProxyAdminProjectDeployer(this, requestedVersion);
   }
 
   // NetworkController
@@ -428,9 +430,9 @@ export default class NetworkController {
     }
 
     log.info(`Publishing project to ${this.network}...`);
-    const simpleProject = <SimpleProject>(await this.fetchOrDeploy(this.currentVersion));
+    const proxyAdminProject = <ProxyAdminProject>(await this.fetchOrDeploy(this.currentVersion));
     const deployer = new AppProjectDeployer(this, this.packageVersion);
-    this.project = await deployer.fromSimpleProject(simpleProject);
+    this.project = await deployer.fromProxyAdminProject(proxyAdminProject);
     log.info(`Publish to ${this.network} successful`);
 
     const proxies = this._fetchOwnedProxies();
@@ -438,7 +440,7 @@ export default class NetworkController {
       log.info(`Awaiting confirmations before transferring proxies to published project (this may take a few minutes)`);
       const app = this.project.getApp();
       await awaitConfirmations(app.contract.transactionHash);
-      await this._changeProxiesAdmin(proxies, app.address, simpleProject);
+      await this._changeProxiesAdmin(proxies, app.address, proxyAdminProject);
       log.info(`${proxies.length} proxies have been successfully transferred`);
     }
   }
@@ -453,6 +455,7 @@ export default class NetworkController {
     const proxyInstance = await this.project.createProxy(contractClass, { packageName, contractName: contractAlias, initMethod, initArgs });
     const implementationAddress = await Proxy.at(proxyInstance).implementation();
     const packageVersion = packageName === this.packageFile.name ? this.currentVersion : (await this.project.getDependencyVersion(packageName));
+    await this._tryRegisterProxyAdmin();
     this._updateTruffleDeployedInformation(contractAlias, proxyInstance);
 
     this.networkFile.addProxy(packageName, contractAlias, {
@@ -461,6 +464,14 @@ export default class NetworkController {
       implementation: implementationAddress
     });
     return proxyInstance;
+  }
+
+  // Proxy model
+  private async _tryRegisterProxyAdmin() {
+    if (!this.networkFile.proxyAdminAddress) {
+      const proxyAdminAddress = await this.project.getAdminAddress();
+      this.networkFile.proxyAdmin = { address:  proxyAdminAddress };
+    }
   }
 
   // Proxy model
@@ -503,7 +514,7 @@ export default class NetworkController {
   }
 
   // Proxy model
-  private async _changeProxiesAdmin(proxies: ProxyInterface[], newAdmin: string, project: SimpleProject | AppProject = null): Promise<void> {
+  private async _changeProxiesAdmin(proxies: ProxyInterface[], newAdmin: string, project: Project = null): Promise<void> {
     if (!project) project = this.project;
     await allPromisesOrError(map(proxies, async (aProxy) => {
       await project.changeProxyAdmin(aProxy.address, newAdmin);

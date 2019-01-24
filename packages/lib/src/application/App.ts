@@ -1,6 +1,5 @@
-import findLast from 'lodash.findlast';
-
 import Logger from '../utils/Logger';
+import Proxy from '../proxy/Proxy';
 import copyContract from '../helpers/copyContract';
 import Contracts from '../artifacts/Contracts';
 import Package from '../application/Package';
@@ -72,24 +71,14 @@ export default class App {
     return this.appContract.methods.getImplementation(packageName, contractName).call();
   }
 
-  public async getProxyImplementation(proxyAddress: string): Promise<string> {
-    return this.appContract.methods.getProxyImplementation(proxyAddress).call({ ...this.txParams });
-  }
-
   public async hasProvider(name: string): Promise<boolean> {
     return (await this.getProvider(name) != null);
   }
 
   public async getProvider(name: string): Promise<ImplementationDirectory> {
-    const address = await this.appContract.methods.getProvider(name).call();
+    const address: string = await this.appContract.methods.getProvider(name).call();
     if (isZeroAddress(address)) return null;
     return await ImplementationDirectory.fetch(address, { ...this.txParams });
-  }
-
-  public async changeProxyAdmin(proxyAddress: string, newAdmin: string): Promise<void> {
-    log.info(`Changing admin for proxy ${proxyAddress} to ${newAdmin}...`);
-    await sendTransaction(this.appContract.methods.changeProxyAdmin, [proxyAddress, newAdmin], { ...this.txParams });
-    log.info(`Admin for proxy ${proxyAddress} set to ${newAdmin}`);
   }
 
   public async createContract(contractClass: ContractFactory, packageName: string, contractName: string, initMethodName: string, initArgs: string[]): Promise<ContractWrapper> {
@@ -98,47 +87,26 @@ export default class App {
     return instance;
   }
 
-  public async createProxy(contractClass: ContractFactory, packageName: string, contractName: string, initMethodName: string, initArgs?: string[]): Promise<ContractWrapper> {
-    const receipt = typeof(initArgs) === 'undefined'
-      ? await this._createProxy(packageName, contractName)
-      : await this._createProxyAndCall(contractClass, packageName, contractName, initMethodName, initArgs);
-
-    log.info(`TX receipt received: ${receipt.transactionHash}`);
-    const event = receipt.events['ProxyCreated'];
-    const address = Array.isArray(event) ? event[event.length - 1].returnValues.proxy : event.returnValues.proxy;
-    log.info(`${packageName} ${contractName} proxy: ${address}`);
-    return contractClass.at(address);
+  public async createProxy(contractClass: ContractFactory, packageName: string, contractName: string, proxyAdmin: string, initMethodName: string, initArgs?: string[]): Promise<ContractWrapper> {
+    const proxy = typeof(initArgs) === 'undefined'
+      ? await this._createProxy(packageName, contractName, proxyAdmin)
+      : await this._createProxyAndCall(contractClass, packageName, contractName, proxyAdmin, initMethodName, initArgs);
+    log.info(`${packageName} ${contractName} proxy: ${proxy.address}`);
+    return contractClass.at(proxy.address);
   }
 
-  public async upgradeProxy(proxyAddress: string, contractClass: ContractFactory, packageName: string, contractName: string, initMethodName: string, initArgs: any): Promise<ContractWrapper> {
-    const receipt = typeof(initArgs) === 'undefined'
-      ? await this._upgradeProxy(proxyAddress, packageName, contractName)
-      : await this._upgradeProxyAndCall(proxyAddress, contractClass, packageName, contractName, initMethodName, initArgs);
-    log.info(`TX receipt received: ${receipt.transactionHash}`);
-    return contractClass.at(proxyAddress);
-  }
-
-  private async _createProxy(packageName: string, contractName: string): Promise<TransactionReceipt> {
+  private async _createProxy(packageName: string, contractName: string, proxyAdmin: string): Promise<Proxy> {
     log.info(`Creating ${packageName} ${contractName} proxy without initializing...`);
     const initializeData: Buffer = Buffer.from('');
-    return sendTransaction(this.appContract.methods.create, [packageName, contractName, initializeData], { ...this.txParams });
+    const implementation = await this.getImplementation(packageName, contractName);
+    return Proxy.deploy(implementation, proxyAdmin, initializeData, this.txParams);
   }
 
-  private async _createProxyAndCall(contractClass: ContractFactory, packageName: string, contractName: string, initMethodName: string, initArgs: any): Promise<TransactionReceipt> {
+  private async _createProxyAndCall(contractClass: ContractFactory, packageName: string, contractName: string, proxyAdmin: string, initMethodName: string, initArgs: any): Promise<Proxy> {
     const { method: initMethod, callData }: CalldataInfo = buildCallData(contractClass, initMethodName, initArgs);
     log.info(`Creating ${packageName} ${contractName} proxy and calling ${callDescription(initMethod, initArgs)}`);
-    return sendTransaction(this.appContract.methods.create, [packageName, contractName, callData], { ...this.txParams });
-  }
-
-  private async _upgradeProxy(proxyAddress: string, packageName: string, contractName: string): Promise<any> {
-    log.info(`Upgrading ${packageName} ${contractName} proxy without running migrations...`);
-    return sendTransaction(this.appContract.methods.upgrade, [proxyAddress, packageName, contractName], { ...this.txParams });
-  }
-
-  private async _upgradeProxyAndCall(proxyAddress: string, contractClass: ContractFactory, packageName: string, contractName: string, initMethodName: string, initArgs: any): Promise<any> {
-    const { method: initMethod, callData }: CalldataInfo = buildCallData(contractClass, initMethodName, initArgs);
-    log.info(`Upgrading ${packageName} ${contractName} proxy and calling ${callDescription(initMethod, initArgs)}...`);
-    return sendTransaction(this.appContract.methods.upgradeAndCall, [proxyAddress, packageName, contractName, callData], { ...this.txParams });
+    const implementation = await this.getImplementation(packageName, contractName);
+    return Proxy.deploy(implementation, proxyAdmin, callData, this.txParams);
   }
 
   private async _copyContract(packageName: string, contractName: string, contractClass: ContractFactory): Promise<ContractWrapper> {
