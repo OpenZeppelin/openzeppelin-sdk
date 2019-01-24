@@ -8,7 +8,7 @@ import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 /**
  * @title App
  * @dev Contract for upgradeable applications.
- * It handles the creation and upgrading of proxies.
+ * It handles the creation of proxies.
  */
 contract App is Ownable {
   /**
@@ -105,7 +105,7 @@ contract App is Ownable {
    * This is useful to initialize the proxied contract.
    * @param packageName Name of the package where the contract is contained.
    * @param contractName Name of the contract.
-   * @param admin address of the proxy administrator.
+   * @param admin Address of the proxy administrator.
    * @param data Data to send as msg.data to the corresponding implementation to initialize the proxied contract.
    * It should include the signature and the parameters of the function to be called, as described in
    * https://solidity.readthedocs.io/en/v0.4.24/abi-spec.html#function-selector-and-argument-encoding.
