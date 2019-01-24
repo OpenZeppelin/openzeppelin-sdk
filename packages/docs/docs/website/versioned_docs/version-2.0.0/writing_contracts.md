@@ -138,7 +138,7 @@ For instance, in the following example, even if `MyContract` is upgradeable (if 
 ```solidity
 import "zos-lib/contracts/Initializable.sol";
 import "openzeppelin-eth/contracts/token/ERC20/ERC20.sol";
-import "openzeppelin-eth/contracts/token/ERC20/RC20Detailed.sol";
+import "openzeppelin-eth/contracts/token/ERC20/ERC20Detailed.sol";
 
 contract MyContract is Initializable {
   ERC20 public token;
