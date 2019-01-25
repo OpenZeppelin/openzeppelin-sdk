@@ -21,13 +21,18 @@ const Truffle = {
 
   async compile() {
     log.info('Compiling contracts with Truffle...')
-    const truffleBin = `${process.cwd()}/node_modules/.bin/truffle`
-    if (!fs.exists(truffleBin)) throw new Error(`Could not find truffle in ${truffleBin}. Please make sure you're placed in the right directory.`)
+    let truffleBin = `${process.cwd()}/node_modules/.bin/truffle`
+    if (!fs.exists(truffleBin)) truffleBin = 'truffle'; // Attempt to load global truffle if local was not found
     return new Promise((resolve, reject) => {
       exec(`${truffleBin} compile`, (error, stdout, stderr) => {
-        if (stdout) console.log(stdout)
-        if (stderr) console.error(stderr)
-        error ? reject(error) : resolve({ stdout, stderr })
+        if (error) {
+          if (error.code === 127) console.error('Could not find truffle executable. Please install it by running: npm install truffle');
+          reject(error);
+        } else {
+          if (stdout) console.log(stdout);
+          if (stderr) console.error(stderr);
+          resolve({ stdout, stderr });
+        }
       })
     })
   },
