@@ -22,8 +22,8 @@ export default class ZosContract {
 
   // Extends Web3's Contract interface.
   public schema: ContractSchema;
-  public binary: string;
-  public deployedBinary: string;
+  public binary: string; // TODO: remove
+  public deployedBinary: string; // TODO: remove
   public storageInfo: StorageLayoutInfo;
   public warnings: any;
   public deploymentTransactionReceipt: TransactionReceipt;
@@ -31,19 +31,14 @@ export default class ZosContract {
 
   constructor(schema: any, atAddress?: any, options?: any) {
     this.schema = schema;
-
     this._setBinaryIfPossible();
-
     this._contract = ZWeb3.contract(schema.abi, atAddress, options);
   }
 
   public async deploy(args: any[] = [], options: any = {}): Promise<ZosContract> {
-    this._validateNonEmptyBinary();
     this._validateNonUnlinkedLibraries();
-
     const defaultOptions = await Contracts.getDefaultTxParams();
     this._contract.options = { ...this._contract.options, ...defaultOptions };
-
     const self = this;
     return new Promise(function(resolve, reject) {
       const tx = self._contract.deploy({data: self.binary, arguments: args});
@@ -76,18 +71,14 @@ export default class ZosContract {
   }
 
   private _setBinaryIfPossible(): void {
-    if (!hasUnlinkedVariables(this.schema.bytecode)) {
+    if(!hasUnlinkedVariables(this.schema.bytecode)) {
       this.binary = this.schema.bytecode;
       this.deployedBinary = this.schema.deployedBytecode;
     }
   }
 
-  private _validateNonEmptyBinary(): void | never {
-    if (this.schema.bytecode === '') throw new Error(`A bytecode must be provided for contract ${this.schema.contractName}.`);
-  }
-
   private _validateNonUnlinkedLibraries(): void | never {
-    if (hasUnlinkedVariables(this.binary)) {
+    if(hasUnlinkedVariables(this.binary)) {
       const libraries = getSolidityLibNames(this.binary);
       throw new Error(`${this.schema.contractName} bytecode contains unlinked libraries: ${libraries.join(', ')}`);
     }

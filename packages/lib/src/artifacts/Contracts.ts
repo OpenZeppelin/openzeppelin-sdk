@@ -98,6 +98,7 @@ export default class Contracts {
 
   private static _getFromPath(targetPath: string): ZosContract {
     const schema = require(targetPath);
+    if(schema.bytecode === '') throw new Error(`A bytecode must be provided for contract ${schema.contractName}.`);
     return new ZosContract(schema);
   }
 }
