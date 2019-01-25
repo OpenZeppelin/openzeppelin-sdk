@@ -47,5 +47,3 @@ contract StorageMockChainChild is StorageMockChainA2, StorageMockChainB {
     }
   }
 }
-
-

@@ -36,33 +36,29 @@ function levenshtein(originalStorage, updatedStorage, areEqualFn) {
   const a = originalStorage,
         b = updatedStorage;
 
-  if (a.length === 0) return b.length * INSERTION_COST;
-  if (b.length === 0) return a.length * DELETION_COST;
-
+  const insertionCost = (_i,j) => (j > a.length ? 0 : INSERTION_COST);
+  const diagonalCost = (i,j) => (areEqualFn(a[i-1], b[j-1]) ? 0 : SUBSTITUTION_COST);
+  const deletionCost = (_i,_j) => DELETION_COST;
+  
   const matrix = Array(a.length + 1);
 
   // increment along the first column of each row  
   for (let i = 0; i <= a.length; i++) { 
     matrix[i] = Array(b.length + 1); 
-    matrix[i][0] = i * DELETION_COST; 
+    matrix[i][0] = i * deletionCost(i, 0); 
   }
 
   // increment each column in the first row
-  for (let j = 0; j <= b.length; j++) { 
-    matrix[0][j] = j * INSERTION_COST;
+  for (let j = 1; j <= b.length; j++) { 
+    matrix[0][j] = matrix[0][j-1] + insertionCost(0, j);
   }
-
+  
   // fill in the rest of the matrix
   for (let i = 1; i <= a.length; i++) {
     for (let j = 1; j <= b.length; j++) {
-      if (areEqualFn(a[i-1], b[j-1])) {
-        matrix[i][j] = matrix[i-1][j-1];
-      } else {
-        const insertionCost = j > a.length ? 0 : INSERTION_COST; // appending is free
-        matrix[i][j] = Math.min(matrix[i-1][j-1] + SUBSTITUTION_COST,
-                                matrix[i][j-1] + insertionCost, 
-                                matrix[i-1][j] + DELETION_COST);
-      }
+      matrix[i][j] = Math.min(matrix[i-1][j-1] + diagonalCost(i,j),
+                              matrix[i][j-1] + insertionCost(i,j), 
+                              matrix[i-1][j] + deletionCost(i,j));
     }
   }
 
@@ -73,8 +69,8 @@ function levenshtein(originalStorage, updatedStorage, areEqualFn) {
 function walk(matrix, originalStorage, updatedStorage, areMatchFn) {
   const a = originalStorage,
         b = updatedStorage;
-  let i = matrix.length - 1,
-      j = matrix[0].length - 1;
+  let i = Math.max(matrix.length - 1, 0),
+      j = Math.max(matrix.length ? matrix[0].length - 1 : 0, 0);
   const operations = [];
 
   while (i > 0 || j > 0) {
@@ -85,7 +81,7 @@ function walk(matrix, originalStorage, updatedStorage, areMatchFn) {
     const matchResult = i > 0 && j > 0 && areMatchFn(a[i-1], b[j-1]);
     const updated = j > 0 && { index: j-1, ...b[j-1] }
     const original = i > 0 && { index: i-1, ...a[i-1] }
-    
+
     if (i > 0 && j > 0 && cost === matrix[i-1][j-1] && matchResult === 'equal') {
       operations.unshift({ action: 'equal', updated, original });
       i--;
