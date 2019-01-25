@@ -11,15 +11,9 @@ export default class ZosContract {
 
   // Wrap Web3 Contract's interface.
   private _contract: Contract;
-  public get options(): any {
-    return this._contract.options;
-  }
-  public get methods(): any {
-    return this._contract.methods;
-  }
-  public get _address(): string {
-    return this._contract._address;
-  }
+  public get options(): any { return this._contract.options; }
+  public get methods(): any { return this._contract.methods; }
+  public get _address(): string { return this._contract._address; }
   public async getPastEvents(event: string, options?: any, cb?: any): Promise<any> {
     return this._contract.getPastEvents(event, options, (error, res) => {
       if(cb) cb(error, res);
@@ -30,20 +24,16 @@ export default class ZosContract {
   public schema: ContractSchema;
   public binary: string;
   public deployedBinary: string;
-  public events: any;
   public storageInfo: StorageLayoutInfo;
   public warnings: any;
   public deploymentTransactionReceipt: TransactionReceipt;
   public deploymentTransactionHash: string;
 
   constructor(schema: any, atAddress?: any, options?: any) {
-
-    // Extract info from schema.
     this.schema = schema;
-    this._parseEvents();
+
     this._setBinaryIfPossible();
 
-    // Initialize Web3 contract.
     this._contract = ZWeb3.contract(schema.abi, atAddress, options);
   }
 
@@ -83,17 +73,6 @@ export default class ZosContract {
       this.binary = this.schema.bytecode.replace(regex, address);
       this.deployedBinary = this.schema.deployedBytecode.replace(regex, address);
     });
-  }
-
-  private _parseEvents(): void {
-    this.events = {};
-    this.schema.abi
-      .filter((item) => item.type === 'event')
-      .forEach((event) => {
-        const signature = `${event.name}(${event.inputs.map((input) => input.type).join(',')})`;
-        const topic = ZWeb3.sha3(signature);
-        this.events[topic] = event;
-      });
   }
 
   private _setBinaryIfPossible(): void {
