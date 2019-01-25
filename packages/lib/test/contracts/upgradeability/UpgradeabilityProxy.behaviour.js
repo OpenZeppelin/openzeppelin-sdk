@@ -17,7 +17,7 @@ export default function shouldBehaveLikeUpgradeabilityProxy(proxyClass, proxyCre
     await assertRevert(proxyClass.new(nonContractAddress, initializeData, { from: proxyCreator }))
   })
 
-  before('deploy implementation', async function () {
+  before('new implementation', async function () {
     this.implementation = utils.toChecksumAddress((await DummyImplementation.new()).address);
   })
 

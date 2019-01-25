@@ -3,7 +3,7 @@ import Contracts from '../artifacts/Contracts';
 import ImplementationDirectory from '../application/ImplementationDirectory';
 import { toSemanticVersion, SemanticVersion } from '../utils/Semver';
 import { toAddress, isZeroAddress } from '../utils/Addresses';
-import ContractFactory from '../artifacts/ContractFactory';
+import ZosContract from '../artifacts/ZosContract';
 import { deploy as deployContract, sendTransaction } from '../utils/Transactions';
 import { Contract } from 'web3-eth-contract';
 
@@ -22,7 +22,7 @@ export default class Package {
 
   public static async deploy(txParams: any = {}): Promise<Package> {
     log.info('Deploying new Package...');
-    const PackageContract: ContractFactory = Contracts.getFromLib('Package');
+    const PackageContract: ZosContract = Contracts.getFromLib('Package');
     const packageContract = await deployContract(PackageContract, [], txParams);
     log.info(`Deployed Package ${packageContract._address}`);
     return new this(packageContract, txParams);

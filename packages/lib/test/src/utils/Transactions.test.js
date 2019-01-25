@@ -47,12 +47,12 @@ contract('Transactions', function(accounts) {
 
   describe('via contract wrapper', function () {
     it('uses default gas for new contract', async function () {
-      const instance = await this.DummyImplementation.new();
-      await assertGas(instance.zosInjections.deploymentTransactionHash, DEFAULT_GAS);
+      const instance = await this.DummyImplementation.deploy();
+      await assertGas(instance.deploymentTransactionHash, DEFAULT_GAS);
     });
 
     it('uses default gas for sending transaction', async function () {
-      const instance = await this.DummyImplementation.new();
+      const instance = await this.DummyImplementation.deploy();
       const receipt = await instance.methods.initialize(42, 'foo', [1,2,3]).send();
       await assertGas(receipt.transactionHash, DEFAULT_GAS);
     });
@@ -312,7 +312,7 @@ contract('Transactions', function(accounts) {
 
       it('honours other tx params', async function () {
         const instance = await deploy(this.DummyImplementation, [], { from: account2 });
-        await assertFrom(instance.zosInjections.deploymentTransactionHash, account2);
+        await assertFrom(instance.deploymentTransactionHash, account2);
       });
 
       it('handles failing constructors', async function () {
@@ -328,14 +328,14 @@ contract('Transactions', function(accounts) {
           describe('when a gas amount is given', function () {
             it('uses specified gas', async function () {
               const instance = await deploy(this.DummyImplementation, [], { gas: 800000 });
-              await assertGas(instance.zosInjections.deploymentTransactionHash, 800000);
+              await assertGas(instance.deploymentTransactionHash, 800000);
             });
           });
 
           describe('when no gas amount is given', function () {
             it('uses the default gas amount', async function () {
               const instance = await deploy(this.DummyImplementation, []);
-              await assertGas(instance.zosInjections.deploymentTransactionHash, DEFAULT_GAS);
+              await assertGas(instance.deploymentTransactionHash, DEFAULT_GAS);
             });
           });
         });
@@ -348,14 +348,14 @@ contract('Transactions', function(accounts) {
           describe('when a gas amount is given', function () {
             it('uses specified gas', async function () {
               const instance = await deploy(this.DummyImplementation, [], { gas: 800000 });
-              await assertGas(instance.zosInjections.deploymentTransactionHash, 800000);
+              await assertGas(instance.deploymentTransactionHash, 800000);
             });
           });
 
           describe('when no gas amount is given', function () {
             it('estimates gas', async function () {
               const instance = await deploy(this.DummyImplementation);
-              await assertGasLt(instance.zosInjections.deploymentTransactionHash, 1000000);
+              await assertGasLt(instance.deploymentTransactionHash, 1000000);
             });
           });
         });
@@ -376,13 +376,13 @@ contract('Transactions', function(accounts) {
           it('uses gas price API when gas not specified', async function () {
             const instance = await deploy(this.DummyImplementation);
 
-            await await assertGasPrice(instance.zosInjections.deploymentTransactionHash, 49 * 1e8);
+            await await assertGasPrice(instance.deploymentTransactionHash, 49 * 1e8);
           });
 
           it('does not use gas price API when gasPrice specified', async function () {
             const instance = await deploy(this.DummyImplementation, [], { gasPrice: 1234 });
 
-            await await assertGasPrice(instance.zosInjections.deploymentTransactionHash, 1234);
+            await await assertGasPrice(instance.deploymentTransactionHash, 1234);
           });
         });
 
@@ -417,7 +417,7 @@ contract('Transactions', function(accounts) {
 
       it('honours other tx params', async function () {
         const instance = await deploy(this.WithConstructorImplementation, [42, "foo"], { from: account2 });
-        await assertFrom(instance.zosInjections.deploymentTransactionHash, account2);
+        await assertFrom(instance.deploymentTransactionHash, account2);
       });
 
       it('handles failing constructors', async function () {
@@ -433,14 +433,14 @@ contract('Transactions', function(accounts) {
           describe('when a gas amount is given', function () {
             it('uses specified gas', async function () {
               const instance = await deploy(this.WithConstructorImplementation, [42, "foo"], { gas: 800000 });
-              await assertGas(instance.zosInjections.deploymentTransactionHash, 800000);
+              await assertGas(instance.deploymentTransactionHash, 800000);
             });
           });
 
           describe('when no gas amount is given', function () {
             it('uses the default gas amount', async function () {
               const instance = await deploy(this.WithConstructorImplementation, [42, "foo"]);
-              await assertGas(instance.zosInjections.deploymentTransactionHash, DEFAULT_GAS);
+              await assertGas(instance.deploymentTransactionHash, DEFAULT_GAS);
             });
           });
         });
@@ -453,14 +453,14 @@ contract('Transactions', function(accounts) {
           describe('when a gas amount is given', function () {
             it('uses specified gas', async function () {
               const instance = await deploy(this.WithConstructorImplementation, [42, "foo"], { gas: 800000 });
-              await assertGas(instance.zosInjections.deploymentTransactionHash, 800000);
+              await assertGas(instance.deploymentTransactionHash, 800000);
             });
           });
 
           describe('when no gas amount is given', function () {
             it('estimates gas', async function () {
               const instance = await deploy(this.WithConstructorImplementation, [42, "foo"]);
-              await assertGasLt(instance.zosInjections.deploymentTransactionHash, 1000000);
+              await assertGasLt(instance.deploymentTransactionHash, 1000000);
             });
 
             it('retries estimating gas', async function () {
@@ -469,7 +469,7 @@ contract('Transactions', function(accounts) {
               stub.returns(800000)
 
               const instance = await deploy(this.WithConstructorImplementation, [42, "foo"]);
-              await assertGas(instance.zosInjections.deploymentTransactionHash, 800000 * 1.25 + 15000);
+              await assertGas(instance.deploymentTransactionHash, 800000 * 1.25 + 15000);
             });
 
             it('retries estimating gas up to 3 times', async function () {
@@ -498,13 +498,13 @@ contract('Transactions', function(accounts) {
           it('uses gas price API when gas not specified', async function () {
             const instance = await deploy(this.WithConstructorImplementation, [42, 'foo']);
 
-            await await assertGasPrice(instance.zosInjections.deploymentTransactionHash, 49 * 1e8);
+            await await assertGasPrice(instance.deploymentTransactionHash, 49 * 1e8);
           });
 
           it('does not use gas price API when gasPrice specified', async function () {
             const instance = await deploy(this.WithConstructorImplementation, [42, 'foo'], { gasPrice: 1234 });
 
-            await assertGasPrice(instance.zosInjections.deploymentTransactionHash, 1234);
+            await assertGasPrice(instance.deploymentTransactionHash, 1234);
           });
         });
 
@@ -542,7 +542,7 @@ contract('Transactions', function(accounts) {
     it('awaits required confirmations', async function () {
       const initialBlock = await ZWeb3.getLatestBlockNumber();
       const instance = await deploy(this.DummyImplementation, [], { gasPrice: 1e9 });
-      await awaitConfirmations(instance.zosInjections.deploymentTransactionHash, 5);
+      await awaitConfirmations(instance.deploymentTransactionHash, 5);
       (await ZWeb3.hasBytecode(instance._address)).should.be.true;
       const endBlock = await ZWeb3.getLatestBlockNumber();
       (endBlock - 5).should.be.greaterThan(initialBlock);
@@ -550,7 +550,7 @@ contract('Transactions', function(accounts) {
 
     it('times out if fails to reach confirmations', async function () {
       const instance = await deploy(this.DummyImplementation, [], { gasPrice: 1e9 });
-      await awaitConfirmations(instance.zosInjections.deploymentTransactionHash, 20, 100, 300).should.be.rejectedWith(/Exceeded timeout/);
+      await awaitConfirmations(instance.deploymentTransactionHash, 20, 100, 300).should.be.rejectedWith(/Exceeded timeout/);
     });
   });
 });

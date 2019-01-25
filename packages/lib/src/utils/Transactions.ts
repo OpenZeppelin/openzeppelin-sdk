@@ -9,7 +9,7 @@ import BN from 'bignumber.js';
 import sleep from '../helpers/sleep';
 import ZWeb3 from '../artifacts/ZWeb3';
 import Contracts from '../artifacts/Contracts';
-import ContractFactory from '../artifacts/ContractFactory';
+import ZosContract from '../artifacts/ZosContract';
 import { Contract } from 'web3-eth-contract';
 import { TransactionReceipt } from 'web3/types';
 import { buildDeploymentCallData } from './ABIs';
@@ -63,7 +63,7 @@ export async function sendTransaction(contractFn: GenericFunction, args: any[] =
  * @param txParams other transaction parameters (from, gasPrice, etc)
  * @param retries number of deploy retries
  */
-export async function deploy(contract: ContractFactory, args: any[] = [], txParams: any = {}, retries: number = RETRY_COUNT): Promise<any> {
+export async function deploy(contract: ZosContract, args: any[] = [], txParams: any = {}, retries: number = RETRY_COUNT): Promise<any> {
   await fixGasPrice(txParams);
 
   try {
@@ -142,15 +142,15 @@ async function _sendContractDataTransaction(contract: Contract, txParams: any): 
  * @param args arguments of the constructor (if any)
  * @param txParams other transaction parameters (from, gasPrice, etc)
  */
-async function _deploy(contract: ContractFactory, args: any[] = [], txParams: any = {}): Promise<Contract> {
+async function _deploy(contract: ZosContract, args: any[] = [], txParams: any = {}): Promise<Contract> {
   // If gas is set explicitly, use it
   const defaultGas = Contracts.getArtifactsDefaults().gas;
   if (!txParams.gas && defaultGas) txParams.gas = defaultGas;
-  if (txParams.gas) return contract.new(...args, txParams);
+  if (txParams.gas) return contract.deploy(args, txParams);
 
   const data = buildDeploymentCallData(contract, args, txParams);
   const gas = await estimateActualGas({ data, ...txParams });
-  return contract.new(...args, { gas, ...txParams });
+  return contract.deploy(args, { gas, ...txParams });
 }
 
 export async function estimateGas(txParams: any, retries: number = RETRY_COUNT): Promise<any> {

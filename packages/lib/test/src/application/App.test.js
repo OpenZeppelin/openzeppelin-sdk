@@ -162,7 +162,7 @@ contract('App', function (accounts) {
       it('should return a non-upgradeable instance', async function () {
         this.instance._address.should.be.not.null;
         (await this.instance.methods.version().call()).should.be.eq('V1');
-        (await ZWeb3.getCode(this.instance._address)).should.be.eq(ImplV1.deployedBytecode)
+        (await ZWeb3.getCode(this.instance._address)).should.be.eq(ImplV1.schema.deployedBytecode)
       });
     };
 

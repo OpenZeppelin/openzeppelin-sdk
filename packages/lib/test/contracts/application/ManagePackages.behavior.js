@@ -22,9 +22,9 @@ export default function shouldManagePackages(accounts) {
 
   describe('setPackage', function () {  
     beforeEach(async function () {
-      this.directoryV1 = await ImplementationDirectory.new({ from: directoryOwner })
+      this.directoryV1 = await ImplementationDirectory.deploy([], { from: directoryOwner })
       await this.package.methods.addVersion(version_1, this.directoryV1._address, contentURI).send({ from: packageOwner });
-      this.anotherPackage = await Package.new({ from: packageOwner })
+      this.anotherPackage = await Package.deploy([], { from: packageOwner })
       await this.anotherPackage.methods.addVersion(version_0, this.directory._address, contentURI).send({ from: packageOwner });
       this.anotherPackageName = 'AnotherPackage';
 
@@ -79,8 +79,8 @@ export default function shouldManagePackages(accounts) {
 
   describe('getProvider', function () {
     beforeEach(async function () {
-      this.anotherDirectory = await ImplementationDirectory.new({ from: directoryOwner });
-      this.anotherPackage = await Package.new({ from: packageOwner })
+      this.anotherDirectory = await ImplementationDirectory.deploy([], { from: directoryOwner });
+      this.anotherPackage = await Package.deploy([], { from: packageOwner })
       await this.anotherPackage.methods.addVersion(version_1, this.anotherDirectory._address, contentURI).send({ from: packageOwner });
       this.anotherPackageName = 'AnotherPackage';
       await this.app.methods.setPackage(this.anotherPackageName, this.anotherPackage._address, version_1).send({ from: appOwner });

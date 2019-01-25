@@ -13,7 +13,7 @@ import { getUninitializedBaseContracts } from './Initializers';
 import { getStorageLayout, getStructsOrEnums } from './Storage';
 import { compareStorageLayouts, Operation } from './Layout';
 import { hasInitialValuesInDeclarations } from './InitialValues';
-import ContractFactory from '../artifacts/ContractFactory.js';
+import ZosContract from '../artifacts/ZosContract.js';
 import { StorageInfo } from '../utils/ContractAST';
 
 const log = new Logger('validate');
@@ -28,7 +28,7 @@ export interface ValidationInfo {
   storageDiff?: Operation[];
 }
 
-export function validate(contractClass: ContractFactory, existingContractInfo: any = {}, buildArtifacts?: any): any {
+export function validate(contractClass: ZosContract, existingContractInfo: any = {}, buildArtifacts?: any): any {
   const storageValidation = validateStorage(contractClass, existingContractInfo, buildArtifacts);
   const uninitializedBaseContracts = [];
 
@@ -63,7 +63,7 @@ export function validationPasses(validations: any): boolean {
     && isEmpty(validations.uninitializedBaseContracts);
 }
 
-function validateStorage(contractClass: ContractFactory, existingContractInfo: any = {}, buildArtifacts: any = null): { storageUncheckedVars?: StorageInfo[], storageDiff?: Operation[] } {
+function validateStorage(contractClass: ZosContract, existingContractInfo: any = {}, buildArtifacts: any = null): { storageUncheckedVars?: StorageInfo[], storageDiff?: Operation[] } {
   const originalStorageInfo = pick(existingContractInfo, 'storage', 'types');
   if (isEmpty(originalStorageInfo.storage)) return {};
 
@@ -77,7 +77,7 @@ function validateStorage(contractClass: ContractFactory, existingContractInfo: a
   };
 }
 
-function tryGetUninitializedBaseContracts(contractClass: ContractFactory): string[] {
+function tryGetUninitializedBaseContracts(contractClass: ZosContract): string[] {
   try {
     const pipeline = [
       (contracts) => values(contracts),

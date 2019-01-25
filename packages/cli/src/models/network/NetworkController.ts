@@ -13,7 +13,7 @@ import forEach from 'lodash.foreach';
 import isEqual from 'lodash.isequal';
 import concat from 'lodash.concat';
 import toPairs from 'lodash.topairs';
-import { Contracts, ContractFactory, Logger, FileSystem as fs, Proxy, awaitConfirmations, semanticVersionToString } from 'zos-lib';
+import { Contracts, ZosContract, Logger, FileSystem as fs, Proxy, awaitConfirmations, semanticVersionToString } from 'zos-lib';
 import { SimpleProject, AppProject, flattenSourceCode, getStorageLayout, BuildArtifacts, getBuildArtifacts, getSolidityLibNames } from 'zos-lib';
 import { validate, newValidationErrors, validationPasses, App } from 'zos-lib';
 import { Contract } from 'web3-eth-contract';
@@ -134,11 +134,11 @@ export default class NetworkController {
   }
 
   // Contract model
-  private _contractsListForPush(onlyChanged: boolean = false, changedLibraries: ContractFactory[] = []): Array<[string, ContractFactory]> {
+  private _contractsListForPush(onlyChanged: boolean = false, changedLibraries: ZosContract[] = []): Array<[string, ZosContract]> {
     const newVersion = this._newVersionRequired();
     const pipeline = [
       (contracts) => toPairs(contracts),
-      (contracts) => map(contracts, ([contractAlias, contractName]): [string, ContractFactory] => [contractAlias, Contracts.getFromLocal(contractName)]),
+      (contracts) => map(contracts, ([contractAlias, contractName]): [string, ZosContract] => [contractAlias, Contracts.getFromLocal(contractName)]),
       (contracts) => filter(contracts, ([contractAlias, contractClass]) => newVersion || !onlyChanged || this.hasContractChanged(contractAlias, contractClass) || this._hasChangedLibraries(contractClass, changedLibraries))
     ];
 
@@ -146,7 +146,7 @@ export default class NetworkController {
   }
 
   // Contract model || SolidityLib model
-  private _solidityLibsForPush(onlyChanged: boolean = false): ContractFactory[] | never {
+  private _solidityLibsForPush(onlyChanged: boolean = false): ZosContract[] | never {
     const { contractNames, contractAliases } = this.packageFile;
     const libNames = this._getAllSolidityLibNames(contractNames);
 
@@ -165,14 +165,14 @@ export default class NetworkController {
   }
 
   // Contract model || SolidityLib model
-  public async uploadSolidityLibs(libs: ContractFactory[]): Promise<void> {
+  public async uploadSolidityLibs(libs: ZosContract[]): Promise<void> {
     await allPromisesOrError(
       libs.map((lib) => this._uploadSolidityLib(lib))
     );
   }
 
   // Contract model || SolidityLib model
-  private async _uploadSolidityLib(libClass: ContractFactory): Promise<void> {
+  private async _uploadSolidityLib(libClass: ZosContract): Promise<void> {
     const libName = libClass.contractName;
     log.info(`Uploading ${libName} library...`);
     const libInstance = await this.project.setImplementation(libClass, libName);
@@ -180,7 +180,7 @@ export default class NetworkController {
   }
 
   // Contract model
-  public async uploadContracts(contracts: Array<[string, ContractFactory]>): Promise<void> {
+  public async uploadContracts(contracts: Array<[string, ZosContract]>): Promise<void> {
     await allPromisesOrError(
       contracts.map(
         ([contractAlias, contractClass]) => this.uploadContract(contractAlias, contractClass)
@@ -189,10 +189,10 @@ export default class NetworkController {
   }
 
   // Contract model
-  public async uploadContract(contractAlias: string, contractClass: ContractFactory): Promise<void | never> {
+  public async uploadContract(contractAlias: string, contractClass: ZosContract): Promise<void | never> {
     try {
       await this._setSolidityLibs(contractClass);
-      log.info(`Uploading ${contractClass.contractName} contract as ${contractAlias}`);
+      log.info(`Uploading ${contractClass.schema.contractName} contract as ${contractAlias}`);
       const contractInstance = await this.project.setImplementation(contractClass, contractAlias);
       this.networkFile.addContract(contractAlias, contractInstance, {
         warnings: contractClass.warnings,
@@ -206,8 +206,8 @@ export default class NetworkController {
   }
 
   // Contract model || SolidityLib model
-  private async _setSolidityLibs(contractClass: ContractFactory): Promise<void> {
-    const currentContractLibs = getSolidityLibNames(contractClass.bytecode);
+  private async _setSolidityLibs(contractClass: ZosContract): Promise<void> {
+    const currentContractLibs = getSolidityLibNames(contractClass.schema.bytecode);
     const libraries = this.networkFile.getSolidityLibs(currentContractLibs);
     await contractClass.link(libraries);
   }
@@ -234,16 +234,16 @@ export default class NetworkController {
   }
 
   // Contract model || SolidityLib model
-  private _hasChangedLibraries(contractClass: ContractFactory, changedLibraries: ContractFactory[]): boolean {
-    const libNames = getSolidityLibNames(contractClass.bytecode);
-    return !isEmpty(intersection(changedLibraries.map((c) => c.contractName), libNames));
+  private _hasChangedLibraries(contractClass: ZosContract, changedLibraries: ZosContract[]): boolean {
+    const libNames = getSolidityLibNames(contractClass.schema.bytecode);
+    return !isEmpty(intersection(changedLibraries.map((c) => c.schema.contractName), libNames));
   }
 
   // Contract model || SolidityLib model
   private _getAllSolidityLibNames(contractNames: string[]): string[] {
     const libNames = contractNames.map((contractName) => {
       const contractClass = Contracts.getFromLocal(contractName);
-      return getSolidityLibNames(contractClass.bytecode);
+      return getSolidityLibNames(contractClass.schema.bytecode);
     });
 
     return uniq(flatten(libNames));
@@ -269,15 +269,15 @@ export default class NetworkController {
   }
 
   // DeployerController || Contract model
-  public validateContracts(contracts: Array<[string, ContractFactory]>, buildArtifacts: BuildArtifacts): boolean {
+  public validateContracts(contracts: Array<[string, ZosContract]>, buildArtifacts: BuildArtifacts): boolean {
     return every(contracts.map(([contractAlias, contractClass]) =>
       this.validateContract(contractAlias, contractClass, buildArtifacts))
     );
   }
 
   // DeployerController || Contract model
-  public validateContract(contractAlias: string, contractClass: ContractFactory, buildArtifacts: BuildArtifacts): boolean {
-    log.info(`Validating contract ${contractClass.contractName}`);
+  public validateContract(contractAlias: string, contractClass: ZosContract, buildArtifacts: BuildArtifacts): boolean {
+    log.info(`Validating contract ${contractClass.schema.contractName}`);
     const existingContractInfo: any = this.networkFile.contract(contractAlias) || {};
     const warnings = validate(contractClass, existingContractInfo, buildArtifacts);
     const newWarnings = newValidationErrors(warnings, existingContractInfo.warnings);
@@ -343,12 +343,12 @@ export default class NetworkController {
   }
 
   // Contract model || SolidityLib model
-  private _hasSolidityLibChanged(libClass: ContractFactory): boolean {
-    return !this.networkFile.hasSameBytecode(libClass.contractName, libClass);
+  private _hasSolidityLibChanged(libClass: ZosContract): boolean {
+    return !this.networkFile.hasSameBytecode(libClass.schema.contractName, libClass);
   }
 
   // Contract model
-  public hasContractChanged(contractAlias: string, contractClass?: ContractFactory): boolean {
+  public hasContractChanged(contractAlias: string, contractClass?: ZosContract): boolean {
     if (!this.isLocalContract(contractAlias)) return false;
     if (!this.isContractDeployed(contractAlias)) return true;
 
@@ -465,12 +465,12 @@ export default class NetworkController {
   }
 
   // Proxy model
-  public checkInitialization(contractClass: ContractFactory, calledInitMethod: string, calledInitArgs: string[]): void {
+  public checkInitialization(contractClass: ZosContract, calledInitMethod: string, calledInitArgs: string[]): void {
     // If there is an initializer called, assume it's ok
     if (calledInitMethod) return;
 
     // Otherwise, warn the user to invoke it
-    const initializeMethod = contractClass.abi.find((fn) => fn.type === 'function' && fn.name === 'initialize');
+    const initializeMethod = contractClass.schema.abi.find((fn) => fn.type === 'function' && fn.name === 'initialize');
     if (!initializeMethod) return;
     log.error(`Possible initialization method 'initialize' found in contract. Make sure you initialize your instance.`);
   }
@@ -563,14 +563,14 @@ export default class NetworkController {
   }
 
   // Proxy model
-  private _checkUpgrade(contractClass: ContractFactory, calledMigrateMethod: string, calledMigrateArgs: string[]): void {
+  private _checkUpgrade(contractClass: ZosContract, calledMigrateMethod: string, calledMigrateArgs: string[]): void {
     // If there is a migration called, assume it's ok
     if (calledMigrateMethod) return;
 
     // Otherwise, warn the user to invoke it
-    const migrateMethod = contractClass.abi.find((fn) => fn.type === 'function' && fn.name === 'migrate');
+    const migrateMethod = contractClass.schema.abi.find((fn) => fn.type === 'function' && fn.name === 'migrate');
     if (!migrateMethod) return;
-    log.error(`Possible migration method 'migrate' found in contract ${contractClass.contractName}. Remember running the migration after deploying it.`);
+    log.error(`Possible migration method 'migrate' found in contract ${contractClass.schema.contractName}. Remember running the migration after deploying it.`);
   }
 
   // Proxy model

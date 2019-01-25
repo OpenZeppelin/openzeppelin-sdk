@@ -1,7 +1,7 @@
 import ZWeb3 from '../artifacts/ZWeb3';
 import Contracts from '../artifacts/Contracts';
 import { toAddress, uint256ToAddress } from '../utils/Addresses';
-import ContractFactory from '../artifacts/ContractFactory';
+import ZosContract from '../artifacts/ZosContract';
 import { Contract } from 'web3-eth-contract';
 import { deploy as deployContract, sendTransaction } from '../utils/Transactions';
 

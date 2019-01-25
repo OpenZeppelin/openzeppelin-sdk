@@ -306,8 +306,8 @@ contract('StatusComparator', function([_, owner, anotherAddress]) {
 
       describe('when the network file has some contracts', function () {
         beforeEach('adding some contracts', async function () {
-          this.impl = await ImplV1.new()
-          this.childImpl = await ChildImplV1.new()
+          this.impl = await ImplV1.deploy()
+          this.childImpl = await ChildImplV1.deploy()
 
           this.networkFile.addContract('Impl', this.impl, getStorageLayout(ImplV1))
           this.networkFile.addContract('ChildImpl', this.childImpl, getStorageLayout(ChildImplV1))
@@ -422,8 +422,8 @@ contract('StatusComparator', function([_, owner, anotherAddress]) {
   function testProxies () {
     describe('proxies', function () {
       beforeEach('adding some contracts', async function () {
-        this.impl = await ImplV1.new()
-        this.childImpl = await ChildImplV1.new()
+        this.impl = await ImplV1.deploy()
+        this.childImpl = await ChildImplV1.deploy()
 
         this.networkFile.addContract('Impl', this.impl, getStorageLayout(ImplV1))
         this.networkFile.addContract('ChildImpl', this.childImpl, getStorageLayout(ChildImplV1))

@@ -1,6 +1,6 @@
 import invertBy from 'lodash.invertby';
 import Contracts from '../artifacts/Contracts';
-import ContractFactory from '../artifacts/ContractFactory.js';
+import ZosContract from '../artifacts/ZosContract.js';
 import { Node } from '../utils/ContractAST';
 
 /**
@@ -9,22 +9,22 @@ import { Node } from '../utils/ContractAST';
  * @param {*} contractClass contract class to check (including all its ancestors)
  */
 // TS-TODO: define return type
-export function getUninitializedBaseContracts(contractClass: ContractFactory): string[] {
+export function getUninitializedBaseContracts(contractClass: ZosContract): string[] {
   const uninitializedBaseContracts = {};
   getUninitializedDirectBaseContracts(contractClass, uninitializedBaseContracts);
   return invertBy(uninitializedBaseContracts);
 }
 
 // TS-TODO: define return type
-function getUninitializedDirectBaseContracts(contractClass: ContractFactory, uninitializedBaseContracts: any): void {
+function getUninitializedDirectBaseContracts(contractClass: ZosContract, uninitializedBaseContracts: any): void {
   // Check whether the contract has base contracts
-  const baseContracts: any = contractClass.ast.nodes.find((n) => n.name === contractClass.contractName).baseContracts;
+  const baseContracts: any = contractClass.schema.ast.nodes.find((n) => n.name === contractClass.schema.contractName).baseContracts;
   if (baseContracts.length === 0) return;
 
   // Run check for the base contracts
   for (const baseContract of baseContracts) {
     const baseContractName: string = baseContract.baseName.name;
-    const baseContractClass: ContractFactory = Contracts.getFromLocal(baseContractName);
+    const baseContractClass: ZosContract = Contracts.getFromLocal(baseContractName);
     getUninitializedDirectBaseContracts(baseContractClass, uninitializedBaseContracts);
   }
 
@@ -33,7 +33,7 @@ function getUninitializedDirectBaseContracts(contractClass: ContractFactory, uni
   const baseContractInitializers: any = {};
   for (const baseContract of baseContracts) {
     const baseContractName: string = baseContract.baseName.name;
-    const baseContractClass: ContractFactory = Contracts.getFromLocal(baseContractName);
+    const baseContractClass: ZosContract = Contracts.getFromLocal(baseContractName);
     // TS-TODO: define type?
     const baseContractInitializer = getContractInitializer(baseContractClass);
     if (baseContractInitializer !== undefined) {
@@ -50,7 +50,7 @@ function getUninitializedDirectBaseContracts(contractClass: ContractFactory, uni
     // If there are 2 or more base contracts with initializers, child contract should initialize all of them
     if (baseContractsWithInitialize.length > 1) {
       for (const baseContract of baseContractsWithInitialize) {
-        uninitializedBaseContracts[baseContract] = contractClass.contractName;
+        uninitializedBaseContracts[baseContract] = contractClass.schema.contractName;
       }
     }
 
@@ -72,15 +72,15 @@ function getUninitializedDirectBaseContracts(contractClass: ContractFactory, uni
   // For each base contract with "initialize" function, check that it's called in the function
   for (const contractName of baseContractsWithInitialize) {
     if (!initializedContracts[contractName]) {
-      uninitializedBaseContracts[contractName] = contractClass.contractName;
+      uninitializedBaseContracts[contractName] = contractClass.schema.contractName;
   }
     }
   return;
 }
 
-function getContractInitializer(contractClass: ContractFactory): Node | undefined {
-  const contractDefinition: Node = contractClass.ast.nodes
-    .find((n: Node) => n.nodeType === 'ContractDefinition' && n.name === contractClass.contractName);
+function getContractInitializer(contractClass: ZosContract): Node | undefined {
+  const contractDefinition: Node = contractClass.schema.ast.nodes
+    .find((n: Node) => n.nodeType === 'ContractDefinition' && n.name === contractClass.schema.contractName);
   const contractFunctions: Node[] = contractDefinition.nodes.filter((n) => n.nodeType === 'FunctionDefinition');
   for (const contractFunction of contractFunctions) {
     const functionModifiers: any = contractFunction.modifiers;

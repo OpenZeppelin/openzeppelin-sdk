@@ -1,6 +1,6 @@
 import glob from 'glob';
 import path from 'path';
-import ContractFactory from './ContractFactory';
+import ZosContract from './ZosContract';
 import ZWeb3 from './ZWeb3';
 
 export default class Contracts {
@@ -47,15 +47,15 @@ export default class Contracts {
     return `${process.cwd()}/node_modules/${dependency}/build/contracts/${contractName}.json`;
   }
 
-  public static getFromLocal(contractName: string): ContractFactory {
+  public static getFromLocal(contractName: string): ZosContract {
     return Contracts._getFromPath(Contracts.getLocalPath(contractName));
   }
 
-  public static getFromLib(contractName: string): ContractFactory {
+  public static getFromLib(contractName: string): ZosContract {
     return Contracts._getFromPath(Contracts.getLibPath(contractName));
   }
 
-  public static getFromNodeModules(dependency: string, contractName: string): ContractFactory {
+  public static getFromNodeModules(dependency: string, contractName: string): ZosContract {
     return Contracts._getFromPath(Contracts.getNodeModulesPath(dependency, contractName));
   }
 
@@ -79,8 +79,8 @@ export default class Contracts {
     Contracts.artifactDefaults = { ...Contracts.getArtifactsDefaults(), ...defaults };
   }
 
-  private static _getFromPath(targetPath: string): ContractFactory {
-    const schema: any = require(targetPath);
-    return new ContractFactory(schema, Contracts.getSyncTimeout());
+  private static _getFromPath(targetPath: string): ZosContract {
+    const schema = require(targetPath);
+    return new ZosContract(schema);
   }
 }

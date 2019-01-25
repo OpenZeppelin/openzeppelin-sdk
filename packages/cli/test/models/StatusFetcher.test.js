@@ -309,8 +309,8 @@ contract('StatusFetcher', async function([_, owner, anotherAddress]) {
 
       describe('when the network file has some contracts', function () {
         beforeEach('adding some contracts', async function () {
-          this.impl = await ImplV1.new()
-          this.childImpl = await ChildImplV1.new()
+          this.impl = await ImplV1.deploy()
+          this.childImpl = await ChildImplV1.deploy()
 
           this.networkFile.addContract('Impl', this.impl, getStorageLayout(ImplV1))
           this.networkFile.addContract('ChildImpl', this.childImpl, getStorageLayout(ChildImplV1))
@@ -428,8 +428,8 @@ contract('StatusFetcher', async function([_, owner, anotherAddress]) {
   function testProxies () {
     describe('proxies', function () {
       beforeEach('adding some contracts', async function () {
-        this.impl = await ImplV1.new()
-        this.childImpl = await ChildImplV1.new()
+        this.impl = await ImplV1.deploy()
+        this.childImpl = await ChildImplV1.deploy()
 
         this.networkFile.addContract('Impl', this.impl, getStorageLayout(ImplV1))
         this.networkFile.addContract('ChildImpl', this.childImpl, getStorageLayout(ChildImplV1))
@@ -438,8 +438,7 @@ contract('StatusFetcher', async function([_, owner, anotherAddress]) {
         await this.directory.unsetImplementation('Impl')
         await this.directory.setImplementation('ChildImpl', this.childImpl._address)
         await this.directory.setImplementation('Impl', this.impl._address)
-      })
-
+      }) 
       describe('when the network file does not have any proxies', function () {
         describe('when the app does not have any proxy registered', function () {
           it('does not modoify the proxies list', async function () {

@@ -13,7 +13,7 @@ const SampleChild = Contracts.getFromLocal('SampleChild');
 contract('Initializable', function () {
   describe('basic testing without inheritance', function () {
     beforeEach('deploying', async function () {
-      this.contract = await InitializableMock.new();
+      this.contract = await InitializableMock.deploy();
     });
 
     context('before initialize', function () {
@@ -54,7 +54,7 @@ contract('Initializable', function () {
     const child  = 78;
 
     beforeEach('deploying', async function () {
-      this.contract = await SampleChild.new();
+      this.contract = await SampleChild.deploy();
     });
 
     beforeEach('initializing', async function () {

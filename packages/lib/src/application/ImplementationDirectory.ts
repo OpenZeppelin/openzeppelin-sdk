@@ -1,7 +1,7 @@
 import Logger from '../utils/Logger';
 import { sendTransaction, deploy } from '../utils/Transactions';
 import Contracts from '../artifacts/Contracts';
-import ContractFactory from '../artifacts/ContractFactory';
+import ZosContract from '../artifacts/ZosContract';
 import { Contract } from 'web3-eth-contract';
 
 const log = new Logger('ImplementationDirectory');
@@ -14,9 +14,9 @@ export default class ImplementationDirectory {
 
   public static async deploy(txParams: any = {}): Promise<ImplementationDirectory> {
     const contractClass = this.getContractClass();
-    log.info(`Deploying new ${contractClass.contractName}...`);
+    log.info(`Deploying new ${contractClass.schema.contractName}...`);
     const directory = await deploy(contractClass, [], txParams);
-    log.info(`Deployed ${contractClass.contractName} at ${directory._address}`);
+    log.info(`Deployed ${contractClass.schema.contractName} at ${directory._address}`);
     return new this(directory, txParams);
   }
 
@@ -26,7 +26,7 @@ export default class ImplementationDirectory {
     return new this(directory, txParams);
   }
 
-  public static getContractClass(): ContractFactory {
+  public static getContractClass(): ZosContract {
     return Contracts.getFromLib('ImplementationDirectory');
   }
 

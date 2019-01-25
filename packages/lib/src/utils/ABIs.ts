@@ -1,6 +1,6 @@
 import encodeCall from '../helpers/encodeCall';
 import ContractAST, { Node } from './ContractAST';
-import ContractFactory from '../artifacts/ContractFactory';
+import ZosContract from '../artifacts/ZosContract';
 import { hasUnlinkedVariables, getSolidityLibNames } from './Bytecode';
 import ZWeb3 from '../artifacts/ZWeb3';
 
@@ -19,37 +19,37 @@ interface FunctionInfo {
   inputs: InputInfo[];
 }
 
-export function buildDeploymentCallData(contract: ContractFactory, args: any[], txParams: any): string {
-  if(contract.bytecode === '') throw new Error(`A bytecode must be provided for contract ${contract.contractName}`);
-  if(hasUnlinkedVariables(contract.binary)) throw new Error(`${contract.contractName} bytecode contains unlinked libraries: ${getSolidityLibNames(contract.binary).join(', ')}`);
-  return ZWeb3.contract(contract.abi).deploy({data: contract.binary, arguments: args}).encodeABI();
+export function buildDeploymentCallData(contract: ZosContract, args: any[], txParams: any): string {
+  if(contract.schema.bytecode === '') throw new Error(`A bytecode must be provided for contract ${contract.schema.contractName}`);
+  if(hasUnlinkedVariables(contract.binary)) throw new Error(`${contract.schema.contractName} bytecode contains unlinked libraries: ${getSolidityLibNames(contract.binary).join(', ')}`);
+  return ZWeb3.contract(contract.schema.abi).deploy({data: contract.binary, arguments: args}).encodeABI();
 }
 
-export function buildCallData(contractClass: ContractFactory, methodName: string, args: any[]): CalldataInfo {
+export function buildCallData(contractClass: ZosContract, methodName: string, args: any[]): CalldataInfo {
   const method = getABIFunction(contractClass, methodName, args);
   const argTypes = method.inputs.map((input) => input.type);
   const callData = encodeCall(method.name, argTypes, args);
   return { method, callData };
 }
 
-export function getABIFunction(contractClass: ContractFactory, methodName: string, args: any[]): FunctionInfo {
+export function getABIFunction(contractClass: ZosContract, methodName: string, args: any[]): FunctionInfo {
   const targetMethod: FunctionInfo = tryGetTargetFunction(contractClass, methodName, args);
   if (targetMethod) methodName = targetMethod.name;
 
   const matchArgsTypes = (fn) => targetMethod && fn.inputs.every((input, index) => targetMethod.inputs[index] && targetMethod.inputs[index].type === input.type);
   const matchNameAndArgsLength = (fn) => fn.name === methodName && fn.inputs.length === args.length;
 
-  let abiMethods: FunctionInfo[] = contractClass.abi.filter((fn) => matchNameAndArgsLength(fn) && matchArgsTypes(fn));
-  if (abiMethods.length === 0) abiMethods = contractClass.abi.filter((fn) => matchNameAndArgsLength(fn));
+  let abiMethods: FunctionInfo[] = contractClass.schema.abi.filter((fn) => matchNameAndArgsLength(fn) && matchArgsTypes(fn));
+  if (abiMethods.length === 0) abiMethods = contractClass.schema.abi.filter((fn) => matchNameAndArgsLength(fn));
 
   switch (abiMethods.length) {
-    case 0: throw Error(`Could not find method ${methodName} with ${args.length} arguments in contract ${contractClass.contractName}`);
+    case 0: throw Error(`Could not find method ${methodName} with ${args.length} arguments in contract ${contractClass.schema.contractName}`);
     case 1: return abiMethods[0];
-    default: throw Error(`Found more than one match for function ${methodName} with ${args.length} arguments in contract ${contractClass.contractName}`);
+    default: throw Error(`Found more than one match for function ${methodName} with ${args.length} arguments in contract ${contractClass.schema.contractName}`);
   }
 }
 
-function tryGetTargetFunction(contractClass: ContractFactory, methodName: string, args: string[] | undefined): FunctionInfo {
+function tryGetTargetFunction(contractClass: ZosContract, methodName: string, args: string[] | undefined): FunctionInfo {
   // Match foo(uint256,string) as method name, and look for that in the ABI
   const match: string[] = methodName.match(/^\s*(.+)\((.*)\)\s*$/);
   if (match) {
@@ -70,7 +70,7 @@ function tryGetTargetFunction(contractClass: ContractFactory, methodName: string
   }
 }
 
-function tryGetFunctionNodeFromMostDerivedContract(contractClass: ContractFactory, methodName: string, args: any[]): Node | null {
+function tryGetFunctionNodeFromMostDerivedContract(contractClass: ZosContract, methodName: string, args: any[]): Node | null {
   const linearizedBaseContracts: Node[] | null = tryGetLinearizedBaseContracts(contractClass);
   if (!linearizedBaseContracts) return null;
 
@@ -85,13 +85,13 @@ function tryGetFunctionNodeFromMostDerivedContract(contractClass: ContractFactor
     switch (funs.length) {
       case 0: continue;
       case 1: return funs[0];
-      default: throw Error(`Found more than one match for function ${methodName} with ${args.length} arguments in contract ${contractClass.contractName}`);
+      default: throw Error(`Found more than one match for function ${methodName} with ${args.length} arguments in contract ${contractClass.schema.contractName}`);
     }
   }
-  throw Error(`Could not find method ${methodName} with ${args.length} arguments in contract ${contractClass.contractName}`);
+  throw Error(`Could not find method ${methodName} with ${args.length} arguments in contract ${contractClass.schema.contractName}`);
 }
 
-function tryGetLinearizedBaseContracts(contractClass: ContractFactory): Node[] | null {
+function tryGetLinearizedBaseContracts(contractClass: ZosContract): Node[] | null {
   try {
     const ast: ContractAST = new ContractAST(contractClass, null, { nodesFilter: ['ContractDefinition', 'FunctionDefinition'] });
     return ast.getLinearizedBaseContracts(true);

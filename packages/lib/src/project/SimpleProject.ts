@@ -7,7 +7,7 @@ import { deploy } from '../utils/Transactions';
 import { toAddress } from '../utils/Addresses';
 import { bytecodeDigest } from '..';
 import { buildCallData, callDescription, CalldataInfo } from '../utils/ABIs';
-import ContractFactory from '../artifacts/ContractFactory';
+import ZosContract from '../artifacts/ZosContract';
 import { Contract } from 'web3-eth-contract';
 import { ContractInterface } from './AppProject';
 import { toSemanticVersion } from '../utils/Semver';
@@ -51,17 +51,17 @@ export default class SimpleProject  {
     const initCallData = this._getAndLogInitCallData(contractClass, initMethodName, initArgs, implementationAddress, 'Creating');
     const proxy = await Proxy.deploy(implementationAddress, initCallData, this.txParams);
     log.info(`Instance created at ${proxy.address}`);
-    return contractClass.at(proxy.address);
+    return new ZosContract(contractClass.schema).at(proxy.address);
   }
 
-  public async upgradeProxy(proxyAddress: string, contractClass: ContractFactory, { packageName, contractName, initMethod: initMethodName, initArgs, redeployIfChanged }: ContractInterface = {}): Promise<Contract> {
+  public async upgradeProxy(proxyAddress: string, contractClass: ZosContract, { packageName, contractName, initMethod: initMethodName, initArgs, redeployIfChanged }: ContractInterface = {}): Promise<Contract> {
     proxyAddress = toAddress(proxyAddress);
     const implementationAddress = await this._getOrDeployImplementation(contractClass, packageName, contractName, redeployIfChanged);
     const initCallData = this._getAndLogInitCallData(contractClass, initMethodName, initArgs, implementationAddress, 'Upgrading');
     const proxy = Proxy.at(proxyAddress, this.txParams);
     await proxy.upgradeTo(implementationAddress, initCallData);
     log.info(`Instance at ${proxyAddress} upgraded`);
-    return contractClass.at(proxyAddress);
+    return new ZosContract(contractClass.schema).at(proxyAddress);
   }
 
   public async changeProxyAdmin(proxyAddress: string, newAdmin: string): Promise<Proxy> {
@@ -71,9 +71,9 @@ export default class SimpleProject  {
     return proxy;
   }
 
-  public async setImplementation(contractClass: ContractFactory, contractName?: string): Promise<any> {
-    log.info(`Deploying logic contract for ${contractClass.contractName}`);
-    if (!contractName) contractName = contractClass.contractName;
+  public async setImplementation(contractClass: ZosContract, contractName?: string): Promise<any> {
+    log.info(`Deploying logic contract for ${contractClass.schema.contractName}`);
+    if (!contractName) contractName = contractClass.schema.contractName;
     const implementation: any = await deploy(contractClass, [], this.txParams);
     await this.registerImplementation(contractName, {
       address: implementation._address,
@@ -118,8 +118,8 @@ export default class SimpleProject  {
     delete this.dependencies[name];
   }
 
-  public async _getOrDeployImplementation(contractClass: ContractFactory, packageName: string, contractName?: string, redeployIfChanged?: boolean): Promise<string | never> {
-    if (!contractName) contractName = contractClass.contractName;
+  public async _getOrDeployImplementation(contractClass: ZosContract, packageName: string, contractName?: string, redeployIfChanged?: boolean): Promise<string | never> {
+    if (!contractName) contractName = contractClass.schema.contractName;
 
     const implementation = !packageName || packageName === this.name
       ? await this._getOrDeployOwnImplementation(contractClass, contractName, redeployIfChanged)
@@ -129,7 +129,7 @@ export default class SimpleProject  {
     return implementation;
   }
 
-  public async _getOrDeployOwnImplementation(contractClass: ContractFactory, contractName: string, redeployIfChanged?: boolean): Promise<string> {
+  public async _getOrDeployOwnImplementation(contractClass: ZosContract, contractName: string, redeployIfChanged?: boolean): Promise<string> {
     const existing: Implementation = this.implementations[contractName];
     const contractChanged: boolean = existing && existing.bytecodeHash !== bytecodeDigest(contractClass.deployedBinary);
     const shouldRedeploy: boolean = !existing || (redeployIfChanged && contractChanged);
@@ -145,7 +145,7 @@ export default class SimpleProject  {
     return thepackage.getImplementation(version, contractName);
   }
 
-  private _getAndLogInitCallData(contractClass: ContractFactory, initMethodName?: string, initArgs?: string[], implementationAddress?: string, actionLabel?: string): string | null {
+  private _getAndLogInitCallData(contractClass: ZosContract, initMethodName?: string, initArgs?: string[], implementationAddress?: string, actionLabel?: string): string | null {
     if (initMethodName) {
       const { method: initMethod, callData }: CalldataInfo = buildCallData(contractClass, initMethodName, initArgs);
       log.info(`${actionLabel} proxy to logic contract ${implementationAddress} and initializing by calling ${callDescription(initMethod, initArgs)}`);

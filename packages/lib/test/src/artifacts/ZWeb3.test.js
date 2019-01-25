@@ -12,7 +12,7 @@ contract('ZWeb3', accounts => {
   
   before('deploy dummy instance', async function () {
     const DummyImplementation = Contracts.getFromLocal('DummyImplementation')
-    this.impl = await DummyImplementation.new()
+    this.impl = await DummyImplementation.deploy()
   })
 
   describe('when it is not initialized', function () {
@@ -92,7 +92,7 @@ contract('ZWeb3', accounts => {
     describe('get code', function () {
       it('can tell the deployed bytecode of a certain address', async function () {
         const bytecode = await ZWeb3.getCode(this.impl._address)
-        bytecode.should.be.equal(this.impl.zosInjections.jsonInterface.deployedBytecode)
+        bytecode.should.be.equal(this.impl.schema.deployedBytecode)
       })
     })
 
@@ -106,8 +106,8 @@ contract('ZWeb3', accounts => {
 
     describe('estimate gas', function () {
       it('can estimate the gas of a call', async function () {
-        const { gasUsed: expectedGas } = this.impl.zosInjections.deploymentTransactionReceipt
-        const gas = await ZWeb3.estimateGas({ data: this.impl.zosInjections.jsonInterface.bytecode })
+        const { gasUsed: expectedGas } = this.impl.deploymentTransactionReceipt
+        const gas = await ZWeb3.estimateGas({ data: this.impl.schema.bytecode })
         gas.should.be.equal(expectedGas)
       })
     })

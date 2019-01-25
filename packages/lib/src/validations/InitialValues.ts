@@ -1,18 +1,18 @@
 import isEmpty from 'lodash.isempty';
 import Contracts from '../artifacts/Contracts';
-import ContractFactory from '../artifacts/ContractFactory.js';
+import ZosContract from '../artifacts/ZosContract.js';
 import { Node } from '../utils/ContractAST';
 
-export function hasInitialValuesInDeclarations(contractClass: ContractFactory): boolean {
+export function hasInitialValuesInDeclarations(contractClass: ZosContract): boolean {
   return detectInitialValues(contractClass);
 }
 
-function detectInitialValues(contractClass: ContractFactory): boolean {
-  const nodes = contractClass.ast.nodes.filter((n) => n.name === contractClass.contractName);
+function detectInitialValues(contractClass: ZosContract): boolean {
+  const nodes = contractClass.schema.ast.nodes.filter((n) => n.name === contractClass.schema.contractName);
   for (const node of nodes) {
     if (hasInitialValues(node)) return true;
     for (const baseContract of node.baseContracts || []) {
-      const parentContract: ContractFactory = Contracts.getFromLocal(baseContract.baseName.name);
+      const parentContract: ZosContract = Contracts.getFromLocal(baseContract.baseName.name);
       return detectInitialValues(parentContract);
     }
   }
