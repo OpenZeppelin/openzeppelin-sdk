@@ -81,7 +81,7 @@ contract('push script', function([_, owner]) {
       const address = this.networkFile.solidityLib('UintLib').address;
       const code = await ZWeb3.getCode(address)
       const uintLib = Contracts.getFromLocal('UintLib');
-      code.length.should.eq(uintLib.deployedBytecode.length).and.be.greaterThan(40);
+      code.length.should.eq(uintLib.schema.deployedBytecode.length).and.be.greaterThan(40);
     });
 
     it('should deploy and link contracts that require libraries', async function () {

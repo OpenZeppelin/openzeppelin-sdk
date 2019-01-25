@@ -4,25 +4,8 @@ import { getSolidityLibNames, hasUnlinkedVariables } from '../utils/Bytecode';
 import { StorageLayoutInfo } from '../validations/Storage';
 import { Contract, TransactionObject } from 'web3-eth-contract';
 import { TransactionReceipt } from 'web3/types';
-import Contracts from './Contracts';
+import Contracts, { ContractSchema } from './Contracts';
 import _ from 'lodash';
-
-interface ContractSchema {
-  schemaVersion: string;
-  contractName: string;
-  abi: any[];
-  bytecode: string;
-  deployedBytecode: string;
-  sourceMap: string;
-  deployedSourceMap: string;
-  source: string;
-  sourcePath: string;
-  ast: any;
-  legacyAST: any;
-  compiler: any;
-  networks: any;
-  updatedAt: string;
-}
 
 export default class ZosContract {
 

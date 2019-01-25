@@ -158,7 +158,7 @@ export default class NetworkController {
     return libNames
       .map((libName) => Contracts.getFromLocal(libName))
       .filter((libClass) => {
-        const hasSolidityLib = this.networkFile.hasSolidityLib(libClass.contractName);
+        const hasSolidityLib = this.networkFile.hasSolidityLib(libClass.schema.contractName);
         const hasChanged = this._hasSolidityLibChanged(libClass);
         return (!hasSolidityLib || !onlyChanged || hasChanged);
       });
@@ -173,7 +173,7 @@ export default class NetworkController {
 
   // Contract model || SolidityLib model
   private async _uploadSolidityLib(libClass: ZosContract): Promise<void> {
-    const libName = libClass.contractName;
+    const libName = libClass.schema.contractName;
     log.info(`Uploading ${libName} library...`);
     const libInstance = await this.project.setImplementation(libClass, libName);
     this.networkFile.addSolidityLib(libName, libInstance);

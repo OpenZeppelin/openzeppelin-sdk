@@ -3,6 +3,23 @@ import path from 'path';
 import ZosContract from './ZosContract';
 import ZWeb3 from './ZWeb3';
 
+export interface ContractSchema {
+  schemaVersion: string;
+  contractName: string;
+  abi: any[];
+  bytecode: string;
+  deployedBytecode: string;
+  sourceMap: string;
+  deployedSourceMap: string;
+  source: string;
+  sourcePath: string;
+  ast: any;
+  legacyAST: any;
+  compiler: any;
+  networks: any;
+  updatedAt: string;
+}
+
 export default class Contracts {
   private static DEFAULT_SYNC_TIMEOUT: number = 240000;
   private static DEFAULT_BUILD_DIR: string = `${process.cwd()}/build/contracts`;

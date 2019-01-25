@@ -111,8 +111,8 @@ class StorageLayout {
         if (this.imports.has(importPath)) return;
         this.imports.add(importPath);
         this.artifacts.getArtifactsFromSourcePath(importPath).forEach((importedArtifact) => {
-          this.collectNodes(importedArtifact.schema.ast);
-          this.collectImports(importedArtifact.schema.ast);
+          this.collectNodes(importedArtifact.ast);
+          this.collectImports(importedArtifact.ast);
         });
       });
   }
