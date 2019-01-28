@@ -303,6 +303,129 @@ contract('Transactions', function(accounts) {
     });
   });
 
+  describe('sendRawTransaction', function () {
+    beforeEach('deploys contract', async function () {
+      this.instance = await Transactions.deployContract(this.DummyImplementation);
+      this.encodedCall = encodeCall('initialize', ['uint256', 'string', 'uint256[]'], DEFAULT_PARAMS);
+    });
+
+    it.only('correctly sends the transaction', async function () {
+      await Transactions.sendRawTransaction(this.instance.address, this.encodedCall);
+      const actualValue = await this.instance.methods.value().call();
+      actualValue.should.eq('42');
+    });
+
+    it('honours other tx params', async function () {
+      const txWrapper = await Transactions.sendDataTransaction(this.instance, { data: this.encodedCall, from: account2 });
+      await assertFrom(txWrapper.receipt.transactionHash, account2);
+    });
+
+    it('handles failing transactions', async function () {
+      await assertRevert(Transactions.sendDataTransaction(this.instance, { data: encodeCall('reverts') }));
+    });
+
+    describe('gas', function () {
+      afterEach('restore stubs', function () {
+        sinon.restore();
+      })
+
+      describe('when there is a default gas amount defined', function () {
+        describe('when a gas amount is given', function () {
+          it('uses specified gas', async function () {
+            const txWrapper = await Transactions.sendDataTransaction(this.instance, { data: this.encodedCall, gas: 800000 });
+            await assertGas(txWrapper.receipt.transactionHash, 800000);
+          });
+        });
+
+        describe('when no gas amount is given', function () {
+          it('uses the default gas amount', async function () {
+            const receipt = await Transactions.sendTransaction(this.instance.methods.initialize, DEFAULT_PARAMS);
+            await assertGas(receipt.transactionHash, DEFAULT_GAS);
+          });
+        });
+      });
+
+      describe('when there is no default gas defined', function () {
+        beforeEach('stub default gas amount', function () {
+          sinon.stub(Contracts, 'getArtifactsDefaults').resolves({ from: _account1, gas: undefined, gasPrice: 100000000000 })
+        });
+
+        describe('when a gas amount is given', function () {
+          it('uses specified gas', async function () {
+            const txWrapper = await Transactions.sendDataTransaction(this.instance, { data: this.encodedCall, gas: 800000 });
+            await assertGas(txWrapper.receipt.transactionHash, 800000);
+          });
+        });
+
+        describe('when no gas amount is given', function () {
+          it('estimates gas', async function () {
+            const txWrapper = await Transactions.sendDataTransaction(this.instance, { data: this.encodedCall });
+            await assertGasLt(txWrapper.receipt.transactionHash, 1000000);
+          });
+
+          it('retries estimating gas', async function () {
+            const stub = sinon.stub(ZWeb3, 'estimateGas')
+            _.times(3, i => stub.onCall(i).throws('Error', 'gas required exceeds allowance or always failing transaction'));
+            stub.returns(800000)
+
+            const txWrapper = await Transactions.sendDataTransaction(this.instance, { data: this.encodedCall });
+            await assertGas(txWrapper.receipt.transactionHash, 800000 * 1.25 + 15000);
+          });
+
+          it('retries estimating gas up to 3 times', async function () {
+            const stub = sinon.stub(ZWeb3, 'estimateGas')
+            _.times(4, i => stub.onCall(i).throws('Error', 'gas required exceeds allowance or always failing transaction'));
+            stub.returns(800000)
+
+            await Transactions.sendDataTransaction(this.instance, { data: this.encodedCall }).should.be.rejectedWith(/always failing transaction/);
+          });
+        });
+      });
+    });
+
+    describe('gas price', function () {
+      describe('uses an API to determine gas price', async function() {
+        beforeEach('Stub API reply and simulate mainnet', async function() {
+          sinon.stub(ZWeb3, 'isMainnet').resolves(true)
+          sinon.stub(axios, 'get').resolves({ data: { average: 49 } })
+        });
+
+        afterEach('return to testnet and undo stub', async function() {
+          delete state.gasPrice;
+          sinon.restore();
+        });
+
+        it('uses gas price API when gas not specified', async function () {
+          const txWrapper = await Transactions.sendDataTransaction(this.instance, { data: this.encodedCall });
+
+          await await assertGasPrice(txWrapper.receipt.transactionHash, 49 * 1e8);
+        });
+
+        it('does not use gas price API when gasPrice specified', async function () {
+          const txWrapper = await Transactions.sendDataTransaction(this.instance, { gasPrice: 1234, data: this.encodedCall });
+
+          await await assertGasPrice(txWrapper.receipt.transactionHash, 1234);
+        });
+      });
+
+      describe('does not blindly trust API', async function() {
+        beforeEach('stub API reply and simulate mainnet', async function() {
+          sinon.stub(ZWeb3, 'isMainnet').resolves(true)
+          sinon.stub(axios, 'get').resolves({ data: { average: 1234123412341234 } })
+        });
+
+        afterEach('Return to testnet and undo stub', async function() {
+          delete state.gasPrice;
+          sinon.restore();
+        });
+
+        it('produces an error when gas price API gives giant value', async function () {
+          await Transactions.sendDataTransaction(this.instance, { data: this.encodedCall }).should.be.rejectedWith(/is over 100 gwei/);
+        });
+      });
+    });
+  });
+
   describe('deploy', function () {
     describe('without a constructor', function () {
       it('correctly deploys an instance', async function () {

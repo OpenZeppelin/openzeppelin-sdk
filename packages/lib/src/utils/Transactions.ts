@@ -38,6 +38,24 @@ interface GenericFunction {
 
 export default {
   /**
+   * Makes a raw transaction to the blockchain using web3 sendTransaction method
+   * @param contractAddress address of the contract with which you are going to interact
+   * @param data encoded function call
+   * @param txParams other transaction parameters (from, gasPrice, etc)
+   * @param retries number of transaction retries
+   */
+  sendRawTransaction: async function(contractAddress: string, data: string, txParams: any = {}, retries: number = RETRY_COUNT): Promise<any> {
+    await this._fixGasPrice(txParams);
+    try {
+      const gas = await this.estimateActualGas({ to: contractAddress, ...txParams });
+      return ZWeb3.eth().sendTransaction({ to: contractAddress, data, ...txParams });
+    } catch(error) {
+      if (!error.message.match(/nonce too low/) || retries <= 0) throw error;
+      return this.sendRawTransaction(contractAddress, data, txParams, retries - 1);
+    }
+  },
+
+  /**
    * Wraps the _sendTransaction function and manages transaction retries.
    * @param contractFn contract function to be executed as the transaction
    * @param args arguments of the call (if any)
@@ -50,7 +68,6 @@ export default {
     try {
       return await this._sendTransaction(contractFn, args, txParams);
     } catch (error) {
-      console.log('error', error.message)
       if (!error.message.match(/nonce too low/) || retries <= 0) throw error;
       return this.sendTransaction(contractFn, args, txParams, retries - 1);
     }
@@ -155,7 +172,6 @@ export default {
 
     // Estimate gas for the call
     const gas = await this.estimateActualGasFnCall(contractFn, args, txParams);
-    console.log('el gas es', gas);
 
     return contractFn(...args).send({ gas, ...txParams });
   },
@@ -226,7 +242,6 @@ export default {
   },
 
   _calculateActualGas: async function(estimatedGas: number): Promise<number> {
-    console.log("estimatedGas", estimatedGas)
     const blockLimit: number = await this._getBlockGasLimit();
     let gasToUse = parseInt(`${estimatedGas * GAS_MULTIPLIER}`, 10);
     // Ganache has a bug (https://github.com/trufflesuite/ganache-core/issues/26) that causes gas
