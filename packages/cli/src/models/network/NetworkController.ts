@@ -434,15 +434,6 @@ export default class NetworkController {
     const deployer = new AppProjectDeployer(this, this.packageVersion);
     this.project = await deployer.fromProxyAdminProject(proxyAdminProject);
     log.info(`Publish to ${this.network} successful`);
-
-    const proxies = this._fetchOwnedProxies();
-    if (proxies.length !== 0) {
-      log.info(`Awaiting confirmations before transferring proxies to published project (this may take a few minutes)`);
-      const app = this.project.getApp();
-      await awaitConfirmations(app.contract.transactionHash);
-      await this._changeProxiesAdmin(proxies, app.address, proxyAdminProject);
-      log.info(`${proxies.length} proxies have been successfully transferred`);
-    }
   }
 
   // Proxy model
