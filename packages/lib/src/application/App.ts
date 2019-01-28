@@ -8,13 +8,12 @@ import { isZeroAddress, toAddress } from '../utils/Addresses';
 import { buildCallData, callDescription, CalldataInfo } from '../utils/ABIs';
 import ContractFactory, { ContractWrapper } from '../artifacts/ContractFactory';
 import { toSemanticVersion, semanticVersionEqual } from '../utils/Semver';
-import { deploy as deployContract, sendTransaction, sendDataTransaction } from '../utils/Transactions';
+import Transactions from '../utils/Transactions';
 import { TransactionReceipt } from 'web3/types';
 
 const log: Logger = new Logger('App');
 
 export default class App {
-
   public appContract: any;
   private txParams: any;
 
@@ -25,7 +24,7 @@ export default class App {
 
   public static async deploy(txParams: any = {}): Promise<App> {
     log.info('Deploying new App...');
-    const appContract: ContractWrapper = await deployContract(this.getContractClass(), [], txParams);
+    const appContract: ContractWrapper = await Transactions.deployContract(this.getContractClass(), [], txParams);
     log.info(`Deployed App at ${appContract.address}`);
     return new this(appContract, txParams);
   }
@@ -52,11 +51,11 @@ export default class App {
   }
 
   public async setPackage(name: string, packageAddress: string, version: string): Promise<any> {
-    return await sendTransaction(this.appContract.methods.setPackage, [name, toAddress(packageAddress), toSemanticVersion(version)], { ...this.txParams });
+    return await Transactions.sendTransaction(this.appContract.methods.setPackage, [name, toAddress(packageAddress), toSemanticVersion(version)], { ...this.txParams });
   }
 
   public async unsetPackage(name: string): Promise<any> {
-    return await sendTransaction(this.appContract.methods.unsetPackage, [name], { ...this.txParams });
+    return await Transactions.sendTransaction(this.appContract.methods.unsetPackage, [name], { ...this.txParams });
   }
 
   get address(): string {
@@ -122,7 +121,7 @@ export default class App {
       // this could be front-run, waiting for new initializers model
       const { method: initMethod, callData }: CalldataInfo = buildCallData(contractClass, initMethodName, initArgs);
       log.info(`Initializing ${packageName} ${contractName} instance at ${instance.address} by calling ${callDescription(initMethod, initArgs)}`);
-      await sendDataTransaction(instance, Object.assign({}, { ...this.txParams }, { data: callData }));
+      await Transactions.sendDataTransaction(instance, Object.assign({}, { ...this.txParams }, { data: callData }));
     }
   }
 }

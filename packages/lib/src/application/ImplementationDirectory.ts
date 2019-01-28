@@ -1,5 +1,5 @@
 import Logger from '../utils/Logger';
-import { sendTransaction, deploy } from '../utils/Transactions';
+import Transactions from '../utils/Transactions';
 import Contracts from '../artifacts/Contracts';
 import ContractFactory, { ContractWrapper } from '../artifacts/ContractFactory';
 
@@ -22,7 +22,7 @@ export default class ImplementationDirectory {
   public static async deploy(txParams: any = {}): Promise<ImplementationDirectory> {
     const contractClass: ContractFactory = this.getContractClass();
     log.info(`Deploying new ${contractClass.contractName}...`);
-    const directory: DirectoryContract = await deploy(contractClass, [], txParams);
+    const directory: DirectoryContract = await Transactions.deployContract(contractClass, [], txParams);
     log.info(`Deployed ${contractClass.contractName} at ${directory.address}`);
     return new this(directory, txParams);
   }
@@ -61,19 +61,19 @@ export default class ImplementationDirectory {
 
   public async setImplementation(contractName: string, implementationAddress: string): Promise<any> {
     log.info(`Setting ${contractName} implementation ${implementationAddress}...`);
-    await sendTransaction(this.directoryContract.methods.setImplementation, [contractName, implementationAddress], { ...this.txParams });
+    await Transactions.sendTransaction(this.directoryContract.methods.setImplementation, [contractName, implementationAddress], { ...this.txParams });
     log.info(`Implementation set: ${implementationAddress}`);
   }
 
   public async unsetImplementation(contractName: string): Promise<any> {
     log.info(`Unsetting ${contractName} implementation...`);
-    await sendTransaction(this.directoryContract.methods.unsetImplementation, [contractName], { ...this.txParams });
+    await Transactions.sendTransaction(this.directoryContract.methods.unsetImplementation, [contractName], { ...this.txParams });
     log.info(`${contractName} implementation unset`);
   }
 
   public async freeze(): Promise<any> {
     log.info('Freezing implementation directory...');
-    await sendTransaction(this.directoryContract.methods.freeze, [], { ...this.txParams });
+    await Transactions.sendTransaction(this.directoryContract.methods.freeze, [], { ...this.txParams });
     log.info('Frozen');
   }
 
