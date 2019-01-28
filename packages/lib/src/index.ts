@@ -14,7 +14,7 @@ import Contracts from './artifacts/Contracts';
 import ContractFactory, { ContractWrapper } from './artifacts/ContractFactory';
 import ZWeb3 from './artifacts/ZWeb3';
 import { bodyCode, constructorCode, bytecodeDigest, replaceSolidityLibAddress, isSolidityLib, getSolidityLibNames } from './utils/Bytecode';
-import { sendTransaction, deploy, awaitConfirmations } from './utils/Transactions';
+import Transactions from './utils/Transactions';
 import { flattenSourceCode } from './utils/Solidity';
 import { semanticVersionEqual, toSemanticVersion, semanticVersionToString } from './utils/Semver';
 
@@ -32,6 +32,7 @@ const assertEvent = helpers.assertEvent;
 
 // model objects
 import Proxy from './proxy/Proxy';
+import ProxyAdmin from './proxy/ProxyAdmin';
 import App from './application/App';
 import Package from './application/Package';
 import ImplementationDirectory from './application/ImplementationDirectory';
@@ -48,8 +49,6 @@ export {
   assertEvent,
   assertions,
   behaviors,
-  sendTransaction,
-  deploy,
   getBuildArtifacts,
   BuildArtifacts,
   getStorageLayout,
@@ -71,15 +70,16 @@ export {
   getSolidityLibNames,
   isSolidityLib,
   sleep,
-  awaitConfirmations,
   Proxy,
   Logger,
   ABI,
   Semver,
   FileSystem,
   ZWeb3,
+  Transactions,
   Contracts,
   App,
+  ProxyAdmin,
   ImplementationDirectory,
   Package,
   BasePackageProject,
