@@ -10,7 +10,7 @@ import ProxyAdmin from '../../../src/proxy/ProxyAdmin'
 import expectEvent from 'openzeppelin-solidity/test/helpers/expectEvent'
 import { ZERO_ADDRESS } from '../../../src/utils/Addresses';
 import { ImplementationDirectory, Proxy } from '../../../src';
-import { deploy as deployContract } from '../../../src/utils/Transactions';
+import Transactions from '../../../src/utils/Transactions';
 import utils from 'web3-utils';
 
 const ImplV1 = Contracts.getFromLocal('DummyImplementation');
@@ -145,14 +145,14 @@ contract('App', function (accounts) {
   async function setImplementation() {
     this.package = await Package.deploy(txParams)
     this.directory = await this.package.newVersion(version)
-    this.implV1 = await deployContract(ImplV1)
+    this.implV1 = await Transactions.deployContract(ImplV1)
     await this.directory.setImplementation(contractName, this.implV1.address)
     await this.app.setPackage(packageName, this.package.address, version)
   }
 
   async function setNewImplementation() {
     this.directory = await this.package.newVersion(anotherVersion)
-    this.implV2 = await deployContract(ImplV2)
+    this.implV2 = await Transactions.deployContract(ImplV2)
     await this.directory.setImplementation(contractName, this.implV2.address)
     await this.app.setPackage(packageName, this.package.address, anotherVersion)
   }
@@ -300,7 +300,7 @@ contract('App', function (accounts) {
 
     describe('with initializer that spawns additional proxies', function() {
       beforeEach('setting proxy creator implementation', async function() {
-        this.proxyCreator = await deployContract(ProxyCreator);
+        this.proxyCreator = await Transactions.deployContract(ProxyCreator);
         await this.directory.setImplementation('ProxyCreator', this.proxyCreator.address);
       });
 

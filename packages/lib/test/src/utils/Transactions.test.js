@@ -11,14 +11,13 @@ import ZWeb3 from '../../../src/artifacts/ZWeb3'
 import Contracts from '../../../src/artifacts/Contracts';
 import advanceBlock from '../../../src/helpers/advanceBlock';
 import { assertRevert, encodeCall, sleep } from '../../../src';
-import { deploy, sendTransaction, sendDataTransaction, awaitConfirmations, state } from '../../../src/utils/Transactions';
+import Transactions, { state } from '../../../src/utils/Transactions';
 
 const DEFAULT_GAS = 6721975;
 const DEFAULT_PARAMS = [42, 'foo', [1, 2, 3]];
 
 contract('Transactions', function(accounts) {
   accounts = accounts.map(utils.toChecksumAddress);
-  
   const [_account1, account2] = accounts;
 
   beforeEach('load contract', function () {
@@ -60,22 +59,22 @@ contract('Transactions', function(accounts) {
 
   describe('sendTransaction', function () {
     beforeEach('deploys contract', async function () {
-      this.instance = await deploy(this.DummyImplementation);
+      this.instance = await Transactions.deployContract(this.DummyImplementation);
     });
 
     it('correctly sends the transaction', async function () {
-      await sendTransaction(this.instance.methods.initialize, DEFAULT_PARAMS);
+      await Transactions.sendTransaction(this.instance.methods.initialize, DEFAULT_PARAMS);
       const actualValue = await this.instance.methods.value().call();
       actualValue.should.eq('42');
     });
 
     it('honours other tx params', async function () {
-      const receipt = await sendTransaction(this.instance.methods.initialize, DEFAULT_PARAMS, { from: account2 });
+      const receipt = await Transactions.sendTransaction(this.instance.methods.initialize, DEFAULT_PARAMS, { from: account2 });
       await assertFrom(receipt.transactionHash, account2);
     });
 
     it('handles failing transactions', async function () {
-      await assertRevert(sendTransaction(this.instance.methods.reverts));
+      await assertRevert(Transactions.sendTransaction(this.instance.methods.reverts));
     });
 
     describe('gas', function () {
@@ -86,14 +85,14 @@ contract('Transactions', function(accounts) {
       describe('when there is a default gas amount defined', function () {
         describe('when a gas amount is given', function () {
           it('uses specified gas', async function () {
-            const receipt = await sendTransaction(this.instance.methods.initialize, DEFAULT_PARAMS, { gas: 800000 });
+            const receipt = await Transactions.sendTransaction(this.instance.methods.initialize, DEFAULT_PARAMS, { gas: 800000 });
             await assertGas(receipt.transactionHash, 800000);
           });
         });
 
         describe('when no gas amount is given', function () {
           it('uses the default gas amount', async function () {
-            const receipt = await sendTransaction(this.instance.methods.initialize, DEFAULT_PARAMS);
+            const receipt = await Transactions.sendTransaction(this.instance.methods.initialize, DEFAULT_PARAMS);
             await assertGas(receipt.transactionHash, DEFAULT_GAS);
           });
         });
@@ -106,14 +105,14 @@ contract('Transactions', function(accounts) {
 
         describe('when a gas amount is given', function () {
           it('uses the specified gas amount', async function () {
-            const receipt = await sendTransaction(this.instance.methods.initialize, DEFAULT_PARAMS, { gas: 800000 });
+            const receipt = await Transactions.sendTransaction(this.instance.methods.initialize, DEFAULT_PARAMS, { gas: 800000 });
             await assertGas(receipt.transactionHash, 800000);
           });
         });
 
         describe('when no gas amount is given', function () {
           it('estimates gas', async function () {
-            const receipt = await sendTransaction(this.instance.methods.initialize, DEFAULT_PARAMS);
+            const receipt = await Transactions.sendTransaction(this.instance.methods.initialize, DEFAULT_PARAMS);
             await assertGasLt(receipt.transactionHash, 1000000);
           });
 
@@ -129,16 +128,15 @@ contract('Transactions', function(accounts) {
             _.times(3, i => stub.onCall(i).throws('Error', 'gas required exceeds allowance or always failing transaction'))
             stub.returns(800000)
 
-            const receipt = await sendTransaction(this.instance.methods.initialize, DEFAULT_PARAMS);
+            const receipt = await Transactions.sendTransaction(this.instance.methods.initialize, DEFAULT_PARAMS);
             await assertGas(receipt.transactionHash, 800000 * 1.25 + 15000);
           });
 
-          it.skip('retries estimating gas up to 3 times', async function () {
-            const stub = sinon.stub(this.instance.methods.initialize, 'estimateGas')
+          it('retries estimating gas up to 3 times', async function () {
+            const stub = sinon.stub(Transactions, '_calculateActualGas');
             _.times(4, i => stub.onCall(i).throws('Error', 'gas required exceeds allowance or always failing transaction'))
-            stub.returns(800000)
 
-            await sendTransaction(this.instance.methods.initialize, DEFAULT_PARAMS).should.be.rejectedWith(/always failing transaction/);
+            await Transactions.sendTransaction(this.instance.methods.initialize, DEFAULT_PARAMS).should.be.rejectedWith(/always failing transaction/);
           });
         });
       });
@@ -160,12 +158,12 @@ contract('Transactions', function(accounts) {
         });
 
         it('uses gas price API when gas not specified', async function () {
-          const receipt = await sendTransaction(this.instance.methods.initialize, DEFAULT_PARAMS);
+          const receipt = await Transactions.sendTransaction(this.instance.methods.initialize, DEFAULT_PARAMS);
           await await assertGasPrice(receipt.transactionHash, 49 * 1e8);
         });
 
         it('does not use gas price API when gasPrice specified', async function () {
-          const receipt = await sendTransaction(this.instance.methods.initialize, DEFAULT_PARAMS, { gasPrice: 1234 });
+          const receipt = await Transactions.sendTransaction(this.instance.methods.initialize, DEFAULT_PARAMS, { gasPrice: 1234 });
           await await assertGasPrice(receipt.transactionHash, 1234);
         });
       });
@@ -176,7 +174,7 @@ contract('Transactions', function(accounts) {
         });
 
         it('produces an error when gas price API gives giant value', async function () {
-          await sendTransaction(this.instance.methods.initialize, DEFAULT_PARAMS).should.be.rejectedWith(/is over 100 gwei/);
+          await Transactions.sendTransaction(this.instance.methods.initialize, DEFAULT_PARAMS).should.be.rejectedWith(/is over 100 gwei/);
         });
       });
     });
@@ -184,23 +182,23 @@ contract('Transactions', function(accounts) {
 
   describe('sendDataTransaction', function () {
     beforeEach('deploys contract', async function () {
-      this.instance = await deploy(this.DummyImplementation);
+      this.instance = await Transactions.deployContract(this.DummyImplementation);
       this.encodedCall = encodeCall('initialize', ['uint256', 'string', 'uint256[]'], DEFAULT_PARAMS);
     });
 
     it('correctly sends the transaction', async function () {
-      await sendDataTransaction(this.instance, { data: this.encodedCall });
+      await Transactions.sendDataTransaction(this.instance, { data: this.encodedCall });
       const actualValue = await this.instance.methods.value().call();
       actualValue.should.eq('42');
     });
 
     it('honours other tx params', async function () {
-      const txWrapper = await sendDataTransaction(this.instance, { data: this.encodedCall, from: account2 });
+      const txWrapper = await Transactions.sendDataTransaction(this.instance, { data: this.encodedCall, from: account2 });
       await assertFrom(txWrapper.receipt.transactionHash, account2);
     });
 
     it('handles failing transactions', async function () {
-      await assertRevert(sendDataTransaction(this.instance, { data: encodeCall('reverts') }));
+      await assertRevert(Transactions.sendDataTransaction(this.instance, { data: encodeCall('reverts') }));
     });
 
     describe('gas', function () {
@@ -211,14 +209,14 @@ contract('Transactions', function(accounts) {
       describe('when there is a default gas amount defined', function () {
         describe('when a gas amount is given', function () {
           it('uses specified gas', async function () {
-            const txWrapper = await sendDataTransaction(this.instance, { data: this.encodedCall, gas: 800000 });
+            const txWrapper = await Transactions.sendDataTransaction(this.instance, { data: this.encodedCall, gas: 800000 });
             await assertGas(txWrapper.receipt.transactionHash, 800000);
           });
         });
 
         describe('when no gas amount is given', function () {
           it('uses the default gas amount', async function () {
-            const receipt = await sendTransaction(this.instance.methods.initialize, DEFAULT_PARAMS);
+            const receipt = await Transactions.sendTransaction(this.instance.methods.initialize, DEFAULT_PARAMS);
             await assertGas(receipt.transactionHash, DEFAULT_GAS);
           });
         });
@@ -231,14 +229,14 @@ contract('Transactions', function(accounts) {
 
         describe('when a gas amount is given', function () {
           it('uses specified gas', async function () {
-            const txWrapper = await sendDataTransaction(this.instance, { data: this.encodedCall, gas: 800000 });
+            const txWrapper = await Transactions.sendDataTransaction(this.instance, { data: this.encodedCall, gas: 800000 });
             await assertGas(txWrapper.receipt.transactionHash, 800000);
           });
         });
 
         describe('when no gas amount is given', function () {
           it('estimates gas', async function () {
-            const txWrapper = await sendDataTransaction(this.instance, { data: this.encodedCall });
+            const txWrapper = await Transactions.sendDataTransaction(this.instance, { data: this.encodedCall });
             await assertGasLt(txWrapper.receipt.transactionHash, 1000000);
           });
 
@@ -247,7 +245,7 @@ contract('Transactions', function(accounts) {
             _.times(3, i => stub.onCall(i).throws('Error', 'gas required exceeds allowance or always failing transaction'));
             stub.returns(800000)
 
-            const txWrapper = await sendDataTransaction(this.instance, { data: this.encodedCall });
+            const txWrapper = await Transactions.sendDataTransaction(this.instance, { data: this.encodedCall });
             await assertGas(txWrapper.receipt.transactionHash, 800000 * 1.25 + 15000);
           });
 
@@ -256,7 +254,7 @@ contract('Transactions', function(accounts) {
             _.times(4, i => stub.onCall(i).throws('Error', 'gas required exceeds allowance or always failing transaction'));
             stub.returns(800000)
 
-            await sendDataTransaction(this.instance, { data: this.encodedCall }).should.be.rejectedWith(/always failing transaction/);
+            await Transactions.sendDataTransaction(this.instance, { data: this.encodedCall }).should.be.rejectedWith(/always failing transaction/);
           });
         });
       });
@@ -275,13 +273,13 @@ contract('Transactions', function(accounts) {
         });
 
         it('uses gas price API when gas not specified', async function () {
-          const txWrapper = await sendDataTransaction(this.instance, { data: this.encodedCall });
+          const txWrapper = await Transactions.sendDataTransaction(this.instance, { data: this.encodedCall });
 
           await await assertGasPrice(txWrapper.receipt.transactionHash, 49 * 1e8);
         });
 
         it('does not use gas price API when gasPrice specified', async function () {
-          const txWrapper = await sendDataTransaction(this.instance, { gasPrice: 1234, data: this.encodedCall });
+          const txWrapper = await Transactions.sendDataTransaction(this.instance, { gasPrice: 1234, data: this.encodedCall });
 
           await await assertGasPrice(txWrapper.receipt.transactionHash, 1234);
         });
@@ -299,7 +297,7 @@ contract('Transactions', function(accounts) {
         });
 
         it('produces an error when gas price API gives giant value', async function () {
-          await sendDataTransaction(this.instance, { data: this.encodedCall }).should.be.rejectedWith(/is over 100 gwei/);
+          await Transactions.sendDataTransaction(this.instance, { data: this.encodedCall }).should.be.rejectedWith(/is over 100 gwei/);
         });
       });
     });
@@ -308,17 +306,17 @@ contract('Transactions', function(accounts) {
   describe('deploy', function () {
     describe('without a constructor', function () {
       it('correctly deploys an instance', async function () {
-        const instance = await deploy(this.DummyImplementation);
+        const instance = await Transactions.deployContract(this.DummyImplementation);
         (await instance.methods.version().call()).should.eq("V1");
       });
 
       it('honours other tx params', async function () {
-        const instance = await deploy(this.DummyImplementation, [], { from: account2 });
+        const instance = await Transactions.deployContract(this.DummyImplementation, [], { from: account2 });
         await assertFrom(instance.transactionHash, account2);
       });
 
       it('handles failing constructors', async function () {
-        await assertRevert(deploy(this.DummyImplementation, [0, "foo"]));
+        await assertRevert(Transactions.deployContract(this.DummyImplementation, [0, "foo"]));
       });
 
       describe('gas', function () {
@@ -329,14 +327,14 @@ contract('Transactions', function(accounts) {
         describe('when there is a default gas amount defined', function () {
           describe('when a gas amount is given', function () {
             it('uses specified gas', async function () {
-              const instance = await deploy(this.DummyImplementation, [], { gas: 800000 });
+              const instance = await Transactions.deployContract(this.DummyImplementation, [], { gas: 800000 });
               await assertGas(instance.transactionHash, 800000);
             });
           });
 
           describe('when no gas amount is given', function () {
             it('uses the default gas amount', async function () {
-              const instance = await deploy(this.DummyImplementation, []);
+              const instance = await Transactions.deployContract(this.DummyImplementation, []);
               await assertGas(instance.transactionHash, DEFAULT_GAS);
             });
           });
@@ -349,14 +347,14 @@ contract('Transactions', function(accounts) {
 
           describe('when a gas amount is given', function () {
             it('uses specified gas', async function () {
-              const instance = await deploy(this.DummyImplementation, [], { gas: 800000 });
+              const instance = await Transactions.deployContract(this.DummyImplementation, [], { gas: 800000 });
               await assertGas(instance.transactionHash, 800000);
             });
           });
 
           describe('when no gas amount is given', function () {
             it('estimates gas', async function () {
-              const instance = await deploy(this.DummyImplementation);
+              const instance = await Transactions.deployContract(this.DummyImplementation);
               await assertGasLt(instance.transactionHash, 1000000);
             });
           });
@@ -376,13 +374,13 @@ contract('Transactions', function(accounts) {
           });
 
           it('uses gas price API when gas not specified', async function () {
-            const instance = await deploy(this.DummyImplementation);
+            const instance = await Transactions.deployContract(this.DummyImplementation);
 
             await await assertGasPrice(instance.transactionHash, 49 * 1e8);
           });
 
           it('does not use gas price API when gasPrice specified', async function () {
-            const instance = await deploy(this.DummyImplementation, [], { gasPrice: 1234 });
+            const instance = await Transactions.deployContract(this.DummyImplementation, [], { gasPrice: 1234 });
 
             await await assertGasPrice(instance.transactionHash, 1234);
           });
@@ -400,7 +398,7 @@ contract('Transactions', function(accounts) {
           });
 
           it('produces an error when gas price API gives giant value', async function () {
-            await deploy(this.DummyImplementation).should.be.rejectedWith(/is over 100 gwei/);
+            await Transactions.deployContract(this.DummyImplementation).should.be.rejectedWith(/is over 100 gwei/);
           });
         });
       });
@@ -412,18 +410,18 @@ contract('Transactions', function(accounts) {
       });
 
       it('correctly deploys an instance', async function () {
-        const instance = await deploy(this.WithConstructorImplementation, [42, "foo"]);
+        const instance = await Transactions.deployContract(this.WithConstructorImplementation, [42, "foo"]);
         (await instance.methods.value().call()).should.eq('42');
         (await instance.methods.text().call()).should.eq("foo");
       });
 
       it('honours other tx params', async function () {
-        const instance = await deploy(this.WithConstructorImplementation, [42, "foo"], { from: account2 });
+        const instance = await Transactions.deployContract(this.WithConstructorImplementation, [42, "foo"], { from: account2 });
         await assertFrom(instance.transactionHash, account2);
       });
 
       it('handles failing constructors', async function () {
-        await assertRevert(deploy(this.WithConstructorImplementation, [0, "foo"]));
+        await assertRevert(Transactions.deployContract(this.WithConstructorImplementation, [0, "foo"]));
       });
 
       describe('gas', function () {
@@ -434,14 +432,14 @@ contract('Transactions', function(accounts) {
         describe('when there is a default gas amount defined', function () {
           describe('when a gas amount is given', function () {
             it('uses specified gas', async function () {
-              const instance = await deploy(this.WithConstructorImplementation, [42, "foo"], { gas: 800000 });
+              const instance = await Transactions.deployContract(this.WithConstructorImplementation, [42, "foo"], { gas: 800000 });
               await assertGas(instance.transactionHash, 800000);
             });
           });
 
           describe('when no gas amount is given', function () {
             it('uses the default gas amount', async function () {
-              const instance = await deploy(this.WithConstructorImplementation, [42, "foo"]);
+              const instance = await Transactions.deployContract(this.WithConstructorImplementation, [42, "foo"]);
               await assertGas(instance.transactionHash, DEFAULT_GAS);
             });
           });
@@ -454,14 +452,14 @@ contract('Transactions', function(accounts) {
 
           describe('when a gas amount is given', function () {
             it('uses specified gas', async function () {
-              const instance = await deploy(this.WithConstructorImplementation, [42, "foo"], { gas: 800000 });
+              const instance = await Transactions.deployContract(this.WithConstructorImplementation, [42, "foo"], { gas: 800000 });
               await assertGas(instance.transactionHash, 800000);
             });
           });
 
           describe('when no gas amount is given', function () {
             it('estimates gas', async function () {
-              const instance = await deploy(this.WithConstructorImplementation, [42, "foo"]);
+              const instance = await Transactions.deployContract(this.WithConstructorImplementation, [42, "foo"]);
               await assertGasLt(instance.transactionHash, 1000000);
             });
 
@@ -470,7 +468,7 @@ contract('Transactions', function(accounts) {
               _.times(3, i => stub.onCall(i).throws('Error', 'gas required exceeds allowance or always failing transaction'))
               stub.returns(800000)
 
-              const instance = await deploy(this.WithConstructorImplementation, [42, "foo"]);
+              const instance = await Transactions.deployContract(this.WithConstructorImplementation, [42, "foo"]);
               await assertGas(instance.transactionHash, 800000 * 1.25 + 15000);
             });
 
@@ -479,7 +477,7 @@ contract('Transactions', function(accounts) {
               _.times(4, i => stub.onCall(i).throws('Error', 'gas required exceeds allowance or always failing transaction'))
               stub.returns(800000)
 
-              await deploy(this.WithConstructorImplementation, [42, "foo"]).should.be.rejectedWith(/always failing transaction/);
+              await Transactions.deployContract(this.WithConstructorImplementation, [42, "foo"]).should.be.rejectedWith(/always failing transaction/);
             });
           });
         });
@@ -498,13 +496,13 @@ contract('Transactions', function(accounts) {
           });
 
           it('uses gas price API when gas not specified', async function () {
-            const instance = await deploy(this.WithConstructorImplementation, [42, 'foo']);
+            const instance = await Transactions.deployContract(this.WithConstructorImplementation, [42, 'foo']);
 
             await await assertGasPrice(instance.transactionHash, 49 * 1e8);
           });
 
           it('does not use gas price API when gasPrice specified', async function () {
-            const instance = await deploy(this.WithConstructorImplementation, [42, 'foo'], { gasPrice: 1234 });
+            const instance = await Transactions.deployContract(this.WithConstructorImplementation, [42, 'foo'], { gasPrice: 1234 });
 
             await assertGasPrice(instance.transactionHash, 1234);
           });
@@ -522,7 +520,7 @@ contract('Transactions', function(accounts) {
           });
 
           it('produces an error when gas price API gives giant value', async function () {
-            await deploy(this.WithConstructorImplementation, [42, 'foo']).should.be.rejectedWith(/is over 100 gwei/);
+            await Transactions.deployContract(this.WithConstructorImplementation, [42, 'foo']).should.be.rejectedWith(/is over 100 gwei/);
           });
         });
       });
@@ -543,16 +541,16 @@ contract('Transactions', function(accounts) {
 
     it('awaits required confirmations', async function () {
       const initialBlock = await ZWeb3.getLatestBlockNumber();
-      const instance = await deploy(this.DummyImplementation, [], { gasPrice: 1e9 });
-      await awaitConfirmations(instance.transactionHash, 5);
+      const instance = await Transactions.deployContract(this.DummyImplementation, [], { gasPrice: 1e9 });
+      await Transactions.awaitConfirmations(instance.transactionHash, 5);
       (await ZWeb3.hasBytecode(instance.address)).should.be.true;
       const endBlock = await ZWeb3.getLatestBlockNumber();
       (endBlock - 5).should.be.greaterThan(initialBlock);
     });
 
     it('times out if fails to reach confirmations', async function () {
-      const instance = await deploy(this.DummyImplementation, [], { gasPrice: 1e9 });
-      await awaitConfirmations(instance.transactionHash, 20, 100, 300).should.be.rejectedWith(/Exceeded timeout/);
+      const instance = await Transactions.deployContract(this.DummyImplementation, [], { gasPrice: 1e9 });
+      await Transactions.awaitConfirmations(instance.transactionHash, 20, 100, 300).should.be.rejectedWith(/Exceeded timeout/);
     });
   });
 });
