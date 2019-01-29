@@ -49,7 +49,7 @@ export function isSolidityLib(bytecode: string): boolean {
 }
 
 function splitCode(contract: ZosContract): {constructor: string, body: string} {
-  const binary = contract.schema.bytecode.replace(/^0x/, '');
+  const binary = contract.schema.linkedBytecode.replace(/^0x/, '');
   const bytecode = contract.schema.bytecode.replace(/^0x/, '');
   const deployedBytecode = contract.schema.deployedBytecode.replace(/^0x/, '');
   const constructor = bytecode.substr(0, bytecode.indexOf(deployedBytecode));

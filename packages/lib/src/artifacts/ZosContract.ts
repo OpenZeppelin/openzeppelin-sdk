@@ -11,14 +11,12 @@ export default class ZosContract {
 
   // Extends Web3's Contract interface.
   public schema: ContractSchema;
-  // public binary: string; // TODO: remove
-  // public deployedBinary: string; // TODO: remove
   public storageInfo: StorageLayoutInfo;
   public warnings: any;
 
   constructor(schema: any) {
     this.schema = schema;
-    // this._setBinaryIfPossible();
+    this._setBinaryIfPossible();
   }
 
   public async deploy(args: any[] = [], options: any = {}): Promise<Contract> {
@@ -27,7 +25,7 @@ export default class ZosContract {
     const contract = ZWeb3.contract(this.schema.abi, null, defaultOptions);
     const self = this;
     return new Promise(function(resolve, reject) {
-      const tx = contract.deploy({data: self.schema.bytecode, arguments: args});
+      const tx = contract.deploy({data: self.schema.linkedBytecode, arguments: args});
       const zosData: any = {};
       tx.send({ ...options })
         .on('error', (error) => reject(error))
@@ -52,21 +50,21 @@ export default class ZosContract {
     Object.keys(libraries).forEach((name: string) => {
       const address = libraries[name].replace(/^0x/, '');
       const regex = new RegExp(`__${name}_+`, 'g');
-      this.schema.bytecode = this.schema.bytecode.replace(regex, address);
-      this.schema.deployedBytecode = this.schema.deployedBytecode.replace(regex, address);
+      this.schema.linkedBytecode = this.schema.bytecode.replace(regex, address);
+      this.schema.linkedDeployedBytecode = this.schema.deployedBytecode.replace(regex, address);
     });
   }
 
-  // private _setBinaryIfPossible(): void {
-  //   if(!hasUnlinkedVariables(this.schema.bytecode)) {
-  //     this.binary = this.schema.bytecode;
-  //     this.deployedBinary = this.schema.deployedBytecode;
-  //   }
-  // }
+  private _setBinaryIfPossible(): void {
+    if(!hasUnlinkedVariables(this.schema.bytecode)) {
+      this.schema.linkedBytecode = this.schema.bytecode;
+      this.schema.linkedDeployedBytecode = this.schema.deployedBytecode;
+    }
+  }
 
   private _validateNonUnlinkedLibraries(): void | never {
-    if(hasUnlinkedVariables(this.schema.bytecode)) {
-      const libraries = getSolidityLibNames(this.schema.bytecode);
+    if(hasUnlinkedVariables(this.schema.linkedBytecode)) {
+      const libraries = getSolidityLibNames(this.schema.linkedBytecode);
       throw new Error(`${this.schema.contractName} bytecode contains unlinked libraries: ${libraries.join(', ')}`);
     }
   }

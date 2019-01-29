@@ -77,7 +77,7 @@ export default class SimpleProject  {
     const implementation: any = await deploy(contractClass, [], this.txParams);
     await this.registerImplementation(contractName, {
       address: implementation._address,
-      bytecodeHash: bytecodeDigest(contractClass.schema.deployedBytecode)
+      bytecodeHash: bytecodeDigest(contractClass.schema.linkedDeployedBytecode)
     });
     return implementation;
   }
@@ -131,7 +131,7 @@ export default class SimpleProject  {
 
   public async _getOrDeployOwnImplementation(contractClass: ZosContract, contractName: string, redeployIfChanged?: boolean): Promise<string> {
     const existing: Implementation = this.implementations[contractName];
-    const contractChanged: boolean = existing && existing.bytecodeHash !== bytecodeDigest(contractClass.schema.deployedBytecode);
+    const contractChanged: boolean = existing && existing.bytecodeHash !== bytecodeDigest(contractClass.schema.linkedDeployedBytecode);
     const shouldRedeploy: boolean = !existing || (redeployIfChanged && contractChanged);
     if (!shouldRedeploy) return existing.address;
     const newInstance: any = await this.setImplementation(contractClass, contractName);

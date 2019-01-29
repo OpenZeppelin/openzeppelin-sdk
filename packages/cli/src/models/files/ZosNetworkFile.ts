@@ -144,7 +144,7 @@ export default class ZosNetworkFile {
       constructorCode: constructorCode(contract),
       bodyBytecodeHash: bytecodeDigest(bodyCode(contract)),
       localBytecodeHash: bytecodeDigest(contract.schema.bytecode),
-      deployedBytecodeHash: bytecodeDigest(contract.schema.bytecode)
+      deployedBytecodeHash: bytecodeDigest(contract.schema.linkedBytecode)
     };
   }
 
@@ -348,7 +348,7 @@ export default class ZosNetworkFile {
       constructorCode: constructorCode(contract),
       bodyBytecodeHash: bytecodeDigest(bodyCode(contract)),
       localBytecodeHash: bytecodeDigest(contract.schema.bytecode),
-      deployedBytecodeHash: bytecodeDigest(contract.schema.bytecode),
+      deployedBytecodeHash: bytecodeDigest(contract.schema.linkedBytecode),
       types,
       storage,
       warnings

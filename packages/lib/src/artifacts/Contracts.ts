@@ -9,6 +9,8 @@ export interface ContractSchema {
   abi: any[];
   bytecode: string;
   deployedBytecode: string;
+  linkedBytecode: string;
+  linkedDeployedBytecode: string;
   sourceMap: string;
   deployedSourceMap: string;
   source: string;
