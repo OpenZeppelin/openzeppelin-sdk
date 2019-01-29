@@ -1,6 +1,6 @@
 {
   "name": "example-truffle-migrate",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "description": "Sample project for using ZeppelinOS within truffle migrations",
   "main": "index.js",
   "scripts": {
