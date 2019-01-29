@@ -142,7 +142,7 @@ export default class SimpleProject  {
   public async _getDependencyImplementation(packageName: string, contractName: string): Promise<string | null> {
     if (!this.hasDependency(packageName)) return null;
     const { package: packageAddress, version }: Dependency = this.dependencies[packageName];
-    const thepackage: Package = await Package.fetch(packageAddress, this.txParams);
+    const thepackage: Package = Package.fetch(packageAddress, this.txParams);
     return thepackage.getImplementation(version, contractName);
   }
 

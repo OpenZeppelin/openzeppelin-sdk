@@ -7,7 +7,7 @@ import { semanticVersionToString } from '../utils/Semver';
 export default class PackageProject extends BasePackageProject {
 
   public static async fetch(packageAddress: string, version: string = '0.1.0', txParams: any): Promise<PackageProject> {
-    const thepackage: Package = await Package.fetch(packageAddress, txParams);
+    const thepackage: Package = Package.fetch(packageAddress, txParams);
     return new this(thepackage, version, txParams);
   }
 
@@ -19,7 +19,7 @@ export default class PackageProject extends BasePackageProject {
 
     try {
       thepackage = packageAddress
-        ? await Package.fetch(packageAddress, txParams)
+        ? Package.fetch(packageAddress, txParams)
         : await Package.deploy(txParams);
       directory = await thepackage.hasVersion(version)
         ? await thepackage.getDirectory(version)

@@ -13,7 +13,7 @@ export default class Package {
   private packageContract: Contract;
   private txParams: any;
 
-  public static async fetch(address: string, txParams: any = {}): Promise<Package | null> {
+  public static fetch(address: string, txParams: any = {}): Package | null {
     if (isZeroAddress(address)) return null;
     const PackageContact = Contracts.getFromLib('Package');
     const packageContract = PackageContact.at(address);

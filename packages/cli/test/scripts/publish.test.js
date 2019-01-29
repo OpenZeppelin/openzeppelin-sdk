@@ -56,15 +56,15 @@ contract('publish script', function(accounts) {
       const app = await App.fetch(this.networkFile.appAddress);
       (await app.getPackage(projectName)).package.address.should.eq(this.networkFile.packageAddress);
 
-      const thepackage = await Package.fetch(this.networkFile.packageAddress);
+      const thepackage = Package.fetch(this.networkFile.packageAddress);
       (await thepackage.getDirectory(defaultVersion)).address.should.eq(this.networkFile.providerAddress);
 
-      const provider = await ImplementationDirectory.fetch(this.networkFile.providerAddress);
+      const provider = ImplementationDirectory.fetch(this.networkFile.providerAddress);
       (await provider.getImplementation(contractAlias)).should.be.nonzeroAddress;
     });
 
     it('should reuse deployed implementations', async function () {
-      const provider = await ImplementationDirectory.fetch(this.networkFile.providerAddress);
+      const provider = ImplementationDirectory.fetch(this.networkFile.providerAddress);
       (await provider.getImplementation(contractAlias)).should.eq(this.previousContractAddress);
       this.networkFile.contract(contractAlias).address.should.eq(this.previousContractAddress);
     });

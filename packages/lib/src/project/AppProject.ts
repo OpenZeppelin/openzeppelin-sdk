@@ -43,7 +43,7 @@ export default class AppProject extends BasePackageProject {
       app = appAddress
         ? await App.fetch(appAddress, txParams)
         : await App.deploy(txParams);
-      if (packageAddress) thepackage = await Package.fetch(packageAddress, txParams);
+      if (packageAddress) thepackage = Package.fetch(packageAddress, txParams);
       else if (await app.hasPackage(name, version)) thepackage = (await app.getPackage(name)).package;
       else thepackage = await Package.deploy(txParams);
       directory = await thepackage.hasVersion(version)

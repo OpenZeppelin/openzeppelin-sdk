@@ -32,7 +32,7 @@ export default class ZosContract {
     });
   }
 
-  public at(address: string): Promise<Contract> | never {
+  public at(address: string): Contract | never {
     if (!ZWeb3.isAddress(address)) throw new Error('Given address is not valid: ' + address);
     const defaultOptions = Contracts.getArtifactsDefaults();
     const contract = ZWeb3.contract(this.schema.abi, address, defaultOptions);

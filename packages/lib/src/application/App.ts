@@ -43,7 +43,7 @@ export default class App {
 
   public async getPackage(name): Promise<{ package: Package, version: string }> {
     const { ['0']: address, ['1']: version } = await this.appContract.methods.getPackage(name).call();
-    const thepackage = await Package.fetch(address, { ...this.txParams });
+    const thepackage = Package.fetch(address, { ...this.txParams });
     return { package: thepackage, version };
   }
 
@@ -84,7 +84,7 @@ export default class App {
   public async getProvider(name: string): Promise<ImplementationDirectory> {
     const address = await this.appContract.methods.getProvider(name).call();
     if (isZeroAddress(address)) return null;
-    return await ImplementationDirectory.fetch(address, { ...this.txParams });
+    return ImplementationDirectory.fetch(address, { ...this.txParams });
   }
 
   public async changeProxyAdmin(proxyAddress: string, newAdmin: string): Promise<void> {

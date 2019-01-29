@@ -32,7 +32,7 @@ contract('Package', function ([_, owner]) {
   describe('fetch', function () {
     beforeEach('deploying package', deploy)
     beforeEach("connecting to existing instance", async function () {
-      this.package = await Package.fetch(this.package.address, txParams)
+      this.package = Package.fetch(this.package.address, txParams)
     })
     shouldInitialize()
   })
