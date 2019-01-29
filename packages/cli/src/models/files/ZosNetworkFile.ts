@@ -294,6 +294,10 @@ export default class ZosNetworkFile {
     }
   }
 
+  set zosversion(version: string) {
+    this.data.zosversion = version;
+  }
+
   set version(version: string) {
     this.data.version = version;
   }

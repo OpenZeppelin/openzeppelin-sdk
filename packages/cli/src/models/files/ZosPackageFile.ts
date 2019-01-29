@@ -17,6 +17,11 @@ export default class ZosPackageFile {
     publish: boolean;
   };
 
+  public static getZosversion(fileName: string = 'zos.json'): string | null {
+    const file = fs.parseJsonIfExists(fileName);
+    return file.zosversion || null;
+  }
+
   constructor(fileName: string = 'zos.json') {
     this.fileName = fileName;
     this.data = fs.parseJsonIfExists(this.fileName) || { zosversion: ZOS_VERSION };
@@ -94,6 +99,10 @@ export default class ZosPackageFile {
 
   public hasContracts(): boolean {
     return !isEmpty(this.contracts);
+  }
+
+  set zosversion(version: string) {
+    this.data.zosversion = version;
   }
 
   set publish(publish: boolean) {
