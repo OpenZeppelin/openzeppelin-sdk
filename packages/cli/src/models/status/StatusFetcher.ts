@@ -45,9 +45,9 @@ export default class StatusFetcher {
       const instance = contract.at(address);
       const remoteBodyBytecode = (await ZWeb3.getCode(address)).replace(/^0x/, '');
       const bodyBytecodeHash = bytecodeDigest(remoteBodyBytecode);
-      if(bodyCode(contract) === remoteBodyBytecode) {
+      if(bodyCode(contract.schema) === remoteBodyBytecode) {
         log.warn(`Assuming that constructor function of local version of ${contractName} is the one registered`);
-        const constructor = constructorCode(contract);
+        const constructor = constructorCode(contract.schema);
         const bytecodeHash = bytecodeDigest(`${constructor}${remoteBodyBytecode}`);
         this.networkFile.setContract(alias, { address, localBytecodeHash: bytecodeHash, deployedBytecodeHash: bytecodeHash, bodyBytecodeHash, constructorCode: constructor });
       }

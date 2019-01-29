@@ -141,8 +141,8 @@ export default class ZosNetworkFile {
   public addSolidityLib(libName: string, contract: ZosContract, instance: Contract): void {
     this.data.solidityLibs[libName] = {
       address: instance._address,
-      constructorCode: constructorCode(contract),
-      bodyBytecodeHash: bytecodeDigest(bodyCode(contract)),
+      constructorCode: constructorCode(contract.schema),
+      bodyBytecodeHash: bytecodeDigest(bodyCode(contract.schema)),
       localBytecodeHash: bytecodeDigest(contract.schema.bytecode),
       deployedBytecodeHash: bytecodeDigest(contract.schema.linkedBytecode)
     };
@@ -345,8 +345,8 @@ export default class ZosNetworkFile {
   public addContract(alias: string, contract: ZosContract, instance: Contract, { warnings, types, storage }: { warnings?: any, types?: any, storage?: any } = {}): void {
     this.setContract(alias, {
       address: instance._address,
-      constructorCode: constructorCode(contract),
-      bodyBytecodeHash: bytecodeDigest(bodyCode(contract)),
+      constructorCode: constructorCode(contract.schema),
+      bodyBytecodeHash: bytecodeDigest(bodyCode(contract.schema)),
       localBytecodeHash: bytecodeDigest(contract.schema.bytecode),
       deployedBytecodeHash: bytecodeDigest(contract.schema.linkedBytecode),
       types,
