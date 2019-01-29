@@ -6,14 +6,12 @@ import { StorageLayoutInfo } from '../validations/Storage';
 import { getSolidityLibNames, hasUnlinkedVariables } from '../utils/Bytecode';
 import { Contract } from 'web3-eth-contract';
 
-export interface ContractSchema {
+export interface SolidityContractSchema {
   schemaVersion: string;
   contractName: string;
   abi: any[];
   bytecode: string;
   deployedBytecode: string;
-  linkedBytecode: string;
-  linkedDeployedBytecode: string;
   sourceMap: string;
   deployedSourceMap: string;
   source: string;
@@ -23,6 +21,11 @@ export interface ContractSchema {
   compiler: any;
   networks: any;
   updatedAt: string;
+}
+
+export interface ZosContractSchema extends SolidityContractSchema {
+  linkedBytecode: string;
+  linkedDeployedBytecode: string;
   warnings: any;
   storageInfo: StorageLayoutInfo;
 }
@@ -105,13 +108,11 @@ export default class Contracts {
 
   private static _getFromPath(targetPath: string): ZosContract {
     const schema = require(targetPath);
-
     if(schema.bytecode === '') throw new Error(`A bytecode must be provided for contract ${schema.contractName}.`);
     if(!hasUnlinkedVariables(schema.bytecode)) {
       schema.linkedBytecode = schema.bytecode;
       schema.linkedDeployedBytecode = schema.deployedBytecode;
     }
-
     return new ZosContract(schema);
   }
 }

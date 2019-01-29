@@ -1,13 +1,12 @@
 import crypto from 'crypto';
 import { ZERO_ADDRESS } from './Addresses';
-import { ContractSchema } from '../artifacts/Contracts';
+import { ZosContractSchema } from '../artifacts/Contracts';
 
-// TS-TODO: instance could probably be typed to some sort of web3 object - seems to be a contract.
-export function bodyCode(schema: ContractSchema): string {
+export function bodyCode(schema: ZosContractSchema): string {
   return splitCode(schema).body;
 }
 
-export function constructorCode(schema: ContractSchema): string {
+export function constructorCode(schema: ZosContractSchema): string {
   return splitCode(schema).constructor;
 }
 
@@ -48,7 +47,7 @@ export function isSolidityLib(bytecode: string): boolean {
   return matches == null ? false : matches.length > 0;
 }
 
-function splitCode(schema: ContractSchema): {constructor: string, body: string} {
+function splitCode(schema: ZosContractSchema): {constructor: string, body: string} {
   const binary = schema.linkedBytecode.replace(/^0x/, '');
   const bytecode = schema.bytecode.replace(/^0x/, '');
   const deployedBytecode = schema.deployedBytecode.replace(/^0x/, '');
