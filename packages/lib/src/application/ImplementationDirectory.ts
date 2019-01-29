@@ -22,7 +22,7 @@ export default class ImplementationDirectory {
 
   public static async fetch(address: string, txParams: any = {}): Promise<ImplementationDirectory> {
     const klazz = this.getContractClass();
-    const directory = <Contract>await klazz.at(address);
+    const directory = <Contract>klazz.at(address);
     return new this(directory, txParams);
   }
 

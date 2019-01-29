@@ -16,7 +16,7 @@ export default class Package {
   public static async fetch(address: string, txParams: any = {}): Promise<Package | null> {
     if (isZeroAddress(address)) return null;
     const PackageContact = Contracts.getFromLib('Package');
-    const packageContract = await PackageContact.at(address);
+    const packageContract = PackageContact.at(address);
     return new this(packageContract, txParams);
   }
 

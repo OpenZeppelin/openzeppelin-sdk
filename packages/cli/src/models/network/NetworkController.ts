@@ -195,9 +195,9 @@ export default class NetworkController {
       log.info(`Uploading ${contractClass.schema.contractName} contract as ${contractAlias}`);
       const contractInstance = await this.project.setImplementation(contractClass, contractAlias);
       this.networkFile.addContract(contractAlias, contractClass, contractInstance, {
-        warnings: contractClass.warnings,
-        types: contractClass.storageInfo.types,
-        storage: contractClass.storageInfo.storage
+        warnings: contractClass.schema.warnings,
+        types: contractClass.schema.storageInfo.types,
+        storage: contractClass.schema.storageInfo.storage
       });
     } catch(error) {
       error.message = `${contractAlias} deployment failed with error: ${error.message}`;
@@ -209,7 +209,7 @@ export default class NetworkController {
   private async _setSolidityLibs(contractClass: ZosContract): Promise<void> {
     const currentContractLibs = getSolidityLibNames(contractClass.schema.bytecode);
     const libraries = this.networkFile.getSolidityLibs(currentContractLibs);
-    await contractClass.link(libraries);
+    contractClass.link(libraries);
   }
 
   // Contract model || SolidityLib model
@@ -285,8 +285,8 @@ export default class NetworkController {
     const validationLogger = new ValidationLogger(contractClass, existingContractInfo);
     validationLogger.log(newWarnings, buildArtifacts);
 
-    contractClass.warnings = warnings;
-    contractClass.storageInfo = getStorageLayout(contractClass, buildArtifacts);
+    contractClass.schema.warnings = warnings;
+    contractClass.schema.storageInfo = getStorageLayout(contractClass, buildArtifacts);
     return validationPasses(newWarnings);
   }
 

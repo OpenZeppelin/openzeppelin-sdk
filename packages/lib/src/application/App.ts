@@ -21,7 +21,7 @@ export default class App {
   private txParams: any;
 
   public static async fetch(address: string, txParams: any = {}): Promise<App> {
-    const appContract = await this.getContractClass().at(address);
+    const appContract = (await this.getContractClass()).at(address);
     return new this(appContract, txParams);
   }
 

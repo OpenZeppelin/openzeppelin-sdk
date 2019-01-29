@@ -11,6 +11,7 @@ import ZosContract from '../artifacts/ZosContract';
 import { Contract } from 'web3-eth-contract';
 import { ContractInterface } from './AppProject';
 import { toSemanticVersion } from '../utils/Semver';
+import Contracts from '../artifacts/Contracts';
 
 interface Implementations {
   [contractName: string]: Implementation;

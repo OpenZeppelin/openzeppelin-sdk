@@ -1,22 +1,16 @@
 import BN from 'bignumber.js';
 import ZWeb3 from './ZWeb3';
 import { getSolidityLibNames, hasUnlinkedVariables } from '../utils/Bytecode';
-import { StorageLayoutInfo } from '../validations/Storage';
 import { Contract, TransactionObject } from 'web3-eth-contract';
 import { TransactionReceipt } from 'web3/types';
 import Contracts, { ContractSchema } from './Contracts';
 import _ from 'lodash';
 
 export default class ZosContract {
-
-  // Extends Web3's Contract interface.
   public schema: ContractSchema;
-  public storageInfo: StorageLayoutInfo;
-  public warnings: any;
 
   constructor(schema: any) {
     this.schema = schema;
-    this._setBinaryIfPossible();
   }
 
   public async deploy(args: any[] = [], options: any = {}): Promise<Contract> {
@@ -53,13 +47,6 @@ export default class ZosContract {
       this.schema.linkedBytecode = this.schema.bytecode.replace(regex, address);
       this.schema.linkedDeployedBytecode = this.schema.deployedBytecode.replace(regex, address);
     });
-  }
-
-  private _setBinaryIfPossible(): void {
-    if(!hasUnlinkedVariables(this.schema.bytecode)) {
-      this.schema.linkedBytecode = this.schema.bytecode;
-      this.schema.linkedDeployedBytecode = this.schema.deployedBytecode;
-    }
   }
 
   private _validateNonUnlinkedLibraries(): void | never {
