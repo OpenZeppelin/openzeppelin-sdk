@@ -309,19 +309,19 @@ contract('Transactions', function(accounts) {
       this.encodedCall = encodeCall('initialize', ['uint256', 'string', 'uint256[]'], DEFAULT_PARAMS);
     });
 
-    it.only('correctly sends the transaction', async function () {
+    it('correctly sends the transaction', async function () {
       await Transactions.sendRawTransaction(this.instance.address, this.encodedCall);
       const actualValue = await this.instance.methods.value().call();
       actualValue.should.eq('42');
     });
 
     it('honours other tx params', async function () {
-      const txWrapper = await Transactions.sendDataTransaction(this.instance, { data: this.encodedCall, from: account2 });
-      await assertFrom(txWrapper.receipt.transactionHash, account2);
+      const receipt = await Transactions.sendRawTransaction(this.instance.address, this.encodedCall, { from: account2 });
+      await assertFrom(receipt.transactionHash, account2);
     });
 
     it('handles failing transactions', async function () {
-      await assertRevert(Transactions.sendDataTransaction(this.instance, { data: encodeCall('reverts') }));
+      await assertRevert(Transactions.sendRawTransaction(this.instance.address, encodeCall('reverts')));
     });
 
     describe('gas', function () {
@@ -332,14 +332,14 @@ contract('Transactions', function(accounts) {
       describe('when there is a default gas amount defined', function () {
         describe('when a gas amount is given', function () {
           it('uses specified gas', async function () {
-            const txWrapper = await Transactions.sendDataTransaction(this.instance, { data: this.encodedCall, gas: 800000 });
-            await assertGas(txWrapper.receipt.transactionHash, 800000);
+            const receipt = await Transactions.sendRawTransaction(this.instance.address, this.encodedCall, { gas: 800000 });
+            await assertGas(receipt.transactionHash, 800000);
           });
         });
 
         describe('when no gas amount is given', function () {
           it('uses the default gas amount', async function () {
-            const receipt = await Transactions.sendTransaction(this.instance.methods.initialize, DEFAULT_PARAMS);
+            const receipt = await Transactions.sendRawTransaction(this.instance.address, this.encodedCall);
             await assertGas(receipt.transactionHash, DEFAULT_GAS);
           });
         });
@@ -352,15 +352,15 @@ contract('Transactions', function(accounts) {
 
         describe('when a gas amount is given', function () {
           it('uses specified gas', async function () {
-            const txWrapper = await Transactions.sendDataTransaction(this.instance, { data: this.encodedCall, gas: 800000 });
-            await assertGas(txWrapper.receipt.transactionHash, 800000);
+            const receipt = await Transactions.sendRawTransaction(this.instance.address, this.encodedCall, { gas: 800000 });
+            await assertGas(receipt.transactionHash, 800000);
           });
         });
 
         describe('when no gas amount is given', function () {
           it('estimates gas', async function () {
-            const txWrapper = await Transactions.sendDataTransaction(this.instance, { data: this.encodedCall });
-            await assertGasLt(txWrapper.receipt.transactionHash, 1000000);
+            const receipt = await Transactions.sendRawTransaction(this.instance.address, this.encodedCall);
+            await assertGasLt(receipt.transactionHash, 1000000);
           });
 
           it('retries estimating gas', async function () {
@@ -368,8 +368,8 @@ contract('Transactions', function(accounts) {
             _.times(3, i => stub.onCall(i).throws('Error', 'gas required exceeds allowance or always failing transaction'));
             stub.returns(800000)
 
-            const txWrapper = await Transactions.sendDataTransaction(this.instance, { data: this.encodedCall });
-            await assertGas(txWrapper.receipt.transactionHash, 800000 * 1.25 + 15000);
+            const receipt = await Transactions.sendRawTransaction(this.instance.address, this.encodedCall);
+            await assertGas(receipt.transactionHash, 800000 * 1.25 + 15000);
           });
 
           it('retries estimating gas up to 3 times', async function () {
@@ -377,7 +377,7 @@ contract('Transactions', function(accounts) {
             _.times(4, i => stub.onCall(i).throws('Error', 'gas required exceeds allowance or always failing transaction'));
             stub.returns(800000)
 
-            await Transactions.sendDataTransaction(this.instance, { data: this.encodedCall }).should.be.rejectedWith(/always failing transaction/);
+            await Transactions.sendRawTransaction(this.instance.address, this.encodedCall).should.be.rejectedWith(/always failing transaction/);
           });
         });
       });
@@ -396,15 +396,15 @@ contract('Transactions', function(accounts) {
         });
 
         it('uses gas price API when gas not specified', async function () {
-          const txWrapper = await Transactions.sendDataTransaction(this.instance, { data: this.encodedCall });
+          const receipt = await Transactions.sendRawTransaction(this.instance.address, this.encodedCall);
 
-          await await assertGasPrice(txWrapper.receipt.transactionHash, 49 * 1e8);
+          await await assertGasPrice(receipt.transactionHash, 49 * 1e8);
         });
 
         it('does not use gas price API when gasPrice specified', async function () {
-          const txWrapper = await Transactions.sendDataTransaction(this.instance, { gasPrice: 1234, data: this.encodedCall });
+          const receipt = await Transactions.sendRawTransaction(this.instance.address, this.encodedCall, { gasPrice: 1234 });
 
-          await await assertGasPrice(txWrapper.receipt.transactionHash, 1234);
+          await await assertGasPrice(receipt.transactionHash, 1234);
         });
       });
 
@@ -420,7 +420,7 @@ contract('Transactions', function(accounts) {
         });
 
         it('produces an error when gas price API gives giant value', async function () {
-          await Transactions.sendDataTransaction(this.instance, { data: this.encodedCall }).should.be.rejectedWith(/is over 100 gwei/);
+          await Transactions.sendRawTransaction(this.instance.address, this.encodedCall).should.be.rejectedWith(/is over 100 gwei/);
         });
       });
     });

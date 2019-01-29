@@ -47,7 +47,10 @@ export default {
   sendRawTransaction: async function(contractAddress: string, data: string, txParams: any = {}, retries: number = RETRY_COUNT): Promise<any> {
     await this._fixGasPrice(txParams);
     try {
-      const gas = await this.estimateActualGas({ to: contractAddress, ...txParams });
+      if (!txParams.from) txParams.from = await ZWeb3.defaultAccount();
+      if (!txParams.gas) {
+        txParams.gas = Contracts.getArtifactsDefaults().gas || await this.estimateActualGas({ to: contractAddress, data });
+      }
       return ZWeb3.eth().sendTransaction({ to: contractAddress, data, ...txParams });
     } catch(error) {
       if (!error.message.match(/nonce too low/) || retries <= 0) throw error;
