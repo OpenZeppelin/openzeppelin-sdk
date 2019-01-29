@@ -1,12 +1,13 @@
 import crypto from 'crypto';
 import { ZERO_ADDRESS } from './Addresses';
+import ZosContract from '../artifacts/ZosContract';
 
 // TS-TODO: instance could probably be typed to some sort of web3 object - seems to be a contract.
-export function bodyCode(instance: any): string {
+export function bodyCode(instance: ZosContract): string {
   return splitCode(instance).body;
 }
 
-export function constructorCode(instance: any): string {
+export function constructorCode(instance: ZosContract): string {
   return splitCode(instance).constructor;
 }
 
@@ -47,11 +48,10 @@ export function isSolidityLib(bytecode: string): boolean {
   return matches == null ? false : matches.length > 0;
 }
 
-// TS-TODO: Define interface for returned object.
-function splitCode(instance: any): {constructor: string, body: string} {
-  const binary = instance.binary.replace(/^0x/, '');
-  const bytecode = instance.schema.bytecode.replace(/^0x/, '');
-  const deployedBytecode = instance.schema.deployedBytecode.replace(/^0x/, '');
+function splitCode(contract: ZosContract): {constructor: string, body: string} {
+  const binary = contract.schema.bytecode.replace(/^0x/, '');
+  const bytecode = contract.schema.bytecode.replace(/^0x/, '');
+  const deployedBytecode = contract.schema.deployedBytecode.replace(/^0x/, '');
   const constructor = bytecode.substr(0, bytecode.indexOf(deployedBytecode));
   const body = binary.replace(constructor, '');
   return { constructor, body };

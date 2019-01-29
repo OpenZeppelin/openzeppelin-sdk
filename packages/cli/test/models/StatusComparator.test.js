@@ -309,8 +309,8 @@ contract('StatusComparator', function([_, owner, anotherAddress]) {
           this.impl = await ImplV1.deploy()
           this.childImpl = await ChildImplV1.deploy()
 
-          this.networkFile.addContract('Impl', this.impl, getStorageLayout(ImplV1))
-          this.networkFile.addContract('ChildImpl', this.childImpl, getStorageLayout(ChildImplV1))
+          this.networkFile.addContract('Impl', ImplV1, this.impl, getStorageLayout(ImplV1))
+          this.networkFile.addContract('ChildImpl', ChildImplV1, this.childImpl, getStorageLayout(ChildImplV1))
         })
 
         describe('when the directory of the current version does not have any contract', function () {
@@ -425,8 +425,8 @@ contract('StatusComparator', function([_, owner, anotherAddress]) {
         this.impl = await ImplV1.deploy()
         this.childImpl = await ChildImplV1.deploy()
 
-        this.networkFile.addContract('Impl', this.impl, getStorageLayout(ImplV1))
-        this.networkFile.addContract('ChildImpl', this.childImpl, getStorageLayout(ChildImplV1))
+        this.networkFile.addContract('Impl', ImplV1, this.impl, getStorageLayout(ImplV1))
+        this.networkFile.addContract('ChildImpl', ChildImplV1, this.childImpl, getStorageLayout(ChildImplV1))
 
         await this.directory.setImplementation('Impl', this.impl._address)
         await this.directory.unsetImplementation('Impl', txParams)

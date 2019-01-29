@@ -108,7 +108,7 @@ export default class App {
     const event = receipt.events['ProxyCreated'];
     const address = Array.isArray(event) ? event[event.length - 1].returnValues.proxy : event.returnValues.proxy;
     log.info(`${packageName} ${contractName} proxy: ${address}`);
-    return new ZosContract(contractClass.schema).at(address);
+    return contractClass.at(address);
   }
 
   public async upgradeProxy(proxyAddress: string, contractClass: ZosContract, packageName: string, contractName: string, initMethodName: string, initArgs: any): Promise<Contract> {
@@ -116,7 +116,7 @@ export default class App {
       ? await this._upgradeProxy(proxyAddress, packageName, contractName)
       : await this._upgradeProxyAndCall(proxyAddress, contractClass, packageName, contractName, initMethodName, initArgs);
     log.info(`TX receipt received: ${receipt.transactionHash}`);
-    return new ZosContract(contractClass.schema).at(proxyAddress);
+    return contractClass.at(proxyAddress);
   }
 
   private async _createProxy(packageName: string, contractName: string): Promise<TransactionReceipt> {

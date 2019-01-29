@@ -8,7 +8,7 @@ import filter from 'lodash.filter';
 import find from 'lodash.find';
 import { Contract } from 'web3-eth-contract';
 
-import { Logger, FileSystem as fs, bytecodeDigest, bodyCode, constructorCode, semanticVersionToString } from 'zos-lib';
+import { Logger, FileSystem as fs, bytecodeDigest, bodyCode, constructorCode, semanticVersionToString, ZosContract } from 'zos-lib';
 import { fromContractFullName, toContractFullName } from '../../utils/naming';
 import { ZOS_VERSION, checkVersion } from './ZosVersion';
 import ZosPackageFile from './ZosPackageFile.js';
@@ -138,13 +138,13 @@ export default class ZosNetworkFile {
     return this.data.solidityLibs || {};
   }
 
-  public addSolidityLib(libName: string, instance: Contract): void {
+  public addSolidityLib(libName: string, contract: ZosContract, instance: Contract): void {
     this.data.solidityLibs[libName] = {
       address: instance._address,
-      constructorCode: constructorCode(instance),
-      bodyBytecodeHash: bytecodeDigest(bodyCode(instance)),
-      localBytecodeHash: bytecodeDigest(instance.schema.bytecode),
-      deployedBytecodeHash: bytecodeDigest(instance.binary)
+      constructorCode: constructorCode(contract),
+      bodyBytecodeHash: bytecodeDigest(bodyCode(contract)),
+      localBytecodeHash: bytecodeDigest(contract.schema.bytecode),
+      deployedBytecodeHash: bytecodeDigest(contract.schema.bytecode)
     };
   }
 
@@ -342,14 +342,13 @@ export default class ZosNetworkFile {
     this.setDependency(name, fn(this.getDependency(name)));
   }
 
-  // TS-TODO: instance can probably be typed to something interesting.
-  public addContract(alias: string, instance: any, { warnings, types, storage }: { warnings?: any, types?: any, storage?: any } = {}): void {
+  public addContract(alias: string, contract: ZosContract, instance: Contract, { warnings, types, storage }: { warnings?: any, types?: any, storage?: any } = {}): void {
     this.setContract(alias, {
       address: instance._address,
-      constructorCode: constructorCode(instance),
-      bodyBytecodeHash: bytecodeDigest(bodyCode(instance)),
-      localBytecodeHash: bytecodeDigest(instance.schema.bytecode),
-      deployedBytecodeHash: bytecodeDigest(instance.binary),
+      constructorCode: constructorCode(contract),
+      bodyBytecodeHash: bytecodeDigest(bodyCode(contract)),
+      localBytecodeHash: bytecodeDigest(contract.schema.bytecode),
+      deployedBytecodeHash: bytecodeDigest(contract.schema.bytecode),
       types,
       storage,
       warnings

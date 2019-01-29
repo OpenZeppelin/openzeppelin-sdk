@@ -32,8 +32,8 @@ export default async function copyContract(contractClass: ZosContract, address: 
 
   const ASM_CODE_COPY: string = `0x73${trimmedAddress}803b8091600080913c6000f3`;
 
-  const params = Object.assign({}, contractClass.options, txParams, { to: null, data: ASM_CODE_COPY });
+  const params = Object.assign({}, txParams, { to: null, data: ASM_CODE_COPY });
   const txHash = await sendTransaction(params);
   const receipt = await ZWeb3.getTransactionReceiptWithTimeout(txHash, Contracts.getSyncTimeout());
-  return new ZosContract(contractClass.schema).at(receipt.contractAddress);
+  return contractClass.at(receipt.contractAddress);
 }

@@ -176,7 +176,7 @@ export default class NetworkController {
     const libName = libClass.schema.contractName;
     log.info(`Uploading ${libName} library...`);
     const libInstance = await this.project.setImplementation(libClass, libName);
-    this.networkFile.addSolidityLib(libName, libInstance);
+    this.networkFile.addSolidityLib(libName, libClass ,libInstance);
   }
 
   // Contract model
@@ -194,7 +194,7 @@ export default class NetworkController {
       await this._setSolidityLibs(contractClass);
       log.info(`Uploading ${contractClass.schema.contractName} contract as ${contractAlias}`);
       const contractInstance = await this.project.setImplementation(contractClass, contractAlias);
-      this.networkFile.addContract(contractAlias, contractInstance, {
+      this.networkFile.addContract(contractAlias, contractClass, contractInstance, {
         warnings: contractClass.warnings,
         types: contractClass.storageInfo.types,
         storage: contractClass.storageInfo.storage

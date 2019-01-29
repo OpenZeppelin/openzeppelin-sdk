@@ -51,7 +51,7 @@ export default class SimpleProject  {
     const initCallData = this._getAndLogInitCallData(contractClass, initMethodName, initArgs, implementationAddress, 'Creating');
     const proxy = await Proxy.deploy(implementationAddress, initCallData, this.txParams);
     log.info(`Instance created at ${proxy.address}`);
-    return new ZosContract(contractClass.schema).at(proxy.address);
+    return contractClass.at(proxy.address);
   }
 
   public async upgradeProxy(proxyAddress: string, contractClass: ZosContract, { packageName, contractName, initMethod: initMethodName, initArgs, redeployIfChanged }: ContractInterface = {}): Promise<Contract> {
@@ -61,7 +61,7 @@ export default class SimpleProject  {
     const proxy = Proxy.at(proxyAddress, this.txParams);
     await proxy.upgradeTo(implementationAddress, initCallData);
     log.info(`Instance at ${proxyAddress} upgraded`);
-    return new ZosContract(contractClass.schema).at(proxyAddress);
+    return contractClass.at(proxyAddress);
   }
 
   public async changeProxyAdmin(proxyAddress: string, newAdmin: string): Promise<Proxy> {
@@ -77,7 +77,7 @@ export default class SimpleProject  {
     const implementation: any = await deploy(contractClass, [], this.txParams);
     await this.registerImplementation(contractName, {
       address: implementation._address,
-      bytecodeHash: bytecodeDigest(contractClass.deployedBinary)
+      bytecodeHash: bytecodeDigest(contractClass.schema.deployedBytecode)
     });
     return implementation;
   }
@@ -131,7 +131,7 @@ export default class SimpleProject  {
 
   public async _getOrDeployOwnImplementation(contractClass: ZosContract, contractName: string, redeployIfChanged?: boolean): Promise<string> {
     const existing: Implementation = this.implementations[contractName];
-    const contractChanged: boolean = existing && existing.bytecodeHash !== bytecodeDigest(contractClass.deployedBinary);
+    const contractChanged: boolean = existing && existing.bytecodeHash !== bytecodeDigest(contractClass.schema.deployedBytecode);
     const shouldRedeploy: boolean = !existing || (redeployIfChanged && contractChanged);
     if (!shouldRedeploy) return existing.address;
     const newInstance: any = await this.setImplementation(contractClass, contractName);
