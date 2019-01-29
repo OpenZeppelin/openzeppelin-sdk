@@ -7,8 +7,5 @@ module.exports = {
       network_id: '*',
       port: 8555
     }
-  },
-  mocha: {
-    bail: true
   }
 }
