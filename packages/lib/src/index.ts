@@ -17,6 +17,7 @@ import { bodyCode, constructorCode, bytecodeDigest, replaceSolidityLibAddress, i
 import Transactions from './utils/Transactions';
 import { flattenSourceCode } from './utils/Solidity';
 import { semanticVersionEqual, toSemanticVersion, semanticVersionToString } from './utils/Semver';
+import AppProxyMigrator from './utils/Migrator';
 
 // validations
 import { getStorageLayout, getStructsOrEnums, StorageLayoutInfo } from './validations/Storage';
@@ -89,5 +90,6 @@ export {
   ProxyAdminProject,
   ContractFactory,
   ContractWrapper,
-  ValidationInfo
+  ValidationInfo,
+  AppProxyMigrator
 };
