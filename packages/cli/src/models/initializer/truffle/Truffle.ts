@@ -32,11 +32,9 @@ const Truffle = {
 
   getProviderAndDefaults(): any {
     const config = this.getConfig();
-    const TruffleResolver = require('truffle-resolver');
-    config.resolver = new TruffleResolver(config);
-    const { provider, resolver } = this._setNonceTrackerIfNeeded(config);
+    const provider = this._setNonceTrackerIfNeeded(config);
 
-    const artifactDefaults = pickBy(pick(resolver.options, 'from', 'gas', 'gasPrice'));
+    const artifactDefaults = pickBy(pick(config, 'from', 'gas', 'gasPrice'));
     if (artifactDefaults.from) artifactDefaults.from = artifactDefaults.from.toLowerCase();
     return { provider, artifactDefaults };
   },
@@ -60,7 +58,7 @@ const Truffle = {
   // the network provider as a function (that returns an HDWalletProvider instance) instead of
   // assigning the HDWalletProvider instance directly.
   // (see https://github.com/trufflesuite/truffle-hdwallet-provider/issues/65)
-  _setNonceTrackerIfNeeded({ resolver, provider }: any): any {
+  _setNonceTrackerIfNeeded({ provider }: any): any {
     const { engine } = provider;
     if (engine && engine.constructor.name === 'Web3ProviderEngine') {
       const NonceSubprovider = require('web3-provider-engine/subproviders/nonce-tracker');
@@ -71,9 +69,8 @@ const Truffle = {
           engine._providers.splice(index, 0, nonceTracker);
         }
       });
-      resolver.options = Object.assign({}, resolver.options, { provider });
     }
-    return { resolver, provider };
+    return provider;
   },
 };
 
