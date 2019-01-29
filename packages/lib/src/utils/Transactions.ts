@@ -44,7 +44,7 @@ export default {
    * @param txParams other transaction parameters (from, gasPrice, etc)
    * @param retries number of transaction retries
    */
-  sendRawTransaction: async function(contractAddress: string, data: string, txParams: any = {}, retries: number = RETRY_COUNT): Promise<any> {
+  async sendRawTransaction(contractAddress: string, data: string, txParams: any = {}, retries: number = RETRY_COUNT): Promise<any> {
     await this._fixGasPrice(txParams);
     try {
       if (!txParams.from) txParams.from = await ZWeb3.defaultAccount();
@@ -65,7 +65,7 @@ export default {
    * @param txParams other transaction parameters (from, gasPrice, etc)
    * @param retries number of transaction retries
    */
-  sendTransaction: async function(contractFn: GenericFunction, args: any[] = [], txParams: any = {}, retries: number = RETRY_COUNT): Promise<any> {
+  async sendTransaction(contractFn: GenericFunction, args: any[] = [], txParams: any = {}, retries: number = RETRY_COUNT): Promise<any> {
     await this._fixGasPrice(txParams);
 
     try {
@@ -83,7 +83,7 @@ export default {
    * @param txParams other transaction parameters (from, gasPrice, etc)
    * @param retries number of deploy retries
    */
-  deployContract: async function(contract: ContractFactory, args: any[] = [], txParams: any = {}, retries: number = RETRY_COUNT): Promise<any> {
+  async deployContract(contract: ContractFactory, args: any[] = [], txParams: any = {}, retries: number = RETRY_COUNT): Promise<any> {
     await this._fixGasPrice(txParams);
 
     try {
@@ -100,7 +100,7 @@ export default {
    * @param txParams all transaction parameters (data, from, gasPrice, etc)
    * @param retries number of data transaction retries
    */
-  sendDataTransaction: async function(contract: ContractWrapper, txParams: any, retries: number = RETRY_COUNT): Promise<TransactionReceiptWrapper> {
+  async sendDataTransaction(contract: ContractWrapper, txParams: any, retries: number = RETRY_COUNT): Promise<TransactionReceiptWrapper> {
     await this._fixGasPrice(txParams);
 
     try {
@@ -112,7 +112,7 @@ export default {
     }
   },
 
-  estimateGas: async function(txParams: any, retries: number = RETRY_COUNT): Promise<any> {
+  async estimateGas(txParams: any, retries: number = RETRY_COUNT): Promise<any> {
     // Retry if estimate fails. This could happen because we are depending
     // on a previous transaction being mined that still hasn't reach the node
     // we are working with, if the txs are routed to different nodes.
@@ -127,7 +127,7 @@ export default {
     }
   },
 
-  estimateActualGasFnCall: async function(contractFn: GenericFunction, args: any[], txParams: any, retries: number = RETRY_COUNT): Promise<any> {
+  async estimateActualGasFnCall(contractFn: GenericFunction, args: any[], txParams: any, retries: number = RETRY_COUNT): Promise<any> {
     // Retry if estimate fails. This could happen because we are depending
     // on a previous transaction being mined that still hasn't reach the node
     // we are working with, if the txs are routed to different nodes.
@@ -141,12 +141,12 @@ export default {
     }
   },
 
-  estimateActualGas: async function(txParams: any): Promise<any> {
+  async estimateActualGas(txParams: any): Promise<any> {
     const estimatedGas = await this.estimateGas(txParams);
     return this._calculateActualGas(estimatedGas);
   },
 
-  awaitConfirmations: async function(transactionHash: string, confirmations: number = 12, interval: number = 1000, timeout: number = (10 * 60 * 1000)): Promise<any | never> {
+  async awaitConfirmations(transactionHash: string, confirmations: number = 12, interval: number = 1000, timeout: number = (10 * 60 * 1000)): Promise<any | never> {
     if (await ZWeb3.isGanacheNode()) return;
     const getTxBlock = () => (ZWeb3.getTransactionReceipt(transactionHash).then((r) => r.blockNumber));
     const now = +(new Date());
@@ -167,7 +167,7 @@ export default {
    * @param args arguments of the call (if any)
    * @param txParams other transaction parameters (from, gasPrice, etc)
    */
-  _sendTransaction: async function(contractFn: GenericFunction, args: any[] = [], txParams: any = {}): Promise<TransactionReceipt> {
+  async _sendTransaction(contractFn: GenericFunction, args: any[] = [], txParams: any = {}): Promise<TransactionReceipt> {
     // If gas is set explicitly, use it
     const defaultGas = Contracts.getArtifactsDefaults().gas;
     if (!txParams.gas && defaultGas) txParams.gas = defaultGas;
@@ -186,7 +186,7 @@ export default {
    * @param args arguments of the constructor (if any)
    * @param txParams other transaction parameters (from, gasPrice, etc)
    */
-  _deployContract: async function(contract: ContractFactory, args: any[] = [], txParams: any = {}): Promise<ContractWrapper> {
+  async _deployContract(contract: ContractFactory, args: any[] = [], txParams: any = {}): Promise<ContractWrapper> {
     // If gas is set explicitly, use it
     const defaultGas = Contracts.getArtifactsDefaults().gas;
     if (!txParams.gas && defaultGas) txParams.gas = defaultGas;
@@ -203,7 +203,7 @@ export default {
    * @param contract contract instance to send the tx to
    * @param txParams all transaction parameters (data, from, gasPrice, etc)
    */
-  _sendDataTransaction: async function(contract: ContractWrapper, txParams: any = {}) {
+  async _sendDataTransaction(contract: ContractWrapper, txParams: any = {}) {
     // If gas is set explicitly, use it
     const defaultGas = Contracts.getArtifactsDefaults().gas;
     if (!txParams.gas && defaultGas) txParams.gas = defaultGas;
@@ -214,7 +214,7 @@ export default {
     return contract.sendTransaction({ gas, ...txParams });
   },
 
-  _getETHGasStationPrice: async function(): Promise<any | never> {
+  async _getETHGasStationPrice(): Promise<any | never> {
     if (state.gasPrice) return state.gasPrice;
 
     try {
@@ -229,7 +229,7 @@ export default {
     }
   },
 
-  _fixGasPrice: async function(txParams: any): Promise<any> {
+  async _fixGasPrice(txParams: any): Promise<any> {
     const gasPrice = txParams.gasPrice || Contracts.getArtifactsDefaults().gasPrice;
 
     if ((TRUFFLE_DEFAULT_GAS_PRICE.eq(gasPrice) || !gasPrice) && await ZWeb3.isMainnet()) {
@@ -238,13 +238,13 @@ export default {
     }
   },
 
-  _getBlockGasLimit: async function(): Promise<number> {
+  async _getBlockGasLimit(): Promise<number> {
     if (state.block) return state.block.gasLimit;
     state.block = await ZWeb3.getLatestBlock();
     return state.block.gasLimit;
   },
 
-  _calculateActualGas: async function(estimatedGas: number): Promise<number> {
+  async _calculateActualGas(estimatedGas: number): Promise<number> {
     const blockLimit: number = await this._getBlockGasLimit();
     let gasToUse = parseInt(`${estimatedGas * GAS_MULTIPLIER}`, 10);
     // Ganache has a bug (https://github.com/trufflesuite/ganache-core/issues/26) that causes gas
