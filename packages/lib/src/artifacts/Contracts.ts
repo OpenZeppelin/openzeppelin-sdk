@@ -27,8 +27,9 @@ export default class Contracts {
   }
 
   public static async getDefaultTxParams(): Promise<any> {
-    const defaultFrom = Contracts.defaultFromAddress ? Contracts.defaultFromAddress : await ZWeb3.defaultAccount();
-    return { ...Contracts.getArtifactsDefaults(), from: defaultFrom };
+    const defaults = { ... Contracts.getArtifactsDefaults() };
+    if (!defaults.from) defaults.from = await Contracts.getDefaultFromAddress();
+    return defaults;
   }
 
   public static getArtifactsDefaults(): any {
@@ -57,6 +58,13 @@ export default class Contracts {
 
   public static getFromNodeModules(dependency: string, contractName: string): ContractFactory {
     return Contracts._getFromPath(Contracts.getNodeModulesPath(dependency, contractName));
+  }
+
+  public static async getDefaultFromAddress() {
+    if (!Contracts.defaultFromAddress) {
+      Contracts.defaultFromAddress = await ZWeb3.defaultAccount();
+    }
+    return Contracts.defaultFromAddress;
   }
 
   public static listBuildArtifacts(): string[] {
