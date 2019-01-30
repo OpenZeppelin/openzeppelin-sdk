@@ -13,9 +13,9 @@ import forEach from 'lodash.foreach';
 import isEqual from 'lodash.isequal';
 import concat from 'lodash.concat';
 import toPairs from 'lodash.topairs';
-import { Contracts, ContractFactory, Logger, FileSystem as fs, Proxy, awaitConfirmations, semanticVersionToString } from 'zos-lib';
+import { Contracts, ContractFactory, Logger, FileSystem as fs, Proxy, Transactions, semanticVersionToString } from 'zos-lib';
 import { ProxyAdminProject, AppProject, flattenSourceCode, getStorageLayout, BuildArtifacts, getBuildArtifacts, getSolidityLibNames } from 'zos-lib';
-import { validate, newValidationErrors, validationPasses, App, ContractWrapper } from 'zos-lib';
+import { validate, newValidationErrors, validationPasses, App, ProxyAdmin, SimpleProject, AppProxyMigrator, ContractWrapper } from 'zos-lib';
 
 import { allPromisesOrError } from '../../utils/async';
 import { toContractFullName } from '../../utils/naming';
@@ -65,6 +65,10 @@ export default class NetworkController {
   // NetworkController
   get packageAddress(): string {
     return this.networkFile.packageAddress;
+  }
+
+  get proxyAdminAddress(): string {
+    return this.networkFile.proxyAdminAddress;
   }
 
   // NetworkController
@@ -422,6 +426,35 @@ export default class NetworkController {
     else return null;
   }
 
+  public async migrate(): Promise<void> {
+    const proxies = this._fetchOwnedProxies();
+    if (proxies.length !== 0) {
+      const proxyAdmin = this.proxyAdminAddress
+        ? await ProxyAdmin.fetch(this.proxyAdminAddress, this.txParams)
+        : await ProxyAdmin.deploy(this.txParams);
+
+      if (!this.proxyAdminAddress) {
+        log.info(`Awaiting confirmations before transferring proxies to ProxyAdmin (this may take a few minutes)`);
+        await Transactions.awaitConfirmations(proxyAdmin.contract.transactionHash);
+      }
+
+      if (this.appAddress) {
+        await allPromisesOrError(map(proxies, async (proxy) => {
+          await AppProxyMigrator(this.appAddress, proxy.address, proxyAdmin.address);
+        }));
+      } else {
+        const simpleProject = await new SimpleProject(this.packageFile.name, this.txParams);
+        await allPromisesOrError(map(proxies, async (proxy) => {
+          await simpleProject.changeProxyAdmin(proxy.address, proxyAdmin.address);
+        }));
+      }
+      log.info('Successfully migrated to zosversion 2.2');
+    } else {
+      log.info('No proxies were found. Updating zosversion to 2.2');
+    }
+    this.updateZosVersions('2.2');
+  }
+
   // DeployerController
   public async publish(): Promise<void> {
     if (this.appAddress) {
@@ -682,5 +715,10 @@ export default class NetworkController {
     } else if (!(new Dependency(packageName)).getPackageFile().contract(contractAlias)) {
       return `Contract ${contractAlias} is not provided by ${packageName}.`;
     }
+  }
+
+  private updateZosVersions(version) {
+    this.networkFile.zosversion = version;
+    this.packageFile.zosversion = version;
   }
 }
