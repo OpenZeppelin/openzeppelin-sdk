@@ -30,6 +30,7 @@ export default class SimpleProject  extends BaseSimpleProject {
   }
 
   public async getAdminAddress(): Promise<string> {
-    return this.txParams.from || ZWeb3.defaultAccount();
+    if (this.txParams.from) return new Promise((resolve) => resolve(this.txParams.from));
+    else return ZWeb3.defaultAccount();
   }
 }

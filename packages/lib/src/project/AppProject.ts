@@ -113,8 +113,8 @@ export default class AppProject extends BasePackageProject {
     return directory;
   }
 
-  public getAdminAddress(): string {
-    return this.proxyAdmin.address;
+  public getAdminAddress(): Promise<string> {
+    return new Promise((resolve) => resolve(this.proxyAdmin.address));
   }
 
   public getApp(): App {

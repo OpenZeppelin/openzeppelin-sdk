@@ -23,7 +23,7 @@ export default function shouldManageProxies([_, appOwner, directoryOwner, anothe
 
     it('sets proxy admin', async function () {
       const admin = await this.proxyAdmin.methods.getProxyAdmin(this.proxyAddress).call()
-      admin.should.be.equal(this.proxyAdmin.address)
+      admin.should.be.equal(this.proxyAdmin._address)
     });
 
     it('delegates to implementation', async function () {
@@ -46,14 +46,14 @@ export default function shouldManageProxies([_, appOwner, directoryOwner, anothe
 
   describe('with proxy admin', function() {
     beforeEach('initialize proxy admin', async function() {
-      this.proxyAdmin = await ProxyAdmin.new({ from: proxyAdminOwner });
-      this.proxyAdminAddress = this.proxyAdmin.address;
+      this.proxyAdmin = await ProxyAdmin.deploy([], { from: proxyAdminOwner });
+      this.proxyAdminAddress = this.proxyAdmin._address;
     })
 
     describe('create', function () {
       describe('successful', function () {
         beforeEach("creating proxy", async function () {
-          const { events } = await this.app.methods.create(this.packageName, this.contractName, this.proxyAdmin.address, EMPTY_INITIALIZATION_DATA).send({ from: proxyAdminOwner });
+          const { events } = await this.app.methods.create(this.packageName, this.contractName, this.proxyAdmin._address, EMPTY_INITIALIZATION_DATA).send({ from: proxyAdminOwner });
           this.proxyAddress = events['ProxyCreated'].returnValues.proxy
         })
 
@@ -61,11 +61,11 @@ export default function shouldManageProxies([_, appOwner, directoryOwner, anothe
       });
 
       it('fails to create a proxy for unregistered package', async function () {
-        await assertRevert(this.app.methods.create("NOTEXISTS", this.contractName, this.proxyAdmin.address, EMPTY_INITIALIZATION_DATA).send())
+        await assertRevert(this.app.methods.create("NOTEXISTS", this.contractName, this.proxyAdmin._address, EMPTY_INITIALIZATION_DATA).send())
       });
 
       it('fails to create a proxy for unregistered contract', async function () {
-        await assertRevert(this.app.methods.create(this.packageName, "NOTEXISTS", this.proxyAdmin.address, EMPTY_INITIALIZATION_DATA).send())
+        await assertRevert(this.app.methods.create(this.packageName, "NOTEXISTS", this.proxyAdmin._address, EMPTY_INITIALIZATION_DATA).send())
       });
     });
 
@@ -76,7 +76,7 @@ export default function shouldManageProxies([_, appOwner, directoryOwner, anothe
 
       describe('successful', function () {
         beforeEach("creating proxy", async function () {
-          const { events } = await this.app.methods.create(this.packageName, this.contractName, this.proxyAdmin.address, initializeData).send({ value })
+          const { events } = await this.app.methods.create(this.packageName, this.contractName, this.proxyAdmin._address, initializeData).send({ value })
           this.proxyAddress = events['ProxyCreated'].returnValues.proxy
         })
 
@@ -94,21 +94,21 @@ export default function shouldManageProxies([_, appOwner, directoryOwner, anothe
       });
 
       it('fails to create a proxy for unregistered package', async function () {
-        await assertRevert(this.app.methods.create("NOTEXISTS", this.contractName, this.proxyAdmin.address, initializeData).send({ value }))
+        await assertRevert(this.app.methods.create("NOTEXISTS", this.contractName, this.proxyAdmin._address, initializeData).send({ value }))
       });
 
       it('fails to create a proxy for unregistered contract', async function () {
-        await assertRevert(this.app.methods.create(this.packageName, "NOTEXISTS", this.proxyAdmin.address, initializeData).send({ value }))
+        await assertRevert(this.app.methods.create(this.packageName, "NOTEXISTS", this.proxyAdmin._address, initializeData).send({ value }))
       });
 
       it('fails to create a proxy with invalid initialize data', async function () {
-        await assertRevert(this.app.methods.create(this.packageName, this.contractName, this.proxyAdmin.address, incorrectData).send({ value }))
+        await assertRevert(this.app.methods.create(this.packageName, this.contractName, this.proxyAdmin._address, incorrectData).send({ value }))
       });
     });
 
     describe('upgrade', function () {
       beforeEach("creating proxy", async function () {
-        const { events } = await this.app.methods.create(this.packageName, this.contractName, this.proxyAdmin.address, EMPTY_INITIALIZATION_DATA).send({ from: appOwner })
+        const { events } = await this.app.methods.create(this.packageName, this.contractName, this.proxyAdmin._address, EMPTY_INITIALIZATION_DATA).send({ from: appOwner })
         this.proxyAddress = events['ProxyCreated'].returnValues.proxy
       })
 
@@ -128,7 +128,7 @@ export default function shouldManageProxies([_, appOwner, directoryOwner, anothe
       const incorrectData = encodeCall('wrong', ['uint256'], [42])
 
       beforeEach("creating proxy", async function () {
-        const { events } = await this.app.methods.create(this.packageName, this.contractName, this.proxyAdmin.address, initializeData).send({ from: appOwner })
+        const { events } = await this.app.methods.create(this.packageName, this.contractName, this.proxyAdmin._address, initializeData).send({ from: appOwner })
         this.proxyAddress = events['ProxyCreated'].returnValues.proxy
       })
 
@@ -153,7 +153,7 @@ export default function shouldManageProxies([_, appOwner, directoryOwner, anothe
 
     describe('changeAdmin', function () {
       beforeEach("creating proxy", async function () {
-        const { events } = await this.app.methods.create(this.packageName, this.contractName, this.proxyAdmin.address, EMPTY_INITIALIZATION_DATA).send()
+        const { events } = await this.app.methods.create(this.packageName, this.contractName, this.proxyAdmin._address, EMPTY_INITIALIZATION_DATA).send()
         this.proxyAddress = events['ProxyCreated'].returnValues.proxy
       })
 

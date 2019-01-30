@@ -10,11 +10,11 @@ import { Contract } from 'web3-eth-contract';
 const log: Logger = new Logger('ProxyAdmin');
 
 export default class ProxyAdmin {
-  public contract;
-  public address;
-  public txParams;
+  public contract: Contract;
+  public address: string;
+  public txParams: any;
 
-  public static async fetch(address: string, txParams: any = {}): Promise<ProxyAdmin> {
+  public static fetch(address: string, txParams: any = {}): ProxyAdmin {
     const contract = Contracts.getFromLib('ProxyAdmin').at(address);
     return new this(contract, txParams);
   }

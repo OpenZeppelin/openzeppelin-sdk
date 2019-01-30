@@ -40,6 +40,6 @@ export default class ProxyAdminProject extends BaseSimpleProject {
   }
 
   public getAdminAddress(): Promise<string> {
-    return this.proxyAdmin.address;
+    return new Promise((resolve) => resolve(this.proxyAdmin.address));
   }
 }

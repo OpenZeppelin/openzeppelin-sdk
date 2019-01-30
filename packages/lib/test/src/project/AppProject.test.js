@@ -43,15 +43,15 @@ contract('AppProject', function (accounts) {
 
       describe('#upgradeProxy', function() {
         it('fails to upgrade a proxy for unregistered package', async function () {
-          await assertRevert(this.project.upgradeProxy(this.proxy.address, ImplV1, { contractName: 'NOTEXISTS' }));
+          await assertRevert(this.project.upgradeProxy(this.proxy._address, ImplV1, { contractName: 'NOTEXISTS' }));
         });
 
         it('fails to upgrade a proxy for unregistered contract', async function () {
-          await assertRevert(this.project.upgradeProxy(this.proxy.address, ImplV1, { packageName: 'NOTEXISTS' }))
+          await assertRevert(this.project.upgradeProxy(this.proxy._address, ImplV1, { packageName: 'NOTEXISTS' }))
         });
 
         it('fails to upgrade a non-proxy contract', async function () {
-          await assertRevert(this.project.upgradeProxy(this.implementation.address, ImplV1))
+          await assertRevert(this.project.upgradeProxy(this.implementation._address, ImplV1))
         });
       });
     });

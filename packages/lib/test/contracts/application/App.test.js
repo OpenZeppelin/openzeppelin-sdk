@@ -33,13 +33,13 @@ contract('App', (accounts) => {
     this.contractName = 'ERC721';
     this.contractNameUpdated = 'ERC721Updated';
     this.packageName = 'MyProject';
-    this.directory = await ImplementationDirectory.new({ from: directoryOwner })
+    this.directory = await ImplementationDirectory.deploy([], { from: directoryOwner })
     await this.directory.methods.setImplementation(this.contractName, this.implementation_v0).send({ from: directoryOwner })
     await this.directory.methods.setImplementation(this.contractNameUpdated, this.implementation_v1).send({ from: directoryOwner })
-    this.package = await Package.new({ from: packageOwner })
-    await this.package.methods.addVersion(toSemanticVersion(version_0), this.directory.address, contentURI).send({ from: packageOwner });
-    this.app = await AppContract.new({ from: appOwner })
-    await this.app.methods.setPackage(this.packageName, this.package.address, toSemanticVersion(version_0)).send({ from: appOwner });
+    this.package = await Package.deploy([], { from: packageOwner })
+    await this.package.methods.addVersion(toSemanticVersion(version_0), this.directory._address, contentURI).send({ from: packageOwner });
+    this.app = await AppContract.deploy([], { from: appOwner })
+    await this.app.methods.setPackage(this.packageName, this.package._address, toSemanticVersion(version_0)).send({ from: appOwner });
   })
 
   describe('ownership', function () {
