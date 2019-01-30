@@ -19,7 +19,7 @@ const register: (program: any) => any = (program) => program
   .action(action);
 
 async function action(contractFullNameOrAddress: string, newAdmin: string, options: any): Promise<void | never> {
-  const zosversion = await ZosPackageFile.getZosversion()
+  const zosversion = await ZosPackageFile.getZosversion();
   if (!await willMigrateProjectIfNeeded(zosversion)) return;
 
   const { yes } = options;

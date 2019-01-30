@@ -27,7 +27,7 @@ function isCurrentVersion(version: string): boolean {
 
 function isCurrentMinor(version: string): boolean {
   const [major, minor] = version.split('.');
-  return minor === CURRENT_MINOR_VERSION
+  return minor === CURRENT_MINOR_VERSION;
 }
 
 function isCurrentMajor(version: string): boolean {

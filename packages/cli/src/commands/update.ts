@@ -23,7 +23,7 @@ const register: (program: any) => any = (program) => program
   .action(action);
 
 async function action(contractFullNameOrAddress: string, options: any): Promise<void> {
-  const zosversion = await ZosPackageFile.getZosversion()
+  const zosversion = await ZosPackageFile.getZosversion();
   if (!await willMigrateProjectIfNeeded(zosversion)) return;
 
   const { initMethod, initArgs } = parseInit(options, 'initialize');

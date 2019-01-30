@@ -51,7 +51,7 @@ export interface DependencyInterface {
   customDeploy?: boolean;
 }
 
-type addressWrapper = { address?: string };
+type addressWrapper =  { address?: string };
 
 export default class ZosNetworkFile {
 

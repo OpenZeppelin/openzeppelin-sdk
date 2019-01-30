@@ -146,7 +146,6 @@ export default class ZosPackageFile {
     return new ZosNetworkFile(this, network, networkFileName);
   }
 
-
   public write(): void {
     if(this._hasChanged()) {
       const exists = this._exists();

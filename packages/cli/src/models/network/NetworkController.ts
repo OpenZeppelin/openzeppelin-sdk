@@ -16,7 +16,7 @@ import toPairs from 'lodash.topairs';
 import { Contracts, ContractFactory, Logger, FileSystem as fs, Proxy, Transactions, semanticVersionToString } from 'zos-lib';
 import { ProxyAdminProject, AppProject, flattenSourceCode, getStorageLayout, BuildArtifacts, getBuildArtifacts, getSolidityLibNames } from 'zos-lib';
 import { validate, newValidationErrors, validationPasses, App, ProxyAdmin, SimpleProject, AppProxyMigrator, ContractWrapper } from 'zos-lib';
-import { isLatestZosversion } from '../files/ZosVersion'
+import { isLatestZosversion } from '../files/ZosVersion';
 import { allPromisesOrError } from '../../utils/async';
 import { toContractFullName } from '../../utils/naming';
 import { AppProjectDeployer, ProxyAdminProjectDeployer } from './ProjectDeployer';
@@ -441,7 +441,7 @@ export default class NetworkController {
         log.info(`Awaiting confirmations before transferring proxies to ProxyAdmin (this may take a few minutes)`);
         await Transactions.awaitConfirmations(proxyAdmin.contract.transactionHash);
       }
-      this._tryRegisterProxyAdmin(proxyAdmin.address)
+      this._tryRegisterProxyAdmin(proxyAdmin.address);
 
       await allPromisesOrError(map(proxies, async (proxy) => {
         const proxyInstance = await Proxy.at(proxy.address);
