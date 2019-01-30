@@ -62,7 +62,7 @@ contract('App', ([_, owner, donor, wallet]) => {
       this.project = await deploy.setupApp({from: owner});
       this.donations = await deploy.deployVersion1(this.project, owner);
       this.token = await deploy.deployVersion2(this.project, this.donations, { from: owner });
-      this.donations = DonationsV2.at(this.donations.address);
+      this.donations = DonationsV2.at(this.donations._address);
     });
 
     // TODO: check that token owner is donations

@@ -9,17 +9,17 @@ export default function(owner, donor, wallet, tokenName, tokenSymbol) {
 
   describe('token', function() {
     it('is mintable by the contract', async function() {
-      (await this.token.methods.isMinter(this.donations.address).call()).should.equal(true);
+      (await this.token.methods.isMinter(this.donations._address).call()).should.equal(true);
     });
 
     it('cannot be set a second time', async function() {
       await assertRevert(
-        this.donations.methods.setToken(this.token.address).send({from: owner})
+        this.donations.methods.setToken(this.token._address).send({from: owner})
       );
     });
 
     it('is the token set in the donations contract', async function() {
-      (await this.donations.methods.token().call()).should.be.eq(this.token.address);
+      (await this.donations.methods.token().call()).should.be.eq(this.token._address);
     });
 
   });

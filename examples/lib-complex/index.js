@@ -44,8 +44,8 @@ async function deployVersion2(project, donations, txParams) {
 
   const DonationsV2 = Contracts.getFromLocal('DonationsV2')
   await project.setImplementation(DonationsV2, contractName);
-  await project.upgradeProxy(donations.address, DonationsV2, { contractName })
-  donations = DonationsV2.at(donations.address)
+  await project.upgradeProxy(donations._address, DonationsV2, { contractName })
+  donations = DonationsV2.at(donations._address)
 
   // Add an ERC721 token implementation to the project, request a proxy for it,
   // and set the token on 'Donations'.
@@ -54,11 +54,11 @@ async function deployVersion2(project, donations, txParams) {
     packageName: 'openzeppelin',
     contractName: tokenClass,
     initMethod: 'initialize',
-    initArgs: [donations.address]
+    initArgs: [donations._address]
   })
-  log.info(`Token proxy created at ${token.address}`)
+  log.info(`Token proxy created at ${token._address}`)
   log.info('Setting application\'s token...')
-  await donations.methods.setToken(token.address).send(txParams)
+  await donations.methods.setToken(token._address).send(txParams)
   log.info('Token set succesfully')
   return token;
 }
@@ -71,8 +71,8 @@ async function getLibrary(txParams) {
     const version = '1.0.0';
     const thepackage = await Package.deploy(txParams);
     const directory = await thepackage.newVersion(version);
-    const tokenImplementation = await ERC721Mintable.new();
-    await directory.setImplementation(tokenClass, tokenImplementation.address);
+    const tokenImplementation = await ERC721Mintable.deploy();
+    await directory.setImplementation(tokenClass, tokenImplementation._address);
     return [thepackage.address, version];
   } else {
     throw Error("Unknown network " + network);
