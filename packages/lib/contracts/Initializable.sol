@@ -32,12 +32,18 @@ contract Initializable {
     require(initializing || isConstructor() || !initialized, "Contract instance has already been initialized");
 
     bool wasInitializing = initializing;
-    initializing = true;
-    initialized = true;
+    if (!wasInitializing) {
+      initializing = true;
+    }
+    if (!initialized) {
+      initialized = true;
+    }
 
     _;
 
-    initializing = wasInitializing;
+    if (!wasInitializing) {
+      initializing = false;
+    }
   }
 
   /// @dev Returns true if and only if the function is running in the constructor
