@@ -89,10 +89,3 @@ export default function shouldManageProxies({ otherAdmin, setImplementations, su
     this.instance = await this.project.createProxy(DummyImplementation);
   };
 }
-
-
-
-
-
-
-

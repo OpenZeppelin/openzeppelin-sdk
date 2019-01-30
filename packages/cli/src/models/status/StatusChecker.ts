@@ -20,7 +20,7 @@ export default class StatusChecker {
   public networkFile: any;
   public packageName: any;
 
-  private _project: AppProject;
+  private project: AppProject;
 
   public static fetch(networkFile: ZosNetworkFile, txParams: any = {}): StatusChecker {
     const fetcher = new StatusFetcher(networkFile);
@@ -43,11 +43,11 @@ export default class StatusChecker {
     try {
       const { packageAddress, appAddress, version } = this.networkFile;
 
-      if (!this._project) {
-        this._project = await AppProject.fetchOrDeploy(this.packageName,  this.networkFile.version, this.txParams, { appAddress, packageAddress });
+      if (!this.project) {
+        this.project = await AppProject.fetchOrDeploy(this.packageName,  this.networkFile.version, this.txParams, { appAddress, packageAddress });
       }
 
-      return this._project;
+      return this.project;
     } catch(error) {
       error.message = `Cannot fetch project contract from address ${this.networkFile.appAddress}: ${error.message}`;
       throw error;
@@ -56,7 +56,7 @@ export default class StatusChecker {
 
   public async call(): Promise<void> {
     await this.setProject();
-    log.info(`Comparing status of project ${(await this._project.getProjectPackage()).address} ...\n`);
+    log.info(`Comparing status of project ${(await this.project.getProjectPackage()).address} ...\n`);
     await this.checkApp();
     this.visitor.onEndChecking();
   }
@@ -66,24 +66,23 @@ export default class StatusChecker {
     await this.checkPackage();
     await this.checkProvider();
     await this.checkImplementations();
-    await this.checkProxies();
     await this.checkDependencies();
   }
 
   public async checkVersion(): Promise<void> {
-    const observed = this._project.version;
+    const observed = this.project.version;
     const expected = this.networkFile.version;
     if(!semanticVersionEqual(observed, expected)) this.visitor.onMismatchingVersion(expected, observed);
   }
 
   public async checkPackage(): Promise<void> {
-    const observed = this._project.package.address;
+    const observed = this.project.package.address;
     const expected = this.networkFile.packageAddress;
     if(observed !== expected) this.visitor.onMismatchingPackage(expected, observed);
   }
 
   public async checkProvider(): Promise<void> {
-    const currentDirectory = await this._project.getCurrentDirectory();
+    const currentDirectory = await this.project.getCurrentDirectory();
     const observed = currentDirectory.address;
     const expected = this.networkFile.providerAddress;
     if(observed !== expected) this.visitor.onMismatchingProvider(expected, observed);
@@ -107,12 +106,6 @@ export default class StatusChecker {
       })
     );
     this._checkUnregisteredLocalImplementations(implementationsInfo);
-  }
-
-  public async checkProxies(): Promise<void> {
-    const proxiesInfo = await this._fetchOnChainProxies();
-    proxiesInfo.forEach((info) => this._checkRemoteProxy(info));
-    this._checkUnregisteredLocalProxies(proxiesInfo);
   }
 
   private async _checkRemoteContractImplementation({ alias, address }: ComparedObject, bytecode: string): Promise<void> {
@@ -166,38 +159,6 @@ export default class StatusChecker {
       });
   }
 
-  private _checkRemoteProxy(remoteProxyInfo: ProxyInterface): void {
-    const localProxyInfo = this.networkFile.getProxy(remoteProxyInfo.address);
-    if (localProxyInfo) {
-      this._checkProxyAlias(localProxyInfo, remoteProxyInfo);
-      this._checkProxyImplementation(localProxyInfo, remoteProxyInfo);
-    } else {
-      this.visitor.onMissingRemoteProxy('none', 'one', { ...remoteProxyInfo, packageName: this.packageName });
-    }
-  }
-
-  private _checkProxyAlias(localProxyInfo: ProxyInterface, remoteProxyInfo: ProxyInterface): void {
-    const { alias: observed } = remoteProxyInfo;
-    const { contract: expected, version, package: packageName } = localProxyInfo;
-    if (observed !== expected) this.visitor.onMismatchingProxyAlias(expected, observed, { packageName, version, ...remoteProxyInfo });
-  }
-
-  private _checkProxyImplementation(localProxyInfo: ProxyInterface, remoteProxyInfo: ProxyInterface): void {
-    const { implementation: observed } = remoteProxyInfo;
-    const { implementation: expected, version, package: packageName } = localProxyInfo;
-    if (observed !== expected) this.visitor.onMismatchingProxyImplementation(expected, observed, { packageName, version, ...remoteProxyInfo });
-  }
-
-  private _checkUnregisteredLocalProxies(proxiesInfo: ProxyInterface[]): void {
-    const foundAddresses = proxiesInfo.map((info) => info.address);
-    this.networkFile.getProxies()
-      .filter((proxy) => !foundAddresses.includes(proxy.address))
-      .forEach((proxy) => {
-        const { contract: alias, package: packageName, address, implementation } = proxy;
-        this.visitor.onUnregisteredLocalProxy('one', 'none', { packageName, alias, address, implementation });
-      });
-  }
-
   private _checkRemoteDependency({ name, version, package: address }: ComparedObject): void {
     if (this.networkFile.hasDependency(name)) {
       this._checkDependencyAddress(name, address);
@@ -229,7 +190,7 @@ export default class StatusChecker {
   // TS-TODO: type for event?
   private async _fetchOnChainImplementations(): Promise<any> {
     const filter = new EventsFilter();
-    const directory = await this._project.getCurrentDirectory();
+    const directory = await this.project.getCurrentDirectory();
     const allEvents = await filter.call(directory.contract, 'ImplementationChanged');
     const contractsAlias = allEvents.map((event) => event.returnValues.contractName);
     const events = allEvents
@@ -240,31 +201,9 @@ export default class StatusChecker {
     return events;
   }
 
-  private async _fetchOnChainProxies(): Promise<ProxyInterface[]> {
-    const implementationsInfo = await this._fetchOnChainImplementations();
-    const filter = new EventsFilter();
-    const app = this._project.getApp();
-    const proxyEvents = await filter.call(app.appContract, 'ProxyCreated');
-    const proxiesInfo = [];
-    await Promise.all(proxyEvents.map(async (event) => {
-      const address = event.returnValues.proxy;
-      const implementation = await app.getProxyImplementation(address);
-      const matchingImplementations = implementationsInfo.filter((info) => info.address === implementation);
-      if (matchingImplementations.length > 1) {
-        this.visitor.onMultipleProxyImplementations('one', matchingImplementations.length, { implementation });
-      } else if (matchingImplementations.length === 0) {
-        this.visitor.onUnregisteredProxyImplementation('one', 'none', { address, implementation });
-      } else {
-        const alias = matchingImplementations[0].alias;
-        proxiesInfo.push({ alias, implementation, address });
-      }
-    }));
-    return proxiesInfo;
-  }
-
   private async _fetchOnChainPackages(): Promise<any[]> {
     const filter = new EventsFilter();
-    const app = this._project.getApp();
+    const app = this.project.getApp();
     const allEvents = await filter.call(app.appContract, 'PackageChanged');
     const filteredEvents = allEvents
       .filter((event) => event.returnValues.package !== ZERO_ADDRESS)
