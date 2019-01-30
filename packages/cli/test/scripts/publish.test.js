@@ -97,7 +97,7 @@ contract('publish script', function(accounts) {
       it('should be owned by proxyAdmin', async function () {
         this.ownProxy = await create({ contractAlias: 'Impl', network, txParams, networkFile: this.networkFile });
         await publish({ network, txParams, networkFile: this.networkFile });
-        (await Proxy.at(this.ownProxy.address).admin()).should.eq(this.networkFile.proxyAdminAddress);
+        (await Proxy.at(this.ownProxy._address).admin()).should.eq(this.networkFile.proxyAdminAddress);
       });
     })
 
