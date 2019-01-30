@@ -120,6 +120,10 @@ export default class ZosNetworkFile {
     return this.data.version;
   }
 
+  get zosversion(): string {
+    return this.data.zosversion;
+  }
+
   get frozen(): boolean {
     return this.data.frozen;
   }
