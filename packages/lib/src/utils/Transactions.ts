@@ -124,13 +124,13 @@ async function _sendDataTransaction(contract: Contract, txParams: any = {}): Pro
   if (txParams.gas) return _sendContractDataTransaction(contract, txParams);
 
   // Estimate gas for the call and run the tx
-  const gas = await estimateActualGas({ to: contract._address, ...txParams });
+  const gas = await estimateActualGas({ to: contract.address, ...txParams });
   return _sendContractDataTransaction(contract, { gas, ...txParams });
 }
 
 async function _sendContractDataTransaction(contract: Contract, txParams: any): Promise<TransactionReceipt> {
   const defaults = await Contracts.getDefaultTxParams();
-  const tx = { to: contract._address, ...defaults, ...txParams };
+  const tx = { to: contract.address, ...defaults, ...txParams };
   const txHash = await ZWeb3.sendTransactionWithoutReceipt(tx);
   return await ZWeb3.getTransactionReceiptWithTimeout(txHash, Contracts.getSyncTimeout());
 }

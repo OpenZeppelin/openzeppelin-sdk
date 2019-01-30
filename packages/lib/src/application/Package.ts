@@ -24,7 +24,7 @@ export default class Package {
     log.info('Deploying new Package...');
     const PackageContract: ZosContract = Contracts.getFromLib('Package');
     const packageContract = await deployContract(PackageContract, [], txParams);
-    log.info(`Deployed Package ${packageContract._address}`);
+    log.info(`Deployed Package ${packageContract.address}`);
     return new this(packageContract, txParams);
   }
 
@@ -38,7 +38,7 @@ export default class Package {
   }
 
   get address(): string {
-    return this.packageContract._address;
+    return this.packageContract.address;
   }
 
   public async hasVersion(version: string): Promise<boolean> {

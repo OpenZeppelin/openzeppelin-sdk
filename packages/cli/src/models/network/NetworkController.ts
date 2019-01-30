@@ -451,7 +451,7 @@ export default class NetworkController {
     this._updateTruffleDeployedInformation(contractAlias, proxyInstance);
 
     this.networkFile.addProxy(packageName, contractAlias, {
-      address: proxyInstance._address,
+      address: proxyInstance.address,
       version: semanticVersionToString(packageVersion),
       implementation: implementationAddress
     });

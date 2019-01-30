@@ -52,7 +52,7 @@ export default abstract class BaseSimpleProject {
     if (!contractName) contractName = contractClass.schema.contractName;
     const implementation: any = await deploy(contractClass, [], this.txParams);
     await this.registerImplementation(contractName, {
-      address: implementation._address,
+      address: implementation.address,
       bytecodeHash: bytecodeDigest(contractClass.schema.linkedDeployedBytecode)
     });
     return implementation;
@@ -109,7 +109,7 @@ export default abstract class BaseSimpleProject {
     const shouldRedeploy: boolean = !existing || (redeployIfChanged && contractChanged);
     if (!shouldRedeploy) return existing.address;
     const newInstance: any = await this.setImplementation(contractClass, contractName);
-    return newInstance._address;
+    return newInstance.address;
   }
 
   private async _getDependencyImplementation(packageName: string, contractName: string): Promise<string | null> {

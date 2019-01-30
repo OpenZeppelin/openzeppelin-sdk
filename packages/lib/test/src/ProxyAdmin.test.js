@@ -23,7 +23,7 @@ contract('ProxyAdmin class', function(accounts) {
   beforeEach(async function() {
     this.proxyAdminContract = await ProxyAdminContract.deploy([], this.txParams);
     this.proxyAdmin = new ProxyAdmin(this.proxyAdminContract, this.txParams);
-    this.proxy = await Proxy.deploy(this.implementationV1._address, this.proxyAdmin.address, null, this.txParams);
+    this.proxy = await Proxy.deploy(this.implementationV1.address, this.proxyAdmin.address, null, this.txParams);
   });
 
   describe('class methods', function() {
@@ -31,7 +31,7 @@ contract('ProxyAdmin class', function(accounts) {
       it('sets ProxyAdmin instance', async function() {
         const proxyAdmin = ProxyAdmin.fetch(this.proxyAdmin.address, this.txParams);
 
-        proxyAdmin.address.should.eq(this.proxyAdminContract._address);
+        proxyAdmin.address.should.eq(this.proxyAdminContract.address);
         proxyAdmin.txParams.should.eq(this.txParams);
       });
     });
@@ -50,7 +50,7 @@ contract('ProxyAdmin class', function(accounts) {
     describe('#getImplementation', function() {
       it('returns proxy implementation address', async function() {
         const implementationAddress = await this.proxyAdmin.getProxyImplementation(this.proxy.address);
-        implementationAddress.should.be.equal(this.implementationV1._address);
+        implementationAddress.should.be.equal(this.implementationV1.address);
       });
     })
 
@@ -65,17 +65,17 @@ contract('ProxyAdmin class', function(accounts) {
     describe('#upradeProxy', function() {
       context('without init args', function() {
         it('upgrades proxy', async function() {
-          await this.proxyAdmin.upgradeProxy(this.proxy.address, this.implementationV2._address, ImplV2);
+          await this.proxyAdmin.upgradeProxy(this.proxy.address, this.implementationV2.address, ImplV2);
           const implementationAddress = await this.proxyAdmin.getProxyImplementation(this.proxy.address);
-          implementationAddress.should.be.equal(this.implementationV2._address)
+          implementationAddress.should.be.equal(this.implementationV2.address)
         });
       });
 
       context('with init args', function() {
         it('upgrades proxy', async function() {
-          await this.proxyAdmin.upgradeProxy(this.proxy.address, this.implementationV2._address, ImplV2, 'migrate', [1337]);
+          await this.proxyAdmin.upgradeProxy(this.proxy.address, this.implementationV2.address, ImplV2, 'migrate', [1337]);
           const implementationAddress = await this.proxyAdmin.getProxyImplementation(this.proxy.address);
-          implementationAddress.should.be.equal(this.implementationV2._address)
+          implementationAddress.should.be.equal(this.implementationV2.address)
         });
       });
     });

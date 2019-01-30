@@ -8,7 +8,7 @@ export const ZERO_ADDRESS: string = '0x0000000000000000000000000000000000000000'
 export function toAddress(contractOrAddress: string | any): string {
   if (isEmpty(contractOrAddress)) throw Error(`Contract or address expected`);
   else if (isString(contractOrAddress)) return utils.toChecksumAddress(contractOrAddress);
-  else return utils.toChecksumAddress(contractOrAddress._address);
+  else return utils.toChecksumAddress(contractOrAddress.address);
 }
 
 export function isZeroAddress(address: string): boolean {

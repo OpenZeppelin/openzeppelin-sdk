@@ -16,7 +16,7 @@ export default class ImplementationDirectory {
     const contractClass = this.getContractClass();
     log.info(`Deploying new ${contractClass.schema.contractName}...`);
     const directory = await deploy(contractClass, [], txParams);
-    log.info(`Deployed ${contractClass.schema.contractName} at ${directory._address}`);
+    log.info(`Deployed ${contractClass.schema.contractName} at ${directory.address}`);
     return new this(directory, txParams);
   }
 
@@ -40,7 +40,7 @@ export default class ImplementationDirectory {
   }
 
   get address(): string {
-    return this.directoryContract._address;
+    return this.directoryContract.address;
   }
 
   public async owner(): Promise<string> {

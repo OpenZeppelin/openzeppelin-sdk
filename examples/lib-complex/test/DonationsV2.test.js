@@ -13,8 +13,8 @@ contract('DonationsV2', ([_, owner, donor, wallet]) => {
     await this.donations.methods.initialize(owner).send();
 
     this.token = await ERC721Mintable.deploy();
-    await this.token.methods.initialize(this.donations._address).send();
-    await this.donations.methods.setToken(this.token._address).send({ from: owner });
+    await this.token.methods.initialize(this.donations.address).send();
+    await this.donations.methods.setToken(this.token.address).send({ from: owner });
   });
 
   shouldBehaveLikeDonationsWithTokens(owner, donor, wallet);

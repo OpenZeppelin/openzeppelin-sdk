@@ -70,7 +70,7 @@ export default function shouldBehaveLikePackageProject({ fetch, onInitialize, on
         const newImplementation = await this.project.setImplementation(DummyImplementation, contractName)
         const directory = await this.project.getCurrentDirectory()
         const implementation = await directory.getImplementation(contractName)
-        implementation.should.eq(newImplementation._address)
+        implementation.should.eq(newImplementation.address)
       })
 
       it('registers a new implementation on a new version', async function() {
@@ -79,7 +79,7 @@ export default function shouldBehaveLikePackageProject({ fetch, onInitialize, on
         const thepackage = await this.project.getProjectPackage()
         const directory = await thepackage.getDirectory(newVersion)
         const implementation = await directory.getImplementation(contractName)
-        implementation.should.eq(newImplementation._address)
+        implementation.should.eq(newImplementation.address)
       })
     })
 

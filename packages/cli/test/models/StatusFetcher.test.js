@@ -242,7 +242,7 @@ contract('StatusFetcher', async function([_, owner, anotherAddress]) {
               await this.checker.checkImplementations()
 
               this.networkFile.contractAliases.should.have.lengthOf(1)
-              this.networkFile.contract('ImplV1').address.should.be.equal(this.impl._address)
+              this.networkFile.contract('ImplV1').address.should.be.equal(this.impl.address)
               this.networkFile.contract('ImplV1').deployedBytecodeHash.should.be.equal(bytecodeDigest(ImplV1.schema.bytecode))
               this.networkFile.contract('ImplV1').constructorCode.should.be.equal(constructorCode(ImplV1.schema))
               this.networkFile.contract('ImplV1').bodyBytecodeHash.should.be.equal(bytecodeDigest(bodyCode(ImplV1.schema)))
@@ -258,7 +258,7 @@ contract('StatusFetcher', async function([_, owner, anotherAddress]) {
               await this.checker.checkImplementations()
 
               this.networkFile.contractAliases.should.have.lengthOf(1)
-              this.networkFile.contract('Impl').address.should.be.equal(this.impl._address)
+              this.networkFile.contract('Impl').address.should.be.equal(this.impl.address)
               this.networkFile.contract('Impl').deployedBytecodeHash.should.be.equal('unknown')
               this.networkFile.contract('Impl').constructorCode.should.be.equal('unknown')
               this.networkFile.contract('Impl').bodyBytecodeHash.should.be.equal(bytecodeDigest(bodyCode(ImplV1.schema)))
@@ -276,11 +276,11 @@ contract('StatusFetcher', async function([_, owner, anotherAddress]) {
             await this.checker.checkImplementations()
 
             this.networkFile.contractAliases.should.have.lengthOf(2)
-            this.networkFile.contract('ImplV1').address.should.be.equal(this.impl._address)
+            this.networkFile.contract('ImplV1').address.should.be.equal(this.impl.address)
             this.networkFile.contract('ImplV1').deployedBytecodeHash.should.be.equal(bytecodeDigest(ImplV1.schema.bytecode))
             this.networkFile.contract('ImplV1').constructorCode.should.be.equal(constructorCode(ImplV1.schema))
             this.networkFile.contract('ImplV1').bodyBytecodeHash.should.be.equal(bytecodeDigest(bodyCode(ImplV1.schema)))
-            this.networkFile.contract('ChildImplV1').address.should.be.equal(this.childImpl._address)
+            this.networkFile.contract('ChildImplV1').address.should.be.equal(this.childImpl.address)
             this.networkFile.contract('ChildImplV1').deployedBytecodeHash.should.be.equal(bytecodeDigest(ChildImplV1.schema.bytecode))
             this.networkFile.contract('ChildImplV1').constructorCode.should.be.equal(constructorCode(ChildImplV1.schema))
             this.networkFile.contract('ChildImplV1').bodyBytecodeHash.should.be.equal(bytecodeDigest(bodyCode(ChildImplV1.schema)))
@@ -298,7 +298,7 @@ contract('StatusFetcher', async function([_, owner, anotherAddress]) {
             await this.checker.checkImplementations()
 
             this.networkFile.contractAliases.should.have.lengthOf(1)
-            this.networkFile.contract('ChildImplV1').address.should.be.equal(this.childImpl._address)
+            this.networkFile.contract('ChildImplV1').address.should.be.equal(this.childImpl.address)
             this.networkFile.contract('ChildImplV1').deployedBytecodeHash.should.be.equal(bytecodeDigest(ChildImplV1.schema.bytecode))
             this.networkFile.contract('ChildImplV1').constructorCode.should.be.equal(constructorCode(ChildImplV1.schema))
             this.networkFile.contract('ChildImplV1').bodyBytecodeHash.should.be.equal(bytecodeDigest(bodyCode(ChildImplV1.schema)))
@@ -326,7 +326,7 @@ contract('StatusFetcher', async function([_, owner, anotherAddress]) {
         describe('when the directory of the current version has one of those contract', function () {
           describe('when the directory has the same address and same bytecode for that contract', function () {
             beforeEach('registering new implementation in AppDirectory', async function () {
-              await this.directory.setImplementation('Impl', this.impl._address, txParams)
+              await this.directory.setImplementation('Impl', this.impl.address, txParams)
             })
 
             it('removes the unregistered contract without changing the registered one', async function () {
@@ -344,7 +344,7 @@ contract('StatusFetcher', async function([_, owner, anotherAddress]) {
 
           describe('when the directory has another address for that contract', function () {
             beforeEach('registering new implementation in AppDirectory', async function () {
-              await this.directory.setImplementation('Impl', this.childImpl._address, txParams)
+              await this.directory.setImplementation('Impl', this.childImpl.address, txParams)
             })
 
             it.skip('removes the unregistered contract and updates the address of the registered one', async function () {
@@ -353,7 +353,7 @@ contract('StatusFetcher', async function([_, owner, anotherAddress]) {
               await this.checker.checkImplementations()
 
               this.networkFile.contractAliases.should.have.lengthOf(1)
-              this.networkFile.contract('Impl').address.should.be.equal(this.childImpl._address)
+              this.networkFile.contract('Impl').address.should.be.equal(this.childImpl.address)
               this.networkFile.contract('Impl').deployedBytecodeHash.should.be.equal(previousContract.deployedBytecodeHash)
               this.networkFile.contract('Impl').constructorCode.should.be.equal(previousContract.constructorCode)
               this.networkFile.contract('Impl').bodyBytecodeHash.should.be.equal(previousContract.bodyBytecodeHash)
@@ -363,7 +363,7 @@ contract('StatusFetcher', async function([_, owner, anotherAddress]) {
           describe('when the bytecode for that contract is different', function () {
             beforeEach('registering new implementation in AppDirectory', async function () {
               this.networkFile.updateImplementation('Impl', (implementation) => ({ ...implementation, bodyBytecodeHash: '0x0' }))
-              await this.directory.setImplementation('Impl', this.impl._address, txParams)
+              await this.directory.setImplementation('Impl', this.impl.address, txParams)
             })
 
             it('removes the unregistered contract and updates the bytecode of the registered one', async function () {
@@ -382,8 +382,8 @@ contract('StatusFetcher', async function([_, owner, anotherAddress]) {
 
         describe('when the directory of the current version has both contracts', function () {
           beforeEach('registering new implementation in AppDirectory', async function () {
-            await this.directory.setImplementation('Impl', this.impl._address, txParams)
-            await this.directory.setImplementation('ChildImpl', this.childImpl._address, txParams)
+            await this.directory.setImplementation('Impl', this.impl.address, txParams)
+            await this.directory.setImplementation('ChildImpl', this.childImpl.address, txParams)
           })
 
           it('does not update the contracts list', async function () {
@@ -404,9 +404,9 @@ contract('StatusFetcher', async function([_, owner, anotherAddress]) {
 
         describe('when the directory of the current version has many contracts and some of them where unregistered', function () {
           beforeEach('registering two new implementations in AppDirectory', async function () {
-            await this.directory.setImplementation('Impl', this.impl._address, txParams)
+            await this.directory.setImplementation('Impl', this.impl.address, txParams)
             await this.project.unsetImplementation('Impl', txParams)
-            await this.directory.setImplementation('ChildImpl', this.childImpl._address, txParams)
+            await this.directory.setImplementation('ChildImpl', this.childImpl.address, txParams)
           })
 
           it('adds the missing contract', async function () {

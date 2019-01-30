@@ -262,7 +262,7 @@ contract('StatusComparator', function([_, owner, anotherAddress]) {
             this.comparator.reports.should.have.lengthOf(1)
             this.comparator.reports[0].expected.should.be.equal('none')
             this.comparator.reports[0].observed.should.be.equal('one')
-            this.comparator.reports[0].description.should.be.equal(`Missing registered contract Impl at ${this.impl._address}`)
+            this.comparator.reports[0].description.should.be.equal(`Missing registered contract Impl at ${this.impl.address}`)
           })
         })
 
@@ -278,10 +278,10 @@ contract('StatusComparator', function([_, owner, anotherAddress]) {
             this.comparator.reports.should.have.lengthOf(2)
             this.comparator.reports[0].expected.should.be.equal('none')
             this.comparator.reports[0].observed.should.be.equal('one')
-            this.comparator.reports[0].description.should.be.equal(`Missing registered contract Impl at ${this.impl._address}`)
+            this.comparator.reports[0].description.should.be.equal(`Missing registered contract Impl at ${this.impl.address}`)
             this.comparator.reports[1].expected.should.be.equal('none')
             this.comparator.reports[1].observed.should.be.equal('one')
-            this.comparator.reports[1].description.should.be.equal(`Missing registered contract ChildImpl at ${this.childImpl._address}`)
+            this.comparator.reports[1].description.should.be.equal(`Missing registered contract ChildImpl at ${this.childImpl.address}`)
           })
         })
 
@@ -298,7 +298,7 @@ contract('StatusComparator', function([_, owner, anotherAddress]) {
             this.comparator.reports.should.have.lengthOf(1)
             this.comparator.reports[0].expected.should.be.equal('none')
             this.comparator.reports[0].observed.should.be.equal('one')
-            this.comparator.reports[0].description.should.be.equal(`Missing registered contract ChildImpl at ${this.childImpl._address}`)
+            this.comparator.reports[0].description.should.be.equal(`Missing registered contract ChildImpl at ${this.childImpl.address}`)
           })
         })
       })
@@ -319,17 +319,17 @@ contract('StatusComparator', function([_, owner, anotherAddress]) {
             this.comparator.reports.should.have.lengthOf(2)
             this.comparator.reports[0].expected.should.be.equal('one')
             this.comparator.reports[0].observed.should.be.equal('none')
-            this.comparator.reports[0].description.should.be.equal(`A contract Impl at ${this.impl._address} is not registered`)
+            this.comparator.reports[0].description.should.be.equal(`A contract Impl at ${this.impl.address} is not registered`)
             this.comparator.reports[1].expected.should.be.equal('one')
             this.comparator.reports[1].observed.should.be.equal('none')
-            this.comparator.reports[1].description.should.be.equal(`A contract ChildImpl at ${this.childImpl._address} is not registered`)
+            this.comparator.reports[1].description.should.be.equal(`A contract ChildImpl at ${this.childImpl.address} is not registered`)
           })
         })
 
         describe('when the directory of the current version has one of those contract', function () {
           describe('when the directory has the same address and same bytecode for that contract', function () {
             beforeEach('registering new implementation in AppDirectory', async function () {
-              await this.directory.setImplementation('Impl', this.impl._address)
+              await this.directory.setImplementation('Impl', this.impl.address)
             })
 
             it('reports only the missing contract', async function () {
@@ -338,28 +338,28 @@ contract('StatusComparator', function([_, owner, anotherAddress]) {
               this.comparator.reports.should.have.lengthOf(1)
               this.comparator.reports[0].expected.should.be.equal('one')
               this.comparator.reports[0].observed.should.be.equal('none')
-              this.comparator.reports[0].description.should.be.equal(`A contract ChildImpl at ${this.childImpl._address} is not registered`)
+              this.comparator.reports[0].description.should.be.equal(`A contract ChildImpl at ${this.childImpl.address} is not registered`)
             })
           })
 
           describe('when the directory has another address for that contract', function () {
             beforeEach('registering new implementation in AppDirectory', async function () {
-              await this.directory.setImplementation('Impl', this.childImpl._address)
+              await this.directory.setImplementation('Impl', this.childImpl.address)
             })
 
             it('reports those diffs', async function () {
               await this.checker.checkImplementations()
 
               this.comparator.reports.should.have.lengthOf(3)
-              this.comparator.reports[0].expected.should.be.equal(this.impl._address)
-              this.comparator.reports[0].observed.should.be.equal(this.childImpl._address)
+              this.comparator.reports[0].expected.should.be.equal(this.impl.address)
+              this.comparator.reports[0].observed.should.be.equal(this.childImpl.address)
               this.comparator.reports[0].description.should.be.equal('Address for contract Impl does not match')
               this.comparator.reports[1].expected.should.be.equal(bytecodeDigest(ImplV1.schema.deployedBytecode))
               this.comparator.reports[1].observed.should.be.equal(bytecodeDigest(ChildImplV1.schema.deployedBytecode))
-              this.comparator.reports[1].description.should.be.equal(`Bytecode at ${this.childImpl._address} for contract Impl does not match`)
+              this.comparator.reports[1].description.should.be.equal(`Bytecode at ${this.childImpl.address} for contract Impl does not match`)
               this.comparator.reports[2].expected.should.be.equal('one')
               this.comparator.reports[2].observed.should.be.equal('none')
-              this.comparator.reports[2].description.should.be.equal(`A contract ChildImpl at ${this.childImpl._address} is not registered`)
+              this.comparator.reports[2].description.should.be.equal(`A contract ChildImpl at ${this.childImpl.address} is not registered`)
             })
           })
 
@@ -368,7 +368,7 @@ contract('StatusComparator', function([_, owner, anotherAddress]) {
               const contracts = this.networkFile.contracts
               contracts.Impl.bodyBytecodeHash = '0x0'
               this.networkFile.contracts = contracts
-              await this.directory.setImplementation('Impl', this.impl._address)
+              await this.directory.setImplementation('Impl', this.impl.address)
             })
 
             it('reports both diffs', async function () {
@@ -377,18 +377,18 @@ contract('StatusComparator', function([_, owner, anotherAddress]) {
               this.comparator.reports.should.have.lengthOf(2)
               this.comparator.reports[0].expected.should.be.equal('0x0')
               this.comparator.reports[0].observed.should.be.equal(bytecodeDigest(ImplV1.schema.deployedBytecode))
-              this.comparator.reports[0].description.should.be.equal(`Bytecode at ${this.impl._address} for contract Impl does not match`)
+              this.comparator.reports[0].description.should.be.equal(`Bytecode at ${this.impl.address} for contract Impl does not match`)
               this.comparator.reports[1].expected.should.be.equal('one')
               this.comparator.reports[1].observed.should.be.equal('none')
-              this.comparator.reports[1].description.should.be.equal(`A contract ChildImpl at ${this.childImpl._address} is not registered`)
+              this.comparator.reports[1].description.should.be.equal(`A contract ChildImpl at ${this.childImpl.address} is not registered`)
             })
           })
         })
 
         describe('when the directory of the current version has both contracts', function () {
           beforeEach('registering new implementation in AppDirectory', async function () {
-            await this.directory.setImplementation('Impl', this.impl._address)
-            await this.directory.setImplementation('ChildImpl', this.childImpl._address)
+            await this.directory.setImplementation('Impl', this.impl.address)
+            await this.directory.setImplementation('ChildImpl', this.childImpl.address)
           })
 
           it('does not report any diff ', async function () {
@@ -400,9 +400,9 @@ contract('StatusComparator', function([_, owner, anotherAddress]) {
 
         describe('when the directory of the current version has many contracts and some of them where unregistered', function () {
           beforeEach('registering two new implementations in AppDirectory', async function () {
-            await this.directory.setImplementation('Impl', this.impl._address)
+            await this.directory.setImplementation('Impl', this.impl.address)
             await this.directory.unsetImplementation('Impl')
-            await this.directory.setImplementation('ChildImpl', this.childImpl._address)
+            await this.directory.setImplementation('ChildImpl', this.childImpl.address)
           })
 
           it('reports one diff per contract', async function () {
@@ -411,7 +411,7 @@ contract('StatusComparator', function([_, owner, anotherAddress]) {
             this.comparator.reports.should.have.lengthOf(1)
             this.comparator.reports[0].expected.should.be.equal('one')
             this.comparator.reports[0].observed.should.be.equal('none')
-            this.comparator.reports[0].description.should.be.equal(`A contract Impl at ${this.impl._address} is not registered`)
+            this.comparator.reports[0].description.should.be.equal(`A contract Impl at ${this.impl.address} is not registered`)
           })
         })
       })

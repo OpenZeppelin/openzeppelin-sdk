@@ -27,7 +27,7 @@ export default class App {
   public static async deploy(txParams: any = {}): Promise<App> {
     log.info('Deploying new App...');
     const appContract = await deployContract(this.getContractClass(), [], txParams);
-    log.info(`Deployed App at ${appContract._address}`);
+    log.info(`Deployed App at ${appContract.address}`);
     return new this(appContract, txParams);
   }
 
@@ -61,7 +61,7 @@ export default class App {
   }
 
   get address(): string {
-    return this.appContract._address;
+    return this.appContract.address;
   }
 
   get contract(): Contract {
@@ -114,7 +114,7 @@ export default class App {
     log.info(`Creating new non-upgradeable instance of ${packageName} ${contractName}...`);
     const implementation = await this.getImplementation(packageName, contractName);
     const instance = await copyContract(contractClass, implementation, { ...this.txParams });
-    log.info(`${packageName} ${contractName} instance created at ${instance._address}`);
+    log.info(`${packageName} ${contractName} instance created at ${instance.address}`);
     return instance;
   }
 

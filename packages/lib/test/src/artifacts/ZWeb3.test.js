@@ -91,7 +91,7 @@ contract('ZWeb3', accounts => {
 
     describe('get code', function () {
       it('can tell the deployed bytecode of a certain address', async function () {
-        const bytecode = await ZWeb3.getCode(this.impl._address)
+        const bytecode = await ZWeb3.getCode(this.impl.address)
         bytecode.should.be.equal(this.DummyImplementation.schema.linkedDeployedBytecode)
       })
     })
@@ -99,14 +99,14 @@ contract('ZWeb3', accounts => {
     describe('get storage', function () {
       it('tells the value stored at a certain storage slot', async function () {
         await this.impl.methods.initialize(32, 'hello', [1, 2, 3]).send()
-        const storage = await ZWeb3.getStorageAt(this.impl._address, 0)
+        const storage = await ZWeb3.getStorageAt(this.impl.address, 0)
         storage.should.be.equal('0x20')
       })
     })
 
     describe('estimate gas', function () {
       it('can estimate the gas of a call', async function () {
-        const { gasUsed: expectedGas } = this.impl.zosData.deploymentTransactionReceipt
+        const { gasUsed: expectedGas } = this.impl.zosData.deployment.transactionReceipt
         const gas = await ZWeb3.estimateGas({ data: this.DummyImplementation.schema.linkedBytecode })
         gas.should.be.equal(expectedGas)
       })

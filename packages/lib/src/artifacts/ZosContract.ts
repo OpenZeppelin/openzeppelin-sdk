@@ -19,13 +19,16 @@ export default class ZosContract {
     const self = this;
     return new Promise(function(resolve, reject) {
       const tx = contract.deploy({data: self.schema.linkedBytecode, arguments: args});
-      const zosData: any = {};
+      const zosData: any = {
+        deployment: {}
+      };
       tx.send({ ...options })
         .on('error', (error) => reject(error))
-        .on('receipt', (receipt) => zosData.deploymentTransactionReceipt = receipt)
-        .on('transactionHash', (hash) => zosData.deploymentTransactionHash = hash)
+        .on('receipt', (receipt) => zosData.deployment.transactionReceipt = receipt)
+        .on('transactionHash', (hash) => zosData.deployment.transactionHash = hash)
         .then((instance) => {
           instance.zosData = zosData;
+          instance.address = instance.options.address;
           resolve(instance);
         })
         .catch((error) => reject(error));
@@ -34,8 +37,9 @@ export default class ZosContract {
 
   public at(address: string): Contract | never {
     const defaultOptions = Contracts.getArtifactsDefaults();
-    const contract = ZWeb3.contract(this.schema.abi, address, defaultOptions);
-    return contract;
+    const instance = ZWeb3.contract(this.schema.abi, address, defaultOptions);
+    instance.address = instance.options.address;
+    return instance;
   }
 
   public link(libraries: { [libAlias: string]: string }): void {

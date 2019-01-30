@@ -41,8 +41,8 @@ export default abstract class BasePackageProject {
     log.info(`Setting implementation of ${contractName} in directory...`);
     const implementation: any = await deploy(contractClass, [], this.txParams);
     const directory: ImplementationDirectory = await this.getCurrentDirectory();
-    await directory.setImplementation(contractName, implementation._address);
-    log.info(`Implementation set: ${implementation._address}`);
+    await directory.setImplementation(contractName, implementation.address);
+    log.info(`Implementation set: ${implementation.address}`);
     return implementation;
   }
 
