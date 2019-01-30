@@ -19,9 +19,6 @@ const Compiler = {
           if (stderr) console.error(stderr);
           resolve({ stdout, stderr });  
         }
-        if (stdout) console.log(stdout);
-        if (stderr) console.error(stderr);
-        error ? reject(error) : resolve({ stdout, stderr });
       });
     });
   }
