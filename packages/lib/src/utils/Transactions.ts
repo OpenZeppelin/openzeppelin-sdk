@@ -10,6 +10,7 @@ import sleep from '../helpers/sleep';
 import ZWeb3 from '../artifacts/ZWeb3';
 import Contracts from '../artifacts/Contracts';
 import ContractFactory, { ContractWrapper, TransactionReceiptWrapper } from '../artifacts/ContractFactory';
+import omit from 'lodash.omit';
 import { TransactionReceipt } from 'web3/types';
 
 // Cache, exported for testing
@@ -150,8 +151,11 @@ export async function estimateGas(txParams: any, retries: number = RETRY_COUNT):
   // we are working with, if the txs are routed to different nodes.
   // See https://github.com/zeppelinos/zos/issues/192 for more info.
   try {
+    // Remove gas from estimateGas call, which may cause Geth to fail
+    // See https://github.com/ethereum/go-ethereum/issues/18973 for more info
+    const txParamsWithoutGas = omit(txParams, 'gas');
     // Use json-rpc method estimateGas to retrieve estimated value
-    return await ZWeb3.estimateGas(txParams);
+    return await ZWeb3.estimateGas(txParamsWithoutGas);
   } catch (error) {
     if (retries <= 0) throw Error(error);
     await sleep(RETRY_SLEEP_TIME);
