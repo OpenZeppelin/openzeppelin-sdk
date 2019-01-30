@@ -37,7 +37,7 @@ export default abstract class BasePackageProject {
   }
 
   public async setImplementation(contractClass: ZosContract, contractName: string): Promise<Contract> {
-    if (!contractName) contractName = contractClass.schema.contractName;
+    if (!contractName) contractName = contractClass.contractName;
     log.info(`Setting implementation of ${contractName} in directory...`);
     const implementation: any = await deploy(contractClass, [], this.txParams);
     const directory: ImplementationDirectory = await this.getCurrentDirectory();

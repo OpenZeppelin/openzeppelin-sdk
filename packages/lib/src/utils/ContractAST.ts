@@ -71,14 +71,14 @@ export default class ContractAST {
     // Node types to collect, null for all
     this.nodesFilter = props.nodesFilter || [];
 
-    this._collectImports(this.contract.schema.ast);
-    this._collectNodes(this.contract.schema.ast);
+    this._collectImports(this.contract.ast);
+    this._collectNodes(this.contract.ast);
   }
 
   public getContractNode(): Node {
-    return this.contract.schema.ast.nodes.find((node: Node) =>
+    return this.contract.ast.nodes.find((node: Node) =>
       node.nodeType === 'ContractDefinition' &&
-      node.name === this.contract.schema.contractName
+      node.name === this.contract.contractName
     );
   }
 
@@ -110,8 +110,8 @@ export default class ContractAST {
         if (this.imports.has(importPath)) return;
         this.imports.add(importPath);
         this.artifacts.getArtifactsFromSourcePath(importPath).forEach((importedArtifact) => {
-          this._collectNodes(importedArtifact.schema.ast);
-          this._collectImports(importedArtifact.schema.ast);
+          this._collectNodes(importedArtifact.ast);
+          this._collectImports(importedArtifact.ast);
         });
       });
   }

@@ -2,33 +2,8 @@ import glob from 'glob';
 import path from 'path';
 import ZosContract from './ZosContract';
 import ZWeb3 from './ZWeb3';
-import { StorageLayoutInfo } from '../validations/Storage';
 import { getSolidityLibNames, hasUnlinkedVariables } from '../utils/Bytecode';
 import { Contract } from 'web3-eth-contract';
-
-export interface SolidityContractSchema {
-  schemaVersion: string;
-  contractName: string;
-  abi: any[];
-  bytecode: string;
-  deployedBytecode: string;
-  sourceMap: string;
-  deployedSourceMap: string;
-  source: string;
-  sourcePath: string;
-  ast: any;
-  legacyAST: any;
-  compiler: any;
-  networks: any;
-  updatedAt: string;
-}
-
-export interface ZosContractSchema extends SolidityContractSchema {
-  linkedBytecode: string;
-  linkedDeployedBytecode: string;
-  warnings: any;
-  storageInfo: StorageLayoutInfo;
-}
 
 export default class Contracts {
   private static DEFAULT_SYNC_TIMEOUT: number = 240000;

@@ -10,7 +10,7 @@ export function hasDelegateCall(contractClass: ZosContract): boolean {
 }
 
 function hasTypeIdentifier(contractClass: ZosContract, typeIdentifier: string): boolean {
-  for (const node of contractClass.schema.ast.nodes.filter((n) => n.name === contractClass.schema.contractName)) {
+  for (const node of contractClass.ast.nodes.filter((n) => n.name === contractClass.contractName)) {
     if (hasKeyValue(node, 'typeIdentifier', typeIdentifier)) return true;
     for (const baseContract of node.baseContracts || []) {
       if (hasTypeIdentifier(Contracts.getFromLocal(baseContract.baseName.name), typeIdentifier)) return true;

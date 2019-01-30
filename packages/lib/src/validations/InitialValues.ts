@@ -8,7 +8,7 @@ export function hasInitialValuesInDeclarations(contractClass: ZosContract): bool
 }
 
 function detectInitialValues(contractClass: ZosContract): boolean {
-  const nodes = contractClass.schema.ast.nodes.filter((n) => n.name === contractClass.schema.contractName);
+  const nodes = contractClass.ast.nodes.filter((n) => n.name === contractClass.contractName);
   for (const node of nodes) {
     if (hasInitialValues(node)) return true;
     for (const baseContract of node.baseContracts || []) {

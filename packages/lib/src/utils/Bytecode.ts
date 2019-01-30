@@ -1,13 +1,13 @@
 import crypto from 'crypto';
 import { ZERO_ADDRESS } from './Addresses';
-import { ZosContractSchema } from '../artifacts/Contracts';
+import ZosContract from '../artifacts/ZosContract';
 
-export function bodyCode(schema: ZosContractSchema): string {
-  return splitCode(schema).body;
+export function bodyCode(contract: ZosContract): string {
+  return splitCode(contract).body;
 }
 
-export function constructorCode(schema: ZosContractSchema): string {
-  return splitCode(schema).constructor;
+export function constructorCode(contract: ZosContract): string {
+  return splitCode(contract).constructor;
 }
 
 export function bytecodeDigest(rawBytecode: string): string {
@@ -47,10 +47,10 @@ export function isSolidityLib(bytecode: string): boolean {
   return matches == null ? false : matches.length > 0;
 }
 
-function splitCode(schema: ZosContractSchema): {constructor: string, body: string} {
-  const binary = schema.linkedBytecode.replace(/^0x/, '');
-  const bytecode = schema.bytecode.replace(/^0x/, '');
-  const deployedBytecode = schema.deployedBytecode.replace(/^0x/, '');
+function splitCode(contract: ZosContract): {constructor: string, body: string} {
+  const binary = contract.linkedBytecode.replace(/^0x/, '');
+  const bytecode = contract.bytecode.replace(/^0x/, '');
+  const deployedBytecode = contract.deployedBytecode.replace(/^0x/, '');
   const constructor = bytecode.substr(0, bytecode.indexOf(deployedBytecode));
   const body = binary.replace(constructor, '');
   return { constructor, body };

@@ -146,10 +146,10 @@ export default class ZosNetworkFile {
   public addSolidityLib(libName: string, contract: ZosContract, instance: Contract): void {
     this.data.solidityLibs[libName] = {
       address: instance.address,
-      constructorCode: constructorCode(contract.schema),
-      bodyBytecodeHash: bytecodeDigest(bodyCode(contract.schema)),
-      localBytecodeHash: bytecodeDigest(contract.schema.bytecode),
-      deployedBytecodeHash: bytecodeDigest(contract.schema.linkedBytecode)
+      constructorCode: constructorCode(contract),
+      bodyBytecodeHash: bytecodeDigest(bodyCode(contract)),
+      localBytecodeHash: bytecodeDigest(contract.bytecode),
+      deployedBytecodeHash: bytecodeDigest(contract.linkedBytecode)
     };
   }
 
@@ -292,7 +292,7 @@ export default class ZosNetworkFile {
     const contract = this.contract(alias) || this.solidityLib(alias);
     if (contract) {
       const localBytecode = contract.localBytecodeHash;
-      const currentBytecode = bytecodeDigest(klass.schema.bytecode);
+      const currentBytecode = bytecodeDigest(klass.bytecode);
       return currentBytecode === localBytecode;
     }
   }
@@ -355,10 +355,10 @@ export default class ZosNetworkFile {
   public addContract(alias: string, contract: ZosContract, instance: Contract, { warnings, types, storage }: { warnings?: any, types?: any, storage?: any } = {}): void {
     this.setContract(alias, {
       address: instance.address,
-      constructorCode: constructorCode(contract.schema),
-      bodyBytecodeHash: bytecodeDigest(bodyCode(contract.schema)),
-      localBytecodeHash: bytecodeDigest(contract.schema.bytecode),
-      deployedBytecodeHash: bytecodeDigest(contract.schema.linkedBytecode),
+      constructorCode: constructorCode(contract),
+      bodyBytecodeHash: bytecodeDigest(bodyCode(contract)),
+      localBytecodeHash: bytecodeDigest(contract.bytecode),
+      deployedBytecodeHash: bytecodeDigest(contract.linkedBytecode),
       types,
       storage,
       warnings

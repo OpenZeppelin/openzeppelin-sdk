@@ -3,22 +3,44 @@ import ZWeb3 from './ZWeb3';
 import { getSolidityLibNames, hasUnlinkedVariables } from '../utils/Bytecode';
 import { Contract, TransactionObject } from 'web3-eth-contract';
 import { TransactionReceipt } from 'web3/types';
-import Contracts, { ZosContractSchema } from './Contracts';
+import { StorageLayoutInfo } from '../validations/Storage';
+import Contracts from './Contracts';
 import _ from 'lodash';
 
 export default class ZosContract {
-  public schema: ZosContractSchema;
+
+  // Solidity contract schema properties.
+  public schemaVersion: string;
+  public contractName: string;
+  public abi: any[];
+  public bytecode: string;
+  public deployedBytecode: string;
+  public sourceMap: string;
+  public deployedSourceMap: string;
+  public source: string;
+  public sourcePath: string;
+  public ast: any;
+  public legacyAST: any;
+  public compiler: any;
+  public networks: any;
+  public updatedAt: string;
+
+  // Custom schema properties.
+  public linkedBytecode: string;
+  public linkedDeployedBytecode: string;
+  public warnings: any;
+  public storageInfo: StorageLayoutInfo;
 
   constructor(schema: any) {
-    this.schema = schema;
+    Object.assign(this, schema);
   }
 
   public async deploy(args: any[] = [], options: any = {}): Promise<Contract> {
-    if(!this.schema.linkedBytecode) throw new Error(`${this.schema.contractName} bytecode contains unlinked libraries.`);
-    const contract = ZWeb3.contract(this.schema.abi, null, await Contracts.getDefaultTxParams());
+    if(!this.linkedBytecode) throw new Error(`${this.contractName} bytecode contains unlinked libraries.`);
+    const contract = ZWeb3.contract(this.abi, null, await Contracts.getDefaultTxParams());
     const self = this;
     return new Promise(function(resolve, reject) {
-      const tx = contract.deploy({data: self.schema.linkedBytecode, arguments: args});
+      const tx = contract.deploy({data: self.linkedBytecode, arguments: args});
       const zosData: any = {
         deployment: {}
       };
@@ -37,7 +59,7 @@ export default class ZosContract {
 
   public at(address: string): Contract | never {
     const defaultOptions = Contracts.getArtifactsDefaults();
-    const instance = ZWeb3.contract(this.schema.abi, address, defaultOptions);
+    const instance = ZWeb3.contract(this.abi, address, defaultOptions);
     instance.address = instance.options.address;
     return instance;
   }
@@ -46,8 +68,8 @@ export default class ZosContract {
     Object.keys(libraries).forEach((name: string) => {
       const address = libraries[name].replace(/^0x/, '');
       const regex = new RegExp(`__${name}_+`, 'g');
-      this.schema.linkedBytecode = this.schema.bytecode.replace(regex, address);
-      this.schema.linkedDeployedBytecode = this.schema.deployedBytecode.replace(regex, address);
+      this.linkedBytecode = this.bytecode.replace(regex, address);
+      this.linkedDeployedBytecode = this.deployedBytecode.replace(regex, address);
     });
   }
 }

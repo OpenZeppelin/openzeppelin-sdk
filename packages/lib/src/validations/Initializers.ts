@@ -18,7 +18,7 @@ export function getUninitializedBaseContracts(contractClass: ZosContract): strin
 // TS-TODO: define return type
 function getUninitializedDirectBaseContracts(contractClass: ZosContract, uninitializedBaseContracts: any): void {
   // Check whether the contract has base contracts
-  const baseContracts: any = contractClass.schema.ast.nodes.find((n) => n.name === contractClass.schema.contractName).baseContracts;
+  const baseContracts: any = contractClass.ast.nodes.find((n) => n.name === contractClass.contractName).baseContracts;
   if (baseContracts.length === 0) return;
 
   // Run check for the base contracts
@@ -50,7 +50,7 @@ function getUninitializedDirectBaseContracts(contractClass: ZosContract, uniniti
     // If there are 2 or more base contracts with initializers, child contract should initialize all of them
     if (baseContractsWithInitialize.length > 1) {
       for (const baseContract of baseContractsWithInitialize) {
-        uninitializedBaseContracts[baseContract] = contractClass.schema.contractName;
+        uninitializedBaseContracts[baseContract] = contractClass.contractName;
       }
     }
 
@@ -72,15 +72,15 @@ function getUninitializedDirectBaseContracts(contractClass: ZosContract, uniniti
   // For each base contract with "initialize" function, check that it's called in the function
   for (const contractName of baseContractsWithInitialize) {
     if (!initializedContracts[contractName]) {
-      uninitializedBaseContracts[contractName] = contractClass.schema.contractName;
+      uninitializedBaseContracts[contractName] = contractClass.contractName;
   }
     }
   return;
 }
 
 function getContractInitializer(contractClass: ZosContract): Node | undefined {
-  const contractDefinition: Node = contractClass.schema.ast.nodes
-    .find((n: Node) => n.nodeType === 'ContractDefinition' && n.name === contractClass.schema.contractName);
+  const contractDefinition: Node = contractClass.ast.nodes
+    .find((n: Node) => n.nodeType === 'ContractDefinition' && n.name === contractClass.contractName);
   const contractFunctions: Node[] = contractDefinition.nodes.filter((n) => n.nodeType === 'FunctionDefinition');
   for (const contractFunction of contractFunctions) {
     const functionModifiers: any = contractFunction.modifiers;

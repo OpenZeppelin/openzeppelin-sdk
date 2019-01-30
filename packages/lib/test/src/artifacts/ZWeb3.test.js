@@ -92,7 +92,7 @@ contract('ZWeb3', accounts => {
     describe('get code', function () {
       it('can tell the deployed bytecode of a certain address', async function () {
         const bytecode = await ZWeb3.getCode(this.impl.address)
-        bytecode.should.be.equal(this.DummyImplementation.schema.linkedDeployedBytecode)
+        bytecode.should.be.equal(this.DummyImplementation.linkedDeployedBytecode)
       })
     })
 
@@ -107,7 +107,7 @@ contract('ZWeb3', accounts => {
     describe('estimate gas', function () {
       it('can estimate the gas of a call', async function () {
         const { gasUsed: expectedGas } = this.impl.zosData.deployment.transactionReceipt
-        const gas = await ZWeb3.estimateGas({ data: this.DummyImplementation.schema.linkedBytecode })
+        const gas = await ZWeb3.estimateGas({ data: this.DummyImplementation.linkedBytecode })
         gas.should.be.equal(expectedGas)
       })
     })
