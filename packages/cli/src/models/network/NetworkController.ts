@@ -393,6 +393,7 @@ export default class NetworkController {
   // NetworkController
   public writeNetworkPackageIfNeeded(): void {
     this.networkFile.write();
+    this.packageFile.write();
   }
 
   // DeployerController
@@ -438,16 +439,18 @@ export default class NetworkController {
         await Transactions.awaitConfirmations(proxyAdmin.contract.transactionHash);
       }
 
-      if (this.appAddress) {
-        await allPromisesOrError(map(proxies, async (proxy) => {
-          await AppProxyMigrator(this.appAddress, proxy.address, proxyAdmin.address);
-        }));
-      } else {
-        const simpleProject = await new SimpleProject(this.packageFile.name, this.txParams);
-        await allPromisesOrError(map(proxies, async (proxy) => {
-          await simpleProject.changeProxyAdmin(proxy.address, proxyAdmin.address);
-        }));
-      }
+      await allPromisesOrError(map(proxies, async (proxy) => {
+        const proxyInstance = await Proxy.at(proxy.address);
+        const currentAdmin = await proxyInstance.admin();
+        if (currentAdmin !== proxyAdmin.address) {
+          if (this.appAddress) {
+            return AppProxyMigrator(this.appAddress, proxy.address, proxyAdmin.address);
+          } else {
+            const simpleProject = await new SimpleProject(this.packageFile.name, this.txParams);
+            return simpleProject.changeProxyAdmin(proxy.address, proxyAdmin.address);
+          }
+        }
+      }));
       log.info('Successfully migrated to zosversion 2.2');
     } else {
       log.info('No proxies were found. Updating zosversion to 2.2');
