@@ -1,3 +1,4 @@
+import isEqual from 'lodash.isequal';
 import isEmpty from 'lodash.isempty';
 import { Logger, FileSystem as fs } from 'zos-lib';
 import Dependency from '../dependency/Dependency';
@@ -145,8 +146,22 @@ export default class ZosPackageFile {
     return new ZosNetworkFile(this, network, networkFileName);
   }
 
+
   public write(): void {
-    fs.writeJson(this.fileName, this.data);
-    log.info(`Successfully written ${this.fileName}`);
+    if(this._hasChanged()) {
+      const exists = this._exists();
+      fs.writeJson(this.fileName, this.data);
+      exists ? log.info(`Updated ${this.fileName}`) : log.info(`Created ${this.fileName}`);
+    }
   }
+
+  public _hasChanged(): boolean {
+    const currentPackgeFile = fs.parseJsonIfExists(this.fileName);
+    return !isEqual(this.data, currentPackgeFile);
+  }
+
+  public _exists(): boolean {
+    return !!fs.parseJsonIfExists(this.fileName);
+  }
+
 }
