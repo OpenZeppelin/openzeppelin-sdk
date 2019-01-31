@@ -61,7 +61,7 @@ export default abstract class BaseSimpleProject {
     delete this.implementations[contractName];
   }
 
-  public async registerImplementation(contractName: string, { address, bytecodeHash }: Implementation): Promise<void> {
+  public registerImplementation(contractName: string, { address, bytecodeHash }: Implementation): void {
     this.implementations[contractName] = { address, bytecodeHash };
   }
 
