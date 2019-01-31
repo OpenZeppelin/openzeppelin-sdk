@@ -17,7 +17,7 @@ const Compiler = {
         } else {
           if (stdout) console.log(stdout);
           if (stderr) console.error(stderr);
-          resolve({ stdout, stderr });  
+          resolve({ stdout, stderr });
         }
       });
     });
