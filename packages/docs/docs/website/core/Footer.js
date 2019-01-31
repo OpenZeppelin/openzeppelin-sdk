@@ -42,17 +42,17 @@ class Footer extends React.Component {
               Reference
             </a>
           </div>
-          {/* <div>
+          <div>
             <h5>Community</h5>
+            <a href="https://forum.zeppelin.solutions/" target="_blank">
+              Forum
+            </a>
             <a
-              href="https://stackoverflow.com/search?q=open+zeppelin/"
+              href="https://t.me/zeppelinos/"
               target="_blank">
-              Stack Overflow
+              Telegram chat
             </a>
-            <a href="https://slack.openzeppelin.org/" target="_blank">
-              Chat on Slack
-            </a>
-          </div> */}
+          </div>
           <div>
             <h5>More</h5>
             <a href="https://zeppelinos.org">Main Site</a>

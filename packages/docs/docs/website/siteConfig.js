@@ -27,6 +27,10 @@ const siteConfig = {
       label: 'Blog',
     },
     {
+      href: 'https://forum.zeppelin.solutions',
+      label: 'Forum',
+    },
+    {
       href: 'https://github.com/zeppelinos',
       label: 'GitHub',
     },

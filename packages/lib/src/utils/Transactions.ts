@@ -5,6 +5,7 @@
 // (see https://github.com/trufflesuite/truffle-contract/pull/95/files#diff-26bcc3534c5a2e62e22643287a7d3295R145)
 
 import axios from 'axios';
+import omit from 'lodash.omit';
 import BN from 'bignumber.js';
 import sleep from '../helpers/sleep';
 import ZWeb3 from '../artifacts/ZWeb3';
@@ -118,6 +119,9 @@ export default {
     // we are working with, if the txs are routed to different nodes.
     // See https://github.com/zeppelinos/zos/issues/192 for more info.
     try {
+      // Remove gas from estimateGas call, which may cause Geth to fail
+      // See https://github.com/ethereum/go-ethereum/issues/18973 for more info
+      const txParamsWithoutGas = omit(txParams, 'gas');
       // Use json-rpc method estimateGas to retrieve estimated value
       return await ZWeb3.estimateGas(txParams);
     } catch (error) {
@@ -257,4 +261,4 @@ export default {
     if (await ZWeb3.isGanacheNode()) gasToUse += 15000;
     return gasToUse >= blockLimit ? (blockLimit - 1) : gasToUse;
   }
-};
+}
