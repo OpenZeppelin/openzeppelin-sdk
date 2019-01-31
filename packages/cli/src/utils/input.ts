@@ -10,7 +10,17 @@ export function parseArgs(args: string): string[] | never {
     const MATCH_WORDS = /(^|([,[]\s*))(\w+)/g;
     args = args.replace(MATCH_WORDS, '$2"$3"'); // replace non quoted number by quoted number
 
-    return JSON.parse('[' + args + ']');
+    // Parse string to array.
+    let parsedArgs = JSON.parse('[' + args + ']');
+
+    // Replace boolean strings with boolean literals.
+    parsedArgs = parsedArgs.map((value) => {
+      if(value === 'false') return false;
+      else if(value === 'true') return true;
+      return value;
+    });
+
+    return parsedArgs;
   } catch (e) {
     throw Error(`Error parsing arguments: ${e}`);
   }

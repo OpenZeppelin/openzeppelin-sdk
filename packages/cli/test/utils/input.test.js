@@ -9,6 +9,8 @@ describe('input', function () {
       () => parseArgs(input).should.deep.eq(expected)
     );
 
+    it('should parse a false boolean', testFn("false", false));
+    it('should parse a true boolean', testFn("true", true));
     it('should parse a number', testFn("42", "42"));
     it('should parse a string', testFn("foo", 'foo'));
     it('should parse a number+string', testFn("42pepe", "42pepe"));
