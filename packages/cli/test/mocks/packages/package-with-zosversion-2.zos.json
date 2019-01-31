@@ -5,8 +5,5 @@
   "contracts": {
     "ImplV1": "ImplV1",
     "ImplV2": "ImplV2"
-  },
-  "dependencies": {
-    "mock-stdlib-undeployed": "1.1.0"
   }
 }

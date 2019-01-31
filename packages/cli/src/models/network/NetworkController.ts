@@ -448,7 +448,7 @@ export default class NetworkController {
         const currentAdmin = await proxyInstance.admin();
         if (currentAdmin !== proxyAdmin.address) {
           if (this.appAddress) {
-            return AppProxyMigrator(this.appAddress, proxy.address, proxyAdmin.address);
+            return AppProxyMigrator(this.appAddress, proxy.address, proxyAdmin.address, this.txParams);
           } else {
             const simpleProject = await new SimpleProject(this.packageFile.name, this.txParams);
             return simpleProject.changeProxyAdmin(proxy.address, proxyAdmin.address);
