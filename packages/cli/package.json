@@ -37,6 +37,7 @@
     "@types/npm": "^2.0.29",
     "@types/semver": "^5.5.0",
     "axios": "^0.18.0",
+    "bignumber.js": "^8.0.2",
     "chalk": "^2.4.1",
     "cheerio": "^1.0.0-rc.2",
     "commander": "^2.15.1",
