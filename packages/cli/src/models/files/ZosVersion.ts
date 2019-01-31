@@ -1,3 +1,4 @@
+import isNull from 'lodash.isnull';
 import isUndefined from 'lodash.isundefined';
 
 const CURRENT_ZOS_VERSION = ['2', '2'];
@@ -13,8 +14,8 @@ export function checkVersion(version: string, where: any): boolean | never {
   }
 }
 
-export function isLatestZosversion(version: string): boolean {
-  return !isUndefined(version) && isCurrentVersion(version);
+export function isNotMigratableZosversion(version: string): boolean {
+  return isUndefined(version) || isNull(version) || isCurrentVersion(version);
 }
 
 function stringifyCurrentZosversion(): string {

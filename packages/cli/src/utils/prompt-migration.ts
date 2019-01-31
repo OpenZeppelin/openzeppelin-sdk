@@ -1,8 +1,8 @@
 import readline from 'readline';
-import { isLatestZosversion } from '../models/files/ZosVersion';
+import { isNotMigratableZosversion } from '../models/files/ZosVersion';
 
 export async function willMigrateProjectIfNeeded(zosversion): Promise<boolean> {
-  if(!isLatestZosversion(zosversion)) {
+  if(!isNotMigratableZosversion(zosversion)) {
     const response = await new Promise((resolve) => {
       const prompt = readline.createInterface({
         input: process.stdin,
