@@ -8,7 +8,7 @@ export async function willMigrateProjectIfNeeded(zosversion): Promise<boolean> {
         input: process.stdin,
         output: process.stdout
       });
-      prompt.question(`An old version of the ZeppelinOS project was detected and needs to be migrated to the latest one.\nDo you want to proceed? [y/n] `, (answer) => {
+      prompt.question(`An old zos version was detected and needs to be migrated to the latest one.\nDo you want to proceed? [y/n] `, (answer) => {
         prompt.close();
         resolve(answer);
       });
