@@ -51,7 +51,7 @@ export interface DependencyInterface {
   customDeploy?: boolean;
 }
 
-type addressWrapper =  { address?: string };
+interface AddressWrapper { address?: string; }
 
 export default class ZosNetworkFile {
 
@@ -63,10 +63,10 @@ export default class ZosNetworkFile {
     solidityLibs: { [libAlias: string]: SolidityLibInterface };
     proxies: { [contractName: string]: ProxyInterface[] };
     zosversion: string;
-    proxyAdmin: addressWrapper;
-    app: addressWrapper;
-    package: addressWrapper;
-    provider: addressWrapper;
+    proxyAdmin: AddressWrapper;
+    app: AddressWrapper;
+    package: AddressWrapper;
+    provider: AddressWrapper;
     version: string;
     frozen: boolean;
     dependencies: { [dependencyName: string]: DependencyInterface };
@@ -84,7 +84,7 @@ export default class ZosNetworkFile {
     checkVersion(this.data.zosversion, this.fileName);
   }
 
-  get proxyAdmin(): addressWrapper {
+  get proxyAdmin(): AddressWrapper {
     return this.data.proxyAdmin || {};
   }
 
@@ -92,7 +92,7 @@ export default class ZosNetworkFile {
     return this.proxyAdmin.address;
   }
 
-  get app(): addressWrapper {
+  get app(): AddressWrapper {
     return this.data.app || {};
   }
 
@@ -100,7 +100,7 @@ export default class ZosNetworkFile {
     return this.app.address;
   }
 
-  get package(): addressWrapper {
+  get package(): AddressWrapper {
     return this.data.package || {};
   }
 
@@ -108,7 +108,7 @@ export default class ZosNetworkFile {
     return this.package.address;
   }
 
-  get provider(): addressWrapper {
+  get provider(): AddressWrapper {
     return this.data.provider || {};
   }
 
@@ -318,20 +318,20 @@ export default class ZosNetworkFile {
     this.data.frozen = frozen;
   }
 
-  set proxyAdmin(admin: addressWrapper) {
+  set proxyAdmin(admin: AddressWrapper) {
     this.data.proxyAdmin = admin;
 
   }
 
-  set app(app: addressWrapper) {
+  set app(app: AddressWrapper) {
     this.data.app = app;
   }
 
-  set provider(provider: addressWrapper) {
+  set provider(provider: AddressWrapper) {
     this.data.provider = provider;
   }
 
-  set package(_package: addressWrapper) {
+  set package(_package: AddressWrapper) {
     this.data.package = _package;
   }
 

@@ -6,7 +6,7 @@ import Package from '../application/Package';
 import Transactions from '../utils/Transactions';
 import { toAddress } from '../utils/Addresses';
 import { bytecodeDigest } from '../utils/Bytecode';
-import { toSemanticVersion }from '../utils/Semver';
+import { toSemanticVersion } from '../utils/Semver';
 import { buildCallData, callDescription, CalldataInfo } from '../utils/ABIs';
 import { ContractInterface } from './AppProject';
 import ContractFactory, { ContractWrapper } from '../artifacts/ContractFactory';
