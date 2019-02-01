@@ -1,6 +1,9 @@
 {
   "name": "root",
   "private": true,
+  "scripts": {
+    "prepare": "git config core.hooksPath .githooks"
+  },
   "devDependencies": {
     "lerna": "~3.3.2",
     "tslint": "^5.11.0",

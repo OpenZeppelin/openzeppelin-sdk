@@ -27,7 +27,7 @@ export default class ProxyAdminProject extends BaseSimpleProject {
 
   public async upgradeProxy(proxyAddress: string, contractClass: ContractFactory, contractParams: ContractInterface = {}): Promise<ContractWrapper> {
     const { initMethod: initMethodName, initArgs } = contractParams;
-    const { implementationAddress, pAddress, initCallData } = await this._setUpgradeParams(proxyAddress, contractClass, contractParams)
+    const { implementationAddress, pAddress, initCallData } = await this._setUpgradeParams(proxyAddress, contractClass, contractParams);
     await this.proxyAdmin.upgradeProxy(pAddress, implementationAddress, contractClass, initMethodName, initArgs);
     log.info(`Instance at ${pAddress} upgraded`);
     return contractClass.at(pAddress);
