@@ -10,16 +10,16 @@ export function parseArgs(args: string): string[] | never {
     const END_LOOKAHEAD = '(?=$|([,\\]]\\s*))'; // Character after match is end of line, comma or closing bracket.
 
      // Replace non quoted hex string by quoted hex string.
-    const MATCH_HEX = '(0[xX][0-9a-fA-F]+)'; // Match '0x' followed by 'a' to 'f' characters, case insensitively.
-    args = args.replace(new RegExp(START_LOOKBEHIND + MATCH_HEX + END_LOOKAHEAD, 'g'), '"$2"');
+    const MATCH_HEX = new RegExp(START_LOOKBEHIND + '(0[xX][0-9a-fA-F]+)'+ END_LOOKAHEAD, 'g');
+    args = args.replace(MATCH_HEX, '"$2"');
 
     // Replace scientific notation numbers by regular numbers.
-    const MATCH_SCIENTIFIC = '(\\s*[-]?\\d+(\\.\\d+)?e(\\+)?\\d+\\s*)'; // Match scientific notation numbers like -1.5e20.
-    args = args.replace(new RegExp(START_LOOKBEHIND + MATCH_SCIENTIFIC + END_LOOKAHEAD, 'g'), (val) => `${(new BN(val)).toString(10)}`);
+    const MATCH_SCIENTIFIC = new RegExp(START_LOOKBEHIND + '(\\s*[-]?\\d+(\\.\\d+)?e(\\+)?\\d+\\s*)'+ END_LOOKAHEAD, 'g');
+    args = args.replace(MATCH_SCIENTIFIC, (val) => `${(new BN(val)).toString(10)}`);
 
      // Replace non quoted number by quoted number.
-    const MATCH_WORDS = '([-]?\\w+)';
-    args = args.replace(new RegExp(START_LOOKBEHIND + MATCH_WORDS + END_LOOKAHEAD, 'g'), '"$2"');
+    const MATCH_WORDS = new RegExp(START_LOOKBEHIND + '([-]?\\w+)'+ END_LOOKAHEAD, 'g');
+    args = args.replace(MATCH_WORDS, '"$2"');
 
     return JSON.parse('[' + args + ']');
   } catch (e) {
