@@ -1,4 +1,4 @@
-import LocalController from  '../models/local/LocalController';
+import LocalController from '../models/local/LocalController';
 import ZosPackageFile from '../models/files/ZosPackageFile';
 import { InitParams } from './interfaces';
 

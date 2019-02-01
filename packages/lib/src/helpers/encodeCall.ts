@@ -1,15 +1,14 @@
-import abi from 'ethereumjs-abi';
-import BN from 'bignumber.js';
+// TODO: Once we migrate to Web3 1.x, we could replace these two dependencies with Web3, since it uses these two under the hood: https://github.com/ethereum/web3.js/blob/1.0/packages/web3-eth-abi/src/index.js
+import { defaultAbiCoder, ParamType } from 'ethers/utils/abi-coder';
+import ZWeb3 from '../artifacts/ZWeb3';
+import _ from 'lodash';
 
-function formatValue(value: any): string {
-  if (typeof(value) === 'number' || BN.isBigNumber(value)) return value.toString();
-  else if (typeof(value) === 'string' && value.match(/\d+(\.\d+)?e(\+)?\d+/)) return (new BN(value)).toString(10);
-  else return value;
+export default function encodeCall(name: string, types: Array<string | ParamType> = [], rawValues: any[] = []): string {
+  const encodedParameters = defaultAbiCoder.encode(types, rawValues).substring(2);
+  const signatureHash = ZWeb3.sha3(`${name}(${types.join(',')})`).substring(2, 10);
+  return `0x${signatureHash}${encodedParameters}`;
 }
 
-export default function encodeCall(name: string, args: string[] = [], rawValues: any[] = []): string {
-  const values: string[] = rawValues.map(formatValue);
-  const methodId: string = abi.methodID(name, args).toString('hex');
-  const params: Buffer = abi.rawEncode(args, values).toString('hex');
-  return '0x' + methodId + params;
+export function decodeCall(types: Array<string | ParamType> = [], data: any[] = []): any[] {
+  return defaultAbiCoder.decode(types, data);
 }

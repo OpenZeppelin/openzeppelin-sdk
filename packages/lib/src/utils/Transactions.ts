@@ -10,6 +10,8 @@ import sleep from '../helpers/sleep';
 import ZWeb3 from '../artifacts/ZWeb3';
 import Contracts from '../artifacts/Contracts';
 import ContractFactory, { ContractWrapper, TransactionReceiptWrapper } from '../artifacts/ContractFactory';
+import omit from 'lodash.omit';
+import { TransactionReceipt } from 'web3/types';
 
 // Cache, exported for testing
 export const state: any = {};
@@ -36,7 +38,7 @@ interface GenericFunction {
 }
 
 /**
- * Wraps the _sendTransaction function and manages transaction retries
+ * Wraps the _sendTransaction function and manages transaction retries.
  * @param contractFn contract function to be executed as the transaction
  * @param args arguments of the call (if any)
  * @param txParams other transaction parameters (from, gasPrice, etc)
@@ -54,7 +56,7 @@ export async function sendTransaction(contractFn: GenericFunction, args: any[] =
 }
 
 /**
- * Wraps the _deploy and manages deploy retries
+ * Wraps the _deploy and manages deploy retries.
  * @param contract truffle contract to be deployed
  * @param args arguments of the constructor (if any)
  * @param txParams other transaction parameters (from, gasPrice, etc)
@@ -72,20 +74,21 @@ export async function deploy(contract: ContractFactory, args: any[] = [], txPara
 }
 
 /**
- * Sends a transaction to the blockchain with data precalculated
- * Uses the node's estimateGas RPC call, and adds a 20% buffer on top of it, capped by the block gas limit.
+ * Wraps the _sendDataTransaction function and manages transaction retries.
  * @param contract contract instance to send the tx to
  * @param txParams all transaction parameters (data, from, gasPrice, etc)
+ * @param retries number of data transaction retries
  */
-export async function sendDataTransaction(contract: ContractWrapper, txParams: any): Promise<TransactionReceiptWrapper> {
-  // TODO: Add retries similar to sendTransaction
+export async function sendDataTransaction(contract: ContractWrapper, txParams: any, retries: number = RETRY_COUNT): Promise<TransactionReceiptWrapper> {
   await fixGasPrice(txParams);
 
-  // If gas is set explicitly, use it
-  if (txParams.gas) return contract.sendTransaction(txParams);
-  // Estimate gas for the call and run the tx
-  const gas = await estimateActualGas({ to: contract.address, ...txParams });
-  return contract.sendTransaction({ gas, ...txParams });
+  try {
+    return await _sendDataTransaction(contract, txParams);
+  } catch (error) {
+    const msg = typeof error === 'string' ? error : error.message;
+    if (!msg.match(/nonce too low/) || retries <= 0) throw error;
+    return sendDataTransaction(contract, txParams, retries - 1);
+  }
 }
 
 /**
@@ -95,14 +98,33 @@ export async function sendDataTransaction(contract: ContractWrapper, txParams: a
  * @param args arguments of the call (if any)
  * @param txParams other transaction parameters (from, gasPrice, etc)
  */
-async function _sendTransaction(contractFn: GenericFunction, args: any[] = [], txParams: any = {}) {
+async function _sendTransaction(contractFn: GenericFunction, args: any[] = [], txParams: any = {}): Promise<TransactionReceipt> {
   // If gas is set explicitly, use it
-  if (txParams.gas) return contractFn(...args, txParams);
+  const defaultGas = Contracts.getArtifactsDefaults().gas;
+  if (!txParams.gas && defaultGas) txParams.gas = defaultGas;
+  if (txParams.gas) return contractFn(...args).send({ ...txParams });
 
   // Estimate gas for the call
   const gas = await estimateActualGasFnCall(contractFn, args, txParams);
 
-  return contractFn(...args, { gas, ...txParams });
+  return contractFn(...args).send({ gas, ...txParams });
+}
+
+/**
+ * Sends a transaction to the blockchain with data precalculated, estimating the gas to be used.
+ * Uses the node's estimateGas RPC call, and adds a 20% buffer on top of it, capped by the block gas limit.
+ * @param contract contract instance to send the tx to
+ * @param txParams all transaction parameters (data, from, gasPrice, etc)
+ */
+async function _sendDataTransaction(contract: ContractWrapper, txParams: any = {}) {
+  // If gas is set explicitly, use it
+  const defaultGas = Contracts.getArtifactsDefaults().gas;
+  if (!txParams.gas && defaultGas) txParams.gas = defaultGas;
+  if (txParams.gas) return contract.sendTransaction(txParams);
+
+  // Estimate gas for the call and run the tx
+  const gas = await estimateActualGas({ to: contract.address, ...txParams });
+  return contract.sendTransaction({ gas, ...txParams });
 }
 
 /**
@@ -114,10 +136,12 @@ async function _sendTransaction(contractFn: GenericFunction, args: any[] = [], t
  */
 async function _deploy(contract: ContractFactory, args: any[] = [], txParams: any = {}): Promise<ContractWrapper> {
   // If gas is set explicitly, use it
+  const defaultGas = Contracts.getArtifactsDefaults().gas;
+  if (!txParams.gas && defaultGas) txParams.gas = defaultGas;
   if (txParams.gas) return contract.new(...args, txParams);
 
-  const data: string = contract.getData(args, txParams);
-  const gas: number = await estimateActualGas({ data, ...txParams });
+  const data = contract.getData(args, txParams);
+  const gas = await estimateActualGas({ data, ...txParams });
   return contract.new(...args, { gas, ...txParams });
 }
 
@@ -127,8 +151,11 @@ export async function estimateGas(txParams: any, retries: number = RETRY_COUNT):
   // we are working with, if the txs are routed to different nodes.
   // See https://github.com/zeppelinos/zos/issues/192 for more info.
   try {
+    // Remove gas from estimateGas call, which may cause Geth to fail
+    // See https://github.com/ethereum/go-ethereum/issues/18973 for more info
+    const txParamsWithoutGas = omit(txParams, 'gas');
     // Use json-rpc method estimateGas to retrieve estimated value
-    return await ZWeb3.estimateGas(txParams);
+    return await ZWeb3.estimateGas(txParamsWithoutGas);
   } catch (error) {
     if (retries <= 0) throw Error(error);
     await sleep(RETRY_SLEEP_TIME);
@@ -142,7 +169,7 @@ export async function estimateActualGasFnCall(contractFn: GenericFunction, args:
   // we are working with, if the txs are routed to different nodes.
   // See https://github.com/zeppelinos/zos/issues/192 for more info.
   try {
-    return await calculateActualGas(await contractFn.estimateGas(...args, txParams));
+    return await calculateActualGas(await contractFn(...args).estimateGas({ ...txParams }));
   } catch(error) {
     if (retries <= 0) throw Error(error);
     await sleep(RETRY_SLEEP_TIME);
@@ -179,13 +206,13 @@ async function fixGasPrice(txParams: any): Promise<any> {
   }
 }
 
-async function getBlockGasLimit(): Promise<any> {
+async function getBlockGasLimit(): Promise<number> {
   if (state.block) return state.block.gasLimit;
   state.block = await ZWeb3.getLatestBlock();
   return state.block.gasLimit;
 }
 
-async function calculateActualGas(estimatedGas): Promise<any> {
+async function calculateActualGas(estimatedGas: number): Promise<number> {
   const blockLimit: number = await getBlockGasLimit();
   let gasToUse = parseInt(`${estimatedGas * GAS_MULTIPLIER}`, 10);
   // Ganache has a bug (https://github.com/trufflesuite/ganache-core/issues/26) that causes gas

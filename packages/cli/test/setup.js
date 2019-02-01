@@ -27,16 +27,13 @@ function doNotInstallStdlib() {
 }
 
 function setArtifactDefaults() {
-  const from = ZWeb3.eth().accounts[0]
 
   const DEFAULT_TESTING_TX_PARAMS = {
-    from,
     gas: 6721975,
     gasPrice: 100000000000
   }
 
   const DEFAULT_COVERAGE_TX_PARAMS = {
-    from,
     gas: 0xfffffffffff,
     gasPrice: 0x01,
   }

@@ -1,10 +1,10 @@
-import _ from 'lodash';
+import forEach from 'lodash.foreach';
 import { Logger } from 'zos-lib';
 
 import ControllerFor from '../models/network/ControllerFor';
-import NetworkController from '../models/network/NetworkController';
 import ZosNetworkFile from '../models/files/ZosNetworkFile';
-import { StatusParams }from './interfaces';
+import { StatusParams } from './interfaces';
+import NetworkController from '../models/network/NetworkController';
 
 const log: Logger = new Logger('scripts/status');
 
@@ -55,7 +55,7 @@ async function contractsInfo(controller: NetworkController): Promise<void> {
   }
 
   // Log status for each contract in package file
-  _.each(controller.packageFile.contracts, function(contractName, contractAlias) {
+  forEach(controller.packageFile.contracts, function(contractName, contractAlias) {
     const isDeployed = controller.isContractDeployed(contractAlias);
     const hasChanged = controller.hasContractChanged(contractAlias);
     const fullName = contractName === contractAlias ? contractAlias : `${contractAlias} (implemented by ${contractName})`;
@@ -79,7 +79,7 @@ async function dependenciesInfo(networkFile: ZosNetworkFile): Promise<void> {
   if (!packageFile.hasDependencies() && !networkFile.hasDependencies()) return;
   log.info('Application dependencies:');
 
-  _.forEach(packageFile.dependencies, (requiredVersion, dependencyName) => {
+  forEach(packageFile.dependencies, (requiredVersion, dependencyName) => {
     const msgHead = `- ${dependencyName}@${requiredVersion}`;
     if (!networkFile.hasDependency(dependencyName)) {
       log.info(`${msgHead} is required but is not linked`);
@@ -99,7 +99,7 @@ async function dependenciesInfo(networkFile: ZosNetworkFile): Promise<void> {
     }
   });
 
-  _.forEach(networkFile.dependenciesNamesMissingFromPackage, (dependencyName) => {
+  forEach(networkFile.dependenciesNamesMissingFromPackage, (dependencyName) => {
     log.info(`- ${dependencyName} will be unlinked on next push`);
   });
 }

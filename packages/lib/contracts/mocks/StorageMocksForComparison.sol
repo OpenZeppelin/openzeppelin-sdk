@@ -1,5 +1,8 @@
 pragma solidity ^0.4.24;
 
+contract StorageMockEmpty {
+}
+
 contract StorageMockSimpleOriginal {
   uint256 a;
   uint256 b;
@@ -51,10 +54,27 @@ contract StorageMockSimpleWithReplacedVar {
   string c;
 }
 
+contract StorageMockSimpleChangedWithAppendedVar {
+  uint256 a2;
+  uint256 b2;
+  uint256 c2;
+}
+
 contract StorageMockComplexOriginal {
   mapping(address => uint256) a;
 }
 
 contract StorageMockComplexWithChangedVar {
   mapping(address => address) a;
+}
+
+contract StorageMockChainPrivateBase {
+  uint256 private a;
+}
+
+contract StorageMockChainPrivateChildV1 is StorageMockChainPrivateBase  {
+}
+
+contract StorageMockChainPrivateChildV2 is StorageMockChainPrivateBase {
+  uint256 private a;
 }

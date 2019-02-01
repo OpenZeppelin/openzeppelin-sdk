@@ -8,7 +8,7 @@ import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 /**
  * @title App
  * @dev Contract for upgradeable applications.
- * It handles the creation and upgrading of proxies.
+ * It handles the creation of proxies.
  */
 contract App is Ownable {
   /**
@@ -101,72 +101,21 @@ contract App is Ownable {
   }
 
   /**
-   * @dev Returns the current implementation of a proxy.
-   * This is needed because only the proxy admin can query it.
-   * @return The address of the current implementation of the proxy.
-   */
-  function getProxyImplementation(AdminUpgradeabilityProxy proxy) public view returns (address) {
-    return proxy.implementation();
-  }
-
-  /**
-   * @dev Returns the admin of a proxy. Only the admin can query it.
-   * @return The address of the current admin of the proxy.
-   */
-  function getProxyAdmin(AdminUpgradeabilityProxy proxy) public view returns (address) {
-    return proxy.admin();
-  }
-
-  /**
-   * @dev Changes the admin of a proxy.
-   * @param proxy Proxy to change admin.
-   * @param newAdmin Address to transfer proxy administration to.
-   */
-  function changeProxyAdmin(AdminUpgradeabilityProxy proxy, address newAdmin) public onlyOwner {
-    proxy.changeAdmin(newAdmin);
-  }
-
-  /**
    * @dev Creates a new proxy for the given contract and forwards a function call to it.
    * This is useful to initialize the proxied contract.
    * @param packageName Name of the package where the contract is contained.
    * @param contractName Name of the contract.
+   * @param admin Address of the proxy administrator.
    * @param data Data to send as msg.data to the corresponding implementation to initialize the proxied contract.
    * It should include the signature and the parameters of the function to be called, as described in
    * https://solidity.readthedocs.io/en/v0.4.24/abi-spec.html#function-selector-and-argument-encoding.
    * This parameter is optional, if no data is given the initialization call to proxied contract will be skipped.
    * @return Address of the new proxy.
    */
-   function create(string packageName, string contractName, bytes data) payable public returns (AdminUpgradeabilityProxy) {
-    address implementation = getImplementation(packageName, contractName);
-     AdminUpgradeabilityProxy proxy = (new AdminUpgradeabilityProxy).value(msg.value)(implementation, data);
+   function create(string packageName, string contractName, address admin, bytes data) payable public returns (AdminUpgradeabilityProxy) {
+     address implementation = getImplementation(packageName, contractName);
+     AdminUpgradeabilityProxy proxy = (new AdminUpgradeabilityProxy).value(msg.value)(implementation, admin, data);
      emit ProxyCreated(proxy);
      return proxy;
-  }
-
-  /**
-   * @dev Upgrades a proxy to the newest implementation of a contract.
-   * @param proxy Proxy to be upgraded.
-   * @param packageName Name of the package where the contract is contained.
-   * @param contractName Name of the contract.
-   */
-  function upgrade(AdminUpgradeabilityProxy proxy, string packageName, string contractName) public onlyOwner {
-    address implementation = getImplementation(packageName, contractName);
-    proxy.upgradeTo(implementation);
-  }
-
-  /**
-   * @dev Upgrades a proxy to the newest implementation of a contract and forwards a function call to it.
-   * This is useful to initialize the proxied contract.
-   * @param proxy Proxy to be upgraded.
-   * @param packageName Name of the package where the contract is contained.
-   * @param contractName Name of the contract.
-   * @param data Data to send as msg.data in the low level call.
-   * It should include the signature and the parameters of the function to be called, as described in
-   * https://solidity.readthedocs.io/en/v0.4.24/abi-spec.html#function-selector-and-argument-encoding.
-   */
-  function upgradeAndCall(AdminUpgradeabilityProxy proxy, string packageName, string contractName, bytes data) payable public onlyOwner {
-    address implementation = getImplementation(packageName, contractName);
-    proxy.upgradeToAndCall.value(msg.value)(implementation, data);
   }
 }

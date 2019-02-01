@@ -1,4 +1,4 @@
-import _ from 'lodash';
+import pickBy from 'lodash.pickby';
 
 export function toContractFullName(packageName: string, contractName: string): string {
   if (!packageName) return contractName;
@@ -10,5 +10,5 @@ export function fromContractFullName(contractFullName: string): {contract?: stri
   const fragments = contractFullName.split('/');
   const contractName = fragments.pop();
   if (fragments.length === 0) return { contract: contractName };
-  else return _.pickBy({ contract: contractName, package: fragments.join('/') });
+  else return pickBy({ contract: contractName, package: fragments.join('/') });
 }

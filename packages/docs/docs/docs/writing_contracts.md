@@ -94,7 +94,7 @@ Contract ERC20Detailed is IERC20 {
 }
 ```
 
-This means that you should not be using these contracts in your ZeppelinOS project. Instead, make sure to use `openzeppelin-eth`, which is an official fork of OpenZeppelin, which has been modified to use initializers instead of constructors. For instance, an ERC20 implementation provided by `openzeppelin-eth` is the [`ERC20Mintable`](hhttps://github.com/OpenZeppelin/openzeppelin-eth/blob/v2.0.2/contracts/token/ERC20/ERC20Mintable.sol):
+This means that you should not be using these contracts in your ZeppelinOS project. Instead, make sure to use `openzeppelin-eth`, which is an official fork of OpenZeppelin, which has been modified to use initializers instead of constructors. For instance, an ERC20 implementation provided by `openzeppelin-eth` is the [`ERC20Mintable`](https://github.com/OpenZeppelin/openzeppelin-eth/blob/v2.0.2/contracts/token/ERC20/ERC20Mintable.sol):
 
 ```solidity
 contract ERC20Mintable is Initializable, ERC20, MinterRole {

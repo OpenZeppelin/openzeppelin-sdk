@@ -1,4 +1,4 @@
-import _ from 'lodash';
+import isEmpty from 'lodash.isempty';
 import { Logger, FileSystem as fs } from 'zos-lib';
 import Dependency from '../dependency/Dependency';
 import { ZOS_VERSION, checkVersion } from './ZosVersion';
@@ -52,7 +52,7 @@ export default class ZosPackageFile {
   }
 
   public hasDependencies(): boolean {
-    return !_.isEmpty(this.dependencies);
+    return !isEmpty(this.dependencies);
   }
 
   get contracts(): { [alias: string]: string } {
@@ -93,7 +93,7 @@ export default class ZosPackageFile {
   }
 
   public hasContracts(): boolean {
-    return !_.isEmpty(this.contracts);
+    return !isEmpty(this.contracts);
   }
 
   set publish(publish: boolean) {

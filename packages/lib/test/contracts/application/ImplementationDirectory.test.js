@@ -6,11 +6,17 @@ import Contracts from '../../../src/artifacts/Contracts'
 import { ZERO_ADDRESS } from '../../../src/utils/Addresses'
 import assertRevert from '../../../src/test/helpers/assertRevert'
 import shouldBehaveLikeOwnable from '../../../src/test/behaviors/Ownable'
+import utils from 'web3-utils';
+import lodash from 'lodash';
 
 const DummyImplementation = Contracts.getFromLocal('DummyImplementation')
 const ImplementationDirectory = Contracts.getFromLocal('ImplementationDirectory')
 
-contract('ImplementationDirectory', function([_, owner, anotherAddress]) {
+contract('ImplementationDirectory', function(accounts) {
+  accounts = lodash.map(accounts, utils.toChecksumAddress); // Required by Web3 v1.x.
+
+  const [_, owner, anotherAddress] = accounts;
+
   beforeEach(async function () {
     this.implementation_v0 = (await DummyImplementation.new()).address
     this.implementation_v1 = (await DummyImplementation.new()).address
@@ -32,41 +38,41 @@ contract('ImplementationDirectory', function([_, owner, anotherAddress]) {
 
       describe('when registering a contract', function () {
         beforeEach('registering the contract', async function () {
-          const { logs } = await this.directory.setImplementation(contractName, this.implementation_v0, { from })
-          this.logs = logs
+          const { events } = await this.directory.methods.setImplementation(contractName, this.implementation_v0).send({ from })
+          this.events = events
         })
 
         it('can be retrieved afterwards', async function () {
-          const registeredImplementation = await this.directory.getImplementation(contractName)
+          const registeredImplementation = await this.directory.methods.getImplementation(contractName).call()
           assert.equal(registeredImplementation, this.implementation_v0)
         })
 
         it('emits an event', async function () {
-          assert.equal(this.logs.length, 1)
-          assert.equal(this.logs[0].event, 'ImplementationChanged')
-          assert.equal(this.logs[0].args.contractName, contractName)
-          assert.equal(this.logs[0].args.implementation, this.implementation_v0)
+          const event = this.events['ImplementationChanged'];
+          expect(event).to.be.an('object');
+          assert.equal(event.returnValues.contractName, contractName)
+          assert.equal(event.returnValues.implementation, this.implementation_v0)
         })
 
         it('allows to register another implementation of the same contract', async function () {
-          await this.directory.setImplementation(contractName, this.implementation_v1, { from })
+          await this.directory.methods.setImplementation(contractName, this.implementation_v1).send({ from })
 
-          const registeredImplementation = await this.directory.getImplementation(contractName)
+          const registeredImplementation = await this.directory.methods.getImplementation(contractName).call()
           assert.equal(registeredImplementation, this.implementation_v1)
         })
 
         it('allows to register another contract', async function () {
           const anotherContract = 'anotherContract';
-          await this.directory.setImplementation(anotherContract, this.implementation_v1, { from })
+          await this.directory.methods.setImplementation(anotherContract, this.implementation_v1).send({ from })
 
-          const registeredImplementation = await this.directory.getImplementation(anotherContract)
+          const registeredImplementation = await this.directory.methods.getImplementation(anotherContract).call()
           assert.equal(registeredImplementation, this.implementation_v1)
         })
       })
 
       describe('when registering an address that is not a contract', function () {
         it('reverts', async function () {
-          await assertRevert(this.directory.setImplementation(contractName, anotherAddress, { from }))
+          await assertRevert(this.directory.methods.setImplementation(contractName, anotherAddress).send({ from }))
         })
       })
     })
@@ -75,7 +81,7 @@ contract('ImplementationDirectory', function([_, owner, anotherAddress]) {
       const from = anotherAddress
 
       it('cannot register contract', async function () {
-        await assertRevert(this.directory.setImplementation(contractName, this.implementation_v0, { from }))
+        await assertRevert(this.directory.methods.setImplementation(contractName, this.implementation_v0).send({ from }))
       })
     })
   })
@@ -84,27 +90,27 @@ contract('ImplementationDirectory', function([_, owner, anotherAddress]) {
     const contractName = 'ERC721'
 
     beforeEach('registering the contract', async function () {
-      await this.directory.setImplementation(contractName, this.implementation_v0, { from: owner })
+      await this.directory.methods.setImplementation(contractName, this.implementation_v0).send({ from: owner })
     })
 
     describe('when the sender is the directory owner', function () {
       const from = owner
 
       beforeEach('unregistering the contract', async function () {
-        const { logs } = await this.directory.unsetImplementation(contractName, { from })
-        this.logs = logs
+        const { events } = await this.directory.methods.unsetImplementation(contractName).send({ from })
+        this.events = events
       })
 
       it('cannot be retrieved afterwards', async function () {
-        const registeredImplementation = await this.directory.getImplementation(contractName)
+        const registeredImplementation = await this.directory.methods.getImplementation(contractName).call()
         assert.equal(registeredImplementation, ZERO_ADDRESS)
       })
 
       it('emits an event', async function () {
-        assert.equal(this.logs.length, 1)
-        assert.equal(this.logs[0].event, 'ImplementationChanged')
-        assert.equal(this.logs[0].args.contractName, contractName)
-        assert.equal(this.logs[0].args.implementation, ZERO_ADDRESS)
+        const event = this.events['ImplementationChanged'];
+        expect(event).to.be.an('object');
+        assert.equal(event.returnValues.contractName, contractName)
+        assert.equal(event.returnValues.implementation, ZERO_ADDRESS)
       })
     })
 
@@ -112,14 +118,14 @@ contract('ImplementationDirectory', function([_, owner, anotherAddress]) {
       const from = anotherAddress
 
       it('cannot unregister contract', async function () {
-        await assertRevert(this.directory.unsetImplementation(contractName, { from }))
+        await assertRevert(this.directory.methods.unsetImplementation(contractName).send({ from }))
       })
     })
   })
 
   describe('freeze', function () {
     it('starts unfrozen', async function () {
-      const frozen = await this.directory.frozen()
+      const frozen = await this.directory.methods.frozen().call()
       frozen.should.be.false
     })
     
@@ -128,19 +134,19 @@ contract('ImplementationDirectory', function([_, owner, anotherAddress]) {
 
       describe('when it is not frozen', function () {
         it('can be frozen', async function () {
-          await this.directory.freeze({ from })
-          const frozen = await this.directory.frozen()
+          await this.directory.methods.freeze().send({ from })
+          const frozen = await this.directory.methods.frozen().call()
           frozen.should.be.true
         })
       })
 
       describe('when it is frozen', function () {
         beforeEach(async function () {
-          await this.directory.freeze({ from })
+          await this.directory.methods.freeze().send({ from })
         })
 
         it('cannot be re-frozen', async function () {
-          await assertRevert(this.directory.freeze({ from }))
+          await assertRevert(this.directory.methods.freeze().send({ from }))
         })
       })
     })
@@ -149,7 +155,7 @@ contract('ImplementationDirectory', function([_, owner, anotherAddress]) {
       const from = anotherAddress
 
       it('reverts', async function () {
-        await assertRevert(this.directory.freeze({ from }))
+        await assertRevert(this.directory.methods.freeze().send({ from }))
       })
     })
   })
@@ -157,15 +163,15 @@ contract('ImplementationDirectory', function([_, owner, anotherAddress]) {
   describe('set/unset implementation', function () {
     describe('when it is frozen', function () {
       beforeEach(async function () {
-        await this.directory.freeze({ from: owner })
+        await this.directory.methods.freeze().send({ from: owner })
       })
 
       it('does not allow to set implementation', async function () {
-        await assertRevert(this.directory.setImplementation('ERC721', this.implementation_v1, { from: owner }))
+        await assertRevert(this.directory.methods.setImplementation('ERC721', this.implementation_v1).send({ from: owner }))
       })
 
       it('does not allow to unset implementation', async function () {
-        await assertRevert(this.directory.unsetImplementation('ERC721', { from: owner }))
+        await assertRevert(this.directory.methods.unsetImplementation('ERC721').send({ from: owner }))
       })
     })
   })

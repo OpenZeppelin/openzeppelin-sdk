@@ -8,7 +8,7 @@ project with one contract. Here is the code of the contract, to keep it fresh
 on our minds:
 
 ```solidity
-pragma solidity ^0.4.24;
+pragma solidity ^0.5.0;
 
 import "zos-lib/contracts/Initializable.sol";
 
@@ -17,7 +17,7 @@ contract MyContract is Initializable {
   uint256 public x;
   string public s;
 
-  function initialize(uint256 _x, string _s) initializer public {
+  function initialize(uint256 _x, string memory _s) initializer public {
     x = _x;
     s = _s;
   }
@@ -72,7 +72,7 @@ that our instance is working as expected:
 by the `create` command we ran above._
 
 ```console
-truffle(local)> myContract = MyContract.at('<your-contract-address>')
+truffle(local)> MyContract.at('<your-contract-address>').then(i => myContract = i)
 truffle(local)> myContract.x().then(x => x.toString())
 '42'
 
@@ -94,7 +94,7 @@ extend its functionalities.
 Open `contracts/MyContract.sol`, and add a new function:
 
 ```solidity
-pragma solidity ^0.4.24;
+pragma solidity ^0.5.0;
 
 import "zos-lib/contracts/Initializable.sol";
 
@@ -103,7 +103,7 @@ contract MyContract is Initializable {
   uint256 public x;
   string public s;
 
-  function initialize(uint256 _x, string _s) initializer public {
+  function initialize(uint256 _x, string memory _s) initializer public {
     x = _x;
     s = _s;
   }
@@ -154,9 +154,9 @@ returned by the `create` command we ran in the previous section, which
 is the same as the one returned by the `update` command we ran above._
 
 ```console
-truffle(local)> myContract = MyContract.at('<your-contract-address>')
+truffle(local)> MyContract.at('<your-contract-address>').then(i => myContract = i)
 truffle(local)> myContract.increment()
-truffle(local)> myContract.x()
+truffle(local)> myContract.x().then(x => x.toString())
 43
 ```
 

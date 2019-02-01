@@ -1,8 +1,10 @@
 import BN from 'bignumber.js';
 import ZWeb3 from './ZWeb3';
-import decodeLogs from '../helpers/decodeLogs';
 import { getSolidityLibNames, hasUnlinkedVariables } from '../utils/Bytecode';
 import { StorageLayoutInfo } from '../validations/Storage';
+import { Contract, TransactionObject } from 'web3-eth-contract';
+import Contracts from './Contracts';
+import _ from 'lodash';
 
 interface ContractSchema {
   contractName: string;
@@ -13,16 +15,17 @@ interface ContractSchema {
 }
 
 export interface ContractWrapper {
+  instance: any;
   address: string;
   transactionHash: string;
   allEvents: any;
   sendTransaction?: (txParams: any) => Promise<TransactionReceiptWrapper>;
   send?: (value: any) => Promise<string>;
+  methods: { [fnName: string]: (...args: any[]) => TransactionObject<any> };
   constructor: any;
 }
 
 export interface TransactionReceiptWrapper {
-  logs: any[];
   tx: string;
   receipt: any;
 }
@@ -43,14 +46,13 @@ export default class ContractFactory {
   public storageInfo: StorageLayoutInfo;
   public warnings: any;
 
-  constructor(schema: ContractSchema, timeout, txParams) {
+  constructor(schema: ContractSchema, timeout) {
     this.abi = schema.abi;
     this.ast = schema.ast;
     this.bytecode = schema.bytecode;
     this.deployedBytecode = schema.deployedBytecode;
     this.contractName = schema.contractName;
     this.timeout = timeout;
-    this.txParams = txParams;
     this._parseEvents();
     this._setBinaryIfPossible();
   }
@@ -59,35 +61,38 @@ export default class ContractFactory {
     this._validateNonEmptyBinary();
     this._validateNonUnlinkedLibraries();
 
-    const [args, txParams] = this._parseArguments(passedArguments);
+    const [args, txParams] = await this._parseArguments(passedArguments);
     if (!txParams.data) txParams.data = this.binary;
+
     const self = this;
 
     return new Promise(function(resolve, reject) {
-      const contractClass: any = ZWeb3.contract(self.abi);
-      contractClass.new(...args, txParams, function(error, instance) {
-        if (error) reject(error);
-        else if (instance && instance.address) {
-          const wrapper: ContractWrapper = self._wrapContract(instance);
+      const contractClass: Contract = ZWeb3.contract(self.abi, null, txParams);
+      const tx = contractClass.deploy({data: txParams.data, arguments: args});
+      let transactionHash;
+      tx.send(txParams)
+        .on('error', (error) => reject(error))
+        .on('transactionHash', (txHash) => transactionHash = txHash)
+        .then((instance) => {
+          const wrapper: ContractWrapper = self._wrapContract(instance, transactionHash);
           resolve(wrapper);
-        }
-      });
+        })
+        .catch((error) => reject(error));
     });
   }
 
   public at(address: string): ContractWrapper | never {
     if (!ZWeb3.isAddress(address)) throw new Error('Given address is not valid: ' + address);
-    const contractClass: any = ZWeb3.contract(this.abi);
-    const contract: any = contractClass.at(address);
-
-    return this._wrapContract(contract);
+    const defaults = Contracts.getArtifactsDefaults();
+    const contractClass: any = ZWeb3.contract(this.abi, address, defaults);
+    return this._wrapContract(contractClass);
   }
 
   public getData(constructorArgs: any, txParams: any): string {
     this._validateNonEmptyBinary();
     this._validateNonUnlinkedLibraries();
     const contractClass = ZWeb3.contract(this.abi);
-    return contractClass.new.getData(...constructorArgs, { ...txParams, data: this.binary });
+    return contractClass.deploy({data: this.binary, arguments: constructorArgs}).encodeABI();
   }
 
   public link(libraries: { [libAlias: string]: string }): void {
@@ -99,10 +104,13 @@ export default class ContractFactory {
     });
   }
 
-  private _wrapContract(contract): ContractWrapper {
-    const { address, transactionHash, allEvents } = contract;
-    const wrapper: ContractWrapper = { address, transactionHash, allEvents, constructor: this };
-    this._promisifyABI(contract, wrapper);
+  private _wrapContract(contract: any, transactionHash?: string): ContractWrapper {
+    const address = contract.options.address;
+    const events = contract.events;
+    const allEvents = contract.events.allEvents;
+    const instance = contract;
+    const wrapper: ContractWrapper = { instance, address, transactionHash, allEvents, constructor: this, methods: contract.methods };
+    // this._promisifyABI(contract, wrapper);
     this._setSendFunctions(contract, wrapper);
     return wrapper;
   }
@@ -111,9 +119,11 @@ export default class ContractFactory {
     const self = this;
 
     wrapper.sendTransaction = async function(txParams: any): Promise<TransactionReceiptWrapper> {
-      const tx = await ZWeb3.sendTransaction({ to: instance.address, ...self.txParams, ...txParams });
-      const receipt = await ZWeb3.getTransactionReceiptWithTimeout(tx, self.timeout);
-      return { tx, receipt, logs: decodeLogs(receipt.logs, self) };
+      const defaults = await Contracts.getDefaultTxParams();
+      const tx = { to: instance.options.address, ...defaults, ...txParams };
+      const txHash = await ZWeb3.sendTransactionWithoutReceipt(tx);
+      const receiptWithTimeout = await ZWeb3.getTransactionReceiptWithTimeout(txHash, self.timeout);
+      return { tx, receipt: receiptWithTimeout };
     };
 
     wrapper.send = async function(value: any): Promise<string> {
@@ -121,55 +131,15 @@ export default class ContractFactory {
     };
   }
 
-  private _promisifyABI(instance: any, wrapper: ContractWrapper): void {
-    instance.abi.filter((item: any) => item.type === 'event').forEach((item: any) => wrapper[item.name] = instance[item.name]);
-    instance.abi.filter((item: any) => item.type === 'function').forEach((item: any) => {
-      wrapper[item.name] = item.constant
-        ? this._promisifyFunction(instance[item.name], instance)
-        : this._promisifyFunctionWithTimeout(instance[item.name], instance);
-      wrapper[item.name].request = instance[item.name].request;
-      wrapper[item.name].call = this._promisifyFunction(instance[item.name].call, instance);
-      wrapper[item.name].sendTransaction = this._promisifyFunction(instance[item.name].sendTransaction, instance);
-      wrapper[item.name].estimateGas = this._promisifyFunction(instance[item.name].estimateGas, instance);
-    });
-  }
-
-  private _promisifyFunction(fn: (...passedArguments) => void, instance: any): (passedArguments: any[]) => Promise<any> {
-    const self = this;
-    return async function(...passedArguments): Promise<any> {
-      const [args, txParams] = self._parseArguments(passedArguments);
-      return new Promise(function(resolve, reject) {
-        args.push(txParams, function(error, result) {
-          return error ? reject(error) : resolve(result);
-        });
-        fn.apply(instance, args);
-      });
-    };
-  }
-
-  private _promisifyFunctionWithTimeout(fn: (...passedArguments) => void, instance: any): (passedArguments: any[]) => Promise<any> {
-    const self = this;
-    return async function(...passedArguments): Promise<any> {
-      const [args, txParams] = self._parseArguments(passedArguments);
-      return new Promise(function(resolve, reject) {
-        args.push(txParams, function(error, tx) {
-          return error ? reject(error) : ZWeb3.getTransactionReceiptWithTimeout(tx, self.timeout)
-            .then((receipt) => resolve({ tx, receipt, logs: decodeLogs(receipt.logs, self) }))
-            .catch(reject);
-        });
-        fn.apply(instance, args);
-      });
-    };
-  }
-
-  private _parseArguments(args: any[]): [any[], any] {
+  private async _parseArguments(args: any[]): Promise<[any[], any]> {
     const params = Array.prototype.slice.call(args);
     let givenTxParams = {};
     if (params.length > 0) {
       const lastArg = params[params.length - 1];
       if (typeof(lastArg) === 'object' && !Array.isArray(lastArg) && !BN.isBigNumber(lastArg)) givenTxParams = params.pop();
     }
-    const txParams = { ...this.txParams, ...givenTxParams };
+    const defaults = await Contracts.getDefaultTxParams();
+    const txParams = { ...defaults, ...givenTxParams };
     return [params, txParams];
   }
 
