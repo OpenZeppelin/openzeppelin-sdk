@@ -11,8 +11,8 @@ export default class Logger {
   private _opts: LoggerOptions;
 
   private static _defaults: LoggerOptions = {
-    verbose: true,
-    silent: false
+    verbose: false,
+    silent: true
   };
 
   public static silent(value): void {
