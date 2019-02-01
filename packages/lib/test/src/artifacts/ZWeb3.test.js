@@ -106,7 +106,7 @@ contract('ZWeb3', accounts => {
 
     describe('estimate gas', function () {
       it('can estimate the gas of a call', async function () {
-        const { gasUsed: expectedGas } = this.impl.zosData.deployment.transactionReceipt
+        const { gasUsed: expectedGas } = this.impl.deployment.transactionReceipt
         const gas = await ZWeb3.estimateGas({ data: this.DummyImplementation.linkedBytecode })
         gas.should.be.equal(expectedGas)
       })

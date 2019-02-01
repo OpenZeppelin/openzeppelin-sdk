@@ -41,15 +41,13 @@ export default class ZosContract {
     const self = this;
     return new Promise(function(resolve, reject) {
       const tx = contract.deploy({data: self.linkedBytecode, arguments: args});
-      const zosData: any = {
-        deployment: {}
-      };
+      const injectedData: any = { deployment: {} };
       tx.send({ ...options })
         .on('error', (error) => reject(error))
-        .on('receipt', (receipt) => zosData.deployment.transactionReceipt = receipt)
-        .on('transactionHash', (hash) => zosData.deployment.transactionHash = hash)
+        .on('receipt', (receipt) => injectedData.deployment.transactionReceipt = receipt)
+        .on('transactionHash', (hash) => injectedData.deployment.transactionHash = hash)
         .then((instance) => {
-          instance.zosData = zosData;
+          instance = Object.assign(instance, injectedData);
           instance.address = instance.options.address;
           resolve(instance);
         })
