@@ -3,52 +3,36 @@ import ZWeb3 from './ZWeb3';
 import { getSolidityLibNames, hasUnlinkedVariables } from '../utils/Bytecode';
 import { Contract, TransactionObject } from 'web3-eth-contract';
 import { TransactionReceipt } from 'web3/types';
-import { StorageLayoutInfo } from '../validations/Storage';
-import Contracts from './Contracts';
+import Contracts, { ZosContractSchema } from './Contracts';
 import _ from 'lodash';
 
 export default class ZosContract {
+  public schema: ZosContractSchema;
 
-  // Solidity contract schema properties.
-  public schemaVersion: string;
-  public contractName: string;
-  public abi: any[];
-  public bytecode: string;
-  public deployedBytecode: string;
-  public sourceMap: string;
-  public deployedSourceMap: string;
-  public source: string;
-  public sourcePath: string;
-  public ast: any;
-  public legacyAST: any;
-  public compiler: any;
-  public networks: any;
-  public updatedAt: string;
-
-  // Custom schema properties.
-  public linkedBytecode: string;
-  public linkedDeployedBytecode: string;
-  public warnings: any;
-  public storageInfo: StorageLayoutInfo;
-
-  constructor(schema: any) {
-    Object.assign(this, schema);
+  constructor(schema: ZosContractSchema) {
+    this.schema = schema;
   }
 
-  public async deploy(args: any[] = [], options: any = {}): Promise<Contract> {
-    if(!this.linkedBytecode) throw new Error(`${this.contractName} bytecode contains unlinked libraries.`);
-    const contract = ZWeb3.contract(this.abi, null, await Contracts.getDefaultTxParams());
+  public async new(args: any[] = [], options: any = {}): Promise<Contract> {
+    if(!this.schema.linkedBytecode) throw new Error(`${this.schema.contractName} bytecode contains unlinked libraries.`);
+    const contract = ZWeb3.contract(this.schema.abi, null, await Contracts.getDefaultTxParams());
     const self = this;
     return new Promise(function(resolve, reject) {
-      const tx = contract.deploy({data: self.linkedBytecode, arguments: args});
-      const injectedData: any = { deployment: {} };
+      const tx = contract.deploy({data: self.schema.linkedBytecode, arguments: args});
+      const injectedData: any = {
+        schema: self.schema,
+        deployment: {} // Gets filled in below async...
+      };
       tx.send({ ...options })
         .on('error', (error) => reject(error))
         .on('receipt', (receipt) => injectedData.deployment.transactionReceipt = receipt)
         .on('transactionHash', (hash) => injectedData.deployment.transactionHash = hash)
         .then((instance) => {
-          instance = Object.assign(instance, injectedData);
-          instance.address = instance.options.address;
+          // Inject custom data to the instance.
+          Object.assign(instance, injectedData);
+          // Add an `.address` getter to the instance.
+          // TODO: Should be removed when Web3 restores the `.address` getter.
+          Object.defineProperty(instance, 'address', { get: () => instance.options.address });
           resolve(instance);
         })
         .catch((error) => reject(error));
@@ -57,7 +41,7 @@ export default class ZosContract {
 
   public at(address: string): Contract | never {
     const defaultOptions = Contracts.getArtifactsDefaults();
-    const instance = ZWeb3.contract(this.abi, address, defaultOptions);
+    const instance = ZWeb3.contract(this.schema.abi, address, defaultOptions);
     instance.address = instance.options.address;
     return instance;
   }
@@ -66,8 +50,8 @@ export default class ZosContract {
     Object.keys(libraries).forEach((name: string) => {
       const address = libraries[name].replace(/^0x/, '');
       const regex = new RegExp(`__${name}_+`, 'g');
-      this.linkedBytecode = this.bytecode.replace(regex, address);
-      this.linkedDeployedBytecode = this.deployedBytecode.replace(regex, address);
+      this.schema.linkedBytecode = this.schema.bytecode.replace(regex, address);
+      this.schema.linkedDeployedBytecode = this.schema.deployedBytecode.replace(regex, address);
     });
   }
 }

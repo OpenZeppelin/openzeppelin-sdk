@@ -14,9 +14,9 @@ export default class ImplementationDirectory {
 
   public static async deploy(txParams: any = {}): Promise<ImplementationDirectory> {
     const contractClass = this.getContractClass();
-    log.info(`Deploying new ${contractClass.contractName}...`);
+    log.info(`Deploying new ${contractClass.schema.contractName}...`);
     const directory = await deploy(contractClass, [], txParams);
-    log.info(`Deployed ${contractClass.contractName} at ${directory.address}`);
+    log.info(`Deployed ${contractClass.schema.contractName} at ${directory.address}`);
     return new this(directory, txParams);
   }
 

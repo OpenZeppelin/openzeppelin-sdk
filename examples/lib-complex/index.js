@@ -71,7 +71,7 @@ async function getLibrary(txParams) {
     const version = '1.0.0';
     const thepackage = await Package.deploy(txParams);
     const directory = await thepackage.newVersion(version);
-    const tokenImplementation = await ERC721Mintable.deploy();
+    const tokenImplementation = await ERC721Mintable.new();
     await directory.setImplementation(tokenClass, tokenImplementation.address);
     return [thepackage.address, version];
   } else {

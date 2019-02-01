@@ -48,12 +48,12 @@ export default abstract class BaseSimpleProject {
   public abstract async getAdminAddress(): Promise<string>;
 
   public async setImplementation(contractClass: ZosContract, contractName?: string): Promise<any> {
-    log.info(`Deploying logic contract for ${contractClass.contractName}`);
-    if (!contractName) contractName = contractClass.contractName;
+    log.info(`Deploying logic contract for ${contractClass.schema.contractName}`);
+    if (!contractName) contractName = contractClass.schema.contractName;
     const implementation: any = await deploy(contractClass, [], this.txParams);
     await this.registerImplementation(contractName, {
       address: implementation.address,
-      bytecodeHash: bytecodeDigest(contractClass.linkedDeployedBytecode)
+      bytecodeHash: bytecodeDigest(contractClass.schema.linkedDeployedBytecode)
     });
     return implementation;
   }
@@ -105,7 +105,7 @@ export default abstract class BaseSimpleProject {
 
   private async _getOrDeployOwnImplementation(contractClass: ZosContract, contractName: string, redeployIfChanged?: boolean): Promise<string> {
     const existing: Implementation = this.implementations[contractName];
-    const contractChanged: boolean = existing && existing.bytecodeHash !== bytecodeDigest(contractClass.linkedDeployedBytecode);
+    const contractChanged: boolean = existing && existing.bytecodeHash !== bytecodeDigest(contractClass.schema.linkedDeployedBytecode);
     const shouldRedeploy: boolean = !existing || (redeployIfChanged && contractChanged);
     if (!shouldRedeploy) return existing.address;
     const newInstance: any = await this.setImplementation(contractClass, contractName);
@@ -126,7 +126,7 @@ export default abstract class BaseSimpleProject {
   }
 
   protected async _getOrDeployImplementation(contractClass: ZosContract, packageName: string, contractName?: string, redeployIfChanged?: boolean): Promise<string | never> {
-    if (!contractName) contractName = contractClass.contractName;
+    if (!contractName) contractName = contractClass.schema.contractName;
 
     const implementation = !packageName || packageName === this.name
       ? await this._getOrDeployOwnImplementation(contractClass, contractName, redeployIfChanged)

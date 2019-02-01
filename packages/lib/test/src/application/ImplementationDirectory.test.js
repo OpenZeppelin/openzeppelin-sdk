@@ -26,7 +26,7 @@ contract('ImplementationDirectory', function(accounts) {
   })
 
   it('can set new implementations', async function () {
-    const implementation = await DummyImplementationV2.deploy()
+    const implementation = await DummyImplementationV2.new()
     await this.directory.setImplementation('DummyImplementation', implementation.address)
 
     const currentImplementation = await this.directory.getImplementation('DummyImplementation');
@@ -34,7 +34,7 @@ contract('ImplementationDirectory', function(accounts) {
   })
 
   it('can unset implementations', async function () {
-    const implementation = await DummyImplementationV2.deploy()
+    const implementation = await DummyImplementationV2.new()
     await this.directory.setImplementation('DummyImplementation', implementation.address)
     await this.directory.unsetImplementation('DummyImplementation')
 

@@ -91,8 +91,8 @@ class StorageLayout {
 
   public run(): StorageLayout {
 
-    this.collectImports(this.contract.ast);
-    this.collectNodes(this.contract.ast);
+    this.collectImports(this.contract.schema.ast);
+    this.collectNodes(this.contract.schema.ast);
 
     // TS-TODO: define contractNode type.
     this.getLinearizedBaseContracts().forEach((contractNode: Node) => {
@@ -170,8 +170,8 @@ class StorageLayout {
   }
 
   private getContractNode(): Node {
-    return this.contract.ast.nodes.find((node) =>
-      node.nodeType === 'ContractDefinition' && node.name === this.contract.contractName
+    return this.contract.schema.ast.nodes.find((node) =>
+      node.nodeType === 'ContractDefinition' && node.name === this.contract.schema.contractName
     );
   }
 

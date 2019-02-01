@@ -146,11 +146,11 @@ async function _deploy(contract: ZosContract, args: any[] = [], txParams: any = 
   // If gas is set explicitly, use it
   const defaultGas = Contracts.getArtifactsDefaults().gas;
   if (!txParams.gas && defaultGas) txParams.gas = defaultGas;
-  if (txParams.gas) return contract.deploy(args, txParams);
+  if (txParams.gas) return contract.new(args, txParams);
 
   const data = buildDeploymentCallData(contract, args, txParams);
   const gas = await estimateActualGas({ data, ...txParams });
-  return contract.deploy(args, { gas, ...txParams });
+  return contract.new(args, { gas, ...txParams });
 }
 
 export async function estimateGas(txParams: any, retries: number = RETRY_COUNT): Promise<any> {

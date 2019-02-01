@@ -286,7 +286,7 @@ contract('Storage', () => {
 
     it('assigns slots according to linearization', async function () {
       const StorageMockChainChild = Contracts.getFromLib('StorageMockChainChild')
-      const instance = await StorageMockChainChild.deploy();
+      const instance = await StorageMockChainChild.new();
       const slots = await instance.methods.slots().call();
       const mappedSlots = [];
       _.mapKeys(slots, (value, key) => { 

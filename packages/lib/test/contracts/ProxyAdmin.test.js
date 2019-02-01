@@ -16,14 +16,14 @@ contract('ProxyAdmin', function(accounts) {
   const [_, proxyAdminOwner, newAdmin, anotherAccount] = accounts.map(utils.toChecksumAddress)
 
   before('set implementations', async function() {
-    this.implementationV1 = await ImplV1.deploy();
-    this.implementationV2 = await ImplV2.deploy();
+    this.implementationV1 = await ImplV1.new();
+    this.implementationV2 = await ImplV2.new();
   });
 
   beforeEach(async function() {
     const initializeData = Buffer.from('');
-    this.proxyAdmin = await ProxyAdmin.deploy([], { from: proxyAdminOwner });
-    this.proxy = await AdminUpgradeabilityProxy.deploy([this.implementationV1.address, this.proxyAdmin.address, initializeData], { from: proxyAdminOwner });
+    this.proxyAdmin = await ProxyAdmin.new([], { from: proxyAdminOwner });
+    this.proxy = await AdminUpgradeabilityProxy.new([this.implementationV1.address, this.proxyAdmin.address, initializeData], { from: proxyAdminOwner });
   });
 
   describe('verifies ownership', function() {

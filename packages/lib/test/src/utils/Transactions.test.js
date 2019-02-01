@@ -47,12 +47,12 @@ contract('Transactions', function(accounts) {
 
   describe('via contract wrapper', function () {
     it('uses default gas for new contract', async function () {
-      const instance = await this.DummyImplementation.deploy();
+      const instance = await this.DummyImplementation.new();
       await assertGas(instance.deployment.transactionHash, DEFAULT_GAS);
     });
 
     it('uses default gas for sending transaction', async function () {
-      const instance = await this.DummyImplementation.deploy();
+      const instance = await this.DummyImplementation.new();
       const receipt = await instance.methods.initialize(42, 'foo', [1,2,3]).send();
       await assertGas(receipt.transactionHash, DEFAULT_GAS);
     });

@@ -305,8 +305,8 @@ contract('StatusComparator', function([_, owner, anotherAddress]) {
 
       describe('when the network file has some contracts', function () {
         beforeEach('adding some contracts', async function () {
-          this.impl = await ImplV1.deploy()
-          this.childImpl = await ChildImplV1.deploy()
+          this.impl = await ImplV1.new()
+          this.childImpl = await ChildImplV1.new()
 
           this.networkFile.addContract('Impl', ImplV1, this.impl, getStorageLayout(ImplV1))
           this.networkFile.addContract('ChildImpl', ChildImplV1, this.childImpl, getStorageLayout(ChildImplV1))
@@ -354,8 +354,8 @@ contract('StatusComparator', function([_, owner, anotherAddress]) {
               this.comparator.reports[0].expected.should.be.equal(this.impl.address)
               this.comparator.reports[0].observed.should.be.equal(this.childImpl.address)
               this.comparator.reports[0].description.should.be.equal('Address for contract Impl does not match')
-              this.comparator.reports[1].expected.should.be.equal(bytecodeDigest(ImplV1.deployedBytecode))
-              this.comparator.reports[1].observed.should.be.equal(bytecodeDigest(ChildImplV1.deployedBytecode))
+              this.comparator.reports[1].expected.should.be.equal(bytecodeDigest(ImplV1.schema.deployedBytecode))
+              this.comparator.reports[1].observed.should.be.equal(bytecodeDigest(ChildImplV1.schema.deployedBytecode))
               this.comparator.reports[1].description.should.be.equal(`Bytecode at ${this.childImpl.address} for contract Impl does not match`)
               this.comparator.reports[2].expected.should.be.equal('one')
               this.comparator.reports[2].observed.should.be.equal('none')
@@ -376,7 +376,7 @@ contract('StatusComparator', function([_, owner, anotherAddress]) {
 
               this.comparator.reports.should.have.lengthOf(2)
               this.comparator.reports[0].expected.should.be.equal('0x0')
-              this.comparator.reports[0].observed.should.be.equal(bytecodeDigest(ImplV1.deployedBytecode))
+              this.comparator.reports[0].observed.should.be.equal(bytecodeDigest(ImplV1.schema.deployedBytecode))
               this.comparator.reports[0].description.should.be.equal(`Bytecode at ${this.impl.address} for contract Impl does not match`)
               this.comparator.reports[1].expected.should.be.equal('one')
               this.comparator.reports[1].observed.should.be.equal('none')

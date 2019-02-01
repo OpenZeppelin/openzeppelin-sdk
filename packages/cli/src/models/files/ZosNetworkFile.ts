@@ -148,8 +148,8 @@ export default class ZosNetworkFile {
       address: instance.address,
       constructorCode: constructorCode(contract),
       bodyBytecodeHash: bytecodeDigest(bodyCode(contract)),
-      localBytecodeHash: bytecodeDigest(contract.bytecode),
-      deployedBytecodeHash: bytecodeDigest(contract.linkedBytecode)
+      localBytecodeHash: bytecodeDigest(contract.schema.bytecode),
+      deployedBytecodeHash: bytecodeDigest(contract.schema.linkedBytecode)
     };
   }
 
@@ -292,7 +292,7 @@ export default class ZosNetworkFile {
     const contract = this.contract(alias) || this.solidityLib(alias);
     if (contract) {
       const localBytecode = contract.localBytecodeHash;
-      const currentBytecode = bytecodeDigest(klass.bytecode);
+      const currentBytecode = bytecodeDigest(klass.schema.bytecode);
       return currentBytecode === localBytecode;
     }
   }
@@ -357,8 +357,8 @@ export default class ZosNetworkFile {
       address: instance.address,
       constructorCode: constructorCode(contract),
       bodyBytecodeHash: bytecodeDigest(bodyCode(contract)),
-      localBytecodeHash: bytecodeDigest(contract.bytecode),
-      deployedBytecodeHash: bytecodeDigest(contract.linkedBytecode),
+      localBytecodeHash: bytecodeDigest(contract.schema.bytecode),
+      deployedBytecodeHash: bytecodeDigest(contract.schema.linkedBytecode),
       types,
       storage,
       warnings

@@ -16,12 +16,12 @@ contract('ProxyAdmin class', function(accounts) {
 
   before(async function() {
     this.txParams = { from: proxyAdminOwner };
-    this.implementationV1 = await ImplV1.deploy();
-    this.implementationV2 = await ImplV2.deploy();
+    this.implementationV1 = await ImplV1.new();
+    this.implementationV2 = await ImplV2.new();
   });
 
   beforeEach(async function() {
-    this.proxyAdminContract = await ProxyAdminContract.deploy([], this.txParams);
+    this.proxyAdminContract = await ProxyAdminContract.new([], this.txParams);
     this.proxyAdmin = new ProxyAdmin(this.proxyAdminContract, this.txParams);
     this.proxy = await Proxy.deploy(this.implementationV1.address, this.proxyAdmin.address, null, this.txParams);
   });

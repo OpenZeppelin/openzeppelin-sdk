@@ -8,7 +8,7 @@ const DonationsV1 = Contracts.getFromLocal('DonationsV1')
 
 contract('DonationsV1', ([_, owner, donor, wallet]) => {
   beforeEach(async function() {
-    this.donations = await DonationsV1.deploy();
+    this.donations = await DonationsV1.new();
     await this.donations.methods.initialize(owner).send()
   });
 

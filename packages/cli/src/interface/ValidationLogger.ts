@@ -29,7 +29,7 @@ export default class ValidationLogger {
   }
 
   get contractName(): string {
-    return this.contract.contractName;
+    return this.contract.schema.contractName;
   }
 
   public log(validations: ValidationInfo, buildArtifacts?: BuildArtifacts): void {

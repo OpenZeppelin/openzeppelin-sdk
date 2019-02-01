@@ -149,21 +149,21 @@ export default class AppProject extends BasePackageProject {
 
   // TODO: Testme
   public async createContract(contractClass: ZosContract, { packageName, contractName, initMethod, initArgs }: ContractInterface = {}): Promise<Contract> {
-    if (!contractName) contractName = contractClass.contractName;
+    if (!contractName) contractName = contractClass.schema.contractName;
     if (!packageName) packageName = this.name;
     return this.app.createContract(contractClass, packageName, contractName, initMethod, initArgs);
   }
 
   public async createProxy(contractClass: ZosContract, { packageName, contractName, initMethod, initArgs }: ContractInterface = {}): Promise<Contract> {
     if (!this.proxyAdmin) this.proxyAdmin = await ProxyAdmin.deploy(this.txParams);
-    if (!contractName) contractName = contractClass.contractName;
+    if (!contractName) contractName = contractClass.schema.contractName;
     if (!packageName) packageName = this.name;
     if (!isEmpty(initArgs) && !initMethod) initMethod = 'initialize';
     return this.app.createProxy(contractClass, packageName, contractName, this.proxyAdmin.address, initMethod, initArgs);
   }
 
   public async upgradeProxy(proxyAddress: string, contractClass: ZosContract, { packageName, contractName, initMethod, initArgs }: ContractInterface = {}): Promise<Contract> {
-    if (!contractName) contractName = contractClass.contractName;
+    if (!contractName) contractName = contractClass.schema.contractName;
     if (!packageName) packageName = this.name;
     const implementationAddress = await this.getImplementation({ packageName, contractName });
     return this.proxyAdmin.upgradeProxy(proxyAddress, implementationAddress, contractClass, initMethod, initArgs);

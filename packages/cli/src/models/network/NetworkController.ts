@@ -160,7 +160,7 @@ export default class NetworkController {
     return libNames
       .map((libName) => Contracts.getFromLocal(libName))
       .filter((libClass) => {
-        const hasSolidityLib = this.networkFile.hasSolidityLib(libClass.contractName);
+        const hasSolidityLib = this.networkFile.hasSolidityLib(libClass.schema.contractName);
         const hasChanged = this._hasSolidityLibChanged(libClass);
         return (!hasSolidityLib || !onlyChanged || hasChanged);
       });
@@ -175,7 +175,7 @@ export default class NetworkController {
 
   // Contract model || SolidityLib model
   private async _uploadSolidityLib(libClass: ZosContract): Promise<void> {
-    const libName = libClass.contractName;
+    const libName = libClass.schema.contractName;
     log.info(`Uploading ${libName} library...`);
     const libInstance = await this.project.setImplementation(libClass, libName);
     this.networkFile.addSolidityLib(libName, libClass ,libInstance);
@@ -194,12 +194,12 @@ export default class NetworkController {
   public async uploadContract(contractAlias: string, contractClass: ZosContract): Promise<void | never> {
     try {
       await this._setSolidityLibs(contractClass);
-      log.info(`Uploading ${contractClass.contractName} contract as ${contractAlias}`);
+      log.info(`Uploading ${contractClass.schema.contractName} contract as ${contractAlias}`);
       const contractInstance = await this.project.setImplementation(contractClass, contractAlias);
       this.networkFile.addContract(contractAlias, contractClass, contractInstance, {
-        warnings: contractClass.warnings,
-        types: contractClass.storageInfo.types,
-        storage: contractClass.storageInfo.storage
+        warnings: contractClass.schema.warnings,
+        types: contractClass.schema.storageInfo.types,
+        storage: contractClass.schema.storageInfo.storage
       });
     } catch(error) {
       error.message = `${contractAlias} deployment failed with error: ${error.message}`;
@@ -209,7 +209,7 @@ export default class NetworkController {
 
   // Contract model || SolidityLib model
   private async _setSolidityLibs(contractClass: ZosContract): Promise<void> {
-    const currentContractLibs = getSolidityLibNames(contractClass.bytecode);
+    const currentContractLibs = getSolidityLibNames(contractClass.schema.bytecode);
     const libraries = this.networkFile.getSolidityLibs(currentContractLibs);
     contractClass.link(libraries);
   }
@@ -237,15 +237,15 @@ export default class NetworkController {
 
   // Contract model || SolidityLib model
   private _hasChangedLibraries(contractClass: ZosContract, changedLibraries: ZosContract[]): boolean {
-    const libNames = getSolidityLibNames(contractClass.bytecode);
-    return !isEmpty(intersection(changedLibraries.map((c) => c.contractName), libNames));
+    const libNames = getSolidityLibNames(contractClass.schema.bytecode);
+    return !isEmpty(intersection(changedLibraries.map((c) => c.schema.contractName), libNames));
   }
 
   // Contract model || SolidityLib model
   private _getAllSolidityLibNames(contractNames: string[]): string[] {
     const libNames = contractNames.map((contractName) => {
       const contractClass = Contracts.getFromLocal(contractName);
-      return getSolidityLibNames(contractClass.bytecode);
+      return getSolidityLibNames(contractClass.schema.bytecode);
     });
 
     return uniq(flatten(libNames));
@@ -279,7 +279,7 @@ export default class NetworkController {
 
   // DeployerController || Contract model
   public validateContract(contractAlias: string, contractClass: ZosContract, buildArtifacts: BuildArtifacts): boolean {
-    log.info(`Validating contract ${contractClass.contractName}`);
+    log.info(`Validating contract ${contractClass.schema.contractName}`);
     const existingContractInfo: any = this.networkFile.contract(contractAlias) || {};
     const warnings = validate(contractClass, existingContractInfo, buildArtifacts);
     const newWarnings = newValidationErrors(warnings, existingContractInfo.warnings);
@@ -287,8 +287,8 @@ export default class NetworkController {
     const validationLogger = new ValidationLogger(contractClass, existingContractInfo);
     validationLogger.log(newWarnings, buildArtifacts);
 
-    contractClass.warnings = warnings;
-    contractClass.storageInfo = getStorageLayout(contractClass, buildArtifacts);
+    contractClass.schema.warnings = warnings;
+    contractClass.schema.storageInfo = getStorageLayout(contractClass, buildArtifacts);
     return validationPasses(newWarnings);
   }
 
@@ -346,7 +346,7 @@ export default class NetworkController {
 
   // Contract model || SolidityLib model
   private _hasSolidityLibChanged(libClass: ZosContract): boolean {
-    return !this.networkFile.hasSameBytecode(libClass.contractName, libClass);
+    return !this.networkFile.hasSameBytecode(libClass.schema.contractName, libClass);
   }
 
   // Contract model
@@ -472,7 +472,7 @@ export default class NetworkController {
     if (calledInitMethod) return;
 
     // Otherwise, warn the user to invoke it
-    const initializeMethod = contractClass.abi.find((fn) => fn.type === 'function' && fn.name === 'initialize');
+    const initializeMethod = contractClass.schema.abi.find((fn) => fn.type === 'function' && fn.name === 'initialize');
     if (!initializeMethod) return;
     log.error(`Possible initialization method 'initialize' found in contract. Make sure you initialize your instance.`);
   }
@@ -570,9 +570,9 @@ export default class NetworkController {
     if (calledMigrateMethod) return;
 
     // Otherwise, warn the user to invoke it
-    const migrateMethod = contractClass.abi.find((fn) => fn.type === 'function' && fn.name === 'migrate');
+    const migrateMethod = contractClass.schema.abi.find((fn) => fn.type === 'function' && fn.name === 'migrate');
     if (!migrateMethod) return;
-    log.error(`Possible migration method 'migrate' found in contract ${contractClass.contractName}. Remember running the migration after deploying it.`);
+    log.error(`Possible migration method 'migrate' found in contract ${contractClass.schema.contractName}. Remember running the migration after deploying it.`);
   }
 
   // Proxy model
