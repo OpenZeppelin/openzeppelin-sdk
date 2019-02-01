@@ -58,13 +58,12 @@ export function createZosContract(schema: ZosContractSchema, contractInstance: C
 
     instance.new = async function(args: any[] = [], options: any = {}): Promise<ZosContract> {
       if(!schema.linkedBytecode) throw new Error(`${schema.contractName} bytecode contains unlinked libraries.`);
-      const mergedOptions = { ...instance.options, from: await Contracts.getDefaultFromAddress(), ...options };
-      instance.options = mergedOptions;
+      instance.options = { ...instance.options, ...(await Contracts.getDefaultTxParams()) };
       return new Promise(function(resolve, reject) {
         const tx = instance.deploy({data: schema.linkedBytecode, arguments: args});
         let transactionReceipt;
         let transactionHash;
-        tx.send(mergedOptions)
+        tx.send({ ...options })
           .on('error', (error) => reject(error))
           .on('receipt', (receipt) => transactionReceipt = receipt)
           .on('transactionHash', (hash) => transactionHash = hash)

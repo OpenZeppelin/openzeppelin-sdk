@@ -12,7 +12,7 @@ import utils from 'web3-utils';
 const ImplV1 = Contracts.getFromLocal('DummyImplementation');
 const ImplV2 = Contracts.getFromLocal('DummyImplementationV2');
 
-contract.only('SimpleProject', function (accounts) {
+contract('SimpleProject', function (accounts) {
   accounts = accounts.map(utils.toChecksumAddress);
   const [_, owner, another] = accounts
   const name = 'MyProject'
