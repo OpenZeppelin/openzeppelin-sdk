@@ -48,6 +48,7 @@ contract('ProxyAdmin', function(accounts) {
 
     it('changes proxy admin', async function() {
       await this.proxyAdmin.methods.changeProxyAdmin(this.proxy.address, newAdmin).send({ from: proxyAdminOwner });
+      (await this.proxy.methods.admin().call({ from: newAdmin })).should.eq(newAdmin);
     });
   });
 
@@ -91,8 +92,8 @@ contract('ProxyAdmin', function(accounts) {
       });
 
       context('with valid callData', function() {
-        it('fails to upgrade', async function() {
-          const callData = encodeCall('initializeNonPayable', ['uint256'], [1337])
+        it('upgrades implementation', async function() {
+          const callData = encodeCall('initializeNonPayable', ['uint256'], [1337]);
           await this.proxyAdmin.methods.upgradeAndCall(this.proxy.address, this.implementationV2.address, callData).send({ from: proxyAdminOwner });
           const implementationAddress = await this.proxyAdmin.methods.getProxyImplementation(this.proxy.address).call();
           implementationAddress.should.be.equal(this.implementationV2.address);
