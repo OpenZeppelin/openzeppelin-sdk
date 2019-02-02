@@ -1,8 +1,8 @@
 import readline from 'readline';
-import { isNotMigratableZosversion } from '../models/files/ZosVersion';
+import { isMigratableZosversion } from '../models/files/ZosVersion';
 
-export async function willMigrateProjectIfNeeded(zosversion): Promise<boolean> {
-  if(!isNotMigratableZosversion(zosversion)) {
+export async function hasToMigrateProject(zosversion): Promise<boolean> {
+  if(isMigratableZosversion(zosversion)) {
     const response = await new Promise((resolve) => {
       const prompt = readline.createInterface({
         input: process.stdin,
@@ -13,12 +13,12 @@ export async function willMigrateProjectIfNeeded(zosversion): Promise<boolean> {
         resolve(answer);
       });
     });
-    if (!isValidResponse(response)) return willMigrateProjectIfNeeded(zosversion);
+    if (!isValidResponse(response)) return hasToMigrateProject(zosversion);
     return response === 'y' || response === 'Y';
   }
   return true;
 }
 
 function isValidResponse(response): boolean {
-  return response == 'y' || response == 'Y' || response == 'n' || response == 'N';
+  return response === 'y' || response === 'Y' || response === 'n' || response === 'N';
 }

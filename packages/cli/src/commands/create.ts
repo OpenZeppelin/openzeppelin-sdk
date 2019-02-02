@@ -3,7 +3,7 @@ import pickBy from 'lodash.pickby';
 import create from '../scripts/create';
 import { parseInit } from '../utils/input';
 import { fromContractFullName } from '../utils/naming';
-import { willMigrateProjectIfNeeded } from '../utils/prompt-migration';
+import { hasToMigrateProject } from '../utils/prompt-migration';
 import ConfigVariablesInitializer from '../models/initializer/ConfigVariablesInitializer';
 import ZosPackageFile from '../models/files/ZosPackageFile';
 
@@ -23,7 +23,7 @@ const register: (program: any) => any = (program) => program
 
 async function action(contractFullName: string, options: any): Promise<void> {
   const zosversion = await ZosPackageFile.getZosversion();
-  if (!await willMigrateProjectIfNeeded(zosversion)) return;
+  if (!await hasToMigrateProject(zosversion)) return;
   const { force } = options;
   const { initMethod, initArgs } = parseInit(options, 'initialize');
   const { contract: contractAlias, package: packageName } = fromContractFullName(contractFullName);

@@ -14,8 +14,8 @@ export function checkVersion(version: string, where: any): void | never {
   }
 }
 
-export function isNotMigratableZosversion(version: string): boolean {
-  return isUndefined(version) || isNull(version) || isCurrentVersion(version);
+export function isMigratableZosversion(version: string): boolean {
+  return !isUndefined(version) && !isNull(version) && !isCurrentVersion(version);
 }
 
 function stringifyCurrentZosversion(): string {

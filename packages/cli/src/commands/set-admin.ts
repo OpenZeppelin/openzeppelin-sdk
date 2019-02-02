@@ -2,7 +2,7 @@ import pickBy from 'lodash.pickby';
 
 import setAdmin from '../scripts/set-admin';
 import { fromContractFullName } from '../utils/naming';
-import { willMigrateProjectIfNeeded } from '../utils/prompt-migration';
+import { hasToMigrateProject } from '../utils/prompt-migration';
 import ConfigVariablesInitializer from '../models/initializer/ConfigVariablesInitializer';
 import ZosPackageFile from '../models/files/ZosPackageFile';
 
@@ -20,7 +20,7 @@ const register: (program: any) => any = (program) => program
 
 async function action(contractFullNameOrAddress: string, newAdmin: string, options: any): Promise<void | never> {
   const zosversion = await ZosPackageFile.getZosversion();
-  if (!await willMigrateProjectIfNeeded(zosversion)) return;
+  if (!await hasToMigrateProject(zosversion)) return;
 
   const { yes } = options;
   if (!yes) {
