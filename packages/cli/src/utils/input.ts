@@ -11,16 +11,16 @@ export function parseArgs(args: string): string[] | never {
     args = args.replace(MATCH_WORDS, '$2"$3"'); // replace non quoted number by quoted number
 
     // Parse string to array.
-    let parsedArgs = JSON.parse('[' + args + ']');
+    const parsedArgs = JSON.parse('[' + args + ']');
 
     // Replace boolean strings with boolean literals.
-    parsedArgs = parsedArgs.map((value) => {
-      if(value === 'false') return false;
-      else if(value === 'true') return true;
+    return parsedArgs.map((value) => {
+      if(typeof value === 'string') {
+        if(value.toLowerCase() === 'false') return false;
+        else if(value.toLowerCase() === 'true') return true;
+      }
       return value;
     });
-
-    return parsedArgs;
   } catch (e) {
     throw Error(`Error parsing arguments: ${e}`);
   }
