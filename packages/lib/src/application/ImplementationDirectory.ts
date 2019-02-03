@@ -2,40 +2,39 @@ import Logger from '../utils/Logger';
 import { sendTransaction, deploy } from '../utils/Transactions';
 import Contracts from '../artifacts/Contracts';
 import ZosContract from '../artifacts/ZosContract';
-import { Contract } from 'web3-eth-contract';
 
 const log = new Logger('ImplementationDirectory');
 
 // TS-TODO: review which members could be private
 export default class ImplementationDirectory {
 
-  public directoryContract: Contract;
+  public directoryContract: ZosContract;
   public txParams: any;
 
   public static async deploy(txParams: any = {}): Promise<ImplementationDirectory> {
-    const contractClass = this.getContractClass();
-    log.info(`Deploying new ${contractClass.schema.contractName}...`);
-    const directory = await deploy(contractClass, [], txParams);
-    log.info(`Deployed ${contractClass.schema.contractName} at ${directory.address}`);
+    const contract = this.getContract();
+    log.info(`Deploying new ${contract.schema.contractName}...`);
+    const directory = await deploy(contract, [], txParams);
+    log.info(`Deployed ${contract.schema.contractName} at ${directory.address}`);
     return new this(directory, txParams);
   }
 
   public static fetch(address: string, txParams: any = {}): ImplementationDirectory {
-    const klazz = this.getContractClass();
-    const directory = <Contract>klazz.at(address);
+    const contract = this.getContract();
+    const directory = contract.at(address);
     return new this(directory, txParams);
   }
 
-  public static getContractClass(): ZosContract {
+  public static getContract(): ZosContract {
     return Contracts.getFromLib('ImplementationDirectory');
   }
 
-  constructor(directory: Contract, txParams: any = {}) {
+  constructor(directory: ZosContract, txParams: any = {}) {
     this.directoryContract = directory;
     this.txParams = txParams;
   }
 
-  get contract(): Contract {
+  get contract(): ZosContract {
     return this.directoryContract;
   }
 

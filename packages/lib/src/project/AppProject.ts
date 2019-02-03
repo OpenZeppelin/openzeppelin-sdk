@@ -12,7 +12,6 @@ import ZosContract from '../artifacts/ZosContract';
 import ProxyAdminProject from './ProxyAdminProject';
 import { DeployError } from '../utils/errors/DeployError';
 import { semanticVersionToString } from '../utils/Semver';
-import { Contract } from 'web3-eth-contract';
 
 const DEFAULT_NAME: string = 'main';
 const DEFAULT_VERSION: string = '0.1.0';
@@ -148,25 +147,25 @@ export default class AppProject extends BasePackageProject {
   }
 
   // TODO: Testme
-  public async createContract(contractClass: ZosContract, { packageName, contractName, initMethod, initArgs }: ContractInterface = {}): Promise<Contract> {
-    if (!contractName) contractName = contractClass.schema.contractName;
+  public async createContract(contract: ZosContract, { packageName, contractName, initMethod, initArgs }: ContractInterface = {}): Promise<ZosContract> {
+    if (!contractName) contractName = contract.schema.contractName;
     if (!packageName) packageName = this.name;
-    return this.app.createContract(contractClass, packageName, contractName, initMethod, initArgs);
+    return this.app.createContract(contract, packageName, contractName, initMethod, initArgs);
   }
 
-  public async createProxy(contractClass: ZosContract, { packageName, contractName, initMethod, initArgs }: ContractInterface = {}): Promise<Contract> {
+  public async createProxy(contract: ZosContract, { packageName, contractName, initMethod, initArgs }: ContractInterface = {}): Promise<ZosContract> {
     if (!this.proxyAdmin) this.proxyAdmin = await ProxyAdmin.deploy(this.txParams);
-    if (!contractName) contractName = contractClass.schema.contractName;
+    if (!contractName) contractName = contract.schema.contractName;
     if (!packageName) packageName = this.name;
     if (!isEmpty(initArgs) && !initMethod) initMethod = 'initialize';
-    return this.app.createProxy(contractClass, packageName, contractName, this.proxyAdmin.address, initMethod, initArgs);
+    return this.app.createProxy(contract, packageName, contractName, this.proxyAdmin.address, initMethod, initArgs);
   }
 
-  public async upgradeProxy(proxyAddress: string, contractClass: ZosContract, { packageName, contractName, initMethod, initArgs }: ContractInterface = {}): Promise<Contract> {
-    if (!contractName) contractName = contractClass.schema.contractName;
+  public async upgradeProxy(proxyAddress: string, contract: ZosContract, { packageName, contractName, initMethod, initArgs }: ContractInterface = {}): Promise<ZosContract> {
+    if (!contractName) contractName = contract.schema.contractName;
     if (!packageName) packageName = this.name;
     const implementationAddress = await this.getImplementation({ packageName, contractName });
-    return this.proxyAdmin.upgradeProxy(proxyAddress, implementationAddress, contractClass, initMethod, initArgs);
+    return this.proxyAdmin.upgradeProxy(proxyAddress, implementationAddress, contract, initMethod, initArgs);
   }
 
   public async changeProxyAdmin(proxyAddress: string, newAdmin: string): Promise<void> {

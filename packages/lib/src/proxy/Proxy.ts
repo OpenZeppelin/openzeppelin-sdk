@@ -2,15 +2,14 @@ import ZWeb3 from '../artifacts/ZWeb3';
 import Contracts from '../artifacts/Contracts';
 import { toAddress, uint256ToAddress } from '../utils/Addresses';
 import ZosContract from '../artifacts/ZosContract';
-import { Contract } from 'web3-eth-contract';
 import { deploy as deployContract, sendTransaction } from '../utils/Transactions';
 
 export default class Proxy {
-  private contract: Contract;
+  private contract: ZosContract;
   private txParams: any;
   public address: string;
 
-  public static at(contractOrAddress: string | Contract, txParams: any = {}): Proxy {
+  public static at(contractOrAddress: string | ZosContract, txParams: any = {}): Proxy {
     const ProxyContract = Contracts.getFromLib('AdminUpgradeabilityProxy');
     const contract = ProxyContract.at(toAddress(contractOrAddress));
     return new this(contract, txParams);
@@ -23,7 +22,7 @@ export default class Proxy {
     return new this(contract, txParams);
   }
 
-  constructor(contract: Contract, txParams: any = {}) {
+  constructor(contract: ZosContract, txParams: any = {}) {
     this.address = toAddress(contract);
     this.contract = contract;
     this.txParams = txParams;

@@ -5,12 +5,11 @@ import { toSemanticVersion, SemanticVersion } from '../utils/Semver';
 import { toAddress, isZeroAddress } from '../utils/Addresses';
 import ZosContract from '../artifacts/ZosContract';
 import { deploy as deployContract, sendTransaction } from '../utils/Transactions';
-import { Contract } from 'web3-eth-contract';
 
 const log: Logger = new Logger('Package');
 
 export default class Package {
-  private packageContract: Contract;
+  private packageContract: ZosContract;
   private txParams: any;
 
   public static fetch(address: string, txParams: any = {}): Package | null {
@@ -28,12 +27,12 @@ export default class Package {
     return new this(packageContract, txParams);
   }
 
-  constructor(packageContract: Contract, txParams: any = {}) {
+  constructor(packageContract: ZosContract, txParams: any = {}) {
     this.packageContract = packageContract;
     this.txParams = txParams;
   }
 
-  get contract(): Contract {
+  get contract(): ZosContract {
     return this.packageContract;
   }
 

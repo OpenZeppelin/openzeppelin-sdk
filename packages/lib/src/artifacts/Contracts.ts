@@ -3,7 +3,6 @@ import path from 'path';
 import ZosContract, { createZosContract } from './ZosContract';
 import ZWeb3 from './ZWeb3';
 import { getSolidityLibNames, hasUnlinkedVariables } from '../utils/Bytecode';
-import { Contract } from 'web3-eth-contract';
 
 export default class Contracts {
   private static DEFAULT_SYNC_TIMEOUT: number = 240000;

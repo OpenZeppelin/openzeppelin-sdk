@@ -4,7 +4,6 @@ import { semanticVersionToString } from '../utils/Semver';
 import ZosContract from '../artifacts/ZosContract';
 import ImplementationDirectory from '../application/ImplementationDirectory';
 import Package from '../application/Package';
-import { Contract } from 'web3-eth-contract';
 
 const log: Logger = new Logger('PackageProject');
 
@@ -36,10 +35,10 @@ export default abstract class BasePackageProject {
     log.info(`Version ${version} has been frozen`);
   }
 
-  public async setImplementation(contractClass: ZosContract, contractName: string): Promise<Contract> {
-    if (!contractName) contractName = contractClass.schema.contractName;
+  public async setImplementation(contract: ZosContract, contractName: string): Promise<ZosContract> {
+    if (!contractName) contractName = contract.schema.contractName;
     log.info(`Setting implementation of ${contractName} in directory...`);
-    const implementation: any = await deploy(contractClass, [], this.txParams);
+    const implementation: any = await deploy(contract, [], this.txParams);
     const directory: ImplementationDirectory = await this.getCurrentDirectory();
     await directory.setImplementation(contractName, implementation.address);
     log.info(`Implementation set: ${implementation.address}`);

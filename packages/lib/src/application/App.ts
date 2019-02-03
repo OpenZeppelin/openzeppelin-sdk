@@ -9,8 +9,6 @@ import { buildCallData, callDescription, CalldataInfo } from '../utils/ABIs';
 import ZosContract from '../artifacts/ZosContract';
 import { toSemanticVersion, semanticVersionEqual } from '../utils/Semver';
 import { deploy as deployContract, sendTransaction, sendDataTransaction } from '../utils/Transactions';
-import { TransactionReceipt } from 'web3/types';
-import { Contract } from 'web3-eth-contract';
 
 const log: Logger = new Logger('App');
 
@@ -35,7 +33,7 @@ export default class App {
     return Contracts.getFromLib('App');
   }
 
-  constructor(appContract: Contract, txParams: any = {}) {
+  constructor(appContract: ZosContract, txParams: any = {}) {
     this.appContract = appContract;
     this.txParams = txParams;
   }
@@ -64,7 +62,7 @@ export default class App {
     return this.appContract.address;
   }
 
-  get contract(): Contract {
+  get contract(): ZosContract {
     return this.appContract;
   }
 
@@ -82,18 +80,18 @@ export default class App {
     return ImplementationDirectory.fetch(address, { ...this.txParams });
   }
 
-  public async createContract(contractClass: ZosContract, packageName: string, contractName: string, initMethodName: string, initArgs: string[]): Promise<Contract> {
-    const instance = await this._copyContract(packageName, contractName, contractClass);
-    await this._initNonUpgradeableInstance(instance, contractClass, packageName, contractName, initMethodName, initArgs);
+  public async createContract(contract: ZosContract, packageName: string, contractName: string, initMethodName: string, initArgs: string[]): Promise<ZosContract> {
+    const instance = await this._copyContract(packageName, contractName, contract);
+    await this._initNonUpgradeableInstance(instance, contract, packageName, contractName, initMethodName, initArgs);
     return instance;
   }
 
-  public async createProxy(contractClass: ZosContract, packageName: string, contractName: string, proxyAdmin: string, initMethodName: string, initArgs?: string[]): Promise<Contract> {
+  public async createProxy(contract: ZosContract, packageName: string, contractName: string, proxyAdmin: string, initMethodName: string, initArgs?: string[]): Promise<ZosContract> {
     const proxy = typeof(initArgs) === 'undefined'
       ? await this._createProxy(packageName, contractName, proxyAdmin)
-      : await this._createProxyAndCall(contractClass, packageName, contractName, proxyAdmin, initMethodName, initArgs);
+      : await this._createProxyAndCall(contract, packageName, contractName, proxyAdmin, initMethodName, initArgs);
     log.info(`${packageName} ${contractName} proxy: ${proxy.address}`);
-    return contractClass.at(proxy.address);
+    return contract.at(proxy.address);
   }
 
   private async _createProxy(packageName: string, contractName: string, proxyAdmin: string): Promise<Proxy> {
@@ -110,15 +108,15 @@ export default class App {
     return Proxy.deploy(implementation, proxyAdmin, callData, this.txParams);
   }
 
-  private async _copyContract(packageName: string, contractName: string, contractClass: ZosContract): Promise<Contract> {
+  private async _copyContract(packageName: string, contractName: string, contract: ZosContract): Promise<ZosContract> {
     log.info(`Creating new non-upgradeable instance of ${packageName} ${contractName}...`);
     const implementation = await this.getImplementation(packageName, contractName);
-    const instance = await copyContract(contractClass, implementation, { ...this.txParams });
+    const instance = await copyContract(contract, implementation, { ...this.txParams });
     log.info(`${packageName} ${contractName} instance created at ${instance.address}`);
     return instance;
   }
 
-  private async _initNonUpgradeableInstance(instance: Contract, contractClass: ZosContract, packageName: string, contractName: string, initMethodName: string, initArgs?: string[]): Promise<any> {
+  private async _initNonUpgradeableInstance(instance: ZosContract, contractClass: ZosContract, packageName: string, contractName: string, initMethodName: string, initArgs?: string[]): Promise<any> {
     if (typeof(initArgs) !== 'undefined') {
       // this could be front-run, waiting for new initializers model
       const { method: initMethod, callData }: CalldataInfo = buildCallData(contractClass, initMethodName, initArgs);

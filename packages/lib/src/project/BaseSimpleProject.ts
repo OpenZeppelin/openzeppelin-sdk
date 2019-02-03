@@ -10,7 +10,6 @@ import { toSemanticVersion } from '../utils/Semver';
 import { buildCallData, callDescription, CalldataInfo } from '../utils/ABIs';
 import { ContractInterface } from './AppProject';
 import ZosContract from '../artifacts/ZosContract';
-import { Contract } from 'web3-eth-contract';
 
 const log: Logger = new Logger('BaseSimpleProject');
 
@@ -94,7 +93,7 @@ export default abstract class BaseSimpleProject {
     delete this.dependencies[name];
   }
 
-  public async createProxy(contractClass, { packageName, contractName, initMethod, initArgs, redeployIfChanged }: ContractInterface = {}): Promise<Contract> {
+  public async createProxy(contractClass, { packageName, contractName, initMethod, initArgs, redeployIfChanged }: ContractInterface = {}): Promise<ZosContract> {
     if (!isEmpty(initArgs) && !initMethod) initMethod = 'initialize';
     const implementationAddress = await this._getOrDeployImplementation(contractClass, packageName, contractName, redeployIfChanged);
     const initCallData = this._getAndLogInitCallData(contractClass, initMethod, initArgs, implementationAddress, 'Creating');

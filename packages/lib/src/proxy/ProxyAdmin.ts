@@ -5,12 +5,11 @@ import { toAddress } from '../utils/Addresses';
 import { buildCallData, callDescription, CalldataInfo } from '../utils/ABIs';
 import ZosContract from '../artifacts/ZosContract';
 import { deploy as deployContract, sendTransaction } from '../utils/Transactions';
-import { Contract } from 'web3-eth-contract';
 
 const log: Logger = new Logger('ProxyAdmin');
 
 export default class ProxyAdmin {
-  public contract: Contract;
+  public contract: ZosContract;
   public address: string;
   public txParams: any;
 
@@ -42,12 +41,12 @@ export default class ProxyAdmin {
     log.info(`Admin for proxy ${proxyAddress} set to ${newAdmin}`);
   }
 
-  public async upgradeProxy(proxyAddress: string, implementationAddress: string, contractClass: ZosContract, initMethodName: string, initArgs: any): Promise<Contract> {
+  public async upgradeProxy(proxyAddress: string, implementationAddress: string, contract: ZosContract, initMethodName: string, initArgs: any): Promise<ZosContract> {
     const receipt: any = typeof(initArgs) === 'undefined'
       ? await this._upgradeProxy(proxyAddress, implementationAddress)
-      : await this._upgradeProxyAndCall(proxyAddress, implementationAddress, contractClass, initMethodName, initArgs);
+      : await this._upgradeProxyAndCall(proxyAddress, implementationAddress, contract, initMethodName, initArgs);
     log.info(`TX receipt received: ${receipt.transactionHash}`);
-    return contractClass.at(proxyAddress);
+    return contract.at(proxyAddress);
   }
 
   private async _upgradeProxy(proxyAddress: string, implementation: string): Promise<any> {

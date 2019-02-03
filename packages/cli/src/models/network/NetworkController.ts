@@ -14,7 +14,6 @@ import isEqual from 'lodash.isequal';
 import concat from 'lodash.concat';
 import toPairs from 'lodash.topairs';
 import { Contracts, ZosContract, Logger, FileSystem as fs, Proxy, awaitConfirmations, semanticVersionToString } from 'zos-lib';
-import { Contract } from 'web3-eth-contract';
 import { ProxyAdminProject, AppProject, flattenSourceCode, getStorageLayout, BuildArtifacts, getBuildArtifacts, getSolidityLibNames } from 'zos-lib';
 import { validate, newValidationErrors, validationPasses, App } from 'zos-lib';
 
@@ -178,7 +177,7 @@ export default class NetworkController {
     const libName = libClass.schema.contractName;
     log.info(`Uploading ${libName} library...`);
     const libInstance = await this.project.setImplementation(libClass, libName);
-    this.networkFile.addSolidityLib(libName, libClass ,libInstance);
+    this.networkFile.addSolidityLib(libName, libInstance);
   }
 
   // Contract model
@@ -196,7 +195,7 @@ export default class NetworkController {
       await this._setSolidityLibs(contractClass);
       log.info(`Uploading ${contractClass.schema.contractName} contract as ${contractAlias}`);
       const contractInstance = await this.project.setImplementation(contractClass, contractAlias);
-      this.networkFile.addContract(contractAlias, contractClass, contractInstance, {
+      this.networkFile.addContract(contractAlias, contractInstance, {
         warnings: contractClass.schema.warnings,
         types: contractClass.schema.storageInfo.types,
         storage: contractClass.schema.storageInfo.storage
@@ -438,7 +437,7 @@ export default class NetworkController {
   }
 
   // Proxy model
-  public async createProxy(packageName: string, contractAlias: string, initMethod: string, initArgs: string[]): Promise<Contract> {
+  public async createProxy(packageName: string, contractAlias: string, initMethod: string, initArgs: string[]): Promise<ZosContract> {
     await this.fetchOrDeploy(this.currentVersion);
     if (!packageName) packageName = this.packageFile.name;
     const contractClass = this.localController.getContractClass(packageName, contractAlias);
@@ -478,7 +477,7 @@ export default class NetworkController {
   }
 
   // Proxy model
-  private _updateTruffleDeployedInformation(contractAlias: string, implementation: Contract): void {
+  private _updateTruffleDeployedInformation(contractAlias: string, implementation: ZosContract): void {
     const contractName = this.packageFile.contract(contractAlias);
     if (contractName) {
       const path = Contracts.getLocalPath(contractName);
@@ -486,7 +485,7 @@ export default class NetworkController {
       if (!data.networks) {
         data.networks = {};
       }
-      data.networks[implementation.constructor.network_id] = {
+      data.networks[(<any>implementation).constructor.network_id] = {
         links: {},
         events: {},
         address: implementation.address,
