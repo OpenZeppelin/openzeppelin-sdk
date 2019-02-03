@@ -60,7 +60,7 @@ export default class Dependency {
     );
 
     const pipeline = [
-      (someContracts) => map(someContracts, ([contractClass]) => getSolidityLibNames(contractClass.schema.bytecode)),
+      (someContracts) => map(someContracts, ([contract]) => getSolidityLibNames(contract.schema.bytecode)),
       (someContracts) => flatten(someContracts),
       (someContracts) => uniq(someContracts),
     ];
@@ -72,9 +72,9 @@ export default class Dependency {
       return [libraryName, implementation.address];
     })));
 
-    await Promise.all(map(contracts, async ([contractClass, contractAlias]) => {
-      contractClass.link(libraries);
-      await project.setImplementation(contractClass, contractAlias);
+    await Promise.all(map(contracts, async ([contract, contractAlias]) => {
+      contract.link(libraries);
+      await project.setImplementation(contract, contractAlias);
     }));
 
     return project;

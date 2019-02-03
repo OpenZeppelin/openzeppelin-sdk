@@ -25,31 +25,31 @@ export function buildDeploymentCallData(contract: ZosContract, args: any[], txPa
   return ZWeb3.contract(contract.schema.abi).deploy({data: contract.schema.linkedBytecode, arguments: args}).encodeABI();
 }
 
-export function buildCallData(contractClass: ZosContract, methodName: string, args: any[]): CalldataInfo {
-  const method = getABIFunction(contractClass, methodName, args);
+export function buildCallData(contract: ZosContract, methodName: string, args: any[]): CalldataInfo {
+  const method = getABIFunction(contract, methodName, args);
   const argTypes = method.inputs.map((input) => input.type);
   const callData = encodeCall(method.name, argTypes, args);
   return { method, callData };
 }
 
-export function getABIFunction(contractClass: ZosContract, methodName: string, args: any[]): FunctionInfo {
-  const targetMethod: FunctionInfo = tryGetTargetFunction(contractClass, methodName, args);
+export function getABIFunction(contract: ZosContract, methodName: string, args: any[]): FunctionInfo {
+  const targetMethod: FunctionInfo = tryGetTargetFunction(contract, methodName, args);
   if (targetMethod) methodName = targetMethod.name;
 
   const matchArgsTypes = (fn) => targetMethod && fn.inputs.every((input, index) => targetMethod.inputs[index] && targetMethod.inputs[index].type === input.type);
   const matchNameAndArgsLength = (fn) => fn.name === methodName && fn.inputs.length === args.length;
 
-  let abiMethods: FunctionInfo[] = contractClass.schema.abi.filter((fn) => matchNameAndArgsLength(fn) && matchArgsTypes(fn));
-  if (abiMethods.length === 0) abiMethods = contractClass.schema.abi.filter((fn) => matchNameAndArgsLength(fn));
+  let abiMethods: FunctionInfo[] = contract.schema.abi.filter((fn) => matchNameAndArgsLength(fn) && matchArgsTypes(fn));
+  if (abiMethods.length === 0) abiMethods = contract.schema.abi.filter((fn) => matchNameAndArgsLength(fn));
 
   switch (abiMethods.length) {
-    case 0: throw Error(`Could not find method ${methodName} with ${args.length} arguments in contract ${contractClass.schema.contractName}`);
+    case 0: throw Error(`Could not find method ${methodName} with ${args.length} arguments in contract ${contract.schema.contractName}`);
     case 1: return abiMethods[0];
-    default: throw Error(`Found more than one match for function ${methodName} with ${args.length} arguments in contract ${contractClass.schema.contractName}`);
+    default: throw Error(`Found more than one match for function ${methodName} with ${args.length} arguments in contract ${contract.schema.contractName}`);
   }
 }
 
-function tryGetTargetFunction(contractClass: ZosContract, methodName: string, args: string[] | undefined): FunctionInfo {
+function tryGetTargetFunction(contract: ZosContract, methodName: string, args: string[] | undefined): FunctionInfo {
   // Match foo(uint256,string) as method name, and look for that in the ABI
   const match: string[] = methodName.match(/^\s*(.+)\((.*)\)\s*$/);
   if (match) {
@@ -59,7 +59,7 @@ function tryGetTargetFunction(contractClass: ZosContract, methodName: string, ar
   }
 
   // Otherwise, look for the most derived contract
-  const methodNode: Node = tryGetFunctionNodeFromMostDerivedContract(contractClass, methodName, args);
+  const methodNode: Node = tryGetFunctionNodeFromMostDerivedContract(contract, methodName, args);
   if (methodNode) {
     const inputs: any[] = methodNode.parameters.parameters.map((parameter: any) => {
       const typeString: string = parameter.typeDescriptions.typeString;
@@ -70,8 +70,8 @@ function tryGetTargetFunction(contractClass: ZosContract, methodName: string, ar
   }
 }
 
-function tryGetFunctionNodeFromMostDerivedContract(contractClass: ZosContract, methodName: string, args: any[]): Node | null {
-  const linearizedBaseContracts: Node[] | null = tryGetLinearizedBaseContracts(contractClass);
+function tryGetFunctionNodeFromMostDerivedContract(contract: ZosContract, methodName: string, args: any[]): Node | null {
+  const linearizedBaseContracts: Node[] | null = tryGetLinearizedBaseContracts(contract);
   if (!linearizedBaseContracts) return null;
 
   const nodeMatches = (node: Node) => (
@@ -80,20 +80,20 @@ function tryGetFunctionNodeFromMostDerivedContract(contractClass: ZosContract, m
     node.parameters.parameters.length === args.length
   );
 
-  for (const contract of linearizedBaseContracts) {
-    const funs: Node[] = contract.nodes.filter(nodeMatches);
+  for (const aContract of linearizedBaseContracts) {
+    const funs: Node[] = aContract.nodes.filter(nodeMatches);
     switch (funs.length) {
       case 0: continue;
       case 1: return funs[0];
-      default: throw Error(`Found more than one match for function ${methodName} with ${args.length} arguments in contract ${contractClass.schema.contractName}`);
+      default: throw Error(`Found more than one match for function ${methodName} with ${args.length} arguments in contract ${contract.schema.contractName}`);
     }
   }
-  throw Error(`Could not find method ${methodName} with ${args.length} arguments in contract ${contractClass.schema.contractName}`);
+  throw Error(`Could not find method ${methodName} with ${args.length} arguments in contract ${contract.schema.contractName}`);
 }
 
-function tryGetLinearizedBaseContracts(contractClass: ZosContract): Node[] | null {
+function tryGetLinearizedBaseContracts(contract: ZosContract): Node[] | null {
   try {
-    const ast: ContractAST = new ContractAST(contractClass, null, { nodesFilter: ['ContractDefinition', 'FunctionDefinition'] });
+    const ast: ContractAST = new ContractAST(contract, null, { nodesFilter: ['ContractDefinition', 'FunctionDefinition'] });
     return ast.getLinearizedBaseContracts(true);
   } catch (err) {
     // This lookup may fail on contracts loaded from libraries, so we just silently fail and fall back to other methods

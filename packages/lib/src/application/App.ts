@@ -101,8 +101,8 @@ export default class App {
     return Proxy.deploy(implementation, proxyAdmin, initializeData, this.txParams);
   }
 
-  private async _createProxyAndCall(contractClass: ZosContract, packageName: string, contractName: string, proxyAdmin: string, initMethodName: string, initArgs: any): Promise<Proxy> {
-    const { method: initMethod, callData }: CalldataInfo = buildCallData(contractClass, initMethodName, initArgs);
+  private async _createProxyAndCall(contract: ZosContract, packageName: string, contractName: string, proxyAdmin: string, initMethodName: string, initArgs: any): Promise<Proxy> {
+    const { method: initMethod, callData }: CalldataInfo = buildCallData(contract, initMethodName, initArgs);
     log.info(`Creating ${packageName} ${contractName} proxy and calling ${callDescription(initMethod, initArgs)}`);
     const implementation = await this.getImplementation(packageName, contractName);
     return Proxy.deploy(implementation, proxyAdmin, callData, this.txParams);
@@ -116,10 +116,10 @@ export default class App {
     return instance;
   }
 
-  private async _initNonUpgradeableInstance(instance: ZosContract, contractClass: ZosContract, packageName: string, contractName: string, initMethodName: string, initArgs?: string[]): Promise<any> {
+  private async _initNonUpgradeableInstance(instance: ZosContract, contract: ZosContract, packageName: string, contractName: string, initMethodName: string, initArgs?: string[]): Promise<any> {
     if (typeof(initArgs) !== 'undefined') {
       // this could be front-run, waiting for new initializers model
-      const { method: initMethod, callData }: CalldataInfo = buildCallData(contractClass, initMethodName, initArgs);
+      const { method: initMethod, callData }: CalldataInfo = buildCallData(contract, initMethodName, initArgs);
       log.info(`Initializing ${packageName} ${contractName} instance at ${instance.address} by calling ${callDescription(initMethod, initArgs)}`);
       await sendDataTransaction(instance, Object.assign({}, { ...this.txParams }, { data: callData }));
     }

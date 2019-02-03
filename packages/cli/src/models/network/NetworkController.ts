@@ -140,7 +140,7 @@ export default class NetworkController {
     const pipeline = [
       (contracts) => toPairs(contracts),
       (contracts) => map(contracts, ([contractAlias, contractName]): [string, ZosContract] => [contractAlias, Contracts.getFromLocal(contractName)]),
-      (contracts) => filter(contracts, ([contractAlias, contractClass]) => newVersion || !onlyChanged || this.hasContractChanged(contractAlias, contractClass) || this._hasChangedLibraries(contractClass, changedLibraries))
+      (contracts) => filter(contracts, ([contractAlias, contract]) => newVersion || !onlyChanged || this.hasContractChanged(contractAlias, contract) || this._hasChangedLibraries(contract, changedLibraries))
     ];
 
     return pipeline.reduce((xs, f) => f(xs), this.packageFile.contracts);
@@ -184,21 +184,21 @@ export default class NetworkController {
   public async uploadContracts(contracts: Array<[string, ZosContract]>): Promise<void> {
     await allPromisesOrError(
       contracts.map(
-        ([contractAlias, contractClass]) => this.uploadContract(contractAlias, contractClass)
+        ([contractAlias, contract]) => this.uploadContract(contractAlias, contract)
       )
     );
   }
 
   // Contract model
-  public async uploadContract(contractAlias: string, contractClass: ZosContract): Promise<void | never> {
+  public async uploadContract(contractAlias: string, contract: ZosContract): Promise<void | never> {
     try {
-      await this._setSolidityLibs(contractClass);
-      log.info(`Uploading ${contractClass.schema.contractName} contract as ${contractAlias}`);
-      const contractInstance = await this.project.setImplementation(contractClass, contractAlias);
+      await this._setSolidityLibs(contract);
+      log.info(`Uploading ${contract.schema.contractName} contract as ${contractAlias}`);
+      const contractInstance = await this.project.setImplementation(contract, contractAlias);
       this.networkFile.addContract(contractAlias, contractInstance, {
-        warnings: contractClass.schema.warnings,
-        types: contractClass.schema.storageInfo.types,
-        storage: contractClass.schema.storageInfo.storage
+        warnings: contract.schema.warnings,
+        types: contract.schema.storageInfo.types,
+        storage: contract.schema.storageInfo.storage
       });
     } catch(error) {
       error.message = `${contractAlias} deployment failed with error: ${error.message}`;
@@ -207,10 +207,10 @@ export default class NetworkController {
   }
 
   // Contract model || SolidityLib model
-  private async _setSolidityLibs(contractClass: ZosContract): Promise<void> {
-    const currentContractLibs = getSolidityLibNames(contractClass.schema.bytecode);
+  private async _setSolidityLibs(contract: ZosContract): Promise<void> {
+    const currentContractLibs = getSolidityLibNames(contract.schema.bytecode);
     const libraries = this.networkFile.getSolidityLibs(currentContractLibs);
-    contractClass.link(libraries);
+    contract.link(libraries);
   }
 
   // Contract model || SolidityLib model
@@ -235,16 +235,16 @@ export default class NetworkController {
   }
 
   // Contract model || SolidityLib model
-  private _hasChangedLibraries(contractClass: ZosContract, changedLibraries: ZosContract[]): boolean {
-    const libNames = getSolidityLibNames(contractClass.schema.bytecode);
+  private _hasChangedLibraries(contract: ZosContract, changedLibraries: ZosContract[]): boolean {
+    const libNames = getSolidityLibNames(contract.schema.bytecode);
     return !isEmpty(intersection(changedLibraries.map((c) => c.schema.contractName), libNames));
   }
 
   // Contract model || SolidityLib model
   private _getAllSolidityLibNames(contractNames: string[]): string[] {
     const libNames = contractNames.map((contractName) => {
-      const contractClass = Contracts.getFromLocal(contractName);
-      return getSolidityLibNames(contractClass.schema.bytecode);
+      const contract = Contracts.getFromLocal(contractName);
+      return getSolidityLibNames(contract.schema.bytecode);
     });
 
     return uniq(flatten(libNames));
@@ -271,23 +271,23 @@ export default class NetworkController {
 
   // DeployerController || Contract model
   public validateContracts(contracts: Array<[string, ZosContract]>, buildArtifacts: BuildArtifacts): boolean {
-    return every(contracts.map(([contractAlias, contractClass]) =>
-      this.validateContract(contractAlias, contractClass, buildArtifacts))
+    return every(contracts.map(([contractAlias, contract]) =>
+      this.validateContract(contractAlias, contract, buildArtifacts))
     );
   }
 
   // DeployerController || Contract model
-  public validateContract(contractAlias: string, contractClass: ZosContract, buildArtifacts: BuildArtifacts): boolean {
-    log.info(`Validating contract ${contractClass.schema.contractName}`);
+  public validateContract(contractAlias: string, contract: ZosContract, buildArtifacts: BuildArtifacts): boolean {
+    log.info(`Validating contract ${contract.schema.contractName}`);
     const existingContractInfo: any = this.networkFile.contract(contractAlias) || {};
-    const warnings = validate(contractClass, existingContractInfo, buildArtifacts);
+    const warnings = validate(contract, existingContractInfo, buildArtifacts);
     const newWarnings = newValidationErrors(warnings, existingContractInfo.warnings);
 
-    const validationLogger = new ValidationLogger(contractClass, existingContractInfo);
+    const validationLogger = new ValidationLogger(contract, existingContractInfo);
     validationLogger.log(newWarnings, buildArtifacts);
 
-    contractClass.schema.warnings = warnings;
-    contractClass.schema.storageInfo = getStorageLayout(contractClass, buildArtifacts);
+    contract.schema.warnings = warnings;
+    contract.schema.storageInfo = getStorageLayout(contract, buildArtifacts);
     return validationPasses(newWarnings);
   }
 
@@ -349,15 +349,15 @@ export default class NetworkController {
   }
 
   // Contract model
-  public hasContractChanged(contractAlias: string, contractClass?: ZosContract): boolean {
+  public hasContractChanged(contractAlias: string, contract?: ZosContract): boolean {
     if (!this.isLocalContract(contractAlias)) return false;
     if (!this.isContractDeployed(contractAlias)) return true;
 
-    if (!contractClass) {
+    if (!contract) {
       const contractName = this.packageFile.contract(contractAlias);
-      contractClass = Contracts.getFromLocal(contractName);
+      contract = Contracts.getFromLocal(contractName);
     }
-    return !this.networkFile.hasSameBytecode(contractAlias, contractClass);
+    return !this.networkFile.hasSameBytecode(contractAlias, contract);
   }
 
   // Contract model
@@ -440,10 +440,10 @@ export default class NetworkController {
   public async createProxy(packageName: string, contractAlias: string, initMethod: string, initArgs: string[]): Promise<ZosContract> {
     await this.fetchOrDeploy(this.currentVersion);
     if (!packageName) packageName = this.packageFile.name;
-    const contractClass = this.localController.getContractClass(packageName, contractAlias);
-    await this._setSolidityLibs(contractClass);
-    this.checkInitialization(contractClass, initMethod, initArgs);
-    const proxyInstance = await this.project.createProxy(contractClass, { packageName, contractName: contractAlias, initMethod, initArgs });
+    const contract = this.localController.getContractClass(packageName, contractAlias);
+    await this._setSolidityLibs(contract);
+    this.checkInitialization(contract, initMethod, initArgs);
+    const proxyInstance = await this.project.createProxy(contract, { packageName, contractName: contractAlias, initMethod, initArgs });
     const implementationAddress = await Proxy.at(proxyInstance).implementation();
     const packageVersion = packageName === this.packageFile.name ? this.currentVersion : (await this.project.getDependencyVersion(packageName));
     await this._tryRegisterProxyAdmin();
@@ -466,12 +466,12 @@ export default class NetworkController {
   }
 
   // Proxy model
-  public checkInitialization(contractClass: ZosContract, calledInitMethod: string, calledInitArgs: string[]): void {
+  public checkInitialization(contract: ZosContract, calledInitMethod: string, calledInitArgs: string[]): void {
     // If there is an initializer called, assume it's ok
     if (calledInitMethod) return;
 
     // Otherwise, warn the user to invoke it
-    const initializeMethod = contractClass.schema.abi.find((fn) => fn.type === 'function' && fn.name === 'initialize');
+    const initializeMethod = contract.schema.abi.find((fn) => fn.type === 'function' && fn.name === 'initialize');
     if (!initializeMethod) return;
     log.error(`Possible initialization method 'initialize' found in contract. Make sure you initialize your instance.`);
   }
@@ -537,15 +537,15 @@ export default class NetworkController {
   private async _upgradeProxy(proxy: ProxyInterface, initMethod: string, initArgs: string[]): Promise<void | never> {
     try {
       const name = { packageName: proxy.package, contractName: proxy.contract };
-      const contractClass = this.localController.getContractClass(proxy.package, proxy.contract);
-      await this._setSolidityLibs(contractClass);
+      const contract = this.localController.getContractClass(proxy.package, proxy.contract);
+      await this._setSolidityLibs(contract);
       const currentImplementation = await Proxy.at(proxy.address).implementation();
       const contractImplementation = await this.project.getImplementation(name);
       const packageVersion = proxy.package === this.packageFile.name ? this.currentVersion : (await this.project.getDependencyVersion(proxy.package));
 
       let newImplementation;
       if (currentImplementation !== contractImplementation) {
-        await this.project.upgradeProxy(proxy.address, contractClass, { initMethod, initArgs, ... name });
+        await this.project.upgradeProxy(proxy.address, contract, { initMethod, initArgs, ... name });
         newImplementation = contractImplementation;
       } else {
         log.info(`Contract ${proxy.contract} at ${proxy.address} is up to date.`);
@@ -564,14 +564,14 @@ export default class NetworkController {
   }
 
   // Proxy model
-  private _checkUpgrade(contractClass: ZosContract, calledMigrateMethod: string, calledMigrateArgs: string[]): void {
+  private _checkUpgrade(contract: ZosContract, calledMigrateMethod: string, calledMigrateArgs: string[]): void {
     // If there is a migration called, assume it's ok
     if (calledMigrateMethod) return;
 
     // Otherwise, warn the user to invoke it
-    const migrateMethod = contractClass.schema.abi.find((fn) => fn.type === 'function' && fn.name === 'migrate');
+    const migrateMethod = contract.schema.abi.find((fn) => fn.type === 'function' && fn.name === 'migrate');
     if (!migrateMethod) return;
-    log.error(`Possible migration method 'migrate' found in contract ${contractClass.schema.contractName}. Remember running the migration after deploying it.`);
+    log.error(`Possible migration method 'migrate' found in contract ${contract.schema.contractName}. Remember running the migration after deploying it.`);
   }
 
   // Proxy model

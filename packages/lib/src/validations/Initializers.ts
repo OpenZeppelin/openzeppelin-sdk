@@ -6,19 +6,17 @@ import { Node } from '../utils/ContractAST';
 /**
  * Returns a mapping from a derived contract in the inheritance chain,
  * to an array of base contracts that are uninitialized.
- * @param {*} contractClass contract class to check (including all its ancestors)
+ * @param {*} contract contract class to check (including all its ancestors)
  */
-// TS-TODO: define return type
-export function getUninitializedBaseContracts(contractClass: ZosContract): string[] {
+export function getUninitializedBaseContracts(contract: ZosContract): string[] {
   const uninitializedBaseContracts = {};
-  getUninitializedDirectBaseContracts(contractClass, uninitializedBaseContracts);
+  getUninitializedDirectBaseContracts(contract, uninitializedBaseContracts);
   return invertBy(uninitializedBaseContracts);
 }
 
-// TS-TODO: define return type
-function getUninitializedDirectBaseContracts(contractClass: ZosContract, uninitializedBaseContracts: any): void {
+function getUninitializedDirectBaseContracts(contract: ZosContract, uninitializedBaseContracts: any): void {
   // Check whether the contract has base contracts
-  const baseContracts: any = contractClass.schema.ast.nodes.find((n) => n.name === contractClass.schema.contractName).baseContracts;
+  const baseContracts: any = contract.schema.ast.nodes.find((n) => n.name === contract.schema.contractName).baseContracts;
   if (baseContracts.length === 0) return;
 
   // Run check for the base contracts
@@ -44,13 +42,13 @@ function getUninitializedDirectBaseContracts(contractClass: ZosContract, uniniti
 
   // Check that initializer exists
     // TS-TODO: define type?
-  const initializer = getContractInitializer(contractClass);
+  const initializer = getContractInitializer(contract);
   if (initializer === undefined) {
     // A contract may lack initializer as long as the base contracts don't have more than 1 initializers in total
     // If there are 2 or more base contracts with initializers, child contract should initialize all of them
     if (baseContractsWithInitialize.length > 1) {
       for (const baseContract of baseContractsWithInitialize) {
-        uninitializedBaseContracts[baseContract] = contractClass.schema.contractName;
+        uninitializedBaseContracts[baseContract] = contract.schema.contractName;
       }
     }
 
@@ -72,15 +70,15 @@ function getUninitializedDirectBaseContracts(contractClass: ZosContract, uniniti
   // For each base contract with "initialize" function, check that it's called in the function
   for (const contractName of baseContractsWithInitialize) {
     if (!initializedContracts[contractName]) {
-      uninitializedBaseContracts[contractName] = contractClass.schema.contractName;
+      uninitializedBaseContracts[contractName] = contract.schema.contractName;
   }
     }
   return;
 }
 
-function getContractInitializer(contractClass: ZosContract): Node | undefined {
-  const contractDefinition: Node = contractClass.schema.ast.nodes
-    .find((n: Node) => n.nodeType === 'ContractDefinition' && n.name === contractClass.schema.contractName);
+function getContractInitializer(contract: ZosContract): Node | undefined {
+  const contractDefinition: Node = contract.schema.ast.nodes
+    .find((n: Node) => n.nodeType === 'ContractDefinition' && n.name === contract.schema.contractName);
   const contractFunctions: Node[] = contractDefinition.nodes.filter((n) => n.nodeType === 'FunctionDefinition');
   for (const contractFunction of contractFunctions) {
     const functionModifiers: any = contractFunction.modifiers;
