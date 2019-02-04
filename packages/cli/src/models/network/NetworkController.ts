@@ -15,7 +15,7 @@ import concat from 'lodash.concat';
 import toPairs from 'lodash.topairs';
 import { Contracts, ZosContract, Logger, FileSystem as fs, Proxy, awaitConfirmations, semanticVersionToString } from 'zos-lib';
 import { ProxyAdminProject, AppProject, flattenSourceCode, getStorageLayout, BuildArtifacts, getBuildArtifacts, getSolidityLibNames } from 'zos-lib';
-import { validate, newValidationErrors, validationPasses, App } from 'zos-lib';
+import { validate, newValidationErrors, validationPasses, App, ZWeb3 } from 'zos-lib';
 
 import { allPromisesOrError } from '../../utils/async';
 import { toContractFullName } from '../../utils/naming';
@@ -447,7 +447,7 @@ export default class NetworkController {
     const implementationAddress = await Proxy.at(proxyInstance).implementation();
     const packageVersion = packageName === this.packageFile.name ? this.currentVersion : (await this.project.getDependencyVersion(packageName));
     await this._tryRegisterProxyAdmin();
-    this._updateTruffleDeployedInformation(contractAlias, proxyInstance);
+    await this._updateTruffleDeployedInformation(contractAlias, proxyInstance);
 
     this.networkFile.addProxy(packageName, contractAlias, {
       address: proxyInstance.address,
@@ -477,7 +477,7 @@ export default class NetworkController {
   }
 
   // Proxy model
-  private _updateTruffleDeployedInformation(contractAlias: string, implementation: ZosContract): void {
+  private async _updateTruffleDeployedInformation(contractAlias: string, implementation: ZosContract): Promise<void> {
     const contractName = this.packageFile.contract(contractAlias);
     if (contractName) {
       const path = Contracts.getLocalPath(contractName);
@@ -485,7 +485,8 @@ export default class NetworkController {
       if (!data.networks) {
         data.networks = {};
       }
-      data.networks[(<any>implementation).constructor.network_id] = {
+      const networkId = await ZWeb3.getNetwork();
+      data.networks[networkId] = {
         links: {},
         events: {},
         address: implementation.address,
