@@ -12,8 +12,8 @@
     "compile-ts": "rm -rf lib && tsc",
     "prepare": "npm run compile-contracts && npm run compile-ts",
     "watch": "tsc -w",
-    "lint": "npx tslint --project tsconfig.json --config ../../tslint.json",
-    "lintfix": "npx tslint --project tsconfig.json --config ../../tslint.json --fix"
+    "lint": "tslint --project tsconfig.json --config ../../tslint.json",
+    "lintfix": "tslint --project tsconfig.json --config ../../tslint.json --fix"
   },
   "files": [
     "lib",

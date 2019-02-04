@@ -11,8 +11,8 @@
     "test": "./scripts/test.sh",
     "gen-docs": "babel-node docs/bin/docs.js",
     "watch": "tsc -w",
-    "lint": "npx tslint --project tsconfig.json --config ../../tslint.json",
-    "lintfix": "npx tslint --project tsconfig.json --config ../../tslint.json --fix"
+    "lint": "tslint --project tsconfig.json --config ../../tslint.json",
+    "lintfix": "tslint --project tsconfig.json --config ../../tslint.json --fix"
   },
   "bin": {
     "zos": "./lib/bin/zos-cli.js"
@@ -38,6 +38,7 @@
     "@types/semver": "^5.5.0",
     "@types/web3": "^1.0.14",
     "axios": "^0.18.0",
+    "bignumber.js": "^8.0.2",
     "chalk": "^2.4.1",
     "cheerio": "^1.0.0-rc.2",
     "commander": "^2.15.1",
