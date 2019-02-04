@@ -7,6 +7,34 @@ import Contracts from './Contracts';
 import { StorageLayoutInfo } from '../validations/Storage';
 import _ from 'lodash';
 
+export default interface ZosContract extends Web3Contract {
+  new: (args: any[], options: any) => Promise<ZosContract>;
+  at: (address: string) => ZosContract;
+  link: (libraries: { [libAlias: string]: string }) => void;
+  schema: ZosContractSchema;
+  deployment?: { transactionHash: string, transactionReceipt: TransactionReceipt };
+  address: string;
+}
+
+interface Web3Contract {
+  options: any;
+  methods: { [fnName: string]: (...args: any[]) => TransactionObject<any>; };
+  deploy(options: { data: string; arguments: any[]; }): TransactionObject<Contract>;
+  events: {
+    [eventName: string]: (options?: { filter?: object; fromBlock?: BlockType; topics?: string[]; }, cb?: Callback<EventLog>) => EventEmitter;
+    allEvents: (options?: { filter?: object; fromBlock?: BlockType; topics?: string[]; }, cb?: Callback<EventLog>) => EventEmitter;
+  };
+  getPastEvents(event: string, options?: { filter?: object; fromBlock?: BlockType; toBlock?: BlockType; topics?: string[]; }, cb?: Callback<EventLog[]>): Promise<EventLog[]>;
+  setProvider(provider: any): void;
+}
+
+interface ZosContractSchema extends SolidityContractSchema {
+  linkedBytecode: string;
+  linkedDeployedBytecode: string;
+  warnings: any;
+  storageInfo: StorageLayoutInfo;
+}
+
 interface SolidityContractSchema {
   schemaVersion: string;
   contractName: string;
@@ -22,34 +50,6 @@ interface SolidityContractSchema {
   compiler: any;
   networks: any;
   updatedAt: string;
-}
-
-interface ZosContractSchema extends SolidityContractSchema {
-  linkedBytecode: string;
-  linkedDeployedBytecode: string;
-  warnings: any;
-  storageInfo: StorageLayoutInfo;
-}
-
-interface Web3Contract {
-  options: any;
-  methods: { [fnName: string]: (...args: any[]) => TransactionObject<any>; };
-  deploy(options: { data: string; arguments: any[]; }): TransactionObject<Contract>;
-  events: {
-    [eventName: string]: (options?: { filter?: object; fromBlock?: BlockType; topics?: string[]; }, cb?: Callback<EventLog>) => EventEmitter;
-    allEvents: (options?: { filter?: object; fromBlock?: BlockType; topics?: string[]; }, cb?: Callback<EventLog>) => EventEmitter;
-  };
-  getPastEvents(event: string, options?: { filter?: object; fromBlock?: BlockType; toBlock?: BlockType; topics?: string[]; }, cb?: Callback<EventLog[]>): Promise<EventLog[]>;
-  setProvider(provider: any): void;
-}
-
-export default interface ZosContract extends Web3Contract {
-  new: (args: any[], options: any) => Promise<ZosContract>;
-  at: (address: string) => ZosContract;
-  link: (libraries: { [libAlias: string]: string }) => void;
-  schema: ZosContractSchema;
-  deployment?: { transactionHash: string, transactionReceipt: TransactionReceipt };
-  address: string;
 }
 
 export function createZosContract(schema: ZosContractSchema, contractInstance: Contract): ZosContract {

@@ -11,6 +11,7 @@ import link from '../../src/scripts/link';
 import ZosPackageFile from "../../src/models/files/ZosPackageFile";
 
 const ImplV1 = Contracts.getFromLocal('ImplV1');
+const BooleanContract = Contracts.getFromLocal('Boolean');
 
 contract('create script', function([_, owner]) {
   const contractName = 'ImplV1';
@@ -19,17 +20,20 @@ contract('create script', function([_, owner]) {
   const anotherContractAlias = 'WithLibraryImpl';
   const uninitializableContractName = 'UninitializableImplV1';
   const uninitializableContractAlias = 'UninitializableImpl';
+  const booleanContractName = 'Boolean';
+  const booleanContractAlias = 'Boolean';
   const contractsData = [
     { name: contractName, alias: contractAlias },
     { name: anotherContractName, alias: anotherContractAlias },
-    { name: uninitializableContractName, alias: uninitializableContractAlias }
+    { name: uninitializableContractName, alias: uninitializableContractAlias },
+    { name: booleanContractName, alias: booleanContractAlias }
   ];
 
   const network = 'test';
   const version = '0.4.0';
   const txParams = { from: owner };
 
-  const assertProxy = async function(networkFile, alias, { version, say, implementation, packageName, value }) {
+  const assertProxy = async function(networkFile, alias, { version, say, implementation, packageName, value, checkBool, boolValue }) {
     const proxyInfo = networkFile.getProxies({ contract: alias })[0]
     proxyInfo.contract.should.eq(alias)
     proxyInfo.address.should.be.nonzeroAddress;
@@ -45,6 +49,12 @@ contract('create script', function([_, owner]) {
       const proxy = await ImplV1.at(proxyInfo.address);
       const actualValue = await proxy.methods.value().call();
       actualValue.should.eq(`${value}`);
+    }
+
+    if (checkBool) {
+      const proxy = await BooleanContract.at(proxyInfo.address);
+      const actualValue = await proxy.methods.value().call();
+      actualValue.should.eq(boolValue);
     }
 
     if (implementation) {
@@ -76,6 +86,20 @@ contract('create script', function([_, owner]) {
 
       const implementation = this.networkFile.contract(contractAlias).address;
       await assertProxy(this.networkFile, contractAlias, { version, say: 'V1', implementation });
+    });
+
+    it('should properly initialize a proxy with false boolean values', async function() {
+      await create({ contractAlias: booleanContractAlias, network, txParams, initMethod: 'initialize', initArgs: [false], networkFile: this.networkFile });
+
+      const implementation = this.networkFile.contract(booleanContractAlias).address;
+      await assertProxy(this.networkFile, booleanContractAlias, { version, checkBool: true, boolValue: false, implementation });
+    });
+
+    it('should properly initialize a proxy with true boolean values', async function() {
+      await create({ contractAlias: booleanContractAlias, network, txParams, initMethod: 'initialize', initArgs: [true], networkFile: this.networkFile });
+
+      const implementation = this.networkFile.contract(booleanContractAlias).address;
+      await assertProxy(this.networkFile, booleanContractAlias, { version, checkBool: true, boolValue: true, implementation });
     });
 
     // TODO: for some reason this test fails on travis
