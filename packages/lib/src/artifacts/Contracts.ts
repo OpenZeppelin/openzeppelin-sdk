@@ -95,6 +95,6 @@ export default class Contracts {
       schema.linkedBytecode = schema.bytecode;
       schema.linkedDeployedBytecode = schema.deployedBytecode;
     }
-    return createZosContract(schema, ZWeb3.contract(schema.abi, null, Contracts.getArtifactsDefaults()));
+    return createZosContract(schema);
   }
 }
