@@ -73,7 +73,6 @@ export function createZosContract(schema: ZosContractSchema, contractInstance: C
               transactionReceipt,
               transactionHash
             };
-            deployedInstance.address = (() => deployedInstance.options.address)();
             resolve(deployedInstance);
           })
           .catch((error) => reject(error));
@@ -82,8 +81,7 @@ export function createZosContract(schema: ZosContractSchema, contractInstance: C
 
     instance.at = function(address: string): Contract | never {
       if(!ZWeb3.isAddress(address)) throw new Error('Given address is not valid: ' + address);
-      instance.options.address = address;
-      instance.address = (() => instance.options.address)();
+      instance.options.address = instance._address = address;
       return instance;
     };
 
@@ -95,6 +93,11 @@ export function createZosContract(schema: ZosContractSchema, contractInstance: C
         instance.schema.linkedDeployedBytecode = instance.schema.deployedBytecode.replace(regex, address);
       });
     };
+
+    // TODO: Remove after web3 adds the getter: https://github.com/ethereum/web3.js/issues/2274
+    if(typeof instance.address === 'undefined') {
+      Object.defineProperty(instance, 'address', { get: () => instance.options.address });
+    }
 
     return instance;
   }
