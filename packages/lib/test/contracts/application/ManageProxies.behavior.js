@@ -46,7 +46,7 @@ export default function shouldManageProxies([_, appOwner, directoryOwner, anothe
 
   describe('with proxy admin', function() {
     beforeEach('initialize proxy admin', async function() {
-      this.proxyAdmin = await ProxyAdmin.new([], { from: proxyAdminOwner });
+      this.proxyAdmin = await ProxyAdmin.new({ from: proxyAdminOwner });
       this.proxyAdminAddress = this.proxyAdmin.address;
     })
 

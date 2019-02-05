@@ -129,12 +129,12 @@ contract('migrate-zosversion script', function(accounts) {
       await push({ network, txParams, networkFile: this.networkFile });
       this.implV1 = this.networkFile.contract('ImplV1');
       this.implV2 = this.networkFile.contract('ImplV2');
-      this.directory = await ImplementationDirectory.new([], { from: owner });
+      this.directory = await ImplementationDirectory.new({ from: owner });
       await this.directory.methods.setImplementation('ImplV1', this.implV1.address).send({ from: owner });
       await this.directory.methods.setImplementation('ImplV2', this.implV2.address).send({ from: owner });
-      this.package = await Package.new([], { from: owner });
+      this.package = await Package.new({ from: owner });
       await this.package.methods.addVersion(toSemanticVersion(this.version), this.directory.address, this.contentURI).send({ from: owner });
-      this.app = await DeprecatedApp.new([], { from: owner });
+      this.app = await DeprecatedApp.new({ from: owner });
       await this.app.methods.setPackage(this.packageName, this.package.address, toSemanticVersion(this.version)).send({ from: owner });
       this.networkFile.app = { address: this.app.address };
       this.networkFile.package = { address: this.package.address };
