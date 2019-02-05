@@ -5,6 +5,7 @@ const expect = require('chai').expect;
 
 import ZosNetworkFile from '../../src/models/files/ZosNetworkFile';
 import ZosPackageFile from '../../src/models/files/ZosPackageFile';
+import { ZOS_VERSION } from '../../src/models/files/ZosVersion';
 
 contract('ZosNetworkFile', function() {
   beforeEach('loads parent package file', function () {
@@ -14,12 +15,12 @@ contract('ZosNetworkFile', function() {
   describe('constructor', function () {
     it('creates empty file', function () {
       const file = new ZosNetworkFile(this.appPackageFile, 'test', 'test/mocks/networks/new.test.json')
-      file.data.zosversion.should.eq('2')
+      file.data.zosversion.should.eq(ZOS_VERSION)
     })
 
     it('loads existing file', function () {
       const file = new ZosNetworkFile(this.appPackageFile, 'test', 'test/mocks/networks/network-app-with-contract.zos.test.json')
-      file.data.zosversion.should.eq('2')
+      file.data.zosversion.should.eq(ZOS_VERSION)
       file.packageAddress.should.eq('0x0000000000000000000000000000000000000080')
       file.providerAddress.should.eq('0x0000000000000000000000000000000000000010')
       file.contract('Greeter').address.should.eq('0x1020')

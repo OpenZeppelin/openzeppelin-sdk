@@ -14,9 +14,10 @@ import Contracts from './artifacts/Contracts';
 import ZosContract from './artifacts/ZosContract';
 import ZWeb3 from './artifacts/ZWeb3';
 import { bodyCode, constructorCode, bytecodeDigest, replaceSolidityLibAddress, isSolidityLib, getSolidityLibNames } from './utils/Bytecode';
-import { sendTransaction, deploy, awaitConfirmations } from './utils/Transactions';
+import Transactions from './utils/Transactions';
 import { flattenSourceCode } from './utils/Solidity';
 import { semanticVersionEqual, toSemanticVersion, semanticVersionToString } from './utils/Semver';
+import AppProxyMigrator from './utils/Migrator';
 
 // validations
 import { getStorageLayout, getStructsOrEnums, StorageLayoutInfo } from './validations/Storage';
@@ -32,6 +33,7 @@ const assertEvent = helpers.assertEvent;
 
 // model objects
 import Proxy from './proxy/Proxy';
+import ProxyAdmin from './proxy/ProxyAdmin';
 import App from './application/App';
 import Package from './application/Package';
 import ImplementationDirectory from './application/ImplementationDirectory';
@@ -48,8 +50,6 @@ export {
   assertEvent,
   assertions,
   behaviors,
-  sendTransaction,
-  deploy,
   getBuildArtifacts,
   BuildArtifacts,
   getStorageLayout,
@@ -71,15 +71,16 @@ export {
   getSolidityLibNames,
   isSolidityLib,
   sleep,
-  awaitConfirmations,
   Proxy,
   Logger,
   ABI,
   Semver,
   FileSystem,
   ZWeb3,
+  Transactions,
   Contracts,
   App,
+  ProxyAdmin,
   ImplementationDirectory,
   Package,
   BasePackageProject,
@@ -88,5 +89,6 @@ export {
   SimpleProject,
   ZosContract,
   ProxyAdminProject,
-  ValidationInfo
+  ValidationInfo,
+  AppProxyMigrator
 };

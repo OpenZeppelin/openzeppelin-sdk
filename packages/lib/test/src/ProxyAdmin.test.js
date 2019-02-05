@@ -13,6 +13,8 @@ const ProxyAdminContract = Contracts.getFromLocal('ProxyAdmin');
 
 contract('ProxyAdmin class', function(accounts) {
   const [_, proxyAdminOwner, newAdmin, otherAccount] = accounts.map(utils.toChecksumAddress);
+  const version = '0.0.1';
+  const contentURI = '0x10';
 
   before(async function() {
     this.txParams = { from: proxyAdminOwner };

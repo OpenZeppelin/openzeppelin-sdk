@@ -1,4 +1,4 @@
-import { deploy } from '../utils/Transactions';
+import Transactions from '../utils/Transactions';
 import Logger from '../utils/Logger';
 import { semanticVersionToString } from '../utils/Semver';
 import ZosContract from '../artifacts/ZosContract';
@@ -38,7 +38,7 @@ export default abstract class BasePackageProject {
   public async setImplementation(contract: ZosContract, contractName: string): Promise<ZosContract> {
     if (!contractName) contractName = contract.schema.contractName;
     log.info(`Setting implementation of ${contractName} in directory...`);
-    const implementation: any = await deploy(contract, [], this.txParams);
+    const implementation: any = await Transactions.deployContract(contract, [], this.txParams);
     const directory: ImplementationDirectory = await this.getCurrentDirectory();
     await directory.setImplementation(contractName, implementation.address);
     log.info(`Implementation set: ${implementation.address}`);

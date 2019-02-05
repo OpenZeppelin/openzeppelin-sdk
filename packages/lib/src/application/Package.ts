@@ -4,7 +4,7 @@ import ImplementationDirectory from '../application/ImplementationDirectory';
 import { toSemanticVersion, SemanticVersion } from '../utils/Semver';
 import { toAddress, isZeroAddress } from '../utils/Addresses';
 import ZosContract from '../artifacts/ZosContract';
-import { deploy as deployContract, sendTransaction } from '../utils/Transactions';
+import Transactions from '../utils/Transactions';
 
 const log: Logger = new Logger('Package');
 
@@ -22,7 +22,7 @@ export default class Package {
   public static async deploy(txParams: any = {}): Promise<Package> {
     log.info('Deploying new Package...');
     const PackageContract: ZosContract = Contracts.getFromLib('Package');
-    const packageContract = await deployContract(PackageContract, [], txParams);
+    const packageContract = await Transactions.deployContract(PackageContract, [], txParams);
     log.info(`Deployed Package ${packageContract.address}`);
     return new this(packageContract, txParams);
   }
@@ -64,7 +64,7 @@ export default class Package {
     log.info('Adding new version...');
     const semver: SemanticVersion = toSemanticVersion(version);
     const directory: ImplementationDirectory = await ImplementationDirectory.deploy({ ...this.txParams });
-    await sendTransaction(this.packageContract.methods.addVersion, [semver, directory.address, Buffer.from(content)], { ...this.txParams });
+    await Transactions.sendTransaction(this.packageContract.methods.addVersion, [semver, directory.address, Buffer.from(content)], { ...this.txParams });
     log.info(`Added version ${semver.join('.')}`);
     return directory;
   }

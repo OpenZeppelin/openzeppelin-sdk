@@ -1,8 +1,8 @@
 import ZWeb3 from '../artifacts/ZWeb3';
 import Contracts from '../artifacts/Contracts';
 import { toAddress, uint256ToAddress } from '../utils/Addresses';
+import Transactions from '../utils/Transactions';
 import ZosContract from '../artifacts/ZosContract';
-import { deploy as deployContract, sendTransaction } from '../utils/Transactions';
 
 export default class Proxy {
   private contract: ZosContract;
@@ -18,7 +18,7 @@ export default class Proxy {
   public static async deploy(implementation: string, admin: string, initData: string | Buffer | null, txParams: any = {}): Promise<Proxy> {
     const ProxyContract = Contracts.getFromLib('AdminUpgradeabilityProxy');
     const contractParams = [toAddress(implementation), toAddress(admin), initData || Buffer.from('')];
-    const contract = await deployContract(ProxyContract, contractParams, txParams);
+    const contract = await Transactions.deployContract(ProxyContract, contractParams, txParams);
     return new this(contract, txParams);
   }
 
@@ -31,13 +31,13 @@ export default class Proxy {
   public async upgradeTo(address: string, migrateData: string | null): Promise<any> {
     await this.checkAdmin();
     return migrateData
-      ? sendTransaction(this.contract.methods.upgradeToAndCall, [toAddress(address), migrateData], this.txParams)
-      : sendTransaction(this.contract.methods.upgradeTo, [toAddress(address)], this.txParams);
+      ? Transactions.sendTransaction(this.contract.methods.upgradeToAndCall, [toAddress(address), migrateData], this.txParams)
+      : Transactions.sendTransaction(this.contract.methods.upgradeTo, [toAddress(address)], this.txParams);
   }
 
   public async changeAdmin(newAdmin: string): Promise<any> {
     await this.checkAdmin();
-    return sendTransaction(this.contract.methods.changeAdmin, [newAdmin], this.txParams);
+    return Transactions.sendTransaction(this.contract.methods.changeAdmin, [newAdmin], this.txParams);
   }
 
   public async implementation(): Promise<string> {

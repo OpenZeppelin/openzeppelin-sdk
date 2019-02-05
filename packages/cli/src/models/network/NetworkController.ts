@@ -13,10 +13,11 @@ import forEach from 'lodash.foreach';
 import isEqual from 'lodash.isequal';
 import concat from 'lodash.concat';
 import toPairs from 'lodash.topairs';
-import { Contracts, ZosContract, Logger, FileSystem as fs, Proxy, awaitConfirmations, semanticVersionToString } from 'zos-lib';
-import { ProxyAdminProject, AppProject, flattenSourceCode, getStorageLayout, BuildArtifacts, getBuildArtifacts, getSolidityLibNames } from 'zos-lib';
-import { validate, newValidationErrors, validationPasses, App, ZWeb3 } from 'zos-lib';
 
+import { Contracts, ZosContract, Logger, FileSystem as fs, Proxy, Transactions, semanticVersionToString } from 'zos-lib';
+import { ProxyAdminProject, AppProject, flattenSourceCode, getStorageLayout, BuildArtifacts, getBuildArtifacts, getSolidityLibNames } from 'zos-lib';
+import { validate, newValidationErrors, validationPasses, App, ZWeb3, ProxyAdmin, SimpleProject, AppProxyMigrator } from 'zos-lib';
+import { isMigratableZosversion } from '../files/ZosVersion';
 import { allPromisesOrError } from '../../utils/async';
 import { toContractFullName } from '../../utils/naming';
 import { AppProjectDeployer, ProxyAdminProjectDeployer } from './ProjectDeployer';
@@ -62,9 +63,17 @@ export default class NetworkController {
     return this.networkFile.version;
   }
 
+  get currentZosversion(): string {
+    return this.networkFile.zosversion;
+  }
+
   // NetworkController
   get packageAddress(): string {
     return this.networkFile.packageAddress;
+  }
+
+  get proxyAdminAddress(): string {
+    return this.networkFile.proxyAdminAddress;
   }
 
   // NetworkController
@@ -389,6 +398,7 @@ export default class NetworkController {
   // NetworkController
   public writeNetworkPackageIfNeeded(): void {
     this.networkFile.write();
+    this.packageFile.write();
   }
 
   // DeployerController
@@ -422,6 +432,41 @@ export default class NetworkController {
     else return null;
   }
 
+  private async _migrate(): Promise<void> {
+    const proxies = this._fetchOwnedProxies();
+    if (proxies.length !== 0) {
+      const proxyAdmin = this.proxyAdminAddress
+        ? await ProxyAdmin.fetch(this.proxyAdminAddress, this.txParams)
+        : await ProxyAdmin.deploy(this.txParams);
+      if (!this.proxyAdminAddress) {
+        log.info(`Awaiting confirmations before transferring proxies to ProxyAdmin (this may take a few minutes)`);
+        await Transactions.awaitConfirmations(proxyAdmin.contract.deployment.transactionHash);
+      }
+      this._tryRegisterProxyAdmin(proxyAdmin.address);
+
+      await allPromisesOrError(map(proxies, async (proxy) => {
+        const proxyInstance = await Proxy.at(proxy.address);
+        const currentAdmin = await proxyInstance.admin();
+        if (currentAdmin !== proxyAdmin.address) {
+          if (this.appAddress) {
+            return AppProxyMigrator(this.appAddress, proxy.address, proxyAdmin.address, this.txParams);
+          } else {
+            const simpleProject = new SimpleProject(this.packageFile.name, this.txParams);
+            return simpleProject.changeProxyAdmin(proxy.address, proxyAdmin.address);
+          }
+        }
+      }));
+      log.info('Successfully migrated to zosversion 2.2');
+    } else {
+      log.info('No proxies were found. Updating zosversion to 2.2');
+    }
+    this.updateZosVersions('2.2');
+  }
+
+  private async _migrateZosversionIfNeeded(): Promise<void> {
+    if (isMigratableZosversion(this.currentZosversion)) await this._migrate();
+  }
+
   // DeployerController
   public async publish(): Promise<void> {
     if (this.appAddress) {
@@ -429,6 +474,7 @@ export default class NetworkController {
       return;
     }
 
+    await this._migrateZosversionIfNeeded();
     log.info(`Publishing project to ${this.network}...`);
     const proxyAdminProject = <ProxyAdminProject>(await this.fetchOrDeploy(this.currentVersion));
     const deployer = new AppProjectDeployer(this, this.packageVersion);
@@ -438,6 +484,7 @@ export default class NetworkController {
 
   // Proxy model
   public async createProxy(packageName: string, contractAlias: string, initMethod: string, initArgs: string[]): Promise<ZosContract> {
+    await this._migrateZosversionIfNeeded();
     await this.fetchOrDeploy(this.currentVersion);
     if (!packageName) packageName = this.packageFile.name;
     const contract = this.localController.getContractClass(packageName, contractAlias);
@@ -458,9 +505,9 @@ export default class NetworkController {
   }
 
   // Proxy model
-  private async _tryRegisterProxyAdmin() {
+  private async _tryRegisterProxyAdmin(adminAddress?: string) {
     if (!this.networkFile.proxyAdminAddress) {
-      const proxyAdminAddress = await this.project.getAdminAddress();
+      const proxyAdminAddress = adminAddress || await this.project.getAdminAddress();
       this.networkFile.proxyAdmin = { address:  proxyAdminAddress };
     }
   }
@@ -498,6 +545,7 @@ export default class NetworkController {
 
   // Proxy model
   public async setProxiesAdmin(packageName: string, contractAlias: string, proxyAddress: string, newAdmin: string): Promise<ProxyInterface[]> {
+    await this._migrateZosversionIfNeeded();
     const proxies = this._fetchOwnedProxies(packageName, contractAlias, proxyAddress);
     if (proxies.length === 0) return [];
     await this.fetchOrDeploy(this.currentVersion);
@@ -516,6 +564,7 @@ export default class NetworkController {
 
   // Proxy model
   public async upgradeProxies(packageName: string, contractAlias: string, proxyAddress: string, initMethod: string, initArgs: string[]): Promise<ProxyInterface[]> {
+    await this._migrateZosversionIfNeeded();
     const proxies = this._fetchOwnedProxies(packageName, contractAlias, proxyAddress);
     if (proxies.length === 0) return [];
     await this.fetchOrDeploy(this.currentVersion);
@@ -683,5 +732,10 @@ export default class NetworkController {
     } else if (!(new Dependency(packageName)).getPackageFile().contract(contractAlias)) {
       return `Contract ${contractAlias} is not provided by ${packageName}.`;
     }
+  }
+
+  private updateZosVersions(version) {
+    this.networkFile.zosversion = version;
+    this.packageFile.zosversion = version;
   }
 }

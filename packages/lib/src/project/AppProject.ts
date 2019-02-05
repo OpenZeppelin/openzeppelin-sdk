@@ -33,7 +33,7 @@ interface ExistingAddresses {
 export default class AppProject extends BasePackageProject {
   private name: string;
   private app: App;
-  private proxyAdmin: ProxyAdmin;
+  public proxyAdmin: ProxyAdmin;
 
   // REFACTOR: Evaluate merging this logic with CLI's ProjectDeployer classes
   public static async fetchOrDeploy(name: string = DEFAULT_NAME, version: string = DEFAULT_VERSION, txParams: any = {}, { appAddress, packageAddress, proxyAdminAddress }: ExistingAddresses = {}): Promise<AppProject | never> {

@@ -1,3 +1,4 @@
+import isEqual from 'lodash.isequal';
 import isEmpty from 'lodash.isempty';
 import { Logger, FileSystem as fs } from 'zos-lib';
 import Dependency from '../dependency/Dependency';
@@ -16,6 +17,11 @@ export default class ZosPackageFile {
     contracts: { [alias: string]: string };
     publish: boolean;
   };
+
+  public static getZosversion(fileName: string = 'zos.json'): string | null {
+    const file = fs.parseJsonIfExists(fileName);
+    return file.zosversion || null;
+  }
 
   constructor(fileName: string = 'zos.json') {
     this.fileName = fileName;
@@ -96,6 +102,10 @@ export default class ZosPackageFile {
     return !isEmpty(this.contracts);
   }
 
+  set zosversion(version: string) {
+    this.data.zosversion = version;
+  }
+
   set publish(publish: boolean) {
     this.data.publish = !!publish;
   }
@@ -137,7 +147,15 @@ export default class ZosPackageFile {
   }
 
   public write(): void {
-    fs.writeJson(this.fileName, this.data);
-    log.info(`Successfully written ${this.fileName}`);
+    if(this.hasChanged()) {
+      const exists = this.exists();
+      fs.writeJson(this.fileName, this.data);
+      exists ? log.info(`Updated ${this.fileName}`) : log.info(`Created ${this.fileName}`);
+    }
+  }
+
+  private hasChanged(): boolean {
+    const currentPackgeFile = fs.parseJsonIfExists(this.fileName);
+    return !isEqual(this.data, currentPackgeFile);
   }
 }

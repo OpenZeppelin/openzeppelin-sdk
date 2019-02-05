@@ -3,7 +3,9 @@ import pickBy from 'lodash.pickby';
 import update from '../scripts/update';
 import { parseInit } from '../utils/input';
 import { fromContractFullName } from '../utils/naming';
+import { hasToMigrateProject } from '../utils/prompt-migration';
 import ConfigVariablesInitializer from '../models/initializer/ConfigVariablesInitializer';
+import ZosPackageFile from '../models/files/ZosPackageFile';
 
 const name: string = 'update';
 const signature: string = `${name} [alias-or-address]`;
@@ -21,6 +23,9 @@ const register: (program: any) => any = (program) => program
   .action(action);
 
 async function action(contractFullNameOrAddress: string, options: any): Promise<void> {
+  const zosversion = await ZosPackageFile.getZosversion();
+  if (!await hasToMigrateProject(zosversion)) return;
+
   const { initMethod, initArgs } = parseInit(options, 'initialize');
   const { all, force } = options;
 

@@ -120,6 +120,10 @@ export default class ZosNetworkFile {
     return this.data.version;
   }
 
+  get zosversion(): string {
+    return this.data.zosversion;
+  }
+
   get frozen(): boolean {
     return this.data.frozen;
   }
@@ -294,6 +298,10 @@ export default class ZosNetworkFile {
     }
   }
 
+  set zosversion(version: string) {
+    this.data.zosversion = version;
+  }
+
   set version(version: string) {
     this.data.version = version;
   }
@@ -408,19 +416,19 @@ export default class ZosNetworkFile {
   }
 
   public write(): void {
-    if(this._hasChanged()) {
-      const exists = this._exists();
+    if(this.hasChanged()) {
+      const exists = this.exists();
       fs.writeJson(this.fileName, this.data);
       exists ? log.info(`Updated ${this.fileName}`) : log.info(`Created ${this.fileName}`);
     }
   }
 
-  public _hasChanged(): boolean {
+  private hasChanged(): boolean {
     const currentNetworkFile = fs.parseJsonIfExists(this.fileName);
     return !isEqual(this.data, currentNetworkFile);
   }
 
-  public _exists(): boolean {
-    return !!fs.parseJsonIfExists(this.fileName);
+  private exists(): boolean {
+    return fs.exists(this.fileName);
   }
 }

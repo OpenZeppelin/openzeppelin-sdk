@@ -2,7 +2,9 @@ import pickBy from 'lodash.pickby';
 
 import setAdmin from '../scripts/set-admin';
 import { fromContractFullName } from '../utils/naming';
+import { hasToMigrateProject } from '../utils/prompt-migration';
 import ConfigVariablesInitializer from '../models/initializer/ConfigVariablesInitializer';
+import ZosPackageFile from '../models/files/ZosPackageFile';
 
 const name: string = 'set-admin';
 const signature: string = `${name} [alias-or-address] [new-admin-address]`;
@@ -17,6 +19,9 @@ const register: (program: any) => any = (program) => program
   .action(action);
 
 async function action(contractFullNameOrAddress: string, newAdmin: string, options: any): Promise<void | never> {
+  const zosversion = await ZosPackageFile.getZosversion();
+  if (!await hasToMigrateProject(zosversion)) return;
+
   const { yes } = options;
   if (!yes) {
     throw Error('This is a potentially irreversible operation: if you specify an incorrect admin address, you may lose the ability to upgrade your contract forever.\nPlease double check all parameters, and run the same command with --yes.');

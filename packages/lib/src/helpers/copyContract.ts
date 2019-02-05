@@ -3,10 +3,10 @@ import { promisify } from 'util';
 import ZWeb3 from '../artifacts/ZWeb3';
 import Contracts from '../artifacts/Contracts';
 import ZosContract from '../artifacts/ZosContract';
-import { estimateGas } from '../utils/Transactions';
+import Transactions from '../utils/Transactions';
 
 async function sendTransaction(params: any): Promise<any> {
-  if (!params.gas) params.gas = await estimateGas(params);
+  if (!params.gas) params.gas = await Transactions.estimateGas(params);
   return ZWeb3.sendTransactionWithoutReceipt(params);
 }
 

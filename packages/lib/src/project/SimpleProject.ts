@@ -1,7 +1,6 @@
 import Proxy from '../proxy/Proxy';
 import Logger from '../utils/Logger';
 import ZWeb3 from '../artifacts/ZWeb3';
-import { deploy } from '../utils/Transactions';
 import ZosContract from '../artifacts/ZosContract';
 import { ContractInterface } from './AppProject';
 import BaseSimpleProject from './BaseSimpleProject';

@@ -3,7 +3,7 @@ import isEmpty from 'lodash.isempty';
 import Proxy from '../proxy/Proxy';
 import Logger from '../utils/Logger';
 import Package from '../application/Package';
-import { deploy } from '../utils/Transactions';
+import Transactions from '../utils/Transactions';
 import { toAddress } from '../utils/Addresses';
 import { bytecodeDigest } from '../utils/Bytecode';
 import { toSemanticVersion } from '../utils/Semver';
@@ -49,7 +49,7 @@ export default abstract class BaseSimpleProject {
   public async setImplementation(contract: ZosContract, contractName?: string): Promise<any> {
     log.info(`Deploying logic contract for ${contract.schema.contractName}`);
     if (!contractName) contractName = contract.schema.contractName;
-    const implementation: any = await deploy(contract, [], this.txParams);
+    const implementation: any = await Transactions.deployContract(contract, [], this.txParams);
     await this.registerImplementation(contractName, {
       address: implementation.address,
       bytecodeHash: bytecodeDigest(contract.schema.linkedDeployedBytecode)
