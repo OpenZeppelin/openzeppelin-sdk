@@ -2,7 +2,7 @@
 
 import every from 'lodash.every';
 import map from 'lodash.map';
-import { Contracts, ContractFactory, Logger, FileSystem as fs, getBuildArtifacts, BuildArtifacts, validate as validateContract, validationPasses} from 'zos-lib';
+import { Contracts, ZosContract, Logger, FileSystem as fs, getBuildArtifacts, BuildArtifacts, validate as validateContract, validationPasses} from 'zos-lib';
 
 import Session from '../network/Session';
 import Dependency from '../dependency/Dependency';
@@ -94,9 +94,9 @@ export default class LocalController {
   // Contract model
   public validate(contractAlias: string, buildArtifacts?: BuildArtifacts): boolean {
     const contractName = this.packageFile.contract(contractAlias);
-    const contractClass = Contracts.getFromLocal(contractName || contractAlias);
-    const warnings = validateContract(contractClass, {}, buildArtifacts);
-    new ValidationLogger(contractClass).log(warnings, buildArtifacts);
+    const contract = Contracts.getFromLocal(contractName || contractAlias);
+    const warnings = validateContract(contract, {}, buildArtifacts);
+    new ValidationLogger(contract).log(warnings, buildArtifacts);
     return validationPasses(warnings);
   }
 
@@ -108,7 +108,7 @@ export default class LocalController {
   }
 
   // Contract model
-  public getContractClass(packageName: string, contractAlias: string): ContractFactory {
+  public getContractClass(packageName: string, contractAlias: string): ZosContract {
     if (!packageName || packageName === this.packageFile.name) {
       const contractName = this.packageFile.contract(contractAlias);
       return Contracts.getFromLocal(contractName);

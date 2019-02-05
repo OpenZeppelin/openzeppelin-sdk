@@ -41,7 +41,8 @@ export default class StatusFetcher {
     log.info(`Adding contract ${contractName} at ${address}`);
     const buildPath = Contracts.getLocalPath(contractName);
     if(fs.exists(buildPath)) {
-      const contract = Contracts.getFromLocal(contractName).at(address);
+      const contract = Contracts.getFromLocal(contractName);
+      const instance = contract.at(address);
       const remoteBodyBytecode = (await ZWeb3.getCode(address)).replace(/^0x/, '');
       const bodyBytecodeHash = bytecodeDigest(remoteBodyBytecode);
       if(bodyCode(contract) === remoteBodyBytecode) {

@@ -35,14 +35,14 @@ contract('push script', function([_, owner]) {
     });
 
     it('should deploy package at specified address', async function () {
-      const _package = await Package.fetch(this.networkFile.packageAddress);
+      const _package = Package.fetch(this.networkFile.packageAddress);
       (await _package.hasVersion(defaultVersion)).should.be.true;
     });
   };
 
   const shouldDeployProvider = function () {
     it('should deploy provider at specified address', async function () {
-      const directory = await ImplementationDirectory.at(this.networkFile.providerAddress);
+      const directory = ImplementationDirectory.at(this.networkFile.providerAddress);
       (await directory.methods.getImplementation('foo').call()).should.be.zeroAddress;
     });
   };
@@ -81,7 +81,7 @@ contract('push script', function([_, owner]) {
       const address = this.networkFile.solidityLib('UintLib').address;
       const code = await ZWeb3.getCode(address)
       const uintLib = Contracts.getFromLocal('UintLib');
-      code.length.should.eq(uintLib.deployedBytecode.length).and.be.greaterThan(40);
+      code.length.should.eq(uintLib.schema.deployedBytecode.length).and.be.greaterThan(40);
     });
 
     it('should deploy and link contracts that require libraries', async function () {
@@ -95,7 +95,7 @@ contract('push script', function([_, owner]) {
   const shouldRegisterContractsInDirectory = function () {
     it('should register instances in directory', async function () {
       const address = this.networkFile.contract('Impl').address;
-      const _package = await Package.fetch(this.networkFile.package.address);
+      const _package = Package.fetch(this.networkFile.package.address);
       (await _package.getImplementation(defaultVersion, 'Impl')).should.eq(address);
     });
   };
@@ -220,7 +220,7 @@ contract('push script', function([_, owner]) {
       await bumpVersion({ version: '1.2.0', packageFile: this.networkFile.packageFile });
       await push({ networkFile: this.networkFile, network, txParams });
 
-      const _package = await Package.fetch(this.networkFile.package.address);
+      const _package = Package.fetch(this.networkFile.package.address);
       (await _package.getDirectory('1.2.0')).address.should.eq(this.networkFile.providerAddress);
     });
 
@@ -228,7 +228,7 @@ contract('push script', function([_, owner]) {
       await bumpVersion({ version: '1.2.0', packageFile: this.networkFile.packageFile });
       await push({ networkFile: this.networkFile, network, txParams });
       const implementationAddress = this.networkFile.contract('Impl').address;
-      const _package = await Package.fetch(this.networkFile.package.address);
+      const _package = Package.fetch(this.networkFile.package.address);
       (await _package.getImplementation('1.2.0', 'Impl')).should.eq(implementationAddress);
     });
 
@@ -251,7 +251,7 @@ contract('push script', function([_, owner]) {
       await push({ network, txParams, networkFile: this.networkFile });
 
       if (unregisterFromDirectory) {
-        const _package = await Package.fetch(this.networkFile.package.address);
+        const _package = Package.fetch(this.networkFile.package.address);
         (await _package.getImplementation(defaultVersion, 'Impl')).should.be.zeroAddress;
       }
       should.not.exist(this.networkFile.contract('Impl'));

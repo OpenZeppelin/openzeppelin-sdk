@@ -2,7 +2,7 @@ import fromPairs from 'lodash.frompairs';
 import map from 'lodash.map';
 import flatten from 'lodash.flatten';
 import uniq from 'lodash.uniq';
-import { FileSystem as fs, PackageProject, Contracts, ContractFactory, getSolidityLibNames, Logger } from 'zos-lib';
+import { FileSystem as fs, PackageProject, Contracts, ZosContract, getSolidityLibNames, Logger } from 'zos-lib';
 import semver from 'semver';
 import npm from 'npm-programmatic';
 
@@ -55,12 +55,12 @@ export default class Dependency {
     // this should all be handled at the Project level. Consider adding a setImplementations (plural) method
     // to Projects, which handle library deployment and linking for a set of contracts altogether.
 
-    const contracts = <Array<[ContractFactory, string]>>map(this.getPackageFile().contracts, (contractName, contractAlias) =>
+    const contracts = <Array<[ZosContract, string]>>map(this.getPackageFile().contracts, (contractName, contractAlias) =>
       [Contracts.getFromNodeModules(this.name, contractName), contractAlias]
     );
 
     const pipeline = [
-      (someContracts) => map(someContracts, ([contractClass]) => getSolidityLibNames(contractClass.bytecode)),
+      (someContracts) => map(someContracts, ([contract]) => getSolidityLibNames(contract.schema.bytecode)),
       (someContracts) => flatten(someContracts),
       (someContracts) => uniq(someContracts),
     ];
@@ -72,9 +72,9 @@ export default class Dependency {
       return [libraryName, implementation.address];
     })));
 
-    await Promise.all(map(contracts, async ([contractClass, contractAlias]) => {
-      contractClass.link(libraries);
-      await project.setImplementation(contractClass, contractAlias);
+    await Promise.all(map(contracts, async ([contract, contractAlias]) => {
+      contract.link(libraries);
+      await project.setImplementation(contract, contractAlias);
     }));
 
     return project;

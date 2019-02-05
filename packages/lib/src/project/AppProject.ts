@@ -8,8 +8,8 @@ import ProxyAdmin from '../proxy/ProxyAdmin';
 import ImplementationDirectory from '../application/ImplementationDirectory';
 import BasePackageProject from './BasePackageProject';
 import SimpleProject from './SimpleProject';
+import ZosContract from '../artifacts/ZosContract';
 import ProxyAdminProject from './ProxyAdminProject';
-import ContractFactory, { ContractWrapper } from '../artifacts/ContractFactory';
 import { DeployError } from '../utils/errors/DeployError';
 import { semanticVersionToString } from '../utils/Semver';
 
@@ -46,7 +46,7 @@ export default class AppProject extends BasePackageProject {
       app = appAddress
         ? await App.fetch(appAddress, txParams)
         : await App.deploy(txParams);
-      if (packageAddress) thepackage = await Package.fetch(packageAddress, txParams);
+      if (packageAddress) thepackage = Package.fetch(packageAddress, txParams);
       else if (await app.hasPackage(name, version)) thepackage = (await app.getPackage(name)).package;
       else thepackage = await Package.deploy(txParams);
       directory = await thepackage.hasVersion(version)
@@ -112,8 +112,8 @@ export default class AppProject extends BasePackageProject {
     return directory;
   }
 
-  public getAdminAddress(): string {
-    return this.proxyAdmin.address;
+  public getAdminAddress(): Promise<string> {
+    return new Promise((resolve) => resolve(this.proxyAdmin.address));
   }
 
   public getApp(): App {
@@ -147,25 +147,25 @@ export default class AppProject extends BasePackageProject {
   }
 
   // TODO: Testme
-  public async createContract(contractClass: ContractFactory, { packageName, contractName, initMethod, initArgs }: ContractInterface = {}): Promise<ContractWrapper> {
-    if (!contractName) contractName = contractClass.contractName;
+  public async createContract(contract: ZosContract, { packageName, contractName, initMethod, initArgs }: ContractInterface = {}): Promise<ZosContract> {
+    if (!contractName) contractName = contract.schema.contractName;
     if (!packageName) packageName = this.name;
-    return this.app.createContract(contractClass, packageName, contractName, initMethod, initArgs);
+    return this.app.createContract(contract, packageName, contractName, initMethod, initArgs);
   }
 
-  public async createProxy(contractClass: ContractFactory, { packageName, contractName, initMethod, initArgs }: ContractInterface = {}): Promise<ContractWrapper> {
+  public async createProxy(contract: ZosContract, { packageName, contractName, initMethod, initArgs }: ContractInterface = {}): Promise<ZosContract> {
     if (!this.proxyAdmin) this.proxyAdmin = await ProxyAdmin.deploy(this.txParams);
-    if (!contractName) contractName = contractClass.contractName;
+    if (!contractName) contractName = contract.schema.contractName;
     if (!packageName) packageName = this.name;
     if (!isEmpty(initArgs) && !initMethod) initMethod = 'initialize';
-    return this.app.createProxy(contractClass, packageName, contractName, this.proxyAdmin.address, initMethod, initArgs);
+    return this.app.createProxy(contract, packageName, contractName, this.proxyAdmin.address, initMethod, initArgs);
   }
 
-  public async upgradeProxy(proxyAddress: string, contractClass: ContractFactory, { packageName, contractName, initMethod, initArgs }: ContractInterface = {}): Promise<ContractWrapper> {
-    if (!contractName) contractName = contractClass.contractName;
+  public async upgradeProxy(proxyAddress: string, contract: ZosContract, { packageName, contractName, initMethod, initArgs }: ContractInterface = {}): Promise<ZosContract> {
+    if (!contractName) contractName = contract.schema.contractName;
     if (!packageName) packageName = this.name;
     const implementationAddress = await this.getImplementation({ packageName, contractName });
-    return this.proxyAdmin.upgradeProxy(proxyAddress, implementationAddress, contractClass, initMethod, initArgs);
+    return this.proxyAdmin.upgradeProxy(proxyAddress, implementationAddress, contract, initMethod, initArgs);
   }
 
   public async changeProxyAdmin(proxyAddress: string, newAdmin: string): Promise<void> {

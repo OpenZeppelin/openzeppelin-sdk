@@ -10,8 +10,9 @@ import BN from 'bignumber.js';
 import sleep from '../helpers/sleep';
 import ZWeb3 from '../artifacts/ZWeb3';
 import Contracts from '../artifacts/Contracts';
-import ContractFactory, { ContractWrapper, TransactionReceiptWrapper } from '../artifacts/ContractFactory';
+import ZosContract from '../artifacts/ZosContract';
 import { TransactionReceipt } from 'web3/types';
+import { buildDeploymentCallData } from './ABIs';
 
 // Cache, exported for testing
 export const state: any = {};
@@ -78,13 +79,13 @@ export default {
   },
 
   /**
-   * Wraps the _deployContract and manages deploy retries.
+   * Wraps the _deploy and manages deploy retries.
    * @param contract truffle contract to be deployed
    * @param args arguments of the constructor (if any)
    * @param txParams other transaction parameters (from, gasPrice, etc)
    * @param retries number of deploy retries
    */
-  async deployContract(contract: ContractFactory, args: any[] = [], txParams: any = {}, retries: number = RETRY_COUNT): Promise<any> {
+  async deployContract(contract: ZosContract, args: any[] = [], txParams: any = {}, retries: number = RETRY_COUNT): Promise<any> {
     await this._fixGasPrice(txParams);
 
     try {
@@ -101,7 +102,7 @@ export default {
    * @param txParams all transaction parameters (data, from, gasPrice, etc)
    * @param retries number of data transaction retries
    */
-  async sendDataTransaction(contract: ContractWrapper, txParams: any, retries: number = RETRY_COUNT): Promise<TransactionReceiptWrapper> {
+  async sendDataTransaction(contract: ZosContract, txParams: any, retries: number = RETRY_COUNT): Promise<TransactionReceipt> {
     await this._fixGasPrice(txParams);
 
     try {
@@ -123,7 +124,7 @@ export default {
       // See https://github.com/ethereum/go-ethereum/issues/18973 for more info
       const txParamsWithoutGas = omit(txParams, 'gas');
       // Use json-rpc method estimateGas to retrieve estimated value
-      return await ZWeb3.estimateGas(txParams);
+      return await ZWeb3.estimateGas(txParamsWithoutGas);
     } catch (error) {
       if (retries <= 0) throw Error(error);
       await sleep(RETRY_SLEEP_TIME);
@@ -184,38 +185,45 @@ export default {
   },
 
   /**
+   * Sends a transaction to the blockchain with data precalculated, estimating the gas to be used.
+   * Uses the node's estimateGas RPC call, and adds a 20% buffer on top of it, capped by the block gas limit.
+   * @param contract contract instance to send the tx to
+   * @param txParams all transaction parameters (data, from, gasPrice, etc)
+   */
+  async _sendDataTransaction(contract: ZosContract, txParams: any = {}): Promise<TransactionReceipt> {
+    // If gas is set explicitly, use it
+    const defaultGas = Contracts.getArtifactsDefaults().gas;
+    if (!txParams.gas && defaultGas) txParams.gas = defaultGas;
+    if (txParams.gas) return this._sendContractDataTransaction(contract, txParams);
+
+    // Estimate gas for the call and run the tx
+    const gas = await this.estimateActualGas({ to: contract.address, ...txParams });
+    return this._sendContractDataTransaction(contract, { gas, ...txParams });
+  },
+
+  async _sendContractDataTransaction(contract: ZosContract, txParams: any): Promise<TransactionReceipt> {
+    const defaults = await Contracts.getDefaultTxParams();
+    const tx = { to: contract.address, ...defaults, ...txParams };
+    const txHash = await ZWeb3.sendTransactionWithoutReceipt(tx);
+    return await ZWeb3.getTransactionReceiptWithTimeout(txHash, Contracts.getSyncTimeout());
+  },
+
+  /**
    * Deploys a contract to the blockchain, estimating the gas to be used.
    * Uses the node's estimateGas RPC call, and adds a 20% buffer on top of it, capped by the block gas limit.
    * @param contract truffle contract to be deployed
    * @param args arguments of the constructor (if any)
    * @param txParams other transaction parameters (from, gasPrice, etc)
    */
-  async _deployContract(contract: ContractFactory, args: any[] = [], txParams: any = {}): Promise<ContractWrapper> {
+  async _deployContract(contract: ZosContract, args: any[] = [], txParams: any = {}): Promise<ZosContract> {
     // If gas is set explicitly, use it
     const defaultGas = Contracts.getArtifactsDefaults().gas;
     if (!txParams.gas && defaultGas) txParams.gas = defaultGas;
-    if (txParams.gas) return contract.new(...args, txParams);
+    if (txParams.gas) return contract.new(args, txParams);
 
-    const data = contract.getData(args, txParams);
+    const data = buildDeploymentCallData(contract, args, txParams);
     const gas = await this.estimateActualGas({ data, ...txParams });
-    return contract.new(...args, { gas, ...txParams });
-  },
-
-  /**
-   * Sends a transaction to the blockchain with data precalculated, estimating the gas to be used.
-   * Uses the node's estimateGas RPC call, and adds a 20% buffer on top of it, capped by the block gas limit.
-   * @param contract contract instance to send the tx to
-   * @param txParams all transaction parameters (data, from, gasPrice, etc)
-   */
-  async _sendDataTransaction(contract: ContractWrapper, txParams: any = {}) {
-    // If gas is set explicitly, use it
-    const defaultGas = Contracts.getArtifactsDefaults().gas;
-    if (!txParams.gas && defaultGas) txParams.gas = defaultGas;
-    if (txParams.gas) return contract.sendTransaction(txParams);
-
-    // Estimate gas for the call and run the tx
-    const gas = await this.estimateActualGas({ to: contract.address, ...txParams });
-    return contract.sendTransaction({ gas, ...txParams });
+    return contract.new(args, { gas, ...txParams });
   },
 
   async _getETHGasStationPrice(): Promise<any | never> {
@@ -260,5 +268,5 @@ export default {
     // this once the issue is resolved.
     if (await ZWeb3.isGanacheNode()) gasToUse += 15000;
     return gasToUse >= blockLimit ? (blockLimit - 1) : gasToUse;
-  }
-}
+  },
+};

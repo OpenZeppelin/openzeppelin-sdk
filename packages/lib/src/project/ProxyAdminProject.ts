@@ -3,7 +3,7 @@ import Logger from '../utils/Logger';
 import ProxyAdmin from '../proxy/ProxyAdmin';
 import BaseSimpleProject from './BaseSimpleProject';
 import { ContractInterface } from './AppProject';
-import ContractFactory, { ContractWrapper } from '../artifacts/ContractFactory';
+import ZosContract from '../artifacts/ZosContract';
 
 const log: Logger = new Logger('ProxyAdminProject');
 
@@ -20,17 +20,17 @@ export default class ProxyAdminProject extends BaseSimpleProject {
     this.proxyAdmin = proxyAdmin;
   }
 
-  public async createProxy(contractClass: ContractFactory, contractParams: ContractInterface = {}): Promise<ContractWrapper> {
+  public async createProxy(contract: ZosContract, contractParams: ContractInterface = {}): Promise<ZosContract> {
     if(!this.proxyAdmin) this.proxyAdmin = await ProxyAdmin.deploy(this.txParams);
-    return super.createProxy(contractClass, contractParams);
+    return super.createProxy(contract, contractParams);
   }
 
-  public async upgradeProxy(proxyAddress: string, contractClass: ContractFactory, contractParams: ContractInterface = {}): Promise<ContractWrapper> {
+  public async upgradeProxy(proxyAddress: string, contract: ZosContract, contractParams: ContractInterface = {}): Promise<ZosContract> {
     const { initMethod: initMethodName, initArgs } = contractParams;
-    const { implementationAddress, pAddress, initCallData } = await this._setUpgradeParams(proxyAddress, contractClass, contractParams);
-    await this.proxyAdmin.upgradeProxy(pAddress, implementationAddress, contractClass, initMethodName, initArgs);
+    const { implementationAddress, pAddress, initCallData } = await this._setUpgradeParams(proxyAddress, contract, contractParams);
+    await this.proxyAdmin.upgradeProxy(pAddress, implementationAddress, contract, initMethodName, initArgs);
     log.info(`Instance at ${pAddress} upgraded`);
-    return contractClass.at(pAddress);
+    return contract.at(pAddress);
   }
 
   public async changeProxyAdmin(proxyAddress: string, newAdmin: string): Promise<void> {
@@ -39,6 +39,6 @@ export default class ProxyAdminProject extends BaseSimpleProject {
   }
 
   public getAdminAddress(): Promise<string> {
-    return this.proxyAdmin.address;
+    return new Promise((resolve) => resolve(this.proxyAdmin.address));
   }
 }

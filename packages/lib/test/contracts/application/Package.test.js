@@ -21,7 +21,7 @@ contract('Package', (accounts) => {
   const from = owner
   
   beforeEach(async function () {
-    this.package = await Package.new({ from: owner })
+    this.package = await Package.new([], { from: owner })
   })
 
   describe('ownership', function () {

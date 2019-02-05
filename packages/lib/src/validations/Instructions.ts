@@ -1,16 +1,16 @@
 import Contracts from '../artifacts/Contracts';
-import ContractFactory from '../artifacts/ContractFactory';
+import ZosContract from '../artifacts/ZosContract';
 
-export function hasSelfDestruct(contractClass: ContractFactory): boolean {
-  return hasTypeIdentifier(contractClass, 't_function_selfdestruct_nonpayable$_t_address_$returns$__$');
+export function hasSelfDestruct(contract: ZosContract): boolean {
+  return hasTypeIdentifier(contract, 't_function_selfdestruct_nonpayable$_t_address_$returns$__$');
 }
 
-export function hasDelegateCall(contractClass: ContractFactory): boolean {
-  return hasTypeIdentifier(contractClass, 't_function_baredelegatecall_nonpayable$__$returns$_t_bool_$');
+export function hasDelegateCall(contract: ZosContract): boolean {
+  return hasTypeIdentifier(contract, 't_function_baredelegatecall_nonpayable$__$returns$_t_bool_$');
 }
 
-function hasTypeIdentifier(contractClass: ContractFactory, typeIdentifier: string): boolean {
-  for (const node of contractClass.ast.nodes.filter((n) => n.name === contractClass.contractName)) {
+function hasTypeIdentifier(contract: ZosContract, typeIdentifier: string): boolean {
+  for (const node of contract.schema.ast.nodes.filter((n) => n.name === contract.schema.contractName)) {
     if (hasKeyValue(node, 'typeIdentifier', typeIdentifier)) return true;
     for (const baseContract of node.baseContracts || []) {
       if (hasTypeIdentifier(Contracts.getFromLocal(baseContract.baseName.name), typeIdentifier)) return true;

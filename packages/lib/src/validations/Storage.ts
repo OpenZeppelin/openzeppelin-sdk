@@ -4,7 +4,7 @@ import reverse from 'lodash.reverse';
 import path from 'path';
 import process from 'process';
 import { getBuildArtifacts } from '../artifacts/BuildArtifacts';
-import ContractFactory from '../artifacts/ContractFactory.js';
+import ZosContract from '../artifacts/ZosContract.js';
 import { BuildArtifacts } from '../artifacts/BuildArtifacts.js';
 import {
   Node,
@@ -15,7 +15,7 @@ import {
 } from '../utils/ContractAST';
 
 // TS-TODO: define return type after typing class members below.
-export function getStorageLayout(contract: ContractFactory, artifacts: BuildArtifacts): StorageLayoutInfo {
+export function getStorageLayout(contract: ZosContract, artifacts: BuildArtifacts): StorageLayoutInfo {
 
   if (!artifacts) artifacts = getBuildArtifacts();
 
@@ -60,7 +60,7 @@ export interface StorageLayoutInfo {
 class StorageLayout {
 
   private artifacts: BuildArtifacts;
-  private contract: ContractFactory;
+  private contract: ZosContract;
   private imports: Set<any>;
 
   private nodes: NodeMapping;
@@ -69,7 +69,7 @@ class StorageLayout {
   public types: TypeInfoMapping;
   public storage: StorageInfo[];
 
-  constructor(contract: ContractFactory, artifacts: BuildArtifacts) {
+  constructor(contract: ZosContract, artifacts: BuildArtifacts) {
 
     this.artifacts = artifacts;
     this.contract = contract;
@@ -91,8 +91,8 @@ class StorageLayout {
 
   public run(): StorageLayout {
 
-    this.collectImports(this.contract.ast);
-    this.collectNodes(this.contract.ast);
+    this.collectImports(this.contract.schema.ast);
+    this.collectNodes(this.contract.schema.ast);
 
     // TS-TODO: define contractNode type.
     this.getLinearizedBaseContracts().forEach((contractNode: Node) => {
@@ -170,8 +170,8 @@ class StorageLayout {
   }
 
   private getContractNode(): Node {
-    return this.contract.ast.nodes.find((node) =>
-      node.nodeType === 'ContractDefinition' && node.name === this.contract.contractName
+    return this.contract.schema.ast.nodes.find((node) =>
+      node.nodeType === 'ContractDefinition' && node.name === this.contract.schema.contractName
     );
   }
 

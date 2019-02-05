@@ -11,6 +11,10 @@ contract('create command', function() {
     create.should.have.been.calledWithExactly( { contractAlias: 'Impl', initMethod: 'setup', initArgs: ['42'], force: true, network: 'test', txParams: { from: '0x40'} })
   })
 
+  itShouldParse('should call create script with options', 'create', 'zos create Boolean --network test --init initialize --args false --force --from 0x40', function(create) {
+    create.should.have.been.calledWithExactly( { contractAlias: 'Boolean', initMethod: 'initialize', initArgs: [false], force: true, network: 'test', txParams: { from: '0x40'} })
+  })
+
   itShouldParse('should call create script with default init method', 'create', 'zos create Impl --network test --init --args 42 --force --from 0x40', function(create) {
     create.should.have.been.calledWithExactly( { contractAlias: 'Impl', initMethod: 'initialize', initArgs: ['42'], force: true, network: 'test', txParams: { from: '0x40'} })
   })
