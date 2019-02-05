@@ -2,7 +2,7 @@ import { promisify } from 'util';
 
 import ZWeb3 from '../artifacts/ZWeb3';
 import Contracts from '../artifacts/Contracts';
-import ContractFactory, { ContractWrapper } from '../artifacts/ContractFactory';
+import ZosContract from '../artifacts/ZosContract';
 import { estimateGas } from '../utils/Transactions';
 
 async function sendTransaction(params: any): Promise<any> {
@@ -10,7 +10,7 @@ async function sendTransaction(params: any): Promise<any> {
   return ZWeb3.sendTransactionWithoutReceipt(params);
 }
 
-export default async function copyContract(contractClass: ContractFactory, address: string, txParams: any = {}): Promise<ContractWrapper> {
+export default async function copyContract(contract: ZosContract, address: string, txParams: any = {}): Promise<ZosContract> {
   const trimmedAddress: string = address.replace('0x', '');
 
   // This is EVM assembly will return of the code of a foreign address.
@@ -31,8 +31,8 @@ export default async function copyContract(contractClass: ContractFactory, addre
 
   const ASM_CODE_COPY: string = `0x73${trimmedAddress}803b8091600080913c6000f3`;
 
-  const params = Object.assign({}, contractClass.txParams, txParams, { to: null, data: ASM_CODE_COPY });
+  const params = Object.assign({}, txParams, { to: null, data: ASM_CODE_COPY });
   const txHash = await sendTransaction(params);
   const receipt = await ZWeb3.getTransactionReceiptWithTimeout(txHash, Contracts.getSyncTimeout());
-  return contractClass.at(receipt.contractAddress);
+  return contract.at(receipt.contractAddress);
 }

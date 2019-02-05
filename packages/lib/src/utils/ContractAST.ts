@@ -4,7 +4,7 @@ import includes from 'lodash.includes';
 import isEqual from 'lodash.isequal';
 
 import { getBuildArtifacts, BuildArtifacts } from '../artifacts/BuildArtifacts';
-import ContractFactory from '../artifacts/ContractFactory';
+import ZosContract from '../artifacts/ZosContract';
 
 // TS-TODO: Many of the interfaces defined here come from Solidity's AST output schema.
 // cli has Solidity schema definitions in @types/solc.d.ts. If such file was moved to the lib
@@ -47,13 +47,13 @@ interface ContractASTProps {
 export default class ContractAST {
 
   private artifacts: BuildArtifacts;
-  private contract: ContractFactory;
+  private contract: ZosContract;
   private imports: Set<any>;
   private nodes: NodeMapping;
   private types: TypeInfoMapping;
   private nodesFilter: string[];
 
-  constructor(contract: ContractFactory, artifacts?: BuildArtifacts, props?: ContractASTProps) {
+  constructor(contract: ZosContract, artifacts?: BuildArtifacts, props?: ContractASTProps) {
 
     this.artifacts = artifacts || getBuildArtifacts();
     this.contract = contract;
@@ -71,14 +71,14 @@ export default class ContractAST {
     // Node types to collect, null for all
     this.nodesFilter = props.nodesFilter || [];
 
-    this._collectImports(this.contract.ast);
-    this._collectNodes(this.contract.ast);
+    this._collectImports(this.contract.schema.ast);
+    this._collectNodes(this.contract.schema.ast);
   }
 
   public getContractNode(): Node {
-    return this.contract.ast.nodes.find((node: Node) =>
+    return this.contract.schema.ast.nodes.find((node: Node) =>
       node.nodeType === 'ContractDefinition' &&
-      node.name === this.contract.contractName
+      node.name === this.contract.schema.contractName
     );
   }
 

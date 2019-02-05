@@ -161,10 +161,10 @@ contract('App', function (accounts) {
     beforeEach('setting implementation', setImplementation);
 
     const shouldReturnANonUpgradeableInstance = function() {
-      it('should return a non-upgradeable instance', async function() {
+      it('should return a non-upgradeable instance', async function () {
         this.instance.address.should.be.not.null;
         (await this.instance.methods.version().call()).should.be.eq('V1');
-        (await ZWeb3.getCode(this.instance.address)).should.be.eq(ImplV1.deployedBytecode)
+        (await ZWeb3.getCode(this.instance.address)).should.be.eq(ImplV1.schema.deployedBytecode)
       });
     };
 
@@ -263,7 +263,7 @@ contract('App', function (accounts) {
     beforeEach('setting implementation', setImplementation);
 
     const shouldReturnProxy = function() {
-      it('should return a proxy', async function() {
+      it('should return a proxy', async function () {
         this.proxy.address.should.be.not.null;
         (await this.proxy.methods.version().call()).should.be.eq('V1');
         (await this.proxyAdmin.getProxyImplementation(this.proxy.address)).should.be.eq(this.implV1.address)

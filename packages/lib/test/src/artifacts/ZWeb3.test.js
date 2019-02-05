@@ -11,8 +11,8 @@ contract('ZWeb3', accounts => {
   accounts = accounts.map(utils.toChecksumAddress); // Required by Web3 v1.x.
   
   before('deploy dummy instance', async function () {
-    const DummyImplementation = Contracts.getFromLocal('DummyImplementation')
-    this.impl = await DummyImplementation.new()
+    this.DummyImplementation = Contracts.getFromLocal('DummyImplementation')
+    this.impl = await this.DummyImplementation.new()
   })
 
   describe('when it is not initialized', function () {
@@ -92,7 +92,7 @@ contract('ZWeb3', accounts => {
     describe('get code', function () {
       it('can tell the deployed bytecode of a certain address', async function () {
         const bytecode = await ZWeb3.getCode(this.impl.address)
-        bytecode.should.be.equal(this.impl.constructor.deployedBytecode)
+        bytecode.should.be.equal(this.DummyImplementation.schema.linkedDeployedBytecode)
       })
     })
 
@@ -105,11 +105,9 @@ contract('ZWeb3', accounts => {
     })
 
     describe('estimate gas', function () {
-      it('can estimates the gas of a call', async function () {
-        const receipt = await ZWeb3.getTransactionReceipt(this.impl.transactionHash)
-        const { gasUsed: expectedGas } = receipt
-
-        const gas = await ZWeb3.estimateGas({ data: this.impl.constructor.bytecode })
+      it('can estimate the gas of a call', async function () {
+        const { gasUsed: expectedGas } = this.impl.deployment.transactionReceipt
+        const gas = await ZWeb3.estimateGas({ data: this.DummyImplementation.schema.linkedBytecode })
         gas.should.be.equal(expectedGas)
       })
     })
@@ -128,7 +126,7 @@ contract('ZWeb3', accounts => {
       })
 
       describe('get transaction', function () {
-        it('can estimates the gas of a call', async function () {
+        it('can estimate the gas of a call', async function () {
           const transaction = await ZWeb3.getTransaction(this.txHash)
 
           transaction.should.be.an('object')
@@ -145,7 +143,7 @@ contract('ZWeb3', accounts => {
       })
 
       describe('get transaction receipt', function () {
-        it('can estimates the gas of a call', async function () {
+        it('can estimate the gas of a call', async function () {
           const receipt = await ZWeb3.getTransactionReceipt(this.txHash)
 
           receipt.should.be.an('object')

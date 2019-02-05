@@ -5,7 +5,7 @@ import utils from 'web3-utils';
 import ProxyAdmin from '../../src/proxy/ProxyAdmin';
 import Proxy from '../../src/proxy/Proxy';
 import Contracts from '../../src/artifacts/Contracts';
-import ContractFactory from '../../src/artifacts/ContractFactory';
+import ZosContract from '../../src/artifacts/ZosContract';
 
 const ImplV1 = Contracts.getFromLocal('DummyImplementation');
 const ImplV2 = Contracts.getFromLocal('DummyImplementationV2');
@@ -21,7 +21,7 @@ contract('ProxyAdmin class', function(accounts) {
   });
 
   beforeEach(async function() {
-    this.proxyAdminContract = await ProxyAdminContract.new(this.txParams);
+    this.proxyAdminContract = await ProxyAdminContract.new([], this.txParams);
     this.proxyAdmin = new ProxyAdmin(this.proxyAdminContract, this.txParams);
     this.proxy = await Proxy.deploy(this.implementationV1.address, this.proxyAdmin.address, null, this.txParams);
   });
@@ -29,9 +29,8 @@ contract('ProxyAdmin class', function(accounts) {
   describe('class methods', function() {
     describe('fetch', function() {
       it('sets ProxyAdmin instance', async function() {
-        const proxyAdmin = await ProxyAdmin.fetch(this.proxyAdmin.address, this.txParams);
+        const proxyAdmin = ProxyAdmin.fetch(this.proxyAdmin.address, this.txParams);
 
-        proxyAdmin.contract.constructor.should.be.instanceof(ContractFactory)
         proxyAdmin.address.should.eq(this.proxyAdminContract.address);
         proxyAdmin.txParams.should.eq(this.txParams);
       });
@@ -41,7 +40,6 @@ contract('ProxyAdmin class', function(accounts) {
       it('sets ProxyAdmin instance', async function() {
         const proxyAdmin = await ProxyAdmin.deploy(this.txParams);
 
-        proxyAdmin.contract.constructor.should.be.instanceof(ContractFactory)
         proxyAdmin.address.should.not.be.null;
         proxyAdmin.txParams.should.eq(this.txParams);
       });

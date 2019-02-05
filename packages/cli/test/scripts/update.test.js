@@ -235,11 +235,11 @@ contract('update script', function(accounts) {
       await update({ proxyAddress, network, txParams, networkFile: this.networkFile });
 
       await assertProxyInfo(this.networkFile, 'Greeter', 0, { version: '1.2.0', address: proxyAddress });
-      const upgradedProxy = await Greeter_V2.at(proxyAddress);
+      const upgradedProxy = Greeter_V2.at(proxyAddress);
       (await upgradedProxy.methods.version().call()).should.eq('1.2.0');
 
       const anotherProxyAddress = this.networkFile.getProxies({ contract: 'Greeter'})[1].address;
-      const notUpgradedProxy = await Greeter_V1.at(anotherProxyAddress);
+      const notUpgradedProxy = Greeter_V1.at(anotherProxyAddress);
       (await notUpgradedProxy.methods.version().call()).should.eq('1.1.0');
     });
 

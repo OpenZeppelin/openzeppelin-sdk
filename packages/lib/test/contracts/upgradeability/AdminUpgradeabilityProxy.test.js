@@ -7,6 +7,7 @@ import encodeCall from '../../../src/helpers/encodeCall'
 import assertRevert from '../../../src/test/helpers/assertRevert'
 import shouldBehaveLikeUpgradeabilityProxy from './UpgradeabilityProxy.behaviour'
 import BN from 'bignumber.js'
+import utils from 'web3-utils';
 
 const Implementation1 = artifacts.require('Implementation1');
 const Implementation2 = artifacts.require('Implementation2');
@@ -26,6 +27,7 @@ const sendTransaction = (target, method, args, values, opts) => {
 };
 
 contract('AdminUpgradeabilityProxy', (accounts) => {
+  accounts = accounts.map(utils.toChecksumAddress);
   const [_, proxyAdminAddress, proxyAdminOwner, anotherAccount] = accounts;
 
   before(async function () {
@@ -281,14 +283,14 @@ contract('AdminUpgradeabilityProxy', (accounts) => {
 
         it('assigns new proxy admin', async function () {
           const newProxyAdmin = await this.proxy.admin({ from: newAdmin })
-          newProxyAdmin.should.be.equal(anotherAccount)
+          newProxyAdmin.should.be.equal(anotherAccount.toLowerCase())
         })
 
         it('emits an event', function () {
           this.logs.should.have.lengthOf( 1)
           this.logs[0].event.should.be.equal('AdminChanged')
-          this.logs[0].args.previousAdmin.should.be.equal(proxyAdminAddress)
-          this.logs[0].args.newAdmin.should.be.equal(newAdmin)
+          this.logs[0].args.previousAdmin.should.be.equal(proxyAdminAddress.toLowerCase())
+          this.logs[0].args.newAdmin.should.be.equal(newAdmin.toLowerCase())
         })
       })
 
@@ -318,7 +320,7 @@ contract('AdminUpgradeabilityProxy', (accounts) => {
 
     it('should store the admin proxy in specified location', async function () {
       const proxyAdmin = await Proxy.at(this.proxyAddress).admin()
-      proxyAdmin.should.be.equal(proxyAdmin);
+      proxyAdmin.should.be.equal(proxyAdminAddress);
     })
   })
 
@@ -338,7 +340,7 @@ contract('AdminUpgradeabilityProxy', (accounts) => {
     context('when function names clash', function () {
       it('when sender is proxy admin should run the proxy function', async function () {
         const value = await this.proxy.admin({ from: proxyAdminAddress });
-        value.should.be.equal(proxyAdminAddress);
+        value.should.be.equal(proxyAdminAddress.toLowerCase());
       });
 
       it('when sender is other should delegate to implementation', async function () {

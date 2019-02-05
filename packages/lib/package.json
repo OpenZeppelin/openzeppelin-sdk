@@ -6,7 +6,7 @@
   "private": false,
   "license": "MIT",
   "scripts": {
-    "test": "scripts/test.sh",
+    "test": "./scripts/test.sh",
     "prepublishOnly": "echo 'Removing mock contracts...' && grep -hoP '^\\s*contract \\K(\\w+)' contracts/mocks/*.sol | sort | uniq | xargs -t -I% rm build/contracts/%.json",
     "compile-contracts": "rm -rf build/contracts && truffle compile",
     "compile-ts": "rm -rf lib && tsc",

@@ -42,7 +42,7 @@ contract('freeze script', function([_, owner]) {
     it('should freeze the requested release', async function () {
       await freeze({ networkFile: this.networkFile, network, txParams })
 
-      const _package = await Package.fetch(this.networkFile.packageAddress, txParams)
+      const _package = Package.fetch(this.networkFile.packageAddress, txParams)
       const frozen = await _package.isFrozen(this.networkFile.version);
       frozen.should.be.true
     })

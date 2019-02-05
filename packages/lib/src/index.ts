@@ -11,7 +11,7 @@ import Semver from './utils/Semver';
 import Logger from './utils/Logger';
 import FileSystem from './utils/FileSystem';
 import Contracts from './artifacts/Contracts';
-import ContractFactory, { ContractWrapper } from './artifacts/ContractFactory';
+import ZosContract from './artifacts/ZosContract';
 import ZWeb3 from './artifacts/ZWeb3';
 import { bodyCode, constructorCode, bytecodeDigest, replaceSolidityLibAddress, isSolidityLib, getSolidityLibNames } from './utils/Bytecode';
 import { sendTransaction, deploy, awaitConfirmations } from './utils/Transactions';
@@ -86,8 +86,7 @@ export {
   PackageProject,
   AppProject,
   SimpleProject,
+  ZosContract,
   ProxyAdminProject,
-  ContractFactory,
-  ContractWrapper,
   ValidationInfo
 };

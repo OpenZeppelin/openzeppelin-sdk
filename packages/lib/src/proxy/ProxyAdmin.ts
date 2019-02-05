@@ -3,17 +3,17 @@ import Logger from '../utils/Logger';
 import Contracts from '../artifacts/Contracts';
 import { toAddress } from '../utils/Addresses';
 import { buildCallData, callDescription, CalldataInfo } from '../utils/ABIs';
-import ContractFactory, { ContractWrapper } from '../artifacts/ContractFactory';
+import ZosContract from '../artifacts/ZosContract';
 import { deploy as deployContract, sendTransaction } from '../utils/Transactions';
 
 const log: Logger = new Logger('ProxyAdmin');
 
 export default class ProxyAdmin {
-  public contract;
-  public address;
-  public txParams;
+  public contract: ZosContract;
+  public address: string;
+  public txParams: any;
 
-  public static async fetch(address: string, txParams: any = {}): Promise<ProxyAdmin> {
+  public static fetch(address: string, txParams: any = {}): ProxyAdmin {
     const contract = Contracts.getFromLib('ProxyAdmin').at(address);
     return new this(contract, txParams);
   }
@@ -41,12 +41,12 @@ export default class ProxyAdmin {
     log.info(`Admin for proxy ${proxyAddress} set to ${newAdmin}`);
   }
 
-  public async upgradeProxy(proxyAddress: string, implementationAddress: string, contractClass: ContractFactory, initMethodName: string, initArgs: any): Promise<ContractWrapper> {
+  public async upgradeProxy(proxyAddress: string, implementationAddress: string, contract: ZosContract, initMethodName: string, initArgs: any): Promise<ZosContract> {
     const receipt: any = typeof(initArgs) === 'undefined'
       ? await this._upgradeProxy(proxyAddress, implementationAddress)
-      : await this._upgradeProxyAndCall(proxyAddress, implementationAddress, contractClass, initMethodName, initArgs);
+      : await this._upgradeProxyAndCall(proxyAddress, implementationAddress, contract, initMethodName, initArgs);
     log.info(`TX receipt received: ${receipt.transactionHash}`);
-    return contractClass.at(proxyAddress);
+    return contract.at(proxyAddress);
   }
 
   private async _upgradeProxy(proxyAddress: string, implementation: string): Promise<any> {
@@ -54,8 +54,8 @@ export default class ProxyAdmin {
     return sendTransaction(this.contract.methods.upgrade, [proxyAddress, implementation], { ...this.txParams });
   }
 
-  private async _upgradeProxyAndCall(proxyAddress: string, implementationAddress: string, contractClass: any, initMethodName: string, initArgs: any): Promise<any> {
-    const { method: initMethod, callData }: CalldataInfo = buildCallData(contractClass, initMethodName, initArgs);
+  private async _upgradeProxyAndCall(proxyAddress: string, implementationAddress: string, contract: any, initMethodName: string, initArgs: any): Promise<any> {
+    const { method: initMethod, callData }: CalldataInfo = buildCallData(contract, initMethodName, initArgs);
     log.info(`Upgrading proxy at ${proxyAddress} and calling ${callDescription(initMethod, initArgs)}...`);
     return sendTransaction(this.contract.methods.upgradeAndCall, [proxyAddress, implementationAddress, callData], { ...this.txParams });
   }

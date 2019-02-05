@@ -9,9 +9,10 @@ import BN from 'bignumber.js';
 import sleep from '../helpers/sleep';
 import ZWeb3 from '../artifacts/ZWeb3';
 import Contracts from '../artifacts/Contracts';
-import ContractFactory, { ContractWrapper, TransactionReceiptWrapper } from '../artifacts/ContractFactory';
+import ZosContract from '../artifacts/ZosContract';
 import omit from 'lodash.omit';
 import { TransactionReceipt } from 'web3/types';
+import { buildDeploymentCallData } from './ABIs';
 
 // Cache, exported for testing
 export const state: any = {};
@@ -62,7 +63,7 @@ export async function sendTransaction(contractFn: GenericFunction, args: any[] =
  * @param txParams other transaction parameters (from, gasPrice, etc)
  * @param retries number of deploy retries
  */
-export async function deploy(contract: ContractFactory, args: any[] = [], txParams: any = {}, retries: number = RETRY_COUNT): Promise<any> {
+export async function deploy(contract: ZosContract, args: any[] = [], txParams: any = {}, retries: number = RETRY_COUNT): Promise<any> {
   await fixGasPrice(txParams);
 
   try {
@@ -79,7 +80,7 @@ export async function deploy(contract: ContractFactory, args: any[] = [], txPara
  * @param txParams all transaction parameters (data, from, gasPrice, etc)
  * @param retries number of data transaction retries
  */
-export async function sendDataTransaction(contract: ContractWrapper, txParams: any, retries: number = RETRY_COUNT): Promise<TransactionReceiptWrapper> {
+export async function sendDataTransaction(contract: ZosContract, txParams: any, retries: number = RETRY_COUNT): Promise<TransactionReceipt> {
   await fixGasPrice(txParams);
 
   try {
@@ -116,15 +117,22 @@ async function _sendTransaction(contractFn: GenericFunction, args: any[] = [], t
  * @param contract contract instance to send the tx to
  * @param txParams all transaction parameters (data, from, gasPrice, etc)
  */
-async function _sendDataTransaction(contract: ContractWrapper, txParams: any = {}) {
+async function _sendDataTransaction(contract: ZosContract, txParams: any = {}): Promise<TransactionReceipt> {
   // If gas is set explicitly, use it
   const defaultGas = Contracts.getArtifactsDefaults().gas;
   if (!txParams.gas && defaultGas) txParams.gas = defaultGas;
-  if (txParams.gas) return contract.sendTransaction(txParams);
+  if (txParams.gas) return _sendContractDataTransaction(contract, txParams);
 
   // Estimate gas for the call and run the tx
   const gas = await estimateActualGas({ to: contract.address, ...txParams });
-  return contract.sendTransaction({ gas, ...txParams });
+  return _sendContractDataTransaction(contract, { gas, ...txParams });
+}
+
+async function _sendContractDataTransaction(contract: ZosContract, txParams: any): Promise<TransactionReceipt> {
+  const defaults = await Contracts.getDefaultTxParams();
+  const tx = { to: contract.address, ...defaults, ...txParams };
+  const txHash = await ZWeb3.sendTransactionWithoutReceipt(tx);
+  return await ZWeb3.getTransactionReceiptWithTimeout(txHash, Contracts.getSyncTimeout());
 }
 
 /**
@@ -134,15 +142,15 @@ async function _sendDataTransaction(contract: ContractWrapper, txParams: any = {
  * @param args arguments of the constructor (if any)
  * @param txParams other transaction parameters (from, gasPrice, etc)
  */
-async function _deploy(contract: ContractFactory, args: any[] = [], txParams: any = {}): Promise<ContractWrapper> {
+async function _deploy(contract: ZosContract, args: any[] = [], txParams: any = {}): Promise<ZosContract> {
   // If gas is set explicitly, use it
   const defaultGas = Contracts.getArtifactsDefaults().gas;
   if (!txParams.gas && defaultGas) txParams.gas = defaultGas;
-  if (txParams.gas) return contract.new(...args, txParams);
+  if (txParams.gas) return contract.new(args, txParams);
 
-  const data = contract.getData(args, txParams);
+  const data = buildDeploymentCallData(contract, args, txParams);
   const gas = await estimateActualGas({ data, ...txParams });
-  return contract.new(...args, { gas, ...txParams });
+  return contract.new(args, { gas, ...txParams });
 }
 
 export async function estimateGas(txParams: any, retries: number = RETRY_COUNT): Promise<any> {

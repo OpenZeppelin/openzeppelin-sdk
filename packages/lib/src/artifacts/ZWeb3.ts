@@ -1,8 +1,8 @@
 import sleep from '../helpers/sleep';
 import Web3 from 'web3';
 import { TransactionReceipt } from 'web3/types';
-import { Contract } from 'web3-eth-contract';
 import { Eth, Block, Transaction } from 'web3-eth';
+import { Contract } from 'web3-eth-contract';
 
 // Reference: see https://github.com/ethereum/EIPs/blob/master/EIPS/eip-155.md#list-of-chain-ids
 const NETWORKS = {
