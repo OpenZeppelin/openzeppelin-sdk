@@ -3,13 +3,13 @@ import Contracts from '../artifacts/Contracts';
 import ImplementationDirectory from '../application/ImplementationDirectory';
 import { toSemanticVersion, SemanticVersion } from '../utils/Semver';
 import { toAddress, isZeroAddress } from '../utils/Addresses';
-import ZosContract from '../artifacts/ZosContract';
+import Contract from '../artifacts/Contract';
 import Transactions from '../utils/Transactions';
 
 const log: Logger = new Logger('Package');
 
 export default class Package {
-  private packageContract: ZosContract;
+  private packageContract: Contract;
   private txParams: any;
 
   public static fetch(address: string, txParams: any = {}): Package | null {
@@ -21,18 +21,18 @@ export default class Package {
 
   public static async deploy(txParams: any = {}): Promise<Package> {
     log.info('Deploying new Package...');
-    const PackageContract: ZosContract = Contracts.getFromLib('Package');
+    const PackageContract: Contract = Contracts.getFromLib('Package');
     const packageContract = await Transactions.deployContract(PackageContract, [], txParams);
     log.info(`Deployed Package ${packageContract.address}`);
     return new this(packageContract, txParams);
   }
 
-  constructor(packageContract: ZosContract, txParams: any = {}) {
+  constructor(packageContract: Contract, txParams: any = {}) {
     this.packageContract = packageContract;
     this.txParams = txParams;
   }
 
-  get contract(): ZosContract {
+  get contract(): Contract {
     return this.packageContract;
   }
 

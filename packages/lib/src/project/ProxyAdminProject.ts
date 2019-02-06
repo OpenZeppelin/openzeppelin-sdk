@@ -3,7 +3,7 @@ import Logger from '../utils/Logger';
 import ProxyAdmin from '../proxy/ProxyAdmin';
 import BaseSimpleProject from './BaseSimpleProject';
 import { ContractInterface } from './AppProject';
-import ZosContract from '../artifacts/ZosContract';
+import Contract from '../artifacts/Contract';
 
 const log: Logger = new Logger('ProxyAdminProject');
 
@@ -20,12 +20,12 @@ export default class ProxyAdminProject extends BaseSimpleProject {
     this.proxyAdmin = proxyAdmin;
   }
 
-  public async createProxy(contract: ZosContract, contractParams: ContractInterface = {}): Promise<ZosContract> {
+  public async createProxy(contract: Contract, contractParams: ContractInterface = {}): Promise<Contract> {
     if(!this.proxyAdmin) this.proxyAdmin = await ProxyAdmin.deploy(this.txParams);
     return super.createProxy(contract, contractParams);
   }
 
-  public async upgradeProxy(proxyAddress: string, contract: ZosContract, contractParams: ContractInterface = {}): Promise<ZosContract> {
+  public async upgradeProxy(proxyAddress: string, contract: Contract, contractParams: ContractInterface = {}): Promise<Contract> {
     const { initMethod: initMethodName, initArgs } = contractParams;
     const { implementationAddress, pAddress, initCallData } = await this._setUpgradeParams(proxyAddress, contract, contractParams);
     await this.proxyAdmin.upgradeProxy(pAddress, implementationAddress, contract, initMethodName, initArgs);

@@ -1,7 +1,7 @@
 import BN from 'bignumber.js';
 import ZWeb3 from './ZWeb3';
 import { getSolidityLibNames, hasUnlinkedVariables } from '../utils/Bytecode';
-import { Contract, TransactionObject, BlockType } from 'web3-eth-contract';
+import { Contract as Web3Contract, TransactionObject, BlockType } from 'web3-eth-contract';
 import { Callback, EventLog, EventEmitter, TransactionReceipt } from 'web3/types';
 import Contracts from './Contracts';
 import { StorageLayoutInfo } from '../validations/Storage';
@@ -15,12 +15,12 @@ import _ from 'lodash';
  * at(): retrieves a deployed contract at the specified address
  * link(): links libraries in a contract schema
  */
-export default interface ZosContract {
+export default interface Contract {
 
   // Web3 Contract interface.
   options: any;
   methods: { [fnName: string]: (...args: any[]) => TransactionObject<any>; };
-  deploy(options: { data: string; arguments: any[]; }): TransactionObject<Contract>;
+  deploy(options: { data: string; arguments: any[]; }): TransactionObject<Web3Contract>;
   events: {
     [eventName: string]: (options?: { filter?: object; fromBlock?: BlockType; topics?: string[]; }, cb?: Callback<EventLog>) => EventEmitter;
     allEvents: (options?: { filter?: object; fromBlock?: BlockType; topics?: string[]; }, cb?: Callback<EventLog>) => EventEmitter;
@@ -30,8 +30,8 @@ export default interface ZosContract {
 
   // ZosContract specific.
   address: string;
-  new: (args: any[], options: any) => Promise<ZosContract>;
-  at: (address: string) => ZosContract;
+  new: (args: any[], options: any) => Promise<Contract>;
+  at: (address: string) => Contract;
   link: (libraries: { [libAlias: string]: string }) => void;
   deployment?: { transactionHash: string, transactionReceipt: TransactionReceipt };
   schema: {
@@ -60,10 +60,10 @@ export default interface ZosContract {
   };
 }
 
-function _wrapContractInstance(schema: any, instance: Contract): ZosContract {
+function _wrapContractInstance(schema: any, instance: Web3Contract): Contract {
   instance.schema = schema;
 
-  instance.new = async function(args: any[] = [], options: any = {}): Promise<ZosContract> {
+  instance.new = async function(args: any[] = [], options: any = {}): Promise<Contract> {
     if(!schema.linkedBytecode) throw new Error(`${schema.contractName} bytecode contains unlinked libraries.`);
     instance.options = { ...instance.options, ...(await Contracts.getDefaultTxParams()) };
     return new Promise((resolve, reject) => {
@@ -105,7 +105,7 @@ function _wrapContractInstance(schema: any, instance: Contract): ZosContract {
   return instance;
 }
 
-export function createZosContract(schema: any): ZosContract {
+export function createZosContract(schema: any): Contract {
   const contract = ZWeb3.contract(schema.abi, null, Contracts.getArtifactsDefaults());
   return _wrapContractInstance(schema, contract);
 }

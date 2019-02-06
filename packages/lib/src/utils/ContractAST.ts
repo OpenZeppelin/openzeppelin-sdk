@@ -4,7 +4,7 @@ import includes from 'lodash.includes';
 import isEqual from 'lodash.isequal';
 
 import { getBuildArtifacts, BuildArtifacts } from '../artifacts/BuildArtifacts';
-import ZosContract from '../artifacts/ZosContract';
+import Contract from '../artifacts/Contract';
 
 // TS-TODO: Many of the interfaces defined here come from Solidity's AST output schema.
 // cli has Solidity schema definitions in @types/solc.d.ts. If such file was moved to the lib
@@ -47,13 +47,13 @@ interface ContractASTProps {
 export default class ContractAST {
 
   private artifacts: BuildArtifacts;
-  private contract: ZosContract;
+  private contract: Contract;
   private imports: Set<any>;
   private nodes: NodeMapping;
   private types: TypeInfoMapping;
   private nodesFilter: string[];
 
-  constructor(contract: ZosContract, artifacts?: BuildArtifacts, props?: ContractASTProps) {
+  constructor(contract: Contract, artifacts?: BuildArtifacts, props?: ContractASTProps) {
 
     this.artifacts = artifacts || getBuildArtifacts();
     this.contract = contract;

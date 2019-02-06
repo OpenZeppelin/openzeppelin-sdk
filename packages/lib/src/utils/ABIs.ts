@@ -1,6 +1,6 @@
 import encodeCall from '../helpers/encodeCall';
 import ContractAST, { Node } from './ContractAST';
-import ZosContract from '../artifacts/ZosContract';
+import Contract from '../artifacts/Contract';
 import { hasUnlinkedVariables, getSolidityLibNames } from './Bytecode';
 import ZWeb3 from '../artifacts/ZWeb3';
 
@@ -19,20 +19,20 @@ interface FunctionInfo {
   inputs: InputInfo[];
 }
 
-export function buildDeploymentCallData(contract: ZosContract, args: any[], txParams: any): string {
+export function buildDeploymentCallData(contract: Contract, args: any[], txParams: any): string {
   if(contract.schema.linkedBytecode === '') throw new Error(`A bytecode must be provided for contract ${contract.schema.contractName}`);
   if(hasUnlinkedVariables(contract.schema.linkedBytecode)) throw new Error(`${contract.schema.contractName} bytecode contains unlinked libraries: ${getSolidityLibNames(contract.schema.linkedBytecode).join(', ')}`);
   return ZWeb3.contract(contract.schema.abi).deploy({data: contract.schema.linkedBytecode, arguments: args}).encodeABI();
 }
 
-export function buildCallData(contract: ZosContract, methodName: string, args: any[]): CalldataInfo {
+export function buildCallData(contract: Contract, methodName: string, args: any[]): CalldataInfo {
   const method = getABIFunction(contract, methodName, args);
   const argTypes = method.inputs.map((input) => input.type);
   const callData = encodeCall(method.name, argTypes, args);
   return { method, callData };
 }
 
-export function getABIFunction(contract: ZosContract, methodName: string, args: any[]): FunctionInfo {
+export function getABIFunction(contract: Contract, methodName: string, args: any[]): FunctionInfo {
   const targetMethod: FunctionInfo = tryGetTargetFunction(contract, methodName, args);
   if (targetMethod) methodName = targetMethod.name;
 
@@ -49,7 +49,7 @@ export function getABIFunction(contract: ZosContract, methodName: string, args: 
   }
 }
 
-function tryGetTargetFunction(contract: ZosContract, methodName: string, args: string[] | undefined): FunctionInfo {
+function tryGetTargetFunction(contract: Contract, methodName: string, args: string[] | undefined): FunctionInfo {
   // Match foo(uint256,string) as method name, and look for that in the ABI
   const match: string[] = methodName.match(/^\s*(.+)\((.*)\)\s*$/);
   if (match) {
@@ -70,7 +70,7 @@ function tryGetTargetFunction(contract: ZosContract, methodName: string, args: s
   }
 }
 
-function tryGetFunctionNodeFromMostDerivedContract(contract: ZosContract, methodName: string, args: any[]): Node | null {
+function tryGetFunctionNodeFromMostDerivedContract(contract: Contract, methodName: string, args: any[]): Node | null {
   const linearizedBaseContracts: Node[] | null = tryGetLinearizedBaseContracts(contract);
   if (!linearizedBaseContracts) return null;
 
@@ -91,7 +91,7 @@ function tryGetFunctionNodeFromMostDerivedContract(contract: ZosContract, method
   throw Error(`Could not find method ${methodName} with ${args.length} arguments in contract ${contract.schema.contractName}`);
 }
 
-function tryGetLinearizedBaseContracts(contract: ZosContract): Node[] | null {
+function tryGetLinearizedBaseContracts(contract: Contract): Node[] | null {
   try {
     const ast: ContractAST = new ContractAST(contract, null, { nodesFilter: ['ContractDefinition', 'FunctionDefinition'] });
     return ast.getLinearizedBaseContracts(true);

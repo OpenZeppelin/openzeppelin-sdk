@@ -9,7 +9,7 @@ import { bytecodeDigest } from '../utils/Bytecode';
 import { toSemanticVersion } from '../utils/Semver';
 import { buildCallData, callDescription, CalldataInfo } from '../utils/ABIs';
 import { ContractInterface } from './AppProject';
-import ZosContract from '../artifacts/ZosContract';
+import Contract from '../artifacts/Contract';
 
 const log: Logger = new Logger('BaseSimpleProject');
 
@@ -46,7 +46,7 @@ export default abstract class BaseSimpleProject {
 
   public abstract async getAdminAddress(): Promise<string>;
 
-  public async setImplementation(contract: ZosContract, contractName?: string): Promise<any> {
+  public async setImplementation(contract: Contract, contractName?: string): Promise<any> {
     log.info(`Deploying logic contract for ${contract.schema.contractName}`);
     if (!contractName) contractName = contract.schema.contractName;
     const implementation: any = await Transactions.deployContract(contract, [], this.txParams);
@@ -93,7 +93,7 @@ export default abstract class BaseSimpleProject {
     delete this.dependencies[name];
   }
 
-  public async createProxy(contract, { packageName, contractName, initMethod, initArgs, redeployIfChanged }: ContractInterface = {}): Promise<ZosContract> {
+  public async createProxy(contract, { packageName, contractName, initMethod, initArgs, redeployIfChanged }: ContractInterface = {}): Promise<Contract> {
     if (!isEmpty(initArgs) && !initMethod) initMethod = 'initialize';
     const implementationAddress = await this._getOrDeployImplementation(contract, packageName, contractName, redeployIfChanged);
     const initCallData = this._getAndLogInitCallData(contract, initMethod, initArgs, implementationAddress, 'Creating');
@@ -102,7 +102,7 @@ export default abstract class BaseSimpleProject {
     return contract.at(proxy.address);
   }
 
-  private async _getOrDeployOwnImplementation(contract: ZosContract, contractName: string, redeployIfChanged?: boolean): Promise<string> {
+  private async _getOrDeployOwnImplementation(contract: Contract, contractName: string, redeployIfChanged?: boolean): Promise<string> {
     const existing: Implementation = this.implementations[contractName];
     const contractChanged: boolean = existing && existing.bytecodeHash !== bytecodeDigest(contract.schema.linkedDeployedBytecode);
     const shouldRedeploy: boolean = !existing || (redeployIfChanged && contractChanged);
@@ -118,13 +118,13 @@ export default abstract class BaseSimpleProject {
     return thepackage.getImplementation(version, contractName);
   }
 
-  protected async _setUpgradeParams(proxyAddress: string, contract: ZosContract, { packageName, contractName, initMethod: initMethodName, initArgs, redeployIfChanged }: ContractInterface = {}): Promise<any> {
+  protected async _setUpgradeParams(proxyAddress: string, contract: Contract, { packageName, contractName, initMethod: initMethodName, initArgs, redeployIfChanged }: ContractInterface = {}): Promise<any> {
     const implementationAddress = await this._getOrDeployImplementation(contract, packageName, contractName, redeployIfChanged);
     const initCallData = this._getAndLogInitCallData(contract, initMethodName, initArgs, implementationAddress, 'Upgrading');
     return { initCallData, implementationAddress, pAddress: toAddress(proxyAddress) };
   }
 
-  protected async _getOrDeployImplementation(contract: ZosContract, packageName: string, contractName?: string, redeployIfChanged?: boolean): Promise<string | never> {
+  protected async _getOrDeployImplementation(contract: Contract, packageName: string, contractName?: string, redeployIfChanged?: boolean): Promise<string | never> {
     if (!contractName) contractName = contract.schema.contractName;
 
     const implementation = !packageName || packageName === this.name
@@ -135,7 +135,7 @@ export default abstract class BaseSimpleProject {
     return implementation;
   }
 
-  protected _getAndLogInitCallData(contract: ZosContract, initMethodName?: string, initArgs?: string[], implementationAddress?: string, actionLabel?: string): string | null {
+  protected _getAndLogInitCallData(contract: Contract, initMethodName?: string, initArgs?: string[], implementationAddress?: string, actionLabel?: string): string | null {
     if (initMethodName) {
       const { method: initMethod, callData }: CalldataInfo = buildCallData(contract, initMethodName, initArgs);
       log.info(`${actionLabel} proxy to logic contract ${implementationAddress} and initializing by calling ${callDescription(initMethod, initArgs)}`);

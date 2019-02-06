@@ -1,14 +1,14 @@
 import Logger from '../utils/Logger';
 import Transactions from '../utils/Transactions';
 import Contracts from '../artifacts/Contracts';
-import ZosContract from '../artifacts/ZosContract';
+import Contract from '../artifacts/Contract';
 
 const log = new Logger('ImplementationDirectory');
 
 // TS-TODO: review which members could be private
 export default class ImplementationDirectory {
 
-  public directoryContract: ZosContract;
+  public directoryContract: Contract;
   public txParams: any;
 
   public static async deploy(txParams: any = {}): Promise<ImplementationDirectory> {
@@ -26,16 +26,16 @@ export default class ImplementationDirectory {
     return new this(directory, txParams);
   }
 
-  public static getContract(): ZosContract {
+  public static getContract(): Contract {
     return Contracts.getFromLib('ImplementationDirectory');
   }
 
-  constructor(directory: ZosContract, txParams: any = {}) {
+  constructor(directory: Contract, txParams: any = {}) {
     this.directoryContract = directory;
     this.txParams = txParams;
   }
 
-  get contract(): ZosContract {
+  get contract(): Contract {
     return this.directoryContract;
   }
 
