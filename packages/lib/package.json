@@ -68,7 +68,7 @@
     "lodash.without": "^4.4.0",
     "openzeppelin-solidity": "~1.10.0",
     "semver": "^5.5.1",
-    "truffle-flattener": "^1.2.8",
+    "truffle-flattener": "^1.2.12",
     "web3": "1.0.0-beta.37"
   },
   "devDependencies": {
