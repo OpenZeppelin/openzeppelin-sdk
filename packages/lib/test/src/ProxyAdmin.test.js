@@ -5,7 +5,7 @@ import utils from 'web3-utils';
 import ProxyAdmin from '../../src/proxy/ProxyAdmin';
 import Proxy from '../../src/proxy/Proxy';
 import Contracts from '../../src/artifacts/Contracts';
-import ZosContract from '../../src/artifacts/ZosContract';
+import Contract from '../../src/artifacts/Contract';
 
 const ImplV1 = Contracts.getFromLocal('DummyImplementation');
 const ImplV2 = Contracts.getFromLocal('DummyImplementationV2');

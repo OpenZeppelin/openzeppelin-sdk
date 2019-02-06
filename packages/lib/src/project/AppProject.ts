@@ -8,7 +8,7 @@ import ProxyAdmin from '../proxy/ProxyAdmin';
 import ImplementationDirectory from '../application/ImplementationDirectory';
 import BasePackageProject from './BasePackageProject';
 import SimpleProject from './SimpleProject';
-import ZosContract from '../artifacts/ZosContract';
+import Contract from '../artifacts/Contract';
 import ProxyAdminProject from './ProxyAdminProject';
 import { DeployError } from '../utils/errors/DeployError';
 import { semanticVersionToString } from '../utils/Semver';
@@ -147,13 +147,13 @@ export default class AppProject extends BasePackageProject {
   }
 
   // TODO: Testme
-  public async createContract(contract: ZosContract, { packageName, contractName, initMethod, initArgs }: ContractInterface = {}): Promise<ZosContract> {
+  public async createContract(contract: Contract, { packageName, contractName, initMethod, initArgs }: ContractInterface = {}): Promise<Contract> {
     if (!contractName) contractName = contract.schema.contractName;
     if (!packageName) packageName = this.name;
     return this.app.createContract(contract, packageName, contractName, initMethod, initArgs);
   }
 
-  public async createProxy(contract: ZosContract, { packageName, contractName, initMethod, initArgs }: ContractInterface = {}): Promise<ZosContract> {
+  public async createProxy(contract: Contract, { packageName, contractName, initMethod, initArgs }: ContractInterface = {}): Promise<Contract> {
     if (!this.proxyAdmin) this.proxyAdmin = await ProxyAdmin.deploy(this.txParams);
     if (!contractName) contractName = contract.schema.contractName;
     if (!packageName) packageName = this.name;
@@ -161,7 +161,7 @@ export default class AppProject extends BasePackageProject {
     return this.app.createProxy(contract, packageName, contractName, this.proxyAdmin.address, initMethod, initArgs);
   }
 
-  public async upgradeProxy(proxyAddress: string, contract: ZosContract, { packageName, contractName, initMethod, initArgs }: ContractInterface = {}): Promise<ZosContract> {
+  public async upgradeProxy(proxyAddress: string, contract: Contract, { packageName, contractName, initMethod, initArgs }: ContractInterface = {}): Promise<Contract> {
     if (!contractName) contractName = contract.schema.contractName;
     if (!packageName) packageName = this.name;
     const implementationAddress = await this.getImplementation({ packageName, contractName });

@@ -10,7 +10,7 @@ import BN from 'bignumber.js';
 import sleep from '../helpers/sleep';
 import ZWeb3 from '../artifacts/ZWeb3';
 import Contracts from '../artifacts/Contracts';
-import ZosContract from '../artifacts/ZosContract';
+import Contract from '../artifacts/Contract';
 import { TransactionReceipt } from 'web3/types';
 import { buildDeploymentCallData } from './ABIs';
 
@@ -85,7 +85,7 @@ export default {
    * @param txParams other transaction parameters (from, gasPrice, etc)
    * @param retries number of deploy retries
    */
-  async deployContract(contract: ZosContract, args: any[] = [], txParams: any = {}, retries: number = RETRY_COUNT): Promise<any> {
+  async deployContract(contract: Contract, args: any[] = [], txParams: any = {}, retries: number = RETRY_COUNT): Promise<any> {
     await this._fixGasPrice(txParams);
 
     try {
@@ -102,7 +102,7 @@ export default {
    * @param txParams all transaction parameters (data, from, gasPrice, etc)
    * @param retries number of data transaction retries
    */
-  async sendDataTransaction(contract: ZosContract, txParams: any, retries: number = RETRY_COUNT): Promise<TransactionReceipt> {
+  async sendDataTransaction(contract: Contract, txParams: any, retries: number = RETRY_COUNT): Promise<TransactionReceipt> {
     await this._fixGasPrice(txParams);
 
     try {
@@ -190,7 +190,7 @@ export default {
    * @param contract contract instance to send the tx to
    * @param txParams all transaction parameters (data, from, gasPrice, etc)
    */
-  async _sendDataTransaction(contract: ZosContract, txParams: any = {}): Promise<TransactionReceipt> {
+  async _sendDataTransaction(contract: Contract, txParams: any = {}): Promise<TransactionReceipt> {
     // If gas is set explicitly, use it
     const defaultGas = Contracts.getArtifactsDefaults().gas;
     if (!txParams.gas && defaultGas) txParams.gas = defaultGas;
@@ -201,7 +201,7 @@ export default {
     return this._sendContractDataTransaction(contract, { gas, ...txParams });
   },
 
-  async _sendContractDataTransaction(contract: ZosContract, txParams: any): Promise<TransactionReceipt> {
+  async _sendContractDataTransaction(contract: Contract, txParams: any): Promise<TransactionReceipt> {
     const defaults = await Contracts.getDefaultTxParams();
     const tx = { to: contract.address, ...defaults, ...txParams };
     const txHash = await ZWeb3.sendTransactionWithoutReceipt(tx);
@@ -215,7 +215,7 @@ export default {
    * @param args arguments of the constructor (if any)
    * @param txParams other transaction parameters (from, gasPrice, etc)
    */
-  async _deployContract(contract: ZosContract, args: any[] = [], txParams: any = {}): Promise<ZosContract> {
+  async _deployContract(contract: Contract, args: any[] = [], txParams: any = {}): Promise<Contract> {
     // If gas is set explicitly, use it
     const defaultGas = Contracts.getArtifactsDefaults().gas;
     if (!txParams.gas && defaultGas) txParams.gas = defaultGas;

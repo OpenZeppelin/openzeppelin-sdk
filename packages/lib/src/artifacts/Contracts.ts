@@ -1,6 +1,6 @@
 import glob from 'glob';
 import path from 'path';
-import ZosContract, { createZosContract } from './ZosContract';
+import Contract, { createZosContract } from './Contract';
 import ZWeb3 from './ZWeb3';
 import { getSolidityLibNames, hasUnlinkedVariables } from '../utils/Bytecode';
 
@@ -49,15 +49,15 @@ export default class Contracts {
     return `${process.cwd()}/node_modules/${dependency}/build/contracts/${contractName}.json`;
   }
 
-  public static getFromLocal(contractName: string): ZosContract {
+  public static getFromLocal(contractName: string): Contract {
     return Contracts._getFromPath(Contracts.getLocalPath(contractName));
   }
 
-  public static getFromLib(contractName: string): ZosContract {
+  public static getFromLib(contractName: string): Contract {
     return Contracts._getFromPath(Contracts.getLibPath(contractName));
   }
 
-  public static getFromNodeModules(dependency: string, contractName: string): ZosContract {
+  public static getFromNodeModules(dependency: string, contractName: string): Contract {
     return Contracts._getFromPath(Contracts.getNodeModulesPath(dependency, contractName));
   }
 
@@ -88,7 +88,7 @@ export default class Contracts {
     Contracts.artifactDefaults = { ...Contracts.getArtifactsDefaults(), ...defaults };
   }
 
-  private static _getFromPath(targetPath: string): ZosContract {
+  private static _getFromPath(targetPath: string): Contract {
     const schema = require(targetPath);
     if(schema.bytecode === '') throw new Error(`A bytecode must be provided for contract ${schema.contractName}.`);
     if(!hasUnlinkedVariables(schema.bytecode)) {

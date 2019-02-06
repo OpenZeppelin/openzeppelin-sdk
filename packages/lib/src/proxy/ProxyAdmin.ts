@@ -4,12 +4,12 @@ import Contracts from '../artifacts/Contracts';
 import { toAddress } from '../utils/Addresses';
 import { buildCallData, callDescription, CalldataInfo } from '../utils/ABIs';
 import Transactions from '../utils/Transactions';
-import ZosContract from '../artifacts/ZosContract';
+import Contract from '../artifacts/Contract';
 
 const log: Logger = new Logger('ProxyAdmin');
 
 export default class ProxyAdmin {
-  public contract: ZosContract;
+  public contract: Contract;
   public address: string;
   public txParams: any;
 
@@ -41,7 +41,7 @@ export default class ProxyAdmin {
     log.info(`Admin for proxy ${proxyAddress} set to ${newAdmin}`);
   }
 
-  public async upgradeProxy(proxyAddress: string, implementationAddress: string, contract: ZosContract, initMethodName: string, initArgs: any): Promise<ZosContract> {
+  public async upgradeProxy(proxyAddress: string, implementationAddress: string, contract: Contract, initMethodName: string, initArgs: any): Promise<Contract> {
     const receipt: any = typeof(initArgs) === 'undefined'
       ? await this._upgradeProxy(proxyAddress, implementationAddress)
       : await this._upgradeProxyAndCall(proxyAddress, implementationAddress, contract, initMethodName, initArgs);

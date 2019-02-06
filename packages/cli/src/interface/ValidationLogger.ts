@@ -7,7 +7,7 @@ import {
   BuildArtifacts,
   StorageLayoutInfo,
   Operation,
-  ZosContract
+  Contract
 } from 'zos-lib';
 import { ContractInterface } from '../models/files/ZosNetworkFile';
 
@@ -20,10 +20,10 @@ const log = new Logger('Validations');
 
 export default class ValidationLogger {
 
-  public contract: ZosContract;
+  public contract: Contract;
   public existingContractInfo: ContractInterface;
 
-  constructor(contract: ZosContract, existingContractInfo?: ContractInterface) {
+  constructor(contract: Contract, existingContractInfo?: ContractInterface) {
     this.contract = contract;
     this.existingContractInfo = existingContractInfo || {};
   }

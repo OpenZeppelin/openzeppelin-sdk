@@ -1,6 +1,6 @@
 import invertBy from 'lodash.invertby';
 import Contracts from '../artifacts/Contracts';
-import ZosContract from '../artifacts/ZosContract.js';
+import Contract from '../artifacts/Contract.js';
 import { Node } from '../utils/ContractAST';
 
 /**
@@ -8,13 +8,13 @@ import { Node } from '../utils/ContractAST';
  * to an array of base contracts that are uninitialized.
  * @param {*} contract contract class to check (including all its ancestors)
  */
-export function getUninitializedBaseContracts(contract: ZosContract): string[] {
+export function getUninitializedBaseContracts(contract: Contract): string[] {
   const uninitializedBaseContracts = {};
   getUninitializedDirectBaseContracts(contract, uninitializedBaseContracts);
   return invertBy(uninitializedBaseContracts);
 }
 
-function getUninitializedDirectBaseContracts(contract: ZosContract, uninitializedBaseContracts: any): void {
+function getUninitializedDirectBaseContracts(contract: Contract, uninitializedBaseContracts: any): void {
   // Check whether the contract has base contracts
   const baseContracts: any = contract.schema.ast.nodes.find((n) => n.name === contract.schema.contractName).baseContracts;
   if (baseContracts.length === 0) return;
@@ -22,7 +22,7 @@ function getUninitializedDirectBaseContracts(contract: ZosContract, uninitialize
   // Run check for the base contracts
   for (const baseContract of baseContracts) {
     const baseContractName: string = baseContract.baseName.name;
-    const baseContractClass: ZosContract = Contracts.getFromLocal(baseContractName);
+    const baseContractClass: Contract = Contracts.getFromLocal(baseContractName);
     getUninitializedDirectBaseContracts(baseContractClass, uninitializedBaseContracts);
   }
 
@@ -31,7 +31,7 @@ function getUninitializedDirectBaseContracts(contract: ZosContract, uninitialize
   const baseContractInitializers: any = {};
   for (const baseContract of baseContracts) {
     const baseContractName: string = baseContract.baseName.name;
-    const baseContractClass: ZosContract = Contracts.getFromLocal(baseContractName);
+    const baseContractClass: Contract = Contracts.getFromLocal(baseContractName);
     // TS-TODO: define type?
     const baseContractInitializer = getContractInitializer(baseContractClass);
     if (baseContractInitializer !== undefined) {
@@ -76,7 +76,7 @@ function getUninitializedDirectBaseContracts(contract: ZosContract, uninitialize
   return;
 }
 
-function getContractInitializer(contract: ZosContract): Node | undefined {
+function getContractInitializer(contract: Contract): Node | undefined {
   const contractDefinition: Node = contract.schema.ast.nodes
     .find((n: Node) => n.nodeType === 'ContractDefinition' && n.name === contract.schema.contractName);
   const contractFunctions: Node[] = contractDefinition.nodes.filter((n) => n.nodeType === 'FunctionDefinition');

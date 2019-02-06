@@ -2,7 +2,7 @@ import { promisify } from 'util';
 
 import ZWeb3 from '../artifacts/ZWeb3';
 import Contracts from '../artifacts/Contracts';
-import ZosContract from '../artifacts/ZosContract';
+import Contract from '../artifacts/Contract';
 import Transactions from '../utils/Transactions';
 
 async function sendTransaction(params: any): Promise<any> {
@@ -10,7 +10,7 @@ async function sendTransaction(params: any): Promise<any> {
   return ZWeb3.sendTransactionWithoutReceipt(params);
 }
 
-export default async function copyContract(contract: ZosContract, address: string, txParams: any = {}): Promise<ZosContract> {
+export default async function copyContract(contract: Contract, address: string, txParams: any = {}): Promise<Contract> {
   const trimmedAddress: string = address.replace('0x', '');
 
   // This is EVM assembly will return of the code of a foreign address.
