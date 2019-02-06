@@ -219,6 +219,7 @@ export default class NetworkController {
   private async _setSolidityLibs(contract: ZosContract): Promise<void> {
     const currentContractLibs = getSolidityLibNames(contract.schema.bytecode);
     const libraries = this.networkFile.getSolidityLibs(currentContractLibs);
+    // TODO: CHANGE HERE!
     contract.link(libraries);
   }
 

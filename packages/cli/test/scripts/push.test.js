@@ -92,6 +92,28 @@ contract('push script', function([_, owner]) {
     });
   };
 
+  const shouldDeployContractsWithLinkedDependencies = function () {
+    it('should not redeploy library', async function () {
+      const library = this.networkFile.solidityLib('GreeterLib');
+      should.not.exist(library);
+    });
+    
+    it('should record contracts in network file', async function () {
+      const contract = this.networkFile.contract('Impl');
+      contract.address.should.be.nonzeroAddress;
+      contract.localBytecodeHash.should.not.be.empty;
+      contract.storage.should.not.be.empty;
+      contract.types.should.not.be.empty;
+    });
+
+    it('should deploy and link contracts that require libraries with dependencies', async function () {
+      const address = this.networkFile.contract('Impl').address;
+      const deployed = await ImplV1.at(address);
+      const result = await deployed.methods.say().call();
+      result.should.eq('WithDependencyLibraryV1');
+    });
+  };
+
   const shouldRegisterContractsInDirectory = function () {
     it('should register instances in directory', async function () {
       const address = this.networkFile.contract('Impl').address;
@@ -331,12 +353,19 @@ contract('push script', function([_, owner]) {
       const dependency = Dependency.fromNameWithVersion('mock-stdlib@1.1.0')
       this.dependencyProject = await dependency.deploy()
       this.dependencyPackage = await this.dependencyProject.getProjectPackage()
+      
+      const contracts = {};
+      await Promise.all(["GreeterLib", "GreeterImpl"].map(async (name) => {
+        contracts[name] = { address: (await this.dependencyProject.getImplementation({ contractName: name })) }
+      }));
+      
+      this.dependencyContracts = contracts;
       this.dependencyGetNetworkFileStub = sinon.stub(Dependency.prototype, 'getNetworkFile');
-      this.dependencyGetNetworkFileStub.callsFake(() => ({ packageAddress: this.dependencyPackage.address, version: '1.1.0' }))
+      this.dependencyGetNetworkFileStub.callsFake(() => ({ packageAddress: this.dependencyPackage.address, version: '1.1.0', contracts }))
     })
 
     afterEach('unstub dependency network file stub', function () {
-      sinon.restore()      
+      sinon.restore()
     })
   };
 
@@ -509,6 +538,21 @@ contract('push script', function([_, owner]) {
 
     shouldSetDependency();
     shouldUpdateDependency();
+  });
+
+  describe.only('an unpublished project with contracts that use dependencies libraries', function() {
+    deployingDependency();
+
+    beforeEach('pushing package-with-contracts-and-stdlib-links', async function () {
+      const packageFile = new ZosPackageFile('test/mocks/packages/package-with-contracts-and-stdlib-links.zos.json')
+      packageFile.publish = false
+      this.networkFile = packageFile.networkFile(network)
+
+      await push({ network, txParams, networkFile: this.networkFile })
+      console.log(this.networkFile.data)
+    });
+
+    shouldDeployContractsWithLinkedDependencies();
   });
 });
 

@@ -1,6 +1,7 @@
 pragma solidity ^0.4.24;
 
 import "./Libraries.sol";
+import "mock-stdlib/contracts/GreeterLib.sol";
 
 contract ImplV1 {
   uint256 public value;
@@ -29,6 +30,15 @@ contract WithLibraryImplV1 is ImplV1 {
 
   function say() public pure returns (string) {
     return "WithLibraryV1";
+  }
+}
+
+contract WithDependencyLibraryImplV1 is ImplV1 {
+  using GreeterLib for string;
+  
+  function say() public pure returns (string) {
+    string memory str = "WithDependencyLibraryV1";
+    return str.wrap();
   }
 }
 

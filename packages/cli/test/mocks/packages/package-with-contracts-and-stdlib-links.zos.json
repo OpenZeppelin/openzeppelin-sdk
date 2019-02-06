@@ -1,0 +1,12 @@
+{
+  "name": "Herbs",
+  "zosversion": "2.2",
+  "publish": true,
+  "version": "1.0",
+  "contracts": {
+    "Impl": "WithDependencyLibraryImplV1"
+  },
+  "dependencies": {
+    "mock-stdlib": "1.1.0"
+  }
+}
