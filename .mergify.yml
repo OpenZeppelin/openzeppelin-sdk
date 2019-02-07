@@ -1,13 +1,19 @@
-rules:
-  default:
-    protection:
-      required_status_checks:
-        contexts:
-          - Travis CI - Branch
-          - Travis CI - Pull Request
-      required_pull_request_reviews:
-        required_approving_review_count: 1
-        dismiss_stale_reviews: false
-    enabling_label: "status:ready-to-merge"
-    merge_strategy:
+pull_request_rules:
+- name: merge
+  actions:
+    merge:
       method: squash
+      rebase_fallback: merge
+  conditions:
+  - base=master
+  - label=status:ready-to-merge
+  - label!=no-mergify
+  - '#approved-reviews-by>=1'
+  - '#changes-requested-reviews-by=0'
+  - status-success=Travis CI - Branch
+  - status-success=Travis CI - Pull Request
+- name: delete head branch after merge
+  conditions:
+  - merged
+  actions:
+    delete_head_branch: {}
