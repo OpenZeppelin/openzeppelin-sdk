@@ -78,7 +78,8 @@ async function publishToEtherscan(params: VerifierOptions): Promise<void | never
 
   const apiSubdomain = setEtherscanApiSubdomain(network);
   const etherscanApiUrl = `https://${apiSubdomain}.etherscan.io/api`;
-  const etherscanContractUrl = `https://${network}.etherscan.io/address`;
+  const networkSubdomain = network === 'mainnet' ? '' : `${network}.`;
+  const etherscanContractUrl = `https://${networkSubdomain}etherscan.io/address`;
 
   try {
     const response = await axios.request({
