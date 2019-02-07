@@ -19,7 +19,7 @@ let's make it import a very common
 contract from the [OpenZeppelin](https://openzeppelin.org/) EVM package:
 
 ```solidity
-pragma solidity ^0.5.0;
+pragma solidity ^0.4.24;
 
 import "openzeppelin-eth/contracts/token/ERC721/ERC721Mintable.sol";
 
@@ -42,8 +42,10 @@ For more information, see
 Now, let's link our project to the openzeppelin-eth package by running:
 
 ```console
-zos link openzeppelin-eth
+npx zos link openzeppelin-eth@2.0.2
 ```
+
+> Note: We are specifically installing openzeppelin-eth 2.0.2 because later versions of openzeppelin-eth use Solidity 0.5, and in this example we are using Solidity 0.4.
 
 This command will install the openzeppelin-eth contracts locally, which is
 needed to compile the contracts that import it; but it will also update the
@@ -55,18 +57,18 @@ The following commands will be familiar to you. Just as we did before, we have
 to add the contract to the project:
 
 ```console
-zos add MyLinkedContract
+npx zos add MyLinkedContract
 ```
 
 > If any of the following commands fail with an `A network name must be provided 
 to execute the requested action` error, it means our session has expired. 
-In that case, renew it by running the command `zos session --network local 
+In that case, renew it by running the command `npx zos session --network local 
 --from 0x1df62f291b2e969fb0849d99d9ce41e2f137006e --expires 3600` again.
 
 Now, let's push our changes to the blockchain:
 
 ```console
-zos push --deploy-dependencies
+npx zos push --deploy-dependencies
 ```
 
 There is one caveat here with the `--deploy-dependencies` flag. We mentioned
@@ -83,13 +85,13 @@ Repeating ourselves from before, let's make an upgradeable instance of the
 contract:
 
 ```console
-zos create MyLinkedContract
+npx zos create MyLinkedContract
 ```
 
 We also need an instance of the `ERC721` token from the EVM package:
 
 ```console
-zos create openzeppelin-eth/StandaloneERC721 --init initialize --args MyToken,TKN,[<address>],[<address>]
+npx zos create openzeppelin-eth/StandaloneERC721 --init initialize --args MyToken,TKN,[<address>],[<address>]
 ```
 
 `<address>` will be the minter and pauser of the token. For local development
@@ -109,7 +111,7 @@ and `StandaloneERC721` respectively. Both addresses were returned by the `create
 commands we ran above._
 
 ```console
-truffle(local)> MyLinkedContract.at('<my-linked-contract-address>').then(i => myLinkedContract = i)
+truffle(local)> myLinkedContract = MyLinkedContract.at('<my-linked-contract-address>')
 truffle(local)> myLinkedContract.setToken('<my-erc721-address>')
 ```
 
