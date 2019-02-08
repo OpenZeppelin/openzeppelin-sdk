@@ -194,12 +194,8 @@ contract('ZWeb3', accounts => {
         context('when address has uppercase hexa letters', function () {
           context('when address is not well checksummed', function () {
             it('fails', function () {
-              try {
-                const address = '0x82154A1cbcAb0461D4C12ee9Cb890244eead6d9F';
-                const checksummed = ZWeb3.toChecksumAddress(address);
-              } catch(error) {
-                error.message.should.match(/is not a valid Ethereum address or it has not been checksummed correctly/);
-              }
+              const address = '0x82154A1cbcAb0461D4C12ee9Cb890244eead6d9F';
+              (() => ZWeb3.toChecksumAddress(address).should.throw('Error', /is not a valid Ethereum address or it has not been checksummed correctly/));
             });
           });
 
