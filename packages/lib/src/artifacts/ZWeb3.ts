@@ -54,7 +54,7 @@ export default class ZWeb3 {
   }
 
   public static async accounts(): Promise<string[]> {
-    return await ZWeb3.eth().personal.getAccounts();
+    return await ZWeb3.eth().getAccounts();
   }
 
   public static async defaultAccount(): Promise<string> {
