@@ -22,7 +22,7 @@ const ConfigVariablesInitializer = {
     Contracts.setSyncTimeout(timeout * 1000);
     Contracts.setArtifactsDefaults(artifactDefaults);
 
-    const txParams = { from: from || artifactDefaults.from || await ZWeb3.defaultAccount() };
+    const txParams = { from: ZWeb3.toChecksumAddress(from || artifactDefaults.from || await ZWeb3.defaultAccount()) };
     return { network: await ZWeb3.getNetworkName(), txParams };
   }
 };

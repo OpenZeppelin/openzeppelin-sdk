@@ -1,8 +1,12 @@
+import Logger from '../utils/Logger';
 import sleep from '../helpers/sleep';
 import Web3 from 'web3';
 import { TransactionReceipt } from 'web3/types';
 import { Eth, Block, Transaction } from 'web3-eth';
 import { Contract } from 'web3-eth-contract';
+import { toChecksumAddress } from 'web3-utils';
+
+const log: Logger = new Logger('ZWeb3');
 
 // Reference: see https://github.com/ethereum/EIPs/blob/master/EIPS/eip-155.md#list-of-chain-ids
 const NETWORKS = {
@@ -59,6 +63,17 @@ export default class ZWeb3 {
 
   public static async defaultAccount(): Promise<string> {
     return (await ZWeb3.accounts())[0];
+  }
+
+  public static toChecksumAddress(address: string): string {
+    if (address.match(/[A-F]/)) {
+      if (toChecksumAddress(address) !== address) {
+        throw Error(`Given address \"${address}\" is not a valid Ethereum address or it has not been checksummed correctly.`);
+      } else return address;
+    } else {
+      log.warn(`WARNING: Address ${address} is not checksummed. Consider checksumming it to avoid future warnings or errors.`);
+      return toChecksumAddress(address);
+    }
   }
 
   public static async estimateGas(params: any): Promise<number> {

@@ -22,7 +22,6 @@ const Truffle = {
     const { networks: networkList } = config;
     if (!networkList[network]) throw Error(`Given network '${network}' is not defined in your truffle-config file`);
     config.network = network;
-    if (networkList[network].from) networkList[network].from = networkList[network].from.toLowerCase();
   },
 
   getBuildDir(): string {
@@ -35,7 +34,6 @@ const Truffle = {
     const provider = this._setNonceTrackerIfNeeded(config);
 
     const artifactDefaults = pickBy(pick(config, 'from', 'gas', 'gasPrice'));
-    if (artifactDefaults.from) artifactDefaults.from = artifactDefaults.from.toLowerCase();
     return { provider, artifactDefaults };
   },
 
