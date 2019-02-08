@@ -53,7 +53,6 @@ const Session = {
   },
 
   _setDefaults(session: SessionOptions): SessionOptions {
-    if (session.from) session.from = session.from.toLowerCase();
     if (!session.timeout) session.timeout = DEFAULT_TX_TIMEOUT;
     return session;
   }
