@@ -88,7 +88,7 @@ export default class ZWeb3 {
 
   public static async isGanacheNode(): Promise<boolean> {
     const nodeVersion = await ZWeb3.getNode();
-    return nodeVersion.match(/TestRPC/).length > 0;
+    return nodeVersion.match(/TestRPC/) !== null;
   }
 
   public static async getBlock(filter: string | number): Promise<Block> {
