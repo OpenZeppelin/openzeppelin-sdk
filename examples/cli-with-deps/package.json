@@ -1,15 +1,15 @@
 {
   "name": "cli-with-deps",
-  "version": "2.1.0",
+  "version": "2.2.0-rc.0",
   "description": "Sample CLI project for ZeppelinOS",
   "author": "santiago@zeppelin.solutions",
   "private": true,
   "license": "MIT",
   "devDependencies": {
-    "dep-basic": "^2.1.0",
+    "dep-basic": "^2.2.0-rc.0",
     "openzeppelin-zos": "^1.9.1",
     "truffle": "^4.1.14",
-    "zos": "^2.1.0",
-    "zos-lib": "^2.1.0"
+    "zos": "^2.2.0-rc.0",
+    "zos-lib": "^2.2.0-rc.0"
   }
 }
