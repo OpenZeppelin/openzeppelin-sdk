@@ -66,11 +66,14 @@ export default class ZWeb3 {
   }
 
   public static toChecksumAddress(address: string): string {
-    const checksummedAddress = toChecksumAddress(address);
-    if (checksummedAddress !== address) {
+    if (address.match(/[A-F]/)) {
+      if (toChecksumAddress(address) !== address) {
+        throw Error(`Given address \"${address}\" is not a valid Ethereum address or it has not been checksummed correctly.`);
+      } else return address;
+    } else {
       log.warn(`WARNING: Address ${address} is not checksummed. Consider checksumming it to avoid future warnings or errors.`);
+      return toChecksumAddress(address);
     }
-    return checksummedAddress;
   }
 
   public static async estimateGas(params: any): Promise<number> {
