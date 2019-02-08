@@ -15,10 +15,10 @@ const Compiler = {
           if (error.code === 127) console.error('Could not find truffle executable. Please install it by running: npm install truffle');
           reject(error);
         } else {
-          if (stdout) console.log(stdout);
-          if (stderr) console.error(stderr);
           resolve({ stdout, stderr });
         }
+        if (stdout) console.log(stdout);
+        if (stderr) console.error(stderr);
       });
     });
   }
