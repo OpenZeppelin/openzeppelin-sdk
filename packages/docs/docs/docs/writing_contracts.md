@@ -53,7 +53,7 @@ contract MyContract is Initializable {
 }
 ```
 
-Another difference between a `constructor` and a regular function is that Solidity takes care of automatically invoking the constructors of all ancestors of a contract. When writing an initializer, you need to take spacial care to manually call the initializers of all parent contracts:
+Another difference between a `constructor` and a regular function is that Solidity takes care of automatically invoking the constructors of all ancestors of a contract. When writing an initializer, you need to take special care to manually call the initializers of all parent contracts:
 
 ```solidity
 import "zos-lib/contracts/Initializable.sol";
