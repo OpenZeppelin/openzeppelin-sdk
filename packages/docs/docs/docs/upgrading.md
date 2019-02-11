@@ -8,7 +8,7 @@ project with one contract. Here is the code of the contract, to keep it fresh
 on our minds:
 
 ```solidity
-pragma solidity ^0.5.0;
+pragma solidity ^0.4.24;
 
 import "zos-lib/contracts/Initializable.sol";
 
@@ -37,17 +37,17 @@ automated, or any combination of both that will earn the trust of our users.
 
 > If any of the following commands fail with an `A network name must be provided 
 to execute the requested action` error, it means our session has expired. 
-In that case, renew it by running the command `zos session --network local 
+In that case, renew it by running the command `npx zos session --network local 
 --from 0x1df62f291b2e969fb0849d99d9ce41e2f137006e --expires 3600` again.
 
 Now let's create an upgradeable instance of this contract so you can 
 experiment with what this is all about:
 
 ```console
-zos create MyContract --init initialize --args 42,hitchhiker
+npx zos create MyContract --init initialize --args 42,hitchhiker
 ```
 
-The `zos create` command receives an optional `--init [function-name]`
+The `npx zos create` command receives an optional `--init [function-name]`
 parameter to call the initialization function after creating the contract,
 and the `--args` parameter allows you to pass arguments to it. This way, you
 are initializing your contract with `42` as the value of the `x` state
@@ -72,7 +72,7 @@ that our instance is working as expected:
 by the `create` command we ran above._
 
 ```console
-truffle(local)> MyContract.at('<your-contract-address>').then(i => myContract = i)
+truffle(local)> myContract = MyContract.at('<your-contract-address>')
 truffle(local)> myContract.x().then(x => x.toString())
 '42'
 
@@ -94,7 +94,7 @@ extend its functionalities.
 Open `contracts/MyContract.sol`, and add a new function:
 
 ```solidity
-pragma solidity ^0.5.0;
+pragma solidity ^0.4.24;
 
 import "zos-lib/contracts/Initializable.sol";
 
@@ -123,13 +123,13 @@ contract MyContract is Initializable {
 Once you have saved these changes, push the new code to the network:
 
 ```console
-zos push
+npx zos push
 ```
 
 Finally, let's update the already deployed contract with the new code:
 
 ```console
-zos update MyContract
+npx zos update MyContract
 ```
 
 You will see that this command prints the same contract address as before, 
@@ -154,7 +154,7 @@ returned by the `create` command we ran in the previous section, which
 is the same as the one returned by the `update` command we ran above._
 
 ```console
-truffle(local)> MyContract.at('<your-contract-address>').then(i => myContract = i)
+truffle(local)> myContract = MyContract.at('<your-contract-address>')
 truffle(local)> myContract.increment()
 truffle(local)> myContract.x().then(x => x.toString())
 43

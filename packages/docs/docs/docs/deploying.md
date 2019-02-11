@@ -5,22 +5,11 @@ title: Deploying your first project
 
 The following steps will get you started using ZeppelinOS.
 
-## Installation
+## Install Node and NPM
 
 First, let's install [Node.js](http://nodejs.org/) and
 [npm](https://npmjs.com/). On their
 respective websites you will find specific instructions for your machine.
-
-Then, install ZeppelinOS by running:
-
-```console
-npm install --global zos
-```
-
-Run `zos --help` to get a list of all the ZeppelinOS commands available. At any time
-during these guides, when we introduce a new command, run
-`zos <command-name> --help` to get more information about that command and
-its arguments.
 
 ## Setting up your project
 
@@ -40,10 +29,21 @@ npm init
 This command will ask you for details about the project. For this very basic
 guide you can just press enter to accept the default values of each field.
 
+Then, install ZeppelinOS in your project folder by running:
+
+```console
+npm install zos
+```
+
+Run `npx zos --help` to get a list of all the ZeppelinOS commands available. At any time
+during these guides, when we introduce a new command, run
+`npx zos <command-name> --help` to get more information about that command and
+its arguments.
+
 Now, we can initialize the ZeppelinOS project:
 
 ```console
-zos init my-project
+npx zos init my-project
 ```
 
 This command will create a `zos.json` file, which contains all the information
@@ -56,11 +56,15 @@ by now, inside the `my-project` directory you should have a `package.json` file
 a `truffle-config.js` file (created by the `zos` CLI for Truffle), and a
 `zos.json` file (created by `zos` for ZeppelinOS).
 
-Note: if you haven't installed Truffle, run the following command to add it to your project:
+Next, we need to install Truffle. To do so, run the following command:
 
 ```console
-npm install truffle --save
+npm install truffle@4.1.15 --save
 ```
+
+> Note: We are specifically installing Truffle 4.1.15, as ZeppelinOS 2.1 only supports Truffle 5 for command-line usage (not programmatic usage). Full support for Truffle 5 and Web3 1.0 will be released in ZeppelinOS 2.2._
+
+That's it! Our project is now fully set up for using ZeppelinOS.
 
 ## Adding a contract
 
@@ -69,7 +73,7 @@ Name it `MyContract.sol`, and put it in the `contracts` folder with the
 following Solidity code:
 
 ```solidity
-pragma solidity ^0.5.0;
+pragma solidity ^0.4.24;
 
 import "zos-lib/contracts/Initializable.sol";
 
@@ -105,7 +109,7 @@ prevent the `initialize` function from be called more than once.
 Now we can add the contract to the project:
 
 ```console
-zos add MyContract
+npx zos add MyContract
 ```
 
 This command will first compile `MyContract`, and then it will add it to the
@@ -139,7 +143,7 @@ Once we have done that, let's go back to the original terminal and
 run the following command:
 
 ```console
-zos session --network local --from 0x1df62f291b2e969fb0849d99d9ce41e2f137006e --expires 3600
+npx zos session --network local --from 0x1df62f291b2e969fb0849d99d9ce41e2f137006e --expires 3600
 ```
 
 The `session` command starts a session to work with a desired network.
@@ -158,7 +162,7 @@ Now that everything has been setup, we are ready to deploy the project.
 To do so simply run:
 
 ```console
-zos push
+npx zos push
 ```
 
 This command deploys `MyContract` to the specified network and prints its

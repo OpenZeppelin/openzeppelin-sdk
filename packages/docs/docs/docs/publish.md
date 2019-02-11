@@ -18,20 +18,20 @@ In the directory of our project, we initialize it:
 mkdir <project-name>
 cd <project-name>
 npm init
-zos init <project-name>
+npx zos init <project-name>
 ```
 
 Then, we can add to our project all the contracts that we have in the
 `contracts` directory:
 
 ```console
-zos add <contract-name-1> <contract-name-2> ... <contract-name-n>
+npx zos add <contract-name-1> <contract-name-2> ... <contract-name-n>
 ```
 
 Next, we push the project to the network:
 
 ```console
-zos push --network <network>
+npx zos push --network <network>
 ```
 
 Note that for the EVM package to be used by others, you need to use a real
@@ -42,7 +42,7 @@ All known commands so far. Here comes what's new. If you want to share your
 package in ZeppelinOS, do it by running the `publish` command:
 
 ```console
-zos publish --network <network>
+npx zos publish --network <network>
 ```
 
 It's that simple! Now you are the developer of an EVM package that lives in
@@ -71,9 +71,9 @@ ZeppelinOS configuration files, so add the following top-level field to the
 }
 ```
 
-Remember that the `zos` configuration files are where ZeppelinOS keep track of 
+Remember that the `zos` configuration files are where ZeppelinOS keeps track of 
 your contracts, the addresses of the instances you have created, and in this
-case the address of the EVM package you have published. This is how ZeppelinOS 
+case the address of the EVM package you will have published. This is how ZeppelinOS 
 solves the link of foreign projects that depend on yours.
 
 Make sure to check that the rest of the fields describe your package
@@ -98,7 +98,7 @@ Now we are done for real. Other developers will be able to link to your
 package by using:
 
 ```console
-zos link <your-project-name>
+npx zos link <your-project-name>
 ```
 
 Spread the word! Tell others to reuse your work, and to help you improving it
