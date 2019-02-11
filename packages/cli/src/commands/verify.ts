@@ -5,7 +5,7 @@ import ConfigVariablesInitializer from '../models/initializer/ConfigVariablesIni
 
 const name: string = 'verify';
 const signature: string = `${name} <contract-alias>`;
-const description: string = 'verify a contract with etherchain. Provide a contract name.';
+const description: string = 'verify a contract with etherscan or etherchain. Provide a contract name.';
 
 const register: (program: any) => any = (program) => program
   .command(signature, undefined, { noHelp: true })
