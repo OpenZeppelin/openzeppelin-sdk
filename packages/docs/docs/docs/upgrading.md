@@ -162,7 +162,7 @@ truffle(local)> myContract.x().then(x => x.toString())
 
 Now let's imagine that instead of just adding a new 
 function to the contract (a change to functionality), we wanted to add a new 
-variable `t` (a change to storage layout). How do we set the initial value of `t`?
+variable `t` to our contract. But how do we set the initial value of `t`?
 The variables `x` and `s` were initialized with the `initialize` function,
 which was called when the proxy was created via the `zos create MyContract --init initialize --args ...` 
 command. The `update` command also accepts `--init` and `--args` parameters, so we can use a function
