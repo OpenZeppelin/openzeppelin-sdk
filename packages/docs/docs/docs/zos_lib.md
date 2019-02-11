@@ -44,7 +44,7 @@ npm install truffle@4.1.15
 We'll be using [ganache](https://truffleframework.com/docs/ganache/quickstart) for local deployment, so let's install it:
 
 ```console
-npm install --global truffle ganache-cli
+npm install --global ganache-cli
 ```
 
 Now, install the ZeppelinOS JavaScript library running:
