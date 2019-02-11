@@ -9,32 +9,82 @@ this library can also be used directly to operate ZeppelinOS projects when a
 programmatic interface is preferred or more flexibility and lower-level
 access is required.
 
-## Installation
+## Install Node and NPM
 
 Let's install [Node.js](http://nodejs.org/) and
 [npm](https://npmjs.com/), which are the dependencies to get started. On their
 respective websites you will find specific instructions for your machine.
 
-Truffle is also required, and we'll be using [ganache](https://truffleframework.com/docs/ganache/quickstart) for local deployment, so let's install them and initialize a directory for our project:
+## Setting up your project
+
+We'll need to create a directory for our project and access it:
 
 ```console
-npm install --global truffle ganache-cli
 mkdir my-project
 cd my-project
-truffle init
+
 ```
 
-Then, install the ZeppelinOS JavaScript library running:
+Use `npm` to create a `package.json` file:
+```console
+npm init
+```
+
+This command will ask you for details about the project. For this very basic
+guide you can just press enter to accept the default values of each field.
+
+Next, we need to install Truffle. To do so, run the following command:
+
+```console
+npm install truffle@4.1.15
+```
+
+> Note: We are specifically installing Truffle 4.1.15, because ZeppelinOS 2.1 only supports that version of Truffle for its programmatic interface. Support for Truffle 5 is to be released in ZeppelinOS 2.2.
+
+We'll be using [ganache](https://truffleframework.com/docs/ganache/quickstart) for local deployment, so let's install it:
+
+```console
+npm install --global ganache-cli
+```
+
+Now, install the ZeppelinOS JavaScript library running:
 
 ```console
 npm install zos-lib
 ```
 
+Finally, since we are creating this project manually, we need to create some folders and files to make our project compatible with Truffle:
+
+```
+mkdir contracts
+mkdir migrations
+touch truffle-config.js
+```
+
+The contents of truffle-config.js should be:
+
+```
+module.exports = {
+  networks: {
+    local: {
+      host: 'localhost',
+      port: 9545,
+      gas: 5000000,
+      gasPrice: 5e9,
+      network_id: '*'
+    }
+  }
+};
+```
+That's it! Our project is now fully set up for using ZeppelinOS programmatically.
+
+## Adding some contracts
+
 Now, let's write two simple contracts. The first in `contracts/MyContractV0`
 with the following contents:
 
 ```solidity
-pragma solidity ^0.5.0;
+pragma solidity ^0.4.24;
 
 import "zos-lib/contracts/Initializable.sol";
 
@@ -51,7 +101,7 @@ The second in `contracts/MyContractV1`, and it will be almost the same as the
 first one but with one extra function:
 
 ```solidity
-pragma solidity ^0.5.0;
+pragma solidity ^0.4.24;
 
 import "zos-lib/contracts/Initializable.sol";
 
@@ -72,9 +122,13 @@ The V1 contract is an upgrade for the V0 contract, so let's see how we can
 use the ZeppelinOS library to apply this upgrade. For this, we need to
 compile the contracts:
 
+## Compiling the contracts
+
 ```console
-truffle compile
+npx truffle compile
 ```
+
+## Running the script
 
 And now, let's write our upgrading script in `index.js`:
 
@@ -113,24 +167,11 @@ Truffle. So let's open a new terminal and start a ganache network by running:
 ```console
 ganache-cli --port 9545
 ```
-We also need to configure a local network inside our `truffle.js` by adding the following:
 
-```javascript
-module.exports = {
-  networks: {
-    local: {
-      host: 'localhost',
-      port: 9545,
-      network_id: '*'
-    }
-  }
-};
-```
-
-Adnd then, execute the script using `truffle exec`:
+And then, execute the script using Truffle:
 
 ```console
-truffle exec index.js --network local
+npx truffle exec index.js --network local
 ```
 
 This is just a very simple example to show the basic functions of the
