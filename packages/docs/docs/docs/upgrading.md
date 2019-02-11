@@ -166,7 +166,7 @@ variable `t` to our contract. But how do we set the initial value of `t`?
 The variables `x` and `s` were initialized with the `initialize` function,
 which was called when the proxy was created via the `zos create MyContract --init initialize --args ...` 
 command. The `update` command also accepts `--init` and `--args` parameters, so we can use a function
-to initialize the new variable once again. We cannot to use the same `initialize` function again, because
+to initialize the new variable once again. We cannot use the same `initialize` function again, because
 the `Initializable` modifier guards it against being called more than once. We need a new function. A good name for the 
 new function could be something like `initializeVersion2` or `migrateToV2`. This function would simply
 set the initial value of `t` and should be called with `zos update MyContract --init migrateToV2 --args 99`.
