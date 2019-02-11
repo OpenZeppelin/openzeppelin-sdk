@@ -111,9 +111,11 @@ zos add MyContract
 This command will first compile `MyContract`, and then it will add it to the
 project registering it in the `zos.json` configuration file.
 
-> **Note**: The current version of ZeppelinOS uses Solidity 0.4.24. If you
-> want to use a different version you will have to use the `--skip-compile`
-> option and provide your own build files.
+> **Note**: The current version of ZeppelinOS relies on Truffle to compile contracts and
+> determine the Solidity compiler version to use. If you want to use a different version, please specify it
+> in the Truffle configuration file.
+> More info:
+> https://github.com/trufflesuite/truffle/releases/tag/v5.0.0-beta.0#specify-a-solcjs-version
 
 ## Deploying your project
 
