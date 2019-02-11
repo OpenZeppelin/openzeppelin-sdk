@@ -1,6 +1,6 @@
 {
   "name": "zos-docs",
-  "version": "2.2.0-rc.0",
+  "version": "2.2.0-rc.1",
   "description": "Documentation for the ZeppelinOS smart contract platform",
   "main": "index.js",
   "private": true,
