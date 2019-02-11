@@ -12,6 +12,7 @@ function registerProjectHooks (network) {
     copy('package.json.v1', 'package.json')
     copy('Samples.sol', 'contracts/Samples.sol')
     copy('GreeterWrapper.sol', 'contracts/GreeterWrapper.sol')
+    run('rm -f package-lock.json')
     run('npx lerna bootstrap --scope=cli-app-tests-workdir --no-ci > /dev/null')
   });
 
