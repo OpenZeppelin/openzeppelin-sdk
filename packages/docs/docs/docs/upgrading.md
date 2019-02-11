@@ -165,13 +165,24 @@ function to the contract (a change to functionality), we wanted to add a new
 variable `t` to our contract. But how do we set the initial value of `t`?
 The variables `x` and `s` were initialized with the `initialize` function,
 which was called when the proxy was created via the `zos create MyContract --init initialize --args ...` 
-command. At first, you may think that the solution would be to add the initialization of `t`
-to the end of the initialize function, but that wouldn't work. We cannot use the same `initialize` function, because
+command. Naturally, the solution would be to add the initialization of `t`
+to the end of the initialize function: 
+
+```
+function initialize(uint256 _x, string memory _s, uint256 _t) initializer public {
+  x = _x;
+  s = _s;
+  t = _t;
+}
+```
+
+That would be fine for newly deployed instances of MyContract, but it wouldn't work for one that 
+has allready been deployed, and is instead being updated. We cannot call the same `initialize` function, because
 the `Initializable` modifier guards it against being called more than once. We need a new function. 
 
 The `update` command also accepts `--init` and `--args` parameters, so we can use a function
 with it to initialize the new variable. A good name for the 
-new function could be something like `initializeT`. This function would simply
+new function could be something like `initializeT` or `initializeVersion2`. This function would simply
 set the initial value of `t` and check that it has not yet been initialized. It should be called with `zos update MyContract --init initializeT --args 99`.
 
 ```
@@ -186,7 +197,7 @@ This initialization validation for `t`, of course, would only make sense if `t` 
 The resulting code would be:
 
 ```solidity
-pragma solidity ^0.5.0;
+pragma solidity ^0.4.24;
 
 import "zos-lib/contracts/Initializable.sol";
 
@@ -196,9 +207,10 @@ contract MyContract is Initializable {
   string public s;
   uint256 public t;
 
-  function initialize(uint256 _x, string memory _s) initializer public {
+  function initialize(uint256 _x, string memory _s, uint256 _t) initializer public {
     x = _x;
     s = _s;
+    t = _t;
   }
 
   function initializeT(uint256 _t) public {
