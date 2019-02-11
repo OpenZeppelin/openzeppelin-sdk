@@ -165,16 +165,50 @@ function to the contract (a change to functionality), we wanted to add a new
 variable `t` to our contract. But how do we set the initial value of `t`?
 The variables `x` and `s` were initialized with the `initialize` function,
 which was called when the proxy was created via the `zos create MyContract --init initialize --args ...` 
-command. The `update` command also accepts `--init` and `--args` parameters, so we can use a function
-to initialize the new variable once again. We cannot use the same `initialize` function again, because
-the `Initializable` modifier guards it against being called more than once. We need a new function. A good name for the 
-new function could be something like `initializeVersion2` or `migrateToV2`. This function would simply
-set the initial value of `t` and should be called with `zos update MyContract --init migrateToV2 --args 99`.
+command. At first, you may think that the solution would be to add the initialization of `t`
+to the end of the initialize function, but that wouldn't work. We cannot use the same `initialize` function, because
+the `Initializable` modifier guards it against being called more than once. We need a new function. 
+
+The `update` command also accepts `--init` and `--args` parameters, so we can use a function
+with it to initialize the new variable. A good name for the 
+new function could be something like `initializeT`. This function would simply
+set the initial value of `t` and check that it has not yet been initialized. It should be called with `zos update MyContract --init initializeT --args 99`.
 
 ```
-function migrateToV2(uint256 _t) public {
+function initializeT(uint256 _t) public {
   require(_t == 0);
   t = _t;
+}
+```
+
+This initialization validation for `t`, of course, would only make sense if `t` cannot be zero. 
+
+The resulting code would be:
+
+```solidity
+pragma solidity ^0.5.0;
+
+import "zos-lib/contracts/Initializable.sol";
+
+contract MyContract is Initializable {
+
+  uint256 public x;
+  string public s;
+  uint256 public t;
+
+  function initialize(uint256 _x, string memory _s) initializer public {
+    x = _x;
+    s = _s;
+  }
+
+  function initializeT(uint256 _t) public {
+    require(_t == 0);
+    t = _t;
+  }
+
+  function increment() public {
+    x += 1;
+  }
 }
 ```
 
