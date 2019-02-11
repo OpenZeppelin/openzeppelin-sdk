@@ -160,7 +160,7 @@ truffle(local)> myContract.x().then(x => x.toString())
 43
 ```
 
-Now, just as a mental exercise, let's imagine that instead of just adding a new 
+Now let's imagine that instead of just adding a new 
 function to the contract (a change to functionality), we wanted to add a new 
 variable `t` (a change to storage layout). How do we set the initial value of `t`?
 The variables `x` and `s` were initialized with the `initialize` function,
