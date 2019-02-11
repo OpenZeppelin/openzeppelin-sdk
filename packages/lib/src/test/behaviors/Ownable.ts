@@ -1,9 +1,6 @@
-import utils from 'web3-utils';
 import assert from 'assert';
-import { expect } from 'chai';
 import assertRevert from '../helpers/assertRevert';
 
-// TS-TODO: should this be in test/behaviors/ instead of src/test/behaviors/?
 export default function shouldBehaveLikeOwnable(owner: string, anotherAccount: string) {
 
   describe('owner', function() {
@@ -16,8 +13,10 @@ export default function shouldBehaveLikeOwnable(owner: string, anotherAccount: s
   describe('transferOwnership', function() {
     describe('when the proposed owner is not the zero address', function() {
       const newOwner = anotherAccount;
+
       describe('when the sender is the owner', function() {
         const from = owner;
+
         it('transfers the ownership', async function() {
           await this.ownable.methods.transferOwnership(newOwner).send({ from });
           const contractOwner: string = await this.ownable.methods.owner().call();
@@ -27,7 +26,7 @@ export default function shouldBehaveLikeOwnable(owner: string, anotherAccount: s
         it('emits an event', async function() {
           const { events } = await this.ownable.methods.transferOwnership(newOwner).send({ from });
           const event = events['OwnershipTransferred'];
-          expect(event).to.be.an('object');
+
           assert.equal(event.returnValues.previousOwner, owner);
           assert.equal(event.returnValues.newOwner, newOwner);
         });
