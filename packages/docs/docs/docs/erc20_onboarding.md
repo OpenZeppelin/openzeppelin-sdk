@@ -42,7 +42,7 @@ that we will use to simulate a real scenario locally. As you can see, this token
 initialized just for testing purposes.
 
 _Before we begin, remember to install the dependencies running `npm install`. Additionally, you should check that everything
-is working as expected by running the test files with `npm test`._
+is working as expected by compiling the contracts with `npx truffle compile` and then running the test files with `npm test`._
 
 Now, let's deploy the legacy token. We will use [ganache-cli](https://truffleframework.com/docs/ganache/quickstart), a
 personal blockchain for Ethereum development that you can use to deploy your contracts and develop your applications.
@@ -82,15 +82,10 @@ Remember not to close this console, as we will be using it later.
 
 ### 1. Initialize your migration project with ZeppelinOS
 
-If you haven't installed the ZeppelinOS CLI, run the following command in your terminal:
-```console
-npm install --global zos
-```
-
 To initialize this project with ZeppelinOS, open a terminal and run the following line:
 
 ```console
-zos init my-token-migration 1.0.0
+npx zos init my-token-migration 1.0.0
 ```
 
 We have just initialized a new ZeppelinOS project. A new `zos.json` file should have been created.
@@ -102,6 +97,8 @@ In our sample project, you will find another contract called [`MyUpgradeableToke
 which will be the upgradeable version of the sample legacy token contract [`MyLegacyToken`](https://github.com/zeppelinos/erc20-onboarding/blob/master/contracts/MyLegacyToken.sol):
 
 ```solidity
+pragma solidity ^0.4.24;
+
 import "zos-lib/contracts/Initializable.sol";
 import "openzeppelin-eth/contracts/token/ERC20/IERC20.sol";
 import "openzeppelin-eth/contracts/drafts/ERC20Migrator.sol";
@@ -139,13 +136,13 @@ in our project, we simply need to use the `link` command giving the name of the 
 to use. In this case, we will link OpenZeppelin EVM package to be able to use the contracts it provides in our project:
 
 ```console
-zos link openzeppelin-eth@^2.0.0
+npx zos link openzeppelin-eth@^2.0.2
 ```
 
 Finally we can add our upgradeable token contract to the project:
 
 ```console
-zos add MyUpgradeableToken
+npx zos add MyUpgradeableToken
 ```
 
 Great, our project has been linked to the OpenZeppelin EVM package and our `MyUpgradeableToken` has been added.
@@ -156,7 +153,7 @@ The first thing we have to do is to deploy our contract source code. We will als
 OpenZeppelin EVM package since we will be working on a local environment. To do so, run the following command:
 
 ```console
-zos push -n local --deploy-dependencies
+npx zos push -n local --deploy-dependencies
 ```
 
 _Note that we are using the `--deploy-dependencies` to deploy the OpenZeppelin EVM package locally, since it is not
@@ -170,9 +167,9 @@ instance of an `ERC20Migrator` first, but given it is not yet provided by the Op
 to add it manually. Then, run the following commands:
 replacing `LEGACY_TOKEN_ADDRESS` with the address of the legacy token contract:
 ```console
-zos add ERC20Migrator
-zos push -n local --deploy-dependencies
-zos create ERC20Migrator --args LEGACY_TOKEN_ADDRESS -n local
+npx zos add ERC20Migrator
+npx zos push -n local --deploy-dependencies
+npx zos create ERC20Migrator --args LEGACY_TOKEN_ADDRESS -n local
 ```
 
 Great! We have created a new upgradeable instance using the `ERC20Migrator` contract provided by the OpenZeppelin EVM
@@ -181,7 +178,7 @@ make sure you replace `LEGACY_TOKEN_ADDRESS` with the address of the legacy toke
 with the address of the instance you created above:
 
 ```console
-zos create MyUpgradeableToken --args LEGACY_TOKEN_ADDRESS,ERC20_MIGRATOR_ADDRESS -n local
+npx zos create MyUpgradeableToken --args LEGACY_TOKEN_ADDRESS,ERC20_MIGRATOR_ADDRESS -n local
 ```
 
 Save the upgradeable token address outputted by this command, we will need it later.
