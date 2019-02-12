@@ -66,7 +66,7 @@ function runIntegrationTest({ lightweight }) {
 
   it('installs new version of a dependency', function () {
     copy('package.json.v2', 'package.json')
-    run('npx lerna bootstrap --scope=cli-app-tests-workdir --no-ci > /dev/null')
+    run('npx lerna bootstrap --no-ci > /dev/null')
     run('npx zos link mock-stdlib@1.2.0 --no-install')
   })
 
