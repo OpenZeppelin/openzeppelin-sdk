@@ -22,7 +22,6 @@ function main(argv) {
     const localWebsiteDir = path.resolve(localDocsDir, 'website')
     const localSidebarFile = path.resolve(localWebsiteDir, 'sidebars.json')
     const packagesDir = path.resolve(tmpDir, 'zos', 'packages')
-    const builtDocs = path.resolve(packagesDir, 'docs', 'docs', 'docs')
 
     mkdir(tmpDir)
     cd(tmpDir)
@@ -37,7 +36,6 @@ function main(argv) {
     const { docs } = JSON.parse(readFileSync(localSidebarFile, 'utf8'))
     const updatedSidebar = generateSidebar(docs, cliSections, libSections, vouchSections)
 
-    cp(`${builtDocs}/*.md`, localBuiltDocsDir)
     writeFileSync(localSidebarFile, JSON.stringify(updatedSidebar, null, 2), { encoding:'utf8', flag: 'w' })
 
     cd(localWebsiteDir)
