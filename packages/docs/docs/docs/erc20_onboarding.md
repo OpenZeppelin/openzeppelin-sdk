@@ -64,7 +64,7 @@ Then, run the following commands:
 ```console
 truffle(local)> compile
 truffle(local)> owner = web3.eth.accounts[1]
-truffle(local)> MyLegacyToken.new({ from: owner }).then(i => legacyToken = i)
+truffle(local)> legacyToken = await MyLegacyToken.new({ from: owner })
 truffle(local)> legacyToken.address
 '0x...'
 ```
@@ -217,10 +217,10 @@ or open a new one against the network where your legacy token is deployed. Then,
 commands of the previous step:
 
 ```console
-truffle(local)> ERC20Migrator.at('ERC20_MIGRATOR_ADDRESS').then(i => erc20Migrator = i)
-truffle(local)> MyUpgradeableToken.at('UPGRADEABLE_TOKEN_ADDRESS').then(i => upgradeableToken = i)
+truffle(local)> erc20Migrator = await ERC20Migrator.at('ERC20_MIGRATOR_ADDRESS')
+truffle(local)> upgradeableToken = await MyUpgradeableToken.at('UPGRADEABLE_TOKEN_ADDRESS')
 truffle(local)> erc20Migrator.beginMigration(upgradeableToken.address, { from: owner })
-truffle(local)> legacyToken.balanceOf(owner).then(b => balance = b)
+truffle(local)> balance = await legacyToken.balanceOf(owner)
 truffle(local)> legacyToken.approve(erc20Migrator.address, balance, { from: owner })
 truffle(local)> erc20Migrator.migrateAll(owner, { from: owner })
 ```
