@@ -49,11 +49,9 @@ export default {
   async sendRawTransaction(contractAddress: string, data: string, txParams: any = {}, retries: number = RETRY_COUNT): Promise<any> {
     await this._fixGasPrice(txParams);
     try {
-      if (!txParams.from) txParams.from = await ZWeb3.defaultAccount();
-      if (!txParams.gas) {
-        txParams.gas = Contracts.getArtifactsDefaults().gas || await this.estimateActualGas({ to: contractAddress, data });
-      }
-      return ZWeb3.eth().sendTransaction({ to: contractAddress, data, ...txParams });
+      const from = await ZWeb3.defaultAccount();
+      const gas = txParams.gas || Contracts.getArtifactsDefaults().gas || await this.estimateActualGas({ to: contractAddress, data });
+      return ZWeb3.eth().sendTransaction({ to: contractAddress, data, from, ...txParams, gas });
     } catch(error) {
       if (!error.message.match(/nonce too low/) || retries <= 0) throw error;
       return this.sendRawTransaction(contractAddress, data, txParams, retries - 1);
@@ -61,7 +59,8 @@ export default {
   },
 
   /**
-   * Wraps the _sendTransaction function and manages transaction retries.
+   * Sends a transaction to the blockchain, estimating the gas to be used.
+   * Uses the node's estimateGas RPC call, and adds a 20% buffer on top of it, capped by the block gas limit.
    * @param contractFn contract function to be executed as the transaction
    * @param args arguments of the call (if any)
    * @param txParams other transaction parameters (from, gasPrice, etc)
@@ -71,7 +70,8 @@ export default {
     await this._fixGasPrice(txParams);
 
     try {
-      return await this._sendTransaction(contractFn, args, txParams);
+      const gas = txParams.gas || Contracts.getArtifactsDefaults().gas || await this.estimateActualGasFnCall(contractFn, args, txParams);
+      return contractFn(...args).send({ ...txParams, gas });
     } catch (error) {
       if (!error.message.match(/nonce too low/) || retries <= 0) throw error;
       return this.sendTransaction(contractFn, args, txParams, retries - 1);
@@ -79,7 +79,8 @@ export default {
   },
 
   /**
-   * Wraps the _deploy and manages deploy retries.
+   * Deploys a contract to the blockchain, estimating the gas to be used.
+   * Uses the node's estimateGas RPC call, and adds a 20% buffer on top of it, capped by the block gas limit.
    * @param contract truffle contract to be deployed
    * @param args arguments of the constructor (if any)
    * @param txParams other transaction parameters (from, gasPrice, etc)
@@ -89,7 +90,8 @@ export default {
     await this._fixGasPrice(txParams);
 
     try {
-      return await this._deployContract(contract, args, txParams);
+      const gas = txParams.gas || Contracts.getArtifactsDefaults().gas || await this.estimateActualGas({ data: buildDeploymentCallData(contract, args), ...txParams });
+      return contract.new(args, { ...txParams, gas });
     } catch (error) {
       if (!error.message.match(/nonce too low/) || retries <= 0) throw error;
       return this.deployContract(contract, args, txParams, retries - 1);
@@ -97,7 +99,8 @@ export default {
   },
 
   /**
-   * Wraps the _sendDataTransaction function and manages transaction retries.
+   * Sends a transaction to the blockchain with data precalculated, estimating the gas to be used.
+   * Uses the node's estimateGas RPC call, and adds a 20% buffer on top of it, capped by the block gas limit.
    * @param contract contract instance to send the tx to
    * @param txParams all transaction parameters (data, from, gasPrice, etc)
    * @param retries number of data transaction retries
@@ -106,7 +109,8 @@ export default {
     await this._fixGasPrice(txParams);
 
     try {
-      return await this._sendDataTransaction(contract, txParams);
+      const gas = txParams.gas || Contracts.getArtifactsDefaults().gas || await this.estimateActualGas({ to: contract.address, ...txParams });
+      return this._sendContractDataTransaction(contract, { ...txParams, gas });
     } catch (error) {
       const msg = typeof error === 'string' ? error : error.message;
       if (!msg.match(/nonce too low/) || retries <= 0) throw error;
@@ -165,65 +169,11 @@ export default {
     }
   },
 
-  /**
-   * Sends a transaction to the blockchain, estimating the gas to be used.
-   * Uses the node's estimateGas RPC call, and adds a 20% buffer on top of it, capped by the block gas limit.
-   * @param contractFn contract function to be executed as the transaction
-   * @param args arguments of the call (if any)
-   * @param txParams other transaction parameters (from, gasPrice, etc)
-   */
-  async _sendTransaction(contractFn: GenericFunction, args: any[] = [], txParams: any = {}): Promise<TransactionReceipt> {
-    // If gas is set explicitly, use it
-    const defaultGas = Contracts.getArtifactsDefaults().gas;
-    if (!txParams.gas && defaultGas) txParams.gas = defaultGas;
-    if (txParams.gas) return contractFn(...args).send({ ...txParams });
-
-    // Estimate gas for the call
-    const gas = await this.estimateActualGasFnCall(contractFn, args, txParams);
-
-    return contractFn(...args).send({ gas, ...txParams });
-  },
-
-  /**
-   * Sends a transaction to the blockchain with data precalculated, estimating the gas to be used.
-   * Uses the node's estimateGas RPC call, and adds a 20% buffer on top of it, capped by the block gas limit.
-   * @param contract contract instance to send the tx to
-   * @param txParams all transaction parameters (data, from, gasPrice, etc)
-   */
-  async _sendDataTransaction(contract: Contract, txParams: any = {}): Promise<TransactionReceipt> {
-    // If gas is set explicitly, use it
-    const defaultGas = Contracts.getArtifactsDefaults().gas;
-    if (!txParams.gas && defaultGas) txParams.gas = defaultGas;
-    if (txParams.gas) return this._sendContractDataTransaction(contract, txParams);
-
-    // Estimate gas for the call and run the tx
-    const gas = await this.estimateActualGas({ to: contract.address, ...txParams });
-    return this._sendContractDataTransaction(contract, { gas, ...txParams });
-  },
-
   async _sendContractDataTransaction(contract: Contract, txParams: any): Promise<TransactionReceipt> {
     const defaults = await Contracts.getDefaultTxParams();
     const tx = { to: contract.address, ...defaults, ...txParams };
     const txHash = await ZWeb3.sendTransactionWithoutReceipt(tx);
     return await ZWeb3.getTransactionReceiptWithTimeout(txHash, Contracts.getSyncTimeout());
-  },
-
-  /**
-   * Deploys a contract to the blockchain, estimating the gas to be used.
-   * Uses the node's estimateGas RPC call, and adds a 20% buffer on top of it, capped by the block gas limit.
-   * @param contract truffle contract to be deployed
-   * @param args arguments of the constructor (if any)
-   * @param txParams other transaction parameters (from, gasPrice, etc)
-   */
-  async _deployContract(contract: Contract, args: any[] = [], txParams: any = {}): Promise<Contract> {
-    // If gas is set explicitly, use it
-    const defaultGas = Contracts.getArtifactsDefaults().gas;
-    if (!txParams.gas && defaultGas) txParams.gas = defaultGas;
-    if (txParams.gas) return contract.new(args, txParams);
-
-    const data = buildDeploymentCallData(contract, args, txParams);
-    const gas = await this.estimateActualGas({ data, ...txParams });
-    return contract.new(args, { gas, ...txParams });
   },
 
   async _getETHGasStationPrice(): Promise<any | never> {

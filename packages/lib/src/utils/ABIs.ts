@@ -19,10 +19,10 @@ interface FunctionInfo {
   inputs: InputInfo[];
 }
 
-export function buildDeploymentCallData(contract: Contract, args: any[], txParams: any): string {
-  if(contract.schema.linkedBytecode === '') throw new Error(`A bytecode must be provided for contract ${contract.schema.contractName}`);
-  if(hasUnlinkedVariables(contract.schema.linkedBytecode)) throw new Error(`${contract.schema.contractName} bytecode contains unlinked libraries: ${getSolidityLibNames(contract.schema.linkedBytecode).join(', ')}`);
-  return ZWeb3.contract(contract.schema.abi).deploy({data: contract.schema.linkedBytecode, arguments: args}).encodeABI();
+export function buildDeploymentCallData(contract: Contract, args: any[]): string {
+  if (contract.schema.linkedBytecode === '') throw new Error(`A bytecode must be provided for contract ${contract.schema.contractName}`);
+  if (hasUnlinkedVariables(contract.schema.linkedBytecode)) throw new Error(`${contract.schema.contractName} bytecode contains unlinked libraries: ${getSolidityLibNames(contract.schema.linkedBytecode).join(', ')}`);
+  return ZWeb3.contract(contract.schema.abi).deploy({ data: contract.schema.linkedBytecode, arguments: args }).encodeABI();
 }
 
 export function buildCallData(contract: Contract, methodName: string, args: any[]): CalldataInfo {
