@@ -6,7 +6,7 @@
   "private": true,
   "license": "MIT",
   "scripts": {
-    "gen-docs": "node scripts/gen-docs.js",
+    "gen-docs": "babel-node scripts/gen-docs.js",
     "bump-docs": "babel-node scripts/bump-docs.js",
     "rebuild-docs": "cd docs/website && npm run build",
     "start": "cd docs/website && npm start"

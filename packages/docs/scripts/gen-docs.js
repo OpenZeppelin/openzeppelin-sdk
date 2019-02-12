@@ -1,4 +1,4 @@
-const handleErrorCode = require('./util').handleErrorCode
+const handleCommandOutput = require('./util').handleCommandOutput
 const path = require('path')
 const shell = require('shelljs')
 const tmp = require('tmp')
@@ -10,13 +10,13 @@ function main(argv) {
   try {
     shell.mkdir('-p', 'docs')
     shell.pushd('-q', 'docs')
-    handleErrorCode(shell.exec('npm init -y'))
-    handleErrorCode(shell.exec('npm install docusaurus-init'))
-    handleErrorCode(shell.exec('docusaurus-init'))
+    handleCommandOutput(shell.exec('npm init -y'))
+    handleCommandOutput(shell.exec('npm install docusaurus-init'))
+    handleCommandOutput(shell.exec('docusaurus-init'))
     shell.mv('docs-examples-from-docusaurus/', 'docs')
     shell.mv('website/blog-examples-from-docusaurus/', 'website/blog')
     shell.pushd('-q', 'website')
-    handleErrorCode(shell.exec('npm run examples versions'))
+    handleCommandOutput(shell.exec('npm run examples versions'))
     shell.popd('-q')
     shell.popd('-q')
   }

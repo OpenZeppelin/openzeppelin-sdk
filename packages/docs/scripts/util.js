@@ -26,7 +26,7 @@ export function rm(filename, options) {
   }
 }
 
-function handleCommandOutput(commandOutput) {
+export function handleCommandOutput(commandOutput) {
   if (commandOutput.code !== 0) {
     throw Error( `Command line operation failed with code ${commandOutput.code}. Standard error output: ${commandOutput.stderr}`)
   }
