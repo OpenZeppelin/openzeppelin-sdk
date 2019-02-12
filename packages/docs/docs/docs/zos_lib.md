@@ -36,10 +36,8 @@ guide you can just press enter to accept the default values of each field.
 Next, we need to install Truffle. To do so, run the following command:
 
 ```console
-npm install truffle@4.1.15
+npm install truffle
 ```
-
-> Note: We are specifically installing Truffle 4.1.15, because ZeppelinOS 2.1 only supports that version of Truffle for its programmatic interface. Support for Truffle 5 is to be released in ZeppelinOS 2.2.
 
 We'll be using [ganache](https://truffleframework.com/docs/ganache/quickstart) for local deployment, so let's install it:
 

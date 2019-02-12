@@ -59,10 +59,8 @@ a `truffle-config.js` file (created by the `zos` CLI for Truffle), and a
 Next, we need to install Truffle. To do so, run the following command:
 
 ```console
-npm install truffle@4.1.15 --save
+npm install truffle
 ```
-
-> Note: We are specifically installing Truffle 4.1.15, as ZeppelinOS 2.1 only supports Truffle 5 for command-line usage (not programmatic usage). Full support for Truffle 5 and Web3 1.0 will be released in ZeppelinOS 2.2._
 
 That's it! Our project is now fully set up for using ZeppelinOS.
 
