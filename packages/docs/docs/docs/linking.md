@@ -27,7 +27,7 @@ contract MyLinkedContract {
   ERC721Mintable private _token;
 
   function setToken(ERC721Mintable token) external {
-    require(token != address(0));
+    require(address(token) != address(0));
     _token = token;
   }
 }
@@ -42,10 +42,8 @@ For more information, see
 Now, let's link our project to the openzeppelin-eth package by running:
 
 ```console
-npx zos link openzeppelin-eth@2.0.2
+npx zos link openzeppelin-eth
 ```
-
-> Note: We are specifically installing openzeppelin-eth 2.0.2 because later versions of openzeppelin-eth use Solidity 0.5, and in this example we are using Solidity 0.4.
 
 This command will install the openzeppelin-eth contracts locally, which is
 needed to compile the contracts that import it; but it will also update the
