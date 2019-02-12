@@ -2,19 +2,22 @@
 
 import path from 'path'
 import { readFileSync, writeFileSync } from 'fs'
+import semver from 'semver';
 
 import { genLibDocs, genVouchDocs, genCliDocs, cleanupSidebar, generateSidebar } from './generators'
 import { exec, cd, cp, rm, mkdir } from './util'
 
 function main(argv) {
-  if(argv.length !== 3) {
-    console.error('Missing ZeppelinOS repository tag. Usage: npm run bump-docs -- <tag>')
+  if(argv.length !== 3 && argv.length !== 4) {
+    console.error('Invalid bump script parameters. Usage: npm run bump-docs <version> or npm run bump-docs <version> <branch>, for example: npm run bump-docs 2.2.0 docs/update_docs or just npm run bump-docs 2.2.0')
     process.exit(1)
   }
 
-  const tag = argv[2]
-  const version = tag.slice(1)
   const tmpDir = path.resolve(__dirname, '../tmp')
+  const version = argv[2]
+  if(!semver.valid(version)) throw new Error(`Invalid version ${version}. Please provide a valid semantic version, e.g., 2.1.2`);
+  let branch;
+  if (argv[3]) branch = argv[3]
 
   try {
     const localDocsDir = path.resolve(__dirname, '../', 'docs')
@@ -28,7 +31,8 @@ function main(argv) {
     cd(tmpDir)
     exec('git clone https://github.com/zeppelinos/zos.git')
     cd('zos')
-    exec(`git checkout -b ${tag} ${tag}`)
+    
+    branch ? exec(`git checkout ${branch}`) : exec(`git checkout -b v${version} v${version}`)
 
     cleanupSidebar(packagesDir)
     const cliSections = genCliDocs(packagesDir)

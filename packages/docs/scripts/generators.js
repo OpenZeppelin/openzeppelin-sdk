@@ -1,6 +1,5 @@
 'use strict'
 
-
 import { readFileSync } from 'fs'
 import path from 'path'
 
@@ -22,7 +21,6 @@ export function cleanupSidebar(packagesDir) {
   const sidebar = path.resolve(packagesDir, 'docs', 'docs', 'website', 'sidebars.json')
   exec(`echo "{}" > ${sidebar}`)
 }
-
 
 export function genCliDocs(packagesDir) {
   const cliDir = path.resolve(packagesDir, 'cli')
