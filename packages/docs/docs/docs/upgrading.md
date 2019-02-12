@@ -8,7 +8,7 @@ project with one contract. Here is the code of the contract, to keep it fresh
 on our minds:
 
 ```solidity
-pragma solidity ^0.4.24;
+pragma solidity ^0.5.0;
 
 import "zos-lib/contracts/Initializable.sol";
 
@@ -94,7 +94,7 @@ extend its functionalities.
 Open `contracts/MyContract.sol`, and add a new function:
 
 ```solidity
-pragma solidity ^0.4.24;
+pragma solidity ^0.5.0;
 
 import "zos-lib/contracts/Initializable.sol";
 
@@ -197,7 +197,7 @@ This initialization validation for `t`, of course, would only make sense if `t` 
 The resulting code would be:
 
 ```solidity
-pragma solidity ^0.4.24;
+pragma solidity ^0.5.0;
 
 import "zos-lib/contracts/Initializable.sol";
 

@@ -19,7 +19,7 @@ let's make it import a very common
 contract from the [OpenZeppelin](https://openzeppelin.org/) EVM package:
 
 ```solidity
-pragma solidity ^0.4.24;
+pragma solidity ^0.5.0;
 
 import "openzeppelin-eth/contracts/token/ERC721/ERC721Mintable.sol";
 
