@@ -6,8 +6,9 @@
   "private": false,
   "license": "MIT",
   "scripts": {
+    "copy-files": "./scripts/copy-files.sh",
     "compile-ts": "rm -rf lib && tsc",
-    "prepare": "npm run compile-ts && chmod 755 ./lib/bin/zos-cli.js",
+    "prepare": "npm run compile-ts && npm run copy-files && chmod 755 ./lib/bin/zos-cli.js",
     "test": "./scripts/test.sh",
     "gen-docs": "babel-node docs/bin/docs.js",
     "watch": "tsc -w",
