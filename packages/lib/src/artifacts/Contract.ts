@@ -1,11 +1,8 @@
-import BN from 'bignumber.js';
 import ZWeb3 from './ZWeb3';
-import { getSolidityLibNames, hasUnlinkedVariables } from '../utils/Bytecode';
-import { Contract as Web3Contract, TransactionObject, BlockType } from 'web3-eth-contract';
-import { Callback, EventLog, EventEmitter, TransactionReceipt } from 'web3/types';
 import Contracts from './Contracts';
 import { StorageLayoutInfo } from '../validations/Storage';
-import _ from 'lodash';
+import { Callback, EventLog, EventEmitter, TransactionReceipt } from 'web3/types';
+import { Contract as Web3Contract, TransactionObject, BlockType } from 'web3-eth-contract';
 
 /*
  * ZosContract is an interface that extends Web3's Contract interface, adding some properties and methods like:
@@ -67,7 +64,7 @@ function _wrapContractInstance(schema: any, instance: Web3Contract): Contract {
     if(!schema.linkedBytecode) throw new Error(`${schema.contractName} bytecode contains unlinked libraries.`);
     instance.options = { ...instance.options, ...(await Contracts.getDefaultTxParams()) };
     return new Promise((resolve, reject) => {
-      const tx = instance.deploy({data: schema.linkedBytecode, arguments: args});
+      const tx = instance.deploy({ data: schema.linkedBytecode, arguments: args });
       let transactionReceipt, transactionHash;
       tx.send({ ...options })
         .on('error', (error) => reject(error))
