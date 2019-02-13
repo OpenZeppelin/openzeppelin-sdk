@@ -3,13 +3,15 @@ id: architecture
 title: Contracts Architecture
 ---
 
-ZeppelinOS's features such as upgrades, EVM package linking, and vouching, can all be used through the `zos` CLI without extra contracts. However, some additional smart contracts get into play when you want to publish your EVM package for others to reuse, calling:
+ZeppelinOS's features such as upgrades, EVM package linking, and vouching, can all be used through the `zos` CLI with only one extra contract; The [ProxyAdmin](https://github.com/zeppelinos/zos/blob/v2.0.0/packages/lib/contracts/upgradeability/ProxyAdmin.sol) contract. ZeppelinOS uses this contract in order to avoid confusion around the [transparent proxy pattern](https://docs.zeppelinos.org/docs/pattern.html#transparent-proxies-and-function-clashes). This contract acts as a central admin for all proxies on your behalf, making their management as simple as possible, while retaining the highest safety standards. 
+
+However, some additional smart contracts come into play when you want to publish your EVM package for others to reuse. Publishing is achieved by calling the command:
 
 ```console
 zos publish
 ```
 
-When publishing, your ZeppelinOS project will be backed by a set of smart contracts whose source can be found in [zos/packages/lib/contracts/application](https://github.com/zeppelinos/zos/tree/master/packages/lib/contracts/application). In the following sections, we describe the general architecture of a ZeppelinOS published EVM package.
+The source code of the contracts involved with a published EVM package can be found in [zos/packages/lib/contracts/application](https://github.com/zeppelinos/zos/tree/master/packages/lib/contracts/application). In the following sections, we describe the general architecture of a ZeppelinOS published EVM package.
 
 ## [App.sol](https://github.com/zeppelinos/zos/blob/v2.0.0/packages/lib/contracts/application/App.sol)
 
