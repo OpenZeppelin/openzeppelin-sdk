@@ -4,9 +4,68 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## Next
+
+### Added
+- Contributing guidelines ([#553](https://github.com/zeppelinos/zos/pull/553))
+- **New `ProxyAdmin` contract to manage proxy instances** ([#588](https://github.com/zeppelinos/zos/pull/588) and [#625](https://github.com/zeppelinos/zos/pull/625)) (see [audit report](https://medium.com/nomic-labs-blog/zeppelinos-audit-report-iii-602714cb92d4))
+- Linter pre-commit githook ([#620](https://github.com/zeppelinos/zos/pull/620))
+
+### Changed
+- **Update Web3 to version `1.0.0-beta.37`** ([#572](https://github.com/zeppelinos/zos/pull/572))
+- Use web3 compatible contract classes ([#595](https://github.com/zeppelinos/zos/pull/595))
+- Migrate `lib` codebase to TypeScript ([#443](https://github.com/zeppelinos/zos/pull/443), [#492](https://github.com/zeppelinos/zos/pull/492), [#493](https://github.com/zeppelinos/zos/pull/493), [#491](https://github.com/zeppelinos/zos/pull/491), [#500](https://github.com/zeppelinos/zos/pull/500), and [#509](https://github.com/zeppelinos/zos/pull/509))
+- Add `lodash` functions separately ([#555](https://github.com/zeppelinos/zos/pull/555)) (thanks @slorenzo!)
+- Update `truffle-flattener` to version `1.2.12` ([#631](https://github.com/zeppelinos/zos/pull/631))
+
+### Fixed
+- Gas estimation issues on geth ([#614](https://github.com/zeppelinos/zos/pull/614))
+- Use gas defaults when present ([#575](https://github.com/zeppelinos/zos/pull/575))
+- Bytecode comparison in `SimpleProject` ([#580](https://github.com/zeppelinos/zos/pull/580))
+- Avoid changing tx params object for every transaction ([#675](https://github.com/zeppelinos/zos/pull/675))
+
+### Removed
+- `truffle-contracts` from codebase ([#451](https://github.com/zeppelinos/zos/pull/451))
+- `truffle-resolver` from CLI and honor `from` in config ([#612](https://github.com/zeppelinos/zos/pull/612))
+
+## v2.1.2 - 2019-02-01
+
+### Fixed
+- Use patched versions of `web3@0.18` ([#9571fd4](https://github.com/zeppelinos/zos/commit/9571fd425647c093ee856784acab0055c7556992))
+- Use patched versions of `ethereumjs-abi@0.6` ([#9571fd4](https://github.com/zeppelinos/zos/commit/9571fd425647c093ee856784acab0055c7556992))
+- Use pinned version `1.2.8` of `truffle-flattener` ([#9571fd4](https://github.com/zeppelinos/zos/commit/9571fd425647c093ee856784acab0055c7556992))
+
+## v2.1.1 - 2019-01-31
+
+### Fixed
+- Storage layout check fixes ([#606](https://github.com/zeppelinos/zos/pull/606))
+
+## v2.1.0 - 2019-01-10
+
+### Added
+- Extend [`Initializable`](https://github.com/zeppelinos/zos/blob/v2.1.0-rc.0/packages/lib/contracts/Initializable.sol) pragma to allow solidity 0.5 ([912bf2d](https://github.com/zeppelinos/zos/commit/912bf2dabb571716c40bb86e429153bda6ef3ad8))
+- Gas price estimations on mainnet with ETH Gas Station ([#299](https://github.com/zeppelinos/zos/pull/299)) (thanks @zachzundel!)
+
+### Changed
+- Use contract method `estimateGas` function to estimate contract functions calls ([#310](https://github.com/zeppelinos/zos/pull/310))
+- Delete mock contracts when publishing package ([#293](https://github.com/zeppelinos/zos/pull/293))
+
+### Fixed
+- Fix `encodeCall` address handling ([#569](https://github.com/zeppelinos/zos/pull/569))
+- Fix ETH Gas Station integration request ([8515895](https://github.com/zeppelinos/zos/commit/8515895ed253409c5d782e8b7e17ab1a96126d0e))
+
+## v2.0.2 - 2018-12-19
+
+### Added
+- `truffle-provider` dependency to make sure we rely on `web3@^0.x` ([38867fd](https://github.com/zeppelinos/zos/commit/38867fdd0e18c6d4bf869c11a1c94f796c8185e0))
+
+### Fixed
+- Pin truffle dependencies versions ([38867fd](https://github.com/zeppelinos/zos/commit/38867fdd0e18c6d4bf869c11a1c94f796c8185e0))
+- Promise resolution in `runWithTruffle` function ([6e4258c](https://github.com/zeppelinos/zos/commit/6e4258c5378afb643454154fd2cf22f93a4d0020))
+
 ## v2.0.1 - 2018-10-26
 
-### Changes
+### Changed
 
 - Skip gas price checks if working on a local ganache instance ([#359](https://github.com/zeppelinos/zos/issues/359)).
 
