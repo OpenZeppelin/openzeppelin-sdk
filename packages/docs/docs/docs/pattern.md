@@ -170,18 +170,14 @@ Assuming a proxy with an `owner()` and an `upgradeTo()` function, that delegates
 | Owner         | returns proxy.owner() | returns proxy.upgradeTo() | fails |
 | Other         | returns erc20.owner() | fails | returns erc20.transfer() |
 
-
-While this is the safest approach, it may lead to some confusing situations. For instance, if you create a proxy from the default account in your node, and then try to interact with it, you'll get a nasty `revert` error. An easy way to avoid this problem is to configure a `zos session` using a `from` address different to the default one in your node.
-
-Another way around this situation is by `publish`ing your project. This will create an `App` contract that will act as the owner of all your proxies, letting you interact directly with them from any account without issues.
+Fortunately, the ZeppelinOS cli accounts for this situation, and creates an intermediary ProxyAdmin contract that is in charge of all the proxies you create via the cli. Even if you call the `create` command from your node's default account, or using the `from` address specified when you started your `zos session`, the ProxyAdmin contract will be the actual admin of all your proxies. This means that you will be able to interact with the proxies from any of your node's accounts, without having to worry about the nuances of the transparent proxy pattern. Only advanced users of ZeppelinOS that use it programmatically via `zos-lib` need to be aware of the transparent proxies pattern.
 
 ## Summary
 
-Any developer using ZeppelinOS should be familiar with proxies in the ways that are described in this article. In the end, the concept is very simple, and ZeppelinOS is designed to encapsulate all the proxy mechanics in a way that the amount of things you need to keep in mind when developing projects are reduced to an absolute minimum. It all comes down to a 4 item list:
+Any developer using ZeppelinOS should be familiar with proxies in the ways that are described in this article. In the end, the concept is very simple, and ZeppelinOS is designed to encapsulate all the proxy mechanics in a way that the amount of things you need to keep in mind when developing projects are reduced to an absolute minimum. It all comes down to the following list:
 
 * Have a basic understanding of what a proxy is
 * Always extend storage instead of modifying it
 * Make sure your contracts use initializer functions instead of constructors
-* Do not interact with a proxy from the same address that created it (except for upgrading it)
 
 Furthermore, ZeppelinOS will let you know when something goes wrong with one of the items in this list.
