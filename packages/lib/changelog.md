@@ -16,7 +16,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Use web3 compatible contract classes ([#595](https://github.com/zeppelinos/zos/pull/595))
 - Migrate `lib` codebase to TypeScript ([#443](https://github.com/zeppelinos/zos/pull/443), [#492](https://github.com/zeppelinos/zos/pull/492), [#493](https://github.com/zeppelinos/zos/pull/493), [#491](https://github.com/zeppelinos/zos/pull/491), [#500](https://github.com/zeppelinos/zos/pull/500), and [#509](https://github.com/zeppelinos/zos/pull/509))
 - Add `lodash` functions separately ([#555](https://github.com/zeppelinos/zos/pull/555)) (thanks @slorenzo!)
-- Update `truffle-flattener` to version `1.2.12` ([#631](https://github.com/zeppelinos/zos/pull/631))
+- Upgrade `truffle-flattener` to version `1.3.0` ([#682](https://github.com/zeppelinos/zos/pull/682))
 
 ### Fixed
 - Gas estimation issues on geth ([#614](https://github.com/zeppelinos/zos/pull/614))
