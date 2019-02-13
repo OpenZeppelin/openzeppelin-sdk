@@ -4,7 +4,7 @@ import path from 'path'
 import { readFileSync, writeFileSync } from 'fs'
 import semver from 'semver';
 
-import { genLibDocs, genVouchDocs, genCliDocs, cleanupSidebar, generateSidebar } from './generators'
+import { genLibDocs, genCliDocs, cleanupSidebar, generateSidebar } from './generators'
 import { exec, cd, cp, rm, mkdir } from './util'
 
 function main(argv) {
@@ -37,9 +37,8 @@ function main(argv) {
     cleanupSidebar(packagesDir)
     const cliSections = genCliDocs(packagesDir)
     const libSections = genLibDocs(packagesDir)
-    const vouchSections = genVouchDocs(packagesDir)
     const { docs } = JSON.parse(readFileSync(localSidebarFile, 'utf8'))
-    const updatedSidebar = generateSidebar(docs, cliSections, libSections, vouchSections)
+    const updatedSidebar = generateSidebar(docs, cliSections, libSections)
 
     cp(`${builtDocs}/*.md`, localBuiltDocsDir)
     writeFileSync(localSidebarFile, JSON.stringify(updatedSidebar, null, 2), { encoding:'utf8', flag: 'w' })
