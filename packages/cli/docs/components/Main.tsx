@@ -1,4 +1,4 @@
-import React from 'react'
+import React from 'react';
 import { Usage, Options } from './Shared';
 
 export default function Main({ program }) {
@@ -13,5 +13,5 @@ export default function Main({ program }) {
 }
 
 function Commands({ commands }) {
-  return null;  
+  return null;
 }

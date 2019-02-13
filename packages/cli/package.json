@@ -10,7 +10,7 @@
     "compile-ts": "rm -rf lib && tsc",
     "prepare": "npm run compile-ts && npm run copy-files && chmod 755 ./lib/bin/zos-cli.js",
     "test": "./scripts/test.sh",
-    "gen-docs": "babel-node docs/bin/docs.js",
+    "gen-docs": "./scripts/gen-docs.sh",
     "watch": "tsc -w",
     "lint": "tslint --project tsconfig.json --config ../../tslint.json",
     "lintfix": "tslint --project tsconfig.json --config ../../tslint.json --fix"
@@ -82,6 +82,8 @@
     "@types/lodash": "^4.14.119",
     "@types/mocha": "^5.2.5",
     "@types/node": "^10.12.12",
+    "@types/react": "^16.8.2",
+    "@types/react-dom": "^16.8.0",
     "chai": "^4.1.2",
     "chai-as-promised": "^7.1.1",
     "chai-bignumber": "^2.0.2",
