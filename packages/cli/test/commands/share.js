@@ -22,7 +22,7 @@ import * as setAdmin from '../../src/scripts/set-admin';
 
 import program from '../../src/bin/program';
 import Session from '../../src/models/network/Session';
-import ZosPackageFile from '../../src/models/files/ZosPackageFile';
+import ZosNetworkFile from '../../src/models/files/ZosNetworkFile';
 import Compiler from '../../src/models/compiler/Compiler';
 import ErrorHandler from '../../src/models/errors/ErrorHandler';
 import ConfigVariablesInitializer from '../../src/models/initializer/ConfigVariablesInitializer';
@@ -72,7 +72,7 @@ exports.stubCommands = function () {
       const txParams = from ? { from } : {}
       return { network, txParams }
     })
-    this.getZosversion = sinon.stub(ZosPackageFile, 'getZosversion').returns('2.2');
+    this.getZosversion = sinon.stub(ZosNetworkFile, 'getZosversion').returns('2.2');
   })
 
   afterEach('restore', function () {
