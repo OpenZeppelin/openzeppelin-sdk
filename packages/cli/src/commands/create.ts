@@ -5,7 +5,7 @@ import { parseInit } from '../utils/input';
 import { fromContractFullName } from '../utils/naming';
 import { hasToMigrateProject } from '../utils/prompt-migration';
 import ConfigVariablesInitializer from '../models/initializer/ConfigVariablesInitializer';
-import ZosPackageFile from '../models/files/ZosPackageFile';
+import ZosNetworkFile from '../models/files/ZosNetworkFile';
 
 const name: string = 'create';
 const signature: string = `${name} <alias>`;
@@ -22,12 +22,13 @@ const register: (program: any) => any = (program) => program
   .action(action);
 
 async function action(contractFullName: string, options: any): Promise<void> {
-  const zosversion = await ZosPackageFile.getZosversion();
-  if (!await hasToMigrateProject(zosversion)) return;
+  const { network, txParams } = await ConfigVariablesInitializer.initNetworkConfiguration(options);
+  const zosversion = await ZosNetworkFile.getZosversion(network);
+  if (!await hasToMigrateProject(zosversion)) process.exit(0);
+
   const { force } = options;
   const { initMethod, initArgs } = parseInit(options, 'initialize');
   const { contract: contractAlias, package: packageName } = fromContractFullName(contractFullName);
-  const { network, txParams } = await ConfigVariablesInitializer.initNetworkConfiguration(options);
   const args = pickBy({ packageName, contractAlias, initMethod, initArgs, force });
 
   await create({ ...args, network, txParams });
