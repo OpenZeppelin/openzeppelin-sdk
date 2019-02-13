@@ -17,7 +17,7 @@ const register: (program: any) => any = (program) => program
 async function action(options: any): Promise<void> {
   const { network, txParams } = await ConfigVariablesInitializer.initNetworkConfiguration(options);
   const zosversion = await ZosNetworkFile.getZosversion(`zos.${network}.json`);
-  if (!await hasToMigrateProject(zosversion)) return;
+  if (!await hasToMigrateProject(zosversion)) process.exit(0);
 
   await publish({ network, txParams });
   if (!options.dontExitProcess && process.env.NODE_ENV !== 'test') process.exit(0);
