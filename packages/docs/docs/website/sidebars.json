@@ -5,6 +5,7 @@
       "new_2"
     ],
     "QUICKSTART": [
+      "zepkit",
       "deploying",
       "upgrading",
       "linking",

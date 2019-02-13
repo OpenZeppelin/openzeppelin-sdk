@@ -51,6 +51,7 @@
     "zos": "zos",
     "configuration": "Configuration Files",
     "deploying": "Deploying your first project",
+    "zepkit": "Creating your first DApp",
     "erc20_onboarding": "Onboarding ERC20 tokens",
     "linking": "Linking to EVM packages",
     "mainnet": "Deploying to mainnet",
