@@ -72,8 +72,8 @@ export default class ZosNetworkFile {
     dependencies: { [dependencyName: string]: DependencyInterface };
   };
 
-  public static getZosversion(fileName: string): string | null {
-    const file = fs.parseJsonIfExists(fileName);
+  public static getZosversion(network: string): string | null {
+    const file = fs.parseJsonIfExists(`zos.${network}.json`);
     return file.zosversion || null;
   }
 

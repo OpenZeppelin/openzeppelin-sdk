@@ -24,7 +24,7 @@ const register: (program: any) => any = (program) => program
 
 async function action(contractFullNameOrAddress: string, options: any): Promise<void> {
   const { network, txParams } = await ConfigVariablesInitializer.initNetworkConfiguration(options);
-  const zosversion = await ZosNetworkFile.getZosversion(`zos.${network}.json`);
+  const zosversion = await ZosNetworkFile.getZosversion(network);
   if (!await hasToMigrateProject(zosversion)) process.exit(0);
 
   const { initMethod, initArgs } = parseInit(options, 'initialize');
