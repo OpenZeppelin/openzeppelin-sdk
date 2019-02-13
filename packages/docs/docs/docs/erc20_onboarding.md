@@ -31,7 +31,7 @@ The central idea of this proposal is to deploy an upgradeable version of your to
 tool. Additionally, we will use the [`ERC20Migrator`](https://github.com/OpenZeppelin/openzeppelin-eth/blob/v2.0.0/contracts/drafts/ERC20Migrator.sol)
 contract provided by `openzeppelin-eth`, the [OpenZeppelin EVM package for ZeppelinOS](https://github.com/OpenZeppelin/openzeppelin-eth/).
 
-To better describe this plan we will use a sample project you can follow and clone from [here](https://github.com/zeppelinos/erc20-onboarding).
+To better describe this plan we will use a sample project you can follow and clone from [here](https://github.com/zeppelinos/erc20-onboarding/tree/zos-2.1).
 
 We will now setup a local environment to demo the onboarding plan. To do this, we will deploy a sample legacy token
 contract and mint some balances. If you wish to work with your already deployed token, you can skip the following lines
