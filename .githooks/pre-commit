@@ -1,2 +1,0 @@
-#!/bin/sh
-lerna run lint
