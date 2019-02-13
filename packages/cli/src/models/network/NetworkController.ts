@@ -701,19 +701,20 @@ export default class NetworkController {
   // DependencyController
   public async linkDependency(depName: string, depVersion: string): Promise<boolean | void | never> {
     try {
-      if (this.networkFile.dependencyHasMatchingCustomDeploy(depName)) {
-        log.info(`Using custom deployment of ${depName}`);
-        const depInfo = this.networkFile.getDependency(depName);
-        return await this.project.setDependency(depName, depInfo.package, depInfo.version);
-      }
-
       if (!this.networkFile.dependencySatisfiesVersionRequirement(depName)) {
-        const dependencyInfo = (new Dependency(depName, depVersion)).getNetworkFile(this.network);
-        if (!dependencyInfo.packageAddress) throw Error(`Dependency '${depName}' has not been published to network '${this.network}', so it cannot be linked. Hint: you can create a custom deployment of all unpublished dependencies by running 'zos push' with the '--deploy-dependencies' option.`);
-        log.info(`Connecting to dependency ${depName} ${dependencyInfo.version}`);
-        await this.project.setDependency(depName, dependencyInfo.packageAddress, dependencyInfo.version);
-        const depInfo = { package: dependencyInfo.packageAddress, version: dependencyInfo.version };
-        this.networkFile.setDependency(depName, depInfo);
+        if (this.networkFile.dependencyHasMatchingCustomDeploy(depName)) {
+          log.info(`Using custom deployment of ${depName}`);
+          const depInfo = this.networkFile.getDependency(depName);
+          return await this.project.setDependency(depName, depInfo.package, depInfo.version);
+        }
+        else {
+          const dependencyInfo = (new Dependency(depName, depVersion)).getNetworkFile(this.network);
+          if (!dependencyInfo.packageAddress) throw Error(`Dependency '${depName}' has not been published to network '${this.network}', so it cannot be linked. Hint: you can create a custom deployment of all unpublished dependencies by running 'zos push' with the '--deploy-dependencies' option.`);
+          log.info(`Connecting to dependency ${depName} ${dependencyInfo.version}`);
+          await this.project.setDependency(depName, dependencyInfo.packageAddress, dependencyInfo.version);
+          const depInfo = { package: dependencyInfo.packageAddress, version: dependencyInfo.version };
+          this.networkFile.setDependency(depName, depInfo);
+        }
       }
     } catch(error) {
       error.message = `Failed to link dependency ${depName}@${depVersion} with error: ${error.message}`;
