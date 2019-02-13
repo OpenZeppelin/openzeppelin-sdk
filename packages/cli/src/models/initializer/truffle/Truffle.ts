@@ -17,8 +17,8 @@ const Truffle = {
     return Truffle.existsTruffleConfig(root) && existsTruffleDependency;
   },
 
-  validateAndLoadNetworkConfig(network: string): void {
-    const config = this.getConfig();
+  validateAndLoadNetworkConfig(network: string, force: boolean = false): void {
+    const config = this.getConfig(force);
     const { networks: networkList } = config;
     if (!networkList[network]) throw Error(`Given network '${network}' is not defined in your truffle-config file`);
     config.network = network;
@@ -32,13 +32,13 @@ const Truffle = {
   getProviderAndDefaults(): any {
     const config = this.getConfig();
     const provider = this._setNonceTrackerIfNeeded(config);
+    const artifactDefaults = this._getArtifactDefaults(config);
 
-    const artifactDefaults = pickBy(pick(config, 'from', 'gas', 'gasPrice'));
     return { provider, artifactDefaults };
   },
 
-  getConfig(): any | never {
-    if (this.config) return this.config;
+  getConfig(force: boolean = false): any | never {
+    if (!force && this.config) return this.config;
     try {
       const TruffleConfig = require('truffle-config');
       this.config = TruffleConfig.detect({ logger: console });
@@ -69,6 +69,18 @@ const Truffle = {
       });
     }
     return provider;
+  },
+
+  _getArtifactDefaults(config) {
+    const network = config.network;
+    const rawConfig = require(require('truffle-config').search()) || {};
+    const networks = rawConfig.networks || {};
+    const networkConfig = networks[network];
+
+    const configDefaults = pickBy(pick(this.config, 'from', 'gasPrice'));
+    const networkDefaults = pickBy(pick(networkConfig, 'from', 'gas', 'gasPrice'));
+
+    return { ...configDefaults, ...networkDefaults };
   },
 };
 
