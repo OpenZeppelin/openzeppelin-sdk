@@ -4,13 +4,80 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## Next
+
+### Added
+- Contributing guidelines ([#553](https://github.com/zeppelinos/zos/pull/553))
+- Example using truffle migrations ([#416](https://github.com/zeppelinos/zos/pull/416))
+- Tests for `verify` command ([#468](https://github.com/zeppelinos/zos/pull/468))
+- Migration process for projects using previous versions of ZeppelinOS v2 ([#621](https://github.com/zeppelinos/zos/pull/621))
+- Support receiving booleans via the CLI ([#623](https://github.com/zeppelinos/zos/pull/623))
+- Parse scientific notation numbers from the CLI ([#567](https://github.com/zeppelinos/zos/pull/567))
+- Linter pre-commit githook ([#620](https://github.com/zeppelinos/zos/pull/620))
+
+### Changed
+- **Update Web3 to version `1.0.0-beta.37`** ([#572](https://github.com/zeppelinos/zos/pull/572))
+- Migrate `cli` codebase to TypeScript ([#494](https://github.com/zeppelinos/zos/pull/494), [#516](https://github.com/zeppelinos/zos/pull/516), [#517](https://github.com/zeppelinos/zos/pull/517), [#523](https://github.com/zeppelinos/zos/pull/523), [#515](https://github.com/zeppelinos/zos/pull/515), [#521](https://github.com/zeppelinos/zos/pull/521), [#525](https://github.com/zeppelinos/zos/pull/525), [#526](https://github.com/zeppelinos/zos/pull/526), [#529](https://github.com/zeppelinos/zos/pull/529), [#530](https://github.com/zeppelinos/zos/pull/530), [#531](https://github.com/zeppelinos/zos/pull/531), [#532](https://github.com/zeppelinos/zos/pull/532), [#537](https://github.com/zeppelinos/zos/pull/537))
+- Add `lodash` functions separately ([#555](https://github.com/zeppelinos/zos/pull/555)) (thanks @slorenzo!)
+- Update Etherscan api key url ([#474](https://github.com/zeppelinos/zos/pull/474))
+- Polish `Truffle` util methods used in CLI ([#507](https://github.com/zeppelinos/zos/pull/507))
+- Avoid transferring proxies to `App` on publish ([#609](https://github.com/zeppelinos/zos/pull/609))
+
+### Fixed
+- Force compiling all contracts ([#581](https://github.com/zeppelinos/zos/pull/581))
+- Etherscan mainnet url ([#642](https://github.com/zeppelinos/zos/pull/642))
+- Checksum default sender address on initialization ([#654](https://github.com/zeppelinos/zos/pull/654))
+- Ignore Truffle's default gas value ([#671](https://github.com/zeppelinos/zos/pull/671))
+- Integration tests using `truffle-hdwallet-provider` ([#473](https://github.com/zeppelinos/zos/pull/473))
+
+### Removed
+- `truffle-contracts` from codebase ([#451](https://github.com/zeppelinos/zos/pull/451))
+- `truffle-resolver` from CLI and honor `from` in config ([#612](https://github.com/zeppelinos/zos/pull/612))
+- Lightweight terminology ([#550](https://github.com/zeppelinos/zos/pull/550))
+
+## v2.1.2 - 2019-02-01
+
+### Fixed
+- Use patched versions of `web3@0.18` ([#9571fd4](https://github.com/zeppelinos/zos/commit/9571fd425647c093ee856784acab0055c7556992))
+- Use patched versions of `ethereumjs-abi@0.6` ([#9571fd4](https://github.com/zeppelinos/zos/commit/9571fd425647c093ee856784acab0055c7556992))
+- Use pinned version `1.2.8` of `truffle-flattener` ([#9571fd4](https://github.com/zeppelinos/zos/commit/9571fd425647c093ee856784acab0055c7556992))
+
+## v2.1.1 - 2019-01-31
+
+### Added
+- Support compiling with globally installed truffle ([#596](https://github.com/zeppelinos/zos/pull/596))
+
+## v2.1.0 - 2019-01-10
+
+### Added
+- Support Truffle 5 projects ([04137b7](https://github.com/zeppelinos/zos/commit/04137b75595fcb2c97972f60b465a778bfa216a7))
+- Etherscan integration for contracts verification ([#413](https://github.com/zeppelinos/zos/pull/413)) (thanks @ProtonGustave!)
+- More tests to `create` command in CLI ([9a935a3](https://github.com/zeppelinos/zos/commit/9a935a3045dec98fe335bae3fdb28f04189efe8a))
+
+### Changed
+- Remove `truffle-workflow-compile` in favor of shell compilation ([423d8f9](https://github.com/zeppelinos/zos/commit/423d8f952c98431e6eb1124d47205952f4cc4017))
+- Delete mock contracts when publishing package ([#293](https://github.com/zeppelinos/zos/pull/293))
+
+### Fixed
+- Avoid deleting deployment info from other networks in truffle artifacts ([#415](https://github.com/zeppelinos/zos/pull/415))
+- Remove legacy code from `app` and `lib` distinction ([#449](https://github.com/zeppelinos/zos/pull/449))
+- Remove `sinon` as a main dependency ([1c64175](https://github.com/zeppelinos/zos/commit/1c641756261f5f8fe3c940bbf3db236da9daef47))
+
+## v2.0.2 - 2018-12-19
+
+### Added
+- `truffle-provider` dependency to make sure we rely on `web3@^0.x` ([38867fd](https://github.com/zeppelinos/zos/commit/38867fdd0e18c6d4bf869c11a1c94f796c8185e0))
+
+### Fixed
+- Pin truffle dependencies versions ([38867fd](https://github.com/zeppelinos/zos/commit/38867fdd0e18c6d4bf869c11a1c94f796c8185e0))
+- Promise resolution in `runWithTruffle` function ([6e4258c](https://github.com/zeppelinos/zos/commit/6e4258c5378afb643454154fd2cf22f93a4d0020))
+
 ## v2.0.1 - 2018-10-26
 
-### Changes
+### Changed
 
 - Improve validation messages for security verifications (such as storage layout checks, no-constructor checks, or fields with initial values in their declaration) ([#362](https://github.com/zeppelinos/zos/issues/362)).
 - Add default gas price of 5 gwei to `truffle.js` template file created on `zos init` ([#354](https://github.com/zeppelinos/zos/issues/354)).
-
 
 ### Fixed
 
