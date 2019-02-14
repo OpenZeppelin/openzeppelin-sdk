@@ -145,13 +145,17 @@ const MyContractV0 = Contracts.getFromLocal('MyContractV0');
 const MyContractV1 = Contracts.getFromLocal('MyContractV1');
 
 async function main() {
+
   // Instantiate a project.
-  const project = new SimpleProject('MyProject', { from: web3.eth.accounts[0] });
+  const initializerAddress = web3.eth.accounts[0];
+  const project = new SimpleProject('MyProject', { from: initializerAddress });
+
   console.log('Creating an upgradeable instance of V0...');
   const proxy = await project.createProxy(MyContractV0, { initArgs: [42] })
   console.log('Contract\'s storage value: ' + (await proxy.value()).toString() + '\n');
+
   console.log('Upgrading to v1...');
-  await project.upgradeProxy(proxy, MyContractV1, { initMethod: 'add', initArgs: [1], initFrom: initializerAddress })
+  const instance = await project.upgradeProxy(proxy, MyContractV1, { initMethod: 'add', initArgs: [1], initFrom: initializerAddress })
   console.log('Contract\'s storage new value: ' + (await instance.value()).toString() + '\n');
 }
 
