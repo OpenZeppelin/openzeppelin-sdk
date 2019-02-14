@@ -63,8 +63,8 @@ Then, run the following commands:
 
 ```console
 truffle(local)> compile
-truffle(local)> owner = web3.eth.accounts[1]
-truffle(local)> MyLegacyToken.new({ from: owner }).then(i => legacyToken = i)
+truffle(local)> owner = (await web3.eth.getAccounts())[1]
+truffle(local)> legacyToken = await MyLegacyToken.new({ from: owner })
 truffle(local)> legacyToken.address
 '0x...'
 ```
@@ -74,8 +74,8 @@ Keep track of the `owner` and `legacyToken` addresses, we will need them in the 
 You can check the owner balance by running:
 
 ```console
-truffle(local)> legacyToken.balanceOf(owner)
-BigNumber { s: 1, e: 22, c: [ 100000000 ] }
+truffle(local)> (await legacyToken.balanceOf(owner)).toString()
+'10000000000000000000000'
 ```
 
 Remember not to close this console, as we will be using it later.
@@ -97,7 +97,7 @@ In our sample project, you will find another contract called [`MyUpgradeableToke
 which will be the upgradeable version of the sample legacy token contract [`MyLegacyToken`](https://github.com/zeppelinos/erc20-onboarding/blob/master/contracts/MyLegacyToken.sol):
 
 ```solidity
-pragma solidity ^0.4.24;
+pragma solidity ^0.5.0;
 
 import "zos-lib/contracts/Initializable.sol";
 import "openzeppelin-eth/contracts/token/ERC20/IERC20.sol";
@@ -108,7 +108,7 @@ import "openzeppelin-eth/contracts/token/ERC20/ERC20Detailed.sol";
 contract MyUpgradeableToken is Initializable, ERC20, ERC20Detailed, ERC20Mintable {
 
   function initialize(ERC20Detailed _legacyToken, ERC20Migrator _migrator) initializer public {
-    ERC20Mintable.initialize(_migrator);
+    ERC20Mintable.initialize(address(_migrator));
     ERC20Detailed.initialize(_legacyToken.name(), _legacyToken.symbol(), _legacyToken.decimals());
     _migrator.beginMigration(this);
   }
@@ -136,7 +136,7 @@ in our project, we simply need to use the `link` command giving the name of the 
 to use. In this case, we will link OpenZeppelin EVM package to be able to use the contracts it provides in our project:
 
 ```console
-npx zos link openzeppelin-eth@^2.0.2
+npx zos link openzeppelin-eth
 ```
 
 Finally we can add our upgradeable token contract to the project:
@@ -217,32 +217,32 @@ or open a new one against the network where your legacy token is deployed. Then,
 commands of the previous step:
 
 ```console
-truffle(local)> ERC20Migrator.at('ERC20_MIGRATOR_ADDRESS').then(i => erc20Migrator = i)
-truffle(local)> MyUpgradeableToken.at('UPGRADEABLE_TOKEN_ADDRESS').then(i => upgradeableToken = i)
+truffle(local)> erc20Migrator = await ERC20Migrator.at('ERC20_MIGRATOR_ADDRESS')
+truffle(local)> upgradeableToken = await MyUpgradeableToken.at('UPGRADEABLE_TOKEN_ADDRESS')
 truffle(local)> erc20Migrator.beginMigration(upgradeableToken.address, { from: owner })
-truffle(local)> legacyToken.balanceOf(owner).then(b => balance = b)
+truffle(local)> balance = await legacyToken.balanceOf(owner)
 truffle(local)> legacyToken.approve(erc20Migrator.address, balance, { from: owner })
 truffle(local)> erc20Migrator.migrateAll(owner, { from: owner })
 ```
 
 We can now check your balance in the legacy token:
 ```console
-truffle(local)> legacyToken.balanceOf(owner)
-BigNumber { s: 1, e: 0, c: [ 0 ] }
+truffle(local)> (await legacyToken.balanceOf(owner)).toString()
+'0'
 ```
 
 Also the burned balance:
 
 ```console
-truffle(local)> legacyToken.balanceOf(erc20Migrator.address)
-BigNumber { s: 1, e: 22, c: [ 100000000 ] }
+truffle(local)> (await legacyToken.balanceOf(erc20Migrator.address)).toString()
+'10000000000000000000000'
 ```
 
 And the upgradeable token balance:
 
 ```console
-truffle(local)> upgradeableToken.balanceOf(owner, { from: owner })
-BigNumber { s: 1, e: 22, c: [ 100000000 ] }
+truffle(local)> (await upgradeableToken.balanceOf(owner, { from: owner })).toString()
+'10000000000000000000000'
 ```
 
 Your legacy token has been migrated to an upgradeable token!

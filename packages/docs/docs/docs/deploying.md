@@ -59,10 +59,8 @@ a `truffle-config.js` file (created by the `zos` CLI for Truffle), and a
 Next, we need to install Truffle. To do so, run the following command:
 
 ```console
-npm install truffle@4.1.15 --save
+npm install truffle@5.0.4
 ```
-
-> Note: We are specifically installing Truffle 4.1.15, as ZeppelinOS 2.1 only supports Truffle 5 for command-line usage (not programmatic usage). Full support for Truffle 5 and Web3 1.0 will be released in ZeppelinOS 2.2._
 
 That's it! Our project is now fully set up for using ZeppelinOS.
 
@@ -73,7 +71,7 @@ Name it `MyContract.sol`, and put it in the `contracts` folder with the
 following Solidity code:
 
 ```solidity
-pragma solidity ^0.4.24;
+pragma solidity ^0.5.0;
 
 import "zos-lib/contracts/Initializable.sol";
 
@@ -112,8 +110,8 @@ Now we can add the contract to the project:
 npx zos add MyContract
 ```
 
-This command will first compile `MyContract`, and then it will add it to the
-project registering it in the `zos.json` configuration file.
+This command will first compile `MyContract`, and then add it to the
+project, registering it in the `zos.json` configuration file.
 
 > **Note**: The current version of ZeppelinOS relies on Truffle to compile contracts and
 > determine the Solidity compiler version to use. If you want to use a different version, please specify it
@@ -151,12 +149,6 @@ In this case, we are telling it to work with the `local` network with the
 `--network` option, and also setting a default sender address for the
 transactions we will run with the `--from` option. Additionally, the
 `expires` flag allows us to indicate the session expiration time in seconds.
-
-> Note that we are using a specific address for the `--from` option which
-is different to the default address that `ganache-cli` would use.
-This is because we need to use different addresses in order to create
-upgradeable contracts and to query them. You can read more about it in the
-[ZeppelinOS upgrades pattern section](pattern.md).
 
 Now that everything has been setup, we are ready to deploy the project.
 To do so simply run:

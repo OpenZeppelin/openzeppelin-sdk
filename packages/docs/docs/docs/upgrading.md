@@ -8,7 +8,7 @@ project with one contract. Here is the code of the contract, to keep it fresh
 on our minds:
 
 ```solidity
-pragma solidity ^0.4.24;
+pragma solidity ^0.5.0;
 
 import "zos-lib/contracts/Initializable.sol";
 
@@ -72,8 +72,8 @@ that our instance is working as expected:
 by the `create` command we ran above._
 
 ```console
-truffle(local)> myContract = MyContract.at('<your-contract-address>')
-truffle(local)> myContract.x().then(x => x.toString())
+truffle(local)> myContract = await MyContract.at('<your-contract-address>')
+truffle(local)> (await myContract.x()).toString()
 '42'
 
 truffle(local)> myContract.s()
@@ -94,7 +94,7 @@ extend its functionalities.
 Open `contracts/MyContract.sol`, and add a new function:
 
 ```solidity
-pragma solidity ^0.4.24;
+pragma solidity ^0.5.0;
 
 import "zos-lib/contracts/Initializable.sol";
 
@@ -154,9 +154,9 @@ returned by the `create` command we ran in the previous section, which
 is the same as the one returned by the `update` command we ran above._
 
 ```console
-truffle(local)> myContract = MyContract.at('<your-contract-address>')
+truffle(local)> myContract = await MyContract.at('<your-contract-address>')
 truffle(local)> myContract.increment()
-truffle(local)> myContract.x().then(x => x.toString())
+truffle(local)> (await myContract.x()).toString()
 43
 ```
 
@@ -197,7 +197,7 @@ This initialization validation for `t`, of course, would only make sense if `t` 
 The resulting code would be:
 
 ```solidity
-pragma solidity ^0.4.24;
+pragma solidity ^0.5.0;
 
 import "zos-lib/contracts/Initializable.sol";
 
