@@ -52,3 +52,9 @@ On 2.x, the `Migratable` contract has been deprecated, and we are shifting to a 
 ## Compatible EVM packages
 
 Also, note that EVM packages created with 1.x cannot be linked to projects using 2.x. All EVM package providers will need to create new packages with 2.x so that they can be used in ZeppelinOS 2.x projects. Again, the CLI will warn you when you attempt to link an incompatible package.
+
+## Changelog
+
+Please see the project's changelogs for more information:
+- [cli](https://github.com/zeppelinos/zos/blob/master/packages/cli/changelog.md)
+- [lib](https://github.com/zeppelinos/zos/blob/master/packages/lib/changelog.md)
