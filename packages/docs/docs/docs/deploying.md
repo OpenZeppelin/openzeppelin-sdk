@@ -59,7 +59,7 @@ a `truffle-config.js` file (created by the `zos` CLI for Truffle), and a
 Next, we need to install Truffle. To do so, run the following command:
 
 ```console
-npm install truffle
+npm install truffle@5.0.4
 ```
 
 That's it! Our project is now fully set up for using ZeppelinOS.

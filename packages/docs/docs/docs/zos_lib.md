@@ -36,7 +36,7 @@ guide you can just press enter to accept the default values of each field.
 Next, we need to install Truffle. To do so, run the following command:
 
 ```console
-npm install truffle
+npm install truffle@5.0.4
 ```
 
 Now, initialize the project as a Truffle project with:
