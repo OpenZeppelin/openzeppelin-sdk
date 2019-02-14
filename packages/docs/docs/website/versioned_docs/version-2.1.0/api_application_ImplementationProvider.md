@@ -1,6 +1,7 @@
 ---
-id: application_ImplementationProvider
+id: version-2.1.0-application_ImplementationProvider
 title: ImplementationProvider
+original_id: application_ImplementationProvider
 ---
 
 <div class="contract-doc"><div class="contract"><h2 class="contract-header"><span class="contract-kind">interface</span> ImplementationProvider</h2><p class="description">Interface for providing implementation addresses for other contracts by name.</p><div class="source">Source: <a href="git+https://github.com/zeppelinos/zos/blob/v2.2.0/contracts/application/ImplementationProvider.sol" target="_blank">application/ImplementationProvider.sol</a></div></div><div class="index"><h2>Index</h2><ul><li><a href="application_ImplementationProvider.html#getImplementation">getImplementation</a></li></ul></div><div class="reference"><h2>Reference</h2><div class="functions"><h3>Functions</h3><ul><li><div class="item function"><span id="getImplementation" class="anchor-marker"></span><h4 class="name">getImplementation</h4><div class="body"><code class="signature"><span>abstract </span>function <strong>getImplementation</strong><span>(string contractName) </span><span>public </span><span>view </span><span>returns  (address) </span></code><hr/><div class="description"><p>Abstract function to return the implementation address of a contract.</p></div><dl><dt><span class="label-parameters">Parameters:</span></dt><dd><div><code>contractName</code> - Name of the contract.</div></dd><dt><span class="label-return">Returns:</span></dt><dd>Implementation address of the contract.</dd></dl></div></div></li></ul></div></div></div>
