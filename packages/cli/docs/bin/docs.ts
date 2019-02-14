@@ -1,4 +1,4 @@
-#! /usr/bin/env node
+#!/usr/bin/env node
 
 import React from 'react';
 import program from '../../src/bin/program';
@@ -28,9 +28,9 @@ function writeMd(id, title, content) {
 
 function makeSidebar(program) {
   const commands = program.commands.map(command => `cli_${command.name()}`)
-  return { 
+  return {
     'cli-api': {
-      'commands': ['cli_main', ...commands]
+      commands: ['cli_main', ...commands]
     }
   };
 }
@@ -53,4 +53,4 @@ function run() {
 }
 
 run();
-console.log(`Docs generated in ${process.cwd()}/${outputPath}`)
+console.log(`Docs generated in ${process.cwd()}/${outputPath}`);

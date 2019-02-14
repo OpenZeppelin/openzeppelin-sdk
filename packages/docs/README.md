@@ -46,6 +46,28 @@ and [`solidity-docgen`](https://github.com/OpenZeppelin/solidity-docgen)
 respectively, and then merge the outcome manually by substituting the
 corresponding `.md` files in the `docs/docs/` directory.
 
+## Bump version
+
+The `bump-version` script is provided in order to bump to a particular version.
+
+### Usage:
+
+Specifying an already released version:
+
+```sh
+
+foo@bar:~$: npm run bump-docs 1.2.0
+
+```
+
+Specifying a version and a branch:
+
+```sh
+
+foo@bar:~$: npm run bump-docs 1.2.0 a_remote_branch
+
+```
+
 ## Maintainers
 
 * [@jcarpanelli](https://github.com/jcarpanelli/)
