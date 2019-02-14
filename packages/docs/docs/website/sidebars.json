@@ -64,10 +64,6 @@
     ],
     "INITIALIZE": [
       "Initializable"
-    ],
-    "VOUCHING": [
-      "Vouching",
-      "ZEPToken"
     ]
   }
 }
