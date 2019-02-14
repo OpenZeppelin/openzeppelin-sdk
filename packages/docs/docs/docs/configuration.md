@@ -70,6 +70,9 @@ These should be configured [in your `truffle.js` file](http://truffleframework.c
     ],
     ...
   },
+  "proxyAdmin": {
+    "address": <proxyAdmin-address>
+  },
   "app": {
     "address": <app-address>
   },
@@ -104,6 +107,8 @@ For every logic contract, besides the deployment address, the following info is 
 Any Solidity libraries used by the project's contracts are tracked in the `solidityLibs` node, which has the same structure as the `contracts` item.
 
 Another thing to notice in these files are the version numbers. The `<app-version>` keeps track of the latest app version, and matches `<version>` from `zos.json`. The `<proxy-i-version>`s, on the other hand, keep track of which version of the contracts the proxies are pointing to. Say you deploy a contract in your app version 1.0.0, and then bump the version to 1.1.0 and push some upgraded code for that same contract. This will be reflected in the `<contract-i-address>`, but not yet in the proxy, which will display 1.0.0 in `<proxy-i-version>` and the old logic contract address in `<implementation-i-address>`. Once you run `zos update` to your contract, `<proxy-i-version>` will show the new 1.1.0 version, and `<implementation-i-address>` will point to the new `<contract-i-address>`. Note that this version identifier will refer to the version of the dependency (and not the app) if the proxy points to a dependent EVM package.
+
+The field `<proxyAdmin>` contains the address of the ProxyAdmin contract, used to manage the [transparent proxy pattern](https://docs.zeppelinos.org/docs/pattern.html#transparent-proxies-and-function-clashes) in the project's proxies.
 
 Also, notice the fields `<app>`, `<package>`, and `<provider>`. These contain the addresses of contracts that ZeppelinOS uses to facilitate the creation of proxies and the management of different versions of your contracts. These contracts will only be deployed once you `publish` your project to a desired network. That is, your project will not have an `app`, `package`, or `provider` unless explicitly running the `publish` command, or if the project was created with the `--publish` flag. Note that this step is required for projects that produce an EVM package. To read more about the architecture of contracts we are using to publish your project on-chain please refer to the [Contract Architecture](https://docs.zeppelinos.org/docs/architecture.html) section.
 
