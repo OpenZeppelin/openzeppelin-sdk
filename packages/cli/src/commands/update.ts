@@ -5,7 +5,7 @@ import { parseInit } from '../utils/input';
 import { fromContractFullName } from '../utils/naming';
 import { hasToMigrateProject } from '../utils/prompt-migration';
 import ConfigVariablesInitializer from '../models/initializer/ConfigVariablesInitializer';
-import ZosPackageFile from '../models/files/ZosPackageFile';
+import ZosNetworkFile from '../models/files/ZosNetworkFile';
 
 const name: string = 'update';
 const signature: string = `${name} [alias-or-address]`;
@@ -23,8 +23,9 @@ const register: (program: any) => any = (program) => program
   .action(action);
 
 async function action(contractFullNameOrAddress: string, options: any): Promise<void> {
-  const zosversion = await ZosPackageFile.getZosversion();
-  if (!await hasToMigrateProject(zosversion)) return;
+  const { network, txParams } = await ConfigVariablesInitializer.initNetworkConfiguration(options);
+  const zosversion = await ZosNetworkFile.getZosversion(network);
+  if (!await hasToMigrateProject(zosversion)) process.exit(0);
 
   const { initMethod, initArgs } = parseInit(options, 'initialize');
   const { all, force } = options;
@@ -40,7 +41,6 @@ async function action(contractFullNameOrAddress: string, options: any): Promise<
   }
 
   const args = pickBy({ contractAlias, packageName, proxyAddress, initMethod, initArgs, all, force });
-  const { network, txParams } = await ConfigVariablesInitializer.initNetworkConfiguration(options);
   await update({ ...args, network, txParams });
   if (!options.dontExitProcess && process.env.NODE_ENV !== 'test') process.exit(0);
 }

@@ -5,14 +5,13 @@ import path from 'path'
 
 import { exec, cd, cp, rm } from './util'
 
-export function generateSidebar(docs, cliSections, libSections, vouchSections) {
+export function generateSidebar(docs, cliSections, libSections) {
   return {
     docs,
     reference: {
       WELCOME: [ 'apis' ],
       ...cliSections,
-      ...libSections,
-      ...vouchSections
+      ...libSections
     }
   }
 }
@@ -34,36 +33,6 @@ export function genCliDocs(packagesDir) {
   const { 'cli-api': { commands } } = JSON.parse(readFileSync(sidebar, 'utf8'))
 
   return { 'CLI REFERENCE': commands }
-}
-
-export function genVouchDocs(packagesDir) {
-  const docsDir = path.resolve(packagesDir, 'docs', 'docs')
-  const builtDocs = path.resolve(docsDir, 'docs')
-  const vouchDir = path.resolve(packagesDir, 'vouching')
-  const vouchContractsDir = path.resolve(vouchDir, 'contracts')
-  const libDir = path.resolve(vouchDir, 'node_modules', 'zos-lib')
-  const tplDir = path.resolve(vouchDir, 'node_modules', 'tpl-contracts-eth')
-  const mocks = path.resolve(vouchContractsDir, 'mocks')
-  const ozeDir = path.resolve(vouchDir, 'node_modules', 'openzeppelin-eth')
-  const sidebar =  path.resolve(docsDir, 'website', 'sidebars.json')
-
-  cd(vouchDir)
-  console.log('Removing mocks contracts manually...')
-  rm(`${mocks}`, '-rf')
-  exec('npm install > "/dev/null" 2>&1')
-  console.log('Generating vouching solidity docs...')
-  exec(`SOLC_ARGS='openzeppelin-eth=${ozeDir} zos-lib=${libDir} tpl-contracts-eth=${tplDir}' npx solidity-docgen ${vouchDir} ${vouchContractsDir} ${docsDir}`)
-  rm(`${builtDocs}/api_es_tpl-contracts-eth*`)
-  rm(`${builtDocs}/api_es_openzeppelin-eth*`)
-  rm(`${builtDocs}/api_es_zos-lib*`)
-  const { 'docs-api': docs } = JSON.parse(readFileSync(sidebar, 'utf8'))
-
-  if (docs.UNCATEGORIZED) {
-    docs.VOUCHING = docs.UNCATEGORIZED
-    delete docs.UNCATEGORIZED
-  }
-
-  return docs
 }
 
 export function genLibDocs(packagesDir) {
