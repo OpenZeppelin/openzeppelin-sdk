@@ -11,7 +11,7 @@ The first file stores the general configuration and is created by the `zos init`
 
 ```json
 {
-  "zosversion": "2",
+  "zosversion": "2.2",
   "name": <projectName>,
   "version": <version>,
   "publish": <publishFlag>,
@@ -41,7 +41,7 @@ These should be configured [in your `truffle.js` file](http://truffleframework.c
 
 ```json
 {
-  "zosversion": "2",
+  "zosversion": "2.2",
   "version": <app-version>,
   "contracts": {
     <contract-N-name>: {
