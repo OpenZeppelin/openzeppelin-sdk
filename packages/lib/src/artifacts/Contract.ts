@@ -61,7 +61,7 @@ function _wrapContractInstance(schema: any, instance: Web3Contract): Contract {
   instance.schema = schema;
 
   instance.new = async function(...passedArguments): Promise<Contract> {
-    const [args, options] = parseArguments(passedArguments);
+    const [args, options] = parseArguments(passedArguments, schema.abi);
     if(!schema.linkedBytecode) throw new Error(`${schema.contractName} bytecode contains unlinked libraries.`);
     instance.options = { ...instance.options, ...(await Contracts.getDefaultTxParams()) };
     return new Promise((resolve, reject) => {
@@ -108,12 +108,16 @@ export function createZosContract(schema: any): Contract {
   return _wrapContractInstance(schema, contract);
 }
 
-function parseArguments(passedArguments) {
+function parseArguments(passedArguments, abi) {
+  const constructorAbi = abi.find((elem) => elem.type === 'constructor') || {};
+  const constructorArgs = constructorAbi.inputs && constructorAbi.inputs.length > 0 ? constructorAbi.inputs : [];
   let givenOptions = {};
-  if (passedArguments.length > 0) {
-    const lastArg = passedArguments[passedArguments.length - 1];
-    if (typeof(lastArg) === 'object' && !Array.isArray(lastArg) && !BN.isBigNumber(lastArg)) givenOptions = passedArguments.pop();
-  }
 
+  if (passedArguments.length === constructorArgs.length + 1) {
+      const lastArg = passedArguments[passedArguments.length - 1];
+      if (typeof(lastArg) === 'object') {
+        givenOptions = passedArguments.pop();
+      }
+  }
   return [passedArguments, givenOptions];
 }
