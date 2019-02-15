@@ -1,0 +1,71 @@
+{
+  "version-2.2.0-docs": {
+    "OVERVIEW": [
+      "version-2.2.0-start",
+      "version-2.2.0-new_2",
+      "version-2.2.0-new_2.2"
+    ],
+    "QUICKSTART": [
+      "version-2.2.0-zepkit",
+      "version-2.2.0-deploying",
+      "version-2.2.0-upgrading",
+      "version-2.2.0-linking",
+      "version-2.2.0-publishing",
+      "version-2.2.0-vouching"
+    ],
+    "GUIDES": [
+      "version-2.2.0-writing_contracts",
+      "version-2.2.0-testing",
+      "version-2.2.0-erc20_onboarding",
+      "version-2.2.0-upgrades_governance",
+      "version-2.2.0-zos_lib"
+    ],
+    "ADVANCED TOPICS": [
+      "version-2.2.0-faq",
+      "version-2.2.0-configuration",
+      "version-2.2.0-architecture",
+      "version-2.2.0-pattern",
+      "version-2.2.0-token_mechanics",
+      "version-2.2.0-whitepaper"
+    ]
+  },
+  "version-2.2.0-reference": {
+    "WELCOME": [
+      "version-2.2.0-apis"
+    ],
+    "CLI REFERENCE": [
+      "version-2.2.0-cli_main",
+      "version-2.2.0-cli_add",
+      "version-2.2.0-cli_bump",
+      "version-2.2.0-cli_check",
+      "version-2.2.0-cli_create",
+      "version-2.2.0-cli_freeze",
+      "version-2.2.0-cli_init",
+      "version-2.2.0-cli_link",
+      "version-2.2.0-cli_publish",
+      "version-2.2.0-cli_push",
+      "version-2.2.0-cli_remove",
+      "version-2.2.0-cli_session",
+      "version-2.2.0-cli_set-admin",
+      "version-2.2.0-cli_status",
+      "version-2.2.0-cli_unlink",
+      "version-2.2.0-cli_update",
+      "version-2.2.0-cli_verify"
+    ],
+    "APPLICATION": [
+      "version-2.2.0-application_App",
+      "version-2.2.0-application_ImplementationDirectory",
+      "version-2.2.0-application_ImplementationProvider",
+      "version-2.2.0-application_Package"
+    ],
+    "UPGRADEABILITY": [
+      "version-2.2.0-upgradeability_AdminUpgradeabilityProxy",
+      "version-2.2.0-upgradeability_Proxy",
+      "version-2.2.0-upgradeability_ProxyAdmin",
+      "version-2.2.0-upgradeability_UpgradeabilityProxy"
+    ],
+    "INITIALIZE": [
+      "version-2.2.0-Initializable"
+    ]
+  }
+}

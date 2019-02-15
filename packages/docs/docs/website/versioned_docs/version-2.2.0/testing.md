@@ -1,6 +1,7 @@
 ---
-id: testing
+id: version-2.2.0-testing
 title: Testing upgradeable projects
+original_id: testing
 ---
 
 When working with ZeppelinOS, you can test your contracts as you usually do, or you can have ZeppelinOS automatically set up your entire project in your testing environment. This allows you to replicate the same set of contracts that manage your project for each test you run.

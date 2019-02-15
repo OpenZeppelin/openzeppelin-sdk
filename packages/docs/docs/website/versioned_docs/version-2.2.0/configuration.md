@@ -1,6 +1,7 @@
 ---
-id: configuration
+id: version-2.2.0-configuration
 title: Configuration Files
+original_id: configuration
 ---
 
 ZeppelinOS's CLI generates `json` files where it stores the configuration of your project.

@@ -61,6 +61,7 @@
     "UPGRADEABILITY": [
       "upgradeability_AdminUpgradeabilityProxy",
       "upgradeability_Proxy",
+      "upgradeability_ProxyAdmin",
       "upgradeability_UpgradeabilityProxy"
     ],
     "INITIALIZE": [
