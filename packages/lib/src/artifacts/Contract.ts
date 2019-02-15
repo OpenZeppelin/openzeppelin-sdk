@@ -5,7 +5,7 @@ import { Callback, EventLog, EventEmitter, TransactionReceipt } from 'web3/types
 import { Contract as Web3Contract, TransactionObject, BlockType } from 'web3-eth-contract';
 
 /*
- * ZosContract is an interface that extends Web3's Contract interface, adding some properties and methods like:
+ * Contract is an interface that extends Web3's Contract interface, adding some properties and methods like:
  * address getter: retrieves the deployed address
  * schema: compilation artifacts
  * new(): deployes a new contract
@@ -25,7 +25,7 @@ export default interface Contract {
   getPastEvents(event: string, options?: { filter?: object; fromBlock?: BlockType; toBlock?: BlockType; topics?: string[]; }, cb?: Callback<EventLog[]>): Promise<EventLog[]>;
   setProvider(provider: any): void;
 
-  // ZosContract specific.
+  // Contract specific.
   address: string;
   new: (args?: any[], options?: {}) => Promise<Contract>;
   at: (address: string) => Contract;
@@ -103,7 +103,7 @@ function _wrapContractInstance(schema: any, instance: Web3Contract): Contract {
   return instance;
 }
 
-export function createZosContract(schema: any): Contract {
+export function createContract(schema: any): Contract {
   const contract = ZWeb3.contract(schema.abi, null, Contracts.getArtifactsDefaults());
   return _wrapContractInstance(schema, contract);
 }
