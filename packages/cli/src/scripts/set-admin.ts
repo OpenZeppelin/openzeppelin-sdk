@@ -1,5 +1,5 @@
 import stdout from '../utils/stdout';
-import ControllerFor from '../models/network/ControllerFor';
+import NetworkController from '../models/network/NetworkController';
 import ScriptError from '../models/errors/ScriptError';
 import { SetAdminParams } from './interfaces';
 
@@ -8,7 +8,7 @@ export default async function setAdmin({ newAdmin, packageName, contractAlias, p
     throw Error('The address or name of the contract to transfer upgradeability admin rights must be provided.');
   }
 
-  const controller = ControllerFor(network, txParams, networkFile);
+  const controller = new NetworkController(network, txParams, networkFile);
 
   try {
     const proxies = await controller.setProxiesAdmin(packageName, contractAlias, proxyAddress, newAdmin);
