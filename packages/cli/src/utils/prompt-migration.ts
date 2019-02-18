@@ -1,7 +1,9 @@
 import readline from 'readline';
 import { isMigratableZosversion } from '../models/files/ZosVersion';
+import ZosNetworkFile from '../models/files/ZosNetworkFile';
 
-export async function hasToMigrateProject(zosversion): Promise<boolean> {
+export async function hasToMigrateProject(network): Promise<boolean> {
+  const zosversion = ZosNetworkFile.getZosversion(network);
   if(isMigratableZosversion(zosversion)) {
     const response = await new Promise((resolve) => {
       const prompt = readline.createInterface({
@@ -13,7 +15,7 @@ export async function hasToMigrateProject(zosversion): Promise<boolean> {
         resolve(answer);
       });
     });
-    if (!isValidResponse(response)) return hasToMigrateProject(zosversion);
+    if (!isValidResponse(response)) return hasToMigrateProject(network);
     return response === 'y' || response === 'Y';
   }
   return true;
