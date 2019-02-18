@@ -74,7 +74,7 @@ export default class ZosNetworkFile {
 
   public static getZosversion(network: string): string | null {
     const file = fs.parseJsonIfExists(`zos.${network}.json`);
-    return file.zosversion || null;
+    return file ? file.zosversion : null;
   }
 
   // TS-TODO: type for network parameter (and class member too).
