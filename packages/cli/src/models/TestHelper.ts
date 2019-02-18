@@ -1,4 +1,4 @@
-import ControllerFor from '../models/network/ControllerFor';
+import NetworkController from '../models/network/NetworkController';
 import ZosNetworkFile from '../models/files/ZosNetworkFile';
 import { ProxyAdminProject, AppProject } from 'zos-lib';
 
@@ -9,7 +9,7 @@ import { ProxyAdminProject, AppProject } from 'zos-lib';
  * @param networkFile optional `ZosNetworkFile` object to use, instead of zos.test.json
  */
 export default async function(txParams: any = {}, networkFile?: ZosNetworkFile): Promise<ProxyAdminProject | AppProject> {
-  const controller = ControllerFor('test', txParams, networkFile);
+  const controller = new NetworkController('test', txParams, networkFile);
   await controller.deployDependencies();
   await controller.push();
 
