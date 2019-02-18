@@ -29,7 +29,7 @@ import LocalController from '../local/LocalController';
 import ZosNetworkFile, { ProxyInterface } from '../files/ZosNetworkFile';
 import ZosPackageFile from '../files/ZosPackageFile';
 
-const log = new Logger('NetworkAppController');
+const log = new Logger('NetworkController');
 type Project = ProxyAdminProject | AppProject;
 type ProjectDeployer = ProxyAdminProjectDeployer | AppProjectDeployer;
 
@@ -41,11 +41,16 @@ export default class NetworkController {
   public networkFile: ZosNetworkFile;
   public project: Project;
 
-  constructor(localController: LocalController, network: string, txParams: any, networkFile?: ZosNetworkFile) {
-    this.localController = localController;
+  constructor(network: string, txParams: any, networkFile?: ZosNetworkFile) {
+    if(!networkFile) {
+      const packageFile = new ZosPackageFile();
+      this.networkFile = packageFile.networkFile(network);
+    } else {
+      this.networkFile = networkFile;
+    }
+    this.localController = new LocalController(this.networkFile.packageFile);
     this.txParams = txParams;
     this.network = network;
-    this.networkFile = networkFile || localController.packageFile.networkFile(network);
   }
 
   // NetworkController
