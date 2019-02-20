@@ -1,0 +1,10 @@
+{
+  "zosversion": "2.2",
+  "name": "dynamic-instance",
+  "version": "0.1.0",
+  "contracts": {
+    "Factory": "Factory",
+    "Instance": "Instance"
+  },
+  "publish": true
+}
