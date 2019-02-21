@@ -1,5 +1,14 @@
 'use strict';
 
+/*
+  This script demonstrates how a ZeppelinOS contract can be used
+  to create instances of upgradeable contracts from another contract,
+  as opposed to only being able to create them via the `zos` CLI.
+
+  Note that this is done programmatically with this script for 
+  illustration purposes, but the entire process can be done from the `zos` CLI.
+  */
+
 // Import node dependencies.
 const fs = require('fs');
 
@@ -15,7 +24,7 @@ async function main() {
   if(fs.existsSync('zos.json')) fs.unlinkSync('zos.json');
   if(fs.existsSync('zos.local.json')) fs.unlinkSync('zos.local.json');
 
-  // Enable command loging in ZeppelinOS.
+  // Enable command logging in ZeppelinOS.
   const Logger = lib.Logger;
   Logger.silent(false);
   Logger.verbose(true);
@@ -84,7 +93,7 @@ async function main() {
   // This call data consists of the contract's `initialize` method with the value of `42`.
   const encodeCall = lib.encodeCall;
   const data = encodeCall('initialize', ['uint256'], [42]);
-  console.log(`Calldata for Instance.sol's initialize: ${data}`);
+  console.log(`Call data for Instance.sol's initialize: ${data}`);
 
   // Create and initialize a proxy instance of the Instance contract,
   // but do so via the Factory contract instead of using the create script.
