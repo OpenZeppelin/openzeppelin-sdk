@@ -1,8 +1,10 @@
 import push from './push';
 import init from '../scripts/init';
+import { promptForArgumentsIfNeeded } from '../utils/prompt';
+import { FileSystem } from 'zos-lib';
 
 const name: string = 'init';
-const signature: string = `${name} <project-name> [version]`;
+const signature: string = `${name} [project-name] [version]`;
 const description: string = `initialize your ZeppelinOS project. Provide a <project-name> and optionally an initial [version] name`;
 
 const register: (program: any) => any = (program) => program
@@ -16,11 +18,17 @@ const register: (program: any) => any = (program) => program
   .withPushOptions()
   .action(action);
 
-async function action(pName: string, version: string, options: any): Promise<void> {
+async function action(projectName: string, version: string, options: any): Promise<void> {
   const { publish, force, link, install: installDependencies } = options;
 
+  const defaultArgs = FileSystem.parseJsonIfExists('package.json') || {};
+  const passedArgs = { name: projectName, version };
+  const promptedArgs = await promptForArgumentsIfNeeded({ args: passedArgs, defaults: defaultArgs });
+
   const dependencies = link ? link.split(',') : [];
-  await init({ name: pName, version, dependencies, installDependencies, force, publish });
+  const flags = { dependencies, installDependencies, force, publish };
+
+  await init({ ...passedArgs, ...promptedArgs, ...flags });
   await push.tryAction(options);
 }
 
