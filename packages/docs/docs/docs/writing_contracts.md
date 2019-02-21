@@ -168,16 +168,16 @@ $ TOKEN=$(zos create TokenContract)
 $ zos create MyContract --init --args $TOKEN
 ```
 
-An advanced alternative, if you need to create upgradeable contracts on the fly, is to keep an instance of your ZeppelinOS `App` in your contracts. The [`App`](api_application_BaseApp.md) is a contract that acts as the entrypoint for your ZeppelinOS project, which has references to your logic implementations, and can create new contract instances:
+An advanced alternative, if you need to create upgradeable contracts on the fly, is to keep an instance of your ZeppelinOS `App` in your contracts. The [`App`](api_application_App.md) is a contract that acts as the entrypoint for your ZeppelinOS project, which has references to your logic implementations, and can create new contract instances:
 
 ```solidity
 import "zos-lib/contracts/Initializable.sol";
-import "zos-lib/contracts/application/BaseApp.sol";
+import "zos-lib/contracts/application/App.sol";
 
 contract MyContract is Initializable {
-  BaseApp private app;
+  App private app;
 
-  function initialize(BaseApp _app) initializer public {
+  function initialize(App _app) initializer public {
     app = _app;
   }
 
