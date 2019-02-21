@@ -45,7 +45,7 @@ export function parseJson(filename: string): any {
   return JSON.parse(read(filename));
 }
 
-export function parseJsonIfExists(filename: string): {} | null {
+export function parseJsonIfExists(filename: string): any | null {
   return exists(filename) ? JSON.parse(read(filename)) : null;
 }
 
