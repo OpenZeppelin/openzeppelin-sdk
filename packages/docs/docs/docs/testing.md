@@ -81,12 +81,9 @@ contract('Sample', function ([_, owner]) {
 
 Use this convenient tool to write tests for your code and storage migrations before executing them in production.
 
-## Calling Initialize Functions Manually in Your Unit Tests with Truffle 4
+## Calling Initialize Functions Manually in Your Unit Tests
 
-_Note: If you're using Truffle 5, as is recommended with ZeppelinOS 2.2, please see 
-[Calling Initialize Functions Manually in Your Unit Tests with Truffle 5](https://docs.zeppelinos.org/docs/advanced.html#calling-initialize-functions-manually-in-your-unit-tests-with-truffle-5) instead._
-
-Truffle 4 does not know how to resolve situations where a contract 
+Sometimes, there are situations where a contract 
 has functions that have matching names, but different arities. 
 Here's an example of a `TimedCrowdsale` contract that inherits 
 from `Crowdsale` which results in a contract that has two 
@@ -114,32 +111,9 @@ may revert if you call `initialize` directly from Truffle. `zos create` handles
 this correctly as it encodes the parameters. However, for your unit tests you will 
 need to call `initialize` manually.
 
-The current solution to this issue is to `npm install zos-lib` and use the same 
-helper function used by the `zos create` command: `encodeCall`. This helper 
-receives the signature of your `initialize` function, as well as its arguments 
-and their types. `encodeCall` crafts the calldata which you can send in a 
-raw call. For example you can now call the `TimedCrowdsale#initialize` doing as follows:
-
-```js
-const { encodeCall } = require('zos-lib')
-
-data = encodeCall(
-  'initialize',
-  ['uint256', 'uint256'],
-  [openingTime, closingTime]
-)
-const timeCrowdsale = await TimeCrowdsale.new()
-await timeCrowdsale.sendTransaction({ data, from: owner })
-```
-
-## Calling Initialize Functions Manually in Your Unit Tests with Truffle 5
-
-_Note: If you're using Truffle 4, please see 
-[Calling Initialize Functions Manually in Your Unit Tests with Truffle 4](https://docs.zeppelinos.org/docs/advanced.html#calling-initialize-functions-manually-in-your-unit-tests-with-truffle-4) instead._
-
-As of version 5, Truffle uses Web3 version 1, whose Contract object has the ability to
+As of version 5, Truffle has the ability to
 overcome the problem depicted above. That is, you can call functions with matching
-names that have different arities in Javascript. 
+names that have different arities in Javascript by using the methods property of Truffle Contract. 
 
 To call TimedCrowdsale's initialize function, use the following syntax:
 
