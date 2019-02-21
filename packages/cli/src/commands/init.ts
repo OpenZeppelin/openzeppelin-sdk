@@ -6,6 +6,16 @@ import { FileSystem } from 'zos-lib';
 const name: string = 'init';
 const signature: string = `${name} [project-name] [version]`;
 const description: string = `initialize your ZeppelinOS project. Provide a <project-name> and optionally an initial [version] name`;
+const argsProps = {
+  name: {
+    message: 'Welcome to ZeppelinOS! Choose a name for your project:',
+    type: 'input'
+  },
+  version: {
+    message: 'Choose a version:',
+    type: 'input',
+  }
+};
 
 const register: (program: any) => any = (program) => program
   .command(signature, undefined, { noHelp: true })
@@ -23,12 +33,12 @@ async function action(projectName: string, version: string, options: any): Promi
 
   const defaultArgs = FileSystem.parseJsonIfExists('package.json') || {};
   const passedArgs = { name: projectName, version };
-  const promptedArgs = await promptForArgumentsIfNeeded({ args: passedArgs, defaults: defaultArgs });
+  const args = await promptForArgumentsIfNeeded({ args: passedArgs, defaults: defaultArgs, props: argsProps });
 
   const dependencies = link ? link.split(',') : [];
   const flags = { dependencies, installDependencies, force, publish };
 
-  await init({ ...passedArgs, ...promptedArgs, ...flags });
+  await init({ ...args, ...flags });
   await push.tryAction(options);
 }
 
