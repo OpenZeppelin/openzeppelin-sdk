@@ -180,7 +180,7 @@ upgradeable instances, as we will see later in the
 
 For example, you wouldn't interact with the instance of MyContract that we just deployed. This instance is only intended for defining the behavior or logic of the contract. You can find the address of this logic contract in the `zos.dev-<network_id>.json` file, under `contracts.MyContract.address`.
 
-So what _do_ you interact with? As we'll see in depth in the next guide, what you do is create a proxy for the logic contract, and interact with this proxy contract instead. 
+So what _do_ you interact with? As we'll see in depth in the next guide, what you do is create an upgradeable instance for the logic contract, and interact with this instance instead. 
 
 ```console
 npx zos create MyContract --init initialize --args 42,hitchhiker
