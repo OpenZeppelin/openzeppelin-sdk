@@ -81,9 +81,12 @@ contract('Sample', function ([_, owner]) {
 
 Use this convenient tool to write tests for your code and storage migrations before executing them in production.
 
-## Calling Initialize Functions Manually in Your Unit Tests
+## Calling Initialize Functions Manually in Your Unit Tests with Truffle 4
 
-Truffle does not know how to resolve situations where a contract 
+_Note: If you're using Truffle 5, as is recommended with ZeppelinOS 2.2, please see 
+[Calling Initialize Functions Manually in Your Unit Tests with Truffle 5](https://docs.zeppelinos.org/docs/advanced.html#calling-initialize-functions-manually-in-your-unit-tests-with-truffle-5) instead._
+
+Truffle 4 does not know how to resolve situations where a contract 
 has functions that have matching names, but different arities. 
 Here's an example of a `TimedCrowdsale` contract that inherits 
 from `Crowdsale` which results in a contract that has two 
@@ -127,4 +130,25 @@ data = encodeCall(
 )
 const timeCrowdsale = await TimeCrowdsale.new()
 await timeCrowdsale.sendTransaction({ data, from: owner })
+```
+
+## Calling Initialize Functions Manually in Your Unit Tests with Truffle 5
+
+_Note: If you're using Truffle 4, please see 
+[Calling Initialize Functions Manually in Your Unit Tests with Truffle 4](https://docs.zeppelinos.org/docs/advanced.html#calling-initialize-functions-manually-in-your-unit-tests-with-truffle-4) instead._
+
+As of version 5, Truffle uses Web3 version 1, whose Contract object has the ability to
+overcome the problem depicted above. That is, you can call functions with matching
+names that have different arities in Javascript. 
+
+To call TimedCrowdsale's initialize function, use the following syntax:
+
+```
+timedCrowadsale.methods['initialize(uint256,uint256)'](openingTime, closingTime);
+```
+
+And to call Crowdsale's initialize function,
+
+```
+timedCrowadsale.methods['initialize(uint256,address,address)'](rate, wallet, token);
 ```
