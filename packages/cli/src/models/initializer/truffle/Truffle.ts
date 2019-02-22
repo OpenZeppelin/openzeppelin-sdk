@@ -5,22 +5,22 @@ import { FileSystem } from 'zos-lib';
 
 const Truffle = {
 
-  existsTruffleConfig(root: string = process.cwd()): boolean {
-    const truffleFile = `${root}/truffle.js`;
-    const truffleConfigFile = `${root}/truffle-config.js`;
+  existsTruffleConfig(path: string = process.cwd()): boolean {
+    const truffleFile = `${path}/truffle.js`;
+    const truffleConfigFile = `${path}/truffle-config.js`;
     return FileSystem.exists(truffleFile) || FileSystem.exists(truffleConfigFile);
   },
 
-  isTruffleProject(root: string = process.cwd()): boolean {
-    const truffleDir = `${root}/node_modules/truffle`;
+  isTruffleProject(path: string = process.cwd()): boolean {
+    const truffleDir = `${path}/node_modules/truffle`;
     const existsTruffleDependency = FileSystem.exists(truffleDir);
-    return Truffle.existsTruffleConfig(root) && existsTruffleDependency;
+    return Truffle.existsTruffleConfig(path) && existsTruffleDependency;
   },
 
-  validateAndLoadNetworkConfig(network: string, force: boolean = false): void {
+  validateAndLoadNetworkConfig(network: string, force: boolean = false, path: string = process.cwd()): void {
     const config = this.getConfig(force);
     const { networks: networkList } = config;
-    if (!networkList[network]) throw Error(`Given network '${network}' is not defined in your truffle-config file`);
+    if (!networkList[network]) throw Error(`Given network '${network}' is not defined in your ${this._getTruffleConfigFileName(path)} file`);
     config.network = network;
   },
 
@@ -45,9 +45,9 @@ const Truffle = {
       return this.config;
     } catch (error) {
       if (error.message === 'Could not find suitable configuration file.') {
-        throw Error('Could not find truffle.js config file, remember to initialize your project.');
+        throw Error('Could not find truffle.js or truffle-config.js file, remember to initialize your project.');
       } else {
-        throw Error('Could not load truffle.js config file.\n' + error);
+        throw Error('Could not load truffle.js or truffle-config.js file.\n' + error);
       }
     }
   },
@@ -82,6 +82,12 @@ const Truffle = {
 
     return { ...configDefaults, ...networkDefaults };
   },
+
+  _getTruffleConfigFileName(path: string): string {
+    const truffleFile = `${path}/truffle.js`;
+    return FileSystem.exists(truffleFile) ? 'truffle.js' : 'truffle-config.js';
+  },
+
 };
 
 export default Truffle;
