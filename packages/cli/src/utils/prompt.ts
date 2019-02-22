@@ -9,15 +9,20 @@ interface Prompt {
   defaults?: {};
 }
 
-export async function promptForArgumentsIfNeeded({ args, defaults, props }: Prompt): Inquirer {
+interface Answers {
+  [key: string]: any;
+}
+
+// TS-TODO: Define a more accurate return type as soon as we know the final structure of it
+export async function promptForArgumentsIfNeeded({ args, defaults, props }: Prompt): Promise<any> {
   const questions = Object.keys(args)
-    .filter((argName) => !args[argName] || isEmpty(args[argName]) || (defaults && !defaults[argName]))
+    .filter((argName) => !args[argName] || isEmpty(args[argName]))
     .map((argName) => promptFor(argName, defaults, props));
 
   return { ...args, ...(await Inquirer.prompt(questions)) };
 }
 
-function promptFor(argName: string, defaults: {}, props: {}) {
+function promptFor(argName: string, defaults: {}, props: {}): { [key: string]: any } {
   const defaultValue = defaults ? defaults[argName] : undefined;
   return {
     default: defaultValue,
