@@ -186,7 +186,7 @@ So what _do_ you interact with? As we'll see in depth in the next guide, what yo
 npx zos create MyContract --init initialize --args 42,hitchhiker
 ```
 
-Once you create a proxy, you always interact with the same proxy, even if you decide to upgrade it and define a new logic contract for it. Executing the command above will return the address of the proxy, but you can also find it in the `zos.dev-<network_id>.json` file, under `proxies.my-project.MyContract`. You will always interact with this address, and you should never interact with the address of the logic contract.
+Once you create an upgradeable instance of MyContract, you always interact with the same instance, even if you decide to upgrade it and define a new logic contract for it. Executing the command above will return the address of the upgradeable contract instance, but you can also find it in the `zos.dev-<network_id>.json` file, under `proxies.my-project.MyContract`. You will always interact with this address, and you should never interact with the address of the logic contract.
 
 You can follow the same steps to deploy your project to mainnet or other test
 networks by just replacing `local` with the network name from your
