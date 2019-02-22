@@ -4,7 +4,6 @@ import setAdmin from '../scripts/set-admin';
 import { fromContractFullName } from '../utils/naming';
 import { hasToMigrateProject } from '../utils/prompt-migration';
 import ConfigVariablesInitializer from '../models/initializer/ConfigVariablesInitializer';
-import ZosNetworkFile from '../models/files/ZosNetworkFile';
 
 const name: string = 'set-admin';
 const signature: string = `${name} [alias-or-address] [new-admin-address]`;
@@ -20,8 +19,7 @@ const register: (program: any) => any = (program) => program
 
 async function action(contractFullNameOrAddress: string, newAdmin: string, options: any): Promise<void | never> {
   const { network, txParams } = await ConfigVariablesInitializer.initNetworkConfiguration(options);
-  const zosversion = await ZosNetworkFile.getZosversion(network);
-  if (!await hasToMigrateProject(zosversion)) process.exit(0);
+  if (!await hasToMigrateProject(network)) process.exit(0);
 
   const { yes } = options;
   if (!yes) {
