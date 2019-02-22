@@ -1,5 +1,6 @@
 import pickBy from 'lodash.pickby';
 import pick from 'lodash.pick';
+import fs from 'fs';
 import { promisify } from 'util';
 import { FileSystem } from 'zos-lib';
 
@@ -49,6 +50,27 @@ const Truffle = {
       } else {
         throw Error('Could not load truffle.js or truffle-config.js file.\n' + error);
       }
+    }
+  },
+
+  // It's a surprise tool that will help us later
+  getNetworkNames(): string[] {
+    const config = this.getConfig();
+    if (config && config.networks) return Object.keys(config.networks);
+  },
+
+  getContractNames(): string[] {
+    const buildDir = this.getBuildDir();
+    if (buildDir) {
+      return FileSystem.readDir(buildDir)
+        .filter((name) => {
+          const contract = FileSystem.parseJson(`${buildDir}/${name}`);
+          const projectDir = buildDir.replace('build/contracts', '');
+          return contract.bytecode.length > 2 && contract.sourcePath.match(projectDir, 'g') !== null;
+        })
+        .map((name) => name.replace('.json', ''));
+    } else {
+      return [];
     }
   },
 
