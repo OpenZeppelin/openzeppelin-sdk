@@ -29,3 +29,9 @@ module.exports = {
 This is due to the [transparent proxy pattern](https://docs.zeppelinos.org/docs/pattern.html#transparent-proxies-and-function-clashes). You shouldn't get this error when using ZeppelinOS via de CLI, because ZeppelinOS uses the ProxyAdmin contract. More info in the [What's new in ZeppelinOS 2.2](https://docs.zeppelinos.org/docs/new_2.2.html) section of the documentation.
 
 However, if you are using ZeppelinOS programmatically, you could run into such error. The solution is to always interact with your proxies from an account that is not the admin of the proxy, unless of course you want to specifically call functions of the proxy itself.
+
+## How can I create an upgradeable instance from Solidity code?
+
+You can create upgradeable instances from Solidity code by using your project's App contract, and then calling its `create` function from Solidity. Note that to be able to do this, your project needs to be published, i.e. it needs to have the ZeppelinOS [Contracts Architecture](https://docs.zeppelinos.org/docs/architecture.html) enabled.
+
+To see an example of how this is done, please refer to the example project [creating-instances-from-solidity](https://github.com/zeppelinos/zos/tree/master/examples/creating-instances-from-solidity).
