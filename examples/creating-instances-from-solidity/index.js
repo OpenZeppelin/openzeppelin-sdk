@@ -54,7 +54,7 @@ async function main() {
   // Notice that publish is set to true, so that the project uses an App contract.
   // This App contract will be used from within Factory.sol to dynamically create
   // proxy instances from the contract itself.
-  await init({name: 'dynamic-instance', version: '0.1.0', publish: true});
+  await init({name: 'creating-instances-from-solidity', version: '0.1.0', publish: true});
 
   // Add the Factory.sol and Instance.sol contracts to the ZeppelinOS project.
   console.log(`Adding contracts...`);
@@ -77,7 +77,7 @@ async function main() {
   // Create and initialize a proxy instance of the Factory contract.
   console.log(`Creating proxy instance of Factory.sol...`);
   const factoryProxy = await create({
-    packageName: 'dynamic-instance',
+    packageName: 'creating-instances-from-solidity',
     contractAlias: 'Factory',
     initMethod: 'initialize', 
     initArgs: [appAddress],
