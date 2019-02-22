@@ -1,6 +1,5 @@
 import pickBy from 'lodash.pickby';
 import pick from 'lodash.pick';
-import fs from 'fs';
 import { promisify } from 'util';
 import { FileSystem } from 'zos-lib';
 
@@ -51,12 +50,6 @@ const Truffle = {
         throw Error('Could not load truffle.js or truffle-config.js file.\n' + error);
       }
     }
-  },
-
-  // It's a surprise tool that will help us later
-  getNetworkNames(): string[] {
-    const config = this.getConfig();
-    if (config && config.networks) return Object.keys(config.networks);
   },
 
   getContractNames(): string[] {
