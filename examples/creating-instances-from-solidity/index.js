@@ -99,6 +99,12 @@ async function main() {
   const data = encodeCall('initialize', ['uint256'], [42]);
   console.log(`Call data for Instance.sol's initialize: ${data}`);
 
+  // TODO: Ideally, we'd want to retrieve the ProxyAdmin and forward that address
+  // to the Factory's createInstance method. The problem is that the ProxyAdmin is created
+  // lazily, and is not available at this time. Once this is changed,
+  // we can also remove the reference to the transparent proxy problem 
+  // from a few lines below.
+
   // Create and initialize a proxy instance of the Instance contract,
   // but do so via the Factory contract instead of using the create script.
   // This is the main concept of this example: proxies can be created from deployed contracts.
@@ -113,7 +119,10 @@ async function main() {
   instanceContract.at(instanceAddress);
 
   // Retrieve the value stored in the instance contract.
-  const value = await instanceContract.methods.value().call(txParams);
+  // Note that we cannot make the call using the same address that created the proxy
+  // because of the transparent proxy problem. See: https://docs.zeppelinos.org/docs/faq.html#why-are-my-getting-the-error-cannot-call-fallback-function-from-the-proxy-admin
+  const anotherAccount = (await ZWeb3.accounts())[1];
+  const value = await instanceContract.methods.value().call({ ...txParams, from: anotherAccount });
   console.log(`Retrieved value from the created Instance contract: ${value}`);
 
   return value;

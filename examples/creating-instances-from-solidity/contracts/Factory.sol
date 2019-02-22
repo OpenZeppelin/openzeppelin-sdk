@@ -14,7 +14,7 @@ contract Factory is Initializable {
   function createInstance(bytes _data) public returns (address proxy) {
     string memory packageName = "creating-instances-from-solidity";
     string memory contractName = "Instance";
-    address admin = address(app);
+    address admin = msg.sender;
     return address(app.create(packageName, contractName, admin, _data));
   }
 }
