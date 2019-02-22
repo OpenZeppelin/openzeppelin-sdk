@@ -19,10 +19,14 @@ const lib = require('zos-lib');
 // Main entry point, called by `truffle exec`.
 async function main() {
 
+  // Retrieve the name of the network being used.
+  const network = process.argv[process.argv.length - 1];
+  console.log(`Running script with the ${network} network...`);
+
   // Delete any previous ZeppelinOS files.
   console.log(`Deleting previous zos files...`);
   if(fs.existsSync('zos.json')) fs.unlinkSync('zos.json');
-  if(fs.existsSync('zos.local.json')) fs.unlinkSync('zos.local.json');
+  if(fs.existsSync(`zos.${network}.json`)) fs.unlinkSync(`zos.${network}.json`);
 
   // Enable command logging in ZeppelinOS.
   const Logger = lib.Logger;
@@ -65,12 +69,12 @@ async function main() {
 
   // Push the contracts implementations to the network.
   console.log(`Pushing contract implementations...`);
-  await push({force: true, network: 'local'});
+  await push({force: true, network });
 
   // Retrieve the address of the project's App contract.
   // This address will be passed to an instance of the Factory contract,
   // so that it can call the App contract's create function.
-  const zosLocalData = require('./zos.local.json');
+  const zosLocalData = require(`./zos.${network}.json`);
   const appAddress = zosLocalData.app.address;
   console.log(`App deployed at ${appAddress}.`);
 
@@ -81,7 +85,7 @@ async function main() {
     contractAlias: 'Factory',
     initMethod: 'initialize', 
     initArgs: [appAddress],
-    network: 'local'
+    network
   });
   console.log(`Factory proxy created at ${factoryProxy.address}`);
 
@@ -115,7 +119,9 @@ async function main() {
 
 // Required by `truffle exec`.
 module.exports = function(callback) {
-  main()
-    .then(() => callback())
-    .catch(err => callback(err));
+  return new Promise((resolve, reject) => {
+    main()
+      .then(() => resolve())
+      .catch(err => reject());
+  });
 };

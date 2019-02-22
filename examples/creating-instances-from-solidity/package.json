@@ -1,11 +1,12 @@
 {
-  "name": "dynamic-instance",
+  "name": "creating-instances-from-solidity",
   "version": "1.0.0",
   "description": "",
   "main": "truffle-config.js",
   "scripts": {
     "compile": "rm -rf build && truffle compile",
-    "start": "npm run compile && truffle exec index.js --network local"
+    "start": "npm run compile && truffle exec index.js --network local",
+    "test": "truffle test --network test"
   },
   "keywords": [],
   "author": "",
