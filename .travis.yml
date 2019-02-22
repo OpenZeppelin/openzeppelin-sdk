@@ -67,7 +67,7 @@ jobs:
     - stage: tests
       name: Creating instances from solidity tests
       install: cd examples/creating-instances-from-solidity && npm install
-      script: cd examples/creating-instances-from-solidity && npm run start
+      script: npm run start
 
     # Integration tests on local geth
     - stage: tests
