@@ -1,7 +1,6 @@
 import publish from '../scripts/publish';
 import ConfigVariablesInitializer from '../models/initializer/ConfigVariablesInitializer';
 import { hasToMigrateProject } from '../utils/prompt-migration';
-import ZosNetworkFile from '../models/files/ZosNetworkFile';
 
 const name: string = 'publish';
 const signature: string = `${name}`;
@@ -16,8 +15,7 @@ const register: (program: any) => any = (program) => program
 
 async function action(options: any): Promise<void> {
   const { network, txParams } = await ConfigVariablesInitializer.initNetworkConfiguration(options);
-  const zosversion = await ZosNetworkFile.getZosversion(network);
-  if (!await hasToMigrateProject(zosversion)) process.exit(0);
+  if (!await hasToMigrateProject(network)) process.exit(0);
 
   await publish({ network, txParams });
   if (!options.dontExitProcess && process.env.NODE_ENV !== 'test') process.exit(0);

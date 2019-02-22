@@ -28,6 +28,7 @@ import Verifier from '../Verifier';
 import LocalController from '../local/LocalController';
 import ZosNetworkFile, { ProxyInterface } from '../files/ZosNetworkFile';
 import ZosPackageFile from '../files/ZosPackageFile';
+import { ZOS_VERSION } from '../files/ZosVersion';
 
 const log = new Logger('NetworkAppController');
 type Project = ProxyAdminProject | AppProject;
@@ -456,15 +457,15 @@ export default class NetworkController {
           }
         }
       }));
-      log.info('Successfully migrated to zosversion 2.2');
+      log.info(`Successfully migrated to zosversion ${ZOS_VERSION}`);
     } else {
-      log.info('No proxies were found. Updating zosversion to 2.2');
+      log.info(`No proxies were found. Updating zosversion to ${ZOS_VERSION}`);
     }
-    this.updateZosVersions('2.2');
   }
 
   private async _migrateZosversionIfNeeded(): Promise<void> {
     if (isMigratableZosversion(this.currentZosversion)) await this._migrate();
+    this._updateZosVersionsIfNeeded(ZOS_VERSION);
   }
 
   // DeployerController
@@ -734,8 +735,8 @@ export default class NetworkController {
     }
   }
 
-  private updateZosVersions(version) {
-    this.networkFile.zosversion = version;
-    this.packageFile.zosversion = version;
+  private _updateZosVersionsIfNeeded(version) {
+    if(this.networkFile.zosversion !== ZOS_VERSION) this.networkFile.zosversion = version;
+    if(this.packageFile.zosversion !== ZOS_VERSION)this.packageFile.zosversion = version;
   }
 }
