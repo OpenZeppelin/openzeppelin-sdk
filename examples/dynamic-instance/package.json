@@ -4,7 +4,8 @@
   "description": "",
   "main": "truffle-config.js",
   "scripts": {
-    "start": "truffle exec index.js --network local"
+    "compile": "rm -rf build && truffle compile",
+    "start": "npm run compile && truffle exec index.js --network local"
   },
   "keywords": [],
   "author": "",

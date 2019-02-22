@@ -109,10 +109,7 @@ async function main() {
   instanceContract.at(instanceAddress);
 
   // Retrieve the value stored in the instance contract.
-  // Note that we cannot make the call using the same address that created the proxy
-  // because of the transparent proxy problem. See: https://docs.zeppelinos.org/docs/faq.html#why-are-my-getting-the-error-cannot-call-fallback-function-from-the-proxy-admin
-  const anotherAccount = (await ZWeb3.accounts())[1];
-  const value = await instanceContract.methods.value().call({from: anotherAccount});
+  const value = await instanceContract.methods.value().call(txParams);
   console.log(`Retrieved value from the created Instance contract: ${value}`);
 }
 

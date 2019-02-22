@@ -1,3 +1,5 @@
 node_modules/*
 build/*
-package.zos.*
+zos.*
+
+.zos.session

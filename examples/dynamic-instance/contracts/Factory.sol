@@ -12,6 +12,9 @@ contract Factory is Initializable {
   }
 
   function createInstance(bytes _data) public returns (address proxy) {
-    return address(app.create("dynamic-instance", "Instance", msg.sender, _data));
+    string memory packageName = "dynamic-instance";
+    string memory contractName = "Instance";
+    address admin = address(app);
+    return address(app.create(packageName, contractName, admin, _data));
   }
 }
