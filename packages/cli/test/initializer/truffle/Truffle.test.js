@@ -84,6 +84,24 @@ contract('Truffle', () => {
     })
   })
 
+  describe('validateAndLoadNetworkConfig', function () {
+    context('when the requested network does not exist in the truffle config file', function () {
+      context('when truffle config file is truffle.js', function () {
+        it('throws an error', function () {
+          FileSystem.write(`${testDir}/truffle.js`, 'module.exports = { networks: { test: { gas: 1, gasPrice: 2, from: \'0x0\' } } }');
+          (() => Truffle.validateAndLoadNetworkConfig('non-existent', true, testDir)).should.throw(/is not defined in your truffle.js file/);
+        })
+      })
+
+      context('when truffle config file is truffle-config.js', function () {
+        it('throws an error', function () {
+          FileSystem.write(`${testDir}/truffle-config.js`, 'module.exports = { networks: { test: { gas: 1, gasPrice: 2, from: \'0x0\' } } }');
+          (() => Truffle.validateAndLoadNetworkConfig('non-existent', true, testDir)).should.throw(/is not defined in your truffle-config.js file/);
+        })
+      })
+    })
+  })
+
   describe('getProviderAndDefaults', function () {
     const configFile = `${process.cwd()}/truffle.js`
     const configFileBackup = `${configFile}.backup`
