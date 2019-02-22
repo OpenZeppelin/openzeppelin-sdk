@@ -83,7 +83,7 @@ Use this convenient tool to write tests for your code and storage migrations bef
 
 ## Calling Initialize Functions Manually in Your Unit Tests
 
-Truffle does not know how to resolve situations where a contract 
+Sometimes, there are situations where a contract 
 has functions that have matching names, but different arities. 
 Here's an example of a `TimedCrowdsale` contract that inherits 
 from `Crowdsale` which results in a contract that has two 
@@ -111,20 +111,18 @@ may revert if you call `initialize` directly from Truffle. `zos create` handles
 this correctly as it encodes the parameters. However, for your unit tests you will 
 need to call `initialize` manually.
 
-The current solution to this issue is to `npm install zos-lib` and use the same 
-helper function used by the `zos create` command: `encodeCall`. This helper 
-receives the signature of your `initialize` function, as well as its arguments 
-and their types. `encodeCall` crafts the calldata which you can send in a 
-raw call. For example you can now call the `TimedCrowdsale#initialize` doing as follows:
+As of version 5, Truffle has the ability to
+overcome the problem depicted above. That is, you can call functions with matching
+names that have different arities in Javascript by using the methods property of Truffle Contract. 
 
-```js
-const { encodeCall } = require('zos-lib')
+To call TimedCrowdsale's initialize function, use the following syntax:
 
-data = encodeCall(
-  'initialize',
-  ['uint256', 'uint256'],
-  [openingTime, closingTime]
-)
-const timeCrowdsale = await TimeCrowdsale.new()
-await timeCrowdsale.sendTransaction({ data, from: owner })
+```
+timedCrowadsale.methods['initialize(uint256,uint256)'](openingTime, closingTime);
+```
+
+And to call Crowdsale's initialize function,
+
+```
+timedCrowadsale.methods['initialize(uint256,address,address)'](rate, wallet, token);
 ```
