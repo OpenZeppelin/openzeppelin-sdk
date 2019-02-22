@@ -66,7 +66,7 @@ jobs:
     # Test stage for creating-instances-from-solidity example
     - stage: tests
       name: Creating instances from solidity tests
-      install: pwd
+      install: npx lerna run compile-contracts
       script: npx lerna run test --concurrency=1 --stream=true --scope=creating-instances-from-solidity
 
     # Integration tests on local geth
