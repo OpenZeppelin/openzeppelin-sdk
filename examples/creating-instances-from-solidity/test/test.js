@@ -3,6 +3,7 @@ index();
 
 contract('Creating instances from Solidity', () => {
   it('should run the main script', async () => {
-    await index(() => console.log(`Test completed!`));
+    const value = await index();
+    assert.equal(value, 42, "final value returned by script is incorrect.");
   })
 });

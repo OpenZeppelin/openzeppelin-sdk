@@ -115,13 +115,19 @@ async function main() {
   // Retrieve the value stored in the instance contract.
   const value = await instanceContract.methods.value().call(txParams);
   console.log(`Retrieved value from the created Instance contract: ${value}`);
+
+  return 33;
+  // return value;
 }
 
 // Required by `truffle exec`.
 module.exports = function(callback) {
   return new Promise((resolve, reject) => {
     main()
-      .then(() => resolve())
-      .catch(err => reject());
+      .then((value) => resolve(value))
+      .catch(err => { 
+        console.log(`Error:`, err);
+        reject(err) 
+      });
   });
 };
