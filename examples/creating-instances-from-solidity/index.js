@@ -116,8 +116,7 @@ async function main() {
   const value = await instanceContract.methods.value().call(txParams);
   console.log(`Retrieved value from the created Instance contract: ${value}`);
 
-  return 33;
-  // return value;
+  return value;
 }
 
 // Required by `truffle exec`.
