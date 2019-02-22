@@ -58,8 +58,10 @@ const Truffle = {
       return FileSystem.readDir(buildDir)
         .filter((name) => {
           const contract = FileSystem.parseJson(`${buildDir}/${name}`);
-          const projectDir = buildDir.replace('build/contracts', '');
-          return contract.bytecode.length > 2 && contract.sourcePath.match(projectDir, 'g') !== null;
+          if (contract) {
+            const projectDir = buildDir.replace('build/contracts', '');
+            return contract.bytecode.length > 2 && contract.sourcePath.indexOf(projectDir) === 0;
+          } else return false;
         })
         .map((name) => name.replace('.json', ''));
     } else {

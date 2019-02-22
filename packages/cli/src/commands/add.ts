@@ -36,7 +36,7 @@ async function action(contractNames: string[], options: any): Promise<void> {
     const promptedArgs = await promptForArgumentsIfNeeded({ args: { contractNames }, props: argsProps(contractList) });
     const contractsData = contractNames.length !== 0
       ? contractNames.map(splitContractName)
-      : promptedArgs.contractNames.map(splitContractName);
+      : promptedArgs.contractNames.map((contractName) => ({ name: contractName }));
 
     add({ contractsData });
   }
@@ -44,8 +44,8 @@ async function action(contractNames: string[], options: any): Promise<void> {
 }
 
 const splitContractName = (rawData) => {
-  const [ aName, alias ] = rawData.split(':');
-  return { name: aName, alias: (alias || aName) };
+  const [contractName, alias] = rawData.split(':');
+  return { name: contractName, alias };
 };
 
 export default { name, signature, description, register, action };
