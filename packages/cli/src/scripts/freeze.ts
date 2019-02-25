@@ -1,9 +1,9 @@
-import ControllerFor from '../models/network/ControllerFor';
+import NetworkController from '../models/network/NetworkController';
 import ScriptError from '../models/errors/ScriptError';
 import { FreezeParams } from './interfaces';
 
 export default async function freeze({ network, txParams = {}, networkFile }: FreezeParams): Promise<void | never> {
-  const controller = ControllerFor(network, txParams, networkFile);
+  const controller = new NetworkController(network, txParams, networkFile);
   try {
     await controller.freeze();
     controller.writeNetworkPackageIfNeeded();

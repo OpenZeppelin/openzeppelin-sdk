@@ -20,18 +20,21 @@ export default class LocalController {
 
   public packageFile: ZosPackageFile;
 
-  constructor(packageFile: ZosPackageFile) {
+  constructor(packageFile: ZosPackageFile = new ZosPackageFile(), init: boolean = false) {
+    if(!init && !packageFile.exists()) {
+      throw Error(`ZeppelinOS file ${packageFile.fileName} not found. Run 'zos init' first to initialize the project.`);
+    }
     this.packageFile = packageFile;
   }
 
-  public init(name: string, version: string, force: boolean = false, publish: boolean = false): void {
-    this.initZosPackageFile(name, version, force);
+  public init(name: string, version: string, force: boolean = false, publish: boolean = false): void | never {
+    if(!name) throw Error('A project name must be provided to initialize the project.');
+    this.initZosPackageFile(name, version, force, publish);
     Session.ignoreFile();
     TruffleProjectInitializer.call();
-    if (publish) this.packageFile.publish = publish;
   }
 
-  public initZosPackageFile(name: string, version: string, force: boolean = false): void | never {
+  public initZosPackageFile(name: string, version: string, force: boolean = false, publish: boolean): void | never {
     if (this.packageFile.exists() && !force) {
       throw Error(`Cannot overwrite existing file ${this.packageFile.fileName}`);
     }
@@ -41,6 +44,7 @@ export default class LocalController {
     this.packageFile.name = name;
     this.packageFile.version = version || DEFAULT_VERSION;
     this.packageFile.contracts = {};
+    if (publish) this.packageFile.publish = publish;
   }
 
   public bumpVersion(version: string): void {
@@ -153,6 +157,6 @@ export default class LocalController {
   }
 
   public onNetwork(network: string, txParams: any, networkFile?: ZosNetworkFile): NetworkController {
-    return new NetworkController(this, network, txParams, networkFile);
+    return new NetworkController(network, txParams, networkFile);
   }
 }

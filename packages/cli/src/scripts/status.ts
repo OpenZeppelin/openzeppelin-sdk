@@ -1,7 +1,6 @@
 import forEach from 'lodash.foreach';
 import { Logger } from 'zos-lib';
 
-import ControllerFor from '../models/network/ControllerFor';
 import ZosNetworkFile from '../models/files/ZosNetworkFile';
 import { StatusParams } from './interfaces';
 import NetworkController from '../models/network/NetworkController';
@@ -9,7 +8,7 @@ import NetworkController from '../models/network/NetworkController';
 const log: Logger = new Logger('scripts/status');
 
 export default async function status({ network, txParams = {}, networkFile }: StatusParams): Promise<void> {
-  const controller = ControllerFor(network, txParams, networkFile);
+  const controller = new NetworkController(network, txParams, networkFile);
   log.info(`Project status for network ${network}`);
 
   if (!(await appInfo(controller))) return;

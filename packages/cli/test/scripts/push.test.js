@@ -159,7 +159,7 @@ contract('push script', function([_, owner]) {
       });
 
       it('should refuse to push a contract with validation error', async function () {
-        add({ contractsData: ['WithConstructor'], packageFile: this.networkFile.packageFile });
+        add({ contractsData: [{ name: 'WithConstructor' }], packageFile: this.networkFile.packageFile });
         await push({ networkFile: this.networkFile, network, txParams }).should.be.rejectedWith(/One or more contracts have validation errors/i)
         
         this.logs.errors.should.have.lengthOf(1);
@@ -167,7 +167,7 @@ contract('push script', function([_, owner]) {
       })
       
       it('should push a contract with validation error if forced', async function () {
-        add({ contractsData: ['WithConstructor'], packageFile: this.networkFile.packageFile });
+        add({ contractsData: [{ name: 'WithConstructor' }], packageFile: this.networkFile.packageFile });
         await push({ networkFile: this.networkFile, network, txParams, force: true });
         
         this.logs.errors.should.have.lengthOf(1);
@@ -178,7 +178,7 @@ contract('push script', function([_, owner]) {
       })
 
       it('should only report new validation errors', async function () {
-        add({ contractsData: ['WithConstructor'], packageFile: this.networkFile.packageFile });
+        add({ contractsData: [{ name: 'WithConstructor' }], packageFile: this.networkFile.packageFile });
         await push({ networkFile: this.networkFile, network, txParams, force: true });
         const previousAddress = this.networkFile.contract('WithConstructor').address;
         
@@ -192,7 +192,7 @@ contract('push script', function([_, owner]) {
       })
 
       it('should only validate modified contracts', async function () {
-        add({ contractsData: ['WithConstructor'], packageFile: this.networkFile.packageFile });
+        add({ contractsData: [{ name: 'WithConstructor' }], packageFile: this.networkFile.packageFile });
         await push({ networkFile: this.networkFile, network, txParams, force: true });
         const previousAddress = this.networkFile.contract('Impl').address;
 

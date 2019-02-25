@@ -8,24 +8,27 @@ import utils from 'web3-utils';
 import BN from 'bignumber.js';
 
 contract('ZWeb3', accounts => {
-  accounts = accounts.map(utils.toChecksumAddress); // Required by Web3 v1.x.
+  accounts = accounts.map(utils.toChecksumAddress);
   
   before('deploy dummy instance', async function () {
     this.DummyImplementation = Contracts.getFromLocal('DummyImplementation')
     this.impl = await this.DummyImplementation.new()
   })
 
-  describe('when it is not initialized', function () {
-    beforeEach('undo ZWeb3 initialization', () => ZWeb3.initialize())
-    afterEach('initialize ZWeb3', () => ZWeb3.initialize(web3.currentProvider))
-
-    it('cannot be called', async function () {
-      expect(() => ZWeb3.web3()).to.throw(/ZWeb3 must be initialized with a web3 provider/)
+  describe('when initializing without a provider', function () {
+    it('initializes web3 without a provider', async function () {
+      ZWeb3.initialize();
+      ZWeb3.web3().should.not.be.null;
+      expect(ZWeb3.web3().currentProvider).to.be.null;
     })
   })
 
   describe('when initialized', function () {
     beforeEach('initialize ZWeb3', () => ZWeb3.initialize(web3.currentProvider))
+
+    it('initializes web3 with a provider', function () {
+      ZWeb3.web3().currentProvider.should.not.be.null;
+    })
 
     it('knows a web3 instance', function () {
       ZWeb3.web3().should.not.be.null

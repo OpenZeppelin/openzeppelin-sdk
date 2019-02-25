@@ -3,7 +3,7 @@ pragma solidity ^0.4.24;
 import "./ImplementationProvider.sol";
 import "./Package.sol";
 import "../upgradeability/AdminUpgradeabilityProxy.sol";
-import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
+import "../openzeppelin-solidity/ownership/Ownable.sol";
 
 /**
  * @title App

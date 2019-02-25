@@ -1,5 +1,5 @@
 import stdout from '../utils/stdout';
-import ControllerFor from '../models/network/ControllerFor';
+import NetworkController from '../models/network/NetworkController';
 import ScriptError from '../models/errors/ScriptError';
 import { UpdateParams } from './interfaces';
 
@@ -8,7 +8,7 @@ export default async function update({ packageName, contractAlias, proxyAddress,
     throw Error('The package name, contract name, or address to update must be provided, or set the `all` flag to update all contracts in the application.');
   }
 
-  const controller = ControllerFor(network, txParams, networkFile);
+  const controller = new NetworkController(network, txParams, networkFile);
 
   try {
     await controller.checkLocalContractsDeployed(!force);

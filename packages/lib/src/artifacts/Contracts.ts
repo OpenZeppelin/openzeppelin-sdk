@@ -1,6 +1,6 @@
 import glob from 'glob';
 import path from 'path';
-import Contract, { createZosContract } from './Contract';
+import Contract, { createContract } from './Contract';
 import ZWeb3 from './ZWeb3';
 import { getSolidityLibNames, hasUnlinkedVariables } from '../utils/Bytecode';
 
@@ -95,6 +95,6 @@ export default class Contracts {
       schema.linkedBytecode = schema.bytecode;
       schema.linkedDeployedBytecode = schema.deployedBytecode;
     }
-    return createZosContract(schema);
+    return createContract(schema);
   }
 }

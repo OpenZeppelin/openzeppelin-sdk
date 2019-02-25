@@ -3,7 +3,7 @@ pragma solidity ^0.4.24;
 import "../application/ImplementationProvider.sol";
 import "../application/Package.sol";
 import { DeprecatedAdminUpgradeabilityProxy as AdminUpgradeabilityProxy } from "../mocks/DeprecatedAdminUpgradeabilityProxy.sol";
-import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
+import "../openzeppelin-solidity/ownership/Ownable.sol";
 
 /**
  * @title App

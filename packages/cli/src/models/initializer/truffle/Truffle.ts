@@ -52,6 +52,24 @@ const Truffle = {
     }
   },
 
+  getContractNames(): string[] {
+    const buildDir = this.getBuildDir();
+    if (buildDir) {
+      return FileSystem.readDir(buildDir)
+        .filter((name) => name.match(/\.json$/))
+        .filter((name) => {
+          const contract = FileSystem.parseJsonIfExists(`${buildDir}/${name}`);
+          if (contract) {
+            const projectDir = buildDir.replace('build/contracts', '');
+            return contract.bytecode.length > 2 && contract.sourcePath.indexOf(projectDir) === 0;
+          } else return false;
+        })
+        .map((name) => name.replace('.json', ''));
+    } else {
+      return [];
+    }
+  },
+
   // This function fixes a truffle issue related to HDWalletProvider that occurs when assigning
   // the network provider as a function (that returns an HDWalletProvider instance) instead of
   // assigning the HDWalletProvider instance directly.
