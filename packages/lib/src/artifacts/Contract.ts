@@ -5,7 +5,7 @@ import { Callback, EventLog, EventEmitter, TransactionReceipt } from 'web3/types
 import { Contract as Web3Contract, TransactionObject, BlockType } from 'web3-eth-contract';
 
 /*
- * ZosContract is an interface that extends Web3's Contract interface, adding some properties and methods like:
+ * Contract is an interface that extends Web3's Contract interface, adding some properties and methods like:
  * address getter: retrieves the deployed address
  * schema: compilation artifacts
  * new(): deployes a new contract
@@ -25,9 +25,9 @@ export default interface Contract {
   getPastEvents(event: string, options?: { filter?: object; fromBlock?: BlockType; toBlock?: BlockType; topics?: string[]; }, cb?: Callback<EventLog[]>): Promise<EventLog[]>;
   setProvider(provider: any): void;
 
-  // ZosContract specific.
+  // Contract specific.
   address: string;
-  new: (args: any[], options: any) => Promise<Contract>;
+  new: (args?: any[], options?: {}) => Promise<Contract>;
   at: (address: string) => Contract;
   link: (libraries: { [libAlias: string]: string }) => void;
   deployment?: { transactionHash: string, transactionReceipt: TransactionReceipt };
@@ -60,7 +60,8 @@ export default interface Contract {
 function _wrapContractInstance(schema: any, instance: Web3Contract): Contract {
   instance.schema = schema;
 
-  instance.new = async function(args: any[] = [], options: any = {}): Promise<Contract> {
+  instance.new = async function(...passedArguments): Promise<Contract> {
+    const [args, options] = parseArguments(passedArguments, schema.abi);
     if(!schema.linkedBytecode) throw new Error(`${schema.contractName} bytecode contains unlinked libraries.`);
     instance.options = { ...instance.options, ...(await Contracts.getDefaultTxParams()) };
     return new Promise((resolve, reject) => {
@@ -102,7 +103,21 @@ function _wrapContractInstance(schema: any, instance: Web3Contract): Contract {
   return instance;
 }
 
-export function createZosContract(schema: any): Contract {
+export function createContract(schema: any): Contract {
   const contract = ZWeb3.contract(schema.abi, null, Contracts.getArtifactsDefaults());
   return _wrapContractInstance(schema, contract);
+}
+
+function parseArguments(passedArguments, abi) {
+  const constructorAbi = abi.find((elem) => elem.type === 'constructor') || {};
+  const constructorArgs = constructorAbi.inputs && constructorAbi.inputs.length > 0 ? constructorAbi.inputs : [];
+  let givenOptions = {};
+
+  if (passedArguments.length === constructorArgs.length + 1) {
+      const lastArg = passedArguments[passedArguments.length - 1];
+      if (typeof(lastArg) === 'object') {
+        givenOptions = passedArguments.pop();
+      }
+  }
+  return [passedArguments, givenOptions];
 }

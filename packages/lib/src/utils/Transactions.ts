@@ -91,7 +91,7 @@ export default {
 
     try {
       const gas = txParams.gas || Contracts.getArtifactsDefaults().gas || await this.estimateActualGas({ data: buildDeploymentCallData(contract, args), ...txParams });
-      return contract.new(args, { ...txParams, gas });
+      return contract.new(...args, { ...txParams, gas });
     } catch (error) {
       if (!error.message.match(/nonce too low/) || retries <= 0) throw error;
       return this.deployContract(contract, args, txParams, retries - 1);

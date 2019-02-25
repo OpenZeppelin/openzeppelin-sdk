@@ -23,7 +23,7 @@ contract('ProxyAdmin class', function(accounts) {
   });
 
   beforeEach(async function() {
-    this.proxyAdminContract = await ProxyAdminContract.new([], this.txParams);
+    this.proxyAdminContract = await ProxyAdminContract.new(this.txParams);
     this.proxyAdmin = new ProxyAdmin(this.proxyAdminContract, this.txParams);
     this.proxy = await Proxy.deploy(this.implementationV1.address, this.proxyAdmin.address, null, this.txParams);
   });

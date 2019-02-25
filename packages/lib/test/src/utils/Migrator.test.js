@@ -23,15 +23,15 @@ contract('migrator', function(accounts) {
     this.version = '0.0.1';
     this.contractName = 'ERC721';
     this.packageName = 'MyProject';
-    this.implV1 = (await ImplV1.new([])).address;
+    this.implV1 = (await ImplV1.new()).address;
   });
 
   beforeEach('initializing', async function() {
-    this.directory = await ImplementationDirectory.new([], { from: owner });
+    this.directory = await ImplementationDirectory.new({ from: owner });
     await this.directory.methods.setImplementation(this.contractName, this.implV1).send({ from: owner });
-    this.package = await Package.new([], { from: owner });
+    this.package = await Package.new({ from: owner });
     await this.package.methods.addVersion(toSemanticVersion(this.version), this.directory.address, this.contentURI).send({ from: owner });
-    this.app = await DeprecatedApp.new([], { from: owner });
+    this.app = await DeprecatedApp.new({ from: owner });
     await this.app.methods.setPackage(this.packageName, this.package.address, toSemanticVersion(this.version)).send({ from: owner });
     const { events } = await this.app.methods.create(this.packageName, this.contractName, EMPTY_INITIALIZATION_DATA).send({ from: owner });
     this.proxyAddress = events['ProxyCreated'].returnValues.proxy;
