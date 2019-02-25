@@ -42,11 +42,7 @@ export function ifNotExistsThrow(filename: string, message: string): void {
 
 // TS-TODO: Returned object could be of a more specific type
 export function parseJson(filename: string): any {
-  try {
-    return JSON.parse(read(filename));
-  } catch(error) {
-    return null;
-  }
+  return JSON.parse(read(filename));
 }
 
 export function parseJsonIfExists(filename: string): any | null {
