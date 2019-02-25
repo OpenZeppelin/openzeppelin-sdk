@@ -13,9 +13,9 @@ async function deploy(options) {
   await update(Object.assign({ contractAlias: 'MyContract', initMethod: 'add', initArgs: [10] }, options));
 }
 
-module.exports = function(deployer, network, accounts) {
+module.exports = function(deployer, networkName, accounts) {
   deployer.then(async () => {
-    const { network, txParams } = await ConfigVariablesInitializer.initNetworkConfiguration({ network, from: accounts[1] })
+    const { network, txParams } = await ConfigVariablesInitializer.initNetworkConfiguration({ network: networkName, from: accounts[1] })
     await deploy({ network, txParams })
   })
 }
