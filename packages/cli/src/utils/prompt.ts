@@ -1,5 +1,6 @@
 import isEmpty from 'lodash.isempty';
 import Inquirer from 'inquirer';
+import Truffle from '../models/initializer/truffle/Truffle';
 
 interface PromptParams {
   args?: {};
@@ -14,6 +15,17 @@ export async function promptForArgumentsIfNeeded({ args, defaults, props }: Prom
     .map((argName) => promptFor(argName, defaults, props));
 
   return { ...args, ...(await Inquirer.prompt(questions)) };
+}
+
+export function getContractsList(message, type) {
+  const contractList = Truffle.getContractNames();
+  return {
+    contractNames: {
+      type,
+      message,
+      choices: contractList
+    }
+  };
 }
 
 function promptFor(argName: string, defaults: {}, props: {}): { [key: string]: any } {

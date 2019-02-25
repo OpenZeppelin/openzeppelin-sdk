@@ -4,8 +4,7 @@ import addAll from '../scripts/add-all';
 import Truffle from '../models/initializer/truffle/Truffle';
 import Compiler from '../models/compiler/Compiler';
 import ConfigVariablesInitializer from '../models/initializer/ConfigVariablesInitializer';
-import { promptForArgumentsIfNeeded } from '../utils/prompt';
-import { getContractsList } from './share';
+import { promptForArgumentsIfNeeded, getContractsList } from '../utils/prompt';
 
 const name: string = 'add';
 const signature: string = `${name} [contractNames...]`;
