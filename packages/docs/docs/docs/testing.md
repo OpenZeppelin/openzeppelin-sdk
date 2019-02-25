@@ -7,7 +7,7 @@ When working with ZeppelinOS, you can test your contracts as you usually do. Tha
 
 Instead, you can use specifically designed ZeppelinOS tools that automatically set up your entire project in your testing environment. This allows you to replicate the same set of contracts that manage your project for each test you run.
 
-The `zos` package provides a `TestHelper()` function to retrieve your project structure from the `zos.json` file and deploy everything to the current test network. All the contracts that you have registered via `zos add`, plus all the contracts provided by the EVM packages you have linked, will be available. The returned project object (either a [`SimpleProject`](https://github.com/zeppelinos/zos/blob/master/packages/lib/src/project/SimpleProject.js) or an [`AppProject`](https://github.com/zeppelinos/zos/blob/master/packages/lib/src/project/AppProject.js)) provides convenient methods for creating upgradeable instances of your contracts, which you can use within your tests. Lets see how this would work in a simple project.
+The `zos` package provides a `TestHelper()` function to retrieve your project structure from the `zos.json` file and deploy everything to the current test network. All the contracts that you have registered via `zos add`, plus all the contracts provided by the EVM packages you have linked, will be available. The returned project object (either a [`SimpleProject`](https://github.com/zeppelinos/zos/blob/master/packages/lib/src/project/ProxyAdminProject.js) or an [`AppProject`](https://github.com/zeppelinos/zos/blob/master/packages/lib/src/project/AppProject.js)) provides convenient methods for creating upgradeable instances of your contracts, which you can use within your tests. Lets see how this would work in a simple project.
 
 ## Setting up a sample project
 
@@ -61,8 +61,8 @@ To be able to use ES6 Javascript syntax in your tests, make sure you [set up bab
 Now, lets create the test file `test/Sample.test.js`:
 
 ```javascript
-import { TestHelper } from 'zos';
-import { Contracts, ZWeb3 } from 'zos-lib';
+const { TestHelper } = require('zos');
+const { Contracts, ZWeb3 } = require('zos-lib');
 
 ZWeb3.initialize(web3.currentProvider);
 
@@ -89,13 +89,12 @@ contract('Sample', function () {
     result.should.eq('0');
   })
 })
-
 ```
 
 Next, modify your `package.json` file to include the following script:
 
 ```json
-"test": "NODE_ENV=test truffle test"
+"test": "truffle test"
 ```
 
 And run the test in your console with:
@@ -108,16 +107,16 @@ That's it! Now, lets look at what we just did in more detail.
 
 ## Understanding the test script
 
-We first import `TestHelper` from `zos`. This helper facilitates the creation of a project object that will set up the entire ZeppelinOS project within a test environment.
+We first require `TestHelper` from `zos`. This helper facilitates the creation of a project object that will set up the entire ZeppelinOS project within a test environment.
 
 ```js
-import { TestHelper } from 'zos';
+const { TestHelper } = require('zos');
 ```
 
-We are also importing `Contracts` and `ZWeb3` from `zos-lib`. `Contracts` helps us retrieve compiled contract artifacts, while `ZWeb3` is needed to set up our Web3 provider to ZeppelinOS.
+We are also requiring `Contracts` and `ZWeb3` from `zos-lib`. `Contracts` helps us retrieve compiled contract artifacts, while `ZWeb3` is needed to set up our Web3 provider to ZeppelinOS.
 
 ```js
-import { Contracts, ZWeb3 } from 'zos-lib';
+const { Contracts, ZWeb3 } = require('zos-lib');
 
 ZWeb3.initialize(web3.currentProvider);
 
@@ -132,7 +131,7 @@ beforeEach(async function () {
 });
 ```
 
-And finally, we add the tests themselves. Notice how each test first creates a proxy for each contract:
+And finally, we add the tests themselves. Notice how each test first creates a upgradeable instance for each contract:
 
 ```js
 const proxy = await this.project.createProxy(Sample);
@@ -148,7 +147,7 @@ const result = await proxy.methods.totalSupply().call();
 
 This is how you should write tests for your ZeppelinOS projects. The project object provided by `TestHelper` wraps all of ZeppelinOS programmatic interface in a way that is very convenient to use in tests. By running tests in this way, you make sure that you are testing your contracts with the exact set of conditions that they would have in production, after you deploy them with ZeppelinOS.
 
-## Bonus: Calling initialize functions manually in your tests
+## Calling initialize functions manually in your tests
 
 Sometimes, there are situations where a contract 
 has functions that have matching names, but different arities. 
