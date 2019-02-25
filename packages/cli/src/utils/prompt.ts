@@ -1,7 +1,5 @@
 import isEmpty from 'lodash.isempty';
-
 import Inquirer from 'inquirer';
-import Truffle from '../models/initializer/truffle/Truffle';
 
 interface PromptParams {
   args?: {};
