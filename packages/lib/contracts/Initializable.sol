@@ -31,17 +31,15 @@ contract Initializable {
   modifier initializer() {
     require(initializing || isConstructor() || !initialized, "Contract instance has already been initialized");
 
-    bool wasInitializing = initializing;
-    if (!wasInitializing) {
+    bool isTopLevelCall = !initializing;
+    if (isTopLevelCall) {
       initializing = true;
-    }
-    if (!initialized) {
       initialized = true;
     }
 
     _;
 
-    if (!wasInitializing) {
+    if (isTopLevelCall) {
       initializing = false;
     }
   }
