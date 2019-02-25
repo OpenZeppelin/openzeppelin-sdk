@@ -7,7 +7,6 @@ import ZWeb3 from '../../../src/artifacts/ZWeb3'
 import Package from '../../../src/application/Package'
 import Contracts from '../../../src/artifacts/Contracts'
 import ProxyAdmin from '../../../src/proxy/ProxyAdmin'
-import expectEvent from 'openzeppelin-solidity/test/helpers/expectEvent'
 import { ZERO_ADDRESS } from '../../../src/utils/Addresses';
 import { ImplementationDirectory, Proxy } from '../../../src';
 import Transactions from '../../../src/utils/Transactions';
