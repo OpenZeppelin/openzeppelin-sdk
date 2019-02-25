@@ -33,7 +33,7 @@ However, if you are using ZeppelinOS programmatically, you could run into such e
 ## How do I use ES6 Javascript syntax in my tests?
 
 First, make sure you add the following dev-dependencies to your project: `babel-polyfill`, `babel-register`, `babel-preset-es2015`, `babel-preset-stage-2` and `babel-preset-stage-3`.
-
+`npm install --save-dev babel-polyfill babel-register babel-preset-es2015 babel-preset-stage-2 babel-preset-stage-3`
 Next, create a `.babelrc` file at the root of your repo, containing:
 
 ```
