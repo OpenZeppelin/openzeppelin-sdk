@@ -56,8 +56,9 @@ const Truffle = {
     const buildDir = this.getBuildDir();
     if (buildDir) {
       return FileSystem.readDir(buildDir)
+        .filter((name) => name.match(/\.json$/))
         .filter((name) => {
-          const contract = FileSystem.parseJson(`${buildDir}/${name}`);
+          const contract = FileSystem.parseJsonIfExists(`${buildDir}/${name}`);
           if (contract) {
             const projectDir = buildDir.replace('build/contracts', '');
             return contract.bytecode.length > 2 && contract.sourcePath.indexOf(projectDir) === 0;
