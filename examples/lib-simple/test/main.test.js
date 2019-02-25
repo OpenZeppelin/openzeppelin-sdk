@@ -1,10 +1,17 @@
 'use strict'
+require('./setup');
 const main = require('../index.js').main;
 
-contract('main', function(_accounts) {
-  it('should run successfully', async function () {
-    const instance = await main();
-    const value = await instance.value();
-    assert.equal(value.toNumber(), 43);
+contract('main', function([creatorAddress, initializerAddress]) {
+  let instance;
+
+  it('initialize successfully', async function () {
+    instance = await main();
+    assert.isString(instance.address);
+  })
+  
+  it('set and update the value successfully', async function () {
+    const value = await instance.methods.value().call({ from: initializerAddress });
+    assert.equal(value, 43);
   })
 });

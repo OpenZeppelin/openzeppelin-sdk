@@ -4,22 +4,32 @@
 global.artifacts = artifacts;
 global.web3 = web3;
 
-const { Contracts, SimpleProject  } = require('zos-lib')
-const MyContract_v0 = Contracts.getFromLocal('MyContract_v0');
-const MyContract_v1 = Contracts.getFromLocal('MyContract_v1');
+const { Contracts, SimpleProject, ZWeb3 } = require('zos-lib')
 
 async function main() {
-  const creatorAddress = web3.eth.accounts[1],
-        initializerAddress = web3.eth.accounts[2],
-        myProject = new SimpleProject('MyProject', { from: creatorAddress });
 
+  /* Initialize ZeppelinOS's Web3 provider. */
+  ZWeb3.initialize(web3.currentProvider)
+
+  /* Retrieve compiled contract artifacts. */
+  const MyContract_v0 = Contracts.getFromLocal('MyContract_v0');
+  const MyContract_v1 = Contracts.getFromLocal('MyContract_v1');
+
+  /* Retrieve a couple of addresses to interact with the contracts. */
+  const [creatorAddress, initializerAddress] = await ZWeb3.accounts();
+
+  /* Create a SimpleProject to interact with ZeppelinOS programmatically. */
+  const myProject = new SimpleProject('MyProject', { from: creatorAddress });
+
+  /* Deploy the contract with a proxy that allows upgrades. Initialize it by setting the value to 42. */
   log('Creating an upgradeable instance of v0...');
   const instance = await myProject.createProxy(MyContract_v0, { initArgs: [42] })
-  log('Contract\'s storage value: ' + (await instance.value()).toString() + '\n');
+  log('Contract\'s storage value: ' + (await instance.methods.value().call({ from: initializerAddress })).toString() + '\n');
   
+  /* Upgrade the contract at the address of our instance to the new logic, and initialize with a call to add. */
   log('Upgrading to v1...');
-  await myProject.upgradeProxy(instance, MyContract_v1, { initMethod: 'add', initArgs: [1], initFrom: initializerAddress })
-  log('Contract\'s storage new value: ' + (await instance.value()).toString() + '\n');
+  await myProject.upgradeProxy(instance.address, MyContract_v1, { initMethod: 'add', initArgs: [1], initFrom: initializerAddress })
+  log('Contract\'s storage new value: ' + (await instance.methods.value().call({ from: initializerAddress })).toString() + '\n');
   
   log('Wohoo! We\'ve upgraded our contract\'s behavior while preserving its storage, thus obtaining 43.');
   return instance
