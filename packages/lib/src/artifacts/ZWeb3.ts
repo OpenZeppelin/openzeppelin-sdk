@@ -29,7 +29,7 @@ export default class ZWeb3 {
 
   // TODO: this.web3 could be cached and initialized lazily?
   public static web3(): any {
-    if (!ZWeb3.provider) throw new Error('ZWeb3 must be initialized with a web3 provider');
+    if (!ZWeb3.provider) return new Web3();
 
     // TODO: improve provider validation for HttpProvider scenarios
     return (typeof ZWeb3.provider === 'string')
