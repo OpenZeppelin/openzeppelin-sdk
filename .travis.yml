@@ -17,6 +17,7 @@ cache:
   - packages/docs/node_modules
   - examples/lib-simple/node_modules
   - examples/lib-complex/node_modules
+  - examples/creating-instances-from-solidity/node_modules
   - tests/cli-app/node_modules
   - tests/cli-app/workdir/node_modules
 
@@ -61,6 +62,12 @@ jobs:
       name: Complex example tests
       install: npx lerna run compile-contracts
       script: npx lerna run test --concurrency=1 --stream=true --scope=zos-lib-complex-example
+
+    # Test stage for creating-instances-from-solidity example
+    - stage: tests
+      name: Creating instances from solidity tests
+      install: npx lerna run compile-contracts
+      script: npx lerna run test --concurrency=1 --stream=true --scope=creating-instances-from-solidity
 
     # Integration tests on local geth
     - stage: tests
