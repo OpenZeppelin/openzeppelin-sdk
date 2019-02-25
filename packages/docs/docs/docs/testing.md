@@ -71,10 +71,10 @@ const ERC20 = Contracts.getFromNodeModules('openzeppelin-eth', 'ERC20');
 
 require('chai').should();
 
-contract('Sample', function ([_, owner]) {
+contract('Sample', function () {
 
   beforeEach(async function () {
-    this.project = await TestHelper({ from: owner });
+    this.project = await TestHelper();
   })
 
   it('should create a proxy', async function () {
@@ -128,7 +128,7 @@ const ERC20 = Contracts.getFromNodeModules('openzeppelin-eth', 'ERC20');
 We then invoke `TestHelper` in the test, optionally including a set of options to be used when deploying the contracts (such as `from`, `gas`, and `gasPrice`):
 ```js
 beforeEach(async function () {
-  this.project = await TestHelper({ from: owner })
+  this.project = await TestHelper()
 });
 ```
 
