@@ -2,25 +2,34 @@ import isEmpty from 'lodash.isempty';
 import Inquirer from 'inquirer';
 import Truffle from '../models/initializer/truffle/Truffle';
 
-interface PromptParams {
+interface Args {
   args?: {};
+  opts?: {};
   props?: {};
   defaults?: {};
 }
 
+interface GenericObject {
+  [key: string]: any;
+}
+
 // TS-TODO: Define a more accurate return type as soon as we know the final structure of it
-export async function promptForArgumentsIfNeeded({ args, defaults, props }: PromptParams): Promise<any> {
-  const questions = Object.keys(args)
+export async function promptIfNeeded({ args = {}, opts = {}, defaults, props }: Args): Promise<any> {
+  const argsQuestions = Object.keys(args)
     .filter((argName) => !args[argName] || isEmpty(args[argName]))
     .map((argName) => promptFor(argName, defaults, props));
 
-  return { ...args, ...(await Inquirer.prompt(questions)) };
+  const optsQuestions = Object.keys(opts)
+    .filter((optName) => !opts[optName])
+    .map((optName) => promptFor(optName, {}, props));
+
+  return { ...args, ...opts, ...await answersFor(argsQuestions), ...await answersFor(optsQuestions) };
 }
 
-export function getContractsList(message, type) {
+export function getContractsList(name, message, type) {
   const contractList = Truffle.getContractNames();
   return {
-    contractNames: {
+    [name]: {
       type,
       message,
       choices: contractList
@@ -28,13 +37,18 @@ export function getContractsList(message, type) {
   };
 }
 
-function promptFor(argName: string, defaults: {}, props: {}): { [key: string]: any } {
-  const defaultValue = defaults ? defaults[argName] : undefined;
+function promptFor(name: string, defaults: {}, props: {}): GenericObject {
+  const defaultValue = defaults ? defaults[name] : undefined;
   return {
-    default: defaultValue,
-    type: props[argName].type,
-    message: props[argName].message,
-    name: argName,
-    choices: props[argName].choices,
+    name,
+    type: props[name].type,
+    message: props[name].message,
+    choices: props[name].choices,
+    when: props[name].when,
+    default: defaultValue || props[name].default
   };
+}
+
+async function answersFor(questions) {
+  return Inquirer.prompt(questions);
 }
