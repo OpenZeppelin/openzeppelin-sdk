@@ -8,5 +8,4 @@ export default async function link({ dependencies = [], installDependencies = fa
 
   await controller.linkDependencies(dependencies, installDependencies);
   controller.writePackage();
-  dependencies.forEach((depNameVersion) => stdout(depNameVersion));
 }

@@ -8,5 +8,4 @@ export default async function unlink({ dependencies = [], packageFile }: UnlinkP
 
   controller.unlinkDependencies(dependencies);
   controller.writePackage();
-  dependencies.forEach((dependencyName) => stdout(dependencyName));
 }
