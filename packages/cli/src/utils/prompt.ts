@@ -21,7 +21,7 @@ export async function promptIfNeeded({ args = {}, opts = {}, defaults, props }: 
 
   const optsQuestions = Object.keys(opts)
     .filter((optName) => !opts[optName])
-    .map((optName) => promptFor(optName, {}, props));
+    .map((optName) => promptFor(optName, defaults, props));
 
   return { ...args, ...opts, ...await answersFor(argsQuestions), ...await answersFor(optsQuestions) };
 }

@@ -21,7 +21,6 @@ const props = (optimizerEnabled) => {
     optimizerRuns: {
       type: 'input',
       message: 'Specify the optimizer runs',
-      default: '200',
       when: ({ optimizer }) => optimizer || optimizerEnabled
     },
     remote: {
@@ -52,7 +51,8 @@ async function action(contractName: string, options: any): Promise<void | never>
   const { optimizer, optimizerRuns, remote, apiKey, network: networkName } = options;
   const currentOpts = { network: networkName, optimizer, optimizerRuns, remote, apiKey };
 
-  const promptedArgsAndOpts = await promptIfNeeded({ args: { contractName }, opts: currentOpts, props: props(optimizer) });
+  const defaultArgs = Truffle.getCompilerInfo();
+  const promptedArgsAndOpts = await promptIfNeeded({ args: { contractName }, opts: currentOpts, defaults: defaultArgs, props: props(optimizer) });
   const { network, txParams } = await ConfigVariablesInitializer.initNetworkConfiguration(promptedArgsAndOpts);
 
   await verify(promptedArgsAndOpts.contractName, { ...promptedArgsAndOpts, network, txParams });
