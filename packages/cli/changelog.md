@@ -4,7 +4,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
-## Next
+## v2.2.1 - 2019-02-26
+
+### Fixed
+- Provider initialization issue on `zos check` command ([#737](https://github.com/zeppelinos/zos/pull/737))
+- Error messages that refer to `truffle.js` config file when actually it is `truffle-config.js` ([#710](https://github.com/zeppelinos/zos/pull/710))
+- Error message "Cannot read zosversion of undefined" when attempting to create a contract on a new network that had not been `push`'ed to before ([#711](https://github.com/zeppelinos/zos/pull/711))
+- Handle spaces in project path when compiling contracts ([#743](https://github.com/zeppelinos/zos/pull/743))
+
+## v2.2.0 - 2019-02-14
 
 ### Added
 - Contributing guidelines ([#553](https://github.com/zeppelinos/zos/pull/553))
