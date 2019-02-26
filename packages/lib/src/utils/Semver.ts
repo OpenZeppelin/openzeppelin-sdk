@@ -12,7 +12,7 @@ type RawSemanticVersion = [any, any, any];
 
 export function toSemanticVersion(version: string | RawSemanticVersion): SemanticVersion | never {
   if (isString(version)) {
-    const semanticVersion: any = semver.parse(version);
+    const semanticVersion: any = semver.parse(<string>version);
     if (!semanticVersion) throw Error(`Cannot parse version identifier ${version}`);
     return [semanticVersion.major, semanticVersion.minor, semanticVersion.patch];
   } else if (isArray(version) && version.length === 3) {

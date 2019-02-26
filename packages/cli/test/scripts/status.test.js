@@ -7,7 +7,7 @@ import bumpVersion from '../../src/scripts/bump';
 import createProxy from '../../src/scripts/create';
 import status from '../../src/scripts/status';
 import link from '../../src/scripts/link';
-import ControllerFor from '../../src/models/local/ControllerFor';
+import LocalController from '../../src/models/local/LocalController';
 import CaptureLogs from '../helpers/captureLogs';
 import ZosPackageFile from "../../src/models/files/ZosPackageFile";
 import remove from '../../src/scripts/remove';
@@ -200,12 +200,12 @@ contract('status script', function([_, owner]) {
   const shouldNotModifyPackage = function () {
     it('should not deploy a new package', async function () {
       await push({ network, txParams, networkFile: this.networkFile });
-      const packageAddress = ControllerFor(this.packageFile).onNetwork(network, txParams, this.networkFile).packageAddress;
+      const packageAddress = new LocalController(this.packageFile).onNetwork(network, txParams, this.networkFile).packageAddress;
 
       await this.capturingLogs(status({ network, networkFile: this.networkFile }));
 
       this.logs.text.should.not.match(/deploying new package/i);
-      ControllerFor(this.packageFile).onNetwork(network, txParams, this.networkFile).packageAddress.should.eq(packageAddress);
+      new LocalController(this.packageFile).onNetwork(network, txParams, this.networkFile).packageAddress.should.eq(packageAddress);
     });
   }
 

@@ -1,5 +1,7 @@
 require('../../setup')
 
+import sinon from 'sinon'
+
 import { FileSystem } from 'zos-lib'
 import Truffle from '../../../src/models/initializer/truffle/Truffle'
 
@@ -117,7 +119,7 @@ contract('Truffle', () => {
 
     context('when the requested network has default values', function () {
       beforeEach('create truffle config file', function () {
-        FileSystem.write(configFile, 'module.exports = { networks: { test: { gas: 1, gasPrice: 2, from: \'0x0\' } } }');
+        FileSystem.write(configFile, 'module.exports = { networks: { test: { gas: 1, gasPrice: 2, from: \'0x0\' } } }')
         Truffle.validateAndLoadNetworkConfig('test', true)
       })
 
@@ -133,7 +135,7 @@ contract('Truffle', () => {
 
     context('when the requested network does not have default values', function () {
       beforeEach('create truffle config file', function () {
-        FileSystem.write(configFile, 'module.exports = { networks: { test: { } } }');
+        FileSystem.write(configFile, 'module.exports = { networks: { test: { } } }')
         Truffle.validateAndLoadNetworkConfig('test', true)
       })
 
@@ -142,6 +144,48 @@ contract('Truffle', () => {
 
         artifactDefaults.should.have.all.keys('gasPrice')
         artifactDefaults.gasPrice.should.be.eq(20000000000)
+      })
+    })
+  })
+
+  describe('getContractNames', function () {
+    beforeEach(function () {
+      sinon.stub(Truffle, 'getBuildDir').returns(`${testDir}/build/contracts`)
+    })
+
+    afterEach(function () {
+      sinon.restore()
+    })
+
+    context('without directory created', function () {
+      it('throws an error', function () {
+        (() => Truffle.getContractNames()).should.throw()
+      })
+    })
+
+    context('with directory created', function () {
+      beforeEach('create build/contracts/ directory', function () {
+        FileSystem.createDirPath(`${testDir}/build/contracts`)
+      })
+
+      context('without contracts', function () {
+        it('returns an empty array', function () {
+          const contractNames = Truffle.getContractNames()
+          expect(contractNames).to.be.empty
+        })
+      })
+
+      context('with contracts', function () {
+        it('returns an array with items inside', function () {
+          FileSystem.writeJson(`${testDir}/build/contracts/Foo.json`, { sourcePath: `${testDir}/contracts`, bytecode: '0x124' })
+          FileSystem.writeJson(`${testDir}/build/contracts/Bar.json`, { sourcePath: `${testDir}/contracts`, bytecode: '0x' })
+          FileSystem.writeJson(`${testDir}/build/contracts/Buz.json`, { sourcePath: `other-directory/contracts`, bytecode: '0x124' })
+          const contractNames = Truffle.getContractNames()
+
+          contractNames.should.be.an('array')
+          contractNames.should.not.be.empty
+          contractNames.should.have.lengthOf(1)
+        })
       })
     })
   })

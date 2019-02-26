@@ -22,8 +22,8 @@ contract('ProxyAdmin', function(accounts) {
 
   beforeEach(async function() {
     const initializeData = Buffer.from('');
-    this.proxyAdmin = await ProxyAdmin.new([], { from: proxyAdminOwner });
-    this.proxy = await AdminUpgradeabilityProxy.new([this.implementationV1.address, this.proxyAdmin.address, initializeData], { from: proxyAdminOwner });
+    this.proxyAdmin = await ProxyAdmin.new({ from: proxyAdminOwner });
+    this.proxy = await AdminUpgradeabilityProxy.new(this.implementationV1.address, this.proxyAdmin.address, initializeData, { from: proxyAdminOwner });
   });
 
   describe('verifies ownership', function() {

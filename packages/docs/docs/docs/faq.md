@@ -48,3 +48,9 @@ Finally, make sure your `truffle-config.js` file contains the following lines at
 require('babel-register');
 require('babel-polyfill');
 ```
+
+## How can I create an upgradeable instance from Solidity code?
+
+You can create upgradeable instances from Solidity code by using your project's App contract, and then calling its `create` function from Solidity. Note that to be able to do this, your project needs to be published, i.e. it needs to have the ZeppelinOS [Contracts Architecture](https://docs.zeppelinos.org/docs/architecture.html) enabled.
+
+To see an example of how this is done, please refer to the example project [creating-instances-from-solidity](https://github.com/zeppelinos/zos/tree/master/examples/creating-instances-from-solidity).
