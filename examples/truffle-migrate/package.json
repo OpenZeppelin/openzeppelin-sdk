@@ -3,6 +3,7 @@
   "version": "2.2.0",
   "description": "Sample project for using ZeppelinOS within truffle migrations",
   "main": "index.js",
+  "private": true,
   "scripts": {
     "check": "truffle exec index.js --network local",
     "test": "truffle test"
