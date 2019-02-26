@@ -37,6 +37,17 @@ export function getContractsList(name, message, type) {
   };
 }
 
+export function getNetworkList(type) {
+  const networkList = Truffle.getNetworkNamesFromConfig();
+  return {
+    network: {
+      type,
+      message: 'Select a network from the network list',
+      choices: networkList
+    }
+  };
+}
+
 function promptFor(name: string, defaults: {}, props: {}): GenericObject {
   const defaultValue = defaults ? defaults[name] : undefined;
   return {
