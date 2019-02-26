@@ -4,11 +4,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
-## Next
+## v2.2.1 - 2019-02-26
+
+### Changed
+- **Remove `openzeppelin-solidity` as a dependency** ([#739](https://github.com/zeppelinos/zos/pull/739))
+
+## v2.2.0 - 2019-02-14
 
 ### Added
-- Contributing guidelines ([#553](https://github.com/zeppelinos/zos/pull/553))
 - **New `ProxyAdmin` contract to manage proxy instances** ([#588](https://github.com/zeppelinos/zos/pull/588) and [#625](https://github.com/zeppelinos/zos/pull/625)) (see [audit report](https://medium.com/nomic-labs-blog/zeppelinos-audit-report-iii-602714cb92d4))
+- Contributing guidelines ([#553](https://github.com/zeppelinos/zos/pull/553))
 - Linter pre-commit githook ([#620](https://github.com/zeppelinos/zos/pull/620))
 
 ### Changed
