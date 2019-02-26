@@ -11,7 +11,7 @@
   "author": "santiago@zeppelin.solutions",
   "license": "MIT",
   "devDependencies": {
-    "truffle": "^4.1.13",
+    "truffle": "^5.0.5",
     "zos": "^2.2.0",
     "zos-lib": "^2.2.0"
   }
