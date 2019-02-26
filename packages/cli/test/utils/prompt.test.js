@@ -4,11 +4,11 @@ require('../setup');
 
 import sinon from 'sinon';
 import Inquirer from 'inquirer';
-import { promptForArgumentsIfNeeded } from '../../src/utils/prompt';
+import { promptIfNeeded } from '../../src/utils/prompt';
 
 describe('prompt', function() {
   describe('functions', function() {
-    describe('#promptForArgumentsIfNeeded', function() {
+    describe('#promptIfNeeded', function() {
       beforeEach('set stub and initialize', function() {
         this.stub = sinon.stub(Inquirer, 'prompt').returns({});
         this.props = { foo: { message: 'message1', type: 'input' }, bar: { message: 'message2', type: 'input' } };
@@ -23,7 +23,7 @@ describe('prompt', function() {
           context('without defaults', function() {
             it('prompts for the missing argument', async function() {
               const args = { foo: 'jango', bar: undefined };
-              await promptForArgumentsIfNeeded({ args, props: this.props });
+              await promptIfNeeded({ args, props: this.props });
               const questions = this.stub.getCall(0).args[0]
 
               questions.should.have.lengthOf(1)
@@ -36,7 +36,7 @@ describe('prompt', function() {
             it('prompts for the missing argument', async function() {
               const args = { foo: undefined, bar: undefined };
               const defaults = { foo: 'foo' };
-              await promptForArgumentsIfNeeded({ args, defaults, props: this.props });
+              await promptIfNeeded({ args, defaults, props: this.props });
               const questions = this.stub.getCall(0).args[0];
 
               questions.should.have.lengthOf(2)
@@ -51,7 +51,7 @@ describe('prompt', function() {
         context('with all arguments', function() {
           it('does not prompt', async function() {
             const args = { foo: 'foo', bar: 'bar' };
-            await promptForArgumentsIfNeeded({ args, props: this.props });
+            await promptIfNeeded({ args, props: this.props });
             const questions = this.stub.getCall(0).args[0];
 
             questions.should.have.lengthOf(0);
@@ -62,7 +62,7 @@ describe('prompt', function() {
       context('with no arguments', function() {
         it('prompts', async function() {
           const args = { foo: 'foo', bar: 'bar' };
-          await promptForArgumentsIfNeeded({ args, props: this.props });
+          await promptIfNeeded({ args, props: this.props });
           const questions = this.stub.getCall(0).args[0];
 
           questions.should.have.lengthOf(0);
