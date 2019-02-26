@@ -52,6 +52,11 @@ const Truffle = {
     }
   },
 
+  getNetworkNamesFromConfig(): string[] | null {
+    const config = this.getConfig();
+    return config && config.networks ? Object.keys(config.networks) : undefined;
+  },
+
   getContractNames(): string[] {
     const buildDir = this.getBuildDir();
     if (buildDir) {

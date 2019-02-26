@@ -148,6 +148,28 @@ contract('Truffle', () => {
     })
   })
 
+  describe('getNetworkNamesFromConfig', function () {
+    const configFile = `${process.cwd()}/truffle.js`
+    const configFileBackup = `${configFile}.backup`
+
+    before('backup truffle-config file', function () {
+      FileSystem.copy(configFile, configFileBackup)
+    })
+
+    after('restore truffle-config file', function () {
+      FileSystem.copy(configFileBackup, configFile)
+      FileSystem.remove(configFileBackup)
+    })
+
+    it('finds a network in truffle network list', function () {
+      FileSystem.write(configFile, 'module.exports = { networks: { test: { gas: 1, gasPrice: 2, from: \'0x0\' } } }');
+      const networkNames = Truffle.getNetworkNamesFromConfig()
+      networkNames.should.be.an('array')
+      networkNames[0].should.eq('test')
+      networkNames.should.have.lengthOf(1)
+    })
+  })
+
   describe('getContractNames', function () {
     beforeEach(function () {
       sinon.stub(Truffle, 'getBuildDir').returns(`${testDir}/build/contracts`)
