@@ -4,7 +4,8 @@ require('../setup');
 
 import sinon from 'sinon';
 import Inquirer from 'inquirer';
-import { promptIfNeeded } from '../../src/utils/prompt';
+import Truffle from '../../src/models/initializer/truffle/Truffle';
+import { promptIfNeeded, getContractsList, getNetworkList } from '../../src/utils/prompt';
 
 describe('prompt', function() {
   describe('functions', function() {
@@ -67,6 +68,44 @@ describe('prompt', function() {
 
           questions.should.have.lengthOf(0);
         });
+      });
+    });
+
+    describe('#getNetworkList', function() {
+      beforeEach('set stub and initialize', function() {
+        this.stub = sinon.stub(Truffle, 'getNetworkNamesFromConfig').returns(['Meinet', 'Rinkebay']);
+      });
+
+      afterEach('restore stub', function() {
+        sinon.restore();
+      });
+
+      it('returns an object with correct keys and values', function() {
+        const networkList = getNetworkList('listy');
+        networkList.should.be.an('object');
+        networkList.network.should.be.an('object').that.has.all.keys('type', 'message', 'choices');
+        networkList.network.type.should.eq('listy');
+        networkList.network.message.should.eq('Select a network from the network list');
+        networkList.network.choices.should.have.members(['Meinet', 'Rinkebay']);
+      });
+    });
+
+    describe('#getContractsList', function() {
+      beforeEach('set stub and initialize', function() {
+        this.stub = sinon.stub(Truffle, 'getContractNames').returns(['Foo', 'Bar']);
+      });
+
+      afterEach('restore stub', function() {
+        sinon.restore();
+      });
+
+      it('returns an object with correct keys and values', function() {
+        const contractsList = getContractsList('keyName', 'Im a message', 'listy');
+        contractsList.should.be.an('object');
+        contractsList.keyName.should.be.an('object').that.has.all.keys('type', 'message', 'choices');
+        contractsList.keyName.type.should.eq('listy');
+        contractsList.keyName.message.should.eq('Im a message');
+        contractsList.keyName.choices.should.have.members(['Foo', 'Bar']);
       });
     });
   });
