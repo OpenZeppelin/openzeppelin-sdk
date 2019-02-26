@@ -62,6 +62,12 @@ jobs:
       name: Complex example tests
       install: npx lerna run compile-contracts
       script: npx lerna run test --concurrency=1 --stream=true --scope=zos-lib-complex-example
+    
+    # Test stage for simple-example
+    - stage: tests
+      name: Simple example tests
+      install: npx lerna run compile-contracts
+      script: npx lerna run test --concurrency=1 --stream=true --scope=zos-lib-simple-example
 
     # Test stage for creating-instances-from-solidity example
     - stage: tests
