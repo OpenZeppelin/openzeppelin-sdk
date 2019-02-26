@@ -7,7 +7,7 @@ When working with ZeppelinOS, you can test your contracts as you usually do. Tha
 
 Instead, you can use specifically designed ZeppelinOS tools that automatically set up your entire project in your testing environment. This allows you to replicate the same set of contracts that manage your project for each test you run.
 
-The `zos` package provides a `TestHelper()` function to retrieve your project structure from the `zos.json` file and deploy everything to the current test network. All the contracts that you have registered via `zos add`, plus all the contracts provided by the EVM packages you have linked, will be available. The returned project object (either a [`SimpleProject`](https://github.com/zeppelinos/zos/blob/master/packages/lib/src/project/ProxyAdminProject.js) or an [`AppProject`](https://github.com/zeppelinos/zos/blob/master/packages/lib/src/project/AppProject.js)) provides convenient methods for creating upgradeable instances of your contracts, which you can use within your tests. Lets see how this would work in a simple project.
+The `zos` package provides a `TestHelper()` function to retrieve your project structure from the `zos.json` file and deploy everything to the current test network. All the contracts that you have registered via `zos add`, plus all the contracts provided by the EVM packages you have linked, will be available. The returned project object (either a [`ProxyAdminProject`](https://github.com/zeppelinos/zos/blob/master/packages/lib/src/project/ProxyAdminProject.js) or an [`AppProject`](https://github.com/zeppelinos/zos/blob/master/packages/lib/src/project/AppProject.js)) provides convenient methods for creating upgradeable instances of your contracts, which you can use within your tests. Lets see how this would work in a simple project.
 
 ## Setting up a sample project
 
@@ -56,7 +56,7 @@ npx zos link openzeppelin-eth
 
 ## Writing the test script
 
-To be able to use ES6 Javascript syntax in your tests, make sure you [set up babel in your project](https://docs.zeppelinos.org/docs/faq.html#how-do-i-use-es6-javascript-syntax-in-my-tests).
+> This test is written in ES5 Javascript. If you'd like to use ES6 syntax instead, make sure you [set up babel in your project](https://docs.zeppelinos.org/docs/faq.html#how-do-i-use-es6-javascript-syntax-in-my-tests).
 
 Now, lets create the test file `test/Sample.test.js`:
 
