@@ -20,3 +20,8 @@ program.Command.prototype.withPushOptions = function(): Command {
     .option('-f, --from <from>', 'specify the transaction sender address for --push')
     .withNetworkTimeoutOption();
 };
+
+program.Command.prototype.withNonInteractiveOption = function(): Command {
+  return this
+    .option('--no-interactive', 'force to run the command in non-interactive mode');
+};

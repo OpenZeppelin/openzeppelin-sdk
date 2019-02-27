@@ -14,7 +14,7 @@ interface GenericObject {
 }
 
 // TS-TODO: Define a more accurate return type as soon as we know the final structure of it
-export async function promptIfNeeded({ args = {}, opts = {}, defaults, props }: Args): Promise<any> {
+export async function promptIfNeeded({ args = {}, opts = {}, defaults, props }: Args, interactive: boolean = true): Promise<any> {
   const argsQuestions = Object.keys(args)
     .filter((argName) => args[argName] === undefined || isEmpty(args[argName]))
     .map((argName) => promptFor(argName, defaults, props));
@@ -23,7 +23,9 @@ export async function promptIfNeeded({ args = {}, opts = {}, defaults, props }: 
     .filter((optName) => opts[optName] === undefined)
     .map((optName) => promptFor(optName, defaults, props));
 
-  return { ...args, ...opts, ...await answersFor(argsQuestions), ...await answersFor(optsQuestions) };
+  return interactive
+    ? { ...args, ...opts, ...await answersFor(argsQuestions), ...await answersFor(optsQuestions) }
+    : { ...args, ...opts };
 }
 
 export function getContractsList(name: string, message: string, type: string): GenericObject {

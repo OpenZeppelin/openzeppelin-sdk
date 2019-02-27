@@ -25,6 +25,7 @@ const register: (program: any) => any = (program) => program
   .description(description)
   .option('--no-install', 'skip installing packages dependencies locally')
   .withPushOptions()
+  .withNonInteractiveOption()
   .action(action);
 
 async function action(dependencies: string[], options: any): Promise<void> {
