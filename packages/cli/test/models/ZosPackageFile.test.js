@@ -7,6 +7,15 @@ import ZosPackageFile from '../../src/models/files/ZosPackageFile';
 import { ZOS_VERSION } from '../../src/models/files/ZosVersion';
 
 contract('ZosPackageFile', function() {  
+  describe('class methods', function () {
+    describe('#getInstalledDependencies', function() {
+      it('gets an array of dependencies', function () {
+        const dependencies = ZosPackageFile.getInstalledDependencies('test/mocks/packages/package-with-stdlib.zos.json');
+        dependencies.should.not.be.empty;
+        dependencies.should.have.lengthOf(1);
+      })
+    });
+  })
   describe('constructor', function () {
     it('creates empty file', function () {
       const file = new ZosPackageFile('test/mocks/packages/new.zos.json')
