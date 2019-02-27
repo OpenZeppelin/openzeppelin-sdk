@@ -30,6 +30,25 @@ This is due to the [transparent proxy pattern](https://docs.zeppelinos.org/docs/
 
 However, if you are using ZeppelinOS programmatically, you could run into such error. The solution is to always interact with your proxies from an account that is not the admin of the proxy, unless of course you want to specifically call functions of the proxy itself.
 
+## How do I use ES6 Javascript syntax in my tests?
+
+First, make sure you add the following dev-dependencies to your project: `babel-polyfill`, `babel-register`, `babel-preset-es2015`, `babel-preset-stage-2` and `babel-preset-stage-3`.
+`npm install --save-dev babel-polyfill babel-register babel-preset-es2015 babel-preset-stage-2 babel-preset-stage-3`
+Next, create a `.babelrc` file at the root of your repo, containing:
+
+```
+{
+  "presets": ["es2015", "stage-2", "stage-3"]
+}
+```
+
+Finally, make sure your `truffle-config.js` file contains the following lines at the beginning of the file:
+
+```
+require('babel-register');
+require('babel-polyfill');
+```
+
 ## How can I create an upgradeable instance from Solidity code?
 
 You can create upgradeable instances from Solidity code by using your project's App contract, and then calling its `create` function from Solidity. Note that to be able to do this, your project needs to be published, i.e. it needs to have the ZeppelinOS [Contracts Architecture](https://docs.zeppelinos.org/docs/architecture.html) enabled.
