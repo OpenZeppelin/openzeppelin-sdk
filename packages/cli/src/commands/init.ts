@@ -1,6 +1,6 @@
 import push from './push';
 import init from '../scripts/init';
-import { promptForArgumentsIfNeeded } from '../utils/prompt';
+import { promptIfNeeded } from '../utils/prompt';
 import { FileSystem } from 'zos-lib';
 
 const name: string = 'init';
@@ -33,7 +33,7 @@ async function action(projectName: string, version: string, options: any): Promi
 
   const defaultArgs = FileSystem.parseJsonIfExists('package.json') || {};
   const passedArgs = { name: projectName, version };
-  const args = await promptForArgumentsIfNeeded({ args: passedArgs, defaults: defaultArgs, props: argsProps });
+  const args = await promptIfNeeded({ args: passedArgs, defaults: defaultArgs, props: argsProps });
 
   const dependencies = link ? link.split(',') : [];
   const flags = { dependencies, installDependencies, force, publish };

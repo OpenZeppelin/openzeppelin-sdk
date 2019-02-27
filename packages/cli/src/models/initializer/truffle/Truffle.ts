@@ -52,6 +52,18 @@ const Truffle = {
     }
   },
 
+  getCompilerInfo(): { version?: string, optimizer?: boolean, optimizerRuns?: number } {
+    const config = this.getConfig();
+    const { compilers: { solc: { version, settings } } } = config;
+    const { enabled: optimizer, runs: optimizerRuns } = settings.optimizer;
+    return { version, optimizer, optimizerRuns };
+  },
+
+  getNetworkNamesFromConfig(): string[] | null {
+    const config = this.getConfig();
+    return config && config.networks ? Object.keys(config.networks) : undefined;
+  },
+
   getContractNames(): string[] {
     const buildDir = this.getBuildDir();
     if (buildDir) {
