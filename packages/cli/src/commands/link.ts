@@ -30,7 +30,7 @@ const register: (program: any) => any = (program) => program
 
 async function action(dependencies: string[], options: any): Promise<void> {
   const { install: installDependencies, interactive } = options;
-  const promptedArgs = await promptIfNeeded({ args: { dependencies, installDependencies }, props }, interactive);
+  const promptedArgs = await promptIfNeeded({ args: { dependencies }, opts: { installDependencies }, props }, interactive);
   if (promptedArgs.dependencies && typeof promptedArgs.dependencies === 'string') {
     promptedArgs.dependencies = [promptedArgs.dependencies];
   }
