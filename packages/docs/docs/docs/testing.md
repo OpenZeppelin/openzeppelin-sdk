@@ -142,7 +142,7 @@ The [createProxy](https://github.com/zeppelinos/zos/blob/master/packages/lib/src
 ```js
 const proxy = await this.project.createProxy(Sample, {
   initMethod: 'initialize',
-  initArts: [42]
+  initArgs: [42]
 });
 ```
 
