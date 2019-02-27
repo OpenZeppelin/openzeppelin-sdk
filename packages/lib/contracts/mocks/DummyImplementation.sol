@@ -1,7 +1,7 @@
-pragma solidity ^0.4.24;
+pragma solidity ^0.5.0;
 
 contract Impl {
-  function version() public pure returns (string); 
+  function version() public pure returns (string memory); 
 }
 
 contract DummyImplementation {
@@ -25,7 +25,7 @@ contract DummyImplementation {
     value = _value;
   }
 
-  function initialize(uint256 _value, string _text, uint256[] _values) public {
+  function initialize(uint256 _value, string memory _text, uint256[] memory _values) public {
     value = _value;
     text = _text;
     values = _values;
@@ -35,7 +35,7 @@ contract DummyImplementation {
     return true;
   }
 
-  function version() public pure returns (string) {
+  function version() public pure returns (string memory) {
     return "V1";
   }
 
@@ -49,7 +49,7 @@ contract DummyImplementationV2 is DummyImplementation {
     value = newVal;
   }
 
-  function version() public pure returns (string) {
+  function version() public pure returns (string memory) {
     return "V2";
   }
 }

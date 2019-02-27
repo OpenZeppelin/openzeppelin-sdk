@@ -1,4 +1,4 @@
-pragma solidity ^0.4.24;
+pragma solidity ^0.5.0;
 
 import './Proxy.sol';
 import '../openzeppelin-solidity/utils/Address.sol';
@@ -72,11 +72,12 @@ contract UpgradeabilityProxy is BaseUpgradeabilityProxy {
    * https://solidity.readthedocs.io/en/v0.4.24/abi-spec.html#function-selector-and-argument-encoding.
    * This parameter is optional, if no data is given the initialization call to proxied contract will be skipped.
    */
-  constructor(address _logic, bytes _data) public payable {
+  constructor(address _logic, bytes memory _data) public payable {
     assert(IMPLEMENTATION_SLOT == keccak256("org.zeppelinos.proxy.implementation"));
     _setImplementation(_logic);
     if(_data.length > 0) {
-      require(_logic.delegatecall(_data));
+      (bool success,) = _logic.delegatecall(_data);
+      require(success);
     }
   }  
 }
@@ -95,12 +96,13 @@ contract InitializableUpgradeabilityProxy is BaseUpgradeabilityProxy {
    * https://solidity.readthedocs.io/en/v0.4.24/abi-spec.html#function-selector-and-argument-encoding.
    * This parameter is optional, if no data is given the initialization call to proxied contract will be skipped.
    */
-  function initialize(address _logic, bytes _data) public payable {
+  function initialize(address _logic, bytes memory _data) public payable {
     require(_implementation() == address(0));
     assert(IMPLEMENTATION_SLOT == keccak256("org.zeppelinos.proxy.implementation"));
     _setImplementation(_logic);
     if(_data.length > 0) {
-      require(_logic.delegatecall(_data));
+      (bool success,) = _logic.delegatecall(_data);
+      require(success);
     }
   }  
 }

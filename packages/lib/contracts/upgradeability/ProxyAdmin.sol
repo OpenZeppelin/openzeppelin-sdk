@@ -1,4 +1,4 @@
-pragma solidity ^0.4.24;
+pragma solidity ^0.5.0;
 
 import "../openzeppelin-solidity/ownership/Ownable.sol";
 import "./AdminUpgradeabilityProxy.sol";
@@ -9,13 +9,18 @@ import "./AdminUpgradeabilityProxy.sol";
  * of upgrading it as well as transferring it to another admin.
  */
 contract ProxyAdmin is Ownable {
+
   /**
    * @dev Returns the current implementation of a proxy.
    * This is needed because only the proxy admin can query it.
    * @return The address of the current implementation of the proxy.
    */
   function getProxyImplementation(AdminUpgradeabilityProxy proxy) public view returns (address) {
-    return proxy.implementation();
+    // We need to manually run the static call since the getter cannot be flagged as view
+    // bytes4(keccak256("implementation()")) == 0x5c60da1b
+    (bool success, bytes memory returndata) = address(proxy).staticcall(hex"5c60da1b");
+    require(success);
+    return abi.decode(returndata, (address));
   }
 
   /**
@@ -23,7 +28,11 @@ contract ProxyAdmin is Ownable {
    * @return The address of the current admin of the proxy.
    */
   function getProxyAdmin(AdminUpgradeabilityProxy proxy) public view returns (address) {
-    return proxy.admin();
+    // We need to manually run the static call since the getter cannot be flagged as view
+    // bytes4(keccak256("admin()")) == 0xf851a440
+    (bool success, bytes memory returndata) = address(proxy).staticcall(hex"f851a440");
+    require(success);
+    return abi.decode(returndata, (address));
   }
 
   /**
@@ -53,7 +62,7 @@ contract ProxyAdmin is Ownable {
    * It should include the signature and the parameters of the function to be called, as described in
    * https://solidity.readthedocs.io/en/v0.4.24/abi-spec.html#function-selector-and-argument-encoding.
    */
-  function upgradeAndCall(AdminUpgradeabilityProxy proxy, address implementation, bytes data) payable public onlyOwner {
+  function upgradeAndCall(AdminUpgradeabilityProxy proxy, address implementation, bytes memory data) payable public onlyOwner {
     proxy.upgradeToAndCall.value(msg.value)(implementation, data);
   }
 }

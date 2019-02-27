@@ -1,4 +1,4 @@
-pragma solidity ^0.4.24;
+pragma solidity ^0.5.0;
 
 contract GetFunctionBase {
   uint256 x;
@@ -7,7 +7,7 @@ contract GetFunctionBase {
     x = _x;
   }
 
-  function initialize(string _x) public {
+  function initialize(string memory _x) public {
     x = bytes(_x).length;
   }
 
@@ -21,7 +21,7 @@ contract GetFunctionBase {
 }
 
 contract GetFunctionChild is GetFunctionBase {
-  function initialize(bytes _x) public {
+  function initialize(bytes memory _x) public {
     x = _x.length;
   }
 }

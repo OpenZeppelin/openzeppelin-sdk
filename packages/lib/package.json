@@ -84,7 +84,7 @@
     "sinon": "^6.1.4",
     "solidity-coverage": "^0.4.15",
     "tmp": "^0.0.33",
-    "truffle": "^4.1.13",
+    "truffle": "^5.0.5",
     "ts-node": "^7.0.1",
     "typescript": "^3.2.2"
   }
