@@ -137,9 +137,18 @@ And finally, we add the tests themselves. Notice how each test first creates a u
 const proxy = await this.project.createProxy(Sample);
 ```
 
-The [createProxy](https://github.com/zeppelinos/zos/blob/master/packages/lib/src/project/BaseSimpleProject.ts#L96) method of the project accepts an additional object parameter in which you can specify an initializer function with arguments, just as you would by using the regular `zos create` command from the CLI, but due to the simplicity of this example, it's not necessary in our case.
+The [createProxy](https://github.com/zeppelinos/zos/blob/master/packages/lib/src/project/BaseSimpleProject.ts#L96) method of the project accepts an additional object parameter in which you can specify an initializer function with arguments, just as you would by using the regular `zos create` command from the CLI, but due to the simplicity of this example, it's not necessary in our case. If you would need to pass parameters though, you would do so like this:
 
-Also, notice that the way we interact with the contracts is by using their `methods` object. This is because ZeppelinOS uses Web3 1.0 Contract interface:
+```js
+const proxy = await this.project.createProxy(Sample, {
+  initMethod: 'initialize',
+  initArts: [42]
+});
+```
+
+This is of course, assuming our Sample contract had an initialize function with one `uint256` parameter, which is doesn't. The above code simply illustrates how you would create the proxy if it had an initialize function.
+
+Continuing with our example, notice that the way we interact with the contracts is by using their `methods` object. This is because ZeppelinOS uses Web3 1.0 Contract interface:
 
 ```js
 const result = await proxy.methods.totalSupply().call();
