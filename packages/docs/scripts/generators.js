@@ -37,11 +37,11 @@ export function genCliDocs(packagesDir) {
 
 export function genLibDocs(packagesDir) {
   const docsDir = path.resolve(packagesDir, 'docs', 'docs')
+  const rootDir = path.resolve(packagesDir, '../')
   const builtDocs = path.resolve(docsDir, 'docs')
   const libDir = path.resolve(packagesDir, 'lib')
   const libContractsDir = path.resolve(libDir, 'contracts')
   const mocks = path.resolve(libContractsDir, 'mocks')
-  const ozDir = path.resolve(libDir, 'node_modules', 'openzeppelin-solidity')
   const mockDependencyDir = path.resolve(libDir, 'node_modules', 'mock-dependency')
   const sidebar = path.resolve(docsDir, 'website', 'sidebars.json')
 
@@ -50,8 +50,7 @@ export function genLibDocs(packagesDir) {
   rm(`${mocks}`, '-rf')
   exec('npm install > "/dev/null" 2>&1')
   console.log('Generating lib solidity docs...')
-  exec(`SOLC_ARGS='openzeppelin-solidity=${ozDir}' npx solidity-docgen ${libDir} ${libContractsDir} ${docsDir}`)
-  rm(`${builtDocs}/api_es_openzeppelin-solidity*`)
+  exec(`npx solidity-docgen ${libDir} ${libContractsDir} ${docsDir} ${rootDir}`)
   const { 'docs-api': docs } = JSON.parse(readFileSync(sidebar, 'utf8'))
 
   if (docs.UNCATEGORIZED) {
