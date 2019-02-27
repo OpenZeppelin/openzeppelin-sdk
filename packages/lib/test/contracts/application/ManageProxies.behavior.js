@@ -8,8 +8,8 @@ import Contracts from '../../../src/artifacts/Contracts'
 import utils from 'web3-utils';
 
 const ProxyAdmin = Contracts.getFromLocal('ProxyAdmin')
-const DummyImplementation = artifacts.require('DummyImplementation')
-const DummyImplementationV2 = artifacts.require('DummyImplementationV2')
+const DummyImplementation = Contracts.getFromLocal('DummyImplementation')
+const DummyImplementationV2 = Contracts.getFromLocal('DummyImplementationV2')
 
 export default function shouldManageProxies([_, appOwner, directoryOwner, anotherAccount]) {
   const EMPTY_INITIALIZATION_DATA = Buffer.from('')
@@ -27,7 +27,7 @@ export default function shouldManageProxies([_, appOwner, directoryOwner, anothe
     });
 
     it('delegates to implementation', async function () {
-      const version = await DummyImplementation.at(this.proxyAddress).version();
+      const version = await DummyImplementation.at(this.proxyAddress).methods.version().call();
       version.should.be.equal("V1");
     });
   };
@@ -39,7 +39,7 @@ export default function shouldManageProxies([_, appOwner, directoryOwner, anothe
     })
 
     it('delegates to new implementation', async function () {
-      const version = await DummyImplementationV2.at(this.proxyAddress).version();
+      const version = await DummyImplementationV2.at(this.proxyAddress).methods.version().call();
       version.should.be.equal("V2");
     });
   };
@@ -83,13 +83,13 @@ export default function shouldManageProxies([_, appOwner, directoryOwner, anothe
         shouldCreateProxy();
 
         it('initializes the proxy', async function() {
-          const value = await DummyImplementation.at(this.proxyAddress).value()
-          value.should.be.bignumber.eq(42)
+          const value = await DummyImplementation.at(this.proxyAddress).methods.value().call()
+          value.should.eq("42")
         })
 
         it('sends given value to the proxy', async function() {
           const balance = await ZWeb3.getBalance(this.proxyAddress)
-          balance.should.be.bignumber.eq(value)
+          balance.should.eq(value.toString())
         })
       });
 
@@ -140,13 +140,13 @@ export default function shouldManageProxies([_, appOwner, directoryOwner, anothe
         shouldUpgradeProxy()
 
         it('migrates the proxy', async function() {
-          const value = await DummyImplementationV2.at(this.proxyAddress).value()
-          value.should.be.bignumber.eq(84)
+          const value = await DummyImplementationV2.at(this.proxyAddress).methods.value().call()
+          value.should.eq("84")
         })
 
         it('sends given value to the proxy', async function() {
           const balance = await ZWeb3.getBalance(this.proxyAddress)
-          balance.should.be.bignumber.eq(value)
+          balance.should.eq(value.toString())
         })
       });
     });

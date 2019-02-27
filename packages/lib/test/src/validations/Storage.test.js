@@ -42,7 +42,7 @@ contract('Storage', () => {
     load('SimpleStorageMock')
 
     it('tracks src and path', function () {
-      this.storage[0].src.should.match(/^134:32/)
+      this.storage[0].src.should.match(/^133:32/)
       this.storage[0].path.should.match(/StorageMocks\.sol$/)
       this.storage[0].path.should.not.match(/^\//)
     })
