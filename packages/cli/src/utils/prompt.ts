@@ -16,17 +16,17 @@ interface GenericObject {
 // TS-TODO: Define a more accurate return type as soon as we know the final structure of it
 export async function promptIfNeeded({ args = {}, opts = {}, defaults, props }: Args): Promise<any> {
   const argsQuestions = Object.keys(args)
-    .filter((argName) => !args[argName] || isEmpty(args[argName]))
+    .filter((argName) => args[argName] === undefined || isEmpty(args[argName]))
     .map((argName) => promptFor(argName, defaults, props));
 
   const optsQuestions = Object.keys(opts)
-    .filter((optName) => !opts[optName])
+    .filter((optName) => opts[optName] === undefined)
     .map((optName) => promptFor(optName, defaults, props));
 
   return { ...args, ...opts, ...await answersFor(argsQuestions), ...await answersFor(optsQuestions) };
 }
 
-export function getContractsList(name, message, type) {
+export function getContractsList(name: string, message: string, type: string): GenericObject {
   const contractList = Truffle.getContractNames();
   return {
     [name]: {
@@ -37,7 +37,7 @@ export function getContractsList(name, message, type) {
   };
 }
 
-export function getNetworkList(type) {
+export function getNetworkList(type: string): GenericObject {
   const networkList = Truffle.getNetworkNamesFromConfig();
   return {
     network: {
@@ -60,6 +60,6 @@ function promptFor(name: string, defaults: {}, props: {}): GenericObject {
   };
 }
 
-async function answersFor(questions) {
+async function answersFor(questions: GenericObject): Promise<GenericObject> {
   return Inquirer.prompt(questions);
 }
