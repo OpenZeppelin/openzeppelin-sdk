@@ -146,7 +146,7 @@ const proxy = await this.project.createProxy(Sample, {
 });
 ```
 
-This is of course, assuming our Sample contract had an initialize function with one `uint256` parameter, which is doesn't. The above code simply illustrates how you would create the proxy if it had an initialize function.
+This is assuming our `Sample` contract had an `initialize` function with one `uint256` parameter, which it doesn't. The above code simply illustrates how you would create the upgradeable instance if it had an `initialize` function.
 
 Continuing with our example, notice that the way we interact with the contracts is by using their `methods` object. This is because ZeppelinOS uses Web3 1.0 Contract interface:
 
