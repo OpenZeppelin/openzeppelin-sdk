@@ -1,4 +1,4 @@
-pragma solidity ^0.4.24;
+pragma solidity ^0.5.0;
 
 import "./Libraries.sol";
 
@@ -9,13 +9,13 @@ contract ImplV1 {
     value = _value;
   }
 
-  function say() public pure returns (string) {
+  function say() public pure returns (string memory) {
     return "V1";
   }
 }
 
 contract ChildImplV1 is ImplV1 {
-  function say() public pure returns (string) {
+  function say() public pure returns (string memory) {
     return "ChildV1";
   }
 }
@@ -27,13 +27,13 @@ contract WithLibraryImplV1 is ImplV1 {
     return x.double();
   }
 
-  function say() public pure returns (string) {
+  function say() public pure returns (string memory) {
     return "WithLibraryV1";
   }
 }
 
 contract UninitializableImplV1 {
-  function say() public pure returns (string) {
+  function say() public pure returns (string memory) {
     return "UninitializableImplV1";
   }
 }
