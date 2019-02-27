@@ -13,7 +13,7 @@ The `zos` package provides a `TestHelper()` function to retrieve your project st
 
 The following section describes a succinct way in how a simple ZeppelinOS project can be set up. If you already have a project set up, you may skip to the next section.
 
-_If you don't understand what's going on in this section, please refer to the Quickstart guides of the documentation, specifically the (Deploying your first project)[https://docs.zeppelinos.org/docs/deploying.html], (Upgrading your project)[https://docs.zeppelinos.org/docs/upgrading.html] and (Linking to EVM packages)[https://docs.zeppelinos.org/docs/linking.html] guides. These guides provide detailed explanations on how a basic ZeppelinOS project works._
+_If you don't understand what's going on in this section, please refer to the Quickstart guides of the documentation, specifically the [Deploying your first project](https://docs.zeppelinos.org/docs/deploying.html), [Upgrading your project](https://docs.zeppelinos.org/docs/upgrading.html) and [Linking to EVM packages](https://docs.zeppelinos.org/docs/linking.html) guides. These guides provide detailed explanations on how a basic ZeppelinOS project works._
 
 Create a new project by running:
 
