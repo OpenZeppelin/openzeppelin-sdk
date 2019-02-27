@@ -3,7 +3,7 @@ id: testing
 title: Testing upgradeable projects
 ---
 
-When working with ZeppelinOS, you can test your contracts as you usually do. That is, you can manually deploy your logic contracts, and test them just like any other contract. However, when using ZeppelinOS, you are dealing with upgradeable contracts, which involves proxies as well as logic contracts. Of course, you could use ZeppelinOS at a lower level programmatically in your tests but this could be rather cumbersome.
+When working with ZeppelinOS, you can test your contracts as you usually do. That is, you can manually deploy your logic contracts, and test them just like any other contract. However, when using ZeppelinOS, you are dealing with upgradeable instances. Of course, you could use ZeppelinOS at a lower level programmatically in your tests but this could be rather cumbersome.
 
 Instead, you can use specifically designed ZeppelinOS tools that automatically set up your entire project in your testing environment. This allows you to replicate the same set of contracts that manage your project for each test you run.
 
