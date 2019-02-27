@@ -3,14 +3,14 @@ pragma solidity ^0.4.24;
 import './UpgradeabilityProxy.sol';
 
 /**
- * @title AdminUpgradeabilityProxy
+ * @title BaseAdminUpgradeabilityProxy
  * @dev This contract combines an upgradeability proxy with an authorization
  * mechanism for administrative tasks.
  * All external functions in this contract must be guarded by the
  * `ifAdmin` modifier. See ethereum/solidity#3864 for a Solidity
  * feature proposal that would enable this to be done automatically.
  */
-contract AdminUpgradeabilityProxy is UpgradeabilityProxy {
+contract BaseAdminUpgradeabilityProxy is BaseUpgradeabilityProxy {
   /**
    * @dev Emitted when the administration has been transferred.
    * @param previousAdmin Address of the previous admin.
@@ -23,7 +23,7 @@ contract AdminUpgradeabilityProxy is UpgradeabilityProxy {
    * This is the keccak-256 hash of "org.zeppelinos.proxy.admin", and is
    * validated in the constructor.
    */
-  bytes32 private constant ADMIN_SLOT = 0x10d6a54a4754c8869d6886b5f5d7fbfa5b4522237ea5c60d11bc4e7a1ff9390b;
+  bytes32 internal constant ADMIN_SLOT = 0x10d6a54a4754c8869d6886b5f5d7fbfa5b4522237ea5c60d11bc4e7a1ff9390b;
 
   /**
    * @dev Modifier to check whether the `msg.sender` is the admin.
@@ -36,21 +36,6 @@ contract AdminUpgradeabilityProxy is UpgradeabilityProxy {
     } else {
       _fallback();
     }
-  }
-
-  /**
-   * Contract constructor.
-   * @param _implementation address of the initial implementation.
-   * @param _admin Address of the proxy administrator.
-   * @param _data Data to send as msg.data to the implementation to initialize the proxied contract.
-   * It should include the signature and the parameters of the function to be called, as described in
-   * https://solidity.readthedocs.io/en/v0.4.24/abi-spec.html#function-selector-and-argument-encoding.
-   * This parameter is optional, if no data is given the initialization call to proxied contract will be skipped.
-   */
-  constructor(address _implementation, address _admin, bytes _data) UpgradeabilityProxy(_implementation, _data) public payable {
-    assert(ADMIN_SLOT == keccak256("org.zeppelinos.proxy.admin"));
-
-    _setAdmin(_admin);
   }
 
   /**
@@ -129,5 +114,49 @@ contract AdminUpgradeabilityProxy is UpgradeabilityProxy {
   function _willFallback() internal {
     require(msg.sender != _admin(), "Cannot call fallback function from the proxy admin");
     super._willFallback();
+  }
+}
+
+/**
+ * @title AdminUpgradeabilityProxy
+ * @dev Extends from BaseAdminUpgradeabilityProxy with a constructor for 
+ * initializing the implementation, admin, and init data.
+ */
+contract AdminUpgradeabilityProxy is BaseAdminUpgradeabilityProxy, UpgradeabilityProxy {
+  /**
+   * Contract constructor.
+   * @param _logic address of the initial implementation.
+   * @param _admin Address of the proxy administrator.
+   * @param _data Data to send as msg.data to the implementation to initialize the proxied contract.
+   * It should include the signature and the parameters of the function to be called, as described in
+   * https://solidity.readthedocs.io/en/v0.4.24/abi-spec.html#function-selector-and-argument-encoding.
+   * This parameter is optional, if no data is given the initialization call to proxied contract will be skipped.
+   */
+  constructor(address _logic, address _admin, bytes _data) UpgradeabilityProxy(_logic, _data) public payable {
+    assert(ADMIN_SLOT == keccak256("org.zeppelinos.proxy.admin"));
+    _setAdmin(_admin);
+  }
+}
+
+/**
+ * @title InitializableAdminUpgradeabilityProxy
+ * @dev Extends from BaseAdminUpgradeabilityProxy with an initializer for 
+ * initializing the implementation, admin, and init data.
+ */
+contract InitializableAdminUpgradeabilityProxy is BaseAdminUpgradeabilityProxy, InitializableUpgradeabilityProxy {
+  /**
+   * Contract initializer.
+   * @param _logic address of the initial implementation.
+   * @param _admin Address of the proxy administrator.
+   * @param _data Data to send as msg.data to the implementation to initialize the proxied contract.
+   * It should include the signature and the parameters of the function to be called, as described in
+   * https://solidity.readthedocs.io/en/v0.4.24/abi-spec.html#function-selector-and-argument-encoding.
+   * This parameter is optional, if no data is given the initialization call to proxied contract will be skipped.
+   */
+  function initialize(address _logic, address _admin, bytes _data) public payable {
+    require(_implementation() == address(0));
+    InitializableUpgradeabilityProxy.initialize(_logic, _data);
+    assert(ADMIN_SLOT == keccak256("org.zeppelinos.proxy.admin"));
+    _setAdmin(_admin);
   }
 }
