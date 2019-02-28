@@ -1,18 +1,16 @@
 'use strict'
 require('../setup')
 
-const expect = require('chai').expect;
-
-import ZosPackageFile from '../../src/models/files/ZosPackageFile';
-import { ZOS_VERSION } from '../../src/models/files/ZosVersion';
+import ZosPackageFile from '../../src/models/files/ZosPackageFile'
+import { ZOS_VERSION } from '../../src/models/files/ZosVersion'
 
 contract('ZosPackageFile', function() {  
   describe('class methods', function () {
-    describe('#getInstalledDependencies', function() {
+    describe('#getLinkedDependencies', function () {
       it('gets an array of dependencies', function () {
-        const dependencies = ZosPackageFile.getInstalledDependencies('test/mocks/packages/package-with-stdlib.zos.json');
-        dependencies.should.not.be.empty;
-        dependencies.should.have.lengthOf(1);
+        const dependencies = ZosPackageFile.getLinkedDependencies('test/mocks/packages/package-with-stdlib.zos.json')
+        dependencies.should.not.be.empty
+        dependencies.should.have.lengthOf(1)
       })
     });
   })

@@ -24,7 +24,7 @@ const register: (program: any) => any = (program) => program
   .action(action);
 
 async function action(dependencies: string[], options: any): Promise<void> {
-  const installedDependencies = ZosPackageFile.getInstalledDependencies();
+  const installedDependencies = ZosPackageFile.getLinkedDependencies();
   const promptedArgs = await promptIfNeeded({ args: { dependencies }, props: props(installedDependencies) });
 
   await unlink(promptedArgs);
