@@ -2,6 +2,11 @@ require('ts-node/register')
 
 module.exports = {
   networks: {
+    testing: {
+      host: 'localhost',
+      network_id: '4447',
+      port: 9555
+    },
     coverage: {
       host: 'localhost',
       network_id: '*',
