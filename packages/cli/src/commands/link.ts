@@ -1,6 +1,7 @@
 import push from './push';
 import link from '../scripts/link';
 import { promptIfNeeded } from '../utils/prompt';
+import Dependency from '../models/dependency/Dependency';
 
 const name: string = 'link';
 const signature: string = `${name} [dependencies...]`;
@@ -10,7 +11,6 @@ const props = {
   dependencies: {
     type: 'input',
     message: 'Provide an EVM-package name and version',
-    default: ['openzeppelin-eth']
   },
   installDependencies: {
     type: 'confirm',
@@ -29,8 +29,13 @@ const register: (program: any) => any = (program) => program
   .action(action);
 
 async function action(dependencies: string[], options: any): Promise<void> {
-  const { install: installDependencies, interactive } = options;
-  const promptedArgs = await promptIfNeeded({ args: { dependencies }, opts: { installDependencies }, props }, interactive);
+  const { install, interactive } = options;
+  const installDependencies = install && interactive ? undefined : install;
+
+  const defaultDependency = await Dependency.fetchVersionFromNpm('openzeppelin-eth');
+  const defaults = { dependencies: [defaultDependency] };
+  const promptedArgs = await promptIfNeeded({ args: { dependencies }, opts: { installDependencies }, props, defaults }, interactive);
+
   if (promptedArgs.dependencies && typeof promptedArgs.dependencies === 'string') {
     promptedArgs.dependencies = [promptedArgs.dependencies];
   }
