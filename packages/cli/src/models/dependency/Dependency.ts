@@ -1,11 +1,13 @@
-import fromPairs from 'lodash.frompairs';
 import map from 'lodash.map';
-import flatten from 'lodash.flatten';
 import uniq from 'lodash.uniq';
-import { FileSystem as fs, PackageProject, Contracts, Contract, getSolidityLibNames, Logger } from 'zos-lib';
+import flatten from 'lodash.flatten';
+import fromPairs from 'lodash.frompairs';
 import semver from 'semver';
 import npm from 'npm-programmatic';
+import { exec } from 'child_process';
+import { promisify } from 'util';
 
+import { FileSystem as fs, PackageProject, Contracts, Contract, getSolidityLibNames, Logger } from 'zos-lib';
 import ZosPackageFile from '../files/ZosPackageFile';
 import ZosNetworkFile from '../files/ZosNetworkFile';
 
@@ -28,6 +30,17 @@ export default class Dependency {
 
   public static satisfiesVersion(version: string | semver.SemVer, requirement: string | semver.Range): boolean {
     return !requirement || version === requirement || semver.satisfies(version, requirement);
+  }
+
+  public static async fetchVersionFromNpm(name: string): Promise<string> {
+    const execAsync = promisify(exec);
+    try {
+      const { stdout } = await execAsync(`npm view ${name} | grep latest`);
+      const versionMatch = stdout.match(/([0-9]+\.){2}[0-9]+/);
+      return (Array.isArray(versionMatch) && versionMatch.length > 0) ? `${name}@${versionMatch[0]}` : name;
+    } catch(error) {
+      return name;
+    }
   }
 
   public static async install(nameAndVersion: string): Promise<Dependency> {

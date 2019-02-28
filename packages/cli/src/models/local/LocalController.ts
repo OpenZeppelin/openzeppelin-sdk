@@ -141,19 +141,32 @@ export default class LocalController {
 
   // DependencyController
   public async linkDependencies(dependencies: string[], installDependencies: boolean = false): Promise<void> {
-    await Promise.all(dependencies.map(async (depNameVersion: string) => {
+    const linkedDependencies = await Promise.all(dependencies.map(async (depNameVersion: string) => {
       const dependency = installDependencies
         ? await Dependency.install(depNameVersion)
         : Dependency.fromNameWithVersion(depNameVersion);
       this.packageFile.setDependency(dependency.name, <string>dependency.requirement);
+      return dependency.name;
     }));
+
+    if (linkedDependencies.length > 0) {
+      const label = linkedDependencies.length === 1 ? 'Dependency' : 'Dependencies';
+      log.info(`${label} ${linkedDependencies.join(', ')} successfully linked`);
+    }
   }
 
   // DependencyController
   public unlinkDependencies(dependenciesNames: string[]): void {
-    dependenciesNames
-      .map((dep) => Dependency.fromNameWithVersion(dep))
-      .forEach((dep) => this.packageFile.unsetDependency(dep.name));
+    const unlinkedDependencies = dependenciesNames.map((dep) => {
+      const dependency = Dependency.fromNameWithVersion(dep);
+      this.packageFile.unsetDependency(dependency.name);
+      return dependency.name;
+    });
+
+    if (unlinkedDependencies.length > 0) {
+      const label = unlinkedDependencies.length === 1 ? 'Dependency' : 'Dependencies';
+      log.info(`${label} ${unlinkedDependencies.join(', ')} successfully unlinked`);
+    }
   }
 
   public onNetwork(network: string, txParams: any, networkFile?: ZosNetworkFile): NetworkController {

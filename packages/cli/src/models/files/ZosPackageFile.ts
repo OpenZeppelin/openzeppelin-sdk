@@ -18,6 +18,13 @@ export default class ZosPackageFile {
     publish: boolean;
   };
 
+  public static getLinkedDependencies(fileName: string = 'zos.json'): string[] {
+    const file = fs.parseJsonIfExists(fileName);
+    if (file && file.dependencies) {
+      return Object.keys(file.dependencies).map((depName) => `${depName}@${file.dependencies[depName]}`);
+    } else return [];
+  }
+
   constructor(fileName: string = 'zos.json') {
     this.fileName = fileName;
     this.data = fs.parseJsonIfExists(this.fileName) || { zosversion: ZOS_VERSION };
