@@ -49,7 +49,8 @@
       "adjacent-overload-signatures": [false],
       "no-string-literal": [false],
       "max-classes-per-file": [false],
-      "one-variable-per-declaration": [false]
+      "one-variable-per-declaration": [false],
+      "arrow-parens": [false]
     },
     "rulesDirectory": []
 }
