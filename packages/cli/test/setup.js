@@ -12,6 +12,7 @@ setArtifactDefaults()
 
 require('chai')
   .use(require('chai-as-promised'))
+  .use(require('chai-string'))
   .use(require('zos-lib').assertions)
   .use(require('sinon-chai'))
   .should()

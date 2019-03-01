@@ -110,7 +110,7 @@ contract('AppProject', function (accounts) {
     });
 
     beforeEach('setting up simple project', async function () {
-      this.simple = new SimpleProject(name, { from: owner });
+      this.simple = new SimpleProject(name, null, { from: owner });
       this.implementation = await this.simple.setImplementation(ImplV1, contractName);
       await this.simple.setDependency(dependencyName, this.dependency.address, dependencyVersion);
     });

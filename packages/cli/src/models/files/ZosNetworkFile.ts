@@ -64,6 +64,7 @@ export default class ZosNetworkFile {
     proxies: { [contractName: string]: ProxyInterface[] };
     zosversion: string;
     proxyAdmin: AddressWrapper;
+    proxyFactory: AddressWrapper;
     app: AddressWrapper;
     package: AddressWrapper;
     provider: AddressWrapper;
@@ -95,6 +96,14 @@ export default class ZosNetworkFile {
 
   get proxyAdminAddress(): string {
     return this.proxyAdmin.address;
+  }
+
+  get proxyFactory(): AddressWrapper {
+    return this.data.proxyFactory || {};
+  }
+
+  get proxyFactoryAddress(): string {
+    return this.proxyFactory.address;
   }
 
   get app(): AddressWrapper {
@@ -325,7 +334,10 @@ export default class ZosNetworkFile {
 
   set proxyAdmin(admin: AddressWrapper) {
     this.data.proxyAdmin = admin;
+  }
 
+  set proxyFactory(factory: AddressWrapper) {
+    this.data.proxyFactory = factory;
   }
 
   set app(app: AddressWrapper) {

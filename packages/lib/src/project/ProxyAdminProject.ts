@@ -27,6 +27,11 @@ export default class ProxyAdminProject extends BaseSimpleProject {
     return super.createProxy(contract, contractParams);
   }
 
+  public async createProxyWithSalt(contract: Contract, salt: string, contractParams: ContractInterface = {}): Promise<Contract> {
+    if (!this.proxyAdmin) this.proxyAdmin = await ProxyAdmin.deploy(this.txParams);
+    return super.createProxyWithSalt(contract, salt, contractParams);
+  }
+
   public async upgradeProxy(proxyAddress: string, contract: Contract, contractParams: ContractInterface = {}): Promise<Contract> {
     const { initMethod: initMethodName, initArgs } = contractParams;
     const { implementationAddress, pAddress, initCallData } = await this._setUpgradeParams(proxyAddress, contract, contractParams);

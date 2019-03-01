@@ -15,6 +15,7 @@ interface ExistingAddresses {
   appAddress?: string;
   packageAddress?: string;
   proxyAdminAddress?: string;
+  proxyFactoryAddress?: string;
 }
 
 type CreateProjectFn = (addresses: ExistingAddresses) => Promise<AppProject>;
@@ -95,10 +96,14 @@ export class AppProjectDeployer extends BasePackageProjectDeployer {
     return this.networkFile.proxyAdminAddress;
   }
 
+  get proxyFactoryAddress(): string {
+    return this.networkFile.proxyFactoryAddress;
+  }
+
   private async _run(createProjectFn: CreateProjectFn): Promise<AppProject | never> {
     try {
-      const { appAddress, packageAddress, proxyAdminAddress }: ExistingAddresses = this;
-      this.project = await createProjectFn({ appAddress, packageAddress, proxyAdminAddress });
+      const { appAddress, packageAddress, proxyAdminAddress, proxyFactoryAddress }: ExistingAddresses = this;
+      this.project = await createProjectFn({ appAddress, packageAddress, proxyAdminAddress, proxyFactoryAddress });
       await this._registerDeploy();
       return this.project;
     } catch (deployError) {
@@ -127,7 +132,7 @@ export class ProxyAdminProjectDeployer extends BaseProjectDeployer {
   public project: ProxyAdminProject;
 
   public async fetchOrDeploy(): Promise<ProxyAdminProject> {
-    this.project = await ProxyAdminProject.fetch(this.packageFile.name, this.txParams, this.networkFile.proxyAdminAddress);
+    this.project = await ProxyAdminProject.fetch(this.packageFile.name, this.txParams, this.networkFile.proxyAdminAddress, this.networkFile.proxyFactoryAddress);
     this.networkFile.version = this.requestedVersion;
     forEach(this.networkFile.contracts, (contractInfo, contractAlias) => {
       this.project.registerImplementation(contractAlias, { address: contractInfo.address, bytecodeHash: contractInfo.bodyBytecodeHash });

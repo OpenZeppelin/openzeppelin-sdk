@@ -82,6 +82,10 @@ export default class NetworkController {
     return this.networkFile.proxyAdminAddress;
   }
 
+  get proxyFactoryAddress(): string {
+    return this.networkFile.proxyFactoryAddress;
+  }
+
   // NetworkController
   public checkNotFrozen(): void | never {
     if (this.networkFile.frozen) {
@@ -449,7 +453,6 @@ export default class NetworkController {
         await Transactions.awaitConfirmations(proxyAdmin.contract.deployment.transactionHash);
       }
       this._tryRegisterProxyAdmin(proxyAdmin.address);
-
       await allPromisesOrError(map(proxies, async (proxy) => {
         const proxyInstance = await Proxy.at(proxy.address);
         const currentAdmin = await proxyInstance.admin();
@@ -457,7 +460,7 @@ export default class NetworkController {
           if (this.appAddress) {
             return AppProxyMigrator(this.appAddress, proxy.address, proxyAdmin.address, this.txParams);
           } else {
-            const simpleProject = new SimpleProject(this.packageFile.name, this.txParams);
+            const simpleProject = new SimpleProject(this.packageFile.name, null, this.txParams);
             return simpleProject.changeProxyAdmin(proxy.address, proxyAdmin.address);
           }
         }
@@ -489,19 +492,24 @@ export default class NetworkController {
   }
 
   // Proxy model
-  public async createProxy(packageName: string, contractAlias: string, initMethod: string, initArgs: string[]): Promise<Contract> {
+  public async createProxy(packageName: string, contractAlias: string, initMethod: string, initArgs: string[], salt?: string): Promise<Contract> {
     await this._migrateZosversionIfNeeded();
     await this.fetchOrDeploy(this.currentVersion);
     if (!packageName) packageName = this.packageFile.name;
     const contract = this.localController.getContractClass(packageName, contractAlias);
     await this._setSolidityLibs(contract);
     this.checkInitialization(contract, initMethod, initArgs);
-    const proxyInstance = await this.project.createProxy(contract, { packageName, contractName: contractAlias, initMethod, initArgs });
+
+    const createArgs = { packageName, contractName: contractAlias, initMethod, initArgs };
+    const proxyInstance = salt
+      ? await this.project.createProxyWithSalt(contract, salt, createArgs)
+      : await this.project.createProxy(contract, createArgs);
+
     const implementationAddress = await Proxy.at(proxyInstance).implementation();
     const packageVersion = packageName === this.packageFile.name ? this.currentVersion : (await this.project.getDependencyVersion(packageName));
     await this._tryRegisterProxyAdmin();
+    await this._tryRegisterProxyFactory();
     await this._updateTruffleDeployedInformation(contractAlias, proxyInstance);
-
     this.networkFile.addProxy(packageName, contractAlias, {
       address: proxyInstance.address,
       version: semanticVersionToString(packageVersion),
@@ -510,11 +518,28 @@ export default class NetworkController {
     return proxyInstance;
   }
 
+  public async getProxyDeploymentAddress(salt: string): Promise<string> {
+    await this._migrateZosversionIfNeeded();
+    await this.fetchOrDeploy(this.currentVersion);
+    const address = await this.project.getProxyDeploymentAddress(salt);
+    this._tryRegisterProxyFactory();
+
+    return address;
+  }
+
   // Proxy model
   private async _tryRegisterProxyAdmin(adminAddress?: string) {
     if (!this.networkFile.proxyAdminAddress) {
       const proxyAdminAddress = adminAddress || await this.project.getAdminAddress();
-      this.networkFile.proxyAdmin = { address:  proxyAdminAddress };
+      this.networkFile.proxyAdmin = { address: proxyAdminAddress };
+    }
+  }
+
+  // Proxy model
+  private async _tryRegisterProxyFactory(adminAddress?: string) {
+    if (!this.networkFile.proxyFactoryAddress) {
+      const proxyFactoryAddress = adminAddress || (this.project.proxyFactory && this.project.proxyFactory.address);
+      if (proxyFactoryAddress) this.networkFile.proxyFactory = { address: proxyFactoryAddress };
     }
   }
 

@@ -50,7 +50,11 @@ export default class ProxyFactory {
   }
 
   public async getDeploymentAddress(salt: string, sender?: string): Promise<string> {
-    const actualSender = sender || this.txParams.from || (await Contracts.getDefaultFromAddress());
+    const actualSender = sender || await this.getDefaultSender();
     return this.contract.methods.getDeploymentAddress(salt, actualSender).call();
+  }
+
+  public async getDefaultSender(): Promise<string> {
+    return this.txParams.from || (await Contracts.getDefaultFromAddress());
   }
 }

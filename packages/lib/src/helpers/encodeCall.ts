@@ -3,8 +3,12 @@ import { defaultAbiCoder, ParamType } from 'ethers/utils/abi-coder';
 import ZWeb3 from '../artifacts/ZWeb3';
 import _ from 'lodash';
 
+export function encodeParams(types: Array<string | ParamType> = [], rawValues: any[] = []): string {
+  return defaultAbiCoder.encode(types, rawValues);
+}
+
 export default function encodeCall(name: string, types: Array<string | ParamType> = [], rawValues: any[] = []): string {
-  const encodedParameters = defaultAbiCoder.encode(types, rawValues).substring(2);
+  const encodedParameters = encodeParams(types, rawValues).substring(2);
   const signatureHash = ZWeb3.sha3(`${name}(${types.join(',')})`).substring(2, 10);
   return `0x${signatureHash}${encodedParameters}`;
 }
