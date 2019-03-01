@@ -4,6 +4,7 @@ require('../setup')
 
 import sinon from 'sinon'
 import npm from 'npm-programmatic'
+import { FileSystem as fs } from 'zos-lib'
 import Dependency from '../../src/models/dependency/Dependency'
 
 contract('Dependency', function([_, from]) {
@@ -48,6 +49,36 @@ contract('Dependency', function([_, from]) {
       })
     })
 
+
+    describe('#hasDependenciesForDeploy', function() {
+      afterEach('restore sinon', function() {
+        sinon.restore()
+      })
+
+      context('when there are dependencies to deploy', function() {
+        it('returns true', function () {
+          const projectPackageFile = fs.parseJsonIfExists('test/mocks/packages/package-with-multiple-stdlibs.zos.json')
+          const projectNetworkFile = fs.parseJsonIfExists('test/mocks/networks/network-with-stdlibs.zos.test.json')
+          const stubbedParseJsonIfExists = sinon.stub(fs, 'parseJsonIfExists')
+          stubbedParseJsonIfExists.withArgs('zos.json').returns(projectPackageFile)
+          stubbedParseJsonIfExists.withArgs('zos.test.json').returns(projectNetworkFile)
+
+          Dependency.hasDependenciesForDeploy('test').should.be.true
+        })
+      })
+
+      context('when all dependencies are already deployed', function() {
+        it('returns false', function() {
+          const projectPackageFile = fs.parseJsonIfExists('test/mocks/packages/package-with-stdlib.zos.json')
+          const projectNetworkFile = fs.parseJsonIfExists('test/mocks/networks/network-with-stdlibs.zos.test.json')
+          const stubbedParseJsonIfExists = sinon.stub(fs, 'parseJsonIfExists')
+          stubbedParseJsonIfExists.withArgs('zos.json').returns(projectPackageFile)
+          stubbedParseJsonIfExists.withArgs('zos.test.json').returns(projectNetworkFile)
+
+          Dependency.hasDependenciesForDeploy('test').should.be.false
+        })
+      })
+    })
   })
 
   describe('#constructor', function() {
