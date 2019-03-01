@@ -4,6 +4,7 @@ require('../../setup')
 import Proxy from '../../../src/proxy/Proxy';
 import Contracts from '../../../src/artifacts/Contracts';
 import { toAddress } from '../../../src/utils/Addresses';
+import random from 'lodash.random';
 
 const Impl = Contracts.getFromLocal('Impl');
 const DummyImplementation = Contracts.getFromLocal('DummyImplementation');
@@ -36,6 +37,36 @@ export default function shouldManageProxies({ otherAdmin, setImplementations, su
         (await instance.methods.value().call()).should.eq('10')
       })
     })
+
+    describe('createProxyWithSalt', function () {
+      beforeEach('setting implementations', setImplementations);
+      beforeEach('generating salt', function () { this.salt = random(0, 2 ** 32) });
+      beforeEach('predicting deployment address', async function () { this.deploymentAddress = await this.project.getProxyDeploymentAddress(this.salt) });
+
+      it('creates a proxy given contract class and salt', async function () {
+        const instance = await this.project.createProxyWithSalt(DummyImplementation, this.salt);
+        await assertIsVersion(instance, 'V1');
+        await assertIsProxy(instance, this.adminAddress);
+        instance.address.should.equalIgnoreCase(this.deploymentAddress);
+      })
+
+      if (supportsNames) {
+        it('creates a proxy given contract name', async function () {
+          const instance = await this.project.createProxyWithSalt(Impl, this.salt, { contractName: 'DummyImplementation' });
+          await assertIsVersion(instance, 'V1');
+          await assertIsProxy(instance, this.adminAddress);
+          instance.address.should.equalIgnoreCase(this.deploymentAddress);
+        })
+      }
+
+      it('creates and initializes a proxy', async function () {
+        const instance = await this.project.createProxyWithSalt(DummyImplementation, this.salt, { initArgs: [10, "foo", [20, 30]] });
+        await assertIsVersion(instance, 'V1');
+        await assertIsProxy(instance, this.adminAddress);
+        (await instance.methods.value().call()).should.eq('10');
+        instance.address.should.equalIgnoreCase(this.deploymentAddress);
+      })
+    });
 
     describe('upgradeProxy', function () {
       beforeEach('setting implementations', setImplementations);

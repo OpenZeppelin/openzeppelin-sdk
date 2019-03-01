@@ -4,12 +4,13 @@ import ZWeb3 from '../artifacts/ZWeb3';
 import Contract from '../artifacts/Contract';
 import { ContractInterface } from './AppProject';
 import BaseSimpleProject from './BaseSimpleProject';
+import ProxyFactory from '../proxy/ProxyFactory';
 
 const log: Logger = new Logger('SimpleProject');
 
 export default class SimpleProject  extends BaseSimpleProject {
-  constructor(name: string = 'main', txParams: any = {}) {
-    super(name, txParams);
+  constructor(name: string = 'main', proxyFactory?: ProxyFactory, txParams: any = {}) {
+    super(name, proxyFactory, txParams);
   }
 
   public async upgradeProxy(proxyAddress: string, contract: Contract, contractParams: ContractInterface = {}): Promise<Contract> {

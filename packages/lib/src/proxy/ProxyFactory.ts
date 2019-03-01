@@ -12,6 +12,10 @@ export default class ProxyFactory {
   public address: string;
   public txParams: any;
 
+  public static tryFetch(address: string, txParams: any = {}): ProxyFactory | null {
+    return address ? this.fetch(address, txParams) : null;
+  }
+
   public static fetch(address: string, txParams: any = {}): ProxyFactory {
     const contract = Contracts.getFromLib('ProxyFactory').at(address);
     return new this(contract, txParams);
