@@ -10,7 +10,7 @@ import "../openzeppelin-solidity/ownership/Ownable.sol";
  * @dev Contract for upgradeable applications.
  * It handles the creation and upgrading of proxies.
  */
-contract DeprecatedApp is Ownable {
+contract DeprecatedApp is ZOSOwnable {
   /**
    * @dev Emitted when a new proxy is created.
    * @param proxy Address of the created proxy.

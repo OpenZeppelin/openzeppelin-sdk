@@ -4,7 +4,7 @@ pragma solidity ^0.4.24;
  * Utility library of inline functions on addresses
  * Source https://raw.githubusercontent.com/OpenZeppelin/openzeppelin-solidity/v2.0.0/contracts/utils/Address.sol
  */
-library Address {
+library ZOSAddress {
 
   /**
    * Returns whether the target address is a contract

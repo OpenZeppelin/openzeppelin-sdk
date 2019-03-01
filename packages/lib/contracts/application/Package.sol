@@ -9,7 +9,7 @@ import "../openzeppelin-solidity/ownership/Ownable.sol";
  * plus an optional content URI with metadata. Note that the semver identifier is restricted
  * to major, minor, and patch, as prerelease tags are not supported.
  */
-contract Package is Ownable {
+contract Package is ZOSOwnable {
   /**
    * @dev Emitted when a version is added to the package.
    * @param semanticVersion Name of the added version.

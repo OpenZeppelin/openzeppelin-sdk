@@ -8,7 +8,7 @@ import "./AdminUpgradeabilityProxy.sol";
  * @dev This contract is the admin of a proxy, and is in charge
  * of upgrading it as well as transferring it to another admin.
  */
-contract ProxyAdmin is Ownable {
+contract ProxyAdmin is ZOSOwnable {
   /**
    * @dev Returns the current implementation of a proxy.
    * This is needed because only the proxy admin can query it.

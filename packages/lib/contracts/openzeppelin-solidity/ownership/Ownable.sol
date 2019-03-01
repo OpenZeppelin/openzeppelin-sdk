@@ -6,7 +6,7 @@ pragma solidity ^0.4.24;
  * functions, this simplifies the implementation of "user permissions".
  * Source: https://raw.githubusercontent.com/OpenZeppelin/openzeppelin-solidity/v2.0.0/contracts/ownership/Ownable.sol
  */
-contract Ownable {
+contract ZOSOwnable {
   address private _owner;
 
   event OwnershipTransferred(
