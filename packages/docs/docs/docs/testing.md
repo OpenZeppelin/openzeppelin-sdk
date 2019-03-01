@@ -7,13 +7,13 @@ When working with ZeppelinOS, you can test your contracts as you usually do. Tha
 
 Instead, you can use specifically designed ZeppelinOS tools that automatically set up your entire project in your testing environment. This allows you to replicate the same set of contracts that manage your project for each test you run.
 
-The `zos` package provides a `TestHelper()` function to retrieve your project structure from the `zos.json` file and deploy everything to the current test network. All the contracts that you have registered via `zos add`, plus all the contracts provided by the EVM packages you have linked, will be available. The returned project object (either a [`ProxyAdminProject`](https://github.com/zeppelinos/zos/blob/master/packages/lib/src/project/ProxyAdminProject.js) or an [`AppProject`](https://github.com/zeppelinos/zos/blob/master/packages/lib/src/project/AppProject.js)) provides convenient methods for creating upgradeable instances of your contracts, which you can use within your tests. Let's see how this would work in a simple project.
+The `zos` package provides a `TestHelper()` function to retrieve your project structure from the `zos.json` file and deploy everything to the current test network. All the contracts that you have registered via `zos add`, plus all the contracts provided by the EVM packages you have linked, will be available. The returned project object (either a [`ProxyAdminProject`](https://github.com/zeppelinos/zos/blob/v2.2.0/packages/lib/src/project/ProxyAdminProject.ts) or an [`AppProject`](https://github.com/zeppelinos/zos/blob/v2.2.0/packages/lib/src/project/AppProject.ts)) provides convenient methods for creating upgradeable instances of your contracts, which you can use within your tests. Let's see how this would work in a simple project.
 
 ## Setting up a sample project
 
 The following section describes a succinct way in how a simple ZeppelinOS project can be set up. If you already have a project set up, you may skip to the next section.
 
-_If you don't understand what's going on in this section, please refer to the Quickstart guides of the documentation, specifically the (Deploying your first project)[https://docs.zeppelinos.org/docs/deploying.html], (Upgrading your project)[https://docs.zeppelinos.org/docs/upgrading.html] and (Linking to EVM packages)[https://docs.zeppelinos.org/docs/linking.html] guides. These guides provide detailed explanations on how a basic ZeppelinOS project works._
+_If you don't understand what's going on in this section, please refer to the Quickstart guides of the documentation, specifically the [Deploying your first project](https://docs.zeppelinos.org/docs/deploying.html), [Upgrading your project](https://docs.zeppelinos.org/docs/upgrading.html) and [Linking to EVM packages](https://docs.zeppelinos.org/docs/linking.html) guides. These guides provide detailed explanations on how a basic ZeppelinOS project works._
 
 Create a new project by running:
 

@@ -20,6 +20,8 @@
     "Initializable": "Initializable",
     "migrations_Initializable": "Initializable",
     "migrations_Migratable": "Migratable",
+    "openzeppelin-solidity_ownership_Ownable": "Ownable",
+    "openzeppelin-solidity_utils_Address": "Address",
     "upgradeability_AdminUpgradeabilityProxy": "AdminUpgradeabilityProxy",
     "upgradeability_Proxy": "Proxy",
     "upgradeability_ProxyAdmin": "ProxyAdmin",
