@@ -29,7 +29,7 @@ export default class Dependency {
   }
 
   public static satisfiesVersion(version: string | semver.SemVer, requirement: string | semver.Range): boolean {
-    return !requirement || version === requirement || semver.satisfies(version, requirement);
+    return !requirement || version === requirement || semver.satisfies(semver.coerce(version), requirement);
   }
 
   public static async fetchVersionFromNpm(name: string): Promise<string> {
@@ -41,6 +41,20 @@ export default class Dependency {
     } catch(error) {
       return name;
     }
+  }
+
+  public static hasDependenciesForDeploy(network: string): boolean {
+    const dependencies = ZosPackageFile.getLinkedDependencies() || [];
+    const networkDependencies = ZosNetworkFile.getDependencies(`zos.${network}.json`) || {};
+    const hasDependenciesForDeploy = dependencies.find(depNameAndVersion => {
+      const [name, version] = depNameAndVersion.split('@');
+      const networkFilePath = `node_modules/${name}/zos.${network}.json`;
+      const projectDependency = networkDependencies[name];
+      const satisfiesVersion = projectDependency && this.satisfiesVersion(projectDependency.version, version);
+      return !fs.exists(networkFilePath) && !satisfiesVersion;
+    });
+
+    return !!hasDependenciesForDeploy;
   }
 
   public static async install(nameAndVersion: string): Promise<Dependency> {

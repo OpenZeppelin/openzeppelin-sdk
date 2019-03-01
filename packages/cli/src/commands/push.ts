@@ -38,12 +38,16 @@ const register: (program: any) => any = (program) => program
 async function action(options: any): Promise<void> {
   const { force, deployDependencies, reset: reupload, network: networkInArgs } = options;
   const { network: networkInSession } = Session.getOptions();
+  const defaultOpts = { network: networkInSession || networkInArgs };
   if (!options.skipCompile) await Compiler.call();
 
-  const promptedOpts = await promptIfNeeded({ opts: { network: networkInSession || networkInArgs }, props: props() });
-  const { network, txParams } = await ConfigVariablesInitializer.initNetworkConfiguration(promptedOpts);
+  const promptedOpts = await promptIfNeeded({ opts: defaultOpts, props: props() });
+  Session.setDefaultNetworkIfNeeded(promptedOpts.network);
 
-  await push({ force, reupload, network, txParams, deployDependencies });
+  const { network, txParams } = await ConfigVariablesInitializer.initNetworkConfiguration(promptedOpts);
+  const promptDepenencyDeploy = await promptForDependencyDeploy(deployDependencies, network);
+
+  await push({ force, reupload, network, txParams, ...promptDepenencyDeploy });
   if (!options.dontExitProcess && process.env.NODE_ENV !== 'test') process.exit(0);
 }
 
@@ -53,6 +57,14 @@ async function tryAction(externalOptions: any): Promise<void> {
   const network = isString(externalOptions.push) ? externalOptions.push : undefined;
   if (network) options.network = network;
   return action(options);
+}
+
+async function promptForDependencyDeploy(deployDependencies, network) {
+  if (await ZWeb3.isGanacheNode()) return { deployDependencies: true };
+  if (Dependency.hasDependenciesForDeploy(network)) {
+    return promptIfNeeded({ opts: { deployDependencies }, props: props(network) });
+  }
+  return { deployDependencies: undefined };
 }
 
 export default { name, signature, description, register, action, tryAction };
