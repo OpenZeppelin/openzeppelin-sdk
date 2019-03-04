@@ -57,13 +57,37 @@ export default class LocalController {
   }
 
   public addAll(): void {
+    function trimExtension(file: string) {
+      let fileExtRegex = new RegExp(/\.[^\.]*$/);
+      return file.replace(fileExtRegex, "");
+    }
+
+    function getAllFilenamesAtPath(path: string): string[] {
+      return fs.readDir(path).reduce((contracts: any, child: string) => {
+        let childPath = path + "/" + child;
+
+        if (fs.isDir(childPath)) {
+          contracts = contracts.concat(getAllFilenamesAtPath(childPath));
+        } else {
+          contracts.push(trimExtension(child));
+        }
+
+        return contracts;
+      }, []);
+    }
+
+    const projectContracts = getAllFilenamesAtPath(Contracts.getLocalContractsDir());
     const folder = Contracts.getLocalBuildDir();
+
     fs.readDir(folder).forEach((file) => {
       const path = `${folder}/${file}`;
       if(this.hasBytecode(path)) {
         const contractData = fs.parseJson(path);
-        const contractName = contractData.contractName;
-        this.add(contractName, contractName);
+
+        if (projectContracts.includes(trimExtension(file)) && contractData.ast.nodes[1].contractKind != "library") {
+          const contractName = contractData.contractName;
+          this.add(contractName, contractName);
+        }
       }
     });
   }

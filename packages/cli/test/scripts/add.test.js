@@ -74,6 +74,8 @@ contract('add script', function() {
   it('should add all contracts in build contracts dir', function() {
     addAll({ packageFile: this.packageFile })
 
+    expect(this.packageFile.contract('Initializable')).to.be.undefined
+    expect(this.packageFile.contract('UintLib')).to.be.undefined
     this.packageFile.contract('ImplV1').should.eq('ImplV1')
     this.packageFile.contract('ImplV2').should.eq('ImplV2')
   })
