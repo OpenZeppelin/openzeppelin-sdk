@@ -1,5 +1,5 @@
-import { exec, ExecException } from 'child_process';
-import { FileSystem, Contracts, Logger } from 'zos-lib';
+import { execFile, ExecException } from 'child_process';
+import { FileSystem, Logger } from 'zos-lib';
 
 const log = new Logger('Compiler');
 
@@ -10,7 +10,8 @@ const Compiler = {
     if (!FileSystem.exists(truffleBin)) truffleBin = 'truffle'; // Attempt to load global truffle if local was not found
 
     return new Promise((resolve, reject) => {
-      exec(`${truffleBin} compile --all`, (error: ExecException, stdout, stderr) => {
+      execFile(truffleBin, ['compile', '--all'], { shell: true }, (error: ExecException, stdout, stderr) => {
+
         if (error) {
           if (error.code === 127) console.error('Could not find truffle executable. Please install it by running: npm install truffle');
           reject(error);
