@@ -72,8 +72,9 @@ const Truffle = {
         .filter((name) => {
           const contract = FileSystem.parseJsonIfExists(`${buildDir}/${name}`);
           if (contract) {
-            let isLibrary = contract.ast ? contract.ast.nodes[1].contractKind === "library" : false;
+            const isLibrary = contract.ast ? contract.ast.nodes[1].contractKind === "library" : false;
             const projectDir = buildDir.replace('build/contracts', '');
+
             return (contract.bytecode.length > 2 &&
                     contract.sourcePath.indexOf(projectDir) === 0 &&
                     !isLibrary);

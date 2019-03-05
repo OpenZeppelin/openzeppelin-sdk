@@ -18,6 +18,12 @@ contract ChildImplV2 is ImplV2 {
   }
 }
 
+contract WithExternalPackageImplV2 is ImplV2, GreeterImpl {
+  function say(string phrase) public pure returns(string) {
+    return phrase.wrap();
+  }
+}
+
 contract WithLibraryImplV2 is ImplV2 {
   using UintLib for uint256;
 

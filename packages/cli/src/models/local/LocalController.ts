@@ -57,34 +57,17 @@ export default class LocalController {
   }
 
   public addAll(): void {
-    function trimExtension(file: string) {
-      let fileExtRegex = new RegExp(/\.[^\.]*$/);
-      return file.replace(fileExtRegex, "");
-    }
+    const buildFolder = Contracts.getLocalBuildDir();
+    const sourceFolder = Contracts.getLocalContractsDir();
 
-    function getAllFilenamesAtPath(path: string): string[] {
-      return fs.readDir(path).reduce((contracts: any, child: string) => {
-        let childPath = path + "/" + child;
-
-        if (fs.isDir(childPath)) {
-          contracts = contracts.concat(getAllFilenamesAtPath(childPath));
-        } else {
-          contracts.push(trimExtension(child));
-        }
-
-        return contracts;
-      }, []);
-    }
-
-    const projectContracts = getAllFilenamesAtPath(Contracts.getLocalContractsDir());
-    const folder = Contracts.getLocalBuildDir();
-
-    fs.readDir(folder).forEach((file) => {
-      const path = `${folder}/${file}`;
+    fs.readDir(buildFolder).forEach((file) => {
+      const path = `${buildFolder}/${file}`;
       if(this.hasBytecode(path)) {
         const contractData = fs.parseJson(path);
+        const isLibrary = contractData.ast.nodes[1].contractKind === "library";
+        const isProjectContract = contractData.sourcePath.indexOf(sourceFolder) === 0;
 
-        if (projectContracts.includes(trimExtension(file)) && contractData.ast.nodes[1].contractKind != "library") {
+        if (!isLibrary && isProjectContract) {
           const contractName = contractData.contractName;
           this.add(contractName, contractName);
         }
