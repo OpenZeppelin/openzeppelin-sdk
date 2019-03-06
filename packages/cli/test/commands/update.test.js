@@ -1,10 +1,9 @@
 'use strict'
 require('../setup')
 
-import {stubCommands, itShouldParse} from './share';
+import { stubCommands, itShouldParse } from './share';
 
-contract('update command', function() {
-
+describe('update command', function() {
   stubCommands()
 
   itShouldParse('should call update script with options', 'update', 'zos update --network test --all --init initialize --args 42 --force --from 0x40', function(update) {
@@ -26,5 +25,4 @@ contract('update command', function() {
   itShouldParse('should call update script with address', 'update', 'zos update 0x80 --network test', function(update) {
     update.should.have.been.calledWith( { proxyAddress: '0x80', network: 'test', txParams: {} } )
   })
-
 })

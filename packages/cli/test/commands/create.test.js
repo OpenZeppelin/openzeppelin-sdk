@@ -1,10 +1,9 @@
 'use strict'
 require('../setup')
 
-import {stubCommands, itShouldParse} from './share';
+import { stubCommands, itShouldParse } from './share';
 
-contract('create command', function() {
-
+describe('create command', function() {
   stubCommands()
 
   itShouldParse('should call create script with options', 'create', 'zos create Impl --network test --init setup --args 42 --force --from 0x40', function(create) {
@@ -30,5 +29,4 @@ contract('create command', function() {
   itShouldParse('should call create script with contract from package with slashes', 'create', 'zos create Zeppelin/OpenZeppelin/Impl --network test', function(create) {
     create.should.have.been.calledWithExactly( { packageName: 'Zeppelin/OpenZeppelin', contractAlias: 'Impl', network: 'test', txParams: {} })
   })
-
 })

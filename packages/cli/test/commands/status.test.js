@@ -1,10 +1,9 @@
 'use strict'
 require('../setup')
 
-import {stubCommands, itShouldParse} from './share';
+import { stubCommands, itShouldParse } from './share';
 
-contract('status command', function() {
-
+describe('status command', function() {
   stubCommands()
 
   itShouldParse('should call status script', 'status', 'zos status --network test', function(status) {
@@ -18,5 +17,4 @@ contract('status command', function() {
   itShouldParse('should call compare script when passing --fetch option', 'compare', 'zos status --network test --fetch', function(compare) {
     compare.should.have.been.calledWithExactly({ network: 'test', txParams: {} })
   })
-
 })
