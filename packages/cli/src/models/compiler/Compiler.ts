@@ -10,7 +10,9 @@ const Compiler = {
     if (!FileSystem.exists(truffleBin)) truffleBin = 'truffle'; // Attempt to load global truffle if local was not found
 
     return new Promise((resolve, reject) => {
-      execFile(truffleBin, ['compile', '--all'], { shell: true }, (error: ExecException, stdout, stderr) => {
+      const args: object = { shell: true };
+
+      execFile(truffleBin, ['compile', '--all'], args, (error: ExecException, stdout, stderr) => {
 
         if (error) {
           if (error.code === 127) console.error('Could not find truffle executable. Please install it by running: npm install truffle');
