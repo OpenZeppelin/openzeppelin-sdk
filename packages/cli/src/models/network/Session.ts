@@ -14,21 +14,33 @@ interface SessionOptions {
   network?: string;
   from?: string;
   timeout?: number;
+  expires?: Date;
 }
 
 const Session = {
 
   getOptions(overrides: SessionOptions = {}): SessionOptions {
     const session = this._parseSession();
-    if (!session) return this._setDefaults(overrides);
+    if (!session || this._hasExpired(session)) return this._setDefaults(overrides);
     log.info(`Using session with ${describe(omitBy(session, (v, key) => overrides[key]))}`);
+
     return { ...session, ...overrides };
   },
 
-  open({ network, from, timeout }: SessionOptions, expires: number = DEFAULT_EXPIRATION_TIMEOUT): void {
+  setDefaultNetworkIfNeeded(network: string): void {
+    const session = this._parseSession();
+    if (!session || this._hasExpired(session)) this.open({ network }, 0, false);
+  },
+
+  getDefaultNetwork(): string | undefined {
+    const session = this._parseSession();
+    return session && this._hasExpired(session) ? session.network : undefined;
+  },
+
+  open({ network, from, timeout }: SessionOptions, expires: number = DEFAULT_EXPIRATION_TIMEOUT, logInfo: boolean = true): void {
     const expirationTimestamp = new Date(new Date().getTime() + expires * 1000);
     fs.writeJson(ZOS_SESSION_PATH, { network, from, timeout, expires: expirationTimestamp });
-    log.info(`Using ${describe({ network, from, timeout })} by default.`);
+    if (logInfo) log.info(`Using ${describe({ network, from, timeout })} by default.`);
   },
 
   close(): void {
@@ -46,15 +58,17 @@ const Session = {
   _parseSession(): SessionOptions | undefined {
     const session = fs.parseJsonIfExists(ZOS_SESSION_PATH);
     if (isEmpty(session)) return undefined;
-    const expires = new Date(session.expires);
-    if (expires <= new Date()) return undefined;
-    const parsedSession = pick(session, 'network', 'timeout', 'from');
+    const parsedSession = pick(session, 'network', 'timeout', 'from', 'expires');
     return this._setDefaults(parsedSession);
   },
 
   _setDefaults(session: SessionOptions): SessionOptions {
     if (!session.timeout) session.timeout = DEFAULT_TX_TIMEOUT;
     return session;
+  },
+
+  _hasExpired(session: SessionOptions): boolean {
+    return session && new Date(session.expires) <= new Date();
   }
 };
 

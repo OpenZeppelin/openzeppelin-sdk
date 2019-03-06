@@ -38,10 +38,11 @@ const register: (program: any) => any = (program) => program
 async function action(options: any): Promise<void> {
   const { force, deployDependencies, reset: reupload, network: networkInArgs } = options;
   const { network: networkInSession } = Session.getOptions();
+  const defaultArgs = { network: Session.getDefaultNetwork() };
   const defaultOpts = { network: networkInSession || networkInArgs };
   if (!options.skipCompile) await Compiler.call();
 
-  const promptedOpts = await promptIfNeeded({ opts: defaultOpts, props: props() });
+  const promptedOpts = await promptIfNeeded({ opts: defaultOpts, defaults: defaultArgs, props: props() });
   Session.setDefaultNetworkIfNeeded(promptedOpts.network);
 
   const { network, txParams } = await ConfigVariablesInitializer.initNetworkConfiguration(promptedOpts);
