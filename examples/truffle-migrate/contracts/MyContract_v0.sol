@@ -1,4 +1,4 @@
-pragma solidity ^0.4.21;
+pragma solidity ^0.5.0;
 
 import "zos-lib/contracts/Initializable.sol";
 
@@ -9,7 +9,7 @@ contract MyContract_v0 is Initializable {
     value = _value;
   }
 
-  function version() public pure returns (string) {
+  function version() public pure returns (string memory) {
     return "v0";
   }
 }
