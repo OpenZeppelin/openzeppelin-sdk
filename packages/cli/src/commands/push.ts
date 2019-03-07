@@ -46,9 +46,9 @@ async function action(options: any): Promise<void> {
   Session.setDefaultNetworkIfNeeded(promptedOpts.network);
 
   const { network, txParams } = await ConfigVariablesInitializer.initNetworkConfiguration(promptedOpts);
-  const promptDepenencyDeploy = await promptForDependencyDeploy(deployDependencies, network);
+  const promptDeployDependencies = await promptForDeployDependencies(deployDependencies, network);
 
-  await push({ force, reupload, network, txParams, ...promptDepenencyDeploy });
+  await push({ force, reupload, network, txParams, ...promptDeployDependencies });
   if (!options.dontExitProcess && process.env.NODE_ENV !== 'test') process.exit(0);
 }
 
@@ -60,7 +60,7 @@ async function tryAction(externalOptions: any): Promise<void> {
   return action(options);
 }
 
-async function promptForDependencyDeploy(deployDependencies, network) {
+async function promptForDeployDependencies(deployDependencies, network): Promise<{ deployDependencies: boolean }> {
   if (await ZWeb3.isGanacheNode()) return { deployDependencies: true };
   if (Dependency.hasDependenciesForDeploy(network)) {
     return promptIfNeeded({ opts: { deployDependencies }, props: props(network) });
