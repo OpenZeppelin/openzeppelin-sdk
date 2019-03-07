@@ -1,5 +1,6 @@
 import ZWeb3 from './ZWeb3';
 import Contracts from './Contracts';
+import ContractAST from '../utils/ContractAST';
 import { StorageLayoutInfo } from '../validations/Storage';
 import { Callback, EventLog, EventEmitter, TransactionReceipt } from 'web3/types';
 import { Contract as Web3Contract, TransactionObject, BlockType } from 'web3-eth-contract';
@@ -30,10 +31,12 @@ export default interface Contract {
   new: (args?: any[], options?: {}) => Promise<Contract>;
   at: (address: string) => Contract;
   link: (libraries: { [libAlias: string]: string }) => void;
+  methodsFromAst: () => ContractMethod[];
   deployment?: { transactionHash: string, transactionReceipt: TransactionReceipt };
   schema: {
 
     // Zos schema specific.
+    directory: string;
     linkedBytecode: string;
     linkedDeployedBytecode: string;
     warnings: any;
@@ -55,6 +58,12 @@ export default interface Contract {
     networks: any;
     updatedAt: string;
   };
+}
+
+interface ContractMethod {
+  name: string;
+  hasInitializer: boolean;
+  inputs: string[];
 }
 
 function _wrapContractInstance(schema: any, instance: Web3Contract): Contract {
@@ -98,6 +107,20 @@ function _wrapContractInstance(schema: any, instance: Web3Contract): Contract {
       instance.schema.linkedBytecode = instance.schema.linkedBytecode.replace(regex, address);
       instance.schema.linkedDeployedBytecode = instance.schema.linkedDeployedBytecode.replace(regex, address);
     });
+  };
+
+    // get methods from AST, as there is no info about the modifiers in the ABI
+  instance.methodsFromAst = function(): ContractMethod[] {
+    const contractAst = new ContractAST(instance, null, { nodesFilter: ['ContractDefinition'] });
+    return contractAst.getMethods()
+      .filter(({ visibility }) => visibility === 'public')
+      .map(method => {
+        const initializer = method
+          .modifiers
+          .find(({ modifierName }) => modifierName.name === 'initializer');
+
+        return { ...method, hasInitializer: initializer ? true : false };
+      });
   };
 
   // TODO: Remove after web3 adds the getter: https://github.com/ethereum/web3.js/issues/2274

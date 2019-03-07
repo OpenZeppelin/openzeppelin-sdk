@@ -7,7 +7,7 @@ import Contracts from '../../../src/artifacts/Contracts'
 
 const ContractWithStructInConstructor = Contracts.getFromLocal('WithStructInConstructor');
 const ContractWithConstructorImplementation = Contracts.getFromLocal('WithConstructorImplementation');
-
+const InitializableMock = Contracts.getFromLocal('InitializableMock');
 
 contract('Contract', function(accounts) {
   const [_, account] = accounts.map(utils.toChecksumAddress)
@@ -60,6 +60,55 @@ contract('Contract', function(accounts) {
         instance1.options.address.should.not.eq(instance2.options.address);
         (await instance1.methods.text().call()).should.eq('foo');
         (await instance2.methods.text().call()).should.eq('bar');
+      });
+    });
+
+    /* public ethods in contract:
+     * initialize()
+     * initializeNested()
+     * initializeWithNested(uint256)
+     * fail()
+   */
+    describe('#methodsFromAst', function() {
+      beforeEach('set methods', function() {
+        this.methods = InitializableMock.methodsFromAst();
+      });
+
+      it('returns only public functions', function() {
+        const nonPublicMethods = this.methods.find(method => method.visibility !== 'public');
+        const publicMethods = this.methods.filter(method => method.visibility === 'public');
+        expect(nonPublicMethods).to.be.undefined;
+        expect(publicMethods).to.have.lengthOf(this.methods.length);
+      });
+
+      it('returns methods with initializers', function() {
+        const methods = this.methods.filter(({ hasInitializer }) => hasInitializer);
+        expect(methods).to.have.lengthOf(3);
+        expect(methods[0].name).to.eq('initialize');
+        expect(methods[1].name).to.eq('initializeNested');
+        expect(methods[2].name).to.eq('initializeWithX');
+      });
+
+      it('returns methods without initializers', function() {
+        const methods = this.methods.filter(({ hasInitializer }) => !hasInitializer);
+        expect(methods).to.have.lengthOf(1);
+        expect(methods[0].name).to.eq('fail');
+      });
+
+      it('sets selectors', function() {
+        expect(this.methods[0].selector).to.eq('initialize()');
+        expect(this.methods[1].selector).to.eq('initializeNested()');
+        expect(this.methods[2].selector).to.eq('initializeWithX(uint256)');
+        expect(this.methods[3].selector).to.eq('fail()');
+      });
+
+      it('sets method inputs', function() {
+        expect(this.methods[0].inputs).to.be.empty;
+        expect(this.methods[1].inputs).to.be.empty;
+        expect(this.methods[2].inputs).to.have.lengthOf(1)
+        expect(this.methods[2].inputs[0].name).to.eq('_x');
+        expect(this.methods[2].inputs[0].type).to.eq('uint256');
+        expect(this.methods[3].inputs).to.be.empty;
       });
     });
   });
