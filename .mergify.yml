@@ -10,7 +10,6 @@ pull_request_rules:
   - label!=no-mergify
   - '#approved-reviews-by>=1'
   - '#changes-requested-reviews-by=0'
-  - status-success=Travis CI - Branch
   - status-success=Travis CI - Pull Request
 - name: delete head branch after merge
   conditions:
