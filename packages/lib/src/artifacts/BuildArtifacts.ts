@@ -5,8 +5,8 @@ import values from 'lodash.values';
 import Contracts from './Contracts';
 import { parseJson } from '../utils/FileSystem';
 
-export function getBuildArtifacts(): BuildArtifacts {
-  return new BuildArtifacts(Contracts.listBuildArtifacts());
+export function getBuildArtifacts(path?: string): BuildArtifacts {
+  return new BuildArtifacts(Contracts.listBuildArtifacts(path));
 }
 
 // TS-TODO: can artifacts by typed?

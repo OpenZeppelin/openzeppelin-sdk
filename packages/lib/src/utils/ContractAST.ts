@@ -54,8 +54,8 @@ export default class ContractAST {
   private nodesFilter: string[];
 
   constructor(contract: Contract, artifacts?: BuildArtifacts, props?: ContractASTProps) {
-
-    this.artifacts = artifacts || getBuildArtifacts();
+    const { directory } = contract.schema;
+    this.artifacts = artifacts || getBuildArtifacts(directory);
     this.contract = contract;
 
     // Transitive closure of source files imported from the contract.

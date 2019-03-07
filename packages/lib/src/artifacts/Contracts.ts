@@ -68,8 +68,9 @@ export default class Contracts {
     return Contracts.defaultFromAddress;
   }
 
-  public static listBuildArtifacts(): string[] {
-    return glob.sync(`${Contracts.getLocalBuildDir()}/*.json`);
+  public static listBuildArtifacts(pathName?: string): string[] {
+    const buildDir = pathName || Contracts.getLocalBuildDir();
+    return glob.sync(`${buildDir}/*.json`);
   }
 
   public static setSyncTimeout(value: number): void {
@@ -90,6 +91,7 @@ export default class Contracts {
 
   private static _getFromPath(targetPath: string): Contract {
     const schema = require(targetPath);
+    schema.directory = targetPath.replace(/contracts\/.*\.json$/, 'contracts');
     if(schema.bytecode === '') throw new Error(`A bytecode must be provided for contract ${schema.contractName}.`);
     if(!hasUnlinkedVariables(schema.bytecode)) {
       schema.linkedBytecode = schema.bytecode;
