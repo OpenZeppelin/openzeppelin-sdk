@@ -4,9 +4,13 @@ pragma solidity ^0.4.24;
  * @title Ownable
  * @dev The Ownable contract has an owner address, and provides basic authorization control
  * functions, this simplifies the implementation of "user permissions".
+ *
  * Source: https://raw.githubusercontent.com/OpenZeppelin/openzeppelin-solidity/v2.0.0/contracts/ownership/Ownable.sol
+ * This contract is copied here and renamed from the original to avoid clashes in the compiled artifacts
+ * when the user imports a zos-lib contract (that transitively causes this contract to be compiled and added to the
+ * build/artifacts folder) as well as the vanilla Ownable implementation from an openzeppelin version.
  */
-contract ZOSOwnable {
+contract ZOSLibOwnable {
   address private _owner;
 
   event OwnershipTransferred(
