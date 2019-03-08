@@ -22,7 +22,7 @@ contract ChildImplV1 is ImplV1 {
 }
 
 contract WithExternalPackageImplV1 is ImplV1, GreeterImpl {
-  function say(string phrase) public pure returns(string) {
+  function say(string memory phrase) public pure returns(string memory) {
     return phrase.wrap();
   }
 }
