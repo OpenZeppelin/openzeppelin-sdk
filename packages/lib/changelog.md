@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## v2.2.2
+
+### Fixed
+- Automatic linking of external Solidity libraries now properly handles multiple libraries on the same contract ([#771](https://github.com/zeppelinos/zos/pull/771))
+
+### Changed
+- Renamed contracts copied from openzeppelin-solidity (Ownable and Address) to avoid clashing of compiled artifacts (([#756](https://github.com/zeppelinos/zos/pull/756)))
+
 ## v2.2.1 - 2019-02-26
 
 ### Changed

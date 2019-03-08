@@ -4,6 +4,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## v2.2.2
+
+### Added
+- Added Goerli network to the list of known networks, both for verification on etherscan and for naming of zos.network.json files ([#768](https://github.com/zeppelinos/zos/pull/768)) (thanks @paulinablaszk!)
+
+### Fixed
+- Fix contracts compilation on Windows workstations ([#764](https://github.com/zeppelinos/zos/pull/764)) (thanks @siromivel!)
+
+### Changed
+- Exceptions thrown during the validation process can be ignored during `zos push` via the `--force` flag ([#770](https://github.com/zeppelinos/zos/pull/770))
+
+
 ## v2.2.1 - 2019-02-26
 
 ### Fixed
