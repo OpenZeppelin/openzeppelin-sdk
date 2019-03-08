@@ -214,10 +214,9 @@ export default class NetworkController {
       await this._setSolidityLibs(contract);
       log.info(`Uploading ${contract.schema.contractName} contract as ${contractAlias}`);
       const contractInstance = await this.project.setImplementation(contract, contractAlias);
+      const { types, storage } = contract.schema.storageInfo || { types: null, storage: null };
       this.networkFile.addContract(contractAlias, contractInstance, {
-        warnings: contract.schema.warnings,
-        types: contract.schema.storageInfo.types,
-        storage: contract.schema.storageInfo.storage
+        warnings: contract.schema.warnings, types, storage
       });
     } catch(error) {
       error.message = `${contractAlias} deployment failed with error: ${error.message}`;
@@ -298,16 +297,21 @@ export default class NetworkController {
   // DeployerController || Contract model
   public validateContract(contractAlias: string, contract: Contract, buildArtifacts: BuildArtifacts): boolean {
     log.info(`Validating contract ${contract.schema.contractName}`);
-    const existingContractInfo: any = this.networkFile.contract(contractAlias) || {};
-    const warnings = validate(contract, existingContractInfo, buildArtifacts);
-    const newWarnings = newValidationErrors(warnings, existingContractInfo.warnings);
+    try {
+      const existingContractInfo: any = this.networkFile.contract(contractAlias) || {};
+      const warnings = validate(contract, existingContractInfo, buildArtifacts);
+      const newWarnings = newValidationErrors(warnings, existingContractInfo.warnings);
 
-    const validationLogger = new ValidationLogger(contract, existingContractInfo);
-    validationLogger.log(newWarnings, buildArtifacts);
+      const validationLogger = new ValidationLogger(contract, existingContractInfo);
+      validationLogger.log(newWarnings, buildArtifacts);
 
-    contract.schema.warnings = warnings;
-    contract.schema.storageInfo = getStorageLayout(contract, buildArtifacts);
-    return validationPasses(newWarnings);
+      contract.schema.warnings = warnings;
+      contract.schema.storageInfo = getStorageLayout(contract, buildArtifacts);
+      return validationPasses(newWarnings);
+    } catch (err) {
+      log.error(`Error while validating contract ${contract.schema.contractName}`, err);
+      return false;
+    }
   }
 
   // Contract model

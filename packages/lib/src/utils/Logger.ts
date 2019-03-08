@@ -36,8 +36,16 @@ export default class Logger {
     this.log(msg, 'yellow');
   }
 
-  public error(msg: string): void {
-    this.log(msg, 'red');
+  public error(msg: string, ex?: Error): void {
+    if (ex && ex.message && !this.opts.verbose) {
+      this.log(`${msg}: ${ex.message}`, 'red');
+    } else {
+      this.log(msg, 'red');
+    }
+
+    if (ex && this.opts.verbose) {
+      this.error(ex.stack);
+    }
   }
 
   public log(msg: string, color: string = ''): void {
