@@ -38,14 +38,13 @@ export function parseArgs(args: string): string[] | never {
   }
 }
 
-export function parseInit(options: any, defaultInit: any): { initMethod: string, initArgs: string[] } {
-  let initMethod = options.init;
-  if (typeof initMethod === 'boolean') initMethod = defaultInit;
-  if (!initMethod && typeof options.args !== 'undefined') initMethod = defaultInit;
+export function parseInit({ init: initMethodName, args: initArgs }: any, defaultInit: string = 'initialize') {
+  if (typeof initMethodName === 'boolean') initMethodName = defaultInit;
+  if (!initMethodName && typeof initArgs !== 'undefined') initMethodName = defaultInit;
+  const initMethod = { name: initMethodName, selector: initMethodName };
 
-  let initArgs = options.args;
   if(typeof initArgs === 'string') initArgs = parseArgs(initArgs);
-  else if(typeof initArgs === 'boolean' || initMethod) initArgs = [];
+  else if(typeof initArgs === 'boolean' || initMethodName) initArgs = [];
 
   return { initMethod, initArgs };
 }
