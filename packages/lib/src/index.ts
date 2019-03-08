@@ -3,6 +3,7 @@ const version = 'v' + require('../package.json').version;
 
 // helpers
 import encodeCall from './helpers/encodeCall';
+import { encodeParams } from './helpers/encodeCall';
 import sleep from './helpers/sleep';
 
 // utils
@@ -46,6 +47,7 @@ import ProxyAdminProject from './project/ProxyAdminProject';
 export {
   version,
   encodeCall,
+  encodeParams,
   assertRevert,
   assertEvent,
   assertions,

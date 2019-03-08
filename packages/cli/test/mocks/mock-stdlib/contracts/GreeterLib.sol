@@ -1,7 +1,7 @@
-pragma solidity ^0.4.24;
+pragma solidity ^0.5.0;
 
 library GreeterLib {
-  function wrap(string self) public pure returns (string) {
+  function wrap(string memory self) public pure returns (string memory) {
     return self;
   }
 }

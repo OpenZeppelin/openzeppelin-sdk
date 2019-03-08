@@ -2,6 +2,7 @@ import add from './add';
 import bump from './bump';
 import check from './check';
 import create from './create';
+import create2 from './create2';
 import freeze from './freeze';
 import init from './init';
 import link from './link';
@@ -20,6 +21,7 @@ export default {
   bump,
   check,
   create,
+  create2,
   freeze,
   init,
   link,

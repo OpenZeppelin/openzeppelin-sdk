@@ -29,7 +29,9 @@ interface Proxy extends Network, PackageArgs {
   force?: boolean;
 }
 
-export interface CreateParams extends Proxy {}
+export interface CreateParams extends Proxy {
+  salt?: string;
+}
 
 export interface CompareParams extends Network {}
 
@@ -106,4 +108,8 @@ export interface CheckParams {
 export interface UnlinkParams {
   dependencies: string[];
   packageFile?: ZosPackageFile;
+}
+
+export interface QueryDeploymentParams extends Network {
+  salt: string;
 }

@@ -10,7 +10,7 @@ setArtifactDefaults()
 
 require('chai')
   .use(require('chai-as-promised')) // TODO: Remove this dependency
-  .use(require('chai-bignumber')(web3.BigNumber))
+  .use(require('chai-string'))
   .use(helpers.assertions)
   .should()
 

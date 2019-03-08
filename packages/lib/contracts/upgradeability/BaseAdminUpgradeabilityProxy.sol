@@ -1,16 +1,16 @@
 pragma solidity ^0.5.0;
 
-import '../upgradeability/UpgradeabilityProxy.sol';
+import './UpgradeabilityProxy.sol';
 
 /**
- * @title AdminUpgradeabilityProxy
+ * @title BaseAdminUpgradeabilityProxy
  * @dev This contract combines an upgradeability proxy with an authorization
  * mechanism for administrative tasks.
  * All external functions in this contract must be guarded by the
  * `ifAdmin` modifier. See ethereum/solidity#3864 for a Solidity
  * feature proposal that would enable this to be done automatically.
  */
-contract DeprecatedAdminUpgradeabilityProxy is UpgradeabilityProxy {
+contract BaseAdminUpgradeabilityProxy is BaseUpgradeabilityProxy {
   /**
    * @dev Emitted when the administration has been transferred.
    * @param previousAdmin Address of the previous admin.
@@ -23,7 +23,7 @@ contract DeprecatedAdminUpgradeabilityProxy is UpgradeabilityProxy {
    * This is the keccak-256 hash of "org.zeppelinos.proxy.admin", and is
    * validated in the constructor.
    */
-  bytes32 private constant ADMIN_SLOT = 0x10d6a54a4754c8869d6886b5f5d7fbfa5b4522237ea5c60d11bc4e7a1ff9390b;
+  bytes32 internal constant ADMIN_SLOT = 0x10d6a54a4754c8869d6886b5f5d7fbfa5b4522237ea5c60d11bc4e7a1ff9390b;
 
   /**
    * @dev Modifier to check whether the `msg.sender` is the admin.
@@ -39,24 +39,9 @@ contract DeprecatedAdminUpgradeabilityProxy is UpgradeabilityProxy {
   }
 
   /**
-   * Contract constructor.
-   * It sets the `msg.sender` as the proxy administrator.
-   * @param _implementation address of the initial implementation.
-   * @param _data Data to send as msg.data to the implementation to initialize the proxied contract.
-   * It should include the signature and the parameters of the function to be called, as described in
-   * https://solidity.readthedocs.io/en/v0.4.24/abi-spec.html#function-selector-and-argument-encoding.
-   * This parameter is optional, if no data is given the initialization call to proxied contract will be skipped.
-   */
-  constructor(address _implementation, bytes memory _data) UpgradeabilityProxy(_implementation, _data) public payable {
-    assert(ADMIN_SLOT == keccak256("org.zeppelinos.proxy.admin"));
-
-    _setAdmin(msg.sender);
-  }
-
-  /**
    * @return The address of the proxy admin.
    */
-  function admin() external view returns (address) {
+  function admin() external ifAdmin returns (address) {
     return _admin();
   }
 

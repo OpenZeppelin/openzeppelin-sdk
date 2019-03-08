@@ -12,6 +12,7 @@ import assertRevert from '../../../src/test/helpers/assertRevert'
 import { toAddress } from '../../../src/utils/Addresses';
 import { Package } from '../../../src';
 import utils from 'web3-utils';
+import ProxyFactory from '../../../src/proxy/ProxyFactory';
 
 const ImplV1 = Contracts.getFromLocal('DummyImplementation');
 const ImplV2 = Contracts.getFromLocal('DummyImplementationV2');
@@ -27,12 +28,19 @@ contract('AppProject', function (accounts) {
   describe('new AppProject', function () {
     beforeEach('deploying', async function () {
       this.proxyAdmin = await ProxyAdmin.deploy({ from: owner });
-      this.project = await AppProject.fetchOrDeploy(name, version, { from: owner }, { proxyAdminAddress: this.proxyAdmin.address });
+      this.proxyFactory = await ProxyFactory.deploy({ from: owner });
+      this.project = await AppProject.fetchOrDeploy(name, version, { from: owner }, { proxyAdminAddress: this.proxyAdmin.address, proxyFactoryAddress: this.proxyFactory.address });
       this.adminAddress = this.project.proxyAdmin.address;
     });
 
     it('should have a proxyAdmin initialized', function() {
       this.project.proxyAdmin.should.be.an.instanceof(ProxyAdmin);
+      this.project.proxyAdmin.address.should.equalIgnoreCase(this.proxyAdmin.address);
+    });
+
+    it('should have a proxyFactory initialized', function() {
+      this.project.proxyFactory.should.be.an.instanceof(ProxyFactory);
+      this.project.proxyFactory.address.should.equalIgnoreCase(this.proxyFactory.address);
     });
 
     describe('instance methods', function() {
@@ -102,7 +110,7 @@ contract('AppProject', function (accounts) {
     });
 
     beforeEach('setting up simple project', async function () {
-      this.simple = new SimpleProject(name, { from: owner });
+      this.simple = new SimpleProject(name, null, { from: owner });
       this.implementation = await this.simple.setImplementation(ImplV1, contractName);
       await this.simple.setDependency(dependencyName, this.dependency.address, dependencyVersion);
     });

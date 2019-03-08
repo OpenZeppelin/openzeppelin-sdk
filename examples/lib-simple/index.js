@@ -19,7 +19,7 @@ async function main() {
   const [creatorAddress, initializerAddress] = await ZWeb3.accounts();
 
   /* Create a SimpleProject to interact with ZeppelinOS programmatically. */
-  const myProject = new SimpleProject('MyProject', { from: creatorAddress });
+  const myProject = new SimpleProject('MyProject', null, { from: creatorAddress });
 
   /* Deploy the contract with a proxy that allows upgrades. Initialize it by setting the value to 42. */
   log('Creating an upgradeable instance of v0...');
@@ -28,7 +28,7 @@ async function main() {
   
   /* Upgrade the contract at the address of our instance to the new logic, and initialize with a call to add. */
   log('Upgrading to v1...');
-  await myProject.upgradeProxy(instance.address, MyContract_v1, { initMethod: 'add', initArgs: [1], initFrom: initializerAddress })
+  await myProject.upgradeProxy(instance.address, MyContract_v1, { initMethod: 'add', initArgs: [1] });
   log('Contract\'s storage new value: ' + (await instance.methods.value().call({ from: initializerAddress })).toString() + '\n');
   
   log('Wohoo! We\'ve upgraded our contract\'s behavior while preserving its storage, thus obtaining 43.');

@@ -4,25 +4,32 @@ import ProxyAdmin from '../proxy/ProxyAdmin';
 import BaseSimpleProject from './BaseSimpleProject';
 import { ContractInterface } from './AppProject';
 import Contract from '../artifacts/Contract';
+import ProxyFactory from '../proxy/ProxyFactory';
 
 const log: Logger = new Logger('ProxyAdminProject');
 
 export default class ProxyAdminProject extends BaseSimpleProject {
   public proxyAdmin: ProxyAdmin;
 
-  public static async fetch(name: string = 'main', txParams: any = {}, proxyAdminAddress?: string) {
+  public static async fetch(name: string = 'main', txParams: any = {}, proxyAdminAddress?: string, proxyFactoryAddress?: string) {
     const proxyAdmin = proxyAdminAddress ? await ProxyAdmin.fetch(proxyAdminAddress, txParams) : null;
-    return new this(name, proxyAdmin, txParams);
+    const proxyFactory = proxyFactoryAddress ? await ProxyFactory.fetch(proxyFactoryAddress, txParams) : null;
+    return new this(name, proxyAdmin, proxyFactory, txParams);
   }
 
-  constructor(name, proxyAdmin, txParams) {
-    super(name, txParams);
+  constructor(name: string = 'main', proxyAdmin: ProxyAdmin, proxyFactory?: ProxyFactory, txParams: any = {}) {
+    super(name, proxyFactory, txParams);
     this.proxyAdmin = proxyAdmin;
   }
 
   public async createProxy(contract: Contract, contractParams: ContractInterface = {}): Promise<Contract> {
-    if(!this.proxyAdmin) this.proxyAdmin = await ProxyAdmin.deploy(this.txParams);
+    if (!this.proxyAdmin) this.proxyAdmin = await ProxyAdmin.deploy(this.txParams);
     return super.createProxy(contract, contractParams);
+  }
+
+  public async createProxyWithSalt(contract: Contract, salt: string, contractParams: ContractInterface = {}): Promise<Contract> {
+    if (!this.proxyAdmin) this.proxyAdmin = await ProxyAdmin.deploy(this.txParams);
+    return super.createProxyWithSalt(contract, salt, contractParams);
   }
 
   public async upgradeProxy(proxyAddress: string, contract: Contract, contractParams: ContractInterface = {}): Promise<Contract> {

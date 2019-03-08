@@ -1,14 +1,19 @@
 'use strict'
 require('../setup')
 
+import random from 'lodash.random';
+
 import CaptureLogs from '../helpers/captureLogs';
 import { Contracts, Logger } from 'zos-lib';
 
 import add from '../../src/scripts/add';
 import push from '../../src/scripts/push';
 import create from '../../src/scripts/create';
+import queryDeployment from '../../src/scripts/query-deployment';
 import link from '../../src/scripts/link';
 import ZosPackageFile from "../../src/models/files/ZosPackageFile";
+
+const should = require('chai').should();
 
 const ImplV1 = Contracts.getFromLocal('ImplV1');
 const BooleanContract = Contracts.getFromLocal('Boolean');
@@ -64,6 +69,8 @@ contract('create script', function([_, owner]) {
     if (packageName) {
       proxyInfo.package.should.eq(packageName)
     }
+
+    return proxyInfo;
   }
 
   const shouldHandleCreateScript = function() {
@@ -138,6 +145,26 @@ contract('create script', function([_, owner]) {
 
       await assertProxy(this.networkFile, contractAlias, { version, say: 'V1' });
       await assertProxy(this.networkFile, anotherContractAlias, { version, say: 'WithLibraryV1' });
+    });
+
+    it('should create a proxy at an address given a salt', async function () {
+      const salt = random(0, 2**32);
+      await create({ contractAlias, network, txParams, networkFile: this.networkFile, salt });
+      
+      const factoryAddress = this.networkFile.proxyFactoryAddress;
+      should.exist(factoryAddress, "Proxy factory was not stored");
+      await assertProxy(this.networkFile, contractAlias, { version, say: 'V1' });
+    });
+
+    it('should create a proxy at an address that matches the predicted one', async function () {
+      const salt = random(0, 2**32);
+      const predictedAddress = await queryDeployment({ network, txParams, networkFile: this.networkFile, salt });
+      const factoryAddress = this.networkFile.proxyFactoryAddress;
+      should.exist(factoryAddress, "Proxy factory was not stored");
+
+      await create({ contractAlias, network, txParams, networkFile: this.networkFile, salt });
+      const proxyInfo = this.networkFile.getProxies({ contract: contractAlias })[0]
+      predictedAddress.should.equalIgnoreCase(proxyInfo.address, "Predicted address does not match actualy deployment address");
     });
 
     describe('warnings', function () {

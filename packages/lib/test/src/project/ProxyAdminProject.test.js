@@ -22,7 +22,7 @@ contract('ProxyAdminProject', function(accounts) {
     this.proxyAdminOwner = proxyAdminOwner;
     this.proxyAdmin = await ProxyAdmin.deploy(txParams);
     this.adminAddress = this.proxyAdmin.address;
-    this.project = new ProxyAdminProject(name, this.proxyAdmin, { from: proxyAdminOwner })
+    this.project = new ProxyAdminProject(name, this.proxyAdmin, null, { from: proxyAdminOwner })
   });
 
   describe('class methods', function() {

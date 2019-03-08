@@ -10,6 +10,7 @@ import { toSemanticVersion } from '../utils/Semver';
 import { buildCallData, callDescription, CalldataInfo } from '../utils/ABIs';
 import { ContractInterface } from './AppProject';
 import Contract from '../artifacts/Contract';
+import ProxyFactory from '../proxy/ProxyFactory';
 
 const log: Logger = new Logger('BaseSimpleProject');
 
@@ -36,12 +37,14 @@ export default abstract class BaseSimpleProject {
   public dependencies: Dependencies;
   public txParams: any;
   public name: string;
+  public proxyFactory?: ProxyFactory;
 
-  constructor(name, txParams) {
+  constructor(name: string, proxyFactory?: ProxyFactory, txParams = {}) {
     this.txParams = txParams;
     this.name = name;
     this.implementations = {};
     this.dependencies = {};
+    this.proxyFactory = proxyFactory;
   }
 
   public abstract async getAdminAddress(): Promise<string>;
@@ -100,6 +103,31 @@ export default abstract class BaseSimpleProject {
     const proxy = await Proxy.deploy(implementationAddress, await this.getAdminAddress(), initCallData, this.txParams);
     log.info(`Instance created at ${proxy.address}`);
     return contract.at(proxy.address);
+  }
+
+  public async createProxyWithSalt(contract, salt: string, { packageName, contractName, initMethod, initArgs, redeployIfChanged }: ContractInterface = {}): Promise<Contract> {
+    if (!isEmpty(initArgs) && !initMethod) initMethod = 'initialize';
+    const implementationAddress = await this._getOrDeployImplementation(contract, packageName, contractName, redeployIfChanged);
+    const initCallData = this._getAndLogInitCallData(contract, initMethod, initArgs, implementationAddress, 'Creating');
+
+    const proxyFactory = await this.ensureProxyFactory();
+    const adminAddress = await this.getAdminAddress();
+    const proxy = await proxyFactory.createProxy(salt, implementationAddress, adminAddress, initCallData);
+
+    log.info(`Instance created at ${proxy.address}`);
+    return contract.at(proxy.address);
+  }
+
+  public async getProxyDeploymentAddress(salt: string): Promise<string> {
+    const proxyFactory = await this.ensureProxyFactory();
+    return proxyFactory.getDeploymentAddress(salt);
+  }
+
+  public async ensureProxyFactory(): Promise<ProxyFactory> {
+    if (!this.proxyFactory) {
+      this.proxyFactory = await ProxyFactory.deploy(this.txParams);
+    }
+    return this.proxyFactory;
   }
 
   private async _getOrDeployOwnImplementation(contract: Contract, contractName: string, redeployIfChanged?: boolean): Promise<string> {

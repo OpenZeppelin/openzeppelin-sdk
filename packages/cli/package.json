@@ -88,7 +88,10 @@
     "chai": "^4.1.2",
     "chai-as-promised": "^7.1.1",
     "chai-bignumber": "^2.0.2",
+    "chai-string": "^1.5.0",
+    "ganache-cli": "^6.4.0",
     "lodash.mapkeys": "^4.6.0",
+    "lodash.random": "^3.2.0",
     "mock-stdlib": "file:./test/mocks/mock-stdlib",
     "mock-stdlib-2": "file:./test/mocks/mock-stdlib-2",
     "mock-stdlib-invalid": "file:./test/mocks/mock-stdlib-invalid",
@@ -100,7 +103,7 @@
     "react-dom": "^16.3.2",
     "sinon": "^6.1.4",
     "sinon-chai": "^3.2.0",
-    "truffle": "^4.1.15",
+    "truffle": "^5.0.5",
     "ts-node": "^7.0.1",
     "typescript": "^3.2.2"
   }

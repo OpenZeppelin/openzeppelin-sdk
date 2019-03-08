@@ -11,22 +11,22 @@ contract WithStructInConstructor {
   Data public localData;
   address public sender;
 
-  constructor(Data _data) public {
+  constructor(Data memory _data) public {
     localData.foo = _data.foo;
     localData.bar = _data.bar;
     localData.buz = _data.buz;
     sender = msg.sender;
   }
 
-  function foo() public returns (string) {
+  function foo() public view returns (string memory) {
     return localData.foo;
   }
 
-  function bar() public returns (string) {
+  function bar() public view returns (string memory) {
     return localData.bar;
   }
 
-  function buz() public returns (uint256) {
+  function buz() public view returns (uint256) {
     return localData.buz;
   }
 }

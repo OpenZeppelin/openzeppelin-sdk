@@ -1,4 +1,4 @@
-pragma solidity ^0.4.24;
+pragma solidity ^0.5.0;
 
 import "./ImplementationProvider.sol";
 import "./Package.sol";
@@ -48,7 +48,7 @@ contract App is Ownable {
    * @param packageName Name of the package to be retrieved.
    * @return The provider.
    */
-  function getProvider(string packageName) public view returns (ImplementationProvider provider) {
+  function getProvider(string memory packageName) public view returns (ImplementationProvider provider) {
     ProviderInfo storage info = providers[packageName];
     if (address(info.package) == address(0)) return ImplementationProvider(0);
     return ImplementationProvider(info.package.getContract(info.version));
@@ -59,7 +59,7 @@ contract App is Ownable {
    * @param packageName Name of the package to be queried.
    * @return A tuple with the package address and pinned version given a package name, or zero if not set
    */
-  function getPackage(string packageName) public view returns (Package, uint64[3]) {
+  function getPackage(string memory packageName) public view returns (Package, uint64[3] memory) {
     ProviderInfo storage info = providers[packageName];
     return (info.package, info.version);
   }
@@ -71,10 +71,10 @@ contract App is Ownable {
    * @param package Address of the package to register.
    * @param version Version of the package to use in this application.
    */
-  function setPackage(string packageName, Package package, uint64[3] version) public onlyOwner {
+  function setPackage(string memory packageName, Package package, uint64[3] memory version) public onlyOwner {
     require(package.hasVersion(version), "The requested version must be registered in the given package");
     providers[packageName] = ProviderInfo(package, version);
-    emit PackageChanged(packageName, package, version);
+    emit PackageChanged(packageName, address(package), version);
   }
 
   /**
@@ -82,7 +82,7 @@ contract App is Ownable {
    * Reverts if the package is not set in the application.
    * @param packageName Name of the package to remove.
    */
-  function unsetPackage(string packageName) public onlyOwner {
+  function unsetPackage(string memory packageName) public onlyOwner {
     require(address(providers[packageName].package) != address(0), "Package to unset not found");
     delete providers[packageName];
     emit PackageChanged(packageName, address(0), [uint64(0), uint64(0), uint64(0)]);
@@ -94,7 +94,7 @@ contract App is Ownable {
    * @param contractName Name of the contract.
    * @return Address where the contract is implemented.
    */
-  function getImplementation(string packageName, string contractName) public view returns (address) {
+  function getImplementation(string memory packageName, string memory contractName) public view returns (address) {
     ImplementationProvider provider = getProvider(packageName);
     if (address(provider) == address(0)) return address(0);
     return provider.getImplementation(contractName);
@@ -112,10 +112,10 @@ contract App is Ownable {
    * This parameter is optional, if no data is given the initialization call to proxied contract will be skipped.
    * @return Address of the new proxy.
    */
-   function create(string packageName, string contractName, address admin, bytes data) payable public returns (AdminUpgradeabilityProxy) {
+   function create(string memory packageName, string memory contractName, address admin, bytes memory data) payable public returns (AdminUpgradeabilityProxy) {
      address implementation = getImplementation(packageName, contractName);
      AdminUpgradeabilityProxy proxy = (new AdminUpgradeabilityProxy).value(msg.value)(implementation, admin, data);
-     emit ProxyCreated(proxy);
+     emit ProxyCreated(address(proxy));
      return proxy;
   }
 }

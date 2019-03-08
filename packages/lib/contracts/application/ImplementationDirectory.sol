@@ -1,4 +1,4 @@
-pragma solidity ^0.4.24;
+pragma solidity ^0.5.0;
 
 import "./ImplementationProvider.sol";
 import "../openzeppelin-solidity/ownership/Ownable.sol";
@@ -49,7 +49,7 @@ contract ImplementationDirectory is ImplementationProvider, Ownable {
    * @param contractName Name of the contract.
    * @return Address of the implementation.
    */
-  function getImplementation(string contractName) public view returns (address) {
+  function getImplementation(string memory contractName) public view returns (address) {
     return implementations[contractName];
   }
 
@@ -58,7 +58,7 @@ contract ImplementationDirectory is ImplementationProvider, Ownable {
    * @param contractName Name of the contract.
    * @param implementation Address of the implementation.
    */
-  function setImplementation(string contractName, address implementation) public onlyOwner whenNotFrozen {
+  function setImplementation(string memory contractName, address implementation) public onlyOwner whenNotFrozen {
     require(Address.isContract(implementation), "Cannot set implementation in directory with a non-contract address");
     implementations[contractName] = implementation;
     emit ImplementationChanged(contractName, implementation);
@@ -68,7 +68,7 @@ contract ImplementationDirectory is ImplementationProvider, Ownable {
    * @dev Removes the address of a contract implementation from the directory.
    * @param contractName Name of the contract.
    */
-  function unsetImplementation(string contractName) public onlyOwner whenNotFrozen {
+  function unsetImplementation(string memory contractName) public onlyOwner whenNotFrozen {
     implementations[contractName] = address(0);
     emit ImplementationChanged(contractName, address(0));
   }

@@ -1,4 +1,4 @@
-pragma solidity ^0.4.24;
+pragma solidity ^0.5.0;
 
 import "./GreeterBase.sol";
 
@@ -10,19 +10,19 @@ import "./GreeterBase.sol";
 // for contracts loaded from libs.
 
 contract GreeterImpl is GreeterBase {
-  function clashingInitialize(string _value) public {
+  function clashingInitialize(string memory _value) public {
     value = bytes(_value).length;
   } 
 
-  function greet(string who) public {
+  function greet(string memory who) public {
     emit Greeting(greeting(who));
   }
 
-  function greeting(string who) public pure returns (string) {
+  function greeting(string memory who) public pure returns (string memory) {
     return who;
   }
 
-  function version() public pure returns (string) {
+  function version() public pure returns (string memory) {
     return "1.1.0";
   }
 }

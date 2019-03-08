@@ -1,4 +1,4 @@
-pragma solidity ^0.4.24;
+pragma solidity ^0.5.0;
 
 import "./ImplV1.sol";
 
@@ -7,13 +7,13 @@ contract ImplV2 is ImplV1 {
     value = newVal;
   }
 
-  function say() public pure returns (string) {
+  function say() public pure returns (string memory) {
     return "V2";
   }
 }
 
 contract ChildImplV2 is ImplV2 {
-  function say() public pure returns (string) {
+  function say() public pure returns (string memory) {
     return "ChildV1";
   }
 }
@@ -25,7 +25,7 @@ contract WithLibraryImplV2 is ImplV2 {
     return x.double();
   }
 
-  function say() public pure returns (string) {
+  function say() public pure returns (string memory) {
     return "WithLibraryV2";
   }
 }
@@ -35,7 +35,7 @@ contract UnmigratableImplV2 is ImplV2 {
     assert(false);
   }
 
-  function say() public pure returns (string) {
+  function say() public pure returns (string memory) {
     return "UnmigratableImplV2";
   }
 }

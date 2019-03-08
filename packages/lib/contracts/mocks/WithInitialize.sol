@@ -1,4 +1,4 @@
-pragma solidity ^0.4.24;
+pragma solidity ^0.5.0;
 
 import "../Initializable.sol";
 
@@ -19,7 +19,7 @@ contract AnotherWithInitialize is Initializable {
 }
 
 contract WithoutInitialize {
-  function say() public pure returns (string) {
+  function say() public pure returns (string memory) {
     return "WithoutInitialize";
   }
 }

@@ -1,4 +1,4 @@
-pragma solidity ^0.4.24;
+pragma solidity ^0.5.0;
 
 import "../openzeppelin-solidity/ownership/Ownable.sol";
 
@@ -33,7 +33,7 @@ contract Package is Ownable {
    * @param semanticVersion Semver identifier of the version.
    * @return Contract address and content URI for the version, or zero if not exists.
    */
-  function getVersion(uint64[3] semanticVersion) public view returns (address contractAddress, bytes contentURI) {
+  function getVersion(uint64[3] memory semanticVersion) public view returns (address contractAddress, bytes memory contentURI) {
     Version storage version = versions[semanticVersionHash(semanticVersion)];
     return (version.contractAddress, version.contentURI); 
   }
@@ -44,7 +44,7 @@ contract Package is Ownable {
    * @param semanticVersion Semver identifier of the version.
    * @return Contract address for the version, or zero if not exists.
    */
-  function getContract(uint64[3] semanticVersion) public view returns (address contractAddress) {
+  function getContract(uint64[3] memory semanticVersion) public view returns (address contractAddress) {
     Version storage version = versions[semanticVersionHash(semanticVersion)];
     return version.contractAddress;
   }
@@ -57,7 +57,7 @@ contract Package is Ownable {
    * @param contractAddress Contract address for the version, must be non-zero.
    * @param contentURI Optional content URI for the version.
    */
-  function addVersion(uint64[3] semanticVersion, address contractAddress, bytes contentURI) public onlyOwner {
+  function addVersion(uint64[3] memory semanticVersion, address contractAddress, bytes memory contentURI) public onlyOwner {
     require(contractAddress != address(0), "Contract address is required");
     require(!hasVersion(semanticVersion), "Given version is already registered in package");
     require(!semanticVersionIsZero(semanticVersion), "Version must be non zero");
@@ -75,7 +75,7 @@ contract Package is Ownable {
     // Update latest version for this major
     uint64 minor = semanticVersion[1];
     uint64 patch = semanticVersion[2];
-    uint64[3] latestVersionForMajor = versions[majorToLatestVersion[major]].semanticVersion;
+    uint64[3] storage latestVersionForMajor = versions[majorToLatestVersion[major]].semanticVersion;
     if (semanticVersionIsZero(latestVersionForMajor) // No latest was set for this major
        || (minor > latestVersionForMajor[1]) // Or current minor is greater 
        || (minor == latestVersionForMajor[1] && patch > latestVersionForMajor[2]) // Or current patch is greater
@@ -91,7 +91,7 @@ contract Package is Ownable {
    * @param semanticVersion Semver identifier of the version.
    * @return true if the version is registered in this package, false otherwise.
    */
-  function hasVersion(uint64[3] semanticVersion) public view returns (bool) {
+  function hasVersion(uint64[3] memory semanticVersion) public view returns (bool) {
     Version storage version = versions[semanticVersionHash(semanticVersion)];
     return address(version.contractAddress) != address(0);
   }
@@ -102,7 +102,7 @@ contract Package is Ownable {
    * of the order in which they were registered. Returns zero if no versions are registered.
    * @return Semver identifier, contract address, and content URI for the version, or zero if not exists.
    */
-  function getLatest() public view returns (uint64[3] semanticVersion, address contractAddress, bytes contentURI) {
+  function getLatest() public view returns (uint64[3] memory semanticVersion, address contractAddress, bytes memory contentURI) {
     return getLatestByMajor(latestMajor);
   }
 
@@ -114,16 +114,16 @@ contract Package is Ownable {
    * @param major Major identifier to query
    * @return Semver identifier, contract address, and content URI for the version, or zero if not exists.
    */
-  function getLatestByMajor(uint64 major) public view returns (uint64[3] semanticVersion, address contractAddress, bytes contentURI) {
+  function getLatestByMajor(uint64 major) public view returns (uint64[3] memory semanticVersion, address contractAddress, bytes memory contentURI) {
     Version storage version = versions[majorToLatestVersion[major]];
     return (version.semanticVersion, version.contractAddress, version.contentURI); 
   }
 
-  function semanticVersionHash(uint64[3] version) internal pure returns (bytes32) {
+  function semanticVersionHash(uint64[3] memory version) internal pure returns (bytes32) {
     return keccak256(abi.encodePacked(version[0], version[1], version[2]));
   }
 
-  function semanticVersionIsZero(uint64[3] version) internal pure returns (bool) {
+  function semanticVersionIsZero(uint64[3] memory version) internal pure returns (bool) {
     return version[0] == 0 && version[1] == 0 && version[2] == 0;
   }
 }

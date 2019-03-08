@@ -62,12 +62,12 @@ contract('ZWeb3', accounts => {
     it('tells the balanace of a given account', async function () {
       const balance = await ZWeb3.getBalance(accounts[1])
       balance.should.be.an('string')
-      balance.should.be.bignumber.equal('100e18')
+      balance.should.equal(100e18.toString())
     })
 
     it('tells the name of the current node', async function () {
       const node = await ZWeb3.getNode()
-      node.should.be.eq('EthereumJS TestRPC/v2.1.0-beta.7/ethereum-js')
+      node.should.match(/EthereumJS TestRPC/)
     })
 
     it('tells the name of the current network ID', async function () {
@@ -124,7 +124,7 @@ contract('ZWeb3', accounts => {
 
       describe('send transaction', function () {
         it('can send a transaction', async function () {
-          (await ZWeb3.getBalance(accounts[2])).should.be.bignumber.eq('101e18')
+          (await ZWeb3.getBalance(accounts[2])).should.eq(101e18.toString())
         })
       })
 
@@ -133,7 +133,7 @@ contract('ZWeb3', accounts => {
           const transaction = await ZWeb3.getTransaction(this.txHash)
 
           transaction.should.be.an('object')
-          transaction.value.should.be.bignumber.eq('1e18')
+          transaction.value.should.be.eq(1e18.toString())
           transaction.from.should.be.eq(accounts[0])
           transaction.to.should.be.eq(accounts[2])
           transaction.nonce.should.not.be.null

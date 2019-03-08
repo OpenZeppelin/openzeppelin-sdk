@@ -1,4 +1,4 @@
-pragma solidity ^0.4.24;
+pragma solidity ^0.5.0;
 
 // Added just for having a circular reference
 import "./StorageMocks3.sol";
@@ -42,7 +42,7 @@ contract StorageMockWithMappings {
 
 contract StorageMockWithFunctions {
   function(uint) internal my_fun;
-  function(string, string)[] internal my_fun_dynarray;
+  function(string memory, string memory)[] internal my_fun_dynarray;
   function(uint) returns (address)[10] internal my_fun_staticarray;
   mapping(uint256 => function(bool)) internal my_fun_mapping;
 }

@@ -6,15 +6,16 @@ import Proxy from '../../../src/proxy/Proxy'
 import ZWeb3 from '../../../src/artifacts/ZWeb3'
 import encodeCall from '../../../src/helpers/encodeCall'
 import assertRevert from '../../../src/test/helpers/assertRevert'
+import Contracts from '../../../src/artifacts/Contracts'
 import utils from 'web3-utils';
 
-const DummyImplementation = artifacts.require('DummyImplementation')
+const DummyImplementation = Contracts.getFromLocal('DummyImplementation')
 
 export default function shouldBehaveLikeUpgradeabilityProxy(proxyClass, proxyAdminAddress, proxyCreator) {
 
   it('cannot be initialized with a non-contract address', async function () {
     const nonContractAddress = proxyCreator
-    const initializeData = ''
+    const initializeData = Buffer.from('')
     const proxyParams = without([nonContractAddress, proxyAdminAddress, initializeData, { from: proxyCreator }], undefined)
     await assertRevert(proxyClass.new(...proxyParams))
   })
@@ -30,17 +31,17 @@ export default function shouldBehaveLikeUpgradeabilityProxy(proxyClass, proxyAdm
     })
 
     it('initializes the proxy', async function () {
-      const dummy = new DummyImplementation(this.proxy);
-      (await dummy.value()).should.be.bignumber.eq(value)
+      const dummy = await DummyImplementation.at(this.proxy);
+      (await dummy.methods.value().call()).should.eq(value.toString())
     })
 
     it('has expected balance', async function () {
-      (await ZWeb3.getBalance(this.proxy)).should.be.bignumber.eq(balance)
+      (await ZWeb3.getBalance(this.proxy)).should.eq(balance.toString())
     })
   }
 
   describe('without initialization', function () {
-    const initializeData = ''
+    const initializeData = Buffer.from('')
 
     describe('when not sending balance', function () {
       beforeEach('creating proxy', async function () {

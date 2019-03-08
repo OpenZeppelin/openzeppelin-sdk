@@ -61,6 +61,7 @@
     "lodash.map": "^4.6.0",
     "lodash.omit": "^4.5.0",
     "lodash.pick": "^4.4.0",
+    "lodash.random": "^3.2.0",
     "lodash.reverse": "^4.0.1",
     "lodash.some": "^4.6.0",
     "lodash.uniq": "^4.5.0",
@@ -76,7 +77,10 @@
     "chai": "^4.1.2",
     "chai-as-promised": "^7.1.1",
     "chai-bignumber": "^2.0.2",
+    "chai-string": "^1.5.0",
     "coveralls": "^3.0.0",
+    "ganache-cli": "^6.4.0",
+    "ganache-core": "^2.5.1",
     "lodash.foreach": "^4.5.0",
     "lodash.times": "^4.3.2",
     "lodash.zipwith": "^4.2.0",
@@ -84,7 +88,7 @@
     "sinon": "^6.1.4",
     "solidity-coverage": "^0.4.15",
     "tmp": "^0.0.33",
-    "truffle": "^4.1.13",
+    "truffle": "^5.0.5",
     "ts-node": "^7.0.1",
     "typescript": "^3.2.2"
   }

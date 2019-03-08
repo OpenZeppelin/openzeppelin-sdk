@@ -12,8 +12,10 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "truffle": "^4.0.15",
     "zos": "^2.2.0",
     "zos-lib": "^2.2.0"
+  },
+  "devDependencies": {
+    "truffle": "^5.0.5"
   }
 }
