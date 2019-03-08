@@ -64,10 +64,10 @@ export default class LocalController {
       const path = `${buildFolder}/${file}`;
       if(this.hasBytecode(path)) {
         const contractData = fs.parseJson(path);
-        const isLibrary = contractData.ast.nodes[1].contractKind === "library";
         const isProjectContract = contractData.sourcePath.indexOf(sourceFolder) === 0;
+        const isLibrary = contractData.ast && contractData.ast.nodes.find((node) => node.name === contractData.contractName && node.contractKind === 'library');
 
-        if (!isLibrary && isProjectContract) {
+        if (isProjectContract && !isLibrary) {
           const contractName = contractData.contractName;
           this.add(contractName, contractName);
         }

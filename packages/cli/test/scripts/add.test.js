@@ -79,7 +79,7 @@ contract('add script', function() {
     this.packageFile.contract('ImplV2').should.eq('ImplV2')
   })
 
-  it('should not add solidity libraries or external packages when adding all', function() {
+  it('should not add solidity libraries or contracts from external packages when adding all', function() {
     addAll({ packageFile: this.packageFile })
 
     expect(this.packageFile.contract('Initializable')).to.be.undefined

@@ -1,6 +1,5 @@
 import pickBy from 'lodash.pickby';
 import pick from 'lodash.pick';
-import { promisify } from 'util';
 import { FileSystem } from 'zos-lib';
 
 const Truffle = {
@@ -72,7 +71,7 @@ const Truffle = {
         .filter((name) => {
           const contract = FileSystem.parseJsonIfExists(`${buildDir}/${name}`);
           if (contract) {
-            const isLibrary = contract.ast ? contract.ast.nodes[1].contractKind === "library" : false;
+            const isLibrary = contract.ast && contract.ast.nodes.find((node) => node.name === contract.contractName && node.contractKind === 'library');
             const projectDir = buildDir.replace('build/contracts', '');
 
             return (contract.bytecode.length > 2 &&
