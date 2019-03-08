@@ -6,6 +6,12 @@ library UintLib {
   }
 }
 
+library Uint32Lib {
+  function triple(uint32 self) public pure returns (uint32) {
+    return self * 3;
+  }
+}
+
 library NumberLib {
   struct Number {
     uint256 x;

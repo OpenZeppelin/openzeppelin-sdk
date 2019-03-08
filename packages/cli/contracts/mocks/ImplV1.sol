@@ -22,9 +22,14 @@ contract ChildImplV1 is ImplV1 {
 
 contract WithLibraryImplV1 is ImplV1 {
   using UintLib for uint256;
+  using Uint32Lib for uint32;
 
   function double(uint256 x) public pure returns (uint256) {
     return x.double();
+  }
+
+  function triple(uint32 x) public pure returns (uint32) {
+    return x.triple();
   }
 
   function say() public pure returns (string) {
