@@ -16,12 +16,12 @@ interface GenericObject {
 // TS-TODO: Define a more accurate return type as soon as we know the final structure of it
 export async function promptIfNeeded({ args = {}, opts = {}, defaults, props }: Args, interactive: boolean = true): Promise<any> {
   const argsQuestions = Object.keys(args)
-    .filter((argName) => args[argName] === undefined || isEmpty(args[argName]))
-    .map((argName) => promptFor(argName, defaults, props));
+    .filter(argName => args[argName] === undefined || isEmpty(args[argName]))
+    .map(argName => promptFor(argName, defaults, props));
 
   const optsQuestions = Object.keys(opts)
-    .filter((optName) => opts[optName] === undefined)
-    .map((optName) => promptFor(optName, defaults, props));
+    .filter(optName => opts[optName] === undefined)
+    .map(optName => promptFor(optName, defaults, props));
 
   return interactive
     ? { ...args, ...opts, ...await answersFor(argsQuestions), ...await answersFor(optsQuestions) }

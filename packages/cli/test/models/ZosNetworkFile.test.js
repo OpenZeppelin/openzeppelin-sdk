@@ -12,6 +12,25 @@ contract('ZosNetworkFile', function() {
     this.appPackageFile = new ZosPackageFile('test/mocks/packages/package-empty.zos.json')
   })
   
+  describe('class methods', function () {
+    describe('#getDependencies', function () {
+      context('on network file with dependencies', function () {
+        it('returns an object with dependencies', function () {
+          const dependencies = ZosNetworkFile.getDependencies('test/mocks/networks/network-with-stdlibs.zos.test.json')
+          dependencies.should.not.be.empty
+          dependencies.should.have.all.keys('mock-stdlib', 'mock-stdlib-2')
+        })
+      })
+
+      context('on network file without dependencies', function () {
+        it('returns an empty object', function () {
+          const dependencies = ZosNetworkFile.getDependencies('test/mocks/networks/network-app-with-contract.zos.test.json')
+          expect(dependencies).to.be.undefined
+        })
+      })
+    })
+  })
+
   describe('constructor', function () {
     it('creates empty file', function () {
       const file = new ZosNetworkFile(this.appPackageFile, 'test', 'test/mocks/networks/new.test.json')

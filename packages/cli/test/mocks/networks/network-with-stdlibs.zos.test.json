@@ -1,0 +1,15 @@
+{
+  "version": "1.1.0",
+  "zosversion": "2.2",
+  "contracts": {},
+  "dependencies": {
+    "mock-stdlib": {
+      "version": "^1.1.0",
+      "package": "0x0000000000000000000000000000000000000210"
+    },
+    "mock-stdlib-2": {
+      "version": "^1.2.0",
+      "package": "0x0000000000000000000000000000000000000210"
+    }
+  }
+}

@@ -1,10 +1,9 @@
 'use strict'
 require('../setup')
 
-import {stubCommands, itShouldParse} from './share';
+import { stubCommands, itShouldParse } from './share';
 
-contract('bump command', function() {
-
+describe('bump command', function() {
   stubCommands()
 
   itShouldParse('should call bump script with version', 'bump', 'zos bump 0.2.0 ', function(bump) {
@@ -12,7 +11,7 @@ contract('bump command', function() {
   })
 
   itShouldParse('should call push script when passing --push option', 'push', 'zos bump 0.2.0 --push test', function(push) {
-    push.should.have.been.calledWithExactly({  deployDependencies: undefined, force: undefined, reupload: undefined, network: 'test', txParams: {} })
+    push.should.have.been.calledWithExactly({  deployDependencies: true, force: undefined, reupload: undefined, network: 'test', txParams: {} })
   })
 
 })

@@ -1,10 +1,9 @@
 'use strict'
 require('../setup')
 
-import {stubCommands, itShouldParse} from './share';
+import { stubCommands, itShouldParse } from './share';
 
-contract('session command', function() {
-
+describe('session command', function() {
   stubCommands()
 
   itShouldParse('should call session script with --expires option', 'session', 'zos session --network test --expires 3600', function(session) {

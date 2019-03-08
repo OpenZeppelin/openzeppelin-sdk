@@ -1,10 +1,9 @@
 'use strict'
 require('../setup')
 
-import {stubCommands, itShouldParse} from './share';
+import { stubCommands, itShouldParse } from './share';
 
-contract('add command', function() {
-
+describe('add command', function() {
   stubCommands()
 
   itShouldParse('should call add script with an alias and a filename', 'add', 'zos add ImplV1:Impl --skip-compile', function(add) {
@@ -16,7 +15,6 @@ contract('add command', function() {
   })
 
   itShouldParse('should call push script when passing --push option', 'push', 'zos add --all --push test --skip-compile', function(push) {
-    push.should.have.been.calledWithExactly({  deployDependencies: undefined, force: undefined, reupload: undefined, network: 'test', txParams: {} })
+    push.should.have.been.calledWithExactly({  deployDependencies: true, force: undefined, reupload: undefined, network: 'test', txParams: {} })
   })
-
 })

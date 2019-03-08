@@ -78,6 +78,11 @@ export default class ZosNetworkFile {
     return file ? file.zosversion : null;
   }
 
+  public static getDependencies(fileName: string): { [key: string]: any } | undefined {
+    const file = fs.parseJsonIfExists(fileName);
+    return file ? file.dependencies : undefined;
+  }
+
   // TS-TODO: type for network parameter (and class member too).
   constructor(packageFile: ZosPackageFile, network: any, fileName: string) {
     this.packageFile = packageFile;
