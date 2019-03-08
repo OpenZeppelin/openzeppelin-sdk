@@ -1,6 +1,7 @@
 'use strict'
 require('../setup')
 
+const zosLib = require('zos-lib');
 import { ZWeb3, Contracts, App, Package } from 'zos-lib'
 
 import sinon from 'sinon'
@@ -133,19 +134,38 @@ contract('push script', function([_, owner]) {
       this.networkFile.contract('WithLibraryImpl').address.should.eq(this.withLibraryPreviousAddress);
     });
 
-    it('should refuse to redeploy a contract if storage is incompatible', async function () {
-      modifyBytecode.call(this, 'Impl');
-      modifyStorageInfo.call(this, 'Impl');
-      await push({ networkFile: this.networkFile, network, txParams }).should.be.rejectedWith(/have validation errors/)
-      this.networkFile.contract('Impl').address.should.eq(this.previousAddress);
-    });
+    context('validations', function () {
+      beforeEach("modifying contracts", function () {
+        modifyBytecode.call(this, 'Impl');
+        modifyStorageInfo.call(this, 'Impl');
+      });
 
-    it('should redeploy contract ignoring warnings', async function () {
-      modifyBytecode.call(this, 'Impl');
-      modifyStorageInfo.call(this, 'Impl');
-      await push({ force: true, networkFile: this.networkFile, network, txParams });
-      this.networkFile.contract('Impl').address.should.not.eq(this.previousAddress);
-    });    
+      it('should refuse to redeploy a contract if storage is incompatible', async function () {
+        await push({ networkFile: this.networkFile, network, txParams }).should.be.rejectedWith(/have validation errors/)
+        this.networkFile.contract('Impl').address.should.eq(this.previousAddress);
+      });
+
+      it('should redeploy contract ignoring warnings', async function () {
+        await push({ force: true, networkFile: this.networkFile, network, txParams });
+        this.networkFile.contract('Impl').address.should.not.eq(this.previousAddress);
+      });
+
+      it('should refuse to redeploy a contract if validation throws', async function () {
+        sinon.stub(zosLib, 'validate').throws(new Error("Stubbed error during contract validation"));
+        await push({ networkFile: this.networkFile, network, txParams }).should.be.rejectedWith(/have validation errors/);
+        this.networkFile.contract('Impl').address.should.eq(this.previousAddress);
+      });
+
+      it('should redeploy contract skipping errors', async function () {
+        sinon.stub(zosLib, 'validate').throws(new Error("Stubbed error during contract validation"));
+        await push({ force: true, networkFile: this.networkFile, network, txParams });
+        this.networkFile.contract('Impl').address.should.not.eq(this.previousAddress);
+      });
+
+      afterEach(function () {
+        sinon.restore();
+      });
+    });
   }
 
   const shouldValidateContracts = function () {
