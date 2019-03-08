@@ -3,7 +3,7 @@ import pickBy from 'lodash.pickby';
 import verify from '../scripts/verify';
 import ConfigVariablesInitializer from '../models/initializer/ConfigVariablesInitializer';
 import Truffle from '../models/initializer/truffle/Truffle';
-import { promptIfNeeded, getContractsList, getNetworkList } from '../utils/prompt';
+import { promptIfNeeded, contractsList, networksList } from '../utils/prompt';
 
 const name: string = 'verify';
 const signature: string = `${name} [contract-alias]`;
@@ -11,8 +11,8 @@ const description: string = 'verify a contract with etherscan or etherchain. Pro
 
 const props = (optimizerEnabled) => {
   return {
-    ...getContractsList('contractName', 'Choose a contract', 'list'),
-    ...getNetworkList('list'),
+    ...contractsList('contractName', 'Choose a contract', 'list', true),
+    ...networksList('list'),
     optimizer: {
       type: 'confirm',
       message: 'Was the optimizer enabled when you compiled your contracts?',

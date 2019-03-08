@@ -3,15 +3,15 @@
 require('../setup');
 
 import sinon from 'sinon';
-import Inquirer from 'inquirer';
+import inquirer from 'inquirer';
 import Truffle from '../../src/models/initializer/truffle/Truffle';
-import { promptIfNeeded, getContractsList, getNetworkList } from '../../src/utils/prompt';
+import { promptIfNeeded, contractsList, networksList } from '../../src/utils/prompt';
 
-describe('prompt', function() {
+describe.only('prompt', function() {
   describe('functions', function() {
     describe('#promptIfNeeded', function() {
       beforeEach('set stub and initialize', function() {
-        this.stub = sinon.stub(Inquirer, 'prompt').returns({});
+        this.stub = sinon.stub(inquirer, 'prompt').returns({});
         this.props = { foo: { message: 'message1', type: 'input' }, bar: { message: 'message2', type: 'input' } };
       });
 
@@ -71,7 +71,7 @@ describe('prompt', function() {
       });
     });
 
-    describe('#getNetworkList', function() {
+    describe('#networksList', function() {
       beforeEach('set stub and initialize', function() {
         this.stub = sinon.stub(Truffle, 'getNetworkNamesFromConfig').returns(['Meinet', 'Rinkebay']);
       });
@@ -81,7 +81,7 @@ describe('prompt', function() {
       });
 
       it('returns an object with correct keys and values', function() {
-        const networkList = getNetworkList('listy');
+        const networkList = networksList('listy');
         networkList.should.be.an('object');
         networkList.network.should.be.an('object').that.has.all.keys('type', 'message', 'choices');
         networkList.network.type.should.eq('listy');
@@ -90,9 +90,9 @@ describe('prompt', function() {
       });
     });
 
-    describe('#getContractsList', function() {
+    describe('#contractsList', function() {
       beforeEach('set stub and initialize', function() {
-        this.stub = sinon.stub(Truffle, 'getContractNames').returns(['Foo', 'Bar']);
+        sinon.stub(Truffle, 'getContractNames').returns(['Foo', 'Bar']);
       });
 
       afterEach('restore stub', function() {
@@ -100,12 +100,13 @@ describe('prompt', function() {
       });
 
       it('returns an object with correct keys and values', function() {
-        const contractsList = getContractsList('keyName', 'Im a message', 'listy');
-        contractsList.should.be.an('object');
-        contractsList.keyName.should.be.an('object').that.has.all.keys('type', 'message', 'choices');
-        contractsList.keyName.type.should.eq('listy');
-        contractsList.keyName.message.should.eq('Im a message');
-        contractsList.keyName.choices.should.have.members(['Foo', 'Bar']);
+        const contracts = contractsList('keyName', 'Im a message', 'listy');
+        contracts.should.be.an('object');
+        contracts.keyName.should.be.an('object').that.has.all.keys('type', 'message', 'choices');
+        contracts.keyName.type.should.eq('listy');
+        contracts.keyName.message.should.eq('Im a message');
+        contracts.keyName.choices.should.include.members(['Foo', 'Bar']);
+        contracts.keyName.choices[0].should.be.an.instanceOf(inquirer.Separator);
       });
     });
   });

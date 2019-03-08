@@ -7,7 +7,7 @@ import Session from '../models/network/Session';
 import Compiler from '../models/compiler/Compiler';
 import Dependency from '../models/dependency/Dependency';
 import ConfigVariablesInitializer from '../models/initializer/ConfigVariablesInitializer';
-import { promptIfNeeded, getNetworkList } from '../utils/prompt';
+import { promptIfNeeded, networksList } from '../utils/prompt';
 
 const name: string = 'push';
 const signature: string = name;
@@ -15,7 +15,7 @@ const description: string = 'deploys your project to the specified <network>';
 
 const props = (networkName?: string) => {
   return {
-    ...getNetworkList('list'),
+    ...networksList('list'),
     deployDependencies: {
       type: 'confirm',
       message: `One or more linked dependencies are not yet deployed on ${networkName}.\nDo you want to deploy them now?`,

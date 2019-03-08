@@ -4,14 +4,14 @@ import addAll from '../scripts/add-all';
 import Truffle from '../models/initializer/truffle/Truffle';
 import Compiler from '../models/compiler/Compiler';
 import ConfigVariablesInitializer from '../models/initializer/ConfigVariablesInitializer';
-import { promptIfNeeded, getContractsList } from '../utils/prompt';
+import { promptIfNeeded, contractsList } from '../utils/prompt';
 
 const name: string = 'add';
 const signature: string = `${name} [contractNames...]`;
 const description: string = 'add contract to your project. Provide a list of whitespace-separated contract names';
 
 const argsProps = () => {
-  return getContractsList('contractNames', 'Choose one or more contracts', 'checkbox');
+  return contractsList('contractNames', 'Choose one or more contracts', 'checkbox', true);
 };
 
 const register: (program: any) => any = (program) => program
