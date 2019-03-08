@@ -147,8 +147,10 @@ function setEtherscanApiSubdomain(network: string): string | never {
       return 'api-ropsten';
     case 'kovan':
       return 'api-kovan';
+    case 'goerli':
+      return 'api-goerli';
     default:
-      throw new Error('Invalid network. Currently, etherscan supports mainnet, rinkeby, ropsten and kovan');
+      throw new Error('Invalid network. Currently, etherscan supports mainnet, rinkeby, ropsten, goerli and kovan');
   }
 }
 
