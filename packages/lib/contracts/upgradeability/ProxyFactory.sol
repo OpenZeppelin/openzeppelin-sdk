@@ -1,6 +1,6 @@
 pragma solidity ^0.5.3;
 
-import "./AdminUpgradeabilityProxy.sol";
+import "./InitializableAdminUpgradeabilityProxy.sol";
 
 contract ProxyFactory {
   
