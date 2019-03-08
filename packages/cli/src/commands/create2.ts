@@ -35,11 +35,11 @@ async function action(contractFullName: string, options: any): Promise<void> {
 
 export default { name, signature, description, register, action };
 
-async function runQuery(options: any, network: any, txParams: any) {
+async function runQuery(options: any, network: string, txParams: any) {
   await queryDeployment({ salt: options.salt, network, txParams });
 }
 
-async function runCreate(options: any, contractFullName: string, network: any, txParams: any) {
+async function runCreate(options: any, contractFullName: string, network: string, txParams: any) {
   const { force, salt } = options;
   const { initMethod, initArgs } = parseInit(options, 'initialize');
   const { contract: contractAlias, package: packageName } = fromContractFullName(contractFullName);

@@ -120,7 +120,7 @@ export default abstract class BaseSimpleProject {
 
   public async getProxyDeploymentAddress(salt: string): Promise<string> {
     const proxyFactory = await this.ensureProxyFactory();
-    return await proxyFactory.getDeploymentAddress(salt);
+    return proxyFactory.getDeploymentAddress(salt);
   }
 
   public async ensureProxyFactory(): Promise<ProxyFactory> {
