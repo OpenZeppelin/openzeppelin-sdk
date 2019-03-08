@@ -3,14 +3,14 @@ pragma solidity ^0.5.0;
 import "../application/ImplementationProvider.sol";
 import "../application/Package.sol";
 import { DeprecatedAdminUpgradeabilityProxy as AdminUpgradeabilityProxy } from "../mocks/DeprecatedAdminUpgradeabilityProxy.sol";
-import "../openzeppelin-solidity/ownership/Ownable.sol";
+import "../ownership/Ownable.sol";
 
 /**
  * @title App
  * @dev Contract for upgradeable applications.
  * It handles the creation and upgrading of proxies.
  */
-contract DeprecatedApp is Ownable {
+contract DeprecatedApp is ZOSLibOwnable {
   /**
    * @dev Emitted when a new proxy is created.
    * @param proxy Address of the created proxy.

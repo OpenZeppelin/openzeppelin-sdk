@@ -1,14 +1,14 @@
 pragma solidity ^0.5.0;
 
 import "./ImplementationProvider.sol";
-import "../openzeppelin-solidity/ownership/Ownable.sol";
-import '../openzeppelin-solidity/utils/Address.sol';
+import "../ownership/Ownable.sol";
+import '../utils/Address.sol';
 
 /**
  * @title ImplementationDirectory
  * @dev Implementation provider that stores contract implementations in a mapping.
  */
-contract ImplementationDirectory is ImplementationProvider, Ownable {
+contract ImplementationDirectory is ImplementationProvider, ZOSLibOwnable {
   /**
    * @dev Emitted when the implementation of a contract is changed.
    * @param contractName Name of the contract.
@@ -59,7 +59,7 @@ contract ImplementationDirectory is ImplementationProvider, Ownable {
    * @param implementation Address of the implementation.
    */
   function setImplementation(string memory contractName, address implementation) public onlyOwner whenNotFrozen {
-    require(Address.isContract(implementation), "Cannot set implementation in directory with a non-contract address");
+    require(ZOSLibAddress.isContract(implementation), "Cannot set implementation in directory with a non-contract address");
     implementations[contractName] = implementation;
     emit ImplementationChanged(contractName, implementation);
   }

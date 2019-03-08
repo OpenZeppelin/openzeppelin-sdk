@@ -1,6 +1,6 @@
 pragma solidity ^0.5.0;
 
-import "../openzeppelin-solidity/ownership/Ownable.sol";
+import "../ownership/Ownable.sol";
 import "./AdminUpgradeabilityProxy.sol";
 
 /**
@@ -8,8 +8,8 @@ import "./AdminUpgradeabilityProxy.sol";
  * @dev This contract is the admin of a proxy, and is in charge
  * of upgrading it as well as transferring it to another admin.
  */
-contract ProxyAdmin is Ownable {
-
+contract ProxyAdmin is ZOSLibOwnable {
+  
   /**
    * @dev Returns the current implementation of a proxy.
    * This is needed because only the proxy admin can query it.

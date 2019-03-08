@@ -3,14 +3,14 @@ pragma solidity ^0.5.0;
 import "./ImplementationProvider.sol";
 import "./Package.sol";
 import "../upgradeability/AdminUpgradeabilityProxy.sol";
-import "../openzeppelin-solidity/ownership/Ownable.sol";
+import "../ownership/Ownable.sol";
 
 /**
  * @title App
  * @dev Contract for upgradeable applications.
  * It handles the creation of proxies.
  */
-contract App is Ownable {
+contract App is ZOSLibOwnable {
   /**
    * @dev Emitted when a new proxy is created.
    * @param proxy Address of the created proxy.
