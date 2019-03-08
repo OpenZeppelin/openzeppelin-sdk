@@ -87,11 +87,14 @@ function _wrapContractInstance(schema: any, instance: Web3Contract): Contract {
   };
 
   instance.link = function(libraries: { [libAlias: string]: string }): void {
+    instance.schema.linkedBytecode = instance.schema.bytecode;
+    instance.schema.linkedDeployedBytecode = instance.schema.deployedBytecode;
+
     Object.keys(libraries).forEach((name: string) => {
       const address = libraries[name].replace(/^0x/, '');
       const regex = new RegExp(`__${name}_+`, 'g');
-      instance.schema.linkedBytecode = instance.schema.bytecode.replace(regex, address);
-      instance.schema.linkedDeployedBytecode = instance.schema.deployedBytecode.replace(regex, address);
+      instance.schema.linkedBytecode = instance.schema.linkedBytecode.replace(regex, address);
+      instance.schema.linkedDeployedBytecode = instance.schema.linkedDeployedBytecode.replace(regex, address);
     });
   };
 
