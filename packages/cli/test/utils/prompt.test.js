@@ -7,7 +7,7 @@ import inquirer from 'inquirer';
 import Truffle from '../../src/models/initializer/truffle/Truffle';
 import { promptIfNeeded, contractsList, networksList } from '../../src/utils/prompt';
 
-describe.only('prompt', function() {
+describe('prompt', function() {
   describe('functions', function() {
     describe('#promptIfNeeded', function() {
       beforeEach('set stub and initialize', function() {
