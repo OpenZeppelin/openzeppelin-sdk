@@ -47,39 +47,39 @@ async function action(contractFullName: string, options: any): Promise<void> {
   const args = pickBy({ packageName, contractAlias, ...initParams, force });
 
   await create({ ...args, network, txParams });
+  Session.setDefaultNetworkIfNeeded(createParams.network);
   if (!options.dontExitProcess && process.env.NODE_ENV !== 'test') process.exit(0);
 }
 
 async function promptForCreate(contractFullName: string, options: any): Promise<any> {
   const { force, network: networkInOpts } = options;
   const { network: networkInSession, expired } = Session.getNetwork();
-  const defaults = { network: networkInSession };
+  const defaultOpts = { network: networkInSession };
   const opts = { network: networkInOpts || !expired ? networkInSession : undefined };
 
-  return promptIfNeeded({ args: { contractFullName }, opts, defaults, props: baseProps });
+  return promptIfNeeded({ args: { contractFullName }, opts, defaults: defaultOpts, props: baseProps });
 }
 
 async function promptForInitParams(contractFullName: string, options: any) {
-  const { init: rawInitMethod, args: rawInitArgs } = options;
-  const initMethodOpts = { initMethod: rawInitMethod };
   const initMethodProps = initProps(contractFullName);
-  let { initArgs, initMethod } = parseInit(options);
+  const initParams = parseInit(options, 'initialize');
+  const { initMethod } = initParams;
+  let { initArgs } = initParams;
 
-  // prompt for init method init method
-  const promptedMethod = await promptIfNeeded({ opts: initMethodOpts, props: initMethodProps });
-  initMethod = promptedMethod.initMethod
-    ? promptedMethod.initMethod
-    : { selector: initMethod, name: initMethod };
+  // prompt for init method
+  let { initMethod: promptedMethod } = await promptIfNeeded({ opts: { initMethod }, props: initMethodProps });
+  // if promptedMethod is a string, set an object
+  if (typeof promptedMethod === 'string') promptedMethod = { name: promptedMethod, selector: promptedMethod };
 
   // if no initial arguments are provided, prompt for them
-  if (!rawInitArgs) {
-    const initArgsKeys = initArgsForPrompt(contractFullName, initMethod.selector);
-    const initArgsProps = initProps(contractFullName, initMethod.selector);
+  if (!initArgs) {
+    const initArgsKeys = initArgsForPrompt(contractFullName, promptedMethod.selector);
+    const initArgsProps = initProps(contractFullName, promptedMethod.selector);
     const promptedArgs = await promptIfNeeded({ opts: initArgsKeys, props: initArgsProps });
     initArgs = Object.values(promptedArgs);
   }
 
-  return { initMethod: initMethod.name, initArgs };
+  return { initMethod: promptedMethod.name, initArgs };
 }
 
 export default { name, signature, description, register, action };
