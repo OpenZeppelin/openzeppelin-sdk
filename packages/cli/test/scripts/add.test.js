@@ -11,7 +11,6 @@ import ZosPackageFile from "../../src/models/files/ZosPackageFile";
 contract('add script', function() {
   const contractName = 'ImplV1';
   const contractAlias = 'Impl';
-
   const contractsData = [{ name: contractName, alias: contractAlias }]
 
   beforeEach('setup', async function() {
@@ -86,8 +85,8 @@ contract('add script', function() {
     expect(this.packageFile.contract('GreeterImpl')).to.be.undefined
     expect(this.packageFile.contract('GreeterLib')).to.be.undefined
     expect(this.packageFile.contract('UintLib')).to.be.undefined
-    this.packageFile.contract('WithExternalPackageImplV1').should.eq('WithExternalPackageImplV1')
-    this.packageFile.contract('WithExternalPackageImplV2').should.eq('WithExternalPackageImplV2')
+    this.packageFile.contracts.should.have.property('WithExternalContractImplV1');
+    this.packageFile.contracts.should.have.property('WithExternalContractImplV2');
   });
 
   describe('failures', function () {

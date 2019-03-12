@@ -71,12 +71,13 @@ const Truffle = {
         .filter((name) => {
           const contract = FileSystem.parseJsonIfExists(`${buildDir}/${name}`);
           if (contract) {
-            const isLibrary = contract.ast && contract.ast.nodes.find((node) => node.name === contract.contractName && node.contractKind === 'library');
+            const isLibrary = contract.ast && contract.ast.nodes
+              .find((node) => node.name === contract.contractName && node.contractKind === 'library');
             const projectDir = buildDir.replace('build/contracts', '');
 
-            return (contract.bytecode.length > 2 &&
-                    contract.sourcePath.indexOf(projectDir) === 0 &&
-                    !isLibrary);
+            return !isLibrary
+                    && contract.sourcePath.indexOf(projectDir) === 0
+                    && contract.bytecode.length > 2;
           } else return false;
         })
         .map((name) => name.replace('.json', ''));
