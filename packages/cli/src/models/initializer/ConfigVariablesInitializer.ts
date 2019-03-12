@@ -9,9 +9,10 @@ const ConfigVariablesInitializer = {
     Contracts.setLocalBuildDir(buildDir);
   },
 
-  async initNetworkConfiguration(options: any): Promise<any> {
+  async initNetworkConfiguration(options: any, silent?: boolean): Promise<any> {
     this.initStaticConfiguration();
-    const { network, from, timeout } = Session.getOptions(options);
+    const { network, from, timeout } = Session.getOptions(options, silent);
+    Session.setDefaultNetworkIfNeeded(options.network);
     if (!network) throw Error('A network name must be provided to execute the requested action.');
 
     // these lines could be expanded to support different libraries like embark, ethjs, buidler, etc
