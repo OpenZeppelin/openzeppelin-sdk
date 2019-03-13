@@ -38,16 +38,15 @@ const register: (program: any) => any = (program) => program
   .action(action);
 
 async function action(options: any): Promise<void> {
-  const { force, deployDependencies, reset: reupload, network: networkInArgs, deployProxyAdmin, deployProxyFactory } = options;
-  const { network: networkInSession } = Session.getOptions();
-  const defaultArgs = { network: Session.getDefaultNetwork() };
-  const defaultOpts = { network: networkInSession || networkInArgs };
+  const { force, deployDependencies, reset: reupload, network: networkInOpts, deployProxyAdmin, deployProxyFactory } = options;
+  const { network: networkInSession, expired } = Session.getNetwork();
+  const defaults = { network: networkInSession };
+  const opts = { network: networkInOpts || !expired ? networkInSession : undefined };
+
   if (!options.skipCompile) await Compiler.call();
 
-  const promptedOpts = await promptIfNeeded({ opts: defaultOpts, defaults: defaultArgs, props: props() });
-  Session.setDefaultNetworkIfNeeded(promptedOpts.network);
-
-  const { network, txParams } = await ConfigVariablesInitializer.initNetworkConfiguration(promptedOpts);
+  const promptedOpts = await promptIfNeeded({ opts, defaults, props: props() });
+  const { network, txParams } = await ConfigVariablesInitializer.initNetworkConfiguration({ ...promptedOpts, ...options });
   const promptDeployDependencies = await promptForDeployDependencies(deployDependencies, network);
 
   await push({ deployProxyAdmin, deployProxyFactory, force, reupload, network, txParams, ...promptDeployDependencies });
