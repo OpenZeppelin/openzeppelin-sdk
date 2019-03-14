@@ -47,17 +47,17 @@ export function contractsList(name: string, message: string, type: string, onlyL
   if (onlyLocal) return genericInquirerQuestion(name, message, type, localContracts);
 
   // otherwise, generate a list of local and package contracts
-  const dependencies = ZosPackageFile.getLinkedDependencies();
-  const packageContracts = dependencies
-    .map(dependencyNameAndVersion => {
-      const [dependencyName] = dependencyNameAndVersion.split('@');
+  const packageFile = new ZosPackageFile();
+  const { dependencies } = packageFile;
+  const packageContracts = Object.keys(dependencies)
+    .map(dependencyName => {
       const contractNames = new Dependency(dependencyName)
         .getPackageFile()
         .contractAliases
         .map(contractName => `${dependencyName}/${contractName}`);
 
       if (contractNames.length > 0) {
-        contractNames.unshift(new inquirer.Separator(` = ${dependencyNameAndVersion} =`));
+        contractNames.unshift(new inquirer.Separator(` = ${dependencyName} =`));
       }
       return contractNames;
     });

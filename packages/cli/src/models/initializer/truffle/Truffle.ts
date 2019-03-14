@@ -83,11 +83,11 @@ const Truffle = {
     return contract.sourcePath.indexOf(projectDir) === 0;
   },
 
-  _isAbstractContract(contract: { [key: string]: any | null }): boolean {
+  _isAbstractContract(contract: { [key: string]: any }): boolean {
     return contract && contract.bytecode.length <= 2;
   },
 
-  _isLibrary(contract: { [key: string]: any | null }): boolean {
+  _isLibrary(contract: { [key: string]: any }): boolean {
     return contract && !!contract.ast.nodes
       .find(node => node.contractKind === 'library' && node.name === contract.contractName);
   },
