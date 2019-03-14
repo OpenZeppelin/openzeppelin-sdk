@@ -1,6 +1,7 @@
 import flatten from 'lodash.flatten';
 import isEmpty from 'lodash.isempty';
 import inquirer from 'inquirer';
+
 import Truffle from '../models/initializer/truffle/Truffle';
 import ZosPackageFile from '../models/files/ZosPackageFile';
 import LocalController from '../models/local/LocalController';
@@ -17,6 +18,8 @@ interface Args {
 interface GenericObject {
   [key: string]: any;
 }
+
+type Choices = Array<{ name: string, value: string } | string>;
 
 // TS-TODO: Define a more accurate return type as soon as we know the final structure of it
 export async function promptIfNeeded({ args = {}, opts = {}, defaults, props }: Args, interactive: boolean = true): Promise<any> {
@@ -41,29 +44,42 @@ export function networksList(type: string): GenericObject {
 }
 
 // Generates an inquirer question with a list of contracts names
-export function contractsList(name: string, message: string, type: string, onlyLocal?: boolean): GenericObject {
-  const localContracts = Truffle.getContractNames();
-  // if return only local contracts
-  if (onlyLocal) return genericInquirerQuestion(name, message, type, localContracts);
+export function contractsList(name: string, message: string, type: string, source?: string): GenericObject {
+  const localPackageFile = new ZosPackageFile();
+  const contractsFromBuild = Truffle.getContractNames();
 
-  // otherwise, generate a list of local and package contracts
-  const packageFile = new ZosPackageFile();
-  const { dependencies } = packageFile;
-  const packageContracts = Object.keys(dependencies)
-    .map(dependencyName => {
-      const contractNames = new Dependency(dependencyName)
-        .getPackageFile()
-        .contractAliases
-        .map(contractName => `${dependencyName}/${contractName}`);
+  // get contracts from `build/contracts`
+  if (!source || source === 'fromBuildDir') {
+    return genericInquirerQuestion(name, message, type, contractsFromBuild);
+  // get contracts from zos.json file
+  } else if(source === 'fromLocal') {
+    const contractsFromLocal = localPackageFile
+      .contractNamesAndAliases
+      .map(({ name: contractName, alias }) => {
+        const label = contractName === alias ? alias : `${alias}[${contractName}]`;
+        return { name: label, value: alias };
+      });
 
-      if (contractNames.length > 0) {
-        contractNames.unshift(new inquirer.Separator(` = ${dependencyName} =`));
-      }
-      return contractNames;
-    });
-  if (localContracts.length > 0) localContracts.unshift(new inquirer.Separator(` = Local contracts =`));
+    return genericInquirerQuestion(name, message, type, contractsFromLocal);
+  // generate a list of built contracts and package contracts
+  } else if (source === 'all') {
+    const packageContracts = Object
+      .keys(localPackageFile.dependencies)
+      .map(dependencyName => {
+        const contractNames = new Dependency(dependencyName)
+          .getPackageFile()
+          .contractAliases
+          .map(contractName => `${dependencyName}/${contractName}`);
 
-  return genericInquirerQuestion(name, message, type, [...localContracts, ...flatten(packageContracts)]);
+        if (contractNames.length > 0) {
+          contractNames.unshift(new inquirer.Separator(` = ${dependencyName} =`));
+        }
+        return contractNames;
+      });
+    if (contractsFromBuild.length > 0) contractsFromBuild.unshift(new inquirer.Separator(` = Local contracts =`));
+
+    return genericInquirerQuestion(name, message, type, [...contractsFromBuild, ...flatten(packageContracts)]);
+  } else return [];
 }
 
 // Returns an inquirer question with a list of methods names for a particular contract
@@ -113,7 +129,7 @@ function contractMethods(contractFullName: string): any {
   return contract.methodsFromAst();
 }
 
-function genericInquirerQuestion(name: string, message: string, type: string, choices?: string[]) {
+function genericInquirerQuestion(name: string, message: string, type: string, choices?: Choices) {
   return { [name]: { type, message, choices } };
 }
 

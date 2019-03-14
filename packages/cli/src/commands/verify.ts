@@ -11,7 +11,7 @@ const description: string = 'verify a contract with etherscan or etherchain. Pro
 
 const props = (optimizerEnabled) => {
   return {
-    ...contractsList('contractName', 'Choose a contract', 'list', true),
+    ...contractsList('contractName', 'Choose a contract', 'list', 'fromLocal'),
     ...networksList('list'),
     optimizer: {
       type: 'confirm',

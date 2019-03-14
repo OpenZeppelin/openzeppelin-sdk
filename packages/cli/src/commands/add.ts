@@ -11,7 +11,7 @@ const signature: string = `${name} [contractNames...]`;
 const description: string = 'add contract to your project. Provide a list of whitespace-separated contract names';
 
 const argsProps = () => {
-  return contractsList('contractNames', 'Choose one or more contracts', 'checkbox', true);
+  return contractsList('contractNames', 'Choose one or more contracts', 'checkbox', 'fromBuildDir');
 };
 
 const register: (program: any) => any = (program) => program

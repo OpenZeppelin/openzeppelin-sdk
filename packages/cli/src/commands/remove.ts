@@ -7,7 +7,7 @@ const signature: string = `${name} [contracts...]`;
 const description: string = 'removes one or more contracts from your project. Provide a list of whitespace-separated contract names.';
 
 const argsProps = () => {
-  return contractsList('contractNames', 'Choose one or more contracts', 'checkbox', true);
+  return contractsList('contractNames', 'Choose one or more contracts', 'checkbox', 'fromLocal');
 };
 
 const register: (program: any) => any = (program) => program

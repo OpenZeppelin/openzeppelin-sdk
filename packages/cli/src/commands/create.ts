@@ -14,7 +14,7 @@ const description: string = 'deploys a new upgradeable contract instance. Provid
 
 const baseProps = {
   ...networksList('list'),
-  ...contractsList('contractFullName', 'Choose a contract', 'list'),
+  ...contractsList('contractFullName', 'Choose a contract', 'list', 'all'),
 };
 
 const initProps = (contractFullName?: string, initMethod?: string) => {
