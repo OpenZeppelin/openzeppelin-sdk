@@ -33,8 +33,8 @@ export default class ZWeb3 {
     if (!ZWeb3.provider) return new Web3();
 
     // TODO: improve provider validation for HttpProvider scenarios
-    return (typeof ZWeb3.provider === 'string')
-      ? new Web3.providers.HttpProvider(ZWeb3.provider)
+    return typeof ZWeb3.provider === 'string'
+      ? new Web3(new Web3.providers.HttpProvider(ZWeb3.provider))
       : new Web3(ZWeb3.provider);
   }
 

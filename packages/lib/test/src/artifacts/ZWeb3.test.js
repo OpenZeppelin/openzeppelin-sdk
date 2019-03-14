@@ -7,25 +7,16 @@ import { ZERO_ADDRESS } from '../../../src/utils/Addresses'
 import utils from 'web3-utils';
 import BN from 'bignumber.js';
 
-contract('ZWeb3', accounts => {
+contract('ZWeb3', function(accounts) {
   accounts = accounts.map(utils.toChecksumAddress);
+  const [_, account, account1, account2] = accounts;
   
   before('deploy dummy instance', async function () {
     this.DummyImplementation = Contracts.getFromLocal('DummyImplementation')
     this.impl = await this.DummyImplementation.new()
   })
 
-  describe('when initializing without a provider', function () {
-    it('initializes web3 without a provider', async function () {
-      ZWeb3.initialize();
-      ZWeb3.web3().should.not.be.null;
-      expect(ZWeb3.web3().currentProvider).to.be.null;
-    })
-  })
-
-  describe('when initialized', function () {
-    beforeEach('initialize ZWeb3', () => ZWeb3.initialize(web3.currentProvider))
-
+  const shouldBehaveLikeWeb3Instance = (account, receiverAccount) => {
     it('initializes web3 with a provider', function () {
       ZWeb3.web3().currentProvider.should.not.be.null;
     })
@@ -60,7 +51,7 @@ contract('ZWeb3', accounts => {
     })
 
     it('tells the balanace of a given account', async function () {
-      const balance = await ZWeb3.getBalance(accounts[1])
+      const balance = await ZWeb3.getBalance(account)
       balance.should.be.an('string')
       balance.should.equal(100e18.toString())
     })
@@ -118,13 +109,13 @@ contract('ZWeb3', accounts => {
     describe('transactions', function () {
       beforeEach('sending transaction', async function () {
         const value = (new BN(1e18)).toString(10);
-        const receipt = await ZWeb3.sendTransaction({ from: accounts[0], to: accounts[2], value })
+        const receipt = await ZWeb3.sendTransaction({ from: accounts[0], to: receiverAccount, value })
         this.txHash = receipt.transactionHash;
       })
 
       describe('send transaction', function () {
         it('can send a transaction', async function () {
-          (await ZWeb3.getBalance(accounts[2])).should.eq(101e18.toString())
+          (await ZWeb3.getBalance(receiverAccount)).should.eq(101e18.toString())
         })
       })
 
@@ -135,7 +126,7 @@ contract('ZWeb3', accounts => {
           transaction.should.be.an('object')
           transaction.value.should.be.eq(1e18.toString())
           transaction.from.should.be.eq(accounts[0])
-          transaction.to.should.be.eq(accounts[2])
+          transaction.to.should.be.eq(receiverAccount)
           transaction.nonce.should.not.be.null
           transaction.blockNumber.should.not.be.null
           transaction.blockHash.should.not.be.null
@@ -217,5 +208,33 @@ contract('ZWeb3', accounts => {
         });
       });
     })
+  };
+
+  describe('initializing ZWeb3', function () {
+    context('when initializing without a provider', function () {
+      it('initializes web3 without a provider', async function () {
+        ZWeb3.initialize();
+        ZWeb3.web3().should.not.be.null;
+
+        expect(ZWeb3.web3().currentProvider).to.be.null;
+      })
+    })
+
+    context('when initializing ZWeb3 with an http url', function () {
+      beforeEach('initialize web3', function () {
+        ZWeb3.initialize('http://localhost:9555');
+      })
+
+      shouldBehaveLikeWeb3Instance(account, account2);
+    })
+
+    context('when initializing ZWeb3 with a web3 provider', function () {
+      beforeEach('initialize web3', function () {
+        ZWeb3.initialize(web3.currentProvider);
+      })
+
+      shouldBehaveLikeWeb3Instance(account, account1);
+    })
+
   })
 })
