@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## v2.2.2
 
 ### Fixed
+- Initialize ZWeb3 using a http url as provider ([#785](https://github.com/zeppelinos/zos/issues/785))
 - Automatic linking of external Solidity libraries now properly handles multiple libraries on the same contract ([#771](https://github.com/zeppelinos/zos/pull/771))
 
 ### Changed
