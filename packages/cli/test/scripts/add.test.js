@@ -14,7 +14,7 @@ contract('add script', function() {
   const contractsData = [{ name: contractName, alias: contractAlias }]
 
   beforeEach('setup', async function() {
-    this.packageFile = new ZosPackageFile('test/mocks/packages/package-empty.zos.json')
+    this.packageFile = new ZosPackageFile('test/mocks/packages/package-with-stdlib.zos.json')
   });
 
   it('should add a logic contract an alias and a filename', function() {
@@ -77,6 +77,17 @@ contract('add script', function() {
     this.packageFile.contract('ImplV1').should.eq('ImplV1')
     this.packageFile.contract('ImplV2').should.eq('ImplV2')
   })
+
+  it('should not add solidity libraries or contracts from external packages when adding all', function() {
+    addAll({ packageFile: this.packageFile })
+
+    expect(this.packageFile.contract('Initializable')).to.be.undefined
+    expect(this.packageFile.contract('GreeterImpl')).to.be.undefined
+    expect(this.packageFile.contract('GreeterLib')).to.be.undefined
+    expect(this.packageFile.contract('UintLib')).to.be.undefined
+    this.packageFile.contracts.should.have.property('WithExternalContractImplV1');
+    this.packageFile.contracts.should.have.property('WithExternalContractImplV2');
+  });
 
   describe('failures', function () {
     it('should fail to add a contract that does not exist', function() {

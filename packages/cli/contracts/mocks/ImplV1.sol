@@ -1,6 +1,7 @@
 pragma solidity ^0.5.0;
 
 import "./Libraries.sol";
+import "mock-stdlib/contracts/GreeterImpl.sol";
 
 contract ImplV1 {
   uint256 public value;
@@ -17,6 +18,12 @@ contract ImplV1 {
 contract ChildImplV1 is ImplV1 {
   function say() public pure returns (string memory) {
     return "ChildV1";
+  }
+}
+
+contract WithExternalContractImplV1 is ImplV1, GreeterImpl {
+  function say(string memory phrase) public pure returns(string memory) {
+    return phrase.wrap();
   }
 }
 

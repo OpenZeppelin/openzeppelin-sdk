@@ -57,13 +57,21 @@ export default class LocalController {
   }
 
   public addAll(): void {
-    const folder = Contracts.getLocalBuildDir();
-    fs.readDir(folder).forEach((file) => {
-      const path = `${folder}/${file}`;
+    const buildFolder = Contracts.getLocalBuildDir();
+    const sourceFolder = Contracts.getLocalContractsDir();
+
+    fs.readDir(buildFolder).forEach((file) => {
+      const path = `${buildFolder}/${file}`;
       if(this.hasBytecode(path)) {
         const contractData = fs.parseJson(path);
-        const contractName = contractData.contractName;
-        this.add(contractName, contractName);
+        const isProjectContract = contractData.sourcePath.indexOf(sourceFolder) === 0;
+        const isLibrary = contractData.ast && contractData.ast.nodes
+          .find((node) => node.name === contractData.contractName && node.contractKind === 'library');
+
+        if (isProjectContract && !isLibrary) {
+          const contractName = contractData.contractName;
+          this.add(contractName, contractName);
+        }
       }
     });
   }
