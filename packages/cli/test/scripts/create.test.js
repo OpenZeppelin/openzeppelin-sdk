@@ -171,7 +171,7 @@ contract('create script', function([_, owner]) {
       const salt = random(0, 2**32);
       await create({ contractAlias, network, txParams, networkFile: this.networkFile, salt });
       await create({ contractAlias, network, txParams, networkFile: this.networkFile, salt })
-        .should.be.rejectedWith(/deployment address already in use/);
+        .should.be.rejectedWith(/Deployment address for salt \d+ is already in use/);
     });
 
     describe('warnings', function () {

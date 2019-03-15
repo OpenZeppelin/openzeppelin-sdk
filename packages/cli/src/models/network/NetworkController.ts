@@ -506,10 +506,7 @@ export default class NetworkController {
 
     const createArgs = { packageName, contractName: contractAlias, initMethod, initArgs };
 
-    if (salt) {
-      const deploymentAddress = await this.getProxyDeploymentAddress(salt);
-      if (await ZWeb3.getCode(deploymentAddress) != '0x') throw new Error("deployment address already in use");
-    }
+    if (salt) await this._checkDeploymentAddress(salt);
 
     const proxyInstance = salt
       ? await this.project.createProxyWithSalt(contract, salt, createArgs)
@@ -535,6 +532,12 @@ export default class NetworkController {
     this._tryRegisterProxyFactory();
 
     return address;
+  }
+
+  // Proxy model
+  private async _checkDeploymentAddress(salt: string) {
+    const deploymentAddress = await this.getProxyDeploymentAddress(salt);
+    if (await ZWeb3.getCode(deploymentAddress) != '0x') throw new Error(`Deployment address for salt ${salt} is already in use`);
   }
 
   // Proxy model
@@ -777,6 +780,6 @@ export default class NetworkController {
 
   private _updateZosVersionsIfNeeded(version) {
     if(this.networkFile.zosversion !== ZOS_VERSION) this.networkFile.zosversion = version;
-    if(this.packageFile.zosversion !== ZOS_VERSION)this.packageFile.zosversion = version;
+    if(this.packageFile.zosversion !== ZOS_VERSION) this.packageFile.zosversion = version;
   }
 }
