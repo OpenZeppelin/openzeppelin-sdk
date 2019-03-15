@@ -167,7 +167,7 @@ contract('create script', function([_, owner]) {
       predictedAddress.should.equalIgnoreCase(proxyInfo.address, "Predicted address does not match actualy deployment address");
     });
 
-    it('should fail if an address is already in use when creating a proxy with create2', async function () {
+    it('should fail if an address is already in use when creating a proxy with a salt', async function () {
       const salt = random(0, 2**32);
       await create({ contractAlias, network, txParams, networkFile: this.networkFile, salt });
       await create({ contractAlias, network, txParams, networkFile: this.networkFile, salt })
