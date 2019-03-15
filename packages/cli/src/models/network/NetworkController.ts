@@ -505,6 +505,12 @@ export default class NetworkController {
     this.checkInitialization(contract, initMethod, initArgs);
 
     const createArgs = { packageName, contractName: contractAlias, initMethod, initArgs };
+
+    if (salt) {
+      const deploymentAddress = await this.getProxyDeploymentAddress(salt);
+      if (await ZWeb3.getCode(deploymentAddress) != '0x') throw new Error("deployment address already in use");
+    }
+
     const proxyInstance = salt
       ? await this.project.createProxyWithSalt(contract, salt, createArgs)
       : await this.project.createProxy(contract, createArgs);
