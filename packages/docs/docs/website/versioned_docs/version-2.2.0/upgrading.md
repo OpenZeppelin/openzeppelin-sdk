@@ -188,7 +188,7 @@ set the initial value of `t` and check that it has not yet been initialized. It 
 
 ```
 function initializeT(uint256 _t) public {
-  require(_t == 0);
+  require(t == 0);
   t = _t;
 }
 ```
@@ -215,7 +215,7 @@ contract MyContract is Initializable {
   }
 
   function initializeT(uint256 _t) public {
-    require(_t == 0);
+    require(t == 0);
     t = _t;
   }
 
