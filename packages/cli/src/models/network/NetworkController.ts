@@ -587,9 +587,10 @@ export default class NetworkController {
   public checkInitialization(contract: Contract, calledInitMethod: string, calledInitArgs: string[]): void {
     // If there is an initializer called, assume it's ok
     if (calledInitMethod) return;
-
     // Otherwise, warn the user to invoke it
-    const initializeMethod = contract.schema.abi.find((fn) => fn.type === 'function' && fn.name === 'initialize');
+    const contractMethods = contract.methodsFromAst();
+    const initializeMethod = contractMethods.find(({ hasInitializer }) => hasInitializer);
+
     if (!initializeMethod) return;
     log.error(`Possible initialization method 'initialize' found in contract. Make sure you initialize your instance.`);
   }
@@ -646,12 +647,6 @@ export default class NetworkController {
     const proxies = this._fetchOwnedProxies(packageName, contractAlias, proxyAddress);
     if (proxies.length === 0) return [];
     await this.fetchOrDeploy(this.currentVersion);
-
-    // Check if there is any migrate method in the contracts and warn the user to call it
-    const contracts = uniqWith(map(proxies, (p) => [p.package, p.contract]), isEqual);
-    forEach(contracts, ([aPackageName, contractName]) =>
-      this._checkUpgrade(this.localController.getContractClass(aPackageName, contractName), initMethod, initArgs)
-    );
 
     // Update all proxies loaded
     await allPromisesOrError(
