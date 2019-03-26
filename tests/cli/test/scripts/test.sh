@@ -25,7 +25,7 @@ start_geth() {
   # Start a geth development instance in the background
   echo "Starting local dev geth"
   geth version
-  nohup geth --dev --dev.period=1 --rpc --rpcport=9955 --rpcaddr=localhost --networkid 9955 > /dev/null &
+  nohup geth --dev --dev.period=1 --rpc --rpcport=9955 --rpcaddr=localhost --networkid 9955 --datadir=.ethereum > /dev/null &
   geth_pid=$!
   sleep 3
   echo "Running local dev geth with pid ${geth_pid}"
@@ -41,7 +41,10 @@ fund_account() {
 
 run_tests() {
   # Run via mocha
-  node_modules/.bin/mocha "$@"
+  ls -lah .
+  ls -lah node_modules
+  ls -lah node_modules/.bin
+  node_modules/.bin/mocha --bail --timeout=120s src
 }
 
 main() {

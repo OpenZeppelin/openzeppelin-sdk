@@ -2,7 +2,7 @@ const { spawnSync } = require('child_process');
 const path = require('path');
 const fs = require('fs');
 const _ = require('lodash');
-const truffleConfig = require('../workdir/truffle')
+const truffleConfig = require('../../workdir/truffle')
 
 function getNetwork() {
   const network = process.env.NETWORK;
@@ -12,7 +12,7 @@ function getNetwork() {
 
 function getProxyAddress(network, name, index) {
   const currentNetwork = truffleConfig.networks[network]
-  const fileName = path.resolve(__dirname, `../workdir/${getNetworkFileName(currentNetwork)}`)
+  const fileName = path.resolve(__dirname, `../../workdir/${getNetworkFileName(currentNetwork)}`)
   const data = JSON.parse(fs.readFileSync(fileName))
 
   if (!data.proxies || !data.proxies[name] || !data.proxies[name][index]) {
@@ -29,7 +29,7 @@ function getProxyAddress(network, name, index) {
 
 function getNetworkInfo(network) {
   const currentNetwork = truffleConfig.networks[network]
-  return JSON.parse(fs.readFileSync(path.resolve(__dirname, `../workdir/${getNetworkFileName(currentNetwork)}`)))
+  return JSON.parse(fs.readFileSync(path.resolve(__dirname, `../../workdir/${getNetworkFileName(currentNetwork)}`)))
 }
 
 function logOutput(out, err) {
@@ -43,7 +43,7 @@ function logCmd(cmd) {
 }
 
 function execInWorkdir(cmd) {
-  const output = spawnSync(cmd, { cwd: path.resolve(__dirname, '../workdir'), shell: true });
+  const output = spawnSync(cmd, { cwd: path.resolve(__dirname, '../../workdir'), shell: true });
   if (output.status != 0 || output.error) {
     logOutput(output.stdout, output.stderr)
     throw new Error(`Error running ${cmd} (err ${output.status}) ${output.error}`);
@@ -68,14 +68,25 @@ function run(cmd) {
 }
 
 function copy(src, target) {
-  fs.copyFileSync(path.resolve(__dirname, `../files/${src}`), path.resolve(__dirname, `../workdir/${target}`));
+  fs.copyFileSync(path.resolve(__dirname, `../files/${src}`), path.resolve(__dirname, `../../workdir/${target}`));
+}
+
+function sed(file, search, replace) {
+  const text = fs.readFileSync(file).toString();
+  const updated = text.replace(search, replace);
+  fs.writeFileSync(file, updated);
 }
 
 function getNetworkFileName(currentNetwork) {
   const { network_id: networkId } = currentNetwork
   const name = networkId === '4' ? 'rinkeby' : `dev-${networkId}`
-
   return `zos.${name}.json`
+}
+
+function setMockStdlibVersion(version) {
+  sed('package.json', /(?<=mock-stdlib-)1\.\d\.0/, version);
+  sed('package-lock.json', /(?<=mock-stdlib-)1\.\d\.0/, version);
+  run(`ln -nsf ../../dependencies/mock-stdlib-${version} node_modules/mock-stdlib`);
 }
 
 module.exports = {
@@ -83,6 +94,8 @@ module.exports = {
   getNetworkInfo,
   getNetwork,
   truffleExec,
+  setMockStdlibVersion,
   run,
-  copy
+  copy,
+  sed
 }

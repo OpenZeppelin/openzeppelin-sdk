@@ -1,19 +1,19 @@
 const _ = require('lodash'); 
-const { truffleExec, run, copy } = require('./share');
+const { truffleExec, setMockStdlibVersion, run, copy } = require('./share');
+
+function cleanup() {
+  run('rm build/contracts/*.json ||:')
+  run('rm contracts/*.sol ||:')
+  run('rm zos.* ||:')
+  setMockStdlibVersion('1.1.0')
+}
 
 function registerProjectHooks (network) {
-  before('cleaning up project folder', function () {
-    run('rm build/contracts/*.json ||:')
-    run('rm contracts/*.sol ||:')
-    run('rm zos.* ||:')
-  });
+  before('cleaning up project folder', cleanup);
 
   before('setting up project', function () {
-    copy('package.json.v1', 'package.json')
     copy('Samples.sol', 'contracts/Samples.sol')
     copy('GreeterWrapper.sol', 'contracts/GreeterWrapper.sol')
-    run('rm -f package-lock.json')
-    run('npx lerna bootstrap --no-ci > /dev/null')
   });
 
   before('loading accounts', async function () {
@@ -25,12 +25,7 @@ function registerProjectHooks (network) {
     }
   })
   
-  after('cleaning up project folder', function () {
-    run('rm build/contracts/*.json ||:')
-    run('rm contracts/*.sol ||:')
-    run('rm zos.* ||:')
-    run('rm package.* ||:')
-  })
+  after('cleaning up project folder', cleanup);
 };
 
 module.exports = {

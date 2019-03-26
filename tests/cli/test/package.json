@@ -1,5 +1,5 @@
 {
-  "name": "cli-app-tests",
+  "name": "cli-integration-tests",
   "private": true,
   "version": "2.3.0-alpha.0",
   "description": "Integration tests for CLI app",

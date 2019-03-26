@@ -1,8 +1,0 @@
-node_modules
-.zos.session
-zos.*
-workdir/build/*
-workdir/node_modules
-workdir/zos*
-workdir/package*
-workdir/contracts/*

@@ -28,7 +28,7 @@ stages:
 jobs:
   include:
 
-    # Install all dependencies and cache them
+    Install all dependencies and cache them
     - stage: prepare cache
       script: true
       install:

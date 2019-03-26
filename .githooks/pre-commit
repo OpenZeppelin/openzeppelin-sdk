@@ -1,2 +1,2 @@
 #!/bin/sh
-lerna run lint
+./node_modules/.bin/lerna run lint
