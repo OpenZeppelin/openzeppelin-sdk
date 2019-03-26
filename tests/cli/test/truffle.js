@@ -1,0 +1,1 @@
+../workdir/truffle.js

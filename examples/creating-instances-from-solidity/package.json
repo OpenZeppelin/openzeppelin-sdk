@@ -1,6 +1,7 @@
 {
-  "name": "creating-instances-from-solidity",
+  "name": "example-creating-instances-from-solidity",
   "version": "2.3.0-alpha.0",
+  "private": true,
   "description": "",
   "main": "truffle-config.js",
   "scripts": {
@@ -10,12 +11,12 @@
   },
   "keywords": [],
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
-    "zos": "^2.3.0-alpha.0",
-    "zos-lib": "^2.3.0-alpha.0"
+    "zos-lib": "2.3.0-alpha.0"
   },
   "devDependencies": {
-    "truffle": "^5.0.5"
+    "truffle": "^5.0.5",
+    "zos": "2.3.0-alpha.0"
   }
 }

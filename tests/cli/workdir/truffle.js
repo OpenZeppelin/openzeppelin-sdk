@@ -5,13 +5,13 @@ module.exports = {
   networks: {
     "geth-dev": {
       host: 'localhost',
-      port: 9955,
+      port: 8545,
       network_id: '9955',
       gasPrice: 1e9
     },
     "geth-dev-hdwallet": {
       provider: function() {
-        return new HDWalletProvider(mnemonic, "http://localhost:9955/")
+        return new HDWalletProvider(mnemonic, "http://localhost:8545/")
       },
       network_id: '9955',
       gasPrice: 1e9

@@ -1,0 +1,206 @@
+version: 2.1
+
+orbs:
+  node: circleci/node@0.0.9
+
+defaults: &defaults
+  docker:
+    - image: circleci/node:10.13
+  working_directory: ~/zos
+
+commands:
+
+  npm-install-with-cache:
+    parameters:
+      dir:
+        type: string
+        description: Working directory.
+        default: ~/zos
+      cache-version:
+        type: string
+        default: v1
+      install-cmd:
+        type: string
+        default: pwd && npm install
+    steps:
+      - restore_cache:
+          keys:
+            - 'dependency-cache-<< parameters.cache-version >>-<< parameters.dir >>-{{ .Branch }}-{{ checksum "<< parameters.dir >>/package.json" }}'
+            - 'dependency-cache-<< parameters.cache-version >>-<< parameters.dir >>-{{ .Branch }}-'
+            - 'dependency-cache-<< parameters.cache-version >>-<< parameters.dir >>-'
+      - run:
+          name: Output npm info
+          command: npm version
+          working_directory: "<< parameters.dir >>"
+      - run:
+          name: "Install dependencies on << parameters.dir >>"
+          command: "<< parameters.install-cmd >>"
+          working_directory: "<< parameters.dir >>"
+      - save_cache:
+          key: 'dependency-cache-<< parameters.cache-version >>-<< parameters.dir >>-{{ .Branch }}-{{ checksum "<< parameters.dir >>/package.json" }}'
+          paths: [ "<< parameters.dir >>/node_modules" ]
+
+  npm-install-and-test:
+    parameters:
+      dir:
+        type: string
+        description: Working directory.
+        default: ~/zos
+      cache-version:
+        type: string
+        default: v1
+      install-cmd:
+        type: string
+        default: pwd && npm install
+    steps:
+      - npm-install-with-cache:
+          dir: "<< parameters.dir >>"
+          cache-version: "<< parameters.cache-version >>"
+          install-cmd: "<< parameters.install-cmd >>"
+      - run: 
+          name: "Test on << parameters.dir >>"
+          command: pwd && npm test
+          working_directory: "<< parameters.dir >>"
+
+jobs:
+
+  setup:
+    <<: *defaults
+    steps:
+      - checkout
+      - restore_cache: &restore-cache-root
+          keys: 
+            - dependency-cache-v1-root-{{ checksum "package.json" }}
+            - dependency-cache-v1-root-
+      - restore_cache: &restore-cache-lib
+          keys: 
+            - dependency-cache-v1-lib-{{ checksum "packages/lib/package.json" }}
+            - dependency-cache-v1-lib-
+      - restore_cache: &restore-cache-cli
+          keys: 
+            - dependency-cache-v1-cli-{{ checksum "packages/cli/package.json" }}
+            - dependency-cache-v1-cli-
+      - run:
+          name: Install dependencies at root
+          command: npm install
+      - run:
+          name: Bootstrap zos packages via lerna
+          command: ./node_modules/.bin/lerna bootstrap --loglevel=info --concurrency=4 --scope="zos" --scope="zos-lib"
+          no_output_timeout: 60m
+      - save_cache:
+          key: dependency-cache-v1-root-{{ checksum "package.json" }}
+          paths: [node_modules]
+      - save_cache:
+          key: dependency-cache-v1-cli-{{ checksum "packages/cli/package.json" }}
+          paths:
+            - packages/cli/node_modules
+            - packages/cli/lib
+            - packages/cli/build
+      - save_cache:
+          key: dependency-cache-v1-lib-{{ checksum "packages/lib/package.json" }}
+          paths:
+            - packages/lib/node_modules
+            - packages/lib/lib
+            - packages/lib/build
+
+  test-lib:
+    <<: *defaults
+    steps:
+      - checkout
+      - restore_cache: *restore-cache-root
+      - restore_cache: *restore-cache-lib
+      - run:
+          name: Test lib
+          command: 'npm run test'
+          working_directory: ~/zos/packages/lib
+
+  test-cli:
+    <<: *defaults
+    steps:
+      - checkout
+      - restore_cache: *restore-cache-root
+      - restore_cache: *restore-cache-lib
+      - restore_cache: *restore-cache-cli
+      - run:
+          name: Test CLI
+          command: 'npm run test'
+          working_directory: ~/zos/packages/cli
+
+  example-lib-simple:
+    <<: *defaults
+    steps:
+      - checkout
+      - restore_cache: *restore-cache-root
+      - restore_cache: *restore-cache-lib
+      - npm-install-and-test:
+          dir: "~/zos/examples/lib-simple"
+          install-cmd: '~/zos/node_modules/.bin/lerna bootstrap --scope=example-zos-lib-simple --scope="zos-lib"'
+
+  example-lib-complex:
+    <<: *defaults
+    steps:
+      - checkout
+      - restore_cache: *restore-cache-root
+      - restore_cache: *restore-cache-lib
+      - npm-install-and-test:
+          dir: "~/zos/examples/lib-complex"
+          install-cmd: '~/zos/node_modules/.bin/lerna bootstrap --scope=example-zos-lib-complex --scope="zos-lib"'
+
+  example-create-instances-from-solidity:
+    <<: *defaults
+    steps:
+      - checkout
+      - restore_cache: *restore-cache-root
+      - restore_cache: *restore-cache-lib
+      - restore_cache: *restore-cache-cli
+      - npm-install-and-test:
+          dir: "~/zos/examples/creating-instances-from-solidity"
+          install-cmd: '~/zos/node_modules/.bin/lerna bootstrap --scope=example-creating-instances-from-solidity --scope="zos*"'
+
+  integration-cli-geth: &integration
+    environment: { NETWORK: "geth-dev" }
+    working_directory: ~/zos
+    docker:
+      - image: circleci/node:10.13
+      - image: ethereum/client-go:release-1.8
+        command: "--dev --dev.period=1 --rpc --rpcport=8545 --rpcaddr=localhost --networkid=9955"
+    steps:
+      - checkout
+      - restore_cache: *restore-cache-root
+      - restore_cache: *restore-cache-lib
+      - restore_cache: *restore-cache-cli
+      - npm-install-with-cache: 
+          dir: "~/zos/tests/cli/workdir"
+          cache-version: 'v3'
+          install-cmd: '~/zos/node_modules/.bin/lerna bootstrap --scope=tests-cli-workdir --scope="zos*"'
+      - npm-install-with-cache: 
+          dir: "~/zos/tests/cli/test"
+          cache-version: 'v3'
+      - run:
+          name: Integration test
+          command: 'npm run test'
+          working_directory: "~/zos/tests/cli/test"
+  
+  integration-cli-hdwallet:
+    <<: *integration
+    environment: { NETWORK: "geth-dev-hdwallet" }
+
+workflows:
+  version: 2
+  test:
+    jobs:
+      - setup
+      - test-lib:
+          requires: [setup]
+      - test-cli:
+          requires: [setup]
+      - example-lib-simple:
+          requires: [test-lib]
+      - example-lib-complex:
+          requires: [test-lib]
+      - example-create-instances-from-solidity:
+          requires: [test-lib, test-cli]
+      - integration-cli-geth:
+          requires: [test-lib, test-cli]
+      - integration-cli-hdwallet:
+          requires: [test-lib, test-cli]

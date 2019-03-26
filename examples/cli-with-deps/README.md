@@ -1,6 +1,6 @@
 # Sample ZeppelinOS project with dependencies
 
-This is a simple ZeppelinOS project that uses several dependencies to retrieve contracts and build an application. It relies on `dep-basic` (from this same repository) to use a sample `EthBox` contract, and on [`openzeppelin-zos`](https://github.com/OpenZeppelin/openzeppelin-zos) for a regular `ERC20` contract.
+This is a simple ZeppelinOS project that uses several dependencies to retrieve contracts and build an application. It relies on `example-dep-basic` (from this same repository) to use a sample `EthBox` contract, and on [`openzeppelin-zos`](https://github.com/OpenZeppelin/openzeppelin-zos) for a regular `ERC20` contract.
 
 ## How this project was set up
 
@@ -9,11 +9,11 @@ To set up a project like this one, you need to first install ZeppelinOS, create 
 ```bash
 $ npm install -g zos
 $ zos init cli-with-deps
-$ zos link dep-basic
+$ zos link example-dep-basic
 $ zos link openzeppelin-zos
 ```
 
-Then add your contracts, and publish the project to a network. In this project, we have a single contract named `TokenExchange`, which depends on an `ERC20` token, and the `EthBox` contract provided by `dep-basic`.
+Then add your contracts, and publish the project to a network. In this project, we have a single contract named `TokenExchange`, which depends on an `ERC20` token, and the `EthBox` contract provided by `example-dep-basic`.
 ```bash
 $ zos add TokenExchange
 $ zos session --network ropsten
@@ -24,9 +24,9 @@ Note that, if you are working on a network where the dependencies have not been 
 
 After you have pushed your code to the network, you can now create instances from your own contracts, or from any provided by the dependencies you are working with:
 ```bash
-$ zos create dep-basic/EthBox
-Creating dep-basic EthBox proxy without initializing...
-dep-basic EthBox proxy: 0xc2069675fe551cae14ca3cf3ec849117e0b40342
+$ zos create example-dep-basic/EthBox
+Creating example-dep-basic EthBox proxy without initializing...
+example-dep-basic EthBox proxy: 0xc2069675fe551cae14ca3cf3ec849117e0b40342
 ```
 ```bash
 $ zos create openzeppelin-zos/DetailedPremintedToken --init initialize --args $OWNER,Test,TEST,8,100000000000000000000

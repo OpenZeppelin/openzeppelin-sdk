@@ -8,7 +8,7 @@
     }
   },
   "proxies": {
-    "dep-basic/EthBox": [
+    "example-dep-basic/EthBox": [
       {
         "address": "0xc2069675fe551cae14ca3cf3ec849117e0b40342",
         "version": "0.1.0",
@@ -42,7 +42,7 @@
   },
   "version": "0.1.0",
   "dependencies": {
-    "dep-basic": {
+    "example-dep-basic": {
       "package": "0x25345c21e9d557b5ade7ab6abba53822c71a9051",
       "version": "0.1.0"
     },
