@@ -200,22 +200,22 @@ export default class AppProject extends BasePackageProject {
     return { contractName, packageName, initArgs, initMethod };
   }
 
-  public async createProxyWithSalt(contract: Contract, salt: string, contractInterface: ContractInterface = {}): Promise<Contract> {
+  public async createProxyWithSalt(contract: Contract, salt: string, signature?: string, contractInterface: ContractInterface = {}): Promise<Contract> {
     const { contractName, packageName, initMethod, initArgs } = this.getContractInterface(contract, contractInterface);
     const implementationAddress = await this.app.getImplementation(packageName, contractName);
     const initCallData = this.getInitCallData(contract, initMethod, initArgs, implementationAddress, 'Creating');
 
     const proxyFactory = await this.ensureProxyFactory();
     const proxyAdmin = await this.ensureProxyAdmin();
-    const proxy = await proxyFactory.createProxy(salt, implementationAddress, proxyAdmin.address, initCallData);
+    const proxy = await proxyFactory.createProxy(salt, implementationAddress, proxyAdmin.address, initCallData, signature);
 
     log.info(`Instance created at ${proxy.address}`);
     return contract.at(proxy.address);
   }
 
-  public async getProxyDeploymentAddress(salt: string): Promise<string> {
+  public async getProxyDeploymentAddress(salt: string, sender?: string): Promise<string> {
     const proxyFactory = await this.ensureProxyFactory();
-    return proxyFactory.getDeploymentAddress(salt);
+    return proxyFactory.getDeploymentAddress(salt, sender);
   }
 
   public async upgradeProxy(proxyAddress: string, contract: Contract, contractInterface: ContractInterface = {}): Promise<Contract> {

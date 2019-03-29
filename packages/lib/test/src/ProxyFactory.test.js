@@ -5,6 +5,7 @@ import utils from 'web3-utils';
 import Contracts from '../../src/artifacts/Contracts';
 import assertRevert from '../../src/test/helpers/assertRevert';
 import ProxyFactory from '../../src/proxy/ProxyFactory';
+import { signDeploy, signer } from '../../src/test/helpers/signing';
 
 const ImplV1 = Contracts.getFromLocal('DummyImplementation');
 const ImplV2 = Contracts.getFromLocal('DummyImplementationV2');
@@ -86,35 +87,19 @@ contract('ProxyFactory model', function(accounts) {
   });
 
   describe('#deploySigned', function () {
-    const signer = '0x239938d1Bd73e99a5042d29DcFFf6991e0Fe5626';
-    const signerPk = '0xbe7e12ce20410c5f0207bd6c7bcae39052679bfd401c62849657ebfe23e3711b';
-
-    const sign = function (salt, logic, admin, initData) {
-      // Encodes and tightly packs the arguments and calculates keccak256
-      const hash = web3.utils.soliditySha3(
-        { type: 'uint256', value: salt },
-        { type: 'address', value: logic },
-        { type: 'address', value: admin },
-        { type: 'bytes', value: initData }
-      );
-      // Prepends the Ethereum Signed Message string, hashes, and signs
-      const signed = web3.eth.accounts.sign(hash, signerPk);
-      return signed.signature;
-    }
-
     it('retrieves signer address', async function () {
       const salt = "16";
       const logic = this.implementationV1.address;
       const admin = signer;
       const initData = '0x01020304';
-      const signature = sign(salt, logic, admin, initData);
+      const signature = signDeploy(salt, logic, admin, initData);
       const actualSigner = await this.factory.getSigner(salt, logic, admin, initData, signature);
       actualSigner.should.eq(signer);
     });
 
     behavesLikeProxyFactory(accounts, signer, async (factory, ... args) => {
       const createArgs = args.length === 3 ? [... args, ''] : args; // append empty initdata if not supplied
-      return factory.createProxy(... createArgs, sign(... createArgs));
+      return factory.createProxy(... createArgs, signDeploy(... createArgs));
     });
   });
   

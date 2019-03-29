@@ -105,22 +105,22 @@ export default abstract class BaseSimpleProject {
     return contract.at(proxy.address);
   }
 
-  public async createProxyWithSalt(contract, salt: string, { packageName, contractName, initMethod, initArgs, redeployIfChanged }: ContractInterface = {}): Promise<Contract> {
+  public async createProxyWithSalt(contract, salt: string, signature?: string, { packageName, contractName, initMethod, initArgs, redeployIfChanged }: ContractInterface = {}): Promise<Contract> {
     if (!isEmpty(initArgs) && !initMethod) initMethod = 'initialize';
     const implementationAddress = await this._getOrDeployImplementation(contract, packageName, contractName, redeployIfChanged);
     const initCallData = this._getAndLogInitCallData(contract, initMethod, initArgs, implementationAddress, 'Creating');
 
     const proxyFactory = await this.ensureProxyFactory();
     const adminAddress = await this.getAdminAddress();
-    const proxy = await proxyFactory.createProxy(salt, implementationAddress, adminAddress, initCallData);
+    const proxy = await proxyFactory.createProxy(salt, implementationAddress, adminAddress, initCallData, signature);
 
     log.info(`Instance created at ${proxy.address}`);
     return contract.at(proxy.address);
   }
 
-  public async getProxyDeploymentAddress(salt: string): Promise<string> {
+  public async getProxyDeploymentAddress(salt: string, sender?: string): Promise<string> {
     const proxyFactory = await this.ensureProxyFactory();
-    return proxyFactory.getDeploymentAddress(salt);
+    return proxyFactory.getDeploymentAddress(salt, sender);
   }
 
   public async ensureProxyFactory(): Promise<ProxyFactory> {

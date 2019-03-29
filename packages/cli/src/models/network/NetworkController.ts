@@ -496,7 +496,7 @@ export default class NetworkController {
   }
 
   // Proxy model
-  public async createProxy(packageName: string, contractAlias: string, initMethod: string, initArgs: string[], salt?: string): Promise<Contract> {
+  public async createProxy(packageName: string, contractAlias: string, initMethod: string, initArgs: string[], salt?: string, signature?: string): Promise<Contract> {
     await this._migrateZosversionIfNeeded();
     await this.fetchOrDeploy(this.currentVersion);
     if (!packageName) packageName = this.packageFile.name;
@@ -509,7 +509,7 @@ export default class NetworkController {
     if (salt) await this._checkDeploymentAddress(salt);
 
     const proxyInstance = salt
-      ? await this.project.createProxyWithSalt(contract, salt, createArgs)
+      ? await this.project.createProxyWithSalt(contract, salt, signature, createArgs)
       : await this.project.createProxy(contract, createArgs);
 
     const implementationAddress = await Proxy.at(proxyInstance).implementation();
@@ -525,10 +525,10 @@ export default class NetworkController {
     return proxyInstance;
   }
 
-  public async getProxyDeploymentAddress(salt: string): Promise<string> {
+  public async getProxyDeploymentAddress(salt: string, sender?: string): Promise<string> {
     await this._migrateZosversionIfNeeded();
     await this.fetchOrDeploy(this.currentVersion);
-    const address = await this.project.getProxyDeploymentAddress(salt);
+    const address = await this.project.getProxyDeploymentAddress(salt, sender);
     this._tryRegisterProxyFactory();
 
     return address;

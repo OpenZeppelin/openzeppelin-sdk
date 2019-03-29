@@ -52,6 +52,7 @@ export {
   assertEvent,
   assertions,
   behaviors,
+  helpers,
   getBuildArtifacts,
   BuildArtifacts,
   getStorageLayout,

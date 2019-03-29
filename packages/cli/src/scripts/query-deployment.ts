@@ -6,13 +6,14 @@ import { Contract, encodeParams, Logger } from 'zos-lib';
 
 const log: Logger = new Logger('QueryDeployment');
 
-export default async function queryDeployment({ salt, network, txParams = {}, networkFile }: QueryDeploymentParams): Promise<string | never> {
+export default async function queryDeployment({ salt, sender, network, txParams = {}, networkFile }: QueryDeploymentParams): Promise<string | never> {
   validateSalt(salt);
   const controller = new NetworkController(network, txParams, networkFile);
 
   try {
-    const address = await controller.getProxyDeploymentAddress(salt);
-    log.info(`Any contract created with salt ${salt} will be deployed to the following address`);
+    const address = await controller.getProxyDeploymentAddress(salt, sender);
+    const senderLog = sender ? ` from ${sender} ` : ' ';
+    log.info(`Any contract created with salt ${salt}${senderLog}will be deployed to the following address`);
     stdout(address);
     controller.writeNetworkPackageIfNeeded();
 

@@ -23,6 +23,12 @@ contract('query-deployment script', function([_, owner, another]) {
       address.should.be.nonzeroAddress;
     });
 
+    it('should query deployment address specifying sender', async function() {
+      const address = await queryDeployment({ salt: this.salt, network, txParams: { from: another }, networkFile: this.networkFile });
+      const addressWithSender = await queryDeployment({ salt: this.salt, sender: another, network, txParams, networkFile: this.networkFile });
+      addressWithSender.should.be.eq(address);
+    });
+
     it('should return consistent deployment addresses', async function() {
       const address1 = await queryDeployment({ salt: this.salt, network, txParams, networkFile: this.networkFile });
       const address2 = await queryDeployment({ salt: this.salt, network, txParams, networkFile: this.networkFile });

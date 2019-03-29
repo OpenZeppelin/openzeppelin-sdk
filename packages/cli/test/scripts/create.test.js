@@ -4,7 +4,7 @@ require('../setup')
 import random from 'lodash.random';
 
 import CaptureLogs from '../helpers/captureLogs';
-import { Contracts, Logger } from 'zos-lib';
+import { Contracts, Logger, helpers } from 'zos-lib';
 
 import add from '../../src/scripts/add';
 import push from '../../src/scripts/push';
@@ -164,7 +164,26 @@ contract('create script', function([_, owner]) {
 
       await create({ contractAlias, network, txParams, networkFile: this.networkFile, salt });
       const proxyInfo = this.networkFile.getProxies({ contract: contractAlias })[0]
-      predictedAddress.should.equalIgnoreCase(proxyInfo.address, "Predicted address does not match actualy deployment address");
+      predictedAddress.should.equalIgnoreCase(proxyInfo.address, "Predicted address does not match actual deployment address");
+    });
+
+    it('should create a proxy at an address given a salt and signature', async function () {
+      // Get predicted address for a signer different than the owner
+      const salt = random(0, 2**32);
+      const predictedAddress = await queryDeployment({ network, txParams, networkFile: this.networkFile, salt, sender: helpers.signer });
+      
+      // Deploy a proxy to a random contract so we force a proxy admin to be deployed
+      await create({ contractAlias: anotherContractAlias, network, txParams, networkFile: this.networkFile });
+      
+      // Create the contract we want with both salt and signature
+      const implementation = this.networkFile.contract(contractAlias).address;
+      const admin = this.networkFile.proxyAdminAddress;
+      const signature = helpers.signDeploy(salt, implementation, admin, '');
+      await create({ contractAlias, network, txParams, networkFile: this.networkFile, salt, signature });
+      
+      // Check the deployment address
+      const proxyInfo = this.networkFile.getProxies({ contract: contractAlias })[0]
+      predictedAddress.should.equalIgnoreCase(proxyInfo.address, "Predicted address does not match actual deployment address");
     });
 
     it('should fail if an address is already in use when creating a proxy with a salt', async function () {

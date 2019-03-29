@@ -31,6 +31,7 @@ interface Proxy extends Network, PackageArgs {
 
 export interface CreateParams extends Proxy {
   salt?: string;
+  signature?: string;
 }
 
 export interface CompareParams extends Network {}
@@ -112,4 +113,5 @@ export interface UnlinkParams {
 
 export interface QueryDeploymentParams extends Network {
   salt: string;
+  sender?: string;
 }
