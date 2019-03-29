@@ -34,12 +34,12 @@ export default class ProxyFactory {
     this.txParams = txParams;
   }
 
-  public async createProxy(salt: string, logicAddress: string, proxyAdmin: string, initData?: string): Promise<Proxy> {
-    const { events, transactionHash } = await Transactions.sendTransaction(
-      this.contract.methods.deploy,
-      [salt, logicAddress, proxyAdmin, initData || Buffer.from('')],
-      { ...this.txParams }
-    );
+  public async createProxy(salt: string, logicAddress: string, proxyAdmin: string, initData?: string, signature?: string): Promise<Proxy> {
+    const args = [salt, logicAddress, proxyAdmin, initData || Buffer.from('')];
+    const method = signature ? this.contract.methods.deploySigned : this.contract.methods.deploy;
+    if (signature) args.push(signature);
+
+    const { events, transactionHash } = await Transactions.sendTransaction(method, args, { ...this.txParams });
 
     if (!events.ProxyCreated) {
       throw new Error(`Could not retrieve proxy deployment address from transaction ${transactionHash}`);
@@ -47,6 +47,10 @@ export default class ProxyFactory {
 
     const address = events.ProxyCreated.returnValues.proxy;
     return Proxy.at(address, this.txParams);
+  }
+
+  public async getSigner(salt: string, logicAddress: string, proxyAdmin: string, initData: string, signature: string): Promise<string> {
+    return this.contract.methods.getSigner(salt, logicAddress, proxyAdmin, initData || Buffer.from(''), signature).call();
   }
 
   public async getDeploymentAddress(salt: string, sender?: string): Promise<string> {
