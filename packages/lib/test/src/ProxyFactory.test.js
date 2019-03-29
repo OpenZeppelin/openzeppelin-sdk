@@ -49,7 +49,7 @@ function behavesLikeProxyFactory(accounts, user, createProxy) {
 
   it('cannot deploy two proxies with the same salt and sender', async function () {
     await createProxy(this.factory, salt1, this.implementationV1.address, admin);
-    await assertRevert(createProxy(this.factory, salt2, this.implementationV2.address, anotherAdmin));
+    await assertRevert(createProxy(this.factory, salt1, this.implementationV2.address, anotherAdmin));
   });
 
   it('keeps deployment address while factory creates other proxies', async function () {

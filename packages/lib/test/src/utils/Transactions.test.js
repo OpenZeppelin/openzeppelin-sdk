@@ -436,10 +436,6 @@ contract('Transactions', function(accounts) {
         await assertFrom(instance.deployment.transactionHash, account2);
       });
 
-      it('handles failing constructors', async function () {
-        await assertRevert(Transactions.deployContract(this.DummyImplementation, [0, "foo"]));
-      });
-
       describe('gas', function () {
         afterEach('restore stubs', function () {
           sinon.restore();
