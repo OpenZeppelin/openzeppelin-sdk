@@ -8,7 +8,7 @@ async function main() {
   const value = await deployed.value();
   const version = await deployed.version();
   console.log(`Value of MyContract (${version}) deployed instance: ${value.toNumber()}`);
-  if(value != 52){
+  if (value !== 52) {
     throw Error("Returned value is incorrect");
   }
 }
