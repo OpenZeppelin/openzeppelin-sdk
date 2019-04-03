@@ -92,14 +92,14 @@ contract('ProxyFactory model', function(accounts) {
       const logic = this.implementationV1.address;
       const admin = signer;
       const initData = '0x01020304';
-      const signature = signDeploy(salt, logic, admin, initData);
+      const signature = signDeploy(this.factory.address, salt, logic, admin, initData);
       const actualSigner = await this.factory.getSigner(salt, logic, admin, initData, signature);
       actualSigner.should.eq(signer);
     });
 
     behavesLikeProxyFactory(accounts, signer, async (factory, ... args) => {
       const createArgs = args.length === 3 ? [... args, ''] : args; // append empty initdata if not supplied
-      return factory.createProxy(... createArgs, signDeploy(... createArgs));
+      return factory.createProxy(... createArgs, signDeploy(factory.address, ... createArgs));
     });
   });
   

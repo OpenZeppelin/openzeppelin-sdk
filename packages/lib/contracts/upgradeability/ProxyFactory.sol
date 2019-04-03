@@ -19,7 +19,6 @@ contract ProxyFactory {
     return _deployProxy(_salt, _logic, _admin, _data, msg.sender);
   }
 
-// TODO: Add address(this) to signature
   function deploySigned(uint256 _salt, address _logic, address _admin, bytes memory _data, bytes memory _signature) public returns (address) {
     address signer = getSigner(_salt, _logic, _admin, _data, _signature);
     require(signer != address(0), "Invalid signature");
@@ -41,11 +40,11 @@ contract ProxyFactory {
     return address(bytes20(rawAddress << 96));
   }
 
-  function getSigner(uint256 _salt, address _logic, address _admin, bytes memory _data, bytes memory _signature) public pure returns (address) {
+  function getSigner(uint256 _salt, address _logic, address _admin, bytes memory _data, bytes memory _signature) public view returns (address) {
     bytes32 msgHash = ZOSLibECDSA.toEthSignedMessageHash(
       keccak256(
         abi.encodePacked(
-          _salt, _logic, _admin, _data
+          _salt, _logic, _admin, _data, address(this)
         )
       )
     );

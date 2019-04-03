@@ -67,7 +67,8 @@ export default function shouldManageProxies({ otherAdmin, setImplementations, su
       it('creates a proxy using signer instead of sender', async function () {
         if (!this.implementationV1) return // If the implementation has not been pre-registered in this suite, bail
         const implementation = this.implementationV1.address;
-        const signature = signDeploy(this.salt, implementation, otherAdmin);
+        const factory = await this.project.ensureProxyFactory();
+        const signature = signDeploy(factory.address, this.salt, implementation, otherAdmin);
         const deploymentAddress = await this.project.getProxyDeploymentAddress(this.salt, signer);
         const instance = await this.project.createProxyWithSalt(DummyImplementation, this.salt, signature, { admin: otherAdmin });
         await assertIsVersion(instance, 'V1');

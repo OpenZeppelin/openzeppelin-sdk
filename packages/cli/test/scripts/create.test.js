@@ -205,7 +205,7 @@ contract('create script', function([_, owner, otherAdmin]) {
       // Create the contract we want with both salt and signature
       const implementation = this.networkFile.contract(contractAlias).address;
       const admin = this.networkFile.proxyAdminAddress;
-      const signature = helpers.signDeploy(salt, implementation, admin, '');
+      const signature = helpers.signDeploy(this.networkFile.proxyFactoryAddress, salt, implementation, admin, '');
       await create({ contractAlias, network, txParams, networkFile: this.networkFile, salt, signature });
       
       // Check the deployment address
@@ -216,7 +216,7 @@ contract('create script', function([_, owner, otherAdmin]) {
       const salt = random(0, 2**32);
       const implementation = this.networkFile.contract(contractAlias).address;
       const predictedAddress = await queryDeployment({ network, txParams, networkFile: this.networkFile, salt, sender: helpers.signer });
-      const signature = helpers.signDeploy(salt, implementation, otherAdmin);
+      const signature = helpers.signDeploy(this.networkFile.proxyFactoryAddress, salt, implementation, otherAdmin);
       await create({ contractAlias, network, txParams, networkFile: this.networkFile, salt, signature, admin: otherAdmin });
       await assertProxy(this.networkFile, contractAlias, { version, say: 'V1', admin: otherAdmin, address: predictedAddress });
     });
