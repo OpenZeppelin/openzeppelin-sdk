@@ -1,7 +1,7 @@
 'use strict'
 require('../setup')
 
-import { Proxy } from "zos-lib";
+import { Proxy, ProxyAdmin } from "zos-lib";
 
 import push from '../../src/scripts/push';
 import createProxy from '../../src/scripts/create';
@@ -45,6 +45,12 @@ contract('set-admin script', function(accounts) {
       await assertAdmin(this.withLibraryImpl.address, this.networkFile.proxyAdminAddress, this.networkFile)
     });
 
+    it('changes owner of a proxy admin', async function() {
+      await setAdmin({ newAdmin, network, txParams, networkFile: this.networkFile });
+      const newOwner = await ProxyAdmin.fetch(this.networkFile.proxyAdmin.address).getOwner();
+      newOwner.should.be.eq(newAdmin);
+    });
+
     it('changes admin of several proxies given name', async function() {
       await setAdmin({ contractAlias: 'Impl', newAdmin, network, txParams, networkFile: this.networkFile });
       
@@ -60,10 +66,6 @@ contract('set-admin script', function(accounts) {
       await assertAdmin(this.impl2.address, anotherNewAdmin, this.networkFile)
       await assertAdmin(this.withLibraryImpl.address, this.networkFile.proxyAdminAddress, this.networkFile)
     });
-
-    it('refuses to update all proxies', async function () {
-      await setAdmin({ newAdmin, network, txParams, networkFile: this.networkFile }).should.be.rejectedWith(/address or name of the contract/);
-    })
 
     it('refuses to update all proxies given package name', async function () {
       await setAdmin({ packageName: "Herbs", newAdmin, network, txParams, networkFile: this.networkFile }).should.be.rejectedWith(/address or name of the contract/);

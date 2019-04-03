@@ -49,6 +49,16 @@ export default class ProxyAdmin {
     return contract.at(proxyAddress);
   }
 
+  public async transferOwnership(newAdminOwner: string): Promise<void> {
+    log.info(`Changing ownership for proxy admin to ${newAdminOwner}...`);
+    await Transactions.sendTransaction(this.contract.methods.transferOwnership, [newAdminOwner], { ...this.txParams });
+    log.info(`Owner for proxy admin set to ${newAdminOwner}`);
+  }
+
+  public async getOwner(): Promise<string> {
+    return await this.contract.methods.owner().call({ ...this.txParams });
+  }
+
   private async _upgradeProxy(proxyAddress: string, implementation: string): Promise<any> {
     log.info(`Upgrading proxy at ${proxyAddress} without running migrations...`);
     return Transactions.sendTransaction(this.contract.methods.upgrade, [proxyAddress, implementation], { ...this.txParams });
@@ -59,4 +69,5 @@ export default class ProxyAdmin {
     log.info(`Upgrading proxy at ${proxyAddress} and calling ${callDescription(initMethod, initArgs)}...`);
     return Transactions.sendTransaction(this.contract.methods.upgradeAndCall, [proxyAddress, implementationAddress, callData], { ...this.txParams });
   }
+
 }

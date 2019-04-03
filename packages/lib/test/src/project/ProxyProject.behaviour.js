@@ -100,9 +100,10 @@ export default function shouldManageProxies({ otherAdmin, setImplementations, su
 
       it('changes admin of a proxy', async function () {
         await this.project.changeProxyAdmin(this.instance.address, otherAdmin);
-        await assertIsProxy(this.instance, otherAdmin)
+        await assertIsProxy(this.instance, otherAdmin);
       })
     });
+
   });
 
   async function assertIsProxy(address, adminAddress) {

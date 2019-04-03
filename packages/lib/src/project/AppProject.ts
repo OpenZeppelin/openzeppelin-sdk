@@ -130,6 +130,10 @@ export default class AppProject extends BasePackageProject {
     return new Promise((resolve) => resolve(this.proxyAdmin.address));
   }
 
+  public async transferAdminOwnership(newAdminOwner: string): Promise<void> {
+    await this.proxyAdmin.transferOwnership(newAdminOwner);
+  }
+
   public getApp(): App {
     return this.app;
   }

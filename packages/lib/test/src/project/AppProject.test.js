@@ -8,6 +8,7 @@ import SimpleProject from '../../../src/project/SimpleProject';
 import shouldManageProxies from './ProxyProject.behaviour';
 import shouldManageDependencies from './DependenciesProject.behaviour';
 import shouldBehaveLikePackageProject from './PackageProject.behavior';
+import shouldManageAdminProxy from './AdminProxy.behaviour';
 import assertRevert from '../../../src/test/helpers/assertRevert'
 import { toAddress } from '../../../src/utils/Addresses';
 import { Package } from '../../../src';
@@ -16,6 +17,11 @@ import ProxyFactory from '../../../src/proxy/ProxyFactory';
 
 const ImplV1 = Contracts.getFromLocal('DummyImplementation');
 const ImplV2 = Contracts.getFromLocal('DummyImplementationV2');
+
+async function setImplementations() {
+  await this.project.setImplementation(ImplV1, "DummyImplementation");
+  await this.project.setImplementation(ImplV2, "DummyImplementationV2");
+}
 
 contract('AppProject', function (accounts) {
   accounts = accounts.map(utils.toChecksumAddress);
@@ -88,13 +94,14 @@ contract('AppProject', function (accounts) {
     shouldManageProxies({
       supportsNames: true,
       otherAdmin: another,
-      setImplementations: async function () {
-        await this.project.setImplementation(ImplV1, "DummyImplementation")
-        await this.project.setImplementation(ImplV2, "DummyImplementationV2")
-      }
+      setImplementations,
     })
 
     shouldManageDependencies();
+    shouldManageAdminProxy({
+      otherAdmin: another,
+      setImplementations,
+    });
   });
 
   describe('fromSimpleProject', function () {
