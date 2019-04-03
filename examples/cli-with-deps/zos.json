@@ -6,7 +6,7 @@
     "TokenExchange": "TokenExchange"
   },
   "dependencies": {
-    "dep-basic": "^0.1.0",
+    "example-dep-basic": "^0.1.0",
     "openzeppelin-zos": "^1.9.1"
   }
 }

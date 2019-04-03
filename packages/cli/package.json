@@ -77,7 +77,7 @@
     "truffle-config": "1.1.2",
     "web3": "1.0.0-beta.37",
     "web3-provider-engine": "14.0.6",
-    "zos-lib": "^2.3.0-alpha.0"
+    "zos-lib": "2.3.0-alpha.0"
   },
   "devDependencies": {
     "@types/lodash": "^4.14.119",

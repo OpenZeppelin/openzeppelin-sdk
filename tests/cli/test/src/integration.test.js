@@ -8,7 +8,8 @@ const {
   getNetwork,
   truffleExec,
   run,
-  copy
+  copy,
+  setMockStdlibVersion
 } = require('./share');
 
 const { 
@@ -65,8 +66,7 @@ function runIntegrationTest({ lightweight }) {
   })
 
   it('installs new version of a dependency', function () {
-    copy('package.json.v2', 'package.json')
-    run('npx lerna bootstrap --no-ci > /dev/null')
+    setMockStdlibVersion('1.2.0')
     run('npx zos link mock-stdlib@1.2.0 --no-install')
   })
 
@@ -80,10 +80,10 @@ function runIntegrationTest({ lightweight }) {
   })
 };
 
-describe(`cli-app on ${network}`, function () {
+describe(`cli integration on ${network}`, function () {
   runIntegrationTest({ lightweight: false })
 })
 
-describe(`cli-app lightweight on ${network}`, function () {
+describe(`cli integration lightweight on ${network}`, function () {
   runIntegrationTest({ lightweight: true })
 })

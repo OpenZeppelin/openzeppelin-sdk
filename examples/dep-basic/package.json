@@ -1,13 +1,15 @@
 {
-  "name": "dep-basic",
+  "name": "example-dep-basic",
   "private": true,
   "version": "2.3.0-alpha.0",
   "description": "Sample basic dependency library for ZeppelinOS",
   "author": "santiago@zeppelin.solutions",
   "license": "MIT",
+  "dependencies": {
+    "zos-lib": "2.3.0-alpha.0"
+  },
   "devDependencies": {
     "truffle": "^4.1.14",
-    "zos": "^2.3.0-alpha.0",
-    "zos-lib": "^2.3.0-alpha.0"
+    "zos": "2.3.0-alpha.0"
   }
 }

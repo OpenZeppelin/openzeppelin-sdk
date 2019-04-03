@@ -29,7 +29,7 @@ else
   start_ganache
 fi
 
-if [ "$CONTINUOUS_INTEGRATION" = true ]; then
+if [ "$CI" = true ]; then
   node_modules/.bin/truffle version
   node_modules/.bin/truffle compile
 fi

@@ -1,6 +1,6 @@
 {
   "zosversion": "2",
-  "name": "dep-basic",
+  "name": "example-dep-basic",
   "version": "0.1.0",
   "contracts": {
     "EthBox": "EthBox"
