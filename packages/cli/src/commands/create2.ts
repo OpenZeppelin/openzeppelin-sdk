@@ -9,7 +9,7 @@ import ConfigVariablesInitializer from '../models/initializer/ConfigVariablesIni
 
 const name: string = 'create2';
 const signature: string = `${name} [alias]`;
-const description: string = 'deploys a new upgradeable contract instance using CREATE2 at a predetermined address given a numeric <salt> and a <from> address. Provide the <alias> you added your contract with, or <package>/<alias> to create a contract from a linked package. Warning: support for this feature is experimental.';
+const description: string = 'deploys a new upgradeable contract instance using CREATE2 at a predetermined address given a numeric <salt> and a <from> address. Provide the <alias> you added your contract with, or <package>/<alias> to create a contract from a linked package. A <signature> can be provided to derive the deployment address from a signer different to the <from> address. Warning: support for this feature is experimental.';
 
 const register: (program: any) => any = (program) => program
   .command(signature, undefined, { noHelp: true })
@@ -19,6 +19,7 @@ const register: (program: any) => any = (program) => program
   .option('--query [sender]', `do not create the contract and just return the deployment address, optionally specifying the sender used to derive the deployment address (defaults to 'from')`)
   .option('--init [function]', `optional initialization function to call after creating contract (defaults to 'initialize')`)
   .option('--args <arg1, arg2, ...>', 'optional arguments to the initialization function')
+  .option('--admin <admin>', 'optional admin of the proxy (uses the project\'s proxy admin if not specified)')
   .option('--signature <signature>', `optional signature of the request, uses the signer instead of sender to derive the deployment address`)
   .option('--force', 'force creation even if contracts have local modifications')
   .withNetworkOptions()
@@ -41,10 +42,10 @@ async function runQuery(options: any, network: string, txParams: any) {
 }
 
 async function runCreate(options: any, contractFullName: string, network: string, txParams: any) {
-  const { force, salt, signature: requestSignature } = options;
+  const { force, salt, signature: requestSignature, admin } = options;
   const { initMethod, initArgs } = parseInit(options, 'initialize');
   const { contract: contractAlias, package: packageName } = fromContractFullName(contractFullName);
   if (!contractAlias) throw new Error('missing required argument: alias');
-  const args = pickBy({ packageName, contractAlias, initMethod, initArgs, force, salt, signature: requestSignature });
+  const args = pickBy({ packageName, contractAlias, initMethod, initArgs, force, salt, signature: requestSignature, admin });
   await create({ ...args, network, txParams });
 }

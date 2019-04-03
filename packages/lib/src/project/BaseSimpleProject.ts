@@ -96,22 +96,23 @@ export default abstract class BaseSimpleProject {
     delete this.dependencies[name];
   }
 
-  public async createProxy(contract, { packageName, contractName, initMethod, initArgs, redeployIfChanged }: ContractInterface = {}): Promise<Contract> {
+  public async createProxy(contract, { packageName, contractName, initMethod, initArgs, redeployIfChanged, admin }: ContractInterface = {}): Promise<Contract> {
     if (!isEmpty(initArgs) && !initMethod) initMethod = 'initialize';
     const implementationAddress = await this._getOrDeployImplementation(contract, packageName, contractName, redeployIfChanged);
     const initCallData = this._getAndLogInitCallData(contract, initMethod, initArgs, implementationAddress, 'Creating');
-    const proxy = await Proxy.deploy(implementationAddress, await this.getAdminAddress(), initCallData, this.txParams);
+    const proxyAdmin = admin || (await this.getAdminAddress());
+    const proxy = await Proxy.deploy(implementationAddress, proxyAdmin, initCallData, this.txParams);
     log.info(`Instance created at ${proxy.address}`);
     return contract.at(proxy.address);
   }
 
-  public async createProxyWithSalt(contract, salt: string, signature?: string, { packageName, contractName, initMethod, initArgs, redeployIfChanged }: ContractInterface = {}): Promise<Contract> {
+  public async createProxyWithSalt(contract, salt: string, signature?: string, { packageName, contractName, initMethod, initArgs, redeployIfChanged, admin }: ContractInterface = {}): Promise<Contract> {
     if (!isEmpty(initArgs) && !initMethod) initMethod = 'initialize';
     const implementationAddress = await this._getOrDeployImplementation(contract, packageName, contractName, redeployIfChanged);
     const initCallData = this._getAndLogInitCallData(contract, initMethod, initArgs, implementationAddress, 'Creating');
 
     const proxyFactory = await this.ensureProxyFactory();
-    const adminAddress = await this.getAdminAddress();
+    const adminAddress = admin || await this.getAdminAddress();
     const proxy = await proxyFactory.createProxy(salt, implementationAddress, adminAddress, initCallData, signature);
 
     log.info(`Instance created at ${proxy.address}`);

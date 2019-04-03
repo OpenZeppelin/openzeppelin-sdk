@@ -19,6 +19,7 @@ contract ProxyFactory {
     return _deployProxy(_salt, _logic, _admin, _data, msg.sender);
   }
 
+// TODO: Add address(this) to signature
   function deploySigned(uint256 _salt, address _logic, address _admin, bytes memory _data, bytes memory _signature) public returns (address) {
     address signer = getSigner(_salt, _logic, _admin, _data, _signature);
     require(signer != address(0), "Invalid signature");

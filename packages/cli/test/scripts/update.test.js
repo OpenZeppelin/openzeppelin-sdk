@@ -31,23 +31,23 @@ contract('update script', function(accounts) {
 
   const assertProxyInfo = async function(networkFile, contractAlias, proxyIndex, { version, implementation, address, value }) {
     const proxyInfo = networkFile.getProxies({ contract: contractAlias })[proxyIndex]
-    if (address) proxyInfo.address.should.eq(address);
+    if (address) proxyInfo.address.should.eq(address, 'Proxy address in network file does not match expected');
     else proxyInfo.address.should.be.nonzeroAddress;
 
     if (implementation) {
       const actualImplementation = await Proxy.at(proxyInfo.address).implementation()
-      actualImplementation.should.eq(implementation);
-      proxyInfo.implementation.should.eq(implementation);
+      actualImplementation.should.eq(implementation, 'Proxy implementation address does not match expected');
+      proxyInfo.implementation.should.eq(implementation, 'Implementation address in network file does not match expected');
     }
 
     if (version) {
-      proxyInfo.version.should.eq(version);
+      proxyInfo.version.should.eq(version, 'Proxy version in network file does not match expected');
     }
 
     if (value) {
       const proxy = ImplV1.at(proxyInfo.address);
       const actualValue = await proxy.methods.value().call();
-      actualValue.should.eq(`${value}`);
+      actualValue.should.eq(`${value}`, 'Called method does not return expected value');
     }
 
     return proxyInfo;

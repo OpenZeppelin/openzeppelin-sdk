@@ -32,6 +32,7 @@ interface Proxy extends Network, PackageArgs {
 export interface CreateParams extends Proxy {
   salt?: string;
   signature?: string;
+  admin?: string;
 }
 
 export interface CompareParams extends Network {}
