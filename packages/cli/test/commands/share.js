@@ -7,6 +7,7 @@ import * as check from '../../src/scripts/check';
 import * as compare from '../../src/scripts/compare';
 import * as create from '../../src/scripts/create';
 import * as queryDeployment from '../../src/scripts/query-deployment';
+import * as querySignedDeployment from '../../src/scripts/query-signed-deployment';
 import * as freeze from '../../src/scripts/freeze';
 import * as init from '../../src/scripts/init';
 import * as link from '../../src/scripts/link';
@@ -53,6 +54,7 @@ exports.stubCommands = function () {
     this.compare = sinon.stub(compare, 'default')
     this.create = sinon.stub(create, 'default')
     this.queryDeployment = sinon.stub(queryDeployment, 'default')
+    this.querySignedDeployment = sinon.stub(querySignedDeployment, 'default')
     this.freeze = sinon.stub(freeze, 'default')
     this.init = sinon.stub(init, 'default')
     this.link = sinon.stub(link, 'default')
@@ -85,6 +87,7 @@ exports.stubCommands = function () {
     this.compare.restore()
     this.create.restore()
     this.queryDeployment.restore()
+    this.querySignedDeployment.restore()
     this.freeze.restore()
     this.init.restore()
     this.link.restore()

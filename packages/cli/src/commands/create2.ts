@@ -2,6 +2,7 @@ import pickBy from 'lodash.pickby';
 
 import create from '../scripts/create';
 import queryDeployment from '../scripts/query-deployment';
+import querySignedDeployment from '../scripts/query-signed-deployment';
 import { parseInit } from '../utils/input';
 import { fromContractFullName } from '../utils/naming';
 import { hasToMigrateProject } from '../utils/prompt-migration';
@@ -28,9 +29,15 @@ const register: (program: any) => any = (program) => program
 async function action(contractFullName: string, options: any): Promise<void> {
   const { network, txParams } = await ConfigVariablesInitializer.initNetworkConfiguration(options);
   if (!await hasToMigrateProject(network)) process.exit(0);
+  if (!options.salt) throw new Error('option `--salt\' is required');
 
-  if (options.query) await runQuery(options, network, txParams);
-  else await runCreate(options, contractFullName, network, txParams);
+  const { initMethod, initArgs } = parseInit(options, 'initialize');
+  const { contract: contractAlias, package: packageName } = fromContractFullName(contractFullName);
+  const opts = { ... options, initMethod, initArgs, contractAlias, packageName };
+
+  if (options.query && options.signature) await runSignatureQuery(opts, network, txParams);
+  else if (options.query) await runQuery(opts, network, txParams);
+  else await runCreate(opts, network, txParams);
 
   if (!options.dontExitProcess && process.env.NODE_ENV !== 'test') process.exit(0);
 }
@@ -41,11 +48,17 @@ async function runQuery(options: any, network: string, txParams: any) {
   await queryDeployment({ salt: options.salt, sender: options.query, network, txParams });
 }
 
-async function runCreate(options: any, contractFullName: string, network: string, txParams: any) {
-  const { force, salt, signature: requestSignature, admin } = options;
-  const { initMethod, initArgs } = parseInit(options, 'initialize');
-  const { contract: contractAlias, package: packageName } = fromContractFullName(contractFullName);
+async function runSignatureQuery(options: any, network: string, txParams: any) {
+  const { sender, initMethod, initArgs, contractAlias, packageName, force, salt, signature: signatureOption, admin } = options;
   if (!contractAlias) throw new Error('missing required argument: alias');
-  const args = pickBy({ packageName, contractAlias, initMethod, initArgs, force, salt, signature: requestSignature, admin });
+  if (typeof sender === 'string') throw new Error('cannot specify argument `sender\' as it is inferred from `signature\'');
+  const args = pickBy({ packageName, contractAlias, initMethod, initArgs, force, salt, signature: signatureOption, admin });
+  await querySignedDeployment({ ... args, network, txParams });
+}
+
+async function runCreate(options: any, network: string, txParams: any) {
+  const { initMethod, initArgs, contractAlias, packageName, force, salt, signature: signatureOption, admin } = options;
+  if (!contractAlias) throw new Error('missing required argument: alias');
+  const args = pickBy({ packageName, contractAlias, initMethod, initArgs, force, salt, signature: signatureOption, admin });
   await create({ ...args, network, txParams });
 }

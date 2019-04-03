@@ -2,12 +2,13 @@ import stdout from '../utils/stdout';
 import NetworkController from '../models/network/NetworkController';
 import ScriptError from '../models/errors/ScriptError';
 import { QueryDeploymentParams } from './interfaces';
-import { Contract, encodeParams, Logger } from 'zos-lib';
+import { Logger } from 'zos-lib';
+import { validateSalt } from '../utils/input';
 
 const log: Logger = new Logger('QueryDeployment');
 
 export default async function queryDeployment({ salt, sender, network, txParams = {}, networkFile }: QueryDeploymentParams): Promise<string | never> {
-  validateSalt(salt);
+  validateSalt(salt, true);
   const controller = new NetworkController(network, txParams, networkFile);
 
   try {
@@ -21,16 +22,5 @@ export default async function queryDeployment({ salt, sender, network, txParams 
   } catch(error) {
     const cb = () => controller.writeNetworkPackageIfNeeded();
     throw new ScriptError(error, cb);
-  }
-}
-
-function validateSalt(salt) {
-  if (!salt) {
-    throw new Error('A non-empty salt is required to calculate the deployment address.');
-  }
-  try {
-    encodeParams(['uint256'], [salt]);
-  } catch(err) {
-    throw new Error(`Invalid salt ${salt}, must be an uint256 value.`);
   }
 }

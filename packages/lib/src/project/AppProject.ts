@@ -170,9 +170,8 @@ export default class AppProject extends BasePackageProject {
     return this.version;
   }
 
-  // TODO: Add another method that returns the address given the contract object instead of the package and name
-  public async getImplementation({ packageName, contractName }: { contractName: string, packageName?: string }): Promise<string> {
-    return this.app.getImplementation(packageName || this.name, contractName);
+  public async getImplementation({ packageName, contractName, contract }: { contractName?: string, packageName?: string, contract?: Contract }): Promise<string> {
+    return this.app.getImplementation(packageName || this.name, contractName || contract.schema.contractName);
   }
 
   public async createContract(contract: Contract, { packageName, contractName, initMethod, initArgs }: ContractInterface = {}): Promise<Contract> {
@@ -216,9 +215,20 @@ export default class AppProject extends BasePackageProject {
     return contract.at(proxy.address);
   }
 
+  // REFACTOR: De-duplicate from BaseSimpleProject
   public async getProxyDeploymentAddress(salt: string, sender?: string): Promise<string> {
     const proxyFactory = await this.ensureProxyFactory();
     return proxyFactory.getDeploymentAddress(salt, sender);
+  }
+
+  // REFACTOR: De-duplicate from BaseSimpleProject
+  public async getProxyDeploymentSigner(contract, salt: string, signature: string, { packageName, contractName, initMethod, initArgs, admin }: ContractInterface = {}): Promise<string> {
+    const proxyFactory = await this.ensureProxyFactory();
+    const implementationAddress = await this.getImplementation({ packageName, contractName, contract });
+    if (!implementationAddress) throw new Error(`Contract ${contractName || contract.schema.contractName} was not found or is not deployed in the current network.`);
+    const adminAddress = admin || await this.getAdminAddress();
+    const initData = initMethod ? buildCallData(contract, initMethod, initArgs).callData : null;
+    return proxyFactory.getSigner(salt, implementationAddress, adminAddress, initData, signature);
   }
 
   public async upgradeProxy(proxyAddress: string, contract: Contract, contractInterface: ContractInterface = {}): Promise<Contract> {

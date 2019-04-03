@@ -534,6 +534,19 @@ export default class NetworkController {
     return address;
   }
 
+  public async getProxySignedDeployment(salt: string, signature: string, packageName: string, contractAlias: string, initMethod?: string, initArgs?: string[], admin?: string): Promise<{ address: string, signer: string }> {
+    await this._migrateZosversionIfNeeded();
+    await this.fetchOrDeploy(this.currentVersion);
+    if (!packageName) packageName = this.packageFile.name;
+    const contract = this.localController.getContractClass(packageName, contractAlias);
+    const args = { packageName, contractName: contractAlias, initMethod, initArgs, admin };
+    const signer = await this.project.getProxyDeploymentSigner(contract, salt, signature, args);
+    const address = await this.project.getProxyDeploymentAddress(salt, signer);
+    this._tryRegisterProxyFactory();
+
+    return { address, signer };
+  }
+
   // Proxy model
   private async _checkDeploymentAddress(salt: string) {
     const deploymentAddress = await this.getProxyDeploymentAddress(salt);

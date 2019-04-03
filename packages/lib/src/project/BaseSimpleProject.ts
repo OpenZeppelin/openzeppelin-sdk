@@ -69,7 +69,9 @@ export default abstract class BaseSimpleProject {
   }
 
   // TS-TODO: review return type
-  public async getImplementation({ packageName, contractName }: { packageName?: string, contractName: string }): Promise<string | undefined> {
+  // TS-TODO: review parameter type (it's packageName?+(contractName|contract))
+  public async getImplementation({ packageName, contractName, contract }: { packageName?: string, contractName?: string, contract?: Contract }): Promise<string | undefined> {
+    contractName = contractName || contract.schema.contractName;
     return !packageName || packageName === this.name
       ? (this.implementations[contractName] && this.implementations[contractName].address)
       : this._getDependencyImplementation(packageName, contractName);
@@ -119,9 +121,20 @@ export default abstract class BaseSimpleProject {
     return contract.at(proxy.address);
   }
 
+  // REFACTOR: De-duplicate from AppProject
   public async getProxyDeploymentAddress(salt: string, sender?: string): Promise<string> {
     const proxyFactory = await this.ensureProxyFactory();
     return proxyFactory.getDeploymentAddress(salt, sender);
+  }
+
+  // REFACTOR: De-duplicate from AppProject and test
+  public async getProxyDeploymentSigner(contract, salt: string, signature: string, { packageName, contractName, initMethod, initArgs, admin }: ContractInterface = {}): Promise<string> {
+    const proxyFactory = await this.ensureProxyFactory();
+    const implementationAddress = await this.getImplementation({ packageName, contractName, contract });
+    if (!implementationAddress) throw new Error(`Contract ${contractName || contract.schema.contractName} was not found or is not deployed in the current network.`);
+    const adminAddress = admin || await this.getAdminAddress();
+    const initData = initMethod ? buildCallData(contract, initMethod, initArgs).callData : null;
+    return proxyFactory.getSigner(salt, implementationAddress, adminAddress, initData, signature);
   }
 
   public async ensureProxyFactory(): Promise<ProxyFactory> {
@@ -167,10 +180,10 @@ export default abstract class BaseSimpleProject {
   protected _getAndLogInitCallData(contract: Contract, initMethodName?: string, initArgs?: string[], implementationAddress?: string, actionLabel?: string): string | null {
     if (initMethodName) {
       const { method: initMethod, callData }: CalldataInfo = buildCallData(contract, initMethodName, initArgs);
-      log.info(`${actionLabel} proxy to logic contract ${implementationAddress} and initializing by calling ${callDescription(initMethod, initArgs)}`);
+      if (actionLabel) log.info(`${actionLabel} proxy to logic contract ${implementationAddress} and initializing by calling ${callDescription(initMethod, initArgs)}`);
       return callData;
     } else {
-      log.info(`${actionLabel} proxy to logic contract ${implementationAddress}`);
+      if (actionLabel) log.info(`${actionLabel} proxy to logic contract ${implementationAddress}`);
       return null;
     }
   }
