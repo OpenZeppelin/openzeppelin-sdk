@@ -11,7 +11,7 @@ import { ProxyAdminProject, AppProject } from 'zos-lib';
 export default async function(txParams: any = {}, networkFile?: ZosNetworkFile): Promise<ProxyAdminProject | AppProject> {
   const controller = new NetworkController('test', txParams, networkFile);
   await controller.deployDependencies();
-  await controller.push();
+  await controller.push(false, true);
 
   return controller.project;
 }
