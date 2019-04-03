@@ -167,6 +167,13 @@ contract('create script', function([_, owner]) {
       predictedAddress.should.equalIgnoreCase(proxyInfo.address, "Predicted address does not match actualy deployment address");
     });
 
+    it('should fail if an address is already in use when creating a proxy with a salt', async function () {
+      const salt = random(0, 2**32);
+      await create({ contractAlias, network, txParams, networkFile: this.networkFile, salt });
+      await create({ contractAlias, network, txParams, networkFile: this.networkFile, salt })
+        .should.be.rejectedWith(/Deployment address for salt \d+ is already in use/);
+    });
+
     describe('warnings', function () {
       beforeEach('capturing log output', function () {
         this.logs = new CaptureLogs();
