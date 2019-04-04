@@ -65,6 +65,8 @@ export interface PushParams extends Network {
   force?: boolean;
   reupload?: boolean;
   deployDependencies?: boolean;
+  deployProxyAdmin?: boolean;
+  deployProxyFactory?: boolean;
 }
 
 export interface VerifyParams extends Network {

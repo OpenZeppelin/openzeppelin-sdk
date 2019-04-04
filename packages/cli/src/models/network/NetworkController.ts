@@ -139,6 +139,20 @@ export default class NetworkController {
   }
 
   // DeployerController
+  public async deployProxyFactory(): Promise<void> {
+    await this.fetchOrDeploy(this.packageVersion);
+    await this.project.ensureProxyFactory();
+    await this._tryRegisterProxyFactory();
+  }
+
+  // DeployerController
+  public async deployProxyAdmin(): Promise<void> {
+    await this.fetchOrDeploy(this.packageVersion);
+    await this.project.ensureProxyAdmin();
+    await this._tryRegisterProxyAdmin();
+  }
+
+  // DeployerController
   private _checkVersion(): void {
     if (this._newVersionRequired()) {
       log.info(`Current version ${this.currentVersion}`);
@@ -562,9 +576,9 @@ export default class NetworkController {
   }
 
   // Proxy model
-  private async _tryRegisterProxyFactory(adminAddress?: string) {
+  private async _tryRegisterProxyFactory(factoryAddress?: string) {
     if (!this.networkFile.proxyFactoryAddress) {
-      const proxyFactoryAddress = adminAddress || (this.project.proxyFactory && this.project.proxyFactory.address);
+      const proxyFactoryAddress = factoryAddress || (this.project.proxyFactory && this.project.proxyFactory.address);
       if (proxyFactoryAddress) this.networkFile.proxyFactory = { address: proxyFactoryAddress };
     }
   }

@@ -11,7 +11,7 @@ describe('bump command', function() {
   })
 
   itShouldParse('should call push script when passing --push option', 'push', 'zos bump 0.2.0 --push test', function(push) {
-    push.should.have.been.calledWithExactly({  deployDependencies: true, force: undefined, reupload: undefined, network: 'test', txParams: {} })
+    push.should.have.been.calledWithExactly({ deployProxyAdmin: undefined, deployProxyFactory: undefined,  deployDependencies: true, force: undefined, reupload: undefined, network: 'test', txParams: {} })
   })
 
 })

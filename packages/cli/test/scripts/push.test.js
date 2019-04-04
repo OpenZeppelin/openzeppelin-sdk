@@ -2,7 +2,7 @@
 require('../setup')
 
 const zosLib = require('zos-lib');
-import { ZWeb3, Contracts, App, Package } from 'zos-lib'
+import { ZWeb3, Contracts, App, Package, ProxyAdmin, ProxyFactory } from 'zos-lib'
 
 import sinon from 'sinon'
 import push from '../../src/scripts/push';
@@ -360,38 +360,79 @@ contract('push script', function([_, owner]) {
     })
   };
 
+  const shouldPushHelperContracts = function () {
+    describe('on pushing helper contracts', function () {
+      beforeEach('pushing', async function () {
+        await push({ deployProxyAdmin: true, deployProxyFactory: true, network, txParams, networkFile: this.networkFile });
+      });
+
+      it('should deploy proxy admin', async function () {
+        const proxyAdminAddress = this.networkFile.proxyAdminAddress;
+        should.exist(proxyAdminAddress);
+        const adminOwner = await ProxyAdmin.fetch(proxyAdminAddress).getOwner();
+        adminOwner.should.eq(owner);
+      });
+
+      it('should deploy proxy factory', async function () {
+        const proxyFactoryAddress = this.networkFile.proxyFactoryAddress;
+        should.exist(proxyFactoryAddress);
+        const deploymentAddress = await ProxyFactory.fetch(proxyFactoryAddress).getDeploymentAddress("42");
+        deploymentAddress.should.be.nonzeroAddress;
+      });
+
+      it('should not redeploy helper contracts if present', async function () {
+        const proxyAdminAddress = this.networkFile.proxyAdminAddress;
+        const proxyFactoryAddress = this.networkFile.proxyFactoryAddress;
+        await push({ deployProxyAdmin: true, deployProxyFactory: true, network, txParams, networkFile: this.networkFile });
+        this.networkFile.proxyAdminAddress.should.eq(proxyAdminAddress);
+        this.networkFile.proxyFactoryAddress.should.eq(proxyFactoryAddress);
+      });
+    });
+  }
+
   describe('an empty app', function() {
-    beforeEach('pushing package-empty', async function () {
+    beforeEach('setting package-empty', async function () {
       const packageFile = new ZosPackageFile('test/mocks/packages/package-empty.zos.json')
       this.networkFile = packageFile.networkFile(network)
-
-      await push({ network, txParams, networkFile: this.networkFile })
     });
 
-    shouldDeployApp();
-    shouldDeployProvider();
+    describe('on push', function () {
+      beforeEach('pushing', async function () {
+        await push({ network, txParams, networkFile: this.networkFile });
+      });
+      
+      shouldDeployApp();
+      shouldDeployProvider();
+    });
+    
+    shouldPushHelperContracts();
   });
 
   describe('an app with contracts', function() {
-    beforeEach('pushing package-with-contracts', async function () {
+    beforeEach('setting package-with-contracts', async function () {
       const packageFile = new ZosPackageFile('test/mocks/packages/package-with-contracts.zos.json')
-      this.networkFile = packageFile.networkFile(network)
-
-      await push({ network, txParams, networkFile: this.networkFile })
-
-      const newPackageFile = new ZosPackageFile('test/mocks/packages/package-with-contracts-v2.zos.json')
-      this.newNetworkFile = newPackageFile.networkFile(network)
+      this.networkFile = packageFile.networkFile(network);
     });
 
-    shouldDeployApp();
-    shouldDeployProvider();
-    shouldDeployContracts();
-    shouldRegisterContractsInDirectory();
-    shouldRedeployContracts();
-    shouldValidateContracts();
-    shouldBumpVersion();
-    shouldNotPushWhileFrozen();
-    shouldDeleteContracts({ unregisterFromDirectory: true });
+    describe('on push', function () {
+      beforeEach('pushing', async function () {
+        await push({ network, txParams, networkFile: this.networkFile })
+        const newPackageFile = new ZosPackageFile('test/mocks/packages/package-with-contracts-v2.zos.json')
+        this.newNetworkFile = newPackageFile.networkFile(network)
+      });
+
+      shouldDeployApp();
+      shouldDeployProvider();
+      shouldDeployContracts();
+      shouldRegisterContractsInDirectory();
+      shouldRedeployContracts();
+      shouldValidateContracts();
+      shouldBumpVersion();
+      shouldNotPushWhileFrozen();
+      shouldDeleteContracts({ unregisterFromDirectory: true });
+    });
+
+    shouldPushHelperContracts();
   });
 
   describe('an app with invalid contracts', function() {
@@ -491,29 +532,37 @@ contract('push script', function([_, owner]) {
     it('should run push', async function () {
       await push({ network, txParams, networkFile: this.networkFile })
     });
+
+    shouldPushHelperContracts();
   });
 
   describe('an unpublished project with contracts', function() {
-    beforeEach('pushing package-with-contracts', async function () {
+    beforeEach('setting package-with-contracts', async function () {
       const packageFile = new ZosPackageFile('test/mocks/packages/package-with-contracts.zos.json')
       packageFile.publish = false
       this.networkFile = packageFile.networkFile(network)
-
-      await push({ network, txParams, networkFile: this.networkFile })
     });
 
-    shouldDeployContracts();
-    shouldValidateContracts();
-    shouldRedeployContracts();
-    shouldDeleteContracts({ unregisterFromDirectory: false });
+    describe('on push', function () {
+      beforeEach('pushing', async function () {
+        await push({ network, txParams, networkFile: this.networkFile });
+      });
 
-    it('should not reupload contracts after version bump', async function () {
-      const previousAddress = this.networkFile.contract('Impl').address
-      await bumpVersion({ version: '1.2.0', packageFile: this.networkFile.packageFile });
-      await push({ networkFile: this.networkFile, network, txParams });
-      this.networkFile.version.should.eq('1.2.0')
-      this.networkFile.contract('Impl').address.should.eq(previousAddress)
-    })
+      shouldDeployContracts();
+      shouldValidateContracts();
+      shouldRedeployContracts();
+      shouldDeleteContracts({ unregisterFromDirectory: false });
+
+      it('should not reupload contracts after version bump', async function () {
+        const previousAddress = this.networkFile.contract('Impl').address
+        await bumpVersion({ version: '1.2.0', packageFile: this.networkFile.packageFile });
+        await push({ networkFile: this.networkFile, network, txParams });
+        this.networkFile.version.should.eq('1.2.0')
+        this.networkFile.contract('Impl').address.should.eq(previousAddress)
+      })
+    });
+
+    shouldPushHelperContracts();
   });
 
   describe('an unpublished project with dependencies', function() {
