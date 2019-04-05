@@ -18,7 +18,7 @@ ganache_running() {
 }
 
 start_ganache() {
-  node_modules/.bin/ganache-cli --networkId 4447 -p $ganache_port -d > /dev/null &
+  node_modules/.bin/ganache-cli --networkId 4447 -p $ganache_port > /dev/null &
   ganache_pid=$!
 }
 
@@ -30,9 +30,9 @@ else
   start_ganache
 fi
 
-# if [ "$CI" = true ]; then
+if [ "$CI" = true ]; then
   node_modules/.bin/truffle version
   node_modules/.bin/truffle compile
-# fi
+fi
 
 node_modules/.bin/truffle exec index.js --network local

@@ -4,7 +4,7 @@
   "description": "Example project for using create2",
   "main": "index.js",
   "scripts": {
-    "test": "truffle compile && truffle test"
+    "test": "scripts/test.sh"
   },
   "author": "santiago@zeppelin.solutions",
   "license": "MIT",
