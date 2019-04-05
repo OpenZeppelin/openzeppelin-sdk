@@ -564,7 +564,7 @@ export default class NetworkController {
   // Proxy model
   private async _checkDeploymentAddress(salt: string) {
     const deploymentAddress = await this.getProxyDeploymentAddress(salt);
-    if (await ZWeb3.getCode(deploymentAddress) != '0x') throw new Error(`Deployment address for salt ${salt} is already in use`);
+    if (await ZWeb3.getCode(deploymentAddress) !== '0x') throw new Error(`Deployment address for salt ${salt} is already in use`);
   }
 
   // Proxy model
