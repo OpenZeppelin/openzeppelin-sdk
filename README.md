@@ -1,7 +1,7 @@
 # ZeppelinOS _(zos)_
 
 [![standard-readme compliant](https://img.shields.io/badge/readme%20style-standard-brightgreen.svg)](https://github.com/RichardLitt/standard-readme)
-[![CircleCI](https://circleci.com/gh/zeppelinos/zos/tree/master.svg?style=svg)](https://circleci.com/gh/zeppelinos/zos/tree/master)
+[![CircleCI](https://circleci.com/gh/zeppelinos/zos/tree/master.svg?style=shield)](https://circleci.com/gh/zeppelinos/zos/tree/master)
 [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lernajs.io/)
 
 > ZeppelinOS smart contract platform.
