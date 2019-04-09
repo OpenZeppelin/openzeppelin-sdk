@@ -598,6 +598,13 @@ export default class NetworkController {
   }
 
   // Proxy model
+  public async setProxyAdminOwner(newAdminOwner: string): Promise<void> {
+    await this._migrateZosversionIfNeeded();
+    await this.fetchOrDeploy(this.currentVersion);
+    await this.project.transferAdminOwnership(newAdminOwner);
+  }
+
+  // Proxy model
   private async _changeProxiesAdmin(proxies: ProxyInterface[], newAdmin: string, project: Project = null): Promise<void> {
     if (!project) project = this.project;
     await allPromisesOrError(map(proxies, async (aProxy) => {

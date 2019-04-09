@@ -7,11 +7,17 @@ import ProxyAdminProject from '../../../src/project/ProxyAdminProject';
 import shouldManageProxies from './ProxyProject.behaviour';
 import shouldManageDependencies from './DependenciesProject.behaviour';
 import shouldManageImplementations from './Implementations.behaviour';
+import shouldManageAdminProxy from './AdminProxy.behaviour';
 import Contracts from '../../../src/artifacts/Contracts';
 import { noop } from 'lodash';
 
 const ImplV1 = Contracts.getFromLocal('DummyImplementation');
 const ImplV2 = Contracts.getFromLocal('DummyImplementationV2');
+
+async function setImplementations() {
+  await this.project.setImplementation(ImplV1, "DummyImplementation");
+  await this.project.setImplementation(ImplV2, "DummyImplementationV2");
+}
 
 contract('ProxyAdminProject', function(accounts) {
   const [_, proxyAdminOwner, another] = accounts.map(utils.toChecksumAddress);
@@ -46,10 +52,7 @@ contract('ProxyAdminProject', function(accounts) {
     shouldManageProxies({
       supportsNames: true,
       otherAdmin: another,
-      setImplementations: async function () {
-        await this.project.setImplementation(ImplV1, "DummyImplementation")
-        await this.project.setImplementation(ImplV2, "DummyImplementationV2")
-      }
+      setImplementations,
     })
 
     it('unsets an implementation', async function () {
@@ -61,4 +64,8 @@ contract('ProxyAdminProject', function(accounts) {
 
   shouldManageDependencies();
   shouldManageImplementations();
+  shouldManageAdminProxy({
+    otherAdmin: another,
+    setImplementations,
+  });
 });

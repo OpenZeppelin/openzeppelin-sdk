@@ -12,7 +12,7 @@ const ImplV2 = Contracts.getFromLocal('DummyImplementationV2');
 const ProxyAdminContract = Contracts.getFromLocal('ProxyAdmin');
 
 contract('ProxyAdmin class', function(accounts) {
-  const [_, proxyAdminOwner, newAdmin, otherAccount] = accounts.map(utils.toChecksumAddress);
+  const [_, proxyAdminOwner, newAdmin, newAdminOwner, otherAccount] = accounts.map(utils.toChecksumAddress);
   const version = '0.0.1';
   const contentURI = '0x10';
 
@@ -79,6 +79,14 @@ contract('ProxyAdmin class', function(accounts) {
           const implementationAddress = await this.proxyAdmin.getProxyImplementation(this.proxy.address);
           implementationAddress.should.be.equal(this.implementationV2.address)
         });
+      });
+    });
+
+    describe('#transferOwnership', function() {
+      it('transfers ownership to a new address', async function() {
+        await this.proxyAdmin.transferOwnership(newAdminOwner);
+        const owner = await this.proxyAdmin.getOwner();
+        owner.should.be.equal(newAdminOwner);
       });
     });
   });
