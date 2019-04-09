@@ -68,14 +68,15 @@ give rewards for reported issues, according to impact and severity.
 
 ## Maintainers
 
-* [@facuspagnuolo](https://github.com/facuspagnuolo/)
 * [@spalladino](https://github.com/spalladino)
+* [@jcarpanelli](https://github.com/jcarpanelli)
+* [@ylv-io](https://github.com/ylv-io)
 
 ## Contribute
 
-To contribute, join our
-[community channel on Telegram](https://t.me/zeppelinos) where you can talk to
-all the ZeppelinOS developers, contributors, partners and users.
+To contribute, join our [forum](https://forum.zeppelin.solutions) or
+[community channel on Telegram](https://t.me/zeppelinos), where you can talk to
+all the ZeppelinOS developers, contributors, partners, and users.
 
 You can also follow the recent developments of the project in our
 [blog](https://blog.zeppelin.solutions/) and

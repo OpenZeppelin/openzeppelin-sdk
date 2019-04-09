@@ -165,6 +165,17 @@ jobs:
           dir: "~/zos/examples/creating-instances-from-solidity"
           install-cmd: '~/zos/node_modules/.bin/lerna bootstrap --scope=example-creating-instances-from-solidity --scope="zos*"'
 
+  example-cli-create2:
+    <<: *defaults
+    steps:
+      - checkout
+      - restore_cache: *restore-cache-root
+      - restore_cache: *restore-cache-lib
+      - restore_cache: *restore-cache-cli
+      - npm-install-and-test:
+          dir: "~/zos/examples/cli-create2"
+          install-cmd: '~/zos/node_modules/.bin/lerna bootstrap --scope=example-cli-create2 --scope="zos*"'
+
   integration-cli-geth: &integration
     environment: { NETWORK: "geth-dev" }
     working_directory: ~/zos
@@ -205,6 +216,8 @@ workflows:
       - example-lib-complex:
           requires: [test-lib]
       - example-create-instances-from-solidity:
+          requires: [test-lib, test-cli]
+      - example-cli-create2:
           requires: [test-lib, test-cli]
       - integration-cli-geth:
           requires: [test-lib, test-cli]

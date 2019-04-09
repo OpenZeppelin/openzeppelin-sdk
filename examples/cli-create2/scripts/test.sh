@@ -4,7 +4,7 @@ set -o errexit
 # Executes cleanup function at script exit.
 trap cleanup EXIT
 
-ganache_port=9555
+ganache_port=9545
 
 cleanup() {
   # Kill the ganache instance that we started (if we started one and if it's still running).
@@ -18,10 +18,11 @@ ganache_running() {
 }
 
 start_ganache() {
-  node_modules/.bin/ganache-cli --networkId 4447 -p $ganache_port -d > /dev/null &
+  node_modules/.bin/ganache-cli --networkId 4447 -p $ganache_port > /dev/null &
   ganache_pid=$!
 }
 
+# Run ganache
 if ganache_running; then
   echo "Using existing ganache instance"
 else
@@ -34,4 +35,4 @@ if [ "$CI" = true ]; then
   node_modules/.bin/truffle compile
 fi
 
-TS_NODE_PROJECT="tsconfig.test.json" node_modules/.bin/truffle test --network testing "$@"
+node_modules/.bin/truffle exec index.js --network local

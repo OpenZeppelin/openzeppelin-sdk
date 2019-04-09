@@ -9,6 +9,8 @@ import link from './link';
 import publish from './publish';
 import pull from './pull';
 import push from './push';
+import queryDeployment from './query-deployment';
+import querySignedDeployment from './query-signed-deployment';
 import remove from './remove';
 import session from './session';
 import setAdmin from './set-admin';
@@ -29,6 +31,8 @@ export default {
   publish,
   pull,
   push,
+  queryDeployment,
+  querySignedDeployment,
   remove,
   session,
   setAdmin,

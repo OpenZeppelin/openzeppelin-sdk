@@ -32,11 +32,13 @@ const register: (program: any) => any = (program) => program
   .option('-d, --deploy-dependencies', 'deploys dependencies to the network if there is no existing deployment')
   .option('--reset', 'redeploys all contracts (not only the ones that changed)')
   .option('-f, --force', 'ignores validation errors and deploys contracts')
+  .option('--deploy-proxy-admin', 'eagerly deploys the project\'s proxy admin (if not deployed yet on the provided network)')
+  .option('--deploy-proxy-factory', 'eagerly deploys the project\'s proxy factory (if not deployed yet on the provided network)')
   .withNetworkOptions()
   .action(action);
 
 async function action(options: any): Promise<void> {
-  const { force, deployDependencies, reset: reupload, network: networkInArgs } = options;
+  const { force, deployDependencies, reset: reupload, network: networkInArgs, deployProxyAdmin, deployProxyFactory } = options;
   const { network: networkInSession } = Session.getOptions();
   const defaultArgs = { network: Session.getDefaultNetwork() };
   const defaultOpts = { network: networkInSession || networkInArgs };
@@ -48,7 +50,7 @@ async function action(options: any): Promise<void> {
   const { network, txParams } = await ConfigVariablesInitializer.initNetworkConfiguration(promptedOpts);
   const promptDeployDependencies = await promptForDeployDependencies(deployDependencies, network);
 
-  await push({ force, reupload, network, txParams, ...promptDeployDependencies });
+  await push({ deployProxyAdmin, deployProxyFactory, force, reupload, network, txParams, ...promptDeployDependencies });
   if (!options.dontExitProcess && process.env.NODE_ENV !== 'test') process.exit(0);
 }
 

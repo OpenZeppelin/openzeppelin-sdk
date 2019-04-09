@@ -1,6 +1,7 @@
 pragma solidity ^0.5.3;
 
 import "./InitializableAdminUpgradeabilityProxy.sol";
+import "../cryptography/ECDSA.sol";
 
 contract ProxyFactory {
   
@@ -15,10 +16,13 @@ contract ProxyFactory {
   }
 
   function deploy(uint256 _salt, address _logic, address _admin, bytes memory _data) public returns (address) {
-    InitializableAdminUpgradeabilityProxy proxy = _createProxy(_salt, msg.sender);    
-    emit ProxyCreated(address(proxy));
-    proxy.initialize(_logic, _admin, _data);
-    return address(proxy);
+    return _deployProxy(_salt, _logic, _admin, _data, msg.sender);
+  }
+
+  function deploySigned(uint256 _salt, address _logic, address _admin, bytes memory _data, bytes memory _signature) public returns (address) {
+    address signer = getSigner(_salt, _logic, _admin, _data, _signature);
+    require(signer != address(0), "Invalid signature");
+    return _deployProxy(_salt, _logic, _admin, _data, signer);
   }
 
   function getDeploymentAddress(uint256 _salt, address _sender) public view returns (address) {
@@ -34,6 +38,25 @@ contract ProxyFactory {
     );
 
     return address(bytes20(rawAddress << 96));
+  }
+
+  function getSigner(uint256 _salt, address _logic, address _admin, bytes memory _data, bytes memory _signature) public view returns (address) {
+    bytes32 msgHash = ZOSLibECDSA.toEthSignedMessageHash(
+      keccak256(
+        abi.encodePacked(
+          _salt, _logic, _admin, _data, address(this)
+        )
+      )
+    );
+
+    return ZOSLibECDSA.recover(msgHash, _signature);
+  }
+
+  function _deployProxy(uint256 _salt, address _logic, address _admin, bytes memory _data, address _sender) internal returns (address) {
+    InitializableAdminUpgradeabilityProxy proxy = _createProxy(_salt, _sender);
+    emit ProxyCreated(address(proxy));
+    proxy.initialize(_logic, _admin, _data);
+    return address(proxy);
   }
 
   function _createProxy(uint256 _salt, address _sender) internal returns (InitializableAdminUpgradeabilityProxy) {

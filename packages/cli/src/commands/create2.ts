@@ -2,6 +2,7 @@ import pickBy from 'lodash.pickby';
 
 import create from '../scripts/create';
 import queryDeployment from '../scripts/query-deployment';
+import querySignedDeployment from '../scripts/query-signed-deployment';
 import { parseInit } from '../utils/input';
 import { fromContractFullName } from '../utils/naming';
 import { hasToMigrateProject } from '../utils/prompt-migration';
@@ -9,16 +10,18 @@ import ConfigVariablesInitializer from '../models/initializer/ConfigVariablesIni
 
 const name: string = 'create2';
 const signature: string = `${name} [alias]`;
-const description: string = 'deploys a new upgradeable contract instance using CREATE2 at a predetermined address given a numeric <salt> and a <from> address. Provide the <alias> you added your contract with, or <package>/<alias> to create a contract from a linked package. Warning: support for this feature is experimental.';
+const description: string = 'deploys a new upgradeable contract instance using CREATE2 at a predetermined address given a numeric <salt> and a <from> address. Provide the <alias> you added your contract with, or <package>/<alias> to create a contract from a linked package. A <signature> can be provided to derive the deployment address from a signer different to the <from> address. Warning: support for this feature is experimental.';
 
 const register: (program: any) => any = (program) => program
   .command(signature, undefined, { noHelp: true })
   .usage('[alias] --network <network> --salt <salt> [options]')
   .description(description)
-  .option('--salt <salt>', `salt used to determine the deployment address`)
-  .option('--query', `do not create the contract and just return the deployment address`)
-  .option('--init [function]', `call function after creating contract. If none is given, 'initialize' will be used`)
-  .option('--args <arg1, arg2, ...>', 'provide initialization arguments for your contract if required')
+  .option('--salt <salt>', `salt used to determine the deployment address (required)`)
+  .option('--query [sender]', `do not create the contract and just return the deployment address, optionally specifying the sender used to derive the deployment address (defaults to 'from')`)
+  .option('--init [function]', `initialization function to call after creating contract (defaults to 'initialize', skips initialization if not set)`)
+  .option('--args <arg1, arg2, ...>', 'arguments to the initialization function')
+  .option('--admin <admin>', 'admin of the proxy (uses the project\'s proxy admin if not set)')
+  .option('--signature <signature>', `signature of the request, uses the signer to derive the deployment address (uses the sender to derive deployment address if not set)`)
   .option('--force', 'force creation even if contracts have local modifications')
   .withNetworkOptions()
   .action(action);
@@ -26,9 +29,15 @@ const register: (program: any) => any = (program) => program
 async function action(contractFullName: string, options: any): Promise<void> {
   const { network, txParams } = await ConfigVariablesInitializer.initNetworkConfiguration(options);
   if (!await hasToMigrateProject(network)) process.exit(0);
+  if (!options.salt) throw new Error('option `--salt\' is required');
 
-  if (options.query) await runQuery(options, network, txParams);
-  else await runCreate(options, contractFullName, network, txParams);
+  const { initMethod, initArgs } = parseInit(options, 'initialize');
+  const { contract: contractAlias, package: packageName } = fromContractFullName(contractFullName);
+  const opts = { ...options, initMethod, initArgs, contractAlias, packageName };
+
+  if (options.query && options.signature) await runSignatureQuery(opts, network, txParams);
+  else if (options.query) await runQuery(opts, network, txParams);
+  else await runCreate(opts, network, txParams);
 
   if (!options.dontExitProcess && process.env.NODE_ENV !== 'test') process.exit(0);
 }
@@ -36,14 +45,21 @@ async function action(contractFullName: string, options: any): Promise<void> {
 export default { name, signature, description, register, action };
 
 async function runQuery(options: any, network: string, txParams: any) {
-  await queryDeployment({ salt: options.salt, network, txParams });
+  const sender = (typeof options.query === 'boolean') ? null : options.query;
+  await queryDeployment({ salt: options.salt, sender, network, txParams });
 }
 
-async function runCreate(options: any, contractFullName: string, network: string, txParams: any) {
-  const { force, salt } = options;
-  const { initMethod, initArgs } = parseInit(options, 'initialize');
-  const { contract: contractAlias, package: packageName } = fromContractFullName(contractFullName);
+async function runSignatureQuery(options: any, network: string, txParams: any) {
+  const { query, initMethod, initArgs, contractAlias, packageName, force, salt, signature: signatureOption, admin } = options;
   if (!contractAlias) throw new Error('missing required argument: alias');
-  const args = pickBy({ packageName, contractAlias, initMethod, initArgs, force, salt });
+  if (typeof query === 'string') throw new Error('cannot specify argument `sender\' as it is inferred from `signature\'');
+  const args = pickBy({ packageName, contractAlias, initMethod, initArgs, force, salt, signature: signatureOption, admin });
+  await querySignedDeployment({ ...args, network, txParams });
+}
+
+async function runCreate(options: any, network: string, txParams: any) {
+  const { initMethod, initArgs, contractAlias, packageName, force, salt, signature: signatureOption, admin } = options;
+  if (!contractAlias) throw new Error('missing required argument: alias');
+  const args = pickBy({ packageName, contractAlias, initMethod, initArgs, force, salt, signature: signatureOption, admin });
   await create({ ...args, network, txParams });
 }

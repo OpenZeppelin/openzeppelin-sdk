@@ -4,7 +4,7 @@ require('../setup')
 import random from 'lodash.random';
 
 import CaptureLogs from '../helpers/captureLogs';
-import { Contracts, Logger } from 'zos-lib';
+import { Contracts, Logger, helpers, Proxy } from 'zos-lib';
 
 import add from '../../src/scripts/add';
 import push from '../../src/scripts/push';
@@ -18,7 +18,7 @@ const should = require('chai').should();
 const ImplV1 = Contracts.getFromLocal('ImplV1');
 const BooleanContract = Contracts.getFromLocal('Boolean');
 
-contract('create script', function([_, owner]) {
+contract('create script', function([_, owner, otherAdmin]) {
   const contractName = 'ImplV1';
   const contractAlias = 'Impl';
   const anotherContractName = 'WithLibraryImplV1';
@@ -38,11 +38,15 @@ contract('create script', function([_, owner]) {
   const version = '0.4.0';
   const txParams = { from: owner };
 
-  const assertProxy = async function(networkFile, alias, { version, say, implementation, packageName, value, checkBool, boolValue }) {
+  const assertProxy = async function(networkFile, alias, { version, say, implementation, packageName, value, checkBool, boolValue, admin, address }) {
     const proxyInfo = networkFile.getProxies({ contract: alias })[0]
     proxyInfo.contract.should.eq(alias)
     proxyInfo.address.should.be.nonzeroAddress;
     proxyInfo.version.should.eq(version);
+
+    if (address) {
+      proxyInfo.address.should.equalIgnoreCase(address);
+    }
 
     if (say) {
       const proxy = await ImplV1.at(proxyInfo.address);
@@ -64,6 +68,14 @@ contract('create script', function([_, owner]) {
 
     if (implementation) {
       proxyInfo.implementation.should.eq(implementation);
+      const proxyImplementation = await Proxy.at(proxyInfo.address).implementation();
+      proxyImplementation.should.equalIgnoreCase(implementation);
+    }
+
+    if (admin) {
+      proxyInfo.admin.should.equalIgnoreCase(admin);
+      const proxyAdmin = await Proxy.at(proxyInfo.address).admin();
+      proxyAdmin.should.equalIgnoreCase(admin);
     }
 
     if (packageName) {
@@ -86,6 +98,13 @@ contract('create script', function([_, owner]) {
 
       const implementation = this.networkFile.contract(contractAlias).address;
       await assertProxy(this.networkFile, contractAlias, { version, say: 'V1', implementation });
+    });
+
+    it('should create a proxy with a different admin', async function() {
+      await create({ contractAlias, network, txParams, networkFile: this.networkFile, admin: otherAdmin });
+
+      const implementation = this.networkFile.contract(contractAlias).address;
+      await assertProxy(this.networkFile, contractAlias, { version, say: 'V1', implementation, admin: otherAdmin });
     });
 
     it('should create a proxy for one of its contracts with explicit package name', async function() {
@@ -156,6 +175,15 @@ contract('create script', function([_, owner]) {
       await assertProxy(this.networkFile, contractAlias, { version, say: 'V1' });
     });
 
+    it('should create a proxy at an address given a salt with a different admin', async function () {
+      const salt = random(0, 2**32);
+      await create({ contractAlias, network, txParams, networkFile: this.networkFile, salt, admin: otherAdmin });
+      
+      const factoryAddress = this.networkFile.proxyFactoryAddress;
+      should.exist(factoryAddress, "Proxy factory was not stored");
+      await assertProxy(this.networkFile, contractAlias, { version, say: 'V1', admin: otherAdmin });
+    });
+
     it('should create a proxy at an address that matches the predicted one', async function () {
       const salt = random(0, 2**32);
       const predictedAddress = await queryDeployment({ network, txParams, networkFile: this.networkFile, salt });
@@ -163,8 +191,34 @@ contract('create script', function([_, owner]) {
       should.exist(factoryAddress, "Proxy factory was not stored");
 
       await create({ contractAlias, network, txParams, networkFile: this.networkFile, salt });
-      const proxyInfo = this.networkFile.getProxies({ contract: contractAlias })[0]
-      predictedAddress.should.equalIgnoreCase(proxyInfo.address, "Predicted address does not match actualy deployment address");
+      await assertProxy(this.networkFile, contractAlias, { version, say: 'V1', address: predictedAddress });
+    });
+
+    it('should create a proxy at an address given a salt and signature', async function () {
+      // Get predicted address for a signer different than the owner
+      const salt = random(0, 2**32);
+      const predictedAddress = await queryDeployment({ network, txParams, networkFile: this.networkFile, salt, sender: helpers.signer });
+      
+      // Deploy a proxy to a random contract so we force a proxy admin to be deployed
+      await create({ contractAlias: anotherContractAlias, network, txParams, networkFile: this.networkFile });
+      
+      // Create the contract we want with both salt and signature
+      const implementation = this.networkFile.contract(contractAlias).address;
+      const admin = this.networkFile.proxyAdminAddress;
+      const signature = helpers.signDeploy(this.networkFile.proxyFactoryAddress, salt, implementation, admin, '');
+      await create({ contractAlias, network, txParams, networkFile: this.networkFile, salt, signature });
+      
+      // Check the deployment address
+      await assertProxy(this.networkFile, contractAlias, { version, say: 'V1', address: predictedAddress });
+    });
+
+    it('should create a proxy at an address given a salt and signature with a different admin', async function () {
+      const salt = random(0, 2**32);
+      const implementation = this.networkFile.contract(contractAlias).address;
+      const predictedAddress = await queryDeployment({ network, txParams, networkFile: this.networkFile, salt, sender: helpers.signer });
+      const signature = helpers.signDeploy(this.networkFile.proxyFactoryAddress, salt, implementation, otherAdmin);
+      await create({ contractAlias, network, txParams, networkFile: this.networkFile, salt, signature, admin: otherAdmin });
+      await assertProxy(this.networkFile, contractAlias, { version, say: 'V1', admin: otherAdmin, address: predictedAddress });
     });
 
     it('should fail if an address is already in use when creating a proxy with a salt', async function () {

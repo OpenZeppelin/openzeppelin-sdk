@@ -66,7 +66,9 @@ export default class ZWeb3 {
     return (await ZWeb3.accounts())[0];
   }
 
-  public static toChecksumAddress(address: string): string {
+  public static toChecksumAddress(address: string): string | null {
+    if (!address) return null;
+
     if (address.match(/[A-F]/)) {
       if (toChecksumAddress(address) !== address) {
         throw Error(`Given address \"${address}\" is not a valid Ethereum address or it has not been checksummed correctly.`);

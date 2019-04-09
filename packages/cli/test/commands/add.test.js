@@ -15,6 +15,6 @@ describe('add command', function() {
   })
 
   itShouldParse('should call push script when passing --push option', 'push', 'zos add --all --push test --skip-compile', function(push) {
-    push.should.have.been.calledWithExactly({  deployDependencies: true, force: undefined, reupload: undefined, network: 'test', txParams: {} })
+    push.should.have.been.calledWithExactly({ deployProxyAdmin: undefined, deployProxyFactory: undefined, deployDependencies: true, force: undefined, reupload: undefined, network: 'test', txParams: {} })
   })
 })

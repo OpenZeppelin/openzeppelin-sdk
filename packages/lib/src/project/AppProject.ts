@@ -27,6 +27,7 @@ export interface ContractInterface {
   initMethod?: string;
   initArgs?: string[];
   redeployIfChanged?: boolean;
+  admin?: string;
 }
 
 interface ExistingAddresses {
@@ -127,7 +128,7 @@ export default class AppProject extends BasePackageProject {
   }
 
   public getAdminAddress(): Promise<string> {
-    return new Promise((resolve) => resolve(this.proxyAdmin.address));
+    return new Promise((resolve) => resolve(this.proxyAdmin ? this.proxyAdmin.address : null));
   }
 
   public async transferAdminOwnership(newAdminOwner: string): Promise<void> {
@@ -169,12 +170,10 @@ export default class AppProject extends BasePackageProject {
     return this.version;
   }
 
-  // TODO: Testme
-  public async getImplementation({ packageName, contractName }: { contractName: string, packageName?: string }): Promise<string> {
-    return this.app.getImplementation(packageName || this.name, contractName);
+  public async getImplementation({ packageName, contractName, contract }: { contractName?: string, packageName?: string, contract?: Contract }): Promise<string> {
+    return this.app.getImplementation(packageName || this.name, contractName || contract.schema.contractName);
   }
 
-  // TODO: Testme
   public async createContract(contract: Contract, { packageName, contractName, initMethod, initArgs }: ContractInterface = {}): Promise<Contract> {
     if (!contractName) contractName = contract.schema.contractName;
     if (!packageName) packageName = this.name;
@@ -182,40 +181,54 @@ export default class AppProject extends BasePackageProject {
   }
 
   public async createProxy(contract: Contract, contractInterface: ContractInterface = {}): Promise<Contract> {
-    const { contractName, packageName, initMethod, initArgs } = this.getContractInterface(contract, contractInterface);
-    const proxyAdmin = await this.ensureProxyAdmin();
-    return this.app.createProxy(contract, packageName, contractName, proxyAdmin.address, initMethod, initArgs);
+    const { contractName, packageName, initMethod, initArgs, admin } = this.getContractInterface(contract, contractInterface);
+    const proxyAdmin = admin || (await this.ensureProxyAdmin()).address;
+    return this.app.createProxy(contract, packageName, contractName, proxyAdmin, initMethod, initArgs);
   }
 
-  protected getContractInterface(contract: Contract, { contractName, packageName, initMethod, initArgs }: ContractInterface = {}): ContractInterface {
+  protected getContractInterface(contract: Contract, opts: ContractInterface = {}): ContractInterface {
+    let { contractName, packageName, initMethod } = opts;
+
     if (!contractName) {
       contractName = contract.schema.contractName;
     }
     if (!packageName) {
       packageName = this.name;
     }
-    if (!isEmpty(initArgs) && !initMethod) {
+    if (!isEmpty(opts.initArgs) && !initMethod) {
       initMethod = 'initialize';
     }
-    return { contractName, packageName, initArgs, initMethod };
+
+    return { ...opts, contractName, packageName, initMethod };
   }
 
-  public async createProxyWithSalt(contract: Contract, salt: string, contractInterface: ContractInterface = {}): Promise<Contract> {
-    const { contractName, packageName, initMethod, initArgs } = this.getContractInterface(contract, contractInterface);
+  public async createProxyWithSalt(contract: Contract, salt: string, signature?: string, contractInterface: ContractInterface = {}): Promise<Contract> {
+    const { contractName, packageName, initMethod, initArgs, admin } = this.getContractInterface(contract, contractInterface);
     const implementationAddress = await this.app.getImplementation(packageName, contractName);
     const initCallData = this.getInitCallData(contract, initMethod, initArgs, implementationAddress, 'Creating');
 
     const proxyFactory = await this.ensureProxyFactory();
-    const proxyAdmin = await this.ensureProxyAdmin();
-    const proxy = await proxyFactory.createProxy(salt, implementationAddress, proxyAdmin.address, initCallData);
+    const proxyAdmin = admin || (await this.ensureProxyAdmin()).address;
+    const proxy = await proxyFactory.createProxy(salt, implementationAddress, proxyAdmin, initCallData, signature);
 
     log.info(`Instance created at ${proxy.address}`);
     return contract.at(proxy.address);
   }
 
-  public async getProxyDeploymentAddress(salt: string): Promise<string> {
+  // REFACTOR: De-duplicate from BaseSimpleProject
+  public async getProxyDeploymentAddress(salt: string, sender?: string): Promise<string> {
     const proxyFactory = await this.ensureProxyFactory();
-    return proxyFactory.getDeploymentAddress(salt);
+    return proxyFactory.getDeploymentAddress(salt, sender);
+  }
+
+  // REFACTOR: De-duplicate from BaseSimpleProject
+  public async getProxyDeploymentSigner(contract, salt: string, signature: string, { packageName, contractName, initMethod, initArgs, admin }: ContractInterface = {}): Promise<string> {
+    const proxyFactory = await this.ensureProxyFactory();
+    const implementationAddress = await this.getImplementation({ packageName, contractName, contract });
+    if (!implementationAddress) throw new Error(`Contract ${contractName || contract.schema.contractName} was not found or is not deployed in the current network.`);
+    const adminAddress = admin || await this.getAdminAddress();
+    const initData = initMethod ? buildCallData(contract, initMethod, initArgs).callData : null;
+    return proxyFactory.getSigner(salt, implementationAddress, adminAddress, initData, signature);
   }
 
   public async upgradeProxy(proxyAddress: string, contract: Contract, contractInterface: ContractInterface = {}): Promise<Contract> {

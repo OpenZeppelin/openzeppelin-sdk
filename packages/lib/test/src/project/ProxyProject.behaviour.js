@@ -4,6 +4,7 @@ require('../../setup')
 import Proxy from '../../../src/proxy/Proxy';
 import Contracts from '../../../src/artifacts/Contracts';
 import { toAddress } from '../../../src/utils/Addresses';
+import { signDeploy, signer } from '../../../src/test/helpers/signing';
 import random from 'lodash.random';
 
 const Impl = Contracts.getFromLocal('Impl');
@@ -20,6 +21,12 @@ export default function shouldManageProxies({ otherAdmin, setImplementations, su
         const instance = await this.project.createProxy(DummyImplementation);
         await assertIsVersion(instance, 'V1');
         await assertIsProxy(instance, this.adminAddress);
+      })
+
+      it('creates a proxy with different admin', async function () {
+        const instance = await this.project.createProxy(DummyImplementation, { admin: otherAdmin });
+        await assertIsVersion(instance, 'V1');
+        await assertIsProxy(instance, otherAdmin);
       })
 
       if (supportsNames) {
@@ -50,9 +57,28 @@ export default function shouldManageProxies({ otherAdmin, setImplementations, su
         instance.address.should.equalIgnoreCase(this.deploymentAddress);
       })
 
+      it('creates a proxy with different admin', async function () {
+        const instance = await this.project.createProxyWithSalt(DummyImplementation, this.salt, null, { admin: otherAdmin });
+        await assertIsVersion(instance, 'V1');
+        await assertIsProxy(instance, otherAdmin);
+        instance.address.should.equalIgnoreCase(this.deploymentAddress);
+      })
+
+      it('creates a proxy using signer instead of sender', async function () {
+        if (!this.implementationV1) return // If the implementation has not been pre-registered in this suite, bail
+        const implementation = this.implementationV1.address;
+        const factory = await this.project.ensureProxyFactory();
+        const signature = signDeploy(factory.address, this.salt, implementation, otherAdmin);
+        const deploymentAddress = await this.project.getProxyDeploymentAddress(this.salt, signer);
+        const instance = await this.project.createProxyWithSalt(DummyImplementation, this.salt, signature, { admin: otherAdmin });
+        await assertIsVersion(instance, 'V1');
+        await assertIsProxy(instance, otherAdmin);
+        instance.address.should.equalIgnoreCase(deploymentAddress);
+      })
+
       if (supportsNames) {
         it('creates a proxy given contract name', async function () {
-          const instance = await this.project.createProxyWithSalt(Impl, this.salt, { contractName: 'DummyImplementation' });
+          const instance = await this.project.createProxyWithSalt(Impl, this.salt, null, { contractName: 'DummyImplementation' });
           await assertIsVersion(instance, 'V1');
           await assertIsProxy(instance, this.adminAddress);
           instance.address.should.equalIgnoreCase(this.deploymentAddress);
@@ -60,7 +86,7 @@ export default function shouldManageProxies({ otherAdmin, setImplementations, su
       }
 
       it('creates and initializes a proxy', async function () {
-        const instance = await this.project.createProxyWithSalt(DummyImplementation, this.salt, { initArgs: [10, "foo", [20, 30]] });
+        const instance = await this.project.createProxyWithSalt(DummyImplementation, this.salt, null, { initArgs: [10, "foo", [20, 30]] });
         await assertIsVersion(instance, 'V1');
         await assertIsProxy(instance, this.adminAddress);
         (await instance.methods.value().call()).should.eq('10');
@@ -109,7 +135,7 @@ export default function shouldManageProxies({ otherAdmin, setImplementations, su
   async function assertIsProxy(address, adminAddress) {
     const proxy = Proxy.at(toAddress(address));
     (await proxy.implementation()).should.be.nonzeroAddress;
-    (await proxy.admin()).should.eq(adminAddress);
+    (await proxy.admin()).should.eq(adminAddress, 'Admin address does not match');
   }
   
   async function assertIsVersion(instance, expected) {

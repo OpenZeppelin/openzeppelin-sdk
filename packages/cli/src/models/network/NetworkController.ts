@@ -139,6 +139,20 @@ export default class NetworkController {
   }
 
   // DeployerController
+  public async deployProxyFactory(): Promise<void> {
+    await this.fetchOrDeploy(this.packageVersion);
+    await this.project.ensureProxyFactory();
+    await this._tryRegisterProxyFactory();
+  }
+
+  // DeployerController
+  public async deployProxyAdmin(): Promise<void> {
+    await this.fetchOrDeploy(this.packageVersion);
+    await this.project.ensureProxyAdmin();
+    await this._tryRegisterProxyAdmin();
+  }
+
+  // DeployerController
   private _checkVersion(): void {
     if (this._newVersionRequired()) {
       log.info(`Current version ${this.currentVersion}`);
@@ -447,7 +461,8 @@ export default class NetworkController {
   }
 
   private async _migrate(): Promise<void> {
-    const proxies = this._fetchOwnedProxies();
+    const owner = this.isPublished ? this.appAddress : this.txParams.from;
+    const proxies = this._fetchOwnedProxies(null, null, null, owner);
     if (proxies.length !== 0) {
       const proxyAdmin = this.proxyAdminAddress
         ? await ProxyAdmin.fetch(this.proxyAdminAddress, this.txParams)
@@ -496,20 +511,18 @@ export default class NetworkController {
   }
 
   // Proxy model
-  public async createProxy(packageName: string, contractAlias: string, initMethod: string, initArgs: string[], salt?: string): Promise<Contract> {
+  public async createProxy(packageName: string, contractAlias: string, initMethod: string, initArgs: string[], admin?: string, salt?: string, signature?: string): Promise<Contract> {
     await this._migrateZosversionIfNeeded();
     await this.fetchOrDeploy(this.currentVersion);
     if (!packageName) packageName = this.packageFile.name;
     const contract = this.localController.getContractClass(packageName, contractAlias);
     await this._setSolidityLibs(contract);
     this.checkInitialization(contract, initMethod, initArgs);
-
-    const createArgs = { packageName, contractName: contractAlias, initMethod, initArgs };
-
     if (salt) await this._checkDeploymentAddress(salt);
 
+    const createArgs = { packageName, contractName: contractAlias, initMethod, initArgs, admin };
     const proxyInstance = salt
-      ? await this.project.createProxyWithSalt(contract, salt, createArgs)
+      ? await this.project.createProxyWithSalt(contract, salt, signature, createArgs)
       : await this.project.createProxy(contract, createArgs);
 
     const implementationAddress = await Proxy.at(proxyInstance).implementation();
@@ -520,38 +533,52 @@ export default class NetworkController {
     this.networkFile.addProxy(packageName, contractAlias, {
       address: proxyInstance.address,
       version: semanticVersionToString(packageVersion),
-      implementation: implementationAddress
+      implementation: implementationAddress,
+      admin: admin || this.networkFile.proxyAdminAddress
     });
     return proxyInstance;
   }
 
-  public async getProxyDeploymentAddress(salt: string): Promise<string> {
+  public async getProxyDeploymentAddress(salt: string, sender?: string): Promise<string> {
     await this._migrateZosversionIfNeeded();
     await this.fetchOrDeploy(this.currentVersion);
-    const address = await this.project.getProxyDeploymentAddress(salt);
+    const address = await this.project.getProxyDeploymentAddress(salt, sender);
     this._tryRegisterProxyFactory();
 
     return address;
   }
 
+  public async getProxySignedDeployment(salt: string, signature: string, packageName: string, contractAlias: string, initMethod?: string, initArgs?: string[], admin?: string): Promise<{ address: string, signer: string }> {
+    await this._migrateZosversionIfNeeded();
+    await this.fetchOrDeploy(this.currentVersion);
+    if (!packageName) packageName = this.packageFile.name;
+    const contract = this.localController.getContractClass(packageName, contractAlias);
+    const args = { packageName, contractName: contractAlias, initMethod, initArgs, admin };
+    const signer = await this.project.getProxyDeploymentSigner(contract, salt, signature, args);
+    const address = await this.project.getProxyDeploymentAddress(salt, signer);
+    this._tryRegisterProxyFactory();
+
+    return { address, signer };
+  }
+
   // Proxy model
   private async _checkDeploymentAddress(salt: string) {
     const deploymentAddress = await this.getProxyDeploymentAddress(salt);
-    if (await ZWeb3.getCode(deploymentAddress) != '0x') throw new Error(`Deployment address for salt ${salt} is already in use`);
+    if (await ZWeb3.getCode(deploymentAddress) !== '0x') throw new Error(`Deployment address for salt ${salt} is already in use`);
   }
 
   // Proxy model
   private async _tryRegisterProxyAdmin(adminAddress?: string) {
     if (!this.networkFile.proxyAdminAddress) {
       const proxyAdminAddress = adminAddress || await this.project.getAdminAddress();
-      this.networkFile.proxyAdmin = { address: proxyAdminAddress };
+      if (proxyAdminAddress) this.networkFile.proxyAdmin = { address: proxyAdminAddress };
     }
   }
 
   // Proxy model
-  private async _tryRegisterProxyFactory(adminAddress?: string) {
+  private async _tryRegisterProxyFactory(factoryAddress?: string) {
     if (!this.networkFile.proxyFactoryAddress) {
-      const proxyFactoryAddress = adminAddress || (this.project.proxyFactory && this.project.proxyFactory.address);
+      const proxyFactoryAddress = factoryAddress || (this.project.proxyFactory && this.project.proxyFactory.address);
       if (proxyFactoryAddress) this.networkFile.proxyFactory = { address: proxyFactoryAddress };
     }
   }
@@ -676,7 +703,7 @@ export default class NetworkController {
   }
 
   // Proxy model
-  private _fetchOwnedProxies(packageName?: string, contractAlias?: string, proxyAddress?: string): ProxyInterface[] {
+  private _fetchOwnedProxies(packageName?: string, contractAlias?: string, proxyAddress?: string, ownerAddress?: string): ProxyInterface[] {
     let criteriaDescription = '';
     if (packageName || contractAlias) criteriaDescription += ` contract ${toContractFullName(packageName, contractAlias)}`;
     if (proxyAddress) criteriaDescription += ` address ${proxyAddress}`;
@@ -692,12 +719,11 @@ export default class NetworkController {
       return [];
     }
 
-    // TODO: If 'from' is not explicitly set, then we need to retrieve it from the set of current accounts
-    const expectedOwner = this.isPublished ? this.appAddress : this.txParams.from;
-    const ownedProxies = proxies.filter((proxy) => !proxy.admin || !expectedOwner || proxy.admin === expectedOwner);
+    const expectedOwner = ZWeb3.toChecksumAddress(ownerAddress || this.networkFile.proxyAdminAddress);
+    const ownedProxies = proxies.filter((proxy) => !proxy.admin || !expectedOwner || ZWeb3.toChecksumAddress(proxy.admin) === expectedOwner);
 
     if (isEmpty(ownedProxies)) {
-      log.info(`No contract instances that match${criteriaDescription} are owned by this application`);
+      log.info(`No contract instances that match${criteriaDescription} are owned by this project`);
     }
 
     return ownedProxies;

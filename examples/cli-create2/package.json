@@ -1,0 +1,21 @@
+{
+  "name": "example-cli-create2",
+  "version": "1.0.0",
+  "description": "Example project for using create2",
+  "main": "index.js",
+  "scripts": {
+    "test": "scripts/test.sh"
+  },
+  "author": "santiago@zeppelin.solutions",
+  "license": "MIT",
+  "dependencies": {
+    "web3": "1.0.0-beta.37",
+    "zos-lib": "2.3.0-alpha.0",
+    "zos": "2.3.0-alpha.0"
+  },
+  "devDependencies": {
+    "chai": "^4.2.0",
+    "ganache-cli": "^6.4.2",
+    "truffle": "^5.0.5"
+  }
+}

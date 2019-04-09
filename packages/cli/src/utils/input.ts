@@ -1,4 +1,5 @@
 import BN from 'bignumber.js';
+import { encodeParams } from 'zos-lib';
 
 export function parseArgs(args: string): string[] | never {
   if (typeof args !== 'string') throw Error(`Cannot parse ${typeof args}`);
@@ -47,4 +48,19 @@ export function parseInit(options: any, defaultInit: any): { initMethod: string,
   else if(typeof initArgs === 'boolean' || initMethod) initArgs = [];
 
   return { initMethod, initArgs };
+}
+
+export function validateSalt(salt: string, required = false) {
+  if (!salt || salt.length === 0) {
+    if (required) {
+      throw new Error('A non-empty salt is required to calculate the deployment address.');
+    } else {
+      return;
+    }
+  }
+  try {
+    encodeParams(['uint256'], [salt]);
+  } catch(err) {
+    throw new Error(`Invalid salt ${salt}, must be an uint256 value.`);
+  }
 }

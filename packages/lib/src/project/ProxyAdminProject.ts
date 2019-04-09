@@ -23,13 +23,13 @@ export default class ProxyAdminProject extends BaseSimpleProject {
   }
 
   public async createProxy(contract: Contract, contractParams: ContractInterface = {}): Promise<Contract> {
-    if (!this.proxyAdmin) this.proxyAdmin = await ProxyAdmin.deploy(this.txParams);
+    if (!contractParams.admin) await this.ensureProxyAdmin();
     return super.createProxy(contract, contractParams);
   }
 
-  public async createProxyWithSalt(contract: Contract, salt: string, contractParams: ContractInterface = {}): Promise<Contract> {
-    if (!this.proxyAdmin) this.proxyAdmin = await ProxyAdmin.deploy(this.txParams);
-    return super.createProxyWithSalt(contract, salt, contractParams);
+  public async createProxyWithSalt(contract: Contract, salt: string, signature?: string, contractParams: ContractInterface = {}): Promise<Contract> {
+    if (!contractParams.admin) await this.ensureProxyAdmin();
+    return super.createProxyWithSalt(contract, salt, signature, contractParams);
   }
 
   public async upgradeProxy(proxyAddress: string, contract: Contract, contractParams: ContractInterface = {}): Promise<Contract> {
@@ -46,11 +46,17 @@ export default class ProxyAdminProject extends BaseSimpleProject {
   }
 
   public getAdminAddress(): Promise<string> {
-    return new Promise((resolve) => resolve(this.proxyAdmin.address));
+    return new Promise((resolve) => resolve(this.proxyAdmin ? this.proxyAdmin.address : null));
   }
 
   public async transferAdminOwnership(newAdminOwner: string): Promise<void> {
     await this.proxyAdmin.transferOwnership(newAdminOwner);
   }
 
+  public async ensureProxyAdmin(): Promise<ProxyAdmin> {
+    if (!this.proxyAdmin) {
+      this.proxyAdmin = await ProxyAdmin.deploy(this.txParams);
+    }
+    return this.proxyAdmin;
+  }
 }

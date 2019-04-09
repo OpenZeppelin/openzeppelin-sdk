@@ -2,7 +2,7 @@ pragma solidity ^0.5.0;
 
 /**
  * @title ImplementationProvider
- * @dev Interface for providing implementation addresses for other contracts by name.
+ * @dev Abstract contract for providing implementation addresses for other contracts by name.
  */
 contract ImplementationProvider {
   /**

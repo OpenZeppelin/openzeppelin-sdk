@@ -9,8 +9,8 @@ describe('push command', function() {
   stubCommands()
 
   context('when network uses ganache', function() {
-    itShouldParse('should call push script with options', 'push', 'zos push --network test --skip-compile -d --reset -f', function(push) {
-      push.should.have.been.calledWithExactly({ force: true, deployDependencies: true, reupload: true, network: 'test', txParams: {} })
+    itShouldParse('should call push script with options', 'push', 'zos push --network test --skip-compile -d --reset -f --deploy-proxy-admin --deploy-proxy-factory', function(push) {
+      push.should.have.been.calledWithExactly({ force: true, deployDependencies: true, deployProxyAdmin: true, deployProxyFactory: true, reupload: true, network: 'test', txParams: {} })
     })
   });
 
@@ -23,8 +23,8 @@ describe('push command', function() {
       sinon.restore();
     })
 
-    itShouldParse('should call push script with options', 'push', 'zos push --network test --skip-compile -d --reset -f', function(push) {
-      push.should.have.been.calledWithExactly({ force: true, deployDependencies: undefined, reupload: true, network: 'test', txParams: {} })
+    itShouldParse('should call push script with options', 'push', 'zos push --network test --skip-compile -d --reset -f --deploy-proxy-admin --deploy-proxy-factory', function(push) {
+      push.should.have.been.calledWithExactly({ force: true, deployProxyAdmin: true, deployProxyFactory: true, deployDependencies: undefined, reupload: true, network: 'test', txParams: {} })
     })
   })
 })
