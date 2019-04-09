@@ -18,5 +18,8 @@ module.exports = {
       version: "0.5.3",
       evmVersion: "constantinople"
     }
+  },
+  mocha: {
+    forbidOnly: !!process.env.CI
   }
 }
