@@ -32,7 +32,7 @@ const register: (program: any) => any = (program) => program
   .option('-d, --deploy-dependencies', 'deploys dependencies to the network if there is no existing deployment')
   .option('--reset', 'redeploys all contracts (not only the ones that changed)')
   .option('-f, --force', 'ignores validation errors and deploys contracts')
-  .option('--proxy-admin', 'eagerly deploys the project\'s proxy admin (if not deployed yet on this network)')
+  .option('--proxy-admin', 'eagerly deploys the project\'s proxy admin (if not deployed yet on the provided network)')
   .option('--proxy-factory', 'eagerly deploys the project\'s proxy factory (if not deployed yet on this network)')
   .withNetworkOptions()
   .action(action);

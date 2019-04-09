@@ -33,7 +33,7 @@ async function action(contractFullName: string, options: any): Promise<void> {
 
   const { initMethod, initArgs } = parseInit(options, 'initialize');
   const { contract: contractAlias, package: packageName } = fromContractFullName(contractFullName);
-  const opts = { ... options, initMethod, initArgs, contractAlias, packageName };
+  const opts = { ...options, initMethod, initArgs, contractAlias, packageName };
 
   if (options.query && options.signature) await runSignatureQuery(opts, network, txParams);
   else if (options.query) await runQuery(opts, network, txParams);
@@ -54,7 +54,7 @@ async function runSignatureQuery(options: any, network: string, txParams: any) {
   if (!contractAlias) throw new Error('missing required argument: alias');
   if (typeof query === 'string') throw new Error('cannot specify argument `sender\' as it is inferred from `signature\'');
   const args = pickBy({ packageName, contractAlias, initMethod, initArgs, force, salt, signature: signatureOption, admin });
-  await querySignedDeployment({ ... args, network, txParams });
+  await querySignedDeployment({ ...args, network, txParams });
 }
 
 async function runCreate(options: any, network: string, txParams: any) {
