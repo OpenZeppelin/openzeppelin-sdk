@@ -1,7 +1,7 @@
 {
   "zosversion": "2.2",
   "name": "example-cli-create2",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "contracts": {
     "Sample": "Sample"
   }

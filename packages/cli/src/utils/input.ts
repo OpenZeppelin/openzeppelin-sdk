@@ -50,7 +50,7 @@ export function parseInit(options: any, defaultInit: any): { initMethod: string,
   return { initMethod, initArgs };
 }
 
-export function validateSalt(salt, required=false) {
+export function validateSalt(salt: string, required = false) {
   if (!salt || salt.length === 0) {
     if (required) {
       throw new Error('A non-empty salt is required to calculate the deployment address.');
