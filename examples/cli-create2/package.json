@@ -1,6 +1,7 @@
 {
   "name": "example-cli-create2",
-  "version": "1.0.0",
+  "version": "2.3.0-alpha.0",
+  "private": true,
   "description": "Example project for using create2",
   "main": "index.js",
   "scripts": {
