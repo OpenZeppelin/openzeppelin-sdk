@@ -1,6 +1,6 @@
 {
   "name": "example-zos-lib-simple",
-  "version": "2.3.0-alpha.0",
+  "version": "2.3.0-alpha.1",
   "private": true,
   "main": "index.js",
   "scripts": {
@@ -10,7 +10,7 @@
   "license": "ISC",
   "dependencies": {
     "truffle": "^5.0.3",
-    "zos-lib": "2.3.0-alpha.0"
+    "zos-lib": "^2.3.0-alpha.1"
   },
   "devDependencies": {
     "babel-polyfill": "^6.23.0",
