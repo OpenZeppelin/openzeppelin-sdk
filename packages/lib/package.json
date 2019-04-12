@@ -1,6 +1,6 @@
 {
   "name": "zos-lib",
-  "version": "2.2.2",
+  "version": "2.2.3",
   "description": "JavaScript library for the ZeppelinOS smart contract platform",
   "main": "./lib/index.js",
   "private": false,
