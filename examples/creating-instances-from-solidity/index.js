@@ -90,8 +90,7 @@ async function main() {
   console.log(`Factory proxy created at ${factoryProxy.address}`);
 
   // Use the Factory proxy address to create a javascript Factory contract object.
-  const factoryContract = Contracts.getFromLocal('Factory');
-  factoryContract.at(factoryProxy.address);
+  const factoryContract = Contracts.getFromLocal('Factory').at(factoryProxy.address);
 
   // Construct the call data for the initialize method of Instance.sol.
   // This call data consists of the contract's `initialize` method with the value of `42`.
@@ -115,8 +114,7 @@ async function main() {
   console.log(`Instance proxy created at ${instanceAddress}`);
 
   // Use the Instance proxy address to create a javascript Instance contract object.
-  const instanceContract = Contracts.getFromLocal('Instance');
-  instanceContract.at(instanceAddress);
+  const instanceContract = Contracts.getFromLocal('Instance').at(instanceAddress);
 
   // Retrieve the value stored in the instance contract.
   // Note that we cannot make the call using the same address that created the proxy

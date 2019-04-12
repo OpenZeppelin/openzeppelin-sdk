@@ -82,8 +82,10 @@ function _wrapContractInstance(schema: any, instance: Web3Contract): Contract {
 
   instance.at = function(address: string): Contract | never {
     if(!ZWeb3.isAddress(address)) throw new Error('Given address is not valid: ' + address);
-    instance.options.address = instance._address = address;
-    return instance;
+    const newWeb3Instance = instance.clone();
+    newWeb3Instance._address = address;
+    newWeb3Instance.options.address = address;
+    return _wrapContractInstance(instance.schema, newWeb3Instance);
   };
 
   instance.link = function(libraries: { [libAlias: string]: string }): void {
