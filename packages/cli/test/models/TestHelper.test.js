@@ -77,6 +77,13 @@ contract('TestHelper', function ([_, owner]) {
       const say = await proxy.methods.say().call()
       say.should.eq('V1')
     })
+
+    it("creates two different proxies", async function() {
+      const proxy1 = await this.project.createProxy(ImplV1, { contractName: 'Impl' })
+      const proxy2 = await this.project.createProxy(ImplV1, { contractName: 'Impl' })  
+      proxy1.address.should.not.be.eq(proxy2.address);
+    });
+  
   })
 
 })

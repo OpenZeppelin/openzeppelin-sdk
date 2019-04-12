@@ -2,12 +2,12 @@
 require('../../setup')
 
 import utils from 'web3-utils';
-import sinon from 'sinon';
 
 import Contracts from '../../../src/artifacts/Contracts'
-import Contract from '../../../src/artifacts/ZosContract';
 
 const ContractWithStructInConstructor = Contracts.getFromLocal('WithStructInConstructor');
+const ContractWithConstructorImplementation = Contracts.getFromLocal('WithConstructorImplementation');
+
 
 contract('Contract', function(accounts) {
   const [_, account] = accounts.map(utils.toChecksumAddress)
@@ -44,6 +44,22 @@ contract('Contract', function(accounts) {
             (await instance.methods.sender().call()).should.eq(account);
           });
         });
+      });
+    });
+
+    describe('#at', function () {
+      beforeEach('deploying contracts', async function () {
+        this.instance1 = await ContractWithConstructorImplementation.new(10, "foo", txParams);
+        this.instance2 = await ContractWithConstructorImplementation.new(20, "bar", txParams);
+      });
+
+      it('creates a copy of the instance', async function () {
+        const instance1 = ContractWithConstructorImplementation.at(this.instance1.address);
+        const instance2 = ContractWithConstructorImplementation.at(this.instance2.address);
+        instance1.address.should.not.eq(instance2.address);
+        instance1.options.address.should.not.eq(instance2.options.address);
+        (await instance1.methods.text().call()).should.eq('foo');
+        (await instance2.methods.text().call()).should.eq('bar');
       });
     });
   });
