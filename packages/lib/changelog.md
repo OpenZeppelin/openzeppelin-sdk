@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## v2.2.3
+
+### Fixed
+- Do not modify `Contract` instance address when calling `Contract#at` but generate a clone instead ([#810](https://github.com/zeppelinos/zos/issues/810))
+
 ## v2.2.2
 
 ### Fixed
