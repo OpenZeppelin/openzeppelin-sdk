@@ -436,6 +436,11 @@ contract('Transactions', function(accounts) {
         await assertFrom(instance.deployment.transactionHash, account2);
       });
 
+      it('shows friendly error if there are unlinked libraries', async function () {
+        const WithLibraryMock = Contracts.getFromLocal('WithLibraryMock');
+        await Transactions.deployContract(WithLibraryMock).should.be.rejectedWith(/unlinked libraries/i);
+      });
+
       describe('gas', function () {
         afterEach('restore stubs', function () {
           sinon.restore();
