@@ -100,7 +100,7 @@ export interface BumpParams {
 }
 
 export interface RemoveParams {
-  contractNames: string[];
+  contracts: string[];
   packageFile?: ZosPackageFile;
 }
 

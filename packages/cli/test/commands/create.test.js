@@ -23,10 +23,10 @@ describe('create command', function() {
   })
 
   itShouldParse('should call create script with contract from package', 'create', 'zos create OpenZeppelin/Impl --network test', function(create) {
-    create.should.have.been.calledWithExactly( { packageName: 'OpenZeppelin', contractAlias: 'Impl', network: 'test', txParams: {} })
+    create.should.have.been.calledWithExactly( { packageName: 'OpenZeppelin', contractAlias: 'Impl', network: 'test', txParams: {}, initArgs: [] })
   })
 
   itShouldParse('should call create script with contract from package with slashes', 'create', 'zos create Zeppelin/OpenZeppelin/Impl --network test', function(create) {
-    create.should.have.been.calledWithExactly( { packageName: 'Zeppelin/OpenZeppelin', contractAlias: 'Impl', network: 'test', txParams: {} })
+    create.should.have.been.calledWithExactly( { packageName: 'Zeppelin/OpenZeppelin', contractAlias: 'Impl', network: 'test', txParams: {}, initArgs: [] })
   })
 })

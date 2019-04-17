@@ -88,7 +88,7 @@ const Truffle = {
   },
 
   _isLibrary(contract: { [key: string]: any }): boolean {
-    return contract && !!contract.ast.nodes
+    return contract && contract.ast && !!contract.ast.nodes
       .find(node => node.contractKind === 'library' && node.name === contract.contractName);
   },
 

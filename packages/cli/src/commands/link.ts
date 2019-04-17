@@ -1,3 +1,4 @@
+import init from './init';
 import push from './push';
 import link from '../scripts/link';
 import { promptIfNeeded } from '../utils/prompt';
@@ -31,6 +32,8 @@ const register: (program: any) => any = (program) => program
 async function action(dependencies: string[], options: any): Promise<void> {
   const { install, interactive } = options;
   const installDependencies = install && interactive ? undefined : install;
+
+  // await init.runActionIfNeeded(options);
 
   const defaultDependency = await Dependency.fetchVersionFromNpm('openzeppelin-eth');
   const defaults = { dependencies: [defaultDependency] };

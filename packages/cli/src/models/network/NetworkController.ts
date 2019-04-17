@@ -589,10 +589,12 @@ export default class NetworkController {
     if (calledInitMethod) return;
     // Otherwise, warn the user to invoke it
     const contractMethods = contract.methodsFromAst();
-    const initializeMethod = contractMethods.find(({ hasInitializer }) => hasInitializer);
+    const initializerMethods = contractMethods
+      .filter(({ hasInitializer, name }) => hasInitializer || name === 'initialize')
+      .map(({ name }) => name);
 
-    if (!initializeMethod) return;
-    log.error(`Possible initialization method 'initialize' found in contract. Make sure you initialize your instance.`);
+    if (initializerMethods.length === 0) return;
+    log.error(`Possible initialization method (${initializerMethods.join(', ')}) found in contract. Make sure you initialize your instance.`);
   }
 
   // Proxy model

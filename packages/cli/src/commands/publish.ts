@@ -17,6 +17,7 @@ const register: (program: any) => any = (program) => program
   .usage('--network <network> [options]')
   .description(description)
   .withNetworkOptions()
+  .withNonInteractiveOption()
   .action(action);
 
 async function action(options: any): Promise<void> {
