@@ -5,16 +5,17 @@ import BaseSimpleProject from './BaseSimpleProject';
 import { ContractInterface } from './AppProject';
 import Contract from '../artifacts/Contract';
 import ProxyFactory from '../proxy/ProxyFactory';
+import ProxyAdminProjectMixin from './mixin/ProxyAdminProjectMixin';
 
 const log: Logger = new Logger('ProxyAdminProject');
 
-export default class ProxyAdminProject extends BaseSimpleProject {
+class BaseProxyAdminProject extends BaseSimpleProject {
   public proxyAdmin: ProxyAdmin;
 
-  public static async fetch(name: string = 'main', txParams: any = {}, proxyAdminAddress?: string, proxyFactoryAddress?: string) {
+  public static async fetch(name: string = 'main', txParams: any = {}, proxyAdminAddress?: string, proxyFactoryAddress?: string): Promise<ProxyAdminProject> {
     const proxyAdmin = proxyAdminAddress ? await ProxyAdmin.fetch(proxyAdminAddress, txParams) : null;
     const proxyFactory = proxyFactoryAddress ? await ProxyFactory.fetch(proxyFactoryAddress, txParams) : null;
-    return new this(name, proxyAdmin, proxyFactory, txParams);
+    return new ProxyAdminProject(name, proxyAdmin, proxyFactory, txParams);
   }
 
   constructor(name: string = 'main', proxyAdmin: ProxyAdmin, proxyFactory?: ProxyFactory, txParams: any = {}) {
@@ -40,17 +41,8 @@ export default class ProxyAdminProject extends BaseSimpleProject {
     return contract.at(pAddress);
   }
 
-  public async changeProxyAdmin(proxyAddress: string, newAdmin: string): Promise<void> {
-    await this.proxyAdmin.changeProxyAdmin(proxyAddress, newAdmin);
-    log.info(`Proxy ${proxyAddress} admin changed to ${newAdmin}`);
-  }
-
   public getAdminAddress(): Promise<string> {
     return new Promise((resolve) => resolve(this.proxyAdmin ? this.proxyAdmin.address : null));
-  }
-
-  public async transferAdminOwnership(newAdminOwner: string): Promise<void> {
-    await this.proxyAdmin.transferOwnership(newAdminOwner);
   }
 
   public async ensureProxyAdmin(): Promise<ProxyAdmin> {
@@ -60,3 +52,7 @@ export default class ProxyAdminProject extends BaseSimpleProject {
     return this.proxyAdmin;
   }
 }
+
+// Mixings produce value but not type
+// We have to export full class with type & callable
+export default class ProxyAdminProject extends ProxyAdminProjectMixin(BaseProxyAdminProject) {};

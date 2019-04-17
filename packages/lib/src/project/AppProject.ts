@@ -5,6 +5,7 @@ import isEmpty from 'lodash.isempty';
 import App from '../application/App';
 import Package from '../application/Package';
 import ProxyAdmin from '../proxy/ProxyAdmin';
+import ProxyAdminProjectMixin from './mixin/ProxyAdminProjectMixin';
 import ImplementationDirectory from '../application/ImplementationDirectory';
 import BasePackageProject from './BasePackageProject';
 import SimpleProject from './SimpleProject';
@@ -37,7 +38,7 @@ interface ExistingAddresses {
   proxyFactoryAddress?: string;
 }
 
-export default class AppProject extends BasePackageProject {
+class BaseAppProject extends BasePackageProject {
   private name: string;
   private app: App;
   public proxyAdmin: ProxyAdmin;
@@ -68,7 +69,7 @@ export default class AppProject extends BasePackageProject {
       if (!await app.hasPackage(name, version)) await app.setPackage(name, thepackage.address, version);
       const proxyAdmin: ProxyAdmin | null = proxyAdminAddress ? await ProxyAdmin.fetch(proxyAdminAddress, txParams) : null;
       const proxyFactory = ProxyFactory.tryFetch(proxyFactoryAddress, txParams);
-      const project: AppProject = new this(app, name, version, proxyAdmin, proxyFactory, txParams);
+      const project: AppProject = new AppProject(app, name, version, proxyAdmin, proxyFactory, txParams);
       project.directory = directory;
       project.package = thepackage;
       return project;
@@ -130,11 +131,6 @@ export default class AppProject extends BasePackageProject {
   public getAdminAddress(): Promise<string> {
     return new Promise((resolve) => resolve(this.proxyAdmin ? this.proxyAdmin.address : null));
   }
-
-  public async transferAdminOwnership(newAdminOwner: string): Promise<void> {
-    await this.proxyAdmin.transferOwnership(newAdminOwner);
-  }
-
   public getApp(): App {
     return this.app;
   }
@@ -237,10 +233,6 @@ export default class AppProject extends BasePackageProject {
     return this.proxyAdmin.upgradeProxy(proxyAddress, implementationAddress, contract, initMethod, initArgs);
   }
 
-  public async changeProxyAdmin(proxyAddress: string, newAdmin: string): Promise<void> {
-    return this.proxyAdmin.changeProxyAdmin(proxyAddress, newAdmin);
-  }
-
   public async getDependencyPackage(name: string): Promise<Package> {
     const packageInfo = await this.app.getPackage(name);
     return packageInfo.package;
@@ -275,3 +267,6 @@ export default class AppProject extends BasePackageProject {
     }
   }
 }
+// Mixings produce value but not type
+// We have to export full class with type & callable
+export default class AppProject extends ProxyAdminProjectMixin(BaseAppProject) {};
