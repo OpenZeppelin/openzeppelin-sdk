@@ -1,3 +1,5 @@
+import isEmpty from 'lodash.isempty';
+
 import Logger from '../utils/Logger';
 import Proxy from '../proxy/Proxy';
 import copyContract from '../helpers/copyContract';
@@ -86,7 +88,8 @@ export default class App {
   }
 
   public async createProxy(contract: Contract, packageName: string, contractName: string, proxyAdmin: string, initMethodName: string, initArgs?: string[]): Promise<Contract> {
-    const proxy = typeof(initArgs) === 'undefined'
+    if (!isEmpty(initArgs) && !initMethodName) initMethodName = 'initialize';
+    const proxy = initMethodName === undefined
       ? await this._createProxy(packageName, contractName, proxyAdmin)
       : await this._createProxyAndCall(contract, packageName, contractName, proxyAdmin, initMethodName, initArgs);
     log.info(`${packageName} ${contractName} proxy: ${proxy.address}`);
