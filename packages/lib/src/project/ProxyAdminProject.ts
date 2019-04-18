@@ -55,4 +55,4 @@ class BaseProxyAdminProject extends BaseSimpleProject {
 
 // Mixings produce value but not type
 // We have to export full class with type & callable
-export default class ProxyAdminProject extends ProxyAdminProjectMixin(BaseProxyAdminProject) {};
+export default class ProxyAdminProject extends ProxyAdminProjectMixin(BaseProxyAdminProject) {}

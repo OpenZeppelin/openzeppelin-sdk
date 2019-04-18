@@ -57,5 +57,4 @@ function setCommandProps() {
   };
 }
 
-
 export default { name, signature, description, register, action, runActionIfNeeded };
