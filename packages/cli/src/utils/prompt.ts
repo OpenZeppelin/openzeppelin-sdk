@@ -99,7 +99,7 @@ export function proxiesList(pickProxyBy: string, network: string, packageFile?: 
   return flatten(list);
 }
 
-// Generates an inquirer question with a list of contracts names
+// Generate a list of contracts names
 export function contractsList(name: string, message: string, type: string, source?: string): { [key: string]: any } {
   const localPackageFile = new ZosPackageFile();
   const contractsFromBuild = Truffle.getContractNames();
@@ -138,7 +138,7 @@ export function contractsList(name: string, message: string, type: string, sourc
   } else return [];
 }
 
-// Returns an inquirer question with a list of methods names for a particular contract
+// Generate a list of methods names for a particular contract
 export function methodsList(contractFullName: string, packageFile?: ZosPackageFile): { [key: string]: any } {
   return contractMethods(contractFullName, packageFile)
     .map(({ name, hasInitializer, inputs, selector }) => {
@@ -150,8 +150,8 @@ export function methodsList(contractFullName: string, packageFile?: ZosPackageFi
     });
 }
 
+// Returns an inquirer question with a list of arguments for a particular method
 export function argsList(contractFullName: string, methodIdentifier: string, packageFile?: ZosPackageFile): string[] {
-  // Returns an inquirer question with a list of arguments for a particular method
   const method = contractMethods(contractFullName, packageFile)
     .find(({ name, selector }) => selector === methodIdentifier || name === methodIdentifier);
   if (method) {
