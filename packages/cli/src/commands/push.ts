@@ -17,17 +17,6 @@ const name: string = 'push';
 const signature: string = name;
 const description: string = 'deploys your project to the specified <network>';
 
-const props = (networkName?: string) => {
-  return {
-    ...networksList('list'),
-    deployDependencies: {
-      type: 'confirm',
-      message: `One or more linked dependencies are not yet deployed on ${networkName}.\nDo you want to deploy them now?`,
-      default: true
-    }
-  };
-};
-
 const register: (program: any) => any = (program) => program
   .command(signature, undefined, { noHelp: true })
   .description(description)
@@ -40,18 +29,25 @@ const register: (program: any) => any = (program) => program
   .option('--deploy-proxy-factory', 'eagerly deploys the project\'s proxy factory (if not deployed yet on the provided network)')
   .withNetworkOptions()
   .withNonInteractiveOption()
-  .action(action);
+  .action(actionsWrapper);
+
+async function actionsWrapper(options: any): Promise<void> {
+  await init.runActionIfNeeded(options);
+  await add.runActionIfNeeded(null, options);
+  await action(options);
+}
 
 async function action(options: any): Promise<void> {
   const { force, deployDependencies, reset: reupload, network: networkInOpts, deployProxyAdmin, deployProxyFactory, interactive } = options;
   const { network: networkInSession, expired } = Session.getNetwork();
-  const defaults = { network: networkInSession };
   const opts = { network: networkInOpts || (!expired ? networkInSession : undefined) };
+  const defaults = { network: networkInSession };
+  const props = setCommandProps();
 
   if (!options.skipCompile) await Compiler.call();
 
-  const promptedOpts = await promptIfNeeded({ opts, defaults, props: props() }, interactive);
-  const { network, txParams } = await ConfigVariablesInitializer.initNetworkConfiguration({ ...promptedOpts, ...options });
+  const prompted = await promptIfNeeded({ opts, defaults, props }, interactive);
+  const { network, txParams } = await ConfigVariablesInitializer.initNetworkConfiguration({ ...options, ...prompted });
   const promptDeployDependencies = await promptForDeployDependencies(deployDependencies, network, interactive);
 
   await push({ deployProxyAdmin, deployProxyFactory, force, reupload, network, txParams, ...promptDeployDependencies });
@@ -67,22 +63,35 @@ async function tryAction(externalOptions: any): Promise<void> {
 }
 
 async function runActionIfNeeded(contractName: string, network: string, options: any): Promise<void> {
+  const { interactive } = options;
   const packageFile = new ZosPackageFile();
   const networkFile = packageFile.networkFile(network);
-  const newOptions = { ...options, dontExitProcess: true };
   const { contract: contractAlias, package: packageName } = fromContractFullName(contractName);
 
-  if ((packageName && !networkFile.hasDependency(packageName)) || (!packageName && !networkFile.hasContract(contractAlias))) {
-    await action(newOptions);
+  if (interactive) {
+    if ((!packageName && !networkFile.hasContract(contractAlias)) || (packageName && !networkFile.hasDependency(packageName))) {
+      await action({ ...options, dontExitProcess: true });
+    }
   }
 }
 
 async function promptForDeployDependencies(deployDependencies: boolean, network: string, interactive: boolean): Promise<{ deployDependencies: boolean }> {
   if (await ZWeb3.isGanacheNode()) return { deployDependencies: true };
   if (Dependency.hasDependenciesForDeploy(network)) {
-    return promptIfNeeded({ opts: { deployDependencies }, props: props(network) }, interactive);
+    return promptIfNeeded({ opts: { deployDependencies }, props: setCommandProps(network) }, interactive);
   }
   return { deployDependencies: undefined };
+}
+
+function setCommandProps(networkName?: string) {
+  return {
+    ...networksList('list'),
+    deployDependencies: {
+      type: 'confirm',
+      message: `One or more linked dependencies are not yet deployed on ${networkName}.\nDo you want to deploy them now?`,
+      default: true
+    }
+  };
 }
 
 export default { name, signature, description, register, action, tryAction, runActionIfNeeded };

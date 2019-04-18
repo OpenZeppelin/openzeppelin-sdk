@@ -4,8 +4,8 @@ import { hasToMigrateProject } from '../utils/prompt-migration';
 import { promptIfNeeded, networksList } from '../utils/prompt';
 import Session from '../models/network/Session';
 
-const baseProps = {
-  ...networksList('list'),
+const baseProps = () => {
+  return networksList('list');
 };
 
 const name: string = 'publish';
