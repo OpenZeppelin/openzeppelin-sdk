@@ -143,7 +143,7 @@ function setCommandProps({ contractReference, network, all, contractFullName, in
     }, {});
 
   return {
-    ...networksList('list'),
+    ...networksList('network', 'Select a network from the network list', 'list'),
     pickProxyBy: {
       message: 'Which proxies would you like to upgrade?',
       type: 'list',

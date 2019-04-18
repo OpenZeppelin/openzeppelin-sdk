@@ -32,7 +32,7 @@ async function action(options: any): Promise<void> {
 }
 
 function setCommandProps(): InquirerQuestions {
-  return networksList('list');
+  return networksList('network', 'Select a network from the network list', 'list');
 }
 
 export default { name, signature, description, register, action };

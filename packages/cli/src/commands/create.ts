@@ -101,7 +101,7 @@ function setCommandProps(contractFullName?: string, initMethod?: string, initArg
     }, {});
 
   return {
-    ...networksList('list'),
+    ...networksList('network', 'Select a network from the network list', 'list'),
     ...contractsList('contractFullName', 'Choose a contract', 'list', 'all'),
     askForInitParams: {
       type: 'confirm',

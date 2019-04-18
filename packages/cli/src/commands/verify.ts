@@ -37,7 +37,7 @@ async function action(contractName: string, options: any): Promise<void> {
 function setCommandProps(optimizerEnabled: boolean): InquirerQuestions {
   return {
     ...contractsList('contractName', 'Choose a contract', 'list', 'fromLocal'),
-    ...networksList('list'),
+    ...networksList('network', 'Select a network from the network list', 'list'),
     optimizer: {
       type: 'confirm',
       message: 'Was the optimizer enabled when you compiled your contracts?',

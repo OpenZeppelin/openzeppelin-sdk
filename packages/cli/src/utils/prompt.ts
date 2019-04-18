@@ -63,12 +63,12 @@ export async function promptIfNeeded({ args = {}, opts = {}, defaults, props }: 
   return await answersFor(argsAndOpts, argsAndOptsQuestions, props, interactive);
 }
 
-export function networksList(type: string): { [key: string]: any } {
+export function networksList(name: string, message: string, type: string): { [key: string]: any } {
   const networks = Truffle.getNetworkNamesFromConfig();
-  return inquirerQuestion('network', 'Select a network from the network list', type, networks);
+  return inquirerQuestion(name, message, type, networks);
 }
 
-// Returns a function that returns a list of all proxies, grouped by package
+// Returns a list of all proxies, grouped by package
 export function proxiesList(pickProxyBy: string, network: string): { [key: string]: any } {
   const packageFile = new ZosPackageFile();
   const networkFile = packageFile.networkFile(network);

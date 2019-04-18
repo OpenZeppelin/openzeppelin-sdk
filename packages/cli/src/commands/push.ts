@@ -87,7 +87,7 @@ async function promptForDeployDependencies(deployDependencies: boolean, network:
 
 function setCommandProps(networkName?: string): InquirerQuestions {
   return {
-    ...networksList('list'),
+    ...networksList('network', 'Select a network from the network list', 'list'),
     deployDependencies: {
       type: 'confirm',
       message: `One or more linked dependencies are not yet deployed on ${networkName}.\nDo you want to deploy them now?`,

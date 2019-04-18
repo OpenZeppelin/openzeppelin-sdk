@@ -37,7 +37,7 @@ async function action(options: any): Promise<void> {
 
 function setCommandProps(accounts: string[] = []): InquirerQuestions {
   return {
-    ...networksList('list'),
+    ...networksList('network', 'Select a network from the network list', 'list'),
     from: {
       type: 'list',
       message: 'Select an account address',
