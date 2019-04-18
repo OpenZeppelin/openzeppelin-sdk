@@ -9,7 +9,7 @@ import { parseInit } from '../utils/input';
 import { fromContractFullName } from '../utils/naming';
 import { hasToMigrateProject } from '../utils/prompt-migration';
 import ConfigVariablesInitializer from '../models/initializer/ConfigVariablesInitializer';
-import { promptIfNeeded, networksList, contractsList, methodsList, argsList } from '../utils/prompt';
+import { promptIfNeeded, networksList, contractsList, methodsList, argsList, InquirerQuestions } from '../utils/prompt';
 
 const name: string = 'create';
 const signature: string = `${name} [alias]`;
@@ -26,7 +26,7 @@ const register: (program: any) => any = (program) => program
   .withNonInteractiveOption()
   .action(actionsWrapper);
 
-async function actionsWrapper(contractFullName: string, options: any) {
+async function actionsWrapper(contractFullName: string, options: any): Promise<void> {
   await init.runActionIfNeeded(options);
 
   const { network: promptedNewtork, contractFullName: promptedContractFullName } = await promptForCreate(contractFullName, options);
@@ -41,7 +41,7 @@ async function actionsWrapper(contractFullName: string, options: any) {
   if (!options.dontExitProcess && process.env.NODE_ENV !== 'test') process.exit(0);
 }
 
-async function action(contractFullName: string, options: any) {
+async function action(contractFullName: string, options: any): Promise<void> {
   const { force, initMethod, initArgs, network, txParams } = options;
   const { contract: contractAlias, package: packageName } = fromContractFullName(contractFullName);
   const args = pickBy({ packageName, contractAlias, initMethod, initArgs, force });
@@ -52,7 +52,7 @@ async function action(contractFullName: string, options: any) {
   Session.setDefaultNetworkIfNeeded(network);
 }
 
-async function promptForCreate(contractFullName: string, options: any): Promise<any> {
+async function promptForCreate(contractFullName: string, options: any): Promise<{ contractFullName: string, network: string }> {
   const { force, network: networkInOpts, interactive } = options;
   const { network: networkInSession, expired } = Session.getNetwork();
   const defaultOpts = { network: networkInSession };
@@ -62,8 +62,7 @@ async function promptForCreate(contractFullName: string, options: any): Promise<
   return promptIfNeeded({ args, opts, defaults: defaultOpts, props: setCommandProps() }, interactive);
 }
 
-// TODO: move to prompt.ts
-async function promptForInitParams(contractFullName: string, options: any) {
+async function promptForInitParams(contractFullName: string, options: any): Promise<{ initMethod: string, initArgs: string[] }> {
   const { interactive } = options;
   let { initMethod, initArgs } = parseInit(options, 'initialize');
   const { init: rawInitMethod } = options;
@@ -76,9 +75,9 @@ async function promptForInitParams(contractFullName: string, options: any) {
   const initArgsKeys = argsList(contractFullName, initMethod.selector)
     .reduce((accum, current) => ({ ...accum, [current]: undefined }), {});
 
-  // if there are no initArgs defined, or the args array length provided is smaller than the
+  // if there are no initArgs defined, or the initArgs array length provided is smaller than the
   // number of arguments in the function, prompt for remaining arguments
-  if (!initArgs || (Array.isArray(initArgs) && initArgs.length < Object.keys(initArgsKeys).length)) {
+  if (!initArgs || initArgs.length < Object.keys(initArgsKeys).length) {
     const initArgsProps = setCommandProps(contractFullName, initMethod.selector, initArgs);
     const promptedArgs = await promptIfNeeded({ opts: initArgsKeys, props: initArgsProps }, interactive);
     initArgs = [...initArgs, ...Object.values(pickBy(promptedArgs))];
@@ -87,7 +86,7 @@ async function promptForInitParams(contractFullName: string, options: any) {
   return { initMethod: initMethod.name, initArgs };
 }
 
-function setCommandProps(contractFullName?: string, initMethod?: string, initArgs?: string[])  {
+function setCommandProps(contractFullName?: string, initMethod?: string, initArgs?: string[]): InquirerQuestions {
   const initMethodsList = methodsList(contractFullName);
   const initArgsList = argsList(contractFullName, initMethod)
     .reduce((accum, argName, index) => {

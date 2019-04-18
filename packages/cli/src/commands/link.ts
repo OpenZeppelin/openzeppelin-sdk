@@ -1,7 +1,7 @@
 import init from './init';
 import push from './push';
 import link from '../scripts/link';
-import { promptIfNeeded } from '../utils/prompt';
+import { promptIfNeeded, InquirerQuestions } from '../utils/prompt';
 import Dependency from '../models/dependency/Dependency';
 
 const name: string = 'link';
@@ -23,21 +23,21 @@ async function action(dependencies: string[], options: any): Promise<void> {
 
   await init.runActionIfNeeded(options);
 
-  const defaults = { dependencies: [await Dependency.fetchVersionFromNpm('openzeppelin-eth')] };
   const args = { dependencies };
   const opts = { installDependencies };
   const props = setCommandProps();
-  const promptedArgs = await promptIfNeeded({ args, opts, props, defaults }, interactive);
+  const defaults = { dependencies: [await Dependency.fetchVersionFromNpm('openzeppelin-eth')] };
+  const prompted = await promptIfNeeded({ args, opts, props, defaults }, interactive);
 
-  if (promptedArgs.dependencies && typeof promptedArgs.dependencies === 'string') {
-    promptedArgs.dependencies = [promptedArgs.dependencies];
+  if (prompted.dependencies && typeof prompted.dependencies === 'string') {
+    prompted.dependencies = [prompted.dependencies];
   }
 
-  await link(promptedArgs);
+  await link(prompted);
   await push.tryAction(options);
 }
 
-function setCommandProps() {
+function setCommandProps(): InquirerQuestions {
   return {
     dependencies: {
       type: 'input',

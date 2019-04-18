@@ -11,7 +11,7 @@ import { fromContractFullName } from '../utils/naming';
 import Dependency from '../models/dependency/Dependency';
 import ZosPackageFile from '../models/files/ZosPackageFile';
 import ConfigVariablesInitializer from '../models/initializer/ConfigVariablesInitializer';
-import { promptIfNeeded, networksList } from '../utils/prompt';
+import { promptIfNeeded, networksList, InquirerQuestions } from '../utils/prompt';
 
 const name: string = 'push';
 const signature: string = name;
@@ -75,7 +75,7 @@ async function runActionIfNeeded(contractName: string, network: string, options:
   }
 }
 
-async function promptForDeployDependencies(deployDependencies: boolean, network: string, interactive: boolean): Promise<{ deployDependencies: boolean }> {
+async function promptForDeployDependencies(deployDependencies: boolean, network: string, interactive: boolean): Promise<{ deployDependencies: boolean | undefined }> {
   if (await ZWeb3.isGanacheNode()) return { deployDependencies: true };
   if (Dependency.hasDependenciesForDeploy(network)) {
     const opts = { deployDependencies };
@@ -85,7 +85,7 @@ async function promptForDeployDependencies(deployDependencies: boolean, network:
   return { deployDependencies: undefined };
 }
 
-function setCommandProps(networkName?: string) {
+function setCommandProps(networkName?: string): InquirerQuestions {
   return {
     ...networksList('list'),
     deployDependencies: {

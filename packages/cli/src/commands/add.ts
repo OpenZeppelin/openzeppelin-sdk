@@ -5,7 +5,7 @@ import addAll from '../scripts/add-all';
 import Truffle from '../models/initializer/truffle/Truffle';
 import Compiler from '../models/compiler/Compiler';
 import ConfigVariablesInitializer from '../models/initializer/ConfigVariablesInitializer';
-import { promptIfNeeded, contractsList } from '../utils/prompt';
+import { promptIfNeeded, contractsList, InquirerQuestions } from '../utils/prompt';
 import { fromContractFullName } from '../utils/naming';
 import ZosPackageFile from '../models/files/ZosPackageFile';
 
@@ -22,7 +22,7 @@ const register: (program: any) => any = (program) => program
   .withNonInteractiveOption()
   .action(actionsWrapper);
 
-async function actionsWrapper(contractNames: string[], options: any) {
+async function actionsWrapper(contractNames: string[], options: any): Promise<void> {
   await init.runActionIfNeeded(options);
   await action(contractNames, options);
 }
@@ -61,11 +61,11 @@ async function runActionIfNeeded(contractName?: string, options?: any): Promise<
   }
 }
 
-function setCommandProps() {
+function setCommandProps(): InquirerQuestions {
   return contractsList('contractNames', 'Choose one or more contracts', 'checkbox', 'fromBuildDir');
 }
 
-function splitContractName(rawData) {
+function splitContractName(rawData: string): { name: string, alias: string } {
   const [contractName, alias] = rawData.split(':');
   return { name: contractName, alias };
 }

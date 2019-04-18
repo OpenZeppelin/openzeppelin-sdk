@@ -108,7 +108,6 @@ describe('prompt', function() {
         contracts.keyName.type.should.eq('listy');
         contracts.keyName.message.should.eq('Im a message');
         contracts.keyName.choices.should.include.members(['Foo', 'Bar']);
-        //contracts.keyName.choices[0].should.be.an.instanceOf(inquirer.Separator);
       });
     });
 

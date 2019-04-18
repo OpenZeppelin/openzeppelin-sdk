@@ -1,6 +1,6 @@
 import push from './push';
 import init from '../scripts/init';
-import { promptIfNeeded } from '../utils/prompt';
+import { promptIfNeeded, InquirerQuestions } from '../utils/prompt';
 import { FileSystem } from 'zos-lib';
 import ZosPackageFile from '../models/files/ZosPackageFile';
 
@@ -44,7 +44,7 @@ async function runActionIfNeeded(options: any): Promise<void> {
   }
 }
 
-function setCommandProps() {
+function setCommandProps(): InquirerQuestions {
   return {
     name: {
       message: 'Welcome to ZeppelinOS! Choose a name for your project:',

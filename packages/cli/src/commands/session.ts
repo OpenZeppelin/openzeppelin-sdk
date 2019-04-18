@@ -1,6 +1,6 @@
 import { ZWeb3 } from 'zos-lib';
 import session from '../scripts/session';
-import { promptIfNeeded, networksList } from '../utils/prompt';
+import { promptIfNeeded, networksList, InquirerQuestions } from '../utils/prompt';
 import Session from '../models/network/Session';
 import ConfigVariablesInitializer from '../models/initializer/ConfigVariablesInitializer';
 
@@ -15,18 +15,19 @@ const register: (program: any) => any = (program) => program
   .option('--expires <expires>', 'expiration of the session in seconds (defaults to 900, 15 minutes)')
   .option('--close', 'closes the current session, removing all network options set')
   .withNetworkOptions()
+  .withNonInteractiveOption()
   .action(action);
 
 async function action(options: any): Promise<void> {
-  const { network: networkInOpts, expires, timeout, from, close } = options;
+  const { network: networkInOpts, expires, timeout, from, close, interactive } = options;
 
   if (close) {
     session({ close });
   } else {
-    const promptedNetwork = await promptIfNeeded({ opts: { network: networkInOpts }, props: setCommandProps() });
+    const promptedNetwork = await promptIfNeeded({ opts: { network: networkInOpts }, props: setCommandProps() }, interactive);
     const { network } = await ConfigVariablesInitializer.initNetworkConfiguration(promptedNetwork, true);
     const accounts = await ZWeb3.accounts();
-    const promptedSession = await promptIfNeeded({ opts: { timeout, from, expires }, props: setCommandProps(accounts) });
+    const promptedSession = await promptIfNeeded({ opts: { timeout, from, expires }, props: setCommandProps(accounts) }, interactive);
 
     session({ close, ...promptedNetwork, ...promptedSession });
   }
@@ -34,7 +35,7 @@ async function action(options: any): Promise<void> {
   if (!options.dontExitProcess && process.env.NODE_ENV !== 'test') process.exit(0);
 }
 
-function setCommandProps(accounts: string[] = []): any {
+function setCommandProps(accounts: string[] = []): InquirerQuestions {
   return {
     ...networksList('list'),
     from: {

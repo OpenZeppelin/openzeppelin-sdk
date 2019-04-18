@@ -6,7 +6,7 @@ import { parseInit } from '../utils/input';
 import { fromContractFullName } from '../utils/naming';
 import { hasToMigrateProject } from '../utils/prompt-migration';
 import ConfigVariablesInitializer from '../models/initializer/ConfigVariablesInitializer';
-import { promptIfNeeded, networksList, argsList, methodsList, proxiesList, proxyInfo } from '../utils/prompt';
+import { promptIfNeeded, networksList, argsList, methodsList, proxiesList, proxyInfo, InquirerQuestions } from '../utils/prompt';
 
 interface PropsParams {
   contractReference?: string;
@@ -15,6 +15,19 @@ interface PropsParams {
   contractFullName?: string;
   initMethod?: string;
   initArgs?: string[];
+}
+
+interface ParsedContractReference {
+  proxyAddress: string | undefined;
+  contractAlias: string | undefined;
+  packageName: string | undefined;
+}
+
+interface ProxyInterface {
+  address: string | undefined;
+  contractFullName: string | undefined;
+  proxyReference: string | undefined;
+  all: boolean;
 }
 
 const name: string = 'update';
@@ -51,30 +64,33 @@ async function action(contractReference: string, options: any): Promise<void> {
   if (!options.dontExitProcess && process.env.NODE_ENV !== 'test') process.exit(0);
 }
 
-async function promptForNetwork(options: any): Promise<any> {
+async function promptForNetwork(options: any): Promise<{ network: string }> {
   const { network: networkInOpts, interactive } = options;
   const { network: networkInSession, expired } = Session.getNetwork();
-  const defaultOpts = { network: networkInSession };
+  const defaults = { network: networkInSession };
   const opts = { network: networkInOpts || (!expired ? networkInSession : undefined) };
+  const props = setCommandProps();
 
-  return promptIfNeeded({ opts, defaults: defaultOpts, props: setCommandProps() }, interactive);
+  return promptIfNeeded({ opts, defaults, props }, interactive);
 }
 
-async function promptForProxies(contractReference: string, network: string, options: any): Promise<any> {
+async function promptForProxies(contractReference: string, network: string, options: any): Promise<ProxyInterface> {
   const { all, interactive } = options;
   const pickProxyBy = all ? 'all' : undefined;
   const args = { pickProxyBy, proxy: contractReference };
   const props = setCommandProps({ contractReference, network, all });
   const { pickProxyBy: promptedPickProxyBy, proxy: promptedProxy } = await promptIfNeeded({ args, props }, interactive);
 
-  return {
+  const foo = {
     ...promptedProxy,
     all:  promptedPickProxyBy  === 'all'
   };
+
+  return foo;
 }
 
 // TODO: move to prompt.ts or other, but dry
-async function promptForInitParams(contractFullName: string, options: any) {
+async function promptForInitParams(contractFullName: string, options: any): Promise<{ initMethod: string, initArgs: string[] }> {
   const { interactive } = options;
   let { initMethod, initArgs } = parseInit(options, 'initialize');
   const { init: rawInitMethod } = options;
@@ -87,9 +103,9 @@ async function promptForInitParams(contractFullName: string, options: any) {
   const initArgsKeys = argsList(contractFullName, initMethod.selector)
     .reduce((accum, current) => ({ ...accum, [current]: undefined }), {});
 
-  // if there are no initArgs defined, or the args array length provided is smaller than the
+  // if there are no initArgs defined, or the initArgs array length provided is smaller than the
   // number of arguments in the function, prompt for remaining arguments
-  if (!initArgs || (Array.isArray(initArgs) && initArgs.length < Object.keys(initArgsKeys).length)) {
+  if (!initArgs || initArgs.length < Object.keys(initArgsKeys).length) {
     const initArgsProps = setCommandProps({ contractFullName, initMethod: initMethod.selector, initArgs });
     const promptedArgs = await promptIfNeeded({ opts: initArgsKeys, props: initArgsProps }, interactive);
     initArgs = [...initArgs, ...Object.values(pickBy(promptedArgs))];
@@ -98,8 +114,7 @@ async function promptForInitParams(contractFullName: string, options: any) {
   return { initMethod: initMethod.name, initArgs };
 }
 
-// TODO: consider moving this into naming.ts
-function parse(contractReference: string) {
+function parse(contractReference: string): ParsedContractReference {
   let proxyAddress;
   let contractAlias;
   let packageName;
@@ -113,7 +128,7 @@ function parse(contractReference: string) {
   return { proxyAddress, contractAlias, packageName };
 }
 
-function setCommandProps({ contractReference, network, all, contractFullName, initMethod, initArgs }: PropsParams = {}) {
+function setCommandProps({ contractReference, network, all, contractFullName, initMethod, initArgs }: PropsParams = {}): InquirerQuestions {
   const initMethodsList = methodsList(contractFullName);
   const initArgsList = argsList(contractFullName, initMethod)
     .reduce((accum, argName, index) => {
@@ -142,13 +157,13 @@ function setCommandProps({ contractReference, network, all, contractFullName, in
         name: 'Let me choose by address',
         value: 'byAddress'
       }],
-      when: () => !contractReference
+      when: () => !contractReference && proxiesList('byAddress', network).length,
     },
     proxy: {
       message: 'Choose a proxy',
       type: 'list',
-      choices: proxiesList(network),
-      when: ({ pickProxyBy }) => !all && pickProxyBy !== 'all',
+      choices: ({ pickProxyBy }) => proxiesList(pickProxyBy, network),
+      when: ({ pickProxyBy }) => !all && pickProxyBy && pickProxyBy !== 'all',
       normalize: (input) => typeof input !== 'object' ? proxyInfo(parse(input), network) : input
     },
     askForInitParams: {
