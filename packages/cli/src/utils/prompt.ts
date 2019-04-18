@@ -69,8 +69,8 @@ export function networksList(name: string, message: string, type: string): { [ke
 }
 
 // Returns a list of all proxies, grouped by package
-export function proxiesList(pickProxyBy: string, network: string): { [key: string]: any } {
-  const packageFile = new ZosPackageFile();
+export function proxiesList(pickProxyBy: string, network: string, packageFile?: ZosPackageFile): { [key: string]: any } {
+  packageFile = packageFile || new ZosPackageFile();
   const networkFile = packageFile.networkFile(network);
   const proxies = networkFile.getProxies();
   const groupedByPackage = groupBy(proxies, 'package');
@@ -139,8 +139,8 @@ export function contractsList(name: string, message: string, type: string, sourc
 }
 
 // Returns an inquirer question with a list of methods names for a particular contract
-export function methodsList(contractFullName: string): { [key: string]: any } {
-  return contractMethods(contractFullName)
+export function methodsList(contractFullName: string, packageFile?: ZosPackageFile): { [key: string]: any } {
+  return contractMethods(contractFullName, packageFile)
     .map(({ name, hasInitializer, inputs, selector }) => {
       const initializable = hasInitializer ? `[Initializable] ` : '';
       const args = inputs.map(({ name: inputName, type }) => `${inputName}: ${type}`);
@@ -150,9 +150,9 @@ export function methodsList(contractFullName: string): { [key: string]: any } {
     });
 }
 
-export function argsList(contractFullName: string, methodIdentifier: string): string[] {
+export function argsList(contractFullName: string, methodIdentifier: string, packageFile?: ZosPackageFile): string[] {
   // Returns an inquirer question with a list of arguments for a particular method
-  const method = contractMethods(contractFullName)
+  const method = contractMethods(contractFullName, packageFile)
     .find(({ name, selector }) => selector === methodIdentifier || name === methodIdentifier);
   if (method) {
     return method
@@ -161,9 +161,9 @@ export function argsList(contractFullName: string, methodIdentifier: string): st
   } else return [];
 }
 
-export function contractMethods(contractFullName: string): any[] {
+function contractMethods(contractFullName: string, packageFile: ZosPackageFile): any[] {
   const { contract: contractAlias, package: packageName } = fromContractFullName(contractFullName);
-  const localController = new LocalController();
+  const localController = new LocalController(packageFile);
   if (!localController.hasContract(packageName, contractAlias)) return [];
   const contract = localController.getContractClass(packageName, contractAlias);
 

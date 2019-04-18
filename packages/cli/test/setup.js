@@ -12,7 +12,6 @@ ZWeb3.initialize(web3.currentProvider)
 setArtifactDefaults()
 prompt.DEFAULT_INTERACTIVE_STATUS = false
 
-
 require('chai')
   .use(require('chai-as-promised'))
   .use(require('chai-string'))

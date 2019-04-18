@@ -1,13 +1,14 @@
 'use strict';
 
 require('../setup');
-
 import sinon from 'sinon';
 import inquirer from 'inquirer';
 import Truffle from '../../src/models/initializer/truffle/Truffle';
-import { promptIfNeeded, contractsList, networksList } from '../../src/utils/prompt';
+import LocalController from '../../src/models/local/LocalController';
+import ZosPackageFile from '../../src/models/files/ZosPackageFile';
+import { promptIfNeeded, contractsList, networksList, methodsList, argsList } from '../../src/utils/prompt';
 
-describe('prompt', function() {
+contract('prompt', function(_, owner) {
   describe('functions', function() {
     describe('#promptIfNeeded', function() {
       beforeEach('set stub and initialize', function() {
@@ -82,7 +83,7 @@ describe('prompt', function() {
       });
 
       it('returns an object with correct keys and values', function() {
-        const networkList = networksList('listy');
+        const networkList = networksList('network', 'Select a network from the network list', 'listy');
         networkList.should.be.an('object');
         networkList.network.should.be.an('object').that.has.all.keys('type', 'message', 'choices');
         networkList.network.type.should.eq('listy');
@@ -111,27 +112,55 @@ describe('prompt', function() {
       });
     });
 
-    describe('#proxiesList', function() {
-      it('does something', function() {
-
-      });
-    });
-
-    describe('#proxyInfo', function() {
-      it('does something', function() {
-
-      });
-    });
-
     describe('#methodsList', function() {
-      it('does something', function() {
+      beforeEach('initialize packageFile', function() {
+        this.packageFile = new ZosPackageFile('test/mocks/mock-stdlib-2/zos.json');
+      });
 
+      context('when providing an unexistent contract in the package', function() {
+        it('returns an empty array of methods', function() {
+          const methods = methodsList('Foobar', this.packageFile);
+          methods.should.be.an('array').that.is.empty;
+        });
+      });
+
+      context('when providing an existent contract', function() {
+        it('returns an array of methods', function() {
+          const methods = methodsList('Greeter', this.packageFile);
+          methods.should.be.an('array');
+          methods.should.have.lengthOf(3);
+          methods[0].should.be.an('object').that.has.all.keys('name', 'value');
+          methods[0].name.should.eq('greet(who: string)');
+          methods[0].value.should.be.an('object').that.has.all.keys('name', 'selector');
+        })
       });
     });
 
     describe('#argsList', function() {
-      it('does something', function() {
+      beforeEach('initialize packageFile', function() {
+        this.packageFile = new ZosPackageFile('test/mocks/mock-stdlib-2/zos.json');
+      });
 
+      context('when providing an unexistent contract in the package', function() {
+        it('returns an empty array', function() {
+          const args = argsList('Foobar', 'foo()', this.packageFile);
+          args.should.be.an('array').that.is.empty;
+        });
+      });
+
+      context('when providing an existent contract but an existent identifier', function() {
+        it('returns an empty array', function() {
+          const args = argsList('Greeter', 'foo(string)', this.packageFile);
+          args.should.be.an('array').that.is.empty;
+        });
+      });
+
+      context('when providing an existent contract and identifier', function() {
+        it('returns an array of method arguments names', function() {
+          const args = argsList('Greeter', 'greet(string)', this.packageFile);
+          args.should.be.an('array');
+          args[0].should.eq('who');
+        });
       });
     });
   });
