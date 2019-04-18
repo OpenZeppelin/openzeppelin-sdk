@@ -29,20 +29,14 @@ export let DEFAULT_INTERACTIVE_STATUS = true;
  * */
 export async function promptIfNeeded({ args = {}, opts = {}, defaults, props }: PromptParams, interactive?: boolean): Promise<any> {
   interactive = typeof interactive === 'undefined' ? DEFAULT_INTERACTIVE_STATUS : interactive;
-  const argsQuestions = Object.keys(args)
-    .filter(argName => args[argName] === undefined || isEmpty(args[argName]))
-    .filter(argName => !hasEmptyChoices(props[argName]))
-    .map(argName => promptFor(argName, defaults, props));
+  const argsAndOpts  = { ...args, ...opts };
 
-  const optsQuestions = Object.keys(opts)
-    .filter(optName => opts[optName] === undefined)
-    .filter(optName => !hasEmptyChoices(props[optName]))
-    .map(optName => promptFor(optName, defaults, props));
+  const argsAndOptsQuestions = Object.keys(argsAndOpts)
+    .filter(name => argsAndOpts[name] === undefined || isEmpty(argsAndOpts[name]))
+    .filter(name => props[name] && !hasEmptyChoices(props[name]))
+    .map(name => promptFor(name, defaults, props));
 
-  return {
-    ...await answersFor(args, argsQuestions, props, interactive),
-    ...await answersFor(opts, optsQuestions, props, interactive)
-  };
+  return await answersFor(argsAndOpts, argsAndOptsQuestions, props, interactive);
 }
 
 export function networksList(type: string): { [key: string]: any } {
@@ -173,20 +167,6 @@ export function argsList(contractFullName: string, methodIdentifier: string): st
   } else return [];
 }
 
-// Returns an object with each key as an argument name and each value as undefined
-// (e.g., { foo: undefined, bar: undefined }) as required by the promptIfNeeded function
-// TODO: change name
-export function initArgsForPrompt(contractFullName: string, methodIdentifier: string): { [key: string]: any } {
-  const method = contractMethods(contractFullName)
-    .find(({ name, selector }) => selector === methodIdentifier || name === methodIdentifier);
-  if (method) {
-    return method
-      .inputs
-      .map(({ name: inputName }) => ({ [inputName]: undefined }))
-      .reduce((accum, current) => ({ ...accum, ...current }), {});
-  } else return {};
-}
-
 export function contractMethods(contractFullName: string): any[] {
   const { contract: contractAlias, package: packageName } = fromContractFullName(contractFullName);
   const localController = new LocalController();
@@ -201,7 +181,7 @@ async function answersFor(inputs, questions, props, interactive) {
   const merged = interactive ? { ...inputs, ...await inquirer.prompt(questions) } : inputs;
 
   Object.keys(merged).forEach(propName => {
-    if (props[propName].normalize) merged[propName] = props[propName].normalize(merged[propName]);
+    if (props[propName] && props[propName].normalize) merged[propName] = props[propName].normalize(merged[propName]);
   });
 
   return merged;
