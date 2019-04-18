@@ -9,7 +9,7 @@ import { parseInit } from '../utils/input';
 import { fromContractFullName } from '../utils/naming';
 import { hasToMigrateProject } from '../utils/prompt-migration';
 import ConfigVariablesInitializer from '../models/initializer/ConfigVariablesInitializer';
-import { promptIfNeeded, networksList, contractsList, methodsList, argsList, contractMethods } from '../utils/prompt';
+import { promptIfNeeded, networksList, contractsList, methodsList, argsList } from '../utils/prompt';
 
 const name: string = 'create';
 const signature: string = `${name} [alias]`;

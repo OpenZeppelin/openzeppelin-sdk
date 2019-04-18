@@ -78,7 +78,9 @@ async function runActionIfNeeded(contractName: string, network: string, options:
 async function promptForDeployDependencies(deployDependencies: boolean, network: string, interactive: boolean): Promise<{ deployDependencies: boolean }> {
   if (await ZWeb3.isGanacheNode()) return { deployDependencies: true };
   if (Dependency.hasDependenciesForDeploy(network)) {
-    return promptIfNeeded({ opts: { deployDependencies }, props: setCommandProps(network) }, interactive);
+    const opts = { deployDependencies };
+    const props = setCommandProps(network);
+    return promptIfNeeded({ opts, props }, interactive);
   }
   return { deployDependencies: undefined };
 }
