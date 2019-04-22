@@ -1,6 +1,7 @@
 import pickBy from 'lodash.pickby';
 
 import init from './init';
+import link from './link';
 import add from './add';
 import push from './push';
 import create from '../scripts/create';
@@ -32,6 +33,7 @@ async function actionsWrapper(contractFullName: string, options: any): Promise<v
   const { network: promptedNewtork, contractFullName: promptedContractFullName } = await promptForCreate(contractFullName, options);
   const { network, txParams } = await ConfigVariablesInitializer.initNetworkConfiguration({ ...options, network: promptedNewtork });
 
+  await link.runActionIfNeeded(promptedContractFullName, options);
   await add.runActionIfNeeded(promptedContractFullName, options);
   await push.runActionIfNeeded(promptedContractFullName, network, { ...options, network: promptedNewtork });
 

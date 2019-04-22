@@ -1,8 +1,10 @@
 import init from './init';
 import push from './push';
 import link from '../scripts/link';
-import { promptIfNeeded, InquirerQuestions } from '../utils/prompt';
 import Dependency from '../models/dependency/Dependency';
+import ZosPackageFile from '../models/files/ZosPackageFile';
+import { promptIfNeeded, InquirerQuestions } from '../utils/prompt';
+import { fromContractFullName } from '../utils/naming';
 
 const name: string = 'link';
 const signature: string = `${name} [dependencies...]`;
@@ -18,8 +20,7 @@ const register: (program: any) => any = (program) => program
   .action(action);
 
 async function action(dependencies: string[], options: any): Promise<void> {
-  const { install, interactive } = options;
-  const installDependencies = install && interactive ? undefined : install;
+  const { install: installDependencies, interactive } = options;
 
   await init.runActionIfNeeded(options);
 
@@ -29,12 +30,17 @@ async function action(dependencies: string[], options: any): Promise<void> {
   const defaults = { dependencies: [await Dependency.fetchVersionFromNpm('openzeppelin-eth')] };
   const prompted = await promptIfNeeded({ args, opts, props, defaults }, interactive);
 
-  if (prompted.dependencies && typeof prompted.dependencies === 'string') {
-    prompted.dependencies = [prompted.dependencies];
-  }
-
   await link(prompted);
   await push.tryAction(options);
+}
+
+async function runActionIfNeeded(contractFullName: string, options: any): Promise<void> {
+  const { interactive } = options;
+  const packageFile = new ZosPackageFile();
+  const { contract: contractAlias, package: packageName } = fromContractFullName(contractFullName);
+  if (interactive && packageName && !packageFile.hasDependency(packageName)) {
+    await action([packageName], { ...options, install: true });
+  }
 }
 
 function setCommandProps(): InquirerQuestions {
@@ -42,6 +48,7 @@ function setCommandProps(): InquirerQuestions {
     dependencies: {
       type: 'input',
       message: 'Provide an EVM-package name and version',
+      normalize: (input) => typeof input === 'string' ? [input] : input
     },
     installDependencies: {
       type: 'confirm',
@@ -51,4 +58,4 @@ function setCommandProps(): InquirerQuestions {
   };
 }
 
-export default { name, signature, description, register, action };
+export default { name, signature, description, register, action, runActionIfNeeded };

@@ -56,7 +56,7 @@ export async function promptIfNeeded({ args = {}, opts = {}, defaults, props }: 
   const argsAndOpts  = { ...args, ...opts };
 
   const argsAndOptsQuestions = Object.keys(argsAndOpts)
-    .filter(name => argsAndOpts[name] === undefined || isEmpty(argsAndOpts[name]))
+    .filter(name =>argsAndOpts[name] === undefined || (typeof argsAndOpts[name] !== 'boolean' && isEmpty(argsAndOpts[name])))
     .filter(name => props[name] && !hasEmptyChoices(props[name]))
     .map(name => promptFor(name, defaults, props));
 
