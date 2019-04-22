@@ -1,3 +1,5 @@
+import isEmpty from 'lodash.isempty';
+
 import Proxy from '../proxy/Proxy';
 import Logger from '../utils/Logger';
 import Contracts from '../artifacts/Contracts';
@@ -42,7 +44,8 @@ export default class ProxyAdmin {
   }
 
   public async upgradeProxy(proxyAddress: string, implementationAddress: string, contract: Contract, initMethodName: string, initArgs: any): Promise<Contract> {
-    const receipt: any = typeof(initArgs) === 'undefined'
+    if (!isEmpty(initArgs) && !initMethodName) initMethodName = 'initialize';
+    const receipt: any = initMethodName === undefined
       ? await this._upgradeProxy(proxyAddress, implementationAddress)
       : await this._upgradeProxyAndCall(proxyAddress, implementationAddress, contract, initMethodName, initArgs);
     log.info(`TX receipt received: ${receipt.transactionHash}`);
