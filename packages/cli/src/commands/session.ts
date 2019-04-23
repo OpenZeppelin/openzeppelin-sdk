@@ -50,13 +50,13 @@ function setCommandProps(accounts: string[] = []): InquirerQuestions {
     },
     timeout: {
       type: 'input',
-      message: 'Provide a timeout value (in seconds)',
+      message: 'Enter a timeout to use for all web3 transactions (in seconds)',
       default: 3600
     },
     expires: {
       type: 'input',
-      message: 'Provide an expiration time (in seconds)',
-      default: 600
+      message: 'Enter an expiration time for this session (in seconds)',
+      default: 3600
     }
   };
 }

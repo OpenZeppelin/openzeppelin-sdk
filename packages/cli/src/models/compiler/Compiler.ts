@@ -3,7 +3,7 @@ import { FileSystem, Logger } from 'zos-lib';
 
 const log = new Logger('Compiler');
 
-const state: any = { alreadyCompiled: false };
+const state = { alreadyCompiled: false };
 
 const Compiler = {
   async call(): Promise<{ stdout: string, stderr: string }> {

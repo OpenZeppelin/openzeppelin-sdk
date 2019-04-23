@@ -48,7 +48,7 @@ export let DEFAULT_INTERACTIVE_STATUS = true;
  * the 'arguments' are the parameters sent right after the command name, e.g., * zos create Foo
  * (Foo is the argument) and the optionn are the parameters sent right after a flag * e.g.,
  * zos push --network local (local is the option). In addition to this, `props` is an object with some
- * inquirer questions attribubes (such as question type, message and name) and `defaults` is an object with
+ * inquirer questions attributes (such as question type, message and name) and `defaults` is an object with
  * default values for each args/props attributes.
  * */
 export async function promptIfNeeded({ args = {}, opts = {}, defaults, props }: PromptParams, interactive?: boolean): Promise<any> {
