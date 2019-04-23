@@ -40,7 +40,7 @@ function setCommandProps(accounts: string[] = []): InquirerQuestions {
     ...networksList('network', 'Select a network from the network list', 'list'),
     from: {
       type: 'list',
-      message: 'Select an account address',
+      message: 'Choose the account to send transactions from',
       choices: accounts.map((account, index) => {
         return {
           name: `(${index}) ${account}`,
