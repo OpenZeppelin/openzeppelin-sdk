@@ -2,6 +2,7 @@ import { execFile, ExecException } from 'child_process';
 import { FileSystem, Logger } from 'zos-lib';
 
 const log = new Logger('Compiler');
+
 const state = { alreadyCompiled: false };
 
 const Compiler = {

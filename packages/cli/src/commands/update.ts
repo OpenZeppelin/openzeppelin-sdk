@@ -125,10 +125,10 @@ function getCommandProps({ contractReference, network, all, contractFullName, in
         name: 'All proxies',
         value: 'all'
       }, {
-        name: 'Let me choose by name or alias',
+        name: 'Choose by name',
         value: 'byName'
       }, {
-        name: 'Let me choose by address',
+        name: 'Choose by address',
         value: 'byAddress'
       }],
       when: () => !contractReference && proxiesList('byAddress', network).length,

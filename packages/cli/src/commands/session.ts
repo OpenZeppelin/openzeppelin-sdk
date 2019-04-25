@@ -40,7 +40,7 @@ function getCommandProps(accounts: string[] = []): InquirerQuestions {
     ...networksList('network', 'list'),
     from: {
       type: 'list',
-      message: 'Select an account address',
+      message: 'Choose the account to send transactions from',
       choices: accounts.map((account, index) => ({
         name: `(${index}) ${account}`,
         value: account
@@ -48,13 +48,13 @@ function getCommandProps(accounts: string[] = []): InquirerQuestions {
     },
     timeout: {
       type: 'input',
-      message: 'Provide a timeout value (in seconds)',
+      message: 'Enter a timeout to use for all web3 transactions (in seconds)',
       default: 3600
     },
     expires: {
       type: 'input',
-      message: 'Provide an expiration time (in seconds)',
-      default: 600
+      message: 'Enter an expiration time for this session (in seconds)',
+      default: 3600
     }
   };
 }

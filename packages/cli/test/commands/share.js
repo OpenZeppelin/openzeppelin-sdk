@@ -127,4 +127,3 @@ exports.itShouldParse = function (name, cmd, args, cb) {
     program.parse(args)
   })
 }
-//exports.itShouldParse.skip = (name) => it.skip(name);
