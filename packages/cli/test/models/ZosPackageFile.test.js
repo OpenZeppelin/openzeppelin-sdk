@@ -14,6 +14,7 @@ contract('ZosPackageFile', function() {
       })
     });
   })
+
   describe('constructor', function () {
     it('creates empty file', function () {
       const file = new ZosPackageFile('test/mocks/packages/new.zos.json')

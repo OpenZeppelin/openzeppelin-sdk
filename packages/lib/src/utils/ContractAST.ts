@@ -2,6 +2,8 @@ import some from 'lodash.some';
 import reverse from 'lodash.reverse';
 import includes from 'lodash.includes';
 import isEqual from 'lodash.isequal';
+import pick from 'lodash.pick';
+import flatten from 'lodash.flatten';
 
 import { getBuildArtifacts, BuildArtifacts } from '../artifacts/BuildArtifacts';
 import Contract from '../artifacts/Contract';
@@ -54,8 +56,8 @@ export default class ContractAST {
   private nodesFilter: string[];
 
   constructor(contract: Contract, artifacts?: BuildArtifacts, props?: ContractASTProps) {
-
-    this.artifacts = artifacts || getBuildArtifacts();
+    const { directory } = contract.schema;
+    this.artifacts = artifacts || getBuildArtifacts(directory);
     this.contract = contract;
 
     // Transitive closure of source files imported from the contract.
@@ -80,6 +82,25 @@ export default class ContractAST {
       node.nodeType === 'ContractDefinition' &&
       node.name === this.contract.schema.contractName
     );
+  }
+
+  public getMethods(attributes?: string[]): any {
+    const baseContracts = this.getLinearizedBaseContracts();
+    return flatten(baseContracts.map(contract => contract.nodes))
+      .filter(({ nodeType, name }) => nodeType === 'FunctionDefinition' && this._isValidMethodName(name))
+      .map(node => {
+        // filter attributes
+        const selectedAttributes = attributes ? pick(node, attributes) : node;
+        // get method parameters
+        const { parameters } = node.parameters;
+        const inputs = parameters
+          .map(({ name, typeDescriptions }) => ({ name, type: typeDescriptions.typeString }));
+        // generate the method selector
+        const selectorArgs = inputs ? inputs.map(({ type }) => type).join(',') : '';
+        const selector = `${node.name}(${selectorArgs})`;
+
+        return { selector, inputs, ...selectedAttributes };
+      });
   }
 
   public getLinearizedBaseContracts(mostDerivedFirst: boolean = false): Node[] {
@@ -131,5 +152,9 @@ export default class ContractAST {
     // Call recursively to children
     if (node.nodes) node.nodes.forEach(this._collectNodes.bind(this));
 
+  }
+
+  private _isValidMethodName(name) {
+    return name !== '' && name !== 'isConstructor';
   }
 }

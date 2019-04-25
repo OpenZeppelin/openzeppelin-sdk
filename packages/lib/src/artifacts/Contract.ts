@@ -1,5 +1,6 @@
 import ZWeb3 from './ZWeb3';
 import Contracts from './Contracts';
+import ContractAST from '../utils/ContractAST';
 import { StorageLayoutInfo } from '../validations/Storage';
 import { Callback, EventLog, EventEmitter, TransactionReceipt } from 'web3/types';
 import { Contract as Web3Contract, TransactionObject, BlockType } from 'web3-eth-contract';
@@ -34,6 +35,7 @@ export default interface Contract {
   schema: {
 
     // Zos schema specific.
+    directory: string;
     linkedBytecode: string;
     linkedDeployedBytecode: string;
     warnings: any;
@@ -55,6 +57,12 @@ export default interface Contract {
     networks: any;
     updatedAt: string;
   };
+}
+
+interface ContractMethod {
+  name: string;
+  hasInitializer: boolean;
+  inputs: string[];
 }
 
 function _wrapContractInstance(schema: any, instance: Web3Contract): Contract {
@@ -111,6 +119,20 @@ function _wrapContractInstance(schema: any, instance: Web3Contract): Contract {
 export function createContract(schema: any): Contract {
   const contract = ZWeb3.contract(schema.abi, null, Contracts.getArtifactsDefaults());
   return _wrapContractInstance(schema, contract);
+}
+
+// get methods from AST, as there is no info about the modifiers in the ABI
+export function contractMethodsFromAst(instance: Contract): ContractMethod[] {
+  const contractAst = new ContractAST(instance, null, { nodesFilter: ['ContractDefinition'] });
+  return contractAst.getMethods()
+    .filter(({ visibility }) => visibility === 'public' || visibility === 'external')
+    .map(method => {
+      const initializer = method
+        .modifiers
+        .find(({ modifierName }) => modifierName.name === 'initializer');
+
+      return { ...method, hasInitializer: initializer ? true : false };
+    });
 }
 
 function parseArguments(passedArguments, abi) {

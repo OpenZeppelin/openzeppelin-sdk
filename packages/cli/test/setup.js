@@ -4,11 +4,13 @@ import { ZWeb3, Contracts } from 'zos-lib'
 import Dependency from '../src/models/dependency/Dependency'
 import ZosPackageFile from '../src/models/files/ZosPackageFile'
 import ZosNetworkFile from '../src/models/files/ZosNetworkFile'
+const prompt = require('../src/prompts/prompt');
 
 useTestZosPackageFile()
 doNotInstallStdlib()
 ZWeb3.initialize(web3.currentProvider)
 setArtifactDefaults()
+prompt.DEFAULT_INTERACTIVE_STATUS = false
 
 require('chai')
   .use(require('chai-as-promised'))

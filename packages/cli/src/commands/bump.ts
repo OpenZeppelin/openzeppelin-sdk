@@ -14,7 +14,7 @@ const register: (program: any) => any = (program) => program
 
 async function action(version: string, options: any): Promise<void> {
   await bump({ version });
-  await push.tryAction(options);
+  await push.runActionIfRequested(options);
 }
 
 export default { name, signature, description, register, action };

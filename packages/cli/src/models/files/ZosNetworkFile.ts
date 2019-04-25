@@ -10,7 +10,7 @@ import find from 'lodash.find';
 import { Logger, FileSystem as fs, bytecodeDigest, bodyCode, constructorCode, semanticVersionToString, Contract } from 'zos-lib';
 import { fromContractFullName, toContractFullName } from '../../utils/naming';
 import { ZOS_VERSION, checkVersion } from './ZosVersion';
-import ZosPackageFile from './ZosPackageFile.js';
+import ZosPackageFile from './ZosPackageFile';
 
 const log = new Logger('ZosNetworkFile');
 

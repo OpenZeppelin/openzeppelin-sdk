@@ -269,4 +269,4 @@ class BaseAppProject extends BasePackageProject {
 }
 // Mixings produce value but not type
 // We have to export full class with type & callable
-export default class AppProject extends ProxyAdminProjectMixin(BaseAppProject) {};
+export default class AppProject extends ProxyAdminProjectMixin(BaseAppProject) {}

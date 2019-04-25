@@ -2,27 +2,20 @@ import omit from 'lodash.omit';
 import isString from 'lodash.isstring';
 import { ZWeb3 } from 'zos-lib';
 
+import init from './init';
+import add from './add';
 import push from '../scripts/push';
 import Session from '../models/network/Session';
 import Compiler from '../models/compiler/Compiler';
+import { fromContractFullName } from '../utils/naming';
 import Dependency from '../models/dependency/Dependency';
+import ZosPackageFile from '../models/files/ZosPackageFile';
 import ConfigVariablesInitializer from '../models/initializer/ConfigVariablesInitializer';
-import { promptIfNeeded, getNetworkList } from '../utils/prompt';
+import { promptIfNeeded, networksList, InquirerQuestions } from '../prompts/prompt';
 
 const name: string = 'push';
 const signature: string = name;
 const description: string = 'deploys your project to the specified <network>';
-
-const props = (networkName?: string) => {
-  return {
-    ...getNetworkList('list'),
-    deployDependencies: {
-      type: 'confirm',
-      message: `One or more linked dependencies are not yet deployed on ${networkName}.\nDo you want to deploy them now?`,
-      default: true
-    }
-  };
-};
 
 const register: (program: any) => any = (program) => program
   .command(signature, undefined, { noHelp: true })
@@ -35,26 +28,33 @@ const register: (program: any) => any = (program) => program
   .option('--deploy-proxy-admin', 'eagerly deploys the project\'s proxy admin (if not deployed yet on the provided network)')
   .option('--deploy-proxy-factory', 'eagerly deploys the project\'s proxy factory (if not deployed yet on the provided network)')
   .withNetworkOptions()
-  .action(action);
+  .withNonInteractiveOption()
+  .action(commandActions);
+
+async function commandActions(options: any): Promise<void> {
+  await init.runActionIfNeeded(options);
+  await add.runActionIfNeeded(null, options);
+  await action(options);
+}
 
 async function action(options: any): Promise<void> {
-  const { force, deployDependencies, reset: reupload, network: networkInArgs, deployProxyAdmin, deployProxyFactory } = options;
-  const { network: networkInSession } = Session.getOptions();
-  const defaultArgs = { network: Session.getDefaultNetwork() };
-  const defaultOpts = { network: networkInSession || networkInArgs };
+  const { force, deployDependencies, reset: reupload, network: networkInOpts, deployProxyAdmin, deployProxyFactory, interactive } = options;
+  const { network: networkInSession, expired } = Session.getNetwork();
+  const opts = { network: networkInOpts || (!expired ? networkInSession : undefined) };
+  const defaults = { network: networkInSession };
+  const props = getCommandProps();
+
   if (!options.skipCompile) await Compiler.call();
 
-  const promptedOpts = await promptIfNeeded({ opts: defaultOpts, defaults: defaultArgs, props: props() });
-  Session.setDefaultNetworkIfNeeded(promptedOpts.network);
-
-  const { network, txParams } = await ConfigVariablesInitializer.initNetworkConfiguration(promptedOpts);
-  const promptDeployDependencies = await promptForDeployDependencies(deployDependencies, network);
+  const prompted = await promptIfNeeded({ opts, defaults, props }, interactive);
+  const { network, txParams } = await ConfigVariablesInitializer.initNetworkConfiguration({ ...options, ...prompted });
+  const promptDeployDependencies = await promptForDeployDependencies(deployDependencies, network, interactive);
 
   await push({ deployProxyAdmin, deployProxyFactory, force, reupload, network, txParams, ...promptDeployDependencies });
   if (!options.dontExitProcess && process.env.NODE_ENV !== 'test') process.exit(0);
 }
 
-async function tryAction(externalOptions: any): Promise<void> {
+async function runActionIfRequested(externalOptions: any): Promise<void> {
   if (!externalOptions.push) return;
   const options = omit(externalOptions, 'push');
   const network = isString(externalOptions.push) ? externalOptions.push : undefined;
@@ -62,12 +62,38 @@ async function tryAction(externalOptions: any): Promise<void> {
   return action(options);
 }
 
-async function promptForDeployDependencies(deployDependencies, network): Promise<{ deployDependencies: boolean }> {
+async function runActionIfNeeded(contractName: string, network: string, options: any): Promise<void> {
+  const { interactive, network: promptedNetwork } = options;
+  const packageFile = new ZosPackageFile();
+  const networkFile = packageFile.networkFile(network);
+  const { contract: contractAlias, package: packageName } = fromContractFullName(contractName);
+
+  if (interactive) {
+    if ((!packageName && !networkFile.hasContract(contractAlias)) || (packageName && !networkFile.hasDependency(packageName))) {
+      await action({ ...options, dontExitProcess: true });
+    }
+  }
+}
+
+async function promptForDeployDependencies(deployDependencies: boolean, network: string, interactive: boolean): Promise<{ deployDependencies: boolean | undefined }> {
   if (await ZWeb3.isGanacheNode()) return { deployDependencies: true };
   if (Dependency.hasDependenciesForDeploy(network)) {
-    return promptIfNeeded({ opts: { deployDependencies }, props: props(network) });
+    const opts = { deployDependencies };
+    const props = getCommandProps(network);
+    return promptIfNeeded({ opts, props }, interactive);
   }
   return { deployDependencies: undefined };
 }
 
-export default { name, signature, description, register, action, tryAction };
+function getCommandProps(networkName?: string): InquirerQuestions {
+  return {
+    ...networksList('network', 'list'),
+    deployDependencies: {
+      type: 'confirm',
+      message: `One or more linked dependencies are not yet deployed on ${networkName}.\nDo you want to deploy them now?`,
+      default: true
+    }
+  };
+}
+
+export default { name, signature, description, register, action, runActionIfRequested, runActionIfNeeded };

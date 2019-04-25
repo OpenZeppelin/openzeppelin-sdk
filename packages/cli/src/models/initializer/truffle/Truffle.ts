@@ -1,6 +1,6 @@
 import pickBy from 'lodash.pickby';
 import pick from 'lodash.pick';
-import { FileSystem } from 'zos-lib';
+import { FileSystem, Contracts } from 'zos-lib';
 
 const Truffle = {
 
@@ -65,25 +65,31 @@ const Truffle = {
 
   getContractNames(): string[] {
     const buildDir = this.getBuildDir();
-    if (buildDir) {
+    if (FileSystem.exists(buildDir)) {
       return FileSystem.readDir(buildDir)
-        .filter((name) => name.match(/\.json$/))
-        .filter((name) => {
-          const contract = FileSystem.parseJsonIfExists(`${buildDir}/${name}`);
-          if (contract) {
-            const isLibrary = contract.ast && contract.ast.nodes
-              .find((node) => node.name === contract.contractName && node.contractKind === 'library');
-            const projectDir = buildDir.replace('build/contracts', '');
-
-            return !isLibrary
-                    && contract.sourcePath.indexOf(projectDir) === 0
-                    && contract.bytecode.length > 2;
-          } else return false;
+        .filter(name => name.match(/\.json$/))
+        .map(name => FileSystem.parseJsonIfExists(`${buildDir}/${name}`))
+        .filter(contract => {
+          return this._isLocalContract(buildDir, contract)
+            && !this._isLibrary(contract)
+            && !this._isAbstractContract(contract);
         })
-        .map((name) => name.replace('.json', ''));
-    } else {
-      return [];
-    }
+        .map(({ contractName }) => contractName);
+    } else return [];
+  },
+
+  _isLocalContract(buildDir: string, contract: { [key: string]: any }): boolean {
+    const projectDir = buildDir.replace('build/contracts', '');
+    return contract.sourcePath.indexOf(projectDir) === 0;
+  },
+
+  _isAbstractContract(contract: { [key: string]: any }): boolean {
+    return contract && contract.bytecode.length <= 2;
+  },
+
+  _isLibrary(contract: { [key: string]: any }): boolean {
+    return contract && contract.ast && !!contract.ast.nodes
+      .find(node => node.contractKind === 'library' && node.name === contract.contractName);
   },
 
   // This function fixes a truffle issue related to HDWalletProvider that occurs when assigning

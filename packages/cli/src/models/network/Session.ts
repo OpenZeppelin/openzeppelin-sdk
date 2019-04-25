@@ -19,10 +19,13 @@ interface SessionOptions {
 
 const Session = {
 
-  getOptions(overrides: SessionOptions = {}): SessionOptions {
+  getOptions(overrides: SessionOptions = {}, silent?: boolean): SessionOptions {
     const session = this._parseSession();
     if (!session || this._hasExpired(session)) return this._setDefaults(overrides);
-    log.info(`Using session with ${describe(omitBy(session, (v, key) => overrides[key]))}`);
+    if (!silent) {
+      const fields = omitBy(session, (v, key) => overrides[key] && overrides[key] !== v);
+      log.info(`Using session with ${describe(fields)}`);
+    }
 
     return { ...session, ...overrides };
   },
@@ -32,9 +35,10 @@ const Session = {
     if (!session || this._hasExpired(session)) this.open({ network }, 0, false);
   },
 
-  getDefaultNetwork(): string | undefined {
+  getNetwork(): { network: string | undefined, expired: boolean } {
     const session = this._parseSession();
-    return session && this._hasExpired(session) ? session.network : undefined;
+    const network = session ? session.network : undefined;
+    return { network, expired: this._hasExpired(session) };
   },
 
   open({ network, from, timeout }: SessionOptions, expires: number = DEFAULT_EXPIRATION_TIMEOUT, logInfo: boolean = true): void {
@@ -68,7 +72,7 @@ const Session = {
   },
 
   _hasExpired(session: SessionOptions): boolean {
-    return session && new Date(session.expires) <= new Date();
+    return !!session && new Date(session.expires) <= new Date();
   }
 };
 

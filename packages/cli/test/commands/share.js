@@ -25,7 +25,9 @@ import * as setAdmin from '../../src/scripts/set-admin';
 import program from '../../src/bin/program';
 import Session from '../../src/models/network/Session';
 import ZosNetworkFile from '../../src/models/files/ZosNetworkFile';
+import ZosPackageFile from '../../src/models/files/ZosPackageFile';
 import Compiler from '../../src/models/compiler/Compiler';
+import Dependency from '../../src/models/dependency/Dependency';
 import ErrorHandler from '../../src/models/errors/ErrorHandler';
 import ConfigVariablesInitializer from '../../src/models/initializer/ConfigVariablesInitializer';
 
@@ -77,6 +79,9 @@ exports.stubCommands = function () {
       return { network, txParams }
     })
     this.getZosversion = sinon.stub(ZosNetworkFile, 'getZosversion').returns('2.2');
+    this.packageFile = sinon.stub(ZosPackageFile.prototype, 'exists').returns(true);
+    const zosPackageFile = new ZosPackageFile('test/mocks/mock-stdlib/zos.json');
+    this.dependency = sinon.stub(Dependency.prototype, 'getPackageFile').returns(zosPackageFile);
   })
 
   afterEach('restore', function () {
@@ -105,6 +110,8 @@ exports.stubCommands = function () {
     this.initializer.restore()
     this.compiler.restore()
     this.getZosversion.restore()
+    this.packageFile.restore()
+    this.dependency.restore()
     program.parseReset()
   })
 }

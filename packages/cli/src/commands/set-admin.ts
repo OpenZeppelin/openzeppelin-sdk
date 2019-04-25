@@ -3,7 +3,7 @@ import inquirer from 'inquirer';
 
 import setAdmin from '../scripts/set-admin';
 import { fromContractFullName } from '../utils/naming';
-import { hasToMigrateProject } from '../utils/prompt-migration';
+import { hasToMigrateProject } from '../prompts/migrations';
 import ConfigVariablesInitializer from '../models/initializer/ConfigVariablesInitializer';
 
 const name: string = 'set-admin';

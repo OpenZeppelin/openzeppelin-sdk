@@ -14,7 +14,7 @@ import isEqual from 'lodash.isequal';
 import concat from 'lodash.concat';
 import toPairs from 'lodash.topairs';
 
-import { Contracts, Contract, Logger, FileSystem as fs, Proxy, Transactions, semanticVersionToString } from 'zos-lib';
+import { Contracts, Contract, Logger, FileSystem as fs, Proxy, Transactions, semanticVersionToString, contractMethodsFromAst } from 'zos-lib';
 import { ProxyAdminProject, AppProject, flattenSourceCode, getStorageLayout, BuildArtifacts, getBuildArtifacts, getSolidityLibNames } from 'zos-lib';
 import { validate, newValidationErrors, validationPasses, App, ZWeb3, ProxyAdmin, SimpleProject, AppProxyMigrator } from 'zos-lib';
 import { isMigratableZosversion } from '../files/ZosVersion';
@@ -587,11 +587,14 @@ export default class NetworkController {
   public checkInitialization(contract: Contract, calledInitMethod: string, calledInitArgs: string[]): void {
     // If there is an initializer called, assume it's ok
     if (calledInitMethod) return;
-
     // Otherwise, warn the user to invoke it
-    const initializeMethod = contract.schema.abi.find((fn) => fn.type === 'function' && fn.name === 'initialize');
-    if (!initializeMethod) return;
-    log.error(`Possible initialization method 'initialize' found in contract. Make sure you initialize your instance.`);
+    const contractMethods = contractMethodsFromAst(contract);
+    const initializerMethods = contractMethods
+      .filter(({ hasInitializer, name }) => hasInitializer || name === 'initialize')
+      .map(({ name }) => name);
+
+    if (initializerMethods.length === 0) return;
+    log.error(`Possible initialization method (${uniq(initializerMethods).join(', ')}) found in contract. Make sure you initialize your instance.`);
   }
 
   // Proxy model
@@ -647,12 +650,6 @@ export default class NetworkController {
     if (proxies.length === 0) return [];
     await this.fetchOrDeploy(this.currentVersion);
 
-    // Check if there is any migrate method in the contracts and warn the user to call it
-    const contracts = uniqWith(map(proxies, (p) => [p.package, p.contract]), isEqual);
-    forEach(contracts, ([aPackageName, contractName]) =>
-      this._checkUpgrade(this.localController.getContractClass(aPackageName, contractName), initMethod, initArgs)
-    );
-
     // Update all proxies loaded
     await allPromisesOrError(
       map(proxies, (proxy) => this._upgradeProxy(proxy, initMethod, initArgs))
@@ -689,17 +686,6 @@ export default class NetworkController {
       error.message = `Proxy ${toContractFullName(proxy.package, proxy.contract)} at ${proxy.address} failed to update with error: ${error.message}`;
       throw error;
     }
-  }
-
-  // Proxy model
-  private _checkUpgrade(contract: Contract, calledMigrateMethod: string, calledMigrateArgs: string[]): void {
-    // If there is a migration called, assume it's ok
-    if (calledMigrateMethod) return;
-
-    // Otherwise, warn the user to invoke it
-    const migrateMethod = contract.schema.abi.find((fn) => fn.type === 'function' && fn.name === 'migrate');
-    if (!migrateMethod) return;
-    log.error(`Possible migration method 'migrate' found in contract ${contract.schema.contractName}. Remember running the migration after deploying it.`);
   }
 
   // Proxy model

@@ -181,7 +181,7 @@ contract('Truffle', () => {
 
     context('without directory created', function () {
       it('throws an error', function () {
-        (() => Truffle.getContractNames()).should.throw()
+        Truffle.getContractNames().should.be.an('array').that.is.empty;
       })
     })
 

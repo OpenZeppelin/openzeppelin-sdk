@@ -5,7 +5,7 @@ import queryDeployment from '../scripts/query-deployment';
 import querySignedDeployment from '../scripts/query-signed-deployment';
 import { parseInit } from '../utils/input';
 import { fromContractFullName } from '../utils/naming';
-import { hasToMigrateProject } from '../utils/prompt-migration';
+import { hasToMigrateProject } from '../prompts/migrations';
 import ConfigVariablesInitializer from '../models/initializer/ConfigVariablesInitializer';
 
 const name: string = 'create2';

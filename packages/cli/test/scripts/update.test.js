@@ -187,18 +187,6 @@ contract('update script', function(accounts) {
         this.logs.restore();
       });
 
-      it('should warn when not migrating a contract with migrate method', async function() {
-        await update({ contractAlias: 'Impl', network, txParams, networkFile: this.networkFile });
-        this.logs.errors.should.have.lengthOf(1);
-        this.logs.errors[0].should.match(/remember running the migration/i);
-      });
-
-      it('should warn when not migrating a contract that inherits from one with a migrate method', async function() {
-        await update({ contractAlias: 'WithLibraryImpl', network, txParams, networkFile: this.networkFile });
-        this.logs.errors.should.have.lengthOf(1);
-        this.logs.errors[0].should.match(/remember running the migration/i);
-      });
-
       it('should not warn when migrating a contract', async function() {
         await update({ contractAlias: 'Impl', network, txParams, initMethod: 'migrate', initArgs: [42], networkFile: this.networkFile });
         this.logs.errors.should.have.lengthOf(0);

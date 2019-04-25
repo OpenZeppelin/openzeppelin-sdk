@@ -1,18 +1,17 @@
 import push from './push';
 import add from '../scripts/add';
+import init from './init';
 import addAll from '../scripts/add-all';
 import Truffle from '../models/initializer/truffle/Truffle';
 import Compiler from '../models/compiler/Compiler';
 import ConfigVariablesInitializer from '../models/initializer/ConfigVariablesInitializer';
-import { promptIfNeeded, getContractsList } from '../utils/prompt';
+import { promptIfNeeded, contractsList, InquirerQuestions } from '../prompts/prompt';
+import { fromContractFullName } from '../utils/naming';
+import ZosPackageFile from '../models/files/ZosPackageFile';
 
 const name: string = 'add';
 const signature: string = `${name} [contractNames...]`;
 const description: string = 'add contract to your project. Provide a list of whitespace-separated contract names';
-
-const argsProps = () => {
-  return getContractsList('contractNames', 'Choose one or more contracts', 'checkbox');
-};
 
 const register: (program: any) => any = (program) => program
   .command(signature, undefined, { noHelp: true })
@@ -20,26 +19,55 @@ const register: (program: any) => any = (program) => program
   .description(description)
   .option('--all', 'add all contracts in your build directory')
   .withPushOptions()
-  .action(action);
+  .withNonInteractiveOption()
+  .action(commandActions);
+
+async function commandActions(contractNames: string[], options: any): Promise<void> {
+  await init.runActionIfNeeded(options);
+  await action(contractNames, options);
+}
 
 async function action(contractNames: string[], options: any): Promise<void> {
+  const { skipCompile, all, interactive } = options;
   ConfigVariablesInitializer.initStaticConfiguration();
-  if(!options.skipCompile) await Compiler.call();
-  if(options.all) addAll({});
+
+  if(!skipCompile) await Compiler.call();
+
+  if(all) addAll({});
   else {
-    const promptedArgs = await promptIfNeeded({ args: { contractNames }, props: argsProps() });
+    const args = { contractNames };
+    const props = getCommandProps();
+    const prompted = await promptIfNeeded({ args, props }, interactive);
     const contractsData = contractNames.length !== 0
       ? contractNames.map(splitContractName)
-      : promptedArgs.contractNames.map((contractName) => ({ name: contractName }));
+      : prompted.contractNames.map((contractName) => ({ name: contractName }));
 
     add({ contractsData });
   }
-  await push.tryAction(options);
+  await push.runActionIfRequested(options);
 }
 
-const splitContractName = (rawData) => {
+async function runActionIfNeeded(contractName?: string, options?: any): Promise<void> {
+  const { interactive } = options;
+  const { contract: contractAlias, package: packageName } = fromContractFullName(contractName);
+  const packageFile = new ZosPackageFile();
+
+  if (interactive) {
+    if (!packageName && contractAlias && !packageFile.hasContract(contractAlias)) {
+      await action([contractAlias], options);
+    } else if (!packageName && !packageFile.hasContracts()) {
+      await action([], options);
+    }
+  }
+}
+
+function getCommandProps(): InquirerQuestions {
+  return contractsList('contractNames', 'Choose one or more contracts', 'checkbox', 'fromBuildDir');
+}
+
+function splitContractName(rawData: string): { name: string, alias: string } {
   const [contractName, alias] = rawData.split(':');
   return { name: contractName, alias };
-};
+}
 
-export default { name, signature, description, register, action };
+export default { name, signature, description, register, action, runActionIfNeeded };

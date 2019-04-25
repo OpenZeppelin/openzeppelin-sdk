@@ -42,7 +42,7 @@ describe('input', function () {
       () => parseInit(options, defaultInit).should.deep.eq({ initMethod: expectedInit, initArgs: expectedArgs })
     );
 
-    it('should not init', testFn({}, undefined, undefined));
+    it('should not init', testFn({}, undefined, []));
     it('should init with default when init is set', testFn({ init: true }, defaultInit, []));
     it('should init when args is set', testFn({ args: '20' }, defaultInit, ["20"]));
     it('should init with specific function', testFn({ init: 'foo' }, 'foo', []));

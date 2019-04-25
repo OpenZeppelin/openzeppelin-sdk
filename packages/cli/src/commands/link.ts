@@ -1,23 +1,14 @@
+import init from './init';
 import push from './push';
 import link from '../scripts/link';
-import { promptIfNeeded } from '../utils/prompt';
 import Dependency from '../models/dependency/Dependency';
+import ZosPackageFile from '../models/files/ZosPackageFile';
+import { promptIfNeeded, InquirerQuestions } from '../prompts/prompt';
+import { fromContractFullName } from '../utils/naming';
 
 const name: string = 'link';
 const signature: string = `${name} [dependencies...]`;
 const description: string = 'links project with a list of dependencies each located in its npm package';
-
-const props = {
-  dependencies: {
-    type: 'input',
-    message: 'Provide an EVM-package name and version',
-  },
-  installDependencies: {
-    type: 'confirm',
-    message: 'Do you want to install the dependency?',
-    default: true
-  }
-};
 
 const register: (program: any) => any = (program) => program
   .command(signature, undefined, { noHelp: true })
@@ -29,19 +20,43 @@ const register: (program: any) => any = (program) => program
   .action(action);
 
 async function action(dependencies: string[], options: any): Promise<void> {
-  const { install, interactive } = options;
-  const installDependencies = install && interactive ? undefined : install;
+  const { install, forceInstall, interactive } = options;
+  const installDependencies = forceInstall || (install && interactive ? undefined : install);
 
-  const defaultDependency = await Dependency.fetchVersionFromNpm('openzeppelin-eth');
-  const defaults = { dependencies: [defaultDependency] };
-  const promptedArgs = await promptIfNeeded({ args: { dependencies }, opts: { installDependencies }, props, defaults }, interactive);
+  await init.runActionIfNeeded(options);
 
-  if (promptedArgs.dependencies && typeof promptedArgs.dependencies === 'string') {
-    promptedArgs.dependencies = [promptedArgs.dependencies];
-  }
+  const args = { dependencies };
+  const opts = { installDependencies };
+  const props = getCommandProps();
+  const defaults = { dependencies: [await Dependency.fetchVersionFromNpm('openzeppelin-eth')] };
+  const prompted = await promptIfNeeded({ args, opts, props, defaults }, interactive);
 
-  await link(promptedArgs);
-  await push.tryAction(options);
+  await link(prompted);
+  await push.runActionIfRequested(options);
 }
 
-export default { name, signature, description, register, action };
+async function runActionIfNeeded(contractFullName: string, options: any): Promise<void> {
+  const { interactive } = options;
+  const packageFile = new ZosPackageFile();
+  const { contract: contractAlias, package: packageName } = fromContractFullName(contractFullName);
+  if (interactive && packageName && !packageFile.hasDependency(packageName)) {
+    await action([packageName], { ...options, forceInstall: true });
+  }
+}
+
+function getCommandProps(): InquirerQuestions {
+  return {
+    dependencies: {
+      type: 'input',
+      message: 'Provide an EVM-package name and version',
+      normalize: (input) => typeof input === 'string' ? [input] : input
+    },
+    installDependencies: {
+      type: 'confirm',
+      message: 'Do you want to install the dependency?',
+      default: true
+    }
+  };
+}
+
+export default { name, signature, description, register, action, runActionIfNeeded };

@@ -11,7 +11,7 @@ describe('session command', function() {
   })
 
   itShouldParse('should call session script with --close option', 'session', 'zos session --network test --close', function(session) {
-    session.should.have.been.calledWithExactly({ close: true, expires: undefined, from: undefined, network: 'test', timeout: undefined })
+    session.should.have.been.calledWithExactly({ close: true })
   })
 
 })
