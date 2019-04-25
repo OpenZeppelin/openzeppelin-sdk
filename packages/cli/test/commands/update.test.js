@@ -18,10 +18,6 @@ describe('update command', function() {
     update.should.have.been.calledWith( { packageName: 'OpenZeppelin', contractAlias: 'Impl', network: 'test', initArgs: [], txParams: {} } )
   })
 
-  //itShouldParse('should call update script with package name only', 'update', 'zos update OpenZeppelin/ --network test', function(update) {
-  //  update.should.have.been.calledWith( { packageName: 'OpenZeppelin', network: 'test', initArgs: [], txParams: {} } )
-  //})
-
   itShouldParse('should call update script with address', 'update', 'zos update 0x80 --network test', function(update) {
     update.should.have.been.calledWith( { proxyAddress: '0x80', network: 'test', initArgs: [], txParams: {} } )
   })

@@ -6,7 +6,7 @@ import inquirer from 'inquirer';
 import Truffle from '../../src/models/initializer/truffle/Truffle';
 import LocalController from '../../src/models/local/LocalController';
 import ZosPackageFile from '../../src/models/files/ZosPackageFile';
-import { promptIfNeeded, contractsList, networksList, methodsList, argsList } from '../../src/utils/prompt';
+import { promptIfNeeded, contractsList, networksList, methodsList, argsList } from '../../src/prompts/prompt';
 
 contract('prompt', function(_, owner) {
   describe('functions', function() {
@@ -83,7 +83,7 @@ contract('prompt', function(_, owner) {
       });
 
       it('returns an object with correct keys and values', function() {
-        const networkList = networksList('network', 'Select a network from the network list', 'listy');
+        const networkList = networksList('network', 'listy');
         networkList.should.be.an('object');
         networkList.network.should.be.an('object').that.has.all.keys('type', 'message', 'choices');
         networkList.network.type.should.eq('listy');

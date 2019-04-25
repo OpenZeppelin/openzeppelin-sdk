@@ -5,7 +5,7 @@ import addAll from '../scripts/add-all';
 import Truffle from '../models/initializer/truffle/Truffle';
 import Compiler from '../models/compiler/Compiler';
 import ConfigVariablesInitializer from '../models/initializer/ConfigVariablesInitializer';
-import { promptIfNeeded, contractsList, InquirerQuestions } from '../utils/prompt';
+import { promptIfNeeded, contractsList, InquirerQuestions } from '../prompts/prompt';
 import { fromContractFullName } from '../utils/naming';
 import ZosPackageFile from '../models/files/ZosPackageFile';
 
@@ -20,9 +20,9 @@ const register: (program: any) => any = (program) => program
   .option('--all', 'add all contracts in your build directory')
   .withPushOptions()
   .withNonInteractiveOption()
-  .action(actionsWrapper);
+  .action(commandActions);
 
-async function actionsWrapper(contractNames: string[], options: any): Promise<void> {
+async function commandActions(contractNames: string[], options: any): Promise<void> {
   await init.runActionIfNeeded(options);
   await action(contractNames, options);
 }
@@ -36,7 +36,7 @@ async function action(contractNames: string[], options: any): Promise<void> {
   if(all) addAll({});
   else {
     const args = { contractNames };
-    const props = setCommandProps();
+    const props = getCommandProps();
     const prompted = await promptIfNeeded({ args, props }, interactive);
     const contractsData = contractNames.length !== 0
       ? contractNames.map(splitContractName)
@@ -44,7 +44,7 @@ async function action(contractNames: string[], options: any): Promise<void> {
 
     add({ contractsData });
   }
-  await push.tryAction(options);
+  await push.runActionIfRequested(options);
 }
 
 async function runActionIfNeeded(contractName?: string, options?: any): Promise<void> {
@@ -61,7 +61,7 @@ async function runActionIfNeeded(contractName?: string, options?: any): Promise<
   }
 }
 
-function setCommandProps(): InquirerQuestions {
+function getCommandProps(): InquirerQuestions {
   return contractsList('contractNames', 'Choose one or more contracts', 'checkbox', 'fromBuildDir');
 }
 

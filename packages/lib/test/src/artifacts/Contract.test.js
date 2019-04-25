@@ -4,6 +4,7 @@ require('../../setup')
 import utils from 'web3-utils';
 
 import Contracts from '../../../src/artifacts/Contracts'
+import { contractMethodsFromAst } from '../../../src/artifacts/Contract';
 
 const ContractWithStructInConstructor = Contracts.getFromLocal('WithStructInConstructor');
 const ContractWithConstructorImplementation = Contracts.getFromLocal('WithConstructorImplementation');
@@ -62,16 +63,18 @@ contract('Contract', function(accounts) {
         (await instance2.methods.text().call()).should.eq('bar');
       });
     });
+  });
 
+  describe('standalone functions', function() {
     /* public ethods in contract:
      * initialize()
      * initializeNested()
      * initializeWithNested(uint256)
      * fail()
    */
-    describe('#methodsFromAst', function() {
+    describe('#contractMethodsFromAst', function() {
       beforeEach('set methods', function() {
-        this.methods = InitializableMock.methodsFromAst();
+        this.methods = contractMethodsFromAst(InitializableMock);
       });
 
       it('returns only public functions', function() {
@@ -111,6 +114,6 @@ contract('Contract', function(accounts) {
         expect(this.methods[3].inputs).to.be.empty;
       });
     });
-  });
+  })
 });
 

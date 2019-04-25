@@ -1,6 +1,6 @@
 import { ZWeb3 } from 'zos-lib';
 import session from '../scripts/session';
-import { promptIfNeeded, networksList, InquirerQuestions } from '../utils/prompt';
+import { promptIfNeeded, networksList, InquirerQuestions } from '../prompts/prompt';
 import Session from '../models/network/Session';
 import ConfigVariablesInitializer from '../models/initializer/ConfigVariablesInitializer';
 
@@ -24,10 +24,10 @@ async function action(options: any): Promise<void> {
   if (close) {
     session({ close });
   } else {
-    const promptedNetwork = await promptIfNeeded({ opts: { network: networkInOpts }, props: setCommandProps() }, interactive);
+    const promptedNetwork = await promptIfNeeded({ opts: { network: networkInOpts }, props: getCommandProps() }, interactive);
     const { network } = await ConfigVariablesInitializer.initNetworkConfiguration(promptedNetwork, true);
     const accounts = await ZWeb3.accounts();
-    const promptedSession = await promptIfNeeded({ opts: { timeout, from, expires }, props: setCommandProps(accounts) }, interactive);
+    const promptedSession = await promptIfNeeded({ opts: { timeout, from, expires }, props: getCommandProps(accounts) }, interactive);
 
     session({ close, ...promptedNetwork, ...promptedSession });
   }
@@ -35,18 +35,16 @@ async function action(options: any): Promise<void> {
   if (!options.dontExitProcess && process.env.NODE_ENV !== 'test') process.exit(0);
 }
 
-function setCommandProps(accounts: string[] = []): InquirerQuestions {
+function getCommandProps(accounts: string[] = []): InquirerQuestions {
   return {
-    ...networksList('network', 'Select a network from the network list', 'list'),
+    ...networksList('network', 'list'),
     from: {
       type: 'list',
       message: 'Select an account address',
-      choices: accounts.map((account, index) => {
-        return {
-          name: `(${index}) ${account}`,
-          value: account
-        };
-      })
+      choices: accounts.map((account, index) => ({
+        name: `(${index}) ${account}`,
+        value: account
+      }))
     },
     timeout: {
       type: 'input',

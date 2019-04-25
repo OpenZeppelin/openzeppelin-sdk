@@ -4,9 +4,10 @@ import update from '../scripts/update';
 import Session from '../models/network/Session';
 import { parseInit } from '../utils/input';
 import { fromContractFullName } from '../utils/naming';
-import { hasToMigrateProject } from '../utils/prompt-migration';
+import { hasToMigrateProject } from '../prompts/migrations';
 import ConfigVariablesInitializer from '../models/initializer/ConfigVariablesInitializer';
-import { promptIfNeeded, networksList, argsList, methodsList, proxiesList, proxyInfo, InquirerQuestions } from '../utils/prompt';
+import { promptIfNeeded, networksList, argsList, methodsList, proxiesList, proxyInfo, InquirerQuestions } from '../prompts/prompt';
+import promptForInitParams from '../prompts/init-params';
 
 interface PropsParams {
   contractReference?: string;
@@ -23,7 +24,7 @@ interface ParsedContractReference {
   packageName: string | undefined;
 }
 
-interface ProxyInterface {
+interface ProxySelectionParams {
   address: string | undefined;
   contractFullName: string | undefined;
   proxyReference: string | undefined;
@@ -53,10 +54,10 @@ async function action(contractReference: string, options: any): Promise<void> {
   if (!await hasToMigrateProject(network)) process.exit(0);
 
   const promptedProxyInfo = await promptForProxies(contractReference, network, options);
-  const parsedContractReference = parse(promptedProxyInfo.proxyReference);
+  const parsedContractReference = parseContractReference(promptedProxyInfo.proxyReference);
 
   const promptedInitParams = promptedProxyInfo.proxyReference && !promptedProxyInfo.all
-    ? await promptForInitParams(promptedProxyInfo.contractFullName, options)
+    ? await promptForInitParams(promptedProxyInfo.contractFullName, getCommandProps, options)
     : {};
 
   const args = pickBy({ all: promptedProxyInfo.all, force, ...parsedContractReference, ...promptedInitParams });
@@ -69,52 +70,25 @@ async function promptForNetwork(options: any): Promise<{ network: string }> {
   const { network: networkInSession, expired } = Session.getNetwork();
   const defaults = { network: networkInSession };
   const opts = { network: networkInOpts || (!expired ? networkInSession : undefined) };
-  const props = setCommandProps();
+  const props = getCommandProps();
 
   return promptIfNeeded({ opts, defaults, props }, interactive);
 }
 
-async function promptForProxies(contractReference: string, network: string, options: any): Promise<ProxyInterface> {
+async function promptForProxies(contractReference: string, network: string, options: any): Promise<ProxySelectionParams> {
   const { all, interactive } = options;
   const pickProxyBy = all ? 'all' : undefined;
   const args = { pickProxyBy, proxy: contractReference };
-  const props = setCommandProps({ contractReference, network, all });
+  const props = getCommandProps({ contractReference, network, all });
   const { pickProxyBy: promptedPickProxyBy, proxy: promptedProxy } = await promptIfNeeded({ args, props }, interactive);
 
-  const foo = {
+  return {
     ...promptedProxy,
     all:  promptedPickProxyBy  === 'all'
   };
-
-  return foo;
 }
 
-// TODO: move to prompt.ts or other, but dry
-async function promptForInitParams(contractFullName: string, options: any): Promise<{ initMethod: string, initArgs: string[] }> {
-  const { interactive } = options;
-  let { initMethod, initArgs } = parseInit(options, 'initialize');
-  const { init: rawInitMethod } = options;
-  const opts = { askForInitParams: rawInitMethod, initMethod };
-  const initMethodProps = setCommandProps({ contractFullName, initMethod });
-
-  // prompt for init method if not provided
-  ({ initMethod } = await promptIfNeeded({ opts, props: initMethodProps }, interactive));
-
-  const initArgsKeys = argsList(contractFullName, initMethod.selector)
-    .reduce((accum, current) => ({ ...accum, [current]: undefined }), {});
-
-  // if there are no initArgs defined, or the initArgs array length provided is smaller than the
-  // number of arguments in the function, prompt for remaining arguments
-  if (!initArgs || initArgs.length < Object.keys(initArgsKeys).length) {
-    const initArgsProps = setCommandProps({ contractFullName, initMethod: initMethod.selector, initArgs });
-    const promptedArgs = await promptIfNeeded({ opts: initArgsKeys, props: initArgsProps }, interactive);
-    initArgs = [...initArgs, ...Object.values(pickBy(promptedArgs))];
-  }
-
-  return { initMethod: initMethod.name, initArgs };
-}
-
-function parse(contractReference: string): ParsedContractReference {
+function parseContractReference(contractReference: string): ParsedContractReference {
   let proxyAddress;
   let contractAlias;
   let packageName;
@@ -128,7 +102,7 @@ function parse(contractReference: string): ParsedContractReference {
   return { proxyAddress, contractAlias, packageName };
 }
 
-function setCommandProps({ contractReference, network, all, contractFullName, initMethod, initArgs }: PropsParams = {}): InquirerQuestions {
+function getCommandProps({ contractReference, network, all, contractFullName, initMethod, initArgs }: PropsParams = {}): InquirerQuestions {
   const initMethodsList = methodsList(contractFullName);
   const initArgsList = argsList(contractFullName, initMethod)
     .reduce((accum, argName, index) => {
@@ -143,7 +117,7 @@ function setCommandProps({ contractReference, network, all, contractFullName, in
     }, {});
 
   return {
-    ...networksList('network', 'Select a network from the network list', 'list'),
+    ...networksList('network', 'list'),
     pickProxyBy: {
       message: 'Which proxies would you like to upgrade?',
       type: 'list',
@@ -164,7 +138,7 @@ function setCommandProps({ contractReference, network, all, contractFullName, in
       type: 'list',
       choices: ({ pickProxyBy }) => proxiesList(pickProxyBy, network),
       when: ({ pickProxyBy }) => !all && pickProxyBy && pickProxyBy !== 'all',
-      normalize: (input) => typeof input !== 'object' ? proxyInfo(parse(input), network) : input
+      normalize: (input) => typeof input !== 'object' ? proxyInfo(parseContractReference(input), network) : input
     },
     askForInitParams: {
       type: 'confirm',

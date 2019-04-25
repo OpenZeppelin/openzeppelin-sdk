@@ -1,6 +1,6 @@
 import unlink from '../scripts/unlink';
 import push from './push';
-import { promptIfNeeded, InquirerQuestions } from '../utils/prompt';
+import { promptIfNeeded, InquirerQuestions } from '../prompts/prompt';
 import ZosPackageFile from '../models/files/ZosPackageFile';
 
 const name: string = 'unlink';
@@ -19,14 +19,14 @@ async function action(dependencies: string[], options: any): Promise<void> {
   const { interactive } = options;
   const installedDependencies = ZosPackageFile.getLinkedDependencies();
   const args = { dependencies };
-  const props = setCommandProps(installedDependencies);
+  const props = getCommandProps(installedDependencies);
   const prompted = await promptIfNeeded({ args, props }, interactive);
 
   await unlink(prompted);
-  await push.tryAction(options);
+  await push.runActionIfRequested(options);
 }
 
-function setCommandProps(depNames: string[]): InquirerQuestions {
+function getCommandProps(depNames: string[]): InquirerQuestions {
   return {
     dependencies: {
       message: 'Select the dependencies you want to unlink',

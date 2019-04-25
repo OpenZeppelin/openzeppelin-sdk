@@ -75,12 +75,6 @@ export default class ZosPackageFile {
     return Object.values(this.contracts);
   }
 
-  get contractNamesAndAliases(): Array<{ name: string, alias: string }> {
-    return Object
-      .keys(this.contracts)
-      .map(alias => ({ name: this.contracts[alias], alias }));
-  }
-
   get isPublished(): boolean {
     return !!this.data.publish;
   }

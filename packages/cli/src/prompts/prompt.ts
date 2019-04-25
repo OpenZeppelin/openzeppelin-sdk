@@ -3,6 +3,7 @@ import flatten from 'lodash.flatten';
 import isEmpty from 'lodash.isempty';
 import groupBy from 'lodash.groupby';
 import inquirer from 'inquirer';
+import { contractMethodsFromAst } from 'zos-lib';
 
 import Truffle from '../models/initializer/truffle/Truffle';
 import ZosPackageFile from '../models/files/ZosPackageFile';
@@ -10,7 +11,7 @@ import LocalController from '../models/local/LocalController';
 import Dependency from '../models/dependency/Dependency';
 import { fromContractFullName, toContractFullName } from '../utils/naming';
 
-type choicesT = string[] | ({ [key: string]: any });
+type ChoicesT = string[] | ({ [key: string]: any });
 
 export interface InquirerQuestions  {
   [key: string]: InquirerQuestion;
@@ -21,7 +22,7 @@ interface InquirerQuestion {
   message: string;
   isInquirerQuestion?: boolean;
   default?: any;
-  choices?: choicesT;
+  choices?: ChoicesT;
   when?: ((answers: { [key: string]: any }) => boolean);
   normalize?: ((input?: any) => any);
 }
@@ -51,8 +52,7 @@ export let DEFAULT_INTERACTIVE_STATUS = true;
  * inquirer questions attribubes (such as question type, message and name) and `defaults` is an object with
  * default values for each args/props attributes.
  * */
-export async function promptIfNeeded({ args = {}, opts = {}, defaults, props }: PromptParams, interactive?: boolean): Promise<any> {
-  interactive = typeof interactive === 'undefined' ? DEFAULT_INTERACTIVE_STATUS : interactive;
+export async function promptIfNeeded({ args = {}, opts = {}, defaults, props }: PromptParams, interactive = DEFAULT_INTERACTIVE_STATUS): Promise<any> {
   const argsAndOpts  = { ...args, ...opts };
 
   const argsAndOptsQuestions = Object.keys(argsAndOpts)
@@ -63,8 +63,10 @@ export async function promptIfNeeded({ args = {}, opts = {}, defaults, props }: 
   return await answersFor(argsAndOpts, argsAndOptsQuestions, props, interactive);
 }
 
-export function networksList(name: string, message: string, type: string): { [key: string]: any } {
+export function networksList(name: string, type: string, message?: string): { [key: string]: any } {
+  message = message || 'Select a network from the network list';
   const networks = Truffle.getNetworkNamesFromConfig();
+
   return inquirerQuestion(name, message, type, networks);
 }
 
@@ -109,8 +111,9 @@ export function contractsList(name: string, message: string, type: string, sourc
     return inquirerQuestion(name, message, type, contractsFromBuild);
   // get contracts from zos.json file
   } else if(source === 'fromLocal') {
-    const contractsFromLocal = localPackageFile
-      .contractNamesAndAliases
+    const contractsFromLocal = Object
+      .keys(localPackageFile.contracts)
+      .map(alias => ({ name: this.contracts[alias], alias }))
       .map(({ name: contractName, alias }) => {
         const label = contractName === alias ? alias : `${alias}[${contractName}]`;
         return { name: label, value: alias };
@@ -167,7 +170,7 @@ function contractMethods(contractFullName: string, packageFile: ZosPackageFile):
   if (!localController.hasContract(packageName, contractAlias)) return [];
   const contract = localController.getContractClass(packageName, contractAlias);
 
-  return contract.methodsFromAst();
+  return contractMethodsFromAst(contract);
 }
 
 export function proxyInfo(contractInfo: any, network: string): any {
@@ -207,7 +210,7 @@ async function answersFor(inputs: PromptParam, questions: any, props: InquirerQu
   return merged;
 }
 
-function inquirerQuestion(name: string, message: string, type: string, choices?: choicesT): InquirerQuestions {
+function inquirerQuestion(name: string, message: string, type: string, choices?: ChoicesT): InquirerQuestions {
   return { [name]: { type, message, choices } };
 }
 
@@ -221,6 +224,6 @@ function promptFor(name: string, defaults: {}, props: {}): InquirerQuestion {
   };
 }
 
-function hasEmptyChoices({ choices }: { choices?: choicesT }): boolean {
+function hasEmptyChoices({ choices }: { choices?: ChoicesT }): boolean {
   return choices && isEmpty(choices) && typeof choices !== 'function';
 }

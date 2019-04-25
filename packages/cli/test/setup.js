@@ -4,7 +4,7 @@ import { ZWeb3, Contracts } from 'zos-lib'
 import Dependency from '../src/models/dependency/Dependency'
 import ZosPackageFile from '../src/models/files/ZosPackageFile'
 import ZosNetworkFile from '../src/models/files/ZosNetworkFile'
-const prompt = require('../src/utils/prompt');
+const prompt = require('../src/prompts/prompt');
 
 useTestZosPackageFile()
 doNotInstallStdlib()

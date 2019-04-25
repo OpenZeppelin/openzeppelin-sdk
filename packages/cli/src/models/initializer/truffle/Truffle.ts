@@ -63,7 +63,7 @@ const Truffle = {
     return config && config.networks ? Object.keys(config.networks) : undefined;
   },
 
-  getContractNames() {
+  getContractNames(): string[] {
     const buildDir = this.getBuildDir();
     if (FileSystem.exists(buildDir)) {
       return FileSystem.readDir(buildDir)

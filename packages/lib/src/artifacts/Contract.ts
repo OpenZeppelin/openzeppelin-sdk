@@ -31,7 +31,6 @@ export default interface Contract {
   new: (args?: any[], options?: {}) => Promise<Contract>;
   at: (address: string) => Contract;
   link: (libraries: { [libAlias: string]: string }) => void;
-  methodsFromAst: () => ContractMethod[];
   deployment?: { transactionHash: string, transactionReceipt: TransactionReceipt };
   schema: {
 
@@ -109,20 +108,6 @@ function _wrapContractInstance(schema: any, instance: Web3Contract): Contract {
     });
   };
 
-    // get methods from AST, as there is no info about the modifiers in the ABI
-  instance.methodsFromAst = function(): ContractMethod[] {
-    const contractAst = new ContractAST(instance, null, { nodesFilter: ['ContractDefinition'] });
-    return contractAst.getMethods()
-      .filter(({ visibility }) => visibility === 'public')
-      .map(method => {
-        const initializer = method
-          .modifiers
-          .find(({ modifierName }) => modifierName.name === 'initializer');
-
-        return { ...method, hasInitializer: initializer ? true : false };
-      });
-  };
-
   // TODO: Remove after web3 adds the getter: https://github.com/ethereum/web3.js/issues/2274
   if(typeof instance.address === 'undefined') {
     Object.defineProperty(instance, 'address', { get: () => instance.options.address });
@@ -134,6 +119,20 @@ function _wrapContractInstance(schema: any, instance: Web3Contract): Contract {
 export function createContract(schema: any): Contract {
   const contract = ZWeb3.contract(schema.abi, null, Contracts.getArtifactsDefaults());
   return _wrapContractInstance(schema, contract);
+}
+
+// get methods from AST, as there is no info about the modifiers in the ABI
+export function contractMethodsFromAst(instance: Contract): ContractMethod[] {
+  const contractAst = new ContractAST(instance, null, { nodesFilter: ['ContractDefinition'] });
+  return contractAst.getMethods()
+    .filter(({ visibility }) => visibility === 'public' || visibility === 'external')
+    .map(method => {
+      const initializer = method
+        .modifiers
+        .find(({ modifierName }) => modifierName.name === 'initializer');
+
+      return { ...method, hasInitializer: initializer ? true : false };
+    });
 }
 
 function parseArguments(passedArguments, abi) {

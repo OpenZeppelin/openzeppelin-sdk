@@ -1,7 +1,7 @@
 import publish from '../scripts/publish';
 import ConfigVariablesInitializer from '../models/initializer/ConfigVariablesInitializer';
-import { hasToMigrateProject } from '../utils/prompt-migration';
-import { promptIfNeeded, networksList, InquirerQuestions } from '../utils/prompt';
+import { hasToMigrateProject } from '../prompts/migrations';
+import { promptIfNeeded, networksList, InquirerQuestions } from '../prompts/prompt';
 import Session from '../models/network/Session';
 
 const name: string = 'publish';
@@ -21,7 +21,7 @@ async function action(options: any): Promise<void> {
   const { network: networkInSession } = Session.getOptions();
   const defaults = { network: Session.getNetwork() };
   const opts = { network: networkInSession || networkInArgs };
-  const props = setCommandProps();
+  const props = getCommandProps();
 
   const promptedOpts = await promptIfNeeded({ opts, defaults, props });
   const { network, txParams } = await ConfigVariablesInitializer.initNetworkConfiguration(promptedOpts);
@@ -31,8 +31,8 @@ async function action(options: any): Promise<void> {
   if (!options.dontExitProcess && process.env.NODE_ENV !== 'test') process.exit(0);
 }
 
-function setCommandProps(): InquirerQuestions {
-  return networksList('network', 'Select a network from the network list', 'list');
+function getCommandProps(): InquirerQuestions {
+  return networksList('network', 'list');
 }
 
 export default { name, signature, description, register, action };

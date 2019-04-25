@@ -1,6 +1,6 @@
 import push from './push';
 import init from '../scripts/init';
-import { promptIfNeeded, InquirerQuestions } from '../utils/prompt';
+import { promptIfNeeded, InquirerQuestions } from '../prompts/prompt';
 import { FileSystem } from 'zos-lib';
 import ZosPackageFile from '../models/files/ZosPackageFile';
 
@@ -24,7 +24,7 @@ async function action(projectName: string, version: string, options: any): Promi
   const { publish, force, link, install: installDependencies, interactive } = options;
 
   const args = { name: projectName, version };
-  const props = setCommandProps();
+  const props = getCommandProps();
   const defaults = FileSystem.parseJsonIfExists('package.json') || {};
   const prompted = await promptIfNeeded({ args, defaults, props }, interactive);
 
@@ -32,7 +32,7 @@ async function action(projectName: string, version: string, options: any): Promi
   const flags = { dependencies, installDependencies, force, publish };
 
   await init({ ...prompted, ...flags });
-  await push.tryAction(options);
+  await push.runActionIfRequested(options);
 }
 
 async function runActionIfNeeded(options: any): Promise<void> {
@@ -44,7 +44,7 @@ async function runActionIfNeeded(options: any): Promise<void> {
   }
 }
 
-function setCommandProps(): InquirerQuestions {
+function getCommandProps(): InquirerQuestions {
   return {
     name: {
       message: 'Welcome to ZeppelinOS! Choose a name for your project:',

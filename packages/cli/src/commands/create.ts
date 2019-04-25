@@ -8,9 +8,16 @@ import create from '../scripts/create';
 import Session from '../models/network/Session';
 import { parseInit } from '../utils/input';
 import { fromContractFullName } from '../utils/naming';
-import { hasToMigrateProject } from '../utils/prompt-migration';
+import { hasToMigrateProject } from '../prompts/migrations';
 import ConfigVariablesInitializer from '../models/initializer/ConfigVariablesInitializer';
-import { promptIfNeeded, networksList, contractsList, methodsList, argsList, InquirerQuestions } from '../utils/prompt';
+import { promptIfNeeded, networksList, contractsList, methodsList, argsList } from '../prompts/prompt';
+import promptForInitParams from '../prompts/init-params';
+
+interface PropsParams {
+  contractFullName?: string;
+  initMethod?: string;
+  initArgs?: string[];
+}
 
 const name: string = 'create';
 const signature: string = `${name} [alias]`;
@@ -25,9 +32,9 @@ const register: (program: any) => any = (program) => program
   .option('--force', 'force creation even if contracts have local modifications')
   .withNetworkOptions()
   .withNonInteractiveOption()
-  .action(actionsWrapper);
+  .action(commandActions);
 
-async function actionsWrapper(contractFullName: string, options: any): Promise<void> {
+async function commandActions(contractFullName: string, options: any) {
   await init.runActionIfNeeded(options);
 
   const { network: promptedNewtork, contractFullName: promptedContractFullName } = await promptForCreate(contractFullName, options);
@@ -37,13 +44,13 @@ async function actionsWrapper(contractFullName: string, options: any): Promise<v
   await add.runActionIfNeeded(promptedContractFullName, options);
   await push.runActionIfNeeded(promptedContractFullName, network, { ...options, network: promptedNewtork });
 
-  const initParams = await promptForInitParams(promptedContractFullName, options);
+  const initParams = await promptForInitParams(promptedContractFullName,getCommandProps, options);
 
   await action(promptedContractFullName, { ...options, ...initParams, network, txParams });
   if (!options.dontExitProcess && process.env.NODE_ENV !== 'test') process.exit(0);
 }
 
-async function action(contractFullName: string, options: any): Promise<void> {
+async function action(contractFullName: string, options: any) {
   const { force, initMethod, initArgs, network, txParams } = options;
   const { contract: contractAlias, package: packageName } = fromContractFullName(contractFullName);
   const args = pickBy({ packageName, contractAlias, initMethod, initArgs, force });
@@ -54,41 +61,17 @@ async function action(contractFullName: string, options: any): Promise<void> {
   Session.setDefaultNetworkIfNeeded(network);
 }
 
-async function promptForCreate(contractFullName: string, options: any): Promise<{ contractFullName: string, network: string }> {
+async function promptForCreate(contractFullName: string, options: any): Promise<any> {
   const { force, network: networkInOpts, interactive } = options;
   const { network: networkInSession, expired } = Session.getNetwork();
   const defaultOpts = { network: networkInSession };
   const args = { contractFullName };
   const opts = { network: networkInOpts || (!expired ? networkInSession : undefined) };
 
-  return promptIfNeeded({ args, opts, defaults: defaultOpts, props: setCommandProps() }, interactive);
+  return promptIfNeeded({ args, opts, defaults: defaultOpts, props: getCommandProps() }, interactive);
 }
 
-async function promptForInitParams(contractFullName: string, options: any): Promise<{ initMethod: string, initArgs: string[] }> {
-  const { interactive } = options;
-  let { initMethod, initArgs } = parseInit(options, 'initialize');
-  const { init: rawInitMethod } = options;
-  const opts = { askForInitParams: rawInitMethod, initMethod };
-  const initMethodProps = setCommandProps(contractFullName, initMethod);
-
-  // prompt for init method if not provided
-  ({ initMethod } = await promptIfNeeded({ opts, props: initMethodProps }, interactive));
-
-  const initArgsKeys = argsList(contractFullName, initMethod.selector)
-    .reduce((accum, current) => ({ ...accum, [current]: undefined }), {});
-
-  // if there are no initArgs defined, or the initArgs array length provided is smaller than the
-  // number of arguments in the function, prompt for remaining arguments
-  if (!initArgs || initArgs.length < Object.keys(initArgsKeys).length) {
-    const initArgsProps = setCommandProps(contractFullName, initMethod.selector, initArgs);
-    const promptedArgs = await promptIfNeeded({ opts: initArgsKeys, props: initArgsProps }, interactive);
-    initArgs = [...initArgs, ...Object.values(pickBy(promptedArgs))];
-  }
-
-  return { initMethod: initMethod.name, initArgs };
-}
-
-function setCommandProps(contractFullName?: string, initMethod?: string, initArgs?: string[]): InquirerQuestions {
+function getCommandProps({ contractFullName, initMethod, initArgs }: PropsParams = {})  {
   const initMethodsList = methodsList(contractFullName);
   const initArgsList = argsList(contractFullName, initMethod)
     .reduce((accum, argName, index) => {
@@ -103,7 +86,7 @@ function setCommandProps(contractFullName?: string, initMethod?: string, initArg
     }, {});
 
   return {
-    ...networksList('network', 'Select a network from the network list', 'list'),
+    ...networksList('network', 'list'),
     ...contractsList('contractFullName', 'Choose a contract', 'list', 'all'),
     askForInitParams: {
       type: 'confirm',
@@ -125,4 +108,4 @@ function setCommandProps(contractFullName?: string, initMethod?: string, initArg
   };
 }
 
-export default { name, signature, description, register, action: actionsWrapper };
+export default { name, signature, description, register, action };

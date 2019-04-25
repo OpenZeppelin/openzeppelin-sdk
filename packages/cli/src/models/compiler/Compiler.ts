@@ -2,12 +2,11 @@ import { execFile, ExecException } from 'child_process';
 import { FileSystem, Logger } from 'zos-lib';
 
 const log = new Logger('Compiler');
-
-const state: any = { alreadyCompiled: false };
+const state = { alreadyCompiled: false };
 
 const Compiler = {
-  async call(): Promise<{ stdout: string, stderr: string }> {
-    if (!state.alreadyCompiled) {
+  async call(force: boolean = false): Promise<{ stdout: string, stderr: string }> {
+    if (force || !state.alreadyCompiled) {
       log.info('Compiling contracts with Truffle...');
       let truffleBin = `${process.cwd()}/node_modules/.bin/truffle`;
       if (!FileSystem.exists(truffleBin)) truffleBin = 'truffle'; // Attempt to load global truffle if local was not found

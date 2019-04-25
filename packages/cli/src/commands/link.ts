@@ -3,7 +3,7 @@ import push from './push';
 import link from '../scripts/link';
 import Dependency from '../models/dependency/Dependency';
 import ZosPackageFile from '../models/files/ZosPackageFile';
-import { promptIfNeeded, InquirerQuestions } from '../utils/prompt';
+import { promptIfNeeded, InquirerQuestions } from '../prompts/prompt';
 import { fromContractFullName } from '../utils/naming';
 
 const name: string = 'link';
@@ -20,18 +20,19 @@ const register: (program: any) => any = (program) => program
   .action(action);
 
 async function action(dependencies: string[], options: any): Promise<void> {
-  const { install: installDependencies, interactive } = options;
+  const { install, forceInstall, interactive } = options;
+  const installDependencies = forceInstall || (install && interactive ? undefined : install);
 
   await init.runActionIfNeeded(options);
 
   const args = { dependencies };
   const opts = { installDependencies };
-  const props = setCommandProps();
+  const props = getCommandProps();
   const defaults = { dependencies: [await Dependency.fetchVersionFromNpm('openzeppelin-eth')] };
   const prompted = await promptIfNeeded({ args, opts, props, defaults }, interactive);
 
   await link(prompted);
-  await push.tryAction(options);
+  await push.runActionIfRequested(options);
 }
 
 async function runActionIfNeeded(contractFullName: string, options: any): Promise<void> {
@@ -39,11 +40,11 @@ async function runActionIfNeeded(contractFullName: string, options: any): Promis
   const packageFile = new ZosPackageFile();
   const { contract: contractAlias, package: packageName } = fromContractFullName(contractFullName);
   if (interactive && packageName && !packageFile.hasDependency(packageName)) {
-    await action([packageName], { ...options, install: true });
+    await action([packageName], { ...options, forceInstall: true });
   }
 }
 
-function setCommandProps(): InquirerQuestions {
+function getCommandProps(): InquirerQuestions {
   return {
     dependencies: {
       type: 'input',

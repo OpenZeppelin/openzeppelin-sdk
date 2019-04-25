@@ -3,7 +3,7 @@ import pickBy from 'lodash.pickby';
 import verify from '../scripts/verify';
 import ConfigVariablesInitializer from '../models/initializer/ConfigVariablesInitializer';
 import Truffle from '../models/initializer/truffle/Truffle';
-import { promptIfNeeded, contractsList, networksList, InquirerQuestions } from '../utils/prompt';
+import { promptIfNeeded, contractsList, networksList, InquirerQuestions } from '../prompts/prompt';
 
 const name: string = 'verify';
 const signature: string = `${name} [contract-alias]`;
@@ -25,7 +25,7 @@ async function action(contractName: string, options: any): Promise<void> {
   const args = { contractName };
   const opts = { network: networkName, optimizer, optimizerRuns, remote, apiKey };
   const defaults= Truffle.getCompilerInfo();
-  const props = setCommandProps(optimizer);
+  const props = getCommandProps(optimizer);
 
   const prompted = await promptIfNeeded({ args, opts, defaults, props }, interactive);
   const { network, txParams } = await ConfigVariablesInitializer.initNetworkConfiguration(prompted);
@@ -34,10 +34,10 @@ async function action(contractName: string, options: any): Promise<void> {
   if (!options.dontExitProcess && process.env.NODE_ENV !== 'test') process.exit(0);
 }
 
-function setCommandProps(optimizerEnabled: boolean): InquirerQuestions {
+function getCommandProps(optimizerEnabled: boolean): InquirerQuestions {
   return {
     ...contractsList('contractName', 'Choose a contract', 'list', 'fromLocal'),
-    ...networksList('network', 'Select a network from the network list', 'list'),
+    ...networksList('network', 'list'),
     optimizer: {
       type: 'confirm',
       message: 'Was the optimizer enabled when you compiled your contracts?',

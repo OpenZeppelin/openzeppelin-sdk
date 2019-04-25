@@ -1,6 +1,6 @@
 import remove from '../scripts/remove';
 import push from './push';
-import { promptIfNeeded, contractsList, InquirerQuestions } from '../utils/prompt';
+import { promptIfNeeded, contractsList, InquirerQuestions } from '../prompts/prompt';
 
 const name: string = 'remove';
 const signature: string = `${name} [contracts...]`;
@@ -18,14 +18,14 @@ const register: (program: any) => any = (program) => program
 async function action(contracts: string[], options: any): Promise<void> {
   const { interactive } = options;
   const args = { contracts };
-  const props = setCommandProps();
+  const props = getCommandProps();
   const prompted = await promptIfNeeded({ args, props }, interactive);
 
   remove(prompted);
-  await push.tryAction(options);
+  await push.runActionIfRequested(options);
 }
 
-function setCommandProps(): InquirerQuestions {
+function getCommandProps(): InquirerQuestions {
   return contractsList('contracts', 'Choose one or more contracts', 'checkbox', 'fromLocal');
 }
 
