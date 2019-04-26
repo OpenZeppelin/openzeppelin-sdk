@@ -1,6 +1,5 @@
 import push from './push';
 import add from '../scripts/add';
-import init from './init';
 import addAll from '../scripts/add-all';
 import Truffle from '../models/initializer/truffle/Truffle';
 import Compiler from '../models/compiler/Compiler';
@@ -20,12 +19,7 @@ const register: (program: any) => any = (program) => program
   .option('--all', 'add all contracts in your build directory')
   .withPushOptions()
   .withNonInteractiveOption()
-  .action(commandActions);
-
-async function commandActions(contractNames: string[], options: any): Promise<void> {
-  await init.runActionIfNeeded(options);
-  await action(contractNames, options);
-}
+  .action(action);
 
 async function action(contractNames: string[], options: any): Promise<void> {
   const { skipCompile, all, interactive } = options;
