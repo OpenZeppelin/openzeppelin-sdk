@@ -20,7 +20,7 @@ export default class ZWeb3 {
 
   // TODO: this.web3 could be cached and initialized lazily?
   public static web3(): any {
-    return ZWeb3.implementation.web3()
+    return ZWeb3.implementation.web3
   }
 
   public static sha3(value: string): string {

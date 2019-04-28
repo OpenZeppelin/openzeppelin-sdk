@@ -7,10 +7,10 @@ import { ZERO_ADDRESS } from '../../../src/utils/Addresses'
 import utils from 'web3-utils';
 import BN from 'bignumber.js';
 
-contract('ZWeb3', function(accounts) {
+contract('ZWeb3', function (accounts) {
   accounts = accounts.map(utils.toChecksumAddress);
   const [_, account, account1, account2] = accounts;
-  
+
   before('deploy dummy instance', async function () {
     this.DummyImplementation = Contracts.getFromLocal('DummyImplementation')
     this.impl = await this.DummyImplementation.new()
@@ -170,7 +170,7 @@ contract('ZWeb3', function(accounts) {
 
         describe('when the transaction receipt fails continuously', function () {
           beforeEach('stub ZWeb3', function () {
-            sinon.stub(ZWeb3, 'getTransactionReceipt').throws('Error', 'unknown transaction')
+            sinon.stub(ZWeb3.implementation, 'getTransactionReceipt').throws('Error', 'unknown transaction')
           })
 
           it('fails', async function () {
