@@ -4,6 +4,32 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## Unreleased
+
+### Added
+- Add new `ProxyFactory` contract and model for supporting the CREATE2 opcode ([#805](https://github.com/zeppelinos/zos/pull/805))
+- Add new `create-instances-from-solidity` example project ([#724](https://github.com/zeppelinos/zos/pull/724))
+- Add READMEs to `lib-simple` and `create-instances-from-solidity` example projects ([#813](https://github.com/zeppelinos/zos/pull/813), [#780](https://github.com/zeppelinos/zos/pull/780)) (thanks @paulinablaszk!)
+- Add mixins support to the typescript codebase for removing code duplication ([#815](https://github.com/zeppelinos/zos/pull/815))
+
+### Changed
+- Optimized `initializer` modifier from `Initializable` contract to use less gas ([#613](https://github.com/zeppelinos/zos/pull/613)) (thanks @k06a!)
+- Deployment of `Contract` class from lib now accepts a variable number of arguments for the constructor instead of an array ([#630](https://github.com/zeppelinos/zos/pull/630))
+
+## v2.2.3 - 2019-04-12
+
+### Fixed
+- Do not modify `Contract` instance address when calling `Contract#at` but generate a clone instead ([#810](https://github.com/zeppelinos/zos/issues/810))
+
+## v2.2.2 - 2019-03-14
+
+### Fixed
+- Initialize ZWeb3 using a http url as provider ([#785](https://github.com/zeppelinos/zos/issues/785))
+- Automatic linking of external Solidity libraries now properly handles multiple libraries on the same contract ([#771](https://github.com/zeppelinos/zos/pull/771))
+
+### Changed
+- Renamed contracts copied from openzeppelin-solidity (Ownable and Address) to avoid clashing of compiled artifacts (([#756](https://github.com/zeppelinos/zos/pull/756)))
+
 ## v2.2.1 - 2019-02-26
 
 ### Changed

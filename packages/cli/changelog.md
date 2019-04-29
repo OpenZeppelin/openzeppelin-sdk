@@ -4,6 +4,32 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## Unreleased
+
+### Added
+- Add interactive prompts for most CLI commands (`add`, `create`, `init`, `link`, `publish`, `push`, `remove`, `session`, `unlink`, `update`, `verify`), plus a `--no-interactive` flag to ensure that no prompts are shown when working in a non-interactive script ([#792](https://github.com/zeppelinos/zos/pull/792), [#766](https://github.com/zeppelinos/zos/pull/766), [#750](https://github.com/zeppelinos/zos/pull/750), [#745](https://github.com/zeppelinos/zos/pull/745), [#730](https://github.com/zeppelinos/zos/pull/730), [#725](https://github.com/zeppelinos/zos/pull/725))
+- Add `zos create2` command for deploying proxies to a predefined address determined via a salt and the sender address, or an off-chain signature of a sender ([#805](https://github.com/zeppelinos/zos/pull/805), [#757](https://github.com/zeppelinos/zos/pull/757)), checking before deployment that the address had not been already deployed to ([#788](https://github.com/zeppelinos/zos/pull/788)) (thanks @siromivel!)
+- Add test to `truffle-migrate` sample project on CI ([#775](https://github.com/zeppelinos/zos/pull/775)) (thanks @paulinablaszk!)
+
+### Fixed
+- Fix issue `truffle-migrate` example ([#763](https://github.com/zeppelinos/zos/pull/763)) (thanks @hardlydifficult!)
+
+### Changed
+- Add support to `set-admin` command for changing the owner of the `ProxyAdmin` component, so ownership of the entire application can be moved to a different entity in a single transaction ([#804](https://github.com/zeppelinos/zos/pull/804))
+
+## v2.2.2 - 2019-03-14
+
+### Added
+- Added Goerli network to the list of known networks, both for verification on etherscan and for naming of zos.network.json files ([#768](https://github.com/zeppelinos/zos/pull/768)) (thanks @paulinablaszk!)
+
+### Fixed
+- Fix contracts compilation on Windows workstations ([#764](https://github.com/zeppelinos/zos/pull/764)) (thanks @siromivel!)
+- Avoid adding libraries and contracts from external packages ([#758](https://github.com/zeppelinos/zos/pull/758)) (thanks @siromivel!)
+- Fix ZWeb3 initialization when providing an HTTP url as a web3 provider ([#785](https://github.com/zeppelinos/zos/issues/785))
+
+### Changed
+- Exceptions thrown during the validation process can be ignored during `zos push` via the `--force` flag ([#770](https://github.com/zeppelinos/zos/pull/770))
+
 ## v2.2.1 - 2019-02-26
 
 ### Fixed
