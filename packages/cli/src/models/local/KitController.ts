@@ -2,13 +2,11 @@ import path from 'path';
 import axios from 'axios';
 import fs from 'fs-extra';
 
-import { Logger } from 'zos-lib';
-
 import stdout from '../../utils/stdout';
 import patch from '../../utils/patch';
 import child from '../../utils/child';
+import Spinner from '../../utils/spinner';
 
-const ora = patch('ora');
 const simpleGit = patch('simple-git/promise');
 
 interface KitConfig {
@@ -27,14 +25,16 @@ export default class KitController {
     if ((await readdir(workingDirPath)).length > 1) throw Error('The directory must be empty');
 
     try {
-      let spinner = ora(`Downloading kit from ${url}`).start();
+      let spinner = new Spinner(`Downloading kit from ${url}`);
+      spinner.start();
       const git = simpleGit(workingDirPath);
       await git.init();
       await git.addRemote('origin', url);
       await git.pull('origin', 'stable');
       spinner.succeed();
 
-      spinner = ora('Unpacking kit').start();
+      spinner = new Spinner('Unpacking kit');
+      spinner.start();
       // always delete .git folder
       config.ignore.push('.git');
       // delete all files/folders from ignore
@@ -58,10 +58,10 @@ export default class KitController {
     if (!url) throw Error('A url must be provided.');
 
     try {
-      return JSON.parse((await axios.get(url
+      return (await axios.get(url
         .replace('.git', '/stable/kit.json')
         .replace('github.com', 'raw.githubusercontent.com')
-      )).data);
+      )).data;
     } catch(e) {
       e.message = `Failed to verify ${url}. Details: ${e.message}`;
       throw e;

@@ -6,13 +6,14 @@ import fs from 'fs-extra';
 import child from '../../src/utils/child';
 import patch, { cache } from '../../src/utils/patch';
 import unpack from '../../src/scripts/unpack';
+import Spinner from '../../src/utils/spinner';
 
 const simpleGit = patch('simple-git/promise');
 
 const repo = 'zeppelinos/zepkit';
 const url = 'https://github.com/zeppelinos/zepkit.git';
 
-describe('unpack script', function() {
+describe.only('unpack script', function() {
   let gitMock;
 
   beforeEach('stub git calls', async function() {
@@ -29,9 +30,9 @@ describe('unpack script', function() {
     sinon.stub(fs, 'readdir').returns(Promise.resolve(['.zos.lock']));
     sinon.stub(fs, 'remove').returns(Promise.resolve());
     sinon.stub(fs, 'pathExists').returns(Promise.resolve(true));
-    sinon.stub(cache, 'ora').returns({
-      start: sinon.fake.returns({ succeed: sinon.fake() })
-    });
+
+    sinon.stub(Spinner.prototype, 'start');
+    sinon.stub(Spinner.prototype, 'succeed');
 
   });
 
@@ -52,7 +53,7 @@ describe('unpack script', function() {
 
   it('should fail with random name', async function () {
     await unpack({ repoOrName: 'lskdjflkdsj' })
-      .should.be.rejectedWith(/Kit with such name doesn't exist/);
+      .should.be.rejectedWith(/Kit named lskdjflkdsj doesn\'t exist/);
   });
 
   it('should fail with random repo', async function () {
@@ -60,10 +61,6 @@ describe('unpack script', function() {
       .should.be.rejectedWith(/Failed to verify/);
   });
 
-  it('should fail with random repo', async function () {
-    await unpack({ repoOrName: 'lskdjflkdsj/sdlkfjlksjfkl' })
-      .should.be.rejectedWith(/Failed to verify/);
-  });
 
   it('should fail if there are files inside the directory', async function () {
     fs.readdir.restore();
