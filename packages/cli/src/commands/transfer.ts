@@ -1,38 +1,41 @@
 import { ZWeb3 } from 'zos-lib';
 import transfer from '../scripts/transfer';
 import { promptIfNeeded, networksList, InquirerQuestions } from '../prompts/prompt';
+import { isValidUnit } from '../utils/units';
 import ConfigVariablesInitializer from '../models/initializer/ConfigVariablesInitializer';
 
 const name: string = 'transfer';
 const signature: string = name;
-const description: string = 'send funds in ether to the specified address';
+const description: string = 'send funds in ether, wei or gwei to a given address';
 
 const register: (program: any) => any = (program) => program
   .command(signature, undefined, { noHelp: true })
   .usage('[options]')
   .description(description)
-  .option('--units [units]', 'specify units.')
-  .option('--to <to>', 'to')
-  .option('--value <value>', 'value')
+  .option('--to <to>', 'specify recipient address')
+  .option('--value <value>', 'the amount of ether units to be transferred')
+  .option('--unit <unit>', 'units name. To see supported units, go to: https://web3js.readthedocs.io/en/1.0/web3-utils.html#id85')
   .withNetworkOptions()
   .withNonInteractiveOption()
   .action(action);
 
 async function action(options: any): Promise<void> {
-  const { network: networkInOpts, units, to, value, from, interactive } = options;
-  const promptedNetwork = await promptIfNeeded({ opts: { network: networkInOpts }, props: getCommandProps() }, interactive);
-  const { txParams } = await ConfigVariablesInitializer.initNetworkConfiguration(promptedNetwork, true);
-  const accounts = await ZWeb3.accounts();
-  const opts = { units, to, from, value };
-  console.log(opts);
-  const prompted = await promptIfNeeded({ opts, props: getCommandProps(accounts) }, interactive);
+  const { network: networkInOpts, unit, to, value, from, interactive } = options;
+  const configOpts = { network: networkInOpts, from };
+  const configProps = getCommandProps();
+  const promptedConfig = await promptIfNeeded({ opts: configOpts, props: configProps }, interactive);
+  const { txParams } = await ConfigVariablesInitializer.initNetworkConfiguration(promptedConfig, true);
 
-  await transfer({ ...txParams, ...prompted });
+  const transferOpts = { to, from, value };
+  const transferProps = getCommandProps(await ZWeb3.accounts(), unit);
+  const promptedTransfer = await promptIfNeeded({ opts: transferOpts, props: transferProps }, interactive);
+
+  await transfer({ ...promptedTransfer, unit, txParams });
 
   if (!options.dontExitProcess && process.env.NODE_ENV !== 'test') process.exit(0);
 }
 
-function getCommandProps(accounts: string[] = []): InquirerQuestions {
+function getCommandProps(accounts: string[] = [], unit: string = 'ether'): InquirerQuestions {
   return {
     ...networksList('network', 'list'),
     from: {
@@ -43,18 +46,17 @@ function getCommandProps(accounts: string[] = []): InquirerQuestions {
         value: account
       }))
     },
-    units: {
-      type: 'list',
-      message: 'Select a unit',
-      choices: () => ['Gwei', 'Wei', 'Ether']
-    },
     to: {
       type: 'input',
       message: 'Enter a receiver account'
     },
     value: {
       type: 'input',
-      message: 'Enter a value in wei'
+      message: 'Enter an amount to transfer',
+      transformer: (value) => {
+        if (value.length === 0 || !isValidUnit(unit)) return value;
+        return `${value} ${unit.toLowerCase()}`;
+      },
     }
   };
 }
