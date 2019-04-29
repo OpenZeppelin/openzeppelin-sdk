@@ -46,6 +46,10 @@ export default class ZWeb3 {
     return Web3.utils.isAddress(address);
   }
 
+  public static toWei(value: string, unit: any): string {
+    return Web3.utils.toWei(value, unit);
+  }
+
   public static eth(): Eth {
     return ZWeb3.web3().eth;
   }
