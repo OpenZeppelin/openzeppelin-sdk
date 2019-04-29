@@ -31,20 +31,6 @@ contract('ZWeb3', function(accounts) {
       ZWeb3.sha3('something').should.be.eq('0x68371d7e884c168ae2022c82bd837d51837718a7f7dfb7aa3f753074a35e1d87')
     })
 
-    describe('toWei', function () {
-      context('when specifying ether as convertion unit', function () {
-        it('transforms ethers to wei', function () {
-          ZWeb3.toWei('1', 'ether').should.eq(1e18.toString());
-        })
-      })
-
-      context('when specifying gwei as convertion unit', function () {
-        it('transforms ethers to wei', function () {
-          ZWeb3.toWei('1', 'gwei').should.eq(1e9.toString());
-        })
-      })
-    })
-
     it('tells whether an address is valid', function () {
       ZWeb3.isAddress(accounts[0]).should.be.true
       ZWeb3.isAddress(ZERO_ADDRESS).should.be.true
@@ -95,6 +81,28 @@ contract('ZWeb3', function(accounts) {
 
       block.should.be.an('object')
       block.number.should.not.be.null
+    })
+
+    describe('toWei', function () {
+      context('when specifying ether as convertion unit', function () {
+        it('transforms ethers to wei', function () {
+          ZWeb3.toWei('1', 'ether').should.eq(1e18.toString());
+        })
+      })
+
+      context('when specifying gwei as convertion unit', function () {
+        it('transforms ethers to wei', function () {
+          ZWeb3.toWei('1', 'gwei').should.eq(1e9.toString());
+        })
+      })
+    })
+
+    describe('getUnits', function () {
+      it('returns array of valid units', function () {
+        const units = ZWeb3.getUnits();
+        units.should.be.an('array').that.includes('wei', 'gwei', 'ether');
+        units.should.be.an('array').that.not.includes('foo', 'bar', 'buz');
+      })
     })
 
     describe('get code', function () {
