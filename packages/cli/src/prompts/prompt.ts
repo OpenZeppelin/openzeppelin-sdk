@@ -24,6 +24,7 @@ interface InquirerQuestion {
   default?: any;
   choices?: ChoicesT;
   when?: ((answers: { [key: string]: any }) => boolean);
+  transformer?: ((value: string, answers: { [key: string]: any }) => string);
   normalize?: ((input?: any) => any);
 }
 
