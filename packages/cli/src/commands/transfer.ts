@@ -6,7 +6,7 @@ import ConfigVariablesInitializer from '../models/initializer/ConfigVariablesIni
 
 const name: string = 'transfer';
 const signature: string = name;
-const description: string = 'send funds in ether, wei or gwei to a given address';
+const description: string = 'send funds to a given address';
 
 const register: (program: any) => any = (program) => program
   .command(signature, undefined, { noHelp: true })
@@ -14,7 +14,7 @@ const register: (program: any) => any = (program) => program
   .description(description)
   .option('--to <to>', 'specify recipient address')
   .option('--value <value>', 'the amount of ether units to be transferred')
-  .option('--unit <unit>', 'units name. To see supported units, go to: https://web3js.readthedocs.io/en/1.0/web3-utils.html#id85')
+  .option('--unit <unit>', 'unit name. If none is given, \'ether\' will be used. To see supported units, go to: https://web3js.readthedocs.io/en/1.0/web3-utils.html#id85')
   .withNetworkOptions()
   .withNonInteractiveOption()
   .action(action);
