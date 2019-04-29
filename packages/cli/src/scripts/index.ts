@@ -18,6 +18,7 @@ import status from './status';
 import unlink from './unlink';
 import update from './update';
 import verify from './verify';
+import transfer from './transfer';
 
 export default {
   add,
@@ -39,5 +40,6 @@ export default {
   status,
   unlink,
   update,
-  verify
+  verify,
+  transfer
 };
