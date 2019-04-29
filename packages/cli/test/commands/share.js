@@ -22,6 +22,7 @@ import * as update from '../../src/scripts/update';
 import * as verify from '../../src/scripts/verify';
 import * as setAdmin from '../../src/scripts/set-admin';
 import * as unpack from '../../src/scripts/unpack';
+import * as transfer from '../../src/scripts/transfer';
 
 import program from '../../src/bin/program';
 import Session from '../../src/models/network/Session';
@@ -72,7 +73,7 @@ exports.stubCommands = function () {
     this.verify = sinon.stub(verify, 'default')
     this.setAdmin = sinon.stub(setAdmin, 'default')
     this.unpack = sinon.stub(unpack, 'default')
-
+    this.transfer= sinon.stub(transfer, 'default')
     this.compiler = sinon.stub(Compiler, 'call').callsFake(() => null)
     this.errorHandler = sinon.stub(ErrorHandler.prototype, 'call').callsFake(() => null)
     this.initializer = sinon.stub(ConfigVariablesInitializer, 'initNetworkConfiguration').callsFake(function (options) {
@@ -88,35 +89,7 @@ exports.stubCommands = function () {
   })
 
   afterEach('restore', function () {
-    this.addAll.restore()
-    this.add.restore()
-    this.bump.restore()
-    this.check.restore()
-    this.compare.restore()
-    this.create.restore()
-    this.queryDeployment.restore()
-    this.querySignedDeployment.restore()
-    this.freeze.restore()
-    this.init.restore()
-    this.link.restore()
-    this.unlink.restore()
-    this.publish.restore()
-    this.pull.restore()
-    this.push.restore()
-    this.remove.restore()
-    this.session.restore()
-    this.status.restore()
-    this.update.restore()
-    this.verify.restore()
-    this.setAdmin.restore()
-    this.unpack.restore()
-
-    this.errorHandler.restore()
-    this.initializer.restore()
-    this.compiler.restore()
-    this.getZosversion.restore()
-    this.packageFile.restore()
-    this.dependency.restore()
+    sinon.restore()
     program.parseReset()
   })
 }
