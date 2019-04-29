@@ -6,8 +6,9 @@ import { ZWeb3 } from 'zos-lib';
 
 import transfer from '../../src/scripts/transfer'
 
-contract.only('transfer script', function(accounts) {
+contract('transfer script', function(accounts) {
   const [_, sender, receiver] = accounts.map(utils.toChecksumAddress);
+
   describe('validations', function() {
     context('when no recipient address is specified', function() {
       it('throws an error', async function() {
@@ -23,7 +24,7 @@ contract.only('transfer script', function(accounts) {
 
     context('when specifying an invalid unit', function() {
       it('throws an error', async function() {
-        await transfer({ to: receiver, value: '10', unit: 'palla' }).should.be.rejectedWith(/Invalid specified unit/);
+        await transfer({ to: receiver, value: '10', unit: 'palla' }).should.be.rejectedWith(/Invalid specified unit palla/);
       });
     });
   });
