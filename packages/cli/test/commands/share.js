@@ -21,6 +21,7 @@ import * as status from '../../src/scripts/status';
 import * as update from '../../src/scripts/update';
 import * as verify from '../../src/scripts/verify';
 import * as setAdmin from '../../src/scripts/set-admin';
+import * as unpack from '../../src/scripts/unpack';
 
 import program from '../../src/bin/program';
 import Session from '../../src/models/network/Session';
@@ -70,6 +71,8 @@ exports.stubCommands = function () {
     this.update = sinon.stub(update, 'default')
     this.verify = sinon.stub(verify, 'default')
     this.setAdmin = sinon.stub(setAdmin, 'default')
+    this.unpack = sinon.stub(unpack, 'default')
+
     this.compiler = sinon.stub(Compiler, 'call').callsFake(() => null)
     this.errorHandler = sinon.stub(ErrorHandler.prototype, 'call').callsFake(() => null)
     this.initializer = sinon.stub(ConfigVariablesInitializer, 'initNetworkConfiguration').callsFake(function (options) {
@@ -106,6 +109,8 @@ exports.stubCommands = function () {
     this.update.restore()
     this.verify.restore()
     this.setAdmin.restore()
+    this.unpack.restore()
+
     this.errorHandler.restore()
     this.initializer.restore()
     this.compiler.restore()

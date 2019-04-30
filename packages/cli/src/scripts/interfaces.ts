@@ -61,6 +61,10 @@ export interface InitParams extends Dependencies {
   packageFile?: ZosPackageFile;
 }
 
+export interface UnpackParams {
+  repoOrName: string;
+}
+
 export interface PushParams extends Network {
   force?: boolean;
   reupload?: boolean;

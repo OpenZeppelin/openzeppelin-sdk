@@ -15,6 +15,7 @@ import status from './status';
 import unlink from './unlink';
 import update from './update';
 import verify from './verify';
+import unpack from './unpack';
 
 export default {
   add,
@@ -34,4 +35,5 @@ export default {
   unlink,
   update,
   verify,
+  unpack,
 };
