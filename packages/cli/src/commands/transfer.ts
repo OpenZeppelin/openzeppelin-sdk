@@ -26,7 +26,7 @@ async function action(options: any): Promise<void> {
   const promptedConfig = await promptIfNeeded({ opts: configOpts, props: configProps }, interactive);
   const { txParams } = await ConfigVariablesInitializer.initNetworkConfiguration(promptedConfig, true);
 
-  const transferOpts = { to, from, value };
+  const transferOpts = { from, to, value };
   const transferProps = getCommandProps(await ZWeb3.accounts(), unit);
   const promptedTransfer = await promptIfNeeded({ opts: transferOpts, props: transferProps }, interactive);
 
