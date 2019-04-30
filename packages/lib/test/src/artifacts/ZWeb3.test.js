@@ -97,6 +97,20 @@ contract('ZWeb3', function(accounts) {
       })
     })
 
+    describe('fromWei', function () {
+      context('when specifying wei to convert to gwei', function () {
+        it('transforms wei to gwei', function () {
+          ZWeb3.fromWei(1e18.toString(), 'gwei').should.eq(1e9.toString());
+        })
+      })
+
+      context('when specifying gwei as convertion unit', function () {
+        it('transforms wei to ether', function () {
+          ZWeb3.fromWei(1e18.toString(), 'ether').should.eq('1');
+        })
+      })
+    })
+
     describe('getUnits', function () {
       it('returns array of valid units', function () {
         const units = ZWeb3.getUnits();

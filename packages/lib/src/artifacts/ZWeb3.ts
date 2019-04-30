@@ -60,6 +60,10 @@ export default class ZWeb3 {
     return Web3.utils.toWei(value, unit);
   }
 
+  public static fromWei(value: string, unit: any): string {
+    return Web3.utils.fromWei(value, unit);
+  }
+
   public static getUnits(): string[] {
     return Object.keys(Web3.utils.unitMap);
   }
