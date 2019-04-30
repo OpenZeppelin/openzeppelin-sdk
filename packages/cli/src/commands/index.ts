@@ -17,6 +17,7 @@ import update from './update';
 import verify from './verify';
 import unpack from './unpack';
 import transfer from './transfer';
+import balance from './balance';
 
 export default {
   add,
@@ -38,4 +39,5 @@ export default {
   verify,
   unpack,
   transfer,
+  balance,
 };

@@ -19,6 +19,7 @@ import unlink from './unlink';
 import update from './update';
 import verify from './verify';
 import transfer from './transfer';
+import balance from './balance';
 
 export default {
   add,
@@ -41,5 +42,6 @@ export default {
   unlink,
   update,
   verify,
-  transfer
+  transfer,
+  balance,
 };
