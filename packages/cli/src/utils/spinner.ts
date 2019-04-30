@@ -12,6 +12,10 @@ export default class Spinner {
   }
 
   public succeed() {
-    this.impl.start();
+    this.impl.succeed();
+  }
+
+  public fail() {
+    this.impl.fail();
   }
 }
