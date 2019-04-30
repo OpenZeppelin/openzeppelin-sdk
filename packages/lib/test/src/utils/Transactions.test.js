@@ -16,7 +16,7 @@ import Transactions, { state } from '../../../src/utils/Transactions';
 const DEFAULT_GAS = 6721975;
 const DEFAULT_PARAMS = [42, 'foo', [1, 2, 3]];
 
-contract('Transactions', function(accounts) {
+contract('Transactions', function (accounts) {
   accounts = accounts.map(utils.toChecksumAddress);
   const [_account1, account2] = accounts;
 
@@ -52,7 +52,7 @@ contract('Transactions', function(accounts) {
 
     it('uses default gas for sending transaction', async function () {
       const instance = await this.DummyImplementation.new();
-      const receipt = await instance.methods.initialize(42, 'foo', [1,2,3]).send();
+      const receipt = await instance.methods.initialize(42, 'foo', [1, 2, 3]).send();
       await assertGas(receipt.transactionHash, DEFAULT_GAS);
     });
   });
@@ -143,17 +143,17 @@ contract('Transactions', function(accounts) {
     });
 
     describe('gas price', function () {
-      beforeEach('simulate mainnet', async function() {
+      beforeEach('simulate mainnet', async function () {
         sinon.stub(ZWeb3, 'isMainnet').resolves(true)
       });
 
-      afterEach('return to testnet and undo stub', async function() {
+      afterEach('return to testnet and undo stub', async function () {
         delete state.gasPrice;
         sinon.restore();
       });
 
-      describe('uses an API to determine gas price', async function() {
-        beforeEach('stub API reply', async function() {
+      describe('uses an API to determine gas price', async function () {
+        beforeEach('stub API reply', async function () {
           sinon.stub(axios, 'get').resolves({ data: { average: 49 } })
         });
 
@@ -168,8 +168,8 @@ contract('Transactions', function(accounts) {
         });
       });
 
-      describe('does not blindly trust API', async function() {
-        beforeEach('stub API reply', async function() {
+      describe('does not blindly trust API', async function () {
+        beforeEach('stub API reply', async function () {
           sinon.stub(axios, 'get').resolves({ data: { average: 1234123412341234 } })
         });
 
@@ -261,13 +261,13 @@ contract('Transactions', function(accounts) {
     });
 
     describe('gas price', function () {
-      describe('uses an API to determine gas price', async function() {
-        beforeEach('Stub API reply and simulate mainnet', async function() {
+      describe('uses an API to determine gas price', async function () {
+        beforeEach('Stub API reply and simulate mainnet', async function () {
           sinon.stub(ZWeb3, 'isMainnet').resolves(true)
           sinon.stub(axios, 'get').resolves({ data: { average: 49 } })
         });
 
-        afterEach('return to testnet and undo stub', async function() {
+        afterEach('return to testnet and undo stub', async function () {
           delete state.gasPrice;
           sinon.restore();
         });
@@ -283,13 +283,13 @@ contract('Transactions', function(accounts) {
         });
       });
 
-      describe('does not blindly trust API', async function() {
-        beforeEach('stub API reply and simulate mainnet', async function() {
+      describe('does not blindly trust API', async function () {
+        beforeEach('stub API reply and simulate mainnet', async function () {
           sinon.stub(ZWeb3, 'isMainnet').resolves(true)
           sinon.stub(axios, 'get').resolves({ data: { average: 1234123412341234 } })
         });
 
-        afterEach('Return to testnet and undo stub', async function() {
+        afterEach('Return to testnet and undo stub', async function () {
           delete state.gasPrice;
           sinon.restore();
         });
@@ -382,13 +382,13 @@ contract('Transactions', function(accounts) {
     });
 
     describe('gas price', function () {
-      describe('uses an API to determine gas price', async function() {
-        beforeEach('Stub API reply and simulate mainnet', async function() {
+      describe('uses an API to determine gas price', async function () {
+        beforeEach('Stub API reply and simulate mainnet', async function () {
           sinon.stub(ZWeb3, 'isMainnet').resolves(true)
           sinon.stub(axios, 'get').resolves({ data: { average: 49 } })
         });
 
-        afterEach('return to testnet and undo stub', async function() {
+        afterEach('return to testnet and undo stub', async function () {
           delete state.gasPrice;
           sinon.restore();
         });
@@ -406,13 +406,13 @@ contract('Transactions', function(accounts) {
         });
       });
 
-      describe('does not blindly trust API', async function() {
-        beforeEach('stub API reply and simulate mainnet', async function() {
+      describe('does not blindly trust API', async function () {
+        beforeEach('stub API reply and simulate mainnet', async function () {
           sinon.stub(ZWeb3, 'isMainnet').resolves(true)
           sinon.stub(axios, 'get').resolves({ data: { average: 1234123412341234 } })
         });
 
-        afterEach('Return to testnet and undo stub', async function() {
+        afterEach('Return to testnet and undo stub', async function () {
           delete state.gasPrice;
           sinon.restore();
         });
@@ -484,13 +484,13 @@ contract('Transactions', function(accounts) {
       });
 
       describe('gas price', function () {
-        describe('uses an API to determine gas price', async function() {
-          beforeEach('stub API reply and simulate mainnet', async function() {
+        describe('uses an API to determine gas price', async function () {
+          beforeEach('stub API reply and simulate mainnet', async function () {
             sinon.stub(ZWeb3, 'isMainnet').resolves(true)
             sinon.stub(axios, 'get').resolves({ data: { average: 49 } })
           });
 
-          afterEach('Return to testnet and undo stub', async function() {
+          afterEach('Return to testnet and undo stub', async function () {
             delete state.gasPrice;
             sinon.restore();
           });
@@ -508,13 +508,13 @@ contract('Transactions', function(accounts) {
           });
         });
 
-        describe('does not blindly trust API', async function() {
-          beforeEach('stub API reply and simulate mainnet', async function() {
+        describe('does not blindly trust API', async function () {
+          beforeEach('stub API reply and simulate mainnet', async function () {
             sinon.stub(ZWeb3, 'isMainnet').resolves(true)
             sinon.stub(axios, 'get').resolves({ data: { average: 1234123412341234 } })
           });
 
-          afterEach('Return to testnet and undo stub', async function() {
+          afterEach('Return to testnet and undo stub', async function () {
             delete state.gasPrice;
             sinon.restore();
           });
@@ -606,13 +606,13 @@ contract('Transactions', function(accounts) {
       });
 
       describe('gas price', function () {
-        describe('uses an API to determine gas price', async function() {
-          beforeEach('stub API reply and simulate mainnet', async function() {
+        describe('uses an API to determine gas price', async function () {
+          beforeEach('stub API reply and simulate mainnet', async function () {
             sinon.stub(ZWeb3, 'isMainnet').resolves(true)
             sinon.stub(axios, 'get').resolves({ data: { average: 49 } })
           });
 
-          afterEach('Return to testnet and undo stub', async function() {
+          afterEach('Return to testnet and undo stub', async function () {
             delete state.gasPrice;
             sinon.restore();
           });
@@ -630,13 +630,13 @@ contract('Transactions', function(accounts) {
           });
         });
 
-        describe('does not blindly trust API', async function() {
-          beforeEach('stub API reply and simulate mainnet', async function() {
+        describe('does not blindly trust API', async function () {
+          beforeEach('stub API reply and simulate mainnet', async function () {
             sinon.stub(ZWeb3, 'isMainnet').resolves(true)
             sinon.stub(axios, 'get').resolves({ data: { average: 1234123412341234 } })
           });
 
-          afterEach('return to testnet and undo stub', async function() {
+          afterEach('return to testnet and undo stub', async function () {
             delete state.gasPrice;
             sinon.restore();
           });
