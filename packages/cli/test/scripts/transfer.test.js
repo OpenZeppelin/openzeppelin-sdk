@@ -24,7 +24,7 @@ contract('transfer script', function(accounts) {
 
     context('when specifying an invalid unit', function() {
       it('throws an error', async function() {
-        await transfer({ to: receiver, value: '10', unit: 'palla' }).should.be.rejectedWith(/Invalid specified unit palla/);
+        await transfer({ to: receiver, value: '10', unit: 'palla' }).should.be.rejectedWith(/Invalid unit palla/);
       });
     });
   });
@@ -43,7 +43,7 @@ contract('transfer script', function(accounts) {
 
         await transfer({ from: sender, to: receiver, value: '10', unit: 'ether' });
 
-        (await ZWeb3.getBalance(sender)).should.not.eq(110e18.toString());
+        (await ZWeb3.getBalance(sender)).should.not.eq(100e18.toString());
         (await ZWeb3.getBalance(receiver)).should.eq(110e18.toString());
       });
     });
