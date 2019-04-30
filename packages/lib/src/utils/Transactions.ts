@@ -51,8 +51,8 @@ export default {
     try {
       const from = await ZWeb3.defaultAccount();
       const gas = txParams.gas || Contracts.getArtifactsDefaults().gas || await this.estimateActualGas({ to: contractAddress, data });
-      return ZWeb3.eth().sendTransaction({ to: contractAddress, data, from, ...txParams, gas });
-    } catch(error) {
+      return ZWeb3.eth().sendTransaction({ to: contractAddress, data, from, ...txParams, gas }); // GEORGETODO fix this
+    } catch (error) {
       if (!error.message.match(/nonce too low/) || retries <= 0) throw error;
       return this.sendRawTransaction(contractAddress, data, txParams, retries - 1);
     }
@@ -143,7 +143,7 @@ export default {
     // See https://github.com/zeppelinos/zos/issues/192 for more info.
     try {
       return await this._calculateActualGas(await contractFn(...args).estimateGas({ ...txParams }));
-    } catch(error) {
+    } catch (error) {
       if (retries <= 0) throw Error(error);
       await sleep(RETRY_SLEEP_TIME);
       return this.estimateActualGasFnCall(contractFn, args, txParams, retries - 1);
