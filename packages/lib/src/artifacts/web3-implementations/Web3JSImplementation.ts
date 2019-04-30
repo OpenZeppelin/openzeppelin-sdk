@@ -2,17 +2,68 @@ import NETWORKS from '../Networks';
 import Logger from '../../utils/Logger';
 import sleep from '../../helpers/sleep';
 import Web3 from 'web3';
-import { TransactionReceipt } from 'web3/types';
+import { TransactionReceipt, Callback, EventLog, EventEmitter } from 'web3/types';
 import { Eth, Block, Transaction } from 'web3-eth';
-import { Contract } from 'web3-eth-contract';
+import { Contract as Web3Contract } from 'web3-eth-contract';
+import Contract from '../Contract';
 import { toChecksumAddress } from 'web3-utils';
 import ZWeb3Interface from '../ZWeb3Interface';
+import { TransactionObject, BlockType } from 'web3/eth/types';
+import { StorageLayoutInfo } from '../../validations/Storage';
+import Contracts from '../Contracts';
 
 const log: Logger = new Logger('ZWeb3JSImplementation');
 
+export interface ZWeb3JSContract {
+
+	// Web3 Contract interface.
+	options: any;
+	methods: { [fnName: string]: (...args: any[]) => TransactionObject<any>; };
+	deploy(options: { data: string; arguments: any[]; }): TransactionObject<Web3Contract>; // GEORGETODO Change the return type
+	events: {
+		[eventName: string]: (options?: { filter?: object; fromBlock?: BlockType; topics?: string[]; }, cb?: Callback<EventLog>) => EventEmitter;
+		allEvents: (options?: { filter?: object; fromBlock?: BlockType; topics?: string[]; }, cb?: Callback<EventLog>) => EventEmitter;
+	};
+	getPastEvents(event: string, options?: { filter?: object; fromBlock?: BlockType; toBlock?: BlockType; topics?: string[]; }, cb?: Callback<EventLog[]>): Promise<EventLog[]>;
+	setProvider(provider: any): void;
+
+	// Contract specific.
+	address: string;
+	new: (args?: any[], options?: {}) => Promise<Contract>;
+	at: (address: string) => Contract;
+	link: (libraries: { [libAlias: string]: string }) => void;
+	deployment?: { transactionHash: string, transactionReceipt: TransactionReceipt };
+	schema: {
+
+		// Zos schema specific.
+		directory: string;
+		linkedBytecode: string;
+		linkedDeployedBytecode: string;
+		warnings: any;
+		storageInfo: StorageLayoutInfo;
+
+		// Solidity schema.
+		schemaVersion: string;
+		contractName: string;
+		abi: any[];
+		bytecode: string;
+		deployedBytecode: string;
+		sourceMap: string;
+		deployedSourceMap: string;
+		source: string;
+		sourcePath: string;
+		ast: any;
+		legacyAST: any;
+		compiler: any;
+		networks: any;
+		updatedAt: string;
+	};
+}
+
+
 // TS-TODO: Type Web3.
 // TS-TODO: Review what could be private in this class.
-export default class Web3JSImplementation implements ZWeb3Interface {
+export class Web3JSImplementation implements ZWeb3Interface {
 
 	private _provider;
 
@@ -50,8 +101,74 @@ export default class Web3JSImplementation implements ZWeb3Interface {
 		return this.web3.version;
 	}
 
-	public contract(abi: any, atAddress?: string, options?: any): Contract {
+	public contract(abi: any, atAddress?: string, options?: any): Eth.Contract {
 		return new (this.eth.Contract)(abi, atAddress, options);
+	}
+
+	public wrapContractInstance(schema: any, instance: Web3Contract): ZWeb3JSContract {
+		const self = this;
+		instance.schema = schema;
+
+		instance.new = async function (...passedArguments): Promise<Contract> {
+			const [args, options] = self.parseArguments(passedArguments, schema.abi);
+			if (!schema.linkedBytecode) throw new Error(`${schema.contractName} bytecode contains unlinked libraries.`);
+			instance.options = { ...instance.options, ...(await Contracts.getDefaultTxParams()) };
+			return new Promise((resolve, reject) => {
+				const tx = instance.deploy({ data: schema.linkedBytecode, arguments: args });
+				let transactionReceipt, transactionHash;
+				tx.send({ ...options })
+					.on('error', (error) => reject(error))
+					.on('receipt', (receipt) => transactionReceipt = receipt)
+					.on('transactionHash', (hash) => transactionHash = hash)
+					.then((deployedInstance) => { // instance != deployedInstance
+						deployedInstance = self.wrapContractInstance(schema, deployedInstance);
+						deployedInstance.deployment = { transactionReceipt, transactionHash };
+						resolve(deployedInstance);
+					})
+					.catch((error) => reject(error));
+			});
+		};
+
+		instance.at = function (address: string): Contract | never {
+			if (!self.isAddress(address)) throw new Error('Given address is not valid: ' + address);
+			const newWeb3Instance = instance.clone();
+			newWeb3Instance._address = address;
+			newWeb3Instance.options.address = address;
+			return self.wrapContractInstance(instance.schema, newWeb3Instance);
+		};
+
+		instance.link = function (libraries: { [libAlias: string]: string }): void {
+			instance.schema.linkedBytecode = instance.schema.bytecode;
+			instance.schema.linkedDeployedBytecode = instance.schema.deployedBytecode;
+
+			Object.keys(libraries).forEach((name: string) => {
+				const address = libraries[name].replace(/^0x/, '');
+				const regex = new RegExp(`__${name}_+`, 'g');
+				instance.schema.linkedBytecode = instance.schema.linkedBytecode.replace(regex, address);
+				instance.schema.linkedDeployedBytecode = instance.schema.linkedDeployedBytecode.replace(regex, address);
+			});
+		};
+
+		// TODO: Remove after web3 adds the getter: https://github.com/ethereum/web3.js/issues/2274
+		if (typeof instance.address === 'undefined') {
+			Object.defineProperty(instance, 'address', { get: () => instance.options.address });
+		}
+
+		return instance;
+	}
+
+	private parseArguments(passedArguments, abi) {
+		const constructorAbi = abi.find((elem) => elem.type === 'constructor') || {};
+		const constructorArgs = constructorAbi.inputs && constructorAbi.inputs.length > 0 ? constructorAbi.inputs : [];
+		let givenOptions = {};
+
+		if (passedArguments.length === constructorArgs.length + 1) {
+			const lastArg = passedArguments[passedArguments.length - 1];
+			if (typeof (lastArg) === 'object') {
+				givenOptions = passedArguments.pop();
+			}
+		}
+		return [passedArguments, givenOptions];
 	}
 
 	public async accounts(): Promise<string[]> {

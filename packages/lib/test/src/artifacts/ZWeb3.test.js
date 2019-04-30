@@ -6,10 +6,14 @@ import Contracts from '../../../src/artifacts/Contracts'
 import { ZERO_ADDRESS } from '../../../src/utils/Addresses'
 import utils from 'web3-utils';
 import BN from 'bignumber.js';
+import IMPLEMENTATIONS from '../../../src/artifacts/web3-implementations/Implementations';
+import { JsonRpcProvider } from 'ethers/providers';
+
 
 contract('ZWeb3', function (accounts) {
   accounts = accounts.map(utils.toChecksumAddress);
-  const [_, account, account1, account2] = accounts;
+  const [_, account, account1, account2, account3, account4, account5, account6] = accounts;
+  const providerURL = 'http://localhost:9555';
 
   before('deploy dummy instance', async function () {
     this.DummyImplementation = Contracts.getFromLocal('DummyImplementation')
@@ -17,9 +21,6 @@ contract('ZWeb3', function (accounts) {
   })
 
   const shouldBehaveLikeWeb3Instance = (account, receiverAccount) => {
-    it('initializes web3 with a provider', function () {
-      ZWeb3.web3().currentProvider.should.not.be.null;
-    })
 
     it('knows a web3 instance', function () {
       ZWeb3.web3().should.not.be.null
@@ -57,7 +58,7 @@ contract('ZWeb3', function (accounts) {
     })
 
     it('tells the name of the current node', async function () {
-      const node = await ZWeb3.getNode()
+      const node = await ZWeb3.getNode();
       node.should.match(/EthereumJS TestRPC/)
     })
 
@@ -120,24 +121,22 @@ contract('ZWeb3', function (accounts) {
       })
 
       describe('get transaction', function () {
-        it('can estimate the gas of a call', async function () {
+        it('can get transaction', async function () {
           const transaction = await ZWeb3.getTransaction(this.txHash)
 
           transaction.should.be.an('object')
-          transaction.value.should.be.eq(1e18.toString())
           transaction.from.should.be.eq(accounts[0])
           transaction.to.should.be.eq(receiverAccount)
           transaction.nonce.should.not.be.null
           transaction.blockNumber.should.not.be.null
           transaction.blockHash.should.not.be.null
-          transaction.gas.should.not.be.null
           transaction.gasPrice.should.not.be.null
           transaction.hash.should.be.eq(this.txHash)
         })
       })
 
       describe('get transaction receipt', function () {
-        it('can estimate the gas of a call', async function () {
+        it('can get transaction receipt', async function () {
           const receipt = await ZWeb3.getTransactionReceipt(this.txHash)
 
           receipt.should.be.an('object')
@@ -183,57 +182,160 @@ contract('ZWeb3', function (accounts) {
           })
         })
       })
+    })
 
-      describe('checksum address', function () {
-        context('when address has uppercase hexa letters', function () {
-          context('when address is not well checksummed', function () {
-            it('fails', function () {
-              const address = '0x82154A1cbcAb0461D4C12ee9Cb890244eead6d9F';
-              (() => ZWeb3.toChecksumAddress(address).should.throw('Error', /is not a valid Ethereum address or it has not been checksummed correctly/));
-            });
-          });
-
-          context('when address has been checksummed properly', function () {
-            it('returns checksummed address', function () {
-              ZWeb3.toChecksumAddress(accounts[0]).should.be.eq(accounts[0]);
-            });
+    describe('checksum address', function () {
+      context('when address has uppercase hexa letters', function () {
+        context('when address is not well checksummed', function () {
+          it('fails', function () {
+            const address = '0x82154A1cbcAb0461D4C12ee9Cb890244eead6d9F';
+            (() => ZWeb3.toChecksumAddress(address).should.throw('Error', /is not a valid Ethereum address or it has not been checksummed correctly/));
           });
         });
 
-        context('when valid but not checksummed address is given', function () {
+        context('when address has been checksummed properly', function () {
           it('returns checksummed address', function () {
-            const address = accounts[0].toLowerCase();
-            ZWeb3.toChecksumAddress(address).should.be.eq(accounts[0]);
+            ZWeb3.toChecksumAddress(accounts[0]).should.be.eq(accounts[0]);
           });
         });
       });
+
+      context('when valid but not checksummed address is given', function () {
+        it('returns checksummed address', function () {
+          const address = accounts[0].toLowerCase();
+          ZWeb3.toChecksumAddress(address).should.be.eq(accounts[0]);
+        });
+      });
+    });
+
+  };
+
+  const shouldBehaveLikeWeb3JSInstance = (account, receiverAccount) => {
+    it('initializes web3 with a provider', function () {
+      ZWeb3.web3().currentProvider.should.not.be.null;
     })
+
+    describe('transactions', function () {
+      beforeEach('sending transaction', async function () {
+        const value = (new BN(1e18)).toString(10);
+        const receipt = await ZWeb3.sendTransaction({ from: accounts[0], to: receiverAccount, value })
+        this.txHash = receipt.transactionHash;
+      })
+
+      describe('get transaction', function () {
+        it('can get transaction', async function () {
+          const transaction = await ZWeb3.getTransaction(this.txHash)
+
+          transaction.value.should.be.eq(1e18.toString())
+          transaction.gas.should.not.be.null
+        })
+      })
+
+    })
+
+  };
+
+  const shouldBehaveLikeWeb3EthersInstance = (account, receiverAccount) => {
+    it('initializes web3 with a provider', function () {
+      ZWeb3.web3().should.not.be.null;
+    })
+
+    describe('transactions', function () {
+      beforeEach('sending transaction', async function () {
+        const value = (new BN(1e18)).toString(10);
+        const receipt = await ZWeb3.sendTransaction({ from: accounts[0], to: receiverAccount, value })
+        this.txHash = receipt.transactionHash;
+      })
+
+      describe('get transaction', function () {
+        it('can get transaction', async function () {
+          const transaction = await ZWeb3.getTransaction(this.txHash)
+          transaction.value.toString().should.be.eq(1e18.toString())
+          transaction.gasLimit.should.not.be.null
+        })
+      })
+
+    })
+
   };
 
   describe('initializing ZWeb3', function () {
-    context('when initializing without a provider', function () {
-      it('initializes web3 without a provider', async function () {
-        ZWeb3.initialize();
-        ZWeb3.web3().should.not.be.null;
 
-        expect(ZWeb3.web3().currentProvider).to.be.null;
+    describe('initializing with ethers Implementation', function () {
+
+      context('when initializing ZWeb3 with an http url', function () {
+        beforeEach('initialize ethers', function () {
+          ZWeb3.initialize(providerURL, IMPLEMENTATIONS.ETHERS);
+        })
+
+        shouldBehaveLikeWeb3Instance(account, account4);
+        shouldBehaveLikeWeb3EthersInstance(account, account4);
       })
+
+      context('when initializing ZWeb3 with a web3 provider', function () {
+        beforeEach('initialize ethers', function () {
+          ZWeb3.initialize(web3.currentProvider, IMPLEMENTATIONS.ETHERS);
+        })
+
+        shouldBehaveLikeWeb3Instance(account, account5);
+        shouldBehaveLikeWeb3EthersInstance(account, account5);
+      })
+
+      context('when initializing ZWeb3 with a ethers provider', function () {
+        let ethersProvider;
+        before(function () {
+          ethersProvider = new JsonRpcProvider(providerURL)
+        })
+
+        beforeEach('initialize ethers', function () {
+          ZWeb3.initialize(ethersProvider, IMPLEMENTATIONS.ETHERS);
+        })
+
+        shouldBehaveLikeWeb3Instance(account, account6);
+        shouldBehaveLikeWeb3EthersInstance(account, account6);
+      })
+
     })
 
-    context('when initializing ZWeb3 with an http url', function () {
-      beforeEach('initialize web3', function () {
-        ZWeb3.initialize('http://localhost:9555');
+    describe('initializing with Web3.js Implementation', function () {
+      context('when initializing without a provider', function () {
+        it('initializes web3 without a provider', async function () {
+          ZWeb3.initialize();
+          ZWeb3.web3().should.not.be.null;
+
+          expect(ZWeb3.web3().currentProvider).to.be.null;
+        })
       })
 
-      shouldBehaveLikeWeb3Instance(account, account2);
-    })
+      context('when initializing ZWeb3 with a web3 provider', function () {
+        beforeEach('initialize web3', function () {
+          ZWeb3.initialize(web3.currentProvider);
+        })
 
-    context('when initializing ZWeb3 with a web3 provider', function () {
-      beforeEach('initialize web3', function () {
-        ZWeb3.initialize(web3.currentProvider);
+        shouldBehaveLikeWeb3Instance(account, account1);
+        shouldBehaveLikeWeb3JSInstance(account, account1);
       })
 
-      shouldBehaveLikeWeb3Instance(account, account1);
+      context('when initializing ZWeb3 with an http url', function () {
+        beforeEach('initialize web3', function () {
+          ZWeb3.initialize(providerURL);
+        })
+
+        shouldBehaveLikeWeb3Instance(account, account2);
+        shouldBehaveLikeWeb3JSInstance(account, account2);
+      })
+
+
+      context('when initializing ZWeb3 with an http url and specifying web3js implementation', function () {
+        beforeEach('initialize web3', function () {
+          ZWeb3.initialize(providerURL, IMPLEMENTATIONS.WEB3JS);
+        })
+
+        shouldBehaveLikeWeb3Instance(account, account3);
+        shouldBehaveLikeWeb3JSInstance(account, account3);
+      })
+
+
     })
 
   })

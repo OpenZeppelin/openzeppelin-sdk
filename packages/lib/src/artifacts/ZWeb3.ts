@@ -1,21 +1,31 @@
 import IMPLEMENTATIONS from './web3-implementations/Implementations';
-import Web3JSImplementation from './web3-implementations/Web3JSImplementation';
+import { Web3JSImplementation } from './web3-implementations/Web3JSImplementation';
 import ZWeb3Interface from './ZWeb3Interface';
+import { EthersImplementation } from './web3-implementations/EthersImplementation';
+import Contract from './Contract';
 
 // TS-TODO: Type Web3.
 // TS-TODO: Review what could be private in this class.
 export default class ZWeb3 {
 
-  public static provider; // GORGETODO add implementation classes. The two classes should have constructor receiving the provider and all methods described below in the context of the implementation
+  public static provider;
   public static implementation: ZWeb3Interface;
 
-  public static initialize(provider: any, implementation: IMPLEMENTATIONS = IMPLEMENTATIONS.WEB3JS): void { // GORGETODO add second param for library, defaulting to web3.js
-    ZWeb3.provider = provider;
+  public static initialize(provider: any, implementation: IMPLEMENTATIONS = IMPLEMENTATIONS.WEB3JS): void {
+
     switch (implementation) {
       case IMPLEMENTATIONS.WEB3JS:
         ZWeb3.implementation = new Web3JSImplementation(provider)
         break;
+      case IMPLEMENTATIONS.ETHERS:
+        ZWeb3.implementation = new EthersImplementation(provider)
+        break;
+      default:
+        throw new Error('No usable implementation supplied');
     }
+
+    ZWeb3.provider = ZWeb3.implementation.provider;
+
   }
 
   // TODO: this.web3 could be cached and initialized lazily?
@@ -39,8 +49,12 @@ export default class ZWeb3 {
     return ZWeb3.implementation.version;
   }
 
-  public static contract(abi: any, atAddress?: string, options?: any): any {
+  public static contract(abi: any, atAddress?: string, options?: any) {
     return ZWeb3.implementation.contract(abi, atAddress, options);
+  }
+
+  public static wrapContractInstance(schema: any, instance: any): Contract {
+    return ZWeb3.implementation.wrapContractInstance(schema, instance);
   }
 
   public static async accounts(): Promise<string[]> {

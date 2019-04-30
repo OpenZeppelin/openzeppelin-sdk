@@ -1,3 +1,5 @@
+import Contract from "./Contract";
+
 export default interface ZWeb3Interface {
 	provider: any;
 	web3: any;
@@ -6,6 +8,7 @@ export default interface ZWeb3Interface {
 	eth: any;
 	version: string;
 	contract(abi: any, atAddress?: string, options?: any): any;
+	wrapContractInstance(schema: any, instance: any): Contract;
 	accounts(): Promise<string[]>;
 	defaultAccount(): Promise<string>;
 	toChecksumAddress(address: string): string | null;
