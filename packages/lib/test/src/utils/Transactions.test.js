@@ -325,6 +325,25 @@ contract('Transactions', function(accounts) {
       await assertRevert(Transactions.sendRawTransaction(this.instance.address, transactionParams));
     });
 
+    context('when calling a function and also sending funds', function() {
+      context('when function is payable', function() {
+        it('sends funds', async function () {
+          const encodedCall = encodeCall('initializePayable', [], []);
+          const transactionParams = { data: encodedCall, value: ZWeb3.toWei('1', 'ether') };
+          await Transactions.sendRawTransaction(this.instance.address, transactionParams, { from: account2 });
+          (await ZWeb3.getBalance(this.instance.address)).should.eq(1e18.toString());
+        });
+      });
+
+      context('when function is not payable', function() {
+        it('reverts', async function () {
+          const transactionParams = { data: this.encodedCall, value: ZWeb3.toWei('1', 'ether') };
+          await assertRevert(Transactions.sendRawTransaction(this.instance.address, transactionParams, { from: account2 }));
+          (await ZWeb3.getBalance(this.instance.address)).should.eq('0');
+        });
+      });
+    });
+
     describe('gas', function () {
       afterEach('restore stubs', function () {
         sinon.restore();
