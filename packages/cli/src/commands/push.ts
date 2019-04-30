@@ -2,7 +2,6 @@ import omit from 'lodash.omit';
 import isString from 'lodash.isstring';
 import { ZWeb3 } from 'zos-lib';
 
-import init from './init';
 import add from './add';
 import push from '../scripts/push';
 import Session from '../models/network/Session';
@@ -32,7 +31,6 @@ const register: (program: any) => any = (program) => program
   .action(commandActions);
 
 async function commandActions(options: any): Promise<void> {
-  await init.runActionIfNeeded(options);
   await add.runActionIfNeeded(null, options);
   await action(options);
 }

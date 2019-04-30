@@ -1,6 +1,5 @@
 import pickBy from 'lodash.pickby';
 
-import init from './init';
 import link from './link';
 import add from './add';
 import push from './push';
@@ -35,8 +34,6 @@ const register: (program: any) => any = (program) => program
   .action(commandActions);
 
 async function commandActions(contractFullName: string, options: any) {
-  await init.runActionIfNeeded(options);
-
   const { network: promptedNewtork, contractFullName: promptedContractFullName } = await promptForCreate(contractFullName, options);
   const { network, txParams } = await ConfigVariablesInitializer.initNetworkConfiguration({ ...options, network: promptedNewtork });
 

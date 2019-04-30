@@ -3,6 +3,15 @@
 import { Logger } from 'zos-lib';
 import { lockSync } from 'lockfile';
 import program from './program';
+import findRootDirectory from './helpers';
+
+const [nodePath, zosPath, command] = process.argv;
+
+if (command !== 'init') {
+  const currentPath = process.cwd();
+  const rootDirectory = findRootDirectory(currentPath) || currentPath;
+  if (rootDirectory !== process.cwd()) process.chdir(rootDirectory);
+}
 
 // Acquire file lock to ensure no other instance is running
 const LOCKFILE: string = '.zos.lock';

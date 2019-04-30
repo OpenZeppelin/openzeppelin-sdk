@@ -1,4 +1,3 @@
-import init from './init';
 import push from './push';
 import link from '../scripts/link';
 import Dependency from '../models/dependency/Dependency';
@@ -22,9 +21,6 @@ const register: (program: any) => any = (program) => program
 async function action(dependencies: string[], options: any): Promise<void> {
   const { install, forceInstall, interactive } = options;
   const installDependencies = forceInstall || (install && interactive ? undefined : install);
-
-  await init.runActionIfNeeded(options);
-
   const args = { dependencies };
   const opts = { installDependencies };
   const props = getCommandProps();
