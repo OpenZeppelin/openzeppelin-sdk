@@ -14,8 +14,6 @@ import { Signer } from 'ethers/abstract-signer';
 
 const log: Logger = new Logger('ZWeb3EthersImplementation');
 
-
-
 export interface IZEthersContract {
 
 	instanceSigner: Signer;
@@ -108,32 +106,40 @@ export class ZEthersContract implements IZEthersContract {
 
 	private convertFunctionToMethod(fnDesc: string, functions: object): object {
 		const call = async (params) => {
-			const paramsCopy = utils.shallowCopy(params);
-			const from = paramsCopy.from | 0;
-			const signer = await this.provider.getSigner(from);
-			delete paramsCopy.from;
-			paramsCopy.value = utils.bigNumberify(paramsCopy.value);
-			return functions[fnDesc](...arguments)
+			// TODO
+		}
+
+		const send = async (params) => {
+			// TODO
+		}
+
+		const encodeABI = async (params) => {
+			// TODO
 		}
 
 		return {
-			call
+			call,
+			send,
+			encodeABI
 		}
 	}
 
 	new(args?: any[], options?: {}): Promise<ZEthersContract> {
+		// TODO
 		return undefined
 	}
 
 	at(address: string): ZEthersContract {
+		// TODO
 		return undefined
 	}
 
 	link(libraries: { [libAlias: string]: string }) {
-
+		// TODO
 	};
 
 	deploy(options: { data: string; arguments: any[]; }): any {
+		// TODO
 		const self = this;
 		return {
 			encodeABI: () => {
@@ -213,11 +219,12 @@ export class EthersImplementation implements ZWeb3Interface {
 	}
 
 	public contract(abi: any, atAddress?: string, options?: any): Interface | EthersContract {
-		// return new Contract()
-		return new Interface(abi) // Check the web3.eth.contract implementation for details on atAddress and options
+		// TODO
+		return new Interface(abi)
 	}
 
 	public wrapContractInstance(schema: any, instance: Interface | EthersContract): ZEthersContract {
+		// TODO
 		return undefined;
 	}
 
