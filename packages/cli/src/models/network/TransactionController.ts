@@ -12,7 +12,7 @@ export default class TransactionController {
 
   public async transfer(to: string, amount: string, unit: string): Promise<void> {
     if (!isValidUnit(unit)) {
-      throw Error(`Invalid specified unit ${unit}. To see supported units, visit: https://web3js.readthedocs.io/en/1.0/web3-utils.html#id74`);
+      throw Error(`Invalid unit ${unit}. Please try with: wei, kwei, gwei, milli, ether or any other well-known unit.`);
     }
     const validUnit = unit.toLowerCase();
     const value = ZWeb3.toWei(amount, validUnit);
