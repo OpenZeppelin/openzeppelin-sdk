@@ -16,6 +16,7 @@ import unlink from './unlink';
 import update from './update';
 import verify from './verify';
 import unpack from './unpack';
+import transfer from './transfer';
 
 export default {
   add,
@@ -36,4 +37,5 @@ export default {
   update,
   verify,
   unpack,
+  transfer,
 };

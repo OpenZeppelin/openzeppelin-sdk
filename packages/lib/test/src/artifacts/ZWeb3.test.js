@@ -83,6 +83,28 @@ contract('ZWeb3', function(accounts) {
       block.number.should.not.be.null
     })
 
+    describe('toWei', function () {
+      context('when specifying ether as convertion unit', function () {
+        it('transforms ethers to wei', function () {
+          ZWeb3.toWei('1', 'ether').should.eq(1e18.toString());
+        })
+      })
+
+      context('when specifying gwei as convertion unit', function () {
+        it('transforms ethers to wei', function () {
+          ZWeb3.toWei('1', 'gwei').should.eq(1e9.toString());
+        })
+      })
+    })
+
+    describe('getUnits', function () {
+      it('returns array of valid units', function () {
+        const units = ZWeb3.getUnits();
+        units.should.be.an('array').that.includes('wei', 'gwei', 'ether');
+        units.should.be.an('array').that.not.includes('foo', 'bar', 'buz');
+      })
+    })
+
     describe('get code', function () {
       it('can tell the deployed bytecode of a certain address', async function () {
         const bytecode = await ZWeb3.getCode(this.impl.address)

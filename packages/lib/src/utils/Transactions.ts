@@ -38,23 +38,31 @@ interface GenericFunction {
   (...a): any;
 }
 
+interface TransactionParams {
+  data?: string;
+  value?: any;
+}
+
 export default {
   /**
    * Makes a raw transaction to the blockchain using web3 sendTransaction method
-   * @param contractAddress address of the contract with which you are going to interact
+   * @param address of the contract or account with which you are going to interact
    * @param data encoded function call
    * @param txParams other transaction parameters (from, gasPrice, etc)
    * @param retries number of transaction retries
    */
-  async sendRawTransaction(contractAddress: string, data: string, txParams: any = {}, retries: number = RETRY_COUNT): Promise<any> {
+  async sendRawTransaction(address: string, { data, value }: TransactionParams, txParams: any = {}, retries: number = RETRY_COUNT): Promise<any> {
     await this._fixGasPrice(txParams);
     try {
       const from = await ZWeb3.defaultAccount();
-      const gas = txParams.gas || Contracts.getArtifactsDefaults().gas || await this.estimateActualGas({ to: contractAddress, data });
-      return ZWeb3.eth().sendTransaction({ to: contractAddress, data, from, ...txParams, gas });
+      const gas = txParams.gas
+        || Contracts.getArtifactsDefaults().gas
+        || await this.estimateActualGas({ to: address, data, value });
+
+      return ZWeb3.eth().sendTransaction({ to: address, data, value, from, ...txParams, gas });
     } catch(error) {
       if (!error.message.match(/nonce too low/) || retries <= 0) throw error;
-      return this.sendRawTransaction(contractAddress, data, txParams, retries - 1);
+      return this.sendRawTransaction(address, data, txParams, retries - 1);
     }
   },
 
