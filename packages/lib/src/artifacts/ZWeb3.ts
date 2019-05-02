@@ -10,11 +10,11 @@ const log: Logger = new Logger('ZWeb3');
 
 // Reference: see https://github.com/ethereum/EIPs/blob/master/EIPS/eip-155.md#list-of-chain-ids
 const NETWORKS = {
-  1:  'mainnet',
-  2:  'morden',
-  3:  'ropsten',
-  4:  'rinkeby',
-  5:  'goerli',
+  1: 'mainnet',
+  2: 'morden',
+  3: 'ropsten',
+  4: 'rinkeby',
+  5: 'goerli',
   42: 'kovan'
 };
 
@@ -24,18 +24,28 @@ export default class ZWeb3 {
 
   public static provider;
 
+  public static web3instance;
+
   public static initialize(provider: any): void {
     ZWeb3.provider = provider;
+    ZWeb3.web3instance = undefined;
   }
 
   // TODO: this.web3 could be cached and initialized lazily?
-  public static web3(): any {
-    if (!ZWeb3.provider) return new Web3();
-
+  public static web3(forceReinit = false): any {
+    if (ZWeb3.web3instance && !forceReinit) {
+      return ZWeb3.web3instance;
+    }
+    if (!ZWeb3.provider) {
+      ZWeb3.web3instance = new Web3();
+      return ZWeb3.web3instance;
+    }
     // TODO: improve provider validation for HttpProvider scenarios
-    return typeof ZWeb3.provider === 'string'
+    ZWeb3.web3instance = typeof ZWeb3.provider === 'string'
       ? new Web3(new Web3.providers.HttpProvider(ZWeb3.provider))
       : new Web3(ZWeb3.provider);
+
+    return ZWeb3.web3instance
   }
 
   public static sha3(value: string): string {
@@ -149,7 +159,7 @@ export default class ZWeb3 {
   public static sendTransactionWithoutReceipt(params: any): Promise<string> {
     return new Promise((resolve, reject) => {
       ZWeb3.eth().sendTransaction({ ...params }, (error, txHash) => {
-        if(error) reject(error.message);
+        if (error) reject(error.message);
         else resolve(txHash);
       });
     });
