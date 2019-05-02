@@ -28,6 +28,7 @@ export default class ZWeb3 {
 
   public static initialize(provider: any): void {
     ZWeb3.provider = provider;
+    ZWeb3.web3instance = undefined;
   }
 
   // TODO: this.web3 could be cached and initialized lazily?
