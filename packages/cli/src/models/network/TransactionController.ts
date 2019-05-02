@@ -1,4 +1,4 @@
-import { Transactions, Logger, ZWeb3, encodeCall } from 'zos-lib';
+import { Transactions, Logger, ZWeb3 } from 'zos-lib';
 import { isValidUnit } from '../../utils/units';
 import { ERC20_PARTIAL_ABI } from '../../utils/constants';
 
