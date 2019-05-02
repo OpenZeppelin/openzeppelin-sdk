@@ -24,28 +24,18 @@ export default class ZWeb3 {
 
   public static provider;
 
-  public static web3instance;
-
   public static initialize(provider: any): void {
     ZWeb3.provider = provider;
-    ZWeb3.web3instance = undefined;
   }
 
   // TODO: this.web3 could be cached and initialized lazily?
-  public static web3(forceReinit = false): any {
-    if (ZWeb3.web3instance && !forceReinit) {
-      return ZWeb3.web3instance;
-    }
-    if (!ZWeb3.provider) {
-      ZWeb3.web3instance = new Web3();
-      return ZWeb3.web3instance;
-    }
+  public static web3(): any {
+    if (!ZWeb3.provider) return new Web3();
+
     // TODO: improve provider validation for HttpProvider scenarios
-    ZWeb3.web3instance = typeof ZWeb3.provider === 'string'
+    return typeof ZWeb3.provider === 'string'
       ? new Web3(new Web3.providers.HttpProvider(ZWeb3.provider))
       : new Web3(ZWeb3.provider);
-
-    return ZWeb3.web3instance
   }
 
   public static sha3(value: string): string {
