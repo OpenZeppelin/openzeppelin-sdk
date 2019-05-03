@@ -22,6 +22,12 @@ contract('balance script', function(accounts) {
   });
 
   describe('get balance', function() {
+    context('when not specifying an account address', function() {
+      it('throws an error', async function() {
+        await balance({ accountAddress: undefined }).should.be.rejectedWith('An account address must be specified.');
+      });
+    });
+
     context('when not specifying an ERC20 token address', function() {
       it('logs balance in ETH', async function() {
         await balance({ accountAddress: account });
