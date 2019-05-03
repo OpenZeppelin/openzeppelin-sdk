@@ -329,7 +329,7 @@ contract('Transactions', function(accounts) {
       context('when function is payable', function() {
         it('sends funds', async function () {
           const encodedCall = encodeCall('initializePayable', [], []);
-          const transactionParams = { data: encodedCall, value: ZWeb3.toWei('1', 'ether') };
+          const transactionParams = { data: encodedCall, value: utils.toWei('1', 'ether') };
           await Transactions.sendRawTransaction(this.instance.address, transactionParams, { from: account2 });
           (await ZWeb3.getBalance(this.instance.address)).should.eq(1e18.toString());
         });
@@ -337,7 +337,7 @@ contract('Transactions', function(accounts) {
 
       context('when function is not payable', function() {
         it('reverts', async function () {
-          const transactionParams = { data: this.encodedCall, value: ZWeb3.toWei('1', 'ether') };
+          const transactionParams = { data: this.encodedCall, value: utils.toWei('1', 'ether') };
           await assertRevert(Transactions.sendRawTransaction(this.instance.address, transactionParams, { from: account2 }));
           (await ZWeb3.getBalance(this.instance.address)).should.eq('0');
         });
