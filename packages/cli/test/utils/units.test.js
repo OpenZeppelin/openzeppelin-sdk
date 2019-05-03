@@ -13,7 +13,7 @@ describe('units', function() {
       });
 
       context('when not specifying decimals and symbol', function() {
-        it('returns value and symbol', function() {
+        it('returns the raw amount value', function() {
           prettifyTokenAmount(15e10.toString()).should.eq(15e10.toString());
         });
       });
@@ -28,7 +28,7 @@ describe('units', function() {
       });
 
       context('when providing a valid unit', function() {
-        it('returns false', function() {
+        it('returns true', function() {
           isValidUnit('wei').should.be.true;
           isValidUnit('gwei').should.be.true;
           isValidUnit('ether').should.be.true;
@@ -45,7 +45,7 @@ describe('units', function() {
       });
 
       context('when specifying gwei as convertion unit', function () {
-        it('transforms ethers to wei', function () {
+        it('transforms gwei to wei', function () {
           toWei('1', 'gwei').should.eq(1e9.toString());
         });
       });
