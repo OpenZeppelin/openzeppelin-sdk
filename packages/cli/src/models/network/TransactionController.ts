@@ -1,8 +1,14 @@
 import { Transactions, Logger, ZWeb3 } from 'zos-lib';
-import { isValidUnit } from '../../utils/units';
+import { isValidUnit, prettifyTokenAmount } from '../../utils/units';
 import { ERC20_PARTIAL_ABI } from '../../utils/constants';
 
 const log = new Logger('TransactionController');
+
+interface ERC20TokenInfo {
+  balance?: string;
+  tokenSymbol?: string;
+  tokenDecimals?: string;
+}
 
 export default class TransactionController {
   public txParams: any;
@@ -11,7 +17,7 @@ export default class TransactionController {
     if (txParams) this.txParams = txParams;
   }
 
-  public async transfer(to: string, amount: string, unit: string): Promise<void> {
+  public async transfer(to: string, amount: string, unit: string): Promise<void | never> {
     if (!isValidUnit(unit)) {
       throw Error(`Invalid unit ${unit}. Please try with: wei, kwei, gwei, milli, ether or any other valid unit.`);
     }
@@ -22,20 +28,30 @@ export default class TransactionController {
     log.info(`Funds successfully sent!. Transaction hash: ${transactionHash}`);
   }
 
-  public async getBalanceOf(accountAddress: string, contractAddress?: string): Promise<void> {
+  public async getBalanceOf(accountAddress: string, contractAddress?: string): Promise<void | never> {
     if (contractAddress) {
-      try {
-        const contract = ZWeb3.contract(ERC20_PARTIAL_ABI, contractAddress);
-        const balance = await contract.methods.balanceOf(accountAddress).call();
-        const tokenSymbol = await contract.methods.symbol().call();
-        log.info(`Balance: ${ZWeb3.fromWei(balance, 'ether')} ${tokenSymbol}`);
-      } catch(error) {
+      const { balance, tokenSymbol, tokenDecimals } = await this.getTokenInfo(accountAddress, contractAddress);
+      log.info(`Balance: ${prettifyTokenAmount(balance, tokenDecimals, tokenSymbol)}`);
+    } else {
+      const balance = await ZWeb3.getBalance(accountAddress);
+      log.info(`Balance: ${ZWeb3.fromWei(balance, 'ether')} ETH`);
+    }
+  }
+
+  private async getTokenInfo(accountAddress: string, contractAddress: string): Promise<ERC20TokenInfo | never> {
+    let balance, tokenSymbol, tokenDecimals;
+    try {
+      const contract = ZWeb3.contract(ERC20_PARTIAL_ABI, contractAddress);
+      balance = await contract.methods.balanceOf(accountAddress).call();
+      tokenSymbol = await contract.methods.symbol().call();
+      tokenDecimals = await contract.methods.decimals().call();
+    } catch(error) {
+      if (!balance) {
         error.message = `Could not get balance of ${accountAddress} in ${contractAddress}. Error: ${error.message}`;
         throw error;
       }
-    } else {
-      const balance = await ZWeb3.getBalance(accountAddress);
-      log.info(`Balance: ${ZWeb3.fromWei(balance, 'ether')} ether`);
     }
+
+    return { balance, tokenSymbol, tokenDecimals };
   }
 }
