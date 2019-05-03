@@ -11,7 +11,7 @@ const register: (program: any) => any = (program) => program
   .command(signature, undefined, { noHelp: true })
   .usage('[options]')
   .description(description)
-  .option('--erc20 <contractAddress>', 'specify an ERC20 token address')
+  .option('--erc20 <contractAddress>', 'specify an ERC20 token address or leave empty to query ETH balance')
   .withNetworkOptions()
   .withNonInteractiveOption()
   .action(action);
