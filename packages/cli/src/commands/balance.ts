@@ -1,6 +1,7 @@
 import balance from '../scripts/balance';
 import { promptIfNeeded, networksList, InquirerQuestions } from '../prompts/prompt';
 import ConfigVariablesInitializer from '../models/initializer/ConfigVariablesInitializer';
+import Session from '../models/network/Session';
 
 const name: string = 'balance';
 const signature: string = `${name} [address]`;
@@ -17,12 +18,14 @@ const register: (program: any) => any = (program) => program
 
 async function action(accountAddress: string, options: any): Promise<void> {
   const { network: networkInOpts, erc20: contractAddress, interactive } = options;
+  const { network: networkInSession, expired } = Session.getNetwork();
+  const opts = { network: networkInOpts || (!expired ? networkInSession : undefined) };
   const args = { accountAddress };
-  const opts = { network: networkInOpts };
   const props = getCommandProps();
-  const promptedConfig = await promptIfNeeded({ args, opts, props }, interactive);
+  const defaults = { network: networkInSession };
+  const promptedConfig = await promptIfNeeded({ args, opts, props, defaults }, interactive);
 
-  await ConfigVariablesInitializer.initNetworkConfiguration(promptedConfig);
+  await ConfigVariablesInitializer.initNetworkConfiguration({ ...options, ...promptedConfig });
   await balance({ accountAddress: promptedConfig.accountAddress, contractAddress });
 
   if (!options.dontExitProcess && process.env.NODE_ENV !== 'test') process.exit(0);
