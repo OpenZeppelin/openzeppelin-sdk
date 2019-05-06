@@ -11,7 +11,7 @@ const register: (program: any) => any = (program) => program
   .command(signature, undefined, { noHelp: true })
   .usage('[options]')
   .description(description)
-  .option('--erc20 <contractAddress>', 'specify an ERC20 token address or leave empty to query ETH balance')
+  .option('--erc20 <contractAddress>', 'query the balance of an ERC20 token instead of ETH')
   .withNetworkOptions()
   .withNonInteractiveOption()
   .action(action);
@@ -36,7 +36,7 @@ function getCommandProps(): InquirerQuestions {
     ...networksList('network', 'list'),
     accountAddress: {
       type: 'input',
-      message: 'Enter an account address',
+      message: 'Enter an address to query its balance',
     },
   };
 }
