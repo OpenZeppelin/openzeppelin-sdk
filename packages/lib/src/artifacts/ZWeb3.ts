@@ -45,7 +45,7 @@ export default class ZWeb3 {
       ? new Web3(new Web3.providers.HttpProvider(ZWeb3.provider))
       : new Web3(ZWeb3.provider);
 
-    return ZWeb3.web3instance
+    return ZWeb3.web3instance;
   }
 
   public static sha3(value: string): string {
@@ -54,14 +54,6 @@ export default class ZWeb3 {
 
   public static isAddress(address: string): boolean {
     return Web3.utils.isAddress(address);
-  }
-
-  public static toWei(value: string, unit: any): string {
-    return Web3.utils.toWei(value, unit);
-  }
-
-  public static getUnits(): string[] {
-    return Object.keys(Web3.utils.unitMap);
   }
 
   public static eth(): Eth {

@@ -23,6 +23,7 @@ import * as verify from '../../src/scripts/verify';
 import * as setAdmin from '../../src/scripts/set-admin';
 import * as unpack from '../../src/scripts/unpack';
 import * as transfer from '../../src/scripts/transfer';
+import * as balance from '../../src/scripts/balance';
 
 import program from '../../src/bin/program';
 import Session from '../../src/models/network/Session';
@@ -73,7 +74,8 @@ exports.stubCommands = function () {
     this.verify = sinon.stub(verify, 'default')
     this.setAdmin = sinon.stub(setAdmin, 'default')
     this.unpack = sinon.stub(unpack, 'default')
-    this.transfer= sinon.stub(transfer, 'default')
+    this.transfer = sinon.stub(transfer, 'default')
+    this.balance = sinon.stub(balance, 'default')
     this.compiler = sinon.stub(Compiler, 'call').callsFake(() => null)
     this.errorHandler = sinon.stub(ErrorHandler.prototype, 'call').callsFake(() => null)
     this.initializer = sinon.stub(ConfigVariablesInitializer, 'initNetworkConfiguration').callsFake(function (options) {

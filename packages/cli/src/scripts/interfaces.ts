@@ -122,3 +122,16 @@ export interface QueryDeploymentParams extends Network {
   salt: string;
   sender?: string;
 }
+
+export interface TransferParams {
+  to: string;
+  value: string;
+  txParams: any;
+  unit?: string;
+  from?: string;
+}
+
+export interface BalanceParams {
+  accountAddress: string;
+  contractAddress?: string;
+}
