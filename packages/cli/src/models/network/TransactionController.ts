@@ -1,6 +1,7 @@
 import { Transactions, Logger, ZWeb3 } from 'zos-lib';
 import { isValidUnit, prettifyTokenAmount, toWei, fromWei } from '../../utils/units';
 import { ERC20_PARTIAL_ABI } from '../../utils/constants';
+import { allPromisesOrError } from '../../utils/async';
 
 const log = new Logger('TransactionController');
 
@@ -43,8 +44,10 @@ export default class TransactionController {
     try {
       const contract = ZWeb3.contract(ERC20_PARTIAL_ABI, contractAddress);
       balance = await contract.methods.balanceOf(accountAddress).call();
-      tokenSymbol = await contract.methods.symbol().call();
-      tokenDecimals = await contract.methods.decimals().call();
+      [tokenSymbol, tokenDecimals] = await allPromisesOrError([
+        contract.methods.symbol().call(),
+        contract.methods.decimals().call()
+      ]);
     } catch(error) {
       if (!balance) {
         error.message = `Could not get balance of ${accountAddress} in ${contractAddress}. Error: ${error.message}`;
