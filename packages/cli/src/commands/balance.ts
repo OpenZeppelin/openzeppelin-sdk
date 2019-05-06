@@ -36,7 +36,7 @@ function getCommandProps(): InquirerQuestions {
     ...networksList('network', 'list'),
     accountAddress: {
       type: 'input',
-      message: 'Enter an account address',
+      message: 'Enter an address to query its balance',
     },
   };
 }
