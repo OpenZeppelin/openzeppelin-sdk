@@ -1,35 +1,21 @@
 import pickBy from 'lodash.pickby';
 
 import update from '../scripts/update';
-import Session from '../models/network/Session';
-import { parseInit } from '../utils/input';
-import { fromContractFullName } from '../utils/naming';
+import { parseContractReference } from '../utils/contract';
 import { hasToMigrateProject } from '../prompts/migrations';
 import ConfigVariablesInitializer from '../models/initializer/ConfigVariablesInitializer';
-import { promptIfNeeded, networksList, argsList, methodsList, proxiesList, proxyInfo, InquirerQuestions } from '../prompts/prompt';
+import { UpdatePropsParams, UpdateSelectionParams } from './interfaces';
+import {
+  promptIfNeeded,
+  networksList,
+  promptForNetwork,
+  argsList,
+  methodsList,
+  proxiesList,
+  proxyInfo,
+  InquirerQuestions
+} from '../prompts/prompt';
 import promptForInitParams from '../prompts/init-params';
-
-interface PropsParams {
-  contractReference?: string;
-  network?: string;
-  all?: boolean;
-  contractFullName?: string;
-  initMethod?: string;
-  initArgs?: string[];
-}
-
-interface ParsedContractReference {
-  proxyAddress: string | undefined;
-  contractAlias: string | undefined;
-  packageName: string | undefined;
-}
-
-interface ProxySelectionParams {
-  address: string | undefined;
-  contractFullName: string | undefined;
-  proxyReference: string | undefined;
-  all: boolean;
-}
 
 const name: string = 'update';
 const signature: string = `${name} [alias-or-address]`;
@@ -49,7 +35,7 @@ const register: (program: any) => any = (program) => program
 
 async function action(contractReference: string, options: any): Promise<void> {
   const { force, interactive, all } = options;
-  const networkOpts = await promptForNetwork(options);
+  const networkOpts = await promptForNetwork(options, () => getCommandProps());
   const { network, txParams } = await ConfigVariablesInitializer.initNetworkConfiguration({ ...options, ...networkOpts });
   if (!await hasToMigrateProject(network)) process.exit(0);
 
@@ -65,17 +51,7 @@ async function action(contractReference: string, options: any): Promise<void> {
   if (!options.dontExitProcess && process.env.NODE_ENV !== 'test') process.exit(0);
 }
 
-async function promptForNetwork(options: any): Promise<{ network: string }> {
-  const { network: networkInOpts, interactive } = options;
-  const { network: networkInSession, expired } = Session.getNetwork();
-  const defaults = { network: networkInSession };
-  const opts = { network: networkInOpts || (!expired ? networkInSession : undefined) };
-  const props = getCommandProps();
-
-  return promptIfNeeded({ opts, defaults, props }, interactive);
-}
-
-async function promptForProxies(contractReference: string, network: string, options: any): Promise<ProxySelectionParams> {
+async function promptForProxies(contractReference: string, network: string, options: any): Promise<UpdateSelectionParams> {
   const { all, interactive } = options;
   const pickProxyBy = all ? 'all' : undefined;
   const args = { pickProxyBy, proxy: contractReference };
@@ -84,25 +60,11 @@ async function promptForProxies(contractReference: string, network: string, opti
 
   return {
     ...promptedProxy,
-    all:  promptedPickProxyBy  === 'all'
+    all: promptedPickProxyBy  === 'all'
   };
 }
 
-function parseContractReference(contractReference: string): ParsedContractReference {
-  let proxyAddress;
-  let contractAlias;
-  let packageName;
-
-  if (contractReference && contractReference.startsWith('0x')) {
-    proxyAddress = contractReference;
-  } else if (contractReference) {
-    ({ contract: contractAlias, package: packageName } = fromContractFullName(contractReference));
-  }
-
-  return { proxyAddress, contractAlias, packageName };
-}
-
-function getCommandProps({ contractReference, network, all, contractFullName, initMethod, initArgs }: PropsParams = {}): InquirerQuestions {
+function getCommandProps({ contractReference, network, all, contractFullName, initMethod, initArgs }: UpdatePropsParams = {}): InquirerQuestions {
   const initMethodsList = methodsList(contractFullName);
   const initArgsList = argsList(contractFullName, initMethod)
     .reduce((accum, argName, index) => {

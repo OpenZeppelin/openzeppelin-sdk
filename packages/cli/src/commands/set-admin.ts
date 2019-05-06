@@ -1,8 +1,18 @@
 import pickBy from 'lodash.pickby';
 import inquirer from 'inquirer';
+import { ZWeb3 } from 'zos-lib';
 
+import { parseContractReference } from '../utils/contract';
+import { SetAdminPropsParams, SetAdminSelectionParams } from './interfaces';
 import setAdmin from '../scripts/set-admin';
-import { fromContractFullName } from '../utils/naming';
+import {
+  promptIfNeeded,
+  networksList,
+  promptForNetwork,
+  proxiesList,
+  proxyInfo,
+  InquirerQuestions
+} from '../prompts/prompt';
 import { hasToMigrateProject } from '../prompts/migrations';
 import ConfigVariablesInitializer from '../models/initializer/ConfigVariablesInitializer';
 
@@ -19,46 +29,118 @@ const register: (program: any) => any = (program) => program
   .description(description)
   .option('-f, --force', 'bypass a manual check')
   .withNetworkOptions()
+  .withNonInteractiveOption()
   .action(action);
 
-async function action(contractFullNameOrAddress: string, newAdmin: string, options: any): Promise<void | never> {
-  const { network, txParams } = await ConfigVariablesInitializer.initNetworkConfiguration(options);
+async function action(contractReference: string, newAdmin: string, options: any): Promise<void | never> {
+  const { force, interactive } = options;
+
+  if (!interactive && !force) throw new Error('Either enable an interactivity mode or set a force flag.');
+
+  const networkOpts = await promptForNetwork(options, () => getCommandProps());
+
+  const { network, txParams } = await ConfigVariablesInitializer.initNetworkConfiguration({ ...options, ...networkOpts });
   if (!await hasToMigrateProject(network)) process.exit(0);
 
-  let proxyAddress;
-  let contractAlias;
-  let packageName;
+  const { proxyReference, newAdmin: pickedNewAdmin } = await promptForProxies(contractReference, newAdmin, network, options);
+  const parsedContractReference = parseContractReference(proxyReference);
 
-  if (!contractFullNameOrAddress) throw Error('You have to specify at least a new admin address.');
+  if (!pickedNewAdmin) throw Error('You have to specify at least a new admin address.');
 
-  // we assume if newAdmin is empty it was specified as first argument
-  if (!newAdmin) {
-    newAdmin = contractFullNameOrAddress;
-    contractFullNameOrAddress = '';
-  }
-
-  if (!options.force) {
-    const answers = await inquirer.prompt([
-      {
-        name: 'address',
-        type: 'string',
-        message: 'Please double check your address and type the last 4 characters of the new admin address. If you provide a wrong address, you will lose control over your contracts.',
-      }
-    ]);
-    if (answers.address !== newAdmin.slice(-4)) {
-      throw Error('Last 4 characters of the admin address do not match');
+  // has to be a standalone question from interactivity
+  // because it is security related and can't be disabled with interactivity set to false
+  if (!force) {
+    const { address } = await promptIfNeeded({
+      args: { address: '' },
+      props: {
+        address: {
+          type: 'string',
+          message: 'Warning! If you provide a wrong address, you will lose control over your contracts. Please double check your address and type the last 4 characters of the new admin address.',
+        },
+      },
+    }, interactive);
+    if (address.toLowerCase() !== pickedNewAdmin.slice(-4).toLowerCase()) {
+      throw new Error('Last 4 characters of the admin address do not match');
     }
   }
 
-  if (contractFullNameOrAddress && contractFullNameOrAddress.startsWith('0x')) {
-    proxyAddress = contractFullNameOrAddress;
-  } else if (contractFullNameOrAddress) {
-    ({ contract: contractAlias, package: packageName } = fromContractFullName(contractFullNameOrAddress));
+  // has to check if a new admin address has balance or wallet
+  // if not display yet another warning
+  const balance = await ZWeb3.getBalance(pickedNewAdmin);
+  const code = await ZWeb3.getCode(pickedNewAdmin);
+  if (!force && (balance === 0x0.toString()) && (code === '0x')) {
+    const { certain } = await promptIfNeeded({
+      args: { certain: undefined },
+      props: {
+        certain: {
+          type: 'confirm',
+          message: 'The new admin address has no funds nor wallet. Are you sure you want to continue?',
+        },
+      }
+    }, interactive);
+    if (!certain) {
+      throw Error('Aborted by user');
+    }
   }
 
-  const args = pickBy({ contractAlias, packageName, proxyAddress, newAdmin });
+  const args = pickBy({ ...parsedContractReference, newAdmin: pickedNewAdmin });
   await setAdmin({ ...args, network, txParams });
   if (!options.dontExitProcess && process.env.NODE_ENV !== 'test') process.exit(0);
+}
+
+async function promptForProxies(
+    contractReference: string,
+    newAdmin: string,
+    network: string,
+    options: any
+  ): Promise<SetAdminSelectionParams> {
+  // we assume if newAdmin is empty it was specified as first argument
+  if (!newAdmin) {
+    newAdmin = contractReference;
+    contractReference = '';
+  }
+  const { interactive } = options;
+  const pickProxyBy = newAdmin ? 'all' : undefined;
+  const args = { pickProxyBy, proxy: contractReference, newAdmin };
+  const props = getCommandProps({ network, all: !!newAdmin });
+  const { pickProxyBy: pickedProxyBy, proxy: pickedProxy, newAdmin: pickedNewAdmin } = await promptIfNeeded({ args, props }, interactive);
+
+  return {
+    newAdmin: pickedNewAdmin,
+    all: pickedProxyBy === 'all',
+    ...pickedProxy,
+  };
+}
+
+function getCommandProps({ network, all }: SetAdminPropsParams = {}): InquirerQuestions {
+  return {
+    ...networksList('network', 'list'),
+    pickProxyBy: {
+      message: 'For which proxies would you like to transfer ownership?',
+      type: 'list',
+      choices: [{
+        name: 'All proxies',
+        value: 'all'
+      }, {
+        name: 'Choose by name',
+        value: 'byName'
+      }, {
+        name: 'Choose by address',
+        value: 'byAddress'
+      }],
+    },
+    proxy: {
+      message: 'Choose a proxy',
+      type: 'list',
+      choices: ({ pickProxyBy }) => proxiesList(pickProxyBy, network),
+      when: ({ pickProxyBy }) => !all && pickProxyBy && pickProxyBy !== 'all',
+      normalize: (input) => typeof input !== 'object' ? proxyInfo(parseContractReference(input), network) : input
+    },
+    newAdmin: {
+      type: 'input',
+      message: 'Enter an address of a new upgradeability admin'
+    },
+  };
 }
 
 export default { name, signature, description, register, action };

@@ -45,7 +45,7 @@ export default class ZWeb3 {
       ? new Web3(new Web3.providers.HttpProvider(ZWeb3.provider))
       : new Web3(ZWeb3.provider);
 
-    return ZWeb3.web3instance
+    return ZWeb3.web3instance;
   }
 
   public static sha3(value: string): string {
