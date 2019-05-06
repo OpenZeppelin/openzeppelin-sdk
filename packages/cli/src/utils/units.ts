@@ -7,7 +7,7 @@ export function isValidUnit(unit: string): boolean {
 
 export function prettifyTokenAmount(amount: string, decimals?: string, symbol?: string): string {
   const prettifiedAmount = decimals
-    ? new BN(amount).dividedBy(new BN(10).exponentiatedBy(decimals)).toFormat()
+    ? new BN(amount).shiftedBy(-decimals).toFormat()
     : amount;
 
   return symbol ? `${prettifiedAmount} ${symbol}` : prettifiedAmount;
