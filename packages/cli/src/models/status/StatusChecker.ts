@@ -1,11 +1,18 @@
-import { promisify } from 'util';
-
 import EventsFilter from './EventsFilter';
 import StatusFetcher from './StatusFetcher';
 import StatusComparator from './StatusComparator';
-import { ZWeb3, Logger, AppProject, bytecodeDigest, semanticVersionToString, semanticVersionEqual, replaceSolidityLibAddress, isSolidityLib } from 'zos-lib';
+import {
+  ZWeb3,
+  TxParams,
+  Logger,
+  AppProject,
+  bytecodeDigest,
+  semanticVersionToString,
+  semanticVersionEqual,
+  replaceSolidityLibAddress,
+  isSolidityLib
+} from 'zos-lib';
 import ZosNetworkFile, {
-  ProxyInterface,
   DependencyInterface
 } from '../files/ZosNetworkFile';
 import { ComparedObject } from './StatusComparator';
@@ -16,23 +23,23 @@ const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000';
 export default class StatusChecker {
 
   public visitor: any;
-  public txParams: any;
+  public txParams: TxParams;
   public networkFile: any;
   public packageName: any;
 
   private project: AppProject;
 
-  public static fetch(networkFile: ZosNetworkFile, txParams: any = {}): StatusChecker {
+  public static fetch(networkFile: ZosNetworkFile, txParams: TxParams = {}): StatusChecker {
     const fetcher = new StatusFetcher(networkFile);
     return new this(fetcher, networkFile, txParams);
   }
 
-  public static compare(networkFile: ZosNetworkFile, txParams: any = {}): StatusChecker {
+  public static compare(networkFile: ZosNetworkFile, txParams: TxParams = {}): StatusChecker {
     const comparator = new StatusComparator();
     return new this(comparator, networkFile, txParams);
   }
 
-  constructor(visitor: any, networkFile: ZosNetworkFile, txParams: any = {}) {
+  constructor(visitor: any, networkFile: ZosNetworkFile, txParams: TxParams = {}) {
     this.visitor = visitor;
     this.txParams = txParams;
     this.networkFile = networkFile;

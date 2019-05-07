@@ -3,13 +3,14 @@ import Contracts from '../artifacts/Contracts';
 import { toAddress, uint256ToAddress } from '../utils/Addresses';
 import Transactions from '../utils/Transactions';
 import Contract from '../artifacts/Contract';
+import { TxParams } from '../artifacts/ZWeb3';
 
 export default class Proxy {
   private contract: Contract;
-  private txParams: any;
+  private txParams: TxParams;
   public address: string;
 
-  public static at(contractOrAddress: string | Contract, txParams: any = {}): Proxy {
+  public static at(contractOrAddress: string | Contract, txParams: TxParams = {}): Proxy {
     const ProxyContract = Contracts.getFromLib('AdminUpgradeabilityProxy');
     const contract = ProxyContract.at(toAddress(contractOrAddress));
     return new this(contract, txParams);
@@ -22,7 +23,7 @@ export default class Proxy {
     return new this(contract, txParams);
   }
 
-  constructor(contract: Contract, txParams: any = {}) {
+  constructor(contract: Contract, txParams: TxParams = {}) {
     this.address = toAddress(contract);
     this.contract = contract;
     this.txParams = txParams;

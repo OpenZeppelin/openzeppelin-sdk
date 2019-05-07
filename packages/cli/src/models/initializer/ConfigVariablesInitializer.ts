@@ -1,15 +1,20 @@
-import { ZWeb3, Contracts } from 'zos-lib';
+import { ZWeb3, Contracts, TxParams } from 'zos-lib';
 import Truffle from './truffle/Truffle';
 import Session from '../network/Session';
 
-const ConfigVariablesInitializer = {
+export interface NetworkConfig {
+  network: string;
+  txParams: TxParams;
+}
 
-  initStaticConfiguration(): void {
+export default class ConfigVariablesInitializer {
+
+  public static initStaticConfiguration(): void {
     const buildDir = Truffle.getBuildDir();
     Contracts.setLocalBuildDir(buildDir);
-  },
+  }
 
-  async initNetworkConfiguration(options: any, silent?: boolean): Promise<any> {
+  public static async initNetworkConfiguration(options: any, silent?: boolean): Promise<NetworkConfig> {
     this.initStaticConfiguration();
     const { network, from, timeout } = Session.getOptions(options, silent);
     Session.setDefaultNetworkIfNeeded(options.network);
@@ -26,6 +31,4 @@ const ConfigVariablesInitializer = {
     const txParams = { from: ZWeb3.toChecksumAddress(from || artifactDefaults.from || await ZWeb3.defaultAccount()) };
     return { network: await ZWeb3.getNetworkName(), txParams };
   }
-};
-
-export default ConfigVariablesInitializer;
+}

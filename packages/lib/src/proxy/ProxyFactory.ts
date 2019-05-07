@@ -4,31 +4,32 @@ import { toAddress } from '../utils/Addresses';
 import Transactions from '../utils/Transactions';
 import Contract from '../artifacts/Contract';
 import Proxy from './Proxy';
+import { TxParams } from '../artifacts/ZWeb3';
 
 const log: Logger = new Logger('ProxyFactory');
 
 export default class ProxyFactory {
   public contract: Contract;
   public address: string;
-  public txParams: any;
+  public txParams: TxParams;
 
-  public static tryFetch(address: string, txParams: any = {}): ProxyFactory | null {
+  public static tryFetch(address: string, txParams: TxParams = {}): ProxyFactory | null {
     return address ? this.fetch(address, txParams) : null;
   }
 
-  public static fetch(address: string, txParams: any = {}): ProxyFactory {
+  public static fetch(address: string, txParams: TxParams = {}): ProxyFactory {
     const contract = Contracts.getFromLib('ProxyFactory').at(address);
     return new this(contract, txParams);
   }
 
-  public static async deploy(txParams: any = {}): Promise<ProxyFactory> {
+  public static async deploy(txParams: TxParams = {}): Promise<ProxyFactory> {
     log.info('Deploying new ProxyFactory...');
     const contract = await Transactions.deployContract(Contracts.getFromLib('ProxyFactory'), [], txParams);
     log.info(`Deployed ProxyFactory at ${contract.address}`);
     return new this(contract, txParams);
   }
 
-  constructor(contract: any, txParams: any = {}) {
+  constructor(contract: any, txParams: TxParams = {}) {
     this.contract = contract;
     this.address = toAddress(contract);
     this.txParams = txParams;

@@ -2,6 +2,7 @@ import Logger from '../utils/Logger';
 import Transactions from '../utils/Transactions';
 import Contracts from '../artifacts/Contracts';
 import Contract from '../artifacts/Contract';
+import { TxParams } from '../artifacts/ZWeb3';
 
 const log = new Logger('ImplementationDirectory');
 
@@ -9,9 +10,9 @@ const log = new Logger('ImplementationDirectory');
 export default class ImplementationDirectory {
 
   public directoryContract: Contract;
-  public txParams: any;
+  public txParams: TxParams;
 
-  public static async deploy(txParams: any = {}): Promise<ImplementationDirectory> {
+  public static async deploy(txParams: TxParams = {}): Promise<ImplementationDirectory> {
     const contract = this.getContract();
     log.info(`Deploying new ${contract.schema.contractName}...`);
     const directory = await Transactions.deployContract(contract, [], txParams);
@@ -20,7 +21,7 @@ export default class ImplementationDirectory {
     return new this(directory, txParams);
   }
 
-  public static fetch(address: string, txParams: any = {}): ImplementationDirectory {
+  public static fetch(address: string, txParams: TxParams = {}): ImplementationDirectory {
     const contract = this.getContract();
     const directory = contract.at(address);
     return new this(directory, txParams);
@@ -30,7 +31,7 @@ export default class ImplementationDirectory {
     return Contracts.getFromLib('ImplementationDirectory');
   }
 
-  constructor(directory: Contract, txParams: any = {}) {
+  constructor(directory: Contract, txParams: TxParams = {}) {
     this.directoryContract = directory;
     this.txParams = txParams;
   }

@@ -1,4 +1,4 @@
-import { Transactions, Logger, ZWeb3 } from 'zos-lib';
+import { Transactions, Logger, ZWeb3, TxParams } from 'zos-lib';
 import { isValidUnit, prettifyTokenAmount, toWei, fromWei } from '../../utils/units';
 import { ERC20_PARTIAL_ABI } from '../../utils/constants';
 import { allPromisesOrError } from '../../utils/async';
@@ -12,7 +12,7 @@ interface ERC20TokenInfo {
 }
 
 export default class TransactionController {
-  public txParams: any;
+  public txParams: TxParams;
 
   constructor(txParams?: any) {
     if (txParams) this.txParams = txParams;

@@ -18,6 +18,11 @@ const NETWORKS = {
   42: 'kovan'
 };
 
+export interface TxParams {
+  from?: string;
+  gas?: number;
+}
+
 // TS-TODO: Type Web3.
 // TS-TODO: Review what could be private in this class.
 export default class ZWeb3 {
@@ -144,11 +149,11 @@ export default class ZWeb3 {
     return NETWORKS[networkId] || `dev-${networkId}`;
   }
 
-  public static async sendTransaction(params: any): Promise<TransactionReceipt> {
+  public static async sendTransaction(params: TxParams): Promise<TransactionReceipt> {
     return ZWeb3.eth().sendTransaction({ ...params });
   }
 
-  public static sendTransactionWithoutReceipt(params: any): Promise<string> {
+  public static sendTransactionWithoutReceipt(params: TxParams): Promise<string> {
     return new Promise((resolve, reject) => {
       ZWeb3.eth().sendTransaction({ ...params }, (error, txHash) => {
         if (error) reject(error.message);

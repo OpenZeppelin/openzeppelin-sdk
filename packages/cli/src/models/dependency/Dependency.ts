@@ -7,7 +7,7 @@ import npm from 'npm-programmatic';
 import { exec } from 'child_process';
 import { promisify } from 'util';
 
-import { FileSystem as fs, PackageProject, Contracts, Contract, getSolidityLibNames, Logger } from 'zos-lib';
+import { TxParams, FileSystem as fs, PackageProject, Contracts, Contract, getSolidityLibNames, Logger } from 'zos-lib';
 import ZosPackageFile from '../files/ZosPackageFile';
 import ZosNetworkFile from '../files/ZosNetworkFile';
 
@@ -74,7 +74,7 @@ export default class Dependency {
     this.requirement = requirement || tryWithCaret(packageVersion);
   }
 
-  public async deploy(txParams: any): Promise<PackageProject> {
+  public async deploy(txParams: TxParams): Promise<PackageProject> {
     const version = semver.coerce(this.version).toString();
     const project = await PackageProject.fetchOrDeploy(version, txParams, {});
 
