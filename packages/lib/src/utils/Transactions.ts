@@ -127,7 +127,7 @@ export default {
     }
   },
 
-  async estimateGas(txParams: any, retries: number = RETRY_COUNT): Promise<any> {
+  async estimateGas(txParams: TxParams, retries: number = RETRY_COUNT): Promise<any> {
     // Retry if estimate fails. This could happen because we are depending
     // on a previous transaction being mined that still hasn't reach the node
     // we are working with, if the txs are routed to different nodes.
@@ -159,7 +159,7 @@ export default {
     }
   },
 
-  async estimateActualGas(txParams: any): Promise<any> {
+  async estimateActualGas(txParams: TxParams): Promise<any> {
     const estimatedGas = await this.estimateGas(txParams);
     return this._calculateActualGas(estimatedGas);
   },
@@ -200,7 +200,7 @@ export default {
     }
   },
 
-  async _fixGasPrice(txParams: any): Promise<any> {
+  async _fixGasPrice(txParams: TxParams): Promise<any> {
     const gasPrice = txParams.gasPrice || Contracts.getArtifactsDefaults().gasPrice;
 
     if ((TRUFFLE_DEFAULT_GAS_PRICE.eq(gasPrice) || !gasPrice) && await ZWeb3.isMainnet()) {
