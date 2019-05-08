@@ -5,6 +5,7 @@ import groupBy from 'lodash.groupby';
 import inquirer from 'inquirer';
 import { contractMethodsFromAst } from 'zos-lib';
 
+import Session from '../models/network/Session';
 import Truffle from '../models/initializer/truffle/Truffle';
 import ZosPackageFile from '../models/files/ZosPackageFile';
 import LocalController from '../models/local/LocalController';
@@ -48,7 +49,7 @@ export let DEFAULT_INTERACTIVE_STATUS = true;
 /*
  * This function will parse and wrap both arguments and options into inquirer questions, where
  * the 'arguments' are the parameters sent right after the command name, e.g., * zos create Foo
- * (Foo is the argument) and the optionn are the parameters sent right after a flag * e.g.,
+ * (Foo is the argument) and the options are the parameters sent right after a flag * e.g.,
  * zos push --network local (local is the option). In addition to this, `props` is an object with some
  * inquirer questions attributes (such as question type, message and name) and `defaults` is an object with
  * default values for each args/props attributes.
@@ -57,7 +58,7 @@ export async function promptIfNeeded({ args = {}, opts = {}, defaults, props }: 
   const argsAndOpts  = { ...args, ...opts };
 
   const argsAndOptsQuestions = Object.keys(argsAndOpts)
-    .filter(name =>argsAndOpts[name] === undefined || (typeof argsAndOpts[name] !== 'boolean' && isEmpty(argsAndOpts[name])))
+    .filter(name => argsAndOpts[name] === undefined || (typeof argsAndOpts[name] !== 'boolean' && isEmpty(argsAndOpts[name])))
     .filter(name => props[name] && !hasEmptyChoices(props[name]))
     .map(name => promptFor(name, defaults, props));
 
@@ -200,6 +201,16 @@ export function proxyInfo(contractInfo: any, network: string): any {
       proxyReference: proxyAddress || contractFullName
     };
   }
+}
+
+export async function promptForNetwork(options: any, getCommandProps: () => any): Promise<{ network: string }> {
+  const { network: networkInOpts, interactive } = options;
+  const { network: networkInSession, expired } = Session.getNetwork();
+  const defaults = { network: networkInSession };
+  const opts = { network: networkInOpts || (!expired ? networkInSession : undefined) };
+  const props = getCommandProps();
+
+  return promptIfNeeded({ opts, defaults, props }, interactive);
 }
 
 async function answersFor(inputs: PromptParam, questions: any, props: InquirerQuestions, interactive: boolean): Promise<InquirerAnswer> {
