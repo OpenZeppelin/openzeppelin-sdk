@@ -32,7 +32,7 @@ const register: (program: any) => any = (program) => program
   .withNonInteractiveOption()
   .action(action);
 
-async function action(contractReference: string, newAdmin: string, options: any): Promise<void | never> {
+async function action(proxyReference: string, newAdmin: string, options: any): Promise<void | never> {
   const { force, interactive } = options;
 
   if (!interactive && !force) throw new Error('Either enable an interactivity mode or set a force flag.');
@@ -42,8 +42,8 @@ async function action(contractReference: string, newAdmin: string, options: any)
   const { network, txParams } = await ConfigVariablesInitializer.initNetworkConfiguration({ ...options, ...networkOpts });
   if (!await hasToMigrateProject(network)) process.exit(0);
 
-  const { proxyReference, newAdmin: pickedNewAdmin } = await promptForProxies(contractReference, newAdmin, network, options);
-  const parsedContractReference = parseContractReference(proxyReference);
+  const { proxyReference: pickedProxyReference, newAdmin: pickedNewAdmin } = await promptForProxies(proxyReference, newAdmin, network, options);
+  const parsedContractReference = parseContractReference(pickedProxyReference);
 
   if (!pickedNewAdmin) throw Error('You have to specify at least a new admin address.');
 
@@ -89,19 +89,19 @@ async function action(contractReference: string, newAdmin: string, options: any)
 }
 
 async function promptForProxies(
-    contractReference: string,
+    proxyReference: string,
     newAdmin: string,
     network: string,
     options: any
   ): Promise<SetAdminSelectionParams> {
   // we assume if newAdmin is empty it was specified as first argument
   if (!newAdmin) {
-    newAdmin = contractReference;
-    contractReference = '';
+    newAdmin = proxyReference;
+    proxyReference = '';
   }
   const { interactive } = options;
   const pickProxyBy = newAdmin ? 'all' : undefined;
-  const args = { pickProxyBy, proxy: contractReference, newAdmin };
+  const args = { pickProxyBy, proxy: proxyReference, newAdmin };
   const props = getCommandProps({ network, all: !!newAdmin });
   const { pickProxyBy: pickedProxyBy, proxy: pickedProxy, newAdmin: pickedNewAdmin } = await promptIfNeeded({ args, props }, interactive);
 

@@ -15,7 +15,7 @@ import {
   proxyInfo,
   InquirerQuestions
 } from '../prompts/prompt';
-import promptForInitParams from '../prompts/method-params';
+import promptForMethodParams from '../prompts/method-params';
 
 const name: string = 'update';
 const signature: string = `${name} [alias-or-address]`;
@@ -33,29 +33,30 @@ const register: (program: any) => any = (program) => program
   .withNonInteractiveOption()
   .action(action);
 
-async function action(contractReference: string, options: any): Promise<void> {
-  const { force, interactive, all } = options;
+async function action(proxyReference: string, options: any): Promise<void> {
+  const { force, interactive, all, init: rawInitMethod } = options;
   const networkOpts = await promptForNetwork(options, () => getCommandProps());
   const { network, txParams } = await ConfigVariablesInitializer.initNetworkConfiguration({ ...options, ...networkOpts });
   if (!await hasToMigrateProject(network)) process.exit(0);
 
-  const promptedProxyInfo = await promptForProxies(contractReference, network, options);
+  const promptedProxyInfo = await promptForProxies(proxyReference, network, options);
   const parsedContractReference = parseContractReference(promptedProxyInfo.proxyReference);
 
-  const promptedInitParams = promptedProxyInfo.proxyReference && !promptedProxyInfo.all
-    ? await promptForInitParams(promptedProxyInfo.contractFullName, getCommandProps, options)
+  const promptMethodOpts = { askForMethodParams: rawInitMethod };
+  const initMethodParams = promptedProxyInfo.proxyReference && !promptedProxyInfo.all
+    ? await promptForMethodParams(promptedProxyInfo.contractFullName, getCommandProps, options, promptMethodOpts)
     : {};
 
-  const args = pickBy({ all: promptedProxyInfo.all, force, ...parsedContractReference, ...promptedInitParams });
+  const args = pickBy({ all: promptedProxyInfo.all, force, ...parsedContractReference, ...initMethodParams });
   await update({ ...args, network, txParams });
   if (!options.dontExitProcess && process.env.NODE_ENV !== 'test') process.exit(0);
 }
 
-async function promptForProxies(contractReference: string, network: string, options: any): Promise<UpdateSelectionParams> {
+async function promptForProxies(proxyReference: string, network: string, options: any): Promise<UpdateSelectionParams> {
   const { all, interactive } = options;
   const pickProxyBy = all ? 'all' : undefined;
-  const args = { pickProxyBy, proxy: contractReference };
-  const props = getCommandProps({ contractReference, network, all });
+  const args = { pickProxyBy, proxy: proxyReference };
+  const props = getCommandProps({ proxyReference, network, all });
   const { pickProxyBy: promptedPickProxyBy, proxy: promptedProxy } = await promptIfNeeded({ args, props }, interactive);
 
   return {
@@ -64,7 +65,7 @@ async function promptForProxies(contractReference: string, network: string, opti
   };
 }
 
-function getCommandProps({ contractReference, network, all, contractFullName, methodName, methodArgs }: UpdatePropsParams = {}): InquirerQuestions {
+function getCommandProps({ proxyReference, network, all, contractFullName, methodName, methodArgs }: UpdatePropsParams = {}): InquirerQuestions {
   const initMethodsList = methodsList(contractFullName);
   const initMethodArgsList = argsList(contractFullName, methodName)
     .reduce((accum, argName, index) => {
@@ -93,7 +94,7 @@ function getCommandProps({ contractReference, network, all, contractFullName, me
         name: 'Choose by address',
         value: 'byAddress'
       }],
-      when: () => !contractReference && proxiesList('byAddress', network).length,
+      when: () => !proxyReference && proxiesList('byAddress', network).length,
     },
     proxy: {
       message: 'Choose a proxy',

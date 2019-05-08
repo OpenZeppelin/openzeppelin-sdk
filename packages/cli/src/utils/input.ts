@@ -39,7 +39,9 @@ export function parseArgs(args: string): string[] | never {
 }
 
 export function parseMethodParams(options: any, defaultMethod?: string): { methodName: any, methodArgs: any[] } {
-  let { init: methodName, args: methodArgs } = options;
+  const { method, init } = options;
+  let methodName = method || init;
+  let { args: methodArgs } = options;
 
   if (typeof methodName === 'boolean') methodName = defaultMethod;
   if (!methodName && typeof methodArgs !== 'undefined') methodName = defaultMethod;
