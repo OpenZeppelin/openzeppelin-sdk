@@ -38,16 +38,16 @@ export function parseArgs(args: string): string[] | never {
   }
 }
 
-export function parseInit(options: any, defaultInit?: string): { initMethod: any, initArgs: any[] } {
-  let { init: initMethod, args: initArgs } = options;
+export function parseMethodParams(options: any, defaultMethod?: string): { methodName: any, methodArgs: any[] } {
+  let { init: methodName, args: methodArgs } = options;
 
-  if (typeof initMethod === 'boolean') initMethod = defaultInit;
-  if (!initMethod && typeof initArgs !== 'undefined') initMethod = defaultInit;
+  if (typeof methodName === 'boolean') methodName = defaultMethod;
+  if (!methodName && typeof methodArgs !== 'undefined') methodName = defaultMethod;
 
-  if(typeof initArgs === 'string') initArgs = parseArgs(initArgs);
-  else if(!initArgs || typeof initArgs === 'boolean' || initMethod) initArgs = [];
+  if(typeof methodArgs === 'string') methodArgs = parseArgs(methodArgs);
+  else if(!methodArgs || typeof methodArgs === 'boolean' || methodName) methodArgs = [];
 
-  return { initMethod, initArgs };
+  return { methodName, methodArgs };
 }
 
 export function validateSalt(salt: string, required = false) {

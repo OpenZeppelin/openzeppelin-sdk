@@ -28,7 +28,7 @@ add({ contractsData: [{ name: 'MyContract_v0', alias: 'MyContract' }] });
 await push(options);
 
 // Create an instance of MyContract, setting initial value to 42
-await create(Object.assign({ contractAlias: 'MyContract', initMethod: 'initialize', initArgs: [42] }, options));
+await create(Object.assign({ contractAlias: 'MyContract', methodName: 'initialize', methodArgs: [42] }, options));
 ```
 
 ### Upgrade
@@ -41,7 +41,7 @@ add({ contractsData: [{ name: 'MyContract_v1', alias: 'MyContract' }] });
 await push(options);
 
 // Update instance, adding +10 to value as part of the migration
-await update(Object.assign({ contractAlias: 'MyContract', initMethod: 'add', initArgs: [10] }, options));
+await update(Object.assign({ contractAlias: 'MyContract', methodName: 'add', methodArgs: [10] }, options));
 ```
 
 ### Boilerplate

@@ -5,7 +5,7 @@ import { TxParams } from 'zos-lib';
 import create from '../scripts/create';
 import queryDeployment from '../scripts/query-deployment';
 import querySignedDeployment from '../scripts/query-signed-deployment';
-import { parseInit } from '../utils/input';
+import { parseMethodParams } from '../utils/input';
 import { fromContractFullName } from '../utils/naming';
 import { hasToMigrateProject } from '../prompts/migrations';
 import ConfigVariablesInitializer from '../models/initializer/ConfigVariablesInitializer';
@@ -33,9 +33,9 @@ async function action(contractFullName: string, options: any): Promise<void> {
   if (!await hasToMigrateProject(network)) process.exit(0);
   if (!options.salt) throw new Error('option `--salt\' is required');
 
-  const { initMethod, initArgs } = parseInit(options, 'initialize');
+  const { methodName, methodArgs } = parseMethodParams(options, 'initialize');
   const { contract: contractAlias, package: packageName } = fromContractFullName(contractFullName);
-  const opts = { ...options, initMethod, initArgs, contractAlias, packageName };
+  const opts = { ...options, methodName, methodArgs, contractAlias, packageName };
 
   if (options.query && options.signature) await runSignatureQuery(opts, network, txParams);
   else if (options.query) await runQuery(opts, network, txParams);
@@ -52,16 +52,16 @@ async function runQuery(options: any, network: string, txParams: TxParams) {
 }
 
 async function runSignatureQuery(options: any, network: string, txParams: TxParams) {
-  const { query, initMethod, initArgs, contractAlias, packageName, force, salt, signature: signatureOption, admin } = options;
+  const { query, methodName, methodArgs, contractAlias, packageName, force, salt, signature: signatureOption, admin } = options;
   if (!contractAlias) throw new Error('missing required argument: alias');
   if (typeof query === 'string') throw new Error('cannot specify argument `sender\' as it is inferred from `signature\'');
-  const args = pickBy({ packageName, contractAlias, initMethod, initArgs, force, salt, signature: signatureOption, admin });
+  const args = pickBy({ packageName, contractAlias, methodName, methodArgs, force, salt, signature: signatureOption, admin });
   await querySignedDeployment({ ...args, network, txParams });
 }
 
 async function runCreate(options: any, network: string, txParams: TxParams) {
-  const { initMethod, initArgs, contractAlias, packageName, force, salt, signature: signatureOption, admin } = options;
+  const { methodName, methodArgs, contractAlias, packageName, force, salt, signature: signatureOption, admin } = options;
   if (!contractAlias) throw new Error('missing required argument: alias');
-  const args = pickBy({ packageName, contractAlias, initMethod, initArgs, force, salt, signature: signatureOption, admin });
+  const args = pickBy({ packageName, contractAlias, methodName, methodArgs, force, salt, signature: signatureOption, admin });
   await create({ ...args, network, txParams });
 }

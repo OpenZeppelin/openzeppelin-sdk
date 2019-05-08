@@ -26,8 +26,8 @@ interface Network {
 
 interface Proxy extends Network, PackageArgs {
   proxyAddress?: string;
-  initMethod?: string;
-  initArgs?: string[];
+  methodName?: string;
+  methodArgs?: string[];
   force?: boolean;
 }
 

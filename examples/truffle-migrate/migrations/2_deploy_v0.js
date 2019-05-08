@@ -10,7 +10,7 @@ async function deploy(options) {
   await push(options);
 
   // Create an instance of MyContract, setting initial value to 42
-  await create(Object.assign({ contractAlias: 'MyContract', initMethod: 'initialize', initArgs: [42] }, options));
+  await create(Object.assign({ contractAlias: 'MyContract', methodName: 'initialize', methodArgs: [42] }, options));
 }
 
 module.exports = function(deployer, networkName, accounts) {

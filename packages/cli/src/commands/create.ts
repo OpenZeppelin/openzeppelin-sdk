@@ -5,17 +5,16 @@ import add from './add';
 import push from './push';
 import create from '../scripts/create';
 import Session from '../models/network/Session';
-import { parseInit } from '../utils/input';
 import { fromContractFullName } from '../utils/naming';
 import { hasToMigrateProject } from '../prompts/migrations';
 import ConfigVariablesInitializer from '../models/initializer/ConfigVariablesInitializer';
 import { promptIfNeeded, networksList, contractsList, methodsList, argsList } from '../prompts/prompt';
-import promptForInitParams from '../prompts/init-params';
+import promptForMethodParams from '../prompts/method-params';
 
 interface PropsParams {
   contractFullName?: string;
-  initMethod?: string;
-  initArgs?: string[];
+  methodName?: string;
+  methodArgs?: string[];
 }
 
 const name: string = 'create';
@@ -41,16 +40,16 @@ async function commandActions(contractFullName: string, options: any) {
   await add.runActionIfNeeded(promptedContractFullName, options);
   await push.runActionIfNeeded(promptedContractFullName, network, { ...options, network: promptedNewtork });
 
-  const initParams = await promptForInitParams(promptedContractFullName,getCommandProps, options);
+  const initMethodParams = await promptForMethodParams(promptedContractFullName,getCommandProps, options);
 
-  await action(promptedContractFullName, { ...options, ...initParams, network, txParams });
+  await action(promptedContractFullName, { ...options, ...initMethodParams, network, txParams });
   if (!options.dontExitProcess && process.env.NODE_ENV !== 'test') process.exit(0);
 }
 
 async function action(contractFullName: string, options: any) {
-  const { force, initMethod, initArgs, network, txParams } = options;
+  const { force, methodName, methodArgs, network, txParams } = options;
   const { contract: contractAlias, package: packageName } = fromContractFullName(contractFullName);
-  const args = pickBy({ packageName, contractAlias, initMethod, initArgs, force });
+  const args = pickBy({ packageName, contractAlias, methodName, methodArgs, force });
 
   if (!await hasToMigrateProject(network)) process.exit(0);
 
@@ -68,16 +67,16 @@ async function promptForCreate(contractFullName: string, options: any): Promise<
   return promptIfNeeded({ args, opts, defaults: defaultOpts, props: getCommandProps() }, interactive);
 }
 
-function getCommandProps({ contractFullName, initMethod, initArgs }: PropsParams = {})  {
+function getCommandProps({ contractFullName, methodName, methodArgs }: PropsParams = {})  {
   const initMethodsList = methodsList(contractFullName);
-  const initArgsList = argsList(contractFullName, initMethod)
+  const initMethodArgsList = argsList(contractFullName, methodName)
     .reduce((accum, argName, index) => {
       return {
         ...accum,
         [argName]: {
           message: `${argName}:`,
           type: 'input',
-          when: () => !initArgs || !initArgs[index]
+          when: () => !methodArgs || !methodArgs[index]
         }
       };
     }, {});
@@ -85,23 +84,23 @@ function getCommandProps({ contractFullName, initMethod, initArgs }: PropsParams
   return {
     ...networksList('network', 'list'),
     ...contractsList('contractFullName', 'Choose a contract', 'list', 'all'),
-    askForInitParams: {
+    askForMethodParams: {
       type: 'confirm',
       message: 'Do you want to run a function after creating the instance?',
-      when: () => initMethodsList.length !== 0 && initMethod !== 'initialize'
+      when: () => initMethodsList.length !== 0 && methodName !== 'initialize'
     },
-    initMethod: {
+    methodName: {
       type: 'list',
       message: 'Select a method',
       choices: initMethodsList,
-      when: (({ askForInitParams }) => askForInitParams),
+      when: (({ askForMethodParams }) => askForMethodParams),
       normalize: (input) => {
         if (typeof input !== 'object') {
           return { name: input, selector: input };
         } else return input;
       }
     },
-    ...initArgsList
+    ...initMethodArgsList
   };
 }
 
