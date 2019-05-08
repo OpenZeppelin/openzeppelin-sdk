@@ -11,19 +11,20 @@ import { buildCallData, callDescription, CalldataInfo } from '../utils/ABIs';
 import Contract from '../artifacts/Contract';
 import { toSemanticVersion, semanticVersionEqual } from '../utils/Semver';
 import Transactions from '../utils/Transactions';
+import { TxParams } from '../artifacts/ZWeb3';
 
 const log: Logger = new Logger('App');
 
 export default class App {
   public appContract: any;
-  private txParams: any;
+  private txParams: TxParams;
 
-  public static async fetch(address: string, txParams: any = {}): Promise<App> {
+  public static async fetch(address: string, txParams: TxParams = {}): Promise<App> {
     const appContract = (await this.getContractClass()).at(address);
     return new this(appContract, txParams);
   }
 
-  public static async deploy(txParams: any = {}): Promise<App> {
+  public static async deploy(txParams: TxParams = {}): Promise<App> {
     log.info('Deploying new App...');
     const appContract = await Transactions.deployContract(this.getContractClass(), [], txParams);
     log.info(`Deployed App at ${appContract.address}`);
@@ -34,7 +35,7 @@ export default class App {
     return Contracts.getFromLib('App');
   }
 
-  constructor(appContract: Contract, txParams: any = {}) {
+  constructor(appContract: Contract, txParams: TxParams = {}) {
     this.appContract = appContract;
     this.txParams = txParams;
   }

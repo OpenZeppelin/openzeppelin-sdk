@@ -1,5 +1,13 @@
 import forEach from 'lodash.foreach';
-import { AppProject, PackageProject, ProxyAdminProject, App, Package, ImplementationDirectory } from 'zos-lib';
+import {
+  AppProject,
+  PackageProject,
+  ProxyAdminProject,
+  App,
+  Package,
+  ImplementationDirectory,
+  TxParams,
+} from 'zos-lib';
 
 import NetworkController from './NetworkController';
 import ZosPackageFile from '../files/ZosPackageFile';
@@ -24,7 +32,7 @@ class BaseProjectDeployer {
   protected controller: NetworkController;
   protected packageFile: ZosPackageFile;
   protected networkFile: ZosNetworkFile;
-  protected txParams: any;
+  protected txParams: TxParams;
   protected requestedVersion: string;
 
   constructor(controller: NetworkController, requestedVersion: string) {

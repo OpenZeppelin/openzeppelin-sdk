@@ -2,7 +2,17 @@
 
 import every from 'lodash.every';
 import map from 'lodash.map';
-import { Contracts, Contract, Logger, FileSystem as fs, getBuildArtifacts, BuildArtifacts, validate as validateContract, validationPasses} from 'zos-lib';
+import {
+  Contracts,
+  Contract,
+  Logger,
+  FileSystem as fs,
+  getBuildArtifacts,
+  BuildArtifacts,
+  validate as validateContract,
+  validationPasses,
+  TxParams,
+} from 'zos-lib';
 
 import Session from '../network/Session';
 import Dependency from '../dependency/Dependency';
@@ -186,7 +196,7 @@ export default class LocalController {
     }
   }
 
-  public onNetwork(network: string, txParams: any, networkFile?: ZosNetworkFile): NetworkController {
+  public onNetwork(network: string, txParams: TxParams, networkFile?: ZosNetworkFile): NetworkController {
     return new NetworkController(network, txParams, networkFile);
   }
 }

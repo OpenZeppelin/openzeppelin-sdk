@@ -1,3 +1,5 @@
+import { TxParams } from 'zos-lib';
+
 import ZosPackageFile from '../models/files/ZosPackageFile';
 import ZosNetworkFile from '../models/files/ZosNetworkFile';
 
@@ -18,7 +20,7 @@ interface PackageArgs {
 
 interface Network {
   network: string;
-  txParams?: any;
+  txParams?: TxParams;
   networkFile?: ZosNetworkFile;
 }
 

@@ -15,6 +15,7 @@ import { DeployError } from '../utils/errors/DeployError';
 import { semanticVersionToString } from '../utils/Semver';
 import ProxyFactory from '../proxy/ProxyFactory';
 import { CalldataInfo, buildCallData, callDescription } from '../utils/ABIs';
+import { TxParams } from '../artifacts/ZWeb3';
 import Logger from '../utils/Logger';
 
 const DEFAULT_NAME: string = 'main';
@@ -48,7 +49,7 @@ class BaseAppProject extends BasePackageProject {
   public static async fetchOrDeploy(
     name: string = DEFAULT_NAME,
     version: string = DEFAULT_VERSION,
-    txParams: any = {},
+    txParams: TxParams = {},
     { appAddress, packageAddress, proxyAdminAddress, proxyFactoryAddress }: ExistingAddresses = {}
   ): Promise<AppProject | never> {
     let thepackage: Package;
@@ -110,7 +111,7 @@ class BaseAppProject extends BasePackageProject {
     return appProject;
   }
 
-  constructor(app: App, name: string = DEFAULT_NAME, version: string = DEFAULT_VERSION, proxyAdmin: ProxyAdmin, proxyFactory: ProxyFactory, txParams: any = {}) {
+  constructor(app: App, name: string = DEFAULT_NAME, version: string = DEFAULT_VERSION, proxyAdmin: ProxyAdmin, proxyFactory: ProxyFactory, txParams: TxParams = {}) {
     super(txParams);
     this.app = app;
     this.name = name;

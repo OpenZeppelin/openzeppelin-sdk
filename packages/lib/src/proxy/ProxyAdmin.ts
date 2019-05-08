@@ -7,27 +7,28 @@ import { toAddress } from '../utils/Addresses';
 import { buildCallData, callDescription, CalldataInfo } from '../utils/ABIs';
 import Transactions from '../utils/Transactions';
 import Contract from '../artifacts/Contract';
+import { TxParams } from '../artifacts/ZWeb3';
 
 const log: Logger = new Logger('ProxyAdmin');
 
 export default class ProxyAdmin {
   public contract: Contract;
   public address: string;
-  public txParams: any;
+  public txParams: TxParams;
 
-  public static fetch(address: string, txParams: any = {}): ProxyAdmin {
+  public static fetch(address: string, txParams: TxParams = {}): ProxyAdmin {
     const contract = Contracts.getFromLib('ProxyAdmin').at(address);
     return new this(contract, txParams);
   }
 
-  public static async deploy(txParams: any = {}): Promise<ProxyAdmin> {
+  public static async deploy(txParams: TxParams = {}): Promise<ProxyAdmin> {
     log.info('Deploying new ProxyAdmin...');
     const contract = await Transactions.deployContract(Contracts.getFromLib('ProxyAdmin'), [], txParams);
     log.info(`Deployed ProxyAdmin at ${contract.address}`);
     return new this(contract, txParams);
   }
 
-  constructor(contract: any, txParams: any = {}) {
+  constructor(contract: any, txParams: TxParams = {}) {
     this.contract = contract;
     this.address = toAddress(contract);
     this.txParams = txParams;
@@ -53,6 +54,7 @@ export default class ProxyAdmin {
   }
 
   public async transferOwnership(newAdminOwner: string): Promise<void> {
+    await this.checkOwner();
     log.info(`Changing ownership for proxy admin to ${newAdminOwner}...`);
     await Transactions.sendTransaction(this.contract.methods.transferOwnership, [newAdminOwner], { ...this.txParams });
     log.info(`Owner for proxy admin set to ${newAdminOwner}`);
@@ -60,6 +62,14 @@ export default class ProxyAdmin {
 
   public async getOwner(): Promise<string> {
     return await this.contract.methods.owner().call({ ...this.txParams });
+  }
+
+  private async checkOwner(): Promise<void | never> {
+    const currentOwner: string = await this.getOwner();
+    const { from } = this.txParams;
+    if (from && currentOwner !== from) {
+      throw new Error(`Cannot change ownership from non-owner account: current owner is ${currentOwner} and sender is ${from}`);
+    }
   }
 
   private async _upgradeProxy(proxyAddress: string, implementation: string): Promise<any> {

@@ -4,13 +4,14 @@ import ZWeb3 from '../artifacts/ZWeb3';
 import Contracts from '../artifacts/Contracts';
 import Contract from '../artifacts/Contract';
 import Transactions from '../utils/Transactions';
+import { TxParams } from '../artifacts/ZWeb3';
 
 async function sendTransaction(params: any): Promise<any> {
   if (!params.gas) params.gas = await Transactions.estimateGas(params);
   return ZWeb3.sendTransactionWithoutReceipt(params);
 }
 
-export default async function copyContract(contract: Contract, address: string, txParams: any = {}): Promise<Contract> {
+export default async function copyContract(contract: Contract, address: string, txParams: TxParams = {}): Promise<Contract> {
   const trimmedAddress: string = address.replace('0x', '');
 
   // This is EVM assembly will return of the code of a foreign address.

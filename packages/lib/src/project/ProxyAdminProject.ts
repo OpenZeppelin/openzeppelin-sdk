@@ -6,13 +6,14 @@ import { ContractInterface } from './AppProject';
 import Contract from '../artifacts/Contract';
 import ProxyFactory from '../proxy/ProxyFactory';
 import ProxyAdminProjectMixin from './mixin/ProxyAdminProjectMixin';
+import { TxParams } from '../artifacts/ZWeb3';
 
 const log: Logger = new Logger('ProxyAdminProject');
 
 class BaseProxyAdminProject extends BaseSimpleProject {
   public proxyAdmin: ProxyAdmin;
 
-  public static async fetch(name: string = 'main', txParams: any = {}, proxyAdminAddress?: string, proxyFactoryAddress?: string): Promise<ProxyAdminProject> {
+  public static async fetch(name: string = 'main', txParams: TxParams = {}, proxyAdminAddress?: string, proxyFactoryAddress?: string): Promise<ProxyAdminProject> {
     const proxyAdmin = proxyAdminAddress ? await ProxyAdmin.fetch(proxyAdminAddress, txParams) : null;
     const proxyFactory = proxyFactoryAddress ? await ProxyFactory.fetch(proxyFactoryAddress, txParams) : null;
     return new ProxyAdminProject(name, proxyAdmin, proxyFactory, txParams);

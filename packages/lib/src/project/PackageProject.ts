@@ -3,16 +3,17 @@ import Package from '../application/Package';
 import ImplementationDirectory from '../application/ImplementationDirectory';
 import { DeployError } from '../utils/errors/DeployError';
 import { semanticVersionToString } from '../utils/Semver';
+import { TxParams } from '../artifacts/ZWeb3';
 
 export default class PackageProject extends BasePackageProject {
 
-  public static async fetch(packageAddress: string, version: string = '0.1.0', txParams: any): Promise<PackageProject> {
+  public static async fetch(packageAddress: string, version: string = '0.1.0', txParams: TxParams): Promise<PackageProject> {
     const thepackage: Package = Package.fetch(packageAddress, txParams);
     return new this(thepackage, version, txParams);
   }
 
   // REFACTOR: Evaluate merging this logic with CLI's ProjectDeployer classes
-  public static async fetchOrDeploy(version: string = '0.1.0', txParams: any = {}, { packageAddress }: { packageAddress?: string } = {}): Promise<PackageProject | never> {
+  public static async fetchOrDeploy(version: string = '0.1.0', txParams: TxParams = {}, { packageAddress }: { packageAddress?: string } = {}): Promise<PackageProject | never> {
     let thepackage: Package;
     let directory: ImplementationDirectory;
     version = semanticVersionToString(version);
@@ -34,7 +35,7 @@ export default class PackageProject extends BasePackageProject {
     }
   }
 
-  constructor(thepackage: Package, version: string = '0.1.0', txParams: any = {}) {
+  constructor(thepackage: Package, version: string = '0.1.0', txParams: TxParams = {}) {
     super(txParams);
     this.package = thepackage;
     this.version = semanticVersionToString(version);

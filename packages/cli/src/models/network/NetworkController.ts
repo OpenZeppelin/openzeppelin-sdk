@@ -14,9 +14,32 @@ import isEqual from 'lodash.isequal';
 import concat from 'lodash.concat';
 import toPairs from 'lodash.topairs';
 
-import { Contracts, Contract, Logger, FileSystem as fs, Proxy, Transactions, semanticVersionToString, contractMethodsFromAst } from 'zos-lib';
-import { ProxyAdminProject, AppProject, flattenSourceCode, getStorageLayout, BuildArtifacts, getBuildArtifacts, getSolidityLibNames } from 'zos-lib';
-import { validate, newValidationErrors, validationPasses, App, ZWeb3, ProxyAdmin, SimpleProject, AppProxyMigrator } from 'zos-lib';
+import {
+  Contracts,
+  Contract,
+  Logger,
+  FileSystem as fs,
+  Proxy,
+  Transactions,
+  semanticVersionToString,
+  contractMethodsFromAst,
+  ProxyAdminProject,
+  AppProject,
+  flattenSourceCode,
+  getStorageLayout,
+  BuildArtifacts,
+  getBuildArtifacts,
+  getSolidityLibNames,
+  validate,
+  newValidationErrors,
+  validationPasses,
+  App,
+  ZWeb3,
+  TxParams,
+  ProxyAdmin,
+  SimpleProject,
+  AppProxyMigrator
+} from 'zos-lib';
 import { isMigratableZosversion } from '../files/ZosVersion';
 import { allPromisesOrError } from '../../utils/async';
 import { toContractFullName } from '../../utils/naming';
@@ -37,12 +60,12 @@ type ProjectDeployer = ProxyAdminProjectDeployer | AppProjectDeployer;
 export default class NetworkController {
 
   public localController: LocalController;
-  public txParams: any;
+  public txParams: TxParams;
   public network: string;
   public networkFile: ZosNetworkFile;
   public project: Project;
 
-  constructor(network: string, txParams: any, networkFile?: ZosNetworkFile) {
+  constructor(network: string, txParams: TxParams, networkFile?: ZosNetworkFile) {
     if(!networkFile) {
       const packageFile = new ZosPackageFile();
       this.networkFile = packageFile.networkFile(network);

@@ -1,5 +1,7 @@
 import pickBy from 'lodash.pickby';
 
+import { TxParams } from 'zos-lib';
+
 import create from '../scripts/create';
 import queryDeployment from '../scripts/query-deployment';
 import querySignedDeployment from '../scripts/query-signed-deployment';
@@ -44,12 +46,12 @@ async function action(contractFullName: string, options: any): Promise<void> {
 
 export default { name, signature, description, register, action };
 
-async function runQuery(options: any, network: string, txParams: any) {
+async function runQuery(options: any, network: string, txParams: TxParams) {
   const sender = (typeof options.query === 'boolean') ? null : options.query;
   await queryDeployment({ salt: options.salt, sender, network, txParams });
 }
 
-async function runSignatureQuery(options: any, network: string, txParams: any) {
+async function runSignatureQuery(options: any, network: string, txParams: TxParams) {
   const { query, initMethod, initArgs, contractAlias, packageName, force, salt, signature: signatureOption, admin } = options;
   if (!contractAlias) throw new Error('missing required argument: alias');
   if (typeof query === 'string') throw new Error('cannot specify argument `sender\' as it is inferred from `signature\'');
@@ -57,7 +59,7 @@ async function runSignatureQuery(options: any, network: string, txParams: any) {
   await querySignedDeployment({ ...args, network, txParams });
 }
 
-async function runCreate(options: any, network: string, txParams: any) {
+async function runCreate(options: any, network: string, txParams: TxParams) {
   const { initMethod, initArgs, contractAlias, packageName, force, salt, signature: signatureOption, admin } = options;
   if (!contractAlias) throw new Error('missing required argument: alias');
   const args = pickBy({ packageName, contractAlias, initMethod, initArgs, force, salt, signature: signatureOption, admin });

@@ -13,7 +13,7 @@ import Logger from './utils/Logger';
 import FileSystem from './utils/FileSystem';
 import Contracts from './artifacts/Contracts';
 import Contract, { contractMethodsFromAst } from './artifacts/Contract';
-import ZWeb3 from './artifacts/ZWeb3';
+import ZWeb3, { TxParams } from './artifacts/ZWeb3';
 import { bodyCode, constructorCode, bytecodeDigest, replaceSolidityLibAddress, isSolidityLib, getSolidityLibNames } from './utils/Bytecode';
 import Transactions from './utils/Transactions';
 import { flattenSourceCode } from './utils/Solidity';
@@ -82,6 +82,7 @@ export {
   Semver,
   FileSystem,
   ZWeb3,
+  TxParams,
   Transactions,
   Contracts,
   App,

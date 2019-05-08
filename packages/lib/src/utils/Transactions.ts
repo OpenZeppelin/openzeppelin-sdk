@@ -13,6 +13,7 @@ import Contracts from '../artifacts/Contracts';
 import Contract from '../artifacts/Contract';
 import { TransactionReceipt } from 'web3/types';
 import { buildDeploymentCallData } from './ABIs';
+import { TxParams } from '../artifacts/ZWeb3';
 
 // Cache, exported for testing
 export const state: any = {};
@@ -51,7 +52,7 @@ export default {
    * @param txParams other transaction parameters (from, gasPrice, etc)
    * @param retries number of transaction retries
    */
-  async sendRawTransaction(address: string, { data, value }: TransactionParams, txParams: any = {}, retries: number = RETRY_COUNT): Promise<any> {
+  async sendRawTransaction(address: string, { data, value }: TransactionParams, txParams: TxParams = {}, retries: number = RETRY_COUNT): Promise<any> {
     await this._fixGasPrice(txParams);
     try {
       const from = await ZWeb3.defaultAccount();
@@ -74,7 +75,7 @@ export default {
    * @param txParams other transaction parameters (from, gasPrice, etc)
    * @param retries number of transaction retries
    */
-  async sendTransaction(contractFn: GenericFunction, args: any[] = [], txParams: any = {}, retries: number = RETRY_COUNT): Promise<any> {
+  async sendTransaction(contractFn: GenericFunction, args: any[] = [], txParams: TxParams = {}, retries: number = RETRY_COUNT): Promise<any> {
     await this._fixGasPrice(txParams);
 
     try {
@@ -94,7 +95,7 @@ export default {
    * @param txParams other transaction parameters (from, gasPrice, etc)
    * @param retries number of deploy retries
    */
-  async deployContract(contract: Contract, args: any[] = [], txParams: any = {}, retries: number = RETRY_COUNT): Promise<any> {
+  async deployContract(contract: Contract, args: any[] = [], txParams: TxParams = {}, retries: number = RETRY_COUNT): Promise<any> {
     await this._fixGasPrice(txParams);
 
     try {
@@ -113,7 +114,7 @@ export default {
    * @param txParams all transaction parameters (data, from, gasPrice, etc)
    * @param retries number of data transaction retries
    */
-  async sendDataTransaction(contract: Contract, txParams: any, retries: number = RETRY_COUNT): Promise<TransactionReceipt> {
+  async sendDataTransaction(contract: Contract, txParams: TxParams, retries: number = RETRY_COUNT): Promise<TransactionReceipt> {
     await this._fixGasPrice(txParams);
 
     try {
@@ -144,7 +145,7 @@ export default {
     }
   },
 
-  async estimateActualGasFnCall(contractFn: GenericFunction, args: any[], txParams: any, retries: number = RETRY_COUNT): Promise<any> {
+  async estimateActualGasFnCall(contractFn: GenericFunction, args: any[], txParams: TxParams, retries: number = RETRY_COUNT): Promise<any> {
     // Retry if estimate fails. This could happen because we are depending
     // on a previous transaction being mined that still hasn't reach the node
     // we are working with, if the txs are routed to different nodes.
@@ -177,7 +178,7 @@ export default {
     }
   },
 
-  async _sendContractDataTransaction(contract: Contract, txParams: any): Promise<TransactionReceipt> {
+  async _sendContractDataTransaction(contract: Contract, txParams: TxParams): Promise<TransactionReceipt> {
     const defaults = await Contracts.getDefaultTxParams();
     const tx = { to: contract.address, ...defaults, ...txParams };
     const txHash = await ZWeb3.sendTransactionWithoutReceipt(tx);

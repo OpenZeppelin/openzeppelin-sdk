@@ -4,12 +4,13 @@ import { semanticVersionToString } from '../utils/Semver';
 import Contract from '../artifacts/Contract';
 import ImplementationDirectory from '../application/ImplementationDirectory';
 import Package from '../application/Package';
+import { TxParams } from '../artifacts/ZWeb3';
 
 const log: Logger = new Logger('PackageProject');
 
 export default abstract class BasePackageProject {
 
-  protected txParams: any;
+  protected txParams: TxParams;
   public version: string;
   public package: Package;
   protected directory: ImplementationDirectory;

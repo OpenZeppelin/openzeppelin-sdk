@@ -11,6 +11,7 @@ import { buildCallData, callDescription, CalldataInfo } from '../utils/ABIs';
 import { ContractInterface } from './AppProject';
 import Contract from '../artifacts/Contract';
 import ProxyFactory from '../proxy/ProxyFactory';
+import { TxParams } from '../artifacts/ZWeb3';
 
 const log: Logger = new Logger('BaseSimpleProject');
 
@@ -35,11 +36,11 @@ interface Dependency {
 export default abstract class BaseSimpleProject {
   public implementations: Implementations;
   public dependencies: Dependencies;
-  public txParams: any;
+  public txParams: TxParams;
   public name: string;
   public proxyFactory?: ProxyFactory;
 
-  constructor(name: string, proxyFactory?: ProxyFactory, txParams = {}) {
+  constructor(name: string, proxyFactory?: ProxyFactory, txParams: TxParams = {}) {
     this.txParams = txParams;
     this.name = name;
     this.implementations = {};
