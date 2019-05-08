@@ -15,7 +15,7 @@ import {
   proxyInfo,
   InquirerQuestions
 } from '../prompts/prompt';
-import promptForInitParams from '../prompts/init-params';
+import promptForInitParams from '../prompts/method-params';
 
 const name: string = 'update';
 const signature: string = `${name} [alias-or-address]`;
@@ -64,16 +64,16 @@ async function promptForProxies(contractReference: string, network: string, opti
   };
 }
 
-function getCommandProps({ contractReference, network, all, contractFullName, initMethod, initArgs }: UpdatePropsParams = {}): InquirerQuestions {
+function getCommandProps({ contractReference, network, all, contractFullName, methodName, methodArgs }: UpdatePropsParams = {}): InquirerQuestions {
   const initMethodsList = methodsList(contractFullName);
-  const initArgsList = argsList(contractFullName, initMethod)
+  const initMethodArgsList = argsList(contractFullName, methodName)
     .reduce((accum, argName, index) => {
       return {
         ...accum,
         [argName]: {
           message: `${argName}:`,
           type: 'input',
-          when: () => !initArgs || !initArgs[index]
+          when: () => !methodArgs || !methodArgs[index]
         }
       };
     }, {});
@@ -102,23 +102,23 @@ function getCommandProps({ contractReference, network, all, contractFullName, in
       when: ({ pickProxyBy }) => !all && pickProxyBy && pickProxyBy !== 'all',
       normalize: (input) => typeof input !== 'object' ? proxyInfo(parseContractReference(input), network) : input
     },
-    askForInitParams: {
+    askForMethodParams: {
       type: 'confirm',
       message: 'Do you want to run a function after updating the instance?',
-      when: () => initMethodsList.length !== 0 && initMethod !== 'initialize'
+      when: () => initMethodsList.length !== 0 && methodName !== 'initialize'
     },
-    initMethod: {
+    methodName: {
       type: 'list',
       message: 'Select a method',
       choices: initMethodsList,
-      when: (({ askForInitParams }) => askForInitParams),
+      when: (({ askForMethodParams }) => askForMethodParams),
       normalize: (input) => {
         if (typeof input !== 'object') {
           return { name: input, selector: input };
         } else return input;
       }
     },
-    ...initArgsList
+    ...initMethodArgsList
   };
 }
 

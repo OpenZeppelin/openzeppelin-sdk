@@ -26,7 +26,7 @@ async function useCreate2(initValue, networkConfig) {
   console.log(`> Instance using salt ${salt} will be deployed at ${address}\n`)
 
   // Actually deploy it!
-  const instance = await scripts.create({ salt, contractAlias: 'Sample', initMethod: 'initialize', initArgs: [initValue], ...networkConfig });
+  const instance = await scripts.create({ salt, contractAlias: 'Sample', methodName: 'initialize', methodArgs: [initValue], ...networkConfig });
   const value = await instance.methods.value().call();
   console.log(`$ zos create2 Sample --salt ${salt} --init --args ${initValue}`);
   console.log(`> Instance deployed at ${instance.options.address} with value ${value}\n`);
@@ -57,7 +57,7 @@ async function useSignedCreate2(initValue, networkConfig) {
   const signature = helpers.signDeploy(networkFile.proxyFactoryAddress, salt, logic, admin, initData, signerPk);
   
   // Query the deployment address for that signature
-  const createArgs = { salt, contractAlias: "Sample", initMethod: "initialize", initArgs: [initValue] };
+  const createArgs = { salt, contractAlias: "Sample", methodName: "initialize", methodArgs: [initValue] };
   const address = await scripts.querySignedDeployment({ signature, ... createArgs, ... networkConfig });
   console.log(`$ zos create2 Sample --query --salt ${salt} --signature ${signature} --init --args ${initValue}`);
   console.log(`> Instance of Sample initialized with 'initialize(${initValue})' with salt ${salt} and signature ${signature} will be deployed at ${address}\n`);

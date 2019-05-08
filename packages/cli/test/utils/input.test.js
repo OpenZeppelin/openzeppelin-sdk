@@ -1,7 +1,7 @@
 'use strict'
 require('../setup');
 
-import { parseArgs, parseInit } from '../../src/utils/input';
+import { parseArgs, parseMethodParams } from '../../src/utils/input';
 
 describe('input', function () {
   describe('parseArgs', function () {
@@ -36,15 +36,15 @@ describe('input', function () {
     it('should parse multiple arguments', testFn('1e2,42,0x39af68cF04Abb0eF8f9d8191E1bD9c041E80e18e,43,1.5e20,"foo",[1e2,1,2,"bar",1e3]', '100', '42', '0x39af68cF04Abb0eF8f9d8191E1bD9c041E80e18e', '43', '150000000000000000000', 'foo', ['100', '1', '2', 'bar', '1000']));
   });
 
-  describe('parseInit', function () {
-    const defaultInit = 'INITIALIZE';
-    const testFn = (options, expectedInit, expectedArgs) => (
-      () => parseInit(options, defaultInit).should.deep.eq({ initMethod: expectedInit, initArgs: expectedArgs })
+  describe('parseMethodParams', function () {
+    const defaulMethodName = 'INITIALIZE';
+    const testFn = (options, expectedMethodName, expectedArgs) => (
+      () => parseMethodParams(options, defaulMethodName).should.deep.eq({ methodName: expectedMethodName, methodArgs: expectedArgs })
     );
 
     it('should not init', testFn({}, undefined, []));
-    it('should init with default when init is set', testFn({ init: true }, defaultInit, []));
-    it('should init when args is set', testFn({ args: '20' }, defaultInit, ["20"]));
+    it('should init with default when init is set', testFn({ init: true }, defaulMethodName, []));
+    it('should init when args is set', testFn({ args: '20' }, defaulMethodName, ["20"]));
     it('should init with specific function', testFn({ init: 'foo' }, 'foo', []));
     it('should init with specific function and args', testFn({ init: 'foo', args: '20' }, 'foo', ['20']));
   });

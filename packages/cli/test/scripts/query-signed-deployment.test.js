@@ -44,7 +44,7 @@ contract('query-signed-deployment script', function([_, owner, another, admin]) 
       const initData = '0xfe4b84df000000000000000000000000000000000000000000000000000000000000001e';
       const signature = helpers.signDeploy(this.networkFile.proxyFactoryAddress, this.salt, implementation, admin, initData);
 
-      const address = await querySignedDeployment({ signature, salt, contractAlias, initMethod: 'initialize', initArgs: [30], admin, network, txParams, networkFile });
+      const address = await querySignedDeployment({ signature, salt, contractAlias, methodName: 'initialize', methodArgs: [30], admin, network, txParams, networkFile });
       address.should.eq(predictedAddress);
     });
   }

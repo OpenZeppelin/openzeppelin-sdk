@@ -83,8 +83,8 @@ async function main() {
   const factoryProxy = await create({
     packageName: 'creating-instances-from-solidity',
     contractAlias: 'Factory',
-    initMethod: 'initialize', 
-    initArgs: [appAddress],
+    methodName: 'initialize',
+    methodArgs: [appAddress],
     network
   });
   console.log(`Factory proxy created at ${factoryProxy.address}`);

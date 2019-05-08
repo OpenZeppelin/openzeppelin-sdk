@@ -16,8 +16,8 @@ export interface UpdatePropsParams {
   network?: string;
   all?: boolean;
   contractFullName?: string;
-  initMethod?: string;
-  initArgs?: string[];
+  methodName?: string;
+  methodArgs?: string[];
 }
 
 export interface UpdateSelectionParams {

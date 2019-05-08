@@ -10,7 +10,7 @@ async function deploy(options) {
   await push(options);
 
   // Update instance, adding +10 to value as part of the migration
-  await update(Object.assign({ contractAlias: 'MyContract', initMethod: 'add', initArgs: [10] }, options));
+  await update(Object.assign({ contractAlias: 'MyContract', methodName: 'add', methodArgs: [10] }, options));
 }
 
 module.exports = function(deployer, networkName, accounts) {

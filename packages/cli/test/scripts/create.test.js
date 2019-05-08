@@ -115,14 +115,14 @@ contract('create script', function([_, owner, otherAdmin]) {
     });
 
     it('should properly initialize a proxy with false boolean values', async function() {
-      await create({ contractAlias: booleanContractAlias, network, txParams, initMethod: 'initialize', initArgs: [false], networkFile: this.networkFile });
+      await create({ contractAlias: booleanContractAlias, network, txParams, methodName: 'initialize', methodArgs: [false], networkFile: this.networkFile });
 
       const implementation = this.networkFile.contract(booleanContractAlias).address;
       await assertProxy(this.networkFile, booleanContractAlias, { version, checkBool: true, boolValue: false, implementation });
     });
 
     it('should properly initialize a proxy with true boolean values', async function() {
-      await create({ contractAlias: booleanContractAlias, network, txParams, initMethod: 'initialize', initArgs: [true], networkFile: this.networkFile });
+      await create({ contractAlias: booleanContractAlias, network, txParams, methodName: 'initialize', methodArgs: [true], networkFile: this.networkFile });
 
       const implementation = this.networkFile.contract(booleanContractAlias).address;
       await assertProxy(this.networkFile, booleanContractAlias, { version, checkBool: true, boolValue: true, implementation });
@@ -252,7 +252,7 @@ contract('create script', function([_, owner, otherAdmin]) {
       });
 
       it('should not warn when initializing a contract', async function() {
-        await create({ contractAlias, network, txParams, initMethod: 'initialize', initArgs: [42], networkFile: this.networkFile });
+        await create({ contractAlias, network, txParams, methodName: 'initialize', methodArgs: [42], networkFile: this.networkFile });
 
         this.logs.errors.should.have.lengthOf(0);
       });
@@ -283,12 +283,12 @@ contract('create script', function([_, owner, otherAdmin]) {
       });
 
       it('should initialize a proxy from a dependency', async function () {
-        await create({ packageName: 'mock-stdlib-undeployed', contractAlias: 'Greeter', network, txParams, networkFile: this.networkFile, initMethod: 'initialize', initArgs: ["42"] });
+        await create({ packageName: 'mock-stdlib-undeployed', contractAlias: 'Greeter', network, txParams, networkFile: this.networkFile, methodName: 'initialize', methodArgs: ["42"] });
         await assertProxy(this.networkFile, 'Greeter', { version: dependencyVersion, packageName: 'mock-stdlib-undeployed', value: 42 });
       });
 
       it('should initialize a proxy from a dependency using explicit function', async function () {
-        await create({ packageName: 'mock-stdlib-undeployed', contractAlias: 'Greeter', network, txParams, networkFile: this.networkFile, initMethod: 'clashingInitialize(uint256)', initArgs: ["42"] });
+        await create({ packageName: 'mock-stdlib-undeployed', contractAlias: 'Greeter', network, txParams, networkFile: this.networkFile, methodName: 'clashingInitialize(uint256)', methodArgs: ["42"] });
         await assertProxy(this.networkFile, 'Greeter', { version: dependencyVersion, packageName: 'mock-stdlib-undeployed', value: 42 });
       });
     });
