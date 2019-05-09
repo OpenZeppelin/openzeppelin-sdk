@@ -9,7 +9,7 @@ import promptForMethod from '../prompts/method-params';
 
 const name: string = 'send-tx';
 const signature: string = name;
-const description: string = 'Send a transaction to the specified contract instance. Provide the [address], method to call and its arguments if needed';
+const description: string = 'send a transaction to the specified contract instance. Provide the [address], method to call and its arguments if needed';
 
 const register: (program: any) => any = (program) => program
   .command(signature, undefined, { noHelp: true })
