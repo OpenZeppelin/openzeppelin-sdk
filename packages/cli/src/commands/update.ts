@@ -1,5 +1,6 @@
 import pickBy from 'lodash.pickby';
 
+import push from './push';
 import update from '../scripts/update';
 import { parseContractReference } from '../utils/contract';
 import { hasToMigrateProject } from '../prompts/migrations';
@@ -31,15 +32,24 @@ const register: (program: any) => any = (program) => program
   .option('--force', 'force creation even if contracts have local modifications')
   .withNetworkOptions()
   .withNonInteractiveOption()
-  .action(action);
+  .action(commandActions);
 
-async function action(contractReference: string, options: any): Promise<void> {
-  const { force, interactive, all } = options;
-  const networkOpts = await promptForNetwork(options, () => getCommandProps());
-  const { network, txParams } = await ConfigVariablesInitializer.initNetworkConfiguration({ ...options, ...networkOpts });
+async function commandActions(proxyReference: string, options: any): Promise<void> {
+  const { network: promptedNetwork } = await promptForNetwork(options, () => getCommandProps());
+  const { network, txParams } = await ConfigVariablesInitializer.initNetworkConfiguration({ ...options, network: promptedNetwork });
+
+  await push.runActionIfNeeded(null, network, { ...options, network: promptedNetwork, force: true });
+
+  await action(proxyReference, { ...options, network, txParams });
+  if (!options.dontExitProcess && process.env.NODE_ENV !== 'test') process.exit(0);
+}
+
+async function action(proxyReference: string, options: any): Promise<void> {
+  const { network, txParams, force, interactive, all, init: rawInitMethod } = options;
+
   if (!await hasToMigrateProject(network)) process.exit(0);
 
-  const promptedProxyInfo = await promptForProxies(contractReference, network, options);
+  const promptedProxyInfo = await promptForProxies(proxyReference, network, options);
   const parsedContractReference = parseContractReference(promptedProxyInfo.proxyReference);
 
   const promptedInitParams = promptedProxyInfo.proxyReference && !promptedProxyInfo.all
@@ -48,7 +58,6 @@ async function action(contractReference: string, options: any): Promise<void> {
 
   const args = pickBy({ all: promptedProxyInfo.all, force, ...parsedContractReference, ...promptedInitParams });
   await update({ ...args, network, txParams });
-  if (!options.dontExitProcess && process.env.NODE_ENV !== 'test') process.exit(0);
 }
 
 async function promptForProxies(contractReference: string, network: string, options: any): Promise<UpdateSelectionParams> {
