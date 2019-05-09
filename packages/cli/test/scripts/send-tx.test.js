@@ -32,7 +32,7 @@ contract('send-tx script', function(accounts) {
     this.logs.restore();
   });
 
-  context('validations', function() {
+  describe('validations', function() {
     context('when specifying a non-existent proxy address', function() {
       it('throws an error', async function() {
         const proxyAddress = '0x124';
@@ -48,7 +48,9 @@ contract('send-tx script', function(accounts) {
           .should.be.rejectedWith('A method name must be specified.');
       });
     });
+  });
 
+  describe('errors', function() {
     context('when specifying a wrong number of method arguments', function() {
       it('throws an error', async function() {
         const proxyAddress = this.networkFile.getProxies({ contract: 'Impl'})[0].address;
@@ -56,10 +58,26 @@ contract('send-tx script', function(accounts) {
           .should.be.rejectedWith('Could not find method initialize with 2 arguments in contract ImplV1');
       });
     });
+
+    context('when sending a value inside txParams to a nonpayable method', function() {
+      it('throws an error', async function() {
+        const proxyAddress = this.networkFile.getProxies({ contract: 'Impl'})[0].address;
+        await sendTx({ network, txParams, networkFile: this.networkFile, proxyAddress, methodName: 'initialize', methodArgs: [42], value: 1000 })
+          .should.be.rejectedWith('Can not send value to non-payable contract method or constructor');
+      });
+    });
+
+    context('when sending a non-reasonable gas amount', function() {
+      it('throws an error', async function() {
+        const proxyAddress = this.networkFile.getProxies({ contract: 'Impl'})[0].address;
+        await sendTx({ network, txParams, networkFile: this.networkFile, proxyAddress, methodName: 'initialize', methodArgs: [42], gas: 1 })
+        .should.be.rejectedWith(/base fee exceeds gas limit/);
+      });
+    });
   });
 
   context('when specifying valid address, method name and method args', function() {
-    it('logs the transaction hash', async function() {
+    it('calls the function and logs the transaction hash', async function() {
       const proxyAddress = this.networkFile.getProxies({ contract: 'Impl'})[0].address;
       await sendTx({ network, txParams, networkFile: this.networkFile, proxyAddress, methodName: 'initialize', methodArgs: [42] });
 

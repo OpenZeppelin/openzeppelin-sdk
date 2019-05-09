@@ -18,19 +18,20 @@ const register: (program: any) => any = (program) => program
   .option('--to <to>', 'specify a contract instance address')
   .option('--method <method>', `specify a method name from the specified contract`)
   .option('--args <arg1, arg2, ...>', 'provide the method arguments for your contract if required')
-  .option('--value [value]', `specify a value in ETH to send to the method`)
+  .option('--value <value>', `specify a value in wei to send to the method`)
+  .option('--gas <gas>', `specify an amount of gas to use`)
   .withNetworkOptions()
   .withNonInteractiveOption()
   .action(action);
 
 async function action(options: any): Promise<void> {
-  const { interactive, to: proxyAddress } = options;
+  const { interactive, to: proxyAddress, value, gas } = options;
   const networkOpts = await promptForNetwork(options, () => getCommandProps());
   const { network, txParams } = await ConfigVariablesInitializer.initNetworkConfiguration({ ...options, ...networkOpts });
 
   const { contractFullName, proxyReference } = await promptForProxy(proxyAddress, network, options);
   const methodParams = await promptForMethod(contractFullName, getCommandProps, options);
-  const args = pickBy({ ...methodParams, proxyAddress: proxyReference, txParams });
+  const args = pickBy({ ...methodParams, proxyAddress: proxyReference, value, gas });
   await sendTx({ ...args, network, txParams });
 
   if (!options.dontExitProcess && process.env.NODE_ENV !== 'test') process.exit(0);
