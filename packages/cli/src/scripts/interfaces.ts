@@ -141,8 +141,6 @@ export interface BalanceParams {
   contractAddress?: string;
 }
 
-export interface SendTxParams extends MethodParams {
-  address: string;
-  network: string;
-  txParams: string;
+export interface SendTxParams extends MethodParams, Network {
+  proxyAddress: string;
 }

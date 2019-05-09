@@ -20,11 +20,14 @@ export default class TransactionController {
   public packageFile: ZosPackageFile;
   public networkFile: ZosNetworkFile;
 
-  constructor(txParams?: any, network?: string) {
+  constructor(txParams?: any, network?: string, networkFile?: ZosNetworkFile) {
     if (txParams) this.txParams = txParams;
-    if (network) {
+    if(!networkFile) {
       this.packageFile = new ZosPackageFile();
       this.networkFile = this.packageFile.networkFile(network);
+    } else {
+      this.networkFile = networkFile;
+      this.packageFile = this.networkFile.packageFile;
     }
   }
 
@@ -50,8 +53,12 @@ export default class TransactionController {
   }
 
   public async sendTransaction(proxyAddress: string, methodName: string, methodArgs: string[]): Promise<any> {
-    const localController = new LocalController(this.packageFile);
+    if (!this.networkFile.hasProxies({ address: proxyAddress })) {
+      throw Error(`Proxy at address ${proxyAddress} not found.`);
+    }
+
     const { package: packageName, contract: contractName } = this.networkFile.getProxy(proxyAddress);
+    const localController = new LocalController(this.packageFile);
     const contract = localController.getContractClass(packageName, contractName).at(proxyAddress);
     const { method } = buildCallData(contract, methodName, methodArgs);
 
