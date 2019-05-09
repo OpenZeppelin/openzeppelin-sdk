@@ -18,6 +18,7 @@ import verify from './verify';
 import unpack from './unpack';
 import transfer from './transfer';
 import balance from './balance';
+import sendTx from './send-tx';
 
 export default {
   add,
@@ -40,4 +41,5 @@ export default {
   unpack,
   transfer,
   balance,
+  sendTx,
 };
