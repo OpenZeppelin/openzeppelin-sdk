@@ -28,9 +28,9 @@ async function action(options: any): Promise<void> {
   const networkOpts = await promptForNetwork(options, () => getCommandProps());
   const { network, txParams } = await ConfigVariablesInitializer.initNetworkConfiguration({ ...options, ...networkOpts });
 
-  const promptedProxyInfo = await promptForProxy(proxyAddress, network, options);
-  const methodParams = await promptForMethod(promptedProxyInfo.contractFullName, getCommandProps, options);
-  const args = pickBy({  ...promptedProxyInfo, ...methodParams, txParams });
+  const { contractFullName, proxyReference } = await promptForProxy(proxyAddress, network, options);
+  const methodParams = await promptForMethod(contractFullName, getCommandProps, options);
+  const args = pickBy({ ...methodParams, proxyAddress: proxyReference, txParams });
   await sendTx({ ...args, network, txParams });
 
   if (!options.dontExitProcess && process.env.NODE_ENV !== 'test') process.exit(0);
