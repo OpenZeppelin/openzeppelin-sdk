@@ -70,6 +70,7 @@ contract('Contract', function(accounts) {
      * initialize()
      * initializeNested()
      * initializeWithNested(uint256)
+     * nonInitializable(uint256)
      * fail()
    */
     describe('#contractMethodsFromAst', function() {
