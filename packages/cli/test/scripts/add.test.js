@@ -43,7 +43,6 @@ contract('add script', function() {
 
   it('should allow contractsData to be an array of contract names instead of an object', function() {
     add({ contractsData: [contractName], packageFile: this.packageFile });
-    console.log(this.packageFile.contract(contractName))
 
     this.packageFile.contract(contractName).should.not.be.null
     this.packageFile.contract(contractName).should.eq(contractName)
