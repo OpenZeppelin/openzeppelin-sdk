@@ -7,6 +7,20 @@ export default class EventsFilter {
 
   public timeout: number;
 
+  public static describe(events: any): void {
+    let description = '';
+    Object.values(events)
+      .forEach(({ event, returnValues }) => {
+        const emitted = Object.keys(returnValues)
+          .filter(key => isNaN(Number(key)))
+          .map(key => `${key}: ${returnValues[key]}`);
+
+        description = description.concat(`\n - ${event}(${emitted.join(', ')})`);
+      });
+
+    log.info(`Events emitted: ${description}`);
+  }
+
   constructor(timeout?: number) {
     this.timeout = timeout || (process.env.NODE_ENV === 'test' ? 2000 : 60000);
   }

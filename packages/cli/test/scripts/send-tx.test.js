@@ -78,17 +78,29 @@ contract('send-tx script', function(accounts) {
       it('throws an error', async function() {
         const proxyAddress = this.networkFile.getProxies({ contract: 'Impl'})[0].address;
         await sendTx({ network, txParams, networkFile: this.networkFile, proxyAddress, methodName: 'initialize', methodArgs: [42], gas: 1 })
-        .should.be.rejectedWith(/base fee exceeds gas limit/);
+          .should.be.rejectedWith(/base fee exceeds gas limit/);
       });
     });
   });
 
   context('when specifying valid address, method name and method args', function() {
-    it('calls the function and logs the transaction hash', async function() {
-      const proxyAddress = this.networkFile.getProxies({ contract: 'Impl'})[0].address;
-      await sendTx({ network, txParams, networkFile: this.networkFile, proxyAddress, methodName: 'initialize', methodArgs: [42] });
+    context('when the method emits an event', function() {
+      it('calls the function and logs the transaction hash and events', async function() {
+        const proxyAddress = this.networkFile.getProxies({ contract: 'Impl'})[0].address;
+        await sendTx({ network, txParams, networkFile: this.networkFile, proxyAddress, methodName: 'initializeWithEvent', methodArgs: [42] });
 
-      this.logs.infos[this.logs.infos.length -1].should.match(/Transaction successful:/);
+        this.logs.infos[this.logs.infos.length - 2].should.match(/Transaction successful:/);
+        this.logs.infos[this.logs.infos.length - 1].should.match(/Events emitted:/);
+      });
+    });
+
+    context('when the method does not emit any event', function() {
+      it('calls the function and logs the transaction hash and events', async function() {
+        const proxyAddress = this.networkFile.getProxies({ contract: 'Impl'})[0].address;
+        await sendTx({ network, txParams, networkFile: this.networkFile, proxyAddress, methodName: 'initialize', methodArgs: [42] });
+
+        this.logs.infos[this.logs.infos.length - 1].should.match(/Transaction successful:/);
+      });
     });
   });
 });

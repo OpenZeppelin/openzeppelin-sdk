@@ -1,3 +1,5 @@
+import isEmpty from 'lodash.isempty';
+
 import { Transactions, Logger, ZWeb3, TxParams, ABI } from 'zos-lib';
 import { isValidUnit, prettifyTokenAmount, toWei, fromWei } from '../../utils/units';
 import { ERC20_PARTIAL_ABI } from '../../utils/constants';
@@ -5,6 +7,7 @@ import { allPromisesOrError } from '../../utils/async';
 import LocalController from '../local/LocalController';
 import ZosPackageFile from '../files/ZosPackageFile';
 import ZosNetworkFile from '../files/ZosNetworkFile';
+import Events from '../status/EventsFilter';
 
 const { buildCallData, callDescription } = ABI;
 const log = new Logger('TransactionController');
@@ -62,9 +65,14 @@ export default class TransactionController {
     const contract = localController.getContractClass(packageName, contractName).at(proxyAddress);
     const { method } = buildCallData(contract, methodName, methodArgs);
 
-    log.info(`Calling ${methodName} with: ${callDescription(method, methodArgs)}`);
-    const { transactionHash } = await Transactions.sendTransaction(contract.methods[methodName], methodArgs, this.txParams);
-    log.info(`Transaction successful: ${transactionHash}`);
+    log.info(`Calling: ${callDescription(method, methodArgs)}`);
+    try {
+      const { transactionHash, events } = await Transactions.sendTransaction(contract.methods[methodName], methodArgs, this.txParams);
+      log.info(`Transaction successful: ${transactionHash}`);
+      if(!isEmpty(events)) Events.describe(events);
+    } catch(error) {
+      throw Error(`Error while trying to send transaction to ${proxyAddress}. ${error}`);
+    }
   }
 
   private async getTokenInfo(accountAddress: string, contractAddress: string): Promise<ERC20TokenInfo | never> {

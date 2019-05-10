@@ -6,8 +6,15 @@ import "mock-stdlib/contracts/GreeterImpl.sol";
 contract ImplV1 {
   uint256 public value;
 
+  event InitializeEvent(uint256 value);
+
   function initialize(uint256 _value) public {
     value = _value;
+  }
+
+  function initializeWithEvent(uint256 _value) public {
+    value = _value;
+    emit InitializeEvent(value);
   }
 
   function say() public pure returns (string memory) {
