@@ -22,6 +22,7 @@ export interface TxParams {
   from?: string;
   value?: number | string;
   gas?: number | string;
+  gasPrice?: number | string;
 }
 
 // TS-TODO: Type Web3.
