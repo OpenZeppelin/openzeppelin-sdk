@@ -60,11 +60,14 @@ export default class TransactionController {
     const { method, contract } = this.getContractAndMethod(proxyAddress, methodName, methodArgs);
     try {
       log.info(`Calling: ${callDescription(method, methodArgs)}`);
-      const result = await contract.methods[methodName](...methodArgs).call({ ...this.txParams });
+      let result = await contract.methods[methodName](...methodArgs).call({ ...this.txParams });
+      if (typeof result === 'object' && Object.keys(result).length !== 0) {
+        result = `(${Object.values(result).join(', ')})`;
+      }
 
-      !isUndefined(result) && typeof result !== 'object'
-        ? log.info(`Call returned: ${result}`)
-        : log.info(`Method ${methodName} successfully called.`);
+      isUndefined(result) || typeof result === 'object'
+        ? log.info(`Method ${methodName} successfully called.`)
+        : log.info(`Call returned: ${result}`);
     } catch(error) {
       throw Error(`Error while trying to call ${proxyAddress}#${methodName}. ${error}`);
     }

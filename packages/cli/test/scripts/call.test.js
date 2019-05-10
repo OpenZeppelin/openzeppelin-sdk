@@ -97,6 +97,15 @@ contract('call script', function(accounts) {
           this.logs.infos[this.logs.infos.length - 1].should.eq(`Call returned: V1`);
         });
       });
+
+      context('when the method returns multiple values', function() {
+        it('calls the method and logs the returned values', async function() {
+          const proxyAddress = this.networkFile.getProxies({ contract: 'Impl'})[0].address;
+          await call({ network, txParams, networkFile: this.networkFile, proxyAddress, methodName: 'sayMore', methodArgs: [] });
+
+          this.logs.infos[this.logs.infos.length - 1].should.eq(`Call returned: (V1, 1)`);
+        });
+      });
     });
   });
 });

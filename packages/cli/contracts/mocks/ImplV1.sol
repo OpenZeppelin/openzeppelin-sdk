@@ -21,6 +21,10 @@ contract ImplV1 {
     return "V1";
   }
 
+  function sayMore() public pure returns (string memory, uint256) {
+    return ("V1", 1);
+  }
+
   function doesNotReturn() public pure {
     uint256 num = 42;
     num = num + 41;
