@@ -249,7 +249,8 @@ export default class ZosNetworkFile {
     const allProxies = flatMap(this.data.proxies || {}, (proxiesList, fullname) => (
       map(proxiesList, (proxyInfo) => ({
         ...fromContractFullName(fullname),
-        ...proxyInfo
+        ...proxyInfo,
+        kind: proxyInfo.kind || ProxyType.Upgradeable
       }))
     ));
     return filter(allProxies, (proxy) => (

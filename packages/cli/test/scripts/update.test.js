@@ -2,6 +2,7 @@
 require('../setup')
 
 import mapKeys from 'lodash.mapkeys';
+import omit from 'lodash.omit';
 import { Contracts, Proxy } from "zos-lib";
 import CaptureLogs from '../helpers/captureLogs';
 
@@ -67,9 +68,9 @@ contract('update script', function(accounts) {
     this.implV1Address = this.networkFile.contract('Impl').address;
     this.withLibraryImplV1Address = this.networkFile.contract('WithLibraryImpl').address;
 
-    await createProxy({ contractAlias: 'Impl', network, txParams, networkFile: this.networkFile });
-    await createProxy({ contractAlias: 'Impl', network, txParams, networkFile: this.networkFile });
-    await createProxy({ contractAlias: 'WithLibraryImpl', network, txParams, networkFile: this.networkFile });
+    this.proxy1 = await createProxy({ contractAlias: 'Impl', network, txParams, networkFile: this.networkFile });
+    this.proxy2 = await createProxy({ contractAlias: 'Impl', network, txParams, networkFile: this.networkFile });
+    this.proxy3 = await createProxy({ contractAlias: 'WithLibraryImpl', network, txParams, networkFile: this.networkFile });
   }
 
   const bumpVersion = async function () {
@@ -111,6 +112,9 @@ contract('update script', function(accounts) {
       });
 
       it('should upgrade the version of all proxies in the app', async function() {
+        this.networkFile.updateProxy({ contract: 'Impl', package: 'Herbs', address: this.proxy1.address }, proxy => (
+          omit(proxy, 'kind')
+        )); // remove proxy.kind to check it properly defaults to Upgradeable
         await update({ contractAlias: undefined, proxyAddress: undefined, all: true, network, txParams, networkFile: this.networkFile });
         await assertProxyInfo(this.networkFile, 'Impl', 0, { version: version_2, implementation: this.implV2Address });
         await assertProxyInfo(this.networkFile, 'Impl', 1, { version: version_2, implementation: this.implV2Address });
