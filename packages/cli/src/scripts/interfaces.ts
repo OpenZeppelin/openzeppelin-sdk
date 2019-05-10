@@ -131,7 +131,7 @@ export interface QueryDeploymentParams extends Network {
 export interface TransferParams {
   to: string;
   value: string;
-  txParams: any;
+  txParams: TxParams;
   unit?: string;
   from?: string;
 }

@@ -20,7 +20,7 @@ export default class TransactionController {
   public packageFile: ZosPackageFile;
   public networkFile: ZosNetworkFile;
 
-  constructor(txParams?: any, network?: string, networkFile?: ZosNetworkFile) {
+  constructor(txParams?: TxParams, network?: string, networkFile?: ZosNetworkFile) {
     if (txParams) this.txParams = txParams;
     if(!networkFile) {
       this.packageFile = new ZosPackageFile();
