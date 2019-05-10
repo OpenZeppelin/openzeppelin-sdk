@@ -13,7 +13,7 @@ const description: string = 'send a transaction to the specified contract instan
 
 const register: (program: any) => any = (program) => program
   .command(signature, undefined, { noHelp: true })
-  .usage('[options]')
+  .usage('--to <to> --method <method> [options]')
   .description(description)
   .option('--to <to>', 'address of the contract that will receive the transaction')
   .option('--method <method>', `name of the method to execute in the contract`)

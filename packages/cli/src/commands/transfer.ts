@@ -10,7 +10,7 @@ const description: string = 'send funds to a given address';
 
 const register: (program: any) => any = (program) => program
   .command(signature, undefined, { noHelp: true })
-  .usage('[options]')
+  .usage('--network <network> [options]')
   .description(description)
   .option('--to <to>', 'specify recipient address')
   .option('--value <value>', 'the amount of ether units to be transferred')
