@@ -1,0 +1,83 @@
+import pickBy from 'lodash.pickby';
+
+import call from '../scripts/call';
+import { parseContractReference } from '../utils/contract';
+import ConfigVariablesInitializer from '../models/initializer/ConfigVariablesInitializer';
+import { promptIfNeeded, networksList, promptForNetwork, argsList, methodsList, proxiesList, proxyInfo, InquirerQuestions } from '../prompts/prompt';
+import { SendTxPropsParams, SendTxSelectionParams } from './interfaces';
+import promptForMethodParams from '../prompts/method-params';
+
+const name: string = 'call';
+const signature: string = name;
+const description: string = 'call a method of the specified contract instance. Provide the [address], method to call and its arguments if needed';
+
+const register: (program: any) => any = (program) => program
+  .command(signature, undefined, { noHelp: true })
+  .usage('--to <to> --method <method> [options]')
+  .description(description)
+  .option('--to <to>', 'address of the contract that will receive the transaction')
+  .option('--method <method>', `name of the method to execute in the contract`)
+  .option('--args <arg1, arg2, ...>', 'arguments to the method to execute')
+  .withNetworkOptions()
+  .withNonInteractiveOption()
+  .action(action);
+
+async function action(options: any): Promise<void> {
+  const { interactive, to: proxyAddress } = options;
+  const networkOpts = await promptForNetwork(options, () => getCommandProps());
+  const { network, txParams } = await ConfigVariablesInitializer.initNetworkConfiguration({ ...options, ...networkOpts });
+
+  const { contractFullName, proxyReference } = await promptForProxy(proxyAddress, network, options);
+  const methodParams = await promptForMethodParams(contractFullName, getCommandProps, options, {}, true);
+  const args = pickBy({ ...methodParams, proxyAddress: proxyReference });
+  await call({ ...args, network, txParams });
+
+  if (!options.dontExitProcess && process.env.NODE_ENV !== 'test') process.exit(0);
+}
+
+async function promptForProxy(proxyAddress: string, network: string, options: any): Promise<SendTxSelectionParams> {
+  const { interactive } = options;
+  const opts = { proxy: proxyAddress };
+  const props = getCommandProps({ network });
+  const { proxy: promptedProxy } = await promptIfNeeded({ opts, props }, interactive);
+
+  return promptedProxy;
+}
+
+function getCommandProps({ network, contractFullName, methodName, methodArgs }: SendTxPropsParams = {}): InquirerQuestions {
+  const methods = methodsList(contractFullName, true);
+  const args = argsList(contractFullName, methodName, true)
+    .reduce((accum, argName, index) => {
+      return {
+        ...accum,
+        [argName]: {
+          message: `${argName}:`,
+          type: 'input',
+          when: () => !methodArgs || !methodArgs[index]
+        }
+      };
+    }, {});
+
+  return {
+    ...networksList('network', 'list'),
+    proxy: {
+      message: 'Choose an instance',
+      type: 'list',
+      choices: () => proxiesList('byAddress', network),
+      normalize: (input) => typeof input !== 'object' ? proxyInfo(parseContractReference(input), network) : input
+    },
+    methodName: {
+      type: 'list',
+      message: 'Select a method',
+      choices: methods,
+      normalize: (input) => {
+        if (typeof input !== 'object') {
+          return { name: input, selector: input };
+        } else return input;
+      }
+    },
+    ...args
+  };
+}
+
+export default { name, signature, description, register, action };

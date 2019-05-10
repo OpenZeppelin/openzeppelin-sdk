@@ -20,6 +20,11 @@ contract ImplV1 {
   function say() public pure returns (string memory) {
     return "V1";
   }
+
+  function doesNotReturn() public pure {
+    uint256 num = 42;
+    num = num + 41;
+  }
 }
 
 contract ChildImplV1 is ImplV1 {
