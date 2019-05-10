@@ -16,6 +16,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Optimized `initializer` modifier from `Initializable` contract to use less gas ([#613](https://github.com/zeppelinos/zos/pull/613)) (thanks @k06a!)
 - Deployment of `Contract` class from lib now accepts a variable number of arguments for the constructor instead of an array ([#630](https://github.com/zeppelinos/zos/pull/630))
 
+### Fixed
+- Web3.js instance is no longer reset inbetween calls ([#836](https://github.com/zeppelinos/zos/pull/836)) (thanks @Perseverance!)
+- Changing the proxy admin now checks that sender is the current admin before sending the transaction ([#840](https://github.com/zeppelinos/zos/pull/840))
+
 ## v2.2.3 - 2019-04-12
 
 ### Fixed
