@@ -121,9 +121,18 @@ export function createContract(schema: any): Contract {
   return _wrapContractInstance(schema, contract);
 }
 
+export function contractMethodsFromAbi(instance: Contract, constant: boolean = false): any[] {
+  return instance.schema.abi
+    .filter(({ constant: isConstant, type }) => constant === isConstant && type === 'function')
+    .map(method => {
+      const { name, inputs } = method;
+      const selector = `${name}(${inputs.map(({ type }) => type)})`;
+      return { selector, ...method };
+    });
+}
+
 // get methods from AST, as there is no info about the modifiers in the ABI
-export function contractMethodsFromAst(instance: Contract, properties: { constant?: boolean } = { constant: false }): ContractMethod[] {
-  const { constant } = properties;
+export function contractMethodsFromAst(instance: Contract, constant: boolean = false): ContractMethod[] {
   const mutabilities = constant ? ['view', 'pure'] : ['payable', 'nonpayable'];
   const contractAst = new ContractAST(instance, null, { nodesFilter: ['ContractDefinition'] });
 
