@@ -119,7 +119,7 @@ describe('prompt', function() {
 
       context('when providing an unexistent contract in the package', function() {
         it('returns an empty array of methods', function() {
-          const methods = methodsList('Foobar', { constant: false }, this.packageFile);
+          const methods = methodsList('Foobar', false, this.packageFile);
           methods.should.be.an('array').that.is.empty;
         });
       });
@@ -127,7 +127,7 @@ describe('prompt', function() {
       context('when providing an existent contract', function() {
         context('when querying constant methods', function() {
           it('returns an array of constant methods', function() {
-            const methods = methodsList('Greeter', { constant: true }, this.packageFile);
+            const methods = methodsList('Greeter', true, this.packageFile);
             methods.should.be.an('array');
             methods.should.have.lengthOf(2);
             methods[0].should.be.an('object').that.has.all.keys('name', 'value');
@@ -138,7 +138,7 @@ describe('prompt', function() {
 
         context('when querying non-constant methods', function() {
           it('returns an array of non-constant methods', function() {
-            const methods = methodsList('Greeter', { constant: false }, this.packageFile);
+            const methods = methodsList('Greeter', false, this.packageFile);
             methods.should.be.an('array');
             methods.should.have.lengthOf(1);
             methods[0].should.be.an('object').that.has.all.keys('name', 'value');
@@ -156,21 +156,21 @@ describe('prompt', function() {
 
       context('when providing an unexistent contract in the package', function() {
         it('returns an empty array', function() {
-          const args = argsList('Foobar', 'foo()', {}, this.packageFile);
+          const args = argsList('Foobar', 'foo()', false, this.packageFile);
           args.should.be.an('array').that.is.empty;
         });
       });
 
       context('when providing an existent contract but an existent identifier', function() {
         it('returns an empty array', function() {
-          const args = argsList('Greeter', 'foo(string)', {}, this.packageFile);
+          const args = argsList('Greeter', 'foo(string)', false, this.packageFile);
           args.should.be.an('array').that.is.empty;
         });
       });
 
       context('when providing an existent contract and identifier', function() {
         it('returns an array of method arguments names', function() {
-          const args = argsList('Greeter', 'greet(string)', {}, this.packageFile);
+          const args = argsList('Greeter', 'greet(string)', false, this.packageFile);
           args.should.be.an('array');
           args[0].should.eq('who');
         });
