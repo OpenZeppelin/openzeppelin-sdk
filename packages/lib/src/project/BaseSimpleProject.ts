@@ -122,6 +122,18 @@ export default abstract class BaseSimpleProject {
     return contract.at(proxy.address);
   }
 
+  public async createMinimalProxy(contract, { packageName, contractName, initMethod, initArgs, redeployIfChanged }: ContractInterface = {}): Promise<Contract> {
+    if (!isEmpty(initArgs) && !initMethod) initMethod = 'initialize';
+    const implementationAddress = await this._getOrDeployImplementation(contract, packageName, contractName, redeployIfChanged);
+    const initCallData = this._getAndLogInitCallData(contract, initMethod, initArgs, implementationAddress, 'Creating');
+
+    const proxyFactory = await this.ensureProxyFactory();
+    const proxy = await proxyFactory.createMinimalProxy(implementationAddress, initCallData);
+
+    log.info(`Instance created at ${proxy.address}`);
+    return contract.at(proxy.address);
+  }
+
   // REFACTOR: De-duplicate from AppProject
   public async getProxyDeploymentAddress(salt: string, sender?: string): Promise<string> {
     const proxyFactory = await this.ensureProxyFactory();
