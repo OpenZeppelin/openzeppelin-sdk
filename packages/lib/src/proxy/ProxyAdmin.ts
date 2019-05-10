@@ -53,6 +53,7 @@ export default class ProxyAdmin {
   }
 
   public async transferOwnership(newAdminOwner: string): Promise<void> {
+    await this.checkOwner();
     log.info(`Changing ownership for proxy admin to ${newAdminOwner}...`);
     await Transactions.sendTransaction(this.contract.methods.transferOwnership, [newAdminOwner], { ...this.txParams });
     log.info(`Owner for proxy admin set to ${newAdminOwner}`);
@@ -60,6 +61,14 @@ export default class ProxyAdmin {
 
   public async getOwner(): Promise<string> {
     return await this.contract.methods.owner().call({ ...this.txParams });
+  }
+
+  private async checkOwner(): Promise<void | never> {
+    const currentOwner: string = await this.getOwner();
+    const { from } = this.txParams;
+    if (from && currentOwner !== from) {
+      throw new Error(`Cannot change ownership from non-owner account: current owner is ${currentOwner} and sender is ${from}`);
+    }
   }
 
   private async _upgradeProxy(proxyAddress: string, implementation: string): Promise<any> {
