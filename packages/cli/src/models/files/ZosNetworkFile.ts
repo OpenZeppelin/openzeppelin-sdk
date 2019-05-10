@@ -244,7 +244,7 @@ export default class ZosNetworkFile {
     return !isEmpty(this.dependencies);
   }
 
-  public getProxies({ package: packageName, contract, address }: ProxyInterface = {}): ProxyInterface[] {
+  public getProxies({ package: packageName, contract, address, kind }: ProxyInterface = {}): ProxyInterface[] {
     if (isEmpty(this.data.proxies)) return [];
     const allProxies = flatMap(this.data.proxies || {}, (proxiesList, fullname) => (
       map(proxiesList, (proxyInfo) => ({
@@ -255,7 +255,8 @@ export default class ZosNetworkFile {
     return filter(allProxies, (proxy) => (
       (!packageName || proxy.package === packageName) &&
       (!contract || proxy.contract === contract) &&
-      (!address || proxy.address === address)
+      (!address || proxy.address === address) &&
+      (!kind || proxy.kind === kind)
     ));
   }
 

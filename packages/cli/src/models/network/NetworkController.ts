@@ -744,7 +744,8 @@ export default class NetworkController {
     const proxies = this.networkFile.getProxies({
       package: packageName || (contractAlias ? this.packageFile.name : undefined),
       contract: contractAlias,
-      address: proxyAddress
+      address: proxyAddress,
+      kind: ProxyType.Upgradeable
     });
 
     if (isEmpty(proxies)) {
