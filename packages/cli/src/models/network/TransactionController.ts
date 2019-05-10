@@ -1,6 +1,7 @@
 import isEmpty from 'lodash.isempty';
+import isUndefined from 'lodash.isundefined';
 
-import { Transactions, Logger, ZWeb3, TxParams, ABI } from 'zos-lib';
+import { Contract, Transactions, Logger, ZWeb3, TxParams, ABI } from 'zos-lib';
 import { isValidUnit, prettifyTokenAmount, toWei, fromWei } from '../../utils/units';
 import { ERC20_PARTIAL_ABI } from '../../utils/constants';
 import { allPromisesOrError } from '../../utils/async';
@@ -55,18 +56,24 @@ export default class TransactionController {
     }
   }
 
-  public async sendTransaction(proxyAddress: string, methodName: string, methodArgs: string[]): Promise<any> {
-    if (!this.networkFile.hasProxies({ address: proxyAddress })) {
-      throw Error(`Proxy at address ${proxyAddress} not found.`);
-    }
-
-    const { package: packageName, contract: contractName } = this.networkFile.getProxy(proxyAddress);
-    const contractManager = new ContractManager(this.packageFile);
-    const contract = contractManager.getContractClass(packageName, contractName).at(proxyAddress);
-    const { method } = buildCallData(contract, methodName, methodArgs);
-
-    log.info(`Calling: ${callDescription(method, methodArgs)}`);
+  public async callContractMethod(proxyAddress: string, methodName: string, methodArgs: string[]): Promise<void | never> {
+    const { method, contract } = this.getContractAndMethod(proxyAddress, methodName, methodArgs);
     try {
+      log.info(`Calling: ${callDescription(method, methodArgs)}`);
+      const result = await contract.methods[methodName](...methodArgs).call({ ...this.txParams });
+
+      !isUndefined(result) && typeof result !== 'object'
+        ? log.info(`Call returned: ${result}`)
+        : log.info(`Method ${methodName} successfully called.`);
+    } catch(error) {
+      throw Error(`Error while trying to call ${proxyAddress}#${methodName}. ${error}`);
+    }
+  }
+
+  public async sendTransaction(proxyAddress: string, methodName: string, methodArgs: string[]): Promise<void | never> {
+    const { method, contract } = this.getContractAndMethod(proxyAddress, methodName, methodArgs);
+    try {
+      log.info(`Calling: ${callDescription(method, methodArgs)}`);
       const { transactionHash, events } = await Transactions.sendTransaction(contract.methods[methodName], methodArgs, this.txParams);
       log.info(`Transaction successful: ${transactionHash}`);
       if(!isEmpty(events)) Events.describe(events);
@@ -92,5 +99,15 @@ export default class TransactionController {
     }
 
     return { balance, tokenSymbol, tokenDecimals };
+  }
+
+  private getContractAndMethod(address: string, methodName: string, methodArgs: string[]): { contract: Contract, method: any } | never {
+    if (!this.networkFile.hasProxies({ address })) throw Error(`Proxy at address ${address} not found.`);
+    const { package: packageName, contract: contractName } = this.networkFile.getProxy(address);
+    const contractManager = new ContractManager(this.packageFile);
+    const contract = contractManager.getContractClass(packageName, contractName).at(address);
+    const { method } = buildCallData(contract, methodName, methodArgs);
+
+    return { contract, method };
   }
 }
