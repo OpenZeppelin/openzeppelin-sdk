@@ -5,7 +5,7 @@ import { parseContractReference } from '../utils/contract';
 import ConfigVariablesInitializer from '../models/initializer/ConfigVariablesInitializer';
 import { promptIfNeeded, networksList, promptForNetwork, argsList, methodsList, proxiesList, proxyInfo, InquirerQuestions } from '../prompts/prompt';
 import { SendTxPropsParams, SendTxSelectionParams } from './interfaces';
-import promptForMethod from '../prompts/method-params';
+import promptForMethodParams from '../prompts/method-params';
 
 const name: string = 'send-tx';
 const signature: string = name;
@@ -30,7 +30,7 @@ async function action(options: any): Promise<void> {
   const { network, txParams } = await ConfigVariablesInitializer.initNetworkConfiguration({ ...options, ...networkOpts });
 
   const { contractFullName, proxyReference } = await promptForProxy(proxyAddress, network, options);
-  const methodParams = await promptForMethod(contractFullName, getCommandProps, options);
+  const methodParams = await promptForMethodParams(contractFullName, getCommandProps, options);
   const args = pickBy({ ...methodParams, proxyAddress: proxyReference, value, gas });
   await sendTx({ ...args, network, txParams });
 

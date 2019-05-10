@@ -42,9 +42,9 @@ async function action(proxyReference: string, options: any): Promise<void> {
   const promptedProxyInfo = await promptForProxies(proxyReference, network, options);
   const parsedContractReference = parseContractReference(promptedProxyInfo.proxyReference);
 
-  const promptMethodOpts = { askForMethodParams: rawInitMethod };
+  const additionalOpts = { askForMethodParams: rawInitMethod };
   const initMethodParams = promptedProxyInfo.proxyReference && !promptedProxyInfo.all
-    ? await promptForMethodParams(promptedProxyInfo.contractFullName, getCommandProps, options, promptMethodOpts)
+    ? await promptForMethodParams(promptedProxyInfo.contractFullName, getCommandProps, options, additionalOpts)
     : {};
 
   const args = pickBy({ all: promptedProxyInfo.all, force, ...parsedContractReference, ...initMethodParams });
