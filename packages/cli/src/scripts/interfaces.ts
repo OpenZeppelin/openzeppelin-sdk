@@ -24,10 +24,13 @@ interface Network {
   networkFile?: ZosNetworkFile;
 }
 
-interface Proxy extends Network, PackageArgs {
+interface MethodParams {
+  methodName: string;
+  methodArgs: string[];
+}
+
+interface Proxy extends Network, MethodParams, PackageArgs {
   proxyAddress?: string;
-  methodName?: string;
-  methodArgs?: string[];
   force?: boolean;
 }
 
@@ -128,7 +131,7 @@ export interface QueryDeploymentParams extends Network {
 export interface TransferParams {
   to: string;
   value: string;
-  txParams: any;
+  txParams: TxParams;
   unit?: string;
   from?: string;
 }
@@ -136,4 +139,10 @@ export interface TransferParams {
 export interface BalanceParams {
   accountAddress: string;
   contractAddress?: string;
+}
+
+export interface SendTxParams extends MethodParams, Network {
+  proxyAddress: string;
+  value?: string;
+  gas?: string;
 }

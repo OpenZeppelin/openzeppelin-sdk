@@ -8,7 +8,7 @@ import { contractMethodsFromAst } from 'zos-lib';
 import Session from '../models/network/Session';
 import Truffle from '../models/initializer/truffle/Truffle';
 import ZosPackageFile from '../models/files/ZosPackageFile';
-import LocalController from '../models/local/LocalController';
+import ContractManager from '../models/local/ContractManager';
 import Dependency from '../models/dependency/Dependency';
 import { fromContractFullName, toContractFullName } from '../utils/naming';
 
@@ -42,6 +42,10 @@ interface PromptParams {
   opts?: PromptParam;
   defaults?: PromptParam;
   props?: InquirerQuestions;
+}
+
+interface MethodOptions {
+  constant?: boolean;
 }
 
 export let DEFAULT_INTERACTIVE_STATUS = true;
@@ -144,8 +148,8 @@ export function contractsList(name: string, message: string, type: string, sourc
 }
 
 // Generate a list of methods names for a particular contract
-export function methodsList(contractFullName: string, packageFile?: ZosPackageFile): { [key: string]: any } {
-  return contractMethods(contractFullName, packageFile)
+export function methodsList(contractFullName: string, options: MethodOptions = { constant: false }, packageFile?: ZosPackageFile): { [key: string]: any } {
+  return contractMethods(contractFullName, options, packageFile)
     .map(({ name, hasInitializer, inputs, selector }) => {
       const initializable = hasInitializer ? `[Initializable] ` : '';
       const args = inputs.map(({ name: inputName, type }) => `${inputName}: ${type}`);
@@ -156,8 +160,8 @@ export function methodsList(contractFullName: string, packageFile?: ZosPackageFi
 }
 
 // Returns an inquirer question with a list of arguments for a particular method
-export function argsList(contractFullName: string, methodIdentifier: string, packageFile?: ZosPackageFile): string[] {
-  const method = contractMethods(contractFullName, packageFile)
+export function argsList(contractFullName: string, methodIdentifier: string, options: MethodOptions = { constant: false }, packageFile?: ZosPackageFile): string[] {
+  const method = contractMethods(contractFullName, options, packageFile)
     .find(({ name, selector }) => selector === methodIdentifier || name === methodIdentifier);
   if (method) {
     return method
@@ -166,13 +170,13 @@ export function argsList(contractFullName: string, methodIdentifier: string, pac
   } else return [];
 }
 
-function contractMethods(contractFullName: string, packageFile: ZosPackageFile): any[] {
+function contractMethods(contractFullName: string, options: MethodOptions, packageFile: ZosPackageFile): any[] {
   const { contract: contractAlias, package: packageName } = fromContractFullName(contractFullName);
-  const localController = new LocalController(packageFile);
-  if (!localController.hasContract(packageName, contractAlias)) return [];
-  const contract = localController.getContractClass(packageName, contractAlias);
+  const contractManager = new ContractManager(packageFile);
+  if (!contractManager.hasContract(packageName, contractAlias)) return [];
+  const contract = contractManager.getContractClass(packageName, contractAlias);
 
-  return contractMethodsFromAst(contract);
+  return contractMethodsFromAst(contract, options);
 }
 
 export function proxyInfo(contractInfo: any, network: string): any {

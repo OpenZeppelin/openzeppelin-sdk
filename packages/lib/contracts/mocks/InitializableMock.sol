@@ -23,6 +23,10 @@ contract InitializableMock is Initializable {
     x = _x;
   }
 
+  function nonInitializable(uint256 _x) public payable {
+    x = _x;
+  }
+
   function fail() public pure {
     require(false, "InitializableMock forced failure");
   }

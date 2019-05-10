@@ -20,8 +20,9 @@ const NETWORKS = {
 
 export interface TxParams {
   from?: string;
-  gas?: number;
-  gasPrice?: number;
+  value?: number | string;
+  gas?: number | string;
+  gasPrice?: number | string;
 }
 
 // TS-TODO: Type Web3.

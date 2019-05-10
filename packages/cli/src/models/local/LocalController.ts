@@ -130,27 +130,6 @@ export default class LocalController {
   }
 
   // Contract model
-  public getContractClass(packageName: string, contractAlias: string): Contract {
-    if (!packageName || packageName === this.packageFile.name) {
-      const contractName = this.packageFile.contract(contractAlias);
-      return Contracts.getFromLocal(contractName);
-    } else {
-      const dependency = new Dependency(packageName);
-      const contractName = dependency.getPackageFile().contract(contractAlias);
-      return Contracts.getFromNodeModules(packageName, contractName);
-    }
-  }
-
-  public hasContract(packageName: string, contractAlias: string): boolean {
-    if (!packageName || packageName === this.packageFile.name) {
-      return !!this.packageFile.contract(contractAlias);
-    } else{
-      const dependency = new Dependency(packageName);
-      return !!dependency.getPackageFile().contract(contractAlias);
-    }
-  }
-
-  // Contract model
   public getContractSourcePath(contractAlias: string): { sourcePath: string, compilerVersion: string } | never {
     const contractName = this.packageFile.contract(contractAlias);
     if (contractName) {

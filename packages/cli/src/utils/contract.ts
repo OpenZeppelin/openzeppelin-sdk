@@ -1,4 +1,6 @@
+import { Contracts, Contract } from 'zos-lib';
 import { fromContractFullName } from './naming';
+import Dependency from '../models/dependency/Dependency';
 
 export interface ParsedContractReference {
   proxyAddress: string | undefined;
@@ -18,4 +20,15 @@ export function parseContractReference(contractReference: string): ParsedContrac
   }
 
   return { proxyAddress, contractAlias, packageName };
+}
+
+export function getContractClass(packageName: string, contractAlias: string): Contract {
+  if (!packageName || packageName === this.packageFile.name) {
+    const contractName = this.packageFile.contract(contractAlias);
+    return Contracts.getFromLocal(contractName);
+  } else {
+    const dependency = new Dependency(packageName);
+    const contractName = dependency.getPackageFile().contract(contractAlias);
+    return Contracts.getFromNodeModules(packageName, contractName);
+  }
 }

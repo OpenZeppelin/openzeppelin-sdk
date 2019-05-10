@@ -6,11 +6,16 @@ import { promptIfNeeded, argsList, InquirerQuestions } from './prompt';
 
 type PropsFn = (any) => InquirerQuestions;
 
-export default async function promptForMethodParams(contractFullName: string, getCommandProps: PropsFn, options: any): Promise<{ methodName: string, methodArgs: string[] }> {
+export default async function promptForMethodParams(
+  contractFullName: string,
+  getCommandProps: PropsFn,
+  options: any,
+  promptMethodOpts: { [key: string]: string } = {}
+): Promise<{ methodName: string, methodArgs: string[] }> {
+
   const { interactive } = options;
   let { methodName, methodArgs } = parseMethodParams(options, 'initialize');
-  const { init: rawInitMethod } = options;
-  const opts = { askForMethodParams: rawInitMethod, methodName };
+  const opts = { ...promptMethodOpts, methodName };
   const methodProps = getCommandProps({ contractFullName, methodName });
 
   // prompt for method name if not provided

@@ -122,10 +122,15 @@ export function createContract(schema: any): Contract {
 }
 
 // get methods from AST, as there is no info about the modifiers in the ABI
-export function contractMethodsFromAst(instance: Contract): ContractMethod[] {
+export function contractMethodsFromAst(instance: Contract, properties: { constant?: boolean } = { constant: false }): ContractMethod[] {
+  const { constant } = properties;
+  const mutabilities = constant ? ['view', 'pure'] : ['payable', 'nonpayable'];
   const contractAst = new ContractAST(instance, null, { nodesFilter: ['ContractDefinition'] });
+
   return contractAst.getMethods()
-    .filter(({ visibility }) => visibility === 'public' || visibility === 'external')
+    .filter(({ visibility, stateMutability }) => {
+      return (visibility === 'public' || visibility === 'external') && mutabilities.includes(stateMutability);
+    })
     .map(method => {
       const initializer = method
         .modifiers

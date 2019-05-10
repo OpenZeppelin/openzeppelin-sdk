@@ -9,7 +9,7 @@ const description: string = 'query the balance of the specified account';
 
 const register: (program: any) => any = (program) => program
   .command(signature, undefined, { noHelp: true })
-  .usage('[options]')
+  .usage('--network <network> [options]')
   .description(description)
   .option('--erc20 <contractAddress>', 'query the balance of an ERC20 token instead of ETH')
   .withNetworkOptions()

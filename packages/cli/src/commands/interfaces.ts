@@ -1,28 +1,38 @@
-export interface SetAdminPropsParams {
-  network?: string;
-  all?: boolean;
+export interface SetAdminPropsParams extends SharedPropsParams {}
+
+export interface SendTxSelectionParams extends SharedSelectionParams {}
+
+export interface UpdateSelectionParams extends SharedSelectionParams {
+  all: boolean;
 }
 
-export interface SetAdminSelectionParams {
-  address?: string;
+export interface SendTxPropsParams extends SharedPropsParams, MethodParams {
   contractFullName?: string;
+  proxyAddress?: string;
+}
+
+export interface UpdatePropsParams extends SharedPropsParams, MethodParams {
   proxyReference?: string;
+  contractFullName?: string;
+}
+
+export interface SetAdminSelectionParams extends SharedSelectionParams {
   all: boolean;
   newAdmin?: string;
 }
 
-export interface UpdatePropsParams {
-  contractReference?: string;
+interface SharedPropsParams {
   network?: string;
   all?: boolean;
-  contractFullName?: string;
-  methodName?: string;
-  methodArgs?: string[];
 }
 
-export interface UpdateSelectionParams {
-  address: string | undefined;
-  contractFullName: string | undefined;
-  proxyReference: string | undefined;
-  all: boolean;
+interface SharedSelectionParams {
+  contractFullName?: string;
+  proxyReference?: string;
+  address?: string;
+}
+
+interface MethodParams {
+  methodName?: string;
+  methodArgs?: string[];
 }
