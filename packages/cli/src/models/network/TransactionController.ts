@@ -6,7 +6,7 @@ import LocalController from '../local/LocalController';
 import ZosPackageFile from '../files/ZosPackageFile';
 import ZosNetworkFile from '../files/ZosNetworkFile';
 
-const { buildCallData, callDescription }  = ABI;
+const { buildCallData, callDescription } = ABI;
 const log = new Logger('TransactionController');
 
 interface ERC20TokenInfo {
@@ -64,7 +64,7 @@ export default class TransactionController {
 
     log.info(`Calling ${methodName} with: ${callDescription(method, methodArgs)}`);
     const { transactionHash } = await Transactions.sendTransaction(contract.methods[methodName], methodArgs, this.txParams);
-    log.info(`Function successfully called! Transaction hash: ${transactionHash}`);
+    log.info(`Transaction successful: ${transactionHash}`);
   }
 
   private async getTokenInfo(accountAddress: string, contractAddress: string): Promise<ERC20TokenInfo | never> {
