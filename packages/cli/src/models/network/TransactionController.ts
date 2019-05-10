@@ -4,7 +4,7 @@ import { Transactions, Logger, ZWeb3, TxParams, ABI } from 'zos-lib';
 import { isValidUnit, prettifyTokenAmount, toWei, fromWei } from '../../utils/units';
 import { ERC20_PARTIAL_ABI } from '../../utils/constants';
 import { allPromisesOrError } from '../../utils/async';
-import LocalController from '../local/LocalController';
+import ContractManager from '../local/ContractManager';
 import ZosPackageFile from '../files/ZosPackageFile';
 import ZosNetworkFile from '../files/ZosNetworkFile';
 import Events from '../status/EventsFilter';
@@ -61,8 +61,8 @@ export default class TransactionController {
     }
 
     const { package: packageName, contract: contractName } = this.networkFile.getProxy(proxyAddress);
-    const localController = new LocalController(this.packageFile);
-    const contract = localController.getContractClass(packageName, contractName).at(proxyAddress);
+    const contractManager = new ContractManager(this.packageFile);
+    const contract = contractManager.getContractClass(packageName, contractName).at(proxyAddress);
     const { method } = buildCallData(contract, methodName, methodArgs);
 
     log.info(`Calling: ${callDescription(method, methodArgs)}`);

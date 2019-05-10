@@ -49,6 +49,7 @@ import StatusChecker from '../status/StatusChecker';
 import ValidationLogger from '../../interface/ValidationLogger';
 import Verifier from '../Verifier';
 import LocalController from '../local/LocalController';
+import ContractManager from '../local/ContractManager';
 import ZosNetworkFile, { ProxyInterface } from '../files/ZosNetworkFile';
 import ZosPackageFile from '../files/ZosPackageFile';
 import { ZOS_VERSION } from '../files/ZosVersion';
@@ -64,6 +65,7 @@ export default class NetworkController {
   public network: string;
   public networkFile: ZosNetworkFile;
   public project: Project;
+  private contractManager: ContractManager;
 
   constructor(network: string, txParams: TxParams, networkFile?: ZosNetworkFile) {
     if(!networkFile) {
@@ -73,6 +75,7 @@ export default class NetworkController {
       this.networkFile = networkFile;
     }
     this.localController = new LocalController(this.networkFile.packageFile);
+    this.contractManager = new ContractManager(this.networkFile.packageFile);
     this.txParams = txParams;
     this.network = network;
   }
@@ -538,7 +541,7 @@ export default class NetworkController {
     await this._migrateZosversionIfNeeded();
     await this.fetchOrDeploy(this.currentVersion);
     if (!packageName) packageName = this.packageFile.name;
-    const contract = this.localController.getContractClass(packageName, contractAlias);
+    const contract = this.contractManager.getContractClass(packageName, contractAlias);
     await this._setSolidityLibs(contract);
     this.checkInitialization(contract, initMethod, initArgs);
     if (salt) await this._checkDeploymentAddress(salt);
@@ -575,7 +578,7 @@ export default class NetworkController {
     await this._migrateZosversionIfNeeded();
     await this.fetchOrDeploy(this.currentVersion);
     if (!packageName) packageName = this.packageFile.name;
-    const contract = this.localController.getContractClass(packageName, contractAlias);
+    const contract = this.contractManager.getContractClass(packageName, contractAlias);
     const args = { packageName, contractName: contractAlias, initMethod, initArgs, admin };
     const signer = await this.project.getProxyDeploymentSigner(contract, salt, signature, args);
     const address = await this.project.getProxyDeploymentAddress(salt, signer);
@@ -685,7 +688,7 @@ export default class NetworkController {
   private async _upgradeProxy(proxy: ProxyInterface, initMethod: string, initArgs: string[]): Promise<void | never> {
     try {
       const name = { packageName: proxy.package, contractName: proxy.contract };
-      const contract = this.localController.getContractClass(proxy.package, proxy.contract);
+      const contract = this.contractManager.getContractClass(proxy.package, proxy.contract);
       await this._setSolidityLibs(contract);
       const currentImplementation = await Proxy.at(proxy.address).implementation();
       const contractImplementation = await this.project.getImplementation(name);

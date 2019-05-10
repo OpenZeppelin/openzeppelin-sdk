@@ -8,7 +8,7 @@ import LocalController from '../../src/models/local/LocalController';
 import ZosPackageFile from '../../src/models/files/ZosPackageFile';
 import { promptIfNeeded, contractsList, networksList, methodsList, argsList } from '../../src/prompts/prompt';
 
-contract('prompt', function(_, owner) {
+describe('prompt', function() {
   describe('functions', function() {
     describe('#promptIfNeeded', function() {
       beforeEach('set stub and initialize', function() {

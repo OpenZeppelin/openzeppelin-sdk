@@ -8,7 +8,7 @@ import { contractMethodsFromAst } from 'zos-lib';
 import Session from '../models/network/Session';
 import Truffle from '../models/initializer/truffle/Truffle';
 import ZosPackageFile from '../models/files/ZosPackageFile';
-import LocalController from '../models/local/LocalController';
+import ContractManager from '../models/local/ContractManager';
 import Dependency from '../models/dependency/Dependency';
 import { fromContractFullName, toContractFullName } from '../utils/naming';
 
@@ -172,9 +172,9 @@ export function argsList(contractFullName: string, methodIdentifier: string, opt
 
 function contractMethods(contractFullName: string, options: MethodOptions, packageFile: ZosPackageFile): any[] {
   const { contract: contractAlias, package: packageName } = fromContractFullName(contractFullName);
-  const localController = new LocalController(packageFile);
-  if (!localController.hasContract(packageName, contractAlias)) return [];
-  const contract = localController.getContractClass(packageName, contractAlias);
+  const contractManager = new ContractManager(packageFile);
+  if (!contractManager.hasContract(packageName, contractAlias)) return [];
+  const contract = contractManager.getContractClass(packageName, contractAlias);
 
   return contractMethodsFromAst(contract, options);
 }
