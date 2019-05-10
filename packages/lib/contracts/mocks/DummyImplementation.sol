@@ -25,12 +25,10 @@ contract DummyImplementation {
     value = _value;
   }
 
-event Bar(uint256 v);
   function initialize(uint256 _value, string memory _text, uint256[] memory _values) public {
     value = _value;
     text = _text;
     values = _values;
-    emit Bar(_value);
   }
 
   function get() public pure returns (bool) {

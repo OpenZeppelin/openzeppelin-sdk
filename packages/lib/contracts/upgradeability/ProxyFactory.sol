@@ -6,7 +6,6 @@ import "../cryptography/ECDSA.sol";
 contract ProxyFactory {
   
   event ProxyCreated(address proxy);
-  event Foo(bytes data);
 
   bytes32 private contractCodeHash;
 
@@ -32,9 +31,7 @@ contract ProxyFactory {
     if(_data.length > 0) {
       (bool success,) = proxy.call(_data);
       require(success);
-      emit Foo(_data);
-    }
-    
+    }    
   }
 
   function deploy(uint256 _salt, address _logic, address _admin, bytes memory _data) public returns (address) {
