@@ -33,6 +33,13 @@ contract('send-tx script', function(accounts) {
   });
 
   describe('validations', function() {
+    context('when not specifying proxy address', function() {
+      it('throws an error', async function() {
+        await sendTx({ network, txParams, networkFile: this.networkFile, methodName: 'initialize', methodArgs: [42] })
+          .should.be.rejectedWith('A contract address must be specified.');
+      });
+    });
+
     context('when specifying a non-existent proxy address', function() {
       it('throws an error', async function() {
         const proxyAddress = '0x124';
@@ -81,7 +88,7 @@ contract('send-tx script', function(accounts) {
       const proxyAddress = this.networkFile.getProxies({ contract: 'Impl'})[0].address;
       await sendTx({ network, txParams, networkFile: this.networkFile, proxyAddress, methodName: 'initialize', methodArgs: [42] });
 
-      this.logs.infos[this.logs.infos.length -1].should.match(/Function successfully called! Transaction hash:/);
+      this.logs.infos[this.logs.infos.length -1].should.match(/Transaction successful:/);
     });
   });
 });
