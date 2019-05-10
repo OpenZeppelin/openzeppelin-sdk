@@ -2,12 +2,17 @@
 require('../setup')
 
 import { stubCommands, itShouldParse } from './share';
+import { ProxyType } from '../../src/scripts/interfaces';
 
 describe('create command', function() {
   stubCommands()
 
   itShouldParse('should call create script with options', 'create', 'zos create Impl --network test --init setup --args 42 --force --from 0x40', function(create) {
     create.should.have.been.calledWithExactly( { contractAlias: 'Impl', methodName: 'setup', methodArgs: ['42'], force: true, network: 'test', txParams: { from: '0x40'} })
+  })
+
+  itShouldParse('should call create script with kind', 'create', 'zos create Impl --network test --init setup --args 42 --force --from 0x40 --minimal', function(create) {
+    create.should.have.been.calledWithExactly( { contractAlias: 'Impl', methodName: 'setup', methodArgs: ['42'], kind: ProxyType.Minimal, force: true, network: 'test', txParams: { from: '0x40'} })
   })
 
   itShouldParse('should call create script with options', 'create', 'zos create Boolean --network test --init initialize --args false --force --from 0x40', function(create) {

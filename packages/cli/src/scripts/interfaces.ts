@@ -31,10 +31,16 @@ interface Proxy extends Network, PackageArgs {
   force?: boolean;
 }
 
+export enum ProxyType {
+  Upgradeable = 'Upgradeable',
+  Minimal = 'Minimal'
+}
+
 export interface CreateParams extends Proxy {
   salt?: string;
   signature?: string;
   admin?: string;
+  kind?: ProxyType;
 }
 
 export interface CompareParams extends Network {}

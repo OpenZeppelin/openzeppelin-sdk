@@ -4,7 +4,7 @@ require('../setup')
 import random from 'lodash.random';
 
 import CaptureLogs from '../helpers/captureLogs';
-import { Contracts, Logger, helpers, Proxy } from 'zos-lib';
+import { Contracts, Logger, helpers, Proxy, MinimalProxy } from 'zos-lib';
 
 import add from '../../src/scripts/add';
 import push from '../../src/scripts/push';
@@ -12,6 +12,7 @@ import create from '../../src/scripts/create';
 import queryDeployment from '../../src/scripts/query-deployment';
 import link from '../../src/scripts/link';
 import ZosPackageFile from "../../src/models/files/ZosPackageFile";
+import { ProxyType } from '../../src/scripts/interfaces';
 
 const should = require('chai').should();
 
@@ -38,7 +39,7 @@ contract('create script', function([_, owner, otherAdmin]) {
   const version = '0.4.0';
   const txParams = { from: owner };
 
-  const assertProxy = async function(networkFile, alias, { version, say, implementation, packageName, value, checkBool, boolValue, admin, address }) {
+  const assertProxy = async function(networkFile, alias, { version, say, implementation, packageName, value, checkBool, boolValue, admin, address, minimal }) {
     const proxyInfo = networkFile.getProxies({ contract: alias })[0]
     proxyInfo.contract.should.eq(alias)
     proxyInfo.address.should.be.nonzeroAddress;
@@ -80,6 +81,13 @@ contract('create script', function([_, owner, otherAdmin]) {
 
     if (packageName) {
       proxyInfo.package.should.eq(packageName)
+    }
+
+    if (minimal) {
+      proxyInfo.kind.should.eq(ProxyType.Minimal);
+      proxyInfo.implementation.should.equalIgnoreCase(minimal);
+      const proxyImplementation = await MinimalProxy.at(proxyInfo.address).implementation();
+      proxyImplementation.should.equalIgnoreCase(minimal);
     }
 
     return proxyInfo;
@@ -128,7 +136,6 @@ contract('create script', function([_, owner, otherAdmin]) {
       await assertProxy(this.networkFile, booleanContractAlias, { version, checkBool: true, boolValue: true, implementation });
     });
 
-    // TODO: for some reason this test fails on travis
     xit('should record the proxy deployed address in contract build json file', async function () {
       await create({ contractAlias, network, txParams, networkFile: this.networkFile });
 
@@ -226,6 +233,20 @@ contract('create script', function([_, owner, otherAdmin]) {
       await create({ contractAlias, network, txParams, networkFile: this.networkFile, salt });
       await create({ contractAlias, network, txParams, networkFile: this.networkFile, salt })
         .should.be.rejectedWith(/Deployment address for salt \d+ is already in use/);
+    });
+
+    it('should create a minimal proxy for one of its contracts', async function() {
+      await create({ kind: ProxyType.Minimal, contractAlias, network, txParams, networkFile: this.networkFile });
+
+      const implementation = this.networkFile.contract(contractAlias).address;
+      await assertProxy(this.networkFile, contractAlias, { version, say: 'V1', minimal: implementation });
+    });
+
+    it('should properly initialize a minimal proxy with true boolean values', async function() {
+      await create({ kind: ProxyType.Minimal, contractAlias: booleanContractAlias, network, txParams, methodName: 'initialize', methodArgs: [true], networkFile: this.networkFile });
+
+      const implementation = this.networkFile.contract(booleanContractAlias).address;
+      await assertProxy(this.networkFile, booleanContractAlias, { version, checkBool: true, boolValue: true, minimal: implementation });
     });
 
     describe('warnings', function () {

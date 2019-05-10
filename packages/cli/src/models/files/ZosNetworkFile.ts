@@ -11,6 +11,7 @@ import { Logger, FileSystem as fs, bytecodeDigest, bodyCode, constructorCode, se
 import { fromContractFullName, toContractFullName } from '../../utils/naming';
 import { ZOS_VERSION, checkVersion } from './ZosVersion';
 import ZosPackageFile from './ZosPackageFile';
+import { ProxyType } from '../../scripts/interfaces';
 
 const log = new Logger('ZosNetworkFile');
 
@@ -42,6 +43,7 @@ export interface ProxyInterface {
   version?: string;
   implementation?: string;
   admin?: string;
+  kind?: ProxyType;
 }
 
 export interface DependencyInterface {

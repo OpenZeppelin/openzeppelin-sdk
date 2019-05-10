@@ -34,6 +34,7 @@ const assertEvent = helpers.assertEvent;
 
 // model objects
 import Proxy from './proxy/Proxy';
+import MinimalProxy from './proxy/MinimalProxy';
 import ProxyAdmin from './proxy/ProxyAdmin';
 import ProxyFactory from './proxy/ProxyFactory';
 import App from './application/App';
@@ -97,5 +98,6 @@ export {
   Contract,
   ProxyAdminProject,
   ValidationInfo,
-  AppProxyMigrator
+  AppProxyMigrator,
+  MinimalProxy
 };
