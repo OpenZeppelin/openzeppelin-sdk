@@ -15,7 +15,7 @@ const register: (program: any) => any = (program) => program
   .command(signature, undefined, { noHelp: true })
   .usage('--to <to> --method <method> [options]')
   .description(description)
-  .option('--to <to>', 'address of the contract that will receive the transaction')
+  .option('--to <to>', 'address of the contract that will receive the call')
   .option('--method <method>', `name of the method to execute in the contract`)
   .option('--args <arg1, arg2, ...>', 'arguments to the method to execute')
   .withNetworkOptions()
