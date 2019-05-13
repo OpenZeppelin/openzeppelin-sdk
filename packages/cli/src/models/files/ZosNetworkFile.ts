@@ -11,6 +11,7 @@ import { Logger, FileSystem as fs, bytecodeDigest, bodyCode, constructorCode, se
 import { fromContractFullName, toContractFullName } from '../../utils/naming';
 import { ZOS_VERSION, checkVersion } from './ZosVersion';
 import ZosPackageFile from './ZosPackageFile';
+import { ProxyType } from '../../scripts/interfaces';
 
 const log = new Logger('ZosNetworkFile');
 
@@ -42,6 +43,7 @@ export interface ProxyInterface {
   version?: string;
   implementation?: string;
   admin?: string;
+  kind?: ProxyType;
 }
 
 export interface DependencyInterface {
@@ -242,18 +244,20 @@ export default class ZosNetworkFile {
     return !isEmpty(this.dependencies);
   }
 
-  public getProxies({ package: packageName, contract, address }: ProxyInterface = {}): ProxyInterface[] {
+  public getProxies({ package: packageName, contract, address, kind }: ProxyInterface = {}): ProxyInterface[] {
     if (isEmpty(this.data.proxies)) return [];
     const allProxies = flatMap(this.data.proxies || {}, (proxiesList, fullname) => (
       map(proxiesList, (proxyInfo) => ({
         ...fromContractFullName(fullname),
-        ...proxyInfo
+        ...proxyInfo,
+        kind: proxyInfo.kind || ProxyType.Upgradeable
       }))
     ));
     return filter(allProxies, (proxy) => (
       (!packageName || proxy.package === packageName) &&
       (!contract || proxy.contract === contract) &&
-      (!address || proxy.address === address)
+      (!address || proxy.address === address) &&
+      (!kind || proxy.kind === kind)
     ));
   }
 

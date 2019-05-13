@@ -10,6 +10,7 @@ import { hasToMigrateProject } from '../prompts/migrations';
 import ConfigVariablesInitializer from '../models/initializer/ConfigVariablesInitializer';
 import { promptIfNeeded, networksList, contractsList, methodsList, argsList } from '../prompts/prompt';
 import promptForMethodParams from '../prompts/method-params';
+import { ProxyType } from '../scripts/interfaces';
 
 interface PropsParams {
   contractFullName?: string;
@@ -28,6 +29,7 @@ const register: (program: any) => any = (program) => program
   .option('--init [function]', `call function after creating contract. If none is given, 'initialize' will be used`)
   .option('--args <arg1, arg2, ...>', 'provide initialization arguments for your contract if required')
   .option('--force', 'force creation even if contracts have local modifications')
+  .option('--minimal', 'creates a cheaper but non-upgradeable instance instead, using a minimal proxy')
   .withNetworkOptions()
   .withNonInteractiveOption()
   .action(commandActions);
@@ -52,6 +54,7 @@ async function action(contractFullName: string, options: any) {
   const { force, methodName, methodArgs, network, txParams } = options;
   const { contract: contractAlias, package: packageName } = fromContractFullName(contractFullName);
   const args = pickBy({ packageName, contractAlias, methodName, methodArgs, force });
+  if (options.minimal) args.kind = ProxyType.Minimal;
 
   if (!await hasToMigrateProject(network)) process.exit(0);
 

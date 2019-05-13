@@ -38,7 +38,8 @@ import {
   TxParams,
   ProxyAdmin,
   SimpleProject,
-  AppProxyMigrator
+  AppProxyMigrator,
+  MinimalProxy
 } from 'zos-lib';
 import { isMigratableZosversion } from '../files/ZosVersion';
 import { allPromisesOrError } from '../../utils/async';
@@ -53,6 +54,7 @@ import ContractManager from '../local/ContractManager';
 import ZosNetworkFile, { ProxyInterface } from '../files/ZosNetworkFile';
 import ZosPackageFile from '../files/ZosPackageFile';
 import { ZOS_VERSION } from '../files/ZosVersion';
+import { ProxyType } from '../../scripts/interfaces';
 
 const log = new Logger('NetworkController');
 type Project = ProxyAdminProject | AppProject;
@@ -537,7 +539,7 @@ export default class NetworkController {
   }
 
   // Proxy model
-  public async createProxy(packageName: string, contractAlias: string, initMethod: string, initArgs: string[], admin?: string, salt?: string, signature?: string): Promise<Contract> {
+  public async createProxy(packageName: string, contractAlias: string, initMethod: string, initArgs: string[], admin?: string, salt?: string, signature?: string, kind?: ProxyType): Promise<Contract> {
     await this._migrateZosversionIfNeeded();
     await this.fetchOrDeploy(this.currentVersion);
     if (!packageName) packageName = this.packageFile.name;
@@ -547,22 +549,46 @@ export default class NetworkController {
     if (salt) await this._checkDeploymentAddress(salt);
 
     const createArgs = { packageName, contractName: contractAlias, initMethod, initArgs, admin };
-    const proxyInstance = salt
-      ? await this.project.createProxyWithSalt(contract, salt, signature, createArgs)
-      : await this.project.createProxy(contract, createArgs);
+    const { proxy, instance } = await this.createProxyInstance(kind, salt, contract, signature, createArgs);
 
-    const implementationAddress = await Proxy.at(proxyInstance).implementation();
+    const implementationAddress = await proxy.implementation();
     const packageVersion = packageName === this.packageFile.name ? this.currentVersion : (await this.project.getDependencyVersion(packageName));
     await this._tryRegisterProxyAdmin();
     await this._tryRegisterProxyFactory();
-    await this._updateTruffleDeployedInformation(contractAlias, proxyInstance);
+    await this._updateTruffleDeployedInformation(contractAlias, instance);
     this.networkFile.addProxy(packageName, contractAlias, {
-      address: proxyInstance.address,
+      address: instance.address,
       version: semanticVersionToString(packageVersion),
       implementation: implementationAddress,
-      admin: admin || this.networkFile.proxyAdminAddress
+      admin: admin || this.networkFile.proxyAdminAddress,
+      kind,
     });
-    return proxyInstance;
+    return instance;
+  }
+
+  private async createProxyInstance(kind: ProxyType, salt: string, contract: Contract, signature: string, createArgs: { packageName: string; contractName: string; initMethod: string; initArgs: string[]; admin: string; }): Promise<{ instance: Contract, proxy: Proxy | MinimalProxy }> {
+    let instance: Contract, proxy: Proxy | MinimalProxy;
+    switch (kind) {
+      case ProxyType.Upgradeable:
+        instance = salt
+          ? await this.project.createProxyWithSalt(contract, salt, signature, createArgs)
+          : await this.project.createProxy(contract, createArgs);
+        proxy = await Proxy.at(instance.address);
+        break;
+
+      case ProxyType.Minimal:
+        if (salt) {
+          throw new Error(`Cannot create a minimal proxy with a precomputed address, use an Upgradeable proxy instead.`);
+        }
+        instance = await this.project.createMinimalProxy(contract, createArgs);
+        proxy = await MinimalProxy.at(instance.address);
+        break;
+
+      default:
+        throw new Error(`Unknown proxy type ${kind}`);
+    }
+
+    return { proxy, instance };
   }
 
   public async getProxyDeploymentAddress(salt: string, sender?: string): Promise<string> {
@@ -723,7 +749,8 @@ export default class NetworkController {
     const proxies = this.networkFile.getProxies({
       package: packageName || (contractAlias ? this.packageFile.name : undefined),
       contract: contractAlias,
-      address: proxyAddress
+      address: proxyAddress,
+      kind: ProxyType.Upgradeable
     });
 
     if (isEmpty(proxies)) {

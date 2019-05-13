@@ -5,6 +5,7 @@ import Transactions from '../utils/Transactions';
 import Contract from '../artifacts/Contract';
 import Proxy from './Proxy';
 import { TxParams } from '../artifacts/ZWeb3';
+import MinimalProxy from './MinimalProxy';
 
 const log: Logger = new Logger('ProxyFactory');
 
@@ -33,6 +34,20 @@ export default class ProxyFactory {
     this.contract = contract;
     this.address = toAddress(contract);
     this.txParams = txParams;
+  }
+
+  public async createMinimalProxy(logicAddress: string, initData?: string): Promise<MinimalProxy> {
+    const args = [logicAddress, initData || Buffer.from('')];
+    const { events, transactionHash } = await Transactions.sendTransaction(
+      this.contract.methods.deployMinimal, args, { ...this.txParams }
+    );
+
+    if (!events.ProxyCreated) {
+      throw new Error(`Could not retrieve proxy deployment address from transaction ${transactionHash}`);
+    }
+
+    const address = events.ProxyCreated.returnValues.proxy;
+    return MinimalProxy.at(address);
   }
 
   public async createProxy(salt: string, logicAddress: string, proxyAdmin: string, initData?: string, signature?: string): Promise<Proxy> {

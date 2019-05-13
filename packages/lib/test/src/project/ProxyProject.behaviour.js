@@ -6,6 +6,7 @@ import Contracts from '../../../src/artifacts/Contracts';
 import { toAddress } from '../../../src/utils/Addresses';
 import { signDeploy, signer } from '../../../src/test/helpers/signing';
 import random from 'lodash.random';
+import MinimalProxy from '../../../src/proxy/MinimalProxy';
 
 const Impl = Contracts.getFromLocal('Impl');
 const DummyImplementation = Contracts.getFromLocal('DummyImplementation');
@@ -41,6 +42,23 @@ export default function shouldManageProxies({ otherAdmin, setImplementations, su
         const instance = await this.project.createProxy(DummyImplementation, { initArgs: [10, "foo", [20, 30]] });
         await assertIsVersion(instance, 'V1');
         await assertIsProxy(instance, this.adminAddress);
+        (await instance.methods.value().call()).should.eq('10')
+      })
+    })
+
+    describe('createMinimalProxy', function () {
+      beforeEach('setting implementations', setImplementations);
+
+      it('creates a proxy given contract class', async function () {
+        const instance = await this.project.createMinimalProxy(DummyImplementation);
+        await assertIsVersion(instance, 'V1');
+        await assertIsMinimalProxy(instance);
+      })
+
+      it('creates and initializes a proxy', async function () {
+        const instance = await this.project.createMinimalProxy(DummyImplementation, { initArgs: [10, "foo", [20, 30]] });
+        await assertIsVersion(instance, 'V1');
+        await assertIsMinimalProxy(instance);
         (await instance.methods.value().call()).should.eq('10')
       })
     })
@@ -131,6 +149,11 @@ export default function shouldManageProxies({ otherAdmin, setImplementations, su
     });
 
   });
+
+  async function assertIsMinimalProxy(address) {
+    const proxy = MinimalProxy.at(toAddress(address));
+    (await proxy.implementation()).should.be.nonzeroAddress;
+  }
 
   async function assertIsProxy(address, adminAddress) {
     const proxy = Proxy.at(toAddress(address));

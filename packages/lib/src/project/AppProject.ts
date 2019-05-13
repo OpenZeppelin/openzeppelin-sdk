@@ -212,6 +212,18 @@ class BaseAppProject extends BasePackageProject {
     return contract.at(proxy.address);
   }
 
+  public async createMinimalProxy(contract: Contract, contractInterface: ContractInterface = {}): Promise<Contract> {
+    const { contractName, packageName, initMethod, initArgs } = this.getContractInterface(contract, contractInterface);
+    const implementationAddress = await this.app.getImplementation(packageName, contractName);
+    const initCallData = this.getInitCallData(contract, initMethod, initArgs, implementationAddress, 'Creating');
+
+    const proxyFactory = await this.ensureProxyFactory();
+    const proxy = await proxyFactory.createMinimalProxy(implementationAddress, initCallData);
+
+    log.info(`Instance created at ${proxy.address}`);
+    return contract.at(proxy.address);
+  }
+
   // REFACTOR: De-duplicate from BaseSimpleProject
   public async getProxyDeploymentAddress(salt: string, sender?: string): Promise<string> {
     const proxyFactory = await this.ensureProxyFactory();
