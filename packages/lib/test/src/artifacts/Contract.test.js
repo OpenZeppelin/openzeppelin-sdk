@@ -10,7 +10,7 @@ const ContractWithStructInConstructor = Contracts.getFromLocal('WithStructInCons
 const ContractWithConstructorImplementation = Contracts.getFromLocal('WithConstructorImplementation');
 const InitializableMock = Contracts.getFromLocal('InitializableMock');
 
-contract.only('Contract', function(accounts) {
+contract('Contract', function(accounts) {
   const [_, account] = accounts.map(utils.toChecksumAddress)
   const txParams = { from: account };
 
