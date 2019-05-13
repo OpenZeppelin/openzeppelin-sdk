@@ -13,6 +13,10 @@ export default class MinimalProxy {
   }
 
   public async implementation(): Promise<string> {
+    // Implementation address is in bytes 10-29
+    // (see http://eips.ethereum.org/EIPS/eip-1167)
+    // We are slicing on the hex representation, hence 2 chars per byte,
+    // and have also to account for the initial 0x in the string
     const code = await ZWeb3.getCode(this.address);
     return `0x${code.slice(22, 62)}`;
   }

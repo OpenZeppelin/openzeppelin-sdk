@@ -571,7 +571,7 @@ export default class NetworkController {
           ? await this.project.createProxyWithSalt(contract, salt, signature, createArgs)
           : await this.project.createProxy(contract, createArgs);
         proxy = await Proxy.at(instance.address);
-        return { proxy, instance };
+        break;
 
       case ProxyType.Minimal:
         if (salt) {
@@ -579,11 +579,13 @@ export default class NetworkController {
         }
         instance = await this.project.createMinimalProxy(contract, createArgs);
         proxy = await MinimalProxy.at(instance.address);
-        return { proxy, instance };
+        break;
 
       default:
         throw new Error(`Unknown proxy type ${kind}`);
     }
+
+    return { proxy, instance };
   }
 
   public async getProxyDeploymentAddress(salt: string, sender?: string): Promise<string> {
