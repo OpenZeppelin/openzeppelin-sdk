@@ -212,7 +212,7 @@ class BaseAppProject extends BasePackageProject {
     return contract.at(proxy.address);
   }
 
-  public async createMinimalProxy(contract, contractInterface: ContractInterface = {}): Promise<Contract> {
+  public async createMinimalProxy(contract: Contract, contractInterface: ContractInterface = {}): Promise<Contract> {
     const { contractName, packageName, initMethod, initArgs } = this.getContractInterface(contract, contractInterface);
     const implementationAddress = await this.app.getImplementation(packageName, contractName);
     const initCallData = this.getInitCallData(contract, initMethod, initArgs, implementationAddress, 'Creating');
