@@ -171,7 +171,6 @@ export function argsList(contractFullName: string, methodIdentifier: string, con
 }
 
 function contractMethods(contractFullName: string, constant: Mutability = Mutability.NonConstant, packageFile: ZosPackageFile): any[] {
-  console.log('constant', constant === Mutability.NonConstant, constant === Mutability.Constant);
   const { contract: contractAlias, package: packageName } = fromContractFullName(contractFullName);
   const contractManager = new ContractManager(packageFile);
   if (!contractManager.hasContract(packageName, contractAlias)) return [];

@@ -106,6 +106,23 @@ contract('call script', function(accounts) {
           this.logs.infos[this.logs.infos.length - 1].should.eq(`Call returned: (V1, 1)`);
         });
       });
+
+      context('when the method returns an array', function() {
+        it('calls the method and logs an empty array', async function() {
+          const proxyAddress = this.networkFile.getProxies({ contract: 'Impl'})[0].address;
+          await call({ network, txParams, networkFile: this.networkFile, proxyAddress, methodName: 'sayNumbers', methodArgs: [] });
+
+          this.logs.infos[this.logs.infos.length - 1].should.eq(`Call returned: []`);
+        });
+
+        it('calls the method and logs the array', async function() {
+          const proxyAddress = this.networkFile.getProxies({ contract: 'Impl'})[0].address;
+          await sendTx({ network, txParams, networkFile: this.networkFile, proxyAddress, methodName: 'initializeNumbers', methodArgs: [[1, 2, 3]] });
+          await call({ network, txParams, networkFile: this.networkFile, proxyAddress, methodName: 'sayNumbers', methodArgs: [] });
+
+          this.logs.infos[this.logs.infos.length - 1].should.eq(`Call returned: [1,2,3]`);
+        });
+      });
     });
   });
 });

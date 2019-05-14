@@ -56,18 +56,18 @@ export default class TransactionController {
     }
   }
 
-  public async callContractMethod(proxyAddress: string, methodName: string, methodArgs: string[]): Promise<void | never> {
+  public async callContractMethod(proxyAddress: string, methodName: string, methodArgs: string[]): Promise<string[] | object | string | never> {
     const { method, contract } = this.getContractAndMethod(proxyAddress, methodName, methodArgs);
     try {
       log.info(`Calling: ${callDescription(method, methodArgs)}`);
-      let result = await contract.methods[methodName](...methodArgs).call({ ...this.txParams });
-      if (typeof result === 'object' && Object.keys(result).length !== 0) {
-        result = `(${Object.values(result).join(', ')})`;
-      }
+      const result = await contract.methods[methodName](...methodArgs).call({ ...this.txParams });
+      const parsedResult = this.parseFunctionCallResult(result);
 
-      isUndefined(result) || typeof result === 'object'
+      isUndefined(parsedResult) || parsedResult === '()' || parsedResult.length === 0
         ? log.info(`Method ${methodName} successfully called.`)
-        : log.info(`Call returned: ${result}`);
+        : log.info(`Call returned: ${parsedResult}`);
+
+      return result;
     } catch(error) {
       throw Error(`Error while trying to call ${proxyAddress}#${methodName}. ${error}`);
     }
@@ -112,5 +112,15 @@ export default class TransactionController {
     const { method } = buildCallData(contract, methodName, methodArgs);
 
     return { contract, method };
+  }
+
+  private parseFunctionCallResult(result: string | string[] | { [key: string]: string }): string {
+    if (Array.isArray(result)) {
+      return `[${result}]`;
+    } else if (typeof result === 'object') {
+      return `(${Object.values(result).join(', ')})`;
+    }
+
+    return result;
   }
 }
