@@ -1,6 +1,8 @@
+import { ContractMethodMutability } from 'zos-lib';
 import pickBy from 'lodash.pickby';
 import isUndefined from 'lodash.isundefined';
 import negate from 'lodash.negate';
+
 import { parseMethodParams } from '../utils/input';
 import { promptIfNeeded, argsList, InquirerQuestions } from './prompt';
 
@@ -11,7 +13,7 @@ export default async function promptForMethodParams(
   getCommandProps: PropsFn,
   options: any,
   additionalOpts: { [key: string]: string } = {},
-  constant: boolean = false
+  constant: ContractMethodMutability = ContractMethodMutability.NonConstant
 ): Promise<{ methodName: string, methodArgs: string[] }> {
 
   const { interactive } = options;

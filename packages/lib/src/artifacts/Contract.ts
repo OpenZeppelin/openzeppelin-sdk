@@ -59,6 +59,11 @@ export default interface Contract {
   };
 }
 
+export enum ContractMethodMutability {
+  Constant,
+  NonConstant
+}
+
 interface ContractMethod {
   name: string;
   hasInitializer: boolean;
@@ -121,9 +126,11 @@ export function createContract(schema: any): Contract {
   return _wrapContractInstance(schema, contract);
 }
 
-export function contractMethodsFromAbi(instance: Contract, constant: boolean = false): any[] {
+export function contractMethodsFromAbi(instance: Contract, constant: ContractMethodMutability = ContractMethodMutability.NonConstant): any[] {
+  const isConstant = constant === ContractMethodMutability.Constant;
+
   return instance.schema.abi
-    .filter(({ constant: isConstant, type }) => constant === isConstant && type === 'function')
+    .filter(({ constant: isConstantMethod, type }) => isConstant === isConstantMethod && type === 'function')
     .map(method => {
       const { name, inputs } = method;
       const selector = `${name}(${inputs.map(({ type }) => type)})`;
@@ -132,8 +139,8 @@ export function contractMethodsFromAbi(instance: Contract, constant: boolean = f
 }
 
 // get methods from AST, as there is no info about the modifiers in the ABI
-export function contractMethodsFromAst(instance: Contract, constant: boolean = false): ContractMethod[] {
-  const mutabilities = constant ? ['view', 'pure'] : ['payable', 'nonpayable'];
+export function contractMethodsFromAst(instance: Contract, constant: ContractMethodMutability = ContractMethodMutability.NonConstant): ContractMethod[] {
+  const mutabilities = constant === ContractMethodMutability.Constant  ? ['view', 'pure'] : ['payable', 'nonpayable'];
   const contractAst = new ContractAST(instance, null, { nodesFilter: ['ContractDefinition'] });
 
   return contractAst.getMethods()

@@ -1,4 +1,5 @@
 import pickBy from 'lodash.pickby';
+import { ContractMethodMutability as Mutability } from 'zos-lib';
 
 import call from '../scripts/call';
 import { parseContractReference } from '../utils/contract';
@@ -28,7 +29,7 @@ async function action(options: any): Promise<void> {
   const { network, txParams } = await ConfigVariablesInitializer.initNetworkConfiguration({ ...options, ...networkOpts });
 
   const { contractFullName, proxyReference } = await promptForProxy(proxyAddress, network, options);
-  const methodParams = await promptForMethodParams(contractFullName, getCommandProps, options, {}, true);
+  const methodParams = await promptForMethodParams(contractFullName, getCommandProps, options, {}, Mutability.Constant);
   const args = pickBy({ ...methodParams, proxyAddress: proxyReference });
   await call({ ...args, network, txParams });
 
@@ -45,8 +46,8 @@ async function promptForProxy(proxyAddress: string, network: string, options: an
 }
 
 function getCommandProps({ network, contractFullName, methodName, methodArgs }: SendTxPropsParams = {}): InquirerQuestions {
-  const methods = methodsList(contractFullName, true);
-  const args = argsList(contractFullName, methodName, true)
+  const methods = methodsList(contractFullName, Mutability.Constant);
+  const args = argsList(contractFullName, methodName, Mutability.Constant)
     .reduce((accum, argName, index) => {
       return {
         ...accum,

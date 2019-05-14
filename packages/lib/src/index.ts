@@ -12,7 +12,7 @@ import Semver from './utils/Semver';
 import Logger from './utils/Logger';
 import FileSystem from './utils/FileSystem';
 import Contracts from './artifacts/Contracts';
-import Contract, { contractMethodsFromAst, contractMethodsFromAbi } from './artifacts/Contract';
+import Contract, { contractMethodsFromAst, contractMethodsFromAbi, ContractMethodMutability } from './artifacts/Contract';
 import ZWeb3, { TxParams } from './artifacts/ZWeb3';
 import { bodyCode, constructorCode, bytecodeDigest, replaceSolidityLibAddress, isSolidityLib, getSolidityLibNames } from './utils/Bytecode';
 import Transactions from './utils/Transactions';
@@ -71,6 +71,7 @@ export {
   semanticVersionEqual,
   toSemanticVersion,
   semanticVersionToString,
+  ContractMethodMutability,
   contractMethodsFromAst,
   contractMethodsFromAbi,
   replaceSolidityLibAddress,
