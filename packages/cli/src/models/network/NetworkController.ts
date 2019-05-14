@@ -512,31 +512,34 @@ export default class NetworkController {
 
   // Proxy model
   public async createProxy(packageName: string, contractAlias: string, initMethod: string, initArgs: string[], admin?: string, salt?: string, signature?: string): Promise<Contract> {
-    await this._migrateZosversionIfNeeded();
-    await this.fetchOrDeploy(this.currentVersion);
-    if (!packageName) packageName = this.packageFile.name;
-    const contract = this.localController.getContractClass(packageName, contractAlias);
-    await this._setSolidityLibs(contract);
-    this.checkInitialization(contract, initMethod, initArgs);
-    if (salt) await this._checkDeploymentAddress(salt);
+    try {
+      await this._migrateZosversionIfNeeded();
+      await this.fetchOrDeploy(this.currentVersion);
+      if (!packageName) packageName = this.packageFile.name;
+      const contract = this.localController.getContractClass(packageName, contractAlias);
+      await this._setSolidityLibs(contract);
+      this.checkInitialization(contract, initMethod, initArgs);
+      if (salt) await this._checkDeploymentAddress(salt);
 
-    const createArgs = { packageName, contractName: contractAlias, initMethod, initArgs, admin };
-    const proxyInstance = salt
-      ? await this.project.createProxyWithSalt(contract, salt, signature, createArgs)
-      : await this.project.createProxy(contract, createArgs);
+      const createArgs = { packageName, contractName: contractAlias, initMethod, initArgs, admin };
+      const proxyInstance = salt
+        ? await this.project.createProxyWithSalt(contract, salt, signature, createArgs)
+        : await this.project.createProxy(contract, createArgs);
 
-    const implementationAddress = await Proxy.at(proxyInstance).implementation();
-    const packageVersion = packageName === this.packageFile.name ? this.currentVersion : (await this.project.getDependencyVersion(packageName));
-    await this._tryRegisterProxyAdmin();
-    await this._tryRegisterProxyFactory();
-    await this._updateTruffleDeployedInformation(contractAlias, proxyInstance);
-    this.networkFile.addProxy(packageName, contractAlias, {
-      address: proxyInstance.address,
-      version: semanticVersionToString(packageVersion),
-      implementation: implementationAddress,
-      admin: admin || this.networkFile.proxyAdminAddress
-    });
-    return proxyInstance;
+      const implementationAddress = await Proxy.at(proxyInstance).implementation();
+      const packageVersion = packageName === this.packageFile.name ? this.currentVersion : (await this.project.getDependencyVersion(packageName));
+      await this._updateTruffleDeployedInformation(contractAlias, proxyInstance);
+      this.networkFile.addProxy(packageName, contractAlias, {
+        address: proxyInstance.address,
+        version: semanticVersionToString(packageVersion),
+        implementation: implementationAddress,
+        admin: admin || this.networkFile.proxyAdminAddress
+      });
+      return proxyInstance;
+    } finally {
+      await this._tryRegisterProxyAdmin();
+      await this._tryRegisterProxyFactory();
+    }
   }
 
   public async getProxyDeploymentAddress(salt: string, sender?: string): Promise<string> {
