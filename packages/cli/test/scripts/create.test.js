@@ -4,7 +4,7 @@ require('../setup')
 import random from 'lodash.random';
 
 import CaptureLogs from '../helpers/captureLogs';
-import { Contracts, Logger, helpers, Proxy, MinimalProxy } from 'zos-lib';
+import { Contracts, Logger, helpers, Proxy, MinimalProxy, assertRevert } from 'zos-lib';
 
 import add from '../../src/scripts/add';
 import push from '../../src/scripts/push';
@@ -173,80 +173,95 @@ contract('create script', function([_, owner, otherAdmin]) {
       await assertProxy(this.networkFile, anotherContractAlias, { version, say: 'WithLibraryV1' });
     });
 
-    it('should create a proxy at an address given a salt', async function () {
-      const salt = random(0, 2**32);
-      await create({ contractAlias, network, txParams, networkFile: this.networkFile, salt });
-      
-      const factoryAddress = this.networkFile.proxyFactoryAddress;
-      should.exist(factoryAddress, "Proxy factory was not stored");
-      await assertProxy(this.networkFile, contractAlias, { version, say: 'V1' });
+    it('should deploy a proxy admin', async function() {
+      await create({ contractAlias, network, txParams, networkFile: this.networkFile });
+      this.networkFile.proxyAdminAddress.should.be.nonzeroAddress;
     });
 
-    it('should create a proxy at an address given a salt with a different admin', async function () {
-      const salt = random(0, 2**32);
-      await create({ contractAlias, network, txParams, networkFile: this.networkFile, salt, admin: otherAdmin });
-      
-      const factoryAddress = this.networkFile.proxyFactoryAddress;
-      should.exist(factoryAddress, "Proxy factory was not stored");
-      await assertProxy(this.networkFile, contractAlias, { version, say: 'V1', admin: otherAdmin });
+    it('should store proxy admin if contract creation fails', async function() {
+      await assertRevert(create({ contractAlias, network, txParams, networkFile: this.networkFile, methodName: 'initializeThatFails', methodArgs: [42] }));
+      should.exist(this.networkFile.proxyAdminAddress);
+      this.networkFile.proxyAdminAddress.should.be.nonzeroAddress;
     });
 
-    it('should create a proxy at an address that matches the predicted one', async function () {
-      const salt = random(0, 2**32);
-      const predictedAddress = await queryDeployment({ network, txParams, networkFile: this.networkFile, salt });
-      const factoryAddress = this.networkFile.proxyFactoryAddress;
-      should.exist(factoryAddress, "Proxy factory was not stored");
+    describe('with salt', function () {
+      it('should create a proxy at an address given a salt', async function () {
+        const salt = random(0, 2**32);
+        await create({ contractAlias, network, txParams, networkFile: this.networkFile, salt });
+        
+        const factoryAddress = this.networkFile.proxyFactoryAddress;
+        should.exist(factoryAddress, "Proxy factory was not stored");
+        await assertProxy(this.networkFile, contractAlias, { version, say: 'V1' });
+      });
 
-      await create({ contractAlias, network, txParams, networkFile: this.networkFile, salt });
-      await assertProxy(this.networkFile, contractAlias, { version, say: 'V1', address: predictedAddress });
+      it('should create a proxy at an address given a salt with a different admin', async function () {
+        const salt = random(0, 2**32);
+        await create({ contractAlias, network, txParams, networkFile: this.networkFile, salt, admin: otherAdmin });
+        
+        const factoryAddress = this.networkFile.proxyFactoryAddress;
+        should.exist(factoryAddress, "Proxy factory was not stored");
+        await assertProxy(this.networkFile, contractAlias, { version, say: 'V1', admin: otherAdmin });
+      });
+
+      it('should create a proxy at an address that matches the predicted one', async function () {
+        const salt = random(0, 2**32);
+        const predictedAddress = await queryDeployment({ network, txParams, networkFile: this.networkFile, salt });
+        const factoryAddress = this.networkFile.proxyFactoryAddress;
+        should.exist(factoryAddress, "Proxy factory was not stored");
+
+        await create({ contractAlias, network, txParams, networkFile: this.networkFile, salt });
+        await assertProxy(this.networkFile, contractAlias, { version, say: 'V1', address: predictedAddress });
+      });
+
+      it('should create a proxy at an address given a salt and signature', async function () {
+        // Get predicted address for a signer different than the owner
+        const salt = random(0, 2**32);
+        const predictedAddress = await queryDeployment({ network, txParams, networkFile: this.networkFile, salt, sender: helpers.signer });
+        
+        // Deploy a proxy to a random contract so we force a proxy admin to be deployed
+        await create({ contractAlias: anotherContractAlias, network, txParams, networkFile: this.networkFile });
+        
+        // Create the contract we want with both salt and signature
+        const implementation = this.networkFile.contract(contractAlias).address;
+        const admin = this.networkFile.proxyAdminAddress;
+        const signature = helpers.signDeploy(this.networkFile.proxyFactoryAddress, salt, implementation, admin, '');
+        await create({ contractAlias, network, txParams, networkFile: this.networkFile, salt, signature });
+        
+        // Check the deployment address
+        await assertProxy(this.networkFile, contractAlias, { version, say: 'V1', address: predictedAddress });
+      });
+
+      it('should create a proxy at an address given a salt and signature with a different admin', async function () {
+        const salt = random(0, 2**32);
+        const implementation = this.networkFile.contract(contractAlias).address;
+        const predictedAddress = await queryDeployment({ network, txParams, networkFile: this.networkFile, salt, sender: helpers.signer });
+        const signature = helpers.signDeploy(this.networkFile.proxyFactoryAddress, salt, implementation, otherAdmin);
+        await create({ contractAlias, network, txParams, networkFile: this.networkFile, salt, signature, admin: otherAdmin });
+        await assertProxy(this.networkFile, contractAlias, { version, say: 'V1', admin: otherAdmin, address: predictedAddress });
+      });
+
+      it('should fail if an address is already in use when creating a proxy with a salt', async function () {
+        const salt = random(0, 2**32);
+        await create({ contractAlias, network, txParams, networkFile: this.networkFile, salt });
+        await create({ contractAlias, network, txParams, networkFile: this.networkFile, salt })
+          .should.be.rejectedWith(/Deployment address for salt \d+ is already in use/);
+      });
     });
 
-    it('should create a proxy at an address given a salt and signature', async function () {
-      // Get predicted address for a signer different than the owner
-      const salt = random(0, 2**32);
-      const predictedAddress = await queryDeployment({ network, txParams, networkFile: this.networkFile, salt, sender: helpers.signer });
-      
-      // Deploy a proxy to a random contract so we force a proxy admin to be deployed
-      await create({ contractAlias: anotherContractAlias, network, txParams, networkFile: this.networkFile });
-      
-      // Create the contract we want with both salt and signature
-      const implementation = this.networkFile.contract(contractAlias).address;
-      const admin = this.networkFile.proxyAdminAddress;
-      const signature = helpers.signDeploy(this.networkFile.proxyFactoryAddress, salt, implementation, admin, '');
-      await create({ contractAlias, network, txParams, networkFile: this.networkFile, salt, signature });
-      
-      // Check the deployment address
-      await assertProxy(this.networkFile, contractAlias, { version, say: 'V1', address: predictedAddress });
-    });
+    describe('with minimal proxy', function () {
+      it('should create a minimal proxy for one of its contracts', async function() {
+        await create({ kind: ProxyType.Minimal, contractAlias, network, txParams, networkFile: this.networkFile });
 
-    it('should create a proxy at an address given a salt and signature with a different admin', async function () {
-      const salt = random(0, 2**32);
-      const implementation = this.networkFile.contract(contractAlias).address;
-      const predictedAddress = await queryDeployment({ network, txParams, networkFile: this.networkFile, salt, sender: helpers.signer });
-      const signature = helpers.signDeploy(this.networkFile.proxyFactoryAddress, salt, implementation, otherAdmin);
-      await create({ contractAlias, network, txParams, networkFile: this.networkFile, salt, signature, admin: otherAdmin });
-      await assertProxy(this.networkFile, contractAlias, { version, say: 'V1', admin: otherAdmin, address: predictedAddress });
-    });
+        const implementation = this.networkFile.contract(contractAlias).address;
+        await assertProxy(this.networkFile, contractAlias, { version, say: 'V1', minimal: implementation });
+      });
 
-    it('should fail if an address is already in use when creating a proxy with a salt', async function () {
-      const salt = random(0, 2**32);
-      await create({ contractAlias, network, txParams, networkFile: this.networkFile, salt });
-      await create({ contractAlias, network, txParams, networkFile: this.networkFile, salt })
-        .should.be.rejectedWith(/Deployment address for salt \d+ is already in use/);
-    });
+      it('should properly initialize a minimal proxy with true boolean values', async function() {
+        await create({ kind: ProxyType.Minimal, contractAlias: booleanContractAlias, network, txParams, methodName: 'initialize', methodArgs: [true], networkFile: this.networkFile });
 
-    it('should create a minimal proxy for one of its contracts', async function() {
-      await create({ kind: ProxyType.Minimal, contractAlias, network, txParams, networkFile: this.networkFile });
-
-      const implementation = this.networkFile.contract(contractAlias).address;
-      await assertProxy(this.networkFile, contractAlias, { version, say: 'V1', minimal: implementation });
-    });
-
-    it('should properly initialize a minimal proxy with true boolean values', async function() {
-      await create({ kind: ProxyType.Minimal, contractAlias: booleanContractAlias, network, txParams, methodName: 'initialize', methodArgs: [true], networkFile: this.networkFile });
-
-      const implementation = this.networkFile.contract(booleanContractAlias).address;
-      await assertProxy(this.networkFile, booleanContractAlias, { version, checkBool: true, boolValue: true, minimal: implementation });
+        const implementation = this.networkFile.contract(booleanContractAlias).address;
+        await assertProxy(this.networkFile, booleanContractAlias, { version, checkBool: true, boolValue: true, minimal: implementation });
+      });
     });
 
     describe('warnings', function () {
