@@ -61,7 +61,7 @@ export default interface Contract {
 
 export enum ContractMethodMutability {
   Constant,
-  NonConstant
+  NotConstant
 }
 
 interface ContractMethod {
@@ -126,7 +126,7 @@ export function createContract(schema: any): Contract {
   return _wrapContractInstance(schema, contract);
 }
 
-export function contractMethodsFromAbi(instance: Contract, constant: ContractMethodMutability = ContractMethodMutability.NonConstant): any[] {
+export function contractMethodsFromAbi(instance: Contract, constant: ContractMethodMutability = ContractMethodMutability.NotConstant): any[] {
   const isConstant = constant === ContractMethodMutability.Constant;
 
   return instance.schema.abi
@@ -139,7 +139,7 @@ export function contractMethodsFromAbi(instance: Contract, constant: ContractMet
 }
 
 // get methods from AST, as there is no info about the modifiers in the ABI
-export function contractMethodsFromAst(instance: Contract, constant: ContractMethodMutability = ContractMethodMutability.NonConstant): ContractMethod[] {
+export function contractMethodsFromAst(instance: Contract, constant: ContractMethodMutability = ContractMethodMutability.NotConstant): ContractMethod[] {
   const mutabilities = constant === ContractMethodMutability.Constant  ? ['view', 'pure'] : ['payable', 'nonpayable'];
   const contractAst = new ContractAST(instance, null, { nodesFilter: ['ContractDefinition'] });
 
