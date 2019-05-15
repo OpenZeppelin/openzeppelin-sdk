@@ -1,5 +1,6 @@
 import isEmpty from 'lodash.isempty';
 import isUndefined from 'lodash.isundefined';
+import isNull from 'lodash.isnull';
 
 import { Contract, Transactions, Logger, ZWeb3, TxParams, ABI } from 'zos-lib';
 import { isValidUnit, prettifyTokenAmount, toWei, fromWei } from '../../utils/units';
@@ -63,7 +64,7 @@ export default class TransactionController {
       const result = await contract.methods[methodName](...methodArgs).call({ ...this.txParams });
       const parsedResult = this.parseFunctionCallResult(result);
 
-      isUndefined(parsedResult) || parsedResult === '()' || parsedResult.length === 0
+      isNull(parsedResult) || isUndefined(parsedResult) || parsedResult === '()' || parsedResult.length === 0
         ? log.info(`Method ${methodName} successfully called.`)
         : log.info(`Call returned: ${parsedResult}`);
 
@@ -114,10 +115,10 @@ export default class TransactionController {
     return { contract, method };
   }
 
-  private parseFunctionCallResult(result: string | string[] | { [key: string]: string }): string {
+  private parseFunctionCallResult(result: any): string | null {
     if (Array.isArray(result)) {
       return `[${result}]`;
-    } else if (typeof result === 'object') {
+    } else if (result !== null && typeof result === 'object') {
       return `(${Object.values(result).join(', ')})`;
     }
 
