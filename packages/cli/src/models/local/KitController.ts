@@ -22,7 +22,7 @@ export default class KitController {
 
     // because zos always spawns '.zos.lock' file
     const files = (await readdir(workingDirPath)).filter(file => file !== '.zos.lock');
-    if (files.length > 0) throw Error('The directory must be empty');
+    if (files.length > 0) throw Error(`Unable to unpack ${url} in the current directory, as it must be empty.`);
 
     let spinner = new Spinner(`Downloading kit from ${url}`);
     try {
