@@ -172,7 +172,7 @@ contract('create script', function([_, owner, otherAdmin]) {
     });
 
     it('should store proxy admin if contract creation fails', async function() {
-      await assertRevert(create({ contractAlias, network, txParams, networkFile: this.networkFile, methodName: 'initializeThatFails', methodArgs: [42] }));
+      await assertRevert(create({ contractAlias, network, txParams, networkFile: this.networkFile, initMethod: 'initializeThatFails', initArgs: [42] }));
       should.exist(this.networkFile.proxyAdminAddress);
       this.networkFile.proxyAdminAddress.should.be.nonzeroAddress;
     });
