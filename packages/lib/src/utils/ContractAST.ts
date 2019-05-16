@@ -43,7 +43,19 @@ export interface StorageInfo {
 }
 
 interface ContractASTProps {
-  nodesFilter: string[];
+  nodesFilter?: string[];
+}
+
+class NodeNotFoundError extends Error {
+  constructor(id, type) {
+    super(`No AST nodes of type ${type} with id ${id} found.`);
+  }
+}
+
+class MultipleNodesFoundError extends Error {
+  constructor(id, type) {
+    super(`Found more than one node of type ${type} with the same id ${id}. Try clearing your build artifacts and recompiling your contracts.`);
+  }
 }
 
 export default class ContractAST {
@@ -55,7 +67,7 @@ export default class ContractAST {
   private types: TypeInfoMapping;
   private nodesFilter: string[];
 
-  constructor(contract: Contract, artifacts?: BuildArtifacts, props?: ContractASTProps) {
+  constructor(contract: Contract, artifacts?: BuildArtifacts, props: ContractASTProps = {}) {
     const { directory } = contract.schema;
     this.artifacts = artifacts || getBuildArtifacts(directory);
     this.contract = contract;
@@ -71,7 +83,7 @@ export default class ContractAST {
     this.types = {};
 
     // Node types to collect, null for all
-    this.nodesFilter = props.nodesFilter || [];
+    this.nodesFilter = props.nodesFilter;
 
     this._collectImports(this.contract.schema.ast);
     this._collectNodes(this.contract.schema.ast);
@@ -103,23 +115,52 @@ export default class ContractAST {
       });
   }
 
+  // This method is used instead of getLinearizedBaseContracts only because
+  // it keeps track of the names as well as the IDs of the ancestor contracts,
+  // and can yield a better error message to the user than "AST node NN not found"
+  public getBaseContractsRecursively(): Node[] {
+    const mapBaseContracts = (baseContracts) => (baseContracts.map(c => ({
+      id: c.baseName.referencedDeclaration, name: c.baseName.name
+    })));
+    const baseContractsToVisit = mapBaseContracts(this.getContractNode().baseContracts);
+    const visitedBaseContracts = {};
+
+    while (baseContractsToVisit.length > 0) {
+      const { id, name } = baseContractsToVisit.pop();
+      if (visitedBaseContracts[id]) continue;
+
+      try {
+        const node = this.getNode(id, 'ContractDefinition');
+        visitedBaseContracts[id] = node;
+        baseContractsToVisit.push(... mapBaseContracts(node.baseContracts));
+      } catch (err) {
+        if (err instanceof NodeNotFoundError) {
+          throw new Error(`Cannot find source data for contract ${name} (base contract of ${this.contract.schema.contractName}). This often happens because either:\n- An incremental compilation step went wrong. Clear your build folder and recompile.\n- There is more than one contract named ${name} in your project (including dependencies). Make sure all contracts have a unique name, and that you are not importing dependencies with duplicated contract names (for example, openzeppelin-eth and openzeppelin-solidity).`);
+        } else {
+          throw err;
+        }
+      }
+    }
+
+    return Object.values(visitedBaseContracts);
+  }
+
   public getLinearizedBaseContracts(mostDerivedFirst: boolean = false): Node[] {
     const contracts = this.getContractNode().linearizedBaseContracts.map((id) => this.getNode(id, 'ContractDefinition'));
     return mostDerivedFirst ? contracts : reverse(contracts);
   }
 
   public getNode(id: string, type: string): Node | never {
-
-    if (!this.nodes[id]) throw Error(`No AST nodes with id ${id} found`);
+    if (!this.nodes[id]) throw new NodeNotFoundError(id, type);
 
     const candidates = this.nodes[id].filter((node: Node) => node.nodeType === type);
     switch (candidates.length) {
       case 0:
-        throw Error(`No AST nodes of type ${type} with id ${id} found (got ${this.nodes[id].map((node: Node) => node.nodeType).join(', ')})`);
+        throw new NodeNotFoundError(id, type);
       case 1:
         return candidates[0];
       default:
-        throw Error(`Found more than one node of type ${type} with the same id ${id}. Please try clearing your build artifacts and recompiling your contracts.`);
+        throw new MultipleNodesFoundError(id, type);
     }
   }
 
@@ -143,7 +184,7 @@ export default class ContractAST {
     if (some(this.nodes[node.id] || [], (n) => isEqual(n, node))) return;
 
     // Only process nodes of the filtered types (or SourceUnits)
-    if (node.nodeType !== 'SourceUnit' && this.nodesFilter && !includes(this.nodesFilter, node.nodeType))  return;
+    if (node.nodeType !== 'SourceUnit' && this.nodesFilter && !includes(this.nodesFilter, node.nodeType)) return;
 
     // Add node to collection with this id otherwise
     if (!this.nodes[node.id]) this.nodes[node.id] = [];

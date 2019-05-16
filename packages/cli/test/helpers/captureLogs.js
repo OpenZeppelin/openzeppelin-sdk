@@ -8,7 +8,7 @@ export default class CaptureLogs {
     this.originalError = Logger.prototype.error
     Logger.prototype.info = msg => this.infos.push(msg)
     Logger.prototype.warn = msg => this.warns.push(msg)
-    Logger.prototype.error = msg => this.errors.push(msg)
+    Logger.prototype.error = (msg, ex) => this.errors.push(ex ? `${msg} ${ex.message}` : msg)
   }
 
   get text() {

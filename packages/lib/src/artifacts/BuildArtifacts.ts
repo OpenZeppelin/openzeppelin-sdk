@@ -42,7 +42,7 @@ export class BuildArtifacts {
   }
 
   public getArtifactsFromSourcePath(sourcePath: string): Artifact[] {
-    return this.sourcesToArtifacts[sourcePath];
+    return this.sourcesToArtifacts[sourcePath] || [];
   }
 
   public getSourcePathFromArtifact(artifact: Artifact): string {
