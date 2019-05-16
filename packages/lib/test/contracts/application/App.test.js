@@ -6,7 +6,6 @@ import shouldManageProxies from './ManageProxies.behavior';
 import shouldManagePackages from './ManagePackages.behavior';
 import shouldBehaveLikeOwnable from '../../../src/test/behaviors/Ownable';
 import { toSemanticVersion } from '../../../src/utils/Semver';
-import lodash from 'lodash';
 import utils from 'web3-utils';
 
 const Package = Contracts.getFromLocal('Package')
@@ -16,7 +15,7 @@ const DummyImplementation = Contracts.getFromLocal('DummyImplementation')
 const DummyImplementationV2 = Contracts.getFromLocal('DummyImplementationV2')
 
 contract('App', (accounts) => {
-  accounts = lodash.map(accounts, utils.toChecksumAddress); // Required by Web3 v1.x.
+  accounts = accounts.map(utils.toChecksumAddress); // Required by Web3 v1.x.
 
   const [_, appOwner, packageOwner, directoryOwner, anotherAccount] = accounts;
 

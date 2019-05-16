@@ -7,13 +7,12 @@ import { ZERO_ADDRESS } from '../../../src/utils/Addresses'
 import assertRevert from '../../../src/test/helpers/assertRevert'
 import shouldBehaveLikeOwnable from '../../../src/test/behaviors/Ownable'
 import utils from 'web3-utils';
-import lodash from 'lodash';
 
 const DummyImplementation = Contracts.getFromLocal('DummyImplementation')
 const ImplementationDirectory = Contracts.getFromLocal('ImplementationDirectory')
 
 contract('ImplementationDirectory', function(accounts) {
-  accounts = lodash.map(accounts, utils.toChecksumAddress); // Required by Web3 v1.x.
+  accounts = accounts.map(utils.toChecksumAddress); // Required by Web3 v1.x.
 
   const [_, owner, anotherAddress] = accounts;
 
