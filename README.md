@@ -72,6 +72,10 @@ give rewards for reported issues, according to impact and severity.
 * [@jcarpanelli](https://github.com/jcarpanelli)
 * [@ylv-io](https://github.com/ylv-io)
 
+## Development setup
+
+Run `npm install` in the root of the project, followed by `npx lerna bootstrap` to have lerna install all dependencies in all packages and symlink them as needed.
+
 ## Contribute
 
 To contribute, join our [forum](https://forum.zeppelin.solutions) or
