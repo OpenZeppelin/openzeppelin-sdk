@@ -31,6 +31,7 @@ const register: (program: any) => any = (program) => program
   .option('--all', 'update all contracts in the application')
   .option('--force', 'force creation even if contracts have local modifications')
   .withNetworkOptions()
+  .withSkipCompileOption()
   .withNonInteractiveOption()
   .action(commandActions);
 

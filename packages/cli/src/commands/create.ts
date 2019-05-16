@@ -30,6 +30,7 @@ const register: (program: any) => any = (program) => program
   .option('--args <arg1, arg2, ...>', 'provide initialization arguments for your contract if required')
   .option('--force', 'force creation even if contracts have local modifications')
   .withNetworkOptions()
+  .withSkipCompileOption()
   .withNonInteractiveOption()
   .action(commandActions);
 
