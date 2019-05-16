@@ -31,6 +31,7 @@ const register: (program: any) => any = (program) => program
   .option('--force', 'force creation even if contracts have local modifications')
   .option('--minimal', 'creates a cheaper but non-upgradeable instance instead, using a minimal proxy')
   .withNetworkOptions()
+  .withSkipCompileOption()
   .withNonInteractiveOption()
   .action(commandActions);
 
@@ -40,7 +41,7 @@ async function commandActions(contractFullName: string, options: any) {
 
   await link.runActionIfNeeded(promptedContractFullName, options);
   await add.runActionIfNeeded(promptedContractFullName, options);
-  await push.runActionIfNeeded(promptedContractFullName, network, { ...options, network: promptedNewtork });
+  await push.runActionIfNeeded(promptedContractFullName, network, { ...options, network: promptedNewtork, force: true });
 
   await action(promptedContractFullName, { ...options, network, txParams });
   if (!options.dontExitProcess && process.env.NODE_ENV !== 'test') process.exit(0);
