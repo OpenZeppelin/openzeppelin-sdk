@@ -61,13 +61,13 @@ async function runActionIfRequested(externalOptions: any): Promise<void> {
 }
 
 async function runActionIfNeeded(contractName: string, network: string, options: any): Promise<void> {
-  const { interactive, network: promptedNetwork } = options;
+  const { force, interactive, network: promptedNetwork } = options;
   const packageFile = new ZosPackageFile();
   const networkFile = packageFile.networkFile(network);
   const { contract: contractAlias, package: packageName } = fromContractFullName(contractName);
 
   if (interactive) {
-    if ((!packageName && !networkFile.hasContract(contractAlias)) || (packageName && !networkFile.hasDependency(packageName))) {
+    if (force || (!packageName && !networkFile.hasContract(contractAlias)) || (packageName && !networkFile.hasDependency(packageName))) {
       await action({ ...options, dontExitProcess: true });
     }
   }

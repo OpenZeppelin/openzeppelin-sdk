@@ -35,7 +35,6 @@ const register: (program: any) => any = (program) => program
   .action(commandActions);
 
 async function commandActions(contractFullName: string, options: any) {
-  const { init: rawInitMethod } = options;
   const { network: promptedNewtork, contractFullName: promptedContractFullName } = await promptForCreate(contractFullName, options);
   const { network, txParams } = await ConfigVariablesInitializer.initNetworkConfiguration({ ...options, network: promptedNewtork });
 
@@ -43,16 +42,17 @@ async function commandActions(contractFullName: string, options: any) {
   await add.runActionIfNeeded(promptedContractFullName, options);
   await push.runActionIfNeeded(promptedContractFullName, network, { ...options, network: promptedNewtork });
 
-  const additionalOpts = { askForMethodParams: rawInitMethod };
-  const initMethodParams = await promptForMethodParams(promptedContractFullName, getCommandProps, options, additionalOpts);
-
-  await action(promptedContractFullName, { ...options, ...initMethodParams, network, txParams });
+  await action(promptedContractFullName, { ...options, network, txParams });
   if (!options.dontExitProcess && process.env.NODE_ENV !== 'test') process.exit(0);
 }
 
 async function action(contractFullName: string, options: any) {
-  const { force, methodName, methodArgs, network, txParams } = options;
+  const { force, network, txParams, init: rawInitMethod } = options;
   const { contract: contractAlias, package: packageName } = fromContractFullName(contractFullName);
+
+  const additionalOpts = { askForMethodParams: rawInitMethod };
+  const { methodName, methodArgs } = await promptForMethodParams(contractFullName, getCommandProps, options, additionalOpts);
+
   const args = pickBy({ packageName, contractAlias, methodName, methodArgs, force });
   if (options.minimal) args.kind = ProxyType.Minimal;
 

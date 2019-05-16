@@ -130,7 +130,6 @@ describe('prompt', function() {
         context('when querying constant methods', function() {
           it('returns an array of constant methods', function() {
             const methods = methodsList('Greeter', Mutability.Constant, this.packageFile);
-            console.log('methods', methods);
             methods.should.be.an('array');
             methods.should.have.lengthOf(2);
             methods[0].should.be.an('object').that.has.all.keys('name', 'value');
