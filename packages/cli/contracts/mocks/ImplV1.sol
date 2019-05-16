@@ -21,6 +21,11 @@ contract ImplV1 {
   function initializeNumbers(uint256[] memory _numbers) public {
     numbers = _numbers;
   }
+  
+  function initializeThatFails(uint256 _value) public {
+    require(false, "Fail");
+    value = _value;
+  }
 
   function say() public pure returns (string memory) {
     return "V1";
