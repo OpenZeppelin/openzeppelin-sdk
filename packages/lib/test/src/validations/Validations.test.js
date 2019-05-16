@@ -1,7 +1,6 @@
 'use strict'
 require('../../setup')
 
-import _ from 'lodash'
 import { validate as validateContract } from '../../../src/validations';
 import Contracts from '../../../src/artifacts/Contracts';
 

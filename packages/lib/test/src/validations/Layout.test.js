@@ -3,8 +3,6 @@ require('../../setup')
 
 const should = require('chai').should()
 
-import _ from 'lodash'
-
 import Contracts from '../../../src/artifacts/Contracts'
 import { getStorageLayout } from '../../../src/validations/Storage'
 import { compareStorageLayouts } from '../../../src/validations/Layout'
