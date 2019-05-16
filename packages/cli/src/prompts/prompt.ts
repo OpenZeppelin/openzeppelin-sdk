@@ -3,7 +3,7 @@ import flatten from 'lodash.flatten';
 import isEmpty from 'lodash.isempty';
 import groupBy from 'lodash.groupby';
 import inquirer from 'inquirer';
-import { contractMethodsFromAst } from 'zos-lib';
+import { contractMethodsFromAst, contractMethodsFromAbi, ContractMethodMutability as Mutability } from 'zos-lib';
 
 import Session from '../models/network/Session';
 import Truffle from '../models/initializer/truffle/Truffle';
@@ -143,8 +143,8 @@ export function contractsList(name: string, message: string, type: string, sourc
 }
 
 // Generate a list of methods names for a particular contract
-export function methodsList(contractFullName: string, packageFile?: ZosPackageFile): { [key: string]: any } {
-  return contractMethods(contractFullName, packageFile)
+export function methodsList(contractFullName: string, constant?: Mutability, packageFile?: ZosPackageFile): { [key: string]: any } {
+  return contractMethods(contractFullName, constant, packageFile)
     .map(({ name, hasInitializer, inputs, selector }) => {
       const initializable = hasInitializer ? `[Initializable] ` : '';
       const args = inputs.map(({ name: inputName, type }) => `${inputName}: ${type}`);
@@ -155,8 +155,8 @@ export function methodsList(contractFullName: string, packageFile?: ZosPackageFi
 }
 
 // Returns an inquirer question with a list of arguments for a particular method
-export function argsList(contractFullName: string, methodIdentifier: string, packageFile?: ZosPackageFile): string[] {
-  const method = contractMethods(contractFullName, packageFile)
+export function argsList(contractFullName: string, methodIdentifier: string, constant?: Mutability, packageFile?: ZosPackageFile): string[] {
+  const method = contractMethods(contractFullName, constant, packageFile)
     .find(({ name, selector }) => selector === methodIdentifier || name === methodIdentifier);
   if (method) {
     return method
@@ -165,13 +165,15 @@ export function argsList(contractFullName: string, methodIdentifier: string, pac
   } else return [];
 }
 
-function contractMethods(contractFullName: string, packageFile: ZosPackageFile): any[] {
+function contractMethods(contractFullName: string, constant: Mutability = Mutability.NotConstant, packageFile: ZosPackageFile): any[] {
   const { contract: contractAlias, package: packageName } = fromContractFullName(contractFullName);
   const localController = new LocalController(packageFile);
   if (!localController.hasContract(packageName, contractAlias)) return [];
   const contract = localController.getContractClass(packageName, contractAlias);
 
-  return contractMethodsFromAst(contract);
+  return constant === Mutability.Constant
+    ? contractMethodsFromAbi(contract, constant)
+    : contractMethodsFromAst(contract, constant);
 }
 
 export function proxyInfo(contractInfo: any, network: string): any {

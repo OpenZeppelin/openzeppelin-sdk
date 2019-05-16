@@ -35,6 +35,7 @@ const register: (program: any) => any = (program) => program
   .action(commandActions);
 
 async function commandActions(contractFullName: string, options: any) {
+  const { init: rawInitMethod } = options;
   const { network: promptedNewtork, contractFullName: promptedContractFullName } = await promptForCreate(contractFullName, options);
   const { network, txParams } = await ConfigVariablesInitializer.initNetworkConfiguration({ ...options, network: promptedNewtork });
 
@@ -42,7 +43,8 @@ async function commandActions(contractFullName: string, options: any) {
   await add.runActionIfNeeded(promptedContractFullName, options);
   await push.runActionIfNeeded(promptedContractFullName, network, { ...options, network: promptedNewtork, force: true });
 
-  const initParams = await promptForInitParams(promptedContractFullName,getCommandProps, options);
+  const additionalOpts = { askForInitParams: rawInitMethod };
+  const initParams = await promptForInitParams(promptedContractFullName,getCommandProps, options, additionalOpts);
 
   await action(promptedContractFullName, { ...options, ...initParams, network, txParams });
   if (!options.dontExitProcess && process.env.NODE_ENV !== 'test') process.exit(0);
