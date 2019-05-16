@@ -82,6 +82,7 @@
     "ganache-cli": "^6.3.0",
     "ganache-core": "^2.5.1",
     "lodash.foreach": "^4.5.0",
+    "lodash.noop": "^3.0.1",
     "lodash.times": "^4.3.2",
     "lodash.zipwith": "^4.2.0",
     "mock-dependency": "file:test/mocks/mock-dependency",

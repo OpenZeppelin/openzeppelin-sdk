@@ -9,7 +9,7 @@ import shouldManageDependencies from './DependenciesProject.behaviour';
 import shouldManageImplementations from './Implementations.behaviour';
 import shouldManageAdminProxy from './AdminProxy.behaviour';
 import Contracts from '../../../src/artifacts/Contracts';
-import { noop } from 'lodash';
+import noop from 'lodash.noop';
 
 const ImplV1 = Contracts.getFromLocal('DummyImplementation');
 const ImplV2 = Contracts.getFromLocal('DummyImplementationV2');
