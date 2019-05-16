@@ -1,3 +1,8 @@
+export enum Mutability {
+  Constant = 'Constant',
+  NotConstant = 'NotConstant',
+}
+
 export interface SetAdminPropsParams extends SharedPropsParams {}
 
 export interface SendTxSelectionParams extends SharedSelectionParams {}

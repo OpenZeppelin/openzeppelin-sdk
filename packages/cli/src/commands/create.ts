@@ -43,8 +43,8 @@ async function commandActions(contractFullName: string, options: any) {
   await add.runActionIfNeeded(promptedContractFullName, options);
   await push.runActionIfNeeded(promptedContractFullName, network, { ...options, network: promptedNewtork });
 
-  const promptMethodOpts = { askForMethodParams: rawInitMethod };
-  const initMethodParams = await promptForMethodParams(promptedContractFullName, getCommandProps, options, promptMethodOpts);
+  const additionalOpts = { askForMethodParams: rawInitMethod };
+  const initMethodParams = await promptForMethodParams(promptedContractFullName, getCommandProps, options, additionalOpts);
 
   await action(promptedContractFullName, { ...options, ...initMethodParams, network, txParams });
   if (!options.dontExitProcess && process.env.NODE_ENV !== 'test') process.exit(0);

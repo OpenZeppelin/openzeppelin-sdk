@@ -19,6 +19,7 @@ import unpack from './unpack';
 import transfer from './transfer';
 import balance from './balance';
 import sendTx from './send-tx';
+import call from './call';
 
 export default {
   add,
@@ -42,4 +43,5 @@ export default {
   transfer,
   balance,
   sendTx,
+  call,
 };

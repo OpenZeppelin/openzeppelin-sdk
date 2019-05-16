@@ -1,38 +1,37 @@
 import pickBy from 'lodash.pickby';
+import { ContractMethodMutability as Mutability } from 'zos-lib';
 
-import sendTx from '../scripts/send-tx';
+import call from '../scripts/call';
 import { parseContractReference } from '../utils/contract';
 import ConfigVariablesInitializer from '../models/initializer/ConfigVariablesInitializer';
 import { promptIfNeeded, networksList, promptForNetwork, argsList, methodsList, proxiesList, proxyInfo, InquirerQuestions } from '../prompts/prompt';
 import { SendTxPropsParams, SendTxSelectionParams } from './interfaces';
 import promptForMethodParams from '../prompts/method-params';
 
-const name: string = 'send-tx';
+const name: string = 'call';
 const signature: string = name;
-const description: string = 'send a transaction to the specified contract instance. Provide the [address], method to call and its arguments if needed';
+const description: string = 'call a method of the specified contract instance. Provide the [address], method to call and its arguments if needed';
 
 const register: (program: any) => any = (program) => program
   .command(signature, undefined, { noHelp: true })
   .usage('--to <to> --method <method> [options]')
   .description(description)
-  .option('--to <to>', 'address of the contract that will receive the transaction')
+  .option('--to <to>', 'address of the contract that will receive the call')
   .option('--method <method>', `name of the method to execute in the contract`)
   .option('--args <arg1, arg2, ...>', 'arguments to the method to execute')
-  .option('--value <value>', `optional value in wei to send with the transaction`)
-  .option('--gas <gas>', `gas limit of the transaction, will default to the limit specified in the configuration file, or use gas estimation if not set`)
   .withNetworkOptions()
   .withNonInteractiveOption()
   .action(action);
 
 async function action(options: any): Promise<void> {
-  const { interactive, to: proxyAddress, value, gas } = options;
+  const { interactive, to: proxyAddress } = options;
   const networkOpts = await promptForNetwork(options, () => getCommandProps());
   const { network, txParams } = await ConfigVariablesInitializer.initNetworkConfiguration({ ...options, ...networkOpts });
 
   const { contractFullName, proxyReference } = await promptForProxy(proxyAddress, network, options);
-  const methodParams = await promptForMethodParams(contractFullName, getCommandProps, options);
-  const args = pickBy({ ...methodParams, proxyAddress: proxyReference, value, gas });
-  await sendTx({ ...args, network, txParams });
+  const methodParams = await promptForMethodParams(contractFullName, getCommandProps, options, {}, Mutability.Constant);
+  const args = pickBy({ ...methodParams, proxyAddress: proxyReference });
+  await call({ ...args, network, txParams });
 
   if (!options.dontExitProcess && process.env.NODE_ENV !== 'test') process.exit(0);
 }
@@ -47,8 +46,8 @@ async function promptForProxy(proxyAddress: string, network: string, options: an
 }
 
 function getCommandProps({ network, contractFullName, methodName, methodArgs }: SendTxPropsParams = {}): InquirerQuestions {
-  const methods = methodsList(contractFullName);
-  const args = argsList(contractFullName, methodName)
+  const methods = methodsList(contractFullName, Mutability.Constant);
+  const args = argsList(contractFullName, methodName, Mutability.Constant)
     .reduce((accum, argName, index) => {
       return {
         ...accum,
