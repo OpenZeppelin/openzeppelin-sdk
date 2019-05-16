@@ -1,7 +1,6 @@
 // TODO: Once we migrate to Web3 1.x, we could replace these two dependencies with Web3, since it uses these two under the hood: https://github.com/ethereum/web3.js/blob/1.0/packages/web3-eth-abi/src/index.js
 import { defaultAbiCoder, ParamType } from 'ethers/utils/abi-coder';
 import ZWeb3 from '../artifacts/ZWeb3';
-import _ from 'lodash';
 
 export function encodeParams(types: Array<string | ParamType> = [], rawValues: any[] = []): string {
   return defaultAbiCoder.encode(types, rawValues);
