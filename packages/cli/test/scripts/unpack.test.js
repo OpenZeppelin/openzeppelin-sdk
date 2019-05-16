@@ -80,11 +80,16 @@ describe('unpack script', function() {
       .should.be.rejectedWith(/Failed to verify/);
   });
 
+  it('should fail if no kit name or repo specified', async function () {
+    await unpack({ repoOrName: undefined })
+      .should.be.rejectedWith(/A kit name or GitHub repo must be provided/);
+  });
+
   it('should fail if there are files inside the directory', async function () {
     fs.readdir.restore();
     sinon.stub(fs, 'readdir').returns(Promise.resolve(['.zos.lock', 'random']));
     await unpack({ repoOrName: repo })
-      .should.be.rejectedWith(/The directory must be empty/);
+      .should.be.rejectedWith('Unable to unpack https://github.com/zeppelinos/zepkit.git in the current directory, as it must be empty.');
   });
 
   it('should fail with wrong kit version', async function () {
