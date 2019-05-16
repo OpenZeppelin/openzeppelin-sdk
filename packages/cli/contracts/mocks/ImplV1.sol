@@ -9,15 +9,6 @@ contract ImplV1 {
   function initialize(uint256 _value) public {
     value = _value;
   }
-
-  function initializeWithEvent(uint256 _value) public {
-    value = _value;
-    emit InitializeEvent(value);
-  }
-
-  function initializeNumbers(uint256[] memory _numbers) public {
-    numbers = _numbers;
-  }
   
   function initializeThatFails(uint256 _value) public {
     require(false, "Fail");
