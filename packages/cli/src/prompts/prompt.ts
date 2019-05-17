@@ -120,7 +120,7 @@ export function contractsList(name: string, message: string, type: string, sourc
   } else if(source === 'fromLocal') {
     const contractsFromLocal = Object
       .keys(localPackageFile.contracts)
-      .map(alias => ({ name: this.contracts[alias], alias }))
+      .map(alias => ({ name: localPackageFile.contracts[alias], alias }))
       .map(({ name: contractName, alias }) => {
         const label = contractName === alias ? alias : `${alias}[${contractName}]`;
         return { name: label, value: alias };
