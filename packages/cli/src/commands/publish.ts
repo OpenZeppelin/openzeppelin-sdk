@@ -17,13 +17,13 @@ const register: (program: any) => any = (program) => program
   .action(action);
 
 async function action(options: any): Promise<void> {
-  const { network: networkInArgs } = options;
+  const { network: networkInArgs, interactive } = options;
   const { network: networkInSession } = Session.getOptions();
   const defaults = { network: Session.getNetwork() };
   const opts = { network: networkInSession || networkInArgs };
   const props = getCommandProps();
 
-  const promptedOpts = await promptIfNeeded({ opts, defaults, props });
+  const promptedOpts = await promptIfNeeded({ opts, defaults, props }, interactive);
   const { network, txParams } = await ConfigVariablesInitializer.initNetworkConfiguration(promptedOpts);
   if (!await hasToMigrateProject(network)) process.exit(0);
 
