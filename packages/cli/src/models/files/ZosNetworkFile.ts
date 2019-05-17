@@ -1,3 +1,4 @@
+import path from 'path';
 import findIndex from 'lodash.findindex';
 import isEmpty from 'lodash.isempty';
 import isEqual from 'lodash.isequal';
@@ -93,7 +94,13 @@ export default class ZosNetworkFile {
 
     const defaults = { contracts: {}, solidityLibs: {}, proxies: {}, zosversion: ZOS_VERSION };
 
-    this.data = fs.parseJsonIfExists(this.fileName) || defaults;
+    try {
+      this.data = fs.parseJsonIfExists(this.fileName) || defaults;
+      // if we failed to read and parse zos.json
+    } catch(e) {
+      e.message = `Failed to parse '${path.resolve(fileName)}' file. Please make sure that ${fileName} is a valid JSON file. Details: ${e.message}.`;
+      throw e;
+    }
     checkVersion(this.data.zosversion, this.fileName);
   }
 
