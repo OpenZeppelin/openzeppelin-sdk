@@ -164,6 +164,10 @@ export default class NetworkController {
     ]);
 
     await this._unsetSolidityLibs();
+
+    if (isEmpty(contracts) && isEmpty(changedLibraries)) {
+      log.info('All logic contracts are up to date');
+    }
   }
 
   // DeployerController
