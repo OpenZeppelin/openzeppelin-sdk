@@ -49,7 +49,7 @@ interface MethodOptions {
   constant?: boolean;
 }
 
-export let DEFAULT_INTERACTIVE_STATUS = true;
+export let DISABLE_INTERACTIVITY: boolean = (!!process.env.ZOS_NON_INTERACTIVE || process.env.DEBIAN_FRONTEND === 'noninteractive');
 
 /*
  * This function will parse and wrap both arguments and options into inquirer questions, where
@@ -59,8 +59,10 @@ export let DEFAULT_INTERACTIVE_STATUS = true;
  * inquirer questions attributes (such as question type, message and name) and `defaults` is an object with
  * default values for each args/props attributes.
  * */
-export async function promptIfNeeded({ args = {}, opts = {}, defaults, props }: PromptParams, interactive = DEFAULT_INTERACTIVE_STATUS): Promise<any> {
+export async function promptIfNeeded({ args = {}, opts = {}, defaults, props }: PromptParams, interactive): Promise<any> {
   const argsAndOpts  = { ...args, ...opts };
+
+  if(DISABLE_INTERACTIVITY) interactive = false;
 
   const argsAndOptsQuestions = Object.keys(argsAndOpts)
     .filter(name => argsAndOpts[name] === undefined || (typeof argsAndOpts[name] !== 'boolean' && isEmpty(argsAndOpts[name])))
