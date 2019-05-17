@@ -20,14 +20,13 @@ const register: (program: any) => any = (program) => program
 
 async function action(dependencies: string[], options: any): Promise<void> {
   const { install, forceInstall, interactive } = options;
-  const installDependencies = forceInstall || (install && interactive ? undefined : install);
+  const installDependencies = install || forceInstall;
   const args = { dependencies };
-  const opts = { installDependencies };
   const props = getCommandProps();
   const defaults = { dependencies: [await Dependency.fetchVersionFromNpm('openzeppelin-eth')] };
-  const prompted = await promptIfNeeded({ args, opts, props, defaults }, interactive);
+  const prompted = await promptIfNeeded({ args, props, defaults }, interactive);
 
-  await link(prompted);
+  await link({ ...prompted, installDependencies });
   await push.runActionIfRequested(options);
 }
 
@@ -46,11 +45,6 @@ function getCommandProps(): InquirerQuestions {
       type: 'input',
       message: 'Provide an EVM-package name and version',
       normalize: (input) => typeof input === 'string' ? [input] : input
-    },
-    installDependencies: {
-      type: 'confirm',
-      message: 'Do you want to install the dependency?',
-      default: true
     }
   };
 }
