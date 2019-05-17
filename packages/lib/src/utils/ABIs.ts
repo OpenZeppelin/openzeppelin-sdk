@@ -68,6 +68,10 @@ function tryGetTargetFunction(contract: Contract, methodName: string, args: stri
     });
     return { name: methodNode.name, inputs };
   }
+
+  // Otherwise, try to get the function by name and method arguments
+  const method = contract.schema.abi.find(({ name, inputs }) => name === methodName && inputs.length === args.length);
+  if (method) return { name: method.name, inputs: method.inputs };
 }
 
 function tryGetFunctionNodeFromMostDerivedContract(contract: Contract, methodName: string, args: any[]): Node | null {
@@ -88,7 +92,6 @@ function tryGetFunctionNodeFromMostDerivedContract(contract: Contract, methodNam
       default: throw Error(`Found more than one match for function ${methodName} with ${args.length} arguments in contract ${contract.schema.contractName}`);
     }
   }
-  throw Error(`Could not find method ${methodName} with ${args.length} arguments in contract ${contract.schema.contractName}`);
 }
 
 function tryGetLinearizedBaseContracts(contract: Contract): Node[] | null {
