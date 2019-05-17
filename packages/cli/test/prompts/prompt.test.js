@@ -20,6 +20,7 @@ describe('prompt', function() {
         this.stub = sinon.stub(inquirer, 'prompt').returns({});
         this.props = { foo: { message: 'message1', type: 'input' }, bar: { message: 'message2', type: 'input' } };
         this.interactive = true;
+        prompt.DISABLE_INTERACTIVITY = false;
       });
 
       afterEach('restore stub', function() {
