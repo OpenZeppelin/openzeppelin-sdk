@@ -5,9 +5,11 @@ import { lockSync } from 'lockfile';
 import program from './program';
 import findRootDirectory from './helpers';
 
+const IGNORED_COMMANDS_IN_ROOT_DIR = ['init', 'unpack'];
+
 const [nodePath, zosPath, command] = process.argv;
 
-if (command !== 'init') {
+if (!IGNORED_COMMANDS_IN_ROOT_DIR.includes(command)) {
   const currentPath = process.cwd();
   const rootDirectory = findRootDirectory(currentPath) || currentPath;
   if (rootDirectory !== process.cwd()) process.chdir(rootDirectory);
