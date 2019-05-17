@@ -30,6 +30,7 @@ const register: (program: any) => any = (program) => program
   .option('--args <arg1, arg2, ...>', 'provide initialization arguments for your contract if required')
   .option('--force', 'force creation even if contracts have local modifications')
   .withNetworkOptions()
+  .withSkipCompileOption()
   .withNonInteractiveOption()
   .action(commandActions);
 
@@ -39,7 +40,7 @@ async function commandActions(contractFullName: string, options: any) {
 
   await link.runActionIfNeeded(promptedContractFullName, options);
   await add.runActionIfNeeded(promptedContractFullName, options);
-  await push.runActionIfNeeded(promptedContractFullName, network, { ...options, network: promptedNewtork });
+  await push.runActionIfNeeded(promptedContractFullName, network, { ...options, network: promptedNewtork, force: true });
 
   const initParams = await promptForInitParams(promptedContractFullName,getCommandProps, options);
 
