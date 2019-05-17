@@ -1,3 +1,4 @@
+import path from 'path';
 import isEqual from 'lodash.isequal';
 import isEmpty from 'lodash.isempty';
 import { Logger, FileSystem as fs } from 'zos-lib';
@@ -31,7 +32,7 @@ export default class ZosPackageFile {
       this.data = fs.parseJsonIfExists(this.fileName) || { zosversion: ZOS_VERSION };
       // if we failed to read and parse zos.json
     } catch(e) {
-      e.message = `Failed to read and parse ${fileName} file. Please make sure ${fileName} is present and valid. Details: ${e.message}.`;
+      e.message = `Failed to parse '${path.resolve(fileName)}' file. Please make sure that ${fileName} is a valid JSON file. Details: ${e.message}.`;
       throw e;
     }
     checkVersion(this.data.zosversion, this.fileName);
