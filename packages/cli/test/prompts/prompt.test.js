@@ -97,20 +97,45 @@ describe('prompt', function() {
     describe('#contractsList', function() {
       beforeEach('set stub and initialize', function() {
         sinon.stub(Truffle, 'getContractNames').returns(['Foo', 'Bar']);
+        sinon.stub(ZosPackageFile.prototype, 'dependencies').get(() => ({'mock-stdlib': '1.1.0'}));
+        sinon.stub(ZosPackageFile.prototype, 'contracts').get(() => ({ 'Foo': 'Foo', 'BarAlias': 'Bar' }));
       });
 
       afterEach('restore stub', function() {
         sinon.restore();
       });
 
-      it('returns an object with correct keys and values', function() {
-        const contracts = contractsList('keyName', 'Im a message', 'listy');
+      it('returns an object with correct keys and values from build dir', function() {
+        const contracts = contractsList('keyName', 'Im a message', 'listy', 'fromBuildDir');
 
         contracts.should.be.an('object');
         contracts.keyName.should.be.an('object').that.has.all.keys('type', 'message', 'choices');
         contracts.keyName.type.should.eq('listy');
         contracts.keyName.message.should.eq('Im a message');
         contracts.keyName.choices.should.include.members(['Foo', 'Bar']);
+      });
+
+      it('returns an object with correct keys and values from local', function() {
+        const contracts = contractsList('keyName', 'Im a message', 'listy', 'fromLocal');
+
+        contracts.should.be.an('object');
+        contracts.keyName.should.be.an('object').that.has.all.keys('type', 'message', 'choices');
+        contracts.keyName.type.should.eq('listy');
+        contracts.keyName.message.should.eq('Im a message');
+        contracts.keyName.choices.should.deep.include.members([
+          { name: 'Foo', value: 'Foo' },
+          { name: 'BarAlias[Bar]', value: 'BarAlias' }
+        ]);
+      });
+
+      it('returns an object with all correct keys and values', function() {
+        const contracts = contractsList('keyName', 'Im a message', 'listy', 'all');
+
+        contracts.should.be.an('object');
+        contracts.keyName.should.be.an('object').that.has.all.keys('type', 'message', 'choices');
+        contracts.keyName.type.should.eq('listy');
+        contracts.keyName.message.should.eq('Im a message');
+        contracts.keyName.choices.should.include.members(['Foo', 'Bar', 'mock-stdlib/Foo', 'mock-stdlib/BarAlias']);
       });
     });
 
