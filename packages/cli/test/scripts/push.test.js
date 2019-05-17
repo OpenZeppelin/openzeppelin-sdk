@@ -589,6 +589,26 @@ contract('push script', function([_, owner]) {
     shouldSetDependency();
     shouldUpdateDependency();
   });
+
+  describe('an unpublished project with duplicated contracts', function() {
+    deployingDependency();
+
+    beforeEach('setting package-with-stdlib with two libs', async function () {
+      const packageFile = new ZosPackageFile('test/mocks/packages/package-with-stdlib.zos.json')
+      packageFile.publish = false
+      packageFile.addContract('ImplV1Clash', 'ImplV1Clash');
+      this.networkFile = packageFile.networkFile(network)
+    });
+
+    it('fails nicely if there are duplicated contract names', async function () {
+      const logs = new CaptureLogs();
+      await push({ network, txParams, networkFile: this.networkFile }).should.be.rejectedWith(/validation errors/);
+      logs.text.should.not.match(/Cannot read property 'forEach' of undefined/);
+      logs.text.should.match(/There is more than one contract named GreeterImpl/);
+      logs.restore();
+    });
+  });
+
 });
 
 async function getImplementationFromApp(contractAlias) {

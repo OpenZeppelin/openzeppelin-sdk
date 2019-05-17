@@ -355,7 +355,7 @@ export default class NetworkController {
       contract.schema.storageInfo = getStorageLayout(contract, buildArtifacts);
       return validationPasses(newWarnings);
     } catch (err) {
-      log.error(`Error while validating contract ${contract.schema.contractName}`, err);
+      log.error(`Error while validating contract ${contract.schema.contractName}:`, err);
       return false;
     }
   }

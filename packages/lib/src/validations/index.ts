@@ -14,7 +14,7 @@ import { getStorageLayout, getStructsOrEnums } from './Storage';
 import { compareStorageLayouts, Operation } from './Layout';
 import { hasInitialValuesInDeclarations } from './InitialValues';
 import Contract from '../artifacts/Contract.js';
-import { StorageInfo } from '../utils/ContractAST';
+import ContractAST, { StorageInfo } from '../utils/ContractAST';
 
 const log = new Logger('validate');
 
@@ -29,6 +29,7 @@ export interface ValidationInfo {
 }
 
 export function validate(contract: Contract, existingContractInfo: any = {}, buildArtifacts?: any): any {
+  checkArtifactsForImportedSources(contract, buildArtifacts);
   const storageValidation = validateStorage(contract, existingContractInfo, buildArtifacts);
   const uninitializedBaseContracts = [];
 
@@ -90,4 +91,8 @@ function tryGetUninitializedBaseContracts(contract: Contract): string[] {
     log.error(`- Skipping uninitialized base contracts validation due to error: ${error.message}`);
     return [];
   }
+}
+
+function checkArtifactsForImportedSources(contract: Contract, buildArtifacts: any): void | never {
+  new ContractAST(contract, buildArtifacts, { nodesFilter: ['ContractDefinition'] }).getBaseContractsRecursively();
 }
