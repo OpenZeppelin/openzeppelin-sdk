@@ -2,6 +2,9 @@
 
 require('../setup');
 import sinon from 'sinon';
+
+import * as prompt from '../../src/prompts/prompt';
+
 import inquirer from 'inquirer';
 import { ContractMethodMutability as Mutability } from 'zos-lib';
 
@@ -71,6 +74,25 @@ describe('prompt', function() {
           const questions = this.stub.getCall(0).args[0];
 
           questions.should.have.lengthOf(0);
+        });
+      });
+
+      context('with DISABLE_INTERACTIVITY environment variable set', function() {
+
+        beforeEach('disable interactivity', function() {
+          prompt.DISABLE_INTERACTIVITY = true;
+        });
+  
+        afterEach('enable interactivity', function() {
+          prompt.DISABLE_INTERACTIVITY = false;
+        });
+
+        it('does not prompt', async function() {
+          const args = { foo: undefined, bar: undefined };
+          await promptIfNeeded({ args, props: this.props }, this.interactive);
+          const call = this.stub.getCall(0);
+
+          (call === null).should.be.true;
         });
       });
     });
