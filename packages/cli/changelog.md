@@ -8,7 +8,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Added
 - Add interactive prompts for most CLI commands (`add`, `create`, `init`, `link`, `publish`, `push`, `remove`, `session`, `set-admin`, `unlink`, `update`, `verify`), plus a `--no-interactive` flag to ensure that no prompts are shown when working in a non-interactive script ([#792](https://github.com/zeppelinos/zos/pull/792), [#766](https://github.com/zeppelinos/zos/pull/766), [#750](https://github.com/zeppelinos/zos/pull/750), [#745](https://github.com/zeppelinos/zos/pull/745), [#730](https://github.com/zeppelinos/zos/pull/730), [#725](https://github.com/zeppelinos/zos/pull/725), [#839](https://github.com/zeppelinos/zos/pull/839))
-- Add `zos unpack` command for initializing a new zepkit from any repository with a `kit.json` specification ([#822](https://github.com/zeppelinos/zos/pull/822))
+- Support `ZOS_NON_INTERACTIVE` environment variable, as well as `DEBIAN_FRONTEND=noninteractive`, to disable interactive prompts in scripts ([#887](https://github.com/zeppelinos/zos/pull/887))
+- Add `zos unpack` command for initializing a new zepkit from any github repository with a `kit.json` specification, with the shortcuts `tutorial` and `zepkit` already set to official packs ([#822](https://github.com/zeppelinos/zos/pull/822), [#869](https://github.com/zeppelinos/zos/pull/869))
 - Add `zos create2` command for deploying proxies to a predefined address determined via a salt and the sender address, or an off-chain signature of a sender ([#805](https://github.com/zeppelinos/zos/pull/805), [#757](https://github.com/zeppelinos/zos/pull/757)), checking before deployment that the address had not been already deployed to ([#788](https://github.com/zeppelinos/zos/pull/788)) (thanks @siromivel!)
 - Add test to `truffle-migrate` sample project on CI ([#775](https://github.com/zeppelinos/zos/pull/775)) (thanks @paulinablaszk!)
 
@@ -18,6 +19,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Fixed
 - Fix issue `truffle-migrate` example ([#763](https://github.com/zeppelinos/zos/pull/763)) (thanks @hardlydifficult!)
+- Output a message notifying if no contracts were pushed in a `zos push` ([#888](https://github.com/zeppelinos/zos/pull/888))
+- Show a reasonable error message if a `zos.json` or `zos.network.json` file is malformed ([#881](https://github.com/zeppelinos/zos/pull/881))
+- Store proxy admin and proxy factory addresses in `zos.network.json` upon a `push` if the upload of a contract failed ([#860](https://github.com/zeppelinos/zos/pull/860))
 
 ## v2.2.2 - 2019-03-14
 
