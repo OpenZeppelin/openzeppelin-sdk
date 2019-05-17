@@ -27,7 +27,13 @@ export default class ZosPackageFile {
 
   constructor(fileName: string = 'zos.json') {
     this.fileName = fileName;
-    this.data = fs.parseJsonIfExists(this.fileName) || { zosversion: ZOS_VERSION };
+    try {
+      this.data = fs.parseJsonIfExists(this.fileName) || { zosversion: ZOS_VERSION };
+      // if we failed to read and parse zos.json
+    } catch(e) {
+      e.message = `Failed to read and parse ${fileName} file. Please make sure ${fileName} is present and valid. Details: ${e.message}.`;
+      throw e;
+    }
     checkVersion(this.data.zosversion, this.fileName);
   }
 
