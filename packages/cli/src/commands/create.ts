@@ -5,7 +5,7 @@ import add from './add';
 import push from './push';
 import create from '../scripts/create';
 import Session from '../models/network/Session';
-import { parseInit } from '../utils/input';
+import Compiler from '../models/compiler/Compiler';
 import { fromContractFullName } from '../utils/naming';
 import { hasToMigrateProject } from '../prompts/migrations';
 import ConfigVariablesInitializer from '../models/initializer/ConfigVariablesInitializer';
@@ -35,7 +35,9 @@ const register: (program: any) => any = (program) => program
   .action(commandActions);
 
 async function commandActions(contractFullName: string, options: any) {
-  const { init: rawInitMethod } = options;
+  const { init: rawInitMethod, skipCompile } = options;
+  if(!skipCompile) await Compiler.call();
+
   const { network: promptedNewtork, contractFullName: promptedContractFullName } = await promptForCreate(contractFullName, options);
   const { network, txParams } = await ConfigVariablesInitializer.initNetworkConfiguration({ ...options, network: promptedNewtork });
 
