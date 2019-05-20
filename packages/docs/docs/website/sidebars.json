@@ -2,9 +2,7 @@
   "docs": {
     "OVERVIEW": [
       "start",
-      "new_2.3",
-      "new_2.2",
-      "new_2"
+      "new_2.3"
     ],
     "QUICKSTART": [
       "zepkit",
