@@ -61,5 +61,5 @@ $ zos create2 MyContract --salt 42 --signature 0xabcdef --init initialize
 ## Changelog
 
 Please see the project's changelogs for more information:
-- [cli](https://github.com/zeppelinos/zos/blob/master/packages/cli/changelog.md)
-- [lib](https://github.com/zeppelinos/zos/blob/master/packages/lib/changelog.md)
+- [cli](https://github.com/zeppelinos/zos/blob/release/2.3/packages/cli/changelog.md)
+- [lib](https://github.com/zeppelinos/zos/blob/release/2.3/packages/lib/changelog.md)
