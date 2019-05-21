@@ -14,6 +14,7 @@ declare module 'solc' {
 
   export interface CompilerOptimizerOptions {
     enabled: boolean;
+    runs?: string;
   }
 
   export interface CompilerSettings {
