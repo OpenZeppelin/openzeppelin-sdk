@@ -125,8 +125,6 @@ export function contractsList(name: string, message: string, type: string, sourc
 
   // get contracts from `build/contracts`
   if (!source || source === 'built') {
-    console.log(contractsFromBuild);
-    console.log(contractsFromLocal);
     return inquirerQuestion(name, message, type, contractsFromBuild);
   // get contracts from zos.json file
   } else if (source === 'notAdded') {
