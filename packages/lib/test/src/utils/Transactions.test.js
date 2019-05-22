@@ -24,6 +24,10 @@ contract('Transactions', function(accounts) {
     this.DummyImplementation = Contracts.getFromLocal('DummyImplementation');
   });
 
+  afterEach(function () {
+    sinon.restore();
+  });
+
   const assertGasLt = async (txHash, expected) => {
     const { gas } = await ZWeb3.getTransaction(txHash);
     gas.should.be.at.most(parseInt(expected));
@@ -78,10 +82,6 @@ contract('Transactions', function(accounts) {
     });
 
     describe('gas', function () {
-      afterEach('restore stubs', function () {
-        sinon.restore();
-      })
-
       describe('when there is a default gas amount defined', function () {
         describe('when a gas amount is given', function () {
           it('uses specified gas', async function () {
@@ -111,6 +111,10 @@ contract('Transactions', function(accounts) {
         });
 
         describe('when no gas amount is given', function () {
+          beforeEach(function () {
+            sinon.stub(ZWeb3, 'isGanacheNode').resolves(false);
+          });
+
           it('estimates gas', async function () {
             const receipt = await Transactions.sendTransaction(this.instance.methods.initialize, DEFAULT_PARAMS);
             await assertGasLt(receipt.transactionHash, 1000000);
@@ -125,7 +129,7 @@ contract('Transactions', function(accounts) {
 
           it.skip('retries estimating gas', async function () {
             const stub = sinon.stub(this.instance.methods.initialize, 'estimateGas')
-            _.times(3, i => stub.onCall(i).throws('Error', 'gas required exceeds allowance or always failing transaction'))
+            times(3, i => stub.onCall(i).throws('Error', 'gas required exceeds allowance or always failing transaction'))
             stub.returns(800000)
 
             const receipt = await Transactions.sendTransaction(this.instance.methods.initialize, DEFAULT_PARAMS);
@@ -147,9 +151,8 @@ contract('Transactions', function(accounts) {
         sinon.stub(ZWeb3, 'isMainnet').resolves(true)
       });
 
-      afterEach('return to testnet and undo stub', async function() {
+      afterEach('return to testnet', async function() {
         delete state.gasPrice;
-        sinon.restore();
       });
 
       describe('uses an API to determine gas price', async function() {
@@ -202,10 +205,6 @@ contract('Transactions', function(accounts) {
     });
 
     describe('gas', function () {
-      afterEach('restore stubs', function () {
-        sinon.restore();
-      })
-
       describe('when there is a default gas amount defined', function () {
         describe('when a gas amount is given', function () {
           it('uses specified gas', async function () {
@@ -235,6 +234,10 @@ contract('Transactions', function(accounts) {
         });
 
         describe('when no gas amount is given', function () {
+          beforeEach(function () {
+            sinon.stub(ZWeb3, 'isGanacheNode').resolves(false);
+          })
+
           it('estimates gas', async function () {
             const receipt = await Transactions.sendDataTransaction(this.instance, { data: this.encodedCall });
             await assertGasLt(receipt.transactionHash, 1000000);
@@ -246,7 +249,7 @@ contract('Transactions', function(accounts) {
             stub.returns(800000)
 
             const receipt = await Transactions.sendDataTransaction(this.instance, { data: this.encodedCall });
-            await assertGas(receipt.transactionHash, 800000 * 1.25 + 15000);
+            await assertGas(receipt.transactionHash, 800000 * 1.25);
           });
 
           it('retries estimating gas up to 3 times', async function () {
@@ -267,9 +270,8 @@ contract('Transactions', function(accounts) {
           sinon.stub(axios, 'get').resolves({ data: { average: 49 } })
         });
 
-        afterEach('return to testnet and undo stub', async function() {
+        afterEach('return to testnet', async function() {
           delete state.gasPrice;
-          sinon.restore();
         });
 
         it('uses gas price API when gas not specified', async function () {
@@ -289,9 +291,8 @@ contract('Transactions', function(accounts) {
           sinon.stub(axios, 'get').resolves({ data: { average: 1234123412341234 } })
         });
 
-        afterEach('Return to testnet and undo stub', async function() {
+        afterEach('return to testnet', async function() {
           delete state.gasPrice;
-          sinon.restore();
         });
 
         it('produces an error when gas price API gives giant value', async function () {
@@ -323,10 +324,6 @@ contract('Transactions', function(accounts) {
     });
 
     describe('gas', function () {
-      afterEach('restore stubs', function () {
-        sinon.restore();
-      })
-
       describe('when there is a default gas amount defined', function () {
         describe('when a gas amount is given', function () {
           it('uses specified gas', async function () {
@@ -356,6 +353,10 @@ contract('Transactions', function(accounts) {
         });
 
         describe('when no gas amount is given', function () {
+          beforeEach(function () {
+            sinon.stub(ZWeb3, 'isGanacheNode').resolves(false);
+          })
+
           it('estimates gas', async function () {
             const receipt = await Transactions.sendRawTransaction(this.instance.address, this.encodedCall);
             await assertGasLt(receipt.transactionHash, 1000000);
@@ -367,7 +368,7 @@ contract('Transactions', function(accounts) {
             stub.returns(800000)
 
             const receipt = await Transactions.sendRawTransaction(this.instance.address, this.encodedCall);
-            await assertGas(receipt.transactionHash, 800000 * 1.25 + 15000);
+            await assertGas(receipt.transactionHash, 800000 * 1.25);
           });
 
           it('retries estimating gas up to 3 times', async function () {
@@ -388,9 +389,8 @@ contract('Transactions', function(accounts) {
           sinon.stub(axios, 'get').resolves({ data: { average: 49 } })
         });
 
-        afterEach('return to testnet and undo stub', async function() {
+        afterEach('return to testnet', async function() {
           delete state.gasPrice;
-          sinon.restore();
         });
 
         it('uses gas price API when gas not specified', async function () {
@@ -412,9 +412,8 @@ contract('Transactions', function(accounts) {
           sinon.stub(axios, 'get').resolves({ data: { average: 1234123412341234 } })
         });
 
-        afterEach('Return to testnet and undo stub', async function() {
+        afterEach('return to testnet', async function() {
           delete state.gasPrice;
-          sinon.restore();
         });
 
         it('produces an error when gas price API gives giant value', async function () {
@@ -442,10 +441,6 @@ contract('Transactions', function(accounts) {
       });
 
       describe('gas', function () {
-        afterEach('restore stubs', function () {
-          sinon.restore();
-        });
-
         describe('when there is a default gas amount defined', function () {
           describe('when a gas amount is given', function () {
             it('uses specified gas', async function () {
@@ -476,9 +471,19 @@ contract('Transactions', function(accounts) {
 
           describe('when no gas amount is given', function () {
             it('estimates gas', async function () {
+              sinon.stub(ZWeb3, 'isGanacheNode').resolves(false);
               const instance = await Transactions.deployContract(this.DummyImplementation);
               await assertGasLt(instance.deployment.transactionHash, 1000000);
             });
+
+            // Regression test for zeppelinos/zos#837
+            it('uses enough gas for initializing a large contract', async function () {
+              const MockStandaloneERC721 = Contracts.getFromLocal('MockStandaloneERC721');;
+              const logic = await Transactions.deployContract(MockStandaloneERC721);
+              const initData = logic.methods.initialize('NFTToken', 'NFT', [account2], [account2]).encodeABI();
+              const Proxy = Contracts.getFromLocal('AdminUpgradeabilityProxy');
+              await Transactions.deployContract(Proxy, [logic.options.address, account2, initData]);
+            });            
           });
         });
       });
@@ -490,9 +495,8 @@ contract('Transactions', function(accounts) {
             sinon.stub(axios, 'get').resolves({ data: { average: 49 } })
           });
 
-          afterEach('Return to testnet and undo stub', async function() {
+          afterEach('return to testnet', async function() {
             delete state.gasPrice;
-            sinon.restore();
           });
 
           it('uses gas price API when gas not specified', async function () {
@@ -514,9 +518,8 @@ contract('Transactions', function(accounts) {
             sinon.stub(axios, 'get').resolves({ data: { average: 1234123412341234 } })
           });
 
-          afterEach('Return to testnet and undo stub', async function() {
+          afterEach('return to testnet', async function() {
             delete state.gasPrice;
-            sinon.restore();
           });
 
           it('produces an error when gas price API gives giant value', async function () {
@@ -547,10 +550,6 @@ contract('Transactions', function(accounts) {
       });
 
       describe('gas', function () {
-        afterEach('restore stubs', function () {
-          sinon.restore();
-        })
-
         describe('when there is a default gas amount defined', function () {
           describe('when a gas amount is given', function () {
             it('uses specified gas', async function () {
@@ -580,6 +579,10 @@ contract('Transactions', function(accounts) {
           });
 
           describe('when no gas amount is given', function () {
+            beforeEach(function () {
+              sinon.stub(ZWeb3, 'isGanacheNode').resolves(false);
+            });
+
             it('estimates gas', async function () {
               const instance = await Transactions.deployContract(this.WithConstructorImplementation, [42, "foo"]);
               await assertGasLt(instance.deployment.transactionHash, 1000000);
@@ -591,7 +594,7 @@ contract('Transactions', function(accounts) {
               stub.returns(800000)
 
               const instance = await Transactions.deployContract(this.WithConstructorImplementation, [42, "foo"]);
-              await assertGas(instance.deployment.transactionHash, 800000 * 1.25 + 15000);
+              await assertGas(instance.deployment.transactionHash, 800000 * 1.25);
             });
 
             it('retries estimating gas up to 3 times', async function () {
@@ -612,9 +615,8 @@ contract('Transactions', function(accounts) {
             sinon.stub(axios, 'get').resolves({ data: { average: 49 } })
           });
 
-          afterEach('Return to testnet and undo stub', async function() {
+          afterEach('return to testnet', async function() {
             delete state.gasPrice;
-            sinon.restore();
           });
 
           it('uses gas price API when gas not specified', async function () {
@@ -636,9 +638,8 @@ contract('Transactions', function(accounts) {
             sinon.stub(axios, 'get').resolves({ data: { average: 1234123412341234 } })
           });
 
-          afterEach('return to testnet and undo stub', async function() {
+          afterEach('return to testnet', async function() {
             delete state.gasPrice;
-            sinon.restore();
           });
 
           it('produces an error when gas price API gives giant value', async function () {
@@ -655,8 +656,7 @@ contract('Transactions', function(accounts) {
       this.mineInterval = setInterval(advanceBlock, 100);
     })
 
-    afterEach('undo stub and disable mining', async function () {
-      sinon.restore()
+    afterEach('disable mining', async function () {
       if (this.mineInterval) clearInterval(this.mineInterval);
       await sleep(100);
     })

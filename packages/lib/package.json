@@ -79,7 +79,7 @@
     "chai-bignumber": "^2.0.2",
     "chai-string": "^1.5.0",
     "coveralls": "^3.0.0",
-    "ganache-cli": "^6.3.0",
+    "ganache-cli": "^6.4.3",
     "ganache-core": "^2.5.1",
     "lodash.foreach": "^4.5.0",
     "lodash.noop": "^3.0.1",
