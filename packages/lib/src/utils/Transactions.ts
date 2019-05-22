@@ -217,15 +217,11 @@ export default {
 
   async _calculateActualGas(estimatedGas: number): Promise<number> {
     const blockLimit: number = await this._getBlockGasLimit();
-    let gasToUse = parseInt(`${estimatedGas * GAS_MULTIPLIER}`, 10);
-    // Ganache has a bug (https://github.com/trufflesuite/ganache-core/issues/26) that causes gas
-    // refunds to be included in the gas estimation; but the transaction needs to send the total
-    // amount of gas to work. Geth and Parity return the correct value, so here we are adding the
-    // value of the refund of setting a storage position to zero (which we do on unsetImplementation).
-    // This is a viable workaround as long as we don't have other methods that have higher refunds,
-    // such as cleaning more storage positions or selfdestructing a contract. We should be able to fix
-    // this once the issue is resolved.
-    if (await ZWeb3.isGanacheNode()) gasToUse += 15000;
+    const gasToUse = parseInt(`${estimatedGas * GAS_MULTIPLIER}`, 10);
+    // Recent versions of ganache (>= 6.4.0) return too low values for gas estimation,
+    // causing some transactions to fail. To fix this, always use the block limit
+    // when working on a ganache node.
+    if (await ZWeb3.isGanacheNode()) return blockLimit - 1;
     return gasToUse >= blockLimit ? (blockLimit - 1) : gasToUse;
   },
 };
