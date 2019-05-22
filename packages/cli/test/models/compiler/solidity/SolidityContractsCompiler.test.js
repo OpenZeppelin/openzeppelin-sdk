@@ -70,7 +70,7 @@ describe('SolidityContractsCompiler', function () {
         describe('when no options are given', function () {
           const options = {}
 
-          it('compiles the given contracts using solc 0.5 byzantium without optimizer', async function () {
+          it('compiles the given contracts using solc 0.5 constantinople without optimizer', async function () {
             const compiler = new SolidityContractsCompiler(contracts, options)
             const output = await compiler.call()
 
@@ -86,13 +86,12 @@ describe('SolidityContractsCompiler', function () {
               data.sourceMap.should.not.be.null
               data.abi.should.not.be.null
               data.ast.should.not.be.null
-              data.legacyAST.should.not.be.null
               data.bytecode.should.not.be.null
               data.deployedBytecode.should.not.be.null
               data.compiler.name.should.be.eq('solc')
-              data.compiler.version.should.be.eq('0.5.1+commit.c8a2cb62.Emscripten.clang')
+              data.compiler.version.should.be.eq('0.5.8+commit.23d335f2.Emscripten.clang')
               data.compiler.optimizer.should.be.deep.equal({ enabled: false })
-              data.compiler.evmVersion.should.be.eq('byzantium')
+              data.compiler.evmVersion.should.be.eq('constantinople')
             })
 
             this.logs.errors.should.be.empty
@@ -119,13 +118,12 @@ describe('SolidityContractsCompiler', function () {
               data.sourceMap.should.not.be.null
               data.abi.should.not.be.null
               data.ast.should.not.be.null
-              data.legacyAST.should.not.be.null
               data.bytecode.should.not.be.null
               data.deployedBytecode.should.not.be.null
               data.compiler.name.should.be.eq('solc')
               data.compiler.version.should.be.eq('0.5.0')
               data.compiler.optimizer.should.be.deep.equal({ enabled: true, runs: 200 })
-              data.compiler.evmVersion.should.be.eq('byzantium')
+              data.compiler.evmVersion.should.be.eq('constantinople')
             })
 
             this.logs.errors.should.be.empty
@@ -154,13 +152,12 @@ describe('SolidityContractsCompiler', function () {
             data.sourceMap.should.not.be.null
             data.abi.should.not.be.null
             data.ast.should.not.be.null
-            data.legacyAST.should.not.be.null
             data.bytecode.should.not.be.null
             data.deployedBytecode.should.not.be.null
             data.compiler.name.should.be.eq('solc')
             data.compiler.version.should.be.eq('0.5.0')
             data.compiler.optimizer.should.be.deep.equal({ enabled: false })
-            data.compiler.evmVersion.should.be.eq('byzantium')
+            data.compiler.evmVersion.should.be.eq('constantinople')
           })
 
           this.logs.errors.should.be.empty
@@ -209,7 +206,7 @@ describe('SolidityContractsCompiler', function () {
         describe('when no options are given but the version', function () {
           const options = { version: '0.4.24' }
 
-          it('compiles the given contracts using solc requested version byzantium without optimizer', async function () {
+          it('compiles the given contracts using solc requested version constantinople without optimizer', async function () {
             const compiler = new SolidityContractsCompiler(contracts, options)
             const output = await compiler.call()
 
@@ -225,13 +222,12 @@ describe('SolidityContractsCompiler', function () {
               data.sourceMap.should.not.be.null
               data.abi.should.not.be.null
               data.ast.should.not.be.null
-              data.legacyAST.should.not.be.null
               data.bytecode.should.not.be.null
               data.deployedBytecode.should.not.be.null
               data.compiler.name.should.be.eq('solc')
               data.compiler.version.should.be.eq('0.4.24')
               data.compiler.optimizer.should.be.deep.equal({ enabled: false })
-              data.compiler.evmVersion.should.be.eq('byzantium')
+              data.compiler.evmVersion.should.be.eq('constantinople')
             })
 
             this.logs.errors.should.be.empty
@@ -258,13 +254,12 @@ describe('SolidityContractsCompiler', function () {
               data.sourceMap.should.not.be.null
               data.abi.should.not.be.null
               data.ast.should.not.be.null
-              data.legacyAST.should.not.be.null
               data.bytecode.should.not.be.null
               data.deployedBytecode.should.not.be.null
               data.compiler.name.should.be.eq('solc')
               data.compiler.version.should.be.eq('0.4.24')
               data.compiler.optimizer.should.be.deep.equal({ enabled: true, runs: 200 })
-              data.compiler.evmVersion.should.be.eq('byzantium')
+              data.compiler.evmVersion.should.be.eq('constantinople')
             })
 
             this.logs.errors.should.be.empty
@@ -293,13 +288,12 @@ describe('SolidityContractsCompiler', function () {
             data.sourceMap.should.not.be.null
             data.abi.should.not.be.null
             data.ast.should.not.be.null
-            data.legacyAST.should.not.be.null
             data.bytecode.should.not.be.null
             data.deployedBytecode.should.not.be.null
             data.compiler.name.should.be.eq('solc')
             data.compiler.version.should.be.eq('0.4.24')
             data.compiler.optimizer.should.be.deep.equal({ enabled: false })
-            data.compiler.evmVersion.should.be.eq('byzantium')
+            data.compiler.evmVersion.should.be.eq('constantinople')
           })
 
           this.logs.errors.should.be.empty

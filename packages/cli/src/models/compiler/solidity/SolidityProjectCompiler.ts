@@ -1,9 +1,13 @@
 import path from 'path';
-import fsSys from 'fs';
+import max from 'lodash.max';
+import { statSync } from 'fs';
 import { FileSystem as fs } from 'zos-lib';
 import SolidityContractsCompiler, { RawContract, CompiledContract, CompilerOptions } from './SolidityContractsCompiler';
 import { ImportsFsEngine } from '@resolver-engine/imports-fs';
 import { gatherSources } from './ResolverEngineGatherer';
+import { Logger } from '../../../../../lib/lib';
+
+const log = new Logger('SolidityProjectCompiler');
 
 export default class SolidityProjectCompiler {
 
@@ -26,6 +30,10 @@ export default class SolidityProjectCompiler {
   public async call(): Promise<void> {
     this._loadSoliditySourcesFromDir();
     await this._loadDependencies();
+    if (!this._shouldCompile()) {
+      log.info('Nothing to compile, all contracts are up to date.');
+      return;
+    }
     await this._compile();
     this._writeOutput();
   }
@@ -39,7 +47,7 @@ export default class SolidityProjectCompiler {
   }
 
   private async _loadDependencies() {
-    const importFiles = await gatherSources(this.roots, process.cwd(), ImportsFsEngine());
+    const importFiles = await gatherSources(this.roots, this.inputDir, ImportsFsEngine());
     this.contracts = importFiles.map(file => ({
       fileName: path.basename(file.url),
       filePath: file.url,
@@ -50,7 +58,7 @@ export default class SolidityProjectCompiler {
 
   private _tryGetLastModified(filePath: string): Date {
     try {
-      return fsSys.statSync(filePath).mtime;
+      return statSync(filePath).mtime;
     } catch {
       return null;
     }
@@ -61,12 +69,34 @@ export default class SolidityProjectCompiler {
     this.compilerOutput = await solidityCompiler.call();
   }
 
+  private _shouldCompile(): boolean {
+    const artifactsMtimes = this._listArtifacts()
+      .map(filePath => statSync(filePath).mtime);
+    const sourcesMtimes = this.contracts
+      .map(contract => contract.lastModified);
+
+    // Compile if there are no previous artifacts, or no mtimes could be collected for sources,
+    // or sources were modified after artifacts
+    // TODO: Check for changes in solc version or compiler settings
+    return !max(artifactsMtimes) || !max(sourcesMtimes)
+      || max(artifactsMtimes) < max(sourcesMtimes);
+  }
+
   private _writeOutput(): void {
     if (!fs.exists(this.outputDir)) fs.createDirPath(this.outputDir);
+    else this._listArtifacts().forEach(filePath => fs.remove(filePath));
     this.compilerOutput.forEach((data) => {
       const buildFileName = `${this.outputDir}/${data.contractName}.json`;
       fs.writeJson(buildFileName, data);
     });
+  }
+
+  private _listArtifacts(): string[] {
+    if (!fs.exists(this.outputDir)) return [];
+    return fs.readDir(this.outputDir)
+      .map(fileName => path.resolve(this.outputDir, fileName))
+      .filter(fileName => !fs.isDir(fileName))
+      .filter(fileName => path.extname(fileName) === '.json');
   }
 
   private _isSolidityFile(fileName: string): boolean {

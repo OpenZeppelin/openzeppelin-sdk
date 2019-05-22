@@ -11,7 +11,7 @@ export interface CompiledContract {
   sourceMap: string;
   abi: any[];
   ast: any;
-  legacyAST: any;
+  legacyAST?: any;
   bytecode: string;
   deployedBytecode: string;
   compiler: solc.CompilerInfo;
@@ -77,6 +77,7 @@ export default class SolidityContractsCompiler {
   }
 
   public async call(): Promise<CompiledContract[]> {
+    // TODO: Support docker and native compilers
     const solcOutput = await this._compile();
     return this._buildContractsSchemas(solcOutput);
   }
@@ -85,6 +86,7 @@ export default class SolidityContractsCompiler {
     if (this.version === SolidityContractsCompiler.latestVersion()) return solc;
     const version = await this._findVersion();
     const parsedVersion = version.replace('soljson-', '').replace('.js', '');
+    // TODO: Manually download and cache chosen version
     return new Promise((resolve, reject) => {
       solc.loadRemoteVersion(parsedVersion, (error, compiler) => {
         return error ? reject(error) : resolve(compiler);
@@ -166,7 +168,6 @@ export default class SolidityContractsCompiler {
       sourceMap: output.evm.bytecode.sourceMap,
       abi: output.abi,
       ast: source.ast,
-      legacyAST: source.legacyAST,
       bytecode: `0x${this._solveLibraryLinks(output.evm.bytecode)}`,
       deployedBytecode: `0x${this._solveLibraryLinks(output.evm.deployedBytecode)}`,
       compiler: {

@@ -27,13 +27,12 @@ describe('SolidityProjectCompiler', function () {
       schema.sourceMap.should.not.be.null
       schema.abi.should.not.be.null
       schema.ast.should.not.be.null
-      schema.legacyAST.should.not.be.null
       schema.bytecode.should.not.be.null
       schema.deployedBytecode.should.not.be.null
       schema.compiler.name.should.be.eq('solc')
       schema.compiler.version.should.be.eq('0.5.1')
       schema.compiler.optimizer.should.be.deep.equal({ enabled: false })
-      schema.compiler.evmVersion.should.be.eq('byzantium')
+      schema.compiler.evmVersion.should.be.eq('constantinople')
     })
   }).timeout(180000)
 })
