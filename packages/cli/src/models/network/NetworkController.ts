@@ -14,7 +14,7 @@ import isEqual from 'lodash.isequal';
 import concat from 'lodash.concat';
 import toPairs from 'lodash.topairs';
 
-import { Contracts, Contract, Logger, FileSystem as fs, Proxy, Transactions, semanticVersionToString, contractMethodsFromAst } from 'zos-lib';
+import { Contracts, Contract, Logger, FileSystem as fs, Proxy, Transactions, semanticVersionToString, contractMethodsFromAbi } from 'zos-lib';
 import { ProxyAdminProject, AppProject, flattenSourceCode, getStorageLayout, BuildArtifacts, getBuildArtifacts, getSolidityLibNames } from 'zos-lib';
 import { validate, newValidationErrors, validationPasses, App, ZWeb3, ProxyAdmin, SimpleProject, AppProxyMigrator } from 'zos-lib';
 import { isMigratableZosversion } from '../files/ZosVersion';
@@ -595,7 +595,7 @@ export default class NetworkController {
     // If there is an initializer called, assume it's ok
     if (calledInitMethod) return;
     // Otherwise, warn the user to invoke it
-    const contractMethods = contractMethodsFromAst(contract);
+    const contractMethods = contractMethodsFromAbi(contract);
     const initializerMethods = contractMethods
       .filter(({ hasInitializer, name }) => hasInitializer || name === 'initialize')
       .map(({ name }) => name);

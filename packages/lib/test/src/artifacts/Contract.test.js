@@ -4,7 +4,7 @@ require('../../setup')
 import utils from 'web3-utils';
 
 import Contracts from '../../../src/artifacts/Contracts'
-import { contractMethodsFromAst, contractMethodsFromAbi, ContractMethodMutability as Mutability } from '../../../src/artifacts/Contract';
+import { contractMethodsFromAbi, ContractMethodMutability as Mutability } from '../../../src/artifacts/Contract';
 
 const ContractWithStructInConstructor = Contracts.getFromLocal('WithStructInConstructor');
 const ContractWithConstructorImplementation = Contracts.getFromLocal('WithConstructorImplementation');
@@ -73,82 +73,6 @@ contract('Contract', function(accounts) {
      * nonInitializable(uint256)
      * fail()
    */
-    describe('#contractMethodsFromAst', function() {
-      context('when querying constant methods', function() {
-        beforeEach('set methods', function() {
-          this.methods = contractMethodsFromAst(InitializableMock, Mutability.Constant);
-        });
-
-        it('returns only public functions', function() {
-          const nonPublicMethods = this.methods.find(method => method.visibility !== 'public');
-          const publicMethods = this.methods.filter(method => method.visibility === 'public');
-          expect(nonPublicMethods).to.be.undefined;
-          expect(publicMethods).to.have.lengthOf(this.methods.length);
-        });
-
-        it('returns methods without initializers', function() {
-          const methods = this.methods.filter(({ hasInitializer }) => !hasInitializer);
-          expect(methods).to.have.lengthOf(1);
-          expect(methods[0].name).to.eq('fail');
-        });
-
-        it('sets selectors', function() {
-          expect(this.methods).to.have.lengthOf(1);
-          expect(this.methods[0].selector).to.eq('fail()');
-        });
-
-        it('sets method inputs', function() {
-          expect(this.methods).to.have.lengthOf(1);
-          expect(this.methods[0].inputs).to.be.empty;
-        });
-      });
-
-      context('when querying non-constant methods', function() {
-        beforeEach('set methods', function() {
-          this.methods = contractMethodsFromAst(InitializableMock, Mutability.NotConstant);
-        });
-
-        it('returns only public functions', function() {
-          const nonPublicMethods = this.methods.find(method => method.visibility !== 'public');
-          const publicMethods = this.methods.filter(method => method.visibility === 'public');
-          expect(nonPublicMethods).to.be.undefined;
-          expect(publicMethods).to.have.lengthOf(this.methods.length);
-        });
-
-        it('returns methods with initializers', function() {
-          const methods = this.methods.filter(({ hasInitializer }) => hasInitializer);
-          expect(methods).to.have.lengthOf(3);
-          expect(methods[0].name).to.eq('initialize');
-          expect(methods[1].name).to.eq('initializeNested');
-          expect(methods[2].name).to.eq('initializeWithX');
-        });
-
-        it('returns methods without initializers', function() {
-          const methods = this.methods.filter(({ hasInitializer }) => !hasInitializer);
-          expect(methods).to.have.lengthOf(1);
-          expect(methods[0].name).to.eq('nonInitializable');
-        });
-
-        it('sets selectors', function() {
-          expect(this.methods).to.have.lengthOf(4);
-          expect(this.methods[0].selector).to.eq('initialize()');
-          expect(this.methods[1].selector).to.eq('initializeNested()');
-          expect(this.methods[2].selector).to.eq('initializeWithX(uint256)');
-          expect(this.methods[3].selector).to.eq('nonInitializable(uint256)');
-        });
-
-        it('sets method inputs', function() {
-          expect(this.methods[0].inputs).to.be.empty;
-          expect(this.methods[1].inputs).to.be.empty;
-          expect(this.methods[2].inputs).to.have.lengthOf(1)
-          expect(this.methods[2].inputs[0].name).to.eq('_x');
-          expect(this.methods[2].inputs[0].type).to.eq('uint256');
-          expect(this.methods[3].inputs[0].name).to.eq('_x');
-          expect(this.methods[3].inputs[0].type).to.eq('uint256');
-        });
-      });
-    });
-
     describe('#contractMethodsFromAbi', function() {
       context('when querying constant methods', function() {
         beforeEach('set methods', function() {
@@ -160,15 +84,37 @@ contract('Contract', function(accounts) {
           this.methods.forEach(method => expect(method.type).to.eq('function'))
         });
 
+        it('returns methods without initializers', function() {
+          const methods = this.methods.filter(({ hasInitializer }) => !hasInitializer);
+          expect(methods).to.have.lengthOf(3);
+          expect(methods[0].name).to.eq('x');
+          expect(methods[1].name).to.eq('initializerRan');
+          expect(methods[2].name).to.eq('fail');
+        });
+
         it('sets selectors', function() {
           const selectors = this.methods.map(({ selector }) => selector);
           expect(selectors).to.include('x()', 'initializerRan()', 'fail()')
         });
       });
 
-      context('when querying constant methods', function() {
+      context('when querying non-constant methods', function() {
         beforeEach('set methods', function() {
           this.methods = contractMethodsFromAbi(InitializableMock, Mutability.NotConstant);
+        });
+
+        it('returns methods without initializers', function() {
+          const methods = this.methods.filter(({ hasInitializer }) => !hasInitializer);
+          expect(methods).to.have.lengthOf(1);
+          expect(methods[0].name).to.eq('nonInitializable');
+        });
+
+        it('returns methods with initializers', function() {
+          const methods = this.methods.filter(({ hasInitializer }) => hasInitializer);
+          expect(methods).to.have.lengthOf(3);
+          expect(methods[0].name).to.eq('initialize');
+          expect(methods[1].name).to.eq('initializeNested');
+          expect(methods[2].name).to.eq('initializeWithX');
         });
 
         it('returns an array of methods', function() {
