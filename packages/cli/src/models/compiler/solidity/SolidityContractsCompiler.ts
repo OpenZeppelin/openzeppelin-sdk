@@ -1,7 +1,6 @@
 import _ from 'lodash';
 import axios from 'axios';
 import { Logger, FileSystem } from 'zos-lib';
-import SolidityDependenciesFinder from './SolidityDependenciesFinder';
 import solc from 'solc';
 
 export interface CompiledContract {
@@ -22,6 +21,7 @@ export interface RawContract {
   fileName: string;
   filePath: string;
   source: string;
+  lastModified?: Date;
 }
 
 export interface CompilerOptions {
@@ -33,12 +33,11 @@ export interface CompilerOptions {
 const log = new Logger('SolidityContractsCompiler');
 
 const DEFAULT_OPTIMIZER = { enabled: false };
-const DEFAULT_EVM_VERSION = 'byzantium';
+const DEFAULT_EVM_VERSION = 'constantinople';
 const VERSIONS_URL = 'https://solc-bin.ethereum.org/bin/list.json';
 const OUTPUT_SELECTION = {
   '*': {
     '': [
-      'legacyAST',
       'ast'
     ],
     '*': [
@@ -102,7 +101,7 @@ export default class SolidityContractsCompiler {
   private async _compile(): Promise<solc.CompilerOutput | never> {
     const input = this._buildCompilerInput();
     const requestedSolc = await this.solc();
-    const output = requestedSolc.compile(JSON.stringify(input), (dep) => this._findDependency(dep, this));
+    const output = requestedSolc.compile(JSON.stringify(input), undefined);
     const parsedOutput = JSON.parse(output);
     const outputErrors = parsedOutput.errors || [];
     if (outputErrors.length === 0) return parsedOutput;
@@ -131,16 +130,6 @@ export default class SolidityContractsCompiler {
       sources[contract.filePath] = { content: contract.source };
       return sources;
     }, {});
-  }
-
-  private _findDependency(dependencyPath: string, compiler: SolidityContractsCompiler): { content: string } | { error: string } {
-    const dependencyName = dependencyPath.substring(dependencyPath.lastIndexOf('/') + 1);
-    let dependencyContract = compiler.contracts.find((contract) => contract.fileName === dependencyName);
-    if (!dependencyContract) dependencyContract = SolidityDependenciesFinder.call(dependencyPath);
-    if (!dependencyContract) return { error: 'File not found' };
-    log.info(`Compiling ${dependencyName} ...`);
-    compiler.contracts.push(dependencyContract);
-    return { content: dependencyContract.source };
   }
 
   private async _findVersion(): Promise<string | never> {

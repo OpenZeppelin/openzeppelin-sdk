@@ -34,6 +34,7 @@
   },
   "homepage": "https://github.com/zeppelinos/zos/tree/master/packages/cli#readme",
   "dependencies": {
+    "@resolver-engine/imports-fs": "^0.3.2",
     "@types/npm": "^2.0.29",
     "@types/semver": "^5.5.0",
     "@types/web3": "^1.0.14",
@@ -81,7 +82,7 @@
     "semver": "^5.5.0",
     "simple-git": "^1.110.0",
     "spinnies": "^0.3.0",
-    "solc": "^0.5.1",
+    "solc": "^0.5.8",
     "truffle-config": "1.1.2",
     "web3": "1.0.0-beta.37",
     "zos-lib": "2.3.0"
