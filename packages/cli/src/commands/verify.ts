@@ -36,28 +36,30 @@ async function action(contractName: string, options: any): Promise<void> {
 
 function getCommandProps(optimizerEnabled: boolean): InquirerQuestions {
   return {
-    ...contractsList('contractName', 'Choose a contract', 'list', 'fromLocal'),
+    ...contractsList('contractName', 'Choose a contract', 'list', 'added'),
     ...networksList('network', 'list'),
     optimizer: {
       type: 'confirm',
       message: 'Was the optimizer enabled when you compiled your contracts?',
-      default: false
+      default: false,
+      when: (({ contractName }) => contractName)
     },
     optimizerRuns: {
       type: 'input',
       message: 'Specify the optimizer runs',
-      when: ({ optimizer }) => optimizer || optimizerEnabled
+      when: ({ optimizer, contractName }) => contractName && (optimizer || optimizerEnabled)
     },
     remote: {
       type: 'list',
       message: 'Select an endpoint',
       choices: ['etherscan', 'etherchain'],
-      default: 'etherscan'
+      default: 'etherscan',
+      when: (({ contractName }) => contractName)
     },
     apiKey: {
       type: 'input',
       message: 'Provide an etherscan API KEY',
-      when: ({ remote }) => remote === 'etherscan'
+      when: ({ remote, contractName }) => contractName && remote === 'etherscan'
     },
   };
 }
