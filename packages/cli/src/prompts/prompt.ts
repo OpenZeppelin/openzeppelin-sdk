@@ -122,7 +122,7 @@ export function contractsList(name: string, message: string, type: string, sourc
     return inquirerQuestion(name, message, type, contractsFromBuild);
   // get contracts from zos.json file
   } else if (source === 'notAdded') {
-    const contracts = difference(contractsFromBuild, contractsFromLocal.map(a => a.value));
+    const contracts = difference(contractsFromBuild, contractsFromLocal.map(({ value }) => value));
     return  inquirerQuestion(name, message, type, contracts);
   } else if(source === 'added') {
     return inquirerQuestion(name, message, type, contractsFromLocal);
