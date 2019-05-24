@@ -101,11 +101,11 @@ const Truffle = {
     if (provider.constructor.name !== 'HDWalletProvider') return;
     const packagesList = await npm.list(path);
     const hdwalletProviderPackage = packagesList
-      .find(packageNameAndVersion => packageNameAndVersion.match(/truffle-hdwallet-provider/));
+      .find(packageNameAndVersion => packageNameAndVersion.match(/^truffle-hdwallet-provider@/));
     if (hdwalletProviderPackage) {
       const [name, version] = hdwalletProviderPackage.split('@');
       if (version && semver.lt(version, '1.0.0')) {
-        log.warn(`WARNING: Version ${version} of truffle-hdwallet-provider might cause errors when sending transactions. Consider upgrading its version to '1.0.0' or higher`);
+        log.warn(`Version ${version} of truffle-hdwallet-provider might fail when deploying multiple contracts. Consider upgrading it to version '1.0.0' or higher.`);
       }
     }
   },
