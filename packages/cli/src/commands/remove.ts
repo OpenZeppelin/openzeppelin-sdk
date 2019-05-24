@@ -26,7 +26,7 @@ async function action(contracts: string[], options: any): Promise<void> {
 }
 
 function getCommandProps(): InquirerQuestions {
-  return contractsList('contracts', 'Choose one or more contracts', 'checkbox', 'fromLocal');
+  return contractsList('contracts', 'Choose one or more contracts', 'checkbox', 'added');
 }
 
 export default { name, signature, description, register, action };
