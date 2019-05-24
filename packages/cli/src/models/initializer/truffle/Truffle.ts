@@ -35,7 +35,7 @@ const Truffle = {
   async getProviderAndDefaults(): Promise<any> {
     const config = this.getConfig();
     const { provider } = config;
-    await this._checkHdWalletProviderVersion();
+    await this._checkHdWalletProviderVersion(provider);
     const artifactDefaults = this._getArtifactDefaults(config);
 
     return { provider, artifactDefaults };
@@ -97,7 +97,8 @@ const Truffle = {
       .find(node => node.contractKind === 'library' && node.name === contract.contractName);
   },
 
-  async _checkHdWalletProviderVersion(path: string = process.cwd()): Promise<void> {
+  async _checkHdWalletProviderVersion(provider: any, path: string = process.cwd()): Promise<void> {
+    if (provider.constructor.name !== 'HDWalletProvider') return;
     const packagesList = await npm.list(path);
     const hdwalletProviderPackage = packagesList
       .find(packageNameAndVersion => packageNameAndVersion.match(/truffle-hdwallet-provider/));

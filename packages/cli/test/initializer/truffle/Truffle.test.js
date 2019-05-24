@@ -151,6 +151,8 @@ contract('Truffle', () => {
 
     context('when using truffle-hdwallet-provider', function () {
       beforeEach(function () {
+        const config = Truffle.getConfig()
+        sinon.stub(Truffle, 'getConfig').returns({ provider: { constructor: { name: 'HDWalletProvider' } } })
         sinon.stub(npm, 'list').resolves(['truffle-hdwallet-provider@0.0.6'])
         this.logs = new CaptureLogs()
       })
