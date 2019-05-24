@@ -22,7 +22,7 @@ import {
   Proxy,
   Transactions,
   semanticVersionToString,
-  contractMethodsFromAst,
+  contractMethodsFromAbi,
   ProxyAdminProject,
   AppProject,
   flattenSourceCode,
@@ -647,7 +647,7 @@ export default class NetworkController {
     // If there is an initializer called, assume it's ok
     if (calledInitMethod) return;
     // Otherwise, warn the user to invoke it
-    const contractMethods = contractMethodsFromAst(contract);
+    const contractMethods = contractMethodsFromAbi(contract);
     const initializerMethods = contractMethods
       .filter(({ hasInitializer, name }) => hasInitializer || name === 'initialize')
       .map(({ name }) => name);
