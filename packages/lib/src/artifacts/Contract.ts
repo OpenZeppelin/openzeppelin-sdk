@@ -128,13 +128,18 @@ export function createContract(schema: any): Contract {
 
 export function contractMethodsFromAbi(instance: Contract, constant: ContractMethodMutability = ContractMethodMutability.NotConstant): any[] {
   const isConstant = constant === ContractMethodMutability.Constant;
+  const contractAst = new ContractAST(instance, null, { nodesFilter: ['ContractDefinition'] });
+  const methodsFromAst = contractAst.getMethods();
 
   return instance.schema.abi
     .filter(({ constant: isConstantMethod, type }) => isConstant === isConstantMethod && type === 'function')
     .map(method => {
       const { name, inputs } = method;
       const selector = `${name}(${inputs.map(({ type }) => type)})`;
-      return { selector, ...method };
+      const infoFromAst = methodsFromAst.find(({ selector: selectorFromAst })=> selectorFromAst === selector);
+      const modifiers = infoFromAst ? infoFromAst.modifiers : [];
+      const initializer = modifiers.find(({ modifierName }) => modifierName.name === 'initializer');
+      return { selector, hasInitializer: initializer ? true : false,  ...method };
     });
 }
 

@@ -3,7 +3,7 @@ import flatten from 'lodash.flatten';
 import isEmpty from 'lodash.isempty';
 import groupBy from 'lodash.groupby';
 import inquirer from 'inquirer';
-import { contractMethodsFromAst, contractMethodsFromAbi, ContractMethodMutability as Mutability } from 'zos-lib';
+import { contractMethodsFromAbi, ContractMethodMutability as Mutability } from 'zos-lib';
 
 import Session from '../models/network/Session';
 import Truffle from '../models/initializer/truffle/Truffle';
@@ -173,9 +173,7 @@ function contractMethods(contractFullName: string, constant: Mutability = Mutabi
   if (!localController.hasContract(packageName, contractAlias)) return [];
   const contract = localController.getContractClass(packageName, contractAlias);
 
-  return constant === Mutability.Constant
-    ? contractMethodsFromAbi(contract, constant)
-    : contractMethodsFromAst(contract, constant);
+  return contractMethodsFromAbi(contract, constant);
 }
 
 export function proxyInfo(contractInfo: any, network: string): any {
