@@ -7,7 +7,7 @@ import { FileSystem } from 'zos-lib'
 import Truffle from '../../../src/models/initializer/truffle/Truffle'
 import CaptureLogs from '../../helpers/captureLogs'
 
-contract('Truffle', () => {;
+contract('Truffle', () => {
   const testDir = `${process.cwd()}/test/tmp`
   
   beforeEach('create test dir', function () {
@@ -151,22 +151,22 @@ contract('Truffle', () => {;
 
     context('when using truffle-hdwallet-provider', function () {
       beforeEach(function () {
-        sinon.stub(npm, 'list').resolves(['truffle-hdwallet-provider@0.0.6']);
-        this.logs = new CaptureLogs();
-      });
+        sinon.stub(npm, 'list').resolves(['truffle-hdwallet-provider@0.0.6'])
+        this.logs = new CaptureLogs()
+      })
 
       afterEach(function () {
-        sinon.restore();
-        this.logs.restore();
-      });
+        sinon.restore()
+        this.logs.restore()
+      })
 
       it('logs a warning message', async function () {
-        await Truffle.getProviderAndDefaults();
-        this.logs.warns.should.have.lengthOf(1);
+        await Truffle.getProviderAndDefaults()
+        this.logs.warns.should.have.lengthOf(1)
         this.logs.warns[0].should.match(/truffle-hdwallet-provider might cause errors when sending transactions/)
-      });
-    });
-  });
+      })
+    })
+  })
 
   describe('getNetworkNamesFromConfig', function () {
     const configFile = `${process.cwd()}/truffle.js`

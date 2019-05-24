@@ -98,7 +98,7 @@ const Truffle = {
   },
 
   async _checkHdWalletProviderVersion(path: string = process.cwd()): Promise<void> {
-    const packagesList = await npm.list(path + '/jdj');
+    const packagesList = await npm.list(path);
     const hdwalletProviderPackage = packagesList
       .find(packageNameAndVersion => packageNameAndVersion.match(/truffle-hdwallet-provider/));
     if (hdwalletProviderPackage) {
