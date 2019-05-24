@@ -20,6 +20,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Web3.js instance is no longer reset inbetween calls ([#836](https://github.com/zeppelinos/zos/pull/836)) (thanks @Perseverance!)
 - Changing the proxy admin now checks that sender is the current admin before sending the transaction ([#840](https://github.com/zeppelinos/zos/pull/840))
 - Properly flagged `lodash.omit` as non-development dependency ([#864](https://github.com/zeppelinos/zos/pull/864))
+- Use the block gas limit as gas allowance for all transactions to ganache, instead of estimating gas, to circumvent bugs with gas estimations in ganache 6.4.0 and above ([#896](https://github.com/zeppelinos/zos/pull/896))
 
 ## v2.2.3 - 2019-04-12
 

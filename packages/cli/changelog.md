@@ -20,6 +20,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Fixed
 - Fix issue `truffle-migrate` example ([#763](https://github.com/zeppelinos/zos/pull/763)) (thanks @hardlydifficult!)
 - Output a message notifying if no contracts were pushed in a `zos push` ([#888](https://github.com/zeppelinos/zos/pull/888))
+- Remove dependency `web3-provider-engine`, which was no longer needed, and caused all of `babel` to be installed along with the CLI ([#909](https://github.com/zeppelinos/zos/pull/909))
 - Show a reasonable error message if a `zos.json` or `zos.network.json` file is malformed ([#881](https://github.com/zeppelinos/zos/pull/881))
 - Store proxy admin and proxy factory addresses in `zos.network.json` upon a `push` if the upload of a contract failed ([#860](https://github.com/zeppelinos/zos/pull/860))
 
