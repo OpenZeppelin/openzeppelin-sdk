@@ -165,7 +165,7 @@ contract('Truffle', () => {
       it('logs a warning message', async function () {
         await Truffle.getProviderAndDefaults()
         this.logs.warns.should.have.lengthOf(1)
-        this.logs.warns[0].should.match(/truffle-hdwallet-provider might cause errors when sending transactions/)
+        this.logs.warns[0].should.match(/Version 0.0.6 of truffle-hdwallet-provider might fail when deploying multiple contracts. /)
       })
     })
   })
