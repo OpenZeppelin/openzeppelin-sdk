@@ -2,6 +2,7 @@ import uniqBy from 'lodash.uniqby';
 import flatten from 'lodash.flatten';
 import isEmpty from 'lodash.isempty';
 import groupBy from 'lodash.groupby';
+import difference from 'lodash.difference';
 import inquirer from 'inquirer';
 import { contractMethodsFromAbi, ContractMethodMutability as Mutability } from 'zos-lib';
 
@@ -114,20 +115,22 @@ export function proxiesList(pickProxyBy: string, network: string, packageFile?: 
 export function contractsList(name: string, message: string, type: string, source?: string): { [key: string]: any } {
   const localPackageFile = new ZosPackageFile();
   const contractsFromBuild = Truffle.getContractNames();
+  const contractsFromLocal = Object
+    .keys(localPackageFile.contracts)
+    .map(alias => ({ name: localPackageFile.contracts[alias], alias }))
+    .map(({ name: contractName, alias }) => {
+      const label = contractName === alias ? alias : `${alias}[${contractName}]`;
+      return { name: label, value: alias };
+    });
 
   // get contracts from `build/contracts`
-  if (!source || source === 'fromBuildDir') {
+  if (!source || source === 'built') {
     return inquirerQuestion(name, message, type, contractsFromBuild);
   // get contracts from zos.json file
-  } else if(source === 'fromLocal') {
-    const contractsFromLocal = Object
-      .keys(localPackageFile.contracts)
-      .map(alias => ({ name: localPackageFile.contracts[alias], alias }))
-      .map(({ name: contractName, alias }) => {
-        const label = contractName === alias ? alias : `${alias}[${contractName}]`;
-        return { name: label, value: alias };
-      });
-
+  } else if (source === 'notAdded') {
+    const contracts = difference(contractsFromBuild, contractsFromLocal.map(({ value }) => value));
+    return  inquirerQuestion(name, message, type, contracts);
+  } else if(source === 'added') {
     return inquirerQuestion(name, message, type, contractsFromLocal);
   // generate a list of built contracts and package contracts
   } else if (source === 'all') {
