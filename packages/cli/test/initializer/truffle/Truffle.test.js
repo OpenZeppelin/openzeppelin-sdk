@@ -7,7 +7,7 @@ import { FileSystem } from 'zos-lib'
 import Truffle from '../../../src/models/initializer/truffle/Truffle'
 import CaptureLogs from '../../helpers/captureLogs'
 
-contract.only('Truffle', () => {;
+contract('Truffle', () => {;
   const testDir = `${process.cwd()}/test/tmp`
   
   beforeEach('create test dir', function () {
