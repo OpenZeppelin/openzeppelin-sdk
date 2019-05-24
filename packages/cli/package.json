@@ -44,8 +44,8 @@
     "chalk": "^2.4.1",
     "cheerio": "^1.0.0-rc.2",
     "commander": "^2.15.1",
-    "fs-extra": "^7.0.1",
     "find-up": "^3.0.0",
+    "fs-extra": "^7.0.1",
     "inquirer": "^6.2.2",
     "lockfile": "^1.0.4",
     "lodash.compact": "^3.0.1",
@@ -78,12 +78,11 @@
     "lodash.uniq": "^4.5.0",
     "lodash.uniqby": "^4.7.0",
     "lodash.uniqwith": "^4.5.0",
-    "npm-programmatic": "0.0.10",
+    "npm-programmatic": "0.0.12",
     "ora": "^3.4.0",
     "semver": "^5.5.0",
     "truffle-config": "1.1.2",
     "web3": "1.0.0-beta.37",
-    "web3-provider-engine": "14.0.6",
     "zos-lib": "^2.3.0-alpha.1"
   },
   "devDependencies": {

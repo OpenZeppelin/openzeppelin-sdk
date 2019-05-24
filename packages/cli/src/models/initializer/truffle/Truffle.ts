@@ -1,6 +1,10 @@
 import pickBy from 'lodash.pickby';
 import pick from 'lodash.pick';
-import { FileSystem, Contracts } from 'zos-lib';
+import npm from 'npm-programmatic';
+import semver from 'semver';
+import { FileSystem, Contracts, Logger } from 'zos-lib';
+
+const log = new Logger('Truffle');
 
 const Truffle = {
 
@@ -28,9 +32,10 @@ const Truffle = {
     return config.contracts_build_directory;
   },
 
-  getProviderAndDefaults(): any {
+  async getProviderAndDefaults(): Promise<any> {
     const config = this.getConfig();
-    const provider = this._setNonceTrackerIfNeeded(config);
+    const { provider } = config;
+    await this._checkHdWalletProviderVersion(provider);
     const artifactDefaults = this._getArtifactDefaults(config);
 
     return { provider, artifactDefaults };
@@ -92,23 +97,17 @@ const Truffle = {
       .find(node => node.contractKind === 'library' && node.name === contract.contractName);
   },
 
-  // This function fixes a truffle issue related to HDWalletProvider that occurs when assigning
-  // the network provider as a function (that returns an HDWalletProvider instance) instead of
-  // assigning the HDWalletProvider instance directly.
-  // (see https://github.com/trufflesuite/truffle-hdwallet-provider/issues/65)
-  _setNonceTrackerIfNeeded({ provider }: any): any {
-    const { engine } = provider;
-    if (engine && engine.constructor.name === 'Web3ProviderEngine') {
-      const NonceSubprovider = require('web3-provider-engine/subproviders/nonce-tracker');
-      const nonceTracker = new NonceSubprovider();
-      engine._providers.forEach((aProvider, index) => {
-        if (aProvider.constructor.name === 'ProviderSubprovider') {
-          nonceTracker.setEngine(engine);
-          engine._providers.splice(index, 0, nonceTracker);
-        }
-      });
+  async _checkHdWalletProviderVersion(provider: any, path: string = process.cwd()): Promise<void> {
+    if (provider.constructor.name !== 'HDWalletProvider') return;
+    const packagesList = await npm.list(path);
+    const hdwalletProviderPackage = packagesList
+      .find(packageNameAndVersion => packageNameAndVersion.match(/^truffle-hdwallet-provider@/));
+    if (hdwalletProviderPackage) {
+      const [name, version] = hdwalletProviderPackage.split('@');
+      if (version && semver.lt(version, '1.0.0')) {
+        log.warn(`Version ${version} of truffle-hdwallet-provider might fail when deploying multiple contracts. Consider upgrading it to version '1.0.0' or higher.`);
+      }
     }
-    return provider;
   },
 
   _getArtifactDefaults(config) {

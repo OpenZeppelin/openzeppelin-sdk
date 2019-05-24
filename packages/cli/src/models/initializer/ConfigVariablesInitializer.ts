@@ -22,7 +22,7 @@ export default class ConfigVariablesInitializer {
 
     // these lines could be expanded to support different libraries like embark, ethjs, buidler, etc
     Truffle.validateAndLoadNetworkConfig(network);
-    const { provider, artifactDefaults } = Truffle.getProviderAndDefaults();
+    const { provider, artifactDefaults } = await Truffle.getProviderAndDefaults();
 
     ZWeb3.initialize(provider);
     Contracts.setSyncTimeout(timeout * 1000);

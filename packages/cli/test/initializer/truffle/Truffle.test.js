@@ -1,9 +1,11 @@
 require('../../setup')
 
+import npm from 'npm-programmatic';
 import sinon from 'sinon'
 
 import { FileSystem } from 'zos-lib'
 import Truffle from '../../../src/models/initializer/truffle/Truffle'
+import CaptureLogs from '../../helpers/captureLogs'
 
 contract('Truffle', () => {
   const testDir = `${process.cwd()}/test/tmp`
@@ -123,8 +125,8 @@ contract('Truffle', () => {
         Truffle.validateAndLoadNetworkConfig('test', true)
       })
 
-      it('uses network default gas, gas price and from values', function () {
-        const { artifactDefaults } = Truffle.getProviderAndDefaults()
+      it('uses network default gas, gas price and from values', async function () {
+        const { artifactDefaults } = await Truffle.getProviderAndDefaults()
 
         artifactDefaults.should.have.all.keys('gas', 'gasPrice', 'from')
         artifactDefaults.gas.should.be.eq(1)
@@ -139,11 +141,31 @@ contract('Truffle', () => {
         Truffle.validateAndLoadNetworkConfig('test', true)
       })
 
-      it('uses Truffle default gas price', function () {
-        const { artifactDefaults } = Truffle.getProviderAndDefaults()
+      it('uses Truffle default gas price', async function () {
+        const { artifactDefaults } = await Truffle.getProviderAndDefaults()
 
         artifactDefaults.should.have.all.keys('gasPrice')
         artifactDefaults.gasPrice.should.be.eq(20000000000)
+      })
+    })
+
+    context('when using truffle-hdwallet-provider', function () {
+      beforeEach(function () {
+        const config = Truffle.getConfig()
+        sinon.stub(Truffle, 'getConfig').returns({ provider: { constructor: { name: 'HDWalletProvider' } } })
+        sinon.stub(npm, 'list').resolves(['truffle-hdwallet-provider@0.0.6'])
+        this.logs = new CaptureLogs()
+      })
+
+      afterEach(function () {
+        sinon.restore()
+        this.logs.restore()
+      })
+
+      it('logs a warning message', async function () {
+        await Truffle.getProviderAndDefaults()
+        this.logs.warns.should.have.lengthOf(1)
+        this.logs.warns[0].should.match(/Version 0.0.6 of truffle-hdwallet-provider might fail when deploying multiple contracts. /)
       })
     })
   })
