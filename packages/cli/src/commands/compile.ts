@@ -10,7 +10,8 @@ const register: (program: any) => any = (program) => program
   .action(action);
 
 async function action(): Promise<void> {
-  await Compiler.call(false);
+  await Compiler.compileWithSolc();
+  // await Compiler.call(false);
 }
 
 export default { name, signature, description, register, action };

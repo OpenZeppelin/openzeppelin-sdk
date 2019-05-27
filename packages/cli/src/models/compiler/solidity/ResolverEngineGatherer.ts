@@ -5,6 +5,7 @@ import { ResolverEngine } from '@resolver-engine/core';
 import pathSys from 'path';
 import urlSys from 'url';
 
+// TODO: Replace by antlr
 export function findImports(data: ImportFile): string[] {
   const result: string[] = [];
   // regex below matches all possible import statements, namely:

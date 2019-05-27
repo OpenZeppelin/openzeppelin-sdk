@@ -1,7 +1,8 @@
 import _ from 'lodash';
-import axios from 'axios';
-import { Logger, FileSystem } from 'zos-lib';
-import solc from 'solc';
+import { Logger } from 'zos-lib';
+import solc from 'solc-wrapper';
+import { getCompiler as getSolc, resolveCompilerVersion as resolveSolc, SolcBuild, fetchCompiler } from './CompilerProvider';
+import { getPragma } from '../../../utils/solidity';
 
 export interface CompiledContract {
   fileName: string;
@@ -21,20 +22,22 @@ export interface RawContract {
   fileName: string;
   filePath: string;
   source: string;
-  lastModified?: Date;
+  lastModified?: number;
 }
 
-export interface CompilerOptions {
-  version?: string;
+export interface CompilerVersionOptions {
   optimizer?: solc.CompilerOptimizerOptions;
   evmVersion?: string;
+}
+
+export interface CompilerOptions extends CompilerVersionOptions {
+  version?: string;
 }
 
 const log = new Logger('SolidityContractsCompiler');
 
 const DEFAULT_OPTIMIZER = { enabled: false };
 const DEFAULT_EVM_VERSION = 'constantinople';
-const VERSIONS_URL = 'https://solc-bin.ethereum.org/bin/list.json';
 const OUTPUT_SELECTION = {
   '*': {
     '': [
@@ -50,25 +53,35 @@ const OUTPUT_SELECTION = {
   }
 };
 
-export default class SolidityContractsCompiler {
+export async function compile(contracts: RawContract[], options: CompilerOptions = {}): Promise<CompiledContract[]> {
+  const version = await resolveCompilerVersion(contracts, options);
+  const compiler = await fetchCompiler(version);
+  return new SolidityContractsCompiler(compiler, contracts, options).call();
+}
 
+export async function resolveCompilerVersion(contracts: RawContract[], options: CompilerOptions = {}): Promise<SolcBuild> {
+  return resolveSolc(options.version || contracts.map(c => getPragma(c.source)));
+}
+
+export async function compileWith(compilerVersion: SolcBuild, contracts: RawContract[], options: CompilerVersionOptions = {}): Promise<CompiledContract[]> {
+  const compiler = await fetchCompiler(compilerVersion);
+  return new SolidityContractsCompiler(compiler, contracts, options).call();
+}
+
+class SolidityContractsCompiler {
   public errors: any[];
   public contracts: RawContract[];
   public optimizer: solc.CompilerOptimizerOptions;
   public evmVersion: string;
-  public version: string;
   public settings: solc.CompilerSettings;
+  public compiler: solc.Compiler;
 
-  public static latestVersion(): string {
-    return solc.version();
-  }
-
-  constructor(contracts: RawContract[], { version, optimizer, evmVersion }: CompilerOptions = {}) {
+  constructor(compiler: solc.Compiler, contracts: RawContract[], { optimizer, evmVersion }: CompilerVersionOptions = {}) {
     this.errors = [];
     this.contracts = contracts;
     this.optimizer = optimizer || DEFAULT_OPTIMIZER;
     this.evmVersion = evmVersion || DEFAULT_EVM_VERSION;
-    this.version = version || SolidityContractsCompiler.latestVersion();
+    this.compiler = compiler;
     this.settings = {
       optimizer: this.optimizer,
       evmVersion: this.evmVersion,
@@ -82,28 +95,9 @@ export default class SolidityContractsCompiler {
     return this._buildContractsSchemas(solcOutput);
   }
 
-  public async solc(): Promise<solc.Compiler> {
-    if (this.version === SolidityContractsCompiler.latestVersion()) return solc;
-    const version = await this._findVersion();
-    const parsedVersion = version.replace('soljson-', '').replace('.js', '');
-    // TODO: Manually download and cache chosen version
-    return new Promise((resolve, reject) => {
-      solc.loadRemoteVersion(parsedVersion, (error, compiler) => {
-        return error ? reject(error) : resolve(compiler);
-      });
-    });
-  }
-
-  public async versions(): Promise<solc.CompilerVersionsInfo | never> {
-    const response = await axios.request({ url: VERSIONS_URL });
-    if (response.status === 200) return response.data;
-    else throw Error(`Could not fetch solc versions from ${VERSIONS_URL} (status ${response.status})`);
-  }
-
   private async _compile(): Promise<solc.CompilerOutput | never> {
     const input = this._buildCompilerInput();
-    const requestedSolc = await this.solc();
-    const output = requestedSolc.compile(JSON.stringify(input), undefined);
+    const output = this.compiler.compile(JSON.stringify(input), undefined);
     const parsedOutput = JSON.parse(output);
     const outputErrors = parsedOutput.errors || [];
     if (outputErrors.length === 0) return parsedOutput;
@@ -134,18 +128,6 @@ export default class SolidityContractsCompiler {
     }, {});
   }
 
-  private async _findVersion(): Promise<string | never> {
-    const versions = await this.versions();
-    if (versions.releases[this.version]) return versions.releases[this.version];
-    const isPrerelease = this.version.includes('nightly') || this.version.includes('commit');
-    if (isPrerelease) {
-      const isVersion = (aBuild) => aBuild.prerelease === this.version || aBuild.build === this.version || aBuild.longVersion === this.version;
-      const build = versions.builds.find(isVersion);
-      if (build) return build.path;
-    }
-    throw Error(`Could not find version ${this.version} in ${VERSIONS_URL}`);
-  }
-
   private _buildContractsSchemas(solcOutput: solc.CompilerOutput): CompiledContract[] {
     const paths = Object.keys(solcOutput.contracts);
     return _.flatMap(paths, (fileName) => {
@@ -172,7 +154,7 @@ export default class SolidityContractsCompiler {
       deployedBytecode: `0x${this._solveLibraryLinks(output.evm.deployedBytecode)}`,
       compiler: {
         name: 'solc',
-        version: this.version,
+        version: this.compiler.version(),
         optimizer: this.optimizer,
         evmVersion: this.evmVersion,
       }

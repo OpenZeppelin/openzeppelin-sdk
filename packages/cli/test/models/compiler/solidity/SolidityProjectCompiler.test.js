@@ -1,38 +1,105 @@
 require('../../../setup')
 
 import { FileSystem } from 'zos-lib'
-import SolidityProjectCompiler from '../../../../src/models/compiler/solidity/SolidityProjectCompiler'
+import { compileProject } from '../../../../src/models/compiler/solidity/SolidityProjectCompiler'
+import { statSync, utimesSync } from 'fs';
+import path from 'path';
 
 describe('SolidityProjectCompiler', function () {
-  const inputDir = `${process.cwd()}/test/mocks/mock-stdlib/contracts`
-  const testBuildDir = `${process.cwd()}/test/tmp`
-  const compiler = new SolidityProjectCompiler(inputDir, testBuildDir, { version: '0.5.1' })
+  const rootDir = path.resolve(__dirname, '../../../../');
+  const baseTestBuildDir = `${rootDir}/test/tmp`;
+  
+  after('cleanup test build dir', function () {
+    FileSystem.removeTree(baseTestBuildDir)
+  });
 
-  afterEach(() => FileSystem.removeTree(testBuildDir))
+  describe('in mock-stdlib project', function () {
+    this.timeout(20000);
 
-  it('compiles all the contracts of the given project', async function () {
-    await compiler.call()
+    const inputDir = `${rootDir}/test/mocks/mock-stdlib/contracts`;
+    const testBuildDir = `${baseTestBuildDir}/mock-stdlib`;
+    const greeterArtifactPath = `${testBuildDir}/GreeterImpl.json`;
+    
+    before('compiling', async function () {
+      await compileProject(inputDir, testBuildDir, { version: '0.5.9' });
+    });
 
-    FileSystem.exists(testBuildDir).should.be.true
-    FileSystem.readDir(testBuildDir).forEach(schemaFileName => {
-      const contractName = schemaFileName.substring(0, schemaFileName.lastIndexOf('.'))
-      const contractPath = `${inputDir}/${contractName}.sol`
-      const schemaPath = `${testBuildDir}/${schemaFileName}`
-      const schema = FileSystem.parseJson(schemaPath)
+    it('compiles all contracts in the project', function () {
+      FileSystem.exists(testBuildDir).should.be.true;
+      FileSystem.readDir(testBuildDir).should.have.lengthOf(2);
+    });
 
-      schema.fileName.should.be.eq(`${contractName}.sol`)
-      schema.contractName.should.be.eq(contractName)
-      schema.source.should.be.eq(FileSystem.read(contractPath))
-      schema.sourcePath.should.be.eq(contractPath)
-      schema.sourceMap.should.not.be.null
-      schema.abi.should.not.be.null
-      schema.ast.should.not.be.null
-      schema.bytecode.should.not.be.null
-      schema.deployedBytecode.should.not.be.null
-      schema.compiler.name.should.be.eq('solc')
-      schema.compiler.version.should.be.eq('0.5.1')
-      schema.compiler.optimizer.should.be.deep.equal({ enabled: false })
-      schema.compiler.evmVersion.should.be.eq('constantinople')
+    it('generates correct artifacts', function () {
+      FileSystem.readDir(testBuildDir).forEach(schemaFileName => {
+        const contractName = schemaFileName.substring(0, schemaFileName.lastIndexOf('.'))
+        const contractPath = `${inputDir}/${contractName}.sol`
+        const schemaPath = `${testBuildDir}/${schemaFileName}`
+        const schema = FileSystem.parseJson(schemaPath)
+  
+        schema.fileName.should.be.eq(`${contractName}.sol`)
+        schema.contractName.should.be.eq(contractName)
+        schema.source.should.be.eq(FileSystem.read(contractPath))
+        schema.sourcePath.should.be.eq(contractPath)
+        schema.sourceMap.should.not.be.null
+        schema.abi.should.not.be.null
+        schema.ast.should.not.be.null
+        schema.bytecode.should.not.be.null
+        schema.deployedBytecode.should.not.be.null
+        schema.compiler.name.should.be.eq('solc')
+        schema.compiler.version.should.be.eq('0.5.9+commit.e560f70d.Emscripten.clang')
+        schema.compiler.optimizer.should.be.deep.equal({ enabled: false })
+        schema.compiler.evmVersion.should.be.eq('constantinople')
+      });
+    });
+
+    it('replaces library names', function () {
+      const schema = FileSystem.parseJson(greeterArtifactPath);
+      schema.bytecode.should.match(/__GreeterLib____________________________/);
+      schema.deployedBytecode.should.match(/__GreeterLib____________________________/);
+    });
+
+    it('does not recompile if there were no changes to sources', async function () {
+      const origMtime = statSync(greeterArtifactPath).mtimeMs;
+      await compileProject(inputDir, testBuildDir, { version: '0.5.9' });
+      statSync(greeterArtifactPath).mtimeMs.should.eq(origMtime);
+    });
+
+    it('recompiles if sources changed', async function () {
+      const { mtimeMs: origMtime, atimeMs } = statSync(greeterArtifactPath);
+      utimesSync(greeterArtifactPath, atimeMs, Date.now());
+      await compileProject(inputDir, testBuildDir, { version: '0.5.9' });
+      statSync(greeterArtifactPath).mtimeMs.should.not.eq(origMtime);
+    });
+
+    it('recompiles if compiler version changed', async function () {
+      const origMtime = statSync(greeterArtifactPath).mtimeMs;
+      await compileProject(inputDir, testBuildDir, { version: '0.5.0' });
+      statSync(greeterArtifactPath).mtimeMs.should.not.eq(origMtime);
+      const schema = FileSystem.parseJson(greeterArtifactPath);
+      schema.compiler.version.should.eq('0.5.0+commit.1d4f565a.Emscripten.clang');
+    });
+  });
+
+  describe('in mock-stdlib-with-deps project', function () {
+    this.timeout(20000);
+
+    const inputDir = `${rootDir}/mocks/mock-stdlib-with-deps/contracts`;
+    const testBuildDir = `${baseTestBuildDir}/mock-stdlib-with-deps`;
+    const greeterArtifactPath = `${testBuildDir}/GreeterImpl.json`;
+    const dependencyArtifactPath = `${testBuildDir}/GreeterImpl.json`;
+    
+    before('compiling', async function () {
+      await compileProject(inputDir, testBuildDir, { version: '0.5.9' });
+    });
+
+    it('compiles project contracts', async function () {
+      FileSystem.exists(greeterArtifactPath).should.be.true;
+      FileSystem.parseJson(greeterArtifactPath).bytecode.should.not.be.null;
+    });
+
+    it('compiles dependency contracts', async function () {
+      FileSystem.exists(dependencyArtifactPath).should.be.true;
+      FileSystem.parseJson(dependencyArtifactPath).bytecode.should.not.be.null;
     })
-  }).timeout(180000)
+  });
 })

@@ -1,21 +1,29 @@
 import path from 'path';
 import max from 'lodash.max';
+import maxBy from 'lodash.maxby';
+import { readJsonSync } from 'fs-extra';
 import { statSync } from 'fs';
-import { FileSystem as fs } from 'zos-lib';
-import SolidityContractsCompiler, { RawContract, CompiledContract, CompilerOptions } from './SolidityContractsCompiler';
+import { FileSystem as fs, Logger } from 'zos-lib';
+import { compile, RawContract, CompiledContract, CompilerOptions, resolveCompilerVersion } from './SolidityContractsCompiler';
 import { ImportsFsEngine } from '@resolver-engine/imports-fs';
 import { gatherSources } from './ResolverEngineGatherer';
-import { Logger } from '../../../../../lib/lib';
+import { SolcBuild } from './CompilerProvider';
+import { compilerVersionMatches } from '../../../utils/solidity';
+import { tryFunc } from '../../../utils/try';
 
 const log = new Logger('SolidityProjectCompiler');
 
-export default class SolidityProjectCompiler {
+export async function compileProject(inputDir: string, outputDir: string, options: CompilerOptions = {}): Promise<void> {
+  return new SolidityProjectCompiler(inputDir, outputDir, options).call();
+}
 
+class SolidityProjectCompiler {
   public inputDir: string;
   public outputDir: string;
   public roots: string[];
   public contracts: RawContract[];
   public compilerOutput: CompiledContract[];
+  public compilerVersion: SolcBuild;
   public options: CompilerOptions;
 
   constructor(inputDir: string, outputDir: string, options: CompilerOptions = {}) {
@@ -28,13 +36,16 @@ export default class SolidityProjectCompiler {
   }
 
   public async call(): Promise<void> {
-    this._loadSoliditySourcesFromDir();
+    await this._loadSoliditySourcesFromDir();
     await this._loadDependencies();
+    await this._resolveCompilerVersion();
+
     if (!this._shouldCompile()) {
       log.info('Nothing to compile, all contracts are up to date.');
       return;
     }
-    await this._compile();
+
+    this.compilerOutput = await compile(this.contracts, this.options);
     this._writeOutput();
   }
 
@@ -42,7 +53,7 @@ export default class SolidityProjectCompiler {
     fs.readDir(dir).forEach((fileName) => {
       const filePath = path.resolve(dir, fileName);
       if (fs.isDir(filePath)) this._loadSoliditySourcesFromDir(filePath);
-      else if (this._isSolidityFile(filePath)) this.roots.push(filePath);
+      else if (path.extname(filePath).toLowerCase() === '.sol') this.roots.push(filePath);
     });
   }
 
@@ -52,39 +63,42 @@ export default class SolidityProjectCompiler {
       fileName: path.basename(file.url),
       filePath: file.url,
       source: file.source,
-      lastModified: this._tryGetLastModified(file.url)
+      lastModified: tryFunc(() => statSync(file.url).mtimeMs)
     }));
   }
 
-  private _tryGetLastModified(filePath: string): Date {
-    try {
-      return statSync(filePath).mtime;
-    } catch {
-      return null;
-    }
-  }
-
-  private async _compile(): Promise<void> {
-    const solidityCompiler = new SolidityContractsCompiler(this.contracts, this.options);
-    this.compilerOutput = await solidityCompiler.call();
+  private async _resolveCompilerVersion() {
+    this.compilerVersion = await resolveCompilerVersion(this.contracts, this.options);
   }
 
   private _shouldCompile(): boolean {
-    const artifactsMtimes = this._listArtifacts()
-      .map(filePath => statSync(filePath).mtime);
-    const sourcesMtimes = this.contracts
-      .map(contract => contract.lastModified);
+    const artifacts = this._listArtifacts();
+    const artifactsWithMtimes = artifacts
+      .map(artifact => ({ artifact, mtime: statSync(artifact).mtimeMs }));
+
+    // We pick a single artifact (the most recent one) to get the version it was compiled with
+    const latestArtifact = maxBy(artifactsWithMtimes, 'mtime');
+    const artifactCompiledVersion = latestArtifact && readJsonSync(latestArtifact.artifact).compiler.version;
+
+    // Gather artifacts vs sources modified times
+    const maxArtifactsMtimes = max(artifactsWithMtimes.map(({ mtime }) => mtime));
+    const maxSourcesMtimes = max(this.contracts.map(({ lastModified }) => lastModified));
 
     // Compile if there are no previous artifacts, or no mtimes could be collected for sources,
-    // or sources were modified after artifacts
-    // TODO: Check for changes in solc version or compiler settings
-    return !max(artifactsMtimes) || !max(sourcesMtimes)
-      || max(artifactsMtimes) < max(sourcesMtimes);
+    // or sources were modified after artifacts, or compiler version changed
+    return !maxArtifactsMtimes
+      || !maxSourcesMtimes
+      || maxArtifactsMtimes < maxSourcesMtimes
+      || !artifactCompiledVersion
+      || !compilerVersionMatches(artifactCompiledVersion, this.compilerVersion.longVersion);
   }
 
   private _writeOutput(): void {
+    // Create directory if not exists, or clear it of artifacts if it does
     if (!fs.exists(this.outputDir)) fs.createDirPath(this.outputDir);
     else this._listArtifacts().forEach(filePath => fs.remove(filePath));
+
+    // Write compiler output
     this.compilerOutput.forEach((data) => {
       const buildFileName = `${this.outputDir}/${data.contractName}.json`;
       fs.writeJson(buildFileName, data);
@@ -97,11 +111,5 @@ export default class SolidityProjectCompiler {
       .map(fileName => path.resolve(this.outputDir, fileName))
       .filter(fileName => !fs.isDir(fileName))
       .filter(fileName => path.extname(fileName) === '.json');
-  }
-
-  private _isSolidityFile(fileName: string): boolean {
-    const solidityExtension = '.sol';
-    const fileExtension = path.extname(fileName).toLowerCase();
-    return fileExtension === solidityExtension;
   }
 }
