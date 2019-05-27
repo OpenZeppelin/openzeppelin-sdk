@@ -1,6 +1,6 @@
 {
   "name": "zos-lib",
-  "version": "2.3.0-alpha.1",
+  "version": "2.3.0",
   "description": "JavaScript library for the ZeppelinOS smart contract platform",
   "main": "./lib/index.js",
   "private": false,
@@ -87,7 +87,6 @@
     "lodash.zipwith": "^4.2.0",
     "mock-dependency": "file:test/mocks/mock-dependency",
     "sinon": "^6.1.4",
-    "solidity-coverage": "^0.4.15",
     "tmp": "^0.0.33",
     "truffle": "^5.0.5",
     "ts-node": "^7.0.1",

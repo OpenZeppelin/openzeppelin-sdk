@@ -132,4 +132,3 @@ contract('Contract', function(accounts) {
     });
   })
 });
-
