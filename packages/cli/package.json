@@ -78,9 +78,19 @@
     "lodash.uniqby": "^4.7.0",
     "lodash.uniqwith": "^4.5.0",
     "npm-programmatic": "0.0.12",
-    "ora": "^3.4.0",
     "semver": "^5.5.0",
     "simple-git": "^1.110.0",
+<<<<<<< 23bc40bde323d7f03e8855256810d2e66b1db48d
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+    "spinnies": "^0.3.0",
+=======
+>>>>>>> c1d9326... Merge 2.3 into master (#911)
+=======
+    "spinnies": "^0.3.0",
+>>>>>>> 742c9cd... Add ESLint and Prettier configs; Apply linting; (#920)
+>>>>>>> Remove ora and add `spinnies`
     "truffle-config": "1.1.2",
     "web3": "1.0.0-beta.37",
     "zos-lib": "2.3.0"
