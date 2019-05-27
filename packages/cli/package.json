@@ -84,7 +84,7 @@
     "simple-git": "^1.110.0",
     "truffle-config": "1.1.2",
     "web3": "1.0.0-beta.37",
-    "zos-lib": "^2.3.0-rc.3"
+    "zos-lib": "2.3.0-rc.3"
   },
   "devDependencies": {
     "@types/lodash": "^4.14.119",
