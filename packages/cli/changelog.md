@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
-## Unreleased
+## v2.3.0 - 2019-05-27
 
 ### Added
 - Add interactive prompts for most CLI commands (`add`, `create`, `init`, `link`, `publish`, `push`, `remove`, `session`, `set-admin`, `unlink`, `update`, `verify`), plus a `--no-interactive` flag to ensure that no prompts are shown when working in a non-interactive script ([#792](https://github.com/zeppelinos/zos/pull/792), [#766](https://github.com/zeppelinos/zos/pull/766), [#750](https://github.com/zeppelinos/zos/pull/750), [#745](https://github.com/zeppelinos/zos/pull/745), [#730](https://github.com/zeppelinos/zos/pull/730), [#725](https://github.com/zeppelinos/zos/pull/725), [#839](https://github.com/zeppelinos/zos/pull/839))
