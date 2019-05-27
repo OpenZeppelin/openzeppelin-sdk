@@ -2,8 +2,7 @@
   "docs": {
     "OVERVIEW": [
       "start",
-      "new_2",
-      "new_2.2"
+      "new_2.3"
     ],
     "QUICKSTART": [
       "zepkit",
@@ -39,6 +38,7 @@
       "cli_bump",
       "cli_check",
       "cli_create",
+      "cli_create2",
       "cli_freeze",
       "cli_init",
       "cli_link",
@@ -50,7 +50,8 @@
       "cli_status",
       "cli_unlink",
       "cli_update",
-      "cli_verify"
+      "cli_verify",
+      "cli_unpack"
     ],
     "APPLICATION": [
       "application_App",
@@ -60,8 +61,13 @@
     ],
     "UPGRADEABILITY": [
       "upgradeability_AdminUpgradeabilityProxy",
+      "upgradeability_BaseAdminUpgradeabilityProxy",
+      "upgradeability_BaseUpgradeabilityProxy",
+      "upgradeability_InitializableAdminUpgradeabilityProxy",
+      "upgradeability_InitializableUpgradeabilityProxy",
       "upgradeability_Proxy",
       "upgradeability_ProxyAdmin",
+      "upgradeability_ProxyFactory",
       "upgradeability_UpgradeabilityProxy"
     ],
     "INITIALIZE": [
