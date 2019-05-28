@@ -1,6 +1,7 @@
 import { ZWeb3, Contracts, TxParams } from 'zos-lib';
 import Truffle from './truffle/Truffle';
 import Session from '../network/Session';
+import ZosConfig from './ZosConfig';
 
 export interface NetworkConfig {
   network: string;
@@ -20,6 +21,7 @@ export default class ConfigVariablesInitializer {
     this.initStaticConfiguration();
     const { network, from, timeout } = Session.getOptions(options, silent);
     Session.setDefaultNetworkIfNeeded(options.network);
+<<<<<<< HEAD
     if (!network)
       throw Error(
         'A network name must be provided to execute the requested action.',
@@ -31,6 +33,19 @@ export default class ConfigVariablesInitializer {
       provider,
       artifactDefaults,
     } = await Truffle.getProviderAndDefaults();
+=======
+    if (!network) throw Error('A network name must be provided to execute the requested action.');
+    let provider, artifactDefaults;
+
+    // these lines could be expanded to support different libraries like embark, ethjs, buidler, etc
+    if (Truffle.existsTruffleConfig() && !ZosConfig.existsZosConfig()) {
+      Truffle.validateAndLoadNetworkConfig(network);
+      ({ provider, artifactDefaults } = await Truffle.getProviderAndDefaults());
+    } else {
+      ZosConfig.load(network);
+      ({ provider, artifactDefaults }  = ZosConfig.load(network));
+    }
+>>>>>>> First approach of zos-config file
 
     ZWeb3.initialize(provider);
     Contracts.setSyncTimeout(timeout * 1000);
