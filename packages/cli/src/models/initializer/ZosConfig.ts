@@ -1,32 +1,38 @@
+import path from 'path';
 import pick from 'lodash.pick';
 import omit from 'lodash.omit';
 import isUndefined from 'lodash.isundefined';
-import { FileSystem, ZWeb3 } from 'zos-lib';
 import Web3 from 'web3';
+import { FileSystem, ZWeb3 } from 'zos-lib';
 
 const ZosConfig = {
-  existsZosConfig(path: string = process.cwd()): boolean {
-    return FileSystem.exists(`${path}/zos-config.js`);
+  initialize(root: string = process.cwd()): void {
+    this._createContractsDir(root);
+    this._createZosConfigFile(root);
+  },
+
+  exists(directory: string = process.cwd()): boolean {
+    return FileSystem.exists(`${directory}/networks.js`);
   },
 
   // TODO: set types.
-  load(networkName: string, force: boolean = false, path: string = process.cwd()): any {
-    return this._buildZosConfig(networkName);
+  load(networkName: string): any {
+    return this._buildConfig(networkName);
   },
 
   // TODO: set types.
-  _buildZosConfig(networkName: string, path: string = process.cwd()) {
-    const zosConfigFile = require(`${path}/zos-config.js`);
+  _buildConfig(networkName: string, directory: string = process.cwd()) {
+    const zosConfigFile = require(`${directory}/networks.js`);
     const { networks } = zosConfigFile;
 
-    if (!networks[networkName]) throw Error(`Given network '${networkName}' is not defined in your zos-config.js file`);
+    if (!networks[networkName]) throw Error(`Given network '${networkName}' is not defined in your networks.js file`);
 
     const network = networks[networkName];
     const compilers = zosConfigFile.compilers || this._setDefaultCompilersProperties();
     const provider = this._setProvider(networks[networkName]);
     const artifactDefaults = this._setArtifactDefaults(zosConfigFile, networks[networkName]);
 
-    this.zosConfig = {
+    this.config = {
       networks,
       network,
       provider,
@@ -34,18 +40,17 @@ const ZosConfig = {
       compilers,
     };
 
-    return this.zosConfig;
+    return this.config;
   },
 
   // TODO: set types
   _setProvider(network: any): any {
     let { provider } = network;
     if (!provider) {
-      const { host, port } = network;
+      const { host, port, protocol } = network;
       if (!host) throw Error('A host name must be specified');
       if (!port) throw Error('A port must be specified');
-      // TODO: set provider for IPC and WS
-      provider = new Web3.providers.HttpProvider(`http://${host}:${port}`);
+      provider = `${protocol ? protocol : 'http'}://${host}:${port}`;
     } else if (typeof provider === 'function' && provider.constructor.name !== 'Function') {
       provider = provider();
     }
@@ -55,10 +60,9 @@ const ZosConfig = {
 
   _setArtifactDefaults(zosConfigFile: any, network: any) {
     const defaults = ['gas', 'gasPrice', 'from'];
-    const configDefaults = omit(pick(this.zosConfig, defaults), isUndefined);
+    const configDefaults = omit(pick(zosConfigFile, defaults), isUndefined);
     const networkDefaults = omit(pick(network, defaults), isUndefined);
 
-    console.log({ ...configDefaults, ...networkDefaults });
     return { ...configDefaults, ...networkDefaults };
   },
 
@@ -74,7 +78,27 @@ const ZosConfig = {
         }
       }
     };
-  }
+  },
+
+  _createContractsDir(root: string): void {
+    const contractsDir = `${root}/contracts`;
+    this._createDir(contractsDir);
+  },
+
+  _createZosConfigFile(root: string): void {
+    if (!this.exists(root)) {
+      const blueprint = path.resolve(__dirname, './blueprint.truffle.js');
+      FileSystem.copy(blueprint, `${root}/truffle-config.js`);
+    }
+  },
+
+  _createDir(dir: string): void {
+    if (!FileSystem.exists(dir)) {
+      FileSystem.createDir(dir);
+      FileSystem.write(`${dir}/.gitkeep`, '');
+    }
+  },
+
 };
 
 export default ZosConfig;
