@@ -19,6 +19,7 @@ import Dependency from '../dependency/Dependency';
 import NetworkController from '../network/NetworkController';
 import ValidationLogger from '../../interface/ValidationLogger';
 import TruffleProjectInitializer from '../initializer/truffle/TruffleProjectInitializer';
+import ZosConfig from '../initializer/ZosConfig';
 import ZosPackageFile from '../files/ZosPackageFile';
 import ZosNetworkFile from '../files/ZosNetworkFile';
 
@@ -53,7 +54,7 @@ export default class LocalController {
       throw Error('A project name must be provided to initialize the project.');
     this.initZosPackageFile(name, version, force, publish);
     Session.ignoreFile();
-    TruffleProjectInitializer.call();
+    ZosConfig.initialize();
   }
 
   public initZosPackageFile(
