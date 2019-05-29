@@ -14,8 +14,12 @@ export default class ConfigVariablesInitializer {
 =======
 const ConfigVariablesInitializer  = {
   initStaticConfiguration(): void {
+<<<<<<< HEAD
 >>>>>>> Add ZosConfig#load call in config initializer obj
     const buildDir = Truffle.getBuildDir();
+=======
+    const buildDir = ZosConfig.exists() ? ZosConfig.getBuildDir() : Truffle.getBuildDir();
+>>>>>>> Set static configuration
     Contracts.setLocalBuildDir(buildDir);
   },
 

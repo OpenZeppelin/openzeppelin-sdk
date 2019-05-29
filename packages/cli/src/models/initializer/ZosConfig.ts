@@ -16,7 +16,9 @@ const ZosConfig = {
   },
 
   getBuildDir() {
-    return this.config.buildDir || `${process.cwd()}/build/contracts`;
+    const buildDir = this.config ? this.config.buildDir : `${process.cwd()}/build/contracts`;
+    if (!FileSystem.exists(buildDir)) FileSystem.createDirPath(buildDir);
+    return buildDir;
   },
 
   // TODO: set types.
@@ -26,6 +28,8 @@ const ZosConfig = {
 
   // TODO: set types.
   _buildConfig(networkName: string, root: string = process.cwd()) {
+    if (this.config) return this.config;
+
     const zosConfigFile = require(`${root}/networks.js`);
     const { networks } = zosConfigFile;
 
