@@ -3,7 +3,8 @@
     "examples/*",
     "packages/*",
     "tests/cli/test",
-    "tests/cli/workdir"
+    "tests/cli/workdir",
+    "tests/zepkit/test"
   ],
   "version": "2.3.0",
   "command": {
