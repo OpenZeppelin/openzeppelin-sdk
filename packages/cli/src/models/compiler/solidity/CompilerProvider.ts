@@ -131,10 +131,19 @@ async function getAvailableCompilerVersions(): Promise<SolcList> {
     return readJsonSync(localPath);
   }
 
-  const response = await axios.get(SOLC_LIST_URL);
-  const list = response.data as SolcList;
-  writeJsonSync(localPath, list);
-  return list;
+  try {
+    const response = await axios.get(SOLC_LIST_URL);
+    const list = response.data as SolcList;
+    writeJsonSync(localPath, list);
+    return list;
+  } catch(err) {
+    if (fs.existsSync(localPath)) {
+      log.warn(`Error downloading solc releases list, using cached version`);
+      return readJsonSync(localPath);
+    } else {
+      throw new Error(`Could not retrieve solc releases list: ${err.message}`);
+    }
+  }
 }
 
 async function getCompilerVersion(requiredSemvers: string[], solcList: SolcList): Promise<SolcBuild> {
