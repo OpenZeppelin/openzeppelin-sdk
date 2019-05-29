@@ -4,7 +4,7 @@ import maxBy from 'lodash.maxby';
 import { readJsonSync } from 'fs-extra';
 import { statSync } from 'fs';
 import { FileSystem as fs, Logger } from 'zos-lib';
-import { compile, RawContract, CompiledContract, CompilerOptions, resolveCompilerVersion } from './SolidityContractsCompiler';
+import { RawContract, CompiledContract, CompilerOptions, resolveCompilerVersion, compileWith } from './SolidityContractsCompiler';
 import { ImportsFsEngine } from '@resolver-engine/imports-fs';
 import { gatherSources } from './ResolverEngineGatherer';
 import { SolcBuild } from './CompilerProvider';
@@ -45,7 +45,8 @@ class SolidityProjectCompiler {
       return;
     }
 
-    this.compilerOutput = await compile(this.contracts, this.options);
+    log.info(`Compiling contracts with ${this.compilerVersion.version} (${this.compilerVersion.build})...`);
+    this.compilerOutput = await compileWith(this.compilerVersion, this.contracts, this.options);
     this._writeOutput();
   }
 

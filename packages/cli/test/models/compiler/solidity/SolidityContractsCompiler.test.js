@@ -203,6 +203,7 @@ function assertOutput(contracts, output, { version, optimizer, evmVersion }) {
     data.source.should.be.eq(source)
     data.sourcePath.should.be.eq(filePath)
     data.sourceMap.should.not.be.null
+    data.deployedSourceMap.should.not.be.null
     data.abi.should.not.be.null
     data.ast.should.not.be.null
     data.bytecode.should.not.be.null

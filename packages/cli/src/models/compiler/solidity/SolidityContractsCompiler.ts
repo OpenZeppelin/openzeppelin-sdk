@@ -15,6 +15,7 @@ export interface CompiledContract {
   legacyAST?: any;
   bytecode: string;
   deployedBytecode: string;
+  deployedSourceMap: string;
   compiler: solc.CompilerInfo;
 }
 
@@ -36,8 +37,9 @@ export interface CompilerOptions extends CompilerVersionOptions {
 
 const log = new Logger('SolidityContractsCompiler');
 
+export const DEFAULT_EVM_VERSION = 'constantinople';
+
 const DEFAULT_OPTIMIZER = { enabled: false };
-const DEFAULT_EVM_VERSION = 'constantinople';
 const OUTPUT_SELECTION = {
   '*': {
     '': [
@@ -148,6 +150,7 @@ class SolidityContractsCompiler {
       source: contract.source,
       sourcePath: contract.filePath,
       sourceMap: output.evm.bytecode.sourceMap,
+      deployedSourceMap: output.evm.deployedBytecode.sourceMap,
       abi: output.abi,
       ast: source.ast,
       bytecode: `0x${this._solveLibraryLinks(output.evm.bytecode)}`,

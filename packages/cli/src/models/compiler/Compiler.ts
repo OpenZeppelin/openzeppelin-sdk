@@ -11,9 +11,10 @@ const state = { alreadyCompiled: false };
 const Compiler = {
   async call(force: boolean = false): Promise<void> {
     if (force || !state.alreadyCompiled) {
-      return Truffle.isTruffleProject()
+      await Truffle.isTruffleProject() // TODO: Check if there is a compiler setting on zos config file to decide
         ? this.compileWithTruffle(force)
         : this.compileWithSolc();
+      state.alreadyCompiled = true;
     }
   },
 
@@ -25,11 +26,10 @@ const Compiler = {
     this.settings = { ...this.getSettings(), ...settings };
   },
 
-  async compileWithSolc(): Promise<void> {
+  async compileWithSolc(compilerOptions?: CompilerOptions): Promise<void> {
     const inputDir = Contracts.getLocalContractsDir();
     const outputDir = Contracts.getLocalBuildDir();
-    const options = this.getSettings();
-    log.info('Compiling contracts with solc...');
+    const options = { ... this.getSettings(), ... compilerOptions };
     await compileProject(inputDir, outputDir, options);
   },
 
@@ -45,7 +45,6 @@ const Compiler = {
           if (error.code === 127) console.error('Could not find truffle executable. Please install it by running: npm install truffle');
           reject(error);
         } else {
-          state.alreadyCompiled = true;
           resolve();
         }
         if (stdout) console.log(stdout);
