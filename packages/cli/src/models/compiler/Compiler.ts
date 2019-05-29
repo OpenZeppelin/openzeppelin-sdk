@@ -3,6 +3,7 @@ import { Contracts, FileSystem, Logger } from 'zos-lib';
 import Truffle from '../initializer/truffle/Truffle';
 import { compileProject } from './solidity/SolidityProjectCompiler';
 import { CompilerOptions } from './solidity/SolidityContractsCompiler';
+import findUp from 'find-up';
 
 const log = new Logger('Compiler');
 const state = { alreadyCompiled: false };
@@ -34,8 +35,7 @@ const Compiler = {
 
   async compileWithTruffle(): Promise<void> {
     log.info('Compiling contracts with Truffle...');
-    let truffleBin = `${process.cwd()}/node_modules/.bin/truffle`;
-    if (!FileSystem.exists(truffleBin)) truffleBin = 'truffle'; // Attempt to load global truffle if local was not found
+    const truffleBin = findUp('node_modules/.bin/truffle') || 'truffle'; // attempt to load global truffle if local was not found
 
     return new Promise((resolve, reject) => {
       const args: object = { shell: true };
