@@ -2,8 +2,7 @@ import path from 'path';
 import pick from 'lodash.pick';
 import omit from 'lodash.omit';
 import isUndefined from 'lodash.isundefined';
-import Web3 from 'web3';
-import { FileSystem, ZWeb3 } from 'zos-lib';
+import { FileSystem } from 'zos-lib';
 
 const ZosConfig = {
   initialize(root: string = process.cwd()): void {
