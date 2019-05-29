@@ -1,3 +1,5 @@
+import { eq as semverEq, parse as parseSemver } from 'semver';
+
 export function getPragma(source: string): string {
   if (!source) return null;
   const match = source.match(/pragma solidity\s+([^;]+?)\s*;/m);
@@ -6,9 +8,16 @@ export function getPragma(source: string): string {
 }
 
 export function compilerVersionMatches(v1: string, v2: string): boolean {
-  // Drop soljson prefix and compiler implementation suffix to get version, and compare them
-  const cleanVersion = (version: string) => version.replace(/^soljson-/, '').replace(/\.Emscripten\.clang$/, '');
-  return cleanVersion(v1) === cleanVersion(v2);
+  if (!v1 || !v2) return false;
+
+  const parseVersion = (version: string) => {
+    const cleaned = version.replace(/^soljson-v?/, '').replace(/\.js$/, '').replace('g++', 'gcc'); // semver fails when parsing '+' characters as part of the build
+    const semver = parseSemver(cleaned);
+    if (!semver) throw new Error(`Invalid compiler version ${version}`);
+    return semver;
+  };
+
+  return semverEq(parseVersion(v1), parseVersion(v2));
 }
 
 export function getImports(source: string): string[] {

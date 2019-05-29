@@ -10,6 +10,9 @@ import castArray from 'lodash.castarray';
 import { Logger } from 'zos-lib';
 import { homedir } from 'os';
 import path from 'path';
+import child from '../../../utils/child';
+import { tryFunc, tryAwait } from '../../../utils/try';
+import { compilerVersionMatches } from '../../../utils/solidity';
 
 const log = new Logger('CompilerProvider');
 
@@ -17,11 +20,19 @@ const log = new Logger('CompilerProvider');
 // TODO: Check writeability and fall back to tmp if needed
 let SOLC_CACHE_PATH = path.join(homedir(), '.solc');
 
+// Modified ENV to use when running native solc
+let SOLC_BIN_ENV = null;
+
 // How frequently to renew the solc list
 const SOLC_LIST_EXPIRES_IN_SECONDS = 1 * 60 * 60; // 1 hour
 
 // and where to download it from
 const SOLC_LIST_URL = 'https://solc-bin.ethereum.org/bin/list.json';
+
+export interface SolcCompiler {
+  version(): string;
+  compile(input: string): Promise<solc.CompilerOutput>;
+}
 
 interface SolcList {
   builds: SolcBuild[];
@@ -38,6 +49,39 @@ export interface SolcBuild {
   urls: string[];
 }
 
+class SolcjsCompiler implements SolcCompiler {
+  public compiler: solc.Compiler;
+
+  constructor(compilerBinary: any) {
+    this.compiler = solc(compilerBinary);
+  }
+
+  public version(): string {
+    return this.compiler.version();
+  }
+
+  public async compile(input: any): Promise<solc.CompilerOutput> {
+    return JSON.parse(this.compiler.compile(JSON.stringify(input), undefined));
+  }
+}
+
+class SolcBinCompiler implements SolcCompiler {
+  public _version: string;
+
+  constructor(version: string) {
+    this._version = version;
+  }
+
+  public version(): string {
+    return this._version;
+  }
+
+  public async compile(input: any): Promise<solc.CompilerOutput> {
+    const output = child.execSync('solc --standard-json', { input: JSON.stringify(input), env: SOLC_BIN_ENV });
+    return JSON.parse(output.toString());
+  }
+}
+
 export async function resolveCompilerVersion(requiredSemver: string | string[]): Promise<SolcBuild> {
   // Create an array with all unique semver restrictions (dropping initial 'v' if set manually by the user)
   const requiredSemvers = uniq(compact(castArray(requiredSemver)))
@@ -49,18 +93,34 @@ export async function resolveCompilerVersion(requiredSemver: string | string[]):
   return build;
 }
 
-export async function fetchCompiler(build: SolcBuild): Promise<solc.Compiler> {
+export async function fetchCompiler(build: SolcBuild): Promise<SolcCompiler> {
+  // Try local compiler and see if version matches
+  const localVersion = await localCompilerVersion();
+  if (localVersion && compilerVersionMatches(localVersion, build.longVersion)) {
+    log.info(`Using local solc compiler found`);
+    return new SolcBinCompiler(localVersion);
+  }
+
+  // Go with emscriptem version if not
   const localFile = path.join(SOLC_CACHE_PATH, build.path);
   if (!fs.existsSync(localFile)) await downloadCompiler(build, localFile);
   const compilerBinary = getCompilerBinary(localFile);
 
   // Wrap emscriptem with solc-wrapper
-  return solc(compilerBinary);
+  return new SolcjsCompiler(compilerBinary);
 }
 
-export async function getCompiler(requiredSemver: string | string[]): Promise<solc.Compiler> {
+export async function getCompiler(requiredSemver: string | string[]): Promise<SolcCompiler> {
   const version = await resolveCompilerVersion(requiredSemver);
   return fetchCompiler(version);
+}
+
+async function localCompilerVersion(): Promise<string | void> {
+  const output = await tryAwait(() => child.exec('solc --version', { env: SOLC_BIN_ENV }));
+  if (!output) return null;
+  const match = output.stdout.match(/^Version: ([^\s]+)/m);
+  if (!match) return null;
+  return match[1];
 }
 
 async function getAvailableCompilerVersions(): Promise<SolcList> {
@@ -139,6 +199,5 @@ export function getCompilerBinary(compilerPath: string) {
 }
 
 // Used for tests
-export function setSolcCachePath(value) {
-  SOLC_CACHE_PATH = value;
-}
+export function setSolcCachePath(value) { SOLC_CACHE_PATH = value; }
+export function setSolcBinEnv(value) { SOLC_BIN_ENV = value; }

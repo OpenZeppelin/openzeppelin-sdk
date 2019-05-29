@@ -2,7 +2,7 @@ require('../../../setup')
 
 import CaptureLogs from '../../../helpers/captureLogs';
 import { compile } from '../../../../src/models/compiler/solidity/SolidityContractsCompiler';
-import { setSolcCachePath } from '../../../../src/models/compiler/solidity/CompilerProvider';
+import { setSolcCachePath, setSolcBinEnv } from '../../../../src/models/compiler/solidity/CompilerProvider';
 import sinon from 'sinon';
 import axios from 'axios';
 import path from 'path';
@@ -82,7 +82,39 @@ describe('SolidityContractsCompiler', function () {
     this.logs.restore()
   })
 
-  describe('version 0.5.x', function () {
+  describe('version 0.5.x binary', function () {
+    beforeEach(function () {
+      setSolcBinEnv({ PATH: `${process.env.PATH}${path.delimiter}${path.resolve(__dirname, '../../../../solc/')}` });
+    });
+
+    afterEach(function () {
+      setSolcBinEnv(null)
+    });
+
+    it('compiles using local binary if available', async function () {
+      const contracts = [contract_Solc05]
+      const output = await compile(contracts, { version: '0.5.9' });
+      assertOutput(contracts, output, { version: '0.5.9+commit.c68bc34e.Linux.g++' });
+      this.logs.errors.should.be.empty
+      this.logs.warns.should.be.empty
+    }).timeout(180000)
+
+    it('fails when a contract has errors', async function () {
+      const options = { version: '0.5.0' }
+      const contracts = [contract_Solc05, contractWithErrors_Solc05]
+      await compile(contracts, options).should.be.rejectedWith(/Different number of arguments in return statement than in returns declaration/)
+    }).timeout(180000)
+
+    it('compiles using solcjs if binary version does not match', async function () {
+      const contracts = [contract_Solc05]
+      const output = await compile(contracts, { version: '0.5.0' });
+      assertOutput(contracts, output, { version: '0.5.0+commit.1d4f565a.Emscripten.clang' });
+      this.logs.errors.should.be.empty
+      this.logs.warns.should.be.empty
+    }).timeout(180000)
+  });
+
+  describe('version 0.5.x solcjs', function () {
     it('compiles using solc nigthly if specified exactly', async function () {
       const contracts = [contract_Solc05]
       const output = await compile(contracts, { version: '0.5.10-nightly.2019.5.28' })

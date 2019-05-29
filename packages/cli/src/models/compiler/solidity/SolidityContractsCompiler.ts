@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import { Logger } from 'zos-lib';
 import solc from 'solc-wrapper';
-import { getCompiler as getSolc, resolveCompilerVersion as resolveSolc, SolcBuild, fetchCompiler } from './CompilerProvider';
+import { getCompiler as getSolc, resolveCompilerVersion as resolveSolc, SolcBuild, fetchCompiler, SolcCompiler } from './CompilerProvider';
 import { getPragma } from '../../../utils/solidity';
 
 export interface CompiledContract {
@@ -76,7 +76,7 @@ class SolidityContractsCompiler {
   public optimizer: solc.CompilerOptimizerOptions;
   public evmVersion: string;
   public settings: solc.CompilerSettings;
-  public compiler: solc.Compiler;
+  public compiler: SolcCompiler;
 
   constructor(compiler: solc.Compiler, contracts: RawContract[], { optimizer, evmVersion }: CompilerVersionOptions = {}) {
     this.errors = [];
@@ -92,17 +92,16 @@ class SolidityContractsCompiler {
   }
 
   public async call(): Promise<CompiledContract[]> {
-    // TODO: Support docker and native compilers
+    // TODO: Support docker compiler
     const solcOutput = await this._compile();
     return this._buildContractsSchemas(solcOutput);
   }
 
   private async _compile(): Promise<solc.CompilerOutput | never> {
     const input = this._buildCompilerInput();
-    const output = this.compiler.compile(JSON.stringify(input), undefined);
-    const parsedOutput = JSON.parse(output);
-    const outputErrors = parsedOutput.errors || [];
-    if (outputErrors.length === 0) return parsedOutput;
+    const output = await this.compiler.compile(input);
+    const outputErrors = output.errors || [];
+    if (outputErrors.length === 0) return output;
 
     const errors = outputErrors.filter((finding) => finding.severity !== 'warning');
     const warnings = outputErrors.filter((finding) => finding.severity === 'warning');
@@ -111,7 +110,7 @@ class SolidityContractsCompiler {
 
     if (warnings.length > 0) log.warn(`Compilation warnings: \n${warningMessages}`);
     if (errors.length > 0) throw Error(`Compilation errors: \n${errorMessages}`);
-    return parsedOutput;
+    return output;
   }
 
   private _buildCompilerInput(): solc.CompilerInput {
