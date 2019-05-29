@@ -11,8 +11,12 @@ const ZosConfig = {
     this._createZosConfigFile(root);
   },
 
-  exists(directory: string = process.cwd()): boolean {
-    return FileSystem.exists(`${directory}/networks.js`);
+  exists(root: string = process.cwd()): boolean {
+    return FileSystem.exists(`${root}/networks.js`);
+  },
+
+  getBuildDir() {
+    return this.config.buildDir || `${process.cwd()}/build/contracts`;
   },
 
   // TODO: set types.
@@ -21,8 +25,8 @@ const ZosConfig = {
   },
 
   // TODO: set types.
-  _buildConfig(networkName: string, directory: string = process.cwd()) {
-    const zosConfigFile = require(`${directory}/networks.js`);
+  _buildConfig(networkName: string, root: string = process.cwd()) {
+    const zosConfigFile = require(`${root}/networks.js`);
     const { networks } = zosConfigFile;
 
     if (!networks[networkName]) throw Error(`Given network '${networkName}' is not defined in your networks.js file`);
@@ -31,6 +35,7 @@ const ZosConfig = {
     const compilers = zosConfigFile.compilers || this._setDefaultCompilersProperties();
     const provider = this._setProvider(networks[networkName]);
     const artifactDefaults = this._setArtifactDefaults(zosConfigFile, networks[networkName]);
+    const buildDir = `${root}/build/contracts`;
 
     this.config = {
       networks,
@@ -38,6 +43,7 @@ const ZosConfig = {
       provider,
       artifactDefaults,
       compilers,
+      buildDir,
     };
 
     return this.config;
@@ -87,8 +93,8 @@ const ZosConfig = {
 
   _createZosConfigFile(root: string): void {
     if (!this.exists(root)) {
-      const blueprint = path.resolve(__dirname, './blueprint.truffle.js');
-      FileSystem.copy(blueprint, `${root}/truffle-config.js`);
+      const blueprint = path.resolve(__dirname, './blueprint.networks.js');
+      FileSystem.copy(blueprint, `${root}/networks.js`);
     }
   },
 
