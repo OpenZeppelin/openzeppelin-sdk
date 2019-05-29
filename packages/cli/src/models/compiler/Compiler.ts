@@ -35,7 +35,7 @@ const Compiler = {
 
   async compileWithTruffle(): Promise<void> {
     log.info('Compiling contracts with Truffle...');
-    const truffleBin = findUp('node_modules/.bin/truffle') || 'truffle'; // attempt to load global truffle if local was not found
+    const truffleBin: string = findUp.sync('node_modules/.bin/truffle') || 'truffle'; // attempt to load global truffle if local was not found
 
     return new Promise((resolve, reject) => {
       const args: object = { shell: true };
