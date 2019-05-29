@@ -89,6 +89,7 @@
     "simple-git": "^1.110.0",
     "spinnies": "^0.3.0",
     "solc-wrapper": "^0.5.8",
+    "solidity-parser-antlr": "^0.4.2",
     "truffle-config": "1.1.2",
     "web3": "1.0.0-beta.37",
     "zos-lib": "2.3.0"

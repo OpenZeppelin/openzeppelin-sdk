@@ -1,32 +1,10 @@
-// Copied from https://github.com/Crypto-Punkers/resolver-engine/blob/master/packages/imports/src/parsers/importparser.ts
-// until a new release is available with fix https://github.com/Crypto-Punkers/resolver-engine/commit/ad05473debe5dc5feeb600d3edb12d94724ffa38#diff-f9eb013289944d47812ffe12eba0222d
-
 import { ResolverEngine } from '@resolver-engine/core';
 import pathSys from 'path';
 import urlSys from 'url';
+import { getImports } from '../../../utils/solidity';
 
-// TODO: Replace by antlr
-export function findImports(data: ImportFile): string[] {
-  const result: string[] = [];
-  // regex below matches all possible import statements, namely:
-  // - import "somefile";
-  // - import "somefile" as something;
-  // - import something from "somefile"
-  // (double that for single quotes)
-  // and captures file names
-  const regex: RegExp = /import\s+(?:(?:"([^;]*)"|'([^;]*)')(?:;|\s+as\s+[^;]*;)|.+from\s+(?:"(.*)"|'(.*)');)/g;
-  let match: RegExpExecArray | null;
-  // tslint:disable-next-line:no-conditional-assignment
-  while ((match = regex.exec(data.source))) {
-    for (let i = 1; i < match.length; i++) {
-      if (match[i] !== undefined) {
-        result.push(match[i]);
-        break;
-      }
-    }
-  }
-  return result;
-}
+// Adapted from resolver-engine
+// https://github.com/Crypto-Punkers/resolver-engine/blob/master/packages/imports/src/parsers/importparser.ts
 
 interface ImportFile {
   url: string;
@@ -71,7 +49,7 @@ async function gatherDepenencyTree(
 
     alreadyImported.add(url);
 
-    const foundImportURIs = findImports(resolvedFile);
+    const foundImportURIs = getImports(resolvedFile.source);
 
     const fileNode: ImportTreeNode = { uri: file.uri, imports: [], ...resolvedFile };
 
@@ -123,7 +101,7 @@ export async function gatherSources(
   while (queue.length > 0) {
     const fileData = queue.shift()!;
     const resolvedFile: ImportFile = await resolver.require(fileData.file, fileData.cwd);
-    const foundImports = findImports(resolvedFile);
+    const foundImports = getImports(resolvedFile.source);
 
     // if imported path starts with '.' we assume it's relative and return it's
     // path relative to resolved name of the file that imported it
