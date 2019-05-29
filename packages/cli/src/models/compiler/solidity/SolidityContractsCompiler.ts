@@ -38,8 +38,8 @@ export interface CompilerOptions extends CompilerVersionOptions {
 const log = new Logger('SolidityContractsCompiler');
 
 export const DEFAULT_EVM_VERSION = 'constantinople';
+export const DEFAULT_OPTIMIZER = { enabled: false };
 
-const DEFAULT_OPTIMIZER = { enabled: false };
 const OUTPUT_SELECTION = {
   '*': {
     '': [

@@ -78,6 +78,15 @@ describe('SolidityProjectCompiler', function () {
       const schema = FileSystem.parseJson(greeterArtifactPath);
       schema.compiler.version.should.eq('0.5.0+commit.1d4f565a.Emscripten.clang');
     });
+
+    it('recompiles if compiler settings changed', async function () {
+      const origMtime = statSync(greeterArtifactPath).mtimeMs;
+      const optimizer = { enabled: true, runs: 300 };
+      await compileProject(inputDir, testBuildDir, { version: '0.5.9', optimizer });
+      statSync(greeterArtifactPath).mtimeMs.should.not.eq(origMtime);
+      const schema = FileSystem.parseJson(greeterArtifactPath);
+      schema.compiler.optimizer.should.be.deep.equal(optimizer)
+    });
   });
 
   describe('in mock-stdlib-with-deps project', function () {

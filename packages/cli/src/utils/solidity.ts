@@ -1,4 +1,5 @@
 import { eq as semverEq, parse as parseSemver } from 'semver';
+import { CompilerVersionOptions } from '../models/compiler/solidity/SolidityContractsCompiler';
 
 export function getPragma(source: string): string {
   if (!source) return null;
@@ -7,7 +8,7 @@ export function getPragma(source: string): string {
   return match[1];
 }
 
-export function compilerVersionMatches(v1: string, v2: string): boolean {
+export function compilerVersionsMatch(v1: string, v2: string): boolean {
   if (!v1 || !v2) return false;
 
   const parseVersion = (version: string) => {
@@ -18,6 +19,16 @@ export function compilerVersionMatches(v1: string, v2: string): boolean {
   };
 
   return semverEq(parseVersion(v1), parseVersion(v2));
+}
+
+export function compilerSettingsMatch(s1: CompilerVersionOptions, s2: CompilerVersionOptions) {
+  if (!s1 || !s2) return false;
+
+  /* tslint:disable:triple-equals */
+  return s1.evmVersion === s2.evmVersion
+    && ((!s1.optimizer && !s2.optimizer)
+        || (s1.optimizer.enabled == s2.optimizer.enabled && s1.optimizer.runs == s2.optimizer.runs));
+  /* tslint:enable:triple-equals */
 }
 
 export function getImports(source: string): string[] {

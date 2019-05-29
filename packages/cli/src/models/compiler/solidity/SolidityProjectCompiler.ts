@@ -1,14 +1,15 @@
 import path from 'path';
 import max from 'lodash.max';
 import maxBy from 'lodash.maxby';
+import pick from 'lodash.pick';
 import { readJsonSync } from 'fs-extra';
 import { statSync } from 'fs';
 import { FileSystem as fs, Logger } from 'zos-lib';
-import { RawContract, CompiledContract, CompilerOptions, resolveCompilerVersion, compileWith } from './SolidityContractsCompiler';
+import { RawContract, CompiledContract, CompilerOptions, resolveCompilerVersion, compileWith, DEFAULT_OPTIMIZER, DEFAULT_EVM_VERSION } from './SolidityContractsCompiler';
 import { ImportsFsEngine } from '@resolver-engine/imports-fs';
 import { gatherSources } from './ResolverEngineGatherer';
 import { SolcBuild } from './CompilerProvider';
-import { compilerVersionMatches } from '../../../utils/solidity';
+import { compilerVersionsMatch, compilerSettingsMatch } from '../../../utils/solidity';
 import { tryFunc } from '../../../utils/try';
 
 const log = new Logger('SolidityProjectCompiler');
@@ -79,19 +80,29 @@ class SolidityProjectCompiler {
 
     // We pick a single artifact (the most recent one) to get the version it was compiled with
     const latestArtifact = maxBy(artifactsWithMtimes, 'mtime');
-    const artifactCompiledVersion = latestArtifact && readJsonSync(latestArtifact.artifact).compiler.version;
+    const latestSchema = latestArtifact && readJsonSync(latestArtifact.artifact);
+    const artifactCompiledVersion = latestSchema && latestSchema.compiler.version;
+    const artifactSettings = latestSchema && pick(latestSchema.compiler, 'evmVersion', 'optimizer');
+
+    // Build current settings based on defaults
+    const currentSettings = {
+      optimizer: DEFAULT_OPTIMIZER,
+      evmVersion: DEFAULT_EVM_VERSION,
+      ... this.options
+    };
 
     // Gather artifacts vs sources modified times
     const maxArtifactsMtimes = max(artifactsWithMtimes.map(({ mtime }) => mtime));
     const maxSourcesMtimes = max(this.contracts.map(({ lastModified }) => lastModified));
 
     // Compile if there are no previous artifacts, or no mtimes could be collected for sources,
-    // or sources were modified after artifacts, or compiler version changed
+    // or sources were modified after artifacts, or compiler version changed, or compiler settings changed
     return !maxArtifactsMtimes
       || !maxSourcesMtimes
       || maxArtifactsMtimes < maxSourcesMtimes
       || !artifactCompiledVersion
-      || !compilerVersionMatches(artifactCompiledVersion, this.compilerVersion.longVersion);
+      || !compilerVersionsMatch(artifactCompiledVersion, this.compilerVersion.longVersion)
+      || !compilerSettingsMatch(currentSettings, artifactSettings);
   }
 
   private _writeOutput(): void {

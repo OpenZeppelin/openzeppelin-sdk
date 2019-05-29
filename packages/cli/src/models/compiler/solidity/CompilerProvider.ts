@@ -11,8 +11,8 @@ import { Logger } from 'zos-lib';
 import { homedir } from 'os';
 import path from 'path';
 import child from '../../../utils/child';
-import { tryFunc, tryAwait } from '../../../utils/try';
-import { compilerVersionMatches } from '../../../utils/solidity';
+import { tryAwait } from '../../../utils/try';
+import { compilerVersionsMatch } from '../../../utils/solidity';
 
 const log = new Logger('CompilerProvider');
 
@@ -96,7 +96,7 @@ export async function resolveCompilerVersion(requiredSemver: string | string[]):
 export async function fetchCompiler(build: SolcBuild): Promise<SolcCompiler> {
   // Try local compiler and see if version matches
   const localVersion = await localCompilerVersion();
-  if (localVersion && compilerVersionMatches(localVersion, build.longVersion)) {
+  if (localVersion && compilerVersionsMatch(localVersion, build.longVersion)) {
     log.info(`Using local solc compiler found`);
     return new SolcBinCompiler(localVersion);
   }
