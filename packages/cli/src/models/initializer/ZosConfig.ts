@@ -4,78 +4,80 @@ import omit from 'lodash.omit';
 import isUndefined from 'lodash.isundefined';
 import { FileSystem } from 'zos-lib';
 
-const ZosConfig = {
-  initialize(root: string = process.cwd()): void {
-    this._createContractsDir(root);
-    this._createZosConfigFile(root);
-  },
+export default class ZosConfig {
+  private config: any;
 
-  exists(root: string = process.cwd()): boolean {
+  public initialize(root: string = process.cwd()) {
+    this.createContractsDir(root);
+    this.createZosConfigFile(root);
+  }
+
+  public exists(root: string = process.cwd()): boolean {
     return FileSystem.exists(`${root}/networks.js`);
-  },
+  }
 
-  getBuildDir() {
-    const buildDir = this.config ? this.config.buildDir : `${process.cwd()}/build/contracts`;
-    if (!FileSystem.exists(buildDir)) FileSystem.createDirPath(buildDir);
-    return buildDir;
-  },
-
-  // TODO: set types.
-  load(networkName: string): any {
-    return this._buildConfig(networkName);
-  },
-
-  // TODO: set types.
-  _buildConfig(networkName: string, root: string = process.cwd()) {
+  public getConfig(root: string = process.cwd()) {
     if (this.config) return this.config;
 
     const zosConfigFile = require(`${root}/networks.js`);
-    const { networks } = zosConfigFile;
+    const compilers = zosConfigFile.compilers || this.setDefaultCompilersProperties();
+    const buildDir = `${root}/build/contracts`;
 
+    return { ...zosConfigFile, compilers, buildDir };
+  }
+
+  public getBuildDir() {
+    return this.config ? this.config.buildDir : `${process.cwd()}/build/contracts`;
+  }
+
+  // TODO: set types.
+  public loadNetworkConfig(networkName: string): any {
+    return this.buildNetworkConfig(networkName);
+  }
+
+  // TODO: set types.
+  private buildNetworkConfig(networkName: string, root: string = process.cwd()) {
+    const config = this.getConfig();
+    const { networks } = config;
     if (!networks[networkName]) throw Error(`Given network '${networkName}' is not defined in your networks.js file`);
 
     const network = networks[networkName];
-    const compilers = zosConfigFile.compilers || this._setDefaultCompilersProperties();
-    const provider = this._setProvider(networks[networkName]);
-    const artifactDefaults = this._setArtifactDefaults(zosConfigFile, networks[networkName]);
-    const buildDir = `${root}/build/contracts`;
+    const provider = this.setProvider(networks[networkName]);
+    const artifactDefaults = this.setArtifactDefaults(config, networks[networkName]);
 
-    this.config = {
-      networks,
+    return {
+      ...config,
       network,
       provider,
       artifactDefaults,
-      compilers,
-      buildDir,
     };
-
-    return this.config;
-  },
+  }
 
   // TODO: set types
-  _setProvider(network: any): any {
+  private setProvider(network: any): any {
     let { provider } = network;
+
     if (!provider) {
       const { host, port, protocol } = network;
       if (!host) throw Error('A host name must be specified');
       if (!port) throw Error('A port must be specified');
       provider = `${protocol ? protocol : 'http'}://${host}:${port}`;
-    } else if (typeof provider === 'function' && provider.constructor.name !== 'Function') {
+    } else if (typeof provider === 'function') {
       provider = provider();
     }
 
     return provider;
-  },
+  }
 
-  _setArtifactDefaults(zosConfigFile: any, network: any) {
+  private setArtifactDefaults(zosConfigFile: any, network: any) {
     const defaults = ['gas', 'gasPrice', 'from'];
     const configDefaults = omit(pick(zosConfigFile, defaults), isUndefined);
     const networkDefaults = omit(pick(network, defaults), isUndefined);
 
     return { ...configDefaults, ...networkDefaults };
-  },
+  }
 
-  _setDefaultCompilersProperties() {
+  private setDefaultCompilersProperties() {
     return {
       vyper: {},
       solc: {
@@ -87,27 +89,24 @@ const ZosConfig = {
         }
       }
     };
-  },
+  }
 
-  _createContractsDir(root: string): void {
+  private createContractsDir(root: string): void {
     const contractsDir = `${root}/contracts`;
-    this._createDir(contractsDir);
-  },
+    this.createDir(contractsDir);
+  }
 
-  _createZosConfigFile(root: string): void {
+  private createZosConfigFile(root: string): void {
     if (!this.exists(root)) {
       const blueprint = path.resolve(__dirname, './blueprint.networks.js');
       FileSystem.copy(blueprint, `${root}/networks.js`);
     }
-  },
+  }
 
-  _createDir(dir: string): void {
+  private createDir(dir: string): void {
     if (!FileSystem.exists(dir)) {
       FileSystem.createDir(dir);
       FileSystem.write(`${dir}/.gitkeep`, '');
     }
-  },
-
-};
-
-export default ZosConfig;
+  }
+}

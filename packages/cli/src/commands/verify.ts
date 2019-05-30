@@ -2,7 +2,6 @@ import pickBy from 'lodash.pickby';
 
 import verify from '../scripts/verify';
 import ConfigVariablesInitializer from '../models/initializer/ConfigVariablesInitializer';
-import Truffle from '../models/initializer/truffle/Truffle';
 import {
   promptIfNeeded,
   contractsList,
@@ -53,7 +52,7 @@ async function action(contractName: string, options: any): Promise<void> {
     remote,
     apiKey,
   };
-  const defaults = Truffle.getCompilerInfo();
+  const defaults = ConfigVariablesInitializer.getCompilerInfo();
   const props = getCommandProps(optimizer);
 
   const prompted = await promptIfNeeded(

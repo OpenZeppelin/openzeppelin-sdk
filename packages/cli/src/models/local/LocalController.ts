@@ -53,7 +53,7 @@ export default class LocalController {
       throw Error('A project name must be provided to initialize the project.');
     this.initZosPackageFile(name, version, force, publish);
     Session.ignoreFile();
-    ZosConfig.initialize();
+    new ZosConfig().initialize();
   }
 
   public initZosPackageFile(
