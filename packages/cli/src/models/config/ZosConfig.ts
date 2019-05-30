@@ -31,13 +31,13 @@ export default class ZosConfig {
   }
 
   // TODO: set types.
-  public loadNetworkConfig(networkName: string): any {
-    return this.buildNetworkConfig(networkName);
+  public loadNetworkConfig(networkName: string, root: string = process.cwd()): any {
+    return this.buildNetworkConfig(networkName, root);
   }
 
   // TODO: set types.
   private buildNetworkConfig(networkName: string, root: string = process.cwd()) {
-    const config = this.getConfig();
+    const config = this.getConfig(root);
     const { networks } = config;
     if (!networks[networkName]) throw Error(`Given network '${networkName}' is not defined in your networks.js file`);
 
