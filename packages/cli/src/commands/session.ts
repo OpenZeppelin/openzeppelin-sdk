@@ -6,7 +6,7 @@ import {
   InquirerQuestions,
 } from '../prompts/prompt';
 import Session from '../models/network/Session';
-import ConfigVariablesInitializer from '../models/config/ConfigManager';
+import ConfigManager from '../models/config/ConfigManager';
 
 const name = 'session';
 const signature: string = name;
@@ -49,7 +49,7 @@ async function action(options: any): Promise<void> {
     );
     const {
       network,
-    } = await ConfigVariablesInitializer.initNetworkConfiguration(
+    } = await ConfigManager.initNetworkConfiguration(
       promptedNetwork,
       true,
     );

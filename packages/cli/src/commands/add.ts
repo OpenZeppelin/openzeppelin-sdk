@@ -3,7 +3,7 @@ import add from '../scripts/add';
 import addAll from '../scripts/add-all';
 import Truffle from '../models/config/Truffle';
 import Compiler from '../models/compiler/Compiler';
-import ConfigVariablesInitializer from '../models/config/ConfigManager';
+import ConfigManager from '../models/config/ConfigManager';
 import { promptIfNeeded, contractsList, InquirerQuestions } from '../prompts/prompt';
 import { fromContractFullName } from '../utils/naming';
 import ZosPackageFile from '../models/files/ZosPackageFile';
@@ -27,7 +27,7 @@ const register: (program: any) => any = program =>
 
 async function action(contractNames: string[], options: any): Promise<void> {
   const { skipCompile, all, interactive } = options;
-  ConfigVariablesInitializer.initStaticConfiguration();
+  ConfigManager.initStaticConfiguration();
 
   if (!skipCompile) await Compiler.call();
 

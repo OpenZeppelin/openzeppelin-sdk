@@ -1,5 +1,5 @@
 import freeze from '../scripts/freeze';
-import ConfigVariablesInitializer from '../models/config/ConfigManager';
+import ConfigManager from '../models/config/ConfigManager';
 
 const name = 'freeze';
 const signature: string = name;
@@ -17,7 +17,7 @@ async function action(options: any): Promise<void> {
   const {
     network,
     txParams,
-  } = await ConfigVariablesInitializer.initNetworkConfiguration(options);
+  } = await ConfigManager.initNetworkConfiguration(options);
   await freeze({ network, txParams });
   if (!options.dontExitProcess && process.env.NODE_ENV !== 'test')
     process.exit(0);

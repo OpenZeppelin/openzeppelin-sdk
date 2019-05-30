@@ -1,7 +1,7 @@
 import pickBy from 'lodash.pickby';
 
 import verify from '../scripts/verify';
-import ConfigVariablesInitializer from '../models/config/ConfigManager';
+import ConfigManager from '../models/config/ConfigManager';
 import { promptIfNeeded, contractsList, networksList, InquirerQuestions } from '../prompts/prompt';
 
 const name = 'verify';
@@ -47,7 +47,7 @@ async function action(contractName: string, options: any): Promise<void> {
     remote,
     apiKey,
   };
-  const defaults = ConfigVariablesInitializer.getCompilerInfo();
+  const defaults = ConfigManager.getCompilerInfo();
   const props = getCommandProps(optimizer);
 
   const prompted = await promptIfNeeded(
@@ -57,7 +57,7 @@ async function action(contractName: string, options: any): Promise<void> {
   const {
     network,
     txParams,
-  } = await ConfigVariablesInitializer.initNetworkConfiguration(prompted);
+  } = await ConfigManager.initNetworkConfiguration(prompted);
 
   await verify(prompted.contractName, { ...prompted, network, txParams });
   if (!options.dontExitProcess && process.env.NODE_ENV !== 'test')

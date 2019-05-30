@@ -1,6 +1,6 @@
 import balance from '../scripts/balance';
 import { promptIfNeeded, networksList, InquirerQuestions } from '../prompts/prompt';
-import ConfigVariablesInitializer from '../models/config/ConfigManager';
+import ConfigManager from '../models/config/ConfigManager';
 import Session from '../models/network/Session';
 
 const name = 'balance';
@@ -38,7 +38,7 @@ async function action(accountAddress: string, options: any): Promise<void> {
     interactive,
   );
 
-  await ConfigVariablesInitializer.initNetworkConfiguration({
+  await ConfigManager.initNetworkConfiguration({
     ...options,
     ...promptedConfig,
   });

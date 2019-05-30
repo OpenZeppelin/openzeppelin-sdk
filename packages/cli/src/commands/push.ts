@@ -9,7 +9,7 @@ import Compiler from '../models/compiler/Compiler';
 import { fromContractFullName } from '../utils/naming';
 import Dependency from '../models/dependency/Dependency';
 import ZosPackageFile from '../models/files/ZosPackageFile';
-import ConfigVariablesInitializer from '../models/config/ConfigManager';
+import ConfigManager from '../models/config/ConfigManager';
 import { promptIfNeeded, networksList, InquirerQuestions } from '../prompts/prompt';
 
 const name = 'push';
@@ -71,7 +71,7 @@ async function action(options: any): Promise<void> {
   const {
     network,
     txParams,
-  } = await ConfigVariablesInitializer.initNetworkConfiguration({
+  } = await ConfigManager.initNetworkConfiguration({
     ...options,
     ...prompted,
   });

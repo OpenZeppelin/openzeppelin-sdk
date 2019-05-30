@@ -8,7 +8,7 @@ import Session from '../models/network/Session';
 import Compiler from '../models/compiler/Compiler';
 import { fromContractFullName } from '../utils/naming';
 import { hasToMigrateProject } from '../prompts/migrations';
-import ConfigVariablesInitializer from '../models/config/ConfigManager';
+import ConfigManager from '../models/config/ConfigManager';
 import { promptIfNeeded, networksList, contractsList, methodsList, argsList } from '../prompts/prompt';
 import promptForMethodParams from '../prompts/method-params';
 import { ProxyType } from '../scripts/interfaces';
@@ -61,7 +61,7 @@ async function commandActions(contractFullName: string, options: any) {
   const {
     network,
     txParams,
-  } = await ConfigVariablesInitializer.initNetworkConfiguration({
+  } = await ConfigManager.initNetworkConfiguration({
     ...options,
     network: promptedNewtork,
   });

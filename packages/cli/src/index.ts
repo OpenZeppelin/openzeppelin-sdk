@@ -10,7 +10,7 @@ import files from './models/files';
 import local from './models/local';
 import network from './models/network';
 import TestHelper from './models/TestHelper';
-import ConfigVariablesInitializer from './models/config/ConfigManager';
+import ConfigManager from './models/config/ConfigManager';
 
 // utils
 import * as naming from './utils/naming';
@@ -26,6 +26,6 @@ export {
   scripts,
   naming,
   stdout,
-  ConfigVariablesInitializer,
+  ConfigManager,
   TestHelper,
 };

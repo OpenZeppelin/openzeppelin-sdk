@@ -8,7 +8,7 @@ import querySignedDeployment from '../scripts/query-signed-deployment';
 import { parseMethodParams } from '../utils/input';
 import { fromContractFullName } from '../utils/naming';
 import { hasToMigrateProject } from '../prompts/migrations';
-import ConfigVariablesInitializer from '../models/config/ConfigManager';
+import ConfigManager from '../models/config/ConfigManager';
 
 const name = 'create2';
 const signature = `${name} [alias]`;
@@ -55,7 +55,7 @@ async function action(contractFullName: string, options: any): Promise<void> {
   const {
     network,
     txParams,
-  } = await ConfigVariablesInitializer.initNetworkConfiguration(options);
+  } = await ConfigManager.initNetworkConfiguration(options);
   if (!(await hasToMigrateProject(network))) process.exit(0);
   if (!options.salt) throw new Error("option `--salt' is required");
 
