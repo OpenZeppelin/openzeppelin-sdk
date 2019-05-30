@@ -130,4 +130,3 @@ contract('ZosConfig', function() {
     });
   });
 });
-
