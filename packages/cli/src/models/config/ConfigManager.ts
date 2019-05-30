@@ -8,15 +8,9 @@ import ZosConfig from './ZosConfig';
   txParams: TxParams;
 }
 
- const ConfigManager = {
-  initialize(root: string = process.cwd()): void {
-    if(!TruffleConfig.exists() && !ZosConfig.exists()) {
-      ZosConfig.createZosConfigFile(root);
-    }
-  },
-
-   initStaticConfiguration(root: string = process.cwd()): void {
-    this.setBaseConfig(root);
+const ConfigManager = {
+  initStaticConfiguration(): void {
+    this.setBaseConfig();
     const buildDir = this.config.getBuildDir();
     Contracts.setLocalBuildDir(buildDir);
   },
@@ -67,14 +61,16 @@ import ZosConfig from './ZosConfig';
     return config && config.networks ? Object.keys(config.networks) : undefined;
   },
 
-   setBaseConfig(root: string = process.cwd()): void | null | never {
+  setBaseConfig(): void | never {
     if (this.config) return;
 
-     // these lines could be expanded to support different libraries like embark, ethjs, buidler, etc
-    if (ZosConfig.exists(root)) {
-      this.config = ZosConfig;
-    } else if (TruffleConfig.exists(root)) {
-      this.config = TruffleConfig;
+    // these lines could be expanded to support different libraries like embark, ethjs, buidler, etc
+    const zosConfig = new ZosConfig();
+    const truffleConfig = new TruffleConfig();
+    if (zosConfig.exists()) {
+      this.config = zosConfig;
+    } else if (truffleConfig.existsTruffleConfig()) {
+      this.config = truffleConfig;
     } else {
       throw Error('Could not find networks.js file, please remember to initialize your project.');
     }

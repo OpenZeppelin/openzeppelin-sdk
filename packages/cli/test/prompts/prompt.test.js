@@ -8,7 +8,7 @@ import * as prompt from '../../src/prompts/prompt';
 import inquirer from 'inquirer';
 import { ContractMethodMutability as Mutability } from 'zos-lib';
 
-import Truffle from '../../src/models/initializer/truffle/Truffle';
+import ConfigManager from '../../src/models/config/ConfigManager';
 import LocalController from '../../src/models/local/LocalController';
 import ZosPackageFile from '../../src/models/files/ZosPackageFile';
 import {
