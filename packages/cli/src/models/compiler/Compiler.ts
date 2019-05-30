@@ -11,9 +11,10 @@ const state = { alreadyCompiled: false };
 const Compiler = {
   async call(force: boolean = false): Promise<void> {
     if (force || !state.alreadyCompiled) {
-      await Truffle.isTruffleProject() // TODO: Check if there is a compiler setting on zos config file to decide
-        ? this.compileWithTruffle(force)
-        : this.compileWithSolc();
+      const compileFn = Truffle.isTruffleProject() // TODO: Check if there is a compiler setting on zos config file to decide
+        ? this.compileWithTruffle
+        : this.compileWithSolc;
+      await compileFn();
       state.alreadyCompiled = true;
     }
   },
