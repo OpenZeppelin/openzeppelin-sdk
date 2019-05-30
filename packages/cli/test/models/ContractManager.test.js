@@ -3,66 +3,68 @@
 require('../setup')
 
 import sinon from 'sinon'
-import npm from 'npm-programmatic'
-import { FileSystem as fs } from 'zos-lib'
+import { FileSystem } from 'zos-lib'
 import ContractManager from '../../src/models/local/ContractManager'
+import ZosPackageFile from '../../src/models/files/ZosPackageFile'
+import ConfigManager from '../../src/models/config/ConfigManager'
 
-contract.skip('ContractManager', function([_, from]) {
-  describe('getNetworkNamesFromConfig', function () {
-    const configFile = `${process.cwd()}/truffle.js`
-    const configFileBackup = `${configFile}.backup`
-
-    before('backup truffle-config file', function () {
-      FileSystem.copy(configFile, configFileBackup)
-    })
-
-    after('restore truffle-config file', function () {
-      FileSystem.copy(configFileBackup, configFile)
-      FileSystem.remove(configFileBackup)
-    })
-
-    it('finds a network in truffle network list', function () {
-      FileSystem.write(configFile, 'module.exports = { networks: { test: { gas: 1, gasPrice: 2, from: \'0x0\' } } }');
-      const networkNames = this.truffleConfig.getNetworkNamesFromConfig()
-      networkNames.should.be.an('array')
-      networkNames[0].should.eq('test')
-      networkNames.should.have.lengthOf(1)
-    })
-  })
-
+contract('ContractManager', function([_, from]) {
   describe('getContractNames', function () {
-    beforeEach(function () {
-      sinon.stub(Truffle.prototype, 'getBuildDir').returns(`${testDir}/build/contracts`)
-    })
-
-    afterEach(function () {
-      sinon.restore()
-    })
-
     context('without directory created', function () {
-      it('throws an error', function () {
-        Truffle.getContractNames().should.be.an('array').that.is.empty;
+      beforeEach('create test dir', function () {
+        this.testDir = `${process.cwd()}/test/tmp`
+        this.packageFile = new ZosPackageFile(`${this.testDir}/zos.json`);
+        this.contractManager = new ContractManager(this.packageFile);
+        FileSystem.createDir(this.testDir)
+        sinon.stub(ConfigManager, 'getBuildDir').returns(`${this.testDir}/build/contracts`)
+      })
+
+      afterEach('remove test dir', function () {
+        FileSystem.removeTree(this.testDir)
+        sinon.restore()
+      })
+
+      it('returns an empty array', function () {
+        this.contractManager.getContractNames().should.be.an('array').that.is.empty;
       })
     })
 
     context('with directory created', function () {
-      beforeEach('create build/contracts/ directory', function () {
-        FileSystem.createDirPath(`${testDir}/build/contracts`)
-      })
-
       context('without contracts', function () {
+        beforeEach('create test dir', function () {
+          this.testDir = `${process.cwd()}/test/tmp`
+          this.packageFile = new ZosPackageFile(`${this.testDir}/zos.json`);
+          this.contractManager = new ContractManager(this.packageFile);
+          FileSystem.createDir(this.testDir)
+          FileSystem.createDirPath(`${this.testDir}/build/contracts`)
+          sinon.stub(ConfigManager, 'getBuildDir').returns(`${this.testDir}/build/contracts`)
+        })
+
+        afterEach('remove test dir', function () {
+          FileSystem.removeTree(this.testDir)
+          sinon.restore()
+        })
+
         it('returns an empty array', function () {
-          const contractNames = Truffle.getContractNames()
+          const contractNames = this.contractManager.getContractNames()
           expect(contractNames).to.be.empty
         })
       })
 
       context('with contracts', function () {
+        beforeEach(function () {
+          this.testDir = `${process.cwd()}/test/mocks/mock-stdlib-2`;
+          this.packageFile = new ZosPackageFile(`${this.testDir}/zos.json`);
+          this.contractManager = new ContractManager(this.packageFile);
+          sinon.stub(ConfigManager, 'getBuildDir').returns(`${this.testDir}/build/contracts`)
+        });
+
+        afterEach(function() {
+          sinon.restore();
+        });
+
         it('returns an array with items inside', function () {
-          FileSystem.writeJson(`${testDir}/build/contracts/Foo.json`, { sourcePath: `${testDir}/contracts`, bytecode: '0x124' })
-          FileSystem.writeJson(`${testDir}/build/contracts/Bar.json`, { sourcePath: `${testDir}/contracts`, bytecode: '0x' })
-          FileSystem.writeJson(`${testDir}/build/contracts/Buz.json`, { sourcePath: `other-directory/contracts`, bytecode: '0x124' })
-          const contractNames = Truffle.getContractNames()
+          const contractNames = this.contractManager.getContractNames()
 
           contractNames.should.be.an('array')
           contractNames.should.not.be.empty
