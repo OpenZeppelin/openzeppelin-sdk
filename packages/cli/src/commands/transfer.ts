@@ -6,7 +6,7 @@ import {
   InquirerQuestions,
 } from '../prompts/prompt';
 import { isValidUnit } from '../utils/units';
-import ConfigVariablesInitializer from '../models/initializer/ConfigVariablesInitializer';
+import ConfigVariablesInitializer from '../models/config/ConfigManager';
 
 const name = 'transfer';
 const signature: string = name;

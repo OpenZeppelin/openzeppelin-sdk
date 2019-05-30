@@ -6,7 +6,7 @@ import {
   InquirerQuestions,
 } from '../prompts/prompt';
 import Session from '../models/network/Session';
-import ConfigVariablesInitializer from '../models/initializer/ConfigVariablesInitializer';
+import ConfigVariablesInitializer from '../models/config/ConfigManager';
 
 const name = 'session';
 const signature: string = name;

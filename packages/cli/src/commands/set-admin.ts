@@ -13,7 +13,7 @@ import {
   InquirerQuestions,
 } from '../prompts/prompt';
 import { hasToMigrateProject } from '../prompts/migrations';
-import ConfigVariablesInitializer from '../models/initializer/ConfigVariablesInitializer';
+import ConfigVariablesInitializer from '../models/config/ConfigManager';
 
 const name = 'set-admin';
 const signature = `${name} [alias-or-address] [new-admin-address]`;

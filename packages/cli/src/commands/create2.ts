@@ -8,7 +8,7 @@ import querySignedDeployment from '../scripts/query-signed-deployment';
 import { parseMethodParams } from '../utils/input';
 import { fromContractFullName } from '../utils/naming';
 import { hasToMigrateProject } from '../prompts/migrations';
-import ConfigVariablesInitializer from '../models/initializer/ConfigVariablesInitializer';
+import ConfigVariablesInitializer from '../models/config/ConfigManager';
 
 const name = 'create2';
 const signature = `${name} [alias]`;

@@ -1,5 +1,5 @@
 import freeze from '../scripts/freeze';
-import ConfigVariablesInitializer from '../models/initializer/ConfigVariablesInitializer';
+import ConfigVariablesInitializer from '../models/config/ConfigManager';
 
 const name = 'freeze';
 const signature: string = name;

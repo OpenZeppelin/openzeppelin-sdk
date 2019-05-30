@@ -1,7 +1,7 @@
 import pull from '../scripts/pull';
 import status from '../scripts/status';
 import compare from '../scripts/compare';
-import ConfigVariablesInitializer from '../models/initializer/ConfigVariablesInitializer';
+import ConfigVariablesInitializer from '../models/config/ConfigManager';
 
 const name = 'status';
 const signature: string = name;

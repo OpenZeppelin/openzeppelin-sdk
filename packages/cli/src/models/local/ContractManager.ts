@@ -1,7 +1,7 @@
 import { Contracts, Contract, FileSystem } from 'zos-lib';
 import Dependency from '../dependency/Dependency';
 import ZosPackageFile from '../files/ZosPackageFile';
-import ConfigVariablesInitializer from '../initializer/ConfigVariablesInitializer';
+import ConfigVariablesInitializer from '../config/ConfigManager';
 
 export default class ContractManager {
   public packageFile: ZosPackageFile;

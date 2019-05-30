@@ -8,14 +8,8 @@ import Session from '../models/network/Session';
 import Compiler from '../models/compiler/Compiler';
 import { fromContractFullName } from '../utils/naming';
 import { hasToMigrateProject } from '../prompts/migrations';
-import ConfigVariablesInitializer from '../models/initializer/ConfigVariablesInitializer';
-import {
-  promptIfNeeded,
-  networksList,
-  contractsList,
-  methodsList,
-  argsList,
-} from '../prompts/prompt';
+import ConfigVariablesInitializer from '../models/config/ConfigManager';
+import { promptIfNeeded, networksList, contractsList, methodsList, argsList } from '../prompts/prompt';
 import promptForMethodParams from '../prompts/method-params';
 import { ProxyType } from '../scripts/interfaces';
 

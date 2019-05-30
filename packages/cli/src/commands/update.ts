@@ -4,7 +4,7 @@ import push from './push';
 import update from '../scripts/update';
 import { parseContractReference } from '../utils/contract';
 import { hasToMigrateProject } from '../prompts/migrations';
-import ConfigVariablesInitializer from '../models/initializer/ConfigVariablesInitializer';
+import ConfigVariablesInitializer from '../models/config/ConfigManager';
 import { UpdatePropsParams, UpdateSelectionParams } from './interfaces';
 import {
   promptIfNeeded,

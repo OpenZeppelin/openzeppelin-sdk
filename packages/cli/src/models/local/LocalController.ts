@@ -18,7 +18,7 @@ import Session from '../network/Session';
 import Dependency from '../dependency/Dependency';
 import NetworkController from '../network/NetworkController';
 import ValidationLogger from '../../interface/ValidationLogger';
-import ZosConfig from '../initializer/ZosConfig';
+import ZosConfig from '../config/ZosConfig';
 import ZosPackageFile from '../files/ZosPackageFile';
 import ZosNetworkFile from '../files/ZosNetworkFile';
 

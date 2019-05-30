@@ -11,7 +11,7 @@ import {
 
 import Session from '../models/network/Session';
 // import Truffle from '../models/initializer/truffle/Truffle';
-import ConfigVariablesInitializer from '../models/initializer/ConfigVariablesInitializer';
+import ConfigVariablesInitializer from '../models/config/ConfigManager';
 import ZosPackageFile from '../models/files/ZosPackageFile';
 import ContractManager from '../models/local/ContractManager';
 import Dependency from '../models/dependency/Dependency';
