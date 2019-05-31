@@ -8,7 +8,7 @@ export default class MinimalProxy {
     return new this(address);
   }
 
-  constructor(address: string) {
+  public constructor(address: string) {
     this.address = toAddress(address);
   }
 

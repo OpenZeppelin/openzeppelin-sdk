@@ -6,13 +6,12 @@ interface LoggerOptions {
 }
 
 export default class Logger {
-
   private _prefix: string;
   private _opts: LoggerOptions;
 
   private static _defaults: LoggerOptions = {
     verbose: false,
-    silent: true
+    silent: true,
   };
 
   public static silent(value): void {
@@ -23,7 +22,7 @@ export default class Logger {
     Logger._defaults.verbose = value;
   }
 
-  constructor(prefix: string, opts?: LoggerOptions) {
+  public constructor(prefix: string, opts?: LoggerOptions) {
     this._prefix = prefix;
     this._opts = opts;
   }
@@ -54,7 +53,7 @@ export default class Logger {
     console.error(chalk.keyword(color)(msg));
   }
 
-  get opts(): LoggerOptions {
-    return {...this._opts, ...Logger._defaults};
+  public get opts(): LoggerOptions {
+    return { ...this._opts, ...Logger._defaults };
   }
 }

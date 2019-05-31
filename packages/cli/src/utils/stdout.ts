@@ -1,5 +1,5 @@
 const state: { silent: boolean } = {
-  silent: false
+  silent: false,
 };
 
 export default function log(...args: any[]): void {

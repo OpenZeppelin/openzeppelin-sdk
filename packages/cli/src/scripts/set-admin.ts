@@ -3,9 +3,19 @@ import NetworkController from '../models/network/NetworkController';
 import ScriptError from '../models/errors/ScriptError';
 import { SetAdminParams } from './interfaces';
 
-export default async function setAdmin({ newAdmin, packageName, contractAlias, proxyAddress, network, txParams = {}, networkFile }: SetAdminParams): Promise<void | never> {
+export default async function setAdmin({
+  newAdmin,
+  packageName,
+  contractAlias,
+  proxyAddress,
+  network,
+  txParams = {},
+  networkFile,
+}: SetAdminParams): Promise<void | never> {
   if (!contractAlias && !proxyAddress && packageName) {
-    throw Error('The address or name of the contract to transfer upgradeability admin rights must be provided.');
+    throw Error(
+      'The address or name of the contract to transfer upgradeability admin rights must be provided.',
+    );
   }
 
   if (!newAdmin) {
@@ -16,13 +26,18 @@ export default async function setAdmin({ newAdmin, packageName, contractAlias, p
 
   try {
     if (contractAlias || proxyAddress) {
-      const proxies = await controller.setProxiesAdmin(packageName, contractAlias, proxyAddress, newAdmin);
-      proxies.forEach((proxy) => stdout(proxy.address));
+      const proxies = await controller.setProxiesAdmin(
+        packageName,
+        contractAlias,
+        proxyAddress,
+        newAdmin,
+      );
+      proxies.forEach(proxy => stdout(proxy.address));
     } else {
       await controller.setProxyAdminOwner(newAdmin);
     }
     controller.writeNetworkPackageIfNeeded();
-  } catch(error) {
+  } catch (error) {
     const cb = () => controller.writeNetworkPackageIfNeeded();
     throw new ScriptError(error, cb);
   }

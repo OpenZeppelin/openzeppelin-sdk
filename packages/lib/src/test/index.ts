@@ -10,14 +10,11 @@ const helpers = {
   assertEvent,
   signDeploy,
   signer,
-  signerPk
+  signerPk,
 };
 
 const behaviors = {
   shouldBehaveLikeOwnable,
 };
 
-export {
-  helpers,
-  behaviors
-};
+export { helpers, behaviors };

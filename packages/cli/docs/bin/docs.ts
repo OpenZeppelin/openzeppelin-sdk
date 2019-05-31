@@ -27,11 +27,11 @@ function writeMd(id, title, content) {
 }
 
 function makeSidebar(program) {
-  const commands = program.commands.map(command => `cli_${command.name()}`)
+  const commands = program.commands.map(command => `cli_${command.name()}`);
   return {
     'cli-api': {
-      commands: ['cli_main', ...commands]
-    }
+      commands: ['cli_main', ...commands],
+    },
   };
 }
 
@@ -44,12 +44,17 @@ function run() {
   writeMd('main', 'zos', main);
 
   program.commands.forEach(command => {
-    const content = renderToStaticMarkup(React.createElement(Command, { command }));
+    const content = renderToStaticMarkup(
+      React.createElement(Command, { command }),
+    );
     writeMd(command.name(), command.name(), content);
   });
 
   const sidebar = makeSidebar(program);
-  writeFileSync(path.resolve(outputPath, 'sidebars.json'), JSON.stringify(sidebar, null, 2));
+  writeFileSync(
+    path.resolve(outputPath, 'sidebars.json'),
+    JSON.stringify(sidebar, null, 2),
+  );
 }
 
 run();

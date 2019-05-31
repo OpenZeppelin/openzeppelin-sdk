@@ -19,13 +19,13 @@ import { TxParams } from '../artifacts/ZWeb3';
 export const state: any = {};
 
 // API for gas price guesses
-const GAS_API_URL: string = 'https://ethgasstation.info/json/ethgasAPI.json';
+const GAS_API_URL = 'https://ethgasstation.info/json/ethgasAPI.json';
 
 // Gas estimates are multiplied by this value to allow for an extra buffer (for reference, truffle-next uses 1.25)
-const GAS_MULTIPLIER: number = 1.25;
+const GAS_MULTIPLIER = 1.25;
 
 // Max number of retries for transactions or queries
-const RETRY_COUNT: number = 3;
+const RETRY_COUNT = 3;
 
 // Time to sleep between retries for query operations
 const RETRY_SLEEP_TIME: number = process.env.NODE_ENV === 'test' ? 1 : 3000;
@@ -52,16 +52,29 @@ export default {
    * @param txParams other transaction parameters (from, gasPrice, etc)
    * @param retries number of transaction retries
    */
-  async sendRawTransaction(address: string, { data, value }: TransactionParams, txParams: TxParams = {}, retries: number = RETRY_COUNT): Promise<any> {
+  async sendRawTransaction(
+    address: string,
+    { data, value }: TransactionParams,
+    txParams: TxParams = {},
+    retries: number = RETRY_COUNT,
+  ): Promise<any> {
     await this._fixGasPrice(txParams);
     try {
       const from = await ZWeb3.defaultAccount();
-      const gas = txParams.gas
-        || Contracts.getArtifactsDefaults().gas
-        || await this.estimateActualGas({ to: address, data, value });
+      const gas =
+        txParams.gas ||
+        Contracts.getArtifactsDefaults().gas ||
+        (await this.estimateActualGas({ to: address, data, value }));
 
-      return ZWeb3.eth().sendTransaction({ to: address, data, value, from, ...txParams, gas });
-    } catch(error) {
+      return ZWeb3.eth().sendTransaction({
+        to: address,
+        data,
+        value,
+        from,
+        ...txParams,
+        gas,
+      });
+    } catch (error) {
       if (!error.message.match(/nonce too low/) || retries <= 0) throw error;
       return this.sendRawTransaction(address, data, txParams, retries - 1);
     }
@@ -75,11 +88,19 @@ export default {
    * @param txParams other transaction parameters (from, gasPrice, etc)
    * @param retries number of transaction retries
    */
-  async sendTransaction(contractFn: GenericFunction, args: any[] = [], txParams: TxParams = {}, retries: number = RETRY_COUNT): Promise<any> {
+  async sendTransaction(
+    contractFn: GenericFunction,
+    args: any[] = [],
+    txParams: TxParams = {},
+    retries: number = RETRY_COUNT,
+  ): Promise<any> {
     await this._fixGasPrice(txParams);
 
     try {
-      const gas = txParams.gas || Contracts.getArtifactsDefaults().gas || await this.estimateActualGasFnCall(contractFn, args, txParams);
+      const gas =
+        txParams.gas ||
+        Contracts.getArtifactsDefaults().gas ||
+        (await this.estimateActualGasFnCall(contractFn, args, txParams));
       return contractFn(...args).send({ ...txParams, gas });
     } catch (error) {
       if (!error.message.match(/nonce too low/) || retries <= 0) throw error;
@@ -95,11 +116,22 @@ export default {
    * @param txParams other transaction parameters (from, gasPrice, etc)
    * @param retries number of deploy retries
    */
-  async deployContract(contract: Contract, args: any[] = [], txParams: TxParams = {}, retries: number = RETRY_COUNT): Promise<any> {
+  async deployContract(
+    contract: Contract,
+    args: any[] = [],
+    txParams: TxParams = {},
+    retries: number = RETRY_COUNT,
+  ): Promise<any> {
     await this._fixGasPrice(txParams);
 
     try {
-      const gas = txParams.gas || Contracts.getArtifactsDefaults().gas || await this.estimateActualGas({ data: buildDeploymentCallData(contract, args), ...txParams });
+      const gas =
+        txParams.gas ||
+        Contracts.getArtifactsDefaults().gas ||
+        (await this.estimateActualGas({
+          data: buildDeploymentCallData(contract, args),
+          ...txParams,
+        }));
       return contract.new(...args, { ...txParams, gas });
     } catch (error) {
       if (!error.message.match(/nonce too low/) || retries <= 0) throw error;
@@ -114,11 +146,18 @@ export default {
    * @param txParams all transaction parameters (data, from, gasPrice, etc)
    * @param retries number of data transaction retries
    */
-  async sendDataTransaction(contract: Contract, txParams: TxParams, retries: number = RETRY_COUNT): Promise<TransactionReceipt> {
+  async sendDataTransaction(
+    contract: Contract,
+    txParams: TxParams,
+    retries: number = RETRY_COUNT,
+  ): Promise<TransactionReceipt> {
     await this._fixGasPrice(txParams);
 
     try {
-      const gas = txParams.gas || Contracts.getArtifactsDefaults().gas || await this.estimateActualGas({ to: contract.address, ...txParams });
+      const gas =
+        txParams.gas ||
+        Contracts.getArtifactsDefaults().gas ||
+        (await this.estimateActualGas({ to: contract.address, ...txParams }));
       return this._sendContractDataTransaction(contract, { ...txParams, gas });
     } catch (error) {
       const msg = typeof error === 'string' ? error : error.message;
@@ -127,7 +166,10 @@ export default {
     }
   },
 
-  async estimateGas(txParams: TxParams, retries: number = RETRY_COUNT): Promise<any> {
+  async estimateGas(
+    txParams: TxParams,
+    retries: number = RETRY_COUNT,
+  ): Promise<any> {
     // Retry if estimate fails. This could happen because we are depending
     // on a previous transaction being mined that still hasn't reach the node
     // we are working with, if the txs are routed to different nodes.
@@ -145,17 +187,29 @@ export default {
     }
   },
 
-  async estimateActualGasFnCall(contractFn: GenericFunction, args: any[], txParams: TxParams, retries: number = RETRY_COUNT): Promise<any> {
+  async estimateActualGasFnCall(
+    contractFn: GenericFunction,
+    args: any[],
+    txParams: TxParams,
+    retries: number = RETRY_COUNT,
+  ): Promise<any> {
     // Retry if estimate fails. This could happen because we are depending
     // on a previous transaction being mined that still hasn't reach the node
     // we are working with, if the txs are routed to different nodes.
     // See https://github.com/zeppelinos/zos/issues/192 for more info.
     try {
-      return await this._calculateActualGas(await contractFn(...args).estimateGas({ ...txParams }));
-    } catch(error) {
+      return await this._calculateActualGas(
+        await contractFn(...args).estimateGas({ ...txParams }),
+      );
+    } catch (error) {
       if (retries <= 0) throw Error(error);
       await sleep(RETRY_SLEEP_TIME);
-      return this.estimateActualGasFnCall(contractFn, args, txParams, retries - 1);
+      return this.estimateActualGasFnCall(
+        contractFn,
+        args,
+        txParams,
+        retries - 1,
+      );
     }
   },
 
@@ -164,13 +218,23 @@ export default {
     return this._calculateActualGas(estimatedGas);
   },
 
-  async awaitConfirmations(transactionHash: string, confirmations: number = 12, interval: number = 1000, timeout: number = (10 * 60 * 1000)): Promise<any | never> {
+  async awaitConfirmations(
+    transactionHash: string,
+    confirmations: number = 12,
+    interval: number = 1000,
+    timeout: number = 10 * 60 * 1000,
+  ): Promise<any | never> {
     if (await ZWeb3.isGanacheNode()) return;
-    const getTxBlock = () => (ZWeb3.getTransactionReceipt(transactionHash).then((r) => r.blockNumber));
-    const now = +(new Date());
+    const getTxBlock = () =>
+      ZWeb3.getTransactionReceipt(transactionHash).then(r => r.blockNumber);
+    const now = +new Date();
 
     while (true) {
-      if ((+(new Date()) - now) > timeout) throw new Error(`Exceeded timeout of ${timeout / 1000} seconds awaiting confirmations for transaction ${transactionHash}`);
+      if (+new Date() - now > timeout)
+        throw new Error(
+          `Exceeded timeout of ${timeout /
+            1000} seconds awaiting confirmations for transaction ${transactionHash}`,
+        );
       const currentBlock: number = await ZWeb3.getLatestBlockNumber();
       const txBlock: number = await getTxBlock();
       if (currentBlock - txBlock >= confirmations) return true;
@@ -178,11 +242,17 @@ export default {
     }
   },
 
-  async _sendContractDataTransaction(contract: Contract, txParams: TxParams): Promise<TransactionReceipt> {
+  async _sendContractDataTransaction(
+    contract: Contract,
+    txParams: TxParams,
+  ): Promise<TransactionReceipt> {
     const defaults = await Contracts.getDefaultTxParams();
     const tx = { to: contract.address, ...defaults, ...txParams };
     const txHash = await ZWeb3.sendTransactionWithoutReceipt(tx);
-    return await ZWeb3.getTransactionReceiptWithTimeout(txHash, Contracts.getSyncTimeout());
+    return await ZWeb3.getTransactionReceiptWithTimeout(
+      txHash,
+      Contracts.getSyncTimeout(),
+    );
   },
 
   async _getETHGasStationPrice(): Promise<any | never> {
@@ -196,16 +266,25 @@ export default {
       state.gasPrice = gasPrice;
       return state.gasPrice;
     } catch (err) {
-      throw new Error(`Could not query gas price API to determine reasonable gas price, please provide one.`);
+      throw new Error(
+        `Could not query gas price API to determine reasonable gas price, please provide one.`,
+      );
     }
   },
 
   async _fixGasPrice(txParams: TxParams): Promise<any> {
-    const gasPrice = txParams.gasPrice || Contracts.getArtifactsDefaults().gasPrice;
+    const gasPrice =
+      txParams.gasPrice || Contracts.getArtifactsDefaults().gasPrice;
 
-    if ((TRUFFLE_DEFAULT_GAS_PRICE.eq(gasPrice) || !gasPrice) && await ZWeb3.isMainnet()) {
+    if (
+      (TRUFFLE_DEFAULT_GAS_PRICE.eq(gasPrice) || !gasPrice) &&
+      (await ZWeb3.isMainnet())
+    ) {
       txParams.gasPrice = await this._getETHGasStationPrice();
-      if (TRUFFLE_DEFAULT_GAS_PRICE.lte(txParams.gasPrice)) throw new Error('The current gas price estimate from ethgasstation.info is over 100 gwei. If you do want to send a transaction with a gas price this high, please set it manually in your truffle.js configuration file.');
+      if (TRUFFLE_DEFAULT_GAS_PRICE.lte(txParams.gasPrice))
+        throw new Error(
+          'The current gas price estimate from ethgasstation.info is over 100 gwei. If you do want to send a transaction with a gas price this high, please set it manually in your truffle.js configuration file.',
+        );
     }
   },
 
@@ -222,6 +301,6 @@ export default {
     // causing some transactions to fail. To fix this, always use the block limit
     // when working on a ganache node.
     if (await ZWeb3.isGanacheNode()) return blockLimit - 1;
-    return gasToUse >= blockLimit ? (blockLimit - 1) : gasToUse;
+    return gasToUse >= blockLimit ? blockLimit - 1 : gasToUse;
   },
 };

@@ -28,9 +28,17 @@ export interface ValidationInfo {
   storageDiff?: Operation[];
 }
 
-export function validate(contract: Contract, existingContractInfo: any = {}, buildArtifacts?: any): any {
+export function validate(
+  contract: Contract,
+  existingContractInfo: any = {},
+  buildArtifacts?: any,
+): any {
   checkArtifactsForImportedSources(contract, buildArtifacts);
-  const storageValidation = validateStorage(contract, existingContractInfo, buildArtifacts);
+  const storageValidation = validateStorage(
+    contract,
+    existingContractInfo,
+    buildArtifacts,
+  );
   const uninitializedBaseContracts = [];
 
   return {
@@ -39,60 +47,95 @@ export function validate(contract: Contract, existingContractInfo: any = {}, bui
     hasDelegateCall: hasDelegateCall(contract),
     hasInitialValuesInDeclarations: hasInitialValuesInDeclarations(contract),
     uninitializedBaseContracts,
-    ... storageValidation
+    ...storageValidation,
   };
 }
 
-export function newValidationErrors(validations: any, existingValidations: any = {}): any {
+export function newValidationErrors(
+  validations: any,
+  existingValidations: any = {},
+): any {
   return {
-    hasConstructor: validations.hasConstructor && !existingValidations.hasConstructor,
-    hasSelfDestruct: validations.hasSelfDestruct && !existingValidations.hasSelfDestruct,
-    hasDelegateCall: validations.hasDelegateCall && !existingValidations.hasDelegateCall,
-    hasInitialValuesInDeclarations: validations.hasInitialValuesInDeclarations && !existingValidations.hasInitialValuesInDeclarations,
-    uninitializedBaseContracts: difference(validations.uninitializedBaseContracts, existingValidations.uninitializedBaseContracts),
-    storageUncheckedVars: difference(validations.storageUncheckedVars, existingValidations.storageUncheckedVars),
-    storageDiff: validations.storageDiff
+    hasConstructor:
+      validations.hasConstructor && !existingValidations.hasConstructor,
+    hasSelfDestruct:
+      validations.hasSelfDestruct && !existingValidations.hasSelfDestruct,
+    hasDelegateCall:
+      validations.hasDelegateCall && !existingValidations.hasDelegateCall,
+    hasInitialValuesInDeclarations:
+      validations.hasInitialValuesInDeclarations &&
+      !existingValidations.hasInitialValuesInDeclarations,
+    uninitializedBaseContracts: difference(
+      validations.uninitializedBaseContracts,
+      existingValidations.uninitializedBaseContracts,
+    ),
+    storageUncheckedVars: difference(
+      validations.storageUncheckedVars,
+      existingValidations.storageUncheckedVars,
+    ),
+    storageDiff: validations.storageDiff,
   };
 }
 
 export function validationPasses(validations: any): boolean {
-  return every(validations.storageDiff, (diff) => diff.action === 'append')
-    && !validations.hasConstructor
-    && !validations.hasSelfDestruct
-    && !validations.hasDelegateCall
-    && !validations.hasInitialValuesInDeclarations
-    && isEmpty(validations.uninitializedBaseContracts);
+  return (
+    every(validations.storageDiff, diff => diff.action === 'append') &&
+    !validations.hasConstructor &&
+    !validations.hasSelfDestruct &&
+    !validations.hasDelegateCall &&
+    !validations.hasInitialValuesInDeclarations &&
+    isEmpty(validations.uninitializedBaseContracts)
+  );
 }
 
-function validateStorage(contract: Contract, existingContractInfo: any = {}, buildArtifacts: any = null): { storageUncheckedVars?: StorageInfo[], storageDiff?: Operation[] } {
+function validateStorage(
+  contract: Contract,
+  existingContractInfo: any = {},
+  buildArtifacts: any = null,
+): { storageUncheckedVars?: StorageInfo[]; storageDiff?: Operation[] } {
   const originalStorageInfo = pick(existingContractInfo, 'storage', 'types');
   if (isEmpty(originalStorageInfo.storage)) return {};
 
   const updatedStorageInfo = getStorageLayout(contract, buildArtifacts);
   const storageUncheckedVars = getStructsOrEnums(updatedStorageInfo);
-  const storageDiff = compareStorageLayouts(originalStorageInfo, updatedStorageInfo);
+  const storageDiff = compareStorageLayouts(
+    originalStorageInfo,
+    updatedStorageInfo,
+  );
 
   return {
     storageUncheckedVars,
-    storageDiff
+    storageDiff,
   };
 }
 
 function tryGetUninitializedBaseContracts(contract: Contract): string[] {
   try {
     const pipeline = [
-      (contracts) => values(contracts),
-      (contracts) => flatten(contracts),
-      (contracts) => uniq(contracts),
+      contracts => values(contracts),
+      contracts => flatten(contracts),
+      contracts => uniq(contracts),
     ];
 
-    return pipeline.reduce((xs, f) => f(xs), getUninitializedBaseContracts(contract));
+    return pipeline.reduce(
+      (xs, f) => f(xs),
+      getUninitializedBaseContracts(contract),
+    );
   } catch (error) {
-    log.error(`- Skipping uninitialized base contracts validation due to error: ${error.message}`);
+    log.error(
+      `- Skipping uninitialized base contracts validation due to error: ${
+        error.message
+      }`,
+    );
     return [];
   }
 }
 
-function checkArtifactsForImportedSources(contract: Contract, buildArtifacts: any): void | never {
-  new ContractAST(contract, buildArtifacts, { nodesFilter: ['ContractDefinition'] }).getBaseContractsRecursively();
+function checkArtifactsForImportedSources(
+  contract: Contract,
+  buildArtifacts: any,
+): void | never {
+  new ContractAST(contract, buildArtifacts, {
+    nodesFilter: ['ContractDefinition'],
+  }).getBaseContractsRecursively();
 }

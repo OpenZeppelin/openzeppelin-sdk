@@ -1,12 +1,14 @@
 declare module 'solc' {
-
   const version: Compiler['version'];
   const loadRemoteVersion: Compiler['loadRemoteVersion'];
   const compile: Compiler['compile'];
 
   export interface Compiler {
     version(): string;
-    loadRemoteVersion(version: string, cb: (error: any, compiler: Compiler) => void);
+    loadRemoteVersion(
+      version: string,
+      cb: (error: any, compiler: Compiler) => void,
+    );
     compile(input: string, readCb: (dependency: any) => void);
   }
 
@@ -48,36 +50,36 @@ declare module 'solc' {
             bytecode: CompilerBytecodeOutput;
             deployedBytecode: CompilerBytecodeOutput;
           };
-          abi: Array<{
+          abi: {
             constant: boolean;
             inputs: any[];
             name: string;
             outputs: any[];
             payable: string;
-          }>;
-        }
-      }
+          }[];
+        };
+      };
     };
     sources: {
       [fileName: string]: {
         ast: any;
         legacyAST: any;
-      }
+      };
     };
     errors: any[];
   }
 
   export interface CompilerVersionsInfo {
-    builds: Array<{
+    builds: {
       path: string;
       version: string;
       build: string;
       longVersion: string;
       keccak256: string;
       urls: string[];
-    }>;
+    }[];
     releases: {
-      [version: string]: string
+      [version: string]: string;
     };
     latestRelease: string;
   }

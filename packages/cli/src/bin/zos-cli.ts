@@ -16,11 +16,13 @@ if (!IGNORED_COMMANDS_IN_ROOT_DIR.includes(command)) {
 }
 
 // Acquire file lock to ensure no other instance is running
-const LOCKFILE: string = '.zos.lock';
+const LOCKFILE = '.zos.lock';
 try {
   lockSync(LOCKFILE, { retries: 0 });
 } catch (e) {
-  console.error(`Cannot run more than one instance of 'zos' at the same time.\nIf you are sure that no other instances are actually running, manually remove the file ${LOCKFILE} and try again.`);
+  console.error(
+    `Cannot run more than one instance of 'zos' at the same time.\nIf you are sure that no other instances are actually running, manually remove the file ${LOCKFILE} and try again.`,
+  );
   process.exit(1);
 }
 

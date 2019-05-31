@@ -1,6 +1,6 @@
 'use strict';
 
-require('../setup')
+require('../setup');
 import utils from 'web3-utils';
 import ProxyAdmin from '../../src/proxy/ProxyAdmin';
 import Proxy from '../../src/proxy/Proxy';
@@ -12,7 +12,13 @@ const ImplV2 = Contracts.getFromLocal('DummyImplementationV2');
 const ProxyAdminContract = Contracts.getFromLocal('ProxyAdmin');
 
 contract('ProxyAdmin class', function(accounts) {
-  const [_, proxyAdminOwner, newAdmin, newAdminOwner, otherAccount] = accounts.map(utils.toChecksumAddress);
+  const [
+    _,
+    proxyAdminOwner,
+    newAdmin,
+    newAdminOwner,
+    otherAccount,
+  ] = accounts.map(utils.toChecksumAddress);
   const version = '0.0.1';
   const contentURI = '0x10';
 
@@ -25,13 +31,21 @@ contract('ProxyAdmin class', function(accounts) {
   beforeEach(async function() {
     this.proxyAdminContract = await ProxyAdminContract.new(this.txParams);
     this.proxyAdmin = new ProxyAdmin(this.proxyAdminContract, this.txParams);
-    this.proxy = await Proxy.deploy(this.implementationV1.address, this.proxyAdmin.address, null, this.txParams);
+    this.proxy = await Proxy.deploy(
+      this.implementationV1.address,
+      this.proxyAdmin.address,
+      null,
+      this.txParams,
+    );
   });
 
   describe('class methods', function() {
     describe('fetch', function() {
       it('sets ProxyAdmin instance', async function() {
-        const proxyAdmin = ProxyAdmin.fetch(this.proxyAdmin.address, this.txParams);
+        const proxyAdmin = ProxyAdmin.fetch(
+          this.proxyAdmin.address,
+          this.txParams,
+        );
 
         proxyAdmin.address.should.eq(this.proxyAdminContract.address);
         proxyAdmin.txParams.should.eq(this.txParams);
@@ -51,10 +65,12 @@ contract('ProxyAdmin class', function(accounts) {
   describe('instance methods', function() {
     describe('#getImplementation', function() {
       it('returns proxy implementation address', async function() {
-        const implementationAddress = await this.proxyAdmin.getProxyImplementation(this.proxy.address);
+        const implementationAddress = await this.proxyAdmin.getProxyImplementation(
+          this.proxy.address,
+        );
         implementationAddress.should.be.equal(this.implementationV1.address);
       });
-    })
+    });
 
     describe('#setAdmin', function() {
       it('changes proxy admin', async function() {
@@ -67,17 +83,31 @@ contract('ProxyAdmin class', function(accounts) {
     describe('#upradeProxy', function() {
       context('without init args', function() {
         it('upgrades proxy', async function() {
-          await this.proxyAdmin.upgradeProxy(this.proxy.address, this.implementationV2.address, ImplV2);
-          const implementationAddress = await this.proxyAdmin.getProxyImplementation(this.proxy.address);
-          implementationAddress.should.be.equal(this.implementationV2.address)
+          await this.proxyAdmin.upgradeProxy(
+            this.proxy.address,
+            this.implementationV2.address,
+            ImplV2,
+          );
+          const implementationAddress = await this.proxyAdmin.getProxyImplementation(
+            this.proxy.address,
+          );
+          implementationAddress.should.be.equal(this.implementationV2.address);
         });
       });
 
       context('with init args', function() {
         it('upgrades proxy', async function() {
-          await this.proxyAdmin.upgradeProxy(this.proxy.address, this.implementationV2.address, ImplV2, 'migrate', [1337]);
-          const implementationAddress = await this.proxyAdmin.getProxyImplementation(this.proxy.address);
-          implementationAddress.should.be.equal(this.implementationV2.address)
+          await this.proxyAdmin.upgradeProxy(
+            this.proxy.address,
+            this.implementationV2.address,
+            ImplV2,
+            'migrate',
+            [1337],
+          );
+          const implementationAddress = await this.proxyAdmin.getProxyImplementation(
+            this.proxy.address,
+          );
+          implementationAddress.should.be.equal(this.implementationV2.address);
         });
       });
     });

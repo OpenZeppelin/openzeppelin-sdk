@@ -1,6 +1,9 @@
 'use strict';
 
-import { checkVersion,  isMigratableZosversion } from '../../src/models/files/ZosVersion';
+import {
+  checkVersion,
+  isMigratableZosversion,
+} from '../../src/models/files/ZosVersion';
 
 contract('ZosVersion', function() {
   describe('functions', function() {
@@ -13,26 +16,39 @@ contract('ZosVersion', function() {
 
       context('when version is undefined', function() {
         it('throws error', function() {
-          (() => checkVersion(undefined, 'zos.json')).should.throw(/zos version identifier not found in/);
+          (() => checkVersion(undefined, 'zos.json')).should.throw(
+            /zos version identifier not found in/,
+          );
         });
       });
 
       context('when version does not exact major and minor', function() {
         it('throws error on different major', function() {
-          (() => checkVersion('3.2', 'zos.json')).should.throw(/Unrecognized zos version identifier/);
+          (() => checkVersion('3.2', 'zos.json')).should.throw(
+            /Unrecognized zos version identifier/,
+          );
         });
 
         it('throws error on different minor', function() {
-          (() => checkVersion('2.3', 'zos.json')).should.throw(/Unrecognized zos version identifier/);
+          (() => checkVersion('2.3', 'zos.json')).should.throw(
+            /Unrecognized zos version identifier/,
+          );
         });
       });
 
-      context('when version is not the latest one, but a valid one', function() {
-        it('does not fail nor returns true', function() {
-          (() => checkVersion('2', 'zos.json')).should.not.throw(/Unrecognized zos version identifier/);
-          (() => checkVersion('2', 'zos.json')).should.not.throw(/zos version identifier not found in/);
-        });
-      });
+      context(
+        'when version is not the latest one, but a valid one',
+        function() {
+          it('does not fail nor returns true', function() {
+            (() => checkVersion('2', 'zos.json')).should.not.throw(
+              /Unrecognized zos version identifier/,
+            );
+            (() => checkVersion('2', 'zos.json')).should.not.throw(
+              /zos version identifier not found in/,
+            );
+          });
+        },
+      );
     });
 
     describe('isMigratableZosversion', function() {

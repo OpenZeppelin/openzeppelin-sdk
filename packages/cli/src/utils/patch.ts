@@ -3,7 +3,8 @@
 
 export const cache: object = {};
 
-export default function(lib: string) {
+export default function(lib: string): any {
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
   const module = require(lib);
   if (!cache.hasOwnProperty(lib)) cache[lib] = module;
   return (...args: any[]) => cache[lib].apply(this, args);

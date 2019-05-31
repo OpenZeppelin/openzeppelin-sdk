@@ -10,8 +10,13 @@ const nameToRepo = {
 
 // https://github.com/zeppelinos/zepkit.git
 
-export default async function unpack({ repoOrName }: UnpackParams): Promise<void | never> {
-  if (!repoOrName) throw Error('A kit name or GitHub repo must be provided to unpack to the current directory.');
+export default async function unpack({
+  repoOrName,
+}: UnpackParams): Promise<void | never> {
+  if (!repoOrName)
+    throw Error(
+      'A kit name or GitHub repo must be provided to unpack to the current directory.',
+    );
   repoOrName = repoOrName.toLowerCase();
   if (!repoOrName.includes('/')) {
     // predefined name has been passed

@@ -12,8 +12,7 @@
     "test": "./scripts/test.sh",
     "gen-docs": "./scripts/gen-docs.sh",
     "watch": "tsc -w",
-    "lint": "tslint --project tsconfig.json --config ../../tslint.json",
-    "lintfix": "tslint --project tsconfig.json --config ../../tslint.json --fix"
+    "lint": "tsc --noEmit && eslint '*/**/*.{js,ts}' --quiet --fix"
   },
   "bin": {
     "zos": "./lib/bin/zos-cli.js"
@@ -92,10 +91,15 @@
     "@types/node": "^10.12.12",
     "@types/react": "^16.8.2",
     "@types/react-dom": "^16.8.0",
+    "@typescript-eslint/eslint-plugin": "^1.9.0",
+    "@typescript-eslint/parser": "^1.9.0",
     "chai": "^4.1.2",
     "chai-as-promised": "^7.1.1",
     "chai-bignumber": "^2.0.2",
     "chai-string": "^1.5.0",
+    "eslint": "^5.16.0",
+    "eslint-config-prettier": "^4.3.0",
+    "eslint-plugin-prettier": "^3.1.0",
     "ganache-cli": "^6.3.0",
     "lodash.mapkeys": "^4.6.0",
     "lodash.random": "^3.2.0",
@@ -106,6 +110,7 @@
     "mock-stdlib-undeployed-2": "file:./test/mocks/mock-stdlib-undeployed-2",
     "mock-stdlib-unpublished": "file:./test/mocks/mock-stdlib-unpublished",
     "mock-stdlib-unsupported": "file:./test/mocks/mock-stdlib-unsupported",
+    "prettier": "^1.17.1",
     "react": "^16.3.2",
     "react-dom": "^16.3.2",
     "sinon": "^6.1.4",

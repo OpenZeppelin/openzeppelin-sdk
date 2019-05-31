@@ -4,24 +4,38 @@ import { promptIfNeeded, InquirerQuestions } from '../prompts/prompt';
 import { FileSystem } from 'zos-lib';
 import ZosPackageFile from '../models/files/ZosPackageFile';
 
-const name: string = 'init';
-const signature: string = `${name} [project-name] [version]`;
-const description: string = `initialize your ZeppelinOS project. Provide a <project-name> and optionally an initial [version] name`;
+const name = 'init';
+const signature = `${name} [project-name] [version]`;
+const description = `initialize your ZeppelinOS project. Provide a <project-name> and optionally an initial [version] name`;
 
-const register: (program: any) => any = (program) => program
-  .command(signature, undefined, { noHelp: true })
-  .usage('<project-name> [version]')
-  .description(description)
-  .option('--publish', 'automatically publishes your project upon pushing it to a network')
-  .option('--force', 'overwrite existing project if there is one')
-  .option('--link <dependency>', 'link to a dependency')
-  .option('--no-install', 'skip installing packages dependencies locally')
-  .withPushOptions()
-  .withNonInteractiveOption()
-  .action(action);
+const register: (program: any) => any = program =>
+  program
+    .command(signature, undefined, { noHelp: true })
+    .usage('<project-name> [version]')
+    .description(description)
+    .option(
+      '--publish',
+      'automatically publishes your project upon pushing it to a network',
+    )
+    .option('--force', 'overwrite existing project if there is one')
+    .option('--link <dependency>', 'link to a dependency')
+    .option('--no-install', 'skip installing packages dependencies locally')
+    .withPushOptions()
+    .withNonInteractiveOption()
+    .action(action);
 
-async function action(projectName: string, version: string, options: any): Promise<void> {
-  const { publish, force, link, install: installDependencies, interactive } = options;
+async function action(
+  projectName: string,
+  version: string,
+  options: any,
+): Promise<void> {
+  const {
+    publish,
+    force,
+    link,
+    install: installDependencies,
+    interactive,
+  } = options;
 
   const args = { name: projectName, version };
   const props = getCommandProps();
@@ -48,13 +62,20 @@ function getCommandProps(): InquirerQuestions {
   return {
     name: {
       message: 'Welcome to ZeppelinOS! Choose a name for your project:',
-      type: 'input'
+      type: 'input',
     },
     version: {
       message: 'Choose a version:',
       type: 'input',
-    }
+    },
   };
 }
 
-export default { name, signature, description, register, action, runActionIfNeeded };
+export default {
+  name,
+  signature,
+  description,
+  register,
+  action,
+  runActionIfNeeded,
+};

@@ -8,7 +8,10 @@ import { ProxyAdminProject, AppProject, TxParams } from 'zos-lib';
  * @param txParams optional txParams (from, gas, gasPrice) to use on every transaction
  * @param networkFile optional `ZosNetworkFile` object to use, instead of zos.test.json
  */
-export default async function(txParams: TxParams = {}, networkFile?: ZosNetworkFile): Promise<ProxyAdminProject | AppProject> {
+export default async function(
+  txParams: TxParams = {},
+  networkFile?: ZosNetworkFile,
+): Promise<ProxyAdminProject | AppProject> {
   const controller = new NetworkController('test', txParams, networkFile);
   await controller.deployDependencies();
   await controller.push(false, true);

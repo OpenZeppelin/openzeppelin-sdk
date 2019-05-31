@@ -12,8 +12,7 @@
     "compile-ts": "rm -rf lib && tsc",
     "prepare": "npm run compile-contracts && npm run compile-ts",
     "watch": "tsc -w",
-    "lint": "tslint --project tsconfig.json --config ../../tslint.json",
-    "lintfix": "tslint --project tsconfig.json --config ../../tslint.json --fix"
+    "lint": "tsc --noEmit && eslint '*/**/*.{js,ts}' --quiet --fix"
   },
   "files": [
     "lib",
@@ -74,11 +73,16 @@
   "devDependencies": {
     "@types/mocha": "^5.2.5",
     "@types/node": "^10.12.12",
+    "@typescript-eslint/eslint-plugin": "^1.9.0",
+    "@typescript-eslint/parser": "^1.9.0",
     "chai": "^4.1.2",
     "chai-as-promised": "^7.1.1",
     "chai-bignumber": "^2.0.2",
     "chai-string": "^1.5.0",
     "coveralls": "^3.0.0",
+    "eslint": "^5.16.0",
+    "eslint-config-prettier": "^4.3.0",
+    "eslint-plugin-prettier": "^3.1.0",
     "ganache-cli": "^6.4.3",
     "ganache-core": "^2.5.1",
     "lodash.foreach": "^4.5.0",
@@ -86,6 +90,7 @@
     "lodash.times": "^4.3.2",
     "lodash.zipwith": "^4.2.0",
     "mock-dependency": "file:test/mocks/mock-dependency",
+    "prettier": "^1.17.1",
     "sinon": "^6.1.4",
     "tmp": "^0.0.33",
     "truffle": "^5.0.5",

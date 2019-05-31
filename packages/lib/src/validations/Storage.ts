@@ -11,12 +11,14 @@ import {
   NodeMapping,
   TypeInfo,
   TypeInfoMapping,
-  StorageInfo
+  StorageInfo,
 } from '../utils/ContractAST';
 
 // TS-TODO: define return type after typing class members below.
-export function getStorageLayout(contract: Contract, artifacts: BuildArtifacts): StorageLayoutInfo {
-
+export function getStorageLayout(
+  contract: Contract,
+  artifacts: BuildArtifacts,
+): StorageLayoutInfo {
   if (!artifacts) artifacts = getBuildArtifacts();
 
   const layout = new StorageLayout(contract, artifacts);
@@ -29,7 +31,9 @@ export function getStorageLayout(contract: Contract, artifacts: BuildArtifacts):
 // TS-TODO: define return type after typing class members below.
 
 export function getStructsOrEnums(info: StorageLayoutInfo): StorageInfo[] {
-  return info.storage.filter((variable: any) => containsStructOrEnum(variable.type, info.types));
+  return info.storage.filter((variable: any) =>
+    containsStructOrEnum(variable.type, info.types),
+  );
 }
 
 // TS-TODO: Define parameter types type after typing class members below.
@@ -43,13 +47,13 @@ function containsStructOrEnum(typeName: string, types): boolean {
 const CONTRACT_TYPE_INFO: TypeInfo = {
   id: 't_address',
   kind: 'elementary',
-  label: 'address'
+  label: 'address',
 };
 
 const FUNCTION_TYPE_INFO: TypeInfo = {
   id: 't_function',
   kind: 'elementary',
-  label: 'function'
+  label: 'function',
 };
 
 export interface StorageLayoutInfo {
@@ -58,7 +62,6 @@ export interface StorageLayoutInfo {
 }
 
 class StorageLayout {
-
   private artifacts: BuildArtifacts;
   private contract: Contract;
   private imports: Set<any>;
@@ -69,8 +72,7 @@ class StorageLayout {
   public types: TypeInfoMapping;
   public storage: StorageInfo[];
 
-  constructor(contract: Contract, artifacts: BuildArtifacts) {
-
+  public constructor(contract: Contract, artifacts: BuildArtifacts) {
     this.artifacts = artifacts;
     this.contract = contract;
 
@@ -86,11 +88,9 @@ class StorageLayout {
 
     // Storage layout for the current contract.
     this.storage = [];
-
   }
 
   public run(): StorageLayout {
-
     this.collectImports(this.contract.schema.ast);
     this.collectNodes(this.contract.schema.ast);
 
@@ -105,22 +105,23 @@ class StorageLayout {
   // TS-TODO: could type ast from artifacts/web3.
   private collectImports(ast: any): void {
     ast.nodes
-      .filter((node) => node.nodeType === 'ImportDirective')
-      .map((node) => node.absolutePath)
-      .forEach((importPath) => {
+      .filter(node => node.nodeType === 'ImportDirective')
+      .map(node => node.absolutePath)
+      .forEach(importPath => {
         if (this.imports.has(importPath)) return;
         this.imports.add(importPath);
-        this.artifacts.getArtifactsFromSourcePath(importPath).forEach((importedArtifact) => {
-          this.collectNodes(importedArtifact.ast);
-          this.collectImports(importedArtifact.ast);
-        });
+        this.artifacts
+          .getArtifactsFromSourcePath(importPath)
+          .forEach(importedArtifact => {
+            this.collectNodes(importedArtifact.ast);
+            this.collectImports(importedArtifact.ast);
+          });
       });
   }
 
   private collectNodes(node: Node): void {
-
     // Return if we have already seen this node.
-    if (some(this.nodes[node.id] || [], (n) => isEqual(n, node))) return;
+    if (some(this.nodes[node.id] || [], n => isEqual(n, node))) return;
 
     // Add node to collection with this id otherwise.
     if (!this.nodes[node.id]) this.nodes[node.id] = [];
@@ -131,20 +132,21 @@ class StorageLayout {
   }
 
   private visitVariables(contractNode: Node): void {
-
     const sourcePath = path.relative(
       process.cwd(),
-      this.getNode(contractNode.scope, 'SourceUnit'
-    ).absolutePath);
+      this.getNode(contractNode.scope, 'SourceUnit').absolutePath,
+    );
 
-    const varNodes = contractNode.nodes.filter((node: Node) => node.stateVariable && !node.constant);
-    varNodes.forEach((node) => {
+    const varNodes = contractNode.nodes.filter(
+      (node: Node) => node.stateVariable && !node.constant,
+    );
+    varNodes.forEach(node => {
       const typeInfo = this.getAndRegisterTypeInfo(node.typeName);
       this.registerType(typeInfo);
       const storageInfo = {
         contract: contractNode.name,
         path: sourcePath,
-        ... this.getStorageInfo(node, typeInfo)
+        ...this.getStorageInfo(node, typeInfo),
       };
       this.storage.push(storageInfo);
     });
@@ -155,28 +157,43 @@ class StorageLayout {
   }
 
   private getNode(id: number, nodeType: string): Node | never {
-
     if (!this.nodes[id]) throw Error(`No AST nodes with id ${id} found`);
 
-    const candidates = this.nodes[id].filter((node) => node.nodeType === nodeType);
+    const candidates = this.nodes[id].filter(
+      node => node.nodeType === nodeType,
+    );
     switch (candidates.length) {
       case 0:
-        throw Error(`No AST nodes of type ${nodeType} with id ${id} found (got ${this.nodes[id].map((node: any) => node.nodeType).join(', ')})`);
+        throw Error(
+          `No AST nodes of type ${nodeType} with id ${id} found (got ${this.nodes[
+            id
+          ]
+            .map((node: any) => node.nodeType)
+            .join(', ')})`,
+        );
       case 1:
         return candidates[0];
       default:
-        throw Error(`Found more than one node of type ${nodeType} with the same id ${id}. Please try clearing your build artifacts and recompiling your contracts.`);
+        throw Error(
+          `Found more than one node of type ${nodeType} with the same id ${id}. Please try clearing your build artifacts and recompiling your contracts.`,
+        );
     }
   }
 
   private getContractNode(): Node {
-    return this.contract.schema.ast.nodes.find((node) =>
-      node.nodeType === 'ContractDefinition' && node.name === this.contract.schema.contractName
+    return this.contract.schema.ast.nodes.find(
+      node =>
+        node.nodeType === 'ContractDefinition' &&
+        node.name === this.contract.schema.contractName,
     );
   }
 
   private getLinearizedBaseContracts(): number[] {
-    return reverse(this.getContractNode().linearizedBaseContracts.map((id: number) => this.getNode(id, 'ContractDefinition')));
+    return reverse(
+      this.getContractNode().linearizedBaseContracts.map((id: number) =>
+        this.getNode(id, 'ContractDefinition'),
+      ),
+    );
   }
 
   private getStorageInfo(varNode, typeInfo): StorageInfo {
@@ -184,7 +201,7 @@ class StorageLayout {
       label: varNode.name,
       astId: varNode.id,
       type: typeInfo.id,
-      src: varNode.src
+      src: varNode.src,
     };
   }
 
@@ -207,7 +224,9 @@ class StorageLayout {
       case 'FunctionTypeName':
         return this.getFunctionTypeInfo();
       default:
-        throw Error(`Cannot get type info for unknown node type ${node.nodeType}`);
+        throw Error(
+          `Cannot get type info for unknown node type ${node.nodeType}`,
+        );
     }
   }
 
@@ -221,7 +240,11 @@ class StorageLayout {
       case 't_enum':
         return this.getEnumTypeInfo(referencedDeclaration);
       default:
-        throw Error(`Unknown type identifier ${typeIdentifier} for ${typeDescriptions.typeString}`);
+        throw Error(
+          `Unknown type identifier ${typeIdentifier} for ${
+            typeDescriptions.typeString
+          }`,
+        );
     }
   }
 
@@ -230,19 +253,23 @@ class StorageLayout {
   }
 
   private getElementaryTypeInfo({ typeDescriptions }): TypeInfo {
-
-    const identifier = typeDescriptions.typeIdentifier
-      .replace(/_storage(_ptr)?$/, '');
+    const identifier = typeDescriptions.typeIdentifier.replace(
+      /_storage(_ptr)?$/,
+      '',
+    );
 
     return {
       id: identifier,
       kind: 'elementary',
-      label: typeDescriptions.typeString
+      label: typeDescriptions.typeString,
     };
   }
 
-  private getArrayTypeInfo({ baseType, length, }): TypeInfo {
-    const { id: baseTypeId, label: baseTypeLabel } = this.getAndRegisterTypeInfo(baseType);
+  private getArrayTypeInfo({ baseType, length }): TypeInfo {
+    const {
+      id: baseTypeId,
+      label: baseTypeLabel,
+    } = this.getAndRegisterTypeInfo(baseType);
     const lengthDescriptor = length ? length.value : 'dyn';
     const lengthLabel = length ? length.value : '';
     return {
@@ -250,46 +277,55 @@ class StorageLayout {
       valueType: baseTypeId,
       length: lengthDescriptor,
       kind: 'array',
-      label: `${baseTypeLabel}[${lengthLabel}]`
+      label: `${baseTypeLabel}[${lengthLabel}]`,
     };
   }
 
   private getMappingTypeInfo({ valueType }): TypeInfo {
     // We ignore the keyTypeId, since it's always hashed and takes up the same amount of space; we only care about the last value type
-    const { id: valueTypeId, label: valueTypeLabel } = this.getValueTypeInfo(valueType);
+    const { id: valueTypeId, label: valueTypeLabel } = this.getValueTypeInfo(
+      valueType,
+    );
     return {
       id: `t_mapping<${valueTypeId}>`,
       valueType: valueTypeId,
       label: `mapping(key => ${valueTypeLabel})`,
-      kind: 'mapping'
+      kind: 'mapping',
     };
   }
 
   private getContractTypeInfo(): TypeInfo {
     // Process a reference to a contract as an address, since we only care about storage size
-    return { ... CONTRACT_TYPE_INFO };
+    return { ...CONTRACT_TYPE_INFO };
   }
 
   private getFunctionTypeInfo(): TypeInfo {
     // Process a reference to a function disregarding types, since we only care how much space it takes
-    return { ... FUNCTION_TYPE_INFO };
+    return { ...FUNCTION_TYPE_INFO };
   }
 
   private getStructTypeInfo(referencedDeclaration): TypeInfo {
-
     // Identify structs by contract and name
-    const referencedNode = this.getNode(referencedDeclaration, 'StructDefinition');
+    const referencedNode = this.getNode(
+      referencedDeclaration,
+      'StructDefinition',
+    );
     const id = `t_struct<${referencedNode.canonicalName}>`;
     if (this.types[id]) return this.types[id];
 
     // We shortcircuit type registration in this scenario to handle recursive structs
-    const typeInfo = { id, kind: 'struct', label: referencedNode.canonicalName, members: [] };
+    const typeInfo = {
+      id,
+      kind: 'struct',
+      label: referencedNode.canonicalName,
+      members: [],
+    };
     this.registerType(typeInfo);
 
     // Store members info in type info
     const members = referencedNode.members
-      .filter((member) => member.nodeType === 'VariableDeclaration')
-      .map((member) => {
+      .filter(member => member.nodeType === 'VariableDeclaration')
+      .map(member => {
         const memberTypeInfo = this.getAndRegisterTypeInfo(member.typeName);
         return this.getStorageInfo(member, memberTypeInfo);
       });
@@ -301,17 +337,20 @@ class StorageLayout {
 
   private getEnumTypeInfo(referencedDeclaration): TypeInfo {
     // Store canonical name and members for an enum
-    const referencedNode = this.getNode(referencedDeclaration, 'EnumDefinition');
+    const referencedNode = this.getNode(
+      referencedDeclaration,
+      'EnumDefinition',
+    );
     return {
       id: `t_enum<${referencedNode.canonicalName}>`,
       kind: 'enum',
       label: referencedNode.canonicalName,
-      members: referencedNode.members.map((m) => m.name)
+      members: referencedNode.members.map(m => m.name),
     };
   }
 
   private getValueTypeInfo(node): TypeInfo {
-    return (node.nodeType === 'Mapping')
+    return node.nodeType === 'Mapping'
       ? this.getValueTypeInfo(node.valueType)
       : this.getAndRegisterTypeInfo(node);
   }

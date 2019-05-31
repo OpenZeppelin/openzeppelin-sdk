@@ -3,7 +3,6 @@ import Truffle from './Truffle';
 import { FileSystem as fs } from 'zos-lib';
 
 const TruffleProjectInitializer = {
-
   call(root: string = process.cwd()): void {
     this._initContractsDir(root);
     this._initMigrationsDir(root);

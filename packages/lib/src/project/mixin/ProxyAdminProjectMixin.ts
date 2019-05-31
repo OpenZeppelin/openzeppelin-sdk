@@ -12,7 +12,10 @@ function ProxyAdminProjectMixin<T extends Constructable>(Base: T) {
       await this.proxyAdmin.transferOwnership(newAdminOwner);
     }
 
-    public async changeProxyAdmin(proxyAddress: string, newAdmin: string): Promise<void> {
+    public async changeProxyAdmin(
+      proxyAddress: string,
+      newAdmin: string,
+    ): Promise<void> {
       return this.proxyAdmin.changeProxyAdmin(proxyAddress, newAdmin);
     }
   };
