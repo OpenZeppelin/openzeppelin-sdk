@@ -23,8 +23,17 @@ describe('ConfigManager', function() {
     after('restore config file', function() {
       FileSystem.copy(configFileBackup, configFile);
       FileSystem.remove(configFileBackup);
+    });
+
+    beforeEach(function() {
       // restore config after each test
+      this.originalConfig = ConfigManager.config;
       ConfigManager.config = null;
+    });
+
+    afterEach('restores sinon', function() {
+      ConfigManager.config = this.originalConfig;
+      sinon.restore();
     });
 
     describe('functions', function() {
@@ -36,12 +45,14 @@ describe('ConfigManager', function() {
 
           callArgs.should.have.lengthOf(1);
           callArgs[0].should.eq(`${process.cwd()}/build/contracts`);
-
-          sinon.restore();
         });
       });
 
       describe('#initNetworkConfiguration', function() {
+        beforeEach(function() {
+          this.initialize = sinon.stub(ZWeb3, 'initialize');
+        });
+
         context('when no network is specified', function() {
           it('throws', function() {
             ConfigManager.initNetworkConfiguration({}, true, configFileDir)
@@ -50,10 +61,6 @@ describe('ConfigManager', function() {
         });
 
         context('when a valid network is specified', function() {
-          afterEach('restores sinon', function() {
-            sinon.restore();
-          });
-
           it('sets local buildDir', function() {
             sinon.spy(Contracts, 'setLocalBuildDir');
             ConfigManager.initStaticConfiguration(configFileDir);
@@ -66,13 +73,11 @@ describe('ConfigManager', function() {
           it('calls the correct config loader', async function() {
             let zweb3Spy;
             if (configFileName === 'truffle.js') {
-              zweb3Spy = sinon.spy(ZWeb3, 'initialize');
               await ConfigManager.initNetworkConfiguration({ network: 'local' }, true, configFileDir);
-              zweb3Spy.args[0][0].should.eq('http://localhost:8545');
+              this.initialize.should.have.been.calledWith('http://localhost:8545');
             } else if (configFileName === 'networks.js') {
-              zweb3Spy = sinon.spy(ZWeb3, 'initialize');
               await ConfigManager.initNetworkConfiguration({ network: 'local' }, true, configFileDir);
-              zweb3Spy.args[0][0].constructor.name.should.eq('HttpProvider');
+              this.initialize.getCall(0).args[0].constructor.name.should.eq('HttpProvider');
             }
           });
         });
