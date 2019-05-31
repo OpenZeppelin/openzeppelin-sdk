@@ -1,5 +1,6 @@
-import Compiler from '../models/compiler/Compiler';
-import { CompilerOptions, DEFAULT_EVM_VERSION } from '../models/compiler/solidity/SolidityContractsCompiler';
+import { compile } from '../models/compiler/Compiler';
+import { DEFAULT_EVM_VERSION } from '../models/compiler/solidity/SolidityContractsCompiler';
+import { ProjectCompilerOptions } from '../models/compiler/solidity/SolidityProjectCompiler';
 
 const name: string = 'compile';
 const signature: string = `${name}`;
@@ -17,18 +18,21 @@ const register: (program: any) => any = (program) => program
 
 async function action(options: { evmVersion: string, using: string, solcVersion: string, optimizer: boolean, optimizerRuns: string}): Promise<void> {
   const { evmVersion, using: manager, solcVersion: version, optimizer, optimizerRuns } = options;
-  const compilerOptions: CompilerOptions = {
+  if (manager === 'truffle' && (evmVersion || version || optimizer || optimizerRuns)) {
+    throw new Error('Cannot set any compiler settings when compiling with truffle. Please modify your truffle-config file manually and run this command again.');
+  }
+
+  const compilerOptions: ProjectCompilerOptions = {
+    manager,
     evmVersion,
     version,
-    optimizer: { enabled: !!optimizer, runs: optimizerRuns },
+    optimizer: {
+      enabled: !!optimizer,
+      runs: optimizerRuns
+    },
   };
 
-  switch (manager) {
-    case 'truffle': return Compiler.compileWithTruffle();
-    case 'zos': return Compiler.compileWithSolc(compilerOptions);
-    case undefined: case null: return Compiler.call(false);
-    default: throw new Error(`Unknown compiler manager ${manager} (valid values are zos or truffle)`);
-  }
+  await compile(compilerOptions);
 }
 
 export default { name, signature, description, register, action };

@@ -4,7 +4,7 @@ import maxBy from 'lodash.maxby';
 import pick from 'lodash.pick';
 import { readJsonSync } from 'fs-extra';
 import { statSync } from 'fs';
-import { FileSystem as fs, Logger } from 'zos-lib';
+import { FileSystem as fs, Logger, Contracts } from 'zos-lib';
 import { RawContract, CompiledContract, CompilerOptions, resolveCompilerVersion, compileWith, DEFAULT_OPTIMIZER, DEFAULT_EVM_VERSION } from './SolidityContractsCompiler';
 import { ImportsFsEngine } from '@resolver-engine/imports-fs';
 import { gatherSources } from './ResolverEngineGatherer';
@@ -14,8 +14,16 @@ import { tryFunc } from '../../../utils/try';
 
 const log = new Logger('SolidityProjectCompiler');
 
-export async function compileProject(inputDir: string, outputDir: string, options: CompilerOptions = {}): Promise<void> {
+export async function compileProject(options: ProjectCompilerOptions = {}): Promise<void> {
+  const inputDir = options.inputDir || Contracts.getLocalContractsDir();
+  const outputDir = options.outputDir || Contracts.getLocalBuildDir();
   return new SolidityProjectCompiler(inputDir, outputDir, options).call();
+}
+
+export interface ProjectCompilerOptions extends CompilerOptions {
+  manager?: string;
+  inputDir?: string;
+  outputDir?: string;
 }
 
 class SolidityProjectCompiler {

@@ -10,11 +10,11 @@ describe('compile command', function() {
     compiler.should.have.been.calledOnce;
   })
 
-  itShouldParse('should call truffle compile', 'truffleCompiler', 'zos compile --using truffle', function(compiler) {
-    compiler.should.have.been.calledOnce;
+  itShouldParse('should call truffle compile', 'compiler', 'zos compile --using truffle', function(compiler) {
+    compiler.should.have.been.calledWithMatch({ manager: 'truffle' });
   })
 
-  itShouldParse('should call zos compile with options', 'solcCompiler', 'zos compile --using zos --solc-version 0.5.0 --optimizer --optimizer-runs 300 --evm-version petersburg', function(compiler) {
-    compiler.should.have.been.calledWithExactly({ version: '0.5.0', optimizer: { enabled: true, runs: "300" }, evmVersion: 'petersburg' });
+  itShouldParse('should call zos compile with options', 'compiler', 'zos compile --using zos --solc-version 0.5.0 --optimizer --optimizer-runs 300 --evm-version petersburg', function(compiler) {
+    compiler.should.have.been.calledWithMatch({ manager: 'zos', version: '0.5.0', optimizer: { enabled: true, runs: "300" }, evmVersion: 'petersburg' });
   })  
 })

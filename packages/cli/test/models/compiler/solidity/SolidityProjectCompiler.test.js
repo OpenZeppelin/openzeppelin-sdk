@@ -17,23 +17,23 @@ describe('SolidityProjectCompiler', function () {
     this.timeout(20000);
 
     const inputDir = `${rootDir}/test/mocks/mock-stdlib/contracts`;
-    const testBuildDir = `${baseTestBuildDir}/mock-stdlib`;
-    const greeterArtifactPath = `${testBuildDir}/GreeterImpl.json`;
+    const outputDir = `${baseTestBuildDir}/mock-stdlib`;
+    const greeterArtifactPath = `${outputDir}/GreeterImpl.json`;
     
     before('compiling', async function () {
-      await compileProject(inputDir, testBuildDir, { version: '0.5.9' });
+      await compileProject({ inputDir, outputDir, version: '0.5.9' });
     });
 
     it('compiles all contracts in the project', function () {
-      FileSystem.exists(testBuildDir).should.be.true;
-      FileSystem.readDir(testBuildDir).should.have.lengthOf(2);
+      FileSystem.exists(outputDir).should.be.true;
+      FileSystem.readDir(outputDir).should.have.lengthOf(2);
     });
 
     it('generates correct artifacts', function () {
-      FileSystem.readDir(testBuildDir).forEach(schemaFileName => {
+      FileSystem.readDir(outputDir).forEach(schemaFileName => {
         const contractName = schemaFileName.substring(0, schemaFileName.lastIndexOf('.'))
         const contractPath = `${inputDir}/${contractName}.sol`
-        const schemaPath = `${testBuildDir}/${schemaFileName}`
+        const schemaPath = `${outputDir}/${schemaFileName}`
         const schema = FileSystem.parseJson(schemaPath)
   
         schema.fileName.should.be.eq(`${contractName}.sol`)
@@ -60,20 +60,20 @@ describe('SolidityProjectCompiler', function () {
 
     it('does not recompile if there were no changes to sources', async function () {
       const origMtime = statSync(greeterArtifactPath).mtimeMs;
-      await compileProject(inputDir, testBuildDir, { version: '0.5.9' });
+      await compileProject({ inputDir, outputDir, version: '0.5.9' });
       statSync(greeterArtifactPath).mtimeMs.should.eq(origMtime);
     });
 
     it('recompiles if sources changed', async function () {
       const { mtimeMs: origMtime, atimeMs } = statSync(greeterArtifactPath);
       utimesSync(greeterArtifactPath, atimeMs, Date.now());
-      await compileProject(inputDir, testBuildDir, { version: '0.5.9' });
+      await compileProject({ inputDir, outputDir, version: '0.5.9' });
       statSync(greeterArtifactPath).mtimeMs.should.not.eq(origMtime);
     });
 
     it('recompiles if compiler version changed', async function () {
       const origMtime = statSync(greeterArtifactPath).mtimeMs;
-      await compileProject(inputDir, testBuildDir, { version: '0.5.0' });
+      await compileProject({ inputDir, outputDir, version: '0.5.0' });
       statSync(greeterArtifactPath).mtimeMs.should.not.eq(origMtime);
       const schema = FileSystem.parseJson(greeterArtifactPath);
       schema.compiler.version.should.eq('0.5.0+commit.1d4f565a.Emscripten.clang');
@@ -82,7 +82,7 @@ describe('SolidityProjectCompiler', function () {
     it('recompiles if compiler settings changed', async function () {
       const origMtime = statSync(greeterArtifactPath).mtimeMs;
       const optimizer = { enabled: true, runs: 300 };
-      await compileProject(inputDir, testBuildDir, { version: '0.5.9', optimizer });
+      await compileProject({ inputDir, outputDir, version: '0.5.9', optimizer });
       statSync(greeterArtifactPath).mtimeMs.should.not.eq(origMtime);
       const schema = FileSystem.parseJson(greeterArtifactPath);
       schema.compiler.optimizer.should.be.deep.equal(optimizer)
@@ -93,12 +93,12 @@ describe('SolidityProjectCompiler', function () {
     this.timeout(20000);
 
     const inputDir = `${rootDir}/mocks/mock-stdlib-with-deps/contracts`;
-    const testBuildDir = `${baseTestBuildDir}/mock-stdlib-with-deps`;
-    const greeterArtifactPath = `${testBuildDir}/GreeterImpl.json`;
-    const dependencyArtifactPath = `${testBuildDir}/GreeterImpl.json`;
+    const outputDir = `${baseTestBuildDir}/mock-stdlib-with-deps`;
+    const greeterArtifactPath = `${outputDir}/GreeterImpl.json`;
+    const dependencyArtifactPath = `${outputDir}/GreeterImpl.json`;
     
     before('compiling', async function () {
-      await compileProject(inputDir, testBuildDir, { version: '0.5.9' });
+      await compileProject({ inputDir, outputDir, version: '0.5.9' });
     });
 
     it('compiles project contracts', async function () {

@@ -31,7 +31,7 @@ import program from '../../src/bin/program';
 import Session from '../../src/models/network/Session';
 import ZosNetworkFile from '../../src/models/files/ZosNetworkFile';
 import ZosPackageFile from '../../src/models/files/ZosPackageFile';
-import Compiler from '../../src/models/compiler/Compiler';
+import * as Compiler from '../../src/models/compiler/Compiler';
 import Dependency from '../../src/models/dependency/Dependency';
 import ErrorHandler from '../../src/models/errors/ErrorHandler';
 import ConfigManager from '../../src/models/config/ConfigManager';
@@ -82,8 +82,6 @@ exports.stubCommands = function() {
     this.call = sinon.stub(call, 'default');
 
     this.compiler = sinon.stub(Compiler, 'call');
-    this.truffleCompiler = sinon.stub(Compiler, 'compileWithTruffle');
-    this.solcCompiler = sinon.stub(Compiler, 'compileWithSolc');
     this.errorHandler = sinon
       .stub(ErrorHandler.prototype, 'call')
       .callsFake(() => null);
