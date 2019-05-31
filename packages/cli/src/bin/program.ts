@@ -5,7 +5,10 @@ import program from 'commander';
 import { Logger } from 'zos-lib';
 import commands from '../commands';
 import registerErrorHandler from './errors';
-import { version } from '../../package.json';
+
+// Do not use import here or Typescript will create wrong build folder
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const { version } = require('../../package.json');
 
 require('./options');
 

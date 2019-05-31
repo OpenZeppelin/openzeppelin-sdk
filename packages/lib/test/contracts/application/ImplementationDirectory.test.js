@@ -19,8 +19,8 @@ contract('ImplementationDirectory', function(accounts) {
   const [_, owner, anotherAddress] = accounts;
 
   beforeEach(async function() {
-    this.implementation_v0 = (await DummyImplementation.new()).address;
-    this.implementation_v1 = (await DummyImplementation.new()).address;
+    this.implementationv0 = (await DummyImplementation.new()).address;
+    this.implementationv1 = (await DummyImplementation.new()).address;
     this.directory = await ImplementationDirectory.new({ from: owner });
   });
 

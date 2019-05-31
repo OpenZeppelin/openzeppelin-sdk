@@ -36,8 +36,8 @@ export default function shouldBehaveLikeAdminUpgradeabilityProxy(
   const [_, proxyAdminAddress, proxyAdminOwner, anotherAccount] = accounts;
 
   before(async function() {
-    this.implementation_v0 = (await DummyImplementation.new()).address;
-    this.implementation_v1 = (await DummyImplementation.new()).address;
+    this.implementationv0 = (await DummyImplementation.new()).address;
+    this.implementationv1 = (await DummyImplementation.new()).address;
   });
 
   beforeEach(async function() {
@@ -204,8 +204,8 @@ export default function shouldBehaveLikeAdminUpgradeabilityProxy(
           const v1MigrationData = encodeCall('initialize', ['uint256'], [42]);
 
           beforeEach(async function() {
-            this.behavior_v1 = await MigratableMockV1.new();
-            this.balancePrevious_v1 = new BN(
+            this.behaviorv1 = await MigratableMockV1.new();
+            this.balancePreviousv1 = new BN(
               await ZWeb3.getBalance(this.proxyAddress),
             );
             this.events = (await this.proxy.methods
@@ -241,8 +241,8 @@ export default function shouldBehaveLikeAdminUpgradeabilityProxy(
             );
 
             beforeEach(async function() {
-              this.behavior_v2 = await MigratableMockV2.new();
-              this.balancePrevious_v2 = new BN(
+              this.behaviorv2 = await MigratableMockV2.new();
+              this.balancePreviousv2 = new BN(
                 await ZWeb3.getBalance(this.proxyAddress),
               );
               this.events = (await this.proxy.methods
@@ -279,8 +279,8 @@ export default function shouldBehaveLikeAdminUpgradeabilityProxy(
               const v3MigrationData = encodeCall('migrate');
 
               beforeEach(async function() {
-                this.behavior_v3 = await MigratableMockV3.new();
-                this.balancePrevious_v3 = new BN(
+                this.behaviorv3 = await MigratableMockV3.new();
+                this.balancePreviousv3 = new BN(
                   await ZWeb3.getBalance(this.proxyAddress),
                 );
                 this.events = (await this.proxy.methods
@@ -323,11 +323,11 @@ export default function shouldBehaveLikeAdminUpgradeabilityProxy(
         const from = anotherAccount;
 
         it('reverts', async function() {
-          const behavior_v1 = await MigratableMockV1.new();
+          const behaviorv1 = await MigratableMockV1.new();
           const v1MigrationData = encodeCall('initialize', ['uint256'], [42]);
           await assertRevert(
             this.proxy.methods
-              .upgradeToAndCall(behavior_v1.address, v1MigrationData)
+              .upgradeToAndCall(behaviorv1.address, v1MigrationData)
               .send({ from }),
           );
         });

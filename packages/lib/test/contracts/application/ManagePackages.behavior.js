@@ -12,8 +12,8 @@ const ImplementationDirectory = Contracts.getFromLocal(
 export default function shouldManagePackages(accounts) {
   const [_, appOwner, packageOwner, directoryOwner, anotherAccount] = accounts;
 
-  const version_0 = toSemanticVersion('1.0.0');
-  const version_1 = toSemanticVersion('1.1.0');
+  const version0 = toSemanticVersion('1.0.0');
+  const version1 = toSemanticVersion('1.1.0');
   const contentURI = '0x10';
 
   const assertPackage = async function(
@@ -34,11 +34,11 @@ export default function shouldManagePackages(accounts) {
         from: directoryOwner,
       });
       await this.package.methods
-        .addVersion(version_1, this.directoryV1.address, contentURI)
+        .addVersion(version1, this.directoryV1.address, contentURI)
         .send({ from: packageOwner });
       this.anotherPackage = await Package.new({ from: packageOwner });
       await this.anotherPackage.methods
-        .addVersion(version_0, this.directory.address, contentURI)
+        .addVersion(version0, this.directory.address, contentURI)
         .send({ from: packageOwner });
       this.anotherPackageName = 'AnotherPackage';
 
@@ -50,40 +50,40 @@ export default function shouldManagePackages(accounts) {
         .setPackage(
           this.anotherPackageName,
           this.anotherPackage.address,
-          version_0,
+          version0,
         )
         .send({ from: appOwner });
       await this.assertPackage(
         this.anotherPackageName,
         this.anotherPackage.address,
-        version_0,
+        version0,
       );
       await this.assertPackage(
         this.packageName,
         this.package.address,
-        version_0,
+        version0,
       );
     });
 
     it('overwrites registered package with the same name', async function() {
       await this.app.methods
-        .setPackage(this.packageName, this.anotherPackage.address, version_0)
+        .setPackage(this.packageName, this.anotherPackage.address, version0)
         .send({ from: appOwner });
       await this.assertPackage(
         this.packageName,
         this.anotherPackage.address,
-        version_0,
+        version0,
       );
     });
 
     it('updates existing package version', async function() {
       await this.app.methods
-        .setPackage(this.packageName, this.package.address, version_1)
+        .setPackage(this.packageName, this.package.address, version1)
         .send({ from: appOwner });
       await this.assertPackage(
         this.packageName,
         this.package.address,
-        version_1,
+        version1,
       );
     });
 
@@ -105,7 +105,7 @@ export default function shouldManagePackages(accounts) {
           .setPackage(
             this.anotherPackageName,
             this.anotherPackage.address,
-            version_0,
+            version0,
           )
           .send({ from: anotherAccount }),
       );
@@ -151,14 +151,14 @@ export default function shouldManagePackages(accounts) {
       });
       this.anotherPackage = await Package.new({ from: packageOwner });
       await this.anotherPackage.methods
-        .addVersion(version_1, this.anotherDirectory.address, contentURI)
+        .addVersion(version1, this.anotherDirectory.address, contentURI)
         .send({ from: packageOwner });
       this.anotherPackageName = 'AnotherPackage';
       await this.app.methods
         .setPackage(
           this.anotherPackageName,
           this.anotherPackage.address,
-          version_1,
+          version1,
         )
         .send({ from: appOwner });
     });
@@ -179,7 +179,7 @@ export default function shouldManagePackages(accounts) {
 
     it('returns provider from updated package', async function() {
       await this.app.methods
-        .setPackage(this.packageName, this.anotherPackage.address, version_1)
+        .setPackage(this.packageName, this.anotherPackage.address, version1)
         .send({ from: appOwner });
       const provider = await this.app.methods
         .getProvider(this.packageName)
@@ -189,10 +189,10 @@ export default function shouldManagePackages(accounts) {
 
     it('returns provider from updated package version', async function() {
       await this.package.methods
-        .addVersion(version_1, this.anotherDirectory.address, contentURI)
+        .addVersion(version1, this.anotherDirectory.address, contentURI)
         .send({ from: packageOwner });
       await this.app.methods
-        .setPackage(this.packageName, this.package.address, version_1)
+        .setPackage(this.packageName, this.package.address, version1)
         .send({ from: appOwner });
       const provider = await this.app.methods
         .getProvider(this.packageName)
