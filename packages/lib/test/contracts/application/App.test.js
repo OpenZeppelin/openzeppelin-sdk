@@ -21,13 +21,17 @@ contract('App', accounts => {
 
   const [_, appOwner, packageOwner, directoryOwner, anotherAccount] = accounts;
 
-  const version0 = '1.0.0';
-  const version1 = '1.1.0';
+  // eslint-disable-next-line @typescript-eslint/camelcase
+  const version_0 = '1.0.0';
+  // eslint-disable-next-line @typescript-eslint/camelcase
+  const version_1 = '1.1.0';
   const contentURI = '0x10';
 
   before('initializing dummy implementations', async function() {
-    this.implementationv0 = (await DummyImplementation.new()).address;
-    this.implementationv1 = (await DummyImplementationV2.new()).address;
+    // eslint-disable-next-line @typescript-eslint/camelcase
+    this.implementation_v0 = (await DummyImplementation.new()).address;
+    // eslint-disable-next-line @typescript-eslint/camelcase
+    this.implementation_v1 = (await DummyImplementationV2.new()).address;
   });
 
   beforeEach('initializing app', async function() {
@@ -46,7 +50,7 @@ contract('App', accounts => {
     this.package = await Package.new({ from: packageOwner });
     await this.package.methods
       .addVersion(
-        toSemanticVersion(version0),
+        toSemanticVersion(version_0),
         this.directory.address,
         contentURI,
       )
@@ -56,7 +60,7 @@ contract('App', accounts => {
       .setPackage(
         this.packageName,
         this.package.address,
-        toSemanticVersion(version0),
+        toSemanticVersion(version_0),
       )
       .send({ from: appOwner });
   });

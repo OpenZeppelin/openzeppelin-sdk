@@ -4,9 +4,11 @@ import assertRevert from '../helpers/assertRevert';
 export default function shouldBehaveLikeOwnable(
   owner: string,
   anotherAccount: string,
-) {
-  describe('owner', function() {
-    it('sets the creator as the owner of the contract', async function() {
+): any {
+  describe('owner', function(): any {
+    it('sets the creator as the owner of the contract', async function(): Promise<
+      any
+    > {
       const contractOwner = await this.ownable.methods.owner().call();
       assert.equal(contractOwner, owner);
     });

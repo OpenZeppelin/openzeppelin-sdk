@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # This script simply renames a .js file to a .ts using git move, 
-# and then runs TSLint on the file. The idea is that the script
+# and then runs ESLint on the file. The idea is that the script
 # is used on one file at a time. 
 # It removes some of the more annoying, repetitive style related tasks when porting Javascript files to Typescript.
 

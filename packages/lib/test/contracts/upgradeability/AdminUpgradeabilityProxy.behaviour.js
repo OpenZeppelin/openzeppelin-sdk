@@ -36,8 +36,10 @@ export default function shouldBehaveLikeAdminUpgradeabilityProxy(
   const [_, proxyAdminAddress, proxyAdminOwner, anotherAccount] = accounts;
 
   before(async function() {
-    this.implementationv0 = (await DummyImplementation.new()).address;
-    this.implementationv1 = (await DummyImplementation.new()).address;
+    // eslint-disable-next-line @typescript-eslint/camelcase
+    this.implementation_v0 = (await DummyImplementation.new()).address;
+    // eslint-disable-next-line @typescript-eslint/camelcase
+    this.implementation_v1 = (await DummyImplementation.new()).address;
   });
 
   beforeEach(async function() {
@@ -204,8 +206,10 @@ export default function shouldBehaveLikeAdminUpgradeabilityProxy(
           const v1MigrationData = encodeCall('initialize', ['uint256'], [42]);
 
           beforeEach(async function() {
-            this.behaviorv1 = await MigratableMockV1.new();
-            this.balancePreviousv1 = new BN(
+            // eslint-disable-next-line @typescript-eslint/camelcase
+            this.behavior_v1 = await MigratableMockV1.new();
+            // eslint-disable-next-line @typescript-eslint/camelcase
+            this.balancePrevious_v1 = new BN(
               await ZWeb3.getBalance(this.proxyAddress),
             );
             this.events = (await this.proxy.methods
@@ -241,8 +245,10 @@ export default function shouldBehaveLikeAdminUpgradeabilityProxy(
             );
 
             beforeEach(async function() {
-              this.behaviorv2 = await MigratableMockV2.new();
-              this.balancePreviousv2 = new BN(
+              // eslint-disable-next-line @typescript-eslint/camelcase
+              this.behavior_v2 = await MigratableMockV2.new();
+              // eslint-disable-next-line @typescript-eslint/camelcase
+              this.balancePrevious_v2 = new BN(
                 await ZWeb3.getBalance(this.proxyAddress),
               );
               this.events = (await this.proxy.methods
@@ -279,8 +285,10 @@ export default function shouldBehaveLikeAdminUpgradeabilityProxy(
               const v3MigrationData = encodeCall('migrate');
 
               beforeEach(async function() {
-                this.behaviorv3 = await MigratableMockV3.new();
-                this.balancePreviousv3 = new BN(
+                // eslint-disable-next-line @typescript-eslint/camelcase
+                this.behavior_v3 = await MigratableMockV3.new();
+                // eslint-disable-next-line @typescript-eslint/camelcase
+                this.balancePrevious_v3 = new BN(
                   await ZWeb3.getBalance(this.proxyAddress),
                 );
                 this.events = (await this.proxy.methods
@@ -323,11 +331,13 @@ export default function shouldBehaveLikeAdminUpgradeabilityProxy(
         const from = anotherAccount;
 
         it('reverts', async function() {
-          const behaviorv1 = await MigratableMockV1.new();
+          // eslint-disable-next-line @typescript-eslint/camelcase
+          const behavior_v1 = await MigratableMockV1.new();
           const v1MigrationData = encodeCall('initialize', ['uint256'], [42]);
           await assertRevert(
             this.proxy.methods
-              .upgradeToAndCall(behaviorv1.address, v1MigrationData)
+              // eslint-disable-next-line @typescript-eslint/camelcase
+              .upgradeToAndCall(behavior_v1.address, v1MigrationData)
               .send({ from }),
           );
         });
