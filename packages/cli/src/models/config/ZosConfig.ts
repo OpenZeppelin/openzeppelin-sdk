@@ -5,8 +5,6 @@ import isUndefined from 'lodash.isundefined';
 import { FileSystem } from 'zos-lib';
 
 export default class ZosConfig {
-  private config: any;
-
   public initialize(root: string = process.cwd()) {
     this.createContractsDir(root);
     this.createZosConfigFile(root);
@@ -17,33 +15,26 @@ export default class ZosConfig {
   }
 
   public getConfig(root: string = process.cwd()) {
-    if (this.config) return this.config;
-
     const zosConfigFile = require(`${root}/networks.js`);
-    const compilers = zosConfigFile.compilers || this.setDefaultCompilersProperties();
+    const compilers = zosConfigFile.compilers || this.getDefaultCompilersProperties();
     const buildDir = `${root}/build/contracts`;
 
     return { ...zosConfigFile, compilers, buildDir };
   }
 
   public getBuildDir() {
-    return this.config ? this.config.buildDir : `${process.cwd()}/build/contracts`;
+    return `${process.cwd()}/build/contracts`;
   }
 
   // TODO: set types.
   public loadNetworkConfig(networkName: string, root: string = process.cwd()): any {
-    return this.buildNetworkConfig(networkName, root);
-  }
-
-  // TODO: set types.
-  private buildNetworkConfig(networkName: string, root: string = process.cwd()) {
     const config = this.getConfig(root);
     const { networks } = config;
     if (!networks[networkName]) throw Error(`Given network '${networkName}' is not defined in your networks.js file`);
 
     const network = networks[networkName];
-    const provider = this.setProvider(networks[networkName]);
-    const artifactDefaults = this.setArtifactDefaults(config, networks[networkName]);
+    const provider = this.getProvider(networks[networkName]);
+    const artifactDefaults = this.getArtifactDefaults(config, networks[networkName]);
 
     return {
       ...config,
@@ -54,7 +45,7 @@ export default class ZosConfig {
   }
 
   // TODO: set types
-  private setProvider(network: any): any {
+  private getProvider(network: any): any {
     let { provider } = network;
 
     if (!provider) {
@@ -69,7 +60,7 @@ export default class ZosConfig {
     return provider;
   }
 
-  private setArtifactDefaults(zosConfigFile: any, network: any) {
+  private getArtifactDefaults(zosConfigFile: any, network: any) {
     const defaults = ['gas', 'gasPrice', 'from'];
     const configDefaults = omit(pick(zosConfigFile, defaults), isUndefined);
     const networkDefaults = omit(pick(network, defaults), isUndefined);
@@ -77,7 +68,7 @@ export default class ZosConfig {
     return { ...configDefaults, ...networkDefaults };
   }
 
-  private setDefaultCompilersProperties() {
+  private getDefaultCompilersProperties() {
     return {
       vyper: {},
       solc: {

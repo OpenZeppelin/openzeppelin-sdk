@@ -87,7 +87,7 @@ contract('ZosConfig', function() {
         it('throws an error', function() {
           this.zosConfig.initialize(tmpDir);
           (() => this.zosConfig.loadNetworkConfig('non-existent', zosConfigDir))
-          .should.throw(/is not defined in your networks.js file/);
+            .should.throw(/is not defined in your networks.js file/);
         });
       });
 

@@ -1,46 +1,111 @@
 'use strict'
 require('../setup')
 
-import { FileSystem } from 'zos-lib'
-import ConfigManager from '../../src/models/config/ConfigManager'
+import sinon from 'sinon';
 
-// TODO: complete
-describe.skip('ConfigManager', function() {
-  const expectToBehaveLikeConfig = (configFile) => {
-    describe('getNetworkNamesFromConfig', function() {
-      const configFileBackup = `${configFile}.backup`;
-      before('backup config file', function() {
-        FileSystem.copy(configFile, configFileBackup);
-      })
+import { FileSystem, Contracts, ZWeb3 } from 'zos-lib';
+import ConfigManager from '../../src/models/config/ConfigManager';
+import ZosConfig from '../../src/models/config/ZosConfig';
+import Truffle from '../../src/models/config/Truffle';
 
-      after('restore config file', function() {
-        FileSystem.copy(configFileBackup, configFile);
-        FileSystem.remove(configFileBackup);
+describe('ConfigManager', function() {
+  // configFileName is the one to backup so it's not read.
+  const expectToBehaveLikeConfig = (configFileName) => {
+    const configFileDir = `${process.cwd()}/test/mocks/config-files`;
+    const configFile = `${configFileDir}/${configFileName}`;
+    const configFileBackup = `${configFile}.backup`;
+
+    before('backup config file', function() {
+      FileSystem.copy(configFile, configFileBackup);
+      FileSystem.remove(configFile);
+    })
+
+    after('restore config file', function() {
+      FileSystem.copy(configFileBackup, configFile);
+      FileSystem.remove(configFileBackup);
+      // restore config after each test
+      ConfigManager.config = null;
+    });
+
+    describe('functions', function() {
+      describe('#initStaticConfiguration', function() {
+        it('sets local buildDir', function() {
+          sinon.spy(Contracts, 'setLocalBuildDir');
+          ConfigManager.initStaticConfiguration(configFileDir);
+          const callArgs = Contracts.setLocalBuildDir.getCall(0).args;
+
+          callArgs.should.have.lengthOf(1);
+          callArgs[0].should.eq(`${process.cwd()}/build/contracts`);
+
+          sinon.restore();
+        });
       });
 
-      it('finds a network in truffle network list', function() {
-        FileSystem.write(configFile, 'module.exports = { networks: { test: { gas: 1, gasPrice: 2, from: \'0x0\' } } }');
-        const networkNames = this.truffleConfig.getNetworkNamesFromConfig();
-        networkNames.should.be.an('array');
-        networkNames[0].should.eq('test');
-        networkNames.should.have.lengthOf(1);
+      describe('#initNetworkConfiguration', function() {
+        context('when no network is specified', function() {
+          it('throws', function() {
+            ConfigManager.initNetworkConfiguration({}, true, configFileDir)
+              .should.be.rejectedWith(/network name must be provided/);
+          });
+        });
+
+        context('when a valid network is specified', function() {
+          afterEach('restores sinon', function() {
+            sinon.restore();
+          });
+
+          it('sets local buildDir', function() {
+            sinon.spy(Contracts, 'setLocalBuildDir');
+            ConfigManager.initStaticConfiguration(configFileDir);
+            const callArgs = Contracts.setLocalBuildDir.getCall(0).args;
+
+            callArgs.should.have.lengthOf(1);
+            callArgs[0].should.eq(`${process.cwd()}/build/contracts`);
+          });
+
+          it('calls the correct config loader', async function() {
+            let zweb3Spy;
+            if (configFileName === 'truffle.js') {
+              zweb3Spy = sinon.spy(ZWeb3, 'initialize');
+              await ConfigManager.initNetworkConfiguration({ network: 'local' }, true, configFileDir);
+              zweb3Spy.args[0][0].should.eq('http://localhost:8545');
+            } else if (configFileName === 'networks.js') {
+              zweb3Spy = sinon.spy(ZWeb3, 'initialize');
+              await ConfigManager.initNetworkConfiguration({ network: 'local' }, true, configFileDir);
+              zweb3Spy.args[0][0].constructor.name.should.eq('HttpProvider');
+            }
+          });
+        });
+      });
+
+      describe('#getBuildDir', function() {
+        it('returns the buildDir path', function() {
+          ConfigManager.getBuildDir(configFileDir).should.eq(`${process.cwd()}/build/contracts`);
+        });
+      });
+
+      describe('#setBaseConfig', function() {
+        it('sets the correct config', function() {
+          const configClassName = configFileName === 'truffle.js' ? 'ZosConfig' : 'Truffle';
+          ConfigManager.setBaseConfig(configFileDir);
+          ConfigManager.config.constructor.name.should.eq(configClassName);
+        })
       });
     });
   };
 
-  context.only('when networks.js present', function() {
-    const configFile = `${process.cwd()}/networks.js`;
-    beforeEach('set config file', function() {
-      configFileBackup = `${configFile}.backup`;
-    });
-
-    expectToBehaveLikeConfig();
+  context('when networks.js present', function() {
+    expectToBehaveLikeConfig('truffle.js');
   });
 
-  context.skip('when truffle.js file present', function() {
-    beforeEach('set config file', function() {
-      configFile = `${process.cwd()}/networks.js`;
-      configFileBackup = `${configFile}.backup`;
+  context('when truffle.js file present', function() {
+    expectToBehaveLikeConfig('networks.js');
+  });
+
+  context('when no config file present', function() {
+    it('throws an error', function() {
+      (() => ConfigManager.setBaseConfig('foo/bar/buz'))
+        .should.throw('Could not find networks.js file, please remember to initialize your project.');
     });
   });
 });
