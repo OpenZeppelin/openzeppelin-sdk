@@ -12,19 +12,43 @@ import Semver from './utils/Semver';
 import Logger from './utils/Logger';
 import FileSystem from './utils/FileSystem';
 import Contracts from './artifacts/Contracts';
-import Contract, { contractMethodsFromAst, contractMethodsFromAbi, ContractMethodMutability } from './artifacts/Contract';
+import Contract, {
+  contractMethodsFromAst,
+  contractMethodsFromAbi,
+  ContractMethodMutability,
+} from './artifacts/Contract';
 import ZWeb3, { TxParams } from './artifacts/ZWeb3';
-import { bodyCode, constructorCode, bytecodeDigest, replaceSolidityLibAddress, isSolidityLib, getSolidityLibNames } from './utils/Bytecode';
+import {
+  bodyCode,
+  constructorCode,
+  bytecodeDigest,
+  replaceSolidityLibAddress,
+  isSolidityLib,
+  getSolidityLibNames,
+} from './utils/Bytecode';
 import Transactions from './utils/Transactions';
 import { flattenSourceCode } from './utils/Solidity';
-import { semanticVersionEqual, toSemanticVersion, semanticVersionToString } from './utils/Semver';
+import {
+  semanticVersionEqual,
+  toSemanticVersion,
+  semanticVersionToString,
+} from './utils/Semver';
 import AppProxyMigrator from './utils/Migrator';
 
 // validations
-import { getStorageLayout, getStructsOrEnums, StorageLayoutInfo } from './validations/Storage';
+import {
+  getStorageLayout,
+  getStructsOrEnums,
+  StorageLayoutInfo,
+} from './validations/Storage';
 import { getBuildArtifacts, BuildArtifacts } from './artifacts/BuildArtifacts';
 import { compareStorageLayouts, Operation } from './validations/Layout';
-import { validate, newValidationErrors, validationPasses, ValidationInfo } from './validations';
+import {
+  validate,
+  newValidationErrors,
+  validationPasses,
+  ValidationInfo,
+} from './validations';
 
 // test behaviors
 import { behaviors, helpers } from './test';
@@ -101,5 +125,5 @@ export {
   ProxyAdminProject,
   ValidationInfo,
   AppProxyMigrator,
-  MinimalProxy
+  MinimalProxy,
 };

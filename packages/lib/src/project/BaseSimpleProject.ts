@@ -40,7 +40,11 @@ export default abstract class BaseSimpleProject {
   public name: string;
   public proxyFactory?: ProxyFactory;
 
-  constructor(name: string, proxyFactory?: ProxyFactory, txParams: TxParams = {}) {
+  public constructor(
+    name: string,
+    proxyFactory?: ProxyFactory,
+    txParams: TxParams = {},
+  ) {
     this.txParams = txParams;
     this.name = name;
     this.implementations = {};
@@ -50,13 +54,20 @@ export default abstract class BaseSimpleProject {
 
   public abstract async getAdminAddress(): Promise<string>;
 
-  public async setImplementation(contract: Contract, contractName?: string): Promise<any> {
+  public async setImplementation(
+    contract: Contract,
+    contractName?: string,
+  ): Promise<any> {
     log.info(`Deploying logic contract for ${contract.schema.contractName}`);
     if (!contractName) contractName = contract.schema.contractName;
-    const implementation: any = await Transactions.deployContract(contract, [], this.txParams);
+    const implementation: any = await Transactions.deployContract(
+      contract,
+      [],
+      this.txParams,
+    );
     await this.registerImplementation(contractName, {
       address: implementation.address,
-      bytecodeHash: bytecodeDigest(contract.schema.linkedDeployedBytecode)
+      bytecodeHash: bytecodeDigest(contract.schema.linkedDeployedBytecode),
     });
     return implementation;
   }
@@ -65,16 +76,28 @@ export default abstract class BaseSimpleProject {
     delete this.implementations[contractName];
   }
 
-  public async registerImplementation(contractName: string, { address, bytecodeHash }: Implementation): Promise<void> {
+  public async registerImplementation(
+    contractName: string,
+    { address, bytecodeHash }: Implementation,
+  ): Promise<void> {
     this.implementations[contractName] = { address, bytecodeHash };
   }
 
   // TS-TODO: review return type
   // TS-TODO: review parameter type (it's packageName?+(contractName|contract))
-  public async getImplementation({ packageName, contractName, contract }: { packageName?: string, contractName?: string, contract?: Contract }): Promise<string | undefined> {
+  public async getImplementation({
+    packageName,
+    contractName,
+    contract,
+  }: {
+    packageName?: string;
+    contractName?: string;
+    contract?: Contract;
+  }): Promise<string | undefined> {
     contractName = contractName || contract.schema.contractName;
     return !packageName || packageName === this.name
-      ? (this.implementations[contractName] && this.implementations[contractName].address)
+      ? this.implementations[contractName] &&
+          this.implementations[contractName].address
       : this._getDependencyImplementation(packageName, contractName);
   }
 
@@ -90,7 +113,11 @@ export default abstract class BaseSimpleProject {
     return !!this.dependencies[name];
   }
 
-  public setDependency(name: string, packageAddress: string, version: string): void {
+  public setDependency(
+    name: string,
+    packageAddress: string,
+    version: string,
+  ): void {
     // TODO: Validate that the package exists and has thatversion
     this.dependencies[name] = { package: packageAddress, version };
   }
@@ -99,55 +126,164 @@ export default abstract class BaseSimpleProject {
     delete this.dependencies[name];
   }
 
-  public async createProxy(contract, { packageName, contractName, initMethod, initArgs, redeployIfChanged, admin }: ContractInterface = {}): Promise<Contract> {
+  public async createProxy(
+    contract,
+    {
+      packageName,
+      contractName,
+      initMethod,
+      initArgs,
+      redeployIfChanged,
+      admin,
+    }: ContractInterface = {},
+  ): Promise<Contract> {
     if (!isEmpty(initArgs) && !initMethod) initMethod = 'initialize';
-    const implementationAddress = await this._getOrDeployImplementation(contract, packageName, contractName, redeployIfChanged);
-    const initCallData = this._getAndLogInitCallData(contract, initMethod, initArgs, implementationAddress, 'Creating');
+    const implementationAddress = await this._getOrDeployImplementation(
+      contract,
+      packageName,
+      contractName,
+      redeployIfChanged,
+    );
+    const initCallData = this._getAndLogInitCallData(
+      contract,
+      initMethod,
+      initArgs,
+      implementationAddress,
+      'Creating',
+    );
     const proxyAdmin = admin || (await this.getAdminAddress());
-    const proxy = await Proxy.deploy(implementationAddress, proxyAdmin, initCallData, this.txParams);
+    const proxy = await Proxy.deploy(
+      implementationAddress,
+      proxyAdmin,
+      initCallData,
+      this.txParams,
+    );
     log.info(`Instance created at ${proxy.address}`);
     return contract.at(proxy.address);
   }
 
-  public async createProxyWithSalt(contract, salt: string, signature?: string, { packageName, contractName, initMethod, initArgs, redeployIfChanged, admin }: ContractInterface = {}): Promise<Contract> {
+  public async createProxyWithSalt(
+    contract,
+    salt: string,
+    signature?: string,
+    {
+      packageName,
+      contractName,
+      initMethod,
+      initArgs,
+      redeployIfChanged,
+      admin,
+    }: ContractInterface = {},
+  ): Promise<Contract> {
     if (!isEmpty(initArgs) && !initMethod) initMethod = 'initialize';
-    const implementationAddress = await this._getOrDeployImplementation(contract, packageName, contractName, redeployIfChanged);
-    const initCallData = this._getAndLogInitCallData(contract, initMethod, initArgs, implementationAddress, 'Creating');
+    const implementationAddress = await this._getOrDeployImplementation(
+      contract,
+      packageName,
+      contractName,
+      redeployIfChanged,
+    );
+    const initCallData = this._getAndLogInitCallData(
+      contract,
+      initMethod,
+      initArgs,
+      implementationAddress,
+      'Creating',
+    );
 
     const proxyFactory = await this.ensureProxyFactory();
-    const adminAddress = admin || await this.getAdminAddress();
-    const proxy = await proxyFactory.createProxy(salt, implementationAddress, adminAddress, initCallData, signature);
+    const adminAddress = admin || (await this.getAdminAddress());
+    const proxy = await proxyFactory.createProxy(
+      salt,
+      implementationAddress,
+      adminAddress,
+      initCallData,
+      signature,
+    );
 
     log.info(`Instance created at ${proxy.address}`);
     return contract.at(proxy.address);
   }
 
-  public async createMinimalProxy(contract, { packageName, contractName, initMethod, initArgs, redeployIfChanged }: ContractInterface = {}): Promise<Contract> {
+  public async createMinimalProxy(
+    contract,
+    {
+      packageName,
+      contractName,
+      initMethod,
+      initArgs,
+      redeployIfChanged,
+    }: ContractInterface = {},
+  ): Promise<Contract> {
     if (!isEmpty(initArgs) && !initMethod) initMethod = 'initialize';
-    const implementationAddress = await this._getOrDeployImplementation(contract, packageName, contractName, redeployIfChanged);
-    const initCallData = this._getAndLogInitCallData(contract, initMethod, initArgs, implementationAddress, 'Creating');
+    const implementationAddress = await this._getOrDeployImplementation(
+      contract,
+      packageName,
+      contractName,
+      redeployIfChanged,
+    );
+    const initCallData = this._getAndLogInitCallData(
+      contract,
+      initMethod,
+      initArgs,
+      implementationAddress,
+      'Creating',
+    );
 
     const proxyFactory = await this.ensureProxyFactory();
-    const proxy = await proxyFactory.createMinimalProxy(implementationAddress, initCallData);
+    const proxy = await proxyFactory.createMinimalProxy(
+      implementationAddress,
+      initCallData,
+    );
 
     log.info(`Instance created at ${proxy.address}`);
     return contract.at(proxy.address);
   }
 
   // REFACTOR: De-duplicate from AppProject
-  public async getProxyDeploymentAddress(salt: string, sender?: string): Promise<string> {
+  public async getProxyDeploymentAddress(
+    salt: string,
+    sender?: string,
+  ): Promise<string> {
     const proxyFactory = await this.ensureProxyFactory();
     return proxyFactory.getDeploymentAddress(salt, sender);
   }
 
   // REFACTOR: De-duplicate from AppProject and test
-  public async getProxyDeploymentSigner(contract, salt: string, signature: string, { packageName, contractName, initMethod, initArgs, admin }: ContractInterface = {}): Promise<string> {
+  public async getProxyDeploymentSigner(
+    contract,
+    salt: string,
+    signature: string,
+    {
+      packageName,
+      contractName,
+      initMethod,
+      initArgs,
+      admin,
+    }: ContractInterface = {},
+  ): Promise<string> {
     const proxyFactory = await this.ensureProxyFactory();
-    const implementationAddress = await this.getImplementation({ packageName, contractName, contract });
-    if (!implementationAddress) throw new Error(`Contract ${contractName || contract.schema.contractName} was not found or is not deployed in the current network.`);
-    const adminAddress = admin || await this.getAdminAddress();
-    const initData = initMethod ? buildCallData(contract, initMethod, initArgs).callData : null;
-    return proxyFactory.getSigner(salt, implementationAddress, adminAddress, initData, signature);
+    const implementationAddress = await this.getImplementation({
+      packageName,
+      contractName,
+      contract,
+    });
+    if (!implementationAddress)
+      throw new Error(
+        `Contract ${contractName ||
+          contract.schema
+            .contractName} was not found or is not deployed in the current network.`,
+      );
+    const adminAddress = admin || (await this.getAdminAddress());
+    const initData = initMethod
+      ? buildCallData(contract, initMethod, initArgs).callData
+      : null;
+    return proxyFactory.getSigner(
+      salt,
+      implementationAddress,
+      adminAddress,
+      initData,
+      signature,
+    );
   }
 
   public async ensureProxyFactory(): Promise<ProxyFactory> {
@@ -157,46 +293,122 @@ export default abstract class BaseSimpleProject {
     return this.proxyFactory;
   }
 
-  private async _getOrDeployOwnImplementation(contract: Contract, contractName: string, redeployIfChanged?: boolean): Promise<string> {
+  private async _getOrDeployOwnImplementation(
+    contract: Contract,
+    contractName: string,
+    redeployIfChanged?: boolean,
+  ): Promise<string> {
     const existing: Implementation = this.implementations[contractName];
-    const contractChanged: boolean = existing && existing.bytecodeHash !== bytecodeDigest(contract.schema.linkedDeployedBytecode);
-    const shouldRedeploy: boolean = !existing || (redeployIfChanged && contractChanged);
+    const contractChanged: boolean =
+      existing &&
+      existing.bytecodeHash !==
+        bytecodeDigest(contract.schema.linkedDeployedBytecode);
+    const shouldRedeploy: boolean =
+      !existing || (redeployIfChanged && contractChanged);
     if (!shouldRedeploy) return existing.address;
-    const newInstance: any = await this.setImplementation(contract, contractName);
+    const newInstance: any = await this.setImplementation(
+      contract,
+      contractName,
+    );
     return newInstance.address;
   }
 
-  private async _getDependencyImplementation(packageName: string, contractName: string): Promise<string | null> {
+  private async _getDependencyImplementation(
+    packageName: string,
+    contractName: string,
+  ): Promise<string | null> {
     if (!this.hasDependency(packageName)) return null;
-    const { package: packageAddress, version }: Dependency = this.dependencies[packageName];
-    const thepackage: Package = await Package.fetch(packageAddress, this.txParams);
+    const { package: packageAddress, version }: Dependency = this.dependencies[
+      packageName
+    ];
+    const thepackage: Package = await Package.fetch(
+      packageAddress,
+      this.txParams,
+    );
     return thepackage.getImplementation(version, contractName);
   }
 
-  protected async _setUpgradeParams(proxyAddress: string, contract: Contract, { packageName, contractName, initMethod: initMethodName, initArgs, redeployIfChanged }: ContractInterface = {}): Promise<any> {
-    const implementationAddress = await this._getOrDeployImplementation(contract, packageName, contractName, redeployIfChanged);
-    const initCallData = this._getAndLogInitCallData(contract, initMethodName, initArgs, implementationAddress, 'Upgrading');
-    return { initCallData, implementationAddress, pAddress: toAddress(proxyAddress) };
+  protected async _setUpgradeParams(
+    proxyAddress: string,
+    contract: Contract,
+    {
+      packageName,
+      contractName,
+      initMethod: initMethodName,
+      initArgs,
+      redeployIfChanged,
+    }: ContractInterface = {},
+  ): Promise<any> {
+    const implementationAddress = await this._getOrDeployImplementation(
+      contract,
+      packageName,
+      contractName,
+      redeployIfChanged,
+    );
+    const initCallData = this._getAndLogInitCallData(
+      contract,
+      initMethodName,
+      initArgs,
+      implementationAddress,
+      'Upgrading',
+    );
+    return {
+      initCallData,
+      implementationAddress,
+      pAddress: toAddress(proxyAddress),
+    };
   }
 
-  protected async _getOrDeployImplementation(contract: Contract, packageName: string, contractName?: string, redeployIfChanged?: boolean): Promise<string | never> {
+  protected async _getOrDeployImplementation(
+    contract: Contract,
+    packageName: string,
+    contractName?: string,
+    redeployIfChanged?: boolean,
+  ): Promise<string | never> {
     if (!contractName) contractName = contract.schema.contractName;
 
-    const implementation = !packageName || packageName === this.name
-      ? await this._getOrDeployOwnImplementation(contract, contractName, redeployIfChanged)
-      : await this._getDependencyImplementation(packageName, contractName);
+    const implementation =
+      !packageName || packageName === this.name
+        ? await this._getOrDeployOwnImplementation(
+            contract,
+            contractName,
+            redeployIfChanged,
+          )
+        : await this._getDependencyImplementation(packageName, contractName);
 
-    if (!implementation) throw Error(`Could not retrieve or deploy contract ${packageName}/${contractName}`);
+    if (!implementation)
+      throw Error(
+        `Could not retrieve or deploy contract ${packageName}/${contractName}`,
+      );
     return implementation;
   }
 
-  protected _getAndLogInitCallData(contract: Contract, initMethodName?: string, initArgs?: string[], implementationAddress?: string, actionLabel?: string): string | null {
+  protected _getAndLogInitCallData(
+    contract: Contract,
+    initMethodName?: string,
+    initArgs?: string[],
+    implementationAddress?: string,
+    actionLabel?: string,
+  ): string | null {
     if (initMethodName) {
-      const { method: initMethod, callData }: CalldataInfo = buildCallData(contract, initMethodName, initArgs);
-      if (actionLabel) log.info(`${actionLabel} proxy to logic contract ${implementationAddress} and initializing by calling ${callDescription(initMethod, initArgs)}`);
+      const { method: initMethod, callData }: CalldataInfo = buildCallData(
+        contract,
+        initMethodName,
+        initArgs,
+      );
+      if (actionLabel)
+        log.info(
+          `${actionLabel} proxy to logic contract ${implementationAddress} and initializing by calling ${callDescription(
+            initMethod,
+            initArgs,
+          )}`,
+        );
       return callData;
     } else {
-      if (actionLabel) log.info(`${actionLabel} proxy to logic contract ${implementationAddress}`);
+      if (actionLabel)
+        log.info(
+          `${actionLabel} proxy to logic contract ${implementationAddress}`,
+        );
       return null;
     }
   }

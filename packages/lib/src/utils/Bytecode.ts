@@ -21,7 +21,9 @@ export function bytecodeDigest(rawBytecode: string): string {
 // the format: __LibName__(...)__ it will fail to get the library names.
 export function getSolidityLibNames(bytecode: string): string[] {
   const libs: string[] = bytecode.match(/__[A-Za-z0-9_]{36}__/g);
-  return libs ? libs.map((lib: string) => lib.replace(/^__/, '').replace(/_*$/, '')) : [];
+  return libs
+    ? libs.map((lib: string) => lib.replace(/^__/, '').replace(/_*$/, ''))
+    : [];
 }
 
 // Tells whether a bytecode has unlinked libraries or not
@@ -37,8 +39,14 @@ export function tryRemoveSwarmHash(bytecode: string): string {
 }
 
 // Replaces the solidity library address inside its bytecode with zeros
-export function replaceSolidityLibAddress(bytecode: string, address: string): string {
-  return bytecode.replace(address.replace(/^0x/, ''), ZERO_ADDRESS.replace(/^0x/, ''));
+export function replaceSolidityLibAddress(
+  bytecode: string,
+  address: string,
+): string {
+  return bytecode.replace(
+    address.replace(/^0x/, ''),
+    ZERO_ADDRESS.replace(/^0x/, ''),
+  );
 }
 
 // Verifies if a bytecode represents a solidity library.
@@ -47,7 +55,7 @@ export function isSolidityLib(bytecode: string): boolean {
   return matches == null ? false : matches.length > 0;
 }
 
-function splitCode(contract: Contract): {constructor: string, body: string} {
+function splitCode(contract: Contract): { constructor: string; body: string } {
   const binary = contract.schema.linkedBytecode.replace(/^0x/, '');
   const bytecode = contract.schema.bytecode.replace(/^0x/, '');
   const deployedBytecode = contract.schema.deployedBytecode.replace(/^0x/, '');

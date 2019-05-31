@@ -15,7 +15,7 @@ const NETWORKS = {
   3: 'ropsten',
   4: 'rinkeby',
   5: 'goerli',
-  42: 'kovan'
+  42: 'kovan',
 };
 
 export interface TxParams {
@@ -28,7 +28,6 @@ export interface TxParams {
 // TS-TODO: Type Web3.
 // TS-TODO: Review what could be private in this class.
 export default class ZWeb3 {
-
   public static provider;
 
   public static web3instance;
@@ -48,9 +47,10 @@ export default class ZWeb3 {
       return ZWeb3.web3instance;
     }
     // TODO: improve provider validation for HttpProvider scenarios
-    ZWeb3.web3instance = typeof ZWeb3.provider === 'string'
-      ? new Web3(new Web3.providers.HttpProvider(ZWeb3.provider))
-      : new Web3(ZWeb3.provider);
+    ZWeb3.web3instance =
+      typeof ZWeb3.provider === 'string'
+        ? new Web3(new Web3.providers.HttpProvider(ZWeb3.provider))
+        : new Web3(ZWeb3.provider);
 
     return ZWeb3.web3instance;
   }
@@ -71,8 +71,12 @@ export default class ZWeb3 {
     return ZWeb3.web3().version;
   }
 
-  public static contract(abi: any, atAddress?: string, options?: any): Contract {
-    return new (ZWeb3.eth().Contract)(abi, atAddress, options);
+  public static contract(
+    abi: any,
+    atAddress?: string,
+    options?: any,
+  ): Contract {
+    return new (ZWeb3.eth()).Contract(abi, atAddress, options);
   }
 
   public static async accounts(): Promise<string[]> {
@@ -88,10 +92,14 @@ export default class ZWeb3 {
 
     if (address.match(/[A-F]/)) {
       if (toChecksumAddress(address) !== address) {
-        throw Error(`Given address \"${address}\" is not a valid Ethereum address or it has not been checksummed correctly.`);
+        throw Error(
+          `Given address \"${address}\" is not a valid Ethereum address or it has not been checksummed correctly.`,
+        );
       } else return address;
     } else {
-      log.warn(`WARNING: Address ${address} is not checksummed. Consider checksumming it to avoid future warnings or errors.`);
+      log.warn(
+        `WARNING: Address ${address} is not checksummed. Consider checksumming it to avoid future warnings or errors.`,
+      );
       return toChecksumAddress(address);
     }
   }
@@ -113,7 +121,10 @@ export default class ZWeb3 {
     return bytecode.length > 2;
   }
 
-  public static async getStorageAt(address: string, position: string): Promise<string> {
+  public static async getStorageAt(
+    address: string,
+    position: string,
+  ): Promise<string> {
     return ZWeb3.eth().getStorageAt(address, position);
   }
 
@@ -151,11 +162,15 @@ export default class ZWeb3 {
     return NETWORKS[networkId] || `dev-${networkId}`;
   }
 
-  public static async sendTransaction(params: TxParams): Promise<TransactionReceipt> {
+  public static async sendTransaction(
+    params: TxParams,
+  ): Promise<TransactionReceipt> {
     return ZWeb3.eth().sendTransaction({ ...params });
   }
 
-  public static sendTransactionWithoutReceipt(params: TxParams): Promise<string> {
+  public static sendTransactionWithoutReceipt(
+    params: TxParams,
+  ): Promise<string> {
     return new Promise((resolve, reject) => {
       ZWeb3.eth().sendTransaction({ ...params }, (error, txHash) => {
         if (error) reject(error.message);
@@ -168,15 +183,28 @@ export default class ZWeb3 {
     return ZWeb3.eth().getTransaction(txHash);
   }
 
-  public static async getTransactionReceipt(txHash: string): Promise<TransactionReceipt> {
+  public static async getTransactionReceipt(
+    txHash: string,
+  ): Promise<TransactionReceipt> {
     return ZWeb3.eth().getTransactionReceipt(txHash);
   }
 
-  public static async getTransactionReceiptWithTimeout(tx: string, timeout: number): Promise<TransactionReceipt> {
-    return ZWeb3._getTransactionReceiptWithTimeout(tx, timeout, new Date().getTime());
+  public static async getTransactionReceiptWithTimeout(
+    tx: string,
+    timeout: number,
+  ): Promise<TransactionReceipt> {
+    return ZWeb3._getTransactionReceiptWithTimeout(
+      tx,
+      timeout,
+      new Date().getTime(),
+    );
   }
 
-  private static async _getTransactionReceiptWithTimeout(tx: string, timeout: number, startTime: number): Promise<TransactionReceipt | never> {
+  private static async _getTransactionReceiptWithTimeout(
+    tx: string,
+    timeout: number,
+    startTime: number,
+  ): Promise<TransactionReceipt | never> {
     const receipt: any = await ZWeb3._tryGettingTransactionReceipt(tx);
     if (receipt) {
       if (receipt.status) return receipt;
@@ -184,12 +212,22 @@ export default class ZWeb3 {
     }
 
     await sleep(1000);
-    const timeoutReached = timeout > 0 && new Date().getTime() - startTime > timeout;
-    if (!timeoutReached) return await ZWeb3._getTransactionReceiptWithTimeout(tx, timeout, startTime);
-    throw new Error(`Transaction ${tx} wasn't processed in ${timeout / 1000} seconds!`);
+    const timeoutReached =
+      timeout > 0 && new Date().getTime() - startTime > timeout;
+    if (!timeoutReached)
+      return await ZWeb3._getTransactionReceiptWithTimeout(
+        tx,
+        timeout,
+        startTime,
+      );
+    throw new Error(
+      `Transaction ${tx} wasn't processed in ${timeout / 1000} seconds!`,
+    );
   }
 
-  private static async _tryGettingTransactionReceipt(tx: string): Promise<TransactionReceipt | never> {
+  private static async _tryGettingTransactionReceipt(
+    tx: string,
+  ): Promise<TransactionReceipt | never> {
     try {
       return await ZWeb3.getTransactionReceipt(tx);
     } catch (error) {

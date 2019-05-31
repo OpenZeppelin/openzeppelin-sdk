@@ -11,14 +11,23 @@ import { ContractMethodMutability as Mutability } from 'zos-lib';
 import Truffle from '../../src/models/initializer/truffle/Truffle';
 import LocalController from '../../src/models/local/LocalController';
 import ZosPackageFile from '../../src/models/files/ZosPackageFile';
-import { promptIfNeeded, contractsList, networksList, methodsList, argsList } from '../../src/prompts/prompt';
+import {
+  promptIfNeeded,
+  contractsList,
+  networksList,
+  methodsList,
+  argsList,
+} from '../../src/prompts/prompt';
 
 describe('prompt', function() {
   describe('functions', function() {
     describe('#promptIfNeeded', function() {
       beforeEach('set stub and initialize', function() {
         this.stub = sinon.stub(inquirer, 'prompt').returns({});
-        this.props = { foo: { message: 'message1', type: 'input' }, bar: { message: 'message2', type: 'input' } };
+        this.props = {
+          foo: { message: 'message1', type: 'input' },
+          bar: { message: 'message2', type: 'input' },
+        };
         this.interactive = true;
         prompt.DISABLE_INTERACTIVITY = false;
       });
@@ -32,10 +41,13 @@ describe('prompt', function() {
           context('without defaults', function() {
             it('prompts for the missing argument', async function() {
               const args = { foo: 'jango', bar: undefined };
-              await promptIfNeeded({ args, props: this.props }, this.interactive);
-              const questions = this.stub.getCall(0).args[0]
+              await promptIfNeeded(
+                { args, props: this.props },
+                this.interactive,
+              );
+              const questions = this.stub.getCall(0).args[0];
 
-              questions.should.have.lengthOf(1)
+              questions.should.have.lengthOf(1);
               questions[0].message.should.eq('message2');
               expect(questions[0].default).to.be.undefined;
             });
@@ -45,10 +57,13 @@ describe('prompt', function() {
             it('prompts for the missing argument', async function() {
               const args = { foo: undefined, bar: undefined };
               const defaults = { foo: 'foo' };
-              await promptIfNeeded({ args, defaults, props: this.props }, this.interactive);
+              await promptIfNeeded(
+                { args, defaults, props: this.props },
+                this.interactive,
+              );
               const questions = this.stub.getCall(0).args[0];
 
-              questions.should.have.lengthOf(2)
+              questions.should.have.lengthOf(2);
               questions[0].message.should.eq('message1');
               questions[0].default.should.eq('foo');
               questions[1].message.should.eq('message2');
@@ -78,28 +93,33 @@ describe('prompt', function() {
         });
       });
 
-      context('with DISABLE_INTERACTIVITY environment variable set', function() {
-        beforeEach('disable interactivity', function() {
-          prompt.DISABLE_INTERACTIVITY = true;
-        });
-  
-        afterEach('enable interactivity', function() {
-          prompt.DISABLE_INTERACTIVITY = false;
-        });
+      context(
+        'with DISABLE_INTERACTIVITY environment variable set',
+        function() {
+          beforeEach('disable interactivity', function() {
+            prompt.DISABLE_INTERACTIVITY = true;
+          });
 
-        it('does not prompt', async function() {
-          const args = { foo: undefined, bar: undefined };
-          await promptIfNeeded({ args, props: this.props }, this.interactive);
-          const call = this.stub.getCall(0);
+          afterEach('enable interactivity', function() {
+            prompt.DISABLE_INTERACTIVITY = false;
+          });
 
-          (call === null).should.be.true;
-        });
-      });
+          it('does not prompt', async function() {
+            const args = { foo: undefined, bar: undefined };
+            await promptIfNeeded({ args, props: this.props }, this.interactive);
+            const call = this.stub.getCall(0);
+
+            (call === null).should.be.true;
+          });
+        },
+      );
     });
 
     describe('#networksList', function() {
       beforeEach('set stub and initialize', function() {
-        this.stub = sinon.stub(Truffle, 'getNetworkNamesFromConfig').returns(['Meinet', 'Rinkebay']);
+        this.stub = sinon
+          .stub(Truffle, 'getNetworkNamesFromConfig')
+          .returns(['Meinet', 'Rinkebay']);
       });
 
       afterEach('restore stub', function() {
@@ -109,9 +129,13 @@ describe('prompt', function() {
       it('returns an object with correct keys and values', function() {
         const networkList = networksList('network', 'listy');
         networkList.should.be.an('object');
-        networkList.network.should.be.an('object').that.has.all.keys('type', 'message', 'choices');
+        networkList.network.should.be
+          .an('object')
+          .that.has.all.keys('type', 'message', 'choices');
         networkList.network.type.should.eq('listy');
-        networkList.network.message.should.eq('Select a network from the network list');
+        networkList.network.message.should.eq(
+          'Select a network from the network list',
+        );
         networkList.network.choices.should.have.members(['Meinet', 'Rinkebay']);
       });
     });
@@ -119,8 +143,12 @@ describe('prompt', function() {
     describe('#contractsList', function() {
       beforeEach('set stub and initialize', function() {
         sinon.stub(Truffle, 'getContractNames').returns(['Foo', 'Bar', 'Buz']);
-        sinon.stub(ZosPackageFile.prototype, 'dependencies').get(() => ({ 'mock-stdlib': '1.1.0' }));
-        sinon.stub(ZosPackageFile.prototype, 'contracts').get(() => ({ 'Foo': 'Foo', 'BarAlias': 'Bar' }));
+        sinon
+          .stub(ZosPackageFile.prototype, 'dependencies')
+          .get(() => ({ 'mock-stdlib': '1.1.0' }));
+        sinon
+          .stub(ZosPackageFile.prototype, 'contracts')
+          .get(() => ({ Foo: 'Foo', BarAlias: 'Bar' }));
       });
 
       afterEach('restore stub', function() {
@@ -129,35 +157,61 @@ describe('prompt', function() {
 
       context('when looking for built contracts', function() {
         it('returns an object with correct keys and values from build dir', function() {
-          const contracts = contractsList('keyName', 'Im a message', 'listy', 'built');
+          const contracts = contractsList(
+            'keyName',
+            'Im a message',
+            'listy',
+            'built',
+          );
 
           contracts.should.be.an('object');
-          contracts.keyName.should.be.an('object').that.has.all.keys('type', 'message', 'choices');
+          contracts.keyName.should.be
+            .an('object')
+            .that.has.all.keys('type', 'message', 'choices');
           contracts.keyName.type.should.eq('listy');
           contracts.keyName.message.should.eq('Im a message');
-          contracts.keyName.choices.should.include.members(['Foo', 'Bar', 'Buz']);
+          contracts.keyName.choices.should.include.members([
+            'Foo',
+            'Bar',
+            'Buz',
+          ]);
         });
       });
 
       context('when looking for added contracts', function() {
         it('returns an object with correct keys and values from local', function() {
-          const contracts = contractsList('keyName', 'Im a message', 'listy', 'added');
+          const contracts = contractsList(
+            'keyName',
+            'Im a message',
+            'listy',
+            'added',
+          );
 
           contracts.should.be.an('object');
-          contracts.keyName.should.be.an('object').that.has.all.keys('type', 'message', 'choices');
+          contracts.keyName.should.be
+            .an('object')
+            .that.has.all.keys('type', 'message', 'choices');
           contracts.keyName.type.should.eq('listy');
           contracts.keyName.message.should.eq('Im a message');
-          contracts.keyName.choices.should.not.deep.include({ name: 'Buz', value: 'Buz' });
+          contracts.keyName.choices.should.not.deep.include({
+            name: 'Buz',
+            value: 'Buz',
+          });
           contracts.keyName.choices.should.deep.include.members([
             { name: 'Foo', value: 'Foo' },
-            { name: 'BarAlias[Bar]', value: 'BarAlias' }
+            { name: 'BarAlias[Bar]', value: 'BarAlias' },
           ]);
         });
       });
 
       context('when looking for not yet added but built contracts', function() {
         it('returns an object with not added contracts', function() {
-          const contracts = contractsList('keyName', 'Im a message', 'listy', 'notAdded');
+          const contracts = contractsList(
+            'keyName',
+            'Im a message',
+            'listy',
+            'notAdded',
+          );
           contracts.keyName.choices.should.include.members(['Bar', 'Buz']);
           contracts.keyName.choices.should.not.include('Foo');
         });
@@ -165,49 +219,86 @@ describe('prompt', function() {
 
       context('when looking for both built and package contracts', function() {
         it('returns an object with all correct keys and values', function() {
-          const contracts = contractsList('keyName', 'Im a message', 'listy', 'all');
+          const contracts = contractsList(
+            'keyName',
+            'Im a message',
+            'listy',
+            'all',
+          );
 
           contracts.should.be.an('object');
-          contracts.keyName.should.be.an('object').that.has.all.keys('type', 'message', 'choices');
+          contracts.keyName.should.be
+            .an('object')
+            .that.has.all.keys('type', 'message', 'choices');
           contracts.keyName.type.should.eq('listy');
           contracts.keyName.message.should.eq('Im a message');
-          contracts.keyName.choices.should.include.members(['Foo', 'Bar', 'mock-stdlib/Foo', 'mock-stdlib/BarAlias']);
+          contracts.keyName.choices.should.include.members([
+            'Foo',
+            'Bar',
+            'mock-stdlib/Foo',
+            'mock-stdlib/BarAlias',
+          ]);
         });
       });
     });
 
     describe('#methodsList', function() {
       beforeEach('initialize packageFile', function() {
-        this.packageFile = new ZosPackageFile('test/mocks/mock-stdlib-2/zos.json');
+        this.packageFile = new ZosPackageFile(
+          'test/mocks/mock-stdlib-2/zos.json',
+        );
       });
 
-      context('when providing an unexistent contract in the package', function() {
-        it('returns an empty array of methods', function() {
-          const methods = methodsList('Foobar', Mutability.NotConstant, this.packageFile);
-          methods.should.be.an('array').that.is.empty;
-        });
-      });
+      context(
+        'when providing an unexistent contract in the package',
+        function() {
+          it('returns an empty array of methods', function() {
+            const methods = methodsList(
+              'Foobar',
+              Mutability.NotConstant,
+              this.packageFile,
+            );
+            methods.should.be.an('array').that.is.empty;
+          });
+        },
+      );
 
       context('when providing an existent contract', function() {
         context('when querying constant methods', function() {
           it('returns an array of constant methods', function() {
-            const methods = methodsList('Greeter', Mutability.Constant, this.packageFile);
+            const methods = methodsList(
+              'Greeter',
+              Mutability.Constant,
+              this.packageFile,
+            );
             methods.should.be.an('array');
             methods.should.have.lengthOf(2);
-            methods[0].should.be.an('object').that.has.all.keys('name', 'value');
+            methods[0].should.be
+              .an('object')
+              .that.has.all.keys('name', 'value');
             methods[0].name.should.eq('greeting(who: string)');
-            methods[0].value.should.be.an('object').that.has.all.keys('name', 'selector');
+            methods[0].value.should.be
+              .an('object')
+              .that.has.all.keys('name', 'selector');
           });
         });
 
         context('when querying non-constant methods', function() {
           it('returns an array of non-constant methods', function() {
-            const methods = methodsList('Greeter', Mutability.NotConstant, this.packageFile);
+            const methods = methodsList(
+              'Greeter',
+              Mutability.NotConstant,
+              this.packageFile,
+            );
             methods.should.be.an('array');
             methods.should.have.lengthOf(1);
-            methods[0].should.be.an('object').that.has.all.keys('name', 'value');
+            methods[0].should.be
+              .an('object')
+              .that.has.all.keys('name', 'value');
             methods[0].name.should.eq('greet(who: string)');
-            methods[0].value.should.be.an('object').that.has.all.keys('name', 'selector');
+            methods[0].value.should.be
+              .an('object')
+              .that.has.all.keys('name', 'selector');
           });
         });
       });
@@ -215,26 +306,49 @@ describe('prompt', function() {
 
     describe('#argsList', function() {
       beforeEach('initialize packageFile', function() {
-        this.packageFile = new ZosPackageFile('test/mocks/mock-stdlib-2/zos.json');
+        this.packageFile = new ZosPackageFile(
+          'test/mocks/mock-stdlib-2/zos.json',
+        );
       });
 
-      context('when providing an unexistent contract in the package', function() {
-        it('returns an empty array', function() {
-          const args = argsList('Foobar', 'foo()', Mutability.NotConstant, this.packageFile);
-          args.should.be.an('array').that.is.empty;
-        });
-      });
+      context(
+        'when providing an unexistent contract in the package',
+        function() {
+          it('returns an empty array', function() {
+            const args = argsList(
+              'Foobar',
+              'foo()',
+              Mutability.NotConstant,
+              this.packageFile,
+            );
+            args.should.be.an('array').that.is.empty;
+          });
+        },
+      );
 
-      context('when providing an existent contract but an existent identifier', function() {
-        it('returns an empty array', function() {
-          const args = argsList('Greeter', 'foo(string)', Mutability.NotConstant, this.packageFile);
-          args.should.be.an('array').that.is.empty;
-        });
-      });
+      context(
+        'when providing an existent contract but an existent identifier',
+        function() {
+          it('returns an empty array', function() {
+            const args = argsList(
+              'Greeter',
+              'foo(string)',
+              Mutability.NotConstant,
+              this.packageFile,
+            );
+            args.should.be.an('array').that.is.empty;
+          });
+        },
+      );
 
       context('when providing an existent contract and identifier', function() {
         it('returns an array of method arguments names', function() {
-          const args = argsList('Greeter', 'greet(string)', Mutability.NotConstant, this.packageFile);
+          const args = argsList(
+            'Greeter',
+            'greet(string)',
+            Mutability.NotConstant,
+            this.packageFile,
+          );
           args.should.be.an('array');
           args[0].should.eq('who');
         });

@@ -47,19 +47,20 @@ interface ContractASTProps {
 }
 
 class NodeNotFoundError extends Error {
-  constructor(id, type) {
+  public constructor(id, type) {
     super(`No AST nodes of type ${type} with id ${id} found.`);
   }
 }
 
 class MultipleNodesFoundError extends Error {
-  constructor(id, type) {
-    super(`Found more than one node of type ${type} with the same id ${id}. Try clearing your build artifacts and recompiling your contracts.`);
+  public constructor(id, type) {
+    super(
+      `Found more than one node of type ${type} with the same id ${id}. Try clearing your build artifacts and recompiling your contracts.`,
+    );
   }
 }
 
 export default class ContractAST {
-
   private artifacts: BuildArtifacts;
   private contract: Contract;
   private imports: Set<any>;
@@ -67,7 +68,11 @@ export default class ContractAST {
   private types: TypeInfoMapping;
   private nodesFilter: string[];
 
-  constructor(contract: Contract, artifacts?: BuildArtifacts, props: ContractASTProps = {}) {
+  public constructor(
+    contract: Contract,
+    artifacts?: BuildArtifacts,
+    props: ContractASTProps = {},
+  ) {
     const { directory } = contract.schema;
     this.artifacts = artifacts || getBuildArtifacts(directory);
     this.contract = contract;
@@ -90,25 +95,33 @@ export default class ContractAST {
   }
 
   public getContractNode(): Node {
-    return this.contract.schema.ast.nodes.find((node: Node) =>
-      node.nodeType === 'ContractDefinition' &&
-      node.name === this.contract.schema.contractName
+    return this.contract.schema.ast.nodes.find(
+      (node: Node) =>
+        node.nodeType === 'ContractDefinition' &&
+        node.name === this.contract.schema.contractName,
     );
   }
 
   public getMethods(attributes?: string[]): any {
     const baseContracts = this.getLinearizedBaseContracts();
     return flatten(baseContracts.map(contract => contract.nodes))
-      .filter(({ nodeType, name }) => nodeType === 'FunctionDefinition' && this._isValidMethodName(name))
+      .filter(
+        ({ nodeType, name }) =>
+          nodeType === 'FunctionDefinition' && this._isValidMethodName(name),
+      )
       .map(node => {
         // filter attributes
         const selectedAttributes = attributes ? pick(node, attributes) : node;
         // get method parameters
         const { parameters } = node.parameters;
-        const inputs = parameters
-          .map(({ name, typeDescriptions }) => ({ name, type: typeDescriptions.typeString }));
+        const inputs = parameters.map(({ name, typeDescriptions }) => ({
+          name,
+          type: typeDescriptions.typeString,
+        }));
         // generate the method selector
-        const selectorArgs = inputs ? inputs.map(({ type }) => type).join(',') : '';
+        const selectorArgs = inputs
+          ? inputs.map(({ type }) => type).join(',')
+          : '';
         const selector = `${node.name}(${selectorArgs})`;
 
         return { selector, inputs, ...selectedAttributes };
@@ -119,10 +132,14 @@ export default class ContractAST {
   // it keeps track of the names as well as the IDs of the ancestor contracts,
   // and can yield a better error message to the user than "AST node NN not found"
   public getBaseContractsRecursively(): Node[] {
-    const mapBaseContracts = (baseContracts) => (baseContracts.map(c => ({
-      id: c.baseName.referencedDeclaration, name: c.baseName.name
-    })));
-    const baseContractsToVisit = mapBaseContracts(this.getContractNode().baseContracts);
+    const mapBaseContracts = baseContracts =>
+      baseContracts.map(c => ({
+        id: c.baseName.referencedDeclaration,
+        name: c.baseName.name,
+      }));
+    const baseContractsToVisit = mapBaseContracts(
+      this.getContractNode().baseContracts,
+    );
     const visitedBaseContracts = {};
 
     while (baseContractsToVisit.length > 0) {
@@ -132,10 +149,14 @@ export default class ContractAST {
       try {
         const node = this.getNode(id, 'ContractDefinition');
         visitedBaseContracts[id] = node;
-        baseContractsToVisit.push(... mapBaseContracts(node.baseContracts));
+        baseContractsToVisit.push(...mapBaseContracts(node.baseContracts));
       } catch (err) {
         if (err instanceof NodeNotFoundError) {
-          throw new Error(`Cannot find source data for contract ${name} (base contract of ${this.contract.schema.contractName}). This often happens because either:\n- An incremental compilation step went wrong. Clear your build folder and recompile.\n- There is more than one contract named ${name} in your project (including dependencies). Make sure all contracts have a unique name, and that you are not importing dependencies with duplicated contract names (for example, openzeppelin-eth and openzeppelin-solidity).`);
+          throw new Error(
+            `Cannot find source data for contract ${name} (base contract of ${
+              this.contract.schema.contractName
+            }). This often happens because either:\n- An incremental compilation step went wrong. Clear your build folder and recompile.\n- There is more than one contract named ${name} in your project (including dependencies). Make sure all contracts have a unique name, and that you are not importing dependencies with duplicated contract names (for example, openzeppelin-eth and openzeppelin-solidity).`,
+          );
         } else {
           throw err;
         }
@@ -146,14 +167,18 @@ export default class ContractAST {
   }
 
   public getLinearizedBaseContracts(mostDerivedFirst: boolean = false): Node[] {
-    const contracts = this.getContractNode().linearizedBaseContracts.map((id) => this.getNode(id, 'ContractDefinition'));
+    const contracts = this.getContractNode().linearizedBaseContracts.map(id =>
+      this.getNode(id, 'ContractDefinition'),
+    );
     return mostDerivedFirst ? contracts : reverse(contracts);
   }
 
   public getNode(id: string, type: string): Node | never {
     if (!this.nodes[id]) throw new NodeNotFoundError(id, type);
 
-    const candidates = this.nodes[id].filter((node: Node) => node.nodeType === type);
+    const candidates = this.nodes[id].filter(
+      (node: Node) => node.nodeType === type,
+    );
     switch (candidates.length) {
       case 0:
         throw new NodeNotFoundError(id, type);
@@ -166,25 +191,31 @@ export default class ContractAST {
 
   private _collectImports(ast: any): void {
     ast.nodes
-      .filter((node) => node.nodeType === 'ImportDirective')
-      .map((node) => node.absolutePath)
-      .forEach((importPath) => {
+      .filter(node => node.nodeType === 'ImportDirective')
+      .map(node => node.absolutePath)
+      .forEach(importPath => {
         if (this.imports.has(importPath)) return;
         this.imports.add(importPath);
-        this.artifacts.getArtifactsFromSourcePath(importPath).forEach((importedArtifact) => {
-          this._collectNodes(importedArtifact.ast);
-          this._collectImports(importedArtifact.ast);
-        });
+        this.artifacts
+          .getArtifactsFromSourcePath(importPath)
+          .forEach(importedArtifact => {
+            this._collectNodes(importedArtifact.ast);
+            this._collectImports(importedArtifact.ast);
+          });
       });
   }
 
   private _collectNodes(node: Node): void {
-
     // Return if we have already seen this node
-    if (some(this.nodes[node.id] || [], (n) => isEqual(n, node))) return;
+    if (some(this.nodes[node.id] || [], n => isEqual(n, node))) return;
 
     // Only process nodes of the filtered types (or SourceUnits)
-    if (node.nodeType !== 'SourceUnit' && this.nodesFilter && !includes(this.nodesFilter, node.nodeType)) return;
+    if (
+      node.nodeType !== 'SourceUnit' &&
+      this.nodesFilter &&
+      !includes(this.nodesFilter, node.nodeType)
+    )
+      return;
 
     // Add node to collection with this id otherwise
     if (!this.nodes[node.id]) this.nodes[node.id] = [];
@@ -192,7 +223,6 @@ export default class ContractAST {
 
     // Call recursively to children
     if (node.nodes) node.nodes.forEach(this._collectNodes.bind(this));
-
   }
 
   private _isValidMethodName(name) {

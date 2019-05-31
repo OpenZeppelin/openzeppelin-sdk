@@ -87,7 +87,7 @@ export function removeDir(dir: string): void {
  */
 export function removeTree(dirPath: string): void {
   if (exists(dirPath)) {
-    readDir(dirPath).forEach((entry) => {
+    readDir(dirPath).forEach(entry => {
       const entryPath: string = path.join(dirPath, entry);
       isDir(entryPath) ? removeTree(entryPath) : remove(entryPath);
     });
@@ -113,5 +113,5 @@ export default {
   copy,
   remove,
   removeDir,
-  removeTree
+  removeTree,
 };

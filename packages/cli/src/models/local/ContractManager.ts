@@ -5,11 +5,14 @@ import ZosPackageFile from '../files/ZosPackageFile';
 export default class ContractManager {
   public packageFile: ZosPackageFile;
 
-  constructor(packageFile: ZosPackageFile = new ZosPackageFile()) {
+  public constructor(packageFile: ZosPackageFile = new ZosPackageFile()) {
     this.packageFile = packageFile;
   }
 
-  public getContractClass(packageName: string, contractAlias: string): Contract {
+  public getContractClass(
+    packageName: string,
+    contractAlias: string,
+  ): Contract {
     if (!packageName || packageName === this.packageFile.name) {
       const contractName = this.packageFile.contract(contractAlias);
       return Contracts.getFromLocal(contractName);
@@ -23,7 +26,7 @@ export default class ContractManager {
   public hasContract(packageName: string, contractAlias: string): boolean {
     if (!packageName || packageName === this.packageFile.name) {
       return !!this.packageFile.contract(contractAlias);
-    } else{
+    } else {
       const dependency = new Dependency(packageName);
       return !!dependency.getPackageFile().contract(contractAlias);
     }

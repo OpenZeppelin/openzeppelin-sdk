@@ -2,16 +2,29 @@
 import { defaultAbiCoder, ParamType } from 'ethers/utils/abi-coder';
 import ZWeb3 from '../artifacts/ZWeb3';
 
-export function encodeParams(types: Array<string | ParamType> = [], rawValues: any[] = []): string {
+export function encodeParams(
+  types: (string | ParamType)[] = [],
+  rawValues: any[] = [],
+): string {
   return defaultAbiCoder.encode(types, rawValues);
 }
 
-export default function encodeCall(name: string, types: Array<string | ParamType> = [], rawValues: any[] = []): string {
+export default function encodeCall(
+  name: string,
+  types: (string | ParamType)[] = [],
+  rawValues: any[] = [],
+): string {
   const encodedParameters = encodeParams(types, rawValues).substring(2);
-  const signatureHash = ZWeb3.sha3(`${name}(${types.join(',')})`).substring(2, 10);
+  const signatureHash = ZWeb3.sha3(`${name}(${types.join(',')})`).substring(
+    2,
+    10,
+  );
   return `0x${signatureHash}${encodedParameters}`;
 }
 
-export function decodeCall(types: Array<string | ParamType> = [], data: any[] = []): any[] {
+export function decodeCall(
+  types: (string | ParamType)[] = [],
+  data: any[] = [],
+): any[] {
   return defaultAbiCoder.decode(types, data);
 }

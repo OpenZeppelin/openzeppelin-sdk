@@ -14,7 +14,10 @@ export default class ProxyFactory {
   public address: string;
   public txParams: TxParams;
 
-  public static tryFetch(address: string, txParams: TxParams = {}): ProxyFactory | null {
+  public static tryFetch(
+    address: string,
+    txParams: TxParams = {},
+  ): ProxyFactory | null {
     return address ? this.fetch(address, txParams) : null;
   }
 
@@ -25,53 +28,97 @@ export default class ProxyFactory {
 
   public static async deploy(txParams: TxParams = {}): Promise<ProxyFactory> {
     log.info('Deploying new ProxyFactory...');
-    const contract = await Transactions.deployContract(Contracts.getFromLib('ProxyFactory'), [], txParams);
+    const contract = await Transactions.deployContract(
+      Contracts.getFromLib('ProxyFactory'),
+      [],
+      txParams,
+    );
     log.info(`Deployed ProxyFactory at ${contract.address}`);
     return new this(contract, txParams);
   }
 
-  constructor(contract: any, txParams: TxParams = {}) {
+  public constructor(contract: any, txParams: TxParams = {}) {
     this.contract = contract;
     this.address = toAddress(contract);
     this.txParams = txParams;
   }
 
-  public async createMinimalProxy(logicAddress: string, initData?: string): Promise<MinimalProxy> {
+  public async createMinimalProxy(
+    logicAddress: string,
+    initData?: string,
+  ): Promise<MinimalProxy> {
     const args = [logicAddress, initData || Buffer.from('')];
     const { events, transactionHash } = await Transactions.sendTransaction(
-      this.contract.methods.deployMinimal, args, { ...this.txParams }
+      this.contract.methods.deployMinimal,
+      args,
+      { ...this.txParams },
     );
 
     if (!events.ProxyCreated) {
-      throw new Error(`Could not retrieve proxy deployment address from transaction ${transactionHash}`);
+      throw new Error(
+        `Could not retrieve proxy deployment address from transaction ${transactionHash}`,
+      );
     }
 
     const address = events.ProxyCreated.returnValues.proxy;
     return MinimalProxy.at(address);
   }
 
-  public async createProxy(salt: string, logicAddress: string, proxyAdmin: string, initData?: string, signature?: string): Promise<Proxy> {
+  public async createProxy(
+    salt: string,
+    logicAddress: string,
+    proxyAdmin: string,
+    initData?: string,
+    signature?: string,
+  ): Promise<Proxy> {
     const args = [salt, logicAddress, proxyAdmin, initData || Buffer.from('')];
-    const method = signature ? this.contract.methods.deploySigned : this.contract.methods.deploy;
+    const method = signature
+      ? this.contract.methods.deploySigned
+      : this.contract.methods.deploy;
     if (signature) args.push(signature);
 
-    const { events, transactionHash } = await Transactions.sendTransaction(method, args, { ...this.txParams });
+    const { events, transactionHash } = await Transactions.sendTransaction(
+      method,
+      args,
+      { ...this.txParams },
+    );
 
     if (!events.ProxyCreated) {
-      throw new Error(`Could not retrieve proxy deployment address from transaction ${transactionHash}`);
+      throw new Error(
+        `Could not retrieve proxy deployment address from transaction ${transactionHash}`,
+      );
     }
 
     const address = events.ProxyCreated.returnValues.proxy;
     return Proxy.at(address, this.txParams);
   }
 
-  public async getSigner(salt: string, logicAddress: string, proxyAdmin: string, initData: string, signature: string): Promise<string> {
-    return this.contract.methods.getSigner(salt, logicAddress, proxyAdmin, initData || Buffer.from(''), signature).call();
+  public async getSigner(
+    salt: string,
+    logicAddress: string,
+    proxyAdmin: string,
+    initData: string,
+    signature: string,
+  ): Promise<string> {
+    return this.contract.methods
+      .getSigner(
+        salt,
+        logicAddress,
+        proxyAdmin,
+        initData || Buffer.from(''),
+        signature,
+      )
+      .call();
   }
 
-  public async getDeploymentAddress(salt: string, sender?: string): Promise<string> {
-    const actualSender = sender || await this.getDefaultSender();
-    return this.contract.methods.getDeploymentAddress(salt, actualSender).call();
+  public async getDeploymentAddress(
+    salt: string,
+    sender?: string,
+  ): Promise<string> {
+    const actualSender = sender || (await this.getDefaultSender());
+    return this.contract.methods
+      .getDeploymentAddress(salt, actualSender)
+      .call();
   }
 
   public async getDefaultSender(): Promise<string> {

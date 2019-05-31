@@ -11,7 +11,11 @@ async function sendTransaction(params: any): Promise<any> {
   return ZWeb3.sendTransactionWithoutReceipt(params);
 }
 
-export default async function copyContract(contract: Contract, address: string, txParams: TxParams = {}): Promise<Contract> {
+export default async function copyContract(
+  contract: Contract,
+  address: string,
+  txParams: TxParams = {},
+): Promise<Contract> {
   const trimmedAddress: string = address.replace('0x', '');
 
   // This is EVM assembly will return of the code of a foreign address.
@@ -30,10 +34,13 @@ export default async function copyContract(contract: Contract, address: string, 
   // push1 00     | 0x60 0x00  | 0xCS 0x00
   // return       | 0xF3       |
 
-  const ASM_CODE_COPY: string = `0x73${trimmedAddress}803b8091600080913c6000f3`;
+  const ASM_CODE_COPY = `0x73${trimmedAddress}803b8091600080913c6000f3`;
 
   const params = Object.assign({}, txParams, { to: null, data: ASM_CODE_COPY });
   const txHash = await sendTransaction(params);
-  const receipt = await ZWeb3.getTransactionReceiptWithTimeout(txHash, Contracts.getSyncTimeout());
+  const receipt = await ZWeb3.getTransactionReceiptWithTimeout(
+    txHash,
+    Contracts.getSyncTimeout(),
+  );
   return contract.at(receipt.contractAddress);
 }

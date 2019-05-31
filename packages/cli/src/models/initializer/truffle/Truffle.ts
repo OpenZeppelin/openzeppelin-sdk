@@ -2,16 +2,18 @@ import pickBy from 'lodash.pickby';
 import pick from 'lodash.pick';
 import npm from 'npm-programmatic';
 import semver from 'semver';
-import { FileSystem, Contracts, Logger } from 'zos-lib';
+import { FileSystem, Logger } from 'zos-lib';
+import TruffleConfig from 'truffle-config';
 
 const log = new Logger('Truffle');
 
 const Truffle = {
-
   existsTruffleConfig(path: string = process.cwd()): boolean {
     const truffleFile = `${path}/truffle.js`;
     const truffleConfigFile = `${path}/truffle-config.js`;
-    return FileSystem.exists(truffleFile) || FileSystem.exists(truffleConfigFile);
+    return (
+      FileSystem.exists(truffleFile) || FileSystem.exists(truffleConfigFile)
+    );
   },
 
   isTruffleProject(path: string = process.cwd()): boolean {
@@ -20,10 +22,19 @@ const Truffle = {
     return Truffle.existsTruffleConfig(path) && existsTruffleDependency;
   },
 
-  validateAndLoadNetworkConfig(network: string, force: boolean = false, path: string = process.cwd()): void {
+  validateAndLoadNetworkConfig(
+    network: string,
+    force: boolean = false,
+    path: string = process.cwd(),
+  ): void {
     const config = this.getConfig(force);
     const { networks: networkList } = config;
-    if (!networkList[network]) throw Error(`Given network '${network}' is not defined in your ${this._getTruffleConfigFileName(path)} file`);
+    if (!networkList[network])
+      throw Error(
+        `Given network '${network}' is not defined in your ${this._getTruffleConfigFileName(
+          path,
+        )} file`,
+      );
     config.network = network;
   },
 
@@ -44,21 +55,32 @@ const Truffle = {
   getConfig(force: boolean = false): any | never {
     if (!force && this.config) return this.config;
     try {
-      const TruffleConfig = require('truffle-config');
       this.config = TruffleConfig.detect({ logger: console });
       return this.config;
     } catch (error) {
       if (error.message === 'Could not find suitable configuration file.') {
-        throw Error('Could not find truffle.js or truffle-config.js file, remember to initialize your project.');
+        throw Error(
+          'Could not find truffle.js or truffle-config.js file, remember to initialize your project.',
+        );
       } else {
-        throw Error('Could not load truffle.js or truffle-config.js file.\n' + error);
+        throw Error(
+          'Could not load truffle.js or truffle-config.js file.\n' + error,
+        );
       }
     }
   },
 
-  getCompilerInfo(): { version?: string, optimizer?: boolean, optimizerRuns?: number } {
+  getCompilerInfo(): {
+    version?: string;
+    optimizer?: boolean;
+    optimizerRuns?: number;
+  } {
     const config = this.getConfig();
-    const { compilers: { solc: { version, settings } } } = config;
+    const {
+      compilers: {
+        solc: { version, settings },
+      },
+    } = config;
     const { enabled: optimizer, runs: optimizerRuns } = settings.optimizer;
     return { version, optimizer, optimizerRuns };
   },
@@ -75,15 +97,20 @@ const Truffle = {
         .filter(name => name.match(/\.json$/))
         .map(name => FileSystem.parseJsonIfExists(`${buildDir}/${name}`))
         .filter(contract => {
-          return this._isLocalContract(buildDir, contract)
-            && !this._isLibrary(contract)
-            && !this._isAbstractContract(contract);
+          return (
+            this._isLocalContract(buildDir, contract) &&
+            !this._isLibrary(contract) &&
+            !this._isAbstractContract(contract)
+          );
         })
         .map(({ contractName }) => contractName);
     } else return [];
   },
 
-  _isLocalContract(buildDir: string, contract: { [key: string]: any }): boolean {
+  _isLocalContract(
+    buildDir: string,
+    contract: { [key: string]: any },
+  ): boolean {
     const projectDir = buildDir.replace('build/contracts', '');
     return contract.sourcePath.indexOf(projectDir) === 0;
   },
@@ -93,19 +120,32 @@ const Truffle = {
   },
 
   _isLibrary(contract: { [key: string]: any }): boolean {
-    return contract && contract.ast && !!contract.ast.nodes
-      .find(node => node.contractKind === 'library' && node.name === contract.contractName);
+    return (
+      contract &&
+      contract.ast &&
+      !!contract.ast.nodes.find(
+        node =>
+          node.contractKind === 'library' &&
+          node.name === contract.contractName,
+      )
+    );
   },
 
-  async _checkHdWalletProviderVersion(provider: any, path: string = process.cwd()): Promise<void> {
+  async _checkHdWalletProviderVersion(
+    provider: any,
+    path: string = process.cwd(),
+  ): Promise<void> {
     if (provider.constructor.name !== 'HDWalletProvider') return;
     const packagesList = await npm.list(path);
-    const hdwalletProviderPackage = packagesList
-      .find(packageNameAndVersion => packageNameAndVersion.match(/^truffle-hdwallet-provider@/));
+    const hdwalletProviderPackage = packagesList.find(packageNameAndVersion =>
+      packageNameAndVersion.match(/^truffle-hdwallet-provider@/),
+    );
     if (hdwalletProviderPackage) {
-      const [name, version] = hdwalletProviderPackage.split('@');
+      const [, version] = hdwalletProviderPackage.split('@');
       if (version && semver.lt(version, '1.0.0')) {
-        log.warn(`Version ${version} of truffle-hdwallet-provider might fail when deploying multiple contracts. Consider upgrading it to version '1.0.0' or higher.`);
+        log.warn(
+          `Version ${version} of truffle-hdwallet-provider might fail when deploying multiple contracts. Consider upgrading it to version '1.0.0' or higher.`,
+        );
       }
     }
   },
@@ -117,7 +157,9 @@ const Truffle = {
     const networkConfig = networks[network];
 
     const configDefaults = pickBy(pick(this.config, 'from', 'gasPrice'));
-    const networkDefaults = pickBy(pick(networkConfig, 'from', 'gas', 'gasPrice'));
+    const networkDefaults = pickBy(
+      pick(networkConfig, 'from', 'gas', 'gasPrice'),
+    );
 
     return { ...configDefaults, ...networkDefaults };
   },
@@ -126,7 +168,6 @@ const Truffle = {
     const truffleFile = `${path}/truffle.js`;
     return FileSystem.exists(truffleFile) ? 'truffle.js' : 'truffle-config.js';
   },
-
 };
 
 export default Truffle;

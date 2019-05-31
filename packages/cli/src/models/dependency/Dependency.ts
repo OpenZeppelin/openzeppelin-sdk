@@ -7,14 +7,21 @@ import npm from 'npm-programmatic';
 import { exec } from 'child_process';
 import { promisify } from 'util';
 
-import { TxParams, FileSystem as fs, PackageProject, Contracts, Contract, getSolidityLibNames, Logger } from 'zos-lib';
+import {
+  TxParams,
+  FileSystem as fs,
+  PackageProject,
+  Contracts,
+  Contract,
+  getSolidityLibNames,
+  Logger,
+} from 'zos-lib';
 import ZosPackageFile from '../files/ZosPackageFile';
 import ZosNetworkFile from '../files/ZosNetworkFile';
 
 const log = new Logger('Dependency');
 
 export default class Dependency {
-
   public name: string;
   public version: string;
   public nameAndVersion: string;
@@ -28,8 +35,15 @@ export default class Dependency {
     return new this(name, version);
   }
 
-  public static satisfiesVersion(version: string | semver.SemVer, requirement: string | semver.Range): boolean {
-    return !requirement || version === requirement || semver.satisfies(semver.coerce(version), requirement);
+  public static satisfiesVersion(
+    version: string | semver.SemVer,
+    requirement: string | semver.Range,
+  ): boolean {
+    return (
+      !requirement ||
+      version === requirement ||
+      semver.satisfies(semver.coerce(version), requirement)
+    );
   }
 
   public static async fetchVersionFromNpm(name: string): Promise<string> {
@@ -37,20 +51,25 @@ export default class Dependency {
     try {
       const { stdout } = await execAsync(`npm view ${name} | grep latest`);
       const versionMatch = stdout.match(/([0-9]+\.){2}[0-9]+/);
-      return (Array.isArray(versionMatch) && versionMatch.length > 0) ? `${name}@${versionMatch[0]}` : name;
-    } catch(error) {
+      return Array.isArray(versionMatch) && versionMatch.length > 0
+        ? `${name}@${versionMatch[0]}`
+        : name;
+    } catch (error) {
       return name;
     }
   }
 
   public static hasDependenciesForDeploy(network: string): boolean {
     const dependencies = ZosPackageFile.getLinkedDependencies() || [];
-    const networkDependencies = ZosNetworkFile.getDependencies(`zos.${network}.json`) || {};
+    const networkDependencies =
+      ZosNetworkFile.getDependencies(`zos.${network}.json`) || {};
     const hasDependenciesForDeploy = dependencies.find(depNameAndVersion => {
       const [name, version] = depNameAndVersion.split('@');
       const networkFilePath = `node_modules/${name}/zos.${network}.json`;
       const projectDependency = networkDependencies[name];
-      const satisfiesVersion = projectDependency && this.satisfiesVersion(projectDependency.version, version);
+      const satisfiesVersion =
+        projectDependency &&
+        this.satisfiesVersion(projectDependency.version, version);
       return !fs.exists(networkFilePath) && !satisfiesVersion;
     });
 
@@ -63,7 +82,7 @@ export default class Dependency {
     return this.fromNameWithVersion(nameAndVersion);
   }
 
-  constructor(name: string, requirement?: string | semver.Range) {
+  public constructor(name: string, requirement?: string | semver.Range) {
     this.name = name;
     this._networkFiles = {};
 
@@ -82,27 +101,43 @@ export default class Dependency {
     // this should all be handled at the Project level. Consider adding a setImplementations (plural) method
     // to Projects, which handle library deployment and linking for a set of contracts altogether.
 
-    const contracts = <Array<[Contract, string]>>map(this.getPackageFile().contracts, (contractName, contractAlias) =>
-      [Contracts.getFromNodeModules(this.name, contractName), contractAlias]
-    );
+    const contracts = map(
+      this.getPackageFile().contracts,
+      (contractName, contractAlias) => [
+        Contracts.getFromNodeModules(this.name, contractName),
+        contractAlias,
+      ],
+    ) as [Contract, string][];
 
     const pipeline = [
-      (someContracts) => map(someContracts, ([contract]) => getSolidityLibNames(contract.schema.bytecode)),
-      (someContracts) => flatten(someContracts),
-      (someContracts) => uniq(someContracts),
+      someContracts =>
+        map(someContracts, ([contract]) =>
+          getSolidityLibNames(contract.schema.bytecode),
+        ),
+      someContracts => flatten(someContracts),
+      someContracts => uniq(someContracts),
     ];
 
     const libraryNames = pipeline.reduce((xs, f) => f(xs), contracts);
 
-    const libraries = fromPairs(await Promise.all(map(libraryNames, async (libraryName) => {
-      const implementation = await project.setImplementation(Contracts.getFromNodeModules(this.name, libraryName), libraryName);
-      return [libraryName, implementation.address];
-    })));
+    const libraries = fromPairs(
+      await Promise.all(
+        map(libraryNames, async libraryName => {
+          const implementation = await project.setImplementation(
+            Contracts.getFromNodeModules(this.name, libraryName),
+            libraryName,
+          );
+          return [libraryName, implementation.address];
+        }),
+      ),
+    );
 
-    await Promise.all(map(contracts, async ([contract, contractAlias]) => {
-      contract.link(libraries);
-      await project.setImplementation(contract, contractAlias);
-    }));
+    await Promise.all(
+      map(contracts, async ([contract, contractAlias]) => {
+        contract.link(libraries);
+        await project.setImplementation(contract, contractAlias);
+      }),
+    );
 
     return project;
   }
@@ -111,7 +146,11 @@ export default class Dependency {
     if (!this._packageFile) {
       const filename = `node_modules/${this.name}/zos.json`;
       if (!fs.exists(filename)) {
-        throw Error(`Could not find a zos.json file for '${this.name}'. Make sure it is provided by the npm package.`);
+        throw Error(
+          `Could not find a zos.json file for '${
+            this.name
+          }'. Make sure it is provided by the npm package.`,
+        );
       }
       this._packageFile = new ZosPackageFile(filename);
     }
@@ -122,11 +161,22 @@ export default class Dependency {
     if (!this._networkFiles[network]) {
       const filename = this._getNetworkFilePath(network);
       if (!fs.exists(filename)) {
-        throw Error(`Could not find a zos file for network '${network}' for '${this.name}'`);
+        throw Error(
+          `Could not find a zos file for network '${network}' for '${
+            this.name
+          }'`,
+        );
       }
 
-      this._networkFiles[network] = new ZosNetworkFile(this.getPackageFile(), network, filename);
-      this._validateSatisfiesVersion(this._networkFiles[network].version, this.requirement);
+      this._networkFiles[network] = new ZosNetworkFile(
+        this.getPackageFile(),
+        network,
+        filename,
+      );
+      this._validateSatisfiesVersion(
+        this._networkFiles[network].version,
+        this.requirement,
+      );
     }
     return this._networkFiles[network];
   }
@@ -141,9 +191,14 @@ export default class Dependency {
     return `node_modules/${this.name}/zos.${network}.json`;
   }
 
-  private _validateSatisfiesVersion(version: string, requirement: string | semver.Range): void | never {
+  private _validateSatisfiesVersion(
+    version: string,
+    requirement: string | semver.Range,
+  ): void | never {
     if (!Dependency.satisfiesVersion(version, requirement)) {
-      throw Error(`Required dependency version ${requirement} does not match version ${version}`);
+      throw Error(
+        `Required dependency version ${requirement} does not match version ${version}`,
+      );
     }
   }
 }
