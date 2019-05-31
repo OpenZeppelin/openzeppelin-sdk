@@ -10,7 +10,6 @@ import {
 } from 'zos-lib';
 
 import Session from '../models/network/Session';
-// import Truffle from '../models/initializer/truffle/Truffle';
 import ConfigManager from '../models/config/ConfigManager';
 import ZosPackageFile from '../models/files/ZosPackageFile';
 import ContractManager from '../models/local/ContractManager';

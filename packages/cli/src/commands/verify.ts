@@ -1,5 +1,3 @@
-import pickBy from 'lodash.pickby';
-
 import verify from '../scripts/verify';
 import ConfigManager from '../models/config/ConfigManager';
 import { promptIfNeeded, contractsList, networksList, InquirerQuestions } from '../prompts/prompt';
