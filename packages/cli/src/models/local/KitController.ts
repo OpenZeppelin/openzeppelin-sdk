@@ -8,7 +8,7 @@ import kitConfigSchema from '../files/kit-config.schema.json';
 import stdout from '../../utils/stdout';
 import patch from '../../utils/patch';
 import child from '../../utils/child';
-import Spinner from '../../utils/spinner';
+import Spinners from '../../utils/spinner';
 
 const simpleGit = patch('simple-git/promise');
 
@@ -26,16 +26,17 @@ export default class KitController {
 
     // because zos always spawns '.zos.lock' file
     const files = (await readdir(workingDirPath)).filter(
-      file => file !== '.zos.lock',
+      (file): boolean => file !== '.zos.lock',
     );
-    if (files.length > 0)
+    if (files.length > 0) {
       throw Error(
         `Unable to unpack ${url} in the current directory, as it must be empty.`,
       );
+    }
 
-    let spinner = new Spinner(`Downloading kit from ${url}`);
+    const spinners = new Spinners();
     try {
-      spinner.start();
+      spinners.start('downloading-kit', `Downloading kit from ${url}`);
       const git = simpleGit(workingDirPath);
       await git.init();
       await git.addRemote('origin', url);
@@ -48,20 +49,19 @@ export default class KitController {
         // http://nicolasgallagher.com/git-checkout-specific-files-from-another-branch/
         await git.checkout([`origin/stable`, `--`, ...config.files]);
       }
-      spinner.succeed();
+      spinners.succeed('downloading-kit');
 
-      spinner = new Spinner('Unpacking kit');
-      spinner.start();
+      spinners.start('unpacking-kit', 'Unpacking kit');
       // always delete .git folder
       await remove(path.join(workingDirPath, '.git'));
       // run kit commands like `npm install`
       await exec(config.hooks['post-unpack']);
-      spinner.succeed();
+      spinners.succeed('unpacking-kit');
 
       stdout('The kit is ready to use. Amazing!');
       stdout(config.message);
     } catch (e) {
-      spinner.fail();
+      spinners.stopAll('fail');
       // TODO: remove all files from directory on fail except .zos.lock
       e.message = `Failed to download and unpack kit from ${url}. Details: ${
         e.message
@@ -85,13 +85,14 @@ export default class KitController {
       const ajv = new Ajv({ allErrors: true });
       const test = ajv.compile(kitConfigSchema);
       const isValid = test(config);
-      if (!isValid)
+      if (!isValid) {
         throw new Error(
           `kit.json is not valid. Errors: ${test.errors.reduce(
-            (ret, err) => `${err.message}, ${ret}`,
+            (ret, err): string => `${err.message}, ${ret}`,
             '',
           )}`,
         );
+      }
 
       // has to be the same version
       if (config.manifestVersion !== MANIFEST_VERSION) {
