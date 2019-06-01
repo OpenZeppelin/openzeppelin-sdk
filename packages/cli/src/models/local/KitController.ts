@@ -26,14 +26,6 @@ export default class KitController {
 
     // because zos always spawns '.zos.lock' file
     const files = (await readdir(workingDirPath)).filter(
-<<<<<<< 23bc40bde323d7f03e8855256810d2e66b1db48d
-      file => file !== '.zos.lock',
-    );
-    if (files.length > 0)
-      throw Error(
-        `Unable to unpack ${url} in the current directory, as it must be empty.`,
-      );
-=======
       (file): boolean => file !== '.zos.lock',
     );
     if (files.length > 0) {
@@ -41,7 +33,6 @@ export default class KitController {
         `Unable to unpack ${url} in the current directory, as it must be empty.`,
       );
     }
->>>>>>> Remove ora and add `spinnies`
 
     const spinners = new Spinners();
     try {
@@ -70,11 +61,7 @@ export default class KitController {
       stdout('The kit is ready to use. Amazing!');
       stdout(config.message);
     } catch (e) {
-<<<<<<< 23bc40bde323d7f03e8855256810d2e66b1db48d
-      spinner.fail();
-=======
       spinners.stopAll('fail');
->>>>>>> Remove ora and add `spinnies`
       // TODO: remove all files from directory on fail except .zos.lock
       e.message = `Failed to download and unpack kit from ${url}. Details: ${
         e.message
@@ -98,15 +85,6 @@ export default class KitController {
       const ajv = new Ajv({ allErrors: true });
       const test = ajv.compile(kitConfigSchema);
       const isValid = test(config);
-<<<<<<< 23bc40bde323d7f03e8855256810d2e66b1db48d
-      if (!isValid)
-        throw new Error(
-          `kit.json is not valid. Errors: ${test.errors.reduce(
-            (ret, err) => `${err.message}, ${ret}`,
-            '',
-          )}`,
-        );
-=======
       if (!isValid) {
         throw new Error(
           `kit.json is not valid. Errors: ${test.errors.reduce(
@@ -115,7 +93,6 @@ export default class KitController {
           )}`,
         );
       }
->>>>>>> Remove ora and add `spinnies`
 
       // has to be the same version
       if (config.manifestVersion !== MANIFEST_VERSION) {
