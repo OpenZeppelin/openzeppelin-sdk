@@ -13,6 +13,11 @@ module.exports = {
       network_id: '4447',
       port: 9555
     },
+    invalid: {
+      host: 'localhost',
+      network_id: '-39',
+      port: 9555
+    },
   },
   mocha: {
     forbidOnly: !!process.env.CI

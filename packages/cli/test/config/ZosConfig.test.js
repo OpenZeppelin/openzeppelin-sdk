@@ -20,7 +20,7 @@ contract('ZosConfig', function() {
     this.zosConfig = new ZosConfig();
   });
 
-  afterEach('cleanup files & folders', cleanupfn(tmpDir));
+  afterEach('cleanup files and folders', cleanupfn(tmpDir));
 
   describe('methods', function() {
     describe('#initialize', function() {
