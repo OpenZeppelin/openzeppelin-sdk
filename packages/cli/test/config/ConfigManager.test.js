@@ -83,7 +83,7 @@ describe('ConfigManager', function() {
     it('throws if provided network id is not correct', async function() {
       if (configFileName === 'truffle.js') {
         await ConfigManager.initNetworkConfiguration({ network: 'invalid' }, true, configFileDir)
-          .should.be.rejectedWith(/Invalid network id -39/);
+          .should.be.rejectedWith(/Unexpected network ID: requested -39/);
       }
     });
 

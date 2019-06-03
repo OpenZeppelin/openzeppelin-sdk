@@ -1,6 +1,7 @@
 'use strict';
 require('../setup');
 
+import sinon from 'sinon';
 import { FileSystem as fs } from 'zos-lib'
 import { cleanup } from '../helpers/cleanup'
 
@@ -16,12 +17,12 @@ contract('init script', function() {
   before('create tmp dir and stub ZosConfig#initialize', function () {
     fs.createDir(tmpDir)
     this.zosConfigInitialize = ZosConfig.prototype.initialize;
-    ZosConfig.prototype.initialize = () => {};
+    sinon.stub(ZosConfig.prototype, 'initialize').returns();
   });
 
   after('cleanup tmp dir', function() {
     cleanup(tmpDir);
-    ZosConfig.prototype.initalize = this.zosConfigInitialize;
+    sinon.restore();
   });
 
   beforeEach('create package file', async function() {

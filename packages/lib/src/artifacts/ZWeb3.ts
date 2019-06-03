@@ -56,6 +56,13 @@ export default class ZWeb3 {
     return Web3.utils.isAddress(address);
   }
 
+  public static async checkNetworkId(providedNetworkId?: string | number): Promise<void | never> {
+    const networkId = await ZWeb3.getNetwork();
+    if (providedNetworkId !== undefined && providedNetworkId !== '*' && Number(networkId) !== Number(providedNetworkId)) {
+      throw Error(`Unexpected network ID: requested ${providedNetworkId} but connected to ${networkId}`);
+    }
+  }
+
   public static eth(): Eth {
     return ZWeb3.web3().eth;
   }
@@ -150,12 +157,8 @@ export default class ZWeb3 {
     return ZWeb3.eth().net.getId();
   }
 
-  public static async getNetworkName(providedNetworkId?: string | number): Promise<string | never> {
+  public static async getNetworkName(): Promise<string> {
     const networkId = await ZWeb3.getNetwork();
-    if (providedNetworkId !== undefined && providedNetworkId !== '*' && Number(networkId) !== Number(providedNetworkId)) {
-      throw Error(`Invalid network id ${providedNetworkId}`);
-    }
-
     return NETWORKS[networkId] || `dev-${networkId}`;
   }
 

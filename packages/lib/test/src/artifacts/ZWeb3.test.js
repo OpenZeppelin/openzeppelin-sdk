@@ -66,18 +66,16 @@ contract('ZWeb3', function(accounts) {
       network.should.be.eq(4447)
     })
 
-    describe('getNetworkName', function () {
-      context('when providing a valid network id', function () {
-        it('tells the name of the current network', async function () {
-          const networkName = await ZWeb3.getNetworkName()
-          networkName.should.be.eq('dev-4447')
-        });
-      });
+    it('tells the name of the current network', async function () {
+      const networkName = await ZWeb3.getNetworkName()
+      networkName.should.be.eq('dev-4447')
+    });
 
+    describe('checkNetworkId', function () {
       context('when providing an invalid network id', function () {
         it('throws an error', async function () {
-          await ZWeb3.getNetworkName('-35')
-            .should.be.rejectedWith(/Invalid network id/);
+          await ZWeb3.checkNetworkId('-35')
+            .should.be.rejectedWith(/Unexpected network ID: requested -35/);
         });
       });
     });

@@ -17,16 +17,25 @@ interface Config {
   compilers?: CompilersInfo;
 }
 
-interface Network {
+interface NetworkCamel<T> {
+  networkId: T;
+}
+
+interface NetworkSnake<T> {
+  network_id: T;
+}
+
+type NetworkId<T> = NetworkCamel<T> | NetworkSnake<T> | (NetworkCamel<T> & NetworkSnake<T>);
+
+type Network = {
   host: string;
   port: number | string;
-  network_id: number | string;
   protocol?: string;
   from?: number | string;
   gas?: number | string;
   gasPrice?: number | string;
   provider?: string | ((any) => any);
-}
+} & NetworkId<string | number>;
 
 interface ArtifactDefaults {
   from?: number | string;
