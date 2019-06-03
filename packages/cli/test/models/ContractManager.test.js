@@ -54,7 +54,9 @@ contract('ContractManager', function([_, from]) {
 
         context('with contracts', function() {
           beforeEach(function() {
-            this.testDir = `${process.cwd()}/test/mocks/mock-stdlib-2`;
+            this.testDir = `${process.cwd()}/test/mocks/mock-stdlib`;
+            const builtContract = { sourcePath: `${this.testDir}/contracts`, bytecode: '0x124', contractName: 'Foo' };
+            FileSystem.writeJson(`${this.testDir}/build/contracts/Foo.json`, builtContract)
             this.packageFile = new ZosPackageFile(`${this.testDir}/zos.json`);
             this.contractManager = new ContractManager(this.packageFile);
             sinon.stub(ConfigManager, 'getBuildDir').returns(`${this.testDir}/build/contracts`);
@@ -70,6 +72,7 @@ contract('ContractManager', function([_, from]) {
             contractNames.should.be.an('array');
             contractNames.should.not.be.empty;
             contractNames.should.have.lengthOf(1);
+            contractNames[0].should.eq('Foo');
           });
         });
       });
