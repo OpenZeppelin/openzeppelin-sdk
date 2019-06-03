@@ -18,8 +18,5 @@ module.exports = {
       network_id: '-39',
       port: 9555
     },
-  },
-  mocha: {
-    forbidOnly: !!process.env.CI
   }
 }
