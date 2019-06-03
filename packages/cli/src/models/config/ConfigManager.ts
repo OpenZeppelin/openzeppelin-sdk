@@ -43,7 +43,11 @@ const ConfigManager = {
     }
   },
 
+<<<<<<< HEAD
    getBuildDir(root: string = process.cwd()): string {
+=======
+  getBuildDir(root: string = process.cwd()): string {
+>>>>>>> Added types to ZosConfig and ConfigManager
     this.setBaseConfig(root);
     return this.config.getBuildDir();
   },
@@ -61,7 +65,7 @@ const ConfigManager = {
     return config && config.networks ? Object.keys(config.networks) : undefined;
   },
 
-  setBaseConfig(root: string = process.cwd()): void | never {
+  setBaseConfig(root: string = process.cwd()): void | null | never {
     if (this.config) return;
 
     // these lines could be expanded to support different libraries like embark, ethjs, buidler, etc

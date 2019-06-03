@@ -4,8 +4,42 @@ import omit from 'lodash.omit';
 import isUndefined from 'lodash.isundefined';
 import { FileSystem } from 'zos-lib';
 
+interface NetworkConfig extends Config {
+  artifactDefaults: ArtifactDefaults;
+  network: Network;
+}
+
+interface Config {
+  networks: { [network: string]: Network };
+  provider: Provider;
+  buildDir: string;
+  // TODO: remove after managing compiler info in zos.json
+  compilers?: CompilersInfo;
+}
+
+interface Network {
+  host: string;
+  port: number | string;
+  network_id: number | string;
+  protocol?: string;
+  from?: number | string;
+  gas?: number | string;
+  gasPrice?: number | string;
+  provider?: string | ((any) => any);
+}
+
+interface ArtifactDefaults {
+  from?: number | string;
+  gas?: number | string;
+  gasPrice?: number | string;
+}
+
+type Provider = string | ((any) => any);
+// TODO: remove after managing compiler info in zos.json
+type CompilersInfo = any;
+
 export default class ZosConfig {
-  public initialize(root: string = process.cwd()) {
+  public initialize(root: string = process.cwd()): void {
     this.createContractsDir(root);
     this.createZosConfigFile(root);
   }
@@ -14,7 +48,7 @@ export default class ZosConfig {
     return FileSystem.exists(`${root}/networks.js`);
   }
 
-  public getConfig(root: string = process.cwd()) {
+  public getConfig(root: string = process.cwd()): Config {
     const zosConfigFile = require(`${root}/networks.js`);
     const compilers = zosConfigFile.compilers || this.getDefaultCompilersProperties();
     const buildDir = `${root}/build/contracts`;
@@ -22,12 +56,11 @@ export default class ZosConfig {
     return { ...zosConfigFile, compilers, buildDir };
   }
 
-  public getBuildDir() {
+  public getBuildDir(): string {
     return `${process.cwd()}/build/contracts`;
   }
 
-  // TODO: set types.
-  public loadNetworkConfig(networkName: string, root: string = process.cwd()): any {
+  public loadNetworkConfig(networkName: string, root: string = process.cwd()): NetworkConfig {
     const config = this.getConfig(root);
     const { networks } = config;
     if (!networks[networkName]) throw Error(`Given network '${networkName}' is not defined in your networks.js file`);
@@ -44,8 +77,7 @@ export default class ZosConfig {
     };
   }
 
-  // TODO: set types
-  private getProvider(network: any): any {
+  private getProvider(network: any): Provider {
     let { provider } = network;
 
     if (!provider) {
@@ -60,7 +92,7 @@ export default class ZosConfig {
     return provider;
   }
 
-  private getArtifactDefaults(zosConfigFile: any, network: any) {
+  private getArtifactDefaults(zosConfigFile: Config, network: Network): ArtifactDefaults {
     const defaults = ['gas', 'gasPrice', 'from'];
     const configDefaults = omit(pick(zosConfigFile, defaults), isUndefined);
     const networkDefaults = omit(pick(network, defaults), isUndefined);
@@ -68,7 +100,7 @@ export default class ZosConfig {
     return { ...configDefaults, ...networkDefaults };
   }
 
-  private getDefaultCompilersProperties() {
+  private getDefaultCompilersProperties(): CompilersInfo {
     return {
       vyper: {},
       solc: {
