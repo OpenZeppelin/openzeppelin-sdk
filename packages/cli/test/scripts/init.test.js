@@ -1,8 +1,8 @@
 'use strict';
 require('../setup');
 
-import { FileSystem as fs } from 'zos-lib';
-import { cleanup, cleanupfn } from '../helpers/cleanup';
+import { FileSystem as fs } from 'zos-lib'
+import { cleanup } from '../helpers/cleanup'
 
 import init from '../../src/scripts/init'
 import ZosPackageFile from '../../src/models/files/ZosPackageFile'
@@ -13,14 +13,14 @@ contract('init script', function() {
   const version = '0.3.0';
   const tmpDir = 'test/tmp';
 
-  before('create tmp dir', function () {
+  before('create tmp dir and stub ZosConfig#initialize', function () {
     fs.createDir(tmpDir)
     this.zosConfigInitialize = ZosConfig.prototype.initialize;
     ZosConfig.prototype.initialize = () => {};
   });
 
-  after('cleanup tmp dir and networks.js', function() {
-    cleanupfn(tmpDir);
+  after('cleanup tmp dir', function() {
+    cleanup(tmpDir);
     ZosConfig.prototype.initalize = this.zosConfigInitialize;
   });
 

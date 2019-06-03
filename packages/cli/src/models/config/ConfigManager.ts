@@ -43,11 +43,7 @@ const ConfigManager = {
     }
   },
 
-<<<<<<< HEAD
-   getBuildDir(root: string = process.cwd()): string {
-=======
   getBuildDir(root: string = process.cwd()): string {
->>>>>>> Added types to ZosConfig and ConfigManager
     this.setBaseConfig(root);
     return this.config.getBuildDir();
   },
