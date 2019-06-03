@@ -16,11 +16,11 @@ interface ConfigFileCompilerOptions {
   contractsDir: string;
   artifactsDir: string;
   compilerSettings: {
-    evmVersion: string,
+    evmVersion: string;
     optimizer: {
-      enabled: boolean,
-      runs: string
-    }
+      enabled: boolean;
+      runs: string;
+    };
   };
 }
 
@@ -33,7 +33,7 @@ export default class ZosPackageFile {
     dependencies: { [name: string]: string };
     contracts: { [alias: string]: string };
     publish: boolean;
-    compiler: ConfigFileCompilerOptions
+    compiler: ConfigFileCompilerOptions;
   };
 
   public static getLinkedDependencies(fileName: string = 'zos.json'): string[] {
@@ -130,10 +130,13 @@ export default class ZosPackageFile {
     return !!this.data.publish;
   }
 
-  get compilerOptions(): ProjectCompilerOptions {
+  public get compilerOptions(): ProjectCompilerOptions {
     // Awkward destructuring is due to https://github.com/microsoft/TypeScript/issues/26235
-    const config = this.data.compiler || ({} as ConfigFileCompilerOptions);
-    const { manager, solcVersion: version, contractsDir: inputDir, artifactsDir: outputDir } = config;
+    const config: ConfigFileCompilerOptions = this.data.compiler;
+    const manager = config && config.manager;
+    const version = config && config.solcVersion;
+    const inputDir = config && config.contractsDir;
+    const outputDir = config && config.artifactsDir;
     const compilerSettings = config && config.compilerSettings;
     const evmVersion = compilerSettings && compilerSettings.evmVersion;
     const optimizer = compilerSettings && compilerSettings.optimizer;
@@ -144,12 +147,19 @@ export default class ZosPackageFile {
       outputDir,
       evmVersion,
       version,
-      optimizer
+      optimizer,
     };
   }
 
   public setCompilerOptions(options: ProjectCompilerOptions) {
-    const { manager, version, outputDir, inputDir, evmVersion, optimizer } = options;
+    const {
+      manager,
+      version,
+      outputDir,
+      inputDir,
+      evmVersion,
+      optimizer,
+    } = options;
     const configOptions: ConfigFileCompilerOptions = {
       manager,
       solcVersion: version,
@@ -157,13 +167,14 @@ export default class ZosPackageFile {
       contractsDir: inputDir,
       compilerSettings: {
         evmVersion,
-        optimizer
-      }
+        optimizer,
+      },
     };
 
-    this.data.compiler = (manager === 'trufle')
-      ? { manager: 'truffle' }
-      : pickBy({ ...this.data.compiler, ...configOptions });
+    this.data.compiler =
+      manager === 'trufle'
+        ? { manager: 'truffle' }
+        : pickBy({ ...this.data.compiler, ...configOptions });
   }
 
   public contract(alias: string): string {

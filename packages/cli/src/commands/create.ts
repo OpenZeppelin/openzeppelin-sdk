@@ -58,7 +58,7 @@ const register: (program: any) => any = program =>
 
 async function commandActions(contractFullName: string, options: any) {
   const { skipCompile } = options;
-  if(!skipCompile) await compile();
+  if (!skipCompile) await compile();
 
   const {
     network: promptedNewtork,

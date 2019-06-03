@@ -52,7 +52,7 @@ export interface SolcBuild {
 class SolcjsCompiler implements SolcCompiler {
   public compiler: solc.Compiler;
 
-  constructor(compilerBinary: any) {
+  public constructor(compilerBinary: any) {
     this.compiler = solc(compilerBinary);
   }
 
@@ -68,7 +68,7 @@ class SolcjsCompiler implements SolcCompiler {
 class SolcBinCompiler implements SolcCompiler {
   public _version: string;
 
-  constructor(version: string) {
+  public constructor(version: string) {
     this._version = version;
   }
 
@@ -77,15 +77,21 @@ class SolcBinCompiler implements SolcCompiler {
   }
 
   public async compile(input: any): Promise<solc.CompilerOutput> {
-    const output = child.execSync('solc --standard-json', { input: JSON.stringify(input), env: SOLC_BIN_ENV });
+    const output = child.execSync('solc --standard-json', {
+      input: JSON.stringify(input),
+      env: SOLC_BIN_ENV,
+    });
     return JSON.parse(output.toString());
   }
 }
 
-export async function resolveCompilerVersion(requiredSemver: string | string[]): Promise<SolcBuild> {
+export async function resolveCompilerVersion(
+  requiredSemver: string | string[],
+): Promise<SolcBuild> {
   // Create an array with all unique semver restrictions (dropping initial 'v' if set manually by the user)
-  const requiredSemvers = uniq(compact(castArray(requiredSemver)))
-    .map(str => str.startsWith('v') ? str.slice(1) : str);
+  const requiredSemvers = uniq(compact(castArray(requiredSemver))).map(str =>
+    str.startsWith('v') ? str.slice(1) : str,
+  );
 
   // TODO: Pin the compiler release, so a new release does not cause all contracts to be recompiled and thus redeployed
   const solcList = await getAvailableCompilerVersions();
@@ -110,13 +116,17 @@ export async function fetchCompiler(build: SolcBuild): Promise<SolcCompiler> {
   return new SolcjsCompiler(compilerBinary);
 }
 
-export async function getCompiler(requiredSemver: string | string[]): Promise<SolcCompiler> {
+export async function getCompiler(
+  requiredSemver: string | string[],
+): Promise<SolcCompiler> {
   const version = await resolveCompilerVersion(requiredSemver);
   return fetchCompiler(version);
 }
 
 async function localCompilerVersion(): Promise<string | void> {
-  const output = await tryAwait(() => child.exec('solc --version', { env: SOLC_BIN_ENV }));
+  const output = await tryAwait(() =>
+    child.exec('solc --version', { env: SOLC_BIN_ENV }),
+  );
   if (!output) return null;
   const match = output.stdout.match(/^Version: ([^\s]+)/m);
   if (!match) return null;
@@ -126,8 +136,11 @@ async function localCompilerVersion(): Promise<string | void> {
 async function getAvailableCompilerVersions(): Promise<SolcList> {
   const localPath = path.join(SOLC_CACHE_PATH, 'list.json');
   mkdirpSync(SOLC_CACHE_PATH);
-  if (fs.existsSync(localPath)
-    && (Date.now() - (+fs.statSync(localPath).mtime)) < SOLC_LIST_EXPIRES_IN_SECONDS * 1000) {
+  if (
+    fs.existsSync(localPath) &&
+    Date.now() - +fs.statSync(localPath).mtime <
+      SOLC_LIST_EXPIRES_IN_SECONDS * 1000
+  ) {
     return readJsonSync(localPath);
   }
 
@@ -136,7 +149,7 @@ async function getAvailableCompilerVersions(): Promise<SolcList> {
     const list = response.data as SolcList;
     writeJsonSync(localPath, list);
     return list;
-  } catch(err) {
+  } catch (err) {
     if (fs.existsSync(localPath)) {
       log.warn(`Error downloading solc releases list, using cached version`);
       return readJsonSync(localPath);
@@ -146,11 +159,13 @@ async function getAvailableCompilerVersions(): Promise<SolcList> {
   }
 }
 
-async function getCompilerVersion(requiredSemvers: string[], solcList: SolcList): Promise<SolcBuild> {
+async function getCompilerVersion(
+  requiredSemvers: string[],
+  solcList: SolcList,
+): Promise<SolcBuild> {
   // Returns build from list given a version
-  const getBuild = (version: string) => (
-    solcList.builds.find(build => build.path === solcList.releases[version])
-  );
+  const getBuild = (version: string) =>
+    solcList.builds.find(build => build.path === solcList.releases[version]);
 
   // Return latest release if there are no restrictions
   if (requiredSemvers.length === 0) return getBuild(solcList.latestRelease);
@@ -163,12 +178,15 @@ async function getCompilerVersion(requiredSemvers: string[], solcList: SolcList)
 
   // If user asked for a specific version, look for it
   if (requiredSemvers.length === 1) {
-    const build = reverse(solcList.builds)
-      .find(b => b.path.startsWith(`soljson-v${requiredSemvers[0]}`));
+    const build = reverse(solcList.builds).find(b =>
+      b.path.startsWith(`soljson-v${requiredSemvers[0]}`),
+    );
     if (build) return build;
   }
 
-  throw new Error(`Could not find a compiler that matches required versions (${comparatorSet})`);
+  throw new Error(
+    `Could not find a compiler that matches required versions (${comparatorSet})`,
+  );
 }
 
 async function downloadCompiler(build: SolcBuild, localFile: string) {
@@ -178,9 +196,15 @@ async function downloadCompiler(build: SolcBuild, localFile: string) {
   const { data: compilerSource } = await axios.get(url);
 
   // Verify checksum
-  const hash = '0x' + require('ethereumjs-util').keccak256(compilerSource).toString('hex');
+  const hash =
+    '0x' +
+    require('ethereumjs-util')
+      .keccak256(compilerSource)
+      .toString('hex');
   if (hash !== keccak256) {
-    throw new Error(`Checksum of compiler downloaded from ${url} does not match (expected ${keccak256} but got ${hash})`);
+    throw new Error(
+      `Checksum of compiler downloaded from ${url} does not match (expected ${keccak256} but got ${hash})`,
+    );
   }
 
   // Cache downloaded source
@@ -196,17 +220,21 @@ export function getCompilerBinary(compilerPath: string) {
 
   Module._extensions['.js'] = function(
     module: NodeJS.Module,
-    filename: string
+    filename: string,
   ) {
     const content = fs.readFileSync(filename, 'utf8');
     Object.getPrototypeOf(module)._compile.call(module, content, filename);
   };
-
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
   const loadedSolc = require(compilerPath);
   Module._extensions['.js'] = previousHook;
   return loadedSolc;
 }
 
 // Used for tests
-export function setSolcCachePath(value) { SOLC_CACHE_PATH = value; }
-export function setSolcBinEnv(value) { SOLC_BIN_ENV = value; }
+export function setSolcCachePath(value) {
+  SOLC_CACHE_PATH = value;
+}
+export function setSolcBinEnv(value) {
+  SOLC_BIN_ENV = value;
+}

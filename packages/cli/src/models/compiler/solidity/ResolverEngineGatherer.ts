@@ -17,7 +17,7 @@ interface ImportTreeNode extends ImportFile {
   // uri and url the same as in rest of resolver-engine
   // it might mean github:user/repo/path.sol and raw link
   // or it might mean relative vs absolute file path
-  imports: Array<{ uri: string; url: string }>;
+  imports: { uri: string; url: string }[];
 }
 
 /**
@@ -39,7 +39,10 @@ async function gatherDepenencyTree(
    * @param file File in a depedency that should now be traversed
    * @returns An absolute path for the requested file
    */
-  async function dfs(file: { searchCwd: string; uri: string }): Promise<string> {
+  async function dfs(file: {
+    searchCwd: string;
+    uri: string;
+  }): Promise<string> {
     const url = await resolver.resolve(file.uri, file.searchCwd);
     if (alreadyImported.has(url)) {
       return url;
@@ -51,7 +54,11 @@ async function gatherDepenencyTree(
 
     const foundImportURIs = getImports(resolvedFile.source);
 
-    const fileNode: ImportTreeNode = { uri: file.uri, imports: [], ...resolvedFile };
+    const fileNode: ImportTreeNode = {
+      uri: file.uri,
+      imports: [],
+      ...resolvedFile,
+    };
 
     const resolvedCwd = pathSys.dirname(url);
     for (const importUri of foundImportURIs) {
@@ -63,7 +70,9 @@ async function gatherDepenencyTree(
     return resolvedFile.url;
   }
 
-  await Promise.all(roots.map(what => dfs({ searchCwd: workingDir, uri: what })));
+  await Promise.all(
+    roots.map(what => dfs({ searchCwd: workingDir, uri: what })),
+  );
 
   return result;
 }
@@ -86,7 +95,7 @@ export async function gatherSources(
   resolver: ResolverEngine<ImportFile>,
 ): Promise<ImportFile[]> {
   const result: ImportFile[] = [];
-  const queue: Array<{ cwd: string; file: string; relativeTo: string }> = [];
+  const queue: { cwd: string; file: string; relativeTo: string }[] = [];
   const alreadyImported = new Set();
 
   if (workingDir !== '') {
@@ -99,8 +108,12 @@ export async function gatherSources(
     alreadyImported.add(absWhat);
   }
   while (queue.length > 0) {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const fileData = queue.shift()!;
-    const resolvedFile: ImportFile = await resolver.require(fileData.file, fileData.cwd);
+    const resolvedFile: ImportFile = await resolver.require(
+      fileData.file,
+      fileData.cwd,
+    );
     const foundImports = getImports(resolvedFile.source);
 
     // if imported path starts with '.' we assume it's relative and return it's
@@ -109,10 +122,18 @@ export async function gatherSources(
     let relativePath: string;
     if (fileData.file[0] === '.') {
       relativePath = urlSys.resolve(fileData.relativeTo, fileData.file);
-      result.push({ url: relativePath, source: resolvedFile.source, provider: resolvedFile.provider });
+      result.push({
+        url: relativePath,
+        source: resolvedFile.source,
+        provider: resolvedFile.provider,
+      });
     } else {
       relativePath = fileData.file;
-      result.push({ url: relativePath, source: resolvedFile.source, provider: resolvedFile.provider });
+      result.push({
+        url: relativePath,
+        source: resolvedFile.source,
+        provider: resolvedFile.provider,
+      });
     }
 
     const fileParentDir = pathSys.dirname(resolvedFile.url);
@@ -125,7 +146,11 @@ export async function gatherSources(
       }
       if (!alreadyImported.has(importName)) {
         alreadyImported.add(importName);
-        queue.push({ cwd: fileParentDir, file: foundImport, relativeTo: relativePath });
+        queue.push({
+          cwd: fileParentDir,
+          file: foundImport,
+          relativeTo: relativePath,
+        });
       }
     }
   }
@@ -147,7 +172,9 @@ export async function gatherSourcesAndCanonizeImports(
   resolver: ResolverEngine<ImportFile>,
 ): Promise<ImportFile[]> {
   function canonizeFile(file: ImportTreeNode) {
-    file.imports.forEach(i => (file.source = file.source.replace(i.uri, i.url)));
+    file.imports.forEach(
+      i => (file.source = file.source.replace(i.uri, i.url)),
+    );
   }
 
   const sources = await gatherDepenencyTree(roots, workingDir, resolver);

@@ -5,5 +5,5 @@ const exec = util.promisify(child.exec);
 
 export default {
   exec,
-  execSync: child.execSync
+  execSync: child.execSync,
 };

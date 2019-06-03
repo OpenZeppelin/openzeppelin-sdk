@@ -33,7 +33,7 @@ async function action(contractNames: string[], options: any): Promise<void> {
   const { skipCompile, all, interactive } = options;
   ConfigManager.initStaticConfiguration();
 
-  if(!skipCompile) await compile();
+  if (!skipCompile) await compile();
 
   if (all) addAll({});
   else {
