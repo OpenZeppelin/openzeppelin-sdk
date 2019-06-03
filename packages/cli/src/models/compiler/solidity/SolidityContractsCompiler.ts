@@ -1,4 +1,4 @@
-import _ from 'lodash';
+import flatMap from 'lodash.flatmap';
 import { Logger } from 'zos-lib';
 import solc from 'solc-wrapper';
 import {
@@ -163,7 +163,7 @@ class SolidityContractsCompiler {
     solcOutput: solc.CompilerOutput,
   ): CompiledContract[] {
     const paths = Object.keys(solcOutput.contracts);
-    return _.flatMap(paths, fileName => {
+    return flatMap(paths, (fileName: string) => {
       const contractNames = Object.keys(solcOutput.contracts[fileName]);
       return contractNames.map(contractName =>
         this._buildContractSchema(solcOutput, fileName, contractName),

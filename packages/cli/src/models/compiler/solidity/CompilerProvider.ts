@@ -13,6 +13,7 @@ import path from 'path';
 import child from '../../../utils/child';
 import { tryAwait } from '../../../utils/try';
 import { compilerVersionsMatch } from '../../../utils/solidity';
+import { keccak256 } from 'ethereumjs-util';
 
 const log = new Logger('CompilerProvider');
 
@@ -154,7 +155,8 @@ async function getAvailableCompilerVersions(): Promise<SolcList> {
       log.warn(`Error downloading solc releases list, using cached version`);
       return readJsonSync(localPath);
     } else {
-      throw new Error(`Could not retrieve solc releases list: ${err.message}`);
+      err.message = `Could not retrieve solc releases list: ${err.message}`;
+      throw err;
     }
   }
 }
@@ -190,20 +192,16 @@ async function getCompilerVersion(
 }
 
 async function downloadCompiler(build: SolcBuild, localFile: string) {
-  const { version, keccak256, path: versionPath } = build;
+  const { version, keccak256: expectedHash, path: versionPath } = build;
   log.info(`Downloading compiler version ${version}`);
   const url = `https://solc-bin.ethereum.org/bin/${versionPath}`;
   const { data: compilerSource } = await axios.get(url);
 
   // Verify checksum
-  const hash =
-    '0x' +
-    require('ethereumjs-util')
-      .keccak256(compilerSource)
-      .toString('hex');
-  if (hash !== keccak256) {
+  const hash = '0x' + keccak256(compilerSource).toString('hex');
+  if (hash !== expectedHash) {
     throw new Error(
-      `Checksum of compiler downloaded from ${url} does not match (expected ${keccak256} but got ${hash})`,
+      `Checksum of compiler downloaded from ${url} does not match (expected ${expectedHash} but got ${hash})`,
     );
   }
 

@@ -30,14 +30,12 @@ export function compilerSettingsMatch(
 ) {
   if (!s1 || !s2) return false;
 
-  /* tslint:disable:triple-equals */
   return (
     s1.evmVersion === s2.evmVersion &&
     ((!s1.optimizer && !s2.optimizer) ||
       (s1.optimizer.enabled == s2.optimizer.enabled &&
         s1.optimizer.runs == s2.optimizer.runs))
   );
-  /* tslint:enable:triple-equals */
 }
 
 export function getImports(source: string): string[] {

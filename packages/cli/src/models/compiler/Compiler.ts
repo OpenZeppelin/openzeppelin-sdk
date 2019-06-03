@@ -1,4 +1,4 @@
-import { execFile, ExecException } from 'child_process';
+import { execFile as callbackExecFile, ExecException } from 'child_process';
 import { Logger } from 'zos-lib';
 import Truffle from '../initializer/truffle/Truffle';
 import {
@@ -7,9 +7,11 @@ import {
 } from './solidity/SolidityProjectCompiler';
 import findUp from 'find-up';
 import ZosPackageFile from '../files/ZosPackageFile';
+import { promisify } from 'util';
 
 const log = new Logger('Compiler');
 const state = { alreadyCompiled: false };
+const execFile = promisify(callbackExecFile);
 
 export async function compile(
   compilerOptions?: ProjectCompilerOptions,
@@ -34,9 +36,10 @@ export async function compile(
     manager === 'truffle' || (!manager && Truffle.isTruffleProject());
 
   // Compile! We use the exports syntax so we can stub them out during tests (nasty, but works!)
+  const { compileWithTruffle, compileWithSolc } = exports;
   const compilePromise = useTruffle
-    ? exports.compileWithTruffle()
-    : exports.compileWithSolc(compilerOptions);
+    ? compileWithTruffle()
+    : compileWithSolc(compilerOptions);
   await compilePromise;
 
   // If compiled successfully, write back compiler settings to zos.json to persist them
@@ -61,27 +64,26 @@ export async function compileWithTruffle(): Promise<void> {
   const truffleBin: string =
     findUp.sync('node_modules/.bin/truffle') || 'truffle';
 
-  return new Promise((resolve, reject) => {
+  let stdout: string, stderr: string;
+  try {
     const args: object = { shell: true };
-    execFile(
+    ({ stdout, stderr } = await execFile(
       truffleBin,
       ['compile', '--all'],
       args,
-      (error: ExecException, stdout, stderr) => {
-        if (error) {
-          if (error.code === 127)
-            console.error(
-              'Could not find truffle executable. Please install it by running: npm install truffle',
-            );
-          reject(error);
-        } else {
-          resolve();
-        }
-        if (stdout) console.log(stdout);
-        if (stderr) console.error(stderr);
-      },
-    );
-  });
+    ));
+  } catch (error) {
+    if (error.code === 127) {
+      log.error(
+        'Could not find truffle executable. Please install it by running: npm install truffle',
+      );
+      ({ stdout, stderr } = error);
+      throw error;
+    }
+  } finally {
+    if (stdout) console.log(stdout);
+    if (stderr) console.log(stderr);
+  }
 }
 
 // Used for tests
