@@ -9,7 +9,7 @@ import { toChecksumAddress } from 'web3-utils';
 const log: Logger = new Logger('ZWeb3');
 
 // Reference: see https://github.com/ethereum/EIPs/blob/master/EIPS/eip-155.md#list-of-chain-ids
-const NETWORKS = {
+export const NETWORKS = {
   1: 'mainnet',
   2: 'morden',
   3: 'ropsten',
@@ -150,8 +150,12 @@ export default class ZWeb3 {
     return ZWeb3.eth().net.getId();
   }
 
-  public static async getNetworkName(): Promise<string> {
+  public static async getNetworkName(providedNetworkId?: string | number): Promise<string | never> {
     const networkId = await ZWeb3.getNetwork();
+    if (providedNetworkId !== undefined && providedNetworkId !== '*' && Number(networkId) !== Number(providedNetworkId)) {
+      throw Error(`Invalid network id ${providedNetworkId}`);
+    }
+
     return NETWORKS[networkId] || `dev-${networkId}`;
   }
 
