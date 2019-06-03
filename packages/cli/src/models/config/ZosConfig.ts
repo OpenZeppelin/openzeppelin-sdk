@@ -17,15 +17,15 @@ interface Config {
   compilers?: CompilersInfo;
 }
 
-interface NetworkCamel<T> {
+interface NetworkCamelCase<T> {
   networkId: T;
 }
 
-interface NetworkSnake<T> {
+interface NetworkSnakeCase<T> {
   network_id: T;
 }
 
-type NetworkId<T> = NetworkCamel<T> | NetworkSnake<T> | (NetworkCamel<T> & NetworkSnake<T>);
+type NetworkId<T> = NetworkCamelCase<T> | NetworkSnakeCase<T> | (NetworkCamelCase<T> & NetworkSnakeCase<T>);
 
 type Network = {
   host: string;
@@ -47,29 +47,29 @@ type Provider = string | ((any) => any);
 // TODO: remove after managing compiler info in zos.json
 type CompilersInfo = any;
 
-export default class ZosConfig {
-  public initialize(root: string = process.cwd()): void {
+const ZosConfig = {
+  initialize(root: string = process.cwd()): void {
     this.createContractsDir(root);
     this.createZosConfigFile(root);
-  }
+  },
 
-  public exists(root: string = process.cwd()): boolean {
+  exists(root: string = process.cwd()): boolean {
     return FileSystem.exists(`${root}/networks.js`);
-  }
+  },
 
-  public getConfig(root: string = process.cwd()): Config {
+  getConfig(root: string = process.cwd()): Config {
     const zosConfigFile = require(`${root}/networks.js`);
     const compilers = zosConfigFile.compilers || this.getDefaultCompilersProperties();
     const buildDir = `${root}/build/contracts`;
 
     return { ...zosConfigFile, compilers, buildDir };
-  }
+  },
 
-  public getBuildDir(): string {
+  getBuildDir(): string {
     return `${process.cwd()}/build/contracts`;
-  }
+  },
 
-  public loadNetworkConfig(networkName: string, root: string = process.cwd()): NetworkConfig {
+  loadNetworkConfig(networkName: string, root: string = process.cwd()): NetworkConfig {
     const config = this.getConfig(root);
     const { networks } = config;
     if (!networks[networkName]) throw Error(`Given network '${networkName}' is not defined in your networks.js file`);
@@ -84,9 +84,9 @@ export default class ZosConfig {
       provider,
       artifactDefaults,
     };
-  }
+  },
 
-  private getProvider(network: any): Provider {
+  getProvider(network: any): Provider {
     let { provider } = network;
 
     if (!provider) {
@@ -99,17 +99,17 @@ export default class ZosConfig {
     }
 
     return provider;
-  }
+  },
 
-  private getArtifactDefaults(zosConfigFile: Config, network: Network): ArtifactDefaults {
+  getArtifactDefaults(zosConfigFile: Config, network: Network): ArtifactDefaults {
     const defaults = ['gas', 'gasPrice', 'from'];
     const configDefaults = omit(pick(zosConfigFile, defaults), isUndefined);
     const networkDefaults = omit(pick(network, defaults), isUndefined);
 
     return { ...configDefaults, ...networkDefaults };
-  }
+  },
 
-  private getDefaultCompilersProperties(): CompilersInfo {
+  getDefaultCompilersProperties(): CompilersInfo {
     return {
       vyper: {},
       solc: {
@@ -121,24 +121,26 @@ export default class ZosConfig {
         }
       }
     };
-  }
+  },
 
-  private createContractsDir(root: string): void {
+  createContractsDir(root: string): void {
     const contractsDir = `${root}/contracts`;
     this.createDir(contractsDir);
-  }
+  },
 
-  private createZosConfigFile(root: string): void {
+  createZosConfigFile(root: string): void {
     if (!this.exists(root)) {
       const blueprint = path.resolve(__dirname, './blueprint.networks.js');
       FileSystem.copy(blueprint, `${root}/networks.js`);
     }
-  }
+  },
 
-  private createDir(dir: string): void {
+  createDir(dir: string): void {
     if (!FileSystem.exists(dir)) {
       FileSystem.createDir(dir);
       FileSystem.write(`${dir}/.gitkeep`, '');
     }
   }
-}
+};
+
+export default ZosConfig;

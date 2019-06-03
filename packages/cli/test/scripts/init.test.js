@@ -7,7 +7,7 @@ import { cleanup } from '../helpers/cleanup'
 
 import init from '../../src/scripts/init'
 import ZosPackageFile from '../../src/models/files/ZosPackageFile'
-import ZosConfig from '../../src/models/config/ZosConfig'
+import ConfigManager from '../../src/models/config/ConfigManager'
 
 contract('init script', function() {
   const name = 'MyApp';
@@ -16,8 +16,7 @@ contract('init script', function() {
 
   before('create tmp dir and stub ZosConfig#initialize', function () {
     fs.createDir(tmpDir)
-    this.zosConfigInitialize = ZosConfig.prototype.initialize;
-    sinon.stub(ZosConfig.prototype, 'initialize').returns();
+    sinon.stub(ConfigManager, 'initialize').returns();
   });
 
   after('cleanup tmp dir', function() {

@@ -5,8 +5,6 @@ import sinon from 'sinon';
 import { FileSystem, Contracts, ZWeb3 } from 'zos-lib';
 
 import ConfigManager from '../../src/models/config/ConfigManager';
-import ZosConfig from '../../src/models/config/ZosConfig';
-import Truffle from '../../src/models/config/Truffle';
 
 const expectToBehaveLikeConfig = (configFileDir) => {
   describe('functions', function() {
@@ -81,10 +79,8 @@ describe('ConfigManager', function() {
     expectToBehaveLikeConfig(configFileDir);
 
     it('throws if provided network id is not correct', async function() {
-      if (configFileName === 'truffle.js') {
-        await ConfigManager.initNetworkConfiguration({ network: 'invalid' }, true, configFileDir)
-          .should.be.rejectedWith(/Unexpected network ID: requested -39/);
-      }
+      await ConfigManager.initNetworkConfiguration({ network: 'invalid' }, true, configFileDir)
+        .should.be.rejectedWith(/Unexpected network ID: requested -39/);
     });
 
     it('calls the correct config loader', async function() {
@@ -95,7 +91,7 @@ describe('ConfigManager', function() {
     describe('#setBaseConfig', function() {
       it('sets the correct config', function() {
         ConfigManager.setBaseConfig(configFileDir);
-        ConfigManager.config.constructor.name.should.eq('ZosConfig');
+        ConfigManager.config.should.have.property('createZosConfigFile');
       });
     });
   });
@@ -125,7 +121,7 @@ describe('ConfigManager', function() {
     describe('#setBaseConfig', function() {
       it('sets the correct config', function() {
         ConfigManager.setBaseConfig(configFileDir);
-        ConfigManager.config.constructor.name.should.eq('Truffle');
+        ConfigManager.config.should.have.property('isTruffleProject')
       });
     });
   });

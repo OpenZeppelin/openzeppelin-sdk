@@ -9,6 +9,12 @@ import ZosConfig from './ZosConfig';
 }
 
 const ConfigManager = {
+  initialize(root: string = process.cwd()): void {
+    if(!TruffleConfig.exists() && !ZosConfig.exists()) {
+      ZosConfig.createZosConfigFile(root);
+    }
+  },
+
   initStaticConfiguration(root: string = process.cwd()): void {
     this.setBaseConfig(root);
     const buildDir = this.config.getBuildDir();
@@ -65,12 +71,10 @@ const ConfigManager = {
     if (this.config) return;
 
     // these lines could be expanded to support different libraries like embark, ethjs, buidler, etc
-    const zosConfig = new ZosConfig();
-    const truffleConfig = new TruffleConfig();
-    if (zosConfig.exists(root)) {
-      this.config = zosConfig;
-    } else if (truffleConfig.existsTruffleConfig(root)) {
-      this.config = truffleConfig;
+    if (ZosConfig.exists(root)) {
+      this.config = ZosConfig;
+    } else if (TruffleConfig.exists(root)) {
+      this.config = TruffleConfig;
     } else {
       throw Error('Could not find networks.js file, please remember to initialize your project.');
     }

@@ -4,45 +4,44 @@ import npm from 'npm-programmatic';
 import sinon from 'sinon'
 
 import { FileSystem } from 'zos-lib'
-import Truffle from '../../src/models/config/Truffle'
+import TruffleConfig from '../../src/models/config/TruffleConfig'
 import CaptureLogs from '../helpers/captureLogs'
 
-contract('Truffle', () => {
+contract('TruffleConfig', () => {
   const testDir = `${process.cwd()}/test/tmp`
   
   beforeEach('create test dir', function () {
     FileSystem.createDir(testDir)
-    this.truffleConfig = new Truffle();
   })
 
   afterEach('remove test dir', function () {
     FileSystem.removeTree(testDir)
   })
 
-  describe('existsTruffleConfig', function () {
+  describe('exists', function () {
     it('returns true when there is a truffle.js file', function () {
       FileSystem.write(`${testDir}/truffle.js`, 'dummy')
 
-      this.truffleConfig.existsTruffleConfig(testDir).should.be.true
+      TruffleConfig.exists(testDir).should.be.true
     })
 
     it('returns true when there is a truffle-config.js file', function () {
       FileSystem.write(`${testDir}/truffle-config.js`, 'dummy')
 
-      this.truffleConfig.existsTruffleConfig(testDir).should.be.true
+      TruffleConfig.exists(testDir).should.be.true
     })
 
     it('returns true when there are both truffle config files', function () {
       FileSystem.write(`${testDir}/truffle.js`, 'dummy')
       FileSystem.write(`${testDir}/truffle-config.js`, 'dummy')
 
-      this.truffleConfig.existsTruffleConfig(testDir).should.be.true
+      TruffleConfig.exists(testDir).should.be.true
     })
 
     it('returns false when there is no truffle config file', function () {
       FileSystem.write(`${testDir}/bla.js`, 'dummy')
 
-      this.truffleConfig.existsTruffleConfig(testDir).should.be.false
+      TruffleConfig.exists(testDir).should.be.false
     })
   })
 
@@ -59,13 +58,13 @@ contract('Truffle', () => {
         })
 
         it('returns true', function () {
-          this.truffleConfig.isTruffleProject(testDir).should.be.true
+          TruffleConfig.isTruffleProject(testDir).should.be.true
         })
       })
 
       describe('when there is no truffle config file', function () {
         it('returns false', function () {
-          this.truffleConfig.isTruffleProject(testDir).should.be.false
+          TruffleConfig.isTruffleProject(testDir).should.be.false
         })
       })
     })
@@ -77,13 +76,13 @@ contract('Truffle', () => {
         })
 
         it('returns false', function () {
-          this.truffleConfig.isTruffleProject(testDir).should.be.false
+          TruffleConfig.isTruffleProject(testDir).should.be.false
         })
       })
 
       describe('when there is no truffle config file', function () {
         it('returns false', function () {
-          this.truffleConfig.isTruffleProject(testDir).should.be.false
+          TruffleConfig.isTruffleProject(testDir).should.be.false
         })
       })
     })
@@ -105,7 +104,7 @@ contract('Truffle', () => {
     context('when the requested network has default values', function () {
       beforeEach('create truffle config file', async function () {
         FileSystem.write(configFile, 'module.exports = { networks: { test: { gas: 1, gasPrice: 2, from: \'0x0\' } } }')
-        this.config = await this.truffleConfig.loadNetworkConfig('test', true)
+        this.config = await TruffleConfig.loadNetworkConfig('test', true)
       })
 
       it('uses network default gas, gas price and from values', function () {
@@ -121,10 +120,10 @@ contract('Truffle', () => {
     context('when the requested network does not have default values', function () {
       beforeEach('create truffle config file', async function () {
         FileSystem.write(configFile, 'module.exports = { networks: { test: { } } }')
-        this.config = await this.truffleConfig.loadNetworkConfig('test', true)
+        this.config = await TruffleConfig.loadNetworkConfig('test', true)
       })
 
-      it('uses Truffle default gas price', function () {
+      it('uses TruffleConfig default gas price', function () {
         const { artifactDefaults } = this.config
 
         artifactDefaults.should.have.all.keys('gasPrice')
@@ -134,7 +133,7 @@ contract('Truffle', () => {
 
     context('when using truffle-hdwallet-provider', function () {
       beforeEach(async function () {
-        sinon.stub(Truffle.prototype, 'getConfig').returns({ networks: { test: {} }, provider: { constructor: { name: 'HDWalletProvider' } } })
+        sinon.stub(TruffleConfig, 'getConfig').returns({ networks: { test: {} }, provider: { constructor: { name: 'HDWalletProvider' } } })
         sinon.stub(npm, 'list').resolves(['truffle-hdwallet-provider@0.0.6'])
         this.logs = new CaptureLogs()
       })
@@ -145,7 +144,7 @@ contract('Truffle', () => {
       })
 
       it('logs a warning message', async function () {
-        await this.truffleConfig.loadNetworkConfig('test', true)
+        await TruffleConfig.loadNetworkConfig('test', true)
         this.logs.warns.should.have.lengthOf(1)
         this.logs.warns[0].should.match(/Version 0.0.6 of truffle-hdwallet-provider might fail when deploying multiple contracts. /)
       })
