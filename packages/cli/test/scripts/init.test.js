@@ -4,19 +4,28 @@ require('../setup');
 import { FileSystem as fs } from 'zos-lib';
 import { cleanup, cleanupfn } from '../helpers/cleanup';
 
-import init from '../../src/scripts/init';
-import ZosPackageFile from '../../src/models/files/ZosPackageFile';
+import init from '../../src/scripts/init'
+import ZosPackageFile from '../../src/models/files/ZosPackageFile'
+import ZosConfig from '../../src/models/config/ZosConfig'
 
 contract('init script', function() {
   const name = 'MyApp';
   const version = '0.3.0';
   const tmpDir = 'test/tmp';
 
-  before('create tmp dir', () => fs.createDir(tmpDir));
-  after('cleanup tmp dir', cleanupfn(tmpDir));
+  before('create tmp dir', function () {
+    fs.createDir(tmpDir)
+    this.zosConfigInitialize = ZosConfig.prototype.initialize;
+    ZosConfig.prototype.initialize = () => {};
+  });
+
+  after('cleanup tmp dir and networks.js', function() {
+    cleanupfn(tmpDir);
+    ZosConfig.prototype.initalize = this.zosConfigInitialize;
+  });
 
   beforeEach('create package file', async function() {
-    this.packageFile = new ZosPackageFile(`${tmpDir}/zos.json`);
+    this.packageFile = new ZosPackageFile(`${tmpDir}/zos.json`)
   });
 
   it('should default to unpublished apps', async function() {
