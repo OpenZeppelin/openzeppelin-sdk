@@ -46,9 +46,7 @@ async function action(options: any): Promise<void> {
       { opts: { network: networkInOpts }, props: getCommandProps() },
       interactive,
     );
-    const {
-      network,
-    } = await ConfigManager.initNetworkConfiguration(
+    const { network } = await ConfigManager.initNetworkConfiguration(
       promptedNetwork,
       true,
     );

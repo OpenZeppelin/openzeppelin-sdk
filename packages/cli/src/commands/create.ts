@@ -9,7 +9,13 @@ import Compiler from '../models/compiler/Compiler';
 import { fromContractFullName } from '../utils/naming';
 import { hasToMigrateProject } from '../prompts/migrations';
 import ConfigManager from '../models/config/ConfigManager';
-import { promptIfNeeded, networksList, contractsList, methodsList, argsList } from '../prompts/prompt';
+import {
+  promptIfNeeded,
+  networksList,
+  contractsList,
+  methodsList,
+  argsList,
+} from '../prompts/prompt';
 import promptForMethodParams from '../prompts/method-params';
 import { ProxyType } from '../scripts/interfaces';
 
@@ -58,10 +64,7 @@ async function commandActions(contractFullName: string, options: any) {
     network: promptedNewtork,
     contractFullName: promptedContractFullName,
   } = await promptForCreate(contractFullName, options);
-  const {
-    network,
-    txParams,
-  } = await ConfigManager.initNetworkConfiguration({
+  const { network, txParams } = await ConfigManager.initNetworkConfiguration({
     ...options,
     network: promptedNewtork,
   });

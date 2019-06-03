@@ -52,10 +52,9 @@ const register: (program: any) => any = program =>
     .action(action);
 
 async function action(contractFullName: string, options: any): Promise<void> {
-  const {
-    network,
-    txParams,
-  } = await ConfigManager.initNetworkConfiguration(options);
+  const { network, txParams } = await ConfigManager.initNetworkConfiguration(
+    options,
+  );
   if (!(await hasToMigrateProject(network))) process.exit(0);
   if (!options.salt) throw new Error("option `--salt' is required");
 

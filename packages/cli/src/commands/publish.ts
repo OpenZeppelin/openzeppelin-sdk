@@ -32,10 +32,9 @@ async function action(options: any): Promise<void> {
     { opts, defaults, props },
     interactive,
   );
-  const {
-    network,
-    txParams,
-  } = await ConfigManager.initNetworkConfiguration(promptedOpts);
+  const { network, txParams } = await ConfigManager.initNetworkConfiguration(
+    promptedOpts,
+  );
   if (!(await hasToMigrateProject(network))) process.exit(0);
 
   await publish({ network, txParams });

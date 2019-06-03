@@ -40,11 +40,7 @@ const register: (program: any) => any = program =>
 async function action(options: any): Promise<void> {
   const { interactive, to: proxyAddress } = options;
   const networkOpts = await promptForNetwork(options, () => getCommandProps());
-<<<<<<< HEAD
-  const {
-    network,
-    txParams,
-  } = await ConfigVariablesInitializer.initNetworkConfiguration({
+  const { network, txParams } = await ConfigManager.initNetworkConfiguration({
     ...options,
     ...networkOpts,
   });

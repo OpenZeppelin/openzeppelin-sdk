@@ -53,10 +53,7 @@ async function commandActions(
   const { network: promptedNetwork } = await promptForNetwork(options, () =>
     getCommandProps(),
   );
-  const {
-    network,
-    txParams,
-  } = await ConfigManager.initNetworkConfiguration({
+  const { network, txParams } = await ConfigManager.initNetworkConfiguration({
     ...options,
     network: promptedNetwork,
   });

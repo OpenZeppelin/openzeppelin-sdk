@@ -42,9 +42,7 @@ async function action(options: any): Promise<void> {
     { opts: configOpts, props: configProps },
     interactive,
   );
-  const {
-    txParams,
-  } = await ConfigManager.initNetworkConfiguration(
+  const { txParams } = await ConfigManager.initNetworkConfiguration(
     promptedConfig,
     true,
   );

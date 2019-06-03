@@ -1,5 +1,9 @@
 import balance from '../scripts/balance';
-import { promptIfNeeded, networksList, InquirerQuestions } from '../prompts/prompt';
+import {
+  promptIfNeeded,
+  networksList,
+  InquirerQuestions,
+} from '../prompts/prompt';
 import ConfigManager from '../models/config/ConfigManager';
 import Session from '../models/network/Session';
 

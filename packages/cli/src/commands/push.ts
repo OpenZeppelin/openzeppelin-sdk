@@ -10,7 +10,11 @@ import { fromContractFullName } from '../utils/naming';
 import Dependency from '../models/dependency/Dependency';
 import ZosPackageFile from '../models/files/ZosPackageFile';
 import ConfigManager from '../models/config/ConfigManager';
-import { promptIfNeeded, networksList, InquirerQuestions } from '../prompts/prompt';
+import {
+  promptIfNeeded,
+  networksList,
+  InquirerQuestions,
+} from '../prompts/prompt';
 
 const name = 'push';
 const signature: string = name;
@@ -68,10 +72,7 @@ async function action(options: any): Promise<void> {
   if (!options.skipCompile) await Compiler.call();
 
   const prompted = await promptIfNeeded({ opts, defaults, props }, interactive);
-  const {
-    network,
-    txParams,
-  } = await ConfigManager.initNetworkConfiguration({
+  const { network, txParams } = await ConfigManager.initNetworkConfiguration({
     ...options,
     ...prompted,
   });

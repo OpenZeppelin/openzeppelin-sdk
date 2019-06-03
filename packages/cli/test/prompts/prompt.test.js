@@ -10,7 +10,6 @@ import { ContractMethodMutability as Mutability } from 'zos-lib';
 
 import ContractManager from '../../src/models/local/ContractManager';
 import ConfigManager from '../../src/models/config/ConfigManager';
-import LocalController from '../../src/models/local/LocalController';
 import ZosPackageFile from '../../src/models/files/ZosPackageFile';
 import {
   promptIfNeeded,
@@ -143,7 +142,9 @@ describe('prompt', function() {
 
     describe('#contractsList', function() {
       beforeEach('set stub and initialize', function() {
-        sinon.stub(ConfigManager, 'getContractNames').returns(['Foo', 'Bar', 'Buz']);
+        sinon
+          .stub(ContractManager.prototype, 'getContractNames')
+          .returns(['Foo', 'Bar', 'Buz']);
         sinon
           .stub(ZosPackageFile.prototype, 'dependencies')
           .get(() => ({ 'mock-stdlib': '1.1.0' }));

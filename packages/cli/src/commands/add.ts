@@ -3,7 +3,11 @@ import add from '../scripts/add';
 import addAll from '../scripts/add-all';
 import Compiler from '../models/compiler/Compiler';
 import ConfigManager from '../models/config/ConfigManager';
-import { promptIfNeeded, contractsList, InquirerQuestions } from '../prompts/prompt';
+import {
+  promptIfNeeded,
+  contractsList,
+  InquirerQuestions,
+} from '../prompts/prompt';
 import { fromContractFullName } from '../utils/naming';
 import ZosPackageFile from '../models/files/ZosPackageFile';
 

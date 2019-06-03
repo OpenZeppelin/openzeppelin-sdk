@@ -1,6 +1,11 @@
 import verify from '../scripts/verify';
 import ConfigManager from '../models/config/ConfigManager';
-import { promptIfNeeded, contractsList, networksList, InquirerQuestions } from '../prompts/prompt';
+import {
+  promptIfNeeded,
+  contractsList,
+  networksList,
+  InquirerQuestions,
+} from '../prompts/prompt';
 
 const name = 'verify';
 const signature = `${name} [contract-alias]`;
@@ -52,10 +57,9 @@ async function action(contractName: string, options: any): Promise<void> {
     { args, opts, defaults, props },
     interactive,
   );
-  const {
-    network,
-    txParams,
-  } = await ConfigManager.initNetworkConfiguration(prompted);
+  const { network, txParams } = await ConfigManager.initNetworkConfiguration(
+    prompted,
+  );
 
   await verify(prompted.contractName, { ...prompted, network, txParams });
   if (!options.dontExitProcess && process.env.NODE_ENV !== 'test')

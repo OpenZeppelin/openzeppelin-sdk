@@ -155,8 +155,7 @@ export function contractsList(
   const localPackageFile = new ZosPackageFile();
   const contractManager = new ContractManager(localPackageFile);
   const contractsFromBuild = contractManager.getContractNames();
-  const contractsFromLocal = Object
-    .keys(localPackageFile.contracts)
+  const contractsFromLocal = Object.keys(localPackageFile.contracts)
     .map(alias => ({ name: localPackageFile.contracts[alias], alias }))
     .map(({ name: contractName, alias }) => {
       const label =

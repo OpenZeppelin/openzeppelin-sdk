@@ -40,15 +40,20 @@ export default class ContractManager {
         .filter(name => name.match(/\.json$/))
         .map(name => FileSystem.parseJsonIfExists(`${buildDir}/${name}`))
         .filter(contract => {
-          return this.isLocalContract(buildDir, contract)
-            && !this.isLibrary(contract)
-            && !this.isAbstractContract(contract);
+          return (
+            this.isLocalContract(buildDir, contract) &&
+            !this.isLibrary(contract) &&
+            !this.isAbstractContract(contract)
+          );
         })
         .map(({ contractName }) => contractName);
     } else return [];
   }
 
-  private isLocalContract(buildDir: string, contract: { [key: string]: any }): boolean {
+  private isLocalContract(
+    buildDir: string,
+    contract: { [key: string]: any },
+  ): boolean {
     const projectDir = buildDir.replace('build/contracts', '');
     return contract.sourcePath.indexOf(projectDir) === 0;
   }
@@ -58,7 +63,14 @@ export default class ContractManager {
   }
 
   private isLibrary(contract: { [key: string]: any }): boolean {
-    return contract && contract.ast && !!contract.ast.nodes
-      .find(node => node.contractKind === 'library' && node.name === contract.contractName);
+    return (
+      contract &&
+      contract.ast &&
+      !!contract.ast.nodes.find(
+        node =>
+          node.contractKind === 'library' &&
+          node.name === contract.contractName,
+      )
+    );
   }
 }

@@ -25,10 +25,9 @@ const register: (program: any) => any = program =>
     .action(action);
 
 async function action(options: any): Promise<void> {
-  const {
-    network,
-    txParams,
-  } = await ConfigManager.initNetworkConfiguration(options);
+  const { network, txParams } = await ConfigManager.initNetworkConfiguration(
+    options,
+  );
 
   if (options.fix) await pull({ network, txParams });
   else if (options.fetch) await compare({ network, txParams });
