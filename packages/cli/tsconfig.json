@@ -11,6 +11,6 @@
     "./src"
   ],
   "exclude": [
-    "./src/models/initializer/truffle/blueprint.truffle.js"
+    "src/models/config/blueprint.networks.js"
   ]
 }

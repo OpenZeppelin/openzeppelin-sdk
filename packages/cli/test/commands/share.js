@@ -34,7 +34,7 @@ import ZosPackageFile from '../../src/models/files/ZosPackageFile';
 import Compiler from '../../src/models/compiler/Compiler';
 import Dependency from '../../src/models/dependency/Dependency';
 import ErrorHandler from '../../src/models/errors/ErrorHandler';
-import ConfigVariablesInitializer from '../../src/models/initializer/ConfigVariablesInitializer';
+import ConfigManager from '../../src/models/config/ConfigManager';
 
 program.Command.prototype.parseReset = function() {
   var self = this;
@@ -86,9 +86,9 @@ exports.stubCommands = function() {
       .stub(ErrorHandler.prototype, 'call')
       .callsFake(() => null);
     this.initializer = sinon
-      .stub(ConfigVariablesInitializer, 'initNetworkConfiguration')
+      .stub(ConfigManager, 'initNetworkConfiguration')
       .callsFake(function(options) {
-        ConfigVariablesInitializer.initStaticConfiguration();
+        ConfigManager.initStaticConfiguration();
         const { network, from } = Session.getOptions(options);
         const txParams = from ? { from } : {};
         return { network, txParams };

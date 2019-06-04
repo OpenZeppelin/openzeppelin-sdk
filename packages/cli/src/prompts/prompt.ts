@@ -10,7 +10,7 @@ import {
 } from 'zos-lib';
 
 import Session from '../models/network/Session';
-import Truffle from '../models/initializer/truffle/Truffle';
+import ConfigManager from '../models/config/ConfigManager';
 import ZosPackageFile from '../models/files/ZosPackageFile';
 import ContractManager from '../models/local/ContractManager';
 import Dependency from '../models/dependency/Dependency';
@@ -96,7 +96,7 @@ export function networksList(
   message?: string,
 ): { [key: string]: any } {
   message = message || 'Select a network from the network list';
-  const networks = Truffle.getNetworkNamesFromConfig();
+  const networks = ConfigManager.getNetworkNamesFromConfig();
 
   return inquirerQuestion(name, message, type, networks);
 }
@@ -153,7 +153,8 @@ export function contractsList(
   source?: string,
 ): { [key: string]: any } {
   const localPackageFile = new ZosPackageFile();
-  const contractsFromBuild = Truffle.getContractNames();
+  const contractManager = new ContractManager(localPackageFile);
+  const contractsFromBuild = contractManager.getContractNames();
   const contractsFromLocal = Object.keys(localPackageFile.contracts)
     .map(alias => ({ name: localPackageFile.contracts[alias], alias }))
     .map(({ name: contractName, alias }) => {

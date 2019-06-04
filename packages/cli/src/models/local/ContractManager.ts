@@ -1,6 +1,7 @@
-import { Contracts, Contract } from 'zos-lib';
+import { Contracts, Contract, FileSystem } from 'zos-lib';
 import Dependency from '../dependency/Dependency';
 import ZosPackageFile from '../files/ZosPackageFile';
+import ConfigManager from '../config/ConfigManager';
 
 export default class ContractManager {
   public packageFile: ZosPackageFile;
@@ -30,5 +31,46 @@ export default class ContractManager {
       const dependency = new Dependency(packageName);
       return !!dependency.getPackageFile().contract(contractAlias);
     }
+  }
+
+  public getContractNames(): string[] {
+    const buildDir = ConfigManager.getBuildDir();
+    if (FileSystem.exists(buildDir)) {
+      return FileSystem.readDir(buildDir)
+        .filter(name => name.match(/\.json$/))
+        .map(name => FileSystem.parseJsonIfExists(`${buildDir}/${name}`))
+        .filter(contract => {
+          return (
+            this.isLocalContract(buildDir, contract) &&
+            !this.isLibrary(contract) &&
+            !this.isAbstractContract(contract)
+          );
+        })
+        .map(({ contractName }) => contractName);
+    } else return [];
+  }
+
+  private isLocalContract(
+    buildDir: string,
+    contract: { [key: string]: any },
+  ): boolean {
+    const projectDir = buildDir.replace('build/contracts', '');
+    return contract.sourcePath.indexOf(projectDir) === 0;
+  }
+
+  private isAbstractContract(contract: { [key: string]: any }): boolean {
+    return contract && contract.bytecode.length <= 2;
+  }
+
+  private isLibrary(contract: { [key: string]: any }): boolean {
+    return (
+      contract &&
+      contract.ast &&
+      !!contract.ast.nodes.find(
+        node =>
+          node.contractKind === 'library' &&
+          node.name === contract.contractName,
+      )
+    );
   }
 }

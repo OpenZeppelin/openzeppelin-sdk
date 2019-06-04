@@ -9,7 +9,7 @@ import { toChecksumAddress } from 'web3-utils';
 const log: Logger = new Logger('ZWeb3');
 
 // Reference: see https://github.com/ethereum/EIPs/blob/master/EIPS/eip-155.md#list-of-chain-ids
-const NETWORKS = {
+export const NETWORKS = {
   1: 'mainnet',
   2: 'morden',
   3: 'ropsten',
@@ -39,18 +39,11 @@ export default class ZWeb3 {
 
   // TODO: this.web3 could be cached and initialized lazily?
   public static web3(forceReinit = false): any {
-    if (ZWeb3.web3instance && !forceReinit) {
-      return ZWeb3.web3instance;
-    }
+    if (ZWeb3.web3instance && !forceReinit) return ZWeb3.web3instance;
     if (!ZWeb3.provider) {
       ZWeb3.web3instance = new Web3();
       return ZWeb3.web3instance;
-    }
-    // TODO: improve provider validation for HttpProvider scenarios
-    ZWeb3.web3instance =
-      typeof ZWeb3.provider === 'string'
-        ? new Web3(new Web3.providers.HttpProvider(ZWeb3.provider))
-        : new Web3(ZWeb3.provider);
+    } else ZWeb3.web3instance = new Web3(ZWeb3.provider);
 
     return ZWeb3.web3instance;
   }
@@ -61,6 +54,13 @@ export default class ZWeb3 {
 
   public static isAddress(address: string): boolean {
     return Web3.utils.isAddress(address);
+  }
+
+  public static async checkNetworkId(providedNetworkId?: string | number): Promise<void | never> {
+    const networkId = await ZWeb3.getNetwork();
+    if (providedNetworkId !== undefined && providedNetworkId !== '*' && Number(networkId) !== Number(providedNetworkId)) {
+      throw Error(`Unexpected network ID: requested ${providedNetworkId} but connected to ${networkId}`);
+    }
   }
 
   public static eth(): Eth {

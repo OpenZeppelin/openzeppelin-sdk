@@ -6,7 +6,7 @@ import {
   InquirerQuestions,
 } from '../prompts/prompt';
 import { isValidUnit } from '../utils/units';
-import ConfigVariablesInitializer from '../models/initializer/ConfigVariablesInitializer';
+import ConfigManager from '../models/config/ConfigManager';
 
 const name = 'transfer';
 const signature: string = name;
@@ -42,9 +42,7 @@ async function action(options: any): Promise<void> {
     { opts: configOpts, props: configProps },
     interactive,
   );
-  const {
-    txParams,
-  } = await ConfigVariablesInitializer.initNetworkConfiguration(
+  const { txParams } = await ConfigManager.initNetworkConfiguration(
     promptedConfig,
     true,
   );

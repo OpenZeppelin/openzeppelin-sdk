@@ -8,8 +8,8 @@ import * as prompt from '../../src/prompts/prompt';
 import inquirer from 'inquirer';
 import { ContractMethodMutability as Mutability } from 'zos-lib';
 
-import Truffle from '../../src/models/initializer/truffle/Truffle';
-import LocalController from '../../src/models/local/LocalController';
+import ContractManager from '../../src/models/local/ContractManager';
+import ConfigManager from '../../src/models/config/ConfigManager';
 import ZosPackageFile from '../../src/models/files/ZosPackageFile';
 import {
   promptIfNeeded,
@@ -118,7 +118,7 @@ describe('prompt', function() {
     describe('#networksList', function() {
       beforeEach('set stub and initialize', function() {
         this.stub = sinon
-          .stub(Truffle, 'getNetworkNamesFromConfig')
+          .stub(ConfigManager, 'getNetworkNamesFromConfig')
           .returns(['Meinet', 'Rinkebay']);
       });
 
@@ -142,7 +142,9 @@ describe('prompt', function() {
 
     describe('#contractsList', function() {
       beforeEach('set stub and initialize', function() {
-        sinon.stub(Truffle, 'getContractNames').returns(['Foo', 'Bar', 'Buz']);
+        sinon
+          .stub(ContractManager.prototype, 'getContractNames')
+          .returns(['Foo', 'Bar', 'Buz']);
         sinon
           .stub(ZosPackageFile.prototype, 'dependencies')
           .get(() => ({ 'mock-stdlib': '1.1.0' }));

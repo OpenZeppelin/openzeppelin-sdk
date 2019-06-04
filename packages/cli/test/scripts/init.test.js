@@ -1,22 +1,31 @@
 'use strict';
 require('../setup');
 
-import { FileSystem as fs } from 'zos-lib';
-import { cleanup, cleanupfn } from '../helpers/cleanup';
+import sinon from 'sinon';
+import { FileSystem as fs } from 'zos-lib'
+import { cleanup } from '../helpers/cleanup'
 
-import init from '../../src/scripts/init';
-import ZosPackageFile from '../../src/models/files/ZosPackageFile';
+import init from '../../src/scripts/init'
+import ZosPackageFile from '../../src/models/files/ZosPackageFile'
+import ConfigManager from '../../src/models/config/ConfigManager'
 
 contract('init script', function() {
   const name = 'MyApp';
   const version = '0.3.0';
   const tmpDir = 'test/tmp';
 
-  before('create tmp dir', () => fs.createDir(tmpDir));
-  after('cleanup tmp dir', cleanupfn(tmpDir));
+  before('create tmp dir and stub ZosConfig#initialize', function () {
+    fs.createDir(tmpDir)
+    sinon.stub(ConfigManager, 'initialize').returns();
+  });
+
+  after('cleanup tmp dir', function() {
+    cleanup(tmpDir);
+    sinon.restore();
+  });
 
   beforeEach('create package file', async function() {
-    this.packageFile = new ZosPackageFile(`${tmpDir}/zos.json`);
+    this.packageFile = new ZosPackageFile(`${tmpDir}/zos.json`)
   });
 
   it('should default to unpublished apps', async function() {

@@ -1,4 +1,4 @@
 #!/bin/bash
 
-# blueprint.truffle.js
-cp src/models/initializer/truffle/blueprint.truffle.js lib/models/initializer/truffle/blueprint.truffle.js
+# blueprint.networks.js
+cp src/models/config/blueprint.networks.js lib/models/config/blueprint.networks.js

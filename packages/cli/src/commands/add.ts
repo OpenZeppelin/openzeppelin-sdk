@@ -1,9 +1,8 @@
 import push from './push';
 import add from '../scripts/add';
 import addAll from '../scripts/add-all';
-import Truffle from '../models/initializer/truffle/Truffle';
 import Compiler from '../models/compiler/Compiler';
-import ConfigVariablesInitializer from '../models/initializer/ConfigVariablesInitializer';
+import ConfigManager from '../models/config/ConfigManager';
 import {
   promptIfNeeded,
   contractsList,
@@ -31,7 +30,7 @@ const register: (program: any) => any = program =>
 
 async function action(contractNames: string[], options: any): Promise<void> {
   const { skipCompile, all, interactive } = options;
-  ConfigVariablesInitializer.initStaticConfiguration();
+  ConfigManager.initStaticConfiguration();
 
   if (!skipCompile) await Compiler.call();
 
