@@ -9,7 +9,7 @@ import sleep from './helpers/sleep';
 // utils
 import ABI from './utils/ABIs';
 import Semver from './utils/Semver';
-import Logger from './utils/Logger';
+import Logger, { Loggy, LogType, LogStatus } from './utils/Logger';
 import FileSystem from './utils/FileSystem';
 import Contracts from './artifacts/Contracts';
 import Contract, {
@@ -105,6 +105,9 @@ export {
   sleep,
   Proxy,
   Logger,
+  Loggy,
+  LogType,
+  LogStatus,
   ABI,
   Semver,
   FileSystem,
