@@ -1,6 +1,6 @@
 import { execFile as callbackExecFile, ExecException } from 'child_process';
 import { Logger } from 'zos-lib';
-import Truffle from '../initializer/truffle/Truffle';
+import Truffle from '../config/TruffleConfig';
 import {
   compileProject,
   ProjectCompilerOptions,

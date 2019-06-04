@@ -2,7 +2,7 @@ require('../../setup')
 
 import sinon from 'sinon';
 
-import Truffle from '../../../src/models/initializer/truffle/Truffle';
+import Truffle from '../../../src/models/config/TruffleConfig';
 import * as Compiler from '../../../src/models/compiler/Compiler';
 import ZosPackageFile from '../../../src/models/files/ZosPackageFile';
 

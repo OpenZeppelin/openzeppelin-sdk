@@ -81,7 +81,7 @@ exports.stubCommands = function() {
     this.sendTx = sinon.stub(sendTx, 'default');
     this.call = sinon.stub(call, 'default');
 
-    this.compiler = sinon.stub(Compiler, 'call');
+    this.compiler = sinon.stub(Compiler, 'compile');
     this.errorHandler = sinon
       .stub(ErrorHandler.prototype, 'call')
       .callsFake(() => null);
@@ -118,14 +118,14 @@ exports.itShouldParse = function(name, cmd, args, cb) {
     this[cmd].onFirstCall().callsFake(() => {
       let err;
       try {
-        cb(this[cmd])
-      } catch(e) {
+        cb(this[cmd]);
+      } catch (e) {
         err = e;
       }
-      done(err)
-    })
-    args = args.split(' ')
-    args.unshift('node')
-    program.parse(args)
-  })
-}
+      done(err);
+    });
+    args = args.split(' ');
+    args.unshift('node');
+    program.parse(args);
+  });
+};
