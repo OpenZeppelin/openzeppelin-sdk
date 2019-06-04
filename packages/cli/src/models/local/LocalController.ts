@@ -6,6 +6,7 @@ import {
   Contracts,
   Contract,
   Logger,
+  Loggy,
   FileSystem as fs,
   getBuildArtifacts,
   BuildArtifacts,
@@ -85,7 +86,9 @@ export default class LocalController {
   }
 
   public add(contractAlias: string, contractName: string): void {
-    log.info(
+    Loggy.add(
+      `${__filename}#add`,
+      `add-${contractAlias}`,
       `Adding ${
         contractAlias === contractName
           ? contractAlias
@@ -93,6 +96,7 @@ export default class LocalController {
       }`,
     );
     this.packageFile.addContract(contractAlias, contractName);
+    Loggy.succeed(`add-${contractAlias}`);
   }
 
   public addAll(): void {
