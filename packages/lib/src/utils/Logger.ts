@@ -14,9 +14,10 @@ export enum LogType {
 }
 
 export enum LogStatus {
+  Spinning = 'spinning',
   Succeed = 'succeed',
   Fail = 'fail',
-  Stopped = 'stop',
+  Stopped = 'stopped',
   NonSpinnable = 'non-spinnable',
 }
 
@@ -33,9 +34,10 @@ export const Loggy = {
     file: string,
     reference: string,
     text: string,
+    initialStatus: LogStatus = LogStatus.Spinning,
     logType: LogType = LogType.Info,
   ): void {
-    this._log(file, reference, text, logType);
+    this._log(file, reference, text, initialStatus, logType);
   },
 
   update(reference: string, status: LogStatus, text?: string): void {
@@ -58,14 +60,20 @@ export const Loggy = {
     spinners.stopAll(status);
   },
 
-  _log(file: string, reference: string, text: string, logType: LogType): void {
+  _log(
+    file: string,
+    reference: string,
+    text: string,
+    status: LogStatus,
+    logType: LogType,
+  ): void {
     if (this.isSilent) return;
     if (this.isVerbose) {
       const color = this._getColorFor(logType);
       const message = `[${file}] ${text}`;
       console.error(chalk.keyword(color)(message));
     } else {
-      spinners.add(reference, { text });
+      spinners.add(reference, { text, status });
     }
   },
 
@@ -74,11 +82,11 @@ export const Loggy = {
       case LogType.Info:
         return 'white';
       case LogType.Warn:
-        return 'yello';
+        return 'yellow';
       case LogType.Err:
         return 'red';
       default:
-        return 'whiteBright';
+        return 'white';
     }
   },
 };

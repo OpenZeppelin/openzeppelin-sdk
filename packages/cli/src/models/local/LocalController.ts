@@ -7,6 +7,7 @@ import {
   Contract,
   Logger,
   Loggy,
+  LogStatus,
   FileSystem as fs,
   getBuildArtifacts,
   BuildArtifacts,
@@ -128,7 +129,12 @@ export default class LocalController {
 
   public remove(contractAlias: string): void {
     if (!this.packageFile.hasContract(contractAlias)) {
-      log.error(`Contract ${contractAlias} to be removed was not found`);
+      Loggy.add(
+        `${__filename}#remove`,
+        `remove-${contractAlias}`,
+        `Contract ${contractAlias} to be removed was not found`,
+        LogStatus.Fail,
+      );
     } else {
       Loggy.add(
         `${__filename}#remove`,
