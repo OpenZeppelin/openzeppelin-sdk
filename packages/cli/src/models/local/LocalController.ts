@@ -13,6 +13,7 @@ import {
   validate as validateContract,
   validationPasses,
   TxParams,
+  OzError,
 } from 'zos-lib';
 
 import Session from '../network/Session';
@@ -35,7 +36,7 @@ export default class LocalController {
     init: boolean = false,
   ) {
     if (!init && !packageFile.exists()) {
-      throw Error(
+      throw new OzError(
         `ZeppelinOS file ${
           packageFile.fileName
         } not found. Run 'zos init' first to initialize the project.`,
@@ -129,7 +130,11 @@ export default class LocalController {
     if (!this.packageFile.hasContract(contractAlias)) {
       log.error(`Contract ${contractAlias} to be removed was not found`);
     } else {
-      log.info(`Removing ${contractAlias}`);
+      Loggy.add(
+        `${__filename}#remove`,
+        `remove-${contractAlias}`,
+        `Removing ${contractAlias}`,
+      );
       this.packageFile.unsetContract(contractAlias);
     }
   }
