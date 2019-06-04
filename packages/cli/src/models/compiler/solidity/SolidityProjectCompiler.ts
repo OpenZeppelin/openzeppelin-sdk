@@ -2,6 +2,8 @@ import path from 'path';
 import max from 'lodash.max';
 import maxBy from 'lodash.maxby';
 import pick from 'lodash.pick';
+import omitBy from 'lodash.omitby';
+import isUndefined from 'lodash.isundefined';
 import { readJsonSync } from 'fs-extra';
 import { statSync } from 'fs';
 import { FileSystem as fs, Logger, Contracts } from 'zos-lib';
@@ -72,7 +74,7 @@ class SolidityProjectCompiler {
     }
 
     log.info(
-      `Compiling contracts with ${this.compilerVersion.version} (${
+      `Compiling contracts with solc ${this.compilerVersion.version} (${
         this.compilerVersion.build
       })...`,
     );
@@ -134,7 +136,7 @@ class SolidityProjectCompiler {
     const currentSettings = {
       optimizer: DEFAULT_OPTIMIZER,
       evmVersion: DEFAULT_EVM_VERSION,
-      ...this.options,
+      ...omitBy(this.options, isUndefined),
     };
 
     // Gather artifacts vs sources modified times

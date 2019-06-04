@@ -42,6 +42,7 @@ async function action(options: {
   } = options;
 
   const compilerOptions: ProjectCompilerOptions = {
+    manager: 'zos',
     evmVersion,
     version,
     optimizer: {

@@ -59,7 +59,9 @@ export async function compileWithSolc(
 }
 
 export async function compileWithTruffle(): Promise<void> {
-  log.info('Compiling contracts with Truffle...');
+  log.info(
+    'Compiling contracts with Truffle, using settings from truffle.js...',
+  );
   // Attempt to load global truffle if local was not found
   const truffleBin: string =
     (await findUp('node_modules/.bin/truffle')) || 'truffle';
