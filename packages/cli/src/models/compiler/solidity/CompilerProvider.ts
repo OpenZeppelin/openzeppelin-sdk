@@ -1,5 +1,5 @@
 import fs from 'fs';
-import { mkdirpSync, readJsonSync, writeJsonSync } from 'fs-extra';
+import { mkdirp, readJson, writeJson } from 'fs-extra';
 import axios from 'axios';
 import solc from 'solc-wrapper';
 import semver from 'semver';
@@ -136,24 +136,24 @@ async function localCompilerVersion(): Promise<string | void> {
 
 async function getAvailableCompilerVersions(): Promise<SolcList> {
   const localPath = path.join(SOLC_CACHE_PATH, 'list.json');
-  mkdirpSync(SOLC_CACHE_PATH);
+  await mkdirp(SOLC_CACHE_PATH);
   if (
     fs.existsSync(localPath) &&
     Date.now() - +fs.statSync(localPath).mtime <
       SOLC_LIST_EXPIRES_IN_SECONDS * 1000
   ) {
-    return readJsonSync(localPath);
+    return readJson(localPath);
   }
 
   try {
     const response = await axios.get(SOLC_LIST_URL);
     const list = response.data as SolcList;
-    writeJsonSync(localPath, list);
+    await writeJson(localPath, list);
     return list;
   } catch (err) {
     if (fs.existsSync(localPath)) {
       log.warn(`Error downloading solc releases list, using cached version`);
-      return readJsonSync(localPath);
+      return readJson(localPath);
     } else {
       err.message = `Could not retrieve solc releases list: ${err.message}`;
       throw err;
@@ -206,7 +206,7 @@ async function downloadCompiler(build: SolcBuild, localFile: string) {
   }
 
   // Cache downloaded source
-  mkdirpSync(SOLC_CACHE_PATH);
+  await mkdirp(SOLC_CACHE_PATH);
   fs.writeFileSync(localFile, compilerSource);
 }
 

@@ -62,7 +62,7 @@ export async function compileWithTruffle(): Promise<void> {
   log.info('Compiling contracts with Truffle...');
   // Attempt to load global truffle if local was not found
   const truffleBin: string =
-    findUp.sync('node_modules/.bin/truffle') || 'truffle';
+    (await findUp('node_modules/.bin/truffle')) || 'truffle';
 
   let stdout: string, stderr: string;
   try {
