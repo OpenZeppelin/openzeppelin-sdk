@@ -106,7 +106,7 @@ export default class Contracts {
   private static _getFromPath(targetPath: string): Contract {
     // eslint-disable-next-line @typescript-eslint/no-var-requires
     const schema = require(targetPath);
-    schema.directory = targetPath.replace(/contracts\/.*\.json$/, 'contracts');
+    schema.directory = path.dirname(targetPath);
     if (schema.bytecode === '')
       throw new Error(
         `A bytecode must be provided for contract ${schema.contractName}.`,
