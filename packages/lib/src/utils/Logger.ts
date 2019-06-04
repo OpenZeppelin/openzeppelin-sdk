@@ -29,7 +29,12 @@ export const Loggy = {
     this.isVerbose = value;
   },
 
-  add(file: string, reference: string, text: string, logType?: LogType): void {
+  add(
+    file: string,
+    reference: string,
+    text: string,
+    logType: LogType = LogType.Info,
+  ): void {
     this._log(file, reference, text, logType);
   },
 
@@ -48,7 +53,7 @@ export const Loggy = {
     spinners.fail(reference, { text });
   },
 
-  stopAll(status: LogStatus): void {
+  stopAll(status: LogStatus = LogStatus.Fail): void {
     if (this.isSilent || this.isVerbose) return;
     spinners.stopAll(status);
   },
@@ -72,6 +77,8 @@ export const Loggy = {
         return 'yello';
       case LogType.Err:
         return 'red';
+      default:
+        return 'whiteBright';
     }
   },
 };

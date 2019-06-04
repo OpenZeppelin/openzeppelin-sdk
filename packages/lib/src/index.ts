@@ -6,6 +6,8 @@ import encodeCall from './helpers/encodeCall';
 import { encodeParams } from './helpers/encodeCall';
 import sleep from './helpers/sleep';
 
+// errors
+import OzError from './errors/OzError';
 // utils
 import ABI from './utils/ABIs';
 import Semver from './utils/Semver';
@@ -103,11 +105,12 @@ export {
   getSolidityLibNames,
   isSolidityLib,
   sleep,
-  Proxy,
+  OzError,
   Logger,
   Loggy,
   LogType,
   LogStatus,
+  Proxy,
   ABI,
   Semver,
   FileSystem,
