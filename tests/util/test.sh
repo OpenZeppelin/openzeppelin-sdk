@@ -42,7 +42,7 @@ start_geth() {
 fund_account() {
   # Funds a target account
   target_account="0x4da710efab33a9986b35e5c1de7e97f7e0704c18"
-  RECIPIENT_ACCOUNT=$target_account node_modules/.bin/truffle exec scripts/fund.js --network geth-dev
+  RECIPIENT_ACCOUNT=$target_account node_modules/.bin/truffle exec ../../util/fund.js --network geth-dev
   sleep 1
   echo "Account $target_account funded"
 }
