@@ -19,9 +19,7 @@ const TruffleConfig = {
   },
 
   isTruffleProject(path: string = process.cwd()): boolean {
-    const truffleDir = `${path}/node_modules/truffle`;
-    const existsTruffleDependency = FileSystem.exists(truffleDir);
-    return this.exists(path) && existsTruffleDependency;
+    return this.exists(path);
   },
 
   async loadNetworkConfig(
