@@ -1,11 +1,11 @@
 'use strict';
 
+import path from 'path';
 import every from 'lodash.every';
 import map from 'lodash.map';
 import {
   Contracts,
   Contract,
-  Logger,
   Loggy,
   LogStatus,
   FileSystem as fs,
@@ -24,8 +24,7 @@ import ConfigManager from '../config/ConfigManager';
 import ZosPackageFile from '../files/ZosPackageFile';
 import ZosNetworkFile from '../files/ZosNetworkFile';
 
-const log = new Logger('LocalController');
-
+const fileName = path.basename(__filename);
 const DEFAULT_VERSION = '0.1.0';
 
 export default class LocalController {
@@ -88,7 +87,7 @@ export default class LocalController {
 
   public add(contractAlias: string, contractName: string): void {
     Loggy.add(
-      `${__filename}#add`,
+      `${fileName}#add`,
       `add-${contractAlias}`,
       `Adding ${
         contractAlias === contractName
@@ -129,14 +128,14 @@ export default class LocalController {
   public remove(contractAlias: string): void {
     if (!this.packageFile.hasContract(contractAlias)) {
       Loggy.add(
-        `${__filename}#remove`,
+        `${fileName}#remove`,
         `remove-${contractAlias}`,
         `Contract ${contractAlias} to be removed was not found`,
         LogStatus.Fail,
       );
     } else {
       Loggy.add(
-        `${__filename}#remove`,
+        `${fileName}#remove`,
         `remove-${contractAlias}`,
         `Removing ${contractAlias}`,
       );
@@ -226,7 +225,7 @@ export default class LocalController {
       const label =
         linkedDependencies.length === 1 ? 'Dependency' : 'Dependencies';
       Loggy.add(
-        `${__filename}#linkDependencies`,
+        `${fileName}#linkDependencies`,
         'link-dependencies',
         `${label} successfully linked to the project. Run 'zos create' to pick and deploy a contract!`,
         LogStatus.NonSpinnable,
@@ -246,7 +245,7 @@ export default class LocalController {
       const label =
         unlinkedDependencies.length === 1 ? 'Dependency' : 'Dependencies';
       Loggy.add(
-        `${__filename}#linkDependencies`,
+        `${fileName}#linkDependencies`,
         'link-dependencies',
         `${label} ${unlinkedDependencies.join(', ')} successfully unlinked.`,
         LogStatus.NonSpinnable,

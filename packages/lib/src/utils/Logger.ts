@@ -78,7 +78,7 @@ export const Loggy = {
     if (this.isSilent) return;
     if (this.isVerbose) {
       const color = this._getColorFor(logType);
-      const message = `[${file}] ${text}`;
+      const message = `[${new Date().toISOString()}@${file}] ${text}`;
       console.error(chalk.keyword(color)(message));
     } else if (logLevel === LogLevel.Normal) {
       spinners.add(reference, { text, status });

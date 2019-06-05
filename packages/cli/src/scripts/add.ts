@@ -1,7 +1,10 @@
+import path from 'path';
 import { Loggy, LogStatus } from 'zos-lib';
 
 import LocalController from '../models/local/LocalController';
 import { AddParams } from './interfaces';
+
+const fileName = path.basename(__filename);
 
 export default function add({
   contractsData,
@@ -20,7 +23,7 @@ export default function add({
   });
 
   Loggy.add(
-    `${__filename}#add`,
+    `${fileName}#add`,
     'add-contracts',
     `All contracts have been successfully added to the project.`,
     LogStatus.NonSpinnable,
