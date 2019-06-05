@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## v2.3.1 - 2019-06-05
+
+### Fixed
+- Fix error `Cannot read property 'absolutePath' of undefined` when retrieving contracts if the project folder had the word "contracts" on it ([#928](https://github.com/zeppelinos/zos/pull/928))
+
 ## v2.3.0 - 2019-05-27
 
 ### Added
