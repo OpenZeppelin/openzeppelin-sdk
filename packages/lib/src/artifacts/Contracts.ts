@@ -91,7 +91,7 @@ export default class Contracts {
 
   private static _getFromPath(targetPath: string): Contract {
     const schema = require(targetPath);
-    schema.directory = targetPath.replace(/contracts\/.*\.json$/, 'contracts');
+    schema.directory = path.dirname(targetPath);
     if(schema.bytecode === '') throw new Error(`A bytecode must be provided for contract ${schema.contractName}.`);
     if(!hasUnlinkedVariables(schema.bytecode)) {
       schema.linkedBytecode = schema.bytecode;
