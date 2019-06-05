@@ -86,8 +86,8 @@ contract('ContractManager', function([_, from]) {
 
             contractNames.should.be.an('array');
             contractNames.should.not.be.empty;
-            contractNames.should.have.lengthOf(2);
-            contractNames.should.deep.eq(['Foo', 'GreeterImpl']);
+            contractNames.should.include('Foo');
+            contractNames.should.not.include('GreeterLib');
           });
         });
       });
