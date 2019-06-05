@@ -5,7 +5,7 @@ import add from './add';
 import push from './push';
 import create from '../scripts/create';
 import Session from '../models/network/Session';
-import Compiler from '../models/compiler/Compiler';
+import { compile } from '../models/compiler/Compiler';
 import { fromContractFullName } from '../utils/naming';
 import { hasToMigrateProject } from '../prompts/migrations';
 import ConfigManager from '../models/config/ConfigManager';
@@ -58,7 +58,7 @@ const register: (program: any) => any = program =>
 
 async function commandActions(contractFullName: string, options: any) {
   const { skipCompile } = options;
-  if (!skipCompile) await Compiler.call();
+  if (!skipCompile) await compile();
 
   const {
     network: promptedNewtork,

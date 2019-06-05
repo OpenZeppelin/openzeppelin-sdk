@@ -31,7 +31,7 @@ import program from '../../src/bin/program';
 import Session from '../../src/models/network/Session';
 import ZosNetworkFile from '../../src/models/files/ZosNetworkFile';
 import ZosPackageFile from '../../src/models/files/ZosPackageFile';
-import Compiler from '../../src/models/compiler/Compiler';
+import * as Compiler from '../../src/models/compiler/Compiler';
 import Dependency from '../../src/models/dependency/Dependency';
 import ErrorHandler from '../../src/models/errors/ErrorHandler';
 import ConfigManager from '../../src/models/config/ConfigManager';
@@ -81,7 +81,7 @@ exports.stubCommands = function() {
     this.sendTx = sinon.stub(sendTx, 'default');
     this.call = sinon.stub(call, 'default');
 
-    this.compiler = sinon.stub(Compiler, 'call').callsFake(() => null);
+    this.compiler = sinon.stub(Compiler, 'compile');
     this.errorHandler = sinon
       .stub(ErrorHandler.prototype, 'call')
       .callsFake(() => null);
@@ -116,8 +116,13 @@ exports.stubCommands = function() {
 exports.itShouldParse = function(name, cmd, args, cb) {
   it(name, function(done) {
     this[cmd].onFirstCall().callsFake(() => {
-      cb(this[cmd]);
-      done();
+      let err;
+      try {
+        cb(this[cmd]);
+      } catch (e) {
+        err = e;
+      }
+      done(err);
     });
     args = args.split(' ');
     args.unshift('node');

@@ -63,6 +63,7 @@ const ZosConfig = {
   },
 
   getConfig(root: string = process.cwd()): Config {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
     const zosConfigFile = require(`${root}/networks.js`);
     const compilers =
       zosConfigFile.compilers || this.getDefaultCompilersProperties();

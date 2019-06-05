@@ -1,5 +1,5 @@
 import check from '../scripts/check';
-import Compiler from '../models/compiler/Compiler';
+import { compile } from '../models/compiler/Compiler';
 import ConfigManager from '../models/config/ConfigManager';
 
 const name = 'check';
@@ -16,7 +16,7 @@ const register: (program: any) => any = program =>
 
 async function action(contractAlias: string, options: any): Promise<void> {
   ConfigManager.initStaticConfiguration();
-  if (!options.skipCompile) await Compiler.call();
+  if (!options.skipCompile) await compile();
   check({ contractAlias });
 }
 

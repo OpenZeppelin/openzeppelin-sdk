@@ -1,8 +1,9 @@
 import push from './push';
 import add from '../scripts/add';
 import addAll from '../scripts/add-all';
-import Compiler from '../models/compiler/Compiler';
 import ConfigManager from '../models/config/ConfigManager';
+import { compile } from '../models/compiler/Compiler';
+
 import {
   promptIfNeeded,
   contractsList,
@@ -32,7 +33,7 @@ async function action(contractNames: string[], options: any): Promise<void> {
   const { skipCompile, all, interactive } = options;
   ConfigManager.initStaticConfiguration();
 
-  if (!skipCompile) await Compiler.call();
+  if (!skipCompile) await compile();
 
   if (all) addAll({});
   else {

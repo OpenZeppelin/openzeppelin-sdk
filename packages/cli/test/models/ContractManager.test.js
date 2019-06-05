@@ -9,7 +9,7 @@ import ZosPackageFile from '../../src/models/files/ZosPackageFile';
 import ConfigManager from '../../src/models/config/ConfigManager';
 
 contract('ContractManager', function([_, from]) {
-  describe("methods", function() {
+  describe('methods', function() {
     describe('getContractNames', function() {
       context('without directory created', function() {
         beforeEach('create test dir', function() {
@@ -17,18 +17,22 @@ contract('ContractManager', function([_, from]) {
           this.packageFile = new ZosPackageFile(`${this.testDir}/zos.json`);
           this.contractManager = new ContractManager(this.packageFile);
           FileSystem.createDir(this.testDir);
-          sinon.stub(ConfigManager, 'getBuildDir').returns(`${this.testDir}/build/contracts`);
-        })
+          sinon
+            .stub(ConfigManager, 'getBuildDir')
+            .returns(`${this.testDir}/build/contracts`);
+        });
 
         afterEach('remove test dir', function() {
           FileSystem.removeTree(this.testDir);
           sinon.restore();
-        })
+        });
 
         it('returns an empty array', function() {
-          this.contractManager.getContractNames().should.be.an('array').that.is.empty;
-        })
-      })
+          this.contractManager
+            .getContractNames()
+            .should.be.an('array').that.is.empty;
+        });
+      });
 
       context('with directory created', function() {
         context('without contracts', function() {
@@ -38,28 +42,39 @@ contract('ContractManager', function([_, from]) {
             this.contractManager = new ContractManager(this.packageFile);
             FileSystem.createDir(this.testDir);
             FileSystem.createDirPath(`${this.testDir}/build/contracts`);
-            sinon.stub(ConfigManager, 'getBuildDir').returns(`${this.testDir}/build/contracts`);
-          })
+            sinon
+              .stub(ConfigManager, 'getBuildDir')
+              .returns(`${this.testDir}/build/contracts`);
+          });
 
           afterEach('remove test dir', function() {
             FileSystem.removeTree(this.testDir);
             sinon.restore();
-          })
+          });
 
           it('returns an empty array', function() {
             const contractNames = this.contractManager.getContractNames();
             expect(contractNames).to.be.empty;
-          })
-        })
+          });
+        });
 
         context('with contracts', function() {
           beforeEach(function() {
             this.testDir = `${process.cwd()}/test/mocks/mock-stdlib`;
-            const builtContract = { sourcePath: `${this.testDir}/contracts`, bytecode: '0x124', contractName: 'Foo' };
-            FileSystem.writeJson(`${this.testDir}/build/contracts/Foo.json`, builtContract)
+            const builtContract = {
+              sourcePath: `${this.testDir}/contracts`,
+              bytecode: '0x124',
+              contractName: 'Foo',
+            };
+            FileSystem.writeJson(
+              `${this.testDir}/build/contracts/Foo.json`,
+              builtContract,
+            );
             this.packageFile = new ZosPackageFile(`${this.testDir}/zos.json`);
             this.contractManager = new ContractManager(this.packageFile);
-            sinon.stub(ConfigManager, 'getBuildDir').returns(`${this.testDir}/build/contracts`);
+            sinon
+              .stub(ConfigManager, 'getBuildDir')
+              .returns(`${this.testDir}/build/contracts`);
           });
 
           afterEach(function() {
@@ -71,8 +86,8 @@ contract('ContractManager', function([_, from]) {
 
             contractNames.should.be.an('array');
             contractNames.should.not.be.empty;
-            contractNames.should.have.lengthOf(1);
-            contractNames[0].should.eq('Foo');
+            contractNames.should.include('Foo');
+            contractNames.should.not.include('GreeterLib');
           });
         });
       });
