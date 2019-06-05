@@ -14,7 +14,6 @@ import {
   validate as validateContract,
   validationPasses,
   TxParams,
-  OzError,
 } from 'zos-lib';
 
 import Session from '../network/Session';
@@ -37,7 +36,7 @@ export default class LocalController {
     init: boolean = false,
   ) {
     if (!init && !packageFile.exists()) {
-      throw new OzError(
+      throw Error(
         `ZeppelinOS file ${
           packageFile.fileName
         } not found. Run 'zos init' first to initialize the project.`,
@@ -142,6 +141,7 @@ export default class LocalController {
         `Removing ${contractAlias}`,
       );
       this.packageFile.unsetContract(contractAlias);
+      Loggy.succeed(`remove-${contractAlias}`);
     }
   }
 
@@ -225,7 +225,12 @@ export default class LocalController {
     if (linkedDependencies.length > 0) {
       const label =
         linkedDependencies.length === 1 ? 'Dependency' : 'Dependencies';
-      log.info(`${label} ${linkedDependencies.join(', ')} successfully linked`);
+      Loggy.add(
+        `${__filename}#linkDependencies`,
+        'link-dependencies',
+        `${label} successfully linked to the project. Run 'zos create' to pick and deploy a contract!`,
+        LogStatus.NonSpinnable,
+      );
     }
   }
 
@@ -240,8 +245,11 @@ export default class LocalController {
     if (unlinkedDependencies.length > 0) {
       const label =
         unlinkedDependencies.length === 1 ? 'Dependency' : 'Dependencies';
-      log.info(
-        `${label} ${unlinkedDependencies.join(', ')} successfully unlinked`,
+      Loggy.add(
+        `${__filename}#linkDependencies`,
+        'link-dependencies',
+        `${label} ${unlinkedDependencies.join(', ')} successfully unlinked.`,
+        LogStatus.NonSpinnable,
       );
     }
   }

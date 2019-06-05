@@ -11,7 +11,7 @@ import OzError from './errors/OzError';
 // utils
 import ABI from './utils/ABIs';
 import Semver from './utils/Semver';
-import Logger, { Loggy, LogType, LogStatus } from './utils/Logger';
+import Logger, { Loggy, LogType, LogStatus, LogLevel } from './utils/Logger';
 import FileSystem from './utils/FileSystem';
 import Contracts from './artifacts/Contracts';
 import Contract, {
@@ -110,6 +110,7 @@ export {
   Loggy,
   LogType,
   LogStatus,
+  LogLevel,
   Proxy,
   ABI,
   Semver,

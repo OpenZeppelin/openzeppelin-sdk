@@ -56,10 +56,18 @@ export default class ZWeb3 {
     return Web3.utils.isAddress(address);
   }
 
-  public static async checkNetworkId(providedNetworkId?: string | number): Promise<void | never> {
+  public static async checkNetworkId(
+    providedNetworkId?: string | number,
+  ): Promise<void | never> {
     const networkId = await ZWeb3.getNetwork();
-    if (providedNetworkId !== undefined && providedNetworkId !== '*' && Number(networkId) !== Number(providedNetworkId)) {
-      throw Error(`Unexpected network ID: requested ${providedNetworkId} but connected to ${networkId}`);
+    if (
+      providedNetworkId !== undefined &&
+      providedNetworkId !== '*' &&
+      Number(networkId) !== Number(providedNetworkId)
+    ) {
+      throw Error(
+        `Unexpected network ID: requested ${providedNetworkId} but connected to ${networkId}`,
+      );
     }
   }
 

@@ -13,6 +13,12 @@ export enum LogType {
   Err,
 }
 
+export enum LogLevel {
+  Normal,
+  Verbose,
+  Silent,
+}
+
 export enum LogStatus {
   Spinning = 'spinning',
   Succeed = 'succeed',
@@ -34,10 +40,11 @@ export const Loggy = {
     file: string,
     reference: string,
     text: string,
-    initialStatus: LogStatus = LogStatus.Spinning,
+    status: LogStatus = LogStatus.Spinning,
+    logLevel: LogLevel = LogLevel.Normal,
     logType: LogType = LogType.Info,
   ): void {
-    this._log(file, reference, text, initialStatus, logType);
+    this._log(file, reference, text, status, logLevel, logType);
   },
 
   update(reference: string, status: LogStatus, text?: string): void {
@@ -65,6 +72,7 @@ export const Loggy = {
     reference: string,
     text: string,
     status: LogStatus,
+    logLevel: LogLevel,
     logType: LogType,
   ): void {
     if (this.isSilent) return;
@@ -72,7 +80,7 @@ export const Loggy = {
       const color = this._getColorFor(logType);
       const message = `[${file}] ${text}`;
       console.error(chalk.keyword(color)(message));
-    } else {
+    } else if (logLevel === LogLevel.Normal) {
       spinners.add(reference, { text, status });
     }
   },

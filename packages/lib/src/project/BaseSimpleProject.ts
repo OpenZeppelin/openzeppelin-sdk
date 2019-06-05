@@ -137,6 +137,7 @@ export default abstract class BaseSimpleProject {
       admin,
     }: ContractInterface = {},
   ): Promise<Contract> {
+    throw Error('jej');
     if (!isEmpty(initArgs) && !initMethod) initMethod = 'initialize';
     const implementationAddress = await this._getOrDeployImplementation(
       contract,

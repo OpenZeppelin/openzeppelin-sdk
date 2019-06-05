@@ -1,5 +1,5 @@
 import { Command } from 'commander';
-import { Logger } from 'zos-lib';
+import { Logger, Loggy, LogStatus } from 'zos-lib';
 import ScriptError from './ScriptError';
 
 const log = new Logger('Error');
@@ -17,6 +17,7 @@ export default class ErrorHandler {
 
   public call(): void {
     if (!this.verbose) {
+      Loggy.stopAll(LogStatus.Fail);
       const errorMessage = this.error.message || GENERIC_ERROR_MESSAGE;
       log.error(errorMessage);
     } else log.error(this.error.stack);
