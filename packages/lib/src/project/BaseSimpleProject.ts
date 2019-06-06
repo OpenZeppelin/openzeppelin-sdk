@@ -1,7 +1,8 @@
+import path from 'path';
 import isEmpty from 'lodash.isempty';
 
 import Proxy from '../proxy/Proxy';
-import Logger from '../utils/Logger';
+import Logger, { Loggy, LogLevel } from '../utils/Logger';
 import Package from '../application/Package';
 import Transactions from '../utils/Transactions';
 import { toAddress } from '../utils/Addresses';
@@ -13,6 +14,7 @@ import Contract from '../artifacts/Contract';
 import ProxyFactory from '../proxy/ProxyFactory';
 import { TxParams } from '../artifacts/ZWeb3';
 
+const fileName = path.basename(__filename);
 const log: Logger = new Logger('BaseSimpleProject');
 
 interface Implementations {
@@ -58,7 +60,12 @@ export default abstract class BaseSimpleProject {
     contract: Contract,
     contractName?: string,
   ): Promise<any> {
-    log.info(`Deploying logic contract for ${contract.schema.contractName}`);
+    Loggy.add(
+      `${fileName}#setImplementation`,
+      `set-implementation-for-${contract.schema.contractName}`,
+      `Deploying logic contract for ${contract.schema.contractName}`,
+      { logLevel: LogLevel.Verbose },
+    );
     if (!contractName) contractName = contract.schema.contractName;
     const implementation: any = await Transactions.deployContract(
       contract,
@@ -137,7 +144,6 @@ export default abstract class BaseSimpleProject {
       admin,
     }: ContractInterface = {},
   ): Promise<Contract> {
-    throw Error('jej');
     if (!isEmpty(initArgs) && !initMethod) initMethod = 'initialize';
     const implementationAddress = await this._getOrDeployImplementation(
       contract,

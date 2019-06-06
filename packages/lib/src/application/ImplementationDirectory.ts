@@ -72,35 +72,56 @@ export default class ImplementationDirectory {
     contractName: string,
     implementationAddress: string,
   ): Promise<any> {
-    log.info(
-      `Setting ${contractName} implementation ${implementationAddress}...`,
+    Loggy.add(
+      `${fileName}#setImplementation`,
+      `set-implementation-${contractName}`,
+      `Setting ${contractName} implementation ${implementationAddress} in directory`,
+      { logLevel: LogLevel.Verbose },
     );
     await Transactions.sendTransaction(
       this.directoryContract.methods.setImplementation,
       [contractName, implementationAddress],
       { ...this.txParams },
     );
-    log.info(`Implementation set: ${implementationAddress}`);
+    Loggy.succeed(
+      `set-implementation-${contractName}`,
+      `Setting ${contractName} in directory`,
+    );
   }
 
   public async unsetImplementation(contractName: string): Promise<any> {
-    log.info(`Unsetting ${contractName} implementation...`);
+    Loggy.add(
+      `${fileName}#unsetImplementation`,
+      `unset-implementation-${contractName}`,
+      `Unsetting ${contractName} implementation...`,
+      { logLevel: LogLevel.Verbose },
+    );
     await Transactions.sendTransaction(
       this.directoryContract.methods.unsetImplementation,
       [contractName],
       { ...this.txParams },
     );
-    log.info(`${contractName} implementation unset`);
+    Loggy.succeed(
+      `unset-implementation-${contractName}`,
+      `${contractName} implementation unset`,
+    );
   }
 
   public async freeze(): Promise<any> {
-    log.info('Freezing implementation directory...');
+    Loggy.add(
+      `${fileName}#freeze`,
+      `freeze-implementation`,
+      'Freezing directory version',
+    );
     await Transactions.sendTransaction(
       this.directoryContract.methods.freeze,
       [],
       { ...this.txParams },
     );
-    log.info('Frozen');
+    Loggy.succeed(
+      `freeze-implementation`,
+      `Directory version successfully freezed`,
+    );
   }
 
   public async isFrozen(): Promise<boolean> {

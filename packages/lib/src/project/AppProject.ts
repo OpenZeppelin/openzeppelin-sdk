@@ -17,7 +17,7 @@ import { semanticVersionToString } from '../utils/Semver';
 import ProxyFactory from '../proxy/ProxyFactory';
 import { CalldataInfo, buildCallData, callDescription } from '../utils/ABIs';
 import { TxParams } from '../artifacts/ZWeb3';
-import Logger, { Loggy } from '../utils/Logger';
+import Logger, { Loggy, SpinnerAction } from '../utils/Logger';
 
 const DEFAULT_NAME = 'main';
 const DEFAULT_VERSION = '0.1.0';
@@ -101,10 +101,12 @@ class BaseAppProject extends BasePackageProject {
           `Adding new version ${version} and creating ImplementationDirectory contract`,
         );
         directory = await thepackage.newVersion(version);
-        Loggy.succeed(
-          `publish-project`,
-          `Project structure successfully deployed!`,
-        );
+        const succeedText =
+          !appAddress || !packageAddress
+            ? `Project structure successfully deployed!`
+            : `Version ${version} successfully added`;
+
+        Loggy.succeed(`publish-project`, succeedText);
       }
 
       if (!(await app.hasPackage(name, version)))

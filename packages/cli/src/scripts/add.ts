@@ -24,8 +24,8 @@ export default function add({
 
   const message =
     contractsData.length > 1
-      ? `All contracts have been successfully added to the project. Try running 'zos create' to deploy them!`
-      : `Contract has been successfully added to the project. Try running 'zos create' to deploy it!`;
+      ? `All contracts have been successfully added to the project.`
+      : `Contract has been successfully added to the project.`;
 
   Loggy.add(`${fileName}#add`, 'add-contracts', message, {
     spinnerAction: SpinnerAction.NonSpinnable,
