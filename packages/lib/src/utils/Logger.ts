@@ -1,3 +1,4 @@
+import pickby from 'lodash.pickby';
 import chalk from 'chalk';
 import Spinnies from 'spinnies';
 
@@ -19,12 +20,23 @@ export enum LogLevel {
   Silent,
 }
 
-export enum LogStatus {
-  Spinning = 'spinning',
-  Succeed = 'succeed',
+export enum SpinnerAction {
+  Add = 'spinning',
+  Update = 'update',
   Fail = 'fail',
-  Stopped = 'stopped',
+  Succeed = 'succeed',
   NonSpinnable = 'non-spinnable',
+}
+
+interface LogInfo {
+  logType?: LogType;
+  logLevel?: LogLevel;
+  spinnerAction?: SpinnerAction;
+}
+
+interface UpdateParams {
+  spinnerAction?: SpinnerAction;
+  text?: string;
 }
 
 export const Loggy = {
@@ -36,52 +48,85 @@ export const Loggy = {
     this.isVerbose = value;
   },
 
+  addOrUpdate(
+    file: string,
+    reference: string,
+    text: string,
+    logInfo: LogInfo = {
+      logLevel: LogLevel.Normal,
+      logType: LogType.Info,
+      spinnerAction: SpinnerAction.Add,
+    },
+  ): void {
+    if (this[reference]) {
+      const { spinnerAction } = logInfo;
+      this.update(reference, { spinnerAction, text }, file);
+    } else this.add(file, reference, text, logInfo);
+  },
+
   add(
     file: string,
     reference: string,
     text: string,
-    status: LogStatus = LogStatus.Spinning,
-    logLevel: LogLevel = LogLevel.Normal,
-    logType: LogType = LogType.Info,
+    { logLevel, logType, spinnerAction }: LogInfo = {
+      logLevel: LogLevel.Normal,
+      logType: LogType.Info,
+      spinnerAction: SpinnerAction.Add,
+    },
   ): void {
-    this._log(file, reference, text, status, logLevel, logType);
+    if (!logLevel) logLevel = LogLevel.Normal;
+    if (!logType) logType = LogType.Info;
+    if (!spinnerAction) spinnerAction = SpinnerAction.Add;
+    this[reference] = { file, text, logLevel, logType, spinnerAction };
+    this._log(reference);
   },
 
-  update(reference: string, status: LogStatus, text?: string): void {
-    if (this.isSilent || this.isVerbose) return;
-    spinners[status](reference, { text });
+  update(
+    reference: string,
+    { spinnerAction, text }: UpdateParams,
+    file?: string,
+  ): void {
+    if (this[reference]) {
+      const args = pickby({ file, text, spinnerAction });
+      this[reference] = { ...this[reference], ...args };
+      this._log(reference);
+    }
   },
 
   succeed(reference: string, text?: string): void {
-    if (this.isSilent || this.isVerbose) return;
-    spinners.succeed(reference, { text });
+    this[reference] = {
+      ...this[reference],
+      spinnerAction: SpinnerAction.Succeed,
+      text,
+    };
+    this._log(reference);
   },
 
   fail(reference: string, text?: string): void {
-    if (this.isSilent || this.isVerbose) return;
-    spinners.fail(reference, { text });
+    this[reference] = {
+      ...this[reference],
+      spinnerAction: SpinnerAction.Fail,
+      text,
+    };
+    this._log(reference);
   },
 
-  stopAll(status: LogStatus = LogStatus.Fail): void {
+  stopAll(spinnerAction: SpinnerAction = SpinnerAction.Fail): void {
     if (this.isSilent || this.isVerbose) return;
-    spinners.stopAll(status);
+    spinners.stopAll(spinnerAction);
   },
 
-  _log(
-    file: string,
-    reference: string,
-    text: string,
-    status: LogStatus,
-    logLevel: LogLevel,
-    logType: LogType,
-  ): void {
+  _log(reference: string): void {
     if (this.isSilent) return;
+    const { file, text, spinnerAction, logLevel, logType } = this[reference];
     if (this.isVerbose) {
       const color = this._getColorFor(logType);
       const message = `[${new Date().toISOString()}@${file}] ${text}`;
       console.error(chalk.keyword(color)(message));
     } else if (logLevel === LogLevel.Normal) {
-      spinners.add(reference, { text, status });
+      !spinners.pick(reference)
+        ? spinners.add(reference, { text, status: spinnerAction })
+        : spinners.update(reference, { text, status: spinnerAction });
     }
   },
 
@@ -149,7 +194,7 @@ export default class Logger {
   public log(msg: string, color: string = ''): void {
     if (this.opts.silent) return;
     if (this.opts.verbose) msg = `[${this._prefix}] ${msg}`;
-    console.error(chalk.keyword(color)(msg));
+    console.error(chalk[color](msg));
   }
 
   public get opts(): LoggerOptions {
