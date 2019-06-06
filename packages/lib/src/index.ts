@@ -6,12 +6,15 @@ import encodeCall from './helpers/encodeCall';
 import { encodeParams } from './helpers/encodeCall';
 import sleep from './helpers/sleep';
 
-// errors
-import OzError from './errors/OzError';
 // utils
 import ABI from './utils/ABIs';
 import Semver from './utils/Semver';
-import Logger, { Loggy, LogType, LogStatus, LogLevel } from './utils/Logger';
+import Logger, {
+  Loggy,
+  LogType,
+  SpinnerAction,
+  LogLevel,
+} from './utils/Logger';
 import FileSystem from './utils/FileSystem';
 import Contracts from './artifacts/Contracts';
 import Contract, {
@@ -105,11 +108,10 @@ export {
   getSolidityLibNames,
   isSolidityLib,
   sleep,
-  OzError,
   Logger,
   Loggy,
   LogType,
-  LogStatus,
+  SpinnerAction,
   LogLevel,
   Proxy,
   ABI,
