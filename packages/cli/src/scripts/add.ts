@@ -1,5 +1,5 @@
 import path from 'path';
-import { Loggy, LogStatus } from 'zos-lib';
+import { Loggy, SpinnerAction } from 'zos-lib';
 
 import LocalController from '../models/local/LocalController';
 import { AddParams } from './interfaces';
@@ -22,11 +22,13 @@ export default function add({
     controller.add(alias || name, name);
   });
 
-  Loggy.add(
-    `${fileName}#add`,
-    'add-contracts',
-    `All contracts have been successfully added to the project.`,
-    LogStatus.NonSpinnable,
-  );
+  const message =
+    contractsData.length > 1
+      ? `All contracts have been successfully added to the project. Try running 'zos create' to deploy them!`
+      : `Contract has been successfully added to the project. Try running 'zos create' to deploy it!`;
+
+  Loggy.add(`${fileName}#add`, 'add-contracts', message, {
+    spinnerAction: SpinnerAction.NonSpinnable,
+  });
   controller.writePackage();
 }

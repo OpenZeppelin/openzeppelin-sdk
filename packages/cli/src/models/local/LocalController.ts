@@ -5,9 +5,8 @@ import every from 'lodash.every';
 import map from 'lodash.map';
 import {
   Contracts,
-  Contract,
   Loggy,
-  LogStatus,
+  SpinnerAction,
   FileSystem as fs,
   getBuildArtifacts,
   BuildArtifacts,
@@ -131,7 +130,7 @@ export default class LocalController {
         `${fileName}#remove`,
         `remove-${contractAlias}`,
         `Contract ${contractAlias} to be removed was not found`,
-        LogStatus.Fail,
+        { spinnerAction: SpinnerAction.Fail },
       );
     } else {
       Loggy.add(
@@ -228,7 +227,7 @@ export default class LocalController {
         `${fileName}#linkDependencies`,
         'link-dependencies',
         `${label} successfully linked to the project. Run 'zos create' to pick and deploy a contract!`,
-        LogStatus.NonSpinnable,
+        { spinnerAction: SpinnerAction.NonSpinnable },
       );
     }
   }
@@ -248,7 +247,7 @@ export default class LocalController {
         `${fileName}#linkDependencies`,
         'link-dependencies',
         `${label} ${unlinkedDependencies.join(', ')} successfully unlinked.`,
-        LogStatus.NonSpinnable,
+        { spinnerAction: SpinnerAction.NonSpinnable },
       );
     }
   }

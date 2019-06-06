@@ -1,5 +1,5 @@
 import path from 'path';
-import { Loggy, LogStatus } from 'zos-lib';
+import { Loggy, SpinnerAction } from 'zos-lib';
 
 import LocalController from '../models/local/LocalController';
 import { RemoveParams } from './interfaces';
@@ -18,8 +18,8 @@ export default function remove({
   Loggy.add(
     `${fileName}#remove`,
     'remove-contracts',
-    `All specified contracts have been successfully removed from the project.`,
-    LogStatus.NonSpinnable,
+    `All specified contracts have been successfully removed from the project. To add them again, just run 'zos add'`,
+    { spinnerAction: SpinnerAction.NonSpinnable },
   );
   controller.writePackage();
 }

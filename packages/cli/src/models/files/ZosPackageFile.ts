@@ -2,7 +2,7 @@ import path from 'path';
 import pickBy from 'lodash.pickby';
 import isEqual from 'lodash.isequal';
 import isEmpty from 'lodash.isempty';
-import { Loggy, LogStatus, LogLevel, FileSystem as fs } from 'zos-lib';
+import { Loggy, SpinnerAction, LogLevel, FileSystem as fs } from 'zos-lib';
 import Dependency from '../dependency/Dependency';
 import { ZOS_VERSION, checkVersion } from './ZosVersion';
 import ZosNetworkFile from './ZosNetworkFile';
@@ -244,8 +244,10 @@ export default class ZosPackageFile {
           : `Project successfully initialized (check the ${
               this.fileName
             } file). Craft your contracts and then run 'zos create' to deploy them!`,
-        LogStatus.Succeed,
-        exists ? LogLevel.Verbose : LogLevel.Normal,
+        {
+          spinnerAction: SpinnerAction.Succeed,
+          logLevel: exists ? LogLevel.Verbose : LogLevel.Normal,
+        },
       );
     }
   }

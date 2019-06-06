@@ -1,5 +1,6 @@
 'use strict';
 
+import path from 'path';
 import isEmpty from 'lodash.isempty';
 import intersection from 'lodash.intersection';
 import uniq from 'lodash.uniq';
@@ -15,6 +16,7 @@ import {
   Contracts,
   Contract,
   Logger,
+  Loggy,
   FileSystem as fs,
   Proxy,
   Transactions,
@@ -57,6 +59,8 @@ import { ZOS_VERSION } from '../files/ZosVersion';
 import { ProxyType } from '../../scripts/interfaces';
 
 const log = new Logger('NetworkController');
+const fileName = path.basename(__filename);
+
 type Project = ProxyAdminProject | AppProject;
 type ProjectDeployer = ProxyAdminProjectDeployer | AppProjectDeployer;
 
@@ -687,13 +691,12 @@ export default class NetworkController {
     }
 
     await this._migrateZosversionIfNeeded();
-    log.info(`Publishing project to ${this.network}...`);
     const proxyAdminProject = (await this.fetchOrDeploy(
       this.currentVersion,
     )) as ProxyAdminProject;
     const deployer = new AppProjectDeployer(this, this.packageVersion);
     this.project = await deployer.fromProxyAdminProject(proxyAdminProject);
-    log.info(`Publish to ${this.network} successful`);
+    Loggy.succeed(`publish-project`, `Publish to ${this.network} successful!`);
   }
 
   // Proxy model
@@ -1110,8 +1113,13 @@ export default class NetworkController {
         this.networkFile.dependencyHasMatchingCustomDeploy(depName)
       )
         return;
-      log.info(`Deploying ${depName} contracts`);
+      Loggy.add(
+        `${fileName}#deployDependencyIfNeeded`,
+        `deploy-dependency-${depName}`,
+        `Deploying ${depName} contracts to network ${this.network}`,
+      );
       const deployment = await dependency.deploy(this.txParams);
+
       this.networkFile.setDependency(depName, {
         package: (await deployment.getProjectPackage()).address,
         version: deployment.version,
