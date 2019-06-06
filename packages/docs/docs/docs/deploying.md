@@ -5,9 +5,15 @@ title: Deploying your first project
 
 The following steps will get you started using ZeppelinOS.
 
-## Install Node and NPM
 
-First, install [Node.js](http://nodejs.org/) and [npm](https://npmjs.com/). On the respective websites you will find specific instructions for installation on your computer.
+## Prerequisites
+
+Make sure that you have installed [Node.js](http://nodejs.org/) and [npm](https://npmjs.com/). The respective websites provide specific instructions for installation on your computer.
+
+> **Note:** Currently you should use Node.js version 10 with ZeppelinOS.
+
+You should also make sure that your computer has **Python**, **gcc**, **node-gyp**, and **make** installed.
+
 
 ## Setting up your project
 
@@ -21,15 +27,13 @@ cd my-project
 Use `npm` to create a `package.json` file:
 
 ```console
-npm init
+npm init -y
 ```
-
-This command will ask you for details about the project. For this getting started project, just press **Enter** to accept the default values for each field.
 
 Then install ZeppelinOS in your project folder by running:
 
 ```console
-npm install zos@2.3.0-rc.2
+npm install zos@2.3.0
 ```
 
 Run `npx zos --version` to output the current ZeppelinOS version.
@@ -37,13 +41,13 @@ Run `npx zos --version` to output the current ZeppelinOS version.
 Run `npx zos --help` to output a list of all ZeppelinOS commands available. At any time
 during this getting started tutorial, you can run `npx zos <command-name> --help` to get detailed information about that command and its arguments.
 
-The contract in this tutorial imports a contract from the ZeppelinOS library package, which includes contracts to help with the development of ZeppelinOS compatible smart contracts. Install the `zos-lib` package as follows:
+The contract that you will be working with in this tutorial imports a contract from the ZeppelinOS library package, which includes contracts to help with the development of ZeppelinOS compatible smart contracts. Install the `zos-lib` package as follows:
 
 ```console
-npm install zos-lib@2.3.0-rc.2
+npm install zos-lib@2.3.0
 ```
 
-For this tutorial, you import `Initializable.sol` so your contract can use the `initializer` modifier, and thus prevent the `initialize` function from being called more than once.
+For this tutorial, import `Initializable.sol` so your contract can use the `initializer` modifier, and thus prevent the `initialize` function from being called more than once.
 
 Now initialize the ZeppelinOS project:
 
@@ -91,11 +95,16 @@ contract MyContract is Initializable {
 }
 ```
 
-Notice that the sample contract has an `initialize` function instead of the standard
-Solidity constructor. This is how you define constructor functionality for upgradeable
-contracts in ZeppelinOS, which you'll see in more detail in the next tutorial.
+At this point it's important to understand that ZeppelinOS deploys two kinds of contracts:
 
-Also note that the contract imports another contract from the `zos-lib` package, which
+* The logic contract, which you just composed with Solidity code.
+* The upgradeable instance, which is a proxy for the logic contract, and holds its state.
+
+Notice that the sample contract above has an `initialize` function instead of the standard
+Solidity constructor. This is how you define constructor functionality for upgradeable
+contracts in ZeppelinOS, which you'll work with in the next tutorial.
+
+Also note that the contract imports another contract from the `zos-lib` package that
 you installed previously.
 
 
@@ -119,7 +128,7 @@ Now run `zos create`:
 $ npx zos create
 ```
 
-Most of the ZeppelinOS commands, such as `create`, are interactive as of version 2.3 and will prompt you for the needed information. In this case, the `create` command will prompt you, and you can use **Enter** to select the defaults as follows:
+Most of the ZeppelinOS commands, such as `create`, are interactive as of version 2.3 and will request information as needed. In this case, use **Enter** to select the defaults as follows:
 
 `Choose a contract:` **MyContract**
 `Select a network:` **local**
@@ -133,19 +142,16 @@ When it prompts you for initial variable values, you can give it any **int** and
 
 The interactive command does the following:
 
-* Invokes `create` to compile your contract.
+* Uses Truffle to compile your contract.
 
   > **Note**: The current version of ZeppelinOS relies on Truffle to compile contracts and
   > determine the Solidity compiler version to use. If you want to use a different version,
-  > specify it in the Truffle configuration file. You can find more information in the
-  > Truffle documentation at:
-  > https://github.com/trufflesuite/truffle/releases/tag/v5.0.0-beta.0#specify-a-solcjs-version
+  > specify it in the Truffle configuration file. You can find more information in the Truffle
+  > [Compiler Configuration](https://www.truffleframework.com/docs/truffle/reference/configuration#compiler-configuration) documentation.
 
 * Invokes `add` to add your contract to the project by registering it in the `zos.json` configuration file.
 
 * Invokes `push` to deploy the contract to the `local` network. If your project had contained other contracts, they would also be deployed.
-
-### Pushing contracts
 
 The `push` command creates a file `zos.dev-<network_id>.json` containing all the information about the project in the specified network. The file includes the address of the deployed contract implementation in `contracts.<contract-name>.address`. For more details about this file format, see
 [Configuration Files](configuration.md#zos-network-json).
@@ -159,5 +165,7 @@ Once you create an upgradeable instance of your contract, you always interact wi
 You can follow the same steps to deploy your project to mainnet or other test networks by simply replacing `local` with the network name from your `truffle-config.js` file. This is further explained in [Deploying to mainnet](mainnet).
 
 Let's continue exploring all the features that ZeppelinOS has to offer! The initial version of your project exists in the blockchain. In the next tutorial you'll learn how to create an upgradeable instance for the logic contract.
+
+> **Note:** To continue with the next tutorial, keep the console window with `ganache-cli` running, or you will lose your original deployment.
 
 Next: [Upgrading your project](https://docs.zeppelinos.org/docs/upgrading.html)
