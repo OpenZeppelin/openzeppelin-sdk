@@ -2,6 +2,7 @@ declare module 'solc' {
   const version: Compiler['version'];
   const loadRemoteVersion: Compiler['loadRemoteVersion'];
   const compile: Compiler['compile'];
+  const setupMethods: Compiler['setupMethods'];
 
   export interface Compiler {
     version(): string;
@@ -10,10 +11,12 @@ declare module 'solc' {
       cb: (error: any, compiler: Compiler) => void,
     );
     compile(input: string, readCb: (dependency: any) => void);
+    setupMethods(input: any): Compiler;
   }
 
   export interface CompilerOptimizerOptions {
     enabled: boolean;
+    runs?: string;
   }
 
   export interface CompilerSettings {

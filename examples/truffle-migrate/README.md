@@ -47,4 +47,4 @@ await update(Object.assign({ contractAlias: 'MyContract', methodName: 'add', met
 ### Boilerplate
 
 Due to limitations on how global variables are managed within truffle scripts, both deployment functions need to be 
-run after the `ConfigVariablesInitializer` object exported by `zos` CLI is called. We have ongoing efforts to remove this restriction in the near future.
+run after the `ConfigManager` object exported by `zos` CLI is called. We have ongoing efforts to remove this restriction in the near future.

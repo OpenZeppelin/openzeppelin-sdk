@@ -2,7 +2,7 @@ import pickBy from 'lodash.pickby';
 
 import sendTx from '../scripts/send-tx';
 import { parseContractReference } from '../utils/contract';
-import ConfigVariablesInitializer from '../models/initializer/ConfigVariablesInitializer';
+import ConfigManager from '../models/config/ConfigManager';
 import {
   promptIfNeeded,
   networksList,
@@ -50,10 +50,7 @@ const register: (program: any) => any = program =>
 async function action(options: any): Promise<void> {
   const { interactive, to: proxyAddress, value, gas } = options;
   const networkOpts = await promptForNetwork(options, () => getCommandProps());
-  const {
-    network,
-    txParams,
-  } = await ConfigVariablesInitializer.initNetworkConfiguration({
+  const { network, txParams } = await ConfigManager.initNetworkConfiguration({
     ...options,
     ...networkOpts,
   });

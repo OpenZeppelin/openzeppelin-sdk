@@ -5,8 +5,7 @@ import {
   networksList,
   InquirerQuestions,
 } from '../prompts/prompt';
-import Session from '../models/network/Session';
-import ConfigVariablesInitializer from '../models/initializer/ConfigVariablesInitializer';
+import ConfigManager from '../models/config/ConfigManager';
 
 const name = 'session';
 const signature: string = name;
@@ -47,9 +46,7 @@ async function action(options: any): Promise<void> {
       { opts: { network: networkInOpts }, props: getCommandProps() },
       interactive,
     );
-    const {
-      network,
-    } = await ConfigVariablesInitializer.initNetworkConfiguration(
+    const { network } = await ConfigManager.initNetworkConfiguration(
       promptedNetwork,
       true,
     );

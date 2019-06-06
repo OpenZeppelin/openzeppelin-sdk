@@ -80,7 +80,7 @@ export default interface Contract {
     source: string;
     sourcePath: string;
     ast: any;
-    legacyAST: any;
+    legacyAST?: any;
     compiler: any;
     networks: any;
     updatedAt: string;

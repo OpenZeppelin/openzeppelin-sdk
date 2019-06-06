@@ -1,10 +1,10 @@
-const { ConfigVariablesInitializer, files, scripts, stdout } = require('zos');
+const { ConfigManager, files, scripts, stdout } = require('zos');
 const { helpers, Contracts } = require('zos-lib');
 stdout.silent(true);
 
 async function setup(network) {
   // Initialize network
-  const networkConfig = await ConfigVariablesInitializer.initNetworkConfiguration({ network: network || process.env.NETWORK || 'local' });
+  const networkConfig = await ConfigManager.initNetworkConfiguration({ network: network || process.env.NETWORK || 'local' });
   console.log(`$ zos session --network ${networkConfig.network}`);
   console.log(`> Initialized session on network ${networkConfig.network}\n`);
 

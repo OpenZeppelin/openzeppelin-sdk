@@ -1,44 +1,94 @@
-import { execFile, ExecException } from 'child_process';
-import { FileSystem, Logger } from 'zos-lib';
+import { execFile as callbackExecFile, ExecException } from 'child_process';
+import { Logger } from 'zos-lib';
+import Truffle from '../config/TruffleConfig';
+import {
+  compileProject,
+  ProjectCompilerOptions,
+} from './solidity/SolidityProjectCompiler';
+import findUp from 'find-up';
+import ZosPackageFile from '../files/ZosPackageFile';
+import { promisify } from 'util';
 
 const log = new Logger('Compiler');
-
 const state = { alreadyCompiled: false };
+const execFile = promisify(callbackExecFile);
 
-const Compiler = {
-  async call(
-    force: boolean = false,
-  ): Promise<{ stdout: string; stderr: string }> {
-    if (force || !state.alreadyCompiled) {
-      log.info('Compiling contracts with Truffle...');
-      let truffleBin = `${process.cwd()}/node_modules/.bin/truffle`;
-      if (!FileSystem.exists(truffleBin)) truffleBin = 'truffle'; // Attempt to load global truffle if local was not found
+export async function compile(
+  compilerOptions?: ProjectCompilerOptions,
+  packageFile = new ZosPackageFile(),
+  force: boolean = false,
+): Promise<void> {
+  if (!force && state.alreadyCompiled) return;
 
-      return new Promise((resolve, reject) => {
-        const args: object = { shell: true };
+  // Merge config file compiler options with those set explicitly
+  compilerOptions = { ...packageFile.compilerOptions, ...compilerOptions };
 
-        execFile(
-          truffleBin,
-          ['compile', '--all'],
-          args,
-          (error: ExecException, stdout, stderr) => {
-            if (error) {
-              if (error.code === 127)
-                console.error(
-                  'Could not find truffle executable. Please install it by running: npm install truffle',
-                );
-              reject(error);
-            } else {
-              state.alreadyCompiled = true;
-              resolve({ stdout, stderr });
-            }
-            if (stdout) console.log(stdout);
-            if (stderr) console.error(stderr);
-          },
-        );
-      });
+  // Validate compiler manager setting
+  const { manager } = compilerOptions;
+  if (manager && manager !== 'truffle' && manager !== 'zos') {
+    throw new Error(
+      `Unknown compiler manager '${manager}' (valid values are 'zos' or 'truffle')`,
+    );
+  }
+
+  // We use truffle if set explicitly, or if nothing was set but there is a truffle.js file
+  const useTruffle =
+    manager === 'truffle' || (!manager && Truffle.isTruffleProject());
+
+  // Compile! We use the exports syntax so we can stub them out during tests (nasty, but works!)
+  const { compileWithTruffle, compileWithSolc } = exports;
+  const compilePromise = useTruffle
+    ? compileWithTruffle()
+    : compileWithSolc(compilerOptions);
+  await compilePromise;
+
+  // If compiled successfully, write back compiler settings to zos.json to persist them
+  packageFile.setCompilerOptions({
+    ...compilerOptions,
+    manager: useTruffle ? 'truffle' : 'zos',
+  });
+  packageFile.write();
+
+  state.alreadyCompiled = true;
+}
+
+export async function compileWithSolc(
+  compilerOptions?: ProjectCompilerOptions,
+): Promise<void> {
+  await compileProject(compilerOptions);
+}
+
+export async function compileWithTruffle(): Promise<void> {
+  log.info(
+    'Compiling contracts with Truffle, using settings from truffle.js...',
+  );
+  // Attempt to load global truffle if local was not found
+  const truffleBin: string =
+    (await findUp('node_modules/.bin/truffle')) || 'truffle';
+
+  let stdout: string, stderr: string;
+  try {
+    const args: object = { shell: true };
+    ({ stdout, stderr } = await execFile(
+      truffleBin,
+      ['compile', '--all'],
+      args,
+    ));
+  } catch (error) {
+    if (error.code === 127) {
+      log.error(
+        'Could not find truffle executable. Please install it by running: npm install truffle',
+      );
+      ({ stdout, stderr } = error);
+      throw error;
     }
-  },
-};
+  } finally {
+    if (stdout) console.log(stdout);
+    if (stderr) console.log(stderr);
+  }
+}
 
-export default Compiler;
+// Used for tests
+export function resetState() {
+  state.alreadyCompiled = false;
+}

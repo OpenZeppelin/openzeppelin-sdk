@@ -5,11 +5,11 @@ import { ZWeb3 } from 'zos-lib';
 import add from './add';
 import push from '../scripts/push';
 import Session from '../models/network/Session';
-import Compiler from '../models/compiler/Compiler';
+import { compile } from '../models/compiler/Compiler';
 import { fromContractFullName } from '../utils/naming';
 import Dependency from '../models/dependency/Dependency';
 import ZosPackageFile from '../models/files/ZosPackageFile';
-import ConfigVariablesInitializer from '../models/initializer/ConfigVariablesInitializer';
+import ConfigManager from '../models/config/ConfigManager';
 import {
   promptIfNeeded,
   networksList,
@@ -69,13 +69,10 @@ async function action(options: any): Promise<void> {
   const defaults = { network: networkInSession };
   const props = getCommandProps();
 
-  if (!options.skipCompile) await Compiler.call();
+  if (!options.skipCompile) await compile();
 
   const prompted = await promptIfNeeded({ opts, defaults, props }, interactive);
-  const {
-    network,
-    txParams,
-  } = await ConfigVariablesInitializer.initNetworkConfiguration({
+  const { network, txParams } = await ConfigManager.initNetworkConfiguration({
     ...options,
     ...prompted,
   });

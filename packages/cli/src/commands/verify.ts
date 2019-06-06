@@ -1,8 +1,5 @@
-import pickBy from 'lodash.pickby';
-
 import verify from '../scripts/verify';
-import ConfigVariablesInitializer from '../models/initializer/ConfigVariablesInitializer';
-import Truffle from '../models/initializer/truffle/Truffle';
+import ConfigManager from '../models/config/ConfigManager';
 import {
   promptIfNeeded,
   contractsList,
@@ -53,17 +50,16 @@ async function action(contractName: string, options: any): Promise<void> {
     remote,
     apiKey,
   };
-  const defaults = Truffle.getCompilerInfo();
+  const defaults = ConfigManager.getCompilerInfo();
   const props = getCommandProps(optimizer);
 
   const prompted = await promptIfNeeded(
     { args, opts, defaults, props },
     interactive,
   );
-  const {
-    network,
-    txParams,
-  } = await ConfigVariablesInitializer.initNetworkConfiguration(prompted);
+  const { network, txParams } = await ConfigManager.initNetworkConfiguration(
+    prompted,
+  );
 
   await verify(prompted.contractName, { ...prompted, network, txParams });
   if (!options.dontExitProcess && process.env.NODE_ENV !== 'test')

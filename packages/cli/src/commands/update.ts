@@ -4,7 +4,7 @@ import push from './push';
 import update from '../scripts/update';
 import { parseContractReference } from '../utils/contract';
 import { hasToMigrateProject } from '../prompts/migrations';
-import ConfigVariablesInitializer from '../models/initializer/ConfigVariablesInitializer';
+import ConfigManager from '../models/config/ConfigManager';
 import { UpdatePropsParams, UpdateSelectionParams } from './interfaces';
 import {
   promptIfNeeded,
@@ -53,10 +53,7 @@ async function commandActions(
   const { network: promptedNetwork } = await promptForNetwork(options, () =>
     getCommandProps(),
   );
-  const {
-    network,
-    txParams,
-  } = await ConfigVariablesInitializer.initNetworkConfiguration({
+  const { network, txParams } = await ConfigManager.initNetworkConfiguration({
     ...options,
     network: promptedNetwork,
   });

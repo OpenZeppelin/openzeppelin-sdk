@@ -13,7 +13,7 @@ import {
   InquirerQuestions,
 } from '../prompts/prompt';
 import { hasToMigrateProject } from '../prompts/migrations';
-import ConfigVariablesInitializer from '../models/initializer/ConfigVariablesInitializer';
+import ConfigManager from '../models/config/ConfigManager';
 
 const name = 'set-admin';
 const signature = `${name} [alias-or-address] [new-admin-address]`;
@@ -46,10 +46,7 @@ async function action(
 
   const networkOpts = await promptForNetwork(options, () => getCommandProps());
 
-  const {
-    network,
-    txParams,
-  } = await ConfigVariablesInitializer.initNetworkConfiguration({
+  const { network, txParams } = await ConfigManager.initNetworkConfiguration({
     ...options,
     ...networkOpts,
   });

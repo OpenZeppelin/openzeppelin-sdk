@@ -1,11 +1,28 @@
 import path from 'path';
+import pickBy from 'lodash.pickby';
 import isEqual from 'lodash.isequal';
 import isEmpty from 'lodash.isempty';
 import { Logger, FileSystem as fs } from 'zos-lib';
 import Dependency from '../dependency/Dependency';
 import { ZOS_VERSION, checkVersion } from './ZosVersion';
 import ZosNetworkFile from './ZosNetworkFile';
+import { ProjectCompilerOptions } from '../compiler/solidity/SolidityProjectCompiler';
+
 const log = new Logger('ZosPackageFile');
+
+interface ConfigFileCompilerOptions {
+  manager: string;
+  solcVersion: string;
+  contractsDir: string;
+  artifactsDir: string;
+  compilerSettings: {
+    evmVersion: string;
+    optimizer: {
+      enabled: boolean;
+      runs: string;
+    };
+  };
+}
 
 export default class ZosPackageFile {
   public fileName: string;
@@ -16,6 +33,7 @@ export default class ZosPackageFile {
     dependencies: { [name: string]: string };
     contracts: { [alias: string]: string };
     publish: boolean;
+    compiler: ConfigFileCompilerOptions;
   };
 
   public static getLinkedDependencies(fileName: string = 'zos.json'): string[] {
@@ -110,6 +128,53 @@ export default class ZosPackageFile {
 
   public get isPublished(): boolean {
     return !!this.data.publish;
+  }
+
+  public get compilerOptions(): ProjectCompilerOptions {
+    // Awkward destructuring is due to https://github.com/microsoft/TypeScript/issues/26235
+    const config: ConfigFileCompilerOptions = this.data.compiler;
+    const manager = config && config.manager;
+    const version = config && config.solcVersion;
+    const inputDir = config && config.contractsDir;
+    const outputDir = config && config.artifactsDir;
+    const compilerSettings = config && config.compilerSettings;
+    const evmVersion = compilerSettings && compilerSettings.evmVersion;
+    const optimizer = compilerSettings && compilerSettings.optimizer;
+
+    return {
+      manager,
+      inputDir,
+      outputDir,
+      evmVersion,
+      version,
+      optimizer,
+    };
+  }
+
+  public setCompilerOptions(options: ProjectCompilerOptions) {
+    const {
+      manager,
+      version,
+      outputDir,
+      inputDir,
+      evmVersion,
+      optimizer,
+    } = options;
+    const configOptions: ConfigFileCompilerOptions = {
+      manager,
+      solcVersion: version,
+      artifactsDir: outputDir,
+      contractsDir: inputDir,
+      compilerSettings: {
+        evmVersion,
+        optimizer,
+      },
+    };
+
+    this.data.compiler =
+      manager === 'trufle'
+        ? { manager: 'truffle' }
+        : pickBy({ ...this.data.compiler, ...configOptions });
   }
 
   public contract(alias: string): string {

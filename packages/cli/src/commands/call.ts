@@ -3,7 +3,6 @@ import { ContractMethodMutability as Mutability } from 'zos-lib';
 
 import call from '../scripts/call';
 import { parseContractReference } from '../utils/contract';
-import ConfigVariablesInitializer from '../models/initializer/ConfigVariablesInitializer';
 import {
   promptIfNeeded,
   networksList,
@@ -14,6 +13,7 @@ import {
   proxyInfo,
   InquirerQuestions,
 } from '../prompts/prompt';
+import ConfigManager from '../models/config/ConfigManager';
 import { SendTxPropsParams, SendTxSelectionParams } from './interfaces';
 import promptForMethodParams from '../prompts/method-params';
 
@@ -40,10 +40,7 @@ const register: (program: any) => any = program =>
 async function action(options: any): Promise<void> {
   const { interactive, to: proxyAddress } = options;
   const networkOpts = await promptForNetwork(options, () => getCommandProps());
-  const {
-    network,
-    txParams,
-  } = await ConfigVariablesInitializer.initNetworkConfiguration({
+  const { network, txParams } = await ConfigManager.initNetworkConfiguration({
     ...options,
     ...networkOpts,
   });

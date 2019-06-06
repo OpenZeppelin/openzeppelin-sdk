@@ -1,6 +1,6 @@
 import check from '../scripts/check';
-import Compiler from '../models/compiler/Compiler';
-import ConfigVariablesInitializer from '../models/initializer/ConfigVariablesInitializer';
+import { compile } from '../models/compiler/Compiler';
+import ConfigManager from '../models/config/ConfigManager';
 
 const name = 'check';
 const signature = `${name} [contract]`;
@@ -15,8 +15,8 @@ const register: (program: any) => any = program =>
     .action(action);
 
 async function action(contractAlias: string, options: any): Promise<void> {
-  ConfigVariablesInitializer.initStaticConfiguration();
-  if (!options.skipCompile) await Compiler.call();
+  ConfigManager.initStaticConfiguration();
+  if (!options.skipCompile) await compile();
   check({ contractAlias });
 }
 
