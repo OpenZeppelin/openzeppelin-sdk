@@ -1,12 +1,14 @@
-import Logger from '../utils/Logger';
+import path from 'path';
+import Logger, { Loggy, LogLevel } from '../utils/Logger';
 import Contracts from '../artifacts/Contracts';
 import ImplementationDirectory from '../application/ImplementationDirectory';
 import { toSemanticVersion, SemanticVersion } from '../utils/Semver';
-import { toAddress, isZeroAddress } from '../utils/Addresses';
+import { isZeroAddress } from '../utils/Addresses';
 import Contract from '../artifacts/Contract';
 import { TxParams } from '../artifacts/ZWeb3';
 import Transactions from '../utils/Transactions';
 
+const fileName = path.basename(__filename);
 const log: Logger = new Logger('Package');
 
 export default class Package {
@@ -24,14 +26,18 @@ export default class Package {
   }
 
   public static async deploy(txParams: TxParams = {}): Promise<Package> {
-    log.info('Deploying new Package...');
     const PackageContract: Contract = Contracts.getFromLib('Package');
     const packageContract = await Transactions.deployContract(
       PackageContract,
       [],
       txParams,
     );
-    log.info(`Deployed Package ${packageContract.address}`);
+    Loggy.add(
+      `${fileName}#deploy`,
+      `deployed-package-${packageContract.address}`,
+      `Deployed Package ${packageContract.address}`,
+      { logLevel: LogLevel.Verbose },
+    );
     return new this(packageContract, txParams);
   }
 
@@ -78,7 +84,6 @@ export default class Package {
     version: string,
     content: string = '',
   ): Promise<ImplementationDirectory> {
-    log.info('Adding new version...');
     const semver: SemanticVersion = toSemanticVersion(version);
     const directory: ImplementationDirectory = await ImplementationDirectory.deploy(
       { ...this.txParams },
@@ -88,7 +93,6 @@ export default class Package {
       [semver, directory.address, Buffer.from(content)],
       { ...this.txParams },
     );
-    log.info(`Added version ${semver.join('.')}`);
     return directory;
   }
 

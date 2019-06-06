@@ -1,9 +1,11 @@
-import Logger from '../utils/Logger';
+import path from 'path';
+import Logger, { Loggy, LogLevel } from '../utils/Logger';
 import Transactions from '../utils/Transactions';
 import Contracts from '../artifacts/Contracts';
 import Contract from '../artifacts/Contract';
 import { TxParams } from '../artifacts/ZWeb3';
 
+const fileName = path.basename(__filename);
 const log = new Logger('ImplementationDirectory');
 
 // TS-TODO: review which members could be private
@@ -15,10 +17,12 @@ export default class ImplementationDirectory {
     txParams: TxParams = {},
   ): Promise<ImplementationDirectory> {
     const contract = this.getContract();
-    log.info(`Deploying new ${contract.schema.contractName}...`);
     const directory = await Transactions.deployContract(contract, [], txParams);
-    log.info(
+    Loggy.add(
+      `${fileName}#deploy`,
+      `deployed-implementation-directory`,
       `Deployed ${contract.schema.contractName} at ${directory.address}`,
+      { logLevel: LogLevel.Verbose },
     );
 
     return new this(directory, txParams);

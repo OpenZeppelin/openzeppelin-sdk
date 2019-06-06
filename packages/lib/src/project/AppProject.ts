@@ -1,3 +1,4 @@
+import path from 'path';
 import concat from 'lodash.concat';
 import map from 'lodash.map';
 import isEmpty from 'lodash.isempty';
@@ -16,11 +17,12 @@ import { semanticVersionToString } from '../utils/Semver';
 import ProxyFactory from '../proxy/ProxyFactory';
 import { CalldataInfo, buildCallData, callDescription } from '../utils/ABIs';
 import { TxParams } from '../artifacts/ZWeb3';
-import Logger from '../utils/Logger';
+import Logger, { Loggy } from '../utils/Logger';
 
 const DEFAULT_NAME = 'main';
 const DEFAULT_VERSION = '0.1.0';
 
+const fileName = path.basename(__filename);
 const log: Logger = new Logger('AppProject');
 
 export interface ContractInterface {
@@ -63,18 +65,51 @@ class BaseAppProject extends BasePackageProject {
     version = semanticVersionToString(version);
 
     try {
-      app = appAddress
-        ? await App.fetch(appAddress, txParams)
-        : await App.deploy(txParams);
-      if (packageAddress) thepackage = Package.fetch(packageAddress, txParams);
-      else if (await app.hasPackage(name, version))
+      if (appAddress) {
+        app = await App.fetch(appAddress, txParams);
+      } else {
+        Loggy.add(
+          `${fileName}#fetchOrDeploy`,
+          `publish-project`,
+          'Preparing everything to publish the project! Deploying new App contract',
+        );
+        app = await App.deploy(txParams);
+      }
+
+      if (packageAddress) {
+        thepackage = Package.fetch(packageAddress, txParams);
+      } else if (await app.hasPackage(name, version)) {
         thepackage = (await app.getPackage(name)).package;
-      else thepackage = await Package.deploy(txParams);
-      directory = (await thepackage.hasVersion(version))
-        ? await thepackage.getDirectory(version)
-        : await thepackage.newVersion(version);
+      } else {
+        Loggy.addOrUpdate(
+          `${fileName}#fetchOrDeploy`,
+          `publish-project`,
+          'Deploying new Package contract',
+        );
+        thepackage = await Package.deploy(txParams);
+        Loggy.update(`publish-project`, {
+          text: 'Deploying new Package contract',
+        });
+      }
+
+      if (await thepackage.hasVersion(version)) {
+        directory = await thepackage.getDirectory(version);
+      } else {
+        Loggy.addOrUpdate(
+          `${fileName}#fetchOrDeploy`,
+          `publish-project`,
+          `Adding new version ${version} and creating ImplementationDirectory contract`,
+        );
+        directory = await thepackage.newVersion(version);
+        Loggy.succeed(
+          `publish-project`,
+          `Project structure successfully deployed!`,
+        );
+      }
+
       if (!(await app.hasPackage(name, version)))
         await app.setPackage(name, thepackage.address, version);
+
       const proxyAdmin: ProxyAdmin | null = proxyAdminAddress
         ? await ProxyAdmin.fetch(proxyAdminAddress, txParams)
         : null;

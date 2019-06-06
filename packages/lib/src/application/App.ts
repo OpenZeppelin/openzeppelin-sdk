@@ -1,6 +1,7 @@
+import path from 'path';
 import isEmpty from 'lodash.isempty';
 
-import Logger from '../utils/Logger';
+import Logger, { Loggy, LogLevel } from '../utils/Logger';
 import Proxy from '../proxy/Proxy';
 import copyContract from '../helpers/copyContract';
 import Contracts from '../artifacts/Contracts';
@@ -13,6 +14,7 @@ import { toSemanticVersion, semanticVersionEqual } from '../utils/Semver';
 import Transactions from '../utils/Transactions';
 import { TxParams } from '../artifacts/ZWeb3';
 
+const fileName = path.basename(__filename);
 const log: Logger = new Logger('App');
 
 export default class App {
@@ -28,13 +30,17 @@ export default class App {
   }
 
   public static async deploy(txParams: TxParams = {}): Promise<App> {
-    log.info('Deploying new App...');
     const appContract = await Transactions.deployContract(
       this.getContractClass(),
       [],
       txParams,
     );
-    log.info(`Deployed App at ${appContract.address}`);
+    Loggy.add(
+      `${fileName}#deploy`,
+      `deployed-app`,
+      `Deployed App at ${appContract.address}`,
+      { logLevel: LogLevel.Verbose },
+    );
     return new this(appContract, txParams);
   }
 
@@ -213,6 +219,7 @@ export default class App {
     return Proxy.deploy(implementation, proxyAdmin, callData, this.txParams);
   }
 
+  // TODO: remove
   private async _copyContract(
     packageName: string,
     contractName: string,
