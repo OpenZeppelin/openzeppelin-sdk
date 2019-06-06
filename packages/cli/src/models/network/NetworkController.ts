@@ -17,6 +17,7 @@ import {
   Contract,
   Logger,
   Loggy,
+  SpinnerAction,
   FileSystem as fs,
   Proxy,
   Transactions,
@@ -186,7 +187,19 @@ export default class NetworkController {
     await this._unsetSolidityLibs();
 
     if (isEmpty(contracts) && isEmpty(changedLibraries)) {
-      log.info('All logic contracts are up to date');
+      Loggy.add(
+        `${fileName}#push`,
+        `after-push`,
+        `All logic contracts are up to date`,
+        { spinnerAction: SpinnerAction.NonSpinnable },
+      );
+    } else {
+      Loggy.add(
+        `${fileName}#push`,
+        `after-push`,
+        `All logic contracts have been successfully pushed`,
+        { spinnerAction: SpinnerAction.NonSpinnable },
+      );
     }
   }
 
@@ -207,8 +220,6 @@ export default class NetworkController {
   // DeployerController
   private _checkVersion(): void {
     if (this._newVersionRequired()) {
-      log.info(`Current version ${this.currentVersion}`);
-      log.info(`Creating new version ${this.packageVersion}`);
       this.networkFile.frozen = false;
       this.networkFile.contracts = {};
     }
@@ -284,9 +295,17 @@ export default class NetworkController {
   // Contract model || SolidityLib model
   private async _uploadSolidityLib(libClass: Contract): Promise<void> {
     const libName = libClass.schema.contractName;
-    log.info(`Uploading ${libName} library...`);
+    Loggy.add(
+      `${fileName}#_uploadSolidityLib`,
+      `upload-solidity-lib${libName}`,
+      `Uploading ${libName} library`,
+    );
     const libInstance = await this.project.setImplementation(libClass, libName);
     this.networkFile.addSolidityLib(libName, libInstance);
+    Loggy.succeed(
+      `upload-solidity-lob${libName}`,
+      `${libName} library successfully uploaded`,
+    );
   }
 
   // Contract model
@@ -305,10 +324,12 @@ export default class NetworkController {
   ): Promise<void | never> {
     try {
       await this._setSolidityLibs(contract);
-      log.info(
-        `Uploading ${
+      Loggy.add(
+        `${fileName}#uploadContract`,
+        `upload-contract${contract.schema.contractName}`,
+        `Performing some security checks and pushing contract ${
           contract.schema.contractName
-        } contract as ${contractAlias}`,
+        }`,
       );
       const contractInstance = await this.project.setImplementation(
         contract,
@@ -323,6 +344,13 @@ export default class NetworkController {
         types,
         storage,
       });
+
+      Loggy.succeed(
+        `upload-contract${contract.schema.contractName}`,
+        `Contract ${
+          contract.schema.contractName
+        } successfully checked and pushed`,
+      );
     } catch (error) {
       error.message = `${contractAlias} deployment failed with error: ${
         error.message
@@ -352,9 +380,14 @@ export default class NetworkController {
   // Contract model || SolidityLib model
   private async _unsetSolidityLib(libName: string): Promise<void | never> {
     try {
-      log.info(`Removing ${libName} library`);
+      Loggy.add(
+        `${fileName}#_unsetSolidityLib`,
+        `unset-solidity-lib-${libName}`,
+        `Removing ${libName} library`,
+      );
       await this.project.unsetImplementation(libName);
       this.networkFile.unsetSolidityLib(libName);
+      Loggy.succeed(`unset-solidity-lib-${libName}`);
     } catch (error) {
       error.message = `Removal of ${libName} failed with error: ${
         error.message
@@ -396,9 +429,14 @@ export default class NetworkController {
   // Contract model
   public async unsetContract(contractAlias: string): Promise<void | never> {
     try {
-      log.info(`Removing ${contractAlias} contract`);
+      Loggy.add(
+        `${fileName}#unsetContract`,
+        `unset-contract-${contractAlias}`,
+        `Removing ${contractAlias} contract`,
+      );
       await this.project.unsetImplementation(contractAlias);
       this.networkFile.unsetContract(contractAlias);
+      Loggy.succeed(`unset-contract-${contractAlias}`);
     } catch (error) {
       error.message = `Removal of ${contractAlias} failed with error: ${
         error.message
@@ -425,7 +463,6 @@ export default class NetworkController {
     contract: Contract,
     buildArtifacts: BuildArtifacts,
   ): boolean {
-    log.info(`Validating contract ${contract.schema.contractName}`);
     try {
       const existingContractInfo: any =
         this.networkFile.contract(contractAlias) || {};
@@ -686,7 +723,12 @@ export default class NetworkController {
   // DeployerController
   public async publish(): Promise<void> {
     if (this.appAddress) {
-      log.info(`Project is already published to ${this.network}`);
+      Loggy.add(
+        `project-already-published`,
+        `${fileName}#publish`,
+        `Project is already published to ${this.network}`,
+        { spinnerAction: SpinnerAction.NonSpinnable },
+      );
       return;
     }
 
@@ -696,7 +738,12 @@ export default class NetworkController {
     )) as ProxyAdminProject;
     const deployer = new AppProjectDeployer(this, this.packageVersion);
     this.project = await deployer.fromProxyAdminProject(proxyAdminProject);
-    Loggy.succeed(`publish-project`, `Publish to ${this.network} successful!`);
+    Loggy.succeed(
+      `publish-project`,
+      `Publish to ${this.network} successful! Go to the zos.${
+        this.network
+      }.json file to check the deployed project info`,
+    );
   }
 
   // Proxy model
@@ -1116,7 +1163,7 @@ export default class NetworkController {
       Loggy.add(
         `${fileName}#deployDependencyIfNeeded`,
         `deploy-dependency-${depName}`,
-        `Deploying ${depName} contracts to network ${this.network}`,
+        `Deploying ${depName} dependency to network ${this.network}`,
       );
       const deployment = await dependency.deploy(this.txParams);
 
@@ -1125,6 +1172,7 @@ export default class NetworkController {
         version: deployment.version,
         customDeploy: true,
       });
+      Loggy.succeed(`deploy-dependency-${depName}`);
     } catch (error) {
       error.message = `Failed deployment of dependency ${depName} with error: ${
         error.message
@@ -1169,7 +1217,12 @@ export default class NetworkController {
   ): Promise<boolean | void | never> {
     try {
       if (this.networkFile.dependencyHasMatchingCustomDeploy(depName)) {
-        log.info(`Using custom deployment of ${depName}`);
+        Loggy.add(
+          `${fileName}#linkDependency`,
+          `link-dependency-${depName}`,
+          `Using custom deployment of ${depName}`,
+          { spinnerAction: SpinnerAction.NonSpinnable },
+        );
         const depInfo = this.networkFile.getDependency(depName);
         return await this.project.setDependency(
           depName,
