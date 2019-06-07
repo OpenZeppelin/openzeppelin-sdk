@@ -1,5 +1,4 @@
-import Proxy from '../proxy/Proxy';
-import Logger from '../utils/Logger';
+import { Loggy } from '../utils/Logger';
 import ProxyAdmin from '../proxy/ProxyAdmin';
 import BaseSimpleProject from './BaseSimpleProject';
 import { ContractInterface } from './AppProject';
@@ -7,8 +6,6 @@ import Contract from '../artifacts/Contract';
 import ProxyFactory from '../proxy/ProxyFactory';
 import ProxyAdminProjectMixin from './mixin/ProxyAdminProjectMixin';
 import { TxParams } from '../artifacts/ZWeb3';
-
-const log: Logger = new Logger('ProxyAdminProject');
 
 class BaseProxyAdminProject extends BaseSimpleProject {
   public proxyAdmin: ProxyAdmin;
@@ -74,7 +71,10 @@ class BaseProxyAdminProject extends BaseSimpleProject {
       initMethodName,
       initArgs,
     );
-    log.info(`Instance at ${pAddress} upgraded`);
+    Loggy.succeed(
+      `action-proxy-${implementationAddress}`,
+      `Instance at ${pAddress} upgraded`,
+    );
     return contract.at(pAddress);
   }
 

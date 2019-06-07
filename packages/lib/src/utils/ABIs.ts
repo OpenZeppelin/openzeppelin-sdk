@@ -186,7 +186,9 @@ export function callDescription(method: any, args: string[]): string {
     (input: any, index: number) =>
       `${input.name} (${input.type}): ${JSON.stringify(args[index])}`,
   );
-  return `${method.name} with: ${argsDescriptions.join(', ')}`;
+  return `function ${method.name} with arguments: ${argsDescriptions.join(
+    ', ',
+  )}`;
 }
 
 export default {

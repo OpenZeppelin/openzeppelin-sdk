@@ -350,8 +350,11 @@ class BaseAppProject extends BasePackageProject {
       initCallData,
       signature,
     );
+    Loggy.succeed(
+      `action-proxy-${implementationAddress}`,
+      `Instance created at ${proxy.address}`,
+    );
 
-    log.info(`Instance created at ${proxy.address}`);
     return contract.at(proxy.address);
   }
 
@@ -382,8 +385,11 @@ class BaseAppProject extends BasePackageProject {
       implementationAddress,
       initCallData,
     );
+    Loggy.succeed(
+      `action-proxy-${implementationAddress}`,
+      `Instance created at ${proxy.address}`,
+    );
 
-    log.info(`Instance created at ${proxy.address}`);
     return contract.at(proxy.address);
   }
 
@@ -499,7 +505,9 @@ class BaseAppProject extends BasePackageProject {
         initArgs,
       );
       if (actionLabel)
-        log.info(
+        Loggy.add(
+          `${fileName}#getInitCallData`,
+          `action-proxy-${implementationAddress}`,
           `${actionLabel} proxy to logic contract ${implementationAddress} and initializing by calling ${callDescription(
             initMethod,
             initArgs,
@@ -508,7 +516,9 @@ class BaseAppProject extends BasePackageProject {
       return callData;
     } else {
       if (actionLabel)
-        log.info(
+        Loggy.add(
+          `${fileName}#getInitCallData`,
+          `action-proxy-${implementationAddress}`,
           `${actionLabel} proxy to logic contract ${implementationAddress}`,
         );
       return null;

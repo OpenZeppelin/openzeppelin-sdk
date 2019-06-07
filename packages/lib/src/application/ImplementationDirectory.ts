@@ -93,7 +93,7 @@ export default class ImplementationDirectory {
     Loggy.add(
       `${fileName}#unsetImplementation`,
       `unset-implementation-${contractName}`,
-      `Unsetting ${contractName} implementation...`,
+      `Unsetting ${contractName} implementation`,
       { logLevel: LogLevel.Verbose },
     );
     await Transactions.sendTransaction(

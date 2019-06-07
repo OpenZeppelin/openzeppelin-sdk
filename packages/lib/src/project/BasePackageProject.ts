@@ -37,7 +37,7 @@ export default abstract class BasePackageProject {
     Loggy.add(
       `${fileName}#freeze`,
       `freezing-${version}`,
-      `Freezing version ${version}...`,
+      `Freezing version ${version}`,
     );
     const directory: ImplementationDirectory = await this.getCurrentDirectory();
     await directory.freeze();
@@ -52,7 +52,7 @@ export default abstract class BasePackageProject {
     Loggy.add(
       `${fileName}#setImplementation`,
       `set-implementation-${contractName}`,
-      `Setting implementation of ${contractName} in directory...`,
+      `Setting implementation of ${contractName} in directory`,
       { logLevel: LogLevel.Verbose },
     );
     const implementation: any = await Transactions.deployContract(
@@ -73,7 +73,7 @@ export default abstract class BasePackageProject {
     Loggy.add(
       `${fileName}#unsetImplementation`,
       `unset-implementation-${contractName}`,
-      `Unsetting implementation of ${contractName}...`,
+      `Unsetting implementation of ${contractName}`,
       { logLevel: LogLevel.Verbose },
     );
     const directory: ImplementationDirectory = await this.getCurrentDirectory();

@@ -1,7 +1,7 @@
 import path from 'path';
 import isEmpty from 'lodash.isempty';
 
-import { Loggy, SpinnerAction } from '../utils/Logger';
+import { Loggy, LogLevel } from '../utils/Logger';
 import Contracts from '../artifacts/Contracts';
 import { toAddress } from '../utils/Addresses';
 import { buildCallData, callDescription, CalldataInfo } from '../utils/ABIs';
@@ -25,7 +25,7 @@ export default class ProxyAdmin {
     Loggy.add(
       `${fileName}#deploy`,
       `deploy-proxy-admin`,
-      'Deploying new ProxyAdmin...',
+      'Deploying new ProxyAdmin',
     );
     const contract = await Transactions.deployContract(
       Contracts.getFromLib('ProxyAdmin'),
@@ -58,7 +58,7 @@ export default class ProxyAdmin {
     Loggy.add(
       `${fileName}#changeProxyAdmin`,
       `change-proxy-admin`,
-      `Changing admin for proxy ${proxyAddress} to ${newAdmin}...`,
+      `Changing admin for proxy ${proxyAddress} to ${newAdmin}`,
     );
     await Transactions.sendTransaction(
       this.contract.methods.changeProxyAdmin,
@@ -93,7 +93,7 @@ export default class ProxyAdmin {
       `${fileName}#upgradeProxy`,
       `upgrade-proxy-${proxyAddress}`,
       `TX receipt received: ${receipt.transactionHash}`,
-      { spinnerAction: SpinnerAction.NonSpinnable },
+      { logLevel: LogLevel.Verbose },
     );
     return contract.at(proxyAddress);
   }
@@ -135,9 +135,10 @@ export default class ProxyAdmin {
     implementation: string,
   ): Promise<any> {
     Loggy.add(
-      `${fileName}_upgradeProxy`,
+      `${fileName}#_upgradeProxy`,
       `upgrade-proxy-${proxyAddress}`,
       `Upgrading proxy at ${proxyAddress}`,
+      { logLevel: LogLevel.Verbose },
     );
     return Transactions.sendTransaction(
       this.contract.methods.upgrade,

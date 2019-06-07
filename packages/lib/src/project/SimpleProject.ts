@@ -1,5 +1,6 @@
+import path from 'path';
 import Proxy from '../proxy/Proxy';
-import Logger from '../utils/Logger';
+import { Loggy } from '../utils/Logger';
 import ZWeb3 from '../artifacts/ZWeb3';
 import Contract from '../artifacts/Contract';
 import { ContractInterface } from './AppProject';
@@ -7,7 +8,7 @@ import BaseSimpleProject from './BaseSimpleProject';
 import ProxyFactory from '../proxy/ProxyFactory';
 import { TxParams } from '../artifacts/ZWeb3';
 
-const log: Logger = new Logger('SimpleProject');
+const fileName = path.basename(__filename);
 
 export default class SimpleProject extends BaseSimpleProject {
   public constructor(
@@ -30,7 +31,10 @@ export default class SimpleProject extends BaseSimpleProject {
     } = await this._setUpgradeParams(proxyAddress, contract, contractParams);
     const proxy = Proxy.at(pAddress, this.txParams);
     await proxy.upgradeTo(implementationAddress, initCallData);
-    log.info(`Instance at ${proxyAddress} upgraded`);
+    Loggy.succeed(
+      `action-proxy-${implementationAddress}`,
+      `Instance at ${pAddress} upgraded`,
+    );
     return contract.at(proxyAddress);
   }
 
@@ -38,9 +42,17 @@ export default class SimpleProject extends BaseSimpleProject {
     proxyAddress: string,
     newAdmin: string,
   ): Promise<Proxy> {
+    Loggy.add(
+      `${fileName}#changeProxyAdmin`,
+      `change-proxy-admin`,
+      `Changing admin for proxy ${proxyAddress} to ${newAdmin}`,
+    );
     const proxy: Proxy = Proxy.at(proxyAddress, this.txParams);
     await proxy.changeAdmin(newAdmin);
-    log.info(`Proxy ${proxyAddress} admin changed to ${newAdmin}`);
+    Loggy.succeed(
+      'change-proxy-admin',
+      `Admin for proxy ${proxyAddress} set to ${newAdmin}`,
+    );
     return proxy;
   }
 
