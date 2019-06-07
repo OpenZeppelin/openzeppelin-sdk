@@ -165,7 +165,10 @@ export default abstract class BaseSimpleProject {
       initCallData,
       this.txParams,
     );
-    log.info(`Instance created at ${proxy.address}`);
+    Loggy.succeed(
+      `create-proxy-${implementationAddress}`,
+      `Instance created at ${proxy.address}`,
+    );
     return contract.at(proxy.address);
   }
 
@@ -206,8 +209,10 @@ export default abstract class BaseSimpleProject {
       initCallData,
       signature,
     );
-
-    log.info(`Instance created at ${proxy.address}`);
+    Loggy.succeed(
+      `create-proxy-${implementationAddress}`,
+      `Instance created at ${proxy.address}`,
+    );
     return contract.at(proxy.address);
   }
 
@@ -241,8 +246,10 @@ export default abstract class BaseSimpleProject {
       implementationAddress,
       initCallData,
     );
-
-    log.info(`Instance created at ${proxy.address}`);
+    Loggy.succeed(
+      `create-proxy-${implementationAddress}`,
+      `Instance created at ${proxy.address}`,
+    );
     return contract.at(proxy.address);
   }
 
@@ -404,8 +411,10 @@ export default abstract class BaseSimpleProject {
         initArgs,
       );
       if (actionLabel)
-        log.info(
-          `${actionLabel} proxy to logic contract ${implementationAddress} and initializing by calling ${callDescription(
+        Loggy.add(
+          `${fileName}#_getAndLogInitCallData`,
+          `create-proxy-${implementationAddress}`,
+          `${actionLabel} instance for ${implementationAddress} and calling ${callDescription(
             initMethod,
             initArgs,
           )}`,
@@ -413,7 +422,9 @@ export default abstract class BaseSimpleProject {
       return callData;
     } else {
       if (actionLabel)
-        log.info(
+        Loggy.add(
+          `${fileName}#_getAndLogInitCallData`,
+          `create-proxy-${implementationAddress}`,
           `${actionLabel} proxy to logic contract ${implementationAddress}`,
         );
       return null;

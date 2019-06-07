@@ -88,11 +88,11 @@ export default abstract class BasePackageProject {
     Loggy.add(
       `${fileName}#registerImplementation`,
       `register-implementation-${contractName}`,
-      `Registering implementation of ${contractName} at ${address} in directory...`,
-      { logLevel: LogLevel.Verbose },
+      `Registering ${contractName} at ${address} in directory`,
     );
     const directory: ImplementationDirectory = await this.getCurrentDirectory();
     await directory.setImplementation(contractName, address);
+    Loggy.succeed(`register-implementation-${contractName}`);
   }
 
   public abstract async getCurrentDirectory(): Promise<any>;

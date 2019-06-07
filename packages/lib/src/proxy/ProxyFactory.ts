@@ -1,4 +1,6 @@
-import Logger from '../utils/Logger';
+import path from 'path';
+
+import Logger, { Loggy } from '../utils/Logger';
 import Contracts from '../artifacts/Contracts';
 import { toAddress } from '../utils/Addresses';
 import Transactions from '../utils/Transactions';
@@ -7,6 +9,7 @@ import Proxy from './Proxy';
 import { TxParams } from '../artifacts/ZWeb3';
 import MinimalProxy from './MinimalProxy';
 
+const fileName = path.basename(__filename);
 const log: Logger = new Logger('ProxyFactory');
 
 export default class ProxyFactory {
@@ -27,13 +30,20 @@ export default class ProxyFactory {
   }
 
   public static async deploy(txParams: TxParams = {}): Promise<ProxyFactory> {
-    log.info('Deploying new ProxyFactory...');
+    Loggy.add(
+      `${fileName}#deploy`,
+      'deploy-proxy-factory',
+      'Deploying new ProxyFactory contract',
+    );
     const contract = await Transactions.deployContract(
       Contracts.getFromLib('ProxyFactory'),
       [],
       txParams,
     );
-    log.info(`Deployed ProxyFactory at ${contract.address}`);
+    Loggy.succeed(
+      'deploy-proxy-factory',
+      `Deployed ProxyFactory at ${contract.address}`,
+    );
     return new this(contract, txParams);
   }
 
