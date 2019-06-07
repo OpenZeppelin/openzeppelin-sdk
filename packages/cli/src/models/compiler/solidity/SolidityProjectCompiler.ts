@@ -101,9 +101,12 @@ class SolidityProjectCompiler {
       this.inputDir,
       ImportsFsEngine(),
     );
+    const cwd = process.cwd();
     this.contracts = importFiles.map(file => ({
       fileName: path.basename(file.url),
-      filePath: file.url,
+      filePath: path.isAbsolute(file.url)
+        ? path.relative(cwd, file.url)
+        : file.url,
       source: file.source,
       lastModified: tryFunc(() => statSync(file.url).mtimeMs),
     }));
