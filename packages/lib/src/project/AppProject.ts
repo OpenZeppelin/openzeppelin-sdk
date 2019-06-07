@@ -275,21 +275,6 @@ class BaseAppProject extends BasePackageProject {
     );
   }
 
-  public async createContract(
-    contract: Contract,
-    { packageName, contractName, initMethod, initArgs }: ContractInterface = {},
-  ): Promise<Contract> {
-    if (!contractName) contractName = contract.schema.contractName;
-    if (!packageName) packageName = this.name;
-    return this.app.createContract(
-      contract,
-      packageName,
-      contractName,
-      initMethod,
-      initArgs,
-    );
-  }
-
   public async createProxy(
     contract: Contract,
     contractInterface: ContractInterface = {},
