@@ -1,8 +1,17 @@
+import path from 'path';
 import isEmpty from 'lodash.isempty';
 import isUndefined from 'lodash.isundefined';
 import isNull from 'lodash.isnull';
 
-import { Contract, Transactions, Logger, ZWeb3, TxParams, ABI } from 'zos-lib';
+import {
+  Contract,
+  Transactions,
+  Loggy,
+  SpinnerAction,
+  ZWeb3,
+  TxParams,
+  ABI,
+} from 'zos-lib';
 import {
   isValidUnit,
   prettifyTokenAmount,
@@ -17,7 +26,8 @@ import ZosNetworkFile from '../files/ZosNetworkFile';
 import Events from '../status/EventsFilter';
 
 const { buildCallData, callDescription } = ABI;
-const log = new Logger('TransactionController');
+
+const fileName = path.basename(__filename);
 
 interface ERC20TokenInfo {
   balance?: string;
@@ -57,13 +67,20 @@ export default class TransactionController {
     }
     const validUnit = unit.toLowerCase();
     const value = toWei(amount, validUnit);
-    log.info(`Sending ${amount} ${validUnit} to ${to}...`);
+    Loggy.add(
+      `${fileName}#transfer`,
+      'transfer-funds',
+      `Sending ${amount} ${validUnit} to ${to}`,
+    );
     const { transactionHash } = await Transactions.sendRawTransaction(
       to,
       { value },
       this.txParams,
     );
-    log.info(`Funds successfully sent!. Transaction hash: ${transactionHash}`);
+    Loggy.succeed(
+      'transfer-funds',
+      `Funds successfully sent! Transaction hash: ${transactionHash}`,
+    );
   }
 
   public async getBalanceOf(
@@ -75,12 +92,20 @@ export default class TransactionController {
         accountAddress,
         contractAddress,
       );
-      log.info(
+      Loggy.add(
+        `${fileName}#getBalanceOf`,
+        'balance-of',
         `Balance: ${prettifyTokenAmount(balance, tokenDecimals, tokenSymbol)}`,
+        { spinnerAction: SpinnerAction.NonSpinnable },
       );
     } else {
       const balance = await ZWeb3.getBalance(accountAddress);
-      log.info(`Balance: ${fromWei(balance, 'ether')} ETH`);
+      Loggy.add(
+        `${fileName}#getBalanceOf`,
+        'balance-of',
+        `Balance: ${fromWei(balance, 'ether')} ETH`,
+        { spinnerAction: SpinnerAction.NonSpinnable },
+      );
     }
   }
 
@@ -95,7 +120,11 @@ export default class TransactionController {
       methodArgs,
     );
     try {
-      log.info(`Calling: ${callDescription(method, methodArgs)}`);
+      Loggy.add(
+        `${fileName}#transfer`,
+        'call-contract-method',
+        `Calling: ${callDescription(method, methodArgs)}`,
+      );
       const result = await contract.methods[methodName](...methodArgs).call({
         ...this.txParams,
       });
@@ -105,8 +134,14 @@ export default class TransactionController {
       isUndefined(parsedResult) ||
       parsedResult === '()' ||
       parsedResult.length === 0
-        ? log.info(`Method ${methodName} successfully called.`)
-        : log.info(`Call returned: ${parsedResult}`);
+        ? Loggy.succeed(
+            'call-contract-method',
+            `Method ${methodName} successfully called.`,
+          )
+        : Loggy.succeed(
+            'call-contract-method',
+            `Call returned: ${parsedResult}`,
+          );
 
       return result;
     } catch (error) {
@@ -127,13 +162,20 @@ export default class TransactionController {
       methodArgs,
     );
     try {
-      log.info(`Calling: ${callDescription(method, methodArgs)}`);
+      Loggy.add(
+        `${fileName}#sendTransaction`,
+        'send-transaction',
+        `Calling: ${callDescription(method, methodArgs)}`,
+      );
       const { transactionHash, events } = await Transactions.sendTransaction(
         contract.methods[methodName],
         methodArgs,
         this.txParams,
       );
-      log.info(`Transaction successful: ${transactionHash}`);
+      Loggy.succeed(
+        'send-transaction',
+        `Transaction successful. Transaction hash: ${transactionHash}`,
+      );
       if (!isEmpty(events)) Events.describe(events);
     } catch (error) {
       throw Error(
