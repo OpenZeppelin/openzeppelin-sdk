@@ -46,7 +46,7 @@ export function tryRemoveMetadata(bytecode: string): string {
   const length = parseInt(rawLength, 16);
 
   // Bail on unreasonable values for length (meaning we read something else other than metadata length)
-  if (length > 200) return bytecode;
+  if (length * 2 > bytecode.length - 4) return bytecode;
 
   // Gather what we assume is the CBOR encoded metadata, and try to parse it
   const metadataStart = bytecode.length - length * 2 - 4;
