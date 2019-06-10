@@ -49,7 +49,6 @@ import {
   ProxyAdminProjectDeployer,
 } from './ProjectDeployer';
 import Dependency from '../dependency/Dependency';
-import StatusChecker from '../status/StatusChecker';
 import ValidationLogger from '../../interface/ValidationLogger';
 import Verifier from '../Verifier';
 import LocalController from '../local/LocalController';
@@ -129,29 +128,6 @@ export default class NetworkController {
         'Cannot modify contracts in a frozen version. Run zos bump to create a new version first.',
       );
     }
-  }
-
-  // StatusController
-  public async compareCurrentStatus(): Promise<void | never> {
-    if (!this.isPublished)
-      throw Error(
-        'Command status-pull is not supported for unpublished projects',
-      );
-    const statusComparator = StatusChecker.compare(
-      this.networkFile,
-      this.txParams,
-    );
-    await statusComparator.call();
-  }
-
-  // StatusController
-  public async pullRemoteStatus(): Promise<void | never> {
-    if (!this.isPublished)
-      throw Error(
-        'Command status-fix is not supported for unpublished projects',
-      );
-    const statusFetcher = StatusChecker.fetch(this.networkFile, this.txParams);
-    await statusFetcher.call();
   }
 
   // DeployerController
