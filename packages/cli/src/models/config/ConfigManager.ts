@@ -11,7 +11,7 @@ export interface NetworkConfig {
 const ConfigManager = {
   initialize(root: string = process.cwd()): void {
     if (!TruffleConfig.exists() && !ZosConfig.exists()) {
-      ZosConfig.createZosConfigFile(root);
+      ZosConfig.initialize(root);
     }
   },
 
