@@ -23,7 +23,7 @@ import { allPromisesOrError } from '../../utils/async';
 import ContractManager from '../local/ContractManager';
 import ZosPackageFile from '../files/ZosPackageFile';
 import ZosNetworkFile from '../files/ZosNetworkFile';
-import Events from '../status/EventsFilter';
+import { describeEvents }from '../status/EventsFilter';
 
 const { buildCallData, callDescription } = ABI;
 
@@ -176,7 +176,7 @@ export default class TransactionController {
         'send-transaction',
         `Transaction successful. Transaction hash: ${transactionHash}`,
       );
-      if (!isEmpty(events)) Events.describe(events);
+      if (!isEmpty(events)) describeEvents(events);
     } catch (error) {
       throw Error(
         `Error while trying to send transaction to ${proxyAddress}. ${error}`,
