@@ -3,7 +3,7 @@
 require('../setup');
 
 import sinon from 'sinon';
-import { FileSystem } from 'zos-lib';
+import { FileSystem, Contracts } from 'zos-lib';
 import ContractManager from '../../src/models/local/ContractManager';
 import ZosPackageFile from '../../src/models/files/ZosPackageFile';
 import ConfigManager from '../../src/models/config/ConfigManager';
@@ -58,38 +58,50 @@ contract('ContractManager', function([_, from]) {
           });
         });
 
-        context('with contracts', function() {
-          beforeEach(function() {
-            this.testDir = `${process.cwd()}/test/mocks/mock-stdlib`;
-            const builtContract = {
-              sourcePath: `${this.testDir}/contracts`,
-              bytecode: '0x124',
-              contractName: 'Foo',
-            };
-            FileSystem.writeJson(
-              `${this.testDir}/build/contracts/Foo.json`,
-              builtContract,
-            );
-            this.packageFile = new ZosPackageFile(`${this.testDir}/zos.json`);
-            this.contractManager = new ContractManager(this.packageFile);
-            sinon
-              .stub(ConfigManager, 'getBuildDir')
-              .returns(`${this.testDir}/build/contracts`);
-          });
+        const testReturnsContracts = function(description, sourcePath) {
+          context(description, function() {
+            beforeEach(function() {
+              this.testDir = `${process.cwd()}/test/mocks/mock-stdlib`;
+              const builtContract = {
+                sourcePath: sourcePath || `${this.testDir}/contracts/Foo.sol`,
+                bytecode: '0x124',
+                contractName: 'Foo',
+              };
+              FileSystem.writeJson(
+                `${this.testDir}/build/contracts/Foo.json`,
+                builtContract,
+              );
+              this.packageFile = new ZosPackageFile(`${this.testDir}/zos.json`);
+              this.contractManager = new ContractManager(this.packageFile);
+              sinon
+                .stub(ConfigManager, 'getBuildDir')
+                .returns(`${this.testDir}/build/contracts`);
+              sinon
+                .stub(Contracts, 'getLocalContractsDir')
+                .returns(`${this.testDir}/contracts`);
+            });
 
-          afterEach(function() {
-            sinon.restore();
-          });
+            afterEach(function() {
+              sinon.restore();
+            });
 
-          it('returns an array with items inside', function() {
-            const contractNames = this.contractManager.getContractNames();
+            it('returns an array with items inside', function() {
+              const contractNames = this.contractManager.getContractNames(
+                this.testDir,
+              );
 
-            contractNames.should.be.an('array');
-            contractNames.should.not.be.empty;
-            contractNames.should.include('Foo');
-            contractNames.should.not.include('GreeterLib');
+              contractNames.should.be.an('array');
+              contractNames.should.include('Foo');
+              contractNames.should.not.include('GreeterLib');
+            });
           });
-        });
+        }.bind(this);
+
+        testReturnsContracts('with contracts with absolute path');
+        testReturnsContracts(
+          'with contracts with relative path',
+          './contracts/Foo.sol',
+        );
       });
     });
   });

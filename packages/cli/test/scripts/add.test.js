@@ -3,7 +3,7 @@ require('../setup');
 
 import { Logger } from 'zos-lib';
 import CaptureLogs from '../helpers/captureLogs';
-
+import sinon from 'sinon';
 import add from '../../src/scripts/add';
 import addAll from '../../src/scripts/add-all';
 import ZosPackageFile from '../../src/models/files/ZosPackageFile';
@@ -17,6 +17,11 @@ contract('add script', function() {
     this.packageFile = new ZosPackageFile(
       'test/mocks/packages/package-with-stdlib.zos.json',
     );
+    sinon.stub(this.packageFile, 'root').get(() => process.cwd());
+  });
+
+  afterEach(function() {
+    sinon.restore();
   });
 
   it('should add a logic contract an alias and a filename', function() {
