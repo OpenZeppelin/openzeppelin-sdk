@@ -591,8 +591,6 @@ export default class NetworkController {
     } = this.localController.getContractSourcePath(contractAlias);
     const contractSource = await flattenSourceCode([sourcePath]);
     const contractAddress = this.networkFile.contracts[contractAlias].address;
-    log.info(`Verifying and publishing ${contractAlias} on ${remote}`);
-
     await Verifier.verifyAndPublish(remote, {
       contractName,
       compilerVersion,

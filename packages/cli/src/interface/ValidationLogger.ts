@@ -1,7 +1,9 @@
+import path from 'path';
 import isEmpty from 'lodash.isempty';
 import {
   FileSystem as fs,
   Logger,
+  Loggy,
   getStorageLayout,
   ValidationInfo,
   BuildArtifacts,
@@ -16,6 +18,8 @@ const DANGEROUS_OPERATIONS_LINK = `${DOCS_HOME}/writing_contracts.html#potential
 const AVOID_INITIAL_VALUES_LINK = `${DOCS_HOME}/writing_contracts.html#avoid-initial-values-in-fields-declarations`;
 const INITIALIZERS_LINK = `${DOCS_HOME}/writing_contracts.html#initializers`;
 const STORAGE_CHECKS_LINK = `${DOCS_HOME}/writing_contracts.html#modifying-your-contracts`;
+
+const fileName = path.basename(__filename);
 const log = new Logger('Validations');
 
 export default class ValidationLogger {
