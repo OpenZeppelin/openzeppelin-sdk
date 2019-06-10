@@ -1,9 +1,10 @@
-import { Logger } from 'zos-lib';
+import path from 'path';
+import { Logger, Loggy, SpinnerAction } from 'zos-lib';
 
 import LocalController from '../models/local/LocalController';
 import { CheckParams } from './interfaces';
 
-const log: Logger = new Logger('Check');
+const fileName = path.basename(__filename);
 
 export default function check({
   contractAlias,
@@ -13,5 +14,9 @@ export default function check({
   const success = contractAlias
     ? controller.validate(contractAlias)
     : controller.validateAll();
-  if (success) log.info('No issues were found');
+  if (success) {
+    Loggy.add(`${fileName}#check`, 'check-script', 'No issues were found', {
+      spinnerAction: SpinnerAction.NonSpinnable,
+    });
+  }
 }

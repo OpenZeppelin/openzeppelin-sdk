@@ -1,11 +1,12 @@
+import path from 'path';
 import stdout from '../utils/stdout';
 import NetworkController from '../models/network/NetworkController';
 import ScriptError from '../models/errors/ScriptError';
 import { CreateParams } from './interfaces';
-import { Contract, encodeParams, Logger } from 'zos-lib';
+import { Loggy, SpinnerAction } from 'zos-lib';
 import { validateSalt } from '../utils/input';
 
-const log: Logger = new Logger('QueryDeployment');
+const fileName = path.basename(__filename);
 
 export default async function querySignedDeployment({
   packageName,
@@ -32,8 +33,11 @@ export default async function querySignedDeployment({
       methodArgs,
       admin,
     );
-    log.info(
+    Loggy.add(
+      `${fileName}#querySignedDeployment`,
+      `query-signed-deployment`,
       `Contract created with salt ${salt} signed by ${signer} will be deployed to the following address`,
+      { spinnerAction: SpinnerAction.NonSpinnable },
     );
     stdout(address);
     controller.writeNetworkPackageIfNeeded();

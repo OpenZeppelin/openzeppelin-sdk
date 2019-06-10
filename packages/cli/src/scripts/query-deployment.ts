@@ -1,11 +1,12 @@
+import path from 'path';
 import stdout from '../utils/stdout';
 import NetworkController from '../models/network/NetworkController';
 import ScriptError from '../models/errors/ScriptError';
 import { QueryDeploymentParams } from './interfaces';
-import { Logger } from 'zos-lib';
+import { Loggy, SpinnerAction } from 'zos-lib';
 import { validateSalt } from '../utils/input';
 
-const log: Logger = new Logger('QueryDeployment');
+const fileName = path.basename(__filename);
 
 export default async function queryDeployment({
   salt,
@@ -20,8 +21,11 @@ export default async function queryDeployment({
   try {
     const address = await controller.getProxyDeploymentAddress(salt, sender);
     const senderLog = sender ? ` from ${sender} ` : ' ';
-    log.info(
+    Loggy.add(
+      `${fileName}#queryDeployment`,
+      'query-deployment',
       `Any contract created with salt ${salt}${senderLog}will be deployed to the following address`,
+      { spinnerAction: SpinnerAction.NonSpinnable },
     );
     stdout(address);
     controller.writeNetworkPackageIfNeeded();
