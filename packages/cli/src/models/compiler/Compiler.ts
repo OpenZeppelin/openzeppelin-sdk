@@ -1,6 +1,6 @@
 import path from 'path';
 import { execFile as callbackExecFile, ExecException } from 'child_process';
-import { Logger, Loggy } from 'zos-lib';
+import { Loggy } from 'zos-lib';
 import Truffle from '../config/TruffleConfig';
 import {
   compileProject,
@@ -11,7 +11,6 @@ import ZosPackageFile from '../files/ZosPackageFile';
 import { promisify } from 'util';
 
 const fileName = path.basename(__filename);
-const log = new Logger('Compiler');
 const state = { alreadyCompiled: false };
 const execFile = promisify(callbackExecFile);
 
@@ -80,7 +79,8 @@ export async function compileWithTruffle(): Promise<void> {
     ));
   } catch (error) {
     if (error.code === 127) {
-      log.error(
+      Loggy.fail(
+        'compile-contracts',
         'Could not find truffle executable. Please install it by running: npm install truffle',
       );
       ({ stdout, stderr } = error);

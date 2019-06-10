@@ -7,7 +7,7 @@ import reverse from 'lodash.reverse';
 import uniq from 'lodash.uniq';
 import compact from 'lodash.compact';
 import castArray from 'lodash.castarray';
-import { Logger, Loggy, SpinnerAction } from 'zos-lib';
+import { Loggy, LogType, SpinnerAction } from 'zos-lib';
 import { homedir } from 'os';
 import path from 'path';
 import child from '../../../utils/child';
@@ -16,7 +16,6 @@ import { compilerVersionsMatch } from '../../../utils/solidity';
 import { keccak256 } from 'ethereumjs-util';
 
 const fileName = path.basename(__filename);
-const log = new Logger('CompilerProvider');
 
 // Downloaded compilers will be stored here.
 // TODO: Check writeability and fall back to tmp if needed
@@ -158,7 +157,13 @@ async function getAvailableCompilerVersions(): Promise<SolcList> {
     return list;
   } catch (err) {
     if (fs.existsSync(localPath)) {
-      log.warn(`Error downloading solc releases list, using cached version`);
+      Loggy.add(
+        `${fileName}#getAvailableCompilerVersions`,
+        'get-compiler-versions',
+        `Error downloading solc releases list, using cached version`,
+        { logType: LogType.Warn, spinnerAction: SpinnerAction.NonSpinnable },
+      );
+
       return readJson(localPath);
     } else {
       err.message = `Could not retrieve solc releases list: ${err.message}`;

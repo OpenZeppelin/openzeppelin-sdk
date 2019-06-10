@@ -1,5 +1,5 @@
 import path from 'path';
-import { Logger, Loggy, SpinnerAction } from 'zos-lib';
+import { Loggy, SpinnerAction } from 'zos-lib';
 
 import LocalController from '../models/local/LocalController';
 import { CheckParams } from './interfaces';

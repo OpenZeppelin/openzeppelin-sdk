@@ -1,3 +1,4 @@
+import path from 'path';
 import difference from 'lodash.difference';
 import every from 'lodash.every';
 import isEmpty from 'lodash.isempty';
@@ -6,7 +7,7 @@ import values from 'lodash.values';
 import flatten from 'lodash.flatten';
 import uniq from 'lodash.uniq';
 
-import Logger from '../utils/Logger';
+import { Loggy, SpinnerAction, LogType }from '../utils/Logger';
 import { hasConstructor } from './Constructors';
 import { hasSelfDestruct, hasDelegateCall } from './Instructions';
 import { getUninitializedBaseContracts } from './Initializers';
@@ -16,7 +17,7 @@ import { hasInitialValuesInDeclarations } from './InitialValues';
 import Contract from '../artifacts/Contract.js';
 import ContractAST, { StorageInfo } from '../utils/ContractAST';
 
-const log = new Logger('validate');
+const fileName = path.basename(__filename);
 
 export interface ValidationInfo {
   hasConstructor: boolean;
@@ -122,10 +123,13 @@ function tryGetUninitializedBaseContracts(contract: Contract): string[] {
       getUninitializedBaseContracts(contract),
     );
   } catch (error) {
-    log.error(
+    Loggy.add(
+      `${fileName}#tryGetUninitializedBaseContracts`,
+      'try-get-uninitialized-base-contracts',
       `- Skipping uninitialized base contracts validation due to error: ${
         error.message
       }`,
+      { spinnerAction: SpinnerAction.NonSpinnable, logType: LogType.Err },
     );
     return [];
   }

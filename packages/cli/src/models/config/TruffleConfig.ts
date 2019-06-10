@@ -1,11 +1,12 @@
+import path from 'path';
 import pickBy from 'lodash.pickby';
 import pick from 'lodash.pick';
 import npm from 'npm-programmatic';
 import semver from 'semver';
-import { FileSystem, Logger } from 'zos-lib';
+import { FileSystem, Loggy, SpinnerAction, LogType } from 'zos-lib';
 import TruffleConfigModule from 'truffle-config';
 
-const log = new Logger('TruffleConfig');
+const fileName = path.basename(__filename);
 
 const TruffleConfig = {
   name: 'TruffleConfig',
@@ -70,8 +71,14 @@ const TruffleConfig = {
     if (hdwalletProviderPackage) {
       const [, version] = hdwalletProviderPackage.split('@');
       if (version && semver.lt(version, '1.0.0')) {
-        log.warn(
+        Loggy.add(
+          `${fileName}#checkHdWalletProviderVersion`,
+          'check-hdwallet-provider-version',
           `Version ${version} of truffle-hdwallet-provider might fail when deploying multiple contracts. Consider upgrading it to version '1.0.0' or higher.`,
+          {
+            spinnerAction: SpinnerAction.NonSpinnable,
+            logType: LogType.Warn,
+          },
         );
       }
     }

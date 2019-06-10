@@ -1,6 +1,6 @@
 import path from 'path';
 import flatMap from 'lodash.flatmap';
-import { Logger, Loggy, LogLevel } from 'zos-lib';
+import { Logger, Loggy, LogLevel, SpinnerAction } from 'zos-lib';
 import solc from 'solc-wrapper';
 import {
   getCompiler as getSolc,
@@ -141,7 +141,12 @@ class SolidityContractsCompiler {
       .join('\n');
 
     if (warnings.length > 0)
-      log.warn(`Compilation warnings: \n${warningMessages}`);
+      Loggy.add(
+        `${fileName}#_compile`,
+        `compile-warnings`,
+        `Compilation warnings: \n${warningMessages}`,
+        { spinnerAction: SpinnerAction.NonSpinnable },
+      );
     if (errors.length > 0)
       throw Error(`Compilation errors: \n${errorMessages}`);
     return output;
