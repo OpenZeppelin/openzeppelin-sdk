@@ -119,14 +119,14 @@ export const Loggy = {
   _log(reference: string): void {
     if (this.isSilent) return;
     const { file, text, spinnerAction, logLevel, logType } = this[reference];
+    const color = this._getColorFor(logType);
     if (this.isVerbose) {
-      const color = this._getColorFor(logType);
       const message = `[${new Date().toISOString()}@${file}] ${text}`;
       console.error(chalk.keyword(color)(message));
     } else if (logLevel === LogLevel.Normal) {
       !spinners.pick(reference)
-        ? spinners.add(reference, { text, status: spinnerAction })
-        : spinners.update(reference, { text, status: spinnerAction });
+        ? spinners.add(reference, { text, status: spinnerAction, color })
+        : spinners.update(reference, { text, status: spinnerAction, color });
     }
   },
 
@@ -137,7 +137,7 @@ export const Loggy = {
       case LogType.Warn:
         return 'yellow';
       case LogType.Err:
-        return 'red';
+        return 'redBright';
       default:
         return 'white';
     }
