@@ -1,5 +1,10 @@
 const _ = require('lodash'); 
-const { truffleExec, setMockStdlibVersion, run, copy } = require('./share');
+const {
+  truffleExec,
+  setMockStdlibVersion,
+  run,
+  copy
+} = require('../../../util/share')(__dirname);
 
 function cleanup() {
   run('rm build/contracts/*.json ||:')

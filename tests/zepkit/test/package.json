@@ -1,0 +1,18 @@
+{
+  "name": "tests-kit-test",
+  "private": true,
+  "version": "2.3.0",
+  "description": "Integration tests for ZepKit and an unpack command",
+  "author": "santiago@zeppelin.solutions",
+  "license": "MIT",
+  "scripts": {
+    "test": "scripts/test.sh"
+  },
+  "devDependencies": {
+    "chai": "^4.1.2",
+    "lodash": "^4.17.0",
+    "mocha": "5.2.0",
+    "truffle": "^5.0.19"
+  },
+  "dependencies": {}
+}

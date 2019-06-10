@@ -10,7 +10,7 @@ const {
   run,
   copy,
   setMockStdlibVersion
-} = require('./share');
+} = require('../../../util/share')(__dirname);
 
 const { 
   registerProjectHooks

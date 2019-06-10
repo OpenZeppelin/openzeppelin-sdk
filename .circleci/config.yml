@@ -202,6 +202,20 @@ jobs:
     <<: *integration
     environment: { NETWORK: "geth-dev-hdwallet" }
 
+  integration-cli-zepkit:
+    <<: *integration
+    environment: { NETWORK: "development" }
+    steps:
+      - checkout
+      - restore-all-caches
+      - npm-install-with-cache: 
+          dir: "~/zos/tests/zepkit/test"
+          cache-version: 'v3'
+      - run:
+          name: ZepKit integration test
+          command: 'npm run test'
+          working_directory: "~/zos/tests/zepkit/test"
+
 workflows:
   version: 2
   test:
@@ -222,4 +236,6 @@ workflows:
       - integration-cli-geth:
           requires: [test-lib, test-cli]
       - integration-cli-hdwallet:
+          requires: [test-lib, test-cli]
+      - integration-cli-zepkit:
           requires: [test-lib, test-cli]
