@@ -17,6 +17,8 @@ import {
   Contract,
   Logger,
   Loggy,
+  LogLevel,
+  LogType,
   SpinnerAction,
   FileSystem as fs,
   Proxy,
@@ -458,9 +460,11 @@ export default class NetworkController {
       contract.schema.storageInfo = getStorageLayout(contract, buildArtifacts);
       return validationPasses(newWarnings);
     } catch (err) {
-      log.error(
+      Loggy.add(
+        `${fileName}#validateContract`,
+        `validate-contract`,
         `Error while validating contract ${contract.schema.contractName}:`,
-        err,
+        { spinnerAction: SpinnerAction.NonSpinnable, logType: LogType.Err },
       );
       return false;
     }
@@ -531,7 +535,9 @@ export default class NetworkController {
     if (throwIfFail) {
       throw Error(msg);
     } else {
-      log.info(msg);
+      Loggy.add(`${fileName}#handeErrorMessage`, `handle-error-message`, msg, {
+        spinnerAction: SpinnerAction.NonSpinnable,
+      });
     }
   }
 
@@ -649,12 +655,15 @@ export default class NetworkController {
         ? await ProxyAdmin.fetch(this.proxyAdminAddress, this.txParams)
         : await ProxyAdmin.deploy(this.txParams);
       if (!this.proxyAdminAddress) {
-        log.info(
-          `Awaiting confirmations before transferring proxies to ProxyAdmin (this may take a few minutes)`,
+        Loggy.add(
+          `${fileName}#fetchOrDeploy`,
+          'await-confirmations',
+          'Awaiting confirmations before transferring proxies to ProxyAdmin (this may take a few minutes)',
         );
         await Transactions.awaitConfirmations(
           proxyAdmin.contract.deployment.transactionHash,
         );
+        Loggy.succeed('await-confirmations');
       }
       this._tryRegisterProxyAdmin(proxyAdmin.address);
       await allPromisesOrError(
@@ -683,9 +692,19 @@ export default class NetworkController {
           }
         }),
       );
-      log.info(`Successfully migrated to zosversion ${ZOS_VERSION}`);
+      Loggy.add(
+        `${fileName}#_migrate`,
+        'migrate-version-cli',
+        `Successfully migrated to zosversion ${ZOS_VERSION}`,
+        { spinnerAction: SpinnerAction.Succeed },
+      );
     } else {
-      log.info(`No proxies were found. Updating zosversion to ${ZOS_VERSION}`);
+      Loggy.add(
+        `${fileName}#_migrate`,
+        'migrate-version-cli',
+        `No proxies were found. Updating zosversion to ${ZOS_VERSION}`,
+        { spinnerAction: SpinnerAction.NonSpinnable },
+      );
     }
   }
 
@@ -913,10 +932,13 @@ export default class NetworkController {
       .map(({ name }) => name);
 
     if (initializerMethods.length === 0) return;
-    log.error(
+    Loggy.add(
+      `${fileName}#validateContract`,
+      `validate-contract`,
       `Possible initialization method (${uniq(initializerMethods).join(
         ', ',
       )}) found in contract. Make sure you initialize your instance.`,
+      { spinnerAction: SpinnerAction.NonSpinnable, logType: LogType.Warn },
     );
   }
 
@@ -1044,8 +1066,11 @@ export default class NetworkController {
         });
         newImplementation = contractImplementation;
       } else {
-        log.info(
+        Loggy.add(
+          `${fileName}#_upgradeProxy`,
+          `upgrade-proxy-${proxy.address}`,
           `Contract ${proxy.contract} at ${proxy.address} is up to date.`,
+          { logLevel: LogLevel.Verbose },
         );
         newImplementation = currentImplementation;
       }
@@ -1088,8 +1113,11 @@ export default class NetworkController {
     });
 
     if (isEmpty(proxies)) {
-      log.info(
+      Loggy.add(
+        `${fileName}#_fetchOwnedProxies`,
+        `fetch-owned-proxies`,
         `No contract instances that match${criteriaDescription} were found`,
+        { spinnerAction: SpinnerAction.NonSpinnable },
       );
       return [];
     }
@@ -1105,8 +1133,11 @@ export default class NetworkController {
     );
 
     if (isEmpty(ownedProxies)) {
-      log.info(
+      Loggy.add(
+        `${fileName}#_fetchOwnedProxies`,
+        `fetch-owned-proxies`,
         `No contract instances that match${criteriaDescription} are owned by this project`,
+        { spinnerAction: SpinnerAction.NonSpinnable },
       );
     }
 
@@ -1173,8 +1204,13 @@ export default class NetworkController {
   public async unlinkDependency(depName: string): Promise<void | never> {
     try {
       if (await this.project.hasDependency(depName)) {
-        log.info(`Unlinking dependency ${depName}`);
+        Loggy.add(
+          `${fileName}#unlinkDependency`,
+          `unlink-dependency-${depName}`,
+          `Unlinking dependency ${depName}`,
+        );
         await this.project.unsetDependency(depName);
+        Loggy.succeed(`unlink-dependency-${depName}`);
       }
       this.networkFile.unsetDependency(depName);
     } catch (error) {
@@ -1216,7 +1252,9 @@ export default class NetworkController {
               this.network
             }', so it cannot be linked. Hint: you can create a custom deployment of all unpublished dependencies by running 'zos push' with the '--deploy-dependencies' option.`,
           );
-        log.info(
+        Loggy.add(
+          `${fileName}#linkDependency`,
+          `link-dependency-${depName}`,
           `Connecting to dependency ${depName} ${dependencyInfo.version}`,
         );
         await this.project.setDependency(
@@ -1229,6 +1267,11 @@ export default class NetworkController {
           version: dependencyInfo.version,
         };
         this.networkFile.setDependency(depName, depInfo);
+
+        Loggy.succeed(
+          `link-dependency-${depName}`,
+          `Connected to dependency ${depName} ${dependencyInfo.version}`,
+        );
       }
     } catch (error) {
       error.message = `Failed to link dependency ${depName}@${depVersion} with error: ${
