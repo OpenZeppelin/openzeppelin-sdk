@@ -1,5 +1,6 @@
+import path from 'path';
 import flatMap from 'lodash.flatmap';
-import { Logger } from 'zos-lib';
+import { Logger, Loggy, LogLevel } from 'zos-lib';
 import solc from 'solc-wrapper';
 import {
   getCompiler as getSolc,
@@ -9,6 +10,8 @@ import {
   SolcCompiler,
 } from './CompilerProvider';
 import { getPragma } from '../../../utils/solidity';
+
+const fileName = path.basename(__filename);
 
 export interface CompiledContract {
   fileName: string;
@@ -120,6 +123,7 @@ class SolidityContractsCompiler {
   private async _compile(): Promise<solc.CompilerOutput | never> {
     const input = this._buildCompilerInput();
     const output = await this.compiler.compile(input);
+
     const outputErrors = output.errors || [];
     if (outputErrors.length === 0) return output;
 
@@ -153,7 +157,12 @@ class SolidityContractsCompiler {
 
   private _buildSources(): { [filePath: string]: { content: string } } {
     return this.contracts.reduce((sources, contract) => {
-      log.info(`Compiling ${contract.fileName} ...`);
+      Loggy.add(
+        `${fileName}#buildSources`,
+        `compile-contract-file-${contract.fileName}`,
+        `Compiling ${contract.fileName}`,
+        { logLevel: LogLevel.Verbose },
+      );
       sources[contract.filePath] = { content: contract.source };
       return sources;
     }, {});

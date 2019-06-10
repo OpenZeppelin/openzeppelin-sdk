@@ -7,7 +7,7 @@ import reverse from 'lodash.reverse';
 import uniq from 'lodash.uniq';
 import compact from 'lodash.compact';
 import castArray from 'lodash.castarray';
-import { Logger } from 'zos-lib';
+import { Logger, Loggy, SpinnerAction } from 'zos-lib';
 import { homedir } from 'os';
 import path from 'path';
 import child from '../../../utils/child';
@@ -15,6 +15,7 @@ import { tryAwait } from '../../../utils/try';
 import { compilerVersionsMatch } from '../../../utils/solidity';
 import { keccak256 } from 'ethereumjs-util';
 
+const fileName = path.basename(__filename);
 const log = new Logger('CompilerProvider');
 
 // Downloaded compilers will be stored here.
@@ -104,7 +105,12 @@ export async function fetchCompiler(build: SolcBuild): Promise<SolcCompiler> {
   // Try local compiler and see if version matches
   const localVersion = await localCompilerVersion();
   if (localVersion && compilerVersionsMatch(localVersion, build.longVersion)) {
-    log.info(`Using local solc compiler found`);
+    Loggy.add(
+      `${fileName}#fetchCompiler`,
+      'download-compiler',
+      `Using local solc compiler found`,
+      { spinnerAction: SpinnerAction.NonSpinnable },
+    );
     return new SolcBinCompiler(localVersion);
   }
 
@@ -191,9 +197,16 @@ async function getCompilerVersion(
   );
 }
 
-async function downloadCompiler(build: SolcBuild, localFile: string) {
+async function downloadCompiler(
+  build: SolcBuild,
+  localFile: string,
+): Promise<void> {
   const { version, keccak256: expectedHash, path: versionPath } = build;
-  log.info(`Downloading compiler version ${version}`);
+  Loggy.add(
+    `${fileName}#downloadCompiler`,
+    'download-compiler',
+    `Downloading compiler version ${version}`,
+  );
   const url = `https://solc-bin.ethereum.org/bin/${versionPath}`;
   const { data: compilerSource } = await axios.get(url);
 
@@ -208,6 +221,8 @@ async function downloadCompiler(build: SolcBuild, localFile: string) {
   // Cache downloaded source
   await mkdirp(SOLC_CACHE_PATH);
   fs.writeFileSync(localFile, compilerSource);
+
+  Loggy.succeed('download-compiler');
 }
 
 export function getCompilerBinary(compilerPath: string) {

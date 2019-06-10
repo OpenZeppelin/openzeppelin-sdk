@@ -1,5 +1,6 @@
+import path from 'path';
 import { execFile as callbackExecFile, ExecException } from 'child_process';
-import { Logger } from 'zos-lib';
+import { Logger, Loggy } from 'zos-lib';
 import Truffle from '../config/TruffleConfig';
 import {
   compileProject,
@@ -9,6 +10,7 @@ import findUp from 'find-up';
 import ZosPackageFile from '../files/ZosPackageFile';
 import { promisify } from 'util';
 
+const fileName = path.basename(__filename);
 const log = new Logger('Compiler');
 const state = { alreadyCompiled: false };
 const execFile = promisify(callbackExecFile);
@@ -59,8 +61,10 @@ export async function compileWithSolc(
 }
 
 export async function compileWithTruffle(): Promise<void> {
-  log.info(
-    'Compiling contracts with Truffle, using settings from truffle.js...',
+  Loggy.add(
+    `${fileName}#compileWithTruffle`,
+    `compile-contracts`,
+    'Compiling contracts with Truffle, using settings from truffle.js file',
   );
   // Attempt to load global truffle if local was not found
   const truffleBin: string =
@@ -83,12 +87,13 @@ export async function compileWithTruffle(): Promise<void> {
       throw error;
     }
   } finally {
-    if (stdout) console.log(stdout);
-    if (stderr) console.log(stderr);
+    Loggy.succeed(`compile-contracts`);
+    if (stdout) console.log(`Truffle output:\n ${stdout}`);
+    if (stderr) console.log(`Truffle output:\n ${stderr}`);
   }
 }
 
 // Used for tests
-export function resetState() {
+export function resetState(): void {
   state.alreadyCompiled = false;
 }
