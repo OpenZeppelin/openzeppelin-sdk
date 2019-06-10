@@ -1,6 +1,10 @@
 import crypto from 'crypto';
 import { ZERO_ADDRESS } from './Addresses';
 import Contract from '../artifacts/Contract';
+import cbor from 'cbor';
+import Logger from '../utils/Logger';
+
+const log = new Logger('Bytecode');
 
 export function bodyCode(contract: Contract): string {
   return splitCode(contract).body;
@@ -11,7 +15,7 @@ export function constructorCode(contract: Contract): string {
 }
 
 export function bytecodeDigest(rawBytecode: string): string {
-  const bytecode: string = tryRemoveSwarmHash(rawBytecode.replace(/^0x/, ''));
+  const bytecode: string = tryRemoveMetadata(rawBytecode.replace(/^0x/, ''));
   const buffer: Buffer = Buffer.from(bytecode, 'hex');
   const hash: any = crypto.createHash('sha256');
   return hash.update(buffer).digest('hex');
@@ -31,11 +35,33 @@ export function hasUnlinkedVariables(bytecode: string): boolean {
   return getSolidityLibNames(bytecode).length > 0;
 }
 
-// Removes the last 43 bytes of the bytecode, i.e., the swarm hash that the solidity compiler appends and that
-// respects the following structure: 0xa1 0x65 'b' 'z' 'z' 'r' '0' 0x58 0x20 <32 bytes swarm hash> 0x00 0x29
-// (see https://solidity.readthedocs.io/en/v0.4.24/metadata.html#encoding-of-the-metadata-hash-in-the-bytecode)
-export function tryRemoveSwarmHash(bytecode: string): string {
-  return bytecode.replace(/a165627a7a72305820[a-fA-F0-9]{64}0029$/, '');
+// Removes the swarm hash from the CBOR encoded metadata at the end of the bytecode
+// (see https://solidity.readthedocs.io/en/v0.5.9/metadata.html)
+export function tryRemoveMetadata(bytecode: string): string {
+  // Bail on empty bytecode
+  if (!bytecode || bytecode.length <= 2) return bytecode;
+
+  // Gather length of CBOR metadata from the end of the file
+  const rawLength = bytecode.slice(bytecode.length - 4);
+  const length = parseInt(rawLength, 16);
+
+  // Bail on unreasonable values for length (meaning we read something else other than metadata length)
+  if (length * 2 > bytecode.length - 4) return bytecode;
+
+  // Gather what we assume is the CBOR encoded metadata, and try to parse it
+  const metadataStart = bytecode.length - length * 2 - 4;
+  const metadata = bytecode.slice(metadataStart, bytecode.length - 4);
+
+  // Parse it to see if it is indeed valid metadata
+  try {
+    cbor.decode(Buffer.from(metadata, 'hex'));
+  } catch (err) {
+    log.warn(`Error parsing contract metadata: ${err.message}. Ignoring.`);
+    return bytecode;
+  }
+
+  // Return bytecode without it
+  return bytecode.slice(0, metadataStart);
 }
 
 // Replaces the solidity library address inside its bytecode with zeros
