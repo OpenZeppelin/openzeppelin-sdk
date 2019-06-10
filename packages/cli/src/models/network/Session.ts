@@ -1,10 +1,11 @@
+import path from 'path';
 import omitBy from 'lodash.omitby';
 import isEmpty from 'lodash.isempty';
 import pick from 'lodash.pick';
 import compact from 'lodash.compact';
-import { FileSystem as fs, Logger } from 'zos-lib';
+import { FileSystem as fs, Loggy, SpinnerAction } from 'zos-lib';
 
-const log: Logger = new Logger('Session');
+const fileName = path.basename(__filename);
 
 const ZOS_SESSION_PATH = '.zos.session';
 const DEFAULT_TX_TIMEOUT: number = 10 * 60; // 10 minutes
@@ -27,7 +28,12 @@ const Session = {
         session,
         (v, key) => overrides[key] && overrides[key] !== v,
       );
-      log.info(`Using session with ${describe(fields)}`);
+      Loggy.add(
+        `${fileName}#getOptions`,
+        `get-options`,
+        `Using session with ${describe(fields)}`,
+        { spinnerAction: SpinnerAction.NonSpinnable },
+      );
     }
 
     return { ...session, ...overrides };
@@ -56,13 +62,24 @@ const Session = {
       timeout,
       expires: expirationTimestamp,
     });
-    if (logInfo)
-      log.info(`Using ${describe({ network, from, timeout })} by default.`);
+    if (logInfo) {
+      Loggy.add(
+        `${fileName}#getOptions`,
+        `get-options`,
+        `Using ${describe({ network, from, timeout })} by default.`,
+        { spinnerAction: SpinnerAction.NonSpinnable },
+      );
+    }
   },
 
   close(): void {
     if (fs.exists(ZOS_SESSION_PATH)) fs.remove(ZOS_SESSION_PATH);
-    log.info(`Closed zos session.`);
+    Loggy.add(
+      `${fileName}#getOptions`,
+      `close-session`,
+      'Successfully closed zos session',
+      { spinnerAction: SpinnerAction.Succeed },
+    );
   },
 
   ignoreFile(): void {
