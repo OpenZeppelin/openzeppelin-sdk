@@ -2,6 +2,7 @@ import { Contracts, Contract, FileSystem } from 'zos-lib';
 import Dependency from '../dependency/Dependency';
 import ZosPackageFile from '../files/ZosPackageFile';
 import ConfigManager from '../config/ConfigManager';
+import path from 'path';
 
 export default class ContractManager {
   public packageFile: ZosPackageFile;
@@ -33,15 +34,16 @@ export default class ContractManager {
     }
   }
 
-  public getContractNames(): string[] {
+  public getContractNames(root: string = this.packageFile.root): string[] {
     const buildDir = ConfigManager.getBuildDir();
+    const contractsDir = Contracts.getLocalContractsDir();
     if (FileSystem.exists(buildDir)) {
       return FileSystem.readDir(buildDir)
         .filter(name => name.match(/\.json$/))
         .map(name => FileSystem.parseJsonIfExists(`${buildDir}/${name}`))
         .filter(contract => {
           return (
-            this.isLocalContract(buildDir, contract) &&
+            this.isLocalContract(contractsDir, contract, root) &&
             !this.isLibrary(contract) &&
             !this.isAbstractContract(contract)
           );
@@ -51,11 +53,13 @@ export default class ContractManager {
   }
 
   private isLocalContract(
-    buildDir: string,
-    contract: { [key: string]: any },
+    contractsDir: string,
+    contract: { sourcePath: string },
+    root: string,
   ): boolean {
-    const projectDir = buildDir.replace('build/contracts', '');
-    return contract.sourcePath.indexOf(projectDir) === 0;
+    const cwd = root || process.cwd();
+    const contractFullPath = path.resolve(cwd, contract.sourcePath);
+    return contractFullPath.indexOf(contractsDir) === 0;
   }
 
   private isAbstractContract(contract: { [key: string]: any }): boolean {

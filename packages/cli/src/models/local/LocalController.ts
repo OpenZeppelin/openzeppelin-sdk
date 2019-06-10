@@ -21,6 +21,7 @@ import ValidationLogger from '../../interface/ValidationLogger';
 import ConfigManager from '../config/ConfigManager';
 import ZosPackageFile from '../files/ZosPackageFile';
 import ZosNetworkFile from '../files/ZosNetworkFile';
+import ContractManager from './ContractManager';
 
 const log = new Logger('LocalController');
 
@@ -96,29 +97,8 @@ export default class LocalController {
   }
 
   public addAll(): void {
-    const buildFolder = Contracts.getLocalBuildDir();
-    const sourceFolder = Contracts.getLocalContractsDir();
-
-    fs.readDir(buildFolder).forEach(file => {
-      const path = `${buildFolder}/${file}`;
-      if (this.hasBytecode(path)) {
-        const contractData = fs.parseJson(path);
-        const isProjectContract =
-          contractData.sourcePath.indexOf(sourceFolder) === 0;
-        const isLibrary =
-          contractData.ast &&
-          contractData.ast.nodes.find(
-            node =>
-              node.name === contractData.contractName &&
-              node.contractKind === 'library',
-          );
-
-        if (isProjectContract && !isLibrary) {
-          const contractName = contractData.contractName;
-          this.add(contractName, contractName);
-        }
-      }
-    });
+    const manager = new ContractManager(this.packageFile);
+    manager.getContractNames().forEach(name => this.add(name, name));
   }
 
   public remove(contractAlias: string): void {

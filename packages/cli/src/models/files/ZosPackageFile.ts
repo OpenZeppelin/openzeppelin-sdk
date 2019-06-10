@@ -67,6 +67,10 @@ export default class ZosPackageFile {
     return fs.exists(this.fileName);
   }
 
+  public get root(): string {
+    return path.dirname(this.fileName);
+  }
+
   public set zosversion(version: string) {
     this.data.zosversion = version;
   }
