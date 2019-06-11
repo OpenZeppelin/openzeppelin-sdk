@@ -49,6 +49,7 @@
     "find-up": "^3.0.0",
     "fs-extra": "^7.0.1",
     "inquirer": "^6.2.2",
+    "is-url": "^1.2.4",
     "lockfile": "^1.0.4",
     "lodash.castarray": "^4.4.0",
     "lodash.compact": "^3.0.1",
