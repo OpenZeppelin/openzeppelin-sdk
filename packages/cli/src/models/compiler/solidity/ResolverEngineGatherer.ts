@@ -175,7 +175,7 @@ function resolvePath(workingDir: string, relativePath: string): string {
 
   return isUrl(workingDir) || isUrl(relativePath)
     ? urlSys.resolve(workingDir, relativePath)
-    : pathSys.resolve(workingDir, relativePath);
+    : pathSys.resolve(pathSys.dirname(workingDir), relativePath);
 }
 
 /**
