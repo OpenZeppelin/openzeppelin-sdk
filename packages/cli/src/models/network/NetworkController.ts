@@ -305,7 +305,7 @@ export default class NetworkController {
       Loggy.add(
         `${fileName}#uploadContract`,
         `upload-contract${contract.schema.contractName}`,
-        `Performing some security checks and pushing contract ${
+        `Validating and pushing logic contract ${
           contract.schema.contractName
         }`,
       );
@@ -325,9 +325,9 @@ export default class NetworkController {
 
       Loggy.succeed(
         `upload-contract${contract.schema.contractName}`,
-        `Contract ${
+        `Logic contract ${
           contract.schema.contractName
-        } successfully checked and pushed`,
+        } successfully pushed`,
       );
     } catch (error) {
       error.message = `${contractAlias} deployment failed with error: ${
@@ -535,7 +535,7 @@ export default class NetworkController {
     if (throwIfFail) {
       throw Error(msg);
     } else {
-      Loggy.add(`${fileName}#handeErrorMessage`, `handle-error-message`, msg, {
+      Loggy.add(`${fileName}#handleErrorMessage`, `handle-error-message`, msg, {
         spinnerAction: SpinnerAction.NonSpinnable,
       });
     }
@@ -1255,7 +1255,7 @@ export default class NetworkController {
         Loggy.add(
           `${fileName}#linkDependency`,
           `link-dependency-${depName}`,
-          `Connecting to dependency ${depName} ${dependencyInfo.version}`,
+          `Linking dependency ${depName} ${dependencyInfo.version}`,
         );
         await this.project.setDependency(
           depName,
@@ -1270,7 +1270,7 @@ export default class NetworkController {
 
         Loggy.succeed(
           `link-dependency-${depName}`,
-          `Connected to dependency ${depName} ${dependencyInfo.version}`,
+          `Linked dependency ${depName} ${dependencyInfo.version}`,
         );
       }
     } catch (error) {

@@ -87,7 +87,7 @@ async function publishToEtherchain(
       if (message.match(/successful/)) {
         Loggy.succeed(
           'verify-and-publish',
-          `Contract verified and published successfully. You can check it here: ${etherchainContractUrl}/${contractAddress}#code`,
+          `Contract source code of ${params.contractName} verified and published successfully. You can check it here: ${etherchainContractUrl}/${contractAddress}#code`,
         );
       } else if (message.match(/^No[\w\s]*provided\.$/)) {
         throw new Error(`Error during contract verification: ${message}`);

@@ -112,7 +112,7 @@ export default class ProxyAdmin {
     );
     Loggy.succeed(
       'transfer-ownership',
-      `Owner for proxy admin set to ${newAdminOwner}`,
+      `Proxy admin owner set to ${newAdminOwner}`,
     );
   }
 
