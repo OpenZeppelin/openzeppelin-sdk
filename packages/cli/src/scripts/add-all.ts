@@ -1,4 +1,3 @@
-import path from 'path';
 import { Loggy } from 'zos-lib';
 import LocalController from '../models/local/LocalController';
 import ZosPackageFile from '../models/files/ZosPackageFile';

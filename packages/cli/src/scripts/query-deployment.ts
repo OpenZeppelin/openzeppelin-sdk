@@ -1,12 +1,9 @@
-import path from 'path';
 import stdout from '../utils/stdout';
 import NetworkController from '../models/network/NetworkController';
 import ScriptError from '../models/errors/ScriptError';
 import { QueryDeploymentParams } from './interfaces';
 import { Loggy } from 'zos-lib';
 import { validateSalt } from '../utils/input';
-
-const fileName = path.basename(__filename);
 
 export default async function queryDeployment({
   salt,

@@ -1,16 +1,8 @@
-import path from 'path';
 import isEmpty from 'lodash.isempty';
 import isUndefined from 'lodash.isundefined';
 import isNull from 'lodash.isnull';
 
-import {
-  Contract,
-  Transactions,
-  Loggy,
-  ZWeb3,
-  TxParams,
-  ABI,
-} from 'zos-lib';
+import { Contract, Transactions, Loggy, ZWeb3, TxParams, ABI } from 'zos-lib';
 import {
   isValidUnit,
   prettifyTokenAmount,
@@ -25,8 +17,6 @@ import ZosNetworkFile from '../files/ZosNetworkFile';
 import { describeEvents } from '../status/EventsFilter';
 
 const { buildCallData, callDescription } = ABI;
-
-const fileName = path.basename(__filename);
 
 interface ERC20TokenInfo {
   balance?: string;
@@ -101,7 +91,8 @@ export default class TransactionController {
     } else {
       const balance = await ZWeb3.getBalance(accountAddress);
       Loggy.noSpin(
-        `${fileName}#getBalanceOf`,
+        __filename,
+        'getBalanceOf',
         'balance-of',
         `Balance: ${fromWei(balance, 'ether')} ETH`,
       );
@@ -163,7 +154,8 @@ export default class TransactionController {
     );
     try {
       Loggy.spin(
-        `${fileName}#sendTransaction`,
+        __filename,
+        'sendTransaction',
         'send-transaction',
         `Calling: ${callDescription(method, methodArgs)}`,
       );

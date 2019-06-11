@@ -527,7 +527,12 @@ export default class NetworkController {
     if (throwIfFail) {
       throw Error(msg);
     } else {
-      Loggy.noSpin(__filename, 'handleErrorMessage', `handle-error-message`, msg);
+      Loggy.noSpin(
+        __filename,
+        'handleErrorMessage',
+        `handle-error-message`,
+        msg,
+      );
     }
   }
 
@@ -584,9 +589,7 @@ export default class NetworkController {
       __filename,
       'verifyAndPublishContract',
       'verify-and-publish',
-      `Verifying and publishing contract source code of ${
-        contractAlias
-      } on ${remote} (this usually takes under 30 seconds)`,
+      `Verifying and publishing contract source code of ${contractAlias} on ${remote} (this usually takes under 30 seconds)`,
     );
     const contractName = this.packageFile.contract(contractAlias);
     const {
