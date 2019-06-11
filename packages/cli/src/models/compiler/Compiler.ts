@@ -47,7 +47,7 @@ export async function compile(
     ...compilerOptions,
     manager: useTruffle ? 'truffle' : 'zos',
   });
-  packageFile.write();
+  if (packageFile.exists()) packageFile.write();
 
   state.alreadyCompiled = true;
 }
