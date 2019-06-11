@@ -14,13 +14,10 @@ import {
   Contracts,
   Contract,
   getSolidityLibNames,
-  Logger,
   Loggy,
 } from 'zos-lib';
 import ZosPackageFile from '../files/ZosPackageFile';
 import ZosNetworkFile from '../files/ZosNetworkFile';
-
-const log = new Logger('Dependency');
 
 export default class Dependency {
   public name: string;
@@ -78,8 +75,9 @@ export default class Dependency {
   }
 
   public static async install(nameAndVersion: string): Promise<Dependency> {
-    Loggy.add(
+    Loggy.spin(
       __filename,
+      'install',
       `install-dependency-${nameAndVersion}`,
       `Installing ${nameAndVersion} via npm`,
     );

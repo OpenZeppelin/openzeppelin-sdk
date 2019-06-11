@@ -1,10 +1,7 @@
-import path from 'path';
 import isEmpty from 'lodash.isempty';
 import {
   FileSystem as fs,
   Loggy,
-  LogType,
-  SpinnerAction,
   getStorageLayout,
   ValidationInfo,
   BuildArtifacts,
@@ -19,8 +16,6 @@ const DANGEROUS_OPERATIONS_LINK = `${DOCS_HOME}/writing_contracts.html#potential
 const AVOID_INITIAL_VALUES_LINK = `${DOCS_HOME}/writing_contracts.html#avoid-initial-values-in-fields-declarations`;
 const INITIALIZERS_LINK = `${DOCS_HOME}/writing_contracts.html#initializers`;
 const STORAGE_CHECKS_LINK = `${DOCS_HOME}/writing_contracts.html#modifying-your-contracts`;
-
-const fileName = path.basename(__filename);
 
 export default class ValidationLogger {
   public contract: Contract;
@@ -66,26 +61,26 @@ export default class ValidationLogger {
 
   public logHasSelfDestruct(hasSelfDestruct: boolean): void {
     if (hasSelfDestruct) {
-      Loggy.add(
-        `${fileName}#logHasSelfDestruct`,
+      Loggy.noSpin.warn(
+        __filename,
+        'logHasSelfDestruct',
         `validation-has-selfdestruct`,
         `- Contract ${
           this.contractName
         } or one of its ancestors has a potentially unsafe selfdestruct operation. See ${DANGEROUS_OPERATIONS_LINK}.`,
-        { spinnerAction: SpinnerAction.NonSpinnable, logType: LogType.Warn },
       );
     }
   }
 
   public logHasDelegateCall(hasDelegateCall: boolean): void {
     if (hasDelegateCall) {
-      Loggy.add(
-        `${fileName}#logHasDelegateCall`,
+      Loggy.noSpin.warn(
+        __filename,
+        'logHasDelegateCall',
         `validation-has-delegatecall`,
         `- Contract ${
           this.contractName
         } or one of its ancestors has a potentially unsafe delegatecall operation. See ${DANGEROUS_OPERATIONS_LINK}.`,
-        { spinnerAction: SpinnerAction.NonSpinnable, logType: LogType.Warn },
       );
     }
   }
@@ -94,34 +89,35 @@ export default class ValidationLogger {
     hasInitialValuesInDeclarations: boolean,
   ): void {
     if (hasInitialValuesInDeclarations) {
-      Loggy.add(
-        `${fileName}#logHasInitialValuesInDeclarations`,
+      Loggy.noSpin.warn(
+        __filename,
+        'logHasInitialValuesInDeclarations',
         `validation-has-initial-values`,
         `- Contract ${
           this.contractName
         } or one of its ancestors sets an initial value in a field declaration. Consider moving all field initializations to an initializer function. See ${AVOID_INITIAL_VALUES_LINK}.`,
-        { spinnerAction: SpinnerAction.NonSpinnable, logType: LogType.Warn },
       );
     }
   }
 
   public logHasConstructor(hasConstructor: boolean): void {
     if (hasConstructor) {
-      Loggy.add(
-        `${fileName}#logHasConstructor`,
+      Loggy.noSpin.error(
+        __filename,
+        'logHasConstructor',
         `validation-has-constructor`,
         `- Contract ${
           this.contractName
         } has an explicit constructor. Change it to an initializer function. See ${INITIALIZERS_LINK}.`,
-        { spinnerAction: SpinnerAction.NonSpinnable, logType: LogType.Err },
       );
     }
   }
 
   public logUninitializedBaseContracts(uninitializedBaseContracts: any): void {
     if (!isEmpty(uninitializedBaseContracts)) {
-      Loggy.add(
-        `${fileName}#logUninitializedBaseContracts`,
+      Loggy.noSpin.warn(
+        __filename,
+        'logUninitializedBaseContracts',
         `validation-uinitialized-base-contracts`,
         `- Contract ${
           this.contractName
@@ -130,7 +126,6 @@ export default class ValidationLogger {
         )} which are initializable, but their initialize methods are not called from ${
           this.contractName
         }.initialize. See ${INITIALIZERS_LINK}.`,
-        { spinnerAction: SpinnerAction.NonSpinnable, logType: LogType.Warn },
       );
     }
   }
@@ -143,11 +138,11 @@ export default class ValidationLogger {
       .join(', ');
     const variablesString = `Variable${vars.length === 1 ? '' : 's'}`;
     const containsString = `contain${vars.length === 1 ? 's' : ''}`;
-    Loggy.add(
-      `${fileName}#logUninitializedBaseContracts`,
+    Loggy.noSpin.warn(
+      __filename,
+      'logUninitializedBaseContracts',
       `validation-unchecked-vars`,
       `- ${variablesString} ${varList} ${containsString} a struct or enum. These are not automatically checked for storage compatibility in the current version. See ${STORAGE_CHECKS_LINK} for more info.`,
-      { spinnerAction: SpinnerAction.NonSpinnable, logType: LogType.Warn },
     );
   }
 
@@ -176,57 +171,49 @@ export default class ValidationLogger {
 
       switch (action) {
         case 'insert':
-          Loggy.add(
-            `${fileName}#logStorageLayoutDiffs`,
+          Loggy.noSpin.error(
+            __filename,
+            'logStorageLayoutDiffs',
             `storage-layout-diffs`,
             `- New variable '${updatedVarDescription}' was inserted in contract ${
               updated.contract
             } in ${updatedVarSource}. You should only add new variables at the end of your contract.`,
-            {
-              spinnerAction: SpinnerAction.NonSpinnable,
-              logType: LogType.Err,
-            },
           );
           break;
         case 'delete':
-          Loggy.add(
-            `${fileName}#logStorageLayoutDiffs`,
+          Loggy.noSpin.error(
+            __filename,
+            'logStorageLayoutDiffs',
             `storage-layout-diffs`,
             `- Variable '${originalVarDescription}' was removed from contract ${
               original.contract
             }. You should avoid deleting variables from your contracts.`,
-            {
-              spinnerAction: SpinnerAction.NonSpinnable,
-              logType: LogType.Err,
-            },
           );
           break;
         case 'append':
-          Loggy.add(
-            `${fileName}#logStorageLayoutDiffs`,
+          Loggy.noSpin(
+            __filename,
+            'logStorageLayoutDiffs',
             `storage-layout-diffs`,
             `- New variable '${updatedVarDescription}' was added in contract ${
               updated.contract
             } in ${updatedVarSource} at the end of the contract.`,
-            { spinnerAction: SpinnerAction.NonSpinnable },
           );
           break;
         case 'pop':
-          Loggy.add(
-            `${fileName}#logStorageLayoutDiffs`,
+          Loggy.noSpin.warn(
+            __filename,
+            'logStorageLayoutDiffs',
             `storage-layout-diffs`,
             `- Variable '${originalVarDescription}' was removed from the end of contract ${
               original.contract
             }. You should avoid deleting variables from your contracts.`,
-            {
-              spinnerAction: SpinnerAction.NonSpinnable,
-              logType: LogType.Warn,
-            },
           );
           break;
         case 'rename':
-          Loggy.add(
-            `${fileName}#logStorageLayoutDiffs`,
+          Loggy.noSpin.warn(
+            __filename,
+            'logStorageLayoutDiffs',
             `storage-layout-diffs`,
             `- Variable '${originalVarDescription}' in contract ${
               original.contract
@@ -234,59 +221,46 @@ export default class ValidationLogger {
               ${updated.label} will have the value of ${
               original.label
             } after upgrading.`,
-            {
-              spinnerAction: SpinnerAction.NonSpinnable,
-              logType: LogType.Warn,
-            },
           );
           break;
         case 'typechange':
-          Loggy.add(
-            `${fileName}#logStorageLayoutDiffs`,
+          Loggy.noSpin.warn(
+            __filename,
+            'logStorageLayoutDiffs',
             `storage-layout-diffs`,
             `- Variable '${original.label}' in contract ${
               original.contract
             } was changed from ${originalVarType.label} to ${
               updatedVarType.label
             } in ${updatedVarSource}. Avoid changing types of existing variables.`,
-            {
-              spinnerAction: SpinnerAction.NonSpinnable,
-              logType: LogType.Warn,
-            },
           );
           break;
         case 'replace':
-          Loggy.add(
-            `${fileName}#logStorageLayoutDiffs`,
+          Loggy.noSpin.warn(
+            __filename,
+            'logStorageLayoutDiffs',
             `storage-layout-diffs`,
             `- Variable '${originalVarDescription}' in contract ${
               original.contract
             } was replaced with '${updatedVarDescription}' in
             ${updatedVarSource}. Avoid changing existing variables.`,
-            {
-              spinnerAction: SpinnerAction.NonSpinnable,
-              logType: LogType.Warn,
-            },
           );
           break;
         default:
-          Loggy.add(
-            `${fileName}#logStorageLayoutDiffs`,
+          Loggy.noSpin.error(
+            __filename,
+            'logStorageLayoutDiffs',
             `storage-layout-diffs`,
             `- Unexpected layout change: ${action}`,
-            {
-              spinnerAction: SpinnerAction.NonSpinnable,
-              logType: LogType.Err,
-            },
           );
       }
     });
 
-    Loggy.add(
-      `${fileName}#logStorageLayoutDiffs`,
+    Loggy.noSpin(
+      __filename,
+      'logStorageLayoutDiffs',
       `storage-layout-diffs-reference`,
       `See ${STORAGE_CHECKS_LINK} for more info.`,
-      { spinnerAction: SpinnerAction.NonSpinnable },
     );
   }
 }

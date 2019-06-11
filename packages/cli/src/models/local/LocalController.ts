@@ -1,12 +1,10 @@
 'use strict';
 
-import path from 'path';
 import every from 'lodash.every';
 import map from 'lodash.map';
 import {
   Contracts,
   Loggy,
-  SpinnerAction,
   FileSystem as fs,
   getBuildArtifacts,
   BuildArtifacts,
@@ -23,7 +21,6 @@ import ConfigManager from '../config/ConfigManager';
 import ZosPackageFile from '../files/ZosPackageFile';
 import ZosNetworkFile from '../files/ZosNetworkFile';
 
-const fileName = path.basename(__filename);
 const DEFAULT_VERSION = '0.1.0';
 
 export default class LocalController {
@@ -85,8 +82,9 @@ export default class LocalController {
   }
 
   public add(contractAlias: string, contractName: string): void {
-    Loggy.add(
-      `${fileName}#add`,
+    Loggy.spin(
+      __filename,
+      'add',
       `add-${contractAlias}`,
       `Adding ${
         contractAlias === contractName
@@ -126,15 +124,16 @@ export default class LocalController {
 
   public remove(contractAlias: string): void {
     if (!this.packageFile.hasContract(contractAlias)) {
-      Loggy.add(
-        `${fileName}#remove`,
+      Loggy.noSpin.error(
+        __filename,
+        'remove',
         `remove-${contractAlias}`,
         `Contract ${contractAlias} to be removed was not found`,
-        { spinnerAction: SpinnerAction.Fail },
       );
     } else {
-      Loggy.add(
-        `${fileName}#remove`,
+      Loggy.spin(
+        __filename,
+        'remove',
         `remove-${contractAlias}`,
         `Removing ${contractAlias}`,
       );
@@ -223,11 +222,11 @@ export default class LocalController {
     if (linkedDependencies.length > 0) {
       const label =
         linkedDependencies.length === 1 ? 'Dependency' : 'Dependencies';
-      Loggy.add(
-        `${fileName}#linkDependencies`,
+      Loggy.noSpin(
+        __filename,
+        'linkDependencies',
         'link-dependencies',
         `${label} successfully linked to the project. Run 'zos create' to deploy one of its contracts!`,
-        { spinnerAction: SpinnerAction.NonSpinnable },
       );
     }
   }
@@ -243,11 +242,11 @@ export default class LocalController {
     if (unlinkedDependencies.length > 0) {
       const label =
         unlinkedDependencies.length === 1 ? 'Dependency' : 'Dependencies';
-      Loggy.add(
-        `${fileName}#linkDependencies`,
+      Loggy.noSpin(
+        __filename,
+        'linkDependencies',
         'link-dependencies',
         `${label} ${unlinkedDependencies.join(', ')} successfully unlinked.`,
-        { spinnerAction: SpinnerAction.NonSpinnable },
       );
     }
   }

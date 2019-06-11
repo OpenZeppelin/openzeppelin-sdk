@@ -1,11 +1,8 @@
-import path from 'path';
 import axios from 'axios';
 import cheerio from 'cheerio';
 import querystring from 'querystring';
 
 import { sleep, Loggy } from 'zos-lib';
-
-const fileName = path.basename(__filename);
 
 // Max number of API request retries on error
 const RETRY_COUNT = 3;
@@ -62,13 +59,6 @@ async function publishToEtherchain(
   const optimizerStatus = optimizer ? 'Enabled' : 'Disabled';
 
   try {
-    Loggy.add(
-      `${fileName}#publishToEtherscan`,
-      'verify-and-publish',
-      `Verifying and publishing contract source code of ${
-        params.contractName
-      } on ${remote} (this usually takes under 30 seconds)`,
-    );
     const response = await axios.request({
       method: 'POST',
       url: etherchainVerificationUrl,
@@ -87,7 +77,9 @@ async function publishToEtherchain(
       if (message.match(/successful/)) {
         Loggy.succeed(
           'verify-and-publish',
-          `Contract source code of ${params.contractName} verified and published successfully. You can check it here: ${etherchainContractUrl}/${contractAddress}#code`,
+          `Contract source code of ${
+            params.contractName
+          } verified and published successfully. You can check it here: ${etherchainContractUrl}/${contractAddress}#code`,
         );
       } else if (message.match(/^No[\w\s]*provided\.$/)) {
         throw new Error(`Error during contract verification: ${message}`);
@@ -134,13 +126,6 @@ async function publishToEtherscan(
     });
 
     if (response.status === 200 && response.data.status === '1') {
-      Loggy.add(
-        `${fileName}#publishToEtherscan`,
-        'verify-and-publish',
-      `Verifying and publishing contract source code of ${
-          params.contractName
-        } on ${remote} (this usually takes under 30 seconds)`,
-      );
       await checkEtherscanVerificationStatus(
         response.data.result,
         etherscanApiUrl,
@@ -148,7 +133,9 @@ async function publishToEtherscan(
       );
       Loggy.succeed(
         'verify-and-publish',
-         `Contract source code of ${params.contractName} verified and published successfully. You can check it here: ${etherscanContractUrl}/${contractAddress}#code`,
+        `Contract source code of ${
+          params.contractName
+        } verified and published successfully. You can check it here: ${etherscanContractUrl}/${contractAddress}#code`,
       );
     } else {
       throw new Error(

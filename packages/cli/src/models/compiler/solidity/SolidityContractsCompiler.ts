@@ -1,6 +1,5 @@
-import path from 'path';
 import flatMap from 'lodash.flatmap';
-import { Logger, Loggy, LogLevel, SpinnerAction } from 'zos-lib';
+import { Loggy } from 'zos-lib';
 import solc from 'solc-wrapper';
 import {
   getCompiler as getSolc,
@@ -10,8 +9,6 @@ import {
   SolcCompiler,
 } from './CompilerProvider';
 import { getPragma } from '../../../utils/solidity';
-
-const fileName = path.basename(__filename);
 
 export interface CompiledContract {
   fileName: string;
@@ -43,8 +40,6 @@ export interface CompilerVersionOptions {
 export interface CompilerOptions extends CompilerVersionOptions {
   version?: string;
 }
-
-const log = new Logger('SolidityContractsCompiler');
 
 export const DEFAULT_EVM_VERSION = 'constantinople';
 export const DEFAULT_OPTIMIZER = { enabled: false };
@@ -141,11 +136,11 @@ class SolidityContractsCompiler {
       .join('\n');
 
     if (warnings.length > 0)
-      Loggy.add(
-        `${fileName}#_compile`,
+      Loggy.noSpin.warn(
+        __filename,
+        '_compile',
         `compile-warnings`,
         `Compilation warnings: \n${warningMessages}`,
-        { spinnerAction: SpinnerAction.NonSpinnable },
       );
     if (errors.length > 0)
       throw Error(`Compilation errors: \n${errorMessages}`);
@@ -162,11 +157,10 @@ class SolidityContractsCompiler {
 
   private _buildSources(): { [filePath: string]: { content: string } } {
     return this.contracts.reduce((sources, contract) => {
-      Loggy.add(
-        `${fileName}#buildSources`,
+      Loggy.onVerbose(
+        __filename,
         `compile-contract-file-${contract.fileName}`,
         `Compiling ${contract.fileName}`,
-        { logLevel: LogLevel.Verbose },
       );
       sources[contract.filePath] = { content: contract.source };
       return sources;

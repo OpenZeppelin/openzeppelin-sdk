@@ -7,7 +7,6 @@ import {
   Contract,
   Transactions,
   Loggy,
-  SpinnerAction,
   ZWeb3,
   TxParams,
   ABI,
@@ -67,8 +66,9 @@ export default class TransactionController {
     }
     const validUnit = unit.toLowerCase();
     const value = toWei(amount, validUnit);
-    Loggy.add(
-      `${fileName}#transfer`,
+    Loggy.spin(
+      __filename,
+      'transfer',
       'transfer-funds',
       `Sending ${amount} ${validUnit} to ${to}`,
     );
@@ -92,19 +92,18 @@ export default class TransactionController {
         accountAddress,
         contractAddress,
       );
-      Loggy.add(
-        `${fileName}#getBalanceOf`,
+      Loggy.noSpin(
+        __filename,
+        'getBalanceOf',
         'balance-of',
         `Balance: ${prettifyTokenAmount(balance, tokenDecimals, tokenSymbol)}`,
-        { spinnerAction: SpinnerAction.NonSpinnable },
       );
     } else {
       const balance = await ZWeb3.getBalance(accountAddress);
-      Loggy.add(
+      Loggy.noSpin(
         `${fileName}#getBalanceOf`,
         'balance-of',
         `Balance: ${fromWei(balance, 'ether')} ETH`,
-        { spinnerAction: SpinnerAction.NonSpinnable },
       );
     }
   }
@@ -120,8 +119,9 @@ export default class TransactionController {
       methodArgs,
     );
     try {
-      Loggy.add(
-        `${fileName}#callContractMethod`,
+      Loggy.spin(
+        __filename,
+        'callContractMethod',
         'call-contract-method',
         `Calling: ${callDescription(method, methodArgs)}`,
       );
@@ -162,7 +162,7 @@ export default class TransactionController {
       methodArgs,
     );
     try {
-      Loggy.add(
+      Loggy.spin(
         `${fileName}#sendTransaction`,
         'send-transaction',
         `Calling: ${callDescription(method, methodArgs)}`,

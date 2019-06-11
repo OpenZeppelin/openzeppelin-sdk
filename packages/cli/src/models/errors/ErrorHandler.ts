@@ -1,9 +1,6 @@
-import path from 'path';
 import { Command } from 'commander';
-import { Loggy, LogType, SpinnerAction } from 'zos-lib';
+import { Loggy } from 'zos-lib';
 import ScriptError from './ScriptError';
-
-const fileName = path.basename(__filename);
 
 const GENERIC_ERROR_MESSAGE =
   'There was an undefined error. Please execute the same command again in verbose mode if necessary.';
@@ -19,17 +16,11 @@ export default class ErrorHandler {
 
   public call(): void {
     if (!this.verbose) {
-      Loggy.stopAll(SpinnerAction.Fail);
+      Loggy.stopAll();
       const errorMessage = this.error.message || GENERIC_ERROR_MESSAGE;
-      Loggy.add(`${fileName}#call`, 'error-message', errorMessage, {
-        logType: LogType.Err,
-        spinnerAction: SpinnerAction.NonSpinnable,
-      });
+      Loggy.noSpin.error(__filename, 'call', 'error-message', errorMessage);
     } else {
-      Loggy.add(`${fileName}#call`, 'error-message', this.error.stack, {
-        logType: LogType.Err,
-        spinnerAction: SpinnerAction.NonSpinnable,
-      });
+      Loggy.noSpin.error(__filename, 'call', 'error-message', this.error.stack);
     }
     if (this.error.cb) this.error.cb();
 

@@ -9,10 +9,7 @@ import filter from 'lodash.filter';
 import find from 'lodash.find';
 
 import {
-  Logger,
   Loggy,
-  SpinnerAction,
-  LogLevel,
   FileSystem as fs,
   bytecodeDigest,
   bodyCode,
@@ -24,8 +21,6 @@ import { fromContractFullName, toContractFullName } from '../../utils/naming';
 import { ZOS_VERSION, checkVersion } from './ZosVersion';
 import ZosPackageFile from './ZosPackageFile';
 import { ProxyType } from '../../scripts/interfaces';
-
-const fileName = path.basename(__filename);
 
 export interface ContractInterface {
   address?: string;
@@ -539,14 +534,11 @@ export default class ZosNetworkFile {
     if (this.hasChanged()) {
       const exists = this.exists();
       fs.writeJson(this.fileName, this.data);
-      Loggy.add(
-        `${fileName}#write`,
+      Loggy.onVerbose(
+        __filename,
+        'write',
         'write-zos-json',
         exists ? `Updated ${this.fileName}` : `Created ${this.fileName}`,
-        {
-          spinnerAction: SpinnerAction.Succeed,
-          logLevel: LogLevel.Verbose,
-        },
       );
     }
   }

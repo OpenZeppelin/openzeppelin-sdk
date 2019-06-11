@@ -1,4 +1,3 @@
-import path from 'path';
 import { execFile as callbackExecFile, ExecException } from 'child_process';
 import { Loggy } from 'zos-lib';
 import Truffle from '../config/TruffleConfig';
@@ -10,7 +9,6 @@ import findUp from 'find-up';
 import ZosPackageFile from '../files/ZosPackageFile';
 import { promisify } from 'util';
 
-const fileName = path.basename(__filename);
 const state = { alreadyCompiled: false };
 const execFile = promisify(callbackExecFile);
 
@@ -60,8 +58,9 @@ export async function compileWithSolc(
 }
 
 export async function compileWithTruffle(): Promise<void> {
-  Loggy.add(
-    `${fileName}#compileWithTruffle`,
+  Loggy.spin(
+    __filename,
+    'compileWithTruffle',
     `compile-contracts`,
     'Compiling contracts with Truffle, using settings from truffle.js file',
   );

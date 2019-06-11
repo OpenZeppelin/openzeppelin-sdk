@@ -2,13 +2,11 @@ import path from 'path';
 import pickBy from 'lodash.pickby';
 import isEqual from 'lodash.isequal';
 import isEmpty from 'lodash.isempty';
-import { Loggy, SpinnerAction, LogLevel, FileSystem as fs } from 'zos-lib';
+import { Loggy, FileSystem as fs } from 'zos-lib';
 import Dependency from '../dependency/Dependency';
 import { ZOS_VERSION, checkVersion } from './ZosVersion';
 import ZosNetworkFile from './ZosNetworkFile';
 import { ProjectCompilerOptions } from '../compiler/solidity/SolidityProjectCompiler';
-
-const fileName = path.basename(__filename);
 
 interface ConfigFileCompilerOptions {
   manager: string;
@@ -236,18 +234,16 @@ export default class ZosPackageFile {
     if (this.hasChanged()) {
       const exists = this.exists();
       fs.writeJson(this.fileName, this.data);
-      Loggy.add(
-        `${fileName}#write`,
+      const logFn = exists ? Loggy.onVerbose : Loggy.noSpin.success;
+      logFn(
+        __filename,
+        'write',
         'write-zos-json',
         exists
           ? `Updated ${this.fileName}`
           : `Project successfully initialized (check the ${
               this.fileName
             } file). Write a new contract in the contracts folder and run 'zos create' to deploy it!`,
-        {
-          spinnerAction: SpinnerAction.Succeed,
-          logLevel: exists ? LogLevel.Verbose : LogLevel.Normal,
-        },
       );
     }
   }

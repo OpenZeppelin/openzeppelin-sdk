@@ -7,15 +7,13 @@ import reverse from 'lodash.reverse';
 import uniq from 'lodash.uniq';
 import compact from 'lodash.compact';
 import castArray from 'lodash.castarray';
-import { Loggy, LogType, SpinnerAction } from 'zos-lib';
+import { Loggy } from 'zos-lib';
 import { homedir } from 'os';
 import path from 'path';
 import child from '../../../utils/child';
 import { tryAwait } from '../../../utils/try';
 import { compilerVersionsMatch } from '../../../utils/solidity';
 import { keccak256 } from 'ethereumjs-util';
-
-const fileName = path.basename(__filename);
 
 // Downloaded compilers will be stored here.
 // TODO: Check writeability and fall back to tmp if needed
@@ -104,11 +102,11 @@ export async function fetchCompiler(build: SolcBuild): Promise<SolcCompiler> {
   // Try local compiler and see if version matches
   const localVersion = await localCompilerVersion();
   if (localVersion && compilerVersionsMatch(localVersion, build.longVersion)) {
-    Loggy.add(
-      `${fileName}#fetchCompiler`,
+    Loggy.noSpin(
+      __filename,
+      'fetchCompiler',
       'download-compiler',
       `Using local solc compiler found`,
-      { spinnerAction: SpinnerAction.NonSpinnable },
     );
     return new SolcBinCompiler(localVersion);
   }
@@ -157,11 +155,11 @@ async function getAvailableCompilerVersions(): Promise<SolcList> {
     return list;
   } catch (err) {
     if (fs.existsSync(localPath)) {
-      Loggy.add(
-        `${fileName}#getAvailableCompilerVersions`,
+      Loggy.noSpin.warn(
+        __filename,
+        'getAvailableCompilerVersions',
         'get-compiler-versions',
         `Error downloading solc releases list, using cached version`,
-        { logType: LogType.Warn, spinnerAction: SpinnerAction.NonSpinnable },
       );
 
       return readJson(localPath);
@@ -207,8 +205,9 @@ async function downloadCompiler(
   localFile: string,
 ): Promise<void> {
   const { version, keccak256: expectedHash, path: versionPath } = build;
-  Loggy.add(
-    `${fileName}#downloadCompiler`,
+  Loggy.spin(
+    __filename,
+    'downloadCompiler',
     'download-compiler',
     `Downloading compiler version ${version}`,
   );

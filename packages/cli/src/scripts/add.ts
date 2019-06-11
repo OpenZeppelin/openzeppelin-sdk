@@ -1,10 +1,7 @@
-import path from 'path';
-import { Loggy, SpinnerAction } from 'zos-lib';
+import { Loggy } from 'zos-lib';
 
 import LocalController from '../models/local/LocalController';
 import { AddParams } from './interfaces';
-
-const fileName = path.basename(__filename);
 
 export default function add({
   contractsData,
@@ -27,8 +24,6 @@ export default function add({
       ? 'All the selected contracts have been added to the project'
       : `Contract ${contractsData[0].name} has been added to the project`;
 
-  Loggy.add(`${fileName}#add`, 'add-contracts', message, {
-    spinnerAction: SpinnerAction.NonSpinnable,
-  });
+  Loggy.noSpin(__filename, 'add-contracts', message);
   controller.writePackage();
 }

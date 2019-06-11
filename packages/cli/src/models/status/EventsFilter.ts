@@ -1,7 +1,4 @@
-import path from 'path';
-import { Loggy, SpinnerAction } from 'zos-lib';
-
-const fileName = path.basename(__filename);
+import { Loggy } from 'zos-lib';
 
 export function describeEvents(events: any): void {
   let description = '';
@@ -13,10 +10,10 @@ export function describeEvents(events: any): void {
     description = description.concat(`\n - ${event}(${emitted.join(', ')})`);
   });
 
-  Loggy.add(
-    `${fileName}#describe`,
+  Loggy.noSpin(
+    __filename,
+    'describe',
     'describe-events',
     `Events emitted: ${description}`,
-    { spinnerAction: SpinnerAction.NonSpinnable },
   );
 }

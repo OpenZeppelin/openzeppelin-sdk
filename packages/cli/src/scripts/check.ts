@@ -1,10 +1,8 @@
 import path from 'path';
-import { Loggy, SpinnerAction } from 'zos-lib';
+import { Loggy } from 'zos-lib';
 
 import LocalController from '../models/local/LocalController';
 import { CheckParams } from './interfaces';
-
-const fileName = path.basename(__filename);
 
 export default function check({
   contractAlias,
@@ -15,8 +13,6 @@ export default function check({
     ? controller.validate(contractAlias)
     : controller.validateAll();
   if (success) {
-    Loggy.add(`${fileName}#check`, 'check-script', 'No issues were found', {
-      spinnerAction: SpinnerAction.NonSpinnable,
-    });
+    Loggy.noSpin(__filename, 'check', 'check-script', 'No issues were found');
   }
 }
