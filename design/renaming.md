@@ -30,7 +30,9 @@ We need to define how we want to support the migration from old to new config fi
 
 | Current | New |
 |---|---|
-| **zos** init MyProject | **oz** init MyProject |
+| **zos** init MyProject | **openzeppelin** init MyProject |
+
+Support **oz** as an alias, and **zos** as deprecated.
 
 ## Configuration files
 
