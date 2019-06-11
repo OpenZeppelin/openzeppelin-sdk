@@ -1,6 +1,7 @@
 'use strict';
 
 import isEmpty from 'lodash.isempty';
+import compact from 'lodash.compact';
 import intersection from 'lodash.intersection';
 import uniq from 'lodash.uniq';
 import flatten from 'lodash.flatten';
@@ -1028,12 +1029,35 @@ export default class NetworkController {
     if (proxies.length === 0) return [];
     await this.fetchOrDeploy(this.currentVersion);
 
-    // Update all proxies loaded
-    await allPromisesOrError(
-      map(proxies, proxy => this._upgradeProxy(proxy, initMethod, initArgs)),
-    );
+    if (await this.hasOutdatedProxies(proxies)) {
+      // Update all out of date proxies 
+      await allPromisesOrError(
+        map(proxies, proxy => this._upgradeProxy(proxy, initMethod, initArgs)),
+      );
+    } else {
+      Loggy.noSpin(
+        __filename,
+        'upgradeProxies',
+        'All instances are up to date',
+      );
+    }
 
     return proxies;
+  }
+
+  private async hasOutdatedProxies(proxies: ProxyInterface[]): Promise<any> {
+    const changedProxies = proxies.map(async proxy => {
+      const name = {
+        packageName: proxy.package,
+        contractName: proxy.contract,
+      };
+      const currentImplementation = await Proxy.at(
+        proxy.address,
+      ).implementation();
+      const contractImplementation = await this.project.getImplementation(name);
+      return contractImplementation == currentImplementation;
+    });
+    return proxies.length !== compact(await Promise.all(changedProxies)).length;
   }
 
   // Proxy model
@@ -1067,7 +1091,7 @@ export default class NetworkController {
         });
         newImplementation = contractImplementation;
       } else {
-        Loggy.onVerbose(
+        Loggy.noSpin(
           __filename,
           '_upgradeProxy',
           `upgrade-proxy-${proxy.address}`,
