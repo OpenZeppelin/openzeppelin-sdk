@@ -1,11 +1,7 @@
-import path from 'path';
 import Transactions from './Transactions';
 import encodeCall from '../helpers/encodeCall';
-import Logger, { Loggy } from '../utils/Logger';
+import { Loggy } from '../utils/Logger';
 import { TxParams } from '../artifacts/ZWeb3';
-
-const fileName = path.basename(__filename);
-const log: Logger = new Logger('Migrator');
 
 export default async function migrate(
   appAddress: string,
@@ -18,8 +14,9 @@ export default async function migrate(
     ['address', 'address'],
     [proxyAddress, proxyAdminAddress],
   );
-  Loggy.add(
-    `${fileName}#migrate`,
+  Loggy.spin(
+    __filename,
+    'migrate',
     'migrate-version',
     `Proxy ${proxyAddress} admin changed to ${proxyAdminAddress}`,
   );

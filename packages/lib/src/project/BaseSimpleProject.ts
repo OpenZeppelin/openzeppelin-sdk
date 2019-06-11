@@ -1,8 +1,7 @@
-import path from 'path';
 import isEmpty from 'lodash.isempty';
 
 import Proxy from '../proxy/Proxy';
-import Logger, { Loggy, LogLevel } from '../utils/Logger';
+import { Loggy } from '../utils/Logger';
 import Package from '../application/Package';
 import Transactions from '../utils/Transactions';
 import { toAddress } from '../utils/Addresses';
@@ -13,9 +12,6 @@ import { ContractInterface } from './AppProject';
 import Contract from '../artifacts/Contract';
 import ProxyFactory from '../proxy/ProxyFactory';
 import { TxParams } from '../artifacts/ZWeb3';
-
-const fileName = path.basename(__filename);
-const log: Logger = new Logger('BaseSimpleProject');
 
 interface Implementations {
   [contractName: string]: Implementation;
@@ -60,11 +56,11 @@ export default abstract class BaseSimpleProject {
     contract: Contract,
     contractName?: string,
   ): Promise<any> {
-    Loggy.add(
-      `${fileName}#setImplementation`,
+    Loggy.onVerbose(
+      __filename,
+      'setImplementation',
       `set-implementation-for-${contract.schema.contractName}`,
       `Deploying logic contract for ${contract.schema.contractName}`,
-      { logLevel: LogLevel.Verbose },
     );
     if (!contractName) contractName = contract.schema.contractName;
     const implementation: any = await Transactions.deployContract(
@@ -411,8 +407,9 @@ export default abstract class BaseSimpleProject {
         initArgs,
       );
       if (actionLabel)
-        Loggy.add(
-          `${fileName}#_getAndLogInitCallData`,
+        Loggy.spin(
+          __filename,
+          '_getAndLogInitCallData',
           `action-proxy-${implementationAddress}`,
           `${actionLabel} instance for ${implementationAddress} and calling ${callDescription(
             initMethod,
@@ -422,8 +419,9 @@ export default abstract class BaseSimpleProject {
       return callData;
     } else {
       if (actionLabel)
-        Loggy.add(
-          `${fileName}#_getAndLogInitCallData`,
+        Loggy.spin(
+          __filename,
+          '_getAndLogInitCallData',
           `action-proxy-${implementationAddress}`,
           `${actionLabel} proxy to logic contract ${implementationAddress}`,
         );

@@ -1,12 +1,8 @@
-import path from 'path';
-import Logger, { Loggy, LogLevel } from '../utils/Logger';
+import { Loggy } from '../utils/Logger';
 import Transactions from '../utils/Transactions';
 import Contracts from '../artifacts/Contracts';
 import Contract from '../artifacts/Contract';
 import { TxParams } from '../artifacts/ZWeb3';
-
-const fileName = path.basename(__filename);
-const log = new Logger('ImplementationDirectory');
 
 // TS-TODO: review which members could be private
 export default class ImplementationDirectory {
@@ -18,11 +14,11 @@ export default class ImplementationDirectory {
   ): Promise<ImplementationDirectory> {
     const contract = this.getContract();
     const directory = await Transactions.deployContract(contract, [], txParams);
-    Loggy.add(
-      `${fileName}#deploy`,
+    Loggy.onVerbose(
+      __filename,
+      'deploy',
       `deployed-implementation-directory`,
       `Deployed ${contract.schema.contractName} at ${directory.address}`,
-      { logLevel: LogLevel.Verbose },
     );
 
     return new this(directory, txParams);
@@ -72,11 +68,11 @@ export default class ImplementationDirectory {
     contractName: string,
     implementationAddress: string,
   ): Promise<any> {
-    Loggy.add(
-      `${fileName}#setImplementation`,
+    Loggy.onVerbose(
+      __filename,
+      'setImplementation',
       `set-implementation-${contractName}`,
       `Setting ${contractName} implementation ${implementationAddress} in directory`,
-      { logLevel: LogLevel.Verbose },
     );
     await Transactions.sendTransaction(
       this.directoryContract.methods.setImplementation,
@@ -90,11 +86,11 @@ export default class ImplementationDirectory {
   }
 
   public async unsetImplementation(contractName: string): Promise<any> {
-    Loggy.add(
-      `${fileName}#unsetImplementation`,
+    Loggy.onVerbose(
+      __filename,
+      'unsetImplementation',
       `unset-implementation-${contractName}`,
       `Unsetting ${contractName} implementation`,
-      { logLevel: LogLevel.Verbose },
     );
     await Transactions.sendTransaction(
       this.directoryContract.methods.unsetImplementation,
@@ -108,8 +104,9 @@ export default class ImplementationDirectory {
   }
 
   public async freeze(): Promise<any> {
-    Loggy.add(
-      `${fileName}#freeze`,
+    Loggy.spin(
+      __filename,
+      'freeze',
       `freeze-implementation`,
       'Freezing directory version',
     );
@@ -118,10 +115,7 @@ export default class ImplementationDirectory {
       [],
       { ...this.txParams },
     );
-    Loggy.succeed(
-      `freeze-implementation`,
-      `Directory version frozen`,
-    );
+    Loggy.succeed(`freeze-implementation`, `Directory version frozen`);
   }
 
   public async isFrozen(): Promise<boolean> {

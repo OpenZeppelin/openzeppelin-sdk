@@ -1,5 +1,4 @@
-import path from 'path';
-import Logger, { Loggy, LogLevel } from '../utils/Logger';
+import { Loggy } from '../utils/Logger';
 import Contracts from '../artifacts/Contracts';
 import ImplementationDirectory from '../application/ImplementationDirectory';
 import { toSemanticVersion, SemanticVersion } from '../utils/Semver';
@@ -7,9 +6,6 @@ import { isZeroAddress } from '../utils/Addresses';
 import Contract from '../artifacts/Contract';
 import { TxParams } from '../artifacts/ZWeb3';
 import Transactions from '../utils/Transactions';
-
-const fileName = path.basename(__filename);
-const log: Logger = new Logger('Package');
 
 export default class Package {
   private packageContract: Contract;
@@ -32,11 +28,11 @@ export default class Package {
       [],
       txParams,
     );
-    Loggy.add(
-      `${fileName}#deploy`,
+    Loggy.onVerbose(
+      __filename,
+      'deploy',
       `deployed-package-${packageContract.address}`,
       `Deployed Package ${packageContract.address}`,
-      { logLevel: LogLevel.Verbose },
     );
     return new this(packageContract, txParams);
   }

@@ -1,4 +1,3 @@
-import path from 'path';
 import concat from 'lodash.concat';
 import map from 'lodash.map';
 import isEmpty from 'lodash.isempty';
@@ -17,13 +16,10 @@ import { semanticVersionToString } from '../utils/Semver';
 import ProxyFactory from '../proxy/ProxyFactory';
 import { CalldataInfo, buildCallData, callDescription } from '../utils/ABIs';
 import { TxParams } from '../artifacts/ZWeb3';
-import Logger, { Loggy, SpinnerAction } from '../utils/Logger';
+import { Loggy } from '../utils/Logger';
 
 const DEFAULT_NAME = 'main';
 const DEFAULT_VERSION = '0.1.0';
-
-const fileName = path.basename(__filename);
-const log: Logger = new Logger('AppProject');
 
 export interface ContractInterface {
   packageName?: string;
@@ -68,8 +64,9 @@ class BaseAppProject extends BasePackageProject {
       if (appAddress) {
         app = await App.fetch(appAddress, txParams);
       } else {
-        Loggy.add(
-          `${fileName}#fetchOrDeploy`,
+        Loggy.spin(
+          __filename,
+          'fetchOrDeploy',
           `publish-project`,
           'Preparing everything to publish the project! Deploying new App contract',
         );
@@ -81,8 +78,9 @@ class BaseAppProject extends BasePackageProject {
       } else if (await app.hasPackage(name, version)) {
         thepackage = (await app.getPackage(name)).package;
       } else {
-        Loggy.addOrUpdate(
-          `${fileName}#fetchOrDeploy`,
+        Loggy.spin(
+          __filename,
+          'fetchOrDeploy',
           `publish-project`,
           'Deploying new Package contract',
         );
@@ -95,8 +93,9 @@ class BaseAppProject extends BasePackageProject {
       if (await thepackage.hasVersion(version)) {
         directory = await thepackage.getDirectory(version);
       } else {
-        Loggy.addOrUpdate(
-          `${fileName}#fetchOrDeploy`,
+        Loggy.spin(
+          __filename,
+          'fetchOrDeploy',
           `publish-project`,
           `Adding new version ${version} and creating ImplementationDirectory contract`,
         );
@@ -505,8 +504,9 @@ class BaseAppProject extends BasePackageProject {
         initArgs,
       );
       if (actionLabel)
-        Loggy.add(
-          `${fileName}#getInitCallData`,
+        Loggy.spin(
+          __filename,
+          'getInitCallData',
           `action-proxy-${implementationAddress}`,
           `${actionLabel} proxy to logic contract ${implementationAddress} and initializing by calling ${callDescription(
             initMethod,
@@ -516,8 +516,10 @@ class BaseAppProject extends BasePackageProject {
       return callData;
     } else {
       if (actionLabel)
-        Loggy.add(
-          `${fileName}#getInitCallData`,
+        Loggy.spin(
+          __filename,
+          'getInitCallData',
+          `${__filename}#getInitCallData`,
           `action-proxy-${implementationAddress}`,
           `${actionLabel} proxy to logic contract ${implementationAddress}`,
         );

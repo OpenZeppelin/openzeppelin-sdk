@@ -1,15 +1,11 @@
-import path from 'path';
 
 import Transactions from '../utils/Transactions';
-import Logger, { Loggy, LogLevel } from '../utils/Logger';
+import { Loggy } from '../utils/Logger';
 import { semanticVersionToString } from '../utils/Semver';
 import Contract from '../artifacts/Contract';
 import ImplementationDirectory from '../application/ImplementationDirectory';
 import Package from '../application/Package';
 import { TxParams } from '../artifacts/ZWeb3';
-
-const fileName = path.basename(__filename);
-const log: Logger = new Logger('PackageProject');
 
 export default abstract class BasePackageProject {
   protected txParams: TxParams;
@@ -34,14 +30,15 @@ export default abstract class BasePackageProject {
   // TODO: Testme
   public async freeze(): Promise<void> {
     const version: string = await this.getCurrentVersion();
-    Loggy.add(
-      `${fileName}#freeze`,
-      `freezing-${version}`,
+    Loggy.spin(
+      __filename,
+      'freeze',
+      `freezing-version`,
       `Freezing version ${version}`,
     );
     const directory: ImplementationDirectory = await this.getCurrentDirectory();
     await directory.freeze();
-    Loggy.succeed(`freezing-${version}`, `Version ${version} has been frozen`);
+    Loggy.succeed(`freezing-version`, `Version ${version} has been frozen`);
   }
 
   public async setImplementation(
@@ -49,11 +46,11 @@ export default abstract class BasePackageProject {
     contractName: string,
   ): Promise<Contract> {
     if (!contractName) contractName = contract.schema.contractName;
-    Loggy.add(
-      `${fileName}#setImplementation`,
+    Loggy.onVerbose(
+      __filename,
+      'setImplementation',
       `set-implementation-${contractName}`,
       `Setting implementation of ${contractName} in directory`,
-      { logLevel: LogLevel.Verbose },
     );
     const implementation: any = await Transactions.deployContract(
       contract,
@@ -62,7 +59,7 @@ export default abstract class BasePackageProject {
     );
     const directory: ImplementationDirectory = await this.getCurrentDirectory();
     await directory.setImplementation(contractName, implementation.address);
-    Loggy.succeed(
+    Loggy.onVerbose(
       `set-implementation-${contractName}`,
       `Implementation set: ${implementation.address}`,
     );
@@ -70,23 +67,24 @@ export default abstract class BasePackageProject {
   }
 
   public async unsetImplementation(contractName: string): Promise<void> {
-    Loggy.add(
-      `${fileName}#unsetImplementation`,
+    Loggy.onVerbose(
+      __filename,
+      'unsetImplementation',
       `unset-implementation-${contractName}`,
       `Unsetting implementation of ${contractName}`,
-      { logLevel: LogLevel.Verbose },
     );
     const directory: ImplementationDirectory = await this.getCurrentDirectory();
     await directory.unsetImplementation(contractName);
-    Loggy.succeed(`unset-implementation-${contractName}`);
+    Loggy.onVerbose(`unset-implementation-${contractName}`);
   }
 
   public async registerImplementation(
     contractName: string,
     { address }: { address: string },
   ): Promise<void> {
-    Loggy.add(
-      `${fileName}#registerImplementation`,
+    Loggy.spin(
+      __filename,
+      'registerImplementation',
       `register-implementation-${contractName}`,
       `Registering ${contractName} at ${address} in directory`,
     );

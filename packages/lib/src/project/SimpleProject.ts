@@ -1,4 +1,3 @@
-import path from 'path';
 import Proxy from '../proxy/Proxy';
 import { Loggy } from '../utils/Logger';
 import ZWeb3 from '../artifacts/ZWeb3';
@@ -7,8 +6,6 @@ import { ContractInterface } from './AppProject';
 import BaseSimpleProject from './BaseSimpleProject';
 import ProxyFactory from '../proxy/ProxyFactory';
 import { TxParams } from '../artifacts/ZWeb3';
-
-const fileName = path.basename(__filename);
 
 export default class SimpleProject extends BaseSimpleProject {
   public constructor(
@@ -42,8 +39,9 @@ export default class SimpleProject extends BaseSimpleProject {
     proxyAddress: string,
     newAdmin: string,
   ): Promise<Proxy> {
-    Loggy.add(
-      `${fileName}#changeProxyAdmin`,
+    Loggy.spin(
+      __filename,
+      'changeProxyAdmin',
       `change-proxy-admin`,
       `Changing admin for proxy ${proxyAddress} to ${newAdmin}`,
     );

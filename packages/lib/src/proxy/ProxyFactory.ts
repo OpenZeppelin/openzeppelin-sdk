@@ -1,6 +1,4 @@
-import path from 'path';
-
-import Logger, { Loggy } from '../utils/Logger';
+import { Loggy } from '../utils/Logger';
 import Contracts from '../artifacts/Contracts';
 import { toAddress } from '../utils/Addresses';
 import Transactions from '../utils/Transactions';
@@ -8,9 +6,6 @@ import Contract from '../artifacts/Contract';
 import Proxy from './Proxy';
 import { TxParams } from '../artifacts/ZWeb3';
 import MinimalProxy from './MinimalProxy';
-
-const fileName = path.basename(__filename);
-const log: Logger = new Logger('ProxyFactory');
 
 export default class ProxyFactory {
   public contract: Contract;
@@ -30,8 +25,9 @@ export default class ProxyFactory {
   }
 
   public static async deploy(txParams: TxParams = {}): Promise<ProxyFactory> {
-    Loggy.add(
-      `${fileName}#deploy`,
+    Loggy.spin(
+      __filename,
+      'deploy',
       'deploy-proxy-factory',
       'Deploying new ProxyFactory contract',
     );

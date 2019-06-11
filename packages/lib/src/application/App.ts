@@ -1,9 +1,7 @@
-import path from 'path';
 import isEmpty from 'lodash.isempty';
 
-import Logger, { Loggy, LogLevel } from '../utils/Logger';
+import { Loggy } from '../utils/Logger';
 import Proxy from '../proxy/Proxy';
-import copyContract from '../helpers/copyContract';
 import Contracts from '../artifacts/Contracts';
 import Package from '../application/Package';
 import ImplementationDirectory from '../application/ImplementationDirectory';
@@ -13,9 +11,6 @@ import Contract from '../artifacts/Contract';
 import { toSemanticVersion, semanticVersionEqual } from '../utils/Semver';
 import Transactions from '../utils/Transactions';
 import { TxParams } from '../artifacts/ZWeb3';
-
-const fileName = path.basename(__filename);
-const log: Logger = new Logger('App');
 
 export default class App {
   public appContract: any;
@@ -35,11 +30,11 @@ export default class App {
       [],
       txParams,
     );
-    Loggy.add(
-      `${fileName}#deploy`,
+    Loggy.onVerbose(
+      __filename,
+      'deploy',
       `deployed-app`,
       `Deployed App at ${appContract.address}`,
-      { logLevel: LogLevel.Verbose },
     );
     return new this(appContract, txParams);
   }
@@ -156,7 +151,7 @@ export default class App {
             initArgs,
           );
     Loggy.succeed(
-      `create-proxy-${implementation}`,
+      `create-proxy`,
       `${packageName} ${contractName} proxy created at ${proxy.address}`,
     );
     return contract.at(proxy.address);
@@ -169,9 +164,10 @@ export default class App {
     proxyAdmin: string,
   ): Promise<Proxy> {
     const initializeData: Buffer = Buffer.from('');
-    Loggy.add(
-      `${fileName}#_createProxy`,
-      `create-proxy-${implementation}`,
+    Loggy.spin(
+      __filename,
+      '_createProxy',
+      `create-proxy`,
       `Creating ${packageName} ${contractName} proxy`,
     );
     return Proxy.deploy(
@@ -196,9 +192,10 @@ export default class App {
       initMethodName,
       initArgs,
     );
-    Loggy.add(
-      `${fileName}#_createProxyAndCall`,
-      `create-proxy-${implementation}`,
+    Loggy.spin(
+      __filename,
+      '_createProxyAndCall',
+      `create-proxy`,
       `Creating ${packageName}/${contractName} proxy and calling ${callDescription(
         initMethod,
         initArgs,

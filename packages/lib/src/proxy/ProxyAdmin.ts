@@ -1,15 +1,13 @@
 import path from 'path';
 import isEmpty from 'lodash.isempty';
 
-import { Loggy, LogLevel } from '../utils/Logger';
+import { Loggy } from '../utils/Logger';
 import Contracts from '../artifacts/Contracts';
 import { toAddress } from '../utils/Addresses';
 import { buildCallData, callDescription, CalldataInfo } from '../utils/ABIs';
 import Transactions from '../utils/Transactions';
 import Contract from '../artifacts/Contract';
 import { TxParams } from '../artifacts/ZWeb3';
-
-const fileName = path.basename(__filename);
 
 export default class ProxyAdmin {
   public contract: Contract;
@@ -22,8 +20,9 @@ export default class ProxyAdmin {
   }
 
   public static async deploy(txParams: TxParams = {}): Promise<ProxyAdmin> {
-    Loggy.add(
-      `${fileName}#deploy`,
+    Loggy.spin(
+      __filename,
+      'deploy',
       `deploy-proxy-admin`,
       'Deploying new ProxyAdmin',
     );
@@ -55,8 +54,9 @@ export default class ProxyAdmin {
     proxyAddress: string,
     newAdmin: string,
   ): Promise<void> {
-    Loggy.add(
-      `${fileName}#changeProxyAdmin`,
+    Loggy.spin(
+      __filename,
+      'changeProxyAdmin',
       `change-proxy-admin`,
       `Changing admin for proxy ${proxyAddress} to ${newAdmin}`,
     );
@@ -89,19 +89,20 @@ export default class ProxyAdmin {
             initMethodName,
             initArgs,
           );
-    Loggy.add(
-      `${fileName}#upgradeProxy`,
+    Loggy.onVerbose(
+      __filename,
+      'upgradeProxy',
       `upgrade-proxy-${proxyAddress}`,
       `Transaction receipt received: ${receipt.transactionHash}`,
-      { logLevel: LogLevel.Verbose },
     );
     return contract.at(proxyAddress);
   }
 
   public async transferOwnership(newAdminOwner: string): Promise<void> {
     await this.checkOwner();
-    Loggy.add(
-      `${fileName}#transferOwnership`,
+    Loggy.spin(
+      __filename,
+      'transferOwnerShip',
       'transfer-ownership',
       `Changing ownership of proxy admin to ${newAdminOwner}`,
     );
@@ -134,11 +135,11 @@ export default class ProxyAdmin {
     proxyAddress: string,
     implementation: string,
   ): Promise<any> {
-    Loggy.add(
-      `${fileName}#_upgradeProxy`,
+    Loggy.onVerbose(
+      __filename,
+      '_upgradeProxy',
       `upgrade-proxy-${proxyAddress}`,
       `Upgrading proxy at ${proxyAddress}`,
-      { logLevel: LogLevel.Verbose },
     );
     return Transactions.sendTransaction(
       this.contract.methods.upgrade,
@@ -159,8 +160,9 @@ export default class ProxyAdmin {
       initMethodName,
       initArgs,
     );
-    Loggy.add(
-      `${fileName}_upgradeProxyAndCall`,
+    Loggy.spin(
+      __filename,
+      '_upgradeProxyAndCall',
       `upgrade-proxy-${proxyAddress}`,
       `Upgrading proxy at ${proxyAddress} and calling ${callDescription(
         initMethod,
