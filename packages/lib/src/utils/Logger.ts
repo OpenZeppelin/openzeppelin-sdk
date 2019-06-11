@@ -10,9 +10,11 @@ const spinners = new Spinnies({
 });
 
 export enum LogType {
+  Success,
   Info,
   Warn,
   Err,
+  Fail,
 }
 
 export enum LogLevel {
@@ -65,7 +67,14 @@ export const Loggy: { [key: string]: any } = {
     if (!logLevel) logLevel = LogLevel.Normal;
     if (!logType) logType = LogType.Info;
     if (!spinnerAction) spinnerAction = SpinnerAction.Add;
-    this.logs[reference] = { file, fnName, text, logLevel, logType, spinnerAction };
+    this.logs[reference] = {
+      file,
+      fnName,
+      text,
+      logLevel,
+      logType,
+      spinnerAction,
+    };
     this._log(reference);
   },
 
@@ -123,11 +132,13 @@ export const Loggy: { [key: string]: any } = {
 
   _getColorFor(logType: LogType): string {
     switch (logType) {
+      case LogType.Success:
+        return 'blueBright';
       case LogType.Info:
         return 'white';
       case LogType.Warn:
         return 'yellow';
-      case LogType.Err:
+      case LogType.Err || LogType.Fail:
         return 'redBright';
       default:
         return 'white';
@@ -141,6 +152,8 @@ const spinnerActions = {
 };
 
 const logTypes = {
+  success: LogType.Success,
+  failed: LogType.Fail,
   info: LogType.Info,
   warn: LogType.Warn,
   error: LogType.Err,

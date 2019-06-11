@@ -1,4 +1,3 @@
-import path from 'path';
 import { Loggy } from '../utils/Logger';
 import sleep from '../helpers/sleep';
 import Web3 from 'web3';

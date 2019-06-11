@@ -1,4 +1,3 @@
-import path from 'path';
 import isEmpty from 'lodash.isempty';
 
 import { Loggy } from '../utils/Logger';

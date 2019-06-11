@@ -1,4 +1,3 @@
-
 import Transactions from '../utils/Transactions';
 import { Loggy } from '../utils/Logger';
 import { semanticVersionToString } from '../utils/Semver';
