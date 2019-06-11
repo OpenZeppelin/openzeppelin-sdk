@@ -20,7 +20,7 @@ const register: (program: any) => any = program =>
     .action(action);
 
 async function action(options: any): Promise<void> {
-  throw Error('Status command has been deprecated.');
+  throw Error('Status command has been removed.');
   if (!options.dontExitProcess && process.env.NODE_ENV !== 'test')
     process.exit(0);
 }

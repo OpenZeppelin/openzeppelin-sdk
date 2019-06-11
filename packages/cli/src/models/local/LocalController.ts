@@ -226,7 +226,7 @@ export default class LocalController {
       Loggy.add(
         `${fileName}#linkDependencies`,
         'link-dependencies',
-        `${label} successfully linked to the project. Run 'zos create' to pick and deploy a contract!`,
+        `${label} successfully linked to the project. Run 'zos create' to deploy one of its contracts!`,
         { spinnerAction: SpinnerAction.NonSpinnable },
       );
     }

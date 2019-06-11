@@ -15,7 +15,7 @@ export default function addAll({
   Loggy.add(
     `${fileName}#add`,
     'add-contracts',
-    'All the contracts have been successfully added to the project.',
+    'All local contracts have been added to the project.',
     {
       spinnerAction: SpinnerAction.NonSpinnable,
     },

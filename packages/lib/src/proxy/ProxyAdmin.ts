@@ -34,7 +34,7 @@ export default class ProxyAdmin {
     );
     Loggy.succeed(
       `deploy-proxy-admin`,
-      `Successfully deployed ProxyAdmin at ${contract.address}`,
+      `Deployed ProxyAdmin at ${contract.address}`,
     );
     return new this(contract, txParams);
   }
@@ -92,7 +92,7 @@ export default class ProxyAdmin {
     Loggy.add(
       `${fileName}#upgradeProxy`,
       `upgrade-proxy-${proxyAddress}`,
-      `TX receipt received: ${receipt.transactionHash}`,
+      `Transaction receipt received: ${receipt.transactionHash}`,
       { logLevel: LogLevel.Verbose },
     );
     return contract.at(proxyAddress);
@@ -103,7 +103,7 @@ export default class ProxyAdmin {
     Loggy.add(
       `${fileName}#transferOwnership`,
       'transfer-ownership',
-      `Changing ownership for proxy admin to ${newAdminOwner}`,
+      `Changing ownership of proxy admin to ${newAdminOwner}`,
     );
     await Transactions.sendTransaction(
       this.contract.methods.transferOwnership,

@@ -18,7 +18,7 @@ export default function remove({
   Loggy.add(
     `${fileName}#remove`,
     'remove-contracts',
-    `All specified contracts have been successfully removed from the project. To add them again, just run 'zos add'`,
+    `All specified contracts have been removed from the project. To add them again, just run 'zos add'.`,
     { spinnerAction: SpinnerAction.NonSpinnable },
   );
   controller.writePackage();

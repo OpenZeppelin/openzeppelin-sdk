@@ -79,7 +79,7 @@ export default class Dependency {
 
   public static async install(nameAndVersion: string): Promise<Dependency> {
     Loggy.add(
-      `${__filename}`,
+      __filename,
       `install-dependency-${nameAndVersion}`,
       `Installing ${nameAndVersion} via npm`,
     );

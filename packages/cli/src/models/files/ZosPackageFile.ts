@@ -243,7 +243,7 @@ export default class ZosPackageFile {
           ? `Updated ${this.fileName}`
           : `Project successfully initialized (check the ${
               this.fileName
-            } file). Craft your contracts and then run 'zos create' to deploy them!`,
+            } file). Write a new contract in the contracts folder and run 'zos create' to deploy it!`,
         {
           spinnerAction: SpinnerAction.Succeed,
           logLevel: exists ? LogLevel.Verbose : LogLevel.Normal,

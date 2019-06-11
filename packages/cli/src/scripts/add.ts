@@ -24,8 +24,8 @@ export default function add({
 
   const message =
     contractsData.length > 1
-      ? 'All the selected contracts have been successfully added to the project'
-      : 'Contract has been successfully added to the project';
+      ? 'All the selected contracts have been added to the project'
+      : `Contract ${contractsData[0].name} has been added to the project`;
 
   Loggy.add(`${fileName}#add`, 'add-contracts', message, {
     spinnerAction: SpinnerAction.NonSpinnable,

@@ -120,7 +120,7 @@ export default class ImplementationDirectory {
     );
     Loggy.succeed(
       `freeze-implementation`,
-      `Directory version successfully freezed`,
+      `Directory version frozen`,
     );
   }
 

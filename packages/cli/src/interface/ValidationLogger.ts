@@ -283,7 +283,7 @@ export default class ValidationLogger {
     });
 
     Loggy.add(
-      `${fileName}#logStrageLayoutDiffs`,
+      `${fileName}#logStorageLayoutDiffs`,
       `storage-layout-diffs-reference`,
       `See ${STORAGE_CHECKS_LINK} for more info.`,
       { spinnerAction: SpinnerAction.NonSpinnable },

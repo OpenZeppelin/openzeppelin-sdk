@@ -121,7 +121,7 @@ export default class TransactionController {
     );
     try {
       Loggy.add(
-        `${fileName}#transfer`,
+        `${fileName}#callContractMethod`,
         'call-contract-method',
         `Calling: ${callDescription(method, methodArgs)}`,
       );
@@ -136,11 +136,11 @@ export default class TransactionController {
       parsedResult.length === 0
         ? Loggy.succeed(
             'call-contract-method',
-            `Method ${methodName} successfully called.`,
+            `Method ${methodName} returned empty.`,
           )
         : Loggy.succeed(
             'call-contract-method',
-            `Call returned: ${parsedResult}`,
+            `Method ${methodName} returned ${parsedResult}`,
           );
 
       return result;

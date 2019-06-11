@@ -65,7 +65,7 @@ async function publishToEtherchain(
     Loggy.add(
       `${fileName}#publishToEtherscan`,
       'verify-and-publish',
-      `Verifying and publishing ${
+      `Verifying and publishing contract source code of ${
         params.contractName
       } on ${remote} (this usually takes under 30 seconds)`,
     );
@@ -137,7 +137,7 @@ async function publishToEtherscan(
       Loggy.add(
         `${fileName}#publishToEtherscan`,
         'verify-and-publish',
-        `Verifying and publishing ${
+      `Verifying and publishing contract source code of ${
           params.contractName
         } on ${remote} (this usually takes under 30 seconds)`,
       );
@@ -148,7 +148,7 @@ async function publishToEtherscan(
       );
       Loggy.succeed(
         'verify-and-publish',
-        `Contract verified successfully. You can check it here: ${etherscanContractUrl}/${contractAddress}#code`,
+         `Contract source code of ${params.contractName} verified and published successfully. You can check it here: ${etherscanContractUrl}/${contractAddress}#code`,
       );
     } else {
       throw new Error(

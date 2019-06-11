@@ -103,8 +103,8 @@ class BaseAppProject extends BasePackageProject {
         directory = await thepackage.newVersion(version);
         const succeedText =
           !appAddress || !packageAddress
-            ? `Project structure successfully deployed!`
-            : `Version ${version} successfully added`;
+            ? `Project structure deployed!`
+            : `Version ${version} deployed`;
 
         Loggy.succeed(`publish-project`, succeedText);
       }
