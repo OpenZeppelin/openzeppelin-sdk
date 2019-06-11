@@ -125,4 +125,25 @@ describe('SolidityProjectCompiler', function() {
       FileSystem.parseJson(dependencyArtifactPath).bytecode.should.not.be.null;
     });
   });
+
+  describe('in mock-stdlib-with-spaces project', function() {
+    this.timeout(20000);
+
+    const inputDir = `${rootDir}/test/mocks/mock-stdlib with spaces/contracts`;
+    const outputDir = `${baseTestBuildDir}/mock-stdlib with spaces`;
+    const greeterArtifactPath = `${outputDir}/GreeterImpl.json`;
+
+    before('compiling', async function() {
+      await compileProject({ inputDir, outputDir, version: '0.5.9' });
+    });
+
+    it('compiles project contracts', async function() {
+      FileSystem.exists(greeterArtifactPath).should.be.true;
+      const schema = FileSystem.parseJson(greeterArtifactPath);
+      schema.bytecode.should.not.be.null;
+      schema.sourcePath.should.be.eq(
+        `test/mocks/mock-stdlib with spaces/contracts/GreeterImpl.sol`,
+      );
+    });
+  });
 });

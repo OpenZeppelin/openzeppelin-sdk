@@ -2,6 +2,7 @@ import { ResolverEngine } from '@resolver-engine/core';
 import pathSys from 'path';
 import urlSys from 'url';
 import { getImports } from '../../../utils/solidity';
+import isUrl from 'is-url';
 
 // Adapted from resolver-engine
 // https://github.com/Crypto-Punkers/resolver-engine/blob/master/packages/imports/src/parsers/importparser.ts
@@ -102,7 +103,7 @@ export async function gatherSources(
     workingDir += '/';
   }
 
-  const absoluteRoots = roots.map(what => urlSys.resolve(workingDir, what));
+  const absoluteRoots = roots.map(what => resolvePath(workingDir, what));
   for (const absWhat of absoluteRoots) {
     queue.push({ cwd: workingDir, file: absWhat, relativeTo: workingDir });
     alreadyImported.add(absWhat);
@@ -121,7 +122,7 @@ export async function gatherSources(
     // if not - return the same name it was imported with
     let relativePath: string;
     if (fileData.file[0] === '.') {
-      relativePath = urlSys.resolve(fileData.relativeTo, fileData.file);
+      relativePath = resolvePath(fileData.relativeTo, fileData.file);
       result.push({
         url: relativePath,
         source: resolvedFile.source,
@@ -140,7 +141,7 @@ export async function gatherSources(
     for (const foundImport of foundImports) {
       let importName: string;
       if (foundImport[0] === '.') {
-        importName = urlSys.resolve(relativePath, foundImport);
+        importName = resolvePath(relativePath, foundImport);
       } else {
         importName = foundImport;
       }
@@ -156,6 +157,25 @@ export async function gatherSources(
   }
 
   return result;
+}
+
+function resolvePath(workingDir: string, relativePath: string): string {
+  // If the working dir is an URL (a file imported from an URL location)
+  // or the relative path is an URL (an URL imported from a local file)
+  // use url.resolve, which will work in both cases.
+  // > url.resolve('/local/folder/', 'http://example.com/myfile.sol')
+  // 'http://example.com/myfile.sol'
+  // > url.resolve('http://example.com/', 'myfile.sol')
+  // 'http://example.com/myfile.sol'
+  //
+  // If not, use path.resolve, since using url.resolve will escape certain
+  // charaters (e.g. a space as an %20), breaking the path
+  // > url.resolve('/local/path/with spaces/', 'myfile.sol')
+  // '/local/path/with%20spaces/myfile.sol'
+
+  return isUrl(workingDir) || isUrl(relativePath)
+    ? urlSys.resolve(workingDir, relativePath)
+    : pathSys.resolve(pathSys.dirname(workingDir), relativePath);
 }
 
 /**
