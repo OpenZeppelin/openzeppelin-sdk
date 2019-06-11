@@ -61,6 +61,8 @@ export default class ZosPackageFile {
       throw e;
     }
     checkVersion(this.data.zosversion, this.fileName);
+    if (!this.data.contracts) this.data.contracts = {};
+    if (!this.data.dependencies) this.data.dependencies = {};
   }
 
   public exists(): boolean {
