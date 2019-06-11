@@ -1,0 +1,17 @@
+{
+  "zosversion": "2.2",
+  "name": "first-project",
+  "version": "1.0.0",
+  "contracts": {
+    "Counter": "Counter"
+  },
+  "compiler": {
+    "manager": "zos",
+    "compilerSettings": {
+      "optimizer": {
+        "enabled": false
+      }
+    }
+  },
+  "dependencies": {}
+}
