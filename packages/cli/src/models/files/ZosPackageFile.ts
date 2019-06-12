@@ -234,14 +234,11 @@ export default class ZosPackageFile {
     if (this.hasChanged()) {
       const exists = this.exists();
       fs.writeJson(this.fileName, this.data);
-      const logFn = exists ? Loggy.onVerbose : Loggy.noSpin;
-      logFn(
+      Loggy.onVerbose(
         __filename,
         'write',
         'write-zos-json',
-        exists
-          ? `Updated ${this.fileName}`
-          : `Project successfully initialized. Write a new contract in the contracts folder and run 'zos create' to deploy it!`,
+        exists ? `Updated ${this.fileName}` : `Created ${this.fileName}`,
       );
     }
   }

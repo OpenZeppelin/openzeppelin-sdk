@@ -75,6 +75,12 @@ export default class LocalController {
     this.packageFile.version = version || DEFAULT_VERSION;
     this.packageFile.contracts = {};
     if (publish) this.packageFile.publish = publish;
+    Loggy.noSpin(
+      __filename,
+      'initZosPackageFile',
+      'init-package-file',
+      `Project successfully initialized. Write a new contract in the contracts folder and run 'zos create' to deploy it!`,
+    );
   }
 
   public bumpVersion(version: string): void {
