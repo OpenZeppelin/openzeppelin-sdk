@@ -11,8 +11,6 @@ import { Contracts } from 'zos-lib';
 import CaptureLogs from '../helpers/captureLogs';
 import ZosPackageFile from '../../src/models/files/ZosPackageFile';
 
-const ImplV1 = Contracts.getFromLocal('ImplV1');
-
 contract('call script', function(accounts) {
   accounts = accounts.map(utils.toChecksumAddress);
   const [_skipped, account] = accounts;
@@ -125,14 +123,14 @@ contract('call script', function(accounts) {
         });
 
         this.logs.infos[this.logs.infos.length - 1].should.eq(
-          `Call returned: 42`,
+          `Method value returned 42`,
         );
       });
     });
 
     context('when calling a regular method', function() {
       context('when the method does not return', function() {
-        it('calls the method and logs that it has been successfully called', async function() {
+        it('calls the method and logs that it has been returned empty', async function() {
           const proxyAddress = this.networkFile.getProxies({
             contract: 'Impl',
           })[0].address;
@@ -146,7 +144,7 @@ contract('call script', function(accounts) {
           });
 
           this.logs.infos[this.logs.infos.length - 1].should.eq(
-            'Method doesNotReturn successfully called.',
+            'Method doesNotReturn returned empty.',
           );
         });
       });
@@ -166,7 +164,7 @@ contract('call script', function(accounts) {
           });
 
           this.logs.infos[this.logs.infos.length - 1].should.eq(
-            `Call returned: V1`,
+            `Method say returned V1`,
           );
         });
       });
@@ -186,7 +184,7 @@ contract('call script', function(accounts) {
           });
 
           this.logs.infos[this.logs.infos.length - 1].should.eq(
-            `Call returned: (V1, 1)`,
+            `Method sayMore returned (V1, 1)`,
           );
         });
       });
@@ -206,7 +204,7 @@ contract('call script', function(accounts) {
           });
 
           this.logs.infos[this.logs.infos.length - 1].should.eq(
-            `Call returned: []`,
+            `Method sayNumbers returned []`,
           );
         });
 
@@ -232,7 +230,7 @@ contract('call script', function(accounts) {
           });
 
           this.logs.infos[this.logs.infos.length - 1].should.eq(
-            `Call returned: [1,2,3]`,
+            `Method sayNumbers returned [1,2,3]`,
           );
         });
       });

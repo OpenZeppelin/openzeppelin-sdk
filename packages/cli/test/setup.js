@@ -1,6 +1,6 @@
 process.env.NODE_ENV = 'test';
 
-import { ZWeb3, Contracts } from 'zos-lib';
+import { ZWeb3, Contracts, Loggy } from 'zos-lib';
 import Dependency from '../src/models/dependency/Dependency';
 import ZosPackageFile from '../src/models/files/ZosPackageFile';
 import ZosNetworkFile from '../src/models/files/ZosNetworkFile';
@@ -9,6 +9,7 @@ useTestZosPackageFile();
 doNotInstallStdlib();
 ZWeb3.initialize(web3.currentProvider);
 setArtifactDefaults();
+Loggy.silent(true);
 
 require('chai')
   .use(require('chai-as-promised'))

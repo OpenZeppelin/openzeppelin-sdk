@@ -457,7 +457,9 @@ export default class NetworkController {
         __filename,
         'validateContract',
         `validate-contract`,
-        `Error while validating contract ${contract.schema.contractName}:`,
+        `Error while validating contract ${
+          contract.schema.contractName
+        }: ${err}`,
       );
       return false;
     }
