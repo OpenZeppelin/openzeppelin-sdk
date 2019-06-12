@@ -1,0 +1,9 @@
+{
+  "name": "mock-stdlib-empty",
+  "version": "1.1.0",
+  "description": "Mock empty stdlib for tests in zos-cli",
+  "main": "index.js",
+  "private": true,
+  "author": "santiago@zeppelin.solutions",
+  "license": "MIT"
+}
