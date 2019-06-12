@@ -2,7 +2,7 @@
 
 import chalk from 'chalk';
 import program from 'commander';
-import { Logger, Loggy } from 'zos-lib';
+import { Loggy } from 'zos-lib';
 import commands from '../commands';
 import registerErrorHandler from './errors';
 

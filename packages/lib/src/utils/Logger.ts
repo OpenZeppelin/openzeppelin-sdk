@@ -42,6 +42,7 @@ interface UpdateParams {
   text?: string;
 }
 
+// TS-TODO: add object interface
 export const Loggy: { [key: string]: any } = {
   logs: {},
 
