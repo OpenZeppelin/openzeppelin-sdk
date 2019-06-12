@@ -39,6 +39,8 @@ The CLI will prompt you to choose a project name and version, defaulting to the 
 
 We are now ready to begin coding.
 
+> Note: Should you get lost at any point during this tutorial, you can refer to the full code for this project in our [`Github repo`](https://github.com/zeppelinos/zos/tree/v2.4.0/examples/first-project).
+
 ## Your first contract
 
 We will write a simple contract in [Solidity](https://solidity.readthedocs.io/), the most popular language for Ethereum smart contracts. Create a new file `contracts/Counter.sol` in your project with the following content:
@@ -132,7 +134,7 @@ Instance at 0xCfEB869F69431e42cdB54A4F4f105C19C080A601 upgraded
 Done! Our `Counter` instance has been updated to the latest version, and neither its address nor its state have changed. Let's check it out by increasing the counter by ten, which should yield eleven, since we had already increased it by one:
 
 ```console
-$ zos-dev send-tx
+$ npx zos send-tx
 ? Select a network from the network list: local
 ? Choose an instance: Counter at 0xCfEB869F69431e42cdB54A4F4f105C19C080A601
 ? Select a method: increase(amount: uint256)
@@ -141,13 +143,13 @@ Calling increase with:
  - amount (uint256): "10"
 Transaction successful: 0x9c84faf32a87a33f517b424518712f1dc5ba0bdac4eae3a67ca80a393c555ece
 
-$ zos-dev call
+$ npx zos call
 ? Select a network from the network list: local
 ? Choose an instance: Counter at 0xCfEB869F69431e42cdB54A4F4f105C19C080A601
 ? Select a method: value()
 Returned "11"
 ```
 
-Note: If you are curious about how ZeppelinOS achieves this feat, given that smart contracts are immutable, check out our [upgrades pattern guide](pattern).
+> Note: If you are curious about how ZeppelinOS achieves this feat, given that smart contracts are immutable, check out our [upgrades pattern guide](pattern). You will see that there are some changes that are not supported during updates. For instance, you cannot [remove or change the type of a contract state variable](https://docs.zeppelinos.org/docs/writing_contracts.html#modifying-your-contracts). Nevertheless, you can change, add, or remove all the functions you want.
 
 That's it! You now know how to start a simple ZeppelinOS project, create a contract, deploy it to a local network, and even update it as you develop. Head over to the next tutorial to learn how to interact with your contract from your code.

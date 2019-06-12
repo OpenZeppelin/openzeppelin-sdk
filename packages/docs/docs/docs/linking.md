@@ -1,127 +1,158 @@
 ---
 id: linking
-title: Linking to EVM packages
+title: Linking OpenZeppelin contracts
 ---
 
-ZeppelinOS allows us to link packages that have been already deployed
-to the blockchain, instead of wasting resources deploying them again every time
-we need them in a project. And of course, developers can upgrade their
-packages and we can update our links to point to the newest versions, so we are
-finally making an efficient use of all the developments in the community.
+In the [first](first) tutorial, we learned how to set up a new ZeppelinOS project, deploy a simple contract, and update it. Now, we will build a more interesting project with multiple contracts, leveraging the [OpenZeppelin contracts package](https://github.com/OpenZeppelin/openzeppelin-eth). We will learn about **linking EVM packages**, and **writing upgradeable contracts**.
 
-To use EVM packages we need first to initialize a ZeppelinOS project. Luckily,
-we already have one after following the guide about
-[Deploying your first project](deploying.md).
+## What we will build
 
-To continue with this exploration, let's write a new contract called
-`MyLinkedContract.sol` and place it in the `contracts` folder. Then,
-let's make it import a very common
-contract from the [OpenZeppelin](https://openzeppelin.org/) EVM package:
+We will write a `TokenExchange` contract, that will allow any user to purchase an ERC20 token in exchange for ETH, at a fixed exchange rate. To do this, we will need not only a TokenExchange contract, but also an [ERC20 implementation](https://docs.openzeppelin.org/v2.3.0/tokens#erc20). Let's start by getting one, but before, make sure to initialize a new project as described [here](first#setting-up-your-project):
+
+```console
+mkdir token-exchange && cd token-exchange
+npm init -y
+npm install --save-dev zos ganache-cli
+npx zos init
+```
+
+> Note: The full code for this project is available in our [Github repo](https://github.com/zeppelinos/zos/tree/v2.4.0/examples/linking-contracts).
+
+## Linking the contracts EVM package
+
+We will first get ourselves an ERC20 token. Instead of coding one from scratch, we will use the one provided by the [OpenZeppelin contracts EVM package](https://github.com/OpenZeppelin/openzeppelin-eth). An EVM package is a set of contracts set up to be easily included in a ZeppelinOS project, with the added bonus that the contracts' code _is already deployed in the Ethereum network_. This is a more secure code distribution mechanism, and also helps you save gas upon deployment.
+
+<!-- TODO: Add guide on what is an EVM package behind the scenes, instead of linking to a blogpost -->
+
+> Note: Check out [this article](https://blog.zeppelinos.org/open-source-collaboration-in-the-blockchain-era-evm-packages/)to learn more about EVM packages.
+
+To link the OpenZeppelin contracts EVM package into your project, simply run:
+
+```console
+npx zos link openzeppelin-eth@2.2.0
+```
+
+This command will download the EVM package (bundled as a regular npm package), and connect it to your ZeppelinOS project. We now have all of OpenZeppelin contracts at our disposal, so let's create an ERC20 token!
+
+## Creating an ERC20 token
+
+Let's deploy an ERC20 token contract to our development network. Make sure to start ganache first:
+```console
+ganache-cli -p 9545 -d
+```
+
+For setting up the token, we will be using the [StandaloneERC20 implementation](https://github.com/OpenZeppelin/openzeppelin-eth/blob/master/contracts/token/ERC20/StandaloneERC20.sol) provided by the OpenZeppelin package. We will _initialize_ the instance with the token metadata (name, symbol, and decimals), and minting a large initial supply for one of our accounts.
+
+<!-- CODE: We need a command to retrieve the current accounts (#967) -->
+
+> Note: Your available accounts are shown by ganache when you start the process. If you ran it with the `-d` flag as instructed, then your first and default account will be `0x90f8bf6a479f320ead074411a4b0e7944ea8c9c1`.
+
+```console
+$ npx zos create
+? Choose a contract: openzeppelin-eth/StandaloneERC20
+? Select a network from the network list: local
+? Do you want to run a function after creating the instance?: Yes
+? Select a method: [Initializable] initialize(name: string, symbol: string, decimals: uint8, initialSupply: uint256, initialHolder: address, minters: address[], pausers: address[])
+? name: MyToken
+? symbol: MYT
+? decimals: 18
+? initialSupply: 100000000000000000000
+? initialHolder: 0x90f8bf6a479f320ead074411a4b0e7944ea8c9c1
+? minters:
+? pausers:
+Instance created at 0x2612Af3A521c2df9EAF28422Ca335b04AdF3ac66
+```
+
+Done! We have a working ERC20 token contract in our development network. Note that, when creating this instance, we chose to _initialize_ it with the initial values needed to set up our token. ZeppelinOS allows us to atomically call any function during the creation of a contract if we need to.
+
+We can check that the initial supply was properly allocated by using the `balance` command. Make sure to use the address where your token instance was created.
+
+<!-- CODE: We need a way to refer to our own contracts by name (and to the local accounts as well!) -->
+
+```console
+$ npx zos balance --erc20 0x2612Af3A521c2df9EAF28422Ca335b04AdF3ac66
+? Enter an address to query its balance: 0x90f8bf6a479f320ead074411a4b0e7944ea8c9c1
+? Select a network from the network list: local
+Balance: 100 MYT
+```
+
+Great! We can now write an exchange contract and connect it to this token when we deploy it.
+
+<!-- We can split the following into a separate tutorial if this one becomes too long -->
+
+## Writing the exchange contract
+
+Our exchange contract will need to store the token contract address and the exchange rate in its state. We will set these values during initialization, when we deploy our contract.
+
+In order to support contract upgrades, ZeppelinOS does not allow the usage of Solidity's `constructor`s. Instead, we need to use _initializers_. An initializer is just a regular Solidity function, with an additional check to ensure that it can be called only once. To make coding initializers easy, ZeppelinOS offers a base `Initializable` contract, that ships with an `initializer` modifier that takes care of this. You will need first to install the package that provides that contract:
+
+```console
+npm install zos-lib@2.4.0
+```
+
+Now, let's write our exchange contract using an _initializer_ to receive its initial state:
 
 ```solidity
 pragma solidity ^0.5.0;
 
-import "openzeppelin-eth/contracts/token/ERC721/ERC721Mintable.sol";
+import "zos-lib/contracts/Initializable.sol";
+import "openzeppelin-eth/contracts/token/ERC20/IERC20.sol";
+import "openzeppelin-eth/contracts/math/SafeMath.sol";
 
-contract MyLinkedContract {
-  ERC721Mintable private _token;
+contract TokenExchange is Initializable {
+  using SafeMath for uint256;
 
-  function setToken(ERC721Mintable token) external {
-    require(address(token) != address(0));
-    _token = token;
+  // Contract state: exchange rate and token
+  uint256 public rate;
+  IERC20 public token;
+
+  // Initializer function (replaces constructor)
+  function initialize(uint256 _rate, IERC20 _token) public initializer {
+    rate = _rate;
+    token = _token;
   }
-}
+
+  // Send tokens back to the sender using predefined exchange rate
+  function() external payable {
+    uint256 tokens = msg.value.mul(rate);
+    token.transfer(msg.sender, tokens);
+  }
+} 
 ```
 
-One thing to notice is that instead of importing `openzeppelin-solidity` we are
-importing `openzeppelin-eth`. This is the name of the OpenZeppelin EVM package,
-the one we have to use if we want to reuse the package already deployed.
-For more information, see
-[this article which explains the difference between openzeppelin-solidity and openzeppelin-eth](https://blog.zeppelin.solutions/getting-started-with-openzeppelin-eth-a-new-stable-and-upgradeable-evm-package-576fb37297d0#125e).
+Note the usage of the `initializer` modifier in the `initialize` method. This guarantees that, after we have deployed our contract, no one can call into that function again to alter the token or the rate.
 
-Now, let's link our project to the openzeppelin-eth package by running:
+Let's now create and initialize our new `TokenExchange` contract:
 
 ```console
-npx zos link openzeppelin-eth
+$ npx zos create
+? Choose a contract: TokenExchange
+? Select a network from the network list: local
+? Do you want to run a function after creating the instance?: Yes
+? Select a method: initialize(_rate: uint256, _token: address)
+? _rate: 10
+? _token: 0x2612Af3A521c2df9EAF28422Ca335b04AdF3ac66
+Instance created at 0x26b4AFb60d6C903165150C6F0AA14F8016bE4aec
 ```
 
-This command will install the openzeppelin-eth contracts locally, which is
-needed to compile the contracts that import it; but it will also update the
-`zos.json` file with a reference to the linked package to make sure that when
-you deploy the project it will use the EVM package that already exists on the
-blockchain.
+<!-- CODE: We need to extend the zos transfer command to support erc20s -->
 
-The following commands will be familiar to you. Just as we did before, we have
-to add the contract to the project:
+Our exchange is almost ready! We only need to fund it, so it can send tokens to purchasers. Let's do that using the `send-tx` command, to transfer the full token balance from our own account to the exchange contract. Make sure to replace the recipient of the transfer with the `TokenExchange` address you got from the previous command.
 
 ```console
-npx zos add MyLinkedContract
+$ npx zos send-tx
+? Select a network from the network list: local
+? Choose an instance: StandaloneERC20 at 0x2612Af3A521c2df9EAF28422Ca335b04AdF3ac66
+? Select a method: transfer(to: address, value: uint256)
+? to: 0x26b4AFb60d6C903165150C6F0AA14F8016bE4aec
+? value: 100000000000000000000
+Transaction successful: 0x5863c8a8e122fcda7c6234abc6e60fad3f5a8108a3f88e2d8a956b63dbc222c2
+Events emitted: 
+ - Transfer(from: 0x90F8bf6A479f320ead074411a4B0e7944Ea8c9C1, to: 0x26b4AFb60d6C903165150C6F0AA14F8016bE4aec, value: 100000000000000000000)
 ```
 
-> If any of the following commands fail with an `A network name must be provided 
-to execute the requested action` error, it means our session has expired. 
-In that case, renew it by running the command `npx zos session --network local 
---from 0x1df62f291b2e969fb0849d99d9ce41e2f137006e --expires 3600` again.
-
-Now, let's push our changes to the blockchain:
-
-```console
-npx zos push --deploy-dependencies
-```
-
-There is one caveat here with the `--deploy-dependencies` flag. We mentioned
-that this feature is about reusing packages that were already deployed, and we
-do have already deployed versions of openzeppelin-eth and many other packages
-to mainnet, ropsten, rinkeby and kovan. However, on this guide we are not using
-any of those networks, instead we started a local development network with
-Truffle that is empty. So, `--deploy-dependencies` tells ZeppelinOS to deploy
-to the network the EVM packages we depend on. This has to be done only once,
-so if you are using one of the real networks mentioned above, or you are
-running the command again on the local network, this flag won't be needed.
-
-Repeating ourselves from before, let's make an upgradeable instance of the
-contract:
-
-```console
-npx zos create MyLinkedContract
-```
-
-We also need an instance of the `ERC721` token from the EVM package:
-
-```console
-npx zos create openzeppelin-eth/StandaloneERC721 --init initialize --args MyToken,TKN,[<address>],[<address>]
-```
-
-`<address>` will be the minter and pauser of the token. For local development
-you can use one of the 10 addresses that `ganache-cli` created by default.
-
-Finally, we can start a new Truffle console to interact with our contract by running:
-
-```console
-npx truffle console --network local
-```
-
-Now, let's jump to that Truffle console and connect our two deployed upgradeable contracts:
-
-> _Make sure you replace <my-linked-contract-address> and <my-erc721-address> 
-with the addresses of the upgradeable instances your created of `MyLinkedContract` 
-and `StandaloneERC721` respectively. Both addresses were returned by the `create` 
-commands we ran above._
-
-```console
-truffle(local)> myLinkedContract = await MyLinkedContract.at('<my-linked-contract-address>')
-truffle(local)> myLinkedContract.setToken('<my-erc721-address>')
-```
-
-Remember that the addresses of both your contract and the token, can also be 
-found in the `zos.dev-<network_id>.json` configuration file.
-
-This is just the beginning of a better blockchain ecosystem, where developers
-share their knowledge and their cool ideas in EVM packages, and we all
-contribute by using and improving those packages. This soon will be a swarm of
-packages that implement crazy new ways for a society to work, and they will all
-be available for you to just link into your project and build on top of them.
-
-But so far we have only seen the side of the users of EVM packages. I'm sure
-you are now asking yourself how can you publish all the packages that you are
-developing. That's what we'll explore next.
+TODO:
+- Make a purchase with send-tx, and verify token balance of purchaser
+- Note that there is no way to extract funds, and update the contract
+- Mention updating EVM packages
+- Summary
