@@ -1,5 +1,5 @@
 import path from 'path';
-import pickby from 'lodash.pickby';
+import pickBy from 'lodash.pickby';
 import chalk from 'chalk';
 import Spinnies from 'spinnies';
 
@@ -10,11 +10,9 @@ const spinners = new Spinnies({
 });
 
 export enum LogType {
-  Success,
   Info,
   Warn,
   Err,
-  Fail,
 }
 
 export enum LogLevel {
@@ -85,13 +83,14 @@ export const Loggy: { [key: string]: any } = {
     file?: string,
   ): void {
     if (this.logs[reference]) {
-      const args = pickby({ file, text, spinnerAction });
+      const args = pickBy({ file, text, spinnerAction });
       this.logs[reference] = { ...this.logs[reference], ...args };
       this._log(reference);
     }
   },
 
   succeed(reference: string, text?: string): void {
+    if (!text && this.logs[reference]) text = this.logs[reference].text;
     this.logs[reference] = {
       ...this.logs[reference],
       spinnerAction: SpinnerAction.Succeed,
@@ -101,6 +100,7 @@ export const Loggy: { [key: string]: any } = {
   },
 
   fail(reference: string, text?: string): void {
+    if (!text && this.logs[reference]) text = this.logs[reference].text;
     this.logs[reference] = {
       ...this.logs[reference],
       spinnerAction: SpinnerAction.Fail,
@@ -122,7 +122,9 @@ export const Loggy: { [key: string]: any } = {
     const color = this._getColorFor(logType);
     if (this.isVerbose) {
       const location = `${path.basename(file)}#${fnName}`;
-      const message = `[${new Date().toISOString()}@${location}] ${text}`;
+      const message = `[${new Date().toISOString()}@${location}] <${this._actionToText(
+        spinnerAction,
+      )}> ${text}`;
       const coloredMessage = color ? chalk.keyword(color)(message) : message;
       console.error(coloredMessage);
     } else if (logLevel === LogLevel.Normal) {
@@ -132,14 +134,27 @@ export const Loggy: { [key: string]: any } = {
     }
   },
 
+  _actionToText(action: SpinnerAction): string {
+    switch (action) {
+      case SpinnerAction.Add || SpinnerAction.NonSpinnable:
+        return 'added';
+      case SpinnerAction.Succeed:
+        return 'succeeded';
+      case SpinnerAction.Fail:
+        return 'failed';
+      case SpinnerAction.Update:
+        return 'updated';
+      default:
+        return '';
+    }
+  },
+
   _getColorFor(logType: LogType): string {
     switch (logType) {
-      case LogType.Success:
-        return 'blueBright';
+      case LogType.Err:
+        return 'redBright';
       case LogType.Warn:
         return 'yellow';
-      case LogType.Err || LogType.Fail:
-        return 'redBright';
       case LogType.Info:
         return null;
       default:
@@ -154,8 +169,6 @@ const spinnerActions = {
 };
 
 const logTypes = {
-  success: LogType.Success,
-  failed: LogType.Fail,
   info: LogType.Info,
   warn: LogType.Warn,
   error: LogType.Err,
