@@ -1,4 +1,3 @@
-import stdout from '../utils/stdout';
 import NetworkController from '../models/network/NetworkController';
 import ScriptError from '../models/errors/ScriptError';
 import { UpdateParams } from './interfaces';
@@ -32,7 +31,6 @@ export default async function update({
       methodName,
       methodArgs,
     );
-    proxies.forEach(proxy => stdout(proxy.address));
     controller.writeNetworkPackageIfNeeded();
   } catch (error) {
     const cb = () => controller.writeNetworkPackageIfNeeded();

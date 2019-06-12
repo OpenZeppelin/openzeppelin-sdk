@@ -1,12 +1,10 @@
-import Logger from '../utils/Logger';
+import { Loggy } from '../utils/Logger';
 import sleep from '../helpers/sleep';
 import Web3 from 'web3';
 import { TransactionReceipt } from 'web3/types';
 import { Eth, Block, Transaction } from 'web3-eth';
 import { Contract } from 'web3-eth-contract';
 import { toChecksumAddress } from 'web3-utils';
-
-const log: Logger = new Logger('ZWeb3');
 
 // Reference: see https://github.com/ethereum/EIPs/blob/master/EIPS/eip-155.md#list-of-chain-ids
 export const NETWORKS = {
@@ -105,7 +103,10 @@ export default class ZWeb3 {
         );
       } else return address;
     } else {
-      log.warn(
+      Loggy.noSpin.warn(
+        __filename,
+        'toChecksumAddress',
+        'checksum-addresses',
         `WARNING: Address ${address} is not checksummed. Consider checksumming it to avoid future warnings or errors.`,
       );
       return toChecksumAddress(address);

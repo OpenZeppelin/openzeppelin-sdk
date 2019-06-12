@@ -28,11 +28,6 @@ async function main() {
   if(fs.existsSync('zos.json')) fs.unlinkSync('zos.json');
   if(fs.existsSync(`zos.${network}.json`)) fs.unlinkSync(`zos.${network}.json`);
 
-  // Enable command logging in ZeppelinOS.
-  const Logger = lib.Logger;
-  Logger.silent(false);
-  Logger.verbose(true);
-
   // Retrieve ZeppelinOS scripts.
   // These are analogous to `zos` CLI commands.
   const { init, add, push, create, publish } = zos.scripts;

@@ -2,13 +2,11 @@ import path from 'path';
 import pickBy from 'lodash.pickby';
 import isEqual from 'lodash.isequal';
 import isEmpty from 'lodash.isempty';
-import { Logger, FileSystem as fs } from 'zos-lib';
+import { Loggy, FileSystem as fs } from 'zos-lib';
 import Dependency from '../dependency/Dependency';
 import { ZOS_VERSION, checkVersion } from './ZosVersion';
 import ZosNetworkFile from './ZosNetworkFile';
 import { ProjectCompilerOptions } from '../compiler/solidity/SolidityProjectCompiler';
-
-const log = new Logger('ZosPackageFile');
 
 interface ConfigFileCompilerOptions {
   manager: string;
@@ -242,9 +240,12 @@ export default class ZosPackageFile {
     if (this.hasChanged()) {
       const exists = this.exists();
       fs.writeJson(this.fileName, this.data);
-      exists
-        ? log.info(`Updated ${this.fileName}`)
-        : log.info(`Created ${this.fileName}`);
+      Loggy.onVerbose(
+        __filename,
+        'write',
+        'write-zos-json',
+        exists ? `Updated ${this.fileName}` : `Created ${this.fileName}`,
+      );
     }
   }
 

@@ -1,15 +1,24 @@
-import { Logger } from 'zos-lib';
+import { Loggy } from 'zos-lib';
 
 export default class CaptureLogs {
   constructor() {
     this.clear();
-    this.originalInfo = Logger.prototype.info;
-    this.originalWarn = Logger.prototype.warn;
-    this.originalError = Logger.prototype.error;
-    Logger.prototype.info = msg => this.infos.push(msg);
-    Logger.prototype.warn = msg => this.warns.push(msg);
-    Logger.prototype.error = (msg, ex) =>
-      this.errors.push(ex ? `${msg} ${ex.message}` : msg);
+    // TODO: Refactor. Replacing the Loggy#add fn should be enough
+    this.originalSpin = Loggy.spin;
+    this.originalNoSpin = Loggy.noSpin;
+    this.originalNoSpinWarn = Loggy.noSpin.warn;
+    this.originalNoSpinError = Loggy.noSpin.error;
+    this.originalSucceed = Loggy.succeed;
+    this.originalFail = Loggy.fail;
+    this.onVerbose = Loggy.onVerbose;
+
+    Loggy.succeed = (ref, msg) => this.infos.push(msg);
+    Loggy.fail = (ref, msg) => this.infos.push(msg);
+    Loggy.spin = (file, fn, ref, msg) => this.infos.push(msg);
+    Loggy.noSpin = (file, fn, ref, msg) => this.infos.push(msg);
+    Loggy.noSpin.warn = (file, fn, ref, msg) => this.warns.push(msg);
+    Loggy.noSpin.error = (file, fn, ref, msg) => this.errors.push(msg);
+    Loggy.onVerbose = (file, fn, ref, msg) => this.infos.push(msg);
   }
 
   get text() {
@@ -27,9 +36,13 @@ export default class CaptureLogs {
   }
 
   restore() {
-    Logger.prototype.info = this.originalInfo;
-    Logger.prototype.warn = this.originalWarn;
-    Logger.prototype.error = this.originalError;
+    Loggy.spin = this.originalSpin;
+    Loggy.noSpin = this.originalNoSpin;
+    Loggy.noSpin.warn = this.originalNoSpinWarn;
+    Loggy.noSpin.error = this.originalNoSpinError;
+    Loggy.succeed = this.originalSucceed;
+    Loggy.fail = this.originalFail;
+    Loggy.onVerbose = this.onVerbose;
   }
 
   match(re) {

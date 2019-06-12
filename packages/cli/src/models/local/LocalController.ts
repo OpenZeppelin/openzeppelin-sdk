@@ -4,8 +4,7 @@ import every from 'lodash.every';
 import map from 'lodash.map';
 import {
   Contracts,
-  Contract,
-  Logger,
+  Loggy,
   FileSystem as fs,
   getBuildArtifacts,
   BuildArtifacts,
@@ -22,8 +21,6 @@ import ConfigManager from '../config/ConfigManager';
 import ZosPackageFile from '../files/ZosPackageFile';
 import ZosNetworkFile from '../files/ZosNetworkFile';
 import ContractManager from './ContractManager';
-
-const log = new Logger('LocalController');
 
 const DEFAULT_VERSION = '0.1.0';
 
@@ -79,6 +76,12 @@ export default class LocalController {
     this.packageFile.version = version || DEFAULT_VERSION;
     this.packageFile.contracts = {};
     if (publish) this.packageFile.publish = publish;
+    Loggy.noSpin(
+      __filename,
+      'initZosPackageFile',
+      'init-package-file',
+      `Project successfully initialized. Write a new contract in the contracts folder and run 'zos create' to deploy it!`,
+    );
   }
 
   public bumpVersion(version: string): void {
@@ -86,7 +89,10 @@ export default class LocalController {
   }
 
   public add(contractAlias: string, contractName: string): void {
-    log.info(
+    Loggy.spin(
+      __filename,
+      'add',
+      `add-${contractAlias}`,
       `Adding ${
         contractAlias === contractName
           ? contractAlias
@@ -94,6 +100,7 @@ export default class LocalController {
       }`,
     );
     this.packageFile.addContract(contractAlias, contractName);
+    Loggy.succeed(`add-${contractAlias}`);
   }
 
   public addAll(): void {
@@ -103,10 +110,21 @@ export default class LocalController {
 
   public remove(contractAlias: string): void {
     if (!this.packageFile.hasContract(contractAlias)) {
-      log.error(`Contract ${contractAlias} to be removed was not found`);
+      Loggy.noSpin.error(
+        __filename,
+        'remove',
+        `remove-${contractAlias}`,
+        `Contract ${contractAlias} to be removed was not found`,
+      );
     } else {
-      log.info(`Removing ${contractAlias}`);
+      Loggy.spin(
+        __filename,
+        'remove',
+        `remove-${contractAlias}`,
+        `Removing ${contractAlias}`,
+      );
       this.packageFile.unsetContract(contractAlias);
+      Loggy.succeed(`remove-${contractAlias}`);
     }
   }
 
@@ -190,7 +208,12 @@ export default class LocalController {
     if (linkedDependencies.length > 0) {
       const label =
         linkedDependencies.length === 1 ? 'Dependency' : 'Dependencies';
-      log.info(`${label} ${linkedDependencies.join(', ')} successfully linked`);
+      Loggy.noSpin(
+        __filename,
+        'linkDependencies',
+        'link-dependencies',
+        `${label} successfully linked to the project. Run 'zos create' to deploy one of its contracts!`,
+      );
     }
   }
 
@@ -205,8 +228,11 @@ export default class LocalController {
     if (unlinkedDependencies.length > 0) {
       const label =
         unlinkedDependencies.length === 1 ? 'Dependency' : 'Dependencies';
-      log.info(
-        `${label} ${unlinkedDependencies.join(', ')} successfully unlinked`,
+      Loggy.noSpin(
+        __filename,
+        'linkDependencies',
+        'link-dependencies',
+        `${label} ${unlinkedDependencies.join(', ')} successfully unlinked.`,
       );
     }
   }

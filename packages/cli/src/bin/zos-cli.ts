@@ -1,6 +1,6 @@
 #! /usr/bin/env node
 
-import { Logger } from 'zos-lib';
+import { Loggy } from 'zos-lib';
 import { lockSync } from 'lockfile';
 import program from './program';
 import findRootDirectory from './helpers';
@@ -26,6 +26,7 @@ try {
   process.exit(1);
 }
 
-Logger.silent(false);
+Loggy.silent(false);
+
 program.parse(process.argv);
 if (program.args.length === 0) program.help();

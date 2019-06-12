@@ -145,10 +145,12 @@ contract('verify script', function() {
           remote: 'etherscan',
           apiKey: 'AP1_k3Y',
         });
-        this.logs.infos.should.have.lengthOf(3);
+        this.logs.infos.should.have.lengthOf(2);
+
         this.logs.infos[0].should.match(/Verifying and publishing/);
-        this.logs.infos[1].should.match(/Contract verification in process/);
-        this.logs.infos[2].should.match(/Contract verified successfully/);
+        this.logs.infos[1].should.match(
+          /Contract source code of ImplV1 verified and published successfully/,
+        );
       });
     });
 
@@ -192,7 +194,7 @@ contract('verify script', function() {
         this.logs.infos.should.have.lengthOf(2);
         this.logs.infos[0].should.match(/Verifying and publishing/);
         this.logs.infos[1].should.match(
-          /Contract verified and published successfully. You can check it here/,
+          /Contract source code of ImplV1 verified and published successfully. You can check it here/,
         );
       });
     });

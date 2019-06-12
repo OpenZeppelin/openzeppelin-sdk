@@ -1,3 +1,5 @@
+import { Loggy } from 'zos-lib';
+
 import LocalController from '../models/local/LocalController';
 import { RemoveParams } from './interfaces';
 
@@ -10,5 +12,6 @@ export default function remove({
 
   const controller = new LocalController(packageFile);
   contracts.forEach(alias => controller.remove(alias));
+  Loggy.noSpin(__filename, 'remove', 'remove-contracts');
   controller.writePackage();
 }

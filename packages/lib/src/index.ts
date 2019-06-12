@@ -9,7 +9,7 @@ import sleep from './helpers/sleep';
 // utils
 import ABI from './utils/ABIs';
 import Semver from './utils/Semver';
-import Logger from './utils/Logger';
+import { Loggy } from './utils/Logger';
 import FileSystem from './utils/FileSystem';
 import Contracts from './artifacts/Contracts';
 import Contract, {
@@ -103,8 +103,8 @@ export {
   getSolidityLibNames,
   isSolidityLib,
   sleep,
+  Loggy,
   Proxy,
-  Logger,
   ABI,
   Semver,
   FileSystem,

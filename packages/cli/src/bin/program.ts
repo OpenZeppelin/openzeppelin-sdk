@@ -2,7 +2,7 @@
 
 import chalk from 'chalk';
 import program from 'commander';
-import { Logger } from 'zos-lib';
+import { Loggy } from 'zos-lib';
 import commands from '../commands';
 import registerErrorHandler from './errors';
 
@@ -42,8 +42,8 @@ program
     'verbose mode on: output errors stacktrace and detailed log.',
   )
   .option('-s, --silent', 'silent mode: no output sent to stderr.')
-  .on('option:verbose', () => Logger.verbose(true))
-  .on('option:silent', () => Logger.silent(true))
+  .on('option:verbose', () => Loggy.verbose(true))
+  .on('option:silent', () => Loggy.silent(true))
   .on('--help', () =>
     commandsList.forEach(c =>
       console.log(

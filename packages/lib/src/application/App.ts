@@ -1,8 +1,7 @@
 import isEmpty from 'lodash.isempty';
 
-import Logger from '../utils/Logger';
+import { Loggy } from '../utils/Logger';
 import Proxy from '../proxy/Proxy';
-import copyContract from '../helpers/copyContract';
 import Contracts from '../artifacts/Contracts';
 import Package from '../application/Package';
 import ImplementationDirectory from '../application/ImplementationDirectory';
@@ -12,8 +11,6 @@ import Contract from '../artifacts/Contract';
 import { toSemanticVersion, semanticVersionEqual } from '../utils/Semver';
 import Transactions from '../utils/Transactions';
 import { TxParams } from '../artifacts/ZWeb3';
-
-const log: Logger = new Logger('App');
 
 export default class App {
   public appContract: any;
@@ -28,13 +25,17 @@ export default class App {
   }
 
   public static async deploy(txParams: TxParams = {}): Promise<App> {
-    log.info('Deploying new App...');
     const appContract = await Transactions.deployContract(
       this.getContractClass(),
       [],
       txParams,
     );
-    log.info(`Deployed App at ${appContract.address}`);
+    Loggy.onVerbose(
+      __filename,
+      'deploy',
+      `deployed-app`,
+      `Deployed App at ${appContract.address}`,
+    );
     return new this(appContract, txParams);
   }
 
@@ -119,29 +120,6 @@ export default class App {
     return ImplementationDirectory.fetch(address, { ...this.txParams });
   }
 
-  public async createContract(
-    contract: Contract,
-    packageName: string,
-    contractName: string,
-    initMethodName: string,
-    initArgs: string[],
-  ): Promise<Contract> {
-    const instance = await this._copyContract(
-      packageName,
-      contractName,
-      contract,
-    );
-    await this._initNonUpgradeableInstance(
-      instance,
-      contract,
-      packageName,
-      contractName,
-      initMethodName,
-      initArgs,
-    );
-    return instance;
-  }
-
   public async createProxy(
     contract: Contract,
     packageName: string,
@@ -151,33 +129,46 @@ export default class App {
     initArgs?: string[],
   ): Promise<Contract> {
     if (!isEmpty(initArgs) && !initMethodName) initMethodName = 'initialize';
+    const implementation = await this.getImplementation(
+      packageName,
+      contractName,
+    );
     const proxy =
       initMethodName === undefined
-        ? await this._createProxy(packageName, contractName, proxyAdmin)
+        ? await this._createProxy(
+            packageName,
+            contractName,
+            implementation,
+            proxyAdmin,
+          )
         : await this._createProxyAndCall(
             contract,
             packageName,
             contractName,
+            implementation,
             proxyAdmin,
             initMethodName,
             initArgs,
           );
-    log.info(`${packageName} ${contractName} proxy: ${proxy.address}`);
+    Loggy.succeed(
+      `create-proxy`,
+      `${packageName} ${contractName} proxy created at ${proxy.address}`,
+    );
     return contract.at(proxy.address);
   }
 
   private async _createProxy(
     packageName: string,
     contractName: string,
+    implementation: string,
     proxyAdmin: string,
   ): Promise<Proxy> {
-    log.info(
-      `Creating ${packageName} ${contractName} proxy without initializing...`,
-    );
     const initializeData: Buffer = Buffer.from('');
-    const implementation = await this.getImplementation(
-      packageName,
-      contractName,
+    Loggy.spin(
+      __filename,
+      '_createProxy',
+      `create-proxy`,
+      `Creating ${packageName} ${contractName} proxy`,
     );
     return Proxy.deploy(
       implementation,
@@ -191,6 +182,7 @@ export default class App {
     contract: Contract,
     packageName: string,
     contractName: string,
+    implementation: string,
     proxyAdmin: string,
     initMethodName: string,
     initArgs: any,
@@ -200,64 +192,15 @@ export default class App {
       initMethodName,
       initArgs,
     );
-    log.info(
-      `Creating ${packageName} ${contractName} proxy and calling ${callDescription(
+    Loggy.spin(
+      __filename,
+      '_createProxyAndCall',
+      `create-proxy`,
+      `Creating ${packageName}/${contractName} proxy and calling ${callDescription(
         initMethod,
         initArgs,
       )}`,
     );
-    const implementation = await this.getImplementation(
-      packageName,
-      contractName,
-    );
     return Proxy.deploy(implementation, proxyAdmin, callData, this.txParams);
-  }
-
-  private async _copyContract(
-    packageName: string,
-    contractName: string,
-    contract: Contract,
-  ): Promise<Contract> {
-    log.info(
-      `Creating new non-upgradeable instance of ${packageName} ${contractName}...`,
-    );
-    const implementation = await this.getImplementation(
-      packageName,
-      contractName,
-    );
-    const instance = await copyContract(contract, implementation, {
-      ...this.txParams,
-    });
-    log.info(
-      `${packageName} ${contractName} instance created at ${instance.address}`,
-    );
-    return instance;
-  }
-
-  private async _initNonUpgradeableInstance(
-    instance: Contract,
-    contract: Contract,
-    packageName: string,
-    contractName: string,
-    initMethodName: string,
-    initArgs?: string[],
-  ): Promise<any> {
-    if (typeof initArgs !== 'undefined') {
-      // this could be front-run, waiting for new initializers model
-      const { method: initMethod, callData }: CalldataInfo = buildCallData(
-        contract,
-        initMethodName,
-        initArgs,
-      );
-      log.info(
-        `Initializing ${packageName} ${contractName} instance at ${
-          instance.address
-        } by calling ${callDescription(initMethod, initArgs)}`,
-      );
-      await Transactions.sendDataTransaction(
-        instance,
-        Object.assign({}, { ...this.txParams }, { data: callData }),
-      );
-    }
   }
 }

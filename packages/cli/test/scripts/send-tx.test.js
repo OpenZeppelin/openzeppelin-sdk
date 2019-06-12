@@ -157,7 +157,7 @@ contract('send-tx script', function(accounts) {
           });
 
           this.logs.infos[this.logs.infos.length - 2].should.match(
-            /Transaction successful:/,
+            /Transaction successful/,
           );
           this.logs.infos[this.logs.infos.length - 1].should.match(
             /Events emitted:/,
@@ -180,7 +180,7 @@ contract('send-tx script', function(accounts) {
           });
 
           this.logs.infos[this.logs.infos.length - 1].should.match(
-            /Transaction successful:/,
+            /Transaction successful/,
           );
         });
       });

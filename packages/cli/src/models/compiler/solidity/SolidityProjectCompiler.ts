@@ -6,7 +6,7 @@ import omitBy from 'lodash.omitby';
 import isUndefined from 'lodash.isundefined';
 import { readJsonSync } from 'fs-extra';
 import { statSync } from 'fs';
-import { FileSystem as fs, Logger, Contracts } from 'zos-lib';
+import { FileSystem as fs, Loggy, Contracts } from 'zos-lib';
 import {
   RawContract,
   CompiledContract,
@@ -24,8 +24,6 @@ import {
   compilerSettingsMatch,
 } from '../../../utils/solidity';
 import { tryFunc } from '../../../utils/try';
-
-const log = new Logger('SolidityProjectCompiler');
 
 export async function compileProject(
   options: ProjectCompilerOptions = {},
@@ -69,14 +67,22 @@ class SolidityProjectCompiler {
     await this._resolveCompilerVersion();
 
     if (!this._shouldCompile()) {
-      log.info('Nothing to compile, all contracts are up to date.');
+      Loggy.noSpin(
+        __filename,
+        'call',
+        `compile-contracts`,
+        'Nothing to compile, all contracts are up to date.',
+      );
       return;
     }
 
-    log.info(
+    Loggy.spin(
+      __filename,
+      'call',
+      'compile-contracts',
       `Compiling contracts with solc ${this.compilerVersion.version} (${
         this.compilerVersion.build
-      })...`,
+      })`,
     );
     this.compilerOutput = await compileWith(
       this.compilerVersion,
@@ -84,6 +90,12 @@ class SolidityProjectCompiler {
       this.options,
     );
     this._writeOutput();
+    Loggy.succeed(
+      'compile-contracts',
+      `Compiled contracts with solc ${this.compilerVersion.version} (${
+        this.compilerVersion.build
+      })`,
+    );
   }
 
   private _loadSoliditySourcesFromDir(dir = this.inputDir): void {

@@ -2,9 +2,7 @@ import omitBy from 'lodash.omitby';
 import isEmpty from 'lodash.isempty';
 import pick from 'lodash.pick';
 import compact from 'lodash.compact';
-import { FileSystem as fs, Logger } from 'zos-lib';
-
-const log: Logger = new Logger('Session');
+import { FileSystem as fs, Loggy } from 'zos-lib';
 
 const ZOS_SESSION_PATH = '.zos.session';
 const DEFAULT_TX_TIMEOUT: number = 10 * 60; // 10 minutes
@@ -27,7 +25,12 @@ const Session = {
         session,
         (v, key) => overrides[key] && overrides[key] !== v,
       );
-      log.info(`Using session with ${describe(fields)}`);
+      Loggy.noSpin(
+        __filename,
+        'getOptions',
+        `get-options`,
+        `Using session with ${describe(fields)}`,
+      );
     }
 
     return { ...session, ...overrides };
@@ -56,13 +59,24 @@ const Session = {
       timeout,
       expires: expirationTimestamp,
     });
-    if (logInfo)
-      log.info(`Using ${describe({ network, from, timeout })} by default.`);
+    if (logInfo) {
+      Loggy.noSpin(
+        __filename,
+        'getOptions',
+        `get-options`,
+        `Using ${describe({ network, from, timeout })} by default.`,
+      );
+    }
   },
 
   close(): void {
     if (fs.exists(ZOS_SESSION_PATH)) fs.remove(ZOS_SESSION_PATH);
-    log.info(`Closed zos session.`);
+    Loggy.noSpin(
+      __filename,
+      'getOptions',
+      `close-session`,
+      'Closed zos session',
+    );
   },
 
   ignoreFile(): void {

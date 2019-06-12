@@ -1,7 +1,7 @@
 import isEmpty from 'lodash.isempty';
 import {
   FileSystem as fs,
-  Logger,
+  Loggy,
   getStorageLayout,
   ValidationInfo,
   BuildArtifacts,
@@ -16,7 +16,6 @@ const DANGEROUS_OPERATIONS_LINK = `${DOCS_HOME}/writing_contracts.html#potential
 const AVOID_INITIAL_VALUES_LINK = `${DOCS_HOME}/writing_contracts.html#avoid-initial-values-in-fields-declarations`;
 const INITIALIZERS_LINK = `${DOCS_HOME}/writing_contracts.html#initializers`;
 const STORAGE_CHECKS_LINK = `${DOCS_HOME}/writing_contracts.html#modifying-your-contracts`;
-const log = new Logger('Validations');
 
 export default class ValidationLogger {
   public contract: Contract;
@@ -62,7 +61,10 @@ export default class ValidationLogger {
 
   public logHasSelfDestruct(hasSelfDestruct: boolean): void {
     if (hasSelfDestruct) {
-      log.warn(
+      Loggy.noSpin.warn(
+        __filename,
+        'logHasSelfDestruct',
+        `validation-has-selfdestruct`,
         `- Contract ${
           this.contractName
         } or one of its ancestors has a potentially unsafe selfdestruct operation. See ${DANGEROUS_OPERATIONS_LINK}.`,
@@ -72,7 +74,10 @@ export default class ValidationLogger {
 
   public logHasDelegateCall(hasDelegateCall: boolean): void {
     if (hasDelegateCall) {
-      log.warn(
+      Loggy.noSpin.warn(
+        __filename,
+        'logHasDelegateCall',
+        `validation-has-delegatecall`,
         `- Contract ${
           this.contractName
         } or one of its ancestors has a potentially unsafe delegatecall operation. See ${DANGEROUS_OPERATIONS_LINK}.`,
@@ -84,7 +89,10 @@ export default class ValidationLogger {
     hasInitialValuesInDeclarations: boolean,
   ): void {
     if (hasInitialValuesInDeclarations) {
-      log.warn(
+      Loggy.noSpin.warn(
+        __filename,
+        'logHasInitialValuesInDeclarations',
+        `validation-has-initial-values`,
         `- Contract ${
           this.contractName
         } or one of its ancestors sets an initial value in a field declaration. Consider moving all field initializations to an initializer function. See ${AVOID_INITIAL_VALUES_LINK}.`,
@@ -94,7 +102,10 @@ export default class ValidationLogger {
 
   public logHasConstructor(hasConstructor: boolean): void {
     if (hasConstructor) {
-      log.error(
+      Loggy.noSpin.error(
+        __filename,
+        'logHasConstructor',
+        `validation-has-constructor`,
         `- Contract ${
           this.contractName
         } has an explicit constructor. Change it to an initializer function. See ${INITIALIZERS_LINK}.`,
@@ -104,7 +115,10 @@ export default class ValidationLogger {
 
   public logUninitializedBaseContracts(uninitializedBaseContracts: any): void {
     if (!isEmpty(uninitializedBaseContracts)) {
-      log.warn(
+      Loggy.noSpin.warn(
+        __filename,
+        'logUninitializedBaseContracts',
+        `validation-uinitialized-base-contracts`,
         `- Contract ${
           this.contractName
         } has base contracts ${uninitializedBaseContracts.join(
@@ -124,9 +138,11 @@ export default class ValidationLogger {
       .join(', ');
     const variablesString = `Variable${vars.length === 1 ? '' : 's'}`;
     const containsString = `contain${vars.length === 1 ? 's' : ''}`;
-    log.warn(
-      `- ${variablesString} ${varList} ${containsString} a struct or enum. These are not automatically checked for storage compatibility in the current version. ` +
-        `See ${STORAGE_CHECKS_LINK} for more info.`,
+    Loggy.noSpin.warn(
+      __filename,
+      'logUninitializedBaseContracts',
+      `validation-unchecked-vars`,
+      `- ${variablesString} ${varList} ${containsString} a struct or enum. These are not automatically checked for storage compatibility in the current version. See ${STORAGE_CHECKS_LINK} for more info.`,
     );
   }
 
@@ -155,69 +171,97 @@ export default class ValidationLogger {
 
       switch (action) {
         case 'insert':
-          log.error(
+          Loggy.noSpin.error(
+            __filename,
+            'logStorageLayoutDiffs',
+            `storage-layout-diffs`,
             `- New variable '${updatedVarDescription}' was inserted in contract ${
               updated.contract
-            } in ${updatedVarSource}. ` +
-              `You should only add new variables at the end of your contract.`,
+            } in ${updatedVarSource}. You should only add new variables at the end of your contract.`,
           );
-
           break;
         case 'delete':
-          log.error(
+          Loggy.noSpin.error(
+            __filename,
+            'logStorageLayoutDiffs',
+            `storage-layout-diffs`,
             `- Variable '${originalVarDescription}' was removed from contract ${
               original.contract
-            }. ` + `You should avoid deleting variables from your contracts.`,
+            }. You should avoid deleting variables from your contracts.`,
           );
           break;
         case 'append':
-          log.info(
+          Loggy.noSpin(
+            __filename,
+            'logStorageLayoutDiffs',
+            `storage-layout-diffs`,
             `- New variable '${updatedVarDescription}' was added in contract ${
               updated.contract
-            } in ${updatedVarSource} ` + `at the end of the contract.`,
+            } in ${updatedVarSource} at the end of the contract.`,
           );
           break;
         case 'pop':
-          log.warn(
+          Loggy.noSpin.warn(
+            __filename,
+            'logStorageLayoutDiffs',
+            `storage-layout-diffs`,
             `- Variable '${originalVarDescription}' was removed from the end of contract ${
               original.contract
-            }. ` + `You should avoid deleting variables from your contracts.`,
+            }. You should avoid deleting variables from your contracts.`,
           );
           break;
         case 'rename':
-          log.warn(
+          Loggy.noSpin.warn(
+            __filename,
+            'logStorageLayoutDiffs',
+            `storage-layout-diffs`,
             `- Variable '${originalVarDescription}' in contract ${
               original.contract
-            } was renamed to ${updated.label} in ${updatedVarSource}.` +
-              `${updated.label} will have the value of ${
-                original.label
-              } after upgrading.`,
+            } was renamed to ${updated.label} in ${updatedVarSource}.
+              ${updated.label} will have the value of ${
+              original.label
+            } after upgrading.`,
           );
           break;
         case 'typechange':
-          log.warn(
+          Loggy.noSpin.warn(
+            __filename,
+            'logStorageLayoutDiffs',
+            `storage-layout-diffs`,
             `- Variable '${original.label}' in contract ${
               original.contract
-            } was changed from ${originalVarType.label} ` +
-              `to ${
-                updatedVarType.label
-              } in ${updatedVarSource}. Avoid changing types of existing variables.`,
+            } was changed from ${originalVarType.label} to ${
+              updatedVarType.label
+            } in ${updatedVarSource}. Avoid changing types of existing variables.`,
           );
           break;
         case 'replace':
-          log.warn(
+          Loggy.noSpin.warn(
+            __filename,
+            'logStorageLayoutDiffs',
+            `storage-layout-diffs`,
             `- Variable '${originalVarDescription}' in contract ${
               original.contract
-            } was replaced with '${updatedVarDescription}' ` +
-              `in ${updatedVarSource}. Avoid changing existing variables.`,
+            } was replaced with '${updatedVarDescription}' in
+            ${updatedVarSource}. Avoid changing existing variables.`,
           );
           break;
         default:
-          log.error(`- Unexpected layout change: ${action}`);
+          Loggy.noSpin.error(
+            __filename,
+            'logStorageLayoutDiffs',
+            `storage-layout-diffs`,
+            `- Unexpected layout change: ${action}`,
+          );
       }
     });
 
-    log.info(`See ${STORAGE_CHECKS_LINK} for more info.`);
+    Loggy.noSpin(
+      __filename,
+      'logStorageLayoutDiffs',
+      `storage-layout-diffs-reference`,
+      `See ${STORAGE_CHECKS_LINK} for more info.`,
+    );
   }
 }
 

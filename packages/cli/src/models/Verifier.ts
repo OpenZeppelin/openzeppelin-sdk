@@ -2,9 +2,7 @@ import axios from 'axios';
 import cheerio from 'cheerio';
 import querystring from 'querystring';
 
-import { sleep, Logger } from 'zos-lib';
-
-const log: Logger = new Logger('Verifier');
+import { sleep, Loggy } from 'zos-lib';
 
 // Max number of API request retries on error
 const RETRY_COUNT = 3;
@@ -29,11 +27,11 @@ const Verifier = {
     params: VerifierOptions,
   ): Promise<void | never> {
     if (remote === 'etherchain') {
-      await publishToEtherchain(params);
+      await publishToEtherchain(params, remote);
     } else if (remote === 'etherscan') {
-      await publishToEtherscan(params);
+      await publishToEtherscan(params, remote);
     } else {
-      throw new Error(
+      throw Error(
         'Invalid remote. Currently, ZeppelinOS contract verifier supports etherchain and etherscan as remote verification applications.',
       );
     }
@@ -42,6 +40,7 @@ const Verifier = {
 
 async function publishToEtherchain(
   params: VerifierOptions,
+  remote: string,
 ): Promise<void | never> {
   if (params.network !== 'mainnet') {
     throw new Error(
@@ -76,8 +75,11 @@ async function publishToEtherchain(
       const html = cheerio.load(response.data);
       const message = html('#infoModal .modal-body').text();
       if (message.match(/successful/)) {
-        log.info(
-          `Contract verified and published successfully. You can check it here: ${etherchainContractUrl}/${contractAddress}#code`,
+        Loggy.succeed(
+          'verify-and-publish',
+          `Contract source code of ${
+            params.contractName
+          } verified and published successfully. You can check it here: ${etherchainContractUrl}/${contractAddress}#code`,
         );
       } else if (message.match(/^No[\w\s]*provided\.$/)) {
         throw new Error(`Error during contract verification: ${message}`);
@@ -92,6 +94,7 @@ async function publishToEtherchain(
 
 async function publishToEtherscan(
   params: VerifierOptions,
+  remote: string,
 ): Promise<void | never> {
   const { network, compilerVersion, optimizer, contractAddress } = params;
   const compiler = `v${compilerVersion.replace('.Emscripten.clang', '')}`;
@@ -123,16 +126,16 @@ async function publishToEtherscan(
     });
 
     if (response.status === 200 && response.data.status === '1') {
-      log.info(
-        'Contract verification in process (this usually takes under 30 seconds)...',
-      );
       await checkEtherscanVerificationStatus(
         response.data.result,
         etherscanApiUrl,
         RETRY_COUNT,
       );
-      log.info(
-        `Contract verified successfully. You can check it here: ${etherscanContractUrl}/${contractAddress}#code`,
+      Loggy.succeed(
+        'verify-and-publish',
+        `Contract source code of ${
+          params.contractName
+        } verified and published successfully. You can check it here: ${etherscanContractUrl}/${contractAddress}#code`,
       );
     } else {
       throw new Error(

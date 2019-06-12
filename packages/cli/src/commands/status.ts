@@ -1,8 +1,3 @@
-import pull from '../scripts/pull';
-import status from '../scripts/status';
-import compare from '../scripts/compare';
-import ConfigManager from '../models/config/ConfigManager';
-
 const name = 'status';
 const signature: string = name;
 const description =
@@ -25,13 +20,7 @@ const register: (program: any) => any = program =>
     .action(action);
 
 async function action(options: any): Promise<void> {
-  const { network, txParams } = await ConfigManager.initNetworkConfiguration(
-    options,
-  );
-
-  if (options.fix) await pull({ network, txParams });
-  else if (options.fetch) await compare({ network, txParams });
-  else await status({ network, txParams });
+  throw Error('Status command has been removed.');
   if (!options.dontExitProcess && process.env.NODE_ENV !== 'test')
     process.exit(0);
 }

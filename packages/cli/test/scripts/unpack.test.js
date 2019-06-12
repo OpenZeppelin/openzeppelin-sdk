@@ -8,8 +8,7 @@ import axios from 'axios';
 import child from '../../src/utils/child';
 import patch, { cache } from '../../src/utils/patch';
 import unpack from '../../src/scripts/unpack';
-import KitFile, { MANIFEST_VERSION } from '../../src/models/files/KitFile';
-import Spinners from '../../src/utils/spinner';
+import { MANIFEST_VERSION } from '../../src/models/files/KitFile';
 
 const simpleGit = patch('simple-git/promise');
 
@@ -43,9 +42,6 @@ describe('unpack script', function() {
     sinon.stub(fs, 'readdir').returns(Promise.resolve(['.zos.lock']));
     sinon.stub(fs, 'remove').returns(Promise.resolve());
     sinon.stub(fs, 'pathExists').returns(Promise.resolve(true));
-
-    sinon.stub(Spinners.prototype, 'start');
-    sinon.stub(Spinners.prototype, 'succeed');
 
     const axiosStub = sinon.stub(axios, 'get');
     axiosStub

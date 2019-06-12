@@ -559,8 +559,8 @@ contract('create script', function([_, owner, otherAdmin]) {
           networkFile: this.networkFile,
         });
 
-        this.logs.errors.should.have.lengthOf(1);
-        this.logs.errors[0].should.match(/make sure you initialize/i);
+        this.logs.warns.should.have.lengthOf(1);
+        this.logs.warns[0].should.match(/make sure you initialize/i);
       });
 
       it('should warn when not initializing a contract that inherits from one with an initialize method', async function() {
@@ -571,8 +571,8 @@ contract('create script', function([_, owner, otherAdmin]) {
           networkFile: this.networkFile,
         });
 
-        this.logs.errors.should.have.lengthOf(1);
-        this.logs.errors[0].should.match(/make sure you initialize/i);
+        this.logs.warns.should.have.lengthOf(1);
+        this.logs.warns[0].should.match(/make sure you initialize/i);
       });
 
       it('should not warn when initializing a contract', async function() {
@@ -585,7 +585,7 @@ contract('create script', function([_, owner, otherAdmin]) {
           networkFile: this.networkFile,
         });
 
-        this.logs.errors.should.have.lengthOf(0);
+        this.logs.warns.should.have.lengthOf(0);
       });
 
       it('should not warn when a contract has not initialize method', async function() {

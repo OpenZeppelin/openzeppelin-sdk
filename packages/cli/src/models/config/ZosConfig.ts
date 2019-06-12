@@ -37,7 +37,7 @@ type Network = {
   from?: number | string;
   gas?: number | string;
   gasPrice?: number | string;
-  provider?: string | ((any) => any);
+  provider?: string | (() => any);
 } & NetworkId<string | number>;
 
 interface ArtifactDefaults {
@@ -102,7 +102,7 @@ const ZosConfig = {
     };
   },
 
-  getProvider(network: any): Provider {
+  getProvider(network: Network): Provider {
     let { provider } = network;
 
     if (!provider) {

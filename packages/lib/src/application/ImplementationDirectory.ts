@@ -1,10 +1,8 @@
-import Logger from '../utils/Logger';
+import { Loggy } from '../utils/Logger';
 import Transactions from '../utils/Transactions';
 import Contracts from '../artifacts/Contracts';
 import Contract from '../artifacts/Contract';
 import { TxParams } from '../artifacts/ZWeb3';
-
-const log = new Logger('ImplementationDirectory');
 
 // TS-TODO: review which members could be private
 export default class ImplementationDirectory {
@@ -15,9 +13,11 @@ export default class ImplementationDirectory {
     txParams: TxParams = {},
   ): Promise<ImplementationDirectory> {
     const contract = this.getContract();
-    log.info(`Deploying new ${contract.schema.contractName}...`);
     const directory = await Transactions.deployContract(contract, [], txParams);
-    log.info(
+    Loggy.onVerbose(
+      __filename,
+      'deploy',
+      `deployed-implementation-directory`,
       `Deployed ${contract.schema.contractName} at ${directory.address}`,
     );
 
@@ -68,35 +68,54 @@ export default class ImplementationDirectory {
     contractName: string,
     implementationAddress: string,
   ): Promise<any> {
-    log.info(
-      `Setting ${contractName} implementation ${implementationAddress}...`,
+    Loggy.onVerbose(
+      __filename,
+      'setImplementation',
+      `set-implementation-${contractName}`,
+      `Setting ${contractName} implementation ${implementationAddress} in directory`,
     );
     await Transactions.sendTransaction(
       this.directoryContract.methods.setImplementation,
       [contractName, implementationAddress],
       { ...this.txParams },
     );
-    log.info(`Implementation set: ${implementationAddress}`);
+    Loggy.succeed(
+      `set-implementation-${contractName}`,
+      `Setting ${contractName} in directory`,
+    );
   }
 
   public async unsetImplementation(contractName: string): Promise<any> {
-    log.info(`Unsetting ${contractName} implementation...`);
+    Loggy.onVerbose(
+      __filename,
+      'unsetImplementation',
+      `unset-implementation-${contractName}`,
+      `Unsetting ${contractName} implementation`,
+    );
     await Transactions.sendTransaction(
       this.directoryContract.methods.unsetImplementation,
       [contractName],
       { ...this.txParams },
     );
-    log.info(`${contractName} implementation unset`);
+    Loggy.succeed(
+      `unset-implementation-${contractName}`,
+      `${contractName} implementation unset`,
+    );
   }
 
   public async freeze(): Promise<any> {
-    log.info('Freezing implementation directory...');
+    Loggy.spin(
+      __filename,
+      'freeze',
+      `freeze-implementation`,
+      'Freezing directory version',
+    );
     await Transactions.sendTransaction(
       this.directoryContract.methods.freeze,
       [],
       { ...this.txParams },
     );
-    log.info('Frozen');
+    Loggy.succeed(`freeze-implementation`, `Directory version frozen`);
   }
 
   public async isFrozen(): Promise<boolean> {

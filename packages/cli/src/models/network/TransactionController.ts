@@ -2,7 +2,7 @@ import isEmpty from 'lodash.isempty';
 import isUndefined from 'lodash.isundefined';
 import isNull from 'lodash.isnull';
 
-import { Contract, Transactions, Logger, ZWeb3, TxParams, ABI } from 'zos-lib';
+import { Contract, Transactions, Loggy, ZWeb3, TxParams, ABI } from 'zos-lib';
 import {
   isValidUnit,
   prettifyTokenAmount,
@@ -14,10 +14,9 @@ import { allPromisesOrError } from '../../utils/async';
 import ContractManager from '../local/ContractManager';
 import ZosPackageFile from '../files/ZosPackageFile';
 import ZosNetworkFile from '../files/ZosNetworkFile';
-import Events from '../status/EventsFilter';
+import { describeEvents } from '../../utils/events';
 
 const { buildCallData, callDescription } = ABI;
-const log = new Logger('TransactionController');
 
 interface ERC20TokenInfo {
   balance?: string;
@@ -57,30 +56,50 @@ export default class TransactionController {
     }
     const validUnit = unit.toLowerCase();
     const value = toWei(amount, validUnit);
-    log.info(`Sending ${amount} ${validUnit} to ${to}...`);
+    Loggy.spin(
+      __filename,
+      'transfer',
+      'transfer-funds',
+      `Sending ${amount} ${validUnit} to ${to}`,
+    );
     const { transactionHash } = await Transactions.sendRawTransaction(
       to,
       { value },
       this.txParams,
     );
-    log.info(`Funds successfully sent!. Transaction hash: ${transactionHash}`);
+    Loggy.succeed(
+      'transfer-funds',
+      `Funds successfully sent! Transaction hash: ${transactionHash}`,
+    );
   }
 
   public async getBalanceOf(
     accountAddress: string,
     contractAddress?: string,
-  ): Promise<void | never> {
+  ): Promise<string | never> {
     if (contractAddress) {
       const { balance, tokenSymbol, tokenDecimals } = await this.getTokenInfo(
         accountAddress,
         contractAddress,
       );
-      log.info(
+      Loggy.noSpin(
+        __filename,
+        'getBalanceOf',
+        'balance-of',
         `Balance: ${prettifyTokenAmount(balance, tokenDecimals, tokenSymbol)}`,
       );
+
+      return balance;
     } else {
       const balance = await ZWeb3.getBalance(accountAddress);
-      log.info(`Balance: ${fromWei(balance, 'ether')} ETH`);
+      Loggy.noSpin(
+        __filename,
+        'getBalanceOf',
+        'balance-of',
+        `Balance: ${fromWei(balance, 'ether')} ETH`,
+      );
+
+      return balance;
     }
   }
 
@@ -95,7 +114,12 @@ export default class TransactionController {
       methodArgs,
     );
     try {
-      log.info(`Calling: ${callDescription(method, methodArgs)}`);
+      Loggy.spin(
+        __filename,
+        'callContractMethod',
+        'call-contract-method',
+        `Calling: ${callDescription(method, methodArgs)}`,
+      );
       const result = await contract.methods[methodName](...methodArgs).call({
         ...this.txParams,
       });
@@ -105,8 +129,14 @@ export default class TransactionController {
       isUndefined(parsedResult) ||
       parsedResult === '()' ||
       parsedResult.length === 0
-        ? log.info(`Method ${methodName} successfully called.`)
-        : log.info(`Call returned: ${parsedResult}`);
+        ? Loggy.succeed(
+            'call-contract-method',
+            `Method ${methodName} returned empty.`,
+          )
+        : Loggy.succeed(
+            'call-contract-method',
+            `Method ${methodName} returned ${parsedResult}`,
+          );
 
       return result;
     } catch (error) {
@@ -127,14 +157,22 @@ export default class TransactionController {
       methodArgs,
     );
     try {
-      log.info(`Calling: ${callDescription(method, methodArgs)}`);
+      Loggy.spin(
+        __filename,
+        'sendTransaction',
+        'send-transaction',
+        `Calling: ${callDescription(method, methodArgs)}`,
+      );
       const { transactionHash, events } = await Transactions.sendTransaction(
         contract.methods[methodName],
         methodArgs,
         this.txParams,
       );
-      log.info(`Transaction successful: ${transactionHash}`);
-      if (!isEmpty(events)) Events.describe(events);
+      Loggy.succeed(
+        'send-transaction',
+        `Transaction successful. Transaction hash: ${transactionHash}`,
+      );
+      if (!isEmpty(events)) describeEvents(events);
     } catch (error) {
       throw Error(
         `Error while trying to send transaction to ${proxyAddress}. ${error}`,

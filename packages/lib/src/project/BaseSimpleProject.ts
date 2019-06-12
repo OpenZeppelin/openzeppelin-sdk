@@ -1,7 +1,7 @@
 import isEmpty from 'lodash.isempty';
 
 import Proxy from '../proxy/Proxy';
-import Logger from '../utils/Logger';
+import { Loggy } from '../utils/Logger';
 import Package from '../application/Package';
 import Transactions from '../utils/Transactions';
 import { toAddress } from '../utils/Addresses';
@@ -12,8 +12,6 @@ import { ContractInterface } from './AppProject';
 import Contract from '../artifacts/Contract';
 import ProxyFactory from '../proxy/ProxyFactory';
 import { TxParams } from '../artifacts/ZWeb3';
-
-const log: Logger = new Logger('BaseSimpleProject');
 
 interface Implementations {
   [contractName: string]: Implementation;
@@ -58,7 +56,12 @@ export default abstract class BaseSimpleProject {
     contract: Contract,
     contractName?: string,
   ): Promise<any> {
-    log.info(`Deploying logic contract for ${contract.schema.contractName}`);
+    Loggy.onVerbose(
+      __filename,
+      'setImplementation',
+      `set-implementation-for-${contract.schema.contractName}`,
+      `Deploying logic contract for ${contract.schema.contractName}`,
+    );
     if (!contractName) contractName = contract.schema.contractName;
     const implementation: any = await Transactions.deployContract(
       contract,
@@ -158,7 +161,10 @@ export default abstract class BaseSimpleProject {
       initCallData,
       this.txParams,
     );
-    log.info(`Instance created at ${proxy.address}`);
+    Loggy.succeed(
+      `action-proxy-${implementationAddress}`,
+      `Instance created at ${proxy.address}`,
+    );
     return contract.at(proxy.address);
   }
 
@@ -199,8 +205,10 @@ export default abstract class BaseSimpleProject {
       initCallData,
       signature,
     );
-
-    log.info(`Instance created at ${proxy.address}`);
+    Loggy.succeed(
+      `action-proxy-${implementationAddress}`,
+      `Instance created at ${proxy.address}`,
+    );
     return contract.at(proxy.address);
   }
 
@@ -234,8 +242,10 @@ export default abstract class BaseSimpleProject {
       implementationAddress,
       initCallData,
     );
-
-    log.info(`Instance created at ${proxy.address}`);
+    Loggy.succeed(
+      `action-proxy-${implementationAddress}`,
+      `Instance created at ${proxy.address}`,
+    );
     return contract.at(proxy.address);
   }
 
@@ -397,8 +407,11 @@ export default abstract class BaseSimpleProject {
         initArgs,
       );
       if (actionLabel)
-        log.info(
-          `${actionLabel} proxy to logic contract ${implementationAddress} and initializing by calling ${callDescription(
+        Loggy.spin(
+          __filename,
+          '_getAndLogInitCallData',
+          `action-proxy-${implementationAddress}`,
+          `${actionLabel} instance for ${implementationAddress} and calling ${callDescription(
             initMethod,
             initArgs,
           )}`,
@@ -406,7 +419,10 @@ export default abstract class BaseSimpleProject {
       return callData;
     } else {
       if (actionLabel)
-        log.info(
+        Loggy.spin(
+          __filename,
+          '_getAndLogInitCallData',
+          `action-proxy-${implementationAddress}`,
           `${actionLabel} proxy to logic contract ${implementationAddress}`,
         );
       return null;

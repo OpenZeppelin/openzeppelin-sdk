@@ -16,12 +16,10 @@ import { semanticVersionToString } from '../utils/Semver';
 import ProxyFactory from '../proxy/ProxyFactory';
 import { CalldataInfo, buildCallData, callDescription } from '../utils/ABIs';
 import { TxParams } from '../artifacts/ZWeb3';
-import Logger from '../utils/Logger';
+import { Loggy } from '../utils/Logger';
 
 const DEFAULT_NAME = 'main';
 const DEFAULT_VERSION = '0.1.0';
-
-const log: Logger = new Logger('AppProject');
 
 export interface ContractInterface {
   packageName?: string;
@@ -63,18 +61,53 @@ class BaseAppProject extends BasePackageProject {
     version = semanticVersionToString(version);
 
     try {
-      app = appAddress
-        ? await App.fetch(appAddress, txParams)
-        : await App.deploy(txParams);
-      if (packageAddress) thepackage = Package.fetch(packageAddress, txParams);
-      else if (await app.hasPackage(name, version))
+      if (appAddress) {
+        app = await App.fetch(appAddress, txParams);
+      } else {
+        Loggy.spin(
+          __filename,
+          'fetchOrDeploy',
+          `publish-project`,
+          'Preparing everything to publish the project! Deploying new App contract',
+        );
+        app = await App.deploy(txParams);
+      }
+
+      if (packageAddress) {
+        thepackage = Package.fetch(packageAddress, txParams);
+      } else if (await app.hasPackage(name, version)) {
         thepackage = (await app.getPackage(name)).package;
-      else thepackage = await Package.deploy(txParams);
-      directory = (await thepackage.hasVersion(version))
-        ? await thepackage.getDirectory(version)
-        : await thepackage.newVersion(version);
+      } else {
+        Loggy.spin(
+          __filename,
+          'fetchOrDeploy',
+          `publish-project`,
+          'Deploying new Package contract',
+        );
+        thepackage = await Package.deploy(txParams);
+      }
+
+      if (await thepackage.hasVersion(version)) {
+        directory = await thepackage.getDirectory(version);
+      } else {
+        Loggy.spin(
+          __filename,
+          'fetchOrDeploy',
+          `publish-project`,
+          `Adding new version ${version} and creating ImplementationDirectory contract`,
+        );
+        directory = await thepackage.newVersion(version);
+        const succeedText =
+          !appAddress || !packageAddress
+            ? `Project structure deployed!`
+            : `Version ${version} deployed`;
+
+        Loggy.succeed(`publish-project`, succeedText);
+      }
+
       if (!(await app.hasPackage(name, version)))
         await app.setPackage(name, thepackage.address, version);
+
       const proxyAdmin: ProxyAdmin | null = proxyAdminAddress
         ? await ProxyAdmin.fetch(proxyAdminAddress, txParams)
         : null;
@@ -238,21 +271,6 @@ class BaseAppProject extends BasePackageProject {
     );
   }
 
-  public async createContract(
-    contract: Contract,
-    { packageName, contractName, initMethod, initArgs }: ContractInterface = {},
-  ): Promise<Contract> {
-    if (!contractName) contractName = contract.schema.contractName;
-    if (!packageName) packageName = this.name;
-    return this.app.createContract(
-      contract,
-      packageName,
-      contractName,
-      initMethod,
-      initArgs,
-    );
-  }
-
   public async createProxy(
     contract: Contract,
     contractInterface: ContractInterface = {},
@@ -328,8 +346,11 @@ class BaseAppProject extends BasePackageProject {
       initCallData,
       signature,
     );
+    Loggy.succeed(
+      `action-proxy-${implementationAddress}`,
+      `Instance created at ${proxy.address}`,
+    );
 
-    log.info(`Instance created at ${proxy.address}`);
     return contract.at(proxy.address);
   }
 
@@ -360,8 +381,11 @@ class BaseAppProject extends BasePackageProject {
       implementationAddress,
       initCallData,
     );
+    Loggy.succeed(
+      `action-proxy-${implementationAddress}`,
+      `Instance created at ${proxy.address}`,
+    );
 
-    log.info(`Instance created at ${proxy.address}`);
     return contract.at(proxy.address);
   }
 
@@ -477,7 +501,10 @@ class BaseAppProject extends BasePackageProject {
         initArgs,
       );
       if (actionLabel)
-        log.info(
+        Loggy.spin(
+          __filename,
+          'getInitCallData',
+          `action-proxy-${implementationAddress}`,
           `${actionLabel} proxy to logic contract ${implementationAddress} and initializing by calling ${callDescription(
             initMethod,
             initArgs,
@@ -486,7 +513,11 @@ class BaseAppProject extends BasePackageProject {
       return callData;
     } else {
       if (actionLabel)
-        log.info(
+        Loggy.spin(
+          __filename,
+          'getInitCallData',
+          `${__filename}#getInitCallData`,
+          `action-proxy-${implementationAddress}`,
           `${actionLabel} proxy to logic contract ${implementationAddress}`,
         );
       return null;
