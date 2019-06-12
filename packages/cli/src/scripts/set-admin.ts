@@ -1,4 +1,3 @@
-import stdout from '../utils/stdout';
 import NetworkController from '../models/network/NetworkController';
 import ScriptError from '../models/errors/ScriptError';
 import { SetAdminParams } from './interfaces';
@@ -32,7 +31,6 @@ export default async function setAdmin({
         proxyAddress,
         newAdmin,
       );
-      proxies.forEach(proxy => stdout(proxy.address));
     } else {
       await controller.setProxyAdminOwner(newAdmin);
     }

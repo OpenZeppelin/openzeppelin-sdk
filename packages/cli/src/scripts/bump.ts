@@ -1,4 +1,3 @@
-import stdout from '../utils/stdout';
 import LocalController from '../models/local/LocalController';
 import { BumpParams } from './interfaces';
 
@@ -11,5 +10,4 @@ export default async function bumpVersion({
   const controller = new LocalController(packageFile);
   controller.bumpVersion(version);
   controller.writePackage();
-  stdout(version);
 }

@@ -1,4 +1,3 @@
-import stdout from '../utils/stdout';
 import NetworkController from '../models/network/NetworkController';
 import ScriptError from '../models/errors/ScriptError';
 import { PushParams } from './interfaces';
@@ -21,7 +20,6 @@ export default async function push({
     if (deployProxyFactory) await controller.deployProxyFactory();
     await controller.push(reupload, force);
     const { appAddress } = controller;
-    if (appAddress) stdout(appAddress);
     controller.writeNetworkPackageIfNeeded();
   } catch (error) {
     const cb = () => controller.writeNetworkPackageIfNeeded();

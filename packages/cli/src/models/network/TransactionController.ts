@@ -76,26 +76,36 @@ export default class TransactionController {
   public async getBalanceOf(
     accountAddress: string,
     contractAddress?: string,
-  ): Promise<void | never> {
+  ): Promise<string | never> {
     if (contractAddress) {
       const { balance, tokenSymbol, tokenDecimals } = await this.getTokenInfo(
         accountAddress,
         contractAddress,
       );
+      const formattedBalance = prettifyTokenAmount(
+        balance,
+        tokenDecimals,
+        tokenSymbol,
+      );
       Loggy.noSpin(
         __filename,
         'getBalanceOf',
         'balance-of',
-        `Balance: ${prettifyTokenAmount(balance, tokenDecimals, tokenSymbol)}`,
+        `Balance: ${formattedBalance}`,
       );
+
+      return formattedBalance;
     } else {
       const balance = await ZWeb3.getBalance(accountAddress);
+      const formattedBalance = `${fromWei(balance, 'ether')} ETH`;
       Loggy.noSpin(
         __filename,
         'getBalanceOf',
         'balance-of',
-        `Balance: ${fromWei(balance, 'ether')} ETH`,
+        `Balance: ${formattedBalance}`,
       );
+
+      return formattedBalance;
     }
   }
 
