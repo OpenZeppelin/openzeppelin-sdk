@@ -123,7 +123,8 @@ export const Loggy: { [key: string]: any } = {
     if (this.isVerbose) {
       const location = `${path.basename(file)}#${fnName}`;
       const message = `[${new Date().toISOString()}@${location}] ${text}`;
-      console.error(chalk.keyword(color)(message));
+      const coloredMessage = color ? chalk.keyword(color)(message) : message;
+      console.error(coloredMessage);
     } else if (logLevel === LogLevel.Normal) {
       !spinners.pick(reference)
         ? spinners.add(reference, { text, status: spinnerAction, color })
@@ -135,14 +136,14 @@ export const Loggy: { [key: string]: any } = {
     switch (logType) {
       case LogType.Success:
         return 'blueBright';
-      case LogType.Info:
-        return 'white';
       case LogType.Warn:
         return 'yellow';
       case LogType.Err || LogType.Fail:
         return 'redBright';
+      case LogType.Info:
+        return null;
       default:
-        return 'white';
+        return null;
     }
   },
 };
