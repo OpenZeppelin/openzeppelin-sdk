@@ -85,9 +85,6 @@ class BaseAppProject extends BasePackageProject {
           'Deploying new Package contract',
         );
         thepackage = await Package.deploy(txParams);
-        Loggy.update(`publish-project`, {
-          text: 'Deploying new Package contract',
-        });
       }
 
       if (await thepackage.hasVersion(version)) {
