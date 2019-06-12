@@ -27,7 +27,7 @@ interface ImportTreeNode extends ImportFile {
  * @param workingDir
  * @param resolver
  */
-async function gatherDepenencyTree(
+async function gatherDependencyTree(
   roots: string[],
   workingDir: string,
   resolver: ResolverEngine<ImportFile>,
@@ -111,9 +111,9 @@ export async function gatherSources(
   while (queue.length > 0) {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const fileData = queue.shift()!;
-    const resolvedFile: ImportFile = await resolver.require(
-      fileData.file,
-      fileData.cwd,
+    const resolvedFile: ImportFile = await resolveImportFile(
+      resolver,
+      fileData,
     );
     const foundImports = getImports(resolvedFile.source);
 
@@ -178,6 +178,24 @@ function resolvePath(workingDir: string, relativePath: string): string {
     : pathSys.resolve(pathSys.dirname(workingDir), relativePath);
 }
 
+async function resolveImportFile(
+  resolver: ResolverEngine<ImportFile>,
+  fileData: { cwd: string; file: string; relativeTo: string },
+): Promise<ImportFile> {
+  try {
+    return await resolver.require(fileData.file, fileData.cwd);
+  } catch (err) {
+    if (err.message.startsWith('None of the sub-resolvers resolved')) {
+      const cwd = pathSys.relative(process.cwd(), fileData.cwd);
+      const relativeTo = pathSys.relative(process.cwd(), fileData.relativeTo);
+      err.message = `Could not find file ${
+        fileData.file
+      } in folder ${cwd} (imported from ${relativeTo})`;
+    }
+    throw err;
+  }
+}
+
 /**
  * This function gathers sources and **REWRITES IMPORTS** inside the source files into resolved, absolute paths instead of using shortcut forms
  * Because the remapping api in solc is not compatible with multiple existing projects and frameworks, changing relative paths to absolute paths
@@ -197,7 +215,7 @@ export async function gatherSourcesAndCanonizeImports(
     );
   }
 
-  const sources = await gatherDepenencyTree(roots, workingDir, resolver);
+  const sources = await gatherDependencyTree(roots, workingDir, resolver);
   sources.forEach(canonizeFile);
   return stripNodes(sources);
 }

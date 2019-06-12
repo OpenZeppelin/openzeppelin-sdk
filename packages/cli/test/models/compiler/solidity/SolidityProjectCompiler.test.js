@@ -2,7 +2,13 @@ require('../../../setup');
 
 import { FileSystem } from 'zos-lib';
 import { compileProject } from '../../../../src/models/compiler/solidity/SolidityProjectCompiler';
-import { statSync, utimesSync } from 'fs';
+import {
+  unlinkSync,
+  existsSync,
+  statSync,
+  utimesSync,
+  writeFileSync,
+} from 'fs';
 import path from 'path';
 
 describe('SolidityProjectCompiler', function() {
@@ -100,6 +106,23 @@ describe('SolidityProjectCompiler', function() {
       statSync(greeterArtifactPath).mtimeMs.should.not.eq(origMtime);
       const schema = FileSystem.parseJson(greeterArtifactPath);
       schema.compiler.optimizer.should.be.deep.equal(optimizer);
+    });
+
+    it('outputs friendly error on invalid import', async function() {
+      writeFileSync(
+        `${inputDir}/Invalid.sol`,
+        'pragma solidity ^0.5.0; import "./NotExists.sol";',
+      );
+      await compileProject({ inputDir, outputDir }).should.be.rejectedWith(
+        /could not find file \.\/NotExists\.sol/i,
+      );
+    });
+
+    afterEach(function() {
+      const invalidFilePath = `${inputDir}/Invalid.sol`;
+      if (existsSync(invalidFilePath)) {
+        unlinkSync(invalidFilePath);
+      }
     });
   });
 
