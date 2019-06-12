@@ -82,30 +82,24 @@ export default class TransactionController {
         accountAddress,
         contractAddress,
       );
-      const formattedBalance = prettifyTokenAmount(
-        balance,
-        tokenDecimals,
-        tokenSymbol,
-      );
       Loggy.noSpin(
         __filename,
         'getBalanceOf',
         'balance-of',
-        `Balance: ${formattedBalance}`,
+        `Balance: ${prettifyTokenAmount(balance, tokenDecimals, tokenSymbol)}`,
       );
 
-      return formattedBalance;
+      return balance;
     } else {
       const balance = await ZWeb3.getBalance(accountAddress);
-      const formattedBalance = `${fromWei(balance, 'ether')} ETH`;
       Loggy.noSpin(
         __filename,
         'getBalanceOf',
         'balance-of',
-        `Balance: ${formattedBalance}`,
+        `Balance: ${fromWei(balance, 'ether')} ETH`,
       );
 
-      return formattedBalance;
+      return balance;
     }
   }
 
