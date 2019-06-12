@@ -3,6 +3,7 @@ import { Loggy } from 'zos-lib';
 export default class CaptureLogs {
   constructor() {
     this.clear();
+    // TODO: Refactor. Replacing the Loggy#add fn should be enough
     this.originalSpin = Loggy.spin;
     this.originalNoSpin = Loggy.noSpin;
     this.originalNoSpinWarn = Loggy.noSpin.warn;
