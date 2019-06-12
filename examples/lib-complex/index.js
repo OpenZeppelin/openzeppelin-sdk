@@ -5,8 +5,7 @@ global.artifacts = artifacts;
 const args = require('minimist')(process.argv.slice(2));
 const network = args.network;
 
-const { Logger, AppProject, Contracts, ImplementationDirectory, Package } = require('zos-lib')
-const log = new Logger('ComplexExample')
+const { AppProject, Contracts, ImplementationDirectory, Package } = require('zos-lib')
 
 const ERC721Mintable = Contracts.getFromLocal('ERC721Mintable');
 
@@ -16,7 +15,7 @@ const tokenClass = 'ERC721Mintable';
 async function setupApp(txParams) {
 
   // On-chain, single entry point of the entire application.
-  log.info(`<< Setting up App >> network: ${network}`)
+  console.error(`<< Setting up App >> network: ${network}`)
   const initialVersion = '0.0.1'
   return await AppProject.fetchOrDeploy('complex-example', initialVersion, txParams, {})
 }
@@ -24,7 +23,7 @@ async function setupApp(txParams) {
 async function deployVersion1(project, owner) {
 
   // Register the first implementation of 'Donations', and request a proxy for it.
-  log.info('<< Deploying version 1 >>')
+  console.error('<< Deploying version 1 >>')
   const DonationsV1 = Contracts.getFromLocal('DonationsV1')
   await project.setImplementation(DonationsV1, contractName);
   return await project.createProxy(DonationsV1, { contractName, initMethod: 'initialize', initArgs: [owner] })
@@ -34,7 +33,7 @@ async function deployVersion2(project, donations, txParams) {
 
   // Create a new version of the project, linked to the ZeppelinOS EVM package.
   // Register a new implementation for 'Donations' and upgrade it's proxy to use the new implementation.
-  log.info('<< Deploying version 2 >>')
+  console.error('<< Deploying version 2 >>')
   const secondVersion = '0.0.2'
   await project.newVersion(secondVersion)
 
@@ -49,17 +48,17 @@ async function deployVersion2(project, donations, txParams) {
 
   // Add an ERC721 token implementation to the project, request a proxy for it,
   // and set the token on 'Donations'.
-  log.info(`Creating ERC721 token proxy to use in ${contractName}...`)
+  console.error(`Creating ERC721 token proxy to use in ${contractName}...`)
   const token = await project.createProxy(ERC721Mintable, {
     packageName: 'openzeppelin',
     contractName: tokenClass,
     initMethod: 'initialize',
     initArgs: [donations.address]
   })
-  log.info(`Token proxy created at ${token.address}`)
-  log.info('Setting application\'s token...')
+  console.error(`Token proxy created at ${token.address}`)
+  console.error('Setting application\'s token...')
   await donations.methods.setToken(token.address).send(txParams)
-  log.info('Token set succesfully')
+  console.error('Token set succesfully')
   return token;
 }
 
