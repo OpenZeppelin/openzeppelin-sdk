@@ -1030,7 +1030,7 @@ export default class NetworkController {
     await this.fetchOrDeploy(this.currentVersion);
 
     if (await this.hasOutdatedProxies(proxies)) {
-      // Update all out of date proxies 
+      // Update all out of date proxies
       await allPromisesOrError(
         map(proxies, proxy => this._upgradeProxy(proxy, initMethod, initArgs)),
       );

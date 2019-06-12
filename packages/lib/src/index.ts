@@ -9,11 +9,8 @@ import sleep from './helpers/sleep';
 // utils
 import ABI from './utils/ABIs';
 import Semver from './utils/Semver';
-import Logger, {
+import {
   Loggy,
-  LogType,
-  SpinnerAction,
-  LogLevel,
 } from './utils/Logger';
 import FileSystem from './utils/FileSystem';
 import Contracts from './artifacts/Contracts';
