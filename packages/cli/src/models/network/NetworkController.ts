@@ -1031,35 +1031,12 @@ export default class NetworkController {
     if (proxies.length === 0) return [];
     await this.fetchOrDeploy(this.currentVersion);
 
-    if (await this.hasOutdatedProxies(proxies)) {
-      // Update all out of date proxies
-      await allPromisesOrError(
-        map(proxies, proxy => this._upgradeProxy(proxy, initMethod, initArgs)),
-      );
-    } else {
-      Loggy.noSpin(
-        __filename,
-        'upgradeProxies',
-        'All instances are up to date',
-      );
-    }
+    // Update all out of date proxies
+    await allPromisesOrError(
+      map(proxies, proxy => this._upgradeProxy(proxy, initMethod, initArgs)),
+    );
 
     return proxies;
-  }
-
-  private async hasOutdatedProxies(proxies: ProxyInterface[]): Promise<any> {
-    const changedProxies = proxies.map(async proxy => {
-      const name = {
-        packageName: proxy.package,
-        contractName: proxy.contract,
-      };
-      const currentImplementation = await Proxy.at(
-        proxy.address,
-      ).implementation();
-      const contractImplementation = await this.project.getImplementation(name);
-      return contractImplementation == currentImplementation;
-    });
-    return proxies.length !== compact(await Promise.all(changedProxies)).length;
   }
 
   // Proxy model
