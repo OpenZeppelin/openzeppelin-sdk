@@ -78,6 +78,9 @@ commands:
       install-cmd:
         type: string
         default: pwd && npm install
+      test-cmd:
+        type: string
+        default: pwd && npm test
     steps:
       - npm-install-with-cache:
           dir: "<< parameters.dir >>"
@@ -85,7 +88,7 @@ commands:
           install-cmd: "<< parameters.install-cmd >>"
       - run: 
           name: "Test on << parameters.dir >>"
-          command: pwd && npm test
+          command: "<< parameters.test-cmd >>"
           working_directory: "<< parameters.dir >>"
 
 jobs:
@@ -176,6 +179,18 @@ jobs:
           dir: "~/zos/examples/cli-create2"
           install-cmd: '~/zos/node_modules/.bin/lerna bootstrap --scope=example-cli-create2 --scope="zos*"'
 
+  example-first-project:
+    <<: *defaults
+    steps:
+      - checkout
+      - restore_cache: *restore-cache-root
+      - restore_cache: *restore-cache-lib
+      - restore_cache: *restore-cache-cli
+      - npm-install-and-test:
+          dir: "~/zos/examples/first-project"
+          install-cmd: '~/zos/node_modules/.bin/lerna bootstrap --scope=example-first-project --scope="zos*"'
+          test-cmd: pwd && scripts/test-ci.sh
+
   integration-cli-geth: &integration
     environment: { NETWORK: "geth-dev" }
     working_directory: ~/zos
@@ -232,6 +247,8 @@ workflows:
       - example-create-instances-from-solidity:
           requires: [test-lib, test-cli]
       - example-cli-create2:
+          requires: [test-lib, test-cli]
+      - example-first-project:
           requires: [test-lib, test-cli]
       - integration-cli-geth:
           requires: [test-lib, test-cli]
