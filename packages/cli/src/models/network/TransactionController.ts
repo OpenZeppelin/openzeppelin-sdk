@@ -14,7 +14,7 @@ import { allPromisesOrError } from '../../utils/async';
 import ContractManager from '../local/ContractManager';
 import ZosPackageFile from '../files/ZosPackageFile';
 import ZosNetworkFile from '../files/ZosNetworkFile';
-import { describeEvents } from '../status/EventsFilter';
+import { describeEvents } from '../../utils/events';
 
 const { buildCallData, callDescription } = ABI;
 
