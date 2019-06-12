@@ -2,13 +2,12 @@ import path from 'path';
 import axios from 'axios';
 import fs from 'fs-extra';
 import Ajv from 'ajv';
+import { Loggy } from 'zos-lib';
 
 import KitFile, { MANIFEST_VERSION } from '../files/KitFile';
 import kitConfigSchema from '../files/kit-config.schema.json';
-import stdout from '../../utils/stdout';
 import patch from '../../utils/patch';
 import child from '../../utils/child';
-import Spinners from '../../utils/spinner';
 
 const simpleGit = patch('simple-git/promise');
 
@@ -34,9 +33,13 @@ export default class KitController {
       );
     }
 
-    const spinners = new Spinners();
     try {
-      spinners.start('downloading-kit', `Downloading kit from ${url}`);
+      Loggy.spin(
+        __filename,
+        'unpack',
+        'unpack-kit',
+        `Downloading kit from ${url}`,
+      );
       const git = simpleGit(workingDirPath);
       await git.init();
       await git.addRemote('origin', url);
@@ -49,19 +52,21 @@ export default class KitController {
         // http://nicolasgallagher.com/git-checkout-specific-files-from-another-branch/
         await git.checkout([`origin/stable`, `--`, ...config.files]);
       }
-      spinners.succeed('downloading-kit');
+      Loggy.update('unpack-kit', 'Unpacking kit');
 
-      spinners.start('unpacking-kit', 'Unpacking kit');
       // always delete .git folder
       await remove(path.join(workingDirPath, '.git'));
       // run kit commands like `npm install`
       await exec(config.hooks['post-unpack']);
-      spinners.succeed('unpacking-kit');
+      Loggy.succeed('unpack-kit', 'Kit downloaded and unpacked');
 
-      stdout('The kit is ready to use. Amazing!');
-      stdout(config.message);
+      Loggy.noSpin(
+        __filename,
+        'unpack',
+        'unpack-succeeded',
+        `The kit is ready to use. Amazing! \n${config.message}`,
+      );
     } catch (e) {
-      spinners.stopAll('fail');
       // TODO: remove all files from directory on fail except .zos.lock
       e.message = `Failed to download and unpack kit from ${url}. Details: ${
         e.message
