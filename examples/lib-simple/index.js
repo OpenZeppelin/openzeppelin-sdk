@@ -4,7 +4,9 @@
 global.artifacts = artifacts;
 global.web3 = web3;
 
-const { Contracts, SimpleProject, ZWeb3 } = require('zos-lib')
+const { Loggy, Contracts, SimpleProject, ZWeb3 } = require('zos-lib')
+
+Loggy.silent(true);
 
 async function main() {
 
