@@ -66,7 +66,12 @@ class SolidityProjectCompiler {
     await this._loadDependencies();
 
     if (this.contracts.length === 0) {
-      log.info('No contracts found to compile.');
+      Loggy.noSpin(
+        __filename,
+        'call',
+        'compile-contracts',
+        'No contracts found to compile.',
+      );
       return;
     }
 
