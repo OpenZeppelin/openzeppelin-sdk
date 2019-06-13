@@ -2,9 +2,7 @@ import crypto from 'crypto';
 import { ZERO_ADDRESS } from './Addresses';
 import Contract from '../artifacts/Contract';
 import cbor from 'cbor';
-import Logger from '../utils/Logger';
-
-const log = new Logger('Bytecode');
+import { Loggy } from '../utils/Logger';
 
 export function bodyCode(contract: Contract): string {
   return splitCode(contract).body;
@@ -56,7 +54,12 @@ export function tryRemoveMetadata(bytecode: string): string {
   try {
     cbor.decode(Buffer.from(metadata, 'hex'));
   } catch (err) {
-    log.warn(`Error parsing contract metadata: ${err.message}. Ignoring.`);
+    Loggy.noSpin.warn(
+      __filename,
+      'tryRemoveMetadata',
+      `Error parsing contract metadata: ${err.message}. Ignoring.`,
+    );
+
     return bytecode;
   }
 

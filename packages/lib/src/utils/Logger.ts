@@ -136,7 +136,9 @@ export const Loggy: { [key: string]: any } = {
 
   _actionToText(action: SpinnerAction): string {
     switch (action) {
-      case SpinnerAction.Add || SpinnerAction.NonSpinnable:
+      case SpinnerAction.Add:
+        return 'started';
+      case SpinnerAction.NonSpinnable:
         return 'started';
       case SpinnerAction.Succeed:
         return 'succeeded';
