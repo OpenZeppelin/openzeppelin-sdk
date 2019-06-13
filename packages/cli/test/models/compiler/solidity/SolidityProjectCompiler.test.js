@@ -169,4 +169,15 @@ describe('SolidityProjectCompiler', function() {
       );
     });
   });
+
+  describe('in mock-stdlib-empty project', function() {
+    this.timeout(20000);
+
+    const inputDir = `${rootDir}/test/mocks/mock-stdlib-empty/contracts`;
+    const outputDir = `${baseTestBuildDir}/mock-stdlib-empty`;
+
+    it('compiles without errors', async function() {
+      await compileProject({ inputDir, outputDir, version: '0.5.9' });
+    });
+  });
 });

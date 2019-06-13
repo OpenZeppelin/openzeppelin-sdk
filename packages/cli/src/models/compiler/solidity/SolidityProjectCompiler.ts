@@ -64,6 +64,17 @@ class SolidityProjectCompiler {
   public async call(): Promise<void> {
     await this._loadSoliditySourcesFromDir();
     await this._loadDependencies();
+
+    if (this.contracts.length === 0) {
+      Loggy.noSpin(
+        __filename,
+        'call',
+        'compile-contracts',
+        'No contracts found to compile.',
+      );
+      return;
+    }
+
     await this._resolveCompilerVersion();
 
     if (!this._shouldCompile()) {
