@@ -88,6 +88,7 @@ function getCommandProps(
           message: `${arg.name}:`,
           type: 'input',
           when: () => !methodArgs || !methodArgs[index],
+          normalize: input => ({ type: arg.type, input })
         },
       };
     },
