@@ -43,6 +43,8 @@ interface UpdateParams {
 // TS-TODO: add object interface
 export const Loggy: { [key: string]: any } = {
   logs: {},
+  isSilent: true,
+  isVerbose: false,
 
   silent(value: boolean): void {
     this.isSilent = value;
