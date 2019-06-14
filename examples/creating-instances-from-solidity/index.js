@@ -15,7 +15,6 @@ const fs = require('fs');
 // Import ZeppelinOS `zos` and `zos-lib` dependencies.
 const zos = require('zos');
 const lib = require('zos-lib');
-lib.Loggy.silent(true);
 
 // Main entry point, called by `truffle exec`.
 async function main() {

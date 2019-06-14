@@ -5,14 +5,12 @@ global.artifacts = artifacts;
 const args = require('minimist')(process.argv.slice(2));
 const network = args.network;
 
-const { Loggy, AppProject, Contracts, ImplementationDirectory, Package } = require('zos-lib')
+const { AppProject, Contracts, ImplementationDirectory, Package } = require('zos-lib')
 
 const ERC721Mintable = Contracts.getFromLocal('ERC721Mintable');
 
 const contractName = 'Donations';
 const tokenClass = 'ERC721Mintable';
-
-Loggy.silent(true);
 
 async function setupApp(txParams) {
 
