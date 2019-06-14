@@ -30,7 +30,7 @@ export default async function promptForMethodParams(
     contractFullName,
     methodName.selector,
     constant,
-  ).reduce((accum, current) => ({ ...accum, [current]: undefined }), {});
+  ).reduce((accum, { name: current }) => ({ ...accum, [current]: undefined }), {});
 
   // if there are no methodArgs defined, or the methodArgs array length provided is smaller than the
   // number of arguments in the function, prompt for remaining arguments

@@ -137,13 +137,13 @@ function getCommandProps({
 }: PropsParams = {}) {
   const initMethodsList = methodsList(contractFullName);
   const initMethodArgsList = argsList(contractFullName, methodName).reduce(
-    (accum, argName, index) => {
+    (accum, { name: argName, type: argType }, index) => {
       return {
         ...accum,
         [argName]: {
           message: `${argName}:`,
           type: 'input',
-          when: () => !methodArgs || !methodArgs[index],
+          when: () => !methodArgs || !methodArgs[index]
         },
       };
     },
