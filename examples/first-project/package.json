@@ -11,6 +11,7 @@
   },
   "devDependencies": {
     "ganache-cli": "^6.4.3",
+    "zos-lib": "^2.4.0-rc.0",
     "zos": "^2.4.0-rc.0"
   }
 }
