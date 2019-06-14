@@ -27,9 +27,9 @@ const Verifier = {
     params: VerifierOptions,
   ): Promise<void | never> {
     if (remote === 'etherchain') {
-      await publishToEtherchain(params, remote);
+      await publishToEtherchain(params);
     } else if (remote === 'etherscan') {
-      await publishToEtherscan(params, remote);
+      await publishToEtherscan(params);
     } else {
       throw Error(
         'Invalid remote. Currently, ZeppelinOS contract verifier supports etherchain and etherscan as remote verification applications.',
@@ -40,7 +40,6 @@ const Verifier = {
 
 async function publishToEtherchain(
   params: VerifierOptions,
-  remote: string,
 ): Promise<void | never> {
   if (params.network !== 'mainnet') {
     throw new Error(
@@ -94,7 +93,6 @@ async function publishToEtherchain(
 
 async function publishToEtherscan(
   params: VerifierOptions,
-  remote: string,
 ): Promise<void | never> {
   const { network, compilerVersion, optimizer, contractAddress } = params;
   const compiler = `v${compilerVersion.replace('.Emscripten.clang', '')}`;
