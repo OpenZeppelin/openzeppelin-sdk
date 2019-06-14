@@ -230,7 +230,7 @@ export function argsList(
   methodIdentifier: string,
   constant?: Mutability,
   packageFile?: ZosPackageFile,
-): { name: string, type: string }[] {
+): { name: string; type: string }[] {
   const method = contractMethods(contractFullName, constant, packageFile).find(
     ({ name, selector }) =>
       selector === methodIdentifier || name === methodIdentifier,

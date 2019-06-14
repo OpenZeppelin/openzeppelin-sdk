@@ -352,7 +352,7 @@ describe('prompt', function() {
             this.packageFile,
           );
           args.should.be.an('array');
-          args[0].should.eq('who');
+          args[0].should.deep.equal({ name: 'who', type: 'string' });
         });
       });
     });

@@ -10,7 +10,6 @@ import {
   promptIfNeeded,
   networksList,
   promptForNetwork,
-  argsList,
   methodsList,
   proxiesList,
   proxyInfo,
@@ -95,7 +94,6 @@ async function action(proxyReference: string, options: any): Promise<void> {
     promptedProxyInfo.proxyReference && !promptedProxyInfo.all
       ? await promptForMethodParams(
           promptedProxyInfo.contractFullName,
-          getCommandProps,
           options,
           additionalOpts,
         )
@@ -134,25 +132,7 @@ function getCommandProps({
   proxyReference,
   network,
   all,
-  contractFullName,
-  methodName,
-  methodArgs,
 }: UpdatePropsParams = {}): InquirerQuestions {
-  const initMethodsList = methodsList(contractFullName);
-  const initMethodArgsList = argsList(contractFullName, methodName).reduce(
-    (accum, argName, index) => {
-      return {
-        ...accum,
-        [argName]: {
-          message: `${argName}:`,
-          type: 'input',
-          when: () => !methodArgs || !methodArgs[index],
-        },
-      };
-    },
-    {},
-  );
-
   return {
     ...networksList('network', 'list'),
     pickProxyBy: {
@@ -184,23 +164,6 @@ function getCommandProps({
           ? proxyInfo(parseContractReference(input), network)
           : input,
     },
-    askForMethodParams: {
-      type: 'confirm',
-      message: 'Do you want to run a function after updating the instance?',
-      when: () => initMethodsList.length !== 0 && methodName !== 'initialize',
-    },
-    methodName: {
-      type: 'list',
-      message: 'Select a method',
-      choices: initMethodsList,
-      when: ({ askForMethodParams }) => askForMethodParams,
-      normalize: input => {
-        if (typeof input !== 'object') {
-          return { name: input, selector: input };
-        } else return input;
-      },
-    },
-    ...initMethodArgsList,
   };
 }
 
