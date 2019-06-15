@@ -3,7 +3,7 @@ import pickBy from 'lodash.pickby';
 import isUndefined from 'lodash.isundefined';
 import negate from 'lodash.negate';
 
-import { parseMethodParams } from '../utils/input';
+import { parseMethodParams, parseArg } from '../utils/input';
 import {
   promptIfNeeded,
   argsList,
@@ -88,7 +88,7 @@ function getCommandProps(
           message: `${arg.name}:`,
           type: 'input',
           when: () => !methodArgs || !methodArgs[index],
-          normalize: input => ({ type: arg.type, input })
+          normalize: input => parseArg(input, arg.type),
         },
       };
     },
