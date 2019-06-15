@@ -14,7 +14,7 @@ import {
   networksList,
   contractsList,
   methodsList,
-  argsList,
+  InquirerQuestions,
 } from '../prompts/prompt';
 import promptForMethodParams from '../prompts/method-params';
 import { ProxyType } from '../scripts/interfaces';
@@ -92,7 +92,6 @@ async function action(contractFullName: string, options: any) {
   const additionalOpts = { askForMethodParams: rawInitMethod };
   const { methodName, methodArgs } = await promptForMethodParams(
     contractFullName,
-    getCommandProps,
     options,
     additionalOpts,
   );
@@ -130,46 +129,10 @@ async function promptForCreate(
   );
 }
 
-function getCommandProps({
-  contractFullName,
-  methodName,
-  methodArgs,
-}: PropsParams = {}) {
-  const initMethodsList = methodsList(contractFullName);
-  const initMethodArgsList = argsList(contractFullName, methodName).reduce(
-    (accum, argName, index) => {
-      return {
-        ...accum,
-        [argName]: {
-          message: `${argName}:`,
-          type: 'input',
-          when: () => !methodArgs || !methodArgs[index],
-        },
-      };
-    },
-    {},
-  );
-
+function getCommandProps(): InquirerQuestions {
   return {
     ...networksList('network', 'list'),
     ...contractsList('contractFullName', 'Choose a contract', 'list', 'all'),
-    askForMethodParams: {
-      type: 'confirm',
-      message: 'Do you want to run a function after creating the instance?',
-      when: () => initMethodsList.length !== 0 && methodName !== 'initialize',
-    },
-    methodName: {
-      type: 'list',
-      message: 'Select a method',
-      choices: initMethodsList,
-      when: ({ askForMethodParams }) => askForMethodParams,
-      normalize: input => {
-        if (typeof input !== 'object') {
-          return { name: input, selector: input };
-        } else return input;
-      },
-    },
-    ...initMethodArgsList,
   };
 }
 

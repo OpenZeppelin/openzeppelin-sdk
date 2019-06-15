@@ -1,7 +1,9 @@
 'use strict';
 require('../setup');
 
-import { parseArgs, parseMethodParams } from '../../src/utils/input';
+const expect = require('chai').expect;
+
+import { parseArgs, parseMethodParams, parseArray } from '../../src/utils/input';
 
 describe('input', function() {
   describe('parseArgs', function() {
@@ -103,6 +105,47 @@ describe('input', function() {
         ['100', '1', '2', 'bar', '1000'],
       ),
     );
+  });
+
+  describe('parseArray', function () {
+    const itParses = (description, input, ...expected) => {
+      return it(description, () => {
+        parseArray(input).should.deep.eq(expected, `Parsing: '${input}'`);  
+      });
+    }
+
+    const itFailsToParse = (description, input, failure) => {
+      return it(description, () => {
+        expect(() => parseArray(input)).to.throw(failure);
+      });
+    }
+
+    itParses('a string', 'foo', 'foo');
+    itParses('a number', '20', '20');
+    itParses('many strings', 'foo,bar,baz', 'foo', 'bar', 'baz');
+    itParses('many strings with spaces', 'foo bar,baz baq', 'foo bar', 'baz baq');
+    itParses('many strings trimming spaces', ' foo bar , baz baq ', 'foo bar', 'baz baq');
+    itParses('a quoted string', '"foo"', 'foo');
+    itParses('many quoted strings', '"foo","bar"', 'foo', 'bar');
+    itParses('many quoted strings with commas', '"foo,bar", "baz,baq"', 'foo,bar', 'baz,baq');
+    itParses('a double quoted string with simple quotes', '"foo: \'bar\'"', 'foo: \'bar\'');
+    itParses('a simple quoted string', '\'foo\'', 'foo');
+    itParses('many simple quoted strings with commas', '\'foo,bar\',\'baz,baq\'', 'foo,bar', 'baz,baq');
+    itParses('an array', '[foo,bar]', ['foo', 'bar']);
+    itParses('many arrays', '[foo,bar],["baz","baq"]', ['foo', 'bar'], ['baz','baq']);
+    itParses('nested arrays', '[foo,[bar,baz],baq]', ['foo', ['bar', 'baz'], 'baq']);
+    
+    itParses('mixed stuff 1', '1 2,[foo,["bar,baz"],baq],3', '1 2', ['foo', ['bar,baz'], 'baq'], '3');
+    itParses('mixed stuff 2', '"0x20","0x30","foo,bar"', '0x20', '0x30', 'foo,bar');
+    itParses('mixed stuff 3', '[foo, [bar]]', ['foo', ['bar']]);
+    itParses('mixed stuff 4', 'foo, bar, [foo, "[bar]"]', 'foo', 'bar', ['foo', '[bar]']);
+
+    itFailsToParse('unterminated quoted string', '"foo', /unterminated/i);
+    itFailsToParse('unexpected quote', 'foo "bar"', /unexpected/i);
+    itFailsToParse('unclosed array', 'foo,[bar', /unclosed/i);
+    itFailsToParse('missing comma after quote', '"foo" "bar"', /expected a comma/i);
+    itFailsToParse('missing comma after array', '[foo] "bar"', /expected a comma/i);
+    itFailsToParse('missing comma before array', '[foo [bar]]', /unexpected/i);
   });
 
   describe('parseMethodParams', function() {

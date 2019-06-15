@@ -230,14 +230,12 @@ export function argsList(
   methodIdentifier: string,
   constant?: Mutability,
   packageFile?: ZosPackageFile,
-): string[] {
+): { name: string; type: string }[] {
   const method = contractMethods(contractFullName, constant, packageFile).find(
     ({ name, selector }) =>
       selector === methodIdentifier || name === methodIdentifier,
   );
-  if (method) {
-    return method.inputs.map(({ name: inputName }) => inputName);
-  } else return [];
+  return method ? method.inputs : [];
 }
 
 function contractMethods(

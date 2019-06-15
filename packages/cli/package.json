@@ -61,6 +61,7 @@
     "lodash.findindex": "^4.6.0",
     "lodash.flatmap": "^4.5.0",
     "lodash.flatten": "^4.4.0",
+    "lodash.flattendeep": "^4.4.0",
     "lodash.foreach": "^4.5.0",
     "lodash.frompairs": "^4.0.1",
     "lodash.groupby": "^4.6.0",
