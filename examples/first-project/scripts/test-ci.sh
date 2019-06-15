@@ -3,7 +3,10 @@ set -o xtrace
 trap cleanup EXIT
 
 ganache_port=9555
-zos="node_modules/.bin/zos"
+
+# Lerna bootstrap is failing to create the symlink in node_modules/.bin in the CI for some reason
+# When fixed, we should change the line below to zos="node_modules/.bin/zos"
+zos="node node_modules/zos/lib/bin/zos-cli.js" 
 
 cleanup() {
   if [ -n "$ganache_pid" ] && ps -p $ganache_pid > /dev/null; then
