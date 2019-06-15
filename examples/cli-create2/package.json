@@ -1,6 +1,6 @@
 {
   "name": "example-cli-create2",
-  "version": "2.4.0-rc.1",
+  "version": "2.4.0-rc.2",
   "private": true,
   "description": "Example project for using create2",
   "main": "index.js",
@@ -11,8 +11,8 @@
   "license": "MIT",
   "dependencies": {
     "web3": "1.0.0-beta.37",
-    "zos": "^2.4.0-rc.1",
-    "zos-lib": "^2.4.0-rc.1"
+    "zos": "^2.4.0-rc.2",
+    "zos-lib": "^2.4.0-rc.2"
   },
   "devDependencies": {
     "chai": "^4.2.0",
