@@ -34,6 +34,7 @@ export default async function promptForMethodParams(
     contractFullName,
     methodName,
     methodArgs,
+    constant,
     additionalOpts,
   );
 
@@ -59,7 +60,9 @@ export default async function promptForMethodParams(
       contractFullName,
       methodName.selector,
       methodArgs,
+      constant,
     );
+
     const promptedArgs = await promptIfNeeded(
       { opts: methodArgsKeys, props: methodArgsProps },
       interactive,
@@ -77,10 +80,11 @@ function getCommandProps(
   contractFullName: string,
   methodName: string,
   methodArgs: string[],
+  constant: Mutability,
   additionalOpts = {},
 ): InquirerQuestions {
-  const methods = methodsList(contractFullName);
-  const args = argsList(contractFullName, methodName).reduce(
+  const methods = methodsList(contractFullName, constant);
+  const args = argsList(contractFullName, methodName, constant).reduce(
     (accum, arg, index) => {
       return {
         ...accum,
