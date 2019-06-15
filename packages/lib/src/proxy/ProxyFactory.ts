@@ -95,7 +95,7 @@ export default class ProxyFactory {
       );
     }
 
-    const address = events.ProxyCreated.returnValues.proxy;
+    const address = (events.ProxyCreated.returnValues || events.ProxyCreated[0].returnValues).proxy;
     return Proxy.at(address, this.txParams);
   }
 
