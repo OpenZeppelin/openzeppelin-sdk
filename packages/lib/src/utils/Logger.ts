@@ -130,9 +130,13 @@ export const Loggy: { [key: string]: any } = {
       const coloredMessage = color ? chalk.keyword(color)(message) : message;
       console.error(coloredMessage);
     } else if (logLevel === LogLevel.Normal) {
+      const options = color
+        ? { text, status: spinnerAction, color }
+        : { text, status: spinnerAction };
+
       !spinners.pick(reference)
-        ? spinners.add(reference, { text, status: spinnerAction, color })
-        : spinners.update(reference, { text, status: spinnerAction, color });
+        ? spinners.add(reference, options)
+        : spinners.update(reference, options);
     }
   },
 
@@ -156,7 +160,7 @@ export const Loggy: { [key: string]: any } = {
   _getColorFor(logType: LogType): string {
     switch (logType) {
       case LogType.Err:
-        return 'redBright';
+        return 'red';
       case LogType.Warn:
         return 'yellow';
       case LogType.Info:
