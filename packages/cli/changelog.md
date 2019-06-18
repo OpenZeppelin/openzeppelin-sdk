@@ -24,7 +24,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Internal
 - Removed TSlint in favor of prettier and ESLint. ([#920](https://github.com/zeppelinos/zos/pull/920))
-- Add integration tests for starter boxes, to ensure that the latest version of the CLI is always compatible with zepki. ([#913](https://github.com/zeppelinos/zos/pull/913), [#957](https://github.com/zeppelinos/zos/pull/957))
+- Add integration tests for starter boxes, to ensure that the latest version of the CLI is always compatible with zepkit. ([#913](https://github.com/zeppelinos/zos/pull/913), [#957](https://github.com/zeppelinos/zos/pull/957))
 
 ## v2.3.0 - 2019-05-27
 
