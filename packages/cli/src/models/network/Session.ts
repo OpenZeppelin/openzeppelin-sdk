@@ -4,6 +4,7 @@ import pick from 'lodash.pick';
 import compact from 'lodash.compact';
 import { FileSystem as fs, Loggy } from 'zos-lib';
 
+const state = { alreadyPrintedSessionInfo: false };
 const ZOS_SESSION_PATH = '.zos.session';
 const DEFAULT_TX_TIMEOUT: number = 10 * 60; // 10 minutes
 const DEFAULT_EXPIRATION_TIMEOUT: number = 15 * 60; // 15 minutes
@@ -20,7 +21,8 @@ const Session = {
     const session = this._parseSession();
     if (!session || this._hasExpired(session))
       return this._setDefaults(overrides);
-    if (!silent) {
+    if (!silent && !state.alreadyPrintedSessionInfo) {
+      state.alreadyPrintedSessionInfo = true;
       const fields = omitBy(
         session,
         (v, key) => overrides[key] && overrides[key] !== v,

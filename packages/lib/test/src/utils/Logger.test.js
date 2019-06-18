@@ -119,22 +119,6 @@ describe('Loggger', function() {
       });
     };
 
-    const shouldBehaveLikeVerboseLog = () => {
-      it(`sets log and calls console.error`, function() {
-        Loggy[method]('filename', 'function', 'reference', 'message');
-        shouldSetLogProperties(
-          Loggy.logs[reference],
-          LogType.Info,
-          LogLevel.Normal,
-          spinnerAction,
-          'message',
-        );
-        this.spyLogger.should.have.been.calledOnceWith(
-          sinon.match(/adfdasadsfjasdff/),
-        );
-      });
-    };
-
     context('in normal mode', function() {
       beforeEach('set logger silent prop to false', function() {
         Loggy.silent(false);
