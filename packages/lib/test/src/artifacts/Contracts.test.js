@@ -33,22 +33,38 @@ contract('Contracts', function() {
       );
     });
 
-    it('can be set some custom configuration', function() {
-      const previousTimeout = Contracts.getSyncTimeout();
-      const previousBuildDir = Contracts.getLocalBuildDir();
-      const previousContractsDir = Contracts.getLocalContractsDir();
+    describe('setting custom config', function () {
+      beforeEach(function() {
+        this.previousTimeout = Contracts.getSyncTimeout();
+        this.previousBuildDir = Contracts.getLocalBuildDir();
+        this.previousContractsDir = Contracts.getLocalContractsDir();
+      });
 
-      Contracts.setSyncTimeout(10);
-      Contracts.setLocalBuildDir('build/bla');
-      Contracts.setLocalContractsDir('bla');
+      afterEach(function() {
+        Contracts.setSyncTimeout(this.previousTimeout);
+        Contracts.setLocalBuildDir(this.previousBuildDir);
+        Contracts.setLocalContractsDir(this.previousContractsDir);
+      });
 
-      Contracts.getSyncTimeout().should.be.eq(10);
-      Contracts.getLocalBuildDir().should.be.eq('build/bla');
-      Contracts.getLocalContractsDir().should.be.eq('bla');
+      it('with relative paths', function() {
+        Contracts.setSyncTimeout(10);
+        Contracts.setLocalBuildDir('build/bla');
+        Contracts.setLocalContractsDir('bla');
 
-      Contracts.setSyncTimeout(previousTimeout);
-      Contracts.setLocalBuildDir(previousBuildDir);
-      Contracts.setLocalContractsDir(previousContractsDir);
+        Contracts.getSyncTimeout().should.be.eq(10);
+        Contracts.getLocalBuildDir().should.be.eq(`${process.cwd()}/build/bla`);
+        Contracts.getLocalContractsDir().should.be.eq(`${process.cwd()}/bla`);
+      });
+
+      it('with absolute paths', function() {
+        Contracts.setSyncTimeout(10);
+        Contracts.setLocalBuildDir('/foo/bar/build/bla');
+        Contracts.setLocalContractsDir('/foo/bar/bla');
+
+        Contracts.getSyncTimeout().should.be.eq(10);
+        Contracts.getLocalBuildDir().should.be.eq(`/foo/bar/build/bla`);
+        Contracts.getLocalContractsDir().should.be.eq(`/foo/bar/bla`);
+      });
     });
   });
 });

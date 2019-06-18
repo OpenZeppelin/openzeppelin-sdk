@@ -6,8 +6,8 @@ import { getSolidityLibNames, hasUnlinkedVariables } from '../utils/Bytecode';
 
 export default class Contracts {
   private static DEFAULT_SYNC_TIMEOUT: number = 240000;
-  private static DEFAULT_BUILD_DIR: string = `${process.cwd()}/build/contracts`;
-  private static DEFAULT_CONTRACTS_DIR: string = `${process.cwd()}/contracts`;
+  private static DEFAULT_BUILD_DIR: string = `build/contracts`;
+  private static DEFAULT_CONTRACTS_DIR: string = `contracts`;
 
   private static timeout: number = Contracts.DEFAULT_SYNC_TIMEOUT;
   private static buildDir: string = Contracts.DEFAULT_BUILD_DIR;
@@ -20,11 +20,13 @@ export default class Contracts {
   }
 
   public static getLocalBuildDir(): string {
-    return Contracts.buildDir || Contracts.DEFAULT_BUILD_DIR;
+    return path.resolve(Contracts.buildDir || Contracts.DEFAULT_BUILD_DIR);
   }
 
   public static getLocalContractsDir(): string {
-    return Contracts.contractsDir || Contracts.DEFAULT_CONTRACTS_DIR;
+    return path.resolve(
+      Contracts.contractsDir || Contracts.DEFAULT_CONTRACTS_DIR,
+    );
   }
 
   public static async getDefaultTxParams(): Promise<any> {
