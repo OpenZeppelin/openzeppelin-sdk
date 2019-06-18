@@ -84,7 +84,7 @@ export default class Dependency {
     await npm.install([nameAndVersion], { save: true, cwd: process.cwd() });
     Loggy.succeed(
       `install-dependency-${nameAndVersion}`,
-      `Dependency ${nameAndVersion} successfully installed`,
+      `Dependency ${nameAndVersion} installed`,
     );
     return this.fromNameWithVersion(nameAndVersion);
   }

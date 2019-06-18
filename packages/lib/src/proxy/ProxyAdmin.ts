@@ -23,17 +23,14 @@ export default class ProxyAdmin {
       __filename,
       'deploy',
       `deploy-proxy-admin`,
-      'Deploying new ProxyAdmin',
+      'Setting everything up to create contract instances',
     );
     const contract = await Transactions.deployContract(
       Contracts.getFromLib('ProxyAdmin'),
       [],
       txParams,
     );
-    Loggy.succeed(
-      `deploy-proxy-admin`,
-      `Deployed ProxyAdmin at ${contract.address}`,
-    );
+    Loggy.succeed(`deploy-proxy-admin`);
     return new this(contract, txParams);
   }
 
@@ -88,11 +85,11 @@ export default class ProxyAdmin {
             initMethodName,
             initArgs,
           );
-    Loggy.onVerbose(
-      __filename,
-      'upgradeProxy',
+    Loggy.succeed(
       `upgrade-proxy-${proxyAddress}`,
-      `Transaction receipt received: ${receipt.transactionHash}`,
+      `Instance upgraded at ${proxyAddress}. Transaction receipt received: ${
+        receipt.transactionHash
+      }`,
     );
     return contract.at(proxyAddress);
   }
@@ -134,11 +131,11 @@ export default class ProxyAdmin {
     proxyAddress: string,
     implementation: string,
   ): Promise<any> {
-    Loggy.onVerbose(
+    Loggy.spin(
       __filename,
       '_upgradeProxy',
       `upgrade-proxy-${proxyAddress}`,
-      `Upgrading proxy at ${proxyAddress}`,
+      `Upgrading instance at ${proxyAddress}`,
     );
     return Transactions.sendTransaction(
       this.contract.methods.upgrade,
@@ -163,7 +160,7 @@ export default class ProxyAdmin {
       __filename,
       '_upgradeProxyAndCall',
       `upgrade-proxy-${proxyAddress}`,
-      `Upgrading proxy at ${proxyAddress} and calling ${callDescription(
+      `Upgrading instance at ${proxyAddress} and calling ${callDescription(
         initMethod,
         initArgs,
       )}`,

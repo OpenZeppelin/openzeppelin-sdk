@@ -16,7 +16,7 @@ export default function remove({
     __filename,
     'remove',
     'remove-contracts',
-    `All specified contracts have been removed from the project. To add them again, run 'zos add'`,
+    `All specified contracts have been removed from the project. To add them again, run 'zos add'.`,
   );
   controller.writePackage();
 }

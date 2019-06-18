@@ -152,7 +152,7 @@ export default class App {
           );
     Loggy.succeed(
       `create-proxy`,
-      `${packageName} ${contractName} proxy created at ${proxy.address}`,
+      `${packageName} ${contractName} instance created at ${proxy.address}`,
     );
     return contract.at(proxy.address);
   }
@@ -196,7 +196,7 @@ export default class App {
       __filename,
       '_createProxyAndCall',
       `create-proxy`,
-      `Creating ${packageName}/${contractName} proxy and calling ${callDescription(
+      `Creating ${packageName}/${contractName} instance and calling ${callDescription(
         initMethod,
         initArgs,
       )}`,

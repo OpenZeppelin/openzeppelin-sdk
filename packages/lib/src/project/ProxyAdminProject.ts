@@ -72,7 +72,7 @@ class BaseProxyAdminProject extends BaseSimpleProject {
       initArgs,
     );
     Loggy.succeed(
-      `action-proxy-${implementationAddress}`,
+      `action-proxy-${pAddress}`,
       `Instance at ${pAddress} upgraded`,
     );
     return contract.at(pAddress);

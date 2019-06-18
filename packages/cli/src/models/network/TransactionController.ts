@@ -135,7 +135,7 @@ export default class TransactionController {
           )
         : Loggy.succeed(
             'call-contract-method',
-            `Method ${methodName} returned ${parsedResult}`,
+            `Method ${methodName} returned: ${parsedResult}`,
           );
 
       return result;
