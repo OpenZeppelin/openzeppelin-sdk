@@ -162,14 +162,14 @@ export default class NetworkController {
         __filename,
         'push',
         `after-push`,
-        `All logic contracts are up to date`,
+        `All contracts are up to date`,
       );
     } else {
       Loggy.noSpin(
         __filename,
         'push',
         `after-push`,
-        `All logic contracts have been successfully pushed`,
+        `All contracts have been deployed`,
       );
     }
   }
@@ -276,7 +276,7 @@ export default class NetworkController {
     this.networkFile.addSolidityLib(libName, libInstance);
     Loggy.succeed(
       `upload-solidity-lob${libName}`,
-      `${libName} library successfully uploaded`,
+      `${libName} library uploaded`,
     );
   }
 
@@ -300,7 +300,7 @@ export default class NetworkController {
         __filename,
         'uploadContract',
         `upload-contract${contract.schema.contractName}`,
-        `Validating and pushing logic contract ${contract.schema.contractName}`,
+        `Validating and deploying contract ${contract.schema.contractName}`,
       );
       const contractInstance = await this.project.setImplementation(
         contract,
@@ -318,7 +318,7 @@ export default class NetworkController {
 
       Loggy.succeed(
         `upload-contract${contract.schema.contractName}`,
-        `Logic contract ${contract.schema.contractName} successfully pushed`,
+        `Contract ${contract.schema.contractName} deployed`,
       );
     } catch (error) {
       error.message = `${contractAlias} deployment failed with error: ${
@@ -735,12 +735,7 @@ export default class NetworkController {
     )) as ProxyAdminProject;
     const deployer = new AppProjectDeployer(this, this.packageVersion);
     this.project = await deployer.fromProxyAdminProject(proxyAdminProject);
-    Loggy.succeed(
-      `publish-project`,
-      `Publish to ${this.network} successful! Go to the zos.${
-        this.network
-      }.json file to check the deployed project info`,
-    );
+    Loggy.succeed(`publish-project`, `Published to ${this.network}!`);
   }
 
   // Proxy model

@@ -19,11 +19,12 @@ export default function add({
     controller.add(alias || name, name);
   });
 
-  const message =
-    contractsData.length > 1
-      ? 'All the selected contracts have been added to the project'
-      : `Contract ${contractsData[0].name} has been added to the project`;
-
-  Loggy.noSpin(__filename, 'add-contracts', message);
+  if (contractsData.length > 1) {
+    Loggy.noSpin(
+      __filename,
+      'add-contracts',
+      'All the selected contracts have been added to the project',
+    );
+  }
   controller.writePackage();
 }

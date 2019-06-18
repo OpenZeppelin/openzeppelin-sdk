@@ -133,9 +133,7 @@ describe('prompt', function() {
           .an('object')
           .that.has.all.keys('type', 'message', 'choices');
         networkList.network.type.should.eq('listy');
-        networkList.network.message.should.eq(
-          'Select a network from the network list',
-        );
+        networkList.network.message.should.eq('Pick a network');
         networkList.network.choices.should.have.members(['Meinet', 'Rinkebay']);
       });
     });

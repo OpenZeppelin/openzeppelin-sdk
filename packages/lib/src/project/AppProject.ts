@@ -329,7 +329,7 @@ class BaseAppProject extends BasePackageProject {
       packageName,
       contractName,
     );
-    const initCallData = this.getInitCallData(
+    const initCallData = this.getAndLogInitCallData(
       contract,
       initMethod,
       initArgs,
@@ -346,10 +346,7 @@ class BaseAppProject extends BasePackageProject {
       initCallData,
       signature,
     );
-    Loggy.succeed(
-      `action-proxy-${implementationAddress}`,
-      `Instance created at ${proxy.address}`,
-    );
+    Loggy.succeed(`create-proxy`, `Instance created at ${proxy.address}`);
 
     return contract.at(proxy.address);
   }
@@ -368,7 +365,7 @@ class BaseAppProject extends BasePackageProject {
       packageName,
       contractName,
     );
-    const initCallData = this.getInitCallData(
+    const initCallData = this.getAndLogInitCallData(
       contract,
       initMethod,
       initArgs,
@@ -381,10 +378,7 @@ class BaseAppProject extends BasePackageProject {
       implementationAddress,
       initCallData,
     );
-    Loggy.succeed(
-      `action-proxy-${implementationAddress}`,
-      `Instance created at ${proxy.address}`,
-    );
+    Loggy.succeed(`create-proxy`, `Instance created at ${proxy.address}`);
 
     return contract.at(proxy.address);
   }
@@ -487,13 +481,22 @@ class BaseAppProject extends BasePackageProject {
   }
 
   // REFACTOR: Deduplicate from BaseSimpleProject
-  protected getInitCallData(
+  protected getAndLogInitCallData(
     contract: Contract,
     initMethodName?: string,
     initArgs?: string[],
     implementationAddress?: string,
     actionLabel?: string,
+    proxyAddress?: string,
   ): string | null {
+    const logReference =
+      actionLabel === 'Creating'
+        ? 'create-proxy'
+        : `upgrade-proxy-${proxyAddress}`;
+    const logMessage =
+      actionLabel === 'Creating'
+        ? `Creating instance for contract at ${implementationAddress}`
+        : `Updating instance at ${proxyAddress}`;
     if (initMethodName) {
       const { method: initMethod, callData }: CalldataInfo = buildCallData(
         contract,
@@ -503,22 +506,19 @@ class BaseAppProject extends BasePackageProject {
       if (actionLabel)
         Loggy.spin(
           __filename,
-          'getInitCallData',
-          `action-proxy-${implementationAddress}`,
-          `${actionLabel} proxy to logic contract ${implementationAddress} and initializing by calling ${callDescription(
-            initMethod,
-            initArgs,
-          )}`,
+          'getAndLogInitCallData',
+          logReference,
+          `${logMessage} and calling ${callDescription(initMethod, initArgs)}`,
         );
       return callData;
     } else {
       if (actionLabel)
         Loggy.spin(
           __filename,
-          'getInitCallData',
-          `${__filename}#getInitCallData`,
-          `action-proxy-${implementationAddress}`,
-          `${actionLabel} proxy to logic contract ${implementationAddress}`,
+          'getAndLogInitCallData',
+          `${__filename}#getAndLogInitCallData`,
+          logReference,
+          logMessage,
         );
       return null;
     }

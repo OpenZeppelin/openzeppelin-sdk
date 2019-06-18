@@ -123,7 +123,7 @@ contract('call script', function(accounts) {
         });
 
         this.logs.infos[this.logs.infos.length - 1].should.eq(
-          `Method value returned 42`,
+          `Method value returned: 42`,
         );
       });
     });
@@ -164,7 +164,7 @@ contract('call script', function(accounts) {
           });
 
           this.logs.infos[this.logs.infos.length - 1].should.eq(
-            `Method say returned V1`,
+            `Method say returned: V1`,
           );
         });
       });
@@ -184,7 +184,7 @@ contract('call script', function(accounts) {
           });
 
           this.logs.infos[this.logs.infos.length - 1].should.eq(
-            `Method sayMore returned (V1, 1)`,
+            `Method sayMore returned: (V1, 1)`,
           );
         });
       });
@@ -204,7 +204,7 @@ contract('call script', function(accounts) {
           });
 
           this.logs.infos[this.logs.infos.length - 1].should.eq(
-            `Method sayNumbers returned []`,
+            `Method sayNumbers returned: []`,
           );
         });
 
@@ -230,7 +230,7 @@ contract('call script', function(accounts) {
           });
 
           this.logs.infos[this.logs.infos.length - 1].should.eq(
-            `Method sayNumbers returned [1,2,3]`,
+            `Method sayNumbers returned: [1,2,3]`,
           );
         });
       });

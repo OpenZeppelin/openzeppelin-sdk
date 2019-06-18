@@ -180,15 +180,14 @@ function tryGetLinearizedBaseContracts(contract: Contract): Node[] | null {
   }
 }
 
-// TODO: rollback to previous state after upgrading spinnies version
 export function callDescription(method: any, args: string[]): string {
-  const argsDescriptions: any = method.inputs.map(
+  const argsDescriptions = method.inputs.map(
     (input: any, index: number) =>
-      `${input.name} (${input.type}): ${JSON.stringify(args[index])}`,
+      `- ${input.name} (${input.type}): ${JSON.stringify(args[index])}`,
   );
-  return `function ${method.name} with arguments: ${argsDescriptions.join(
-    ', ',
-  )}`;
+  return args.length
+    ? `${method.name} with:\n${argsDescriptions.join('\n')}`
+    : `${method.name} with no arguments`;
 }
 
 export default {

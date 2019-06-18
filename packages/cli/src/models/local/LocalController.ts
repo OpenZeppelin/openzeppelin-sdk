@@ -80,7 +80,7 @@ export default class LocalController {
       __filename,
       'initZosPackageFile',
       'init-package-file',
-      `Project successfully initialized. Write a new contract in the contracts folder and run 'zos create' to deploy it!`,
+      `Project initialized. Write a new contract in the contracts folder and run 'zos create' to deploy it!`,
     );
   }
 
@@ -100,7 +100,7 @@ export default class LocalController {
       }`,
     );
     this.packageFile.addContract(contractAlias, contractName);
-    Loggy.succeed(`add-${contractAlias}`);
+    Loggy.succeed(`add-${contractAlias}`, `Added contract ${contractAlias}`);
   }
 
   public addAll(): void {
@@ -124,7 +124,10 @@ export default class LocalController {
         `Removing ${contractAlias}`,
       );
       this.packageFile.unsetContract(contractAlias);
-      Loggy.succeed(`remove-${contractAlias}`);
+      Loggy.succeed(
+        `remove-${contractAlias}`,
+        `Removed contract ${contractAlias}`,
+      );
     }
   }
 
@@ -212,7 +215,7 @@ export default class LocalController {
         __filename,
         'linkDependencies',
         'link-dependencies',
-        `${label} successfully linked to the project. Run 'zos create' to deploy one of its contracts!`,
+        `${label} linked to the project. Run 'zos create' to deploy one of its contracts!`,
       );
     }
   }
@@ -232,7 +235,7 @@ export default class LocalController {
         __filename,
         'linkDependencies',
         'link-dependencies',
-        `${label} ${unlinkedDependencies.join(', ')} successfully unlinked.`,
+        `${label} ${unlinkedDependencies.join(', ')} unlinked.`,
       );
     }
   }

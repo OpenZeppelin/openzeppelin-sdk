@@ -61,11 +61,11 @@ async function runActionIfNeeded(options: any): Promise<void> {
 function getCommandProps(): InquirerQuestions {
   return {
     name: {
-      message: 'Welcome to ZeppelinOS! Choose a name for your project:',
+      message: 'Welcome to ZeppelinOS! Choose a name for your project',
       type: 'input',
     },
     version: {
-      message: 'Choose a version:',
+      message: 'Initial project version',
       type: 'input',
     },
   };
