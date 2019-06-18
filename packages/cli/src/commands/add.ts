@@ -77,7 +77,7 @@ async function runActionIfNeeded(
 function getCommandProps(): InquirerQuestions {
   return contractsList(
     'contractNames',
-    'Choose one or more contracts',
+    'Pick which contracts you want to add',
     'checkbox',
     'notAdded',
   );

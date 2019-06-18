@@ -100,7 +100,7 @@ export default class LocalController {
       }`,
     );
     this.packageFile.addContract(contractAlias, contractName);
-    Loggy.succeed(`add-${contractAlias}`);
+    Loggy.succeed(`add-${contractAlias}`, `Added contract ${contractAlias}`);
   }
 
   public addAll(): void {
@@ -124,7 +124,10 @@ export default class LocalController {
         `Removing ${contractAlias}`,
       );
       this.packageFile.unsetContract(contractAlias);
-      Loggy.succeed(`remove-${contractAlias}`);
+      Loggy.succeed(
+        `remove-${contractAlias}`,
+        `Removed contract ${contractAlias}`,
+      );
     }
   }
 

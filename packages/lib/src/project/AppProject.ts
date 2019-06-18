@@ -505,7 +505,7 @@ class BaseAppProject extends BasePackageProject {
           __filename,
           'getInitCallData',
           `action-proxy-${implementationAddress}`,
-          `${actionLabel} proxy to logic contract ${implementationAddress} and initializing by calling ${callDescription(
+          `${actionLabel} instance for contract at ${implementationAddress} and calling ${callDescription(
             initMethod,
             initArgs,
           )}`,
@@ -518,7 +518,7 @@ class BaseAppProject extends BasePackageProject {
           'getInitCallData',
           `${__filename}#getInitCallData`,
           `action-proxy-${implementationAddress}`,
-          `${actionLabel} proxy to logic contract ${implementationAddress}`,
+          `${actionLabel} instance for contract at ${implementationAddress}`,
         );
       return null;
     }

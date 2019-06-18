@@ -411,7 +411,7 @@ export default abstract class BaseSimpleProject {
           __filename,
           '_getAndLogInitCallData',
           `action-proxy-${implementationAddress}`,
-          `${actionLabel} instance for ${implementationAddress} and calling ${callDescription(
+          `${actionLabel} instance for contract at ${implementationAddress} and calling ${callDescription(
             initMethod,
             initArgs,
           )}`,
@@ -423,7 +423,7 @@ export default abstract class BaseSimpleProject {
           __filename,
           '_getAndLogInitCallData',
           `action-proxy-${implementationAddress}`,
-          `${actionLabel} proxy to logic contract ${implementationAddress}`,
+          `${actionLabel} instance for contract at ${implementationAddress}`,
         );
       return null;
     }

@@ -152,15 +152,21 @@ function getCommandProps({
 
   return {
     ...networksList('network', 'list'),
-    ...contractsList('contractFullName', 'Choose a contract', 'list', 'all'),
+    ...contractsList(
+      'contractFullName',
+      'Pick a contract to instantiate',
+      'list',
+      'all',
+    ),
     askForMethodParams: {
       type: 'confirm',
-      message: 'Do you want to run a function after creating the instance?',
+      message:
+        'Do you want to call a function on the instance after creating it?',
       when: () => initMethodsList.length !== 0 && methodName !== 'initialize',
     },
     methodName: {
       type: 'list',
-      message: 'Select a method',
+      message: 'Select which function',
       choices: initMethodsList,
       when: ({ askForMethodParams }) => askForMethodParams,
       normalize: input => {

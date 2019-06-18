@@ -26,6 +26,7 @@ const description =
 const register: (program: any) => any = program =>
   program
     .command(signature, undefined, { noHelp: true })
+    .alias('upgrade')
     .usage('[alias-or-address] --network <network> [options]')
     .description(description)
     .option(
@@ -175,7 +176,7 @@ function getCommandProps({
       when: () => !proxyReference && proxiesList('byAddress', network).length,
     },
     proxy: {
-      message: 'Choose a proxy',
+      message: 'Pick a contract to update',
       type: 'list',
       choices: ({ pickProxyBy }) => proxiesList(pickProxyBy, network),
       when: ({ pickProxyBy }) => !all && pickProxyBy && pickProxyBy !== 'all',
@@ -186,12 +187,13 @@ function getCommandProps({
     },
     askForMethodParams: {
       type: 'confirm',
-      message: 'Do you want to run a function after updating the instance?',
+      message:
+        'Do you want to call a function on the instance after creating it?',
       when: () => initMethodsList.length !== 0 && methodName !== 'initialize',
     },
     methodName: {
       type: 'list',
-      message: 'Select a method',
+      message: 'Select which function',
       choices: initMethodsList,
       when: ({ askForMethodParams }) => askForMethodParams,
       normalize: input => {

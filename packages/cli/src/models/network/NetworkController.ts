@@ -300,7 +300,7 @@ export default class NetworkController {
         __filename,
         'uploadContract',
         `upload-contract${contract.schema.contractName}`,
-        `Validating and pushing logic contract ${contract.schema.contractName}`,
+        `Validating and deploying contract ${contract.schema.contractName}`,
       );
       const contractInstance = await this.project.setImplementation(
         contract,
@@ -318,7 +318,7 @@ export default class NetworkController {
 
       Loggy.succeed(
         `upload-contract${contract.schema.contractName}`,
-        `Logic contract ${contract.schema.contractName} successfully pushed`,
+        `Logic contract ${contract.schema.contractName} successfully deployed`,
       );
     } catch (error) {
       error.message = `${contractAlias} deployment failed with error: ${
