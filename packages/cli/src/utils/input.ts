@@ -61,8 +61,16 @@ export function parseArg(input: string | string[], type: string): any {
 
   // TODO: Handle tuples in ABI specification
 
+  // Arrays: recursively parse
+  if (type.match(ARRAY_TYPE_REGEX)) {
+    const arrayType = type.match(ARRAY_TYPE_REGEX)[1];
+    const inputs =
+      typeof input === 'string' ? parseArray(stripBrackets(input)) : input;
+    return inputs.map(input => parseArg(input, arrayType));
+  }
+
   // Integers: passed via bignumber to handle signs and scientific notation
-  if (
+  else if (
     (type.startsWith('uint') ||
       type.startsWith('int') ||
       type.startsWith('fixed') ||
@@ -81,14 +89,6 @@ export function parseArg(input: string | string[], type: string): any {
     if (TRUE_VALUES.includes(lowercaseInput)) return true;
     else if (FALSE_VALUES.includes(lowercaseInput)) return false;
     else throw new Error(`Could not parse boolean value ${input}`);
-  }
-
-  // Arrays: recursively parse as needed
-  else if (type.match(ARRAY_TYPE_REGEX)) {
-    const arrayType = type.match(ARRAY_TYPE_REGEX)[1];
-    const inputs =
-      typeof input === 'string' ? parseArray(stripBrackets(input)) : input;
-    return inputs.map(input => parseArg(input, arrayType));
   }
 
   // Bytes, strings, addresses: untouched, as web3 handles most validations
@@ -197,6 +197,10 @@ export function parseArray(input: string): (string | string[])[] {
         result.push(innerArray);
         requireCommaOrClosing();
       } else if (char === ']') {
+        if (!requireClosingBracket)
+          throw new Error(
+            `Unexpected closing array at position ${i + 1} in ${input}`,
+          );
         return result;
       } else {
         i--;
