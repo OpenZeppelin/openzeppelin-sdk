@@ -107,7 +107,7 @@ function getCommandProps({
     proxy: {
       message: 'Choose an instance',
       type: 'list',
-      choices: () => proxiesList('byAddress', network),
+      choices: proxiesList('byAddress', network),
       normalize: input =>
         typeof input !== 'object'
           ? proxyInfo(parseContractReference(input), network)
