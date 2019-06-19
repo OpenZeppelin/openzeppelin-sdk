@@ -4,10 +4,12 @@ import Truffle from '../config/TruffleConfig';
 import {
   compileProject,
   ProjectCompilerOptions,
+  ProjectCompileResult,
 } from './solidity/SolidityProjectCompiler';
 import findUp from 'find-up';
 import ZosPackageFile from '../files/ZosPackageFile';
 import { promisify } from 'util';
+import merge from 'lodash.merge';
 
 const state = { alreadyCompiled: false };
 const execFile = promisify(callbackExecFile);
@@ -20,10 +22,11 @@ export async function compile(
   if (!force && state.alreadyCompiled) return;
 
   // Merge config file compiler options with those set explicitly
-  compilerOptions = { ...packageFile.compilerOptions, ...compilerOptions };
+  const resolvedOptions: ProjectCompilerOptions = {};
+  merge(resolvedOptions, packageFile.compilerOptions, compilerOptions);
 
   // Validate compiler manager setting
-  const { manager } = compilerOptions;
+  const { manager } = resolvedOptions;
   if (manager && manager !== 'truffle' && manager !== 'zos') {
     throw new Error(
       `Unknown compiler manager '${manager}' (valid values are 'zos' or 'truffle')`,
@@ -38,12 +41,17 @@ export async function compile(
   const { compileWithTruffle, compileWithSolc } = exports;
   const compilePromise = useTruffle
     ? compileWithTruffle()
-    : compileWithSolc(compilerOptions);
-  await compilePromise;
+    : compileWithSolc(resolvedOptions);
+  const compileResult = await compilePromise;
+  const compileVersion = compileResult && compileResult.compilerVersion.version;
+  const compileVersionOptions = compileVersion
+    ? { version: compileVersion }
+    : null;
 
   // If compiled successfully, write back compiler settings to zos.json to persist them
   packageFile.setCompilerOptions({
-    ...compilerOptions,
+    ...resolvedOptions,
+    ...compileVersionOptions,
     manager: useTruffle ? 'truffle' : 'zos',
   });
   if (packageFile.exists()) packageFile.write();
@@ -53,8 +61,8 @@ export async function compile(
 
 export async function compileWithSolc(
   compilerOptions?: ProjectCompilerOptions,
-): Promise<void> {
-  await compileProject(compilerOptions);
+): Promise<ProjectCompileResult> {
+  return compileProject(compilerOptions);
 }
 
 export async function compileWithTruffle(): Promise<void> {

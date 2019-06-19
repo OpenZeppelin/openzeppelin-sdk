@@ -1,7 +1,9 @@
 'use strict';
 require('../setup');
 
-import { parseArgs, parseMethodParams } from '../../src/utils/input';
+const expect = require('chai').expect;
+
+import { parseArgs, parseMethodParams, parseArray, parseArg } from '../../src/utils/input';
 
 describe('input', function() {
   describe('parseArgs', function() {
@@ -103,6 +105,113 @@ describe('input', function() {
         ['100', '1', '2', 'bar', '1000'],
       ),
     );
+  });
+
+  describe('parseArg', function () {
+    const itParses = (input, type, expected) => {
+      return it(`parses ${input} as ${type}`, () => {
+        parseArg(input, type).should.deep.eq(expected, `Parsing: '${input}'`);  
+      });
+    }
+
+    const itFailsToParse = (input, type, failure) => {
+      return it(`parsing ${input} as ${type} fails`, () => {
+        expect(() => parseArg(input, type)).to.throw(failure);
+      });
+    }
+
+    itParses('42', 'uint256', '42');
+    itParses('42000000000000000000', 'uint256', '42000000000000000000');
+    itParses('42', 'uint8', '42');
+    itParses('2.4e18', 'uint256', '2400000000000000000');
+    itParses('-42', 'int8', '-42');
+    
+    itFailsToParse('foo', 'uint256', /could not parse/i);
+
+    itParses('true', 'bool', true);
+    itParses('TRUE', 'bool', true);
+    itParses('t', 'bool', true);
+    itParses('y', 'bool', true);
+    itParses('yes', 'bool', true);
+    itParses('1', 'bool', true);
+
+    itParses('false', 'bool', false);
+    itParses('FALSE', 'bool', false);
+    itParses('f', 'bool', false);
+    itParses('n', 'bool', false);
+    itParses('no', 'bool', false);
+    itParses('0', 'bool', false);
+
+    itFailsToParse('2', 'bool', /could not parse/i);
+    itFailsToParse('foo', 'bool', /could not parse/i);
+
+    itParses('0x123456', 'bytes', '0x123456');
+    itParses('0x12345678', 'bytes4', '0x12345678');
+    itParses('0x39af68cF04Abb0eF8f9d8191E1bD9c041E80e18e', 'address', '0x39af68cF04Abb0eF8f9d8191E1bD9c041E80e18e');
+    itParses('foobar', 'string', 'foobar');
+    itParses('1e18', 'string', '1e18');
+    itParses('true', 'string', 'true');
+    itParses('f', 'string', 'f');
+
+    itParses('1,2,3', 'uint256[]', ['1', '2', '3']);
+    itParses('1,-2,3e6', 'int256[]', ['1', '-2', '3000000']);
+    itParses('[1,2,3]', 'uint256[]', ['1', '2', '3']);
+    itParses('[[1,2,3]]', 'uint256[][]', [['1', '2', '3']]);
+    itParses('[[1,2],[3,4]]', 'uint256[][]', [['1', '2'], ['3', '4']]);
+    itParses('foo,bar,baz', 'string[]', ['foo', 'bar', 'baz']);
+    itParses('["foo","bar","baz"]', 'string[]', ['foo', 'bar', 'baz']);
+    itParses('[\'foo\',\'bar\',\'baz\']', 'string[]', ['foo', 'bar', 'baz']);
+    itParses('t,t,f', 'bool[]', [true, true, false]);
+    itParses('0x39af68cF04Abb0eF8f9d8191E1bD9c041E80e18e', 'address[]', ['0x39af68cF04Abb0eF8f9d8191E1bD9c041E80e18e']);
+    itParses('0x39af68cF04Abb0eF8f9d8191E1bD9c041E80e18e, 0x39af68cF04Abb0eF8f9d8191E1bD9c041E80e18e', 'address[]', ['0x39af68cF04Abb0eF8f9d8191E1bD9c041E80e18e', '0x39af68cF04Abb0eF8f9d8191E1bD9c041E80e18e']);
+
+    itParses('foo', 'unknown', 'foo');
+
+    context.skip('pending', function () {
+      itParses('[1,2,3]', 'uint256[][]', [['1', '2', '3']], true);
+      itParses('[1,2],[3,4]', 'uint256[][]', [['1', '2'], ['3', '4']], true); 
+    });
+  });
+
+  describe('parseArray', function () {
+    const itParses = (description, input, ...expected) => {
+      return it(description, () => {
+        parseArray(input).should.deep.eq(expected, `Parsing: '${input}'`);  
+      });
+    }
+
+    const itFailsToParse = (description, input, failure) => {
+      return it(description, () => {
+        expect(() => parseArray(input)).to.throw(failure);
+      });
+    }
+
+    itParses('a string', 'foo', 'foo');
+    itParses('a number', '20', '20');
+    itParses('many strings', 'foo,bar,baz', 'foo', 'bar', 'baz');
+    itParses('many strings with spaces', 'foo bar,baz baq', 'foo bar', 'baz baq');
+    itParses('many strings trimming spaces', ' foo bar , baz baq ', 'foo bar', 'baz baq');
+    itParses('a quoted string', '"foo"', 'foo');
+    itParses('many quoted strings', '"foo","bar"', 'foo', 'bar');
+    itParses('many quoted strings with commas', '"foo,bar", "baz,baq"', 'foo,bar', 'baz,baq');
+    itParses('a double quoted string with simple quotes', '"foo: \'bar\'"', 'foo: \'bar\'');
+    itParses('a simple quoted string', '\'foo\'', 'foo');
+    itParses('many simple quoted strings with commas', '\'foo,bar\',\'baz,baq\'', 'foo,bar', 'baz,baq');
+    itParses('an array', '[foo,bar]', ['foo', 'bar']);
+    itParses('many arrays', '[foo,bar],["baz","baq"]', ['foo', 'bar'], ['baz','baq']);
+    itParses('nested arrays', '[foo,[bar,baz],baq]', ['foo', ['bar', 'baz'], 'baq']);
+    
+    itParses('mixed stuff 1', '1 2,[foo,["bar,baz"],baq],3', '1 2', ['foo', ['bar,baz'], 'baq'], '3');
+    itParses('mixed stuff 2', '"0x20","0x30","foo,bar"', '0x20', '0x30', 'foo,bar');
+    itParses('mixed stuff 3', '[foo, [bar]]', ['foo', ['bar']]);
+    itParses('mixed stuff 4', 'foo, bar, [foo, "[bar]"]', 'foo', 'bar', ['foo', '[bar]']);
+
+    itFailsToParse('unterminated quoted string', '"foo', /unterminated/i);
+    itFailsToParse('unexpected quote', 'foo "bar"', /unexpected/i);
+    itFailsToParse('unclosed array', 'foo,[bar', /unclosed/i);
+    itFailsToParse('missing comma after quote', '"foo" "bar"', /expected a comma/i);
+    itFailsToParse('missing comma after array', '[foo] "bar"', /expected a comma/i);
+    itFailsToParse('missing comma before array', '[foo [bar]]', /unexpected/i);
   });
 
   describe('parseMethodParams', function() {

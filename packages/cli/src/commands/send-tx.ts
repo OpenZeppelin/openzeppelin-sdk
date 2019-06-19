@@ -7,8 +7,6 @@ import {
   promptIfNeeded,
   networksList,
   promptForNetwork,
-  argsList,
-  methodsList,
   proxiesList,
   proxyInfo,
   InquirerQuestions,
@@ -60,11 +58,7 @@ async function action(options: any): Promise<void> {
     network,
     options,
   );
-  const methodParams = await promptForMethodParams(
-    contractFullName,
-    getCommandProps,
-    options,
-  );
+  const methodParams = await promptForMethodParams(contractFullName, options);
   const args = pickBy({
     ...methodParams,
     proxyAddress: proxyReference,
@@ -84,7 +78,7 @@ async function promptForProxy(
 ): Promise<SendTxSelectionParams> {
   const { interactive } = options;
   const opts = { proxy: proxyAddress };
-  const props = getCommandProps({ network });
+  const props = getCommandProps(network);
   const { proxy: promptedProxy } = await promptIfNeeded(
     { opts, props },
     interactive,
@@ -93,27 +87,7 @@ async function promptForProxy(
   return promptedProxy;
 }
 
-function getCommandProps({
-  network,
-  contractFullName,
-  methodName,
-  methodArgs,
-}: SendTxPropsParams = {}): InquirerQuestions {
-  const methods = methodsList(contractFullName);
-  const args = argsList(contractFullName, methodName).reduce(
-    (accum, argName, index) => {
-      return {
-        ...accum,
-        [argName]: {
-          message: `${argName}:`,
-          type: 'input',
-          when: () => !methodArgs || !methodArgs[index],
-        },
-      };
-    },
-    {},
-  );
-
+function getCommandProps(network?: string): InquirerQuestions {
   return {
     ...networksList('network', 'list'),
     proxy: {
@@ -125,17 +99,6 @@ function getCommandProps({
           ? proxyInfo(parseContractReference(input), network)
           : input,
     },
-    methodName: {
-      type: 'list',
-      message: 'Select a function',
-      choices: methods,
-      normalize: input => {
-        if (typeof input !== 'object') {
-          return { name: input, selector: input };
-        } else return input;
-      },
-    },
-    ...args,
   };
 }
 

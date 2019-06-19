@@ -54,6 +54,10 @@ export default class ZWeb3 {
     return Web3.utils.isAddress(address);
   }
 
+  public static isHex(hex: string): boolean {
+    return Web3.utils.isHex(hex);
+  }
+
   public static async checkNetworkId(
     providedNetworkId?: string | number,
   ): Promise<void | never> {

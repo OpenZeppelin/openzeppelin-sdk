@@ -15,8 +15,8 @@ const register: (program: any) => any = program =>
       'version of the solc compiler to use (value is written to configuration file for future runs, defaults to most recent release that satisfies contract pragmas)',
     )
     .option(
-      '--optimizer',
-      'enables compiler optimizer (value is written to configuration file for future runs, defaults to false)',
+      '--optimizer [on|off]',
+      'enables compiler optimizer (value is written to configuration file for future runs, defaults to off)',
     )
     .option(
       '--optimizer-runs [runs]',
@@ -31,7 +31,7 @@ const register: (program: any) => any = program =>
 async function action(options: {
   evmVersion: string;
   solcVersion: string;
-  optimizer: boolean;
+  optimizer: string | boolean;
   optimizerRuns: string;
 }): Promise<void> {
   const {
@@ -41,13 +41,30 @@ async function action(options: {
     optimizerRuns,
   } = options;
 
+  // Handle optimizer option:
+  //- on --optimizer or --optimizer=on, enable it
+  //- on --optimizer=off disable it
+  //- if no --optimizer is set, use default from zos.json, or false
+  //- on any other --optimizer value, throw
+  let optimizerEnabled = undefined;
+  if (typeof optimizer === 'string') {
+    if (optimizer.toLowerCase() === 'on') optimizerEnabled = true;
+    else if (optimizer.toLowerCase() === 'off') optimizerEnabled = false;
+    else
+      throw new Error(
+        `Invalid value ${optimizer} for optimizer flag (valid values are 'on' or 'off')`,
+      );
+  } else if (typeof optimizer === 'boolean') {
+    optimizerEnabled = optimizer;
+  }
+
   const compilerOptions: ProjectCompilerOptions = {
     manager: 'zos',
     evmVersion,
     version,
     optimizer: {
-      enabled: !!optimizer,
-      runs: optimizerRuns,
+      enabled: optimizerEnabled,
+      runs: optimizerRuns && parseInt(optimizerRuns),
     },
   };
 

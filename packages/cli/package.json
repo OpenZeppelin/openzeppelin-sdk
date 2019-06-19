@@ -1,6 +1,6 @@
 {
   "name": "zos",
-  "version": "2.4.0-rc.1",
+  "version": "2.4.0-rc.3",
   "description": "Command-line interface for the ZeppelinOS smart contract platform",
   "main": "./lib/index.js",
   "private": false,
@@ -61,6 +61,7 @@
     "lodash.findindex": "^4.6.0",
     "lodash.flatmap": "^4.5.0",
     "lodash.flatten": "^4.4.0",
+    "lodash.flattendeep": "^4.4.0",
     "lodash.foreach": "^4.5.0",
     "lodash.frompairs": "^4.0.1",
     "lodash.groupby": "^4.6.0",
@@ -75,6 +76,7 @@
     "lodash.map": "^4.6.0",
     "lodash.max": "^4.0.1",
     "lodash.maxby": "^4.6.0",
+    "lodash.merge": "^4.6.1",
     "lodash.negate": "^3.0.2",
     "lodash.omit": "^4.5.0",
     "lodash.omitby": "^4.6.0",
@@ -95,7 +97,7 @@
     "spinnies": "^0.3.0",
     "truffle-config": "1.1.2",
     "web3": "1.0.0-beta.37",
-    "zos-lib": "^2.4.0-rc.1"
+    "zos-lib": "^2.4.0-rc.3"
   },
   "devDependencies": {
     "@types/lodash": "^4.14.119",

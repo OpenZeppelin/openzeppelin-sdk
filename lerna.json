@@ -7,7 +7,7 @@
     "tests/zepkit/test",
     "tests/zepkit/workdir"
   ],
-  "version": "2.4.0-rc.1",
+  "version": "2.4.0-rc.3",
   "command": {
     "publish": {
       "ignoreChanges": [

@@ -20,8 +20,21 @@ describe('compile command', function() {
       compiler.should.have.been.calledWithMatch({
         manager: 'zos',
         version: '0.5.0',
-        optimizer: { enabled: true, runs: '300' },
+        optimizer: { enabled: true, runs: 300 },
         evmVersion: 'petersburg',
+      });
+    },
+  );
+
+  itShouldParse(
+    'should call compile with optimizer disabled',
+    'compiler',
+    'zos compile --solc-version 0.5.0 --optimizer=off',
+    function(compiler) {
+      compiler.should.have.been.calledWithMatch({
+        manager: 'zos',
+        version: '0.5.0',
+        optimizer: { enabled: false },
       });
     },
   );

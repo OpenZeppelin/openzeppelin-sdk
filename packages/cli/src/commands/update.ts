@@ -10,13 +10,13 @@ import {
   promptIfNeeded,
   networksList,
   promptForNetwork,
-  argsList,
   methodsList,
   proxiesList,
   proxyInfo,
   InquirerQuestions,
 } from '../prompts/prompt';
 import promptForMethodParams from '../prompts/method-params';
+import { ProxyType } from '../scripts/interfaces';
 
 const name = 'upgrade';
 const signature = `${name} [alias-or-address]`;
@@ -91,12 +91,14 @@ async function action(proxyReference: string, options: any): Promise<void> {
     promptedProxyInfo.proxyReference,
   );
 
-  const additionalOpts = { askForMethodParams: rawInitMethod };
+  const additionalOpts = { 
+    askForMethodParams: rawInitMethod,
+    askForMethodParamsMessage: 'Do you want to call a function on the instance after upgrading it?'
+  };
   const initMethodParams =
     promptedProxyInfo.proxyReference && !promptedProxyInfo.all
       ? await promptForMethodParams(
           promptedProxyInfo.contractFullName,
-          getCommandProps,
           options,
           additionalOpts,
         )
@@ -135,25 +137,7 @@ function getCommandProps({
   proxyReference,
   network,
   all,
-  contractFullName,
-  methodName,
-  methodArgs,
 }: UpdatePropsParams = {}): InquirerQuestions {
-  const initMethodsList = methodsList(contractFullName);
-  const initMethodArgsList = argsList(contractFullName, methodName).reduce(
-    (accum, argName, index) => {
-      return {
-        ...accum,
-        [argName]: {
-          message: `${argName}:`,
-          type: 'input',
-          when: () => !methodArgs || !methodArgs[index],
-        },
-      };
-    },
-    {},
-  );
-
   return {
     ...networksList('network', 'list'),
     pickProxyBy: {
@@ -173,36 +157,22 @@ function getCommandProps({
           value: 'byAddress',
         },
       ],
-      when: () => !proxyReference && proxiesList('byAddress', network).length,
+      when: () =>
+        !proxyReference &&
+        proxiesList('byAddress', network, { kind: ProxyType.Upgradeable })
+          .length,
     },
     proxy: {
       message: 'Pick a contract to upgrade',
       type: 'list',
-      choices: ({ pickProxyBy }) => proxiesList(pickProxyBy, network),
+      choices: ({ pickProxyBy }) =>
+        proxiesList(pickProxyBy, network, { kind: ProxyType.Upgradeable }),
       when: ({ pickProxyBy }) => !all && pickProxyBy && pickProxyBy !== 'all',
       normalize: input =>
         typeof input !== 'object'
           ? proxyInfo(parseContractReference(input), network)
           : input,
     },
-    askForMethodParams: {
-      type: 'confirm',
-      message:
-        'Do you want to call a function on the instance after upgrade it?',
-      when: () => initMethodsList.length !== 0 && methodName !== 'initialize',
-    },
-    methodName: {
-      type: 'list',
-      message: 'Select which function',
-      choices: initMethodsList,
-      when: ({ askForMethodParams }) => askForMethodParams,
-      normalize: input => {
-        if (typeof input !== 'object') {
-          return { name: input, selector: input };
-        } else return input;
-      },
-    },
-    ...initMethodArgsList,
   };
 }
 

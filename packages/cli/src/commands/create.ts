@@ -15,7 +15,7 @@ import {
   networksList,
   contractsList,
   methodsList,
-  argsList,
+  InquirerQuestions,
 } from '../prompts/prompt';
 import promptForMethodParams from '../prompts/method-params';
 import { ProxyType } from '../scripts/interfaces';
@@ -102,10 +102,12 @@ async function action(contractFullName: string, options: any): Promise<void> {
     package: packageName,
   } = fromContractFullName(contractFullName);
 
-  const additionalOpts = { askForMethodParams: rawInitMethod };
+  const additionalOpts = { 
+    askForMethodParams: rawInitMethod,
+    askForMethodParamsMessage: 'Do you want to call a function on the instance after creating it?'
+  };
   const { methodName, methodArgs } = await promptForMethodParams(
     contractFullName,
-    getCommandProps,
     options,
     additionalOpts,
   );
@@ -144,26 +146,7 @@ async function promptForCreate(
   );
 }
 
-function getCommandProps({
-  contractFullName,
-  methodName,
-  methodArgs,
-}: PropsParams = {}) {
-  const initMethodsList = methodsList(contractFullName);
-  const initMethodArgsList = argsList(contractFullName, methodName).reduce(
-    (accum, argName, index) => {
-      return {
-        ...accum,
-        [argName]: {
-          message: `${argName}:`,
-          type: 'input',
-          when: () => !methodArgs || !methodArgs[index],
-        },
-      };
-    },
-    {},
-  );
-
+function getCommandProps(): InquirerQuestions {
   return {
     ...networksList('network', 'list'),
     ...contractsList(
@@ -171,25 +154,7 @@ function getCommandProps({
       'Pick a contract to instantiate',
       'list',
       'all',
-    ),
-    askForMethodParams: {
-      type: 'confirm',
-      message:
-        'Do you want to call a function on the instance after creating it?',
-      when: () => initMethodsList.length !== 0 && methodName !== 'initialize',
-    },
-    methodName: {
-      type: 'list',
-      message: 'Select which function',
-      choices: initMethodsList,
-      when: ({ askForMethodParams }) => askForMethodParams,
-      normalize: input => {
-        if (typeof input !== 'object') {
-          return { name: input, selector: input };
-        } else return input;
-      },
-    },
-    ...initMethodArgsList,
+    )
   };
 }
 
