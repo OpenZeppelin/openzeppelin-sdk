@@ -749,6 +749,14 @@ export default class NetworkController {
     signature?: string,
     kind?: ProxyType,
   ): Promise<Contract> {
+    if (kind === ProxyType.Minimal) {
+      Loggy.noSpin.warn(
+        __filename,
+        'createProxy',
+        'create-minimal-proxy',
+        'Warning: Creating minimal proxies is still not ready for production',
+      );
+    }
     try {
       await this._migrateZosversionIfNeeded();
       await this.fetchOrDeploy(this.currentVersion);
