@@ -220,7 +220,13 @@ export function methodsList(
       return { name: label, value: { name, selector } };
     })
     .sort((a, b) => {
-      if (b.name.startsWith('*')) return 1;
+      if (a.name.startsWith('*') && !b.name.startsWith('*')) return -1;
+      else if (
+        (a.name.startsWith('*') && b.name.startsWith('*')) ||
+        (!a.name.startsWith('*') && !b.name.startsWith('*'))
+      )
+        return 0;
+      else if (!a.name.startsWith('*') && b.name.startsWith('*')) return 1;
     });
 }
 
