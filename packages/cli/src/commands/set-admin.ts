@@ -14,6 +14,7 @@ import {
 } from '../prompts/prompt';
 import { hasToMigrateProject } from '../prompts/migrations';
 import ConfigManager from '../models/config/ConfigManager';
+import { ProxyType } from '../scripts/interfaces';
 
 const name = 'set-admin';
 const signature = `${name} [alias-or-address] [new-admin-address]`;
@@ -166,7 +167,8 @@ function getCommandProps({
     proxy: {
       message: 'Choose a proxy',
       type: 'list',
-      choices: ({ pickProxyBy }) => proxiesList(pickProxyBy, network),
+      choices: ({ pickProxyBy }) =>
+        proxiesList(pickProxyBy, network, { kind: ProxyType.Upgradeable }),
       when: ({ pickProxyBy }) => !all && pickProxyBy && pickProxyBy !== 'all',
       normalize: input =>
         typeof input !== 'object'
