@@ -69,7 +69,7 @@ export default class TransactionController {
     );
     Loggy.succeed(
       'transfer-funds',
-      `Funds successfully sent! Transaction hash: ${transactionHash}`,
+      `Funds sent. Transaction hash: ${transactionHash}`,
     );
   }
 

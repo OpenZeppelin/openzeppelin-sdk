@@ -80,7 +80,7 @@ export default class LocalController {
       __filename,
       'initZosPackageFile',
       'init-package-file',
-      `Project initialized. Write a new contract in the contracts folder and run 'zos create' to deploy it!`,
+      `Project initialized. Write a new contract in the contracts folder and run 'zos create' to deploy it.`,
     );
   }
 
@@ -215,7 +215,7 @@ export default class LocalController {
         __filename,
         'linkDependencies',
         'link-dependencies',
-        `${label} linked to the project. Run 'zos create' to deploy one of its contracts!`,
+        `${label} linked to the project. Run 'zos create' to deploy one of its contracts.`,
       );
     }
   }
