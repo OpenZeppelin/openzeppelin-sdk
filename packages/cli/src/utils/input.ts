@@ -102,7 +102,7 @@ export function parseArg(input: string | string[], type: string): any {
   // Bytes: same, just check they are a valid hex
   else if (type.startsWith('bytes') && requireInputString(input)) {
     if (!ZWeb3.isHex(input)) {
-      throw new Error(`${input} is not a valid address`);
+      throw new Error(`${input} is not a valid hexadecimal`);
     }
     return input;
   }
