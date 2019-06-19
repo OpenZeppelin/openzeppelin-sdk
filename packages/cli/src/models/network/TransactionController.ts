@@ -131,11 +131,11 @@ export default class TransactionController {
       parsedResult.length === 0
         ? Loggy.succeed(
             'call-contract-method',
-            `Method ${methodName} returned empty.`,
+            `Method '${methodName}' returned empty.`,
           )
         : Loggy.succeed(
             'call-contract-method',
-            `Method ${methodName} returned: ${parsedResult}`,
+            `Method '${methodName}' returned: ${parsedResult}`,
           );
 
       return result;
