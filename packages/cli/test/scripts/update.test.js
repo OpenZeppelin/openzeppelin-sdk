@@ -356,7 +356,7 @@ contract('update script', function(accounts) {
           network,
           txParams,
           networkFile: this.networkFile,
-        }).should.be.rejectedWith(/failed to update/);
+        }).should.be.rejectedWith(/failed to upgrade/);
 
         await assertProxyInfo(this.networkFile, 'Impl', 0, {
           version: version_2,
