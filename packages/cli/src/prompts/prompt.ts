@@ -1,3 +1,4 @@
+import sortBy from 'lodash.sortby';
 import uniqBy from 'lodash.uniqby';
 import flatten from 'lodash.flatten';
 import isEmpty from 'lodash.isempty';
@@ -209,9 +210,9 @@ export function methodsList(
   constant?: Mutability,
   packageFile?: ZosPackageFile,
 ): { [key: string]: any } {
-  return contractMethods(contractFullName, constant, packageFile).map(
+  const methods = contractMethods(contractFullName, constant, packageFile).map(
     ({ name, hasInitializer, inputs, selector }) => {
-      const initializable = hasInitializer ? `[Initializable] ` : '';
+      const initializable = hasInitializer ? '* ' : '';
       const args = inputs.map(
         ({ name: inputName, type }) => `${inputName}: ${type}`,
       );
@@ -220,6 +221,8 @@ export function methodsList(
       return { name: label, value: { name, selector } };
     },
   );
+
+  return sortBy(methods, ['name']);
 }
 
 // Returns an inquirer question with a list of arguments for a particular method
