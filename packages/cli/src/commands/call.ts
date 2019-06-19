@@ -15,10 +15,10 @@ import ConfigManager from '../models/config/ConfigManager';
 import { SendTxPropsParams, SendTxSelectionParams } from './interfaces';
 import promptForMethodParams from '../prompts/method-params';
 
-const name = 'call';
+const name = 'query';
 const signature: string = name;
 const description =
-  'call a method of the specified contract instance. Provide the [address], method to call and its arguments if needed';
+  'query a view or pure function of the specified contract instance. Provide the [address], method to call and its arguments if needed';
 
 const register: (program: any) => any = program =>
   program
