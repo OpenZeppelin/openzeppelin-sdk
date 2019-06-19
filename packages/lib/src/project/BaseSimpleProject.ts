@@ -161,10 +161,7 @@ export default abstract class BaseSimpleProject {
       initCallData,
       this.txParams,
     );
-    Loggy.succeed(
-      `action-proxy-${implementationAddress}`,
-      `Instance created at ${proxy.address}`,
-    );
+    Loggy.succeed(`create-proxy`, `Instance created at ${proxy.address}`);
     return contract.at(proxy.address);
   }
 
@@ -205,10 +202,7 @@ export default abstract class BaseSimpleProject {
       initCallData,
       signature,
     );
-    Loggy.succeed(
-      `action-proxy-${implementationAddress}`,
-      `Instance created at ${proxy.address}`,
-    );
+    Loggy.succeed(`create-proxy`, `Instance created at ${proxy.address}`);
     return contract.at(proxy.address);
   }
 
@@ -242,10 +236,7 @@ export default abstract class BaseSimpleProject {
       implementationAddress,
       initCallData,
     );
-    Loggy.succeed(
-      `action-proxy-${implementationAddress}`,
-      `Instance created at ${proxy.address}`,
-    );
+    Loggy.succeed(`create-proxy`, `Instance created at ${proxy.address}`);
     return contract.at(proxy.address);
   }
 
@@ -361,6 +352,7 @@ export default abstract class BaseSimpleProject {
       initArgs,
       implementationAddress,
       'Upgrading',
+      proxyAddress,
     );
     return {
       initCallData,
@@ -399,7 +391,16 @@ export default abstract class BaseSimpleProject {
     initArgs?: string[],
     implementationAddress?: string,
     actionLabel?: string,
+    proxyAddress?: string,
   ): string | null {
+    const logReference =
+      actionLabel === 'Creating'
+        ? 'create-proxy'
+        : `upgrade-proxy-${proxyAddress}`;
+    const logMessage =
+      actionLabel === 'Creating'
+        ? `Creating instance for contract at ${implementationAddress}`
+        : `Upgrading instance at ${proxyAddress}`;
     if (initMethodName) {
       const { method: initMethod, callData }: CalldataInfo = buildCallData(
         contract,
@@ -410,11 +411,8 @@ export default abstract class BaseSimpleProject {
         Loggy.spin(
           __filename,
           '_getAndLogInitCallData',
-          `action-proxy-${implementationAddress}`,
-          `${actionLabel} instance for ${implementationAddress} and calling ${callDescription(
-            initMethod,
-            initArgs,
-          )}`,
+          logReference,
+          `${logMessage} and calling ${callDescription(initMethod, initArgs)}`,
         );
       return callData;
     } else {
@@ -422,8 +420,8 @@ export default abstract class BaseSimpleProject {
         Loggy.spin(
           __filename,
           '_getAndLogInitCallData',
-          `action-proxy-${implementationAddress}`,
-          `${actionLabel} proxy to logic contract ${implementationAddress}`,
+          logReference,
+          logMessage,
         );
       return null;
     }

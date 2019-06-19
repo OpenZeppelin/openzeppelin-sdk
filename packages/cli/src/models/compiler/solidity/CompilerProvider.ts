@@ -102,7 +102,7 @@ export async function fetchCompiler(build: SolcBuild): Promise<SolcCompiler> {
   // Try local compiler and see if version matches
   const localVersion = await localCompilerVersion();
   if (localVersion && compilerVersionsMatch(localVersion, build.longVersion)) {
-    Loggy.noSpin(
+    Loggy.onVerbose(
       __filename,
       'fetchCompiler',
       'download-compiler',
@@ -205,7 +205,7 @@ async function downloadCompiler(
   localFile: string,
 ): Promise<void> {
   const { version, keccak256: expectedHash, path: versionPath } = build;
-  Loggy.spin(
+  Loggy.onVerbose(
     __filename,
     'downloadCompiler',
     'download-compiler',

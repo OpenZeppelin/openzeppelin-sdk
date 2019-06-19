@@ -1,4 +1,5 @@
 import pickBy from 'lodash.pickby';
+import { Loggy } from 'zos-lib';
 
 import link from './link';
 import add from './add';
@@ -56,7 +57,19 @@ const register: (program: any) => any = program =>
     .withNonInteractiveOption()
     .action(commandActions);
 
-async function commandActions(contractFullName: string, options: any) {
+async function commandActions(
+  contractFullName: string,
+  options: any,
+): Promise<void> {
+  if (options.minimal) {
+    Loggy.noSpin.warn(
+      __filename,
+      'action',
+      'create-minimal-proxy',
+      'Minimal proxy support is still experimental.',
+    );
+  }
+
   const { skipCompile } = options;
   if (!skipCompile) await compile();
 
@@ -82,14 +95,17 @@ async function commandActions(contractFullName: string, options: any) {
     process.exit(0);
 }
 
-async function action(contractFullName: string, options: any) {
+async function action(contractFullName: string, options: any): Promise<void> {
   const { force, network, txParams, init: rawInitMethod } = options;
   const {
     contract: contractAlias,
     package: packageName,
   } = fromContractFullName(contractFullName);
 
-  const additionalOpts = { askForMethodParams: rawInitMethod };
+  const additionalOpts = { 
+    askForMethodParams: rawInitMethod,
+    askForMethodParamsMessage: 'Do you want to call a function on the instance after creating it?'
+  };
   const { methodName, methodArgs } = await promptForMethodParams(
     contractFullName,
     options,
@@ -103,6 +119,7 @@ async function action(contractFullName: string, options: any) {
     methodArgs,
     force,
   });
+
   if (options.minimal) args.kind = ProxyType.Minimal;
 
   if (!(await hasToMigrateProject(network))) process.exit(0);
@@ -132,7 +149,12 @@ async function promptForCreate(
 function getCommandProps(): InquirerQuestions {
   return {
     ...networksList('network', 'list'),
-    ...contractsList('contractFullName', 'Choose a contract', 'list', 'all'),
+    ...contractsList(
+      'contractFullName',
+      'Pick a contract to instantiate',
+      'list',
+      'all',
+    )
   };
 }
 

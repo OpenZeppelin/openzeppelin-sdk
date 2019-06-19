@@ -96,7 +96,7 @@ export function networksList(
   type: string,
   message?: string,
 ): { [key: string]: any } {
-  message = message || 'Select a network from the network list';
+  message = message || 'Pick a network';
   const networks = ConfigManager.getNetworkNamesFromConfig();
 
   return inquirerQuestion(name, message, type, networks);
@@ -115,7 +115,7 @@ export function proxiesList(
   const groupedByPackage = groupBy(proxies, 'package');
   const list = Object.keys(groupedByPackage).map(packageName => {
     const separator =
-      packageName === packageFile.name ? 'Local contracts' : packageName;
+      packageName === packageFile.name ? 'Your contracts' : packageName;
     const packageList = groupedByPackage[packageName].map(
       ({ contract, address }) => {
         const name =
@@ -196,9 +196,7 @@ export function contractsList(
       },
     );
     if (contractsFromBuild.length > 0)
-      contractsFromBuild.unshift(
-        new inquirer.Separator(` = Local contracts =`),
-      );
+      contractsFromBuild.unshift(new inquirer.Separator(` = Your contracts =`));
 
     return inquirerQuestion(name, message, type, [
       ...contractsFromBuild,
@@ -213,17 +211,25 @@ export function methodsList(
   constant?: Mutability,
   packageFile?: ZosPackageFile,
 ): { [key: string]: any } {
-  return contractMethods(contractFullName, constant, packageFile).map(
-    ({ name, hasInitializer, inputs, selector }) => {
-      const initializable = hasInitializer ? `[Initializable] ` : '';
+  return contractMethods(contractFullName, constant, packageFile)
+    .map(({ name, hasInitializer, inputs, selector }) => {
+      const initializable = hasInitializer ? '* ' : '';
       const args = inputs.map(
         ({ name: inputName, type }) => `${inputName}: ${type}`,
       );
       const label = `${initializable}${name}(${args.join(', ')})`;
 
       return { name: label, value: { name, selector } };
-    },
-  );
+    })
+    .sort((a, b) => {
+      if (a.name.startsWith('*') && !b.name.startsWith('*')) return -1;
+      else if (
+        (a.name.startsWith('*') && b.name.startsWith('*')) ||
+        (!a.name.startsWith('*') && !b.name.startsWith('*'))
+      )
+        return 0;
+      else if (!a.name.startsWith('*') && b.name.startsWith('*')) return 1;
+    });
 }
 
 // Returns an inquirer question with a list of arguments for a particular method

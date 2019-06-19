@@ -167,6 +167,7 @@ class SolidityContractsCompiler {
     return this.contracts.reduce((sources, contract) => {
       Loggy.onVerbose(
         __filename,
+        '_buildSources',
         `compile-contract-file-${contract.fileName}`,
         `Compiling ${contract.fileName}`,
       );

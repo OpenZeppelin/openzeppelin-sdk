@@ -81,9 +81,9 @@ function getCommandProps(network?: string): InquirerQuestions {
   return {
     ...networksList('network', 'list'),
     proxy: {
-      message: 'Choose an instance',
+      message: 'Pick an instance',
       type: 'list',
-      choices: () => proxiesList('byAddress', network),
+      choices: proxiesList('byAddress', network),
       normalize: input =>
         typeof input !== 'object'
           ? proxyInfo(parseContractReference(input), network)

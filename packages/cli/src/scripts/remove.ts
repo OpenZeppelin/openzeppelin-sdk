@@ -12,6 +12,11 @@ export default function remove({
 
   const controller = new LocalController(packageFile);
   contracts.forEach(alias => controller.remove(alias));
-  Loggy.noSpin(__filename, 'remove', 'remove-contracts');
+  Loggy.noSpin(
+    __filename,
+    'remove',
+    'remove-contracts',
+    `All specified contracts have been removed from the project. To add them again, run 'zos add'.`,
+  );
   controller.writePackage();
 }

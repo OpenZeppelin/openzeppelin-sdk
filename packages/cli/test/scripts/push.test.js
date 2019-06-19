@@ -602,7 +602,7 @@ contract('push script', function([_, owner]) {
       it('should notify if there was nothing to do since last push', async function() {
         const logs = new CaptureLogs();
         await push({ network, txParams, networkFile: this.networkFile });
-        logs.text.should.match(/all logic contracts are up to date/i);
+        logs.text.should.match(/all contracts are up to date/i);
         logs.restore();
       });
     });
@@ -746,7 +746,7 @@ contract('push script', function([_, owner]) {
     it('should run push', async function() {
       const logs = new CaptureLogs();
       await push({ network, txParams, networkFile: this.networkFile });
-      logs.text.should.match(/all logic contracts are up to date/i);
+      logs.text.should.match(/all contracts are up to date/i);
       logs.restore();
     });
 

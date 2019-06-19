@@ -1,18 +1,18 @@
-'use strict'
-require('../setup')
+'use strict';
+require('../setup');
 
 import sinon from 'sinon';
 import path from 'path';
-import { FileSystem } from 'zos-lib'
+import { FileSystem } from 'zos-lib';
 
-import { cleanupfn } from '../helpers/cleanup'
-import ZosConfig from '../../src/models/config/ZosConfig'
+import { cleanupfn } from '../helpers/cleanup';
+import ZosConfig from '../../src/models/config/ZosConfig';
 
-contract('ZosConfig', function() {
+describe('ZosConfig', function() {
   const tmpDir = 'test/tmp';
   const contractsDir = `${tmpDir}/contracts`;
-  const zosConfigFile  = `${tmpDir}/networks.js`;
-  const zosConfigDir =  `${process.cwd()}/${tmpDir}`;
+  const zosConfigFile = `${tmpDir}/networks.js`;
+  const zosConfigDir = `${process.cwd()}/${tmpDir}`;
   const zosConfigPath = `${process.cwd()}/${zosConfigFile}`;
 
   beforeEach('create tmp dir', function() {
@@ -57,13 +57,13 @@ contract('ZosConfig', function() {
 
     describe('#exists', function() {
       context('when the networks.js file does not exist', function() {
-        it('returns false', function () {
+        it('returns false', function() {
           ZosConfig.exists(tmpDir).should.eq(false);
         });
       });
 
       context('when the networks.js file exists', function() {
-        it('returns true', function () {
+        it('returns true', function() {
           ZosConfig.initialize(tmpDir);
           ZosConfig.exists(tmpDir).should.eq(true);
         });
@@ -77,7 +77,9 @@ contract('ZosConfig', function() {
 
         config.should.have.all.keys('networks', 'compilers', 'buildDir');
         config.should.not.have.key('network');
-        config.buildDir.should.eq(path.resolve(process.cwd(), tmpDir, 'build/contracts'));
+        config.buildDir.should.eq(
+          path.resolve(process.cwd(), tmpDir, 'build/contracts'),
+        );
       });
     });
 
@@ -94,10 +96,16 @@ contract('ZosConfig', function() {
         it('setups the current selected network config', function() {
           ZosConfig.initialize(tmpDir);
           const config = ZosConfig.getConfig(zosConfigDir);
-          const networkConfig = ZosConfig.loadNetworkConfig('local', zosConfigDir);
+          const networkConfig = ZosConfig.loadNetworkConfig(
+            'development',
+            zosConfigDir,
+          );
 
-          networkConfig.provider.should.eq('http://localhost:9545');
-          networkConfig.artifactDefaults.should.include({ gas: 5000000, gasPrice: 5000000000 });
+          networkConfig.provider.should.eq('http://localhost:8545');
+          networkConfig.artifactDefaults.should.include({
+            gas: 5000000,
+            gasPrice: 5000000000,
+          });
           networkConfig.should.deep.include(config);
         });
 

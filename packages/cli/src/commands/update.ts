@@ -18,14 +18,15 @@ import {
 import promptForMethodParams from '../prompts/method-params';
 import { ProxyType } from '../scripts/interfaces';
 
-const name = 'update';
+const name = 'upgrade';
 const signature = `${name} [alias-or-address]`;
 const description =
-  'update contract to a new logic. Provide the [alias] or [package]/[alias] you added your contract with, its [address], or use --all flag to update all contracts in your project.';
+  'upgrade contract to a new logic. Provide the [alias] or [package]/[alias] you added your contract with, its [address], or use --all flag to upgrade all contracts in your project.';
 
 const register: (program: any) => any = program =>
   program
     .command(signature, undefined, { noHelp: true })
+    .alias('update')
     .usage('[alias-or-address] --network <network> [options]')
     .description(description)
     .option(
@@ -36,7 +37,7 @@ const register: (program: any) => any = program =>
       '--args <arg1, arg2, ...>',
       'provide initialization arguments for your contract if required',
     )
-    .option('--all', 'update all contracts in the application')
+    .option('--all', 'upgrade all contracts in the application')
     .option(
       '--force',
       'force creation even if contracts have local modifications',
@@ -90,7 +91,10 @@ async function action(proxyReference: string, options: any): Promise<void> {
     promptedProxyInfo.proxyReference,
   );
 
-  const additionalOpts = { askForMethodParams: rawInitMethod };
+  const additionalOpts = { 
+    askForMethodParams: rawInitMethod,
+    askForMethodParamsMessage: 'Do you want to call a function on the instance after upgrading it?'
+  };
   const initMethodParams =
     promptedProxyInfo.proxyReference && !promptedProxyInfo.all
       ? await promptForMethodParams(
@@ -159,7 +163,7 @@ function getCommandProps({
           .length,
     },
     proxy: {
-      message: 'Choose a proxy',
+      message: 'Pick a contract to upgrade',
       type: 'list',
       choices: ({ pickProxyBy }) =>
         proxiesList(pickProxyBy, network, { kind: ProxyType.Upgradeable }),

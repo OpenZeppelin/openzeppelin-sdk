@@ -14,6 +14,7 @@ require('chai')
   .use(require('chai-as-promised')) // TODO: Remove this dependency
   .use(require('chai-string'))
   .use(helpers.assertions)
+  .use(require('sinon-chai'))
   .should();
 
 function setArtifactDefaults() {

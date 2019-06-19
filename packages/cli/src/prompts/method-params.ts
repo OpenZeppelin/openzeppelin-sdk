@@ -112,7 +112,7 @@ function getCommandProps(
   return {
     askForMethodParams: {
       type: 'confirm',
-      message: 'Do you want to run a function after creating the instance?',
+      message: additionalOpts['askForMethodParamsMessage'],
       when: () =>
         methods.length !== 0 &&
         methodName !== 'initialize' &&
@@ -120,7 +120,7 @@ function getCommandProps(
     },
     methodName: {
       type: 'list',
-      message: 'Select a method',
+      message: 'Select which function',
       choices: methods,
       when: ({ askForMethodParams }) =>
         !additionalOpts.hasOwnProperty('askForMethodParams') ||

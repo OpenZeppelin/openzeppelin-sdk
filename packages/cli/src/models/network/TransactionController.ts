@@ -69,7 +69,7 @@ export default class TransactionController {
     );
     Loggy.succeed(
       'transfer-funds',
-      `Funds successfully sent! Transaction hash: ${transactionHash}`,
+      `Funds sent. Transaction hash: ${transactionHash}`,
     );
   }
 
@@ -131,11 +131,11 @@ export default class TransactionController {
       parsedResult.length === 0
         ? Loggy.succeed(
             'call-contract-method',
-            `Method ${methodName} returned empty.`,
+            `Method '${methodName}' returned empty.`,
           )
         : Loggy.succeed(
             'call-contract-method',
-            `Method ${methodName} returned ${parsedResult}`,
+            `Method '${methodName}' returned: ${parsedResult}`,
           );
 
       return result;

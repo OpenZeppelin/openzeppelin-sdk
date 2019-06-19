@@ -75,7 +75,7 @@ async function action(contractName: string, options: any): Promise<void> {
 
 function getCommandProps(optimizerEnabled: boolean): InquirerQuestions {
   return {
-    ...contractsList('contractName', 'Choose a contract', 'list', 'added'),
+    ...contractsList('contractName', 'Pick a contract', 'list', 'added'),
     ...networksList('network', 'list'),
     optimizer: {
       type: 'confirm',

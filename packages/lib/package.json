@@ -70,8 +70,8 @@
     "lodash.values": "^4.3.0",
     "lodash.without": "^4.4.0",
     "semver": "^5.5.1",
-    "spinnies": "^0.3.2",
-    "truffle-flattener": "^1.3.0",
+    "spinnies": "^0.4.2",
+    "truffle-flattener": "^1.4.0",
     "web3": "1.0.0-beta.37"
   },
   "devDependencies": {
@@ -96,6 +96,7 @@
     "mock-dependency": "file:test/mocks/mock-dependency",
     "prettier": "^1.17.1",
     "sinon": "^6.1.4",
+    "sinon-chai": "^3.3.0",
     "tmp": "^0.0.33",
     "truffle": "^5.0.5",
     "ts-node": "^7.0.1",

@@ -64,7 +64,7 @@ export default class KitController {
         __filename,
         'unpack',
         'unpack-succeeded',
-        `The kit is ready to use. Amazing! \n${config.message}`,
+        `The kit is ready to use. \n${config.message}`,
       );
     } catch (e) {
       // TODO: remove all files from directory on fail except .zos.lock

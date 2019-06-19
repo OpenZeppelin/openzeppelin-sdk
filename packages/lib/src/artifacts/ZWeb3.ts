@@ -234,7 +234,7 @@ export default class ZWeb3 {
         startTime,
       );
     throw new Error(
-      `Transaction ${tx} wasn't processed in ${timeout / 1000} seconds!`,
+      `Transaction ${tx} wasn't processed in ${timeout / 1000} seconds`,
     );
   }
 
