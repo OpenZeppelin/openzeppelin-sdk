@@ -27,16 +27,30 @@ import { tryFunc } from '../../../utils/try';
 
 export async function compileProject(
   options: ProjectCompilerOptions = {},
-): Promise<void> {
+): Promise<ProjectCompileResult> {
   const inputDir = options.inputDir || Contracts.getLocalContractsDir();
   const outputDir = options.outputDir || Contracts.getLocalBuildDir();
-  return new SolidityProjectCompiler(inputDir, outputDir, options).call();
+  const projectCompiler = new SolidityProjectCompiler(
+    inputDir,
+    outputDir,
+    options,
+  );
+  await projectCompiler.call();
+  return {
+    contracts: projectCompiler.contracts,
+    compilerVersion: projectCompiler.compilerVersion,
+  };
 }
 
 export interface ProjectCompilerOptions extends CompilerOptions {
   manager?: string;
   inputDir?: string;
   outputDir?: string;
+}
+
+export interface ProjectCompileResult {
+  compilerVersion: SolcBuild;
+  contracts: RawContract[];
 }
 
 class SolidityProjectCompiler {
