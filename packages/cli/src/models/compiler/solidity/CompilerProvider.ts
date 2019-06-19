@@ -1,7 +1,7 @@
 import fs from 'fs';
 import { mkdirp, readJson, writeJson } from 'fs-extra';
 import axios from 'axios';
-import solc from 'solc-wrapper';
+import solc, { CompilerOutput, Compiler, CompilerInput } from 'solc-wrapper';
 import semver from 'semver';
 import reverse from 'lodash.reverse';
 import uniq from 'lodash.uniq';
@@ -30,7 +30,7 @@ const SOLC_LIST_URL = 'https://solc-bin.ethereum.org/bin/list.json';
 
 export interface SolcCompiler {
   version(): string;
-  compile(input: string): Promise<solc.CompilerOutput>;
+  compile(input: CompilerInput): Promise<CompilerOutput>;
 }
 
 interface SolcList {
@@ -49,7 +49,7 @@ export interface SolcBuild {
 }
 
 class SolcjsCompiler implements SolcCompiler {
-  public compiler: solc.Compiler;
+  public compiler: Compiler;
 
   public constructor(compilerBinary: any) {
     this.compiler = solc(compilerBinary);
@@ -59,7 +59,7 @@ class SolcjsCompiler implements SolcCompiler {
     return this.compiler.version();
   }
 
-  public async compile(input: any): Promise<solc.CompilerOutput> {
+  public async compile(input: any): Promise<CompilerOutput> {
     return JSON.parse(this.compiler.compile(JSON.stringify(input), undefined));
   }
 }
@@ -75,7 +75,7 @@ class SolcBinCompiler implements SolcCompiler {
     return this._version;
   }
 
-  public async compile(input: any): Promise<solc.CompilerOutput> {
+  public async compile(input: any): Promise<CompilerOutput> {
     const output = child.execSync('solc --standard-json', {
       input: JSON.stringify(input),
       env: SOLC_BIN_ENV,

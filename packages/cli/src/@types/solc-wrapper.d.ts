@@ -1,8 +1,5 @@
-declare module 'solc' {
-  const version: Compiler['version'];
-  const loadRemoteVersion: Compiler['loadRemoteVersion'];
-  const compile: Compiler['compile'];
-  const setupMethods: Compiler['setupMethods'];
+declare module 'solc-wrapper' {
+  export default function(binary: any): Compiler;
 
   export interface Compiler {
     version(): string;
@@ -10,13 +7,13 @@ declare module 'solc' {
       version: string,
       cb: (error: any, compiler: Compiler) => void,
     );
-    compile(input: string, readCb: (dependency: any) => void);
+    compile(input: string, readCb: (dependency: any) => void): string;
     setupMethods(input: any): Compiler;
   }
 
   export interface CompilerOptimizerOptions {
     enabled: boolean;
-    runs?: string;
+    runs?: number;
   }
 
   export interface CompilerSettings {
