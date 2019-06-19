@@ -97,7 +97,7 @@ function getCommandProps(
               parseArg(input, arg.type);
               return true;
             } catch (err) {
-              return `Error parsing ${input} (${err.message}). Enter a valid ${
+              return `${err.message}. Enter a valid ${
                 arg.type
               } such as: ${getPlaceholder(arg.type)}.`;
             }
