@@ -16,6 +16,7 @@ import {
   InquirerQuestions,
 } from '../prompts/prompt';
 import promptForMethodParams from '../prompts/method-params';
+import { ProxyType } from '../scripts/interfaces';
 
 const name = 'update';
 const signature = `${name} [alias-or-address]`;
@@ -152,12 +153,16 @@ function getCommandProps({
           value: 'byAddress',
         },
       ],
-      when: () => !proxyReference && proxiesList('byAddress', network).length,
+      when: () =>
+        !proxyReference &&
+        proxiesList('byAddress', network, { kind: ProxyType.Upgradeable })
+          .length,
     },
     proxy: {
       message: 'Choose a proxy',
       type: 'list',
-      choices: ({ pickProxyBy }) => proxiesList(pickProxyBy, network),
+      choices: ({ pickProxyBy }) =>
+        proxiesList(pickProxyBy, network, { kind: ProxyType.Upgradeable }),
       when: ({ pickProxyBy }) => !all && pickProxyBy && pickProxyBy !== 'all',
       normalize: input =>
         typeof input !== 'object'

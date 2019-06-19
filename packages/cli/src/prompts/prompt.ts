@@ -16,6 +16,7 @@ import ContractManager from '../models/local/ContractManager';
 import Dependency from '../models/dependency/Dependency';
 import { fromContractFullName, toContractFullName } from '../utils/naming';
 import { ProxyType } from '../scripts/interfaces';
+import { ProxyInterface } from '../models/files/ZosNetworkFile';
 
 type ChoicesT = string[] | ({ [key: string]: any });
 
@@ -105,11 +106,12 @@ export function networksList(
 export function proxiesList(
   pickProxyBy: string,
   network: string,
+  filter?: ProxyInterface,
   packageFile?: ZosPackageFile,
 ): { [key: string]: any } {
   packageFile = packageFile || new ZosPackageFile();
   const networkFile = packageFile.networkFile(network);
-  const proxies = networkFile.getProxies({ kind: ProxyType.Upgradeable });
+  const proxies = networkFile.getProxies(filter || {});
   const groupedByPackage = groupBy(proxies, 'package');
   const list = Object.keys(groupedByPackage).map(packageName => {
     const separator =
