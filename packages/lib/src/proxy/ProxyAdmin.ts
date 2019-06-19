@@ -87,7 +87,7 @@ export default class ProxyAdmin {
           );
     Loggy.succeed(
       `upgrade-proxy-${proxyAddress}`,
-      `Instance upgraded at ${proxyAddress}. Transaction receipt received: ${
+      `Instance upgraded at ${proxyAddress}. Transaction receipt: ${
         receipt.transactionHash
       }`,
     );

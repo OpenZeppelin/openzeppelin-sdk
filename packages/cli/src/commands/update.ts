@@ -18,15 +18,15 @@ import {
 } from '../prompts/prompt';
 import promptForMethodParams from '../prompts/method-params';
 
-const name = 'update';
+const name = 'upgrade';
 const signature = `${name} [alias-or-address]`;
 const description =
-  'update contract to a new logic. Provide the [alias] or [package]/[alias] you added your contract with, its [address], or use --all flag to update all contracts in your project.';
+  'upgrade contract to a new logic. Provide the [alias] or [package]/[alias] you added your contract with, its [address], or use --all flag to upgrade all contracts in your project.';
 
 const register: (program: any) => any = program =>
   program
     .command(signature, undefined, { noHelp: true })
-    .alias('upgrade')
+    .alias('update')
     .usage('[alias-or-address] --network <network> [options]')
     .description(description)
     .option(
@@ -37,7 +37,7 @@ const register: (program: any) => any = program =>
       '--args <arg1, arg2, ...>',
       'provide initialization arguments for your contract if required',
     )
-    .option('--all', 'update all contracts in the application')
+    .option('--all', 'upgrade all contracts in the application')
     .option(
       '--force',
       'force creation even if contracts have local modifications',
@@ -176,7 +176,7 @@ function getCommandProps({
       when: () => !proxyReference && proxiesList('byAddress', network).length,
     },
     proxy: {
-      message: 'Pick a contract to update',
+      message: 'Pick a contract to upgrade',
       type: 'list',
       choices: ({ pickProxyBy }) => proxiesList(pickProxyBy, network),
       when: ({ pickProxyBy }) => !all && pickProxyBy && pickProxyBy !== 'all',
@@ -188,7 +188,7 @@ function getCommandProps({
     askForMethodParams: {
       type: 'confirm',
       message:
-        'Do you want to call a function on the instance after creating it?',
+        'Do you want to call a function on the instance after upgrade it?',
       when: () => initMethodsList.length !== 0 && methodName !== 'initialize',
     },
     methodName: {

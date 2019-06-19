@@ -117,7 +117,7 @@ function getCommandProps({
   return {
     ...networksList('network', 'list'),
     proxy: {
-      message: 'Choose an instance',
+      message: 'Pick an instance',
       type: 'list',
       choices: proxiesList('byAddress', network),
       normalize: input =>
@@ -127,7 +127,7 @@ function getCommandProps({
     },
     methodName: {
       type: 'list',
-      message: 'Select a method',
+      message: 'Select a function',
       choices: methods,
       normalize: input => {
         if (typeof input !== 'object') {

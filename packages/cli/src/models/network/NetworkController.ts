@@ -1083,7 +1083,7 @@ export default class NetworkController {
       error.message = `Proxy ${toContractFullName(
         proxy.package,
         proxy.contract,
-      )} at ${proxy.address} failed to update with error: ${error.message}`;
+      )} at ${proxy.address} failed to upgrade with error: ${error.message}`;
       throw error;
     }
   }
@@ -1228,7 +1228,7 @@ export default class NetworkController {
   ): Promise<boolean | void | never> {
     try {
       if (this.networkFile.dependencyHasMatchingCustomDeploy(depName)) {
-        Loggy.noSpin(
+        Loggy.onVerbose(
           __filename,
           'linkDependency',
           `link-dependency-${depName}`,

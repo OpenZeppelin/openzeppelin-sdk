@@ -68,7 +68,7 @@ class BaseAppProject extends BasePackageProject {
           __filename,
           'fetchOrDeploy',
           `publish-project`,
-          'Preparing everything to publish the project! Deploying new App contract',
+          'Preparing everything to publish the project. Deploying new App contract',
         );
         app = await App.deploy(txParams);
       }
@@ -99,7 +99,7 @@ class BaseAppProject extends BasePackageProject {
         directory = await thepackage.newVersion(version);
         const succeedText =
           !appAddress || !packageAddress
-            ? `Project structure deployed!`
+            ? `Project structure deployed`
             : `Version ${version} deployed`;
 
         Loggy.succeed(`publish-project`, succeedText);
@@ -496,7 +496,7 @@ class BaseAppProject extends BasePackageProject {
     const logMessage =
       actionLabel === 'Creating'
         ? `Creating instance for contract at ${implementationAddress}`
-        : `Updating instance at ${proxyAddress}`;
+        : `Upgrading instance at ${proxyAddress}`;
     if (initMethodName) {
       const { method: initMethod, callData }: CalldataInfo = buildCallData(
         contract,

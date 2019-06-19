@@ -209,17 +209,25 @@ export function methodsList(
   constant?: Mutability,
   packageFile?: ZosPackageFile,
 ): { [key: string]: any } {
-  return contractMethods(contractFullName, constant, packageFile).map(
-    ({ name, hasInitializer, inputs, selector }) => {
-      const initializable = hasInitializer ? `[Initializable] ` : '';
+  return contractMethods(contractFullName, constant, packageFile)
+    .map(({ name, hasInitializer, inputs, selector }) => {
+      const initializable = hasInitializer ? '* ' : '';
       const args = inputs.map(
         ({ name: inputName, type }) => `${inputName}: ${type}`,
       );
       const label = `${initializable}${name}(${args.join(', ')})`;
 
       return { name: label, value: { name, selector } };
-    },
-  );
+    })
+    .sort((a, b) => {
+      if (a.name.startsWith('*') && !b.name.startsWith('*')) return -1;
+      else if (
+        (a.name.startsWith('*') && b.name.startsWith('*')) ||
+        (!a.name.startsWith('*') && !b.name.startsWith('*'))
+      )
+        return 0;
+      else if (!a.name.startsWith('*') && b.name.startsWith('*')) return 1;
+    });
 }
 
 // Returns an inquirer question with a list of arguments for a particular method

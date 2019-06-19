@@ -199,7 +199,7 @@ contract('ZWeb3', function(accounts) {
             } catch (error) {
               error.message.should.be.eq(
                 `Transaction ${this.txHash} wasn't processed in ${this.timeout /
-                  1000} seconds!`,
+                  1000} seconds`,
               );
             }
           });
