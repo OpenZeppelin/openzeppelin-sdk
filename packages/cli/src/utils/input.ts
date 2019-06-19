@@ -1,6 +1,6 @@
 import BN from 'bignumber.js';
 import flattenDeep from 'lodash.flattendeep';
-import { encodeParams, Loggy } from 'zos-lib';
+import { encodeParams, Loggy, ZWeb3 } from 'zos-lib';
 
 // TODO: Deprecate in favor of a combination of parseArg and parseArray
 export function parseArgs(args: string): string[] | never {
@@ -91,22 +91,36 @@ export function parseArg(input: string | string[], type: string): any {
     else throw new Error(`Could not parse boolean value ${input}`);
   }
 
-  // Bytes, strings, addresses: untouched, as web3 handles most validations
-  else if (
-    type.startsWith('bytes') ||
-    type === 'string' ||
-    type === 'address'
-  ) {
+  // Address: just validate them
+  else if (type === 'address' && requireInputString(input)) {
+    if (!ZWeb3.isAddress(input)) {
+      throw new Error(`${input} is not a valid address`);
+    }
+    return input;
+  }
+
+  // Bytes: same, just check they are a valid hex
+  else if (type.startsWith('bytes') && requireInputString(input)) {
+    if (!ZWeb3.isHex(input)) {
+      throw new Error(`${input} is not a valid hexadecimal`);
+    }
+    return input;
+  }
+
+  // Strings: pass through
+  else if (type === 'string' && requireInputString(input)) {
     return input;
   }
 
   // Warn if we see a type we don't recognise, but return it as is
-  Loggy.noSpin.warn(
-    __filename,
-    'parseArg',
-    `Unknown argument ${type} (skipping input validation)`,
-  );
-  return input;
+  else {
+    Loggy.noSpin.warn(
+      __filename,
+      'parseArg',
+      `Unknown argument ${type} (skipping input validation)`,
+    );
+    return input;
+  }
 }
 
 export function stripBrackets(inputMaybeWithBrackets: string): string {
