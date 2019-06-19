@@ -4,14 +4,14 @@ require('../setup');
 import { Package } from 'zos-lib';
 import push from '../../src/scripts/push';
 import freeze from '../../src/scripts/freeze';
-import ZosPackageFile from '../../src/models/files/ZosPackageFile';
+import ProjectFile from '../../src/models/files/ProjectFile';
 
 contract('freeze script', function([_, owner]) {
   const network = 'test';
   const txParams = { from: owner };
 
   beforeEach('init package file', async function() {
-    this.packageFile = new ZosPackageFile(
+    this.packageFile = new ProjectFile(
       'test/mocks/packages/package-with-contracts.zos.json',
     );
   });

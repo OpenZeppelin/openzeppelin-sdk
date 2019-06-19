@@ -6,7 +6,7 @@ import {
   networksList,
   InquirerQuestions,
 } from '../prompts/prompt';
-import ZosPackageFile from '../models/files/ZosPackageFile';
+import ZosPackageFile from '../models/files/ProjectFile';
 
 const name = 'verify';
 const signature = `${name} [contract-alias]`;

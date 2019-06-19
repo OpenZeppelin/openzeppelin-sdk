@@ -2,7 +2,7 @@
 require('../setup');
 
 import link from '../../src/scripts/link';
-import ZosPackageFile from '../../src/models/files/ZosPackageFile';
+import ProjectFile from '../../src/models/files/ProjectFile';
 
 const should = require('chai').should();
 
@@ -13,7 +13,7 @@ contract('link script', function() {
   };
 
   beforeEach('setup', async function() {
-    this.packageFile = new ZosPackageFile(
+    this.packageFile = new ProjectFile(
       'test/mocks/packages/package-with-stdlib.zos.json',
     );
     this.shouldHaveDependency = shouldHaveDependency.bind(this);
@@ -94,10 +94,10 @@ contract('link script', function() {
     );
   });
 
-  it('should raise an error if requested version of dependency lacks zosversion identifier', async function() {
+  it('should raise an error if requested version of dependency lacks manifestversion identifier', async function() {
     await link({
       dependencies: ['mock-stdlib-unsupported@1.1.0'],
       packageFile: this.packageFile,
-    }).should.be.rejectedWith(/zos version identifier not found/i);
+    }).should.be.rejectedWith(/Manifest version identifier not found/i);
   });
 });

@@ -1,5 +1,5 @@
 {
-  "zosversion": "2",
+  "manifestversion": "2",
   "name": "example-dep-basic",
   "version": "0.1.0",
   "contracts": {

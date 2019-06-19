@@ -18,8 +18,8 @@ import {
   Contract,
 } from 'zos-lib';
 import { fromContractFullName, toContractFullName } from '../../utils/naming';
-import { ZOS_VERSION, checkVersion } from './ZosVersion';
-import ZosPackageFile from './ZosPackageFile';
+import { MANIFEST_VERSION, checkVersion } from './ManifestVersion';
+import ProjectFile from './ProjectFile';
 import { ProxyType } from '../../scripts/interfaces';
 
 export interface ContractInterface {
@@ -64,15 +64,15 @@ interface AddressWrapper {
   address?: string;
 }
 
-export default class ZosNetworkFile {
-  public packageFile: ZosPackageFile;
+export default class NetworkFile {
+  public packageFile: ProjectFile;
   public network: any;
   public fileName: string;
   public data: {
     contracts: { [contractAlias: string]: ContractInterface };
     solidityLibs: { [libAlias: string]: SolidityLibInterface };
     proxies: { [contractName: string]: ProxyInterface[] };
-    zosversion: string;
+    manifestversion: string;
     proxyAdmin: AddressWrapper;
     proxyFactory: AddressWrapper;
     app: AddressWrapper;
@@ -83,9 +83,9 @@ export default class ZosNetworkFile {
     dependencies: { [dependencyName: string]: DependencyInterface };
   };
 
-  public static getZosversion(network: string): string | null {
+  public static getManifestVersion(network: string): string | null {
     const file = fs.parseJsonIfExists(`zos.${network}.json`);
-    return file ? file.zosversion : null;
+    return file ? file.manifestversion : null;
   }
 
   public static getDependencies(
@@ -96,11 +96,7 @@ export default class ZosNetworkFile {
   }
 
   // TS-TODO: type for network parameter (and class member too).
-  public constructor(
-    packageFile: ZosPackageFile,
-    network: any,
-    fileName: string,
-  ) {
+  public constructor(packageFile: ProjectFile, network: any, fileName: string) {
     this.packageFile = packageFile;
     this.network = network;
     this.fileName = fileName;
@@ -109,7 +105,7 @@ export default class ZosNetworkFile {
       contracts: {},
       solidityLibs: {},
       proxies: {},
-      zosversion: ZOS_VERSION,
+      manifestversion: MANIFEST_VERSION,
     };
 
     try {
@@ -123,15 +119,15 @@ export default class ZosNetworkFile {
       }.`;
       throw e;
     }
-    checkVersion(this.data.zosversion, this.fileName);
+    checkVersion(this.data.manifestversion, this.fileName);
   }
 
-  public set zosversion(version: string) {
-    this.data.zosversion = version;
+  public set manifestversion(version: string) {
+    this.data.manifestversion = version;
   }
 
-  public get zosversion(): string {
-    return this.data.zosversion;
+  public get manifestversion(): string {
+    return this.data.manifestversion;
   }
 
   public set version(version: string) {

@@ -4,7 +4,7 @@ import sinon from 'sinon';
 
 import Truffle from '../../../src/models/config/TruffleConfig';
 import * as Compiler from '../../../src/models/compiler/Compiler';
-import ZosPackageFile from '../../../src/models/files/ZosPackageFile';
+import ProjectFile from '../../../src/models/files/ProjectFile';
 
 describe('Compiler', function () {
   beforeEach('setup', function () {
@@ -15,7 +15,7 @@ describe('Compiler', function () {
     );
     this.truffleCompile = sinon.stub(Compiler, 'compileWithTruffle');
     this.isTruffleConfig = sinon.stub(Truffle, 'isTruffleProject').returns(false);
-    this.packageFile = new ZosPackageFile('test/mocks/packages/package-empty-lite.zos.json')
+    this.packageFile = new ProjectFile('test/mocks/packages/package-empty-lite.zos.json')
     this.compile = (opts, force) => Compiler.compile(opts, this.packageFile, force);
   });
 

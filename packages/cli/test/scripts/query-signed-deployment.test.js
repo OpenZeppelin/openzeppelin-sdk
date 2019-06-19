@@ -3,7 +3,7 @@ require('../setup');
 
 import random from 'lodash.random';
 import querySignedDeployment from '../../src/scripts/query-signed-deployment';
-import ZosPackageFile from '../../src/models/files/ZosPackageFile';
+import ProjectFile from '../../src/models/files/ProjectFile';
 import { helpers } from 'zos-lib';
 import push from '../../src/scripts/push';
 import queryDeployment from '../../src/scripts/query-deployment';
@@ -98,7 +98,7 @@ contract('query-signed-deployment script', function([
 
   describe('on unpublished project', function() {
     beforeEach('setup', async function() {
-      this.packageFile = new ZosPackageFile(
+      this.packageFile = new ProjectFile(
         'test/mocks/packages/package-with-contracts.zos.json',
       );
       this.packageFile.version = version;
@@ -110,7 +110,7 @@ contract('query-signed-deployment script', function([
 
   describe('on published project', function() {
     beforeEach('setup', async function() {
-      this.packageFile = new ZosPackageFile(
+      this.packageFile = new ProjectFile(
         'test/mocks/packages/package-with-contracts.zos.json',
       );
       this.packageFile.version = version;

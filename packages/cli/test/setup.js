@@ -2,10 +2,10 @@ process.env.NODE_ENV = 'test';
 
 import { ZWeb3, Contracts, Loggy } from 'zos-lib';
 import Dependency from '../src/models/dependency/Dependency';
-import ZosPackageFile from '../src/models/files/ZosPackageFile';
-import ZosNetworkFile from '../src/models/files/ZosNetworkFile';
+import ProjectFile from '../src/models/files/ProjectFile';
+import NetworkFile from '../src/models/files/NetworkFile';
 
-useTestZosPackageFile();
+useTestProjectFile();
 doNotInstallStdlib();
 ZWeb3.initialize(web3.currentProvider);
 setArtifactDefaults();
@@ -18,9 +18,9 @@ require('chai')
   .use(require('sinon-chai'))
   .should();
 
-function useTestZosPackageFile() {
-  ZosPackageFile.prototype.write = () => {};
-  ZosNetworkFile.prototype.write = () => {};
+function useTestProjectFile() {
+  ProjectFile.prototype.write = () => {};
+  NetworkFile.prototype.write = () => {};
 }
 
 function doNotInstallStdlib() {

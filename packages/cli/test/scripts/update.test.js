@@ -13,7 +13,7 @@ import link from '../../src/scripts/link';
 import createProxy from '../../src/scripts/create';
 import update from '../../src/scripts/update';
 import setAdmin from '../../src/scripts/set-admin';
-import ZosPackageFile from '../../src/models/files/ZosPackageFile';
+import ProjectFile from '../../src/models/files/ProjectFile';
 import utils from 'web3-utils';
 import { ProxyType } from '../../src/scripts/interfaces';
 
@@ -673,7 +673,7 @@ contract('update script', function(accounts) {
 
   describe('on application contract', function() {
     beforeEach('setup package', async function() {
-      this.packageFile = new ZosPackageFile(
+      this.packageFile = new ProjectFile(
         'test/mocks/packages/package-empty.zos.json',
       );
       this.packageFile.version = version_1;
@@ -685,7 +685,7 @@ contract('update script', function(accounts) {
 
   describe('on application contract in unpublished mode', function() {
     beforeEach('setup package', async function() {
-      this.packageFile = new ZosPackageFile(
+      this.packageFile = new ProjectFile(
         'test/mocks/packages/package-empty.zos.json',
       );
       this.packageFile.publish = false;
@@ -698,7 +698,7 @@ contract('update script', function(accounts) {
 
   describe('on dependency contract', function() {
     beforeEach('setup package', async function() {
-      this.packageFile = new ZosPackageFile(
+      this.packageFile = new ProjectFile(
         'test/mocks/packages/package-with-undeployed-stdlib.zos.json',
       );
       this.packageFile.version = version_1;
@@ -709,7 +709,7 @@ contract('update script', function(accounts) {
 
   describe('on dependency contract in unpublished mode', function() {
     beforeEach('setup package', async function() {
-      this.packageFile = new ZosPackageFile(
+      this.packageFile = new ProjectFile(
         'test/mocks/packages/package-with-undeployed-stdlib.zos.json',
       );
       this.packageFile.publish = false;

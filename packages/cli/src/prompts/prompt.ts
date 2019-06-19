@@ -11,12 +11,12 @@ import {
 
 import Session from '../models/network/Session';
 import ConfigManager from '../models/config/ConfigManager';
-import ZosPackageFile from '../models/files/ZosPackageFile';
+import ProjectFile from '../models/files/ProjectFile';
 import ContractManager from '../models/local/ContractManager';
 import Dependency from '../models/dependency/Dependency';
 import { fromContractFullName, toContractFullName } from '../utils/naming';
 import { ProxyType } from '../scripts/interfaces';
-import { ProxyInterface } from '../models/files/ZosNetworkFile';
+import { ProxyInterface } from '../models/files/NetworkFile';
 
 type ChoicesT = string[] | ({ [key: string]: any });
 
@@ -107,21 +107,21 @@ export function proxiesList(
   pickProxyBy: string,
   network: string,
   filter?: ProxyInterface,
-  packageFile?: ZosPackageFile,
+  projectFile?: ProjectFile,
 ): { [key: string]: any } {
-  packageFile = packageFile || new ZosPackageFile();
-  const networkFile = packageFile.networkFile(network);
+  projectFile = projectFile || new ProjectFile();
+  const networkFile = projectFile.networkFile(network);
   const proxies = networkFile.getProxies(filter || {});
   const groupedByPackage = groupBy(proxies, 'package');
   const list = Object.keys(groupedByPackage).map(packageName => {
     const separator =
-      packageName === packageFile.name ? 'Your contracts' : packageName;
+      packageName === projectFile.name ? 'Your contracts' : packageName;
     const packageList = groupedByPackage[packageName].map(
       ({ contract, address }) => {
         const name =
           pickProxyBy === 'byAddress' ? `${contract} at ${address}` : contract;
         const contractFullName =
-          packageName === packageFile.name
+          packageName === projectFile.name
             ? `${contract}`
             : `${packageName}/${contract}`;
         const proxyReference =
@@ -154,7 +154,7 @@ export function contractsList(
   type: string,
   source?: string,
 ): { [key: string]: any } {
-  const localPackageFile = new ZosPackageFile();
+  const localPackageFile = new ProjectFile();
   const contractManager = new ContractManager(localPackageFile);
   const contractsFromBuild = contractManager.getContractNames();
   const contractsFromLocal = Object.keys(localPackageFile.contracts)
@@ -209,7 +209,7 @@ export function contractsList(
 export function methodsList(
   contractFullName: string,
   constant?: Mutability,
-  packageFile?: ZosPackageFile,
+  packageFile?: ProjectFile,
 ): { [key: string]: any } {
   return contractMethods(contractFullName, constant, packageFile)
     .map(({ name, hasInitializer, inputs, selector }) => {
@@ -237,10 +237,10 @@ export function argsList(
   contractFullName: string,
   methodIdentifier: string,
   constant?: Mutability,
-  packageFile?: ZosPackageFile,
+  packageFile?: ProjectFile,
 ): { name: string; type: string }[] {
   const method = contractMethods(contractFullName, constant, packageFile).find(
-    ({ name, selector }) =>
+    ({ name, selector }): any =>
       selector === methodIdentifier || name === methodIdentifier,
   );
   return method ? method.inputs : [];
@@ -249,7 +249,7 @@ export function argsList(
 function contractMethods(
   contractFullName: string,
   constant: Mutability = Mutability.NotConstant,
-  packageFile: ZosPackageFile,
+  packageFile: ProjectFile,
 ): any[] {
   const {
     contract: contractAlias,
@@ -264,7 +264,7 @@ function contractMethods(
 
 export function proxyInfo(contractInfo: any, network: string): any {
   const { contractAlias, proxyAddress, packageName } = contractInfo;
-  const packageFile = new ZosPackageFile();
+  const packageFile = new ProjectFile();
   const networkFile = packageFile.networkFile(network);
   const proxyParams = {
     contract: contractAlias,

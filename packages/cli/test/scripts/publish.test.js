@@ -7,7 +7,7 @@ import publish from '../../src/scripts/publish';
 import push from '../../src/scripts/push';
 import create from '../../src/scripts/create';
 import setAdmin from '../../src/scripts/set-admin';
-import ZosPackageFile from '../../src/models/files/ZosPackageFile';
+import ProjectFile from '../../src/models/files/ProjectFile';
 import utils from 'web3-utils';
 
 const should = require('chai').should();
@@ -24,7 +24,7 @@ contract('publish script', function(accounts) {
   const dependencyName = 'mock-stdlib-undeployed';
 
   beforeEach('pushing package', async function() {
-    const packageFile = new ZosPackageFile(
+    const packageFile = new ProjectFile(
       'test/mocks/packages/package-with-contracts-and-stdlib.zos.json',
     );
     packageFile.publish = false;

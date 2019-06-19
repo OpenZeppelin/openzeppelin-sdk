@@ -12,8 +12,8 @@ import {
 import { ERC20_PARTIAL_ABI } from '../../utils/constants';
 import { allPromisesOrError } from '../../utils/async';
 import ContractManager from '../local/ContractManager';
-import ZosPackageFile from '../files/ZosPackageFile';
-import ZosNetworkFile from '../files/ZosNetworkFile';
+import ProjectFile from '../files/ProjectFile';
+import NetworkFile from '../files/NetworkFile';
 import { describeEvents } from '../../utils/events';
 
 const { buildCallData, callDescription } = ABI;
@@ -26,17 +26,17 @@ interface ERC20TokenInfo {
 
 export default class TransactionController {
   public txParams: TxParams;
-  public packageFile: ZosPackageFile;
-  public networkFile: ZosNetworkFile;
+  public packageFile: ProjectFile;
+  public networkFile: NetworkFile;
 
   public constructor(
     txParams?: TxParams,
     network?: string,
-    networkFile?: ZosNetworkFile,
+    networkFile?: NetworkFile,
   ) {
     if (txParams) this.txParams = txParams;
     if (!networkFile) {
-      this.packageFile = new ZosPackageFile();
+      this.packageFile = new ProjectFile();
       this.networkFile = this.packageFile.networkFile(network);
     } else {
       this.networkFile = networkFile;

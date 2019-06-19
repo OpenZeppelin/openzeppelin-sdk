@@ -10,8 +10,8 @@ import {
 } from 'zos-lib';
 
 import NetworkController from './NetworkController';
-import ZosPackageFile from '../files/ZosPackageFile';
-import ZosNetworkFile from '../files/ZosNetworkFile';
+import ProjectFile from '../files/ProjectFile';
+import NetworkFile from '../files/NetworkFile';
 
 interface PartialDeploy {
   app?: App;
@@ -30,8 +30,8 @@ type CreateProjectFn = (addresses: ExistingAddresses) => Promise<AppProject>;
 
 class BaseProjectDeployer {
   protected controller: NetworkController;
-  protected packageFile: ZosPackageFile;
-  protected networkFile: ZosNetworkFile;
+  protected packageFile: ProjectFile;
+  protected networkFile: NetworkFile;
   protected txParams: TxParams;
   protected requestedVersion: string;
 

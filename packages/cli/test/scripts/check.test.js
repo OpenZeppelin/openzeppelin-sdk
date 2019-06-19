@@ -3,13 +3,13 @@ require('../setup');
 
 import CaptureLogs from '../helpers/captureLogs';
 import check from '../../src/scripts/check';
-import ZosPackageFile from '../../src/models/files/ZosPackageFile';
+import ProjectFile from '../../src/models/files/ProjectFile';
 
 const expect = require('chai').expect;
 
 contract('check script', function() {
   beforeEach('setup', async function() {
-    this.packageFile = new ZosPackageFile(
+    this.packageFile = new ProjectFile(
       'test/mocks/packages/package-empty.zos.json',
     );
   });

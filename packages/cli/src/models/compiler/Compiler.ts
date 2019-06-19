@@ -7,7 +7,7 @@ import {
   ProjectCompileResult,
 } from './solidity/SolidityProjectCompiler';
 import findUp from 'find-up';
-import ZosPackageFile from '../files/ZosPackageFile';
+import ProjectFile from '../files/ProjectFile';
 import { promisify } from 'util';
 import merge from 'lodash.merge';
 
@@ -16,7 +16,7 @@ const execFile = promisify(callbackExecFile);
 
 export async function compile(
   compilerOptions?: ProjectCompilerOptions,
-  packageFile = new ZosPackageFile(),
+  packageFile = new ProjectFile(),
   force: boolean = false,
 ): Promise<void> {
   if (!force && state.alreadyCompiled) return;

@@ -1,5 +1,5 @@
 import LocalController from '../models/local/LocalController';
-import ZosPackageFile from '../models/files/ZosPackageFile';
+import ProjectFile from '../models/files/ProjectFile';
 import { InitParams } from './interfaces';
 
 export default async function init({
@@ -9,7 +9,7 @@ export default async function init({
   dependencies = [],
   installDependencies = false,
   force = false,
-  packageFile = new ZosPackageFile(),
+  packageFile = new ProjectFile(),
 }: InitParams): Promise<void | never> {
   const controller = new LocalController(packageFile, true);
   controller.init(name, version, force, publish);

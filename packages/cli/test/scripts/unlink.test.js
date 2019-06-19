@@ -2,11 +2,11 @@
 require('../setup');
 
 import unlink from '../../src/scripts/unlink';
-import ZosPackageFile from '../../src/models/files/ZosPackageFile';
+import ProjectFile from '../../src/models/files/ProjectFile';
 
 contract('unlink script', function() {
   beforeEach(async function() {
-    this.packageFile = new ZosPackageFile(
+    this.packageFile = new ProjectFile(
       'test/mocks/packages/package-with-multiple-stdlibs.zos.json',
     );
   });

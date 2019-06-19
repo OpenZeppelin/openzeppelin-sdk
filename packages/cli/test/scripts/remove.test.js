@@ -2,7 +2,7 @@
 require('../setup');
 
 import remove from '../../src/scripts/remove';
-import ZosPackageFile from '../../src/models/files/ZosPackageFile';
+import ProjectFile from '../../src/models/files/ProjectFile';
 import CaptureLogs from '../helpers/captureLogs';
 
 const should = require('chai').should();
@@ -12,7 +12,7 @@ contract('remove script', function() {
   const anotherContractAlias = 'WithLibraryImpl';
 
   beforeEach('setup', async function() {
-    this.packageFile = new ZosPackageFile(
+    this.packageFile = new ProjectFile(
       'test/mocks/packages/package-with-contracts.zos.json',
     );
   });

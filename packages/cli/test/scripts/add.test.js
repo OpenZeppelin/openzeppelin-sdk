@@ -1,12 +1,10 @@
 'use strict';
 require('../setup');
 
-import { Logger } from 'zos-lib';
-import CaptureLogs from '../helpers/captureLogs';
 import sinon from 'sinon';
 import add from '../../src/scripts/add';
 import addAll from '../../src/scripts/add-all';
-import ZosPackageFile from '../../src/models/files/ZosPackageFile';
+import ProjectFile from '../../src/models/files/ProjectFile';
 
 contract('add script', function() {
   const contractName = 'ImplV1';
@@ -14,7 +12,7 @@ contract('add script', function() {
   const contractsData = [{ name: contractName, alias: contractAlias }];
 
   beforeEach('setup', async function() {
-    this.packageFile = new ZosPackageFile(
+    this.packageFile = new ProjectFile(
       'test/mocks/packages/package-with-stdlib.zos.json',
     );
     sinon.stub(this.packageFile, 'root').get(() => process.cwd());

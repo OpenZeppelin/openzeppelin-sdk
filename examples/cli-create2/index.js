@@ -47,7 +47,7 @@ async function useSignedCreate2(initValue, networkConfig) {
   const initData = Sample.methods.initialize(initValue).encodeABI();
 
   // We will use the project's proxy admin as upgradeability admin of this instance
-  const networkFile = new files.ZosPackageFile().networkFile(networkConfig.network);
+  const networkFile = new files.ProjectFile().networkFile(networkConfig.network);
   const admin = networkFile.proxyAdminAddress;
 
   // And will use the current implementation for Sample as logic contract

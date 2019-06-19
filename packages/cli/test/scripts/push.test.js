@@ -16,7 +16,7 @@ import push from '../../src/scripts/push';
 import freeze from '../../src/scripts/freeze';
 import add from '../../src/scripts/add';
 import bumpVersion from '../../src/scripts/bump';
-import ZosPackageFile from '../../src/models/files/ZosPackageFile';
+import ProjectFile from '../../src/models/files/ProjectFile';
 import remove from '../../src/scripts/remove';
 import Dependency from '../../src/models/dependency/Dependency';
 import CaptureLogs from '../helpers/captureLogs';
@@ -429,7 +429,7 @@ contract('push script', function([_, owner]) {
       const newVersion = '1.2.0';
 
       beforeEach('deploying new dependency version', async function() {
-        const mockStdlibPackage = new ZosPackageFile(
+        const mockStdlibPackage = new ProjectFile(
           'test/mocks/mock-stdlib/zos.json',
         );
         mockStdlibPackage.version = newVersion;
@@ -554,7 +554,7 @@ contract('push script', function([_, owner]) {
 
   describe('an empty app', function() {
     beforeEach('setting package-empty', async function() {
-      const packageFile = new ZosPackageFile(
+      const packageFile = new ProjectFile(
         'test/mocks/packages/package-empty.zos.json',
       );
       this.networkFile = packageFile.networkFile(network);
@@ -574,7 +574,7 @@ contract('push script', function([_, owner]) {
 
   describe('an app with contracts', function() {
     beforeEach('setting package-with-contracts', async function() {
-      const packageFile = new ZosPackageFile(
+      const packageFile = new ProjectFile(
         'test/mocks/packages/package-with-contracts.zos.json',
       );
       this.networkFile = packageFile.networkFile(network);
@@ -583,7 +583,7 @@ contract('push script', function([_, owner]) {
     describe('on push', function() {
       beforeEach('pushing', async function() {
         await push({ network, txParams, networkFile: this.networkFile });
-        const newPackageFile = new ZosPackageFile(
+        const newPackageFile = new ProjectFile(
           'test/mocks/packages/package-with-contracts-v2.zos.json',
         );
         this.newNetworkFile = newPackageFile.networkFile(network);
@@ -612,7 +612,7 @@ contract('push script', function([_, owner]) {
 
   describe('an app with invalid contracts', function() {
     beforeEach('pushing package-with-invalid-contracts', async function() {
-      const packageFile = new ZosPackageFile(
+      const packageFile = new ProjectFile(
         'test/mocks/packages/package-with-invalid-contracts.zos.json',
       );
       this.networkFile = packageFile.networkFile(network);
@@ -634,7 +634,7 @@ contract('push script', function([_, owner]) {
 
     describe('when using a valid dependency', function() {
       beforeEach('pushing package-stdlib', async function() {
-        const packageFile = new ZosPackageFile(
+        const packageFile = new ProjectFile(
           'test/mocks/packages/package-with-stdlib.zos.json',
         );
         this.networkFile = packageFile.networkFile(network);
@@ -649,7 +649,7 @@ contract('push script', function([_, owner]) {
 
     describe('when using a dependency with a version range', function() {
       beforeEach('pushing package-stdlib-range', async function() {
-        const packageFile = new ZosPackageFile(
+        const packageFile = new ProjectFile(
           'test/mocks/packages/package-with-stdlib-range.zos.json',
         );
         this.networkFile = packageFile.networkFile(network);
@@ -666,7 +666,7 @@ contract('push script', function([_, owner]) {
   describe('an app with invalid dependency', function() {
     describe('when using an invalid dependency', function() {
       beforeEach('building network file', async function() {
-        const packageFile = new ZosPackageFile(
+        const packageFile = new ProjectFile(
           'test/mocks/packages/package-with-invalid-stdlib.zos.json',
         );
         this.networkFile = packageFile.networkFile(network);
@@ -685,7 +685,7 @@ contract('push script', function([_, owner]) {
 
     describe('when using an undeployed dependency', function() {
       beforeEach('building network file', async function() {
-        const packageFile = new ZosPackageFile(
+        const packageFile = new ProjectFile(
           'test/mocks/packages/package-with-undeployed-stdlib.zos.json',
         );
         this.networkFile = packageFile.networkFile(network);
@@ -704,7 +704,7 @@ contract('push script', function([_, owner]) {
 
     describe('when using an unpublished dependency', function() {
       beforeEach('building network file', async function() {
-        const packageFile = new ZosPackageFile(
+        const packageFile = new ProjectFile(
           'test/mocks/packages/package-with-unpublished-stdlib.zos.json',
         );
         this.networkFile = packageFile.networkFile(network);
@@ -737,7 +737,7 @@ contract('push script', function([_, owner]) {
 
   describe('an empty unpublished project', function() {
     beforeEach('pushing package-empty-lite', async function() {
-      const packageFile = new ZosPackageFile(
+      const packageFile = new ProjectFile(
         'test/mocks/packages/package-empty-lite.zos.json',
       );
       this.networkFile = packageFile.networkFile(network);
@@ -755,7 +755,7 @@ contract('push script', function([_, owner]) {
 
   describe('an unpublished project with contracts', function() {
     beforeEach('setting package-with-contracts', async function() {
-      const packageFile = new ZosPackageFile(
+      const packageFile = new ProjectFile(
         'test/mocks/packages/package-with-contracts.zos.json',
       );
       packageFile.publish = false;
@@ -791,7 +791,7 @@ contract('push script', function([_, owner]) {
     deployingDependency();
 
     beforeEach('pushing package-with-stdlib', async function() {
-      const packageFile = new ZosPackageFile(
+      const packageFile = new ProjectFile(
         'test/mocks/packages/package-with-stdlib.zos.json',
       );
       packageFile.publish = false;
@@ -808,12 +808,12 @@ contract('push script', function([_, owner]) {
     deployingDependency();
 
     beforeEach('setting package-with-stdlib with two libs', async function() {
-      const packageFile = new ZosPackageFile(
+      const projectFile = new ProjectFile(
         'test/mocks/packages/package-with-stdlib.zos.json',
       );
-      packageFile.publish = false;
-      packageFile.addContract('ImplV1Clash', 'ImplV1Clash');
-      this.networkFile = packageFile.networkFile(network);
+      projectFile.publish = false;
+      projectFile.addContract('ImplV1Clash', 'ImplV1Clash');
+      this.networkFile = projectFile.networkFile(network);
     });
 
     it('fails nicely if there are duplicated contract names', async function() {

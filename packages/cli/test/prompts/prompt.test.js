@@ -10,7 +10,7 @@ import { ContractMethodMutability as Mutability } from 'zos-lib';
 
 import ContractManager from '../../src/models/local/ContractManager';
 import ConfigManager from '../../src/models/config/ConfigManager';
-import ZosPackageFile from '../../src/models/files/ZosPackageFile';
+import ProjectFile from '../../src/models/files/ProjectFile';
 import {
   promptIfNeeded,
   contractsList,
@@ -144,10 +144,10 @@ describe('prompt', function() {
           .stub(ContractManager.prototype, 'getContractNames')
           .returns(['Foo', 'Bar', 'Buz']);
         sinon
-          .stub(ZosPackageFile.prototype, 'dependencies')
+          .stub(ProjectFile.prototype, 'dependencies')
           .get(() => ({ 'mock-stdlib': '1.1.0' }));
         sinon
-          .stub(ZosPackageFile.prototype, 'contracts')
+          .stub(ProjectFile.prototype, 'contracts')
           .get(() => ({ Foo: 'Foo', BarAlias: 'Bar' }));
       });
 
@@ -244,7 +244,7 @@ describe('prompt', function() {
 
     describe('#methodsList', function() {
       beforeEach('initialize packageFile', function() {
-        this.packageFile = new ZosPackageFile(
+        this.packageFile = new ProjectFile(
           'test/mocks/mock-stdlib-2/zos.json',
         );
       });
@@ -306,7 +306,7 @@ describe('prompt', function() {
 
     describe('#argsList', function() {
       beforeEach('initialize packageFile', function() {
-        this.packageFile = new ZosPackageFile(
+        this.packageFile = new ProjectFile(
           'test/mocks/mock-stdlib-2/zos.json',
         );
       });

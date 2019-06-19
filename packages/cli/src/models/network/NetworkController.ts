@@ -39,7 +39,7 @@ import {
   AppProxyMigrator,
   MinimalProxy,
 } from 'zos-lib';
-import { isMigratableZosversion } from '../files/ZosVersion';
+import { isMigratableManifestVersion } from '../files/ManifestVersion';
 import { allPromisesOrError } from '../../utils/async';
 import { toContractFullName } from '../../utils/naming';
 import {
@@ -51,9 +51,9 @@ import ValidationLogger from '../../interface/ValidationLogger';
 import Verifier from '../Verifier';
 import LocalController from '../local/LocalController';
 import ContractManager from '../local/ContractManager';
-import ZosNetworkFile, { ProxyInterface } from '../files/ZosNetworkFile';
-import ZosPackageFile from '../files/ZosPackageFile';
-import { ZOS_VERSION } from '../files/ZosVersion';
+import NetworkFile, { ProxyInterface } from '../files/NetworkFile';
+import ProjectFile from '../files/ProjectFile';
+import { MANIFEST_VERSION } from '../files/ManifestVersion';
 import { ProxyType } from '../../scripts/interfaces';
 
 type Project = ProxyAdminProject | AppProject;
@@ -63,17 +63,17 @@ export default class NetworkController {
   public localController: LocalController;
   public txParams: TxParams;
   public network: string;
-  public networkFile: ZosNetworkFile;
+  public networkFile: NetworkFile;
   public project: Project;
   private contractManager: ContractManager;
 
   public constructor(
     network: string,
     txParams: TxParams,
-    networkFile?: ZosNetworkFile,
+    networkFile?: NetworkFile,
   ) {
     if (!networkFile) {
-      const packageFile = new ZosPackageFile();
+      const packageFile = new ProjectFile();
       this.networkFile = packageFile.networkFile(network);
     } else {
       this.networkFile = networkFile;
@@ -85,8 +85,8 @@ export default class NetworkController {
   }
 
   // NetworkController
-  public get packageFile(): ZosPackageFile {
-    return this.localController.packageFile;
+  public get packageFile(): ProjectFile {
+    return this.localController.projectFile;
   }
 
   // NetworkController
@@ -99,8 +99,8 @@ export default class NetworkController {
     return this.networkFile.version;
   }
 
-  public get currentZosversion(): string {
-    return this.networkFile.zosversion;
+  public get currentManifestVersion(): string {
+    return this.networkFile.manifestversion;
   }
 
   // NetworkController
@@ -701,21 +701,22 @@ export default class NetworkController {
         __filename,
         '_migrate',
         'migrate-version-cli',
-        `Successfully migrated to zosversion ${ZOS_VERSION}`,
+        `Successfully migrated to manifest version ${MANIFEST_VERSION}`,
       );
     } else {
       Loggy.noSpin(
         __filename,
         '_migrate',
         'migrate-version-cli',
-        `No proxies were found. Updating zosversion to ${ZOS_VERSION}`,
+        `No proxies were found. Updating manifest version to ${MANIFEST_VERSION}`,
       );
     }
   }
 
-  private async _migrateZosversionIfNeeded(): Promise<void> {
-    if (isMigratableZosversion(this.currentZosversion)) await this._migrate();
-    this._updateZosVersionsIfNeeded(ZOS_VERSION);
+  private async migrateManifestVersionIfNeeded(): Promise<void> {
+    if (isMigratableManifestVersion(this.currentManifestVersion))
+      await this._migrate();
+    this.updateManifestVersionsIfNeeded(MANIFEST_VERSION);
   }
 
   // DeployerController
@@ -729,7 +730,7 @@ export default class NetworkController {
       return;
     }
 
-    await this._migrateZosversionIfNeeded();
+    await this.migrateManifestVersionIfNeeded();
     const proxyAdminProject = (await this.fetchOrDeploy(
       this.currentVersion,
     )) as ProxyAdminProject;
@@ -750,7 +751,7 @@ export default class NetworkController {
     kind?: ProxyType,
   ): Promise<Contract> {
     try {
-      await this._migrateZosversionIfNeeded();
+      await this.migrateManifestVersionIfNeeded();
       await this.fetchOrDeploy(this.currentVersion);
       if (!packageName) packageName = this.packageFile.name;
       const contract = this.contractManager.getContractClass(
@@ -844,7 +845,7 @@ export default class NetworkController {
     salt: string,
     sender?: string,
   ): Promise<string> {
-    await this._migrateZosversionIfNeeded();
+    await this.migrateManifestVersionIfNeeded();
     await this.fetchOrDeploy(this.currentVersion);
     const address = await this.project.getProxyDeploymentAddress(salt, sender);
     this._tryRegisterProxyFactory();
@@ -861,7 +862,7 @@ export default class NetworkController {
     initArgs?: string[],
     admin?: string,
   ): Promise<{ address: string; signer: string }> {
-    await this._migrateZosversionIfNeeded();
+    await this.migrateManifestVersionIfNeeded();
     await this.fetchOrDeploy(this.currentVersion);
     if (!packageName) packageName = this.packageFile.name;
     const contract = this.contractManager.getContractClass(
@@ -972,7 +973,7 @@ export default class NetworkController {
     proxyAddress: string,
     newAdmin: string,
   ): Promise<ProxyInterface[]> {
-    await this._migrateZosversionIfNeeded();
+    await this.migrateManifestVersionIfNeeded();
     const proxies = this._fetchOwnedProxies(
       packageName,
       contractAlias,
@@ -986,7 +987,7 @@ export default class NetworkController {
 
   // Proxy model
   public async setProxyAdminOwner(newAdminOwner: string): Promise<void> {
-    await this._migrateZosversionIfNeeded();
+    await this.migrateManifestVersionIfNeeded();
     await this.fetchOrDeploy(this.currentVersion);
     await this.project.transferAdminOwnership(newAdminOwner);
   }
@@ -1017,7 +1018,7 @@ export default class NetworkController {
     initMethod: string,
     initArgs: string[],
   ): Promise<ProxyInterface[]> {
-    await this._migrateZosversionIfNeeded();
+    await this.migrateManifestVersionIfNeeded();
     const proxies = this._fetchOwnedProxies(
       packageName,
       contractAlias,
@@ -1301,10 +1302,10 @@ export default class NetworkController {
     }
   }
 
-  private _updateZosVersionsIfNeeded(version) {
-    if (this.networkFile.zosversion !== ZOS_VERSION)
-      this.networkFile.zosversion = version;
-    if (this.packageFile.zosversion !== ZOS_VERSION)
-      this.packageFile.zosversion = version;
+  private updateManifestVersionsIfNeeded(version): void {
+    if (this.networkFile.manifestversion !== MANIFEST_VERSION)
+      this.networkFile.manifestversion = version;
+    if (this.packageFile.manifestversion !== MANIFEST_VERSION)
+      this.packageFile.manifestversion = version;
   }
 }

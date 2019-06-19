@@ -4,7 +4,7 @@ require('../setup');
 
 import { Contracts } from 'zos-lib';
 import TestHelper from '../../src/models/TestHelper';
-import ZosPackageFile from '../../src/models/files/ZosPackageFile';
+import ProjectFile from '../../src/models/files/ProjectFile';
 
 const ImplV1 = Contracts.getFromLocal('ImplV1');
 const WithLibraryImpl = Contracts.getFromLocal('WithLibraryImplV1');
@@ -16,7 +16,7 @@ contract('TestHelper', function([_, owner]) {
 
   describe('for app project', function() {
     beforeEach(async function() {
-      this.packageFile = new ZosPackageFile(
+      this.packageFile = new ProjectFile(
         'test/mocks/packages/package-with-contracts-and-multiple-stdlibs.zos.json',
       );
       this.networkFile = this.packageFile.networkFile('test');
@@ -74,7 +74,7 @@ contract('TestHelper', function([_, owner]) {
 
   describe('for an unpublished project', function() {
     beforeEach(async function() {
-      this.packageFile = new ZosPackageFile(
+      this.packageFile = new ProjectFile(
         'test/mocks/packages/package-with-contracts.zos.json',
       );
       this.packageFile.publish = false;

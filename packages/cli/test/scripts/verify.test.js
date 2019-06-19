@@ -8,7 +8,7 @@ import CaptureLogs from '../helpers/captureLogs';
 
 import verify from '../../src/scripts/verify';
 import push from '../../src/scripts/push';
-import ZosPackageFile from '../../src/models/files/ZosPackageFile';
+import ProjectFile from '../../src/models/files/ProjectFile';
 
 contract('verify script', function() {
   const contractAlias = 'Impl';
@@ -26,7 +26,7 @@ contract('verify script', function() {
   describe('validations', function() {
     describe('with invalid package or network files', function() {
       it('throws error if zOS project is not yet initialized', async function() {
-        const packageFile = new ZosPackageFile('non-existent-package.zos.json');
+        const packageFile = new ProjectFile('non-existent-package.zos.json');
         const networkFile = packageFile.networkFile(network);
         await assertVerify(
           contractAlias,
@@ -36,7 +36,7 @@ contract('verify script', function() {
       });
 
       it('throws error if contract not yet added', async function() {
-        const packageFile = new ZosPackageFile(
+        const packageFile = new ProjectFile(
           'test/mocks/packages/package-with-contracts.zos.json',
         );
         const networkFile = packageFile.networkFile(network);
@@ -51,7 +51,7 @@ contract('verify script', function() {
 
     describe('with valid package and network files', async function() {
       beforeEach(function() {
-        this.packageFile = new ZosPackageFile(
+        this.packageFile = new ProjectFile(
           'test/mocks/packages/package-with-contracts.zos.json',
         );
         this.networkFile = this.packageFile.networkFile(network);
@@ -83,7 +83,7 @@ contract('verify script', function() {
     const network = 'mainnet';
 
     beforeEach(async function() {
-      this.packageFile = new ZosPackageFile(
+      this.packageFile = new ProjectFile(
         'test/mocks/packages/package-with-contracts.zos.json',
       );
       this.networkFile = this.packageFile.networkFile(network);

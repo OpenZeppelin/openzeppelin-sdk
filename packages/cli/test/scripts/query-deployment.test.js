@@ -3,7 +3,7 @@ require('../setup');
 
 import random from 'lodash.random';
 import queryDeployment from '../../src/scripts/query-deployment';
-import ZosPackageFile from '../../src/models/files/ZosPackageFile';
+import ProjectFile from '../../src/models/files/ProjectFile';
 
 const should = require('chai').should();
 
@@ -109,7 +109,7 @@ contract('query-deployment script', function([_, owner, another]) {
 
   describe('on unpublished project', function() {
     beforeEach('setup', async function() {
-      this.packageFile = new ZosPackageFile(
+      this.packageFile = new ProjectFile(
         'test/mocks/packages/package-empty.zos.json',
       );
       this.packageFile.version = version;
@@ -121,7 +121,7 @@ contract('query-deployment script', function([_, owner, another]) {
 
   describe('on published project', function() {
     beforeEach('setup', async function() {
-      this.packageFile = new ZosPackageFile(
+      this.packageFile = new ProjectFile(
         'test/mocks/packages/package-empty.zos.json',
       );
       this.packageFile.version = version;

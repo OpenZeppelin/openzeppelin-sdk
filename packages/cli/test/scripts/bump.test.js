@@ -4,14 +4,14 @@ require('../setup');
 import add from '../../src/scripts/add';
 import bump from '../../src/scripts/bump';
 import link from '../../src/scripts/link';
-import ZosPackageFile from '../../src/models/files/ZosPackageFile';
+import ProjectFile from '../../src/models/files/ProjectFile';
 
 contract('bump script', function() {
   const newVersion = '0.2.0';
 
   describe('on app', function() {
     beforeEach(function() {
-      this.packageFile = new ZosPackageFile(
+      this.packageFile = new ProjectFile(
         'test/mocks/packages/package-empty.zos.json',
       );
     });

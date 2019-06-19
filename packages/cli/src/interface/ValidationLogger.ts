@@ -9,7 +9,7 @@ import {
   Operation,
   Contract,
 } from 'zos-lib';
-import { ContractInterface } from '../models/files/ZosNetworkFile';
+import { ContractInterface } from '../models/files/NetworkFile';
 
 const DOCS_HOME = 'https://docs.zeppelinos.org/docs';
 const DANGEROUS_OPERATIONS_LINK = `${DOCS_HOME}/writing_contracts.html#potentially-unsafe-operations`;

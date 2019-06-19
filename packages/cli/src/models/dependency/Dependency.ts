@@ -16,8 +16,8 @@ import {
   getSolidityLibNames,
   Loggy,
 } from 'zos-lib';
-import ZosPackageFile from '../files/ZosPackageFile';
-import ZosNetworkFile from '../files/ZosNetworkFile';
+import ProjectFile from '../files/ProjectFile';
+import NetworkFile from '../files/NetworkFile';
 
 export default class Dependency {
   public name: string;
@@ -25,8 +25,8 @@ export default class Dependency {
   public nameAndVersion: string;
   public requirement: string | semver.Range;
 
-  private _networkFiles: { [network: string]: ZosNetworkFile };
-  private _packageFile: ZosPackageFile;
+  private _networkFiles: { [network: string]: NetworkFile };
+  private _packageFile: ProjectFile;
 
   public static fromNameWithVersion(nameAndVersion: string): Dependency {
     const [name, version] = nameAndVersion.split('@');
@@ -58,9 +58,9 @@ export default class Dependency {
   }
 
   public static hasDependenciesForDeploy(network: string): boolean {
-    const dependencies = ZosPackageFile.getLinkedDependencies() || [];
+    const dependencies = ProjectFile.getLinkedDependencies() || [];
     const networkDependencies =
-      ZosNetworkFile.getDependencies(`zos.${network}.json`) || {};
+      NetworkFile.getDependencies(`zos.${network}.json`) || {};
     const hasDependenciesForDeploy = dependencies.find(depNameAndVersion => {
       const [name, version] = depNameAndVersion.split('@');
       const networkFilePath = `node_modules/${name}/zos.${network}.json`;
@@ -149,7 +149,7 @@ export default class Dependency {
     return project;
   }
 
-  public getPackageFile(): ZosPackageFile | never {
+  public getPackageFile(): ProjectFile | never {
     if (!this._packageFile) {
       const filename = `node_modules/${this.name}/zos.json`;
       if (!fs.exists(filename)) {
@@ -159,12 +159,12 @@ export default class Dependency {
           }'. Make sure it is provided by the npm package.`,
         );
       }
-      this._packageFile = new ZosPackageFile(filename);
+      this._packageFile = new ProjectFile(filename);
     }
     return this._packageFile;
   }
 
-  public getNetworkFile(network: string): ZosNetworkFile | never {
+  public getNetworkFile(network: string): NetworkFile | never {
     if (!this._networkFiles[network]) {
       const filename = this._getNetworkFilePath(network);
       if (!fs.exists(filename)) {
@@ -175,7 +175,7 @@ export default class Dependency {
         );
       }
 
-      this._networkFiles[network] = new ZosNetworkFile(
+      this._networkFiles[network] = new NetworkFile(
         this.getPackageFile(),
         network,
         filename,

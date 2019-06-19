@@ -6,7 +6,7 @@ import { FileSystem as fs } from 'zos-lib'
 import { cleanup } from '../helpers/cleanup'
 
 import init from '../../src/scripts/init'
-import ZosPackageFile from '../../src/models/files/ZosPackageFile'
+import ProjectFile from '../../src/models/files/ProjectFile'
 import ConfigManager from '../../src/models/config/ConfigManager'
 
 contract('init script', function() {
@@ -25,7 +25,7 @@ contract('init script', function() {
   });
 
   beforeEach('create package file', async function() {
-    this.packageFile = new ZosPackageFile(`${tmpDir}/zos.json`)
+    this.packageFile = new ProjectFile(`${tmpDir}/zos.json`)
   });
 
   it('should default to unpublished apps', async function() {

@@ -18,7 +18,7 @@ import push from '../../src/scripts/push';
 import create from '../../src/scripts/create';
 import queryDeployment from '../../src/scripts/query-deployment';
 import link from '../../src/scripts/link';
-import ZosPackageFile from '../../src/models/files/ZosPackageFile';
+import ProjectFile from '../../src/models/files/ProjectFile';
 import { ProxyType } from '../../src/scripts/interfaces';
 
 const should = require('chai').should();
@@ -766,7 +766,7 @@ contract('create script', function([_, owner, otherAdmin]) {
 
   describe('on unpublished project', function() {
     beforeEach('setup', async function() {
-      this.packageFile = new ZosPackageFile(
+      this.packageFile = new ProjectFile(
         'test/mocks/packages/package-empty.zos.json',
       );
       this.packageFile.version = version;
@@ -778,7 +778,7 @@ contract('create script', function([_, owner, otherAdmin]) {
 
   describe('on published project', function() {
     beforeEach('setup', async function() {
-      this.packageFile = new ZosPackageFile(
+      this.packageFile = new ProjectFile(
         'test/mocks/packages/package-empty.zos.json',
       );
       this.packageFile.version = version;

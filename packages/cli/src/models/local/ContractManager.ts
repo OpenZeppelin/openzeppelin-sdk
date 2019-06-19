@@ -1,13 +1,13 @@
 import { Contracts, Contract, FileSystem } from 'zos-lib';
 import Dependency from '../dependency/Dependency';
-import ZosPackageFile from '../files/ZosPackageFile';
+import ProjectFile from '../files/ProjectFile';
 import ConfigManager from '../config/ConfigManager';
 import path from 'path';
 
 export default class ContractManager {
-  public packageFile: ZosPackageFile;
+  public packageFile: ProjectFile;
 
-  public constructor(packageFile: ZosPackageFile = new ZosPackageFile()) {
+  public constructor(packageFile: ProjectFile = new ProjectFile()) {
     this.packageFile = packageFile;
   }
 
