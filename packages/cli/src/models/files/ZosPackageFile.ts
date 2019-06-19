@@ -17,7 +17,7 @@ interface ConfigFileCompilerOptions {
     evmVersion: string;
     optimizer: {
       enabled: boolean;
-      runs: string;
+      runs?: string;
     };
   };
 }
@@ -151,7 +151,10 @@ export default class ZosPackageFile {
       outputDir,
       evmVersion,
       version,
-      optimizer,
+      optimizer: {
+        enabled: optimizer && optimizer.enabled,
+        runs: optimizer && parseInt(optimizer.runs),
+      },
     };
   }
 
@@ -171,7 +174,10 @@ export default class ZosPackageFile {
       contractsDir: inputDir,
       compilerSettings: {
         evmVersion,
-        optimizer,
+        optimizer: {
+          enabled: optimizer && optimizer.enabled,
+          runs: optimizer && optimizer.runs && optimizer.runs.toString(),
+        },
       },
     };
 

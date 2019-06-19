@@ -1,6 +1,14 @@
 import flatMap from 'lodash.flatmap';
 import { Loggy } from 'zos-lib';
-import solc from 'solc-wrapper';
+import solc, {
+  CompilerOptimizerOptions,
+  CompilerSettings,
+  Compiler,
+  CompilerOutput,
+  CompilerInput,
+  CompilerBytecodeOutput,
+  CompilerInfo,
+} from 'solc-wrapper';
 import {
   getCompiler as getSolc,
   resolveCompilerVersion as resolveSolc,
@@ -22,7 +30,7 @@ export interface CompiledContract {
   bytecode: string;
   deployedBytecode: string;
   deployedSourceMap: string;
-  compiler: solc.CompilerInfo;
+  compiler: CompilerInfo;
 }
 
 export interface RawContract {
@@ -33,7 +41,7 @@ export interface RawContract {
 }
 
 export interface CompilerVersionOptions {
-  optimizer?: solc.CompilerOptimizerOptions;
+  optimizer?: CompilerOptimizerOptions;
   evmVersion?: string;
 }
 
@@ -87,13 +95,13 @@ export async function compileWith(
 class SolidityContractsCompiler {
   public errors: any[];
   public contracts: RawContract[];
-  public optimizer: solc.CompilerOptimizerOptions;
+  public optimizer: CompilerOptimizerOptions;
   public evmVersion: string;
-  public settings: solc.CompilerSettings;
+  public settings: CompilerSettings;
   public compiler: SolcCompiler;
 
   public constructor(
-    compiler: solc.Compiler,
+    compiler: SolcCompiler,
     contracts: RawContract[],
     { optimizer, evmVersion }: CompilerVersionOptions = {},
   ) {
@@ -115,7 +123,7 @@ class SolidityContractsCompiler {
     return this._buildContractsSchemas(solcOutput);
   }
 
-  private async _compile(): Promise<solc.CompilerOutput | never> {
+  private async _compile(): Promise<CompilerOutput | never> {
     const input = this._buildCompilerInput();
     const output = await this.compiler.compile(input);
 
@@ -147,7 +155,7 @@ class SolidityContractsCompiler {
     return output;
   }
 
-  private _buildCompilerInput(): solc.CompilerInput {
+  private _buildCompilerInput(): CompilerInput {
     return {
       language: 'Solidity',
       settings: this.settings,
@@ -168,7 +176,7 @@ class SolidityContractsCompiler {
   }
 
   private _buildContractsSchemas(
-    solcOutput: solc.CompilerOutput,
+    solcOutput: CompilerOutput,
   ): CompiledContract[] {
     const paths = Object.keys(solcOutput.contracts);
     return flatMap(paths, (fileName: string) => {
@@ -180,7 +188,7 @@ class SolidityContractsCompiler {
   }
 
   private _buildContractSchema(
-    solcOutput: solc.CompilerOutput,
+    solcOutput: CompilerOutput,
     fileName: string,
     contractName: string,
   ): CompiledContract {
@@ -213,9 +221,7 @@ class SolidityContractsCompiler {
     };
   }
 
-  private _solveLibraryLinks(
-    outputBytecode: solc.CompilerBytecodeOutput,
-  ): string {
+  private _solveLibraryLinks(outputBytecode: CompilerBytecodeOutput): string {
     const librariesPaths = Object.keys(outputBytecode.linkReferences);
     if (librariesPaths.length === 0) return outputBytecode.object;
     const links = librariesPaths.map(

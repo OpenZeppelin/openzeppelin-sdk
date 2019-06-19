@@ -47,7 +47,7 @@ async function action(options: {
     version,
     optimizer: {
       enabled: !!optimizer,
-      runs: optimizerRuns,
+      runs: optimizerRuns && parseInt(optimizerRuns),
     },
   };
 

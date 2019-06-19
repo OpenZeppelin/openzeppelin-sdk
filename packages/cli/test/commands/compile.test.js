@@ -20,7 +20,7 @@ describe('compile command', function() {
       compiler.should.have.been.calledWithMatch({
         manager: 'zos',
         version: '0.5.0',
-        optimizer: { enabled: true, runs: '300' },
+        optimizer: { enabled: true, runs: 300 },
         evmVersion: 'petersburg',
       });
     },
