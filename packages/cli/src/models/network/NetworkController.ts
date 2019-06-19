@@ -1228,7 +1228,7 @@ export default class NetworkController {
   ): Promise<boolean | void | never> {
     try {
       if (this.networkFile.dependencyHasMatchingCustomDeploy(depName)) {
-        Loggy.noSpin(
+        Loggy.onVerbose(
           __filename,
           'linkDependency',
           `link-dependency-${depName}`,
