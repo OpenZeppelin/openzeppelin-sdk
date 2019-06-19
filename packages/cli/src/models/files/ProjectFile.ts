@@ -27,7 +27,7 @@ export default class ProjectFile {
   public data: {
     name: string;
     version: string;
-    manifestversion: string;
+    manifestVersion: string;
     dependencies: { [name: string]: string };
     contracts: { [alias: string]: string };
     publish: boolean;
@@ -47,7 +47,7 @@ export default class ProjectFile {
     this.fileName = fileName;
     try {
       this.data = fs.parseJsonIfExists(this.fileName) || {
-        manifestversion: MANIFEST_VERSION,
+        manifestVersion: MANIFEST_VERSION,
       };
       // if we failed to read and parse zos.json
     } catch (e) {
@@ -58,7 +58,7 @@ export default class ProjectFile {
       }.`;
       throw e;
     }
-    checkVersion(this.data.manifestversion, this.fileName);
+    checkVersion(this.data.manifestVersion, this.fileName);
     if (!this.data.contracts) this.data.contracts = {};
     if (!this.data.dependencies) this.data.dependencies = {};
   }
@@ -71,8 +71,8 @@ export default class ProjectFile {
     return path.dirname(this.fileName);
   }
 
-  public set manifestversion(version: string) {
-    this.data.manifestversion = version;
+  public set manifestVersion(version: string) {
+    this.data.manifestVersion = version;
   }
 
   public set publish(publish: boolean) {

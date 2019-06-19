@@ -94,7 +94,15 @@ contract('link script', function() {
     );
   });
 
+<<<<<<< ae0d974ad8d68dfaa1ec24a058d6487fd756b700
+<<<<<<< 70b1a54816d33fd4d81dbaa70f91dc6b30b4c87a
+  it('should raise an error if requested version of dependency lacks manifestVersion identifier', async function() {
+=======
   it('should raise an error if requested version of dependency lacks manifestversion identifier', async function() {
+>>>>>>> Rename ZosPackageFile, ZosNetworkFile, ZosVersion, and zosversion
+=======
+  it('should raise an error if requested version of dependency lacks manifestVersion identifier', async function() {
+>>>>>>> Support manifestVersion
     await link({
       dependencies: ['mock-stdlib-unsupported@1.1.0'],
       packageFile: this.packageFile,

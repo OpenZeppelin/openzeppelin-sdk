@@ -229,7 +229,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Modes `--fetch` and `--fix` from the `status` command now work properly with lib projects ([#314](https://github.com/zeppelinos/zos-cli/issues/314))
 
 ### Changed
-- Swapped `TestApp` initializer parameters, it now accepts `txParams` first and an optional `ZosNetworkFile` object as a last argument.
+- Swapped `TestApp` initializer parameters, it now accepts `txParams` first and an optional `NetworkFile` object as a last argument.
 
 ## v1.1.0 - 2018-06-28
 
@@ -238,7 +238,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - New `remove` command to remove a logic contract from a project
 - Flag `--fetch` in `status` command retrieve app information directly from the network instead of from the local network file
 - Flag `--fix` in `status` command to update the local network file with information retrieved from the network
-- Models `ZosPackageFile` and `ZosNetworkFile` to manage zos JSON files 
+- Models `ProjectFile` and `NetworkFile` to manage zos JSON files 
 - Write proxy address in contract build files on creation
 - Add optional transaction `timeout` parameter to all commands
 - Allow stdlib versions to be specified with npm range syntax

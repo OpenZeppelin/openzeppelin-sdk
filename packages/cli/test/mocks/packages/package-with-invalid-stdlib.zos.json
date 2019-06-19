@@ -1,6 +1,14 @@
 {
   "name": "Herbs",
+<<<<<<< ae0d974ad8d68dfaa1ec24a058d6487fd756b700
+<<<<<<< 70b1a54816d33fd4d81dbaa70f91dc6b30b4c87a
+  "manifestVersion": "2.2",
+=======
   "manifestversion": "2.2",
+>>>>>>> Rename ZosPackageFile, ZosNetworkFile, ZosVersion, and zosversion
+=======
+  "manifestVersion": "2.2",
+>>>>>>> Support manifestVersion
   "publish": true,
   "version": "1.1.0",
   "dependencies": {

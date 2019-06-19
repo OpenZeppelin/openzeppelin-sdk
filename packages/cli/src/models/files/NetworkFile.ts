@@ -72,7 +72,7 @@ export default class NetworkFile {
     contracts: { [contractAlias: string]: ContractInterface };
     solidityLibs: { [libAlias: string]: SolidityLibInterface };
     proxies: { [contractName: string]: ProxyInterface[] };
-    manifestversion: string;
+    manifestVersion: string;
     proxyAdmin: AddressWrapper;
     proxyFactory: AddressWrapper;
     app: AddressWrapper;
@@ -85,7 +85,7 @@ export default class NetworkFile {
 
   public static getManifestVersion(network: string): string | null {
     const file = fs.parseJsonIfExists(`zos.${network}.json`);
-    return file ? file.manifestversion : null;
+    return file ? file.manifestVersion : null;
   }
 
   public static getDependencies(
@@ -105,7 +105,7 @@ export default class NetworkFile {
       contracts: {},
       solidityLibs: {},
       proxies: {},
-      manifestversion: MANIFEST_VERSION,
+      manifestVersion: MANIFEST_VERSION,
     };
 
     try {
@@ -119,15 +119,15 @@ export default class NetworkFile {
       }.`;
       throw e;
     }
-    checkVersion(this.data.manifestversion, this.fileName);
+    checkVersion(this.data.manifestVersion, this.fileName);
   }
 
-  public set manifestversion(version: string) {
-    this.data.manifestversion = version;
+  public set manifestVersion(version: string) {
+    this.data.manifestVersion = version;
   }
 
-  public get manifestversion(): string {
-    return this.data.manifestversion;
+  public get manifestVersion(): string {
+    return this.data.manifestVersion;
   }
 
   public set version(version: string) {

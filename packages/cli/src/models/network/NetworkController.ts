@@ -100,7 +100,7 @@ export default class NetworkController {
   }
 
   public get currentManifestVersion(): string {
-    return this.networkFile.manifestversion;
+    return this.networkFile.manifestVersion;
   }
 
   // NetworkController
@@ -1303,9 +1303,9 @@ export default class NetworkController {
   }
 
   private updateManifestVersionsIfNeeded(version): void {
-    if (this.networkFile.manifestversion !== MANIFEST_VERSION)
-      this.networkFile.manifestversion = version;
-    if (this.packageFile.manifestversion !== MANIFEST_VERSION)
-      this.packageFile.manifestversion = version;
+    if (this.networkFile.manifestVersion !== MANIFEST_VERSION)
+      this.networkFile.manifestVersion = version;
+    if (this.packageFile.manifestVersion !== MANIFEST_VERSION)
+      this.packageFile.manifestVersion = version;
   }
 }
