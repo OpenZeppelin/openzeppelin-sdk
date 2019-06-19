@@ -205,7 +205,7 @@ async function downloadCompiler(
   localFile: string,
 ): Promise<void> {
   const { version, keccak256: expectedHash, path: versionPath } = build;
-  Loggy.spin(
+  Loggy.onVerbose(
     __filename,
     'downloadCompiler',
     'download-compiler',
