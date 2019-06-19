@@ -16,7 +16,7 @@ export default async function update({
 }: UpdateParams) {
   if (!packageName && !contractAlias && !proxyAddress && !all) {
     throw Error(
-      'The package name, contract name, or address to update must be provided, or set the `all` flag to update all contracts in the application.',
+      'The package name, contract name, or address to upgrade must be provided, or set the `all` flag to upgrade all contracts in the application.',
     );
   }
 

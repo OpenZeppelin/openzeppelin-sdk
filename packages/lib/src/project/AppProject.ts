@@ -496,7 +496,7 @@ class BaseAppProject extends BasePackageProject {
     const logMessage =
       actionLabel === 'Creating'
         ? `Creating instance for contract at ${implementationAddress}`
-        : `Updating instance at ${proxyAddress}`;
+        : `Upgrading instance at ${proxyAddress}`;
     if (initMethodName) {
       const { method: initMethod, callData }: CalldataInfo = buildCallData(
         contract,
