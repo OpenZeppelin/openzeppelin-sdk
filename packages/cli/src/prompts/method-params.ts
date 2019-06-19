@@ -73,7 +73,7 @@ export default async function promptForMethodParams(
     ];
   }
 
-  return { methodName: methodName.name, methodArgs };
+  return { methodName: methodName.selector, methodArgs };
 }
 
 function getCommandProps(
