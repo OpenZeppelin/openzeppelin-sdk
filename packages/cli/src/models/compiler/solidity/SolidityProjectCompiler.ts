@@ -4,9 +4,9 @@ import maxBy from 'lodash.maxby';
 import pick from 'lodash.pick';
 import omitBy from 'lodash.omitby';
 import isUndefined from 'lodash.isundefined';
-import { readJsonSync } from 'fs-extra';
-import { statSync } from 'fs';
-import { FileSystem as fs, Loggy, Contracts } from 'zos-lib';
+import { readJsonSync, ensureDirSync, writeJsonSync } from 'fs-extra';
+import { statSync, existsSync, unlinkSync, readdirSync, lstatSync } from 'fs';
+import { Loggy, Contracts } from 'zos-lib';
 import {
   RawContract,
   CompiledContract,
@@ -110,11 +110,14 @@ class SolidityProjectCompiler {
   }
 
   private _loadSoliditySourcesFromDir(dir = this.inputDir): void {
-    fs.readDir(dir).forEach(fileName => {
+    // TODO: Replace by a glob expression
+    readdirSync(dir).forEach(fileName => {
       const filePath = path.resolve(dir, fileName);
-      if (fs.isDir(filePath)) this._loadSoliditySourcesFromDir(filePath);
-      else if (path.extname(filePath).toLowerCase() === '.sol')
+      if (lstatSync(filePath).isDirectory()) {
+        this._loadSoliditySourcesFromDir(filePath);
+      } else if (path.extname(filePath).toLowerCase() === '.sol') {
         this.roots.push(filePath);
+      }
     });
   }
 
@@ -190,22 +193,21 @@ class SolidityProjectCompiler {
 
   private _writeOutput(): void {
     // Create directory if not exists, or clear it of artifacts if it does
-    if (!fs.exists(this.outputDir)) fs.createDirPath(this.outputDir);
-    else this._listArtifacts().forEach(filePath => fs.remove(filePath));
+    if (!existsSync(this.outputDir)) ensureDirSync(this.outputDir);
+    else this._listArtifacts().forEach(filePath => unlinkSync(filePath));
 
     // Write compiler output
     this.compilerOutput.forEach(data => {
       const buildFileName = `${this.outputDir}/${data.contractName}.json`;
-      fs.writeJson(buildFileName, data);
+      writeJsonSync(buildFileName, data);
     });
   }
 
   private _listArtifacts(): string[] {
-    if (!fs.exists(this.outputDir)) return [];
-    return fs
-      .readDir(this.outputDir)
+    if (!existsSync(this.outputDir)) return [];
+    return readdirSync(this.outputDir)
       .map(fileName => path.resolve(this.outputDir, fileName))
-      .filter(fileName => !fs.isDir(fileName))
+      .filter(fileName => !lstatSync(fileName).isDirectory())
       .filter(fileName => path.extname(fileName) === '.json');
   }
 }
