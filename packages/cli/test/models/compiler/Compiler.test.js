@@ -10,7 +10,9 @@ describe('Compiler', function () {
   beforeEach('setup', function () {
     Compiler.resetState();
     
-    this.solcCompile = sinon.stub(Compiler, 'compileWithSolc');
+    this.solcCompile = sinon.stub(Compiler, 'compileWithSolc').callsFake(({ version }) =>
+      Promise.resolve({ compilerVersion: { version: version || '0.5.6' } })
+    );
     this.truffleCompile = sinon.stub(Compiler, 'compileWithTruffle');
     this.isTruffleConfig = sinon.stub(Truffle, 'isTruffleProject').returns(false);
     this.packageFile = new ZosPackageFile('test/mocks/packages/package-empty-lite.zos.json')
@@ -74,6 +76,11 @@ describe('Compiler', function () {
     this.packageFile.data.compiler = { solcVersion: '0.5.3' };
     await this.compile({ version: '0.5.4' });
     this.packageFile.compilerOptions.version.should.eq('0.5.4');
+  });
+
+  it('updates local config with default compiler version after running', async function () {
+    await this.compile();
+    this.packageFile.compilerOptions.version.should.eq('0.5.6');
   });
 
   it('does not compile twice', async function () {
