@@ -76,7 +76,7 @@ function getCommandProps(
     },
     to: {
       type: 'input',
-      message: 'Enter a receiver account',
+      message: 'Enter the receiver account',
     },
     value: {
       type: 'input',
