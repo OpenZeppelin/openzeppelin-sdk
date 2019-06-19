@@ -153,7 +153,7 @@ export default class ZosPackageFile {
       version,
       optimizer: {
         enabled: optimizer && optimizer.enabled,
-        runs: optimizer && parseInt(optimizer.runs),
+        runs: optimizer && optimizer.runs && parseInt(optimizer.runs),
       },
     };
   }
