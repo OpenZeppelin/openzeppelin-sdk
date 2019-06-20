@@ -61,7 +61,7 @@ export interface UpdateParams extends Proxy {
 }
 
 export interface LinkParams extends Dependencies {
-  packageFile?: ProjectFile;
+  projectFile?: ProjectFile;
 }
 
 export interface InitParams extends Dependencies {
@@ -69,7 +69,7 @@ export interface InitParams extends Dependencies {
   version?: string;
   force?: boolean;
   publish?: boolean;
-  packageFile?: ProjectFile;
+  projectFile?: ProjectFile;
 }
 
 export interface UnpackParams {
@@ -98,7 +98,7 @@ export interface SetAdminParams extends Network, PackageArgs {
 
 export interface AddParams {
   contractsData: ContractData[];
-  packageFile?: ProjectFile;
+  projectFile?: ProjectFile;
 }
 
 export interface SessionParams {
@@ -111,22 +111,22 @@ export interface SessionParams {
 
 export interface BumpParams {
   version: string;
-  packageFile?: ProjectFile;
+  projectFile?: ProjectFile;
 }
 
 export interface RemoveParams {
   contracts: string[];
-  packageFile?: ProjectFile;
+  projectFile?: ProjectFile;
 }
 
 export interface CheckParams {
   contractAlias: string;
-  packageFile?: ProjectFile;
+  projectFile?: ProjectFile;
 }
 
 export interface UnlinkParams {
   dependencies: string[];
-  packageFile?: ProjectFile;
+  projectFile?: ProjectFile;
 }
 
 export interface QueryDeploymentParams extends Network {

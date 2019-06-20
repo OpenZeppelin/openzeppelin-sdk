@@ -154,11 +154,11 @@ export function contractsList(
   type: string,
   source?: string,
 ): { [key: string]: any } {
-  const localPackageFile = new ProjectFile();
-  const contractManager = new ContractManager(localPackageFile);
+  const localProjectFile = new ProjectFile();
+  const contractManager = new ContractManager(localProjectFile);
   const contractsFromBuild = contractManager.getContractNames();
-  const contractsFromLocal = Object.keys(localPackageFile.contracts)
-    .map(alias => ({ name: localPackageFile.contracts[alias], alias }))
+  const contractsFromLocal = Object.keys(localProjectFile.contracts)
+    .map(alias => ({ name: localProjectFile.contracts[alias], alias }))
     .map(({ name: contractName, alias }) => {
       const label =
         contractName === alias ? alias : `${alias}[${contractName}]`;
@@ -179,10 +179,10 @@ export function contractsList(
     return inquirerQuestion(name, message, type, contractsFromLocal);
     // generate a list of built contracts and package contracts
   } else if (source === 'all') {
-    const packageContracts = Object.keys(localPackageFile.dependencies).map(
+    const packageContracts = Object.keys(localProjectFile.dependencies).map(
       dependencyName => {
         const contractNames = new Dependency(dependencyName)
-          .getPackageFile()
+          .getProjectFile()
           .contractAliases.map(
             contractName => `${dependencyName}/${contractName}`,
           );
@@ -209,9 +209,9 @@ export function contractsList(
 export function methodsList(
   contractFullName: string,
   constant?: Mutability,
-  packageFile?: ProjectFile,
+  projectFile?: ProjectFile,
 ): { [key: string]: any } {
-  return contractMethods(contractFullName, constant, packageFile)
+  return contractMethods(contractFullName, constant, projectFile)
     .map(({ name, hasInitializer, inputs, selector }) => {
       const initializable = hasInitializer ? '* ' : '';
       const args = inputs.map(
@@ -237,9 +237,9 @@ export function argsList(
   contractFullName: string,
   methodIdentifier: string,
   constant?: Mutability,
-  packageFile?: ProjectFile,
+  projectFile?: ProjectFile,
 ): { name: string; type: string }[] {
-  const method = contractMethods(contractFullName, constant, packageFile).find(
+  const method = contractMethods(contractFullName, constant, projectFile).find(
     ({ name, selector }): any =>
       selector === methodIdentifier || name === methodIdentifier,
   );
@@ -249,13 +249,13 @@ export function argsList(
 function contractMethods(
   contractFullName: string,
   constant: Mutability = Mutability.NotConstant,
-  packageFile: ProjectFile,
+  projectFile: ProjectFile,
 ): any[] {
   const {
     contract: contractAlias,
     package: packageName,
   } = fromContractFullName(contractFullName);
-  const contractManager = new ContractManager(packageFile);
+  const contractManager = new ContractManager(projectFile);
   if (!contractManager.hasContract(packageName, contractAlias)) return [];
   const contract = contractManager.getContractClass(packageName, contractAlias);
 
@@ -264,8 +264,8 @@ function contractMethods(
 
 export function proxyInfo(contractInfo: any, network: string): any {
   const { contractAlias, proxyAddress, packageName } = contractInfo;
-  const packageFile = new ProjectFile();
-  const networkFile = packageFile.networkFile(network);
+  const projectFile = new ProjectFile();
+  const networkFile = projectFile.networkFile(network);
   const proxyParams = {
     contract: contractAlias,
     address: proxyAddress,

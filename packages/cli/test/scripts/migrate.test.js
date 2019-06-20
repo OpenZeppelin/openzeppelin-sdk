@@ -17,15 +17,7 @@ const Package = Contracts.getFromLib('Package');
 const DeprecatedApp = Contracts.getFromLib('DeprecatedApp');
 const ImplementationDirectory = Contracts.getFromLib('ImplementationDirectory');
 
-<<<<<<< ae0d974ad8d68dfaa1ec24a058d6487fd756b700
-<<<<<<< 70b1a54816d33fd4d81dbaa70f91dc6b30b4c87a
 contract('migrate-manifest-version script', function(accounts) {
-=======
-contract('migrate-manifestversion script', function(accounts) {
->>>>>>> Rename ZosPackageFile, ZosNetworkFile, ZosVersion, and zosversion
-=======
-contract('migrate-manifest-version script', function(accounts) {
->>>>>>> Support manifestVersion
   const [_, owner, newAdmin, anotherAdmin] = accounts.map(
     utils.toChecksumAddress,
   );
@@ -39,33 +31,14 @@ contract('migrate-manifest-version script', function(accounts) {
     this.packageName = 'Herbs';
   });
 
-<<<<<<< ae0d974ad8d68dfaa1ec24a058d6487fd756b700
-<<<<<<< 70b1a54816d33fd4d81dbaa70f91dc6b30b4c87a
   beforeEach('initialize environment for manifest version 2', async function() {
     // set package and network file
-    const packageFile = new ProjectFile(
+    const projectFile = new ProjectFile(
       'test/mocks/packages/package-with-manifest-version-2.zos.json',
     );
-    packageFile.publish = false;
-    this.networkFile = packageFile.networkFile(network);
+    projectFile.publish = false;
+    this.networkFile = projectFile.networkFile(network);
     this.networkFile.manifestVersion = '2';
-=======
-  beforeEach('initialize environment for manifestversion2', async function() {
-=======
-  beforeEach('initialize environment for manifest version 2', async function() {
->>>>>>> Support manifestVersion
-    // set package and network file
-    const packageFile = new ProjectFile(
-      'test/mocks/packages/package-with-manifest-version-2.zos.json',
-    );
-    packageFile.publish = false;
-    this.networkFile = packageFile.networkFile(network);
-<<<<<<< ae0d974ad8d68dfaa1ec24a058d6487fd756b700
-    this.networkFile.manifestversion = '2';
->>>>>>> Rename ZosPackageFile, ZosNetworkFile, ZosVersion, and zosversion
-=======
-    this.networkFile.manifestVersion = '2';
->>>>>>> Support manifestVersion
   });
 
   const addProxies = function() {
@@ -88,18 +61,8 @@ contract('migrate-manifest-version script', function(accounts) {
       this.networkFile.proxyAdminAddress.should.not.be.null;
     });
 
-<<<<<<< ae0d974ad8d68dfaa1ec24a058d6487fd756b700
-<<<<<<< 70b1a54816d33fd4d81dbaa70f91dc6b30b4c87a
     it('updates manifes version', function() {
       this.networkFile.manifestVersion.should.eq('2.2');
-=======
-    it('updates manifestversion', function() {
-      this.networkFile.manifestversion.should.eq('2.2');
->>>>>>> Rename ZosPackageFile, ZosNetworkFile, ZosVersion, and zosversion
-=======
-    it('updates manifes version', function() {
-      this.networkFile.manifestVersion.should.eq('2.2');
->>>>>>> Support manifestVersion
     });
 
     it('changes admin of owned proxy', async function() {
@@ -199,15 +162,7 @@ contract('migrate-manifest-version script', function(accounts) {
   });
 
   context('for published project', function() {
-<<<<<<< ae0d974ad8d68dfaa1ec24a058d6487fd756b700
-<<<<<<< 70b1a54816d33fd4d81dbaa70f91dc6b30b4c87a
     beforeEach('simulates a manifest version 2 project', async function() {
-=======
-    beforeEach('simulates a manifestversion 2 project', async function() {
->>>>>>> Rename ZosPackageFile, ZosNetworkFile, ZosVersion, and zosversion
-=======
-    beforeEach('simulates a manifest version 2 project', async function() {
->>>>>>> Support manifestVersion
       await push({ network, txParams, networkFile: this.networkFile });
       this.implV1 = this.networkFile.contract('ImplV1');
       this.implV2 = this.networkFile.contract('ImplV2');

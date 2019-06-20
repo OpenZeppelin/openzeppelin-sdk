@@ -41,10 +41,10 @@ contract('set-admin script', function(accounts) {
 
   describe('on application contract', function() {
     beforeEach('setup', async function() {
-      this.packageFile = new ProjectFile(
+      this.projectFile = new ProjectFile(
         'test/mocks/packages/package-with-contracts.zos.json',
       );
-      this.networkFile = this.packageFile.networkFile(network);
+      this.networkFile = this.projectFile.networkFile(network);
       await push({ network, txParams, networkFile: this.networkFile });
 
       this.impl1 = await createProxy({
@@ -157,10 +157,10 @@ contract('set-admin script', function(accounts) {
 
   describe('on dependency contract', function() {
     beforeEach('setup', async function() {
-      this.packageFile = new ProjectFile(
+      this.projectFile = new ProjectFile(
         'test/mocks/packages/package-with-undeployed-stdlib.zos.json',
       );
-      this.networkFile = this.packageFile.networkFile(network);
+      this.networkFile = this.projectFile.networkFile(network);
       await push({
         network,
         txParams,

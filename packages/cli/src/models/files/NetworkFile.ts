@@ -65,7 +65,7 @@ interface AddressWrapper {
 }
 
 export default class NetworkFile {
-  public packageFile: ProjectFile;
+  public projectFile: ProjectFile;
   public network: any;
   public fileName: string;
   public data: {
@@ -96,8 +96,8 @@ export default class NetworkFile {
   }
 
   // TS-TODO: type for network parameter (and class member too).
-  public constructor(packageFile: ProjectFile, network: any, fileName: string) {
-    this.packageFile = packageFile;
+  public constructor(projectFile: ProjectFile, network: any, fileName: string) {
+    this.projectFile = projectFile;
     this.network = network;
     this.fileName = fileName;
 
@@ -227,7 +227,7 @@ export default class NetworkFile {
   }
 
   public get isPublished(): boolean {
-    return this.packageFile.isPublished;
+    return this.projectFile.isPublished;
   }
 
   public get contractAliases(): string[] {
@@ -363,7 +363,7 @@ export default class NetworkFile {
   }
 
   public contractAliasesMissingFromPackage(): any[] {
-    return difference(this.contractAliases, this.packageFile.contractAliases);
+    return difference(this.contractAliases, this.projectFile.contractAliases);
   }
 
   public isCurrentVersion(version: string): boolean {
@@ -383,13 +383,13 @@ export default class NetworkFile {
   }
 
   public hasMatchingVersion(): boolean {
-    return this.packageFile.isCurrentVersion(this.version);
+    return this.projectFile.isCurrentVersion(this.version);
   }
 
   public dependenciesNamesMissingFromPackage(): any[] {
     return difference(
       this.dependenciesNames,
-      this.packageFile.dependenciesNames,
+      this.projectFile.dependenciesNames,
     );
   }
 
@@ -400,7 +400,7 @@ export default class NetworkFile {
 
   public dependencySatisfiesVersionRequirement(name: string): boolean {
     const dep = this.getDependency(name);
-    return dep && this.packageFile.dependencyMatches(name, dep.version);
+    return dep && this.projectFile.dependencyMatches(name, dep.version);
   }
 
   public dependencyHasMatchingCustomDeploy(name: string): boolean {

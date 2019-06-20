@@ -1,14 +1,6 @@
 {
   "name": "mock-stdlib",
-<<<<<<< ae0d974ad8d68dfaa1ec24a058d6487fd756b700
-<<<<<<< 282f79e4b5bd710113cd0a5b367728960f8c3d20
   "manifestVersion": "2",
-=======
-  "manifestversion": "2",
->>>>>>> Fix integration test
-=======
-  "manifestVersion": "2",
->>>>>>> Support manifestVersion
   "version": "1.1.0",
   "contracts": {
     "Greeter": "Greeter"

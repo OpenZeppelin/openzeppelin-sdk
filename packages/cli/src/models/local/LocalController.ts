@@ -196,16 +196,18 @@ export default class LocalController {
     installDependencies: boolean = false,
   ): Promise<void> {
     const linkedDependencies = await Promise.all(
-      dependencies.map(async (depNameVersion: string) => {
-        const dependency = installDependencies
-          ? await Dependency.install(depNameVersion)
-          : Dependency.fromNameWithVersion(depNameVersion);
-        this.projectFile.setDependency(
-          dependency.name,
-          dependency.requirement as string,
-        );
-        return dependency.name;
-      }),
+      dependencies.map(
+        async (depNameVersion: string): Promise<string> => {
+          const dependency = installDependencies
+            ? await Dependency.install(depNameVersion)
+            : Dependency.fromNameWithVersion(depNameVersion);
+          this.projectFile.setDependency(
+            dependency.name,
+            dependency.requirement as string,
+          );
+          return dependency.name;
+        },
+      ),
     );
 
     if (linkedDependencies.length > 0) {

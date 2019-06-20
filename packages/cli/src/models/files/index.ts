@@ -4,7 +4,7 @@ import ProjectFile from './ProjectFile';
 
 export default {
   checkVersion,
-  NetworkFile: NetworkFile,
+  NetworkFile,
   ProjectFile,
   MANIFEST_VERSION,
 };

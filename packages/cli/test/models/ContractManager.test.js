@@ -14,8 +14,8 @@ contract('ContractManager', function([_, from]) {
       context('without directory created', function() {
         beforeEach('create test dir', function() {
           this.testDir = `${process.cwd()}/test/tmp`;
-          this.packageFile = new ProjectFile(`${this.testDir}/zos.json`);
-          this.contractManager = new ContractManager(this.packageFile);
+          this.projectFile = new ProjectFile(`${this.testDir}/zos.json`);
+          this.contractManager = new ContractManager(this.projectFile);
           FileSystem.createDir(this.testDir);
           sinon
             .stub(ConfigManager, 'getBuildDir')
@@ -38,8 +38,8 @@ contract('ContractManager', function([_, from]) {
         context('without contracts', function() {
           beforeEach('create test dir', function() {
             this.testDir = `${process.cwd()}/test/tmp`;
-            this.packageFile = new ProjectFile(`${this.testDir}/zos.json`);
-            this.contractManager = new ContractManager(this.packageFile);
+            this.projectFile = new ProjectFile(`${this.testDir}/zos.json`);
+            this.contractManager = new ContractManager(this.projectFile);
             FileSystem.createDir(this.testDir);
             FileSystem.createDirPath(`${this.testDir}/build/contracts`);
             sinon
@@ -71,8 +71,8 @@ contract('ContractManager', function([_, from]) {
                 `${this.testDir}/build/contracts/Foo.json`,
                 builtContract,
               );
-              this.packageFile = new ProjectFile(`${this.testDir}/zos.json`);
-              this.contractManager = new ContractManager(this.packageFile);
+              this.projectFile = new ProjectFile(`${this.testDir}/zos.json`);
+              this.contractManager = new ContractManager(this.projectFile);
               sinon
                 .stub(ConfigManager, 'getBuildDir')
                 .returns(`${this.testDir}/build/contracts`);

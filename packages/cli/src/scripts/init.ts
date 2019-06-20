@@ -9,9 +9,9 @@ export default async function init({
   dependencies = [],
   installDependencies = false,
   force = false,
-  packageFile = new ProjectFile(),
+  projectFile = new ProjectFile(),
 }: InitParams): Promise<void | never> {
-  const controller = new LocalController(packageFile, true);
+  const controller = new LocalController(projectFile, true);
   controller.init(name, version, force, publish);
   if (dependencies.length !== 0)
     await controller.linkDependencies(dependencies, installDependencies);

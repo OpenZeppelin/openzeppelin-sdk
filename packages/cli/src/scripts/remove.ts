@@ -5,12 +5,12 @@ import { RemoveParams } from './interfaces';
 
 export default function remove({
   contracts,
-  packageFile,
+  projectFile,
 }: RemoveParams): void | never {
   if (contracts.length === 0)
     throw new Error('At least one contract name must be provided to remove.');
 
-  const controller = new LocalController(packageFile);
+  const controller = new LocalController(projectFile);
   contracts.forEach(alias => controller.remove(alias));
   Loggy.noSpin(
     __filename,

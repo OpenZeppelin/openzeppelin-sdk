@@ -111,8 +111,8 @@ async function runActionIfNeeded(
   options: any,
 ): Promise<void> {
   const { force, interactive, network: promptedNetwork } = options;
-  const packageFile = new ProjectFile();
-  const networkFile = packageFile.networkFile(network);
+  const projectFile = new ProjectFile();
+  const networkFile = projectFile.networkFile(network);
   const {
     contract: contractAlias,
     package: packageName,

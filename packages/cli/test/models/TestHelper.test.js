@@ -16,10 +16,10 @@ contract('TestHelper', function([_, owner]) {
 
   describe('for app project', function() {
     beforeEach(async function() {
-      this.packageFile = new ProjectFile(
+      this.projectFile = new ProjectFile(
         'test/mocks/packages/package-with-contracts-and-multiple-stdlibs.zos.json',
       );
-      this.networkFile = this.packageFile.networkFile('test');
+      this.networkFile = this.projectFile.networkFile('test');
       this.project = await TestHelper(txParams, this.networkFile);
     });
 
@@ -74,11 +74,11 @@ contract('TestHelper', function([_, owner]) {
 
   describe('for an unpublished project', function() {
     beforeEach(async function() {
-      this.packageFile = new ProjectFile(
+      this.projectFile = new ProjectFile(
         'test/mocks/packages/package-with-contracts.zos.json',
       );
-      this.packageFile.publish = false;
-      this.networkFile = this.packageFile.networkFile('test');
+      this.projectFile.publish = false;
+      this.networkFile = this.projectFile.networkFile('test');
       this.project = await TestHelper(txParams, this.networkFile);
     });
 

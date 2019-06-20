@@ -121,9 +121,9 @@ contract('create script', function([_, owner, otherAdmin]) {
 
   const shouldHandleCreateScript = function() {
     beforeEach('setup', async function() {
-      this.networkFile = this.packageFile.networkFile(network);
+      this.networkFile = this.projectFile.networkFile(network);
 
-      await add({ contractsData, packageFile: this.packageFile });
+      await add({ contractsData, projectFile: this.projectFile });
       await push({ network, txParams, networkFile: this.networkFile });
     });
 
@@ -251,7 +251,7 @@ contract('create script', function([_, owner, otherAdmin]) {
       ];
       await add({
         contractsData: customContractsData,
-        packageFile: this.packageFile,
+        projectFile: this.projectFile,
       });
 
       await create({
@@ -606,7 +606,7 @@ contract('create script', function([_, owner, otherAdmin]) {
       beforeEach('setting dependency', async function() {
         await link({
           dependencies: ['mock-stdlib-undeployed@1.1.0'],
-          packageFile: this.packageFile,
+          projectFile: this.projectFile,
         });
         await push({
           network,
@@ -678,7 +678,7 @@ contract('create script', function([_, owner, otherAdmin]) {
       beforeEach('setting dependency', async function() {
         await link({
           dependencies: ['mock-stdlib@1.1.0'],
-          packageFile: this.packageFile,
+          projectFile: this.projectFile,
         });
       });
 
@@ -766,11 +766,11 @@ contract('create script', function([_, owner, otherAdmin]) {
 
   describe('on unpublished project', function() {
     beforeEach('setup', async function() {
-      this.packageFile = new ProjectFile(
+      this.projectFile = new ProjectFile(
         'test/mocks/packages/package-empty.zos.json',
       );
-      this.packageFile.version = version;
-      this.packageFile.publish = false;
+      this.projectFile.version = version;
+      this.projectFile.publish = false;
     });
 
     shouldHandleCreateScript();
@@ -778,10 +778,10 @@ contract('create script', function([_, owner, otherAdmin]) {
 
   describe('on published project', function() {
     beforeEach('setup', async function() {
-      this.packageFile = new ProjectFile(
+      this.projectFile = new ProjectFile(
         'test/mocks/packages/package-empty.zos.json',
       );
-      this.packageFile.version = version;
+      this.projectFile.version = version;
     });
 
     shouldHandleCreateScript();

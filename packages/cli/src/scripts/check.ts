@@ -5,9 +5,9 @@ import { CheckParams } from './interfaces';
 
 export default function check({
   contractAlias,
-  packageFile,
+  projectFile,
 }: CheckParams): void {
-  const controller = new LocalController(packageFile);
+  const controller = new LocalController(projectFile);
   const success = contractAlias
     ? controller.validate(contractAlias)
     : controller.validateAll();

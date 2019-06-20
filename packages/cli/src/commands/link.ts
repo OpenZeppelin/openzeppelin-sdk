@@ -39,12 +39,12 @@ async function runActionIfNeeded(
   options: any,
 ): Promise<void> {
   const { interactive } = options;
-  const packageFile = new ProjectFile();
+  const projectFile = new ProjectFile();
   const {
     contract: contractAlias,
     package: packageName,
   } = fromContractFullName(contractFullName);
-  if (interactive && packageName && !packageFile.hasDependency(packageName)) {
+  if (interactive && packageName && !projectFile.hasDependency(packageName)) {
     await action([packageName], { ...options, forceInstall: true });
   }
 }

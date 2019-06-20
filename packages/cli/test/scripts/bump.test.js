@@ -11,36 +11,36 @@ contract('bump script', function() {
 
   describe('on app', function() {
     beforeEach(function() {
-      this.packageFile = new ProjectFile(
+      this.projectFile = new ProjectFile(
         'test/mocks/packages/package-empty.zos.json',
       );
     });
 
     it('should update the app version in the main package file', async function() {
-      await bump({ version: newVersion, packageFile: this.packageFile });
+      await bump({ version: newVersion, projectFile: this.projectFile });
 
-      this.packageFile.version.should.eq(newVersion);
+      this.projectFile.version.should.eq(newVersion);
     });
 
     it('should preserve added logic contracts', async function() {
       await add({
         contractsData: [{ name: 'ImplV1' }],
-        packageFile: this.packageFile,
+        projectFile: this.projectFile,
       });
-      await bump({ version: newVersion, packageFile: this.packageFile });
+      await bump({ version: newVersion, projectFile: this.projectFile });
 
-      this.packageFile.version.should.eq(newVersion);
-      this.packageFile.contract('ImplV1').should.eq('ImplV1');
+      this.projectFile.version.should.eq(newVersion);
+      this.projectFile.contract('ImplV1').should.eq('ImplV1');
     });
 
     it('should preserve dependencies', async function() {
       await link({
         dependencies: ['mock-stdlib@1.1.0'],
-        packageFile: this.packageFile,
+        projectFile: this.projectFile,
       });
-      await bump({ version: newVersion, packageFile: this.packageFile });
+      await bump({ version: newVersion, projectFile: this.projectFile });
 
-      this.packageFile.getDependencyVersion('mock-stdlib').should.eq('1.1.0');
+      this.projectFile.getDependencyVersion('mock-stdlib').should.eq('1.1.0');
     });
   });
 });

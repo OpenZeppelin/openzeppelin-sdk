@@ -59,16 +59,16 @@ async function runActionIfNeeded(
     contract: contractAlias,
     package: packageName,
   } = fromContractFullName(contractName);
-  const packageFile = new ProjectFile();
+  const projectFile = new ProjectFile();
 
   if (interactive) {
     if (
       !packageName &&
       contractAlias &&
-      !packageFile.hasContract(contractAlias)
+      !projectFile.hasContract(contractAlias)
     ) {
       await action([contractAlias], options);
-    } else if (!packageName && !packageFile.hasContracts()) {
+    } else if (!packageName && !projectFile.hasContracts()) {
       await action([], options);
     }
   }

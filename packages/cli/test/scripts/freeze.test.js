@@ -11,15 +11,15 @@ contract('freeze script', function([_, owner]) {
   const txParams = { from: owner };
 
   beforeEach('init package file', async function() {
-    this.packageFile = new ProjectFile(
+    this.projectFile = new ProjectFile(
       'test/mocks/packages/package-with-contracts.zos.json',
     );
   });
 
   describe('for an unpublished app', function() {
     beforeEach('push lib', async function() {
-      this.packageFile.publish = false;
-      this.networkFile = this.packageFile.networkFile(network);
+      this.projectFile.publish = false;
+      this.networkFile = this.projectFile.networkFile(network);
       await push({ networkFile: this.networkFile, network, txParams });
     });
 
@@ -34,7 +34,7 @@ contract('freeze script', function([_, owner]) {
 
   describe('for a published app', function() {
     beforeEach('push lib', async function() {
-      this.networkFile = this.packageFile.networkFile(network);
+      this.networkFile = this.projectFile.networkFile(network);
       await push({ networkFile: this.networkFile, network, txParams });
     });
 

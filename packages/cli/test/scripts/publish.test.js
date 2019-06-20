@@ -24,11 +24,11 @@ contract('publish script', function(accounts) {
   const dependencyName = 'mock-stdlib-undeployed';
 
   beforeEach('pushing package', async function() {
-    const packageFile = new ProjectFile(
+    const projectFile = new ProjectFile(
       'test/mocks/packages/package-with-contracts-and-stdlib.zos.json',
     );
-    packageFile.publish = false;
-    this.networkFile = packageFile.networkFile(network);
+    projectFile.publish = false;
+    this.networkFile = projectFile.networkFile(network);
 
     await push({
       network,

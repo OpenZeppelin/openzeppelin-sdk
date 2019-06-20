@@ -90,12 +90,12 @@ exports.stubCommands = function() {
     this.getManifestVersion = sinon
       .stub(NetworkFile, 'getManifestVersion')
       .returns('2.2');
-    this.packageFile = sinon
+    this.projectFile = sinon
       .stub(ProjectFile.prototype, 'exists')
       .returns(true);
     const projectFile = new ProjectFile('test/mocks/mock-stdlib/zos.json');
     this.dependency = sinon
-      .stub(Dependency.prototype, 'getPackageFile')
+      .stub(Dependency.prototype, 'getProjectFile')
       .returns(projectFile);
   });
 

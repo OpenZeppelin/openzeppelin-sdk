@@ -26,7 +26,7 @@ interface ERC20TokenInfo {
 
 export default class TransactionController {
   public txParams: TxParams;
-  public packageFile: ProjectFile;
+  public projectFile: ProjectFile;
   public networkFile: NetworkFile;
 
   public constructor(
@@ -36,11 +36,11 @@ export default class TransactionController {
   ) {
     if (txParams) this.txParams = txParams;
     if (!networkFile) {
-      this.packageFile = new ProjectFile();
-      this.networkFile = this.packageFile.networkFile(network);
+      this.projectFile = new ProjectFile();
+      this.networkFile = this.projectFile.networkFile(network);
     } else {
       this.networkFile = networkFile;
-      this.packageFile = this.networkFile.packageFile;
+      this.projectFile = this.networkFile.projectFile;
     }
   }
 
@@ -215,7 +215,7 @@ export default class TransactionController {
       package: packageName,
       contract: contractName,
     } = this.networkFile.getProxy(address);
-    const contractManager = new ContractManager(this.packageFile);
+    const contractManager = new ContractManager(this.projectFile);
     const contract = contractManager
       .getContractClass(packageName, contractName)
       .at(address);

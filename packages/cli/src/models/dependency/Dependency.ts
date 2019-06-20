@@ -26,7 +26,7 @@ export default class Dependency {
   public requirement: string | semver.Range;
 
   private _networkFiles: { [network: string]: NetworkFile };
-  private _packageFile: ProjectFile;
+  private _projectFile: ProjectFile;
 
   public static fromNameWithVersion(nameAndVersion: string): Dependency {
     const [name, version] = nameAndVersion.split('@');
@@ -93,11 +93,11 @@ export default class Dependency {
     this.name = name;
     this._networkFiles = {};
 
-    const packageVersion = this.getPackageFile().version;
-    this._validateSatisfiesVersion(packageVersion, requirement);
-    this.version = packageVersion;
-    this.nameAndVersion = `${name}@${packageVersion}`;
-    this.requirement = requirement || tryWithCaret(packageVersion);
+    const projectVersion = this.getProjectFile().version;
+    this._validateSatisfiesVersion(projectVersion, requirement);
+    this.version = projectVersion;
+    this.nameAndVersion = `${name}@${projectVersion}`;
+    this.requirement = requirement || tryWithCaret(projectVersion);
   }
 
   public async deploy(txParams: TxParams): Promise<PackageProject> {
@@ -109,7 +109,7 @@ export default class Dependency {
     // to Projects, which handle library deployment and linking for a set of contracts altogether.
 
     const contracts = map(
-      this.getPackageFile().contracts,
+      this.getProjectFile().contracts,
       (contractName, contractAlias) => [
         Contracts.getFromNodeModules(this.name, contractName),
         contractAlias,
@@ -149,8 +149,8 @@ export default class Dependency {
     return project;
   }
 
-  public getPackageFile(): ProjectFile | never {
-    if (!this._packageFile) {
+  public getProjectFile(): ProjectFile | never {
+    if (!this._projectFile) {
       const filename = `node_modules/${this.name}/zos.json`;
       if (!fs.exists(filename)) {
         throw Error(
@@ -159,9 +159,9 @@ export default class Dependency {
           }'. Make sure it is provided by the npm package.`,
         );
       }
-      this._packageFile = new ProjectFile(filename);
+      this._projectFile = new ProjectFile(filename);
     }
-    return this._packageFile;
+    return this._projectFile;
   }
 
   public getNetworkFile(network: string): NetworkFile | never {
@@ -176,7 +176,7 @@ export default class Dependency {
       }
 
       this._networkFiles[network] = new NetworkFile(
-        this.getPackageFile(),
+        this.getProjectFile(),
         network,
         filename,
       );

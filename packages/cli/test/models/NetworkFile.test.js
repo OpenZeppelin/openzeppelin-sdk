@@ -9,7 +9,7 @@ import { MANIFEST_VERSION } from '../../src/models/files/ManifestVersion';
 
 contract('NetworkFile', function() {
   beforeEach('loads parent package file', function() {
-    this.appPackageFile = new ProjectFile(
+    this.appProjectFile = new ProjectFile(
       'test/mocks/packages/package-empty.zos.json',
     );
   });
@@ -40,7 +40,7 @@ contract('NetworkFile', function() {
   describe('constructor', function() {
     it('creates empty file', function() {
       const file = new NetworkFile(
-        this.appPackageFile,
+        this.appProjectFile,
         'test',
         'test/mocks/networks/new.test.json',
       );
@@ -49,19 +49,11 @@ contract('NetworkFile', function() {
 
     it('loads existing file', function() {
       const file = new NetworkFile(
-        this.appPackageFile,
+        this.appProjectFile,
         'test',
         'test/mocks/networks/network-app-with-contract.zos.test.json',
       );
-<<<<<<< ae0d974ad8d68dfaa1ec24a058d6487fd756b700
-<<<<<<< 70b1a54816d33fd4d81dbaa70f91dc6b30b4c87a:packages/cli/test/models/NetworkFile.test.js
       file.data.manifestVersion.should.eq(MANIFEST_VERSION);
-=======
-      file.data.manifestversion.should.eq(MANIFEST_VERSION);
->>>>>>> Rename ZosPackageFile, ZosNetworkFile, ZosVersion, and zosversion:packages/cli/test/models/NetworkFile.test.js
-=======
-      file.data.manifestVersion.should.eq(MANIFEST_VERSION);
->>>>>>> Support manifestVersion
       file.packageAddress.should.eq(
         '0x0000000000000000000000000000000000000080',
       );
@@ -71,56 +63,24 @@ contract('NetworkFile', function() {
       file.contract('Greeter').address.should.eq('0x1020');
     });
 
-<<<<<<< ae0d974ad8d68dfaa1ec24a058d6487fd756b700
-<<<<<<< 70b1a54816d33fd4d81dbaa70f91dc6b30b4c87a:packages/cli/test/models/NetworkFile.test.js
     it('fails to load missing manifestVersion', function() {
-=======
-    it('fails to load missing manifestversion', function() {
->>>>>>> Rename ZosPackageFile, ZosNetworkFile, ZosVersion, and zosversion:packages/cli/test/models/NetworkFile.test.js
-=======
-    it('fails to load missing manifestVersion', function() {
->>>>>>> Support manifestVersion
       expect(
         () =>
           new NetworkFile(
-            this.appPackageFile,
+            this.appProjectFile,
             'test',
-<<<<<<< ae0d974ad8d68dfaa1ec24a058d6487fd756b700
-<<<<<<< 70b1a54816d33fd4d81dbaa70f91dc6b30b4c87a:packages/cli/test/models/NetworkFile.test.js
             'test/mocks/networks/network-missing-manifest-version.zos.test.json',
-=======
-            'test/mocks/networks/network-missing-manifestversion.zos.test.json',
->>>>>>> Rename ZosPackageFile, ZosNetworkFile, ZosVersion, and zosversion:packages/cli/test/models/NetworkFile.test.js
-=======
-            'test/mocks/networks/network-missing-manifest-version.zos.test.json',
->>>>>>> Support manifestVersion
           ),
       ).to.throw(/Manifest version identifier not found/);
     });
 
-<<<<<<< ae0d974ad8d68dfaa1ec24a058d6487fd756b700
-<<<<<<< 70b1a54816d33fd4d81dbaa70f91dc6b30b4c87a:packages/cli/test/models/NetworkFile.test.js
     it('fails to load unsupported manifestVersion', function() {
-=======
-    it('fails to load unsupported manifestversion', function() {
->>>>>>> Rename ZosPackageFile, ZosNetworkFile, ZosVersion, and zosversion:packages/cli/test/models/NetworkFile.test.js
-=======
-    it('fails to load unsupported manifestVersion', function() {
->>>>>>> Support manifestVersion
       expect(
         () =>
           new NetworkFile(
-            this.appPackageFile,
+            this.appProjectFile,
             'test',
-<<<<<<< ae0d974ad8d68dfaa1ec24a058d6487fd756b700
-<<<<<<< 70b1a54816d33fd4d81dbaa70f91dc6b30b4c87a:packages/cli/test/models/NetworkFile.test.js
             'test/mocks/networks/network-unsupported-manifest-version.zos.test.json',
-=======
-            'test/mocks/networks/network-unsupported-manifestversion.zos.test.json',
->>>>>>> Rename ZosPackageFile, ZosNetworkFile, ZosVersion, and zosversion:packages/cli/test/models/NetworkFile.test.js
-=======
-            'test/mocks/networks/network-unsupported-manifest-version.zos.test.json',
->>>>>>> Support manifestVersion
           ),
       ).to.throw(/Unrecognized manifest version identifier 3/);
     });

@@ -3,11 +3,11 @@ import LocalController from '../models/local/LocalController';
 import ProjectFile from '../models/files/ProjectFile';
 
 export default function addAll({
-  packageFile,
+  projectFile,
 }: {
-  packageFile?: ProjectFile;
+  projectFile?: ProjectFile;
 }): void {
-  const controller = new LocalController(packageFile);
+  const controller = new LocalController(projectFile);
   controller.addAll();
   Loggy.noSpin(
     __filename,

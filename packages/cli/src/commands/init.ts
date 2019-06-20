@@ -51,9 +51,9 @@ async function action(
 
 async function runActionIfNeeded(options: any): Promise<void> {
   const { interactive } = options;
-  const packageFile = new ProjectFile();
+  const projectFile = new ProjectFile();
 
-  if (interactive && !packageFile.exists()) {
+  if (interactive && !projectFile.exists()) {
     await action(undefined, undefined, { dontExitProcess: true });
   }
 }
