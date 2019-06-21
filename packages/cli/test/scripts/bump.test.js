@@ -4,43 +4,43 @@ require('../setup');
 import add from '../../src/scripts/add';
 import bump from '../../src/scripts/bump';
 import link from '../../src/scripts/link';
-import ZosPackageFile from '../../src/models/files/ZosPackageFile';
+import ProjectFile from '../../src/models/files/ProjectFile';
 
 contract('bump script', function() {
   const newVersion = '0.2.0';
 
   describe('on app', function() {
     beforeEach(function() {
-      this.packageFile = new ZosPackageFile(
+      this.projectFile = new ProjectFile(
         'test/mocks/packages/package-empty.zos.json',
       );
     });
 
     it('should update the app version in the main package file', async function() {
-      await bump({ version: newVersion, packageFile: this.packageFile });
+      await bump({ version: newVersion, projectFile: this.projectFile });
 
-      this.packageFile.version.should.eq(newVersion);
+      this.projectFile.version.should.eq(newVersion);
     });
 
     it('should preserve added logic contracts', async function() {
       await add({
         contractsData: [{ name: 'ImplV1' }],
-        packageFile: this.packageFile,
+        projectFile: this.projectFile,
       });
-      await bump({ version: newVersion, packageFile: this.packageFile });
+      await bump({ version: newVersion, projectFile: this.projectFile });
 
-      this.packageFile.version.should.eq(newVersion);
-      this.packageFile.contract('ImplV1').should.eq('ImplV1');
+      this.projectFile.version.should.eq(newVersion);
+      this.projectFile.contract('ImplV1').should.eq('ImplV1');
     });
 
     it('should preserve dependencies', async function() {
       await link({
         dependencies: ['mock-stdlib@1.1.0'],
-        packageFile: this.packageFile,
+        projectFile: this.projectFile,
       });
-      await bump({ version: newVersion, packageFile: this.packageFile });
+      await bump({ version: newVersion, projectFile: this.projectFile });
 
-      this.packageFile.getDependencyVersion('mock-stdlib').should.eq('1.1.0');
+      this.projectFile.getDependencyVersion('mock-stdlib').should.eq('1.1.0');
     });
   });
 });

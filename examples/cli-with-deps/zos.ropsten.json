@@ -1,4 +1,4 @@
-{
+  {
   "contracts": {
     "TokenExchange": {
       "address": "0x3c1c7ee4688acaf89bb81a432cd9aa7b144bda30",
@@ -30,7 +30,7 @@
       }
     ]
   },
-  "zosversion": "2",
+  "manifestVersion": "2",
   "app": {
     "address": "0xb77d0766f52785c8fdc203e1d9a746e5a3ef5a00"
   },

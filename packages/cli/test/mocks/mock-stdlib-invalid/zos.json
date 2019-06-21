@@ -1,6 +1,6 @@
 {
   "name": "mock-stdlib-invalid",
   "version": "2.0.0",
-  "zosversion": "2.2",
+  "manifestVersion": "2.2",
   "contracts": {}
 }

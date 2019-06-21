@@ -9,7 +9,7 @@ import create from '../../src/scripts/create';
 import update from '../../src/scripts/update';
 import publish from '../../src/scripts/publish';
 import setAdmin from '../../src/scripts/set-admin';
-import ZosPackageFile from '../../src/models/files/ZosPackageFile';
+import ProjectFile from '../../src/models/files/ProjectFile';
 
 const should = require('chai').should();
 
@@ -17,7 +17,7 @@ const Package = Contracts.getFromLib('Package');
 const DeprecatedApp = Contracts.getFromLib('DeprecatedApp');
 const ImplementationDirectory = Contracts.getFromLib('ImplementationDirectory');
 
-contract('migrate-zosversion script', function(accounts) {
+contract('migrate-manifest-version script', function(accounts) {
   const [_, owner, newAdmin, anotherAdmin] = accounts.map(
     utils.toChecksumAddress,
   );
@@ -31,14 +31,14 @@ contract('migrate-zosversion script', function(accounts) {
     this.packageName = 'Herbs';
   });
 
-  beforeEach('initialize environment for zosversion2', async function() {
+  beforeEach('initialize environment for manifest version 2', async function() {
     // set package and network file
-    const packageFile = new ZosPackageFile(
-      'test/mocks/packages/package-with-zosversion-2.zos.json',
+    const projectFile = new ProjectFile(
+      'test/mocks/packages/package-with-manifest-version-2.zos.json',
     );
-    packageFile.publish = false;
-    this.networkFile = packageFile.networkFile(network);
-    this.networkFile.zosversion = '2';
+    projectFile.publish = false;
+    this.networkFile = projectFile.networkFile(network);
+    this.networkFile.manifestVersion = '2';
   });
 
   const addProxies = function() {
@@ -61,8 +61,8 @@ contract('migrate-zosversion script', function(accounts) {
       this.networkFile.proxyAdminAddress.should.not.be.null;
     });
 
-    it('updates zosVersion', function() {
-      this.networkFile.zosversion.should.eq('2.2');
+    it('updates manifes version', function() {
+      this.networkFile.manifestVersion.should.eq('2.2');
     });
 
     it('changes admin of owned proxy', async function() {
@@ -162,7 +162,7 @@ contract('migrate-zosversion script', function(accounts) {
   });
 
   context('for published project', function() {
-    beforeEach('simulates a zosversion 2 project', async function() {
+    beforeEach('simulates a manifest version 2 project', async function() {
       await push({ network, txParams, networkFile: this.networkFile });
       this.implV1 = this.networkFile.contract('ImplV1');
       this.implV2 = this.networkFile.contract('ImplV2');

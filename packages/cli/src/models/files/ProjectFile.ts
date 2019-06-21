@@ -4,8 +4,8 @@ import isEqual from 'lodash.isequal';
 import isEmpty from 'lodash.isempty';
 import { Loggy, FileSystem as fs } from 'zos-lib';
 import Dependency from '../dependency/Dependency';
-import { ZOS_VERSION, checkVersion } from './ZosVersion';
-import ZosNetworkFile from './ZosNetworkFile';
+import { MANIFEST_VERSION, checkVersion } from './ManifestVersion';
+import NetworkFile from './NetworkFile';
 import { ProjectCompilerOptions } from '../compiler/solidity/SolidityProjectCompiler';
 
 interface ConfigFileCompilerOptions {
@@ -22,12 +22,12 @@ interface ConfigFileCompilerOptions {
   };
 }
 
-export default class ZosPackageFile {
+export default class ProjectFile {
   public fileName: string;
   public data: {
     name: string;
     version: string;
-    zosversion: string;
+    manifestVersion: string;
     dependencies: { [name: string]: string };
     contracts: { [alias: string]: string };
     publish: boolean;
@@ -47,7 +47,7 @@ export default class ZosPackageFile {
     this.fileName = fileName;
     try {
       this.data = fs.parseJsonIfExists(this.fileName) || {
-        zosversion: ZOS_VERSION,
+        manifestVersion: MANIFEST_VERSION,
       };
       // if we failed to read and parse zos.json
     } catch (e) {
@@ -58,7 +58,7 @@ export default class ZosPackageFile {
       }.`;
       throw e;
     }
-    checkVersion(this.data.zosversion, this.fileName);
+    checkVersion(this.data.manifestVersion, this.fileName);
     if (!this.data.contracts) this.data.contracts = {};
     if (!this.data.dependencies) this.data.dependencies = {};
   }
@@ -71,8 +71,8 @@ export default class ZosPackageFile {
     return path.dirname(this.fileName);
   }
 
-  public set zosversion(version: string) {
-    this.data.zosversion = version;
+  public set manifestVersion(version: string) {
+    this.data.manifestVersion = version;
   }
 
   public set publish(publish: boolean) {
@@ -158,7 +158,7 @@ export default class ZosPackageFile {
     };
   }
 
-  public setCompilerOptions(options: ProjectCompilerOptions) {
+  public setCompilerOptions(options: ProjectCompilerOptions): void {
     const {
       manager,
       version,
@@ -232,14 +232,14 @@ export default class ZosPackageFile {
     delete this.data.contracts[alias];
   }
 
-  public networkFile(network): ZosNetworkFile | never {
+  public networkFile(network): NetworkFile | never {
     const networkFileName = this.fileName.replace(
       /\.json\s*$/,
       `.${network}.json`,
     );
     if (networkFileName === this.fileName)
       throw Error(`Cannot create network file name from ${this.fileName}`);
-    return new ZosNetworkFile(this, network, networkFileName);
+    return new NetworkFile(this, network, networkFileName);
   }
 
   public write(): void {

@@ -1,6 +1,6 @@
 {
   "version": "3.0.0",
-  "zosversion": "2.2",
+  "manifestVersion": "2.2",
   "provider": {},
   "contracts": {}
 }

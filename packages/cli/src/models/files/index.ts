@@ -1,12 +1,10 @@
-import { ZOS_VERSION, checkVersion } from './ZosVersion';
-import ZosNetworkFile from './ZosNetworkFile';
-import ZosPackageFile from './ZosPackageFile';
-import { MANIFEST_VERSION } from './KitFile';
+import { MANIFEST_VERSION, checkVersion } from './ManifestVersion';
+import NetworkFile from './NetworkFile';
+import ProjectFile from './ProjectFile';
 
 export default {
-  ZOS_VERSION,
   checkVersion,
-  ZosNetworkFile,
-  ZosPackageFile,
+  NetworkFile,
+  ProjectFile,
   MANIFEST_VERSION,
 };

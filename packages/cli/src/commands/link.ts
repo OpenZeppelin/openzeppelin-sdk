@@ -1,7 +1,7 @@
 import push from './push';
 import link from '../scripts/link';
 import Dependency from '../models/dependency/Dependency';
-import ZosPackageFile from '../models/files/ZosPackageFile';
+import ProjectFile from '../models/files/ProjectFile';
 import { promptIfNeeded, InquirerQuestions } from '../prompts/prompt';
 import { fromContractFullName } from '../utils/naming';
 
@@ -39,12 +39,12 @@ async function runActionIfNeeded(
   options: any,
 ): Promise<void> {
   const { interactive } = options;
-  const packageFile = new ZosPackageFile();
+  const projectFile = new ProjectFile();
   const {
     contract: contractAlias,
     package: packageName,
   } = fromContractFullName(contractFullName);
-  if (interactive && packageName && !packageFile.hasDependency(packageName)) {
+  if (interactive && packageName && !projectFile.hasDependency(packageName)) {
     await action([packageName], { ...options, forceInstall: true });
   }
 }

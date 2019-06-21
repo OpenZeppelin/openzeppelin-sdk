@@ -8,7 +8,7 @@ import CaptureLogs from '../helpers/captureLogs';
 
 import verify from '../../src/scripts/verify';
 import push from '../../src/scripts/push';
-import ZosPackageFile from '../../src/models/files/ZosPackageFile';
+import ProjectFile from '../../src/models/files/ProjectFile';
 
 contract('verify script', function() {
   const contractAlias = 'Impl';
@@ -26,8 +26,8 @@ contract('verify script', function() {
   describe('validations', function() {
     describe('with invalid package or network files', function() {
       it('throws error if zOS project is not yet initialized', async function() {
-        const packageFile = new ZosPackageFile('non-existent-package.zos.json');
-        const networkFile = packageFile.networkFile(network);
+        const projectFile = new ProjectFile('non-existent-package.zos.json');
+        const networkFile = projectFile.networkFile(network);
         await assertVerify(
           contractAlias,
           { network, networkFile },
@@ -36,10 +36,10 @@ contract('verify script', function() {
       });
 
       it('throws error if contract not yet added', async function() {
-        const packageFile = new ZosPackageFile(
+        const projectFile = new ProjectFile(
           'test/mocks/packages/package-with-contracts.zos.json',
         );
-        const networkFile = packageFile.networkFile(network);
+        const networkFile = projectFile.networkFile(network);
         const nonExistentContract = 'NonExistent';
         await assertVerify(
           nonExistentContract,
@@ -51,10 +51,10 @@ contract('verify script', function() {
 
     describe('with valid package and network files', async function() {
       beforeEach(function() {
-        this.packageFile = new ZosPackageFile(
+        this.projectFile = new ProjectFile(
           'test/mocks/packages/package-with-contracts.zos.json',
         );
-        this.networkFile = this.packageFile.networkFile(network);
+        this.networkFile = this.projectFile.networkFile(network);
       });
 
       it('throws error if contract not yet deployed', async function() {
@@ -83,10 +83,10 @@ contract('verify script', function() {
     const network = 'mainnet';
 
     beforeEach(async function() {
-      this.packageFile = new ZosPackageFile(
+      this.projectFile = new ProjectFile(
         'test/mocks/packages/package-with-contracts.zos.json',
       );
-      this.networkFile = this.packageFile.networkFile(network);
+      this.networkFile = this.projectFile.networkFile(network);
       await push({ network, networkFile: this.networkFile, txParams });
       this.logs = new CaptureLogs();
       this.axiosStub = sinon.stub(axios, 'request');

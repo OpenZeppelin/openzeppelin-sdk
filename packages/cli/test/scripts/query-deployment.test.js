@@ -3,7 +3,7 @@ require('../setup');
 
 import random from 'lodash.random';
 import queryDeployment from '../../src/scripts/query-deployment';
-import ZosPackageFile from '../../src/models/files/ZosPackageFile';
+import ProjectFile from '../../src/models/files/ProjectFile';
 
 const should = require('chai').should();
 
@@ -14,7 +14,7 @@ contract('query-deployment script', function([_, owner, another]) {
 
   const shouldHandleQueryDeploymentScript = function() {
     beforeEach('setup', async function() {
-      this.networkFile = this.packageFile.networkFile(network);
+      this.networkFile = this.projectFile.networkFile(network);
       this.salt = random(0, 2 ** 32);
     });
 
@@ -109,11 +109,11 @@ contract('query-deployment script', function([_, owner, another]) {
 
   describe('on unpublished project', function() {
     beforeEach('setup', async function() {
-      this.packageFile = new ZosPackageFile(
+      this.projectFile = new ProjectFile(
         'test/mocks/packages/package-empty.zos.json',
       );
-      this.packageFile.version = version;
-      this.packageFile.publish = false;
+      this.projectFile.version = version;
+      this.projectFile.publish = false;
     });
 
     shouldHandleQueryDeploymentScript();
@@ -121,10 +121,10 @@ contract('query-deployment script', function([_, owner, another]) {
 
   describe('on published project', function() {
     beforeEach('setup', async function() {
-      this.packageFile = new ZosPackageFile(
+      this.projectFile = new ProjectFile(
         'test/mocks/packages/package-empty.zos.json',
       );
-      this.packageFile.version = version;
+      this.projectFile.version = version;
     });
 
     shouldHandleQueryDeploymentScript();

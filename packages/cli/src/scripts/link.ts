@@ -5,13 +5,13 @@ import { LinkParams } from './interfaces';
 export default async function link({
   dependencies = [],
   installDependencies = false,
-  packageFile,
+  projectFile,
 }: LinkParams) {
   if (!dependencies.length)
     throw Error(
       'At least one dependency name and version to be linked must be provided.',
     );
-  const controller = new LocalController(packageFile);
+  const controller = new LocalController(projectFile);
 
   await controller.linkDependencies(dependencies, installDependencies);
   controller.writePackage();

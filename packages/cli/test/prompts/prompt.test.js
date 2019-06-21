@@ -10,7 +10,7 @@ import { ContractMethodMutability as Mutability } from 'zos-lib';
 
 import ContractManager from '../../src/models/local/ContractManager';
 import ConfigManager from '../../src/models/config/ConfigManager';
-import ZosPackageFile from '../../src/models/files/ZosPackageFile';
+import ProjectFile from '../../src/models/files/ProjectFile';
 import {
   promptIfNeeded,
   contractsList,
@@ -144,10 +144,10 @@ describe('prompt', function() {
           .stub(ContractManager.prototype, 'getContractNames')
           .returns(['Foo', 'Bar', 'Buz']);
         sinon
-          .stub(ZosPackageFile.prototype, 'dependencies')
+          .stub(ProjectFile.prototype, 'dependencies')
           .get(() => ({ 'mock-stdlib': '1.1.0' }));
         sinon
-          .stub(ZosPackageFile.prototype, 'contracts')
+          .stub(ProjectFile.prototype, 'contracts')
           .get(() => ({ Foo: 'Foo', BarAlias: 'Bar' }));
       });
 
@@ -243,8 +243,8 @@ describe('prompt', function() {
     });
 
     describe('#methodsList', function() {
-      beforeEach('initialize packageFile', function() {
-        this.packageFile = new ZosPackageFile(
+      beforeEach('initialize projectFile', function() {
+        this.projectFile = new ProjectFile(
           'test/mocks/mock-stdlib-2/zos.json',
         );
       });
@@ -256,7 +256,7 @@ describe('prompt', function() {
             const methods = methodsList(
               'Foobar',
               Mutability.NotConstant,
-              this.packageFile,
+              this.projectFile,
             );
             methods.should.be.an('array').that.is.empty;
           });
@@ -269,7 +269,7 @@ describe('prompt', function() {
             const methods = methodsList(
               'Greeter',
               Mutability.Constant,
-              this.packageFile,
+              this.projectFile,
             );
             methods.should.be.an('array');
             methods.should.have.lengthOf(2);
@@ -288,7 +288,7 @@ describe('prompt', function() {
             const methods = methodsList(
               'Greeter',
               Mutability.NotConstant,
-              this.packageFile,
+              this.projectFile,
             );
             methods.should.be.an('array');
             methods.should.have.lengthOf(1);
@@ -305,8 +305,8 @@ describe('prompt', function() {
     });
 
     describe('#argsList', function() {
-      beforeEach('initialize packageFile', function() {
-        this.packageFile = new ZosPackageFile(
+      beforeEach('initialize projectFile', function() {
+        this.projectFile = new ProjectFile(
           'test/mocks/mock-stdlib-2/zos.json',
         );
       });
@@ -319,7 +319,7 @@ describe('prompt', function() {
               'Foobar',
               'foo()',
               Mutability.NotConstant,
-              this.packageFile,
+              this.projectFile,
             );
             args.should.be.an('array').that.is.empty;
           });
@@ -334,7 +334,7 @@ describe('prompt', function() {
               'Greeter',
               'foo(string)',
               Mutability.NotConstant,
-              this.packageFile,
+              this.projectFile,
             );
             args.should.be.an('array').that.is.empty;
           });
@@ -347,7 +347,7 @@ describe('prompt', function() {
             'Greeter',
             'greet(string)',
             Mutability.NotConstant,
-            this.packageFile,
+            this.projectFile,
           );
           args.should.be.an('array');
           args[0].should.deep.equal({ name: 'who', type: 'string' });

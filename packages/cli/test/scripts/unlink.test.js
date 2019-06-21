@@ -2,11 +2,11 @@
 require('../setup');
 
 import unlink from '../../src/scripts/unlink';
-import ZosPackageFile from '../../src/models/files/ZosPackageFile';
+import ProjectFile from '../../src/models/files/ProjectFile';
 
 contract('unlink script', function() {
   beforeEach(async function() {
-    this.packageFile = new ZosPackageFile(
+    this.projectFile = new ProjectFile(
       'test/mocks/packages/package-with-multiple-stdlibs.zos.json',
     );
   });
@@ -16,7 +16,7 @@ contract('unlink script', function() {
       const dependencies = [];
       await unlink({
         dependencies,
-        packageFile: this.packageFile,
+        projectFile: this.projectFile,
       }).should.be.rejectedWith(
         'At least one dependency name must be provided.',
       );
@@ -26,7 +26,7 @@ contract('unlink script', function() {
       const dependencyName = 'bulbasaur-lib2';
       await unlink({
         dependencies: [dependencyName],
-        packageFile: this.packageFile,
+        projectFile: this.projectFile,
       }).should.be.rejectedWith(
         `Could not find a zos.json file for '${dependencyName}'. Make sure it is provided by the npm package.`,
       );
@@ -35,13 +35,13 @@ contract('unlink script', function() {
 
   describe('with valid parameters', function() {
     it('unlinks a dependency', async function() {
-      const { dependencies } = this.packageFile;
+      const { dependencies } = this.projectFile;
       const dependencyToUnlink = 'mock-stdlib';
       const remainingDependencies = ['mock-stdlib-2', 'mock-stdlib-undeployed'];
 
       await unlink({
         dependencies: [dependencyToUnlink],
-        packageFile: this.packageFile,
+        projectFile: this.projectFile,
       });
 
       dependencies.should.not.have.all.keys(dependencyToUnlink);
@@ -49,13 +49,13 @@ contract('unlink script', function() {
     });
 
     it('unlinks multiple dependencies', async function() {
-      const { dependencies } = this.packageFile;
+      const { dependencies } = this.projectFile;
       const dependenciesToUnlink = ['mock-stdlib', 'mock-stdlib-2'];
       const remainingDependency = 'mock-stdlib-undeployed';
 
       await unlink({
         dependencies: dependenciesToUnlink,
-        packageFile: this.packageFile,
+        projectFile: this.projectFile,
       });
 
       dependencies.should.not.have.all.keys(dependenciesToUnlink);

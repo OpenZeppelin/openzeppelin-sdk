@@ -9,7 +9,7 @@
   },
   "lib": true,
   "frozen": false,
-  "zosversion": "2",
+  "manifestVersion": "2",
   "package": {
     "address": "0x25345c21e9d557b5ade7ab6abba53822c71a9051"
   },

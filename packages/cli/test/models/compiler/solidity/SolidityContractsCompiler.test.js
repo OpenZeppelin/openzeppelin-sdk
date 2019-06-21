@@ -325,8 +325,8 @@ function assertOutput(contracts, output, { version, optimizer, evmVersion }) {
     data.bytecode.should.not.be.null;
     data.deployedBytecode.should.not.be.null;
     data.compiler.name.should.be.eq('solc');
-    data.compiler.version.should.be.eq(
-      version || '0.5.9+commit.e560f70d.Emscripten.clang',
+    [version, '0.5.9+commit.e560f70d.Emscripten.clang'].should.include(
+      data.compiler.version,
     );
     data.compiler.optimizer.should.be.deep.equal(
       optimizer || { enabled: false },

@@ -2,18 +2,18 @@
 require('../setup');
 
 import link from '../../src/scripts/link';
-import ZosPackageFile from '../../src/models/files/ZosPackageFile';
+import ProjectFile from '../../src/models/files/ProjectFile';
 
 const should = require('chai').should();
 
 contract('link script', function() {
   const shouldHaveDependency = function(name, version) {
-    should.exist(this.packageFile.getDependencyVersion(name));
-    this.packageFile.getDependencyVersion(name).should.eq(version);
+    should.exist(this.projectFile.getDependencyVersion(name));
+    this.projectFile.getDependencyVersion(name).should.eq(version);
   };
 
   beforeEach('setup', async function() {
-    this.packageFile = new ZosPackageFile(
+    this.projectFile = new ProjectFile(
       'test/mocks/packages/package-with-stdlib.zos.json',
     );
     this.shouldHaveDependency = shouldHaveDependency.bind(this);
@@ -22,14 +22,14 @@ contract('link script', function() {
   it('should set a dependency', async function() {
     await link({
       dependencies: ['mock-stdlib@1.1.0'],
-      packageFile: this.packageFile,
+      projectFile: this.projectFile,
     });
     this.shouldHaveDependency('mock-stdlib', '1.1.0');
   });
 
   it('should set multiple dependencies', async function() {
     const dependencies = ['mock-stdlib@1.1.0', 'mock-stdlib-2@1.2.0'];
-    await link({ dependencies, packageFile: this.packageFile });
+    await link({ dependencies, projectFile: this.projectFile });
     this.shouldHaveDependency('mock-stdlib', '1.1.0');
     this.shouldHaveDependency('mock-stdlib-2', '1.2.0');
   });
@@ -38,8 +38,8 @@ contract('link script', function() {
     const initialLibs = ['mock-stdlib@^1.0.0', 'mock-stdlib-2@1.2.0'];
     const withUpdatedLib = ['mock-stdlib@~1.1.0'];
 
-    await link({ dependencies: initialLibs, packageFile: this.packageFile });
-    await link({ dependencies: withUpdatedLib, packageFile: this.packageFile });
+    await link({ dependencies: initialLibs, projectFile: this.projectFile });
+    await link({ dependencies: withUpdatedLib, projectFile: this.projectFile });
 
     this.shouldHaveDependency('mock-stdlib', '~1.1.0');
     this.shouldHaveDependency('mock-stdlib-2', '1.2.0');
@@ -51,7 +51,7 @@ contract('link script', function() {
     await link({
       dependencies,
       installLib: true,
-      packageFile: this.packageFile,
+      projectFile: this.projectFile,
     });
 
     this.shouldHaveDependency('mock-stdlib', '1.1.0');
@@ -61,7 +61,7 @@ contract('link script', function() {
   it('should raise an error if requested version of dependency does not match its package version', async function() {
     await link({
       dependencies: ['mock-stdlib-invalid@1.0.0'],
-      packageFile: this.packageFile,
+      projectFile: this.projectFile,
     }).should.be.rejectedWith(
       'Required dependency version 1.0.0 does not match version 2.0.0',
     );
@@ -71,7 +71,7 @@ contract('link script', function() {
     await link({
       dependencies: ['mock-stdlib@^1.0.0'],
       installLib: true,
-      packageFile: this.packageFile,
+      projectFile: this.projectFile,
     });
     this.shouldHaveDependency('mock-stdlib', '^1.0.0');
   });
@@ -80,7 +80,7 @@ contract('link script', function() {
     await link({
       dependencies: ['mock-stdlib'],
       installLib: true,
-      packageFile: this.packageFile,
+      projectFile: this.projectFile,
     });
     this.shouldHaveDependency('mock-stdlib', '^1.1.0');
   });
@@ -88,16 +88,16 @@ contract('link script', function() {
   it('should raise an error if requested version range does not match its package version', async function() {
     await link({
       dependencies: ['mock-stdlib@~1.0.0'],
-      packageFile: this.packageFile,
+      projectFile: this.projectFile,
     }).should.be.rejectedWith(
       'Required dependency version ~1.0.0 does not match version 1.1.0',
     );
   });
 
-  it('should raise an error if requested version of dependency lacks zosversion identifier', async function() {
+  it('should raise an error if requested version of dependency lacks manifestVersion identifier', async function() {
     await link({
       dependencies: ['mock-stdlib-unsupported@1.1.0'],
-      packageFile: this.packageFile,
-    }).should.be.rejectedWith(/zos version identifier not found/i);
+      projectFile: this.projectFile,
+    }).should.be.rejectedWith(/Manifest version identifier not found/i);
   });
 });

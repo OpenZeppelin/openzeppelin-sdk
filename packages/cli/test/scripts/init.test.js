@@ -6,7 +6,7 @@ import { FileSystem as fs } from 'zos-lib'
 import { cleanup } from '../helpers/cleanup'
 
 import init from '../../src/scripts/init'
-import ZosPackageFile from '../../src/models/files/ZosPackageFile'
+import ProjectFile from '../../src/models/files/ProjectFile'
 import ConfigManager from '../../src/models/config/ConfigManager'
 
 contract('init script', function() {
@@ -25,38 +25,38 @@ contract('init script', function() {
   });
 
   beforeEach('create package file', async function() {
-    this.packageFile = new ZosPackageFile(`${tmpDir}/zos.json`)
+    this.projectFile = new ProjectFile(`${tmpDir}/zos.json`)
   });
 
   it('should default to unpublished apps', async function() {
-    await init({ name, version, packageFile: this.packageFile });
-    this.packageFile.isPublished.should.eq(false);
+    await init({ name, version, projectFile: this.projectFile });
+    this.projectFile.isPublished.should.eq(false);
   });
 
   function testInit(publish) {
     it('should have correct publish mark', async function() {
-      await init({ publish, name, version, packageFile: this.packageFile });
-      this.packageFile.isPublished.should.eq(publish);
+      await init({ publish, name, version, projectFile: this.projectFile });
+      this.projectFile.isPublished.should.eq(publish);
     });
 
     it('should have the appropriate app name', async function() {
-      await init({ publish, name, version, packageFile: this.packageFile });
-      this.packageFile.hasName(name).should.be.true;
+      await init({ publish, name, version, projectFile: this.projectFile });
+      this.projectFile.hasName(name).should.be.true;
     });
 
     it('should have a default version if not specified', async function() {
-      await init({ publish, name, packageFile: this.packageFile });
-      this.packageFile.isCurrentVersion('0.1.0').should.be.true;
+      await init({ publish, name, projectFile: this.projectFile });
+      this.projectFile.isCurrentVersion('0.1.0').should.be.true;
     });
 
     it('should have the appropriate version', async function() {
-      await init({ publish, name, version, packageFile: this.packageFile });
-      this.packageFile.isCurrentVersion(version).should.be.true;
+      await init({ publish, name, version, projectFile: this.projectFile });
+      this.projectFile.isCurrentVersion(version).should.be.true;
     });
 
     it('should have an empty contracts object', async function() {
-      await init({ publish, name, version, packageFile: this.packageFile });
-      this.packageFile.contracts.should.be.eql({});
+      await init({ publish, name, version, projectFile: this.projectFile });
+      this.projectFile.contracts.should.be.eql({});
     });
 
     it('should set dependency', async function() {
@@ -65,27 +65,27 @@ contract('init script', function() {
         name,
         version,
         dependencies: ['mock-stdlib@1.1.0'],
-        packageFile: this.packageFile,
+        projectFile: this.projectFile,
       });
-      this.packageFile.getDependencyVersion('mock-stdlib').should.eq('1.1.0');
+      this.projectFile.getDependencyVersion('mock-stdlib').should.eq('1.1.0');
     });
 
     it('should not overwrite existing file by default', async function() {
-      fs.writeJson(this.packageFile.fileName, { name: 'previousApp' });
+      fs.writeJson(this.projectFile.fileName, { name: 'previousApp' });
       await init({
         publish,
         name,
         version,
-        packageFile: this.packageFile,
+        projectFile: this.projectFile,
       }).should.be.rejectedWith(
-        `Cannot overwrite existing file ${this.packageFile.fileName}`,
+        `Cannot overwrite existing file ${this.projectFile.fileName}`,
       );
 
-      cleanup(this.packageFile.fileName);
+      cleanup(this.projectFile.fileName);
     });
 
     it('should overwrite existing file if requested', async function() {
-      fs.writeJson(this.packageFile.fileName, {
+      fs.writeJson(this.projectFile.fileName, {
         name: 'previousApp',
         version: '0',
       });
@@ -94,13 +94,13 @@ contract('init script', function() {
         name,
         version,
         force: true,
-        packageFile: this.packageFile,
+        projectFile: this.projectFile,
       });
 
-      this.packageFile.hasName(name).should.be.true;
-      this.packageFile.isCurrentVersion(version).should.be.true;
+      this.projectFile.hasName(name).should.be.true;
+      this.projectFile.isCurrentVersion(version).should.be.true;
 
-      cleanup(this.packageFile.fileName);
+      cleanup(this.projectFile.fileName);
     });
   }
 

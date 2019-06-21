@@ -18,8 +18,8 @@ import {
   Contract,
 } from 'zos-lib';
 import { fromContractFullName, toContractFullName } from '../../utils/naming';
-import { ZOS_VERSION, checkVersion } from './ZosVersion';
-import ZosPackageFile from './ZosPackageFile';
+import { MANIFEST_VERSION, checkVersion } from './ManifestVersion';
+import ProjectFile from './ProjectFile';
 import { ProxyType } from '../../scripts/interfaces';
 
 export interface ContractInterface {
@@ -64,15 +64,15 @@ interface AddressWrapper {
   address?: string;
 }
 
-export default class ZosNetworkFile {
-  public packageFile: ZosPackageFile;
+export default class NetworkFile {
+  public projectFile: ProjectFile;
   public network: any;
   public fileName: string;
   public data: {
     contracts: { [contractAlias: string]: ContractInterface };
     solidityLibs: { [libAlias: string]: SolidityLibInterface };
     proxies: { [contractName: string]: ProxyInterface[] };
-    zosversion: string;
+    manifestVersion: string;
     proxyAdmin: AddressWrapper;
     proxyFactory: AddressWrapper;
     app: AddressWrapper;
@@ -83,9 +83,9 @@ export default class ZosNetworkFile {
     dependencies: { [dependencyName: string]: DependencyInterface };
   };
 
-  public static getZosversion(network: string): string | null {
+  public static getManifestVersion(network: string): string | null {
     const file = fs.parseJsonIfExists(`zos.${network}.json`);
-    return file ? file.zosversion : null;
+    return file ? file.manifestVersion : null;
   }
 
   public static getDependencies(
@@ -96,12 +96,8 @@ export default class ZosNetworkFile {
   }
 
   // TS-TODO: type for network parameter (and class member too).
-  public constructor(
-    packageFile: ZosPackageFile,
-    network: any,
-    fileName: string,
-  ) {
-    this.packageFile = packageFile;
+  public constructor(projectFile: ProjectFile, network: any, fileName: string) {
+    this.projectFile = projectFile;
     this.network = network;
     this.fileName = fileName;
 
@@ -109,7 +105,7 @@ export default class ZosNetworkFile {
       contracts: {},
       solidityLibs: {},
       proxies: {},
-      zosversion: ZOS_VERSION,
+      manifestVersion: MANIFEST_VERSION,
     };
 
     try {
@@ -123,15 +119,15 @@ export default class ZosNetworkFile {
       }.`;
       throw e;
     }
-    checkVersion(this.data.zosversion, this.fileName);
+    checkVersion(this.data.manifestVersion, this.fileName);
   }
 
-  public set zosversion(version: string) {
-    this.data.zosversion = version;
+  public set manifestVersion(version: string) {
+    this.data.manifestVersion = version;
   }
 
-  public get zosversion(): string {
-    return this.data.zosversion;
+  public get manifestVersion(): string {
+    return this.data.manifestVersion;
   }
 
   public set version(version: string) {
@@ -231,7 +227,7 @@ export default class ZosNetworkFile {
   }
 
   public get isPublished(): boolean {
-    return this.packageFile.isPublished;
+    return this.projectFile.isPublished;
   }
 
   public get contractAliases(): string[] {
@@ -367,7 +363,7 @@ export default class ZosNetworkFile {
   }
 
   public contractAliasesMissingFromPackage(): any[] {
-    return difference(this.contractAliases, this.packageFile.contractAliases);
+    return difference(this.contractAliases, this.projectFile.contractAliases);
   }
 
   public isCurrentVersion(version: string): boolean {
@@ -387,13 +383,13 @@ export default class ZosNetworkFile {
   }
 
   public hasMatchingVersion(): boolean {
-    return this.packageFile.isCurrentVersion(this.version);
+    return this.projectFile.isCurrentVersion(this.version);
   }
 
   public dependenciesNamesMissingFromPackage(): any[] {
     return difference(
       this.dependenciesNames,
-      this.packageFile.dependenciesNames,
+      this.projectFile.dependenciesNames,
     );
   }
 
@@ -404,7 +400,7 @@ export default class ZosNetworkFile {
 
   public dependencySatisfiesVersionRequirement(name: string): boolean {
     const dep = this.getDependency(name);
-    return dep && this.packageFile.dependencyMatches(name, dep.version);
+    return dep && this.projectFile.dependencyMatches(name, dep.version);
   }
 
   public dependencyHasMatchingCustomDeploy(name: string): boolean {

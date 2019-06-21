@@ -1,5 +1,5 @@
 {
-  "zosversion": "2.2",
+  "manifestVersion": "2.2",
   "name": "example-truffle-migrate",
   "version": "0.1.0",
   "contracts": {

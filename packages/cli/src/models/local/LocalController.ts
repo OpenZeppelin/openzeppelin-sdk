@@ -18,27 +18,27 @@ import Dependency from '../dependency/Dependency';
 import NetworkController from '../network/NetworkController';
 import ValidationLogger from '../../interface/ValidationLogger';
 import ConfigManager from '../config/ConfigManager';
-import ZosPackageFile from '../files/ZosPackageFile';
-import ZosNetworkFile from '../files/ZosNetworkFile';
+import ProjectFile from '../files/ProjectFile';
+import NetworkFile from '../files/NetworkFile';
 import ContractManager from './ContractManager';
 
 const DEFAULT_VERSION = '0.1.0';
 
 export default class LocalController {
-  public packageFile: ZosPackageFile;
+  public projectFile: ProjectFile;
 
   public constructor(
-    packageFile: ZosPackageFile = new ZosPackageFile(),
+    projectFile: ProjectFile = new ProjectFile(),
     init: boolean = false,
   ) {
-    if (!init && !packageFile.exists()) {
+    if (!init && !projectFile.exists()) {
       throw Error(
         `ZeppelinOS file ${
-          packageFile.fileName
+          projectFile.fileName
         } not found. Run 'zos init' first to initialize the project.`,
       );
     }
-    this.packageFile = packageFile;
+    this.projectFile = projectFile;
   }
 
   public init(
@@ -49,43 +49,43 @@ export default class LocalController {
   ): void | never {
     if (!name)
       throw Error('A project name must be provided to initialize the project.');
-    this.initZosPackageFile(name, version, force, publish);
+    this.initProjectFile(name, version, force, publish);
     Session.ignoreFile();
     ConfigManager.initialize();
   }
 
-  public initZosPackageFile(
+  public initProjectFile(
     name: string,
     version: string,
     force: boolean = false,
     publish: boolean,
   ): void | never {
-    if (this.packageFile.exists() && !force) {
+    if (this.projectFile.exists() && !force) {
       throw Error(
-        `Cannot overwrite existing file ${this.packageFile.fileName}`,
+        `Cannot overwrite existing file ${this.projectFile.fileName}`,
       );
     }
-    if (this.packageFile.name && !force) {
+    if (this.projectFile.name && !force) {
       throw Error(
         `Cannot initialize already initialized package ${
-          this.packageFile.name
+          this.projectFile.name
         }`,
       );
     }
-    this.packageFile.name = name;
-    this.packageFile.version = version || DEFAULT_VERSION;
-    this.packageFile.contracts = {};
-    if (publish) this.packageFile.publish = publish;
+    this.projectFile.name = name;
+    this.projectFile.version = version || DEFAULT_VERSION;
+    this.projectFile.contracts = {};
+    if (publish) this.projectFile.publish = publish;
     Loggy.noSpin(
       __filename,
-      'initZosPackageFile',
-      'init-package-file',
+      'initProjectFile',
+      'init-project-file',
       `Project initialized. Write a new contract in the contracts folder and run 'zos create' to deploy it.`,
     );
   }
 
   public bumpVersion(version: string): void {
-    this.packageFile.version = version;
+    this.projectFile.version = version;
   }
 
   public add(contractAlias: string, contractName: string): void {
@@ -99,17 +99,17 @@ export default class LocalController {
           : `${contractAlias}:${contractName}`
       }`,
     );
-    this.packageFile.addContract(contractAlias, contractName);
+    this.projectFile.addContract(contractAlias, contractName);
     Loggy.succeed(`add-${contractAlias}`, `Added contract ${contractAlias}`);
   }
 
   public addAll(): void {
-    const manager = new ContractManager(this.packageFile);
+    const manager = new ContractManager(this.projectFile);
     manager.getContractNames().forEach(name => this.add(name, name));
   }
 
   public remove(contractAlias: string): void {
-    if (!this.packageFile.hasContract(contractAlias)) {
+    if (!this.projectFile.hasContract(contractAlias)) {
       Loggy.noSpin.error(
         __filename,
         'remove',
@@ -123,7 +123,7 @@ export default class LocalController {
         `remove-${contractAlias}`,
         `Removing ${contractAlias}`,
       );
-      this.packageFile.unsetContract(contractAlias);
+      this.projectFile.unsetContract(contractAlias);
       Loggy.succeed(
         `remove-${contractAlias}`,
         `Removed contract ${contractAlias}`,
@@ -147,7 +147,7 @@ export default class LocalController {
   public validateAll(): boolean {
     const buildArtifacts = getBuildArtifacts();
     return every(
-      map(this.packageFile.contractAliases, contractAlias =>
+      map(this.projectFile.contractAliases, contractAlias =>
         this.validate(contractAlias, buildArtifacts),
       ),
     );
@@ -158,7 +158,7 @@ export default class LocalController {
     contractAlias: string,
     buildArtifacts?: BuildArtifacts,
   ): boolean {
-    const contractName = this.packageFile.contract(contractAlias);
+    const contractName = this.projectFile.contract(contractAlias);
     const contract = Contracts.getFromLocal(contractName || contractAlias);
     const warnings = validateContract(contract, {}, buildArtifacts);
     new ValidationLogger(contract).log(warnings, buildArtifacts);
@@ -176,7 +176,7 @@ export default class LocalController {
   public getContractSourcePath(
     contractAlias: string,
   ): { sourcePath: string; compilerVersion: string } | never {
-    const contractName = this.packageFile.contract(contractAlias);
+    const contractName = this.projectFile.contract(contractAlias);
     if (contractName) {
       const contractDataPath = Contracts.getLocalPath(contractName);
       const { compiler, sourcePath } = fs.parseJson(contractDataPath);
@@ -187,7 +187,7 @@ export default class LocalController {
   }
 
   public writePackage(): void {
-    this.packageFile.write();
+    this.projectFile.write();
   }
 
   // DependencyController
@@ -196,16 +196,18 @@ export default class LocalController {
     installDependencies: boolean = false,
   ): Promise<void> {
     const linkedDependencies = await Promise.all(
-      dependencies.map(async (depNameVersion: string) => {
-        const dependency = installDependencies
-          ? await Dependency.install(depNameVersion)
-          : Dependency.fromNameWithVersion(depNameVersion);
-        this.packageFile.setDependency(
-          dependency.name,
-          dependency.requirement as string,
-        );
-        return dependency.name;
-      }),
+      dependencies.map(
+        async (depNameVersion: string): Promise<string> => {
+          const dependency = installDependencies
+            ? await Dependency.install(depNameVersion)
+            : Dependency.fromNameWithVersion(depNameVersion);
+          this.projectFile.setDependency(
+            dependency.name,
+            dependency.requirement as string,
+          );
+          return dependency.name;
+        },
+      ),
     );
 
     if (linkedDependencies.length > 0) {
@@ -224,7 +226,7 @@ export default class LocalController {
   public unlinkDependencies(dependenciesNames: string[]): void {
     const unlinkedDependencies = dependenciesNames.map(dep => {
       const dependency = Dependency.fromNameWithVersion(dep);
-      this.packageFile.unsetDependency(dependency.name);
+      this.projectFile.unsetDependency(dependency.name);
       return dependency.name;
     });
 
@@ -243,7 +245,7 @@ export default class LocalController {
   public onNetwork(
     network: string,
     txParams: TxParams,
-    networkFile?: ZosNetworkFile,
+    networkFile?: NetworkFile,
   ): NetworkController {
     return new NetworkController(network, txParams, networkFile);
   }

@@ -2,7 +2,7 @@ import push from './push';
 import init from '../scripts/init';
 import { promptIfNeeded, InquirerQuestions } from '../prompts/prompt';
 import { FileSystem } from 'zos-lib';
-import ZosPackageFile from '../models/files/ZosPackageFile';
+import ProjectFile from '../models/files/ProjectFile';
 
 const name = 'init';
 const signature = `${name} [project-name] [version]`;
@@ -51,9 +51,9 @@ async function action(
 
 async function runActionIfNeeded(options: any): Promise<void> {
   const { interactive } = options;
-  const packageFile = new ZosPackageFile();
+  const projectFile = new ProjectFile();
 
-  if (interactive && !packageFile.exists()) {
+  if (interactive && !projectFile.exists()) {
     await action(undefined, undefined, { dontExitProcess: true });
   }
 }

@@ -7,7 +7,7 @@ import {
   ProjectCompileResult,
 } from './solidity/SolidityProjectCompiler';
 import findUp from 'find-up';
-import ZosPackageFile from '../files/ZosPackageFile';
+import ProjectFile from '../files/ProjectFile';
 import { promisify } from 'util';
 import merge from 'lodash.merge';
 
@@ -16,14 +16,14 @@ const execFile = promisify(callbackExecFile);
 
 export async function compile(
   compilerOptions?: ProjectCompilerOptions,
-  packageFile = new ZosPackageFile(),
+  projectFile = new ProjectFile(),
   force: boolean = false,
 ): Promise<void> {
   if (!force && state.alreadyCompiled) return;
 
   // Merge config file compiler options with those set explicitly
   const resolvedOptions: ProjectCompilerOptions = {};
-  merge(resolvedOptions, packageFile.compilerOptions, compilerOptions);
+  merge(resolvedOptions, projectFile.compilerOptions, compilerOptions);
 
   // Validate compiler manager setting
   const { manager } = resolvedOptions;
@@ -49,12 +49,12 @@ export async function compile(
     : null;
 
   // If compiled successfully, write back compiler settings to zos.json to persist them
-  packageFile.setCompilerOptions({
+  projectFile.setCompilerOptions({
     ...resolvedOptions,
     ...compileVersionOptions,
     manager: useTruffle ? 'truffle' : 'zos',
   });
-  if (packageFile.exists()) packageFile.write();
+  if (projectFile.exists()) projectFile.write();
 
   state.alreadyCompiled = true;
 }

@@ -10,7 +10,7 @@ import {
   InquirerQuestions,
 } from '../prompts/prompt';
 import { fromContractFullName } from '../utils/naming';
-import ZosPackageFile from '../models/files/ZosPackageFile';
+import ProjectFile from '../models/files/ProjectFile';
 
 const name = 'add';
 const signature = `${name} [contractNames...]`;
@@ -59,16 +59,16 @@ async function runActionIfNeeded(
     contract: contractAlias,
     package: packageName,
   } = fromContractFullName(contractName);
-  const packageFile = new ZosPackageFile();
+  const projectFile = new ProjectFile();
 
   if (interactive) {
     if (
       !packageName &&
       contractAlias &&
-      !packageFile.hasContract(contractAlias)
+      !projectFile.hasContract(contractAlias)
     ) {
       await action([contractAlias], options);
-    } else if (!packageName && !packageFile.hasContracts()) {
+    } else if (!packageName && !projectFile.hasContracts()) {
       await action([], options);
     }
   }

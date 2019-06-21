@@ -3,13 +3,13 @@ require('../setup');
 
 const expect = require('chai').expect;
 
-import ZosNetworkFile from '../../src/models/files/ZosNetworkFile';
-import ZosPackageFile from '../../src/models/files/ZosPackageFile';
-import { ZOS_VERSION } from '../../src/models/files/ZosVersion';
+import NetworkFile from '../../src/models/files/NetworkFile';
+import ProjectFile from '../../src/models/files/ProjectFile';
+import { MANIFEST_VERSION } from '../../src/models/files/ManifestVersion';
 
-contract('ZosNetworkFile', function() {
+contract('NetworkFile', function() {
   beforeEach('loads parent package file', function() {
-    this.appPackageFile = new ZosPackageFile(
+    this.appProjectFile = new ProjectFile(
       'test/mocks/packages/package-empty.zos.json',
     );
   });
@@ -18,7 +18,7 @@ contract('ZosNetworkFile', function() {
     describe('#getDependencies', function() {
       context('on network file with dependencies', function() {
         it('returns an object with dependencies', function() {
-          const dependencies = ZosNetworkFile.getDependencies(
+          const dependencies = NetworkFile.getDependencies(
             'test/mocks/networks/network-with-stdlibs.zos.test.json',
           );
           dependencies.should.not.be.empty;
@@ -28,7 +28,7 @@ contract('ZosNetworkFile', function() {
 
       context('on network file without dependencies', function() {
         it('returns an empty object', function() {
-          const dependencies = ZosNetworkFile.getDependencies(
+          const dependencies = NetworkFile.getDependencies(
             'test/mocks/networks/network-app-with-contract.zos.test.json',
           );
           expect(dependencies).to.be.undefined;
@@ -39,21 +39,21 @@ contract('ZosNetworkFile', function() {
 
   describe('constructor', function() {
     it('creates empty file', function() {
-      const file = new ZosNetworkFile(
-        this.appPackageFile,
+      const file = new NetworkFile(
+        this.appProjectFile,
         'test',
         'test/mocks/networks/new.test.json',
       );
-      file.data.zosversion.should.eq(ZOS_VERSION);
+      file.data.manifestVersion.should.eq(MANIFEST_VERSION);
     });
 
     it('loads existing file', function() {
-      const file = new ZosNetworkFile(
-        this.appPackageFile,
+      const file = new NetworkFile(
+        this.appProjectFile,
         'test',
         'test/mocks/networks/network-app-with-contract.zos.test.json',
       );
-      file.data.zosversion.should.eq(ZOS_VERSION);
+      file.data.manifestVersion.should.eq(MANIFEST_VERSION);
       file.packageAddress.should.eq(
         '0x0000000000000000000000000000000000000080',
       );
@@ -63,26 +63,26 @@ contract('ZosNetworkFile', function() {
       file.contract('Greeter').address.should.eq('0x1020');
     });
 
-    it('fails to load missing zosversion', function() {
+    it('fails to load missing manifestVersion', function() {
       expect(
         () =>
-          new ZosNetworkFile(
-            this.appPackageFile,
+          new NetworkFile(
+            this.appProjectFile,
             'test',
-            'test/mocks/networks/network-missing-zosversion.zos.test.json',
+            'test/mocks/networks/network-missing-manifest-version.zos.test.json',
           ),
-      ).to.throw(/zos version identifier not found/);
+      ).to.throw(/Manifest version identifier not found/);
     });
 
-    it('fails to load unsupported zosversion', function() {
+    it('fails to load unsupported manifestVersion', function() {
       expect(
         () =>
-          new ZosNetworkFile(
-            this.appPackageFile,
+          new NetworkFile(
+            this.appProjectFile,
             'test',
-            'test/mocks/networks/network-unsupported-zosversion.zos.test.json',
+            'test/mocks/networks/network-unsupported-manifest-version.zos.test.json',
           ),
-      ).to.throw(/Unrecognized zos version identifier 3/);
+      ).to.throw(/Unrecognized manifest version identifier 3/);
     });
   });
 });

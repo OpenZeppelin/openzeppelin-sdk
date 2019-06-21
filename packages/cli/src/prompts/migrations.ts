@@ -1,10 +1,10 @@
 import readline from 'readline';
-import { isMigratableZosversion } from '../models/files/ZosVersion';
-import ZosNetworkFile from '../models/files/ZosNetworkFile';
+import { isMigratableManifestVersion } from '../models/files/ManifestVersion';
+import NetworkFile from '../models/files/NetworkFile';
 
 export async function hasToMigrateProject(network): Promise<boolean> {
-  const zosversion = ZosNetworkFile.getZosversion(network);
-  if (isMigratableZosversion(zosversion)) {
+  const version = NetworkFile.getManifestVersion(network);
+  if (isMigratableManifestVersion(version)) {
     const response = await new Promise(resolve => {
       const prompt = readline.createInterface({
         input: process.stdin,

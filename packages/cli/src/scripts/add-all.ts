@@ -1,13 +1,13 @@
 import { Loggy } from 'zos-lib';
 import LocalController from '../models/local/LocalController';
-import ZosPackageFile from '../models/files/ZosPackageFile';
+import ProjectFile from '../models/files/ProjectFile';
 
 export default function addAll({
-  packageFile,
+  projectFile,
 }: {
-  packageFile?: ZosPackageFile;
+  projectFile?: ProjectFile;
 }): void {
-  const controller = new LocalController(packageFile);
+  const controller = new LocalController(projectFile);
   controller.addAll();
   Loggy.noSpin(
     __filename,

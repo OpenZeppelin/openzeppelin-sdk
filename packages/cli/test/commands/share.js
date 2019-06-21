@@ -26,8 +26,8 @@ import * as call from '../../src/scripts/call';
 
 import program from '../../src/bin/program';
 import Session from '../../src/models/network/Session';
-import ZosNetworkFile from '../../src/models/files/ZosNetworkFile';
-import ZosPackageFile from '../../src/models/files/ZosPackageFile';
+import NetworkFile from '../../src/models/files/NetworkFile';
+import ProjectFile from '../../src/models/files/ProjectFile';
 import * as Compiler from '../../src/models/compiler/Compiler';
 import Dependency from '../../src/models/dependency/Dependency';
 import ErrorHandler from '../../src/models/errors/ErrorHandler';
@@ -87,18 +87,16 @@ exports.stubCommands = function() {
         const txParams = from ? { from } : {};
         return { network, txParams };
       });
-    this.getZosversion = sinon
-      .stub(ZosNetworkFile, 'getZosversion')
+    this.getManifestVersion = sinon
+      .stub(NetworkFile, 'getManifestVersion')
       .returns('2.2');
-    this.packageFile = sinon
-      .stub(ZosPackageFile.prototype, 'exists')
+    this.projectFile = sinon
+      .stub(ProjectFile.prototype, 'exists')
       .returns(true);
-    const zosPackageFile = new ZosPackageFile(
-      'test/mocks/mock-stdlib/zos.json',
-    );
+    const projectFile = new ProjectFile('test/mocks/mock-stdlib/zos.json');
     this.dependency = sinon
-      .stub(Dependency.prototype, 'getPackageFile')
-      .returns(zosPackageFile);
+      .stub(Dependency.prototype, 'getProjectFile')
+      .returns(projectFile);
   });
 
   afterEach('restore', function() {

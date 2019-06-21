@@ -1,7 +1,7 @@
 import { TxParams } from 'zos-lib';
 
-import ZosPackageFile from '../models/files/ZosPackageFile';
-import ZosNetworkFile from '../models/files/ZosNetworkFile';
+import ProjectFile from '../models/files/ProjectFile';
+import NetworkFile from '../models/files/NetworkFile';
 
 interface ContractData {
   name: string;
@@ -21,7 +21,7 @@ interface PackageArgs {
 interface Network {
   network: string;
   txParams?: TxParams;
-  networkFile?: ZosNetworkFile;
+  networkFile?: NetworkFile;
 }
 
 interface MethodParams {
@@ -61,7 +61,7 @@ export interface UpdateParams extends Proxy {
 }
 
 export interface LinkParams extends Dependencies {
-  packageFile?: ZosPackageFile;
+  projectFile?: ProjectFile;
 }
 
 export interface InitParams extends Dependencies {
@@ -69,7 +69,7 @@ export interface InitParams extends Dependencies {
   version?: string;
   force?: boolean;
   publish?: boolean;
-  packageFile?: ZosPackageFile;
+  projectFile?: ProjectFile;
 }
 
 export interface UnpackParams {
@@ -98,7 +98,7 @@ export interface SetAdminParams extends Network, PackageArgs {
 
 export interface AddParams {
   contractsData: ContractData[];
-  packageFile?: ZosPackageFile;
+  projectFile?: ProjectFile;
 }
 
 export interface SessionParams {
@@ -111,22 +111,22 @@ export interface SessionParams {
 
 export interface BumpParams {
   version: string;
-  packageFile?: ZosPackageFile;
+  projectFile?: ProjectFile;
 }
 
 export interface RemoveParams {
   contracts: string[];
-  packageFile?: ZosPackageFile;
+  projectFile?: ProjectFile;
 }
 
 export interface CheckParams {
   contractAlias: string;
-  packageFile?: ZosPackageFile;
+  projectFile?: ProjectFile;
 }
 
 export interface UnlinkParams {
   dependencies: string[];
-  packageFile?: ZosPackageFile;
+  projectFile?: ProjectFile;
 }
 
 export interface QueryDeploymentParams extends Network {

@@ -48,7 +48,7 @@ describe('ZosConfig', function() {
       });
 
       it('does not create a networks.js file if present', function() {
-        FileSystem.write(zosConfigFile , '');
+        FileSystem.write(zosConfigFile, '');
         ZosConfig.initialize(tmpDir);
 
         FileSystem.read(zosConfigPath).should.have.lengthOf(0);
@@ -87,8 +87,11 @@ describe('ZosConfig', function() {
       context('when provided network does not exist', function() {
         it('throws an error', function() {
           ZosConfig.initialize(tmpDir);
-          (() => ZosConfig.loadNetworkConfig('non-existent', zosConfigDir))
-            .should.throw(/is not defined in your networks.js file/);
+          (() =>
+            ZosConfig.loadNetworkConfig(
+              'non-existent',
+              zosConfigDir,
+            )).should.throw(/is not defined in your networks.js file/);
         });
       });
 
@@ -117,18 +120,32 @@ describe('ZosConfig', function() {
           context('when specifying a function as provider', function() {
             it('calls the function', function() {
               const provider = () => 'returned provider';
-              sinon.stub(ZosConfig, 'getConfig').returns({ networks: { local: { provider, host: 'localhost', port: '1324' } } });
+              sinon.stub(ZosConfig, 'getConfig').returns({
+                networks: {
+                  local: { provider, host: 'localhost', port: '1324' },
+                },
+              });
               ZosConfig.initialize(tmpDir);
-              const networkConfig = ZosConfig.loadNetworkConfig('local', zosConfigDir);
+              const networkConfig = ZosConfig.loadNetworkConfig(
+                'local',
+                zosConfigDir,
+              );
               networkConfig.provider.should.eq('returned provider');
             });
           });
 
           context('when specifying a different protocol', function() {
             it('setups a different provider', function() {
-              sinon.stub(ZosConfig, 'getConfig').returns({ networks: { local: { protocol: 'wss', host: 'localhost', port: '1324' } } });
+              sinon.stub(ZosConfig, 'getConfig').returns({
+                networks: {
+                  local: { protocol: 'wss', host: 'localhost', port: '1324' },
+                },
+              });
               ZosConfig.initialize(tmpDir);
-              const networkConfig = ZosConfig.loadNetworkConfig('local', zosConfigDir);
+              const networkConfig = ZosConfig.loadNetworkConfig(
+                'local',
+                zosConfigDir,
+              );
               networkConfig.provider.should.eq('wss://localhost:1324');
             });
           });

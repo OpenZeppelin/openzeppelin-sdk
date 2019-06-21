@@ -13,16 +13,16 @@ const DummyImplementationV2 = Contracts.getFromLocal('DummyImplementationV2');
 
 export default function shouldManageDependencies() {
   const packageName = 'MyDependency';
-  const packageVersion = '1.3.0';
+  const projectVersion = '1.3.0';
 
   describe('dependencies management', function() {
     beforeEach('setting dependency', async function() {
       this.package = await Package.deploy();
-      await this.package.newVersion(packageVersion);
+      await this.package.newVersion(projectVersion);
       await this.project.setDependency(
         packageName,
         this.package.address,
-        packageVersion,
+        projectVersion,
       );
     });
 
@@ -30,7 +30,7 @@ export default function shouldManageDependencies() {
       (await this.project.hasDependency(packageName)).should.be.true;
       (await this.project.getDependencyVersion(
         packageName,
-      )).should.be.semverEqual(packageVersion);
+      )).should.be.semverEqual(projectVersion);
       (await this.project.getDependencyPackage(packageName)).address.should.eq(
         this.package.address,
       );
@@ -44,14 +44,14 @@ export default function shouldManageDependencies() {
 
   describe('proxies on dependencies', async function() {
     beforeEach('setting dependency', async function() {
-      this.dependency = await PackageProject.fetchOrDeploy(packageVersion);
+      this.dependency = await PackageProject.fetchOrDeploy(projectVersion);
       await this.dependency.setImplementation(DummyImplementation);
       await this.dependency.setImplementation(DummyImplementationV2);
       this.package = await this.dependency.getProjectPackage();
       await this.project.setDependency(
         packageName,
         this.package.address,
-        packageVersion,
+        projectVersion,
       );
     });
 

@@ -91,9 +91,10 @@ async function action(proxyReference: string, options: any): Promise<void> {
     promptedProxyInfo.proxyReference,
   );
 
-  const additionalOpts = { 
+  const additionalOpts = {
     askForMethodParams: rawInitMethod,
-    askForMethodParamsMessage: 'Do you want to call a function on the instance after upgrading it?'
+    askForMethodParamsMessage:
+      'Do you want to call a function on the instance after upgrading it?',
   };
   const initMethodParams =
     promptedProxyInfo.proxyReference && !promptedProxyInfo.all

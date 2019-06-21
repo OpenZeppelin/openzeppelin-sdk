@@ -6,7 +6,7 @@ import {
   networksList,
   InquirerQuestions,
 } from '../prompts/prompt';
-import ZosPackageFile from '../models/files/ZosPackageFile';
+import ProjectFile from '../models/files/ProjectFile';
 
 const name = 'verify';
 const signature = `${name} [contract-alias]`;
@@ -52,7 +52,7 @@ async function action(contractName: string, options: any): Promise<void> {
     apiKey,
   };
 
-  const config = new ZosPackageFile().compilerOptions;
+  const config = new ProjectFile().compilerOptions;
   const defaults = {
     optimizer: config.optimizer && config.optimizer.enabled,
     optimizerRuns: config.optimizer && config.optimizer.runs,

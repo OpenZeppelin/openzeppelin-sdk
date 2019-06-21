@@ -62,7 +62,7 @@ contract('Dependency', function([_, from]) {
 
       context('when there are dependencies to deploy', function() {
         it('returns true', function() {
-          const projectPackageFile = fs.parseJsonIfExists(
+          const projectProjectFile = fs.parseJsonIfExists(
             'test/mocks/packages/package-with-multiple-stdlibs.zos.json',
           );
           const projectNetworkFile = fs.parseJsonIfExists(
@@ -71,7 +71,7 @@ contract('Dependency', function([_, from]) {
           const stubbedParseJsonIfExists = sinon.stub(fs, 'parseJsonIfExists');
           stubbedParseJsonIfExists
             .withArgs('zos.json')
-            .returns(projectPackageFile);
+            .returns(projectProjectFile);
           stubbedParseJsonIfExists
             .withArgs('zos.test.json')
             .returns(projectNetworkFile);
@@ -82,7 +82,7 @@ contract('Dependency', function([_, from]) {
 
       context('when all dependencies are already deployed', function() {
         it('returns false', function() {
-          const projectPackageFile = fs.parseJsonIfExists(
+          const projectProjectFile = fs.parseJsonIfExists(
             'test/mocks/packages/package-with-stdlib.zos.json',
           );
           const projectNetworkFile = fs.parseJsonIfExists(
@@ -91,7 +91,7 @@ contract('Dependency', function([_, from]) {
           const stubbedParseJsonIfExists = sinon.stub(fs, 'parseJsonIfExists');
           stubbedParseJsonIfExists
             .withArgs('zos.json')
-            .returns(projectPackageFile);
+            .returns(projectProjectFile);
           stubbedParseJsonIfExists
             .withArgs('zos.test.json')
             .returns(projectNetworkFile);
@@ -132,8 +132,8 @@ contract('Dependency', function([_, from]) {
         this.dependency.requirement.should.equal('1.1.0');
       });
 
-      it('sets packageFile', function() {
-        this.dependency._packageFile.should.not.be.null;
+      it('sets projectFile', function() {
+        this.dependency._projectFile.should.not.be.null;
       });
     });
   });
@@ -143,7 +143,7 @@ contract('Dependency', function([_, from]) {
       this.dependency = new Dependency('mock-stdlib', '1.1.0');
       this.txParams = {};
       this.addresses = {};
-      delete this.dependency._packageFile;
+      delete this.dependency._projectFile;
     });
 
     describe('#deploy', function() {
@@ -156,13 +156,13 @@ contract('Dependency', function([_, from]) {
       });
     });
 
-    describe('#getPackageFile', function() {
+    describe('#getProjectFile', function() {
       it('generates a package file', function() {
-        const packageFile = this.dependency.getPackageFile();
-        packageFile.should.not.be.null;
-        packageFile.fileName.should.eq('node_modules/mock-stdlib/zos.json');
-        packageFile.version.should.eq('1.1.0');
-        packageFile.contracts.should.include({ Greeter: 'GreeterImpl' });
+        const projectFile = this.dependency.getProjectFile();
+        projectFile.should.not.be.null;
+        projectFile.fileName.should.eq('node_modules/mock-stdlib/zos.json');
+        projectFile.version.should.eq('1.1.0');
+        projectFile.contracts.should.include({ Greeter: 'GreeterImpl' });
       });
     });
 

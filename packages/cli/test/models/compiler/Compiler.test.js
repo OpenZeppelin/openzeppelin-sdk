@@ -4,7 +4,7 @@ import sinon from 'sinon';
 
 import Truffle from '../../../src/models/config/TruffleConfig';
 import * as Compiler from '../../../src/models/compiler/Compiler';
-import ZosPackageFile from '../../../src/models/files/ZosPackageFile';
+import ProjectFile from '../../../src/models/files/ProjectFile';
 
 describe('Compiler', function () {
   beforeEach('setup', function () {
@@ -15,8 +15,8 @@ describe('Compiler', function () {
     );
     this.truffleCompile = sinon.stub(Compiler, 'compileWithTruffle');
     this.isTruffleConfig = sinon.stub(Truffle, 'isTruffleProject').returns(false);
-    this.packageFile = new ZosPackageFile('test/mocks/packages/package-empty-lite.zos.json')
-    this.compile = (opts, force) => Compiler.compile(opts, this.packageFile, force);
+    this.projectFile = new ProjectFile('test/mocks/packages/package-empty-lite.zos.json')
+    this.compile = (opts, force) => Compiler.compile(opts, this.projectFile, force);
   });
 
   afterEach('restoring stubs', function () {
@@ -38,13 +38,13 @@ describe('Compiler', function () {
   });
 
   it('compiles with zos if set in local config', async function () {
-    this.packageFile.data.compiler = { manager: 'zos' };
+    this.projectFile.data.compiler = { manager: 'zos' };
     await this.compile();
     this.solcCompile.should.have.been.calledOnce;
   });
 
   it('compiles with truffle if set in local config', async function () {
-    this.packageFile.data.compiler = { manager: 'truffle' };
+    this.projectFile.data.compiler = { manager: 'truffle' };
     await this.compile();
     this.truffleCompile.should.have.been.calledOnce;
   });
@@ -61,26 +61,26 @@ describe('Compiler', function () {
   });
 
   it('uses local config compiler settings', async function () {
-    this.packageFile.data.compiler = { solcVersion: '0.5.3' };
+    this.projectFile.data.compiler = { solcVersion: '0.5.3' };
     await this.compile();
     this.solcCompile.should.have.been.calledWithMatch({ version: '0.5.3' });
   });
 
   it('prefers explicitly set compiler settings over local config', async function () {
-    this.packageFile.data.compiler = { solcVersion: '0.5.3' };
+    this.projectFile.data.compiler = { solcVersion: '0.5.3' };
     await this.compile({ version: '0.5.4' });
     this.solcCompile.should.have.been.calledWithMatch({ version: '0.5.4' });
   });
 
   it('updates local config with compiler settings after running', async function () {
-    this.packageFile.data.compiler = { solcVersion: '0.5.3' };
+    this.projectFile.data.compiler = { solcVersion: '0.5.3' };
     await this.compile({ version: '0.5.4' });
-    this.packageFile.compilerOptions.version.should.eq('0.5.4');
+    this.projectFile.compilerOptions.version.should.eq('0.5.4');
   });
 
   it('updates local config with default compiler version after running', async function () {
     await this.compile();
-    this.packageFile.compilerOptions.version.should.eq('0.5.6');
+    this.projectFile.compilerOptions.version.should.eq('0.5.6');
   });
 
   it('does not compile twice', async function () {

@@ -8,7 +8,7 @@ import sendTx from '../../src/scripts/send-tx';
 import createProxy from '../../src/scripts/create';
 import { Contracts } from 'zos-lib';
 import CaptureLogs from '../helpers/captureLogs';
-import ZosPackageFile from '../../src/models/files/ZosPackageFile';
+import ProjectFile from '../../src/models/files/ProjectFile';
 
 const ImplV1 = Contracts.getFromLocal('ImplV1');
 
@@ -20,12 +20,12 @@ contract('send-tx script', function(accounts) {
 
   beforeEach('setup', async function() {
     this.logs = new CaptureLogs();
-    this.packageFile = new ZosPackageFile(
+    this.projectFile = new ProjectFile(
       'test/mocks/packages/package-empty.zos.json',
     );
-    this.networkFile = this.packageFile.networkFile(network);
+    this.networkFile = this.projectFile.networkFile(network);
     const contractsData = [{ name: 'ImplV1', alias: 'Impl' }];
-    await add({ contractsData, packageFile: this.packageFile });
+    await add({ contractsData, projectFile: this.projectFile });
     await push({ network, txParams, networkFile: this.networkFile });
     await createProxy({
       contractAlias: 'Impl',

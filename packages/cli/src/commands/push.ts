@@ -8,7 +8,7 @@ import Session from '../models/network/Session';
 import { compile } from '../models/compiler/Compiler';
 import { fromContractFullName } from '../utils/naming';
 import Dependency from '../models/dependency/Dependency';
-import ZosPackageFile from '../models/files/ZosPackageFile';
+import ProjectFile from '../models/files/ProjectFile';
 import ConfigManager from '../models/config/ConfigManager';
 import {
   promptIfNeeded,
@@ -111,8 +111,8 @@ async function runActionIfNeeded(
   options: any,
 ): Promise<void> {
   const { force, interactive, network: promptedNetwork } = options;
-  const packageFile = new ZosPackageFile();
-  const networkFile = packageFile.networkFile(network);
+  const projectFile = new ProjectFile();
+  const networkFile = projectFile.networkFile(network);
   const {
     contract: contractAlias,
     package: packageName,

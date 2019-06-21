@@ -13,7 +13,7 @@ import link from '../../src/scripts/link';
 import createProxy from '../../src/scripts/create';
 import update from '../../src/scripts/update';
 import setAdmin from '../../src/scripts/set-admin';
-import ZosPackageFile from '../../src/models/files/ZosPackageFile';
+import ProjectFile from '../../src/models/files/ProjectFile';
 import utils from 'web3-utils';
 import { ProxyType } from '../../src/scripts/interfaces';
 
@@ -84,13 +84,13 @@ contract('update script', function(accounts) {
   };
 
   const createProxies = async function() {
-    this.networkFile = this.packageFile.networkFile(network);
+    this.networkFile = this.projectFile.networkFile(network);
 
     const contractsData = [
       { name: 'ImplV1', alias: 'Impl' },
       { name: 'WithLibraryImplV1', alias: 'WithLibraryImpl' },
     ];
-    await add({ contractsData, packageFile: this.packageFile });
+    await add({ contractsData, projectFile: this.projectFile });
     await push({ network, txParams, networkFile: this.networkFile });
 
     this.implV1Address = this.networkFile.contract('Impl').address;
@@ -119,14 +119,14 @@ contract('update script', function(accounts) {
   };
 
   const bumpVersion = async function() {
-    await bump({ version: version_2, txParams, packageFile: this.packageFile });
+    await bump({ version: version_2, txParams, projectFile: this.projectFile });
     const newContractsData = [
       { name: 'ImplV2', alias: 'Impl' },
       { name: 'WithLibraryImplV2', alias: 'WithLibraryImpl' },
     ];
     await add({
       contractsData: newContractsData,
-      packageFile: this.packageFile,
+      projectFile: this.projectFile,
     });
     await push({ network, txParams, networkFile: this.networkFile });
 
@@ -343,7 +343,7 @@ contract('update script', function(accounts) {
           contractsData: [
             { name: 'UnmigratableImplV2', alias: 'WithLibraryImpl' },
           ],
-          packageFile: this.packageFile,
+          projectFile: this.projectFile,
         });
         await push({ network, txParams, networkFile: this.networkFile });
 
@@ -448,7 +448,7 @@ contract('update script', function(accounts) {
         it('should not warn when a contract has no migrate method', async function() {
           await add({
             contractsData: [{ name: 'WithLibraryImplV1', alias: 'NoMigrate' }],
-            packageFile: this.packageFile,
+            projectFile: this.projectFile,
           });
           await push({ network, txParams, networkFile: this.networkFile });
 
@@ -511,7 +511,7 @@ contract('update script', function(accounts) {
   const shouldHandleUpdateOnDependency = function() {
     describe('updating on dependency', function() {
       beforeEach('setup', async function() {
-        this.networkFile = this.packageFile.networkFile(network);
+        this.networkFile = this.projectFile.networkFile(network);
 
         await push({
           network,
@@ -537,12 +537,12 @@ contract('update script', function(accounts) {
         await bump({
           version: version_2,
           txParams,
-          packageFile: this.packageFile,
+          projectFile: this.projectFile,
         });
         await link({
           txParams,
           dependencies: ['mock-stdlib-undeployed-2@1.2.0'],
-          packageFile: this.packageFile,
+          projectFile: this.projectFile,
         });
         await push({
           network,
@@ -673,10 +673,10 @@ contract('update script', function(accounts) {
 
   describe('on application contract', function() {
     beforeEach('setup package', async function() {
-      this.packageFile = new ZosPackageFile(
+      this.projectFile = new ProjectFile(
         'test/mocks/packages/package-empty.zos.json',
       );
-      this.packageFile.version = version_1;
+      this.projectFile.version = version_1;
     });
 
     shouldHandleUpdateScript();
@@ -685,11 +685,11 @@ contract('update script', function(accounts) {
 
   describe('on application contract in unpublished mode', function() {
     beforeEach('setup package', async function() {
-      this.packageFile = new ZosPackageFile(
+      this.projectFile = new ProjectFile(
         'test/mocks/packages/package-empty.zos.json',
       );
-      this.packageFile.publish = false;
-      this.packageFile.version = version_1;
+      this.projectFile.publish = false;
+      this.projectFile.version = version_1;
     });
 
     shouldHandleUpdateScript();
@@ -698,10 +698,10 @@ contract('update script', function(accounts) {
 
   describe('on dependency contract', function() {
     beforeEach('setup package', async function() {
-      this.packageFile = new ZosPackageFile(
+      this.projectFile = new ProjectFile(
         'test/mocks/packages/package-with-undeployed-stdlib.zos.json',
       );
-      this.packageFile.version = version_1;
+      this.projectFile.version = version_1;
     });
 
     shouldHandleUpdateOnDependency();
@@ -709,11 +709,11 @@ contract('update script', function(accounts) {
 
   describe('on dependency contract in unpublished mode', function() {
     beforeEach('setup package', async function() {
-      this.packageFile = new ZosPackageFile(
+      this.projectFile = new ProjectFile(
         'test/mocks/packages/package-with-undeployed-stdlib.zos.json',
       );
-      this.packageFile.publish = false;
-      this.packageFile.version = version_1;
+      this.projectFile.publish = false;
+      this.projectFile.version = version_1;
     });
 
     shouldHandleUpdateOnDependency();

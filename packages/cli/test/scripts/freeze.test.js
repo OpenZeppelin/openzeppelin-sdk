@@ -4,22 +4,22 @@ require('../setup');
 import { Package } from 'zos-lib';
 import push from '../../src/scripts/push';
 import freeze from '../../src/scripts/freeze';
-import ZosPackageFile from '../../src/models/files/ZosPackageFile';
+import ProjectFile from '../../src/models/files/ProjectFile';
 
 contract('freeze script', function([_, owner]) {
   const network = 'test';
   const txParams = { from: owner };
 
   beforeEach('init package file', async function() {
-    this.packageFile = new ZosPackageFile(
+    this.projectFile = new ProjectFile(
       'test/mocks/packages/package-with-contracts.zos.json',
     );
   });
 
   describe('for an unpublished app', function() {
     beforeEach('push lib', async function() {
-      this.packageFile.publish = false;
-      this.networkFile = this.packageFile.networkFile(network);
+      this.projectFile.publish = false;
+      this.networkFile = this.projectFile.networkFile(network);
       await push({ networkFile: this.networkFile, network, txParams });
     });
 
@@ -34,7 +34,7 @@ contract('freeze script', function([_, owner]) {
 
   describe('for a published app', function() {
     beforeEach('push lib', async function() {
-      this.networkFile = this.packageFile.networkFile(network);
+      this.networkFile = this.projectFile.networkFile(network);
       await push({ networkFile: this.networkFile, network, txParams });
     });
 

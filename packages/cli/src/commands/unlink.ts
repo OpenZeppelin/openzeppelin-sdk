@@ -1,7 +1,7 @@
 import unlink from '../scripts/unlink';
 import push from './push';
 import { promptIfNeeded, InquirerQuestions } from '../prompts/prompt';
-import ZosPackageFile from '../models/files/ZosPackageFile';
+import ProjectFile from '../models/files/ProjectFile';
 
 const name = 'unlink';
 const signature = `${name} [dependencies...]`;
@@ -19,7 +19,7 @@ const register: (program: any) => any = program =>
 
 async function action(dependencies: string[], options: any): Promise<void> {
   const { interactive } = options;
-  const installedDependencies = ZosPackageFile.getLinkedDependencies();
+  const installedDependencies = ProjectFile.getLinkedDependencies();
   const args = { dependencies };
   const props = getCommandProps(installedDependencies);
   const prompted = await promptIfNeeded({ args, props }, interactive);

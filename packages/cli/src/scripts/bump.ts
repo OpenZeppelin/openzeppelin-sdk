@@ -3,11 +3,11 @@ import { BumpParams } from './interfaces';
 
 export default async function bumpVersion({
   version,
-  packageFile,
+  projectFile,
 }: BumpParams): Promise<void | never> {
   if (!version)
     throw Error('A version name must be provided to initialize a new version.');
-  const controller = new LocalController(packageFile);
+  const controller = new LocalController(projectFile);
   controller.bumpVersion(version);
   controller.writePackage();
 }

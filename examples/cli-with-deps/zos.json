@@ -1,5 +1,5 @@
 {
-  "zosversion": "2",
+  "manifestVersion": "2",
   "name": "cli-with-deps",
   "version": "0.1.0",
   "contracts": {

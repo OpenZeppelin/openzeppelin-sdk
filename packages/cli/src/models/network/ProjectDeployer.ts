@@ -10,8 +10,8 @@ import {
 } from 'zos-lib';
 
 import NetworkController from './NetworkController';
-import ZosPackageFile from '../files/ZosPackageFile';
-import ZosNetworkFile from '../files/ZosNetworkFile';
+import ProjectFile from '../files/ProjectFile';
+import NetworkFile from '../files/NetworkFile';
 
 interface PartialDeploy {
   app?: App;
@@ -30,14 +30,14 @@ type CreateProjectFn = (addresses: ExistingAddresses) => Promise<AppProject>;
 
 class BaseProjectDeployer {
   protected controller: NetworkController;
-  protected packageFile: ZosPackageFile;
-  protected networkFile: ZosNetworkFile;
+  protected projectFile: ProjectFile;
+  protected networkFile: NetworkFile;
   protected txParams: TxParams;
   protected requestedVersion: string;
 
   public constructor(controller: NetworkController, requestedVersion: string) {
     this.controller = controller;
-    this.packageFile = controller.packageFile;
+    this.projectFile = controller.projectFile;
     this.networkFile = controller.networkFile;
     this.txParams = controller.txParams;
     this.requestedVersion = requestedVersion;
@@ -100,7 +100,7 @@ export class AppProjectDeployer extends BasePackageProjectDeployer {
   public async fetchOrDeploy(): Promise<AppProject> {
     return this._run((existingAddresses: ExistingAddresses) =>
       AppProject.fetchOrDeploy(
-        this.packageFile.name,
+        this.projectFile.name,
         this.requestedVersion,
         this.txParams,
         existingAddresses,
@@ -184,7 +184,7 @@ export class ProxyAdminProjectDeployer extends BaseProjectDeployer {
 
   public async fetchOrDeploy(): Promise<ProxyAdminProject> {
     this.project = await ProxyAdminProject.fetch(
-      this.packageFile.name,
+      this.projectFile.name,
       this.txParams,
       this.networkFile.proxyAdminAddress,
       this.networkFile.proxyFactoryAddress,

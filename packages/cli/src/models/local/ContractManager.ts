@@ -1,40 +1,40 @@
 import { Contracts, Contract, FileSystem } from 'zos-lib';
 import Dependency from '../dependency/Dependency';
-import ZosPackageFile from '../files/ZosPackageFile';
+import ProjectFile from '../files/ProjectFile';
 import ConfigManager from '../config/ConfigManager';
 import path from 'path';
 
 export default class ContractManager {
-  public packageFile: ZosPackageFile;
+  public projectFile: ProjectFile;
 
-  public constructor(packageFile: ZosPackageFile = new ZosPackageFile()) {
-    this.packageFile = packageFile;
+  public constructor(projectFile: ProjectFile = new ProjectFile()) {
+    this.projectFile = projectFile;
   }
 
   public getContractClass(
     packageName: string,
     contractAlias: string,
   ): Contract {
-    if (!packageName || packageName === this.packageFile.name) {
-      const contractName = this.packageFile.contract(contractAlias);
+    if (!packageName || packageName === this.projectFile.name) {
+      const contractName = this.projectFile.contract(contractAlias);
       return Contracts.getFromLocal(contractName);
     } else {
       const dependency = new Dependency(packageName);
-      const contractName = dependency.getPackageFile().contract(contractAlias);
+      const contractName = dependency.getProjectFile().contract(contractAlias);
       return Contracts.getFromNodeModules(packageName, contractName);
     }
   }
 
   public hasContract(packageName: string, contractAlias: string): boolean {
-    if (!packageName || packageName === this.packageFile.name) {
-      return !!this.packageFile.contract(contractAlias);
+    if (!packageName || packageName === this.projectFile.name) {
+      return !!this.projectFile.contract(contractAlias);
     } else {
       const dependency = new Dependency(packageName);
-      return !!dependency.getPackageFile().contract(contractAlias);
+      return !!dependency.getProjectFile().contract(contractAlias);
     }
   }
 
-  public getContractNames(root: string = this.packageFile.root): string[] {
+  public getContractNames(root: string = this.projectFile.root): string[] {
     const buildDir = ConfigManager.getBuildDir();
     const contractsDir = Contracts.getLocalContractsDir();
     if (FileSystem.exists(buildDir)) {
