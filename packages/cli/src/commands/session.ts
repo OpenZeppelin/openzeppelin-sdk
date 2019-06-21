@@ -10,7 +10,7 @@ import ConfigManager from '../models/config/ConfigManager';
 const name = 'session';
 const signature: string = name;
 const description =
-  'by providing network options, commands like create, freeze, push, status and update will use them unless overridden. Use --close to undo.';
+  'by providing network options, commands like create, freeze, push, and update will use them unless overridden. Use --close to undo.';
 
 const register: (program: any) => any = program =>
   program
