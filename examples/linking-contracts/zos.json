@@ -10,6 +10,9 @@
   },
   "compiler": {
     "manager": "zos",
-    "compilerSettings": {}
+    "compilerSettings": {
+      "optimizer": {}
+    },
+    "solcVersion": "0.5.9"
   }
 }

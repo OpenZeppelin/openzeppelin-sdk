@@ -19,4 +19,17 @@ contract TokenExchange is Initializable {
     uint256 tokens = msg.value.mul(rate);
     token.transfer(msg.sender, tokens);
   }
+
+  // Added on subsequent version!
+  address public owner;
+
+  function withdraw() public {
+    require(msg.sender == owner);
+    msg.sender.transfer(address(this).balance);
+  }
+
+  function setOwner(address _owner) public {
+    require(owner == address(0));
+    owner = _owner;
+  }
 } 
