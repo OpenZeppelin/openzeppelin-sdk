@@ -141,7 +141,7 @@ function getCommandProps({
   return {
     ...networksList('network', 'list'),
     pickProxyBy: {
-      message: 'Which proxies would you like to upgrade?',
+      message: 'Which instances would you like to upgrade?',
       type: 'list',
       choices: [
         {
@@ -163,7 +163,7 @@ function getCommandProps({
           .length,
     },
     proxy: {
-      message: 'Pick a contract to upgrade',
+      message: 'Pick an instance to upgrade',
       type: 'list',
       choices: ({ pickProxyBy }) =>
         proxiesList(pickProxyBy, network, { kind: ProxyType.Upgradeable }),
