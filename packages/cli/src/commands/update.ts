@@ -145,7 +145,7 @@ function getCommandProps({
       type: 'list',
       choices: [
         {
-          name: 'All proxies',
+          name: 'All instances',
           value: 'all',
         },
         {
