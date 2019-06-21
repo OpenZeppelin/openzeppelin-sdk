@@ -52,7 +52,10 @@ const TruffleConfig = {
       this.config = TruffleConfigModule.detect({ logger: console });
       return this.config;
     } catch (error) {
-      return;
+      error.message = `Could not load truffle configuration file. Error: ${
+        error.message
+      }`;
+      throw error;
     }
   },
 
