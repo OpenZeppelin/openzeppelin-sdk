@@ -3,7 +3,7 @@
   "contracts": {
     "TokenExchange": "TokenExchange"
   },
-  "name": "linking-contracts",
+  "name": "example-linking-contracts",
   "version": "1.0.0",
   "dependencies": {
     "openzeppelin-eth": "2.2.0"
