@@ -102,9 +102,10 @@ async function action(contractFullName: string, options: any): Promise<void> {
     package: packageName,
   } = fromContractFullName(contractFullName);
 
-  const additionalOpts = { 
+  const additionalOpts = {
     askForMethodParams: rawInitMethod,
-    askForMethodParamsMessage: 'Do you want to call a function on the instance after creating it?'
+    askForMethodParamsMessage:
+      'Do you want to call a function on the instance after creating it?',
   };
   const { methodName, methodArgs } = await promptForMethodParams(
     contractFullName,
@@ -154,7 +155,7 @@ function getCommandProps(): InquirerQuestions {
       'Pick a contract to instantiate',
       'list',
       'all',
-    )
+    ),
   };
 }
 
