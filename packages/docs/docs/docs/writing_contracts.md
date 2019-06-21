@@ -128,6 +128,15 @@ contract MyContract is Initializable {
 }
 ```
 
+Note that it still is fine to set constants here, because the compiler does not reserve a storage slot for these variables, and every occurrence is replaced by the respective constant expression. So the following still works with ZeppelinOS:
+
+```solidity
+contract MyContract {
+  uint256 constant public hasInitialValue = 42;
+}
+```
+
+
 ## Creating new instances from your contract code
 
 When creating a new instance of a contract from your contract's code, these creations are handled directly by Solidity and not by ZeppelinOS, which means that **these contracts will not be upgradeable**.
