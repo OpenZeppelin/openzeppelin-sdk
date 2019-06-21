@@ -1,7 +1,7 @@
 {
   "name": "tests-cli-workdir",
   "private": true,
-  "version": "2.4.0-rc.3",
+  "version": "2.4.0-rc.4",
   "description": "CLI app project for ZeppelinOS integration test",
   "author": "santiago@zeppelin.solutions",
   "license": "MIT",
@@ -9,10 +9,10 @@
     "bignumber.js": "^7.2.0",
     "mock-stdlib": "file:../dependencies/mock-stdlib-1.1.0",
     "truffle-hdwallet-provider": "0.0.6",
-    "zos-lib": "^2.4.0-rc.3"
+    "zos-lib": "^2.4.0-rc.4"
   },
   "devDependencies": {
     "truffle": "^4.1.14",
-    "zos": "^2.4.0-rc.3"
+    "zos": "^2.4.0-rc.4"
   }
 }
