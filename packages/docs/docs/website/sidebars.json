@@ -5,15 +5,14 @@
       "new_2.3"
     ],
     "QUICKSTART": [
-      "zepkit",
-      "deploying",
-      "upgrading",
+      "first",
+      "interacting",
       "linking",
-      "publishing",
-      "vouching"
+      "zepkit"
     ],
     "GUIDES": [
       "writing_contracts",
+      "publishing",
       "testing",
       "erc20_onboarding",
       "upgrades_governance",
