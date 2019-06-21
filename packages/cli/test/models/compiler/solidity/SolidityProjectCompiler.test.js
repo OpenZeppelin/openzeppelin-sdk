@@ -180,4 +180,22 @@ describe('SolidityProjectCompiler', function() {
       await compileProject({ inputDir, outputDir, version: '0.5.9' });
     });
   });
+
+  describe('in mock-project-with-root-imports project', function() {
+    this.timeout(20000);
+
+    const projectDir = `${rootDir}/mocks/mock-project-with-root-imports`;
+    const inputDir = `${rootDir}/mocks/mock-project-with-root-imports/contracts`;
+    const outputDir = `${baseTestBuildDir}/mock-project-with-root-imports`;
+
+    it('compiles without errors', async function() {
+      this.cwd = process.cwd();
+      process.chdir(projectDir);
+      await compileProject({ inputDir, outputDir, version: '0.5.9' });
+    });
+
+    afterEach(function () {
+      process.chdir(this.cwd);
+    });
+  });
 });
