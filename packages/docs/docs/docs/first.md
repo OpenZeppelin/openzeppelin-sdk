@@ -61,6 +61,8 @@ This contract will just keep a numeric `value`, that will be increased by one ev
 
 You can run `npx zos compile` to compile the contract and check for any errors. After it compiled successfully, we can now deploy our contract.
 
+> Note: You don't have to worry if you forget to compile your contract. The CLI will automatically check if your contract changed when you run any command, and compile it if needed.
+
 ## Deploying to a development network
 
 We will use [ganache](https://truffleframework.com/ganache) as a _development network_ to deploy our contract. If you don't have ganache installed, do so now by running `npm install -g ganache-cli`.
@@ -70,17 +72,21 @@ Development networks are mini blockchains that run just on your computer, and ar
 Open a separate terminal, and start a new ganache process:
 
 ```console
-ganache-cli -p 9545 -d
+ganache-cli --deterministic
 ```
 
-This will start a new development network on port 9545, where ZeppelinOS defaults to for local development. We can now deploy our contract there, running `npx zos create`, and choosing to deploy the `Counter` contract to the `local` network.
+This will start a new development network, using a deterministic set of accounts, instead of random ones. We can now deploy our contract there, running `npx zos create`, and choosing to deploy the `Counter` contract to the `local` network.
 
 ```console
 $ npx zos create
-? Choose a contract: Counter
-? Select a network from the network list: local
-? Do you want to run a function after creating the instance? No
-Instance created at 0xCfEB869F69431e42cdB54A4F4f105C19C080A601
+✓ Compiled contracts with solc 0.5.9 (commit.e560f70d)
+? Pick a contract to instantiate: Counter
+? Pick a network: local
+✓ Added contract Counter
+✓ Contract Counter deployed
+? Do you want to call a function on the instance after creating it?: No
+✓ Setting everything up to create contract instances
+✓ Instance created at 0xCfEB869F69431e42cdB54A4F4f105C19C080A601
 ```
 
 > Note: The addresses where your contracts are created, or the transaction identifiers you see, may differ from the ones listed here.
@@ -89,20 +95,20 @@ Our counter contract is deployed to the local network and ready to go! We can te
 
 ```console
 $ npx zos send-tx
-? Select a network from the network list: local
-? Choose an instance: Counter at 0xCfEB869F69431e42cdB54A4F4f105C19C080A601
-? Select a method: increase()
-Transaction successful: 0x1993a8b6774ce05f2f2da0c5fc1174de46a3630e642fac81cf71bec28864e451
+? Pick a network: local
+? Pick an instance: Counter at 0xCfEB869F69431e42cdB54A4F4f105C19C080A601
+? Select which function: increase()
+✓ Transaction successful. Transaction hash: 0x20bef6583ea32cc57fe179e34dd57a5494db3c403e441624e56a886898cb52bd
 ```
 
 We can now use `npx zos call` to query the contract's public `value`, and check that it was indeed increased from zero to one.
 
 ```console
 $ npx zos call
-? Select a network from the network list: local
-? Choose an instance: Counter at 0x9561C133DD8580860B6b7E504bC5Aa500f0f06a7
-? Select a method: value()
-Returned "1"
+? Pick a network: local
+? Pick an instance: Counter at 0xCfEB869F69431e42cdB54A4F4f105C19C080A601
+? Select which function: value()
+✓ Method 'value()' returned: 1
 ```
 
 <!-- We could move the following to a separate tutorial -->
@@ -122,31 +128,31 @@ contract Counter {
 }
 ```
 
-We can now update the instance we created earlier to this new version:
+We can now upgrade the instance we created earlier to this new version:
 
 ```console
-$ npx zos update
-? Select a network from the network list: local
-? Which proxies would you like to upgrade? All proxies
-Instance at 0xCfEB869F69431e42cdB54A4F4f105C19C080A601 upgraded
+$ npx zos upgrade
+? Pick a network: local
+✓ Compiled contracts with solc 0.5.9 (commit.e560f70d)
+✓ Contract Counter deployed
+? Which proxies would you like to upgrade?: All proxies
+Instance upgraded at 0xCfEB869F69431e42cdB54A4F4f105C19C080A601.
 ```
 
-Done! Our `Counter` instance has been updated to the latest version, and neither its address nor its state have changed. Let's check it out by increasing the counter by ten, which should yield eleven, since we had already increased it by one:
+Done! Our `Counter` instance has been upgraded to the latest version, and neither its address nor its state have changed. Let's check it out by increasing the counter by ten, which should yield eleven, since we had already increased it by one:
 
 ```console
 $ npx zos send-tx
-? Select a network from the network list: local
-? Choose an instance: Counter at 0xCfEB869F69431e42cdB54A4F4f105C19C080A601
-? Select a method: increase(amount: uint256)
-? amount: 10
-Calling increase with: 
- - amount (uint256): "10"
+? Pick a network: local
+? Pick an instance: Counter at 0xCfEB869F69431e42cdB54A4F4f105C19C080A601
+? Select which function: increase(amount: uint256)
+? amount (uint256): 10
 Transaction successful: 0x9c84faf32a87a33f517b424518712f1dc5ba0bdac4eae3a67ca80a393c555ece
 
 $ npx zos call
-? Select a network from the network list: local
-? Choose an instance: Counter at 0xCfEB869F69431e42cdB54A4F4f105C19C080A601
-? Select a method: value()
+? Pick a network: local
+? Pick an instance: Counter at 0xCfEB869F69431e42cdB54A4F4f105C19C080A601
+? Select which function: value()
 Returned "11"
 ```
 

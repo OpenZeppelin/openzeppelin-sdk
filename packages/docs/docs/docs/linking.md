@@ -12,7 +12,7 @@ We will write a `TokenExchange` contract, that will allow any user to purchase a
 ```console
 mkdir token-exchange && cd token-exchange
 npm init -y
-npm install --save-dev zos ganache-cli
+npm install --save-dev zos
 npx zos init
 ```
 
@@ -26,7 +26,7 @@ We will first get ourselves an ERC20 token. Instead of coding one from scratch, 
 
 > Note: Check out [this article](https://blog.zeppelinos.org/open-source-collaboration-in-the-blockchain-era-evm-packages/)to learn more about EVM packages.
 
-To link the OpenZeppelin contracts EVM package into your project, simply run:
+To link the OpenZeppelin contracts EVM package into your project, simply run the following:
 
 ```console
 npx zos link openzeppelin-eth@2.2.0
@@ -34,45 +34,51 @@ npx zos link openzeppelin-eth@2.2.0
 
 This command will download the EVM package (bundled as a regular npm package), and connect it to your ZeppelinOS project. We now have all of OpenZeppelin contracts at our disposal, so let's create an ERC20 token!
 
+> Note: Make sure you install `openzeppelin-eth` and not `openzeppelin-solidity`. The latter is set up for general usage, while `openzeppelin-eth` is tailored for being used with ZeppelinOS. This means that its contracts are [already set up to be upgradeable](writing_contracts#use-upgradeable-packages).
+
 ## Creating an ERC20 token
 
-Let's deploy an ERC20 token contract to our development network. Make sure to start ganache first:
+Let's deploy an ERC20 token contract to our development network. But first, make sure to install ganache if needed, and start a new instance:
+
 ```console
-ganache-cli -p 9545 -d
+npm install -g ganache-cli
+ganache-cli --deterministic
 ```
 
-For setting up the token, we will be using the [StandaloneERC20 implementation](https://github.com/OpenZeppelin/openzeppelin-eth/blob/master/contracts/token/ERC20/StandaloneERC20.sol) provided by the OpenZeppelin package. We will _initialize_ the instance with the token metadata (name, symbol, and decimals), and minting a large initial supply for one of our accounts.
+For setting up the token, we will be using the [StandaloneERC20 implementation](https://github.com/OpenZeppelin/openzeppelin-eth/blob/master/contracts/token/ERC20/StandaloneERC20.sol) provided by the OpenZeppelin package. We will _initialize_ the instance with the token metadata (name, symbol, and decimals), and mint a large initial supply for one of our accounts.
 
 <!-- CODE: We need a command to retrieve the current accounts (#967) -->
 
-> Note: Your available accounts are shown by ganache when you start the process. If you ran it with the `-d` flag as instructed, then your first and default account will be `0x90f8bf6a479f320ead074411a4b0e7944ea8c9c1`.
+> Note: Your available accounts are shown by ganache when you start the process. If you ran it with the `--deterministic` flag as instructed, then your first and default account will be `0x90f8bf6a479f320ead074411a4b0e7944ea8c9c1`.
 
 ```console
 $ npx zos create
-? Choose a contract: openzeppelin-eth/StandaloneERC20
-? Select a network from the network list: local
-? Do you want to run a function after creating the instance?: Yes
-? Select a method: [Initializable] initialize(name: string, symbol: string, decimals: uint8, initialSupply: uint256, initialHolder: address, minters: address[], pausers: address[])
-? name: MyToken
-? symbol: MYT
-? decimals: 18
-? initialSupply: 100000000000000000000
-? initialHolder: 0x90f8bf6a479f320ead074411a4b0e7944ea8c9c1
-? minters:
-? pausers:
-Instance created at 0x2612Af3A521c2df9EAF28422Ca335b04AdF3ac66
+? Pick a contract to instantiate: openzeppelin-eth/StandaloneERC20
+? Pick a network: local
+✓ Deploying openzeppelin-eth dependency to network
+? Do you want to call a function on the instance after creating it?: Yes
+? Select which function: * initialize(name: string, symbol: string, decimals: uint8, initialSupply: uint256, initialHolder: address, minters: address[], pausers: address[])
+? name (string): MyToken
+? symbol (string): MYT
+? decimals (uint8): 18
+? initialSupply (uint256): 100e18
+? initialHolder (address): 0x90f8bf6a479f320ead074411a4b0e7944ea8c9c1
+? minters (address[]): 
+? pausers (address[]): 
+✓ Setting everything up to create contract instances
+✓ Instance created at 0x2612Af3A521c2df9EAF28422Ca335b04AdF3ac66
 ```
 
 Done! We have a working ERC20 token contract in our development network. Note that, when creating this instance, we chose to _initialize_ it with the initial values needed to set up our token. ZeppelinOS allows us to atomically call any function during the creation of a contract if we need to.
 
-We can check that the initial supply was properly allocated by using the `balance` command. Make sure to use the address where your token instance was created.
+We can check that the initial supply was properly allocated by using the `balance` command. Make sure to use the address where your ERC20 token instance was created.
 
 <!-- CODE: We need a way to refer to our own contracts by name (and to the local accounts as well!) -->
 
 ```console
 $ npx zos balance --erc20 0x2612Af3A521c2df9EAF28422Ca335b04AdF3ac66
 ? Enter an address to query its balance: 0x90f8bf6a479f320ead074411a4b0e7944ea8c9c1
-? Select a network from the network list: local
+? Pick a network: local
 Balance: 100 MYT
 ```
 
@@ -84,18 +90,21 @@ Great! We can now write an exchange contract and connect it to this token when w
 
 Our exchange contract will need to store the token contract address and the exchange rate in its state. We will set these values during initialization, when we deploy our contract.
 
-In order to support contract upgrades, ZeppelinOS does not allow the usage of Solidity's `constructor`s. Instead, we need to use _initializers_. An initializer is just a regular Solidity function, with an additional check to ensure that it can be called only once. To make coding initializers easy, ZeppelinOS offers a base `Initializable` contract, that ships with an `initializer` modifier that takes care of this. You will need first to install the package that provides that contract:
+In order to support contract upgrades, ZeppelinOS does not allow the usage of Solidity's `constructor`s. Instead, we need to use _initializers_. An initializer is just a regular Solidity function, with an additional check to ensure that it can be called only once. To make coding initializers easy, ZeppelinOS provides a base `Initializable` contract, that includes an `initializer` modifier that takes care of this. You will first need to install the package that provides that contract:
 
 ```console
 npm install zos-lib@2.4.0
 ```
 
-Now, let's write our exchange contract using an _initializer_ to receive its initial state:
+Now, let's write our exchange contract using an _initializer_ to set its initial state:
 
 ```solidity
 pragma solidity ^0.5.0;
 
+// Import base Initializable contract
 import "zos-lib/contracts/Initializable.sol";
+
+// Import interface and library from OpenZeppelin contracts
 import "openzeppelin-eth/contracts/token/ERC20/IERC20.sol";
 import "openzeppelin-eth/contracts/math/SafeMath.sol";
 
@@ -126,12 +135,14 @@ Let's now create and initialize our new `TokenExchange` contract:
 
 ```console
 $ npx zos create
-? Choose a contract: TokenExchange
-? Select a network from the network list: local
-? Do you want to run a function after creating the instance?: Yes
-? Select a method: initialize(_rate: uint256, _token: address)
-? _rate: 10
-? _token: 0x2612Af3A521c2df9EAF28422Ca335b04AdF3ac66
+✓ Compiled contracts with solc 0.5.9 (commit.e560f70d)
+? Pick a contract to instantiate: TokenExchange
+? Pick a network: local
+✓ Contract TokenExchange deployed
+? Do you want to call a function on the instance after creating it?: Yes
+? Select which function: initialize(_rate: uint256, _token: address)
+? _rate (uint256): 10
+? _token (address): 0x2612Af3A521c2df9EAF28422Ca335b04AdF3ac66
 Instance created at 0x26b4AFb60d6C903165150C6F0AA14F8016bE4aec
 ```
 
@@ -141,18 +152,130 @@ Our exchange is almost ready! We only need to fund it, so it can send tokens to 
 
 ```console
 $ npx zos send-tx
-? Select a network from the network list: local
+? Pick a network local
 ? Choose an instance: StandaloneERC20 at 0x2612Af3A521c2df9EAF28422Ca335b04AdF3ac66
-? Select a method: transfer(to: address, value: uint256)
-? to: 0x26b4AFb60d6C903165150C6F0AA14F8016bE4aec
-? value: 100000000000000000000
+? Select which function: transfer(to: address, value: uint256)
+? to (address): 0x26b4AFb60d6C903165150C6F0AA14F8016bE4aec
+? value (uint256): 10e18
 Transaction successful: 0x5863c8a8e122fcda7c6234abc6e60fad3f5a8108a3f88e2d8a956b63dbc222c2
 Events emitted: 
- - Transfer(from: 0x90F8bf6A479f320ead074411a4B0e7944Ea8c9C1, to: 0x26b4AFb60d6C903165150C6F0AA14F8016bE4aec, value: 100000000000000000000)
+ - Transfer
+    from: 0x90F8bf6A479f320ead074411a4B0e7944Ea8c9C1, 
+    to: 0x26b4AFb60d6C903165150C6F0AA14F8016bE4aec, 
+    value: 10000000000000000000
 ```
 
-TODO:
-- Make a purchase with send-tx, and verify token balance of purchaser
-- Note that there is no way to extract funds, and update the contract
-- Mention updating EVM packages
-- Summary
+All set! We can start playing with our brand new token exchange.
+
+## Using our exchange
+
+Now that we have initialized our exchange contract initialized, and seeded it with funds, we can test it out by purchasing tokens. Recall from our contract that the purchase is made automatically when we send ETH to the contract, so let's try it by using `zos transfer`, sending funds to the `TokenExchange` instance address:
+
+```console
+$ npx zos transfer
+? Pick a network: local
+? Choose the account to send transactions from: (1) 0xFFcf8FDEE72ac11b5c542428B35EEF5769C409f0
+? Enter the receiver account: 0x26b4AFb60d6C903165150C6F0AA14F8016bE4aec
+? Enter an amount to transfer 0.1 ether
+✓ Funds sent. Transaction hash: 0xc85a8caa161110ba7f08134f4496a995968a5aff7ae60ad9b6ce1c824e13cacb
+```
+
+<!-- Code: We need a method to easily go through the addresses of deployed contracts -->
+
+> Note: Make sure you replace the receiver account with the corresponding address where your `TokenExchange` was created.
+
+We can now use `zos balance` again, to check the token balance of the address that made the purchase. Since we sent 0.1 ETH, and we used a 1:10 exchange rate, we should see a balance of 1 MYT (MyToken).
+
+```console
+$ npx zos balance --erc20 0x5f8e26fAcC23FA4cbd87b8d9Dbbd33D5047abDE1
+? Enter an address to query its balance: 0xFFcf8FDEE72ac11b5c542428B35EEF5769C409f0
+? Pick a network: local
+Balance: 1 MYT
+```
+
+Success! We have our exchange up and running, gathering ETH in exchange for our tokens. But how can we collect the funds we earned...?
+
+## Upgrading the exchange
+
+We forgot to add a method to withdraw the funds from the token exchange contract! While this would typically mean that the funds are locked in there forever, we can upgrade the contract with ZeppelinOS to add a way to collect those funds.
+
+> Note: While upgrading a contract is certainly useful in situations like this, where you need to fix a bug or add a missing feature, it could still be used to change the rules of the game. For instance, you could upgrade the token exchange contract to alter the rate at any time. Because of this, it is important to have a proper [upgrades governance mechanism](upgrades_governance) in place.
+
+Let's modify the `TokenExchange` contract to add a `withdraw` method, only callable by an `owner`.
+
+```solidity
+contract TokenExchange is Initializable {
+  uint256 public rate;
+  IERC20 public token;
+  address public owner;
+
+  function withdraw() public {
+    require(msg.sender == owner);
+    msg.sender.transfer(address(this).balance);
+  }
+
+  // (existing functions not shown here for brevity)
+}
+```
+
+When modifying your contract, make sure to add the `owner` variable **after** the others ([here](writing_contracts#modifying-your-contracts) you can see why this restriction). Don't worry if you forget about it, the CLI will check this for you when you try to upgrade.
+
+> Note: If you are familiar with OpenZeppelin contracts, you may be wondering why we didn't simply extend from `Ownable` and used the `onlyOwner` modifier. The fact is ZeppelinOS does not support modifying the contracts you extend from (if they declare their own state variables). Again, the CLI will alert you if you attempt to do this. See [here](writing_contracts#modifying-your-contracts) for more info. 
+
+The only thing missing is actually _setting_ the `owner` of the contract. To do this, we can add another function that we will call when upgrading, making sure it can only be called once:
+
+```solidity
+contract TokenExchange is Initializable {
+  uint256 public rate;
+  IERC20 public token;
+  address public owner;
+
+  function withdraw() public {
+    require(msg.sender == owner);
+    msg.sender.transfer(address(this).balance);
+  }
+
+  // To be run during update, ensuring it can never be called again
+  function setOwner(address _owner) public {
+    require(owner == address(0));
+    owner = _owner;
+  }
+
+  // (existing functions not shown here for brevity)
+}
+```
+
+We can now upgrade our token exchange contract to this new version. We will call `setOwner` during the upgrade process. ZeppelinOS will take care of making the upgrade and the call atomic, all in a single transaction.
+
+```console
+$ npx zos upgrade
+? Pick a network: local
+✓ Compiled contracts with solc 0.5.9 (commit.e560f70d)
+- New variable 'address owner' was added in contract TokenExchange in contracts/TokenExchange.sol:1 at the end of the contract.
+✓ Contract TokenExchange deployed
+? Which proxies would you like to upgrade?: Choose by name
+? Pick a contract to upgrade: TokenExchange
+? Do you want to call a function on the instance after upgrading it?: Yes
+? Select which function: setOwner(_owner: address)
+? _owner (address): 0x90f8bf6a479f320ead074411a4b0e7944ea8c9c1
+✓ Instance upgraded at 0x26b4AFb60d6C903165150C6F0AA14F8016bE4aec.
+```
+
+There! We can now call `withdraw` from our default address to extract all ETH sent to the exchange.
+
+```console
+$ npx zos send-tx
+? Pick a network: local
+? Pick an instance: TokenExchange at 0xD86C8F0327494034F60e25074420BcCF560D5610
+? Select which function: withdraw()
+✓ Transaction successful. Transaction hash: 0xc9fb0d3ada96ec4c67c1c8f1569f9cfaf0ff0f7b241e172b32a023b1763ab7ab
+```
+
+> Note: You can also update contracts from an EVM package. Upon a new release of openzeppelin-eth, if you want to update your ERC20 to include the latest fixes, you can just `zos link` the new version and use `zos update` to get your instance to the newest code.
+
+## Wrapping up
+
+We have built a more complex setup in this tutorial, and learned several concepts along the way. We introduced [EVM packages](https://blog.zeppelinos.org/open-source-collaboration-in-the-blockchain-era-evm-packages/) as dependencies for our projects, allowing us to spin up a new token with little effort. We also presented some [limitations](writing_contracts) of the [upgrades pattern](pattern) that ZeppelinOS uses, such as [initializer methods](writing_contracts#initializers) as a replacement for constructors, or [preserving the storage layout](writing_contracts#modifying-your-contracts) when modifying our source code. We also learned how to run a function as a migration when updating a contract.
+
+Feel free to explore the rest of the guides in the site to keep learning more, or start coding with ZeppelinOS right away!
+
