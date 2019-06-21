@@ -7,10 +7,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## Unreleased
 
 ### Fixed
-- Handle new metadata format [introduced in Solidity 0.5.2](https://github.com/ethereum/solidity/pull/4764/commits/aa4ee3a1559ebc0354926af962efb3fcc7dc15bd) embedded in the contract's bytecode ([#934](https://github.com/zeppelinos/zos/pull/934)).
+- Handle new metadata format [introduced in Solidity 0.5.2](https://github.com/ethereum/solidity/pull/4764/commits/aa4ee3a1559ebc0354926af962efb3fcc7dc15bd) embedded in the contract's bytecode. ([#934](https://github.com/zeppelinos/zos/pull/934))
+- Fix extracting proxy address from `ProxyCreated` event when running `solidity-coverage`. ([#978](https://github.com/zeppelinos/zos/pull/978)) (thanks @tsudmi!)
 
 ### Internal
-- Removed TSlint in favor of prettier and ESLint ([#920](https://github.com/zeppelinos/zos/pull/920))
+- Removed TSlint in favor of prettier and ESLint. ([#920](https://github.com/zeppelinos/zos/pull/920))
 
 ## v2.3.1 - 2019-06-05
 
