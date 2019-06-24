@@ -3,7 +3,7 @@ id: first
 title: Your first project
 ---
 
-This tutorial will get you started using ZeppelinOS. We will create a new project with a simple contract, deploy it to a development network, interact with it from the terminal, and then update it.
+This tutorial will get you started using ZeppelinOS. We will create a new project with a simple contract, deploy it to a development network, interact with it from the terminal, and then upgrade it.
 
 ## Prerequisites
 
@@ -112,7 +112,7 @@ $ npx zos call
 ```
 
 <!-- We could move the following to a separate tutorial -->
-## Updating your contract
+## Upgrading your contract
 
 We will now modify our `Counter` contract to make the `increase` function more interesting. Instead of increasing the counter by one, we will allow the caller to increase the counter by any value. Let's modify the code in `contracts/Counter.sol` to the following:
 
@@ -156,6 +156,6 @@ $ npx zos call
 Returned "11"
 ```
 
-> Note: If you are curious about how ZeppelinOS achieves this feat, given that smart contracts are immutable, check out our [upgrades pattern guide](pattern). You will see that there are some changes that are not supported during updates. For instance, you cannot [remove or change the type of a contract state variable](https://docs.zeppelinos.org/docs/writing_contracts.html#modifying-your-contracts). Nevertheless, you can change, add, or remove all the functions you want.
+> Note: If you are curious about how ZeppelinOS achieves this feat, given that smart contracts are immutable, check out our [upgrades pattern guide](pattern). You will see that there are some changes that are not supported during upgrades. For instance, you cannot [remove or change the type of a contract state variable](https://docs.zeppelinos.org/docs/writing_contracts.html#modifying-your-contracts). Nevertheless, you can change, add, or remove all the functions you want.
 
-That's it! You now know how to start a simple ZeppelinOS project, create a contract, deploy it to a local network, and even update it as you develop. Head over to the next tutorial to learn how to interact with your contract from your code.
+That's it! You now know how to start a simple ZeppelinOS project, create a contract, deploy it to a local network, and even upgrade it as you develop. Head over to the next tutorial to learn how to interact with your contract from your code.

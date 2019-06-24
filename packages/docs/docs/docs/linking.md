@@ -3,7 +3,7 @@ id: linking
 title: Linking OpenZeppelin contracts
 ---
 
-In the [first](first) tutorial, we learned how to set up a new ZeppelinOS project, deploy a simple contract, and update it. Now, we will build a more interesting project with multiple contracts, leveraging the [OpenZeppelin contracts package](https://github.com/OpenZeppelin/openzeppelin-eth). We will learn about **linking EVM packages**, and **writing upgradeable contracts**.
+In the [first](first) tutorial, we learned how to set up a new ZeppelinOS project, deploy a simple contract, and upgrade it. Now, we will build a more interesting project with multiple contracts, leveraging the [OpenZeppelin contracts package](https://github.com/OpenZeppelin/openzeppelin-eth). We will learn about **linking EVM packages**, and **writing upgradeable contracts**.
 
 ## What we will build
 
@@ -235,7 +235,7 @@ contract TokenExchange is Initializable {
     msg.sender.transfer(address(this).balance);
   }
 
-  // To be run during update, ensuring it can never be called again
+  // To be run during upgrade, ensuring it can never be called again
   function setOwner(address _owner) public {
     require(owner == address(0));
     owner = _owner;
@@ -271,11 +271,11 @@ $ npx zos send-tx
 ✓ Transaction successful. Transaction hash: 0xc9fb0d3ada96ec4c67c1c8f1569f9cfaf0ff0f7b241e172b32a023b1763ab7ab
 ```
 
-> Note: You can also update contracts from an EVM package. Upon a new release of openzeppelin-eth, if you want to update your ERC20 to include the latest fixes, you can just `zos link` the new version and use `zos update` to get your instance to the newest code.
+> Note: You can also upgrade contracts from an EVM package. Upon a new release of openzeppelin-eth, if you want to update your ERC20 to include the latest fixes, you can just `zos link` the new version and use `zos upgrade` to get your instance to the newest code.
 
 ## Wrapping up
 
-We have built a more complex setup in this tutorial, and learned several concepts along the way. We introduced [EVM packages](https://blog.zeppelinos.org/open-source-collaboration-in-the-blockchain-era-evm-packages/) as dependencies for our projects, allowing us to spin up a new token with little effort. We also presented some [limitations](writing_contracts) of the [upgrades pattern](pattern) that ZeppelinOS uses, such as [initializer methods](writing_contracts#initializers) as a replacement for constructors, or [preserving the storage layout](writing_contracts#modifying-your-contracts) when modifying our source code. We also learned how to run a function as a migration when updating a contract.
+We have built a more complex setup in this tutorial, and learned several concepts along the way. We introduced [EVM packages](https://blog.zeppelinos.org/open-source-collaboration-in-the-blockchain-era-evm-packages/) as dependencies for our projects, allowing us to spin up a new token with little effort. We also presented some [limitations](writing_contracts) of the [upgrades pattern](pattern) that ZeppelinOS uses, such as [initializer methods](writing_contracts#initializers) as a replacement for constructors, or [preserving the storage layout](writing_contracts#modifying-your-contracts) when modifying our source code. We also learned how to run a function as a migration when upgrading a contract.
 
 Feel free to explore the rest of the guides in the site to keep learning more, or start coding with ZeppelinOS right away!
 
