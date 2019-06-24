@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
-## Unreleased
+## v2.4.0 - 2019-06-24
 
 ### Added
 - New `zos compile` command that uses solc directly to compile your contracts, generating artifacts with a format compatible to truffle's. The compiler version and optimizer settings can be controlled via command flags that are persisted on the `zos.json` file. The CLI will now default to this compiler when running commands that require compilation (like `add` or `create`), unless there are no compiler settings on `zos.json` and there is a `truffle.js` present in the project root, in which case it will rely on `truffle compile` as usual. ([#914](https://github.com/zeppelinos/zos/pull/914), [#940](https://github.com/zeppelinos/zos/pull/940), [#945](https://github.com/zeppelinos/zos/pull/945), [#953](https://github.com/zeppelinos/zos/pull/953), [#956](https://github.com/zeppelinos/zos/pull/956), [#959](https://github.com/zeppelinos/zos/pull/959), [#963](https://github.com/zeppelinos/zos/pull/963))

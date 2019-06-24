@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
-## Unreleased
+## v2.4.0 - 2019-06-24
 
 ### Fixed
 - Handle new metadata format [introduced in Solidity 0.5.2](https://github.com/ethereum/solidity/pull/4764/commits/aa4ee3a1559ebc0354926af962efb3fcc7dc15bd) embedded in the contract's bytecode. ([#934](https://github.com/zeppelinos/zos/pull/934))
