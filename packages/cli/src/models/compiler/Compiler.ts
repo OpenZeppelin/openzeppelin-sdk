@@ -43,7 +43,10 @@ export async function compile(
     ? compileWithTruffle()
     : compileWithSolc(resolvedOptions);
   const compileResult = await compilePromise;
-  const compileVersion = compileResult && compileResult.compilerVersion.version;
+  const compileVersion =
+    compileResult &&
+    compileResult.compilerVersion &&
+    compileResult.compilerVersion.version;
   const compileVersionOptions = compileVersion
     ? { version: compileVersion }
     : null;
