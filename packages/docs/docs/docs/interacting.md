@@ -21,7 +21,7 @@ Keep in mind that there are many other javascript libraries available, and you c
 
 Our first step will be to open a connection to the network. We will connect to the local development network we started on the previous tutorial. 
 
-> Caution: By default, `ganache-cli` deletes all data when you stop it. If you stopped the ganache process from the previous tutorial, you will need to start a new one with `ganache-cli -p 9545 -d`, and run `npx zos create Counter` again.
+> Caution: By default, `ganache-cli` deletes all data when you stop it. If you stopped the ganache process from the previous tutorial, you will need to start a new one with `ganache-cli -d`, and run `npx zos create Counter` again.
 
 Let's begin coding in a new `src/index.js` file, where we will be writing our javascript script. We will start with some boilerplate for writing async code, and setting up a new `web3` object.
 
@@ -32,17 +32,17 @@ const Web3 = require('web3');
 
 async function main() {
   // Set up web3 object, connected to the local development network
-  const web3 = new Web3('http://localhost:9545');
+  const web3 = new Web3('http://localhost:8545');
 }
 
 main();
 ```
 
-Here, we are initializing a new `web3` instance connecting to the local development network, that is running on localhost port 9545. We can test if the connection works by asking something to the local node, such as the list of enabled accounts:
+Here, we are initializing a new `web3` instance connecting to the local development network, that is running on localhost port 8545. We can test if the connection works by asking something to the local node, such as the list of enabled accounts:
 
 ```js
 // Set up web3 object, connected to the local development network
-const web3 = new Web3('http://localhost:9545');
+const web3 = new Web3('http://localhost:8545');
 
 // Retrieve accounts from the local node
 const accounts = await web3.eth.getAccounts();
@@ -83,7 +83,7 @@ The address was returned by the ZeppelinOS CLI when we deployed the contract. As
 
 ```js
 // Set up web3 object, connected to the local development network
-const web3 = new Web3('http://localhost:9545');
+const web3 = new Web3('http://localhost:8545');
 
 // Set up a web3 contract, representing our deployed Counter instance
 const address = '0xCfEB869F69431e42cdB54A4F4f105C19C080A601';
