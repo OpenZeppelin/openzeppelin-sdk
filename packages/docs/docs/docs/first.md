@@ -35,7 +35,7 @@ And use the CLI to initialize a ZeppelinOS project:
 npx zos init
 ```
 
-The CLI will prompt you to choose a project name and version, defaulting to the ones from the `package.json`, and then set up a some files for running your ZeppelinOS project. 
+The CLI will prompt you to choose a project name and version, defaulting to the ones from the `package.json`, and then set up some files for running your ZeppelinOS project.
 
 We are now ready to begin coding.
 
