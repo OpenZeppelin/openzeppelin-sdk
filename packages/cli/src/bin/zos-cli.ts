@@ -1,6 +1,5 @@
 #! /usr/bin/env node
 
-import path from 'path';
 import fs from 'fs-extra';
 
 import { Loggy } from 'zos-lib';
@@ -29,7 +28,7 @@ try {
   lockSync(LOCK_FILE_PATH, { retries: 0 });
 } catch (e) {
   console.error(
-    `Cannot run more than one instance of 'platform' at the same time.\nIf you are sure that no other instances are actually running, manually remove the file ${LOCK_FILE_PATH} and try again.`,
+    `Cannot run more than one instance of 'openzeppelin' at the same time.\nIf you are sure that no other instances are actually running, manually remove the file ${LOCK_FILE_PATH} and try again.`,
   );
   process.exit(1);
 }

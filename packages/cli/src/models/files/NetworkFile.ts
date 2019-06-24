@@ -540,9 +540,11 @@ export default class NetworkFile {
     }
   }
 
-  public static getNetworkFilePath(network: string): string {
+  public static getFilePath(network: string): string {
     // TODO: Remove legacy project file support
     let legacyFilePath = `zos.${network}.json`;
+    console.log(legacyFilePath);
+
     legacyFilePath = fs.exists(legacyFilePath) ? legacyFilePath : null;
     return legacyFilePath || `${OPEN_ZEPPELIN_FOLDER}/${network}.json`;
   }

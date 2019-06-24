@@ -93,7 +93,7 @@ module.exports = function (dirname) {
   function getNetworkFileName(currentNetwork) {
     const { network_id: networkId } = currentNetwork
     const name = networkId === '4' ? 'rinkeby' : `dev-${networkId}`
-    return `zos.${name}.json`
+    return `.openzeppelin/${name}.json`
   }
 
   function setMockStdlibVersion(version) {

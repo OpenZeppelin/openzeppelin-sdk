@@ -64,8 +64,7 @@ export default class Dependency {
   public static hasDependenciesForDeploy(network: string): boolean {
     const dependencies = ProjectFile.getLinkedDependencies() || [];
     const networkDependencies =
-      NetworkFile.getDependencies(NetworkFile.getNetworkFilePath(network)) ||
-      {};
+      NetworkFile.getDependencies(NetworkFile.getFilePath(network)) || {};
     const hasDependenciesForDeploy = dependencies.find(
       (depNameAndVersion): any => {
         const [name, version] = depNameAndVersion.split('@');
@@ -161,7 +160,7 @@ export default class Dependency {
 
   public getProjectFile(): ProjectFile | never {
     if (!this._projectFile) {
-      // TODO: remove legacy project file support
+      // TODO-v3: remove legacy project file support
       const legacyFilePath = `node_modules/${
         this.name
       }/${LEGACY_PROJECT_FILE_NAME}`;
@@ -216,14 +215,14 @@ export default class Dependency {
     name: string,
     network: string,
   ): string {
-    // TODO: Remove legacy project file support
+    // TODO-v3: Remove legacy project file support
     let legacyFilePath = `node_modules/${name}/zos.${network}.json`;
     legacyFilePath = fs.exists(legacyFilePath) ? legacyFilePath : null;
     let filePath = `node_modules/${
       this.name
     }/${OPEN_ZEPPELIN_FOLDER}/${network}.json`;
     filePath = fs.exists(filePath) ? filePath : null;
-    return legacyFilePath || filePath;
+    return filePath || legacyFilePath;
   }
 
   private validateSatisfiesVersion(

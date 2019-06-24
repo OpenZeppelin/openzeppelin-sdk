@@ -1,5 +1,6 @@
 const { ConfigManager, files, scripts, stdout } = require('zos');
 const { helpers, Contracts } = require('zos-lib');
+
 stdout.silent(true);
 
 async function setup(network) {

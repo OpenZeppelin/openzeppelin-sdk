@@ -65,7 +65,7 @@ export default class ProjectFile {
       this.data = this.tryToLoadProject(filePath);
     } else {
       // try to load legacy file first
-      // TODO: remove legacy project file support as a breaking change at 3.0
+      // TODO-v3: remove legacy project file support as a breaking change at 3.0
       let data = this.tryToLoadProject(LEGACY_PROJECT_FILE_NAME);
       if (data) {
         this.data = data;
@@ -254,11 +254,7 @@ export default class ProjectFile {
   }
 
   public networkFile(network): NetworkFile | never {
-    return new NetworkFile(
-      this,
-      network,
-      path.join(OPEN_ZEPPELIN_FOLDER, `${network}.json`),
-    );
+    return new NetworkFile(this, network, NetworkFile.getFilePath(network));
   }
 
   public write(): void {
