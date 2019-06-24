@@ -1,7 +1,7 @@
 const Web3 = require('web3');
 
 async function main() {
-  const web3 = new Web3(process.env.PROVIDER_URL || 'http://localhost:9545');
+  const web3 = new Web3(process.env.PROVIDER_URL || 'http://localhost:8545');
 
   // Create web3 contract instance
   const address = '0xCfEB869F69431e42cdB54A4F4f105C19C080A601';
