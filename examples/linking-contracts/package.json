@@ -1,0 +1,18 @@
+{
+  "name": "example-linking-contracts",
+  "version": "1.0.0",
+  "private": true,
+  "description": "",
+  "main": "index.js",
+  "keywords": [],
+  "author": "Santiago Palladino <santiago@zeppelin.solutions>",
+  "license": "MIT",
+  "dependencies": {
+    "openzeppelin-eth": "^2.2.0",
+    "zos-lib": "^2.4.0-rc.0"
+  },
+  "devDependencies": {
+    "ganache-cli": "^6.4.3",
+    "zos": "^2.4.0-rc.0"
+  }
+}
