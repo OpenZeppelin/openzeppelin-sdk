@@ -13,7 +13,7 @@ We will write a `TokenExchange` contract, that will allow any user to purchase a
 mkdir token-exchange && cd token-exchange
 npm init -y
 npm install --save-dev zos
-npx zos init
+zos init
 ```
 
 > Note: The full code for this project is available in our [Github repo](https://github.com/zeppelinos/zos/tree/v2.4.0/examples/linking-contracts).
@@ -29,7 +29,7 @@ We will first get ourselves an ERC20 token. Instead of coding one from scratch, 
 To link the OpenZeppelin contracts EVM package into your project, simply run the following:
 
 ```console
-npx zos link openzeppelin-eth@2.2.0
+zos link openzeppelin-eth@2.2.0
 ```
 
 This command will download the EVM package (bundled as a regular npm package), and connect it to your ZeppelinOS project. We now have all of OpenZeppelin contracts at our disposal, so let's create an ERC20 token!
@@ -52,7 +52,7 @@ For setting up the token, we will be using the [StandaloneERC20 implementation](
 > Note: Your available accounts are shown by ganache when you start the process. If you ran it with the `--deterministic` flag as instructed, then your first and default account will be `0x90f8bf6a479f320ead074411a4b0e7944ea8c9c1`.
 
 ```console
-$ npx zos create
+$ zos create
 ? Pick a contract to instantiate: openzeppelin-eth/StandaloneERC20
 ? Pick a network: development
 ✓ Deploying openzeppelin-eth dependency to network
@@ -76,7 +76,7 @@ We now have a working ERC20 token contract in our development network. We can ch
 <!-- CODE: We need a way to refer to our own contracts by name (and to the local accounts as well!) -->
 
 ```console
-$ npx zos balance --erc20 0x2612Af3A521c2df9EAF28422Ca335b04AdF3ac66
+$ zos balance --erc20 0x2612Af3A521c2df9EAF28422Ca335b04AdF3ac66
 ? Enter an address to query its balance: 0x90f8bf6a479f320ead074411a4b0e7944ea8c9c1
 ? Pick a network: development
 Balance: 100 MYT
@@ -134,7 +134,7 @@ Note the usage of the `initializer` modifier in the `initialize` method. This gu
 Let's now create and initialize our new `TokenExchange` contract:
 
 ```console
-$ npx zos create
+$ zos create
 ✓ Compiled contracts with solc 0.5.9 (commit.e560f70d)
 ? Pick a contract to instantiate: TokenExchange
 ? Pick a network: development
@@ -151,7 +151,7 @@ Instance created at 0x26b4AFb60d6C903165150C6F0AA14F8016bE4aec
 Our exchange is almost ready! We only need to fund it, so it can send tokens to purchasers. Let's do that using the `send-tx` command, to transfer the full token balance from our own account to the exchange contract. Make sure to replace the recipient of the transfer with the `TokenExchange` address you got from the previous command.
 
 ```console
-$ npx zos send-tx
+$ zos send-tx
 ? Pick a network: development
 ? Choose an instance: StandaloneERC20 at 0x2612Af3A521c2df9EAF28422Ca335b04AdF3ac66
 ? Select which function: transfer(to: address, value: uint256)
@@ -172,7 +172,7 @@ All set! We can start playing with our brand new token exchange.
 Now that we have initialized our exchange contract initialized, and seeded it with funds, we can test it out by purchasing tokens. Recall from our contract that the purchase is made automatically when we send ETH to the contract, so let's try it by using `zos transfer`, sending funds to the `TokenExchange` instance address:
 
 ```console
-$ npx zos transfer
+$ zos transfer
 ? Pick a network: development
 ? Choose the account to send transactions from: (1) 0xFFcf8FDEE72ac11b5c542428B35EEF5769C409f0
 ? Enter the receiver account: 0x26b4AFb60d6C903165150C6F0AA14F8016bE4aec
@@ -187,7 +187,7 @@ $ npx zos transfer
 We can now use `zos balance` again, to check the token balance of the address that made the purchase. Since we sent 0.1 ETH, and we used a 1:10 exchange rate, we should see a balance of 1 MYT (MyToken).
 
 ```console
-$ npx zos balance --erc20 0x5f8e26fAcC23FA4cbd87b8d9Dbbd33D5047abDE1
+$ zos balance --erc20 0x5f8e26fAcC23FA4cbd87b8d9Dbbd33D5047abDE1
 ? Enter an address to query its balance: 0xFFcf8FDEE72ac11b5c542428B35EEF5769C409f0
 ? Pick a network: development
 Balance: 1 MYT
@@ -248,7 +248,7 @@ contract TokenExchange is Initializable {
 We can now upgrade our token exchange contract to this new version. We will call `setOwner` during the upgrade process. ZeppelinOS will take care of making the upgrade and the call atomic, all in a single transaction.
 
 ```console
-$ npx zos upgrade
+$ zos upgrade
 ? Pick a network: development
 ✓ Compiled contracts with solc 0.5.9 (commit.e560f70d)
 - New variable 'address owner' was added in contract TokenExchange in contracts/TokenExchange.sol:1 at the end of the contract.
@@ -264,7 +264,7 @@ $ npx zos upgrade
 There! We can now call `withdraw` from our default address to extract all ETH sent to the exchange.
 
 ```console
-$ npx zos send-tx
+$ zos send-tx
 ? Pick a network: development
 ? Pick an instance: TokenExchange at 0xD86C8F0327494034F60e25074420BcCF560D5610
 ? Select which function: withdraw()

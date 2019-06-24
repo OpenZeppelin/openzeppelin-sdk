@@ -11,6 +11,14 @@ ZeppelinOS is bundled as an [npm package](https://npmjs.com/package/zos). We wil
 
 > Note: At the moment, ZeppelinOS does not support node 12. Make sure to install version 10.
 
+Once you have installed `node`, you can install the ZeppelinOS CLI:
+
+```console
+npm install --global zos
+```
+
+> Note: We are installing the CLI [globally](https://docs.npmjs.com/downloading-and-installing-packages-globally) in our workstation. Alternatively, you can install it [local](https://docs.npmjs.com/downloading-and-installing-packages-locally) to each project by running `npm install --save-dev zos` in your project folder. This would require you to run every command by prefixing it with `npx`. Installing it locally allows you to have different `zos` versions in different projects, but requires you to reinstall every time you start a new project.
+
 ## Setting up your project
 
 We'll first create a node.js project in a new directory. Head over to a terminal and run:
@@ -21,21 +29,13 @@ cd my-project
 npm init -y
 ```
 
-Now that we have a clean `package.json`, install the ZeppelinOS CLI:
+Let's now use the CLI to initialize a ZeppelinOS project:
 
 ```console
-npm install --save-dev zos
+zos init
 ```
 
-> Note: We are installing the CLI locally to the project, which means that we will run every command as `npx zos`. Alternatively, you can also install it globally using `npm install --global zos`, and drop the `npx` from every command.
-
-And use the CLI to initialize a ZeppelinOS project:
-
-```console
-npx zos init
-```
-
-The CLI will prompt you to choose a project name and version, defaulting to the ones from the `package.json`, and then set up some files for running your ZeppelinOS project.
+The CLI will prompt you to choose a project name and version, defaulting to the ones from the `package.json`, and then set up a few files and folders for running your ZeppelinOS project.
 
 We are now ready to begin coding.
 
@@ -59,7 +59,7 @@ contract Counter {
 
 This contract will just keep a numeric `value`, that will be increased by one every time we send a transaction to the `increase()` function.
 
-You can run `npx zos compile` to compile the contract and check for any errors. After it compiled successfully, we can now deploy our contract.
+You can run `zos compile` to compile the contract and check for any errors. After it compiled successfully, we can now deploy our contract.
 
 > Note: You don't have to worry if you forget to compile your contract. The CLI will automatically check if your contract changed when you run any command, and compile it if needed.
 
@@ -75,10 +75,10 @@ Open a separate terminal, and start a new ganache process:
 ganache-cli --deterministic
 ```
 
-This will start a new development network, using a deterministic set of accounts, instead of random ones. We can now deploy our contract there, running `npx zos create`, and choosing to deploy the `Counter` contract to the `development` network.
+This will start a new development network, using a deterministic set of accounts, instead of random ones. We can now deploy our contract there, running `zos create`, and choosing to deploy the `Counter` contract to the `development` network.
 
 ```console
-$ npx zos create
+$ zos create
 ✓ Compiled contracts with solc 0.5.9 (commit.e560f70d)
 ? Pick a contract to instantiate: Counter
 ? Pick a network: development
@@ -91,20 +91,20 @@ $ npx zos create
 
 > Note: The addresses where your contracts are created, or the transaction identifiers you see, may differ from the ones listed here.
 
-Our counter contract is deployed to the local development network and ready to go! We can test it out by interacting with it from the terminal. Let's try incrementing the counter, by sending a transaction to call the `increase` function through `npx zos send-tx`.
+Our counter contract is deployed to the local development network and ready to go! We can test it out by interacting with it from the terminal. Let's try incrementing the counter, by sending a transaction to call the `increase` function through `zos send-tx`.
 
 ```console
-$ npx zos send-tx
+$ zos send-tx
 ? Pick a network: development
 ? Pick an instance: Counter at 0xCfEB869F69431e42cdB54A4F4f105C19C080A601
 ? Select which function: increase()
 ✓ Transaction successful. Transaction hash: 0x20bef6583ea32cc57fe179e34dd57a5494db3c403e441624e56a886898cb52bd
 ```
 
-We can now use `npx zos call` to query the contract's public `value`, and check that it was indeed increased from zero to one.
+We can now use `zos call` to query the contract's public `value`, and check that it was indeed increased from zero to one.
 
 ```console
-$ npx zos call
+$ zos call
 ? Pick a network: development
 ? Pick an instance: Counter at 0xCfEB869F69431e42cdB54A4F4f105C19C080A601
 ? Select which function: value()
@@ -131,7 +131,7 @@ contract Counter {
 We can now upgrade the instance we created earlier to this new version:
 
 ```console
-$ npx zos upgrade
+$ zos upgrade
 ? Pick a network: development
 ✓ Compiled contracts with solc 0.5.9 (commit.e560f70d)
 ✓ Contract Counter deployed
@@ -142,14 +142,14 @@ Instance upgraded at 0xCfEB869F69431e42cdB54A4F4f105C19C080A601.
 Done! Our `Counter` instance has been upgraded to the latest version, and neither its address nor its state have changed. Let's check it out by increasing the counter by ten, which should yield eleven, since we had already increased it by one:
 
 ```console
-$ npx zos send-tx
+$ zos send-tx
 ? Pick a network: development
 ? Pick an instance: Counter at 0xCfEB869F69431e42cdB54A4F4f105C19C080A601
 ? Select which function: increase(amount: uint256)
 ? amount (uint256): 10
 Transaction successful: 0x9c84faf32a87a33f517b424518712f1dc5ba0bdac4eae3a67ca80a393c555ece
 
-$ npx zos call
+$ zos call
 ? Pick a network: development
 ? Pick an instance: Counter at 0xCfEB869F69431e42cdB54A4F4f105C19C080A601
 ? Select which function: value()

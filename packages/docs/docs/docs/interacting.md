@@ -23,7 +23,7 @@ Keep in mind that there are many other javascript libraries available, and you c
 
 Our first step will be to open a connection to the network. We will connect to the local development network we started on the previous tutorial. 
 
-> Caution: By default, `ganache-cli` deletes all data when you stop it. If you stopped the ganache process from the previous tutorial, you will need to start a new one with `ganache-cli --deterministic`, and run `npx zos create Counter` again.
+> Caution: By default, `ganache-cli` deletes all data when you stop it. If you stopped the ganache process from the previous tutorial, you will need to start a new one with `ganache-cli --deterministic`, and run `zos create Counter` again.
 
 Let's begin coding in a new `src/index.js` file, where we will be writing our javascript script. We will start with some boilerplate for writing async code, and setting up a new `web3` object.
 
@@ -150,7 +150,7 @@ $ node src/index.js
 71
 ```
 
-You can also try interacting with the contract using `npx zos send-tx` and `npx zos call` as we did on the previous tutorial, and verify that it is the same instance we are working with from two different interfaces.
+You can also try interacting with the contract using `zos send-tx` and `zos call` as we did on the previous tutorial, and verify that it is the same instance we are working with from two different interfaces.
 
 The snippet from this tutorial, while simple, is the basis for interacting with your smart contracts from your javascript applications. Remember you can use other libraries other than `web3.js` - or even other languages other than javascript! ZeppelinOS will take care of managing your contracts on the blockchain. 
 
