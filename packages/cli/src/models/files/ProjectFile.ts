@@ -45,15 +45,14 @@ export default class ProjectFile {
   public filePath: string;
   public data: ProjectFileData;
 
-  public static getLinkedDependencies(
-    fileName: string = PROJECT_FILE_NAME,
-  ): string[] {
-    const file = fs.parseJsonIfExists(fileName);
-    if (file && file.dependencies) {
-      return Object.keys(file.dependencies).map(
-        depName => `${depName}@${file.dependencies[depName]}`,
+  public static getLinkedDependencies(filePath: string = null): string[] {
+    const project = new ProjectFile(filePath);
+    if (project && project.dependencies) {
+      return Object.keys(project.dependencies).map(
+        depName => `${depName}@${project.dependencies[depName]}`,
       );
-    } else return [];
+    }
+    return [];
   }
 
   public constructor(filePath: string = null) {
