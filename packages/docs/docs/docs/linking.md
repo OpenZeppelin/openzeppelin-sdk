@@ -10,9 +10,9 @@ In the [first](first) tutorial, we learned how to set up a new ZeppelinOS projec
 We will write a `TokenExchange` contract, that will allow any user to purchase an ERC20 token in exchange for ETH, at a fixed exchange rate. To do this, we will need not only a TokenExchange contract, but also an [ERC20 implementation](https://docs.openzeppelin.org/v2.3.0/tokens#erc20). Let's start by getting one, but before, make sure to initialize a new project as described [here](first#setting-up-your-project):
 
 ```console
+npm install --global zos ganache-cli
 mkdir token-exchange && cd token-exchange
 npm init -y
-npm install --save-dev zos
 zos init
 ```
 
@@ -38,10 +38,9 @@ This command will download the EVM package (bundled as a regular npm package), a
 
 ## Creating an ERC20 token
 
-Let's deploy an ERC20 token contract to our development network. But first, make sure to install ganache if needed, and start a new instance:
+Let's deploy an ERC20 token contract to our development network. Make sure to [have a ganache instance running](first#deploying-to-a-development-network), or start one by running:
 
 ```console
-npm install --global ganache-cli
 ganache-cli --deterministic
 ```
 
@@ -88,7 +87,7 @@ Great! We can now write an exchange contract and connect it to this token when w
 
 ## Writing the exchange contract
 
-Our exchange contract will need to store the token contract address and the exchange rate in its state. We will set these values during initialization, when we deploy our contract.
+In order to transfer an amount of tokens every time it receives ETH, our exchange contract will need to store the token contract address and the exchange rate in its state. We will set these two values during initialization, when we create the instance with `zos create`.
 
 In order to support contract upgrades, ZeppelinOS [does not allow the usage of Solidity's `constructor`s](pattern#the-constructor-caveat). Instead, we need to use _initializers_. An initializer is just a regular Solidity function, with an additional check to ensure that it can be called only once. To make coding initializers easy, ZeppelinOS provides a base `Initializable` contract, that includes an `initializer` modifier that takes care of this. You will first need to install the package that provides that contract:
 
@@ -96,7 +95,7 @@ In order to support contract upgrades, ZeppelinOS [does not allow the usage of S
 npm install zos-lib@2.4.0
 ```
 
-Now, let's write our exchange contract using an _initializer_ to set its initial state:
+Now, let's write our exchange contract in `contracts/TokenExchange.sol`, using an _initializer_ to set its initial state:
 
 ```solidity
 pragma solidity ^0.5.0;
@@ -169,7 +168,7 @@ All set! We can start playing with our brand new token exchange.
 
 ## Using our exchange
 
-Now that we have initialized our exchange contract initialized, and seeded it with funds, we can test it out by purchasing tokens. Recall from our contract that the purchase is made automatically when we send ETH to the contract, so let's try it by using `zos transfer`, sending funds to the `TokenExchange` instance address:
+Now that we have initialized our exchange contract initialized, and seeded it with funds, we can test it out by purchasing tokens. Our exchange contract will send tokens back automatically when we send ETH to it, so let's test it by using the `zos transfer` command. This command allows us to send funds to any address; in this case, we will use it to send ETH to our `TokenExchange` instance:
 
 ```console
 $ zos transfer
@@ -218,7 +217,7 @@ contract TokenExchange is Initializable {
 }
 ```
 
-When modifying your contract, make sure to add the `owner` variable **after** the others ([here](writing_contracts#modifying-your-contracts) you can see why this restriction). Don't worry if you forget about it, the CLI will check this for you when you try to upgrade.
+When modifying your contract, make sure to add the `owner` variable **after** the other variables ([here](writing_contracts#modifying-your-contracts) you can see why this restriction). Don't worry if you forget about it, the CLI will check this for you when you try to upgrade.
 
 > Note: If you are familiar with OpenZeppelin contracts, you may be wondering why we didn't simply extend from `Ownable` and used the `onlyOwner` modifier. The fact is ZeppelinOS does not support modifying the contracts you extend from (if they declare their own state variables). Again, the CLI will alert you if you attempt to do this. See [here](writing_contracts#modifying-your-contracts) for more info. 
 
