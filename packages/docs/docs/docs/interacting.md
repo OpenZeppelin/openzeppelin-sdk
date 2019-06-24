@@ -3,7 +3,7 @@ id: interacting
 title: Interacting with your contracts
 ---
 
-This tutorial [build on the previous one](first) where we created a new ZeppelinOS project, and created (and updated!) a simple `Counter` contract in a local development network. We will now see how to interact with this contract from javascript code using [web3.js](https://web3js.readthedocs.io/en/1.0/). We will build a small script that will increase the counter and report back the updated value.
+This tutorial [build on the previous one](first) where we created a new ZeppelinOS project, and created (and upgraded!) a simple `Counter` contract in a local development network. We will now see how to interact with this contract from javascript code using [web3.js](https://web3js.readthedocs.io/en/1.0/). We will build a small script that will increase the counter and report back the updated value.
 
 The full code for this tutorial can be found in the [`first-project` example](https://github.com/zeppelinos/zos/blob/v2.4.0/examples/first-project/src/index.js) in the ZeppelinOS github repository.
 
@@ -23,7 +23,7 @@ Keep in mind that there are many other javascript libraries available, and you c
 
 Our first step will be to open a connection to the network. We will connect to the local development network we started on the previous tutorial. 
 
-> Caution: By default, `ganache-cli` deletes all data when you stop it. If you stopped the ganache process from the previous tutorial, you will need to start a new one with `ganache-cli -d`, and run `npx zos create Counter` again.
+> Caution: By default, `ganache-cli` deletes all data when you stop it. If you stopped the ganache process from the previous tutorial, you will need to start a new one with `ganache-cli --deterministic`, and run `npx zos create Counter` again.
 
 Let's begin coding in a new `src/index.js` file, where we will be writing our javascript script. We will start with some boilerplate for writing async code, and setting up a new `web3` object.
 

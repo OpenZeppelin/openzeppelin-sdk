@@ -41,7 +41,7 @@ This command will download the EVM package (bundled as a regular npm package), a
 Let's deploy an ERC20 token contract to our development network. But first, make sure to install ganache if needed, and start a new instance:
 
 ```console
-npm install -g ganache-cli
+npm install --global ganache-cli
 ganache-cli --deterministic
 ```
 
@@ -69,9 +69,9 @@ $ npx zos create
 ✓ Instance created at 0x2612Af3A521c2df9EAF28422Ca335b04AdF3ac66
 ```
 
-Done! We have a working ERC20 token contract in our development network. Note that, when creating this instance, we chose to _initialize_ it with the initial values needed to set up our token. ZeppelinOS allows us to atomically call any function during the creation of a contract if we need to.
+Let's break down what we did in the command above. We first chose to create an instance of the `StandaloneERC20` contract from the `openzeppelin-eth` package we had linked before, and to create it in the local `development` network. We are then instructing the CLI to _initialize_ it with the initial values needed to set up our token. This requires us to choose the appropriate `initialize` function, and input all the required arguments. ZeppelinOS will then atomically create and initialize the new instance in a single transaction.
 
-We can check that the initial supply was properly allocated by using the `balance` command. Make sure to use the address where your ERC20 token instance was created.
+We now have a working ERC20 token contract in our development network. We can check that the initial supply was properly allocated by using the `balance` command. Make sure to use the address where your ERC20 token instance was created.
 
 <!-- CODE: We need a way to refer to our own contracts by name (and to the local accounts as well!) -->
 
@@ -90,7 +90,7 @@ Great! We can now write an exchange contract and connect it to this token when w
 
 Our exchange contract will need to store the token contract address and the exchange rate in its state. We will set these values during initialization, when we deploy our contract.
 
-In order to support contract upgrades, ZeppelinOS does not allow the usage of Solidity's `constructor`s. Instead, we need to use _initializers_. An initializer is just a regular Solidity function, with an additional check to ensure that it can be called only once. To make coding initializers easy, ZeppelinOS provides a base `Initializable` contract, that includes an `initializer` modifier that takes care of this. You will first need to install the package that provides that contract:
+In order to support contract upgrades, ZeppelinOS [does not allow the usage of Solidity's `constructor`s](pattern#the-constructor-caveat). Instead, we need to use _initializers_. An initializer is just a regular Solidity function, with an additional check to ensure that it can be called only once. To make coding initializers easy, ZeppelinOS provides a base `Initializable` contract, that includes an `initializer` modifier that takes care of this. You will first need to install the package that provides that contract:
 
 ```console
 npm install zos-lib@2.4.0
