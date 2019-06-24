@@ -168,7 +168,7 @@ export function contractsList(
   // get contracts from `build/contracts`
   if (!source || source === 'built') {
     return inquirerQuestion(name, message, type, contractsFromBuild);
-    // get contracts from zos.json file
+    // get contracts from project.json file
   } else if (source === 'notAdded') {
     const contracts = difference(
       contractsFromBuild,

@@ -44,7 +44,7 @@ async function action(options: {
   // Handle optimizer option:
   //- on --optimizer or --optimizer=on, enable it
   //- on --optimizer=off disable it
-  //- if no --optimizer is set, use default from zos.json, or false
+  //- if no --optimizer is set, use default from project.json, or false
   //- on any other --optimizer value, throw
   let optimizerEnabled = undefined;
   if (typeof optimizer === 'string') {

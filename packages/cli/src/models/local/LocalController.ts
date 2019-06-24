@@ -34,7 +34,7 @@ export default class LocalController {
     if (!init && !projectFile.exists()) {
       throw Error(
         `ZeppelinOS file ${
-          projectFile.fileName
+          projectFile.filePath
         } not found. Run 'zos init' first to initialize the project.`,
       );
     }
@@ -62,7 +62,7 @@ export default class LocalController {
   ): void | never {
     if (this.projectFile.exists() && !force) {
       throw Error(
-        `Cannot overwrite existing file ${this.projectFile.fileName}`,
+        `Cannot overwrite existing file ${this.projectFile.filePath}`,
       );
     }
     if (this.projectFile.name && !force) {

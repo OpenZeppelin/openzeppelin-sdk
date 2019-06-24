@@ -13,7 +13,7 @@ interface Config {
   networks: { [network: string]: Network };
   provider: Provider;
   buildDir: string;
-  // TODO: remove after managing compiler info in zos.json
+  // TODO: remove after managing compiler info in project.json
   compilers?: CompilersInfo;
 }
 
@@ -47,7 +47,7 @@ interface ArtifactDefaults {
 }
 
 type Provider = string | ((any) => any);
-// TODO: remove after managing compiler info in zos.json
+// TODO: remove after managing compiler info in project.json
 type CompilersInfo = any;
 
 const ZosConfig = {

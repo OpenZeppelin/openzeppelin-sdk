@@ -29,7 +29,7 @@ contract('Dependency', function([_, from]) {
         it('throws error', function() {
           assertErrorMessage(
             () => Dependency.fromNameWithVersion('bildts-kcom'),
-            /Could not find a zos.json file/,
+            /Could not find a project.json file/,
           );
         });
       });
@@ -116,7 +116,7 @@ contract('Dependency', function([_, from]) {
       it('throws an error', function() {
         assertErrorMessage(
           () => new Dependency('bildts-kcom', '1.1.0'),
-          /Could not find a zos.json file/,
+          /Could not find a project.json file/,
         );
       });
     });
@@ -160,7 +160,7 @@ contract('Dependency', function([_, from]) {
       it('generates a package file', function() {
         const projectFile = this.dependency.getProjectFile();
         projectFile.should.not.be.null;
-        projectFile.fileName.should.eq('node_modules/mock-stdlib/zos.json');
+        projectFile.filePath.should.eq('node_modules/mock-stdlib/zos.json');
         projectFile.version.should.eq('1.1.0');
         projectFile.contracts.should.include({ Greeter: 'GreeterImpl' });
       });
@@ -171,7 +171,7 @@ contract('Dependency', function([_, from]) {
         it('throws an error', function() {
           assertErrorMessage(
             () => this.dependency.getNetworkFile('bildts-kcom'),
-            /Could not find a zos file for network/,
+            /Could not find a project file for network/,
           );
         });
       });
@@ -179,7 +179,7 @@ contract('Dependency', function([_, from]) {
       context('for an existent network', function() {
         it('generates network file', function() {
           const networkFile = this.dependency.getNetworkFile('test');
-          networkFile.fileName.should.eq(
+          networkFile.filePath.should.eq(
             'node_modules/mock-stdlib/zos.test.json',
           );
         });

@@ -4,6 +4,7 @@ import fs from 'fs-extra';
 import Ajv from 'ajv';
 import { Loggy } from 'zos-lib';
 
+import { OPEN_ZEPPELIN_FOLDER } from '../files/constants';
 import KitFile, { MANIFEST_VERSION } from '../files/KitFile';
 import kitConfigSchema from '../files/kit-config.schema.json';
 import patch from '../../utils/patch';
@@ -23,9 +24,9 @@ export default class KitController {
     const { exec } = child;
     const { readdir, remove } = fs;
 
-    // because zos always spawns '.zos.lock' file
+    // because zos always spawns '.lock' file
     const files = (await readdir(workingDirPath)).filter(
-      (file): boolean => file !== '.zos.lock',
+      (file): boolean => file !== OPEN_ZEPPELIN_FOLDER,
     );
     if (files.length > 0) {
       throw Error(
@@ -67,7 +68,7 @@ export default class KitController {
         `The kit is ready to use. \n${config.message}`,
       );
     } catch (e) {
-      // TODO: remove all files from directory on fail except .zos.lock
+      // TODO: remove all files from directory on fail except .lock
       e.message = `Failed to download and unpack kit from ${url}. Details: ${
         e.message
       }`;

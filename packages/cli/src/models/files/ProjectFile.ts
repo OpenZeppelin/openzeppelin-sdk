@@ -2,9 +2,11 @@ import path from 'path';
 import pickBy from 'lodash.pickby';
 import isEqual from 'lodash.isequal';
 import isEmpty from 'lodash.isempty';
+
 import { Loggy, FileSystem as fs } from 'zos-lib';
 import Dependency from '../dependency/Dependency';
 import { MANIFEST_VERSION, checkVersion } from './ManifestVersion';
+import { OPEN_ZEPPELIN_FOLDER } from './constants';
 import NetworkFile from './NetworkFile';
 import { ProjectCompilerOptions } from '../compiler/solidity/SolidityProjectCompiler';
 
@@ -22,19 +24,30 @@ interface ConfigFileCompilerOptions {
   };
 }
 
-export default class ProjectFile {
-  public fileName: string;
-  public data: {
-    name: string;
-    version: string;
-    manifestVersion: string;
-    dependencies: { [name: string]: string };
-    contracts: { [alias: string]: string };
-    publish: boolean;
-    compiler: ConfigFileCompilerOptions;
-  };
+interface ProjectFileData {
+  name: string;
+  version: string;
+  manifestVersion: string;
+  dependencies: { [name: string]: string };
+  contracts: { [alias: string]: string };
+  publish: boolean;
+  compiler: ConfigFileCompilerOptions;
+}
 
-  public static getLinkedDependencies(fileName: string = 'zos.json'): string[] {
+export const PROJECT_FILE_NAME = 'project.json';
+export const PROJECT_FILE_PATH = path.join(
+  OPEN_ZEPPELIN_FOLDER,
+  PROJECT_FILE_NAME,
+);
+export const LEGACY_PROJECT_FILE_NAME = 'zos.json';
+
+export default class ProjectFile {
+  public filePath: string;
+  public data: ProjectFileData;
+
+  public static getLinkedDependencies(
+    fileName: string = PROJECT_FILE_NAME,
+  ): string[] {
     const file = fs.parseJsonIfExists(fileName);
     if (file && file.dependencies) {
       return Object.keys(file.dependencies).map(
@@ -43,32 +56,41 @@ export default class ProjectFile {
     } else return [];
   }
 
-  public constructor(fileName: string = 'zos.json') {
-    this.fileName = fileName;
-    try {
-      this.data = fs.parseJsonIfExists(this.fileName) || {
-        manifestVersion: MANIFEST_VERSION,
-      };
-      // if we failed to read and parse zos.json
-    } catch (e) {
-      e.message = `Failed to parse '${path.resolve(
-        fileName,
-      )}' file. Please make sure that ${fileName} is a valid JSON file. Details: ${
-        e.message
-      }.`;
-      throw e;
+  public constructor(filePath: string = null) {
+    const defaultData = {
+      manifestVersion: MANIFEST_VERSION,
+    } as any;
+    // if project file path is provided use only it
+    if (filePath) {
+      this.filePath = filePath;
+      this.data = this.tryToLoadProject(filePath);
+    } else {
+      // try to load legacy file first
+      // TODO: remove legacy project file support as a breaking change at 3.0
+      let data = this.tryToLoadProject(LEGACY_PROJECT_FILE_NAME);
+      if (data) {
+        this.data = data;
+        this.filePath = LEGACY_PROJECT_FILE_NAME;
+      } else {
+        // if there is no legacy project file try to load a normal project file
+        data = this.tryToLoadProject(PROJECT_FILE_PATH);
+        // if no project file available start a new one
+        this.data = data;
+        this.filePath = PROJECT_FILE_PATH;
+      }
     }
-    checkVersion(this.data.manifestVersion, this.fileName);
+    this.data = this.data || defaultData;
+    checkVersion(this.data.manifestVersion, this.filePath);
     if (!this.data.contracts) this.data.contracts = {};
     if (!this.data.dependencies) this.data.dependencies = {};
   }
 
   public exists(): boolean {
-    return fs.exists(this.fileName);
+    return fs.exists(this.filePath);
   }
 
   public get root(): string {
-    return path.dirname(this.fileName);
+    return path.dirname(this.filePath);
   }
 
   public set manifestVersion(version: string) {
@@ -233,30 +255,42 @@ export default class ProjectFile {
   }
 
   public networkFile(network): NetworkFile | never {
-    const networkFileName = this.fileName.replace(
-      /\.json\s*$/,
-      `.${network}.json`,
+    return new NetworkFile(
+      this,
+      network,
+      path.join(OPEN_ZEPPELIN_FOLDER, `${network}.json`),
     );
-    if (networkFileName === this.fileName)
-      throw Error(`Cannot create network file name from ${this.fileName}`);
-    return new NetworkFile(this, network, networkFileName);
   }
 
   public write(): void {
     if (this.hasChanged()) {
       const exists = this.exists();
-      fs.writeJson(this.fileName, this.data);
+      fs.writeJson(this.filePath, this.data);
       Loggy.onVerbose(
         __filename,
         'write',
         'write-zos-json',
-        exists ? `Updated ${this.fileName}` : `Created ${this.fileName}`,
+        exists ? `Updated ${this.filePath}` : `Created ${this.filePath}`,
       );
     }
   }
 
   private hasChanged(): boolean {
-    const currentPackgeFile = fs.parseJsonIfExists(this.fileName);
+    const currentPackgeFile = fs.parseJsonIfExists(this.filePath);
     return !isEqual(this.data, currentPackgeFile);
+  }
+
+  private tryToLoadProject(filePath: string): ProjectFileData {
+    try {
+      return fs.parseJsonIfExists(filePath);
+      // if we failed to read and parse project file
+    } catch (e) {
+      e.message = `Failed to parse '${path.resolve(
+        filePath,
+      )}' file. Please make sure that ${filePath} is a valid JSON file. Details: ${
+        e.message
+      }.`;
+      throw e;
+    }
   }
 }

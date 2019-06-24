@@ -2,10 +2,14 @@ import omitBy from 'lodash.omitby';
 import isEmpty from 'lodash.isempty';
 import pick from 'lodash.pick';
 import compact from 'lodash.compact';
+import path from 'path';
+
 import { FileSystem as fs, Loggy } from 'zos-lib';
+import { OPEN_ZEPPELIN_FOLDER } from '../files/constants';
 
 const state = { alreadyPrintedSessionInfo: false };
-const ZOS_SESSION_PATH = '.zos.session';
+const SESSION_FILE = '.session';
+const SESSION_PATH = path.join(OPEN_ZEPPELIN_FOLDER, SESSION_FILE);
 const DEFAULT_TX_TIMEOUT: number = 10 * 60; // 10 minutes
 const DEFAULT_EXPIRATION_TIMEOUT: number = 15 * 60; // 15 minutes
 
@@ -55,7 +59,7 @@ const Session = {
     logInfo: boolean = true,
   ): void {
     const expirationTimestamp = new Date(new Date().getTime() + expires * 1000);
-    fs.writeJson(ZOS_SESSION_PATH, {
+    fs.writeJson(SESSION_PATH, {
       network,
       from,
       timeout,
@@ -72,7 +76,7 @@ const Session = {
   },
 
   close(): void {
-    if (fs.exists(ZOS_SESSION_PATH)) fs.remove(ZOS_SESSION_PATH);
+    if (fs.exists(SESSION_PATH)) fs.remove(SESSION_PATH);
     Loggy.noSpin(
       __filename,
       'getOptions',
@@ -88,14 +92,14 @@ const Session = {
       fs
         .read(GIT_IGNORE)
         .toString()
-        .indexOf(ZOS_SESSION_PATH) < 0
+        .indexOf(SESSION_PATH) < 0
     ) {
-      fs.append(GIT_IGNORE, `\n${ZOS_SESSION_PATH}\n`);
+      fs.append(GIT_IGNORE, `\n${SESSION_PATH}\n`);
     }
   },
 
   _parseSession(): SessionOptions | undefined {
-    const session = fs.parseJsonIfExists(ZOS_SESSION_PATH);
+    const session = fs.parseJsonIfExists(SESSION_PATH);
     if (isEmpty(session)) return undefined;
     const parsedSession = pick(
       session,

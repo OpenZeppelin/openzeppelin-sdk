@@ -20,6 +20,7 @@ import {
 import { fromContractFullName, toContractFullName } from '../../utils/naming';
 import { MANIFEST_VERSION, checkVersion } from './ManifestVersion';
 import ProjectFile from './ProjectFile';
+import { OPEN_ZEPPELIN_FOLDER } from '../files/constants';
 import { ProxyType } from '../../scripts/interfaces';
 
 export interface ContractInterface {
@@ -67,7 +68,7 @@ interface AddressWrapper {
 export default class NetworkFile {
   public projectFile: ProjectFile;
   public network: any;
-  public fileName: string;
+  public filePath: string;
   public data: {
     contracts: { [contractAlias: string]: ContractInterface };
     solidityLibs: { [libAlias: string]: SolidityLibInterface };
@@ -96,10 +97,10 @@ export default class NetworkFile {
   }
 
   // TS-TODO: type for network parameter (and class member too).
-  public constructor(projectFile: ProjectFile, network: any, fileName: string) {
+  public constructor(projectFile: ProjectFile, network: any, filePath: string) {
     this.projectFile = projectFile;
     this.network = network;
-    this.fileName = fileName;
+    this.filePath = filePath;
 
     const defaults = {
       contracts: {},
@@ -109,17 +110,17 @@ export default class NetworkFile {
     };
 
     try {
-      this.data = fs.parseJsonIfExists(this.fileName) || defaults;
-      // if we failed to read and parse zos.json
+      this.data = fs.parseJsonIfExists(this.filePath) || defaults;
+      // if we failed to read and parse project.json
     } catch (e) {
       e.message = `Failed to parse '${path.resolve(
-        fileName,
-      )}' file. Please make sure that ${fileName} is a valid JSON file. Details: ${
+        filePath,
+      )}' file. Please make sure that ${filePath} is a valid JSON file. Details: ${
         e.message
       }.`;
       throw e;
     }
-    checkVersion(this.data.manifestVersion, this.fileName);
+    checkVersion(this.data.manifestVersion, this.filePath);
   }
 
   public set manifestVersion(version: string) {
@@ -529,22 +530,29 @@ export default class NetworkFile {
   public write(): void {
     if (this.hasChanged()) {
       const exists = this.exists();
-      fs.writeJson(this.fileName, this.data);
+      fs.writeJson(this.filePath, this.data);
       Loggy.onVerbose(
         __filename,
         'write',
         'write-zos-json',
-        exists ? `Updated ${this.fileName}` : `Created ${this.fileName}`,
+        exists ? `Updated ${this.filePath}` : `Created ${this.filePath}`,
       );
     }
   }
 
+  public static getNetworkFilePath(network: string): string {
+    // TODO: Remove legacy project file support
+    let legacyFilePath = `zos.${network}.json`;
+    legacyFilePath = fs.exists(legacyFilePath) ? legacyFilePath : null;
+    return legacyFilePath || `${OPEN_ZEPPELIN_FOLDER}/${network}.json`;
+  }
+
   private hasChanged(): boolean {
-    const currentNetworkFile = fs.parseJsonIfExists(this.fileName);
+    const currentNetworkFile = fs.parseJsonIfExists(this.filePath);
     return !isEqual(this.data, currentNetworkFile);
   }
 
   private exists(): boolean {
-    return fs.exists(this.fileName);
+    return fs.exists(this.filePath);
   }
 }

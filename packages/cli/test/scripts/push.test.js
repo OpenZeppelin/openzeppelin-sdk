@@ -697,7 +697,7 @@ contract('push script', function([_, owner]) {
           txParams,
           networkFile: this.networkFile,
         }).should.be.rejectedWith(
-          /Could not find a zos file for network 'test' for 'mock-stdlib-undeployed'/,
+          /Could not find a project file for network 'test' for 'mock-stdlib-undeployed'/,
         );
       });
     });
