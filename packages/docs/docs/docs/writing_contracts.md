@@ -128,7 +128,7 @@ contract MyContract is Initializable {
 }
 ```
 
-Note that it still is fine to set constants here, because the compiler does not reserve a storage slot for these variables, and every occurrence is replaced by the respective constant expression. So the following still works with ZeppelinOS:
+Note that it still is fine to set constants here, because the compiler [does not reserve a storage slot for these variables](https://solidity.readthedocs.io/en/latest/contracts.html#constant-state-variables), and every occurrence is replaced by the respective constant expression. So the following still works with ZeppelinOS:
 
 ```solidity
 contract MyContract {
