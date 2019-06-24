@@ -54,7 +54,7 @@ For setting up the token, we will be using the [StandaloneERC20 implementation](
 ```console
 $ npx zos create
 ? Pick a contract to instantiate: openzeppelin-eth/StandaloneERC20
-? Pick a network: local
+? Pick a network: development
 ✓ Deploying openzeppelin-eth dependency to network
 ? Do you want to call a function on the instance after creating it?: Yes
 ? Select which function: * initialize(name: string, symbol: string, decimals: uint8, initialSupply: uint256, initialHolder: address, minters: address[], pausers: address[])
@@ -78,7 +78,7 @@ We now have a working ERC20 token contract in our development network. We can ch
 ```console
 $ npx zos balance --erc20 0x2612Af3A521c2df9EAF28422Ca335b04AdF3ac66
 ? Enter an address to query its balance: 0x90f8bf6a479f320ead074411a4b0e7944ea8c9c1
-? Pick a network: local
+? Pick a network: development
 Balance: 100 MYT
 ```
 
@@ -137,7 +137,7 @@ Let's now create and initialize our new `TokenExchange` contract:
 $ npx zos create
 ✓ Compiled contracts with solc 0.5.9 (commit.e560f70d)
 ? Pick a contract to instantiate: TokenExchange
-? Pick a network: local
+? Pick a network: development
 ✓ Contract TokenExchange deployed
 ? Do you want to call a function on the instance after creating it?: Yes
 ? Select which function: initialize(_rate: uint256, _token: address)
@@ -152,7 +152,7 @@ Our exchange is almost ready! We only need to fund it, so it can send tokens to 
 
 ```console
 $ npx zos send-tx
-? Pick a network local
+? Pick a network: development
 ? Choose an instance: StandaloneERC20 at 0x2612Af3A521c2df9EAF28422Ca335b04AdF3ac66
 ? Select which function: transfer(to: address, value: uint256)
 ? to (address): 0x26b4AFb60d6C903165150C6F0AA14F8016bE4aec
@@ -173,7 +173,7 @@ Now that we have initialized our exchange contract initialized, and seeded it wi
 
 ```console
 $ npx zos transfer
-? Pick a network: local
+? Pick a network: development
 ? Choose the account to send transactions from: (1) 0xFFcf8FDEE72ac11b5c542428B35EEF5769C409f0
 ? Enter the receiver account: 0x26b4AFb60d6C903165150C6F0AA14F8016bE4aec
 ? Enter an amount to transfer 0.1 ether
@@ -189,7 +189,7 @@ We can now use `zos balance` again, to check the token balance of the address th
 ```console
 $ npx zos balance --erc20 0x5f8e26fAcC23FA4cbd87b8d9Dbbd33D5047abDE1
 ? Enter an address to query its balance: 0xFFcf8FDEE72ac11b5c542428B35EEF5769C409f0
-? Pick a network: local
+? Pick a network: development
 Balance: 1 MYT
 ```
 
@@ -249,7 +249,7 @@ We can now upgrade our token exchange contract to this new version. We will call
 
 ```console
 $ npx zos upgrade
-? Pick a network: local
+? Pick a network: development
 ✓ Compiled contracts with solc 0.5.9 (commit.e560f70d)
 - New variable 'address owner' was added in contract TokenExchange in contracts/TokenExchange.sol:1 at the end of the contract.
 ✓ Contract TokenExchange deployed
@@ -265,7 +265,7 @@ There! We can now call `withdraw` from our default address to extract all ETH se
 
 ```console
 $ npx zos send-tx
-? Pick a network: local
+? Pick a network: development
 ? Pick an instance: TokenExchange at 0xD86C8F0327494034F60e25074420BcCF560D5610
 ? Select which function: withdraw()
 ✓ Transaction successful. Transaction hash: 0xc9fb0d3ada96ec4c67c1c8f1569f9cfaf0ff0f7b241e172b32a023b1763ab7ab

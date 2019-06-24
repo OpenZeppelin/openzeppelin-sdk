@@ -75,13 +75,13 @@ Open a separate terminal, and start a new ganache process:
 ganache-cli --deterministic
 ```
 
-This will start a new development network, using a deterministic set of accounts, instead of random ones. We can now deploy our contract there, running `npx zos create`, and choosing to deploy the `Counter` contract to the `local` network.
+This will start a new development network, using a deterministic set of accounts, instead of random ones. We can now deploy our contract there, running `npx zos create`, and choosing to deploy the `Counter` contract to the `development` network.
 
 ```console
 $ npx zos create
 ✓ Compiled contracts with solc 0.5.9 (commit.e560f70d)
 ? Pick a contract to instantiate: Counter
-? Pick a network: local
+? Pick a network: development
 ✓ Added contract Counter
 ✓ Contract Counter deployed
 ? Do you want to call a function on the instance after creating it?: No
@@ -91,11 +91,11 @@ $ npx zos create
 
 > Note: The addresses where your contracts are created, or the transaction identifiers you see, may differ from the ones listed here.
 
-Our counter contract is deployed to the local network and ready to go! We can test it out by interacting with it from the terminal. Let's try incrementing the counter, by sending a transaction to call the `increase` function through `npx zos send-tx`.
+Our counter contract is deployed to the local development network and ready to go! We can test it out by interacting with it from the terminal. Let's try incrementing the counter, by sending a transaction to call the `increase` function through `npx zos send-tx`.
 
 ```console
 $ npx zos send-tx
-? Pick a network: local
+? Pick a network: development
 ? Pick an instance: Counter at 0xCfEB869F69431e42cdB54A4F4f105C19C080A601
 ? Select which function: increase()
 ✓ Transaction successful. Transaction hash: 0x20bef6583ea32cc57fe179e34dd57a5494db3c403e441624e56a886898cb52bd
@@ -105,7 +105,7 @@ We can now use `npx zos call` to query the contract's public `value`, and check 
 
 ```console
 $ npx zos call
-? Pick a network: local
+? Pick a network: development
 ? Pick an instance: Counter at 0xCfEB869F69431e42cdB54A4F4f105C19C080A601
 ? Select which function: value()
 ✓ Method 'value()' returned: 1
@@ -132,7 +132,7 @@ We can now upgrade the instance we created earlier to this new version:
 
 ```console
 $ npx zos upgrade
-? Pick a network: local
+? Pick a network: development
 ✓ Compiled contracts with solc 0.5.9 (commit.e560f70d)
 ✓ Contract Counter deployed
 ? Which proxies would you like to upgrade?: All proxies
@@ -143,14 +143,14 @@ Done! Our `Counter` instance has been upgraded to the latest version, and neithe
 
 ```console
 $ npx zos send-tx
-? Pick a network: local
+? Pick a network: development
 ? Pick an instance: Counter at 0xCfEB869F69431e42cdB54A4F4f105C19C080A601
 ? Select which function: increase(amount: uint256)
 ? amount (uint256): 10
 Transaction successful: 0x9c84faf32a87a33f517b424518712f1dc5ba0bdac4eae3a67ca80a393c555ece
 
 $ npx zos call
-? Pick a network: local
+? Pick a network: development
 ? Pick an instance: Counter at 0xCfEB869F69431e42cdB54A4F4f105C19C080A601
 ? Select which function: value()
 Returned "11"
