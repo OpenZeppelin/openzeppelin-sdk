@@ -113,6 +113,7 @@ $ zos call
 ```
 
 <!-- We could move the following to a separate tutorial -->
+
 ## Upgrading your contract
 
 We will now modify our `Counter` contract to make the `increase` function more interesting. Instead of increasing the counter by one, we will allow the caller to increase the counter by any value. Let's modify the code in `contracts/Counter.sol` to the following:
