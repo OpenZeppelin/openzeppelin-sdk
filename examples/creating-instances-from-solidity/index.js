@@ -70,9 +70,9 @@ async function main() {
   // Retrieve the address of the project's App contract.
   // This address will be passed to an instance of the Factory contract,
   // so that it can call the App contract's create function.
-  const zosLocalData = require(`./.openzeppelin/${network}.json`);
+  const ozLocalData = require(`./.openzeppelin/${network}.json`);
 
-  const appAddress = zosLocalData.app.address;
+  const appAddress = ozLocalData.app.address;
   console.log(`App deployed at ${appAddress}.`);
 
   // Create and initialize a proxy instance of the Factory contract.

@@ -8,6 +8,7 @@ import push from '../../src/scripts/push';
 import create from '../../src/scripts/create';
 import setAdmin from '../../src/scripts/set-admin';
 import ProjectFile from '../../src/models/files/ProjectFile';
+import NetworkFile from '../../src/models/files/NetworkFile';
 import utils from 'web3-utils';
 
 const should = require('chai').should();
@@ -28,7 +29,7 @@ contract('publish script', function(accounts) {
       'test/mocks/packages/package-with-contracts-and-stdlib.zos.json',
     );
     projectFile.publish = false;
-    this.networkFile = projectFile.networkFile(network);
+    this.networkFile = new NetworkFile(projectFile, network);
 
     await push({
       network,

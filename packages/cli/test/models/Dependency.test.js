@@ -6,6 +6,8 @@ import sinon from 'sinon';
 import npm from 'npm-programmatic';
 import { FileSystem as fs } from 'zos-lib';
 import Dependency from '../../src/models/dependency/Dependency';
+import ProjectFile from '../../src/models/files/ProjectFile';
+import NetworkFile from '../../src/models/files/NetworkFile';
 
 contract('Dependency', function([_, from]) {
   const assertErrorMessage = (fn, errorMessage) => {
@@ -68,6 +70,13 @@ contract('Dependency', function([_, from]) {
           const projectNetworkFile = fs.parseJsonIfExists(
             'test/mocks/networks/network-with-stdlibs.zos.test.json',
           );
+
+          sinon.stub(ProjectFile, 'getExistingFilePath').returns('zos.json');
+
+          sinon
+            .stub(NetworkFile, 'getExistingFilePath')
+            .returns('zos.test.json');
+
           const stubbedParseJsonIfExists = sinon.stub(fs, 'parseJsonIfExists');
           stubbedParseJsonIfExists
             .withArgs('zos.json')
@@ -156,9 +165,9 @@ contract('Dependency', function([_, from]) {
       });
     });
 
-    describe('#getProjectFile', function() {
+    describe('#projectFile', function() {
       it('generates a package file', function() {
-        const projectFile = this.dependency.getProjectFile();
+        const projectFile = this.dependency.projectFile;
         projectFile.should.not.be.null;
         projectFile.filePath.should.eq('node_modules/mock-stdlib/zos.json');
         projectFile.version.should.eq('1.1.0');

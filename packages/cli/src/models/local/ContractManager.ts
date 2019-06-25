@@ -20,7 +20,7 @@ export default class ContractManager {
       return Contracts.getFromLocal(contractName);
     } else {
       const dependency = new Dependency(packageName);
-      const contractName = dependency.getProjectFile().contract(contractAlias);
+      const contractName = dependency.projectFile.contract(contractAlias);
       return Contracts.getFromNodeModules(packageName, contractName);
     }
   }
@@ -30,7 +30,7 @@ export default class ContractManager {
       return !!this.projectFile.contract(contractAlias);
     } else {
       const dependency = new Dependency(packageName);
-      return !!dependency.getProjectFile().contract(contractAlias);
+      return !!dependency.projectFile.contract(contractAlias);
     }
   }
 

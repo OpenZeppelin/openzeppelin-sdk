@@ -89,37 +89,44 @@ export default class NetworkFile {
     return file ? file.manifestVersion : null;
   }
 
-  public static getDependencies(
-    fileName: string,
-  ): { [key: string]: any } | undefined {
-    const file = fs.parseJsonIfExists(fileName);
-    return file ? file.dependencies : undefined;
-  }
-
   // TS-TODO: type for network parameter (and class member too).
-  public constructor(projectFile: ProjectFile, network: any, filePath: string) {
+  public constructor(
+    projectFile: ProjectFile,
+    network: any,
+    filePath: string = null,
+  ) {
     this.projectFile = projectFile;
     this.network = network;
-    this.filePath = filePath;
 
     const defaults = {
       contracts: {},
       solidityLibs: {},
       proxies: {},
       manifestVersion: MANIFEST_VERSION,
-    };
+    } as any;
 
-    try {
-      this.data = fs.parseJsonIfExists(this.filePath) || defaults;
-      // if we failed to read and parse project.json
-    } catch (e) {
-      e.message = `Failed to parse '${path.resolve(
-        filePath,
-      )}' file. Please make sure that ${filePath} is a valid JSON file. Details: ${
-        e.message
-      }.`;
-      throw e;
+    this.filePath = NetworkFile.getExistingFilePath(
+      network,
+      process.cwd(),
+      filePath,
+    );
+
+    if (this.filePath) {
+      try {
+        this.data = fs.parseJsonIfExists(this.filePath);
+      } catch (e) {
+        e.message = `Failed to parse '${path.resolve(
+          filePath,
+        )}' file. Please make sure that ${filePath} is a valid JSON file. Details: ${
+          e.message
+        }.`;
+        throw e;
+      }
     }
+
+    this.data = this.data || defaults;
+    this.filePath = this.filePath || `${OPEN_ZEPPELIN_FOLDER}/${network}.json`;
+
     checkVersion(this.data.manifestVersion, this.filePath);
   }
 
@@ -534,19 +541,24 @@ export default class NetworkFile {
       Loggy.onVerbose(
         __filename,
         'write',
-        'write-zos-json',
+        'write-network-json',
         exists ? `Updated ${this.filePath}` : `Created ${this.filePath}`,
       );
     }
   }
 
-  public static getFilePath(network: string): string {
-    // TODO: Remove legacy project file support
-    let legacyFilePath = `zos.${network}.json`;
-    console.log(legacyFilePath);
-
-    legacyFilePath = fs.exists(legacyFilePath) ? legacyFilePath : null;
-    return legacyFilePath || `${OPEN_ZEPPELIN_FOLDER}/${network}.json`;
+  public static getExistingFilePath(
+    network: string,
+    dir: string = process.cwd(),
+    ...paths: string[]
+  ): string {
+    // TODO-v3: remove legacy project file support
+    // Prefer the new format over the old one
+    return [
+      ...paths,
+      `${dir}/zos.${network}.json`,
+      `${dir}/${OPEN_ZEPPELIN_FOLDER}/${network}.json`,
+    ].find(fs.exists);
   }
 
   private hasChanged(): boolean {

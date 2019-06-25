@@ -5,6 +5,7 @@ require('../setup');
 import { Contracts } from 'zos-lib';
 import TestHelper from '../../src/models/TestHelper';
 import ProjectFile from '../../src/models/files/ProjectFile';
+import NetworkFile from '../../src/models/files/NetworkFile';
 
 const ImplV1 = Contracts.getFromLocal('ImplV1');
 const WithLibraryImpl = Contracts.getFromLocal('WithLibraryImplV1');
@@ -19,7 +20,7 @@ contract('TestHelper', function([_, owner]) {
       this.projectFile = new ProjectFile(
         'test/mocks/packages/package-with-contracts-and-multiple-stdlibs.zos.json',
       );
-      this.networkFile = this.projectFile.networkFile('test');
+      this.networkFile = new NetworkFile(this.projectFile, 'test');
       this.project = await TestHelper(txParams, this.networkFile);
     });
 
@@ -78,7 +79,7 @@ contract('TestHelper', function([_, owner]) {
         'test/mocks/packages/package-with-contracts.zos.json',
       );
       this.projectFile.publish = false;
-      this.networkFile = this.projectFile.networkFile('test');
+      this.networkFile = new NetworkFile(this.projectFile, 'test');
       this.project = await TestHelper(txParams, this.networkFile);
     });
 

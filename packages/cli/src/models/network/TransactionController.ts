@@ -37,7 +37,7 @@ export default class TransactionController {
     if (txParams) this.txParams = txParams;
     if (!networkFile) {
       this.projectFile = new ProjectFile();
-      this.networkFile = this.projectFile.networkFile(network);
+      this.networkFile = new NetworkFile(this.projectFile, network);
     } else {
       this.networkFile = networkFile;
       this.projectFile = this.networkFile.projectFile;

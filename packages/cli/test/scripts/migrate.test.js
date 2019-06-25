@@ -10,6 +10,7 @@ import update from '../../src/scripts/update';
 import publish from '../../src/scripts/publish';
 import setAdmin from '../../src/scripts/set-admin';
 import ProjectFile from '../../src/models/files/ProjectFile';
+import NetworkFile from '../../src/models/files/NetworkFile';
 
 const should = require('chai').should();
 
@@ -37,7 +38,7 @@ contract('migrate-manifest-version script', function(accounts) {
       'test/mocks/packages/package-with-manifest-version-2.zos.json',
     );
     projectFile.publish = false;
-    this.networkFile = projectFile.networkFile(network);
+    this.networkFile = new NetworkFile(projectFile, network);
     this.networkFile.manifestVersion = '2';
   });
 

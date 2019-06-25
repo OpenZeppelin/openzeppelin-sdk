@@ -4,6 +4,7 @@ require('../setup');
 import random from 'lodash.random';
 import querySignedDeployment from '../../src/scripts/query-signed-deployment';
 import ProjectFile from '../../src/models/files/ProjectFile';
+import NetworkFile from '../../src/models/files/NetworkFile';
 import { helpers } from 'zos-lib';
 import push from '../../src/scripts/push';
 import queryDeployment from '../../src/scripts/query-deployment';
@@ -23,7 +24,8 @@ contract('query-signed-deployment script', function([
 
   const shouldHandleQuerySignedDeploymentScript = function() {
     beforeEach('setup', async function() {
-      this.networkFile = this.projectFile.networkFile(network);
+      this.networkFile = new NetworkFile(this.projectFile, network);
+
       this.salt = random(0, 2 ** 32);
       await push({ network, networkFile: this.networkFile });
     });

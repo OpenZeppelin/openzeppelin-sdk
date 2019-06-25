@@ -63,8 +63,7 @@ export default class Dependency {
 
   public static hasDependenciesForDeploy(network: string): boolean {
     const dependencies = ProjectFile.getLinkedDependencies() || [];
-    const networkDependencies =
-      NetworkFile.getDependencies(NetworkFile.getFilePath(network)) || {};
+    const networkDependencies = new NetworkFile(null, network).dependencies;
     const hasDependenciesForDeploy = dependencies.find(
       (depNameAndVersion): any => {
         const [name, version] = depNameAndVersion.split('@');
@@ -102,7 +101,7 @@ export default class Dependency {
     this.name = name;
     this._networkFiles = {};
 
-    const projectVersion = this.getProjectFile().version;
+    const projectVersion = this.projectFile.version;
     this.validateSatisfiesVersion(projectVersion, requirement);
     this.version = projectVersion;
     this.nameAndVersion = `${name}@${projectVersion}`;
@@ -118,7 +117,7 @@ export default class Dependency {
     // to Projects, which handle library deployment and linking for a set of contracts altogether.
 
     const contracts = map(
-      this.getProjectFile().contracts,
+      this.projectFile.contracts,
       (contractName, contractAlias) => [
         Contracts.getFromNodeModules(this.name, contractName),
         contractAlias,
@@ -158,21 +157,19 @@ export default class Dependency {
     return project;
   }
 
-  public getProjectFile(): ProjectFile | never {
+  public get projectFile(): ProjectFile | never {
     if (!this._projectFile) {
-      // TODO-v3: remove legacy project file support
-      const legacyFilePath = `node_modules/${
-        this.name
-      }/${LEGACY_PROJECT_FILE_NAME}`;
-      const filePath = `node_modules/${this.name}/${PROJECT_FILE_PATH}`;
-      if (!fs.exists(legacyFilePath) && !fs.exists(filePath)) {
-        throw Error(
+      const filePath = ProjectFile.getExistingFilePath(
+        `node_modules/${this.name}`,
+      );
+      if (!filePath) {
+        throw new Error(
           `Could not find a project.json file for '${
             this.name
           }'. Make sure it is provided by the npm package.`,
         );
       }
-      this._projectFile = new ProjectFile(legacyFilePath || filePath);
+      this._projectFile = new ProjectFile(filePath);
     }
     return this._projectFile;
   }
@@ -193,7 +190,7 @@ export default class Dependency {
       }
 
       this._networkFiles[network] = new NetworkFile(
-        this.getProjectFile(),
+        this.projectFile,
         network,
         filePath,
       );
@@ -206,8 +203,8 @@ export default class Dependency {
   }
 
   public isDeployedOnNetwork(network: string): boolean {
-    const filename = Dependency.getExistingNetworkFilePath(this.name, network);
-    if (!fs.exists(filename)) return false;
+    const filePath = Dependency.getExistingNetworkFilePath(this.name, network);
+    if (!fs.exists(filePath)) return false;
     return !!this.getNetworkFile(network).packageAddress;
   }
 

@@ -7,6 +7,7 @@ import push from '../../src/scripts/push';
 import createProxy from '../../src/scripts/create';
 import setAdmin from '../../src/scripts/set-admin';
 import ProjectFile from '../../src/models/files/ProjectFile';
+import NetworkFile from '../../src/models/files/NetworkFile';
 import utils from 'web3-utils';
 
 contract('set-admin script', function(accounts) {
@@ -44,7 +45,8 @@ contract('set-admin script', function(accounts) {
       this.projectFile = new ProjectFile(
         'test/mocks/packages/package-with-contracts.zos.json',
       );
-      this.networkFile = this.projectFile.networkFile(network);
+      this.networkFile = new NetworkFile(this.projectFile, network);
+
       await push({ network, txParams, networkFile: this.networkFile });
 
       this.impl1 = await createProxy({
@@ -160,7 +162,8 @@ contract('set-admin script', function(accounts) {
       this.projectFile = new ProjectFile(
         'test/mocks/packages/package-with-undeployed-stdlib.zos.json',
       );
-      this.networkFile = this.projectFile.networkFile(network);
+      this.networkFile = new NetworkFile(this.projectFile, network);
+
       await push({
         network,
         txParams,

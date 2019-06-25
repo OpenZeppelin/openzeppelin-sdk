@@ -59,25 +59,21 @@ export default class ProjectFile {
     const defaultData = {
       manifestVersion: MANIFEST_VERSION,
     } as any;
-    // if project file path is provided use only it
-    if (filePath) {
-      this.filePath = filePath;
-      this.data = this.tryToLoadProject(filePath);
-    } else {
-      // try to load legacy file first
-      // TODO-v3: remove legacy project file support as a breaking change at 3.0
-      let data = this.tryToLoadProject(LEGACY_PROJECT_FILE_NAME);
-      if (data) {
-        this.data = data;
-        this.filePath = LEGACY_PROJECT_FILE_NAME;
-      } else {
-        // if there is no legacy project file try to load a normal project file
-        data = this.tryToLoadProject(PROJECT_FILE_PATH);
-        // if no project file available start a new one
-        this.data = data;
-        this.filePath = PROJECT_FILE_PATH;
+    this.filePath = ProjectFile.getExistingFilePath(process.cwd(), filePath);
+    if (this.filePath) {
+      try {
+        this.data = fs.parseJsonIfExists(this.filePath);
+        // if we failed to read and parse project file
+      } catch (e) {
+        e.message = `Failed to parse '${path.resolve(
+          this.filePath,
+        )}' file. Please make sure that ${
+          this.filePath
+        } is a valid JSON file. Details: ${e.message}.`;
+        throw e;
       }
     }
+    this.filePath = this.filePath || PROJECT_FILE_PATH;
     this.data = this.data || defaultData;
     checkVersion(this.data.manifestVersion, this.filePath);
     if (!this.data.contracts) this.data.contracts = {};
@@ -253,10 +249,6 @@ export default class ProjectFile {
     delete this.data.contracts[alias];
   }
 
-  public networkFile(network): NetworkFile | never {
-    return new NetworkFile(this, network, NetworkFile.getFilePath(network));
-  }
-
   public write(): void {
     if (this.hasChanged()) {
       const exists = this.exists();
@@ -264,28 +256,27 @@ export default class ProjectFile {
       Loggy.onVerbose(
         __filename,
         'write',
-        'write-zos-json',
+        'write-project-json',
         exists ? `Updated ${this.filePath}` : `Created ${this.filePath}`,
       );
     }
   }
 
+  public static getExistingFilePath(
+    dir: string = process.cwd(),
+    ...paths: string[]
+  ): string {
+    // TODO-v3: remove legacy project file support
+    // Prefer the new format over the old one
+    return [
+      ...paths,
+      `${dir}/${PROJECT_FILE_PATH}`,
+      `${dir}/${LEGACY_PROJECT_FILE_NAME}`,
+    ].find(fs.exists);
+  }
+
   private hasChanged(): boolean {
     const currentPackgeFile = fs.parseJsonIfExists(this.filePath);
     return !isEqual(this.data, currentPackgeFile);
-  }
-
-  private tryToLoadProject(filePath: string): ProjectFileData {
-    try {
-      return fs.parseJsonIfExists(filePath);
-      // if we failed to read and parse project file
-    } catch (e) {
-      e.message = `Failed to parse '${path.resolve(
-        filePath,
-      )}' file. Please make sure that ${filePath} is a valid JSON file. Details: ${
-        e.message
-      }.`;
-      throw e;
-    }
   }
 }

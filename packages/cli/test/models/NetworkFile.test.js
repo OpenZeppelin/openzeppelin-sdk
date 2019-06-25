@@ -14,29 +14,6 @@ contract('NetworkFile', function() {
     );
   });
 
-  describe('class methods', function() {
-    describe('#getDependencies', function() {
-      context('on network file with dependencies', function() {
-        it('returns an object with dependencies', function() {
-          const dependencies = NetworkFile.getDependencies(
-            'test/mocks/networks/network-with-stdlibs.zos.test.json',
-          );
-          dependencies.should.not.be.empty;
-          dependencies.should.have.all.keys('mock-stdlib', 'mock-stdlib-2');
-        });
-      });
-
-      context('on network file without dependencies', function() {
-        it('returns an empty object', function() {
-          const dependencies = NetworkFile.getDependencies(
-            'test/mocks/networks/network-app-with-contract.zos.test.json',
-          );
-          expect(dependencies).to.be.undefined;
-        });
-      });
-    });
-  });
-
   describe('constructor', function() {
     it('creates empty file', function() {
       const file = new NetworkFile(
