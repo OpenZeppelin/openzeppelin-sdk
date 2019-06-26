@@ -1,5 +1,5 @@
 {
-  "zosversion": "2.2",
+  "manifestVersion": "2.2",
   "contracts": {
     "TokenExchange": "TokenExchange"
   },
