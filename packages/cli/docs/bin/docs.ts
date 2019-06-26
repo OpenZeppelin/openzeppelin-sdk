@@ -27,7 +27,10 @@ function writeMd(id, title, content) {
 }
 
 function makeSidebar(program) {
-  const commands = program.commands.map(command => `cli_${command.name()}`);
+  const commands = program.commands
+    // TODO: remove filtering status command before next major release
+    .filter(command => command.name() !== 'status')
+    .map(command => `cli_${command.name()}`);
   return {
     'cli-api': {
       commands: ['cli_main', ...commands],
@@ -43,12 +46,15 @@ function run() {
   const main = renderToStaticMarkup(React.createElement(Main, { program }));
   writeMd('main', 'zos', main);
 
-  program.commands.forEach(command => {
-    const content = renderToStaticMarkup(
-      React.createElement(Command, { command }),
-    );
-    writeMd(command.name(), command.name(), content);
-  });
+  program.commands
+    // TODO: remove filtering status command before next major release
+    .filter(command => command.name() !== 'status')
+    .forEach(command => {
+      const content = renderToStaticMarkup(
+        React.createElement(Command, { command }),
+      );
+      writeMd(command.name(), command.name(), content);
+    });
 
   const sidebar = makeSidebar(program);
   writeFileSync(

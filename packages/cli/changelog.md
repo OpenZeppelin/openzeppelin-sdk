@@ -4,23 +4,29 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
-## Unreleased
+## v2.4.0 - 2019-06-24
 
 ### Added
 - New `zos compile` command that uses solc directly to compile your contracts, generating artifacts with a format compatible to truffle's. The compiler version and optimizer settings can be controlled via command flags that are persisted on the `zos.json` file. The CLI will now default to this compiler when running commands that require compilation (like `add` or `create`), unless there are no compiler settings on `zos.json` and there is a `truffle.js` present in the project root, in which case it will rely on `truffle compile` as usual. ([#914](https://github.com/zeppelinos/zos/pull/914), [#940](https://github.com/zeppelinos/zos/pull/940), [#945](https://github.com/zeppelinos/zos/pull/945), [#953](https://github.com/zeppelinos/zos/pull/953), [#956](https://github.com/zeppelinos/zos/pull/956), [#959](https://github.com/zeppelinos/zos/pull/959), [#963](https://github.com/zeppelinos/zos/pull/963))
 - New `networks.js` default configuration file for specifying networks connections. This file replaces the truffle config file in specifying the available networks for the CLI, and shares most of its format. A `truffle.js` or `truffle-config.js` can still be used. ([#918](https://github.com/zeppelinos/zos/pull/918), [#949](https://github.com/zeppelinos/zos/pull/949))
 - New `zos call` and `zos send-tx` interactive commands for interacting with a contract directly from the command line, by calling a constant method or sending a transaction to a function. ([#848](https://github.com/zeppelinos/zos/pull/848), [#853](https://github.com/zeppelinos/zos/pull/853))
 - New `zos balance` and `zos transfer` commands for querying and transferring ETH directly from the command line. The `balance` command additionally supports an `--erc20` flag to query the balance of an ERC20 token instead of ETH. ([#823](https://github.com/zeppelinos/zos/pull/823), [#834](https://github.com/zeppelinos/zos/pull/834))
+- Added validations to method arguments in the interactive prompt. ([#1018](https://github.com/zeppelinos/zos/pull/1018))
 - [**experimental**] Add minimal proxy support ([EIP 1167](http://eips.ethereum.org/EIPS/eip-1167)) via a `--minimal` flag when running `zos create`. Instances created this way will not be upgradeable, but consume much less gas than their upgradeable counterpart. ([#850](https://github.com/zeppelinos/zos/pull/850))
 
 ### Changed
-- Reworked all log outputs in the application to be less verbose and more user-friendly. The `--verbose` flag re-enables the previous logging level. ([#915](https://github.com/zeppelinos/zos/pull/915), [#948](https://github.com/zeppelinos/zos/pull/948), [#969](https://github.com/zeppelinos/zos/pull/969))
+- Reworked all log outputs in the application to be less verbose and more user-friendly. The `--verbose` flag re-enables the previous logging level. ([#915](https://github.com/zeppelinos/zos/pull/915), [#948](https://github.com/zeppelinos/zos/pull/948), [#969](https://github.com/zeppelinos/zos/pull/969), [#988](https://github.com/zeppelinos/zos/pull/988), [#1003](https://github.com/zeppelinos/zos/pull/1003))
 - [**breaking**] The `ConfigVariablesInitializer` class of the CLI programmatic interface has been renamed to `ConfigManager`. ([#918](https://github.com/zeppelinos/zos/pull/918/))
 - [**breaking**] The `initMethod` and `initArgs` parameter names of the CLI programmatic interface were changed to `methodName` and `methodArgs` respectively. ([#841](https://github.com/zeppelinos/zos/pull/841))
 
 ### Fixed
 - Do not list contracts already added in interactive prompt when running `zos add`. ([#904](https://github.com/zeppelinos/zos/pull/904))
-- Fixed error `Cannot find method forEach of undefined` when two contracts with the same name are present in the project ([#880](https://github.com/zeppelinos/zos/pull/880))
+- Fixed error `Cannot find method forEach of undefined` when two contracts with the same name are present in the project. ([#880](https://github.com/zeppelinos/zos/pull/880))
+- Support invoking a method in a contract when there is another method with the same name and number of arguments. ([#1019](https://github.com/zeppelinos/zos/pull/1019))
+- Fixed parsing of array, boolean, and integer arguments when calling a method via the interactive prompt. ([#976](https://github.com/zeppelinos/zos/pull/976), [#987](https://github.com/zeppelinos/zos/pull/987))
+
+### Removed
+- [**breaking**] Removed the `status` command, which was unmaintained and failing in certain scenarios.
 
 ### Internal
 - Removed TSlint in favor of prettier and ESLint. ([#920](https://github.com/zeppelinos/zos/pull/920))

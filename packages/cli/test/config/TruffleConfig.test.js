@@ -67,11 +67,11 @@ contract('TruffleConfig', () => {
     const configFile = `${process.cwd()}/truffle.js`;
     const configFileBackup = `${configFile}.backup`;
 
-    before('backup truffle-config file', function() {
+    beforeEach('backup truffle-config file', function() {
       FileSystem.copy(configFile, configFileBackup);
     });
 
-    after('restore truffle-config file', function() {
+    afterEach('restore truffle-config file', function() {
       FileSystem.copy(configFileBackup, configFile);
       FileSystem.remove(configFileBackup);
     });
@@ -114,6 +114,19 @@ contract('TruffleConfig', () => {
         });
       },
     );
+
+    context('when the truffle config file is corrupted', function() {
+      beforeEach('create truffle config file', function() {
+        FileSystem.write(configFile, 'module.exports = undefined.foo');
+      });
+
+      it('throws an error', async function() {
+        await TruffleConfig.loadNetworkConfig(
+          'test',
+          true,
+        ).should.be.rejectedWith(/Could not load truffle configuration file./);
+      });
+    });
 
     context('when using truffle-hdwallet-provider', function() {
       beforeEach(async function() {

@@ -1,6 +1,6 @@
 {
   "name": "zos",
-  "version": "2.4.0-rc.3",
+  "version": "2.4.0",
   "description": "Command-line interface for the ZeppelinOS smart contract platform",
   "main": "./lib/index.js",
   "private": false,
@@ -97,7 +97,7 @@
     "spinnies": "^0.3.0",
     "truffle-config": "1.1.2",
     "web3": "1.0.0-beta.37",
-    "zos-lib": "^2.4.0-rc.3"
+    "zos-lib": "^2.4.0"
   },
   "devDependencies": {
     "@types/lodash": "^4.14.119",

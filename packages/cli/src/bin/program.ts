@@ -22,10 +22,13 @@ interface CommandInterface {
   tryAction?: any;
 }
 
-const commandsList: CommandInterface[] = Object.values(commands);
+let commandsList: CommandInterface[] = Object.values(commands);
 commandsList.forEach(
   (command: CommandInterface): void => command.register(program),
 );
+// Remove the status command from the command list
+commandsList = commandsList.filter(c => c.name !== 'status');
+
 const maxLength: number = Math.max(
   ...commandsList.map(command => command.signature.length),
 );
