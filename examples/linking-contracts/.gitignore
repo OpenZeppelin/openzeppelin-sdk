@@ -1,2 +1,4 @@
+/build/*
 /.zos.session
 /zos.dev-*
+.zos*
