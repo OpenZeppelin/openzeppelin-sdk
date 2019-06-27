@@ -16,14 +16,14 @@ function getProxyAddress(network, name, index) {
     throw new Error(`Address not found in proxy ${name}/${index}`, data.proxies[name][index])
   }
 
-  return proxyAddress
+  return proxyAddress;
 }
 
 function getNetworkFileName(currentNetwork) {
   const { network_id: networkId } = currentNetwork
   const name = networkId === '4' ? 'rinkeby' : `dev-${networkId}`
 
-  return `zos.${name}.json`
+  return `.openzeppelin/${name}.json`
 }
 
 module.exports = {

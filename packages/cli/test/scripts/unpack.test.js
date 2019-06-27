@@ -5,6 +5,7 @@ import sinon from 'sinon';
 import fs from 'fs-extra';
 import axios from 'axios';
 
+import { OPEN_ZEPPELIN_FOLDER } from '../../src/models/files/constants';
 import child from '../../src/utils/child';
 import patch, { cache } from '../../src/utils/patch';
 import unpack from '../../src/scripts/unpack';
@@ -39,7 +40,7 @@ describe('unpack script', function() {
     sinon.stub(cache, 'simple-git/promise').returns(git);
 
     sinon.stub(child, 'exec').returns(Promise.resolve());
-    sinon.stub(fs, 'readdir').returns(Promise.resolve(['.zos.lock']));
+    sinon.stub(fs, 'readdir').returns(Promise.resolve([OPEN_ZEPPELIN_FOLDER]));
     sinon.stub(fs, 'remove').returns(Promise.resolve());
     sinon.stub(fs, 'pathExists').returns(Promise.resolve(true));
 
@@ -92,7 +93,9 @@ describe('unpack script', function() {
 
   it('should fail if there are files inside the directory', async function() {
     fs.readdir.restore();
-    sinon.stub(fs, 'readdir').returns(Promise.resolve(['.zos.lock', 'random']));
+    sinon
+      .stub(fs, 'readdir')
+      .returns(Promise.resolve([OPEN_ZEPPELIN_FOLDER, 'random']));
     await unpack({ repoOrName: repo }).should.be.rejectedWith(
       'Unable to unpack https://github.com/zeppelinos/zepkit.git in the current directory, as it must be empty.',
     );

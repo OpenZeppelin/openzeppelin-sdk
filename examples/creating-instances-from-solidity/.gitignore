@@ -3,3 +3,5 @@ build/*
 zos.*
 
 .zos.session
+
+.openzeppelin/.session

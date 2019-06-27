@@ -20,6 +20,7 @@ import queryDeployment from '../../src/scripts/query-deployment';
 import link from '../../src/scripts/link';
 import ProjectFile from '../../src/models/files/ProjectFile';
 import { ProxyType } from '../../src/scripts/interfaces';
+import NetworkFile from '../../src/models/files/NetworkFile';
 
 const should = require('chai').should();
 
@@ -121,7 +122,7 @@ contract('create script', function([_, owner, otherAdmin]) {
 
   const shouldHandleCreateScript = function() {
     beforeEach('setup', async function() {
-      this.networkFile = this.projectFile.networkFile(network);
+      this.networkFile = new NetworkFile(this.projectFile, network);
 
       await add({ contractsData, projectFile: this.projectFile });
       await push({ network, txParams, networkFile: this.networkFile });

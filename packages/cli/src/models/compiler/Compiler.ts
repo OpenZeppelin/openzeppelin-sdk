@@ -51,7 +51,7 @@ export async function compile(
     ? { version: compileVersion }
     : null;
 
-  // If compiled successfully, write back compiler settings to zos.json to persist them
+  // If compiled successfully, write back compiler settings to project.json to persist them
   projectFile.setCompilerOptions({
     ...resolvedOptions,
     ...compileVersionOptions,

@@ -16,8 +16,12 @@ import {
   getSolidityLibNames,
   Loggy,
 } from 'zos-lib';
-import ProjectFile from '../files/ProjectFile';
+import ProjectFile, {
+  LEGACY_PROJECT_FILE_NAME,
+  PROJECT_FILE_PATH,
+} from '../files/ProjectFile';
 import NetworkFile from '../files/NetworkFile';
+import { OPEN_ZEPPELIN_FOLDER } from '../files/constants';
 
 export default class Dependency {
   public name: string;
@@ -59,17 +63,21 @@ export default class Dependency {
 
   public static hasDependenciesForDeploy(network: string): boolean {
     const dependencies = ProjectFile.getLinkedDependencies() || [];
-    const networkDependencies =
-      NetworkFile.getDependencies(`zos.${network}.json`) || {};
-    const hasDependenciesForDeploy = dependencies.find(depNameAndVersion => {
-      const [name, version] = depNameAndVersion.split('@');
-      const networkFilePath = `node_modules/${name}/zos.${network}.json`;
-      const projectDependency = networkDependencies[name];
-      const satisfiesVersion =
-        projectDependency &&
-        this.satisfiesVersion(projectDependency.version, version);
-      return !fs.exists(networkFilePath) && !satisfiesVersion;
-    });
+    const networkDependencies = new NetworkFile(null, network).dependencies;
+    const hasDependenciesForDeploy = dependencies.find(
+      (depNameAndVersion): any => {
+        const [name, version] = depNameAndVersion.split('@');
+        const networkFilePath = Dependency.getExistingNetworkFilePath(
+          name,
+          network,
+        );
+        const projectDependency = networkDependencies[name];
+        const satisfiesVersion =
+          projectDependency &&
+          this.satisfiesVersion(projectDependency.version, version);
+        return !fs.exists(networkFilePath) && !satisfiesVersion;
+      },
+    );
 
     return !!hasDependenciesForDeploy;
   }
@@ -93,8 +101,8 @@ export default class Dependency {
     this.name = name;
     this._networkFiles = {};
 
-    const projectVersion = this.getProjectFile().version;
-    this._validateSatisfiesVersion(projectVersion, requirement);
+    const projectVersion = this.projectFile.version;
+    this.validateSatisfiesVersion(projectVersion, requirement);
     this.version = projectVersion;
     this.nameAndVersion = `${name}@${projectVersion}`;
     this.requirement = requirement || tryWithCaret(projectVersion);
@@ -109,7 +117,7 @@ export default class Dependency {
     // to Projects, which handle library deployment and linking for a set of contracts altogether.
 
     const contracts = map(
-      this.getProjectFile().contracts,
+      this.projectFile.contracts,
       (contractName, contractAlias) => [
         Contracts.getFromNodeModules(this.name, contractName),
         contractAlias,
@@ -149,38 +157,44 @@ export default class Dependency {
     return project;
   }
 
-  public getProjectFile(): ProjectFile | never {
+  public get projectFile(): ProjectFile | never {
     if (!this._projectFile) {
-      const filename = `node_modules/${this.name}/zos.json`;
-      if (!fs.exists(filename)) {
-        throw Error(
-          `Could not find a zos.json file for '${
+      const filePath = ProjectFile.getExistingFilePath(
+        `node_modules/${this.name}`,
+      );
+      if (!filePath) {
+        throw new Error(
+          `Could not find a project.json file for '${
             this.name
           }'. Make sure it is provided by the npm package.`,
         );
       }
-      this._projectFile = new ProjectFile(filename);
+      this._projectFile = new ProjectFile(filePath);
     }
     return this._projectFile;
   }
 
   public getNetworkFile(network: string): NetworkFile | never {
     if (!this._networkFiles[network]) {
-      const filename = this._getNetworkFilePath(network);
-      if (!fs.exists(filename)) {
+      const filePath = Dependency.getExistingNetworkFilePath(
+        this.name,
+        network,
+      );
+
+      if (!fs.exists(filePath)) {
         throw Error(
-          `Could not find a zos file for network '${network}' for '${
+          `Could not find a project file for network '${network}' for '${
             this.name
           }'`,
         );
       }
 
       this._networkFiles[network] = new NetworkFile(
-        this.getProjectFile(),
+        this.projectFile,
         network,
-        filename,
+        filePath,
       );
-      this._validateSatisfiesVersion(
+      this.validateSatisfiesVersion(
         this._networkFiles[network].version,
         this.requirement,
       );
@@ -189,16 +203,26 @@ export default class Dependency {
   }
 
   public isDeployedOnNetwork(network: string): boolean {
-    const filename = this._getNetworkFilePath(network);
-    if (!fs.exists(filename)) return false;
+    const filePath = Dependency.getExistingNetworkFilePath(this.name, network);
+    if (!fs.exists(filePath)) return false;
     return !!this.getNetworkFile(network).packageAddress;
   }
 
-  private _getNetworkFilePath(network: string): string {
-    return `node_modules/${this.name}/zos.${network}.json`;
+  private static getExistingNetworkFilePath(
+    name: string,
+    network: string,
+  ): string {
+    // TODO-v3: Remove legacy project file support
+    let legacyFilePath = `node_modules/${name}/zos.${network}.json`;
+    legacyFilePath = fs.exists(legacyFilePath) ? legacyFilePath : null;
+    let filePath = `node_modules/${
+      this.name
+    }/${OPEN_ZEPPELIN_FOLDER}/${network}.json`;
+    filePath = fs.exists(filePath) ? filePath : null;
+    return filePath || legacyFilePath;
   }
 
-  private _validateSatisfiesVersion(
+  private validateSatisfiesVersion(
     version: string,
     requirement: string | semver.Range,
   ): void | never {

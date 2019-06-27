@@ -74,7 +74,7 @@ export default class NetworkController {
   ) {
     if (!networkFile) {
       const projectFile = new ProjectFile();
-      this.networkFile = projectFile.networkFile(network);
+      this.networkFile = new NetworkFile(projectFile, network);
     } else {
       this.networkFile = networkFile;
     }
@@ -1296,7 +1296,7 @@ export default class NetworkController {
     } else if (!this.networkFile.hasDependency(packageName)) {
       return `Dependency ${packageName} has not been linked yet. Please run zos push.`;
     } else if (
-      !new Dependency(packageName).getProjectFile().contract(contractAlias)
+      !new Dependency(packageName).projectFile.contract(contractAlias)
     ) {
       return `Contract ${contractAlias} is not provided by ${packageName}.`;
     }

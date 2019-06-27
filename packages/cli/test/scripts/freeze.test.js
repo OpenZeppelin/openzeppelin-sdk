@@ -5,6 +5,7 @@ import { Package } from 'zos-lib';
 import push from '../../src/scripts/push';
 import freeze from '../../src/scripts/freeze';
 import ProjectFile from '../../src/models/files/ProjectFile';
+import NetworkFile from '../../src/models/files/NetworkFile';
 
 contract('freeze script', function([_, owner]) {
   const network = 'test';
@@ -19,7 +20,8 @@ contract('freeze script', function([_, owner]) {
   describe('for an unpublished app', function() {
     beforeEach('push lib', async function() {
       this.projectFile.publish = false;
-      this.networkFile = this.projectFile.networkFile(network);
+      this.networkFile = new NetworkFile(this.projectFile, network);
+
       await push({ networkFile: this.networkFile, network, txParams });
     });
 
@@ -34,7 +36,8 @@ contract('freeze script', function([_, owner]) {
 
   describe('for a published app', function() {
     beforeEach('push lib', async function() {
-      this.networkFile = this.projectFile.networkFile(network);
+      this.networkFile = new NetworkFile(this.projectFile, network);
+
       await push({ networkFile: this.networkFile, network, txParams });
     });
 

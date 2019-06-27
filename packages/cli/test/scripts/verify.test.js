@@ -9,6 +9,7 @@ import CaptureLogs from '../helpers/captureLogs';
 import verify from '../../src/scripts/verify';
 import push from '../../src/scripts/push';
 import ProjectFile from '../../src/models/files/ProjectFile';
+import NetworkFile from '../../src/models/files/NetworkFile';
 
 contract('verify script', function() {
   const contractAlias = 'Impl';
@@ -27,7 +28,8 @@ contract('verify script', function() {
     describe('with invalid package or network files', function() {
       it('throws error if zOS project is not yet initialized', async function() {
         const projectFile = new ProjectFile('non-existent-package.zos.json');
-        const networkFile = projectFile.networkFile(network);
+        const networkFile = new NetworkFile(projectFile, network);
+
         await assertVerify(
           contractAlias,
           { network, networkFile },
@@ -39,7 +41,7 @@ contract('verify script', function() {
         const projectFile = new ProjectFile(
           'test/mocks/packages/package-with-contracts.zos.json',
         );
-        const networkFile = projectFile.networkFile(network);
+        const networkFile = new NetworkFile(projectFile, network);
         const nonExistentContract = 'NonExistent';
         await assertVerify(
           nonExistentContract,
@@ -54,7 +56,8 @@ contract('verify script', function() {
         this.projectFile = new ProjectFile(
           'test/mocks/packages/package-with-contracts.zos.json',
         );
-        this.networkFile = this.projectFile.networkFile(network);
+
+        this.networkFile = new NetworkFile(this.projectFile, network);
       });
 
       it('throws error if contract not yet deployed', async function() {
@@ -86,7 +89,8 @@ contract('verify script', function() {
       this.projectFile = new ProjectFile(
         'test/mocks/packages/package-with-contracts.zos.json',
       );
-      this.networkFile = this.projectFile.networkFile(network);
+      this.networkFile = new NetworkFile(this.projectFile, network);
+
       await push({ network, networkFile: this.networkFile, txParams });
       this.logs = new CaptureLogs();
       this.axiosStub = sinon.stub(axios, 'request');

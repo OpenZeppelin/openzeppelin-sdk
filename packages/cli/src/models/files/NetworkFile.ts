@@ -20,6 +20,7 @@ import {
 import { fromContractFullName, toContractFullName } from '../../utils/naming';
 import { MANIFEST_VERSION, checkVersion } from './ManifestVersion';
 import ProjectFile from './ProjectFile';
+import { OPEN_ZEPPELIN_FOLDER } from '../files/constants';
 import { ProxyType } from '../../scripts/interfaces';
 
 export interface ContractInterface {
@@ -67,7 +68,7 @@ interface AddressWrapper {
 export default class NetworkFile {
   public projectFile: ProjectFile;
   public network: any;
-  public fileName: string;
+  public filePath: string;
   public data: {
     contracts: { [contractAlias: string]: ContractInterface };
     solidityLibs: { [libAlias: string]: SolidityLibInterface };
@@ -88,38 +89,45 @@ export default class NetworkFile {
     return file ? file.manifestVersion : null;
   }
 
-  public static getDependencies(
-    fileName: string,
-  ): { [key: string]: any } | undefined {
-    const file = fs.parseJsonIfExists(fileName);
-    return file ? file.dependencies : undefined;
-  }
-
   // TS-TODO: type for network parameter (and class member too).
-  public constructor(projectFile: ProjectFile, network: any, fileName: string) {
+  public constructor(
+    projectFile: ProjectFile,
+    network: any,
+    filePath: string = null,
+  ) {
     this.projectFile = projectFile;
     this.network = network;
-    this.fileName = fileName;
 
     const defaults = {
       contracts: {},
       solidityLibs: {},
       proxies: {},
       manifestVersion: MANIFEST_VERSION,
-    };
+    } as any;
 
-    try {
-      this.data = fs.parseJsonIfExists(this.fileName) || defaults;
-      // if we failed to read and parse zos.json
-    } catch (e) {
-      e.message = `Failed to parse '${path.resolve(
-        fileName,
-      )}' file. Please make sure that ${fileName} is a valid JSON file. Details: ${
-        e.message
-      }.`;
-      throw e;
+    this.filePath = NetworkFile.getExistingFilePath(
+      network,
+      process.cwd(),
+      filePath,
+    );
+
+    if (this.filePath) {
+      try {
+        this.data = fs.parseJsonIfExists(this.filePath);
+      } catch (e) {
+        e.message = `Failed to parse '${path.resolve(
+          filePath,
+        )}' file. Please make sure that ${filePath} is a valid JSON file. Details: ${
+          e.message
+        }.`;
+        throw e;
+      }
     }
-    checkVersion(this.data.manifestVersion, this.fileName);
+
+    this.data = this.data || defaults;
+    this.filePath = this.filePath || `${OPEN_ZEPPELIN_FOLDER}/${network}.json`;
+
+    checkVersion(this.data.manifestVersion, this.filePath);
   }
 
   public set manifestVersion(version: string) {
@@ -529,22 +537,36 @@ export default class NetworkFile {
   public write(): void {
     if (this.hasChanged()) {
       const exists = this.exists();
-      fs.writeJson(this.fileName, this.data);
+      fs.writeJson(this.filePath, this.data);
       Loggy.onVerbose(
         __filename,
         'write',
-        'write-zos-json',
-        exists ? `Updated ${this.fileName}` : `Created ${this.fileName}`,
+        'write-network-json',
+        exists ? `Updated ${this.filePath}` : `Created ${this.filePath}`,
       );
     }
   }
 
+  public static getExistingFilePath(
+    network: string,
+    dir: string = process.cwd(),
+    ...paths: string[]
+  ): string {
+    // TODO-v3: remove legacy project file support
+    // Prefer the new format over the old one
+    return [
+      ...paths,
+      `${dir}/zos.${network}.json`,
+      `${dir}/${OPEN_ZEPPELIN_FOLDER}/${network}.json`,
+    ].find(fs.exists);
+  }
+
   private hasChanged(): boolean {
-    const currentNetworkFile = fs.parseJsonIfExists(this.fileName);
+    const currentNetworkFile = fs.parseJsonIfExists(this.filePath);
     return !isEqual(this.data, currentNetworkFile);
   }
 
   private exists(): boolean {
-    return fs.exists(this.fileName);
+    return fs.exists(this.filePath);
   }
 }

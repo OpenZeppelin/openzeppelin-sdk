@@ -15,6 +15,7 @@ import {
   networksList,
   InquirerQuestions,
 } from '../prompts/prompt';
+import NetworkFile from '../models/files/NetworkFile';
 
 const name = 'push';
 const signature: string = name;
@@ -112,7 +113,7 @@ async function runActionIfNeeded(
 ): Promise<void> {
   const { force, interactive, network: promptedNetwork } = options;
   const projectFile = new ProjectFile();
-  const networkFile = projectFile.networkFile(network);
+  const networkFile = new NetworkFile(projectFile, network);
   const {
     contract: contractAlias,
     package: packageName,

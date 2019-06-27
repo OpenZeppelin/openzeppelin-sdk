@@ -16,7 +16,7 @@ import ContractManager from '../models/local/ContractManager';
 import Dependency from '../models/dependency/Dependency';
 import { fromContractFullName, toContractFullName } from '../utils/naming';
 import { ProxyType } from '../scripts/interfaces';
-import { ProxyInterface } from '../models/files/NetworkFile';
+import NetworkFile, { ProxyInterface } from '../models/files/NetworkFile';
 
 type ChoicesT = string[] | ({ [key: string]: any });
 
@@ -110,7 +110,7 @@ export function proxiesList(
   projectFile?: ProjectFile,
 ): { [key: string]: any } {
   projectFile = projectFile || new ProjectFile();
-  const networkFile = projectFile.networkFile(network);
+  const networkFile = new NetworkFile(projectFile, network);
   const proxies = networkFile.getProxies(filter || {});
   const groupedByPackage = groupBy(proxies, 'package');
   const list = Object.keys(groupedByPackage).map(packageName => {
@@ -168,7 +168,7 @@ export function contractsList(
   // get contracts from `build/contracts`
   if (!source || source === 'built') {
     return inquirerQuestion(name, message, type, contractsFromBuild);
-    // get contracts from zos.json file
+    // get contracts from project.json file
   } else if (source === 'notAdded') {
     const contracts = difference(
       contractsFromBuild,
@@ -181,11 +181,11 @@ export function contractsList(
   } else if (source === 'all') {
     const packageContracts = Object.keys(localProjectFile.dependencies).map(
       dependencyName => {
-        const contractNames = new Dependency(dependencyName)
-          .getProjectFile()
-          .contractAliases.map(
-            contractName => `${dependencyName}/${contractName}`,
-          );
+        const contractNames = new Dependency(
+          dependencyName,
+        ).projectFile.contractAliases.map(
+          contractName => `${dependencyName}/${contractName}`,
+        );
 
         if (contractNames.length > 0) {
           contractNames.unshift(
@@ -265,7 +265,7 @@ function contractMethods(
 export function proxyInfo(contractInfo: any, network: string): any {
   const { contractAlias, proxyAddress, packageName } = contractInfo;
   const projectFile = new ProjectFile();
-  const networkFile = projectFile.networkFile(network);
+  const networkFile = new NetworkFile(projectFile, network);
   const proxyParams = {
     contract: contractAlias,
     address: proxyAddress,

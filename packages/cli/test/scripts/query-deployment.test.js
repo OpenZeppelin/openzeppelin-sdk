@@ -4,6 +4,7 @@ require('../setup');
 import random from 'lodash.random';
 import queryDeployment from '../../src/scripts/query-deployment';
 import ProjectFile from '../../src/models/files/ProjectFile';
+import NetworkFile from '../../src/models/files/NetworkFile';
 
 const should = require('chai').should();
 
@@ -14,7 +15,8 @@ contract('query-deployment script', function([_, owner, another]) {
 
   const shouldHandleQueryDeploymentScript = function() {
     beforeEach('setup', async function() {
-      this.networkFile = this.projectFile.networkFile(network);
+      this.networkFile = new NetworkFile(this.projectFile, network);
+
       this.salt = random(0, 2 ** 32);
     });
 

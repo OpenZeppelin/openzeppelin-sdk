@@ -6,6 +6,8 @@ import sinon from 'sinon';
 import npm from 'npm-programmatic';
 import { FileSystem as fs } from 'zos-lib';
 import Dependency from '../../src/models/dependency/Dependency';
+import ProjectFile from '../../src/models/files/ProjectFile';
+import NetworkFile from '../../src/models/files/NetworkFile';
 
 contract('Dependency', function([_, from]) {
   const assertErrorMessage = (fn, errorMessage) => {
@@ -29,7 +31,7 @@ contract('Dependency', function([_, from]) {
         it('throws error', function() {
           assertErrorMessage(
             () => Dependency.fromNameWithVersion('bildts-kcom'),
-            /Could not find a zos.json file/,
+            /Could not find a project.json file/,
           );
         });
       });
@@ -68,6 +70,13 @@ contract('Dependency', function([_, from]) {
           const projectNetworkFile = fs.parseJsonIfExists(
             'test/mocks/networks/network-with-stdlibs.zos.test.json',
           );
+
+          sinon.stub(ProjectFile, 'getExistingFilePath').returns('zos.json');
+
+          sinon
+            .stub(NetworkFile, 'getExistingFilePath')
+            .returns('zos.test.json');
+
           const stubbedParseJsonIfExists = sinon.stub(fs, 'parseJsonIfExists');
           stubbedParseJsonIfExists
             .withArgs('zos.json')
@@ -116,7 +125,7 @@ contract('Dependency', function([_, from]) {
       it('throws an error', function() {
         assertErrorMessage(
           () => new Dependency('bildts-kcom', '1.1.0'),
-          /Could not find a zos.json file/,
+          /Could not find a project.json file/,
         );
       });
     });
@@ -156,11 +165,11 @@ contract('Dependency', function([_, from]) {
       });
     });
 
-    describe('#getProjectFile', function() {
+    describe('#projectFile', function() {
       it('generates a package file', function() {
-        const projectFile = this.dependency.getProjectFile();
+        const projectFile = this.dependency.projectFile;
         projectFile.should.not.be.null;
-        projectFile.fileName.should.eq('node_modules/mock-stdlib/zos.json');
+        projectFile.filePath.should.eq('node_modules/mock-stdlib/zos.json');
         projectFile.version.should.eq('1.1.0');
         projectFile.contracts.should.include({ Greeter: 'GreeterImpl' });
       });
@@ -171,7 +180,7 @@ contract('Dependency', function([_, from]) {
         it('throws an error', function() {
           assertErrorMessage(
             () => this.dependency.getNetworkFile('bildts-kcom'),
-            /Could not find a zos file for network/,
+            /Could not find a project file for network/,
           );
         });
       });
@@ -179,7 +188,7 @@ contract('Dependency', function([_, from]) {
       context('for an existent network', function() {
         it('generates network file', function() {
           const networkFile = this.dependency.getNetworkFile('test');
-          networkFile.fileName.should.eq(
+          networkFile.filePath.should.eq(
             'node_modules/mock-stdlib/zos.test.json',
           );
         });

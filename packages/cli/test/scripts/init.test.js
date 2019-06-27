@@ -2,20 +2,20 @@
 require('../setup');
 
 import sinon from 'sinon';
-import { FileSystem as fs } from 'zos-lib'
-import { cleanup } from '../helpers/cleanup'
+import { FileSystem as fs } from 'zos-lib';
+import { cleanup } from '../helpers/cleanup';
 
-import init from '../../src/scripts/init'
-import ProjectFile from '../../src/models/files/ProjectFile'
-import ConfigManager from '../../src/models/config/ConfigManager'
+import init from '../../src/scripts/init';
+import ProjectFile from '../../src/models/files/ProjectFile';
+import ConfigManager from '../../src/models/config/ConfigManager';
 
 contract('init script', function() {
   const name = 'MyApp';
   const version = '0.3.0';
   const tmpDir = 'test/tmp';
 
-  before('create tmp dir and stub ZosConfig#initialize', function () {
-    fs.createDir(tmpDir)
+  before('create tmp dir and stub ZosConfig#initialize', function() {
+    fs.createDir(tmpDir);
     sinon.stub(ConfigManager, 'initialize').returns();
   });
 
@@ -25,7 +25,7 @@ contract('init script', function() {
   });
 
   beforeEach('create package file', async function() {
-    this.projectFile = new ProjectFile(`${tmpDir}/zos.json`)
+    this.projectFile = new ProjectFile(`${tmpDir}/zos.json`);
   });
 
   it('should default to unpublished apps', async function() {
@@ -71,21 +71,21 @@ contract('init script', function() {
     });
 
     it('should not overwrite existing file by default', async function() {
-      fs.writeJson(this.projectFile.fileName, { name: 'previousApp' });
+      fs.writeJson(this.projectFile.filePath, { name: 'previousApp' });
       await init({
         publish,
         name,
         version,
         projectFile: this.projectFile,
       }).should.be.rejectedWith(
-        `Cannot overwrite existing file ${this.projectFile.fileName}`,
+        `Cannot overwrite existing file ${this.projectFile.filePath}`,
       );
 
-      cleanup(this.projectFile.fileName);
+      cleanup(this.projectFile.filePath);
     });
 
     it('should overwrite existing file if requested', async function() {
-      fs.writeJson(this.projectFile.fileName, {
+      fs.writeJson(this.projectFile.filePath, {
         name: 'previousApp',
         version: '0',
       });
@@ -100,7 +100,7 @@ contract('init script', function() {
       this.projectFile.hasName(name).should.be.true;
       this.projectFile.isCurrentVersion(version).should.be.true;
 
-      cleanup(this.projectFile.fileName);
+      cleanup(this.projectFile.filePath);
     });
   }
 

@@ -19,14 +19,15 @@ const lib = require('zos-lib');
 // Main entry point, called by `truffle exec`.
 async function main() {
 
+
   // Retrieve the name of the network being used.
   const network = process.argv[process.argv.length - 1];
   console.log(`Running script with the ${network} network...`);
 
   // Delete any previous ZeppelinOS files.
-  console.log(`Deleting previous zos files...`);
-  if(fs.existsSync('zos.json')) fs.unlinkSync('zos.json');
-  if(fs.existsSync(`zos.${network}.json`)) fs.unlinkSync(`zos.${network}.json`);
+  console.log(`Deleting previous project files...`);
+  if(fs.existsSync('.openzeppelin/project.json')) fs.unlinkSync('.openzeppelin/project.json');
+  if(fs.existsSync(`.openzeppelin/${network}.json`)) fs.unlinkSync(`.openzeppelin/${network}.json`);
 
   // Retrieve ZeppelinOS scripts.
   // These are analogous to `zos` CLI commands.
@@ -69,8 +70,9 @@ async function main() {
   // Retrieve the address of the project's App contract.
   // This address will be passed to an instance of the Factory contract,
   // so that it can call the App contract's create function.
-  const zosLocalData = require(`./zos.${network}.json`);
-  const appAddress = zosLocalData.app.address;
+  const ozLocalData = require(`./.openzeppelin/${network}.json`);
+
+  const appAddress = ozLocalData.app.address;
   console.log(`App deployed at ${appAddress}.`);
 
   // Create and initialize a proxy instance of the Factory contract.

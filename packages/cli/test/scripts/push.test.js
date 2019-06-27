@@ -17,6 +17,7 @@ import freeze from '../../src/scripts/freeze';
 import add from '../../src/scripts/add';
 import bumpVersion from '../../src/scripts/bump';
 import ProjectFile from '../../src/models/files/ProjectFile';
+import NetworkFile from '../../src/models/files/NetworkFile';
 import remove from '../../src/scripts/remove';
 import Dependency from '../../src/models/dependency/Dependency';
 import CaptureLogs from '../helpers/captureLogs';
@@ -434,8 +435,10 @@ contract('push script', function([_, owner]) {
         );
         mockStdlibPackage.version = newVersion;
         sinon
-          .stub(Dependency.prototype, 'getProjectFile')
-          .callsFake(() => mockStdlibPackage);
+          .stub(Dependency.prototype, 'projectFile')
+          .get(function getterFn() {
+            return mockStdlibPackage;
+          });
 
         await this.dependencyPackage.newVersion(newVersion);
         this.dependencyGetNetworkFileStub.callsFake(() => ({
@@ -557,7 +560,7 @@ contract('push script', function([_, owner]) {
       const projectFile = new ProjectFile(
         'test/mocks/packages/package-empty.zos.json',
       );
-      this.networkFile = projectFile.networkFile(network);
+      this.networkFile = new NetworkFile(projectFile, network);
     });
 
     describe('on push', function() {
@@ -577,7 +580,7 @@ contract('push script', function([_, owner]) {
       const projectFile = new ProjectFile(
         'test/mocks/packages/package-with-contracts.zos.json',
       );
-      this.networkFile = projectFile.networkFile(network);
+      this.networkFile = new NetworkFile(projectFile, network);
     });
 
     describe('on push', function() {
@@ -586,7 +589,7 @@ contract('push script', function([_, owner]) {
         const newProjectFile = new ProjectFile(
           'test/mocks/packages/package-with-contracts-v2.zos.json',
         );
-        this.newNetworkFile = newProjectFile.networkFile(network);
+        this.newNetworkFile = new NetworkFile(newProjectFile, network);
       });
 
       shouldDeployApp();
@@ -615,7 +618,7 @@ contract('push script', function([_, owner]) {
       const projectFile = new ProjectFile(
         'test/mocks/packages/package-with-invalid-contracts.zos.json',
       );
-      this.networkFile = projectFile.networkFile(network);
+      this.networkFile = new NetworkFile(projectFile, network);
 
       await push({
         networkFile: this.networkFile,
@@ -637,7 +640,7 @@ contract('push script', function([_, owner]) {
         const projectFile = new ProjectFile(
           'test/mocks/packages/package-with-stdlib.zos.json',
         );
-        this.networkFile = projectFile.networkFile(network);
+        this.networkFile = new NetworkFile(projectFile, network);
 
         await push({ networkFile: this.networkFile, network, txParams });
       });
@@ -652,7 +655,7 @@ contract('push script', function([_, owner]) {
         const projectFile = new ProjectFile(
           'test/mocks/packages/package-with-stdlib-range.zos.json',
         );
-        this.networkFile = projectFile.networkFile(network);
+        this.networkFile = new NetworkFile(projectFile, network);
 
         await push({ networkFile: this.networkFile, network, txParams });
       });
@@ -669,7 +672,7 @@ contract('push script', function([_, owner]) {
         const projectFile = new ProjectFile(
           'test/mocks/packages/package-with-invalid-stdlib.zos.json',
         );
-        this.networkFile = projectFile.networkFile(network);
+        this.networkFile = new NetworkFile(projectFile, network);
       });
 
       it('should fail to push', async function() {
@@ -688,7 +691,7 @@ contract('push script', function([_, owner]) {
         const projectFile = new ProjectFile(
           'test/mocks/packages/package-with-undeployed-stdlib.zos.json',
         );
-        this.networkFile = projectFile.networkFile(network);
+        this.networkFile = new NetworkFile(projectFile, network);
       });
 
       it('should fail to push', async function() {
@@ -697,7 +700,7 @@ contract('push script', function([_, owner]) {
           txParams,
           networkFile: this.networkFile,
         }).should.be.rejectedWith(
-          /Could not find a zos file for network 'test' for 'mock-stdlib-undeployed'/,
+          /Could not find a project file for network 'test' for 'mock-stdlib-undeployed'/,
         );
       });
     });
@@ -707,7 +710,7 @@ contract('push script', function([_, owner]) {
         const projectFile = new ProjectFile(
           'test/mocks/packages/package-with-unpublished-stdlib.zos.json',
         );
-        this.networkFile = projectFile.networkFile(network);
+        this.networkFile = new NetworkFile(projectFile, network);
       });
 
       it('should fail to push', async function() {
@@ -740,7 +743,7 @@ contract('push script', function([_, owner]) {
       const projectFile = new ProjectFile(
         'test/mocks/packages/package-empty-lite.zos.json',
       );
-      this.networkFile = projectFile.networkFile(network);
+      this.networkFile = new NetworkFile(projectFile, network);
     });
 
     it('should run push', async function() {
@@ -759,7 +762,7 @@ contract('push script', function([_, owner]) {
         'test/mocks/packages/package-with-contracts.zos.json',
       );
       projectFile.publish = false;
-      this.networkFile = projectFile.networkFile(network);
+      this.networkFile = new NetworkFile(projectFile, network);
     });
 
     describe('on push', function() {
@@ -795,7 +798,7 @@ contract('push script', function([_, owner]) {
         'test/mocks/packages/package-with-stdlib.zos.json',
       );
       projectFile.publish = false;
-      this.networkFile = projectFile.networkFile(network);
+      this.networkFile = new NetworkFile(projectFile, network);
 
       await push({ network, txParams, networkFile: this.networkFile });
     });
@@ -813,7 +816,7 @@ contract('push script', function([_, owner]) {
       );
       projectFile.publish = false;
       projectFile.addContract('ImplV1Clash', 'ImplV1Clash');
-      this.networkFile = projectFile.networkFile(network);
+      this.networkFile = new NetworkFile(projectFile, network);
     });
 
     it('fails nicely if there are duplicated contract names', async function() {

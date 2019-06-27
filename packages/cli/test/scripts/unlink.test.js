@@ -28,7 +28,7 @@ contract('unlink script', function() {
         dependencies: [dependencyName],
         projectFile: this.projectFile,
       }).should.be.rejectedWith(
-        `Could not find a zos.json file for '${dependencyName}'. Make sure it is provided by the npm package.`,
+        `Could not find a project.json file for '${dependencyName}'. Make sure it is provided by the npm package.`,
       );
     });
   });

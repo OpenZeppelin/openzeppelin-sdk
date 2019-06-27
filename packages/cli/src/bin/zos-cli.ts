@@ -1,9 +1,15 @@
 #! /usr/bin/env node
 
+import fs from 'fs-extra';
+
 import { Loggy } from 'zos-lib';
 import { lockSync } from 'lockfile';
 import program from './program';
 import findRootDirectory from './helpers';
+import {
+  LOCK_FILE_PATH,
+  OPEN_ZEPPELIN_FOLDER,
+} from '../models/files/constants';
 
 const IGNORED_COMMANDS_IN_ROOT_DIR = ['init', 'unpack'];
 
@@ -16,12 +22,13 @@ if (!IGNORED_COMMANDS_IN_ROOT_DIR.includes(command)) {
 }
 
 // Acquire file lock to ensure no other instance is running
-const LOCKFILE = '.zos.lock';
+
 try {
-  lockSync(LOCKFILE, { retries: 0 });
+  fs.ensureDirSync(OPEN_ZEPPELIN_FOLDER);
+  lockSync(LOCK_FILE_PATH, { retries: 0 });
 } catch (e) {
   console.error(
-    `Cannot run more than one instance of 'zos' at the same time.\nIf you are sure that no other instances are actually running, manually remove the file ${LOCKFILE} and try again.`,
+    `Cannot run more than one instance of 'openzeppelin' at the same time.\nIf you are sure that no other instances are actually running, manually remove the file ${LOCK_FILE_PATH} and try again.`,
   );
   process.exit(1);
 }
