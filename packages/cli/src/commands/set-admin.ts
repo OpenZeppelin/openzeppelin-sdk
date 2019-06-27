@@ -147,11 +147,11 @@ function getCommandProps({
   return {
     ...networksList('network', 'list'),
     pickProxyBy: {
-      message: 'For which proxies would you like to transfer ownership?',
+      message: 'For which instances would you like to transfer ownership?',
       type: 'list',
       choices: [
         {
-          name: 'All proxies',
+          name: 'All instances',
           value: 'all',
         },
         {
@@ -165,7 +165,7 @@ function getCommandProps({
       ],
     },
     proxy: {
-      message: 'Choose a proxy',
+      message: 'Choose an instance',
       type: 'list',
       choices: ({ pickProxyBy }) =>
         proxiesList(pickProxyBy, network, { kind: ProxyType.Upgradeable }),

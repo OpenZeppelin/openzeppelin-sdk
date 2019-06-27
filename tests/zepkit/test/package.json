@@ -1,7 +1,7 @@
 {
   "name": "tests-kit-test",
   "private": true,
-  "version": "2.4.0-rc.2",
+  "version": "2.4.0",
   "description": "Integration tests for ZepKit and an unpack command",
   "author": "santiago@zeppelin.solutions",
   "license": "MIT",

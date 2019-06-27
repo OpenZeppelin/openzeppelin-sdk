@@ -1,0 +1,16 @@
+{
+  "manifestVersion": "2.2",
+  "contracts": {
+    "Counter": "Counter"
+  },
+  "dependencies": {},
+  "name": "example-first-project",
+  "version": "1.0.0",
+  "compiler": {
+    "manager": "zos",
+    "solcVersion": "0.5.9",
+    "compilerSettings": {
+      "optimizer": {}
+    }
+  }
+}
