@@ -4,6 +4,7 @@ import { toAddress, uint256ToAddress } from '../utils/Addresses';
 import Transactions from '../utils/Transactions';
 import Contract from '../artifacts/Contract';
 import { TxParams } from '../artifacts/ZWeb3';
+import { IMPLEMENTATION_LABEL, DEPRECATED_IMPLEMENTATION_LABEL, ADMIN_LABEL, DEPRECATED_ADMIN_LABEL } from '../utils/Constants';
 
 export default class Proxy {
   private contract: Contract;
@@ -51,17 +52,21 @@ export default class Proxy {
   }
 
   public async implementation(): Promise<string> {
-    const position = ZWeb3.sha3('org.zeppelinos.proxy.implementation');
-    return uint256ToAddress(await this.getStorageAt(position));
+    return uint256ToAddress(await this.getStorageAt(IMPLEMENTATION_LABEL, DEPRECATED_IMPLEMENTATION_LABEL));
   }
 
   public async admin(): Promise<string> {
-    const position = ZWeb3.sha3('org.zeppelinos.proxy.admin');
-    return uint256ToAddress(await this.getStorageAt(position));
+    return uint256ToAddress(await this.getStorageAt(ADMIN_LABEL, DEPRECATED_ADMIN_LABEL));
   }
 
-  public async getStorageAt(position: string): Promise<string> {
-    return ZWeb3.getStorageAt(this.address, position);
+  public async getStorageAt(label: string, deprecatedLabel: string): Promise<string> {
+    let storage = await ZWeb3.getStorageAt(this.address, ZWeb3.sha3(label));
+    console.log('storage', storage);
+    if (storage === '0x0') {
+      storage = await ZWeb3.getStorageAt(this.address, ZWeb3.sha3(deprecatedLabel));
+    }
+
+    return storage;
   }
 
   private async checkAdmin(): Promise<void | never> {
