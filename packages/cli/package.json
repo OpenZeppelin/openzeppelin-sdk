@@ -34,6 +34,7 @@
   },
   "homepage": "https://github.com/zeppelinos/zos/tree/master/packages/cli#readme",
   "dependencies": {
+    "@resolver-engine/core": "^0.3.0",
     "@resolver-engine/imports-fs": "^0.3.2",
     "@types/fs-extra": "^7.0.0",
     "@types/npm": "^2.0.29",
