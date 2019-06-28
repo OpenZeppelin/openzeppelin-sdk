@@ -8,7 +8,7 @@ pragma solidity ^0.5.0;
  * when the user imports a zos-lib contract (that transitively causes this contract to be compiled and added to the
  * build/artifacts folder) as well as the vanilla Address implementation from an openzeppelin version.
  */
-library ZOSLibAddress {
+library OpenZeppelinUpgradesAddress {
     /**
      * Returns whether the target address is a contract
      * @dev This function will return false if invoked during the constructor of a contract,

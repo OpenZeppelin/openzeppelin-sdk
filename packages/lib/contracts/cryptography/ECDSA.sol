@@ -12,7 +12,7 @@ pragma solidity ^0.5.2;
  * build/artifacts folder) as well as the vanilla implementation from an openzeppelin version.
  */
 
-library ZOSLibECDSA {
+library OpenZeppelinUpgradesECDSA {
     /**
      * @dev Recover signer address from a message by using their signature
      * @param hash bytes32 message, the hash is the signed message. What is recovered is the signer address.
