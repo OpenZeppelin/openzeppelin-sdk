@@ -18,7 +18,7 @@ Once you have installed `node`, you can install the ZeppelinOS CLI:
 npm install --global zos
 ```
 
-> Note: We are installing the CLI [globally](https://docs.npmjs.com/downloading-and-installing-packages-globally) in our workstation. Alternatively, you can install it [local](https://docs.npmjs.com/downloading-and-installing-packages-locally) to each project by running `npm install --save-dev zos` in your project folder. This would require you to run every command by prefixing it with `npx`. Installing it locally allows you to have different `zos` versions in different projects, but requires you to reinstall every time you start a new project.
+> Note: We are installing the CLI [globally](https://docs.npmjs.com/downloading-and-installing-packages-globally) in our workstation. Alternatively, you can install it [locally](https://docs.npmjs.com/downloading-and-installing-packages-locally) to each project by running `npm install --save-dev zos` in your project folder. This would require you to run every command by prefixing it with `npx`. Installing it locally allows you to have different `zos` versions in different projects, but it requires you to reinstall every time you start a new project.
 
 ## Setting up your project
 
@@ -36,7 +36,7 @@ Let's now use the CLI to initialize a ZeppelinOS project:
 zos init
 ```
 
-The CLI will prompt you to choose a project name and version, defaulting to the ones from the `package.json`, and then set up a few files and folders for running your ZeppelinOS project.
+The CLI will prompt you to choose a project name and version, defaulting to the ones from the `package.json`, and then it will set up a few files and folders for running your ZeppelinOS project.
 
 We are now ready to begin coding.
 
@@ -58,17 +58,17 @@ contract Counter {
 }
 ```
 
-This contract will just keep a numeric `value`, that will be increased by one every time we send a transaction to the `increase()` function.
+This contract will just keep a numeric `value` that will be increased by one every time we send a transaction to the `increase()` function.
 
-You can run `zos compile` to compile the contract and check for any errors. After it compiled successfully, we can now deploy our contract.
+You can run `zos compile` to compile the contract and check for any errors. After it is compiled successfully, we can deploy our contract.
 
-> Note: You don't have to worry if you forget to compile your contract. The CLI will automatically check if your contract changed when you run any command, and compile it if needed.
+> Note: You don't have to worry if you forget to compile your contract. The CLI will automatically check if your contract changed when you run any command and compile it if needed.
 
 ## Deploying to a development network
 
 We will use [ganache](https://truffleframework.com/ganache) as a _development network_ to deploy our contract. If you don't have ganache installed, do so now by running `npm install -g ganache-cli`.
 
-Development networks are mini blockchains that run just on your computer, and are much faster than the actual Ethereum network. We will use one for coding and testing.
+Development networks are mini blockchains that run just on your computer and are much faster than the actual Ethereum network. We will use one for coding and testing.
 
 Open a separate terminal, and start a new ganache process:
 
@@ -76,7 +76,7 @@ Open a separate terminal, and start a new ganache process:
 ganache-cli --deterministic
 ```
 
-This will start a new development network, using a deterministic set of accounts, instead of random ones. We can now deploy our contract there, running `zos create`, and choosing to deploy the `Counter` contract to the `development` network.
+This will start a new development network using a deterministic set of accounts instead of random ones. We can now deploy our contract there, running `zos create`, and choosing to deploy the `Counter` contract to the `development` network.
 
 ```console
 $ zos create
@@ -92,7 +92,7 @@ $ zos create
 
 > Note: The addresses where your contracts are created, or the transaction identifiers you see, may differ from the ones listed here.
 
-Our counter contract is deployed to the local development network and ready to go! We can test it out by interacting with it from the terminal. Let's try incrementing the counter, by sending a transaction to call the `increase` function through `zos send-tx`.
+Our counter contract is deployed to the local development network and ready to go! We can test it out by interacting with it from the terminal. Let's try incrementing the counter by sending a transaction to call the `increase` function through `zos send-tx`.
 
 ```console
 $ zos send-tx
@@ -102,7 +102,7 @@ $ zos send-tx
 ✓ Transaction successful. Transaction hash: 0x20bef6583ea32cc57fe179e34dd57a5494db3c403e441624e56a886898cb52bd
 ```
 
-We can now use `zos call` to query the contract's public `value`, and check that it was indeed increased from zero to one.
+We can now use `zos call` to query the contract's public `value` and check that it was indeed increased from zero to one.
 
 ```console
 $ zos call
@@ -141,7 +141,7 @@ $ zos upgrade
 Instance upgraded at 0xCfEB869F69431e42cdB54A4F4f105C19C080A601.
 ```
 
-Done! Our `Counter` instance has been upgraded to the latest version, and neither its address nor its state have changed. Let's check it out by increasing the counter by ten, which should yield eleven, since we had already increased it by one:
+Done! Our `Counter` instance has been upgraded to the latest version, and neither its address nor its state has changed. Let's check it out by increasing the counter by ten, which should yield eleven, since we had already increased it by one:
 
 ```console
 $ zos send-tx
@@ -158,6 +158,6 @@ $ zos call
 Returned "11"
 ```
 
-> Note: If you are curious about how ZeppelinOS achieves this feat, given that smart contracts are immutable, check out our [upgrades pattern guide](pattern). You will see that there are some changes that are not supported during upgrades. For instance, you cannot [remove or change the type of a contract state variable](https://docs.zeppelinos.org/docs/writing_contracts.html#modifying-your-contracts). Nevertheless, you can change, add, or remove all the functions you want.
+> Note: If you are curious about how ZeppelinOS achieves this feat, given that smart contracts are immutable, check out our [upgrades pattern guide](pattern). You will see that there are some changes that are not supported during upgrades. For instance, you cannot [remove or change the type of a contract state variable](https://docs.zeppelinos.org/docs/writing_contracts.html#modifying-your-contracts). However, you can change, add, or remove all the functions you want.
 
 That's it! You now know how to start a simple ZeppelinOS project, create a contract, deploy it to a local network, and even upgrade it as you develop. Head over to the next tutorial to learn how to interact with your contract from your code.
