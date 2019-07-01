@@ -24,17 +24,13 @@ export function compilerVersionsMatch(v1: string, v2: string): boolean {
   return semverEq(parseVersion(v1), parseVersion(v2));
 }
 
-export function compilerSettingsMatch(
-  s1: CompilerVersionOptions,
-  s2: CompilerVersionOptions,
-) {
+export function compilerSettingsMatch(s1: CompilerVersionOptions, s2: CompilerVersionOptions) {
   if (!s1 || !s2) return false;
 
   return (
     s1.evmVersion === s2.evmVersion &&
     ((!s1.optimizer && !s2.optimizer) ||
-      (s1.optimizer.enabled == s2.optimizer.enabled &&
-        s1.optimizer.runs == s2.optimizer.runs))
+      (s1.optimizer.enabled == s2.optimizer.enabled && s1.optimizer.runs == s2.optimizer.runs))
   );
 }
 

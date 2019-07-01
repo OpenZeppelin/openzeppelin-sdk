@@ -49,10 +49,7 @@ class BasePackageProjectDeployer extends BaseProjectDeployer {
     return this.controller.packageAddress;
   }
 
-  protected _tryRegisterPartialDeploy({
-    thepackage,
-    directory,
-  }: PartialDeploy): void {
+  protected _tryRegisterPartialDeploy({ thepackage, directory }: PartialDeploy): void {
     if (thepackage) this._registerPackage(thepackage);
     if (directory) this._registerVersion(this.requestedVersion, directory);
   }
@@ -61,10 +58,7 @@ class BasePackageProjectDeployer extends BaseProjectDeployer {
     this.networkFile.package = { address };
   }
 
-  protected _registerVersion(
-    version: string,
-    { address }: { address: string },
-  ): void {
+  protected _registerVersion(version: string, { address }: { address: string }): void {
     this.networkFile.provider = { address };
     this.networkFile.version = version;
   }
@@ -76,16 +70,9 @@ export class PackageProjectDeployer extends BasePackageProjectDeployer {
   public async fetchOrDeploy(): Promise<PackageProject> {
     try {
       const packageAddress: string = this.packageAddress;
-      this.project = await PackageProject.fetchOrDeploy(
-        this.requestedVersion,
-        this.txParams,
-        { packageAddress },
-      );
+      this.project = await PackageProject.fetchOrDeploy(this.requestedVersion, this.txParams, { packageAddress });
       this._registerPackage(await this.project.getProjectPackage());
-      this._registerVersion(
-        this.requestedVersion,
-        await this.project.getCurrentDirectory(),
-      );
+      this._registerVersion(this.requestedVersion, await this.project.getCurrentDirectory());
       return this.project;
     } catch (deployError) {
       this._tryRegisterPartialDeploy(deployError);
@@ -99,24 +86,13 @@ export class AppProjectDeployer extends BasePackageProjectDeployer {
 
   public async fetchOrDeploy(): Promise<AppProject> {
     return this._run((existingAddresses: ExistingAddresses) =>
-      AppProject.fetchOrDeploy(
-        this.projectFile.name,
-        this.requestedVersion,
-        this.txParams,
-        existingAddresses,
-      ),
+      AppProject.fetchOrDeploy(this.projectFile.name, this.requestedVersion, this.txParams, existingAddresses),
     );
   }
 
-  public async fromProxyAdminProject(
-    proxyAdminProject: ProxyAdminProject,
-  ): Promise<AppProject> {
+  public async fromProxyAdminProject(proxyAdminProject: ProxyAdminProject): Promise<AppProject> {
     return this._run((existingAddresses: ExistingAddresses) =>
-      AppProject.fromProxyAdminProject(
-        proxyAdminProject,
-        this.requestedVersion,
-        existingAddresses,
-      ),
+      AppProject.fromProxyAdminProject(proxyAdminProject, this.requestedVersion, existingAddresses),
     );
   }
 
@@ -132,16 +108,9 @@ export class AppProjectDeployer extends BasePackageProjectDeployer {
     return this.networkFile.proxyFactoryAddress;
   }
 
-  private async _run(
-    createProjectFn: CreateProjectFn,
-  ): Promise<AppProject | never> {
+  private async _run(createProjectFn: CreateProjectFn): Promise<AppProject | never> {
     try {
-      const {
-        appAddress,
-        packageAddress,
-        proxyAdminAddress,
-        proxyFactoryAddress,
-      }: ExistingAddresses = this;
+      const { appAddress, packageAddress, proxyAdminAddress, proxyFactoryAddress }: ExistingAddresses = this;
       this.project = await createProjectFn({
         appAddress,
         packageAddress,
@@ -156,11 +125,7 @@ export class AppProjectDeployer extends BasePackageProjectDeployer {
     }
   }
 
-  protected _tryRegisterPartialDeploy({
-    thepackage,
-    app,
-    directory,
-  }: PartialDeploy): void {
+  protected _tryRegisterPartialDeploy({ thepackage, app, directory }: PartialDeploy): void {
     super._tryRegisterPartialDeploy({ thepackage, directory });
     if (app) this._registerApp(app);
   }
@@ -168,10 +133,7 @@ export class AppProjectDeployer extends BasePackageProjectDeployer {
   private async _registerDeploy(): Promise<void> {
     this._registerApp(this.project.getApp());
     this._registerPackage(await this.project.getProjectPackage());
-    this._registerVersion(
-      this.requestedVersion,
-      await this.project.getCurrentDirectory(),
-    );
+    this._registerVersion(this.requestedVersion, await this.project.getCurrentDirectory());
   }
 
   private _registerApp({ address }: { address: string }): void {
@@ -197,11 +159,7 @@ export class ProxyAdminProjectDeployer extends BaseProjectDeployer {
       });
     });
     forEach(this.networkFile.dependencies, (dependencyInfo, dependencyName) => {
-      this.project.setDependency(
-        dependencyName,
-        dependencyInfo.package,
-        dependencyInfo.version,
-      );
+      this.project.setDependency(dependencyName, dependencyInfo.package, dependencyInfo.version);
     });
 
     return this.project;

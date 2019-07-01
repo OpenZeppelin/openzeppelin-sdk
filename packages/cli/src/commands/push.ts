@@ -10,11 +10,7 @@ import { fromContractFullName } from '../utils/naming';
 import Dependency from '../models/dependency/Dependency';
 import ProjectFile from '../models/files/ProjectFile';
 import ConfigManager from '../models/config/ConfigManager';
-import {
-  promptIfNeeded,
-  networksList,
-  InquirerQuestions,
-} from '../prompts/prompt';
+import { promptIfNeeded, networksList, InquirerQuestions } from '../prompts/prompt';
 import NetworkFile from '../models/files/NetworkFile';
 
 const name = 'push';
@@ -27,14 +23,8 @@ const register: (program: any) => any = program =>
     .description(description)
     .usage('--network <network> [options]')
     .option('--skip-compile', 'skips contract compilation')
-    .option(
-      '-d, --deploy-dependencies',
-      'deploys dependencies to the network if there is no existing deployment',
-    )
-    .option(
-      '--reset',
-      'redeploys all contracts (not only the ones that changed)',
-    )
+    .option('-d, --deploy-dependencies', 'deploys dependencies to the network if there is no existing deployment')
+    .option('--reset', 'redeploys all contracts (not only the ones that changed)')
     .option('-f, --force', 'ignores validation errors and deploys contracts')
     .option(
       '--deploy-proxy-admin',
@@ -77,11 +67,7 @@ async function action(options: any): Promise<void> {
     ...options,
     ...prompted,
   });
-  const promptDeployDependencies = await promptForDeployDependencies(
-    deployDependencies,
-    network,
-    interactive,
-  );
+  const promptDeployDependencies = await promptForDeployDependencies(deployDependencies, network, interactive);
 
   await push({
     deployProxyAdmin,
@@ -92,32 +78,22 @@ async function action(options: any): Promise<void> {
     txParams,
     ...promptDeployDependencies,
   });
-  if (!options.dontExitProcess && process.env.NODE_ENV !== 'test')
-    process.exit(0);
+  if (!options.dontExitProcess && process.env.NODE_ENV !== 'test') process.exit(0);
 }
 
 async function runActionIfRequested(externalOptions: any): Promise<void> {
   if (!externalOptions.push) return;
   const options = omit(externalOptions, 'push');
-  const network = isString(externalOptions.push)
-    ? externalOptions.push
-    : undefined;
+  const network = isString(externalOptions.push) ? externalOptions.push : undefined;
   if (network) options.network = network;
   return action(options);
 }
 
-async function runActionIfNeeded(
-  contractName: string,
-  network: string,
-  options: any,
-): Promise<void> {
+async function runActionIfNeeded(contractName: string, network: string, options: any): Promise<void> {
   const { force, interactive, network: promptedNetwork } = options;
   const projectFile = new ProjectFile();
   const networkFile = new NetworkFile(projectFile, network);
-  const {
-    contract: contractAlias,
-    package: packageName,
-  } = fromContractFullName(contractName);
+  const { contract: contractAlias, package: packageName } = fromContractFullName(contractName);
 
   if (interactive) {
     if (

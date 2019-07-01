@@ -35,10 +35,7 @@ interface ProjectFileData {
 }
 
 export const PROJECT_FILE_NAME = 'project.json';
-export const PROJECT_FILE_PATH = path.join(
-  OPEN_ZEPPELIN_FOLDER,
-  PROJECT_FILE_NAME,
-);
+export const PROJECT_FILE_PATH = path.join(OPEN_ZEPPELIN_FOLDER, PROJECT_FILE_NAME);
 export const LEGACY_PROJECT_FILE_NAME = 'zos.json';
 
 export default class ProjectFile {
@@ -48,9 +45,7 @@ export default class ProjectFile {
   public static getLinkedDependencies(filePath: string = null): string[] {
     const project = new ProjectFile(filePath);
     if (project && project.dependencies) {
-      return Object.keys(project.dependencies).map(
-        depName => `${depName}@${project.dependencies[depName]}`,
-      );
+      return Object.keys(project.dependencies).map(depName => `${depName}@${project.dependencies[depName]}`);
     }
     return [];
   }
@@ -65,9 +60,7 @@ export default class ProjectFile {
         this.data = fs.parseJsonIfExists(this.filePath);
         // if we failed to read and parse project file
       } catch (e) {
-        e.message = `Failed to parse '${path.resolve(
-          this.filePath,
-        )}' file. Please make sure that ${
+        e.message = `Failed to parse '${path.resolve(this.filePath)}' file. Please make sure that ${
           this.filePath
         } is a valid JSON file. Details: ${e.message}.`;
         throw e;
@@ -176,14 +169,7 @@ export default class ProjectFile {
   }
 
   public setCompilerOptions(options: ProjectCompilerOptions): void {
-    const {
-      manager,
-      version,
-      outputDir,
-      inputDir,
-      evmVersion,
-      optimizer,
-    } = options;
+    const { manager, version, outputDir, inputDir, evmVersion, optimizer } = options;
     const configOptions: ConfigFileCompilerOptions = {
       manager,
       solcVersion: version,
@@ -199,9 +185,7 @@ export default class ProjectFile {
     };
 
     this.data.compiler =
-      manager === 'trufle'
-        ? { manager: 'truffle' }
-        : pickBy({ ...this.data.compiler, ...configOptions });
+      manager === 'trufle' ? { manager: 'truffle' } : pickBy({ ...this.data.compiler, ...configOptions });
   }
 
   public contract(alias: string): string {
@@ -213,10 +197,7 @@ export default class ProjectFile {
   }
 
   public dependencyMatches(name: string, version: string): boolean {
-    return (
-      this.hasDependency(name) &&
-      Dependency.satisfiesVersion(version, this.getDependencyVersion(name))
-    );
+    return this.hasDependency(name) && Dependency.satisfiesVersion(version, this.getDependencyVersion(name));
   }
 
   public isCurrentVersion(version: string): boolean {
@@ -262,17 +243,10 @@ export default class ProjectFile {
     }
   }
 
-  public static getExistingFilePath(
-    dir: string = process.cwd(),
-    ...paths: string[]
-  ): string {
+  public static getExistingFilePath(dir: string = process.cwd(), ...paths: string[]): string {
     // TODO-v3: remove legacy project file support
     // Prefer the new format over the old one
-    return [
-      ...paths,
-      `${dir}/${PROJECT_FILE_PATH}`,
-      `${dir}/${LEGACY_PROJECT_FILE_NAME}`,
-    ].find(fs.exists);
+    return [...paths, `${dir}/${PROJECT_FILE_PATH}`, `${dir}/${LEGACY_PROJECT_FILE_NAME}`].find(fs.exists);
   }
 
   private hasChanged(): boolean {

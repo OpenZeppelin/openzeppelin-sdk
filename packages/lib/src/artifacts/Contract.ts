@@ -2,17 +2,8 @@ import ZWeb3 from './ZWeb3';
 import Contracts from './Contracts';
 import ContractAST from '../utils/ContractAST';
 import { StorageLayoutInfo } from '../validations/Storage';
-import {
-  Callback,
-  EventLog,
-  EventEmitter,
-  TransactionReceipt,
-} from 'web3/types';
-import {
-  Contract as Web3Contract,
-  TransactionObject,
-  BlockType,
-} from 'web3-eth-contract';
+import { Callback, EventLog, EventEmitter, TransactionReceipt } from 'web3/types';
+import { Contract as Web3Contract, TransactionObject, BlockType } from 'web3-eth-contract';
 
 /*
  * Contract is an interface that extends Web3's Contract interface, adding some properties and methods like:
@@ -26,10 +17,7 @@ export default interface Contract {
   // Web3 Contract interface.
   options: any;
   methods: { [fnName: string]: (...args: any[]) => TransactionObject<any> };
-  deploy(options: {
-    data: string;
-    arguments: any[];
-  }): TransactionObject<Web3Contract>;
+  deploy(options: { data: string; arguments: any[] }): TransactionObject<Web3Contract>;
   events: {
     [eventName: string]: (
       options?: { filter?: object; fromBlock?: BlockType; topics?: string[] },
@@ -103,10 +91,7 @@ function _wrapContractInstance(schema: any, instance: Web3Contract): Contract {
 
   instance.new = async function(...passedArguments): Promise<Contract> {
     const [args, options] = parseArguments(passedArguments, schema.abi);
-    if (!schema.linkedBytecode)
-      throw new Error(
-        `${schema.contractName} bytecode contains unlinked libraries.`,
-      );
+    if (!schema.linkedBytecode) throw new Error(`${schema.contractName} bytecode contains unlinked libraries.`);
     instance.options = {
       ...instance.options,
       ...(await Contracts.getDefaultTxParams()),
@@ -132,8 +117,7 @@ function _wrapContractInstance(schema: any, instance: Web3Contract): Contract {
   };
 
   instance.at = function(address: string): Contract | never {
-    if (!ZWeb3.isAddress(address))
-      throw new Error('Given address is not valid: ' + address);
+    if (!ZWeb3.isAddress(address)) throw new Error('Given address is not valid: ' + address);
     const newWeb3Instance = instance.clone();
     newWeb3Instance._address = address;
     newWeb3Instance.options.address = address;
@@ -147,14 +131,8 @@ function _wrapContractInstance(schema: any, instance: Web3Contract): Contract {
     Object.keys(libraries).forEach((name: string) => {
       const address = libraries[name].replace(/^0x/, '');
       const regex = new RegExp(`__${name}_+`, 'g');
-      instance.schema.linkedBytecode = instance.schema.linkedBytecode.replace(
-        regex,
-        address,
-      );
-      instance.schema.linkedDeployedBytecode = instance.schema.linkedDeployedBytecode.replace(
-        regex,
-        address,
-      );
+      instance.schema.linkedBytecode = instance.schema.linkedBytecode.replace(regex, address);
+      instance.schema.linkedDeployedBytecode = instance.schema.linkedDeployedBytecode.replace(regex, address);
     });
   };
 
@@ -169,11 +147,7 @@ function _wrapContractInstance(schema: any, instance: Web3Contract): Contract {
 }
 
 export function createContract(schema: any): Contract {
-  const contract = ZWeb3.contract(
-    schema.abi,
-    null,
-    Contracts.getArtifactsDefaults(),
-  );
+  const contract = ZWeb3.contract(schema.abi, null, Contracts.getArtifactsDefaults());
   return _wrapContractInstance(schema, contract);
 }
 
@@ -188,20 +162,13 @@ export function contractMethodsFromAbi(
   const methodsFromAst = contractAst.getMethods();
 
   return instance.schema.abi
-    .filter(
-      ({ constant: isConstantMethod, type }) =>
-        isConstant === isConstantMethod && type === 'function',
-    )
+    .filter(({ constant: isConstantMethod, type }) => isConstant === isConstantMethod && type === 'function')
     .map(method => {
       const { name, inputs } = method;
       const selector = `${name}(${inputs.map(({ type }) => type)})`;
-      const infoFromAst = methodsFromAst.find(
-        ({ selector: selectorFromAst }) => selectorFromAst === selector,
-      );
+      const infoFromAst = methodsFromAst.find(({ selector: selectorFromAst }) => selectorFromAst === selector);
       const modifiers = infoFromAst ? infoFromAst.modifiers : [];
-      const initializer = modifiers.find(
-        ({ modifierName }) => modifierName.name === 'initializer',
-      );
+      const initializer = modifiers.find(({ modifierName }) => modifierName.name === 'initializer');
       return {
         selector,
         hasInitializer: initializer ? true : false,
@@ -215,10 +182,7 @@ export function contractMethodsFromAst(
   instance: Contract,
   constant: ContractMethodMutability = ContractMethodMutability.NotConstant,
 ): ContractMethod[] {
-  const mutabilities =
-    constant === ContractMethodMutability.Constant
-      ? ['view', 'pure']
-      : ['payable', 'nonpayable'];
+  const mutabilities = constant === ContractMethodMutability.Constant ? ['view', 'pure'] : ['payable', 'nonpayable'];
   const contractAst = new ContractAST(instance, null, {
     nodesFilter: ['ContractDefinition'],
   });
@@ -226,15 +190,10 @@ export function contractMethodsFromAst(
   return contractAst
     .getMethods()
     .filter(({ visibility, stateMutability }) => {
-      return (
-        (visibility === 'public' || visibility === 'external') &&
-        mutabilities.includes(stateMutability)
-      );
+      return (visibility === 'public' || visibility === 'external') && mutabilities.includes(stateMutability);
     })
     .map(method => {
-      const initializer = method.modifiers.find(
-        ({ modifierName }) => modifierName.name === 'initializer',
-      );
+      const initializer = method.modifiers.find(({ modifierName }) => modifierName.name === 'initializer');
 
       return { ...method, hasInitializer: initializer ? true : false };
     });
@@ -242,10 +201,7 @@ export function contractMethodsFromAst(
 
 function parseArguments(passedArguments, abi) {
   const constructorAbi = abi.find(elem => elem.type === 'constructor') || {};
-  const constructorArgs =
-    constructorAbi.inputs && constructorAbi.inputs.length > 0
-      ? constructorAbi.inputs
-      : [];
+  const constructorArgs = constructorAbi.inputs && constructorAbi.inputs.length > 0 ? constructorAbi.inputs : [];
   let givenOptions = {};
 
   if (passedArguments.length === constructorArgs.length + 1) {

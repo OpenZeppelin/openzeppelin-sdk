@@ -42,10 +42,7 @@ import {
 import { isMigratableManifestVersion } from '../files/ManifestVersion';
 import { allPromisesOrError } from '../../utils/async';
 import { toContractFullName } from '../../utils/naming';
-import {
-  AppProjectDeployer,
-  ProxyAdminProjectDeployer,
-} from './ProjectDeployer';
+import { AppProjectDeployer, ProxyAdminProjectDeployer } from './ProjectDeployer';
 import Dependency from '../dependency/Dependency';
 import ValidationLogger from '../../interface/ValidationLogger';
 import Verifier from '../Verifier';
@@ -67,11 +64,7 @@ export default class NetworkController {
   public project: Project;
   private contractManager: ContractManager;
 
-  public constructor(
-    network: string,
-    txParams: TxParams,
-    networkFile?: NetworkFile,
-  ) {
+  public constructor(network: string, txParams: TxParams, networkFile?: NetworkFile) {
     if (!networkFile) {
       const projectFile = new ProjectFile();
       this.networkFile = new NetworkFile(projectFile, network);
@@ -119,9 +112,7 @@ export default class NetworkController {
   // NetworkController
   public checkNotFrozen(): void | never {
     if (this.networkFile.frozen) {
-      throw Error(
-        'Cannot modify contracts in a frozen version. Run zos bump to create a new version first.',
-      );
+      throw Error('Cannot modify contracts in a frozen version. Run zos bump to create a new version first.');
     }
   }
 
@@ -132,10 +123,7 @@ export default class NetworkController {
   }
 
   // DeployerController
-  public async push(
-    reupload: boolean = false,
-    force: boolean = false,
-  ): Promise<void | never> {
+  public async push(reupload: boolean = false, force: boolean = false): Promise<void | never> {
     const changedLibraries = this._solidityLibsForPush(!reupload);
     const contracts = this._contractsListForPush(!reupload, changedLibraries);
     const buildArtifacts = getBuildArtifacts();
@@ -158,19 +146,9 @@ export default class NetworkController {
     await this._unsetSolidityLibs();
 
     if (isEmpty(contracts) && isEmpty(changedLibraries)) {
-      Loggy.noSpin(
-        __filename,
-        'push',
-        `after-push`,
-        `All contracts are up to date`,
-      );
+      Loggy.noSpin(__filename, 'push', `after-push`, `All contracts are up to date`);
     } else {
-      Loggy.noSpin(
-        __filename,
-        'push',
-        `after-push`,
-        `All contracts have been deployed`,
-      );
+      Loggy.noSpin(__filename, 'push', `after-push`, `All contracts have been deployed`);
     }
   }
 
@@ -202,20 +180,14 @@ export default class NetworkController {
   }
 
   // Contract model
-  private _contractsListForPush(
-    onlyChanged: boolean = false,
-    changedLibraries: Contract[] = [],
-  ): [string, Contract][] {
+  private _contractsListForPush(onlyChanged: boolean = false, changedLibraries: Contract[] = []): [string, Contract][] {
     const newVersion = this._newVersionRequired();
     const pipeline = [
       contracts => toPairs(contracts),
       contracts =>
         map(
           contracts,
-          ([contractAlias, contractName]): [string, Contract] => [
-            contractAlias,
-            Contracts.getFromLocal(contractName),
-          ],
+          ([contractAlias, contractName]): [string, Contract] => [contractAlias, Contracts.getFromLocal(contractName)],
         ),
       contracts =>
         filter(
@@ -232,27 +204,19 @@ export default class NetworkController {
   }
 
   // Contract model || SolidityLib model
-  private _solidityLibsForPush(
-    onlyChanged: boolean = false,
-  ): Contract[] | never {
+  private _solidityLibsForPush(onlyChanged: boolean = false): Contract[] | never {
     const { contractNames, contractAliases } = this.projectFile;
     const libNames = this._getAllSolidityLibNames(contractNames);
 
     const clashes = intersection(libNames, contractAliases);
     if (!isEmpty(clashes)) {
-      throw new Error(
-        `Cannot upload libraries with the same name as a contract alias: ${clashes.join(
-          ', ',
-        )}`,
-      );
+      throw new Error(`Cannot upload libraries with the same name as a contract alias: ${clashes.join(', ')}`);
     }
 
     return libNames
       .map(libName => Contracts.getFromLocal(libName))
       .filter(libClass => {
-        const hasSolidityLib = this.networkFile.hasSolidityLib(
-          libClass.schema.contractName,
-        );
+        const hasSolidityLib = this.networkFile.hasSolidityLib(libClass.schema.contractName);
         const hasChanged = this._hasSolidityLibChanged(libClass);
         return !hasSolidityLib || !onlyChanged || hasChanged;
       });
@@ -266,34 +230,21 @@ export default class NetworkController {
   // Contract model || SolidityLib model
   private async _uploadSolidityLib(libClass: Contract): Promise<void> {
     const libName = libClass.schema.contractName;
-    Loggy.spin(
-      __filename,
-      '_uploadSolidityLib',
-      `upload-solidity-lib${libName}`,
-      `Uploading ${libName} library`,
-    );
+    Loggy.spin(__filename, '_uploadSolidityLib', `upload-solidity-lib${libName}`, `Uploading ${libName} library`);
     const libInstance = await this.project.setImplementation(libClass, libName);
     this.networkFile.addSolidityLib(libName, libInstance);
-    Loggy.succeed(
-      `upload-solidity-lob${libName}`,
-      `${libName} library uploaded`,
-    );
+    Loggy.succeed(`upload-solidity-lob${libName}`, `${libName} library uploaded`);
   }
 
   // Contract model
   public async uploadContracts(contracts: [string, Contract][]): Promise<void> {
     await allPromisesOrError(
-      contracts.map(([contractAlias, contract]) =>
-        this.uploadContract(contractAlias, contract),
-      ),
+      contracts.map(([contractAlias, contract]) => this.uploadContract(contractAlias, contract)),
     );
   }
 
   // Contract model
-  public async uploadContract(
-    contractAlias: string,
-    contract: Contract,
-  ): Promise<void | never> {
+  public async uploadContract(contractAlias: string, contract: Contract): Promise<void | never> {
     try {
       await this._setSolidityLibs(contract);
       Loggy.spin(
@@ -302,10 +253,7 @@ export default class NetworkController {
         `upload-contract${contract.schema.contractName}`,
         `Validating and deploying contract ${contract.schema.contractName}`,
       );
-      const contractInstance = await this.project.setImplementation(
-        contract,
-        contractAlias,
-      );
+      const contractInstance = await this.project.setImplementation(contract, contractAlias);
       const { types, storage } = contract.schema.storageInfo || {
         types: null,
         storage: null,
@@ -321,9 +269,7 @@ export default class NetworkController {
         `Contract ${contract.schema.contractName} deployed`,
       );
     } catch (error) {
-      error.message = `${contractAlias} deployment failed with error: ${
-        error.message
-      }`;
+      error.message = `${contractAlias} deployment failed with error: ${error.message}`;
       throw error;
     }
   }
@@ -340,41 +286,27 @@ export default class NetworkController {
     const { contractNames } = this.projectFile;
     const libNames = this._getAllSolidityLibNames(contractNames);
     await allPromisesOrError(
-      this.networkFile
-        .solidityLibsMissing(libNames)
-        .map(libName => this._unsetSolidityLib(libName)),
+      this.networkFile.solidityLibsMissing(libNames).map(libName => this._unsetSolidityLib(libName)),
     );
   }
 
   // Contract model || SolidityLib model
   private async _unsetSolidityLib(libName: string): Promise<void | never> {
     try {
-      Loggy.spin(
-        __filename,
-        '_unsetSolidityLib',
-        `unset-solidity-lib-${libName}`,
-        `Removing ${libName} library`,
-      );
+      Loggy.spin(__filename, '_unsetSolidityLib', `unset-solidity-lib-${libName}`, `Removing ${libName} library`);
       await this.project.unsetImplementation(libName);
       this.networkFile.unsetSolidityLib(libName);
       Loggy.succeed(`unset-solidity-lib-${libName}`);
     } catch (error) {
-      error.message = `Removal of ${libName} failed with error: ${
-        error.message
-      }`;
+      error.message = `Removal of ${libName} failed with error: ${error.message}`;
       throw error;
     }
   }
 
   // Contract model || SolidityLib model
-  private _hasChangedLibraries(
-    contract: Contract,
-    changedLibraries: Contract[],
-  ): boolean {
+  private _hasChangedLibraries(contract: Contract, changedLibraries: Contract[]): boolean {
     const libNames = getSolidityLibNames(contract.schema.bytecode);
-    return !isEmpty(
-      intersection(changedLibraries.map(c => c.schema.contractName), libNames),
-    );
+    return !isEmpty(intersection(changedLibraries.map(c => c.schema.contractName), libNames));
   }
 
   // Contract model || SolidityLib model
@@ -390,63 +322,38 @@ export default class NetworkController {
   // Contract model
   public async unsetContracts(): Promise<void> {
     await allPromisesOrError(
-      this.networkFile
-        .contractAliasesMissingFromPackage()
-        .map(contractAlias => this.unsetContract(contractAlias)),
+      this.networkFile.contractAliasesMissingFromPackage().map(contractAlias => this.unsetContract(contractAlias)),
     );
   }
 
   // Contract model
   public async unsetContract(contractAlias: string): Promise<void | never> {
     try {
-      Loggy.spin(
-        __filename,
-        'unsetContract',
-        `unset-contract-${contractAlias}`,
-        `Removing ${contractAlias} contract`,
-      );
+      Loggy.spin(__filename, 'unsetContract', `unset-contract-${contractAlias}`, `Removing ${contractAlias} contract`);
       await this.project.unsetImplementation(contractAlias);
       this.networkFile.unsetContract(contractAlias);
       Loggy.succeed(`unset-contract-${contractAlias}`);
     } catch (error) {
-      error.message = `Removal of ${contractAlias} failed with error: ${
-        error.message
-      }`;
+      error.message = `Removal of ${contractAlias} failed with error: ${error.message}`;
       throw error;
     }
   }
 
   // DeployerController || Contract model
-  public validateContracts(
-    contracts: [string, Contract][],
-    buildArtifacts: BuildArtifacts,
-  ): boolean {
+  public validateContracts(contracts: [string, Contract][], buildArtifacts: BuildArtifacts): boolean {
     return every(
-      contracts.map(([contractAlias, contract]) =>
-        this.validateContract(contractAlias, contract, buildArtifacts),
-      ),
+      contracts.map(([contractAlias, contract]) => this.validateContract(contractAlias, contract, buildArtifacts)),
     );
   }
 
   // DeployerController || Contract model
-  public validateContract(
-    contractAlias: string,
-    contract: Contract,
-    buildArtifacts: BuildArtifacts,
-  ): boolean {
+  public validateContract(contractAlias: string, contract: Contract, buildArtifacts: BuildArtifacts): boolean {
     try {
-      const existingContractInfo: any =
-        this.networkFile.contract(contractAlias) || {};
+      const existingContractInfo: any = this.networkFile.contract(contractAlias) || {};
       const warnings = validate(contract, existingContractInfo, buildArtifacts);
-      const newWarnings = newValidationErrors(
-        warnings,
-        existingContractInfo.warnings,
-      );
+      const newWarnings = newValidationErrors(warnings, existingContractInfo.warnings);
 
-      const validationLogger = new ValidationLogger(
-        contract,
-        existingContractInfo,
-      );
+      const validationLogger = new ValidationLogger(contract, existingContractInfo);
       validationLogger.log(newWarnings, buildArtifacts);
 
       contract.schema.warnings = warnings;
@@ -457,20 +364,14 @@ export default class NetworkController {
         __filename,
         'validateContract',
         `validate-contract`,
-        `Error while validating contract ${
-          contract.schema.contractName
-        }: ${err}`,
+        `Error while validating contract ${contract.schema.contractName}: ${err}`,
       );
       return false;
     }
   }
 
   // Contract model
-  public checkContractDeployed(
-    packageName: string,
-    contractAlias: string,
-    throwIfFail: boolean = false,
-  ): void {
+  public checkContractDeployed(packageName: string, contractAlias: string, throwIfFail: boolean = false): void {
     if (!packageName) packageName = this.projectFile.name;
     const err = this._errorForContractDeployed(packageName, contractAlias);
     if (err) this._handleErrorMessage(err, throwIfFail);
@@ -484,28 +385,20 @@ export default class NetworkController {
 
   // Contract model
   private _errorForLocalContractsDeployed(): string {
-    const [contractsDeployed, contractsMissing] = partition(
-      this.projectFile.contractAliases,
-      alias => this.isContractDeployed(alias),
+    const [contractsDeployed, contractsMissing] = partition(this.projectFile.contractAliases, alias =>
+      this.isContractDeployed(alias),
     );
-    const contractsChanged = filter(contractsDeployed, alias =>
-      this.hasContractChanged(alias),
-    );
+    const contractsChanged = filter(contractsDeployed, alias => this.hasContractChanged(alias));
 
     if (!isEmpty(contractsMissing)) {
       return `Contracts ${contractsMissing.join(', ')} are not deployed.`;
     } else if (!isEmpty(contractsChanged)) {
-      return `Contracts ${contractsChanged.join(
-        ', ',
-      )} have changed since the last deploy.`;
+      return `Contracts ${contractsChanged.join(', ')} have changed since the last deploy.`;
     }
   }
 
   // Contract model
-  public checkLocalContractDeployed(
-    contractAlias: string,
-    throwIfFail: boolean = false,
-  ): void {
+  public checkLocalContractDeployed(contractAlias: string, throwIfFail: boolean = false): void {
     // if (!packageName) packageName = this.projectFile.name
     const err = this._errorForLocalContractDeployed(contractAlias);
     if (err) this._handleErrorMessage(err, throwIfFail);
@@ -523,35 +416,21 @@ export default class NetworkController {
   }
 
   // TODO: move to utils folder or somewhere else
-  private _handleErrorMessage(
-    msg: string,
-    throwIfFail: boolean = false,
-  ): void | never {
+  private _handleErrorMessage(msg: string, throwIfFail: boolean = false): void | never {
     if (throwIfFail) {
       throw Error(msg);
     } else {
-      Loggy.noSpin(
-        __filename,
-        'handleErrorMessage',
-        `handle-error-message`,
-        msg,
-      );
+      Loggy.noSpin(__filename, 'handleErrorMessage', `handle-error-message`, msg);
     }
   }
 
   // Contract model || SolidityLib model
   private _hasSolidityLibChanged(libClass: Contract): boolean {
-    return !this.networkFile.hasSameBytecode(
-      libClass.schema.contractName,
-      libClass,
-    );
+    return !this.networkFile.hasSameBytecode(libClass.schema.contractName, libClass);
   }
 
   // Contract model
-  public hasContractChanged(
-    contractAlias: string,
-    contract?: Contract,
-  ): boolean {
+  public hasContractChanged(contractAlias: string, contract?: Contract): boolean {
     if (!this.isLocalContract(contractAlias)) return false;
     if (!this.isContractDeployed(contractAlias)) return true;
 
@@ -574,10 +453,7 @@ export default class NetworkController {
 
   // Contract model
   public isContractDeployed(contractAlias: string): boolean {
-    return (
-      !this.isLocalContract(contractAlias) ||
-      this.networkFile.hasContract(contractAlias)
-    );
+    return !this.isLocalContract(contractAlias) || this.networkFile.hasContract(contractAlias);
   }
 
   // VerifierController
@@ -595,10 +471,7 @@ export default class NetworkController {
       `Verifying and publishing contract source code of ${contractAlias} on ${remote} (this usually takes under 30 seconds)`,
     );
     const contractName = this.projectFile.contract(contractAlias);
-    const {
-      compilerVersion,
-      sourcePath,
-    } = this.localController.getContractSourcePath(contractAlias);
+    const { compilerVersion, sourcePath } = this.localController.getContractSourcePath(contractAlias);
     const contractSource = await flattenSourceCode([sourcePath]);
     const contractAddress = this.networkFile.contracts[contractAlias].address;
     await Verifier.verifyAndPublish(remote, {
@@ -621,8 +494,7 @@ export default class NetworkController {
 
   // DeployerController
   public async freeze(): Promise<void | never> {
-    if (!this.packageAddress)
-      throw Error('Cannot freeze an unpublished project');
+    if (!this.packageAddress) throw Error('Cannot freeze an unpublished project');
     await this.fetchOrDeploy(this.currentVersion);
     if (this.project instanceof AppProject) await this.project.freeze();
     this.networkFile.frozen = true;
@@ -665,9 +537,7 @@ export default class NetworkController {
           'await-confirmations',
           'Awaiting confirmations before transferring proxies to ProxyAdmin (this may take a few minutes)',
         );
-        await Transactions.awaitConfirmations(
-          proxyAdmin.contract.deployment.transactionHash,
-        );
+        await Transactions.awaitConfirmations(proxyAdmin.contract.deployment.transactionHash);
         Loggy.succeed('await-confirmations');
       }
       this._tryRegisterProxyAdmin(proxyAdmin.address);
@@ -677,22 +547,10 @@ export default class NetworkController {
           const currentAdmin = await proxyInstance.admin();
           if (currentAdmin !== proxyAdmin.address) {
             if (this.appAddress) {
-              return AppProxyMigrator(
-                this.appAddress,
-                proxy.address,
-                proxyAdmin.address,
-                this.txParams,
-              );
+              return AppProxyMigrator(this.appAddress, proxy.address, proxyAdmin.address, this.txParams);
             } else {
-              const simpleProject = new SimpleProject(
-                this.projectFile.name,
-                null,
-                this.txParams,
-              );
-              return simpleProject.changeProxyAdmin(
-                proxy.address,
-                proxyAdmin.address,
-              );
+              const simpleProject = new SimpleProject(this.projectFile.name, null, this.txParams);
+              return simpleProject.changeProxyAdmin(proxy.address, proxyAdmin.address);
             }
           }
         }),
@@ -714,26 +572,19 @@ export default class NetworkController {
   }
 
   private async migrateManifestVersionIfNeeded(): Promise<void> {
-    if (isMigratableManifestVersion(this.currentManifestVersion))
-      await this._migrate();
+    if (isMigratableManifestVersion(this.currentManifestVersion)) await this._migrate();
     this.updateManifestVersionsIfNeeded(MANIFEST_VERSION);
   }
 
   // DeployerController
   public async publish(): Promise<void> {
     if (this.appAddress) {
-      Loggy.noSpin(
-        __filename,
-        'publish',
-        `Project is already published to ${this.network}`,
-      );
+      Loggy.noSpin(__filename, 'publish', `Project is already published to ${this.network}`);
       return;
     }
 
     await this.migrateManifestVersionIfNeeded();
-    const proxyAdminProject = (await this.fetchOrDeploy(
-      this.currentVersion,
-    )) as ProxyAdminProject;
+    const proxyAdminProject = (await this.fetchOrDeploy(this.currentVersion)) as ProxyAdminProject;
     const deployer = new AppProjectDeployer(this, this.projectVersion);
     this.project = await deployer.fromProxyAdminProject(proxyAdminProject);
     Loggy.succeed(`publish-project`, `Published to ${this.network}!`);
@@ -754,10 +605,7 @@ export default class NetworkController {
       await this.migrateManifestVersionIfNeeded();
       await this.fetchOrDeploy(this.currentVersion);
       if (!packageName) packageName = this.projectFile.name;
-      const contract = this.contractManager.getContractClass(
-        packageName,
-        contractAlias,
-      );
+      const contract = this.contractManager.getContractClass(packageName, contractAlias);
       await this._setSolidityLibs(contract);
       this.checkInitialization(contract, initMethod);
       if (salt) await this._checkDeploymentAddress(salt);
@@ -769,13 +617,7 @@ export default class NetworkController {
         initArgs,
         admin,
       };
-      const { proxy, instance } = await this.createProxyInstance(
-        kind,
-        salt,
-        contract,
-        signature,
-        createArgs,
-      );
+      const { proxy, instance } = await this.createProxyInstance(kind, salt, contract, signature, createArgs);
 
       const implementationAddress = await proxy.implementation();
       const projectVersion =
@@ -814,12 +656,7 @@ export default class NetworkController {
     switch (kind) {
       case ProxyType.Upgradeable:
         instance = salt
-          ? await this.project.createProxyWithSalt(
-              contract,
-              salt,
-              signature,
-              createArgs,
-            )
+          ? await this.project.createProxyWithSalt(contract, salt, signature, createArgs)
           : await this.project.createProxy(contract, createArgs);
         proxy = await Proxy.at(instance.address);
         break;
@@ -841,10 +678,7 @@ export default class NetworkController {
     return { proxy, instance };
   }
 
-  public async getProxyDeploymentAddress(
-    salt: string,
-    sender?: string,
-  ): Promise<string> {
+  public async getProxyDeploymentAddress(salt: string, sender?: string): Promise<string> {
     await this.migrateManifestVersionIfNeeded();
     await this.fetchOrDeploy(this.currentVersion);
     const address = await this.project.getProxyDeploymentAddress(salt, sender);
@@ -865,10 +699,7 @@ export default class NetworkController {
     await this.migrateManifestVersionIfNeeded();
     await this.fetchOrDeploy(this.currentVersion);
     if (!packageName) packageName = this.projectFile.name;
-    const contract = this.contractManager.getContractClass(
-      packageName,
-      contractAlias,
-    );
+    const contract = this.contractManager.getContractClass(packageName, contractAlias);
     const args = {
       packageName,
       contractName: contractAlias,
@@ -876,12 +707,7 @@ export default class NetworkController {
       initArgs,
       admin,
     };
-    const signer = await this.project.getProxyDeploymentSigner(
-      contract,
-      salt,
-      signature,
-      args,
-    );
+    const signer = await this.project.getProxyDeploymentSigner(contract, salt, signature, args);
     const address = await this.project.getProxyDeploymentAddress(salt, signer);
     this._tryRegisterProxyFactory();
 
@@ -898,37 +724,27 @@ export default class NetworkController {
   // Proxy model
   private async _tryRegisterProxyAdmin(adminAddress?: string) {
     if (!this.networkFile.proxyAdminAddress) {
-      const proxyAdminAddress =
-        adminAddress || (await this.project.getAdminAddress());
-      if (proxyAdminAddress)
-        this.networkFile.proxyAdmin = { address: proxyAdminAddress };
+      const proxyAdminAddress = adminAddress || (await this.project.getAdminAddress());
+      if (proxyAdminAddress) this.networkFile.proxyAdmin = { address: proxyAdminAddress };
     }
   }
 
   // Proxy model
   private async _tryRegisterProxyFactory(factoryAddress?: string) {
     if (!this.networkFile.proxyFactoryAddress) {
-      const proxyFactoryAddress =
-        factoryAddress ||
-        (this.project.proxyFactory && this.project.proxyFactory.address);
-      if (proxyFactoryAddress)
-        this.networkFile.proxyFactory = { address: proxyFactoryAddress };
+      const proxyFactoryAddress = factoryAddress || (this.project.proxyFactory && this.project.proxyFactory.address);
+      if (proxyFactoryAddress) this.networkFile.proxyFactory = { address: proxyFactoryAddress };
     }
   }
 
   // Proxy model
-  public checkInitialization(
-    contract: Contract,
-    calledInitMethod: string,
-  ): void {
+  public checkInitialization(contract: Contract, calledInitMethod: string): void {
     // If there is an initializer called, assume it's ok
     if (calledInitMethod) return;
     // Otherwise, warn the user to invoke it
     const contractMethods = contractMethodsFromAbi(contract);
     const initializerMethods = contractMethods
-      .filter(
-        ({ hasInitializer, name }) => hasInitializer || name === 'initialize',
-      )
+      .filter(({ hasInitializer, name }) => hasInitializer || name === 'initialize')
       .map(({ name }) => name);
 
     if (initializerMethods.length === 0) return;
@@ -943,10 +759,7 @@ export default class NetworkController {
   }
 
   // Proxy model
-  private async _updateTruffleDeployedInformation(
-    contractAlias: string,
-    implementation: Contract,
-  ): Promise<void> {
+  private async _updateTruffleDeployedInformation(contractAlias: string, implementation: Contract): Promise<void> {
     const contractName = this.projectFile.contract(contractAlias);
     if (contractName) {
       const path = Contracts.getLocalPath(contractName);
@@ -974,11 +787,7 @@ export default class NetworkController {
     newAdmin: string,
   ): Promise<ProxyInterface[]> {
     await this.migrateManifestVersionIfNeeded();
-    const proxies = this._fetchOwnedProxies(
-      packageName,
-      contractAlias,
-      proxyAddress,
-    );
+    const proxies = this._fetchOwnedProxies(packageName, contractAlias, proxyAddress);
     if (proxies.length === 0) return [];
     await this.fetchOrDeploy(this.currentVersion);
     await this._changeProxiesAdmin(proxies, newAdmin);
@@ -1019,38 +828,23 @@ export default class NetworkController {
     initArgs: string[],
   ): Promise<ProxyInterface[]> {
     await this.migrateManifestVersionIfNeeded();
-    const proxies = this._fetchOwnedProxies(
-      packageName,
-      contractAlias,
-      proxyAddress,
-    );
+    const proxies = this._fetchOwnedProxies(packageName, contractAlias, proxyAddress);
     if (proxies.length === 0) return [];
     await this.fetchOrDeploy(this.currentVersion);
 
     // Update all out of date proxies
-    await allPromisesOrError(
-      map(proxies, proxy => this._upgradeProxy(proxy, initMethod, initArgs)),
-    );
+    await allPromisesOrError(map(proxies, proxy => this._upgradeProxy(proxy, initMethod, initArgs)));
 
     return proxies;
   }
 
   // Proxy model
-  private async _upgradeProxy(
-    proxy: ProxyInterface,
-    initMethod: string,
-    initArgs: string[],
-  ): Promise<void | never> {
+  private async _upgradeProxy(proxy: ProxyInterface, initMethod: string, initArgs: string[]): Promise<void | never> {
     try {
       const name = { packageName: proxy.package, contractName: proxy.contract };
-      const contract = this.contractManager.getContractClass(
-        proxy.package,
-        proxy.contract,
-      );
+      const contract = this.contractManager.getContractClass(proxy.package, proxy.contract);
       await this._setSolidityLibs(contract);
-      const currentImplementation = await Proxy.at(
-        proxy.address,
-      ).implementation();
+      const currentImplementation = await Proxy.at(proxy.address).implementation();
       const contractImplementation = await this.project.getImplementation(name);
       const projectVersion =
         proxy.package === this.projectFile.name
@@ -1081,10 +875,9 @@ export default class NetworkController {
         version: semanticVersionToString(projectVersion),
       }));
     } catch (error) {
-      error.message = `Proxy ${toContractFullName(
-        proxy.package,
-        proxy.contract,
-      )} at ${proxy.address} failed to upgrade with error: ${error.message}`;
+      error.message = `Proxy ${toContractFullName(proxy.package, proxy.contract)} at ${
+        proxy.address
+      } failed to upgrade with error: ${error.message}`;
       throw error;
     }
   }
@@ -1098,15 +891,11 @@ export default class NetworkController {
   ): ProxyInterface[] {
     let criteriaDescription = '';
     if (packageName || contractAlias)
-      criteriaDescription += ` contract ${toContractFullName(
-        packageName,
-        contractAlias,
-      )}`;
+      criteriaDescription += ` contract ${toContractFullName(packageName, contractAlias)}`;
     if (proxyAddress) criteriaDescription += ` address ${proxyAddress}`;
 
     const proxies = this.networkFile.getProxies({
-      package:
-        packageName || (contractAlias ? this.projectFile.name : undefined),
+      package: packageName || (contractAlias ? this.projectFile.name : undefined),
       contract: contractAlias,
       address: proxyAddress,
       kind: ProxyType.Upgradeable,
@@ -1122,14 +911,9 @@ export default class NetworkController {
       return [];
     }
 
-    const expectedOwner = ZWeb3.toChecksumAddress(
-      ownerAddress || this.networkFile.proxyAdminAddress,
-    );
+    const expectedOwner = ZWeb3.toChecksumAddress(ownerAddress || this.networkFile.proxyAdminAddress);
     const ownedProxies = proxies.filter(
-      proxy =>
-        !proxy.admin ||
-        !expectedOwner ||
-        ZWeb3.toChecksumAddress(proxy.admin) === expectedOwner,
+      proxy => !proxy.admin || !expectedOwner || ZWeb3.toChecksumAddress(proxy.admin) === expectedOwner,
     );
 
     if (isEmpty(ownedProxies)) {
@@ -1147,23 +931,15 @@ export default class NetworkController {
   // Dependency Controller
   public async deployDependencies(): Promise<void> {
     await allPromisesOrError(
-      map(this.projectFile.dependencies, (version, dep) =>
-        this.deployDependencyIfNeeded(dep, version),
-      ),
+      map(this.projectFile.dependencies, (version, dep) => this.deployDependencyIfNeeded(dep, version)),
     );
   }
 
   // DependencyController
-  public async deployDependencyIfNeeded(
-    depName: string,
-    depVersion: string,
-  ): Promise<void | never> {
+  public async deployDependencyIfNeeded(depName: string, depVersion: string): Promise<void | never> {
     try {
       const dependency = new Dependency(depName, depVersion);
-      if (
-        dependency.isDeployedOnNetwork(this.network) ||
-        this.networkFile.dependencyHasMatchingCustomDeploy(depName)
-      )
+      if (dependency.isDeployedOnNetwork(this.network) || this.networkFile.dependencyHasMatchingCustomDeploy(depName))
         return;
       Loggy.spin(
         __filename,
@@ -1180,9 +956,7 @@ export default class NetworkController {
       });
       Loggy.succeed(`deploy-dependency-${depName}`);
     } catch (error) {
-      error.message = `Failed deployment of dependency ${depName} with error: ${
-        error.message
-      }`;
+      error.message = `Failed deployment of dependency ${depName} with error: ${error.message}`;
       throw error;
     }
   }
@@ -1191,12 +965,8 @@ export default class NetworkController {
   public async handleDependenciesLink(): Promise<void> {
     await allPromisesOrError(
       concat(
-        map(this.projectFile.dependencies, (version, dep) =>
-          this.linkDependency(dep, version),
-        ),
-        map(this.networkFile.dependenciesNamesMissingFromPackage(), dep =>
-          this.unlinkDependency(dep),
-        ),
+        map(this.projectFile.dependencies, (version, dep) => this.linkDependency(dep, version)),
+        map(this.networkFile.dependenciesNamesMissingFromPackage(), dep => this.unlinkDependency(dep)),
       ),
     );
   }
@@ -1205,28 +975,18 @@ export default class NetworkController {
   public async unlinkDependency(depName: string): Promise<void | never> {
     try {
       if (await this.project.hasDependency(depName)) {
-        Loggy.spin(
-          __filename,
-          'unlinkDependency',
-          `unlink-dependency-${depName}`,
-          `Unlinking dependency ${depName}`,
-        );
+        Loggy.spin(__filename, 'unlinkDependency', `unlink-dependency-${depName}`, `Unlinking dependency ${depName}`);
         await this.project.unsetDependency(depName);
         Loggy.succeed(`unlink-dependency-${depName}`);
       }
       this.networkFile.unsetDependency(depName);
     } catch (error) {
-      throw Error(
-        `Failed to unlink dependency ${depName} with error: ${error.message}`,
-      );
+      throw Error(`Failed to unlink dependency ${depName} with error: ${error.message}`);
     }
   }
 
   // DependencyController
-  public async linkDependency(
-    depName: string,
-    depVersion: string,
-  ): Promise<boolean | void | never> {
+  public async linkDependency(depName: string, depVersion: string): Promise<boolean | void | never> {
     try {
       if (this.networkFile.dependencyHasMatchingCustomDeploy(depName)) {
         Loggy.onVerbose(
@@ -1236,18 +996,11 @@ export default class NetworkController {
           `Using custom deployment of ${depName}`,
         );
         const depInfo = this.networkFile.getDependency(depName);
-        return await this.project.setDependency(
-          depName,
-          depInfo.package,
-          depInfo.version,
-        );
+        return await this.project.setDependency(depName, depInfo.package, depInfo.version);
       }
 
       if (!this.networkFile.dependencySatisfiesVersionRequirement(depName)) {
-        const dependencyInfo = new Dependency(
-          depName,
-          depVersion,
-        ).getNetworkFile(this.network);
+        const dependencyInfo = new Dependency(depName, depVersion).getNetworkFile(this.network);
         if (!dependencyInfo.packageAddress)
           throw Error(
             `Dependency '${depName}' has not been published to network '${
@@ -1260,52 +1013,36 @@ export default class NetworkController {
           `link-dependency-${depName}`,
           `Linking dependency ${depName} ${dependencyInfo.version}`,
         );
-        await this.project.setDependency(
-          depName,
-          dependencyInfo.packageAddress,
-          dependencyInfo.version,
-        );
+        await this.project.setDependency(depName, dependencyInfo.packageAddress, dependencyInfo.version);
         const depInfo = {
           package: dependencyInfo.packageAddress,
           version: dependencyInfo.version,
         };
         this.networkFile.setDependency(depName, depInfo);
 
-        Loggy.succeed(
-          `link-dependency-${depName}`,
-          `Linked dependency ${depName} ${dependencyInfo.version}`,
-        );
+        Loggy.succeed(`link-dependency-${depName}`, `Linked dependency ${depName} ${dependencyInfo.version}`);
       }
     } catch (error) {
-      error.message = `Failed to link dependency ${depName}@${depVersion} with error: ${
-        error.message
-      }`;
+      error.message = `Failed to link dependency ${depName}@${depVersion} with error: ${error.message}`;
       throw error;
     }
   }
 
   // Contract model
-  private _errorForContractDeployed(
-    packageName: string,
-    contractAlias: string,
-  ): string {
+  private _errorForContractDeployed(packageName: string, contractAlias: string): string {
     if (packageName === this.projectFile.name) {
       return this._errorForLocalContractDeployed(contractAlias);
     } else if (!this.projectFile.hasDependency(packageName)) {
       return `Dependency ${packageName} not found in project.`;
     } else if (!this.networkFile.hasDependency(packageName)) {
       return `Dependency ${packageName} has not been linked yet. Please run zos push.`;
-    } else if (
-      !new Dependency(packageName).projectFile.contract(contractAlias)
-    ) {
+    } else if (!new Dependency(packageName).projectFile.contract(contractAlias)) {
       return `Contract ${contractAlias} is not provided by ${packageName}.`;
     }
   }
 
   private updateManifestVersionsIfNeeded(version): void {
-    if (this.networkFile.manifestVersion !== MANIFEST_VERSION)
-      this.networkFile.manifestVersion = version;
-    if (this.projectFile.manifestVersion !== MANIFEST_VERSION)
-      this.projectFile.manifestVersion = version;
+    if (this.networkFile.manifestVersion !== MANIFEST_VERSION) this.networkFile.manifestVersion = version;
+    if (this.projectFile.manifestVersion !== MANIFEST_VERSION) this.projectFile.manifestVersion = version;
   }
 }

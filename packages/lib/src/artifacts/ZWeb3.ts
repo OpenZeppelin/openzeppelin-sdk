@@ -58,18 +58,14 @@ export default class ZWeb3 {
     return Web3.utils.isHex(hex);
   }
 
-  public static async checkNetworkId(
-    providedNetworkId?: string | number,
-  ): Promise<void | never> {
+  public static async checkNetworkId(providedNetworkId?: string | number): Promise<void | never> {
     const networkId = await ZWeb3.getNetwork();
     if (
       providedNetworkId !== undefined &&
       providedNetworkId !== '*' &&
       Number(networkId) !== Number(providedNetworkId)
     ) {
-      throw Error(
-        `Unexpected network ID: requested ${providedNetworkId} but connected to ${networkId}`,
-      );
+      throw Error(`Unexpected network ID: requested ${providedNetworkId} but connected to ${networkId}`);
     }
   }
 
@@ -81,11 +77,7 @@ export default class ZWeb3 {
     return ZWeb3.web3().version;
   }
 
-  public static contract(
-    abi: any,
-    atAddress?: string,
-    options?: any,
-  ): Contract {
+  public static contract(abi: any, atAddress?: string, options?: any): Contract {
     return new (ZWeb3.eth()).Contract(abi, atAddress, options);
   }
 
@@ -134,10 +126,7 @@ export default class ZWeb3 {
     return bytecode.length > 2;
   }
 
-  public static async getStorageAt(
-    address: string,
-    position: string,
-  ): Promise<string> {
+  public static async getStorageAt(address: string, position: string): Promise<string> {
     return ZWeb3.eth().getStorageAt(address, position);
   }
 
@@ -175,15 +164,11 @@ export default class ZWeb3 {
     return NETWORKS[networkId] || `dev-${networkId}`;
   }
 
-  public static async sendTransaction(
-    params: TxParams,
-  ): Promise<TransactionReceipt> {
+  public static async sendTransaction(params: TxParams): Promise<TransactionReceipt> {
     return ZWeb3.eth().sendTransaction({ ...params });
   }
 
-  public static sendTransactionWithoutReceipt(
-    params: TxParams,
-  ): Promise<string> {
+  public static sendTransactionWithoutReceipt(params: TxParams): Promise<string> {
     return new Promise((resolve, reject) => {
       ZWeb3.eth().sendTransaction({ ...params }, (error, txHash) => {
         if (error) reject(error.message);
@@ -196,21 +181,12 @@ export default class ZWeb3 {
     return ZWeb3.eth().getTransaction(txHash);
   }
 
-  public static async getTransactionReceipt(
-    txHash: string,
-  ): Promise<TransactionReceipt> {
+  public static async getTransactionReceipt(txHash: string): Promise<TransactionReceipt> {
     return ZWeb3.eth().getTransactionReceipt(txHash);
   }
 
-  public static async getTransactionReceiptWithTimeout(
-    tx: string,
-    timeout: number,
-  ): Promise<TransactionReceipt> {
-    return ZWeb3._getTransactionReceiptWithTimeout(
-      tx,
-      timeout,
-      new Date().getTime(),
-    );
+  public static async getTransactionReceiptWithTimeout(tx: string, timeout: number): Promise<TransactionReceipt> {
+    return ZWeb3._getTransactionReceiptWithTimeout(tx, timeout, new Date().getTime());
   }
 
   private static async _getTransactionReceiptWithTimeout(
@@ -225,22 +201,12 @@ export default class ZWeb3 {
     }
 
     await sleep(1000);
-    const timeoutReached =
-      timeout > 0 && new Date().getTime() - startTime > timeout;
-    if (!timeoutReached)
-      return await ZWeb3._getTransactionReceiptWithTimeout(
-        tx,
-        timeout,
-        startTime,
-      );
-    throw new Error(
-      `Transaction ${tx} wasn't processed in ${timeout / 1000} seconds`,
-    );
+    const timeoutReached = timeout > 0 && new Date().getTime() - startTime > timeout;
+    if (!timeoutReached) return await ZWeb3._getTransactionReceiptWithTimeout(tx, timeout, startTime);
+    throw new Error(`Transaction ${tx} wasn't processed in ${timeout / 1000} seconds`);
   }
 
-  private static async _tryGettingTransactionReceipt(
-    tx: string,
-  ): Promise<TransactionReceipt | never> {
+  private static async _tryGettingTransactionReceipt(tx: string): Promise<TransactionReceipt | never> {
     try {
       return await ZWeb3.getTransactionReceipt(tx);
     } catch (error) {

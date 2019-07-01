@@ -4,10 +4,7 @@ import isEmpty from 'lodash.isempty';
 import groupBy from 'lodash.groupby';
 import difference from 'lodash.difference';
 import inquirer from 'inquirer';
-import {
-  contractMethodsFromAbi,
-  ContractMethodMutability as Mutability,
-} from 'zos-lib';
+import { contractMethodsFromAbi, ContractMethodMutability as Mutability } from 'zos-lib';
 
 import Session from '../models/network/Session';
 import ConfigManager from '../models/config/ConfigManager';
@@ -55,8 +52,7 @@ interface MethodOptions {
 }
 
 export let DISABLE_INTERACTIVITY: boolean =
-  !!process.env.ZOS_NON_INTERACTIVE ||
-  process.env.DEBIAN_FRONTEND === 'noninteractive';
+  !!process.env.ZOS_NON_INTERACTIVE || process.env.DEBIAN_FRONTEND === 'noninteractive';
 
 /*
  * This function will parse and wrap both arguments and options into inquirer questions, where
@@ -76,26 +72,15 @@ export async function promptIfNeeded(
 
   const argsAndOptsQuestions = Object.keys(argsAndOpts)
     .filter(
-      name =>
-        argsAndOpts[name] === undefined ||
-        (typeof argsAndOpts[name] !== 'boolean' && isEmpty(argsAndOpts[name])),
+      name => argsAndOpts[name] === undefined || (typeof argsAndOpts[name] !== 'boolean' && isEmpty(argsAndOpts[name])),
     )
     .filter(name => props[name] && !hasEmptyChoices(props[name]))
     .map(name => promptFor(name, defaults, props));
 
-  return await answersFor(
-    argsAndOpts,
-    argsAndOptsQuestions,
-    props,
-    interactive,
-  );
+  return await answersFor(argsAndOpts, argsAndOptsQuestions, props, interactive);
 }
 
-export function networksList(
-  name: string,
-  type: string,
-  message?: string,
-): { [key: string]: any } {
+export function networksList(name: string, type: string, message?: string): { [key: string]: any } {
   message = message || 'Pick a network';
   const networks = ConfigManager.getNetworkNamesFromConfig();
 
@@ -114,54 +99,37 @@ export function proxiesList(
   const proxies = networkFile.getProxies(filter || {});
   const groupedByPackage = groupBy(proxies, 'package');
   const list = Object.keys(groupedByPackage).map(packageName => {
-    const separator =
-      packageName === projectFile.name ? 'Your contracts' : packageName;
-    const packageList = groupedByPackage[packageName].map(
-      ({ contract, address }) => {
-        const name =
-          pickProxyBy === 'byAddress' ? `${contract} at ${address}` : contract;
-        const contractFullName =
-          packageName === projectFile.name
-            ? `${contract}`
-            : `${packageName}/${contract}`;
-        const proxyReference =
-          pickProxyBy === 'byAddress' ? address : contractFullName;
+    const separator = packageName === projectFile.name ? 'Your contracts' : packageName;
+    const packageList = groupedByPackage[packageName].map(({ contract, address }) => {
+      const name = pickProxyBy === 'byAddress' ? `${contract} at ${address}` : contract;
+      const contractFullName = packageName === projectFile.name ? `${contract}` : `${packageName}/${contract}`;
+      const proxyReference = pickProxyBy === 'byAddress' ? address : contractFullName;
 
-        return {
-          name,
-          value: {
-            address,
-            contractFullName,
-            proxyReference,
-          },
-        };
-      },
-    );
+      return {
+        name,
+        value: {
+          address,
+          contractFullName,
+          proxyReference,
+        },
+      };
+    });
 
-    return [
-      new inquirer.Separator(` = ${separator} =`),
-      ...uniqBy(packageList, 'name'),
-    ];
+    return [new inquirer.Separator(` = ${separator} =`), ...uniqBy(packageList, 'name')];
   });
 
   return flatten(list);
 }
 
 // Generate a list of contracts names
-export function contractsList(
-  name: string,
-  message: string,
-  type: string,
-  source?: string,
-): { [key: string]: any } {
+export function contractsList(name: string, message: string, type: string, source?: string): { [key: string]: any } {
   const localProjectFile = new ProjectFile();
   const contractManager = new ContractManager(localProjectFile);
   const contractsFromBuild = contractManager.getContractNames();
   const contractsFromLocal = Object.keys(localProjectFile.contracts)
     .map(alias => ({ name: localProjectFile.contracts[alias], alias }))
     .map(({ name: contractName, alias }) => {
-      const label =
-        contractName === alias ? alias : `${alias}[${contractName}]`;
+      const label = contractName === alias ? alias : `${alias}[${contractName}]`;
       return { name: label, value: alias };
     });
 
@@ -170,38 +138,25 @@ export function contractsList(
     return inquirerQuestion(name, message, type, contractsFromBuild);
     // get contracts from project.json file
   } else if (source === 'notAdded') {
-    const contracts = difference(
-      contractsFromBuild,
-      contractsFromLocal.map(({ value }) => value),
-    );
+    const contracts = difference(contractsFromBuild, contractsFromLocal.map(({ value }) => value));
     return inquirerQuestion(name, message, type, contracts);
   } else if (source === 'added') {
     return inquirerQuestion(name, message, type, contractsFromLocal);
     // generate a list of built contracts and package contracts
   } else if (source === 'all') {
-    const packageContracts = Object.keys(localProjectFile.dependencies).map(
-      dependencyName => {
-        const contractNames = new Dependency(
-          dependencyName,
-        ).projectFile.contractAliases.map(
-          contractName => `${dependencyName}/${contractName}`,
-        );
+    const packageContracts = Object.keys(localProjectFile.dependencies).map(dependencyName => {
+      const contractNames = new Dependency(dependencyName).projectFile.contractAliases.map(
+        contractName => `${dependencyName}/${contractName}`,
+      );
 
-        if (contractNames.length > 0) {
-          contractNames.unshift(
-            new inquirer.Separator(` = ${dependencyName} =`),
-          );
-        }
-        return contractNames;
-      },
-    );
-    if (contractsFromBuild.length > 0)
-      contractsFromBuild.unshift(new inquirer.Separator(` = Your contracts =`));
+      if (contractNames.length > 0) {
+        contractNames.unshift(new inquirer.Separator(` = ${dependencyName} =`));
+      }
+      return contractNames;
+    });
+    if (contractsFromBuild.length > 0) contractsFromBuild.unshift(new inquirer.Separator(` = Your contracts =`));
 
-    return inquirerQuestion(name, message, type, [
-      ...contractsFromBuild,
-      ...flatten(packageContracts),
-    ]);
+    return inquirerQuestion(name, message, type, [...contractsFromBuild, ...flatten(packageContracts)]);
   } else return [];
 }
 
@@ -214,9 +169,7 @@ export function methodsList(
   return contractMethods(contractFullName, constant, projectFile)
     .map(({ name, hasInitializer, inputs, selector }) => {
       const initializable = hasInitializer ? '* ' : '';
-      const args = inputs.map(
-        ({ name: inputName, type }) => `${inputName}: ${type}`,
-      );
+      const args = inputs.map(({ name: inputName, type }) => `${inputName}: ${type}`);
       const label = `${initializable}${name}(${args.join(', ')})`;
 
       return { name: label, value: { name, selector } };
@@ -240,8 +193,7 @@ export function argsList(
   projectFile?: ProjectFile,
 ): { name: string; type: string }[] {
   const method = contractMethods(contractFullName, constant, projectFile).find(
-    ({ name, selector }): any =>
-      selector === methodIdentifier || name === methodIdentifier,
+    ({ name, selector }): any => selector === methodIdentifier || name === methodIdentifier,
   );
   return method ? method.inputs : [];
 }
@@ -251,10 +203,7 @@ function contractMethods(
   constant: Mutability = Mutability.NotConstant,
   projectFile: ProjectFile,
 ): any[] {
-  const {
-    contract: contractAlias,
-    package: packageName,
-  } = fromContractFullName(contractFullName);
+  const { contract: contractAlias, package: packageName } = fromContractFullName(contractFullName);
   const contractManager = new ContractManager(projectFile);
   if (!contractManager.hasContract(packageName, contractAlias)) return [];
   const contract = contractManager.getContractClass(packageName, contractAlias);
@@ -293,10 +242,7 @@ export function proxyInfo(contractInfo: any, network: string): any {
   }
 }
 
-export async function promptForNetwork(
-  options: any,
-  getCommandProps: () => any,
-): Promise<{ network: string }> {
+export async function promptForNetwork(options: any, getCommandProps: () => any): Promise<{ network: string }> {
   const { network: networkInOpts, interactive } = options;
   const { network: networkInSession, expired } = Session.getNetwork();
   const defaults = { network: networkInSession };
@@ -314,23 +260,15 @@ async function answersFor(
   props: InquirerQuestions,
   interactive: boolean,
 ): Promise<InquirerAnswer> {
-  const merged = interactive
-    ? { ...inputs, ...(await inquirer.prompt(questions)) }
-    : inputs;
+  const merged = interactive ? { ...inputs, ...(await inquirer.prompt(questions)) } : inputs;
   Object.keys(merged).forEach(propName => {
-    if (props[propName] && props[propName].normalize)
-      merged[propName] = props[propName].normalize(merged[propName]);
+    if (props[propName] && props[propName].normalize) merged[propName] = props[propName].normalize(merged[propName]);
   });
 
   return merged;
 }
 
-function inquirerQuestion(
-  name: string,
-  message: string,
-  type: string,
-  choices?: ChoicesT,
-): InquirerQuestions {
+function inquirerQuestion(name: string, message: string, type: string, choices?: ChoicesT): InquirerQuestions {
   return { [name]: { type, message, choices } };
 }
 

@@ -9,9 +9,7 @@ export default class ImplementationDirectory {
   public directoryContract: Contract;
   public txParams: TxParams;
 
-  public static async deploy(
-    txParams: TxParams = {},
-  ): Promise<ImplementationDirectory> {
+  public static async deploy(txParams: TxParams = {}): Promise<ImplementationDirectory> {
     const contract = this.getContract();
     const directory = await Transactions.deployContract(contract, [], txParams);
     Loggy.onVerbose(
@@ -24,10 +22,7 @@ export default class ImplementationDirectory {
     return new this(directory, txParams);
   }
 
-  public static fetch(
-    address: string,
-    txParams: TxParams = {},
-  ): ImplementationDirectory {
+  public static fetch(address: string, txParams: TxParams = {}): ImplementationDirectory {
     const contract = this.getContract();
     const directory = contract.at(address);
     return new this(directory, txParams);
@@ -54,20 +49,12 @@ export default class ImplementationDirectory {
     return this.directoryContract.methods.owner().call({ ...this.txParams });
   }
 
-  public async getImplementation(
-    contractName: string,
-  ): Promise<string | never> {
-    if (!contractName)
-      throw Error('Contract name is required to retrieve an implementation');
-    return await this.directoryContract.methods
-      .getImplementation(contractName)
-      .call({ ...this.txParams });
+  public async getImplementation(contractName: string): Promise<string | never> {
+    if (!contractName) throw Error('Contract name is required to retrieve an implementation');
+    return await this.directoryContract.methods.getImplementation(contractName).call({ ...this.txParams });
   }
 
-  public async setImplementation(
-    contractName: string,
-    implementationAddress: string,
-  ): Promise<any> {
+  public async setImplementation(contractName: string, implementationAddress: string): Promise<any> {
     Loggy.onVerbose(
       __filename,
       'setImplementation',
@@ -79,10 +66,7 @@ export default class ImplementationDirectory {
       [contractName, implementationAddress],
       { ...this.txParams },
     );
-    Loggy.succeed(
-      `set-implementation-${contractName}`,
-      `Setting ${contractName} in directory`,
-    );
+    Loggy.succeed(`set-implementation-${contractName}`, `Setting ${contractName} in directory`);
   }
 
   public async unsetImplementation(contractName: string): Promise<any> {
@@ -92,29 +76,15 @@ export default class ImplementationDirectory {
       `unset-implementation-${contractName}`,
       `Unsetting ${contractName} implementation`,
     );
-    await Transactions.sendTransaction(
-      this.directoryContract.methods.unsetImplementation,
-      [contractName],
-      { ...this.txParams },
-    );
-    Loggy.succeed(
-      `unset-implementation-${contractName}`,
-      `${contractName} implementation unset`,
-    );
+    await Transactions.sendTransaction(this.directoryContract.methods.unsetImplementation, [contractName], {
+      ...this.txParams,
+    });
+    Loggy.succeed(`unset-implementation-${contractName}`, `${contractName} implementation unset`);
   }
 
   public async freeze(): Promise<any> {
-    Loggy.spin(
-      __filename,
-      'freeze',
-      `freeze-implementation`,
-      'Freezing directory version',
-    );
-    await Transactions.sendTransaction(
-      this.directoryContract.methods.freeze,
-      [],
-      { ...this.txParams },
-    );
+    Loggy.spin(__filename, 'freeze', `freeze-implementation`, 'Freezing directory version');
+    await Transactions.sendTransaction(this.directoryContract.methods.freeze, [], { ...this.txParams });
     Loggy.succeed(`freeze-implementation`, `Directory version frozen`);
   }
 

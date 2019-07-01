@@ -33,27 +33,16 @@ const register: (program: any) => any = program =>
       '--init [function]',
       `call function after upgrading contract. If no name is given, 'initialize' will be used`,
     )
-    .option(
-      '--args <arg1, arg2, ...>',
-      'provide initialization arguments for your contract if required',
-    )
+    .option('--args <arg1, arg2, ...>', 'provide initialization arguments for your contract if required')
     .option('--all', 'upgrade all contracts in the application')
-    .option(
-      '--force',
-      'force creation even if contracts have local modifications',
-    )
+    .option('--force', 'force creation even if contracts have local modifications')
     .withNetworkOptions()
     .withSkipCompileOption()
     .withNonInteractiveOption()
     .action(commandActions);
 
-async function commandActions(
-  proxyReference: string,
-  options: any,
-): Promise<void> {
-  const { network: promptedNetwork } = await promptForNetwork(options, () =>
-    getCommandProps(),
-  );
+async function commandActions(proxyReference: string, options: any): Promise<void> {
+  const { network: promptedNetwork } = await promptForNetwork(options, () => getCommandProps());
   const { network, txParams } = await ConfigManager.initNetworkConfiguration({
     ...options,
     network: promptedNetwork,
@@ -66,43 +55,24 @@ async function commandActions(
   });
 
   await action(proxyReference, { ...options, network, txParams });
-  if (!options.dontExitProcess && process.env.NODE_ENV !== 'test')
-    process.exit(0);
+  if (!options.dontExitProcess && process.env.NODE_ENV !== 'test') process.exit(0);
 }
 
 async function action(proxyReference: string, options: any): Promise<void> {
-  const {
-    network,
-    txParams,
-    force,
-    interactive,
-    all,
-    init: rawInitMethod,
-  } = options;
+  const { network, txParams, force, interactive, all, init: rawInitMethod } = options;
 
   if (!(await hasToMigrateProject(network))) process.exit(0);
 
-  const promptedProxyInfo = await promptForProxies(
-    proxyReference,
-    network,
-    options,
-  );
-  const parsedContractReference = parseContractReference(
-    promptedProxyInfo.proxyReference,
-  );
+  const promptedProxyInfo = await promptForProxies(proxyReference, network, options);
+  const parsedContractReference = parseContractReference(promptedProxyInfo.proxyReference);
 
   const additionalOpts = {
     askForMethodParams: rawInitMethod,
-    askForMethodParamsMessage:
-      'Do you want to call a function on the instance after upgrading it?',
+    askForMethodParamsMessage: 'Do you want to call a function on the instance after upgrading it?',
   };
   const initMethodParams =
     promptedProxyInfo.proxyReference && !promptedProxyInfo.all
-      ? await promptForMethodParams(
-          promptedProxyInfo.contractFullName,
-          options,
-          additionalOpts,
-        )
+      ? await promptForMethodParams(promptedProxyInfo.contractFullName, options, additionalOpts)
       : {};
 
   const args = pickBy({
@@ -114,19 +84,12 @@ async function action(proxyReference: string, options: any): Promise<void> {
   await update({ ...args, network, txParams });
 }
 
-async function promptForProxies(
-  proxyReference: string,
-  network: string,
-  options: any,
-): Promise<UpdateSelectionParams> {
+async function promptForProxies(proxyReference: string, network: string, options: any): Promise<UpdateSelectionParams> {
   const { all, interactive } = options;
   const pickProxyBy = all ? 'all' : undefined;
   const args = { pickProxyBy, proxy: proxyReference };
   const props = getCommandProps({ proxyReference, network, all });
-  const {
-    pickProxyBy: promptedPickProxyBy,
-    proxy: promptedProxy,
-  } = await promptIfNeeded({ args, props }, interactive);
+  const { pickProxyBy: promptedPickProxyBy, proxy: promptedProxy } = await promptIfNeeded({ args, props }, interactive);
 
   return {
     ...promptedProxy,
@@ -134,11 +97,7 @@ async function promptForProxies(
   };
 }
 
-function getCommandProps({
-  proxyReference,
-  network,
-  all,
-}: UpdatePropsParams = {}): InquirerQuestions {
+function getCommandProps({ proxyReference, network, all }: UpdatePropsParams = {}): InquirerQuestions {
   return {
     ...networksList('network', 'list'),
     pickProxyBy: {
@@ -158,21 +117,14 @@ function getCommandProps({
           value: 'byAddress',
         },
       ],
-      when: () =>
-        !proxyReference &&
-        proxiesList('byAddress', network, { kind: ProxyType.Upgradeable })
-          .length,
+      when: () => !proxyReference && proxiesList('byAddress', network, { kind: ProxyType.Upgradeable }).length,
     },
     proxy: {
       message: 'Pick an instance to upgrade',
       type: 'list',
-      choices: ({ pickProxyBy }) =>
-        proxiesList(pickProxyBy, network, { kind: ProxyType.Upgradeable }),
+      choices: ({ pickProxyBy }) => proxiesList(pickProxyBy, network, { kind: ProxyType.Upgradeable }),
       when: ({ pickProxyBy }) => !all && pickProxyBy && pickProxyBy !== 'all',
-      normalize: input =>
-        typeof input !== 'object'
-          ? proxyInfo(parseContractReference(input), network)
-          : input,
+      normalize: input => (typeof input !== 'object' ? proxyInfo(parseContractReference(input), network) : input),
     },
   };
 }

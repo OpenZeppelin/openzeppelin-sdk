@@ -25,10 +25,7 @@ interface NetworkSnakeCase<T> {
   network_id: T;
 }
 
-type NetworkId<T> =
-  | NetworkCamelCase<T>
-  | NetworkSnakeCase<T>
-  | (NetworkCamelCase<T> & NetworkSnakeCase<T>);
+type NetworkId<T> = NetworkCamelCase<T> | NetworkSnakeCase<T> | (NetworkCamelCase<T> & NetworkSnakeCase<T>);
 
 type Network = {
   host: string;
@@ -65,8 +62,7 @@ const ZosConfig = {
   getConfig(root: string = process.cwd()): Config {
     // eslint-disable-next-line @typescript-eslint/no-var-requires
     const zosConfigFile = require(`${root}/networks.js`);
-    const compilers =
-      zosConfigFile.compilers || this.getDefaultCompilersProperties();
+    const compilers = zosConfigFile.compilers || this.getDefaultCompilersProperties();
     const buildDir = `${root}/build/contracts`;
 
     return { ...zosConfigFile, compilers, buildDir };
@@ -76,23 +72,14 @@ const ZosConfig = {
     return `${process.cwd()}/build/contracts`;
   },
 
-  loadNetworkConfig(
-    networkName: string,
-    root: string = process.cwd(),
-  ): NetworkConfig {
+  loadNetworkConfig(networkName: string, root: string = process.cwd()): NetworkConfig {
     const config = this.getConfig(root);
     const { networks } = config;
-    if (!networks[networkName])
-      throw Error(
-        `Given network '${networkName}' is not defined in your networks.js file`,
-      );
+    if (!networks[networkName]) throw Error(`Given network '${networkName}' is not defined in your networks.js file`);
 
     const network = networks[networkName];
     const provider = this.getProvider(networks[networkName]);
-    const artifactDefaults = this.getArtifactDefaults(
-      config,
-      networks[networkName],
-    );
+    const artifactDefaults = this.getArtifactDefaults(config, networks[networkName]);
 
     return {
       ...config,
@@ -117,10 +104,7 @@ const ZosConfig = {
     return provider;
   },
 
-  getArtifactDefaults(
-    zosConfigFile: Config,
-    network: Network,
-  ): ArtifactDefaults {
+  getArtifactDefaults(zosConfigFile: Config, network: Network): ArtifactDefaults {
     const defaults = ['gas', 'gasPrice', 'from'];
     const configDefaults = omit(pick(zosConfigFile, defaults), isUndefined);
     const networkDefaults = omit(pick(network, defaults), isUndefined);

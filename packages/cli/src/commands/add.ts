@@ -4,25 +4,18 @@ import addAll from '../scripts/add-all';
 import ConfigManager from '../models/config/ConfigManager';
 import { compile } from '../models/compiler/Compiler';
 
-import {
-  promptIfNeeded,
-  contractsList,
-  InquirerQuestions,
-} from '../prompts/prompt';
+import { promptIfNeeded, contractsList, InquirerQuestions } from '../prompts/prompt';
 import { fromContractFullName } from '../utils/naming';
 import ProjectFile from '../models/files/ProjectFile';
 
 const name = 'add';
 const signature = `${name} [contractNames...]`;
-const description =
-  'add contract to your project. Provide a list of whitespace-separated contract names';
+const description = 'add contract to your project. Provide a list of whitespace-separated contract names';
 
 const register: (program: any) => any = program =>
   program
     .command(signature, undefined, { noHelp: true })
-    .usage(
-      '[contractName1[:contractAlias1] ... contractNameN[:contractAliasN]] [options]',
-    )
+    .usage('[contractName1[:contractAlias1] ... contractNameN[:contractAliasN]] [options]')
     .description(description)
     .option('--all', 'add all contracts in your build directory')
     .withPushOptions()
@@ -50,23 +43,13 @@ async function action(contractNames: string[], options: any): Promise<void> {
   await push.runActionIfRequested(options);
 }
 
-async function runActionIfNeeded(
-  contractName?: string,
-  options?: any,
-): Promise<void> {
+async function runActionIfNeeded(contractName?: string, options?: any): Promise<void> {
   const { interactive } = options;
-  const {
-    contract: contractAlias,
-    package: packageName,
-  } = fromContractFullName(contractName);
+  const { contract: contractAlias, package: packageName } = fromContractFullName(contractName);
   const projectFile = new ProjectFile();
 
   if (interactive) {
-    if (
-      !packageName &&
-      contractAlias &&
-      !projectFile.hasContract(contractAlias)
-    ) {
+    if (!packageName && contractAlias && !projectFile.hasContract(contractAlias)) {
       await action([contractAlias], options);
     } else if (!packageName && !projectFile.hasContracts()) {
       await action([], options);
@@ -75,12 +58,7 @@ async function runActionIfNeeded(
 }
 
 function getCommandProps(): InquirerQuestions {
-  return contractsList(
-    'contractNames',
-    'Pick which contracts you want to add',
-    'checkbox',
-    'notAdded',
-  );
+  return contractsList('contractNames', 'Pick which contracts you want to add', 'checkbox', 'notAdded');
 }
 
 function splitContractName(rawData: string): { name: string; alias: string } {

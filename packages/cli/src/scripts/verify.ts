@@ -15,17 +15,9 @@ export default async function verify(
 ): Promise<void | never> {
   if (!contractAlias) throw Error('A contract alias must be specified');
   if (remote === 'etherscan' && !apiKey)
-    throw Error(
-      'Etherscan API key not specified. To get one, follow this link: https://etherscan.io/myapikey',
-    );
+    throw Error('Etherscan API key not specified. To get one, follow this link: https://etherscan.io/myapikey');
 
   const controller = new NetworkController(network, txParams, networkFile);
   controller.checkLocalContractDeployed(contractAlias, true);
-  await controller.verifyAndPublishContract(
-    contractAlias,
-    optimizer,
-    optimizerRuns as string,
-    remote,
-    apiKey,
-  );
+  await controller.verifyAndPublishContract(contractAlias, optimizer, optimizerRuns as string, remote, apiKey);
 }

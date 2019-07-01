@@ -6,10 +6,7 @@ import { Loggy } from 'zos-lib';
 import { lockSync } from 'lockfile';
 import program from './program';
 import findRootDirectory from './helpers';
-import {
-  LOCK_FILE_PATH,
-  OPEN_ZEPPELIN_FOLDER,
-} from '../models/files/constants';
+import { LOCK_FILE_PATH, OPEN_ZEPPELIN_FOLDER } from '../models/files/constants';
 
 const IGNORED_COMMANDS_IN_ROOT_DIR = ['init', 'unpack'];
 

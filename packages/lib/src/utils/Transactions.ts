@@ -166,10 +166,7 @@ export default {
     }
   },
 
-  async estimateGas(
-    txParams: TxParams,
-    retries: number = RETRY_COUNT,
-  ): Promise<any> {
+  async estimateGas(txParams: TxParams, retries: number = RETRY_COUNT): Promise<any> {
     // Retry if estimate fails. This could happen because we are depending
     // on a previous transaction being mined that still hasn't reach the node
     // we are working with, if the txs are routed to different nodes.
@@ -198,18 +195,11 @@ export default {
     // we are working with, if the txs are routed to different nodes.
     // See https://github.com/zeppelinos/zos/issues/192 for more info.
     try {
-      return await this._calculateActualGas(
-        await contractFn(...args).estimateGas({ ...txParams }),
-      );
+      return await this._calculateActualGas(await contractFn(...args).estimateGas({ ...txParams }));
     } catch (error) {
       if (retries <= 0) throw Error(error);
       await sleep(RETRY_SLEEP_TIME);
-      return this.estimateActualGasFnCall(
-        contractFn,
-        args,
-        txParams,
-        retries - 1,
-      );
+      return this.estimateActualGasFnCall(contractFn, args, txParams, retries - 1);
     }
   },
 
@@ -225,15 +215,13 @@ export default {
     timeout: number = 10 * 60 * 1000,
   ): Promise<any | never> {
     if (await ZWeb3.isGanacheNode()) return;
-    const getTxBlock = () =>
-      ZWeb3.getTransactionReceipt(transactionHash).then(r => r.blockNumber);
+    const getTxBlock = () => ZWeb3.getTransactionReceipt(transactionHash).then(r => r.blockNumber);
     const now = +new Date();
 
     while (true) {
       if (+new Date() - now > timeout)
         throw new Error(
-          `Exceeded timeout of ${timeout /
-            1000} seconds awaiting confirmations for transaction ${transactionHash}`,
+          `Exceeded timeout of ${timeout / 1000} seconds awaiting confirmations for transaction ${transactionHash}`,
         );
       const currentBlock: number = await ZWeb3.getLatestBlockNumber();
       const txBlock: number = await getTxBlock();
@@ -242,17 +230,11 @@ export default {
     }
   },
 
-  async _sendContractDataTransaction(
-    contract: Contract,
-    txParams: TxParams,
-  ): Promise<TransactionReceipt> {
+  async _sendContractDataTransaction(contract: Contract, txParams: TxParams): Promise<TransactionReceipt> {
     const defaults = await Contracts.getDefaultTxParams();
     const tx = { to: contract.address, ...defaults, ...txParams };
     const txHash = await ZWeb3.sendTransactionWithoutReceipt(tx);
-    return await ZWeb3.getTransactionReceiptWithTimeout(
-      txHash,
-      Contracts.getSyncTimeout(),
-    );
+    return await ZWeb3.getTransactionReceiptWithTimeout(txHash, Contracts.getSyncTimeout());
   },
 
   async _getETHGasStationPrice(): Promise<any | never> {
@@ -266,20 +248,14 @@ export default {
       state.gasPrice = gasPrice;
       return state.gasPrice;
     } catch (err) {
-      throw new Error(
-        `Could not query gas price API to determine reasonable gas price, please provide one.`,
-      );
+      throw new Error(`Could not query gas price API to determine reasonable gas price, please provide one.`);
     }
   },
 
   async _fixGasPrice(txParams: TxParams): Promise<any> {
-    const gasPrice =
-      txParams.gasPrice || Contracts.getArtifactsDefaults().gasPrice;
+    const gasPrice = txParams.gasPrice || Contracts.getArtifactsDefaults().gasPrice;
 
-    if (
-      (TRUFFLE_DEFAULT_GAS_PRICE.eq(gasPrice) || !gasPrice) &&
-      (await ZWeb3.isMainnet())
-    ) {
+    if ((TRUFFLE_DEFAULT_GAS_PRICE.eq(gasPrice) || !gasPrice) && (await ZWeb3.isMainnet())) {
       txParams.gasPrice = await this._getETHGasStationPrice();
       if (TRUFFLE_DEFAULT_GAS_PRICE.lte(txParams.gasPrice))
         throw new Error(

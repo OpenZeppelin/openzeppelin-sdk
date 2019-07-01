@@ -24,9 +24,7 @@ export default class Contracts {
   }
 
   public static getLocalContractsDir(): string {
-    return path.resolve(
-      Contracts.contractsDir || Contracts.DEFAULT_CONTRACTS_DIR,
-    );
+    return path.resolve(Contracts.contractsDir || Contracts.DEFAULT_CONTRACTS_DIR);
   }
 
   public static async getDefaultTxParams(): Promise<any> {
@@ -44,16 +42,10 @@ export default class Contracts {
   }
 
   public static getLibPath(contractName: string): string {
-    return path.resolve(
-      __dirname,
-      `../../build/contracts/${contractName}.json`,
-    );
+    return path.resolve(__dirname, `../../build/contracts/${contractName}.json`);
   }
 
-  public static getNodeModulesPath(
-    dependency: string,
-    contractName: string,
-  ): string {
+  public static getNodeModulesPath(dependency: string, contractName: string): string {
     return `${process.cwd()}/node_modules/${dependency}/build/contracts/${contractName}.json`;
   }
 
@@ -65,13 +57,8 @@ export default class Contracts {
     return Contracts._getFromPath(Contracts.getLibPath(contractName));
   }
 
-  public static getFromNodeModules(
-    dependency: string,
-    contractName: string,
-  ): Contract {
-    return Contracts._getFromPath(
-      Contracts.getNodeModulesPath(dependency, contractName),
-    );
+  public static getFromNodeModules(dependency: string, contractName: string): Contract {
+    return Contracts._getFromPath(Contracts.getNodeModulesPath(dependency, contractName));
   }
 
   public static async getDefaultFromAddress() {
@@ -109,10 +96,7 @@ export default class Contracts {
     // eslint-disable-next-line @typescript-eslint/no-var-requires
     const schema = require(targetPath);
     schema.directory = path.dirname(targetPath);
-    if (schema.bytecode === '')
-      throw new Error(
-        `A bytecode must be provided for contract ${schema.contractName}.`,
-      );
+    if (schema.bytecode === '') throw new Error(`A bytecode must be provided for contract ${schema.contractName}.`);
     if (!hasUnlinkedVariables(schema.bytecode)) {
       schema.linkedBytecode = schema.bytecode;
       schema.linkedDeployedBytecode = schema.deployedBytecode;

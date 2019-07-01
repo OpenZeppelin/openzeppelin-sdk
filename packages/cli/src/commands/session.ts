@@ -1,10 +1,6 @@
 import { ZWeb3 } from 'zos-lib';
 import session from '../scripts/session';
-import {
-  promptIfNeeded,
-  networksList,
-  InquirerQuestions,
-} from '../prompts/prompt';
+import { promptIfNeeded, networksList, InquirerQuestions } from '../prompts/prompt';
 import ConfigManager from '../models/config/ConfigManager';
 
 const name = 'session';
@@ -17,27 +13,14 @@ const register: (program: any) => any = program =>
     .command(signature, undefined, { noHelp: true })
     .usage('[options]')
     .description(description)
-    .option(
-      '--expires <expires>',
-      'expiration of the session in seconds (defaults to 900, 15 minutes)',
-    )
-    .option(
-      '--close',
-      'closes the current session, removing all network options set',
-    )
+    .option('--expires <expires>', 'expiration of the session in seconds (defaults to 900, 15 minutes)')
+    .option('--close', 'closes the current session, removing all network options set')
     .withNetworkOptions()
     .withNonInteractiveOption()
     .action(action);
 
 async function action(options: any): Promise<void> {
-  const {
-    network: networkInOpts,
-    expires,
-    timeout,
-    from,
-    close,
-    interactive,
-  } = options;
+  const { network: networkInOpts, expires, timeout, from, close, interactive } = options;
 
   if (close) {
     session({ close });
@@ -46,10 +29,7 @@ async function action(options: any): Promise<void> {
       { opts: { network: networkInOpts }, props: getCommandProps() },
       interactive,
     );
-    const { network } = await ConfigManager.initNetworkConfiguration(
-      promptedNetwork,
-      true,
-    );
+    const { network } = await ConfigManager.initNetworkConfiguration(promptedNetwork, true);
     const accounts = await ZWeb3.accounts();
     const promptedSession = await promptIfNeeded(
       { opts: { timeout, from, expires }, props: getCommandProps(accounts) },
@@ -59,8 +39,7 @@ async function action(options: any): Promise<void> {
     session({ close, ...promptedNetwork, ...promptedSession });
   }
 
-  if (!options.dontExitProcess && process.env.NODE_ENV !== 'test')
-    process.exit(0);
+  if (!options.dontExitProcess && process.env.NODE_ENV !== 'test') process.exit(0);
 }
 
 function getCommandProps(accounts: string[] = []): InquirerQuestions {

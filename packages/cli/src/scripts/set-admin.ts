@@ -12,9 +12,7 @@ export default async function setAdmin({
   networkFile,
 }: SetAdminParams): Promise<void | never> {
   if (!contractAlias && !proxyAddress && packageName) {
-    throw Error(
-      'The address or name of the contract to transfer upgradeability admin rights must be provided.',
-    );
+    throw Error('The address or name of the contract to transfer upgradeability admin rights must be provided.');
   }
 
   if (!newAdmin) {
@@ -25,12 +23,7 @@ export default async function setAdmin({
 
   try {
     if (contractAlias || proxyAddress) {
-      const proxies = await controller.setProxiesAdmin(
-        packageName,
-        contractAlias,
-        proxyAddress,
-        newAdmin,
-      );
+      const proxies = await controller.setProxiesAdmin(packageName, contractAlias, proxyAddress, newAdmin);
     } else {
       await controller.setProxyAdminOwner(newAdmin);
     }

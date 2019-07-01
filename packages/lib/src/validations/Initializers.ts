@@ -14,26 +14,16 @@ export function getUninitializedBaseContracts(contract: Contract): string[] {
   return invertBy(uninitializedBaseContracts);
 }
 
-function getUninitializedDirectBaseContracts(
-  contract: Contract,
-  uninitializedBaseContracts: any,
-): void {
+function getUninitializedDirectBaseContracts(contract: Contract, uninitializedBaseContracts: any): void {
   // Check whether the contract has base contracts
-  const baseContracts: any = contract.schema.ast.nodes.find(
-    n => n.name === contract.schema.contractName,
-  ).baseContracts;
+  const baseContracts: any = contract.schema.ast.nodes.find(n => n.name === contract.schema.contractName).baseContracts;
   if (baseContracts.length === 0) return;
 
   // Run check for the base contracts
   for (const baseContract of baseContracts) {
     const baseContractName: string = baseContract.baseName.name;
-    const baseContractClass: Contract = Contracts.getFromLocal(
-      baseContractName,
-    );
-    getUninitializedDirectBaseContracts(
-      baseContractClass,
-      uninitializedBaseContracts,
-    );
+    const baseContractClass: Contract = Contracts.getFromLocal(baseContractName);
+    getUninitializedDirectBaseContracts(baseContractClass, uninitializedBaseContracts);
   }
 
   // Make a dict of base contracts that have "initialize" function
@@ -41,9 +31,7 @@ function getUninitializedDirectBaseContracts(
   const baseContractInitializers: any = {};
   for (const baseContract of baseContracts) {
     const baseContractName: string = baseContract.baseName.name;
-    const baseContractClass: Contract = Contracts.getFromLocal(
-      baseContractName,
-    );
+    const baseContractClass: Contract = Contracts.getFromLocal(baseContractName);
     // TS-TODO: define type?
     const baseContractInitializer = getContractInitializer(baseContractClass);
     if (baseContractInitializer !== undefined) {
@@ -70,12 +58,8 @@ function getUninitializedDirectBaseContracts(
   // Update map with each call of "initialize" function of the base contract
   const initializedContracts: any = {};
   for (const statement of initializer.body.statements) {
-    if (
-      statement.nodeType === 'ExpressionStatement' &&
-      statement.expression.nodeType === 'FunctionCall'
-    ) {
-      const baseContractName: string =
-        statement.expression.expression.expression.name;
+    if (statement.nodeType === 'ExpressionStatement' && statement.expression.nodeType === 'FunctionCall') {
+      const baseContractName: string = statement.expression.expression.expression.name;
       const functionName: string = statement.expression.expression.memberName;
       if (baseContractInitializers[baseContractName] === functionName) {
         initializedContracts[baseContractName] = true;
@@ -94,22 +78,13 @@ function getUninitializedDirectBaseContracts(
 
 function getContractInitializer(contract: Contract): Node | undefined {
   const contractDefinition: Node = contract.schema.ast.nodes.find(
-    (n: Node) =>
-      n.nodeType === 'ContractDefinition' &&
-      n.name === contract.schema.contractName,
+    (n: Node) => n.nodeType === 'ContractDefinition' && n.name === contract.schema.contractName,
   );
-  const contractFunctions: Node[] = contractDefinition.nodes.filter(
-    n => n.nodeType === 'FunctionDefinition',
-  );
+  const contractFunctions: Node[] = contractDefinition.nodes.filter(n => n.nodeType === 'FunctionDefinition');
   for (const contractFunction of contractFunctions) {
     const functionModifiers: any = contractFunction.modifiers;
-    const initializerModifier: any = functionModifiers.find(
-      m => m.modifierName.name === 'initializer',
-    );
-    if (
-      contractFunction.name === 'initialize' ||
-      initializerModifier !== undefined
-    ) {
+    const initializerModifier: any = functionModifiers.find(m => m.modifierName.name === 'initializer');
+    if (contractFunction.name === 'initialize' || initializerModifier !== undefined) {
       return contractFunction;
     }
   }

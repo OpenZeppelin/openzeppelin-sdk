@@ -24,13 +24,7 @@ export default async function update({
 
   try {
     await controller.checkLocalContractsDeployed(!force);
-    const proxies = await controller.upgradeProxies(
-      packageName,
-      contractAlias,
-      proxyAddress,
-      methodName,
-      methodArgs,
-    );
+    const proxies = await controller.upgradeProxies(packageName, contractAlias, proxyAddress, methodName, methodArgs);
     controller.writeNetworkPackageIfNeeded();
   } catch (error) {
     const cb = () => controller.writeNetworkPackageIfNeeded();

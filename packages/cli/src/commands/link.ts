@@ -7,8 +7,7 @@ import { fromContractFullName } from '../utils/naming';
 
 const name = 'link';
 const signature = `${name} [dependencies...]`;
-const description =
-  'links project with a list of dependencies each located in its npm package';
+const description = 'links project with a list of dependencies each located in its npm package';
 
 const register: (program: any) => any = program =>
   program
@@ -34,16 +33,10 @@ async function action(dependencies: string[], options: any): Promise<void> {
   await push.runActionIfRequested(options);
 }
 
-async function runActionIfNeeded(
-  contractFullName: string,
-  options: any,
-): Promise<void> {
+async function runActionIfNeeded(contractFullName: string, options: any): Promise<void> {
   const { interactive } = options;
   const projectFile = new ProjectFile();
-  const {
-    contract: contractAlias,
-    package: packageName,
-  } = fromContractFullName(contractFullName);
+  const { contract: contractAlias, package: packageName } = fromContractFullName(contractFullName);
   if (interactive && packageName && !projectFile.hasDependency(packageName)) {
     await action([packageName], { ...options, forceInstall: true });
   }

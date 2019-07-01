@@ -15,23 +15,14 @@ program.Command.prototype.withNetworkOptions = function(): Command {
 };
 
 program.Command.prototype.withPushOptions = function(): Command {
-  return this.option(
-    '--push [network]',
-    'push all changes to the specified network',
-  )
-    .option(
-      '-f, --from <from>',
-      'specify the transaction sender address for --push',
-    )
+  return this.option('--push [network]', 'push all changes to the specified network')
+    .option('-f, --from <from>', 'specify the transaction sender address for --push')
     .withSkipCompileOption()
     .withNetworkTimeoutOption();
 };
 
 program.Command.prototype.withNonInteractiveOption = function(): Command {
-  return this.option(
-    '--no-interactive',
-    'force to run the command in non-interactive mode',
-  );
+  return this.option('--no-interactive', 'force to run the command in non-interactive mode');
 };
 
 program.Command.prototype.withSkipCompileOption = function(): Command {

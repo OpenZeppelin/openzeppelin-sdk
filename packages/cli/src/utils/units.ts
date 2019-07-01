@@ -5,14 +5,8 @@ export function isValidUnit(unit: string): boolean {
   return Object.keys(web3Utils.unitMap).includes(unit.toLowerCase());
 }
 
-export function prettifyTokenAmount(
-  amount: string,
-  decimals?: string,
-  symbol?: string,
-): string {
-  const prettifiedAmount = decimals
-    ? new BN(amount).shiftedBy(-decimals).toFormat()
-    : amount;
+export function prettifyTokenAmount(amount: string, decimals?: string, symbol?: string): string {
+  const prettifiedAmount = decimals ? new BN(amount).shiftedBy(-decimals).toFormat() : amount;
 
   return symbol ? `${prettifiedAmount} ${symbol}` : prettifiedAmount;
 }

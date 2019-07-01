@@ -26,24 +26,17 @@ Note that if you transfer to an incorrect address, you may irreversibly lose con
 const register: (program: any) => any = program =>
   program
     .command(signature, undefined, { noHelp: true })
-    .usage(
-      '[alias-or-address] [new-admin-address] --network <network> [options]',
-    )
+    .usage('[alias-or-address] [new-admin-address] --network <network> [options]')
     .description(description)
     .option('-f, --force', 'bypass a manual check')
     .withNetworkOptions()
     .withNonInteractiveOption()
     .action(action);
 
-async function action(
-  proxyReference: string,
-  newAdmin: string,
-  options: any,
-): Promise<void | never> {
+async function action(proxyReference: string, newAdmin: string, options: any): Promise<void | never> {
   const { force, interactive } = options;
 
-  if (!interactive && !force)
-    throw new Error('Either enable an interactivity mode or set a force flag.');
+  if (!interactive && !force) throw new Error('Either enable an interactivity mode or set a force flag.');
 
   const networkOpts = await promptForNetwork(options, () => getCommandProps());
 
@@ -53,14 +46,15 @@ async function action(
   });
   if (!(await hasToMigrateProject(network))) process.exit(0);
 
-  const {
-    proxyReference: pickedProxyReference,
-    newAdmin: pickedNewAdmin,
-  } = await promptForProxies(proxyReference, newAdmin, network, options);
+  const { proxyReference: pickedProxyReference, newAdmin: pickedNewAdmin } = await promptForProxies(
+    proxyReference,
+    newAdmin,
+    network,
+    options,
+  );
   const parsedContractReference = parseContractReference(pickedProxyReference);
 
-  if (!pickedNewAdmin)
-    throw Error('You have to specify at least a new admin address.');
+  if (!pickedNewAdmin) throw Error('You have to specify at least a new admin address.');
 
   // has to be a standalone question from interactivity
   // because it is security related and can't be disabled with interactivity set to false
@@ -94,8 +88,7 @@ async function action(
         props: {
           certain: {
             type: 'confirm',
-            message:
-              'The new admin address has no funds nor wallet. Are you sure you want to continue?',
+            message: 'The new admin address has no funds nor wallet. Are you sure you want to continue?',
           },
         },
       },
@@ -108,8 +101,7 @@ async function action(
 
   const args = pickBy({ ...parsedContractReference, newAdmin: pickedNewAdmin });
   await setAdmin({ ...args, network, txParams });
-  if (!options.dontExitProcess && process.env.NODE_ENV !== 'test')
-    process.exit(0);
+  if (!options.dontExitProcess && process.env.NODE_ENV !== 'test') process.exit(0);
 }
 
 async function promptForProxies(
@@ -127,11 +119,10 @@ async function promptForProxies(
   const pickProxyBy = newAdmin ? 'all' : undefined;
   const args = { pickProxyBy, proxy: proxyReference, newAdmin };
   const props = getCommandProps({ network, all: !!newAdmin });
-  const {
-    pickProxyBy: pickedProxyBy,
-    proxy: pickedProxy,
-    newAdmin: pickedNewAdmin,
-  } = await promptIfNeeded({ args, props }, interactive);
+  const { pickProxyBy: pickedProxyBy, proxy: pickedProxy, newAdmin: pickedNewAdmin } = await promptIfNeeded(
+    { args, props },
+    interactive,
+  );
 
   return {
     newAdmin: pickedNewAdmin,
@@ -140,10 +131,7 @@ async function promptForProxies(
   };
 }
 
-function getCommandProps({
-  network,
-  all,
-}: SetAdminPropsParams = {}): InquirerQuestions {
+function getCommandProps({ network, all }: SetAdminPropsParams = {}): InquirerQuestions {
   return {
     ...networksList('network', 'list'),
     pickProxyBy: {
@@ -167,13 +155,9 @@ function getCommandProps({
     proxy: {
       message: 'Choose an instance',
       type: 'list',
-      choices: ({ pickProxyBy }) =>
-        proxiesList(pickProxyBy, network, { kind: ProxyType.Upgradeable }),
+      choices: ({ pickProxyBy }) => proxiesList(pickProxyBy, network, { kind: ProxyType.Upgradeable }),
       when: ({ pickProxyBy }) => !all && pickProxyBy && pickProxyBy !== 'all',
-      normalize: input =>
-        typeof input !== 'object'
-          ? proxyInfo(parseContractReference(input), network)
-          : input,
+      normalize: input => (typeof input !== 'object' ? proxyInfo(parseContractReference(input), network) : input),
     },
     newAdmin: {
       type: 'input',

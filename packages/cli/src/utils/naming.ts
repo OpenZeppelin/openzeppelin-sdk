@@ -1,16 +1,11 @@
 import pickBy from 'lodash.pickby';
 
-export function toContractFullName(
-  packageName: string,
-  contractName: string,
-): string {
+export function toContractFullName(packageName: string, contractName: string): string {
   if (!packageName) return contractName;
   return [packageName, contractName].join('/');
 }
 
-export function fromContractFullName(
-  contractFullName: string,
-): { contract?: string; package?: string } {
+export function fromContractFullName(contractFullName: string): { contract?: string; package?: string } {
   if (!contractFullName) return {};
   const fragments = contractFullName.split('/');
   const contractName = fragments.pop();

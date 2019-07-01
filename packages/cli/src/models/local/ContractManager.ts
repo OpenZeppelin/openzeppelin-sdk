@@ -11,10 +11,7 @@ export default class ContractManager {
     this.projectFile = projectFile;
   }
 
-  public getContractClass(
-    packageName: string,
-    contractAlias: string,
-  ): Contract {
+  public getContractClass(packageName: string, contractAlias: string): Contract {
     if (!packageName || packageName === this.projectFile.name) {
       const contractName = this.projectFile.contract(contractAlias);
       return Contracts.getFromLocal(contractName);
@@ -52,11 +49,7 @@ export default class ContractManager {
     } else return [];
   }
 
-  private isLocalContract(
-    contractsDir: string,
-    contract: { sourcePath: string },
-    root: string,
-  ): boolean {
+  private isLocalContract(contractsDir: string, contract: { sourcePath: string }, root: string): boolean {
     const cwd = root || process.cwd();
     const contractFullPath = path.resolve(cwd, contract.sourcePath);
     return contractFullPath.indexOf(contractsDir) === 0;
@@ -70,11 +63,7 @@ export default class ContractManager {
     return (
       contract &&
       contract.ast &&
-      !!contract.ast.nodes.find(
-        node =>
-          node.contractKind === 'library' &&
-          node.name === contract.contractName,
-      )
+      !!contract.ast.nodes.find(node => node.contractKind === 'library' && node.name === contract.contractName)
     );
   }
 }

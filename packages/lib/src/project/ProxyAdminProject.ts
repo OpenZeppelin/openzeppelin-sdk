@@ -16,29 +16,17 @@ class BaseProxyAdminProject extends BaseSimpleProject {
     proxyAdminAddress?: string,
     proxyFactoryAddress?: string,
   ): Promise<ProxyAdminProject> {
-    const proxyAdmin = proxyAdminAddress
-      ? await ProxyAdmin.fetch(proxyAdminAddress, txParams)
-      : null;
-    const proxyFactory = proxyFactoryAddress
-      ? await ProxyFactory.fetch(proxyFactoryAddress, txParams)
-      : null;
+    const proxyAdmin = proxyAdminAddress ? await ProxyAdmin.fetch(proxyAdminAddress, txParams) : null;
+    const proxyFactory = proxyFactoryAddress ? await ProxyFactory.fetch(proxyFactoryAddress, txParams) : null;
     return new ProxyAdminProject(name, proxyAdmin, proxyFactory, txParams);
   }
 
-  public constructor(
-    name: string = 'main',
-    proxyAdmin: ProxyAdmin,
-    proxyFactory?: ProxyFactory,
-    txParams: any = {},
-  ) {
+  public constructor(name: string = 'main', proxyAdmin: ProxyAdmin, proxyFactory?: ProxyFactory, txParams: any = {}) {
     super(name, proxyFactory, txParams);
     this.proxyAdmin = proxyAdmin;
   }
 
-  public async createProxy(
-    contract: Contract,
-    contractParams: ContractInterface = {},
-  ): Promise<Contract> {
+  public async createProxy(contract: Contract, contractParams: ContractInterface = {}): Promise<Contract> {
     if (!contractParams.admin) await this.ensureProxyAdmin();
     return super.createProxy(contract, contractParams);
   }
@@ -59,29 +47,18 @@ class BaseProxyAdminProject extends BaseSimpleProject {
     contractParams: ContractInterface = {},
   ): Promise<Contract> {
     const { initMethod: initMethodName, initArgs } = contractParams;
-    const {
-      implementationAddress,
-      pAddress,
-      initCallData,
-    } = await this._setUpgradeParams(proxyAddress, contract, contractParams);
-    await this.proxyAdmin.upgradeProxy(
-      pAddress,
-      implementationAddress,
+    const { implementationAddress, pAddress, initCallData } = await this._setUpgradeParams(
+      proxyAddress,
       contract,
-      initMethodName,
-      initArgs,
+      contractParams,
     );
-    Loggy.succeed(
-      `action-proxy-${pAddress}`,
-      `Instance at ${pAddress} upgraded`,
-    );
+    await this.proxyAdmin.upgradeProxy(pAddress, implementationAddress, contract, initMethodName, initArgs);
+    Loggy.succeed(`action-proxy-${pAddress}`, `Instance at ${pAddress} upgraded`);
     return contract.at(pAddress);
   }
 
   public getAdminAddress(): Promise<string> {
-    return new Promise(resolve =>
-      resolve(this.proxyAdmin ? this.proxyAdmin.address : null),
-    );
+    return new Promise(resolve => resolve(this.proxyAdmin ? this.proxyAdmin.address : null));
   }
 
   public async ensureProxyAdmin(): Promise<ProxyAdmin> {
@@ -94,6 +71,4 @@ class BaseProxyAdminProject extends BaseSimpleProject {
 
 // Mixings produce value but not type
 // We have to export full class with type & callable
-export default class ProxyAdminProject extends ProxyAdminProjectMixin(
-  BaseProxyAdminProject,
-) {}
+export default class ProxyAdminProject extends ProxyAdminProjectMixin(BaseProxyAdminProject) {}

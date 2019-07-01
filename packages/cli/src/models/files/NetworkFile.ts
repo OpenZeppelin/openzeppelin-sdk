@@ -90,11 +90,7 @@ export default class NetworkFile {
   }
 
   // TS-TODO: type for network parameter (and class member too).
-  public constructor(
-    projectFile: ProjectFile,
-    network: any,
-    filePath: string = null,
-  ) {
+  public constructor(projectFile: ProjectFile, network: any, filePath: string = null) {
     this.projectFile = projectFile;
     this.network = network;
 
@@ -105,11 +101,7 @@ export default class NetworkFile {
       manifestVersion: MANIFEST_VERSION,
     } as any;
 
-    this.filePath = NetworkFile.getExistingFilePath(
-      network,
-      process.cwd(),
-      filePath,
-    );
+    this.filePath = NetworkFile.getExistingFilePath(network, process.cwd(), filePath);
 
     if (this.filePath) {
       try {
@@ -117,9 +109,7 @@ export default class NetworkFile {
       } catch (e) {
         e.message = `Failed to parse '${path.resolve(
           filePath,
-        )}' file. Please make sure that ${filePath} is a valid JSON file. Details: ${
-          e.message
-        }.`;
+        )}' file. Please make sure that ${filePath} is a valid JSON file. Details: ${e.message}.`;
         throw e;
       }
     }
@@ -146,9 +136,7 @@ export default class NetworkFile {
     return this.data.version;
   }
 
-  public set contracts(contracts: {
-    [contractAlias: string]: ContractInterface;
-  }) {
+  public set contracts(contracts: { [contractAlias: string]: ContractInterface }) {
     this.data.contracts = contracts;
   }
 
@@ -156,9 +144,7 @@ export default class NetworkFile {
     return this.data.contracts || {};
   }
 
-  public set solidityLibs(solidityLibs: {
-    [libAlias: string]: SolidityLibInterface;
-  }) {
+  public set solidityLibs(solidityLibs: { [libAlias: string]: SolidityLibInterface }) {
     this.data.solidityLibs = solidityLibs;
   }
 
@@ -285,12 +271,8 @@ export default class NetworkFile {
     return difference(Object.keys(this.solidityLibs), libs);
   }
 
-  public getSolidityLibOrContract(
-    aliasOrName: string,
-  ): ContractInterface | SolidityLibInterface {
-    return (
-      this.data.solidityLibs[aliasOrName] || this.data.contracts[aliasOrName]
-    );
+  public getSolidityLibOrContract(aliasOrName: string): ContractInterface | SolidityLibInterface {
+    return this.data.solidityLibs[aliasOrName] || this.data.contracts[aliasOrName];
   }
 
   public hasSolidityLibOrContract(aliasOrName: string): boolean {
@@ -299,18 +281,12 @@ export default class NetworkFile {
 
   public updateImplementation(
     aliasOrName: string,
-    fn: (
-      source: ContractInterface | SolidityLibInterface,
-    ) => ContractInterface | SolidityLibInterface,
+    fn: (source: ContractInterface | SolidityLibInterface) => ContractInterface | SolidityLibInterface,
   ): void {
     if (this.hasContract(aliasOrName))
-      this.data.contracts[aliasOrName] = fn(
-        this.data.contracts[aliasOrName],
-      ) as ContractInterface;
+      this.data.contracts[aliasOrName] = fn(this.data.contracts[aliasOrName]) as ContractInterface;
     else if (this.hasSolidityLib(aliasOrName))
-      this.data.solidityLibs[aliasOrName] = fn(
-        this.data.solidityLibs[aliasOrName],
-      ) as SolidityLibInterface;
+      this.data.solidityLibs[aliasOrName] = fn(this.data.solidityLibs[aliasOrName]) as SolidityLibInterface;
     else return;
   }
 
@@ -335,21 +311,14 @@ export default class NetworkFile {
     return !isEmpty(this.dependencies);
   }
 
-  public getProxies({
-    package: packageName,
-    contract,
-    address,
-    kind,
-  }: ProxyInterface = {}): ProxyInterface[] {
+  public getProxies({ package: packageName, contract, address, kind }: ProxyInterface = {}): ProxyInterface[] {
     if (isEmpty(this.data.proxies)) return [];
-    const allProxies = flatMap(
-      this.data.proxies || {},
-      (proxiesList, fullname) =>
-        map(proxiesList, proxyInfo => ({
-          ...fromContractFullName(fullname),
-          ...proxyInfo,
-          kind: proxyInfo.kind || ProxyType.Upgradeable,
-        })),
+    const allProxies = flatMap(this.data.proxies || {}, (proxiesList, fullname) =>
+      map(proxiesList, proxyInfo => ({
+        ...fromContractFullName(fullname),
+        ...proxyInfo,
+        kind: proxyInfo.kind || ProxyType.Upgradeable,
+      })),
     );
     return filter(
       allProxies,
@@ -395,10 +364,7 @@ export default class NetworkFile {
   }
 
   public dependenciesNamesMissingFromPackage(): any[] {
-    return difference(
-      this.dependenciesNames,
-      this.projectFile.dependenciesNames,
-    );
+    return difference(this.dependenciesNames, this.projectFile.dependenciesNames);
   }
 
   public dependencyHasCustomDeploy(name: string): boolean {
@@ -412,10 +378,7 @@ export default class NetworkFile {
   }
 
   public dependencyHasMatchingCustomDeploy(name: string): boolean {
-    return (
-      this.dependencyHasCustomDeploy(name) &&
-      this.dependencySatisfiesVersionRequirement(name)
-    );
+    return this.dependencyHasCustomDeploy(name) && this.dependencySatisfiesVersionRequirement(name);
   }
 
   public hasSameBytecode(alias: string, klass: any): boolean {
@@ -427,10 +390,7 @@ export default class NetworkFile {
     }
   }
 
-  public setDependency(
-    name: string,
-    { package: thepackage, version, customDeploy }: DependencyInterface = {},
-  ) {
+  public setDependency(name: string, { package: thepackage, version, customDeploy }: DependencyInterface = {}) {
     if (!this.data.dependencies) this.data.dependencies = {};
 
     const dependency = {
@@ -455,11 +415,7 @@ export default class NetworkFile {
   public addContract(
     alias: string,
     instance: Contract,
-    {
-      warnings,
-      types,
-      storage,
-    }: { warnings?: any; types?: any; storage?: any } = {},
+    { warnings, types, storage }: { warnings?: any; types?: any; storage?: any } = {},
   ): void {
     this.setContract(alias, {
       address: instance.address,
@@ -481,20 +437,12 @@ export default class NetworkFile {
     delete this.data.contracts[alias];
   }
 
-  public setProxies(
-    packageName: string,
-    alias: string,
-    value: ProxyInterface[],
-  ): void {
+  public setProxies(packageName: string, alias: string, value: ProxyInterface[]): void {
     const fullname = toContractFullName(packageName, alias);
     this.data.proxies[fullname] = value;
   }
 
-  public addProxy(
-    thepackage: string,
-    alias: string,
-    info: ProxyInterface,
-  ): void {
+  public addProxy(thepackage: string, alias: string, info: ProxyInterface): void {
     const fullname = toContractFullName(thepackage, alias);
     if (!this.data.proxies[fullname]) this.data.proxies[fullname] = [];
     this.data.proxies[fullname].push(info);
@@ -505,24 +453,16 @@ export default class NetworkFile {
     const index = this._indexOfProxy(fullname, address);
     if (index < 0) return;
     this.data.proxies[fullname].splice(index, 1);
-    if (this._proxiesOf(fullname).length === 0)
-      delete this.data.proxies[fullname];
+    if (this._proxiesOf(fullname).length === 0) delete this.data.proxies[fullname];
   }
 
   public updateProxy(
-    {
-      package: proxyPackageName,
-      contract: proxyContractName,
-      address: proxyAddress,
-    }: ProxyInterface,
+    { package: proxyPackageName, contract: proxyContractName, address: proxyAddress }: ProxyInterface,
     fn: (...args: any[]) => any,
   ): void {
     const fullname = toContractFullName(proxyPackageName, proxyContractName);
     const index = this._indexOfProxy(fullname, proxyAddress);
-    if (index === -1)
-      throw Error(
-        `Proxy ${fullname} at ${proxyAddress} not found in network file`,
-      );
+    if (index === -1) throw Error(`Proxy ${fullname} at ${proxyAddress} not found in network file`);
     this.data.proxies[fullname][index] = fn(this.data.proxies[fullname][index]);
   }
 
@@ -547,18 +487,10 @@ export default class NetworkFile {
     }
   }
 
-  public static getExistingFilePath(
-    network: string,
-    dir: string = process.cwd(),
-    ...paths: string[]
-  ): string {
+  public static getExistingFilePath(network: string, dir: string = process.cwd(), ...paths: string[]): string {
     // TODO-v3: remove legacy project file support
     // Prefer the new format over the old one
-    return [
-      ...paths,
-      `${dir}/zos.${network}.json`,
-      `${dir}/${OPEN_ZEPPELIN_FOLDER}/${network}.json`,
-    ].find(fs.exists);
+    return [...paths, `${dir}/zos.${network}.json`, `${dir}/${OPEN_ZEPPELIN_FOLDER}/${network}.json`].find(fs.exists);
   }
 
   private hasChanged(): boolean {

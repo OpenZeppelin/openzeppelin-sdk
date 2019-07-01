@@ -7,8 +7,7 @@ export const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000';
 // TS-TODO: Web3 typings? => contract.
 export function toAddress(contractOrAddress: string | any): string {
   if (isEmpty(contractOrAddress)) throw Error(`Contract or address expected`);
-  else if (isString(contractOrAddress))
-    return utils.toChecksumAddress(contractOrAddress);
+  else if (isString(contractOrAddress)) return utils.toChecksumAddress(contractOrAddress);
   else return utils.toChecksumAddress(contractOrAddress.address);
 }
 

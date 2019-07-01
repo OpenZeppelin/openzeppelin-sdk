@@ -40,10 +40,7 @@ async function gatherDependencyTree(
    * @param file File in a depedency that should now be traversed
    * @returns An absolute path for the requested file
    */
-  async function dfs(file: {
-    searchCwd: string;
-    uri: string;
-  }): Promise<string> {
+  async function dfs(file: { searchCwd: string; uri: string }): Promise<string> {
     const url = await resolver.resolve(file.uri, file.searchCwd);
     if (alreadyImported.has(url)) {
       return url;
@@ -71,9 +68,7 @@ async function gatherDependencyTree(
     return resolvedFile.url;
   }
 
-  await Promise.all(
-    roots.map(what => dfs({ searchCwd: workingDir, uri: what })),
-  );
+  await Promise.all(roots.map(what => dfs({ searchCwd: workingDir, uri: what })));
 
   return result;
 }
@@ -111,10 +106,7 @@ export async function gatherSources(
   while (queue.length > 0) {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const fileData = queue.shift()!;
-    const resolvedFile: ImportFile = await resolveImportFile(
-      resolver,
-      fileData,
-    );
+    const resolvedFile: ImportFile = await resolveImportFile(resolver, fileData);
     const foundImports = getImports(resolvedFile.source);
 
     // if imported path starts with '.' we assume it's relative and return it's
@@ -199,9 +191,7 @@ async function resolveImportFile(
       const cwd = pathSys.relative(process.cwd(), fileData.cwd);
       const cwdDesc = cwd.length === 0 ? 'the project' : `folder ${cwd}`;
       const relativeTo = pathSys.relative(process.cwd(), fileData.relativeTo);
-      err.message = `Could not find file ${
-        fileData.file
-      } in ${cwdDesc} (imported from ${relativeTo})`;
+      err.message = `Could not find file ${fileData.file} in ${cwdDesc} (imported from ${relativeTo})`;
     }
     throw err;
   }
@@ -221,9 +211,7 @@ export async function gatherSourcesAndCanonizeImports(
   resolver: ResolverEngine<ImportFile>,
 ): Promise<ImportFile[]> {
   function canonizeFile(file: ImportTreeNode) {
-    file.imports.forEach(
-      i => (file.source = file.source.replace(i.uri, i.url)),
-    );
+    file.imports.forEach(i => (file.source = file.source.replace(i.uri, i.url)));
   }
 
   const sources = await gatherDependencyTree(roots, workingDir, resolver);

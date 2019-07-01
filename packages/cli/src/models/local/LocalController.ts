@@ -27,50 +27,26 @@ const DEFAULT_VERSION = '0.1.0';
 export default class LocalController {
   public projectFile: ProjectFile;
 
-  public constructor(
-    projectFile: ProjectFile = new ProjectFile(),
-    init: boolean = false,
-  ) {
+  public constructor(projectFile: ProjectFile = new ProjectFile(), init: boolean = false) {
     if (!init && !projectFile.exists()) {
-      throw Error(
-        `ZeppelinOS file ${
-          projectFile.filePath
-        } not found. Run 'zos init' first to initialize the project.`,
-      );
+      throw Error(`ZeppelinOS file ${projectFile.filePath} not found. Run 'zos init' first to initialize the project.`);
     }
     this.projectFile = projectFile;
   }
 
-  public init(
-    name: string,
-    version: string,
-    force: boolean = false,
-    publish: boolean = false,
-  ): void | never {
-    if (!name)
-      throw Error('A project name must be provided to initialize the project.');
+  public init(name: string, version: string, force: boolean = false, publish: boolean = false): void | never {
+    if (!name) throw Error('A project name must be provided to initialize the project.');
     this.initProjectFile(name, version, force, publish);
     Session.ignoreFile();
     ConfigManager.initialize();
   }
 
-  public initProjectFile(
-    name: string,
-    version: string,
-    force: boolean = false,
-    publish: boolean,
-  ): void | never {
+  public initProjectFile(name: string, version: string, force: boolean = false, publish: boolean): void | never {
     if (this.projectFile.exists() && !force) {
-      throw Error(
-        `Cannot overwrite existing file ${this.projectFile.filePath}`,
-      );
+      throw Error(`Cannot overwrite existing file ${this.projectFile.filePath}`);
     }
     if (this.projectFile.name && !force) {
-      throw Error(
-        `Cannot initialize already initialized package ${
-          this.projectFile.name
-        }`,
-      );
+      throw Error(`Cannot initialize already initialized package ${this.projectFile.name}`);
     }
     this.projectFile.name = name;
     this.projectFile.version = version || DEFAULT_VERSION;
@@ -93,11 +69,7 @@ export default class LocalController {
       __filename,
       'add',
       `add-${contractAlias}`,
-      `Adding ${
-        contractAlias === contractName
-          ? contractAlias
-          : `${contractAlias}:${contractName}`
-      }`,
+      `Adding ${contractAlias === contractName ? contractAlias : `${contractAlias}:${contractName}`}`,
     );
     this.projectFile.addContract(contractAlias, contractName);
     Loggy.succeed(`add-${contractAlias}`, `Added contract ${contractAlias}`);
@@ -117,17 +89,9 @@ export default class LocalController {
         `Contract ${contractAlias} to be removed was not found`,
       );
     } else {
-      Loggy.spin(
-        __filename,
-        'remove',
-        `remove-${contractAlias}`,
-        `Removing ${contractAlias}`,
-      );
+      Loggy.spin(__filename, 'remove', `remove-${contractAlias}`, `Removing ${contractAlias}`);
       this.projectFile.unsetContract(contractAlias);
-      Loggy.succeed(
-        `remove-${contractAlias}`,
-        `Removed contract ${contractAlias}`,
-      );
+      Loggy.succeed(`remove-${contractAlias}`, `Removed contract ${contractAlias}`);
     }
   }
 
@@ -137,27 +101,18 @@ export default class LocalController {
       throw Error(`Contract ${contractName} not found in path ${path}`);
     }
     if (!this.hasBytecode(path)) {
-      throw Error(
-        `Contract ${contractName} is abstract and cannot be deployed.`,
-      );
+      throw Error(`Contract ${contractName} is abstract and cannot be deployed.`);
     }
   }
 
   // Contract model
   public validateAll(): boolean {
     const buildArtifacts = getBuildArtifacts();
-    return every(
-      map(this.projectFile.contractAliases, contractAlias =>
-        this.validate(contractAlias, buildArtifacts),
-      ),
-    );
+    return every(map(this.projectFile.contractAliases, contractAlias => this.validate(contractAlias, buildArtifacts)));
   }
 
   // Contract model
-  public validate(
-    contractAlias: string,
-    buildArtifacts?: BuildArtifacts,
-  ): boolean {
+  public validate(contractAlias: string, buildArtifacts?: BuildArtifacts): boolean {
     const contractName = this.projectFile.contract(contractAlias);
     const contract = Contracts.getFromLocal(contractName || contractAlias);
     const warnings = validateContract(contract, {}, buildArtifacts);
@@ -173,9 +128,7 @@ export default class LocalController {
   }
 
   // Contract model
-  public getContractSourcePath(
-    contractAlias: string,
-  ): { sourcePath: string; compilerVersion: string } | never {
+  public getContractSourcePath(contractAlias: string): { sourcePath: string; compilerVersion: string } | never {
     const contractName = this.projectFile.contract(contractAlias);
     if (contractName) {
       const contractDataPath = Contracts.getLocalPath(contractName);
@@ -191,28 +144,21 @@ export default class LocalController {
   }
 
   // DependencyController
-  public async linkDependencies(
-    dependencies: string[],
-    installDependencies: boolean = false,
-  ): Promise<void> {
+  public async linkDependencies(dependencies: string[], installDependencies: boolean = false): Promise<void> {
     const linkedDependencies = await Promise.all(
       dependencies.map(
         async (depNameVersion: string): Promise<string> => {
           const dependency = installDependencies
             ? await Dependency.install(depNameVersion)
             : Dependency.fromNameWithVersion(depNameVersion);
-          this.projectFile.setDependency(
-            dependency.name,
-            dependency.requirement as string,
-          );
+          this.projectFile.setDependency(dependency.name, dependency.requirement as string);
           return dependency.name;
         },
       ),
     );
 
     if (linkedDependencies.length > 0) {
-      const label =
-        linkedDependencies.length === 1 ? 'Dependency' : 'Dependencies';
+      const label = linkedDependencies.length === 1 ? 'Dependency' : 'Dependencies';
       Loggy.noSpin(
         __filename,
         'linkDependencies',
@@ -231,8 +177,7 @@ export default class LocalController {
     });
 
     if (unlinkedDependencies.length > 0) {
-      const label =
-        unlinkedDependencies.length === 1 ? 'Dependency' : 'Dependencies';
+      const label = unlinkedDependencies.length === 1 ? 'Dependency' : 'Dependencies';
       Loggy.noSpin(
         __filename,
         'linkDependencies',
@@ -242,11 +187,7 @@ export default class LocalController {
     }
   }
 
-  public onNetwork(
-    network: string,
-    txParams: TxParams,
-    networkFile?: NetworkFile,
-  ): NetworkController {
+  public onNetwork(network: string, txParams: TxParams, networkFile?: NetworkFile): NetworkController {
     return new NetworkController(network, txParams, networkFile);
   }
 }

@@ -13,7 +13,6 @@ export default async function init({
 }: InitParams): Promise<void | never> {
   const controller = new LocalController(projectFile, true);
   controller.init(name, version, force, publish);
-  if (dependencies.length !== 0)
-    await controller.linkDependencies(dependencies, installDependencies);
+  if (dependencies.length !== 0) await controller.linkDependencies(dependencies, installDependencies);
   controller.writePackage();
 }

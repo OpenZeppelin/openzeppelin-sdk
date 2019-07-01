@@ -26,9 +26,7 @@ export default class PackageProject extends BasePackageProject {
     version = semanticVersionToString(version);
 
     try {
-      thepackage = packageAddress
-        ? Package.fetch(packageAddress, txParams)
-        : await Package.deploy(txParams);
+      thepackage = packageAddress ? Package.fetch(packageAddress, txParams) : await Package.deploy(txParams);
       directory = (await thepackage.hasVersion(version))
         ? await thepackage.getDirectory(version)
         : await thepackage.newVersion(version);
@@ -42,21 +40,13 @@ export default class PackageProject extends BasePackageProject {
     }
   }
 
-  public constructor(
-    thepackage: Package,
-    version: string = '0.1.0',
-    txParams: TxParams = {},
-  ) {
+  public constructor(thepackage: Package, version: string = '0.1.0', txParams: TxParams = {}) {
     super(txParams);
     this.package = thepackage;
     this.version = semanticVersionToString(version);
   }
 
-  public async getImplementation({
-    contractName,
-  }: {
-    contractName: string;
-  }): Promise<string> {
+  public async getImplementation({ contractName }: { contractName: string }): Promise<string> {
     const directory: ImplementationDirectory = await this.getCurrentDirectory();
     return directory.getImplementation(contractName);
   }

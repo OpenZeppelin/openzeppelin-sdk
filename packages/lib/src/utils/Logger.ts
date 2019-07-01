@@ -79,11 +79,7 @@ export const Loggy: { [key: string]: any } = {
     this._log(reference);
   },
 
-  update(
-    reference: string,
-    { spinnerAction, text }: UpdateParams,
-    file?: string,
-  ): void {
+  update(reference: string, { spinnerAction, text }: UpdateParams, file?: string): void {
     if (this.logs[reference]) {
       const args = pickBy({ file, text, spinnerAction });
       this.logs[reference] = { ...this.logs[reference], ...args };
@@ -118,25 +114,17 @@ export const Loggy: { [key: string]: any } = {
 
   _log(reference: string): void {
     if (this.isSilent) return;
-    const { file, fnName, text, spinnerAction, logLevel, logType } = this.logs[
-      reference
-    ];
+    const { file, fnName, text, spinnerAction, logLevel, logType } = this.logs[reference];
     const color = this._getColorFor(logType);
     if (this.isVerbose) {
       const location = `${path.basename(file)}#${fnName}`;
-      const message = `[${new Date().toISOString()}@${location}] <${this._actionToText(
-        spinnerAction,
-      )}> ${text}`;
+      const message = `[${new Date().toISOString()}@${location}] <${this._actionToText(spinnerAction)}> ${text}`;
       const coloredMessage = color ? chalk.keyword(color)(message) : message;
       console.error(coloredMessage);
     } else if (logLevel === LogLevel.Normal) {
-      const options = color
-        ? { text, status: spinnerAction, color }
-        : { text, status: spinnerAction };
+      const options = color ? { text, status: spinnerAction, color } : { text, status: spinnerAction };
 
-      !spinners.pick(reference)
-        ? spinners.add(reference, options)
-        : spinners.update(reference, options);
+      !spinners.pick(reference) ? spinners.add(reference, options) : spinners.update(reference, options);
     }
   },
 
@@ -183,55 +171,30 @@ const logTypes = {
 };
 
 Object.keys(spinnerActions).forEach(spinnerAction => {
-  Loggy.onVerbose = (
-    file: string,
-    fnName: string,
-    reference: string,
-    text: string,
-  ): void =>
+  Loggy.onVerbose = (file: string, fnName: string, reference: string, text: string): void =>
     Loggy.add(file, fnName, reference, text, {
       logLevel: LogLevel.Verbose,
     });
 
-  Loggy[spinnerAction] = (
-    file: string,
-    fnName: string,
-    reference: string,
-    text: string,
-  ): void =>
+  Loggy[spinnerAction] = (file: string, fnName: string, reference: string, text: string): void =>
     Loggy.add(file, fnName, reference, text, {
       spinnerAction: spinnerActions[spinnerAction],
     });
 
-  Loggy[spinnerAction].onVerbose = (
-    file: string,
-    fnName: string,
-    reference: string,
-    text: string,
-  ): void =>
+  Loggy[spinnerAction].onVerbose = (file: string, fnName: string, reference: string, text: string): void =>
     Loggy.add(file, fnName, reference, text, {
       spinnerAction: spinnerActions[spinnerAction],
       logLevel: LogLevel.Verbose,
     });
 
   Object.keys(logTypes).forEach(logType => {
-    Loggy[spinnerAction][logType] = (
-      file: string,
-      fnName: string,
-      reference: string,
-      text: string,
-    ): void =>
+    Loggy[spinnerAction][logType] = (file: string, fnName: string, reference: string, text: string): void =>
       Loggy.add(file, fnName, reference, text, {
         spinnerAction: spinnerActions[spinnerAction],
         logType: logTypes[logType],
       });
 
-    Loggy[spinnerAction][logType].onVerbose = (
-      file: string,
-      fnName: string,
-      reference: string,
-      text: string,
-    ): void =>
+    Loggy[spinnerAction][logType].onVerbose = (file: string, fnName: string, reference: string, text: string): void =>
       Loggy.add(file, fnName, reference, text, {
         spinnerAction: spinnerActions[spinnerAction],
         logType: logTypes[logType],

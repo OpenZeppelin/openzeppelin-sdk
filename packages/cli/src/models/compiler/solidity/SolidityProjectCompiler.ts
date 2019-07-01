@@ -19,22 +19,13 @@ import {
 import { ImportsFsEngine } from '@resolver-engine/imports-fs';
 import { gatherSources } from './ResolverEngineGatherer';
 import { SolcBuild } from './CompilerProvider';
-import {
-  compilerVersionsMatch,
-  compilerSettingsMatch,
-} from '../../../utils/solidity';
+import { compilerVersionsMatch, compilerSettingsMatch } from '../../../utils/solidity';
 import { tryFunc } from '../../../utils/try';
 
-export async function compileProject(
-  options: ProjectCompilerOptions = {},
-): Promise<ProjectCompileResult> {
+export async function compileProject(options: ProjectCompilerOptions = {}): Promise<ProjectCompileResult> {
   const inputDir = options.inputDir || Contracts.getLocalContractsDir();
   const outputDir = options.outputDir || Contracts.getLocalBuildDir();
-  const projectCompiler = new SolidityProjectCompiler(
-    inputDir,
-    outputDir,
-    options,
-  );
+  const projectCompiler = new SolidityProjectCompiler(inputDir, outputDir, options);
   await projectCompiler.call();
   return {
     contracts: projectCompiler.contracts,
@@ -62,11 +53,7 @@ class SolidityProjectCompiler {
   public compilerVersion: SolcBuild;
   public options: CompilerOptions;
 
-  public constructor(
-    inputDir: string,
-    outputDir: string,
-    options: CompilerOptions = {},
-  ) {
+  public constructor(inputDir: string, outputDir: string, options: CompilerOptions = {}) {
     this.inputDir = inputDir;
     this.outputDir = outputDir;
     this.roots = [];
@@ -80,24 +67,14 @@ class SolidityProjectCompiler {
     await this._loadDependencies();
 
     if (this.contracts.length === 0) {
-      Loggy.noSpin(
-        __filename,
-        'call',
-        'compile-contracts',
-        'No contracts found to compile.',
-      );
+      Loggy.noSpin(__filename, 'call', 'compile-contracts', 'No contracts found to compile.');
       return;
     }
 
     await this._resolveCompilerVersion();
 
     if (!this._shouldCompile()) {
-      Loggy.noSpin(
-        __filename,
-        'call',
-        `compile-contracts`,
-        'Nothing to compile, all contracts are up to date.',
-      );
+      Loggy.noSpin(__filename, 'call', `compile-contracts`, 'Nothing to compile, all contracts are up to date.');
       return;
     }
 
@@ -105,21 +82,13 @@ class SolidityProjectCompiler {
       __filename,
       'call',
       'compile-contracts',
-      `Compiling contracts with solc ${this.compilerVersion.version} (${
-        this.compilerVersion.build
-      })`,
+      `Compiling contracts with solc ${this.compilerVersion.version} (${this.compilerVersion.build})`,
     );
-    this.compilerOutput = await compileWith(
-      this.compilerVersion,
-      this.contracts,
-      this.options,
-    );
+    this.compilerOutput = await compileWith(this.compilerVersion, this.contracts, this.options);
     this._writeOutput();
     Loggy.succeed(
       'compile-contracts',
-      `Compiled contracts with solc ${this.compilerVersion.version} (${
-        this.compilerVersion.build
-      })`,
+      `Compiled contracts with solc ${this.compilerVersion.version} (${this.compilerVersion.build})`,
     );
   }
 
@@ -136,27 +105,18 @@ class SolidityProjectCompiler {
   }
 
   private async _loadDependencies() {
-    const importFiles = await gatherSources(
-      this.roots,
-      this.inputDir,
-      ImportsFsEngine(),
-    );
+    const importFiles = await gatherSources(this.roots, this.inputDir, ImportsFsEngine());
     const cwd = process.cwd();
     this.contracts = importFiles.map(file => ({
       fileName: path.basename(file.url),
-      filePath: path.isAbsolute(file.url)
-        ? path.relative(cwd, file.url)
-        : file.url,
+      filePath: path.isAbsolute(file.url) ? path.relative(cwd, file.url) : file.url,
       source: file.source,
       lastModified: tryFunc(() => statSync(file.url).mtimeMs),
     }));
   }
 
   private async _resolveCompilerVersion() {
-    this.compilerVersion = await resolveCompilerVersion(
-      this.contracts,
-      this.options,
-    );
+    this.compilerVersion = await resolveCompilerVersion(this.contracts, this.options);
   }
 
   private _shouldCompile(): boolean {
@@ -168,12 +128,9 @@ class SolidityProjectCompiler {
 
     // We pick a single artifact (the most recent one) to get the version it was compiled with
     const latestArtifact = maxBy(artifactsWithMtimes, 'mtime');
-    const latestSchema =
-      latestArtifact && readJsonSync(latestArtifact.artifact);
-    const artifactCompiledVersion =
-      latestSchema && latestSchema.compiler.version;
-    const artifactSettings =
-      latestSchema && pick(latestSchema.compiler, 'evmVersion', 'optimizer');
+    const latestSchema = latestArtifact && readJsonSync(latestArtifact.artifact);
+    const artifactCompiledVersion = latestSchema && latestSchema.compiler.version;
+    const artifactSettings = latestSchema && pick(latestSchema.compiler, 'evmVersion', 'optimizer');
 
     // Build current settings based on defaults
     const currentSettings = {
@@ -183,12 +140,8 @@ class SolidityProjectCompiler {
     };
 
     // Gather artifacts vs sources modified times
-    const maxArtifactsMtimes = max(
-      artifactsWithMtimes.map(({ mtime }) => mtime),
-    );
-    const maxSourcesMtimes = max(
-      this.contracts.map(({ lastModified }) => lastModified),
-    );
+    const maxArtifactsMtimes = max(artifactsWithMtimes.map(({ mtime }) => mtime));
+    const maxSourcesMtimes = max(this.contracts.map(({ lastModified }) => lastModified));
 
     // Compile if there are no previous artifacts, or no mtimes could be collected for sources,
     // or sources were modified after artifacts, or compiler version changed, or compiler settings changed
@@ -197,10 +150,7 @@ class SolidityProjectCompiler {
       !maxSourcesMtimes ||
       maxArtifactsMtimes < maxSourcesMtimes ||
       !artifactCompiledVersion ||
-      !compilerVersionsMatch(
-        artifactCompiledVersion,
-        this.compilerVersion.longVersion,
-      ) ||
+      !compilerVersionsMatch(artifactCompiledVersion, this.compilerVersion.longVersion) ||
       !compilerSettingsMatch(currentSettings, artifactSettings)
     );
   }
