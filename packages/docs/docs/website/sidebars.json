@@ -23,7 +23,6 @@
       "configuration",
       "architecture",
       "pattern",
-      "token_mechanics",
       "whitepaper"
     ]
   },
@@ -46,11 +45,15 @@
       "cli_remove",
       "cli_session",
       "cli_set-admin",
-      "cli_status",
       "cli_unlink",
-      "cli_update",
+      "cli_upgrade",
       "cli_verify",
-      "cli_unpack"
+      "cli_unpack",
+      "cli_transfer",
+      "cli_balance",
+      "cli_send-tx",
+      "cli_call",
+      "cli_compile"
     ],
     "APPLICATION": [
       "application_App",

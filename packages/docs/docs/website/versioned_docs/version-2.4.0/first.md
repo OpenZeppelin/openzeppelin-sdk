@@ -1,6 +1,7 @@
 ---
-id: first
+id: version-2.4.0-first
 title: Your first project
+original_id: first
 ---
 
 This tutorial will get you started using ZeppelinOS. We will create a new project with a simple contract, deploy it to a development network, interact with it from the terminal, and then upgrade it.
