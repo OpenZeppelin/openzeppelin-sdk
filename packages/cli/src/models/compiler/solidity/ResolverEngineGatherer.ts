@@ -1,4 +1,4 @@
-import { ResolverEngine } from '@resolver-engine/core';
+import { ResolverEngine } from '@openzeppelin/resolver-engine-core';
 import pathSys from 'path';
 import urlSys from 'url';
 import { getImports } from '../../../utils/solidity';
