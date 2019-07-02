@@ -100,7 +100,7 @@ export async function gatherSources(
   const alreadyImported = new Set();
 
   if (workingDir !== '') {
-    workingDir += '/';
+    workingDir += pathSys.sep;
   }
 
   const absoluteRoots = roots.map(what => resolvePath(workingDir, what));
