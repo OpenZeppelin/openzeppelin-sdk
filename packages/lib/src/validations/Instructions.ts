@@ -16,22 +16,11 @@ export function hasDelegateCall(contract: Contract): boolean {
   ]);
 }
 
-function hasTypeIdentifier(
-  contract: Contract,
-  typeIdentifiers: string[],
-): boolean {
-  for (const node of contract.schema.ast.nodes.filter(
-    n => n.name === contract.schema.contractName,
-  )) {
+function hasTypeIdentifier(contract: Contract, typeIdentifiers: string[]): boolean {
+  for (const node of contract.schema.ast.nodes.filter(n => n.name === contract.schema.contractName)) {
     if (hasKeyValue(node, 'typeIdentifier', typeIdentifiers)) return true;
     for (const baseContract of node.baseContracts || []) {
-      if (
-        hasTypeIdentifier(
-          Contracts.getFromLocal(baseContract.baseName.name),
-          typeIdentifiers,
-        )
-      )
-        return true;
+      if (hasTypeIdentifier(Contracts.getFromLocal(baseContract.baseName.name), typeIdentifiers)) return true;
     }
   }
   return false;
@@ -41,11 +30,7 @@ function hasKeyValue(data: any, key: string, values: string[]): boolean {
   if (!data) return false;
   if (values.includes(data[key])) return true;
   for (const childKey in data) {
-    if (
-      typeof data[childKey] === 'object' &&
-      hasKeyValue(data[childKey], key, values)
-    )
-      return true;
+    if (typeof data[childKey] === 'object' && hasKeyValue(data[childKey], key, values)) return true;
   }
   return false;
 }

@@ -23,9 +23,7 @@ export function bytecodeDigest(rawBytecode: string): string {
 // the format: __LibName__(...)__ it will fail to get the library names.
 export function getSolidityLibNames(bytecode: string): string[] {
   const libs: string[] = bytecode.match(/__[A-Za-z0-9_]{36}__/g);
-  return libs
-    ? libs.map((lib: string) => lib.replace(/^__/, '').replace(/_*$/, ''))
-    : [];
+  return libs ? libs.map((lib: string) => lib.replace(/^__/, '').replace(/_*$/, '')) : [];
 }
 
 // Tells whether a bytecode has unlinked libraries or not
@@ -54,11 +52,7 @@ export function tryRemoveMetadata(bytecode: string): string {
   try {
     cbor.decode(Buffer.from(metadata, 'hex'));
   } catch (err) {
-    Loggy.noSpin.warn(
-      __filename,
-      'tryRemoveMetadata',
-      `Error parsing contract metadata: ${err.message}. Ignoring.`,
-    );
+    Loggy.noSpin.warn(__filename, 'tryRemoveMetadata', `Error parsing contract metadata: ${err.message}. Ignoring.`);
 
     return bytecode;
   }
@@ -68,14 +62,8 @@ export function tryRemoveMetadata(bytecode: string): string {
 }
 
 // Replaces the solidity library address inside its bytecode with zeros
-export function replaceSolidityLibAddress(
-  bytecode: string,
-  address: string,
-): string {
-  return bytecode.replace(
-    address.replace(/^0x/, ''),
-    ZERO_ADDRESS.replace(/^0x/, ''),
-  );
+export function replaceSolidityLibAddress(bytecode: string, address: string): string {
+  return bytecode.replace(address.replace(/^0x/, ''), ZERO_ADDRESS.replace(/^0x/, ''));
 }
 
 // Verifies if a bytecode represents a solidity library.

@@ -3,12 +3,7 @@ import isUndefined from 'lodash.isundefined';
 import isNull from 'lodash.isnull';
 
 import { Contract, Transactions, Loggy, ZWeb3, TxParams, ABI } from 'zos-lib';
-import {
-  isValidUnit,
-  prettifyTokenAmount,
-  toWei,
-  fromWei,
-} from '../../utils/units';
+import { isValidUnit, prettifyTokenAmount, toWei, fromWei } from '../../utils/units';
 import { ERC20_PARTIAL_ABI } from '../../utils/constants';
 import { allPromisesOrError } from '../../utils/async';
 import ContractManager from '../local/ContractManager';
@@ -29,11 +24,7 @@ export default class TransactionController {
   public projectFile: ProjectFile;
   public networkFile: NetworkFile;
 
-  public constructor(
-    txParams?: TxParams,
-    network?: string,
-    networkFile?: NetworkFile,
-  ) {
+  public constructor(txParams?: TxParams, network?: string, networkFile?: NetworkFile) {
     if (txParams) this.txParams = txParams;
     if (!networkFile) {
       this.projectFile = new ProjectFile();
@@ -44,44 +35,20 @@ export default class TransactionController {
     }
   }
 
-  public async transfer(
-    to: string,
-    amount: string,
-    unit: string,
-  ): Promise<void | never> {
+  public async transfer(to: string, amount: string, unit: string): Promise<void | never> {
     if (!isValidUnit(unit)) {
-      throw Error(
-        `Invalid unit ${unit}. Please try with: wei, kwei, gwei, milli, ether or any other valid unit.`,
-      );
+      throw Error(`Invalid unit ${unit}. Please try with: wei, kwei, gwei, milli, ether or any other valid unit.`);
     }
     const validUnit = unit.toLowerCase();
     const value = toWei(amount, validUnit);
-    Loggy.spin(
-      __filename,
-      'transfer',
-      'transfer-funds',
-      `Sending ${amount} ${validUnit} to ${to}`,
-    );
-    const { transactionHash } = await Transactions.sendRawTransaction(
-      to,
-      { value },
-      this.txParams,
-    );
-    Loggy.succeed(
-      'transfer-funds',
-      `Funds sent. Transaction hash: ${transactionHash}`,
-    );
+    Loggy.spin(__filename, 'transfer', 'transfer-funds', `Sending ${amount} ${validUnit} to ${to}`);
+    const { transactionHash } = await Transactions.sendRawTransaction(to, { value }, this.txParams);
+    Loggy.succeed('transfer-funds', `Funds sent. Transaction hash: ${transactionHash}`);
   }
 
-  public async getBalanceOf(
-    accountAddress: string,
-    contractAddress?: string,
-  ): Promise<string | never> {
+  public async getBalanceOf(accountAddress: string, contractAddress?: string): Promise<string | never> {
     if (contractAddress) {
-      const { balance, tokenSymbol, tokenDecimals } = await this.getTokenInfo(
-        accountAddress,
-        contractAddress,
-      );
+      const { balance, tokenSymbol, tokenDecimals } = await this.getTokenInfo(accountAddress, contractAddress);
       Loggy.noSpin(
         __filename,
         'getBalanceOf',
@@ -92,12 +59,7 @@ export default class TransactionController {
       return balance;
     } else {
       const balance = await ZWeb3.getBalance(accountAddress);
-      Loggy.noSpin(
-        __filename,
-        'getBalanceOf',
-        'balance-of',
-        `Balance: ${fromWei(balance, 'ether')} ETH`,
-      );
+      Loggy.noSpin(__filename, 'getBalanceOf', 'balance-of', `Balance: ${fromWei(balance, 'ether')} ETH`);
 
       return balance;
     }
@@ -108,11 +70,7 @@ export default class TransactionController {
     methodName: string,
     methodArgs: string[],
   ): Promise<string[] | object | string | never> {
-    const { method, contract } = this.getContractAndMethod(
-      proxyAddress,
-      methodName,
-      methodArgs,
-    );
+    const { method, contract } = this.getContractAndMethod(proxyAddress, methodName, methodArgs);
     try {
       Loggy.spin(
         __filename,
@@ -125,65 +83,33 @@ export default class TransactionController {
       });
       const parsedResult = this.parseFunctionCallResult(result);
 
-      isNull(parsedResult) ||
-      isUndefined(parsedResult) ||
-      parsedResult === '()' ||
-      parsedResult.length === 0
-        ? Loggy.succeed(
-            'call-contract-method',
-            `Method '${methodName}' returned empty.`,
-          )
-        : Loggy.succeed(
-            'call-contract-method',
-            `Method '${methodName}' returned: ${parsedResult}`,
-          );
+      isNull(parsedResult) || isUndefined(parsedResult) || parsedResult === '()' || parsedResult.length === 0
+        ? Loggy.succeed('call-contract-method', `Method '${methodName}' returned empty.`)
+        : Loggy.succeed('call-contract-method', `Method '${methodName}' returned: ${parsedResult}`);
 
       return result;
     } catch (error) {
-      throw Error(
-        `Error while trying to call ${proxyAddress}#${methodName}. ${error}`,
-      );
+      throw Error(`Error while trying to call ${proxyAddress}#${methodName}. ${error}`);
     }
   }
 
-  public async sendTransaction(
-    proxyAddress: string,
-    methodName: string,
-    methodArgs: string[],
-  ): Promise<void | never> {
-    const { method, contract } = this.getContractAndMethod(
-      proxyAddress,
-      methodName,
-      methodArgs,
-    );
+  public async sendTransaction(proxyAddress: string, methodName: string, methodArgs: string[]): Promise<void | never> {
+    const { method, contract } = this.getContractAndMethod(proxyAddress, methodName, methodArgs);
     try {
-      Loggy.spin(
-        __filename,
-        'sendTransaction',
-        'send-transaction',
-        `Calling: ${callDescription(method, methodArgs)}`,
-      );
+      Loggy.spin(__filename, 'sendTransaction', 'send-transaction', `Calling: ${callDescription(method, methodArgs)}`);
       const { transactionHash, events } = await Transactions.sendTransaction(
         contract.methods[methodName],
         methodArgs,
         this.txParams,
       );
-      Loggy.succeed(
-        'send-transaction',
-        `Transaction successful. Transaction hash: ${transactionHash}`,
-      );
+      Loggy.succeed('send-transaction', `Transaction successful. Transaction hash: ${transactionHash}`);
       if (!isEmpty(events)) describeEvents(events);
     } catch (error) {
-      throw Error(
-        `Error while trying to send transaction to ${proxyAddress}. ${error}`,
-      );
+      throw Error(`Error while trying to send transaction to ${proxyAddress}. ${error}`);
     }
   }
 
-  private async getTokenInfo(
-    accountAddress: string,
-    contractAddress: string,
-  ): Promise<ERC20TokenInfo | never> {
+  private async getTokenInfo(accountAddress: string, contractAddress: string): Promise<ERC20TokenInfo | never> {
     let balance, tokenSymbol, tokenDecimals;
     try {
       const contract = ZWeb3.contract(ERC20_PARTIAL_ABI, contractAddress);
@@ -194,9 +120,7 @@ export default class TransactionController {
       ]);
     } catch (error) {
       if (!balance) {
-        error.message = `Could not get balance of ${accountAddress} in ${contractAddress}. Error: ${
-          error.message
-        }`;
+        error.message = `Could not get balance of ${accountAddress} in ${contractAddress}. Error: ${error.message}`;
         throw error;
       }
     }
@@ -209,16 +133,10 @@ export default class TransactionController {
     methodName: string,
     methodArgs: string[],
   ): { contract: Contract; method: any } | never {
-    if (!this.networkFile.hasProxies({ address }))
-      throw Error(`Proxy at address ${address} not found.`);
-    const {
-      package: packageName,
-      contract: contractName,
-    } = this.networkFile.getProxy(address);
+    if (!this.networkFile.hasProxies({ address })) throw Error(`Proxy at address ${address} not found.`);
+    const { package: packageName, contract: contractName } = this.networkFile.getProxy(address);
     const contractManager = new ContractManager(this.projectFile);
-    const contract = contractManager
-      .getContractClass(packageName, contractName)
-      .at(address);
+    const contract = contractManager.getContractClass(packageName, contractName).at(address);
     const { method } = buildCallData(contract, methodName, methodArgs);
 
     return { contract, method };

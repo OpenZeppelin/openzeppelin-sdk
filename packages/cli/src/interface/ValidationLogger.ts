@@ -21,10 +21,7 @@ export default class ValidationLogger {
   public contract: Contract;
   public existingContractInfo: ContractInterface;
 
-  public constructor(
-    contract: Contract,
-    existingContractInfo?: ContractInterface,
-  ) {
+  public constructor(contract: Contract, existingContractInfo?: ContractInterface) {
     this.contract = contract;
     this.existingContractInfo = existingContractInfo || {};
   }
@@ -33,10 +30,7 @@ export default class ValidationLogger {
     return this.contract.schema.contractName;
   }
 
-  public log(
-    validations: ValidationInfo,
-    buildArtifacts?: BuildArtifacts,
-  ): void {
+  public log(validations: ValidationInfo, buildArtifacts?: BuildArtifacts): void {
     const {
       hasConstructor,
       hasSelfDestruct,
@@ -53,10 +47,7 @@ export default class ValidationLogger {
     this.logHasInitialValuesInDeclarations(hasInitialValuesInDeclarations);
     this.logUncheckedVars(storageUncheckedVars);
     this.logUninitializedBaseContracts(uninitializedBaseContracts);
-    this.logStorageLayoutDiffs(
-      storageDiff,
-      getStorageLayout(this.contract, buildArtifacts),
-    );
+    this.logStorageLayoutDiffs(storageDiff, getStorageLayout(this.contract, buildArtifacts));
   }
 
   public logHasSelfDestruct(hasSelfDestruct: boolean): void {
@@ -85,9 +76,7 @@ export default class ValidationLogger {
     }
   }
 
-  public logHasInitialValuesInDeclarations(
-    hasInitialValuesInDeclarations: boolean,
-  ): void {
+  public logHasInitialValuesInDeclarations(hasInitialValuesInDeclarations: boolean): void {
     if (hasInitialValuesInDeclarations) {
       Loggy.noSpin.warn(
         __filename,
@@ -119,9 +108,7 @@ export default class ValidationLogger {
         __filename,
         'logUninitializedBaseContracts',
         `validation-uinitialized-base-contracts`,
-        `- Contract ${
-          this.contractName
-        } has base contracts ${uninitializedBaseContracts.join(
+        `- Contract ${this.contractName} has base contracts ${uninitializedBaseContracts.join(
           ', ',
         )} which are initializable, but their initialize methods are not called from ${
           this.contractName
@@ -133,9 +120,7 @@ export default class ValidationLogger {
   public logUncheckedVars(vars: any): void {
     if (isEmpty(vars)) return;
 
-    const varList = vars
-      .map(({ label, contract }) => `${label} (${contract})`)
-      .join(', ');
+    const varList = vars.map(({ label, contract }) => `${label} (${contract})`).join(', ');
     const variablesString = `Variable${vars.length === 1 ? '' : 's'}`;
     const containsString = `contain${vars.length === 1 ? 's' : ''}`;
     Loggy.noSpin.warn(
@@ -146,28 +131,21 @@ export default class ValidationLogger {
     );
   }
 
-  public logStorageLayoutDiffs(
-    storageDiff: Operation[],
-    updatedStorageInfo: StorageLayoutInfo,
-  ): void {
+  public logStorageLayoutDiffs(storageDiff: Operation[], updatedStorageInfo: StorageLayoutInfo): void {
     if (isEmpty(storageDiff)) return;
     const originalTypesInfo = this.existingContractInfo.types || {};
 
     storageDiff.forEach(({ updated, original, action }) => {
-      const updatedSourceCode =
-        updated && fs.exists(updated.path) && fs.read(updated.path);
+      const updatedSourceCode = updated && fs.exists(updated.path) && fs.read(updated.path);
       const updatedVarType = updated && updatedStorageInfo.types[updated.type];
-      const updatedVarSource =
-        updated &&
-        [updated.path, _srcToLineNumber(updated.path, updated.src)].join(':');
+      const updatedVarSource = updated && [updated.path, _srcToLineNumber(updated.path, updated.src)].join(':');
       const updatedVarDescription =
         updated &&
         (_tryGetSourceFragment(updatedSourceCode, updatedVarType.src) ||
           [updatedVarType.label, updated.label].join(' '));
 
       const originalVarType = original && originalTypesInfo[original.type];
-      const originalVarDescription =
-        original && [originalVarType.label, original.label].join(' ');
+      const originalVarDescription = original && [originalVarType.label, original.label].join(' ');
 
       switch (action) {
         case 'insert':
@@ -215,12 +193,10 @@ export default class ValidationLogger {
             __filename,
             'logStorageLayoutDiffs',
             `storage-layout-diffs`,
-            `- Variable '${originalVarDescription}' in contract ${
-              original.contract
-            } was renamed to ${updated.label} in ${updatedVarSource}.
-              ${updated.label} will have the value of ${
-              original.label
-            } after upgrading.`,
+            `- Variable '${originalVarDescription}' in contract ${original.contract} was renamed to ${
+              updated.label
+            } in ${updatedVarSource}.
+              ${updated.label} will have the value of ${original.label} after upgrading.`,
           );
           break;
         case 'typechange':
@@ -228,11 +204,9 @@ export default class ValidationLogger {
             __filename,
             'logStorageLayoutDiffs',
             `storage-layout-diffs`,
-            `- Variable '${original.label}' in contract ${
-              original.contract
-            } was changed from ${originalVarType.label} to ${
-              updatedVarType.label
-            } in ${updatedVarSource}. Avoid changing types of existing variables.`,
+            `- Variable '${original.label}' in contract ${original.contract} was changed from ${
+              originalVarType.label
+            } to ${updatedVarType.label} in ${updatedVarSource}. Avoid changing types of existing variables.`,
           );
           break;
         case 'replace':

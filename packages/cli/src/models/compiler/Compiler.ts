@@ -1,11 +1,7 @@
 import { execFile as callbackExecFile, ExecException } from 'child_process';
 import { Loggy } from 'zos-lib';
 import Truffle from '../config/TruffleConfig';
-import {
-  compileProject,
-  ProjectCompilerOptions,
-  ProjectCompileResult,
-} from './solidity/SolidityProjectCompiler';
+import { compileProject, ProjectCompilerOptions, ProjectCompileResult } from './solidity/SolidityProjectCompiler';
 import findUp from 'find-up';
 import ProjectFile from '../files/ProjectFile';
 import { promisify } from 'util';
@@ -28,28 +24,18 @@ export async function compile(
   // Validate compiler manager setting
   const { manager } = resolvedOptions;
   if (manager && manager !== 'truffle' && manager !== 'zos') {
-    throw new Error(
-      `Unknown compiler manager '${manager}' (valid values are 'zos' or 'truffle')`,
-    );
+    throw new Error(`Unknown compiler manager '${manager}' (valid values are 'zos' or 'truffle')`);
   }
 
   // We use truffle if set explicitly, or if nothing was set but there is a truffle.js file
-  const useTruffle =
-    manager === 'truffle' || (!manager && Truffle.isTruffleProject());
+  const useTruffle = manager === 'truffle' || (!manager && Truffle.isTruffleProject());
 
   // Compile! We use the exports syntax so we can stub them out during tests (nasty, but works!)
   const { compileWithTruffle, compileWithSolc } = exports;
-  const compilePromise = useTruffle
-    ? compileWithTruffle()
-    : compileWithSolc(resolvedOptions);
+  const compilePromise = useTruffle ? compileWithTruffle() : compileWithSolc(resolvedOptions);
   const compileResult = await compilePromise;
-  const compileVersion =
-    compileResult &&
-    compileResult.compilerVersion &&
-    compileResult.compilerVersion.version;
-  const compileVersionOptions = compileVersion
-    ? { version: compileVersion }
-    : null;
+  const compileVersion = compileResult && compileResult.compilerVersion && compileResult.compilerVersion.version;
+  const compileVersionOptions = compileVersion ? { version: compileVersion } : null;
 
   // If compiled successfully, write back compiler settings to project.json to persist them
   projectFile.setCompilerOptions({
@@ -62,9 +48,7 @@ export async function compile(
   state.alreadyCompiled = true;
 }
 
-export async function compileWithSolc(
-  compilerOptions?: ProjectCompilerOptions,
-): Promise<ProjectCompileResult> {
+export async function compileWithSolc(compilerOptions?: ProjectCompilerOptions): Promise<ProjectCompileResult> {
   return compileProject(compilerOptions);
 }
 
@@ -76,17 +60,12 @@ export async function compileWithTruffle(): Promise<void> {
     'Compiling contracts with Truffle, using settings from truffle.js file',
   );
   // Attempt to load global truffle if local was not found
-  const truffleBin: string =
-    (await findUp('node_modules/.bin/truffle')) || 'truffle';
+  const truffleBin: string = (await findUp('node_modules/.bin/truffle')) || 'truffle';
 
   let stdout: string, stderr: string;
   try {
     const args: object = { shell: true };
-    ({ stdout, stderr } = await execFile(
-      truffleBin,
-      ['compile', '--all'],
-      args,
-    ));
+    ({ stdout, stderr } = await execFile(truffleBin, ['compile', '--all'], args));
   } catch (error) {
     if (error.code === 127) {
       Loggy.fail(

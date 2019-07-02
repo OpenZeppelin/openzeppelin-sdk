@@ -10,10 +10,7 @@ export default class Proxy {
   private txParams: TxParams;
   public address: string;
 
-  public static at(
-    contractOrAddress: string | Contract,
-    txParams: TxParams = {},
-  ): Proxy {
+  public static at(contractOrAddress: string | Contract, txParams: TxParams = {}): Proxy {
     const ProxyContract = Contracts.getFromLib('AdminUpgradeabilityProxy');
     const contract = ProxyContract.at(toAddress(contractOrAddress));
     return new this(contract, txParams);
@@ -26,16 +23,8 @@ export default class Proxy {
     txParams: any = {},
   ): Promise<Proxy> {
     const ProxyContract = Contracts.getFromLib('AdminUpgradeabilityProxy');
-    const contractParams = [
-      toAddress(implementation),
-      toAddress(admin),
-      initData || Buffer.from(''),
-    ];
-    const contract = await Transactions.deployContract(
-      ProxyContract,
-      contractParams,
-      txParams,
-    );
+    const contractParams = [toAddress(implementation), toAddress(admin), initData || Buffer.from('')];
+    const contract = await Transactions.deployContract(ProxyContract, contractParams, txParams);
     return new this(contract, txParams);
   }
 
@@ -45,10 +34,7 @@ export default class Proxy {
     this.txParams = txParams;
   }
 
-  public async upgradeTo(
-    address: string,
-    migrateData: string | null,
-  ): Promise<any> {
+  public async upgradeTo(address: string, migrateData: string | null): Promise<any> {
     await this.checkAdmin();
     return migrateData
       ? Transactions.sendTransaction(
@@ -56,20 +42,12 @@ export default class Proxy {
           [toAddress(address), migrateData],
           this.txParams,
         )
-      : Transactions.sendTransaction(
-          this.contract.methods.upgradeTo,
-          [toAddress(address)],
-          this.txParams,
-        );
+      : Transactions.sendTransaction(this.contract.methods.upgradeTo, [toAddress(address)], this.txParams);
   }
 
   public async changeAdmin(newAdmin: string): Promise<any> {
     await this.checkAdmin();
-    return Transactions.sendTransaction(
-      this.contract.methods.changeAdmin,
-      [newAdmin],
-      this.txParams,
-    );
+    return Transactions.sendTransaction(this.contract.methods.changeAdmin, [newAdmin], this.txParams);
   }
 
   public async implementation(): Promise<string> {

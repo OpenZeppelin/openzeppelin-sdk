@@ -84,9 +84,7 @@ class SolcBinCompiler implements SolcCompiler {
   }
 }
 
-export async function resolveCompilerVersion(
-  requiredSemver: string | string[],
-): Promise<SolcBuild> {
+export async function resolveCompilerVersion(requiredSemver: string | string[]): Promise<SolcBuild> {
   // Create an array with all unique semver restrictions (dropping initial 'v' if set manually by the user)
   const requiredSemvers = uniq(compact(castArray(requiredSemver))).map(str =>
     str.startsWith('v') ? str.slice(1) : str,
@@ -102,12 +100,7 @@ export async function fetchCompiler(build: SolcBuild): Promise<SolcCompiler> {
   // Try local compiler and see if version matches
   const localVersion = await localCompilerVersion();
   if (localVersion && compilerVersionsMatch(localVersion, build.longVersion)) {
-    Loggy.onVerbose(
-      __filename,
-      'fetchCompiler',
-      'download-compiler',
-      `Using local solc compiler found`,
-    );
+    Loggy.onVerbose(__filename, 'fetchCompiler', 'download-compiler', `Using local solc compiler found`);
     return new SolcBinCompiler(localVersion);
   }
 
@@ -120,17 +113,13 @@ export async function fetchCompiler(build: SolcBuild): Promise<SolcCompiler> {
   return new SolcjsCompiler(compilerBinary);
 }
 
-export async function getCompiler(
-  requiredSemver: string | string[],
-): Promise<SolcCompiler> {
+export async function getCompiler(requiredSemver: string | string[]): Promise<SolcCompiler> {
   const version = await resolveCompilerVersion(requiredSemver);
   return fetchCompiler(version);
 }
 
 async function localCompilerVersion(): Promise<string | void> {
-  const output = await tryAwait(() =>
-    child.exec('solc --version', { env: SOLC_BIN_ENV }),
-  );
+  const output = await tryAwait(() => child.exec('solc --version', { env: SOLC_BIN_ENV }));
   if (!output) return null;
   const match = output.stdout.match(/^Version: ([^\s]+)/m);
   if (!match) return null;
@@ -140,11 +129,7 @@ async function localCompilerVersion(): Promise<string | void> {
 async function getAvailableCompilerVersions(): Promise<SolcList> {
   const localPath = path.join(SOLC_CACHE_PATH, 'list.json');
   await mkdirp(SOLC_CACHE_PATH);
-  if (
-    fs.existsSync(localPath) &&
-    Date.now() - +fs.statSync(localPath).mtime <
-      SOLC_LIST_EXPIRES_IN_SECONDS * 1000
-  ) {
+  if (fs.existsSync(localPath) && Date.now() - +fs.statSync(localPath).mtime < SOLC_LIST_EXPIRES_IN_SECONDS * 1000) {
     return readJson(localPath);
   }
 
@@ -170,13 +155,9 @@ async function getAvailableCompilerVersions(): Promise<SolcList> {
   }
 }
 
-async function getCompilerVersion(
-  requiredSemvers: string[],
-  solcList: SolcList,
-): Promise<SolcBuild> {
+async function getCompilerVersion(requiredSemvers: string[], solcList: SolcList): Promise<SolcBuild> {
   // Returns build from list given a version
-  const getBuild = (version: string) =>
-    solcList.builds.find(build => build.path === solcList.releases[version]);
+  const getBuild = (version: string) => solcList.builds.find(build => build.path === solcList.releases[version]);
 
   // Return latest release if there are no restrictions
   if (requiredSemvers.length === 0) return getBuild(solcList.latestRelease);
@@ -189,28 +170,16 @@ async function getCompilerVersion(
 
   // If user asked for a specific version, look for it
   if (requiredSemvers.length === 1) {
-    const build = reverse(solcList.builds).find(b =>
-      b.path.startsWith(`soljson-v${requiredSemvers[0]}`),
-    );
+    const build = reverse(solcList.builds).find(b => b.path.startsWith(`soljson-v${requiredSemvers[0]}`));
     if (build) return build;
   }
 
-  throw new Error(
-    `Could not find a compiler that matches required versions (${comparatorSet})`,
-  );
+  throw new Error(`Could not find a compiler that matches required versions (${comparatorSet})`);
 }
 
-async function downloadCompiler(
-  build: SolcBuild,
-  localFile: string,
-): Promise<void> {
+async function downloadCompiler(build: SolcBuild, localFile: string): Promise<void> {
   const { version, keccak256: expectedHash, path: versionPath } = build;
-  Loggy.onVerbose(
-    __filename,
-    'downloadCompiler',
-    'download-compiler',
-    `Downloading compiler version ${version}`,
-  );
+  Loggy.onVerbose(__filename, 'downloadCompiler', 'download-compiler', `Downloading compiler version ${version}`);
   const url = `https://solc-bin.ethereum.org/bin/${versionPath}`;
   const { data: compilerSource } = await axios.get(url);
 
@@ -235,10 +204,7 @@ export function getCompilerBinary(compilerPath: string) {
   const Module = module.constructor as any;
   const previousHook = Module._extensions['.js'];
 
-  Module._extensions['.js'] = function(
-    module: NodeJS.Module,
-    filename: string,
-  ) {
+  Module._extensions['.js'] = function(module: NodeJS.Module, filename: string) {
     const content = fs.readFileSync(filename, 'utf8');
     Object.getPrototypeOf(module)._compile.call(module, content, filename);
   };

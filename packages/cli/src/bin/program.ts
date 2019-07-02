@@ -23,36 +23,23 @@ interface CommandInterface {
 }
 
 let commandsList: CommandInterface[] = Object.values(commands);
-commandsList.forEach(
-  (command: CommandInterface): void => command.register(program),
-);
+commandsList.forEach((command: CommandInterface): void => command.register(program));
 // Remove the status command from the command list
 commandsList = commandsList.filter(c => c.name !== 'status');
 
-const maxLength: number = Math.max(
-  ...commandsList.map(command => command.signature.length),
-);
+const maxLength: number = Math.max(...commandsList.map(command => command.signature.length));
 
 program
   .name('zos')
   .usage('<command> [options]')
-  .description(
-    `where <command> is one of: ${commandsList.map(c => c.name).join(', ')}`,
-  )
+  .description(`where <command> is one of: ${commandsList.map(c => c.name).join(', ')}`)
   .version(version, '--version')
-  .option(
-    '-v, --verbose',
-    'verbose mode on: output errors stacktrace and detailed log.',
-  )
+  .option('-v, --verbose', 'verbose mode on: output errors stacktrace and detailed log.')
   .option('-s, --silent', 'silent mode: no output sent to stderr.')
   .on('option:verbose', () => Loggy.verbose(true))
   .on('option:silent', () => Loggy.silent(true))
   .on('--help', () =>
-    commandsList.forEach(c =>
-      console.log(
-        `   ${chalk.bold(c.signature.padEnd(maxLength))}\t${c.description}\n`,
-      ),
-    ),
+    commandsList.forEach(c => console.log(`   ${chalk.bold(c.signature.padEnd(maxLength))}\t${c.description}\n`)),
   );
 
 registerErrorHandler(program);

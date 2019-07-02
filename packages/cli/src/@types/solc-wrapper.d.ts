@@ -3,10 +3,7 @@ declare module 'solc-wrapper' {
 
   export interface Compiler {
     version(): string;
-    loadRemoteVersion(
-      version: string,
-      cb: (error: any, compiler: Compiler) => void,
-    );
+    loadRemoteVersion(version: string, cb: (error: any, compiler: Compiler) => void);
     compile(input: string, readCb: (dependency: any) => void): string;
     setupMethods(input: any): Compiler;
   }

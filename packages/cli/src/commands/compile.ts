@@ -34,12 +34,7 @@ async function action(options: {
   optimizer: string | boolean;
   optimizerRuns: string;
 }): Promise<void> {
-  const {
-    evmVersion,
-    solcVersion: version,
-    optimizer,
-    optimizerRuns,
-  } = options;
+  const { evmVersion, solcVersion: version, optimizer, optimizerRuns } = options;
 
   // Handle optimizer option:
   //- on --optimizer or --optimizer=on, enable it
@@ -50,10 +45,7 @@ async function action(options: {
   if (typeof optimizer === 'string') {
     if (optimizer.toLowerCase() === 'on') optimizerEnabled = true;
     else if (optimizer.toLowerCase() === 'off') optimizerEnabled = false;
-    else
-      throw new Error(
-        `Invalid value ${optimizer} for optimizer flag (valid values are 'on' or 'off')`,
-      );
+    else throw new Error(`Invalid value ${optimizer} for optimizer flag (valid values are 'on' or 'off')`);
   } else if (typeof optimizer === 'boolean') {
     optimizerEnabled = optimizer;
   }

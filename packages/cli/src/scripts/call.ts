@@ -14,10 +14,6 @@ export default async function call({
   if (!methodName) throw Error('A method name must be specified.');
 
   const controller = new TransactionController(txParams, network, networkFile);
-  const returnedValue = await controller.callContractMethod(
-    proxyAddress,
-    methodName,
-    methodArgs,
-  );
+  const returnedValue = await controller.callContractMethod(proxyAddress, methodName, methodArgs);
   if (returnedValue !== undefined) stdout(returnedValue);
 }

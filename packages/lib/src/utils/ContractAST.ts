@@ -68,11 +68,7 @@ export default class ContractAST {
   private types: TypeInfoMapping;
   private nodesFilter: string[];
 
-  public constructor(
-    contract: Contract,
-    artifacts?: BuildArtifacts,
-    props: ContractASTProps = {},
-  ) {
+  public constructor(contract: Contract, artifacts?: BuildArtifacts, props: ContractASTProps = {}) {
     const { directory } = contract.schema;
     this.artifacts = artifacts || getBuildArtifacts(directory);
     this.contract = contract;
@@ -96,19 +92,14 @@ export default class ContractAST {
 
   public getContractNode(): Node {
     return this.contract.schema.ast.nodes.find(
-      (node: Node) =>
-        node.nodeType === 'ContractDefinition' &&
-        node.name === this.contract.schema.contractName,
+      (node: Node) => node.nodeType === 'ContractDefinition' && node.name === this.contract.schema.contractName,
     );
   }
 
   public getMethods(attributes?: string[]): any {
     const baseContracts = this.getLinearizedBaseContracts();
     return flatten(baseContracts.map(contract => contract.nodes))
-      .filter(
-        ({ nodeType, name }) =>
-          nodeType === 'FunctionDefinition' && this._isValidMethodName(name),
-      )
+      .filter(({ nodeType, name }) => nodeType === 'FunctionDefinition' && this._isValidMethodName(name))
       .map(node => {
         // filter attributes
         const selectedAttributes = attributes ? pick(node, attributes) : node;
@@ -119,9 +110,7 @@ export default class ContractAST {
           type: typeDescriptions.typeString,
         }));
         // generate the method selector
-        const selectorArgs = inputs
-          ? inputs.map(({ type }) => type).join(',')
-          : '';
+        const selectorArgs = inputs ? inputs.map(({ type }) => type).join(',') : '';
         const selector = `${node.name}(${selectorArgs})`;
 
         return { selector, inputs, ...selectedAttributes };
@@ -137,9 +126,7 @@ export default class ContractAST {
         id: c.baseName.referencedDeclaration,
         name: c.baseName.name,
       }));
-    const baseContractsToVisit = mapBaseContracts(
-      this.getContractNode().baseContracts,
-    );
+    const baseContractsToVisit = mapBaseContracts(this.getContractNode().baseContracts);
     const visitedBaseContracts = {};
 
     while (baseContractsToVisit.length > 0) {
@@ -167,18 +154,14 @@ export default class ContractAST {
   }
 
   public getLinearizedBaseContracts(mostDerivedFirst: boolean = false): Node[] {
-    const contracts = this.getContractNode().linearizedBaseContracts.map(id =>
-      this.getNode(id, 'ContractDefinition'),
-    );
+    const contracts = this.getContractNode().linearizedBaseContracts.map(id => this.getNode(id, 'ContractDefinition'));
     return mostDerivedFirst ? contracts : reverse(contracts);
   }
 
   public getNode(id: string, type: string): Node | never {
     if (!this.nodes[id]) throw new NodeNotFoundError(id, type);
 
-    const candidates = this.nodes[id].filter(
-      (node: Node) => node.nodeType === type,
-    );
+    const candidates = this.nodes[id].filter((node: Node) => node.nodeType === type);
     switch (candidates.length) {
       case 0:
         throw new NodeNotFoundError(id, type);
@@ -196,12 +179,10 @@ export default class ContractAST {
       .forEach(importPath => {
         if (this.imports.has(importPath)) return;
         this.imports.add(importPath);
-        this.artifacts
-          .getArtifactsFromSourcePath(importPath)
-          .forEach(importedArtifact => {
-            this._collectNodes(importedArtifact.ast);
-            this._collectImports(importedArtifact.ast);
-          });
+        this.artifacts.getArtifactsFromSourcePath(importPath).forEach(importedArtifact => {
+          this._collectNodes(importedArtifact.ast);
+          this._collectImports(importedArtifact.ast);
+        });
       });
   }
 
@@ -210,12 +191,7 @@ export default class ContractAST {
     if (some(this.nodes[node.id] || [], n => isEqual(n, node))) return;
 
     // Only process nodes of the filtered types (or SourceUnits)
-    if (
-      node.nodeType !== 'SourceUnit' &&
-      this.nodesFilter &&
-      !includes(this.nodesFilter, node.nodeType)
-    )
-      return;
+    if (node.nodeType !== 'SourceUnit' && this.nodesFilter && !includes(this.nodesFilter, node.nodeType)) return;
 
     // Add node to collection with this id otherwise
     if (!this.nodes[node.id]) this.nodes[node.id] = [];

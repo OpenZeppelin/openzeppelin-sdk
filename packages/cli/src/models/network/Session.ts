@@ -23,20 +23,11 @@ interface SessionOptions {
 const Session = {
   getOptions(overrides: SessionOptions = {}, silent?: boolean): SessionOptions {
     const session = this._parseSession();
-    if (!session || this._hasExpired(session))
-      return this._setDefaults(overrides);
+    if (!session || this._hasExpired(session)) return this._setDefaults(overrides);
     if (!silent && !state.alreadyPrintedSessionInfo) {
       state.alreadyPrintedSessionInfo = true;
-      const fields = omitBy(
-        session,
-        (v, key) => overrides[key] && overrides[key] !== v,
-      );
-      Loggy.noSpin(
-        __filename,
-        'getOptions',
-        `get-options`,
-        `Using session with ${describe(fields)}`,
-      );
+      const fields = omitBy(session, (v, key) => overrides[key] && overrides[key] !== v);
+      Loggy.noSpin(__filename, 'getOptions', `get-options`, `Using session with ${describe(fields)}`);
     }
 
     return { ...session, ...overrides };
@@ -77,12 +68,7 @@ const Session = {
 
   close(): void {
     if (fs.exists(SESSION_PATH)) fs.remove(SESSION_PATH);
-    Loggy.noSpin(
-      __filename,
-      'getOptions',
-      `close-session`,
-      'Closed zos session',
-    );
+    Loggy.noSpin(__filename, 'getOptions', `close-session`, 'Closed zos session');
   },
 
   ignoreFile(): void {
@@ -101,13 +87,7 @@ const Session = {
   _parseSession(): SessionOptions | undefined {
     const session = fs.parseJsonIfExists(SESSION_PATH);
     if (isEmpty(session)) return undefined;
-    const parsedSession = pick(
-      session,
-      'network',
-      'timeout',
-      'from',
-      'expires',
-    );
+    const parsedSession = pick(session, 'network', 'timeout', 'from', 'expires');
     return this._setDefaults(parsedSession);
   },
 

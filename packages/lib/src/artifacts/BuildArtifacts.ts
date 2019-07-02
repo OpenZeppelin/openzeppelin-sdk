@@ -46,12 +46,8 @@ export class BuildArtifacts {
     return artifact.ast.absolutePath;
   }
 
-  public registerArtifactForSourcePath(
-    sourcePath: string,
-    artifact: Artifact,
-  ): void {
-    if (!this.sourcesToArtifacts[sourcePath])
-      this.sourcesToArtifacts[sourcePath] = [];
+  public registerArtifactForSourcePath(sourcePath: string, artifact: Artifact): void {
+    if (!this.sourcesToArtifacts[sourcePath]) this.sourcesToArtifacts[sourcePath] = [];
     this.sourcesToArtifacts[sourcePath].push(artifact);
   }
 }

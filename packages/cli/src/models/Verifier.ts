@@ -22,10 +22,7 @@ interface VerifierOptions {
 }
 
 const Verifier = {
-  async verifyAndPublish(
-    remote: string,
-    params: VerifierOptions,
-  ): Promise<void | never> {
+  async verifyAndPublish(remote: string, params: VerifierOptions): Promise<void | never> {
     if (remote === 'etherchain') {
       await publishToEtherchain(params);
     } else if (remote === 'etherscan') {
@@ -38,23 +35,15 @@ const Verifier = {
   },
 };
 
-async function publishToEtherchain(
-  params: VerifierOptions,
-): Promise<void | never> {
+async function publishToEtherchain(params: VerifierOptions): Promise<void | never> {
   if (params.network !== 'mainnet') {
-    throw new Error(
-      'Invalid network. Currently, etherchain supports only mainnet',
-    );
+    throw new Error('Invalid network. Currently, etherchain supports only mainnet');
   }
 
-  const etherchainVerificationUrl =
-    'https://www.etherchain.org/tools/verifyContract';
+  const etherchainVerificationUrl = 'https://www.etherchain.org/tools/verifyContract';
   const etherchainContractUrl = 'https://www.etherchain.org/account';
   const { compilerVersion, optimizer, contractAddress } = params;
-  const compiler = `soljson-v${compilerVersion.replace(
-    '.Emscripten.clang',
-    '',
-  )}.js`;
+  const compiler = `soljson-v${compilerVersion.replace('.Emscripten.clang', '')}.js`;
   const optimizerStatus = optimizer ? 'Enabled' : 'Disabled';
 
   try {
@@ -91,9 +80,7 @@ async function publishToEtherchain(
   }
 }
 
-async function publishToEtherscan(
-  params: VerifierOptions,
-): Promise<void | never> {
+async function publishToEtherscan(params: VerifierOptions): Promise<void | never> {
   const { network, compilerVersion, optimizer, contractAddress } = params;
   const compiler = `v${compilerVersion.replace('.Emscripten.clang', '')}`;
   const optimizerStatus = optimizer ? 1 : 0;
@@ -124,11 +111,7 @@ async function publishToEtherscan(
     });
 
     if (response.status === 200 && response.data.status === '1') {
-      await checkEtherscanVerificationStatus(
-        response.data.result,
-        etherscanApiUrl,
-        RETRY_COUNT,
-      );
+      await checkEtherscanVerificationStatus(response.data.result, etherscanApiUrl, RETRY_COUNT);
       Loggy.succeed(
         'verify-and-publish',
         `Contract source code of ${
@@ -136,9 +119,7 @@ async function publishToEtherscan(
         } verified and published successfully. You can check it here: ${etherscanContractUrl}/${contractAddress}#code`,
       );
     } else {
-      throw new Error(
-        `Error while trying to verify contract: ${response.data.result}`,
-      );
+      throw new Error(`Error while trying to verify contract: ${response.data.result}`);
     }
   } catch (error) {
     throw new Error(error.message || 'Error while trying to verify contract');
@@ -163,15 +144,10 @@ async function checkEtherscanVerificationStatus(
     });
 
     if (response.data.status !== '1') {
-      throw new Error(
-        `Error while trying to verify contract: ${response.data.result}`,
-      );
+      throw new Error(`Error while trying to verify contract: ${response.data.result}`);
     }
   } catch (error) {
-    if (retries === 0)
-      throw new Error(
-        error.message || 'Error while trying to check verification status',
-      );
+    if (retries === 0) throw new Error(error.message || 'Error while trying to check verification status');
     await sleep(RETRY_SLEEP_TIME);
     await checkEtherscanVerificationStatus(guid, etherscanApiUrl, retries - 1);
   }
@@ -190,9 +166,7 @@ function setEtherscanApiSubdomain(network: string): string | never {
     case 'goerli':
       return 'api-goerli';
     default:
-      throw new Error(
-        'Invalid network. Currently, etherscan supports mainnet, rinkeby, ropsten, goerli and kovan',
-      );
+      throw new Error('Invalid network. Currently, etherscan supports mainnet, rinkeby, ropsten, goerli and kovan');
   }
 }
 

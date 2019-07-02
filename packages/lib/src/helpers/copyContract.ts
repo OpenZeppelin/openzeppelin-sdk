@@ -38,9 +38,6 @@ export default async function copyContract(
 
   const params = Object.assign({}, txParams, { to: null, data: ASM_CODE_COPY });
   const txHash = await sendTransaction(params);
-  const receipt = await ZWeb3.getTransactionReceiptWithTimeout(
-    txHash,
-    Contracts.getSyncTimeout(),
-  );
+  const receipt = await ZWeb3.getTransactionReceiptWithTimeout(txHash, Contracts.getSyncTimeout());
   return contract.at(receipt.contractAddress);
 }

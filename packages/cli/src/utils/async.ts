@@ -28,9 +28,7 @@ export async function allPromisesOrError(
   if (!isEmpty(failures)) {
     if (failures.length === 1) throw failures[0].error;
     const message = failures
-      .map(({ error, object }) =>
-        toErrorMessage ? toErrorMessage(error, object) : error.message || error,
-      )
+      .map(({ error, object }) => (toErrorMessage ? toErrorMessage(error, object) : error.message || error))
       .join('\n');
     throw Error(message);
   }

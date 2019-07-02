@@ -25,7 +25,5 @@ export async function hasToMigrateProject(network): Promise<boolean> {
 }
 
 function isValidResponse(response): boolean {
-  return (
-    response === 'y' || response === 'Y' || response === 'n' || response === 'N'
-  );
+  return response === 'y' || response === 'Y' || response === 'n' || response === 'N';
 }

@@ -1,10 +1,6 @@
 import { ZWeb3 } from 'zos-lib';
 import transfer from '../scripts/transfer';
-import {
-  promptIfNeeded,
-  networksList,
-  InquirerQuestions,
-} from '../prompts/prompt';
+import { promptIfNeeded, networksList, InquirerQuestions } from '../prompts/prompt';
 import { isValidUnit } from '../utils/units';
 import ConfigManager from '../models/config/ConfigManager';
 
@@ -28,42 +24,22 @@ const register: (program: any) => any = program =>
     .action(action);
 
 async function action(options: any): Promise<void> {
-  const {
-    network: networkInOpts,
-    unit,
-    to,
-    value,
-    from,
-    interactive,
-  } = options;
+  const { network: networkInOpts, unit, to, value, from, interactive } = options;
   const configOpts = { network: networkInOpts, from };
   const configProps = getCommandProps();
-  const promptedConfig = await promptIfNeeded(
-    { opts: configOpts, props: configProps },
-    interactive,
-  );
-  const { txParams } = await ConfigManager.initNetworkConfiguration(
-    promptedConfig,
-    true,
-  );
+  const promptedConfig = await promptIfNeeded({ opts: configOpts, props: configProps }, interactive);
+  const { txParams } = await ConfigManager.initNetworkConfiguration(promptedConfig, true);
 
   const transferOpts = { from, to, value };
   const transferProps = getCommandProps(await ZWeb3.accounts(), unit);
-  const promptedTransfer = await promptIfNeeded(
-    { opts: transferOpts, props: transferProps },
-    interactive,
-  );
+  const promptedTransfer = await promptIfNeeded({ opts: transferOpts, props: transferProps }, interactive);
 
   await transfer({ ...promptedTransfer, unit, txParams });
 
-  if (!options.dontExitProcess && process.env.NODE_ENV !== 'test')
-    process.exit(0);
+  if (!options.dontExitProcess && process.env.NODE_ENV !== 'test') process.exit(0);
 }
 
-function getCommandProps(
-  accounts: string[] = [],
-  unit: string = 'ether',
-): InquirerQuestions {
+function getCommandProps(accounts: string[] = [], unit: string = 'ether'): InquirerQuestions {
   return {
     ...networksList('network', 'list'),
     from: {

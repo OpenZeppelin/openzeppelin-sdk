@@ -1,11 +1,7 @@
 import publish from '../scripts/publish';
 import ConfigManager from '../models/config/ConfigManager';
 import { hasToMigrateProject } from '../prompts/migrations';
-import {
-  promptIfNeeded,
-  networksList,
-  InquirerQuestions,
-} from '../prompts/prompt';
+import { promptIfNeeded, networksList, InquirerQuestions } from '../prompts/prompt';
 import Session from '../models/network/Session';
 
 const name = 'publish';
@@ -28,18 +24,12 @@ async function action(options: any): Promise<void> {
   const opts = { network: networkInSession || networkInArgs };
   const props = getCommandProps();
 
-  const promptedOpts = await promptIfNeeded(
-    { opts, defaults, props },
-    interactive,
-  );
-  const { network, txParams } = await ConfigManager.initNetworkConfiguration(
-    promptedOpts,
-  );
+  const promptedOpts = await promptIfNeeded({ opts, defaults, props }, interactive);
+  const { network, txParams } = await ConfigManager.initNetworkConfiguration(promptedOpts);
   if (!(await hasToMigrateProject(network))) process.exit(0);
 
   await publish({ network, txParams });
-  if (!options.dontExitProcess && process.env.NODE_ENV !== 'test')
-    process.exit(0);
+  if (!options.dontExitProcess && process.env.NODE_ENV !== 'test') process.exit(0);
 }
 
 function getCommandProps(): InquirerQuestions {

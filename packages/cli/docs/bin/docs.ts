@@ -50,17 +50,12 @@ function run() {
     // TODO: remove filtering status command before next major release
     .filter(command => command.name() !== 'status')
     .forEach(command => {
-      const content = renderToStaticMarkup(
-        React.createElement(Command, { command }),
-      );
+      const content = renderToStaticMarkup(React.createElement(Command, { command }));
       writeMd(command.name(), command.name(), content);
     });
 
   const sidebar = makeSidebar(program);
-  writeFileSync(
-    path.resolve(outputPath, 'sidebars.json'),
-    JSON.stringify(sidebar, null, 2),
-  );
+  writeFileSync(path.resolve(outputPath, 'sidebars.json'), JSON.stringify(sidebar, null, 2));
 }
 
 run();

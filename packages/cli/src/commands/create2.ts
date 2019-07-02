@@ -20,10 +20,7 @@ const register: (program: any) => any = program =>
     .command(signature, undefined, { noHelp: true })
     .usage('[alias] --network <network> --salt <salt> [options]')
     .description(description)
-    .option(
-      '--salt <salt>',
-      `salt used to determine the deployment address (required)`,
-    )
+    .option('--salt <salt>', `salt used to determine the deployment address (required)`)
     .option(
       '--query [sender]',
       `do not create the contract and just return the deployment address, optionally specifying the sender used to derive the deployment address (defaults to 'from')`,
@@ -32,37 +29,23 @@ const register: (program: any) => any = program =>
       '--init [function]',
       `initialization function to call after creating contract (defaults to 'initialize', skips initialization if not set)`,
     )
-    .option(
-      '--args <arg1, arg2, ...>',
-      'arguments to the initialization function',
-    )
-    .option(
-      '--admin <admin>',
-      "admin of the proxy (uses the project's proxy admin if not set)",
-    )
+    .option('--args <arg1, arg2, ...>', 'arguments to the initialization function')
+    .option('--admin <admin>', "admin of the proxy (uses the project's proxy admin if not set)")
     .option(
       '--signature <signature>',
       `signature of the request, uses the signer to derive the deployment address (uses the sender to derive deployment address if not set)`,
     )
-    .option(
-      '--force',
-      'force creation even if contracts have local modifications',
-    )
+    .option('--force', 'force creation even if contracts have local modifications')
     .withNetworkOptions()
     .action(action);
 
 async function action(contractFullName: string, options: any): Promise<void> {
-  const { network, txParams } = await ConfigManager.initNetworkConfiguration(
-    options,
-  );
+  const { network, txParams } = await ConfigManager.initNetworkConfiguration(options);
   if (!(await hasToMigrateProject(network))) process.exit(0);
   if (!options.salt) throw new Error("option `--salt' is required");
 
   const { methodName, methodArgs } = parseMethodParams(options, 'initialize');
-  const {
-    contract: contractAlias,
-    package: packageName,
-  } = fromContractFullName(contractFullName);
+  const { contract: contractAlias, package: packageName } = fromContractFullName(contractFullName);
   const opts = {
     ...options,
     methodName,
@@ -71,13 +54,11 @@ async function action(contractFullName: string, options: any): Promise<void> {
     packageName,
   };
 
-  if (options.query && options.signature)
-    await runSignatureQuery(opts, network, txParams);
+  if (options.query && options.signature) await runSignatureQuery(opts, network, txParams);
   else if (options.query) await runQuery(opts, network, txParams);
   else await runCreate(opts, network, txParams);
 
-  if (!options.dontExitProcess && process.env.NODE_ENV !== 'test')
-    process.exit(0);
+  if (!options.dontExitProcess && process.env.NODE_ENV !== 'test') process.exit(0);
 }
 
 export default { name, signature, description, register, action };
@@ -87,11 +68,7 @@ async function runQuery(options: any, network: string, txParams: TxParams) {
   await queryDeployment({ salt: options.salt, sender, network, txParams });
 }
 
-async function runSignatureQuery(
-  options: any,
-  network: string,
-  txParams: TxParams,
-) {
+async function runSignatureQuery(options: any, network: string, txParams: TxParams) {
   const {
     query,
     methodName,
@@ -104,10 +81,7 @@ async function runSignatureQuery(
     admin,
   } = options;
   if (!contractAlias) throw new Error('missing required argument: alias');
-  if (typeof query === 'string')
-    throw new Error(
-      "cannot specify argument `sender' as it is inferred from `signature'",
-    );
+  if (typeof query === 'string') throw new Error("cannot specify argument `sender' as it is inferred from `signature'");
   const args = pickBy({
     packageName,
     contractAlias,
