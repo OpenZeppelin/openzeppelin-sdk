@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## v2.4.1 - 2019-07-02
+
+### Fixed
+- `zos compile` now works properly on Windows. ([#1066](https://github.com/zeppelinos/zos/pull/1066))
+- Spinners are now shown properly on Windows. ([#1067](https://github.com/zeppelinos/zos/pull/1067))
+- Installation issues with yarn now fixed. ([#1059](https://github.com/zeppelinos/zos/pull/1059))
+
 ## v2.4.0 - 2019-06-24
 
 ### Added
