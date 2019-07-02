@@ -16,7 +16,7 @@ import {
   DEFAULT_OPTIMIZER,
   DEFAULT_EVM_VERSION,
 } from './SolidityContractsCompiler';
-import { ImportsFsEngine } from '@resolver-engine/imports-fs';
+import { ImportsFsEngine } from '@openzeppelin/resolver-engine-imports-fs';
 import { gatherSources } from './ResolverEngineGatherer';
 import { SolcBuild } from './CompilerProvider';
 import { compilerVersionsMatch, compilerSettingsMatch } from '../../../utils/solidity';

@@ -1,4 +1,4 @@
-import { ResolverEngine } from '@resolver-engine/core';
+import { ResolverEngine } from '@openzeppelin/resolver-engine-core';
 import pathSys from 'path';
 import urlSys from 'url';
 import { getImports } from '../../../utils/solidity';
@@ -95,7 +95,7 @@ export async function gatherSources(
   const alreadyImported = new Set();
 
   if (workingDir !== '') {
-    workingDir += '/';
+    workingDir += pathSys.sep;
   }
 
   const absoluteRoots = roots.map(what => resolvePath(workingDir, what));

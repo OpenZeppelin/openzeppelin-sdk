@@ -55,7 +55,8 @@
   "homepage": "https://github.com/OpenZeppelin/openzeppelin-sdk/tree/master/packages/cli#readme",
   "dependencies": {
     "@openzeppelin/upgrades": "2.5.0-rc.1",
-    "@resolver-engine/imports-fs": "^0.3.2",
+    "@openzeppelin/resolver-engine-core": "^0.3.3",
+    "@openzeppelin/resolver-engine-imports-fs": "^0.3.3",
     "@types/fs-extra": "^7.0.0",
     "@types/npm": "^2.0.29",
     "@types/semver": "^5.5.0",
