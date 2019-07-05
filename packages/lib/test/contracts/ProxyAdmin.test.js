@@ -13,9 +13,7 @@ const ProxyAdmin = Contracts.getFromLocal('ProxyAdmin');
 const AdminUpgradeabilityProxy = Contracts.getFromLocal('AdminUpgradeabilityProxy');
 
 contract('ProxyAdmin', function(accounts) {
-  const [_, proxyAdminOwner, newAdmin, anotherAccount] = accounts.map(
-    utils.toChecksumAddress,
-  );
+  const [_, proxyAdminOwner, newAdmin, anotherAccount] = accounts.map(utils.toChecksumAddress);
 
   before('set implementations', async function() {
     this.implementationV1 = await ImplV1.new();
@@ -38,7 +36,7 @@ contract('ProxyAdmin', function(accounts) {
       this.ownable = this.proxyAdmin;
     });
 
-    // shouldBehaveLikeOwnable(proxyAdminOwner, anotherAccount);
+    shouldBehaveLikeOwnable(proxyAdminOwner, anotherAccount);
   });
 
   describe('#getProxyAdmin', function() {

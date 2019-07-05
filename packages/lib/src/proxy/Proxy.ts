@@ -60,11 +60,6 @@ export default class Proxy {
     return uint256ToAddress(storage);
   }
 
-  public async implementation2(): Promise<string> {
-    const position = ZWeb3.sha3('org.openzeppelinupgrades.proxy.implementation');
-    return uint256ToAddress(await this.getStorageAt(position));
-  }
-
   public async admin(): Promise<string> {
     let storage = await this.getStorageAt(ZWeb3.sha3(ADMIN_LABEL));
     if (storage === '0x0') {
