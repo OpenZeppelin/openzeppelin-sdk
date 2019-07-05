@@ -52,21 +52,29 @@ export default class Proxy {
   }
 
   public async implementation(): Promise<string> {
-    return uint256ToAddress(await this.getStorageAt(IMPLEMENTATION_LABEL, DEPRECATED_IMPLEMENTATION_LABEL));
+    let storage = await this.getStorageAt(ZWeb3.sha3(IMPLEMENTATION_LABEL));
+    if (storage === '0x0') {
+      storage = await this.getStorageAt(ZWeb3.sha3(DEPRECATED_IMPLEMENTATION_LABEL));
+    }
+
+    return uint256ToAddress(storage);
+  }
+
+  public async implementation2(): Promise<string> {
+    const position = ZWeb3.sha3('org.openzeppelinupgrades.proxy.implementation');
+    return uint256ToAddress(await this.getStorageAt(position));
   }
 
   public async admin(): Promise<string> {
-    return uint256ToAddress(await this.getStorageAt(ADMIN_LABEL, DEPRECATED_ADMIN_LABEL));
+    let storage = await this.getStorageAt(ZWeb3.sha3(ADMIN_LABEL));
+    if (storage === '0x0') {
+      storage = await this.getStorageAt(ZWeb3.sha3(DEPRECATED_ADMIN_LABEL));
+    }
+    return uint256ToAddress(storage);
   }
 
-  public async getStorageAt(label: string, deprecatedLabel: string): Promise<string> {
-    let storage = await ZWeb3.getStorageAt(this.address, ZWeb3.sha3(label));
-    console.log('storage', storage);
-    if (storage === '0x0') {
-      storage = await ZWeb3.getStorageAt(this.address, ZWeb3.sha3(deprecatedLabel));
-    }
-
-    return storage;
+  public async getStorageAt(position: string): Promise<string> {
+    return ZWeb3.getStorageAt(this.address, position);
   }
 
   private async checkAdmin(): Promise<void | never> {

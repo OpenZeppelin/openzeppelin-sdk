@@ -166,9 +166,7 @@ export default function shouldBehaveLikeAdminUpgradeabilityProxy(
             //  - 1-50: Initailizable reserved storage (50 slots)
             //  - 51: initializerRan
             //  - 52: x
-            const storedValue = await Proxy.at(this.proxyAddress).getStorageAt(
-              52,
-            );
+            const storedValue = await Proxy.at(this.proxyAddress).getStorageAt(52);
             parseInt(storedValue).should.eq(42);
           });
         });

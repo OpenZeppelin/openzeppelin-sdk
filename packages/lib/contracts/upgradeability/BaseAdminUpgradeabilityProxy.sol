@@ -20,10 +20,12 @@ contract BaseAdminUpgradeabilityProxy is BaseUpgradeabilityProxy {
 
   /**
    * @dev Storage slot with the admin of the contract.
-   * This is the keccak-256 hash of "org.zeppelinos.proxy.admin", and is
+   * This is the keccak-256 hash of "com.openzeppelinupgrades.proxy.admin", and is
    * validated in the constructor.
    */
-  bytes32 internal constant ADMIN_SLOT = 0x10d6a54a4754c8869d6886b5f5d7fbfa5b4522237ea5c60d11bc4e7a1ff9390b;
+
+  bytes32 internal constant ADMIN_SLOT = 0xb4160bff6c76d69de89006ee3653a5051d28b87681e6c0cd53e2f13724ecb8cb;
+  // bytes32 internal constant ADMIN_SLOT = 0x10d6a54a4754c8869d6886b5f5d7fbfa5b4522237ea5c60d11bc4e7a1ff9390b;
 
   /**
    * @dev Modifier to check whether the `msg.sender` is the admin.
