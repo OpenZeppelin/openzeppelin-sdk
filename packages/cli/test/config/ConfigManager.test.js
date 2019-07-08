@@ -91,7 +91,7 @@ describe('ConfigManager', function() {
     describe('#setBaseConfig', function() {
       it('sets the correct config', function() {
         ConfigManager.setBaseConfig(configFileDir);
-        ConfigManager.config.should.have.property('createZosConfigFile');
+        ConfigManager.config.should.have.property('createNetworkConfigFile');
       });
     });
   });
