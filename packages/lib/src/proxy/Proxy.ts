@@ -58,7 +58,7 @@ export default class Proxy {
 
   public async implementation(): Promise<string> {
     let storage = await this.getStorageAt(ZWeb3.sha3(IMPLEMENTATION_LABEL));
-    // TODO: Remove legacy 'zos' support before next major release
+    // TODO-v3: Remove deprecated 'zos' support
     if (storage === '0x0') {
       storage = await this.getStorageAt(ZWeb3.sha3(DEPRECATED_IMPLEMENTATION_LABEL));
     }
@@ -68,7 +68,7 @@ export default class Proxy {
 
   public async admin(): Promise<string> {
     let storage = await this.getStorageAt(ZWeb3.sha3(ADMIN_LABEL));
-    // TODO: Remove legacy 'zos' support before next major release
+    // TODO-v3: Remove deprecated 'zos' support
     if (storage === '0x0') {
       storage = await this.getStorageAt(ZWeb3.sha3(DEPRECATED_ADMIN_LABEL));
     }
