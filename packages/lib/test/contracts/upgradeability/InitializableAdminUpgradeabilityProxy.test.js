@@ -11,9 +11,7 @@ import shouldBehaveLikeAdminUpgradeabilityProxy from './AdminUpgradeabilityProxy
 import omit from 'lodash.omit';
 
 const DummyImplementation = Contracts.getFromLocal('DummyImplementation');
-const InitializableAdminUpgradeabilityProxy = Contracts.getFromLocal(
-  'InitializableAdminUpgradeabilityProxy',
-);
+const InitializableAdminUpgradeabilityProxy = Contracts.getFromLocal('InitializableAdminUpgradeabilityProxy');
 
 contract('InitializableAdminUpgradeabilityProxy', accounts => {
   accounts = accounts.map(utils.toChecksumAddress);
@@ -43,10 +41,6 @@ contract('InitializableAdminUpgradeabilityProxy', accounts => {
     });
   });
 
-  shouldBehaveLikeUpgradeabilityProxy(
-    createProxy,
-    proxyAdminAddress,
-    proxyAdminOwner,
-  );
+  shouldBehaveLikeUpgradeabilityProxy(createProxy, proxyAdminAddress, proxyAdminOwner);
   shouldBehaveLikeAdminUpgradeabilityProxy(createProxy, accounts);
 });

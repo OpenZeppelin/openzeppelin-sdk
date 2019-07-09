@@ -4,7 +4,12 @@ import { toAddress, uint256ToAddress } from '../utils/Addresses';
 import Transactions from '../utils/Transactions';
 import Contract from '../artifacts/Contract';
 import { TxParams } from '../artifacts/ZWeb3';
-import { IMPLEMENTATION_LABEL, DEPRECATED_IMPLEMENTATION_LABEL, ADMIN_LABEL, DEPRECATED_ADMIN_LABEL } from '../utils/Constants';
+import {
+  IMPLEMENTATION_LABEL,
+  DEPRECATED_IMPLEMENTATION_LABEL,
+  ADMIN_LABEL,
+  DEPRECATED_ADMIN_LABEL,
+} from '../utils/Constants';
 
 export default class Proxy {
   private contract: Contract;
@@ -53,6 +58,7 @@ export default class Proxy {
 
   public async implementation(): Promise<string> {
     let storage = await this.getStorageAt(ZWeb3.sha3(IMPLEMENTATION_LABEL));
+    // TODO: Remove legacy 'zos' support before next major release
     if (storage === '0x0') {
       storage = await this.getStorageAt(ZWeb3.sha3(DEPRECATED_IMPLEMENTATION_LABEL));
     }
@@ -62,9 +68,11 @@ export default class Proxy {
 
   public async admin(): Promise<string> {
     let storage = await this.getStorageAt(ZWeb3.sha3(ADMIN_LABEL));
+    // TODO: Remove legacy 'zos' support before next major release
     if (storage === '0x0') {
       storage = await this.getStorageAt(ZWeb3.sha3(DEPRECATED_ADMIN_LABEL));
     }
+
     return uint256ToAddress(storage);
   }
 
