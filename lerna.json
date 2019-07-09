@@ -4,8 +4,8 @@
     "packages/*",
     "tests/cli/test",
     "tests/cli/workdir",
-    "tests/zepkit/test",
-    "tests/zepkit/workdir"
+    "tests/kits/test",
+    "tests/kits/workdir"
   ],
   "version": "2.4.0",
   "command": {

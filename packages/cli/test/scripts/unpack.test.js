@@ -60,7 +60,7 @@ describe('unpack script', function() {
   });
 
   it('should unpack kit to current directory by name', async function() {
-    await unpack({ repoOrName: 'zepkit' });
+    await unpack({ repoOrName: 'starter' });
     gitMock.verify();
   });
 
@@ -130,7 +130,7 @@ describe('unpack script', function() {
         },
       }),
     );
-    await unpack({ repoOrName: 'zepkit' });
+    await unpack({ repoOrName: 'starter' });
     gitMock.verify();
   });
 });

@@ -23,7 +23,7 @@ function runIntegrationTest({ kit }, action) {
 
   // have to replace zos with local version so we test current build
   it('replace zos with local version', function() {
-    run(`${findUp.sync('node_modules/.bin/lerna')} bootstrap --scope=tests-cli-zepkit --scope="zos*"`);
+    run(`${findUp.sync('node_modules/.bin/lerna')} bootstrap --scope=tests-cli-kits --scope="zos*"`);
   });
 
   it('init zos project', function() {
@@ -40,15 +40,15 @@ function runIntegrationTest({ kit }, action) {
 }
 
 // TODO-v3: Remove legacy support
-describe(`Unpack ZepKit integration on ${network}`, function() {
+describe(`Unpacks a ZepKit on ${network}`, function() {
   runIntegrationTest({ kit: 'zepkit' }, function() {});
 });
 
-describe(`Unpack starter kit integration on ${network}`, function() {
+describe(`Unpack a Starter kit on ${network}`, function() {
   runIntegrationTest({ kit: 'starter' }, function() {});
 });
 
-describe(`Unpack tutorial kit integration on ${network}`, function() {
+describe(`Unpack a Tutorial kit on ${network}`, function() {
   runIntegrationTest({ kit: 'tutorial' }, function() {
     it('Add Counter contract', function() {
       run(`npx zos add Counter`);
