@@ -1,0 +1,24 @@
+{
+  "name": "tests-kit-test",
+  "private": true,
+  "version": "2.4.0",
+  "description": "Integration tests for Starter kits and an unpack command",
+  "author": "igor@zeppelin.solutions",
+  "license": "MIT",
+  "scripts": {
+    "test": "scripts/test.sh"
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^1.11.0",
+    "@typescript-eslint/parser": "^1.11.0",
+    "chai": "^4.1.2",
+    "eslint": "^5.16.0",
+    "eslint-config-prettier": "^6.0.0",
+    "eslint-plugin-prettier": "^3.1.0",
+    "lodash": "^4.17.0",
+    "mocha": "5.2.0",
+    "prettier": "^1.18.2",
+    "truffle": "5.0.21",
+    "typescript": "^3.5.2"
+  }
+}

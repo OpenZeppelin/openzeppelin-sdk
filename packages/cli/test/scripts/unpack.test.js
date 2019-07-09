@@ -13,12 +13,12 @@ import { MANIFEST_VERSION } from '../../src/models/files/KitFile';
 
 const simpleGit = patch('simple-git/promise');
 
-const repo = 'zeppelinos/zepkit';
-const url = 'https://github.com/zeppelinos/zepkit.git';
+const repo = 'openzeppelin/starter-kit';
+const url = 'https://github.com/openzeppelin/starter-kit.git';
 
 const properConfig = {
   manifestVersion: MANIFEST_VERSION,
-  message: 'Please, continue at https://github.com/zeppelinos/zepkit',
+  message: 'Please, continue at https://github.com/openzeppelin/starter-kit',
   files: [],
   hooks: {},
 };
@@ -46,11 +46,7 @@ describe('unpack script', function() {
 
     const axiosStub = sinon.stub(axios, 'get');
     axiosStub
-      .withArgs(
-        url
-          .replace('.git', '/stable/kit.json')
-          .replace('github.com', 'raw.githubusercontent.com'),
-      )
+      .withArgs(url.replace('.git', '/stable/kit.json').replace('github.com', 'raw.githubusercontent.com'))
       .returns(
         Promise.resolve({
           data: properConfig,
@@ -64,7 +60,7 @@ describe('unpack script', function() {
   });
 
   it('should unpack kit to current directory by name', async function() {
-    await unpack({ repoOrName: 'ZepKit' });
+    await unpack({ repoOrName: 'starter' });
     gitMock.verify();
   });
 
@@ -74,9 +70,7 @@ describe('unpack script', function() {
   });
 
   it('should fail with random name', async function() {
-    await unpack({ repoOrName: 'lskdjflkdsj' }).should.be.rejectedWith(
-      /Kit named lskdjflkdsj doesn\'t exist/,
-    );
+    await unpack({ repoOrName: 'lskdjflkdsj' }).should.be.rejectedWith(/Kit named lskdjflkdsj doesn\'t exist/);
   });
 
   it('should fail with random repo', async function() {
@@ -86,18 +80,14 @@ describe('unpack script', function() {
   });
 
   it('should fail if no kit name or repo specified', async function() {
-    await unpack({ repoOrName: undefined }).should.be.rejectedWith(
-      /A kit name or GitHub repo must be provided/,
-    );
+    await unpack({ repoOrName: undefined }).should.be.rejectedWith(/A kit name or GitHub repo must be provided/);
   });
 
   it('should fail if there are files inside the directory', async function() {
     fs.readdir.restore();
-    sinon
-      .stub(fs, 'readdir')
-      .returns(Promise.resolve([OPEN_ZEPPELIN_FOLDER, 'random']));
+    sinon.stub(fs, 'readdir').returns(Promise.resolve([OPEN_ZEPPELIN_FOLDER, 'random']));
     await unpack({ repoOrName: repo }).should.be.rejectedWith(
-      'Unable to unpack https://github.com/zeppelinos/zepkit.git in the current directory, as it must be empty.',
+      `Unable to unpack ${url} in the current directory, as it must be empty.`,
     );
   });
 
@@ -111,9 +101,7 @@ describe('unpack script', function() {
         },
       }),
     );
-    await unpack({ repoOrName: repo }).should.be.rejectedWith(
-      /Unrecognized kit version identifier/,
-    );
+    await unpack({ repoOrName: repo }).should.be.rejectedWith(/Unrecognized kit version identifier/);
   });
 
   it('should fail with wrong json kit', async function() {
@@ -125,9 +113,7 @@ describe('unpack script', function() {
         },
       }),
     );
-    await unpack({ repoOrName: repo }).should.be.rejectedWith(
-      /kit.json is not valid/,
-    );
+    await unpack({ repoOrName: repo }).should.be.rejectedWith(/kit.json is not valid/);
   });
 
   it('should checkout only the files specified in a config', async function() {
@@ -144,7 +130,7 @@ describe('unpack script', function() {
         },
       }),
     );
-    await unpack({ repoOrName: 'ZepKit' });
+    await unpack({ repoOrName: 'starter' });
     gitMock.verify();
   });
 });
