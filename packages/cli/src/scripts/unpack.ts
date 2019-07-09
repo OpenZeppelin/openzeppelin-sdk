@@ -4,11 +4,13 @@ import KitController from '../models/local/KitController';
 import { UnpackParams } from './interfaces';
 
 const nameToRepo = {
-  zepkit: 'zeppelinos/zepkit',
-  tutorial: 'zeppelinos/tutorial-kit',
+  // TODO-v3: Remove legacy zepkit support
+  zepkit: 'openzeppelin/starter-kit',
+  starter: 'openzeppelin/starter-kit',
+  tutorial: 'openzeppelin/tutorial-kit',
 };
 
-// https://github.com/zeppelinos/zepkit.git
+// https://github.com/openzeppelin/starter-kit.git
 
 export default async function unpack({ repoOrName }: UnpackParams): Promise<void | never> {
   if (!repoOrName) throw Error('A kit name or GitHub repo must be provided to unpack to the current directory.');
