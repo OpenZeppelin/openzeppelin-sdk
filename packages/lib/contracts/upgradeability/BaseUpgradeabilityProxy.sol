@@ -18,10 +18,10 @@ contract BaseUpgradeabilityProxy is Proxy {
 
   /**
    * @dev Storage slot with the address of the current implementation.
-   * This is the keccak-256 hash of "com.openzeppelinupgrades.proxy.implementation", and is
+   * This is the keccak-256 hash of "eip1967.proxy.implementation" subtracted by 1, and is
    * validated in the constructor.
    */
-  bytes32 internal constant IMPLEMENTATION_SLOT = 0x07bad43279966bf4ffd58355c7321ea5a3ccc3782b7eab073c9e464accb50fc9;
+  bytes32 internal constant IMPLEMENTATION_SLOT = 0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc;
 
   /**
    * @dev Returns the current implementation.
