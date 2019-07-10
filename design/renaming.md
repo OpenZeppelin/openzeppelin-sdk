@@ -16,7 +16,7 @@ We need to define how we want to support the migration from old to new config fi
 | Current | New |
 |---|---|
 | zos | @openzeppelin/cli |
-| zos-lib | @openzeppelin/upgrades.js |
+| zos-lib | @openzeppelin/upgrades |
 | zos-docs | @openzeppelin/sdk-docs |
 
 ## Internal folder names
