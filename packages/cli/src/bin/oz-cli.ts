@@ -37,7 +37,7 @@ if (binPath.match(/zos$/)) {
     __filename,
     'oz-cli',
     `deprecated-zos-bin`,
-    `'zos' command is deprecated and will be removed in the next major version. Please, use 'openzeppelin' or 'oz' instead.`,
+    `'zos' command is deprecated and will be removed in the next major version. Please use 'openzeppelin' or 'oz' instead.`,
   );
 }
 
