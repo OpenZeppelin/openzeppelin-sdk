@@ -5,7 +5,7 @@ global.artifacts = artifacts;
 const args = require('minimist')(process.argv.slice(2));
 const network = args.network;
 
-const { AppProject, Contracts, ImplementationDirectory, Package } = require('zos-lib')
+const { AppProject, Contracts, Package } = require('zos-lib')
 
 const ERC721Mintable = Contracts.getFromLocal('ERC721Mintable');
 
