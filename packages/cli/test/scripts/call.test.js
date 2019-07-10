@@ -10,6 +10,7 @@ import createProxy from '../../src/scripts/create';
 import { Contracts } from 'zos-lib';
 import CaptureLogs from '../helpers/captureLogs';
 import ProjectFile from '../../src/models/files/ProjectFile';
+import NetworkFile from '../../src/models/files/NetworkFile';
 
 contract('call script', function(accounts) {
   accounts = accounts.map(utils.toChecksumAddress);
@@ -22,7 +23,7 @@ contract('call script', function(accounts) {
     this.projectFile = new ProjectFile(
       'test/mocks/packages/package-empty.zos.json',
     );
-    this.networkFile = this.projectFile.networkFile(network);
+    this.networkFile = new NetworkFile(this.projectFile, network);
     const contractsData = [{ name: 'ImplV1', alias: 'Impl' }];
     await add({ contractsData, projectFile: this.projectFile });
     await push({ network, txParams, networkFile: this.networkFile });

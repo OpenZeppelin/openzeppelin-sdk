@@ -19,17 +19,8 @@ export default class ProxyAdmin {
   }
 
   public static async deploy(txParams: TxParams = {}): Promise<ProxyAdmin> {
-    Loggy.spin(
-      __filename,
-      'deploy',
-      `deploy-proxy-admin`,
-      'Setting everything up to create contract instances',
-    );
-    const contract = await Transactions.deployContract(
-      Contracts.getFromLib('ProxyAdmin'),
-      [],
-      txParams,
-    );
+    Loggy.spin(__filename, 'deploy', `deploy-proxy-admin`, 'Setting everything up to create contract instances');
+    const contract = await Transactions.deployContract(Contracts.getFromLib('ProxyAdmin'), [], txParams);
     Loggy.succeed(`deploy-proxy-admin`);
     return new this(contract, txParams);
   }
@@ -41,30 +32,20 @@ export default class ProxyAdmin {
   }
 
   public async getProxyImplementation(proxyAddress: string): Promise<string> {
-    return this.contract.methods
-      .getProxyImplementation(proxyAddress)
-      .call({ ...this.txParams });
+    return this.contract.methods.getProxyImplementation(proxyAddress).call({ ...this.txParams });
   }
 
-  public async changeProxyAdmin(
-    proxyAddress: string,
-    newAdmin: string,
-  ): Promise<void> {
+  public async changeProxyAdmin(proxyAddress: string, newAdmin: string): Promise<void> {
     Loggy.spin(
       __filename,
       'changeProxyAdmin',
       `change-proxy-admin`,
       `Changing admin for proxy ${proxyAddress} to ${newAdmin}`,
     );
-    await Transactions.sendTransaction(
-      this.contract.methods.changeProxyAdmin,
-      [proxyAddress, newAdmin],
-      { ...this.txParams },
-    );
-    Loggy.succeed(
-      'change-proxy-admin',
-      `Admin for proxy ${proxyAddress} set to ${newAdmin}`,
-    );
+    await Transactions.sendTransaction(this.contract.methods.changeProxyAdmin, [proxyAddress, newAdmin], {
+      ...this.txParams,
+    });
+    Loggy.succeed('change-proxy-admin', `Admin for proxy ${proxyAddress} set to ${newAdmin}`);
   }
 
   public async upgradeProxy(
@@ -78,18 +59,10 @@ export default class ProxyAdmin {
     const receipt: any =
       initMethodName === undefined
         ? await this._upgradeProxy(proxyAddress, implementationAddress)
-        : await this._upgradeProxyAndCall(
-            proxyAddress,
-            implementationAddress,
-            contract,
-            initMethodName,
-            initArgs,
-          );
+        : await this._upgradeProxyAndCall(proxyAddress, implementationAddress, contract, initMethodName, initArgs);
     Loggy.succeed(
       `upgrade-proxy-${proxyAddress}`,
-      `Instance upgraded at ${proxyAddress}. Transaction receipt: ${
-        receipt.transactionHash
-      }`,
+      `Instance upgraded at ${proxyAddress}. Transaction receipt: ${receipt.transactionHash}`,
     );
     return contract.at(proxyAddress);
   }
@@ -102,15 +75,8 @@ export default class ProxyAdmin {
       'transfer-ownership',
       `Changing ownership of proxy admin to ${newAdminOwner}`,
     );
-    await Transactions.sendTransaction(
-      this.contract.methods.transferOwnership,
-      [newAdminOwner],
-      { ...this.txParams },
-    );
-    Loggy.succeed(
-      'transfer-ownership',
-      `Proxy admin owner set to ${newAdminOwner}`,
-    );
+    await Transactions.sendTransaction(this.contract.methods.transferOwnership, [newAdminOwner], { ...this.txParams });
+    Loggy.succeed('transfer-ownership', `Proxy admin owner set to ${newAdminOwner}`);
   }
 
   public async getOwner(): Promise<string> {
@@ -127,21 +93,11 @@ export default class ProxyAdmin {
     }
   }
 
-  private async _upgradeProxy(
-    proxyAddress: string,
-    implementation: string,
-  ): Promise<any> {
-    Loggy.spin(
-      __filename,
-      '_upgradeProxy',
-      `upgrade-proxy-${proxyAddress}`,
-      `Upgrading instance at ${proxyAddress}`,
-    );
-    return Transactions.sendTransaction(
-      this.contract.methods.upgrade,
-      [proxyAddress, implementation],
-      { ...this.txParams },
-    );
+  private async _upgradeProxy(proxyAddress: string, implementation: string): Promise<any> {
+    Loggy.spin(__filename, '_upgradeProxy', `upgrade-proxy-${proxyAddress}`, `Upgrading instance at ${proxyAddress}`);
+    return Transactions.sendTransaction(this.contract.methods.upgrade, [proxyAddress, implementation], {
+      ...this.txParams,
+    });
   }
 
   private async _upgradeProxyAndCall(
@@ -151,19 +107,12 @@ export default class ProxyAdmin {
     initMethodName: string,
     initArgs: any,
   ): Promise<any> {
-    const { method: initMethod, callData }: CalldataInfo = buildCallData(
-      contract,
-      initMethodName,
-      initArgs,
-    );
+    const { method: initMethod, callData }: CalldataInfo = buildCallData(contract, initMethodName, initArgs);
     Loggy.spin(
       __filename,
       '_upgradeProxyAndCall',
       `upgrade-proxy-${proxyAddress}`,
-      `Upgrading instance at ${proxyAddress} and calling ${callDescription(
-        initMethod,
-        initArgs,
-      )}`,
+      `Upgrading instance at ${proxyAddress} and calling ${callDescription(initMethod, initArgs)}`,
     );
     return Transactions.sendTransaction(
       this.contract.methods.upgradeAndCall,

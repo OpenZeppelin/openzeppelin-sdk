@@ -4,6 +4,7 @@ import fs from 'fs-extra';
 import Ajv from 'ajv';
 import { Loggy } from 'zos-lib';
 
+import { OPEN_ZEPPELIN_FOLDER } from '../files/constants';
 import KitFile, { MANIFEST_VERSION } from '../files/KitFile';
 import kitConfigSchema from '../files/kit-config.schema.json';
 import patch from '../../utils/patch';
@@ -12,34 +13,21 @@ import child from '../../utils/child';
 const simpleGit = patch('simple-git/promise');
 
 export default class KitController {
-  public async unpack(
-    url: string,
-    workingDirPath: string = '',
-    config: KitFile,
-  ): Promise<void | never> {
+  public async unpack(url: string, workingDirPath: string = '', config: KitFile): Promise<void | never> {
     if (!url) throw Error('A url must be provided.');
     if (!config) throw Error('A config must be provided.');
 
     const { exec } = child;
     const { readdir, remove } = fs;
 
-    // because zos always spawns '.zos.lock' file
-    const files = (await readdir(workingDirPath)).filter(
-      (file): boolean => file !== '.zos.lock',
-    );
+    // because zos always spawns '.lock' file
+    const files = (await readdir(workingDirPath)).filter((file): boolean => file !== OPEN_ZEPPELIN_FOLDER);
     if (files.length > 0) {
-      throw Error(
-        `Unable to unpack ${url} in the current directory, as it must be empty.`,
-      );
+      throw Error(`Unable to unpack ${url} in the current directory, as it must be empty.`);
     }
 
     try {
-      Loggy.spin(
-        __filename,
-        'unpack',
-        'unpack-kit',
-        `Downloading kit from ${url}`,
-      );
+      Loggy.spin(__filename, 'unpack', 'unpack-kit', `Downloading kit from ${url}`);
       const git = simpleGit(workingDirPath);
       await git.init();
       await git.addRemote('origin', url);
@@ -60,17 +48,10 @@ export default class KitController {
       await exec(config.hooks['post-unpack']);
       Loggy.succeed('unpack-kit', 'Kit downloaded and unpacked');
 
-      Loggy.noSpin(
-        __filename,
-        'unpack',
-        'unpack-succeeded',
-        `The kit is ready to use. \n${config.message}`,
-      );
+      Loggy.noSpin(__filename, 'unpack', 'unpack-succeeded', `The kit is ready to use. \n${config.message}`);
     } catch (e) {
-      // TODO: remove all files from directory on fail except .zos.lock
-      e.message = `Failed to download and unpack kit from ${url}. Details: ${
-        e.message
-      }`;
+      // TODO: remove all files from directory on fail except .lock
+      e.message = `Failed to download and unpack kit from ${url}. Details: ${e.message}`;
       throw e;
     }
   }
@@ -80,9 +61,7 @@ export default class KitController {
 
     try {
       const config = (await axios.get(
-        url
-          .replace('.git', '/stable/kit.json')
-          .replace('github.com', 'raw.githubusercontent.com'),
+        url.replace('.git', '/stable/kit.json').replace('github.com', 'raw.githubusercontent.com'),
       )).data as KitFile;
 
       // validate our json config
@@ -92,18 +71,13 @@ export default class KitController {
       const isValid = test(config);
       if (!isValid) {
         throw new Error(
-          `kit.json is not valid. Errors: ${test.errors.reduce(
-            (ret, err): string => `${err.message}, ${ret}`,
-            '',
-          )}`,
+          `kit.json is not valid. Errors: ${test.errors.reduce((ret, err): string => `${err.message}, ${ret}`, '')}`,
         );
       }
 
       // has to be the same version
       if (config.manifestVersion !== MANIFEST_VERSION) {
-        throw new Error(`Unrecognized kit version identifier ${
-          config.manifestVersion
-        }.
+        throw new Error(`Unrecognized kit version identifier ${config.manifestVersion}.
           This means the kit was built with an unknown version of zos.
           Please refer to the documentation at https://docs.zeppelinos.org for more info.`);
       }

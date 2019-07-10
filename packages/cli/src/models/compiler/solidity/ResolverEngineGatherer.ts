@@ -40,10 +40,7 @@ async function gatherDependencyTree(
    * @param file File in a depedency that should now be traversed
    * @returns An absolute path for the requested file
    */
-  async function dfs(file: {
-    searchCwd: string;
-    uri: string;
-  }): Promise<string> {
+  async function dfs(file: { searchCwd: string; uri: string }): Promise<string> {
     const url = await resolver.resolve(file.uri, file.searchCwd);
     if (alreadyImported.has(url)) {
       return url;
@@ -71,9 +68,7 @@ async function gatherDependencyTree(
     return resolvedFile.url;
   }
 
-  await Promise.all(
-    roots.map(what => dfs({ searchCwd: workingDir, uri: what })),
-  );
+  await Promise.all(roots.map(what => dfs({ searchCwd: workingDir, uri: what })));
 
   return result;
 }
@@ -111,10 +106,7 @@ export async function gatherSources(
   while (queue.length > 0) {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const fileData = queue.shift()!;
-    const resolvedFile: ImportFile = await resolveImportFile(
-      resolver,
-      fileData,
-    );
+    const resolvedFile: ImportFile = await resolveImportFile(resolver, fileData);
     const foundImports = getImports(resolvedFile.source);
 
     // if imported path starts with '.' we assume it's relative and return it's
@@ -140,6 +132,7 @@ export async function gatherSources(
     const fileParentDir = pathSys.dirname(resolvedFile.url);
     for (const foundImport of foundImports) {
       let importName: string;
+      // If it's relative, resolve it; otherwise, pass through
       if (foundImport[0] === '.') {
         importName = resolvePath(relativePath, foundImport);
       } else {
@@ -186,11 +179,19 @@ async function resolveImportFile(
     return await resolver.require(fileData.file, fileData.cwd);
   } catch (err) {
     if (err.message.startsWith('None of the sub-resolvers resolved')) {
+      // If the import failed, we retry it from the project root,
+      // in order to support `import "contracts/folder/Contract.sol";`
+      // See https://github.com/zeppelinos/zos/issues/1024
+      if (fileData.cwd !== process.cwd() && fileData.file[0] !== '.') {
+        return resolveImportFile(resolver, {
+          ...fileData,
+          cwd: process.cwd(),
+        });
+      }
       const cwd = pathSys.relative(process.cwd(), fileData.cwd);
+      const cwdDesc = cwd.length === 0 ? 'the project' : `folder ${cwd}`;
       const relativeTo = pathSys.relative(process.cwd(), fileData.relativeTo);
-      err.message = `Could not find file ${
-        fileData.file
-      } in folder ${cwd} (imported from ${relativeTo})`;
+      err.message = `Could not find file ${fileData.file} in ${cwdDesc} (imported from ${relativeTo})`;
     }
     throw err;
   }
@@ -210,9 +211,7 @@ export async function gatherSourcesAndCanonizeImports(
   resolver: ResolverEngine<ImportFile>,
 ): Promise<ImportFile[]> {
   function canonizeFile(file: ImportTreeNode) {
-    file.imports.forEach(
-      i => (file.source = file.source.replace(i.uri, i.url)),
-    );
+    file.imports.forEach(i => (file.source = file.source.replace(i.uri, i.url)));
   }
 
   const sources = await gatherDependencyTree(roots, workingDir, resolver);

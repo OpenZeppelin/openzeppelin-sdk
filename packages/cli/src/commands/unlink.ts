@@ -5,8 +5,7 @@ import ProjectFile from '../models/files/ProjectFile';
 
 const name = 'unlink';
 const signature = `${name} [dependencies...]`;
-const description =
-  'unlinks dependencies from the project. Provide a list of whitespace-separated dependency names';
+const description = 'unlinks dependencies from the project. Provide a list of whitespace-separated dependency names';
 
 const register: (program: any) => any = program =>
   program

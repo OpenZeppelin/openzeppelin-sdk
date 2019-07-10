@@ -8,16 +8,14 @@ on Ethereum and every other EVM and eWASM-powered blockchain.
 
 ## Features
 
-* Upgrades: deploy new versions of packages to the blockchain.
-* Publish EVM packages: deploy packages to the blockchain to allow other
-  projects to reuse them.
-* Link EVM packages: link your project to EVM packages already deployed on the
-  blockchain.
-* Vouching: use ZEP tokens to back the quality of an EVM package.
+* **Interactive commands**: Send transactions, query balances, and interact with your contracts directly from the command line.
+* **Upgrade your contracts**: You can develop your smart contracts iteratively, speeding up development locally, or squashing bugs in production.
+* **Link EVM packages**: Use code from contracts already deployed to the blockchain directly on your project, saving gas on deployments and managing your dependencies securely.
+* **Build a (d)app**: Jumpstart your dapp by unpacking one of our starter kits, pre-configured with OpenZeppelin contracts, ZeppelinOS, React, and Infura.
 
 ## Getting Started
 
-Start by [deploying your first ZeppelinOS project](deploying.md).
+Start by [deploying your first ZeppelinOS project](first.md).
 
 ## Security
 

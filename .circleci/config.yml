@@ -78,6 +78,9 @@ commands:
       install-cmd:
         type: string
         default: pwd && npm install
+      test-cmd:
+        type: string
+        default: pwd && npm test
     steps:
       - npm-install-with-cache:
           dir: "<< parameters.dir >>"
@@ -85,7 +88,7 @@ commands:
           install-cmd: "<< parameters.install-cmd >>"
       - run: 
           name: "Test on << parameters.dir >>"
-          command: pwd && npm test
+          command: "<< parameters.test-cmd >>"
           working_directory: "<< parameters.dir >>"
 
 jobs:
@@ -176,6 +179,18 @@ jobs:
           dir: "~/zos/examples/cli-create2"
           install-cmd: '~/zos/node_modules/.bin/lerna bootstrap --scope=example-cli-create2 --scope="zos*"'
 
+  example-first-project:
+    <<: *defaults
+    steps:
+      - checkout
+      - restore_cache: *restore-cache-root
+      - restore_cache: *restore-cache-lib
+      - restore_cache: *restore-cache-cli
+      - npm-install-and-test:
+          dir: "~/zos/examples/first-project"
+          install-cmd: '~/zos/node_modules/.bin/lerna bootstrap --scope=example-first-project --scope="zos*"'
+          test-cmd: pwd && scripts/test-ci.sh
+
   integration-cli-geth: &integration
     environment: { NETWORK: "geth-dev" }
     working_directory: ~/zos
@@ -202,19 +217,19 @@ jobs:
     <<: *integration
     environment: { NETWORK: "geth-dev-hdwallet" }
 
-  integration-cli-zepkit:
+  integration-cli-kits:
     <<: *integration
     environment: { NETWORK: "development" }
     steps:
       - checkout
       - restore-all-caches
       - npm-install-with-cache: 
-          dir: "~/zos/tests/zepkit/test"
+          dir: "~/zos/tests/kits/test"
           cache-version: 'v3'
       - run:
-          name: ZepKit integration test
+          name: Kits integration test
           command: 'npm run test'
-          working_directory: "~/zos/tests/zepkit/test"
+          working_directory: "~/zos/tests/kits/test"
 
 workflows:
   version: 2
@@ -233,9 +248,11 @@ workflows:
           requires: [test-lib, test-cli]
       - example-cli-create2:
           requires: [test-lib, test-cli]
+      - example-first-project:
+          requires: [test-lib, test-cli]
       - integration-cli-geth:
           requires: [test-lib, test-cli]
       - integration-cli-hdwallet:
           requires: [test-lib, test-cli]
-      - integration-cli-zepkit:
+      - integration-cli-kits:
           requires: [test-lib, test-cli]

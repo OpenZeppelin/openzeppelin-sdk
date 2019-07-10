@@ -16,26 +16,14 @@ export default class App {
   public appContract: any;
   private txParams: TxParams;
 
-  public static async fetch(
-    address: string,
-    txParams: TxParams = {},
-  ): Promise<App> {
+  public static async fetch(address: string, txParams: TxParams = {}): Promise<App> {
     const appContract = (await this.getContractClass()).at(address);
     return new this(appContract, txParams);
   }
 
   public static async deploy(txParams: TxParams = {}): Promise<App> {
-    const appContract = await Transactions.deployContract(
-      this.getContractClass(),
-      [],
-      txParams,
-    );
-    Loggy.onVerbose(
-      __filename,
-      'deploy',
-      `deployed-app`,
-      `Deployed App at ${appContract.address}`,
-    );
+    const appContract = await Transactions.deployContract(this.getContractClass(), [], txParams);
+    Loggy.onVerbose(__filename, 'deploy', `deployed-app`, `Deployed App at ${appContract.address}`);
     return new this(appContract, txParams);
   }
 
@@ -48,36 +36,18 @@ export default class App {
     this.txParams = txParams;
   }
 
-  public async getPackage(
-    name,
-  ): Promise<{ package: Package; version: string }> {
-    const {
-      ['0']: address,
-      ['1']: version,
-    } = await this.appContract.methods.getPackage(name).call();
+  public async getPackage(name): Promise<{ package: Package; version: string }> {
+    const { ['0']: address, ['1']: version } = await this.appContract.methods.getPackage(name).call();
     const thepackage = Package.fetch(address, { ...this.txParams });
     return { package: thepackage, version };
   }
 
-  public async hasPackage(
-    name: string,
-    expectedVersion?: string,
-  ): Promise<boolean> {
-    const {
-      ['0']: address,
-      ['1']: version,
-    } = await this.appContract.methods.getPackage(name).call();
-    return (
-      !isZeroAddress(address) &&
-      (!expectedVersion || semanticVersionEqual(expectedVersion, version))
-    );
+  public async hasPackage(name: string, expectedVersion?: string): Promise<boolean> {
+    const { ['0']: address, ['1']: version } = await this.appContract.methods.getPackage(name).call();
+    return !isZeroAddress(address) && (!expectedVersion || semanticVersionEqual(expectedVersion, version));
   }
 
-  public async setPackage(
-    name: string,
-    packageAddress: string,
-    version: string,
-  ): Promise<any> {
+  public async setPackage(name: string, packageAddress: string, version: string): Promise<any> {
     return await Transactions.sendTransaction(
       this.appContract.methods.setPackage,
       [name, toAddress(packageAddress), toSemanticVersion(version)],
@@ -86,11 +56,7 @@ export default class App {
   }
 
   public async unsetPackage(name: string): Promise<any> {
-    return await Transactions.sendTransaction(
-      this.appContract.methods.unsetPackage,
-      [name],
-      { ...this.txParams },
-    );
+    return await Transactions.sendTransaction(this.appContract.methods.unsetPackage, [name], { ...this.txParams });
   }
 
   public get address(): string {
@@ -101,13 +67,8 @@ export default class App {
     return this.appContract;
   }
 
-  public async getImplementation(
-    packageName: string,
-    contractName: string,
-  ): Promise<string> {
-    return this.appContract.methods
-      .getImplementation(packageName, contractName)
-      .call();
+  public async getImplementation(packageName: string, contractName: string): Promise<string> {
+    return this.appContract.methods.getImplementation(packageName, contractName).call();
   }
 
   public async hasProvider(name: string): Promise<boolean> {
@@ -129,18 +90,10 @@ export default class App {
     initArgs?: string[],
   ): Promise<Contract> {
     if (!isEmpty(initArgs) && !initMethodName) initMethodName = 'initialize';
-    const implementation = await this.getImplementation(
-      packageName,
-      contractName,
-    );
+    const implementation = await this.getImplementation(packageName, contractName);
     const proxy =
       initMethodName === undefined
-        ? await this._createProxy(
-            packageName,
-            contractName,
-            implementation,
-            proxyAdmin,
-          )
+        ? await this._createProxy(packageName, contractName, implementation, proxyAdmin)
         : await this._createProxyAndCall(
             contract,
             packageName,
@@ -150,10 +103,7 @@ export default class App {
             initMethodName,
             initArgs,
           );
-    Loggy.succeed(
-      `create-proxy`,
-      `${packageName} ${contractName} instance created at ${proxy.address}`,
-    );
+    Loggy.succeed(`create-proxy`, `${packageName} ${contractName} instance created at ${proxy.address}`);
     return contract.at(proxy.address);
   }
 
@@ -164,18 +114,8 @@ export default class App {
     proxyAdmin: string,
   ): Promise<Proxy> {
     const initializeData: Buffer = Buffer.from('');
-    Loggy.spin(
-      __filename,
-      '_createProxy',
-      `create-proxy`,
-      `Creating ${packageName} ${contractName} proxy`,
-    );
-    return Proxy.deploy(
-      implementation,
-      proxyAdmin,
-      initializeData,
-      this.txParams,
-    );
+    Loggy.spin(__filename, '_createProxy', `create-proxy`, `Creating ${packageName} ${contractName} proxy`);
+    return Proxy.deploy(implementation, proxyAdmin, initializeData, this.txParams);
   }
 
   private async _createProxyAndCall(
@@ -187,19 +127,12 @@ export default class App {
     initMethodName: string,
     initArgs: any,
   ): Promise<Proxy> {
-    const { method: initMethod, callData }: CalldataInfo = buildCallData(
-      contract,
-      initMethodName,
-      initArgs,
-    );
+    const { method: initMethod, callData }: CalldataInfo = buildCallData(contract, initMethodName, initArgs);
     Loggy.spin(
       __filename,
       '_createProxyAndCall',
       `create-proxy`,
-      `Creating ${packageName}/${contractName} instance and calling ${callDescription(
-        initMethod,
-        initArgs,
-      )}`,
+      `Creating ${packageName}/${contractName} instance and calling ${callDescription(initMethod, initArgs)}`,
     );
     return Proxy.deploy(implementation, proxyAdmin, callData, this.txParams);
   }

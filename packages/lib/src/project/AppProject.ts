@@ -48,12 +48,7 @@ class BaseAppProject extends BasePackageProject {
     name: string = DEFAULT_NAME,
     version: string = DEFAULT_VERSION,
     txParams: TxParams = {},
-    {
-      appAddress,
-      packageAddress,
-      proxyAdminAddress,
-      proxyFactoryAddress,
-    }: ExistingAddresses = {},
+    { appAddress, packageAddress, proxyAdminAddress, proxyFactoryAddress }: ExistingAddresses = {},
   ): Promise<AppProject | never> {
     let thepackage: Package;
     let directory: ImplementationDirectory;
@@ -78,12 +73,7 @@ class BaseAppProject extends BasePackageProject {
       } else if (await app.hasPackage(name, version)) {
         thepackage = (await app.getPackage(name)).package;
       } else {
-        Loggy.spin(
-          __filename,
-          'fetchOrDeploy',
-          `publish-project`,
-          'Deploying new Package contract',
-        );
+        Loggy.spin(__filename, 'fetchOrDeploy', `publish-project`, 'Deploying new Package contract');
         thepackage = await Package.deploy(txParams);
       }
 
@@ -98,28 +88,18 @@ class BaseAppProject extends BasePackageProject {
         );
         directory = await thepackage.newVersion(version);
         const succeedText =
-          !appAddress || !packageAddress
-            ? `Project structure deployed`
-            : `Version ${version} deployed`;
+          !appAddress || !packageAddress ? `Project structure deployed` : `Version ${version} deployed`;
 
         Loggy.succeed(`publish-project`, succeedText);
       }
 
-      if (!(await app.hasPackage(name, version)))
-        await app.setPackage(name, thepackage.address, version);
+      if (!(await app.hasPackage(name, version))) await app.setPackage(name, thepackage.address, version);
 
       const proxyAdmin: ProxyAdmin | null = proxyAdminAddress
         ? await ProxyAdmin.fetch(proxyAdminAddress, txParams)
         : null;
       const proxyFactory = ProxyFactory.tryFetch(proxyFactoryAddress, txParams);
-      const project: AppProject = new AppProject(
-        app,
-        name,
-        version,
-        proxyAdmin,
-        proxyFactory,
-        txParams,
-      );
+      const project: AppProject = new AppProject(app, name, version, proxyAdmin, proxyFactory, txParams);
       project.directory = directory;
       project.package = thepackage;
       return project;
@@ -147,11 +127,7 @@ class BaseAppProject extends BasePackageProject {
           appProject.registerImplementation(contractAlias, contractInfo),
         ),
         map(proxyAdminProject.dependencies, (dependencyInfo, dependencyName) =>
-          appProject.setDependency(
-            dependencyName,
-            dependencyInfo.package,
-            dependencyInfo.version,
-          ),
+          appProject.setDependency(dependencyName, dependencyInfo.package, dependencyInfo.version),
         ),
       ),
     );
@@ -177,11 +153,7 @@ class BaseAppProject extends BasePackageProject {
           appProject.registerImplementation(contractAlias, contractInfo),
         ),
         map(simpleProject.dependencies, (dependencyInfo, dependencyName) =>
-          appProject.setDependency(
-            dependencyName,
-            dependencyInfo.package,
-            dependencyInfo.version,
-          ),
+          appProject.setDependency(dependencyName, dependencyInfo.package, dependencyInfo.version),
         ),
       ),
     );
@@ -214,9 +186,7 @@ class BaseAppProject extends BasePackageProject {
   }
 
   public getAdminAddress(): Promise<string> {
-    return new Promise(resolve =>
-      resolve(this.proxyAdmin ? this.proxyAdmin.address : null),
-    );
+    return new Promise(resolve => resolve(this.proxyAdmin ? this.proxyAdmin.address : null));
   }
   public getApp(): App {
     return this.app;
@@ -265,38 +235,19 @@ class BaseAppProject extends BasePackageProject {
     packageName?: string;
     contract?: Contract;
   }): Promise<string> {
-    return this.app.getImplementation(
-      packageName || this.name,
-      contractName || contract.schema.contractName,
-    );
+    return this.app.getImplementation(packageName || this.name, contractName || contract.schema.contractName);
   }
 
-  public async createProxy(
-    contract: Contract,
-    contractInterface: ContractInterface = {},
-  ): Promise<Contract> {
-    const {
-      contractName,
-      packageName,
-      initMethod,
-      initArgs,
-      admin,
-    } = this.getContractInterface(contract, contractInterface);
-    const proxyAdmin = admin || (await this.ensureProxyAdmin()).address;
-    return this.app.createProxy(
+  public async createProxy(contract: Contract, contractInterface: ContractInterface = {}): Promise<Contract> {
+    const { contractName, packageName, initMethod, initArgs, admin } = this.getContractInterface(
       contract,
-      packageName,
-      contractName,
-      proxyAdmin,
-      initMethod,
-      initArgs,
+      contractInterface,
     );
+    const proxyAdmin = admin || (await this.ensureProxyAdmin()).address;
+    return this.app.createProxy(contract, packageName, contractName, proxyAdmin, initMethod, initArgs);
   }
 
-  protected getContractInterface(
-    contract: Contract,
-    opts: ContractInterface = {},
-  ): ContractInterface {
+  protected getContractInterface(contract: Contract, opts: ContractInterface = {}): ContractInterface {
     let { contractName, packageName, initMethod } = opts;
 
     if (!contractName) {
@@ -318,76 +269,35 @@ class BaseAppProject extends BasePackageProject {
     signature?: string,
     contractInterface: ContractInterface = {},
   ): Promise<Contract> {
-    const {
-      contractName,
-      packageName,
-      initMethod,
-      initArgs,
-      admin,
-    } = this.getContractInterface(contract, contractInterface);
-    const implementationAddress = await this.app.getImplementation(
-      packageName,
-      contractName,
-    );
-    const initCallData = this.getAndLogInitCallData(
+    const { contractName, packageName, initMethod, initArgs, admin } = this.getContractInterface(
       contract,
-      initMethod,
-      initArgs,
-      implementationAddress,
-      'Creating',
+      contractInterface,
     );
+    const implementationAddress = await this.app.getImplementation(packageName, contractName);
+    const initCallData = this.getAndLogInitCallData(contract, initMethod, initArgs, implementationAddress, 'Creating');
 
     const proxyFactory = await this.ensureProxyFactory();
     const proxyAdmin = admin || (await this.ensureProxyAdmin()).address;
-    const proxy = await proxyFactory.createProxy(
-      salt,
-      implementationAddress,
-      proxyAdmin,
-      initCallData,
-      signature,
-    );
+    const proxy = await proxyFactory.createProxy(salt, implementationAddress, proxyAdmin, initCallData, signature);
     Loggy.succeed(`create-proxy`, `Instance created at ${proxy.address}`);
 
     return contract.at(proxy.address);
   }
 
-  public async createMinimalProxy(
-    contract: Contract,
-    contractInterface: ContractInterface = {},
-  ): Promise<Contract> {
-    const {
-      contractName,
-      packageName,
-      initMethod,
-      initArgs,
-    } = this.getContractInterface(contract, contractInterface);
-    const implementationAddress = await this.app.getImplementation(
-      packageName,
-      contractName,
-    );
-    const initCallData = this.getAndLogInitCallData(
-      contract,
-      initMethod,
-      initArgs,
-      implementationAddress,
-      'Creating',
-    );
+  public async createMinimalProxy(contract: Contract, contractInterface: ContractInterface = {}): Promise<Contract> {
+    const { contractName, packageName, initMethod, initArgs } = this.getContractInterface(contract, contractInterface);
+    const implementationAddress = await this.app.getImplementation(packageName, contractName);
+    const initCallData = this.getAndLogInitCallData(contract, initMethod, initArgs, implementationAddress, 'Creating');
 
     const proxyFactory = await this.ensureProxyFactory();
-    const proxy = await proxyFactory.createMinimalProxy(
-      implementationAddress,
-      initCallData,
-    );
+    const proxy = await proxyFactory.createMinimalProxy(implementationAddress, initCallData);
     Loggy.succeed(`create-proxy`, `Instance created at ${proxy.address}`);
 
     return contract.at(proxy.address);
   }
 
   // REFACTOR: De-duplicate from BaseSimpleProject
-  public async getProxyDeploymentAddress(
-    salt: string,
-    sender?: string,
-  ): Promise<string> {
+  public async getProxyDeploymentAddress(salt: string, sender?: string): Promise<string> {
     const proxyFactory = await this.ensureProxyFactory();
     return proxyFactory.getDeploymentAddress(salt, sender);
   }
@@ -397,13 +307,7 @@ class BaseAppProject extends BasePackageProject {
     contract,
     salt: string,
     signature: string,
-    {
-      packageName,
-      contractName,
-      initMethod,
-      initArgs,
-      admin,
-    }: ContractInterface = {},
+    { packageName, contractName, initMethod, initArgs, admin }: ContractInterface = {},
   ): Promise<string> {
     const proxyFactory = await this.ensureProxyFactory();
     const implementationAddress = await this.getImplementation({
@@ -414,20 +318,11 @@ class BaseAppProject extends BasePackageProject {
     if (!implementationAddress)
       throw new Error(
         `Contract ${contractName ||
-          contract.schema
-            .contractName} was not found or is not deployed in the current network.`,
+          contract.schema.contractName} was not found or is not deployed in the current network.`,
       );
     const adminAddress = admin || (await this.getAdminAddress());
-    const initData = initMethod
-      ? buildCallData(contract, initMethod, initArgs).callData
-      : null;
-    return proxyFactory.getSigner(
-      salt,
-      implementationAddress,
-      adminAddress,
-      initData,
-      signature,
-    );
+    const initData = initMethod ? buildCallData(contract, initMethod, initArgs).callData : null;
+    return proxyFactory.getSigner(salt, implementationAddress, adminAddress, initData, signature);
   }
 
   public async upgradeProxy(
@@ -435,23 +330,12 @@ class BaseAppProject extends BasePackageProject {
     contract: Contract,
     contractInterface: ContractInterface = {},
   ): Promise<Contract> {
-    const {
-      contractName,
-      packageName,
-      initMethod,
-      initArgs,
-    } = this.getContractInterface(contract, contractInterface);
+    const { contractName, packageName, initMethod, initArgs } = this.getContractInterface(contract, contractInterface);
     const implementationAddress = await this.getImplementation({
       packageName,
       contractName,
     });
-    return this.proxyAdmin.upgradeProxy(
-      proxyAddress,
-      implementationAddress,
-      contract,
-      initMethod,
-      initArgs,
-    );
+    return this.proxyAdmin.upgradeProxy(proxyAddress, implementationAddress, contract, initMethod, initArgs);
   }
 
   public async getDependencyPackage(name: string): Promise<Package> {
@@ -468,11 +352,7 @@ class BaseAppProject extends BasePackageProject {
     return this.app.hasPackage(name);
   }
 
-  public async setDependency(
-    name: string,
-    packageAddress: string,
-    version: string,
-  ): Promise<boolean> {
+  public async setDependency(name: string, packageAddress: string, version: string): Promise<boolean> {
     return this.app.setPackage(name, packageAddress, version);
   }
 
@@ -489,20 +369,13 @@ class BaseAppProject extends BasePackageProject {
     actionLabel?: string,
     proxyAddress?: string,
   ): string | null {
-    const logReference =
-      actionLabel === 'Creating'
-        ? 'create-proxy'
-        : `upgrade-proxy-${proxyAddress}`;
+    const logReference = actionLabel === 'Creating' ? 'create-proxy' : `upgrade-proxy-${proxyAddress}`;
     const logMessage =
       actionLabel === 'Creating'
         ? `Creating instance for contract at ${implementationAddress}`
         : `Upgrading instance at ${proxyAddress}`;
     if (initMethodName) {
-      const { method: initMethod, callData }: CalldataInfo = buildCallData(
-        contract,
-        initMethodName,
-        initArgs,
-      );
+      const { method: initMethod, callData }: CalldataInfo = buildCallData(contract, initMethodName, initArgs);
       if (actionLabel)
         Loggy.spin(
           __filename,
@@ -526,6 +399,4 @@ class BaseAppProject extends BasePackageProject {
 }
 // Mixings produce value but not type
 // We have to export full class with type & callable
-export default class AppProject extends ProxyAdminProjectMixin(
-  BaseAppProject,
-) {}
+export default class AppProject extends ProxyAdminProjectMixin(BaseAppProject) {}

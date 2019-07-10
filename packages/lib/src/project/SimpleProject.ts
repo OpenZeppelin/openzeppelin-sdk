@@ -8,11 +8,7 @@ import ProxyFactory from '../proxy/ProxyFactory';
 import { TxParams } from '../artifacts/ZWeb3';
 
 export default class SimpleProject extends BaseSimpleProject {
-  public constructor(
-    name: string = 'main',
-    proxyFactory?: ProxyFactory,
-    txParams: TxParams = {},
-  ) {
+  public constructor(name: string = 'main', proxyFactory?: ProxyFactory, txParams: TxParams = {}) {
     super(name, proxyFactory, txParams);
   }
 
@@ -21,24 +17,18 @@ export default class SimpleProject extends BaseSimpleProject {
     contract: Contract,
     contractParams: ContractInterface = {},
   ): Promise<Contract> {
-    const {
-      implementationAddress,
-      pAddress,
-      initCallData,
-    } = await this._setUpgradeParams(proxyAddress, contract, contractParams);
+    const { implementationAddress, pAddress, initCallData } = await this._setUpgradeParams(
+      proxyAddress,
+      contract,
+      contractParams,
+    );
     const proxy = Proxy.at(pAddress, this.txParams);
     await proxy.upgradeTo(implementationAddress, initCallData);
-    Loggy.succeed(
-      `action-proxy-${implementationAddress}`,
-      `Instance at ${pAddress} upgraded`,
-    );
+    Loggy.succeed(`action-proxy-${implementationAddress}`, `Instance at ${pAddress} upgraded`);
     return contract.at(proxyAddress);
   }
 
-  public async changeProxyAdmin(
-    proxyAddress: string,
-    newAdmin: string,
-  ): Promise<Proxy> {
+  public async changeProxyAdmin(proxyAddress: string, newAdmin: string): Promise<Proxy> {
     Loggy.spin(
       __filename,
       'changeProxyAdmin',
@@ -47,16 +37,12 @@ export default class SimpleProject extends BaseSimpleProject {
     );
     const proxy: Proxy = Proxy.at(proxyAddress, this.txParams);
     await proxy.changeAdmin(newAdmin);
-    Loggy.succeed(
-      'change-proxy-admin',
-      `Admin for proxy ${proxyAddress} set to ${newAdmin}`,
-    );
+    Loggy.succeed('change-proxy-admin', `Admin for proxy ${proxyAddress} set to ${newAdmin}`);
     return proxy;
   }
 
   public async getAdminAddress(): Promise<string> {
-    if (this.txParams.from)
-      return new Promise(resolve => resolve(this.txParams.from));
+    if (this.txParams.from) return new Promise(resolve => resolve(this.txParams.from));
     else return ZWeb3.defaultAccount();
   }
 }

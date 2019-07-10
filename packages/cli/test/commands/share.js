@@ -95,8 +95,10 @@ exports.stubCommands = function() {
       .returns(true);
     const projectFile = new ProjectFile('test/mocks/mock-stdlib/zos.json');
     this.dependency = sinon
-      .stub(Dependency.prototype, 'getProjectFile')
-      .returns(projectFile);
+      .stub(Dependency.prototype, 'projectFile')
+      .get(function getterFn() {
+        return projectFile;
+      });
   });
 
   afterEach('restore', function() {

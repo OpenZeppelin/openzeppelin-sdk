@@ -26,10 +26,7 @@ const register: (program: any) => any = program =>
     .usage('--to <to> --method <method> [options]')
     .description(description)
     .option('--to <to>', 'address of the contract that will receive the call')
-    .option(
-      '--method <method>',
-      `name of the method to execute in the contract`,
-    )
+    .option('--method <method>', `name of the method to execute in the contract`)
     .option('--args <arg1, arg2, ...>', 'arguments to the method to execute')
     .withNetworkOptions()
     .withNonInteractiveOption()
@@ -43,36 +40,19 @@ async function action(options: any): Promise<void> {
     ...networkOpts,
   });
 
-  const { contractFullName, proxyReference } = await promptForProxy(
-    proxyAddress,
-    network,
-    options,
-  );
-  const methodParams = await promptForMethodParams(
-    contractFullName,
-    options,
-    {},
-    Mutability.Constant,
-  );
+  const { contractFullName, proxyReference } = await promptForProxy(proxyAddress, network, options);
+  const methodParams = await promptForMethodParams(contractFullName, options, {}, Mutability.Constant);
   const args = pickBy({ ...methodParams, proxyAddress: proxyReference });
   await call({ ...args, network, txParams });
 
-  if (!options.dontExitProcess && process.env.NODE_ENV !== 'test')
-    process.exit(0);
+  if (!options.dontExitProcess && process.env.NODE_ENV !== 'test') process.exit(0);
 }
 
-async function promptForProxy(
-  proxyAddress: string,
-  network: string,
-  options: any,
-): Promise<SendTxSelectionParams> {
+async function promptForProxy(proxyAddress: string, network: string, options: any): Promise<SendTxSelectionParams> {
   const { interactive } = options;
   const opts = { proxy: proxyAddress };
   const props = getCommandProps(network);
-  const { proxy: promptedProxy } = await promptIfNeeded(
-    { opts, props },
-    interactive,
-  );
+  const { proxy: promptedProxy } = await promptIfNeeded({ opts, props }, interactive);
 
   return promptedProxy;
 }
@@ -84,10 +64,7 @@ function getCommandProps(network?: string): InquirerQuestions {
       message: 'Pick an instance',
       type: 'list',
       choices: proxiesList('byAddress', network),
-      normalize: input =>
-        typeof input !== 'object'
-          ? proxyInfo(parseContractReference(input), network)
-          : input,
+      normalize: input => (typeof input !== 'object' ? proxyInfo(parseContractReference(input), network) : input),
     },
   };
 }

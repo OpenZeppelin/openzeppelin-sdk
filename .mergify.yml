@@ -20,5 +20,6 @@ pull_request_rules:
 - name: delete head branch after merge
   conditions:
   - merged
+  - head~=^(fix|feature|docs|design|refactor|test|rename|dx)/
   actions:
     delete_head_branch: {}

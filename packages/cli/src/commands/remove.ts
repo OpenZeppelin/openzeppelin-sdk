@@ -1,10 +1,6 @@
 import remove from '../scripts/remove';
 import push from './push';
-import {
-  promptIfNeeded,
-  contractsList,
-  InquirerQuestions,
-} from '../prompts/prompt';
+import { promptIfNeeded, contractsList, InquirerQuestions } from '../prompts/prompt';
 
 const name = 'remove';
 const signature = `${name} [contracts...]`;
@@ -32,12 +28,7 @@ async function action(contracts: string[], options: any): Promise<void> {
 }
 
 function getCommandProps(): InquirerQuestions {
-  return contractsList(
-    'contracts',
-    'Choose one or more contracts',
-    'checkbox',
-    'added',
-  );
+  return contractsList('contracts', 'Choose one or more contracts', 'checkbox', 'added');
 }
 
 export default { name, signature, description, register, action };

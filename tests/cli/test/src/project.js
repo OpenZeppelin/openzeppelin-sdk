@@ -10,6 +10,7 @@ function cleanup() {
   run('rm build/contracts/*.json ||:')
   run('rm contracts/*.sol ||:')
   run('rm zos.* ||:')
+  run('rm .openzeppelin/*.json ||:')
   setMockStdlibVersion('1.1.0')
 }
 

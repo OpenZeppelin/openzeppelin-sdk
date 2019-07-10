@@ -14,6 +14,7 @@ import createProxy from '../../src/scripts/create';
 import update from '../../src/scripts/update';
 import setAdmin from '../../src/scripts/set-admin';
 import ProjectFile from '../../src/models/files/ProjectFile';
+import NetworkFile from '../../src/models/files/NetworkFile';
 import utils from 'web3-utils';
 import { ProxyType } from '../../src/scripts/interfaces';
 
@@ -84,7 +85,7 @@ contract('update script', function(accounts) {
   };
 
   const createProxies = async function() {
-    this.networkFile = this.projectFile.networkFile(network);
+    this.networkFile = new NetworkFile(this.projectFile, network);
 
     const contractsData = [
       { name: 'ImplV1', alias: 'Impl' },
@@ -511,7 +512,7 @@ contract('update script', function(accounts) {
   const shouldHandleUpdateOnDependency = function() {
     describe('updating on dependency', function() {
       beforeEach('setup', async function() {
-        this.networkFile = this.projectFile.networkFile(network);
+        this.networkFile = new NetworkFile(this.projectFile, network);
 
         await push({
           network,

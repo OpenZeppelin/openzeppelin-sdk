@@ -14,12 +14,9 @@ const register: (program: any) => any = program =>
     .action(action);
 
 async function action(options: any): Promise<void> {
-  const { network, txParams } = await ConfigManager.initNetworkConfiguration(
-    options,
-  );
+  const { network, txParams } = await ConfigManager.initNetworkConfiguration(options);
   await freeze({ network, txParams });
-  if (!options.dontExitProcess && process.env.NODE_ENV !== 'test')
-    process.exit(0);
+  if (!options.dontExitProcess && process.env.NODE_ENV !== 'test') process.exit(0);
 }
 
 export default { name, signature, description, register, action };

@@ -30,26 +30,18 @@ function quoteArguments(args: string) {
   const END_LOOKAHEAD = '(?=$|([,\\]]\\s*))'; // Character after match is end of line, comma or closing bracket.
 
   // Replace non quoted hex string by quoted hex string.
-  const MATCH_HEX = new RegExp(
-    START_LOOKBEHIND + '(0[xX][0-9a-fA-F]+)' + END_LOOKAHEAD,
-    'g',
-  );
+  const MATCH_HEX = new RegExp(START_LOOKBEHIND + '(0[xX][0-9a-fA-F]+)' + END_LOOKAHEAD, 'g');
   args = args.replace(MATCH_HEX, '"$2"');
 
   // Replace scientific notation numbers by regular numbers.
   const MATCH_SCIENTIFIC = new RegExp(
-    START_LOOKBEHIND +
-      '(\\s*[-]?\\d+(\\.\\d+)?e(\\+)?\\d+\\s*)' +
-      END_LOOKAHEAD,
+    START_LOOKBEHIND + '(\\s*[-]?\\d+(\\.\\d+)?e(\\+)?\\d+\\s*)' + END_LOOKAHEAD,
     'g',
   );
   args = args.replace(MATCH_SCIENTIFIC, val => `${new BN(val).toString(10)}`);
 
   // Replace non quoted number by quoted number.
-  const MATCH_WORDS = new RegExp(
-    START_LOOKBEHIND + '([-]?\\w+)' + END_LOOKAHEAD,
-    'g',
-  );
+  const MATCH_WORDS = new RegExp(START_LOOKBEHIND + '([-]?\\w+)' + END_LOOKAHEAD, 'g');
   args = args.replace(MATCH_WORDS, '"$2"');
   return args;
 }
@@ -64,22 +56,17 @@ export function parseArg(input: string | string[], type: string): any {
   // Arrays: recursively parse
   if (type.match(ARRAY_TYPE_REGEX)) {
     const arrayType = type.match(ARRAY_TYPE_REGEX)[1];
-    const inputs =
-      typeof input === 'string' ? parseArray(stripBrackets(input)) : input;
+    const inputs = typeof input === 'string' ? parseArray(stripBrackets(input)) : input;
     return inputs.map(input => parseArg(input, arrayType));
   }
 
   // Integers: passed via bignumber to handle signs and scientific notation
   else if (
-    (type.startsWith('uint') ||
-      type.startsWith('int') ||
-      type.startsWith('fixed') ||
-      type.startsWith('ufixed')) &&
+    (type.startsWith('uint') || type.startsWith('int') || type.startsWith('fixed') || type.startsWith('ufixed')) &&
     requireInputString(input)
   ) {
     const parsed = new BN(input);
-    if (parsed.isNaN())
-      throw new Error(`Could not parse '${input}' as ${type}`);
+    if (parsed.isNaN()) throw new Error(`Could not parse '${input}' as ${type}`);
     return parsed.toString(10);
   }
 
@@ -114,28 +101,18 @@ export function parseArg(input: string | string[], type: string): any {
 
   // Warn if we see a type we don't recognise, but return it as is
   else {
-    Loggy.noSpin.warn(
-      __filename,
-      'parseArg',
-      `Unknown argument ${type} (skipping input validation)`,
-    );
+    Loggy.noSpin.warn(__filename, 'parseArg', `Unknown argument ${type} (skipping input validation)`);
     return input;
   }
 }
 
 export function stripBrackets(inputMaybeWithBrackets: string): string {
-  return `${inputMaybeWithBrackets
-    .replace(/^\s*\[/, '')
-    .replace(/\]\s*$/, '')}`;
+  return `${inputMaybeWithBrackets.replace(/^\s*\[/, '').replace(/\]\s*$/, '')}`;
 }
 
 function requireInputString(arg: string | string[]): arg is string {
   if (typeof arg !== 'string') {
-    throw new Error(
-      `Expected ${flattenDeep(arg).join(
-        ',',
-      )} to be a scalar value but was an array`,
-    );
+    throw new Error(`Expected ${flattenDeep(arg).join(',')} to be a scalar value but was an array`);
   }
   return true;
 }
@@ -211,10 +188,7 @@ export function parseArray(input: string): (string | string[])[] {
         result.push(innerArray);
         requireCommaOrClosing();
       } else if (char === ']') {
-        if (!requireClosingBracket)
-          throw new Error(
-            `Unexpected closing array at position ${i + 1} in ${input}`,
-          );
+        if (!requireClosingBracket) throw new Error(`Unexpected closing array at position ${i + 1} in ${input}`);
         return result;
       } else {
         i--;
@@ -223,8 +197,7 @@ export function parseArray(input: string): (string | string[])[] {
         result.push(trimmedString);
       }
     }
-    if (requireClosingBracket)
-      throw new Error(`Unclosed array ${input.slice(start)}`);
+    if (requireClosingBracket) throw new Error(`Unclosed array ${input.slice(start)}`);
     return result;
   }
 
@@ -236,22 +209,17 @@ export function parseArray(input: string): (string | string[])[] {
   }
 }
 
-export function parseMethodParams(
-  options: any,
-  defaultMethod?: string,
-): { methodName: any; methodArgs: any[] } {
+export function parseMethodParams(options: any, defaultMethod?: string): { methodName: any; methodArgs: any[] } {
   const { method, init } = options;
   let methodName = method || init;
   let { args: methodArgs } = options;
 
   if (typeof methodName === 'boolean') methodName = defaultMethod;
-  if (!methodName && typeof methodArgs !== 'undefined')
-    methodName = defaultMethod;
+  if (!methodName && typeof methodArgs !== 'undefined') methodName = defaultMethod;
 
   // TODO: Change to use parseArray instead
   if (typeof methodArgs === 'string') methodArgs = parseArgs(methodArgs);
-  else if (!methodArgs || typeof methodArgs === 'boolean' || methodName)
-    methodArgs = [];
+  else if (!methodArgs || typeof methodArgs === 'boolean' || methodName) methodArgs = [];
 
   return { methodName, methodArgs };
 }
@@ -259,9 +227,7 @@ export function parseMethodParams(
 export function validateSalt(salt: string, required = false) {
   if (!salt || salt.length === 0) {
     if (required) {
-      throw new Error(
-        'A non-empty salt is required to calculate the deployment address.',
-      );
+      throw new Error('A non-empty salt is required to calculate the deployment address.');
     } else {
       return;
     }

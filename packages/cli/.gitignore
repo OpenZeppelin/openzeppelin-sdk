@@ -4,3 +4,5 @@ zos.*
 build
 /lib
 .node-xmlhttprequest-sync-*
+
+.openzeppelin/.session
