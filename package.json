@@ -1,11 +1,14 @@
 {
   "name": "root",
   "private": true,
-  "scripts": {
-    "prepare": "git config core.hooksPath .githooks"
-  },
   "devDependencies": {
+    "husky": "^2.7.0",
     "lerna": "~3.13.1",
     "typescript": "^3.2.2"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lerna run --concurrency 1 --stream precommit"
+    }
   }
 }
