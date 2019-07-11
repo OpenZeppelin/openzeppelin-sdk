@@ -103,7 +103,7 @@ Before deploying, we need to add our contract usingzos add, this will add our co
 zos add Wallet 
 ```
 
-Now we will generate contract address using zos create2, we will use 12345 as salt, you can choose any random number and--query option tells zOS that we want to compute address, not the actual deployment of the contract. We will also pass network information using -n development , you can find this configuration innetworks.js file.
+Now we will generate contract address using zos create2, we will use 12345 as salt, you can choose any random number and --query option tells zOS that we want to compute address, not the actual deployment of the contract. We will also pass network information using -n development, you can find this configuration in networks.js file.
 
 ```console 
 $ zos create2 --salt 12345 --query -n development
