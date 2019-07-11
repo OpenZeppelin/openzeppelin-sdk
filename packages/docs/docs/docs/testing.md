@@ -7,7 +7,7 @@ When working with the OpenZeppelin SDK, you can test your contracts as you usual
 
 Instead, you can use specifically designed OpenZeppelin SDK tools that automatically set up your entire project in your testing environment. This allows you to replicate the same set of contracts that manage your project for each test you run.
 
-The `@openzeppelin/cli` package provides a `TestHelper()` function to retrieve your project structure from the `.openzeppelin/project.json` file and deploy everything to the current test network. All the contracts that you have registered via `openzeppelin add`, plus all the contracts provided by the EVM packages you have linked, will be available. The returned project object (either a [`ProxyAdminProject`](https://github.com/zeppelinos/zos/blob/v2.2.0/packages/lib/src/project/ProxyAdminProject.ts) or an [`AppProject`](https://github.com/zeppelinos/zos/blob/v2.2.0/packages/lib/src/project/AppProject.ts)) provides convenient methods for creating upgradeable instances of your contracts, which you can use within your tests. Let's see how this would work in a simple project.
+The `@openzeppelin/cli` package provides a `TestHelper()` function to retrieve your project structure from the `.openzeppelin/project.json` file and deploy everything to the current test network. All the contracts that you have registered via `openzeppelin add`, plus all the contracts provided by the EVM packages you have linked, will be available. The returned project object (either a [`ProxyAdminProject`](https://github.com/OpenZeppelin/openzeppelin-sdk/blob/v2.2.0/packages/lib/src/project/ProxyAdminProject.ts) or an [`AppProject`](https://github.com/OpenZeppelin/openzeppelin-sdk/blob/v2.2.0/packages/lib/src/project/AppProject.ts)) provides convenient methods for creating upgradeable instances of your contracts, which you can use within your tests. Let's see how this would work in a simple project.
 
 ## Setting up a sample project
 
@@ -137,7 +137,7 @@ And finally, we add the tests themselves. Notice how each test first creates a u
 const proxy = await this.project.createProxy(Sample);
 ```
 
-The [createProxy](https://github.com/zeppelinos/zos/blob/master/packages/lib/src/project/BaseSimpleProject.ts#L96) method of the project accepts an additional object parameter in which you can specify an initializer function with arguments, just as you would by using the regular `openzeppelin create` command from the CLI, but due to the simplicity of this example, it's not necessary in our case. If you would need to pass parameters though, you would do so like this:
+The [createProxy](https://github.com/OpenZeppelin/openzeppelin-sdk/blob/master/packages/lib/src/project/BaseSimpleProject.ts#L96) method of the project accepts an additional object parameter in which you can specify an initializer function with arguments, just as you would by using the regular `openzeppelin create` command from the CLI, but due to the simplicity of this example, it's not necessary in our case. If you would need to pass parameters though, you would do so like this:
 
 ```js
 const proxy = await this.project.createProxy(Sample, {

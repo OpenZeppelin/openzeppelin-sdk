@@ -63,4 +63,4 @@ require('babel-polyfill');
 
 You can create upgradeable instances from Solidity code by using your project's App contract, and then calling its `create` function from Solidity. Note that to be able to do this, your project needs to be published, i.e. it needs to have the OpenZeppelin SDK [Contracts Architecture](https://docs.zeppelinos.org/docs/architecture.html) enabled.
 
-To see an example of how this is done, please refer to the example project [creating-instances-from-solidity](https://github.com/zeppelinos/zos/tree/master/examples/creating-instances-from-solidity).
+To see an example of how this is done, please refer to the example project [creating-instances-from-solidity](https://github.com/OpenZeppelin/openzeppelin-sdk/tree/master/examples/creating-instances-from-solidity).

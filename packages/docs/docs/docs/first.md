@@ -39,7 +39,7 @@ The CLI will prompt you to choose a project name and version, defaulting to the 
 
 We are now ready to begin coding.
 
-> Note: Should you get lost at any point during this tutorial, you can refer to the full code for this project in our [`Github repo`](https://github.com/zeppelinos/zos/tree/v2.4.0/examples/first-project).
+> Note: Should you get lost at any point during this tutorial, you can refer to the full code for this project in our [`Github repo`](https://github.com/OpenZeppelin/openzeppelin-sdk/tree/v2.4.0/examples/first-project).
 
 ## Your first contract
 

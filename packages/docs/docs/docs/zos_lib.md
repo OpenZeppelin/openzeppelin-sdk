@@ -178,4 +178,4 @@ npx truffle exec index.js --network local
 
 This is just a very simple example to show the basic functions of the
 OpenZeppelin SDK JavaScript library. You can find more examples in the
-[OpenZeppelin SDK repository](https://github.com/zeppelinos/zos/tree/master/examples).
+[OpenZeppelin SDK repository](https://github.com/OpenZeppelin/openzeppelin-sdk/tree/master/examples).

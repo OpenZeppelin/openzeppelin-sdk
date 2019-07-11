@@ -28,16 +28,16 @@ This on-boarding plan considers the following assumptions:
 ## Onboarding plan demo
 
 The central idea of this proposal is to deploy an upgradeable version of your token, using the OpenZeppelin command line
-tool. Additionally, we will use the [`ERC20Migrator`](https://github.com/OpenZeppelin/openzeppelin-eth/blob/v2.0.0/contracts/drafts/ERC20Migrator.sol)
-contract provided by `openzeppelin-eth`, the [OpenZeppelin Ethereum package](https://github.com/OpenZeppelin/openzeppelin-eth/).
+tool. Additionally, we will use the [`ERC20Migrator`](https://github.com/OpenZeppelin/openzeppelin-contracts-eth/blob/v2.0.0/contracts/drafts/ERC20Migrator.sol)
+contract provided by `openzeppelin-eth`, the [OpenZeppelin Ethereum package](https://github.com/OpenZeppelin/openzeppelin-contracts-eth/).
 
-To better describe this plan we will use a sample project you can follow and clone from [here](https://github.com/zeppelinos/erc20-onboarding/tree/zos-2.1).
+To better describe this plan we will use a sample project you can follow and clone from [here](https://github.com/OpenZeppelin/erc20-onboarding/tree/zos-2.1).
 
 We will now setup a local environment to demo the onboarding plan. To do this, we will deploy a sample legacy token
 contract and mint some balances. If you wish to work with your already deployed token, you can skip the following lines
 and jump directly to the [step 1](erc20_onboarding.html#1-initialize-your-migration-project-with-zeppelinos).
 
-In the sample repository you will find a contract called [`MyLegacyToken`](https://github.com/zeppelinos/erc20-onboarding/blob/master/contracts/MyLegacyToken.sol)
+In the sample repository you will find a contract called [`MyLegacyToken`](https://github.com/OpenZeppelin/erc20-onboarding/blob/master/contracts/MyLegacyToken.sol)
 that we will use to simulate a real scenario locally. As you can see, this token will mint 100 tokens to the owner once
 initialized just for testing purposes.
 
@@ -93,8 +93,8 @@ We have just initialized a new OpenZeppelin project. A new `.openzeppelin/projec
 Next, we will have to modify the legacy token contract to get the new upgradeable version of it where the current balances
 are going to be migrated.
 
-In our sample project, you will find another contract called [`MyUpgradeableToken`](https://github.com/zeppelinos/erc20-onboarding/blob/master/contracts/MyUpgradeableToken.sol)
-which will be the upgradeable version of the sample legacy token contract [`MyLegacyToken`](https://github.com/zeppelinos/erc20-onboarding/blob/master/contracts/MyLegacyToken.sol):
+In our sample project, you will find another contract called [`MyUpgradeableToken`](https://github.com/OpenZeppelin/erc20-onboarding/blob/master/contracts/MyUpgradeableToken.sol)
+which will be the upgradeable version of the sample legacy token contract [`MyLegacyToken`](https://github.com/OpenZeppelin/erc20-onboarding/blob/master/contracts/MyLegacyToken.sol):
 
 ```solidity
 pragma solidity ^0.5.0;

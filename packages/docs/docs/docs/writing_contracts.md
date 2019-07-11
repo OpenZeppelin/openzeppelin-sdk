@@ -78,7 +78,7 @@ contract MyContract is BaseContract {
 
 ### Use upgradeable packages
 
-Keep in mind that this restriction affects not only your contracts, but also the contracts you import from a library. For instance, if you use the [`ERC20Detailed` token implementation](https://github.com/OpenZeppelin/openzeppelin-solidity/blob/v2.0.0/contracts/token/ERC20/ERC20Detailed.sol) from OpenZeppelin, the contract initializes the token's name, symbol and decimals in its constructor:
+Keep in mind that this restriction affects not only your contracts, but also the contracts you import from a library. For instance, if you use the [`ERC20Detailed` token implementation](https://github.com/OpenZeppelin/openzeppelin-contracts/blob/v2.0.0/contracts/token/ERC20/ERC20Detailed.sol) from OpenZeppelin, the contract initializes the token's name, symbol and decimals in its constructor:
 
 ```solidity
 Contract ERC20Detailed is IERC20 {
@@ -94,7 +94,7 @@ Contract ERC20Detailed is IERC20 {
 }
 ```
 
-This means that you should not be using these contracts in your OpenZeppelin SDK project. Instead, make sure to use `openzeppelin-eth`, which is an official fork of `openzeppelin-solidity` that has been modified to use initializers instead of constructors. For instance, an ERC20 implementation provided by `openzeppelin-eth` is the [`ERC20Mintable`](https://github.com/OpenZeppelin/openzeppelin-eth/blob/v2.0.2/contracts/token/ERC20/ERC20Mintable.sol):
+This means that you should not be using these contracts in your OpenZeppelin SDK project. Instead, make sure to use `openzeppelin-eth`, which is an official fork of `openzeppelin-contracts` that has been modified to use initializers instead of constructors. For instance, an ERC20 implementation provided by `openzeppelin-eth` is the [`ERC20Mintable`](https://github.com/OpenZeppelin/openzeppelin-contracts-eth/blob/v2.0.2/contracts/token/ERC20/ERC20Mintable.sol):
 
 ```solidity
 contract ERC20Mintable is Initializable, ERC20, MinterRole {

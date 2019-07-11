@@ -5,7 +5,7 @@ title: Interacting with your contracts
 
 This tutorial [builds on the previous one](first) where we created a new OpenZeppelin project, and created (and upgraded!) a simple `Counter` contract in a local development network. We will now see how to interact with this contract from javascript code using [web3.js](https://web3js.readthedocs.io/en/1.0/). We will build a small script that will increase the counter and report back the updated value.
 
-The full code for this tutorial can be found in the [`first-project` example](https://github.com/zeppelinos/zos/blob/v2.4.0/examples/first-project/src/index.js) in the OpenZeppelin SDK github repository.
+The full code for this tutorial can be found in the [`first-project` example](https://github.com/OpenZeppelin/openzeppelin-sdk/blob/v2.4.0/examples/first-project/src/index.js) in the OpenZeppelin SDK github repository.
 
 ## Setup
 
