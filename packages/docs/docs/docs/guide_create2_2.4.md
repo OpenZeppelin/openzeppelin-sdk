@@ -5,7 +5,7 @@ title: Upgradable Create2 Contracts with zOS
 
 
 
-Create2 opcode gives us the ability to calculate smart contracts addresses without actually deploying them on Ethereum blockchain. This opens up a lot of possibilities to improve [user onboarding and scalability](https://blog.zeppelinos.org/getting-the-most-out-of-create2/).
+The CREATE2 opcode gives us the ability to calculate smart contracts addresses without actually deploying them on the Ethereum blockchain. This opens up a lot of possibilities to improve [user onboarding and scalability](https://blog.zeppelinos.org/getting-the-most-out-of-create2/).
 
 In this guide, we will create an upgradableWallet contract with a transfer method, then we will reserve an address using Create2 without actually deploying Wallet contract and send some ethers to this address. At last, we will actually deploy our Wallet contract and execute transfer method to transfer contract funds to another account.
 
