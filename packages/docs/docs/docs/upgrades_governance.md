@@ -5,12 +5,12 @@ title: Upgrades governance
 
 ## Introduction
 
-ZeppelinOS provides the chance to have upgradeable smart contracts which follows the immutability rules guaranteed by
+The OpenZeppelin SDK provides the chance to have upgradeable smart contracts which follows the immutability rules guaranteed by
 the Ethereum blockchain. However, it is desirable to have a mechanism that allows all parties involved to decide on
 whether a contract should be upgraded or not, instead of having an unilateral decision.
 
 Given that there are many projects already working on really good solutions to achieve decentralized governance,
-we've been exploring some of them to study how they can be integrated with ZeppelinOS to manage contract upgrades.
+we've been exploring some of them to study how they can be integrated with the OpenZeppelin SDK to manage contract upgrades.
 
 In this case, we will use a multisignature wallet.
 
@@ -24,7 +24,7 @@ deploy your own multisig wallet.
 
 ![](https://lh5.googleusercontent.com/CqtaZkTZqJ_jT9vdQdPj-CNj304InYItfIBi5LnWrnsySGNOpN0HVu9DFIZbE1TpIq20ZN-3bAB1fNhFQiD_fTKqoLFyzQR7bLmmyfMJZABQMYMOnOzfTrsAkk_sgxeEQTriSJAB)
 
-Once inside your ZeppelinOS project, let's suppose we have an arbitrary contract called `MyContract`. Now let's see how
+Once inside your OpenZeppelin SDK project, let's suppose we have an arbitrary contract called `MyContract`. Now let's see how
 we can create an upgradeable instance of it being handled by a multisig wallet. In order to do that, we will need first
 to register this contract, push it to the network and create a new upgradeable instance of it as we explained in the
 previous sections:
@@ -58,7 +58,7 @@ Now, if we want to upgrade our `MyContract` instance to a new version, we’ll n
 multisig contract. Note that we have transferred only the ownership of our `MyContract` instance. If we had created
 more instances of `MyContract`, or of any other contract, they would still be under control of the deployer account.
 
-The same applies to our ZeppelinOS app. This allows us to keep interacting with our project via the CLI, by creating new
+The same applies to our OpenZeppelin SDK app. This allows us to keep interacting with our project via the CLI, by creating new
 instances or registering new logic contracts, as we’ll be doing in the next step.
 
 ## Uploading a new version

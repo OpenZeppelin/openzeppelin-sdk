@@ -3,13 +3,13 @@ id: interacting
 title: Interacting with your contracts
 ---
 
-This tutorial [build on the previous one](first) where we created a new ZeppelinOS project, and created (and upgraded!) a simple `Counter` contract in a local development network. We will now see how to interact with this contract from javascript code using [web3.js](https://web3js.readthedocs.io/en/1.0/). We will build a small script that will increase the counter and report back the updated value.
+This tutorial [builds on the previous one](first) where we created a new OpenZeppelin project, and created (and upgraded!) a simple `Counter` contract in a local development network. We will now see how to interact with this contract from javascript code using [web3.js](https://web3js.readthedocs.io/en/1.0/). We will build a small script that will increase the counter and report back the updated value.
 
-The full code for this tutorial can be found in the [`first-project` example](https://github.com/zeppelinos/zos/blob/v2.4.0/examples/first-project/src/index.js) in the ZeppelinOS github repository.
+The full code for this tutorial can be found in the [`first-project` example](https://github.com/zeppelinos/zos/blob/v2.4.0/examples/first-project/src/index.js) in the OpenZeppelin SDK github repository.
 
 ## Setup
 
-We will be using [web3.js](https://web3js.readthedocs.io/en/1.0/) to interact with the blockchain from our code, which is the same library that ZeppelinOS uses under the hood. In the `my-project` project folder we created earlier, run the following to install it:
+We will be using [web3.js](https://web3js.readthedocs.io/en/1.0/) to interact with the blockchain from our code, which is the same library that OpenZeppelin SDK uses under the hood. In the `my-project` project folder we created earlier, run the following to install it:
 
 ```console
 npm install web3@1.0.0-beta.37
@@ -81,7 +81,7 @@ To create this web3 contract, we need two things:
 
 <!-- Code: We should provide both a command and a js function to easily retrieve the address from the network.json file. Same for the ABI, and for building a web3 contract altogether. -->
 
-The address was returned by the ZeppelinOS CLI when we deployed the contract. As for the ABI, we can retrieve it from the compiled artifact in the `build/contracts` folder as shown below.
+The address was returned by the OpenZeppelin CLI when we deployed the contract. As for the ABI, we can retrieve it from the compiled artifact in the `build/contracts` folder as shown below.
 
 ```js
 // Set up web3 object, connected to the local development network
@@ -152,6 +152,6 @@ $ node src/index.js
 
 You can also try interacting with the contract using `openzeppelin send-tx` and `openzeppelin call` as we did on the previous tutorial, and verify that it is the same instance we are working with from two different interfaces.
 
-The snippet from this tutorial, while simple, is the basis for interacting with your smart contracts from your javascript applications. Remember you can use other libraries other than `web3.js` - or even other languages other than javascript! ZeppelinOS will take care of managing your contracts on the blockchain. 
+The snippet from this tutorial, while simple, is the basis for interacting with your smart contracts from your javascript applications. Remember you can use other libraries other than `web3.js` - or even other languages other than javascript! The OpenZeppelin SDK will take care of managing your contracts on the blockchain. 
 
 In the next tutorial, we will go into a more interesting smart contract application. We will work with more complex logic, connect with `@openzeppelin/contracts` to create a token, and connect different contracts between themselves.

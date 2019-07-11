@@ -3,7 +3,7 @@ id: upgrading
 title: Upgrading your project
 ---
 
-At the end of the [previous guide](deploying) we deployed a ZeppelinOS
+At the end of the [previous guide](deploying) we deployed an OpenZeppelin SDK
 project with one contract. Here is the code of the contract, to keep it fresh
 on our minds:
 
@@ -26,7 +26,7 @@ contract MyContract is Initializable {
 
 This is a traditional immutable contract that will remain frozen for ever on
 the blockchain, with mistakes, limited functionalities and everything.
-ZeppelinOS lets us opt-in to allow upgrades on our contracts, and open the
+The OpenZeppelin SDK lets us opt-in to allow upgrades on our contracts, and open the
 doors to a more sustainable process for developing our projects. With upgrades
 we can make iterative releases, quickly adding small pieces of functionalities
 that we can adjust according to the always changing goals of our users; and of
@@ -114,7 +114,7 @@ contract MyContract is Initializable {
 }
 ```
 
-> **Note**: While ZeppelinOS supports arbitrary changes regarding functionality,
+> **Note**: While the OpenZeppelin SDK supports arbitrary changes regarding functionality,
 > you will need to preserve all the variables that appeared in previous versions of
 > your contracts, declaring any new variables below the already existing ones.
 > All the considerations and some recommendations for your upgrades are
@@ -224,6 +224,6 @@ contract MyContract is Initializable {
 }
 ```
 
-Upgrades are only one of the features of ZeppelinOS. Next, we will see another
+Upgrades are only one of the features of the OpenZeppelin SDK. Next, we will see another
 very interesting feature, because it allows us to reuse packages that have been
 already deployed to the blockchain.

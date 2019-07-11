@@ -27,9 +27,9 @@ This on-boarding plan considers the following assumptions:
 
 ## Onboarding plan demo
 
-The central idea of this proposal is to deploy an upgradeable version of your token, using the ZeppelinOS command line
+The central idea of this proposal is to deploy an upgradeable version of your token, using the OpenZeppelin command line
 tool. Additionally, we will use the [`ERC20Migrator`](https://github.com/OpenZeppelin/openzeppelin-eth/blob/v2.0.0/contracts/drafts/ERC20Migrator.sol)
-contract provided by `openzeppelin-eth`, the [OpenZeppelin EVM package for ZeppelinOS](https://github.com/OpenZeppelin/openzeppelin-eth/).
+contract provided by `openzeppelin-eth`, the [OpenZeppelin Ethereum package](https://github.com/OpenZeppelin/openzeppelin-eth/).
 
 To better describe this plan we will use a sample project you can follow and clone from [here](https://github.com/zeppelinos/erc20-onboarding/tree/zos-2.1).
 
@@ -80,15 +80,15 @@ truffle(local)> (await legacyToken.balanceOf(owner)).toString()
 
 Remember not to close this console, as we will be using it later.
 
-### 1. Initialize your migration project with ZeppelinOS
+### 1. Initialize your migration project with the OpenZeppelin SDK
 
-To initialize this project with ZeppelinOS, open a terminal and run the following line:
+To initialize this project with the OpenZeppelin SDK, open a terminal and run the following line:
 
 ```console
 npx openzeppelin init my-token-migration 1.0.0
 ```
 
-We have just initialized a new ZeppelinOS project. A new `.openzeppelin/project.json` file should have been created.
+We have just initialized a new OpenZeppelin project. A new `.openzeppelin/project.json` file should have been created.
 
 Next, we will have to modify the legacy token contract to get the new upgradeable version of it where the current balances
 are going to be migrated.
@@ -118,22 +118,22 @@ contract MyUpgradeableToken is Initializable, ERC20, ERC20Detailed, ERC20Mintabl
 
 On one hand, it is very important to replicate all the information and functionality that was provided by the
 legacy token. In this case, we are inheriting from the `ERC20` and `ERC20Detailed` contracts provided by the
-OpenZeppelin EVM package to replicate all the functionality of an ERC20 token.
+OpenZeppelin Contracts EVM package to replicate all the functionality of an ERC20 token.
 
 On the other hand, we are defining an `initialize` method that receives an `ERC20Migrator` instance that will take care
 of all the migration functionality we will need. To work with `ERC20Migrator`, your upgradeable token has to be
 mintable, that's why we are also inheriting from the `ERC20Mintable` contract provided by the OpenZeppelin EVM
 package as well.
 
-_Initializers are the way to define constructor functionality for upgradeable contracts in ZeppelinOS. The `initializer`
+_Initializers are the way to define constructor functionality for upgradeable contracts in the OpenZeppelin SDK. The `initializer`
 modifier will make sure your `initialize` method can only be called once in the whole lifetime of your contract._
 
-Notice that all the contracts from `openzeppelin-eth` have been adapted for ZeppelinOS compatibility, and should be the
+Notice that all the contracts from `openzeppelin-eth` have been adapted for OpenZeppelin SDK compatibility, and should be the
 ones used when dealing with upgradeable contracts.
 
-Besides allowing us to build upgradeable applications, ZeppelinOS provides EVM packages. To use an EVM package
+Besides allowing us to build upgradeable applications, the OpenZeppelin SDK provides EVM packages. To use an EVM package
 in our project, we simply need to use the `link` command giving the name of the npm package of the EVM package we want
-to use. In this case, we will link OpenZeppelin EVM package to be able to use the contracts it provides in our project:
+to use. In this case, we will link the OpenZeppelin Contracts EVM package to be able to use the contracts it provides in our project:
 
 ```console
 npx openzeppelin link openzeppelin-eth
@@ -145,25 +145,25 @@ Finally we can add our upgradeable token contract to the project:
 npx openzeppelin add MyUpgradeableToken
 ```
 
-Great, our project has been linked to the OpenZeppelin EVM package and our `MyUpgradeableToken` has been added.
+Great, our project has been linked to the OpenZeppelin Contracts EVM package and our `MyUpgradeableToken` has been added.
 
 ### 2. Deploy the upgradeable token
 
 The first thing we have to do is to deploy our contract source code. We will also need to deploy a copy of the
-OpenZeppelin EVM package since we will be working on a local environment. To do so, run the following command:
+OpenZeppelin Contracts EVM package since we will be working on a local environment. To do so, run the following command:
 
 ```console
 npx openzeppelin push -n local --deploy-dependencies
 ```
 
-_Note that we are using the `--deploy-dependencies` to deploy the OpenZeppelin EVM package locally, since it is not
+_Note that we are using the `--deploy-dependencies` to deploy the OpenZeppelin Contracts EVM package locally, since it is not
 deployed in our local blockchain yet._
 
-We have just deployed the `MyUpgradeableToken` source code and the OpenZeppelin EVM package to the `local` network. A
+We have just deployed the `MyUpgradeableToken` source code and the OpenZeppelin Contracts EVM package to the `local` network. A
 new `.openzeppelin/dev-<network_id>.json` file should have been created.
 
-Now, let's create a new instance of the upgradeable token using ZeppelinOS. To do so, we will need to create an
-instance of an `ERC20Migrator` first, but given it is not yet provided by the OpenZeppelin EVM package, we will have
+Now, let's create a new instance of the upgradeable token using the OpenZeppelin SDK. To do so, we will need to create an
+instance of an `ERC20Migrator` first, but given it is not yet provided by the OpenZeppelin Contracts EVM package, we will have
 to add it manually. Then, run the following commands:
 replacing `LEGACY_TOKEN_ADDRESS` with the address of the legacy token contract:
 ```console
@@ -183,7 +183,7 @@ npx openzeppelin create MyUpgradeableToken --args LEGACY_TOKEN_ADDRESS,ERC20_MIG
 
 Save the upgradeable token address outputted by this command, we will need it later.
 
-Note that the `proxies` section of `.openzeppelin/dev-<network_id>.json` should now include the following, as ZeppelinOS is
+Note that the `proxies` section of `.openzeppelin/dev-<network_id>.json` should now include the following, as the OpenZeppelin SDK is
 tracking the upgradeable instances we have just created:
 
 ```json

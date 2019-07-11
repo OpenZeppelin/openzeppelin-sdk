@@ -3,17 +3,17 @@ id: testing
 title: Testing upgradeable projects
 ---
 
-When working with ZeppelinOS, you can test your contracts as you usually do. That is, you can manually deploy your logic contracts, and test them just like any other contract. However, when using ZeppelinOS, you are dealing with upgradeable instances. Of course, you could use ZeppelinOS at a lower level programmatically in your tests but this could be rather cumbersome.
+When working with the OpenZeppelin SDK, you can test your contracts as you usually do. That is, you can manually deploy your logic contracts, and test them just like any other contract. However, when using the OpenZeppelin SDK, you are dealing with upgradeable instances. Of course, you could use the OpenZeppelin SDK at a lower level programmatically in your tests but this could be rather cumbersome.
 
-Instead, you can use specifically designed ZeppelinOS tools that automatically set up your entire project in your testing environment. This allows you to replicate the same set of contracts that manage your project for each test you run.
+Instead, you can use specifically designed OpenZeppelin SDK tools that automatically set up your entire project in your testing environment. This allows you to replicate the same set of contracts that manage your project for each test you run.
 
-The `zos` package provides a `TestHelper()` function to retrieve your project structure from the `.openzeppelin/project.json` file and deploy everything to the current test network. All the contracts that you have registered via `openzeppelin add`, plus all the contracts provided by the EVM packages you have linked, will be available. The returned project object (either a [`ProxyAdminProject`](https://github.com/zeppelinos/zos/blob/v2.2.0/packages/lib/src/project/ProxyAdminProject.ts) or an [`AppProject`](https://github.com/zeppelinos/zos/blob/v2.2.0/packages/lib/src/project/AppProject.ts)) provides convenient methods for creating upgradeable instances of your contracts, which you can use within your tests. Let's see how this would work in a simple project.
+The `@openzeppelin/cli` package provides a `TestHelper()` function to retrieve your project structure from the `.openzeppelin/project.json` file and deploy everything to the current test network. All the contracts that you have registered via `openzeppelin add`, plus all the contracts provided by the EVM packages you have linked, will be available. The returned project object (either a [`ProxyAdminProject`](https://github.com/zeppelinos/zos/blob/v2.2.0/packages/lib/src/project/ProxyAdminProject.ts) or an [`AppProject`](https://github.com/zeppelinos/zos/blob/v2.2.0/packages/lib/src/project/AppProject.ts)) provides convenient methods for creating upgradeable instances of your contracts, which you can use within your tests. Let's see how this would work in a simple project.
 
 ## Setting up a sample project
 
-The following section describes a succinct way in how a simple ZeppelinOS project can be set up. If you already have a project set up, you may skip to the next section.
+The following section describes a succinct way in how a simple OpenZeppelin SDK project can be set up. If you already have a project set up, you may skip to the next section.
 
-_If you don't understand what's going on in this section, please refer to the Quickstart guides of the documentation, specifically the [Deploying your first project](https://docs.zeppelinos.org/docs/deploying.html), [Upgrading your project](https://docs.zeppelinos.org/docs/upgrading.html) and [Linking to EVM packages](https://docs.zeppelinos.org/docs/linking.html) guides. These guides provide detailed explanations on how a basic ZeppelinOS project works._
+_If you don't understand what's going on in this section, please refer to the Quickstart guides of the documentation, specifically the [Deploying your first project](https://docs.zeppelinos.org/docs/deploying.html), [Upgrading your project](https://docs.zeppelinos.org/docs/upgrading.html) and [Linking to EVM packages](https://docs.zeppelinos.org/docs/linking.html) guides. These guides provide detailed explanations on how a basic OpenZeppelin SDK project works._
 
 Create a new project by running:
 
@@ -42,13 +42,13 @@ contract Sample {
 }
 ```
 
-Now, add your contract to the ZeppelinOS project:
+Now, add your contract to your OpenZeppelin SDK project:
 
 ```console
 npx openzeppelin add Sample
 ```
 
-And link your ZeppelinOS project to the `openzeppelin-eth` EVM package:
+And link your OpenZeppelin SDK project to the `openzeppelin-eth` EVM package:
 
 ```
 npx openzeppelin link openzeppelin-eth
@@ -107,13 +107,13 @@ That's it! Now, let's look at what we just did in more detail.
 
 ## Understanding the test script
 
-We first require `TestHelper` from `zos`. This helper facilitates the creation of a project object that will set up the entire ZeppelinOS project within a test environment.
+We first require `TestHelper` from `zos`. This helper facilitates the creation of a project object that will set up the entire OpenZeppelin SDK project within a test environment.
 
 ```js
 const { TestHelper } = require('zos');
 ```
 
-We are also requiring `Contracts` and `ZWeb3` from `zos-lib`. `Contracts` helps us retrieve compiled contract artifacts, while `ZWeb3` is needed to set up our Web3 provider to ZeppelinOS.
+We are also requiring `Contracts` and `ZWeb3` from `zos-lib`. `Contracts` helps us retrieve compiled contract artifacts, while `ZWeb3` is needed to set up our Web3 provider in the OpenZeppelin SDK.
 
 ```js
 const { Contracts, ZWeb3 } = require('zos-lib');
@@ -148,13 +148,13 @@ const proxy = await this.project.createProxy(Sample, {
 
 This is assuming our `Sample` contract had an `initialize` function with one `uint256` parameter, which it doesn't. The above code simply illustrates how you would create the upgradeable instance if it had an `initialize` function.
 
-Continuing with our example, notice that the way we interact with the contracts is by using their `methods` object. This is because ZeppelinOS uses Web3 1.0 Contract interface:
+Continuing with our example, notice that the way we interact with the contracts is by using their `methods` object. This is because the OpenZeppelin SDK uses the web3.js 1.0 Contract interface:
 
 ```js
 const result = await proxy.methods.totalSupply().call();
 ```
 
-This is how you should write tests for your ZeppelinOS projects. The project object provided by `TestHelper` wraps all of ZeppelinOS programmatic interface in a way that is very convenient to use in tests. By running tests in this way, you make sure that you are testing your contracts with the exact set of conditions that they would have in production, after you deploy them with ZeppelinOS.
+This is how you should write tests for your OpenZeppelin SDK projects. The project object provided by `TestHelper` wraps all of OpenZeppelin SDK programmatic interface in a way that is very convenient to use in tests. By running tests in this way, you make sure that you are testing your contracts with the exact set of conditions that they would have in production, after you deploy them with the OpenZeppelin SDK.
 
 ## Calling initialize functions manually in your tests
 
@@ -181,7 +181,7 @@ contract Crowdsale {
 ```
 
 This means that calls to contracts with more than one function named `initialize`, 
-as is the case with some contracts from OpenZeppelin (e.g., TimedCrowdsale), 
+as is the case with some contracts from OpenZeppelin (e.g., `TimedCrowdsale`), 
 may revert if you call `initialize` directly from Truffle. `openzeppelin create` handles 
 this correctly as it encodes the parameters. However, for your unit tests you will 
 need to call `initialize` manually.

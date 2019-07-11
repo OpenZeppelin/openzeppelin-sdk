@@ -1,9 +1,9 @@
 ---
 id: start
-title: ZeppelinOS
+title: OpenZeppelin SDK
 ---
 
-ZeppelinOS is a platform to develop, deploy and operate smart contract projects
+The OpenZeppelin SDK is a platform to develop, deploy and operate smart contract projects
 on Ethereum and every other EVM and eWASM-powered blockchain.
 
 ## Features
@@ -11,11 +11,11 @@ on Ethereum and every other EVM and eWASM-powered blockchain.
 * **Interactive commands**: Send transactions, query balances, and interact with your contracts directly from the command line.
 * **Upgrade your contracts**: You can develop your smart contracts iteratively, speeding up development locally, or squashing bugs in production.
 * **Link EVM packages**: Use code from contracts already deployed to the blockchain directly on your project, saving gas on deployments and managing your dependencies securely.
-* **Build a (d)app**: Jumpstart your dapp by unpacking one of our starter kits, pre-configured with OpenZeppelin contracts, ZeppelinOS, React, and Infura.
+* **Build a (d)app**: Jumpstart your dapp by unpacking one of our starter kits, pre-configured with OpenZeppelin Contracts, OpenZeppelin SDK, React, and Infura.
 
 ## Getting Started
 
-Start by [deploying your first ZeppelinOS project](first.md).
+Start by [deploying your first OpenZeppelin SDK project](first.md).
 
 ## Security
 
@@ -24,4 +24,4 @@ give rewards for reported issues, according to impact and severity.
 
 ## Team
 
-ZeppelinOS was started and is sponsored by [Zeppelin](https://zeppelin.solutions/).
+The OpenZeppelin SDK was started and is sponsored by [the OpenZeppelin team](https://openzeppelin.com/).

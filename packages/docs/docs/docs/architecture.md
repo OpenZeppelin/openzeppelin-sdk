@@ -3,7 +3,7 @@ id: architecture
 title: Contracts Architecture
 ---
 
-ZeppelinOS's features such as upgrades, EVM package linking, and vouching, can all be used through the `zos` CLI with only one extra contract; The [ProxyAdmin](https://github.com/zeppelinos/zos/blob/v2.0.0/packages/lib/contracts/upgradeability/ProxyAdmin.sol) contract. ZeppelinOS uses this contract in order to avoid confusion around the [transparent proxy pattern](https://docs.zeppelinos.org/docs/pattern.html#transparent-proxies-and-function-clashes). This contract acts as a central admin for all proxies on your behalf, making their management as simple as possible, while retaining the highest safety standards. 
+OpenZeppelin SDK's features such as upgrades and EVM package linking can be used through the `openzeppelin` CLI with only one extra contract. The [ProxyAdmin](https://github.com/zeppelinos/zos/blob/v2.0.0/packages/lib/contracts/upgradeability/ProxyAdmin.sol) contract. The OpenZeppelin SDK uses this contract in order to avoid confusion around the [transparent proxy pattern](https://docs.zeppelinos.org/docs/pattern.html#transparent-proxies-and-function-clashes). This contract acts as a central admin for all proxies on your behalf, making their management as simple as possible, while retaining the highest safety standards. 
 
 However, some additional smart contracts come into play when you want to publish your EVM package for others to reuse. Publishing is achieved by calling the command:
 
@@ -11,11 +11,11 @@ However, some additional smart contracts come into play when you want to publish
 openzeppelin publish
 ```
 
-The source code of the contracts involved with a published EVM package can be found in [zos/packages/lib/contracts/application](https://github.com/zeppelinos/zos/tree/master/packages/lib/contracts/application). In the following sections, we describe the general architecture of a ZeppelinOS published EVM package.
+The source code of the contracts involved with a published EVM package can be found in [zos/packages/lib/contracts/application](https://github.com/zeppelinos/zos/tree/master/packages/lib/contracts/application). In the following sections, we describe the general architecture of an OpenZeppelin published EVM package.
 
 ## [App.sol](https://github.com/zeppelinos/zos/blob/v2.0.0/packages/lib/contracts/application/App.sol)
 
-The App contract is the project's main entry point. Its most important function is to manage your project's "providers". A provider is basically an EVM package identified by a name at a specific version. For example, a project may track your application's contracts in one provider named "my-application" at version "0.0.1", an OpenZeppelin provider named "openzeppelin-eth" at version "2.0.0", and a few other providers. These providers are your project's sources of on-chain logic.
+The App contract is the project's main entry point. Its most important function is to manage your project's "providers". A provider is basically an EVM package identified by a name at a specific version. For example, a project may track your application's contracts in one provider named "my-application" at version "0.0.1", an OpenZeppelin Contracts provider named "openzeppelin-eth" at version "2.0.0", and a few other providers. These providers are your project's sources of on-chain logic.
 
 The providers are mapped by name to `ProviderInfo` structs:
 
@@ -93,4 +93,4 @@ Other implementations of the interface could provide contracts without such a li
 
 The following diagram illustrates the interface of the contracts of published EVM packages:
 
-![ZeppelinOS 2.x UML](/img/zos2.png)
+![OpenZeppelin SDK 2.x UML](/img/zos2.png)

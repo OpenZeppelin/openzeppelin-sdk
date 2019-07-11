@@ -19,8 +19,8 @@ On the other hand, decentralized networks are not structured to work together,
 often needing access to each other’s native tokens to operate, making it hard
 to leverage external systems.
 
-To address these issues we propose ZeppelinOS: an open-source, decentralized
+To address these issues we propose the OpenZeppelin SDK: an open-source, decentralized
 platform of tools and services on top of the EVM to securely build and manage
 smart contract applications, free of charge.
 
-[Download and read the full ZeppelinOS whitepaper](https://zeppelinos.org/zeppelin_os_whitepaper.pdf).
+[Download and read the full OpenZeppelin whitepaper](https://zeppelinos.org/zeppelin_os_whitepaper.pdf).

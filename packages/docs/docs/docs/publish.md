@@ -3,10 +3,10 @@ id: publishing
 title: Publishing an EVM package
 ---
 
-On the previous guides we have explored how to initialize a ZeppelinOS project,
+On the previous guides we have explored how to initialize an OpenZeppelin SDK project,
 how to add contracts to it, how to upgrade those contracts and how to link to
 existing EVM packages. At this point we have a simple project that uses various
-ZeppelinOS functionalities. On this guide we will instead add new
+of the OpenZeppelin SDK features. On this guide we will instead add new
 functionalities to the platform, nicely wrapped as an EVM package ready for
 others to use.
 
@@ -39,7 +39,7 @@ network instead of your local development one. We have a guide about
 [Deploying to mainnet](mainnet) which can be useful.
 
 All known commands so far. Here comes what's new. If you want to share your
-package in ZeppelinOS, do it by running the `publish` command:
+package to the OpenZeppelin SDK community, do it by running the `publish` command:
 
 ```console
 npx openzeppelin publish --network <network>
@@ -55,7 +55,7 @@ If you haven't published a package before, you will need to
 [sign up for an npm account](https://www.npmjs.com/signup).
 
 The npm package should include all the source and compiled contracts and the
-ZeppelinOS configuration files, so add the following top-level field to the
+OpenZeppelin SDK configuration files, so add the following top-level field to the
 `package.json` file:
 
 ```json
@@ -70,9 +70,9 @@ ZeppelinOS configuration files, so add the following top-level field to the
 }
 ```
 
-Remember that the `zos` configuration files are where ZeppelinOS keeps track of 
+Remember that the `openzeppelin` configuration files are where the OpenZeppelin SDK keeps track of 
 your contracts, the addresses of the instances you have created, and in this
-case the address of the EVM package you will have published. This is how ZeppelinOS 
+case the address of the EVM package you will have published. This is how the OpenZeppelin SDK 
 solves the link of foreign projects that depend on yours.
 
 Make sure to check that the rest of the fields describe your package
@@ -101,6 +101,4 @@ npx openzeppelin link <your-project-name>
 ```
 
 Spread the word! Tell others to reuse your work, and to help you improving it
-with more crazy ideas of how a decentralized society should be. Now, to
-finish this quick exploration of the ZeppelinOS features we will see how you
-can vouch to back the quality of your EVM packages.
+with more crazy ideas of how a decentralized society should be.
