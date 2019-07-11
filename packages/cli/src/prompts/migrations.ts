@@ -11,7 +11,7 @@ export async function hasToMigrateProject(network): Promise<boolean> {
         output: process.stdout,
       });
       prompt.question(
-        `An old zos version was detected and needs to be migrated to the latest one.\nDo you want to proceed? [y/n] `,
+        `An old @openzeppelin/cli version was detected and needs to be migrated to the latest one.\nDo you want to proceed? [y/n] `,
         answer => {
           prompt.close();
           resolve(answer);
