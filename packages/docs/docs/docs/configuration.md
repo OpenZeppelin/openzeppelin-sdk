@@ -6,7 +6,7 @@ title: Configuration Files
 ZeppelinOS's CLI generates `json` files where it stores the configuration of your project.
 
 
-## `zos.json`
+## `project.json`
 The first file stores the general configuration and is created by the `zos init` command. It has the following structure:
 
 ```json
@@ -30,7 +30,7 @@ The first file stores the general configuration and is created by the `zos init`
 }
 ```
 
-Here, `<projectName>` is the name of the project, and `<version>` is the current semver number. The boolean value `<publish>` indicates whether the project should be automatically published to the network upon being `push`ed, allowing it to be reused as an EVM package by other projects. The field `zosversion` indicates the major version of ZeppelinOS you are using: `zos.json` files with a different major version are automatically rejected. 
+Here, `<projectName>` is the name of the project, and `<version>` is the current semver number. The boolean value `<publish>` indicates whether the project should be automatically published to the network upon being `push`ed, allowing it to be reused as an EVM package by other projects. The field `zosversion` indicates the major version of ZeppelinOS you are using: `project.json` files with a different major version are automatically rejected. 
 
 Once you start adding your contracts via `zos add`, they will be recorded under the `"contracts"` field, with the contract aliases as the keys (which default to the contract names), and the contract names as the values. Finally, if you link a dependency with `zos link`, this will be reflected in the `"dependencies"` field, where `<dependency-name>` is the name of the linked EVM Package, and `<dependency-version>` is its semver required version.
 
@@ -106,7 +106,7 @@ For every logic contract, besides the deployment address, the following info is 
 
 Any Solidity libraries used by the project's contracts are tracked in the `solidityLibs` node, which has the same structure as the `contracts` item.
 
-Another thing to notice in these files are the version numbers. The `<app-version>` keeps track of the latest app version, and matches `<version>` from `zos.json`. The `<proxy-i-version>`s, on the other hand, keep track of which version of the contracts the proxies are pointing to. Say you deploy a contract in your app version 1.0.0, and then bump the version to 1.1.0 and push some upgraded code for that same contract. This will be reflected in the `<contract-i-address>`, but not yet in the proxy, which will display 1.0.0 in `<proxy-i-version>` and the old logic contract address in `<implementation-i-address>`. Once you run `zos update` to your contract, `<proxy-i-version>` will show the new 1.1.0 version, and `<implementation-i-address>` will point to the new `<contract-i-address>`. Note that this version identifier will refer to the version of the dependency (and not the app) if the proxy points to a dependent EVM package.
+Another thing to notice in these files are the version numbers. The `<app-version>` keeps track of the latest app version, and matches `<version>` from `project.json`. The `<proxy-i-version>`s, on the other hand, keep track of which version of the contracts the proxies are pointing to. Say you deploy a contract in your app version 1.0.0, and then bump the version to 1.1.0 and push some upgraded code for that same contract. This will be reflected in the `<contract-i-address>`, but not yet in the proxy, which will display 1.0.0 in `<proxy-i-version>` and the old logic contract address in `<implementation-i-address>`. Once you run `zos update` to your contract, `<proxy-i-version>` will show the new 1.1.0 version, and `<implementation-i-address>` will point to the new `<contract-i-address>`. Note that this version identifier will refer to the version of the dependency (and not the app) if the proxy points to a dependent EVM package.
 
 The field `<proxyAdmin>` contains the address of the ProxyAdmin contract, used to manage the [transparent proxy pattern](https://docs.zeppelinos.org/docs/pattern.html#transparent-proxies-and-function-clashes) in the project's proxies.
 
@@ -135,21 +135,21 @@ networks: {
   }
  }
 ```
- Using `zos push --network geth_ropsten` or `zos push --network parity_ropsten` will both produce a file named `zos.ropsten.json` no matter which method was used to connect to the ropsten network. ZeppelinOS will automatically detect which public network is being referred to (using web3.network.getVersion()) and use this information for determining the file name.
- When dealing with local networks, ZeppelinOS will generate files with `dev-<network_id>`, given that these networks are not public and don't have a canonical name. Using `zos push --network local` will produce a file named `zos.dev-1540303312049.json` (or some other number representing the network id of the local network).
+ Using `zos push --network geth_ropsten` or `zos push --network parity_ropsten` will both produce a file named `ropsten.json` no matter which method was used to connect to the ropsten network. ZeppelinOS will automatically detect which public network is being referred to (using web3.network.getVersion()) and use this information for determining the file name.
+ When dealing with local networks, ZeppelinOS will generate files with `dev-<network_id>`, given that these networks are not public and don't have a canonical name. Using `zos push --network local` will produce a file named `dev-1540303312049.json` (or some other number representing the network id of the local network).
 
-## `zos.json` files in version control
+## Configuration files in version control
 
-The `zos.json` file should be tracked in version control. This file represents a project's ZeppelinOS configuration; the contracts and EVM packages that compose it, its name and version, the version of the ZeppelinOS CLI it uses, etc. The file should be identical for all the contributors of a project.
+The `project.json` file should be tracked in version control. This file represents a project's ZeppelinOS configuration; the contracts and EVM packages that compose it, its name and version, the version of the ZeppelinOS CLI it uses, etc. The file should be identical for all the contributors of a project.
 
-Public network files like `zos.mainnet.json` or `zos.ropsten.json` should also be tracked in version control. These contain valuable information about your project's status in the corresponding network; the addresses of the contract implementations that have been deployed, the addresses of the proxies that have been deployed, etc. Such files should also be identical for all the contributors of a project.
+Public network files like `mainnet.json` or `ropsten.json` should also be tracked in version control. These contain valuable information about your project's status in the corresponding network; the addresses of the contract implementations that have been deployed, the addresses of the proxies that have been deployed, etc. Such files should also be identical for all the contributors of a project.
 
-However, local network files like `zos.dev-<netowrk_id>.json` only represent a project's deployment in a temporary local network such as `ganache-cli` that are only relevant to a single contributor of the project and should not be tracked in version control.
+However, local network files like `dev-<network_id>.json` only represent a project's deployment in a temporary local network such as `ganache-cli` that are only relevant to a single contributor of the project and should not be tracked in version control.
 
 An example `.gitignore` file could contain the following entries for ZeppelinOS :
 
 ```
 # ZeppelinOS
-zos.dev-*.json
-.zos.session
+.openzeppelin/dev-*.json
+.openzeppelin/.session
 ```

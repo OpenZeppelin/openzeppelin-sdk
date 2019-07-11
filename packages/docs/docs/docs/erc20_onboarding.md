@@ -88,7 +88,7 @@ To initialize this project with ZeppelinOS, open a terminal and run the followin
 npx zos init my-token-migration 1.0.0
 ```
 
-We have just initialized a new ZeppelinOS project. A new `zos.json` file should have been created.
+We have just initialized a new ZeppelinOS project. A new `.openzeppelin/project.json` file should have been created.
 
 Next, we will have to modify the legacy token contract to get the new upgradeable version of it where the current balances
 are going to be migrated.
@@ -160,7 +160,7 @@ _Note that we are using the `--deploy-dependencies` to deploy the OpenZeppelin E
 deployed in our local blockchain yet._
 
 We have just deployed the `MyUpgradeableToken` source code and the OpenZeppelin EVM package to the `local` network. A
-new `zos.dev-<network_id>.json` file should have been created.
+new `.openzeppelin/dev-<network_id>.json` file should have been created.
 
 Now, let's create a new instance of the upgradeable token using ZeppelinOS. To do so, we will need to create an
 instance of an `ERC20Migrator` first, but given it is not yet provided by the OpenZeppelin EVM package, we will have
@@ -183,7 +183,7 @@ npx zos create MyUpgradeableToken --args LEGACY_TOKEN_ADDRESS,ERC20_MIGRATOR_ADD
 
 Save the upgradeable token address outputted by this command, we will need it later.
 
-Note that the `proxies` section of `zos.dev-<network_id>.json` should now include the following, as ZeppelinOS is
+Note that the `proxies` section of `.openzeppelin/dev-<network_id>.json` should now include the following, as ZeppelinOS is
 tracking the upgradeable instances we have just created:
 
 ```json

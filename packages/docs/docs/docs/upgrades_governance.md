@@ -81,7 +81,7 @@ multisig to perform this operation, as the CLI’s account.
 
 Let’s submit a transaction to the multisig wallet for our contract instance to be upgraded. We can do this from the
 Gnosis dApp by including the [proxy's ABI](https://gist.github.com/spalladino/d25c41c19a538ae918735e5b1c07db07) and choosing to invoke `upgradeTo`. We also need to supply the address of
-the new implementation, which can be found in the output of the last `zos push` command or in the `zos.ropsten.json`
+the new implementation, which can be found in the output of the last `zos push` command or in the `.openzeppelin/ropsten.json`
 file.
 
 ![](https://lh3.googleusercontent.com/Wi76B5WGVs8_qGD1GPVYpA5oOF4hEVt1mfl1grCszZRfxRlkPS1PsPxm9-Kpm0NfX0qlmq-5rUNfXdEJrIlH8gJK9TNW7NjlZ_QVqAuv5JZRFW-zQNxATQpA9OapPq_6J85nzTLz)

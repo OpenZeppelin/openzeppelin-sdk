@@ -65,8 +65,7 @@ ZeppelinOS configuration files, so add the following top-level field to the
     "build",
     "contracts",
     "test",
-    "zos.json",
-    "zos.*.json"
+    ".openzeppelin/*.json"
   ]
 }
 ```
@@ -79,7 +78,7 @@ solves the link of foreign projects that depend on yours.
 Make sure to check that the rest of the fields describe your package
 accurately. It could be a good idea to remove the `main` field, if present,
 because it doesn't make sense for EVM packages. Also, if you have a
-`zos.dev-<network_id>.json` file, you can remove it now because it is specific for your
+`.openzeppelin/dev-<network_id>.json` file, you can remove it now because it is specific for your
 local test environment. You can also add this file pattern to your `.gitignore` file.
 
 With that, we should be ready. Log in to npm with:
