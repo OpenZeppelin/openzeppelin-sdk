@@ -11,7 +11,7 @@ import {
   Proxy,
   MinimalProxy,
   assertRevert,
-} from 'zos-lib';
+} from '@openzeppelin/upgrades';
 
 import add from '../../src/scripts/add';
 import push from '../../src/scripts/push';

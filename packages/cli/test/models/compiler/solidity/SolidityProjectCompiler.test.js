@@ -1,6 +1,6 @@
 require('../../../setup');
 
-import { FileSystem } from 'zos-lib';
+import { FileSystem } from '@openzeppelin/upgrades';
 import { compileProject } from '../../../../src/models/compiler/solidity/SolidityProjectCompiler';
 import {
   unlinkSync,

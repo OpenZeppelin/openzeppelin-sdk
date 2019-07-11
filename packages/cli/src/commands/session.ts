@@ -1,4 +1,4 @@
-import { ZWeb3 } from 'zos-lib';
+import { ZWeb3 } from '@openzeppelin/upgrades';
 import session from '../scripts/session';
 import { promptIfNeeded, networksList, InquirerQuestions } from '../prompts/prompt';
 import ConfigManager from '../models/config/ConfigManager';

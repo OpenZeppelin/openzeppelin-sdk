@@ -5,7 +5,7 @@
 [![CircleCI](https://circleci.com/gh/OpenZeppelin/openzeppelin-sdk/tree/master.svg?style=shield)](https://circleci.com/gh/OpenZeppelin/openzeppelin-sdk/tree/master)
 [![Coverage Status](https://coveralls.io/repos/github/zeppelinos/zos-lib/badge.svg?branch=master)](https://coveralls.io/github/zeppelinos/zos-lib?branch=master)
 
-> JavaScript library for the OpenZeppelin SDK smart contract platform.
+> JavaScript library for the OpenZeppelin smart contract platform.
 
 OpenZeppelin SDK is a platform to develop, deploy and operate smart contract
 projects on Ethereum and every other EVM and eWASM-powered blockchain.

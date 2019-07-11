@@ -6,7 +6,7 @@ import add from '../../src/scripts/add';
 import push from '../../src/scripts/push';
 import sendTx from '../../src/scripts/send-tx';
 import createProxy from '../../src/scripts/create';
-import { Contracts } from 'zos-lib';
+import { Contracts } from '@openzeppelin/upgrades';
 import CaptureLogs from '../helpers/captureLogs';
 import ProjectFile from '../../src/models/files/ProjectFile';
 import NetworkFile from '../../src/models/files/NetworkFile';

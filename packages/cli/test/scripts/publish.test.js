@@ -1,7 +1,7 @@
 'use strict';
 require('../setup');
 
-import { App, Package, ImplementationDirectory, Proxy } from 'zos-lib';
+import { App, Package, ImplementationDirectory, Proxy } from '@openzeppelin/upgrades';
 
 import publish from '../../src/scripts/publish';
 import push from '../../src/scripts/push';

@@ -2,7 +2,7 @@
 require('../setup');
 
 import utils from 'web3-utils';
-import { Transactions, Contracts } from 'zos-lib';
+import { Transactions, Contracts } from '@openzeppelin/upgrades';
 
 import CaptureLogs from '../helpers/captureLogs';
 import { describeEvents } from '../../src/utils/events';

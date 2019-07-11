@@ -1,4 +1,4 @@
-import { Loggy } from 'zos-lib';
+import { Loggy } from '@openzeppelin/upgrades';
 import LocalController from '../models/local/LocalController';
 import ProjectFile from '../models/files/ProjectFile';
 

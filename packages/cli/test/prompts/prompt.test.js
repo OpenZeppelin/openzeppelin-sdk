@@ -6,7 +6,7 @@ import sinon from 'sinon';
 import * as prompt from '../../src/prompts/prompt';
 
 import inquirer from 'inquirer';
-import { ContractMethodMutability as Mutability } from 'zos-lib';
+import { ContractMethodMutability as Mutability } from '@openzeppelin/upgrades';
 
 import ContractManager from '../../src/models/local/ContractManager';
 import ConfigManager from '../../src/models/config/ConfigManager';

@@ -8,7 +8,7 @@ import {
   StorageLayoutInfo,
   Operation,
   Contract,
-} from 'zos-lib';
+} from '@openzeppelin/upgrades';
 import { ContractInterface } from '../models/files/NetworkFile';
 
 const DOCS_HOME = 'https://docs.zeppelinos.org/docs';

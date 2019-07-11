@@ -1,5 +1,5 @@
 import pickBy from 'lodash.pickby';
-import { ContractMethodMutability as Mutability } from 'zos-lib';
+import { ContractMethodMutability as Mutability } from '@openzeppelin/upgrades';
 
 import call from '../scripts/call';
 import { parseContractReference } from '../utils/contract';

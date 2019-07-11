@@ -13,8 +13,8 @@
 const fs = require('fs');
 
 // Import ZeppelinOS `zos` and `zos-lib` dependencies.
-const zos = require('zos');
-const lib = require('zos-lib');
+const zos = require('@openzeppelin/cli');
+const lib = require('@openzeppelin/upgrades');
 
 // Main entry point, called by `truffle exec`.
 async function main() {

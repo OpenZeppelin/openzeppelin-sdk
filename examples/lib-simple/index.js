@@ -4,7 +4,7 @@
 global.artifacts = artifacts;
 global.web3 = web3;
 
-const { Contracts, SimpleProject, ZWeb3 } = require('zos-lib')
+const { Contracts, SimpleProject, ZWeb3 } = require('@openzeppelin/upgrades')
 
 async function main() {
 

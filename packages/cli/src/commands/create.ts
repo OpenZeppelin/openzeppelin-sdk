@@ -1,5 +1,5 @@
 import pickBy from 'lodash.pickby';
-import { Loggy } from 'zos-lib';
+import { Loggy } from '@openzeppelin/upgrades';
 
 import link from './link';
 import add from './add';

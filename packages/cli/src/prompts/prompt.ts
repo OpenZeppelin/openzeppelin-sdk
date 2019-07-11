@@ -4,7 +4,7 @@ import isEmpty from 'lodash.isempty';
 import groupBy from 'lodash.groupby';
 import difference from 'lodash.difference';
 import inquirer from 'inquirer';
-import { contractMethodsFromAbi, ContractMethodMutability as Mutability } from 'zos-lib';
+import { contractMethodsFromAbi, ContractMethodMutability as Mutability } from '@openzeppelin/upgrades';
 
 import Session from '../models/network/Session';
 import ConfigManager from '../models/config/ConfigManager';

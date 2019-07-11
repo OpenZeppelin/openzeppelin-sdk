@@ -2,7 +2,7 @@
 require('../setup')
 
 import sinon from 'sinon';
-import { FileSystem, Contracts, ZWeb3 } from 'zos-lib';
+import { FileSystem, Contracts, ZWeb3 } from '@openzeppelin/upgrades';
 
 import ConfigManager from '../../src/models/config/ConfigManager';
 

@@ -11,7 +11,7 @@ import {
   validate as validateContract,
   validationPasses,
   TxParams,
-} from 'zos-lib';
+} from '@openzeppelin/upgrades';
 
 import Session from '../network/Session';
 import Dependency from '../dependency/Dependency';

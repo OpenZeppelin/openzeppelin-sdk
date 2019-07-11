@@ -1,4 +1,4 @@
-import { Loggy } from 'zos-lib';
+import { Loggy } from '@openzeppelin/upgrades';
 
 import LocalController from '../models/local/LocalController';
 import { CheckParams } from './interfaces';

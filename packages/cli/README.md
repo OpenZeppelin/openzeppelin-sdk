@@ -4,7 +4,7 @@
 [![NPM Package](https://img.shields.io/npm/v/@openzeppelin/cli.svg?style=flat-square)](https://www.npmjs.org/package/@openzeppelin/cli)
 [![CircleCI](https://circleci.com/gh/OpenZeppelin/openzeppelin-sdk/tree/master.svg?style=shield)](https://circleci.com/gh/OpenZeppelin/openzeppelin-sdk/tree/master)
 
-> Command-line interface for the OpenZeppelin SDK smart contract platform.
+> Command-line interface for the OpenZeppelin smart contract platform.
 
 OpenZeppelin SDK is a platform to develop, deploy and operate smart contract
 projects on Ethereum and every other EVM and eWASM-powered blockchain.

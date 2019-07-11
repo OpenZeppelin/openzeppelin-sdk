@@ -38,7 +38,7 @@ import {
   SimpleProject,
   AppProxyMigrator,
   MinimalProxy,
-} from 'zos-lib';
+} from '@openzeppelin/upgrades';
 import { isMigratableManifestVersion } from '../files/ManifestVersion';
 import { allPromisesOrError } from '../../utils/async';
 import { toContractFullName } from '../../utils/naming';

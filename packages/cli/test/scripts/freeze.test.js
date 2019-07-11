@@ -1,7 +1,7 @@
 'use strict';
 require('../setup');
 
-import { Package } from 'zos-lib';
+import { Package } from '@openzeppelin/upgrades';
 import push from '../../src/scripts/push';
 import freeze from '../../src/scripts/freeze';
 import ProjectFile from '../../src/models/files/ProjectFile';

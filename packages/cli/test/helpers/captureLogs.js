@@ -1,4 +1,4 @@
-import { Loggy } from 'zos-lib';
+import { Loggy } from '@openzeppelin/upgrades';
 
 export default class CaptureLogs {
   constructor() {

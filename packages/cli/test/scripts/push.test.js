@@ -1,7 +1,7 @@
 'use strict';
 require('../setup');
 
-const zosLib = require('zos-lib');
+const zosLib = require('@openzeppelin/upgrades');
 import {
   ZWeb3,
   Contracts,
@@ -9,7 +9,7 @@ import {
   Package,
   ProxyAdmin,
   ProxyFactory,
-} from 'zos-lib';
+} from '@openzeppelin/upgrades';
 
 import sinon from 'sinon';
 import push from '../../src/scripts/push';
@@ -27,7 +27,7 @@ const should = require('chai').should();
 const ImplV1 = Contracts.getFromLocal('ImplV1');
 const WithLibraryImplV1 = Contracts.getFromLocal('WithLibraryImplV1');
 const ImplementationDirectory = Contracts.getFromNodeModules(
-  'zos-lib',
+  '@openzeppelin/upgrades',
   'ImplementationDirectory',
 );
 

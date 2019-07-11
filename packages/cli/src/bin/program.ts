@@ -2,7 +2,7 @@
 
 import chalk from 'chalk';
 import program from 'commander';
-import { Loggy } from 'zos-lib';
+import { Loggy } from '@openzeppelin/upgrades';
 import commands from '../commands';
 import registerErrorHandler from './errors';
 

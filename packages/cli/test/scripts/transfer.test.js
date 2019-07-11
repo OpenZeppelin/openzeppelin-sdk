@@ -2,7 +2,7 @@
 require('../setup');
 
 import utils from 'web3-utils';
-import { ZWeb3 } from 'zos-lib';
+import { ZWeb3 } from '@openzeppelin/upgrades';
 
 import transfer from '../../src/scripts/transfer';
 

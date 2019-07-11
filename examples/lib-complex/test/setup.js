@@ -11,5 +11,5 @@ Contracts.setArtifactsDefaults({
 })
 
 require('chai')
-  .use(require('zos-lib').assertions)
+  .use(require('@openzeppelin/upgrades').assertions)
   .should()

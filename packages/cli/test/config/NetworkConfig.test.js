@@ -3,7 +3,7 @@ require('../setup');
 
 import sinon from 'sinon';
 import path from 'path';
-import { FileSystem } from 'zos-lib';
+import { FileSystem } from '@openzeppelin/upgrades';
 
 import { cleanupfn } from '../helpers/cleanup';
 import NetworkConfig from '../../src/models/config/NetworkConfig';

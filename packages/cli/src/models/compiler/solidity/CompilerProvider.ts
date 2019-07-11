@@ -7,7 +7,7 @@ import reverse from 'lodash.reverse';
 import uniq from 'lodash.uniq';
 import compact from 'lodash.compact';
 import castArray from 'lodash.castarray';
-import { Loggy } from 'zos-lib';
+import { Loggy } from '@openzeppelin/upgrades';
 import { homedir } from 'os';
 import path from 'path';
 import child from '../../../utils/child';

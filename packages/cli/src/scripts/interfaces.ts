@@ -1,4 +1,4 @@
-import { TxParams } from 'zos-lib';
+import { TxParams } from '@openzeppelin/upgrades';
 
 import ProjectFile from '../models/files/ProjectFile';
 import NetworkFile from '../models/files/NetworkFile';

@@ -1,5 +1,5 @@
-const { ConfigManager, files, scripts, stdout } = require('zos');
-const { helpers, Contracts } = require('zos-lib');
+const { ConfigManager, files, scripts, stdout } = require('@openzeppelin/cli');
+const { helpers, Contracts } = require('@openzeppelin/upgrades');
 
 stdout.silent(true);
 

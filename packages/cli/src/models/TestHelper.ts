@@ -1,6 +1,6 @@
 import NetworkController from '../models/network/NetworkController';
 import NetworkFile from '../models/files/NetworkFile';
-import { ProxyAdminProject, AppProject, TxParams } from 'zos-lib';
+import { ProxyAdminProject, AppProject, TxParams } from '@openzeppelin/upgrades';
 
 /**
  * Initializes a zOS application testing and deploying it to the test network,

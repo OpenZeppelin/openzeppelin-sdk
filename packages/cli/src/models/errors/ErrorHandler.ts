@@ -1,5 +1,5 @@
 import { Command } from 'commander';
-import { Loggy } from 'zos-lib';
+import { Loggy } from '@openzeppelin/upgrades';
 import ScriptError from './ScriptError';
 
 const GENERIC_ERROR_MESSAGE =

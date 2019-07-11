@@ -2,7 +2,7 @@ import stdout from '../utils/stdout';
 import NetworkController from '../models/network/NetworkController';
 import ScriptError from '../models/errors/ScriptError';
 import { CreateParams, ProxyType } from './interfaces';
-import { Contract } from 'zos-lib';
+import { Contract } from '@openzeppelin/upgrades';
 import { validateSalt } from '../utils/input';
 
 export default async function createProxy({

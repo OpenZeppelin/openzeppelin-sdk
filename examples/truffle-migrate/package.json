@@ -11,10 +11,10 @@
   "author": "santiago@zeppelin.solutions",
   "license": "MIT",
   "dependencies": {
-    "zos-lib": "^2.4.0"
+    "@openzeppelin/upgrades": "^2.4.0"
   },
   "devDependencies": {
     "truffle": "^5.0.5",
-    "zos": "^2.4.0"
+    "@openzeppelin/cli": "^2.4.0"
   }
 }

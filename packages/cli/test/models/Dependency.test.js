@@ -4,7 +4,7 @@ require('../setup');
 
 import sinon from 'sinon';
 import npm from 'npm-programmatic';
-import { FileSystem as fs } from 'zos-lib';
+import { FileSystem as fs } from '@openzeppelin/upgrades';
 import Dependency from '../../src/models/dependency/Dependency';
 import ProjectFile from '../../src/models/files/ProjectFile';
 import NetworkFile from '../../src/models/files/NetworkFile';

@@ -1,4 +1,4 @@
-import { FileSystem as fs } from 'zos-lib';
+import { FileSystem as fs } from '@openzeppelin/upgrades';
 
 export function cleanup(path) {
   try {

@@ -1,4 +1,4 @@
-import { ZWeb3 } from 'zos-lib';
+import { ZWeb3 } from '@openzeppelin/upgrades';
 import transfer from '../scripts/transfer';
 import { promptIfNeeded, networksList, InquirerQuestions } from '../prompts/prompt';
 import { isValidUnit } from '../utils/units';

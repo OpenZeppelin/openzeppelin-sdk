@@ -2,7 +2,7 @@
 
 import fs from 'fs-extra';
 
-import { Loggy } from 'zos-lib';
+import { Loggy } from '@openzeppelin/upgrades';
 import { lockSync } from 'lockfile';
 import program from './program';
 import findRootDirectory from './helpers';

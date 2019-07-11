@@ -7,7 +7,7 @@ import {
   Package,
   ImplementationDirectory,
   TxParams,
-} from 'zos-lib';
+} from '@openzeppelin/upgrades';
 
 import NetworkController from './NetworkController';
 import ProjectFile from '../files/ProjectFile';

@@ -1,4 +1,4 @@
-import { ContractMethodMutability as Mutability } from 'zos-lib';
+import { ContractMethodMutability as Mutability } from '@openzeppelin/upgrades';
 import pickBy from 'lodash.pickby';
 import isUndefined from 'lodash.isundefined';
 import negate from 'lodash.negate';

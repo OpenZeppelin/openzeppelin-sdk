@@ -2,7 +2,7 @@ import stdout from '../utils/stdout';
 import NetworkController from '../models/network/NetworkController';
 import ScriptError from '../models/errors/ScriptError';
 import { QueryDeploymentParams } from './interfaces';
-import { Loggy } from 'zos-lib';
+import { Loggy } from '@openzeppelin/upgrades';
 import { validateSalt } from '../utils/input';
 
 export default async function queryDeployment({

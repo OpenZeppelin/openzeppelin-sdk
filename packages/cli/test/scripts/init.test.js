@@ -2,7 +2,7 @@
 require('../setup');
 
 import sinon from 'sinon';
-import { FileSystem as fs } from 'zos-lib';
+import { FileSystem as fs } from '@openzeppelin/upgrades';
 import { cleanup } from '../helpers/cleanup';
 
 import init from '../../src/scripts/init';

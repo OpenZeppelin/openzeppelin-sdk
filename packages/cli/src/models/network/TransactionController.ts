@@ -2,7 +2,7 @@ import isEmpty from 'lodash.isempty';
 import isUndefined from 'lodash.isundefined';
 import isNull from 'lodash.isnull';
 
-import { Contract, Transactions, Loggy, ZWeb3, TxParams, ABI } from 'zos-lib';
+import { Contract, Transactions, Loggy, ZWeb3, TxParams, ABI } from '@openzeppelin/upgrades';
 import { isValidUnit, prettifyTokenAmount, toWei, fromWei } from '../../utils/units';
 import { ERC20_PARTIAL_ABI } from '../../utils/constants';
 import { allPromisesOrError } from '../../utils/async';

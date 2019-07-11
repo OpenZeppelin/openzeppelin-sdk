@@ -2,7 +2,7 @@ import axios from 'axios';
 import cheerio from 'cheerio';
 import querystring from 'querystring';
 
-import { sleep, Loggy } from 'zos-lib';
+import { sleep, Loggy } from '@openzeppelin/upgrades';
 
 // Max number of API request retries on error
 const RETRY_COUNT = 3;

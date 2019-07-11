@@ -1,7 +1,7 @@
 import push from './push';
 import init from '../scripts/init';
 import { promptIfNeeded, InquirerQuestions } from '../prompts/prompt';
-import { FileSystem } from 'zos-lib';
+import { FileSystem } from '@openzeppelin/upgrades';
 import ProjectFile from '../models/files/ProjectFile';
 
 const name = 'init';

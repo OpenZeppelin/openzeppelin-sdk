@@ -1,7 +1,7 @@
 'use strict';
 require('../setup');
 
-import { ZWeb3 } from 'zos-lib';
+import { ZWeb3 } from '@openzeppelin/upgrades';
 import sinon from 'sinon';
 import { stubCommands, itShouldParse } from './share';
 
