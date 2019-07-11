@@ -32,7 +32,7 @@ npm init -y
 Let's now use the CLI to initialize a ZeppelinOS project:
 
 ```console
-zos init
+openzeppelin init
 ```
 
 The CLI will prompt you to choose a project name and version, defaulting to the ones from the `package.json`, and then set up a few files and folders for running your ZeppelinOS project.
@@ -59,7 +59,7 @@ contract Counter {
 
 This contract will just keep a numeric `value`, that will be increased by one every time we send a transaction to the `increase()` function.
 
-You can run `zos compile` to compile the contract and check for any errors. After it compiled successfully, we can now deploy our contract.
+You can run `openzeppelin compile` to compile the contract and check for any errors. After it compiled successfully, we can now deploy our contract.
 
 > Note: You don't have to worry if you forget to compile your contract. The CLI will automatically check if your contract changed when you run any command, and compile it if needed.
 
@@ -75,7 +75,7 @@ Open a separate terminal, and start a new ganache process:
 ganache-cli --deterministic
 ```
 
-This will start a new development network, using a deterministic set of accounts, instead of random ones. We can now deploy our contract there, running `zos create`, and choosing to deploy the `Counter` contract to the `development` network.
+This will start a new development network, using a deterministic set of accounts, instead of random ones. We can now deploy our contract there, running `openzeppelin create`, and choosing to deploy the `Counter` contract to the `development` network.
 
 ```console
 $ zos create
@@ -91,7 +91,7 @@ $ zos create
 
 > Note: The addresses where your contracts are created, or the transaction identifiers you see, may differ from the ones listed here.
 
-Our counter contract is deployed to the local development network and ready to go! We can test it out by interacting with it from the terminal. Let's try incrementing the counter, by sending a transaction to call the `increase` function through `zos send-tx`.
+Our counter contract is deployed to the local development network and ready to go! We can test it out by interacting with it from the terminal. Let's try incrementing the counter, by sending a transaction to call the `increase` function through `openzeppelin send-tx`.
 
 ```console
 $ zos send-tx
@@ -101,7 +101,7 @@ $ zos send-tx
 ✓ Transaction successful. Transaction hash: 0x20bef6583ea32cc57fe179e34dd57a5494db3c403e441624e56a886898cb52bd
 ```
 
-We can now use `zos call` to query the contract's public `value`, and check that it was indeed increased from zero to one.
+We can now use `openzeppelin call` to query the contract's public `value`, and check that it was indeed increased from zero to one.
 
 ```console
 $ zos call

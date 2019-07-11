@@ -13,7 +13,7 @@ We will write a `TokenExchange` contract, that will allow any user to purchase a
 npm install --global zos ganache-cli
 mkdir token-exchange && cd token-exchange
 npm init -y
-zos init
+openzeppelin init
 ```
 
 > Note: The full code for this project is available in our [Github repo](https://github.com/zeppelinos/zos/tree/v2.4.0/examples/linking-contracts).
@@ -29,7 +29,7 @@ We will first get ourselves an ERC20 token. Instead of coding one from scratch, 
 To link the OpenZeppelin contracts EVM package into your project, simply run the following:
 
 ```console
-zos link openzeppelin-eth@2.2.0
+openzeppelin link openzeppelin-eth@2.2.0
 ```
 
 This command will download the EVM package (bundled as a regular npm package), and connect it to your ZeppelinOS project. We now have all of OpenZeppelin contracts at our disposal, so let's create an ERC20 token!
@@ -87,7 +87,7 @@ Great! We can now write an exchange contract and connect it to this token when w
 
 ## Writing the exchange contract
 
-In order to transfer an amount of tokens every time it receives ETH, our exchange contract will need to store the token contract address and the exchange rate in its state. We will set these two values during initialization, when we create the instance with `zos create`.
+In order to transfer an amount of tokens every time it receives ETH, our exchange contract will need to store the token contract address and the exchange rate in its state. We will set these two values during initialization, when we create the instance with `openzeppelin create`.
 
 In order to support contract upgrades, ZeppelinOS [does not allow the usage of Solidity's `constructor`s](pattern#the-constructor-caveat). Instead, we need to use _initializers_. An initializer is just a regular Solidity function, with an additional check to ensure that it can be called only once. To make coding initializers easy, ZeppelinOS provides a base `Initializable` contract, that includes an `initializer` modifier that takes care of this. You will first need to install the package that provides that contract:
 
@@ -168,7 +168,7 @@ All set! We can start playing with our brand new token exchange.
 
 ## Using our exchange
 
-Now that we have initialized our exchange contract initialized, and seeded it with funds, we can test it out by purchasing tokens. Our exchange contract will send tokens back automatically when we send ETH to it, so let's test it by using the `zos transfer` command. This command allows us to send funds to any address; in this case, we will use it to send ETH to our `TokenExchange` instance:
+Now that we have initialized our exchange contract initialized, and seeded it with funds, we can test it out by purchasing tokens. Our exchange contract will send tokens back automatically when we send ETH to it, so let's test it by using the `openzeppelin transfer` command. This command allows us to send funds to any address; in this case, we will use it to send ETH to our `TokenExchange` instance:
 
 ```console
 $ zos transfer
@@ -183,7 +183,7 @@ $ zos transfer
 
 > Note: Make sure you replace the receiver account with the corresponding address where your `TokenExchange` was created.
 
-We can now use `zos balance` again, to check the token balance of the address that made the purchase. Since we sent 0.1 ETH, and we used a 1:10 exchange rate, we should see a balance of 1 MYT (MyToken).
+We can now use `openzeppelin balance` again, to check the token balance of the address that made the purchase. Since we sent 0.1 ETH, and we used a 1:10 exchange rate, we should see a balance of 1 MYT (MyToken).
 
 ```console
 $ zos balance --erc20 0x5f8e26fAcC23FA4cbd87b8d9Dbbd33D5047abDE1
@@ -270,7 +270,7 @@ $ zos send-tx
 ✓ Transaction successful. Transaction hash: 0xc9fb0d3ada96ec4c67c1c8f1569f9cfaf0ff0f7b241e172b32a023b1763ab7ab
 ```
 
-> Note: You can also upgrade contracts from an EVM package. Upon a new release of openzeppelin-eth, if you want to update your ERC20 to include the latest fixes, you can just `zos link` the new version and use `zos upgrade` to get your instance to the newest code.
+> Note: You can also upgrade contracts from an EVM package. Upon a new release of openzeppelin-eth, if you want to update your ERC20 to include the latest fixes, you can just `openzeppelin link` the new version and use `openzeppelin upgrade` to get your instance to the newest code.
 
 ## Wrapping up
 

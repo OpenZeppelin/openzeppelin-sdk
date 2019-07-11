@@ -141,7 +141,7 @@ contract MyContract {
 
 When creating a new instance of a contract from your contract's code, these creations are handled directly by Solidity and not by ZeppelinOS, which means that **these contracts will not be upgradeable**.
 
-For instance, in the following example, even if `MyContract` is upgradeable (if created via `zos create MyContract`), the `token` contract created is not:
+For instance, in the following example, even if `MyContract` is upgradeable (if created via `openzeppelin create MyContract`), the `token` contract created is not:
 
 ```solidity
 import "zos-lib/contracts/Initializable.sol";

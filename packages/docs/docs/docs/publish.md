@@ -18,20 +18,20 @@ In the directory of our project, we initialize it:
 mkdir <project-name>
 cd <project-name>
 npm init
-npx zos init <project-name>
+npx openzeppelin init <project-name>
 ```
 
 Then, we can add to our project all the contracts that we have in the
 `contracts` directory:
 
 ```console
-npx zos add <contract-name-1> <contract-name-2> ... <contract-name-n>
+npx openzeppelin add <contract-name-1> <contract-name-2> ... <contract-name-n>
 ```
 
 Next, we push the project to the network:
 
 ```console
-npx zos push --network <network>
+npx openzeppelin push --network <network>
 ```
 
 Note that for the EVM package to be used by others, you need to use a real
@@ -42,7 +42,7 @@ All known commands so far. Here comes what's new. If you want to share your
 package in ZeppelinOS, do it by running the `publish` command:
 
 ```console
-npx zos publish --network <network>
+npx openzeppelin publish --network <network>
 ```
 
 It's that simple! Now you are the developer of an EVM package that lives in
@@ -97,7 +97,7 @@ Now we are done for real. Other developers will be able to link to your
 package by using:
 
 ```console
-npx zos link <your-project-name>
+npx openzeppelin link <your-project-name>
 ```
 
 Spread the word! Tell others to reuse your work, and to help you improving it

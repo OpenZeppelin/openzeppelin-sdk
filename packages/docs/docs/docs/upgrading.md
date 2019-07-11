@@ -37,17 +37,17 @@ automated, or any combination of both that will earn the trust of our users.
 
 > If any of the following commands fail with an `A network name must be provided 
 to execute the requested action` error, it means our session has expired. 
-In that case, renew it by running the command `npx zos session --network local 
+In that case, renew it by running the command `npx openzeppelin session --network local 
 --from 0x1df62f291b2e969fb0849d99d9ce41e2f137006e --expires 3600` again.
 
 Now let's create an upgradeable instance of this contract so you can 
 experiment with what this is all about:
 
 ```console
-npx zos create MyContract --init initialize --args 42,hitchhiker
+npx openzeppelin create MyContract --init initialize --args 42,hitchhiker
 ```
 
-The `npx zos create` command receives an optional `--init [function-name]`
+The `npx openzeppelin create` command receives an optional `--init [function-name]`
 parameter to call the initialization function after creating the contract,
 and the `--args` parameter allows you to pass arguments to it. This way, you
 are initializing your contract with `42` as the value of the `x` state
@@ -123,13 +123,13 @@ contract MyContract is Initializable {
 Once you have saved these changes, push the new code to the network:
 
 ```console
-npx zos push
+npx openzeppelin push
 ```
 
 Finally, let's update the already deployed contract with the new code:
 
 ```console
-npx zos update MyContract
+npx openzeppelin update MyContract
 ```
 
 You will see that this command prints the same contract address as before, 
@@ -164,7 +164,7 @@ Now let's imagine that instead of just adding a new
 function to the contract (a change to functionality), we wanted to add a new 
 variable `t` to our contract. But how do we set the initial value of `t`?
 The variables `x` and `s` were initialized with the `initialize` function,
-which was called when the proxy was created via the `zos create MyContract --init initialize --args ...` 
+which was called when the proxy was created via the `openzeppelin create MyContract --init initialize --args ...` 
 command. Naturally, the solution would be to add the initialization of `t`
 to the end of the initialize function: 
 
@@ -183,7 +183,7 @@ the `Initializable` modifier guards it against being called more than once. We n
 The `update` command also accepts `--init` and `--args` parameters, so we can use a function
 with it to initialize the new variable. A good name for the 
 new function could be something like `initializeT` or `initializeVersion2`. This function would simply
-set the initial value of `t` and check that it has not yet been initialized. It should be called with `zos update MyContract --init initializeT --args 99`.
+set the initial value of `t` and check that it has not yet been initialized. It should be called with `openzeppelin update MyContract --init initializeT --args 99`.
 
 ```
 function initializeT(uint256 _t) public {

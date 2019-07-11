@@ -3,7 +3,7 @@ id: safety
 title: Safety Checks
 ---
 
-The ZeppelinOS CLI performs a series of safety checks in some of its commands with the purpose of strengthening the security of your projects. For example, the `zos add` command can detect if a contract has a `constructor`, or contains usages of `selfdestruct` or `delegatecall`. Below is a list of some of the checks made, along with the reasoning behind why they are considered to be security risks.
+The ZeppelinOS CLI performs a series of safety checks in some of its commands with the purpose of strengthening the security of your projects. For example, the `openzeppelin add` command can detect if a contract has a `constructor`, or contains usages of `selfdestruct` or `delegatecall`. Below is a list of some of the checks made, along with the reasoning behind why they are considered to be security risks.
 
 **Some validation examples:**
 * constructor check: Proxied contracts should use initializer functions instead of constructors. For more info, see [Initializers vs. constructors](https://docs.zeppelinos.org/docs/advanced.html#initializers-vs-constructors) in this page.

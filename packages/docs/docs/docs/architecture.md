@@ -8,7 +8,7 @@ ZeppelinOS's features such as upgrades, EVM package linking, and vouching, can a
 However, some additional smart contracts come into play when you want to publish your EVM package for others to reuse. Publishing is achieved by calling the command:
 
 ```console
-zos publish
+openzeppelin publish
 ```
 
 The source code of the contracts involved with a published EVM package can be found in [zos/packages/lib/contracts/application](https://github.com/zeppelinos/zos/tree/master/packages/lib/contracts/application). In the following sections, we describe the general architecture of a ZeppelinOS published EVM package.

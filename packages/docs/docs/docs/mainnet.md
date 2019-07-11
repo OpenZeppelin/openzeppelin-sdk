@@ -44,7 +44,7 @@ npm install truffle-hdwallet-provider
 And now you can run `zos` commands in mainnet. For example:
 
 ```console
-zos push --network mainnet
+openzeppelin push --network mainnet
 ```
 
 

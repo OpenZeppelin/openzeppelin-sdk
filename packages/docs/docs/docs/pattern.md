@@ -130,7 +130,7 @@ The problem is easily solved though. Logic contracts should move the code within
 This is why when the ZeppelinOS CLI creates a proxy, it allows you to indicate an initializer function:
 
 ```console
-npx zos create MyLogicContract --init initialize --args arg1,arg2,arg3
+npx openzeppelin create MyLogicContract --init initialize --args arg1,arg2,arg3
 ```
 
 With this command, ZeppelinOS creates a proxy that wraps around `MyLogicContract`, uses `MyLogicContract` as the logic contract, and calls the logic contract's `initialize` function.
@@ -170,7 +170,7 @@ Assuming a proxy with an `owner()` and an `upgradeTo()` function, that delegates
 | Owner         | returns proxy.owner() | returns proxy.upgradeTo() | fails |
 | Other         | returns erc20.owner() | fails | returns erc20.transfer() |
 
-Fortunately, the ZeppelinOS cli accounts for this situation, and creates an intermediary ProxyAdmin contract that is in charge of all the proxies you create via the cli. Even if you call the `create` command from your node's default account, or using the `from` address specified when you started your `zos session`, the ProxyAdmin contract will be the actual admin of all your proxies. This means that you will be able to interact with the proxies from any of your node's accounts, without having to worry about the nuances of the transparent proxy pattern. Only advanced users of ZeppelinOS that use it programmatically via `zos-lib` need to be aware of the transparent proxies pattern.
+Fortunately, the ZeppelinOS cli accounts for this situation, and creates an intermediary ProxyAdmin contract that is in charge of all the proxies you create via the cli. Even if you call the `create` command from your node's default account, or using the `from` address specified when you started your `openzeppelin session`, the ProxyAdmin contract will be the actual admin of all your proxies. This means that you will be able to interact with the proxies from any of your node's accounts, without having to worry about the nuances of the transparent proxy pattern. Only advanced users of ZeppelinOS that use it programmatically via `zos-lib` need to be aware of the transparent proxies pattern.
 
 ## Summary
 

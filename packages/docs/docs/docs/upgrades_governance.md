@@ -30,9 +30,9 @@ to register this contract, push it to the network and create a new upgradeable i
 previous sections:
 
 ```console
-zos add MyContract
-zos push -n ropsten
-zos create MyContract -n ropsten
+openzeppelin add MyContract
+openzeppelin push -n ropsten
+openzeppelin create MyContract -n ropsten
 ```
 
 We have our contract deployed to the `ropsten` network, with an instance of our `MyContract` contract up and running.
@@ -45,7 +45,7 @@ Since we want to avoid having a single account with full control over our `MyCon
 of it to our multisig contract. To do this, we’ll use the `set-admin` command to yield control to the multisig account.
 
 ```console
-zos set-admin [MYCONTRACT_ADDRESS] [MULTISIG_ADDRESS] -y
+openzeppelin set-admin [MYCONTRACT_ADDRESS] [MULTISIG_ADDRESS] -y
 ```
 
 > Please remember to replace `[MYCONTRACT_ADDRESS]` by the address of the upgradeable instance of `MyContract` we
@@ -67,8 +67,8 @@ Let’s suppose we extend the functionality somehow. The first step is to upload
 Since the whole project is still managed by our deployer account, we can easily do that from the CLI by running:
 
 ```console
-zos add MyContract
-zos push
+openzeppelin add MyContract
+openzeppelin push
 ```
 
 Now that our new logic contract is uploaded to the network, we can proceed to upgrade our `MyContract` instance.
@@ -81,7 +81,7 @@ multisig to perform this operation, as the CLI’s account.
 
 Let’s submit a transaction to the multisig wallet for our contract instance to be upgraded. We can do this from the
 Gnosis dApp by including the [proxy's ABI](https://gist.github.com/spalladino/d25c41c19a538ae918735e5b1c07db07) and choosing to invoke `upgradeTo`. We also need to supply the address of
-the new implementation, which can be found in the output of the last `zos push` command or in the `.openzeppelin/ropsten.json`
+the new implementation, which can be found in the output of the last `openzeppelin push` command or in the `.openzeppelin/ropsten.json`
 file.
 
 ![](https://lh3.googleusercontent.com/Wi76B5WGVs8_qGD1GPVYpA5oOF4hEVt1mfl1grCszZRfxRlkPS1PsPxm9-Kpm0NfX0qlmq-5rUNfXdEJrIlH8gJK9TNW7NjlZ_QVqAuv5JZRFW-zQNxATQpA9OapPq_6J85nzTLz)

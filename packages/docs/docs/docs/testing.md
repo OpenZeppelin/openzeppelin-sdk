@@ -7,7 +7,7 @@ When working with ZeppelinOS, you can test your contracts as you usually do. Tha
 
 Instead, you can use specifically designed ZeppelinOS tools that automatically set up your entire project in your testing environment. This allows you to replicate the same set of contracts that manage your project for each test you run.
 
-The `zos` package provides a `TestHelper()` function to retrieve your project structure from the `.openzeppelin/project.json` file and deploy everything to the current test network. All the contracts that you have registered via `zos add`, plus all the contracts provided by the EVM packages you have linked, will be available. The returned project object (either a [`ProxyAdminProject`](https://github.com/zeppelinos/zos/blob/v2.2.0/packages/lib/src/project/ProxyAdminProject.ts) or an [`AppProject`](https://github.com/zeppelinos/zos/blob/v2.2.0/packages/lib/src/project/AppProject.ts)) provides convenient methods for creating upgradeable instances of your contracts, which you can use within your tests. Let's see how this would work in a simple project.
+The `zos` package provides a `TestHelper()` function to retrieve your project structure from the `.openzeppelin/project.json` file and deploy everything to the current test network. All the contracts that you have registered via `openzeppelin add`, plus all the contracts provided by the EVM packages you have linked, will be available. The returned project object (either a [`ProxyAdminProject`](https://github.com/zeppelinos/zos/blob/v2.2.0/packages/lib/src/project/ProxyAdminProject.ts) or an [`AppProject`](https://github.com/zeppelinos/zos/blob/v2.2.0/packages/lib/src/project/AppProject.ts)) provides convenient methods for creating upgradeable instances of your contracts, which you can use within your tests. Let's see how this would work in a simple project.
 
 ## Setting up a sample project
 
@@ -27,7 +27,7 @@ npm install zos zos-lib openzeppelin-eth truffle chai
 Now, run:
 
 ```console
-npx zos init my-project
+npx openzeppelin init my-project
 ```
 
 Let's add a simple contract to the project, create the file `contracts/Sample.sol`:
@@ -45,13 +45,13 @@ contract Sample {
 Now, add your contract to the ZeppelinOS project:
 
 ```console
-npx zos add Sample
+npx openzeppelin add Sample
 ```
 
 And link your ZeppelinOS project to the `openzeppelin-eth` EVM package:
 
 ```
-npx zos link openzeppelin-eth
+npx openzeppelin link openzeppelin-eth
 ```
 
 ## Writing the test script
@@ -137,7 +137,7 @@ And finally, we add the tests themselves. Notice how each test first creates a u
 const proxy = await this.project.createProxy(Sample);
 ```
 
-The [createProxy](https://github.com/zeppelinos/zos/blob/master/packages/lib/src/project/BaseSimpleProject.ts#L96) method of the project accepts an additional object parameter in which you can specify an initializer function with arguments, just as you would by using the regular `zos create` command from the CLI, but due to the simplicity of this example, it's not necessary in our case. If you would need to pass parameters though, you would do so like this:
+The [createProxy](https://github.com/zeppelinos/zos/blob/master/packages/lib/src/project/BaseSimpleProject.ts#L96) method of the project accepts an additional object parameter in which you can specify an initializer function with arguments, just as you would by using the regular `openzeppelin create` command from the CLI, but due to the simplicity of this example, it's not necessary in our case. If you would need to pass parameters though, you would do so like this:
 
 ```js
 const proxy = await this.project.createProxy(Sample, {
@@ -182,7 +182,7 @@ contract Crowdsale {
 
 This means that calls to contracts with more than one function named `initialize`, 
 as is the case with some contracts from OpenZeppelin (e.g., TimedCrowdsale), 
-may revert if you call `initialize` directly from Truffle. `zos create` handles 
+may revert if you call `initialize` directly from Truffle. `openzeppelin create` handles 
 this correctly as it encodes the parameters. However, for your unit tests you will 
 need to call `initialize` manually.
 
