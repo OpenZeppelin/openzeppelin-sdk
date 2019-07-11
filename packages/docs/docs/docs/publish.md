@@ -1,13 +1,13 @@
 ---
 id: publishing
-title: Publishing an EVM package
+title: Publishing an Ethereum package
 ---
 
 On the previous guides we have explored how to initialize an OpenZeppelin SDK project,
 how to add contracts to it, how to upgrade those contracts and how to link to
-existing EVM packages. At this point we have a simple project that uses various
+existing Ethereum packages. At this point we have a simple project that uses various
 of the OpenZeppelin SDK features. On this guide we will instead add new
-functionalities to the platform, nicely wrapped as an EVM package ready for
+functionalities to the platform, nicely wrapped as an Ethereum package ready for
 others to use.
 
 Let's first remember some of the things we've learned so far.
@@ -34,7 +34,7 @@ Next, we push the project to the network:
 npx openzeppelin push --network <network>
 ```
 
-Note that for the EVM package to be used by others, you need to use a real
+Note that for the Ethereum package to be used by others, you need to use a real
 network instead of your local development one. We have a guide about
 [Deploying to mainnet](mainnet) which can be useful.
 
@@ -45,7 +45,7 @@ package to the OpenZeppelin SDK community, do it by running the `publish` comman
 npx openzeppelin publish --network <network>
 ```
 
-It's that simple! Now you are the developer of an EVM package that lives in
+It's that simple! Now you are the developer of an Ethereum package that lives in
 the blockchain ready to help building the next revolution. But this is only
 half of the story, because for the package to be discovered and linked by
 other projects, you will also need to publish it to
@@ -72,12 +72,12 @@ OpenZeppelin SDK configuration files, so add the following top-level field to th
 
 Remember that the `openzeppelin` configuration files are where the OpenZeppelin SDK keeps track of 
 your contracts, the addresses of the instances you have created, and in this
-case the address of the EVM package you will have published. This is how the OpenZeppelin SDK 
+case the address of the Ethereum package you will have published. This is how the OpenZeppelin SDK 
 solves the link of foreign projects that depend on yours.
 
 Make sure to check that the rest of the fields describe your package
 accurately. It could be a good idea to remove the `main` field, if present,
-because it doesn't make sense for EVM packages. Also, if you have a
+because it doesn't make sense for Ethereum packages. Also, if you have a
 `.openzeppelin/dev-<network_id>.json` file, you can remove it now because it is specific for your
 local test environment. You can also add this file pattern to your `.gitignore` file.
 

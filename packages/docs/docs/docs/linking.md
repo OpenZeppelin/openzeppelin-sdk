@@ -3,7 +3,7 @@ id: linking
 title: Linking OpenZeppelin contracts
 ---
 
-In the [first](first) tutorial, we learned how to set up a new OpenZeppelin SDK project, deploy a simple contract, and upgrade it. Now, we will build a more interesting project with multiple contracts, leveraging the [OpenZeppelin Contracts package](https://github.com/OpenZeppelin/openzeppelin-contracts-ethereum-package). We will learn about **linking EVM packages**, and **writing upgradeable contracts**.
+In the [first](first) tutorial, we learned how to set up a new OpenZeppelin SDK project, deploy a simple contract, and upgrade it. Now, we will build a more interesting project with multiple contracts, leveraging the [OpenZeppelin Contracts package](https://github.com/OpenZeppelin/openzeppelin-contracts-ethereum-package). We will learn about **linking Ethereum packages**, and **writing upgradeable contracts**.
 
 ## What we will build
 
@@ -18,21 +18,21 @@ openzeppelin init
 
 > Note: The full code for this project is available in our [Github repo](https://github.com/OpenZeppelin/openzeppelin-sdk/tree/v2.4.0/examples/linking-contracts).
 
-## Linking the Contracts EVM package
+## Linking the Contracts Ethereum package
 
-We will first get ourselves an ERC20 token. Instead of coding one from scratch, we will use the one provided by the [OpenZeppelin Contracts EVM package](https://github.com/OpenZeppelin/openzeppelin-contracts-ethereum-package). An EVM package is a set of contracts set up to be easily included in a OpenZeppelin SDK project, with the added bonus that the contracts' code _is already deployed in the Ethereum network_. This is a more secure code distribution mechanism, and also helps you save gas upon deployment.
+We will first get ourselves an ERC20 token. Instead of coding one from scratch, we will use the one provided by the [OpenZeppelin Contracts Ethereum package](https://github.com/OpenZeppelin/openzeppelin-contracts-ethereum-package). An Ethereum package is a set of contracts set up to be easily included in a OpenZeppelin SDK project, with the added bonus that the contracts' code _is already deployed in the Ethereum network_. This is a more secure code distribution mechanism, and also helps you save gas upon deployment.
 
-<!-- TODO: Add guide on what is an EVM package behind the scenes, instead of linking to a blogpost -->
+<!-- TODO: Add guide on what is an Ethereum package behind the scenes, instead of linking to a blogpost -->
 
-> Note: Check out [this article](https://blog.zeppelinos.org/open-source-collaboration-in-the-blockchain-era-evm-packages/)to learn more about EVM packages.
+> Note: Check out [this article](https://blog.zeppelinos.org/open-source-collaboration-in-the-blockchain-era-evm-packages/)to learn more about Ethereum packages.
 
-To link the OpenZeppelin Contracts EVM package into your project, simply run the following:
+To link the OpenZeppelin Contracts Ethereum package into your project, simply run the following:
 
 ```console
 openzeppelin link @openzeppelin/contracts-ethereum-package@2.2.0
 ```
 
-This command will download the EVM package (bundled as a regular npm package), and connect it to your OpenZeppelin project. We now have all of OpenZeppelin contracts at our disposal, so let's create an ERC20 token!
+This command will download the Ethereum package (bundled as a regular npm package), and connect it to your OpenZeppelin project. We now have all of OpenZeppelin contracts at our disposal, so let's create an ERC20 token!
 
 > Note: Make sure you install `@openzeppelin/contracts-ethereum-package` and not the vanilla `@openzeppelin/contracts`. The latter is set up for general usage, while `@openzeppelin/contracts-ethereum-package` is tailored for being used with the OpenZeppelin SDK. This means that its contracts are [already set up to be upgradeable](writing_contracts#use-upgradeable-packages).
 
@@ -270,11 +270,11 @@ $ openzeppelin send-tx
 ✓ Transaction successful. Transaction hash: 0xc9fb0d3ada96ec4c67c1c8f1569f9cfaf0ff0f7b241e172b32a023b1763ab7ab
 ```
 
-> Note: You can also upgrade contracts from an EVM package. Upon a new release of @openzeppelin/contracts-ethereum-package, if you want to update your ERC20 to include the latest fixes, you can just `openzeppelin link` the new version and use `openzeppelin upgrade` to get your instance to the newest code.
+> Note: You can also upgrade contracts from an Ethereum package. Upon a new release of @openzeppelin/contracts-ethereum-package, if you want to update your ERC20 to include the latest fixes, you can just `openzeppelin link` the new version and use `openzeppelin upgrade` to get your instance to the newest code.
 
 ## Wrapping up
 
-We have built a more complex setup in this tutorial, and learned several concepts along the way. We introduced [EVM packages](https://blog.zeppelinos.org/open-source-collaboration-in-the-blockchain-era-evm-packages/) as dependencies for our projects, allowing us to spin up a new token with little effort. We also presented some [limitations](writing_contracts) of the [upgrades pattern](pattern) that the OpenZeppelin SDK uses, such as [initializer methods](writing_contracts#initializers) as a replacement for constructors, or [preserving the storage layout](writing_contracts#modifying-your-contracts) when modifying our source code. We also learned how to run a function as a migration when upgrading a contract.
+We have built a more complex setup in this tutorial, and learned several concepts along the way. We introduced [Ethereum packages](https://blog.zeppelinos.org/open-source-collaboration-in-the-blockchain-era-evm-packages/) as dependencies for our projects, allowing us to spin up a new token with little effort. We also presented some [limitations](writing_contracts) of the [upgrades pattern](pattern) that the OpenZeppelin SDK uses, such as [initializer methods](writing_contracts#initializers) as a replacement for constructors, or [preserving the storage layout](writing_contracts#modifying-your-contracts) when modifying our source code. We also learned how to run a function as a migration when upgrading a contract.
 
 Feel free to explore the rest of the guides in the site to keep learning more, or start coding with the OpenZeppelin SDK right away!
 
