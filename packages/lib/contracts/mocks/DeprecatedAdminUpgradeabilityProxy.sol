@@ -20,10 +20,10 @@ contract DeprecatedAdminUpgradeabilityProxy is UpgradeabilityProxy {
 
   /**
    * @dev Storage slot with the admin of the contract.
-   * This is the keccak-256 hash of "com.openzeppelinupgrades.proxy.admin", and is
+   * This is the keccak-256 hash of "org.zeppelinos.proxy.admin", and is
    * validated in the constructor.
    */
-  bytes32 private constant ADMIN_SLOT = 0xb4160bff6c76d69de89006ee3653a5051d28b87681e6c0cd53e2f13724ecb8cb;
+  bytes32 private constant ADMIN_SLOT = 0x10d6a54a4754c8869d6886b5f5d7fbfa5b4522237ea5c60d11bc4e7a1ff9390b;
 
   /**
    * @dev Modifier to check whether the `msg.sender` is the admin.
@@ -48,7 +48,7 @@ contract DeprecatedAdminUpgradeabilityProxy is UpgradeabilityProxy {
    * This parameter is optional, if no data is given the initialization call to proxied contract will be skipped.
    */
   constructor(address _implementation, bytes memory _data) UpgradeabilityProxy(_implementation, _data) public payable {
-    assert(ADMIN_SLOT == keccak256("com.openzeppelinupgrades.proxy.admin"));
+    assert(ADMIN_SLOT == keccak256("org.zeppelinos.proxy.admin"));
 
     _setAdmin(msg.sender);
   }
