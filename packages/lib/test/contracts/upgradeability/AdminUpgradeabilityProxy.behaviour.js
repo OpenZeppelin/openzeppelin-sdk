@@ -54,21 +54,6 @@ export default function shouldBehaveLikeAdminUpgradeabilityProxy(
     this.proxyAddress = this.proxy.address;
   });
 
-  afterEach(function () {
-    sinon.restore();
-  });
-
-  it('uses the correct admin storage slot', async function() {
-    const spy = sinon.spy(Proxy.prototype, 'getStorageAt');
-    const proxy = await Proxy.at(this.proxy.address);
-    const adminAddress = await proxy.admin();
-
-    adminAddress.should.eq(proxyAdminAddress);
-    spy.should.have.been.calledOnceWith(ZWeb3.sha3(ADMIN_LABEL))
-    spy.should.have.not.been.calledWith(ZWeb3.sha3(DEPRECATED_ADMIN_LABEL))
-    spy.restore();
-  });
-
   describe('implementation', function() {
     it('returns the current implementation address', async function() {
       const implementation = await this.proxy.methods

@@ -3,7 +3,6 @@
 require('../../setup');
 
 import without from 'lodash.without';
-import sinon from 'sinon';
 
 import Proxy from '../../../src/proxy/Proxy';
 import ZWeb3 from '../../../src/artifacts/ZWeb3';
@@ -36,10 +35,6 @@ export default function shouldBehaveLikeUpgradeabilityProxy(
     );
   });
 
-  afterEach(function() {
-    sinon.restore();
-  });
-
   const assertProxyInitialization = function({ value, balance }) {
     it('sets the implementation address', async function() {
       const implementation = await Proxy.at(this.proxy).implementation();
@@ -53,16 +48,6 @@ export default function shouldBehaveLikeUpgradeabilityProxy(
 
     it('has expected balance', async function() {
       (await ZWeb3.getBalance(this.proxy)).should.eq(balance.toString());
-    });
-
-    it('uses the correct implementation storage slot', async function() {
-      const spy = sinon.spy(Proxy.prototype, 'getStorageAt');
-      const proxy = await Proxy.at(this.proxy);
-      const implementationAddress = await proxy.implementation();
-
-      implementationAddress.should.eq(this.implementation);
-      spy.should.have.been.calledOnceWith(ZWeb3.sha3(IMPLEMENTATION_LABEL))
-      spy.should.have.not.been.calledWith(ZWeb3.sha3(DEPRECATED_IMPLEMENTATION_LABEL))
     });
   };
 
