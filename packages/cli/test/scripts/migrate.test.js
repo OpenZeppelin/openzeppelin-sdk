@@ -12,8 +12,6 @@ import setAdmin from '../../src/scripts/set-admin';
 import ProjectFile from '../../src/models/files/ProjectFile';
 import NetworkFile from '../../src/models/files/NetworkFile';
 
-const should = require('chai').should();
-
 const Package = Contracts.getFromLib('Package');
 const DeprecatedApp = Contracts.getFromLib('DeprecatedApp');
 const ImplementationDirectory = Contracts.getFromLib('ImplementationDirectory');

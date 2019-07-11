@@ -1,6 +1,6 @@
 pragma solidity ^0.5.0;
 
-import './UpgradeabilityProxy.sol';
+import './ZosUpgradeabilityProxy.sol';
 
 /**
  * @title BaseAdminUpgradeabilityProxy
@@ -10,7 +10,7 @@ import './UpgradeabilityProxy.sol';
  * `ifAdmin` modifier. See ethereum/solidity#3864 for a Solidity
  * feature proposal that would enable this to be done automatically.
  */
-contract BaseAdminUpgradeabilityProxy is BaseUpgradeabilityProxy {
+contract ZosBaseAdminUpgradeabilityProxy is ZosBaseUpgradeabilityProxy {
   /**
    * @dev Emitted when the administration has been transferred.
    * @param previousAdmin Address of the previous admin.
@@ -20,11 +20,11 @@ contract BaseAdminUpgradeabilityProxy is BaseUpgradeabilityProxy {
 
   /**
    * @dev Storage slot with the admin of the contract.
-   * This is the keccak-256 hash of "eip1967.proxy.admin" subtracted by 1, and is
+   * This is the keccak-256 hash of "org.zeppelinos.proxy.admin", and is
    * validated in the constructor.
    */
 
-  bytes32 internal constant ADMIN_SLOT = 0xb53127684a568b3173ae13b9f8a6016e243e63b6e8ee1178d6a717850b5d6103;
+  bytes32 internal constant ADMIN_SLOT = 0x10d6a54a4754c8869d6886b5f5d7fbfa5b4522237ea5c60d11bc4e7a1ff9390b;
 
   /**
    * @dev Modifier to check whether the `msg.sender` is the admin.

@@ -8,7 +8,7 @@ import '../utils/Address.sol';
  * @title ImplementationDirectory
  * @dev Implementation provider that stores contract implementations in a mapping.
  */
-contract ImplementationDirectory is ImplementationProvider, ZOSLibOwnable {
+contract ImplementationDirectory is ImplementationProvider, OpenZeppelinUpgradesOwnable {
   /**
    * @dev Emitted when the implementation of a contract is changed.
    * @param contractName Name of the contract.
@@ -59,7 +59,7 @@ contract ImplementationDirectory is ImplementationProvider, ZOSLibOwnable {
    * @param implementation Address of the implementation.
    */
   function setImplementation(string memory contractName, address implementation) public onlyOwner whenNotFrozen {
-    require(ZOSLibAddress.isContract(implementation), "Cannot set implementation in directory with a non-contract address");
+    require(OpenZeppelinUpgradesAddress.isContract(implementation), "Cannot set implementation in directory with a non-contract address");
     implementations[contractName] = implementation;
     emit ImplementationChanged(contractName, implementation);
   }

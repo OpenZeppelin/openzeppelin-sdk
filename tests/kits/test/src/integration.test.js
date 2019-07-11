@@ -16,10 +16,10 @@ const network = getNetwork();
 function runIntegrationTest({ kit }, action) {
   before('cleaning up project folder', cleanup);
 
-  it('unpack kit', function() {
-    // have to replace zos with local version so we test current build
-    run(`node ../../../packages/cli/lib/bin/zos-cli.js unpack ${kit}`);
-  });
+  it('unpack kit', function () {
+    // have to replace oz with local version so we test current build
+    run(`node ../../../packages/cli/lib/bin/oz-cli.js unpack ${kit}`);
+  })
 
   // have to replace zos with local version so we test current build
   it('replace zos with local version', function() {

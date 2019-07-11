@@ -8,7 +8,7 @@
   "scripts": {
     "copy-files": "./scripts/copy-files.sh",
     "compile-ts": "rm -rf lib && tsc",
-    "prepare": "npm run compile-ts && npm run copy-files && chmod 755 ./lib/bin/zos-cli.js",
+    "prepare": "npm run compile-ts && npm run copy-files && chmod 755 ./lib/bin/oz-cli.js",
     "test": "./scripts/test.sh",
     "gen-docs": "./scripts/gen-docs.sh",
     "watch": "tsc -w",
@@ -25,7 +25,9 @@
     }
   },
   "bin": {
-    "zos": "./lib/bin/zos-cli.js"
+    "openzeppelin": "./lib/bin/oz-cli.js",
+    "oz": "./lib/bin/oz-cli.js",
+    "zos": "./lib/bin/oz-cli.js"
   },
   "files": [
     "lib"

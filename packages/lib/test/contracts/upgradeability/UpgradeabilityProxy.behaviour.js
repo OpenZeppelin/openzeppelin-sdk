@@ -1,6 +1,8 @@
 'use strict';
-import without from 'lodash.without';
+
 require('../../setup');
+
+import without from 'lodash.without';
 
 import Proxy from '../../../src/proxy/Proxy';
 import ZWeb3 from '../../../src/artifacts/ZWeb3';
@@ -8,6 +10,7 @@ import encodeCall from '../../../src/helpers/encodeCall';
 import assertRevert from '../../../src/test/helpers/assertRevert';
 import Contracts from '../../../src/artifacts/Contracts';
 import utils from 'web3-utils';
+import { DEPRECATED_IMPLEMENTATION_LABEL, IMPLEMENTATION_LABEL } from '../../../src/utils/Constants';
 
 const DummyImplementation = Contracts.getFromLocal('DummyImplementation');
 

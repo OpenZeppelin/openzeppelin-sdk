@@ -8,7 +8,7 @@ import "./AdminUpgradeabilityProxy.sol";
  * @dev This contract is the admin of a proxy, and is in charge
  * of upgrading it as well as transferring it to another admin.
  */
-contract ProxyAdmin is ZOSLibOwnable {
+contract ProxyAdmin is OpenZeppelinUpgradesOwnable {
   
   /**
    * @dev Returns the current implementation of a proxy.

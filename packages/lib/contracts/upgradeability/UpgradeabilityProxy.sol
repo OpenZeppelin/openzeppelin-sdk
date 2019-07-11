@@ -17,7 +17,7 @@ contract UpgradeabilityProxy is BaseUpgradeabilityProxy {
    * This parameter is optional, if no data is given the initialization call to proxied contract will be skipped.
    */
   constructor(address _logic, bytes memory _data) public payable {
-    assert(IMPLEMENTATION_SLOT == keccak256("org.zeppelinos.proxy.implementation"));
+    assert(IMPLEMENTATION_SLOT == bytes32(uint256(keccak256('eip1967.proxy.implementation')) - 1));
     _setImplementation(_logic);
     if(_data.length > 0) {
       (bool success,) = _logic.delegatecall(_data);

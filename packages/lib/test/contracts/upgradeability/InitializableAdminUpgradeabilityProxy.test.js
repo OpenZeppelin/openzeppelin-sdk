@@ -1,28 +1,28 @@
 'use strict';
+
 require('../../setup');
 
-import ZWeb3 from '../../../src/artifacts/ZWeb3';
-import encodeCall from '../../../src/helpers/encodeCall';
-import assertRevert from '../../../src/test/helpers/assertRevert';
-import shouldBehaveLikeUpgradeabilityProxy from './UpgradeabilityProxy.behaviour';
-import utils from 'web3-utils';
-import Contracts from '../../../src/artifacts/Contracts';
-import shouldBehaveLikeAdminUpgradeabilityProxy from './AdminUpgradeabilityProxy.behaviour';
 import omit from 'lodash.omit';
+import utils from 'web3-utils';
+
+import assertRevert from '../../../src/test/helpers/assertRevert';
+import Contracts from '../../../src/artifacts/Contracts';
+import shouldBehaveLikeUpgradeabilityProxy from './UpgradeabilityProxy.behaviour';
+import shouldBehaveLikeAdminUpgradeabilityProxy from './AdminUpgradeabilityProxy.behaviour';
+import { shouldUseEIP1967StorageSlot, shouldUseLegacyStorageSlot } from './storageSlot.test';
+import { ADMIN_LABEL, DEPRECATED_ADMIN_LABEL } from '../../../src/utils/Constants';
 
 const DummyImplementation = Contracts.getFromLocal('DummyImplementation');
-const InitializableAdminUpgradeabilityProxy = Contracts.getFromLocal(
-  'InitializableAdminUpgradeabilityProxy',
-);
+const InitializableAdminUpgradeabilityProxy = Contracts.getFromLocal('InitializableAdminUpgradeabilityProxy');
+const ZosInitializableAdminUpgradeabilityProxy = Contracts.getFromLocal('ZosInitializableAdminUpgradeabilityProxy');
 
-contract('InitializableAdminUpgradeabilityProxy', accounts => {
+contract('InitializableAdminUpgradeabilityProxy', function(accounts) {
   accounts = accounts.map(utils.toChecksumAddress);
   const [_, proxyAdminAddress, proxyAdminOwner] = accounts;
+  const labels = { label: ADMIN_LABEL, deprecatedLabel: DEPRECATED_ADMIN_LABEL };
 
   const createProxy = async function(logic, admin, initData, opts) {
-    const proxy = await InitializableAdminUpgradeabilityProxy.new(
-      omit(opts, 'value'),
-    );
+    const proxy = await InitializableAdminUpgradeabilityProxy.new(omit(opts, 'value'));
     await proxy.methods.initialize(logic, admin, initData).send(opts);
     return proxy;
   };
@@ -30,23 +30,26 @@ contract('InitializableAdminUpgradeabilityProxy', accounts => {
   describe('initialization', function() {
     it('cannot be initialized twice', async function() {
       const implementation = (await DummyImplementation.new()).address;
-      const proxy = await createProxy(
-        implementation,
-        proxyAdminAddress,
-        Buffer.from(''),
-      );
+      const proxy = await createProxy(implementation, proxyAdminAddress, Buffer.from(''));
       await assertRevert(
-        proxy.methods
-          .initialize(implementation, proxyAdminAddress, Buffer.from(''))
-          .send({ from: proxyAdminOwner }),
+        proxy.methods.initialize(implementation, proxyAdminAddress, Buffer.from('')).send({ from: proxyAdminOwner }),
       );
     });
   });
 
-  shouldBehaveLikeUpgradeabilityProxy(
-    createProxy,
-    proxyAdminAddress,
-    proxyAdminOwner,
-  );
+  shouldUseEIP1967StorageSlot(createProxy, accounts, labels, 'admin');
+  shouldBehaveLikeUpgradeabilityProxy(createProxy, proxyAdminAddress, proxyAdminOwner);
   shouldBehaveLikeAdminUpgradeabilityProxy(createProxy, accounts);
+
+  describe('legacy InitializableAdminUpgradeabilityProxy', function() {
+    const createProxy = async function(logic, admin, initData, opts) {
+      const proxy = await ZosInitializableAdminUpgradeabilityProxy.new(omit(opts, 'value'));
+      await proxy.methods.initialize(logic, admin, initData).send(opts);
+      return proxy;
+    };
+
+    shouldUseLegacyStorageSlot(createProxy, accounts, labels, 'admin');
+    shouldBehaveLikeUpgradeabilityProxy(createProxy, proxyAdminAddress, proxyAdminOwner);
+    shouldBehaveLikeAdminUpgradeabilityProxy(createProxy, accounts);
+  });
 });

@@ -10,7 +10,7 @@ import "../ownership/Ownable.sol";
  * @dev Contract for upgradeable applications.
  * It handles the creation of proxies.
  */
-contract App is ZOSLibOwnable {
+contract App is OpenZeppelinUpgradesOwnable {
   /**
    * @dev Emitted when a new proxy is created.
    * @param proxy Address of the created proxy.

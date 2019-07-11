@@ -1,7 +1,7 @@
 pragma solidity ^0.5.0;
 
-import './Proxy.sol';
-import '../utils/Address.sol';
+import '../../upgradeability/Proxy.sol';
+import '../../utils/Address.sol';
 
 /**
  * @title BaseUpgradeabilityProxy
@@ -9,7 +9,7 @@ import '../utils/Address.sol';
  * implementation address to which it will delegate.
  * Such a change is called an implementation upgrade.
  */
-contract BaseUpgradeabilityProxy is Proxy {
+contract ZosBaseUpgradeabilityProxy is Proxy {
   /**
    * @dev Emitted when the implementation is upgraded.
    * @param implementation Address of the new implementation.
@@ -18,10 +18,10 @@ contract BaseUpgradeabilityProxy is Proxy {
 
   /**
    * @dev Storage slot with the address of the current implementation.
-   * This is the keccak-256 hash of "eip1967.proxy.implementation" subtracted by 1, and is
+   * This is the keccak-256 hash of "org.zeppelinos.proxy.implementation", and is
    * validated in the constructor.
    */
-  bytes32 internal constant IMPLEMENTATION_SLOT = 0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc;
+  bytes32 internal constant IMPLEMENTATION_SLOT = 0x7050c9e0f4ca769c69bd3a8ef740bc37934f8e2c036e5a723fd8ee048ed3f8c3;
 
   /**
    * @dev Returns the current implementation.

@@ -52,7 +52,12 @@ export function tryRemoveMetadata(bytecode: string): string {
   try {
     cbor.decode(Buffer.from(metadata, 'hex'));
   } catch (err) {
-    Loggy.noSpin.warn(__filename, 'tryRemoveMetadata', `Error parsing contract metadata: ${err.message}. Ignoring.`);
+    Loggy.noSpin.warn(
+      __filename,
+      'tryRemoveMetadata',
+      'parse-contract-metadata',
+      `Error parsing contract metadata: ${err.message}. Ignoring.`,
+    );
 
     return bytecode;
   }

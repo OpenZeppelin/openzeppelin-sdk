@@ -50,7 +50,7 @@ export default interface Contract {
     transactionReceipt: TransactionReceipt;
   };
   schema: {
-    // Zos schema specific.
+    // openzeppelin schema specific.
     directory: string;
     linkedBytecode: string;
     linkedDeployedBytecode: string;
