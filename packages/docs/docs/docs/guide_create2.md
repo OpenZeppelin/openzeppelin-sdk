@@ -9,7 +9,7 @@ The CREATE2 opcode gives us the ability to calculate smart contracts addresses w
 
 In this guide, we will create an upgradable `Wallet` contract with a `transfer` method, then we will reserve an address using CREATE2 without actually deploying `Wallet` contract and send some `ethers` to this address. At last, we will actually deploy our `Wallet` contract and execute `transfer` method to transfer contract funds to another account.
 
-## Account creation using CREATE opcode
+## Contract creation using CREATE opcode
 
 CREATE opcode calculates new addresses as a function of the sender’s address and a nonce.
 
