@@ -103,7 +103,7 @@ jobs:
           command: npm install
       - run:
           name: Bootstrap zos packages via lerna
-          command: ./node_modules/.bin/lerna bootstrap --loglevel=info --concurrency=4 --scope="zos" --scope="zos-lib"
+          command: ./node_modules/.bin/lerna bootstrap --loglevel=info --concurrency=4 --scope="@openzeppelin/cli" --scope="@openzeppelin/upgrades"
           no_output_timeout: 60m
       - save_cache:
           key: dependency-cache-v1-root-{{ checksum "package.json" }}
@@ -148,7 +148,7 @@ jobs:
       - restore-lib-caches
       - npm-install-and-test:
           dir: "~/zos/examples/lib-simple"
-          install-cmd: '~/zos/node_modules/.bin/lerna bootstrap --scope=example-zos-lib-simple --scope="zos-lib"'
+          install-cmd: '~/zos/node_modules/.bin/lerna bootstrap --scope=example-zos-lib-simple --scope="@openzeppelin/upgrades"'
 
   example-lib-complex:
     <<: *defaults
@@ -157,7 +157,7 @@ jobs:
       - restore-lib-caches
       - npm-install-and-test:
           dir: "~/zos/examples/lib-complex"
-          install-cmd: '~/zos/node_modules/.bin/lerna bootstrap --scope=example-zos-lib-complex --scope="zos-lib"'
+          install-cmd: '~/zos/node_modules/.bin/lerna bootstrap --scope=example-zos-lib-complex --scope="@openzeppelin/upgrades"'
 
   example-create-instances-from-solidity:
     <<: *defaults
@@ -166,7 +166,7 @@ jobs:
       - restore-all-caches
       - npm-install-and-test:
           dir: "~/zos/examples/creating-instances-from-solidity"
-          install-cmd: '~/zos/node_modules/.bin/lerna bootstrap --scope=example-creating-instances-from-solidity --scope="zos*"'
+          install-cmd: '~/zos/node_modules/.bin/lerna bootstrap --scope=example-creating-instances-from-solidity --scope="@openzeppelin/cli" --scope="@openzeppelin/upgrades"'
 
   example-cli-create2:
     <<: *defaults
@@ -177,7 +177,7 @@ jobs:
       - restore_cache: *restore-cache-cli
       - npm-install-and-test:
           dir: "~/zos/examples/cli-create2"
-          install-cmd: '~/zos/node_modules/.bin/lerna bootstrap --scope=example-cli-create2 --scope="zos*"'
+          install-cmd: '~/zos/node_modules/.bin/lerna bootstrap --scope=example-cli-create2 --scope="@openzeppelin/cli" --scope="@openzeppelin/upgrades"'
 
   example-first-project:
     <<: *defaults
@@ -188,7 +188,7 @@ jobs:
       - restore_cache: *restore-cache-cli
       - npm-install-and-test:
           dir: "~/zos/examples/first-project"
-          install-cmd: '~/zos/node_modules/.bin/lerna bootstrap --scope=example-first-project --scope="zos*"'
+          install-cmd: '~/zos/node_modules/.bin/lerna bootstrap --scope=example-first-project --scope="@openzeppelin/cli" --scope="@openzeppelin/upgrades"'
           test-cmd: pwd && scripts/test-ci.sh
 
   integration-cli-geth: &integration
@@ -204,7 +204,7 @@ jobs:
       - npm-install-with-cache: 
           dir: "~/zos/tests/cli/workdir"
           cache-version: 'v3'
-          install-cmd: '~/zos/node_modules/.bin/lerna bootstrap --scope=tests-cli-workdir --scope="zos*"'
+          install-cmd: '~/zos/node_modules/.bin/lerna bootstrap --scope=tests-cli-workdir --scope="@openzeppelin/cli" --scope="@openzeppelin/upgrades"'
       - npm-install-with-cache: 
           dir: "~/zos/tests/cli/test"
           cache-version: 'v3'
