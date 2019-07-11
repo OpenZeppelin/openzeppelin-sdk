@@ -156,6 +156,6 @@ $ openzeppelin call
 Returned "11"
 ```
 
-> Note: If you are curious about how the OpenZeppelin SDK achieves this feat, given that smart contracts are immutable, check out our [upgrades pattern guide](pattern). You will see that there are some changes that are not supported during upgrades. For instance, you cannot [remove or change the type of a contract state variable](https://docs.zeppelinos.org/docs/writing_contracts.html#modifying-your-contracts). Nevertheless, you can change, add, or remove all the functions you want.
+> Note: If you are curious about how the OpenZeppelin SDK achieves this feat, given that smart contracts are immutable, check out our [upgrades pattern guide](pattern). You will see that there are some changes that are not supported during upgrades. For instance, you cannot [remove or change the type of a contract state variable](writing_contracts#modifying-your-contracts). Nevertheless, you can change, add, or remove all the functions you want.
 
 That's it! You now know how to start a simple OpenZeppelin project, create a contract, deploy it to a local network, and even upgrade it as you develop. Head over to the next tutorial to learn how to interact with your contract from your code.

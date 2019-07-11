@@ -36,7 +36,7 @@ module.exports = {
 
 ## Why are my getting the error "Cannot call fallback function from the proxy admin"?
 
-This is due to the [transparent proxy pattern](https://docs.zeppelinos.org/docs/pattern.html#transparent-proxies-and-function-clashes). You shouldn't get this error when using OpenZeppelin SDK via the CLI, since it relies on the `ProxyAdmin` contract. More info in the [version 2.2](https://docs.zeppelinos.org/docs/new_2.2.html) section of the documentation.
+This is due to the [transparent proxy pattern](pattern#transparent-proxies-and-function-clashes). You shouldn't get this error when using OpenZeppelin SDK via the CLI, since it relies on the `ProxyAdmin` contract for managing your proxies.
 
 However, if you are using the OpenZeppelin SDK programmatically, you could run into such error. The solution is to always interact with your proxies from an account that is not the admin of the proxy, unless you want to specifically call functions of the proxy itself.
 
@@ -61,6 +61,6 @@ require('babel-polyfill');
 
 ## How can I create an upgradeable instance from Solidity code?
 
-You can create upgradeable instances from Solidity code by using your project's App contract, and then calling its `create` function from Solidity. Note that to be able to do this, your project needs to be published, i.e. it needs to have the OpenZeppelin SDK [Contracts Architecture](https://docs.zeppelinos.org/docs/architecture.html) enabled.
+You can create upgradeable instances from Solidity code by using your project's App contract, and then calling its `create` function from Solidity. Note that to be able to do this, your project needs to be published, i.e. it needs to have the OpenZeppelin SDK [Contracts Architecture](architecture) enabled.
 
 To see an example of how this is done, please refer to the example project [creating-instances-from-solidity](https://github.com/OpenZeppelin/openzeppelin-sdk/tree/master/examples/creating-instances-from-solidity).

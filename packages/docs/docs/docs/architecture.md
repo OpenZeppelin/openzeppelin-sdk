@@ -3,7 +3,7 @@ id: architecture
 title: Contracts Architecture
 ---
 
-OpenZeppelin SDK's features such as upgrades and EVM package linking can be used through the `openzeppelin` CLI with only one extra contract. The [ProxyAdmin](https://github.com/OpenZeppelin/openzeppelin-sdk/blob/v2.0.0/packages/lib/contracts/upgradeability/ProxyAdmin.sol) contract. The OpenZeppelin SDK uses this contract in order to avoid confusion around the [transparent proxy pattern](https://docs.zeppelinos.org/docs/pattern.html#transparent-proxies-and-function-clashes). This contract acts as a central admin for all proxies on your behalf, making their management as simple as possible, while retaining the highest safety standards. 
+OpenZeppelin SDK's features such as upgrades and EVM package linking can be used through the `openzeppelin` CLI with only one extra contract. The [ProxyAdmin](https://github.com/OpenZeppelin/openzeppelin-sdk/blob/v2.0.0/packages/lib/contracts/upgradeability/ProxyAdmin.sol) contract. The OpenZeppelin SDK uses this contract in order to avoid confusion around the [transparent proxy pattern](pattern#transparent-proxies-and-function-clashes). This contract acts as a central admin for all proxies on your behalf, making their management as simple as possible, while retaining the highest safety standards. 
 
 However, some additional smart contracts come into play when you want to publish your EVM package for others to reuse. Publishing is achieved by calling the command:
 
@@ -40,7 +40,7 @@ When you upgrade one of your application's smart contracts, it is your applicati
 
 An EVM package is defined by the `Package` contract, as we'll see next.
 
-NOTE: Additionally the `App` contract also facilitates the creation of proxies, by conveniently wrapping around the `AdminUpgradeabilityProxy` contract. For more info on direct usage of proxies, please see [the low level usage section](https://docs.zeppelinos.org/docs/low_level_contract.html).
+NOTE: Additionally the `App` contract also facilitates the creation of proxies, by conveniently wrapping around the `AdminUpgradeabilityProxy` contract. For more info on direct usage of proxies, please see [the low level usage section](low_level_contract).
 
 ## [Package.sol](https://github.com/OpenZeppelin/openzeppelin-sdk/blob/v2.0.0/packages/lib/contracts/application/Package.sol)
 

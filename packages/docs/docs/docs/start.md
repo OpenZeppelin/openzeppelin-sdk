@@ -19,7 +19,7 @@ Start by [deploying your first OpenZeppelin SDK project](first.md).
 
 ## Security
 
-If you find a security issue, please contact us at security@zeppelinos.org. We
+If you find a security issue, please contact us at security@openzeppelin.com. We
 give rewards for reported issues, according to impact and severity.
 
 ## Team

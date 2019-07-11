@@ -35,7 +35,7 @@ To better describe this plan we will use a sample project you can follow and clo
 
 We will now setup a local environment to demo the onboarding plan. To do this, we will deploy a sample legacy token
 contract and mint some balances. If you wish to work with your already deployed token, you can skip the following lines
-and jump directly to the [step 1](erc20_onboarding.html#1-initialize-your-migration-project-with-zeppelinos).
+and jump directly to the [step 1](erc20_onboarding.html#1-initialize-your-migration-project-with-the-openzeppelin-sdk).
 
 In the sample repository you will find a contract called [`MyLegacyToken`](https://github.com/OpenZeppelin/erc20-onboarding/blob/master/contracts/MyLegacyToken.sol)
 that we will use to simulate a real scenario locally. As you can see, this token will mint 100 tokens to the owner once

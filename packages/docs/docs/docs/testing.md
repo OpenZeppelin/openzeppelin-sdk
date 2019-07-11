@@ -13,7 +13,7 @@ The `@openzeppelin/cli` package provides a `TestHelper()` function to retrieve y
 
 The following section describes a succinct way in how a simple OpenZeppelin SDK project can be set up. If you already have a project set up, you may skip to the next section.
 
-_If you don't understand what's going on in this section, please refer to the Quickstart guides of the documentation, specifically the [Deploying your first project](https://docs.zeppelinos.org/docs/deploying.html), [Upgrading your project](https://docs.zeppelinos.org/docs/upgrading.html) and [Linking to EVM packages](https://docs.zeppelinos.org/docs/linking.html) guides. These guides provide detailed explanations on how a basic OpenZeppelin SDK project works._
+_If you don't understand what's going on in this section, please refer to the Quickstart guides of the documentation, specifically the [Deploying your first project](deploying), [Upgrading your project](upgrading) and [Linking to EVM packages](linking) guides. These guides provide detailed explanations on how a basic OpenZeppelin SDK project works._
 
 Create a new project by running:
 
@@ -56,7 +56,7 @@ npx openzeppelin link openzeppelin-eth
 
 ## Writing the test script
 
-> This test is written in ES5 Javascript. If you'd like to use ES6 syntax instead, make sure you [set up babel in your project](https://docs.zeppelinos.org/docs/faq.html#how-do-i-use-es6-javascript-syntax-in-my-tests).
+> This test is written in ES5 Javascript. If you'd like to use ES6 syntax instead, make sure you [set up babel in your project](faq#how-do-i-use-es6-javascript-syntax-in-my-tests).
 
 Now, let's create the test file `test/Sample.test.js`:
 
