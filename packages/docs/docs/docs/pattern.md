@@ -139,7 +139,7 @@ To ensure that the `initialize` function can only be called once, a simple modif
 
 ```solidity
 
-import "zos-lib/contracts/Initializable.sol";
+import "@openzeppelin/upgrades/contracts/Initializable.sol";
 
 contract MyContract is Initializable {
 

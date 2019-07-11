@@ -101,11 +101,11 @@ Now, let's write our exchange contract in `contracts/TokenExchange.sol`, using a
 pragma solidity ^0.5.0;
 
 // Import base Initializable contract
-import "zos-lib/contracts/Initializable.sol";
+import "@openzeppelin/upgrades/contracts/Initializable.sol";
 
 // Import interface and library from OpenZeppelin contracts
-import "openzeppelin-eth/contracts/token/ERC20/IERC20.sol";
-import "openzeppelin-eth/contracts/math/SafeMath.sol";
+import "@openzeppelin/contracts-ethereum-package/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts-ethereum-package/contracts/math/SafeMath.sol";
 
 contract TokenExchange is Initializable {
   using SafeMath for uint256;

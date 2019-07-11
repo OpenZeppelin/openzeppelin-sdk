@@ -10,7 +10,7 @@ on our minds:
 ```solidity
 pragma solidity ^0.5.0;
 
-import "zos-lib/contracts/Initializable.sol";
+import "@openzeppelin/upgrades/contracts/Initializable.sol";
 
 contract MyContract is Initializable {
 
@@ -96,7 +96,7 @@ Open `contracts/MyContract.sol`, and add a new function:
 ```solidity
 pragma solidity ^0.5.0;
 
-import "zos-lib/contracts/Initializable.sol";
+import "@openzeppelin/upgrades/contracts/Initializable.sol";
 
 contract MyContract is Initializable {
 
@@ -199,7 +199,7 @@ The resulting code would be:
 ```solidity
 pragma solidity ^0.5.0;
 
-import "zos-lib/contracts/Initializable.sol";
+import "@openzeppelin/upgrades/contracts/Initializable.sol";
 
 contract MyContract is Initializable {
 

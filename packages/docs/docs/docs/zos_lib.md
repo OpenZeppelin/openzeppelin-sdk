@@ -82,7 +82,7 @@ with the following contents:
 ```solidity
 pragma solidity ^0.5.0;
 
-import "zos-lib/contracts/Initializable.sol";
+import "@openzeppelin/upgrades/contracts/Initializable.sol";
 
 contract MyContractV0 is Initializable {
   uint256 public value;
@@ -99,7 +99,7 @@ first one but with one extra function:
 ```solidity
 pragma solidity ^0.5.0;
 
-import "zos-lib/contracts/Initializable.sol";
+import "@openzeppelin/upgrades/contracts/Initializable.sol";
 
 contract MyContractV1 is Initializable {
   uint256 public value;

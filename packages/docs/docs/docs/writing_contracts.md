@@ -42,7 +42,7 @@ contract MyContract {
 Since this pattern is very common when writing upgradeable contracts, the OpenZeppelin SDK provides an `Initializable` base contract that has an `initializer` modifier that takes care of this:
 
 ```solidity
-import "zos-lib/contracts/Initializable.sol";
+import "@openzeppelin/upgrades/contracts/Initializable.sol";
 
 contract MyContract is Initializable {
   uint256 public x;
@@ -56,7 +56,7 @@ contract MyContract is Initializable {
 Another difference between a `constructor` and a regular function is that Solidity takes care of automatically invoking the constructors of all ancestors of a contract. When writing an initializer, you need to take special care to manually call the initializers of all parent contracts:
 
 ```solidity
-import "zos-lib/contracts/Initializable.sol";
+import "@openzeppelin/upgrades/contracts/Initializable.sol";
 
 contract BaseContract is Initializable {
   uint256 public y;
@@ -144,9 +144,9 @@ When creating a new instance of a contract from your contract's code, these crea
 For instance, in the following example, even if `MyContract` is upgradeable (if created via `openzeppelin create MyContract`), the `token` contract created is not:
 
 ```solidity
-import "zos-lib/contracts/Initializable.sol";
-import "openzeppelin-eth/contracts/token/ERC20/ERC20.sol";
-import "openzeppelin-eth/contracts/token/ERC20/RC20Detailed.sol";
+import "@openzeppelin/upgrades/contracts/Initializable.sol";
+import "@openzeppelin/contracts-ethereum-package/contracts/token/ERC20/ERC20.sol";
+import "@openzeppelin/contracts-ethereum-package/contracts/token/ERC20/RC20Detailed.sol";
 
 contract MyContract is Initializable {
   ERC20 public token;
@@ -160,8 +160,8 @@ contract MyContract is Initializable {
 The easiest way around this issue is to avoid creating contracts on your own altogether: instead of creating a contract in an `initialize` function, simply accept an instance of that contract as a parameter, and inject it after creating it from the OpenZeppelin SDK:
 
 ```solidity
-import "zos-lib/contracts/Initializable.sol";
-import "openzeppelin-eth/contracts/token/ERC20/ERC20.sol";
+import "@openzeppelin/upgrades/contracts/Initializable.sol";
+import "@openzeppelin/contracts-ethereum-package/contracts/token/ERC20/ERC20.sol";
 
 contract MyContract is Initializable {
   ERC20 public token;
@@ -180,8 +180,8 @@ $ openzeppelin create MyContract --init --args $TOKEN
 An advanced alternative, if you need to create upgradeable contracts on the fly, is to keep an instance of your OpenZeppelin SDK `App` in your contracts. The [`App`](api_application_App.md) is a contract that acts as the entrypoint for your OpenZeppelin SDK project, which has references to your logic implementations, and can create new contract instances:
 
 ```solidity
-import "zos-lib/contracts/Initializable.sol";
-import "zos-lib/contracts/application/App.sol";
+import "@openzeppelin/upgrades/contracts/Initializable.sol";
+import "@openzeppelin/upgrades/contracts/application/App.sol";
 
 contract MyContract is Initializable {
   App private app;
