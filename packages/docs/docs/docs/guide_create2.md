@@ -1,13 +1,13 @@
 ---
 id: CREATE2
-title: Using CREATE2 for deploying to precomputed addresses
+title: Using CREATE2 for deploying precomputed addresses
 ---
 
 
 
 The CREATE2 opcode gives us the ability to calculate smart contracts addresses without actually deploying them on the Ethereum blockchain. This opens up a lot of possibilities to improve [user onboarding and scalability](https://blog.zeppelinos.org/getting-the-most-out-of-create2/).
 
-In this guide, we will create an upgradable `Wallet` contract with a `transfer` method, then we will reserve an address using CREATE2 without actually deploying `Wallet` contract and send some `ethers` to this address. At last, we will actually deploy our `Wallet` contract and execute transfer method to transfer contract funds to another account.
+In this guide, we will create an upgradable `Wallet` contract with a `transfer` method, then we will reserve an address using CREATE2 without actually deploying `Wallet` contract and send some `ethers` to this address. At last, we will actually deploy our `Wallet` contract and execute `transfer` method to transfer contract funds to another account.
 
 ## Account creation using CREATE opcode
 
@@ -130,7 +130,7 @@ Transaction hash: 0xbcaefc07f4e03a69456f3cb40a1998a597914eb1352470ee01991631cab3
 Next, we will verify `Wallet` contract balance and the sender’s balance using `zos balance`
 
 ```console 
--- Contract balance
+-- Wallet contract balance
 
 $ zos balance 0x4e08589Cd399474157f24f591B9fB100D1adD5d9
 Balance: 10 ETH
@@ -174,11 +174,11 @@ receiver (address): 0xffcf8fdee72ac11b5c542428b35eef5769c409f0
 ✓ Transaction successful. Transaction hash: 0xef464fecd93b609a001c1d439e89c77484797b217587ee8fb907531df9489275
 ```
 
-> Note: We have *transfer* method in our *Wallet* contract, which will transfer contract funds to a given account. Here, we are tranferring funds to a receiver account 0xffcf8fdee72ac11b5c542428b35eef5769c409f0, it is one of the 10 accounts which Ganache provided us. 
+> Note: We have `transfer` method in our `Wallet` contract, which will transfer contract's funds to a given account. Here, we are tranferring funds to a receiver account 0xffcf8fdee72ac11b5c542428b35eef5769c409f0, it is one of the 10 accounts which Ganache provided us. 
 
-Now, let’s check the balance of the contract and the receiver account using `zos balance`, contract balance should be 0 now as all the funds are transferred to the receiver's account.
+Now, let’s check the balance of the `Wallet` contract and the receiver's account using `zos balance`, `Wallet` contract balance should be 0 now as all the funds are transferred to the receiver's account.
 ```console 
--- Contract balance
+-- Wallet contract balance
 
 $ zos balance 0x4e08589Cd399474157f24f591B9fB100D1adD5d9
 Balance: 0 ETH
@@ -193,7 +193,7 @@ Balance: 110 ETH
 
 ## Wrapping up
 
-To summarize, let’s see what we have learned so far, we have created an upgradable smart contract Wallet using CREATE2 and sent some ethers into it, then we actually deployed the contract and executed transfer method to send funds to another account.
+To summarize, let’s see what we have learned so far, we have created an upgradable smart contract `Wallet` using CREATE2 and funded it with 10 ethers, then we actually deployed the contract and executed `transfer` method to send funds to another account.
 
 That’s it!! Now you know how to use CREATE2 to reserve an address and deploy upgradable contracts, [here](https://blog.zeppelinos.org/getting-the-most-out-of-create2/) is our blog post if you want to deep dive into CREATE2 and its use cases in *counterfactual instantiation *and* user onboarding.* In the next tutorial, we will learn how to create contracts using another contract.
 
