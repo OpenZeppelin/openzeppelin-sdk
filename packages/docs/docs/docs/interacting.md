@@ -154,4 +154,4 @@ You can also try interacting with the contract using `openzeppelin send-tx` and 
 
 The snippet from this tutorial, while simple, is the basis for interacting with your smart contracts from your javascript applications. Remember you can use other libraries other than `web3.js` - or even other languages other than javascript! The OpenZeppelin SDK will take care of managing your contracts on the blockchain. 
 
-In the next tutorial, we will go into a more interesting smart contract application. We will work with more complex logic, connect with `@openzeppelin/contracts` to create a token, and connect different contracts between themselves.
+In the next tutorial, we will go into a more interesting smart contract application. We will work with more complex logic, connect with `@openzeppelin/contracts-ethereum-package` to create a token, and connect different contracts between themselves.

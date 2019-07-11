@@ -3,7 +3,7 @@ id: linking
 title: Linking OpenZeppelin contracts
 ---
 
-In the [first](first) tutorial, we learned how to set up a new OpenZeppelin SDK project, deploy a simple contract, and upgrade it. Now, we will build a more interesting project with multiple contracts, leveraging the [OpenZeppelin Contracts package](https://github.com/OpenZeppelin/openzeppelin-contracts-eth). We will learn about **linking EVM packages**, and **writing upgradeable contracts**.
+In the [first](first) tutorial, we learned how to set up a new OpenZeppelin SDK project, deploy a simple contract, and upgrade it. Now, we will build a more interesting project with multiple contracts, leveraging the [OpenZeppelin Contracts package](https://github.com/OpenZeppelin/openzeppelin-contracts-ethereum-package). We will learn about **linking EVM packages**, and **writing upgradeable contracts**.
 
 ## What we will build
 
@@ -20,7 +20,7 @@ openzeppelin init
 
 ## Linking the Contracts EVM package
 
-We will first get ourselves an ERC20 token. Instead of coding one from scratch, we will use the one provided by the [OpenZeppelin Contracts EVM package](https://github.com/OpenZeppelin/openzeppelin-contracts-eth). An EVM package is a set of contracts set up to be easily included in a OpenZeppelin SDK project, with the added bonus that the contracts' code _is already deployed in the Ethereum network_. This is a more secure code distribution mechanism, and also helps you save gas upon deployment.
+We will first get ourselves an ERC20 token. Instead of coding one from scratch, we will use the one provided by the [OpenZeppelin Contracts EVM package](https://github.com/OpenZeppelin/openzeppelin-contracts-ethereum-package). An EVM package is a set of contracts set up to be easily included in a OpenZeppelin SDK project, with the added bonus that the contracts' code _is already deployed in the Ethereum network_. This is a more secure code distribution mechanism, and also helps you save gas upon deployment.
 
 <!-- TODO: Add guide on what is an EVM package behind the scenes, instead of linking to a blogpost -->
 
@@ -29,12 +29,12 @@ We will first get ourselves an ERC20 token. Instead of coding one from scratch, 
 To link the OpenZeppelin Contracts EVM package into your project, simply run the following:
 
 ```console
-openzeppelin link openzeppelin-eth@2.2.0
+openzeppelin link @openzeppelin/contracts-ethereum-package@2.2.0
 ```
 
 This command will download the EVM package (bundled as a regular npm package), and connect it to your OpenZeppelin project. We now have all of OpenZeppelin contracts at our disposal, so let's create an ERC20 token!
 
-> Note: Make sure you install `openzeppelin-eth` and not `openzeppelin-contracts`. The latter is set up for general usage, while `openzeppelin-eth` is tailored for being used with the OpenZeppelin SDK. This means that its contracts are [already set up to be upgradeable](writing_contracts#use-upgradeable-packages).
+> Note: Make sure you install `@openzeppelin/contracts-ethereum-package` and not the vanilla `@openzeppelin/contracts`. The latter is set up for general usage, while `@openzeppelin/contracts-ethereum-package` is tailored for being used with the OpenZeppelin SDK. This means that its contracts are [already set up to be upgradeable](writing_contracts#use-upgradeable-packages).
 
 ## Creating an ERC20 token
 
@@ -44,7 +44,7 @@ Let's deploy an ERC20 token contract to our development network. Make sure to [h
 ganache-cli --deterministic
 ```
 
-For setting up the token, we will be using the [StandaloneERC20 implementation](https://github.com/OpenZeppelin/openzeppelin-contracts-eth/blob/master/contracts/token/ERC20/StandaloneERC20.sol) provided by the OpenZeppelin package. We will _initialize_ the instance with the token metadata (name, symbol, and decimals), and mint a large initial supply for one of our accounts.
+For setting up the token, we will be using the [StandaloneERC20 implementation](https://github.com/OpenZeppelin/openzeppelin-contracts-ethereum-package/blob/master/contracts/token/ERC20/StandaloneERC20.sol) provided by the OpenZeppelin package. We will _initialize_ the instance with the token metadata (name, symbol, and decimals), and mint a large initial supply for one of our accounts.
 
 <!-- CODE: We need a command to retrieve the current accounts (#967) -->
 
@@ -52,9 +52,9 @@ For setting up the token, we will be using the [StandaloneERC20 implementation](
 
 ```console
 $ openzeppelin create
-? Pick a contract to instantiate: openzeppelin-eth/StandaloneERC20
+? Pick a contract to instantiate: @openzeppelin/contracts-ethereum-package/StandaloneERC20
 ? Pick a network: development
-✓ Deploying openzeppelin-eth dependency to network
+✓ Deploying @openzeppelin/contracts-ethereum-package dependency to network
 ? Do you want to call a function on the instance after creating it?: Yes
 ? Select which function: * initialize(name: string, symbol: string, decimals: uint8, initialSupply: uint256, initialHolder: address, minters: address[], pausers: address[])
 ? name (string): MyToken
@@ -68,7 +68,7 @@ $ openzeppelin create
 ✓ Instance created at 0x2612Af3A521c2df9EAF28422Ca335b04AdF3ac66
 ```
 
-Let's break down what we did in the command above. We first chose to create an instance of the `StandaloneERC20` contract from the `openzeppelin-eth` package we had linked before, and to create it in the local `development` network. We are then instructing the CLI to _initialize_ it with the initial values needed to set up our token. This requires us to choose the appropriate `initialize` function, and input all the required arguments. OpenZeppelin SDK will then atomically create and initialize the new instance in a single transaction.
+Let's break down what we did in the command above. We first chose to create an instance of the `StandaloneERC20` contract from the `@openzeppelin/contracts-ethereum-package` package we had linked before, and to create it in the local `development` network. We are then instructing the CLI to _initialize_ it with the initial values needed to set up our token. This requires us to choose the appropriate `initialize` function, and input all the required arguments. OpenZeppelin SDK will then atomically create and initialize the new instance in a single transaction.
 
 We now have a working ERC20 token contract in our development network. We can check that the initial supply was properly allocated by using the `balance` command. Make sure to use the address where your ERC20 token instance was created.
 
@@ -270,7 +270,7 @@ $ openzeppelin send-tx
 ✓ Transaction successful. Transaction hash: 0xc9fb0d3ada96ec4c67c1c8f1569f9cfaf0ff0f7b241e172b32a023b1763ab7ab
 ```
 
-> Note: You can also upgrade contracts from an EVM package. Upon a new release of openzeppelin-eth, if you want to update your ERC20 to include the latest fixes, you can just `openzeppelin link` the new version and use `openzeppelin upgrade` to get your instance to the newest code.
+> Note: You can also upgrade contracts from an EVM package. Upon a new release of @openzeppelin/contracts-ethereum-package, if you want to update your ERC20 to include the latest fixes, you can just `openzeppelin link` the new version and use `openzeppelin upgrade` to get your instance to the newest code.
 
 ## Wrapping up
 

@@ -28,8 +28,8 @@ This on-boarding plan considers the following assumptions:
 ## Onboarding plan demo
 
 The central idea of this proposal is to deploy an upgradeable version of your token, using the OpenZeppelin command line
-tool. Additionally, we will use the [`ERC20Migrator`](https://github.com/OpenZeppelin/openzeppelin-contracts-eth/blob/v2.0.0/contracts/drafts/ERC20Migrator.sol)
-contract provided by `openzeppelin-eth`, the [OpenZeppelin Ethereum package](https://github.com/OpenZeppelin/openzeppelin-contracts-eth/).
+tool. Additionally, we will use the [`ERC20Migrator`](https://github.com/OpenZeppelin/openzeppelin-contracts-ethereum-package/blob/v2.0.0/contracts/drafts/ERC20Migrator.sol)
+contract provided by `@openzeppelin/contracts-ethereum-package`, the [OpenZeppelin Contracts Ethereum package](https://github.com/OpenZeppelin/openzeppelin-contracts-ethereum-package/).
 
 To better describe this plan we will use a sample project you can follow and clone from [here](https://github.com/OpenZeppelin/erc20-onboarding/tree/zos-2.1).
 
@@ -128,7 +128,7 @@ package as well.
 _Initializers are the way to define constructor functionality for upgradeable contracts in the OpenZeppelin SDK. The `initializer`
 modifier will make sure your `initialize` method can only be called once in the whole lifetime of your contract._
 
-Notice that all the contracts from `openzeppelin-eth` have been adapted for OpenZeppelin SDK compatibility, and should be the
+Notice that all the contracts from `@openzeppelin/contracts-ethereum-package` have been adapted for OpenZeppelin SDK compatibility, and should be the
 ones used when dealing with upgradeable contracts.
 
 Besides allowing us to build upgradeable applications, the OpenZeppelin SDK provides EVM packages. To use an EVM package
@@ -136,7 +136,7 @@ in our project, we simply need to use the `link` command giving the name of the 
 to use. In this case, we will link the OpenZeppelin Contracts EVM package to be able to use the contracts it provides in our project:
 
 ```console
-npx openzeppelin link openzeppelin-eth
+npx openzeppelin link @openzeppelin/contracts-ethereum-package
 ```
 
 Finally we can add our upgradeable token contract to the project:

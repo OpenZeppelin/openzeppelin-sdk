@@ -21,7 +21,7 @@ Create a new project by running:
 mkdir my-project
 cd my-project
 npm init --yes
-npm install @openzeppelin/cli @openzeppelin/upgrades openzeppelin-eth truffle chai
+npm install @openzeppelin/cli @openzeppelin/upgrades @openzeppelin/contracts-ethereum-package truffle chai
 ```
 
 Now, run:
@@ -48,10 +48,10 @@ Now, add your contract to your OpenZeppelin SDK project:
 npx openzeppelin add Sample
 ```
 
-And link your OpenZeppelin SDK project to the `openzeppelin-eth` EVM package:
+And link your OpenZeppelin SDK project to the `@openzeppelin/contracts-ethereum-package` EVM package:
 
 ```
-npx openzeppelin link openzeppelin-eth
+npx openzeppelin link @openzeppelin/contracts-ethereum-package
 ```
 
 ## Writing the test script
@@ -67,7 +67,7 @@ const { Contracts, ZWeb3 } = require('@openzeppelin/upgrades');
 ZWeb3.initialize(web3.currentProvider);
 
 const Sample = Contracts.getFromLocal('Sample');
-const ERC20 = Contracts.getFromNodeModules('openzeppelin-contracts-eth', 'ERC20');
+const ERC20 = Contracts.getFromNodeModules('openzeppelin-contracts-ethereum-package', 'ERC20');
 
 require('chai').should();
 
@@ -84,7 +84,7 @@ contract('Sample', function () {
   })
 
   it('should create a proxy for the EVM package', async function () {
-    const proxy = await this.project.createProxy(ERC20, { contractName: 'StandaloneERC20', packageName: 'openzeppelin-eth' });
+    const proxy = await this.project.createProxy(ERC20, { contractName: 'StandaloneERC20', packageName: '@openzeppelin/contracts-ethereum-package' });
     const result = await proxy.methods.totalSupply().call();
     result.should.eq('0');
   })
@@ -121,7 +121,7 @@ const { Contracts, ZWeb3 } = require('@openzeppelin/upgrades');
 ZWeb3.initialize(web3.currentProvider);
 
 const Sample = Contracts.getFromLocal('Sample');
-const ERC20 = Contracts.getFromNodeModules('openzeppelin-eth', 'ERC20');
+const ERC20 = Contracts.getFromNodeModules('@openzeppelin/contracts-ethereum-package', 'ERC20');
 ```
 
 We then invoke `TestHelper` in the test, optionally including a set of options to be used when deploying the contracts (such as `from`, `gas`, and `gasPrice`):
