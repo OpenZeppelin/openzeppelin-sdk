@@ -170,7 +170,7 @@ Assuming a proxy with an `owner()` and an `upgradeTo()` function, that delegates
 | Owner         | returns proxy.owner() | returns proxy.upgradeTo() | fails |
 | Other         | returns erc20.owner() | fails | returns erc20.transfer() |
 
-Fortunately, the OpenZeppelin CLI accounts for this situation, and creates an intermediary ProxyAdmin contract that is in charge of all the proxies you create via the cli. Even if you call the `create` command from your node's default account, or using the `from` address specified when you started your `openzeppelin session`, the ProxyAdmin contract will be the actual admin of all your proxies. This means that you will be able to interact with the proxies from any of your node's accounts, without having to worry about the nuances of the transparent proxy pattern. Only advanced users of the OpenZeppelin SDK that use it programmatically via `zos-lib` need to be aware of the transparent proxies pattern.
+Fortunately, the OpenZeppelin CLI accounts for this situation, and creates an intermediary ProxyAdmin contract that is in charge of all the proxies you create via the cli. Even if you call the `create` command from your node's default account, or using the `from` address specified when you started your `openzeppelin session`, the ProxyAdmin contract will be the actual admin of all your proxies. This means that you will be able to interact with the proxies from any of your node's accounts, without having to worry about the nuances of the transparent proxy pattern. Only advanced users of the OpenZeppelin SDK that use it programmatically via `@openzeppelin/upgrades` need to be aware of the transparent proxies pattern.
 
 ## Summary
 

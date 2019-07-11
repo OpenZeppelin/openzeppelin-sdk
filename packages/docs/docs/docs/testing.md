@@ -21,7 +21,7 @@ Create a new project by running:
 mkdir my-project
 cd my-project
 npm init --yes
-npm install zos zos-lib openzeppelin-eth truffle chai
+npm install @openzeppelin/cli @openzeppelin/upgrades openzeppelin-eth truffle chai
 ```
 
 Now, run:
@@ -61,13 +61,13 @@ npx openzeppelin link openzeppelin-eth
 Now, let's create the test file `test/Sample.test.js`:
 
 ```javascript
-const { TestHelper } = require('zos');
-const { Contracts, ZWeb3 } = require('zos-lib');
+const { TestHelper } = require('@openzeppelin/cli');
+const { Contracts, ZWeb3 } = require('@openzeppelin/upgrades');
 
 ZWeb3.initialize(web3.currentProvider);
 
 const Sample = Contracts.getFromLocal('Sample');
-const ERC20 = Contracts.getFromNodeModules('openzeppelin-eth', 'ERC20');
+const ERC20 = Contracts.getFromNodeModules('openzeppelin-contracts-eth', 'ERC20');
 
 require('chai').should();
 
@@ -107,16 +107,16 @@ That's it! Now, let's look at what we just did in more detail.
 
 ## Understanding the test script
 
-We first require `TestHelper` from `zos`. This helper facilitates the creation of a project object that will set up the entire OpenZeppelin SDK project within a test environment.
+We first require `TestHelper` from `@openzeppelin/cli`. This helper facilitates the creation of a project object that will set up the entire OpenZeppelin SDK project within a test environment.
 
 ```js
-const { TestHelper } = require('zos');
+const { TestHelper } = require('@openzeppelin/cli');
 ```
 
-We are also requiring `Contracts` and `ZWeb3` from `zos-lib`. `Contracts` helps us retrieve compiled contract artifacts, while `ZWeb3` is needed to set up our Web3 provider in the OpenZeppelin SDK.
+We are also requiring `Contracts` and `ZWeb3` from `@openzeppelin/upgrades`. `Contracts` helps us retrieve compiled contract artifacts, while `ZWeb3` is needed to set up our Web3 provider in the OpenZeppelin SDK.
 
 ```js
-const { Contracts, ZWeb3 } = require('zos-lib');
+const { Contracts, ZWeb3 } = require('@openzeppelin/upgrades');
 
 ZWeb3.initialize(web3.currentProvider);
 

@@ -173,7 +173,7 @@ contract MyContract is Initializable {
 ```
 
 ```console
-$ TOKEN=$(zos create TokenContract)
+$ TOKEN=$(openzeppelin create TokenContract)
 $ openzeppelin create MyContract --init --args $TOKEN
 ```
 

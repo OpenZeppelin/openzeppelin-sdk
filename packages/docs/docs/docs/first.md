@@ -7,7 +7,7 @@ This tutorial will get you started using the OpenZeppelin SDK. We will create a 
 
 ## Prerequisites
 
-The OpenZeppelin SDK is bundled as an [npm package](https://npmjs.com/package/zos). We will need [node.js](https://nodejs.org/) to install and run it. Head over to [its website](https://nodejs.org/) for instructions on how to install it.
+The OpenZeppelin SDK is bundled as an [npm package](https://npmjs.com/package/@openzeppelin/cli). We will need [node.js](https://nodejs.org/) to install and run it. Head over to [its website](https://nodejs.org/) for instructions on how to install it.
 
 > Note: At the moment, the OpenZeppelin SDK does not support node 12. Make sure to install version 10.
 

@@ -16,7 +16,7 @@ Yes. You can run `openzeppelin compile --solc-version 5.X` to compile your contr
   "name": "my-project",
   "version": "1.0.0",
   "compiler": {
-    "manager": "zos",
+    "manager": "openzeppelin",
     "solcVersion": "0.5.9"
   }
 }

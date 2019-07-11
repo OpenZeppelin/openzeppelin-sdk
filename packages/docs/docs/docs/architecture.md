@@ -11,7 +11,7 @@ However, some additional smart contracts come into play when you want to publish
 openzeppelin publish
 ```
 
-The source code of the contracts involved with a published EVM package can be found in [zos/packages/lib/contracts/application](https://github.com/OpenZeppelin/openzeppelin-sdk/tree/master/packages/lib/contracts/application). In the following sections, we describe the general architecture of an OpenZeppelin published EVM package.
+The source code of the contracts involved with a published EVM package can be found in the folder [packages/lib/contracts/application](https://github.com/OpenZeppelin/openzeppelin-sdk/tree/master/packages/lib/contracts/application). In the following sections, we describe the general architecture of an OpenZeppelin published EVM package.
 
 ## [App.sol](https://github.com/OpenZeppelin/openzeppelin-sdk/blob/v2.0.0/packages/lib/contracts/application/App.sol)
 

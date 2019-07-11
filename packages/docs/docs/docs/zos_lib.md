@@ -1,5 +1,5 @@
 ---
-id: zos_lib
+id: sdk_js_library
 title: Using the OpenZeppelin SDK programmatic library
 ---
 
@@ -69,7 +69,7 @@ npm install --global ganache-cli
 Now, install the OpenZeppelin SDK JavaScript library running:
 
 ```console
-npm install zos-lib
+npm install @openzeppelin/upgrades
 ```
 
 That's it! Our project is now fully set up for using OpenZeppelin SDK programmatically.
@@ -131,11 +131,11 @@ And now, let's write our upgrading script in `index.js`:
 ```js
 'use strict';
 
-// Required by zos-lib when running from truffle
+// Required by openzeppelin when running from truffle
 global.artifacts = artifacts;
 global.web3 = web3;
 
-const { Contracts, SimpleProject, ZWeb3 } = require('zos-lib')
+const { Contracts, SimpleProject, ZWeb3 } = require('@openzeppelin/upgrades')
 ZWeb3.initialize(web3.currentProvider)
 
 // Load the contract.

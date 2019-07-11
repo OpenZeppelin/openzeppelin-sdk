@@ -10,7 +10,7 @@ In the [first](first) tutorial, we learned how to set up a new OpenZeppelin SDK 
 We will write a `TokenExchange` contract, that will allow any user to purchase an ERC20 token in exchange for ETH, at a fixed exchange rate. To do this, we will need not only a TokenExchange contract, but also an [ERC20 implementation](https://docs.openzeppelin.org/v2.3.0/tokens#erc20). Let's start by getting one, but before, make sure to initialize a new project as described [here](first#setting-up-your-project):
 
 ```console
-npm install --global zos ganache-cli
+npm install --global @openzeppelin/cli ganache-cli
 mkdir token-exchange && cd token-exchange
 npm init -y
 openzeppelin init
@@ -92,7 +92,7 @@ In order to transfer an amount of tokens every time it receives ETH, our exchang
 In order to support contract upgrades, the OpenZeppelin SDK [does not allow the usage of Solidity's `constructor`s](pattern#the-constructor-caveat). Instead, we need to use _initializers_. An initializer is just a regular Solidity function, with an additional check to ensure that it can be called only once. To make coding initializers easy, OpenZeppelin SDK provides a base `Initializable` contract, that includes an `initializer` modifier that takes care of this. You will first need to install the package that provides that contract:
 
 ```console
-npm install zos-lib@2.4.0
+npm install @openzeppelin/upgrades@2.4.0
 ```
 
 Now, let's write our exchange contract in `contracts/TokenExchange.sol`, using an _initializer_ to set its initial state:
@@ -145,7 +145,7 @@ $ openzeppelin create
 Instance created at 0x26b4AFb60d6C903165150C6F0AA14F8016bE4aec
 ```
 
-<!-- CODE: We need to extend the zos transfer command to support erc20s -->
+<!-- CODE: We need to extend the oz transfer command to support erc20s -->
 
 Our exchange is almost ready! We only need to fund it, so it can send tokens to purchasers. Let's do that using the `send-tx` command, to transfer the full token balance from our own account to the exchange contract. Make sure to replace the recipient of the transfer with the `TokenExchange` address you got from the previous command.
 
