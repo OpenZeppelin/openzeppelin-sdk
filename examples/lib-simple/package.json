@@ -1,5 +1,5 @@
 {
-  "name": "example-zos-lib-simple",
+  "name": "example-openzeppelin-upgrades-simple",
   "version": "2.4.0",
   "private": true,
   "main": "index.js",

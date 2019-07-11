@@ -1,6 +1,6 @@
 'use strict';
 
-// Required by zos-lib when running from truffle
+// Required by @openzeppelin/upgrades when running from truffle
 global.artifacts = artifacts;
 global.web3 = web3;
 
