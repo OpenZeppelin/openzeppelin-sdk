@@ -1,6 +1,6 @@
 ---
 id: create2
-title: Upgradable Create2 Contracts with zOS
+title: Using CREATE2 for deploying to precomputed addresses
 ---
 
 
