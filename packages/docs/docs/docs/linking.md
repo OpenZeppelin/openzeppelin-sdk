@@ -20,7 +20,7 @@ openzeppelin init
 
 ## Linking the Contracts Ethereum package
 
-We will first get ourselves an ERC20 token. Instead of coding one from scratch, we will use the one provided by the [OpenZeppelin Contracts Ethereum package](https://github.com/OpenZeppelin/openzeppelin-contracts-ethereum-package). An Ethereum package is a set of contracts set up to be easily included in a OpenZeppelin SDK project, with the added bonus that the contracts' code _is already deployed in the Ethereum network_. This is a more secure code distribution mechanism, and also helps you save gas upon deployment.
+We will first get ourselves an ERC20 token. Instead of coding one from scratch, we will use the one provided by the [OpenZeppelin Contracts Ethereum package](https://github.com/OpenZeppelin/openzeppelin-contracts-ethereum-package). An Ethereum package is a set of contracts set up to be easily included in an OpenZeppelin SDK project, with the added bonus that the contracts' code _is already deployed in the Ethereum network_. This is a more secure code distribution mechanism, and also helps you save gas upon deployment.
 
 <!-- TODO: Add guide on what is an Ethereum package behind the scenes, instead of linking to a blogpost -->
 
@@ -68,7 +68,7 @@ $ openzeppelin create
 ✓ Instance created at 0x2612Af3A521c2df9EAF28422Ca335b04AdF3ac66
 ```
 
-Let's break down what we did in the command above. We first chose to create an instance of the `StandaloneERC20` contract from the `@openzeppelin/contracts-ethereum-package` package we had linked before, and to create it in the local `development` network. We are then instructing the CLI to _initialize_ it with the initial values needed to set up our token. This requires us to choose the appropriate `initialize` function, and input all the required arguments. OpenZeppelin SDK will then atomically create and initialize the new instance in a single transaction.
+Let's break down what we did in the command above. We first chose to create an instance of the `StandaloneERC20` contract from the `@openzeppelin/contracts-ethereum-package` package we had linked before, and to create it in the local `development` network. We are then instructing the CLI to _initialize_ it with the initial values needed to set up our token. This requires us to choose the appropriate `initialize` function, and input all the required arguments. The OpenZeppelin SDK will then atomically create and initialize the new instance in a single transaction.
 
 We now have a working ERC20 token contract in our development network. We can check that the initial supply was properly allocated by using the `balance` command. Make sure to use the address where your ERC20 token instance was created.
 
@@ -89,7 +89,7 @@ Great! We can now write an exchange contract and connect it to this token when w
 
 In order to transfer an amount of tokens every time it receives ETH, our exchange contract will need to store the token contract address and the exchange rate in its state. We will set these two values during initialization, when we create the instance with `openzeppelin create`.
 
-In order to support contract upgrades, the OpenZeppelin SDK [does not allow the usage of Solidity's `constructor`s](pattern#the-constructor-caveat). Instead, we need to use _initializers_. An initializer is just a regular Solidity function, with an additional check to ensure that it can be called only once. To make coding initializers easy, OpenZeppelin SDK provides a base `Initializable` contract, that includes an `initializer` modifier that takes care of this. You will first need to install the package that provides that contract:
+In order to support contract upgrades, the OpenZeppelin SDK [does not allow the usage of Solidity's `constructor`s](pattern#the-constructor-caveat). Instead, we need to use _initializers_. An initializer is just a regular Solidity function, with an additional check to ensure that it can be called only once. To make coding initializers easy, the OpenZeppelin SDK provides a base `Initializable` contract, that includes an `initializer` modifier that takes care of this. You will first need to install the package that provides that contract:
 
 ```console
 npm install @openzeppelin/upgrades@2.4.0

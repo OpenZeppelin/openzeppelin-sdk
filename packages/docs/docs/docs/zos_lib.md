@@ -3,7 +3,7 @@ id: sdk_js_library
 title: Using the OpenZeppelin SDK programmatic library
 ---
 
-OpenZeppelin SDK has a JavaScript library. It is mainly used by the `openzeppelin`
+The OpenZeppelin SDK has a JavaScript library. It is mainly used by the `openzeppelin`
 command-line interface, which is the recommended way to use the OpenZeppelin SDK; but
 this library can also be used directly to operate OpenZeppelin SDK projects when a
 programmatic interface is preferred or more flexibility and lower-level
@@ -72,7 +72,7 @@ Now, install the OpenZeppelin SDK JavaScript library running:
 npm install @openzeppelin/upgrades
 ```
 
-That's it! Our project is now fully set up for using OpenZeppelin SDK programmatically.
+That's it! Our project is now fully set up for using the OpenZeppelin SDK programmatically.
 
 ## Adding some contracts
 

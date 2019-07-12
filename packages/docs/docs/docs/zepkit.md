@@ -10,7 +10,7 @@ The OpenZeppelin Starter Kit allows you to bootstrap your decentralized applicat
 The starter kit works by creating a React application that serves a web user interface.
 This interface allows you to interact with your smart contracts via a web3
 provider: Metamask, Coinbase Wallet. The interaction is enabled by Truffle and
-OpenZeppelin SDK. They work together to compile and test your smart contracts
+the OpenZeppelin SDK. They work together to compile and test your smart contracts
 locally. Eventually, you need to take your application to mainnet, and Infura
 is already configured to help you do so effortlessly.
 

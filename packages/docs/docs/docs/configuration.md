@@ -134,18 +134,18 @@ networks: {
   }
  }
 ```
- Using `openzeppelin push --network geth_ropsten` or `openzeppelin push --network parity_ropsten` will both produce a file named `ropsten.json` no matter which method was used to connect to the ropsten network. OpenZeppelin SDK will automatically detect which public network is being referred to (using web3.network.getVersion()) and use this information for determining the file name.
- When dealing with local networks, OpenZeppelin SDK will generate files with `dev-<network_id>`, given that these networks are not public and don't have a canonical name. Using `openzeppelin push --network local` will produce a file named `dev-1540303312049.json` (or some other number representing the network id of the local network).
+ Using `openzeppelin push --network geth_ropsten` or `openzeppelin push --network parity_ropsten` will both produce a file named `ropsten.json` no matter which method was used to connect to the ropsten network. The OpenZeppelin SDK will automatically detect which public network is being referred to (using web3.network.getVersion()) and use this information for determining the file name.
+ When dealing with local networks, the OpenZeppelin SDK will generate files with `dev-<network_id>`, given that these networks are not public and don't have a canonical name. Using `openzeppelin push --network local` will produce a file named `dev-1540303312049.json` (or some other number representing the network id of the local network).
 
 ## Configuration files in version control
 
-The `project.json` file should be tracked in version control. This file represents a project's OpenZeppelin SDK configuration; the contracts and Ethereum packages that compose it, its name and version, the version of the OpenZeppelin SDK CLI it uses, etc. The file should be identical for all the contributors of a project.
+The `project.json` file should be tracked in version control. This file represents a project's OpenZeppelin SDK configuration; the contracts and Ethereum packages that compose it, its name and version, the version of the OpenZeppelin CLI it uses, etc. The file should be identical for all the contributors of a project.
 
 Public network files like `mainnet.json` or `ropsten.json` should also be tracked in version control. These contain valuable information about your project's status in the corresponding network; the addresses of the contract implementations that have been deployed, the addresses of the proxies that have been deployed, etc. Such files should also be identical for all the contributors of a project.
 
 However, local network files like `dev-<network_id>.json` only represent a project's deployment in a temporary local network such as `ganache-cli` that are only relevant to a single contributor of the project and should not be tracked in version control.
 
-An example `.gitignore` file could contain the following entries for OpenZeppelin SDK :
+An example `.gitignore` file could contain the following entries for the OpenZeppelin SDK:
 
 ```
 # OpenZeppelin SDK

@@ -167,7 +167,7 @@ contract MyContract is Initializable {
   ERC20 public token;
 
   function initialize(ERC20 _token) initializer public {
-    token = _token; // This contract will be upgradeable if it was created via OpenZeppelin SDK
+    token = _token; // This contract will be upgradeable if it was created via the OpenZeppelin SDK
   }
 }
 ```

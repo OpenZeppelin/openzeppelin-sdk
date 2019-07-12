@@ -154,7 +154,7 @@ Continuing with our example, notice that the way we interact with the contracts 
 const result = await proxy.methods.totalSupply().call();
 ```
 
-This is how you should write tests for your OpenZeppelin SDK projects. The project object provided by `TestHelper` wraps all of OpenZeppelin SDK programmatic interface in a way that is very convenient to use in tests. By running tests in this way, you make sure that you are testing your contracts with the exact set of conditions that they would have in production, after you deploy them with the OpenZeppelin SDK.
+This is how you should write tests for your OpenZeppelin SDK projects. The project object provided by `TestHelper` wraps all of the OpenZeppelin SDK programmatic interface in a way that is very convenient to use in tests. By running tests in this way, you make sure that you are testing your contracts with the exact set of conditions that they would have in production, after you deploy them with the OpenZeppelin SDK.
 
 ## Calling initialize functions manually in your tests
 
