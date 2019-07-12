@@ -29,7 +29,7 @@ const Verifier = {
       await publishToEtherscan(params);
     } else {
       throw Error(
-        'Invalid remote. Currently, OpenZeppelin contract verifier supports etherchain and etherscan as remote verification applications.',
+        'Invalid remote. Currently, the OpenZeppelin contract verifier supports only etherchain and etherscan as remote verification applications.',
       );
     }
   },
