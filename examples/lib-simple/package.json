@@ -1,6 +1,6 @@
 {
   "name": "example-openzeppelin-upgrades-simple",
-  "version": "2.4.0",
+  "version": "2.5.0-rc.0",
   "private": true,
   "main": "index.js",
   "scripts": {
@@ -9,8 +9,8 @@
   },
   "license": "ISC",
   "dependencies": {
-    "truffle": "^5.0.3",
-    "@openzeppelin/upgrades": "^2.4.0"
+    "@openzeppelin/upgrades": "2.5.0-rc.0",
+    "truffle": "^5.0.3"
   },
   "devDependencies": {
     "babel-polyfill": "^6.23.0",

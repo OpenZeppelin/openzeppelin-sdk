@@ -1,15 +1,15 @@
 {
   "name": "example-dep-basic",
   "private": true,
-  "version": "2.4.0",
+  "version": "2.5.0-rc.0",
   "description": "Sample basic dependency library for ZeppelinOS",
   "author": "santiago@zeppelin.solutions",
   "license": "MIT",
   "dependencies": {
-    "@openzeppelin/upgrades": "^2.4.0"
+    "@openzeppelin/upgrades": "2.5.0-rc.0"
   },
   "devDependencies": {
-    "truffle": "^4.1.14",
-    "@openzeppelin/cli": "^2.4.0"
+    "@openzeppelin/cli": "2.5.0-rc.0",
+    "truffle": "^4.1.14"
   }
 }

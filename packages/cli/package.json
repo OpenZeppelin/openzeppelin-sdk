@@ -1,6 +1,6 @@
 {
   "name": "@openzeppelin/cli",
-  "version": "2.4.0",
+  "version": "2.5.0-rc.0",
   "description": "Command-line interface for the ZeppelinOS smart contract platform",
   "main": "./lib/index.js",
   "private": false,
@@ -50,6 +50,7 @@
   },
   "homepage": "https://github.com/OpenZeppelin/openzeppelin-sdk/tree/master/packages/cli#readme",
   "dependencies": {
+    "@openzeppelin/upgrades": "2.5.0-rc.0",
     "@resolver-engine/imports-fs": "^0.3.2",
     "@types/fs-extra": "^7.0.0",
     "@types/npm": "^2.0.29",
@@ -112,8 +113,7 @@
     "solidity-parser-antlr": "^0.4.2",
     "spinnies": "^0.3.0",
     "truffle-config": "1.1.2",
-    "web3": "1.0.0-beta.37",
-    "@openzeppelin/upgrades": "^2.4.0"
+    "web3": "1.0.0-beta.37"
   },
   "devDependencies": {
     "@types/lodash": "^4.14.119",
