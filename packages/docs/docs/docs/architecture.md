@@ -3,7 +3,7 @@ id: architecture
 title: Contracts Architecture
 ---
 
-OpenZeppelin SDK's features such as upgrades and Ethereum Package linking can be used through the `openzeppelin` CLI with only one extra contract. The [ProxyAdmin](https://github.com/OpenZeppelin/openzeppelin-sdk/blob/v2.0.0/packages/lib/contracts/upgradeability/ProxyAdmin.sol) contract. The OpenZeppelin SDK uses this contract in order to avoid confusion around the [transparent proxy pattern](pattern#transparent-proxies-and-function-clashes). This contract acts as a central admin for all proxies on your behalf, making their management as simple as possible, while retaining the highest safety standards. 
+OpenZeppelin SDK's features such as upgrades and Ethereum Package linking can be used through the `openzeppelin` CLI. The CLI deploys a [ProxyAdmin](https://github.com/OpenZeppelin/openzeppelin-sdk/blob/v2.0.0/packages/lib/contracts/upgradeability/ProxyAdmin.sol) contract for managing your upgradeable instances, and optionally a ProxyFactory to support the `create2` command.
 
 However, some additional smart contracts come into play when you want to publish your Ethereum Package for others to reuse. Publishing is achieved by calling the command:
 
@@ -11,40 +11,42 @@ However, some additional smart contracts come into play when you want to publish
 openzeppelin publish
 ```
 
-The source code of the contracts involved with a published Ethereum Package can be found in the folder [packages/lib/contracts/application](https://github.com/OpenZeppelin/openzeppelin-sdk/tree/master/packages/lib/contracts/application). In the following sections, we describe the general architecture of an OpenZeppelin published Ethereum Package.
+The source code of the contracts involved with a published Ethereum Package can be found in the folder [packages/lib/contracts/application](https://github.com/OpenZeppelin/openzeppelin-sdk/tree/master/packages/lib/contracts/application). In the following sections, we describe the `ProxyAdmin`, as well as the general architecture of an OpenZeppelin published Ethereum Package.
 
-## [ProxyAdmin.sol](https://github.com/zeppelinos/zos/blob/v2.0.0/packages/lib/contracts/application/App.sol)
+## [ProxyAdmin.sol](https://github.com/OpenZeppelin/openzeppelin-sdk/blob/v2.0.0/packages/lib/contracts/application/App.sol)
 
-This contract acts as a central admin for all proxies on your behalf, making their management as simple as possible. The ProxyAdmin contract is owned by the deployer (the project owner). It is the admin of all the proxy contracts and is in charge of upgrading them as well as transferring their ownership to another admin.
+This contract acts as a central admin for all proxies on your behalf, making their management as simple as possible. The `ProxyAdmin` contract is owned by the deployer (the project owner). It is the admin of all the proxy contracts and is in charge of upgrading them as well as transferring their ownership to another admin. This contract is used to complement the [transparent proxy pattern](pattern#transparent-proxies-and-function-clashes), which prevents an admin from accidentally triggering a proxy management function when interacting with their instances.
 
-**Ownership transfer of a single contract vs complete project**
+### Ownership transfers
 
-ZeppelinOS provides `set-admin` command to transfer ownership. Using this command, we can transfer ownership of any single contract or we can also transfer the ownership of our entire project just by transferring the ownership of the ProxyAdmin contract itself.
+The OpenZeppelin SDK provides the `set-admin` command to transfer ownership. Using this command, we can transfer ownership of any single contract or we can also transfer the ownership of our entire project just by transferring the ownership of the `ProxyAdmin` contract itself.
 
-To transfer ownership of a single contract
-
-```console
-zos set-admin [MYCONTRACT_ADDRESS] [NEW_ADMIN_ADDRESS]
-```
-To transfer ownership of the complete project
+To transfer ownership of a single contract:
 
 ```console
-zos set-admin [NEW_ADMIN_ADDRESS]
+openzeppelin set-admin [MYCONTRACT_ADDRESS] [NEW_ADMIN_ADDRESS]
+
 ```
->Note: Please replace [MYCONTRACT_ADDRESS] with the address of your contract for whom you want to change the ownership. Also, `zos set-admin` is an interactive command, and if you have any confusion just run `zos set-admin`, it will help you with upgrading your contracts.
+To transfer ownership of the complete project:
 
-**Contract upgrade using ProxyAdmin**
+```console
+openzeppelin set-admin [NEW_ADMIN_ADDRESS]
+```
 
-`ProxyAdmin.sol` also responsible for upgrading our contracts. When you run `zos upgrade` command, it goes through ProxyAdmin contract's [`upgrade`](https://docs.zeppelinos.org/docs/2.2.0/upgradeability_ProxyAdmin.html#upgrade) method. The ProxyAdmin contract also provides another method [`getProxyImplementation`](https://docs.zeppelinos.org/docs/2.2.0/upgradeability_ProxyAdmin.html#getProxyImplementation) which returns the current implementation of a given proxy.
+>Note: Please replace [MYCONTRACT_ADDRESS] with the address of your contract for whom you want to change the ownership. Also, `openzeppelin set-admin` is an interactive command, and if you have any confusion just run `openzeppelin set-admin`, it will help you with upgrading your contracts.
 
-You can find your ProxyAdmin contract address in `zos.<network>.json` under the same name.
+### Contract upgrades via ProxyAdmin
+
+The `ProxyAdmin.sol` also responsible for upgrading our contracts. When you run the `openzeppelin upgrade` command, it goes through `ProxyAdmin`'s [`upgrade`](upgradeability_ProxyAdmin.html#upgrade) method. The `ProxyAdmin` contract also provides another method [`getProxyImplementation`](upgradeability_ProxyAdmin.html#getProxyImplementation) which returns the current implementation of a given proxy.
+
+You can find your `ProxyAdmin` contract address in `.openzeppelin/<network>.json` under the same name.
 
 ```console json
 "proxyAdmin": {
    "address": <proxyAdmin-address>
 }
 ```
-The [`ProxyAdmin.sol`](https://github.com/zeppelinos/zos/blob/v2.2.0/packages/lib/contracts/upgradeability/ProxyAdmin.sol) comes with `zos-lib` package.
+The [`ProxyAdmin.sol`](https://github.com/OpenZeppelin/openzeppelin-sdk/blob/v2.2.0/packages/lib/contracts/upgradeability/ProxyAdmin.sol) comes with `@openzeppelin/upgrades` package.
 
 ## [App.sol](https://github.com/OpenZeppelin/openzeppelin-sdk/blob/v2.0.0/packages/lib/contracts/application/App.sol)
 
