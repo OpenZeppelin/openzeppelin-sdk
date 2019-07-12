@@ -37,6 +37,7 @@
     "openzeppelin-sdk",
     "solidity",
     "smart-contracts",
+    "ethereum",
     "zos",
     "zeppelinos",
     "cli"
@@ -47,6 +48,9 @@
   },
   "bugs": {
     "url": "https://github.com/OpenZeppelin/openzeppelin-sdk/issues"
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "homepage": "https://github.com/OpenZeppelin/openzeppelin-sdk/tree/master/packages/cli#readme",
   "dependencies": {

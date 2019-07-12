@@ -35,13 +35,16 @@
     "zeppelinos",
     "zeppelin",
     "ethereum",
-    "smartcontracts",
+    "smart-contracts",
     "solidity",
     "upgradeability",
     "security",
     "proxy",
     "evm"
   ],
+  "publishConfig": {
+    "access": "public"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/OpenZeppelin/openzeppelin-sdk.git"
