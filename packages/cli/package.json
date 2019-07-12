@@ -1,7 +1,7 @@
 {
   "name": "@openzeppelin/cli",
   "version": "2.5.0-rc.0",
-  "description": "Command-line interface for the ZeppelinOS smart contract platform",
+  "description": "Command-line interface for the OpenZeppelin smart contract platform",
   "main": "./lib/index.js",
   "private": false,
   "license": "MIT",
