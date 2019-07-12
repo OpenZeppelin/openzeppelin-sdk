@@ -35,7 +35,8 @@
   "keywords": [
     "openzeppelin",
     "openzeppelin-sdk",
-    "@openzeppelin/cli",
+    "solidity",
+    "smart-contracts",
     "zos",
     "zeppelinos",
     "cli"
