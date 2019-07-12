@@ -119,7 +119,7 @@ As discussed, the unstructured approach avoids storage collisions between the lo
 
 The unstructured storage proxy mechanism doesn't safeguard against this situation.
 It is up to the user to have new versions of a logic contract extend previous versions, or otherwise guarantee that the storage hierarchy is always appended to but not modified.
-However, the OpenZeppelin CLI does detect such collisions, and warns the developer appropriately.
+However, the OpenZeppelin SDK does detect such collisions, and warns the developer appropriately.
 
 ## The constructor caveat
 
