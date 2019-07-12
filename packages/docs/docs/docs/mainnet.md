@@ -8,8 +8,8 @@ deploy a project to a local network, which is very good for testing.
 Once you are happy with your initial contracts, you can deploy them to mainnet
 using the `--network` flag.
 
-This flag takes the network details from the Truffle configuration file. You
-can use Infura to connect to mainnet, with a `truffle-config.js` like this one:
+This flag takes the network details from the network configuration file. You
+can use Infura to connect to mainnet, with a `networks.js` or `truffle.js` like this one:
 
 ```js
 'use strict';
@@ -41,12 +41,11 @@ Install the `truffle-hdwallet-provider` module with:
 npm install truffle-hdwallet-provider
 ```
 
-And now you can run `zos` commands in mainnet. For example:
+And now you can run `openzeppelin` commands in mainnet. For example:
 
 ```console
-zos push --network mainnet
+openzeppelin push --network mainnet
 ```
-
 
 This will use your first account generated from the mnemonic. If you want to
 specify a different account, use the `--from` flag.

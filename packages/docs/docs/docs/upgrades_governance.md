@@ -5,12 +5,12 @@ title: Upgrades governance
 
 ## Introduction
 
-ZeppelinOS provides the chance to have upgradeable smart contracts which follows the immutability rules guaranteed by
+The OpenZeppelin SDK provides the chance to have upgradeable smart contracts which follows the immutability rules guaranteed by
 the Ethereum blockchain. However, it is desirable to have a mechanism that allows all parties involved to decide on
 whether a contract should be upgraded or not, instead of having an unilateral decision.
 
 Given that there are many projects already working on really good solutions to achieve decentralized governance,
-we've been exploring some of them to study how they can be integrated with ZeppelinOS to manage contract upgrades.
+we've been exploring some of them to study how they can be integrated with the OpenZeppelin SDK to manage contract upgrades.
 
 In this case, we will use a multisignature wallet.
 
@@ -24,15 +24,15 @@ deploy your own multisig wallet.
 
 ![](https://lh5.googleusercontent.com/CqtaZkTZqJ_jT9vdQdPj-CNj304InYItfIBi5LnWrnsySGNOpN0HVu9DFIZbE1TpIq20ZN-3bAB1fNhFQiD_fTKqoLFyzQR7bLmmyfMJZABQMYMOnOzfTrsAkk_sgxeEQTriSJAB)
 
-Once inside your ZeppelinOS project, let's suppose we have an arbitrary contract called `MyContract`. Now let's see how
+Once inside your OpenZeppelin SDK project, let's suppose we have an arbitrary contract called `MyContract`. Now let's see how
 we can create an upgradeable instance of it being handled by a multisig wallet. In order to do that, we will need first
 to register this contract, push it to the network and create a new upgradeable instance of it as we explained in the
 previous sections:
 
 ```console
-zos add MyContract
-zos push -n ropsten
-zos create MyContract -n ropsten
+openzeppelin add MyContract
+openzeppelin push -n ropsten
+openzeppelin create MyContract -n ropsten
 ```
 
 We have our contract deployed to the `ropsten` network, with an instance of our `MyContract` contract up and running.
@@ -45,7 +45,7 @@ Since we want to avoid having a single account with full control over our `MyCon
 of it to our multisig contract. To do this, we’ll use the `set-admin` command to yield control to the multisig account.
 
 ```console
-zos set-admin [MYCONTRACT_ADDRESS] [MULTISIG_ADDRESS] -y
+openzeppelin set-admin [MYCONTRACT_ADDRESS] [MULTISIG_ADDRESS] -y
 ```
 
 > Please remember to replace `[MYCONTRACT_ADDRESS]` by the address of the upgradeable instance of `MyContract` we
@@ -58,7 +58,7 @@ Now, if we want to upgrade our `MyContract` instance to a new version, we’ll n
 multisig contract. Note that we have transferred only the ownership of our `MyContract` instance. If we had created
 more instances of `MyContract`, or of any other contract, they would still be under control of the deployer account.
 
-The same applies to our ZeppelinOS app. This allows us to keep interacting with our project via the CLI, by creating new
+The same applies to our OpenZeppelin SDK app. This allows us to keep interacting with our project via the CLI, by creating new
 instances or registering new logic contracts, as we’ll be doing in the next step.
 
 ## Uploading a new version
@@ -67,8 +67,8 @@ Let’s suppose we extend the functionality somehow. The first step is to upload
 Since the whole project is still managed by our deployer account, we can easily do that from the CLI by running:
 
 ```console
-zos add MyContract
-zos push
+openzeppelin add MyContract
+openzeppelin push
 ```
 
 Now that our new logic contract is uploaded to the network, we can proceed to upgrade our `MyContract` instance.
@@ -81,7 +81,7 @@ multisig to perform this operation, as the CLI’s account.
 
 Let’s submit a transaction to the multisig wallet for our contract instance to be upgraded. We can do this from the
 Gnosis dApp by including the [proxy's ABI](https://gist.github.com/spalladino/d25c41c19a538ae918735e5b1c07db07) and choosing to invoke `upgradeTo`. We also need to supply the address of
-the new implementation, which can be found in the output of the last `zos push` command or in the `zos.ropsten.json`
+the new implementation, which can be found in the output of the last `openzeppelin push` command or in the `.openzeppelin/ropsten.json`
 file.
 
 ![](https://lh3.googleusercontent.com/Wi76B5WGVs8_qGD1GPVYpA5oOF4hEVt1mfl1grCszZRfxRlkPS1PsPxm9-Kpm0NfX0qlmq-5rUNfXdEJrIlH8gJK9TNW7NjlZ_QVqAuv5JZRFW-zQNxATQpA9OapPq_6J85nzTLz)

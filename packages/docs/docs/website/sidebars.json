@@ -16,7 +16,7 @@
       "testing",
       "erc20_onboarding",
       "upgrades_governance",
-      "zos_lib"
+      "sdk_js_library"
     ],
     "ADVANCED TOPICS": [
       "faq",

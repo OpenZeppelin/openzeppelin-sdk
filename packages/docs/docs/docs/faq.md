@@ -7,18 +7,28 @@ title: Frequently asked questions
 
 Yes. The Solidity team guarantess that the compiler [preserves storage layout among versions](https://twitter.com/ethchris/status/1073692785176444928).
 
-## Is it possible to specify which Solidity compiler version to use in ZeppelinOS?
+## Is it possible to specify which Solidity compiler version to use in the OpenZeppelin SDK?
 
-Yes. As of ZeppelinOS version 2.1, you can specify which compiler version to use in `truffle.js`, as you do with Truffle (version 5):
+Yes. You can run `openzeppelin compile --solc-version 5.X` to compile your contracts with a specific Solidity compiler version. This choice will be saved to `.openzeppelin/project.json` for future runs.
+```
+{
+  "manifestVersion": "2.2",
+  "name": "my-project",
+  "version": "1.0.0",
+  "compiler": {
+    "manager": "openzeppelin",
+    "solcVersion": "0.5.9"
+  }
+}
+```
+
+If you are using `truffle` for compiling your project,, you can specify which compiler version to use in your `truffle.js` or `truffle-config.js` file, as you do normally in a truffle 5+ project:
 
 ```
 module.exports = {
-  networks: {
-    ... etc ...
-  },
   compilers: {
      solc: {
-       version: <string>  // example:  "0.4.24" or "0.5.0"
+       version: "0.5.9"
      }
   }
 }
@@ -26,9 +36,9 @@ module.exports = {
 
 ## Why are my getting the error "Cannot call fallback function from the proxy admin"?
 
-This is due to the [transparent proxy pattern](https://docs.zeppelinos.org/docs/pattern.html#transparent-proxies-and-function-clashes). You shouldn't get this error when using ZeppelinOS via de CLI, because ZeppelinOS uses the ProxyAdmin contract. More info in the [What's new in ZeppelinOS 2.2](https://docs.zeppelinos.org/docs/new_2.2.html) section of the documentation.
+This is due to the [transparent proxy pattern](pattern#transparent-proxies-and-function-clashes). You shouldn't get this error when using the OpenZeppelin SDK via its CLI, since it relies on the `ProxyAdmin` contract for managing your proxies.
 
-However, if you are using ZeppelinOS programmatically, you could run into such error. The solution is to always interact with your proxies from an account that is not the admin of the proxy, unless of course you want to specifically call functions of the proxy itself.
+However, if you are using the OpenZeppelin SDK programmatically, you could run into such error. The solution is to always interact with your proxies from an account that is not the admin of the proxy, unless you want to specifically call functions of the proxy itself.
 
 ## How do I use ES6 Javascript syntax in my tests?
 
@@ -51,6 +61,6 @@ require('babel-polyfill');
 
 ## How can I create an upgradeable instance from Solidity code?
 
-You can create upgradeable instances from Solidity code by using your project's App contract, and then calling its `create` function from Solidity. Note that to be able to do this, your project needs to be published, i.e. it needs to have the ZeppelinOS [Contracts Architecture](https://docs.zeppelinos.org/docs/architecture.html) enabled.
+You can create upgradeable instances from Solidity code by using your project's App contract, and then calling its `create` function from Solidity. Note that to be able to do this, your project needs to be published, i.e. it needs to have the OpenZeppelin SDK [Contracts Architecture](architecture) enabled.
 
-To see an example of how this is done, please refer to the example project [creating-instances-from-solidity](https://github.com/zeppelinos/zos/tree/master/examples/creating-instances-from-solidity).
+To see an example of how this is done, please refer to the example project [creating-instances-from-solidity](https://github.com/OpenZeppelin/openzeppelin-sdk/tree/master/examples/creating-instances-from-solidity).

@@ -1,15 +1,15 @@
 ---
 id: pattern
-title: ZeppelinOS Upgrades Pattern
+title: OpenZeppelin SDK Upgrades Pattern
 ---
 
-This article describes the "unstructured storage" proxy pattern, the fundamental building block of ZeppelinOS's upgrades.
+This article describes the "unstructured storage" proxy pattern, the fundamental building block of the OpenZeppelin SDK's upgrades.
 
-Note: For a more in depth read, please see [blog.zeppelinos.org/proxy-patterns](https://blog.zeppelinos.org/proxy-patterns/), which discusses the need for proxies, goes into more technical detail on the subject, elaborates on other possible proxy patterns that were considered for ZeppelinOS, and more.
+> Note: For a more in depth read, please see [our proxy-patterns blog post](https://blog.zeppelinos.org/proxy-patterns/), which discusses the need for proxies, goes into more technical detail on the subject, elaborates on other possible proxy patterns that were considered for the OpenZeppelin SDK, and more.
 
 ## Why upgrade a contract?
 
-By design, smart contracts are immutable. On the other hand, software quality heavily depends on the ability to upgrade and patch source code in order to produce iterative releases. Even though blockchain based software profits significantly from the technology's immutability, still a certain degree of mutability is needed for bug fixing and potential product improvements. ZeppelinOS solves this apparent contradiction by providing an easy to use, simple, robust, and opt-in upgrade mechanism for smart contracts that can be controlled by any type of governance, be it a multi-sig wallet, a simple address or a complex DAO.
+By design, smart contracts are immutable. On the other hand, software quality heavily depends on the ability to upgrade and patch source code in order to produce iterative releases. Even though blockchain based software profits significantly from the technology's immutability, still a certain degree of mutability is needed for bug fixing and potential product improvements. The OpenZeppelin SDK solves this apparent contradiction by providing an easy to use, simple, robust, and opt-in upgrade mechanism for smart contracts that can be controlled by any type of governance, be it a multi-sig wallet, a simple address or a complex DAO.
 
 ## Upgrading via the proxy pattern
 
@@ -65,7 +65,7 @@ A problem that quickly comes up when using proxies has to do with the way in whi
 |                          |...                      |
 ```
 
-There are many ways to overcome this problem, and the "unstructured storage" approach which ZeppelinOS implements works as follows. Instead of storing the `_implementation` address at the proxy's first storage slot, it chooses a pseudo random slot instead. This slot is sufficiently random, that the probability of a logic contract declaring a variable at the same slot is negligible. The same principle of randomizing slot positions in the proxy's storage is used in any other variables the proxy may have, such as an admin address (that is allowed to update the value of `_implementation`), etc.
+There are many ways to overcome this problem, and the "unstructured storage" approach which the OpenZeppelin SDK implements works as follows. Instead of storing the `_implementation` address at the proxy's first storage slot, it chooses a pseudo random slot instead. This slot is sufficiently random, that the probability of a logic contract declaring a variable at the same slot is negligible. The same principle of randomizing slot positions in the proxy's storage is used in any other variables the proxy may have, such as an admin address (that is allowed to update the value of `_implementation`), etc.
 
 ```
 |Proxy                     |Implementation           |
@@ -83,10 +83,10 @@ There are many ways to overcome this problem, and the "unstructured storage" app
 |...                       |                         |
 ```
 
-An example of how the randomized storage is achieved:
+An example of how the randomized storage is achieved, following [EIP 1967](http://eips.ethereum.org/EIPS/eip-1967):
 
 ```solidity
-bytes32 private constant implementationPosition = keccak256("org.zeppelinos.proxy.implementation");
+bytes32 private constant implementationPosition = bytes32(uint256(keccak256('eip1967.proxy.implementation')) - 1));
 ```
 
 As a result, a logic contract doesn't need to care about overwriting any of the proxy's variables. Other proxy implementations that face this problem usually imply having the proxy know about the logic contract's storage structure and adapt to it, or instead having the logic contract know about the proxy's storage structure and adapt to it. This is why this approach is called "unstructured storage"; neither of the contracts needs to care about the structure of the other.
@@ -119,7 +119,7 @@ As discussed, the unstructured approach avoids storage collisions between the lo
 
 The unstructured storage proxy mechanism doesn't safeguard against this situation.
 It is up to the user to have new versions of a logic contract extend previous versions, or otherwise guarantee that the storage hierarchy is always appended to but not modified.
-However, ZeppelinOS CLI does detect such collisions, and warns the developer appropriately.
+However, the OpenZeppelin SDK does detect such collisions, and warns the developer appropriately.
 
 ## The constructor caveat
 
@@ -127,19 +127,19 @@ In Solidity, code that is inside a constructor or part of a global variable decl
 
 The problem is easily solved though. Logic contracts should move the code within the constructor to a regular 'initializer' function, and have this function be called whenever the proxy links to this logic contract. Special care needs to be taken with this initializer function so that it can only be called once, which is one of the properties of constructors in general programming.
 
-This is why when the ZeppelinOS CLI creates a proxy, it allows you to indicate an initializer function:
+This is why when the OpenZeppelin CLI creates a proxy, it allows you to indicate an initializer function:
 
 ```console
-npx zos create MyLogicContract --init initialize --args arg1,arg2,arg3
+npx openzeppelin create MyLogicContract --init initialize --args arg1,arg2,arg3
 ```
 
-With this command, ZeppelinOS creates a proxy that wraps around `MyLogicContract`, uses `MyLogicContract` as the logic contract, and calls the logic contract's `initialize` function.
+With this command, the OpenZeppelin SDK creates a proxy that wraps around `MyLogicContract`, uses `MyLogicContract` as the logic contract, and calls the logic contract's `initialize` function.
 
-To ensure that the `initialize` function can only be called once, a simple modifier is used. ZeppelinOS provides this functionality via a contract that can be extended:
+To ensure that the `initialize` function can only be called once, a simple modifier is used. The OpenZeppelin SDK provides this functionality via a contract that can be extended:
 
 ```solidity
 
-import "zos-lib/contracts/Initializable.sol";
+import "@openzeppelin/upgrades/contracts/Initializable.sol";
 
 contract MyContract is Initializable {
 
@@ -159,7 +159,7 @@ As described in the previous sections, upgradeable contract instances (or proxie
 
 > Clashing can also happen among functions with different names. Every function that is part of a contract's public ABI is identified, at the bytecode level, by a 4-byte identifier. This identifier depends on the name and arity of the function, but since it's only 4 bytes, there is a possibility that two different functions with different names may end up having the same identifier. The Solidity compiler tracks when this happens within the same contract, but not when the collision happens across different ones, such as between a proxy and its logic contract. Read [this article](https://medium.com/nomic-labs-blog/malicious-backdoors-in-ethereum-proxies-62629adf3357) for more info on this.
 
-The way ZeppelinOS deals with this problem is via the _transparent proxy_ pattern. A transparent proxy will decide which calls are delegated to the underlying logic contract based on the caller address (ie the `msg.sender`):
+The way the OpenZeppelin SDK deals with this problem is via the _transparent proxy_ pattern. A transparent proxy will decide which calls are delegated to the underlying logic contract based on the caller address (ie the `msg.sender`):
 - If the caller is the admin of the proxy (the address with rights to upgrade the proxy), then the proxy will **not** delegate any calls, and only answer any messages it understands.
 - If the caller is any other address, the proxy will **always** delegate a call, no matter if it matches one of the proxy's functions.
 
@@ -170,14 +170,14 @@ Assuming a proxy with an `owner()` and an `upgradeTo()` function, that delegates
 | Owner         | returns proxy.owner() | returns proxy.upgradeTo() | fails |
 | Other         | returns erc20.owner() | fails | returns erc20.transfer() |
 
-Fortunately, the ZeppelinOS cli accounts for this situation, and creates an intermediary ProxyAdmin contract that is in charge of all the proxies you create via the cli. Even if you call the `create` command from your node's default account, or using the `from` address specified when you started your `zos session`, the ProxyAdmin contract will be the actual admin of all your proxies. This means that you will be able to interact with the proxies from any of your node's accounts, without having to worry about the nuances of the transparent proxy pattern. Only advanced users of ZeppelinOS that use it programmatically via `zos-lib` need to be aware of the transparent proxies pattern.
+Fortunately, the OpenZeppelin CLI accounts for this situation, and creates an intermediary ProxyAdmin contract that is in charge of all the proxies you create via the cli. Even if you call the `create` command from your node's default account, or using the `from` address specified when you started your `openzeppelin session`, the ProxyAdmin contract will be the actual admin of all your proxies. This means that you will be able to interact with the proxies from any of your node's accounts, without having to worry about the nuances of the transparent proxy pattern. Only advanced users of the OpenZeppelin SDK that use it programmatically via `@openzeppelin/upgrades` need to be aware of the transparent proxies pattern.
 
 ## Summary
 
-Any developer using ZeppelinOS should be familiar with proxies in the ways that are described in this article. In the end, the concept is very simple, and ZeppelinOS is designed to encapsulate all the proxy mechanics in a way that the amount of things you need to keep in mind when developing projects are reduced to an absolute minimum. It all comes down to the following list:
+Any developer using the OpenZeppelin SDK should be familiar with proxies in the ways that are described in this article. In the end, the concept is very simple, and the OpenZeppelin SDK is designed to encapsulate all the proxy mechanics in a way that the amount of things you need to keep in mind when developing projects are reduced to an absolute minimum. It all comes down to the following list:
 
 * Have a basic understanding of what a proxy is
 * Always extend storage instead of modifying it
 * Make sure your contracts use initializer functions instead of constructors
 
-Furthermore, ZeppelinOS will let you know when something goes wrong with one of the items in this list.
+Furthermore, the OpenZeppelin SDK will let you know when something goes wrong with one of the items in this list.

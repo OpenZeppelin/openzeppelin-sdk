@@ -1,11 +1,11 @@
 ---
-id: zos_lib
-title: Using the ZeppelinOS programmatic library
+id: sdk_js_library
+title: Using the OpenZeppelin SDK programmatic library
 ---
 
-ZeppelinOS has a JavaScript library. It is mainly used by the `zos`
-command-line interface, which is the recommended way to use ZeppelinOS; but
-this library can also be used directly to operate ZeppelinOS projects when a
+The OpenZeppelin SDK has a JavaScript library. It is mainly used by the `openzeppelin`
+command-line interface, which is the recommended way to use the OpenZeppelin SDK; but
+this library can also be used directly to operate OpenZeppelin SDK projects when a
 programmatic interface is preferred or more flexibility and lower-level
 access is required.
 
@@ -66,13 +66,13 @@ We'll be using [ganache](https://truffleframework.com/docs/ganache/quickstart) f
 npm install --global ganache-cli
 ```
 
-Now, install the ZeppelinOS JavaScript library running:
+Now, install the OpenZeppelin SDK JavaScript library running:
 
 ```console
-npm install zos-lib
+npm install @openzeppelin/upgrades
 ```
 
-That's it! Our project is now fully set up for using ZeppelinOS programmatically.
+That's it! Our project is now fully set up for using the OpenZeppelin SDK programmatically.
 
 ## Adding some contracts
 
@@ -82,7 +82,7 @@ with the following contents:
 ```solidity
 pragma solidity ^0.5.0;
 
-import "zos-lib/contracts/Initializable.sol";
+import "@openzeppelin/upgrades/contracts/Initializable.sol";
 
 contract MyContractV0 is Initializable {
   uint256 public value;
@@ -99,7 +99,7 @@ first one but with one extra function:
 ```solidity
 pragma solidity ^0.5.0;
 
-import "zos-lib/contracts/Initializable.sol";
+import "@openzeppelin/upgrades/contracts/Initializable.sol";
 
 contract MyContractV1 is Initializable {
   uint256 public value;
@@ -115,7 +115,7 @@ contract MyContractV1 is Initializable {
 ```
 
 The V1 contract is an upgrade for the V0 contract, so let's see how we can
-use the ZeppelinOS library to apply this upgrade. For this, we need to
+use the OpenZeppelin SDK library to apply this upgrade. For this, we need to
 compile the contracts:
 
 ## Compiling the contracts
@@ -131,11 +131,11 @@ And now, let's write our upgrading script in `index.js`:
 ```js
 'use strict';
 
-// Required by zos-lib when running from truffle
+// Required by openzeppelin when running from truffle
 global.artifacts = artifacts;
 global.web3 = web3;
 
-const { Contracts, SimpleProject, ZWeb3 } = require('zos-lib')
+const { Contracts, SimpleProject, ZWeb3 } = require('@openzeppelin/upgrades')
 ZWeb3.initialize(web3.currentProvider)
 
 // Load the contract.
@@ -177,5 +177,5 @@ npx truffle exec index.js --network local
 ```
 
 This is just a very simple example to show the basic functions of the
-ZeppelinOS JavaScript library. You can find more examples in the
-[ZeppelinOS repository](https://github.com/zeppelinos/zos/tree/master/examples).
+OpenZeppelin SDK JavaScript library. You can find more examples in the
+[OpenZeppelin SDK repository](https://github.com/OpenZeppelin/openzeppelin-sdk/tree/master/examples).
