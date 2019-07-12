@@ -1,14 +1,18 @@
 'use strict';
 require('../../setup');
 
+import BN from 'bignumber.js';
+import utils from 'web3-utils';
+import sinon from 'sinon';
+
 import Proxy from '../../../src/proxy/Proxy';
 import ZWeb3 from '../../../src/artifacts/ZWeb3';
 import encodeCall from '../../../src/helpers/encodeCall';
 import assertRevert from '../../../src/test/helpers/assertRevert';
 import shouldBehaveLikeUpgradeabilityProxy from './UpgradeabilityProxy.behaviour';
-import BN from 'bignumber.js';
 import Contracts from '../../../src/artifacts/Contracts';
 import { ZERO_ADDRESS } from '../../../src/utils/Addresses';
+import { ADMIN_LABEL, DEPRECATED_ADMIN_LABEL } from '../../../src/utils/Constants';
 
 const Implementation1 = Contracts.getFromLocal('Implementation1');
 const Implementation2 = Contracts.getFromLocal('Implementation2');
@@ -20,9 +24,6 @@ const MigratableMockV3 = Contracts.getFromLocal('MigratableMockV3');
 const InitializableMock = Contracts.getFromLocal('InitializableMock');
 const DummyImplementation = Contracts.getFromLocal('DummyImplementation');
 const ClashingImplementation = Contracts.getFromLocal('ClashingImplementation');
-const AdminUpgradeabilityProxy = Contracts.getFromLocal(
-  'AdminUpgradeabilityProxy',
-);
 
 const sendTransaction = (target, method, args, values, opts) => {
   const data = encodeCall(method, args, values);
@@ -166,9 +167,7 @@ export default function shouldBehaveLikeAdminUpgradeabilityProxy(
             //  - 1-50: Initailizable reserved storage (50 slots)
             //  - 51: initializerRan
             //  - 52: x
-            const storedValue = await Proxy.at(this.proxyAddress).getStorageAt(
-              52,
-            );
+            const storedValue = await Proxy.at(this.proxyAddress).getStorageAt(52);
             parseInt(storedValue).should.eq(42);
           });
         });

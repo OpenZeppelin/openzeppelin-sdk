@@ -4,13 +4,13 @@ title: Writing upgradeable contracts
 sidebar_label: Writing upgradeable contracts
 ---
 
-When working with upgradeable contracts in ZeppelinOS, there are a few minor caveats to keep in mind when writing your Solidity code. It's worth mentioning that these restrictions have their roots in how the Ethereum VM works, and apply to all projects that work with upgradeable contracts, not just ZeppelinOS.
+When working with upgradeable contracts in the OpenZeppelin SDK, there are a few minor caveats to keep in mind when writing your Solidity code. It's worth mentioning that these restrictions have their roots in how the Ethereum VM works, and apply to all projects that work with upgradeable contracts, not just the OpenZeppelin SDK.
 
 ## Initializers
 
-You can use your Solidity contracts in ZeppelinOS without any modifications, except for their _constructors_. Due to a requirement of the proxy-based upgradeability system, no constructors can be used in upgradeable contracts. You can read in-depth about the reasons behind this restriction [in the ZeppelinOS Upgrades Pattern page](pattern.md#the-constructor-caveat).
+You can use your Solidity contracts in the OpenZeppelin SDK without any modifications, except for their _constructors_. Due to a requirement of the proxy-based upgradeability system, no constructors can be used in upgradeable contracts. You can read in-depth about the reasons behind this restriction [in the OpenZeppelin SDK Upgrades Pattern page](pattern.md#the-constructor-caveat).
 
-This means that, when using a contract within ZeppelinOS, you need to change its constructor into a regular function, typically named `initialize`, where you run all the setup logic:
+This means that, when using a contract within the OpenZeppelin SDK, you need to change its constructor into a regular function, typically named `initialize`, where you run all the setup logic:
 
 ```solidity
 // NOTE: Do not use this code snippet, it's incomplete and has a critical vulnerability!
@@ -39,10 +39,10 @@ contract MyContract {
 }
 ```
 
-Since this pattern is very common when writing upgradeable contracts, ZeppelinOS provides an `Initializable` base contract that has an `initializer` modifier that takes care of this:
+Since this pattern is very common when writing upgradeable contracts, the OpenZeppelin SDK provides an `Initializable` base contract that has an `initializer` modifier that takes care of this:
 
 ```solidity
-import "zos-lib/contracts/Initializable.sol";
+import "@openzeppelin/upgrades/contracts/Initializable.sol";
 
 contract MyContract is Initializable {
   uint256 public x;
@@ -56,7 +56,7 @@ contract MyContract is Initializable {
 Another difference between a `constructor` and a regular function is that Solidity takes care of automatically invoking the constructors of all ancestors of a contract. When writing an initializer, you need to take special care to manually call the initializers of all parent contracts:
 
 ```solidity
-import "zos-lib/contracts/Initializable.sol";
+import "@openzeppelin/upgrades/contracts/Initializable.sol";
 
 contract BaseContract is Initializable {
   uint256 public y;
@@ -78,7 +78,7 @@ contract MyContract is BaseContract {
 
 ### Use upgradeable packages
 
-Keep in mind that this restriction affects not only your contracts, but also the contracts you import from a library. For instance, if you use the [`ERC20Detailed` token implementation](https://github.com/OpenZeppelin/openzeppelin-solidity/blob/v2.0.0/contracts/token/ERC20/ERC20Detailed.sol) from OpenZeppelin, the contract initializes the token's name, symbol and decimals in its constructor:
+Keep in mind that this restriction affects not only your contracts, but also the contracts you import from a library. For instance, if you use the [`ERC20Detailed` token implementation](https://github.com/OpenZeppelin/openzeppelin-contracts/blob/v2.0.0/contracts/token/ERC20/ERC20Detailed.sol) from OpenZeppelin, the contract initializes the token's name, symbol and decimals in its constructor:
 
 ```solidity
 Contract ERC20Detailed is IERC20 {
@@ -94,7 +94,7 @@ Contract ERC20Detailed is IERC20 {
 }
 ```
 
-This means that you should not be using these contracts in your ZeppelinOS project. Instead, make sure to use `openzeppelin-eth`, which is an official fork of OpenZeppelin, which has been modified to use initializers instead of constructors. For instance, an ERC20 implementation provided by `openzeppelin-eth` is the [`ERC20Mintable`](https://github.com/OpenZeppelin/openzeppelin-eth/blob/v2.0.2/contracts/token/ERC20/ERC20Mintable.sol):
+This means that you should not be using these contracts in your OpenZeppelin SDK project. Instead, make sure to use `@openzeppelin/contracts-ethereum-package`, which is an official fork of `openzeppelin-contracts` that has been modified to use initializers instead of constructors. For instance, an ERC20 implementation provided by `@openzeppelin/contracts-ethereum-package` is the [`ERC20Mintable`](https://github.com/OpenZeppelin/openzeppelin-contracts-ethereum-package/blob/v2.0.2/contracts/token/ERC20/ERC20Mintable.sol):
 
 ```solidity
 contract ERC20Mintable is Initializable, ERC20, MinterRole {
@@ -105,7 +105,7 @@ contract ERC20Mintable is Initializable, ERC20, MinterRole {
 }
 ```
 
-Whether it is OpenZeppelin or another EVM package, always make sure that the package is set up to handle upgradeable contracts.
+Whether it is OpenZeppelin Contracts or another Ethereum Package, always make sure that the package is set up to handle upgradeable contracts.
 
 ### Avoid initial values in field declarations
 
@@ -128,7 +128,7 @@ contract MyContract is Initializable {
 }
 ```
 
-Note that it still is fine to set constants here, because the compiler [does not reserve a storage slot for these variables](https://solidity.readthedocs.io/en/latest/contracts.html#constant-state-variables), and every occurrence is replaced by the respective constant expression. So the following still works with ZeppelinOS:
+Note that it still is fine to set constants here, because the compiler [does not reserve a storage slot for these variables](https://solidity.readthedocs.io/en/latest/contracts.html#constant-state-variables), and every occurrence is replaced by the respective constant expression. So the following still works in the OpenZeppelin SDK:
 
 ```solidity
 contract MyContract {
@@ -139,14 +139,14 @@ contract MyContract {
 
 ## Creating new instances from your contract code
 
-When creating a new instance of a contract from your contract's code, these creations are handled directly by Solidity and not by ZeppelinOS, which means that **these contracts will not be upgradeable**.
+When creating a new instance of a contract from your contract's code, these creations are handled directly by Solidity and not by the OpenZeppelin SDK, which means that **these contracts will not be upgradeable**.
 
-For instance, in the following example, even if `MyContract` is upgradeable (if created via `zos create MyContract`), the `token` contract created is not:
+For instance, in the following example, even if `MyContract` is upgradeable (if created via `openzeppelin create MyContract`), the `token` contract created is not:
 
 ```solidity
-import "zos-lib/contracts/Initializable.sol";
-import "openzeppelin-eth/contracts/token/ERC20/ERC20.sol";
-import "openzeppelin-eth/contracts/token/ERC20/RC20Detailed.sol";
+import "@openzeppelin/upgrades/contracts/Initializable.sol";
+import "@openzeppelin/contracts-ethereum-package/contracts/token/ERC20/ERC20.sol";
+import "@openzeppelin/contracts-ethereum-package/contracts/token/ERC20/RC20Detailed.sol";
 
 contract MyContract is Initializable {
   ERC20 public token;
@@ -157,31 +157,31 @@ contract MyContract is Initializable {
 }
 ```
 
-The easiest way around this issue is to avoid creating contracts on your own altogether: instead of creating a contract in an `initialize` function, simply accept an instance of that contract as a parameter, and inject it after creating it from ZeppelinOS:
+The easiest way around this issue is to avoid creating contracts on your own altogether: instead of creating a contract in an `initialize` function, simply accept an instance of that contract as a parameter, and inject it after creating it from the OpenZeppelin SDK:
 
 ```solidity
-import "zos-lib/contracts/Initializable.sol";
-import "openzeppelin-eth/contracts/token/ERC20/ERC20.sol";
+import "@openzeppelin/upgrades/contracts/Initializable.sol";
+import "@openzeppelin/contracts-ethereum-package/contracts/token/ERC20/ERC20.sol";
 
 contract MyContract is Initializable {
   ERC20 public token;
 
   function initialize(ERC20 _token) initializer public {
-    token = _token; // This contract will be upgradeable if it was created via ZeppelinOS
+    token = _token; // This contract will be upgradeable if it was created via the OpenZeppelin SDK
   }
 }
 ```
 
 ```console
-$ TOKEN=$(zos create TokenContract)
-$ zos create MyContract --init --args $TOKEN
+$ TOKEN=$(openzeppelin create TokenContract)
+$ openzeppelin create MyContract --init --args $TOKEN
 ```
 
-An advanced alternative, if you need to create upgradeable contracts on the fly, is to keep an instance of your ZeppelinOS `App` in your contracts. The [`App`](api_application_App.md) is a contract that acts as the entrypoint for your ZeppelinOS project, which has references to your logic implementations, and can create new contract instances:
+An advanced alternative, if you need to create upgradeable contracts on the fly, is to keep an instance of your OpenZeppelin SDK `App` in your contracts. The [`App`](api_application_App.md) is a contract that acts as the entrypoint for your OpenZeppelin SDK project, which has references to your logic implementations, and can create new contract instances:
 
 ```solidity
-import "zos-lib/contracts/Initializable.sol";
-import "zos-lib/contracts/application/App.sol";
+import "@openzeppelin/upgrades/contracts/Initializable.sol";
+import "@openzeppelin/upgrades/contracts/application/App.sol";
 
 contract MyContract is Initializable {
   App private app;
@@ -191,7 +191,7 @@ contract MyContract is Initializable {
   }
 
   function createNewToken() public returns(address) {
-    return app.create("openzeppelin-eth", "StandaloneERC20");
+    return app.create("@openzeppelin/contracts-ethereum-package", "StandaloneERC20");
   }
 }
 ```

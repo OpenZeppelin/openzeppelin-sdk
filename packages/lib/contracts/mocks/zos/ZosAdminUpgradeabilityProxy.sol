@@ -1,13 +1,13 @@
 pragma solidity ^0.5.0;
 
-import './BaseAdminUpgradeabilityProxy.sol';
+import './ZosBaseAdminUpgradeabilityProxy.sol';
 
 /**
  * @title AdminUpgradeabilityProxy
  * @dev Extends from BaseAdminUpgradeabilityProxy with a constructor for 
  * initializing the implementation, admin, and init data.
  */
-contract AdminUpgradeabilityProxy is BaseAdminUpgradeabilityProxy, UpgradeabilityProxy {
+contract ZosAdminUpgradeabilityProxy is ZosBaseAdminUpgradeabilityProxy, ZosUpgradeabilityProxy {
   /**
    * Contract constructor.
    * @param _logic address of the initial implementation.
@@ -17,8 +17,8 @@ contract AdminUpgradeabilityProxy is BaseAdminUpgradeabilityProxy, Upgradeabilit
    * https://solidity.readthedocs.io/en/v0.4.24/abi-spec.html#function-selector-and-argument-encoding.
    * This parameter is optional, if no data is given the initialization call to proxied contract will be skipped.
    */
-  constructor(address _logic, address _admin, bytes memory _data) UpgradeabilityProxy(_logic, _data) public payable {
-    assert(ADMIN_SLOT == bytes32(uint256(keccak256('eip1967.proxy.admin')) - 1));
+  constructor(address _logic, address _admin, bytes memory _data) ZosUpgradeabilityProxy(_logic, _data) public payable {
+    assert(ADMIN_SLOT == keccak256("org.zeppelinos.proxy.admin"));
     _setAdmin(_admin);
   }
 }

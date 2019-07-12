@@ -10,7 +10,7 @@ import { LOCK_FILE_PATH, OPEN_ZEPPELIN_FOLDER } from '../models/files/constants'
 
 const IGNORED_COMMANDS_IN_ROOT_DIR = ['init', 'unpack'];
 
-const [nodePath, zosPath, command] = process.argv;
+const [nodePath, binPath, command] = process.argv;
 
 if (!IGNORED_COMMANDS_IN_ROOT_DIR.includes(command)) {
   const currentPath = process.cwd();
@@ -31,6 +31,15 @@ try {
 }
 
 Loggy.silent(false);
+
+if (binPath.match(/zos$/)) {
+  Loggy.noSpin.warn(
+    __filename,
+    'oz-cli',
+    `deprecated-zos-bin`,
+    `'zos' command is deprecated and will be removed in the next major version. Please use 'openzeppelin' or 'oz' instead.`,
+  );
+}
 
 program.parse(process.argv);
 if (program.args.length === 0) program.help();

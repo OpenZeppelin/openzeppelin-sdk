@@ -10,7 +10,7 @@ pragma solidity ^0.5.0;
  * when the user imports a zos-lib contract (that transitively causes this contract to be compiled and added to the
  * build/artifacts folder) as well as the vanilla Ownable implementation from an openzeppelin version.
  */
-contract ZOSLibOwnable {
+contract OpenZeppelinUpgradesOwnable {
     address private _owner;
 
     event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);

@@ -10,14 +10,10 @@ import shouldBehaveLikeOwnable from '../../src/test/behaviors/Ownable';
 const ImplV1 = Contracts.getFromLocal('DummyImplementation');
 const ImplV2 = Contracts.getFromLocal('DummyImplementationV2');
 const ProxyAdmin = Contracts.getFromLocal('ProxyAdmin');
-const AdminUpgradeabilityProxy = Contracts.getFromLocal(
-  'AdminUpgradeabilityProxy',
-);
+const AdminUpgradeabilityProxy = Contracts.getFromLocal('AdminUpgradeabilityProxy');
 
 contract('ProxyAdmin', function(accounts) {
-  const [_, proxyAdminOwner, newAdmin, anotherAccount] = accounts.map(
-    utils.toChecksumAddress,
-  );
+  const [_, proxyAdminOwner, newAdmin, anotherAccount] = accounts.map(utils.toChecksumAddress);
 
   before('set implementations', async function() {
     this.implementationV1 = await ImplV1.new();
