@@ -19,7 +19,7 @@ is already configured to help you do so effortlessly.
 * Upgrade smart contracts. Fix bugs and security vulnerabilities,
   and introduce new features to your projects without migrating all your data.
 * Reuse on-chain code. Reuse on-chain Solidity code that has been vetted by the
-  community. Link to on-chain smart contract packages (Ethereum packages) as
+  community. Link to on-chain smart contract packages (Ethereum Packages) as
   building blocks for your project, and publish your packages for others to
   use. OpenZeppelin is included in the example.
 * Easily connect with Ethereum networks via preconfigured Infura API keys. Use

@@ -105,7 +105,7 @@ contract ERC20Mintable is Initializable, ERC20, MinterRole {
 }
 ```
 
-Whether it is OpenZeppelin Contracts or another Ethereum package, always make sure that the package is set up to handle upgradeable contracts.
+Whether it is OpenZeppelin Contracts or another Ethereum Package, always make sure that the package is set up to handle upgradeable contracts.
 
 ### Avoid initial values in field declarations
 

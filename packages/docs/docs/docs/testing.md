@@ -7,13 +7,13 @@ When working with the OpenZeppelin SDK, you can test your contracts as you usual
 
 Instead, you can use specifically designed OpenZeppelin SDK tools that automatically set up your entire project in your testing environment. This allows you to replicate the same set of contracts that manage your project for each test you run.
 
-The `@openzeppelin/cli` package provides a `TestHelper()` function to retrieve your project structure from the `.openzeppelin/project.json` file and deploy everything to the current test network. All the contracts that you have registered via `openzeppelin add`, plus all the contracts provided by the Ethereum packages you have linked, will be available. The returned project object (either a [`ProxyAdminProject`](https://github.com/OpenZeppelin/openzeppelin-sdk/blob/v2.2.0/packages/lib/src/project/ProxyAdminProject.ts) or an [`AppProject`](https://github.com/OpenZeppelin/openzeppelin-sdk/blob/v2.2.0/packages/lib/src/project/AppProject.ts)) provides convenient methods for creating upgradeable instances of your contracts, which you can use within your tests. Let's see how this would work in a simple project.
+The `@openzeppelin/cli` package provides a `TestHelper()` function to retrieve your project structure from the `.openzeppelin/project.json` file and deploy everything to the current test network. All the contracts that you have registered via `openzeppelin add`, plus all the contracts provided by the Ethereum Packages you have linked, will be available. The returned project object (either a [`ProxyAdminProject`](https://github.com/OpenZeppelin/openzeppelin-sdk/blob/v2.2.0/packages/lib/src/project/ProxyAdminProject.ts) or an [`AppProject`](https://github.com/OpenZeppelin/openzeppelin-sdk/blob/v2.2.0/packages/lib/src/project/AppProject.ts)) provides convenient methods for creating upgradeable instances of your contracts, which you can use within your tests. Let's see how this would work in a simple project.
 
 ## Setting up a sample project
 
 The following section describes a succinct way in how a simple OpenZeppelin SDK project can be set up. If you already have a project set up, you may skip to the next section.
 
-_If you don't understand what's going on in this section, please refer to the Quickstart guides of the documentation, specifically the [Deploying your first project](deploying), [Upgrading your project](upgrading) and [Linking to Ethereum packages](linking) guides. These guides provide detailed explanations on how a basic OpenZeppelin SDK project works._
+_If you don't understand what's going on in this section, please refer to the Quickstart guides of the documentation, specifically the [Deploying your first project](deploying), [Upgrading your project](upgrading) and [Linking to Ethereum Packages](linking) guides. These guides provide detailed explanations on how a basic OpenZeppelin SDK project works._
 
 Create a new project by running:
 
@@ -48,7 +48,7 @@ Now, add your contract to your OpenZeppelin SDK project:
 npx openzeppelin add Sample
 ```
 
-And link your OpenZeppelin SDK project to the `@openzeppelin/contracts-ethereum-package` Ethereum package:
+And link your OpenZeppelin SDK project to the `@openzeppelin/contracts-ethereum-package` Ethereum Package:
 
 ```
 npx openzeppelin link @openzeppelin/contracts-ethereum-package
@@ -83,7 +83,7 @@ contract('Sample', function () {
     result.should.eq('A sample');
   })
 
-  it('should create a proxy for the Ethereum package', async function () {
+  it('should create a proxy for the Ethereum Package', async function () {
     const proxy = await this.project.createProxy(ERC20, { contractName: 'StandaloneERC20', packageName: '@openzeppelin/contracts-ethereum-package' });
     const result = await proxy.methods.totalSupply().call();
     result.should.eq('0');

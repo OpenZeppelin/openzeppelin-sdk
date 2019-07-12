@@ -10,7 +10,7 @@ on Ethereum and every other EVM and eWASM-powered blockchain.
 
 * **Interactive commands**: Send transactions, query balances, and interact with your contracts directly from the command line.
 * **Upgrade your contracts**: You can develop your smart contracts iteratively, speeding up development locally, or squashing bugs in production.
-* **Link Ethereum packages**: Use code from contracts already deployed to the blockchain directly on your project, saving gas on deployments and managing your dependencies securely.
+* **Link Ethereum Packages**: Use code from contracts already deployed to the blockchain directly on your project, saving gas on deployments and managing your dependencies securely.
 * **Build a (d)app**: Jumpstart your dapp by unpacking one of our starter kits, pre-configured with OpenZeppelin Contracts, OpenZeppelin SDK, React, and Infura.
 
 ## Getting Started

@@ -29,7 +29,7 @@ This on-boarding plan considers the following assumptions:
 
 The central idea of this proposal is to deploy an upgradeable version of your token, using the OpenZeppelin command line
 tool. Additionally, we will use the [`ERC20Migrator`](https://github.com/OpenZeppelin/openzeppelin-contracts-ethereum-package/blob/v2.0.0/contracts/drafts/ERC20Migrator.sol)
-contract provided by `@openzeppelin/contracts-ethereum-package`, the [OpenZeppelin Contracts Ethereum package](https://github.com/OpenZeppelin/openzeppelin-contracts-ethereum-package/).
+contract provided by `@openzeppelin/contracts-ethereum-package`, the [OpenZeppelin Contracts Ethereum Package](https://github.com/OpenZeppelin/openzeppelin-contracts-ethereum-package/).
 
 To better describe this plan we will use a sample project you can follow and clone from [here](https://github.com/OpenZeppelin/erc20-onboarding/tree/zos-2.1).
 
@@ -118,7 +118,7 @@ contract MyUpgradeableToken is Initializable, ERC20, ERC20Detailed, ERC20Mintabl
 
 On one hand, it is very important to replicate all the information and functionality that was provided by the
 legacy token. In this case, we are inheriting from the `ERC20` and `ERC20Detailed` contracts provided by the
-OpenZeppelin Contracts Ethereum package to replicate all the functionality of an ERC20 token.
+OpenZeppelin Contracts Ethereum Package to replicate all the functionality of an ERC20 token.
 
 On the other hand, we are defining an `initialize` method that receives an `ERC20Migrator` instance that will take care
 of all the migration functionality we will need. To work with `ERC20Migrator`, your upgradeable token has to be
@@ -131,9 +131,9 @@ modifier will make sure your `initialize` method can only be called once in the 
 Notice that all the contracts from `@openzeppelin/contracts-ethereum-package` have been adapted for OpenZeppelin SDK compatibility, and should be the
 ones used when dealing with upgradeable contracts.
 
-Besides allowing us to build upgradeable applications, the OpenZeppelin SDK provides Ethereum packages. To use an Ethereum package
-in our project, we simply need to use the `link` command giving the name of the npm package of the Ethereum package we want
-to use. In this case, we will link the OpenZeppelin Contracts Ethereum package to be able to use the contracts it provides in our project:
+Besides allowing us to build upgradeable applications, the OpenZeppelin SDK provides Ethereum Packages. To use an Ethereum Package
+in our project, we simply need to use the `link` command giving the name of the npm package of the Ethereum Package we want
+to use. In this case, we will link the OpenZeppelin Contracts Ethereum Package to be able to use the contracts it provides in our project:
 
 ```console
 npx openzeppelin link @openzeppelin/contracts-ethereum-package
@@ -145,25 +145,25 @@ Finally we can add our upgradeable token contract to the project:
 npx openzeppelin add MyUpgradeableToken
 ```
 
-Great, our project has been linked to the OpenZeppelin Contracts Ethereum package and our `MyUpgradeableToken` has been added.
+Great, our project has been linked to the OpenZeppelin Contracts Ethereum Package and our `MyUpgradeableToken` has been added.
 
 ### 2. Deploy the upgradeable token
 
 The first thing we have to do is to deploy our contract source code. We will also need to deploy a copy of the
-OpenZeppelin Contracts Ethereum package since we will be working on a local environment. To do so, run the following command:
+OpenZeppelin Contracts Ethereum Package since we will be working on a local environment. To do so, run the following command:
 
 ```console
 npx openzeppelin push -n local --deploy-dependencies
 ```
 
-_Note that we are using the `--deploy-dependencies` to deploy the OpenZeppelin Contracts Ethereum package locally, since it is not
+_Note that we are using the `--deploy-dependencies` to deploy the OpenZeppelin Contracts Ethereum Package locally, since it is not
 deployed in our local blockchain yet._
 
-We have just deployed the `MyUpgradeableToken` source code and the OpenZeppelin Contracts Ethereum package to the `local` network. A
+We have just deployed the `MyUpgradeableToken` source code and the OpenZeppelin Contracts Ethereum Package to the `local` network. A
 new `.openzeppelin/dev-<network_id>.json` file should have been created.
 
 Now, let's create a new instance of the upgradeable token using the OpenZeppelin SDK. To do so, we will need to create an
-instance of an `ERC20Migrator` first, but given it is not yet provided by the OpenZeppelin Contracts Ethereum package, we will have
+instance of an `ERC20Migrator` first, but given it is not yet provided by the OpenZeppelin Contracts Ethereum Package, we will have
 to add it manually. Then, run the following commands:
 replacing `LEGACY_TOKEN_ADDRESS` with the address of the legacy token contract:
 ```console
