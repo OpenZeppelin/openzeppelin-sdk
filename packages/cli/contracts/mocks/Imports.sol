@@ -1,5 +1,5 @@
 pragma solidity ^0.5.0;
 
-import "zos-lib/contracts/mocks/StorageMocksForComparison.sol";
-import "zos-lib/contracts/mocks/Invalid.sol";
-import "zos-lib/contracts/mocks/WithInitialize.sol";
+import "@openzeppelin/upgrades/contracts/mocks/StorageMocksForComparison.sol";
+import "@openzeppelin/upgrades/contracts/mocks/Invalid.sol";
+import "@openzeppelin/upgrades/contracts/mocks/WithInitialize.sol";

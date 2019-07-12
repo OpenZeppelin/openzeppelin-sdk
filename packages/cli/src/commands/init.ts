@@ -1,12 +1,12 @@
 import push from './push';
 import init from '../scripts/init';
 import { promptIfNeeded, InquirerQuestions } from '../prompts/prompt';
-import { FileSystem } from 'zos-lib';
+import { FileSystem } from '@openzeppelin/upgrades';
 import ProjectFile from '../models/files/ProjectFile';
 
 const name = 'init';
 const signature = `${name} [project-name] [version]`;
-const description = `initialize your ZeppelinOS project. Provide a <project-name> and optionally an initial [version] name`;
+const description = `initialize your OpenZeppelin project. Provide a <project-name> and optionally an initial [version] name`;
 
 const register: (program: any) => any = program =>
   program
@@ -48,7 +48,7 @@ async function runActionIfNeeded(options: any): Promise<void> {
 function getCommandProps(): InquirerQuestions {
   return {
     name: {
-      message: 'Welcome to ZeppelinOS! Choose a name for your project',
+      message: 'Welcome to OpenZeppelin! Choose a name for your project',
       type: 'input',
     },
     version: {

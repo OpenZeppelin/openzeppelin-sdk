@@ -1,5 +1,5 @@
 import pickBy from 'lodash.pickby';
-import { ZWeb3 } from 'zos-lib';
+import { ZWeb3 } from '@openzeppelin/upgrades';
 
 import { parseContractReference } from '../utils/contract';
 import { SetAdminPropsParams, SetAdminSelectionParams } from './interfaces';

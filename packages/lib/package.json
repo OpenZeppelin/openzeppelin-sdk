@@ -1,7 +1,7 @@
 {
-  "name": "zos-lib",
+  "name": "@openzeppelin/upgrades",
   "version": "2.4.0",
-  "description": "JavaScript library for the ZeppelinOS smart contract platform",
+  "description": "JavaScript library for the OpenZeppelin smart contract platform",
   "main": "./lib/index.js",
   "private": false,
   "license": "MIT",
@@ -30,6 +30,8 @@
     "contracts"
   ],
   "keywords": [
+    "openzeppelin",
+    "openzeppelin-sdk",
     "zeppelinos",
     "zeppelin",
     "ethereum",
@@ -42,12 +44,12 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/zeppelinos/zos.git"
+    "url": "git+https://github.com/OpenZeppelin/openzeppelin-sdk.git"
   },
   "bugs": {
-    "url": "https://github.com/zeppelinos/zos/issues"
+    "url": "https://github.com/OpenZeppelin/openzeppelin-sdk/issues"
   },
-  "homepage": "https://github.com/zeppelinos/zos/tree/master/packages/lib#readme",
+  "homepage": "https://github.com/OpenZeppelin/openzeppelin-sdk/tree/master/packages/lib#readme",
   "dependencies": {
     "@types/cbor": "^2.0.0",
     "@types/web3": "^1.0.14",

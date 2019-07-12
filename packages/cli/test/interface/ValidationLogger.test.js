@@ -7,7 +7,7 @@ import {
   getStorageLayout,
   compareStorageLayouts,
   getBuildArtifacts,
-} from 'zos-lib';
+} from '@openzeppelin/upgrades';
 import ValidationLogger from '../../src/interface/ValidationLogger';
 
 contract('ValidationLogger', function() {

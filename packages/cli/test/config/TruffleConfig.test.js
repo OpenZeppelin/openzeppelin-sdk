@@ -3,7 +3,7 @@ require('../setup');
 import npm from 'npm-programmatic';
 import sinon from 'sinon';
 
-import { FileSystem } from 'zos-lib';
+import { FileSystem } from '@openzeppelin/upgrades';
 import TruffleConfig from '../../src/models/config/TruffleConfig';
 import CaptureLogs from '../helpers/captureLogs';
 

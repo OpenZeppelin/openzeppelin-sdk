@@ -2,14 +2,14 @@ import path from 'path';
 import pick from 'lodash.pick';
 import omit from 'lodash.omit';
 import isUndefined from 'lodash.isundefined';
-import { FileSystem } from 'zos-lib';
+import { FileSystem } from '@openzeppelin/upgrades';
 
-interface NetworkConfig extends Config {
+interface NetworkConfigInterface extends ConfigInterface {
   artifactDefaults: ArtifactDefaults;
   network: Network;
 }
 
-interface Config {
+interface ConfigInterface {
   networks: { [network: string]: Network };
   provider: Provider;
   buildDir: string;
@@ -47,19 +47,19 @@ type Provider = string | ((any) => any);
 // TODO: remove after managing compiler info in project.json
 type CompilersInfo = any;
 
-const ZosConfig = {
-  name: 'ZosConfig',
+const NetworkConfig = {
+  name: 'NetworkConfig',
 
   initialize(root: string = process.cwd()): void {
     this.createContractsDir(root);
-    this.createZosConfigFile(root);
+    this.createNetworkConfigFile(root);
   },
 
   exists(root: string = process.cwd()): boolean {
     return FileSystem.exists(`${root}/networks.js`);
   },
 
-  getConfig(root: string = process.cwd()): Config {
+  getConfig(root: string = process.cwd()): ConfigInterface {
     // eslint-disable-next-line @typescript-eslint/no-var-requires
     const zosConfigFile = require(`${root}/networks.js`);
     const compilers = zosConfigFile.compilers || this.getDefaultCompilersProperties();
@@ -72,7 +72,7 @@ const ZosConfig = {
     return `${process.cwd()}/build/contracts`;
   },
 
-  loadNetworkConfig(networkName: string, root: string = process.cwd()): NetworkConfig {
+  loadNetworkConfig(networkName: string, root: string = process.cwd()): NetworkConfigInterface {
     const config = this.getConfig(root);
     const { networks } = config;
     if (!networks[networkName]) throw Error(`Given network '${networkName}' is not defined in your networks.js file`);
@@ -104,7 +104,7 @@ const ZosConfig = {
     return provider;
   },
 
-  getArtifactDefaults(zosConfigFile: Config, network: Network): ArtifactDefaults {
+  getArtifactDefaults(zosConfigFile: ConfigInterface, network: Network): ArtifactDefaults {
     const defaults = ['gas', 'gasPrice', 'from'];
     const configDefaults = omit(pick(zosConfigFile, defaults), isUndefined);
     const networkDefaults = omit(pick(network, defaults), isUndefined);
@@ -131,7 +131,7 @@ const ZosConfig = {
     this.createDir(contractsDir);
   },
 
-  createZosConfigFile(root: string): void {
+  createNetworkConfigFile(root: string): void {
     if (!this.exists(root)) {
       const blueprint = path.resolve(__dirname, './blueprint.networks.js');
       FileSystem.copy(blueprint, `${root}/networks.js`);
@@ -146,4 +146,4 @@ const ZosConfig = {
   },
 };
 
-export default ZosConfig;
+export default NetworkConfig;

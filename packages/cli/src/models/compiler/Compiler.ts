@@ -1,5 +1,5 @@
 import { execFile as callbackExecFile, ExecException } from 'child_process';
-import { Loggy } from 'zos-lib';
+import { Loggy } from '@openzeppelin/upgrades';
 import Truffle from '../config/TruffleConfig';
 import { compileProject, ProjectCompilerOptions, ProjectCompileResult } from './solidity/SolidityProjectCompiler';
 import findUp from 'find-up';

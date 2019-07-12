@@ -1,6 +1,6 @@
 import pickBy from 'lodash.pickby';
 
-import { TxParams } from 'zos-lib';
+import { TxParams } from '@openzeppelin/upgrades';
 
 import create from '../scripts/create';
 import queryDeployment from '../scripts/query-deployment';

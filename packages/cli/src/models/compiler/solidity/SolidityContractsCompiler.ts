@@ -1,5 +1,5 @@
 import flatMap from 'lodash.flatmap';
-import { Loggy } from 'zos-lib';
+import { Loggy } from '@openzeppelin/upgrades';
 import solc, {
   CompilerOptimizerOptions,
   CompilerSettings,

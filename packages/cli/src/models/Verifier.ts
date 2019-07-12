@@ -2,7 +2,7 @@ import axios from 'axios';
 import cheerio from 'cheerio';
 import querystring from 'querystring';
 
-import { sleep, Loggy } from 'zos-lib';
+import { sleep, Loggy } from '@openzeppelin/upgrades';
 
 // Max number of API request retries on error
 const RETRY_COUNT = 3;
@@ -29,7 +29,7 @@ const Verifier = {
       await publishToEtherscan(params);
     } else {
       throw Error(
-        'Invalid remote. Currently, ZeppelinOS contract verifier supports etherchain and etherscan as remote verification applications.',
+        'Invalid remote. Currently, the OpenZeppelin contract verifier supports only etherchain and etherscan as remote verification applications.',
       );
     }
   },

@@ -1,31 +1,31 @@
-# ZeppelinOS _(zos)_
+# OpenZeppelin SDK _(openzeppelin-sdk)_
 
 [![standard-readme compliant](https://img.shields.io/badge/readme%20style-standard-brightgreen.svg)](https://github.com/RichardLitt/standard-readme)
-[![CircleCI](https://circleci.com/gh/zeppelinos/zos/tree/master.svg?style=shield)](https://circleci.com/gh/zeppelinos/zos/tree/master)
+[![CircleCI](https://circleci.com/gh/OpenZeppelin/openzeppelin-sdk/tree/master.svg?style=shield)](https://circleci.com/gh/OpenZeppelin/openzeppelin-sdk/tree/master)
 [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lernajs.io/)
 
-> ZeppelinOS smart contract platform.
+> OpenZeppelin smart contract platform.
 
-ZeppelinOS is a platform to develop, deploy and operate smart contract
+OpenZeppelin is a platform to develop, deploy and operate smart contract
 projects on Ethereum and every other EVM and eWASM-powered blockchain.
 
-This repository includes the ZeppelinOS
-[Command-Line Interface](https://github.com/zeppelinos/zos/tree/master/packages/cli#readme),
-[JavaScript Library](https://github.com/zeppelinos/zos/tree/master/packages/lib#readme),
-and [the sources for the Documentation Website](https://github.com/zeppelinos/zos/tree/master/packages/docs#readme).
+This repository includes the OpenZeppelin
+[Command-Line Interface](https://github.com/OpenZeppelin/openzeppelin-sdk/tree/master/packages/cli#readme),
+[JavaScript Library](https://github.com/OpenZeppelin/openzeppelin-sdk/tree/master/packages/lib#readme),
+and [the sources for the Documentation Website](https://github.com/OpenZeppelin/openzeppelin-sdk/tree/master/packages/docs#readme).
 
 ## Install
 
 First, install [Node.js](http://nodejs.org/) and [npm](https://npmjs.com/).
-Then, install ZeppelinOS running:
+Then, install the OpenZeppelin SDK running:
 
 ```sh
-npm install --global zos
+npm install --global @openzeppelin/cli
 ```
 
 ## Usage
 
-We recommend to use ZeppelinOS through the `zos` command-line interface.
+We recommend to use the OpenZeppelin SDK through the `openzeppelin sdk` command-line interface.
 
 To start, create a directory for the project and access it:
 
@@ -40,22 +40,22 @@ Use `npm` to create a `package.json` file:
 npm init
 ```
 
-And initialize the ZeppelinOS project:
+And initialize the OpenZeppelin SDK project:
 
 ```sh
-zos init my-project
+openzeppelin init my-project
 ```
 
-Now it is possible to add contracts to the project with the `zos add` command,
-push these contracts to a blockchain network with `zos push`, use
-`zos create` to create instances for these contracts that later can be
+Now it is possible to add contracts to the project with the `openzeppelin add` command,
+push these contracts to a blockchain network with `openzeppelin push`, use
+`openzeppelin create` to create instances for these contracts that later can be
 upgraded, and many more things.
 
-Run `zos --help` for more details about thes and all the other functions of
-ZeppelinOS.
+Run `openzeppelin --help` for more details about thes and all the other functions of the
+OpenZeppelin CLI.
 
 The
-[ZeppelinOS documentation](https://docs.zeppelinos.org/)
+[OpenZeppelin SDK documentation](https://docs.openzeppelin.com/sdk/2.4)
 explains how to build a project using our platform, how to upgrade contracts,
 how to share packages for other projects to reuse, how to vouch for the quality
 of a package, how to use the JavaScript libraries to operate the project, and
@@ -63,7 +63,7 @@ it explains details of the platform and some advanced topics.
 
 ## Security
 
-If you find a security issue, please contact us at security@zeppelinos.org. We
+If you find a security issue, please contact us at security@openzeppelin.com. We
 give rewards for reported issues, according to impact and severity.
 
 ## Maintainers
@@ -78,14 +78,14 @@ Run `npm install` in the root of the project, followed by `npx lerna bootstrap` 
 
 ## Contribute
 
-To contribute, join our [forum](https://forum.zeppelin.solutions) or
+To contribute, join our [forum](https://forum.openzeppelin.com) or
 [community channel on Telegram](https://t.me/zeppelinos), where you can talk to
-all the ZeppelinOS developers, contributors, partners, and users.
+all the OpenZeppelin developers, contributors, partners, and users.
 
 You can also follow the recent developments of the project in our
-[blog](https://blog.zeppelin.solutions/) and
-[Twitter account](https://twitter.com/zeppelinorg).
+[blog](https://blog.openzeppelin.com/) and
+[Twitter account](https://twitter.com/openzeppelin).
 
 ## License
 
-[MIT](LICENSE) © Zeppelin
+[MIT](LICENSE) © OpenZeppelin

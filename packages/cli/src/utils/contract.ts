@@ -1,4 +1,4 @@
-import { Contracts, Contract } from 'zos-lib';
+import { Contracts, Contract } from '@openzeppelin/upgrades';
 import { fromContractFullName } from './naming';
 import Dependency from '../models/dependency/Dependency';
 

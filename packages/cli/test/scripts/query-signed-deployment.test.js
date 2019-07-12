@@ -5,7 +5,7 @@ import random from 'lodash.random';
 import querySignedDeployment from '../../src/scripts/query-signed-deployment';
 import ProjectFile from '../../src/models/files/ProjectFile';
 import NetworkFile from '../../src/models/files/NetworkFile';
-import { helpers } from 'zos-lib';
+import { helpers } from '@openzeppelin/upgrades';
 import push from '../../src/scripts/push';
 import queryDeployment from '../../src/scripts/query-deployment';
 

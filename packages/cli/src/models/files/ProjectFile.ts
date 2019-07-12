@@ -3,7 +3,7 @@ import pickBy from 'lodash.pickby';
 import isEqual from 'lodash.isequal';
 import isEmpty from 'lodash.isempty';
 
-import { Loggy, FileSystem as fs } from 'zos-lib';
+import { Loggy, FileSystem as fs } from '@openzeppelin/upgrades';
 import Dependency from '../dependency/Dependency';
 import { MANIFEST_VERSION, checkVersion } from './ManifestVersion';
 import { OPEN_ZEPPELIN_FOLDER } from './constants';

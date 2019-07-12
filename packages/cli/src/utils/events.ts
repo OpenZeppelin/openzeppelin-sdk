@@ -1,4 +1,4 @@
-import { Loggy } from 'zos-lib';
+import { Loggy } from '@openzeppelin/upgrades';
 
 export function describeEvents(events: any): void {
   let description = '';

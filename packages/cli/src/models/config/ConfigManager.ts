@@ -1,17 +1,12 @@
-import { ZWeb3, Contracts, TxParams } from 'zos-lib';
+import { ZWeb3, Contracts, TxParams } from '@openzeppelin/upgrades';
 import TruffleConfig from './TruffleConfig';
 import Session from '../network/Session';
-import ZosConfig from './ZosConfig';
-
-export interface NetworkConfig {
-  network: string;
-  txParams: TxParams;
-}
+import NetworkConfig from './NetworkConfig';
 
 const ConfigManager = {
   initialize(root: string = process.cwd()): void {
-    if (!TruffleConfig.exists() && !ZosConfig.exists()) {
-      ZosConfig.initialize(root);
+    if (!TruffleConfig.exists() && !NetworkConfig.exists()) {
+      NetworkConfig.initialize(root);
     }
   },
 
@@ -25,7 +20,7 @@ const ConfigManager = {
     options: any = {},
     silent?: boolean,
     root: string = process.cwd(),
-  ): Promise<NetworkConfig | never> {
+  ): Promise<{ network: string, txParams: TxParams } | never> {
     this.initStaticConfiguration(root);
     const { network: networkName, from, timeout } = Session.getOptions(options, silent);
     Session.setDefaultNetworkIfNeeded(options.network);
@@ -46,7 +41,7 @@ const ConfigManager = {
 
       return { network: await ZWeb3.getNetworkName(), txParams };
     } catch (error) {
-      if (this.config && this.config.name === 'ZosConfig') {
+      if (this.config && this.config.name === 'NetworkConfig') {
         const providerInfo = typeof provider === 'string' ? ` on ${provider}` : '';
         const message = `Could not connect to the ${networkName} Ethereum network${providerInfo}. Please check your networks.js configuration file.`;
         error.message = `${message} Error: ${error.message}.`;
@@ -81,8 +76,8 @@ const ConfigManager = {
     if (this.config) return;
 
     // these lines could be expanded to support different libraries like embark, ethjs, buidler, etc
-    if (ZosConfig.exists(root)) {
-      this.config = ZosConfig;
+    if (NetworkConfig.exists(root)) {
+      this.config = NetworkConfig;
     } else if (TruffleConfig.exists(root)) {
       this.config = TruffleConfig;
     } else {

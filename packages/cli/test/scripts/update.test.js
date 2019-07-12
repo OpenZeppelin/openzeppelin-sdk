@@ -3,7 +3,7 @@ require('../setup');
 
 import mapKeys from 'lodash.mapkeys';
 import omit from 'lodash.omit';
-import { Contracts, Proxy } from 'zos-lib';
+import { Contracts, Proxy } from '@openzeppelin/upgrades';
 import CaptureLogs from '../helpers/captureLogs';
 
 import add from '../../src/scripts/add';

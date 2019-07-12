@@ -1,5 +1,5 @@
-const { ConfigManager, files, scripts, stdout } = require('zos');
-const { helpers, Contracts } = require('zos-lib');
+const { ConfigManager, files, scripts, stdout } = require('@openzeppelin/cli');
+const { helpers, Contracts } = require('@openzeppelin/upgrades');
 
 stdout.silent(true);
 
@@ -54,7 +54,7 @@ async function useSignedCreate2(initValue, networkConfig) {
   // And will use the current implementation for Sample as logic contract
   const logic = networkFile.contract('Sample').address;
 
-  // We now ask zos-lib to sign the request for us
+  // We now ask @openzeppelin/upgrades to sign the request for us
   const signature = helpers.signDeploy(networkFile.proxyFactoryAddress, salt, logic, admin, initData, signerPk);
   
   // Query the deployment address for that signature

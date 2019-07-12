@@ -1,7 +1,7 @@
 'use strict'
 require('../setup')
 
-import { assertRevert } from 'zos-lib'
+import { assertRevert } from '@openzeppelin/upgrades'
 import shouldBehaveLikeDonations from './Donations.behavior.js'
 
 export default function(owner, donor, wallet, tokenName, tokenSymbol) {

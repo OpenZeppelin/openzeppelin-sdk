@@ -2,7 +2,7 @@
 require('../setup')
 
 import sinon from 'sinon';
-import { FileSystem, Contracts, ZWeb3 } from 'zos-lib';
+import { FileSystem, Contracts, ZWeb3 } from '@openzeppelin/upgrades';
 
 import ConfigManager from '../../src/models/config/ConfigManager';
 
@@ -91,7 +91,7 @@ describe('ConfigManager', function() {
     describe('#setBaseConfig', function() {
       it('sets the correct config', function() {
         ConfigManager.setBaseConfig(configFileDir);
-        ConfigManager.config.should.have.property('createZosConfigFile');
+        ConfigManager.config.should.have.property('createNetworkConfigFile');
       });
     });
   });

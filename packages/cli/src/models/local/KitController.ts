@@ -2,7 +2,7 @@ import path from 'path';
 import axios from 'axios';
 import fs from 'fs-extra';
 import Ajv from 'ajv';
-import { Loggy } from 'zos-lib';
+import { Loggy } from '@openzeppelin/upgrades';
 
 import { OPEN_ZEPPELIN_FOLDER } from '../files/constants';
 import KitFile, { MANIFEST_VERSION } from '../files/KitFile';

@@ -2,7 +2,7 @@
 require('./setup')
 const deploy = require('../index.js')
 
-import { Contracts } from 'zos-lib'
+import { Contracts } from '@openzeppelin/upgrades'
 import shouldBehaveLikeDonations from './behaviors/Donations.behavior'
 import shouldBehaveLikeDonationsWithTokens from './behaviors/DonationsWithTokens.behavior'
 

@@ -1,29 +1,29 @@
-# ZeppelinOS JavaScript Library _(zos-lib)_
+# OpenZeppelin SDK JavaScript Library _(@openzeppelin/upgrades)_
 
 [![standard-readme compliant](https://img.shields.io/badge/readme%20style-standard-brightgreen.svg)](https://github.com/RichardLitt/standard-readme)
-[![NPM Package](https://img.shields.io/npm/v/zos-lib.svg?style=flat-square)](https://www.npmjs.org/package/zos-lib)
-[![Build Status](https://travis-ci.com/zeppelinos/zos.svg?branch=master)](https://travis-ci.com/zeppelinos/zos)
+[![NPM Package](https://img.shields.io/npm/v/@openzeppelin/upgrades.svg?style=flat-square)](https://www.npmjs.org/package/@openzeppelin/upgrades)
+[![CircleCI](https://circleci.com/gh/OpenZeppelin/openzeppelin-sdk/tree/master.svg?style=shield)](https://circleci.com/gh/OpenZeppelin/openzeppelin-sdk/tree/master)
 [![Coverage Status](https://coveralls.io/repos/github/zeppelinos/zos-lib/badge.svg?branch=master)](https://coveralls.io/github/zeppelinos/zos-lib?branch=master)
 
-> JavaScript library for the ZeppelinOS smart contract platform.
+> JavaScript library for the OpenZeppelin smart contract platform.
 
-ZeppelinOS is a platform to develop, deploy and operate smart contract
+OpenZeppelin SDK is a platform to develop, deploy and operate smart contract
 projects on Ethereum and every other EVM and eWASM-powered blockchain.
 
-This is the repository for the ZeppelinOS JavaScript library. It is mainly used
+This is the repository for the OpenZeppelin SDK JavaScript library. It is mainly used
 by the
-[`zos` command-line interface](https://github.com/zeppelinos/zos/tree/master/packages/cli#zeppelinos-command-line-interface),
-which is the recommended way to use ZeppelinOS; but this library can also be
-used directly to operate ZeppelinOS projects when a programmatic interface is
+[`openzeppelin-sdk` command-line interface](https://github.com/OpenZeppelin/openzeppelin-sdk/tree/master/packages/cli#openzeppelin-sdk-command-line-interface-openzeppelincli),
+which is the recommended way to use the OpenZeppelin SDK; but this library can also be
+used directly to operate projects when a programmatic interface is
 preferred or more flexibility and lower-level access is required.
 
 ## Install
 
 First, install [Node.js](http://nodejs.org/) and [npm](https://npmjs.com/).
-Then, install the ZeppelinOS JavaScript Library running:
+Then, install the OpenZeppelin SDK JavaScript Library running:
 
 ```sh
-npm install zos-lib
+npm install @openzeppelin/upgrades
 ```
 
 ## Usage
@@ -40,7 +40,7 @@ node
 ```
 
 ```js
-> const { ZWeb3, Contracts, SimpleProject } = require('zos-lib')
+> const { ZWeb3, Contracts, SimpleProject } = require('@openzeppelin/upgrades')
 > // Initialize a web3 provider.
 > ZWeb3.initialize("http://localhost:9545")
 > // Load the contract.
@@ -56,7 +56,7 @@ node
 
 ## Security
 
-If you find a security issue, please contact us at security@zeppelinos.org. We
+If you find a security issue, please contact us at security@openzeppelin.com. We
 give rewards for reported issues, according to impact and severity.
 
 ## API
@@ -65,19 +65,20 @@ TODO.
 
 ## Maintainers
 
-* [@facuspagnuolo](https://github.com/facuspagnuolo/)
 * [@spalladino](https://github.com/spalladino)
+* [@jcarpanelli](https://github.com/jcarpanelli)
+* [@ylv-io](https://github.com/ylv-io)
 
 ## Contribute
 
 To contribute, join our
 [community channel on Telegram](https://t.me/zeppelinos) where you can talk to
-all the ZeppelinOS developers, contributors, partners and users.
+all the OpenZeppelin developers, contributors, partners and users.
 
 You can also follow the recent developments of the project in our
-[blog](https://blog.zeppelin.solutions/) and
-[Twitter account](https://twitter.com/zeppelinorg).
+[blog](https://blog.openzeppelin.com/) and
+[Twitter account](https://twitter.com/openzeppelin).
 
 ## License
 
-[MIT](LICENSE.md) © Zeppelin
+[MIT](LICENSE.md) © OpenZeppelin

@@ -16,7 +16,7 @@ import {
   constructorCode,
   semanticVersionToString,
   Contract,
-} from 'zos-lib';
+} from '@openzeppelin/upgrades';
 import { fromContractFullName, toContractFullName } from '../../utils/naming';
 import { MANIFEST_VERSION, checkVersion } from './ManifestVersion';
 import ProjectFile from './ProjectFile';

@@ -1,5 +1,5 @@
 // Load zos scripts and truffle wrapper function
-const { ConfigManager, scripts } = require('zos');
+const { ConfigManager, scripts } = require('@openzeppelin/cli');
 const { add, push, update } = scripts;
 
 async function deploy(options) {

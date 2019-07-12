@@ -2,7 +2,7 @@ import unpack from '../scripts/unpack';
 
 const name = 'unpack';
 const signature = `${name} [kit]`;
-const description = `download and install a ZeppelinOS kit to the current directory`;
+const description = `download and install an OpenZeppelin Starter Kit to the current directory`;
 
 const register: (program: any) => any = program =>
   program

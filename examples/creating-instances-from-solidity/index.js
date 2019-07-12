@@ -12,9 +12,9 @@
 // Import node dependencies.
 const fs = require('fs');
 
-// Import ZeppelinOS `zos` and `zos-lib` dependencies.
-const zos = require('zos');
-const lib = require('zos-lib');
+// Import @openzeppelin/cli and @openzeppelin/upgrades dependencies.
+const zos = require('@openzeppelin/cli');
+const lib = require('@openzeppelin/upgrades');
 
 // Main entry point, called by `truffle exec`.
 async function main() {
@@ -106,7 +106,7 @@ async function main() {
   // This is the main concept of this example: proxies can be created from deployed contracts.
   console.log(`Creating proxy instance of Instance.sol (via Factory.sol)...`);
   const transactionReceipt = await factoryContract.methods.createInstance(data).send(txParams);
-  const uint256ToAddress = require('zos-lib/lib/utils/Addresses.js').uint256ToAddress;
+  const uint256ToAddress = require('@openzeppelin/upgrades/lib/utils/Addresses.js').uint256ToAddress;
   const instanceAddress = uint256ToAddress(transactionReceipt.events['0'].raw.data);
   console.log(`Instance proxy created at ${instanceAddress}`);
 
