@@ -24,7 +24,7 @@ describe('Compiler', function () {
   });
 
   it('compiles with zos if explicitly set', async function () {
-    await this.compile({ manager: 'zos' });
+    await this.compile({ manager: 'openzeppelin' });
     this.solcCompile.should.have.been.calledOnce;
   });
 
@@ -38,7 +38,7 @@ describe('Compiler', function () {
   });
 
   it('compiles with zos if set in local config', async function () {
-    this.projectFile.data.compiler = { manager: 'zos' };
+    this.projectFile.data.compiler = { manager: 'openzeppelin' };
     await this.compile();
     this.solcCompile.should.have.been.calledOnce;
   });

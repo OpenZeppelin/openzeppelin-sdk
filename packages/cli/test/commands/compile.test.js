@@ -18,7 +18,7 @@ describe('compile command', function() {
     'zos compile --solc-version 0.5.0 --optimizer --optimizer-runs 300 --evm-version petersburg',
     function(compiler) {
       compiler.should.have.been.calledWithMatch({
-        manager: 'zos',
+        manager: 'openzeppelin',
         version: '0.5.0',
         optimizer: { enabled: true, runs: 300 },
         evmVersion: 'petersburg',
@@ -32,7 +32,7 @@ describe('compile command', function() {
     'zos compile --solc-version 0.5.0 --optimizer=off',
     function(compiler) {
       compiler.should.have.been.calledWithMatch({
-        manager: 'zos',
+        manager: 'openzeppelin',
         version: '0.5.0',
         optimizer: { enabled: false },
       });
