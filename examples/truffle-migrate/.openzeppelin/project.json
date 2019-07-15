@@ -4,5 +4,6 @@
   "version": "0.1.0",
   "contracts": {
     "MyContract": "MyContract_v1"
-  }
+  },
+  "dependencies": {}
 }

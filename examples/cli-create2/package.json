@@ -7,7 +7,7 @@
   "scripts": {
     "test": "scripts/test.sh"
   },
-  "author": "santiago@zeppelin.solutions",
+  "author": "santiago@openzeppelin.com",
   "license": "MIT",
   "dependencies": {
     "@openzeppelin/cli": "2.5.0-rc.0",

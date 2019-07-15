@@ -8,7 +8,7 @@ const { Contracts, SimpleProject, ZWeb3 } = require('@openzeppelin/upgrades')
 
 async function main() {
 
-  /* Initialize ZeppelinOS's Web3 provider. */
+  /* Initialize OpenZeppelin's Web3 provider. */
   ZWeb3.initialize(web3.currentProvider)
 
   /* Retrieve compiled contract artifacts. */
@@ -18,7 +18,7 @@ async function main() {
   /* Retrieve a couple of addresses to interact with the contracts. */
   const [creatorAddress, initializerAddress] = await ZWeb3.accounts();
 
-  /* Create a SimpleProject to interact with ZeppelinOS programmatically. */
+  /* Create a SimpleProject to interact with OpenZeppelin programmatically. */
   const myProject = new SimpleProject('MyProject', null, { from: creatorAddress });
 
   /* Deploy the contract with a proxy that allows upgrades. Initialize it by setting the value to 42. */
