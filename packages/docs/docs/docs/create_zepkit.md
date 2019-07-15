@@ -16,11 +16,11 @@ In this guide, we will learn how to create a ZepKit and share it with other deve
 
 * [React ](https://github.com/facebook/create-react-app)& [Rimble](https://rimble.consensys.design/) to build usable and friendly interfaces.
 
-**Build your own Zepkit**
+**Build your own ZepKit**
 
 To build our own ZepKit, we will use [Tutorial ZepKit](https://zepkit.zeppelinos.org/) and add an extra `Hello` contract. To download and install Tutorial ZepKit follow [these](https://zepkit.zeppelinos.org/) instructions.
 
-**Add our Hello contract**
+**Add Hello contract**
 
 ```console solidity
 pragma solidity ^0.5.0;
@@ -38,7 +38,7 @@ contract Hello is Initializable {
 ```
 > Note: Ideally you want to change front-end code and test your ZepKit properly before sharing it with others. 
 
-### Creating Zepkit 
+### Creating ZepKit 
 
 To create a ZOS kit there are two main requirement 
 
