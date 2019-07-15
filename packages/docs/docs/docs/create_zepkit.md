@@ -1,10 +1,10 @@
 ---
-id: zepkit
-title: Starter Kit
+id: create_zepkit
+title: Build your own ZepKit
 ---
 
 
-In this guide, we will learn how to create a zepkit and share it with other developers. If you didn’t try zepkit until now, check [here](https://zepkit.zeppelinos.org/). Zepkit is the easiest way to start building a Web3 application and comes with already configured Ethereum tools. Zepkit involves
+In this guide, we will learn how to create a ZepKit and share it with other developers. If you didn’t try ZepKit until now, check [here](https://zepkit.zeppelinos.org/). ZepKit is the easiest way to start building a Web3 application and comes with already configured Ethereum tools. ZepKit involves
 
 * [OpenZeppelin](https://openzeppelin.org/) as an EVM package.
 
@@ -18,7 +18,7 @@ In this guide, we will learn how to create a zepkit and share it with other deve
 
 **Build your own Zepkit**
 
-To build our own zepkit, we will use [Tutorial zepkit](https://zepkit.zeppelinos.org/) and add an extra `Hello` contract. To download and install Tutorial zepkit follow [these](https://zepkit.zeppelinos.org/) instructions.
+To build our own ZepKit, we will use [Tutorial ZepKit](https://zepkit.zeppelinos.org/) and add an extra `Hello` contract. To download and install Tutorial ZepKit follow [these](https://zepkit.zeppelinos.org/) instructions.
 
 **Add our Hello contract**
 
@@ -36,7 +36,7 @@ contract Hello is Initializable {
   }
 }
 ```
-> Note: Ideally you want to change front-end code and test your zepkit properly before sharing it with others. 
+> Note: Ideally you want to change front-end code and test your ZepKit properly before sharing it with others. 
 
 ### Creating Zepkit 
 
@@ -46,7 +46,7 @@ To create a ZOS kit there are two main requirement
 
 * A GitHub repository with ***stable*** branch
 
-`Kit.json` file contains all the configuration information for your zepkit. Below is our `kit.json` file.  
+`Kit.json` file contains all the configuration information for your ZepKit. Below is our `kit.json` file.  
 ```console json
 {
   "manifestVersion": "0.1.0",
@@ -82,7 +82,7 @@ We also need to push this into Github on stable branch, It means you need to cre
 
 **Best practices**
 
-As zepkit will be reviewed and shared with other developers, there are few important points.
+As ZepKit will be reviewed and shared with other developers, there are few important points.
 
 * Your repository should have meaningful README.md file walking users through installation, running and building a kit. 
 
@@ -90,5 +90,5 @@ As zepkit will be reviewed and shared with other developers, there are few impor
 
 **Getting listed at ZeppelinOS website**
 
-We value community contribution and would love to list your zepkit on ZeppelinOS website. Every submitted kit undergoes a screening process to ensure safety. To start this process send us an email with your desired kit name and description, along with a link to its GitHub repo or post your zepkit information on the Zeppelin [forum](https://forum.zeppelin.solutions). 
+We value community contribution and would love to list your ZepKit on ZeppelinOS website. Every submitted kit undergoes a screening process to ensure safety. To start this process send us an email with your desired kit name and description, along with a link to its GitHub repo or post your ZepKit information on the Zeppelin [forum](https://forum.zeppelin.solutions). 
 
