@@ -1,9 +1,0 @@
-{
-  "manifestVersion": "2",
-  "name": "example-dep-basic",
-  "version": "0.1.0",
-  "contracts": {
-    "EthBox": "EthBox"
-  },
-  "lib": true
-}
