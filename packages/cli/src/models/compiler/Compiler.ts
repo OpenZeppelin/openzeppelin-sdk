@@ -23,8 +23,8 @@ export async function compile(
 
   // Validate compiler manager setting
   const { manager } = resolvedOptions;
-  if (manager && manager !== 'truffle' && manager !== 'zos') {
-    throw new Error(`Unknown compiler manager '${manager}' (valid values are 'zos' or 'truffle')`);
+  if (manager && manager !== 'truffle' && manager !== 'zos' && manager !== 'openzeppelin') {
+    throw new Error(`Unknown compiler manager '${manager}' (valid values are 'openzeppelin' or 'truffle')`);
   }
 
   // We use truffle if set explicitly, or if nothing was set but there is a truffle.js file
@@ -41,7 +41,7 @@ export async function compile(
   projectFile.setCompilerOptions({
     ...resolvedOptions,
     ...compileVersionOptions,
-    manager: useTruffle ? 'truffle' : 'zos',
+    manager: useTruffle ? 'truffle' : 'openzeppelin',
   });
   if (projectFile.exists()) projectFile.write();
 

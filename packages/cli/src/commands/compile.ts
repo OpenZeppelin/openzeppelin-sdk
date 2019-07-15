@@ -51,7 +51,7 @@ async function action(options: {
   }
 
   const compilerOptions: ProjectCompilerOptions = {
-    manager: 'zos',
+    manager: 'openzeppelin',
     evmVersion,
     version,
     optimizer: {
