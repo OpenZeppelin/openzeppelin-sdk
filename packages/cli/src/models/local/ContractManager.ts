@@ -31,7 +31,7 @@ export default class ContractManager {
     }
   }
 
-  public getContractNames(root: string = this.projectFile.root): string[] {
+  public getContractNames(root: string = process.cwd()): string[] {
     const buildDir = ConfigManager.getBuildDir();
     const contractsDir = Contracts.getLocalContractsDir();
     if (FileSystem.exists(buildDir)) {
