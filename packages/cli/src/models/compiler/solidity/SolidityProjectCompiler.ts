@@ -4,8 +4,8 @@ import maxBy from 'lodash.maxby';
 import pick from 'lodash.pick';
 import omitBy from 'lodash.omitby';
 import isUndefined from 'lodash.isundefined';
-import { readJsonSync, ensureDirSync, writeJsonSync } from 'fs-extra';
-import { statSync, existsSync, unlinkSync, readdirSync, lstatSync } from 'fs';
+import { readJsonSync, ensureDirSync, readJSON, writeJson, unlink } from 'fs-extra';
+import { statSync, existsSync, readdirSync, lstatSync } from 'fs';
 import { Loggy, Contracts } from '@openzeppelin/upgrades';
 import {
   RawContract,
@@ -23,9 +23,12 @@ import { compilerVersionsMatch, compilerSettingsMatch } from '../../../utils/sol
 import { tryFunc } from '../../../utils/try';
 
 export async function compileProject(options: ProjectCompilerOptions = {}): Promise<ProjectCompileResult> {
-  const inputDir = options.inputDir || Contracts.getLocalContractsDir();
-  const outputDir = options.outputDir || Contracts.getLocalBuildDir();
-  const projectCompiler = new SolidityProjectCompiler(inputDir, outputDir, options);
+  const projectCompiler = new SolidityProjectCompiler({
+    ...options,
+    inputDir: options.inputDir || Contracts.getLocalContractsDir(),
+    outputDir: options.outputDir || Contracts.getLocalBuildDir(),
+  });
+
   await projectCompiler.call();
   return {
     contracts: projectCompiler.contracts,
@@ -37,6 +40,7 @@ export interface ProjectCompilerOptions extends CompilerOptions {
   manager?: string;
   inputDir?: string;
   outputDir?: string;
+  force?: boolean;
 }
 
 export interface ProjectCompileResult {
@@ -45,21 +49,25 @@ export interface ProjectCompileResult {
 }
 
 class SolidityProjectCompiler {
-  public inputDir: string;
-  public outputDir: string;
   public roots: string[];
   public contracts: RawContract[];
   public compilerOutput: CompiledContract[];
   public compilerVersion: SolcBuild;
-  public options: CompilerOptions;
+  public options: ProjectCompilerOptions;
 
-  public constructor(inputDir: string, outputDir: string, options: CompilerOptions = {}) {
-    this.inputDir = inputDir;
-    this.outputDir = outputDir;
+  public constructor(options: ProjectCompilerOptions = {}) {
     this.roots = [];
     this.contracts = [];
     this.compilerOutput = [];
     this.options = options;
+  }
+
+  public get inputDir(): string {
+    return this.options.inputDir;
+  }
+
+  public get outputDir(): string {
+    return this.options.outputDir;
   }
 
   public async call(): Promise<void> {
@@ -85,7 +93,7 @@ class SolidityProjectCompiler {
       `Compiling contracts with solc ${this.compilerVersion.version} (${this.compilerVersion.build})`,
     );
     this.compilerOutput = await compileWith(this.compilerVersion, this.contracts, this.options);
-    this._writeOutput();
+    await this._writeOutput();
     Loggy.succeed(
       'compile-contracts',
       `Compiled contracts with solc ${this.compilerVersion.version} (${this.compilerVersion.build})`,
@@ -120,6 +128,7 @@ class SolidityProjectCompiler {
   }
 
   private _shouldCompile(): boolean {
+    if (this.options.force) return true;
     const artifacts = this._listArtifacts();
     const artifactsWithMtimes = artifacts.map(artifact => ({
       artifact,
@@ -140,7 +149,7 @@ class SolidityProjectCompiler {
     };
 
     // Gather artifacts vs sources modified times
-    const maxArtifactsMtimes = max(artifactsWithMtimes.map(({ mtime }) => mtime));
+    const maxArtifactsMtimes = latestArtifact && latestArtifact.mtime;
     const maxSourcesMtimes = max(this.contracts.map(({ lastModified }) => lastModified));
 
     // Compile if there are no previous artifacts, or no mtimes could be collected for sources,
@@ -155,16 +164,33 @@ class SolidityProjectCompiler {
     );
   }
 
-  private _writeOutput(): void {
-    // Create directory if not exists, or clear it of artifacts if it does
-    if (!existsSync(this.outputDir)) ensureDirSync(this.outputDir);
-    else this._listArtifacts().forEach(filePath => unlinkSync(filePath));
+  private async _writeOutput(): Promise<void> {
+    // Create directory if not exists, or clear it of artifacts if it does,
+    // preserving networks deployment info
+    const networksInfo = {};
+    if (!existsSync(this.outputDir)) {
+      ensureDirSync(this.outputDir);
+    } else {
+      const artifacts = this._listArtifacts();
+      await Promise.all(
+        artifacts.map(async filePath => {
+          const name = path.basename(filePath, '.json');
+          const schema = await readJSON(filePath);
+          if (schema.networks) networksInfo[name] = schema.networks;
+          await unlink(filePath);
+        }),
+      );
+    }
 
-    // Write compiler output
-    this.compilerOutput.forEach(data => {
-      const buildFileName = `${this.outputDir}/${data.contractName}.json`;
-      writeJsonSync(buildFileName, data);
-    });
+    // Write compiler output, saving networks info if present
+    await Promise.all(
+      this.compilerOutput.map(async data => {
+        const name = data.contractName;
+        const buildFileName = `${this.outputDir}/${name}.json`;
+        if (networksInfo[name]) Object.assign(data, { networks: networksInfo[name] });
+        await writeJson(buildFileName, data);
+      }),
+    );
   }
 
   private _listArtifacts(): string[] {

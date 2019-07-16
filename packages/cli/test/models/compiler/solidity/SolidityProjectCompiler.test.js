@@ -7,9 +7,10 @@ import {
   existsSync,
   statSync,
   utimesSync,
-  writeFileSync,
+  writeFileSync
 } from 'fs';
 import path from 'path';
+import { writeJSONSync, readJSONSync } from 'fs-extra';
 
 describe('SolidityProjectCompiler', function() {
   const rootDir = path.resolve(__dirname, '../../../../');
@@ -25,9 +26,8 @@ describe('SolidityProjectCompiler', function() {
     const inputDir = `${rootDir}/test/mocks/mock-stdlib/contracts`;
     const outputDir = `${baseTestBuildDir}/mock-stdlib`;
     const greeterArtifactPath = `${outputDir}/GreeterImpl.json`;
-
-    before('compiling', async function() {
-      await compileProject({ inputDir, outputDir, version: '0.5.9' });
+    beforeEach('compiling', async function() {
+      await compileProject({ inputDir, outputDir, version: '0.5.9', force: true });
     });
 
     it('compiles all contracts in the project', function() {
@@ -116,6 +116,40 @@ describe('SolidityProjectCompiler', function() {
       await compileProject({ inputDir, outputDir }).should.be.rejectedWith(
         /could not find file \.\/NotExists\.sol/i,
       );
+    });
+
+    // For more info, see: https://github.com/zeppelinos/zos/issues/1071
+    it('preserves truffle deployment info', async function () {
+      const networksData = {
+        "100001": {
+          "address": "0x63b52a2f619537f553e5097b8866c0f4ebec62ee",
+          "links": {},
+          "events": {},
+          "updated_at": 1563287608947
+        },
+        "100002": {
+          "address": "0x63b52a2f619537f553e5097b8866c0f4ebec62ef",
+          "links": {},
+          "events": {},
+          "updated_at": 1563287608948
+        }
+      };
+
+      // Add networks data to compiled artifact
+      writeJSONSync(greeterArtifactPath, {
+        ... readJSONSync(greeterArtifactPath),
+        networks: networksData
+      });
+  
+      // Force recompile
+      await compileProject({ inputDir, outputDir, force: true });
+      
+      // Artifact should have been compiled and deployment info preserved
+      const schema = readJSONSync(greeterArtifactPath);
+      schema.abi.should.be.not.null;
+      schema.bytecode.should.be.not.null;
+      schema.networks.should.be.not.null;
+      schema.networks.should.deep.include(networksData);
     });
 
     afterEach(function() {
