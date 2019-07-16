@@ -1,14 +1,14 @@
 {
   "name": "example-truffle-migrate",
   "version": "2.5.0-rc.0",
-  "description": "Sample project for using ZeppelinOS within truffle migrations",
+  "description": "OpenZeppelin SDK example: using truffle migrations",
   "main": "index.js",
   "private": true,
   "scripts": {
     "check": "truffle exec index.js --network local",
     "test": "truffle test"
   },
-  "author": "santiago@zeppelin.solutions",
+  "author": "santiago@openzeppelin.com",
   "license": "MIT",
   "dependencies": {
     "@openzeppelin/upgrades": "2.5.0-rc.0"

@@ -12,6 +12,8 @@
     "test": "npm run compile && truffle test"
   },
   "keywords": [
+    "openzeppelin",
+    "openzeppelin-sdk",
     "zos",
     "zeppelinos"
   ],

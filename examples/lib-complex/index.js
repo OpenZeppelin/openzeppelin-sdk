@@ -31,7 +31,7 @@ async function deployVersion1(project, owner) {
 
 async function deployVersion2(project, donations, txParams) {
 
-  // Create a new version of the project, linked to the ZeppelinOS EVM package.
+  // Create a new version of the project, linked to the OpenZeppelin Ethereum Package.
   // Register a new implementation for 'Donations' and upgrade it's proxy to use the new implementation.
   console.error('<< Deploying version 2 >>')
   const secondVersion = '0.0.2'
@@ -65,7 +65,7 @@ async function deployVersion2(project, donations, txParams) {
 async function getLibrary(txParams) {
 
   // Use deployed EVM package, or simulate one in local networks.
-  // TODO: Install and link openzeppelin-zos here, instead of manually building a mock
+  // TODO: Install and link openzeppelin-contracts-ethereum-package here, instead of manually building a mock
   if(!network || network === 'local') {
     const version = '1.0.0';
     const thepackage = await Package.deploy(txParams);

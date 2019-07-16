@@ -6,7 +6,7 @@ stdout.silent(true);
 async function setup(network) {
   // Initialize network
   const networkConfig = await ConfigManager.initNetworkConfiguration({ network: network || process.env.NETWORK || 'local' });
-  console.log(`$ zos session --network ${networkConfig.network}`);
+  console.log(`$ openzeppelin session --network ${networkConfig.network}`);
   console.log(`> Initialized session on network ${networkConfig.network}\n`);
 
   return networkConfig;
@@ -15,7 +15,7 @@ async function setup(network) {
 async function push(networkConfig) {
   // Push contracts to the network
   await scripts.push({ deployProxyAdmin: true, ...networkConfig });
-  console.log(`$ zos push`)
+  console.log(`$ openzeppelin push`)
   console.log(`> Pushed logic contract to the network\n`)
 }
 
@@ -23,13 +23,13 @@ async function useCreate2(initValue, networkConfig) {
   // Calculate reserved address for a salt for the current sender
   const salt = parseInt(Math.random() * 1000);
   const address = await scripts.queryDeployment({ salt, ...networkConfig });
-  console.log(`$ zos create2 --salt ${salt}`);
+  console.log(`$ openzeppelin create2 --salt ${salt}`);
   console.log(`> Instance using salt ${salt} will be deployed at ${address}\n`)
 
   // Actually deploy it!
   const instance = await scripts.create({ salt, contractAlias: 'Sample', methodName: 'initialize', methodArgs: [initValue], ...networkConfig });
   const value = await instance.methods.value().call();
-  console.log(`$ zos create2 Sample --salt ${salt} --init --args ${initValue}`);
+  console.log(`$ openzeppelin create2 Sample --salt ${salt} --init --args ${initValue}`);
   console.log(`> Instance deployed at ${instance.options.address} with value ${value}\n`);
   if (value != initValue.toString()) throw new Error(`Expected value ${initValue} but got ${value}`);
 
@@ -60,13 +60,13 @@ async function useSignedCreate2(initValue, networkConfig) {
   // Query the deployment address for that signature
   const createArgs = { salt, contractAlias: "Sample", methodName: "initialize", methodArgs: [initValue] };
   const address = await scripts.querySignedDeployment({ signature, ... createArgs, ... networkConfig });
-  console.log(`$ zos create2 Sample --query --salt ${salt} --signature ${signature} --init --args ${initValue}`);
+  console.log(`$ openzeppelin create2 Sample --query --salt ${salt} --signature ${signature} --init --args ${initValue}`);
   console.log(`> Instance of Sample initialized with 'initialize(${initValue})' with salt ${salt} and signature ${signature} will be deployed at ${address}\n`);
 
   // And deploy!
   const instance = await scripts.create({ signature, ... createArgs, ... networkConfig });
   const value = await instance.methods.value().call();
-  console.log(`$ zos create2 Sample --salt ${salt} --signature ${signature} --init --args ${initValue}`);
+  console.log(`$ openzeppelin create2 Sample --salt ${salt} --signature ${signature} --init --args ${initValue}`);
   console.log(`> Instance deployed at ${instance.options.address} with value ${value} using signature ${signature}\n`);
   if (value != initValue.toString()) throw new Error(`Expected value ${initValue} but got ${value}`);
 

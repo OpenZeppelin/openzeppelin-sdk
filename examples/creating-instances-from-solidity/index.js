@@ -1,45 +1,41 @@
 'use strict';
 
 /*
-  This script demonstrates how a ZeppelinOS contract can be used
+  This script demonstrates how an OpenZeppelin SDK contract can be used
   to create instances of upgradeable contracts from another contract,
-  as opposed to only being able to create them via the `zos` CLI.
+  as opposed to only being able to create them via the `openzeppelin` CLI.
 
   Note that this is done programmatically with this script for 
-  illustration purposes, but the entire process can be done from the `zos` CLI.
+  illustration purposes, but the entire process can be done from the `openzeppelin` CLI.
   */
 
 // Import node dependencies.
 const fs = require('fs');
 
-// Import @openzeppelin/cli and @openzeppelin/upgrades dependencies.
-const zos = require('@openzeppelin/cli');
-const lib = require('@openzeppelin/upgrades');
+// Retrieve @openzeppelin/cli scripts.
+// These are analogous to `openzeppelin` CLI commands.
+const { init, add, push, create } = require('@openzeppelin/cli').scripts;
+
+// Import @openzeppelin/upgrades dependencies.
+const { ZWeb3, Contracts, encodeCall } = require('@openzeppelin/upgrades');
 
 // Main entry point, called by `truffle exec`.
 async function main() {
-
 
   // Retrieve the name of the network being used.
   const network = process.argv[process.argv.length - 1];
   console.log(`Running script with the ${network} network...`);
 
-  // Delete any previous ZeppelinOS files.
+  // Delete any previous OpenZeppelin SDK files.
   console.log(`Deleting previous project files...`);
   if(fs.existsSync('.openzeppelin/project.json')) fs.unlinkSync('.openzeppelin/project.json');
   if(fs.existsSync(`.openzeppelin/${network}.json`)) fs.unlinkSync(`.openzeppelin/${network}.json`);
 
-  // Retrieve ZeppelinOS scripts.
-  // These are analogous to `zos` CLI commands.
-  const { init, add, push, create, publish } = zos.scripts;
-
-  // Initialize ZeppelinOS with Truffle's Web3 provider.
-  console.log(`Initializing ZeppelinOS...`);
-  const ZWeb3 = lib.ZWeb3;
+  // Initialize OpenZeppelin SDK with Truffle's Web3 provider.
+  console.log(`Initializing OpenZeppelin SDK...`);
   ZWeb3.initialize(web3.currentProvider);
 
   // Set the default parameters to be used in future transactions.
-  const Contracts = lib.Contracts;
   Contracts.setArtifactsDefaults({
     gas: 6721975,
     gasPrice: 100000000000
@@ -50,13 +46,13 @@ async function main() {
   const txParams = await Contracts.getDefaultTxParams();
   console.log(`Default params to be used in transactions:`, txParams);
 
-  // Initialize the ZeppelinOS project.
+  // Initialize the OpenZeppelin SDK project.
   // Notice that publish is set to true, so that the project uses an App contract.
   // This App contract will be used from within Factory.sol to dynamically create
   // proxy instances from the contract itself.
   await init({name: 'creating-instances-from-solidity', version: '0.1.0', publish: true});
 
-  // Add the Factory.sol and Instance.sol contracts to the ZeppelinOS project.
+  // Add the Factory.sol and Instance.sol contracts to the OpenZeppelin SDK project.
   console.log(`Adding contracts...`);
   await add({contractsData: [
     {alias: 'Factory', name: 'Factory'},
@@ -91,7 +87,6 @@ async function main() {
 
   // Construct the call data for the initialize method of Instance.sol.
   // This call data consists of the contract's `initialize` method with the value of `42`.
-  const encodeCall = lib.encodeCall;
   const data = encodeCall('initialize', ['uint256'], [42]);
   console.log(`Call data for Instance.sol's initialize: ${data}`);
 
@@ -115,7 +110,7 @@ async function main() {
 
   // Retrieve the value stored in the instance contract.
   // Note that we cannot make the call using the same address that created the proxy
-  // because of the transparent proxy problem. See: https://docs.zeppelinos.org/docs/faq.html#why-are-my-getting-the-error-cannot-call-fallback-function-from-the-proxy-admin
+  // because of the transparent proxy problem. See: https://docs.openzeppelin.com/sdk/2.4/faq.html#why-are-my-getting-the-error-cannot-call-fallback-function-from-the-proxy-admin
   const anotherAccount = (await ZWeb3.accounts())[1];
   const value = await instanceContract.methods.value().call({ ...txParams, from: anotherAccount });
   console.log(`Retrieved value from the created Instance contract: ${value}`);

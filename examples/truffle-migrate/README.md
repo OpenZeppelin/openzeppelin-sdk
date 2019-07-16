@@ -1,8 +1,8 @@
-# Sample ZeppelinOS project with truffle migrations
+# OpenZeppelin SDK example: using truffle migrations
 
-This is a sample ZeppelinOS project that runs `zos` from truffle migrations, using the CLI javascript interface. 
-This allows any project that currently relies on truffle migrations to switch over to `zos`, thus deploying 
-upgradeable instances instead of regular ones. Also, by using the CLI interface, `zos` keeps track of all deployed 
+This is a sample OpenZeppelin SDK project that runs `openzeppelin` from truffle migrations, using the CLI javascript interface. 
+This allows any project that currently relies on truffle migrations to switch over to `openzeppelin`, thus deploying 
+upgradeable instances instead of regular ones. Also, by using the CLI interface, `openzeppelin` keeps track of all deployed 
 logic contracts and all upgradeable instances, and also tracks them in truffle build artifacts.
 
 ## Running this project
@@ -21,7 +21,7 @@ deployed instance via truffle's `MyContract.deployed()`.
 ### Initial deployment
 
 ```js
-// Register v0 of MyContract in the zos project
+// Register v0 of MyContract in the OpenZeppelin SDK project
 add({ contractsData: [{ name: 'MyContract_v0', alias: 'MyContract' }] });
 
 // Push implementation contracts to the network
@@ -34,7 +34,7 @@ await create(Object.assign({ contractAlias: 'MyContract', methodName: 'initializ
 ### Upgrade
 
 ```js
-// Register v1 of MyContract in the zos project as MyContract
+// Register v1 of MyContract in the OpenZeppelin SDK project as MyContract
 add({ contractsData: [{ name: 'MyContract_v1', alias: 'MyContract' }] });
 
 // Push implementation contracts to the network
@@ -47,4 +47,4 @@ await update(Object.assign({ contractAlias: 'MyContract', methodName: 'add', met
 ### Boilerplate
 
 Due to limitations on how global variables are managed within truffle scripts, both deployment functions need to be 
-run after the `ConfigManager` object exported by `zos` CLI is called. We have ongoing efforts to remove this restriction in the near future.
+run after the `ConfigManager` object exported by the `openzeppelin` CLI is called. We have ongoing efforts to remove this restriction in the near future.

@@ -5,7 +5,7 @@
   "description": "",
   "main": "index.js",
   "keywords": [],
-  "author": "Santiago Palladino <santiago@zeppelin.solutions>",
+  "author": "Santiago Palladino <santiago@openzeppelin.com>",
   "license": "MIT",
   "dependencies": {
     "@openzeppelin/upgrades": "2.5.0-rc.0",
