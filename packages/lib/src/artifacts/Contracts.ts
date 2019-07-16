@@ -12,6 +12,7 @@ export default class Contracts {
   private static timeout: number = Contracts.DEFAULT_SYNC_TIMEOUT;
   private static buildDir: string = Contracts.DEFAULT_BUILD_DIR;
   private static contractsDir: string = Contracts.DEFAULT_CONTRACTS_DIR;
+  private static projectRoot: string = null;
   private static artifactDefaults: any = {};
   private static defaultFromAddress: string;
 
@@ -25,6 +26,10 @@ export default class Contracts {
 
   public static getLocalContractsDir(): string {
     return path.resolve(Contracts.contractsDir || Contracts.DEFAULT_CONTRACTS_DIR);
+  }
+
+  public static getProjectRoot(): string {
+    return path.resolve(this.projectRoot || process.cwd());
   }
 
   public static async getDefaultTxParams(): Promise<any> {
@@ -46,7 +51,7 @@ export default class Contracts {
   }
 
   public static getNodeModulesPath(dependency: string, contractName: string): string {
-    return `${process.cwd()}/node_modules/${dependency}/build/contracts/${contractName}.json`;
+    return require.resolve(`${dependency}/build/contracts/${contractName}.json`, { paths: [this.getProjectRoot()] });
   }
 
   public static getFromLocal(contractName: string): Contract {
@@ -83,6 +88,10 @@ export default class Contracts {
 
   public static setLocalContractsDir(dir: string): void {
     Contracts.contractsDir = dir;
+  }
+
+  public static setProjectRoot(dir: string): void {
+    Contracts.projectRoot = dir;
   }
 
   public static setArtifactsDefaults(defaults: any): void {

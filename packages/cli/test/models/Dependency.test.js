@@ -9,7 +9,7 @@ import Dependency from '../../src/models/dependency/Dependency';
 import ProjectFile from '../../src/models/files/ProjectFile';
 import NetworkFile from '../../src/models/files/NetworkFile';
 
-contract.only('Dependency', function([_, from]) {
+contract('Dependency', function([_, from]) {
   describe('static methods', function() {
     describe('#satisfiesVersion', function() {
       it('verifies if requirement satisfies version', function() {
@@ -23,7 +23,7 @@ contract.only('Dependency', function([_, from]) {
         it('throws error', function() {
           expect(
             () => Dependency.fromNameWithVersion('bildts-kcom')
-          ).to.throw(/Could not find a project.json file/);
+          ).to.throw(/Could not find dependency bildts-kcom/);
         });
       });
 
@@ -115,7 +115,15 @@ contract.only('Dependency', function([_, from]) {
       it('throws an error', function() {
         expect(
           () => new Dependency('bildts-kcom', '1.1.0')
-        ).to.throw(/Could not find a project.json file/);
+        ).to.throw(/Could not find dependency bildts-kcom/);
+      });
+    });
+
+    context('with non-ethereum package', function() {
+      it('throws an error', function() {
+        expect(
+          () => new Dependency('chai')
+        ).to.throw(/Could not find an \.openzeppelin\/project\.json/);
       });
     });
 
@@ -136,51 +144,54 @@ contract.only('Dependency', function([_, from]) {
     });
   });
 
-  describe('instance methods', function() {
-    beforeEach(function() {
-      this.dependency = new Dependency('mock-stdlib', '1.1.0');
-      this.txParams = {};
-      this.addresses = {};
-      delete this.dependency._projectFile;
-    });
-
-    describe('#deploy', function() {
-      it('deploys a dependency', async function() {
-        const project = await this.dependency.deploy({ from });
-        const address = await project.getImplementation({
-          contractName: 'Greeter',
-        });
-        address.should.be.nonzeroAddress;
+  function testInstanceMethodsFor(libname) {
+    describe(`instance methods for ${libname}`, function() {
+      beforeEach(function() {
+        this.dependency = new Dependency(libname, '1.1.0');
+        this.txParams = {};
+        this.addresses = {};
+        delete this.dependency._projectFile;
       });
-    });
 
-    describe('#projectFile', function() {
-      it('generates a package file', function() {
-        const projectFile = this.dependency.projectFile;
-        projectFile.should.not.be.null;
-        projectFile.filePath.should.eq('node_modules/mock-stdlib/zos.json');
-        projectFile.version.should.eq('1.1.0');
-        projectFile.contracts.should.include({ Greeter: 'GreeterImpl' });
-      });
-    });
-
-    describe('#getNetworkFile', function() {
-      context('for a non-existent network', function() {
-        it('throws an error', function() {
-          expect(
-            () => this.dependency.getNetworkFile('bildts-kcom')
-          ).to.throw(/Could not find a project file for network/);
+      describe('#deploy', function() {
+        it('deploys a dependency', async function() {
+          const project = await this.dependency.deploy({ from });
+          const address = await project.getImplementation({
+            contractName: 'Greeter',
+          });
+          address.should.be.nonzeroAddress;
         });
       });
 
-      context('for an existent network', function() {
-        it('generates network file', function() {
-          const networkFile = this.dependency.getNetworkFile('test');
-          networkFile.filePath.should.eq(
-            'node_modules/mock-stdlib/zos.test.json',
-          );
+      describe('#projectFile', function() {
+        it('generates a package file', function() {
+          const projectFile = this.dependency.projectFile;
+          projectFile.should.not.be.null;
+          projectFile.filePath.should.match(/mock-stdlib\/zos\.json$/);
+          projectFile.version.should.eq('1.1.0');
+          projectFile.contracts.should.include({ Greeter: 'GreeterImpl' });
+        });
+      });
+
+      describe('#getNetworkFile', function() {
+        context('for a non-existent network', function() {
+          it('throws an error', function() {
+            expect(
+              () => this.dependency.getNetworkFile('bildts-kcom')
+            ).to.throw(/Could not find a project file for network/);
+          });
+        });
+
+        context('for an existent network', function() {
+          it('generates network file', function() {
+            const networkFile = this.dependency.getNetworkFile('test');
+            networkFile.filePath.should.match(/mock-stdlib\/zos\.test\.json$/);
+          });
         });
       });
     });
-  });
+  }
+
+  testInstanceMethodsFor('mock-stdlib');
+  testInstanceMethodsFor('mock-stdlib-root');
 });
