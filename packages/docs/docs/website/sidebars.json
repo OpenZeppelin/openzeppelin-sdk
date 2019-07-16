@@ -20,6 +20,7 @@
     ],
     "ADVANCED TOPICS": [
       "faq",
+      "create_zepkit",
       "configuration",
       "architecture",
       "pattern",
