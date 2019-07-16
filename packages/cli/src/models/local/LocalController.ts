@@ -30,7 +30,7 @@ export default class LocalController {
   public constructor(projectFile: ProjectFile = new ProjectFile(), init: boolean = false) {
     if (!init && !projectFile.exists()) {
       throw Error(
-        `OpenZeppelin file ${projectFile.filePath} not found. Run 'zos init' first to initialize the project.`,
+        `OpenZeppelin file ${projectFile.filePath} not found. Run 'openzeppelin init' first to initialize the project.`,
       );
     }
     this.projectFile = projectFile;
@@ -58,7 +58,7 @@ export default class LocalController {
       __filename,
       'initProjectFile',
       'init-project-file',
-      `Project initialized. Write a new contract in the contracts folder and run 'zos create' to deploy it.`,
+      `Project initialized. Write a new contract in the contracts folder and run 'openzeppelin create' to deploy it.`,
     );
   }
 
@@ -165,7 +165,7 @@ export default class LocalController {
         __filename,
         'linkDependencies',
         'link-dependencies',
-        `${label} linked to the project. Run 'zos create' to deploy one of its contracts.`,
+        `${label} linked to the project. Run 'openzeppelin create' to deploy one of its contracts.`,
       );
     }
   }
