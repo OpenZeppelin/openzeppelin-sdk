@@ -1,7 +1,7 @@
 'use strict';
 
 /*
-  This script demonstrates how a OpenZeppelin SDK contract can be used
+  This script demonstrates how an OpenZeppelin SDK contract can be used
   to create instances of upgradeable contracts from another contract,
   as opposed to only being able to create them via the `openzeppelin` CLI.
 
@@ -14,7 +14,7 @@ const fs = require('fs');
 
 // Import @openzeppelin/cli and @openzeppelin/upgrades dependencies.
 const openzeppelin = require('@openzeppelin/cli');
-const lib = require('@openzeppelin/upgrades');
+const { ZWeb3 } = require('@openzeppelin/upgrades');
 
 // Main entry point, called by `truffle exec`.
 async function main() {
@@ -34,7 +34,6 @@ async function main() {
 
   // Initialize OpenZeppelin SDK with Truffle's Web3 provider.
   console.log(`Initializing OpenZeppelin SDK...`);
-  const ZWeb3 = lib.ZWeb3;
   ZWeb3.initialize(web3.currentProvider);
 
   // Set the default parameters to be used in future transactions.
@@ -114,7 +113,7 @@ async function main() {
 
   // Retrieve the value stored in the instance contract.
   // Note that we cannot make the call using the same address that created the proxy
-  // because of the transparent proxy problem. See: https://docs.OpenZeppelin SDK.org/docs/faq.html#why-are-my-getting-the-error-cannot-call-fallback-function-from-the-proxy-admin
+  // because of the transparent proxy problem. See: https://docs.openzeppelin.com/sdk/2.4/faq.html#why-are-my-getting-the-error-cannot-call-fallback-function-from-the-proxy-admin
   const anotherAccount = (await ZWeb3.accounts())[1];
   const value = await instanceContract.methods.value().call({ ...txParams, from: anotherAccount });
   console.log(`Retrieved value from the created Instance contract: ${value}`);

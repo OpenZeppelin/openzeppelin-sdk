@@ -1,6 +1,6 @@
 # OpenZeppelin SDK example: using the CREATE2 command
 
-This project contains a sample `index.js` showing how to use the `openzeppelin create2` command. All scripts are executed using `openzeppelin` javascript interface, though the command-line equivalent is also shown for completion.
+This project contains a sample `index.js` showing how to use the `openzeppelin create2` command. All scripts are executed using the `openzeppelin` javascript interface, though the command-line equivalent is also shown for completion.
 
 ## How the command works
 
@@ -11,7 +11,7 @@ The `openzeppelin create2` command also accepts a `query` flag that is used to c
 ## Running this project
 
 - Install all dependencies via `npm install` or `lerna bootstrap`
-- Start a ganache instance in port 9545 via `ganache-cli -p 9545 -d`
+- Start a ganache instance in port 9545 via `ganache-cli --port 9545 --deterministic`
 - Run `npx truffle exec index.js --network local`
 
 ## Sample output

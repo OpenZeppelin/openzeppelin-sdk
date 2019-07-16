@@ -1,4 +1,4 @@
-# OpenZeppelin SDK example: using openzeppelin-upgrades programmatic library
+# OpenZeppelin SDK example: using @openzeppelin/upgrades programmatic library
 
 The OpenZeppelin SDK has a JavaScript library that (besides the CLI ) can be used directly to operate OpenZeppelin SDK projects. It can be especially useful when a programmatic interface is preferred or more flexibility and lower-level access is required. 
 

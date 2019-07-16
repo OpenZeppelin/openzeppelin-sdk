@@ -10,7 +10,7 @@ To run this project locally first, install all dependencies with:
 
 Then start a ganache instance by running:
 
-    $ npx ganache-cli -p 9545
+    $ npx ganache-cli --port 9545
 
 Next run `index.js` script using the command:
 
