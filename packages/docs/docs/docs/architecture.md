@@ -37,7 +37,7 @@ openzeppelin set-admin [NEW_ADMIN_ADDRESS]
 
 ### Contract upgrades via ProxyAdmin
 
-The `ProxyAdmin.sol` also responsible for upgrading our contracts. When you run the `openzeppelin upgrade` command, it goes through `ProxyAdmin`'s [`upgrade`](upgradeability_ProxyAdmin.html#upgrade) method. The `ProxyAdmin` contract also provides another method [`getProxyImplementation`](upgradeability_ProxyAdmin.html#getProxyImplementation) which returns the current implementation of a given proxy.
+The `ProxyAdmin.sol` also responsible for upgrading our contracts. When you run the `openzeppelin upgrade` command, it goes through `ProxyAdmin's` [`upgrade`](upgradeability_ProxyAdmin.html#upgrade) method. The `ProxyAdmin` contract also provides another method [`getProxyImplementation`](upgradeability_ProxyAdmin.html#getProxyImplementation) which returns the current implementation of a given proxy.
 
 You can find your `ProxyAdmin` contract address in `.openzeppelin/<network>.json` under the same name.
 
@@ -47,6 +47,12 @@ You can find your `ProxyAdmin` contract address in `.openzeppelin/<network>.json
 }
 ```
 The [`ProxyAdmin.sol`](https://github.com/OpenZeppelin/openzeppelin-sdk/blob/v2.2.0/packages/lib/contracts/upgradeability/ProxyAdmin.sol) comes with `@openzeppelin/upgrades` package.
+
+
+## [ProxyFactory](https://docs.zeppelinos.org/docs/2.3.0/upgradeability_ProxyFactory.html)
+
+
+The [ProxyFactory contract](https://docs.zeppelinos.org/docs/2.3.0/upgradeability_ProxyFactory.html#docsNav) comes with `@openzeppelin/upgrades` package and helps in creating `CREATE2` contracts using `zos create2` command. This contract contains all the necessary methods to deploy a `CREATE2` contract. Some important methods in `ProxyFactory.sol` are [_createProxy](https://docs.zeppelinos.org/docs/2.3.0/upgradeability_ProxyFactory.html#_createProxy), [_deployProxy](https://docs.zeppelinos.org/docs/2.3.0/upgradeability_ProxyFactory.html#_deployProxy) and [deploy](https://docs.zeppelinos.org/docs/2.3.0/upgradeability_ProxyFactory.html#deploy) which helps in deploying a proxy contract. You can find the full source code of `ProxyFactory` contract [here](https://github.com/zeppelinos/zos/blob/v2.4.0/packages/lib/contracts/upgradeability/ProxyFactory.sol#L81). 
 
 ## [App.sol](https://github.com/OpenZeppelin/openzeppelin-sdk/blob/v2.0.0/packages/lib/contracts/application/App.sol)
 
