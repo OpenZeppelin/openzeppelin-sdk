@@ -12,6 +12,7 @@
     ],
     "GUIDES": [
       "writing_contracts",
+      "create_from_solidity",
       "publishing",
       "testing",
       "erc20_onboarding",
