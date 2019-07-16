@@ -12,9 +12,12 @@
 // Import node dependencies.
 const fs = require('fs');
 
-// Import @openzeppelin/cli and @openzeppelin/upgrades dependencies.
-const openzeppelin = require('@openzeppelin/cli');
-const { ZWeb3 } = require('@openzeppelin/upgrades');
+// Retrieve @openzeppelin/cli scripts.
+// These are analogous to `openzeppelin` CLI commands.
+const { init, add, push, create } = require('@openzeppelin/cli').scripts;
+
+// Import @openzeppelin/upgrades dependencies.
+const { ZWeb3, Contracts, encodeCall } = require('@openzeppelin/upgrades');
 
 // Main entry point, called by `truffle exec`.
 async function main() {
@@ -28,16 +31,11 @@ async function main() {
   if(fs.existsSync('.openzeppelin/project.json')) fs.unlinkSync('.openzeppelin/project.json');
   if(fs.existsSync(`.openzeppelin/${network}.json`)) fs.unlinkSync(`.openzeppelin/${network}.json`);
 
-  // Retrieve OpenZeppelin SDK scripts.
-  // These are analogous to `openzeppelin` CLI commands.
-  const { init, add, push, create, publish } = openzeppelin.scripts;
-
   // Initialize OpenZeppelin SDK with Truffle's Web3 provider.
   console.log(`Initializing OpenZeppelin SDK...`);
   ZWeb3.initialize(web3.currentProvider);
 
   // Set the default parameters to be used in future transactions.
-  const Contracts = lib.Contracts;
   Contracts.setArtifactsDefaults({
     gas: 6721975,
     gasPrice: 100000000000
@@ -89,7 +87,6 @@ async function main() {
 
   // Construct the call data for the initialize method of Instance.sol.
   // This call data consists of the contract's `initialize` method with the value of `42`.
-  const encodeCall = lib.encodeCall;
   const data = encodeCall('initialize', ['uint256'], [42]);
   console.log(`Call data for Instance.sol's initialize: ${data}`);
 
