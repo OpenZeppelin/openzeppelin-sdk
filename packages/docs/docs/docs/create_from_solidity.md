@@ -59,7 +59,7 @@ contract Instance is Initializable {
 
 ## Deploying the Factory contract
 
-Now, we will deploy our `Factory` contract using `openzeppelin create`. We need to initialize our `Factory` contract with the [App.sol](https://docs.zeppelinos.org/docs/architecture.html#appsol-https-githubcom-zeppelinos-zos-blob-v200-packages-lib-contracts-application-appsol) contract address. The `App` contract is your OpenZeppelin SDK project's main directory. It tracks the addresses of all the logic contracts you have deployed, and Ethereum Packages you have linked (read more about it [here](https://docs.zeppelinos.org/docs/architecture.html)). This contract is only deployed if you `publish` your project, so first run:
+Now, we will deploy our `Factory` contract using `openzeppelin create`. We need to initialize our `Factory` contract with the [App.sol](https://docs.zeppelinos.org/docs/architecture.html) contract address. The `App` contract is your OpenZeppelin SDK project's main directory. It tracks the addresses of all the logic contracts you have deployed, and Ethereum Packages you have linked (read more about it [here](https://docs.zeppelinos.org/docs/architecture.html)). This contract is only deployed if you `publish` your project, so first run:
 
 ```console
 $ openzeppelin add Factory
@@ -80,7 +80,7 @@ All contracts have been deployed
 ? Select which function * initialize(_appContractAddress: address)
 ? _appContractAddress (address): 0xe78A0F7E598Cc8b0Bb87894B0F60dD2a88d6a8Ab
 ✓ Setting everything up to create contract instances
-✓ zosfactory Factory instance created at 0x9b1f7F645351AF3631a656421eD2e40f2802E6c0
+✓ Factory instance created at 0x9b1f7F645351AF3631a656421eD2e40f2802E6c0
 0x9b1f7F645351AF3631a656421eD2e40f2802E6c0
 ```
 
