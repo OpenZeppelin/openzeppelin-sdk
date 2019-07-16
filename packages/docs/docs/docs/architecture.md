@@ -17,7 +17,9 @@ The source code of the contracts involved with a published Ethereum Package can 
 
 This contract acts as a central admin for all proxies on your behalf, making their management as simple as possible. The `ProxyAdmin` contract is owned by the deployer (the project owner). It is the admin of all the proxy contracts and is in charge of upgrading them as well as transferring their ownership to another admin. This contract is used to complement the [transparent proxy pattern](pattern#transparent-proxies-and-function-clashes), which prevents an admin from accidentally triggering a proxy management function when interacting with their instances.
 
-### Ownership transfers
+The `ProxyAdmin` is only deployed when you run an `openzeppelin create` (or `openzeppelin create2`) command for the first time. You can force the CLI to deploy it by running `openzeppelin push --deploy-proxy-admin`.
+
+### Ownership transfer
 
 The OpenZeppelin SDK provides the `set-admin` command to transfer ownership. Using this command, we can transfer ownership of any single contract or we can also transfer the ownership of our entire project just by transferring the ownership of the `ProxyAdmin` contract itself.
 
@@ -33,7 +35,7 @@ To transfer ownership of the complete project:
 openzeppelin set-admin [NEW_ADMIN_ADDRESS]
 ```
 
->Note: Please replace [MYCONTRACT_ADDRESS] with the address of your contract for whom you want to change the ownership. Also, `openzeppelin set-admin` is an interactive command, and if you have any confusion just run `openzeppelin set-admin`, it will help you with upgrading your contracts.
+> Note: Please replace [MYCONTRACT_ADDRESS] with the address of your contract for whom you want to change the ownership. Also, `openzeppelin set-admin` is an interactive command, and if you have any confusion just run `openzeppelin set-admin`, it will help you with upgrading your contracts.
 
 ### Contract upgrades via ProxyAdmin
 
@@ -49,10 +51,12 @@ You can find your `ProxyAdmin` contract address in `.openzeppelin/<network>.json
 The [`ProxyAdmin.sol`](https://github.com/OpenZeppelin/openzeppelin-sdk/blob/v2.2.0/packages/lib/contracts/upgradeability/ProxyAdmin.sol) comes with `@openzeppelin/upgrades` package.
 
 
-## [ProxyFactory](https://docs.zeppelinos.org/docs/2.3.0/upgradeability_ProxyFactory.html)
+## [ProxyFactory](https://github.com/OpenZeppelin/openzeppelin-sdk/blob/v2.4.0/packages/lib/contracts/upgradeability/ProxyFactory.sol)
 
 
-The [ProxyFactory contract](https://docs.zeppelinos.org/docs/2.3.0/upgradeability_ProxyFactory.html#docsNav) comes with `@openzeppelin/upgrades` package and helps in creating `CREATE2` contracts using `zos create2` command. This contract contains all the necessary methods to deploy a `CREATE2` contract. Some important methods in `ProxyFactory.sol` are [_createProxy](https://docs.zeppelinos.org/docs/2.3.0/upgradeability_ProxyFactory.html#_createProxy), [_deployProxy](https://docs.zeppelinos.org/docs/2.3.0/upgradeability_ProxyFactory.html#_deployProxy) and [deploy](https://docs.zeppelinos.org/docs/2.3.0/upgradeability_ProxyFactory.html#deploy) which helps in deploying a proxy contract. You can find the full source code of `ProxyFactory` contract [here](https://github.com/zeppelinos/zos/blob/v2.4.0/packages/lib/contracts/upgradeability/ProxyFactory.sol#L81). 
+The [ProxyFactory contract](https://github.com/OpenZeppelin/openzeppelin-sdk/blob/v2.4.0/packages/lib/contracts/upgradeability/ProxyFactory.sol) ships with `@openzeppelin/upgrades` package and is used in creating contracts via the `openzeppelin create2` command, as well as for creating minimal proxies. This contract contains all the necessary methods to deploy a proxy through the `CREATE2` opcode, or a minimal non-upgradeable proxy.
+
+This contract is only deployed when you run `openzeppelin create2` or `openzeppelin create --minimal` for the first time. You can force the CLI to deploy it by running `openzeppelin push --deploy-proxy-factory`.
 
 ## [App.sol](https://github.com/OpenZeppelin/openzeppelin-sdk/blob/v2.0.0/packages/lib/contracts/application/App.sol)
 
