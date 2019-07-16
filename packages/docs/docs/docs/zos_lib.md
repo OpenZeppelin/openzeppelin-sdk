@@ -129,32 +129,35 @@ npx truffle compile
 And now, let's write our upgrading script in `index.js`:
 
 ```js
-'use strict';
-
-// Required by openzeppelin when running from truffle
+// Required by @openzeppelin/upgrades when running from truffle
 global.artifacts = artifacts;
 global.web3 = web3;
 
+// Import dependencies from OpenZeppelin SDK programmatic library
 const { Contracts, SimpleProject, ZWeb3 } = require('@openzeppelin/upgrades')
-ZWeb3.initialize(web3.currentProvider)
-
-// Load the contract.
-const MyContractV0 = Contracts.getFromLocal('MyContractV0');
-const MyContractV1 = Contracts.getFromLocal('MyContractV1');
 
 async function main() {
 
-  // Instantiate a project.
-  const initializerAddress = (await web3.eth.getAccounts())[1];
-  const project = new SimpleProject('MyProject', { from: initializerAddress } );
+  /* Initialize OpenZeppelin's Web3 provider. */
+  ZWeb3.initialize(web3.currentProvider)
 
-  console.log('Creating an upgradeable instance of V0...');
-  const proxy = await project.createProxy(MyContractV0, { initArgs: [42] })
-  console.log('Contract\'s storage value: ' + (await proxy.methods.value().call()).toString() + '\n');
+  /* Retrieve compiled contract artifacts. */
+  const MyContract_v0 = Contracts.getFromLocal('MyContract_v0');
+  const MyContract_v1 = Contracts.getFromLocal('MyContract_v1');
 
-  console.log('Upgrading to v1...');
-  const instance = await project.upgradeProxy(proxy.address, MyContractV1, { initMethod: 'add', initArgs: [1], initFrom: initializerAddress })
-  console.log('Contract\'s storage new value: ' + (await instance.methods.value().call()).toString() + '\n');
+  /* Retrieve a couple of addresses to interact with the contracts. */
+  const [creatorAddress, initializerAddress] = await ZWeb3.accounts();
+
+  /* Create a SimpleProject to interact with OpenZeppelin programmatically. */
+  const myProject = new SimpleProject('MyProject', null, { from: creatorAddress });
+
+  /* Deploy the contract with a proxy that allows upgrades. Initialize it by setting the value to 42. */
+  const instance = await myProject.createProxy(MyContract_v0, { initArgs: [42] })
+  console.log('Contract\'s storage value:', (await instance.methods.value().call({ from: initializerAddress })).toString());
+  
+  /* Upgrade the contract at the address of our instance to the new logic, and initialize with a call to add. */
+  await myProject.upgradeProxy(instance.address, MyContract_v1, { initMethod: 'add', initArgs: [1] });
+  console.log('Contract\'s storage new value:', (await instance.methods.value().call({ from: initializerAddress })).toString());
 }
 
 // For truffle exec
