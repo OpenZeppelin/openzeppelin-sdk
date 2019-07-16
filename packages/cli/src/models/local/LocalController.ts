@@ -29,7 +29,9 @@ export default class LocalController {
 
   public constructor(projectFile: ProjectFile = new ProjectFile(), init: boolean = false) {
     if (!init && !projectFile.exists()) {
-      throw Error(`OpenZeppelin file ${projectFile.filePath} not found. Run 'zos init' first to initialize the project.`);
+      throw Error(
+        `OpenZeppelin file ${projectFile.filePath} not found. Run 'zos init' first to initialize the project.`,
+      );
     }
     this.projectFile = projectFile;
   }
