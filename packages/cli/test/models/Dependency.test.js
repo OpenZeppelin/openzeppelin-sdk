@@ -9,15 +9,7 @@ import Dependency from '../../src/models/dependency/Dependency';
 import ProjectFile from '../../src/models/files/ProjectFile';
 import NetworkFile from '../../src/models/files/NetworkFile';
 
-contract('Dependency', function([_, from]) {
-  const assertErrorMessage = (fn, errorMessage) => {
-    try {
-      fn();
-    } catch (error) {
-      error.message.should.match(errorMessage);
-    }
-  };
-
+contract.only('Dependency', function([_, from]) {
   describe('static methods', function() {
     describe('#satisfiesVersion', function() {
       it('verifies if requirement satisfies version', function() {
@@ -29,10 +21,9 @@ contract('Dependency', function([_, from]) {
     describe('#fromNameAndVersion', function() {
       describe('with invalid nameAndVersion', function() {
         it('throws error', function() {
-          assertErrorMessage(
-            () => Dependency.fromNameWithVersion('bildts-kcom'),
-            /Could not find a project.json file/,
-          );
+          expect(
+            () => Dependency.fromNameWithVersion('bildts-kcom')
+          ).to.throw(/Could not find a project.json file/);
         });
       });
 
@@ -114,19 +105,17 @@ contract('Dependency', function([_, from]) {
   describe('#constructor', function() {
     context('with invalid version', function() {
       it('throws an error', function() {
-        assertErrorMessage(
-          () => new Dependency('mock-stdlib', '1.2.0'),
-          /does not match version/,
-        );
+        expect(
+          () => new Dependency('mock-stdlib', '1.2.0')
+        ).to.throw(/does not match version/);
       });
     });
 
     context('with non-existent dependency name', function() {
       it('throws an error', function() {
-        assertErrorMessage(
-          () => new Dependency('bildts-kcom', '1.1.0'),
-          /Could not find a project.json file/,
-        );
+        expect(
+          () => new Dependency('bildts-kcom', '1.1.0')
+        ).to.throw(/Could not find a project.json file/);
       });
     });
 
@@ -178,10 +167,9 @@ contract('Dependency', function([_, from]) {
     describe('#getNetworkFile', function() {
       context('for a non-existent network', function() {
         it('throws an error', function() {
-          assertErrorMessage(
-            () => this.dependency.getNetworkFile('bildts-kcom'),
-            /Could not find a project file for network/,
-          );
+          expect(
+            () => this.dependency.getNetworkFile('bildts-kcom')
+          ).to.throw(/Could not find a project file for network/);
         });
       });
 
