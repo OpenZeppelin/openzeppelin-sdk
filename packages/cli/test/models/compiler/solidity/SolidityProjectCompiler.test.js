@@ -26,7 +26,6 @@ describe('SolidityProjectCompiler', function() {
     const inputDir = `${rootDir}/test/mocks/mock-stdlib/contracts`;
     const outputDir = `${baseTestBuildDir}/mock-stdlib`;
     const greeterArtifactPath = `${outputDir}/GreeterImpl.json`;
-    
     beforeEach('compiling', async function() {
       await compileProject({ inputDir, outputDir, version: '0.5.9', force: true });
     });
@@ -119,7 +118,7 @@ describe('SolidityProjectCompiler', function() {
       );
     });
 
-    // https://github.com/zeppelinos/zos/issues/1071
+    // For more info, see: https://github.com/zeppelinos/zos/issues/1071
     it('preserves truffle deployment info', async function () {
       const networksData = {
         "100001": {
