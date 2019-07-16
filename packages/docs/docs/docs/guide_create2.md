@@ -3,15 +3,13 @@ id: CREATE2
 title: Using CREATE2 for deploying precomputed addresses
 ---
 
-
-
 The CREATE2 opcode gives us the ability to calculate smart contracts addresses without actually deploying them on the Ethereum blockchain. This opens up a lot of possibilities to improve [user onboarding and scalability](https://blog.zeppelinos.org/getting-the-most-out-of-create2/).
 
 In this guide, we will create an upgradable `Wallet` contract with a `transfer` method, then we will reserve an address using CREATE2 without actually deploying `Wallet` contract and send some `ethers` to this address. At last, we will actually deploy our `Wallet` contract and execute `transfer` method to transfer contract funds to another account.
 
 ## Contract creation using CREATE opcode
 
-CREATE opcode calculates new addresses as a function of the sender’s address and a nonce.
+The `CREATE` opcode calculates new addresses as a function of the sender’s address and a nonce.
 
 ```console 
 contract address = hash(sender, nonce)
@@ -27,7 +25,7 @@ Every account has an associated nonce: for EOAs, this nonce is increased on ever
 
 Because of these two conditions, we can’t rely on nonce as any arbitrary transaction in future can replace our contract.  
 
-Hence CREATE opcode does not help us with calculating contract addresses in a secure and deterministic way for future use (parking an address).
+Hence the `CREATE` opcode does not help us with calculating contract addresses in a secure and deterministic way for future use (ie parking an address).
 
 ## CREATE2
 
@@ -47,26 +45,25 @@ CREATE2 calculates new addresses as a function of
 contract address = hash(0xFF,sender, salt, contract creation code)
 ```
 
-
 Here, `salt` is an independent value and will produce the same contract address when used with the same sender address and contract creation code. This allows a secure and deterministic way to calculate contract addresses for future use.
 
-## CREATE2 with zOS
+## CREATE2 with OpenZeppelin SDK
 
-Zeppelin OS supports the creation of **upgradeable** smart contracts using zos CREATE2 . Let’s [setup](https://docs.zeppelinos.org/docs/first.html#setting-up-your-project) our project and use CLI to initialize a ZeppelinOS project:
+The OpenZeppelin SDK supports the creation of **upgradeable** smart contracts using openzeppelin CREATE2 . Let’s [setup](https://docs.zeppelinos.org/docs/first.html#setting-up-your-project) our project and use CLI to initialize an OpenZeppelin SDK project:
 
  ```console 
- zos init 
+ openzeppelin init 
  ```
-
 
 Next, we will create an upgradable `Wallet` contract with a `transfer` method. We will reserve an address for it using CREATE2 and send some `ethers` to this contract without deploying it. In the end, we will actually deploy our `Wallet` contract and execute `transfer` method to transfer contract funds to another account.
 
 ## Add Wallet.sol
 
-Now, create a `Wallet.sol` file in your `contracts` folder.
+Now, create a `Wallet.sol` file in your `contracts` folder:
+
 ```solidity
 pragma solidity ^ 0.5.0;
-import "zos-lib/contracts/Initializable.sol";
+import "@openzeppelin/upgrades/contracts/Initializable.sol";
 
 contract Wallet is Initializable {
   address owner;
@@ -83,92 +80,82 @@ contract Wallet is Initializable {
 
 Now, we need to install and run [Ganache](https://docs.zeppelinos.org/docs/first.html#deploying-to-a-development-network) to deploy our contracts on our local development blockchain.
 
-## Deploying Contract using Create2
+## Deploying a contract using CREATE2
 
-Before deploying, we need to add our contract using `zos add`, this will add our contract to our ZeppelinOS project, so it can be deployed using `zos push` afterward.
+Before deploying, we need to add our contract using `openzeppelin add`, this will add our contract to our OpenZeppelin SDK project, so it can be deployed using `openzeppelin push` afterward.
 
 ```console 
-zos add Wallet 
+openzeppelin add Wallet 
 ```
 
-Now, we will generate contract address using `zos create2`, we will use `12345` as salt, you can choose any random number and `--query` option tells zOS that we want to compute address, not the actual deployment of the contract. We will also pass network information using `-n development`, you can find this configuration in networks.js file.
+Now, we will generate contract address using `openzeppelin create2`, we will use `12345` as salt, you can choose any random number and `--query` option tells openzeppelin that we want to compute address, not the actual deployment of the contract. We will also pass network information using `-n development`, you can find this configuration in networks.js file.
 
 ```console 
-$ zos create2 --salt 12345 --query -n development
-
+$ openzeppelin create2 --salt 12345 --query -n development
 ✓ Deployed ProxyFactory at 0x4e08589Cd399474157f24f591B9fB100D1adD5d9
 
 Any contract created with salt 12345 will be deployed to the following address
-
 0x4e08589Cd399474157f24f591B9fB100D1adD5d9
 ```
 
-> Note : Here zOS using proxy contract code as contract creation code under the hood and 0x4e08589Cd399474157f24f591B9fB100D1adD5d9 is computed address but contract is still not deployed on this address. Owner of Wallet contract is 0x90f8bf6a479f320ead074411a4b0e7944ea8c9c1.
+> Note : Here openzeppelin using proxy contract code as contract creation code under the hood and 0x4e08589Cd399474157f24f591B9fB100D1adD5d9 is computed address but contract is still not deployed on this address. Owner of Wallet contract is 0x90f8bf6a479f320ead074411a4b0e7944ea8c9c1.
 
 ## Interacting with the Contract
 
-Now, we will send 10 ethers to our newly generated contract address using `zos transfer`.
+Now, we will send 10 ethers to our newly generated contract address using `openzeppelin transfer`.
 
 ```console 
-$ zos transfer
+$ openzeppelin transfer
 
 Pick a network: development
-
 Choose the account to send transactions from: 0x90F8bf6A479f320ead074411a4B0e7944Ea8c9C1
-
 Enter the receiver account: 0x4e08589Cd399474157f24f591B9fB100D1adD5d9
-
 Enter an amount to transfer: 10 ether
 
 ✓ Funds sent.
-
 Transaction hash: 0xbcaefc07f4e03a69456f3cb40a1998a597914eb1352470ee01991631cab35c4a
 ```
 
 > Note: Ganache provides us ten addresses with 100 ethers in each of them. These are test ethers, do not send or use them as real ether.
 
-Next, we will verify `Wallet` contract balance and the sender’s balance using `zos balance`
+Next, we will verify the `Wallet` contract balance and the sender’s balance using `openzeppelin balance`
 
 ```console 
--- Wallet contract balance
-
-$ zos balance 0x4e08589Cd399474157f24f591B9fB100D1adD5d9
+$ openzeppelin balance 0x4e08589Cd399474157f24f591B9fB100D1adD5d9
 Balance: 10 ETH
+```
 
--- Sender's balance
-
-$ zos balance 0x90F8bf6A479f320ead074411a4B0e7944Ea8c9C1Balance 
+```
+$ openzeppelin balance 0x90F8bf6A479f320ead074411a4B0e7944Ea8c9C1Balance 
 Balance: 89.97829973 ETH
 ```
 
 > Note: Here 0x90F8bf6A479f320ead074411a4B0e7944Ea8c9C1 is sender as well as owner of our `Wallet` contract.
 
-## Deploy Wallet Contract
+## Deploy the wallet contract
 
 Now, we will deploy our contract and withdraw 10 ethers which we sent above.
 
-To deploy first we need to execute `zos push` , which deploys our logic contract (with the code) and then `create2` which deploys our proxy contract.
+To deploy first we need to execute `openzeppelin push` , which deploys our logic contract (with the code) and then `create2` which deploys our proxy contract.
 
-> Note: In zOS every contract is actually a combination of two contracts: [A proxy contract and a logic contract.](https://blog.zeppelinos.org/the-transparent-proxy-pattern/) Proxy pattern enables upgradibility in zOS.
+> Note: In openzeppelin every contract is actually a combination of two contracts: [a proxy contract and a logic contract](https://blog.zeppelinos.org/the-transparent-proxy-pattern/).
 
 ```console 
-zos push
-
-zos create2 Wallet --salt 12345 --init --args 0x90F8bf6A479f320ead074411a4B0e7944Ea8c9C1 -n development
+openzeppelin push
+openzeppelin create2 Wallet --salt 12345 --init --args 0x90F8bf6A479f320ead074411a4B0e7944Ea8c9C1 -n development
 ```
 
 > Note: We are using same salt `12345` and mentioning ccontract owner address 0x90F8bf6A479f320ead074411a4B0e7944Ea8c9C1 which was used to initialize our `Wallet` contract above.
 
-## Transfer Fund from Contract
+## Transfer funds from the contract
 
-Now, we will transfer funds from our `Wallet` contract using `zos send-tx` to another address 0xffcf8fdee72ac11b5c542428b35eef5769c409f0 . Remember, we have sent 10 ethers without deploying our contract above. 
+Now, we will transfer funds from our `Wallet` contract using `openzeppelin send-tx` to another address 0xffcf8fdee72ac11b5c542428b35eef5769c409f0 . Remember, we have sent 10 ethers without deploying our contract above. 
+
 ```console 
-$ zos send-tx
+$ openzeppelin send-tx
 
-Pick an instance Wallet at 0x4e08589Cd399474157f24f591B9fB100D1adD5d9
-
-Select which function transfer(receiver: address)
-
+Pick an instance: Wallet at 0x4e08589Cd399474157f24f591B9fB100D1adD5d9
+Select which function: transfer(receiver: address)
 receiver (address): 0xffcf8fdee72ac11b5c542428b35eef5769c409f0
 
 ✓ Transaction successful. Transaction hash: 0xef464fecd93b609a001c1d439e89c77484797b217587ee8fb907531df9489275
@@ -176,26 +163,25 @@ receiver (address): 0xffcf8fdee72ac11b5c542428b35eef5769c409f0
 
 > Note: We have `transfer` method in our `Wallet` contract, which will transfer contract's funds to a given account. Here, we are tranferring funds to a receiver account 0xffcf8fdee72ac11b5c542428b35eef5769c409f0, it is one of the 10 accounts which Ganache provided us. 
 
-Now, let’s check the balance of the `Wallet` contract and the receiver's account using `zos balance`, `Wallet` contract balance should be 0 now as all the funds are transferred to the receiver's account.
+Now, let's check the balance of the `Wallet` contract and the receiver's account using `openzeppelin balance`, `Wallet` contract balance should be 0 now as all the funds are transferred to the receiver's account.
+
 ```console 
--- Wallet contract balance
-
-$ zos balance 0x4e08589Cd399474157f24f591B9fB100D1adD5d9
+$ openzeppelin balance 0x4e08589Cd399474157f24f591B9fB100D1adD5d9
 Balance: 0 ETH
+```
 
--- Receiver's balance
-
-$ zos balance 0xffcf8fdee72ac11b5c542428b35eef5769c409f0
+```console
+$ openzeppelin balance 0xffcf8fdee72ac11b5c542428b35eef5769c409f0
 Balance: 110 ETH
  ```
 
-> Note: Our `Wallet` contract is upgradeable and we can upgrade it using `zos upgrade` command.
+> Note: Our `Wallet` contract is upgradeable and we can upgrade it using `openzeppelin upgrade` command.
 
 ## Wrapping up
 
-To summarize, let’s see what we have learned so far, we have created an upgradable smart contract `Wallet` using CREATE2 and funded it with 10 ethers, then we actually deployed the contract and executed `transfer` method to send funds to another account.
+To summarize, let’s see what we have learned so far. We have created an upgradable smart contract `Wallet` using CREATE2 and funded it with 10 ethers, then we actually deployed the contract and executed `transfer` method to send funds to another account.
 
-That’s it!! Now you know how to use CREATE2 to reserve an address and deploy upgradable contracts, [here](https://blog.zeppelinos.org/getting-the-most-out-of-create2/) is our blog post if you want to deep dive into CREATE2 and its use cases in *counterfactual instantiation *and* user onboarding.* In the next tutorial, we will learn how to create contracts using another contract.
+That’s it!1 Now you know how to use CREATE2 to reserve an address and deploy upgradable contracts, [here](https://blog.zeppelinos.org/getting-the-most-out-of-create2/) is our blog post if you want to deep dive into CREATE2 and its use cases in *counterfactual instantiation* and *user onboarding*.
 
 
 
