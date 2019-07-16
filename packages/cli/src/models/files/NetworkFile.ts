@@ -65,28 +65,31 @@ interface AddressWrapper {
   address?: string;
 }
 
+interface NetworkFileData {
+  contracts: { [contractAlias: string]: ContractInterface };
+  solidityLibs: { [libAlias: string]: SolidityLibInterface };
+  proxies: { [contractName: string]: ProxyInterface[] };
+  manifestVersion?: string;
+  zosversion?: string;
+  proxyAdmin: AddressWrapper;
+  proxyFactory: AddressWrapper;
+  app: AddressWrapper;
+  package: AddressWrapper;
+  provider: AddressWrapper;
+  version: string;
+  frozen: boolean;
+  dependencies: { [dependencyName: string]: DependencyInterface };
+}
+
 export default class NetworkFile {
   public projectFile: ProjectFile;
   public network: any;
   public filePath: string;
-  public data: {
-    contracts: { [contractAlias: string]: ContractInterface };
-    solidityLibs: { [libAlias: string]: SolidityLibInterface };
-    proxies: { [contractName: string]: ProxyInterface[] };
-    manifestVersion: string;
-    proxyAdmin: AddressWrapper;
-    proxyFactory: AddressWrapper;
-    app: AddressWrapper;
-    package: AddressWrapper;
-    provider: AddressWrapper;
-    version: string;
-    frozen: boolean;
-    dependencies: { [dependencyName: string]: DependencyInterface };
-  };
+  public data: NetworkFileData;
 
   public static getManifestVersion(network: string): string | null {
     const file = fs.parseJsonIfExists(`zos.${network}.json`);
-    return file ? file.manifestVersion : null;
+    return file ? file.manifestVersion || file.zosversion : null;
   }
 
   // TS-TODO: type for network parameter (and class member too).
@@ -117,15 +120,19 @@ export default class NetworkFile {
     this.data = this.data || defaults;
     this.filePath = this.filePath || `${OPEN_ZEPPELIN_FOLDER}/${network}.json`;
 
-    checkVersion(this.data.manifestVersion, this.filePath);
+    checkVersion(this.data.manifestVersion || this.data.zosversion, this.filePath);
   }
 
   public set manifestVersion(version: string) {
-    this.data.manifestVersion = version;
+    if (this.data.manifestVersion) {
+      this.data.manifestVersion = version;
+    } else {
+      this.data.zosversion = version;
+    }
   }
 
   public get manifestVersion(): string {
-    return this.data.manifestVersion;
+    return this.data.manifestVersion || this.data.zosversion;
   }
 
   public set version(version: string) {

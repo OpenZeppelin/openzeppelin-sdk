@@ -20,7 +20,7 @@ const ConfigManager = {
     options: any = {},
     silent?: boolean,
     root: string = process.cwd(),
-  ): Promise<{ network: string, txParams: TxParams } | never> {
+  ): Promise<{ network: string; txParams: TxParams } | never> {
     this.initStaticConfiguration(root);
     const { network: networkName, from, timeout } = Session.getOptions(options, silent);
     Session.setDefaultNetworkIfNeeded(options.network);

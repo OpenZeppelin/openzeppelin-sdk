@@ -62,4 +62,14 @@ contract('NetworkFile', function() {
       ).to.throw(/Unrecognized manifest version identifier 3/);
     });
   });
+
+  it('supports deprecated manifest version', function() {
+    const file = new NetworkFile(
+      this.appProjectFile,
+      'test',
+      'test/mocks/networks/network-deprecated-manifest-version.zos.test.json',
+    );
+
+    file.manifestVersion.should.eq('2.2');
+  });
 });

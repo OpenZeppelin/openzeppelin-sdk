@@ -27,7 +27,8 @@ interface ConfigFileCompilerOptions {
 interface ProjectFileData {
   name: string;
   version: string;
-  manifestVersion: string;
+  manifestVersion?: string;
+  zosversion?: string;
   dependencies: { [name: string]: string };
   contracts: { [alias: string]: string };
   publish: boolean;
@@ -68,7 +69,7 @@ export default class ProjectFile {
     }
     this.filePath = this.filePath || PROJECT_FILE_PATH;
     this.data = this.data || defaultData;
-    checkVersion(this.data.manifestVersion, this.filePath);
+    checkVersion(this.data.manifestVersion || this.data.zosversion, this.filePath);
     if (!this.data.contracts) this.data.contracts = {};
     if (!this.data.dependencies) this.data.dependencies = {};
   }
@@ -82,7 +83,11 @@ export default class ProjectFile {
   }
 
   public set manifestVersion(version: string) {
-    this.data.manifestVersion = version;
+    if (this.data.manifestVersion) {
+      this.data.manifestVersion = version;
+    } else {
+      this.data.zosversion = version;
+    }
   }
 
   public set publish(publish: boolean) {
