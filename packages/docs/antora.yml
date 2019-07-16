@@ -1,5 +1,5 @@
 name: 'sdk'
-title: 'OpenZeppelin SDK'
+title: 'SDK'
 version: '2.4'
 nav: 
   - modules/ROOT/nav.adoc
