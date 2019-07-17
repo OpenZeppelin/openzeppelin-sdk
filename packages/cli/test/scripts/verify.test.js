@@ -33,7 +33,7 @@ contract('verify script', function() {
         await assertVerify(
           contractAlias,
           { network, networkFile },
-          /Run 'zos init' first to initialize the project./,
+          /Run 'openzeppelin init' first to initialize the project./,
         );
       });
 
