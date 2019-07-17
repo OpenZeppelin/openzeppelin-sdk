@@ -1,52 +1,49 @@
----
-id: sdk_js_library
-title: Using the OpenZeppelin SDK programmatic library
----
+[[using-the-openzeppelin-sdk-programmatic-library]]
+= Using the OpenZeppelin SDK programmatic library
 
-The OpenZeppelin SDK has a JavaScript library. It is mainly used by the `openzeppelin`
-command-line interface, which is the recommended way to use the OpenZeppelin SDK; but
-this library can also be used directly to operate OpenZeppelin SDK projects when a
-programmatic interface is preferred or more flexibility and lower-level
-access is required.
+The OpenZeppelin SDK has a JavaScript library. It is mainly used by the `openzeppelin` command-line interface, which is the recommended way to use the OpenZeppelin SDK; but this library can also be used directly to operate OpenZeppelin SDK projects when a programmatic interface is preferred or more flexibility and lower-level access is required.
 
-## Install Node and NPM
+[[install-node-and-npm]]
+== Install Node and NPM
 
-Let's install [Node.js](http://nodejs.org/) and
-[npm](https://npmjs.com/), which are the dependencies to get started. On their
-respective websites you will find specific instructions for your machine.
+Let's install http://nodejs.org/[Node.js] and https://npmjs.com/[npm], which are the dependencies to get started. On their respective websites you will find specific instructions for your machine.
 
-## Setting up your project
+[[setting-up-your-project]]
+== Setting up your project
 
 We'll need to create a directory for our project and access it:
 
-```console
+[source,console]
+----
 mkdir my-project
 cd my-project
-
-```
+----
 
 Use `npm` to create a `package.json` file:
-```console
-npm init
-```
 
-This command will ask you for details about the project. For this very basic
-guide you can just press enter to accept the default values of each field.
+[source,console]
+----
+npm init
+----
+
+This command will ask you for details about the project. For this very basic guide you can just press enter to accept the default values of each field.
 
 Next, we need to install Truffle. To do so, run the following command:
 
-```console
+[source,console]
+----
 npm install truffle@5.0.4
-```
+----
 
 Now, initialize the project as a Truffle project with:
 
-```
+....
 npx truffle init
-```
+....
 
 And make sure that you have the local network configured:
-```
+
+....
 module.exports = {
   networks: {
     local: {
@@ -58,28 +55,31 @@ module.exports = {
     }
   }
 };
-```
+....
 
-We'll be using [ganache](https://truffleframework.com/docs/ganache/quickstart) for local deployment, so let's install it:
+We'll be using https://truffleframework.com/docs/ganache/quickstart[ganache] for local deployment, so let's install it:
 
-```console
+[source,console]
+----
 npm install --global ganache-cli
-```
+----
 
 Now, install the OpenZeppelin SDK JavaScript library running:
 
-```console
+[source,console]
+----
 npm install @openzeppelin/upgrades
-```
+----
 
 That's it! Our project is now fully set up for using the OpenZeppelin SDK programmatically.
 
-## Adding some contracts
+[[adding-some-contracts]]
+== Adding some contracts
 
-Now, let's write two simple contracts. The first in `contracts/MyContractV0`
-with the following contents:
+Now, let's write two simple contracts. The first in `contracts/MyContractV0` with the following contents:
 
-```solidity
+[source,solidity]
+----
 pragma solidity ^0.5.0;
 
 import "@openzeppelin/upgrades/contracts/Initializable.sol";
@@ -91,12 +91,12 @@ contract MyContractV0 is Initializable {
     value = _value;
   }
 }
-```
+----
 
-The second in `contracts/MyContractV1`, and it will be almost the same as the
-first one but with one extra function:
+The second in `contracts/MyContractV1`, and it will be almost the same as the first one but with one extra function:
 
-```solidity
+[source,solidity]
+----
 pragma solidity ^0.5.0;
 
 import "@openzeppelin/upgrades/contracts/Initializable.sol";
@@ -112,23 +112,25 @@ contract MyContractV1 is Initializable {
     value = value + _value;
   }
 }
-```
+----
 
-The V1 contract is an upgrade for the V0 contract, so let's see how we can
-use the OpenZeppelin SDK library to apply this upgrade. For this, we need to
-compile the contracts:
+The V1 contract is an upgrade for the V0 contract, so let's see how we can use the OpenZeppelin SDK library to apply this upgrade. For this, we need to compile the contracts:
 
-## Compiling the contracts
+[[compiling-the-contracts]]
+== Compiling the contracts
 
-```console
+[source,console]
+----
 npx truffle compile
-```
+----
 
-## Running the script
+[[running-the-script]]
+== Running the script
 
 And now, let's write our upgrading script in `index.js`:
 
-```js
+[source,js]
+----
 // Required by @openzeppelin/upgrades when running from truffle
 global.artifacts = artifacts;
 global.web3 = web3;
@@ -164,21 +166,20 @@ async function main() {
 module.exports = function(callback) {
   main().then(() => callback()).catch(err => callback(err))
 };
-```
+----
 
-As you can see on the code, this script was prepared to be executed with
-Truffle. So let's open a new terminal and start a ganache network by running:
+As you can see on the code, this script was prepared to be executed with Truffle. So let's open a new terminal and start a ganache network by running:
 
-```console
+[source,console]
+----
 ganache-cli --port 9545
-```
+----
 
 And then, execute the script using Truffle:
 
-```console
+[source,console]
+----
 npx truffle exec index.js --network local
-```
+----
 
-This is just a very simple example to show the basic functions of the
-OpenZeppelin SDK JavaScript library. You can find more examples in the
-[OpenZeppelin SDK repository](https://github.com/OpenZeppelin/openzeppelin-sdk/tree/master/examples).
+This is just a very simple example to show the basic functions of the OpenZeppelin SDK JavaScript library. You can find more examples in the https://github.com/OpenZeppelin/openzeppelin-sdk/tree/master/examples[OpenZeppelin SDK repository].
