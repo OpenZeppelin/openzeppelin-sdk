@@ -19,6 +19,7 @@ import {
 import ProjectFile, { LEGACY_PROJECT_FILE_NAME, PROJECT_FILE_PATH } from '../files/ProjectFile';
 import NetworkFile from '../files/NetworkFile';
 import { OPEN_ZEPPELIN_FOLDER } from '../files/constants';
+import { dirname } from 'path';
 
 export default class Dependency {
   public name: string;
@@ -55,7 +56,8 @@ export default class Dependency {
     const hasDependenciesForDeploy = dependencies.find(
       (depNameAndVersion): any => {
         const [name, version] = depNameAndVersion.split('@');
-        const networkFilePath = Dependency.getExistingNetworkFilePath(name, network);
+        const dependency = new Dependency(name);
+        const networkFilePath = dependency.getExistingNetworkFilePath(network);
         const projectDependency = networkDependencies[name];
         const satisfiesVersion = projectDependency && this.satisfiesVersion(projectDependency.version, version);
         return !fs.exists(networkFilePath) && !satisfiesVersion;
@@ -128,11 +130,9 @@ export default class Dependency {
 
   public get projectFile(): ProjectFile | never {
     if (!this._projectFile) {
-      const filePath = ProjectFile.getExistingFilePath(`node_modules/${this.name}`);
+      const filePath = ProjectFile.getExistingFilePath(this.getDependencyFolder());
       if (!filePath) {
-        throw new Error(
-          `Could not find a project.json file for '${this.name}'. Make sure it is provided by the npm package.`,
-        );
+        throw new Error(`Could not find an .openzeppelin/project.json or zos.json file for '${this.name}'`);
       }
       this._projectFile = new ProjectFile(filePath);
     }
@@ -141,7 +141,7 @@ export default class Dependency {
 
   public getNetworkFile(network: string): NetworkFile | never {
     if (!this._networkFiles[network]) {
-      const filePath = Dependency.getExistingNetworkFilePath(this.name, network);
+      const filePath = this.getExistingNetworkFilePath(network);
 
       if (!fs.exists(filePath)) {
         throw Error(`Could not find a project file for network '${network}' for '${this.name}'`);
@@ -154,18 +154,21 @@ export default class Dependency {
   }
 
   public isDeployedOnNetwork(network: string): boolean {
-    const filePath = Dependency.getExistingNetworkFilePath(this.name, network);
+    const filePath = this.getExistingNetworkFilePath(network);
     if (!fs.exists(filePath)) return false;
     return !!this.getNetworkFile(network).packageAddress;
   }
 
-  private static getExistingNetworkFilePath(name: string, network: string): string {
-    // TODO-v3: Remove legacy project file support
-    let legacyFilePath = `node_modules/${name}/zos.${network}.json`;
-    legacyFilePath = fs.exists(legacyFilePath) ? legacyFilePath : null;
-    let filePath = `node_modules/${this.name}/${OPEN_ZEPPELIN_FOLDER}/${network}.json`;
-    filePath = fs.exists(filePath) ? filePath : null;
-    return filePath || legacyFilePath;
+  private getDependencyFolder(): string {
+    try { 
+      return dirname(require.resolve(`${this.name}/package.json`, { paths: [process.cwd()] }));
+    } catch (err) { 
+      throw new Error(`Could not find dependency ${this.name}.`) 
+    }
+  }
+
+  private getExistingNetworkFilePath(network: string): string {
+    return NetworkFile.getExistingFilePath(network, this.getDependencyFolder());
   }
 
   private validateSatisfiesVersion(version: string, requirement: string | semver.Range): void | never {
