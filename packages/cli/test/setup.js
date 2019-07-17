@@ -9,7 +9,8 @@ useTestZosPackageFile();
 doNotInstallStdlib();
 ZWeb3.initialize(web3.currentProvider);
 setArtifactDefaults();
-Loggy.silent(true);
+Loggy.silent(false);
+Loggy.testing(true);
 
 require('chai')
   .use(require('chai-as-promised'))
