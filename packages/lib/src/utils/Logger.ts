@@ -124,9 +124,14 @@ export const Loggy: { [key: string]: any } = {
   _log(reference: string): void {
     try {
       if (this.isSilent) return;
-      const { file, fnName, text, spinnerAction, logLevel, logType } = this.logs[
-        reference
-      ];
+      const {
+        file,
+        fnName,
+        text,
+        spinnerAction,
+        logLevel,
+        logType,
+      } = this.logs[reference];
       const color = this._getColorFor(logType);
       if (this.isVerbose || this.isTesting) {
         const location = `${path.basename(file)}#${fnName}`;
@@ -134,7 +139,7 @@ export const Loggy: { [key: string]: any } = {
           spinnerAction,
         )}> ${text}`;
         const coloredMessage = color ? chalk.keyword(color)(message) : message;
-        console.error(coloredMessage);
+        if (!this.isTesting) console.error(coloredMessage);
       } else if (logLevel === LogLevel.Normal) {
         const options = color
           ? { text, status: spinnerAction, color }

@@ -28,7 +28,7 @@ contract('unlink script', function() {
         dependencies: [dependencyName],
         packageFile: this.packageFile,
       }).should.be.rejectedWith(
-        `Could not find a zos.json file for '${dependencyName}'. Make sure it is provided by the npm package.`,
+        /Cannot find module/,
       );
     });
   });

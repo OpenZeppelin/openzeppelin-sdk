@@ -22,6 +22,12 @@ contract('Contracts', function() {
     instance.address.should.not.be.null;
   });
 
+  it('can lookup contracts from hoisted node modules', async function() {
+    const GreeterLib = Contracts.getFromNodeModules('mock-stdlib-root', 'GreeterLib');
+    const instance = await GreeterLib.new();
+    instance.address.should.not.be.null;
+  });
+
   describe('configuration', function() {
     it('has some default configuration', function() {
       Contracts.getSyncTimeout().should.be.eq(240000);

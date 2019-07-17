@@ -65,10 +65,10 @@ class BaseProxyAdminProject extends BaseSimpleProject {
       initCallData,
     } = await this._setUpgradeParams(proxyAddress, contract, contractParams);
     Loggy.spin(
-      __filename, 
-      'upgradeProxy', 
-      `action-proxy-${pAddress}`, 
-      `Upgrading instance at ${pAddress}`
+      __filename,
+      'upgradeProxy',
+      `action-proxy-${pAddress}`,
+      `Upgrading instance at ${pAddress}`,
     );
     await this.proxyAdmin.upgradeProxy(
       pAddress,
