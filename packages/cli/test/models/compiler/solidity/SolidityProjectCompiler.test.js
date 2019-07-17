@@ -213,6 +213,11 @@ describe('SolidityProjectCompiler', function() {
     it('compiles without errors', async function() {
       await compileProject({ inputDir, outputDir, version: '0.5.9' });
     });
+
+    it('compiles without errors if input dir does not exist', async function() {
+      const inputDir = `${rootDir}/test/mocks/mock-stdlib-empty/not-exists`;
+      await compileProject({ inputDir, outputDir, version: '0.5.9' });
+    });
   });
 
   describe('in mock-project-with-root-imports project', function() {

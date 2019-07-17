@@ -101,6 +101,8 @@ class SolidityProjectCompiler {
   }
 
   private _loadSoliditySourcesFromDir(dir = this.inputDir): void {
+    if (!existsSync(dir) || !lstatSync(dir).isDirectory) return;
+
     // TODO: Replace by a glob expression
     readdirSync(dir).forEach(fileName => {
       const filePath = path.resolve(dir, fileName);
