@@ -233,7 +233,7 @@ export default class NetworkController {
     Loggy.spin(__filename, '_uploadSolidityLib', `upload-solidity-lib${libName}`, `Uploading ${libName} library`);
     const libInstance = await this.project.setImplementation(libClass, libName);
     this.networkFile.addSolidityLib(libName, libInstance);
-    Loggy.succeed(`upload-solidity-lob${libName}`, `${libName} library uploaded`);
+    Loggy.succeed(`upload-solidity-lib${libName}`, `${libName} library uploaded`);
   }
 
   // Contract model

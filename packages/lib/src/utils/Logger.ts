@@ -45,6 +45,7 @@ export const Loggy: { [key: string]: any } = {
   logs: {},
   isSilent: true,
   isVerbose: false,
+  isTesting: false,
 
   silent(value: boolean): void {
     this.isSilent = value;
@@ -52,6 +53,10 @@ export const Loggy: { [key: string]: any } = {
 
   verbose(value: boolean): void {
     this.isVerbose = value;
+  },
+
+  testing(value: boolean): void {
+    this.isTesting = value;
   },
 
   add(
@@ -113,18 +118,22 @@ export const Loggy: { [key: string]: any } = {
   },
 
   _log(reference: string): void {
-    if (this.isSilent) return;
-    const { file, fnName, text, spinnerAction, logLevel, logType } = this.logs[reference];
-    const color = this._getColorFor(logType);
-    if (this.isVerbose) {
-      const location = `${path.basename(file)}#${fnName}`;
-      const message = `[${new Date().toISOString()}@${location}] <${this._actionToText(spinnerAction)}> ${text}`;
-      const coloredMessage = color ? chalk.keyword(color)(message) : message;
-      console.error(coloredMessage);
-    } else if (logLevel === LogLevel.Normal) {
-      const options = color ? { text, status: spinnerAction, color } : { text, status: spinnerAction };
-
-      !spinners.pick(reference) ? spinners.add(reference, options) : spinners.update(reference, options);
+    try {
+      if (this.isSilent) return;
+      const { file, fnName, text, spinnerAction, logLevel, logType } = this.logs[reference];
+      const color = this._getColorFor(logType);
+      if (this.isVerbose || this.isTesting) {
+        const location = `${path.basename(file)}#${fnName}`;
+        const message = `[${new Date().toISOString()}@${location}] <${this._actionToText(spinnerAction)}> ${text}`;
+        const coloredMessage = color ? chalk.keyword(color)(message) : message;
+        if (!this.isTesting) console.error(coloredMessage);
+      } else if (logLevel === LogLevel.Normal) {
+        const options = color ? { text, status: spinnerAction, color } : { text, status: spinnerAction };
+        !spinners.pick(reference) ? spinners.add(reference, options) : spinners.update(reference, options);
+      }
+    } catch (err) {
+      if (this.isTesting) throw new Error(`Error logging ${reference}: ${err}`);
+      else console.error(`Error logging ${reference}: ${err}`);
     }
   },
 
