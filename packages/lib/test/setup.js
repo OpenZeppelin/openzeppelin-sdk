@@ -6,7 +6,8 @@ import Contracts from '../src/artifacts/Contracts';
 import { helpers } from '../src/test';
 import { Loggy } from '../src/utils/Logger';
 
-Loggy.silent(true);
+Loggy.silent(false);
+Loggy.testing(true);
 ZWeb3.initialize(web3.currentProvider);
 setArtifactDefaults();
 

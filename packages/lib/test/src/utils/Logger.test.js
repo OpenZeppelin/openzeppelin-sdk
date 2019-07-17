@@ -11,23 +11,17 @@ import {
   LogType,
 } from '../../../src/utils/Logger';
 
-describe('Loggger', function() {
-  afterEach('restore logger', function() {
-    Loggy.silent(true);
+describe('Logger', function() {
+  beforeEach(function () {
+    Loggy.testing(false);
+  });
+
+  afterEach('restore logger', function() {    
+    Loggy.testing(true);
+    Loggy.silent(false);
     Loggy.verbose(false);
     Loggy.logs = {};
     sinon.restore();
-  });
-
-  describe('default attributes', function() {
-    it('is silent and non-verbose by default', function() {
-      Loggy.isSilent.should.be.true;
-      Loggy.isVerbose.should.be.false;
-    });
-
-    it(`has a 'logs' object initialized`, function() {
-      Loggy.logs.should.be.an('object').that.is.empty;
-    });
   });
 
   describe('methods', function() {
@@ -41,7 +35,14 @@ describe('Loggger', function() {
     describe('#verbose', function() {
       it('changes isVerbose property value', function() {
         Loggy.verbose(true);
-        Loggy.isSilent.should.be.true;
+        Loggy.isVerbose.should.be.true;
+      });
+    });
+
+    describe('#testing', function() {
+      it('changes isTesting property value', function() {
+        Loggy.testing(true);
+        Loggy.isTesting.should.be.true;
       });
     });
 
