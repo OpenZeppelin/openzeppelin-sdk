@@ -24,12 +24,6 @@ describe('Logger', function() {
     sinon.restore();
   });
 
-  describe('default attributes', function() {
-    it(`has a 'logs' object initialized`, function() {
-      Loggy.logs.should.be.an('object').that.is.empty;
-    });
-  });
-
   describe('methods', function() {
     describe('#silent', function() {
       it('changes isSilent property value', function() {
