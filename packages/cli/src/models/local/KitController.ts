@@ -78,7 +78,7 @@ export default class KitController {
       // has to be the same version
       if (config.manifestVersion !== MANIFEST_VERSION) {
         throw new Error(`Unrecognized kit version identifier ${config.manifestVersion}.
-          This means the kit was built with an unknown version of zos.
+          This means the kit was built with an unknown version of openzeppelin.
           Please refer to the documentation at https://docs.zeppelinos.org for more info.`);
       }
       return config;

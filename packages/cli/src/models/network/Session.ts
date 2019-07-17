@@ -68,7 +68,7 @@ const Session = {
 
   close(): void {
     if (fs.exists(SESSION_PATH)) fs.remove(SESSION_PATH);
-    Loggy.noSpin(__filename, 'getOptions', `close-session`, 'Closed zos session');
+    Loggy.noSpin(__filename, 'getOptions', `close-session`, 'Closed openzeppelin session');
   },
 
   ignoreFile(): void {

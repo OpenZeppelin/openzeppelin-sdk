@@ -730,7 +730,7 @@ contract('create script', function([_, owner, otherAdmin]) {
           txParams,
           networkFile: this.networkFile,
         }).should.be.rejectedWith(
-          "Contract Impl has changed locally since the last deploy, consider running 'zos push'.",
+          "Contract Impl has changed locally since the last deploy, consider running 'openzeppelin push'.",
         );
       });
 

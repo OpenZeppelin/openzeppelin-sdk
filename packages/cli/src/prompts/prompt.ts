@@ -52,7 +52,9 @@ interface MethodOptions {
 }
 
 export let DISABLE_INTERACTIVITY: boolean =
-  !!process.env.ZOS_NON_INTERACTIVE || process.env.DEBIAN_FRONTEND === 'noninteractive';
+  !!process.env.OPENZEPPELIN_NON_INTERACTIVE 
+  || !!process.env.ZOS_NON_INTERACTIVE 
+  || process.env.DEBIAN_FRONTEND === 'noninteractive';
 
 /*
  * This function will parse and wrap both arguments and options into inquirer questions, where

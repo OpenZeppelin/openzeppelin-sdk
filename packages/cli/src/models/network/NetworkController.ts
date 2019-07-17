@@ -112,7 +112,7 @@ export default class NetworkController {
   // NetworkController
   public checkNotFrozen(): void | never {
     if (this.networkFile.frozen) {
-      throw Error('Cannot modify contracts in a frozen version. Run zos bump to create a new version first.');
+      throw Error(`Cannot modify contracts in a frozen version. Run 'openzeppelin bump' to create a new version first.`);
     }
   }
 
@@ -411,7 +411,7 @@ export default class NetworkController {
     } else if (!this.isContractDeployed(contractAlias)) {
       return `Contract ${contractAlias} is not deployed to ${this.network}.`;
     } else if (this.hasContractChanged(contractAlias)) {
-      return `Contract ${contractAlias} has changed locally since the last deploy, consider running 'zos push'.`;
+      return `Contract ${contractAlias} has changed locally since the last deploy, consider running 'openzeppelin push'.`;
     }
   }
 
@@ -1005,7 +1005,7 @@ export default class NetworkController {
           throw Error(
             `Dependency '${depName}' has not been published to network '${
               this.network
-            }', so it cannot be linked. Hint: you can create a custom deployment of all unpublished dependencies by running 'zos push' with the '--deploy-dependencies' option.`,
+            }', so it cannot be linked. Hint: you can create a custom deployment of all unpublished dependencies by running 'openzeppelin push --deploy-dependencies'.`,
           );
         Loggy.spin(
           __filename,
@@ -1035,7 +1035,7 @@ export default class NetworkController {
     } else if (!this.projectFile.hasDependency(packageName)) {
       return `Dependency ${packageName} not found in project.`;
     } else if (!this.networkFile.hasDependency(packageName)) {
-      return `Dependency ${packageName} has not been linked yet. Please run zos push.`;
+      return `Dependency ${packageName} has not been linked yet. Please run 'openzeppelin push'.`;
     } else if (!new Dependency(packageName).projectFile.contract(contractAlias)) {
       return `Contract ${contractAlias} is not provided by ${packageName}.`;
     }
