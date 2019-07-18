@@ -12,7 +12,7 @@ describe('push command', function() {
     itShouldParse(
       'should call push script with options',
       'push',
-      'zos push --network test --skip-compile -d --reset -f --deploy-proxy-admin --deploy-proxy-factory',
+      'zos push --network test --skip-compile -d --reset --force --deploy-proxy-admin --deploy-proxy-factory',
       function(push) {
         push.should.have.been.calledWithExactly({
           force: true,
@@ -39,7 +39,7 @@ describe('push command', function() {
     itShouldParse(
       'should call push script with options',
       'push',
-      'zos push --network test --skip-compile -d --reset -f --deploy-proxy-admin --deploy-proxy-factory',
+      'zos push --network test --skip-compile -d --reset --force --deploy-proxy-admin --deploy-proxy-factory',
       function(push) {
         push.should.have.been.calledWithExactly({
           force: true,
