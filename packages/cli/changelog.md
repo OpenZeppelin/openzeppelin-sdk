@@ -7,10 +7,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## v2.4.2 - 2019-07-18
 
 ### Fixed
+- The `-f` flag was used for specifying the `--from` option in several commands, and at the same time for setting the `--force` toggle in `push` and `set-admin`; now it is only used for `--from`, and `--force` only accepts the long form. ([#1123](https://github.com/zeppelinos/zos/pull/1123)) (thanks @pcowgill for the report!)
 - Preserve truffle deployment info stored in contract artifacts when compiling. ([#1100](https://github.com/zeppelinos/zos/pull/1100))
-- Linked EVM packages lookup works properly when dependencies are hoisted. ([#1110](https://github.com/zeppelinos/zos/pull/1110))
+- Linked EVM packages lookup works properly when dependencies are hoisted. ([#1110](https://github.com/zeppelinos/zos/pull/1110)) (thanks @PaulRBerg for the report!)
 - Do not throw an error if the `contracts` local folder is missing. ([#1107](https://github.com/zeppelinos/zos/pull/1107))
 - Properly detect when an Ethereum Package is on an older version for pushing it to the local network for development. ([#1119](https://github.com/zeppelinos/zos/pull/1119))
+- Store proxy admin address for the first proxy created in a network. ([#1124](https://github.com/zeppelinos/zos/pull/1124))
 
 ## v2.4.1 - 2019-07-02
 

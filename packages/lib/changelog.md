@@ -7,9 +7,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## v2.4.2 - 2019-07-18
 
 ### Fixed
-- Contracts lookup from dependencies works properly when dependencies are hoisted. ([#1110](https://github.com/zeppelinos/zos/pull/1110))
-- Fixed errors from logger that occured in verbose mode only when uploading solidity libraries or upgrading instances. ([#1112](https://github.com/zeppelinos/zos/pull/1112))
-- Add explicit dependency on `web3-utils`, that could cause issues when checksumming addresses. ([#1114](https://github.com/zeppelinos/zos/pull/1114))
+- Contracts lookup from dependencies works properly when dependencies are hoisted. ([#1110](https://github.com/zeppelinos/zos/pull/1110)) (thanks @PaulRBerg for the report!)
+- Fixed errors from logger that occured in verbose mode only when uploading solidity libraries or upgrading instances. ([#1112](https://github.com/zeppelinos/zos/pull/1112)) (thanks @hickscorp for the report!)
+- Add explicit dependency on `web3-utils`, that could cause issues when checksumming addresses. ([#1114](https://github.com/zeppelinos/zos/pull/1114)) (thanks @chentschel for the report!)
 
 ## v2.4.0 - 2019-06-24
 
