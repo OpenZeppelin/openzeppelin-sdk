@@ -58,12 +58,7 @@ export default abstract class BasePackageProject {
     );
     const directory: ImplementationDirectory = await this.getCurrentDirectory();
     await directory.setImplementation(contractName, implementation.address);
-    Loggy.onVerbose(
-      __filename,
-      'setImplementation',
-      `set-implementation-${contractName}`,
-      `Implementation set: ${implementation.address}`,
-    );
+    Loggy.succeed(`set-implementation-${contractName}`);
     return implementation;
   }
 
@@ -76,12 +71,7 @@ export default abstract class BasePackageProject {
     );
     const directory: ImplementationDirectory = await this.getCurrentDirectory();
     await directory.unsetImplementation(contractName);
-    Loggy.onVerbose(
-      __filename,
-      'unsetImplementation',
-      `unset-implementation-${contractName}`,
-      `Implementation unset: ${contractName}`,
-    );
+    Loggy.succeed(`unset-implementation-${contractName}`);
   }
 
   public async registerImplementation(
