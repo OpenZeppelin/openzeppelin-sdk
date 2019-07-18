@@ -4,10 +4,7 @@ require('../setup');
 
 import sinon from 'sinon';
 import npm from 'npm-programmatic';
-import { FileSystem as fs } from '@openzeppelin/upgrades';
 import Dependency from '../../src/models/dependency/Dependency';
-import ProjectFile from '../../src/models/files/ProjectFile';
-import NetworkFile from '../../src/models/files/NetworkFile';
 
 contract('Dependency', function([_, from]) {
   describe('static methods', function() {
@@ -49,54 +46,33 @@ contract('Dependency', function([_, from]) {
     });
 
     describe('#hasDependenciesForDeploy', function() {
-      afterEach('restore sinon', function() {
-        sinon.restore();
-      });
-
       context('when there are dependencies to deploy', function() {
         it('returns true', function() {
-          const projectProjectFile = fs.parseJsonIfExists(
+          Dependency.hasDependenciesForDeploy(
+            'test', 
             'test/mocks/packages/package-with-multiple-stdlibs.zos.json',
-          );
-          const projectNetworkFile = fs.parseJsonIfExists(
-            'test/mocks/networks/network-with-stdlibs.zos.test.json',
-          );
-
-          sinon.stub(ProjectFile, 'getExistingFilePath').returns('zos.json');
-
-          sinon
-            .stub(NetworkFile, 'getExistingFilePath')
-            .returns('zos.test.json');
-
-          const stubbedParseJsonIfExists = sinon.stub(fs, 'parseJsonIfExists');
-          stubbedParseJsonIfExists
-            .withArgs('zos.json')
-            .returns(projectProjectFile);
-          stubbedParseJsonIfExists
-            .withArgs('zos.test.json')
-            .returns(projectNetworkFile);
-
-          Dependency.hasDependenciesForDeploy('test').should.be.true;
+            'test/mocks/networks/network-with-stdlibs.zos.test.json'
+          ).should.be.true;
         });
       });
 
       context('when all dependencies are already deployed', function() {
         it('returns false', function() {
-          const projectProjectFile = fs.parseJsonIfExists(
+          Dependency.hasDependenciesForDeploy(
+            'test', 
             'test/mocks/packages/package-with-stdlib.zos.json',
-          );
-          const projectNetworkFile = fs.parseJsonIfExists(
-            'test/mocks/networks/network-with-stdlibs.zos.test.json',
-          );
-          const stubbedParseJsonIfExists = sinon.stub(fs, 'parseJsonIfExists');
-          stubbedParseJsonIfExists
-            .withArgs('zos.json')
-            .returns(projectProjectFile);
-          stubbedParseJsonIfExists
-            .withArgs('zos.test.json')
-            .returns(projectNetworkFile);
+            'test/mocks/networks/network-with-stdlibs.zos.test.json'
+          ).should.be.false;
+        });
+      });
 
-          Dependency.hasDependenciesForDeploy('test').should.be.false;
+      context('when there are dependencies to update', function() {
+        it('returns true', function() {
+          Dependency.hasDependenciesForDeploy(
+            'test', 
+            'test/mocks/packages/package-with-newer-stdlib.zos.json',
+            'test/mocks/networks/network-with-stdlibs.zos.test.json'
+          ).should.be.true;
         });
       });
     });
