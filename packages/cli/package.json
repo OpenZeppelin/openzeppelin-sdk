@@ -1,6 +1,6 @@
 {
   "name": "@openzeppelin/cli",
-  "version": "2.5.0-rc.0",
+  "version": "2.5.0-rc.1",
   "description": "Command-line interface for the OpenZeppelin smart contract platform",
   "main": "./lib/index.js",
   "private": false,
@@ -54,7 +54,7 @@
   },
   "homepage": "https://github.com/OpenZeppelin/openzeppelin-sdk/tree/master/packages/cli#readme",
   "dependencies": {
-    "@openzeppelin/upgrades": "2.5.0-rc.0",
+    "@openzeppelin/upgrades": "2.5.0-rc.1",
     "@resolver-engine/imports-fs": "^0.3.2",
     "@types/fs-extra": "^7.0.0",
     "@types/npm": "^2.0.29",
