@@ -30,7 +30,7 @@ const register: (program: any) => any = program =>
       '[alias-or-address] [new-admin-address] --network <network> [options]',
     )
     .description(description)
-    .option('-f, --force', 'bypass a manual check')
+    .option('--force', 'bypass a manual check')
     .withNetworkOptions()
     .withNonInteractiveOption()
     .action(action);

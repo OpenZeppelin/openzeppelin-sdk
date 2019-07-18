@@ -11,7 +11,7 @@ describe('set-admin command', function() {
   itShouldParse(
     'should call set-admin script with proxy address',
     'setAdmin',
-    `zos set-admin 0x20 ${newAdmin} -f --network test`,
+    `zos set-admin 0x20 ${newAdmin} --force --network test`,
     function(update) {
       update.should.have.been.calledWith({
         proxyAddress: '0x20',
@@ -25,7 +25,7 @@ describe('set-admin command', function() {
   itShouldParse(
     'should call set-admin script with network options',
     'setAdmin',
-    `zos set-admin 0x20 ${newAdmin} -f --network test --from 0x40`,
+    `zos set-admin 0x20 ${newAdmin} --force --network test --from 0x40`,
     function(update) {
       update.should.have.been.calledWith({
         proxyAddress: '0x20',
@@ -39,7 +39,7 @@ describe('set-admin command', function() {
   itShouldParse(
     'should call set-admin script with contract name',
     'setAdmin',
-    `zos set-admin Impl ${newAdmin} -f --network test`,
+    `zos set-admin Impl ${newAdmin} --force --network test`,
     function(update) {
       update.should.have.been.calledWith({
         contractAlias: 'Impl',
@@ -53,7 +53,7 @@ describe('set-admin command', function() {
   itShouldParse(
     'should call set-admin script with package name and contract name',
     'setAdmin',
-    `zos set-admin OpenZeppelin/Impl ${newAdmin} -f --network test`,
+    `zos set-admin OpenZeppelin/Impl ${newAdmin} --force --network test`,
     function(update) {
       update.should.have.been.calledWith({
         packageName: 'OpenZeppelin',
@@ -68,7 +68,7 @@ describe('set-admin command', function() {
   itShouldParse(
     'should call set-admin with new proxy admin owner address',
     'setAdmin',
-    `zos set-admin ${newAdmin} -f --network test`,
+    `zos set-admin ${newAdmin} --force --network test`,
     function(update) {
       update.should.have.been.calledWith({
         newAdmin: newAdmin,
