@@ -1,62 +1,60 @@
 #!/usr/bin/env node
 
-import React from 'react';
 import program from '../../src/bin/program';
-import { renderToStaticMarkup } from 'react-dom/server';
-import { writeFileSync, existsSync, mkdirSync } from 'fs';
-import Main from '../components/Main';
-import Command from '../components/Command';
+import { writeFileSync } from 'fs';
+import { ensureDirSync } from 'fs-extra';
 import path from 'path';
 import process from 'process';
 
-const outputPath = 'docs/build';
+const outputPath = '../docs/modules/cli';
 
-function formatContent(id, title, content) {
-  return `---
-id: cli_${id}
-title: ${title}
----
+function render(cmd) {
+  const description = cmd.description() || '';
+  const options = cmd.options.map(o => `\`${o.flags}\`:: ${o.description}`).join('\n');
 
-${content}
+  return `\
+== ${cmd.name()}
+
+Usage: \`${cmd.name()} ${cmd.usage()}\`
+
+${description}
+
+${options}
 `;
 }
 
-function writeMd(id, title, content) {
-  const data = formatContent(id, title, content);
-  writeFileSync(path.resolve(outputPath, `cli_${id}.md`), data);
+function writeAdoc(id, title, content) {
+  const data = content;
+  writeFileSync(path.resolve(outputPath, 'pages', `${id}.adoc`), data);
 }
 
 function makeSidebar(program) {
+  const makeEntry = name => `* xref:${name}.adoc[${name}]`;
   const commands = program.commands
     // TODO: remove filtering status command before next major release
     .filter(command => command.name() !== 'status')
-    .map(command => `cli_${command.name()}`);
-  return {
-    'cli-api': {
-      commands: ['cli_main', ...commands],
-    },
-  };
+    .map(command => makeEntry(command.name()));
+  return ['.CLI', makeEntry('main'), ...commands].join('\n');
 }
 
 function run() {
-  if (!existsSync(outputPath)) {
-    mkdirSync(outputPath);
-  }
+  ensureDirSync(outputPath);
+  ensureDirSync(path.join(outputPath, 'pages'));
 
-  const main = renderToStaticMarkup(React.createElement(Main, { program }));
-  writeMd('main', 'zos', main);
+  const main = render(program);
+  writeAdoc('main', 'zos', main);
 
   program.commands
     // TODO: remove filtering status command before next major release
     .filter(command => command.name() !== 'status')
     .forEach(command => {
-      const content = renderToStaticMarkup(React.createElement(Command, { command }));
-      writeMd(command.name(), command.name(), content);
+      const content = render(command);
+      writeAdoc(command.name(), command.name(), content);
     });
 
   const sidebar = makeSidebar(program);
-  writeFileSync(path.resolve(outputPath, 'sidebars.json'), JSON.stringify(sidebar, null, 2));
+  writeFileSync(path.resolve(outputPath, 'nav.adoc'), sidebar);
 }
 
 run();
-console.log(`Docs generated in ${process.cwd()}/${outputPath}`);
+console.log(`Docs generated in ${path.resolve(outputPath)}`);
