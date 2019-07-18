@@ -7,7 +7,7 @@
     "tests/kits/test",
     "tests/kits/workdir"
   ],
-  "version": "2.5.0-rc.0",
+  "version": "2.5.0-rc.1",
   "command": {
     "publish": {
       "ignoreChanges": [
