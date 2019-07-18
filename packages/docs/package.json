@@ -6,7 +6,7 @@
   "private": true,
   "license": "MIT",
   "scripts": {
-    "prepare-docs": "echo fake preparing",
+    "prepare-docs": "bash scripts/prepare-docs.sh",
     "docsite": "bash scripts/docsite.sh"
   },
   "files": [],
@@ -21,7 +21,7 @@
   "dependencies": {
     "semver": "^5.6.0",
     "shelljs": "^0.8.2",
-    "solidity-docgen": "^0.1.1",
+    "solidity-docgen": "^0.3.0-beta.3",
     "tmp": "0.0.33"
   },
   "devDependencies": {
