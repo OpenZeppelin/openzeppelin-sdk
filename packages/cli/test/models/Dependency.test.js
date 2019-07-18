@@ -69,6 +69,16 @@ contract('Dependency', function([_, from]) {
           ).should.be.false;
         });
       });
+
+      context('when there are dependencies to update', function() {
+        it('returns true', function() {
+          Dependency.hasDependenciesForDeploy(
+            'test', 
+            'test/mocks/packages/package-with-newer-stdlib.zos.json',
+            'test/mocks/networks/network-with-stdlibs.zos.test.json'
+          ).should.be.true;
+        });
+      });
     });
   });
 
