@@ -76,7 +76,7 @@ export default class Dependency {
       const satisfiesVersion =
         projectDependency &&
         this.satisfiesVersion(projectDependency.version, version);
-      return !fs.exists(networkFilePath) && !satisfiesVersion;
+      return !fs.exists(networkFilePath) || !satisfiesVersion;
     });
 
     return !!hasDependenciesForDeploy;
