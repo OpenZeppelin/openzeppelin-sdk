@@ -6,6 +6,7 @@
   },
   "devDependencies": {
     "lerna": "~3.13.1",
-    "typescript": "^3.2.2"
+    "typescript": "^3.2.2",
+    "mock-stdlib-root": "file:./packages/cli/test/mocks/mock-stdlib"
   }
 }

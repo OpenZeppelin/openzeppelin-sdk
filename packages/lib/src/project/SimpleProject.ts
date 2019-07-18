@@ -26,10 +26,16 @@ export default class SimpleProject extends BaseSimpleProject {
       pAddress,
       initCallData,
     } = await this._setUpgradeParams(proxyAddress, contract, contractParams);
+    Loggy.spin(
+      __filename,
+      'upgradeProxy',
+      `action-proxy-${pAddress}`,
+      `Upgrading instance at ${pAddress}`,
+    );
     const proxy = Proxy.at(pAddress, this.txParams);
     await proxy.upgradeTo(implementationAddress, initCallData);
     Loggy.succeed(
-      `action-proxy-${implementationAddress}`,
+      `action-proxy-${pAddress}`,
       `Instance at ${pAddress} upgraded`,
     );
     return contract.at(proxyAddress);

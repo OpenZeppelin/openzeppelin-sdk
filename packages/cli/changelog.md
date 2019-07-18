@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## v2.4.2 - 2019-07-18
+
+### Fixed
+- Preserve truffle deployment info stored in contract artifacts when compiling. ([#1100](https://github.com/zeppelinos/zos/pull/1100))
+- Linked EVM packages lookup works properly when dependencies are hoisted. ([#1110](https://github.com/zeppelinos/zos/pull/1110))
+- Do not throw an error if the `contracts` local folder is missing. ([#1107](https://github.com/zeppelinos/zos/pull/1107))
+
 ## v2.4.1 - 2019-07-02
 
 ### Fixed

@@ -275,7 +275,7 @@ export default class NetworkController {
     const libInstance = await this.project.setImplementation(libClass, libName);
     this.networkFile.addSolidityLib(libName, libInstance);
     Loggy.succeed(
-      `upload-solidity-lob${libName}`,
+      `upload-solidity-lib${libName}`,
       `${libName} library uploaded`,
     );
   }

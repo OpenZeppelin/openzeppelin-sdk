@@ -57,13 +57,21 @@ export default class Dependency {
     }
   }
 
-  public static hasDependenciesForDeploy(network: string): boolean {
-    const dependencies = ZosPackageFile.getLinkedDependencies() || [];
+  public static hasDependenciesForDeploy(
+    network: string,
+    packageFilename = 'zos.json',
+    networkFilename: string = undefined,
+  ): boolean {
+    const dependencies =
+      ZosPackageFile.getLinkedDependencies(packageFilename) || [];
     const networkDependencies =
-      ZosNetworkFile.getDependencies(`zos.${network}.json`) || {};
+      ZosNetworkFile.getDependencies(
+        networkFilename || `zos.${network}.json`,
+      ) || {};
     const hasDependenciesForDeploy = dependencies.find(depNameAndVersion => {
       const [name, version] = depNameAndVersion.split('@');
-      const networkFilePath = `node_modules/${name}/zos.${network}.json`;
+      const dependency = new Dependency(name);
+      const networkFilePath = dependency._getNetworkFilePath(network);
       const projectDependency = networkDependencies[name];
       const satisfiesVersion =
         projectDependency &&
@@ -151,15 +159,16 @@ export default class Dependency {
 
   public getPackageFile(): ZosPackageFile | never {
     if (!this._packageFile) {
-      const filename = `node_modules/${this.name}/zos.json`;
-      if (!fs.exists(filename)) {
+      try {
+        const filename = require.resolve(`${this.name}/zos.json`, {
+          paths: [process.cwd()],
+        });
+        this._packageFile = new ZosPackageFile(filename);
+      } catch (err) {
         throw Error(
-          `Could not find a zos.json file for '${
-            this.name
-          }'. Make sure it is provided by the npm package.`,
+          `Could not find a zos.json file for '${this.name}'. (${err.message})`,
         );
       }
-      this._packageFile = new ZosPackageFile(filename);
     }
     return this._packageFile;
   }
@@ -171,7 +180,7 @@ export default class Dependency {
         throw Error(
           `Could not find a zos file for network '${network}' for '${
             this.name
-          }'`,
+          }'.`,
         );
       }
 
@@ -195,7 +204,13 @@ export default class Dependency {
   }
 
   private _getNetworkFilePath(network: string): string {
-    return `node_modules/${this.name}/zos.${network}.json`;
+    try {
+      return require.resolve(`${this.name}/zos.${network}.json`, {
+        paths: [process.cwd()],
+      });
+    } catch (err) {
+      return null;
+    }
   }
 
   private _validateSatisfiesVersion(
