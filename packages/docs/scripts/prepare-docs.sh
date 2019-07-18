@@ -12,5 +12,6 @@ log "Done"
 # cli
 log "Building CLI docs..."
 cd ../cli
+npm install --no-package-lock --no-audit
 npm run gen-docs
 log "Done"
