@@ -38,9 +38,7 @@ To transfer ownership of the complete project:
 openzeppelin set-admin [NEW_ADMIN_ADDRESS]
 ----
 
-_________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________
-Note: Please replace [MYCONTRACT_ADDRESS] with the address of your contract for whom you want to change the ownership. Also, `openzeppelin set-admin` is an interactive command, and if you have any confusion just run `openzeppelin set-admin`, it will help you with upgrading your contracts.
-_________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________
+NOTE: Please replace [MYCONTRACT_ADDRESS] with the address of your contract for whom you want to change the ownership. Also, `openzeppelin set-admin` is an interactive command, and if you have any confusion just run `openzeppelin set-admin`, it will help you with upgrading your contracts.
 
 [[contract-upgrades-via-proxyadmin]]
 === Contract upgrades via ProxyAdmin

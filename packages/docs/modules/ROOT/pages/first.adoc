@@ -8,9 +8,7 @@ This tutorial will get you started using the OpenZeppelin SDK. We will create a 
 
 The OpenZeppelin SDK is bundled as an https://npmjs.com/package/@openzeppelin/cli[npm package]. We will need https://nodejs.org/[node.js] to install and run it. Head over to https://nodejs.org/[its website] for instructions on how to install it.
 
-____________________________________________________________________________________________________
-Note: At the moment, the OpenZeppelin SDK does not support node 12. Make sure to install version 10.
-____________________________________________________________________________________________________
+NOTE: At the moment, the OpenZeppelin SDK does not support node 12. Make sure to install version 10.
 
 Once you have installed `node`, you can install the OpenZeppelin SDK CLI:
 
@@ -19,9 +17,7 @@ Once you have installed `node`, you can install the OpenZeppelin SDK CLI:
 npm install --global @openzeppelin/cli
 ----
 
-_______________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________
-Note: We are installing the CLI https://docs.npmjs.com/downloading-and-installing-packages-globally[globally] in our workstation. Alternatively, you can install it https://docs.npmjs.com/downloading-and-installing-packages-locally[local] to each project by running `npm install --save-dev @openzeppelin/cli` in your project folder. This would require you to run every command by prefixing it with `npx`. Installing it locally allows you to have different `openzeppelin` versions in different projects, but requires you to reinstall every time you start a new project.
-_______________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________
+NOTE: We are installing the CLI https://docs.npmjs.com/downloading-and-installing-packages-globally[globally] in our workstation. Alternatively, you can install it https://docs.npmjs.com/downloading-and-installing-packages-locally[local] to each project by running `npm install --save-dev @openzeppelin/cli` in your project folder. This would require you to run every command by prefixing it with `npx`. Installing it locally allows you to have different `openzeppelin` versions in different projects, but requires you to reinstall every time you start a new project.
 
 [[setting-up-your-project]]
 == Setting up your project
@@ -46,9 +42,7 @@ The CLI will prompt you to choose a project name and version, defaulting to the 
 
 We are now ready to begin coding.
 
-_______________________________________________________________________________________________________________________________________________________________________________________________________________________
-Note: Should you get lost at any point during this tutorial, you can refer to the full code for this project in our https://github.com/OpenZeppelin/openzeppelin-sdk/tree/v2.4.0/examples/first-project[`Github repo`].
-_______________________________________________________________________________________________________________________________________________________________________________________________________________________
+NOTE: Should you get lost at any point during this tutorial, you can refer to the full code for this project in our https://github.com/OpenZeppelin/openzeppelin-sdk/tree/v2.4.0/examples/first-project[`Github repo`].
 
 [[your-first-contract]]
 == Your first contract
@@ -72,9 +66,7 @@ This contract will just keep a numeric `value`, that will be increased by one ev
 
 You can run `openzeppelin compile` to compile the contract and check for any errors. After it compiled successfully, we can now deploy our contract.
 
-___________________________________________________________________________________________________________________________________________________________________________________
-Note: You don't have to worry if you forget to compile your contract. The CLI will automatically check if your contract changed when you run any command, and compile it if needed.
-___________________________________________________________________________________________________________________________________________________________________________________
+NOTE: You don't have to worry if you forget to compile your contract. The CLI will automatically check if your contract changed when you run any command, and compile it if needed.
 
 [[deploying-to-a-development-network]]
 == Deploying to a development network
@@ -105,9 +97,7 @@ $ openzeppelin create
 ✓ Instance created at 0xCfEB869F69431e42cdB54A4F4f105C19C080A601
 ----
 
-___________________________________________________________________________________________________________________________________
-Note: The addresses where your contracts are created, or the transaction identifiers you see, may differ from the ones listed here.
-___________________________________________________________________________________________________________________________________
+NOTE: The addresses where your contracts are created, or the transaction identifiers you see, may differ from the ones listed here.
 
 Our counter contract is deployed to the local development network and ready to go! We can test it out by interacting with it from the terminal. Let's try incrementing the counter, by sending a transaction to call the `increase` function through `openzeppelin send-tx`.
 
@@ -179,8 +169,6 @@ $ openzeppelin call
 Returned "11"
 ----
 
-_____________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________
-Note: If you are curious about how the OpenZeppelin SDK achieves this feat, given that smart contracts are immutable, check out our link:pattern[upgrades pattern guide]. You will see that there are some changes that are not supported during upgrades. For instance, you cannot link:writing_contracts#modifying-your-contracts[remove or change the type of a contract state variable]. Nevertheless, you can change, add, or remove all the functions you want.
-_____________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________
+NOTE: If you are curious about how the OpenZeppelin SDK achieves this feat, given that smart contracts are immutable, check out our link:pattern[upgrades pattern guide]. You will see that there are some changes that are not supported during upgrades. For instance, you cannot link:writing_contracts#modifying-your-contracts[remove or change the type of a contract state variable]. Nevertheless, you can change, add, or remove all the functions you want.
 
 That's it! You now know how to start a simple OpenZeppelin project, create a contract, deploy it to a local network, and even upgrade it as you develop. Head over to the next tutorial to learn how to interact with your contract from your code.

@@ -60,9 +60,7 @@ npx openzeppelin link @openzeppelin/contracts-ethereum-package
 [[writing-the-test-script]]
 == Writing the test script
 
-_____________________________________________________________________________________________________________________________________________________________________________________
-This test is written in ES5 Javascript. If you'd like to use ES6 syntax instead, make sure you link:faq#how-do-i-use-es6-javascript-syntax-in-my-tests[set up babel in your project].
-_____________________________________________________________________________________________________________________________________________________________________________________
+TIP: This test is written in ES5 Javascript. If you'd like to use ES6 syntax instead, make sure you link:faq#how-do-i-use-es6-javascript-syntax-in-my-tests[set up babel in your project].
 
 Now, let's create the test file `test/Sample.test.js`:
 

@@ -15,9 +15,7 @@ We will be using https://web3js.readthedocs.io/en/1.0/[web3.js] to interact with
 npm install web3@1.0.0-beta.37
 ----
 
-_________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________
-Note: We are using beta.37 version at the moment, due to incompatibility issues with later versions, but expect to see these guides updated to 1.0.0 stable soon. Also, if you run into any issues installing `web3`, make sure you are using node 10 and not 12.
-_________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________
+NOTE: We are using beta.37 version at the moment, due to incompatibility issues with later versions, but expect to see these guides updated to 1.0.0 stable soon. Also, if you run into any issues installing `web3`, make sure you are using node 10 and not 12.
 
 Keep in mind that there are many other javascript libraries available, and you can use whichever you like the most. Once a contract is deployed, you can interact with it through any library!
 
@@ -26,9 +24,7 @@ Keep in mind that there are many other javascript libraries available, and you c
 
 Our first step will be to open a connection to the network. We will connect to the local development network we started on the previous tutorial.
 
-______________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________
-Caution: By default, `ganache-cli` deletes all data when you stop it. If you stopped the ganache process from the previous tutorial, you will need to start a new one with `ganache-cli --deterministic`, and run `openzeppelin create Counter` again.
-______________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________
+CAUTION: By default, `ganache-cli` deletes all data when you stop it. If you stopped the ganache process from the previous tutorial, you will need to start a new one with `ganache-cli --deterministic`, and run `openzeppelin create Counter` again.
 
 Let's begin coding in a new `src/index.js` file, where we will be writing our javascript script. We will start with some boilerplate for writing async code, and setting up a new `web3` object.
 
@@ -56,9 +52,7 @@ const accounts = await web3.eth.getAccounts();
 console.log(accounts);
 ----
 
-_________________________________________________________________________________________________________________________________________________
-Note: We will not be repeating the boilerplate code on every snippet, but make sure to always code _inside_ the `main` function we defined above!
-_________________________________________________________________________________________________________________________________________________
+NOTE: We will not be repeating the boilerplate code on every snippet, but make sure to always code _inside_ the `main` function we defined above!
 
 Run the code above using `node`, and check that you are getting a list of available accounts in response. These should match the ones you saw when first starting the `ganache-cli` process.
 
@@ -99,9 +93,7 @@ const abi = require('../build/contracts/Counter.json').abi;
 const counter = new web3.eth.Contract(abi, address);
 ----
 
-________________________________________________________________________________________________________________________________________
-Note: Make sure to replace the `address` with the one you got when deploying the contract, which may be different to the one shown here.
-________________________________________________________________________________________________________________________________________
+NOTE: Make sure to replace the `address` with the one you got when deploying the contract, which may be different to the one shown here.
 
 We can now use this javascript object to interact with our contract. Let's see how!
 
@@ -125,9 +117,7 @@ $ node src/index.js
 11
 ----
 
-_______________________________________________________________________________________________________________________________________________________________
-Note: If you restarted ganache between the link:first[previous tutorial] and this one, the returned value will be zero, since all state will have been cleared.
-_______________________________________________________________________________________________________________________________________________________________
+NOTE: If you restarted ganache between the link:first[previous tutorial] and this one, the returned value will be zero, since all state will have been cleared.
 
 Cool! We can now actually interact with the contract by sending a transaction to it.
 
@@ -136,9 +126,7 @@ Cool! We can now actually interact with the contract by sending a transaction to
 
 We will now https://web3js.readthedocs.io/en/1.0/web3-eth-contract.html#methods-mymethod-send[send a transaction] to `increase` the value of our Counter. Sending a transaction is not as straightforward as making a call: we need to specify who the sender will be, the gas limit, and the gas price we are going to use. To keep this example simple, we will use a hardcoded value for both gas and gas price, and send the transaction from the first available account on the node.
 
-_____________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________
-Note: In a real-world application, you may want to https://web3js.readthedocs.io/en/1.0/web3-eth-contract.html#methods-mymethod-estimategas[estimate the gas] of your transactions, and check a https://ethgasstation.info/[gas price oracle] to know the optimal values to use on every transaction.
-_____________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________
+NOTE: In a real-world application, you may want to https://web3js.readthedocs.io/en/1.0/web3-eth-contract.html#methods-mymethod-estimategas[estimate the gas] of your transactions, and check a https://ethgasstation.info/[gas price oracle] to know the optimal values to use on every transaction.
 
 Let's increase our `Counter` value by 20 every time our snippet is run, and then use the code we had written before to display the updated value:
 

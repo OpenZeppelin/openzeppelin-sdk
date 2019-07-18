@@ -90,9 +90,7 @@ Let’s unpack a few things here, `openzeppelin add` adds our `Factory` and `Ins
 
 Note, while creating our Factory contract, we are also calling it’s `initialize` method and setting `_appContractAddress`. The App contract address is shown when you publish your `App`, or you can also retrieve it from your network file `.openzeppelin/dev-NNNN.json`.
 
-_________________________________________________________________________
-Note: In `.openzeppelin/dev-NNNN.json`, `NNNN` is the network identifier.
-_________________________________________________________________________
+NOTE: In `.openzeppelin/dev-NNNN.json`, `NNNN` is the network identifier.
 
 [[encoding-call-data]]
 == Encoding Call Data
@@ -117,9 +115,7 @@ console.log(`Call data for Instance.sol's initialize: ${data}`);
 
 This will output encoded data, which we need to pass to `Factory` contract's `createInstance` method.
 
-_____________________________________________________________________________________________________________________________
-Note: The output for the above script should be `0xfe4b84df000000000000000000000000000000000000000000000000000000000000002a`.
-_____________________________________________________________________________________________________________________________
+NOTE: The output for the above script should be `0xfe4b84df000000000000000000000000000000000000000000000000000000000000002a`.
 
 [[creating-the-instance-contract]]
 == Creating the Instance contract
@@ -137,9 +133,7 @@ $ openzeppelin send-tx
 ✓ Transaction sent
 ----
 
-_________________________________________________________________________________________
-Note: We are calling `createInstance` method of `Factory` contract with our encoded data.
-_________________________________________________________________________________________
+NOTE: We are calling `createInstance` method of `Factory` contract with our encoded data.
 
 This has effectively created an instance of our `Instance` contract directly from our `Factory`!
 

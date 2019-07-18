@@ -100,9 +100,7 @@ Any contract created with salt 12345 will be deployed to the following address
 0x4e08589Cd399474157f24f591B9fB100D1adD5d9
 ----
 
-__________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________
-Note : Here openzeppelin using proxy contract code as contract creation code under the hood and 0x4e08589Cd399474157f24f591B9fB100D1adD5d9 is computed address but contract is still not deployed on this address. Owner of Wallet contract is 0x90f8bf6a479f320ead074411a4b0e7944ea8c9c1.
-__________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________
+NOTE: Here openzeppelin using proxy contract code as contract creation code under the hood and 0x4e08589Cd399474157f24f591B9fB100D1adD5d9 is computed address but contract is still not deployed on this address. Owner of Wallet contract is 0x90f8bf6a479f320ead074411a4b0e7944ea8c9c1.
 
 [[interacting-with-the-contract]]
 == Interacting with the Contract
@@ -122,9 +120,7 @@ Enter an amount to transfer: 10 ether
 Transaction hash: 0xbcaefc07f4e03a69456f3cb40a1998a597914eb1352470ee01991631cab35c4a
 ----
 
-______________________________________________________________________________________________________________________________________
-Note: Ganache provides us ten addresses with 100 ethers in each of them. These are test ethers, do not send or use them as real ether.
-______________________________________________________________________________________________________________________________________
+NOTE: Ganache provides us ten addresses with 100 ethers in each of them. These are test ethers, do not send or use them as real ether.
 
 Next, we will verify the `Wallet` contract balance and the sender’s balance using `openzeppelin balance`
 
@@ -139,9 +135,7 @@ $ openzeppelin balance 0x90F8bf6A479f320ead074411a4B0e7944Ea8c9C1Balance
 Balance: 89.97829973 ETH
 ....
 
-__________________________________________________________________________________________________________
-Note: Here 0x90F8bf6A479f320ead074411a4B0e7944Ea8c9C1 is sender as well as owner of our `Wallet` contract.
-__________________________________________________________________________________________________________
+NOTE: Here 0x90F8bf6A479f320ead074411a4B0e7944Ea8c9C1 is sender as well as owner of our `Wallet` contract.
 
 [[deploy-the-wallet-contract]]
 == Deploy the wallet contract
@@ -150,9 +144,7 @@ Now, we will deploy our contract and withdraw 10 ethers which we sent above.
 
 To deploy first we need to execute `openzeppelin push` , which deploys our logic contract (with the code) and then `create2` which deploys our proxy contract.
 
-___________________________________________________________________________________________________________________________________________________________________________________
-Note: In openzeppelin every contract is actually a combination of two contracts: https://blog.zeppelinos.org/the-transparent-proxy-pattern/[a proxy contract and a logic contract].
-___________________________________________________________________________________________________________________________________________________________________________________
+NOTE: In openzeppelin every contract is actually a combination of two contracts: https://blog.zeppelinos.org/the-transparent-proxy-pattern/[a proxy contract and a logic contract].
 
 [source,console]
 ----
@@ -160,9 +152,7 @@ openzeppelin push
 openzeppelin create2 Wallet --salt 12345 --init --args 0x90F8bf6A479f320ead074411a4B0e7944Ea8c9C1 -n development
 ----
 
-________________________________________________________________________________________________________________________________________________________________________________
-Note: We are using same salt `12345` and mentioning ccontract owner address 0x90F8bf6A479f320ead074411a4B0e7944Ea8c9C1 which was used to initialize our `Wallet` contract above.
-________________________________________________________________________________________________________________________________________________________________________________
+NOTE: We are using same salt `12345` and mentioning ccontract owner address 0x90F8bf6A479f320ead074411a4B0e7944Ea8c9C1 which was used to initialize our `Wallet` contract above.
 
 [[transfer-funds-from-the-contract]]
 == Transfer funds from the contract
@@ -180,9 +170,7 @@ receiver (address): 0xffcf8fdee72ac11b5c542428b35eef5769c409f0
 ✓ Transaction successful. Transaction hash: 0xef464fecd93b609a001c1d439e89c77484797b217587ee8fb907531df9489275
 ----
 
-___________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________
-Note: We have `transfer` method in our `Wallet` contract, which will transfer contract's funds to a given account. Here, we are tranferring funds to a receiver account 0xffcf8fdee72ac11b5c542428b35eef5769c409f0, it is one of the 10 accounts which Ganache provided us.
-___________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________
+NOTE: We have `transfer` method in our `Wallet` contract, which will transfer contract's funds to a given account. Here, we are tranferring funds to a receiver account 0xffcf8fdee72ac11b5c542428b35eef5769c409f0, it is one of the 10 accounts which Ganache provided us.
 
 Now, let's check the balance of the `Wallet` contract and the receiver's account using `openzeppelin balance`, `Wallet` contract balance should be 0 now as all the funds are transferred to the receiver's account.
 
@@ -194,9 +182,7 @@ Balance: 0 ETH
 
 `console $ openzeppelin balance 0xffcf8fdee72ac11b5c542428b35eef5769c409f0 Balance: 110 ETH`
 
-______________________________________________________________________________________________________
-Note: Our `Wallet` contract is upgradeable and we can upgrade it using `openzeppelin upgrade` command.
-______________________________________________________________________________________________________
+NOTE: Our `Wallet` contract is upgradeable and we can upgrade it using `openzeppelin upgrade` command.
 
 [[wrapping-up]]
 == Wrapping up

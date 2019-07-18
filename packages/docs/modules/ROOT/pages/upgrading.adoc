@@ -23,9 +23,7 @@ contract MyContract is Initializable {
 
 This is a traditional immutable contract that will remain frozen for ever on the blockchain, with mistakes, limited functionalities and everything. The OpenZeppelin SDK lets us opt-in to allow upgrades on our contracts, and open the doors to a more sustainable process for developing our projects. With upgrades we can make iterative releases, quickly adding small pieces of functionalities that we can adjust according to the always changing goals of our users; and of course, we can add fixes for any bugs we introduced on previous iterations. And just as with any other contract on the blockchain, we can define governance mechanisms to decide when and how to upgrade the contracts, that can be manual, automated, or any combination of both that will earn the trust of our users.
 
-___________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________
-If any of the following commands fail with an `A network name must be provided  to execute the requested action` error, it means our session has expired. In that case, renew it by running the command `npx openzeppelin session --network local  --from 0x1df62f291b2e969fb0849d99d9ce41e2f137006e --expires 3600` again.
-___________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________
+TIP: If any of the following commands fail with an `A network name must be provided  to execute the requested action` error, it means our session has expired. In that case, renew it by running the command `npx openzeppelin session --network local  --from 0x1df62f291b2e969fb0849d99d9ce41e2f137006e --expires 3600` again.
 
 Now let's create an upgradeable instance of this contract so you can experiment with what this is all about:
 
@@ -38,9 +36,7 @@ The `npx openzeppelin create` command receives an optional `--init [function-nam
 
 This command will print the address of your contract, and it will update the `.openzeppelin/dev-<network_id>.json` file.
 
-_____________________________________________________________________________________________________________________________________
-*Note*: When calling an initializer with many variables, these should be passed as a comma-separated list, with no spaces in between.
-_____________________________________________________________________________________________________________________________________
+NOTE: When calling an initializer with many variables, these should be passed as a comma-separated list, with no spaces in between.
 
 We can start a console to interact with our contract and check that it has been properly initialized:
 
@@ -51,9 +47,7 @@ npx truffle console --network local
 
 Once in the Truffle console, execute the following instructions to test that our instance is working as expected:
 
-_______________________________________________________________________________________
-_Make sure you replace with the address returned by the `create` command we ran above._
-_______________________________________________________________________________________
+NOTE: Make sure you replace with the address returned by the `create` command we ran above.
 
 [source,console]
 ----
@@ -98,9 +92,7 @@ contract MyContract is Initializable {
 }
 ----
 
-___________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________
-*Note*: While the OpenZeppelin SDK supports arbitrary changes regarding functionality, you will need to preserve all the variables that appeared in previous versions of your contracts, declaring any new variables below the already existing ones. All the considerations and some recommendations for your upgrades are explained in the link:writing_contracts.md[Writing upgradeable contracts] page.
-___________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________
+NOTE: While the OpenZeppelin SDK supports arbitrary changes regarding functionality, you will need to preserve all the variables that appeared in previous versions of your contracts, declaring any new variables below the already existing ones. All the considerations and some recommendations for your upgrades are explained in the link:writing_contracts.md[Writing upgradeable contracts] page.
 
 Once you have saved these changes, push the new code to the network:
 
@@ -127,9 +119,7 @@ npx truffle console --network local
 
 Once in the Truffle console, execute the following instructions to try the new functionality we've just added:
 
-________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________
-_Make sure you replace with the address of the upgradeable instance your created of `MyContract`. This address was returned by the `create` command we ran in the previous section, which is the same as the one returned by the `update` command we ran above._
-________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________
+NOTE: Make sure you replace with the address of the upgradeable instance your created of `MyContract`. This address was returned by the `create` command we ran in the previous section, which is the same as the one returned by the `update` command we ran above.
 
 [source,console]
 ----

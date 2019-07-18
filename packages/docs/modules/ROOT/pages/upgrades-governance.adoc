@@ -38,13 +38,9 @@ Since we want to avoid having a single account with full control over our `MyCon
 openzeppelin set-admin [MYCONTRACT_ADDRESS] [MULTISIG_ADDRESS] -y
 ----
 
-_____________________________________________________________________________________________________________________________________________________________________________________________________________________________________
-Please remember to replace `[MYCONTRACT_ADDRESS]` by the address of the upgradeable instance of `MyContract` we created above. Additionally, `[MULTISIG_ADDRESS]` should be replaced by the address of your multisig wallet contract.
-_____________________________________________________________________________________________________________________________________________________________________________________________________________________________________
+NOTE: Please remember to replace `[MYCONTRACT_ADDRESS]` by the address of the upgradeable instance of `MyContract` we created above. Additionally, `[MULTISIG_ADDRESS]` should be replaced by the address of your multisig wallet contract.
 
-________________________________________________________________________________________________________________________________________________________________
-The `-y` option is mandatory to carry out this action. Bear in mind that this could be an irreversible operation in case you specify an incorrect admin address.
-________________________________________________________________________________________________________________________________________________________________
+IMPORTANT: The `-y` option is mandatory to carry out this action. Bear in mind that this could be an irreversible operation in case you specify an incorrect admin address.
 
 Now, if we want to upgrade our `MyContract` instance to a new version, we’ll need to perform the operation from the multisig contract. Note that we have transferred only the ownership of our `MyContract` instance. If we had created more instances of `MyContract`, or of any other contract, they would still be under control of the deployer account.
 
