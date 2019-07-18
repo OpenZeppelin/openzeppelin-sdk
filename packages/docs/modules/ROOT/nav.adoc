@@ -1,0 +1,22 @@
+* xref:whats-new.adoc[What's new in ZeppelinOS 2.4]
+
+.Quickstart
+* xref:first.adoc[Your first project]
+* xref:interacting.adoc[Interacting with your contracts]
+* xref:linking.adoc[Linking OpenZeppelin contracts]
+* xref:zepkit.adoc[Starter Kit]
+
+.Guides
+* xref:writing-contracts.adoc[Writing upgradeable contracts]
+* xref:publish.adoc[Publishing an Ethereum Package]
+* xref:testing.adoc[Testing upgradeable projects]
+* xref:erc20-onboarding.adoc[Onboarding ERC20 tokens]
+* xref:upgrades-governance.adoc[Upgrades governance]
+* xref:zos-lib.adoc[Using the OpenZeppelin SDK programmatic library]
+
+.Advanced Topics
+* xref:faq.adoc[Frequently asked questions]
+* xref:configuration.adoc[Configuration Files]
+* xref:architecture.adoc[Contracts Architecture]
+* xref:pattern.adoc[OpenZeppelin SDK Upgrades Pattern]
+* xref:whitepaper.adoc[Whitepaper]

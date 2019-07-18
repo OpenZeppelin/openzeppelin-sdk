@@ -1,0 +1,7 @@
+name: 'sdk'
+title: 'SDK'
+version: '2.4'
+nav: 
+  - modules/ROOT/nav.adoc
+  - modules/cli/nav.adoc
+  - modules/lib/nav.adoc

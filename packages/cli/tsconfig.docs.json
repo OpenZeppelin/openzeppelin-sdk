@@ -3,7 +3,6 @@
   "defaultSeverity": "warning",
   "compilerOptions": {
     "allowJs": true,
-    "jsx": "react"
   },
   "include": [
     "./src"

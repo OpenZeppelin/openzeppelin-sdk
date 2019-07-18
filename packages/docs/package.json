@@ -6,10 +6,8 @@
   "private": true,
   "license": "MIT",
   "scripts": {
-    "gen-docs": "node scripts/gen-docs.js",
-    "bump-docs": "babel-node scripts/bump-docs.js",
-    "rebuild-docs": "cd docs/website && npm run build",
-    "start": "cd docs/website && npm start"
+    "prepare-docs": "bash scripts/prepare-docs.sh",
+    "docsite": "bash scripts/docsite.sh"
   },
   "files": [],
   "keywords": [
@@ -23,7 +21,7 @@
   "dependencies": {
     "semver": "^5.6.0",
     "shelljs": "^0.8.2",
-    "solidity-docgen": "^0.1.1",
+    "solidity-docgen": "^0.3.0-beta.3",
     "tmp": "0.0.33"
   },
   "devDependencies": {
@@ -31,6 +29,9 @@
     "babel-plugin-transform-export-extensions": "^6.22.0",
     "babel-plugin-transform-object-rest-spread": "^6.26.0",
     "babel-polyfill": "^6.26.0",
-    "babel-preset-env": "^1.7.0"
+    "babel-preset-env": "^1.7.0",
+    "concurrently": "^4.1.1",
+    "http-server": "^0.11.1",
+    "nodemon": "^1.19.1"
   }
 }
