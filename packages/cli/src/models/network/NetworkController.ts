@@ -629,7 +629,7 @@ export default class NetworkController {
         address: instance.address,
         version: semanticVersionToString(projectVersion),
         implementation: implementationAddress,
-        admin: admin || this.networkFile.proxyAdminAddress,
+        admin: admin || this.networkFile.proxyAdminAddress || (await this.project.getAdminAddress()),
         kind,
       });
       return instance;
