@@ -18,10 +18,7 @@ import { ProxyType } from '../scripts/interfaces';
 
 const name = 'set-admin';
 const signature = `${name} [alias-or-address] [new-admin-address]`;
-const description = `change upgradeability admin of a contract instance, all instances or proxy admin.
-Provide the [alias] or [package]/[alias] of the contract to change the ownership of all its instances,
-or its [address] to change a single one, or none to change all contract instances to a new admin.
-Note that if you transfer to an incorrect address, you may irreversibly lose control over upgrading your contract.`;
+const description = `change upgradeability admin of a contract instance, all instances or proxy admin. Provide the [alias] or [package]/[alias] of the contract to change the ownership of all its instances, or its [address] to change a single one, or none to change all contract instances to a new admin. Note that if you transfer to an incorrect address, you may irreversibly lose control over upgrading your contract.`;
 
 const register: (program: any) => any = program =>
   program
