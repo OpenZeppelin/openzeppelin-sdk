@@ -7,7 +7,7 @@
   "license": "MIT",
   "scripts": {
     "prepare-docs": "bash scripts/prepare-docs.sh",
-    "docsite": "bash scripts/docsite.sh"
+    "docs": "bash scripts/docs.sh"
   },
   "files": [],
   "keywords": [
