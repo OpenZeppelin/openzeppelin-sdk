@@ -12,6 +12,7 @@ log "Done"
 # cli
 log "Building CLI docs..."
 cd ../cli
+shopt -s globstar && rm -rf ../**/node_modules/websocket/.git
 npm install --no-package-lock --no-audit
 npm run gen-docs
 log "Done"
