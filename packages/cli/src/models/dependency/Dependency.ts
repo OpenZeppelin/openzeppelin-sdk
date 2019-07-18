@@ -59,15 +59,14 @@ export default class Dependency {
 
   public static hasDependenciesForDeploy(
     network: string,
-    packageFilename = 'zos.json',
-    networkFilename: string = undefined,
+    packageFile?: string,
+    networkFile?: string,
   ): boolean {
     const dependencies =
-      ZosPackageFile.getLinkedDependencies(packageFilename) || [];
+      ZosPackageFile.getLinkedDependencies(packageFile || 'zos.json') || [];
     const networkDependencies =
-      ZosNetworkFile.getDependencies(
-        networkFilename || `zos.${network}.json`,
-      ) || {};
+      ZosNetworkFile.getDependencies(networkFile || `zos.${network}.json`) ||
+      {};
     const hasDependenciesForDeploy = dependencies.find(depNameAndVersion => {
       const [name, version] = depNameAndVersion.split('@');
       const dependency = new Dependency(name);
