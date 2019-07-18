@@ -1,6 +1,6 @@
 {
   "name": "example-first-project",
-  "version": "2.4.1",
+  "version": "2.4.2",
   "description": "",
   "private": true,
   "main": "index.js",
@@ -11,7 +11,7 @@
   },
   "devDependencies": {
     "ganache-cli": "^6.4.3",
-    "zos": "^2.4.1",
-    "zos-lib": "^2.4.1"
+    "zos": "2.4.2",
+    "zos-lib": "2.4.2"
   }
 }
