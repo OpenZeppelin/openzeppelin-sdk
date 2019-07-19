@@ -23,6 +23,7 @@ import * as transfer from '../../src/scripts/transfer';
 import * as balance from '../../src/scripts/balance';
 import * as sendTx from '../../src/scripts/send-tx';
 import * as call from '../../src/scripts/call';
+import * as accounts from '../../src/scripts/accounts';
 
 import program from '../../src/bin/program';
 import Session from '../../src/models/network/Session';
@@ -74,6 +75,7 @@ exports.stubCommands = function() {
     this.balance = sinon.stub(balance, 'default');
     this.sendTx = sinon.stub(sendTx, 'default');
     this.call = sinon.stub(call, 'default');
+    this.accounts = sinon.stub(accounts, 'default');
 
     this.compiler = sinon.stub(Compiler, 'compile');
     this.errorHandler = sinon
