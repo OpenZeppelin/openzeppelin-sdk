@@ -11,7 +11,7 @@ import {
 } from '@openzeppelin/upgrades';
 import { ContractInterface } from '../models/files/NetworkFile';
 
-const DOCS_HOME = 'https://docs.zeppelinos.org/docs';
+const DOCS_HOME = 'https://docs.openzeppelin.com/sdk/2.5';
 const DANGEROUS_OPERATIONS_LINK = `${DOCS_HOME}/writing_contracts.html#potentially-unsafe-operations`;
 const AVOID_INITIAL_VALUES_LINK = `${DOCS_HOME}/writing_contracts.html#avoid-initial-values-in-fields-declarations`;
 const INITIALIZERS_LINK = `${DOCS_HOME}/writing_contracts.html#initializers`;
