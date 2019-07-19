@@ -30,9 +30,7 @@ commandsList = commandsList.filter(c => c.name !== 'status');
 const maxLength: number = Math.max(...commandsList.map(command => command.signature.length));
 
 program
-  .name('openzeppelin')
-  .alias('oz')
-  .alias('zos')
+  .name('openzeppelin|oz')
   .usage('<command> [options]')
   .description(`where <command> is one of: ${commandsList.map(c => c.name).join(', ')}`)
   .version(version, '--version')
