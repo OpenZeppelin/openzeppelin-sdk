@@ -1,6 +1,6 @@
 {
   "name": "oz-sdk-docs",
-  "version": "2.5.0-rc.1",
+  "version": "2.5.0",
   "description": "Documentation for the OpenZeppelin smart contract platform",
   "main": "index.js",
   "private": true,
