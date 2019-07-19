@@ -4,6 +4,37 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## v2.5.0 - 2019-07-19
+
+### Changed
+- Rename `zos` package to `@openzeppelin/cli` ([#1077](https://github.com/OpenZeppelin/openzeppelin-sdk/pull/1077))
+- Rename `zos` command to `openzeppelin` ([#1074](https://github.com/OpenZeppelin/openzeppelin-sdk/pull/1074), [#1128](https://github.com/OpenZeppelin/openzeppelin-sdk/pull/1128))
+- Rename Project, Network, Session and Lock files ([#1040](https://github.com/OpenZeppelin/openzeppelin-sdk/pull/1040), [#1091](https://github.com/OpenZeppelin/openzeppelin-sdk/pull/1091))
+- Rename ZeppelinOS/zos text references ([#1077](https://github.com/OpenZeppelin/openzeppelin-sdk/pull/1077), [#1011](https://github.com/OpenZeppelin/openzeppelin-sdk/pull/1111), [#1129](https://github.com/OpenZeppelin/openzeppelin-sdk/pull/1129))
+- Add support to new `Zepkit` kits in `unpack` command ([#1078](https://github.com/OpenZeppelin/openzeppelin-sdk/pull/1078))
+- Rename compiler manager to `openzeppelin` ([#1097](https://github.com/OpenZeppelin/openzeppelin-sdk/pull/1097))
+
+### Fixed
+- Use Array.isArray instead of deprecated `lodash.isarray` ([#1127](https://github.com/OpenZeppelin/openzeppelin-sdk/pull/1127))
+- Fix `set-admin` description format ([#1117](https://github.com/OpenZeppelin/openzeppelin-sdk/pull/1117))
+
+## v2.4.2 - 2019-07-18
+
+### Fixed
+- The `-f` flag was used for specifying the `--from` option in several commands, and at the same time for setting the `--force` toggle in `push` and `set-admin`; now it is only used for `--from`, and `--force` only accepts the long form. ([#1123](https://github.com/zeppelinos/zos/pull/1123)) (thanks @pcowgill for the report!)
+- Preserve truffle deployment info stored in contract artifacts when compiling. ([#1100](https://github.com/zeppelinos/zos/pull/1100))
+- Linked EVM packages lookup works properly when dependencies are hoisted. ([#1110](https://github.com/zeppelinos/zos/pull/1110)) (thanks @PaulRBerg for the report!)
+- Do not throw an error if the `contracts` local folder is missing. ([#1107](https://github.com/zeppelinos/zos/pull/1107))
+- Properly detect when an Ethereum Package is on an older version for pushing it to the local network for development. ([#1119](https://github.com/zeppelinos/zos/pull/1119))
+- Store proxy admin address for the first proxy created in a network. ([#1124](https://github.com/zeppelinos/zos/pull/1124))
+
+## v2.4.1 - 2019-07-02
+
+### Fixed
+- `zos compile` now works properly on Windows. ([#1066](https://github.com/zeppelinos/zos/pull/1066))
+- Spinners are now shown properly on Windows. ([#1067](https://github.com/zeppelinos/zos/pull/1067))
+- Installation issues with yarn now fixed. ([#1059](https://github.com/zeppelinos/zos/pull/1059))
+
 ## v2.4.0 - 2019-06-24
 
 ### Added
