@@ -69,7 +69,6 @@
     "lodash.flatten": "^4.4.0",
     "lodash.includes": "^4.3.0",
     "lodash.invertby": "^4.7.0",
-    "lodash.isarray": "^4.0.0",
     "lodash.isempty": "^4.4.0",
     "lodash.isequal": "^4.5.0",
     "lodash.isstring": "^4.0.1",

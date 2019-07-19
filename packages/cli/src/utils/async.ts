@@ -1,6 +1,5 @@
 import map from 'lodash.map';
 import isEmpty from 'lodash.isempty';
-import isArray from 'lodash.isarray';
 
 export async function allPromisesOrError(
   promisesWithObjects: any[],
@@ -11,7 +10,7 @@ export async function allPromisesOrError(
     let promise;
     let object = null;
     try {
-      if (isArray(item)) {
+      if (Array.isArray(item)) {
         [promise, object] = item;
       } else {
         promise = item;
