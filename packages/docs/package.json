@@ -1,7 +1,7 @@
 {
-  "name": "zos-docs",
+  "name": "oz-sdk-docs",
   "version": "2.5.0-rc.1",
-  "description": "Documentation for the ZeppelinOS smart contract platform",
+  "description": "Documentation for the OpenZeppelin smart contract platform",
   "main": "index.js",
   "private": true,
   "license": "MIT",
