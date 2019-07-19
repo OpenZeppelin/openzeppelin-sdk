@@ -11,8 +11,13 @@ log "Done"
 
 # cli
 log "Building CLI docs..."
-cd ../cli
-shopt -s globstar && rm -rf ../**/node_modules/websocket/.git
-npm install --no-package-lock --no-audit
+
+# [TODO] run this only if dependencies aren't installed yet
+cd ../..
+shopt -s globstar && rm -rf **/node_modules/websocket/.git
+npm ci
+npx lerna bootstrap
+cd packages/cli
+
 npm run gen-docs
 log "Done"
