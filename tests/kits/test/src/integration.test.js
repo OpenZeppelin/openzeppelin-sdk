@@ -23,7 +23,7 @@ function runIntegrationTest({ kit }, action) {
 
   // have to replace zos with local version so we test current build
   it('replace zos with local version', function() {
-    run(`${findUp.sync('node_modules/.bin/lerna')} bootstrap --scope=tests-cli-kits --scope="zos*"`);
+    run(`${findUp.sync('node_modules/.bin/lerna')} bootstrap --scope=tests-cli-kits --scope="@openzeppelin/*"`);
   });
 
   it('init zos project', function() {
