@@ -31,7 +31,7 @@ export default class Dependency {
   private _projectFile: ProjectFile;
 
   public static fromNameWithVersion(nameAndVersion: string): Dependency {
-    const [name, version] = nameAndVersion.split('@');
+    const [name, version] = this.splitNameAndVersion(nameAndVersion);
     return new this(name, version);
   }
 
@@ -55,7 +55,7 @@ export default class Dependency {
     const networkDependencies = new NetworkFile(null, network, networkFileName).dependencies;
     const hasDependenciesForDeploy = dependencies.find(
       (depNameAndVersion): any => {
-        const [name, version] = depNameAndVersion.split('@');
+        const [name, version] = this.splitNameAndVersion(depNameAndVersion);
         const dependency = new Dependency(name);
         const networkFilePath = dependency.getExistingNetworkFilePath(network);
         const projectDependency = networkDependencies[name];
@@ -72,6 +72,15 @@ export default class Dependency {
     await npm.install([nameAndVersion], { save: true, cwd: process.cwd() });
     Loggy.succeed(`install-dependency-${nameAndVersion}`, `Dependency ${nameAndVersion} installed`);
     return this.fromNameWithVersion(nameAndVersion);
+  }
+
+  public static splitNameAndVersion(nameAndVersion: string): [string, string] {
+    const parts = nameAndVersion.split('@');
+    if (parts[0].length === 0) {
+      parts.shift();
+      parts[0] = `@${parts[0]}`;
+    }
+    return [parts[0], parts[1]];
   }
 
   public constructor(name: string, requirement?: string | semver.Range) {
