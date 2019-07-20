@@ -16,7 +16,10 @@ This strategy is based on an optional migration of the token balances. This migr
 [[requirements]]
 == Requirements
 
-This on-boarding plan considers the following assumptions: - There is an already deployed token contract that follows the ERC20 standard. - The legacy token contract is not frozen or paused, so token holders can trade it.
+This on-boarding plan considers the following assumptions:
+
+* There is an already deployed token contract that follows the ERC20 standard.
+* The legacy token contract is not frozen or paused, so token holders can trade it.
 
 [[onboarding-plan-demo]]
 == Onboarding plan demo

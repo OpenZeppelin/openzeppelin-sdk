@@ -46,4 +46,7 @@ You can try deploying one of these proxies by adding the `--minimal` flag when r
 [[changelog]]
 == Changelog
 
-Please see the project's changelogs for more information: - https://github.com/zeppelinos/zos/blob/release/2.4/packages/cli/changelog.md[cli] - https://github.com/zeppelinos/zos/blob/release/2.4/packages/lib/changelog.md[lib]
+Please see the project's changelogs for more information:
+
+* https://github.com/zeppelinos/zos/blob/release/2.4/packages/cli/changelog.md[cli]
+* https://github.com/zeppelinos/zos/blob/release/2.4/packages/lib/changelog.md[lib]

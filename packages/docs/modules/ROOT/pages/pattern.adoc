@@ -169,7 +169,10 @@ As described in the previous sections, upgradeable contract instances (or proxie
 
 CAUTION: Clashing can also happen among functions with different names. Every function that is part of a contract's public ABI is identified, at the bytecode level, by a 4-byte identifier. This identifier depends on the name and arity of the function, but since it's only 4 bytes, there is a possibility that two different functions with different names may end up having the same identifier. The Solidity compiler tracks when this happens within the same contract, but not when the collision happens across different ones, such as between a proxy and its logic contract. Read https://medium.com/nomic-labs-blog/malicious-backdoors-in-ethereum-proxies-62629adf3357[this article] for more info on this.
 
-The way the OpenZeppelin SDK deals with this problem is via the _transparent proxy_ pattern. A transparent proxy will decide which calls are delegated to the underlying logic contract based on the caller address (ie the `msg.sender`): - If the caller is the admin of the proxy (the address with rights to upgrade the proxy), then the proxy will *not* delegate any calls, and only answer any messages it understands. - If the caller is any other address, the proxy will *always* delegate a call, no matter if it matches one of the proxy's functions.
+The way the OpenZeppelin SDK deals with this problem is via the _transparent proxy_ pattern. A transparent proxy will decide which calls are delegated to the underlying logic contract based on the caller address (ie the `msg.sender`):
+
+* If the caller is the admin of the proxy (the address with rights to upgrade the proxy), then the proxy will *not* delegate any calls, and only answer any messages it understands.
+* If the caller is any other address, the proxy will *always* delegate a call, no matter if it matches one of the proxy's functions.
 
 Assuming a proxy with an `owner()` and an `upgradeTo()` function, that delegates calls to an ERC20 contract with an `owner()` and a `transfer()` function, the following table covers all scenarios:
 

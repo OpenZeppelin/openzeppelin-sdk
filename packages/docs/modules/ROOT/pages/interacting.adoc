@@ -78,7 +78,10 @@ Great! We have our first code snippet getting data out of a blockchain. Let's st
 
 In order to interact with our deployed `Counter` contract, we will create a new https://web3js.readthedocs.io/en/1.0/web3-eth-contract.html[web3 contract instance]. This is a javascript object that represents our contract in the blockchain.
 
-To create this web3 contract, we need two things: - The address where it is deployed - The ABI of the contract, which is the definition of the contract's public functions
+To create this web3 contract, we need two things:
+
+* The address where it is deployed
+* The ABI of the contract, which is the definition of the contract's public functions
 
 The address was returned by the OpenZeppelin CLI when we deployed the contract. As for the ABI, we can retrieve it from the compiled artifact in the `build/contracts` folder as shown below.
 
