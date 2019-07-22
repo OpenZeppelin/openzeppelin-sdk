@@ -15,6 +15,18 @@ contract('Dependency', function([_, from]) {
       });
     });
 
+    describe('#fetchVersionFromNpm', function() {
+      it('fetches version from npm', async function () {
+        const actual = await Dependency.fetchVersionFromNpm('zos');
+        actual.should.match(/^zos@\^2\.\d+\.0$/);
+      });
+
+      it('fetches version from npm for org package', async function () {
+        const actual = await Dependency.fetchVersionFromNpm('@openzeppelin/cli');
+        actual.should.match(/^@openzeppelin\/cli@\^\d+\.\d+\.0$/);
+      });
+    });
+
     describe('#fromNameAndVersion', function() {
       describe('with invalid nameAndVersion', function() {
         it('throws error', function() {
