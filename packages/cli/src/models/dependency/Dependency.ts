@@ -42,9 +42,9 @@ export default class Dependency {
   public static async fetchVersionFromNpm(name: string): Promise<string> {
     const execAsync = promisify(exec);
     try {
-      const { stdout } = await execAsync(`npm view ${name} | grep latest`);
-      const versionMatch = stdout.match(/([0-9]+\.){2}[0-9]+/);
-      return Array.isArray(versionMatch) && versionMatch.length > 0 ? `${name}@${versionMatch[0]}` : name;
+      const { stdout } = await execAsync(`npm view ${name}@latest version`);
+      const version = new semver.SemVer(stdout.trim());
+      return `${name}@^${version.major}.${version.minor}.0`;
     } catch (error) {
       return name;
     }
