@@ -45,10 +45,8 @@ export default class ProjectFile {
 
   public static getLinkedDependencies(filePath: string = null): string[] {
     const project = new ProjectFile(filePath);
-    if (project && project.dependencies) {
-      return Object.keys(project.dependencies).map(depName => `${depName}@${project.dependencies[depName]}`);
-    }
-    return [];
+    if (!project) return [];
+    return project.linkedDependencies;
   }
 
   public constructor(filePath: string = null) {
@@ -171,6 +169,12 @@ export default class ProjectFile {
         runs: optimizer && optimizer.runs && parseInt(optimizer.runs),
       },
     };
+  }
+
+  public get linkedDependencies(): string[] {
+    const dependencies = this.data.dependencies;
+    if (!dependencies) return [];
+    return Object.keys(dependencies).map(depName => `${depName}@${dependencies[depName]}`);
   }
 
   public setCompilerOptions(options: ProjectCompilerOptions): void {
