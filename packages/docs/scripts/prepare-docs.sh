@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -o errexit
+
 log() {
   echo "$*" >&2
 }
