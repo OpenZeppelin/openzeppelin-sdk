@@ -4,19 +4,29 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## v2.5.1 - 2019-07-22
+
+### Changed
+- `link` interactive command now installs an Ethereum Package with a caret by default. ([#1146](https://github.com/OpenZeppelin/openzeppelin-sdk/pull/1146))
+
+### Fixed
+- Fixes error `Could not find dependency` when `link`ing Ethereum Packages published within an npm organization. ([#1138](https://github.com/OpenZeppelin/openzeppelin-sdk/pull/1138))
+- Removed incorrect prompt to deploy dependencies to the current network when they were already deployed. ([#1141](https://github.com/OpenZeppelin/openzeppelin-sdk/pull/1141))
+- `link` interactive command works properly on Windows. ([#1146](https://github.com/OpenZeppelin/openzeppelin-sdk/pull/1146))
+
 ## v2.5.0 - 2019-07-19
 
 ### Changed
-- Rename `zos` package to `@openzeppelin/cli` ([#1077](https://github.com/OpenZeppelin/openzeppelin-sdk/pull/1077))
-- Rename `zos` command to `openzeppelin` ([#1074](https://github.com/OpenZeppelin/openzeppelin-sdk/pull/1074), [#1128](https://github.com/OpenZeppelin/openzeppelin-sdk/pull/1128))
-- Rename Project, Network, Session and Lock files ([#1040](https://github.com/OpenZeppelin/openzeppelin-sdk/pull/1040), [#1091](https://github.com/OpenZeppelin/openzeppelin-sdk/pull/1091))
-- Rename ZeppelinOS/zos text references ([#1077](https://github.com/OpenZeppelin/openzeppelin-sdk/pull/1077), [#1011](https://github.com/OpenZeppelin/openzeppelin-sdk/pull/1111), [#1129](https://github.com/OpenZeppelin/openzeppelin-sdk/pull/1129))
-- Add support to new `Zepkit` kits in `unpack` command ([#1078](https://github.com/OpenZeppelin/openzeppelin-sdk/pull/1078))
-- Rename compiler manager to `openzeppelin` ([#1097](https://github.com/OpenZeppelin/openzeppelin-sdk/pull/1097))
+- Rename `zos` package to `@openzeppelin/cli`. ([#1077](https://github.com/OpenZeppelin/openzeppelin-sdk/pull/1077))
+- Rename `zos` command to `openzeppelin`. ([#1074](https://github.com/OpenZeppelin/openzeppelin-sdk/pull/1074), [#1128](https://github.com/OpenZeppelin/openzeppelin-sdk/pull/1128))
+- Rename Project, Network, Session and Lock files. ([#1040](https://github.com/OpenZeppelin/openzeppelin-sdk/pull/1040), [#1091](https://github.com/OpenZeppelin/openzeppelin-sdk/pull/1091))
+- Rename ZeppelinOS/zos text references. ([#1077](https://github.com/OpenZeppelin/openzeppelin-sdk/pull/1077), [#1011](https://github.com/OpenZeppelin/openzeppelin-sdk/pull/1111), [#1129](https://github.com/OpenZeppelin/openzeppelin-sdk/pull/1129))
+- Add support to new `Zepkit` kits in `unpack` command. ([#1078](https://github.com/OpenZeppelin/openzeppelin-sdk/pull/1078))
+- Rename compiler manager to `openzeppelin`. ([#1097](https://github.com/OpenZeppelin/openzeppelin-sdk/pull/1097))
 
 ### Fixed
-- Use Array.isArray instead of deprecated `lodash.isarray` ([#1127](https://github.com/OpenZeppelin/openzeppelin-sdk/pull/1127))
-- Fix `set-admin` description format ([#1117](https://github.com/OpenZeppelin/openzeppelin-sdk/pull/1117))
+- Use Array.isArray instead of deprecated `lodash.isarray`. ([#1127](https://github.com/OpenZeppelin/openzeppelin-sdk/pull/1127))
+- Fix `set-admin` description format. ([#1117](https://github.com/OpenZeppelin/openzeppelin-sdk/pull/1117))
 
 ## v2.4.2 - 2019-07-18
 
