@@ -11,7 +11,8 @@ Yes. The Solidity team guarantess that the compiler https://twitter.com/ethchris
 
 Yes. You can run `openzeppelin compile --solc-version 5.X` to compile your contracts with a specific Solidity compiler version. This choice will be saved to `.openzeppelin/project.json` for future runs.
 
-....
+[source]
+----
 {
   "manifestVersion": "2.2",
   "name": "my-project",
@@ -21,11 +22,12 @@ Yes. You can run `openzeppelin compile --solc-version 5.X` to compile your contr
     "solcVersion": "0.5.9"
   }
 }
-....
+----
 
 If you are using `truffle` for compiling your project,, you can specify which compiler version to use in your `truffle.js` or `truffle-config.js` file, as you do normally in a truffle 5+ project:
 
-....
+[source]
+----
 module.exports = {
   compilers: {
      solc: {
@@ -33,7 +35,7 @@ module.exports = {
      }
   }
 }
-....
+----
 
 [[why-are-my-getting-the-error-cannot-call-fallback-function-from-the-proxy-admin]]
 == Why are my getting the error "Cannot call fallback function from the proxy admin"?
@@ -47,18 +49,20 @@ However, if you are using the OpenZeppelin SDK programmatically, you could run i
 
 First, make sure you add the following dev-dependencies to your project: `babel-polyfill`, `babel-register`, `babel-preset-es2015`, `babel-preset-stage-2` and `babel-preset-stage-3`. `npm install --save-dev babel-polyfill babel-register babel-preset-es2015 babel-preset-stage-2 babel-preset-stage-3` Next, create a `.babelrc` file at the root of your repo, containing:
 
-....
+[source,json]
+----
 {
   "presets": ["es2015", "stage-2", "stage-3"]
 }
-....
+----
 
 Finally, make sure your `truffle-config.js` file contains the following lines at the beginning of the file:
 
-....
+[source,javascript]
+----
 require('babel-register');
 require('babel-polyfill');
-....
+----
 
 [[how-can-i-create-an-upgradeable-instance-from-solidity-code]]
 == How can I create an upgradeable instance from Solidity code?

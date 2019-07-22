@@ -152,8 +152,9 @@ However, local network files like `dev-<network_id>.json` only represent a proje
 
 An example `.gitignore` file could contain the following entries for the OpenZeppelin SDK:
 
-....
+[source]
+----
 # OpenZeppelin SDK
 .openzeppelin/dev-*.json
 .openzeppelin/.session
-....
+----

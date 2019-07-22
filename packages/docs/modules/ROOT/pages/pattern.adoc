@@ -15,13 +15,13 @@ By design, smart contracts are immutable. On the other hand, software quality he
 
 The basic idea is using a proxy for upgrades. The first contract is a simple wrapper or "proxy" which users interact with directly and is in charge of forwarding transactions to and from the second contract, which contains the logic. The key concept to understand is that the logic contract can be replaced while the proxy, or the access point is never changed. Both contracts are still immutable in the sense that their code cannot be changed, but the logic contract can simply be swapped by another contract. The wrapper can thus point to a different logic implementation and in doing so, the software is "upgraded".
 
-....
+----
 User ---- tx ---> Proxy ----------> Implementation_v0
                      |
                       ------------> Implementation_v1
                      |
                       ------------> Implementation_v2
-....
+----
 
 [[proxy-forwarding]]
 == Proxy forwarding
@@ -59,18 +59,18 @@ A very important thing to note is that the code makes use of the EVM's `delegate
 
 A problem that quickly comes up when using proxies has to do with the way in which variables are stored in the proxy contract. Suppose that the proxy stores the logic contract's address in it's only variable `address public _implementation;`. Now, suppose that the logic contract is a basic token whose first variable is `address public _owner`. Both variables are 32 byte in size, and as far as the EVM knows, occupy the first slot of the resulting execution flow of a proxied call. When the logic contract writes to `_owner`, it does so in the scope of the proxy's state, and in reality writes to `_implementation`. This problem can be referred to as a "storage collision".
 
-....
+----
 |Proxy                     |Implementation           |
 |--------------------------|-------------------------|
 |address _implementation   |address _owner           | <=== Storage collision!
 |...                       |mapping _balances        |
 |                          |uint256 _supply          |
 |                          |...                      |
-....
+----
 
 There are many ways to overcome this problem, and the "unstructured storage" approach which the OpenZeppelin SDK implements works as follows. Instead of storing the `_implementation` address at the proxy's first storage slot, it chooses a pseudo random slot instead. This slot is sufficiently random, that the probability of a logic contract declaring a variable at the same slot is negligible. The same principle of randomizing slot positions in the proxy's storage is used in any other variables the proxy may have, such as an admin address (that is allowed to update the value of `_implementation`), etc.
 
-....
+----
 |Proxy                     |Implementation           |
 |--------------------------|-------------------------|
 |...                       |address _owner           |
@@ -84,7 +84,7 @@ There are many ways to overcome this problem, and the "unstructured storage" app
 |address _implementation   |                         | <=== Randomized slot.
 |...                       |                         |
 |...                       |                         |
-....
+----
 
 An example of how the randomized storage is achieved, following http://eips.ethereum.org/EIPS/eip-1967[EIP 1967]:
 
@@ -103,7 +103,7 @@ As discussed, the unstructured approach avoids storage collisions between the lo
 [[incorrect-storage-preservation]]
 === Incorrect storage preservation:
 
-....
+----
 |Implementation_v0   |Implementation_v1        |
 |--------------------|-------------------------|
 |address _owner      |address _lastContributor | <=== Storage collision!
@@ -111,12 +111,12 @@ As discussed, the unstructured approach avoids storage collisions between the lo
 |uint256 _supply     |mapping _balances        |
 |...                 |uint256 _supply          |
 |                    |...                      |
-....
+----
 
 [[correct-storage-preservation]]
 === Correct storage preservation:
 
-....
+----
 |Implementation_v0   |Implementation_v1        |
 |--------------------|-------------------------|
 |address _owner      |address _owner           |
@@ -124,7 +124,7 @@ As discussed, the unstructured approach avoids storage collisions between the lo
 |uint256 _supply     |uint256 _supply          |
 |...                 |address _lastContributor | <=== Storage extension.
 |                    |...                      |
-....
+----
 
 The unstructured storage proxy mechanism doesn't safeguard against this situation. It is up to the user to have new versions of a logic contract extend previous versions, or otherwise guarantee that the storage hierarchy is always appended to but not modified. However, the OpenZeppelin SDK does detect such collisions, and warns the developer appropriately.
 

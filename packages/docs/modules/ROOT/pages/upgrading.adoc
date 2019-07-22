@@ -131,24 +131,26 @@ truffle(local)> (await myContract.x()).toString()
 
 Now let's imagine that instead of just adding a new function to the contract (a change to functionality), we wanted to add a new variable `t` to our contract. But how do we set the initial value of `t`? The variables `x` and `s` were initialized with the `initialize` function, which was called when the proxy was created via the `openzeppelin create MyContract --init initialize --args ...` command. Naturally, the solution would be to add the initialization of `t` to the end of the initialize function:
 
-....
+[source,solidity]
+----
 function initialize(uint256 _x, string memory _s, uint256 _t) initializer public {
   x = _x;
   s = _s;
   t = _t;
 }
-....
+----
 
 That would be fine for newly deployed instances of MyContract, but it wouldn't work for one that has allready been deployed, and is instead being updated. We cannot call the same `initialize` function, because the `Initializable` modifier guards it against being called more than once. We need a new function.
 
 The `update` command also accepts `--init` and `--args` parameters, so we can use a function with it to initialize the new variable. A good name for the new function could be something like `initializeT` or `initializeVersion2`. This function would simply set the initial value of `t` and check that it has not yet been initialized. It should be called with `openzeppelin update MyContract --init initializeT --args 99`.
 
-....
+[source,solidity]
+----
 function initializeT(uint256 _t) public {
   require(t == 0);
   t = _t;
 }
-....
+----
 
 This initialization validation for `t`, of course, would only make sense if `t` cannot be zero.
 
