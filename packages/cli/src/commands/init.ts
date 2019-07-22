@@ -48,7 +48,7 @@ async function runActionIfNeeded(options: any): Promise<void> {
 function getCommandProps(): InquirerQuestions {
   return {
     name: {
-      message: 'Welcome to OpenZeppelin! Choose a name for your project',
+      message: 'Welcome to the OpenZeppelin SDK! Choose a name for your project',
       type: 'input',
     },
     version: {
