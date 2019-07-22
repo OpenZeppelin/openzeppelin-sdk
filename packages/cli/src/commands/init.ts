@@ -1,8 +1,10 @@
 import push from './push';
 import init from '../scripts/init';
+import semver from 'semver';
 import { promptIfNeeded, InquirerQuestions } from '../prompts/prompt';
 import { FileSystem } from '@openzeppelin/upgrades';
 import ProjectFile from '../models/files/ProjectFile';
+import { notEmpty } from '../prompts/validators';
 
 const name = 'init';
 const signature = `${name} [project-name] [version]`;
@@ -26,7 +28,7 @@ async function action(projectName: string, version: string, options: any): Promi
 
   const args = { name: projectName, version };
   const props = getCommandProps();
-  const defaults = FileSystem.parseJsonIfExists('package.json') || {};
+  const defaults = FileSystem.parseJsonIfExists('package.json') || { version: '1.0.0' };
   const prompted = await promptIfNeeded({ args, defaults, props }, interactive);
 
   const dependencies = link ? link.split(',') : [];
@@ -50,10 +52,15 @@ function getCommandProps(): InquirerQuestions {
     name: {
       message: 'Welcome to the OpenZeppelin SDK! Choose a name for your project',
       type: 'input',
+      validate: notEmpty
     },
     version: {
       message: 'Initial project version',
       type: 'input',
+      validate: input => {
+        if (semver.parse(input)) return true;
+        return `Invalid semantic version: ${input}`;
+      }
     },
   };
 }

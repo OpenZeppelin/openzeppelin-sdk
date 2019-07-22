@@ -30,6 +30,7 @@ interface InquirerQuestion {
   when?: (answers: { [key: string]: any }) => boolean;
   transformer?: (value: string, answers: { [key: string]: any }) => string;
   normalize?: (input?: any) => any;
+  validate?: (input?: any) => boolean | string;
 }
 
 interface InquirerAnswer {
