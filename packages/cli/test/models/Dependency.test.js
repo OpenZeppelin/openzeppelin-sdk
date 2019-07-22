@@ -30,6 +30,28 @@ contract('Dependency', function([_, from]) {
       });
     });
 
+    describe('#splitNameAndVersion', function () {
+      it('parses package name', function () {
+        Dependency.splitNameAndVersion('foo').should.deep.eq(['foo', undefined]);
+      });
+
+      it('parses package name and version', function () {
+        Dependency.splitNameAndVersion('foo@1.2.3').should.deep.eq(['foo', '1.2.3']);
+      });
+
+      it('parses organization package', function () {
+        Dependency.splitNameAndVersion('@org/foo').should.deep.eq(['@org/foo', undefined]);
+      });
+
+      it('parses organization package with version', function () {
+        Dependency.splitNameAndVersion('@org/foo@1.2.3').should.deep.eq(['@org/foo', '1.2.3']);
+      });
+
+      it('parses organization package with version and prerelease tag', function () {
+        Dependency.splitNameAndVersion('@org/foo@1.2.3-rc.1').should.deep.eq(['@org/foo', '1.2.3-rc.1']);
+      });
+    });
+
     describe('#install', function() {
       it('calls npm install', async function() {
         const npmInstallStub = sinon.stub(npm, 'install');
