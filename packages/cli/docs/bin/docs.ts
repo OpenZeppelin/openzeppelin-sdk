@@ -12,6 +12,7 @@ function render(cmd) {
   const options = cmd.options.map(o => `\`${o.flags}\`:: ${o.description}`).join('\n');
 
   return `\
+[[${cmd.name()}]]
 == ${cmd.name()}
 
 Usage: \`${cmd.name()} ${cmd.usage()}\`
