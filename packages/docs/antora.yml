@@ -3,5 +3,4 @@ title: 'SDK'
 version: '2.5'
 nav: 
   - modules/ROOT/nav.adoc
-  - modules/cli/nav.adoc
-  - modules/lib/nav.adoc
+  - modules/api/nav.adoc
