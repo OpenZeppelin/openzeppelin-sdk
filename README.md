@@ -4,7 +4,7 @@
 [![CircleCI](https://circleci.com/gh/OpenZeppelin/openzeppelin-sdk/tree/master.svg?style=shield)](https://circleci.com/gh/OpenZeppelin/openzeppelin-sdk/tree/master)
 [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lernajs.io/)
 
-> OpenZeppelin smart contract platform.
+> Formerly known as ZeppelinOS
 
 OpenZeppelin is a platform to develop, deploy and operate smart contract
 projects on Ethereum and every other EVM and eWASM-powered blockchain.
