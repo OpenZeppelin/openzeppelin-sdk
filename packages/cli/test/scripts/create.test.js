@@ -117,6 +117,10 @@ contract('create script', function([_, owner, otherAdmin]) {
       proxyImplementation.should.equalIgnoreCase(minimal);
     }
 
+    if(!minimal) {
+      proxyInfo.admin.should.not.be.undefined;
+    }
+
     return proxyInfo;
   };
 

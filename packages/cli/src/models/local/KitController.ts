@@ -79,7 +79,7 @@ export default class KitController {
       if (config.manifestVersion !== MANIFEST_VERSION) {
         throw new Error(`Unrecognized kit version identifier ${config.manifestVersion}.
           This means the kit was built with an unknown version of openzeppelin.
-          Please refer to the documentation at https://docs.zeppelinos.org for more info.`);
+          Please refer to the documentation at https://docs.openzeppelin.com/sdk for more info.`);
       }
       return config;
     } catch (e) {

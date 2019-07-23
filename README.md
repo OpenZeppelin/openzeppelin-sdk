@@ -55,7 +55,7 @@ Run `openzeppelin --help` for more details about thes and all the other function
 OpenZeppelin CLI.
 
 The
-[OpenZeppelin SDK documentation](https://docs.openzeppelin.com/sdk/2.4)
+[OpenZeppelin SDK documentation](https://docs.openzeppelin.com/sdk/2.5)
 explains how to build a project using our platform, how to upgrade contracts,
 how to share packages for other projects to reuse, how to vouch for the quality
 of a package, how to use the JavaScript libraries to operate the project, and

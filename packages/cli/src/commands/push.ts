@@ -25,7 +25,7 @@ const register: (program: any) => any = program =>
     .option('--skip-compile', 'skips contract compilation')
     .option('-d, --deploy-dependencies', 'deploys dependencies to the network if there is no existing deployment')
     .option('--reset', 'redeploys all contracts (not only the ones that changed)')
-    .option('-f, --force', 'ignores validation errors and deploys contracts')
+    .option('--force', 'ignores validation errors and deploys contracts')
     .option(
       '--deploy-proxy-admin',
       "eagerly deploys the project's proxy admin (if not deployed yet on the provided network)",

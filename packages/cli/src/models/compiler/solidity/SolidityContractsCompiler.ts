@@ -1,3 +1,4 @@
+import path from 'path';
 import flatMap from 'lodash.flatmap';
 import { Loggy } from '@openzeppelin/upgrades';
 import solc, {
@@ -168,8 +169,10 @@ class SolidityContractsCompiler {
   private _buildContractSchema(solcOutput: CompilerOutput, fileName: string, contractName: string): CompiledContract {
     const output = solcOutput.contracts[fileName][contractName];
     const source = solcOutput.sources[fileName];
-    fileName = fileName.substring(fileName.lastIndexOf('/') + 1);
-    const contract = this.contracts.find(aContract => aContract.fileName === fileName);
+    fileName = path.basename(fileName);
+    const contract = this.contracts.find(
+      aContract => aContract.fileName === fileName,
+    );
 
     return {
       fileName,

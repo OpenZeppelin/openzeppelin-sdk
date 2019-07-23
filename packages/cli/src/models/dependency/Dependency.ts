@@ -50,9 +50,9 @@ export default class Dependency {
     }
   }
 
-  public static hasDependenciesForDeploy(network: string): boolean {
-    const dependencies = ProjectFile.getLinkedDependencies() || [];
-    const networkDependencies = new NetworkFile(null, network).dependencies;
+  public static hasDependenciesForDeploy(network: string, packageFileName?: string, networkFileName?: string): boolean {
+    const dependencies = ProjectFile.getLinkedDependencies(packageFileName) || [];
+    const networkDependencies = new NetworkFile(null, network, networkFileName).dependencies;
     const hasDependenciesForDeploy = dependencies.find(
       (depNameAndVersion): any => {
         const [name, version] = depNameAndVersion.split('@');
@@ -60,7 +60,7 @@ export default class Dependency {
         const networkFilePath = dependency.getExistingNetworkFilePath(network);
         const projectDependency = networkDependencies[name];
         const satisfiesVersion = projectDependency && this.satisfiesVersion(projectDependency.version, version);
-        return !fs.exists(networkFilePath) && !satisfiesVersion;
+        return !fs.exists(networkFilePath) || !satisfiesVersion;
       },
     );
 

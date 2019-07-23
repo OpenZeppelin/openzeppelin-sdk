@@ -25,7 +25,7 @@ async function action(dependencies: string[], options: any): Promise<void> {
   const args = { dependencies };
   const props = getCommandProps();
   const defaults = {
-    dependencies: [await Dependency.fetchVersionFromNpm('openzeppelin-eth')],
+    dependencies: [await Dependency.fetchVersionFromNpm('@openzeppelin/contracts-ethereum-package')],
   };
   const prompted = await promptIfNeeded({ args, props, defaults }, interactive);
 
