@@ -4,6 +4,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## v2.5.0 - 2019-07-19
+
+### Changed
+- Rename `zos-lib` package to `@openzeppelin/upgrades` ([#1077](https://github.com/OpenZeppelin/openzeppelin-sdk/pull/1077))
+- Rename `zos-lib` contracts and implement EIP 1967 for implementation and admin label ([#1074](https://github.com/OpenZeppelin/openzeppelin-sdk/pull/1074))
+
+### Fixed
+- Use Array.isArray instead of deprecated `lodash.isarray` ([#1127](https://github.com/OpenZeppelin/openzeppelin-sdk/pull/1127))
+
+## v2.4.2 - 2019-07-18
+
+### Fixed
+- Contracts lookup from dependencies works properly when dependencies are hoisted. ([#1110](https://github.com/zeppelinos/zos/pull/1110)) (thanks @PaulRBerg for the report!)
+- Fixed errors from logger that occured in verbose mode only when uploading solidity libraries or upgrading instances. ([#1112](https://github.com/zeppelinos/zos/pull/1112)) (thanks @hickscorp for the report!)
+- Add explicit dependency on `web3-utils`, that could cause issues when checksumming addresses. ([#1114](https://github.com/zeppelinos/zos/pull/1114)) (thanks @chentschel for the report!)
+
 ## v2.4.0 - 2019-06-24
 
 ### Fixed

@@ -1,7 +1,7 @@
 {
   "name": "tests-cli-test",
   "private": true,
-  "version": "2.5.0",
+  "version": "2.5.1",
   "description": "Integration tests for CLI app",
   "author": "santiago@zeppelin.solutions",
   "license": "MIT",

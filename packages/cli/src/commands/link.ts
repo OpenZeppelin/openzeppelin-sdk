@@ -46,7 +46,7 @@ function getCommandProps(): InquirerQuestions {
   return {
     dependencies: {
       type: 'input',
-      message: 'Provide an EVM-package name and version',
+      message: 'Provide an Ethereum Package name and version',
       normalize: input => (typeof input === 'string' ? [input] : input),
     },
   };

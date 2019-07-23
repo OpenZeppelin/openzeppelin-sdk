@@ -31,7 +31,7 @@ export default class Dependency {
   private _projectFile: ProjectFile;
 
   public static fromNameWithVersion(nameAndVersion: string): Dependency {
-    const [name, version] = nameAndVersion.split('@');
+    const [name, version] = this.splitNameAndVersion(nameAndVersion);
     return new this(name, version);
   }
 
@@ -42,25 +42,22 @@ export default class Dependency {
   public static async fetchVersionFromNpm(name: string): Promise<string> {
     const execAsync = promisify(exec);
     try {
-      const { stdout } = await execAsync(`npm view ${name} | grep latest`);
-      const versionMatch = stdout.match(/([0-9]+\.){2}[0-9]+/);
-      return Array.isArray(versionMatch) && versionMatch.length > 0 ? `${name}@${versionMatch[0]}` : name;
+      const { stdout } = await execAsync(`npm view ${name}@latest version`);
+      const version = new semver.SemVer(stdout.trim());
+      return `${name}@^${version.major}.${version.minor}.0`;
     } catch (error) {
       return name;
     }
   }
 
   public static hasDependenciesForDeploy(network: string, packageFileName?: string, networkFileName?: string): boolean {
-    const dependencies = ProjectFile.getLinkedDependencies(packageFileName) || [];
-    const networkDependencies = new NetworkFile(null, network, networkFileName).dependencies;
+    const project = new ProjectFile(packageFileName);
+    const dependencies = project.linkedDependencies;
+    const networkFile = new NetworkFile(project, network, networkFileName);
     const hasDependenciesForDeploy = dependencies.find(
       (depNameAndVersion): any => {
-        const [name, version] = depNameAndVersion.split('@');
-        const dependency = new Dependency(name);
-        const networkFilePath = dependency.getExistingNetworkFilePath(network);
-        const projectDependency = networkDependencies[name];
-        const satisfiesVersion = projectDependency && this.satisfiesVersion(projectDependency.version, version);
-        return !fs.exists(networkFilePath) || !satisfiesVersion;
+        const dependency = Dependency.fromNameWithVersion(depNameAndVersion);
+        return !(dependency.isDeployedOnNetwork(network) || networkFile.dependencyHasMatchingCustomDeploy(dependency.name));
       },
     );
 
@@ -72,6 +69,15 @@ export default class Dependency {
     await npm.install([nameAndVersion], { save: true, cwd: process.cwd() });
     Loggy.succeed(`install-dependency-${nameAndVersion}`, `Dependency ${nameAndVersion} installed`);
     return this.fromNameWithVersion(nameAndVersion);
+  }
+
+  public static splitNameAndVersion(nameAndVersion: string): [string, string] {
+    const parts = nameAndVersion.split('@');
+    if (parts[0].length === 0) {
+      parts.shift();
+      parts[0] = `@${parts[0]}`;
+    }
+    return [parts[0], parts[1]];
   }
 
   public constructor(name: string, requirement?: string | semver.Range) {

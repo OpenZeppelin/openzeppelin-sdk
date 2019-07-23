@@ -15,6 +15,18 @@ contract('Dependency', function([_, from]) {
       });
     });
 
+    describe('#fetchVersionFromNpm', function() {
+      it('fetches version from npm', async function () {
+        const actual = await Dependency.fetchVersionFromNpm('zos');
+        actual.should.match(/^zos@\^2\.\d+\.0$/);
+      });
+
+      it('fetches version from npm for org package', async function () {
+        const actual = await Dependency.fetchVersionFromNpm('@openzeppelin/cli');
+        actual.should.match(/^@openzeppelin\/cli@\^\d+\.\d+\.0$/);
+      });
+    });
+
     describe('#fromNameAndVersion', function() {
       describe('with invalid nameAndVersion', function() {
         it('throws error', function() {
@@ -27,6 +39,28 @@ contract('Dependency', function([_, from]) {
       it('initializes a dependency instance', function() {
         const dependency = Dependency.fromNameWithVersion('mock-stdlib@1.1.0');
         dependency.should.not.be.null;
+      });
+    });
+
+    describe('#splitNameAndVersion', function () {
+      it('parses package name', function () {
+        Dependency.splitNameAndVersion('foo').should.deep.eq(['foo', undefined]);
+      });
+
+      it('parses package name and version', function () {
+        Dependency.splitNameAndVersion('foo@1.2.3').should.deep.eq(['foo', '1.2.3']);
+      });
+
+      it('parses organization package', function () {
+        Dependency.splitNameAndVersion('@org/foo').should.deep.eq(['@org/foo', undefined]);
+      });
+
+      it('parses organization package with version', function () {
+        Dependency.splitNameAndVersion('@org/foo@1.2.3').should.deep.eq(['@org/foo', '1.2.3']);
+      });
+
+      it('parses organization package with version and prerelease tag', function () {
+        Dependency.splitNameAndVersion('@org/foo@1.2.3-rc.1').should.deep.eq(['@org/foo', '1.2.3-rc.1']);
       });
     });
 
@@ -66,12 +100,12 @@ contract('Dependency', function([_, from]) {
         });
       });
 
-      context('when there are dependencies to update', function() {
+      context.skip('when there are dependencies to update', function() {
         it('returns true', function() {
           Dependency.hasDependenciesForDeploy(
             'test', 
-            'test/mocks/packages/package-with-newer-stdlib.zos.json',
-            'test/mocks/networks/network-with-stdlibs.zos.test.json'
+            'test/mocks/packages/package-with-stdlib.zos.json',
+            'test/mocks/networks/network-with-older-stdlibs.zos.test.json'
           ).should.be.true;
         });
       });
