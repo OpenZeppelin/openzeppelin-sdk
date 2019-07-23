@@ -34,7 +34,7 @@ contract Initializable {
   function _initialized() internal view returns (bool initialized) {
     bytes32 slot = INITIALIZED_SLOT;
     assembly {
-      impl := sload(slot)
+      initialized := sload(slot)
     }
   }
 
@@ -56,7 +56,7 @@ contract Initializable {
   function _initializing() internal view returns (bool initializing) {
     bytes32 slot = INITIALIZING_SLOT;
     assembly {
-      impl := sload(slot)
+      initializing := sload(slot)
     }
   }
 
