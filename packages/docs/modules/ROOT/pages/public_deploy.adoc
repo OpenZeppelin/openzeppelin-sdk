@@ -22,7 +22,7 @@ We use https://github.com/itinance/mnemonics[mnemonics] to generate a 12 word mn
 npx mnemonics
 ----
 
-Add test Ether to the account that you want to use e.g. the first account derived from the mnemonic.  You can import the 12 word seed phrase into https://metamask.io[MetaMask] and then you can request test Ether (e.g. Ropsten) from a faucet. e.g. https://faucet.metamask.io  If the account doesn’t have enough test Ether you will get the error `insufficient funds for gas * price + value` when you attempt to deploy.
+Add test Ether to the account that you want to use e.g. the first account derived from the mnemonic.  You can import the 12 word seed phrase into https://metamask.io[MetaMask] and then you can request test Ether (e.g. Ropsten) from a faucet. (e.g. https://faucet.metamask.io)  If the account doesn’t have enough test Ether you will get the error `insufficient funds for gas * price + value` when you attempt to deploy.
 
 [[infura]]
 == Create Infura account
@@ -30,7 +30,7 @@ Add test Ether to the account that you want to use e.g. the first account derive
 We will use https://infura.io[Infura] to interact with public Ethereum nodes (if you are not running your own nodes).  Infura Core is free to use. Follow the instructions on the Infura website to sign up and create a new project.  
 
 [[install-dotenv]]
-== Install .env
+== Install dotenv
 
 We will use https://github.com/motdotla/dotenv[dotenv] to store your Infura Project ID and your development mnemonic.  Run the following in your project folder to install as a development dependency:
 
@@ -57,7 +57,7 @@ build
 ----
 
 [[configure-dotenv]]
-== Configure .env
+== Configure `.env`
 
 We configure `.env` to store our Infura Project ID and development Mnemonic used for testing.  Create a `.env` file in your project folder with the following contents, using the Infura Project ID and the development Mnemonic you created earlier:
 [source,js]
@@ -77,7 +77,7 @@ $ npm install --save-dev truffle-hdwallet-provider
 ----
 
 [[configure-networks-js]]
-== Configure networks.js
+== Configure `networks.js`
 
 Update `networks.js` to configure additional networks to connect to.  We require `dotenv` and `truffle-hdwallet-provider` and then specify the provider for the network using the Infura Project ID and development mnemonic.  Your `networks.js` should look like the following:
 
@@ -161,6 +161,6 @@ $ npx openzeppelin call
 [[explorer]]
 == View your transactions on a blockchain explorer
 
-You can view your transactions on a blockchain explorer that supports the network you used.  e.g. Etherscan supports Ropsten. https://ropsten.etherscan.io/  Search Etherscan using the contract address of your instance of Counter.  The contract address is displayed during deployment and when interacting. e.g. Instance created at 0x584Fcb424b17d3505B21c881d57EF9Bf1B18c4A7
+You can view your transactions on a blockchain explorer that supports the network you used.  (e.g. Etherscan supports Ropsten: https://ropsten.etherscan.io/)  Search Etherscan using the contract address of your instance of Counter.  The contract address is displayed during deployment and when interacting. e.g. Instance created at 0x584Fcb424b17d3505B21c881d57EF9Bf1B18c4A7
 
 That’s it! You now know how to deploy an OpenZeppelin SDK contract to a public network and interact with it using OpenZeppelin SDK interactive commands.
