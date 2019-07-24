@@ -17,6 +17,7 @@ import update from './update';
 import verify from './verify';
 import transfer from './transfer';
 import balance from './balance';
+import accounts from './accounts';
 
 export default {
   add,
@@ -38,4 +39,5 @@ export default {
   verify,
   transfer,
   balance,
+  accounts,
 };
