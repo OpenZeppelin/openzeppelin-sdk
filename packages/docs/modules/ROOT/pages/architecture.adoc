@@ -71,7 +71,7 @@ The App contract is the project's main entry point. Its most important function 
 The providers are mapped by name to `ProviderInfo` structs:
 
 [[app.sol-1]]
-==== App.sol
+=== App.sol
 
 [source,solidity]
 ----
@@ -104,7 +104,7 @@ A `Package` contract tracks all the versions of a given Ethereum Package. Follow
 The versions are mapped by a semver hash to `Version` structs:
 
 [[package.sol-1]]
-==== Package.sol
+=== Package.sol
 
 [source,solidity]
 ----
