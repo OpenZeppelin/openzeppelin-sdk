@@ -1,4 +1,4 @@
-* xref:whats-new.adoc[What's new in ZeppelinOS 2.4]
+* xref:new-2.4.adoc[What's new in ZeppelinOS 2.4]
 
 .Quickstart
 * xref:first.adoc[Your first project]

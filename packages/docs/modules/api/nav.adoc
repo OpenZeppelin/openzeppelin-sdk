@@ -1,0 +1,3 @@
+.API
+* xref:cli.adoc[CLI]
+* xref:upgrades.adoc[Upgrades]

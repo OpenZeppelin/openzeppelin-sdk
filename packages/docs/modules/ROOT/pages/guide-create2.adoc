@@ -130,10 +130,11 @@ $ openzeppelin balance 0x4e08589Cd399474157f24f591B9fB100D1adD5d9
 Balance: 10 ETH
 ----
 
-....
+[source,console]
+----
 $ openzeppelin balance 0x90F8bf6A479f320ead074411a4B0e7944Ea8c9C1Balance 
 Balance: 89.97829973 ETH
-....
+----
 
 NOTE: Here 0x90F8bf6A479f320ead074411a4B0e7944Ea8c9C1 is sender as well as owner of our `Wallet` contract.
 

@@ -15,7 +15,7 @@ The source code of the contracts involved with a published Ethereum Package can 
 [[proxyadmin.sol]]
 == https://github.com/OpenZeppelin/openzeppelin-sdk/blob/v2.0.0/packages/lib/contracts/application/App.sol[ProxyAdmin.sol]
 
-This contract acts as a central admin for all proxies on your behalf, making their management as simple as possible. The `ProxyAdmin` contract is owned by the deployer (the project owner). It is the admin of all the proxy contracts and is in charge of upgrading them as well as transferring their ownership to another admin. This contract is used to complement the link:pattern#transparent-proxies-and-function-clashes[transparent proxy pattern], which prevents an admin from accidentally triggering a proxy management function when interacting with their instances.
+This contract acts as a central admin for all proxies on your behalf, making their management as simple as possible. The `ProxyAdmin` contract is owned by the deployer (the project owner). It is the admin of all the proxy contracts and is in charge of upgrading them as well as transferring their ownership to another admin. This contract is used to complement the xref:pattern.adoc#transparent-proxies-and-function-clashes[transparent proxy pattern], which prevents an admin from accidentally triggering a proxy management function when interacting with their instances.
 
 The `ProxyAdmin` is only deployed when you run an `openzeppelin create` (or `openzeppelin create2`) command for the first time. You can force the CLI to deploy it by running `openzeppelin push --deploy-proxy-admin`.
 
@@ -43,11 +43,18 @@ NOTE: Please replace [MYCONTRACT_ADDRESS] with the address of your contract for 
 [[contract-upgrades-via-proxyadmin]]
 === Contract upgrades via ProxyAdmin
 
-The `ProxyAdmin.sol` also responsible for upgrading our contracts. When you run the `openzeppelin upgrade` command, it goes through `ProxyAdmin's` link:upgradeability_ProxyAdmin.html#upgrade[`upgrade`] method. The `ProxyAdmin` contract also provides another method link:upgradeability_ProxyAdmin.html#getProxyImplementation[`getProxyImplementation`] which returns the current implementation of a given proxy.
+The `ProxyAdmin.sol` also responsible for upgrading our contracts. When you run the `openzeppelin upgrade` command, it goes through `ProxyAdmin's` xref:api::upgrades.adoc#ProxyAdmin-upgrade-contract-AdminUpgradeabilityProxy-address-[`upgrade`] method. The `ProxyAdmin` contract also provides another method xref:api::upgrades.adoc#ProxyAdmin-getProxyImplementation-contract-AdminUpgradeabilityProxy-[`getProxyImplementation`] which returns the current implementation of a given proxy.
 
 You can find your `ProxyAdmin` contract address in `.openzeppelin/<network>.json` under the same name.
 
-`console json "proxyAdmin": {    "address": <proxyAdmin-address> }` The https://github.com/OpenZeppelin/openzeppelin-sdk/blob/v2.2.0/packages/lib/contracts/upgradeability/ProxyAdmin.sol[`ProxyAdmin.sol`] comes with `@openzeppelin/upgrades` package.
+[source,json]
+----
+"proxyAdmin": {
+   "address": <proxyAdmin-address>
+}
+----
+
+The https://github.com/OpenZeppelin/openzeppelin-sdk/blob/v2.2.0/packages/lib/contracts/upgradeability/ProxyAdmin.sol[`ProxyAdmin.sol`] comes with `@openzeppelin/upgrades` package.
 
 [[proxyfactory]]
 == https://github.com/OpenZeppelin/openzeppelin-sdk/blob/v2.4.0/packages/lib/contracts/upgradeability/ProxyFactory.sol[ProxyFactory]
@@ -87,7 +94,7 @@ When you upgrade one of your application's smart contracts, it is your applicati
 
 An Ethereum Package is defined by the `Package` contract, as we'll see next.
 
-NOTE: Additionally the `App` contract also facilitates the creation of proxies, by conveniently wrapping around the `AdminUpgradeabilityProxy` contract. For more info on direct usage of proxies, please see link:low_level_contract[the low level usage section].
+NOTE: Additionally the `App` contract also facilitates the creation of proxies, by conveniently wrapping around the `AdminUpgradeabilityProxy` contract.
 
 [[package.sol]]
 == https://github.com/OpenZeppelin/openzeppelin-sdk/blob/v2.0.0/packages/lib/contracts/application/Package.sol[Package.sol]
@@ -122,11 +129,17 @@ The versions are mapped by a semver hash to `Version` structs:
 
 A version's `contractAddress` is an instance of the `ImplementationDirectory` contract, which is basically a mapping of contract aliases (or names) to deployed implementation instances. Continuing the example, your project's "my-application" package for version "0.0.1" could contain a directory with the following contracts:
 
-*Directory for version "0.0.1" of the "my-application" package* * Alias: "MainContract", Implementation: "0x0B06339ad63A875D4874dB7B7C921012BbFfe943" * Alias: "MyToken", Implementation: "0x1b9a62585255981c85Acec022cDaC701132884f7"
+*Directory for version "0.0.1" of the "my-application" package*
+
+* Alias: "MainContract", Implementation: "0x0B06339ad63A875D4874dB7B7C921012BbFfe943"
+* Alias: "MyToken", Implementation: "0x1b9a62585255981c85Acec022cDaC701132884f7"
 
 While version "0.0.2" of the "my-application" package could look like this:
 
-*Directory for version "0.0.2" of the "my-application" package* * Alias: "MainContract", Implementation: "0x0B06339ad63A875D4874dB7B7C921012BbFfe943" * Alias: "MyToken", Implementation: "0x724a43099d375e36c07be60c967b8bbbec985dc8" <--- this changed
+*Directory for version "0.0.2" of the "my-application" package*
+
+* Alias: "MainContract", Implementation: "0x0B06339ad63A875D4874dB7B7C921012BbFfe943"
+* Alias: "MyToken", Implementation: "0x724a43099d375e36c07be60c967b8bbbec985dc8" <--- this changed
 
 Notice how version "0.0.2" uses a new implementation for the "MyToken" contract.
 

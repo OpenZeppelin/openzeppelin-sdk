@@ -1,72 +1,15 @@
-# OpenZeppelin SDK documentation website
-
-[![standard-readme compliant](https://img.shields.io/badge/readme%20style-standard-brightgreen.svg)](https://github.com/RichardLitt/standard-readme)
+# OpenZeppelin SDK Documentation
 
 > Documentation for the OpenZeppelin smart contract platform.
 
+The content in this package is published in https://docs.openzeppelin.com/sdk/.
+
+Additionally, some of the content in that site is automatically generated from
+the source code comments in this repository, in the smart contracts and in the CLI.
+
 ## Development setup
 
-First, install [Node.js](http://nodejs.org/), [npm](https://npmjs.com/) and
-[git](https://git-scm.com/).
-
-Then, clone the repository and navigate to the docs package:
-
-```sh
-git clone https://github.com/OpenZeppelin/openzeppelin-sdk.git
-cd openzeppelin-sdk/packages/docs
-```
-
-Install Docusaurus:
-
-```sh
-npm install --global docusaurus-init
-```
-
-Navigate to the `docs/website` directory and install the dependencies:
-
-```sh
-cd docs/website
-npm install
-```
-
-And finally run:
-
-```sh
-npm run start
-```
-
-This will serve the wesite locally in your computer at `http://localhost:3000/`.
-
-## API Reference generation
-
-At present, we need to generate the API reference for `@openzeppelin/cli` and `@openzeppelin/upgrades`
-using
-[`gen-docs`](https://github.com/OpenZeppelin/openzeppelin-sdk/blob/master/packages/cli/docs/bin/docs.ts)
-and [`solidity-docgen`](https://github.com/OpenZeppelin/solidity-docgen)
-respectively, and then merge the outcome manually by substituting the
-corresponding `.md` files in the `docs/docs/` directory.
-
-## Bump version
-
-The `bump-version` script is provided in order to bump to a particular version.
-
-### Usage:
-
-Specifying an already released version:
-
-```sh
-
-foo@bar:~$: npm run bump-docs 1.2.0
-
-```
-
-Specifying a version and a branch:
-
-```sh
-
-foo@bar:~$: npm run bump-docs 1.2.0 a_remote_branch
-
-```
+To get a local preview of the site, run `npm run docs start`.
 
 ## Maintainers
 

@@ -6,7 +6,7 @@ When working with upgradeable contracts in the OpenZeppelin SDK, there are a few
 [[initializers]]
 == Initializers
 
-You can use your Solidity contracts in the OpenZeppelin SDK without any modifications, except for their _constructors_. Due to a requirement of the proxy-based upgradeability system, no constructors can be used in upgradeable contracts. You can read in-depth about the reasons behind this restriction link:pattern.md#the-constructor-caveat[in the OpenZeppelin SDK Upgrades Pattern page].
+You can use your Solidity contracts in the OpenZeppelin SDK without any modifications, except for their _constructors_. Due to a requirement of the proxy-based upgradeability system, no constructors can be used in upgradeable contracts. You can read in-depth about the reasons behind this restriction xref:pattern.adoc#the-constructor-caveat[in the OpenZeppelin SDK Upgrades Pattern page].
 
 This means that, when using a contract within the OpenZeppelin SDK, you need to change its constructor into a regular function, typically named `initialize`, where you run all the setup logic:
 
@@ -189,7 +189,7 @@ $ TOKEN=$(openzeppelin create TokenContract)
 $ openzeppelin create MyContract --init --args $TOKEN
 ----
 
-An advanced alternative, if you need to create upgradeable contracts on the fly, is to keep an instance of your OpenZeppelin SDK `App` in your contracts. The link:api_application_App.md[`App`] is a contract that acts as the entrypoint for your OpenZeppelin SDK project, which has references to your logic implementations, and can create new contract instances:
+An advanced alternative, if you need to create upgradeable contracts on the fly, is to keep an instance of your OpenZeppelin SDK `App` in your contracts. The xref:api::lib.adoc#App[`App`] is a contract that acts as the entrypoint for your OpenZeppelin SDK project, which has references to your logic implementations, and can create new contract instances:
 
 [source,solidity]
 ----
@@ -223,7 +223,7 @@ As such, it is strongly recommended to avoid any usage of either `selfdestruct` 
 [[modifying-your-contracts]]
 == Modifying your contracts
 
-When writing new versions of your contracts, either due to new features or bugfixing, there is an additional restriction to observe: you cannot change the order in which the contract state variables are declared, nor their type. You can read more about the reasons behind this restriction link:pattern.md[in the pattern section].
+When writing new versions of your contracts, either due to new features or bugfixing, there is an additional restriction to observe: you cannot change the order in which the contract state variables are declared, nor their type. You can read more about the reasons behind this restriction xref:pattern.adoc[in the pattern section].
 
 This means that if you have an initial contract that looks like this:
 
