@@ -1,7 +1,7 @@
 [[upgrading-your-project]]
 = Upgrading your project
 
-At the end of the link:deploying[previous guide] we deployed an OpenZeppelin SDK project with one contract. Here is the code of the contract, to keep it fresh on our minds:
+At the end of the xref:deploying.adoc[previous guide] we deployed an OpenZeppelin SDK project with one contract. Here is the code of the contract, to keep it fresh on our minds:
 
 [source,solidity]
 ----
@@ -64,7 +64,7 @@ You can now exit the Truffle console and continue with the following steps.
 [[upgrading-the-contract]]
 == Upgrading the contract
 
-Remember that for this guide we are using a https://truffleframework.com/docs/ganache/quickstart[ganache] local development network. Do not stop the `ganache-cli` command that link:deploying.md#deploying-your-project[we ran before], or you will lose your previous deployment!
+Remember that for this guide we are using a https://truffleframework.com/docs/ganache/quickstart[ganache] local development network. Do not stop the `ganache-cli` command that xref:deploying.adoc#deploying-your-project[we ran before], or you will lose your previous deployment!
 
 Now, let's say we found an issue on our contract, or maybe we just want to extend its functionalities.
 
@@ -92,7 +92,7 @@ contract MyContract is Initializable {
 }
 ----
 
-NOTE: While the OpenZeppelin SDK supports arbitrary changes regarding functionality, you will need to preserve all the variables that appeared in previous versions of your contracts, declaring any new variables below the already existing ones. All the considerations and some recommendations for your upgrades are explained in the link:writing_contracts.md[Writing upgradeable contracts] page.
+NOTE: While the OpenZeppelin SDK supports arbitrary changes regarding functionality, you will need to preserve all the variables that appeared in previous versions of your contracts, declaring any new variables below the already existing ones. All the considerations and some recommendations for your upgrades are explained in the xref:writing_contracts.adoc[Writing upgradeable contracts] page.
 
 Once you have saved these changes, push the new code to the network:
 

@@ -37,7 +37,7 @@ npm install truffle@5.0.4
 
 Now, initialize the project as a Truffle project with:
 
-[source,console]
+[source,shell]
 ----
 npx truffle init
 ----

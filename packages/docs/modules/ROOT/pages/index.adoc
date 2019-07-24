@@ -14,7 +14,7 @@ The OpenZeppelin SDK is a platform to develop, deploy and operate smart contract
 [[getting-started]]
 == Getting Started
 
-Start by link:first.md[deploying your first OpenZeppelin SDK project].
+Start by xref:first.adoc[deploying your first OpenZeppelin SDK project].
 
 [[security]]
 == Security

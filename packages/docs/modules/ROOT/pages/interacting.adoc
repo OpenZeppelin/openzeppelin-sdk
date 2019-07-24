@@ -1,7 +1,7 @@
 [[interacting-with-your-contracts]]
 = Interacting with your contracts
 
-This tutorial link:first[builds on the previous one] where we created a new OpenZeppelin project, and created (and upgraded!) a simple `Counter` contract in a local development network. We will now see how to interact with this contract from javascript code using https://web3js.readthedocs.io/en/1.0/[web3.js]. We will build a small script that will increase the counter and report back the updated value.
+This tutorial xref:first.adoc[builds on the previous one] where we created a new OpenZeppelin project, and created (and upgraded!) a simple `Counter` contract in a local development network. We will now see how to interact with this contract from javascript code using https://web3js.readthedocs.io/en/1.0/[web3.js]. We will build a small script that will increase the counter and report back the updated value.
 
 The full code for this tutorial can be found in the https://github.com/OpenZeppelin/openzeppelin-sdk/blob/v2.4.0/examples/first-project/src/index.js[`first-project` example] in the OpenZeppelin SDK github repository.
 
@@ -120,7 +120,7 @@ $ node src/index.js
 11
 ----
 
-NOTE: If you restarted ganache between the link:first[previous tutorial] and this one, the returned value will be zero, since all state will have been cleared.
+NOTE: If you restarted ganache between the xref:first.adoc[previous tutorial] and this one, the returned value will be zero, since all state will have been cleared.
 
 Cool! We can now actually interact with the contract by sending a transaction to it.
 

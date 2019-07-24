@@ -8,7 +8,7 @@ In this guide, we will learn how to create an upgradable contract from Solidity.
 [[create-the-factory-and-instance-contracts]]
 == Create the Factory and Instance contracts
 
-Before starting we need to link:first#setting-up-your-project[set up] our project using:
+Before starting we need to xref:first.adoc#setting-up-your-project[set up] our project using:
 
 [source,console]
 ----
