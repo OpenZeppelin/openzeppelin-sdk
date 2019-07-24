@@ -3,6 +3,8 @@
 
 The OpenZeppelin SDK is a platform to develop, deploy and operate smart contract projects on Ethereum and every other EVM and eWASM-powered blockchain.
 
+TIP: Looking for the documentation for version 2.4 or earlier? You can find it https://docs.zeppelinos.org/versions[here].
+
 [[features]]
 == Features
 
