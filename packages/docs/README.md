@@ -9,7 +9,7 @@ the source code comments in this repository, in the smart contracts and in the C
 
 ## Development setup
 
-To get a local preview of the site, run `npm run docs start`.
+To get a local preview of the site, run `npm run docs start`, and navigate to `http://localhost:8080`.
 
 ## Maintainers
 
