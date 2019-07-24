@@ -15,34 +15,24 @@ We will use the `my-project` project folder we created earlier.
 
 [[test-account]]
 == Test account
-We use https://github.com/itinance/mnemonics[mnemonics] to generate a 12 word mnemonic
-
-Run the following to generate a mnemonic for testing purposes:
+We use https://github.com/itinance/mnemonics[mnemonics] to generate a 12 word mnemonic.  Run the following to generate a mnemonic for testing purposes:
 
 [source,console]
 ----
 npx mnemonics
 ----
 
-Add test Ether to the account that you want to use e.g. the first account derived from the mnemonic.
-
-You can import the 12 word seed phrase into MetaMask and then you can request test Ether (e.g. Ropsten) from a faucet
-https://faucet.metamask.io/
-
-If the account doesn’t have enough test Ether you will get the error  `insufficient funds for gas * price + value` when you attempt to deploy
+Add test Ether to the account that you want to use e.g. the first account derived from the mnemonic.  You can import the 12 word seed phrase into https://metamask.io[MetaMask] and then you can request test Ether (e.g. Ropsten) from a faucet. e.g. https://faucet.metamask.io  If the account doesn’t have enough test Ether you will get the error `insufficient funds for gas * price + value` when you attempt to deploy.
 
 [[infura]]
 == Create Infura account
 
-We will use https://infura.io/[Infura] to interact with public Ethereum nodes (if you are not running your own nodes). 
-Infura Core is free to use. 
-Follow the instructions on the Infura website to sign up and create a new project.  
+We will use https://infura.io[Infura] to interact with public Ethereum nodes (if you are not running your own nodes).  Infura Core is free to use. Follow the instructions on the Infura website to sign up and create a new project.  
 
 [[install-dotenv]]
 == Install .env
 
-We will use https://github.com/motdotla/dotenv[dotenv] to store your Infura Project ID and your development mnemonic.
-Run the following to install as a development dependency:
+We will use https://github.com/motdotla/dotenv[dotenv] to store your Infura Project ID and your development mnemonic.  Run the following in your project folder to install as a development dependency:
 
 [source,console]
 ----
@@ -52,9 +42,7 @@ $ npm install --save-dev dotenv
 [[configure-gitignore]]
 == Configure .gitignore
 
-We configure .gitignore to ensure that values in `.env` (Infura Project ID and development mnemonic) don't get accidentally committed to our source code repository.
-
-Create a `.gitignore` file in your project folder with the following contents:
+We configure .gitignore to ensure that values in `.env` (Infura Project ID and development mnemonic) don't get accidentally committed to our source code repository.  Create a `.gitignore` file in your project folder with the following contents:
 
 [source,js]
 ----
@@ -71,9 +59,7 @@ build
 [[configure-dotenv]]
 == Configure .env
 
-We configure `.env` to store our Infura Project ID and development Mnemonic used for testing.
-
-Create a `.env` file in your project folder with the following contents, using the Infura Project ID and the development Mnemonic you created earlier:
+We configure `.env` to store our Infura Project ID and development Mnemonic used for testing.  Create a `.env` file in your project folder with the following contents, using the Infura Project ID and the development Mnemonic you created earlier:
 [source,js]
 ----
 INFURA_PROJECT_ID="ENTER INFURA PROJECT ID"
@@ -83,8 +69,7 @@ DEV_MNEMONIC="ENTER 12 WORD SEED PHRASE"
 [[install-hdwallet-provider]]
 == Install HD Wallet Provider
 
-We will use https://github.com/trufflesuite/truffle/tree/develop/packages/truffle-hdwallet-provider[truffle-hdwallet-provider] to sign transactions for addresses derived from a 12 or 24 word mnemonic.
-Run the following to install as a development dependency:
+We will use https://github.com/trufflesuite/truffle/tree/develop/packages/truffle-hdwallet-provider[truffle-hdwallet-provider] to sign transactions for addresses derived from a 12 or 24 word mnemonic.  Run the following in your project folder to install as a development dependency:
 
 [source,console]
 ----
@@ -94,11 +79,7 @@ $ npm install --save-dev truffle-hdwallet-provider
 [[configure-networks-js]]
 == Configure networks.js
 
-Update `networks.js` to configure additional networks to connect to.
-
-We require `dotenv` and `truffle-hdwallet-provider` and then specify the provider for the network using the Infura Project ID and development mnemonic.
-
-Your `networks.js` should look like the following:
+Update `networks.js` to configure additional networks to connect to.  We require `dotenv` and `truffle-hdwallet-provider` and then specify the provider for the network using the Infura Project ID and development mnemonic.  Your `networks.js` should look like the following:
 
 [source,js]
 ----
@@ -134,8 +115,7 @@ See the https://github.com/trufflesuite/truffle/blob/develop/packages/truffle-hd
 [[deploy]]
 == Deploy contract
 
-We deploy our contract using OpenZeppelin SDK interactive commands by running `openzeppelin create`.
-Select the Counter contract, the ropsten network and say no to calling a function on the instance after creating it.
+We deploy our contract using OpenZeppelin SDK interactive commands by running `openzeppelin create`.  Select the Counter contract, the ropsten network and press N for no to calling a function on the instance after creating it.
 
 [source,console]
 ----
@@ -154,9 +134,7 @@ All contracts have been deployed
 [[interact]]
 == Interact
 
-We can send transactions to our contract using OpenZeppelin SDK interactive commands by running `openzeppelin send-tx`.
-
-Select the Counter contract, the ropsten network, the function to use and an amount to increase the Counter by. e.g. 23.
+We can send transactions to our contract using OpenZeppelin SDK interactive commands by running `openzeppelin send-tx`.  Select the Counter contract, the ropsten network, the function to use and an amount to increase the Counter by. e.g. 23.
 
 [source,console]
 ----
@@ -168,9 +146,7 @@ $ npx openzeppelin send-tx
 ✓ Transaction successful. Transaction hash: 0x5f3449b06aee60146ccb3c63d4bdbc8f03bf9140ce9b23b51defe98e32b81a74
 ----
 
-We can call functions on our contract using OpenZeppelin SDK interactive commands by running `openzeppelin call`.
-
-Select the Counter contract, the ropsten network and the function to call `value()`.
+We can call functions on our contract using OpenZeppelin SDK interactive commands by running `openzeppelin call`.  Select the Counter contract, the ropsten network and the function to call `value()`.
 
 [source,console]
 ----
@@ -185,10 +161,6 @@ $ npx openzeppelin call
 [[explorer]]
 == View your transactions on a blockchain explorer
 
-You can view your transactions on a blockchain explorer that supports the network you used.  e.g. Etherscan supports Ropsten. https://ropsten.etherscan.io/
-
-Search Etherscan using the contract address of your instance of Counter.
-
-The contract address is displayed during deployment and when interacting. e.g. Instance created at 0x584Fcb424b17d3505B21c881d57EF9Bf1B18c4A7
+You can view your transactions on a blockchain explorer that supports the network you used.  e.g. Etherscan supports Ropsten. https://ropsten.etherscan.io/  Search Etherscan using the contract address of your instance of Counter.  The contract address is displayed during deployment and when interacting. e.g. Instance created at 0x584Fcb424b17d3505B21c881d57EF9Bf1B18c4A7
 
 That’s it! You now know how to deploy an OpenZeppelin SDK contract to a public network and interact with it using OpenZeppelin SDK interactive commands.
