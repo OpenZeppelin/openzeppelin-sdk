@@ -3,7 +3,10 @@
 
 This tutorial link:first[builds on the first tutorial] where we created a new OpenZeppelin SDK project, and created a simple `Counter` contract in a local development network. We will now see how to deploy this contract to a public network.  
 
-We will use the Ropsten public test network for this tutorial.  You could also use other public test networks such as Rinkeby, Kovan or Goerli.
+We will use the Ropsten public test network for this tutorial, though you could use other public test networks.
+
+NOTE: Ethereum public test networks include:
+Ropsten (Proof of Work, multi-client, ~ 15 second blocktimes); Rinkeby (Proof of Authority, geth client only, 15 second blocktimes); Kovan (Proof of Authority, parity client only, 4 second blocktimes); Goerli (Proof of Authority, multi-client, 15 second blocktimes)
 
 [[setup]]
 == Setup
