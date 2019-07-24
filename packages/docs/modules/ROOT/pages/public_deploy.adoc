@@ -30,14 +30,14 @@ Run the following to install as a development dependency:
 $ npm install --save-dev dotenv
 ----
 
-[[configure-network-js]]
-== Configure network.js
+[[configure-networks-js]]
+== Configure networks.js
 
-Update `network.js` to configure additional networks to connect to.
+Update `networks.js` to configure additional networks to connect to.
 
 We require `dotenv` and `truffle-hdwallet-provider` and then specify the provider for the network using the Infura Project ID and development mnemonic.
 
-Your `network.js` should look like the following:
+Your `networks.js` should look like the following:
 
 [source,js]
 ----
