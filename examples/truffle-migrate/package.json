@@ -1,6 +1,6 @@
 {
   "name": "example-truffle-migrate",
-  "version": "2.5.1",
+  "version": "2.5.2",
   "description": "OpenZeppelin SDK example: using truffle migrations",
   "main": "index.js",
   "private": true,
@@ -11,10 +11,10 @@
   "author": "santiago@openzeppelin.com",
   "license": "MIT",
   "dependencies": {
-    "@openzeppelin/upgrades": "2.5.1"
+    "@openzeppelin/upgrades": "^2.5.2"
   },
   "devDependencies": {
-    "@openzeppelin/cli": "2.5.1",
+    "@openzeppelin/cli": "^2.5.2",
     "truffle": "^5.0.5"
   }
 }
