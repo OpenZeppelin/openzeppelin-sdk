@@ -1,7 +1,7 @@
 [[deploy-your-contracts-to-a-public-network]]
 = Deploy your contracts to a public network
 
-This tutorial link:first[builds on the first tutorial] where we created a new OpenZeppelin SDK project, and created a simple `Counter` contract in a local development network. We will now see how to deploy this contract to a public network.  
+This guide xref:first.adoc[builds on the first tutorial] where we created a new OpenZeppelin SDK project, and created a simple `Counter` contract in a local development network. We will now see how to deploy this contract to a public network.  
 
 We will use the Ropsten public test network for this tutorial, though you could use other public test networks.
 
@@ -161,6 +161,6 @@ $ npx openzeppelin call
 [[explorer]]
 == View your transactions on a blockchain explorer
 
-You can view your transactions on a blockchain explorer that supports the network you used.  (e.g. Etherscan supports Ropsten: https://ropsten.etherscan.io/)  Search Etherscan using the contract address of your instance of Counter.  The contract address is displayed during deployment and when interacting. e.g. Instance created at 0x584Fcb424b17d3505B21c881d57EF9Bf1B18c4A7
+You can view your transactions on a blockchain explorer that supports the network you used. For instance, Etherscan supports Ropsten at https://ropsten.etherscan.io/. You can search Etherscan using the contract address of your instance of `Counter`, remember that the contract address is displayed during deployment and when interacting with it (`Instance created at 0x...`).
 
-That’s it! You now know how to deploy an OpenZeppelin SDK contract to a public network and interact with it using OpenZeppelin SDK interactive commands.
+That's it! You now know how to deploy an OpenZeppelin SDK contract to a public network and interact with it using OpenZeppelin SDK interactive commands.
