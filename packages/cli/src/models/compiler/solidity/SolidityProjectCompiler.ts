@@ -190,7 +190,7 @@ class SolidityProjectCompiler {
         const name = data.contractName;
         const buildFileName = `${this.outputDir}/${name}.json`;
         if (networksInfo[name]) Object.assign(data, { networks: networksInfo[name] });
-        await writeJson(buildFileName, data);
+        await writeJson(buildFileName, data, { spaces: 2 });
       }),
     );
   }
