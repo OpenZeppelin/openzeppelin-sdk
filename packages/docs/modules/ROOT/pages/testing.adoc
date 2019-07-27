@@ -12,7 +12,7 @@ The `@openzeppelin/cli` package provides a `TestHelper()` function to retrieve y
 
 The following section describes a succinct way in how a simple OpenZeppelin SDK project can be set up. If you already have a project set up, you may skip to the next section.
 
-_If you don't understand what's going on in this section, please refer to the Quickstart guides of the documentation, specifically the link:deploying[Deploying your first project], link:upgrading[Upgrading your project] and link:linking[Linking to Ethereum Packages] guides. These guides provide detailed explanations on how a basic OpenZeppelin SDK project works._
+_If you don't understand what's going on in this section, please refer to the Quickstart guides of the documentation, specifically the xref:deploying.adoc[Deploying your first project], xref:upgrading.adoc[Upgrading your project] and xref:linking.adoc[Linking to Ethereum Packages] guides. These guides provide detailed explanations on how a basic OpenZeppelin SDK project works._
 
 Create a new project by running:
 
@@ -53,14 +53,15 @@ npx openzeppelin add Sample
 
 And link your OpenZeppelin SDK project to the `@openzeppelin/contracts-ethereum-package` Ethereum Package:
 
-....
+[source,console]
+----
 npx openzeppelin link @openzeppelin/contracts-ethereum-package
-....
+----
 
 [[writing-the-test-script]]
 == Writing the test script
 
-TIP: This test is written in ES5 Javascript. If you'd like to use ES6 syntax instead, make sure you link:faq#how-do-i-use-es6-javascript-syntax-in-my-tests[set up babel in your project].
+TIP: This test is written in ES5 Javascript. If you'd like to use ES6 syntax instead, make sure you xref:faq.adoc#how-do-i-use-es6-javascript-syntax-in-my-tests[set up babel in your project].
 
 Now, let's create the test file `test/Sample.test.js`:
 
@@ -199,12 +200,14 @@ As of version 5, Truffle has the ability to overcome the problem depicted above.
 
 To call TimedCrowdsale's initialize function, use the following syntax:
 
-....
+[source,javascript]
+----
 timedCrowadsale.methods['initialize(uint256,uint256)'](openingTime, closingTime);
-....
+----
 
 And to call Crowdsale's initialize function,
 
-....
+[source,javascript]
+----
 timedCrowadsale.methods['initialize(uint256,address,address)'](rate, wallet, token);
-....
+----

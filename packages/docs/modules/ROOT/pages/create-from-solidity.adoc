@@ -8,7 +8,7 @@ In this guide, we will learn how to create an upgradable contract from Solidity.
 [[create-the-factory-and-instance-contracts]]
 == Create the Factory and Instance contracts
 
-Before starting we need to link:first#setting-up-your-project[set up] our project using:
+Before starting we need to xref:first.adoc#setting-up-your-project[set up] our project using:
 
 [source,console]
 ----
@@ -72,7 +72,8 @@ $ openzeppelin publish
 
 After we have run these commands which created our `App`, we can create a `Factory` using its address:
 
-....
+[source,console]
+----
 $ openzeppelin create Factory
 ? Pick a network development
 ✓ Contract Factory deployed
@@ -84,7 +85,7 @@ All contracts have been deployed
 ✓ Setting everything up to create contract instances
 ✓ Factory instance created at 0x9b1f7F645351AF3631a656421eD2e40f2802E6c0
 0x9b1f7F645351AF3631a656421eD2e40f2802E6c0
-....
+----
 
 Let’s unpack a few things here, `openzeppelin add` adds our `Factory` and `Instance` contract to our OpenZeppelin SDK project, and `openzeppelin publish` deploys the `App` contract and registers all our logic contracts (in our case `Factory` and `Instance`).
 

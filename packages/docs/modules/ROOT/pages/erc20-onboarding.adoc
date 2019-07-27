@@ -16,7 +16,10 @@ This strategy is based on an optional migration of the token balances. This migr
 [[requirements]]
 == Requirements
 
-This on-boarding plan considers the following assumptions: - There is an already deployed token contract that follows the ERC20 standard. - The legacy token contract is not frozen or paused, so token holders can trade it.
+This on-boarding plan considers the following assumptions:
+
+* There is an already deployed token contract that follows the ERC20 standard.
+* The legacy token contract is not frozen or paused, so token holders can trade it.
 
 [[onboarding-plan-demo]]
 == Onboarding plan demo
@@ -25,7 +28,7 @@ The central idea of this proposal is to deploy an upgradeable version of your to
 
 To better describe this plan we will use a sample project you can follow and clone from https://github.com/OpenZeppelin/erc20-onboarding/tree/zos-2.1[here].
 
-We will now setup a local environment to demo the onboarding plan. To do this, we will deploy a sample legacy token contract and mint some balances. If you wish to work with your already deployed token, you can skip the following lines and jump directly to the link:erc20_onboarding.html#1-initialize-your-migration-project-with-the-openzeppelin-sdk[step 1].
+We will now setup a local environment to demo the onboarding plan. To do this, we will deploy a sample legacy token contract and mint some balances. If you wish to work with your already deployed token, you can skip the following lines and jump directly to the xref:erc20_onboarding.adoc#1-initialize-your-migration-project-with-the-openzeppelin-sdk[step 1].
 
 In the sample repository you will find a contract called https://github.com/OpenZeppelin/erc20-onboarding/blob/master/contracts/MyLegacyToken.sol[`MyLegacyToken`] that we will use to simulate a real scenario locally. As you can see, this token will mint 100 tokens to the owner once initialized just for testing purposes.
 

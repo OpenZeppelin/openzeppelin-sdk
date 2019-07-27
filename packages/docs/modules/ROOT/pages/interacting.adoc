@@ -1,7 +1,7 @@
 [[interacting-with-your-contracts]]
 = Interacting with your contracts
 
-This tutorial link:first[builds on the previous one] where we created a new OpenZeppelin project, and created (and upgraded!) a simple `Counter` contract in a local development network. We will now see how to interact with this contract from javascript code using https://web3js.readthedocs.io/en/1.0/[web3.js]. We will build a small script that will increase the counter and report back the updated value.
+This tutorial xref:first.adoc[builds on the previous one] where we created a new OpenZeppelin project, and created (and upgraded!) a simple `Counter` contract in a local development network. We will now see how to interact with this contract from javascript code using https://web3js.readthedocs.io/en/1.0/[web3.js]. We will build a small script that will increase the counter and report back the updated value.
 
 The full code for this tutorial can be found in the https://github.com/OpenZeppelin/openzeppelin-sdk/blob/v2.4.0/examples/first-project/src/index.js[`first-project` example] in the OpenZeppelin SDK github repository.
 
@@ -78,7 +78,10 @@ Great! We have our first code snippet getting data out of a blockchain. Let's st
 
 In order to interact with our deployed `Counter` contract, we will create a new https://web3js.readthedocs.io/en/1.0/web3-eth-contract.html[web3 contract instance]. This is a javascript object that represents our contract in the blockchain.
 
-To create this web3 contract, we need two things: - The address where it is deployed - The ABI of the contract, which is the definition of the contract's public functions
+To create this web3 contract, we need two things:
+
+* The address where it is deployed
+* The ABI of the contract, which is the definition of the contract's public functions
 
 The address was returned by the OpenZeppelin CLI when we deployed the contract. As for the ABI, we can retrieve it from the compiled artifact in the `build/contracts` folder as shown below.
 
@@ -117,7 +120,7 @@ $ node src/index.js
 11
 ----
 
-NOTE: If you restarted ganache between the link:first[previous tutorial] and this one, the returned value will be zero, since all state will have been cleared.
+NOTE: If you restarted ganache between the xref:first.adoc[previous tutorial] and this one, the returned value will be zero, since all state will have been cleared.
 
 Cool! We can now actually interact with the contract by sending a transaction to it.
 

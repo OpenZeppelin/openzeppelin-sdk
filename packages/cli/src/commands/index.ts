@@ -21,6 +21,7 @@ import balance from './balance';
 import sendTx from './send-tx';
 import call from './call';
 import compile from './compile';
+import accounts from './accounts';
 
 export default {
   add,
@@ -46,4 +47,5 @@ export default {
   sendTx,
   call,
   compile,
+  accounts,
 };

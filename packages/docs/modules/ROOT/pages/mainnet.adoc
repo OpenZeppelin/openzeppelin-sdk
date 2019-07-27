@@ -1,7 +1,7 @@
 [[deploying-to-mainnet]]
 = Deploying to mainnet
 
-The link:deploying.md[guide about Deploying your first project] explains how to deploy a project to a local network, which is very good for testing. Once you are happy with your initial contracts, you can deploy them to mainnet using the `--network` flag.
+The xref:deploying.adoc[guide about Deploying your first project] explains how to deploy a project to a local network, which is very good for testing. Once you are happy with your initial contracts, you can deploy them to mainnet using the `--network` flag.
 
 This flag takes the network details from the network configuration file. You can use Infura to connect to mainnet, with a `networks.js` or `truffle.js` like this one:
 

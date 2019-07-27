@@ -29,7 +29,7 @@ Next, we push the project to the network:
 npx openzeppelin push --network <network>
 ----
 
-Note that for the Ethereum Package to be used by others, you need to use a real network instead of your local development one. We have a guide about link:mainnet[Deploying to mainnet] which can be useful.
+Note that for the Ethereum Package to be used by others, you need to use a real network instead of your local development one. We have a guide about xref:mainnet.adoc[Deploying to mainnet] which can be useful.
 
 All known commands so far. Here comes what's new. If you want to share your package to the OpenZeppelin SDK community, do it by running the `publish` command:
 

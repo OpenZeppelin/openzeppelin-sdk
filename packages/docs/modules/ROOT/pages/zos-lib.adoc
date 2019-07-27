@@ -37,13 +37,15 @@ npm install truffle@5.0.4
 
 Now, initialize the project as a Truffle project with:
 
-....
+[source,shell]
+----
 npx truffle init
-....
+----
 
 And make sure that you have the local network configured:
 
-....
+[source,javascript]
+----
 module.exports = {
   networks: {
     local: {
@@ -55,7 +57,7 @@ module.exports = {
     }
   }
 };
-....
+----
 
 We'll be using https://truffleframework.com/docs/ganache/quickstart[ganache] for local deployment, so let's install it:
 
