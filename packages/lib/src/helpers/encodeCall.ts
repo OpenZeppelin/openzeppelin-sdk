@@ -10,6 +10,6 @@ export default function encodeCall(name: string, types: (string | ParamType)[] =
   return `0x${signatureHash}${encodedParameters}`;
 }
 
-export function decodeCall(types: (string | ParamType)[] = [], data: string = ''): object {
+export function decodeCall(types: (string | ParamType)[] = [], data: string = ''): any[] {
   return abi.decodeParameters(types, data);
 }

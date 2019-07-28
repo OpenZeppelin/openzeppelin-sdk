@@ -225,13 +225,30 @@ describe('encodeCall helper', () => {
 
 function assertGoodEncoding(types, values) {
   const encoded = encodeCall(FUNCTION_NAME, types, values).substring(10); // Remove signature hash.
-  const decoded = decodeCall(types, `0x${encoded}`);
-  if (values.length !== decoded.__length__)
+  const decoded = decodedObjectToArray(decodeCall(types, `0x${encoded}`));
+  if (values.length !== decoded.length)
     throw new Error(
       'Invalid encoding/decoding: Mismatch in number of encoded and decoded values.',
     );
+
+    zipWith(values, decoded, (value, decodedValue) => {
+      if (Buffer.isBuffer(value)) value = `0x${value.toString('hex')}`;
+      if (decodedValue === null) decodedValue = `0x`;      
+      if (value.toString() != decodedValue.toString())
+        throw new Error(
+          `Invalid encoding/decoding. Encoded: ${value}, Decoded: ${decodedValue}`,
+        );
+    });
 }
 
 function assertBadEncoding(types, values, errorRegex) {
   expect(() => encodeCall(FUNCTION_NAME, types, values)).to.throw(errorRegex);
+}
+
+function decodedObjectToArray(decodedObject) {
+  let array = [];
+  for(var i = 0; i < decodedObject.__length__; i++){
+    array.push(decodedObject[i]);
+  }
+  return array;
 }
