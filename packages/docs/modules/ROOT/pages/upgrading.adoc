@@ -92,7 +92,7 @@ contract MyContract is Initializable {
 }
 ----
 
-NOTE: While the OpenZeppelin SDK supports arbitrary changes regarding functionality, you will need to preserve all the variables that appeared in previous versions of your contracts, declaring any new variables below the already existing ones. All the considerations and some recommendations for your upgrades are explained in the xref:writing_contracts.adoc[Writing upgradeable contracts] page.
+NOTE: While the OpenZeppelin SDK supports arbitrary changes regarding functionality, you will need to preserve all the variables that appeared in previous versions of your contracts, declaring any new variables below the already existing ones. All the considerations and some recommendations for your upgrades are explained in the xref:writing-contracts.adoc[Writing upgradeable contracts] page.
 
 Once you have saved these changes, push the new code to the network:
 
