@@ -13,7 +13,7 @@ In this case, we will use a multisignature wallet.
 [[getting-started]]
 == Getting started
 
-A multisig is a contract that can execute arbitrary transactions, with the restriction that a certain number of owners must agree upon them. We highly recommend using the https://github.com/gnosis/MultiSigWallet[Gnosis MultiSig Wallet], which was https://blog.zeppelin.solutions/gnosis-multisig-wallet-audit-d702ff0e2b1e[audited by the Zeppelin team] and has a https://wallet.gnosis.pm/[useful dApp] for submitting and confirming transactions. You can use it easily to deploy your own multisig wallet.
+A multisig is a contract that can execute arbitrary transactions, with the restriction that a certain number of owners must agree upon them. We highly recommend using the https://github.com/gnosis/MultiSigWallet[Gnosis MultiSig Wallet], which was https://blog.openzeppelin.com/gnosis-multisig-wallet-audit-d702ff0e2b1e[audited by the Zeppelin team] and has a https://wallet.gnosis.pm/[useful dApp] for submitting and confirming transactions. You can use it easily to deploy your own multisig wallet.
 
 image:https://lh5.googleusercontent.com/CqtaZkTZqJ_jT9vdQdPj-CNj304InYItfIBi5LnWrnsySGNOpN0HVu9DFIZbE1TpIq20ZN-3bAB1fNhFQiD_fTKqoLFyzQR7bLmmyfMJZABQMYMOnOzfTrsAkk_sgxeEQTriSJAB[image]
 
