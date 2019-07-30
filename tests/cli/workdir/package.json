@@ -3,7 +3,7 @@
   "private": true,
   "version": "2.5.2",
   "description": "CLI app project for ZeppelinOS integration test",
-  "author": "santiago@zeppelin.solutions",
+  "author": "santiago@openzeppelin.com",
   "license": "MIT",
   "dependencies": {
     "@openzeppelin/upgrades": "^2.5.2",
