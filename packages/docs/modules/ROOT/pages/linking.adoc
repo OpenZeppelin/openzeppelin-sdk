@@ -23,13 +23,13 @@ NOTE: The full code for this project is available in our https://github.com/Open
 
 We will first get ourselves an ERC20 token. Instead of coding one from scratch, we will use the one provided by the https://github.com/OpenZeppelin/openzeppelin-contracts-ethereum-package[OpenZeppelin Contracts Ethereum Package]. An Ethereum Package is a set of contracts set up to be easily included in an OpenZeppelin SDK project, with the added bonus that the contracts' code _is already deployed in the Ethereum network_. This is a more secure code distribution mechanism, and also helps you save gas upon deployment.
 
-NOTE: Check out https://blog.zeppelinos.org/open-source-collaboration-in-the-blockchain-era-evm-packages/[this article]to learn more about Ethereum Packages.
+NOTE: Check out https://blog.zeppelinos.org/open-source-collaboration-in-the-blockchain-era-evm-packages/[this article] to learn more about Ethereum Packages.
 
 To link the OpenZeppelin Contracts Ethereum Package into your project, simply run the following:
 
 [source,console]
 ----
-openzeppelin link @openzeppelin/contracts-ethereum-package@2.2.0
+openzeppelin link @openzeppelin/contracts-ethereum-package
 ----
 
 This command will download the Ethereum Package (bundled as a regular npm package), and connect it to your OpenZeppelin project. We now have all of OpenZeppelin contracts at our disposal, so let's create an ERC20 token!
@@ -88,7 +88,7 @@ Great! We can now write an exchange contract and connect it to this token when w
 
 In order to transfer an amount of tokens every time it receives ETH, our exchange contract will need to store the token contract address and the exchange rate in its state. We will set these two values during initialization, when we create the instance with `openzeppelin create`.
 
-In order to support contract upgrades, the OpenZeppelin SDK xref:pattern.adoc#the-constructor-caveat[does not allow the usage of Solidity's `constructor`s]. Instead, we need to use _initializers_. An initializer is just a regular Solidity function, with an additional check to ensure that it can be called only once. To make coding initializers easy, the OpenZeppelin SDK provides a base `Initializable` contract, that includes an `initializer` modifier that takes care of this. You will first need to install the package that provides that contract:
+In order to support contract upgrades, the OpenZeppelin SDK xref:pattern.adoc#the-constructor-caveat[does not allow the usage of Solidity's `constructor`]. Instead, we need to use _initializers_. An initializer is just a regular Solidity function, with an additional check to ensure that it can be called only once. To make coding initializers easy, the OpenZeppelin SDK provides a base `Initializable` contract, that includes an `initializer` modifier that takes care of this. You will first need to install the package that provides that contract:
 
 [source,console]
 ----
@@ -170,7 +170,7 @@ All set! We can start playing with our brand new token exchange.
 [[using-our-exchange]]
 == Using our exchange
 
-Now that we have initialized our exchange contract initialized, and seeded it with funds, we can test it out by purchasing tokens. Our exchange contract will send tokens back automatically when we send ETH to it, so let's test it by using the `openzeppelin transfer` command. This command allows us to send funds to any address; in this case, we will use it to send ETH to our `TokenExchange` instance:
+Now that we have initialized our exchange contract, and seeded it with funds, we can test it out by purchasing tokens. Our exchange contract will send tokens back automatically when we send ETH to it, so let's test it by using the `openzeppelin transfer` command. This command allows us to send funds to any address; in this case, we will use it to send ETH to our `TokenExchange` instance:
 
 [source,console]
 ----
@@ -213,7 +213,7 @@ contract TokenExchange is Initializable {
   address public owner;
 
   function withdraw() public {
-    require(msg.sender == owner);
+    require(msg.sender == owner, "Address not allowed to call this function");
     msg.sender.transfer(address(this).balance);
   }
 
@@ -235,13 +235,13 @@ contract TokenExchange is Initializable {
   address public owner;
 
   function withdraw() public {
-    require(msg.sender == owner);
+    require(msg.sender == owner, "Address not allowed to call this function");
     msg.sender.transfer(address(this).balance);
   }
 
   // To be run during upgrade, ensuring it can never be called again
   function setOwner(address _owner) public {
-    require(owner == address(0));
+    require(owner == address(0), "Owner already set, cannot modify!");
     owner = _owner;
   }
 
