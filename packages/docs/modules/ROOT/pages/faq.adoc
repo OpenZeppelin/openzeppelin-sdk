@@ -37,8 +37,8 @@ module.exports = {
 }
 ----
 
-[[why-are-my-getting-the-error-cannot-call-fallback-function-from-the-proxy-admin]]
-== Why are my getting the error "Cannot call fallback function from the proxy admin"?
+[[why-am-i-getting-the-error-cannot-call-fallback-function-from-the-proxy-admin]]
+== Why am I getting the error "Cannot call fallback function from the proxy admin"?
 
 This is due to the xref:pattern.adoc#transparent-proxies-and-function-clashes[transparent proxy pattern]. You shouldn't get this error when using the OpenZeppelin SDK via its CLI, since it relies on the `ProxyAdmin` contract for managing your proxies.
 
