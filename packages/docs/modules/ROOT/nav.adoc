@@ -1,5 +1,3 @@
-* xref:new-2.4.adoc[What's new in ZeppelinOS 2.4]
-
 .Quickstart
 * xref:first.adoc[Your first project]
 * xref:interacting.adoc[Interacting with your contracts]
