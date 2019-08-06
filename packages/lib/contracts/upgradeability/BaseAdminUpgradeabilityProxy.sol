@@ -27,12 +27,22 @@ contract BaseAdminUpgradeabilityProxy is BaseUpgradeabilityProxy {
   bytes32 internal constant ADMIN_SLOT = 0xb53127684a568b3173ae13b9f8a6016e243e63b6e8ee1178d6a717850b5d6103;
 
   /**
+   * @dev Declarative boolean constants for the payability parameter of the `ifAdmin` modifier.
+   * All `ifAdmin` modifier arguments should be one of these two.
+   */
+
+  bool internal constant IS_PAYABLE_FOR_ADMIN = true;
+  bool internal constant IS_NOT_PAYABLE_FOR_ADMIN = false;
+
+  /**
    * @dev Modifier to check whether the `msg.sender` is the admin.
    * If it is, it will run the function. Otherwise, it will delegate the call
    * to the implementation.
+   * @param isPayableForAdmin If true, the administrative function can receive nonzero `msg.value`.
    */
-  modifier ifAdmin() {
+  modifier ifAdmin(bool isPayableForAdmin) {
     if (msg.sender == _admin()) {
+      require(isPayableForAdmin || msg.value == 0, "This administrative proxy function does not accept network value.");
       _;
     } else {
       _fallback();
@@ -42,14 +52,14 @@ contract BaseAdminUpgradeabilityProxy is BaseUpgradeabilityProxy {
   /**
    * @return The address of the proxy admin.
    */
-  function admin() external ifAdmin returns (address) {
+  function admin() payable external ifAdmin(IS_NOT_PAYABLE_FOR_ADMIN) returns (address) {
     return _admin();
   }
 
   /**
    * @return The address of the implementation.
    */
-  function implementation() external ifAdmin returns (address) {
+  function implementation() payable external ifAdmin(IS_NOT_PAYABLE_FOR_ADMIN) returns (address) {
     return _implementation();
   }
 
@@ -58,7 +68,7 @@ contract BaseAdminUpgradeabilityProxy is BaseUpgradeabilityProxy {
    * Only the current admin can call this function.
    * @param newAdmin Address to transfer proxy administration to.
    */
-  function changeAdmin(address newAdmin) external ifAdmin {
+  function changeAdmin(address newAdmin) payable external ifAdmin(IS_NOT_PAYABLE_FOR_ADMIN) {
     require(newAdmin != address(0), "Cannot change the admin of a proxy to the zero address");
     emit AdminChanged(_admin(), newAdmin);
     _setAdmin(newAdmin);
@@ -69,7 +79,7 @@ contract BaseAdminUpgradeabilityProxy is BaseUpgradeabilityProxy {
    * Only the admin can call this function.
    * @param newImplementation Address of the new implementation.
    */
-  function upgradeTo(address newImplementation) external ifAdmin {
+  function upgradeTo(address newImplementation) payable external ifAdmin(IS_NOT_PAYABLE_FOR_ADMIN) {
     _upgradeTo(newImplementation);
   }
 
@@ -82,7 +92,7 @@ contract BaseAdminUpgradeabilityProxy is BaseUpgradeabilityProxy {
    * It should include the signature and the parameters of the function to be called, as described in
    * https://solidity.readthedocs.io/en/v0.4.24/abi-spec.html#function-selector-and-argument-encoding.
    */
-  function upgradeToAndCall(address newImplementation, bytes calldata data) payable external ifAdmin {
+  function upgradeToAndCall(address newImplementation, bytes calldata data) payable external ifAdmin(IS_PAYABLE_FOR_ADMIN) {
     _upgradeTo(newImplementation);
     (bool success,) = newImplementation.delegatecall(data);
     require(success);
