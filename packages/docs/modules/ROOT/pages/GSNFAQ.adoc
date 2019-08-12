@@ -1,0 +1,104 @@
+# FAQ - GSN - (or Meta Transactions?)
+
+#### 1: How does it work?
+
+The Gas Stations Network is a decentralized network of Relays which can be used to sign and send ethereum transactions without the original sender (the users) paying for gas.
+
+Users sign messages (not transactions) compromising information about a transaction they would like and arguments they would like to pass. Relays are then responsible for signing valid Ethereum transactions with this information, and an inherited `RelayRecipient.sol` contract preserves the identity of the user that originally requested the transaction. In this way, users can interact directly with smart contracts without needing to have a wallet or own ETH. 
+
+#### 2: What does GSN stand for? 
+
+GSN stands for "[Gas Stations Network](https://medium.com/tabookey/1-800-ethereum-gas-stations-network-for-toll-free-transactions-4bbfc03a0a56)". Originally conceived and designed by [TabooKey](https://www.tabookey.com) the GSN has grown to encompass many companies in the Ethereum space looking to work together to solve the problem of onboarding users to Ethereum applications. 
+
+#### 3: Who is paying the gas?
+
+As GSN is intended primarily to [solve the user onboarding problem](https://medium.com/coinmonks/eth-onboarding-solution-90607fb81380), it is expected that the (d)app developers themselves will be responsible for paying the gas cost of users. In this case, gas costs should be considered the cost of user acquisition.
+
+Alternatively, the GSN can be used for more specific situations, such as paying for DAO users transactions from a DAO treasury account, or contracts where users pay for their transactions via counterfactually deployed smart contracts.
+
+Normally when interacting with the Ethereum network and smart contracts, it is required that the user pay gas in the form of ETH to compensate the Network for the cost of processing transactions. 
+When using GSN, the Ethereum network still requires gas as payment to sign transactions, but it is no longer necessary for the user pay. Instead, a network of relayers pay the gas cost by signing transactions in the name of users and the relayers are then refunded directly by the contract they users wish to interact with.
+
+### 4: Does this work for any contract?
+
+For relayers to pay the gas cost of signing transactions, it is required that the contract with which the user is interacting be GSN enabled. To enable GSN a contract must inherit from the `RelayRecipient.sol` contract in the `OpenZeppelin-contracts` library. 
+
+### 5: Does this work for any transaction?
+
+No, relayers are only able to pay the gas cost of signing transactions for GSN enabled contracts that conform to the GSN specification. Arbitrary contract calls to non-GSN enabled contracts, or for tasks such as sending ETH or mining ETH are not currently supported.
+
+#### 6: Where is the private key?
+
+While relayers pay the gas cost for users, this does not mean they have access to users private keys. The `RelayRecipient.sol` contract has a utility function called `getSender()` which is to be used in place of the solidity system variable `msg.sender` and returns the true address of the user- even when transactions are signed by the relayers private key.
+
+User private keys are never shared or exposed to the relays. 
+
+#### 7: Is this safe? Secure?
+
+The GSN network and smart contracts have been audited by `OpenZeppelin` and are considered to be safe. As the Relays do not have access to users private keys there is no danger of user funds being stolen via stolen private keys.
+
+The original [Gas Stations Network EIP: 1613](http://eips.ethereum.org/EIPS/eip-1613) lists several theoretical attacks against the relay network which have been accounted for by the software implementation and the Relay network should be considered safe.
+
+As always, applications which intend to store large amounts of value should consider carefully their software architecture design to minimize the opportunity for unaccounted for edge cases which could lead to a reduction in security and loss of funds.
+
+#### 8: How do I know who the user is?
+
+The `RelayRecipient.sol` contract has a utility function called `getSender()` which returns the true address of the user making a contract call. The function `getSender()` should be used in place of the solidity system variable `msg.sender`. 
+
+#### 9: Why does it matter if I know who the user is?
+
+The GSN network is built to be compatible with the Ethereum network in its present state. This means that for relayed transactions, `msg.sender` will return the address of the relay signing the transaction, and not the user requesting the transaction. Contracts which use `msg.sender` are not natively compatible with the Gas Stations network. It is necessary to inherit the `getSender()` function from the `RelayHub.sol` contract in the `OpenZeppelin-Contracts` library if your contract needs to identify the initiator of a GSN powered transaction. 
+
+#### 10: Do I pay for everyone? How do I decide who to pay for?
+
+(D)app owners can choose from basic predefined payment strategies or construct their own. The `OpenZeppelin-Contracts` `RelayRecipient.sol` contract provides for pre and post-payment hooks that can be used to verify that a contract function and user are eligible for the transaction cost to be covered by a Relay as well as allow users to pay relays in tokens rather than ETH.
+
+When deciding how many payments and for how much to cover, (d)app owners should consider what they expect the total cost of payment to be, and how they will identify who are their users. It is up to (d)app owners to decide how they will identify who is an eligible user. 
+
+#### 11: If users don't need Metamask, where is the private key?
+
+To use GSN it is not necessary for users to have ETH or even have a wallet such as Metamask. This makes it ideal for creating universally accessible (d)apps which work equally as well on mobile as on desktop.
+
+With GSN, private key (keypairs) are only necessary to sign a message for the relays to process as normal Ethereum transactions. Users need not store value on this keypair and thus the security necessary for this key pair can be tuned to match the requirements of the (d)application. 
+
+It is expected that in the majority of use cases the users' keypair will be generated in-browser ephemerally. For persistent keypairs (d)apps can store this keypair in local storage, or leverage traditional web2 technologies to present users with a typical web2 login experience.
+
+#### 12: Does GSN work with MetaMask?
+
+Although GSN does not require a wallet provider such as Metamask, it is possible to use a wallet provider in conjunction with GSN for novel use cases. An example would be an application which requires users to register via a normal (non-gsn) Ethereum transaction and then for some time afterward, they would not be required to use Metamask to sign each transaction, rather the transactions would be handled by the GSN relays. This could be very convenient for applications which require a high number of transactions and where a confirmation popup for each transaction would be distracting or give a poor user experience.
+
+#### 13: How do I transition users from the browser key to using MetaMask or vice versa?
+
+`OpenZeppelin` will be producing several guides and tutorials to help developers integrate GSN into their smart contracts and (d)applications. The process is rather straightforward and involves only inheriting a `RelayRecipient.sol` contract in the smart contract. It is up to developers to decide how and when they wish their users to send transactions via the GSN network. 
+
+#### 14: Can I use this with credit cards?
+
+An interesting use case for the GSN network is allowing users to pay for transactions via credit cards. An example way this might work would be charging a user directly for tokens that are then used to access services via the (d)application. The tokens can be held in a contract representing a users balance, and when making a transaction using the GSN their token balance can be decremented to cover the 'cost' of each transaction. 
+
+#### 15: Do I have to run a relay?
+
+The GSN network is open source and anyone is free to run a relay. It is envisioned that there will be many independent relays each offering different uptime guarantees and service pricing. GSN enabled applications are free to use any relay that they choose, it is not required for a (d)application to run a relay.
+
+#### 16: Why do I have to deposit ETH in the RelayHub?
+
+Relay providers deposit a stake in the `RelayHub` while (d)app owners deposit a balance. 
+
+The balance deposited by (d)app owners is used to refund relayers for the cost of relaying transactions plus a small fee so that they can cover their expenses and hopefully make a profit. 
+
+Relay providers are required to deposit a stake into the `RelayHub` to ensure good behavior. In the event a Relay behaves badly (for example attempting to reuse a nonce) their deposit can be slashed and collected by other relays which can then prove on-chain a relays bad behavior. This system of checks and balances is one of the features that keeps the GSN safe and ensures that some forms of attacks against the network do not scale. 
+
+#### 17: Does my app need to hold money?
+
+No. The funds which are used by a smart contract application to pay for a users gas costs are stored in the audited `RelayHub` contract. This contract is already deployed at the same address on every network (testnet, mainnet, etc..) and does not need to be managed by (d)app developers. 
+Developers need to ensure that the balance stored on RelayHub is sufficient to cover the cost of their users' transactions. If there is not a sufficient balance to cover the cost of relaying transactions, no transactions will be processed for the smart contract application until the balance is increased.
+
+
+#### 18: How do I manage this?
+
+`OpenZeppelin` has created several convenient web-based tools to manage your applications' GSN transactions. There is a tool for [(d)app developers](https://gsn.openzeppelin.com/recipients) as well as  for [relays](https://gsn.openzeppelin.com/relays).
+
+
+#### 19: Does it work with other web3 providers?
+
+As GSN does not require a user-supplied provider such as Metamask, it will work fine with or without a user-supplied provider. Developers will still need to connect the (d)app to a web3 provider, for example via [Infura](https://infura.io) to receive events or query the Ethereum blockchain.
+
