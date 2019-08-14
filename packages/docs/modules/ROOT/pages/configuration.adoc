@@ -30,7 +30,7 @@ The first file stores the general configuration and is created by the `openzeppe
 }
 ----
 
-Here, `<projectName>` is the name of the project, and `<version>` is the current semver number. The boolean value `<publish>` indicates whether the project should be automatically published to the network upon being `push`ed, allowing it to be reused as an Ethereum Package by other projects. The field `manifestVersion` indicates the version of the configuration file.
+Here, `<projectName>` is the name of the project, and `<version>` is the current semver number. The boolean value `<publish>` indicates whether the project should be automatically published to the network upon being pushed, allowing it to be reused as an Ethereum Package by other projects. The field `manifestVersion` indicates the version of the configuration file.
 
 Once you start adding your contracts via `openzeppelin add`, they will be recorded under the `"contracts"` field, with the contract aliases as the keys (which default to the contract names), and the contract names as the values. Finally, if you link a dependency with `openzeppelin link`, this will be reflected in the `"dependencies"` field, where `<dependency-name>` is the name of the linked Ethereum Package, and `<dependency-version>` is its semver required version.
 
@@ -94,7 +94,7 @@ The OpenZeppelin CLI will also generate a file for each of the networks you work
 }
 ----
 
-The most important things to see here are the proxies and contracts' addresses, `<proxy-i-address>` and `<contract-i-address>` respectively. What will happen is that each time you upload new versions of your logic contracts, `<contract-i-address>` will change. The proxy addresses, however, will stay the same, so you can interact seamlessly with the same addresses as if no change has taken place. Note that `<implementation-i-address>` will always point to the current contract address `<contract-i-address>` if the proxies are `update`d. Proxies are grouped by the name of the package and contract they are backed by.
+The most important things to see here are the proxies and contracts' addresses, `<proxy-i-address>` and `<contract-i-address>` respectively. What will happen is that each time you upload new versions of your logic contracts, `<contract-i-address>` will change. The proxy addresses, however, will stay the same, so you can interact seamlessly with the same addresses as if no change has taken place. Note that `<implementation-i-address>` will always point to the current contract address `<contract-i-address>` if the proxies are `update`-ed. Proxies are grouped by the name of the package and contract they are backed by.
 
 For every logic contract, besides the deployment address, the following info is also tracked:
 
@@ -102,13 +102,13 @@ For every logic contract, besides the deployment address, the following info is 
 * `bodyBytecodeHash` is the SHA256 hash of the same bytecode as above, stripped of its constructor
 * `localBytecodeHash` is the SHA256 hash of the bytecode, including any Solidity library placeholders
 * `deployedBytecodeHash` is the SHA256 hash of the bytecode, with all Solidity library placeholders replaced by their corresponding addresses
-* `types` keeps track of all the types used in the contract or its ancestors, from basic types like `uint256` to custom `struct`s
+* `types` keeps track of all the types used in the contract or its ancestors, from basic types like `uint256` to custom `struct` types
 * `storage` tracks the storage layout of the linearized contract, referencing the types defined in the `types` section, and is used for verifying that any storage layout changes between subsequent versions are compatible
 * `warnings` tracks any existing warnings for the contract, such as whether it has a constructor or `selfdestruct` operations
 
 Any Solidity libraries used by the project's contracts are tracked in the `solidityLibs` node, which has the same structure as the `contracts` item.
 
-Another thing to notice in these files are the version numbers. The `<app-version>` keeps track of the latest app version, and matches `<version>` from `project.json`. The `<proxy-i-version>`s, on the other hand, keep track of which version of the contracts the proxies are pointing to. Say you deploy a contract in your app version 1.0.0, and then bump the version to 1.1.0 and push some upgraded code for that same contract. This will be reflected in the `<contract-i-address>`, but not yet in the proxy, which will display 1.0.0 in `<proxy-i-version>` and the old logic contract address in `<implementation-i-address>`. Once you run `openzeppelin update` to your contract, `<proxy-i-version>` will show the new 1.1.0 version, and `<implementation-i-address>` will point to the new `<contract-i-address>`. Note that this version identifier will refer to the version of the dependency (and not the app) if the proxy points to a dependent Ethereum Package.
+Another thing to notice in these files are the version numbers. The `<app-version>` keeps track of the latest app version, and matches `<version>` from `project.json`. The `<proxy-i-version>`, on the other hand, keeps track of which version of the contracts the proxies are pointing to. Say you deploy a contract in your app version 1.0.0, and then bump the version to 1.1.0 and push some upgraded code for that same contract. This will be reflected in the `<contract-i-address>`, but not yet in the proxy, which will display 1.0.0 in `<proxy-i-version>` and the old logic contract address in `<implementation-i-address>`. Once you run `openzeppelin update` to your contract, `<proxy-i-version>` will show the new 1.1.0 version, and `<implementation-i-address>` will point to the new `<contract-i-address>`. Note that this version identifier will refer to the version of the dependency (and not the app) if the proxy points to a dependent Ethereum Package.
 
 The field `<proxyAdmin>` contains the address of the ProxyAdmin contract, used to manage the xref:pattern.adoc#transparent-proxies-and-function-clashes[transparent proxy pattern] in the project's proxies.
 
