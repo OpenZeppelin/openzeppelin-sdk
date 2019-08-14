@@ -110,7 +110,7 @@ async function main() {
 
   // Retrieve the value stored in the instance contract.
   // Note that we cannot make the call using the same address that created the proxy
-  // because of the transparent proxy problem. See: https://docs.openzeppelin.com/sdk/2.4/faq.html#why-are-my-getting-the-error-cannot-call-fallback-function-from-the-proxy-admin
+  // because of the transparent proxy problem. See: https://docs.openzeppelin.com/sdk/2.5/faq#why-am-i-getting-the-error-cannot-call-fallback-function-from-the-proxy-admin
   const anotherAccount = (await ZWeb3.accounts())[1];
   const value = await instanceContract.methods.value().call({ ...txParams, from: anotherAccount });
   console.log(`Retrieved value from the created Instance contract: ${value}`);
