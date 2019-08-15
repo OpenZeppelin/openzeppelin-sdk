@@ -30,7 +30,7 @@ npm install --global @openzeppelin/cli ganache-cli
 ----
 
 
-Then, let's use the CLI to set up a new project, so we can write our first contract.
+Use the CLI to set up a new project and follow the prompts so we can write our first contract.
 
 [source,console]
 ----
@@ -62,7 +62,7 @@ Simple enough. Let's now modify it to add GSN support. This requires extending f
 NOTE: For most (d)apps, it is probably not a good idea to have such a generous policy since any malicious user can easily drain your contract from funds. Check out our https://docs.openzeppelin.com/[guide on GSN payment strategies] for different approaches to this problem.
 
 [source,solidity]
----
+----
 pragma solidity ^0.5.0;
 
 import "@openzeppelin/contracts-ethereum-package/contracts/GSN/GSNRecipient.sol";
@@ -94,7 +94,6 @@ Start ganache on a separate terminal by running `ganache-cli`, and then create a
 
 NOTE: It is important that you remember to call the `initialize()` function which registers the address of the RelayHub in your contract. 
 
-*
 
 [source,console]
 ----
@@ -130,7 +129,7 @@ RelayHttpServer starting. version: 0.4.0
 Relay funded. Balance: 4999305160000000000
 ----
 
-NOTE Under the hood, this command takes care of several steps to have a local relayer up and running. First, it will download a relayer binary for your platform, and start it. It will then deploy the `RelayHub` contract to your local ganache, register the relayer on the hub, and fund it so it can relay transactions. You can run these steps individually by using other `oz-gsn commands`, or even https://github.com/OpenZeppelin/openzeppelin-gsn-helpers[directly from your code].
+NOTE: Under the hood, this command takes care of several steps to have a local relayer up and running. First, it will download a relayer binary for your platform, and start it. It will then deploy the `RelayHub` contract to your local ganache, register the relayer on the hub, and fund it so it can relay transactions. You can run these steps individually by using other `oz-gsn commands`, or even https://github.com/OpenZeppelin/openzeppelin-gsn-helpers[directly from your code].
 
 The last step will be to _fund_ our `Counter` contract. GSN relayers require recipient contracts to have funds since they will then charge the cost of the relayed transaction (plus a fee!) to it. We will again use the `oz-gsn` set of commands to do this. Make sure to replace the recipient address with the address of your `Counter` contract instance.
 
@@ -157,6 +156,9 @@ Create a symlink so we can access our contract `.json` file. From inside the `sr
 
 `ln -ns ../../build`
 
+This will allow our front end to reach our contract artifacts.
+
+Replace `App.js` in your react project with the following code:
 
 
 [source,javascript]
@@ -165,107 +167,107 @@ import React, { useState, useEffect, useCallback } from "react";
 import { useWeb3Network } from "@openzeppelin/network";
 
 function App() {
- // get GSN web3
- const context = useWeb3Network("http://127.0.0.1:8545", {
- gsn: {
- dev: true
- }
- });
+  // get GSN web3
+  const context = useWeb3Network("http://127.0.0.1:8545", {
+    gsn: {
+      dev: true
+    }
+  });
 
- const { accounts, lib } = context;
+  const { accounts, lib } = context;
 
- // load Counter json artifact
- let counterJSON = undefined;
- try {
- counterJSON = require("./build/contracts/Counter.json");
- } catch (e) {
- console.log(e);
- }
+  // load Counter json artifact
+  let counterJSON = undefined;
+  try {
+    counterJSON = require("./build/contracts/Counter.json");
+  } catch (e) {
+    console.log(e);
+  }
 
- // load Counter Instance
- const [counterInstance, setCounterInstance] = useState(undefined);
+  // load Counter Instance
+  const [counterInstance, setCounterInstance] = useState(undefined);
 
- let deployedNetwork = undefined;
- if (
- !counterInstance &&
- context &&
- counterJSON.networks &&
- context.networkId
- ) {
- deployedNetwork = counterJSON.networks[context.networkId.toString()];
- if (deployedNetwork) {
- setCounterInstance(
- new context.lib.eth.Contract(counterJSON.abi, deployedNetwork.address)
- );
- }
- }
+  let deployedNetwork = undefined;
+  if (
+    !counterInstance &&
+    context &&
+    counterJSON.networks &&
+    context.networkId
+  ) {
+    deployedNetwork = counterJSON.networks[context.networkId.toString()];
+    if (deployedNetwork) {
+      setCounterInstance(
+        new context.lib.eth.Contract(counterJSON.abi, deployedNetwork.address)
+      );
+    }
+  }
 
+  const [count, setCount] = useState(0);
 
- const [count, setCount] = useState(0);
+  const getCount = useCallback(async () => {
+    if (counterInstance) {
+      // Get the value from the contract to prove it worked.
+      const response = await counterInstance.methods.value().call();
+      // Update state with the result.
+      setCount(response);
+    }
+  }, [counterInstance]);
 
- const getCount = useCallback(async () => {
- if (counterInstance) {
- // Get the value from the contract to prove it worked.
- const response = await counterInstance.methods.value().call();
- // Update state with the result.
- setCount(response);
- }
- },[counterInstance])
+  useEffect(() => {
+    getCount();
+  }, [counterInstance, getCount]);
 
- useEffect(() => {
- getCount();
- }, [counterInstance, getCount]);
+  const { methods } = counterInstance || {};
 
- const { methods } = counterInstance || {};
+  const increase = async () => {
+    await counterInstance.methods.increase().send({ from: accounts[0] });
+    getCount();
+  };
 
- const increase = async () => {
- await counterInstance.methods.increase().send({ from: accounts[0] });
- getCount();
- };
+  const decrease = async () => {
+    await counterInstance.methods.decrease().send({ from: accounts[0] });
+    getCount();
+  };
 
- const decrease = async () => {
- await counterInstance.methods.decrease().send({ from: accounts[0] });
- getCount();
- };
-
- return (
- <div>
- <h3> Counter counterInstance </h3>
- {lib && !counterInstance && (
- <React.Fragment>
- <div>Contract Instance or network not loaded.</div>
- </React.Fragment>
- )}
- {lib && counterInstance && (
- <React.Fragment>
- <div>
- <div>Counter Value:</div>
- <div>{count}</div>
- </div>
- <div>Counter Actions</div>
- <div>
- <button onClick={() => increase(1)} size="small">
- Increase Counter by 1
- </button>
- <button
- onClick={() => decrease(1)}
- disabled={!(methods && methods.decreaseCounter)}
- size="small"
- >
- Decrease Counter by 1
- </button>
- </div>
- </React.Fragment>
- )}
- </div>
- );
+  return (
+    <div>
+      <h3> Counter counterInstance </h3>
+      {lib && !counterInstance && (
+        <React.Fragment>
+          <div>Contract Instance or network not loaded.</div>
+        </React.Fragment>
+      )}
+      {lib && counterInstance && (
+        <React.Fragment>
+          <div>
+            <div>Counter Value:</div>
+            <div>{count}</div>
+          </div>
+          <div>Counter Actions</div>
+          <div>
+            <button onClick={() => increase(1)} size="small">
+              Increase Counter by 1
+            </button>
+            <button
+              onClick={() => decrease(1)}
+              disabled={!(methods && methods.decreaseCounter)}
+              size="small"
+            >
+              Decrease Counter by 1
+            </button>
+          </div>
+        </React.Fragment>
+      )}
+    </div>
+  );
 }
 
-export default App
+export default App;
+
 ----
 
 
-NOTE You can pass a `dev: true` flag to the `gsn` options when setting up the provider. This will use the https://github.com/OpenZeppelin/openzeppelin-gsn-provider/[GSNDevProvider] instead of the regular GSN provider. This is a provider set up specifically for testing or development, and it _does not require a relayer to be running_ to work. This can make development easier, but it will feel less like the actual GSN experience.
+NOTE: You can pass a `dev: true` flag to the `gsn` options when setting up the provider. This will use the https://github.com/OpenZeppelin/openzeppelin-gsn-provider/[GSNDevProvider] instead of the regular GSN provider. This is a provider set up specifically for testing or development, and it _does not require a relayer to be running_ to work. This can make development easier, but it will feel less like the actual GSN experience.
 
 Great! We can now fire up our application running `npm start` from within the `client` folder. Remember to keep both your ganache and relayer up and running. You should be able to send transactions to your `Counter` contract without having to use MetaMask or have any ETH at all!
 
@@ -284,7 +286,8 @@ $ openzeppelin create
 ? Pick a network: rinkeby
 ✓ Added contract Counter
 ✓ Contract Counter deployed
-? Do you want to call a function on the instance after creating it?: No
+? Do you want to call a function on the instance after creating it?: Yes
+? Select which function * initialize()
 ✓ Setting everything up to create contract instances
 ✓ Instance created at 0xCfEB869F69431e42cdB54A4F4f105C19C080A601
 ----
@@ -294,7 +297,9 @@ The next step will be to instruct our (d)app to connect to a Rinkeby node instea
 
 [source,javascript]
 ----
- // get GSN web3
+
+//Inside App.js
+
  const gasPrice = 22000000001;
  let relay_client_config = {
  txfee: REACT_APP_TX_FEE,
