@@ -45,7 +45,7 @@ export default class KitController {
       // always delete .git folder
       await remove(path.join(workingDirPath, '.git'));
       // run kit commands like `npm install`
-      await exec(config.hooks['post-unpack']);
+      await exec(config.hooks['post-unpack'], { maxBuffer: 1024 * 1024 * 100});
       Loggy.succeed('unpack-kit', 'Kit downloaded and unpacked');
 
       Loggy.noSpin(__filename, 'unpack', 'unpack-succeeded', `The kit is ready to use. \n${config.message}`);
