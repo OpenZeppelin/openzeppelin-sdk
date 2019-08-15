@@ -90,7 +90,11 @@ contract Counter is GSNRecipient {
 }
 ----
 
-Start ganache on a separate terminal by running `ganache-cli`, and then create an instance of our new contract using the OpenZeppelin CLI: `oz create` and follow the prompts. You will want to call the `initialize()` function which registers the address of the RelayHub in your contrat. Take care to copy the address of your instance which is returned at the end of the process.
+Start ganache on a separate terminal by running `ganache-cli`, and then create an instance of our new contract using the OpenZeppelin CLI: `oz create` and follow the prompts.Take care to copy the address of your instance which is returned at the end of the process.
+
+NOTE: It is important that you remember to call the `initialize()` function which registers the address of the RelayHub in your contract. 
+
+*
 
 [source,console]
 ----
