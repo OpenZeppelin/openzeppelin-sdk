@@ -1,11 +1,11 @@
 [[building-gsn-powered-dapp]]
 = Building a GSN powered (d)app from scratch
 
-In this tutorial, we will integrate several libraries from the SDK, as well as OpenZeppelin Contracts, to build a GSN-powered (d)app. The GSN, or Gas Station Network, is a decentralized network of relayers that allow you to subsidize your users' transactions. This way, they do not need gas to use your (d)app. You can read more about the GSN https://docs.openzeppelin.com/[here].
+In this tutorial, we will integrate several libraries from the SDK, as well as OpenZeppelin Contracts, to build a GSN-powered (d)app. The https://gsn.ethereum.org[GSN], or Gas Station Network, is a decentralized network of relayers that allow you to subsidize your users' transactions. This way, they do not need gas to use your (d)app. You can read more about the GSN https://docs.openzeppelin.com/contracts/2.x/gsn[here].
 
 We will use the `create-react-app` package to bootstrap a React application and use the `@openzeppelin/network` package to easily set up a web3 object with GSN support. Also, since the gas station network is not available on your local ganache, we will use the `@openzeppelin/gsn-helpers` package to emulate it locally. We will use the `@openzeppelin/cli` to manage our contracts, and extend from `@openzeppelin/contracts-ethereum-package` to add GSN capabilities to them. 
 
-NOTE: It might feel like there many moving pieces here, but each component has a well-defined role in building this application. That said, if you are new to the OpenZeppelin platform, it may help to look into the https://docs.openzeppelin.com/contracts/2.x/gsn[Contracts GSN guide] and how to start your first SDK project before you continue reading.
+NOTE: It might feel like there many moving pieces here, but each component has a well-defined role in building this application. That said, if you are new to the OpenZeppelin platform, it may help to look into the https://docs.openzeppelin.com/contracts/2.x/gsn[OpenZeppelin Contracts GSN guide] and xref:first.adoc[how to start your first SDK project] before you continue reading.
 
 We will create a super simple contract that just counts transactions sent to it from users but will tie it into the GSN so the users will not have to pay for the gas of those transactions. Let's get started!
 
@@ -48,11 +48,11 @@ We will write our vanilla `Counter` contract in the newly created `contracts` fo
 pragma solidity ^0.5.0;
 
 contract Counter {
- uint256 public value;
+  uint256 public value;
 
- function increase() public {
- value += 1;
- }
+  function increase() public {
+    value += 1;
+  }
 }
 ----
 
@@ -68,31 +68,31 @@ pragma solidity ^0.5.0;
 import "@openzeppelin/contracts-ethereum-package/contracts/GSN/GSNRecipient.sol";
 
 contract Counter is GSNRecipient {
- uint256 public value;
+  uint256 public value;
 
- function increase() public {
- value += 1;
- }
+  function increase() public {
+    value += 1;
+  }
 
- function acceptRelayedCall(
- address relay,
- address from,
- bytes calldata encodedFunction,
- uint256 transactionFee,
- uint256 gasPrice,
- uint256 gasLimit,
- uint256 nonce,
- bytes calldata approvalData,
- uint256 maxPossibleCharge
- ) external view returns (uint256, bytes memory) {
- return _approveRelayedCall();
- }
+  function acceptRelayedCall(
+    address relay,
+    address from,
+    bytes calldata encodedFunction,
+    uint256 transactionFee,
+    uint256 gasPrice,
+    uint256 gasLimit,
+    uint256 nonce,
+    bytes calldata approvalData,
+    uint256 maxPossibleCharge
+  ) external view returns (uint256, bytes memory) {
+    return _approveRelayedCall();
+  }
 }
 ----
 
-Start ganache on a separate terminal by running `ganache-cli`, and then create an instance of our new contract using the OpenZeppelin CLI: `oz create` and follow the prompts.Take care to copy the address of your instance which is returned at the end of the process.
+Start ganache on a separate terminal by running `ganache-cli`, and then create an instance of our new contract using the OpenZeppelin CLI with `oz create` and follow the prompts. Take care to copy the address of your instance which is returned at the end of the process.
 
-NOTE: It is important that you remember to call the `initialize()` function which registers the address of the RelayHub in your contract. 
+NOTE: It is important that you remember to call the `initialize()` function when creating the contract, as this will take care to get your contract ready to be used in the GSN.
 
 
 [source,console]
@@ -152,37 +152,31 @@ npx create-react-app client
 
 On the `client/App.js` file, add the following code. This will use `@openzeppelin/network` to create a new provider connected to the local network. It will use a key generated on the spot to sign all transactions on behalf of the user and will use the GSN to relay them to the network. This allows your users to start interacting with your (d)app right away, even if they do not have MetaMask installed, an Ethereum account, or any ETH at all.
 
-Create a symlink so we can access our contract `.json` file. From inside the `src` directory:
+First, create a symlink so we can access our compiled contracts `.json` files. From inside the `src` directory run:
 
 `ln -ns ../../build`
 
 This will allow our front end to reach our contract artifacts.
 
-Replace `App.js` in your react project with the following code:
-
+Then, replace `App.js` in your react project with the following code:
 
 [source,javascript]
 ----
 import React, { useState, useEffect, useCallback } from "react";
 import { useWeb3Network } from "@openzeppelin/network";
 
+const PROVIDER_URL = "http://127.0.0.1:8545";
+
 function App() {
   // get GSN web3
-  const context = useWeb3Network("http://127.0.0.1:8545", {
-    gsn: {
-      dev: true
-    }
+  const context = useWeb3Network(PROVIDER_URL, {
+    gsn: { dev: true }
   });
 
   const { accounts, lib } = context;
 
   // load Counter json artifact
-  let counterJSON = undefined;
-  try {
-    counterJSON = require("./build/contracts/Counter.json");
-  } catch (e) {
-    console.log(e);
-  }
+  const counterJSON = require("./build/contracts/Counter.json");
 
   // load Counter Instance
   const [counterInstance, setCounterInstance] = useState(undefined);
@@ -191,14 +185,11 @@ function App() {
   if (
     !counterInstance &&
     context &&
-    counterJSON.networks &&
     context.networkId
   ) {
-    deployedNetwork = counterJSON.networks[context.networkId.toString()];
-    if (deployedNetwork) {
-      setCounterInstance(
-        new context.lib.eth.Contract(counterJSON.abi, deployedNetwork.address)
-      );
+    const deployedNetwork = counterJSON.networks[context.networkId.toString()];
+    const instance = new context.lib.eth.Contract(counterJSON.abi, deployedNetwork.address);
+    setCounterInstance(instance);
     }
   }
 
@@ -267,7 +258,7 @@ export default App;
 ----
 
 
-NOTE: You can pass a `dev: true` flag to the `gsn` options when setting up the provider. This will use the https://github.com/OpenZeppelin/openzeppelin-gsn-provider/[GSNDevProvider] instead of the regular GSN provider. This is a provider set up specifically for testing or development, and it _does not require a relayer to be running_ to work. This can make development easier, but it will feel less like the actual GSN experience.
+NOTE: You can pass a `dev: true` flag to the `gsn` options when setting up the provider. This will use the https://github.com/OpenZeppelin/openzeppelin-gsn-provider/[GSNDevProvider] instead of the regular GSN provider. This is a provider set up specifically for testing or development, and it _does not require a relayer to be running_ to work. This can make development easier, but it will feel less like the actual GSN experience. If you want to use an actual require, you can run `npx oz-gsn run-relayer` locally (see the https://github.com/OpenZeppelin/openzeppelin-gsn-helpers#running-the-relayer-binary[OpenZeppelin GSN helpers] for more info).
 
 Great! We can now fire up our application running `npm start` from within the `client` folder. Remember to keep both your ganache and relayer up and running. You should be able to send transactions to your `Counter` contract without having to use MetaMask or have any ETH at all!
 
@@ -298,27 +289,17 @@ The next step will be to instruct our (d)app to connect to a Rinkeby node instea
 [source,javascript]
 ----
 
-//Inside App.js
+import { useWeb3Network, useEphemeralKey } from "@openzeppelin/network";
 
- const gasPrice = 22000000001;
- let relay_client_config = {
- txfee: REACT_APP_TX_FEE,
- force_gasPrice: gasPrice, //override requested gas price
- gasPrice: gasPrice, //override requested gas price
- force_gasLimit: 500000, //override requested gas limit.
- gasLimit: 500000, //override requested gas limit.
- verbose: true
- };
-
- const context = useWeb3Network('https://rinkeby.infura.io/v3/<<Your Infura Api Token>>', 
- {
- gsn: { signKey, ...relay_client_config }
- });
+// inside App.js#App()
+const context = useWeb3Network('https://rinkeby.infura.io/v3/' + INFURA_API_TOKEN, {
+  gsn: { signKey: useEphemeralKey() }
+});
 ----
  
-Redeploy using the cli command `oz create`, selecting `Rinkeby` as the network and copy the address returned at the end (You will need it to fund your contract). 
+Redeploy using the cli command `oz create`, selecting `Rinkeby` as the network and copy the address returned at the end (you will need it later to fund your contract!).
 
-We are almost there! If you try to use your (d)app now, you will notice that you are not able to send any transactions. This is because your `Counter` contract has not been funded on this network yet. Instead of using the `gsn-helper` command we used earlier, we will now use the https://gsn.openzeppelin.com[online gsn-tool] by pasting in the address of your instance. To do this the web interface requires that you use MetaMask and will allow you to deposit funds into your contract. 
+We are almost there! If you try to use your (d)app now, you will notice that you are not able to send any transactions. This is because your `Counter` contract has not been funded on this network yet. Instead of using the `oz-gsn fund-recipient` command we used earlier, we will now use the https://gsn.openzeppelin.com[online gsn-tool] by pasting in the address of your instance. To do this the web interface requires that you use MetaMask on the Rinkeby Network, which will allow you to deposit funds into your contract.
 
 image::GSNDappTool.png[OpenZeppelin GSN Dapp Tool,500]
 
