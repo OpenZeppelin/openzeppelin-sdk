@@ -36,6 +36,7 @@ const register: (program: any) => any = program =>
       `signature of the request, uses the signer to derive the deployment address (uses the sender to derive deployment address if not set)`,
     )
     .option('--force', 'force creation even if contracts have local modifications')
+    .withPrivateForOption()
     .withNetworkOptions()
     .action(action);
 

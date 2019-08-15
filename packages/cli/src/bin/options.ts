@@ -1,6 +1,14 @@
 import program, { Command } from 'commander';
 import { DEFAULT_TX_TIMEOUT } from '../models/network/Session';
 
+function appender(xs?: string[]) {
+  xs = xs || [];
+  return function(x: string) {
+    xs.push(x);
+    return xs;
+  };
+}
+
 program.Command.prototype.withNetworkTimeoutOption = function(): Command {
   return this.option(
     '--timeout <timeout>',
@@ -27,4 +35,8 @@ program.Command.prototype.withNonInteractiveOption = function(): Command {
 
 program.Command.prototype.withSkipCompileOption = function(): Command {
   return this.option('--skip-compile', 'skips contract compilation');
+};
+
+program.Command.prototype.withPrivateForOption = function(): Command {
+  return this.option('--privateFor <key>', 'array of public keys for Quorum networks', appender(), []);
 };

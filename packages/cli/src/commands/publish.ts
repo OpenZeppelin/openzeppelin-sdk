@@ -13,6 +13,7 @@ const register: (program: any) => any = program =>
     .command(signature, undefined, { noHelp: true })
     .usage('--network <network> [options]')
     .description(description)
+    .withPrivateForOption()
     .withNetworkOptions()
     .withNonInteractiveOption()
     .action(action);
@@ -25,7 +26,7 @@ async function action(options: any): Promise<void> {
   const props = getCommandProps();
 
   const promptedOpts = await promptIfNeeded({ opts, defaults, props }, interactive);
-  const { network, txParams } = await ConfigManager.initNetworkConfiguration(promptedOpts);
+  const { network, txParams } = await ConfigManager.initNetworkConfiguration(Object.assign({}, options, promptedOpts));
   if (!(await hasToMigrateProject(network))) process.exit(0);
 
   await publish({ network, txParams });

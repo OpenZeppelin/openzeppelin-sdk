@@ -26,6 +26,7 @@ const register: (program: any) => any = program =>
     .usage('[alias-or-address] [new-admin-address] --network <network> [options]')
     .description(description)
     .option('--force', 'bypass a manual check')
+    .withPrivateForOption()
     .withNetworkOptions()
     .withNonInteractiveOption()
     .action(action);

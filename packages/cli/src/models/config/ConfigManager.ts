@@ -22,7 +22,7 @@ const ConfigManager = {
     root: string = process.cwd(),
   ): Promise<{ network: string; txParams: TxParams } | never> {
     this.initStaticConfiguration(root);
-    const { network: networkName, from, timeout } = Session.getOptions(options, silent);
+    const { network: networkName, from, timeout, privateFor } = Session.getOptions(options, silent);
     Session.setDefaultNetworkIfNeeded(options.network);
     if (!networkName) throw Error('A network name must be provided to execute the requested action.');
 
@@ -38,6 +38,7 @@ const ConfigManager = {
       const txParams = {
         from: ZWeb3.toChecksumAddress(from || artifactDefaults.from || (await ZWeb3.defaultAccount())),
       };
+      if (privateFor && privateFor.length > 0) txParams['privateFor'] = privateFor;
 
       return { network: await ZWeb3.getNetworkName(), txParams };
     } catch (error) {

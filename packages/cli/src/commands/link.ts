@@ -15,6 +15,7 @@ const register: (program: any) => any = program =>
     .usage('[dependencyName1 ... dependencyNameN] [options]')
     .description(description)
     .option('--no-install', 'skip installing packages dependencies locally')
+    .withPrivateForOption()
     .withPushOptions()
     .withNonInteractiveOption()
     .action(action);
