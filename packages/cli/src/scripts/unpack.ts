@@ -15,7 +15,8 @@ const nameToRepo = {
 export default async function unpack({ repoOrName }: UnpackParams): Promise<void | never> {
   if (!repoOrName) throw Error('A kit name or GitHub repo must be provided to unpack to the current directory.');
   repoOrName = repoOrName.toLowerCase();
-  if (!repoOrName.includes('/')) {
+
+  if (!repoOrName.includes('/') && !repoOrName.includes('#')) {
     // predefined name has been passed
     // check if it is registered
     if (!nameToRepo.hasOwnProperty(repoOrName)) {
@@ -23,8 +24,14 @@ export default async function unpack({ repoOrName }: UnpackParams): Promise<void
     }
     repoOrName = nameToRepo[repoOrName];
   }
+
+  let branchName = 'stable';
+  if (repoOrName.includes('#')) {
+    [repoOrName, branchName] = repoOrName.split('#', 2);
+  }
+
   const url = `https://github.com/${repoOrName}.git`;
   const controller = new KitController();
-  const config = await controller.verifyRepo(url);
-  await controller.unpack(url, process.cwd(), config);
+  const config = await controller.verifyRepo(url, branchName);
+  await controller.unpack(url, branchName, process.cwd(), config);
 }
