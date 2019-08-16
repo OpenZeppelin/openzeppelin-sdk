@@ -7,6 +7,7 @@
 .Guides
 * xref:public-deploy.adoc[Deploying to a public network]
 * xref:writing-contracts.adoc[Writing upgradeable contracts]
+* xref:gsn-dapp.adoc[Building a GSN powered dapp]
 * xref:publish.adoc[Publishing an Ethereum Package]
 * xref:testing.adoc[Testing upgradeable projects]
 * xref:erc20-onboarding.adoc[Onboarding ERC20 tokens]
