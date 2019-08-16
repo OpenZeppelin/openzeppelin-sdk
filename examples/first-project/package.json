@@ -7,7 +7,7 @@
   "author": "santiago@openzeppelin.com",
   "license": "MIT",
   "dependencies": {
-    "web3": "^1.2.0"
+    "web3": "1.2.1"
   },
   "devDependencies": {
     "@openzeppelin/cli": "^2.5.2",
