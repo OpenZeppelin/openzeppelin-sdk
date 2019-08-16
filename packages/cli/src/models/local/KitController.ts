@@ -13,7 +13,7 @@ import child from '../../utils/child';
 const simpleGit = patch('simple-git/promise');
 
 export default class KitController {
-  public async unpack(url: string, workingDirPath: string = '', config: KitFile): Promise<void | never> {
+  public async unpack(url: string, branchName: string = 'stable', workingDirPath: string = '', config: KitFile): Promise<void | never> {
     if (!url) throw Error('A url must be provided.');
     if (!config) throw Error('A config must be provided.');
 
@@ -34,11 +34,11 @@ export default class KitController {
       await git.fetch();
       // if files are empty checkout everything
       if (!config.files.length) {
-        await git.pull('origin', 'stable');
+        await git.pull('origin', branchName);
       } else {
         // if there are some files then do tree-ish checkout
         // http://nicolasgallagher.com/git-checkout-specific-files-from-another-branch/
-        await git.checkout([`origin/stable`, `--`, ...config.files]);
+        await git.checkout([`origin/${branchName}`, `--`, ...config.files]);
       }
       Loggy.update('unpack-kit', 'Unpacking kit');
 
@@ -56,12 +56,12 @@ export default class KitController {
     }
   }
 
-  public async verifyRepo(url: string): Promise<KitFile | never> {
+  public async verifyRepo(url: string, branchName: string = 'stable'): Promise<KitFile | never> {
     if (!url) throw Error('A url must be provided.');
 
     try {
       const config = (await axios.get(
-        url.replace('.git', '/stable/kit.json').replace('github.com', 'raw.githubusercontent.com'),
+        url.replace('.git', `/${branchName}/kit.json`).replace('github.com', 'raw.githubusercontent.com'),
       )).data as KitFile;
 
       // validate our json config
@@ -83,7 +83,7 @@ export default class KitController {
       }
       return config;
     } catch (e) {
-      e.message = `Failed to verify ${url}. Details: ${e.message}`;
+      e.message = `Failed to verify ${url} at branch ${branchName}. Details: ${e.message}`;
       throw e;
     }
   }
