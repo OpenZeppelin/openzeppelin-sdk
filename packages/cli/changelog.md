@@ -15,8 +15,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Fixed
 - Increase stdio buffer for the post unpack starter kit hook. ([#1191](https://github.com/OpenZeppelin/openzeppelin-sdk/pull/1191))
 
-
 ## v2.5.2 - 2019-07-26
+
+### Added
+- New `openzeppelin accounts` command that lists available accounts on a network connection. ([#1130](https://github.com/OpenZeppelin/openzeppelin-sdk/pull/1130))
 
 ### Changed
 - Migrated from `web3@1.0.0-beta.37` to the stable `web3@1.2.0` release. ([#1152](https://github.com/OpenZeppelin/openzeppelin-sdk/pull/1152))
