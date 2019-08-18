@@ -8,6 +8,7 @@ const nameToRepo = {
   zepkit: 'openzeppelin/starter-kit',
   starter: 'openzeppelin/starter-kit',
   tutorial: 'openzeppelin/tutorial-kit',
+  gsn: 'openzeppelin/starter-kit-gsn',
 };
 
 // https://github.com/openzeppelin/starter-kit.git
