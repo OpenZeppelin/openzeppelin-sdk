@@ -1,6 +1,6 @@
 {
   "name": "example-first-project",
-  "version": "2.5.2",
+  "version": "2.5.3",
   "description": "",
   "private": true,
   "main": "index.js",
@@ -10,8 +10,8 @@
     "web3": "1.2.1"
   },
   "devDependencies": {
-    "@openzeppelin/cli": "^2.5.2",
-    "@openzeppelin/upgrades": "^2.5.2",
+    "@openzeppelin/cli": "^2.5.3",
+    "@openzeppelin/upgrades": "^2.5.3",
     "ganache-cli": "^6.4.3"
   }
 }

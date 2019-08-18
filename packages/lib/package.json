@@ -1,6 +1,6 @@
 {
   "name": "@openzeppelin/upgrades",
-  "version": "2.5.2",
+  "version": "2.5.3",
   "description": "JavaScript library for the OpenZeppelin smart contract platform",
   "main": "./lib/index.js",
   "private": false,
