@@ -4,10 +4,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
-## v2.5.3 - 2019-08-16
+## v2.5.3 - 2019-08-18
 
 ### Added
 - Allow specifying a branch on the `unpack` command, using the syntax `openzeppelin unpack org/repo#branch`. ([#1190](https://github.com/OpenZeppelin/openzeppelin-sdk/pull/1190))
+- Add `gsn` shortname for `openzeppelin/starter-kit-gsn`. ([#1196](https://github.com/OpenZeppelin/openzeppelin-sdk/pull/1196))
 
 ### Changed
 - Bump `web3` version to `web3@1.2.1`. ([#1192](https://github.com/OpenZeppelin/openzeppelin-sdk/pull/1192))
