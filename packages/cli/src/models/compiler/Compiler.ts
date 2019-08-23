@@ -18,7 +18,12 @@ export async function compile(
   if (!force && state.alreadyCompiled) return;
 
   // Merge config file compiler options with those set explicitly
-  const resolvedOptions: ProjectCompilerOptions = {};
+  const resolvedOptions: ProjectCompilerOptions = {
+    optimizer: {
+      enabled: false,
+      runs: 200,
+    },
+  };
   merge(resolvedOptions, projectFile.compilerOptions, compilerOptions);
 
   // Validate compiler manager setting
