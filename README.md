@@ -23,6 +23,8 @@ Then, install the OpenZeppelin SDK running:
 npm install --global @openzeppelin/cli
 ```
 
+*Note:* in order to fix `Error: EACCES: permission denied, mkdir '/usr/local/lib/node_modules/@openzeppelin/cli/node_modules/keccak/.node-gyp'` use `--unsafe-perm` flag
+
 ## Usage
 
 We recommend to use the OpenZeppelin SDK through the `openzeppelin sdk` command-line interface.
