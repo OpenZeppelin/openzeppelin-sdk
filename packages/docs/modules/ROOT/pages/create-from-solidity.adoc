@@ -79,7 +79,7 @@ $ openzeppelin create Factory
 ✓ Contract Factory deployed
 ✓ Contract Instance deployed
 All contracts have been deployed
-? Do you want to call a function on the instance after creating it? Yes
+? Call a function to initialize the instance after creating it? Yes
 ? Select which function * initialize(_appContractAddress: address)
 ? _appContractAddress (address): 0xe78A0F7E598Cc8b0Bb87894B0F60dD2a88d6a8Ab
 ✓ Setting everything up to create contract instances
