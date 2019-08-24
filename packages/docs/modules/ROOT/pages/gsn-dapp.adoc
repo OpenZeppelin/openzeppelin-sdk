@@ -241,7 +241,7 @@ function App() {
             </button>
             <button
               onClick={() => decrease(1)}
-              disabled={!(methods && methods.decreaseCounter)}
+              disabled={!(methods && methods.decrease)}
               size="small"
             >
               Decrease Counter by 1
