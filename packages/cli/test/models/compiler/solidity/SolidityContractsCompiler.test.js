@@ -121,6 +121,7 @@ describe('SolidityContractsCompiler', function() {
       const output = await compile(contracts, { version: '0.5.9' });
       assertOutput(contracts, output, {
         version: '0.5.9+commit.c68bc34e.Linux.g++',
+        evmVersion: 'petersburg',
       });
       this.logs.errors.should.be.empty;
       this.logs.warns.should.be.empty;
@@ -139,6 +140,7 @@ describe('SolidityContractsCompiler', function() {
       const output = await compile(contracts, { version: '0.5.0' });
       assertOutput(contracts, output, {
         version: '0.5.0+commit.1d4f565a.Emscripten.clang',
+        evmVersion: 'byzantium',
       });
       this.logs.errors.should.be.empty;
       this.logs.warns.should.be.empty;
@@ -153,6 +155,7 @@ describe('SolidityContractsCompiler', function() {
       });
       assertOutput(contracts, output, {
         version: '0.5.10-nightly.2019.5.28+commit.ff8898b8.Emscripten.clang',
+        evmVersion: 'petersburg',
       });
       this.logs.errors.should.be.empty;
       this.logs.warns[0].should.match(/This is a pre-release compiler version/);
@@ -163,6 +166,7 @@ describe('SolidityContractsCompiler', function() {
       const output = await compile(contracts, {});
       assertOutput(contracts, output, {
         version: '0.5.9+commit.e560f70d.Emscripten.clang',
+        evmVersion: 'petersburg',
       });
       this.logs.errors.should.be.empty;
       this.logs.warns[0].should.match(
@@ -175,6 +179,7 @@ describe('SolidityContractsCompiler', function() {
       const output = await compile(contracts, {});
       assertOutput(contracts, output, {
         version: '0.5.9+commit.e560f70d.Emscripten.clang',
+        evmVersion: 'petersburg',
       });
       this.logs.errors.should.be.empty;
       this.logs.warns.should.be.empty;
@@ -190,6 +195,7 @@ describe('SolidityContractsCompiler', function() {
       assertOutput(contracts, output, {
         version: '0.5.0+commit.1d4f565a.Emscripten.clang',
         optimizer: options.optimizer,
+        evmVersion: 'byzantium',
       });
       this.logs.errors.should.be.empty;
       this.logs.warns.should.be.empty;
@@ -205,6 +211,7 @@ describe('SolidityContractsCompiler', function() {
       const output = await compile(contracts, options);
       assertOutput(contracts, output, {
         version: '0.5.0+commit.1d4f565a.Emscripten.clang',
+        evmVersion: 'byzantium',
       });
       this.logs.errors.should.be.empty;
       this.logs.warns.should.have.lengthOf(1);
@@ -243,19 +250,20 @@ describe('SolidityContractsCompiler', function() {
 
   describe('version 0.4.x', function() {
     const version = '0.4.24+commit.e67f0147.Emscripten.clang';
+    const evmVersion = 'byzantium';
     const contracts = [contract_Solc04, anotherContract_Solc04];
     const options = { version: '0.4.24' };
 
     it('compiles using solc 0.4.24 based on pragma', async function() {
       const output = await compile(contracts, {});
-      assertOutput(contracts, output, { version });
+      assertOutput(contracts, output, { version, evmVersion });
       this.logs.errors.should.be.empty;
       this.logs.warns.should.be.empty;
     }).timeout(180000);
 
     it('compiles using solc 0.4.24 based on options', async function() {
       const output = await compile(contracts, options);
-      assertOutput(contracts, output, { version });
+      assertOutput(contracts, output, { version, evmVersion });
       this.logs.errors.should.be.empty;
       this.logs.warns.should.be.empty;
     }).timeout(180000);
@@ -266,7 +274,7 @@ describe('SolidityContractsCompiler', function() {
         optimizer: { enabled: true, runs: 200 },
       };
       const output = await compile(contracts, options);
-      assertOutput(contracts, output, { ...options, version });
+      assertOutput(contracts, output, { ...options, version, evmVersion });
       this.logs.errors.should.be.empty;
       this.logs.warns.should.be.empty;
     }).timeout(180000);
@@ -278,7 +286,7 @@ describe('SolidityContractsCompiler', function() {
         contractWithWarnings_Solc04,
       ];
       const output = await compile(contracts, options);
-      assertOutput(contracts, output, { version });
+      assertOutput(contracts, output, { version, evmVersion });
       this.logs.errors.should.be.empty;
       this.logs.warns.should.have.lengthOf(1);
       this.logs.warns[0].should.match(
