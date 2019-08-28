@@ -12,10 +12,10 @@ import {
 import { ContractInterface } from '../models/files/NetworkFile';
 
 const DOCS_HOME = 'https://docs.openzeppelin.com/sdk/2.5';
-const DANGEROUS_OPERATIONS_LINK = `${DOCS_HOME}/writing_contracts.html#potentially-unsafe-operations`;
-const AVOID_INITIAL_VALUES_LINK = `${DOCS_HOME}/writing_contracts.html#avoid-initial-values-in-fields-declarations`;
-const INITIALIZERS_LINK = `${DOCS_HOME}/writing_contracts.html#initializers`;
-const STORAGE_CHECKS_LINK = `${DOCS_HOME}/writing_contracts.html#modifying-your-contracts`;
+const DANGEROUS_OPERATIONS_LINK = `${DOCS_HOME}/writing-contracts#potentially-unsafe-operations`;
+const AVOID_INITIAL_VALUES_LINK = `${DOCS_HOME}/writing-contracts#avoid-initial-values-in-field-declarations`;
+const INITIALIZERS_LINK = `${DOCS_HOME}/writing-contracts#initializers`;
+const STORAGE_CHECKS_LINK = `${DOCS_HOME}/writing-contracts#modifying-your-contracts`;
 
 export default class ValidationLogger {
   public contract: Contract;
