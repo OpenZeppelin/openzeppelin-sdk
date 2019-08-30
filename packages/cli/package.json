@@ -70,6 +70,7 @@
     "ethereumjs-util": "^6.1.0",
     "find-up": "^3.0.0",
     "fs-extra": "^7.0.1",
+    "fs-readdir-recursive": "^1.1.0",
     "inquirer": "^6.4.1",
     "is-url": "^1.2.4",
     "lockfile": "^1.0.4",

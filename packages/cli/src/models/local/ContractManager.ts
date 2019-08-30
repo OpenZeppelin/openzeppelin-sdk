@@ -3,6 +3,7 @@ import Dependency from '../dependency/Dependency';
 import ProjectFile from '../files/ProjectFile';
 import ConfigManager from '../config/ConfigManager';
 import path from 'path';
+import readdirSync from 'fs-readdir-recursive';
 
 export default class ContractManager {
   public projectFile: ProjectFile;
@@ -35,7 +36,7 @@ export default class ContractManager {
     const buildDir = ConfigManager.getBuildDir();
     const contractsDir = Contracts.getLocalContractsDir();
     if (FileSystem.exists(buildDir)) {
-      return FileSystem.readDir(buildDir)
+      return readdirSync(buildDir)
         .filter(name => name.match(/\.json$/))
         .map(name => FileSystem.parseJsonIfExists(`${buildDir}/${name}`))
         .filter(contract => {
@@ -45,7 +46,7 @@ export default class ContractManager {
             !this.isAbstractContract(contract)
           );
         })
-        .map(({ contractName }) => contractName);
+        .map(({ sourcePath, contractName }) => `${sourcePath.replace(/contracts\/(.*)/, `$1`)}/${contractName}`);
     } else return [];
   }
 

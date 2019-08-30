@@ -5,7 +5,8 @@ import pick from 'lodash.pick';
 import omitBy from 'lodash.omitby';
 import isUndefined from 'lodash.isundefined';
 import { readJsonSync, ensureDirSync, readJSON, writeJson, unlink } from 'fs-extra';
-import { statSync, existsSync, readdirSync, lstatSync } from 'fs';
+import { statSync, existsSync, lstatSync } from 'fs';
+import readdirSync from 'fs-readdir-recursive';
 import { Loggy, Contracts } from '@openzeppelin/upgrades';
 import {
   RawContract,
@@ -188,7 +189,9 @@ class SolidityProjectCompiler {
     await Promise.all(
       this.compilerOutput.map(async data => {
         const name = data.contractName;
-        const buildFileName = `${this.outputDir}/${name}.json`;
+        const buildDirName = `${this.outputDir}/${data.sourcePath.replace(/^contracts\/(.*)$/, `$1`)}`;
+        ensureDirSync(buildDirName);
+        const buildFileName = `${buildDirName}/${name}.json`;
         if (networksInfo[name]) Object.assign(data, { networks: networksInfo[name] });
         await writeJson(buildFileName, data, { spaces: 2 });
       }),
