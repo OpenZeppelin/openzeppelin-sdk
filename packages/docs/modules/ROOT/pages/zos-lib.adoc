@@ -78,7 +78,7 @@ That's it! Our project is now fully set up for using the OpenZeppelin SDK progra
 [[adding-some-contracts]]
 == Adding some contracts
 
-Now, let's write two simple contracts. The first in `contracts/MyContractV0` with the following contents:
+Now, let's write two simple contracts. The first in `contracts/MyContract_v0` with the following contents:
 
 [source,solidity]
 ----
@@ -86,7 +86,7 @@ pragma solidity ^0.5.0;
 
 import "@openzeppelin/upgrades/contracts/Initializable.sol";
 
-contract MyContractV0 is Initializable {
+contract MyContract_v0 is Initializable {
   uint256 public value;
 
   function initialize(uint256 _value) initializer public {
@@ -95,7 +95,7 @@ contract MyContractV0 is Initializable {
 }
 ----
 
-The second in `contracts/MyContractV1`, and it will be almost the same as the first one but with one extra function:
+The second in `contracts/MyContract_v1`, and it will be almost the same as the first one but with one extra function:
 
 [source,solidity]
 ----
@@ -103,7 +103,7 @@ pragma solidity ^0.5.0;
 
 import "@openzeppelin/upgrades/contracts/Initializable.sol";
 
-contract MyContractV1 is Initializable {
+contract MyContract_v1 is Initializable {
   uint256 public value;
 
   function initialize(uint256 _value) initializer public {
