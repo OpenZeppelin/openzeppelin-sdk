@@ -190,7 +190,7 @@ function App() {
     const deployedNetwork = counterJSON.networks[context.networkId.toString()];
     const instance = new context.lib.eth.Contract(counterJSON.abi, deployedNetwork.address);
     setCounterInstance(instance);
-    }
+  }
 
   const [count, setCount] = useState(0);
 
