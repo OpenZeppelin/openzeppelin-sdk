@@ -8,8 +8,6 @@ This tutorial will get you started using the OpenZeppelin SDK. We will create a 
 
 The OpenZeppelin SDK is bundled as an https://npmjs.com/package/@openzeppelin/cli[npm package]. We will need https://nodejs.org/[node.js] to install and run it. Head over to https://nodejs.org/[its website] for instructions on how to install it.
 
-NOTE: At the moment, the OpenZeppelin SDK does not support node 12. Make sure to install version 10.
-
 Once you have installed `node`, you can install the OpenZeppelin SDK CLI:
 
 [source,console]
