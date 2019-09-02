@@ -190,7 +190,6 @@ function App() {
     const deployedNetwork = counterJSON.networks[context.networkId.toString()];
     const instance = new context.lib.eth.Contract(counterJSON.abi, deployedNetwork.address);
     setCounterInstance(instance);
-    }
   }
 
   const [count, setCount] = useState(0);
@@ -310,4 +309,4 @@ That's it! We can now start sending transactions to our `Counter` contract on th
 
 In this example, we have built a GSN-powered (d)app from scratch combining several OpenZeppelin libraries. First, we extended from the OpenZeppelin Contracts to have our contract act as GSN recipients. Then, we used the OpenZeppelin CLI to compile and deploy our contract on a local network. After that, we set up a local GSN (relayer included!) using the `oz-gsn run-relayer` command from `@openzeppelin/gsn-helpers` and funded our recipient with `oz-gsn fund-recipient`. Once we had our contract set up in our local network, we relied on `create-react-app` to set up a new client-side app and used `@openzeppelin/network` to easily get a web3 GSN provider to start interacting with our contract.
 
-If you want to fast-forward to start building your GSN-powered (d)app right away, make sure to check out our https://docs.openzeppelin.com/starter-kits/2.3/[GSN Starter Kit], which provides you with a ready-to-use project template that combines all of what we have seen in this guide!
+If you want to fast-forward to start building your GSN-powered (d)app right away, make sure to check out our https://docs.openzeppelin.com/starter-kits/2.3/[GSN Starter Kit], which provides you with a ready-to-use project template that combines all of what we have seen on this guide!
