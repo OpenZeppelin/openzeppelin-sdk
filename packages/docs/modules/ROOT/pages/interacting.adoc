@@ -12,10 +12,8 @@ We will be using https://web3js.readthedocs.io/en/1.0/[web3.js] to interact with
 
 [source,console]
 ----
-npm install web3@1.2.0
+npm install web3
 ----
-
-NOTE: `web3 version 1.2.0` formerly was known as `web3 version 1.0.0-beta.37`. If you run into any issues installing `web3`, make sure you are using node 10 and not 12.
 
 Keep in mind that there are many other javascript libraries available, and you can use whichever you like the most. Once a contract is deployed, you can interact with it through any library!
 
