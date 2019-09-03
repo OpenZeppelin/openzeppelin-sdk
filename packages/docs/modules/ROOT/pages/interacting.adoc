@@ -52,7 +52,7 @@ console.log(accounts);
 
 NOTE: We will not be repeating the boilerplate code on every snippet, but make sure to always code _inside_ the `main` function we defined above!
 
-Run the code above using `node`, and check that you are getting a list of available accounts in response. These should match the ones you saw when first starting the `ganache-cli` process.
+Run the code above using `node`, and check that you are getting a list of available accounts in response. 
 
 [source,console]
 ----
@@ -67,6 +67,27 @@ $ node src/index.js
   '0x28a8746e75304c0780E011BEd21C72cD78cd535E',
   '0xACa94ef8bD5ffEE41947b4585a84BdA5a3d3DA6E',
   '0x1dF62f291b2E969fB0849d99D9Ce41e2F137006e' ]
+----
+
+The accounts should match the ones you get when you run `openzeppelin accounts`.
+
+[source,console]
+----
+$ openzeppelin accounts
+? Pick a network development
+Accounts for dev-1567476967339:
+Default: 0x90F8bf6A479f320ead074411a4B0e7944Ea8c9C1
+All:
+- 0: 0x90F8bf6A479f320ead074411a4B0e7944Ea8c9C1
+- 1: 0xFFcf8FDEE72ac11b5c542428B35EEF5769C409f0
+- 2: 0x22d491Bde2303f2f43325b2108D26f1eAbA1e32b
+- 3: 0xE11BA2b4D45Eaed5996Cd0823791E0C93114882d
+- 4: 0xd03ea8624C8C5987235048901fB614fDcA89b117
+- 5: 0x95cED938F7991cd0dFcb48F0a06a40FA1aF46EBC
+- 6: 0x3E5e9111Ae8eB78Fe1CC3bb8915d5D461F3Ef9A9
+- 7: 0x28a8746e75304c0780E011BEd21C72cD78cd535E
+- 8: 0xACa94ef8bD5ffEE41947b4585a84BdA5a3d3DA6E
+- 9: 0x1dF62f291b2E969fB0849d99D9Ce41e2F137006e
 ----
 
 Great! We have our first code snippet getting data out of a blockchain. Let's start working with our contract now.
