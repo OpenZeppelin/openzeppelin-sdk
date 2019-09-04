@@ -207,15 +207,8 @@ function App() {
     getCount();
   }, [counterInstance, getCount]);
 
-  const { methods } = counterInstance || {};
-
   const increase = async () => {
     await counterInstance.methods.increase().send({ from: accounts[0] });
-    getCount();
-  };
-
-  const decrease = async () => {
-    await counterInstance.methods.decrease().send({ from: accounts[0] });
     getCount();
   };
 
@@ -234,18 +227,9 @@ function App() {
             <div>{count}</div>
           </div>
           <div>Counter Actions</div>
-          <div>
-            <button onClick={() => increase(1)} size="small">
+            <button onClick={() => increase()} size="small">
               Increase Counter by 1
             </button>
-            <button
-              onClick={() => decrease(1)}
-              disabled={!(methods && methods.decreaseCounter)}
-              size="small"
-            >
-              Decrease Counter by 1
-            </button>
-          </div>
         </React.Fragment>
       )}
     </div>
