@@ -163,7 +163,7 @@ Then, replace `App.js` in your react project with the following code:
 [source,javascript]
 ----
 import React, { useState, useEffect, useCallback } from "react";
-import { useWeb3Network } from "@openzeppelin/network";
+import { useWeb3Network } from "@openzeppelin/network/react";
 
 const PROVIDER_URL = "http://127.0.0.1:8545";
 
@@ -288,7 +288,7 @@ The next step will be to instruct our (d)app to connect to a Rinkeby node instea
 [source,javascript]
 ----
 
-import { useWeb3Network, useEphemeralKey } from "@openzeppelin/network";
+import { useWeb3Network, useEphemeralKey } from "@openzeppelin/network/react";
 
 // inside App.js#App()
 const context = useWeb3Network('https://rinkeby.infura.io/v3/' + INFURA_API_TOKEN, {
