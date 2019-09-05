@@ -59,7 +59,7 @@ describe('SolidityProjectCompiler', function() {
         schema.compiler.name.should.be.eq('solc');
         schema.compiler.version.should.startWith('0.5.9+commit');
         schema.compiler.optimizer.should.be.deep.equal({ enabled: false });
-        schema.compiler.evmVersion.should.be.eq('constantinople');
+        schema.compiler.evmVersion.should.be.eq('petersburg');
       });
     });
 

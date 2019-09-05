@@ -14,7 +14,7 @@ import {
   resolveCompilerVersion,
   compileWith,
   DEFAULT_OPTIMIZER,
-  DEFAULT_EVM_VERSION,
+  defaultEVMVersion,
 } from './SolidityContractsCompiler';
 import { ImportsFsEngine } from '@openzeppelin/resolver-engine-imports-fs';
 import { gatherSources } from './ResolverEngineGatherer';
@@ -146,7 +146,7 @@ class SolidityProjectCompiler {
     // Build current settings based on defaults
     const currentSettings = {
       optimizer: DEFAULT_OPTIMIZER,
-      evmVersion: DEFAULT_EVM_VERSION,
+      evmVersion: defaultEVMVersion(this.compilerVersion.longVersion),
       ...omitBy(this.options, isUndefined),
     };
 

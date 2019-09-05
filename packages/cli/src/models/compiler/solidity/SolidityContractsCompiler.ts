@@ -1,5 +1,6 @@
 import path from 'path';
 import flatMap from 'lodash.flatmap';
+import semver from 'semver';
 import { Loggy } from '@openzeppelin/upgrades';
 import solc, {
   CompilerOptimizerOptions,
@@ -50,7 +51,10 @@ export interface CompilerOptions extends CompilerVersionOptions {
   version?: string;
 }
 
-export const DEFAULT_EVM_VERSION = 'constantinople';
+export function defaultEVMVersion(version) {
+  return semver.gte(version.split('+')[0], '0.5.5') ? 'petersburg' : 'byzantium';
+}
+
 export const DEFAULT_OPTIMIZER = { enabled: false };
 
 const OUTPUT_SELECTION = {
@@ -104,7 +108,7 @@ class SolidityContractsCompiler {
     this.errors = [];
     this.contracts = contracts;
     this.optimizer = optimizer || DEFAULT_OPTIMIZER;
-    this.evmVersion = evmVersion || DEFAULT_EVM_VERSION;
+    this.evmVersion = evmVersion || defaultEVMVersion(compiler.version());
     this.compiler = compiler;
     this.settings = {
       optimizer: this.optimizer,
