@@ -56,7 +56,7 @@ $ openzeppelin create
 ? Pick a contract to instantiate: @openzeppelin/contracts-ethereum-package/StandaloneERC20
 ? Pick a network: development
 ✓ Deploying @openzeppelin/contracts-ethereum-package dependency to network
-? Do you want to call a function on the instance after creating it?: Yes
+? Call a function to initialize the instance after creating it?: Yes
 ? Select which function: * initialize(name: string, symbol: string, decimals: uint8, initialSupply: uint256, initialHolder: address, minters: address[], pausers: address[])
 ? name (string): MyToken
 ? symbol (string): MYT
@@ -140,7 +140,7 @@ $ openzeppelin create
 ? Pick a contract to instantiate: TokenExchange
 ? Pick a network: development
 ✓ Contract TokenExchange deployed
-? Do you want to call a function on the instance after creating it?: Yes
+? Call a function to initialize the instance after creating it?: Yes
 ? Select which function: initialize(_rate: uint256, _token: address)
 ? _rate (uint256): 10
 ? _token (address): 0x2612Af3A521c2df9EAF28422Ca335b04AdF3ac66
@@ -260,7 +260,7 @@ $ openzeppelin upgrade
 ✓ Contract TokenExchange deployed
 ? Which proxies would you like to upgrade?: Choose by name
 ? Pick a contract to upgrade: TokenExchange
-? Do you want to call a function on the instance after upgrading it?: Yes
+? Call a function on the instance after upgrading it?: Yes
 ? Select which function: setOwner(_owner: address)
 ? _owner (address): 0x90f8bf6a479f320ead074411a4b0e7944ea8c9c1
 ✓ Instance upgraded at 0x26b4AFb60d6C903165150C6F0AA14F8016bE4aec.

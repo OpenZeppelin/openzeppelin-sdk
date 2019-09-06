@@ -90,7 +90,7 @@ $ openzeppelin create
 ? Pick a network: development
 ✓ Added contract Counter
 ✓ Contract Counter deployed
-? Do you want to call a function on the instance after creating it?: No
+? Call a function to initialize the instance after creating it?: No
 ✓ Setting everything up to create contract instances
 ✓ Instance created at 0xCfEB869F69431e42cdB54A4F4f105C19C080A601
 ----

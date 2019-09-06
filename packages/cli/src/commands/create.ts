@@ -74,7 +74,7 @@ async function action(contractFullName: string, options: any): Promise<void> {
 
   const additionalOpts = {
     askForMethodParams: rawInitMethod,
-    askForMethodParamsMessage: 'Do you want to call a function on the instance after creating it?',
+    askForMethodParamsMessage: 'Call a function to initialize the instance after creating it?',
   };
   const { methodName, methodArgs } = await promptForMethodParams(contractFullName, options, additionalOpts);
 

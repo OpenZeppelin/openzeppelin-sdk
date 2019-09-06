@@ -143,7 +143,7 @@ Nothing to compile, all contracts are up to date.
 ? Pick a network ropsten
 ✓ Contract Counter deployed
 All contracts have been deployed
-? Do you want to call a function on the instance after creating it? No
+? Call a function to initialize the instance after creating it? No
 ✓ Setting everything up to create contract instances
 ✓ Instance created at 0x584Fcb424b17d3505B21c881d57EF9Bf1B18c4A7
 0x584Fcb424b17d3505B21c881d57EF9Bf1B18c4A7

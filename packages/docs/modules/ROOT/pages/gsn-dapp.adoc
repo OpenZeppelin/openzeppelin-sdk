@@ -102,7 +102,7 @@ $ openzeppelin create
 ? Pick a contract to instantiate Counter
 ? Pick a network development
 All contracts are up to date
-? Do you want to call a function on the instance after creating it? Yes
+? Call a function to initialize the instance after creating it? Yes
 ? Select which function * initialize()
 ✓ Instance created at 0x7F73086E24ce5834E62075dEAB2b8F10865FFF9B
 ----
@@ -260,7 +260,7 @@ $ openzeppelin create
 ? Pick a network: rinkeby
 ✓ Added contract Counter
 ✓ Contract Counter deployed
-? Do you want to call a function on the instance after creating it?: Yes
+? Call a function to initialize the instance after creating it?: Yes
 ? Select which function * initialize()
 ✓ Setting everything up to create contract instances
 ✓ Instance created at 0xCfEB869F69431e42cdB54A4F4f105C19C080A601
