@@ -260,7 +260,7 @@ $ openzeppelin upgrade
 ✓ Contract TokenExchange deployed
 ? Which proxies would you like to upgrade?: Choose by name
 ? Pick a contract to upgrade: TokenExchange
-? Do you want to call a function on the instance after upgrading it?: Yes
+? Call a function on the instance after upgrading it?: Yes
 ? Select which function: setOwner(_owner: address)
 ? _owner (address): 0x90f8bf6a479f320ead074411a4b0e7944ea8c9c1
 ✓ Instance upgraded at 0x26b4AFb60d6C903165150C6F0AA14F8016bE4aec.
