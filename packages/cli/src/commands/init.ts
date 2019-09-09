@@ -52,7 +52,7 @@ function getCommandProps(): InquirerQuestions {
     name: {
       message: 'Welcome to the OpenZeppelin SDK! Choose a name for your project',
       type: 'input',
-      validate: notEmpty
+      validate: notEmpty,
     },
     version: {
       message: 'Initial project version',
@@ -60,7 +60,7 @@ function getCommandProps(): InquirerQuestions {
       validate: input => {
         if (semver.parse(input)) return true;
         return `Invalid semantic version: ${input}`;
-      }
+      },
     },
   };
 }

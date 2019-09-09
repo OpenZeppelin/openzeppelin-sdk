@@ -172,7 +172,7 @@ export function methodsList(
   return contractMethods(contractFullName, constant, projectFile)
     .map(({ name, hasInitializer, inputs, selector }) => {
       const initializable = hasInitializer ? '* ' : '';
-      const args = inputs.map(({ name: inputName, type }) => `${inputName}: ${type}`);
+      const args = inputs.map(({ name: inputName, type }) => (inputName ? `${inputName}: ${type}` : type));
       const label = `${initializable}${name}(${args.join(', ')})`;
 
       return { name: label, value: { name, selector } };
