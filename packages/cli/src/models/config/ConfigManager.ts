@@ -4,6 +4,8 @@ import Session from '../network/Session';
 import NetworkConfig from './NetworkConfig';
 
 const ConfigManager = {
+  config: undefined,
+
   initialize(root: string = process.cwd()): void {
     if (!TruffleConfig.exists() && !NetworkConfig.exists()) {
       NetworkConfig.initialize(root);

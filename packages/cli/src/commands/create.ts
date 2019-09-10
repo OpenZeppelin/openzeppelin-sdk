@@ -13,6 +13,7 @@ import ConfigManager from '../models/config/ConfigManager';
 import { promptIfNeeded, networksList, contractsList, methodsList, InquirerQuestions } from '../prompts/prompt';
 import promptForMethodParams from '../prompts/method-params';
 import { ProxyType } from '../scripts/interfaces';
+import { telemetry } from '../telemetry';
 
 interface PropsParams {
   contractFullName?: string;
@@ -47,28 +48,28 @@ async function commandActions(contractFullName: string, options: any): Promise<v
   const { skipCompile } = options;
   if (!skipCompile) await compile();
 
-  const { network: promptedNewtork, contractFullName: promptedContractFullName } = await promptForCreate(
+  const { network: promptedNetwork, contractFullName: promptedContractFullName } = await promptForCreate(
     contractFullName,
     options,
   );
   const { network, txParams } = await ConfigManager.initNetworkConfiguration({
     ...options,
-    network: promptedNewtork,
+    network: promptedNetwork,
   });
 
   await link.runActionIfNeeded(promptedContractFullName, options);
   await add.runActionIfNeeded(promptedContractFullName, options);
   await push.runActionIfNeeded(promptedContractFullName, network, {
     ...options,
-    network: promptedNewtork,
+    network: promptedNetwork,
     force: true,
   });
 
-  await action(promptedContractFullName, { ...options, network, txParams });
+  await action(promptedContractFullName, { ...options, network, txParams }, promptedNetwork);
   if (!options.dontExitProcess && process.env.NODE_ENV !== 'test') process.exit(0);
 }
 
-async function action(contractFullName: string, options: any): Promise<void> {
+async function action(contractFullName: string, options: any, networkName: string): Promise<void> {
   const { force, network, txParams, init: rawInitMethod } = options;
   const { contract: contractAlias, package: packageName } = fromContractFullName(contractFullName);
 
@@ -90,6 +91,7 @@ async function action(contractFullName: string, options: any): Promise<void> {
 
   if (!(await hasToMigrateProject(network))) process.exit(0);
 
+  await telemetry('create', { ...args, network, txParams, networkName });
   await create({ ...args, network, txParams });
   Session.setDefaultNetworkIfNeeded(network);
 }
