@@ -33,6 +33,7 @@ interface ProjectFileData {
   contracts: { [alias: string]: string };
   publish: boolean;
   compiler: ConfigFileCompilerOptions;
+  telemetryOptIn?: boolean;
 }
 
 export const PROJECT_FILE_NAME = 'project.json';
@@ -98,6 +99,14 @@ export default class ProjectFile {
 
   public get name(): string {
     return this.data.name;
+  }
+
+  public set telemetryOptIn(optIn: boolean) {
+    this.data.telemetryOptIn = optIn;
+  }
+
+  public get telemetryOptIn(): boolean | undefined {
+    return this.data.telemetryOptIn;
   }
 
   public set version(version: string) {
