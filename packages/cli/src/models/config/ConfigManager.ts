@@ -27,14 +27,13 @@ const ConfigManager = {
     if (!networkName) throw Error('A network name must be provided to execute the requested action.');
 
     const { provider, artifactDefaults, network } = await this.config.loadNetworkConfig(networkName, root);
-    const networkId = network.networkId || network.network_id;
 
     Contracts.setSyncTimeout(timeout * 1000);
     Contracts.setArtifactsDefaults(artifactDefaults);
 
     try {
       ZWeb3.initialize(provider);
-      await ZWeb3.checkNetworkId(networkId);
+      await ZWeb3.checkNetworkId(network.networkId);
       const txParams = {
         from: ZWeb3.toChecksumAddress(from || artifactDefaults.from || (await ZWeb3.defaultAccount())),
       };
