@@ -112,7 +112,9 @@ export default class NetworkController {
   // NetworkController
   public checkNotFrozen(): void | never {
     if (this.networkFile.frozen) {
-      throw Error(`Cannot modify contracts in a frozen version. Run 'openzeppelin bump' to create a new version first.`);
+      throw Error(
+        `Cannot modify contracts in a frozen version. Run 'openzeppelin bump' to create a new version first.`,
+      );
     }
   }
 

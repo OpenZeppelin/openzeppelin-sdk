@@ -166,10 +166,10 @@ export default class Dependency {
   }
 
   private getDependencyFolder(): string {
-    try { 
+    try {
       return dirname(require.resolve(`${this.name}/package.json`, { paths: [process.cwd()] }));
-    } catch (err) { 
-      throw new Error(`Could not find dependency ${this.name}.`) 
+    } catch (err) {
+      throw new Error(`Could not find dependency ${this.name}.`);
     }
   }
 
