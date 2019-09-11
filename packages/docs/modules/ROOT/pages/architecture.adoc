@@ -154,4 +154,4 @@ Other implementations of the interface could provide contracts without such a li
 
 The following diagram illustrates the interface of the contracts of published Ethereum Packages:
 
-image:/img/zos2.png[OpenZeppelin SDK 2.x UML]
+image::architecture.png[OpenZeppelin SDK 2.x UML]
