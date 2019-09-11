@@ -57,7 +57,9 @@ export default class Dependency {
     const hasDependenciesForDeploy = dependencies.find(
       (depNameAndVersion): any => {
         const dependency = Dependency.fromNameWithVersion(depNameAndVersion);
-        return !(dependency.isDeployedOnNetwork(network) || networkFile.dependencyHasMatchingCustomDeploy(dependency.name));
+        return !(
+          dependency.isDeployedOnNetwork(network) || networkFile.dependencyHasMatchingCustomDeploy(dependency.name)
+        );
       },
     );
 

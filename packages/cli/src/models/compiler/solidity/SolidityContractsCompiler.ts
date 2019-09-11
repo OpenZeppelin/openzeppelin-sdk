@@ -174,9 +174,7 @@ class SolidityContractsCompiler {
     const output = solcOutput.contracts[fileName][contractName];
     const source = solcOutput.sources[fileName];
     fileName = path.basename(fileName);
-    const contract = this.contracts.find(
-      aContract => aContract.fileName === fileName,
-    );
+    const contract = this.contracts.find(aContract => aContract.fileName === fileName);
 
     return {
       fileName,

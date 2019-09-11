@@ -172,7 +172,7 @@ export function methodsList(
   return contractMethods(contractFullName, constant, projectFile)
     .map(({ name, hasInitializer, inputs, selector }) => {
       const initializable = hasInitializer ? '* ' : '';
-      const args = inputs.map(({ name: inputName, type }) => `${inputName}: ${type}`);
+      const args = inputs.map(({ name: inputName, type }) => (inputName ? `${inputName}: ${type}` : type));
       const label = `${initializable}${name}(${args.join(', ')})`;
 
       return { name: label, value: { name, selector } };
@@ -198,7 +198,13 @@ export function argsList(
   const method = contractMethods(contractFullName, constant, projectFile).find(
     ({ name, selector }): any => selector === methodIdentifier || name === methodIdentifier,
   );
-  return method ? method.inputs : [];
+
+  if (method) {
+    return method.inputs.map((input, index) => {
+      return input.name ? input : { ...input, name: `#${index}` };
+    });
+  }
+  return [];
 }
 
 function contractMethods(
