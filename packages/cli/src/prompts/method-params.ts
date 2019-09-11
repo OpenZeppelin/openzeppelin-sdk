@@ -59,7 +59,7 @@ function getCommandProps(
     return {
       ...accum,
       [arg.name]: {
-        message: `${arg.name} (${arg.type}):`,
+        message: arg.name ? `${arg.name} (${arg.type}):` : `(${arg.type}):`,
         type: 'input',
         when: () => !methodArgs || !methodArgs[index],
         validate: input => {

@@ -198,7 +198,13 @@ export function argsList(
   const method = contractMethods(contractFullName, constant, projectFile).find(
     ({ name, selector }): any => selector === methodIdentifier || name === methodIdentifier,
   );
-  return method ? method.inputs : [];
+
+  if (method) {
+    return method.inputs.map((input, index) => {
+      return input.name ? input : { ...input, name: `#${index}` };
+    });
+  }
+  return [];
 }
 
 function contractMethods(
