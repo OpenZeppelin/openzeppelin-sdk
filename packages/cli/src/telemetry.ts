@@ -1,29 +1,62 @@
+/// <reference lib="dom" />
 import envPaths from 'env-paths';
+import uuid from 'uuid/v4';
 import path from 'path';
 import fs from 'fs-extra';
 import inquirer from 'inquirer';
-import ProjectFile from './models/files/ProjectFile';
+import firebase from 'firebase/app';
+import 'firebase/auth';
+import 'firebase/firestore';
 
+import ProjectFile from './models/files/ProjectFile';
 import ConfigManager from './models/config/ConfigManager';
 
+const FIREBASE_CONFIG = {
+  apiKey: 'AIzaSyAZoGB2p26UejODezZPmczgwehI6xlSKPs',
+  authDomain: 'cli-telemetry.firebaseapp.com',
+  databaseURL: 'https://cli-telemetry.firebaseio.com',
+  projectId: 'cli-telemetry',
+  storageBucket: '',
+  messagingSenderId: '449985678611',
+  appId: '1:449985678611:web:88b411adc68e6521e19ee6',
+};
+
+// TODO: change
 interface GlobalTelemetry {
   optIn: boolean;
-  uuid: unknown;
+  uuid: string;
   salt: unknown;
 }
 
 //TODO: rename
 export async function telemetry(commandName, options) {
-  if (!(await checkOptIn())) return;
-  const { networkName } = options;
-  const {
-    network: { networkId },
-  } = ConfigManager.config.loadNetworkConfig(networkName);
+  const telemetry = await checkOptIn();
+  if (!telemetry) return;
 
-  // TODO: send data to the server
+  // Initialize Firebase and anonymously authenticate
+  const app = firebase.initializeApp(FIREBASE_CONFIG);
+  const db = app.firestore();
+  const { FieldValue } = firebase.firestore;
+  await app.auth().signInAnonymously();
+
+  // create a new command document for the current uuid
+  await db.runTransaction(async tx => {
+    const incrementalId = (await tx.get(db.doc(`users/${telemetry.uuid}`))).get('latestIncrementalId');
+    await tx.update(db.doc(`users/${telemetry.uuid}`), { latestIncrementalId: FieldValue.increment(1) });
+    await tx.set(db.collection(`users/${telemetry.uuid}/commands`).doc(), { ...options, id: incrementalId + 1 });
+  });
+
+  // TODO: remove. query all created rows
+  const query = (await db
+    .collection('users/some-uuid/commands')
+    .orderBy('id')
+    .get()).docs.map(i => i.data());
+
+  console.log(query);
 }
 
-async function checkOptIn(): Promise<boolean> {
+// TODO: test
+async function checkOptIn(): Promise<GlobalTelemetry | undefined> {
   const project = new ProjectFile();
   const localOptIn = project.telemetryOptIn;
 
@@ -31,7 +64,7 @@ async function checkOptIn(): Promise<boolean> {
   const globalDataPath = path.join(globalDataDir, 'telemetry.json');
   let globalOptIn: GlobalTelemetry | undefined = await fs.readJson(globalDataPath).catch(() => undefined);
 
-  if (localOptIn === false) return false;
+  if (localOptIn === false) return undefined;
 
   if (globalOptIn === undefined) {
     const { telemetry } = await inquirer.prompt({
@@ -41,7 +74,8 @@ async function checkOptIn(): Promise<boolean> {
       default: true,
     });
 
-    globalOptIn = { optIn: telemetry, uuid: 1, salt: 0 };
+    globalOptIn = { optIn: telemetry, uuid: uuid(), salt: 0 };
+    await fs.ensureDir(globalDataDir);
     await fs.writeJson(globalDataPath, globalOptIn);
   }
 
@@ -51,5 +85,5 @@ async function checkOptIn(): Promise<boolean> {
     project.write();
   }
 
-  return globalOptIn.optIn;
+  return globalOptIn;
 }

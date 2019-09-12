@@ -65,11 +65,11 @@ async function commandActions(contractFullName: string, options: any): Promise<v
     force: true,
   });
 
-  await action(promptedContractFullName, { ...options, network, txParams }, promptedNetwork);
+  await action(promptedContractFullName, { ...options, network, txParams });
   if (!options.dontExitProcess && process.env.NODE_ENV !== 'test') process.exit(0);
 }
 
-async function action(contractFullName: string, options: any, networkName: string): Promise<void> {
+async function action(contractFullName: string, options: any): Promise<void> {
   const { force, network, txParams, init: rawInitMethod } = options;
   const { contract: contractAlias, package: packageName } = fromContractFullName(contractFullName);
 
@@ -91,7 +91,7 @@ async function action(contractFullName: string, options: any, networkName: strin
 
   if (!(await hasToMigrateProject(network))) process.exit(0);
 
-  await telemetry('create', { ...args, network, txParams, networkName });
+  await telemetry('create', { ...args, network, txParams });
   await create({ ...args, network, txParams });
   Session.setDefaultNetworkIfNeeded(network);
 }
