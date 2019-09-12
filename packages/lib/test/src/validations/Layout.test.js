@@ -20,26 +20,18 @@ contract('Layout', () => {
     result.forEach((change, index) => {
       const expectedChange = expectedChanges[index];
       change.action.should.eq(expectedChange.action);
-      if (expectedChange.updated)
-        change.updated.should.include(expectedChange.updated);
-      if (expectedChange.original)
-        change.original.should.include(expectedChange.original);
+      if (expectedChange.updated) change.updated.should.include(expectedChange.updated);
+      if (expectedChange.original) change.original.should.include(expectedChange.original);
     });
   }
 
   it('reports no changes', function() {
-    const result = compare(
-      'StorageMockSimpleOriginal',
-      'StorageMockSimpleUnchanged',
-    );
+    const result = compare('StorageMockSimpleOriginal', 'StorageMockSimpleUnchanged');
     assertChanges(result, []);
   });
 
   it('reports inserted var', function() {
-    const result = compare(
-      'StorageMockSimpleOriginal',
-      'StorageMockSimpleWithInsertedVar',
-    );
+    const result = compare('StorageMockSimpleOriginal', 'StorageMockSimpleWithInsertedVar');
     assertChanges(result, [
       {
         updated: {
@@ -54,10 +46,7 @@ contract('Layout', () => {
   });
 
   it('reports unshifted var', function() {
-    const result = compare(
-      'StorageMockSimpleOriginal',
-      'StorageMockSimpleWithUnshiftedVar',
-    );
+    const result = compare('StorageMockSimpleOriginal', 'StorageMockSimpleWithUnshiftedVar');
     assertChanges(result, [
       {
         updated: {
@@ -72,10 +61,7 @@ contract('Layout', () => {
   });
 
   it('reports appended var', function() {
-    const result = compare(
-      'StorageMockSimpleOriginal',
-      'StorageMockSimpleWithAddedVar',
-    );
+    const result = compare('StorageMockSimpleOriginal', 'StorageMockSimpleWithAddedVar');
     assertChanges(result, [
       {
         updated: {
@@ -90,10 +76,7 @@ contract('Layout', () => {
   });
 
   it('reports renamed var', function() {
-    const result = compare(
-      'StorageMockSimpleOriginal',
-      'StorageMockSimpleWithRenamedVar',
-    );
+    const result = compare('StorageMockSimpleOriginal', 'StorageMockSimpleWithRenamedVar');
     assertChanges(result, [
       {
         action: 'rename',
@@ -104,10 +87,7 @@ contract('Layout', () => {
   });
 
   it('reports type changed', function() {
-    const result = compare(
-      'StorageMockSimpleOriginal',
-      'StorageMockSimpleWithTypeChanged',
-    );
+    const result = compare('StorageMockSimpleOriginal', 'StorageMockSimpleWithTypeChanged');
     assertChanges(result, [
       {
         action: 'typechange',
@@ -118,10 +98,7 @@ contract('Layout', () => {
   });
 
   it('reports deleted var', function() {
-    const result = compare(
-      'StorageMockSimpleOriginal',
-      'StorageMockSimpleWithDeletedVar',
-    );
+    const result = compare('StorageMockSimpleOriginal', 'StorageMockSimpleWithDeletedVar');
     assertChanges(result, [
       {
         original: {
@@ -136,10 +113,7 @@ contract('Layout', () => {
   });
 
   it('reports popped var', function() {
-    const result = compare(
-      'StorageMockSimpleOriginal',
-      'StorageMockSimpleWithPoppedVar',
-    );
+    const result = compare('StorageMockSimpleOriginal', 'StorageMockSimpleWithPoppedVar');
     assertChanges(result, [
       {
         original: {
@@ -153,10 +127,7 @@ contract('Layout', () => {
   });
 
   it('reports replaced var', function() {
-    const result = compare(
-      'StorageMockSimpleOriginal',
-      'StorageMockSimpleWithReplacedVar',
-    );
+    const result = compare('StorageMockSimpleOriginal', 'StorageMockSimpleWithReplacedVar');
     assertChanges(result, [
       {
         action: 'replace',
@@ -167,18 +138,12 @@ contract('Layout', () => {
   });
 
   it('reports no changes on complex contract', function() {
-    const result = compare(
-      'StorageMockComplexOriginal',
-      'StorageMockComplexOriginal',
-    );
+    const result = compare('StorageMockComplexOriginal', 'StorageMockComplexOriginal');
     assertChanges(result, []);
   });
 
   it('reports changes and appended', function() {
-    const result = compare(
-      'StorageMockSimpleOriginal',
-      'StorageMockSimpleChangedWithAppendedVar',
-    );
+    const result = compare('StorageMockSimpleOriginal', 'StorageMockSimpleChangedWithAppendedVar');
     assertChanges(result, [
       {
         action: 'rename',
@@ -216,10 +181,7 @@ contract('Layout', () => {
   });
 
   it('reports append and not insert on variable added with repeated name in most derived contract', function() {
-    const result = compare(
-      'StorageMockChainPrivateChildV1',
-      'StorageMockChainPrivateChildV2',
-    );
+    const result = compare('StorageMockChainPrivateChildV1', 'StorageMockChainPrivateChildV2');
     assertChanges(result, [
       {
         action: 'append',

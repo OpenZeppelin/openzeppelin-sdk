@@ -49,24 +49,17 @@ contract('AppProject', function(accounts) {
 
     it('should have a proxyAdmin initialized', function() {
       this.project.proxyAdmin.should.be.an.instanceof(ProxyAdmin);
-      this.project.proxyAdmin.address.should.equalIgnoreCase(
-        this.proxyAdmin.address,
-      );
+      this.project.proxyAdmin.address.should.equalIgnoreCase(this.proxyAdmin.address);
     });
 
     it('should have a proxyFactory initialized', function() {
       this.project.proxyFactory.should.be.an.instanceof(ProxyFactory);
-      this.project.proxyFactory.address.should.equalIgnoreCase(
-        this.proxyFactory.address,
-      );
+      this.project.proxyFactory.address.should.equalIgnoreCase(this.proxyFactory.address);
     });
 
     describe('instance methods', function() {
       beforeEach('deploy implementations', async function() {
-        this.implementation = await this.project.setImplementation(
-          ImplV1,
-          'DummyImplementation',
-        );
+        this.implementation = await this.project.setImplementation(ImplV1, 'DummyImplementation');
         this.proxy = await this.project.createProxy(ImplV1);
       });
 
@@ -88,9 +81,7 @@ contract('AppProject', function(accounts) {
         });
 
         it('fails to upgrade a non-proxy contract', async function() {
-          await assertRevert(
-            this.project.upgradeProxy(this.implementation.address, ImplV1),
-          );
+          await assertRevert(this.project.upgradeProxy(this.implementation.address, ImplV1));
         });
       });
     });
@@ -98,12 +89,7 @@ contract('AppProject', function(accounts) {
     shouldBehaveLikePackageProject({
       fetch: async function() {
         this.appAddress = this.project.getApp().address;
-        this.project = await AppProject.fetchOrDeploy(
-          name,
-          version,
-          { from: owner },
-          { appAddress: this.appAddress },
-        );
+        this.project = await AppProject.fetchOrDeploy(name, version, { from: owner }, { appAddress: this.appAddress });
       },
       onNewVersion: function() {
         it('registers the new package version in the app', async function() {
@@ -148,28 +134,15 @@ contract('AppProject', function(accounts) {
 
     beforeEach('setting up simple project', async function() {
       this.simple = new SimpleProject(name, null, { from: owner });
-      this.implementation = await this.simple.setImplementation(
-        ImplV1,
-        contractName,
-      );
-      await this.simple.setDependency(
-        dependencyName,
-        this.dependency.address,
-        dependencyVersion,
-      );
+      this.implementation = await this.simple.setImplementation(ImplV1, contractName);
+      await this.simple.setDependency(dependencyName, this.dependency.address, dependencyVersion);
     });
 
     it('creates a new app project from a simple project', async function() {
       this.project = await AppProject.fromSimpleProject(this.simple);
-      (await this.project.getImplementation({ contractName })).should.eq(
-        toAddress(this.implementation),
-      );
-      (await this.project.getDependencyVersion(
-        dependencyName,
-      )).should.be.semverEqual(dependencyVersion);
-      (await this.project.getDependencyPackage(
-        dependencyName,
-      )).address.should.be.eq(this.dependency.address);
+      (await this.project.getImplementation({ contractName })).should.eq(toAddress(this.implementation));
+      (await this.project.getDependencyVersion(dependencyName)).should.be.semverEqual(dependencyVersion);
+      (await this.project.getDependencyPackage(dependencyName)).address.should.be.eq(this.dependency.address);
     });
   });
 });

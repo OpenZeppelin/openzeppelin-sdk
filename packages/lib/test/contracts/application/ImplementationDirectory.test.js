@@ -9,9 +9,7 @@ import shouldBehaveLikeOwnable from '../../../src/test/behaviors/Ownable';
 import utils from 'web3-utils';
 
 const DummyImplementation = Contracts.getFromLocal('DummyImplementation');
-const ImplementationDirectory = Contracts.getFromLocal(
-  'ImplementationDirectory',
-);
+const ImplementationDirectory = Contracts.getFromLocal('ImplementationDirectory');
 
 contract('ImplementationDirectory', function(accounts) {
   accounts = accounts.map(utils.toChecksumAddress); // Required by Web3 v1.x.
@@ -48,9 +46,7 @@ contract('ImplementationDirectory', function(accounts) {
         });
 
         it('can be retrieved afterwards', async function() {
-          const registeredImplementation = await this.directory.methods
-            .getImplementation(contractName)
-            .call();
+          const registeredImplementation = await this.directory.methods.getImplementation(contractName).call();
           assert.equal(registeredImplementation, this.implementation_v0);
         });
 
@@ -58,43 +54,28 @@ contract('ImplementationDirectory', function(accounts) {
           const event = this.events['ImplementationChanged'];
           expect(event).to.be.an('object');
           assert.equal(event.returnValues.contractName, contractName);
-          assert.equal(
-            event.returnValues.implementation,
-            this.implementation_v0,
-          );
+          assert.equal(event.returnValues.implementation, this.implementation_v0);
         });
 
         it('allows to register another implementation of the same contract', async function() {
-          await this.directory.methods
-            .setImplementation(contractName, this.implementation_v1)
-            .send({ from });
+          await this.directory.methods.setImplementation(contractName, this.implementation_v1).send({ from });
 
-          const registeredImplementation = await this.directory.methods
-            .getImplementation(contractName)
-            .call();
+          const registeredImplementation = await this.directory.methods.getImplementation(contractName).call();
           assert.equal(registeredImplementation, this.implementation_v1);
         });
 
         it('allows to register another contract', async function() {
           const anotherContract = 'anotherContract';
-          await this.directory.methods
-            .setImplementation(anotherContract, this.implementation_v1)
-            .send({ from });
+          await this.directory.methods.setImplementation(anotherContract, this.implementation_v1).send({ from });
 
-          const registeredImplementation = await this.directory.methods
-            .getImplementation(anotherContract)
-            .call();
+          const registeredImplementation = await this.directory.methods.getImplementation(anotherContract).call();
           assert.equal(registeredImplementation, this.implementation_v1);
         });
       });
 
       describe('when registering an address that is not a contract', function() {
         it('reverts', async function() {
-          await assertRevert(
-            this.directory.methods
-              .setImplementation(contractName, anotherAddress)
-              .send({ from }),
-          );
+          await assertRevert(this.directory.methods.setImplementation(contractName, anotherAddress).send({ from }));
         });
       });
     });
@@ -104,9 +85,7 @@ contract('ImplementationDirectory', function(accounts) {
 
       it('cannot register contract', async function() {
         await assertRevert(
-          this.directory.methods
-            .setImplementation(contractName, this.implementation_v0)
-            .send({ from }),
+          this.directory.methods.setImplementation(contractName, this.implementation_v0).send({ from }),
         );
       });
     });
@@ -116,25 +95,19 @@ contract('ImplementationDirectory', function(accounts) {
     const contractName = 'ERC721';
 
     beforeEach('registering the contract', async function() {
-      await this.directory.methods
-        .setImplementation(contractName, this.implementation_v0)
-        .send({ from: owner });
+      await this.directory.methods.setImplementation(contractName, this.implementation_v0).send({ from: owner });
     });
 
     describe('when the sender is the directory owner', function() {
       const from = owner;
 
       beforeEach('unregistering the contract', async function() {
-        const { events } = await this.directory.methods
-          .unsetImplementation(contractName)
-          .send({ from });
+        const { events } = await this.directory.methods.unsetImplementation(contractName).send({ from });
         this.events = events;
       });
 
       it('cannot be retrieved afterwards', async function() {
-        const registeredImplementation = await this.directory.methods
-          .getImplementation(contractName)
-          .call();
+        const registeredImplementation = await this.directory.methods.getImplementation(contractName).call();
         assert.equal(registeredImplementation, ZERO_ADDRESS);
       });
 
@@ -150,11 +123,7 @@ contract('ImplementationDirectory', function(accounts) {
       const from = anotherAddress;
 
       it('cannot unregister contract', async function() {
-        await assertRevert(
-          this.directory.methods
-            .unsetImplementation(contractName)
-            .send({ from }),
-        );
+        await assertRevert(this.directory.methods.unsetImplementation(contractName).send({ from }));
       });
     });
   });
@@ -204,18 +173,12 @@ contract('ImplementationDirectory', function(accounts) {
 
       it('does not allow to set implementation', async function() {
         await assertRevert(
-          this.directory.methods
-            .setImplementation('ERC721', this.implementation_v1)
-            .send({ from: owner }),
+          this.directory.methods.setImplementation('ERC721', this.implementation_v1).send({ from: owner }),
         );
       });
 
       it('does not allow to unset implementation', async function() {
-        await assertRevert(
-          this.directory.methods
-            .unsetImplementation('ERC721')
-            .send({ from: owner }),
-        );
+        await assertRevert(this.directory.methods.unsetImplementation('ERC721').send({ from: owner }));
       });
     });
   });

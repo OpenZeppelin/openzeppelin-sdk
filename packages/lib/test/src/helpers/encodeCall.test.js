@@ -13,19 +13,11 @@ describe('encodeCall helper', () => {
 
   it('should fail with invalid type widths', () => {
     assertBadEncoding(['uint512'], [123], /invalid uint bit length/);
-    assertBadEncoding(
-      ['bytes0'],
-      [Buffer.from('0xab', 'hex')],
-      /invalid bytes length/,
-    );
+    assertBadEncoding(['bytes0'], [Buffer.from('0xab', 'hex')], /invalid bytes length/);
   });
 
   it('should fail with invalid non matching number of types and values', () => {
-    assertBadEncoding(
-      ['uint', 'address'],
-      [123],
-      /types\/values length mismatch/,
-    );
+    assertBadEncoding(['uint', 'address'], [123], /types\/values length mismatch/);
   });
 
   it('should fail with invalid type/value pairs', () => {
@@ -35,11 +27,7 @@ describe('encodeCall helper', () => {
     assertBadEncoding(['int'], ['3.14'], /invalid number value/);
     assertBadEncoding(['int'], ['-3.14'], /invalid number value/);
     assertBadEncoding(['string'], [32], /invalid string value/);
-    assertBadEncoding(
-      ['address'],
-      ['0x0fd60495d7057689fbe8b3'],
-      /invalid address/,
-    );
+    assertBadEncoding(['address'], ['0x0fd60495d7057689fbe8b3'], /invalid address/);
     assertBadEncoding(['bytes'], [32], /invalid bytes value/);
   });
 
@@ -82,10 +70,7 @@ describe('encodeCall helper', () => {
       assertGoodEncoding(['string'], ['hello']);
       assertGoodEncoding(['string'], ['0x123']);
       assertGoodEncoding(['string'], ['42']);
-      assertGoodEncoding(
-        ['string'],
-        ['0x39af68cF04Abb0eF8f9d8191E1bD9c041E80e18e'],
-      );
+      assertGoodEncoding(['string'], ['0x39af68cF04Abb0eF8f9d8191E1bD9c041E80e18e']);
     });
 
     it('should throw when the passed value is not a string nor a Buffer', () => {
@@ -115,18 +100,11 @@ describe('encodeCall helper', () => {
 
   describe('when the specified type is an address', () => {
     it('should accept valid values', () => {
-      assertGoodEncoding(
-        ['address'],
-        ['0x39af68cF04Abb0eF8f9d8191E1bD9c041E80e18e'],
-      );
+      assertGoodEncoding(['address'], ['0x39af68cF04Abb0eF8f9d8191E1bD9c041E80e18e']);
     });
 
     it('should throw when an invalid address is passed', () => {
-      assertBadEncoding(
-        ['address'],
-        ['0x39af68cF04Abb8f9d8191E1bD9ce18e'],
-        /invalid address/,
-      );
+      assertBadEncoding(['address'], ['0x39af68cF04Abb8f9d8191E1bD9ce18e'], /invalid address/);
       assertBadEncoding(
         ['address'],
         ['0x00000000000000000000000000000000000000000000000000000000f8a8fd6d'],
@@ -135,27 +113,15 @@ describe('encodeCall helper', () => {
     });
 
     it('should throw when an address with upper and lower case chars and an invalid checksum is passed', () => {
-      assertBadEncoding(
-        ['address'],
-        ['0xCF5609B003b2776699eeA1233F7C82d5695CC9AA'],
-        /invalid address/,
-      );
+      assertBadEncoding(['address'], ['0xCF5609B003b2776699eeA1233F7C82d5695CC9AA'], /invalid address/);
     });
 
     it('should not throw when an address with an invalid checksum is passed, if the address contains all upper or lower case strings', () => {
       expect(() =>
-        encodeCall(
-          FUNCTION_NAME,
-          ['address'],
-          ['0xCF5609B003B2776699EEA1233F7C82D5695CC9AA'],
-        ),
+        encodeCall(FUNCTION_NAME, ['address'], ['0xCF5609B003B2776699EEA1233F7C82D5695CC9AA']),
       ).to.not.throw();
       expect(() =>
-        encodeCall(
-          FUNCTION_NAME,
-          ['address'],
-          ['0xcf5609b003b2776699eea1233f7c82d5695cc9aa'],
-        ),
+        encodeCall(FUNCTION_NAME, ['address'], ['0xcf5609b003b2776699eea1233f7c82d5695cc9aa']),
       ).to.not.throw();
     });
 
@@ -177,14 +143,8 @@ describe('encodeCall helper', () => {
     });
 
     it('supports nested tuples', function() {
-      assertGoodEncoding(
-        ['tuple(uint256,string[])'],
-        [[42, ['one', 'two', 'three']]],
-      );
-      assertGoodEncoding(
-        ['tuple(uint256,tuple(uint256,string))'],
-        [[42, [42, 'hello']]],
-      );
+      assertGoodEncoding(['tuple(uint256,string[])'], [[42, ['one', 'two', 'three']]]);
+      assertGoodEncoding(['tuple(uint256,tuple(uint256,string))'], [[42, [42, 'hello']]]);
     });
   });
 
@@ -200,12 +160,7 @@ describe('encodeCall helper', () => {
       assertGoodEncoding(['uint256[]'], [[20, 30]]);
       assertGoodEncoding(
         ['address[]'],
-        [
-          [
-            '0x39af68cF04Abb0eF8f9d8191E1bD9c041E80e18e',
-            '0x39af68cF04Abb0eF8f9d8191E1bD9c041E80e18e',
-          ],
-        ],
+        [['0x39af68cF04Abb0eF8f9d8191E1bD9c041E80e18e', '0x39af68cF04Abb0eF8f9d8191E1bD9c041E80e18e']],
       );
       assertGoodEncoding(['string[]'], [['hello', '']]);
       assertGoodEncoding(['bool[]'], [[true, false]]);
@@ -213,11 +168,7 @@ describe('encodeCall helper', () => {
 
     it('should throw when the values do not match the type', function() {
       assertBadEncoding(['address[]'], [['one', 'two']], /invalid address/);
-      assertBadEncoding(
-        ['uint256[]'],
-        [['20', '30', 'hello']],
-        /invalid number value/,
-      );
+      assertBadEncoding(['uint256[]'], [['20', '30', 'hello']], /invalid number value/);
       assertBadEncoding(['uint256[]'], [['20', '-30']], /invalid number value/);
     });
 
@@ -232,16 +183,12 @@ function assertGoodEncoding(types, values) {
   const encoded = encodeCall(FUNCTION_NAME, types, values).substring(10); // Remove signature hash.
   const decoded = decodeCall(types, `0x${encoded}`);
   if (values.length !== decoded.length)
-    throw new Error(
-      'Invalid encoding/decoding: Mismatch in number of encoded and decoded values.',
-    );
+    throw new Error('Invalid encoding/decoding: Mismatch in number of encoded and decoded values.');
 
   zipWith(values, decoded, (value, decodedValue) => {
     if (Buffer.isBuffer(value)) value = `0x${value.toString('hex')}`;
     if (value.toString() != decodedValue.toString())
-      throw new Error(
-        `Invalid encoding/decoding. Encoded: ${value}, Decoded: ${decodedValue}`,
-      );
+      throw new Error(`Invalid encoding/decoding. Encoded: ${value}, Decoded: ${decodedValue}`);
   });
 }
 

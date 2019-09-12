@@ -5,11 +5,7 @@ import Contracts from '../../../src/artifacts/Contracts';
 
 const DummyImplementation = Contracts.getFromLocal('DummyImplementation');
 
-export default function shouldBehaveLikePackageProject({
-  fetch,
-  onInitialize,
-  onNewVersion,
-} = {}) {
+export default function shouldBehaveLikePackageProject({ fetch, onInitialize, onNewVersion } = {}) {
   const version = '0.2.0';
   const newVersion = '0.3.0';
   const contractName = 'Dummy';
@@ -70,10 +66,7 @@ export default function shouldBehaveLikePackageProject({
 
     describe('setImplementation', function() {
       it('registers a new implementation', async function() {
-        const newImplementation = await this.project.setImplementation(
-          DummyImplementation,
-          contractName,
-        );
+        const newImplementation = await this.project.setImplementation(DummyImplementation, contractName);
         const directory = await this.project.getCurrentDirectory();
         const implementation = await directory.getImplementation(contractName);
         implementation.should.eq(newImplementation.address);
@@ -81,10 +74,7 @@ export default function shouldBehaveLikePackageProject({
 
       it('registers a new implementation on a new version', async function() {
         await this.project.newVersion(newVersion);
-        const newImplementation = await this.project.setImplementation(
-          DummyImplementation,
-          contractName,
-        );
+        const newImplementation = await this.project.setImplementation(DummyImplementation, contractName);
         const thepackage = await this.project.getProjectPackage();
         const directory = await thepackage.getDirectory(newVersion);
         const implementation = await directory.getImplementation(contractName);

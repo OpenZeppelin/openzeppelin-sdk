@@ -29,8 +29,6 @@ function setArtifactDefaults() {
     gasPrice: 0x01,
   };
 
-  const defaults = process.env.SOLIDITY_COVERAGE
-    ? DEFAULT_COVERAGE_TX_PARAMS
-    : DEFAULT_TESTING_TX_PARAMS;
+  const defaults = process.env.SOLIDITY_COVERAGE ? DEFAULT_COVERAGE_TX_PARAMS : DEFAULT_TESTING_TX_PARAMS;
   Contracts.setArtifactsDefaults(defaults);
 }

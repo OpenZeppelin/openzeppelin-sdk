@@ -5,9 +5,7 @@ import assertRevert from '../../../src/test/helpers/assertRevert';
 import { toSemanticVersion } from '../../../src/utils/Semver';
 
 const Package = Contracts.getFromLocal('Package');
-const ImplementationDirectory = Contracts.getFromLocal(
-  'ImplementationDirectory',
-);
+const ImplementationDirectory = Contracts.getFromLocal('ImplementationDirectory');
 
 export default function shouldManagePackages(accounts) {
   const [_, appOwner, packageOwner, directoryOwner, anotherAccount] = accounts;
@@ -16,14 +14,8 @@ export default function shouldManagePackages(accounts) {
   const version1 = toSemanticVersion('1.1.0');
   const contentURI = '0x10';
 
-  const assertPackage = async function(
-    packageName,
-    expectedAddress,
-    expectedVersion,
-  ) {
-    let { ['0']: address, ['1']: version } = await this.app.methods
-      .getPackage(packageName)
-      .call();
+  const assertPackage = async function(packageName, expectedAddress, expectedVersion) {
+    let { ['0']: address, ['1']: version } = await this.app.methods.getPackage(packageName).call();
     version.should.be.semverEqual(expectedVersion);
     address.should.eq(expectedAddress);
   };
@@ -47,54 +39,28 @@ export default function shouldManagePackages(accounts) {
 
     it('registers a new package and version', async function() {
       await this.app.methods
-        .setPackage(
-          this.anotherPackageName,
-          this.anotherPackage.address,
-          version0,
-        )
+        .setPackage(this.anotherPackageName, this.anotherPackage.address, version0)
         .send({ from: appOwner });
-      await this.assertPackage(
-        this.anotherPackageName,
-        this.anotherPackage.address,
-        version0,
-      );
-      await this.assertPackage(
-        this.packageName,
-        this.package.address,
-        version0,
-      );
+      await this.assertPackage(this.anotherPackageName, this.anotherPackage.address, version0);
+      await this.assertPackage(this.packageName, this.package.address, version0);
     });
 
     it('overwrites registered package with the same name', async function() {
       await this.app.methods
         .setPackage(this.packageName, this.anotherPackage.address, version0)
         .send({ from: appOwner });
-      await this.assertPackage(
-        this.packageName,
-        this.anotherPackage.address,
-        version0,
-      );
+      await this.assertPackage(this.packageName, this.anotherPackage.address, version0);
     });
 
     it('updates existing package version', async function() {
-      await this.app.methods
-        .setPackage(this.packageName, this.package.address, version1)
-        .send({ from: appOwner });
-      await this.assertPackage(
-        this.packageName,
-        this.package.address,
-        version1,
-      );
+      await this.app.methods.setPackage(this.packageName, this.package.address, version1).send({ from: appOwner });
+      await this.assertPackage(this.packageName, this.package.address, version1);
     });
 
     it('fails if package does not have the required version', async function() {
       await assertRevert(
         this.app.methods
-          .setPackage(this.anotherPackageName, this.anotherPackage.address, [
-            9,
-            9,
-            9,
-          ])
+          .setPackage(this.anotherPackageName, this.anotherPackage.address, [9, 9, 9])
           .send({ from: appOwner }),
       );
     });
@@ -102,11 +68,7 @@ export default function shouldManagePackages(accounts) {
     it('fails if called from non-owner account', async function() {
       await assertRevert(
         this.app.methods
-          .setPackage(
-            this.anotherPackageName,
-            this.anotherPackage.address,
-            version0,
-          )
+          .setPackage(this.anotherPackageName, this.anotherPackage.address, version0)
           .send({ from: anotherAccount }),
       );
     });
@@ -118,29 +80,18 @@ export default function shouldManagePackages(accounts) {
     });
 
     it('unsets a package', async function() {
-      await this.app.methods
-        .unsetPackage(this.packageName)
-        .send({ from: appOwner });
-      let {
-        ['0']: address,
-        ['1']: version,
-      } = await this.app.methods.getPackage(this.packageName).call();
+      await this.app.methods.unsetPackage(this.packageName).send({ from: appOwner });
+      let { ['0']: address, ['1']: version } = await this.app.methods.getPackage(this.packageName).call();
       version.should.be.semverEqual([0, 0, 0]);
       address.should.be.zeroAddress;
     });
 
     it('fails to unset a package from non-owner account', async function() {
-      await assertRevert(
-        this.app.methods
-          .unsetPackage(this.packageName)
-          .send({ from: anotherAccount }),
-      );
+      await assertRevert(this.app.methods.unsetPackage(this.packageName).send({ from: anotherAccount }));
     });
 
     it('fails to unset a non-existing package', async function() {
-      await assertRevert(
-        this.app.methods.unsetPackage('NOTEXISTS').send({ from: appOwner }),
-      );
+      await assertRevert(this.app.methods.unsetPackage('NOTEXISTS').send({ from: appOwner }));
     });
   });
 
@@ -155,25 +106,17 @@ export default function shouldManagePackages(accounts) {
         .send({ from: packageOwner });
       this.anotherPackageName = 'AnotherPackage';
       await this.app.methods
-        .setPackage(
-          this.anotherPackageName,
-          this.anotherPackage.address,
-          version1,
-        )
+        .setPackage(this.anotherPackageName, this.anotherPackage.address, version1)
         .send({ from: appOwner });
     });
 
     it('returns provider from package', async function() {
-      const provider = await this.app.methods
-        .getProvider(this.packageName)
-        .call();
+      const provider = await this.app.methods.getProvider(this.packageName).call();
       provider.should.eq(this.directory.address);
     });
 
     it('returns provider from another package', async function() {
-      const provider = await this.app.methods
-        .getProvider(this.anotherPackageName)
-        .call();
+      const provider = await this.app.methods.getProvider(this.anotherPackageName).call();
       provider.should.eq(this.anotherDirectory.address);
     });
 
@@ -181,9 +124,7 @@ export default function shouldManagePackages(accounts) {
       await this.app.methods
         .setPackage(this.packageName, this.anotherPackage.address, version1)
         .send({ from: appOwner });
-      const provider = await this.app.methods
-        .getProvider(this.packageName)
-        .call();
+      const provider = await this.app.methods.getProvider(this.packageName).call();
       provider.should.eq(this.anotherDirectory.address);
     });
 
@@ -191,12 +132,8 @@ export default function shouldManagePackages(accounts) {
       await this.package.methods
         .addVersion(version1, this.anotherDirectory.address, contentURI)
         .send({ from: packageOwner });
-      await this.app.methods
-        .setPackage(this.packageName, this.package.address, version1)
-        .send({ from: appOwner });
-      const provider = await this.app.methods
-        .getProvider(this.packageName)
-        .call();
+      await this.app.methods.setPackage(this.packageName, this.package.address, version1).send({ from: appOwner });
+      const provider = await this.app.methods.getProvider(this.packageName).call();
       provider.should.eq(this.anotherDirectory.address);
     });
 
