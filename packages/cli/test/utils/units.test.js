@@ -1,21 +1,14 @@
 'use strict';
 require('../setup');
 
-import {
-  isValidUnit,
-  prettifyTokenAmount,
-  toWei,
-  fromWei,
-} from '../../src/utils/units';
+import { isValidUnit, prettifyTokenAmount, toWei, fromWei } from '../../src/utils/units';
 
 describe('units', function() {
   describe('functions', function() {
     describe('#prettifyTokenAmount', function() {
       context('when specifying decimals and symbol', function() {
         it('returns value and symbol', function() {
-          prettifyTokenAmount((15e10).toString(), '10', 'TKN').should.eq(
-            '15 TKN',
-          );
+          prettifyTokenAmount((15e10).toString(), '10', 'TKN').should.eq('15 TKN');
         });
       });
 

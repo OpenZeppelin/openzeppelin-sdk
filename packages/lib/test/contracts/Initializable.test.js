@@ -58,9 +58,7 @@ contract('Initializable', function() {
     });
 
     beforeEach('initializing', async function() {
-      await this.contract.methods
-        .initialize(mother, gramps, father, child)
-        .send();
+      await this.contract.methods.initialize(mother, gramps, father, child).send();
     });
 
     it('initializes human', async function() {

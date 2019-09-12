@@ -6,9 +6,7 @@ import ProjectFile from '../../src/models/files/ProjectFile';
 
 contract('unlink script', function() {
   beforeEach(async function() {
-    this.projectFile = new ProjectFile(
-      'test/mocks/packages/package-with-multiple-stdlibs.zos.json',
-    );
+    this.projectFile = new ProjectFile('test/mocks/packages/package-with-multiple-stdlibs.zos.json');
   });
 
   describe('without valid parameters', function() {
@@ -17,9 +15,7 @@ contract('unlink script', function() {
       await unlink({
         dependencies,
         projectFile: this.projectFile,
-      }).should.be.rejectedWith(
-        'At least one dependency name must be provided.',
-      );
+      }).should.be.rejectedWith('At least one dependency name must be provided.');
     });
 
     it('throws an error if project dependency does not exist', async function() {
@@ -27,9 +23,7 @@ contract('unlink script', function() {
       await unlink({
         dependencies: [dependencyName],
         projectFile: this.projectFile,
-      }).should.be.rejectedWith(
-        `Could not find dependency ${dependencyName}.`,
-      );
+      }).should.be.rejectedWith(`Could not find dependency ${dependencyName}.`);
     });
   });
 

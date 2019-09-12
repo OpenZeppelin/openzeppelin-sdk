@@ -2,12 +2,7 @@
 require('../setup');
 
 import CaptureLogs from '../helpers/captureLogs';
-import {
-  Contracts,
-  getStorageLayout,
-  compareStorageLayouts,
-  getBuildArtifacts,
-} from '@openzeppelin/upgrades';
+import { Contracts, getStorageLayout, compareStorageLayouts, getBuildArtifacts } from '@openzeppelin/upgrades';
 import ValidationLogger from '../../src/interface/ValidationLogger';
 
 contract('ValidationLogger', function() {
@@ -41,18 +36,14 @@ contract('ValidationLogger', function() {
       validationLogger().log({
         uninitializedBaseContracts: ['ContractA', 'ContractB', 'ContractC'],
       });
-      this.logs.warns[0].should.match(
-        /has base contracts ContractA, ContractB, ContractC which are initializable/,
-      );
+      this.logs.warns[0].should.match(/has base contracts ContractA, ContractB, ContractC which are initializable/);
     });
 
     it('logs vars unchecked for storage layout', async function() {
       validationLogger().log({
         storageUncheckedVars: [{ label: 'foo', contract: 'MyContract' }],
       });
-      this.logs.warns[0].should.match(
-        /foo \(MyContract\) contains a struct or enum/,
-      );
+      this.logs.warns[0].should.match(/foo \(MyContract\) contains a struct or enum/);
     });
 
     it('logs when detecting initial values in fields declarations', async function() {
@@ -83,16 +74,12 @@ contract('ValidationLogger', function() {
 
     it('reports appended var', function() {
       compare('StorageMockSimpleOriginal', 'StorageMockSimpleWithAddedVar');
-      this.logs.infos[0].should.match(
-        /New variable 'uint256 c' was added in contract StorageMockSimpleWithAddedVar/,
-      );
+      this.logs.infos[0].should.match(/New variable 'uint256 c' was added in contract StorageMockSimpleWithAddedVar/);
     });
 
     it('reports renamed var', function() {
       compare('StorageMockSimpleOriginal', 'StorageMockSimpleWithRenamedVar');
-      this.logs.warns[0].should.match(
-        /Variable 'uint256 b' in contract StorageMockSimpleOriginal was renamed to c/,
-      );
+      this.logs.warns[0].should.match(/Variable 'uint256 b' in contract StorageMockSimpleOriginal was renamed to c/);
     });
 
     it('reports type changed', function() {
@@ -104,9 +91,7 @@ contract('ValidationLogger', function() {
 
     it('reports deleted var', function() {
       compare('StorageMockSimpleOriginal', 'StorageMockSimpleWithDeletedVar');
-      this.logs.errors[0].should.match(
-        /Variable 'uint256 a' was removed from contract StorageMockSimpleOriginal/,
-      );
+      this.logs.errors[0].should.match(/Variable 'uint256 a' was removed from contract StorageMockSimpleOriginal/);
     });
 
     it('reports popped var', function() {
@@ -133,9 +118,7 @@ function compare(originalContractName, updatedContractName) {
     getStorageLayout(originalContract, buildArtifacts),
     getStorageLayout(updatedContract, buildArtifacts),
   );
-  new ValidationLogger(updatedContract, getStorageLayout(originalContract)).log(
-    { storageDiff: comparison },
-  );
+  new ValidationLogger(updatedContract, getStorageLayout(originalContract)).log({ storageDiff: comparison });
 }
 
 function validationLogger(contractName = 'Impl') {

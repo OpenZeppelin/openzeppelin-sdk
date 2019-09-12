@@ -34,11 +34,7 @@ contract('App', function(accounts) {
   async function setPackage() {
     this.package = await Package.deploy(txParams);
     this.directory = await this.package.newVersion(version);
-    this.setPackageTx = await this.app.setPackage(
-      packageName,
-      this.package.address,
-      version,
-    );
+    this.setPackageTx = await this.app.setPackage(packageName, this.package.address, version);
   }
 
   describe('getPackage', function() {
@@ -76,11 +72,7 @@ contract('App', function(accounts) {
       const thepackage = await Package.deploy(txParams);
       await thepackage.newVersion(version);
 
-      const { events } = await this.app.setPackage(
-        packageName,
-        thepackage.address,
-        version,
-      );
+      const { events } = await this.app.setPackage(packageName, thepackage.address, version);
       const event = events['PackageChanged'];
       expect(event).to.be.an('object');
       event.returnValues.providerName.should.be.equal(packageName);
@@ -96,11 +88,7 @@ contract('App', function(accounts) {
       const directory2 = await package2.newVersion(anotherVersion);
 
       await this.app.setPackage(packageName, package1.address, version);
-      await this.app.setPackage(
-        anotherPackageName,
-        package2.address,
-        anotherVersion,
-      );
+      await this.app.setPackage(anotherPackageName, package2.address, anotherVersion);
 
       const provider1 = await this.app.getProvider(packageName);
       provider1.address.should.eq(directory1.address);
@@ -112,11 +100,7 @@ contract('App', function(accounts) {
     it('can overwrite package version', async function() {
       await setPackage.apply(this);
       await this.package.newVersion(anotherVersion);
-      await this.app.setPackage(
-        packageName,
-        this.package.address,
-        anotherVersion,
-      );
+      await this.app.setPackage(packageName, this.package.address, anotherVersion);
       const packageInfo = await this.app.getPackage(packageName);
       packageInfo.version.should.be.semverEqual(anotherVersion);
     });
@@ -169,29 +153,19 @@ contract('App', function(accounts) {
     this.directory = await this.package.newVersion(anotherVersion);
     this.implV2 = await Transactions.deployContract(ImplV2);
     await this.directory.setImplementation(contractName, this.implV2.address);
-    await this.app.setPackage(
-      packageName,
-      this.package.address,
-      anotherVersion,
-    );
+    await this.app.setPackage(packageName, this.package.address, anotherVersion);
   }
 
   describe('getImplementation', async function() {
     beforeEach('setting implementation', setImplementation);
 
     it('returns implementation address', async function() {
-      const implementation = await this.app.getImplementation(
-        packageName,
-        contractName,
-      );
+      const implementation = await this.app.getImplementation(packageName, contractName);
       implementation.should.eq(this.implV1.address);
     });
 
     it('returns zero if not exists', async function() {
-      const implementation = await this.app.getImplementation(
-        packageName,
-        'NOTEXISTS',
-      );
+      const implementation = await this.app.getImplementation(packageName, 'NOTEXISTS');
       implementation.should.be.zeroAddress;
     });
   });
@@ -230,20 +204,8 @@ contract('App', function(accounts) {
     return async function() {
       this.proxyAdmin = await ProxyAdmin.deploy(txParams);
       this.proxy = initArgs
-        ? await this.app.createProxy(
-            impl,
-            packageName,
-            contractName,
-            this.proxyAdmin.address,
-            initMethod,
-            initArgs,
-          )
-        : await this.app.createProxy(
-            impl,
-            packageName,
-            contractName,
-            this.proxyAdmin.address,
-          );
+        ? await this.app.createProxy(impl, packageName, contractName, this.proxyAdmin.address, initMethod, initArgs)
+        : await this.app.createProxy(impl, packageName, contractName, this.proxyAdmin.address);
     };
   }
 
@@ -254,27 +216,17 @@ contract('App', function(accounts) {
       it('should return a proxy', async function() {
         this.proxy.address.should.be.not.null;
         (await this.proxy.methods.version().call()).should.be.eq('V1');
-        (await this.proxyAdmin.getProxyImplementation(
-          this.proxy.address,
-        )).should.be.eq(this.implV1.address);
+        (await this.proxyAdmin.getProxyImplementation(this.proxy.address)).should.be.eq(this.implV1.address);
       });
     };
 
     describe('without initializer', function() {
-      beforeEach(
-        'creating a proxy',
-        createProxy(ImplV1, packageName, contractName),
-      );
+      beforeEach('creating a proxy', createProxy(ImplV1, packageName, contractName));
       shouldReturnProxy();
     });
 
     describe('with initializer', function() {
-      beforeEach(
-        'creating a proxy',
-        createProxy(ImplV1, packageName, contractName, 'initializeNonPayable', [
-          10,
-        ]),
-      );
+      beforeEach('creating a proxy', createProxy(ImplV1, packageName, contractName, 'initializeNonPayable', [10]));
       shouldReturnProxy();
 
       it('should have initialized the proxy', async function() {
@@ -284,14 +236,7 @@ contract('App', function(accounts) {
     });
 
     describe('with complex initializer', function() {
-      beforeEach(
-        'creating a proxy',
-        createProxy(ImplV1, packageName, contractName, 'initialize', [
-          10,
-          'foo',
-          [],
-        ]),
-      );
+      beforeEach('creating a proxy', createProxy(ImplV1, packageName, contractName, 'initialize', [10, 'foo', []]));
       shouldReturnProxy();
 
       it('should have initialized the proxy', async function() {
@@ -306,21 +251,12 @@ contract('App', function(accounts) {
     describe('with initializer that spawns additional proxies', function() {
       beforeEach('setting proxy creator implementation', async function() {
         this.proxyCreator = await Transactions.deployContract(ProxyCreator);
-        await this.directory.setImplementation(
-          'ProxyCreator',
-          this.proxyCreator.address,
-        );
+        await this.directory.setImplementation('ProxyCreator', this.proxyCreator.address);
       });
 
       it('should return proxy creator instance', async function() {
         this.proxyAdmin = await ProxyAdmin.deploy(txParams);
-        const fnArgs = [
-          this.app.address,
-          packageName,
-          contractName,
-          this.proxyAdmin.address,
-          Buffer.from(''),
-        ];
+        const fnArgs = [this.app.address, packageName, contractName, this.proxyAdmin.address, Buffer.from('')];
         const proxy = await this.app.createProxy(
           ProxyCreator,
           packageName,

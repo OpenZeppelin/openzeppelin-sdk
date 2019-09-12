@@ -26,12 +26,7 @@ describe('ABIs', function() {
     });
 
     it('chooses function based on explicit types', async function() {
-      testGetFunction(
-        'GetFunctionGrandchild',
-        ['1'],
-        ['uint256'],
-        'initialize(uint256)',
-      );
+      testGetFunction('GetFunctionGrandchild', ['1'], ['uint256'], 'initialize(uint256)');
     });
 
     it('throws if not found', async function() {
@@ -48,12 +43,7 @@ describe('ABIs', function() {
   });
 });
 
-function testGetFunction(
-  contractName,
-  args,
-  expectedTypes,
-  funName = 'initialize',
-) {
+function testGetFunction(contractName, args, expectedTypes, funName = 'initialize') {
   const contractClass = Contracts.getFromLocal(contractName);
   const method = getFunction(contractClass, funName, args);
   should.exist(method);

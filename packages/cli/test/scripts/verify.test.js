@@ -38,34 +38,22 @@ contract('verify script', function() {
       });
 
       it('throws error if contract not yet added', async function() {
-        const projectFile = new ProjectFile(
-          'test/mocks/packages/package-with-contracts.zos.json',
-        );
+        const projectFile = new ProjectFile('test/mocks/packages/package-with-contracts.zos.json');
         const networkFile = new NetworkFile(projectFile, network);
         const nonExistentContract = 'NonExistent';
-        await assertVerify(
-          nonExistentContract,
-          { network, networkFile },
-          /not found in this project/,
-        );
+        await assertVerify(nonExistentContract, { network, networkFile }, /not found in this project/);
       });
     });
 
     describe('with valid package and network files', async function() {
       beforeEach(function() {
-        this.projectFile = new ProjectFile(
-          'test/mocks/packages/package-with-contracts.zos.json',
-        );
+        this.projectFile = new ProjectFile('test/mocks/packages/package-with-contracts.zos.json');
 
         this.networkFile = new NetworkFile(this.projectFile, network);
       });
 
       it('throws error if contract not yet deployed', async function() {
-        await assertVerify(
-          contractAlias,
-          { network, networkFile: this.networkFile },
-          /is not deployed to/,
-        );
+        await assertVerify(contractAlias, { network, networkFile: this.networkFile }, /is not deployed to/);
       });
 
       it('throws error if contract source code has changed locally since last deploy', async function() {
@@ -86,9 +74,7 @@ contract('verify script', function() {
     const network = 'mainnet';
 
     beforeEach(async function() {
-      this.projectFile = new ProjectFile(
-        'test/mocks/packages/package-with-contracts.zos.json',
-      );
+      this.projectFile = new ProjectFile('test/mocks/packages/package-with-contracts.zos.json');
       this.networkFile = new NetworkFile(this.projectFile, network);
 
       await push({ network, networkFile: this.networkFile, txParams });
@@ -140,9 +126,7 @@ contract('verify script', function() {
           status: 200,
           data: { status: '1', result: 'GU1D_NUMB3R' },
         });
-        this.axiosStub
-          .onCall(1)
-          .returns({ status: 200, data: { status: '1' } });
+        this.axiosStub.onCall(1).returns({ status: 200, data: { status: '1' } });
         await verify(contractAlias, {
           network,
           networkFile: this.networkFile,
@@ -152,9 +136,7 @@ contract('verify script', function() {
         this.logs.infos.should.have.lengthOf(2);
 
         this.logs.infos[0].should.match(/Verifying and publishing/);
-        this.logs.infos[1].should.match(
-          /Contract source code of ImplV1 verified and published successfully/,
-        );
+        this.logs.infos[1].should.match(/Contract source code of ImplV1 verified and published successfully/);
       });
     });
 
@@ -174,21 +156,15 @@ contract('verify script', function() {
       it('throws error if contract could not be verified', async function() {
         this.axiosStub.returns({
           status: 200,
-          data:
-            '<div id="infoModal"><div class="modal-body"> Error: </div></div>',
+          data: '<div id="infoModal"><div class="modal-body"> Error: </div></div>',
         });
-        await assertVerify(
-          contractAlias,
-          { network, networkFile: this.networkFile, remote: 'etherchain' },
-          /Error/,
-        );
+        await assertVerify(contractAlias, { network, networkFile: this.networkFile, remote: 'etherchain' }, /Error/);
       });
 
       it('logs a success info message when contract is verified', async function() {
         this.axiosStub.returns({
           status: 200,
-          data:
-            '<div id="infoModal"><div class="modal-body"> successful </div></div>',
+          data: '<div id="infoModal"><div class="modal-body"> successful </div></div>',
         });
         await verify(contractAlias, {
           network,

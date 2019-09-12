@@ -20,9 +20,7 @@ contract('call script', function(accounts) {
 
   beforeEach('setup', async function() {
     this.logs = new CaptureLogs();
-    this.projectFile = new ProjectFile(
-      'test/mocks/packages/package-empty.zos.json',
-    );
+    this.projectFile = new ProjectFile('test/mocks/packages/package-empty.zos.json');
     this.networkFile = new NetworkFile(this.projectFile, network);
     const contractsData = [{ name: 'ImplV1', alias: 'Impl' }];
     await add({ contractsData, projectFile: this.projectFile });
@@ -93,9 +91,7 @@ contract('call script', function(accounts) {
           proxyAddress,
           methodName: 'initialize',
           methodArgs: [42, 44],
-        }).should.be.rejectedWith(
-          'Could not find method initialize with 2 arguments in contract ImplV1',
-        );
+        }).should.be.rejectedWith('Could not find method initialize with 2 arguments in contract ImplV1');
       });
     });
   });
@@ -123,9 +119,7 @@ contract('call script', function(accounts) {
           methodArgs: [],
         });
 
-        this.logs.infos[this.logs.infos.length - 1].should.eq(
-          `Method 'value' returned: 42`,
-        );
+        this.logs.infos[this.logs.infos.length - 1].should.eq(`Method 'value' returned: 42`);
       });
     });
 
@@ -144,9 +138,7 @@ contract('call script', function(accounts) {
             methodArgs: [],
           });
 
-          this.logs.infos[this.logs.infos.length - 1].should.eq(
-            `Method 'doesNotReturn' returned empty.`,
-          );
+          this.logs.infos[this.logs.infos.length - 1].should.eq(`Method 'doesNotReturn' returned empty.`);
         });
       });
 
@@ -164,9 +156,7 @@ contract('call script', function(accounts) {
             methodArgs: [],
           });
 
-          this.logs.infos[this.logs.infos.length - 1].should.eq(
-            `Method 'say' returned: V1`,
-          );
+          this.logs.infos[this.logs.infos.length - 1].should.eq(`Method 'say' returned: V1`);
         });
       });
 
@@ -184,9 +174,7 @@ contract('call script', function(accounts) {
             methodArgs: [],
           });
 
-          this.logs.infos[this.logs.infos.length - 1].should.eq(
-            `Method 'sayMore' returned: (V1, 1)`,
-          );
+          this.logs.infos[this.logs.infos.length - 1].should.eq(`Method 'sayMore' returned: (V1, 1)`);
         });
       });
 
@@ -204,9 +192,7 @@ contract('call script', function(accounts) {
             methodArgs: [],
           });
 
-          this.logs.infos[this.logs.infos.length - 1].should.eq(
-            `Method 'sayNumbers' returned: []`,
-          );
+          this.logs.infos[this.logs.infos.length - 1].should.eq(`Method 'sayNumbers' returned: []`);
         });
 
         it('calls the method and logs the array', async function() {
@@ -230,9 +216,7 @@ contract('call script', function(accounts) {
             methodArgs: [],
           });
 
-          this.logs.infos[this.logs.infos.length - 1].should.eq(
-            `Method 'sayNumbers' returned: [1,2,3]`,
-          );
+          this.logs.infos[this.logs.infos.length - 1].should.eq(`Method 'sayNumbers' returned: [1,2,3]`);
         });
       });
     });

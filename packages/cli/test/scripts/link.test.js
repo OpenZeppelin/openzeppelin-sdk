@@ -13,9 +13,7 @@ contract('link script', function() {
   };
 
   beforeEach('setup', async function() {
-    this.projectFile = new ProjectFile(
-      'test/mocks/packages/package-with-stdlib.zos.json',
-    );
+    this.projectFile = new ProjectFile('test/mocks/packages/package-with-stdlib.zos.json');
     this.shouldHaveDependency = shouldHaveDependency.bind(this);
   });
 
@@ -62,9 +60,7 @@ contract('link script', function() {
     await link({
       dependencies: ['mock-stdlib-invalid@1.0.0'],
       projectFile: this.projectFile,
-    }).should.be.rejectedWith(
-      'Required dependency version 1.0.0 does not match version 2.0.0',
-    );
+    }).should.be.rejectedWith('Required dependency version 1.0.0 does not match version 2.0.0');
   });
 
   it('should install the dependency if a valid version range is requested', async function() {
@@ -89,9 +85,7 @@ contract('link script', function() {
     await link({
       dependencies: ['mock-stdlib@~1.0.0'],
       projectFile: this.projectFile,
-    }).should.be.rejectedWith(
-      'Required dependency version ~1.0.0 does not match version 1.1.0',
-    );
+    }).should.be.rejectedWith('Required dependency version ~1.0.0 does not match version 1.1.0');
   });
 
   it('should raise an error if requested version of dependency lacks manifestVersion identifier', async function() {

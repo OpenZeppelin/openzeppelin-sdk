@@ -12,9 +12,7 @@ contract('remove script', function() {
   const anotherContractAlias = 'WithLibraryImpl';
 
   beforeEach('setup', async function() {
-    this.projectFile = new ProjectFile(
-      'test/mocks/packages/package-with-contracts.zos.json',
-    );
+    this.projectFile = new ProjectFile('test/mocks/packages/package-with-contracts.zos.json');
   });
 
   beforeEach('capturing log output', function() {
@@ -28,9 +26,7 @@ contract('remove script', function() {
   it('should remove a contract', function() {
     remove({ contracts: [contractAlias], projectFile: this.projectFile });
     should.not.exist(this.projectFile.contract(contractAlias));
-    this.projectFile
-      .contract(anotherContractAlias)
-      .should.eq('WithLibraryImplV1');
+    this.projectFile.contract(anotherContractAlias).should.eq('WithLibraryImplV1');
   });
 
   it('should remove multiple contracts', function() {

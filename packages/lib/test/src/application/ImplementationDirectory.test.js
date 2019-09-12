@@ -22,35 +22,23 @@ contract('ImplementationDirectory', function(accounts) {
   });
 
   it('has an owner', async function() {
-    (await this.directory.directoryContract.methods
-      .owner()
-      .call()).should.be.equal(owner);
+    (await this.directory.directoryContract.methods.owner().call()).should.be.equal(owner);
   });
 
   it('can set new implementations', async function() {
     const implementation = await DummyImplementationV2.new();
-    await this.directory.setImplementation(
-      'DummyImplementation',
-      implementation.address,
-    );
+    await this.directory.setImplementation('DummyImplementation', implementation.address);
 
-    const currentImplementation = await this.directory.getImplementation(
-      'DummyImplementation',
-    );
+    const currentImplementation = await this.directory.getImplementation('DummyImplementation');
     currentImplementation.should.be.eq(implementation.address);
   });
 
   it('can unset implementations', async function() {
     const implementation = await DummyImplementationV2.new();
-    await this.directory.setImplementation(
-      'DummyImplementation',
-      implementation.address,
-    );
+    await this.directory.setImplementation('DummyImplementation', implementation.address);
     await this.directory.unsetImplementation('DummyImplementation');
 
-    const currentImplementation = await this.directory.getImplementation(
-      'DummyImplementation',
-    );
+    const currentImplementation = await this.directory.getImplementation('DummyImplementation');
     currentImplementation.should.be.zeroAddress;
   });
 

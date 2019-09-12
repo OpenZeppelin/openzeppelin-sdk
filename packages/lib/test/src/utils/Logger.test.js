@@ -4,19 +4,14 @@ require('../../setup');
 import sinon from 'sinon';
 import Spinners from 'spinnies';
 
-import {
-  Loggy,
-  SpinnerAction,
-  LogLevel,
-  LogType,
-} from '../../../src/utils/Logger';
+import { Loggy, SpinnerAction, LogLevel, LogType } from '../../../src/utils/Logger';
 
 describe('Logger', function() {
-  beforeEach(function () {
+  beforeEach(function() {
     Loggy.testing(false);
   });
 
-  afterEach('restore logger', function() {    
+  afterEach('restore logger', function() {
     Loggy.testing(true);
     Loggy.silent(false);
     Loggy.verbose(false);
@@ -46,13 +41,7 @@ describe('Logger', function() {
       });
     });
 
-    const shouldSetLogProperties = (
-      log,
-      logType,
-      logLevel,
-      spinnerAction,
-      message,
-    ) => {
+    const shouldSetLogProperties = (log, logType, logLevel, spinnerAction, message) => {
       log.should.deep.equal({
         file: 'filename',
         fnName: 'function',
@@ -63,20 +52,10 @@ describe('Logger', function() {
       });
     };
 
-    const shouldBehaveLikeSpinnerLog = (
-      spinnerAction,
-      method,
-      reference = 'reference',
-    ) => {
+    const shouldBehaveLikeSpinnerLog = (spinnerAction, method, reference = 'reference') => {
       it(`sets log and calls spinner#${method}`, function() {
         Loggy[method]('filename', 'function', reference, 'message');
-        shouldSetLogProperties(
-          Loggy.logs[reference],
-          LogType.Info,
-          LogLevel.Normal,
-          spinnerAction,
-          'message',
-        );
+        shouldSetLogProperties(Loggy.logs[reference], LogType.Info, LogLevel.Normal, spinnerAction, 'message');
         this.spyLogger.should.have.been.calledOnceWith(reference, {
           text: 'message',
           status: spinnerAction,
@@ -86,13 +65,7 @@ describe('Logger', function() {
       describe('warn', function() {
         it(`sets log and calls spinner#${method} with warn color`, function() {
           Loggy[method].warn('filename', 'function', reference, 'message');
-          shouldSetLogProperties(
-            Loggy.logs[reference],
-            LogType.Warn,
-            LogLevel.Normal,
-            spinnerAction,
-            'message',
-          );
+          shouldSetLogProperties(Loggy.logs[reference], LogType.Warn, LogLevel.Normal, spinnerAction, 'message');
           this.spyLogger.should.have.been.calledOnceWith(reference, {
             text: 'message',
             status: spinnerAction,
@@ -104,13 +77,7 @@ describe('Logger', function() {
       describe('error', function() {
         it(`sets log and calls spinner#${method} with error color`, function() {
           Loggy[method].error('filename', 'function', reference, 'message');
-          shouldSetLogProperties(
-            Loggy.logs[reference],
-            LogType.Err,
-            LogLevel.Normal,
-            spinnerAction,
-            'message',
-          );
+          shouldSetLogProperties(Loggy.logs[reference], LogType.Err, LogLevel.Normal, spinnerAction, 'message');
           this.spyLogger.should.have.been.calledOnceWith(reference, {
             text: 'message',
             status: spinnerAction,
@@ -190,11 +157,7 @@ describe('Logger', function() {
         });
 
         describe('noSpin', function() {
-          shouldBehaveLikeSpinnerLog(
-            SpinnerAction.NonSpinnable,
-            'noSpin',
-            'ref-update',
-          );
+          shouldBehaveLikeSpinnerLog(SpinnerAction.NonSpinnable, 'noSpin', 'ref-update');
         });
 
         describe('spin', function() {
@@ -213,16 +176,8 @@ describe('Logger', function() {
       describe('#add', function() {
         it(`sets log and calls console.error`, function() {
           Loggy.add('filename', 'function', 'reference', 'message');
-          shouldSetLogProperties(
-            Loggy.logs['reference'],
-            LogType.Info,
-            LogLevel.Normal,
-            SpinnerAction.Add,
-            'message',
-          );
-          this.spyLogger.should.have.been.calledOnceWith(
-            sinon.match(/<started> message/),
-          );
+          shouldSetLogProperties(Loggy.logs['reference'], LogType.Info, LogLevel.Normal, SpinnerAction.Add, 'message');
+          this.spyLogger.should.have.been.calledOnceWith(sinon.match(/<started> message/));
         });
       });
 
@@ -237,12 +192,8 @@ describe('Logger', function() {
             SpinnerAction.Succeed,
             'new message',
           );
-          this.spyLogger.should.have.been.calledWith(
-            sinon.match(/<started> message/),
-          );
-          this.spyLogger.should.have.been.calledWith(
-            sinon.match(/<succeeded> new message/),
-          );
+          this.spyLogger.should.have.been.calledWith(sinon.match(/<started> message/));
+          this.spyLogger.should.have.been.calledWith(sinon.match(/<succeeded> new message/));
         });
       });
 
@@ -257,12 +208,8 @@ describe('Logger', function() {
             SpinnerAction.Fail,
             'new message',
           );
-          this.spyLogger.should.have.been.calledWith(
-            sinon.match(/<started> message/),
-          );
-          this.spyLogger.should.have.been.calledWith(
-            sinon.match(/<failed> new message/),
-          );
+          this.spyLogger.should.have.been.calledWith(sinon.match(/<started> message/));
+          this.spyLogger.should.have.been.calledWith(sinon.match(/<failed> new message/));
         });
       });
     });

@@ -31,15 +31,11 @@ contract('Contracts', function() {
   describe('configuration', function() {
     it('has some default configuration', function() {
       Contracts.getSyncTimeout().should.be.eq(240000);
-      Contracts.getLocalBuildDir().should.be.eq(
-        `${process.cwd()}/build/contracts`,
-      );
-      Contracts.getLocalContractsDir().should.be.eq(
-        `${process.cwd()}/contracts`,
-      );
+      Contracts.getLocalBuildDir().should.be.eq(`${process.cwd()}/build/contracts`);
+      Contracts.getLocalContractsDir().should.be.eq(`${process.cwd()}/contracts`);
     });
 
-    describe('setting custom config', function () {
+    describe('setting custom config', function() {
       beforeEach(function() {
         this.previousTimeout = Contracts.getSyncTimeout();
         this.previousBuildDir = Contracts.getLocalBuildDir();

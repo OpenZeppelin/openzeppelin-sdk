@@ -12,13 +12,7 @@ const Package = Contracts.getFromLocal('Package');
 contract('Package', accounts => {
   accounts = accounts.map(utils.toChecksumAddress); // Required by Web3 v1.x.
 
-  const [
-    _,
-    owner,
-    anotherAddress,
-    contractAddress,
-    anotherContractAddress,
-  ] = accounts;
+  const [_, owner, anotherAddress, contractAddress, anotherContractAddress] = accounts;
 
   const version = [1, 0, 0];
   const anotherVersion = [2, 0, 0];
@@ -40,9 +34,7 @@ contract('Package', accounts => {
 
   describe('addVersion', function() {
     it('registers given implementation directory', async function() {
-      const { events } = await this.package.methods
-        .addVersion(version, contractAddress, contentURI)
-        .send({ from });
+      const { events } = await this.package.methods.addVersion(version, contractAddress, contentURI).send({ from });
 
       const {
         contractAddress: registeredDirectory,
@@ -59,12 +51,8 @@ contract('Package', accounts => {
     });
 
     it('registers multiple versions', async function() {
-      await this.package.methods
-        .addVersion(version, contractAddress, contentURI)
-        .send({ from });
-      await this.package.methods
-        .addVersion(anotherVersion, anotherContractAddress, anotherContentURI)
-        .send({ from });
+      await this.package.methods.addVersion(version, contractAddress, contentURI).send({ from });
+      await this.package.methods.addVersion(anotherVersion, anotherContractAddress, anotherContentURI).send({ from });
 
       const {
         contractAddress: newRegisteredDirectory,
@@ -75,9 +63,7 @@ contract('Package', accounts => {
     });
 
     it('accepts empty content URI', async function() {
-      await this.package.methods
-        .addVersion(version, contractAddress, Buffer.from(''))
-        .send({ from });
+      await this.package.methods.addVersion(version, contractAddress, Buffer.from('')).send({ from });
       const {
         contractAddress: _registeredDirectory,
         contentURI: registeredContentURI,
@@ -86,46 +72,28 @@ contract('Package', accounts => {
     });
 
     it('reverts if contract address is zero', async function() {
-      await assertRevert(
-        this.package.methods
-          .addVersion(version, ZERO_ADDRESS, contentURI)
-          .send({ from }),
-      );
+      await assertRevert(this.package.methods.addVersion(version, ZERO_ADDRESS, contentURI).send({ from }));
     });
 
     it('reverts if version is zero', async function() {
-      await assertRevert(
-        this.package.methods
-          .addVersion([0, 0, 0], contractAddress, contentURI)
-          .send({ from }),
-      );
+      await assertRevert(this.package.methods.addVersion([0, 0, 0], contractAddress, contentURI).send({ from }));
     });
 
     it('reverts if re-registering version', async function() {
-      await this.package.methods
-        .addVersion(version, contractAddress, contentURI)
-        .send({ from });
-      await assertRevert(
-        this.package.methods
-          .addVersion(version, anotherContractAddress, contentURI)
-          .send({ from }),
-      );
+      await this.package.methods.addVersion(version, contractAddress, contentURI).send({ from });
+      await assertRevert(this.package.methods.addVersion(version, anotherContractAddress, contentURI).send({ from }));
     });
 
     it('reverts if called from another address', async function() {
       await assertRevert(
-        this.package.methods
-          .addVersion(version, contractAddress, contentURI)
-          .send({ from: anotherAddress }),
+        this.package.methods.addVersion(version, contractAddress, contentURI).send({ from: anotherAddress }),
       );
     });
   });
 
   describe('getVersion', function() {
     it('returns the registered version', async function() {
-      await this.package.methods
-        .addVersion(version, contractAddress, contentURI)
-        .send({ from: owner });
+      await this.package.methods.addVersion(version, contractAddress, contentURI).send({ from: owner });
       const {
         contractAddress: registeredDirectory,
         contentURI: registeredContentURI,
@@ -146,28 +114,20 @@ contract('Package', accounts => {
 
   describe('getContract', function() {
     it('returns the registered contract', async function() {
-      await this.package.methods
-        .addVersion(version, contractAddress, contentURI)
-        .send({ from: owner });
-      const registeredDirectory = await this.package.methods
-        .getContract(version)
-        .call();
+      await this.package.methods.addVersion(version, contractAddress, contentURI).send({ from: owner });
+      const registeredDirectory = await this.package.methods.getContract(version).call();
       registeredDirectory.should.be.equal(contractAddress);
     });
 
     it('returns zero address if version is not registered', async function() {
-      const registeredDirectory = await this.package.methods
-        .getContract(version)
-        .call();
+      const registeredDirectory = await this.package.methods.getContract(version).call();
       registeredDirectory.should.be.zeroAddress;
     });
   });
 
   describe('hasVersion', function() {
     it('returns true if version is registered', async function() {
-      await this.package.methods
-        .addVersion(version, contractAddress, contentURI)
-        .send({ from: owner });
+      await this.package.methods.addVersion(version, contractAddress, contentURI).send({ from: owner });
       const hasVersion = await this.package.methods.hasVersion(version).call();
       hasVersion.should.be.true;
     });
@@ -191,9 +151,7 @@ contract('Package', accounts => {
     });
 
     it('returns full version info', async function() {
-      await this.package.methods
-        .addVersion(version, contractAddress, contentURI)
-        .send({ from });
+      await this.package.methods.addVersion(version, contractAddress, contentURI).send({ from });
       const {
         semanticVersion: registeredVersion,
         contractAddress: registeredDirectory,
@@ -206,18 +164,10 @@ contract('Package', accounts => {
 
     for (const latestVersion of [[2, 1, 5], [2, 2, 3], [3, 0, 3]]) {
       it(`returns latest version ${latestVersion}`, async function() {
-        await this.package.methods
-          .addVersion(latestVersion, contractAddress, contentURI)
-          .send({ from });
-        await this.package.methods
-          .addVersion([1, 0, 0], contractAddress, contentURI)
-          .send({ from });
-        await this.package.methods
-          .addVersion([2, 1, 4], contractAddress, contentURI)
-          .send({ from });
-        const {
-          semanticVersion: registeredVersion,
-        } = await this.package.methods.getLatest().call();
+        await this.package.methods.addVersion(latestVersion, contractAddress, contentURI).send({ from });
+        await this.package.methods.addVersion([1, 0, 0], contractAddress, contentURI).send({ from });
+        await this.package.methods.addVersion([2, 1, 4], contractAddress, contentURI).send({ from });
+        const { semanticVersion: registeredVersion } = await this.package.methods.getLatest().call();
         registeredVersion.should.be.semverEqual(latestVersion);
       });
     }
@@ -225,9 +175,7 @@ contract('Package', accounts => {
 
   describe('getLatestByMajor', function() {
     it('returns zero if no version for that major is registered', async function() {
-      await this.package.methods
-        .addVersion(version, contractAddress, contentURI)
-        .send({ from });
+      await this.package.methods.addVersion(version, contractAddress, contentURI).send({ from });
       const {
         semanticVersion: registeredVersion,
         contractAddress: registeredDirectory,
@@ -239,9 +187,7 @@ contract('Package', accounts => {
     });
 
     it('returns full version info', async function() {
-      await this.package.methods
-        .addVersion(version, contractAddress, contentURI)
-        .send({ from });
+      await this.package.methods.addVersion(version, contractAddress, contentURI).send({ from });
       const {
         semanticVersion: registeredVersion,
         contractAddress: registeredDirectory,
@@ -253,33 +199,17 @@ contract('Package', accounts => {
     });
 
     it('returns latest version by major', async function() {
-      await this.package.methods
-        .addVersion([3, 0, 0], contractAddress, contentURI)
-        .send({ from });
-      await this.package.methods
-        .addVersion([1, 0, 0], contractAddress, contentURI)
-        .send({ from });
-      await this.package.methods
-        .addVersion([1, 2, 0], contractAddress, contentURI)
-        .send({ from });
-      await this.package.methods
-        .addVersion([2, 4, 0], contractAddress, contentURI)
-        .send({ from });
-      await this.package.methods
-        .addVersion([2, 1, 0], contractAddress, contentURI)
-        .send({ from });
+      await this.package.methods.addVersion([3, 0, 0], contractAddress, contentURI).send({ from });
+      await this.package.methods.addVersion([1, 0, 0], contractAddress, contentURI).send({ from });
+      await this.package.methods.addVersion([1, 2, 0], contractAddress, contentURI).send({ from });
+      await this.package.methods.addVersion([2, 4, 0], contractAddress, contentURI).send({ from });
+      await this.package.methods.addVersion([2, 1, 0], contractAddress, contentURI).send({ from });
 
-      const {
-        semanticVersion: registeredVersionFor1,
-      } = await this.package.methods.getLatestByMajor(1).call();
+      const { semanticVersion: registeredVersionFor1 } = await this.package.methods.getLatestByMajor(1).call();
       registeredVersionFor1.should.be.semverEqual([1, 2, 0]);
-      const {
-        semanticVersion: registeredVersionFor2,
-      } = await this.package.methods.getLatestByMajor(2).call();
+      const { semanticVersion: registeredVersionFor2 } = await this.package.methods.getLatestByMajor(2).call();
       registeredVersionFor2.should.be.semverEqual([2, 4, 0]);
-      const {
-        semanticVersion: registeredVersionFor3,
-      } = await this.package.methods.getLatestByMajor(3).call();
+      const { semanticVersion: registeredVersionFor3 } = await this.package.methods.getLatestByMajor(3).call();
       registeredVersionFor3.should.be.semverEqual([3, 0, 0]);
     });
   });

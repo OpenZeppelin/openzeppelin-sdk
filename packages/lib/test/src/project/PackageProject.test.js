@@ -9,11 +9,7 @@ contract('PackageProject', function(accounts) {
   const version = '0.2.0';
 
   beforeEach('deploying', async function() {
-    this.project = await PackageProject.fetchOrDeploy(
-      version,
-      { from: owner },
-      {},
-    );
+    this.project = await PackageProject.fetchOrDeploy(version, { from: owner }, {});
   });
 
   shouldBehaveLikePackageProject({

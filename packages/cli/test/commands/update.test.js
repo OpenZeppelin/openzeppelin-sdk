@@ -22,19 +22,16 @@ describe('update command', function() {
     },
   );
 
-  itShouldParse(
-    'should call update script with contract name',
-    'update',
-    'zos update Impl --network test',
-    function(update) {
-      update.should.have.been.calledWith({
-        contractAlias: 'Impl',
-        network: 'test',
-        txParams: {},
-        methodArgs: [],
-      });
-    },
-  );
+  itShouldParse('should call update script with contract name', 'update', 'zos update Impl --network test', function(
+    update,
+  ) {
+    update.should.have.been.calledWith({
+      contractAlias: 'Impl',
+      network: 'test',
+      txParams: {},
+      methodArgs: [],
+    });
+  });
 
   itShouldParse(
     'should call update script with contract and package name',
@@ -51,19 +48,14 @@ describe('update command', function() {
     },
   );
 
-  itShouldParse(
-    'should call update script with address',
-    'update',
-    'zos update 0x80 --network test',
-    function(update) {
-      update.should.have.been.calledWith({
-        proxyAddress: '0x80',
-        network: 'test',
-        methodArgs: [],
-        txParams: {},
-      });
-    },
-  );
+  itShouldParse('should call update script with address', 'update', 'zos update 0x80 --network test', function(update) {
+    update.should.have.been.calledWith({
+      proxyAddress: '0x80',
+      network: 'test',
+      methodArgs: [],
+      txParams: {},
+    });
+  });
 
   itShouldParse(
     'should call update script without init params',

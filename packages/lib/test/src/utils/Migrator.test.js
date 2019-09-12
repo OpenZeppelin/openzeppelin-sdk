@@ -11,19 +11,11 @@ import { toSemanticVersion } from '../../../src/utils/Semver';
 const Package = Contracts.getFromLocal('Package');
 const DeprecatedApp = Contracts.getFromLocal('DeprecatedApp');
 const Proxy = Contracts.getFromLocal('DeprecatedAdminUpgradeabilityProxy');
-const ImplementationDirectory = Contracts.getFromLocal(
-  'ImplementationDirectory',
-);
+const ImplementationDirectory = Contracts.getFromLocal('ImplementationDirectory');
 const ImplV1 = Contracts.getFromLocal('DummyImplementation');
 
 contract('migrator', function(accounts) {
-  const [
-    _,
-    owner,
-    proxyAdminAddress,
-    anotherAccount,
-    anotherAddress,
-  ] = accounts.map(utils.toChecksumAddress);
+  const [_, owner, proxyAdminAddress, anotherAccount, anotherAddress] = accounts.map(utils.toChecksumAddress);
   const EMPTY_INITIALIZATION_DATA = Buffer.from('');
 
   before('initialize logic contracts', async function() {
@@ -36,24 +28,14 @@ contract('migrator', function(accounts) {
 
   beforeEach('initializing', async function() {
     this.directory = await ImplementationDirectory.new({ from: owner });
-    await this.directory.methods
-      .setImplementation(this.contractName, this.implV1)
-      .send({ from: owner });
+    await this.directory.methods.setImplementation(this.contractName, this.implV1).send({ from: owner });
     this.package = await Package.new({ from: owner });
     await this.package.methods
-      .addVersion(
-        toSemanticVersion(this.version),
-        this.directory.address,
-        this.contentURI,
-      )
+      .addVersion(toSemanticVersion(this.version), this.directory.address, this.contentURI)
       .send({ from: owner });
     this.app = await DeprecatedApp.new({ from: owner });
     await this.app.methods
-      .setPackage(
-        this.packageName,
-        this.package.address,
-        toSemanticVersion(this.version),
-      )
+      .setPackage(this.packageName, this.package.address, toSemanticVersion(this.version))
       .send({ from: owner });
     const { events } = await this.app.methods
       .create(this.packageName, this.contractName, EMPTY_INITIALIZATION_DATA)
@@ -67,9 +49,7 @@ contract('migrator', function(accounts) {
         await migrate(this.app.address, this.proxyAddress, proxyAdminAddress, {
           from: owner,
         });
-        (await this.app.methods
-          .getProxyAdmin(this.proxyAddress)
-          .call()).should.eq(proxyAdminAddress);
+        (await this.app.methods.getProxyAdmin(this.proxyAddress).call()).should.eq(proxyAdminAddress);
       });
     });
 

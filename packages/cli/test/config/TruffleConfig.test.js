@@ -78,10 +78,7 @@ contract('TruffleConfig', () => {
 
     context('when the requested network has default values', function() {
       beforeEach('create truffle config file', async function() {
-        FileSystem.write(
-          configFile,
-          "module.exports = { networks: { test: { gas: 1, gasPrice: 2, from: '0x0' } } }",
-        );
+        FileSystem.write(configFile, "module.exports = { networks: { test: { gas: 1, gasPrice: 2, from: '0x0' } } }");
         this.config = await TruffleConfig.loadNetworkConfig('test', true);
       });
 
@@ -95,25 +92,19 @@ contract('TruffleConfig', () => {
       });
     });
 
-    context(
-      'when the requested network does not have default values',
-      function() {
-        beforeEach('create truffle config file', async function() {
-          FileSystem.write(
-            configFile,
-            'module.exports = { networks: { test: { } } }',
-          );
-          this.config = await TruffleConfig.loadNetworkConfig('test', true);
-        });
+    context('when the requested network does not have default values', function() {
+      beforeEach('create truffle config file', async function() {
+        FileSystem.write(configFile, 'module.exports = { networks: { test: { } } }');
+        this.config = await TruffleConfig.loadNetworkConfig('test', true);
+      });
 
-        it('uses TruffleConfig default gas price', function() {
-          const { artifactDefaults } = this.config;
+      it('uses TruffleConfig default gas price', function() {
+        const { artifactDefaults } = this.config;
 
-          artifactDefaults.should.have.all.keys('gasPrice');
-          artifactDefaults.gasPrice.should.be.eq(20000000000);
-        });
-      },
-    );
+        artifactDefaults.should.have.all.keys('gasPrice');
+        artifactDefaults.gasPrice.should.be.eq(20000000000);
+      });
+    });
 
     context('when the truffle config file is corrupted', function() {
       beforeEach('create truffle config file', function() {
@@ -121,10 +112,9 @@ contract('TruffleConfig', () => {
       });
 
       it('throws an error', async function() {
-        await TruffleConfig.loadNetworkConfig(
-          'test',
-          true,
-        ).should.be.rejectedWith(/Could not load truffle configuration file./);
+        await TruffleConfig.loadNetworkConfig('test', true).should.be.rejectedWith(
+          /Could not load truffle configuration file./,
+        );
       });
     });
 

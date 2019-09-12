@@ -111,9 +111,7 @@ contract('query-deployment script', function([_, owner, another]) {
 
   describe('on unpublished project', function() {
     beforeEach('setup', async function() {
-      this.projectFile = new ProjectFile(
-        'test/mocks/packages/package-empty.zos.json',
-      );
+      this.projectFile = new ProjectFile('test/mocks/packages/package-empty.zos.json');
       this.projectFile.version = version;
       this.projectFile.publish = false;
     });
@@ -123,9 +121,7 @@ contract('query-deployment script', function([_, owner, another]) {
 
   describe('on published project', function() {
     beforeEach('setup', async function() {
-      this.projectFile = new ProjectFile(
-        'test/mocks/packages/package-empty.zos.json',
-      );
+      this.projectFile = new ProjectFile('test/mocks/packages/package-empty.zos.json');
       this.projectFile.version = version;
     });
 
