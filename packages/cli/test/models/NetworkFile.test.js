@@ -9,18 +9,12 @@ import { MANIFEST_VERSION } from '../../src/models/files/ManifestVersion';
 
 contract('NetworkFile', function() {
   beforeEach('loads parent package file', function() {
-    this.appProjectFile = new ProjectFile(
-      'test/mocks/packages/package-empty.zos.json',
-    );
+    this.appProjectFile = new ProjectFile('test/mocks/packages/package-empty.zos.json');
   });
 
   describe('constructor', function() {
     it('creates empty file', function() {
-      const file = new NetworkFile(
-        this.appProjectFile,
-        'test',
-        'test/mocks/networks/new.test.json',
-      );
+      const file = new NetworkFile(this.appProjectFile, 'test', 'test/mocks/networks/new.test.json');
       file.data.manifestVersion.should.eq(MANIFEST_VERSION);
     });
 
@@ -31,12 +25,8 @@ contract('NetworkFile', function() {
         'test/mocks/networks/network-app-with-contract.zos.test.json',
       );
       file.data.manifestVersion.should.eq(MANIFEST_VERSION);
-      file.packageAddress.should.eq(
-        '0x0000000000000000000000000000000000000080',
-      );
-      file.providerAddress.should.eq(
-        '0x0000000000000000000000000000000000000010',
-      );
+      file.packageAddress.should.eq('0x0000000000000000000000000000000000000080');
+      file.providerAddress.should.eq('0x0000000000000000000000000000000000000010');
       file.contract('Greeter').address.should.eq('0x1020');
     });
 

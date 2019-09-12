@@ -11,12 +11,7 @@ import queryDeployment from '../../src/scripts/query-deployment';
 
 const should = require('chai').should();
 
-contract('query-signed-deployment script', function([
-  _,
-  owner,
-  another,
-  admin,
-]) {
+contract('query-signed-deployment script', function([_, owner, another, admin]) {
   const network = 'test';
   const version = '0.4.0';
   const txParams = { from: owner };
@@ -42,12 +37,7 @@ contract('query-signed-deployment script', function([
         sender: helpers.signer,
       });
       const implementation = this.networkFile.contract(contractAlias).address;
-      const signature = helpers.signDeploy(
-        this.networkFile.proxyFactoryAddress,
-        this.salt,
-        implementation,
-        admin,
-      );
+      const signature = helpers.signDeploy(this.networkFile.proxyFactoryAddress, this.salt, implementation, admin);
 
       const address = await querySignedDeployment({
         signature,
@@ -73,8 +63,7 @@ contract('query-signed-deployment script', function([
         sender: helpers.signer,
       });
       const implementation = this.networkFile.contract(contractAlias).address;
-      const initData =
-        '0xfe4b84df000000000000000000000000000000000000000000000000000000000000001e';
+      const initData = '0xfe4b84df000000000000000000000000000000000000000000000000000000000000001e';
       const signature = helpers.signDeploy(
         this.networkFile.proxyFactoryAddress,
         this.salt,
@@ -100,9 +89,7 @@ contract('query-signed-deployment script', function([
 
   describe('on unpublished project', function() {
     beforeEach('setup', async function() {
-      this.projectFile = new ProjectFile(
-        'test/mocks/packages/package-with-contracts.zos.json',
-      );
+      this.projectFile = new ProjectFile('test/mocks/packages/package-with-contracts.zos.json');
       this.projectFile.version = version;
       this.projectFile.publish = false;
     });
@@ -112,9 +99,7 @@ contract('query-signed-deployment script', function([
 
   describe('on published project', function() {
     beforeEach('setup', async function() {
-      this.projectFile = new ProjectFile(
-        'test/mocks/packages/package-with-contracts.zos.json',
-      );
+      this.projectFile = new ProjectFile('test/mocks/packages/package-with-contracts.zos.json');
       this.projectFile.version = version;
       this.projectFile.publish = true;
     });

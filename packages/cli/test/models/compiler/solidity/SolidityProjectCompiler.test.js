@@ -2,13 +2,7 @@ require('../../../setup');
 
 import { FileSystem } from '@openzeppelin/upgrades';
 import { compileProject } from '../../../../src/models/compiler/solidity/SolidityProjectCompiler';
-import {
-  unlinkSync,
-  existsSync,
-  statSync,
-  utimesSync,
-  writeFileSync
-} from 'fs';
+import { unlinkSync, existsSync, statSync, utimesSync, writeFileSync } from 'fs';
 import path from 'path';
 import { writeJSONSync, readJSONSync } from 'fs-extra';
 
@@ -37,10 +31,7 @@ describe('SolidityProjectCompiler', function() {
 
     it('generates correct artifacts', function() {
       FileSystem.readDir(outputDir).forEach(schemaFileName => {
-        const contractName = schemaFileName.substring(
-          0,
-          schemaFileName.lastIndexOf('.'),
-        );
+        const contractName = schemaFileName.substring(0, schemaFileName.lastIndexOf('.'));
         const contractPath = `${inputDir}/${contractName}.sol`;
         const schemaPath = `${outputDir}/${schemaFileName}`;
         const schema = FileSystem.parseJson(schemaPath);
@@ -48,9 +39,7 @@ describe('SolidityProjectCompiler', function() {
         schema.fileName.should.be.eq(`${contractName}.sol`);
         schema.contractName.should.be.eq(contractName);
         schema.source.should.be.eq(FileSystem.read(contractPath));
-        schema.sourcePath.should.be.eq(
-          `test/mocks/mock-stdlib/contracts/${contractName}.sol`,
-        );
+        schema.sourcePath.should.be.eq(`test/mocks/mock-stdlib/contracts/${contractName}.sol`);
         schema.sourceMap.should.not.be.null;
         schema.abi.should.not.be.null;
         schema.ast.should.not.be.null;
@@ -66,9 +55,7 @@ describe('SolidityProjectCompiler', function() {
     it('replaces library names', function() {
       const schema = FileSystem.parseJson(greeterArtifactPath);
       schema.bytecode.should.match(/__GreeterLib____________________________/);
-      schema.deployedBytecode.should.match(
-        /__GreeterLib____________________________/,
-      );
+      schema.deployedBytecode.should.match(/__GreeterLib____________________________/);
     });
 
     it('does not recompile if there were no changes to sources', async function() {
@@ -89,9 +76,7 @@ describe('SolidityProjectCompiler', function() {
       await compileProject({ inputDir, outputDir, version: '0.5.0' });
       statSync(greeterArtifactPath).mtimeMs.should.not.eq(origMtime);
       const schema = FileSystem.parseJson(greeterArtifactPath);
-      schema.compiler.version.should.eq(
-        '0.5.0+commit.1d4f565a.Emscripten.clang',
-      );
+      schema.compiler.version.should.eq('0.5.0+commit.1d4f565a.Emscripten.clang');
     });
 
     it('recompiles if compiler settings changed', async function() {
@@ -109,41 +94,36 @@ describe('SolidityProjectCompiler', function() {
     });
 
     it('outputs friendly error on invalid import', async function() {
-      writeFileSync(
-        `${inputDir}/Invalid.sol`,
-        'pragma solidity ^0.5.0; import "./NotExists.sol";',
-      );
-      await compileProject({ inputDir, outputDir }).should.be.rejectedWith(
-        /could not find file \.\/NotExists\.sol/i,
-      );
+      writeFileSync(`${inputDir}/Invalid.sol`, 'pragma solidity ^0.5.0; import "./NotExists.sol";');
+      await compileProject({ inputDir, outputDir }).should.be.rejectedWith(/could not find file \.\/NotExists\.sol/i);
     });
 
     // For more info, see: https://github.com/zeppelinos/zos/issues/1071
-    it('preserves truffle deployment info', async function () {
+    it('preserves truffle deployment info', async function() {
       const networksData = {
-        "100001": {
-          "address": "0x63b52a2f619537f553e5097b8866c0f4ebec62ee",
-          "links": {},
-          "events": {},
-          "updated_at": 1563287608947
+        '100001': {
+          address: '0x63b52a2f619537f553e5097b8866c0f4ebec62ee',
+          links: {},
+          events: {},
+          updated_at: 1563287608947,
         },
-        "100002": {
-          "address": "0x63b52a2f619537f553e5097b8866c0f4ebec62ef",
-          "links": {},
-          "events": {},
-          "updated_at": 1563287608948
-        }
+        '100002': {
+          address: '0x63b52a2f619537f553e5097b8866c0f4ebec62ef',
+          links: {},
+          events: {},
+          updated_at: 1563287608948,
+        },
       };
 
       // Add networks data to compiled artifact
       writeJSONSync(greeterArtifactPath, {
-        ... readJSONSync(greeterArtifactPath),
-        networks: networksData
+        ...readJSONSync(greeterArtifactPath),
+        networks: networksData,
       });
-  
+
       // Force recompile
       await compileProject({ inputDir, outputDir, force: true });
-      
+
       // Artifact should have been compiled and deployment info preserved
       const schema = readJSONSync(greeterArtifactPath);
       schema.abi.should.be.not.null;
@@ -198,9 +178,7 @@ describe('SolidityProjectCompiler', function() {
       FileSystem.exists(greeterArtifactPath).should.be.true;
       const schema = FileSystem.parseJson(greeterArtifactPath);
       schema.bytecode.should.not.be.null;
-      schema.sourcePath.should.be.eq(
-        `test/mocks/mock-stdlib with spaces/contracts/GreeterImpl.sol`,
-      );
+      schema.sourcePath.should.be.eq(`test/mocks/mock-stdlib with spaces/contracts/GreeterImpl.sol`);
     });
   });
 
@@ -233,7 +211,7 @@ describe('SolidityProjectCompiler', function() {
       await compileProject({ inputDir, outputDir, version: '0.5.9' });
     });
 
-    afterEach(function () {
+    afterEach(function() {
       process.chdir(this.cwd);
     });
   });

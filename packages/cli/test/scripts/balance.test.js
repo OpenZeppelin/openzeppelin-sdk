@@ -24,9 +24,7 @@ contract('balance script', function(accounts) {
   describe('get balance', function() {
     context('when not specifying an account address', function() {
       it('throws an error', async function() {
-        await balance({}).should.be.rejectedWith(
-          'An account address must be specified.',
-        );
+        await balance({}).should.be.rejectedWith('An account address must be specified.');
       });
     });
 
@@ -67,9 +65,7 @@ contract('balance script', function(accounts) {
       context('when it is an ERC20Detailed', function() {
         beforeEach('setup', async function() {
           this.erc20Detailed = await ERC20Detailed.new('MyToken', 'TKN', 10);
-          await this.erc20Detailed.methods
-            .giveAway(accountAddress, 15e10)
-            .send();
+          await this.erc20Detailed.methods.giveAway(accountAddress, 15e10).send();
         });
 
         it('logs the balance formatting the output with decimals and shows symbol', async function() {

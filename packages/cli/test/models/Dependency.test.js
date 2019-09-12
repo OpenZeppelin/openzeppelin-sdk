@@ -16,12 +16,12 @@ contract('Dependency', function([_, from]) {
     });
 
     describe('#fetchVersionFromNpm', function() {
-      it('fetches version from npm', async function () {
+      it('fetches version from npm', async function() {
         const actual = await Dependency.fetchVersionFromNpm('zos');
         actual.should.match(/^zos@\^2\.\d+\.0$/);
       });
 
-      it('fetches version from npm for org package', async function () {
+      it('fetches version from npm for org package', async function() {
         const actual = await Dependency.fetchVersionFromNpm('@openzeppelin/cli');
         actual.should.match(/^@openzeppelin\/cli@\^\d+\.\d+\.0$/);
       });
@@ -30,9 +30,7 @@ contract('Dependency', function([_, from]) {
     describe('#fromNameAndVersion', function() {
       describe('with invalid nameAndVersion', function() {
         it('throws error', function() {
-          expect(
-            () => Dependency.fromNameWithVersion('bildts-kcom')
-          ).to.throw(/Could not find dependency bildts-kcom/);
+          expect(() => Dependency.fromNameWithVersion('bildts-kcom')).to.throw(/Could not find dependency bildts-kcom/);
         });
       });
 
@@ -42,24 +40,24 @@ contract('Dependency', function([_, from]) {
       });
     });
 
-    describe('#splitNameAndVersion', function () {
-      it('parses package name', function () {
+    describe('#splitNameAndVersion', function() {
+      it('parses package name', function() {
         Dependency.splitNameAndVersion('foo').should.deep.eq(['foo', undefined]);
       });
 
-      it('parses package name and version', function () {
+      it('parses package name and version', function() {
         Dependency.splitNameAndVersion('foo@1.2.3').should.deep.eq(['foo', '1.2.3']);
       });
 
-      it('parses organization package', function () {
+      it('parses organization package', function() {
         Dependency.splitNameAndVersion('@org/foo').should.deep.eq(['@org/foo', undefined]);
       });
 
-      it('parses organization package with version', function () {
+      it('parses organization package with version', function() {
         Dependency.splitNameAndVersion('@org/foo@1.2.3').should.deep.eq(['@org/foo', '1.2.3']);
       });
 
-      it('parses organization package with version and prerelease tag', function () {
+      it('parses organization package with version and prerelease tag', function() {
         Dependency.splitNameAndVersion('@org/foo@1.2.3-rc.1').should.deep.eq(['@org/foo', '1.2.3-rc.1']);
       });
     });
@@ -71,10 +69,7 @@ contract('Dependency', function([_, from]) {
         const npmParams = { save: true, cwd: process.cwd() };
 
         await Dependency.installFn(nameAndVersion);
-        npmInstallStub.should.have.been.calledWithExactly(
-          [nameAndVersion],
-          npmParams,
-        );
+        npmInstallStub.should.have.been.calledWithExactly([nameAndVersion], npmParams);
         sinon.restore();
       });
     });
@@ -83,9 +78,9 @@ contract('Dependency', function([_, from]) {
       context('when there are dependencies to deploy', function() {
         it('returns true', function() {
           Dependency.hasDependenciesForDeploy(
-            'test', 
+            'test',
             'test/mocks/packages/package-with-multiple-stdlibs.zos.json',
-            'test/mocks/networks/network-with-stdlibs.zos.test.json'
+            'test/mocks/networks/network-with-stdlibs.zos.test.json',
           ).should.be.true;
         });
       });
@@ -93,9 +88,9 @@ contract('Dependency', function([_, from]) {
       context('when all dependencies are already deployed', function() {
         it('returns false', function() {
           Dependency.hasDependenciesForDeploy(
-            'test', 
+            'test',
             'test/mocks/packages/package-with-stdlib.zos.json',
-            'test/mocks/networks/network-with-stdlibs.zos.test.json'
+            'test/mocks/networks/network-with-stdlibs.zos.test.json',
           ).should.be.false;
         });
       });
@@ -103,9 +98,9 @@ contract('Dependency', function([_, from]) {
       context.skip('when there are dependencies to update', function() {
         it('returns true', function() {
           Dependency.hasDependenciesForDeploy(
-            'test', 
+            'test',
             'test/mocks/packages/package-with-stdlib.zos.json',
-            'test/mocks/networks/network-with-older-stdlibs.zos.test.json'
+            'test/mocks/networks/network-with-older-stdlibs.zos.test.json',
           ).should.be.true;
         });
       });
@@ -115,25 +110,19 @@ contract('Dependency', function([_, from]) {
   describe('#constructor', function() {
     context('with invalid version', function() {
       it('throws an error', function() {
-        expect(
-          () => new Dependency('mock-stdlib', '1.2.0')
-        ).to.throw(/does not match version/);
+        expect(() => new Dependency('mock-stdlib', '1.2.0')).to.throw(/does not match version/);
       });
     });
 
     context('with non-existent dependency name', function() {
       it('throws an error', function() {
-        expect(
-          () => new Dependency('bildts-kcom', '1.1.0')
-        ).to.throw(/Could not find dependency bildts-kcom/);
+        expect(() => new Dependency('bildts-kcom', '1.1.0')).to.throw(/Could not find dependency bildts-kcom/);
       });
     });
 
     context('with non-ethereum package', function() {
       it('throws an error', function() {
-        expect(
-          () => new Dependency('chai')
-        ).to.throw(/Could not find an \.openzeppelin\/project\.json/);
+        expect(() => new Dependency('chai')).to.throw(/Could not find an \.openzeppelin\/project\.json/);
       });
     });
 
@@ -186,9 +175,9 @@ contract('Dependency', function([_, from]) {
       describe('#getNetworkFile', function() {
         context('for a non-existent network', function() {
           it('throws an error', function() {
-            expect(
-              () => this.dependency.getNetworkFile('bildts-kcom')
-            ).to.throw(/Could not find a project file for network/);
+            expect(() => this.dependency.getNetworkFile('bildts-kcom')).to.throw(
+              /Could not find a project file for network/,
+            );
           });
         });
 

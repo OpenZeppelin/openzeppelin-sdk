@@ -36,7 +36,7 @@ describe('unpack script', function() {
       .once()
       .withExactArgs('origin', url);
     gitMock.expects('fetch');
-    
+
     sinon.stub(cache, 'simple-git/promise').returns(git);
 
     sinon.stub(child, 'exec').returns(Promise.resolve());
@@ -59,9 +59,8 @@ describe('unpack script', function() {
     gitMock.restore();
   });
 
-  context('on default branch', function () {
-
-    beforeEach(function () {
+  context('on default branch', function() {
+    beforeEach(function() {
       sinon.stub(this.git, 'pull');
     });
 
@@ -141,16 +140,16 @@ describe('unpack script', function() {
     });
   });
 
-  context('on custom branch', function () {
-
-    it('should checkout a specified branch', async function () {
+  context('on custom branch', function() {
+    it('should checkout a specified branch', async function() {
       gitMock
         .expects('pull')
         .once()
         .withExactArgs('origin', 'feature/foobar');
-      
-      axios.get.restore();    
-      sinon.stub(axios, 'get')
+
+      axios.get.restore();
+      sinon
+        .stub(axios, 'get')
         .withArgs(url.replace('.git', '/feature/foobar/kit.json').replace('github.com', 'raw.githubusercontent.com'))
         .returns(
           Promise.resolve({
@@ -162,21 +161,22 @@ describe('unpack script', function() {
       gitMock.verify();
     });
 
-    it('should checkout only files specified in a config from a specified branch', async function () {
+    it('should checkout only files specified in a config from a specified branch', async function() {
       gitMock
         .expects('checkout')
         .once()
         .withExactArgs(['origin/feature/foobar', '--', 'hello', 'second']);
-      
-      axios.get.restore();    
-      sinon.stub(axios, 'get')
+
+      axios.get.restore();
+      sinon
+        .stub(axios, 'get')
         .withArgs(url.replace('.git', '/feature/foobar/kit.json').replace('github.com', 'raw.githubusercontent.com'))
         .returns(
           Promise.resolve({
             data: {
               ...properConfig,
               files: ['hello', 'second'],
-            }
+            },
           }),
         );
 

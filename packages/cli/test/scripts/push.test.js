@@ -2,14 +2,7 @@
 require('../setup');
 
 const zosLib = require('@openzeppelin/upgrades');
-import {
-  ZWeb3,
-  Contracts,
-  App,
-  Package,
-  ProxyAdmin,
-  ProxyFactory,
-} from '@openzeppelin/upgrades';
+import { ZWeb3, Contracts, App, Package, ProxyAdmin, ProxyFactory } from '@openzeppelin/upgrades';
 
 import sinon from 'sinon';
 import push from '../../src/scripts/push';
@@ -26,10 +19,7 @@ const should = require('chai').should();
 
 const ImplV1 = Contracts.getFromLocal('ImplV1');
 const WithLibraryImplV1 = Contracts.getFromLocal('WithLibraryImplV1');
-const ImplementationDirectory = Contracts.getFromNodeModules(
-  '@openzeppelin/upgrades',
-  'ImplementationDirectory',
-);
+const ImplementationDirectory = Contracts.getFromNodeModules('@openzeppelin/upgrades', 'ImplementationDirectory');
 
 contract('push script', function([_, owner]) {
   const network = 'test';
@@ -54,11 +44,8 @@ contract('push script', function([_, owner]) {
 
   const shouldDeployProvider = function() {
     it('should deploy provider at specified address', async function() {
-      const directory = ImplementationDirectory.at(
-        this.networkFile.providerAddress,
-      );
-      (await directory.methods.getImplementation('foo').call()).should.be
-        .zeroAddress;
+      const directory = ImplementationDirectory.at(this.networkFile.providerAddress);
+      (await directory.methods.getImplementation('foo').call()).should.be.zeroAddress;
     });
   };
 
@@ -70,10 +57,7 @@ contract('push script', function([_, owner]) {
       address.should.be.nonzeroAddress;
 
       const app = await App.fetch(address);
-      const hasPackage = await app.hasPackage(
-        this.networkFile.projectFile.name,
-        defaultVersion,
-      );
+      const hasPackage = await app.hasPackage(this.networkFile.projectFile.name, defaultVersion);
       hasPackage.should.be.true;
     });
   };
@@ -99,9 +83,7 @@ contract('push script', function([_, owner]) {
       const address = this.networkFile.solidityLib('UintLib').address;
       const code = await ZWeb3.getCode(address);
       const uintLib = Contracts.getFromLocal('UintLib');
-      code.length.should
-        .eq(uintLib.schema.deployedBytecode.length)
-        .and.be.greaterThan(40);
+      code.length.should.eq(uintLib.schema.deployedBytecode.length).and.be.greaterThan(40);
     });
 
     it('should deploy and link contracts that require libraries', async function() {
@@ -116,18 +98,14 @@ contract('push script', function([_, owner]) {
     it('should register instances in directory', async function() {
       const address = this.networkFile.contract('Impl').address;
       const _package = Package.fetch(this.networkFile.package.address);
-      (await _package.getImplementation(defaultVersion, 'Impl')).should.eq(
-        address,
-      );
+      (await _package.getImplementation(defaultVersion, 'Impl')).should.eq(address);
     });
   };
 
   const shouldRedeployContracts = function() {
     beforeEach('loading previous addresses', function() {
       this.previousAddress = this.networkFile.contract('Impl').address;
-      this.withLibraryPreviousAddress = this.networkFile.contract(
-        'WithLibraryImpl',
-      ).address;
+      this.withLibraryPreviousAddress = this.networkFile.contract('WithLibraryImpl').address;
     });
 
     it('should not redeploy contracts if unmodified', async function() {
@@ -142,32 +120,24 @@ contract('push script', function([_, owner]) {
         txParams,
         reupload: true,
       });
-      this.networkFile
-        .contract('Impl')
-        .address.should.not.eq(this.previousAddress);
+      this.networkFile.contract('Impl').address.should.not.eq(this.previousAddress);
     });
 
     it('should redeploy contracts if modified', async function() {
       modifyBytecode.call(this, 'Impl');
       await push({ networkFile: this.networkFile, network, txParams });
-      this.networkFile
-        .contract('Impl')
-        .address.should.not.eq(this.previousAddress);
+      this.networkFile.contract('Impl').address.should.not.eq(this.previousAddress);
     });
 
     it('should redeploy contracts if library is modified', async function() {
       modifyLibraryBytecode.call(this, 'UintLib');
       await push({ networkFile: this.networkFile, network, txParams });
-      this.networkFile
-        .contract('WithLibraryImpl')
-        .address.should.not.eq(this.withLibraryPreviousAddress);
+      this.networkFile.contract('WithLibraryImpl').address.should.not.eq(this.withLibraryPreviousAddress);
     });
 
     it('should not redeploy contracts if library is unmodified', async function() {
       await push({ networkFile: this.networkFile, network, txParams });
-      this.networkFile
-        .contract('WithLibraryImpl')
-        .address.should.eq(this.withLibraryPreviousAddress);
+      this.networkFile.contract('WithLibraryImpl').address.should.eq(this.withLibraryPreviousAddress);
     });
 
     context('validations', function() {
@@ -182,9 +152,7 @@ contract('push script', function([_, owner]) {
           network,
           txParams,
         }).should.be.rejectedWith(/have validation errors/);
-        this.networkFile
-          .contract('Impl')
-          .address.should.eq(this.previousAddress);
+        this.networkFile.contract('Impl').address.should.eq(this.previousAddress);
       });
 
       it('should redeploy contract ignoring warnings', async function() {
@@ -194,38 +162,28 @@ contract('push script', function([_, owner]) {
           network,
           txParams,
         });
-        this.networkFile
-          .contract('Impl')
-          .address.should.not.eq(this.previousAddress);
+        this.networkFile.contract('Impl').address.should.not.eq(this.previousAddress);
       });
 
       it('should refuse to redeploy a contract if validation throws', async function() {
-        sinon
-          .stub(zosLib, 'validate')
-          .throws(new Error('Stubbed error during contract validation'));
+        sinon.stub(zosLib, 'validate').throws(new Error('Stubbed error during contract validation'));
         await push({
           networkFile: this.networkFile,
           network,
           txParams,
         }).should.be.rejectedWith(/have validation errors/);
-        this.networkFile
-          .contract('Impl')
-          .address.should.eq(this.previousAddress);
+        this.networkFile.contract('Impl').address.should.eq(this.previousAddress);
       });
 
       it('should redeploy contract skipping errors', async function() {
-        sinon
-          .stub(zosLib, 'validate')
-          .throws(new Error('Stubbed error during contract validation'));
+        sinon.stub(zosLib, 'validate').throws(new Error('Stubbed error during contract validation'));
         await push({
           force: true,
           networkFile: this.networkFile,
           network,
           txParams,
         });
-        this.networkFile
-          .contract('Impl')
-          .address.should.not.eq(this.previousAddress);
+        this.networkFile.contract('Impl').address.should.not.eq(this.previousAddress);
       });
 
       afterEach(function() {
@@ -253,9 +211,7 @@ contract('push script', function([_, owner]) {
           networkFile: this.networkFile,
           network,
           txParams,
-        }).should.be.rejectedWith(
-          /One or more contracts have validation errors/i,
-        );
+        }).should.be.rejectedWith(/One or more contracts have validation errors/i);
 
         this.logs.errors.should.have.lengthOf(1);
         this.logs.errors[0].should.match(/constructor/i);
@@ -291,8 +247,7 @@ contract('push script', function([_, owner]) {
           txParams,
           force: true,
         });
-        const previousAddress = this.networkFile.contract('WithConstructor')
-          .address;
+        const previousAddress = this.networkFile.contract('WithConstructor').address;
 
         this.logs.clear();
         modifyBytecode.call(this, 'WithConstructor');
@@ -321,9 +276,7 @@ contract('push script', function([_, owner]) {
         await push({ networkFile: this.networkFile, network, txParams });
 
         this.logs.errors.should.have.lengthOf(0);
-        this.networkFile
-          .contract('Impl')
-          .address.should.not.eq(previousAddress);
+        this.networkFile.contract('Impl').address.should.not.eq(previousAddress);
       });
     });
   };
@@ -349,9 +302,7 @@ contract('push script', function([_, owner]) {
       await push({ networkFile: this.networkFile, network, txParams });
 
       const _package = Package.fetch(this.networkFile.package.address);
-      (await _package.getDirectory('1.2.0')).address.should.eq(
-        this.networkFile.providerAddress,
-      );
+      (await _package.getDirectory('1.2.0')).address.should.eq(this.networkFile.providerAddress);
     });
 
     it('should upload contracts to new directory when bumping version', async function() {
@@ -362,9 +313,7 @@ contract('push script', function([_, owner]) {
       await push({ networkFile: this.networkFile, network, txParams });
       const implementationAddress = this.networkFile.contract('Impl').address;
       const _package = Package.fetch(this.networkFile.package.address);
-      (await _package.getImplementation('1.2.0', 'Impl')).should.eq(
-        implementationAddress,
-      );
+      (await _package.getImplementation('1.2.0', 'Impl')).should.eq(implementationAddress);
     });
 
     it('should set frozen back to false', async function() {
@@ -399,8 +348,7 @@ contract('push script', function([_, owner]) {
 
       if (unregisterFromDirectory) {
         const _package = Package.fetch(this.networkFile.package.address);
-        (await _package.getImplementation(defaultVersion, 'Impl')).should.be
-          .zeroAddress;
+        (await _package.getImplementation(defaultVersion, 'Impl')).should.be.zeroAddress;
       }
       should.not.exist(this.networkFile.contract('Impl'));
     });
@@ -430,15 +378,11 @@ contract('push script', function([_, owner]) {
       const newVersion = '1.2.0';
 
       beforeEach('deploying new dependency version', async function() {
-        const mockStdlibPackage = new ProjectFile(
-          'test/mocks/mock-stdlib/zos.json',
-        );
+        const mockStdlibPackage = new ProjectFile('test/mocks/mock-stdlib/zos.json');
         mockStdlibPackage.version = newVersion;
-        sinon
-          .stub(Dependency.prototype, 'projectFile')
-          .get(function getterFn() {
-            return mockStdlibPackage;
-          });
+        sinon.stub(Dependency.prototype, 'projectFile').get(function getterFn() {
+          return mockStdlibPackage;
+        });
 
         await this.dependencyPackage.newVersion(newVersion);
         this.dependencyGetNetworkFileStub.callsFake(() => ({
@@ -496,10 +440,7 @@ contract('push script', function([_, owner]) {
       const dependency = Dependency.fromNameWithVersion('mock-stdlib@1.1.0');
       this.dependencyProject = await dependency.deploy();
       this.dependencyPackage = await this.dependencyProject.getProjectPackage();
-      this.dependencyGetNetworkFileStub = sinon.stub(
-        Dependency.prototype,
-        'getNetworkFile',
-      );
+      this.dependencyGetNetworkFileStub = sinon.stub(Dependency.prototype, 'getNetworkFile');
       this.dependencyGetNetworkFileStub.callsFake(() => ({
         packageAddress: this.dependencyPackage.address,
         version: '1.1.0',
@@ -533,9 +474,7 @@ contract('push script', function([_, owner]) {
       it('should deploy proxy factory', async function() {
         const proxyFactoryAddress = this.networkFile.proxyFactoryAddress;
         should.exist(proxyFactoryAddress);
-        const deploymentAddress = await ProxyFactory.fetch(
-          proxyFactoryAddress,
-        ).getDeploymentAddress('42');
+        const deploymentAddress = await ProxyFactory.fetch(proxyFactoryAddress).getDeploymentAddress('42');
         deploymentAddress.should.be.nonzeroAddress;
       });
 
@@ -557,9 +496,7 @@ contract('push script', function([_, owner]) {
 
   describe('an empty app', function() {
     beforeEach('setting package-empty', async function() {
-      const projectFile = new ProjectFile(
-        'test/mocks/packages/package-empty.zos.json',
-      );
+      const projectFile = new ProjectFile('test/mocks/packages/package-empty.zos.json');
       this.networkFile = new NetworkFile(projectFile, network);
     });
 
@@ -577,18 +514,14 @@ contract('push script', function([_, owner]) {
 
   describe('an app with contracts', function() {
     beforeEach('setting package-with-contracts', async function() {
-      const projectFile = new ProjectFile(
-        'test/mocks/packages/package-with-contracts.zos.json',
-      );
+      const projectFile = new ProjectFile('test/mocks/packages/package-with-contracts.zos.json');
       this.networkFile = new NetworkFile(projectFile, network);
     });
 
     describe('on push', function() {
       beforeEach('pushing', async function() {
         await push({ network, txParams, networkFile: this.networkFile });
-        const newProjectFile = new ProjectFile(
-          'test/mocks/packages/package-with-contracts-v2.zos.json',
-        );
+        const newProjectFile = new ProjectFile('test/mocks/packages/package-with-contracts-v2.zos.json');
         this.newNetworkFile = new NetworkFile(newProjectFile, network);
       });
 
@@ -615,9 +548,7 @@ contract('push script', function([_, owner]) {
 
   describe('an app with invalid contracts', function() {
     beforeEach('pushing package-with-invalid-contracts', async function() {
-      const projectFile = new ProjectFile(
-        'test/mocks/packages/package-with-invalid-contracts.zos.json',
-      );
+      const projectFile = new ProjectFile('test/mocks/packages/package-with-invalid-contracts.zos.json');
       this.networkFile = new NetworkFile(projectFile, network);
 
       await push({
@@ -637,9 +568,7 @@ contract('push script', function([_, owner]) {
 
     describe('when using a valid dependency', function() {
       beforeEach('pushing package-stdlib', async function() {
-        const projectFile = new ProjectFile(
-          'test/mocks/packages/package-with-stdlib.zos.json',
-        );
+        const projectFile = new ProjectFile('test/mocks/packages/package-with-stdlib.zos.json');
         this.networkFile = new NetworkFile(projectFile, network);
 
         await push({ networkFile: this.networkFile, network, txParams });
@@ -652,9 +581,7 @@ contract('push script', function([_, owner]) {
 
     describe('when using a dependency with a version range', function() {
       beforeEach('pushing package-stdlib-range', async function() {
-        const projectFile = new ProjectFile(
-          'test/mocks/packages/package-with-stdlib-range.zos.json',
-        );
+        const projectFile = new ProjectFile('test/mocks/packages/package-with-stdlib-range.zos.json');
         this.networkFile = new NetworkFile(projectFile, network);
 
         await push({ networkFile: this.networkFile, network, txParams });
@@ -669,9 +596,7 @@ contract('push script', function([_, owner]) {
   describe('an app with invalid dependency', function() {
     describe('when using an invalid dependency', function() {
       beforeEach('building network file', async function() {
-        const projectFile = new ProjectFile(
-          'test/mocks/packages/package-with-invalid-stdlib.zos.json',
-        );
+        const projectFile = new ProjectFile('test/mocks/packages/package-with-invalid-stdlib.zos.json');
         this.networkFile = new NetworkFile(projectFile, network);
       });
 
@@ -680,17 +605,13 @@ contract('push script', function([_, owner]) {
           network,
           txParams,
           networkFile: this.networkFile,
-        }).should.be.rejectedWith(
-          /Required dependency version 1.0.0 does not match version 2.0.0/,
-        );
+        }).should.be.rejectedWith(/Required dependency version 1.0.0 does not match version 2.0.0/);
       });
     });
 
     describe('when using an undeployed dependency', function() {
       beforeEach('building network file', async function() {
-        const projectFile = new ProjectFile(
-          'test/mocks/packages/package-with-undeployed-stdlib.zos.json',
-        );
+        const projectFile = new ProjectFile('test/mocks/packages/package-with-undeployed-stdlib.zos.json');
         this.networkFile = new NetworkFile(projectFile, network);
       });
 
@@ -699,17 +620,13 @@ contract('push script', function([_, owner]) {
           network,
           txParams,
           networkFile: this.networkFile,
-        }).should.be.rejectedWith(
-          /Could not find a project file for network 'test' for 'mock-stdlib-undeployed'/,
-        );
+        }).should.be.rejectedWith(/Could not find a project file for network 'test' for 'mock-stdlib-undeployed'/);
       });
     });
 
     describe('when using an unpublished dependency', function() {
       beforeEach('building network file', async function() {
-        const projectFile = new ProjectFile(
-          'test/mocks/packages/package-with-unpublished-stdlib.zos.json',
-        );
+        const projectFile = new ProjectFile('test/mocks/packages/package-with-unpublished-stdlib.zos.json');
         this.networkFile = new NetworkFile(projectFile, network);
       });
 
@@ -740,9 +657,7 @@ contract('push script', function([_, owner]) {
 
   describe('an empty unpublished project', function() {
     beforeEach('pushing package-empty-lite', async function() {
-      const projectFile = new ProjectFile(
-        'test/mocks/packages/package-empty-lite.zos.json',
-      );
+      const projectFile = new ProjectFile('test/mocks/packages/package-empty-lite.zos.json');
       this.networkFile = new NetworkFile(projectFile, network);
     });
 
@@ -758,9 +673,7 @@ contract('push script', function([_, owner]) {
 
   describe('an unpublished project with contracts', function() {
     beforeEach('setting package-with-contracts', async function() {
-      const projectFile = new ProjectFile(
-        'test/mocks/packages/package-with-contracts.zos.json',
-      );
+      const projectFile = new ProjectFile('test/mocks/packages/package-with-contracts.zos.json');
       projectFile.publish = false;
       this.networkFile = new NetworkFile(projectFile, network);
     });
@@ -794,9 +707,7 @@ contract('push script', function([_, owner]) {
     deployingDependency();
 
     beforeEach('pushing package-with-stdlib', async function() {
-      const projectFile = new ProjectFile(
-        'test/mocks/packages/package-with-stdlib.zos.json',
-      );
+      const projectFile = new ProjectFile('test/mocks/packages/package-with-stdlib.zos.json');
       projectFile.publish = false;
       this.networkFile = new NetworkFile(projectFile, network);
 
@@ -811,9 +722,7 @@ contract('push script', function([_, owner]) {
     deployingDependency();
 
     beforeEach('setting package-with-stdlib with two libs', async function() {
-      const projectFile = new ProjectFile(
-        'test/mocks/packages/package-with-stdlib.zos.json',
-      );
+      const projectFile = new ProjectFile('test/mocks/packages/package-with-stdlib.zos.json');
       projectFile.publish = false;
       projectFile.addContract('ImplV1Clash', 'ImplV1Clash');
       this.networkFile = new NetworkFile(projectFile, network);
@@ -827,9 +736,7 @@ contract('push script', function([_, owner]) {
         networkFile: this.networkFile,
       }).should.be.rejectedWith(/validation errors/);
       logs.text.should.not.match(/Cannot read property 'forEach' of undefined/);
-      logs.text.should.match(
-        /There is more than one contract named GreeterImpl/,
-      );
+      logs.text.should.match(/There is more than one contract named GreeterImpl/);
       logs.restore();
     });
   });
@@ -837,10 +744,7 @@ contract('push script', function([_, owner]) {
 
 async function getImplementationFromApp(contractAlias) {
   const app = await App.fetch(this.networkFile.appAddress);
-  return await app.getImplementation(
-    this.networkFile.projectFile.name,
-    contractAlias,
-  );
+  return await app.getImplementation(this.networkFile.projectFile.name, contractAlias);
 }
 
 function modifyBytecode(contractAlias) {

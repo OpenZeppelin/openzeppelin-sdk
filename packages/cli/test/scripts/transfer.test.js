@@ -12,9 +12,7 @@ contract('transfer script', function(accounts) {
   describe('validations', function() {
     context('when no recipient address is specified', function() {
       it('throws an error', async function() {
-        await transfer({ value: '10', unit: 'ether' }).should.be.rejectedWith(
-          'A recipient address must be specified',
-        );
+        await transfer({ value: '10', unit: 'ether' }).should.be.rejectedWith('A recipient address must be specified');
       });
     });
 
@@ -44,9 +42,7 @@ contract('transfer script', function(accounts) {
           to: receiver,
           value: '1000',
           unit: 'ether',
-        }).should.be.rejectedWith(
-          /sender doesn't have enough funds to send tx/,
-        );
+        }).should.be.rejectedWith(/sender doesn't have enough funds to send tx/);
       });
     });
 

@@ -17,9 +17,7 @@ const DeprecatedApp = Contracts.getFromLib('DeprecatedApp');
 const ImplementationDirectory = Contracts.getFromLib('ImplementationDirectory');
 
 contract('migrate-manifest-version script', function(accounts) {
-  const [_, owner, newAdmin, anotherAdmin] = accounts.map(
-    utils.toChecksumAddress,
-  );
+  const [_, owner, newAdmin, anotherAdmin] = accounts.map(utils.toChecksumAddress);
   const EMPTY_INITIALIZATION_DATA = Buffer.from('');
   const network = 'test';
   const txParams = { from: owner };
@@ -32,9 +30,7 @@ contract('migrate-manifest-version script', function(accounts) {
 
   beforeEach('initialize environment for manifest version 2', async function() {
     // set package and network file
-    const projectFile = new ProjectFile(
-      'test/mocks/packages/package-with-manifest-version-2.zos.json',
-    );
+    const projectFile = new ProjectFile('test/mocks/packages/package-with-manifest-version-2.zos.json');
     projectFile.publish = false;
     this.networkFile = new NetworkFile(projectFile, network);
     this.networkFile.manifestVersion = '2';
@@ -65,15 +61,11 @@ contract('migrate-manifest-version script', function(accounts) {
     });
 
     it('changes admin of owned proxy', async function() {
-      (await Proxy.at(this.implV1Proxy.address).admin()).should.eq(
-        newAdmin || this.networkFile.proxyAdminAddress,
-      );
+      (await Proxy.at(this.implV1Proxy.address).admin()).should.eq(newAdmin || this.networkFile.proxyAdminAddress);
     });
 
     it('does not change admin of not owned proxy', async function() {
-      (await Proxy.at(this.implV2Proxy.address).admin()).should.eq(
-        anotherAdmin,
-      );
+      (await Proxy.at(this.implV2Proxy.address).admin()).should.eq(anotherAdmin);
     });
   };
 
@@ -82,18 +74,8 @@ contract('migrate-manifest-version script', function(accounts) {
       await push({ network, txParams, networkFile: this.networkFile });
       this.implV1 = this.networkFile.contract('ImplV1');
       this.implV2 = this.networkFile.contract('ImplV2');
-      this.implV1Proxy = await Proxy.deploy(
-        this.implV1.address,
-        owner,
-        EMPTY_INITIALIZATION_DATA,
-        txParams,
-      );
-      this.implV2Proxy = await Proxy.deploy(
-        this.implV2.address,
-        anotherAdmin,
-        EMPTY_INITIALIZATION_DATA,
-        txParams,
-      );
+      this.implV1Proxy = await Proxy.deploy(this.implV1.address, owner, EMPTY_INITIALIZATION_DATA, txParams);
+      this.implV2Proxy = await Proxy.deploy(this.implV2.address, anotherAdmin, EMPTY_INITIALIZATION_DATA, txParams);
     });
 
     beforeEach('manually add proxies to network file', addProxies);
@@ -118,9 +100,7 @@ contract('migrate-manifest-version script', function(accounts) {
         });
 
         it('creates the proxy assigning proxyAdmin address as admin', async function() {
-          (await Proxy.at(this.newProxy.address).admin()).should.eq(
-            this.networkFile.proxyAdminAddress,
-          );
+          (await Proxy.at(this.newProxy.address).admin()).should.eq(this.networkFile.proxyAdminAddress);
         });
 
         it('adds the proxy to networkfile', async function() {
@@ -166,27 +146,15 @@ contract('migrate-manifest-version script', function(accounts) {
       this.implV1 = this.networkFile.contract('ImplV1');
       this.implV2 = this.networkFile.contract('ImplV2');
       this.directory = await ImplementationDirectory.new({ from: owner });
-      await this.directory.methods
-        .setImplementation('ImplV1', this.implV1.address)
-        .send({ from: owner });
-      await this.directory.methods
-        .setImplementation('ImplV2', this.implV2.address)
-        .send({ from: owner });
+      await this.directory.methods.setImplementation('ImplV1', this.implV1.address).send({ from: owner });
+      await this.directory.methods.setImplementation('ImplV2', this.implV2.address).send({ from: owner });
       this.package = await Package.new({ from: owner });
       await this.package.methods
-        .addVersion(
-          toSemanticVersion(this.version),
-          this.directory.address,
-          this.contentURI,
-        )
+        .addVersion(toSemanticVersion(this.version), this.directory.address, this.contentURI)
         .send({ from: owner });
       this.app = await DeprecatedApp.new({ from: owner });
       await this.app.methods
-        .setPackage(
-          this.packageName,
-          this.package.address,
-          toSemanticVersion(this.version),
-        )
+        .setPackage(this.packageName, this.package.address, toSemanticVersion(this.version))
         .send({ from: owner });
       this.networkFile.app = { address: this.app.address };
       this.networkFile.package = { address: this.package.address };
@@ -200,17 +168,9 @@ contract('migrate-manifest-version script', function(accounts) {
       const { events: eventsV2Proxy } = await this.app.methods
         .create(this.packageName, 'ImplV2', EMPTY_INITIALIZATION_DATA)
         .send({ from: owner });
-      this.implV1Proxy = await Proxy.at(
-        eventsV1Proxy['ProxyCreated'].returnValues.proxy,
-        txParams,
-      );
-      this.implV2Proxy = await Proxy.at(
-        eventsV2Proxy['ProxyCreated'].returnValues.proxy,
-        txParams,
-      );
-      await this.app.methods
-        .changeProxyAdmin(this.implV2Proxy.address, anotherAdmin)
-        .send({ from: owner });
+      this.implV1Proxy = await Proxy.at(eventsV1Proxy['ProxyCreated'].returnValues.proxy, txParams);
+      this.implV2Proxy = await Proxy.at(eventsV2Proxy['ProxyCreated'].returnValues.proxy, txParams);
+      await this.app.methods.changeProxyAdmin(this.implV2Proxy.address, anotherAdmin).send({ from: owner });
     });
 
     beforeEach('manually add proxies to network file', addProxies);
@@ -227,9 +187,7 @@ contract('migrate-manifest-version script', function(accounts) {
         });
 
         it('creates the proxy assigning proxyAdmin address as admin', async function() {
-          (await Proxy.at(this.newProxy.address).admin()).should.eq(
-            this.networkFile.proxyAdminAddress,
-          );
+          (await Proxy.at(this.newProxy.address).admin()).should.eq(this.networkFile.proxyAdminAddress);
         });
 
         it('adds the proxy to networkfile', async function() {

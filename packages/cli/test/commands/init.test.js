@@ -40,19 +40,14 @@ describe('init command', function() {
     },
   );
 
-  itShouldParse(
-    'should call init script with light flag',
-    'init',
-    'zos init MyApp 0.2.0 --publish',
-    function(init) {
-      init.should.have.been.calledWithExactly({
-        name: 'MyApp',
-        version: '0.2.0',
-        publish: true,
-        force: undefined,
-        installDependencies: undefined,
-        dependencies: [],
-      });
-    },
-  );
+  itShouldParse('should call init script with light flag', 'init', 'zos init MyApp 0.2.0 --publish', function(init) {
+    init.should.have.been.calledWithExactly({
+      name: 'MyApp',
+      version: '0.2.0',
+      publish: true,
+      force: undefined,
+      installDependencies: undefined,
+      dependencies: [],
+    });
+  });
 });

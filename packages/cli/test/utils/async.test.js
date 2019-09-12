@@ -17,35 +17,19 @@ describe('allPromisesOrError', function() {
   });
 
   it('returns error messages from all failed promises', async function() {
-    const promises = [
-      Promise.resolve(4),
-      Promise.reject('FAIL'),
-      Promise.reject('FAIL2'),
-    ];
+    const promises = [Promise.resolve(4), Promise.reject('FAIL'), Promise.reject('FAIL2')];
     await allPromisesOrError(promises).should.be.rejectedWith('FAIL\nFAIL2');
   });
 
   it('customizes error messages', async function() {
-    const promises = [
-      Promise.resolve(4),
-      Promise.reject('FAIL'),
-      Promise.reject('FAIL2'),
-    ];
-    await allPromisesOrError(
-      promises,
-      err => `ERROR:${err}`,
-    ).should.be.rejectedWith('ERROR:FAIL\nERROR:FAIL2');
+    const promises = [Promise.resolve(4), Promise.reject('FAIL'), Promise.reject('FAIL2')];
+    await allPromisesOrError(promises, err => `ERROR:${err}`).should.be.rejectedWith('ERROR:FAIL\nERROR:FAIL2');
   });
 
   it('customizes error messages with objects', async function() {
-    const promises = [
-      [Promise.resolve(4), 4],
-      [Promise.reject('FAIL'), 1],
-      [Promise.reject('FAIL2'), 2],
-    ];
-    await allPromisesOrError(
-      promises,
-      (err, obj) => `ERROR:${err}:${obj}`,
-    ).should.be.rejectedWith('ERROR:FAIL:1\nERROR:FAIL2:2');
+    const promises = [[Promise.resolve(4), 4], [Promise.reject('FAIL'), 1], [Promise.reject('FAIL2'), 2]];
+    await allPromisesOrError(promises, (err, obj) => `ERROR:${err}:${obj}`).should.be.rejectedWith(
+      'ERROR:FAIL:1\nERROR:FAIL2:2',
+    );
   });
 });
