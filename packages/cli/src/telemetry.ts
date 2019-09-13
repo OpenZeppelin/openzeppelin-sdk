@@ -29,7 +29,7 @@ interface GlobalTelemetry {
 }
 
 //TODO: rename
-export async function telemetry(commandName, options) {
+export async function telemetry(commandName: string, options: any): Promise<void> {
   const telemetry = await checkOptIn();
   if (!telemetry) return;
 
@@ -41,14 +41,27 @@ export async function telemetry(commandName, options) {
 
   // create a new command document for the current uuid
   await db.runTransaction(async tx => {
-    const incrementalId = (await tx.get(db.doc(`users/${telemetry.uuid}`))).get('latestIncrementalId');
-    await tx.update(db.doc(`users/${telemetry.uuid}`), { latestIncrementalId: FieldValue.increment(1) });
-    await tx.set(db.collection(`users/${telemetry.uuid}/commands`).doc(), { ...options, id: incrementalId + 1 });
+    try {
+      const dbSnapshot = await tx.get(db.doc(`users/${telemetry.uuid}`));
+      let incrementalId;
+      // if the current user document exists, retreive the latest id and create a new command document.
+      // otherwise, create a document for the user and set the id to 0.
+      if (dbSnapshot.exists) {
+        incrementalId = (await tx.get(db.doc(`users/${telemetry.uuid}`))).get('latestId') + 1;
+        await tx.update(db.doc(`users/${telemetry.uuid}`), { latestId: FieldValue.increment(1) });
+      } else {
+        incrementalId = 0;
+        await tx.set(db.doc(`users/${telemetry.uuid}`), { latestId: 0 });
+      }
+      await tx.set(db.collection(`users/${telemetry.uuid}/commands`).doc(), { ...options, id: incrementalId });
+    } catch (_) {
+      return;
+    }
   });
 
   // TODO: remove. query all created rows
   const query = (await db
-    .collection('users/some-uuid/commands')
+    .collection(`users/${telemetry.uuid}/commands`)
     .orderBy('id')
     .get()).docs.map(i => i.data());
 
