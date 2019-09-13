@@ -61,6 +61,9 @@ export async function report(commandName: string, options: any): Promise<void> {
       }
       await tx.set(db.collection(`users/${telemetry.uuid}/commands`).doc(), { ...commandData, id: incrementalId });
     });
+
+    // close all connections
+    await app.delete();
   } catch (_) {
     return;
   }
