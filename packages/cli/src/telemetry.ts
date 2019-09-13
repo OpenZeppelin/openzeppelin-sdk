@@ -1,8 +1,10 @@
 /// <reference lib="dom" />
-import envPaths from 'env-paths';
+import fs from 'fs-extra';
 import uuid from 'uuid/v4';
 import path from 'path';
-import fs from 'fs-extra';
+import crypto from 'crypto';
+import envPaths from 'env-paths';
+import mapValues from 'lodash.mapvalues';
 import inquirer from 'inquirer';
 import firebase from 'firebase/app';
 import 'firebase/auth';
@@ -21,51 +23,47 @@ const FIREBASE_CONFIG = {
   appId: '1:449985678611:web:88b411adc68e6521e19ee6',
 };
 
-// TODO: change
+type Field = string | number | boolean;
+
 interface GlobalTelemetry {
   optIn: boolean;
   uuid: string;
-  salt: unknown;
+  salt: string;
 }
 
 //TODO: rename
-export async function telemetry(commandName: string, options: any): Promise<void> {
+export async function report(commandName: string, options: any): Promise<void> {
   const telemetry = await checkOptIn();
   if (!telemetry) return;
+
+  // encrypt data before sending it
+  const commandData = concealData(commandName, options, telemetry.salt);
 
   // Initialize Firebase and anonymously authenticate
   const app = firebase.initializeApp(FIREBASE_CONFIG);
   const db = app.firestore();
   const { FieldValue } = firebase.firestore;
-  await app.auth().signInAnonymously();
+  try {
+    await app.auth().signInAnonymously();
 
-  // create a new command document for the current uuid
-  await db.runTransaction(async tx => {
-    try {
+    // create a new command document for the current uuid
+    await db.runTransaction(async tx => {
       const dbSnapshot = await tx.get(db.doc(`users/${telemetry.uuid}`));
       let incrementalId;
-      // if the current user document exists, retreive the latest id and create a new command document.
+      // if the current user document exists, retreive the latest command id and create a new command document.
       // otherwise, create a document for the user and set the id to 0.
       if (dbSnapshot.exists) {
-        incrementalId = (await tx.get(db.doc(`users/${telemetry.uuid}`))).get('latestId') + 1;
+        incrementalId = dbSnapshot.get('latestId') + 1;
         await tx.update(db.doc(`users/${telemetry.uuid}`), { latestId: FieldValue.increment(1) });
       } else {
         incrementalId = 0;
         await tx.set(db.doc(`users/${telemetry.uuid}`), { latestId: 0 });
       }
-      await tx.set(db.collection(`users/${telemetry.uuid}/commands`).doc(), { ...options, id: incrementalId });
-    } catch (_) {
-      return;
-    }
-  });
-
-  // TODO: remove. query all created rows
-  const query = (await db
-    .collection(`users/${telemetry.uuid}/commands`)
-    .orderBy('id')
-    .get()).docs.map(i => i.data());
-
-  console.log(query);
+      await tx.set(db.collection(`users/${telemetry.uuid}/commands`).doc(), { ...commandData, id: incrementalId });
+    });
+  } catch (_) {
+    return;
+  }
 }
 
 // TODO: test
@@ -87,7 +85,8 @@ async function checkOptIn(): Promise<GlobalTelemetry | undefined> {
       default: true,
     });
 
-    globalOptIn = { optIn: telemetry, uuid: uuid(), salt: 0 };
+    const salt = crypto.randomBytes(32);
+    globalOptIn = { optIn: telemetry, uuid: uuid(), salt: salt.toString('hex') };
     await fs.ensureDir(globalDataDir);
     await fs.writeJson(globalDataPath, globalOptIn);
   }
@@ -99,4 +98,31 @@ async function checkOptIn(): Promise<GlobalTelemetry | undefined> {
   }
 
   return globalOptIn;
+}
+
+function hashField(field: Field, salt: string): string {
+  const hash = crypto.createHash('sha256');
+  hash.update(salt);
+  hash.update(field.toString());
+
+  return hash.digest('hex');
+}
+
+function concealData(name: string, options: any, salt: string) {
+  const hashedOptions = mapValues(options, function recur(x) {
+    if (Array.isArray(x)) {
+      return x.map(recur);
+    } else if (typeof x === 'object') {
+      return mapValues(x, recur);
+    } else {
+      return hashField(x, salt);
+    }
+  });
+
+  const commandData = {
+    name,
+    options: hashedOptions,
+  };
+
+  return commandData;
 }
