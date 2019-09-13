@@ -97,6 +97,7 @@
     "lodash.isstring": "^4.0.1",
     "lodash.isundefined": "^3.0.1",
     "lodash.map": "^4.6.0",
+    "lodash.mapvalues": "^4.6.0",
     "lodash.max": "^4.0.1",
     "lodash.maxby": "^4.6.0",
     "lodash.merge": "^4.6.1",
