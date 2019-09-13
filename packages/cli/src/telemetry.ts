@@ -81,6 +81,7 @@ async function checkOptIn(): Promise<GlobalTelemetry | undefined> {
   if (localOptIn === false) return undefined;
 
   if (globalOptIn === undefined) {
+    // TODO: add ability to disable interactivity w/--no-interactive flag
     const { telemetry } = await inquirer.prompt({
       name: 'telemetry',
       type: 'confirm',

@@ -4,6 +4,7 @@ import Dependency from '../models/dependency/Dependency';
 import ProjectFile from '../models/files/ProjectFile';
 import { promptIfNeeded, InquirerQuestions } from '../prompts/prompt';
 import { fromContractFullName } from '../utils/naming';
+import { report } from '../telemetry';
 
 const name = 'link';
 const signature = `${name} [dependencies...]`;
@@ -28,8 +29,10 @@ async function action(dependencies: string[], options: any): Promise<void> {
     dependencies: [await Dependency.fetchVersionFromNpm('@openzeppelin/contracts-ethereum-package')],
   };
   const prompted = await promptIfNeeded({ args, props, defaults }, interactive);
+  const linkArguments = { ...prompted, installDependencies };
 
-  await link({ ...prompted, installDependencies });
+  if (!options.skipTelemetry) await report('push', linkArguments);
+  await link(linkArguments);
   await push.runActionIfRequested(options);
 }
 
@@ -38,7 +41,7 @@ async function runActionIfNeeded(contractFullName: string, options: any): Promis
   const projectFile = new ProjectFile();
   const { contract: contractAlias, package: packageName } = fromContractFullName(contractFullName);
   if (interactive && packageName && !projectFile.hasDependency(packageName)) {
-    await action([packageName], { ...options, forceInstall: true });
+    await action([packageName], { ...options, forceInstall: true, skipTelemetry: true });
   }
 }
 

@@ -3,10 +3,10 @@ import add from '../scripts/add';
 import addAll from '../scripts/add-all';
 import ConfigManager from '../models/config/ConfigManager';
 import { compile } from '../models/compiler/Compiler';
-
 import { promptIfNeeded, contractsList, InquirerQuestions } from '../prompts/prompt';
 import { fromContractFullName } from '../utils/naming';
 import ProjectFile from '../models/files/ProjectFile';
+import { report } from '../telemetry';
 
 const name = 'add';
 const signature = `${name} [contractNames...]`;
@@ -38,6 +38,7 @@ async function action(contractNames: string[], options: any): Promise<void> {
         ? contractNames.map(splitContractName)
         : prompted.contractNames.map(contractName => ({ name: contractName }));
 
+    if (!options.skipTelemetry) await report('add', { contractsData });
     add({ contractsData });
   }
   await push.runActionIfRequested(options);
@@ -47,6 +48,7 @@ async function runActionIfNeeded(contractName?: string, options?: any): Promise<
   const { interactive } = options;
   const { contract: contractAlias, package: packageName } = fromContractFullName(contractName);
   const projectFile = new ProjectFile();
+  options = { ...options, skipTelemetry: true };
 
   if (interactive) {
     if (!packageName && contractAlias && !projectFile.hasContract(contractAlias)) {
