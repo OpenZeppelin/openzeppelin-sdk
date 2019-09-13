@@ -9,9 +9,9 @@ describe('init command', function() {
   itShouldParse(
     'should call init script with name, version and dependencies',
     'init',
-    'zos init MyApp 0.2.0 --force --no-install --link mock-stdlib@1.1.0,mock-stdlib2@1.2.0',
+    'zos init MyApp 0.2.0 --force --no-install --link mock-stdlib@1.1.0,mock-stdlib-2@1.2.0',
     function(init) {
-      const dependencies = ['mock-stdlib@1.1.0', 'mock-stdlib2@1.2.0'];
+      const dependencies = ['mock-stdlib@1.1.0', 'mock-stdlib-2@1.2.0'];
       init.should.have.been.calledWithExactly({
         name: 'MyApp',
         version: '0.2.0',
