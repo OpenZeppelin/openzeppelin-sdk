@@ -106,7 +106,7 @@ async function checkOptIn(): Promise<GlobalTelemetry | undefined> {
 function hashField(field: Field, salt: string): string {
   const hash = crypto.createHash('sha256');
   hash.update(salt);
-  hash.update(field.toString());
+  hash.update(String(field));
 
   return hash.digest('hex');
 }
