@@ -26,13 +26,12 @@ const FIREBASE_CONFIG = {
 
 type Field = string | number | boolean;
 
-interface GlobalTelemetry {
+interface GlobalTelemetryOptions {
   optIn: boolean;
   uuid: string;
   salt: string;
 }
 
-//TODO: rename
 export async function report(commandName: string, options: any): Promise<void> {
   const telemetry = await checkOptIn();
   if (!telemetry) return;
