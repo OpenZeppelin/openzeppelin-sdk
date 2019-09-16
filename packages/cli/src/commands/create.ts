@@ -91,7 +91,7 @@ async function action(contractFullName: string, options: any): Promise<void> {
 
   if (!(await hasToMigrateProject(network))) process.exit(0);
 
-  await report('create', { ...args, network, txParams });
+  await report('create', { ...args, network, txParams }, options.interactive);
   await create({ ...args, network, txParams });
   Session.setDefaultNetworkIfNeeded(network);
 }

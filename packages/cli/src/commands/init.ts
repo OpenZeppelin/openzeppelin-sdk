@@ -37,7 +37,7 @@ async function action(projectName: string, version: string, options: any): Promi
   const initArguments = { ...prompted, ...flags };
 
   await init(initArguments);
-  await report('init', initArguments);
+  await report('init', initArguments, interactive);
   await push.runActionIfRequested(options);
 }
 

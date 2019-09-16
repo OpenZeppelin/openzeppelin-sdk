@@ -81,7 +81,7 @@ async function action(proxyReference: string, options: any): Promise<void> {
     ...parsedContractReference,
     ...initMethodParams,
   });
-  await report('update', { ...args, network, txParams });
+  await report('update', { ...args, network, txParams }, interactive);
   await update({ ...args, network, txParams });
 }
 

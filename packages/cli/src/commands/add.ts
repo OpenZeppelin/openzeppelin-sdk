@@ -38,7 +38,7 @@ async function action(contractNames: string[], options: any): Promise<void> {
         ? contractNames.map(splitContractName)
         : prompted.contractNames.map(contractName => ({ name: contractName }));
 
-    if (!options.skipTelemetry) await report('add', { contractsData });
+    if (!options.skipTelemetry) await report('add', { contractsData }, interactive);
     add({ contractsData });
   }
   await push.runActionIfRequested(options);

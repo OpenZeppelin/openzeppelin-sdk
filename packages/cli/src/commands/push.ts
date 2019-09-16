@@ -80,7 +80,7 @@ async function action(options: any): Promise<void> {
     ...promptDeployDependencies,
   };
 
-  if (!options.skipTelemetry) await report('push', pushArguments);
+  if (!options.skipTelemetry) await report('push', pushArguments, interactive);
   await push(pushArguments);
   if (!options.dontExitProcess && process.env.NODE_ENV !== 'test') process.exit(0);
 }

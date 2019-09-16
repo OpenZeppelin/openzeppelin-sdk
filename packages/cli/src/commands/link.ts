@@ -31,7 +31,7 @@ async function action(dependencies: string[], options: any): Promise<void> {
   const prompted = await promptIfNeeded({ args, props, defaults }, interactive);
   const linkArguments = { ...prompted, installDependencies };
 
-  if (!options.skipTelemetry) await report('push', linkArguments);
+  if (!options.skipTelemetry) await report('push', linkArguments, interactive);
   await link(linkArguments);
   await push.runActionIfRequested(options);
 }
