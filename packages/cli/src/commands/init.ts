@@ -5,7 +5,7 @@ import { promptIfNeeded, InquirerQuestions } from '../prompts/prompt';
 import { FileSystem } from '@openzeppelin/upgrades';
 import ProjectFile from '../models/files/ProjectFile';
 import { notEmpty } from '../prompts/validators';
-import { report } from '../telemetry';
+import Telemetry from '../telemetry';
 
 const name = 'init';
 const signature = `${name} [project-name] [version]`;
@@ -37,7 +37,7 @@ async function action(projectName: string, version: string, options: any): Promi
   const initArguments = { ...prompted, ...flags };
 
   await init(initArguments);
-  await report('init', initArguments, interactive);
+  await Telemetry.report('init', initArguments, interactive);
   await push.runActionIfRequested(options);
 }
 

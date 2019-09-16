@@ -4,7 +4,7 @@ import Dependency from '../models/dependency/Dependency';
 import ProjectFile from '../models/files/ProjectFile';
 import { promptIfNeeded, InquirerQuestions } from '../prompts/prompt';
 import { fromContractFullName } from '../utils/naming';
-import { report } from '../telemetry';
+import Telemetry from '../telemetry';
 
 const name = 'link';
 const signature = `${name} [dependencies...]`;
@@ -31,7 +31,7 @@ async function action(dependencies: string[], options: any): Promise<void> {
   const prompted = await promptIfNeeded({ args, props, defaults }, interactive);
   const linkArguments = { ...prompted, installDependencies };
 
-  if (!options.skipTelemetry) await report('push', linkArguments, interactive);
+  if (!options.skipTelemetry) await Telemetry.report('push', linkArguments, interactive);
   await link(linkArguments);
   await push.runActionIfRequested(options);
 }

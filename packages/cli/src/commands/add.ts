@@ -6,7 +6,7 @@ import { compile } from '../models/compiler/Compiler';
 import { promptIfNeeded, contractsList, InquirerQuestions } from '../prompts/prompt';
 import { fromContractFullName } from '../utils/naming';
 import ProjectFile from '../models/files/ProjectFile';
-import { report } from '../telemetry';
+import Telemetry from '../telemetry';
 
 const name = 'add';
 const signature = `${name} [contractNames...]`;
@@ -38,7 +38,7 @@ async function action(contractNames: string[], options: any): Promise<void> {
         ? contractNames.map(splitContractName)
         : prompted.contractNames.map(contractName => ({ name: contractName }));
 
-    if (!options.skipTelemetry) await report('add', { contractsData }, interactive);
+    if (!options.skipTelemetry) await Telemetry.report('add', { contractsData }, interactive);
     add({ contractsData });
   }
   await push.runActionIfRequested(options);

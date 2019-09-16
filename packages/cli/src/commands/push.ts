@@ -12,7 +12,7 @@ import ProjectFile from '../models/files/ProjectFile';
 import ConfigManager from '../models/config/ConfigManager';
 import { promptIfNeeded, networksList, InquirerQuestions } from '../prompts/prompt';
 import NetworkFile from '../models/files/NetworkFile';
-import { report } from '../telemetry';
+import Telemetry from '../telemetry';
 
 const name = 'push';
 const signature: string = name;
@@ -80,7 +80,7 @@ async function action(options: any): Promise<void> {
     ...promptDeployDependencies,
   };
 
-  if (!options.skipTelemetry) await report('push', pushArguments, interactive);
+  if (!options.skipTelemetry) await Telemetry.report('push', pushArguments, interactive);
   await push(pushArguments);
   if (!options.dontExitProcess && process.env.NODE_ENV !== 'test') process.exit(0);
 }

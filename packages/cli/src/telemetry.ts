@@ -32,48 +32,55 @@ interface GlobalTelemetryOptions {
   salt: string;
 }
 
-export async function report(commandName: string, options: any, interactive: boolean): Promise<void> {
-  const telemetry = await checkOptIn(interactive);
-  if (telemetry === undefined || !telemetry.optIn) return;
+export default {
+  async report(commandName: string, options: any, interactive: boolean): Promise<void> {
+    const telemetry = await checkOptIn(interactive);
+    if (telemetry === undefined || !telemetry.optIn) return;
 
-  // extract network name if present
-  let { network } = pickBy(options, (_, key) => key === 'network');
-  if (network) delete options.network;
-  if (network && network.match(/dev-/)) network = 'development';
+    // extract network name if present
+    let { network } = pickBy(options, (_, key) => key === 'network');
+    if (network) delete options.network;
+    if (network && network.match(/dev-/)) network = 'development';
 
-  // encrypt data before sending it
-  const concealedData = concealData(commandName, options, telemetry.salt);
-  const commandData = network ? { ...concealedData, network } : concealedData;
+    // encrypt data before sending it
+    const concealedData = concealData(commandName, options, telemetry.salt);
+    const commandData = network ? { ...concealedData, network } : concealedData;
 
-  // Initialize Firebase and anonymously authenticate
-  const app = firebase.initializeApp(FIREBASE_CONFIG);
-  const db = app.firestore();
-  const { FieldValue } = firebase.firestore;
-  try {
-    await app.auth().signInAnonymously();
+    await this.sendToFirebase(telemetry.uuid, commandData);
+  },
 
-    // create a new command document for the current uuid
-    await db.runTransaction(async tx => {
-      const dbSnapshot = await tx.get(db.doc(`users/${telemetry.uuid}`));
-      let incrementalId;
-      // if the current user document exists, retreive the latest command id and create a new command document.
-      // otherwise, create a document for the user and set the id to 0.
-      if (dbSnapshot.exists) {
-        incrementalId = dbSnapshot.get('latestId') + 1;
-        await tx.update(db.doc(`users/${telemetry.uuid}`), { latestId: FieldValue.increment(1) });
-      } else {
-        incrementalId = 0;
-        await tx.set(db.doc(`users/${telemetry.uuid}`), { latestId: 0 });
-      }
-      await tx.set(db.collection(`users/${telemetry.uuid}/commands`).doc(), { ...commandData, id: incrementalId });
-    });
+  async sendToFirebase(uuid: string, commandData: any): Promise<void> {
+    // Initialize Firebase and anonymously authenticate
+    const app = firebase.initializeApp(FIREBASE_CONFIG);
+    const db = app.firestore();
+    const { FieldValue } = firebase.firestore;
 
-    // close all connections
-    await app.delete();
-  } catch (_) {
-    return;
-  }
-}
+    try {
+      await app.auth().signInAnonymously();
+
+      // create a new command document for the current uuid
+      await db.runTransaction(async tx => {
+        const dbSnapshot = await tx.get(db.doc(`users/${uuid}`));
+        let incrementalId;
+        // if the current user document exists, retreive the latest command id and create a new command document.
+        // otherwise, create a document for the user and set the id to 0.
+        if (dbSnapshot.exists) {
+          incrementalId = dbSnapshot.get('latestId') + 1;
+          await tx.update(db.doc(`users/${uuid}`), { latestId: FieldValue.increment(1) });
+        } else {
+          incrementalId = 0;
+          await tx.set(db.doc(`users/${uuid}`), { latestId: 0 });
+        }
+        await tx.set(db.collection(`users/${uuid}/commands`).doc(), { ...commandData, id: incrementalId });
+      });
+
+      // close all connections
+      await app.delete();
+    } catch (_) {
+      return;
+    }
+  },
+};
 
 async function checkOptIn(interactive: boolean): Promise<GlobalTelemetryOptions | undefined> {
   const project = new ProjectFile();
@@ -86,6 +93,7 @@ async function checkOptIn(interactive: boolean): Promise<GlobalTelemetryOptions 
   if (localOptIn === false) return undefined;
 
   // disable interactivity manually for tests and CI
+  // TODO: move to options.ts
   if (DISABLE_INTERACTIVITY) interactive = false;
 
   if (globalOptIn === undefined && interactive) {

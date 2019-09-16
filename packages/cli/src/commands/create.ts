@@ -13,7 +13,7 @@ import ConfigManager from '../models/config/ConfigManager';
 import { promptIfNeeded, networksList, contractsList, methodsList, InquirerQuestions } from '../prompts/prompt';
 import promptForMethodParams from '../prompts/method-params';
 import { ProxyType } from '../scripts/interfaces';
-import { report } from '../telemetry';
+import Telemetry from '../telemetry';
 
 interface PropsParams {
   contractFullName?: string;
@@ -91,7 +91,7 @@ async function action(contractFullName: string, options: any): Promise<void> {
 
   if (!(await hasToMigrateProject(network))) process.exit(0);
 
-  await report('create', { ...args, network, txParams }, options.interactive);
+  await Telemetry.report('create', { ...args, network, txParams }, options.interactive);
   await create({ ...args, network, txParams });
   Session.setDefaultNetworkIfNeeded(network);
 }
