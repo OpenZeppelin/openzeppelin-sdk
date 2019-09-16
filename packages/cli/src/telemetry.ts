@@ -5,6 +5,7 @@ import path from 'path';
 import crypto from 'crypto';
 import envPaths from 'env-paths';
 import mapValues from 'lodash.mapvalues';
+import pickBy from 'lodash.pickby';
 import inquirer from 'inquirer';
 import firebase from 'firebase/app';
 import 'firebase/auth';
@@ -36,8 +37,14 @@ export async function report(commandName: string, options: any): Promise<void> {
   const telemetry = await checkOptIn();
   if (!telemetry) return;
 
+  // extract network name if present
+  let { network } = pickBy(options, (_, key) => key === 'network');
+  if (network) delete options.network;
+  if (network && network.match(/dev-/)) network = 'development';
+
   // encrypt data before sending it
-  const commandData = concealData(commandName, options, telemetry.salt);
+  const concealedData = concealData(commandName, options, telemetry.salt);
+  const commandData = network ? { ...concealedData, network } : concealedData;
 
   // Initialize Firebase and anonymously authenticate
   const app = firebase.initializeApp(FIREBASE_CONFIG);
@@ -97,7 +104,7 @@ async function checkOptIn(): Promise<GlobalTelemetry | undefined> {
 
   if (localOptIn === undefined) {
     project.telemetryOptIn = globalOptIn.optIn;
-    // Note: following function is sync
+    // following function is sync
     project.write();
   }
 
