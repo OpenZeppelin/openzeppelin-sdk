@@ -10,9 +10,9 @@ import inquirer from 'inquirer';
 import firebase from 'firebase/app';
 import 'firebase/auth';
 import 'firebase/firestore';
+import { DISABLE_INTERACTIVITY } from './prompts/prompt';
 
 import ProjectFile from './models/files/ProjectFile';
-import ConfigManager from './models/config/ConfigManager';
 
 const FIREBASE_CONFIG = {
   apiKey: 'AIzaSyAZoGB2p26UejODezZPmczgwehI6xlSKPs',
@@ -32,8 +32,8 @@ interface GlobalTelemetryOptions {
   salt: string;
 }
 
-export async function report(commandName: string, options: any): Promise<void> {
-  const telemetry = await checkOptIn();
+export async function report(commandName: string, options: any, interactive: boolean): Promise<void> {
+  const telemetry = await checkOptIn(interactive);
   if (telemetry === undefined || !telemetry.optIn) return;
 
   // extract network name if present
@@ -75,19 +75,20 @@ export async function report(commandName: string, options: any): Promise<void> {
   }
 }
 
-// TODO: test
-async function checkOptIn(): Promise<GlobalTelemetry | undefined> {
+async function checkOptIn(interactive: boolean): Promise<GlobalTelemetryOptions | undefined> {
   const project = new ProjectFile();
   const localOptIn = project.telemetryOptIn;
 
   const { data: globalDataDir } = envPaths('openzeppelin-sdk');
   const globalDataPath = path.join(globalDataDir, 'telemetry.json');
-  let globalOptIn: GlobalTelemetry | undefined = await fs.readJson(globalDataPath).catch(() => undefined);
+  let globalOptIn: GlobalTelemetryOptions | undefined = await fs.readJson(globalDataPath).catch(() => undefined);
 
   if (localOptIn === false) return undefined;
 
-  if (globalOptIn === undefined) {
-    // TODO: add ability to disable interactivity w/--no-interactive flag
+  // disable interactivity manually for tests and CI
+  if (DISABLE_INTERACTIVITY) interactive = false;
+
+  if (globalOptIn === undefined && interactive) {
     const { telemetry } = await inquirer.prompt({
       name: 'telemetry',
       type: 'confirm',
