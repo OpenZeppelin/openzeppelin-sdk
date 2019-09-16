@@ -34,7 +34,7 @@ interface GlobalTelemetryOptions {
 
 export async function report(commandName: string, options: any): Promise<void> {
   const telemetry = await checkOptIn();
-  if (!telemetry) return;
+  if (telemetry === undefined || !telemetry.optIn) return;
 
   // extract network name if present
   let { network } = pickBy(options, (_, key) => key === 'network');
@@ -101,7 +101,7 @@ async function checkOptIn(): Promise<GlobalTelemetry | undefined> {
     await fs.writeJson(globalDataPath, globalOptIn);
   }
 
-  if (localOptIn === undefined) {
+  if (localOptIn === undefined && globalOptIn !== undefined) {
     project.telemetryOptIn = globalOptIn.optIn;
     // following function is sync
     project.write();
