@@ -4,19 +4,18 @@ require('./setup');
 
 import fs from 'fs-extra';
 import sinon from 'sinon';
-import firebase from 'firebase/app';
 import inquirer from 'inquirer';
 import 'firebase/auth';
 import 'firebase/firestore';
 
-import Telemetry from '../src/telemetry'
+import Telemetry from '../src/telemetry';
 import ProjectFile from '../src/models/files/ProjectFile';
 
 describe('telemetry', function() {
   beforeEach('stub fs-extra functions', function() {
-    this.readJsonStub = sinon.stub(fs, 'readJson').returns({ catch: () => undefined })
-    this.ensureDirStub = sinon.stub(fs, 'ensureDir')
-    this.writeJsonStub = sinon.stub(fs, 'writeJson')
+    this.readJsonStub = sinon.stub(fs, 'readJson').returns({ catch: () => undefined });
+    this.ensureDirStub = sinon.stub(fs, 'ensureDir');
+    this.writeJsonStub = sinon.stub(fs, 'writeJson');
   });
 
   afterEach('restore stubs', function() {
@@ -53,8 +52,8 @@ describe('telemetry', function() {
             await Telemetry.report('create', {}, true);
 
             this.telemetryOptInSetter.set.should.have.been.calledWithExactly(false);
-            this.projectFileWrite.calledOnce.should.be.true
-          })
+            this.projectFileWrite.calledOnce.should.be.true;
+          });
 
           it('writes the global file with salt, uuid, and optIn as false', async function() {
             await Telemetry.report('create', {}, true);
@@ -74,7 +73,7 @@ describe('telemetry', function() {
 
           it('prompts for telemetry', async function() {
             await Telemetry.report('create', {}, true);
-            this.inquirerPrompt.calledOnce.should.be.true
+            this.inquirerPrompt.calledOnce.should.be.true;
           });
 
           it('writes the global file with salt, uuid and optIn as true', async function() {
@@ -93,13 +92,13 @@ describe('telemetry', function() {
             await Telemetry.report('create', {}, true);
 
             this.telemetryOptInSetter.set.should.have.been.calledWithExactly(true);
-            this.projectFileWrite.calledOnce.should.be.true
-          })
+            this.projectFileWrite.calledOnce.should.be.true;
+          });
 
           describe('sendToFirebase function call', function() {
             before(function() {
-              this.commandData = { 
-                stringField: 'foo', 
+              this.commandData = {
+                stringField: 'foo',
                 numberField: 3,
                 objectField: { stringField: 'foo', arrayField: [1, 2, 3] },
               };
@@ -141,4 +140,3 @@ function shouldConcealOptions(options) {
   options.objectField.arrayField[1].should.match(/^[a-f0-9]{64}$/);
   options.objectField.arrayField[2].should.match(/^[a-f0-9]{64}$/);
 }
-
