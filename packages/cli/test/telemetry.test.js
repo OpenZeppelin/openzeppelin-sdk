@@ -12,7 +12,7 @@ import 'firebase/firestore';
 import Telemetry from '../src/telemetry'
 import ProjectFile from '../src/models/files/ProjectFile';
 
-describe.only('telemetry', function() {
+describe('telemetry', function() {
   beforeEach('stub fs-extra functions', function() {
     this.readJsonStub = sinon.stub(fs, 'readJson').returns({ catch: () => undefined })
     this.ensureDirStub = sinon.stub(fs, 'ensureDir')
@@ -37,7 +37,7 @@ describe.only('telemetry', function() {
 
     context('when interactive mode is activated', function() {
       context('when neither local nor global options are set', function() {
-        context('when the user answers no to telemetry prompt', function() {
+        context('when the user answers no to telemetry prompted question', function() {
           beforeEach(async function() {
             this.inquirerPrompt = sinon.stub(inquirer, 'prompt').returns({ telemetry: false });
           });
@@ -46,9 +46,28 @@ describe.only('telemetry', function() {
             await Telemetry.report('create', {}, true);
             expect(this.sendToFirebase.getCall(0)).to.be.null;
           });
+
+          it('writes local file and sets telemetryOptIn option to false', async function() {
+            this.telemetryOptInSetter = sinon.spy(ProjectFile.prototype, 'telemetryOptIn', ['set']);
+            this.projectFileWrite = sinon.spy(ProjectFile.prototype, 'write');
+            await Telemetry.report('create', {}, true);
+
+            this.telemetryOptInSetter.set.should.have.been.calledWithExactly(false);
+            this.projectFileWrite.calledOnce.should.be.true
+          })
+
+          it('writes the global file with salt, uuid, and optIn as false', async function() {
+            await Telemetry.report('create', {}, true);
+            const [firstArg, secondArg] = this.writeJsonStub.getCall(0).args;
+
+            firstArg.should.match(/telemetry.json/);
+            secondArg.optIn.should.be.false;
+            secondArg.uuid.should.match(/^[a-f0-9\-]+$/);
+            secondArg.salt.should.match(/^[a-f0-9]+$/);
+          });
         });
 
-        context('when the user answers yes to telemetry prompt', function() {
+        context('when the user answers yes to telemetry prompted question', function() {
           beforeEach(async function() {
             this.inquirerPrompt = sinon.stub(inquirer, 'prompt').returns({ telemetry: true });
           });
@@ -58,7 +77,7 @@ describe.only('telemetry', function() {
             this.inquirerPrompt.calledOnce.should.be.true
           });
 
-          it('writes the global file with salt and uuid', async function() {
+          it('writes the global file with salt, uuid and optIn as true', async function() {
             await Telemetry.report('create', {}, true);
             const [firstArg, secondArg] = this.writeJsonStub.getCall(0).args;
 
@@ -67,6 +86,15 @@ describe.only('telemetry', function() {
             secondArg.uuid.should.match(/^[a-f0-9\-]+$/);
             secondArg.salt.should.match(/^[a-f0-9]+$/);
           });
+
+          it('writes local file', async function() {
+            this.telemetryOptInSetter = sinon.spy(ProjectFile.prototype, 'telemetryOptIn', ['set']);
+            this.projectFileWrite = sinon.spy(ProjectFile.prototype, 'write');
+            await Telemetry.report('create', {}, true);
+
+            this.telemetryOptInSetter.set.should.have.been.calledWithExactly(true);
+            this.projectFileWrite.calledOnce.should.be.true
+          })
 
           describe('sendToFirebase function call', function() {
             before(function() {

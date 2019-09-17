@@ -93,7 +93,6 @@ async function checkOptIn(interactive: boolean): Promise<GlobalTelemetryOptions 
   if (localOptIn === false) return undefined;
 
   // disable interactivity manually for tests and CI
-  // TODO: move to options.ts
   if (DISABLE_INTERACTIVITY) interactive = false;
 
   if (globalOptIn === undefined && interactive) {
