@@ -47,20 +47,20 @@ async function commandActions(contractFullName: string, options: any): Promise<v
   const { skipCompile } = options;
   if (!skipCompile) await compile();
 
-  const { network: promptedNewtork, contractFullName: promptedContractFullName } = await promptForCreate(
+  const { network: promptedNetwork, contractFullName: promptedContractFullName } = await promptForCreate(
     contractFullName,
     options,
   );
   const { network, txParams } = await ConfigManager.initNetworkConfiguration({
     ...options,
-    network: promptedNewtork,
+    network: promptedNetwork,
   });
 
   await link.runActionIfNeeded(promptedContractFullName, options);
   await add.runActionIfNeeded(promptedContractFullName, options);
   await push.runActionIfNeeded(promptedContractFullName, network, {
     ...options,
-    network: promptedNewtork,
+    network: promptedNetwork,
     force: true,
   });
 
