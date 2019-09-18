@@ -24,8 +24,7 @@ export default async function createProxy({
 
   const controller = new NetworkController(network, txParams, networkFile);
   try {
-    await controller.checkContractDeployed(packageName, contractAlias, !force);
-    const proxy = await controller.createProxy(
+    const instance = await controller.deployInstance(
       packageName,
       contractAlias,
       methodName,
@@ -35,10 +34,10 @@ export default async function createProxy({
       signature,
       kind,
     );
-    stdout(proxy.address);
+    stdout(instance.address);
     controller.writeNetworkPackageIfNeeded();
 
-    return proxy;
+    return instance;
   } catch (error) {
     const cb = () => controller.writeNetworkPackageIfNeeded();
     throw new ScriptError(error, cb);

@@ -593,8 +593,76 @@ export default class NetworkController {
     Loggy.succeed(`publish-project`, `Published to ${this.network}!`);
   }
 
+  // todo: make packageName optional
+  public async deployInstance(
+    packageName: string,
+    contractAlias: string,
+    initMethod: string,
+    initArgs: string[],
+    admin?: string,
+    salt?: string,
+    signature?: string,
+    kind?: ProxyType,
+    // TODO: remove contract
+  ): Promise<Contract> {
+    await this.migrateManifestVersionIfNeeded();
+    if (!packageName) packageName = this.projectFile.name;
+    const contract = this.contractManager.getContractClass(packageName, contractAlias);
+    await this._setSolidityLibs(contract);
+    let { instance, instanceInfo } = { instance: 3 as any, instanceInfo: {} };
+
+    // TODO: manage here all cases.
+    if (this.isUpgradeable(contract) || kind === ProxyType.Minimal) {
+      ({ instance, instanceInfo } = await this.createProxy(
+        contract,
+        packageName,
+        contractAlias,
+        initMethod,
+        initArgs,
+        admin,
+        salt,
+        signature,
+        kind,
+      ));
+    } else {
+      // TODO: add hint adding Upgradeable marker in contract
+      if (initMethod !== undefined) throw Error('Regular deploys do not allow calling initializer functions');
+      ({ instance, instanceInfo } = await this.deployRegularInstance(contract, initArgs));
+    }
+    // TODO: fill for each instance case
+    this.networkFile.addProxy(packageName, contractAlias, instanceInfo as any);
+    await this._updateTruffleDeployedInformation(contractAlias, instance);
+
+    return instance;
+  }
+
+  // TODO: change ProxyInstanceInfo to RegularInterface
+  private async deployRegularInstance(
+    contract: Contract,
+    initArgs: string[],
+  ): Promise<{ instance: Contract; instanceInfo: RegularInstanceInfo }> {
+    const instance = await Transactions.deployContract(contract, initArgs, this.txParams);
+    console.log(instance.address);
+
+    const instanceInfo: RegularInstanceInfo = {
+      address: instance.address,
+    };
+
+    return { instance, instanceInfo };
+  }
+
+  // TODO: move anywhere else. (ContractManager?)
+  private isUpgradeable(contract: Contract): boolean {
+    const contractAst = new ContractAST(contract, null, { nodesFilter: ['ContractDefinition'] });
+    return contractAst.getContractNode().baseContracts.find(({ baseName }) => {
+      // TODO: take into account only @openzeppelin/upgrades Initializable and Upgradeable contracts
+      return baseName.name === 'Initializable' || baseName.name === 'Upgradeable';
+    });
+  }
+
   // Proxy model
   public async createProxy(
+    contract: Contract,
     packageName: string,
     contractAlias: string,
     initMethod: string,
@@ -625,15 +693,17 @@ export default class NetworkController {
         packageName === this.projectFile.name
           ? this.currentVersion
           : await this.project.getDependencyVersion(packageName);
-      await this._updateTruffleDeployedInformation(contractAlias, instance);
-      this.networkFile.addProxy(packageName, contractAlias, {
-        address: instance.address,
-        version: semanticVersionToString(projectVersion),
-        implementation: implementationAddress,
-        admin: admin || this.networkFile.proxyAdminAddress || (await this.project.getAdminAddress()),
-        kind,
-      });
-      return instance;
+
+      return {
+        instance,
+        instanceInfo: {
+          address: instance.address,
+          version: semanticVersionToString(projectVersion),
+          implementation: implementationAddress,
+          admin: admin || this.networkFile.proxyAdminAddress || (await this.project.getAdminAddress()),
+          kind,
+        },
+      };
     } finally {
       await this._tryRegisterProxyAdmin();
       await this._tryRegisterProxyFactory();
