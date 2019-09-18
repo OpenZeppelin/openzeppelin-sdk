@@ -49,7 +49,7 @@ import ValidationLogger from '../../interface/ValidationLogger';
 import Verifier from '../Verifier';
 import LocalController from '../local/LocalController';
 import ContractManager from '../local/ContractManager';
-import NetworkFile, { ProxyInterface } from '../files/NetworkFile';
+import NetworkFile, { RegularInstanceInfo, ProxyInstanceInfo, ProxyInstanceQuery } from '../files/NetworkFile';
 import ProjectFile from '../files/ProjectFile';
 import { MANIFEST_VERSION } from '../files/ManifestVersion';
 import { ProxyType } from '../../scripts/interfaces';
@@ -603,13 +603,11 @@ export default class NetworkController {
     salt?: string,
     signature?: string,
     kind?: ProxyType,
-  ): Promise<Contract> {
+  ): Promise<{ instance: Contract; instanceInfo: ProxyInstanceInfo }> {
     try {
-      await this.migrateManifestVersionIfNeeded();
+      // TODO: put inside proxy creation
+      // await controller.checkContractDeployed(packageName, contractAlias, !force);
       await this.fetchOrDeploy(this.currentVersion);
-      if (!packageName) packageName = this.projectFile.name;
-      const contract = this.contractManager.getContractClass(packageName, contractAlias);
-      await this._setSolidityLibs(contract);
       this.checkInitialization(contract, initMethod);
       if (salt) await this._checkDeploymentAddress(salt);
 
@@ -788,7 +786,7 @@ export default class NetworkController {
     contractAlias: string,
     proxyAddress: string,
     newAdmin: string,
-  ): Promise<ProxyInterface[]> {
+  ): Promise<ProxyInstanceInfo[]> {
     await this.migrateManifestVersionIfNeeded();
     const proxies = this._fetchOwnedProxies(packageName, contractAlias, proxyAddress);
     if (proxies.length === 0) return [];
@@ -806,7 +804,7 @@ export default class NetworkController {
 
   // Proxy model
   private async _changeProxiesAdmin(
-    proxies: ProxyInterface[],
+    proxies: ProxyInstanceQuery[],
     newAdmin: string,
     project: Project = null,
   ): Promise<void> {
@@ -829,7 +827,7 @@ export default class NetworkController {
     proxyAddress: string,
     initMethod: string,
     initArgs: string[],
-  ): Promise<ProxyInterface[]> {
+  ): Promise<ProxyInstanceInfo[]> {
     await this.migrateManifestVersionIfNeeded();
     const proxies = this._fetchOwnedProxies(packageName, contractAlias, proxyAddress);
     if (proxies.length === 0) return [];
@@ -842,7 +840,7 @@ export default class NetworkController {
   }
 
   // Proxy model
-  private async _upgradeProxy(proxy: ProxyInterface, initMethod: string, initArgs: string[]): Promise<void | never> {
+  private async _upgradeProxy(proxy: ProxyInstanceQuery, initMethod: string, initArgs: string[]): Promise<void | never> {
     try {
       const name = { packageName: proxy.package, contractName: proxy.contract };
       const contract = this.contractManager.getContractClass(proxy.package, proxy.contract);
@@ -891,7 +889,7 @@ export default class NetworkController {
     contractAlias?: string,
     proxyAddress?: string,
     ownerAddress?: string,
-  ): ProxyInterface[] {
+  ): ProxyInstanceInfo[] {
     let criteriaDescription = '';
     if (packageName || contractAlias)
       criteriaDescription += ` contract ${toContractFullName(packageName, contractAlias)}`;

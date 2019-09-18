@@ -13,7 +13,7 @@ import ContractManager from '../models/local/ContractManager';
 import Dependency from '../models/dependency/Dependency';
 import { fromContractFullName, toContractFullName } from '../utils/naming';
 import { ProxyType } from '../scripts/interfaces';
-import NetworkFile, { ProxyInterface } from '../models/files/NetworkFile';
+import NetworkFile, { ProxyInstanceQuery } from '../models/files/NetworkFile';
 
 type ChoicesT = string[] | ({ [key: string]: any });
 
@@ -94,7 +94,7 @@ export function networksList(name: string, type: string, message?: string): { [k
 export function proxiesList(
   pickProxyBy: string,
   network: string,
-  filter?: ProxyInterface,
+  filter?: Partial<ProxyInstanceQuery>,
   projectFile?: ProjectFile,
 ): { [key: string]: any } {
   projectFile = projectFile || new ProjectFile();
@@ -240,7 +240,7 @@ export function proxyInfo(contractInfo: any, network: string): any {
     };
   } else {
     const proxies = networkFile.getProxies(proxyParams);
-    const proxy = proxies[0] || {};
+    const proxy: ProxyInstanceQuery = proxies[0] || {};
     const contractFullName = toContractFullName(proxy.package, proxy.contract);
 
     return {
