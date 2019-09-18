@@ -15,6 +15,7 @@ import toPairs from 'lodash.topairs';
 import {
   Contracts,
   Contract,
+  ContractAST,
   Loggy,
   FileSystem as fs,
   Proxy,

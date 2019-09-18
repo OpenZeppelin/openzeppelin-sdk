@@ -151,6 +151,7 @@ export function createContract(schema: any): Contract {
   return _wrapContractInstance(schema, contract);
 }
 
+// TODO: move to cli
 export function contractMethodsFromAbi(
   instance: Contract,
   constant: ContractMethodMutability = ContractMethodMutability.NotConstant,

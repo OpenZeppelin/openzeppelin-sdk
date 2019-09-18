@@ -201,7 +201,7 @@ export default class ContractAST {
     if (node.nodes) node.nodes.forEach(this._collectNodes.bind(this));
   }
 
-  private _isValidMethodName(name) {
+  private _isValidMethodName(name): boolean {
     return name !== '' && name !== 'isConstructor';
   }
 }

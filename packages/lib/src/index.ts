@@ -12,6 +12,7 @@ import Semver from './utils/Semver';
 import { Loggy } from './utils/Logger';
 import FileSystem from './utils/FileSystem';
 import Contracts from './artifacts/Contracts';
+import ContractAST from './utils/ContractAST';
 import Contract, {
   contractMethodsFromAst,
   contractMethodsFromAbi,
@@ -109,6 +110,7 @@ export {
   AppProject,
   SimpleProject,
   Contract,
+  ContractAST,
   ProxyAdminProject,
   ValidationInfo,
   AppProxyMigrator,
