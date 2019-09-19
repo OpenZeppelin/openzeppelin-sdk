@@ -12,6 +12,7 @@ import 'firebase/auth';
 import 'firebase/firestore';
 import { DISABLE_INTERACTIVITY } from './prompts/prompt';
 
+import { Params } from './scripts/interfaces';
 import ProjectFile from './models/files/ProjectFile';
 
 const FIREBASE_CONFIG = {
@@ -32,15 +33,23 @@ interface GlobalTelemetryOptions {
   salt: string;
 }
 
+type CommandData = Params & {
+  name: string;
+  network: string;
+};
+
 export default {
-  async report(commandName: string, options: any, interactive: boolean): Promise<void> {
+  async report(commandName: string, options: Params, interactive: boolean): Promise<void> {
     const telemetry = await checkOptIn(interactive);
     if (telemetry === undefined || !telemetry.optIn) return;
 
     // extract network name if present
-    let { network } = pickBy(options, (_, key) => key === 'network');
-    if (network) delete options.network;
-    if (network && network.match(/dev-/)) network = 'development';
+    let network;
+    if ('network' in options) {
+      network = options.network;
+      delete options.network;
+      if (network.match(/dev-/)) network = 'development';
+    }
 
     // Conceal data before sending it
     const concealedData = concealData(options, telemetry.salt) as object;
@@ -49,7 +58,7 @@ export default {
     await this.sendToFirebase(telemetry.uuid, commandData);
   },
 
-  async sendToFirebase(uuid: string, commandData: any): Promise<void> {
+  async sendToFirebase(uuid: string, commandData: CommandData): Promise<void> {
     // Initialize Firebase and anonymously authenticate
     const app = firebase.initializeApp(FIREBASE_CONFIG);
     const db = app.firestore();

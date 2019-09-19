@@ -39,6 +39,32 @@ export enum ProxyType {
   Minimal = 'Minimal',
 }
 
+export type Params =
+  | CreateParams
+  | CompareParams
+  | PullParams
+  | StatusParams
+  | FreezeParams
+  | PublishParams
+  | UpdateParams
+  | LinkParams
+  | InitParams
+  | UnpackParams
+  | PushParams
+  | VerifyParams
+  | SetAdminParams
+  | AddParams
+  | SessionParams
+  | BumpParams
+  | RemoveParams
+  | CheckParams
+  | UnlinkParams
+  | QueryDeploymentParams
+  | TransferParams
+  | BalanceParams
+  | CallParams
+  | SendTxParams;
+
 export interface CreateParams extends Proxy {
   salt?: string;
   signature?: string;
