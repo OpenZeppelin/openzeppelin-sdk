@@ -42,9 +42,9 @@ export default {
     if (network) delete options.network;
     if (network && network.match(/dev-/)) network = 'development';
 
-    // encrypt data before sending it
-    const concealedData = concealData(commandName, options, telemetry.salt);
-    const commandData = network ? { ...concealedData, network } : concealedData;
+    // Conceal data before sending it
+    const concealedData = concealData(options, telemetry.salt) as object;
+    const commandData = network ? { ...concealedData, name: commandName, network } : concealedData;
 
     await this.sendToFirebase(telemetry.uuid, commandData);
   },
@@ -126,21 +126,25 @@ function hashField(field: Field, salt: string): string {
   return hash.digest('hex');
 }
 
-function concealData(name: string, options: any, salt: string) {
-  const hashedOptions = mapValues(options, function recur(x) {
-    if (Array.isArray(x)) {
-      return x.map(recur);
-    } else if (typeof x === 'object') {
-      return mapValues(x, recur);
+function concealData<T>(obj: T, salt: string): Concealed<T> {
+  return mapValues(obj, function recur(val) {
+    if (Array.isArray(val)) {
+      return val.map(recur);
+    } else if (typeof val === 'object') {
+      return mapValues(val, recur);
     } else {
-      return hashField(x, salt);
+      return hashField(val, salt);
     }
   });
-
-  const commandData = {
-    name,
-    options: hashedOptions,
-  };
-
-  return commandData;
 }
+
+// This type essentially recursively converts everything into a string.
+type Concealed<T> = T extends (infer U)[]
+  ? ConcealedArray<U>
+  : T extends object
+  ? { [P in keyof T]: Concealed<T[P]> }
+  : string;
+
+// Necessary to avoid error on the recursive type alias.
+// https://github.com/Microsoft/TypeScript/issues/3496#issuecomment-128553540
+interface ConcealedArray<T> extends Array<Concealed<T>> {}
