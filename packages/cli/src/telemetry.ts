@@ -35,7 +35,7 @@ interface GlobalTelemetryOptions {
 
 type CommandData = Params & {
   name: string;
-  network: string;
+  network?: string;
 };
 
 export default {
@@ -52,8 +52,9 @@ export default {
     }
 
     // Conceal data before sending it
-    const concealedData = concealData(options, telemetry.salt) as object;
-    const commandData = network ? { ...concealedData, name: commandName, network } : concealedData;
+    const concealedData = concealData(options, telemetry.salt);
+    const commandData: CommandData = { ...concealedData, name: commandName };
+    if (network !== undefined) commandData.network = network;
 
     await this.sendToFirebase(telemetry.uuid, commandData);
   },
