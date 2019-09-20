@@ -1,6 +1,6 @@
 = Network.js
 
-The OpenZeppelin Network.js is an easy to use and reliable library that provides one line access to the Web3 API.  It can be used in both React and in vanilla JavaScript.
+The *OpenZeppelin Network.js* is an easy to use and reliable library that provides one line access to the Web3 API.  It can be used in both React and in vanilla JavaScript.
 
 == Features
 
@@ -38,7 +38,7 @@ Import Network.js for React:
 import { useWeb3Injected, useWeb3Network, useEphemeralKey } from '@openzeppelin/network/react';
 ----
 
-Get Web3Context with React Hooks inside functional component:
+You can get the Web3Context from an injected provider such as MetaMask or use a network provider such as Infura:
 
 [source,js]
 ----
@@ -46,27 +46,28 @@ const web3Context = useWeb3Injected();
 ----
 [source,js]
 ----
-const web3Context = useWeb3Network('http://127.0.0.1:8545');
+const web3Context = useWeb3Network(`wss://rinkeby.infura.io/ws/v3/${infuraProjectId}`);
 ----
 
-Use Web3Context to get fresh data:
+Once you have a web3Context you can get fresh data.  Network.js will re-render the component when network, accounts or connection state change.
+
+Web3 library can be accessed via `lib`
 
 [source,js]
 ----
 const { accounts, networkId, networkName, providerName, lib, connected } = web3Context;
 ----
-Network.js will re-render component when network, accounts or connetion state change.
 
-== Usage - Vanilla Javascript
+== Usage - Javascript
 
-Import the library:
+Import Network.js for (vanilla) JavaScript:
 
 [source,js]
 ----
 import { fromInjected, fromConnection } from '@openzeppelin/network';
 ----
 
-Get Web3Context:
+You can get the Web3Context from an injected provider such as MetaMask or use a network provider such as Infura:
 [source,js]
 ----
 const web3Context = await fromInjected();
@@ -77,14 +78,15 @@ const web3Context = await fromInjected();
 const web3Context = await fromConnection('http://127.0.0.1:8545');
 ----
 
-Use Web3Context to get fresh data immediately:
+Once you have a web3Context you can access data.  
+Web3 library can be accessed via `lib`
 
 [source,js]
 ----
 const { accounts, networkId, networkName, providerName, lib, connected } = web3Context;
 ----
 
-Subscribe to events to get notified:
+To get notified of events such as `networkId`, `accounts` or `connected` status changing you can subscribe to events:
 [source,js]
 ----
 function updateNetwork(networkId, networkName) {}
@@ -96,7 +98,7 @@ web3Context.on(Web3Context.AccountsChangedEventName, updateAccounts);
 web3Context.on(Web3Context.ConnectionChangedEventName, updateConnection);
 ----
 
-Unsubscribe from events once you don't need them:
+You should unsubscribe from events once you no longer need them:
 
 [source,js]
 ----
