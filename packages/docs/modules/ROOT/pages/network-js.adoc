@@ -1,6 +1,6 @@
 = Network.js
 
-The *OpenZeppelin Network.js* is an easy to use and reliable library that provides one line access to the Web3 API.  It can be used in both React and in vanilla JavaScript.
+The *OpenZeppelin Network.js* is an easy to use and reliable library that provides one line access to the Web3 API.  It can be used in both React and in (vanilla) JavaScript.
 
 == Features
 
@@ -12,22 +12,22 @@ The *OpenZeppelin Network.js* is an easy to use and reliable library that provid
 * *Events*: Fires events even for HTTP and forcefully terminated providers.
 * *Changed events*: Network, accounts, and connection changed events for all web3 providers.
 
-== Install
-To install OpenZeppelin Network.js, run the following in your projects root directory:
-
-[source,console]
-----
-npm install @openzeppelin/network
-----
-
 == Starter Kits
-Network.js is used in the OpenZeppelin GSN Starter Kit so you can start working quickly on your dapp.
+Network.js is used in the https://docs.openzeppelin.com/starter-kits/2.3/gsnkit[OpenZeppelin GSN Starter Kit] so you can start working quickly on your dapp.
 
 To unpack the starter kit, run the following inside an empty project directory and follow the instructions.
 
 [source,console]
 ----
 openzeppelin unpack OpenZeppelin/starter-kit-gsn
+----
+
+== Install
+To install OpenZeppelin Network.js, run the following in your projects root directory:
+
+[source,console]
+----
+npm install @openzeppelin/network
 ----
 
 == Usage - React
@@ -38,7 +38,11 @@ Import Network.js for React:
 import { useWeb3Injected, useWeb3Network, useEphemeralKey } from '@openzeppelin/network/react';
 ----
 
-You can get the Web3Context from an injected provider such as MetaMask or use a network provider such as Infura:
+You can get the Web3Context from:
+
+* `useWeb3Injected` for an injected provider such as MetaMask.
+* `useWeb3Network` for a network provider with a connection string such as Infura or a private node.
+* `useWeb3` for an injected provider with a fallback to a network provider when there is no injected provider.
 
 [source,js]
 ----
@@ -48,10 +52,20 @@ const web3Context = useWeb3Injected();
 ----
 const web3Context = useWeb3Network(`wss://rinkeby.infura.io/ws/v3/${infuraProjectId}`);
 ----
+[source,js]
+----
+const web3Context = useWeb3(fallbackConnection: `wss://rinkeby.infura.io/ws/v3/${infuraProjectId}`);
+----
+Once you have a Web3Context you can access the following:
 
-Once you have a web3Context you can get fresh data.  Network.js will re-render the component when network, accounts or connection state change.
+* `accounts` of the web3 provider.  If the array is empty then accounts are either locked or not available.
+* `networkId` of the current network e.g. 3 for Ropsten.
+* `networkName` of the current network e.g. Ropsten.
+* `providerName` of the current web3 provider e.g. metamask, infura.
+* `lib` is the initialized instance of `web3.js`.
+* `connected` indicates if the underlying web3 provider is available or not.
 
-Web3 library can be accessed via `lib`
+Network.js in React will re-render on changes to the above.
 
 [source,js]
 ----
@@ -67,7 +81,11 @@ Import Network.js for (vanilla) JavaScript:
 import { fromInjected, fromConnection } from '@openzeppelin/network';
 ----
 
-You can get the Web3Context from an injected provider such as MetaMask or use a network provider such as Infura:
+You can get the Web3Context from:  
+
+* `fromInjected` for an injected provider such as MetaMask.
+* `fromConnection` for a network provider with a connection string such as Infura or a private node.
+
 [source,js]
 ----
 const web3Context = await fromInjected();
@@ -78,15 +96,22 @@ const web3Context = await fromInjected();
 const web3Context = await fromConnection('http://127.0.0.1:8545');
 ----
 
-Once you have a web3Context you can access data.  
-Web3 library can be accessed via `lib`
+Once you have a Web3Context you can access the following:    
+
+* `accounts` of the web3 provider.  If the array is empty then accounts are either locked or not available.
+* `networkId` of the current network e.g. 3 for Ropsten.
+* `networkName` of the current network e.g. Ropsten.
+* `providerName` of the current web3 provider e.g. metamask, infura.
+* `lib` is the initialized instance of `web3.js`.
+* `connected` indicates if the underlying web3 provider is available or not.
 
 [source,js]
 ----
 const { accounts, networkId, networkName, providerName, lib, connected } = web3Context;
 ----
 
-To get notified of events such as `networkId`, `accounts` or `connected` status changing you can subscribe to events:
+To get notified of changes such as `networkId`, `accounts` or `connected` changing you can subscribe to events:
+
 [source,js]
 ----
 function updateNetwork(networkId, networkName) {}
