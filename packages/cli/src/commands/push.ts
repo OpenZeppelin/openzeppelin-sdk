@@ -12,6 +12,7 @@ import ProjectFile from '../models/files/ProjectFile';
 import ConfigManager from '../models/config/ConfigManager';
 import { promptIfNeeded, networksList, InquirerQuestions } from '../prompts/prompt';
 import NetworkFile from '../models/files/NetworkFile';
+import ContractManager from '../models/local/ContractManager';
 
 const name = 'push';
 const signature: string = name;
@@ -94,14 +95,16 @@ async function runActionIfNeeded(contractName: string, network: string, options:
   const projectFile = new ProjectFile();
   const networkFile = new NetworkFile(projectFile, network);
   const { contract: contractAlias, package: packageName } = fromContractFullName(contractName);
+  const isUpgradeable = new ContractManager(projectFile).isUpgradeableContract(packageName, contractAlias);
 
   if (interactive) {
     if (
-      force ||
-      (!packageName && !networkFile.hasContract(contractAlias)) ||
-      (packageName && !networkFile.hasDependency(packageName))
+      isUpgradeable &&
+      (force ||
+        (!packageName && !networkFile.hasContract(contractAlias)) ||
+        (packageName && !networkFile.hasDependency(packageName)))
     ) {
-      await action({ ...options, dontExitProcess: true });
+      await action({ ...options, contractAlias, dontExitProcess: true });
     }
   }
 }

@@ -1,4 +1,4 @@
-import { Contracts, Contract, FileSystem } from '@openzeppelin/upgrades';
+import { Contracts, Contract, ContractAST, FileSystem } from '@openzeppelin/upgrades';
 import Dependency from '../dependency/Dependency';
 import ProjectFile from '../files/ProjectFile';
 import ConfigManager from '../config/ConfigManager';
@@ -49,6 +49,15 @@ export default class ContractManager {
     } else return [];
   }
 
+  public isUpgradeableContract(packageName: string, contractName: string): boolean {
+    const contract = this.getContractClass(packageName, contractName);
+    const contractAst = new ContractAST(contract, null, { nodesFilter: ['ContractDefinition'] });
+
+    return !!contractAst.getContractNode().baseContracts.find(({ baseName }) => {
+      // TODO: take into account only @openzeppelin/upgrades Initializable and Upgradeable contracts
+      return baseName.name === 'Initializable' || baseName.name === 'Upgradeable';
+    });
+  }
   private isLocalContract(contractsDir: string, contract: { sourcePath: string }, root: string): boolean {
     const cwd = root || process.cwd();
     const contractFullPath = path.resolve(cwd, contract.sourcePath);
