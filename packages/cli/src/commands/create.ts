@@ -20,20 +20,24 @@ interface PropsParams {
   methodArgs?: string[];
 }
 
-const name = 'create';
+const name = 'deploy';
 const signature = `${name} [alias]`;
 const description =
-  'deploys a new upgradeable contract instance. Provide the <alias> you added your contract with, or <package>/<alias> to create a contract from a linked package.';
+  'deploys a new contract instance. Provide the <name> you added your contract with, or <package>/<name> to deploy a contract from a linked package.';
 
 const register: (program: any) => any = program =>
   program
     .command(signature, undefined, { noHelp: true })
+    .alias('create')
     .usage('[alias] --network <network> [options]')
     .description(description)
-    .option('--init [function]', `call function after creating contract. If none is given, 'initialize' will be used`)
+    .option(
+      '--init [function]',
+      `call function after creating an upgradeable instance. If none is given, 'initialize' will be used`,
+    )
     .option('--args <arg1, arg2, ...>', 'provide initialization arguments for your contract if required')
     .option('--force', 'force creation even if contracts have local modifications')
-    .option('--minimal', 'creates a cheaper but non-upgradeable instance instead, using a minimal proxy')
+    .option('--minimal', 'deploys a cheaper but non-upgradeable instance instead, using a minimal proxy')
     .withNetworkOptions()
     .withSkipCompileOption()
     .withNonInteractiveOption()
