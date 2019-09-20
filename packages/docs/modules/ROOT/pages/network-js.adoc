@@ -31,7 +31,7 @@ openzeppelin unpack OpenZeppelin/starter-kit-gsn
 ----
 
 == Usage - React
-Import the library:
+Import Network.js for React:
 
 [source,js]
 ----
@@ -42,8 +42,11 @@ Get Web3Context with React Hooks inside functional component:
 
 [source,js]
 ----
-const injected = useWeb3Injected();
-const local = useWeb3Network('http://127.0.0.1:8545');
+const web3Context = useWeb3Injected();
+----
+[source,js]
+----
+const web3Context = useWeb3Network('http://127.0.0.1:8545');
 ----
 
 Use Web3Context to get fresh data:
@@ -66,16 +69,12 @@ import { fromInjected, fromConnection } from '@openzeppelin/network';
 Get Web3Context:
 [source,js]
 ----
-const injected = await fromInjected();
-const local = await fromConnection('http://127.0.0.1:8545');
+const web3Context = await fromInjected();
 ----
 
-To use GSN include a gsn option, including a signing key:
 [source,js]
 ----
-const injected = await fromInjected('http://127.0.0.1:8545', { 
-  gsn: { signKey: ephemeral() } 
-});
+const web3Context = await fromConnection('http://127.0.0.1:8545');
 ----
 
 Use Web3Context to get fresh data immediately:
@@ -111,16 +110,16 @@ web3Context.off(Web3Context.ConnectionChangedEventName, updateConnection);
 To use GSN with any React hook specify GSN as an option, providing a signing key:
 [source,js]
 ----
-const local = useWeb3Network('http://127.0.0.1:8545', { 
+const web3Context = useWeb3Network('http://127.0.0.1:8545', { 
   gsn: { signKey: useEphemeralKey() } 
 });
 ----
 
-In a local development environment you can pass a `dev: true` flag to the gsn options and this will use the GSNDevProvider instead of the regular GSN provider. This provider does not require a relayer to be running to work. 
+In a local development environment you can pass a `dev: true` flag to the gsn options so a relayer is not required to work.
 
 [source,js]
 ----
-const local = useWeb3Network('http://127.0.0.1:8545', { 
+const web3Context = useWeb3Network('http://127.0.0.1:8545', { 
   gsn: { 
     dev: true,
     signKey: useEphemeralKey() 
