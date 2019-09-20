@@ -15,7 +15,6 @@ import toPairs from 'lodash.topairs';
 import {
   Contracts,
   Contract,
-  ContractAST,
   Loggy,
   FileSystem as fs,
   Proxy,
@@ -130,7 +129,27 @@ export default class NetworkController {
     return this.project;
   }
 
-  // DeployerController
+  public async pushSingle(contractName: string, force: boolean = false): Promise<void | never> {
+    const contract = this.contractManager.getContractClass(this.projectFile.name, contractName);
+    const buildArtifacts = getBuildArtifacts();
+
+    // ValidateContracts also extends each contract class with validation errors and storage info
+    if (!this.validateContracts([[contractName, contract]], buildArtifacts) && !force) {
+      throw Error(
+        `Contract ${contractName} has validation errors. Please review the items listed above and fix them, or run this command again with the --force option.`,
+      );
+    }
+    this._checkVersion();
+    await this.fetchOrDeploy(this.projectVersion);
+    await this.handleDependenciesLink();
+
+    this.checkNotFrozen();
+
+    await this.linkSolidityLibraries(contract);
+    await this.uploadContracts([[contractName, contract]]);
+  }
+
+  // DEPRECATED. This function is deprecated and will be removed together with the push command in next major release
   public async push(reupload: boolean = false, force: boolean = false): Promise<void | never> {
     const changedLibraries = this._solidityLibsForPush(!reupload);
     const contracts = this._contractsListForPush(!reupload, changedLibraries);

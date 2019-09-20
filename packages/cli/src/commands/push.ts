@@ -52,6 +52,7 @@ async function action(options: any): Promise<void> {
     network: networkInOpts,
     deployProxyAdmin,
     deployProxyFactory,
+    contractAlias,
     interactive,
   } = options;
   const { network: networkInSession, expired } = Session.getNetwork();
@@ -70,7 +71,7 @@ async function action(options: any): Promise<void> {
   });
   const promptDeployDependencies = await promptForDeployDependencies(deployDependencies, network, interactive);
 
-  await push({
+  const pushParams = {
     deployProxyAdmin,
     deployProxyFactory,
     force,
@@ -78,7 +79,9 @@ async function action(options: any): Promise<void> {
     network,
     txParams,
     ...promptDeployDependencies,
-  });
+  };
+
+  await push(contractAlias ? { ...pushParams, contractAlias } : pushParams);
   if (!options.dontExitProcess && process.env.NODE_ENV !== 'test') process.exit(0);
 }
 

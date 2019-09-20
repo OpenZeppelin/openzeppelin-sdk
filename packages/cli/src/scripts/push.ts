@@ -11,6 +11,7 @@ export default async function push({
   force = false,
   txParams = {},
   networkFile,
+  contractAlias,
 }: PushParams): Promise<void | never> {
   const controller = new NetworkController(network, txParams, networkFile);
 
@@ -18,8 +19,8 @@ export default async function push({
     if (deployDependencies) await controller.deployDependencies();
     if (deployProxyAdmin) await controller.deployProxyAdmin();
     if (deployProxyFactory) await controller.deployProxyFactory();
-    await controller.push(reupload, force);
-    const { appAddress } = controller;
+    contractAlias ? await controller.pushSingle(contractAlias, force) : await controller.push(reupload, force);
+
     controller.writeNetworkPackageIfNeeded();
   } catch (error) {
     const cb = () => controller.writeNetworkPackageIfNeeded();

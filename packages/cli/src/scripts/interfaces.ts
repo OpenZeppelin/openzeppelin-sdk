@@ -82,6 +82,7 @@ export interface PushParams extends Network {
   deployDependencies?: boolean;
   deployProxyAdmin?: boolean;
   deployProxyFactory?: boolean;
+  contractAlias?: string;
 }
 
 export interface VerifyParams extends Network {
