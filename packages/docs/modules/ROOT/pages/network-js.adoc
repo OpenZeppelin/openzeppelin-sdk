@@ -1,0 +1,111 @@
+= Network.js
+
+The OpenZeppelin Network.js is an easy to use and reliable library that provides one line access to the Web3 API.
+
+== Features
+
+* *Abstraction*: Hides various Web3 providers behind common API.
+* *One line access*: Access Web3 providers with a single line (MetaMask, Infura, Geth, Portis and etc).
+* *Multiple providers*: Supports multiple Web3 providers within the same app.
+* *Meta Transactions*: First class support of Gas Station Network meta-transactions.
+* *React hooks*: React integration using hooks.
+* *Events*: Fires events even for HTTP and forcefully terminated providers.
+* *Changed events*: Network, accounts, and connection changed events for all web3 providers.
+
+
+== Install
+To install OpenZeppelin Network.js, run the following in your projects root directory:
+
+[source,console]
+----
+npm install @openzeppelin/network
+----
+
+== Usage - React
+Import the library:
+
+[source,js]
+----
+import { useWeb3Injected, useWeb3Network, useEphemeralKey } from '@openzeppelin/network/react';
+----
+
+Get Web3Context with React Hooks inside functional component:
+
+[source,js]
+----
+const injected = useWeb3Injected();
+const local = useWeb3Network('http://127.0.0.1:8545');
+----
+
+Use Web3Context to get fresh data:
+
+[source,js]
+----
+const { accounts, networkId, networkName, providerName, lib, connected } = web3Context;
+----
+Network.js will re-render component when network, accounts or connetion state change.
+
+== Usage - Vanilla Javascript
+
+Import the library:
+
+[source,js]
+----
+import { fromInjected, fromConnection } from '@openzeppelin/network';
+----
+
+Get Web3Context:
+[source,js]
+----
+const injected = await fromInjected();
+const local = await fromConnection('http://127.0.0.1:8545');
+----
+
+To use GSN include a gsn option, including a signing key:
+[source,js]
+----
+const injected = await fromInjected('http://127.0.0.1:8545', { 
+  gsn: { signKey: ephemeral() } 
+});
+----
+
+Use Web3Context to get fresh data immediately:
+
+[source,js]
+----
+const { accounts, networkId, networkName, providerName, lib, connected } = web3Context;
+----
+
+Subscribe to events to get notified:
+[source,js]
+----
+function updateNetwork(networkId, networkName) {}
+function updateAccounts(accounts) {}
+function updateConnection(connected) {}
+
+web3Context.on(Web3Context.NetworkIdChangedEventName, updateNetwork);
+web3Context.on(Web3Context.AccountsChangedEventName, updateAccounts);
+web3Context.on(Web3Context.ConnectionChangedEventName, updateConnection);
+----
+
+Unsubscribe from events once you don't need them:
+
+[source,js]
+----
+web3Context.off(Web3Context.NetworkIdChangedEventName, updateNetwork);
+web3Context.off(Web3Context.AccountsChangedEventName, updateAccounts);
+web3Context.off(Web3Context.ConnectionChangedEventName, updateConnection);
+----
+
+== GSN
+
+To use GSN with any hook specify GSN as an option, providing a signing key:
+[source,js]
+----
+const local = useWeb3Network('http://127.0.0.1:8545', { 
+  gsn: { signKey: useEphemeralKey() } 
+});
+----
+
+== Starter Kit
+Run `npx @openzeppelin/cli unpack starter` inside an empty project directory and follow the instructions.
