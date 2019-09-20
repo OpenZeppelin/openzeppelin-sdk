@@ -43,20 +43,22 @@ interface SolidityLibInterface {
   deployedBytecodeHash: string;
 }
 
-export interface InstanceInfo {
+interface CommonInstanceInfo {
+  address: string;
   package?: string;
   contract?: string;
-  address: string;
 }
 
-export interface ProxyInstanceInfo extends InstanceInfo {
+export interface ProxyInstanceInfo extends CommonInstanceInfo {
   version: string;
   implementation: string;
   admin: string;
   kind: ProxyType;
 }
 
-export interface RegularInstanceInfo extends InstanceInfo {}
+export interface RegularInstanceInfo extends CommonInstanceInfo {}
+
+export interface InstanceInfo extends ProxyInstanceInfo, RegularInstanceInfo {}
 
 export interface ProxyInstanceQuery extends Partial<ProxyInstanceInfo> {}
 
@@ -74,7 +76,7 @@ interface AddressWrapper {
 interface NetworkFileData {
   contracts: { [contractAlias: string]: ContractInterface };
   solidityLibs: { [libAlias: string]: SolidityLibInterface };
-  proxies: { [contractName: string]: ProxyInstanceInfo[] };
+  proxies: { [contractName: string]: InstanceInfo[] };
   manifestVersion?: string;
   zosversion?: string;
   proxyAdmin: AddressWrapper;
@@ -324,7 +326,7 @@ export default class NetworkFile {
     return !isEmpty(this.dependencies);
   }
 
-  public getProxies({ package: packageName, contract, address, kind }: ProxyInstanceQuery = {}): ProxyInstanceInfo[] {
+  public getProxies({ package: packageName, contract, address, kind }: ProxyInstanceQuery = {}): InstanceInfo[] {
     if (isEmpty(this.data.proxies)) return [];
     const allProxies = flatMap(this.data.proxies || {}, (proxiesList, fullname) =>
       map(proxiesList, proxyInfo => ({
@@ -343,7 +345,7 @@ export default class NetworkFile {
     );
   }
 
-  public getProxy(address: string): ProxyInstanceInfo {
+  public getProxy(address: string): InstanceInfo {
     const allProxies = this.getProxies();
     return find(allProxies, { address });
   }
@@ -450,12 +452,12 @@ export default class NetworkFile {
     delete this.data.contracts[alias];
   }
 
-  public setProxies(packageName: string, alias: string, value: ProxyInstanceInfo[]): void {
+  public setProxies(packageName: string, alias: string, value: InstanceInfo[]): void {
     const fullname = toContractFullName(packageName, alias);
     this.data.proxies[fullname] = value;
   }
 
-  public addProxy(thepackage: string, alias: string, info: ProxyInstanceInfo): void {
+  public addProxy(thepackage: string, alias: string, info: any): void {
     const fullname = toContractFullName(thepackage, alias);
     if (!this.data.proxies[fullname]) this.data.proxies[fullname] = [];
     this.data.proxies[fullname].push(info);
@@ -483,7 +485,7 @@ export default class NetworkFile {
     return findIndex(this.data.proxies[fullname], { address });
   }
 
-  public _proxiesOf(fullname: string): ProxyInstanceInfo[] {
+  public _proxiesOf(fullname: string): InstanceInfo[] {
     return this.data.proxies[fullname] || [];
   }
 

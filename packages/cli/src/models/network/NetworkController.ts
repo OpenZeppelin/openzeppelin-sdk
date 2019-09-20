@@ -49,7 +49,12 @@ import ValidationLogger from '../../interface/ValidationLogger';
 import Verifier from '../Verifier';
 import LocalController from '../local/LocalController';
 import ContractManager from '../local/ContractManager';
-import NetworkFile, { RegularInstanceInfo, ProxyInstanceInfo, ProxyInstanceQuery } from '../files/NetworkFile';
+import NetworkFile, {
+  InstanceInfo,
+  RegularInstanceInfo,
+  ProxyInstanceInfo,
+  ProxyInstanceQuery,
+} from '../files/NetworkFile';
 import ProjectFile from '../files/ProjectFile';
 import { MANIFEST_VERSION } from '../files/ManifestVersion';
 import { ProxyType } from '../../scripts/interfaces';
@@ -234,7 +239,9 @@ export default class NetworkController {
   private async _uploadSolidityLib(libClass: Contract): Promise<void> {
     const libName = libClass.schema.contractName;
     Loggy.spin(__filename, '_uploadSolidityLib', `upload-solidity-lib${libName}`, `Uploading ${libName} library`);
-    const libInstance = await this.project.setImplementation(libClass, libName);
+    const libInstance = this.project
+      ? await this.project.setImplementation(libClass, libName)
+      : await Transactions.deployContract(libClass, [], this.txParams);
     this.networkFile.addSolidityLib(libName, libInstance);
     Loggy.succeed(`upload-solidity-lib${libName}`, `${libName} library uploaded`);
   }
@@ -609,10 +616,10 @@ export default class NetworkController {
     if (!packageName) packageName = this.projectFile.name;
     const contract = this.contractManager.getContractClass(packageName, contractAlias);
     await this._setSolidityLibs(contract);
-    let { instance, instanceInfo } = { instance: 3 as any, instanceInfo: {} };
+    let instance: Contract;
+    let instanceInfo: ProxyInstanceInfo | RegularInstanceInfo;
 
-    // TODO: manage here all cases.
-    if (this.isUpgradeable(contract) || kind === ProxyType.Minimal) {
+    if (this.contractManager.isUpgradeableContract(packageName, contractAlias) || kind === ProxyType.Minimal) {
       ({ instance, instanceInfo } = await this.createProxy(
         contract,
         packageName,
@@ -630,34 +637,46 @@ export default class NetworkController {
       ({ instance, instanceInfo } = await this.deployRegularInstance(contract, initArgs));
     }
     // TODO: fill for each instance case
-    this.networkFile.addProxy(packageName, contractAlias, instanceInfo as any);
+    this.networkFile.addProxy(packageName, contractAlias, instanceInfo);
     await this._updateTruffleDeployedInformation(contractAlias, instance);
 
     return instance;
   }
 
-  // TODO: change ProxyInstanceInfo to RegularInterface
+  private async linkSolidityLibraries(contract: Contract) {
+    const solidityLibNames = getSolidityLibNames(contract.schema.bytecode);
+    const solidityLibs = solidityLibNames
+      .map(libName => Contracts.getFromLocal(libName))
+      .filter(lib => !this.networkFile.hasSolidityLib(lib.schema.contractName) || this._hasSolidityLibChanged(lib));
+
+    // deploys outdated or new solidity libraries
+    await this.uploadSolidityLibs(solidityLibs);
+    contract.link(this.networkFile.getSolidityLibs(solidityLibNames));
+  }
+
   private async deployRegularInstance(
     contract: Contract,
     initArgs: string[],
   ): Promise<{ instance: Contract; instanceInfo: RegularInstanceInfo }> {
+    // link solidity libraries before deploying
+    await this.linkSolidityLibraries(contract);
+    Loggy.spin(
+      __filename,
+      'deployRegularInstance',
+      `deploy-regular-instance`,
+      `Deploying contract ${contract.schema.contractName}`,
+    );
     const instance = await Transactions.deployContract(contract, initArgs, this.txParams);
-    console.log(instance.address);
-
     const instanceInfo: RegularInstanceInfo = {
       address: instance.address,
     };
 
-    return { instance, instanceInfo };
-  }
+    Loggy.succeed(
+      `deploy-regular-instance`,
+      `Deployed contract ${instance.schema.contractName} at ${instance.address}`,
+    );
 
-  // TODO: move anywhere else. (ContractManager?)
-  private isUpgradeable(contract: Contract): boolean {
-    const contractAst = new ContractAST(contract, null, { nodesFilter: ['ContractDefinition'] });
-    return contractAst.getContractNode().baseContracts.find(({ baseName }) => {
-      // TODO: take into account only @openzeppelin/upgrades Initializable and Upgradeable contracts
-      return baseName.name === 'Initializable' || baseName.name === 'Upgradeable';
-    });
+    return { instance, instanceInfo };
   }
 
   // Proxy model
@@ -856,7 +875,7 @@ export default class NetworkController {
     contractAlias: string,
     proxyAddress: string,
     newAdmin: string,
-  ): Promise<ProxyInstanceInfo[]> {
+  ): Promise<InstanceInfo[]> {
     await this.migrateManifestVersionIfNeeded();
     const proxies = this._fetchOwnedProxies(packageName, contractAlias, proxyAddress);
     if (proxies.length === 0) return [];
@@ -910,7 +929,11 @@ export default class NetworkController {
   }
 
   // Proxy model
-  private async _upgradeProxy(proxy: ProxyInstanceQuery, initMethod: string, initArgs: string[]): Promise<void | never> {
+  private async _upgradeProxy(
+    proxy: ProxyInstanceQuery,
+    initMethod: string,
+    initArgs: string[],
+  ): Promise<void | never> {
     try {
       const name = { packageName: proxy.package, contractName: proxy.contract };
       const contract = this.contractManager.getContractClass(proxy.package, proxy.contract);
@@ -959,7 +982,7 @@ export default class NetworkController {
     contractAlias?: string,
     proxyAddress?: string,
     ownerAddress?: string,
-  ): ProxyInstanceInfo[] {
+  ): InstanceInfo[] {
     let criteriaDescription = '';
     if (packageName || contractAlias)
       criteriaDescription += ` contract ${toContractFullName(packageName, contractAlias)}`;
