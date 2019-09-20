@@ -109,15 +109,15 @@ web3Context.off(Web3Context.ConnectionChangedEventName, updateConnection);
 
 == GSN
 
-To use GSN with any React hook specify GSN as an option, providing a signing key:
+To use GSN, specify GSN as an option, providing a signing key:
 [source,js]
 ----
-const web3Context = useWeb3Network('http://127.0.0.1:8545', { 
+const web3Context = useWeb3Network(`wss://rinkeby.infura.io/ws/v3/${infuraProjectId}`, { 
   gsn: { signKey: useEphemeralKey() } 
 });
 ----
 
-In a local development environment you can pass a `dev: true` flag to the gsn options so a relayer is not required to work.
+In a local development environment you can pass a `dev: true` flag to the gsn options so a relayer is not required.
 
 [source,js]
 ----
