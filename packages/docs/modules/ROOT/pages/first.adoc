@@ -38,6 +38,8 @@ openzeppelin init
 
 The CLI will prompt you to choose a project name and version, defaulting to the ones from the `package.json`, and then set up a few files and folders for running your OpenZeppelin project.
 
+NOTE: `oz` is an alias for `openzeppelin` e.g. instead of `openzeppelin init` can just use `oz init`
+
 We are now ready to begin coding.
 
 NOTE: Should you get lost at any point during this tutorial, you can refer to the full code for this project in our https://github.com/OpenZeppelin/openzeppelin-sdk/tree/v2.4.0/examples/first-project[`Github repo`].
