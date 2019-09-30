@@ -45,7 +45,6 @@ import './App.css';
 import { useWeb3Network, useEphemeralKey, useWeb3Injected } from '@openzeppelin/network/react';
 
 import Web3Info from './components/Web3Info/index.js';
-import Counter from './components/Counter/index.js';
 
 function App() {
 
