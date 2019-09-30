@@ -39,10 +39,10 @@ npx create-react-app client
 On the `client/src/App.js` file, replace `App.js` in your react project with the following code:
 [source,js]
 ----
-import React, { useState } from 'react';
+import React from 'react';
 import './App.css';
 
-import { useWeb3Network, useEphemeralKey, useWeb3Injected } from '@openzeppelin/network/react';
+import { useWeb3Injected } from '@openzeppelin/network/react';
 
 import Web3Info from './components/Web3Info/index.js';
 
@@ -50,20 +50,10 @@ function App() {
 
   const context = useWeb3Injected();
 
-  function renderNoWeb3() {
-    return (
-      <div>
-        <h3>Web3 Provider Not Found</h3>
-        <p>Please, install and run Ganache.</p>
-      </div>
-    );
-  }
-
   return (
     <div className="App">
-     
+
       <div>
-        {!context.lib && renderNoWeb3()}
         <div>
           <Web3Info title="Web3 Provider" context={context} />
         </div>
