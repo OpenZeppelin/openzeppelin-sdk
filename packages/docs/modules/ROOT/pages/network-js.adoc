@@ -1,12 +1,12 @@
 = Building a Network.js powered (d)app from scratch
-In this tutorial, we will integrate OpenZeppelin Network.js from the SDK, to build a (d)app. 
+In this tutorial, we will integrate OpenZeppelin Network.js from the SDK, to build a (d)app that can be used in a browser with injected Web3 e.g. using MetaMask. 
 
-The *OpenZeppelin Network.js* is an easy to use and reliable library that provides one line access to the Web3 API.  It can be used in both React and in (vanilla) JavaScript.
+The *OpenZeppelin Network.js* is an easy to use and reliable library that provides one line access to the Web3 API.  It can be used in both React and in (vanilla) JavaScript.  It also supports the Gas Station Network.
 
-We will use the create-react-app package to bootstrap a React application and use Network.js to easily set up a web3 object. 
+We will use the `create-react-app` package to bootstrap a React application and use Network.js to easily set up a web3 context. 
 
 == Setting up the environment
-We will begin by creating a new project and installing all dependencies.
+We begin by creating a new project and installing all dependencies.
 
 [source,console]
 ----
@@ -27,6 +27,8 @@ Use the CLI to set up a new project and follow the prompts.
 ----
 openzeppelin init
 ----
+
+We also need an injected Web3 provider such as MetaMask installed.  Follow the instructions on the https://metamask.io/[MetaMask website] to install the browser extension.
 
 == Creating the dapp
 We will create our (d)app using the `create-react-app` package, which bootstraps a simple client-side application using React.
@@ -130,6 +132,11 @@ export default function Web3Info(props) {
   );
 }
 ----
+
+We can now fire up our (d)app running `npm start` from within the `client` directory. 
+
+Press `Request Access` to request access to injected Web3.  
+NOTE: Best practice is to wait to request web3 access until a user wants to perform an action that they can only do with Web3.
 
 == Starter Kits
 Network.js is used in the https://docs.openzeppelin.com/starter-kits/2.3/gsnkit[OpenZeppelin GSN Starter Kit] so you can start working quickly on your dapp.
