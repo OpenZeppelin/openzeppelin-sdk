@@ -1,16 +1,146 @@
-= Network.js
+= Building a Network.js powered (d)app from scratch
+In this tutorial, we will integrate OpenZeppelin Network.js from the SDK, to build a (d)app. 
 
 The *OpenZeppelin Network.js* is an easy to use and reliable library that provides one line access to the Web3 API.  It can be used in both React and in (vanilla) JavaScript.
 
-== Features
+We will use the create-react-app package to bootstrap a React application and use Network.js to easily set up a web3 object. 
 
-* *Abstraction*: Hides various Web3 providers behind a common API.
-* *One line access*: Access Web3 providers with a single line (MetaMask, Infura, Geth, Portis etc).
-* *Multiple providers*: Supports multiple Web3 providers within the same app.
-* *Meta Transactions*: First class support of Gas Station Network meta-transactions.
-* *React hooks*: React integration using hooks.
-* *Events*: Fires events even for HTTP and forcefully terminated providers.
-* *Changed events*: Network, accounts, and connection changed events for all web3 providers.
+== Setting up the environment
+We will begin by creating a new project and installing all dependencies.
+
+[source,console]
+----
+mkdir web3-dapp && cd web3-dapp
+npm init -y
+npm install @openzeppelin/network
+----
+Make sure you have the OpenZeppelin CLI installed, as well as Ganache for running a local network.
+
+[source,console]
+----
+npm install --global @openzeppelin/cli ganache-cli
+----
+
+Use the CLI to set up a new project and follow the prompts.
+
+[source,console]
+----
+openzeppelin init
+----
+
+== Creating the dapp
+We will create our (d)app using the `create-react-app` package, which bootstraps a simple client-side application using React.
+
+[source,console]
+----
+npx create-react-app client
+----
+
+On the `client/src/App.js` file, replace `App.js` in your react project with the following code:
+[source,js]
+----
+import React, { useState } from 'react';
+import './App.css';
+
+import { useWeb3Network, useEphemeralKey, useWeb3Injected } from '@openzeppelin/network/react';
+
+import Web3Info from './components/Web3Info/index.js';
+import Counter from './components/Counter/index.js';
+
+function App() {
+
+  const context = useWeb3Injected();
+
+  function renderNoWeb3() {
+    return (
+      <div>
+        <h3>Web3 Provider Not Found</h3>
+        <p>Please, install and run Ganache.</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="App">
+     
+      <div>
+        {!context.lib && renderNoWeb3()}
+        <div>
+          <Web3Info title="Web3 Provider" context={context} />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default App;
+----
+
+In the `src` directory create a `components` directory and in `components` create a `Web3Info` directory.  Create an `index.js` file in `Web3Info` directory with the following code:
+[source,js]
+----
+import React, { useState, useEffect, useCallback } from 'react';
+
+export default function Web3Info(props) {
+  const { context } = props;
+  const { networkId, networkName, accounts, providerName, lib } = context;
+
+  const [balance, setBalance] = useState(0);
+
+  const getBalance = useCallback(async () => {
+    let balance =
+      accounts && accounts.length > 0 ? lib.utils.fromWei(await lib.eth.getBalance(accounts[0]), 'ether') : 'Unknown';
+    setBalance(balance);
+  }, [accounts, lib.eth, lib.utils]);
+
+  useEffect(() => {
+    getBalance();
+  }, [accounts, getBalance, networkId]);
+
+  const requestAuth = async web3Context => {
+    try {
+      await web3Context.requestAuth();
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const buttonStyle = {
+    color: 'blue',
+    cursor: 'pointer',
+  };
+
+  return (
+    <div>
+      <h3> {props.title} </h3>
+      <div>
+        Network: {networkId ? `${networkId} – ${networkName}` : 'No connection'}
+      </div>
+      <div>
+        Your address: {accounts && accounts.length ? accounts[0] : 'Unknown'}
+      </div>
+      <div>
+        Your ETH balance: {balance}
+      </div>
+      <div>
+        Provider: {providerName}
+      </div>
+      {accounts && accounts.length ? (
+        <div>
+          Accounts & Signing Status: Access Granted
+        </div>
+      ) : !!networkId && providerName !== 'infura' ? (
+        <div>
+          <br />
+          <div style={buttonStyle} onClick={() => requestAuth(context)}>Request Access</div>
+        </div>
+      ) : (
+        <div></div>
+      )}
+    </div>
+  );
+}
+----
 
 == Starter Kits
 Network.js is used in the https://docs.openzeppelin.com/starter-kits/2.3/gsnkit[OpenZeppelin GSN Starter Kit] so you can start working quickly on your dapp.
@@ -22,134 +152,4 @@ To unpack the starter kit, run the following inside an empty project directory a
 openzeppelin unpack OpenZeppelin/starter-kit-gsn
 ----
 
-== Install
-To install OpenZeppelin Network.js, run the following in your projects root directory:
 
-[source,console]
-----
-npm install @openzeppelin/network
-----
-
-== Usage - React
-Import Network.js for React:
-
-[source,js]
-----
-import { useWeb3Injected, useWeb3Network, useEphemeralKey } from '@openzeppelin/network/react';
-----
-
-You can get the Web3Context from:
-
-* `useWeb3Injected` for an injected provider such as MetaMask.
-* `useWeb3Network` for a network provider with a connection string such as Infura or a private node.
-* `useWeb3` for an injected provider with a fallback to a network provider when there is no injected provider.
-
-[source,js]
-----
-const web3Context = useWeb3Injected();
-----
-[source,js]
-----
-const web3Context = useWeb3Network(`wss://rinkeby.infura.io/ws/v3/${infuraProjectId}`);
-----
-[source,js]
-----
-const web3Context = useWeb3(fallbackConnection: `wss://rinkeby.infura.io/ws/v3/${infuraProjectId}`);
-----
-Once you have a Web3Context you can access the following:
-
-* `accounts` of the web3 provider.  If the array is empty then accounts are either locked or not available.
-* `networkId` of the current network e.g. 3 for Ropsten.
-* `networkName` of the current network e.g. Ropsten.
-* `providerName` of the current web3 provider e.g. metamask, infura.
-* `lib` is the initialized instance of `web3.js`.
-* `connected` indicates if the underlying web3 provider is available or not.
-
-Network.js in React will re-render on changes to the above.
-
-[source,js]
-----
-const { accounts, networkId, networkName, providerName, lib, connected } = web3Context;
-----
-
-== Usage - Javascript
-
-Import Network.js for (vanilla) JavaScript:
-
-[source,js]
-----
-import { fromInjected, fromConnection } from '@openzeppelin/network';
-----
-
-You can get the Web3Context from:  
-
-* `fromInjected` for an injected provider such as MetaMask.
-* `fromConnection` for a network provider with a connection string such as Infura or a private node.
-
-[source,js]
-----
-const web3Context = await fromInjected();
-----
-
-[source,js]
-----
-const web3Context = await fromConnection('http://127.0.0.1:8545');
-----
-
-Once you have a Web3Context you can access the following:    
-
-* `accounts` of the web3 provider.  If the array is empty then accounts are either locked or not available.
-* `networkId` of the current network e.g. 3 for Ropsten.
-* `networkName` of the current network e.g. Ropsten.
-* `providerName` of the current web3 provider e.g. metamask, infura.
-* `lib` is the initialized instance of `web3.js`.
-* `connected` indicates if the underlying web3 provider is available or not.
-
-[source,js]
-----
-const { accounts, networkId, networkName, providerName, lib, connected } = web3Context;
-----
-
-To get notified of changes such as `networkId`, `accounts` or `connected` changing you can subscribe to events:
-
-[source,js]
-----
-function updateNetwork(networkId, networkName) {}
-function updateAccounts(accounts) {}
-function updateConnection(connected) {}
-
-web3Context.on(Web3Context.NetworkIdChangedEventName, updateNetwork);
-web3Context.on(Web3Context.AccountsChangedEventName, updateAccounts);
-web3Context.on(Web3Context.ConnectionChangedEventName, updateConnection);
-----
-
-You should unsubscribe from events once you no longer need them:
-
-[source,js]
-----
-web3Context.off(Web3Context.NetworkIdChangedEventName, updateNetwork);
-web3Context.off(Web3Context.AccountsChangedEventName, updateAccounts);
-web3Context.off(Web3Context.ConnectionChangedEventName, updateConnection);
-----
-
-== GSN
-
-To use GSN, specify GSN as an option, providing a signing key:
-[source,js]
-----
-const web3Context = useWeb3Network(`wss://rinkeby.infura.io/ws/v3/${infuraProjectId}`, { 
-  gsn: { signKey: useEphemeralKey() } 
-});
-----
-
-In a local development environment you can pass a `dev: true` flag to the gsn options so a relayer is not required.
-
-[source,js]
-----
-const web3Context = useWeb3Network('http://127.0.0.1:8545', { 
-  gsn: { 
-    dev: true,
-    signKey: useEphemeralKey() 
-  } 
-});
-----
