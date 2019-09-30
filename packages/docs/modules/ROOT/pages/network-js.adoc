@@ -136,6 +136,7 @@ export default function Web3Info(props) {
 We can now fire up our (d)app running `npm start` from within the `client` directory. 
 
 Press `Request Access` to request access to injected Web3.  
+
 NOTE: Best practice is to wait to request web3 access until a user wants to perform an action that they can only do with Web3.
 
 == Starter Kits
