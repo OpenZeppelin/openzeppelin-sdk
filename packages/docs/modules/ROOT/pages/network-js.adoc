@@ -132,13 +132,13 @@ Press `Request Access` to request access to injected Web3.
 NOTE: Best practice is to wait to request web3 access until a user wants to perform an action that they can only do with Web3.
 
 == Starter Kits
-Network.js is used in the https://docs.openzeppelin.com/starter-kits/2.3/gsnkit[OpenZeppelin GSN Starter Kit] so you can start working quickly on your dapp.
+To get started quickly with OpenZeppelin Network.js you can use the https://docs.openzeppelin.com/starter-kits/2.3/gsnkit[OpenZeppelin GSN Starter Kit].
 
 To unpack the starter kit, run the following inside an empty project directory and follow the instructions.
 
 [source,console]
 ----
-openzeppelin unpack OpenZeppelin/starter-kit-gsn
+openzeppelin unpack @openzeppelin/starter-kit-gsn
 ----
 
 
