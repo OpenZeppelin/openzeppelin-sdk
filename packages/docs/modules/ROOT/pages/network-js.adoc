@@ -44,13 +44,16 @@ On the `client/src/App.js` file, replace `App.js` in your react project with the
 import React from 'react';
 import './App.css';
 
-import { useWeb3Injected } from '@openzeppelin/network/react';
+import { useWeb3 } from '@openzeppelin/network/react';
 
 import Web3Info from './components/Web3Info/index.js';
 
+// const infuraProjectId = process.env.REACT_APP_INFURA_PROJECT_ID;
+const infuraProjectId = '95202223388e49f48b423ea50a70e336';
+
 function App() {
 
-  const web3Context = useWeb3Injected();
+  const web3Context = useWeb3(`wss://rinkeby.infura.io/ws/v3/${infuraProjectId}`);
 
   return (
     <div className="App">
