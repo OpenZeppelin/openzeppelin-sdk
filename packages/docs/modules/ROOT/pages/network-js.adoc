@@ -67,7 +67,7 @@ function App() {
 export default App;
 ----
 
-In the `src` directory create a `components` directory and in `components` create a `Web3Info` directory.  Create an `index.js` file in `Web3Info` directory with the following code:
+In the `client/src` directory create a `components` directory.  In the `components` directory create a `Web3Info` directory.  Then create an `index.js` file in the `Web3Info` directory with the following code:
 [source,js]
 ----
 import React, { useState, useEffect, useCallback } from 'react';
@@ -101,29 +101,21 @@ export default function Web3Info(props) {
     cursor: 'pointer',
   };
 
+  const requestAccess = useCallback(() => requestAuth(context), []);
+
   return (
     <div>
       <h3> {props.title} </h3>
-      <div>
-        Network: {networkId ? `${networkId} – ${networkName}` : 'No connection'}
-      </div>
-      <div>
-        Your address: {accounts && accounts.length ? accounts[0] : 'Unknown'}
-      </div>
-      <div>
-        Your ETH balance: {balance}
-      </div>
-      <div>
-        Provider: {providerName}
-      </div>
+      <div>Network: {networkId ? `${networkId} – ${networkName}` : 'No connection'}</div>
+      <div>Your address: {accounts && accounts.length ? accounts[0] : 'Unknown'}</div>
+      <div>Your ETH balance: {balance}</div>
+      <div>Provider: {providerName}</div>
       {accounts && accounts.length ? (
-        <div>
-          Accounts & Signing Status: Access Granted
-        </div>
+        <div>Accounts & Signing Status: Access Granted</div>
       ) : !!networkId && providerName !== 'infura' ? (
         <div>
           <br />
-          <div style={buttonStyle} onClick={() => requestAuth(context)}>Request Access</div>
+          <div style={buttonStyle} onClick={requestAccess}>Request Access</div>
         </div>
       ) : (
         <div></div>
