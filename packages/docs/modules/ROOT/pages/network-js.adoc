@@ -50,14 +50,14 @@ import Web3Info from './components/Web3Info/index.js';
 
 function App() {
 
-  const context = useWeb3Injected();
+  const web3Context = useWeb3Injected();
 
   return (
     <div className="App">
 
       <div>
         <div>
-          <Web3Info title="Web3 Provider" context={context} />
+          <Web3Info title="Web3 Provider" web3Context={web3Context} />
         </div>
       </div>
     </div>
@@ -73,8 +73,8 @@ In the `client/src` directory create a `components` directory.  In the `componen
 import React, { useState, useEffect, useCallback } from 'react';
 
 export default function Web3Info(props) {
-  const { context } = props;
-  const { networkId, networkName, accounts, providerName, lib } = context;
+  const { web3Context } = props;
+  const { networkId, networkName, accounts, providerName, lib } = web3Context;
 
   const [balance, setBalance] = useState(0);
 
@@ -101,7 +101,7 @@ export default function Web3Info(props) {
     cursor: 'pointer',
   };
 
-  const requestAccess = useCallback(() => requestAuth(context), []);
+  const requestAccess = useCallback(() => requestAuth(web3Context), []);
 
   return (
     <div>
