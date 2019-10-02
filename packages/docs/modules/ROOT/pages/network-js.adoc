@@ -31,7 +31,7 @@ openzeppelin init
 We also need an injected Web3 provider such as MetaMask installed.  Follow the instructions on the https://metamask.io/[MetaMask website] to install the browser extension.
 
 == Creating the dapp
-We will create our (d)app using the `create-react-app` package, which bootstraps a simple client-side application using React.
+We will create our dapp using the `create-react-app` package, which bootstraps a simple client-side application using React.
 
 [source,console]
 ----
@@ -130,6 +130,9 @@ We can now fire up our (d)app running `npm start` from within the `client` direc
 Press `Request Access` to request access to injected Web3.  
 
 NOTE: Best practice is to wait to request web3 access until a user wants to perform an action that they can only do with Web3.
+
+Try changing networks in MetaMask and the dapp will update with the network ID and network name.  Also try changing accounts in MetaMask and the dapp will update the address.
+
 
 == Starter Kits
 To get started quickly with OpenZeppelin Network.js you can use the https://docs.openzeppelin.com/starter-kits/2.3/gsnkit[OpenZeppelin GSN Starter Kit].
