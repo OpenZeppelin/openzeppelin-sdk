@@ -14,19 +14,6 @@ mkdir web3-dapp && cd web3-dapp
 npm init -y
 npm install @openzeppelin/network
 ----
-Make sure you have the OpenZeppelin CLI installed, as well as Ganache for running a local network.
-
-[source,console]
-----
-npm install --global @openzeppelin/cli ganache-cli
-----
-
-Use the CLI to set up a new project and follow the prompts.
-
-[source,console]
-----
-openzeppelin init
-----
 
 We also need an injected Web3 provider such as MetaMask installed.  Follow the instructions on the https://metamask.io/[MetaMask website] to install the browser extension.
 
@@ -135,11 +122,11 @@ Once the dapp is loaded in the browser, press `Request Access` to request access
 
 NOTE: Best practice is to wait to request web3 access until a user wants to perform an action that they can only do with Web3.
 
-`OpenZeppelin Network.js` will re-render components on account, network, and connection changes.
+`OpenZeppelin Network.js` will re-render React components on account, network, and connection changes.
 Try changing networks in MetaMask and the dapp will update with the network ID and network name.  
 Also try changing accounts in MetaMask and the dapp will update the address and balance.  
 
-In this example we used `useWeb3` which attempts to obtain an injected Web3 provider (e.g. MetaMask) first, before falling back to a network connection, in this case Infura.  Instead of `useWeb3` we could `useWeb3Injected` for an injected Web3 provider or `useWeb3Network` for a network provider e.g. Infura or a private node.  Also dapps can be configured to use multiple providers if necessary.
+In this example we imported `useWeb3` which attempts to obtain an injected Web3 provider (e.g. MetaMask) first, before falling back to a network connection, in this case Infura.  Instead of `useWeb3` we could `useWeb3Injected` for an injected Web3 provider or `useWeb3Network` for a network provider e.g. Infura or a private node.  Also dapps can be configured to use multiple providers if necessary.
 
 == Gas Station Network
 `OpenZeppelin Network.js` can be used with the Gas Station Network (GSN).  The example below uses a network provider (Infura), and generates an ephemeral key for signing relay requests to the GSN.
@@ -160,6 +147,21 @@ openzeppelin unpack @openzeppelin/starter-kit-gsn
 ----
 
 == (vanilla) JavaScript and non-React frameworks
-`OpenZeppelin Network.js` can be used with (vanilla) JavaScript.
+`OpenZeppelin Network.js` can be used with (vanilla) JavaScript and non-React frameworks.  Please note that the import is `@openzeppelin/network` rather than `@openzeppelin/network/react` and `fromInjected` rather than `useWeb3Injected`.
+
+[source,js]
+----
+import { fromInjected, fromConnection } from '@openzeppelin/network';
+
+const web3Context = await fromInjected();
+
+function updateNetwork(networkId, networkName) {}
+function updateAccounts(accounts) {}
+function updateConnection(connected) {}
+
+web3Context.on(Web3Context.NetworkIdChangedEventName, updateNetwork);
+web3Context.on(Web3Context.AccountsChangedEventName, updateAccounts);
+web3Context.on(Web3Context.ConnectionChangedEventName, updateConnection);
+----
 
 
