@@ -56,7 +56,9 @@ export default {
     const commandData: CommandData = { ...concealedData, name: commandName };
     if (network !== undefined) commandData.network = network;
 
-    await this.sendToFirebase(telemetry.uuid, commandData);
+    // We send to Firebase without awaiting so that the rest of the CLI is not blocked.
+    // We catch and ignore all errors to protect from uncaught Promise rejections.
+    this.sendToFirebase(telemetry.uuid, commandData).catch(() => {});
   },
 
   async sendToFirebase(uuid: string, commandData: CommandData): Promise<void> {
@@ -65,30 +67,26 @@ export default {
     const db = app.firestore();
     const { FieldValue } = firebase.firestore;
 
-    try {
-      await app.auth().signInAnonymously();
+    await app.auth().signInAnonymously();
 
-      // create a new command document for the current uuid
-      await db.runTransaction(async tx => {
-        const dbSnapshot = await tx.get(db.doc(`users/${uuid}`));
-        let incrementalId;
-        // if the current user document exists, retreive the latest command id and create a new command document.
-        // otherwise, create a document for the user and set the id to 0.
-        if (dbSnapshot.exists) {
-          incrementalId = dbSnapshot.get('latestId') + 1;
-          await tx.update(db.doc(`users/${uuid}`), { latestId: FieldValue.increment(1) });
-        } else {
-          incrementalId = 0;
-          await tx.set(db.doc(`users/${uuid}`), { latestId: 0 });
-        }
-        await tx.set(db.collection(`users/${uuid}/commands`).doc(), { ...commandData, id: incrementalId });
-      });
+    // create a new command document for the current uuid
+    await db.runTransaction(async tx => {
+      const dbSnapshot = await tx.get(db.doc(`users/${uuid}`));
+      let incrementalId;
+      // if the current user document exists, retreive the latest command id and create a new command document.
+      // otherwise, create a document for the user and set the id to 0.
+      if (dbSnapshot.exists) {
+        incrementalId = dbSnapshot.get('latestId') + 1;
+        await tx.update(db.doc(`users/${uuid}`), { latestId: FieldValue.increment(1) });
+      } else {
+        incrementalId = 0;
+        await tx.set(db.doc(`users/${uuid}`), { latestId: 0 });
+      }
+      await tx.set(db.collection(`users/${uuid}/commands`).doc(), { ...commandData, id: incrementalId });
+    });
 
-      // close all connections
-      await app.delete();
-    } catch (_) {
-      return;
-    }
+    // close all connections
+    await app.delete();
   },
 };
 
