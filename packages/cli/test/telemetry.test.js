@@ -42,6 +42,11 @@ describe('telemetry', function() {
             this.inquirerPrompt = sinon.stub(inquirer, 'prompt').returns({ telemetry: false });
           });
 
+          it('prompts for telemetry', async function() {
+            await Telemetry.report('create', {}, true);
+            this.inquirerPrompt.calledOnce.should.be.true;
+          });
+
           it('does not call sendToFirebase function', async function() {
             await Telemetry.report('create', {}, true);
             expect(this.sendToFirebase.getCall(0)).to.be.null;
