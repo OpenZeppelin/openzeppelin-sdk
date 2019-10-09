@@ -5,6 +5,7 @@ require('./setup');
 import fs from 'fs-extra';
 import sinon from 'sinon';
 import inquirer from 'inquirer';
+import path from 'path';
 import 'firebase/auth';
 import 'firebase/firestore';
 
@@ -59,7 +60,7 @@ describe('telemetry', function() {
             await Telemetry.report('create', {}, true);
             const [firstArg, secondArg] = this.writeJsonStub.getCall(0).args;
 
-            firstArg.should.match(/telemetry.json/);
+            path.basename(firstArg).should.equal('telemetry.json');
             secondArg.optIn.should.be.false;
             secondArg.uuid.should.match(/^[a-f0-9\-]+$/);
             secondArg.salt.should.match(/^[a-f0-9]+$/);
@@ -80,7 +81,7 @@ describe('telemetry', function() {
             await Telemetry.report('create', {}, true);
             const [firstArg, secondArg] = this.writeJsonStub.getCall(0).args;
 
-            firstArg.should.match(/telemetry.json/);
+            path.basename(firstArg).should.equal('telemetry.json');
             secondArg.optIn.should.be.true;
             secondArg.uuid.should.match(/^[a-f0-9\-]+$/);
             secondArg.salt.should.match(/^[a-f0-9]+$/);
