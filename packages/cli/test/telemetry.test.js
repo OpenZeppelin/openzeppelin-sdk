@@ -112,7 +112,7 @@ describe('telemetry', function() {
 
                 commandData.name.should.eq('create');
                 commandData.network.should.eq('ropsten');
-                shouldConcealOptions(commandData.options);
+                shouldConcealOptions(commandData);
               });
             });
 
@@ -123,7 +123,7 @@ describe('telemetry', function() {
 
                 commandData.name.should.eq('create');
                 commandData.network.should.eq('development');
-                shouldConcealOptions(commandData.options);
+                shouldConcealOptions(commandData);
               });
             });
           });
@@ -133,11 +133,11 @@ describe('telemetry', function() {
   });
 });
 
-function shouldConcealOptions(options) {
-  options.stringField.should.match(/^[a-f0-9]{64}$/);
-  options.numberField.should.match(/^[a-f0-9]{64}$/);
-  options.objectField.stringField.should.match(/^[a-f0-9]{64}$/);
-  options.objectField.arrayField[0].should.match(/^[a-f0-9]{64}$/);
-  options.objectField.arrayField[1].should.match(/^[a-f0-9]{64}$/);
-  options.objectField.arrayField[2].should.match(/^[a-f0-9]{64}$/);
+function shouldConcealOptions(commandData) {
+  commandData.stringField.should.match(/^[a-f0-9]{64}$/);
+  commandData.numberField.should.match(/^[a-f0-9]{64}$/);
+  commandData.objectField.stringField.should.match(/^[a-f0-9]{64}$/);
+  commandData.objectField.arrayField[0].should.match(/^[a-f0-9]{64}$/);
+  commandData.objectField.arrayField[1].should.match(/^[a-f0-9]{64}$/);
+  commandData.objectField.arrayField[2].should.match(/^[a-f0-9]{64}$/);
 }
