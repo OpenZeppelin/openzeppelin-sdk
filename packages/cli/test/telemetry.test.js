@@ -108,7 +108,7 @@ describe('telemetry', function() {
             context('when a non-development network is specified', function() {
               it('conceals all options recursively except for the network name', async function() {
                 await Telemetry.report('create', { network: 'ropsten', ...this.commandData }, true);
-                const [_, commandData] = this.sendToFirebase.getCall(0).args;
+                const [, commandData] = this.sendToFirebase.getCall(0).args;
 
                 commandData.name.should.eq('create');
                 commandData.network.should.eq('ropsten');
@@ -119,7 +119,7 @@ describe('telemetry', function() {
             context('when a dev network is specified', function() {
               it('changes the network name to development', async function() {
                 await Telemetry.report('create', { network: 'dev-209384093', ...this.commandData }, true);
-                const [_, commandData] = this.sendToFirebase.getCall(0).args;
+                const [, commandData] = this.sendToFirebase.getCall(0).args;
 
                 commandData.name.should.eq('create');
                 commandData.network.should.eq('development');
