@@ -107,7 +107,8 @@ async function checkOptIn(interactive: boolean): Promise<GlobalTelemetryOptions 
     const { telemetry } = await inquirer.prompt({
       name: 'telemetry',
       type: 'confirm',
-      message: 'telemetry?',
+      message:
+        'Would you like to contribute anonymous usage data to help us improve the OpenZeppelin CLI? Learn more at https://zpl.in/telemetry',
       default: true,
     });
 
