@@ -12,7 +12,18 @@ import 'firebase/firestore';
 import Telemetry from '../src/telemetry';
 import ProjectFile from '../src/models/files/ProjectFile';
 
+import * as prompt from '../src/prompts/prompt';
+
 describe('telemetry', function() {
+  before(function() {
+    this.originalDisableInteractivity = prompt.DISABLE_INTERACTIVITY;
+    prompt.DISABLE_INTERACTIVITY = false;
+  });
+
+  after(function() {
+    prompt.DISABLE_INTERACTIVITY = this.originalDisableInteractivity;
+  });
+
   beforeEach('stub fs-extra functions', function() {
     this.readJsonStub = sinon.stub(fs, 'readJson').returns({ catch: () => undefined });
     this.ensureDirStub = sinon.stub(fs, 'ensureDir');

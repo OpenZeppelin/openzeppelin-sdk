@@ -23,11 +23,13 @@ describe('prompt', function() {
           bar: { message: 'message2', type: 'input' },
         };
         this.interactive = true;
+        this.originalDisableInteractivity = prompt.DISABLE_INTERACTIVITY;
         prompt.DISABLE_INTERACTIVITY = false;
       });
 
       afterEach('restore stub', function() {
         sinon.restore();
+        prompt.DISABLE_INTERACTIVITY = this.originalDisableInteractivity;
       });
 
       context('with arguments', function() {
