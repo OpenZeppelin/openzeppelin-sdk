@@ -189,5 +189,4 @@ export interface CompileParams {
   solcVersion: string;
   optimizer: string | boolean;
   optimizerRuns: string;
-  interactive: boolean;
 }

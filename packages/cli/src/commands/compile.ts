@@ -30,7 +30,7 @@ const register: (program: any) => any = program =>
     .withNonInteractiveOption()
     .action(action);
 
-async function action(options: CompileParams): Promise<void> {
+async function action(options: CompileParams & { interactive: boolean }): Promise<void> {
   const { evmVersion, solcVersion: version, optimizer, optimizerRuns } = options;
 
   // Handle optimizer option:
@@ -57,7 +57,11 @@ async function action(options: CompileParams): Promise<void> {
     },
   };
 
-  await Telemetry.report('compile', options, options.interactive);
+  await Telemetry.report(
+    'compile',
+    { evmVersion, solcVersion: version, optimizer, optimizerRuns },
+    options.interactive,
+  );
   await compile(compilerOptions);
 }
 
