@@ -63,7 +63,8 @@ export type Params =
   | TransferParams
   | BalanceParams
   | CallParams
-  | SendTxParams;
+  | SendTxParams
+  | CompileParams;
 
 export interface CreateParams extends Proxy {
   salt?: string;
@@ -181,4 +182,12 @@ export interface SendTxParams extends MethodParams, Network {
   proxyAddress: string;
   value?: string;
   gas?: string;
+}
+
+export interface CompileParams {
+  evmVersion: string;
+  solcVersion: string;
+  optimizer: string | boolean;
+  optimizerRuns: string;
+  interactive: boolean;
 }

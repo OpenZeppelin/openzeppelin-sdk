@@ -14,6 +14,7 @@ import {
 import ConfigManager from '../models/config/ConfigManager';
 import { SendTxPropsParams, SendTxSelectionParams } from './interfaces';
 import promptForMethodParams from '../prompts/method-params';
+import Telemetry from '../telemetry';
 
 const name = 'call';
 const signature: string = name;
@@ -43,6 +44,7 @@ async function action(options: any): Promise<void> {
   const { contractFullName, proxyReference } = await promptForProxy(proxyAddress, network, options);
   const methodParams = await promptForMethodParams(contractFullName, options, {}, Mutability.Constant);
   const args = pickBy({ ...methodParams, proxyAddress: proxyReference });
+  await Telemetry.report('call', { ...args, network, txParams }, interactive);
   await call({ ...args, network, txParams });
 
   if (!options.dontExitProcess && process.env.NODE_ENV !== 'test') process.exit(0);

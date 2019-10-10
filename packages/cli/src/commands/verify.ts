@@ -2,6 +2,7 @@ import verify from '../scripts/verify';
 import ConfigManager from '../models/config/ConfigManager';
 import { promptIfNeeded, contractsList, networksList, InquirerQuestions } from '../prompts/prompt';
 import ProjectFile from '../models/files/ProjectFile';
+import Telemetry from '../telemetry';
 
 const name = 'verify';
 const signature = `${name} [contract-alias]`;
@@ -41,6 +42,7 @@ async function action(contractName: string, options: any): Promise<void> {
   const prompted = await promptIfNeeded({ args, opts, defaults, props }, interactive);
   const { network, txParams } = await ConfigManager.initNetworkConfiguration(prompted);
 
+  await Telemetry.report('verify', { ...prompted, network, txParams }, interactive);
   await verify(prompted.contractName, { ...prompted, network, txParams });
   if (!options.dontExitProcess && process.env.NODE_ENV !== 'test') process.exit(0);
 }

@@ -2,6 +2,7 @@ import unlink from '../scripts/unlink';
 import push from './push';
 import { promptIfNeeded, InquirerQuestions } from '../prompts/prompt';
 import ProjectFile from '../models/files/ProjectFile';
+import Telemetry from '../telemetry';
 
 const name = 'unlink';
 const signature = `${name} [dependencies...]`;
@@ -23,6 +24,7 @@ async function action(dependencies: string[], options: any): Promise<void> {
   const props = getCommandProps(installedDependencies);
   const prompted = await promptIfNeeded({ args, props }, interactive);
 
+  await Telemetry.report('unlink', prompted, interactive);
   await unlink(prompted);
   await push.runActionIfRequested(options);
 }

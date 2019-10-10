@@ -2,6 +2,7 @@ import { ZWeb3 } from '@openzeppelin/upgrades';
 import session from '../scripts/session';
 import { promptIfNeeded, networksList, InquirerQuestions } from '../prompts/prompt';
 import ConfigManager from '../models/config/ConfigManager';
+import Telemetry from '../telemetry';
 
 const name = 'session';
 const signature: string = name;
@@ -23,6 +24,7 @@ async function action(options: any): Promise<void> {
   const { network: networkInOpts, expires, timeout, from, close, interactive } = options;
 
   if (close) {
+    await Telemetry.report('session', { close }, options.interactive);
     session({ close });
   } else {
     const promptedNetwork = await promptIfNeeded(
@@ -36,6 +38,7 @@ async function action(options: any): Promise<void> {
       interactive,
     );
 
+    await Telemetry.report('session', { close, ...promptedNetwork, ...promptedSession, network }, options.interactive);
     session({ close, ...promptedNetwork, ...promptedSession });
   }
 

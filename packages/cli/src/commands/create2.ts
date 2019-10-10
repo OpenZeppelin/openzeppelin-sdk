@@ -9,6 +9,7 @@ import { parseMethodParams } from '../utils/input';
 import { fromContractFullName } from '../utils/naming';
 import { hasToMigrateProject } from '../prompts/migrations';
 import ConfigManager from '../models/config/ConfigManager';
+import Telemetry from '../telemetry';
 
 const name = 'create2';
 const signature = `${name} [alias]`;
@@ -53,6 +54,8 @@ async function action(contractFullName: string, options: any): Promise<void> {
     contractAlias,
     packageName,
   };
+
+  await Telemetry.report('create2', { ...opts, network, txParams }, options.interactive);
 
   if (options.query && options.signature) await runSignatureQuery(opts, network, txParams);
   else if (options.query) await runQuery(opts, network, txParams);

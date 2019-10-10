@@ -1,4 +1,5 @@
 import unpack from '../scripts/unpack';
+import Telemetry from '../telemetry';
 
 const name = 'unpack';
 const signature = `${name} [kit]`;
@@ -9,9 +10,11 @@ const register: (program: any) => any = program =>
     .command(signature, undefined, { noHelp: true })
     .usage('[kit]')
     .description(description)
+    .withNonInteractiveOption()
     .action(action);
 
-async function action(kit: string): Promise<void> {
+async function action(kit: string, options: any): Promise<void> {
+  await Telemetry.report('unpack', { repoOrName: kit }, options.interactive);
   await unpack({ repoOrName: kit });
 }
 

@@ -1,5 +1,6 @@
 import push from './push';
 import bump from '../scripts/bump';
+import Telemetry from '../telemetry';
 
 const name = 'bump';
 const signature = `${name} <version>`;
@@ -14,6 +15,7 @@ const register: (program: any) => any = program =>
     .action(action);
 
 async function action(version: string, options: any): Promise<void> {
+  await Telemetry.report('bump', { version }, options.interactive);
   await bump({ version });
   await push.runActionIfRequested(options);
 }
