@@ -35,7 +35,7 @@ async function action(accountAddress: string, options: any): Promise<void> {
   });
 
   await Telemetry.report('balance', { ...promptedConfig, contractAddress, network }, interactive);
-  await balance({ ...promptedConfig, contractAddress });
+  await balance({ accountAddress: promptedConfig.accountAddress, contractAddress });
 
   if (!options.dontExitProcess && process.env.NODE_ENV !== 'test') process.exit(0);
 }
