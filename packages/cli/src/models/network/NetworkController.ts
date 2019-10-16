@@ -208,7 +208,8 @@ export default class NetworkController {
   // Contract model || SolidityLib model
   private _solidityLibsForPush(onlyChanged: boolean = false): Contract[] | never {
     const { contractNames, contractAliases } = this.projectFile;
-    const libNames = this._getAllSolidityLibNames(contractNames);
+
+    let libNames = this._getAllSolidityLibNames(contractNames);
 
     const clashes = intersection(libNames, contractAliases);
     if (!isEmpty(clashes)) {
@@ -226,12 +227,16 @@ export default class NetworkController {
 
   // Contract model || SolidityLib model
   public async uploadSolidityLibs(libs: Contract[]): Promise<void> {
-    await allPromisesOrError(libs.map(lib => this._uploadSolidityLib(lib)));
+    // Libs may have dependencies, so deploy them in order
+    for (let i = 0; i < libs.length; i++) {
+      await this._uploadSolidityLib(libs[i]);
+    }
   }
 
   // Contract model || SolidityLib model
   private async _uploadSolidityLib(libClass: Contract): Promise<void> {
     const libName = libClass.schema.contractName;
+    await this._setSolidityLibs(libClass);
     Loggy.spin(__filename, '_uploadSolidityLib', `upload-solidity-lib${libName}`, `Uploading ${libName} library`);
     const libInstance = await this.project.setImplementation(libClass, libName);
     this.networkFile.addSolidityLib(libName, libInstance);
@@ -313,11 +318,29 @@ export default class NetworkController {
 
   // Contract model || SolidityLib model
   private _getAllSolidityLibNames(contractNames: string[]): string[] {
+    let newLibNames = this._getSolidityLibNames(contractNames);
+    let libNames = newLibNames;
+    while (newLibNames.length > 0) {
+      // Get new library dependencies
+      newLibNames = this._getSolidityLibNames(newLibNames);
+
+      // Prepend new libs to ensure they are deployed first
+      libNames = newLibNames.concat(libNames);
+
+      // Detect loops
+      if (uniq(libNames).length !== libNames.length) {
+        throw new Error(`Library dependency cycle detected: ${libNames}`);
+      }
+    }
+
+    return libNames;
+  }
+
+  private _getSolidityLibNames(contractNames: string[]): string[] {
     const libNames = contractNames.map(contractName => {
       const contract = Contracts.getFromLocal(contractName);
       return getSolidityLibNames(contract.schema.bytecode);
     });
-
     return uniq(flatten(libNames));
   }
 
