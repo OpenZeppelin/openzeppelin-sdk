@@ -6,23 +6,11 @@ import crypto from 'crypto';
 import envPaths from 'env-paths';
 import mapValues from 'lodash.mapvalues';
 import inquirer from 'inquirer';
-import firebase from 'firebase/app';
-import 'firebase/auth';
-import 'firebase/firestore';
-import { DISABLE_INTERACTIVITY } from './prompts/prompt';
+import proc from 'child_process';
 
-import { Params } from './scripts/interfaces';
-import ProjectFile from './models/files/ProjectFile';
-
-const FIREBASE_CONFIG = {
-  apiKey: 'AIzaSyAZoGB2p26UejODezZPmczgwehI6xlSKPs',
-  authDomain: 'cli-telemetry.firebaseapp.com',
-  databaseURL: 'https://cli-telemetry.firebaseio.com',
-  projectId: 'cli-telemetry',
-  storageBucket: '',
-  messagingSenderId: '449985678611',
-  appId: '1:449985678611:web:88b411adc68e6521e19ee6',
-};
+import { DISABLE_INTERACTIVITY } from '../prompts/prompt';
+import { Params } from '../scripts/interfaces';
+import ProjectFile from '../models/files/ProjectFile';
 
 type Field = string | number | boolean;
 
@@ -32,7 +20,7 @@ interface GlobalTelemetryOptions {
   salt: string;
 }
 
-type CommandData = Params & {
+export type CommandData = Params & {
   name: string;
   network?: string;
 };
@@ -55,40 +43,17 @@ export default {
     const commandData: CommandData = { ...concealedData, name: commandName };
     if (network !== undefined) commandData.network = network;
 
-    // We send to Firebase without awaiting so that the rest of the CLI is not blocked.
-    // We catch and ignore all errors to protect from uncaught Promise rejections.
-    this.sendToFirebase(telemetry.uuid, commandData).catch(() => {});
+    this.sendToFirebase(telemetry.uuid, commandData);
   },
 
-  async sendToFirebase(uuid: string, commandData: CommandData): Promise<void> {
-    // Initialize Firebase and anonymously authenticate
-    const app = firebase.initializeApp(FIREBASE_CONFIG);
+  sendToFirebase(uuid: string, commandData: CommandData): void {
+    // We send to Firebase in a child process so that the CLI is not blocked from exiting.
+    const child = proc.fork(path.join(__dirname, './send-to-firebase'));
+    child.send({ uuid, commandData });
 
-    try {
-      const db = app.firestore();
-      const { FieldValue } = firebase.firestore;
-
-      await app.auth().signInAnonymously();
-
-      // create a new command document for the current uuid
-      await db.runTransaction(async tx => {
-        const dbSnapshot = await tx.get(db.doc(`users/${uuid}`));
-        let incrementalId;
-        // if the current user document exists, retreive the latest command id and create a new command document.
-        // otherwise, create a document for the user and set the id to 0.
-        if (dbSnapshot.exists) {
-          incrementalId = dbSnapshot.get('latestId') + 1;
-          await tx.update(db.doc(`users/${uuid}`), { latestId: FieldValue.increment(1) });
-        } else {
-          incrementalId = 0;
-          await tx.set(db.doc(`users/${uuid}`), { latestId: 0 });
-        }
-        await tx.set(db.collection(`users/${uuid}/commands`).doc(), { ...commandData, id: incrementalId });
-      });
-    } finally {
-      // close all connections
-      await app.delete();
-    }
+    // Allow this process to exit while the child is still alive.
+    child.disconnect();
+    child.unref();
   },
 };
 

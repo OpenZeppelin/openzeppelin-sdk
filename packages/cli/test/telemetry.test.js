@@ -36,7 +36,7 @@ describe('telemetry', function() {
 
   describe('#report', function() {
     beforeEach('stubs sendToFirebase', async function() {
-      this.sendToFirebase = sinon.stub(Telemetry, 'sendToFirebase').returns({ catch: () => undefined });
+      this.sendToFirebase = sinon.stub(Telemetry, 'sendToFirebase');
     });
 
     context('when interactive mode is not activated', function() {
