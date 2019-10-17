@@ -5,7 +5,6 @@ import path from 'path';
 import crypto from 'crypto';
 import envPaths from 'env-paths';
 import mapValues from 'lodash.mapvalues';
-import pickBy from 'lodash.pickby';
 import inquirer from 'inquirer';
 import firebase from 'firebase/app';
 import 'firebase/auth';
