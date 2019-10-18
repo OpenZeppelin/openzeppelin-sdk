@@ -1,6 +1,7 @@
 import check from '../scripts/check';
 import { compile } from '../models/compiler/Compiler';
 import ConfigManager from '../models/config/ConfigManager';
+import Telemetry from '../telemetry';
 
 const name = 'check';
 const signature = `${name} [contract]`;
@@ -17,6 +18,7 @@ const register: (program: any) => any = program =>
 async function action(contractAlias: string, options: any): Promise<void> {
   ConfigManager.initStaticConfiguration();
   if (!options.skipCompile) await compile();
+  await Telemetry.report('check', { contractAlias }, options.interactive);
   check({ contractAlias });
 }
 

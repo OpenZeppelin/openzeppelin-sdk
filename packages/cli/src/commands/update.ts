@@ -10,12 +10,12 @@ import {
   promptIfNeeded,
   networksList,
   promptForNetwork,
-  methodsList,
   proxiesList,
   proxyInfo,
   InquirerQuestions,
 } from '../prompts/prompt';
 import promptForMethodParams from '../prompts/method-params';
+import Telemetry from '../telemetry';
 import { ProxyType } from '../scripts/interfaces';
 
 const name = 'upgrade';
@@ -81,6 +81,7 @@ async function action(proxyReference: string, options: any): Promise<void> {
     ...parsedContractReference,
     ...initMethodParams,
   });
+  await Telemetry.report('update', { ...args, network, txParams }, interactive);
   await update({ ...args, network, txParams });
 }
 

@@ -67,8 +67,10 @@
     "chalk": "^2.4.1",
     "cheerio": "^1.0.0-rc.2",
     "commander": "^2.15.1",
+    "env-paths": "^2.2.0",
     "ethereumjs-util": "^6.1.0",
     "find-up": "^3.0.0",
+    "firebase": "^6.6.0",
     "fs-extra": "^7.0.1",
     "inquirer": "^6.4.1",
     "is-url": "^1.2.4",
@@ -95,6 +97,7 @@
     "lodash.isstring": "^4.0.1",
     "lodash.isundefined": "^3.0.1",
     "lodash.map": "^4.6.0",
+    "lodash.mapvalues": "^4.6.0",
     "lodash.max": "^4.0.1",
     "lodash.maxby": "^4.6.0",
     "lodash.merge": "^4.6.1",
@@ -118,6 +121,7 @@
     "spinnies": "^0.3.0",
     "truffle-config": "1.1.16",
     "underscore": "^1.9.1",
+    "uuid": "^3.3.3",
     "web3": "1.2.1",
     "web3-utils": "1.2.0"
   },
@@ -151,6 +155,7 @@
     "sinon-chai": "^3.2.0",
     "truffle": "^5.0.5",
     "ts-node": "^7.0.1",
-    "typescript": "^3.2.2"
+    "typescript": "^3.2.2",
+    "yargs": "^7.1.0"
   }
 }

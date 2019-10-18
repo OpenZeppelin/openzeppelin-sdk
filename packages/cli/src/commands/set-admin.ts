@@ -15,6 +15,7 @@ import {
 import { hasToMigrateProject } from '../prompts/migrations';
 import ConfigManager from '../models/config/ConfigManager';
 import { ProxyType } from '../scripts/interfaces';
+import Telemetry from '../telemetry';
 
 const name = 'set-admin';
 const signature = `${name} [alias-or-address] [new-admin-address]`;
@@ -97,6 +98,7 @@ async function action(proxyReference: string, newAdmin: string, options: any): P
   }
 
   const args = pickBy({ ...parsedContractReference, newAdmin: pickedNewAdmin });
+  await Telemetry.report('set-admin', { ...args, network, txParams }, options.interactive);
   await setAdmin({ ...args, network, txParams });
   if (!options.dontExitProcess && process.env.NODE_ENV !== 'test') process.exit(0);
 }

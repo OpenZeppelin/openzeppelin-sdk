@@ -13,6 +13,7 @@ import {
 } from '../prompts/prompt';
 import { SendTxPropsParams, SendTxSelectionParams } from './interfaces';
 import promptForMethodParams from '../prompts/method-params';
+import Telemetry from '../telemetry';
 
 const name = 'send-tx';
 const signature: string = name;
@@ -52,6 +53,8 @@ async function action(options: any): Promise<void> {
     value,
     gas,
   });
+
+  await Telemetry.report('send-tx', { ...args, network, txParams }, interactive);
   await sendTx({ ...args, network, txParams });
 
   if (!options.dontExitProcess && process.env.NODE_ENV !== 'test') process.exit(0);

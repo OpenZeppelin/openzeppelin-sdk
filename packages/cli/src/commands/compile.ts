@@ -1,5 +1,7 @@
 import { compile } from '../models/compiler/Compiler';
+import { CompileParams } from '../scripts/interfaces';
 import { ProjectCompilerOptions } from '../models/compiler/solidity/SolidityProjectCompiler';
+import Telemetry from '../telemetry';
 
 const name = 'compile';
 const signature = `${name}`;
@@ -25,14 +27,10 @@ const register: (program: any) => any = program =>
       '--evm-version [evm]',
       `choose target evm version (value is written to configuration file for future runs, defaults depends on compiler: byzantium prior to 0.5.5, petersburg from 0.5.5)`,
     )
+    .withNonInteractiveOption()
     .action(action);
 
-async function action(options: {
-  evmVersion: string;
-  solcVersion: string;
-  optimizer: string | boolean;
-  optimizerRuns: string;
-}): Promise<void> {
+async function action(options: CompileParams & { interactive: boolean }): Promise<void> {
   const { evmVersion, solcVersion: version, optimizer, optimizerRuns } = options;
 
   // Handle optimizer option:
@@ -59,6 +57,11 @@ async function action(options: {
     },
   };
 
+  await Telemetry.report(
+    'compile',
+    { evmVersion, solcVersion: version, optimizer, optimizerRuns },
+    options.interactive,
+  );
   await compile(compilerOptions);
 }
 

@@ -1,6 +1,7 @@
 import remove from '../scripts/remove';
 import push from './push';
 import { promptIfNeeded, contractsList, InquirerQuestions } from '../prompts/prompt';
+import Telemetry from '../telemetry';
 
 const name = 'remove';
 const signature = `${name} [contracts...]`;
@@ -23,6 +24,7 @@ async function action(contracts: string[], options: any): Promise<void> {
   const props = getCommandProps();
   const prompted = await promptIfNeeded({ args, props }, interactive);
 
+  await Telemetry.report('remove', prompted, interactive);
   remove(prompted);
   await push.runActionIfRequested(options);
 }

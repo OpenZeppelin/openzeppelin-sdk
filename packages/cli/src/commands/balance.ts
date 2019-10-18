@@ -2,6 +2,7 @@ import balance from '../scripts/balance';
 import { promptIfNeeded, networksList, InquirerQuestions } from '../prompts/prompt';
 import ConfigManager from '../models/config/ConfigManager';
 import Session from '../models/network/Session';
+import Telemetry from '../telemetry';
 
 const name = 'balance';
 const signature = `${name} [address]`;
@@ -28,14 +29,13 @@ async function action(accountAddress: string, options: any): Promise<void> {
   const defaults = { network: networkInSession };
   const promptedConfig = await promptIfNeeded({ args, opts, props, defaults }, interactive);
 
-  await ConfigManager.initNetworkConfiguration({
+  const { network } = await ConfigManager.initNetworkConfiguration({
     ...options,
     ...promptedConfig,
   });
-  await balance({
-    accountAddress: promptedConfig.accountAddress,
-    contractAddress,
-  });
+
+  await Telemetry.report('balance', { ...promptedConfig, contractAddress, network }, interactive);
+  await balance({ accountAddress: promptedConfig.accountAddress, contractAddress });
 
   if (!options.dontExitProcess && process.env.NODE_ENV !== 'test') process.exit(0);
 }

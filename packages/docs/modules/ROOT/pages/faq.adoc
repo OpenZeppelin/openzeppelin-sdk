@@ -70,3 +70,15 @@ require('babel-polyfill');
 You can create upgradeable instances from Solidity code by using your project's App contract, and then calling its `create` function from Solidity. Note that to be able to do this, your project needs to be published, i.e. it needs to have the OpenZeppelin SDK xref:architecture.adoc[Contracts Architecture] enabled.
 
 To see an example of how this is done, please refer to the example project https://github.com/OpenZeppelin/openzeppelin-sdk/tree/master/examples/creating-instances-from-solidity[creating-instances-from-solidity].
+
+[[opt-in-usage-data-reporting]]
+== Opt-In Usage Data Reporting
+
+In order to better guide the development of our tools, we ask users if they would like to opt in to contributing anonymized logs of their usage of the OpenZeppelin CLI. In this document we explain exactly what data we collect and how we anonymize it. Please visit https://openzeppelin.com/privacy for further information about our privacy practices.
+
+When you run the OpenZeppelin CLI for the first time we ask if you would like to opt in to contributing usage logs. This is a setting that will be stored globally and will apply to future projects. You can opt-out at any time, and you can also choose to opt out on a per-project basis.
+
+If you choose to you opt in, we generate a random user identifier and a random 32-byte salt.
+
+Every `openzeppelin` subcommand you run will be first anonymized by hashing each argument together with the random salt. Note that this only applies to user-specific arguments (e.g. the name of a contract, or an address), and not to the flags themselves (e.g. `--force`). The anonymized commands will be logged on our servers together with the random user identifier, and the network that they were run in.
+

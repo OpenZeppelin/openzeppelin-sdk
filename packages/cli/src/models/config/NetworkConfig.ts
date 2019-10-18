@@ -78,6 +78,10 @@ const NetworkConfig = {
     if (!networks[networkName]) throw Error(`Given network '${networkName}' is not defined in your networks.js file`);
 
     const network = networks[networkName];
+    if (isUndefined(network.networkId)) {
+      network.networkId = network.network_id;
+    }
+
     const provider = this.getProvider(networks[networkName]);
     const artifactDefaults = this.getArtifactDefaults(config, networks[networkName]);
 

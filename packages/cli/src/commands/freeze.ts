@@ -1,5 +1,6 @@
 import freeze from '../scripts/freeze';
 import ConfigManager from '../models/config/ConfigManager';
+import Telemetry from '../telemetry';
 
 const name = 'freeze';
 const signature: string = name;
@@ -15,6 +16,7 @@ const register: (program: any) => any = program =>
 
 async function action(options: any): Promise<void> {
   const { network, txParams } = await ConfigManager.initNetworkConfiguration(options);
+  await Telemetry.report('freeze', { network, txParams }, options.interactive);
   await freeze({ network, txParams });
   if (!options.dontExitProcess && process.env.NODE_ENV !== 'test') process.exit(0);
 }

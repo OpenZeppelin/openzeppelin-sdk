@@ -3,6 +3,7 @@ import ConfigManager from '../models/config/ConfigManager';
 import { hasToMigrateProject } from '../prompts/migrations';
 import { promptIfNeeded, networksList, InquirerQuestions } from '../prompts/prompt';
 import Session from '../models/network/Session';
+import Telemetry from '../telemetry';
 
 const name = 'publish';
 const signature = `${name}`;
@@ -28,6 +29,7 @@ async function action(options: any): Promise<void> {
   const { network, txParams } = await ConfigManager.initNetworkConfiguration(promptedOpts);
   if (!(await hasToMigrateProject(network))) process.exit(0);
 
+  await Telemetry.report('publish', { network, txParams }, interactive);
   await publish({ network, txParams });
   if (!options.dontExitProcess && process.env.NODE_ENV !== 'test') process.exit(0);
 }

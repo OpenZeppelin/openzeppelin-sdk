@@ -24,6 +24,8 @@ const TruffleConfig = {
     if (!networkList[network])
       throw Error(`Given network '${network}' is not defined in your ${this.getTruffleConfigFileName(path)} file`);
     config.network = network;
+    config.networkId = config.network_id;
+
     const { provider } = config;
     await this.checkHdWalletProviderVersion(provider);
     const artifactDefaults = this.getArtifactDefaults(config);
