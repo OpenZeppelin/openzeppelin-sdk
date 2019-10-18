@@ -1,4 +1,3 @@
-/// <reference lib="dom" />
 import fs from 'fs-extra';
 import uuid from 'uuid/v4';
 import path from 'path';

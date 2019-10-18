@@ -1,3 +1,4 @@
+/// <reference lib="dom" /> - Necessary for firebase types.
 import firebase from 'firebase/app';
 import 'firebase/auth';
 import 'firebase/firestore';
