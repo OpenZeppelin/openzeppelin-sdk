@@ -34,7 +34,6 @@ export default {
     let network;
     if ('network' in options) {
       network = options.network;
-      delete options.network;
       if (network.match(/dev-/)) network = 'development';
     }
 
