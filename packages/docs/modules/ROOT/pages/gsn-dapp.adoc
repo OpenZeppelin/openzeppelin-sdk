@@ -90,7 +90,7 @@ contract Counter is GSNRecipient {
 }
 ----
 
-Start ganache on a separate terminal by running `ganache-cli`. Then, create an instance of our new contract using the OpenZeppelin CLI with `oz create`, and follow the prompts. Be sure to copy the address of your instance which is returned at the end of the process.
+Start ganache on a separate terminal by running `ganache-cli`. Then, create an instance of our new contract using the OpenZeppelin CLI with `oz create`, and follow the prompts, including saying yes to call a function to initialize the instance. Be sure to copy the address of your instance which is returned at the end of the process.
 
 NOTE: It is important that you remember to call the `initialize()` function when creating the contract, as this will be sure to get your contract ready to be used in the GSN.
 
@@ -150,15 +150,15 @@ We will create our (d)app using the `create-react-app` package, which bootstraps
 npx create-react-app client
 ----
 
-On the `client/App.js` file, add the following code. This will use `@openzeppelin/network` to create a new provider connected to the local network. It will use a key generated on the spot to sign all transactions on behalf of the user and will use the GSN to relay them to the network. This allows your users to start interacting with your (d)app right away, even if they do not have MetaMask installed, an Ethereum account, or any ETH at all.
-
-First, create a symlink so we can access our compiled contract `.json` files. From inside the `src` directory, run:
-
-`ln -ns ../../build`
+First, create a symlink so we can access our compiled contract `.json` files. From inside the `client/src` directory, run:
+[source,console]
+----
+ln -ns ../../build
+----
 
 This will allow our front end to reach our contract artifacts.
 
-Then, replace `App.js` in your react project with the following code:
+Then, replace `client/src/App.js` file, with the following code. This will use `@openzeppelin/network` to create a new provider connected to the local network. It will use a key generated on the spot to sign all transactions on behalf of the user and will use the GSN to relay them to the network. This allows your users to start interacting with your (d)app right away, even if they do not have MetaMask installed, an Ethereum account, or any ETH at all.
 
 [source,javascript]
 ----
@@ -241,7 +241,7 @@ export default App;
 ----
 
 
-NOTE: You can pass a `dev: true` flag to the `gsn` options when setting up the provider. This will use the https://github.com/OpenZeppelin/openzeppelin-gsn-provider/[GSNDevProvider] instead of the regular GSN provider. This is a provider set up specifically for testing or development, and it _does not require a relayer to be running_ to work. This can make development easier, but it will feel less like the actual GSN experience. If you want to use an actual require, you can run `npx oz-gsn run-relayer` locally (see the https://github.com/OpenZeppelin/openzeppelin-gsn-helpers#running-the-relayer-binary[OpenZeppelin GSN helpers] for more info).
+NOTE: You can pass a `dev: true` flag to the `gsn` options when setting up the provider. This will use the https://github.com/OpenZeppelin/openzeppelin-gsn-provider/[GSNDevProvider] instead of the regular GSN provider. This is a provider set up specifically for testing or development, and it _does not require a relayer to be running_ to work. This can make development easier, but it will feel less like the actual GSN experience. If you want to use an actual relayer, you can run `npx oz-gsn run-relayer` locally (see the https://github.com/OpenZeppelin/openzeppelin-gsn-helpers#running-the-relayer-binary[OpenZeppelin GSN helpers] for more info).
 
 Great! We can now fire up our application running `npm start` from within the `client` folder. Remember to keep both your ganache and relayer up and running. You should be able to send transactions to your `Counter` contract without having to use MetaMask or have any ETH at all!
 
@@ -250,7 +250,7 @@ Great! We can now fire up our application running `npm start` from within the `c
 
 It is not too impressive sending a local transaction in your ganache network, where you already have a bunch of fully-funded accounts. To witness the GSN at its full potential, let's move our application to the Rinkeby testnet. If you later want to go onto mainnet, the instructions are the same.
 
-Let's start by deploying our `Counter` contract to Rinkeby. You will need an account with some Rinkeby ETH for this, which you will have to register in your `network.js` file. Take a look at https://docs.openzeppelin.com[this guide] for more info.
+Let's start by deploying our `Counter` contract to Rinkeby. You will need an account with some Rinkeby Ether for this, which you will have to register in your `network.js` file. Take a look at xref:public-deploy.adoc[deploying to a public network] guide for more information.
 
 [source,console]
 ----
