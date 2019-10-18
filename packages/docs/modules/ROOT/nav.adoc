@@ -9,6 +9,7 @@
 * xref:writing-contracts.adoc[Writing upgradeable contracts]
 * xref:gsn-dapp.adoc[Building a GSN powered dapp]
 * xref:publish.adoc[Publishing an Ethereum Package]
+* xref:truffle.adoc[Using the SDK with Truffle]
 * xref:testing.adoc[Testing upgradeable projects]
 * xref:erc20-onboarding.adoc[Onboarding ERC20 tokens]
 * xref:upgrades-governance.adoc[Upgrades governance]
