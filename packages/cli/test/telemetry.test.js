@@ -14,7 +14,7 @@ import ProjectFile from '../src/models/files/ProjectFile';
 
 import * as prompt from '../src/prompts/prompt';
 
-describe.only('telemetry', function() {
+describe('telemetry', function() {
   before(function() {
     this.originalDisableInteractivity = prompt.DISABLE_INTERACTIVITY;
     prompt.DISABLE_INTERACTIVITY = false;
