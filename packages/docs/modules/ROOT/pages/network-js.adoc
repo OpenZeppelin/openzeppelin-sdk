@@ -1,4 +1,4 @@
-= Building a Network.js powered dapp from scratch
+= Building an OpenZeppelin Network.js powered dapp from scratch
 In this tutorial, we will integrate *OpenZeppelin Network.js* from the OpenZeppelin SDK, to build a dapp that can be used in a browser with injected web3 e.g. using MetaMask. 
 
 The *OpenZeppelin Network.js* is an easy to use and reliable library that provides one line access to the web3 API.  It can be used in both React and in (vanilla) JavaScript.  It also supports the Gas Station Network.
