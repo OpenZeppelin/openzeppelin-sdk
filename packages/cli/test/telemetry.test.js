@@ -14,7 +14,7 @@ import ProjectFile from '../src/models/files/ProjectFile';
 
 import * as prompt from '../src/prompts/prompt';
 
-describe('telemetry', function() {
+describe.only('telemetry', function() {
   before(function() {
     this.originalDisableInteractivity = prompt.DISABLE_INTERACTIVITY;
     prompt.DISABLE_INTERACTIVITY = false;
@@ -64,6 +64,7 @@ describe('telemetry', function() {
           });
 
           it('writes local file and sets telemetryOptIn option to false', async function() {
+            this.telemetryOptInSetter = sinon.stub(ProjectFile.prototype, 'exists').returns(true);
             this.telemetryOptInSetter = sinon.spy(ProjectFile.prototype, 'telemetryOptIn', ['set']);
             this.projectFileWrite = sinon.spy(ProjectFile.prototype, 'write');
             await Telemetry.report('create', {}, true);
@@ -104,6 +105,7 @@ describe('telemetry', function() {
           });
 
           it('writes local file', async function() {
+            this.telemetryOptInSetter = sinon.stub(ProjectFile.prototype, 'exists').returns(true);
             this.telemetryOptInSetter = sinon.spy(ProjectFile.prototype, 'telemetryOptIn', ['set']);
             this.projectFileWrite = sinon.spy(ProjectFile.prototype, 'write');
             await Telemetry.report('create', {}, true);

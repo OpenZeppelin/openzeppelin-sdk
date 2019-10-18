@@ -36,8 +36,8 @@ async function action(projectName: string, version: string, options: any): Promi
   const flags = { dependencies, installDependencies, force, publish };
   const initArguments = { ...prompted, ...flags };
 
-  await init(initArguments);
   await Telemetry.report('init', initArguments, interactive);
+  await init(initArguments);
   await push.runActionIfRequested(options);
 }
 

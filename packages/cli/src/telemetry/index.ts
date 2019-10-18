@@ -86,7 +86,7 @@ async function checkOptIn(interactive: boolean): Promise<GlobalTelemetryOptions 
     await fs.writeJson(globalDataPath, globalOptions);
   }
 
-  if (localOptIn === undefined && globalOptions !== undefined) {
+  if (project.exists() && localOptIn === undefined && globalOptions !== undefined) {
     project.telemetryOptIn = globalOptions.optIn;
     // following function is sync
     project.write();
