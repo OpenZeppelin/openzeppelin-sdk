@@ -11,7 +11,7 @@ import { fromContractFullName } from '../utils/naming';
 import { hasToMigrateProject } from '../prompts/migrations';
 import ConfigManager from '../models/config/ConfigManager';
 import { promptIfNeeded, networksList, contractsList, methodsList, InquirerQuestions } from '../prompts/prompt';
-import promptForMethodParams from '../prompts/method-params';
+import promptForMethodParams, { promptMethods } from '../prompts/method-params';
 import { ProxyType } from '../scripts/interfaces';
 
 interface PropsParams {
@@ -81,6 +81,7 @@ async function action(contractFullName: string, options: any): Promise<void> {
     askForMethodParamsMessage: 'Call a function to initialize the instance after creating it?',
   };
   const { methodName, methodArgs } = await promptForMethodParams(contractFullName, options, additionalOpts);
+  const { methodName: foo } = await promptMethods(contractFullName, options, additionalOpts);
 
   const args = pickBy({
     packageName,

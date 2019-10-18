@@ -5,6 +5,8 @@ import negate from 'lodash.negate';
 
 import { parseMethodParams, parseArg } from '../utils/input';
 import { promptIfNeeded, argsList, methodsList, InquirerQuestions } from './prompt';
+import { fromContractFullName } from '../utils/naming';
+import ContractManager from '../models/local/ContractManager';
 
 type PropsFn = (any) => InquirerQuestions;
 
@@ -13,6 +15,34 @@ interface CommandProps {
   methodName: string;
   methodArgs: string[];
   additionalOpts?: { [key: string]: any };
+}
+
+export async function promptMethods(
+  contractFullName: string,
+  options: any,
+  additionalOpts: { [key: string]: string | boolean } = {},
+  constant: Mutability = Mutability.NotConstant,
+): Promise<{ methodName: string }> {
+  const { interactive } = options;
+  let { methodName, methodArgs } = parseMethodParams(options, 'initialize');
+  const opts = { ...additionalOpts, methodName };
+  const contractManager = new ContractManager();
+  const { package: packageName, contract } = fromContractFullName(contractFullName);
+  const isUpgradeable = contractManager.isUpgradeableContract(packageName, contract);
+  additionalOpts = { ...additionalOpts, isUpgradeable };
+
+  const methodProps = getCommandProps(contractFullName, methodName, methodArgs, constant, additionalOpts);
+  contractManager.hasConstructor(packageName, contract);
+
+  // prompt for method name if not provided
+  if (isUpgradeable) {
+    ({ methodName } = await promptIfNeeded({ opts, props: methodProps }, interactive));
+  } else {
+    console.log(contractManager.hasConstructor(packageName, contract));
+    methodName = 'foo';
+  }
+
+  return methodName;
 }
 
 export default async function promptForMethodParams(

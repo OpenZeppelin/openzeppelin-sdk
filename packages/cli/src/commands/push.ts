@@ -94,7 +94,7 @@ async function runActionIfRequested(externalOptions: any): Promise<void> {
 }
 
 async function runActionIfNeeded(contractName: string, network: string, options: any): Promise<void> {
-  const { force, interactive, network: promptedNetwork } = options;
+  const { force, interactive } = options;
   const projectFile = new ProjectFile();
   const networkFile = new NetworkFile(projectFile, network);
   const { contract: contractAlias, package: packageName } = fromContractFullName(contractName);

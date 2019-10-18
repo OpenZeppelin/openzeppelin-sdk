@@ -129,24 +129,47 @@ export default class NetworkController {
     return this.project;
   }
 
+  public hasChangedLibraries(contract: Contract): boolean {
+    const solidityLibNames = getSolidityLibNames(contract.schema.bytecode);
+    return !!solidityLibNames
+      .map(libName => Contracts.getFromLocal(libName))
+      .find(lib => this.hasSolidityLibChanged(lib));
+  }
+
+  public isPushableContract(contractName: string, contract: Contract): boolean {
+    const newVersion = this._newVersionRequired();
+    const contractHasChanged = this.hasContractChanged(contractName, contract);
+    const hasChangedLibraries = this.hasChangedLibraries(contract);
+
+    return contractHasChanged || newVersion || hasChangedLibraries;
+  }
+
+  private async unsetSolidityLibs(contract: Contract): Promise<void> {
+    const libNames = getSolidityLibNames(contract.schema.bytecode);
+    await allPromisesOrError(
+      this.networkFile.solidityLibsMissing(libNames).map(libName => this._unsetSolidityLib(libName)),
+    );
+  }
+
   public async pushSingle(contractName: string, force: boolean = false): Promise<void | never> {
     const contract = this.contractManager.getContractClass(this.projectFile.name, contractName);
+    if (!this.isPushableContract(contractName, contract)) return;
     const buildArtifacts = getBuildArtifacts();
-
-    // ValidateContracts also extends each contract class with validation errors and storage info
-    if (!this.validateContracts([[contractName, contract]], buildArtifacts) && !force) {
+    // Validate Contract also extends each contract class with validation errors and storage info
+    if (this.validateContract(contractName, contract, buildArtifacts) && !force) {
       throw Error(
         `Contract ${contractName} has validation errors. Please review the items listed above and fix them, or run this command again with the --force option.`,
       );
     }
-    this._checkVersion();
+
+    this.checkVersion();
+    this.checkNotFrozen();
     await this.fetchOrDeploy(this.projectVersion);
     await this.handleDependenciesLink();
 
-    this.checkNotFrozen();
-
     await this.linkSolidityLibraries(contract);
-    await this.uploadContracts([[contractName, contract]]);
+    await this.uploadContract(contractName, contract);
+    await this._unsetSolidityLibs();
   }
 
   // DEPRECATED. This function is deprecated and will be removed together with the push command in next major release
@@ -162,7 +185,7 @@ export default class NetworkController {
       );
     }
 
-    this._checkVersion();
+    this.checkVersion();
     await this.fetchOrDeploy(this.projectVersion);
     await this.handleDependenciesLink();
 
@@ -194,7 +217,7 @@ export default class NetworkController {
   }
 
   // DeployerController
-  private _checkVersion(): void {
+  private checkVersion(): void {
     if (this._newVersionRequired()) {
       this.networkFile.frozen = false;
       this.networkFile.contracts = {};
@@ -244,7 +267,7 @@ export default class NetworkController {
       .map(libName => Contracts.getFromLocal(libName))
       .filter(libClass => {
         const hasSolidityLib = this.networkFile.hasSolidityLib(libClass.schema.contractName);
-        const hasChanged = this._hasSolidityLibChanged(libClass);
+        const hasChanged = this.hasSolidityLibChanged(libClass);
         return !hasSolidityLib || !onlyChanged || hasChanged;
       });
   }
@@ -454,7 +477,7 @@ export default class NetworkController {
   }
 
   // Contract model || SolidityLib model
-  private _hasSolidityLibChanged(libClass: Contract): boolean {
+  private hasSolidityLibChanged(libClass: Contract): boolean {
     return !this.networkFile.hasSameBytecode(libClass.schema.contractName, libClass);
   }
 
@@ -482,7 +505,16 @@ export default class NetworkController {
 
   // Contract model
   public isContractDeployed(contractAlias: string): boolean {
-    return !this.isLocalContract(contractAlias) || this.networkFile.hasContract(contractAlias);
+    const hasUpgradeableInstance = this.networkFile.getProxies({
+      contract: contractAlias,
+      kind: ProxyType.Upgradeable,
+    });
+
+    return (
+      !this.isLocalContract(contractAlias) ||
+      this.networkFile.hasContract(contractAlias) ||
+      hasUpgradeableInstance.length === 0
+    );
   }
 
   // VerifierController
@@ -666,7 +698,7 @@ export default class NetworkController {
     const solidityLibNames = getSolidityLibNames(contract.schema.bytecode);
     const solidityLibs = solidityLibNames
       .map(libName => Contracts.getFromLocal(libName))
-      .filter(lib => !this.networkFile.hasSolidityLib(lib.schema.contractName) || this._hasSolidityLibChanged(lib));
+      .filter(lib => !this.networkFile.hasSolidityLib(lib.schema.contractName) || this.hasSolidityLibChanged(lib));
 
     // deploys outdated or new solidity libraries
     await this.uploadSolidityLibs(solidityLibs);
@@ -688,6 +720,7 @@ export default class NetworkController {
     const instance = await Transactions.deployContract(contract, initArgs, this.txParams);
     const instanceInfo: RegularInstanceInfo = {
       address: instance.address,
+      kind: ProxyType.Regular,
     };
 
     Loggy.succeed(

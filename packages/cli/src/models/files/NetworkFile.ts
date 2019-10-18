@@ -56,7 +56,9 @@ export interface ProxyInstanceInfo extends CommonInstanceInfo {
   kind: ProxyType;
 }
 
-export interface RegularInstanceInfo extends CommonInstanceInfo {}
+export interface RegularInstanceInfo extends CommonInstanceInfo {
+  kind: ProxyType;
+}
 
 export interface InstanceInfo extends ProxyInstanceInfo, RegularInstanceInfo {}
 

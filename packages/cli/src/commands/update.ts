@@ -86,7 +86,6 @@ async function promptForProxies(proxyReference: string, network: string, options
   const args = { pickProxyBy, proxy: proxyReference };
   const props = getCommandProps({ proxyReference, network, all });
   const { pickProxyBy: promptedPickProxyBy, proxy: promptedProxy } = await promptIfNeeded({ args, props }, interactive);
-  console.log('que prompteo', promptedProxy);
 
   return {
     ...promptedProxy,

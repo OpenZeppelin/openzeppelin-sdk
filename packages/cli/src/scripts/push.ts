@@ -20,7 +20,7 @@ export default async function push({
     if (deployProxyAdmin) await controller.deployProxyAdmin();
     if (deployProxyFactory) await controller.deployProxyFactory();
     contractAlias ? await controller.pushSingle(contractAlias, force) : await controller.push(reupload, force);
-
+    const { appAddress } = controller;
     controller.writeNetworkPackageIfNeeded();
   } catch (error) {
     const cb = () => controller.writeNetworkPackageIfNeeded();

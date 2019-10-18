@@ -68,6 +68,11 @@ export default class ContractManager {
     return contract && contract.bytecode.length <= 2;
   }
 
+  public hasConstructor(packageName: string, contractName: string): boolean {
+    const contract = this.getContractClass(packageName, contractName);
+    return !!contract.schema.abi.find(method => method.type === 'constructor');
+  }
+
   private isLibrary(contract: { [key: string]: any }): boolean {
     return (
       contract &&
