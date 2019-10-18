@@ -50,7 +50,7 @@ describe('telemetry', function() {
       context('when neither local nor global options are set', function() {
         context('when the user answers no to telemetry prompted question', function() {
           beforeEach(async function() {
-            this.inquirerPrompt = sinon.stub(inquirer, 'prompt').returns({ telemetry: false });
+            this.inquirerPrompt = sinon.stub(inquirer, 'prompt').returns({ optIn: false });
           });
 
           it('prompts for telemetry', async function() {
@@ -85,7 +85,7 @@ describe('telemetry', function() {
 
         context('when the user answers yes to telemetry prompted question', function() {
           beforeEach(async function() {
-            this.inquirerPrompt = sinon.stub(inquirer, 'prompt').returns({ telemetry: true });
+            this.inquirerPrompt = sinon.stub(inquirer, 'prompt').returns({ optIn: true });
           });
 
           it('prompts for telemetry', async function() {

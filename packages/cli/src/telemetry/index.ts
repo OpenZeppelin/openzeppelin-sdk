@@ -27,8 +27,8 @@ export type CommandData = Params & {
 // We export an object with report and sendToFirebase so that we can stub them in tests.
 export default {
   async report(commandName: string, options: Params, interactive: boolean): Promise<void> {
-    const telemetry = await checkOptIn(interactive);
-    if (telemetry === undefined || !telemetry.optIn) return;
+    const telemetryOptions = await checkOptIn(interactive);
+    if (telemetryOptions === undefined || !telemetryOptions.optIn) return;
 
     // extract network name if present
     let network;
@@ -39,11 +39,11 @@ export default {
     }
 
     // Conceal data before sending it
-    const concealedData = concealData(options, telemetry.salt);
+    const concealedData = concealData(options, telemetryOptions.salt);
     const commandData: CommandData = { ...concealedData, name: commandName };
     if (network !== undefined) commandData.network = network;
 
-    this.sendToFirebase(telemetry.uuid, commandData);
+    this.sendToFirebase(telemetryOptions.uuid, commandData);
   },
 
   sendToFirebase(uuid: string, commandData: CommandData): void {
@@ -65,16 +65,16 @@ async function checkOptIn(interactive: boolean): Promise<GlobalTelemetryOptions 
 
   const { data: globalDataDir } = envPaths('openzeppelin-sdk');
   const globalDataPath = path.join(globalDataDir, 'telemetry.json');
-  let globalOptIn: GlobalTelemetryOptions | undefined = await fs.readJson(globalDataPath).catch(() => undefined);
+  let globalOptions: GlobalTelemetryOptions | undefined = await fs.readJson(globalDataPath).catch(() => undefined);
 
   if (localOptIn === false) return undefined;
 
   // disable interactivity manually for tests and CI
   if (DISABLE_INTERACTIVITY) interactive = false;
 
-  if (globalOptIn === undefined && interactive) {
-    const { telemetry } = await inquirer.prompt({
-      name: 'telemetry',
+  if (globalOptions === undefined && interactive) {
+    const { optIn } = await inquirer.prompt({
+      name: 'optIn',
       type: 'confirm',
       message:
         'Would you like to contribute anonymous usage data to help us improve the OpenZeppelin CLI? Learn more at https://zpl.in/telemetry',
@@ -82,18 +82,18 @@ async function checkOptIn(interactive: boolean): Promise<GlobalTelemetryOptions 
     });
 
     const salt = crypto.randomBytes(32);
-    globalOptIn = { optIn: telemetry, uuid: uuid(), salt: salt.toString('hex') };
+    globalOptions = { optIn, uuid: uuid(), salt: salt.toString('hex') };
     await fs.ensureDir(globalDataDir);
-    await fs.writeJson(globalDataPath, globalOptIn);
+    await fs.writeJson(globalDataPath, globalOptions);
   }
 
-  if (localOptIn === undefined && globalOptIn !== undefined) {
-    project.telemetryOptIn = globalOptIn.optIn;
+  if (localOptIn === undefined && globalOptions !== undefined) {
+    project.telemetryOptIn = globalOptions.optIn;
     // following function is sync
     project.write();
   }
 
-  return globalOptIn;
+  return globalOptions;
 }
 
 function hashField(field: Field, salt: string): string {
