@@ -10,15 +10,15 @@ defaults: &defaults
 
 aliases:
   - restore_cache: &restore-build-cache-lib
-      keys: ['dependency-cache-v2-build-lib-{{ .Revision }}']
+      keys: ['dependency-cache-v3-build-lib-{{ .Revision }}']
   - restore_cache: &restore-build-cache-cli
-      keys: ['dependency-cache-v2-build-cli-{{ .Revision }}']
+      keys: ['dependency-cache-v3-build-cli-{{ .Revision }}']
   - restore_cache: &restore-cache-root
-      keys: ['dependency-cache-v2-root-{{ checksum "package.json" }}', 'dependency-cache-v2-root-']
+      keys: ['dependency-cache-v3-root-{{ checksum "package.json" }}', 'dependency-cache-v3-root-']
   - restore_cache: &restore-cache-lib
-      keys: ['dependency-cache-v2-lib-{{ checksum "packages/lib/package.json" }}', 'dependency-cache-v2-lib-']
+      keys: ['dependency-cache-v3-lib-{{ checksum "packages/lib/package.json" }}', 'dependency-cache-v3-lib-']
   - restore_cache: &restore-cache-cli
-      keys: ['dependency-cache-v2-cli-{{ checksum "packages/cli/package.json" }}', 'dependency-cache-v2-cli-']
+      keys: ['dependency-cache-v3-cli-{{ checksum "packages/cli/package.json" }}', 'dependency-cache-v3-cli-']
 
 commands:
 
@@ -106,19 +106,19 @@ jobs:
           command: ./node_modules/.bin/lerna bootstrap --loglevel=info --concurrency=4 --scope="@openzeppelin/cli" --scope="@openzeppelin/upgrades"
           no_output_timeout: 60m
       - save_cache:
-          key: dependency-cache-v2-root-{{ checksum "package.json" }}
+          key: dependency-cache-v3-root-{{ checksum "package.json" }}
           paths: [node_modules]
       - save_cache:
-          key: dependency-cache-v2-cli-{{ checksum "packages/cli/package.json" }}
+          key: dependency-cache-v3-cli-{{ checksum "packages/cli/package.json" }}
           paths: [packages/cli/node_modules]
       - save_cache:
-          key: dependency-cache-v2-lib-{{ checksum "packages/lib/package.json" }}
+          key: dependency-cache-v3-lib-{{ checksum "packages/lib/package.json" }}
           paths: [packages/lib/node_modules]
       - save_cache:
-          key: dependency-cache-v2-build-cli-{{ .Revision }}
+          key: dependency-cache-v3-build-cli-{{ .Revision }}
           paths: [packages/cli/lib, packages/cli/build]
       - save_cache:
-          key: dependency-cache-v2-build-lib-{{ .Revision }}
+          key: dependency-cache-v3-build-lib-{{ .Revision }}
           paths: [packages/lib/lib, packages/lib/build]
 
   test-lib:
