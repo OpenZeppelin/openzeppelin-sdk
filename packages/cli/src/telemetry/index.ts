@@ -47,7 +47,9 @@ export default {
 
   sendToFirebase(uuid: string, commandData: CommandData): void {
     // We send to Firebase in a child process so that the CLI is not blocked from exiting.
-    const child = proc.fork(path.join(__dirname, './send-to-firebase'));
+    const child = proc.fork(path.join(__dirname, './send-to-firebase'), [], {
+      stdio: ['ignore', 'ignore', 'ignore', 'ipc'],
+    });
     child.send({ uuid, commandData });
 
     // Allow this process to exit while the child is still alive.
