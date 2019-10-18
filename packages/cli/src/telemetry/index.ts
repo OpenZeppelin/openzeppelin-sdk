@@ -24,6 +24,7 @@ export type CommandData = Params & {
   network?: string;
 };
 
+// We export an object with report and sendToFirebase so that we can stub them in tests.
 export default {
   async report(commandName: string, options: Params, interactive: boolean): Promise<void> {
     const telemetry = await checkOptIn(interactive);
