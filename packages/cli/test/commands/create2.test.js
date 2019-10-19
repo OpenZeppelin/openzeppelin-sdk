@@ -9,7 +9,7 @@ contract('create2 command', function() {
   itShouldParse(
     'should call create2 script with options',
     'create',
-    'zos create2 Impl --network test --init setup --args 42 --force --salt 10 --from 0x40 --signature 0x80',
+    'zos create2 Impl.sol/Impl --network test --init setup --args 42 --force --salt 10 --from 0x40 --signature 0x80',
     function(create) {
       create.should.have.been.calledWithExactly({
         contractAlias: 'Impl',
@@ -41,7 +41,7 @@ contract('create2 command', function() {
   itShouldParse(
     'should call create2 script querying signature',
     'querySignedDeployment',
-    'zos create2 Impl --query --init setup --args 42 --signature 0x80 --network test --salt 10 --from 0x40',
+    'zos create2 Impl.sol/Impl --query --init setup --args 42 --signature 0x80 --network test --salt 10 --from 0x40',
     function(querySignedDeployment) {
       querySignedDeployment.should.have.been.calledWithExactly({
         network: 'test',

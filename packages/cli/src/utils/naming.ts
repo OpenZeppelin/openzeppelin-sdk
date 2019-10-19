@@ -8,7 +8,6 @@ export function toContractFullName(packageName: string, contractName: string): s
 export function fromContractFullName(contractFullName: string): { contract?: string; package?: string } {
   if (!contractFullName) return {};
   const fragments = contractFullName.split('/');
-  const contractName = fragments.pop();
-  if (fragments.length === 0) return { contract: contractName };
-  else return pickBy({ contract: contractName, package: fragments.join('/') });
+  if (fragments.length === 2) return { contract: contractFullName };
+  else return pickBy({ contract: fragments.slice(1).join('/'), package: fragments[0] });
 }

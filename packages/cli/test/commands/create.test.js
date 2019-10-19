@@ -10,7 +10,7 @@ describe('create command', function() {
   itShouldParse(
     'should call create script with options',
     'create',
-    'zos create Impl --network test --init setup --args 42 --force --from 0x40',
+    'zos create Impl.sol/Impl --network test --init setup --args 42 --force --from 0x40',
     function(create) {
       create.should.have.been.calledWithExactly({
         contractAlias: 'Impl',
@@ -26,7 +26,7 @@ describe('create command', function() {
   itShouldParse(
     'should call create script with kind',
     'create',
-    'zos create Impl --network test --init setup --args 42 --force --from 0x40 --minimal',
+    'zos create Impl.sol/Impl --network test --init setup --args 42 --force --from 0x40 --minimal',
     function(create) {
       create.should.have.been.calledWithExactly({
         contractAlias: 'Impl',
@@ -43,7 +43,7 @@ describe('create command', function() {
   itShouldParse(
     'should call create script with options',
     'create',
-    'zos create Boolean --network test --init initialize --args false --force --from 0x40',
+    'zos create Boolean.sol/Boolean --network test --init initialize --args false --force --from 0x40',
     function(create) {
       create.should.have.been.calledWithExactly({
         contractAlias: 'Boolean',
@@ -59,7 +59,7 @@ describe('create command', function() {
   itShouldParse(
     'should call create script with default init method',
     'create',
-    'zos create Impl --network test --init --args 42 --force --from 0x40',
+    'zos create Impl.sol/Impl --network test --init --args 42 --force --from 0x40',
     function(create) {
       create.should.have.been.calledWithExactly({
         contractAlias: 'Impl',
@@ -75,7 +75,7 @@ describe('create command', function() {
   itShouldParse(
     'should call create script with init if only args is provided',
     'create',
-    'zos create Impl --network test --args 42 --force --from 0x40',
+    'zos create Impl.sol/Impl --network test --args 42 --force --from 0x40',
     function(create) {
       create.should.have.been.calledWithExactly({
         contractAlias: 'Impl',
