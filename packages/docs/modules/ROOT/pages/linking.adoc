@@ -92,7 +92,7 @@ In order to support contract upgrades, the OpenZeppelin SDK xref:pattern.adoc#th
 
 [source,console]
 ----
-npm install @openzeppelin/upgrades@2.4.0
+npm install @openzeppelin/upgrades
 ----
 
 Now, let's write our exchange contract in `contracts/TokenExchange.sol`, using an _initializer_ to set its initial state:
