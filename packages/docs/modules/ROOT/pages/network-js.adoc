@@ -31,7 +31,7 @@ npx create-react-app client
 Our dapp will display the current Ethereum network that we are connected to and which web3 provider is being used.
 
 In the code below, first we import `useWeb3` from the React implementation of *OpenZeppelin Network.js* (`@openzeppelin/network/react`).
-We then get a web3Context using `useWeb3` which will attempt to retrieve an injected web3 provider (e.g. MetaMask), otherwise it will fall back to a network connection, which in this case is a connection to mainnet via Infura.
+We then get a web3Context using `useWeb3`. This hook will attempt to retrieve an injected web3 provider (e.g. MetaMask), otherwise it will fall back to a network connection, which in this case is a connection to mainnet via Infura.
 The `networkId`, `networkName` and `providerName` are obtained from the web3Context and displayed in the dapp.
 
 On the `client/src/App.js` file, replace the placeholder code in `App.js` in our react project with the following code:
