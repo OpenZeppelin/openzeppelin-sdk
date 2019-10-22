@@ -106,12 +106,10 @@ In the `client/src/App.js` file, add an import for our `Web3Info` component:
 import Web3Info from './components/Web3Info.js';
 ----
 
-Then replace the `App` function in `App.js` with the following code:
+Then replace the contents of the `App` function in `App.js` with the following code:
 
 [source,js]
 ----
-function App() {
-
   const web3Context = useWeb3(`wss://mainnet.infura.io/ws/v3/${infuraProjectId}`);
 
   return (
@@ -122,7 +120,6 @@ function App() {
       </div>
     </div>
   );
-}
 ----
 
 Start our dapp again by running `npm start` from within the `client` directory. 
