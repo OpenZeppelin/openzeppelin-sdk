@@ -99,20 +99,17 @@ export default function Web3Info(props) {
 
 In our App we use our `Web3Info` component and provide a `web3Context`.
 
-On the `client/src/App.js` file, replace `App.js` in our react project with the following code:
+In the `client/src/App.js` file, add an import for our `Web3Info` component:
 
 [source,js]
 ----
-import React from 'react';
-import './App.css';
+import Web3Info from './components/Web3Info.js';
+----
 
-import { useWeb3 } from '@openzeppelin/network/react';
+Then replace the `App` function in `App.js` with the following code:
 
-import Web3Info from './components/Web3Info/index.js';
-
-// const infuraProjectId = process.env.REACT_APP_INFURA_PROJECT_ID;
-const infuraProjectId = '95202223388e49f48b423ea50a70e336';
-
+[source,js]
+----
 function App() {
 
   const web3Context = useWeb3(`wss://mainnet.infura.io/ws/v3/${infuraProjectId}`);
@@ -126,8 +123,6 @@ function App() {
     </div>
   );
 }
-
-export default App;
 ----
 
 Start our dapp again by running `npm start` from within the `client` directory. 
@@ -146,7 +141,7 @@ In the code below, we get `accounts` from the `web3Context` and if available the
 If `accounts` are not available we display a button for the user to request access to injected web3.  When pressed, the `requestAuth` function in `web3Context` is called and the injected web3 provider can display a dialog to the user requesting access.
 We also use react functionality, `useCallback` to setup the callback for request access.
 
-On the Web3Info components `/Web3Info/index.js` file, replace `index.js` with the following code:
+In the `Web3Info.js` file, replace the contents of the component with the following code:
 
 [source,js]
 ----
@@ -203,7 +198,8 @@ For the final iteration of our dapp we will add to our component to display the 
 In the code below, we get the `lib` from the `web3Context` which is an initialized instance of `web3.js`.  We use `lib` (web3.js) to `getBalance` of the account and to convert `fromWei` to ether units.
 We also use react functionality, `useState` to track the state of the account balance and `useEffect` to get the balance if `accounts` or `networkId` change.
 
-On the components `/Web3Info/index.js` file, replace `index.js` in our react project with the following code:
+In the `Web3Info.js` file, replace the contents of the component with the following code:
+
 [source,js]
 ----
 import React, { useState, useEffect, useCallback } from 'react';
