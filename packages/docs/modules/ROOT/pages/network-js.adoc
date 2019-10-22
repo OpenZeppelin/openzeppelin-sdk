@@ -78,7 +78,7 @@ To install MetaMask as our injected web3 provider (if you don't have an injected
 
 In the code below, our `Web3Info` component expects a web3Context.  The `networkId`, `networkName` and `providerName` are obtained from the web3Context and displayed in the component.
 
-In the `client/src` directory create a `components` directory. In the `components` directory create a `Web3Info` directory for our `Web3Info` component.  Then create an `index.js` file in the `Web3Info` directory with the following code:
+In the `client/src` directory create a `components` directory. In the `components` directory create a `Web3Info.js` file  with the following code:
 [source,js]
 ----
 import React from 'react';
