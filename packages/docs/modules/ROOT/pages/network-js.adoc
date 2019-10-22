@@ -72,7 +72,7 @@ We use `useWeb3` which attempts to obtain an injected web3 provider first, befor
 NOTE: If you use Infura in your own dapp, you will need to create an account with Infura and setup an Infura Project (with corresponding Infura Project ID).  See https://infura.io[Infura website] to create an account.
 
 == Add a component to the dapp
-For the second iteration of our dapp we will move the display of the current Ethereum network to a component and show how components are re-rendered when changes are made, such as the network.
+For the second iteration of our dapp we will move the display of the current Ethereum network to a component and see how components are re-rendered when changes are made, such as the network.
 
 To install MetaMask as our injected web3 provider (if you don't have an injected web3 provider installed already), follow the instructions on the https://metamask.io[MetaMask website] to install the browser extension.
 
