@@ -128,14 +128,16 @@ Start our dapp again by running `npm start` from within the `client` directory.
 
 Try changing networks in MetaMask and *OpenZeppelin Network.js* will cause the component to update with the network ID and network name.  
 
-== Add request access to injected web3 to the dapp
-For the third iteration of our dapp we will add a mechanism request to access injected web3 and once the user has connected will display the address of the users account.
+== Add request access to account address to the dapp
+For the third iteration of our dapp we will add a mechanism to request access to the users address and once the user has connected will display the account address.  
 
-NOTE: Best practice is to wait to request injected web3 access until a user wants to perform an action that they can only do with injected web3.  See https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1102.md[EIP-1102] for details.
+Injected web3 providers don't give the dapp access to a users address until the user has given permission.  This is to protect the privacy of users, otherwise websites could track users based on their account address.  See https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1102.md[EIP-1102] for details.
+
+NOTE: Best practice is for a dapp to wait to request access to the users address until a user wants to perform an action that they can only do which requires this access.  
 Remember dapps can be configured to use multiple web3 providers such as a network provider if necessary.
 
-In the code below, we get `accounts` from the `web3Context` and if available the users account is displayed in the dapp.
-If `accounts` are not available we display a button for the user to request access to injected web3.  When pressed, the `requestAuth` function in `web3Context` is called and the injected web3 provider can display a dialog to the user requesting access.
+In the code below, we get `accounts` from the `web3Context` and if available the users address is displayed in the dapp.
+If `accounts` are not available we display a button for the user to request access for the dapp to the users address.  When pressed, the `requestAuth` function in `web3Context` is called and the injected web3 provider can display a dialog to the user to request access.
 We also use react functionality, `useCallback` to setup the callback for request access.
 
 In the `Web3Info.js` file, replace the contents of the component with the following code:
@@ -180,7 +182,7 @@ export default function Web3Info(props) {
 
 Start our dapp again by running `npm start` from within the `client` directory. 
 
-Once the dapp is loaded in the browser, press `Request Access` to request access to injected web3 and then accept the request (in MetaMask press the Connect button).  The users address will then be displayed.
+Once the dapp is loaded in the browser, press `Request Access` to request access to the users address and then accept the request (in MetaMask press the Connect button).  The users address will then be displayed.
 To restart the process, in MetaMask you can logout and the user will need to request access again.
 
 == Add account balance to the dapp
