@@ -156,11 +156,6 @@ export default function Web3Info(props) {
     }
   };
 
-  const buttonStyle = {
-    color: 'blue',
-    cursor: 'pointer',
-  };
-
   const requestAccess = useCallback(() => requestAuth(web3Context), []);
 
   return (
@@ -173,8 +168,7 @@ export default function Web3Info(props) {
         <div>Accounts & Signing Status: Access Granted</div>
       ) : !!networkId && providerName !== 'infura' ? (
         <div>
-          <br />
-          <div style={buttonStyle} onClick={requestAccess}>Request Access</div>
+          <button onClick={requestAccess}>Request Access</button>
         </div>
       ) : (
         <div></div>
@@ -225,11 +219,6 @@ export default function Web3Info(props) {
     }
   };
 
-  const buttonStyle = {
-    color: 'blue',
-    cursor: 'pointer',
-  };
-
   const requestAccess = useCallback(() => requestAuth(web3Context), []);
 
   return (
@@ -243,8 +232,7 @@ export default function Web3Info(props) {
         <div>Accounts & Signing Status: Access Granted</div>
       ) : !!networkId && providerName !== 'infura' ? (
         <div>
-          <br />
-          <div style={buttonStyle} onClick={requestAccess}>Request Access</div>
+          <button onClick={requestAccess}>Request Access</button>
         </div>
       ) : (
         <div></div>
