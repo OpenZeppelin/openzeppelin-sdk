@@ -1,0 +1,285 @@
+= Building an OpenZeppelin Network.js powered dapp from scratch
+In this tutorial, we will integrate *OpenZeppelin Network.js* from the OpenZeppelin SDK, to build a dapp that can be used in a browser with injected web3 e.g. using MetaMask. 
+
+The *OpenZeppelin Network.js* is an easy to use and reliable library that provides one line access to the web3 API.  It can be used in both React and in (vanilla) JavaScript.  It also supports the Gas Station Network.
+
+We will use the `create-react-app` package to bootstrap a React application and use *OpenZeppelin Network.js* to easily set up a web3 context. 
+
+== Setting up the environment
+We begin by creating a new project.
+
+[source,console]
+----
+mkdir web3-dapp && cd web3-dapp
+npm init -y
+----
+
+Then we install *OpenZeppelin Network.js*
+[source,console]
+----
+npm install @openzeppelin/network
+----
+
+== Creating the dapp
+We will create our dapp using the `create-react-app` package, which bootstraps a simple client-side application using React.
+
+[source,console]
+----
+npx create-react-app client
+----
+
+Our dapp will display the current Ethereum network that we are connected to and which web3 provider is being used.
+
+In the code below, first we import `useWeb3` from the React implementation of *OpenZeppelin Network.js* (`@openzeppelin/network/react`).
+We then get a `web3Context` using `useWeb3`. This hook will attempt to retrieve an injected web3 provider (e.g. MetaMask), otherwise it will fall back to a network connection, which in this case is a connection to mainnet via Infura.
+The `networkId`, `networkName` and `providerName` are obtained from the `web3Context` and displayed in the dapp.
+
+On the `client/src/App.js` file, replace the placeholder code in `App.js` in our react project with the following code:
+[source,js]
+----
+import React from 'react';
+import './App.css';
+
+import { useWeb3 } from '@openzeppelin/network/react';
+
+const infuraProjectId = '95202223388e49f48b423ea50a70e336';
+
+function App() {
+
+  const web3Context = useWeb3(`wss://mainnet.infura.io/ws/v3/${infuraProjectId}`);
+  const { networkId, networkName, providerName } = web3Context;
+
+  return (
+    <div className="App">
+      <div>
+        <h1>OpenZeppelin Network.js</h1>
+        <div>Network: {networkId ? `${networkId} – ${networkName}` : 'No connection'}</div>
+        <div>Provider: {providerName}</div>
+      </div>
+    </div>
+  );
+}
+
+export default App;
+----
+
+We can start our dapp by running `npm start` from within the `client` directory. 
+
+The dapp will display the Ethereum network ID and network name, either of mainnet from our network connection if no injected web3 provider such as MetaMask is available, otherwise it will display the current network as selected by the injected web3 provider, along with the web3 provider name.
+
+We use `useWeb3` which attempts to obtain an injected web3 provider first, before falling back to a network connection.  Alternatively we could use `useWeb3Injected` for an injected web3 provider or `useWeb3Network` for a network provider e.g. Infura or a private node.  Dapps can also be configured to use multiple providers if necessary.
+
+NOTE: If you use Infura in your own dapp, you will need to create an account with Infura and setup an Infura Project (with corresponding Infura Project ID).  See https://infura.io[Infura website] to create an account.
+
+== Add a component to the dapp
+For the second iteration of our dapp we will move the display of the current Ethereum network to a component and see how components are re-rendered when changes are made, such as the network.
+
+To install MetaMask as our injected web3 provider (if you don't have an injected web3 provider installed already), follow the instructions on the https://metamask.io[MetaMask website] to install the browser extension.
+
+In the code below, our `Web3Info` component expects a `web3Context`.  The `networkId`, `networkName` and `providerName` are obtained from the `web3Context` and displayed in the component.
+
+In the `client/src` directory create a `components` directory. In the `components` directory create a `Web3Info.js` file  with the following code:
+[source,js]
+----
+import React from 'react';
+
+export default function Web3Info(props) {
+  const { web3Context } = props;
+  const { networkId, networkName, providerName } = web3Context;
+
+  return (
+    <div>
+      <h3> {props.title} </h3>
+      <div>Network: {networkId ? `${networkId} – ${networkName}` : 'No connection'}</div>
+      <div>Provider: {providerName}</div>
+    </div>
+  );
+}
+----
+
+In our App we use our `Web3Info` component and provide a `web3Context`.
+
+In the `client/src/App.js` file, add an import for our `Web3Info` component:
+
+[source,js]
+----
+import Web3Info from './components/Web3Info.js';
+----
+
+Then replace the contents of the `App` function in `App.js` with the following code:
+
+[source,js]
+----
+  const web3Context = useWeb3(`wss://mainnet.infura.io/ws/v3/${infuraProjectId}`);
+
+  return (
+    <div className="App">
+      <div>
+        <h1>OpenZeppelin Network.js</h1>
+        <Web3Info title="Web3 Info" web3Context={web3Context} />
+      </div>
+    </div>
+  );
+----
+
+Start our dapp again by running `npm start` from within the `client` directory. 
+
+*OpenZeppelin Network.js* re-renders React components on changes such as account, network, and connection.
+
+Try changing networks in MetaMask and *OpenZeppelin Network.js* will cause the component to update with the network ID and network name.  
+
+== Add request access to account address to the dapp
+For the third iteration of our dapp we will add a mechanism to request access to the users address and once the user has connected will display the account address.  
+
+Injected web3 providers don't give the dapp access to a users address until the user has given permission.  This is to protect the privacy of users, otherwise websites could track users based on their account address.  See https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1102.md[EIP-1102] for details.
+
+NOTE: Best practice is for a dapp to wait to request access to the users address until a user wants to perform an action that they can only do which requires this access.  
+Remember dapps can be configured to use multiple web3 providers such as a network provider if necessary.
+
+In the code below, we get `accounts` from the `web3Context` and if available the users address is displayed in the dapp.
+If `accounts` are not available we display a button for the user to request access for the dapp to the users address.  When pressed, the `requestAuth` function in `web3Context` is called and the injected web3 provider can display a dialog to the user to request access.
+We also use react functionality, `useCallback` to setup the callback for request access.
+
+In the `Web3Info.js` file, replace the contents of the component with the following code:
+
+[source,js]
+----
+import React, { useCallback } from 'react';
+
+export default function Web3Info(props) {
+  const { web3Context } = props;
+  const { networkId, networkName, accounts, providerName } = web3Context;
+
+  const requestAuth = async web3Context => {
+    try {
+      await web3Context.requestAuth();
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const requestAccess = useCallback(() => requestAuth(web3Context), []);
+
+  return (
+    <div>
+      <h3> {props.title} </h3>
+      <div>Network: {networkId ? `${networkId} – ${networkName}` : 'No connection'}</div>
+      <div>Your address: {accounts && accounts.length ? accounts[0] : 'Unknown'}</div>
+      <div>Provider: {providerName}</div>
+      {accounts && accounts.length ? (
+        <div>Accounts & Signing Status: Access Granted</div>
+      ) : !!networkId && providerName !== 'infura' ? (
+        <div>
+          <button onClick={requestAccess}>Request Access</button>
+        </div>
+      ) : (
+        <div></div>
+      )}
+    </div>
+  );
+}
+----
+
+Start our dapp again by running `npm start` from within the `client` directory. 
+
+Once the dapp is loaded in the browser, press `Request Access` to request access to the users address and then accept the request (in MetaMask press the Connect button).  The users address will then be displayed.
+To restart the process, in MetaMask you can logout and the user will need to request access again.
+
+== Add account balance to the dapp
+For the final iteration of our dapp we will add to our component to display the account balance.
+
+In the code below, we get the `lib` from the `web3Context` which is an initialized instance of `web3.js`.  We use `lib` (web3.js) to `getBalance` of the account and to convert `fromWei` to ether units.
+We also use react functionality, `useState` to track the state of the account balance and `useEffect` to get the balance if `accounts` or `networkId` change.
+
+In the `Web3Info.js` file, replace the contents of the component with the following code:
+
+[source,js]
+----
+import React, { useState, useEffect, useCallback } from 'react';
+
+export default function Web3Info(props) {
+  const { web3Context } = props;
+  const { networkId, networkName, accounts, providerName, lib } = web3Context;
+
+  const [balance, setBalance] = useState(0);
+
+  const getBalance = useCallback(async () => {
+    let balance =
+      accounts && accounts.length > 0 ? lib.utils.fromWei(await lib.eth.getBalance(accounts[0]), 'ether') : 'Unknown';
+    setBalance(balance);
+  }, [accounts, lib.eth, lib.utils]);
+
+  useEffect(() => {
+    getBalance();
+  }, [accounts, getBalance, networkId]);
+
+  const requestAuth = async web3Context => {
+    try {
+      await web3Context.requestAuth();
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const requestAccess = useCallback(() => requestAuth(web3Context), []);
+
+  return (
+    <div>
+      <h3> {props.title} </h3>
+      <div>Network: {networkId ? `${networkId} – ${networkName}` : 'No connection'}</div>
+      <div>Your address: {accounts && accounts.length ? accounts[0] : 'Unknown'}</div>
+      <div>Your ETH balance: {balance}</div>
+      <div>Provider: {providerName}</div>
+      {accounts && accounts.length ? (
+        <div>Accounts & Signing Status: Access Granted</div>
+      ) : !!networkId && providerName !== 'infura' ? (
+        <div>
+          <button onClick={requestAccess}>Request Access</button>
+        </div>
+      ) : (
+        <div></div>
+      )}
+    </div>
+  );
+}
+----
+
+Start our dapp again by running `npm start` from within the `client` directory. 
+
+The dapp now displays the account balance.
+
+== Gas Station Network
+*OpenZeppelin Network.js* can be used with the Gas Station Network (GSN).  The example below uses a network provider (Infura), and generates an ephemeral key for signing relay requests to the GSN.
+[source,js]
+----
+const web3Context = useWeb3Network(`wss://rinkeby.infura.io/ws/v3/${infuraProjectId}`, { 
+  gsn: { signKey: useEphemeralKey() } 
+});
+----
+
+To get started quickly with *OpenZeppelin Network.js* and the Gas Station Network you can use the https://docs.openzeppelin.com/starter-kits/2.3/gsnkit[OpenZeppelin GSN Starter Kit].
+
+To unpack the starter kit, run the following inside an empty project directory and follow the instructions.
+
+[source,console]
+----
+openzeppelin unpack @openzeppelin/starter-kit-gsn
+----
+
+== (vanilla) JavaScript and non-React frameworks
+*OpenZeppelin Network.js* can be used with (vanilla) JavaScript and non-React frameworks.  Please note that the import is `@openzeppelin/network` rather than `@openzeppelin/network/react` and `fromInjected` rather than `useWeb3Injected`.
+
+[source,js]
+----
+import { fromInjected, fromConnection } from '@openzeppelin/network';
+
+const web3Context = await fromInjected();
+
+function updateNetwork(networkId, networkName) {}
+function updateAccounts(accounts) {}
+function updateConnection(connected) {}
+
+web3Context.on(Web3Context.NetworkIdChangedEventName, updateNetwork);
+web3Context.on(Web3Context.AccountsChangedEventName, updateAccounts);
+web3Context.on(Web3Context.ConnectionChangedEventName, updateConnection);
+----
