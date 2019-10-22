@@ -263,7 +263,7 @@ export default function Web3Info(props) {
 
 Start our dapp again by running `npm start` from within the `client` directory. 
 
-the dapp now displays the account balance.
+The dapp now displays the account balance.
 
 == Gas Station Network
 *OpenZeppelin Network.js* can be used with the Gas Station Network (GSN).  The example below uses a network provider (Infura), and generates an ephemeral key for signing relay requests to the GSN.
