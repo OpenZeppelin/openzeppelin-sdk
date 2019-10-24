@@ -39,13 +39,13 @@ export default {
 
     // Conceal data before sending it
     const concealedData = concealData(options, telemetryOptions.salt);
-    const commandData: CommandData = { ...concealedData, name: commandName };
+    const commandData: Concealed<CommandData> = { ...concealedData, name: commandName };
     if (network !== undefined) commandData.network = network;
 
     this.sendToFirebase(telemetryOptions.uuid, commandData);
   },
 
-  sendToFirebase(uuid: string, commandData: CommandData): void {
+  sendToFirebase(uuid: string, commandData: Concealed<CommandData>): void {
     // We send to Firebase in a child process so that the CLI is not blocked from exiting.
     const child = proc.fork(path.join(__dirname, './send-to-firebase'), [], {
       stdio: ['ignore', 'ignore', 'ignore', 'ipc'],
