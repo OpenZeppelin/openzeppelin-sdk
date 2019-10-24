@@ -9,6 +9,9 @@
     "tests/kits/test",
     "tests/kits/workdir"
   ],
+  "scripts": {
+    "prepare": "lerna run prepare"
+  },
   "devDependencies": {
     "husky": "^2.7.0",
     "lerna": "^3.13.4",
