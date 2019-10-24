@@ -3,7 +3,7 @@ import { TxParams } from '@openzeppelin/upgrades';
 import ProjectFile from '../models/files/ProjectFile';
 import NetworkFile from '../models/files/NetworkFile';
 
-interface ContractData {
+export interface ContractData {
   name: string;
   alias: string;
 }
