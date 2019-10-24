@@ -1,12 +1,6 @@
 {
-  "packages": [
-    "examples/*",
-    "packages/*",
-    "tests/cli/test",
-    "tests/cli/workdir",
-    "tests/kits/test",
-    "tests/kits/workdir"
-  ],
+  "npmClient": "yarn",
+  "useWorkspaces": true,
   "version": "2.5.3",
   "command": {
     "publish": {
