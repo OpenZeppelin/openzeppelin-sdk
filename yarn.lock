@@ -8845,7 +8845,7 @@ mock-fs@^4.1.0:
 "mock-stdlib-invalid@file:./packages/cli/test/mocks/mock-stdlib-invalid":
   version "1.1.0"
 
-"mock-stdlib-root@file:./packages/cli/test/mocks/mock-stdlib":
+"mock-stdlib-root@file:./packages/cli/test/mocks/mock-stdlib", "mock-stdlib@file:./packages/cli/test/mocks/mock-stdlib":
   version "1.1.0"
 
 "mock-stdlib-undeployed-2@file:./packages/cli/test/mocks/mock-stdlib-undeployed-2":
@@ -8858,9 +8858,6 @@ mock-fs@^4.1.0:
   version "1.1.0"
 
 "mock-stdlib-unsupported@file:./packages/cli/test/mocks/mock-stdlib-unsupported":
-  version "1.1.0"
-
-"mock-stdlib@file:./packages/cli/test/mocks/mock-stdlib":
   version "1.1.0"
 
 "mock-stdlib@file:tests/cli/dependencies/mock-stdlib-1.1.0":
@@ -12190,7 +12187,7 @@ truffle@5.0.21:
     mocha "^4.1.0"
     original-require "1.0.1"
 
-truffle@^4.1.13, truffle@^4.1.14:
+truffle@^4.1.14:
   version "4.1.16"
   resolved "https://registry.yarnpkg.com/truffle/-/truffle-4.1.16.tgz#5cc160dcbbbcff6078e80ce328873d83247b084e"
   integrity sha512-Ew0YSyy2802wqqe1Ko4kxo1FMffM+l9uEUXJ+GScwAAXFXwKWRC++eEa9pIIQdHcEj0rJo0jXhp65vS/LOcNwA==
@@ -12198,6 +12195,15 @@ truffle@^4.1.13, truffle@^4.1.14:
     mocha "^4.1.0"
     original-require "1.0.1"
     solc "0.4.26"
+
+truffle@^5.0.0:
+  version "5.0.42"
+  resolved "https://registry.yarnpkg.com/truffle/-/truffle-5.0.42.tgz#2de4f73af7b40f2d3a5620dade6dded74e928321"
+  integrity sha512-WbXGdHElluVbQP9FQljpvBLWjSEiKHaUx27TZ+RK7yEyrYDb8ATjpX0Owkc72bIy3AjKcbrlrptnqYswY1mtsg==
+  dependencies:
+    app-module-path "^2.2.0"
+    mocha "5.2.0"
+    original-require "1.0.1"
 
 truffle@^5.0.3, truffle@^5.0.5:
   version "5.0.41"

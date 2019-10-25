@@ -2,13 +2,13 @@ import { assertRevert } from '@openzeppelin/upgrades'
 import getBalance from '../helpers/getBalance.js'
 
 export default function(owner, donor, wallet) {
-  const ETH_1 = web3.toWei(1, 'ether');
+  const ETH_1 = web3.utils.toWei('1', 'ether');
 
   describe('donate', function () {
     const from = donor
 
     describe('when the donation is zero', function() {
-      const value = web3.toWei(0, 'ether')
+      const value = web3.utils.toWei('0', 'ether')
 
       it('reverts', async function() {
         await assertRevert(this.donations.methods.donate().send({ from, value }))
@@ -63,8 +63,8 @@ export default function(owner, donor, wallet) {
       const from = donor
 
       it('returns the donors balance', async function() {
-        const donation = parseInt(await this.donations.methods.getDonationBalance(from).call(), 10);
-        const donationNum = parseInt(web3.fromWei(donation, 'ether'), 10);
+        const donation = await this.donations.methods.getDonationBalance(from).call();
+        const donationNum = parseInt(web3.utils.fromWei(donation, 'ether'), 10);
         donationNum.should.be.eq(1);
       });
     });
@@ -73,8 +73,8 @@ export default function(owner, donor, wallet) {
       const from = owner
 
       it('returns zero', async function() {
-        const donation = parseInt(await this.donations.methods.getDonationBalance(from).call(), 10);
-        const donationNum = parseInt(web3.fromWei(donation, 'ether'), 10);
+        const donation = await this.donations.methods.getDonationBalance(from).call();
+        const donationNum = parseInt(web3.utils.fromWei(donation, 'ether'), 10);
         donationNum.should.be.eq(0);
       });
     });
