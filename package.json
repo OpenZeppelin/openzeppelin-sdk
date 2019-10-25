@@ -9,6 +9,7 @@
     "tests/kits/test",
     "tests/kits/workdir"
   ],
+  "nohoist": ["**/mock-stdlib"],
   "scripts": {
     "prepare": "lerna run prepare"
   },
