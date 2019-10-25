@@ -9,9 +9,7 @@ const expect = require('chai').expect;
 
 contract('check script', function() {
   beforeEach('setup', async function() {
-    this.projectFile = new ProjectFile(
-      'test/mocks/packages/package-empty.zos.json',
-    );
+    this.projectFile = new ProjectFile('test/mocks/packages/package-empty.zos.json');
   });
 
   beforeEach('capturing log output', function() {
@@ -58,9 +56,7 @@ contract('check script', function() {
     });
 
     it('fails if contract not found', function() {
-      expect(() =>
-        check({ contractAlias: 'NotExists', projectFile: this.projectFile }),
-      ).to.throw();
+      expect(() => check({ contractAlias: 'NotExists', projectFile: this.projectFile })).to.throw();
     });
   });
 

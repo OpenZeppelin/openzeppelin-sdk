@@ -17,9 +17,7 @@ contract('ContractManager', function([_, from]) {
           this.projectFile = new ProjectFile(`${this.testDir}/zos.json`);
           this.contractManager = new ContractManager(this.projectFile);
           FileSystem.createDir(this.testDir);
-          sinon
-            .stub(ConfigManager, 'getBuildDir')
-            .returns(`${this.testDir}/build/contracts`);
+          sinon.stub(ConfigManager, 'getBuildDir').returns(`${this.testDir}/build/contracts`);
         });
 
         afterEach('remove test dir', function() {
@@ -28,9 +26,7 @@ contract('ContractManager', function([_, from]) {
         });
 
         it('returns an empty array', function() {
-          this.contractManager
-            .getContractNames()
-            .should.be.an('array').that.is.empty;
+          this.contractManager.getContractNames().should.be.an('array').that.is.empty;
         });
       });
 
@@ -42,9 +38,7 @@ contract('ContractManager', function([_, from]) {
             this.contractManager = new ContractManager(this.projectFile);
             FileSystem.createDir(this.testDir);
             FileSystem.createDirPath(`${this.testDir}/build/contracts`);
-            sinon
-              .stub(ConfigManager, 'getBuildDir')
-              .returns(`${this.testDir}/build/contracts`);
+            sinon.stub(ConfigManager, 'getBuildDir').returns(`${this.testDir}/build/contracts`);
           });
 
           afterEach('remove test dir', function() {
@@ -67,18 +61,11 @@ contract('ContractManager', function([_, from]) {
                 bytecode: '0x124',
                 contractName: 'Foo',
               };
-              FileSystem.writeJson(
-                `${this.testDir}/build/contracts/Foo.json`,
-                builtContract,
-              );
+              FileSystem.writeJson(`${this.testDir}/build/contracts/Foo.json`, builtContract);
               this.projectFile = new ProjectFile(`${this.testDir}/zos.json`);
               this.contractManager = new ContractManager(this.projectFile);
-              sinon
-                .stub(ConfigManager, 'getBuildDir')
-                .returns(`${this.testDir}/build/contracts`);
-              sinon
-                .stub(Contracts, 'getLocalContractsDir')
-                .returns(`${this.testDir}/contracts`);
+              sinon.stub(ConfigManager, 'getBuildDir').returns(`${this.testDir}/build/contracts`);
+              sinon.stub(Contracts, 'getLocalContractsDir').returns(`${this.testDir}/contracts`);
             });
 
             afterEach(function() {
@@ -86,9 +73,7 @@ contract('ContractManager', function([_, from]) {
             });
 
             it('returns an array with items inside', function() {
-              const contractNames = this.contractManager.getContractNames(
-                this.testDir,
-              );
+              const contractNames = this.contractManager.getContractNames(this.testDir);
 
               contractNames.should.be.an('array');
               contractNames.should.include('Foo');
@@ -98,10 +83,7 @@ contract('ContractManager', function([_, from]) {
         }.bind(this);
 
         testReturnsContracts('with contracts with absolute path');
-        testReturnsContracts(
-          'with contracts with relative path',
-          './contracts/Foo.sol',
-        );
+        testReturnsContracts('with contracts with relative path', './contracts/Foo.sol');
       });
     });
   });

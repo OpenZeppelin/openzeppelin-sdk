@@ -30,10 +30,7 @@ const sendTransaction = (target, method, args, values, opts) => {
   return ZWeb3.sendTransaction({ ...opts, to: target.address, data });
 };
 
-export default function shouldBehaveLikeAdminUpgradeabilityProxy(
-  createProxy,
-  accounts,
-) {
+export default function shouldBehaveLikeAdminUpgradeabilityProxy(createProxy, accounts) {
   const [_, proxyAdminAddress, proxyAdminOwner, anotherAccount] = accounts;
 
   before(async function() {
@@ -45,20 +42,15 @@ export default function shouldBehaveLikeAdminUpgradeabilityProxy(
 
   beforeEach(async function() {
     const initializeData = Buffer.from('');
-    this.proxy = await createProxy(
-      this.implementation_v0,
-      proxyAdminAddress,
-      initializeData,
-      { from: proxyAdminOwner },
-    );
+    this.proxy = await createProxy(this.implementation_v0, proxyAdminAddress, initializeData, {
+      from: proxyAdminOwner,
+    });
     this.proxyAddress = this.proxy.address;
   });
 
   describe('implementation', function() {
     it('returns the current implementation address', async function() {
-      const implementation = await this.proxy.methods
-        .implementation()
-        .call({ from: proxyAdminAddress });
+      const implementation = await this.proxy.methods.implementation().call({ from: proxyAdminAddress });
 
       implementation.should.be.equal(this.implementation_v0);
     });
@@ -77,32 +69,22 @@ export default function shouldBehaveLikeAdminUpgradeabilityProxy(
 
       describe('when the given implementation is different from the current one', function() {
         it('upgrades to the requested implementation', async function() {
-          await this.proxy.methods
-            .upgradeTo(this.implementation_v1)
-            .send({ from });
+          await this.proxy.methods.upgradeTo(this.implementation_v1).send({ from });
 
-          const implementation = await this.proxy.methods
-            .implementation()
-            .call({ from: proxyAdminAddress });
+          const implementation = await this.proxy.methods.implementation().call({ from: proxyAdminAddress });
           implementation.should.be.equal(this.implementation_v1);
         });
 
         it('emits an event', async function() {
-          const { events } = await this.proxy.methods
-            .upgradeTo(this.implementation_v1)
-            .send({ from });
+          const { events } = await this.proxy.methods.upgradeTo(this.implementation_v1).send({ from });
           events.should.have.key('Upgraded');
-          events['Upgraded'].returnValues.implementation.should.be.equal(
-            this.implementation_v1,
-          );
+          events['Upgraded'].returnValues.implementation.should.be.equal(this.implementation_v1);
         });
       });
 
       describe('when the given implementation is the zero address', function() {
         it('reverts', async function() {
-          await assertRevert(
-            this.proxy.methods.upgradeTo(ZERO_ADDRESS).send({ from }),
-          );
+          await assertRevert(this.proxy.methods.upgradeTo(ZERO_ADDRESS).send({ from }));
         });
       });
     });
@@ -111,9 +93,7 @@ export default function shouldBehaveLikeAdminUpgradeabilityProxy(
       const from = anotherAccount;
 
       it('reverts', async function() {
-        await assertRevert(
-          this.proxy.methods.upgradeTo(this.implementation_v1).send({ from }),
-        );
+        await assertRevert(this.proxy.methods.upgradeTo(this.implementation_v1).send({ from }));
       });
     });
   });
@@ -138,16 +118,12 @@ export default function shouldBehaveLikeAdminUpgradeabilityProxy(
           });
 
           it('upgrades to the requested implementation', async function() {
-            const implementation = await this.proxy.methods
-              .implementation()
-              .call({ from: proxyAdminAddress });
+            const implementation = await this.proxy.methods.implementation().call({ from: proxyAdminAddress });
             implementation.should.be.equal(this.behavior.address);
           });
 
           it('emits an event', function() {
-            this.events['Upgraded'].returnValues.implementation.should.be.equal(
-              this.behavior.address,
-            );
+            this.events['Upgraded'].returnValues.implementation.should.be.equal(this.behavior.address);
           });
 
           it('calls the initializer function', async function() {
@@ -175,9 +151,7 @@ export default function shouldBehaveLikeAdminUpgradeabilityProxy(
         describe('when the sender is not the admin', function() {
           it('reverts', async function() {
             await assertRevert(
-              this.proxy.methods
-                .upgradeToAndCall(this.behavior.address, initializeData)
-                .send({ from: anotherAccount }),
+              this.proxy.methods.upgradeToAndCall(this.behavior.address, initializeData).send({ from: anotherAccount }),
             );
           });
         });
@@ -208,22 +182,16 @@ export default function shouldBehaveLikeAdminUpgradeabilityProxy(
             // eslint-disable-next-line @typescript-eslint/camelcase
             this.behavior_v1 = await MigratableMockV1.new();
             // eslint-disable-next-line @typescript-eslint/camelcase
-            this.balancePrevious_v1 = new BN(
-              await ZWeb3.getBalance(this.proxyAddress),
-            );
+            this.balancePrevious_v1 = new BN(await ZWeb3.getBalance(this.proxyAddress));
             this.events = (await this.proxy.methods
               .upgradeToAndCall(this.behavior_v1.address, v1MigrationData)
               .send({ from, value })).events;
           });
 
           it('upgrades to the requested version and emits an event', async function() {
-            const implementation = await this.proxy.methods
-              .implementation()
-              .call({ from: proxyAdminAddress });
+            const implementation = await this.proxy.methods.implementation().call({ from: proxyAdminAddress });
             implementation.should.be.equal(this.behavior_v1.address);
-            this.events['Upgraded'].returnValues.implementation.should.be.equal(
-              this.behavior_v1.address,
-            );
+            this.events['Upgraded'].returnValues.implementation.should.be.equal(this.behavior_v1.address);
           });
 
           it("calls the 'initialize' function and sends given value to the proxy", async function() {
@@ -237,34 +205,22 @@ export default function shouldBehaveLikeAdminUpgradeabilityProxy(
           });
 
           describe('when upgrading to V2', function() {
-            const v2MigrationData = encodeCall(
-              'migrate',
-              ['uint256', 'uint256'],
-              [10, 42],
-            );
+            const v2MigrationData = encodeCall('migrate', ['uint256', 'uint256'], [10, 42]);
 
             beforeEach(async function() {
               // eslint-disable-next-line @typescript-eslint/camelcase
               this.behavior_v2 = await MigratableMockV2.new();
               // eslint-disable-next-line @typescript-eslint/camelcase
-              this.balancePrevious_v2 = new BN(
-                await ZWeb3.getBalance(this.proxyAddress),
-              );
+              this.balancePrevious_v2 = new BN(await ZWeb3.getBalance(this.proxyAddress));
               this.events = (await this.proxy.methods
                 .upgradeToAndCall(this.behavior_v2.address, v2MigrationData)
                 .send({ from, value })).events;
             });
 
             it('upgrades to the requested version and emits an event', async function() {
-              const implementation = await this.proxy.methods
-                .implementation()
-                .call({ from: proxyAdminAddress });
+              const implementation = await this.proxy.methods.implementation().call({ from: proxyAdminAddress });
               implementation.should.be.equal(this.behavior_v2.address);
-              this.events[
-                'Upgraded'
-              ].returnValues.implementation.should.be.equal(
-                this.behavior_v2.address,
-              );
+              this.events['Upgraded'].returnValues.implementation.should.be.equal(this.behavior_v2.address);
             });
 
             it("calls the 'migrate' function and sends given value to the proxy", async function() {
@@ -287,24 +243,16 @@ export default function shouldBehaveLikeAdminUpgradeabilityProxy(
                 // eslint-disable-next-line @typescript-eslint/camelcase
                 this.behavior_v3 = await MigratableMockV3.new();
                 // eslint-disable-next-line @typescript-eslint/camelcase
-                this.balancePrevious_v3 = new BN(
-                  await ZWeb3.getBalance(this.proxyAddress),
-                );
+                this.balancePrevious_v3 = new BN(await ZWeb3.getBalance(this.proxyAddress));
                 this.events = (await this.proxy.methods
                   .upgradeToAndCall(this.behavior_v3.address, v3MigrationData)
                   .send({ from, value })).events;
               });
 
               it('upgrades to the requested version and emits an event', async function() {
-                const implementation = await this.proxy.methods
-                  .implementation()
-                  .call({ from: proxyAdminAddress });
+                const implementation = await this.proxy.methods.implementation().call({ from: proxyAdminAddress });
                 implementation.should.be.equal(this.behavior_v3.address);
-                this.events[
-                  'Upgraded'
-                ].returnValues.implementation.should.be.equal(
-                  this.behavior_v3.address,
-                );
+                this.events['Upgraded'].returnValues.implementation.should.be.equal(this.behavior_v3.address);
               });
 
               it("calls the 'migrate' function and sends given value to the proxy", async function() {
@@ -316,9 +264,7 @@ export default function shouldBehaveLikeAdminUpgradeabilityProxy(
                 const y = await migratable.methods.y().call();
                 y.should.eq('10');
 
-                const balance = new BN(
-                  await ZWeb3.getBalance(this.proxyAddress),
-                );
+                const balance = new BN(await ZWeb3.getBalance(this.proxyAddress));
                 expect(balance).to.eql(this.balancePrevious_v3.plus(value));
               });
             });
@@ -350,50 +296,32 @@ export default function shouldBehaveLikeAdminUpgradeabilityProxy(
 
       describe('when the sender is the admin', function() {
         beforeEach('transferring', async function() {
-          const { events } = await this.proxy.methods
-            .changeAdmin(newAdmin)
-            .send({ from: proxyAdminAddress });
+          const { events } = await this.proxy.methods.changeAdmin(newAdmin).send({ from: proxyAdminAddress });
           this.events = events;
         });
 
         it('assigns new proxy admin', async function() {
-          const newProxyAdmin = await this.proxy.methods
-            .admin()
-            .call({ from: newAdmin });
+          const newProxyAdmin = await this.proxy.methods.admin().call({ from: newAdmin });
           newProxyAdmin.should.be.equalIgnoreCase(anotherAccount);
         });
 
         it('emits an event', function() {
           this.events.should.have.key('AdminChanged');
-          this.events[
-            'AdminChanged'
-          ].returnValues.previousAdmin.should.be.equalIgnoreCase(
-            proxyAdminAddress,
-          );
-          this.events[
-            'AdminChanged'
-          ].returnValues.newAdmin.should.be.equalIgnoreCase(newAdmin);
+          this.events['AdminChanged'].returnValues.previousAdmin.should.be.equalIgnoreCase(proxyAdminAddress);
+          this.events['AdminChanged'].returnValues.newAdmin.should.be.equalIgnoreCase(newAdmin);
         });
       });
 
       describe('when the sender is not the admin', function() {
         it('reverts', async function() {
-          await assertRevert(
-            this.proxy.methods
-              .changeAdmin(newAdmin)
-              .send({ from: anotherAccount }),
-          );
+          await assertRevert(this.proxy.methods.changeAdmin(newAdmin).send({ from: anotherAccount }));
         });
       });
     });
 
     describe('when the new proposed admin is the zero address', function() {
       it('reverts', async function() {
-        await assertRevert(
-          this.proxy.methods
-            .changeAdmin(ZERO_ADDRESS)
-            .send({ from: proxyAdminAddress }),
-        );
+        await assertRevert(this.proxy.methods.changeAdmin(ZERO_ADDRESS).send({ from: proxyAdminAddress }));
       });
     });
   });
@@ -414,36 +342,23 @@ export default function shouldBehaveLikeAdminUpgradeabilityProxy(
     beforeEach('creating proxy', async function() {
       const initializeData = Buffer.from('');
       this.impl = await ClashingImplementation.new();
-      this.proxy = await createProxy(
-        this.impl.address,
-        proxyAdminAddress,
-        initializeData,
-        { from: proxyAdminOwner },
-      );
+      this.proxy = await createProxy(this.impl.address, proxyAdminAddress, initializeData, { from: proxyAdminOwner });
 
       this.clashing = await ClashingImplementation.at(this.proxy.address);
     });
 
     it('proxy admin cannot call delegated functions', async function() {
-      await assertRevert(
-        this.clashing.methods
-          .delegatedFunction()
-          .send({ from: proxyAdminAddress }),
-      );
+      await assertRevert(this.clashing.methods.delegatedFunction().send({ from: proxyAdminAddress }));
     });
 
     context('when function names clash', function() {
       it('when sender is proxy admin should run the proxy function', async function() {
-        const value = await this.proxy.methods
-          .admin()
-          .call({ from: proxyAdminAddress });
+        const value = await this.proxy.methods.admin().call({ from: proxyAdminAddress });
         value.should.be.equalIgnoreCase(proxyAdminAddress);
       });
 
       it('when sender is other should delegate to implementation', async function() {
-        const value = await this.proxy.methods
-          .admin()
-          .call({ from: anotherAccount });
+        const value = await this.proxy.methods.admin().call({ from: anotherAccount });
         value.should.be.equal('0x0000000000000000000000000000000011111142');
       });
     });
@@ -454,20 +369,13 @@ export default function shouldBehaveLikeAdminUpgradeabilityProxy(
 
     it('should add new function', async () => {
       const instance1 = await Implementation1.new();
-      const proxy = await createProxy(
-        instance1.address,
-        proxyAdminAddress,
-        initializeData,
-        { from: proxyAdminOwner },
-      );
+      const proxy = await createProxy(instance1.address, proxyAdminAddress, initializeData, { from: proxyAdminOwner });
 
       const proxyInstance1 = await Implementation1.at(proxy.address);
       await proxyInstance1.methods.setValue(42).send();
 
       const instance2 = await Implementation2.new();
-      await proxy.methods
-        .upgradeTo(instance2.address)
-        .send({ from: proxyAdminAddress });
+      await proxy.methods.upgradeTo(instance2.address).send({ from: proxyAdminAddress });
 
       const proxyInstance2 = await Implementation2.at(proxy.address);
       const res = await proxyInstance2.methods.getValue().call();
@@ -476,12 +384,7 @@ export default function shouldBehaveLikeAdminUpgradeabilityProxy(
 
     it('should remove function', async () => {
       const instance2 = await Implementation2.new();
-      const proxy = await createProxy(
-        instance2.address,
-        proxyAdminAddress,
-        initializeData,
-        { from: proxyAdminOwner },
-      );
+      const proxy = await createProxy(instance2.address, proxyAdminAddress, initializeData, { from: proxyAdminOwner });
 
       const proxyInstance2 = await Implementation2.at(proxy.address);
       await proxyInstance2.methods.setValue(42).send();
@@ -489,9 +392,7 @@ export default function shouldBehaveLikeAdminUpgradeabilityProxy(
       res.toString().should.eq('42');
 
       const instance1 = await Implementation1.new();
-      await proxy.methods
-        .upgradeTo(instance1.address)
-        .send({ from: proxyAdminAddress });
+      await proxy.methods.upgradeTo(instance1.address).send({ from: proxyAdminAddress });
 
       const proxyInstance1 = await Implementation2.at(proxy.address);
       await assertRevert(proxyInstance1.methods.getValue().call());
@@ -499,20 +400,13 @@ export default function shouldBehaveLikeAdminUpgradeabilityProxy(
 
     it('should change function signature', async () => {
       const instance1 = await Implementation1.new();
-      const proxy = await createProxy(
-        instance1.address,
-        proxyAdminAddress,
-        initializeData,
-        { from: proxyAdminOwner },
-      );
+      const proxy = await createProxy(instance1.address, proxyAdminAddress, initializeData, { from: proxyAdminOwner });
 
       const proxyInstance1 = await Implementation1.at(proxy.address);
       await proxyInstance1.methods.setValue(42).send();
 
       const instance3 = await Implementation3.new();
-      await proxy.methods
-        .upgradeTo(instance3.address)
-        .send({ from: proxyAdminAddress });
+      await proxy.methods.upgradeTo(instance3.address).send({ from: proxyAdminAddress });
       const proxyInstance3 = Implementation3.at(proxy.address);
 
       const res = await proxyInstance3.methods.getValue(8).call();
@@ -522,17 +416,10 @@ export default function shouldBehaveLikeAdminUpgradeabilityProxy(
     it('should add fallback function', async () => {
       const initializeData = Buffer.from('');
       const instance1 = await Implementation1.new();
-      const proxy = await createProxy(
-        instance1.address,
-        proxyAdminAddress,
-        initializeData,
-        { from: proxyAdminOwner },
-      );
+      const proxy = await createProxy(instance1.address, proxyAdminAddress, initializeData, { from: proxyAdminOwner });
 
       const instance4 = await Implementation4.new();
-      await proxy.methods
-        .upgradeTo(instance4.address)
-        .send({ from: proxyAdminAddress });
+      await proxy.methods.upgradeTo(instance4.address).send({ from: proxyAdminAddress });
       const proxyInstance4 = await Implementation4.at(proxy.address);
 
       await sendTransaction(proxy, '', [], [], { from: anotherAccount });
@@ -543,21 +430,12 @@ export default function shouldBehaveLikeAdminUpgradeabilityProxy(
 
     it('should remove fallback function', async () => {
       const instance4 = await Implementation4.new();
-      const proxy = await createProxy(
-        instance4.address,
-        proxyAdminAddress,
-        initializeData,
-        { from: proxyAdminOwner },
-      );
+      const proxy = await createProxy(instance4.address, proxyAdminAddress, initializeData, { from: proxyAdminOwner });
 
       const instance2 = await Implementation2.new();
-      await proxy.methods
-        .upgradeTo(instance2.address)
-        .send({ from: proxyAdminAddress });
+      await proxy.methods.upgradeTo(instance2.address).send({ from: proxyAdminAddress });
 
-      await assertRevert(
-        sendTransaction(proxy, '', [], [], { from: anotherAccount }),
-      );
+      await assertRevert(sendTransaction(proxy, '', [], [], { from: anotherAccount }));
 
       const proxyInstance2 = await Implementation2.at(proxy.address);
       const res = await proxyInstance2.methods.getValue().call();

@@ -26,8 +26,8 @@ contract('accounts script', function(accountList) {
       await accounts({ network });
 
       this.logs.infos.should.have.lengthOf(3);
-      this.logs.infos[0].should.eq(`Accounts for ${network}:`)
-      this.logs.infos[1].should.eq(`Default: ${defaultAccount}`)
+      this.logs.infos[0].should.eq(`Accounts for ${network}:`);
+      this.logs.infos[1].should.eq(`Default: ${defaultAccount}`);
       accountList.forEach(account => this.logs.infos[2].should.match(new RegExp(account)));
     });
   });

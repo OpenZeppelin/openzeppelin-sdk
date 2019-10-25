@@ -4,14 +4,7 @@ require('../setup');
 import random from 'lodash.random';
 
 import CaptureLogs from '../helpers/captureLogs';
-import {
-  Contracts,
-  Logger,
-  helpers,
-  Proxy,
-  MinimalProxy,
-  assertRevert,
-} from '@openzeppelin/upgrades';
+import { Contracts, Logger, helpers, Proxy, MinimalProxy, assertRevert } from '@openzeppelin/upgrades';
 
 import add from '../../src/scripts/add';
 import push from '../../src/scripts/push';
@@ -50,18 +43,7 @@ contract('create script', function([_, owner, otherAdmin]) {
   const assertProxy = async function(
     networkFile,
     alias,
-    {
-      version,
-      say,
-      implementation,
-      packageName,
-      value,
-      checkBool,
-      boolValue,
-      admin,
-      address,
-      minimal,
-    },
+    { version, say, implementation, packageName, value, checkBool, boolValue, admin, address, minimal },
   ) {
     const proxyInfo = networkFile.getProxies({ contract: alias })[0];
     proxyInfo.contract.should.eq(alias);
@@ -92,9 +74,7 @@ contract('create script', function([_, owner, otherAdmin]) {
 
     if (implementation) {
       proxyInfo.implementation.should.eq(implementation);
-      const proxyImplementation = await Proxy.at(
-        proxyInfo.address,
-      ).implementation();
+      const proxyImplementation = await Proxy.at(proxyInfo.address).implementation();
       proxyImplementation.should.equalIgnoreCase(implementation);
     }
 
@@ -111,13 +91,11 @@ contract('create script', function([_, owner, otherAdmin]) {
     if (minimal) {
       proxyInfo.kind.should.eq(ProxyType.Minimal);
       proxyInfo.implementation.should.equalIgnoreCase(minimal);
-      const proxyImplementation = await MinimalProxy.at(
-        proxyInfo.address,
-      ).implementation();
+      const proxyImplementation = await MinimalProxy.at(proxyInfo.address).implementation();
       proxyImplementation.should.equalIgnoreCase(minimal);
     }
 
-    if(!minimal) {
+    if (!minimal) {
       proxyInfo.admin.should.not.be.undefined;
     }
 
@@ -193,8 +171,7 @@ contract('create script', function([_, owner, otherAdmin]) {
         networkFile: this.networkFile,
       });
 
-      const implementation = this.networkFile.contract(booleanContractAlias)
-        .address;
+      const implementation = this.networkFile.contract(booleanContractAlias).address;
       await assertProxy(this.networkFile, booleanContractAlias, {
         version,
         checkBool: true,
@@ -213,8 +190,7 @@ contract('create script', function([_, owner, otherAdmin]) {
         networkFile: this.networkFile,
       });
 
-      const implementation = this.networkFile.contract(booleanContractAlias)
-        .address;
+      const implementation = this.networkFile.contract(booleanContractAlias).address;
       await assertProxy(this.networkFile, booleanContractAlias, {
         version,
         checkBool: true,
@@ -231,14 +207,9 @@ contract('create script', function([_, owner, otherAdmin]) {
         networkFile: this.networkFile,
       });
 
-      const networks = Object.values(
-        Contracts.getFromLocal(contractName).networks,
-      );
-      const proxyAddress = this.networkFile.proxy(contractAlias, 0)
-        .implementation;
-      networks
-        .filter(network => network.address === proxyAddress)
-        .should.be.have.lengthOf(1);
+      const networks = Object.values(Contracts.getFromLocal(contractName).networks);
+      const proxyAddress = this.networkFile.proxy(contractAlias, 0).implementation;
+      networks.filter(network => network.address === proxyAddress).should.be.have.lengthOf(1);
     });
 
     it('should refuse to create a proxy for an undefined contract', async function() {
@@ -251,9 +222,7 @@ contract('create script', function([_, owner, otherAdmin]) {
     });
 
     it('should refuse to create a proxy for an undeployed contract', async function() {
-      const customContractsData = [
-        { name: contractName, alias: 'NotDeployed' },
-      ];
+      const customContractsData = [{ name: contractName, alias: 'NotDeployed' }];
       await add({
         contractsData: customContractsData,
         projectFile: this.projectFile,
@@ -264,9 +233,7 @@ contract('create script', function([_, owner, otherAdmin]) {
         network,
         txParams,
         networkFile: this.networkFile,
-      }).should.be.rejectedWith(
-        'Contract NotDeployed is not deployed to test.',
-      );
+      }).should.be.rejectedWith('Contract NotDeployed is not deployed to test.');
     });
 
     it('should be able to have multiple proxies for one of its contracts', async function() {
@@ -289,9 +256,7 @@ contract('create script', function([_, owner, otherAdmin]) {
         networkFile: this.networkFile,
       });
 
-      this.networkFile
-        .getProxies({ contract: contractAlias })
-        .should.have.lengthOf(3);
+      this.networkFile.getProxies({ contract: contractAlias }).should.have.lengthOf(3);
     });
 
     it('should be able to handle proxies for more than one contract', async function() {
@@ -429,13 +394,7 @@ contract('create script', function([_, owner, otherAdmin]) {
         // Create the contract we want with both salt and signature
         const implementation = this.networkFile.contract(contractAlias).address;
         const admin = this.networkFile.proxyAdminAddress;
-        const signature = helpers.signDeploy(
-          this.networkFile.proxyFactoryAddress,
-          salt,
-          implementation,
-          admin,
-          '',
-        );
+        const signature = helpers.signDeploy(this.networkFile.proxyFactoryAddress, salt, implementation, admin, '');
         await create({
           contractAlias,
           network,
@@ -463,12 +422,7 @@ contract('create script', function([_, owner, otherAdmin]) {
           salt,
           sender: helpers.signer,
         });
-        const signature = helpers.signDeploy(
-          this.networkFile.proxyFactoryAddress,
-          salt,
-          implementation,
-          otherAdmin,
-        );
+        const signature = helpers.signDeploy(this.networkFile.proxyFactoryAddress, salt, implementation, otherAdmin);
         await create({
           contractAlias,
           network,
@@ -501,9 +455,7 @@ contract('create script', function([_, owner, otherAdmin]) {
           txParams,
           networkFile: this.networkFile,
           salt,
-        }).should.be.rejectedWith(
-          /Deployment address for salt \d+ is already in use/,
-        );
+        }).should.be.rejectedWith(/Deployment address for salt \d+ is already in use/);
       });
     });
 
@@ -536,8 +488,7 @@ contract('create script', function([_, owner, otherAdmin]) {
           networkFile: this.networkFile,
         });
 
-        const implementation = this.networkFile.contract(booleanContractAlias)
-          .address;
+        const implementation = this.networkFile.contract(booleanContractAlias).address;
         await assertProxy(this.networkFile, booleanContractAlias, {
           version,
           checkBool: true,
@@ -694,9 +645,7 @@ contract('create script', function([_, owner, otherAdmin]) {
           network,
           txParams,
           networkFile: this.networkFile,
-        }).should.be.rejectedWith(
-          /Dependency mock-stdlib has not been linked yet/,
-        );
+        }).should.be.rejectedWith(/Dependency mock-stdlib has not been linked yet/);
       });
     });
 
@@ -720,12 +669,9 @@ contract('create script', function([_, owner, otherAdmin]) {
     });
 
     describe('with local modifications', function() {
-      beforeEach(
-        'changing local network file to have a different bytecode',
-        async function() {
-          this.networkFile.contract(contractAlias).localBytecodeHash = '0xabcd';
-        },
-      );
+      beforeEach('changing local network file to have a different bytecode', async function() {
+        this.networkFile.contract(contractAlias).localBytecodeHash = '0xabcd';
+      });
 
       it('should refuse to create a proxy for a modified contract', async function() {
         await create({
@@ -771,9 +717,7 @@ contract('create script', function([_, owner, otherAdmin]) {
 
   describe('on unpublished project', function() {
     beforeEach('setup', async function() {
-      this.projectFile = new ProjectFile(
-        'test/mocks/packages/package-empty.zos.json',
-      );
+      this.projectFile = new ProjectFile('test/mocks/packages/package-empty.zos.json');
       this.projectFile.version = version;
       this.projectFile.publish = false;
     });
@@ -783,9 +727,7 @@ contract('create script', function([_, owner, otherAdmin]) {
 
   describe('on published project', function() {
     beforeEach('setup', async function() {
-      this.projectFile = new ProjectFile(
-        'test/mocks/packages/package-empty.zos.json',
-      );
+      this.projectFile = new ProjectFile('test/mocks/packages/package-empty.zos.json');
       this.projectFile.version = version;
     });
 

@@ -25,9 +25,7 @@ contract('publish script', function(accounts) {
   const dependencyName = 'mock-stdlib-undeployed';
 
   beforeEach('pushing package', async function() {
-    const projectFile = new ProjectFile(
-      'test/mocks/packages/package-with-contracts-and-stdlib.zos.json',
-    );
+    const projectFile = new ProjectFile('test/mocks/packages/package-with-contracts-and-stdlib.zos.json');
     projectFile.publish = false;
     this.networkFile = new NetworkFile(projectFile, network);
 
@@ -37,12 +35,8 @@ contract('publish script', function(accounts) {
       networkFile: this.networkFile,
       deployDependencies: true,
     });
-    this.previousContractAddress = this.networkFile.contract(
-      contractAlias,
-    ).address;
-    this.previousDependencyAddress = this.networkFile.getDependency(
-      dependencyName,
-    ).package;
+    this.previousContractAddress = this.networkFile.contract(contractAlias).address;
+    this.previousDependencyAddress = this.networkFile.getDependency(dependencyName).package;
   });
 
   describe('before publishing', function() {
@@ -66,40 +60,24 @@ contract('publish script', function(accounts) {
 
     it('should deploy contracts at logged addresses', async function() {
       const app = await App.fetch(this.networkFile.appAddress);
-      (await app.getPackage(projectName)).package.address.should.eq(
-        this.networkFile.packageAddress,
-      );
+      (await app.getPackage(projectName)).package.address.should.eq(this.networkFile.packageAddress);
 
       const thepackage = Package.fetch(this.networkFile.packageAddress);
-      (await thepackage.getDirectory(defaultVersion)).address.should.eq(
-        this.networkFile.providerAddress,
-      );
+      (await thepackage.getDirectory(defaultVersion)).address.should.eq(this.networkFile.providerAddress);
 
-      const provider = ImplementationDirectory.fetch(
-        this.networkFile.providerAddress,
-      );
-      (await provider.getImplementation(
-        contractAlias,
-      )).should.be.nonzeroAddress;
+      const provider = ImplementationDirectory.fetch(this.networkFile.providerAddress);
+      (await provider.getImplementation(contractAlias)).should.be.nonzeroAddress;
     });
 
     it('should reuse deployed implementations', async function() {
-      const provider = ImplementationDirectory.fetch(
-        this.networkFile.providerAddress,
-      );
-      (await provider.getImplementation(contractAlias)).should.eq(
-        this.previousContractAddress,
-      );
-      this.networkFile
-        .contract(contractAlias)
-        .address.should.eq(this.previousContractAddress);
+      const provider = ImplementationDirectory.fetch(this.networkFile.providerAddress);
+      (await provider.getImplementation(contractAlias)).should.eq(this.previousContractAddress);
+      this.networkFile.contract(contractAlias).address.should.eq(this.previousContractAddress);
     });
 
     it('should link dependencies', async function() {
       const app = await App.fetch(this.networkFile.appAddress);
-      (await app.getPackage(dependencyName)).package.address.should.eq(
-        this.previousDependencyAddress,
-      );
+      (await app.getPackage(dependencyName)).package.address.should.eq(this.previousDependencyAddress);
     });
   });
 
@@ -115,10 +93,7 @@ contract('publish script', function(accounts) {
 
     it('should not redeploy modified contract on app', async function() {
       const app = await App.fetch(this.networkFile.appAddress);
-      const newImplFromApp = await app.getImplementation(
-        projectName,
-        contractAlias,
-      );
+      const newImplFromApp = await app.getImplementation(projectName, contractAlias);
       const newImplFromFile = this.networkFile.contract(contractAlias).address;
 
       newImplFromApp.should.eq(newImplFromFile);
@@ -136,9 +111,7 @@ contract('publish script', function(accounts) {
           networkFile: this.networkFile,
         });
         await publish({ network, txParams, networkFile: this.networkFile });
-        (await Proxy.at(this.ownProxy.address).admin()).should.eq(
-          this.networkFile.proxyAdminAddress,
-        );
+        (await Proxy.at(this.ownProxy.address).admin()).should.eq(this.networkFile.proxyAdminAddress);
       });
     });
 
@@ -152,9 +125,7 @@ contract('publish script', function(accounts) {
           networkFile: this.networkFile,
         });
         await publish({ network, txParams, networkFile: this.networkFile });
-        (await Proxy.at(this.dependencyProxy.address).admin()).should.eq(
-          this.networkFile.proxyAdminAddress,
-        );
+        (await Proxy.at(this.dependencyProxy.address).admin()).should.eq(this.networkFile.proxyAdminAddress);
       });
     });
   });

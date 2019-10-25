@@ -7,10 +7,7 @@ const util = require('util');
 import forEach from 'lodash.foreach';
 
 import Contracts from '../../../src/artifacts/Contracts';
-import {
-  getStorageLayout,
-  getStructsOrEnums,
-} from '../../../src/validations/Storage';
+import { getStorageLayout, getStructsOrEnums } from '../../../src/validations/Storage';
 
 contract('Storage', () => {
   function load(name) {
@@ -26,9 +23,7 @@ contract('Storage', () => {
     it('returns storage layout', function() {
       this.storage.should.have.lengthOf(
         expectedStorage.length,
-        `storage should be:\n${expectedStorage
-          .map(util.inspect)
-          .join('\n')}\n\n      but was:\n${this.storage
+        `storage should be:\n${expectedStorage.map(util.inspect).join('\n')}\n\n      but was:\n${this.storage
           .map(util.inspect)
           .join('\n')}\n\n`,
       );
@@ -41,12 +36,7 @@ contract('Storage', () => {
   function checkTypes(expectedTypes) {
     it('returns types information', function() {
       forEach(expectedTypes, (value, id) => {
-        should.exist(
-          this.types[id],
-          `expected types to include key ${id} but was:\n${util.inspect(
-            this.types,
-          )}\n`,
-        );
+        should.exist(this.types[id], `expected types to include key ${id} but was:\n${util.inspect(this.types)}\n`);
         this.types[id].should.deep.include(value);
       });
     });
@@ -324,14 +314,11 @@ contract('Storage', () => {
     load('StorageMockWithStructs');
 
     it('uses struct canonical name as type id', function() {
-      this.storage[0].type.should.eq(
-        't_struct<StorageMockWithStructs.MyStruct>',
-      );
+      this.storage[0].type.should.eq('t_struct<StorageMockWithStructs.MyStruct>');
     });
 
     it('tracks struct members in type definition', function() {
-      const members = this.types['t_struct<StorageMockWithStructs.MyStruct>']
-        .members;
+      const members = this.types['t_struct<StorageMockWithStructs.MyStruct>'].members;
       members.should.have.lengthOf(3);
       members[0].should.include({ label: 'struct_uint256', type: 't_uint256' });
       members[1].should.include({ label: 'struct_string', type: 't_string' });
@@ -383,9 +370,7 @@ contract('Storage', () => {
     load('StorageMockWithComplexStructs');
 
     it('tracks struct members in type definition', function() {
-      const members = this.types[
-        't_struct<StorageMockWithComplexStructs.MyStruct>'
-      ].members;
+      const members = this.types['t_struct<StorageMockWithComplexStructs.MyStruct>'].members;
       members.should.have.lengthOf(3);
       members[0].should.include({
         label: 'uint256_dynarray',
@@ -417,14 +402,11 @@ contract('Storage', () => {
     load('StorageMockWithRecursiveStructs');
 
     it('tracks struct members in type definition', function() {
-      const members = this.types[
-        't_struct<StorageMockWithRecursiveStructs.MyStruct>'
-      ].members;
+      const members = this.types['t_struct<StorageMockWithRecursiveStructs.MyStruct>'].members;
       members.should.have.lengthOf(1);
       members[0].should.include({
         label: 'other_structs',
-        type:
-          't_array:dyn<t_struct<StorageMockWithRecursiveStructs.OtherStruct>>',
+        type: 't_array:dyn<t_struct<StorageMockWithRecursiveStructs.OtherStruct>>',
       });
     });
 
@@ -456,13 +438,9 @@ contract('Storage', () => {
       load(contractName);
 
       const structScope =
-        contractName === 'StorageMockWithNodeModulesReferences'
-          ? 'DependencyStorageMock'
-          : 'StorageMockWithStructs';
+        contractName === 'StorageMockWithNodeModulesReferences' ? 'DependencyStorageMock' : 'StorageMockWithStructs';
       const enumScope =
-        contractName === 'StorageMockWithNodeModulesReferences'
-          ? 'DependencyStorageMock'
-          : 'StorageMockWithEnums';
+        contractName === 'StorageMockWithNodeModulesReferences' ? 'DependencyStorageMock' : 'StorageMockWithEnums';
 
       checkStorage([
         { label: 'my_enum', type: `t_enum<${enumScope}.MyEnum>` },
@@ -488,9 +466,7 @@ contract('Storage', () => {
     load('StorageMockChainChild');
 
     it('assigns slots according to linearization', async function() {
-      const StorageMockChainChild = Contracts.getFromLib(
-        'StorageMockChainChild',
-      );
+      const StorageMockChainChild = Contracts.getFromLib('StorageMockChainChild');
       const instance = await StorageMockChainChild.new();
       const slots = await instance.methods.slots().call();
       const mappedSlots = [];
@@ -516,9 +492,7 @@ contract('Storage', () => {
 
   describe('#getStructsOrEnums', function() {
     it('returns all structs and enums from complex contract', function() {
-      const storageInfo = getStorageLayout(
-        Contracts.getFromLib('StorageMockMixed'),
-      );
+      const storageInfo = getStorageLayout(Contracts.getFromLib('StorageMockMixed'));
       const result = getStructsOrEnums(storageInfo);
       const resultVarNames = result.map(variable => variable.label);
 
@@ -535,9 +509,7 @@ contract('Storage', () => {
     });
 
     it('returns none from mappings contract', function() {
-      const storageInfo = getStorageLayout(
-        Contracts.getFromLib('StorageMockWithMappings'),
-      );
+      const storageInfo = getStorageLayout(Contracts.getFromLib('StorageMockWithMappings'));
       const result = getStructsOrEnums(storageInfo);
       const resultVarNames = result.map(variable => variable.label);
 
@@ -545,9 +517,7 @@ contract('Storage', () => {
     });
 
     it('returns none from arrays contract', function() {
-      const storageInfo = getStorageLayout(
-        Contracts.getFromLib('StorageMockWithArrays'),
-      );
+      const storageInfo = getStorageLayout(Contracts.getFromLib('StorageMockWithArrays'));
       const result = getStructsOrEnums(storageInfo);
       const resultVarNames = result.map(variable => variable.label);
 
@@ -555,9 +525,7 @@ contract('Storage', () => {
     });
 
     it('returns struct from structs contract', function() {
-      const storageInfo = getStorageLayout(
-        Contracts.getFromLib('StorageMockWithStructs'),
-      );
+      const storageInfo = getStorageLayout(Contracts.getFromLib('StorageMockWithStructs'));
       const result = getStructsOrEnums(storageInfo);
       const resultVarNames = result.map(variable => variable.label);
 

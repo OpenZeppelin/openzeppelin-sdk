@@ -12,9 +12,7 @@ contract('add script', function() {
   const contractsData = [{ name: contractName, alias: contractAlias }];
 
   beforeEach('setup', async function() {
-    this.projectFile = new ProjectFile(
-      'test/mocks/packages/package-with-stdlib.zos.json',
-    );
+    this.projectFile = new ProjectFile('test/mocks/packages/package-with-stdlib.zos.json');
     sinon.stub(this.projectFile, 'root').get(() => process.cwd());
   });
 
@@ -40,9 +38,7 @@ contract('add script', function() {
     add({ contractsData, projectFile: this.projectFile });
 
     const customContractName = 'ImplV2';
-    const customContractsData = [
-      { name: customContractName, alias: contractAlias },
-    ];
+    const customContractsData = [{ name: customContractName, alias: contractAlias }];
     add({ contractsData: customContractsData, projectFile: this.projectFile });
 
     this.projectFile.contract(contractAlias).should.eq(customContractName);
@@ -66,12 +62,8 @@ contract('add script', function() {
     ];
     add({ contractsData: customContractsData, projectFile: this.projectFile });
 
-    this.projectFile
-      .contract(customContractAlias)
-      .should.eq(customContractName);
-    this.projectFile
-      .contract(anotherCustomContractAlias)
-      .should.eq(anotherCustomContractName);
+    this.projectFile.contract(customContractAlias).should.eq(customContractName);
+    this.projectFile.contract(anotherCustomContractAlias).should.eq(anotherCustomContractName);
   });
 
   it('should use a default alias if one is not provided', function() {
@@ -95,27 +87,19 @@ contract('add script', function() {
     expect(this.projectFile.contract('GreeterImpl')).to.be.undefined;
     expect(this.projectFile.contract('GreeterLib')).to.be.undefined;
     expect(this.projectFile.contract('UintLib')).to.be.undefined;
-    this.projectFile.contracts.should.have.property(
-      'WithExternalContractImplV1',
-    );
-    this.projectFile.contracts.should.have.property(
-      'WithExternalContractImplV2',
-    );
+    this.projectFile.contracts.should.have.property('WithExternalContractImplV1');
+    this.projectFile.contracts.should.have.property('WithExternalContractImplV2');
   });
 
   describe('failures', function() {
     it('should fail to add a contract that does not exist', function() {
       const contractsData = [{ name: 'NonExists', alias: contractAlias }];
-      expect(() =>
-        add({ contractsData, projectFile: this.projectFile }),
-      ).to.throw(/not found/);
+      expect(() => add({ contractsData, projectFile: this.projectFile })).to.throw(/not found/);
     });
 
     it('should fail to add an abstract contract', function() {
       const contractsData = [{ name: 'Impl', alias: contractAlias }];
-      expect(() =>
-        add({ contractsData, projectFile: this.projectFile }),
-      ).to.throw(/abstract/);
+      expect(() => add({ contractsData, projectFile: this.projectFile })).to.throw(/abstract/);
     });
 
     xit('should fail to add a contract with an invalid alias');

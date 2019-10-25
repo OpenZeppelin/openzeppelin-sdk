@@ -16,26 +16,44 @@ As a contributor, you are expected to fork this repository, work on your own for
 
 ## A typical workflow
 
-1) Make sure your fork is up to date with the main repository:
-```
-git remote add upstream https://github.com/OpenZeppelin/openzeppelin-sdk.git
-git fetch upstream
-git pull --rebase upstream master
-```
+1. Make sure your fork is up to date with the main repository:
+    ```
+    git remote add upstream https://github.com/OpenZeppelin/openzeppelin-sdk.git
+    git fetch upstream
+    git pull --rebase upstream master
+    ```
 
-2) Branch out from `master` into `fix/some-bug-#123`, `feature/some-feature-#456`, or `docs/some-doc-#789`:
-```
-git checkout -b fix/some-bug-#123
-```
+2. Bootstrap SDK
+    ```
+    npm install
+    npx lerna bootstrap
+    openzeppelin-sdk/packages/cli$ npm link
+    openzeppelin-sdk/packages/lib$ npm link
+    ```
 
-3) Make your changes, add your files, commit and push to your fork:
-```
-git add SomeFile.js
-git commit "Fix some bug #123"
-git push origin fix/some-bug-#123
-```
+3. Branch out from `master` into `fix/some-bug-#123`, `feature/some-feature-#456`, or `docs/some-doc-#789`:
+    ```
+    git checkout -b fix/some-bug-#123
+    ```
 
-4) Go to [OpenZeppelin/openzeppelin-sdk](https://github.com/OpenZeppelin/openzeppelin-sdk) in your web browser and issue a new pull request.
+4. While developing keep running
+    ```
+    npm run watch
+    ```
 
-5) Maintainers will review your code and possibly ask for changes before your code is pulled in to the main repository. We'll check that all tests pass, review the coding style, and check for general code correctness. If everything is ok, we'll merge your pull request and your code will be part of OpenZeppelin SDK.
+5. Make your changes, add your files, commit and push to your fork:
+    ```
+    git add SomeFile.js
+    git commit "Fix some bug #123"
+    git push origin fix/some-bug-#123
+    ```
 
+6. Make sure all tests are passed
+    ```
+    openzeppelin-sdk/packages/cli$ npm test
+    openzeppelin-sdk/packages/lib$ npm test
+    ```
+
+7. Go to [OpenZeppelin/openzeppelin-sdk](https://github.com/OpenZeppelin/openzeppelin-sdk) in your web browser and issue a new pull request.
+
+8. Maintainers will review your code and possibly ask for changes before your code is pulled in to the main repository. We'll check that all tests pass, review the coding style, and check for general code correctness. If everything is ok, we'll merge your pull request and your code will be part of OpenZeppelin SDK.

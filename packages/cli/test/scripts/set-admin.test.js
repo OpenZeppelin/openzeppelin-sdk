@@ -20,31 +20,20 @@ contract('set-admin script', function(accounts) {
 
   const assertAdmin = async function(address, expectedAdmin, networkFile) {
     const actualAdmin = await Proxy.at(address).admin();
-    actualAdmin.should.eq(
-      expectedAdmin,
-      'Admin property in deployed proxy does not match',
-    );
+    actualAdmin.should.eq(expectedAdmin, 'Admin property in deployed proxy does not match');
 
-    const proxyInfo = networkFile
-      .getProxies({})
-      .find(p => p.address === address);
+    const proxyInfo = networkFile.getProxies({}).find(p => p.address === address);
     if (!proxyInfo.admin)
       expectedAdmin.should.eq(
         networkFile.proxyAdminAddress,
         'Expected admin should be app address as proxy admin is missing',
       );
-    else
-      proxyInfo.admin.should.eq(
-        expectedAdmin,
-        'Admin field in network json file does not match',
-      );
+    else proxyInfo.admin.should.eq(expectedAdmin, 'Admin field in network json file does not match');
   };
 
   describe('on application contract', function() {
     beforeEach('setup', async function() {
-      this.projectFile = new ProjectFile(
-        'test/mocks/packages/package-with-contracts.zos.json',
-      );
+      this.projectFile = new ProjectFile('test/mocks/packages/package-with-contracts.zos.json');
       this.networkFile = new NetworkFile(this.projectFile, network);
 
       await push({ network, txParams, networkFile: this.networkFile });
@@ -79,16 +68,8 @@ contract('set-admin script', function(accounts) {
       });
 
       await assertAdmin(this.impl1.address, newAdmin, this.networkFile);
-      await assertAdmin(
-        this.impl2.address,
-        this.networkFile.proxyAdminAddress,
-        this.networkFile,
-      );
-      await assertAdmin(
-        this.withLibraryImpl.address,
-        this.networkFile.proxyAdminAddress,
-        this.networkFile,
-      );
+      await assertAdmin(this.impl2.address, this.networkFile.proxyAdminAddress, this.networkFile);
+      await assertAdmin(this.withLibraryImpl.address, this.networkFile.proxyAdminAddress, this.networkFile);
     });
 
     it('changes owner of a proxy admin', async function() {
@@ -98,9 +79,7 @@ contract('set-admin script', function(accounts) {
         txParams,
         networkFile: this.networkFile,
       });
-      const newOwner = await ProxyAdmin.fetch(
-        this.networkFile.proxyAdmin.address,
-      ).getOwner();
+      const newOwner = await ProxyAdmin.fetch(this.networkFile.proxyAdmin.address).getOwner();
       newOwner.should.be.eq(newAdmin);
     });
 
@@ -115,11 +94,7 @@ contract('set-admin script', function(accounts) {
 
       await assertAdmin(this.impl1.address, newAdmin, this.networkFile);
       await assertAdmin(this.impl2.address, newAdmin, this.networkFile);
-      await assertAdmin(
-        this.withLibraryImpl.address,
-        this.networkFile.proxyAdminAddress,
-        this.networkFile,
-      );
+      await assertAdmin(this.withLibraryImpl.address, this.networkFile.proxyAdminAddress, this.networkFile);
     });
 
     it('does not attempt to change admin of unowned proxy', async function() {
@@ -139,11 +114,7 @@ contract('set-admin script', function(accounts) {
       });
       await assertAdmin(this.impl1.address, newAdmin, this.networkFile);
       await assertAdmin(this.impl2.address, anotherNewAdmin, this.networkFile);
-      await assertAdmin(
-        this.withLibraryImpl.address,
-        this.networkFile.proxyAdminAddress,
-        this.networkFile,
-      );
+      await assertAdmin(this.withLibraryImpl.address, this.networkFile.proxyAdminAddress, this.networkFile);
     });
 
     it('refuses to update all proxies given package name', async function() {
@@ -159,9 +130,7 @@ contract('set-admin script', function(accounts) {
 
   describe('on dependency contract', function() {
     beforeEach('setup', async function() {
-      this.projectFile = new ProjectFile(
-        'test/mocks/packages/package-with-undeployed-stdlib.zos.json',
-      );
+      this.projectFile = new ProjectFile('test/mocks/packages/package-with-undeployed-stdlib.zos.json');
       this.networkFile = new NetworkFile(this.projectFile, network);
 
       await push({
@@ -197,11 +166,7 @@ contract('set-admin script', function(accounts) {
       });
 
       await assertAdmin(this.greeter1.address, newAdmin, this.networkFile);
-      await assertAdmin(
-        this.greeter2.address,
-        this.networkFile.proxyAdminAddress,
-        this.networkFile,
-      );
+      await assertAdmin(this.greeter2.address, this.networkFile.proxyAdminAddress, this.networkFile);
     });
 
     it('changes admin of several proxies given package and name', async function() {
@@ -227,16 +192,8 @@ contract('set-admin script', function(accounts) {
         networkFile: this.networkFile,
       });
 
-      await assertAdmin(
-        this.greeter1.address,
-        this.networkFile.proxyAdminAddress,
-        this.networkFile,
-      );
-      await assertAdmin(
-        this.greeter2.address,
-        this.networkFile.proxyAdminAddress,
-        this.networkFile,
-      );
+      await assertAdmin(this.greeter1.address, this.networkFile.proxyAdminAddress, this.networkFile);
+      await assertAdmin(this.greeter2.address, this.networkFile.proxyAdminAddress, this.networkFile);
     });
   });
 });

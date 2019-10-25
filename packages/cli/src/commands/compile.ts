@@ -1,5 +1,4 @@
 import { compile } from '../models/compiler/Compiler';
-import { DEFAULT_EVM_VERSION } from '../models/compiler/solidity/SolidityContractsCompiler';
 import { ProjectCompilerOptions } from '../models/compiler/solidity/SolidityProjectCompiler';
 
 const name = 'compile';
@@ -24,7 +23,7 @@ const register: (program: any) => any = program =>
     )
     .option(
       '--evm-version [evm]',
-      `choose target evm version (value is written to configuration file for future runs, defaults to ${DEFAULT_EVM_VERSION})`,
+      `choose target evm version (value is written to configuration file for future runs, defaults depends on compiler: byzantium prior to 0.5.5, petersburg from 0.5.5)`,
     )
     .action(action);
 

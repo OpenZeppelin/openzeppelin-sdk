@@ -77,9 +77,7 @@ describe('NetworkConfig', function() {
 
         config.should.have.all.keys('networks', 'compilers', 'buildDir');
         config.should.not.have.key('network');
-        config.buildDir.should.eq(
-          path.resolve(process.cwd(), tmpDir, 'build/contracts'),
-        );
+        config.buildDir.should.eq(path.resolve(process.cwd(), tmpDir, 'build/contracts'));
       });
     });
 
@@ -87,11 +85,9 @@ describe('NetworkConfig', function() {
       context('when provided network does not exist', function() {
         it('throws an error', function() {
           NetworkConfig.initialize(tmpDir);
-          (() =>
-            NetworkConfig.loadNetworkConfig(
-              'non-existent',
-              networkConfigDir,
-            )).should.throw(/is not defined in your networks.js file/);
+          (() => NetworkConfig.loadNetworkConfig('non-existent', networkConfigDir)).should.throw(
+            /is not defined in your networks.js file/,
+          );
         });
       });
 
@@ -99,10 +95,7 @@ describe('NetworkConfig', function() {
         it('setups the current selected network config', function() {
           NetworkConfig.initialize(tmpDir);
           const config = NetworkConfig.getConfig(networkConfigDir);
-          const networkConfig = NetworkConfig.loadNetworkConfig(
-            'development',
-            networkConfigDir,
-          );
+          const networkConfig = NetworkConfig.loadNetworkConfig('development', networkConfigDir);
 
           networkConfig.provider.should.eq('http://localhost:8545');
           networkConfig.artifactDefaults.should.include({
@@ -126,10 +119,7 @@ describe('NetworkConfig', function() {
                 },
               });
               NetworkConfig.initialize(tmpDir);
-              const networkConfig = NetworkConfig.loadNetworkConfig(
-                'local',
-                networkConfigDir,
-              );
+              const networkConfig = NetworkConfig.loadNetworkConfig('local', networkConfigDir);
               networkConfig.provider.should.eq('returned provider');
             });
           });
@@ -142,10 +132,7 @@ describe('NetworkConfig', function() {
                 },
               });
               NetworkConfig.initialize(tmpDir);
-              const networkConfig = NetworkConfig.loadNetworkConfig(
-                'local',
-                networkConfigDir,
-              );
+              const networkConfig = NetworkConfig.loadNetworkConfig('local', networkConfigDir);
               networkConfig.provider.should.eq('wss://localhost:1324');
             });
           });

@@ -41,9 +41,7 @@ contract('ProxyAdmin', function(accounts) {
 
   describe('#getProxyAdmin', function() {
     it('returns proxyAdmin as admin of the proxy', async function() {
-      const admin = await this.proxyAdmin.methods
-        .getProxyAdmin(this.proxy.address)
-        .call();
+      const admin = await this.proxyAdmin.methods.getProxyAdmin(this.proxy.address).call();
       admin.should.be.equal(this.proxyAdmin.address);
     });
   });
@@ -51,27 +49,19 @@ contract('ProxyAdmin', function(accounts) {
   describe('#changeProxyAdmin', function() {
     it('fails to change proxy admin if its not the proxy owner', async function() {
       await assertRevert(
-        this.proxyAdmin.methods
-          .changeProxyAdmin(this.proxy.address, newAdmin)
-          .send({ from: anotherAccount }),
+        this.proxyAdmin.methods.changeProxyAdmin(this.proxy.address, newAdmin).send({ from: anotherAccount }),
       );
     });
 
     it('changes proxy admin', async function() {
-      await this.proxyAdmin.methods
-        .changeProxyAdmin(this.proxy.address, newAdmin)
-        .send({ from: proxyAdminOwner });
-      (await this.proxy.methods.admin().call({ from: newAdmin })).should.eq(
-        newAdmin,
-      );
+      await this.proxyAdmin.methods.changeProxyAdmin(this.proxy.address, newAdmin).send({ from: proxyAdminOwner });
+      (await this.proxy.methods.admin().call({ from: newAdmin })).should.eq(newAdmin);
     });
   });
 
   describe('#getProxyImplementation', function() {
     it('returns proxy implementation address', async function() {
-      const implementationAddress = await this.proxyAdmin.methods
-        .getProxyImplementation(this.proxy.address)
-        .call();
+      const implementationAddress = await this.proxyAdmin.methods.getProxyImplementation(this.proxy.address).call();
       implementationAddress.should.be.equal(this.implementationV1.address);
     });
   });
@@ -92,9 +82,7 @@ contract('ProxyAdmin', function(accounts) {
         await this.proxyAdmin.methods
           .upgrade(this.proxy.address, this.implementationV2.address)
           .send({ from: proxyAdminOwner });
-        const implementationAddress = await this.proxyAdmin.methods
-          .getProxyImplementation(this.proxy.address)
-          .call();
+        const implementationAddress = await this.proxyAdmin.methods.getProxyImplementation(this.proxy.address).call();
         implementationAddress.should.be.equal(this.implementationV2.address);
       });
     });
@@ -103,18 +91,10 @@ contract('ProxyAdmin', function(accounts) {
   describe('#upgradeAndCall', function() {
     context('with unauthorized account', function() {
       it('fails to upgrade', async function() {
-        const callData = encodeCall(
-          'initializeNonPayable',
-          ['uint256'],
-          [1337],
-        );
+        const callData = encodeCall('initializeNonPayable', ['uint256'], [1337]);
         await assertRevert(
           this.proxyAdmin.methods
-            .upgradeAndCall(
-              this.proxy.address,
-              this.implementationV2.address,
-              callData,
-            )
+            .upgradeAndCall(this.proxy.address, this.implementationV2.address, callData)
             .send({ from: anotherAccount }),
         );
       });
@@ -126,11 +106,7 @@ contract('ProxyAdmin', function(accounts) {
           const callData = encodeCall('meesaNoExist', ['uint256'], [1337]);
           await assertRevert(
             this.proxyAdmin.methods
-              .upgradeAndCall(
-                this.proxy.address,
-                this.implementationV2.address,
-                callData,
-              )
+              .upgradeAndCall(this.proxy.address, this.implementationV2.address, callData)
               .send({ from: proxyAdminOwner }),
           );
         });
@@ -138,21 +114,11 @@ contract('ProxyAdmin', function(accounts) {
 
       context('with valid callData', function() {
         it('upgrades implementation', async function() {
-          const callData = encodeCall(
-            'initializeNonPayable',
-            ['uint256'],
-            [1337],
-          );
+          const callData = encodeCall('initializeNonPayable', ['uint256'], [1337]);
           await this.proxyAdmin.methods
-            .upgradeAndCall(
-              this.proxy.address,
-              this.implementationV2.address,
-              callData,
-            )
+            .upgradeAndCall(this.proxy.address, this.implementationV2.address, callData)
             .send({ from: proxyAdminOwner });
-          const implementationAddress = await this.proxyAdmin.methods
-            .getProxyImplementation(this.proxy.address)
-            .call();
+          const implementationAddress = await this.proxyAdmin.methods.getProxyImplementation(this.proxy.address).call();
           implementationAddress.should.be.equal(this.implementationV2.address);
         });
       });

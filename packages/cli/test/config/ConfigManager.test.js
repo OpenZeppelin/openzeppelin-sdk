@@ -1,12 +1,12 @@
-'use strict'
-require('../setup')
+'use strict';
+require('../setup');
 
 import sinon from 'sinon';
 import { FileSystem, Contracts, ZWeb3 } from '@openzeppelin/upgrades';
 
 import ConfigManager from '../../src/models/config/ConfigManager';
 
-const expectToBehaveLikeConfig = (configFileDir) => {
+const expectToBehaveLikeConfig = configFileDir => {
   describe('functions', function() {
     describe('#initStaticConfiguration', function() {
       it('sets local buildDir', function() {
@@ -22,8 +22,9 @@ const expectToBehaveLikeConfig = (configFileDir) => {
     describe('#initNetworkConfiguration', function() {
       context('when no network is specified', function() {
         it('throws', function() {
-          ConfigManager.initNetworkConfiguration({}, true, configFileDir)
-            .should.be.rejectedWith(/network name must be provided/);
+          ConfigManager.initNetworkConfiguration({}, true, configFileDir).should.be.rejectedWith(
+            /network name must be provided/,
+          );
         });
       });
 
@@ -69,7 +70,7 @@ describe('ConfigManager', function() {
     before('backup config file', function() {
       FileSystem.copy(configFile, configFileBackup);
       FileSystem.remove(configFile);
-    })
+    });
 
     after('restore config file', function() {
       FileSystem.copy(configFileBackup, configFile);
@@ -79,13 +80,14 @@ describe('ConfigManager', function() {
     expectToBehaveLikeConfig(configFileDir);
 
     it('throws if provided network id is not correct', async function() {
-      await ConfigManager.initNetworkConfiguration({ network: 'invalid' }, true, configFileDir)
-        .should.be.rejectedWith(/Unexpected network ID: requested -39/);
+      await ConfigManager.initNetworkConfiguration({ network: 'invalid' }, true, configFileDir).should.be.rejectedWith(
+        /Unexpected network ID: requested -39/,
+      );
     });
 
     it('calls the correct config loader', async function() {
-        await ConfigManager.initNetworkConfiguration({ network: 'local' }, true, configFileDir);
-        this.initialize.should.have.been.calledWith('http://localhost:8545');
+      await ConfigManager.initNetworkConfiguration({ network: 'local' }, true, configFileDir);
+      this.initialize.should.have.been.calledWith('http://localhost:8545');
     });
 
     describe('#setBaseConfig', function() {
@@ -104,7 +106,7 @@ describe('ConfigManager', function() {
     before('backup config file', function() {
       FileSystem.copy(configFile, configFileBackup);
       FileSystem.remove(configFile);
-    })
+    });
 
     after('restore config file', function() {
       FileSystem.copy(configFileBackup, configFile);
@@ -121,15 +123,16 @@ describe('ConfigManager', function() {
     describe('#setBaseConfig', function() {
       it('sets the correct config', function() {
         ConfigManager.setBaseConfig(configFileDir);
-        ConfigManager.config.should.have.property('isTruffleProject')
+        ConfigManager.config.should.have.property('isTruffleProject');
       });
     });
   });
 
   context('when no config file present', function() {
     it('throws an error', function() {
-      (() => ConfigManager.setBaseConfig('foo/bar/buz'))
-        .should.throw('Could not find networks.js file, please remember to initialize your project.');
+      (() => ConfigManager.setBaseConfig('foo/bar/buz')).should.throw(
+        'Could not find networks.js file, please remember to initialize your project.',
+      );
     });
   });
 });

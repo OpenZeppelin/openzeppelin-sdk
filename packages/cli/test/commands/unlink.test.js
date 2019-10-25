@@ -9,9 +9,9 @@ describe('unlink command', function() {
   itShouldParse(
     'calls unlink script with a dependency name as parameter',
     'unlink',
-    'zos unlink mock-stdlib@1.1.0 mock-stdlib2@1.1.0',
+    'zos unlink mock-stdlib@1.1.0 mock-stdlib-2@1.1.0',
     function(unlink) {
-      const dependencies = ['mock-stdlib@1.1.0', 'mock-stdlib2@1.1.0'];
+      const dependencies = ['mock-stdlib@1.1.0', 'mock-stdlib-2@1.1.0'];
       unlink.should.have.been.calledWithExactly({ dependencies });
     },
   );

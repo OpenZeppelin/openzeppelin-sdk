@@ -73,7 +73,7 @@ const { Contracts, ZWeb3 } = require('@openzeppelin/upgrades');
 ZWeb3.initialize(web3.currentProvider);
 
 const Sample = Contracts.getFromLocal('Sample');
-const ERC20 = Contracts.getFromNodeModules('openzeppelin-contracts-ethereum-package', 'ERC20');
+const ERC20 = Contracts.getFromNodeModules('@openzeppelin/contracts-ethereum-package', 'ERC20');
 
 require('chai').should();
 

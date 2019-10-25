@@ -4,6 +4,8 @@ import "./GreeterLib.sol";
 
 contract GreeterImpl {
   using GreeterLib for string;
+
+  mapping(uint256 => string) public greetings;
   event Greeting(string greeting);
 
   function greet(string memory who) public {

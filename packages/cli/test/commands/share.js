@@ -78,29 +78,19 @@ exports.stubCommands = function() {
     this.accounts = sinon.stub(accounts, 'default');
 
     this.compiler = sinon.stub(Compiler, 'compile');
-    this.errorHandler = sinon
-      .stub(ErrorHandler.prototype, 'call')
-      .callsFake(() => null);
-    this.initializer = sinon
-      .stub(ConfigManager, 'initNetworkConfiguration')
-      .callsFake(function(options) {
-        ConfigManager.initStaticConfiguration();
-        const { network, from } = Session.getOptions(options);
-        const txParams = from ? { from } : {};
-        return { network, txParams };
-      });
-    this.getManifestVersion = sinon
-      .stub(NetworkFile, 'getManifestVersion')
-      .returns('2.2');
-    this.projectFile = sinon
-      .stub(ProjectFile.prototype, 'exists')
-      .returns(true);
+    this.errorHandler = sinon.stub(ErrorHandler.prototype, 'call').callsFake(() => null);
+    this.initializer = sinon.stub(ConfigManager, 'initNetworkConfiguration').callsFake(function(options) {
+      ConfigManager.initStaticConfiguration();
+      const { network, from } = Session.getOptions(options);
+      const txParams = from ? { from } : {};
+      return { network, txParams };
+    });
+    this.getManifestVersion = sinon.stub(NetworkFile, 'getManifestVersion').returns('2.2');
+    this.projectFile = sinon.stub(ProjectFile.prototype, 'exists').returns(true);
     const projectFile = new ProjectFile('test/mocks/mock-stdlib/zos.json');
-    this.dependency = sinon
-      .stub(Dependency.prototype, 'projectFile')
-      .get(function getterFn() {
-        return projectFile;
-      });
+    this.dependency = sinon.stub(Dependency.prototype, 'projectFile').get(function getterFn() {
+      return projectFile;
+    });
   });
 
   afterEach('restore', function() {

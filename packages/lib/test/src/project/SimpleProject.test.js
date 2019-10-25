@@ -35,14 +35,8 @@ contract('SimpleProject', function(accounts) {
       supportsNames: true,
       otherAdmin: another,
       setImplementations: async function() {
-        this.implementationV1 = await this.project.setImplementation(
-          ImplV1,
-          'DummyImplementation',
-        );
-        this.implementationV2 = await this.project.setImplementation(
-          ImplV2,
-          'DummyImplementationV2',
-        );
+        this.implementationV1 = await this.project.setImplementation(ImplV1, 'DummyImplementation');
+        this.implementationV2 = await this.project.setImplementation(ImplV2, 'DummyImplementationV2');
       },
     });
 

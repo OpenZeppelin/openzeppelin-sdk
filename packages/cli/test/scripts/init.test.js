@@ -77,9 +77,7 @@ contract('init script', function() {
         name,
         version,
         projectFile: this.projectFile,
-      }).should.be.rejectedWith(
-        `Cannot overwrite existing file ${this.projectFile.filePath}`,
-      );
+      }).should.be.rejectedWith(`Cannot overwrite existing file ${this.projectFile.filePath}`);
 
       cleanup(this.projectFile.filePath);
     });

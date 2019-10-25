@@ -17,9 +17,7 @@ contract('TestHelper', function([_, owner]) {
 
   describe('for app project', function() {
     beforeEach(async function() {
-      this.projectFile = new ProjectFile(
-        'test/mocks/packages/package-with-contracts-and-multiple-stdlibs.zos.json',
-      );
+      this.projectFile = new ProjectFile('test/mocks/packages/package-with-contracts-and-multiple-stdlibs.zos.json');
       this.networkFile = new NetworkFile(this.projectFile, 'test');
       this.project = await TestHelper(txParams, this.networkFile);
     });
@@ -52,12 +50,8 @@ contract('TestHelper', function([_, owner]) {
     });
 
     it('has dependencies deployed', async function() {
-      const dep1 = await this.project.getDependencyPackage(
-        'mock-stdlib-undeployed',
-      );
-      const dep2 = await this.project.getDependencyPackage(
-        'mock-stdlib-undeployed-2',
-      );
+      const dep1 = await this.project.getDependencyPackage('mock-stdlib-undeployed');
+      const dep2 = await this.project.getDependencyPackage('mock-stdlib-undeployed-2');
 
       dep1.should.not.be.null;
       dep2.should.not.be.null;
@@ -75,9 +69,7 @@ contract('TestHelper', function([_, owner]) {
 
   describe('for an unpublished project', function() {
     beforeEach(async function() {
-      this.projectFile = new ProjectFile(
-        'test/mocks/packages/package-with-contracts.zos.json',
-      );
+      this.projectFile = new ProjectFile('test/mocks/packages/package-with-contracts.zos.json');
       this.projectFile.publish = false;
       this.networkFile = new NetworkFile(this.projectFile, 'test');
       this.project = await TestHelper(txParams, this.networkFile);
