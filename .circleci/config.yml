@@ -54,9 +54,9 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-          key: dependency-cache-v4-{{ checksum "yarn.lock" }}
-      - restore_cache:
-          key: yarn-cache-v6-
+          keys:
+            - dependency-cache-v4-{{ checksum "yarn.lock" }}
+            - yarn-cache-v6-
       - run:
           name: Install dependencies and build
           command: yarn
