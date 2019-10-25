@@ -124,7 +124,6 @@ jobs:
       - test:
           workspace: examples/first-project
           run-yarn: true
-          test-cmd: scripts/test-ci.sh
 
   integration-cli-geth: &integration
     <<: *defaults
