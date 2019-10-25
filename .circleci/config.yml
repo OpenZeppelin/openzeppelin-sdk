@@ -127,6 +127,7 @@ jobs:
           test-cmd: scripts/test-ci.sh
 
   integration-cli-geth: &integration
+    <<: *defaults
     docker:
       - image: circleci/node:10.13
       - image: ethereum/client-go:release-1.8
