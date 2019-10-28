@@ -7,10 +7,14 @@
   "name": "example-first-project",
   "version": "1.0.0",
   "compiler": {
-    "manager": "zos",
+    "manager": "openzeppelin",
     "solcVersion": "0.5.9",
     "compilerSettings": {
-      "optimizer": {}
+      "optimizer": {
+        "enabled": false,
+        "runs": "200"
+      }
     }
-  }
+  },
+  "telemetryOptIn": false
 }

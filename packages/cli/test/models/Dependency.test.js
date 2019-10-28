@@ -166,7 +166,7 @@ contract('Dependency', function([_, from]) {
         it('generates a package file', function() {
           const projectFile = this.dependency.projectFile;
           projectFile.should.not.be.null;
-          projectFile.filePath.should.match(/mock-stdlib\/zos\.json$/);
+          projectFile.filePath.should.match(new RegExp(`/${libname}/zos\\.json$`));
           projectFile.version.should.eq('1.1.0');
           projectFile.contracts.should.include({ Greeter: 'GreeterImpl' });
         });
@@ -184,7 +184,7 @@ contract('Dependency', function([_, from]) {
         context('for an existent network', function() {
           it('generates network file', function() {
             const networkFile = this.dependency.getNetworkFile('test');
-            networkFile.filePath.should.match(/mock-stdlib\/zos\.test\.json$/);
+            networkFile.filePath.should.match(new RegExp(`/${libname}/zos\\.test\\.json$`));
           });
         });
       });

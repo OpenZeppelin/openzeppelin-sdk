@@ -1,95 +1,51 @@
 version: 2.1
 
-orbs:
-  node: circleci/node@0.0.9
-
 defaults: &defaults
   docker:
     - image: circleci/node:10.13
+  environment:
+    YARN_CACHE_FOLDER: ~/.cache/yarn/v6
   working_directory: ~/openzeppelin
 
-aliases:
-  - restore_cache: &restore-build-cache-lib
-      keys: ['dependency-cache-v3-build-lib-{{ .Revision }}']
-  - restore_cache: &restore-build-cache-cli
-      keys: ['dependency-cache-v3-build-cli-{{ .Revision }}']
-  - restore_cache: &restore-cache-root
-      keys: ['dependency-cache-v3-root-{{ checksum "package.json" }}', 'dependency-cache-v3-root-']
-  - restore_cache: &restore-cache-lib
-      keys: ['dependency-cache-v3-lib-{{ checksum "packages/lib/package.json" }}', 'dependency-cache-v3-lib-']
-  - restore_cache: &restore-cache-cli
-      keys: ['dependency-cache-v3-cli-{{ checksum "packages/cli/package.json" }}', 'dependency-cache-v3-cli-']
-
 commands:
-
-  restore-lib-caches:
-    steps:
-      - restore_cache: *restore-cache-root
-      - restore_cache: *restore-cache-lib
-      - restore_cache: *restore-build-cache-lib
-
-  restore-all-caches:
-    steps:
-      - restore_cache: *restore-cache-root
-      - restore_cache: *restore-cache-lib
-      - restore_cache: *restore-cache-cli
-      - restore_cache: *restore-build-cache-lib
-      - restore_cache: *restore-build-cache-cli
-
-  npm-install-with-cache:
+  test:
     parameters:
-      dir:
+      workspace:
         type: string
-        description: Working directory.
-        default: ~/openzeppelin
-      cache-version:
-        type: string
-        default: v1
-      install-cmd:
-        type: string
-        default: pwd && npm install
-    steps:
-      - restore_cache:
-          keys:
-            - 'dependency-cache-<< parameters.cache-version >>-<< parameters.dir >>-{{ .Branch }}-{{ checksum "<< parameters.dir >>/package.json" }}'
-            - 'dependency-cache-<< parameters.cache-version >>-<< parameters.dir >>-{{ .Branch }}-'
-            - 'dependency-cache-<< parameters.cache-version >>-<< parameters.dir >>-'
-      - run:
-          name: Output npm info
-          command: npm version
-          working_directory: "<< parameters.dir >>"
-      - run:
-          name: "Install dependencies on << parameters.dir >>"
-          command: "<< parameters.install-cmd >>"
-          working_directory: "<< parameters.dir >>"
-      - save_cache:
-          key: 'dependency-cache-<< parameters.cache-version >>-<< parameters.dir >>-{{ .Branch }}-{{ checksum "<< parameters.dir >>/package.json" }}'
-          paths: [ "<< parameters.dir >>/node_modules" ]
-
-  npm-install-and-test:
-    parameters:
-      dir:
-        type: string
-        description: Working directory.
-        default: ~/openzeppelin
-      cache-version:
-        type: string
-        default: v1
-      install-cmd:
-        type: string
-        default: pwd && npm install
+        description: Yarn workspace to test
+      run-yarn:
+        type: boolean
+        default: false
+      prepare-workdir:
+        type: boolean
+        default: false
       test-cmd:
         type: string
-        default: pwd && npm test
+        default: yarn test
     steps:
-      - npm-install-with-cache:
-          dir: "<< parameters.dir >>"
-          cache-version: "<< parameters.cache-version >>"
-          install-cmd: "<< parameters.install-cmd >>"
+      - checkout
+      - restore_cache:
+          key: dependency-cache-v4-{{ checksum "yarn.lock" }}
+      - attach_workspace:
+          at: ~/openzeppelin
+      - when:
+          condition: << parameters.run-yarn >>
+          steps:
+            - restore_cache:
+                key: yarn-cache-v6-
+            - run:
+                command: yarn
+                working_directory: "~/openzeppelin/<< parameters.workspace >>"
+      - when:
+          condition: << parameters.prepare-workdir >>
+          steps:
+            - run:
+                command: yarn
+                working_directory: "~/openzeppelin/tests/cli/workdir"
       - run: 
-          name: "Test on << parameters.dir >>"
+          name: "Test << parameters.workspace >>"
           command: "<< parameters.test-cmd >>"
-          working_directory: "<< parameters.dir >>"
+          working_directory: "~/openzeppelin/<< parameters.workspace >>"
 
 jobs:
 
@@ -97,139 +53,105 @@ jobs:
     <<: *defaults
     steps:
       - checkout
-      - restore-lib-caches
+      - restore_cache:
+          keys:
+            - dependency-cache-v4-{{ checksum "yarn.lock" }}
+            - yarn-cache-v6-
       - run:
-          name: Install dependencies at root
-          command: npm install
-      - run:
-          name: Bootstrap openzeppelin packages via lerna
-          command: ./node_modules/.bin/lerna bootstrap --loglevel=info --concurrency=4 --scope="@openzeppelin/cli" --scope="@openzeppelin/upgrades"
-          no_output_timeout: 60m
+          name: Install dependencies and build
+          command: yarn
       - save_cache:
-          key: dependency-cache-v3-root-{{ checksum "package.json" }}
-          paths: [node_modules]
+          key: dependency-cache-v4-{{ checksum "yarn.lock" }}
+          paths:
+            - node_modules
+            - packages/cli/node_modules
+            - packages/lib/node_modules
       - save_cache:
-          key: dependency-cache-v3-cli-{{ checksum "packages/cli/package.json" }}
-          paths: [packages/cli/node_modules]
-      - save_cache:
-          key: dependency-cache-v3-lib-{{ checksum "packages/lib/package.json" }}
-          paths: [packages/lib/node_modules]
-      - save_cache:
-          key: dependency-cache-v3-build-cli-{{ .Revision }}
-          paths: [packages/cli/lib, packages/cli/build]
-      - save_cache:
-          key: dependency-cache-v3-build-lib-{{ .Revision }}
-          paths: [packages/lib/lib, packages/lib/build]
+          key: yarn-cache-v6-{{ checksum "yarn.lock" }}
+          paths:
+            - ~/.cache/yarn/v6
+      - persist_to_workspace:
+          root: .
+          paths:
+            - packages/cli/lib
+            - packages/cli/build
+            - packages/lib/lib
+            - packages/lib/build
 
   test-lib:
     <<: *defaults
     steps:
-      - checkout
-      - restore-lib-caches
-      - run:
-          name: Test lib
-          command: 'npm run test'
-          working_directory: ~/openzeppelin/packages/lib
+      - test:
+          workspace: packages/lib
 
   test-cli:
     <<: *defaults
     steps:
-      - checkout
-      - restore-all-caches
-      - run:
-          name: Test CLI
-          command: 'npm run test'
-          working_directory: ~/openzeppelin/packages/cli
+      - test:
+          workspace: packages/cli
 
   example-lib-simple:
     <<: *defaults
     steps:
-      - checkout
-      - restore-lib-caches
-      - npm-install-and-test:
-          dir: "~/openzeppelin/examples/lib-simple"
-          install-cmd: '~/openzeppelin/node_modules/.bin/lerna bootstrap --scope=example-openzeppelin-upgrades-simple --scope="@openzeppelin/upgrades"'
+      - test:
+          workspace: examples/lib-simple
+          run-yarn: true
 
   example-lib-complex:
     <<: *defaults
     steps:
-      - checkout
-      - restore-lib-caches
-      - npm-install-and-test:
-          dir: "~/openzeppelin/examples/lib-complex"
-          install-cmd: '~/openzeppelin/node_modules/.bin/lerna bootstrap --scope=example-openzeppelin-upgrades-complex --scope="@openzeppelin/upgrades"'
+      - test:
+          workspace: examples/lib-complex
+          run-yarn: true
 
   example-create-instances-from-solidity:
     <<: *defaults
     steps:
-      - checkout
-      - restore-all-caches
-      - npm-install-and-test:
-          dir: "~/openzeppelin/examples/creating-instances-from-solidity"
-          install-cmd: '~/openzeppelin/node_modules/.bin/lerna bootstrap --scope=example-creating-instances-from-solidity --scope="@openzeppelin/cli" --scope="@openzeppelin/upgrades"'
+      - test:
+          workspace: examples/creating-instances-from-solidity
+          run-yarn: true
 
   example-cli-create2:
     <<: *defaults
     steps:
-      - checkout
-      - restore_cache: *restore-cache-root
-      - restore_cache: *restore-cache-lib
-      - restore_cache: *restore-cache-cli
-      - npm-install-and-test:
-          dir: "~/openzeppelin/examples/cli-create2"
-          install-cmd: '~/openzeppelin/node_modules/.bin/lerna bootstrap --scope=example-cli-create2 --scope="@openzeppelin/cli" --scope="@openzeppelin/upgrades"'
+      - test:
+          workspace: examples/cli-create2
+          run-yarn: true
 
   example-first-project:
     <<: *defaults
     steps:
-      - checkout
-      - restore_cache: *restore-cache-root
-      - restore_cache: *restore-cache-lib
-      - restore_cache: *restore-cache-cli
-      - npm-install-and-test:
-          dir: "~/openzeppelin/examples/first-project"
-          install-cmd: '~/openzeppelin/node_modules/.bin/lerna bootstrap --scope=example-first-project --scope="@openzeppelin/cli" --scope="@openzeppelin/upgrades"'
-          test-cmd: pwd && scripts/test-ci.sh
+      - test:
+          workspace: examples/first-project
+          run-yarn: true
 
   integration-cli-geth: &integration
-    environment: { NETWORK: "geth-dev" }
-    working_directory: ~/openzeppelin
+    <<: *defaults
     docker:
       - image: circleci/node:10.13
       - image: ethereum/client-go:release-1.8
         command: "--dev --dev.period=1 --rpc --rpcport=8545 --rpcaddr=localhost --networkid=9955"
+    environment:
+      NETWORK: "geth-dev"
     steps:
-      - checkout
-      - restore-all-caches
-      - npm-install-with-cache: 
-          dir: "~/openzeppelin/tests/cli/workdir"
-          cache-version: 'v3'
-          install-cmd: '~/openzeppelin/node_modules/.bin/lerna bootstrap --scope=tests-cli-workdir --scope="@openzeppelin/cli" --scope="@openzeppelin/upgrades"'
-      - npm-install-with-cache: 
-          dir: "~/openzeppelin/tests/cli/test"
-          cache-version: 'v3'
-      - run:
-          name: Integration test
-          command: 'npm run test'
-          working_directory: "~/openzeppelin/tests/cli/test"
+      - test:
+          workspace: tests/cli/test
+          run-yarn: true
+          prepare-workdir: true
   
   integration-cli-hdwallet:
     <<: *integration
-    environment: { NETWORK: "geth-dev-hdwallet" }
+    environment:
+      NETWORK: "geth-dev-hdwallet"
 
   integration-cli-kits:
     <<: *integration
-    environment: { NETWORK: "development" }
+    environment:
+      NETWORK: "development"
     steps:
-      - checkout
-      - restore-all-caches
-      - npm-install-with-cache: 
-          dir: "~/openzeppelin/tests/kits/test"
-          cache-version: 'v3'
-      - run:
-          name: Kits integration test
-          command: 'npm run test'
-          working_directory: "~/openzeppelin/tests/kits/test"
+      - test:
+          workspace: tests/kits/test
+          run-yarn: true
 
 workflows:
   version: 2

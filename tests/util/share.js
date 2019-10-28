@@ -59,7 +59,7 @@ module.exports = function (dirname) {
     const output = spawnSync(cmd, { cwd: path.resolve(dirname, workdirPath), shell: true });
     if (output.status != 0 || output.error) {
       logOutput(output.stdout, output.stderr)
-      throw new Error(`Error running ${cmd} (err ${output.status}) ${output.error}`);
+      throw new Error(`Error running ${cmd} (err ${output.status})\n${output.error}\n${String(output.stderr || '')}`);
     }
     return [output.stdout.toString(), output.stderr.toString()]
   }
@@ -98,8 +98,8 @@ module.exports = function (dirname) {
 
   function setMockStdlibVersion(version) {
     sed('package.json', /(?<=mock-stdlib-)1\.\d\.0/, version);
-    sed('package-lock.json', /(?<=mock-stdlib-)1\.\d\.0/, version);
-    run(`ln -nsf ../../dependencies/mock-stdlib-${version} node_modules/mock-stdlib`);
+    run('rm -rf node_modules/mock-stdlib');
+    run(`ln -Tnsf ../../dependencies/mock-stdlib-${version} node_modules/mock-stdlib`);
 }
 
   return {
