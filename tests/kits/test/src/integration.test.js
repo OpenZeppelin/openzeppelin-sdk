@@ -13,6 +13,9 @@ function cleanup() {
 
 const network = getNetwork();
 
+// TODO: Review warning by react-scripts about eslint versions.
+process.env.SKIP_PREFLIGHT_CHECK = true;
+
 function runIntegrationTest({ kit }, action) {
   before('cleaning up project folder', cleanup);
 
