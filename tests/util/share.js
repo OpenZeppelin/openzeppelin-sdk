@@ -59,7 +59,7 @@ module.exports = function (dirname) {
     const output = spawnSync(cmd, { cwd: path.resolve(dirname, workdirPath), shell: true });
     if (output.status != 0 || output.error) {
       logOutput(output.stdout, output.stderr)
-      throw new Error(`Error running ${cmd} (err ${output.status})\n${output.error}\n${output.stderr.toString()}`);
+      throw new Error(`Error running ${cmd} (err ${output.status})\n${output.error}\n${String(output.stderr || '')}`);
     }
     return [output.stdout.toString(), output.stderr.toString()]
   }
