@@ -8791,6 +8791,9 @@ mock-fs@^4.1.0:
 "mock-stdlib-invalid@file:./packages/cli/test/mocks/mock-stdlib-invalid":
   version "1.1.0"
 
+"mock-stdlib-libdeps@file:./packages/cli/test/mocks/mock-stdlib-libdeps":
+  version "1.1.0"
+
 "mock-stdlib-root@file:./packages/cli/test/mocks/mock-stdlib":
   version "1.1.0"
 
