@@ -32,7 +32,9 @@ fi
 
 if [ "$CI" = true ]; then
   node_modules/.bin/truffle version
-  node_modules/.bin/truffle compile
 fi
+
+rm -rf build/contracts
+node_modules/.bin/truffle compile
 
 TS_NODE_PROJECT="tsconfig.test.json" node_modules/.bin/truffle test --network testing "$@"
