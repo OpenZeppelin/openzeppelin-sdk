@@ -4,3 +4,5 @@ build/*
 node_modules
 zos.*
 contracts/*
+
+.openzeppelin/.session

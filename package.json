@@ -1,11 +1,23 @@
 {
   "name": "root",
   "private": true,
+  "workspaces": [
+    "examples/*",
+    "packages/*",
+    "tests/cli/test",
+    "tests/cli/workdir",
+    "tests/kits/test",
+    "tests/kits/workdir"
+  ],
+  "nohoist": ["**/mock-stdlib"],
+  "scripts": {
+    "prepare": "lerna run prepare"
+  },
   "devDependencies": {
     "husky": "^2.7.0",
-    "lerna": "~3.13.1",
-    "typescript": "^3.2.2",
-    "mock-stdlib-root": "file:./packages/cli/test/mocks/mock-stdlib"
+    "lerna": "^3.13.4",
+    "mock-stdlib-root": "file:./packages/cli/test/mocks/mock-stdlib",
+    "yarn": "^1.17.3"
   },
   "husky": {
     "hooks": {

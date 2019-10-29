@@ -27,10 +27,10 @@ export default function(owner, donor, wallet, tokenName, tokenSymbol) {
   describe('donate', function() {
 
     describe('when receiving a donation that is greater than zero', function() {
-      const donationValue = 1;
+      const donationValue = '1';
 
       beforeEach(async function() {
-        const donation = {from: donor, value: web3.toWei(donationValue, 'ether')};
+        const donation = {from: donor, value: web3.utils.toWei(donationValue, 'ether')};
         await this.donations.methods.donate().send(donation);
       });
 

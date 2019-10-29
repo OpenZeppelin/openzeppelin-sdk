@@ -1,19 +1,17 @@
+#!/usr/bin/env bash
+
 set -o errexit
 set -o xtrace
 trap cleanup EXIT
 
 ganache_port=9555
 
-# Lerna bootstrap is failing to create the symlink in node_modules/.bin in the CI for some reason
-# When fixed, we should change the line below to zos="node_modules/.bin/zos"
-zos="node node_modules/@openzeppelin/cli/lib/bin/oz-cli.js"
+oz="node_modules/.bin/oz"
 
 cleanup() {
   if [ -n "$ganache_pid" ] && ps -p $ganache_pid > /dev/null; then
     kill -9 $ganache_pid
   fi
-
-  rm -f ./openzeppelin/dev-4447.json
 }
 
 start_ganache() {
@@ -22,13 +20,15 @@ start_ganache() {
   ganache_pid=$!
 }
 
+
+rm -f .openzeppelin/dev-4447.json
 start_ganache
 sleep 2
 
-$zos --version
+$oz --version
 
-$zos push --network test --no-interactive
-$zos create Counter --network test --no-interactive
+$oz push --network test --no-interactive
+$oz create Counter --network test --no-interactive
 
 RESULT=$(PROVIDER_URL="http://localhost:${ganache_port}" node src/index.js)
 if [ "$RESULT" != "20" ]; then

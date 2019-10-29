@@ -23,7 +23,7 @@
     "@openzeppelin/upgrades": "^2.5.3",
     "minimist": "^1.2.0",
     "openzeppelin-zos": "git+https://github.com/OpenZeppelin/openzeppelin-zos.git#19610325924e03f008bb57dd8868f196bb7e3c98",
-    "truffle": "^4.1.13",
+    "truffle": "^5.0.0",
     "zos-lib": "2.4.1"
   },
   "devDependencies": {

@@ -7,10 +7,10 @@ const {
 } = require('../../../util/share')(__dirname);
 
 function cleanup() {
-  run('rm build/contracts/*.json ||:')
-  run('rm contracts/*.sol ||:')
-  run('rm zos.* ||:')
-  run('rm .openzeppelin/*.json ||:')
+  run('rm -f build/contracts/*.json')
+  run('rm -f contracts/*.sol')
+  run('rm -f zos.*')
+  run('rm -f .openzeppelin/*.json')
   setMockStdlibVersion('1.1.0')
 }
 

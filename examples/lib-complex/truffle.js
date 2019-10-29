@@ -13,5 +13,10 @@ module.exports = {
       network_id: '*', // eslint-disable-line camelcase
       port: 8545
     }
-  }
+  },
+  compilers: {
+    solc: {
+      version: '0.4.26',
+    },
+  },
 }

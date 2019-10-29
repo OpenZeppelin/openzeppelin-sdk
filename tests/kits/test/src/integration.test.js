@@ -13,6 +13,9 @@ function cleanup() {
 
 const network = getNetwork();
 
+// TODO: Review warning by react-scripts about eslint versions.
+process.env.SKIP_PREFLIGHT_CHECK = true;
+
 function runIntegrationTest({ kit }, action) {
   before('cleaning up project folder', cleanup);
 
@@ -21,13 +24,13 @@ function runIntegrationTest({ kit }, action) {
     run(`node ../../../packages/cli/lib/bin/oz-cli.js unpack ${kit}`);
   });
 
-  // have to replace zos with local version so we test current build
-  it('replace zos with local version', function() {
+  // have to replace oz with local version so we test current build
+  it('replace oz with local version', function() {
     run(`${findUp.sync('node_modules/.bin/lerna')} bootstrap --scope=tests-cli-kits --scope="@openzeppelin/*"`);
   });
 
-  it('init zos project', function() {
-    run(`npx zos init ${kit} 1.0.0 --no-interactive`);
+  it('init oz project', function() {
+    run(`npx oz init ${kit} 1.0.0 --no-interactive`);
   });
 
   action();
@@ -39,27 +42,30 @@ function runIntegrationTest({ kit }, action) {
   after('cleaning up project folder', cleanup);
 }
 
-// TODO-v3: Remove legacy support
-describe(`Unpacks a ZepKit on ${network}`, function() {
-  runIntegrationTest({ kit: 'zepkit' }, function() {});
-});
-
-describe(`Unpack a Starter kit on ${network}`, function() {
+describe(`Unpack a Starter Kit on the ${network}`, function() {
   runIntegrationTest({ kit: 'starter' }, function() {});
 });
 
-describe(`Unpack a Tutorial kit on ${network}`, function() {
+describe(`Unpack a Tutorial Kit on the ${network}`, function() {
   runIntegrationTest({ kit: 'tutorial' }, function() {
     it('Add Counter contract', function() {
-      run(`npx zos add Counter`);
+      run(`npx oz add Counter`);
     });
 
-    it(`Push contracts on a ${network}`, function() {
-      run(`npx zos push --network ${network}`);
+    it(`Create a Counter proxy on the ${network}`, function() {
+      run(`npx oz create Counter --init initialize --args 2 --network ${network}`);
+    });
+  });
+});
+
+describe(`Unpack a GSN Kit on the ${network}`, function() {
+  runIntegrationTest({ kit: 'gsn' }, function() {
+    it('Add Counter contract', function() {
+      run(`npx oz add Counter`);
     });
 
-    it(`Create a Counter proxy on a ${network}`, function() {
-      run(`npx zos create Counter --init initialize --args 2 --network ${network}`);
+    it(`Create a Counter proxy on the ${network}`, function() {
+      run(`npx oz create Counter --init initialize --args 2 --network ${network}`);
     });
   });
 });

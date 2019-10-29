@@ -7,7 +7,7 @@
   "scripts": {
     "compile": "rm -rf build && truffle compile",
     "start": "npm run compile && truffle exec index.js --network local",
-    "test": "npm run compile && truffle test --network test"
+    "test": "npm run compile && truffle test"
   },
   "keywords": [],
   "author": "",
