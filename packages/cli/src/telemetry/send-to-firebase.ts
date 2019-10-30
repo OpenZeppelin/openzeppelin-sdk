@@ -21,6 +21,8 @@ interface Arguments {
 }
 
 process.once('message', async function({ uuid, commandData }: Arguments) {
+  const unixWeek = Math.floor(Date.now() / (1000 * 60 * 60 * 24 * 7));
+
   // Initialize Firebase and anonymously authenticate
   const app = firebase.initializeApp(FIREBASE_CONFIG);
 
@@ -43,7 +45,11 @@ process.once('message', async function({ uuid, commandData }: Arguments) {
         incrementalId = 0;
         await tx.set(db.doc(`users/${uuid}`), { latestId: 0 });
       }
-      await tx.set(db.collection(`users/${uuid}/commands`).doc(), { ...commandData, id: incrementalId });
+      await tx.set(db.collection(`users/${uuid}/commands`).doc(), {
+        ...commandData,
+        unixWeek,
+        id: incrementalId,
+      });
     });
   } finally {
     // close all connections
