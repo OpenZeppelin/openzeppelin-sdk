@@ -1,7 +1,7 @@
 'use strict';
 
 import isEmpty from 'lodash.isempty';
-import compact from 'lodash.compact';
+import difference from 'lodash.difference';
 import intersection from 'lodash.intersection';
 import uniq from 'lodash.uniq';
 import flatten from 'lodash.flatten';
@@ -320,17 +320,30 @@ export default class NetworkController {
   private _getAllSolidityLibNames(contractNames: string[]): string[] {
     let newLibNames = this._getSolidityLibNames(contractNames);
     let libNames = newLibNames;
-    while (newLibNames.length > 0) {
-      // Get new library dependencies
-      newLibNames = this._getSolidityLibNames(newLibNames);
+    while (true) {
+      newLibNames = uniq(this._getSolidityLibNames(newLibNames))
 
-      // Prepend new libs to ensure they are deployed first
-      libNames = newLibNames.concat(libNames);
+      // Get new deps
+      const uniqNewLibNames = difference(newLibNames, libNames)
 
-      // Detect loops
-      if (uniq(libNames).length !== libNames.length) {
-        throw new Error(`Library dependency cycle detected: ${libNames}`);
+      // Get repeat deps
+      const repeatLibNames = intersection(newLibNames, libNames)
+
+      // Exclude repeat deps
+      libNames = difference(libNames, repeatLibNames)
+
+      // Prepend deps to ensure they are deployed first
+      const nextLibNames = uniq(uniqNewLibNames.concat(repeatLibNames).concat(libNames))
+
+      // no new libs
+      if (nextLibNames.length === libNames.length) {
+        break;
       }
+      // otherwise
+      // look into the new libs
+      newLibNames = uniqNewLibNames
+      // update all libs
+      libNames = nextLibNames
     }
 
     return libNames;

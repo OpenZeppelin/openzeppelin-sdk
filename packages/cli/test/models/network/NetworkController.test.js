@@ -19,6 +19,32 @@ contract('NetworkController', function() {
     sinon.restore();
   })
 
+  describe('_getAllSolidityLibNames()', () => {
+    let controllerMock
+    beforeEach(() => {
+      projectFile = new ProjectFile('test/mocks/mock-stdlib/zos.json');
+      networkFile = new NetworkFile(projectFile, 'test');
+      controller = new NetworkController('test', {}, networkFile);
+      controllerMock = sinon.mock(controller)
+    })
+
+    it('should order dependencies correctly', () => {
+
+      const de = sinon.match.array.deepEquals
+
+      const contractNames = ['A', 'B', 'C']
+
+      controllerMock.expects('_getSolidityLibNames').withArgs(de(contractNames)).returns(['E', 'F', 'D'])
+      controllerMock.expects('_getSolidityLibNames').withArgs(de(['E', 'F', 'D'])).returns(['D', 'G', 'H'])
+      controllerMock.expects('_getSolidityLibNames').withArgs(de(['G', 'H'])).returns(['D', 'I'])
+      controllerMock.expects('_getSolidityLibNames').withArgs(de(['I'])).returns([])
+
+      const result = controller._getAllSolidityLibNames(['A', 'B', 'C'])
+
+      assert.deepEqual(result, ['I', 'D', 'G', 'H', 'E', 'F'])
+    })
+  })
+
   describe('_solidityLibsForPush()', () => {
     describe('with one public library', () => {
       beforeEach(() => {
