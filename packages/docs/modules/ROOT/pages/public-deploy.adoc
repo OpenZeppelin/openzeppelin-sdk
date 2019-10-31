@@ -138,26 +138,6 @@ If the account doesn’t have enough test Ether when you attempt to deploy, you 
 You can also import the 12 word seed phrase into https://metamask.io[MetaMask] and then you can request test Ether from the MetaMask faucet. (https://faucet.metamask.io)  
 
 
-[[fund-test-account]]
-== Fund test account
-Use the interactive command `openzeppelin accounts`, selecting the desired network to view the configured accounts for that network:
-
-[source,console]
-----
-$ npx openzeppelin accounts
-? Pick a network ropsten
-Accounts for ropsten:
-Default: 0x581f96c12064e2dfb72E8B9722a18731D756Fe73
-All:
-- 0: 0x581f96c12064e2dfb72E8B9722a18731D756Fe73
-----
-
-Add test Ether to the account that you want to use e.g. the default/first account derived from the mnemonic.  You can add funds using a faucet (e.g. https://faucet.ropsten.be).  
-If the account doesn’t have enough test Ether when you attempt to deploy, you will get the error `deployment failed with error: insufficient funds for gas * price + value`.
-
-You can also import the 12 word seed phrase into https://metamask.io[MetaMask] and then you can request test Ether from the MetaMask faucet. (https://faucet.metamask.io)  
-
-
 [[deploy]]
 == Deploy contract
 
