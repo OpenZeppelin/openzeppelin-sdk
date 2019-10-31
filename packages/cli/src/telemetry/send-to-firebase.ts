@@ -3,7 +3,7 @@ import firebase from 'firebase/app';
 import 'firebase/auth';
 import 'firebase/firestore';
 
-import { CommandData } from '.';
+import { CommandData, UserEnvironment } from '.';
 
 const FIREBASE_CONFIG = {
   apiKey: 'AIzaSyAZoGB2p26UejODezZPmczgwehI6xlSKPs',
@@ -18,9 +18,10 @@ const FIREBASE_CONFIG = {
 interface Arguments {
   uuid: string;
   commandData: CommandData;
+  userEnvironment: UserEnvironment;
 }
 
-process.once('message', async function({ uuid, commandData }: Arguments) {
+process.once('message', async function({ uuid, commandData, userEnvironment }: Arguments) {
   const unixWeek = Math.floor(Date.now() / (1000 * 60 * 60 * 24 * 7));
 
   // Initialize Firebase and anonymously authenticate
@@ -47,6 +48,7 @@ process.once('message', async function({ uuid, commandData }: Arguments) {
       }
       await tx.set(db.collection(`users/${uuid}/commands`).doc(), {
         ...commandData,
+        userEnvironment,
         unixWeek,
         id: incrementalId,
       });

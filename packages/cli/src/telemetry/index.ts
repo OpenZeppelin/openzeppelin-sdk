@@ -6,6 +6,7 @@ import envPaths from 'env-paths';
 import mapValues from 'lodash.mapvalues';
 import inquirer from 'inquirer';
 import proc from 'child_process';
+import process from 'process';
 
 import { DISABLE_INTERACTIVITY } from '../prompts/prompt';
 import { Params } from '../scripts/interfaces';
@@ -24,6 +25,16 @@ export type CommandData = Params & {
   network?: string;
 };
 
+export type UserEnvironment = {
+  platform: string;
+  arch: string;
+  nodeVersion: string;
+  cliVersion: string;
+  upgradesVersion: string | null;
+  web3Version: string | null;
+  truffleVersion: string | null;
+}
+
 // We export an object with report and sendToFirebase so that we can stub them in tests.
 export default {
   async report(commandName: string, options: Params, interactive: boolean): Promise<void> {
@@ -41,16 +52,17 @@ export default {
     const concealedData = concealData(options, telemetryOptions.salt);
     const commandData: Concealed<CommandData> = { ...concealedData, name: commandName };
     if (network !== undefined) commandData.network = network;
-
-    this.sendToFirebase(telemetryOptions.uuid, commandData);
+    
+    const userEnvironment = getUserEnvironment();
+    this.sendToFirebase(telemetryOptions.uuid, commandData, userEnvironment);
   },
 
-  sendToFirebase(uuid: string, commandData: Concealed<CommandData>): void {
+  sendToFirebase(uuid: string, commandData: Concealed<CommandData>, userEnvironment: UserEnvironment): void {
     // We send to Firebase in a child process so that the CLI is not blocked from exiting.
     const child = proc.fork(path.join(__dirname, './send-to-firebase'), [], {
       stdio: ['ignore', 'ignore', 'ignore', 'ipc'],
     });
-    child.send({ uuid, commandData });
+    child.send({ uuid, commandData, userEnvironment });
 
     // Allow this process to exit while the child is still alive.
     child.disconnect();
@@ -93,6 +105,26 @@ async function checkOptIn(interactive: boolean): Promise<GlobalTelemetryOptions 
   }
 
   return globalOptions;
+}
+
+function getUserEnvironment() : UserEnvironment {
+  return {
+    platform: process.platform,
+    arch: process.arch,
+    nodeVersion: process.version,
+    cliVersion: require('../../package.json').version,
+    upgradesVersion: getDependencyVersion('@openzeppelin/upgrades'),
+    truffleVersion: getDependencyVersion('truffle'),
+    web3Version: getDependencyVersion('web3'),
+  };
+}
+
+function getDependencyVersion(dep : string) : string | null {
+  try {
+    return require(`${dep}/package.json`).version;
+  } catch {
+    return null;
+  }
 }
 
 function hashField(field: Field, salt: string): string {
