@@ -25,7 +25,7 @@ export type CommandData = Params & {
   network?: string;
 };
 
-export type UserEnvironment = {
+export interface UserEnvironment {
   platform: string;
   arch: string;
   nodeVersion: string;
@@ -52,7 +52,7 @@ export default {
     const concealedData = concealData(options, telemetryOptions.salt);
     const commandData: Concealed<CommandData> = { ...concealedData, name: commandName };
     if (network !== undefined) commandData.network = network;
-    
+
     const userEnvironment = getUserEnvironment();
     this.sendToFirebase(telemetryOptions.uuid, commandData, userEnvironment);
   },
@@ -71,6 +71,9 @@ export default {
 };
 
 async function checkOptIn(interactive: boolean): Promise<GlobalTelemetryOptions | undefined> {
+  // disable via env var for local development
+  if (!!process.env.OPENZEPPELIN_DISABLE_TELEMETRY) return undefined;
+
   const project = new ProjectFile();
   const localOptIn = project.telemetryOptIn;
 
@@ -107,7 +110,7 @@ async function checkOptIn(interactive: boolean): Promise<GlobalTelemetryOptions 
   return globalOptions;
 }
 
-function getUserEnvironment() : UserEnvironment {
+function getUserEnvironment(): UserEnvironment {
   return {
     platform: process.platform,
     arch: process.arch,
@@ -119,7 +122,7 @@ function getUserEnvironment() : UserEnvironment {
   };
 }
 
-function getDependencyVersion(dep : string) : string | null {
+function getDependencyVersion(dep: string): string | null {
   try {
     return require(`${dep}/package.json`).version;
   } catch {

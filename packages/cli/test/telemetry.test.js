@@ -147,13 +147,13 @@ describe('telemetry', function() {
               });
             });
 
-            it('sends environment data', async function () {
+            it('sends environment data', async function() {
               sinon.stub(process, 'platform').value('awesome-linux');
               sinon.stub(process, 'arch').value('x128');
               sinon.stub(process, 'version').value('v18.01');
 
               await Telemetry.report('create', this.commandData, true);
-              const [,, userEnvironment] = this.sendToFirebase.getCall(0).args;
+              const [, , userEnvironment] = this.sendToFirebase.getCall(0).args;
 
               userEnvironment.platform.should.eq('awesome-linux');
               userEnvironment.arch.should.eq('x128');
