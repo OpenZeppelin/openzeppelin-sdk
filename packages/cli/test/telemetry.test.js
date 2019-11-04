@@ -20,10 +20,13 @@ describe('telemetry', function() {
   before(function() {
     this.originalDisableInteractivity = prompt.DISABLE_INTERACTIVITY;
     prompt.DISABLE_INTERACTIVITY = false;
+    this.originalDisableTelemetry = Telemetry.DISABLE_TELEMETRY;
+    Telemetry.DISABLE_TELEMETRY = false;
   });
 
   after(function() {
     prompt.DISABLE_INTERACTIVITY = this.originalDisableInteractivity;
+    Telemetry.DISABLE_TELEMETRY = this.originalDisableTelemetry;
   });
 
   beforeEach('stub fs-extra functions', function() {
@@ -159,9 +162,9 @@ describe('telemetry', function() {
               userEnvironment.arch.should.eq('x128');
               userEnvironment.nodeVersion.should.eq('v18.01');
               userEnvironment.cliVersion.should.eq(require('../package.json').version);
-              userEnvironment.upgradesVersion.should.eq(require('@openzeppelin/upgrades').version.substr(1)); // remove leading 'v' from version identifier
-              userEnvironment.truffleVersion.should.eq(require('truffle').version);
-              userEnvironment.web3Version.should.eq(require('web3').version);
+              userEnvironment.upgradesVersion.should.eq(require('../../lib/package.json').version);
+              userEnvironment.truffleVersion.should.eq(require('truffle/package.json').version);
+              userEnvironment.web3Version.should.eq(require('web3/package.json').version);
             });
           });
         });

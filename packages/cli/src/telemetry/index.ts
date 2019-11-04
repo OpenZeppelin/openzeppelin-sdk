@@ -37,6 +37,8 @@ export interface UserEnvironment {
 
 // We export an object with report and sendToFirebase so that we can stub them in tests.
 export default {
+  DISABLE_TELEMETRY: !!process.env.OPENZEPPELIN_DISABLE_TELEMETRY,
+
   async report(commandName: string, options: Params, interactive: boolean): Promise<void> {
     const telemetryOptions = await checkOptIn(interactive);
     if (telemetryOptions === undefined || !telemetryOptions.optIn) return;
@@ -72,7 +74,7 @@ export default {
 
 async function checkOptIn(interactive: boolean): Promise<GlobalTelemetryOptions | undefined> {
   // disable via env var for local development
-  if (!!process.env.OPENZEPPELIN_DISABLE_TELEMETRY) return undefined;
+  if (module.exports.DISABLE_TELEMETRY) return undefined;
 
   const project = new ProjectFile();
   const localOptIn = project.telemetryOptIn;
