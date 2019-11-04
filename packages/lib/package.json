@@ -13,6 +13,7 @@
     "prepare": "npm run compile-contracts && npm run compile-ts",
     "watch": "tsc -w",
     "lint": "tsc --noEmit && eslint '*/**/*.{js,ts}' --quiet --fix",
+    "lint:check": "eslint '*/**/*.{js,ts}' --quiet",
     "precommit": "tsc --noEmit && lint-staged"
   },
   "lint-staged": {

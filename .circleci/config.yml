@@ -60,6 +60,9 @@ jobs:
       - run:
           name: Install dependencies and build
           command: yarn
+      - run:
+          name: Lint check
+          command: yarn lint:check
       - save_cache:
           key: dependency-cache-v4-{{ checksum "yarn.lock" }}
           paths:
