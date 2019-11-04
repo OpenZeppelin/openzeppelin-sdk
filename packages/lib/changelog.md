@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## v2.6.0 - 2019-11-04
+
+### Internal
+- Migrated project from npm to yarn, using yarn workspaces together with lerna ([#1241](https://github.com/OpenZeppelin/openzeppelin-sdk/pull/1241))
+
 ## v2.5.3 - 2019-08-18
 
 ### Changed
