@@ -30,9 +30,9 @@ export interface UserEnvironment {
   arch: string;
   nodeVersion: string;
   cliVersion: string;
-  upgradesVersion: string | null;
-  web3Version: string | null;
-  truffleVersion: string | null;
+  upgradesVersion?: string;
+  web3Version?: string;
+  truffleVersion?: string;
 }
 
 // We export an object with report and sendToFirebase so that we can stub them in tests.
