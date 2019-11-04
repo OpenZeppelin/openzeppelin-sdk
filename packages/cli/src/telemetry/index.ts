@@ -122,11 +122,11 @@ function getUserEnvironment(): UserEnvironment {
   };
 }
 
-function getDependencyVersion(dep: string): string | null {
+function getDependencyVersion(dep: string): string | undefined {
   try {
     return require(`${dep}/package.json`).version;
   } catch {
-    return null;
+    return undefined;
   }
 }
 
