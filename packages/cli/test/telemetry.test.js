@@ -6,6 +6,8 @@ import fs from 'fs-extra';
 import sinon from 'sinon';
 import inquirer from 'inquirer';
 import path from 'path';
+import process from 'process';
+
 import 'firebase/auth';
 import 'firebase/firestore';
 
@@ -18,10 +20,13 @@ describe('telemetry', function() {
   before(function() {
     this.originalDisableInteractivity = prompt.DISABLE_INTERACTIVITY;
     prompt.DISABLE_INTERACTIVITY = false;
+    this.originalDisableTelemetry = Telemetry.DISABLE_TELEMETRY;
+    Telemetry.DISABLE_TELEMETRY = false;
   });
 
   after(function() {
     prompt.DISABLE_INTERACTIVITY = this.originalDisableInteractivity;
+    Telemetry.DISABLE_TELEMETRY = this.originalDisableTelemetry;
   });
 
   beforeEach('stub fs-extra functions', function() {
@@ -143,6 +148,23 @@ describe('telemetry', function() {
                 commandData.network.should.eq('development');
                 shouldConcealOptions(commandData);
               });
+            });
+
+            it('sends environment data', async function() {
+              sinon.stub(process, 'platform').value('awesome-linux');
+              sinon.stub(process, 'arch').value('x128');
+              sinon.stub(process, 'version').value('v18.01');
+
+              await Telemetry.report('create', this.commandData, true);
+              const [, , userEnvironment] = this.sendToFirebase.getCall(0).args;
+
+              userEnvironment.platform.should.eq('awesome-linux');
+              userEnvironment.arch.should.eq('x128');
+              userEnvironment.nodeVersion.should.eq('v18.01');
+              userEnvironment.cliVersion.should.eq(require('../package.json').version);
+              userEnvironment.upgradesVersion.should.eq(require('../../lib/package.json').version);
+              userEnvironment.truffleVersion.should.eq(require('truffle/package.json').version);
+              userEnvironment.web3Version.should.eq(require('web3/package.json').version);
             });
           });
         });

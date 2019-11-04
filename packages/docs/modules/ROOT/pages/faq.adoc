@@ -80,5 +80,5 @@ When you run the OpenZeppelin CLI for the first time we ask if you would like to
 
 If you choose to you opt in, we generate a random user identifier and a random 32-byte salt.
 
-Every `openzeppelin` subcommand you run will be first anonymized by hashing each argument together with the random salt. Note that this only applies to user-specific arguments (e.g. the name of a contract, or an address), and not to the flags themselves (e.g. `--force`). The anonymized commands will be logged on our servers together with the random user identifier, and the network that they were run in.
+Every `openzeppelin` subcommand you run will be first anonymized by hashing each argument together with the random salt. Note that this only applies to user-specific arguments (e.g. the name of a contract, or an address), and not to the flags themselves (e.g. `--force`). The anonymized commands will be logged on our servers together with the random user identifier, the network that they were run in, as well as general information about the environment (platform, architecture, and versions of node, the CLI, and web3 dependencies).
 
