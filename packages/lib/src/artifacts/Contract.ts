@@ -2,7 +2,7 @@ import ZWeb3 from './ZWeb3';
 import Contracts from './Contracts';
 import ContractAST from '../utils/ContractAST';
 import { StorageLayoutInfo } from '../validations/Storage';
-import { Callback, EventLog, EventEmitter, TransactionReceipt } from 'web3/types';
+import { Callback, EventLog, EventEmitter, TransactionReceipt } from 'web3-core';
 import { Contract as Web3Contract, TransactionObject, BlockType } from 'web3-eth-contract';
 
 /*

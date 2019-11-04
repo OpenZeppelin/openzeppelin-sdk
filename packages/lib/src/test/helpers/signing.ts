@@ -1,5 +1,5 @@
 import Web3 from 'web3';
-const web3 = new Web3();
+const web3 = new Web3(null);
 
 export const signer = '0x239938d1Bd73e99a5042d29DcFFf6991e0Fe5626';
 export const signerPk = '0xbe7e12ce20410c5f0207bd6c7bcae39052679bfd401c62849657ebfe23e3711b';
