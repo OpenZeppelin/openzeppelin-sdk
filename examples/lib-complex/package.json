@@ -1,6 +1,6 @@
 {
   "name": "example-openzeppelin-upgrades-complex",
-  "version": "2.5.3",
+  "version": "2.6.0-rc.0",
   "private": true,
   "description": "Example of using the upgradeability-lib's App",
   "main": "index.js",
@@ -20,7 +20,7 @@
   "author": "ajs",
   "license": "ISC",
   "dependencies": {
-    "@openzeppelin/upgrades": "^2.5.3",
+    "@openzeppelin/upgrades": "^2.6.0-rc.0",
     "minimist": "^1.2.0",
     "openzeppelin-zos": "git+https://github.com/OpenZeppelin/openzeppelin-zos.git#19610325924e03f008bb57dd8868f196bb7e3c98",
     "truffle": "^5.0.0",
