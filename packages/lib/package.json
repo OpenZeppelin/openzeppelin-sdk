@@ -55,7 +55,6 @@
   "homepage": "https://github.com/OpenZeppelin/openzeppelin-sdk/tree/master/packages/lib#readme",
   "dependencies": {
     "@types/cbor": "^2.0.0",
-    "@types/web3": "^1.0.14",
     "axios": "^0.18.0",
     "bignumber.js": "^7.2.0",
     "cbor": "^4.1.5",

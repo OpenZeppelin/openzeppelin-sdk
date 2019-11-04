@@ -60,7 +60,6 @@
     "@types/fs-extra": "^7.0.0",
     "@types/npm": "^2.0.29",
     "@types/semver": "^5.5.0",
-    "@types/web3": "^1.0.14",
     "ajv": "^6.10.0",
     "axios": "^0.18.0",
     "bignumber.js": "^8.0.2",
