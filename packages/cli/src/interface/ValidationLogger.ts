@@ -56,9 +56,7 @@ export default class ValidationLogger {
         __filename,
         'logHasSelfDestruct',
         `validation-has-selfdestruct`,
-        `- Contract ${
-          this.contractName
-        } or one of its ancestors has a potentially unsafe selfdestruct operation. See ${DANGEROUS_OPERATIONS_LINK}.`,
+        `- Contract ${this.contractName} or one of its ancestors has a potentially unsafe selfdestruct operation. See ${DANGEROUS_OPERATIONS_LINK}.`,
       );
     }
   }
@@ -69,9 +67,7 @@ export default class ValidationLogger {
         __filename,
         'logHasDelegateCall',
         `validation-has-delegatecall`,
-        `- Contract ${
-          this.contractName
-        } or one of its ancestors has a potentially unsafe delegatecall operation. See ${DANGEROUS_OPERATIONS_LINK}.`,
+        `- Contract ${this.contractName} or one of its ancestors has a potentially unsafe delegatecall operation. See ${DANGEROUS_OPERATIONS_LINK}.`,
       );
     }
   }
@@ -82,9 +78,7 @@ export default class ValidationLogger {
         __filename,
         'logHasInitialValuesInDeclarations',
         `validation-has-initial-values`,
-        `- Contract ${
-          this.contractName
-        } or one of its ancestors sets an initial value in a field declaration. Consider moving all field initializations to an initializer function. See ${AVOID_INITIAL_VALUES_LINK}.`,
+        `- Contract ${this.contractName} or one of its ancestors sets an initial value in a field declaration. Consider moving all field initializations to an initializer function. See ${AVOID_INITIAL_VALUES_LINK}.`,
       );
     }
   }
@@ -95,9 +89,7 @@ export default class ValidationLogger {
         __filename,
         'logHasConstructor',
         `validation-has-constructor`,
-        `- Contract ${
-          this.contractName
-        } has an explicit constructor. Change it to an initializer function. See ${INITIALIZERS_LINK}.`,
+        `- Contract ${this.contractName} has an explicit constructor. Change it to an initializer function. See ${INITIALIZERS_LINK}.`,
       );
     }
   }
@@ -153,9 +145,7 @@ export default class ValidationLogger {
             __filename,
             'logStorageLayoutDiffs',
             `storage-layout-diffs`,
-            `- New variable '${updatedVarDescription}' was inserted in contract ${
-              updated.contract
-            } in ${updatedVarSource}. You should only add new variables at the end of your contract.`,
+            `- New variable '${updatedVarDescription}' was inserted in contract ${updated.contract} in ${updatedVarSource}. You should only add new variables at the end of your contract.`,
           );
           break;
         case 'delete':
@@ -163,9 +153,7 @@ export default class ValidationLogger {
             __filename,
             'logStorageLayoutDiffs',
             `storage-layout-diffs`,
-            `- Variable '${originalVarDescription}' was removed from contract ${
-              original.contract
-            }. You should avoid deleting variables from your contracts.`,
+            `- Variable '${originalVarDescription}' was removed from contract ${original.contract}. You should avoid deleting variables from your contracts.`,
           );
           break;
         case 'append':
@@ -173,9 +161,7 @@ export default class ValidationLogger {
             __filename,
             'logStorageLayoutDiffs',
             `storage-layout-diffs`,
-            `- New variable '${updatedVarDescription}' was added in contract ${
-              updated.contract
-            } in ${updatedVarSource} at the end of the contract.`,
+            `- New variable '${updatedVarDescription}' was added in contract ${updated.contract} in ${updatedVarSource} at the end of the contract.`,
           );
           break;
         case 'pop':
@@ -183,9 +169,7 @@ export default class ValidationLogger {
             __filename,
             'logStorageLayoutDiffs',
             `storage-layout-diffs`,
-            `- Variable '${originalVarDescription}' was removed from the end of contract ${
-              original.contract
-            }. You should avoid deleting variables from your contracts.`,
+            `- Variable '${originalVarDescription}' was removed from the end of contract ${original.contract}. You should avoid deleting variables from your contracts.`,
           );
           break;
         case 'rename':
@@ -193,9 +177,7 @@ export default class ValidationLogger {
             __filename,
             'logStorageLayoutDiffs',
             `storage-layout-diffs`,
-            `- Variable '${originalVarDescription}' in contract ${original.contract} was renamed to ${
-              updated.label
-            } in ${updatedVarSource}.
+            `- Variable '${originalVarDescription}' in contract ${original.contract} was renamed to ${updated.label} in ${updatedVarSource}.
               ${updated.label} will have the value of ${original.label} after upgrading.`,
           );
           break;
@@ -204,9 +186,7 @@ export default class ValidationLogger {
             __filename,
             'logStorageLayoutDiffs',
             `storage-layout-diffs`,
-            `- Variable '${original.label}' in contract ${original.contract} was changed from ${
-              originalVarType.label
-            } to ${updatedVarType.label} in ${updatedVarSource}. Avoid changing types of existing variables.`,
+            `- Variable '${original.label}' in contract ${original.contract} was changed from ${originalVarType.label} to ${updatedVarType.label} in ${updatedVarSource}. Avoid changing types of existing variables.`,
           );
           break;
         case 'replace':
@@ -214,9 +194,7 @@ export default class ValidationLogger {
             __filename,
             'logStorageLayoutDiffs',
             `storage-layout-diffs`,
-            `- Variable '${originalVarDescription}' in contract ${
-              original.contract
-            } was replaced with '${updatedVarDescription}' in
+            `- Variable '${originalVarDescription}' in contract ${original.contract} was replaced with '${updatedVarDescription}' in
             ${updatedVarSource}. Avoid changing existing variables.`,
           );
           break;

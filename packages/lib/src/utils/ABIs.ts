@@ -61,9 +61,7 @@ export function getABIFunction(contract: Contract, methodName: string, args: any
       return abiMethods[0];
     default:
       throw Error(
-        `Found more than one match for function ${methodName} with ${args.length} arguments in contract ${
-          contract.schema.contractName
-        }`,
+        `Found more than one match for function ${methodName} with ${args.length} arguments in contract ${contract.schema.contractName}`,
       );
   }
 }
@@ -111,9 +109,7 @@ function tryGetFunctionNodeFromMostDerivedContract(contract: Contract, methodNam
         return funs[0];
       default:
         throw Error(
-          `Found more than one match for function ${methodName} with ${args.length} arguments in contract ${
-            contract.schema.contractName
-          }`,
+          `Found more than one match for function ${methodName} with ${args.length} arguments in contract ${contract.schema.contractName}`,
         );
     }
   }

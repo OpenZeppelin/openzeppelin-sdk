@@ -1,9 +1,10 @@
+/* eslint-disable @typescript-eslint/camelcase */
 'use strict';
 require('../../setup');
 
 const should = require('chai').should();
-const util = require('util');
 
+import util from 'util';
 import forEach from 'lodash.foreach';
 
 import Contracts from '../../../src/artifacts/Contracts';

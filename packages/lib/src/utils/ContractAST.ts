@@ -140,9 +140,7 @@ export default class ContractAST {
       } catch (err) {
         if (err instanceof NodeNotFoundError) {
           throw new Error(
-            `Cannot find source data for contract ${name} (base contract of ${
-              this.contract.schema.contractName
-            }). This often happens because either:\n- An incremental compilation step went wrong. Clear your build folder and recompile.\n- There is more than one contract named ${name} in your project (including dependencies). Make sure all contracts have a unique name, and that you are not importing dependencies with duplicated contract names (for example, openzeppelin-eth and openzeppelin-solidity).`,
+            `Cannot find source data for contract ${name} (base contract of ${this.contract.schema.contractName}). This often happens because either:\n- An incremental compilation step went wrong. Clear your build folder and recompile.\n- There is more than one contract named ${name} in your project (including dependencies). Make sure all contracts have a unique name, and that you are not importing dependencies with duplicated contract names (for example, openzeppelin-eth and openzeppelin-solidity).`,
           );
         } else {
           throw err;

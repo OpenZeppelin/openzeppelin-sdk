@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/camelcase */
 'use strict';
 require('../../setup');
 

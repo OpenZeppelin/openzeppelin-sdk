@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/camelcase */
 require('../../../setup');
 
 import CaptureLogs from '../../../helpers/captureLogs';

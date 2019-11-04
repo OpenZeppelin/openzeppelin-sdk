@@ -187,10 +187,10 @@ export default class NetworkController {
     const pipeline = [
       contracts => toPairs(contracts),
       contracts =>
-        map(
-          contracts,
-          ([contractAlias, contractName]): [string, Contract] => [contractAlias, Contracts.getFromLocal(contractName)],
-        ),
+        map(contracts, ([contractAlias, contractName]): [string, Contract] => [
+          contractAlias,
+          Contracts.getFromLocal(contractName),
+        ]),
       contracts =>
         filter(
           contracts,
@@ -1005,9 +1005,7 @@ export default class NetworkController {
         const dependencyInfo = new Dependency(depName, depVersion).getNetworkFile(this.network);
         if (!dependencyInfo.packageAddress)
           throw Error(
-            `Dependency '${depName}' has not been published to network '${
-              this.network
-            }', so it cannot be linked. Hint: you can create a custom deployment of all unpublished dependencies by running 'openzeppelin push --deploy-dependencies'.`,
+            `Dependency '${depName}' has not been published to network '${this.network}', so it cannot be linked. Hint: you can create a custom deployment of all unpublished dependencies by running 'openzeppelin push --deploy-dependencies'.`,
           );
         Loggy.spin(
           __filename,

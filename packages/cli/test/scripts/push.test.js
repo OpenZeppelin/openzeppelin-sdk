@@ -1,7 +1,7 @@
 'use strict';
 require('../setup');
 
-const zosLib = require('@openzeppelin/upgrades');
+const zosLib = require('@openzeppelin/upgrades'); // eslint-disable-line @typescript-eslint/no-var-requires
 import { ZWeb3, Contracts, App, Package, ProxyAdmin, ProxyFactory } from '@openzeppelin/upgrades';
 
 import sinon from 'sinon';
