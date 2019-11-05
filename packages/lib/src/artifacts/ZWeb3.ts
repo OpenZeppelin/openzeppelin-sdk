@@ -2,9 +2,9 @@ import { Loggy } from '../utils/Logger';
 import sleep from '../helpers/sleep';
 import Web3 from 'web3';
 import { TransactionReceipt, Transaction } from 'web3-core';
-import { Eth, Block } from 'web3-eth';
+import { Block, Eth } from 'web3-eth';
 import { Contract } from 'web3-eth-contract';
-import { toChecksumAddress, hexToNumber } from 'web3-utils';
+import { toChecksumAddress } from 'web3-utils';
 
 // Reference: see https://github.com/ethereum/EIPs/blob/master/EIPS/eip-155.md#list-of-chain-ids
 export const NETWORKS = {
@@ -21,6 +21,13 @@ export interface TxParams {
   value?: number | string;
   gas?: number | string;
   gasPrice?: number | string;
+}
+
+// Patch typing for getStorageAt method
+declare module 'web3-eth' {
+  interface Eth {
+    getStorageAt(address: string, position: number | string): Promise<string>;
+  }
 }
 
 // TS-TODO: Type Web3.
@@ -127,7 +134,7 @@ export default class ZWeb3 {
   }
 
   public static async getStorageAt(address: string, position: string): Promise<string> {
-    return ZWeb3.eth().getStorageAt(address, hexToNumber(position));
+    return ZWeb3.eth().getStorageAt(address, position);
   }
 
   public static async getNode(): Promise<string> {
