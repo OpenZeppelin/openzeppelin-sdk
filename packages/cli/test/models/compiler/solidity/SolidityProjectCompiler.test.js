@@ -105,13 +105,13 @@ describe('SolidityProjectCompiler', function() {
           address: '0x63b52a2f619537f553e5097b8866c0f4ebec62ee',
           links: {},
           events: {},
-          updated_at: 1563287608947,
+          updated_at: 1563287608947, // eslint-disable-line @typescript-eslint/camelcase
         },
         '100002': {
           address: '0x63b52a2f619537f553e5097b8866c0f4ebec62ef',
           links: {},
           events: {},
-          updated_at: 1563287608948,
+          updated_at: 1563287608948, // eslint-disable-line @typescript-eslint/camelcase
         },
       };
 

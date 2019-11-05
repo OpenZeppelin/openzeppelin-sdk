@@ -65,9 +65,7 @@ async function publishToEtherchain(params: VerifierOptions): Promise<void | neve
       if (message.match(/successful/)) {
         Loggy.succeed(
           'verify-and-publish',
-          `Contract source code of ${
-            params.contractName
-          } verified and published successfully. You can check it here: ${etherchainContractUrl}/${contractAddress}#code`,
+          `Contract source code of ${params.contractName} verified and published successfully. You can check it here: ${etherchainContractUrl}/${contractAddress}#code`,
         );
       } else if (message.match(/^No[\w\s]*provided\.$/)) {
         throw new Error(`Error during contract verification: ${message}`);
@@ -114,9 +112,7 @@ async function publishToEtherscan(params: VerifierOptions): Promise<void | never
       await checkEtherscanVerificationStatus(response.data.result, etherscanApiUrl, RETRY_COUNT);
       Loggy.succeed(
         'verify-and-publish',
-        `Contract source code of ${
-          params.contractName
-        } verified and published successfully. You can check it here: ${etherscanContractUrl}/${contractAddress}#code`,
+        `Contract source code of ${params.contractName} verified and published successfully. You can check it here: ${etherscanContractUrl}/${contractAddress}#code`,
       );
     } else {
       throw new Error(`Error while trying to verify contract: ${response.data.result}`);

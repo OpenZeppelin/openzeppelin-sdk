@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "pretty": true,
+    "disableSizeLimit": true,
     "module": "commonjs",
     "moduleResolution": "Node",
     "target": "es6",

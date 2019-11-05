@@ -15,7 +15,6 @@ contract('set-admin script', function(accounts) {
   const [_skipped, owner, newAdmin, anotherNewAdmin] = accounts;
 
   const network = 'test';
-  const version_1 = '1.1.0';
   const txParams = { from: owner };
 
   const assertAdmin = async function(address, expectedAdmin, networkFile) {

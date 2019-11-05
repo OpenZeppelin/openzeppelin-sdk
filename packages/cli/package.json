@@ -13,6 +13,7 @@
     "gen-docs": "./scripts/gen-docs.sh",
     "watch": "tsc -w",
     "lint": "eslint '*/**/*.{js,ts}' --quiet --fix",
+    "lint:check": "eslint '*/**/*.{js,ts}' --quiet",
     "precommit": "tsc --noEmit && lint-staged"
   },
   "lint-staged": {

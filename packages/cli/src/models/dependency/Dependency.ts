@@ -54,14 +54,12 @@ export default class Dependency {
     const project = new ProjectFile(packageFileName);
     const dependencies = project.linkedDependencies;
     const networkFile = new NetworkFile(project, network, networkFileName);
-    const hasDependenciesForDeploy = dependencies.find(
-      (depNameAndVersion): any => {
-        const dependency = Dependency.fromNameWithVersion(depNameAndVersion);
-        return !(
-          dependency.isDeployedOnNetwork(network) || networkFile.dependencyHasMatchingCustomDeploy(dependency.name)
-        );
-      },
-    );
+    const hasDependenciesForDeploy = dependencies.find((depNameAndVersion): any => {
+      const dependency = Dependency.fromNameWithVersion(depNameAndVersion);
+      return !(
+        dependency.isDeployedOnNetwork(network) || networkFile.dependencyHasMatchingCustomDeploy(dependency.name)
+      );
+    });
 
     return !!hasDependenciesForDeploy;
   }
