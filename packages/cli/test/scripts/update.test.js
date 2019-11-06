@@ -19,16 +19,21 @@ import utils from 'web3-utils';
 import { ProxyType } from '../../src/scripts/interfaces';
 
 const ImplV1 = Contracts.getFromLocal('ImplV1');
-const GreeterV1 = Contracts.getFromNodeModules('mock-stdlib', 'GreeterImpl');
-const GreeterV2 = Contracts.getFromNodeModules('mock-stdlib-2', 'GreeterImpl');
+const ImplV2 = Contracts.getFromLocal('ImplV2');
+// eslint-disable-next-line @typescript-eslint/camelcase
+const Greeter_V1 = Contracts.getFromNodeModules('mock-stdlib', 'GreeterImpl');
+// eslint-disable-next-line @typescript-eslint/camelcase
+const Greeter_V2 = Contracts.getFromNodeModules('mock-stdlib-2', 'GreeterImpl');
 
 contract('update script', function(accounts) {
   accounts = accounts.map(utils.toChecksumAddress);
   const [_skipped, owner, anotherAccount] = accounts;
 
   const network = 'test';
-  const version1 = '0.1.0';
-  const version2 = '0.2.0';
+  // eslint-disable-next-line @typescript-eslint/camelcase
+  const version_1 = '0.1.0';
+  // eslint-disable-next-line @typescript-eslint/camelcase
+  const version_2 = '0.2.0';
   const txParams = { from: owner };
 
   const assertProxyInfo = async function(
@@ -100,7 +105,8 @@ contract('update script', function(accounts) {
   };
 
   const bumpVersion = async function() {
-    await bump({ version: version2, txParams, projectFile: this.projectFile });
+    // eslint-disable-next-line @typescript-eslint/camelcase
+    await bump({ version: version_2, txParams, projectFile: this.projectFile });
     const newContractsData = [
       { name: 'ImplV2', alias: 'Impl' },
       { name: 'WithLibraryImplV2', alias: 'WithLibraryImpl' },
@@ -135,14 +141,16 @@ contract('update script', function(accounts) {
           networkFile: this.networkFile,
         });
         await assertProxyInfo(this.networkFile, 'Impl', 0, {
-          version: version2,
+          // eslint-disable-next-line @typescript-eslint/camelcase
+          version: version_2,
           implementation: this.implV2Address,
           address: proxyAddress,
         });
 
         // Check other proxies were unmodified
         await assertProxyInfo(this.networkFile, 'Impl', 1, {
-          version: version1,
+          // eslint-disable-next-line @typescript-eslint/camelcase
+          version: version_1,
           implementation: this.implV1Address,
         });
         await assertProxyInfo(this.networkFile, 'WithLibraryImpl', 0, {
@@ -161,17 +169,20 @@ contract('update script', function(accounts) {
           networkFile: this.networkFile,
         });
         await assertProxyInfo(this.networkFile, 'Impl', 0, {
-          version: version2,
+          // eslint-disable-next-line @typescript-eslint/camelcase
+          version: version_2,
           implementation: this.implV2Address,
         });
         await assertProxyInfo(this.networkFile, 'Impl', 1, {
-          version: version2,
+          // eslint-disable-next-line @typescript-eslint/camelcase
+          version: version_2,
           implementation: this.implV2Address,
         });
 
         // Keep WithLibraryImpl unmodified
         await assertProxyInfo(this.networkFile, 'WithLibraryImpl', 0, {
-          version: version1,
+          // eslint-disable-next-line @typescript-eslint/camelcase
+          version: version_1,
           implementation: this.withLibraryImplV1Address,
         });
       });
@@ -189,15 +200,18 @@ contract('update script', function(accounts) {
           networkFile: this.networkFile,
         });
         await assertProxyInfo(this.networkFile, 'Impl', 0, {
-          version: version2,
+          // eslint-disable-next-line @typescript-eslint/camelcase
+          version: version_2,
           implementation: this.implV2Address,
         });
         await assertProxyInfo(this.networkFile, 'Impl', 1, {
-          version: version2,
+          // eslint-disable-next-line @typescript-eslint/camelcase
+          version: version_2,
           implementation: this.implV2Address,
         });
         await assertProxyInfo(this.networkFile, 'WithLibraryImpl', 0, {
-          version: version2,
+          // eslint-disable-next-line @typescript-eslint/camelcase
+          version: version_2,
           implementation: this.withLibraryImplV2Address,
         });
       });
@@ -222,15 +236,18 @@ contract('update script', function(accounts) {
           networkFile: this.networkFile,
         });
         await assertProxyInfo(this.networkFile, 'Impl', 0, {
-          version: version1,
+          // eslint-disable-next-line @typescript-eslint/camelcase
+          version: version_1,
           implementation: this.implV1Address,
         });
         await assertProxyInfo(this.networkFile, 'Impl', 1, {
-          version: version2,
+          // eslint-disable-next-line @typescript-eslint/camelcase
+          version: version_2,
           implementation: this.implV2Address,
         });
         await assertProxyInfo(this.networkFile, 'WithLibraryImpl', 0, {
-          version: version2,
+          // eslint-disable-next-line @typescript-eslint/camelcase
+          version: version_2,
           implementation: this.withLibraryImplV2Address,
         });
       });
@@ -248,7 +265,8 @@ contract('update script', function(accounts) {
           networkFile: this.networkFile,
         });
         await assertProxyInfo(this.networkFile, 'Impl', 0, {
-          version: version2,
+          // eslint-disable-next-line @typescript-eslint/camelcase
+          version: version_2,
           implementation: this.implV2Address,
           address: proxyAddress,
         });
@@ -263,11 +281,13 @@ contract('update script', function(accounts) {
           networkFile: this.networkFile,
         });
         await assertProxyInfo(this.networkFile, 'Impl', 1, {
-          version: version2,
+          // eslint-disable-next-line @typescript-eslint/camelcase
+          version: version_2,
           implementation: this.implV2Address,
         });
         await assertProxyInfo(this.networkFile, 'WithLibraryImpl', 0, {
-          version: version2,
+          // eslint-disable-next-line @typescript-eslint/camelcase
+          version: version_2,
           implementation: this.withLibraryImplV2Address,
         });
       });
@@ -286,7 +306,8 @@ contract('update script', function(accounts) {
           networkFile: this.networkFile,
         });
         await assertProxyInfo(this.networkFile, 'Impl', 0, {
-          version: version2,
+          // eslint-disable-next-line @typescript-eslint/camelcase
+          version: version_2,
           implementation: this.implV2Address,
           address: proxyAddress,
           value: 42,
@@ -304,12 +325,14 @@ contract('update script', function(accounts) {
           networkFile: this.networkFile,
         });
         await assertProxyInfo(this.networkFile, 'Impl', 0, {
-          version: version2,
+          // eslint-disable-next-line @typescript-eslint/camelcase
+          version: version_2,
           implementation: this.implV2Address,
           value: 42,
         });
         await assertProxyInfo(this.networkFile, 'Impl', 1, {
-          version: version2,
+          // eslint-disable-next-line @typescript-eslint/camelcase
+          version: version_2,
           implementation: this.implV2Address,
           value: 42,
         });
@@ -335,17 +358,20 @@ contract('update script', function(accounts) {
         }).should.be.rejectedWith(/failed to upgrade/);
 
         await assertProxyInfo(this.networkFile, 'Impl', 0, {
-          version: version2,
+          // eslint-disable-next-line @typescript-eslint/camelcase
+          version: version_2,
           implementation: this.implV2Address,
           value: 42,
         });
         await assertProxyInfo(this.networkFile, 'Impl', 1, {
-          version: version2,
+          // eslint-disable-next-line @typescript-eslint/camelcase
+          version: version_2,
           implementation: this.implV2Address,
           value: 42,
         });
         await assertProxyInfo(this.networkFile, 'WithLibraryImpl', 0, {
-          version: version1,
+          // eslint-disable-next-line @typescript-eslint/camelcase
+          version: version_1,
           implementation: this.withLibraryImplV1Address,
         });
       });
@@ -389,7 +415,8 @@ contract('update script', function(accounts) {
             networkFile: this.networkFile,
           });
           await assertProxyInfo(this.networkFile, 'Impl', 0, {
-            version: version2,
+            // eslint-disable-next-line @typescript-eslint/camelcase
+            version: version_2,
             implementation: this.implV2Address,
           });
         });
@@ -459,20 +486,24 @@ contract('update script', function(accounts) {
           networkFile: this.networkFile,
         });
         await assertProxyInfo(this.networkFile, 'Impl', 0, {
-          version: version2,
+          // eslint-disable-next-line @typescript-eslint/camelcase
+          version: version_2,
           implementation: this.implV2Address,
         });
         await assertProxyInfo(this.networkFile, 'Impl', 1, {
-          version: version2,
+          // eslint-disable-next-line @typescript-eslint/camelcase
+          version: version_2,
           implementation: this.implV2Address,
         });
         await assertProxyInfo(this.networkFile, 'Impl', 2, {
-          version: version1,
+          // eslint-disable-next-line @typescript-eslint/camelcase
+          version: version_1,
           implementation: this.implV1Address,
           minimal: true,
         });
         await assertProxyInfo(this.networkFile, 'WithLibraryImpl', 0, {
-          version: version2,
+          // eslint-disable-next-line @typescript-eslint/camelcase
+          version: version_2,
           implementation: this.withLibraryImplV2Address,
         });
       });
@@ -506,7 +537,8 @@ contract('update script', function(accounts) {
         });
 
         await bump({
-          version: version2,
+          // eslint-disable-next-line @typescript-eslint/camelcase
+          version: version_2,
           txParams,
           projectFile: this.projectFile,
         });
@@ -543,13 +575,15 @@ contract('update script', function(accounts) {
           version: '1.2.0',
           address: proxyAddress,
         });
-        const upgradedProxy = GreeterV2.at(proxyAddress);
+        // eslint-disable-next-line @typescript-eslint/camelcase
+        const upgradedProxy = Greeter_V2.at(proxyAddress);
         (await upgradedProxy.methods.version().call()).should.eq('1.2.0');
 
         const anotherProxyAddress = this.networkFile.getProxies({
           contract: 'Greeter',
         })[1].address;
-        const notUpgradedProxy = GreeterV1.at(anotherProxyAddress);
+        // eslint-disable-next-line @typescript-eslint/camelcase
+        const notUpgradedProxy = Greeter_V1.at(anotherProxyAddress);
         (await notUpgradedProxy.methods.version().call()).should.eq('1.1.0');
       });
 
@@ -563,13 +597,15 @@ contract('update script', function(accounts) {
         });
 
         const { address: proxyAddress } = await assertProxyInfo(this.networkFile, 'Greeter', 0, { version: '1.2.0' });
-        (await GreeterV2.at(proxyAddress)
+        // eslint-disable-next-line @typescript-eslint/camelcase
+        (await Greeter_V2.at(proxyAddress)
           .methods.version()
           .call()).should.eq('1.2.0');
         const { address: anotherProxyAddress } = await assertProxyInfo(this.networkFile, 'Greeter', 0, {
           version: '1.2.0',
         });
-        (await GreeterV2.at(anotherProxyAddress)
+        // eslint-disable-next-line @typescript-eslint/camelcase
+        (await Greeter_V2.at(anotherProxyAddress)
           .methods.version()
           .call()).should.eq('1.2.0');
       });
@@ -583,13 +619,15 @@ contract('update script', function(accounts) {
         });
 
         const { address: proxyAddress } = await assertProxyInfo(this.networkFile, 'Greeter', 0, { version: '1.2.0' });
-        (await GreeterV2.at(proxyAddress)
+        // eslint-disable-next-line @typescript-eslint/camelcase
+        (await Greeter_V2.at(proxyAddress)
           .methods.version()
           .call()).should.eq('1.2.0');
         const { address: anotherProxyAddress } = await assertProxyInfo(this.networkFile, 'Greeter', 0, {
           version: '1.2.0',
         });
-        (await GreeterV2.at(anotherProxyAddress)
+        // eslint-disable-next-line @typescript-eslint/camelcase
+        (await Greeter_V2.at(anotherProxyAddress)
           .methods.version()
           .call()).should.eq('1.2.0');
       });
@@ -603,13 +641,15 @@ contract('update script', function(accounts) {
         });
 
         const { address: proxyAddress } = await assertProxyInfo(this.networkFile, 'Greeter', 0, { version: '1.2.0' });
-        (await GreeterV2.at(proxyAddress)
+        // eslint-disable-next-line @typescript-eslint/camelcase
+        (await Greeter_V2.at(proxyAddress)
           .methods.version()
           .call()).should.eq('1.2.0');
         const { address: anotherProxyAddress } = await assertProxyInfo(this.networkFile, 'Greeter', 0, {
           version: '1.2.0',
         });
-        (await GreeterV2.at(anotherProxyAddress)
+        // eslint-disable-next-line @typescript-eslint/camelcase
+        (await Greeter_V2.at(anotherProxyAddress)
           .methods.version()
           .call()).should.eq('1.2.0');
       });
@@ -619,7 +659,8 @@ contract('update script', function(accounts) {
   describe('on application contract', function() {
     beforeEach('setup package', async function() {
       this.projectFile = new ProjectFile('test/mocks/packages/package-empty.zos.json');
-      this.projectFile.version = version1;
+      // eslint-disable-next-line @typescript-eslint/camelcase
+      this.projectFile.version = version_1;
     });
 
     shouldHandleUpdateScript();
@@ -630,7 +671,8 @@ contract('update script', function(accounts) {
     beforeEach('setup package', async function() {
       this.projectFile = new ProjectFile('test/mocks/packages/package-empty.zos.json');
       this.projectFile.publish = false;
-      this.projectFile.version = version1;
+      // eslint-disable-next-line @typescript-eslint/camelcase
+      this.projectFile.version = version_1;
     });
 
     shouldHandleUpdateScript();
@@ -640,7 +682,8 @@ contract('update script', function(accounts) {
   describe('on dependency contract', function() {
     beforeEach('setup package', async function() {
       this.projectFile = new ProjectFile('test/mocks/packages/package-with-undeployed-stdlib.zos.json');
-      this.projectFile.version = version1;
+      // eslint-disable-next-line @typescript-eslint/camelcase
+      this.projectFile.version = version_1;
     });
 
     shouldHandleUpdateOnDependency();
@@ -650,7 +693,8 @@ contract('update script', function(accounts) {
     beforeEach('setup package', async function() {
       this.projectFile = new ProjectFile('test/mocks/packages/package-with-undeployed-stdlib.zos.json');
       this.projectFile.publish = false;
-      this.projectFile.version = version1;
+      // eslint-disable-next-line @typescript-eslint/camelcase
+      this.projectFile.version = version_1;
     });
 
     shouldHandleUpdateOnDependency();

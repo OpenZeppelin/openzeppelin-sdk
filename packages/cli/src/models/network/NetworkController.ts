@@ -292,6 +292,7 @@ export default class NetworkController {
   private async _unsetSolidityLibs(): Promise<void> {
     const { contractNames } = this.projectFile;
     const libNames = this._getAllSolidityLibNames(contractNames);
+    console.log(libNames);
     await allPromisesOrError(
       this.networkFile.solidityLibsMissing(libNames).map(libName => this._unsetSolidityLib(libName)),
     );
@@ -319,34 +320,9 @@ export default class NetworkController {
   // Contract model || SolidityLib model
   private _getAllSolidityLibNames(contractNames: string[]): string[] {
     let newLibNames = this._getSolidityLibNames(contractNames);
-    let libNames = newLibNames;
-    while (true) {
-      newLibNames = uniq(this._getSolidityLibNames(newLibNames))
-
-      // Get new deps
-      const uniqNewLibNames = difference(newLibNames, libNames)
-
-      // Get repeat deps
-      const repeatLibNames = intersection(newLibNames, libNames)
-
-      // Exclude repeat deps
-      libNames = difference(libNames, repeatLibNames)
-
-      // Prepend deps to ensure they are deployed first
-      const nextLibNames = uniq(uniqNewLibNames.concat(repeatLibNames).concat(libNames))
-
-      // no new libs
-      if (nextLibNames.length === libNames.length) {
-        break;
-      }
-      // otherwise
-      // look into the new libs
-      newLibNames = uniqNewLibNames
-      // update all libs
-      libNames = nextLibNames
-    }
-
-    return libNames;
+    // deploy children before parents
+    // we want to deploy each contract only once
+    return uniq([...(newLibNames.length ? this._getAllSolidityLibNames(newLibNames) : []), ...newLibNames]);
   }
 
   private _getSolidityLibNames(contractNames: string[]): string[] {
