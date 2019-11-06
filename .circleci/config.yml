@@ -97,13 +97,6 @@ jobs:
           workspace: examples/lib-simple
           run-yarn: true
 
-  example-lib-complex:
-    <<: *defaults
-    steps:
-      - test:
-          workspace: examples/lib-complex
-          run-yarn: true
-
   example-create-instances-from-solidity:
     <<: *defaults
     steps:
@@ -163,8 +156,6 @@ workflows:
       - test-cli:
           requires: [setup]
       - example-lib-simple:
-          requires: [test-lib]
-      - example-lib-complex:
           requires: [test-lib]
       - example-create-instances-from-solidity:
           requires: [test-lib, test-cli]
