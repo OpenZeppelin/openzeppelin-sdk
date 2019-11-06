@@ -14,9 +14,11 @@ pull_request_rules:
   - 'status-success="ci/circleci: test-lib"'
   - 'status-success="ci/circleci: example-create-instances-from-solidity"'
   - 'status-success="ci/circleci: example-lib-simple"'
-  - 'status-success="ci/circleci: example-lib-complex"'
+  - 'status-success="ci/circleci: example-cli-create2"'
+  - 'status-success="ci/circleci: example-first-project"'
   - 'status-success="ci/circleci: integration-cli-geth"'
   - 'status-success="ci/circleci: integration-cli-hdwallet"'
+  - 'status-success="ci/circleci: integration-cli-kits"'
 - name: delete head branch after merge
   conditions:
   - merged
