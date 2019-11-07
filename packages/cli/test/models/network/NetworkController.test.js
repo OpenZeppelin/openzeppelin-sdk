@@ -42,16 +42,16 @@ contract('NetworkController', function() {
         .returns(['D', 'G', 'H']);
       controllerMock
         .expects('_getSolidityLibNames')
-        .withArgs(de(['D', 'G', 'H']))
+        .withArgs(de(['G', 'H']))
         .returns(['D', 'I']);
       controllerMock
         .expects('_getSolidityLibNames')
-        .withArgs(de(['D', 'I']))
+        .withArgs(de(['I']))
         .returns([]);
 
       const result = controller._getAllSolidityLibNames(['A', 'B', 'C']);
 
-      assert.deepEqual(result, ['D', 'I', 'G', 'H', 'E', 'F']);
+      assert.deepEqual(result, ['I', 'D', 'G', 'H', 'E', 'F']);
     });
   });
 
