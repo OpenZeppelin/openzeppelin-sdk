@@ -23,7 +23,7 @@ export interface TxParams {
   gasPrice?: number | string;
 }
 
-// Patch typing for getStorageAt method
+// Patch typing for getStorageAt method -- see https://github.com/ethereum/web3.js/pull/3180
 declare module 'web3-eth' {
   interface Eth {
     getStorageAt(address: string, position: number | string): Promise<string>;
