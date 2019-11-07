@@ -61,7 +61,7 @@ interface ContractMethod {
 }
 
 function _wrapContractInstance(schema: any, web3instance: Web3Contract): Contract {
-  const instance : Contract = web3instance as Contract;
+  const instance: Contract = web3instance as Contract;
   instance.schema = schema;
 
   instance.new = async function(...passedArguments): Promise<Contract> {
