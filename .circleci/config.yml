@@ -25,14 +25,14 @@ commands:
     steps:
       - checkout
       - restore_cache:
-          key: dependency-cache-v4-{{ checksum "yarn.lock" }}
+          key: dependency-cache-v5-{{ checksum "yarn.lock" }}
       - attach_workspace:
           at: ~/openzeppelin
       - when:
           condition: << parameters.run-yarn >>
           steps:
             - restore_cache:
-                key: yarn-cache-v6-
+                key: yarn-cache-v7-
             - run:
                 command: yarn
                 working_directory: "~/openzeppelin/<< parameters.workspace >>"
@@ -55,8 +55,8 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - dependency-cache-v4-{{ checksum "yarn.lock" }}
-            - yarn-cache-v6-
+            - dependency-cache-v5-{{ checksum "yarn.lock" }}
+            - yarn-cache-v7-
       - run:
           name: Install dependencies and build
           command: yarn
@@ -64,13 +64,13 @@ jobs:
           name: Lint check
           command: yarn lint:check
       - save_cache:
-          key: dependency-cache-v4-{{ checksum "yarn.lock" }}
+          key: dependency-cache-v5-{{ checksum "yarn.lock" }}
           paths:
             - node_modules
             - packages/cli/node_modules
             - packages/lib/node_modules
       - save_cache:
-          key: yarn-cache-v6-{{ checksum "yarn.lock" }}
+          key: yarn-cache-v7-{{ checksum "yarn.lock" }}
           paths:
             - ~/.cache/yarn/v6
       - persist_to_workspace:
@@ -98,13 +98,6 @@ jobs:
     steps:
       - test:
           workspace: examples/lib-simple
-          run-yarn: true
-
-  example-lib-complex:
-    <<: *defaults
-    steps:
-      - test:
-          workspace: examples/lib-complex
           run-yarn: true
 
   example-create-instances-from-solidity:
@@ -166,8 +159,6 @@ workflows:
       - test-cli:
           requires: [setup]
       - example-lib-simple:
-          requires: [test-lib]
-      - example-lib-complex:
           requires: [test-lib]
       - example-create-instances-from-solidity:
           requires: [test-lib, test-cli]

@@ -2,8 +2,8 @@ import ZWeb3 from './ZWeb3';
 import Contracts from './Contracts';
 import ContractAST from '../utils/ContractAST';
 import { StorageLayoutInfo } from '../validations/Storage';
-import { Callback, EventLog, EventEmitter, TransactionReceipt } from 'web3/types';
-import { Contract as Web3Contract, TransactionObject, BlockType } from 'web3-eth-contract';
+import { TransactionReceipt } from 'web3-core';
+import { Contract as Web3Contract } from 'web3-eth-contract';
 
 /*
  * Contract is an interface that extends Web3's Contract interface, adding some properties and methods like:
@@ -13,33 +13,7 @@ import { Contract as Web3Contract, TransactionObject, BlockType } from 'web3-eth
  * at(): retrieves a deployed contract at the specified address
  * link(): links libraries in a contract schema
  */
-export default interface Contract {
-  // Web3 Contract interface.
-  options: any;
-  methods: { [fnName: string]: (...args: any[]) => TransactionObject<any> };
-  deploy(options: { data: string; arguments: any[] }): TransactionObject<Web3Contract>;
-  events: {
-    [eventName: string]: (
-      options?: { filter?: object; fromBlock?: BlockType; topics?: string[] },
-      cb?: Callback<EventLog>,
-    ) => EventEmitter;
-    allEvents: (
-      options?: { filter?: object; fromBlock?: BlockType; topics?: string[] },
-      cb?: Callback<EventLog>,
-    ) => EventEmitter;
-  };
-  getPastEvents(
-    event: string,
-    options?: {
-      filter?: object;
-      fromBlock?: BlockType;
-      toBlock?: BlockType;
-      topics?: string[];
-    },
-    cb?: Callback<EventLog[]>,
-  ): Promise<EventLog[]>;
-  setProvider(provider: any): void;
-
+export default interface Contract extends Web3Contract {
   // Contract specific.
   address: string;
   new: (args?: any[], options?: {}) => Promise<Contract>;
@@ -86,7 +60,8 @@ interface ContractMethod {
   inputs: string[];
 }
 
-function _wrapContractInstance(schema: any, instance: Web3Contract): Contract {
+function _wrapContractInstance(schema: any, web3instance: Web3Contract): Contract {
+  const instance : Contract = web3instance as Contract;
   instance.schema = schema;
 
   instance.new = async function(...passedArguments): Promise<Contract> {
@@ -106,9 +81,9 @@ function _wrapContractInstance(schema: any, instance: Web3Contract): Contract {
         .on('error', error => reject(error))
         .on('receipt', receipt => (transactionReceipt = receipt))
         .on('transactionHash', hash => (transactionHash = hash))
-        .then(deployedInstance => {
+        .then(web3DeployedInstance => {
           // instance != deployedInstance
-          deployedInstance = _wrapContractInstance(schema, deployedInstance);
+          const deployedInstance = _wrapContractInstance(schema, web3DeployedInstance);
           deployedInstance.deployment = { transactionReceipt, transactionHash };
           resolve(deployedInstance);
         })
@@ -119,7 +94,7 @@ function _wrapContractInstance(schema: any, instance: Web3Contract): Contract {
   instance.at = function(address: string): Contract | never {
     if (!ZWeb3.isAddress(address)) throw new Error('Given address is not valid: ' + address);
     const newWeb3Instance = instance.clone();
-    newWeb3Instance._address = address;
+    newWeb3Instance['_address'] = address;
     newWeb3Instance.options.address = address;
     return _wrapContractInstance(instance.schema, newWeb3Instance);
   };

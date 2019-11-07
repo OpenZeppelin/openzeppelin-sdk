@@ -56,7 +56,6 @@
   "homepage": "https://github.com/OpenZeppelin/openzeppelin-sdk/tree/master/packages/lib#readme",
   "dependencies": {
     "@types/cbor": "^2.0.0",
-    "@types/web3": "^1.0.14",
     "axios": "^0.18.0",
     "bignumber.js": "^7.2.0",
     "cbor": "^4.1.5",
@@ -87,8 +86,10 @@
     "semver": "^5.5.1",
     "spinnies": "^0.4.2",
     "truffle-flattener": "^1.4.0",
-    "web3": "1.2.1",
-    "web3-utils": "1.2.0"
+    "web3": "1.2.2",
+    "web3-eth": "1.2.2",
+    "web3-eth-contract": "1.2.2",
+    "web3-utils": "1.2.2"
   },
   "devDependencies": {
     "@types/mocha": "^5.2.5",

@@ -11,7 +11,7 @@ import sleep from '../helpers/sleep';
 import ZWeb3 from '../artifacts/ZWeb3';
 import Contracts from '../artifacts/Contracts';
 import Contract from '../artifacts/Contract';
-import { TransactionReceipt } from 'web3/types';
+import { TransactionReceipt } from 'web3-core';
 import { buildDeploymentCallData } from './ABIs';
 import { TxParams } from '../artifacts/ZWeb3';
 

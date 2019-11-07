@@ -10,7 +10,7 @@
     "test": "scripts/test-ci.sh"
   },
   "dependencies": {
-    "web3": "1.2.1"
+    "web3": "1.2.2"
   },
   "devDependencies": {
     "@openzeppelin/cli": "^2.6.0-rc.0",

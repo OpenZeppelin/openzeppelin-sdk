@@ -1,8 +1,8 @@
 import { Loggy } from '../utils/Logger';
 import sleep from '../helpers/sleep';
 import Web3 from 'web3';
-import { TransactionReceipt } from 'web3/types';
-import { Eth, Block, Transaction } from 'web3-eth';
+import { TransactionReceipt, Transaction } from 'web3-core';
+import { Block, Eth } from 'web3-eth';
 import { Contract } from 'web3-eth-contract';
 import { toChecksumAddress } from 'web3-utils';
 
@@ -23,6 +23,13 @@ export interface TxParams {
   gasPrice?: number | string;
 }
 
+// Patch typing for getStorageAt method -- see https://github.com/ethereum/web3.js/pull/3180
+declare module 'web3-eth' {
+  interface Eth {
+    getStorageAt(address: string, position: number | string): Promise<string>;
+  }
+}
+
 // TS-TODO: Type Web3.
 // TS-TODO: Review what could be private in this class.
 export default class ZWeb3 {
@@ -39,7 +46,7 @@ export default class ZWeb3 {
   public static web3(forceReinit = false): any {
     if (ZWeb3.web3instance && !forceReinit) return ZWeb3.web3instance;
     if (!ZWeb3.provider) {
-      ZWeb3.web3instance = new Web3();
+      ZWeb3.web3instance = new Web3(null);
       return ZWeb3.web3instance;
     } else ZWeb3.web3instance = new Web3(ZWeb3.provider);
 

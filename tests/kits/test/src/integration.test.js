@@ -1,6 +1,5 @@
 'use strict';
 
-const findUp = require('find-up');
 require('chai').should();
 const _ = require('lodash');
 
@@ -20,13 +19,14 @@ function runIntegrationTest({ kit }, action) {
   before('cleaning up project folder', cleanup);
 
   it('unpack kit', function() {
-    // have to replace oz with local version so we test current build
     run(`node ../../../packages/cli/lib/bin/oz-cli.js unpack ${kit}`);
   });
 
   // have to replace oz with local version so we test current build
   it('replace oz with local version', function() {
-    run(`${findUp.sync('node_modules/.bin/lerna')} bootstrap --scope=tests-cli-kits --scope="@openzeppelin/*"`);
+    const version = require('../package.json').version;
+    run(`yarn add @openzeppelin/upgrades@${version}`);
+    run(`yarn add -D @openzeppelin/cli@${version}`);
   });
 
   it('init oz project', function() {
