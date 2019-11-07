@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
-## v2.6.0 - 2019-11-04
+## v2.6.0 - 2019-11-07
 
 ### Added
 - Opt-in to report anonymous usage statistics ([#1226](https://github.com/OpenZeppelin/openzeppelin-sdk/pull/1226), [#1266](https://github.com/OpenZeppelin/openzeppelin-sdk/pull/1266), [#1275](https://github.com/OpenZeppelin/openzeppelin-sdk/pull/1275))
@@ -15,8 +15,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Set default EVM version depending on solc version ([#1208](https://github.com/OpenZeppelin/openzeppelin-sdk/pull/1208)) (thanks @melnikaite!)
 - Set expected default values for compiler ([#1202](https://github.com/OpenZeppelin/openzeppelin-sdk/pull/1202)) (thanks @melnikaite!)
 
+### Changed
+- Bump `web3` version to `web3@1.2.2`. ([#1277](https://github.com/OpenZeppelin/openzeppelin-sdk/pull/1277))
+
 ### Internal
-- Migrated project from npm to yarn, using yarn workspaces together with lerna ([#1241](https://github.com/OpenZeppelin/openzeppelin-sdk/pull/1241))
+- Migrate project from npm to yarn, using yarn workspaces together with lerna ([#1241](https://github.com/OpenZeppelin/openzeppelin-sdk/pull/1241))
 
 ## v2.5.3 - 2019-08-18
 

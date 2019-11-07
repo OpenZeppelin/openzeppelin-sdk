@@ -4,10 +4,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
-## v2.6.0 - 2019-11-04
+## v2.6.0 - 2019-11-07
+
+### Changed
+- Bump `web3` version to `web3@1.2.2`. ([#1277](https://github.com/OpenZeppelin/openzeppelin-sdk/pull/1277))
 
 ### Internal
-- Migrated project from npm to yarn, using yarn workspaces together with lerna ([#1241](https://github.com/OpenZeppelin/openzeppelin-sdk/pull/1241))
+- Migrate project from npm to yarn, using yarn workspaces together with lerna ([#1241](https://github.com/OpenZeppelin/openzeppelin-sdk/pull/1241))
 
 ## v2.5.3 - 2019-08-18
 
@@ -17,7 +20,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## v2.5.2 - 2019-07-26
 
 ### Changed
-- Migrated from `web3@1.0.0-beta.37` to the stable `web3@1.2.0` release. ([#1152](https://github.com/OpenZeppelin/openzeppelin-sdk/pull/1152))
+- Migrate from `web3@1.0.0-beta.37` to the stable `web3@1.2.0` release. ([#1152](https://github.com/OpenZeppelin/openzeppelin-sdk/pull/1152))
 
 ## v2.5.0 - 2019-07-19
 
