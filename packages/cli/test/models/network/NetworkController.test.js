@@ -5,13 +5,13 @@ import sinon from 'sinon';
 import NetworkController from '../../../src/models/network/NetworkController';
 import NetworkFile from '../../../src/models/files/NetworkFile';
 import ProjectFile from '../../../src/models/files/ProjectFile';
-import { AppProjectDeployer, ProxyAdminProjectDeployer } from '../../../src/models/network/ProjectDeployer';
+import { AppProjectDeployer } from '../../../src/models/network/ProjectDeployer';
 
 contract('NetworkController', function() {
-  let deployer, projectFile, networkFile, controller;
+  let projectFile, networkFile, controller;
 
   beforeEach(() => {
-    deployer = sinon.createStubInstance(AppProjectDeployer);
+    sinon.createStubInstance(AppProjectDeployer);
   });
 
   afterEach(() => {
@@ -33,14 +33,15 @@ contract('NetworkController', function() {
        *  A => D, E, F
        *  B => C, E, F, G
        *  C => D, G
-       *  D =>
-       *  E => D
+       *  D => []
+       *  E => D, Y
        *  F => G
        *  G => E
+       *  Y => []
        *
        *  Expected ordering:
        *
-       *  [D, E, G, F, A, C, B]
+       *  [Y, D, E, G, F, A, C, B]
        *
        */
 
@@ -66,13 +67,23 @@ contract('NetworkController', function() {
 
       controllerMock
         .expects('_getContractDependencies')
+        .withArgs('Y')
+        .returns(['Z']);
+
+      controllerMock
+        .expects('_getContractDependencies')
+        .withArgs('Z')
+        .returns([]);
+
+      controllerMock
+        .expects('_getContractDependencies')
         .withArgs('D')
         .returns([]);
 
       controllerMock
         .expects('_getContractDependencies')
         .withArgs('E')
-        .returns(['D']);
+        .returns(['D', 'Y']);
 
       controllerMock
         .expects('_getContractDependencies')
@@ -86,7 +97,7 @@ contract('NetworkController', function() {
 
       const result = controller._getAllSolidityLibNames(['0']);
 
-      assert.deepEqual(result, ['D', 'E', 'G', 'F', 'A', 'C', 'B']);
+      assert.deepEqual(result, ['D', 'Z', 'Y', 'E', 'G', 'F', 'A', 'C', 'B']);
     });
 
     it('should throw on cycles', () => {
@@ -154,7 +165,7 @@ contract('NetworkController', function() {
   });
 
   describe('uploadSolidityLibs()', () => {
-    let projectMock, networkFileMock;
+    let networkFileMock;
 
     beforeEach(() => {
       projectFile = new ProjectFile('test/mocks/mock-stdlib-libdeps/zos.json');

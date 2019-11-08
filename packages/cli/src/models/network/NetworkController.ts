@@ -1,10 +1,8 @@
 'use strict';
 
 import isEmpty from 'lodash.isempty';
-import difference from 'lodash.difference';
 import intersection from 'lodash.intersection';
 import uniq from 'lodash.uniq';
-import flatten from 'lodash.flatten';
 import filter from 'lodash.filter';
 import every from 'lodash.every';
 import partition from 'lodash.partition';
@@ -40,6 +38,7 @@ import {
   AppProxyMigrator,
   MinimalProxy,
 } from '@openzeppelin/upgrades';
+
 import { isMigratableManifestVersion } from '../files/ManifestVersion';
 import { allPromisesOrError } from '../../utils/async';
 import { toContractFullName } from '../../utils/naming';
@@ -318,7 +317,7 @@ export default class NetworkController {
   }
 
   // Contract model || SolidityLib model
-  private _getAllSolidityLibNames(contractNames: string[], allDependencies: string[] = []): string[] {
+  private _getAllSolidityLibNames(contractNames: string[]): string[] {
     const graph = new TopologicalSort<string, string>(new Map<string, string>());
 
     contractNames.forEach(contractName => {
