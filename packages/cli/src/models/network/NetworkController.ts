@@ -11,6 +11,7 @@ import partition from 'lodash.partition';
 import map from 'lodash.map';
 import concat from 'lodash.concat';
 import toPairs from 'lodash.topairs';
+import TopologicalSort from 'topological-sort';
 
 import {
   Contracts,
@@ -318,27 +319,34 @@ export default class NetworkController {
 
   // Contract model || SolidityLib model
   private _getAllSolidityLibNames(contractNames: string[], allDependencies: string[] = []): string[] {
-    let newLibNames = this._getSolidityLibNames(contractNames);
+    const graph = new TopologicalSort<string, string>(new Map<string, string>());
 
-    let newLibs = difference(newLibNames, allDependencies);
-    let repeatLibs = intersection(newLibNames, allDependencies);
-    let oldLibs = difference(allDependencies, newLibNames);
+    contractNames.forEach(contractName => {
+      const deps = this._getContractDependencies(contractName);
+      deps.forEach(dependencyContractName => {
+        this._populateDependencyGraph(dependencyContractName, graph);
+      });
+    });
 
-    // reorder so that dependencies are pulled up
-    let reorderedOldLibs = repeatLibs.concat(oldLibs);
-
-    // create a new list of all libs
-    let allLibs = newLibs.concat(reorderedOldLibs);
-
-    return uniq([...(newLibs.length ? this._getAllSolidityLibNames(newLibs, allLibs) : []), ...reorderedOldLibs]);
+    const sorted = graph.sort();
+    return [...sorted.keys()].reverse();
   }
 
-  private _getSolidityLibNames(contractNames: string[]): string[] {
-    const libNames = contractNames.map(contractName => {
-      const contract = Contracts.getFromLocal(contractName);
-      return getSolidityLibNames(contract.schema.bytecode);
-    });
-    return uniq(flatten(libNames));
+  private _populateDependencyGraph(contractName: string, graph: TopologicalSort<string, string>) {
+    // @ts-ignore
+    if (!graph.nodes.has(contractName)) {
+      graph.addNode(contractName, contractName);
+      const deps = this._getContractDependencies(contractName);
+      deps.forEach(dependencyContractName => {
+        this._populateDependencyGraph(dependencyContractName, graph);
+        graph.addEdge(contractName, dependencyContractName);
+      });
+    }
+  }
+
+  private _getContractDependencies(contractName: string): string[] {
+    const contract = Contracts.getFromLocal(contractName);
+    return getSolidityLibNames(contract.schema.bytecode);
   }
 
   // Contract model

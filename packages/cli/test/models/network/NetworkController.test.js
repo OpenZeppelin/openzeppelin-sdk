@@ -28,30 +28,99 @@ contract('NetworkController', function() {
     });
 
     it('should order dependencies correctly', () => {
-      const de = sinon.match.array.deepEquals;
+      /**
+       *
+       *  A => D, E, F
+       *  B => C, E, F, G
+       *  C => D, G
+       *  D =>
+       *  E => D
+       *  F => G
+       *  G => E
+       *
+       *  Expected ordering:
+       *
+       *  [D, E, G, F, A, C, B]
+       *
+       */
 
-      const contractNames = ['A', 'B', 'C'];
+      controllerMock
+        .expects('_getContractDependencies')
+        .withArgs('0')
+        .returns(['A', 'B', 'C']);
 
       controllerMock
-        .expects('_getSolidityLibNames')
-        .withArgs(de(contractNames))
-        .returns(['E', 'F', 'D']);
+        .expects('_getContractDependencies')
+        .withArgs('A')
+        .returns(['D', 'E', 'F']);
+
       controllerMock
-        .expects('_getSolidityLibNames')
-        .withArgs(de(['E', 'F', 'D']))
-        .returns(['D', 'G', 'H']);
+        .expects('_getContractDependencies')
+        .withArgs('B')
+        .returns(['C', 'E', 'F', 'G']);
+
       controllerMock
-        .expects('_getSolidityLibNames')
-        .withArgs(de(['G', 'H']))
-        .returns(['D', 'I']);
+        .expects('_getContractDependencies')
+        .withArgs('C')
+        .returns(['D', 'G']);
+
       controllerMock
-        .expects('_getSolidityLibNames')
-        .withArgs(de(['I']))
+        .expects('_getContractDependencies')
+        .withArgs('D')
         .returns([]);
 
-      const result = controller._getAllSolidityLibNames(['A', 'B', 'C']);
+      controllerMock
+        .expects('_getContractDependencies')
+        .withArgs('E')
+        .returns(['D']);
 
-      assert.deepEqual(result, ['I', 'D', 'G', 'H', 'E', 'F']);
+      controllerMock
+        .expects('_getContractDependencies')
+        .withArgs('F')
+        .returns(['G']);
+
+      controllerMock
+        .expects('_getContractDependencies')
+        .withArgs('G')
+        .returns(['E']);
+
+      const result = controller._getAllSolidityLibNames(['0']);
+
+      assert.deepEqual(result, ['D', 'E', 'G', 'F', 'A', 'C', 'B']);
+    });
+
+    it('should throw on cycles', () => {
+      /**
+       *
+       *  A => B
+       *  B => C
+       *  C => A
+       *
+       */
+
+      controllerMock
+        .expects('_getContractDependencies')
+        .withArgs('0')
+        .returns(['A']);
+
+      controllerMock
+        .expects('_getContractDependencies')
+        .withArgs('A')
+        .returns(['B']);
+
+      controllerMock
+        .expects('_getContractDependencies')
+        .withArgs('B')
+        .returns(['C']);
+
+      controllerMock
+        .expects('_getContractDependencies')
+        .withArgs('C')
+        .returns(['A']);
+
+      expect(() => {
+        controller._getAllSolidityLibNames(['0']);
+      }).to.throw(/circular/);
     });
   });
 
