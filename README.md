@@ -74,19 +74,9 @@ give rewards for reported issues, according to impact and severity.
 * [@jcarpanelli](https://github.com/jcarpanelli)
 * [@ylv-io](https://github.com/ylv-io)
 
-## Development setup
-
-Run `npm install` in the root of the project, followed by `npx lerna bootstrap` to have lerna install all dependencies in all packages and symlink them as needed.
-
 ## Contribute
 
-To contribute, join our [forum](https://forum.openzeppelin.com) or
-[community channel on Telegram](https://t.me/zeppelinos), where you can talk to
-all the OpenZeppelin developers, contributors, partners, and users.
-
-You can also follow the recent developments of the project in our
-[blog](https://blog.openzeppelin.com/) and
-[Twitter account](https://twitter.com/openzeppelin).
+OpenZeppelin exists thanks to its contributors. There are many ways you can participate and help build high quality software. Check out the [contribution guide]!
 
 ## License
 
