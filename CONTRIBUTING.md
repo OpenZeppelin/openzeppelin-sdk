@@ -23,12 +23,9 @@ As a contributor, you are expected to fork this repository, work on your own for
     git pull --rebase upstream master
     ```
 
-2. Bootstrap SDK
+2. Setup
     ```
-    npm install
-    npx lerna bootstrap
-    openzeppelin-sdk/packages/cli$ npm link
-    openzeppelin-sdk/packages/lib$ npm link
+    yarn
     ```
 
 3. Branch out from `master` into `fix/some-bug-#123`, `feature/some-feature-#456`, or `docs/some-doc-#789`:
@@ -36,22 +33,17 @@ As a contributor, you are expected to fork this repository, work on your own for
     git checkout -b fix/some-bug-#123
     ```
 
-4. While developing keep running
-    ```
-    npm run watch
-    ```
-
-5. Make your changes, add your files, commit and push to your fork:
+4. Make your changes, add your files, commit and push to your fork:
     ```
     git add SomeFile.js
     git commit "Fix some bug #123"
     git push origin fix/some-bug-#123
     ```
 
-6. Make sure all tests are passed
+5. Make sure all tests are passed
     ```
-    openzeppelin-sdk/packages/cli$ npm test
-    openzeppelin-sdk/packages/lib$ npm test
+    openzeppelin-sdk/packages/cli$ yarn test
+    openzeppelin-sdk/packages/lib$ yarn test
     ```
 
 7. Go to [OpenZeppelin/openzeppelin-sdk](https://github.com/OpenZeppelin/openzeppelin-sdk) in your web browser and issue a new pull request.
