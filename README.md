@@ -48,10 +48,8 @@ And initialize the OpenZeppelin SDK project:
 openzeppelin init my-project
 ```
 
-Now it is possible to add contracts to the project with the `openzeppelin add` command,
-push these contracts to a blockchain network with `openzeppelin push`, use
-`openzeppelin create` to create instances for these contracts that later can be
-upgraded, and many more things.
+Now it is possible to use `openzeppelin create` to create instances for these contracts that 
+later can be upgraded, and many more things.
 
 Run `openzeppelin --help` for more details about thes and all the other functions of the
 OpenZeppelin CLI.
