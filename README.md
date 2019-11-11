@@ -76,7 +76,7 @@ give rewards for reported issues, according to impact and severity.
 
 ## Contribute
 
-OpenZeppelin exists thanks to its contributors. There are many ways you can participate and help build high quality software. Check out the [contribution guide]!
+OpenZeppelin exists thanks to its contributors. There are many ways you can participate and help build high quality software. Check out the [contribution guide](https://github.com/OpenZeppelin/openzeppelin-sdk/blob/master/CONTRIBUTING.md)!
 
 ## License
 
