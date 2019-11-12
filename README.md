@@ -72,6 +72,15 @@ give rewards for reported issues, according to impact and severity.
 * [@jcarpanelli](https://github.com/jcarpanelli)
 * [@ylv-io](https://github.com/ylv-io)
 
+## Community
+
+Join our [Community Forum](https://forum.openzeppelin.com) or
+[community channel on Telegram](https://t.me/zeppelinos), where you can talk to
+all the OpenZeppelin developers, contributors, partners, and users.
+
+You can also follow the recent developments of the project in the OpenZeppelin [blog](https://blog.openzeppelin.com/) and
+[Twitter account](https://twitter.com/openzeppelin).
+
 ## Contribute
 
 OpenZeppelin exists thanks to its contributors. There are many ways you can participate and help build high quality software. Check out the [contribution guide](https://github.com/OpenZeppelin/openzeppelin-sdk/blob/master/CONTRIBUTING.md)!
