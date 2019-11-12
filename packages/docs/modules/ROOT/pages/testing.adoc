@@ -202,12 +202,12 @@ To call TimedCrowdsale's initialize function, use the following syntax:
 
 [source,javascript]
 ----
-timedCrowadsale.methods['initialize(uint256,uint256)'](openingTime, closingTime);
+timedCrowdsale.methods['initialize(uint256,uint256)'](openingTime, closingTime);
 ----
 
 And to call Crowdsale's initialize function,
 
 [source,javascript]
 ----
-timedCrowadsale.methods['initialize(uint256,address,address)'](rate, wallet, token);
+timedCrowdsale.methods['initialize(uint256,address,address)'](rate, wallet, token);
 ----
