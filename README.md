@@ -82,8 +82,11 @@ You can also follow the recent developments of the project in the OpenZeppelin [
 [Twitter account](https://twitter.com/openzeppelin).
 
 ## Contribute
+OpenZeppelin exists thanks to its contributors. There are many ways you can participate and help build high quality software. 
 
-OpenZeppelin exists thanks to its contributors. There are many ways you can participate and help build high quality software. Check out the [contribution guide](https://github.com/OpenZeppelin/openzeppelin-sdk/blob/master/CONTRIBUTING.md)!
+OpenZeppelin SDK is bootstrapped by running `yarn` in the root of the project.
+
+Check out the [contribution guide](CONTRIBUTING.md) for details!
 
 ## License
 
