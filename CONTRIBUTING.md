@@ -2,7 +2,8 @@
 
 _This contribution guide is inspired in [the one from OpenZeppelin Contracts](https://github.com/OpenZeppelin/openzeppelin-solidity/blob/master/CONTRIBUTING.md)._
 
-We really appreciate and value contributions to the OpenZeppelin SDK.  Please take 5' to review the items listed below to make sure that your contributions are merged as soon as possible.
+We really appreciate and value contributions to the OpenZeppelin SDK.    
+Please take 5' to review the items listed below to make sure that your contributions are merged as soon as possible.
 
 ## Ensure there is an issue for your contribution
 
