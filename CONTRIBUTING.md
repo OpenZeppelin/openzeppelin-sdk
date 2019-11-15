@@ -2,13 +2,16 @@
 
 _This contribution guide is inspired in [the one from OpenZeppelin Contracts](https://github.com/OpenZeppelin/openzeppelin-solidity/blob/master/CONTRIBUTING.md)._
 
-We really appreciate and value contributions to the OpenZeppelin SDK. Please take 5' to review the items listed below to make sure that your contributions are merged as soon as possible.
+We really appreciate and value contributions to the OpenZeppelin SDK.    
+Please take 5' to review the items listed below to make sure that your contributions are merged as soon as possible.
 
 ## Ensure there is an issue for your contribution
 
 **Always make sure there is an issue that corresponds to the contribution you want to make.** Before you start coding a new feature that you think could be awesome for the OpenZeppelin SDK, take a few minutes before and [open a new issue](https://github.com/OpenZeppelin/openzeppelin-sdk/issues/new) to propose it and discuss its design. This way, we can help you in coming up with the best design that fits within the project, and you don't spend time writing code that could be rejected later.
 
 If you start working on an existing issue, it's good practice to let us know by adding a comment on the issue, so we can avoid duplicated efforts.
+
+If you find a typo in the documentation, then please go straight to creating a pull request to fix.
 
 ## Creating Pull Requests (PRs)
 
@@ -23,12 +26,9 @@ As a contributor, you are expected to fork this repository, work on your own for
     git pull --rebase upstream master
     ```
 
-2. Bootstrap SDK
+2. Setup
     ```
-    npm install
-    npx lerna bootstrap
-    openzeppelin-sdk/packages/cli$ npm link
-    openzeppelin-sdk/packages/lib$ npm link
+    yarn
     ```
 
 3. Branch out from `master` into `fix/some-bug-#123`, `feature/some-feature-#456`, or `docs/some-doc-#789`:
@@ -36,22 +36,17 @@ As a contributor, you are expected to fork this repository, work on your own for
     git checkout -b fix/some-bug-#123
     ```
 
-4. While developing keep running
-    ```
-    npm run watch
-    ```
-
-5. Make your changes, add your files, commit and push to your fork:
+4. Make your changes, add your files, commit and push to your fork:
     ```
     git add SomeFile.js
     git commit "Fix some bug #123"
     git push origin fix/some-bug-#123
     ```
 
-6. Make sure all tests are passed
+5. Make sure all tests are passed
     ```
-    openzeppelin-sdk/packages/cli$ npm test
-    openzeppelin-sdk/packages/lib$ npm test
+    openzeppelin-sdk/packages/cli$ yarn test
+    openzeppelin-sdk/packages/lib$ yarn test
     ```
 
 7. Go to [OpenZeppelin/openzeppelin-sdk](https://github.com/OpenZeppelin/openzeppelin-sdk) in your web browser and issue a new pull request.
