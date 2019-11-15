@@ -26,7 +26,7 @@ interface ConfigFileCompilerOptions {
     enabled: boolean;
     outDir?: string;
     target?: string;
-  }
+  };
 }
 
 interface ProjectFileData {
@@ -183,7 +183,7 @@ export default class ProjectFile {
         enabled: optimizer && optimizer.enabled,
         runs: optimizer && optimizer.runs && parseInt(optimizer.runs),
       },
-      typechain
+      typechain,
     };
   }
 
@@ -207,7 +207,7 @@ export default class ProjectFile {
           runs: optimizer && optimizer.runs && optimizer.runs.toString(),
         },
       },
-      typechain
+      typechain,
     };
 
     this.data.compiler =

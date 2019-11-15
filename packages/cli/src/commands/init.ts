@@ -30,7 +30,13 @@ const register: (program: any) => any = program =>
 async function action(projectName: string, version: string, options: any): Promise<void> {
   const { publish, force, link, install: installDependencies, interactive, typechainOutdir, typechain } = options;
 
-  const args = { name: projectName, version, typechainEnabled: (typechain ? true : typechain), typechainTarget: typechain, typechainOutdir };
+  const args = {
+    name: projectName,
+    version,
+    typechainEnabled: typechain ? true : typechain,
+    typechainTarget: typechain,
+    typechainOutdir,
+  };
   const props = getCommandProps();
   const defaults = FileSystem.parseJsonIfExists('package.json') || { version: '1.0.0' };
   const prompted = await promptIfNeeded({ args, defaults, props }, interactive);
@@ -68,7 +74,7 @@ function getCommandProps(): InquirerQuestions {
         return `Invalid semantic version: ${input}`;
       },
     },
-    ... TypechainQuestions
+    ...TypechainQuestions,
   };
 }
 

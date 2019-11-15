@@ -63,8 +63,19 @@ async function action(options: CompileParams & { interactive: boolean }): Promis
 
   // If typechain settings are undefined, we are running from an old project, so we ask the user if they want to enable it if we find a ts-config (this last bit handled by the typechain questions)
   const projectFile = new ProjectFile();
-  if (!projectFile.compilerOptions || !projectFile.compilerOptions.typechain || isundefined(projectFile.compilerOptions.typechain.enabled)) {
-    const { typechainEnabled, typechainTarget, typechainOutdir } = await promptIfNeeded({ args: { typechainEnabled: undefined, typechainTarget: undefined, typechainOutdir: undefined }, defaults: {}, props: TypechainQuestions }, interactive);
+  if (
+    !projectFile.compilerOptions ||
+    !projectFile.compilerOptions.typechain ||
+    isundefined(projectFile.compilerOptions.typechain.enabled)
+  ) {
+    const { typechainEnabled, typechainTarget, typechainOutdir } = await promptIfNeeded(
+      {
+        args: { typechainEnabled: undefined, typechainTarget: undefined, typechainOutdir: undefined },
+        defaults: {},
+        props: TypechainQuestions,
+      },
+      interactive,
+    );
     compilerOptions.typechain = { enabled: typechainEnabled };
     if (typechainEnabled) {
       Object.assign(compilerOptions.typechain, { outDir: typechainOutdir, target: typechainTarget });
