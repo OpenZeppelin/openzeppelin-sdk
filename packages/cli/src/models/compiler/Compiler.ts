@@ -1,5 +1,5 @@
 import { execFile as callbackExecFile, ExecException } from 'child_process';
-import { Loggy } from '@openzeppelin/upgrades';
+import { Loggy, Contracts } from '@openzeppelin/upgrades';
 import Truffle from '../config/TruffleConfig';
 import { compileProject, ProjectCompileResult } from './solidity/SolidityProjectCompiler';
 import { ProjectCompilerOptions } from './ProjectCompilerOptions';
@@ -25,6 +25,8 @@ export async function compile(
       enabled: false,
       runs: 200,
     },
+    inputDir: Contracts.getLocalContractsDir(),
+    outputDir: Contracts.getLocalBuildDir(),
   };
   merge(resolvedOptions, projectFile.compilerOptions, compilerOptions);
 
