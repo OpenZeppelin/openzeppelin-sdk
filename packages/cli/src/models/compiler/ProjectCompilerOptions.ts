@@ -2,8 +2,8 @@ import { CompilerOptions } from './solidity/SolidityContractsCompiler';
 
 export interface TypechainOptions {
   enabled: boolean;
-  outDir: string;
-  target: string;
+  outDir?: string;
+  target?: string;
 }
 
 export interface ProjectCompilerOptions extends CompilerOptions {

@@ -18,6 +18,8 @@ const register: (program: any) => any = program =>
     .description(description)
     .option('--publish', 'automatically publishes your project upon pushing it to a network')
     .option('--force', 'overwrite existing project if there is one')
+    .option('--typechain <target>', 'enable typechain support with specified target (web3-v1, ethers, or truffle)')
+    .option('--typechain-outdir <path>', 'output directory for typechain compilation (defaults to types/contracts)')
     .option('--link <dependency>', 'link to a dependency')
     .option('--no-install', 'skip installing packages dependencies locally')
     .withPushOptions()
@@ -25,9 +27,9 @@ const register: (program: any) => any = program =>
     .action(action);
 
 async function action(projectName: string, version: string, options: any): Promise<void> {
-  const { publish, force, link, install: installDependencies, interactive } = options;
+  const { publish, force, link, install: installDependencies, interactive, typechainOutdir, typechain } = options;
 
-  const args = { name: projectName, version };
+  const args = { name: projectName, version, typechainEnabled: (typechain ? true : typechain), typechainTarget: typechain, typechainOutdir };
   const props = getCommandProps();
   const defaults = FileSystem.parseJsonIfExists('package.json') || { version: '1.0.0' };
   const prompted = await promptIfNeeded({ args, defaults, props }, interactive);
@@ -65,6 +67,29 @@ function getCommandProps(): InquirerQuestions {
         return `Invalid semantic version: ${input}`;
       },
     },
+    typechainEnabled: {
+      message: 'Enable typechain support?',
+      type: 'confirm',
+      default: true,
+      when: () => FileSystem.exists('tsconfig.json')
+    },
+    typechainTarget: {
+      message: 'Typechain compilation target',
+      type: 'list',
+      choices: [
+        { name: 'web3-v1 compatible', value: 'web3-v1' },
+        { name: 'truffle-contract compatible', value: 'truffle' },
+        { name: 'ethers.js compatible', value: 'ethers' }
+      ],
+      when: ({ typechainEnabled }) => typechainEnabled
+    },
+    typechainOutdir: {
+      message: 'Typechain output directory',
+      type: 'input',
+      validate: notEmpty,
+      default: './types/contracts/',
+      when: ({ typechainEnabled }) => typechainEnabled
+    }
   };
 }
 
