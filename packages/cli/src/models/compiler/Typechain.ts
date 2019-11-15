@@ -1,14 +1,9 @@
 import { mkdirpSync } from 'fs-extra';
 import path from 'path';
+import { tsGenerator } from 'ts-generator';
+import { TypeChain as typeChain } from 'typechain/dist/TypeChain';
 
 export default async function typechain(files: string, outDir: string, target: string): Promise<void> {
-  checkModule();
-
-  /* eslint-disable @typescript-eslint/no-var-requires */
-  const { tsGenerator } = require('ts-generator');
-  const { TypeChain: typeChain } = require('typechain/dist/TypeChain');
-  /* eslint-enable @typescript-eslint/no-var-requires */
-
   const cwd = process.cwd();
   mkdirpSync(outDir);
 
@@ -26,12 +21,4 @@ export default async function typechain(files: string, outDir: string, target: s
       },
     }),
   );
-}
-
-function checkModule() {
-  try {
-    require.resolve('typechain');
-  } catch {
-    throw new Error("Could not find module 'typechain'. Please install it to support typescript contract wrappers.");
-  }
 }

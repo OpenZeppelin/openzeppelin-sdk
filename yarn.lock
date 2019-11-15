@@ -12275,6 +12275,13 @@ type@^1.0.1:
   resolved "https://registry.yarnpkg.com/type/-/type-1.2.0.tgz#848dd7698dafa3e54a6c479e759c4bc3f18847a0"
   integrity sha512-+5nt5AAniqsCnu2cEQQdpzCAh33kVx8n0VoFidKpB1dVVLAN/F+bgVOqOJqOnEnrhp222clB5p3vUlD+1QAnfg==
 
+typechain-target-truffle@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/typechain-target-truffle/-/typechain-target-truffle-1.0.0.tgz#57e6cd2ea582d94b4b4a2a4626b3b21e42662a82"
+  integrity sha512-oacoGf9sBd29GDbf1DC2cE2V1JYvmhYz541zhwYBlbLH9i4mSzlQChDxYibFaifVEKPdZ4eJ+zz23lZ/DsNyYw==
+  dependencies:
+    lodash "^4.17.15"
+
 typechain-target-web3-v1@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/typechain-target-web3-v1/-/typechain-target-web3-v1-1.0.0.tgz#45dc6a8cbf2bd0889d42ef3139c386b01cc8f687"
