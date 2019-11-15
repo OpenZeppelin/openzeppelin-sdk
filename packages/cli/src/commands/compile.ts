@@ -1,6 +1,6 @@
 import { compile } from '../models/compiler/Compiler';
 import { CompileParams } from '../scripts/interfaces';
-import { ProjectCompilerOptions } from '../models/compiler/solidity/SolidityProjectCompiler';
+import { ProjectCompilerOptions } from '../models/compiler/ProjectCompilerOptions';
 import Telemetry from '../telemetry';
 
 const name = 'compile';

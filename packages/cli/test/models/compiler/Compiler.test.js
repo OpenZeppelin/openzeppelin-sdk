@@ -5,14 +5,20 @@ import sinon from 'sinon';
 import Truffle from '../../../src/models/config/TruffleConfig';
 import * as Compiler from '../../../src/models/compiler/Compiler';
 import ProjectFile from '../../../src/models/files/ProjectFile';
+import path from 'path';
+import { FileSystem } from '@openzeppelin/upgrades';
+import fs from 'fs';
 
 describe('Compiler', function() {
   beforeEach('setup', function() {
     Compiler.resetState();
 
-    this.solcCompile = sinon
-      .stub(Compiler, 'compileWithSolc')
-      .callsFake(({ version }) => Promise.resolve({ compilerVersion: { version: version || '0.5.6' } }));
+    this.solcCompile = sinon.stub(Compiler, 'compileWithSolc').callsFake(({ version }) =>
+      Promise.resolve({
+        compilerVersion: { version: version || '0.5.6' },
+        artifacts: [{ contractName: 'GreeterLib' }],
+      }),
+    );
     this.truffleCompile = sinon.stub(Compiler, 'compileWithTruffle');
     this.isTruffleConfig = sinon.stub(Truffle, 'isTruffleProject').returns(false);
     this.projectFile = new ProjectFile('test/mocks/packages/package-empty-lite.zos.json');
@@ -23,7 +29,7 @@ describe('Compiler', function() {
     sinon.restore();
   });
 
-  it('compiles with zos if explicitly set', async function() {
+  it('compiles with openzeppelin if explicitly set', async function() {
     await this.compile({ manager: 'openzeppelin' });
     this.solcCompile.should.have.been.calledOnce;
   });
@@ -37,7 +43,7 @@ describe('Compiler', function() {
     await this.compile({ manager: 'foo' }).should.be.rejectedWith(/Unknown compiler manager/);
   });
 
-  it('compiles with zos if set in local config', async function() {
+  it('compiles with openzeppelin if set in local config', async function() {
     this.projectFile.data.compiler = { manager: 'openzeppelin' };
     await this.compile();
     this.solcCompile.should.have.been.calledOnce;
@@ -49,7 +55,7 @@ describe('Compiler', function() {
     this.truffleCompile.should.have.been.calledOnce;
   });
 
-  it('compiles with zos by default', async function() {
+  it('compiles with openzeppelin by default', async function() {
     await this.compile();
     this.solcCompile.should.have.been.calledOnce;
   });
@@ -93,5 +99,33 @@ describe('Compiler', function() {
     await this.compile();
     await this.compile({}, true);
     this.solcCompile.should.have.been.calledTwice;
+  });
+
+  describe('typechain', function() {
+    const testRoot = path.resolve(__dirname, '../../../test/');
+    const artifactsDir = path.join(testRoot, 'mocks', 'mock-stdlib', 'build', 'contracts');
+    const typechainOutdir = path.join(testRoot, 'tmp', 'typechain');
+
+    const typechain = {
+      enabled: true,
+      target: 'web3-v1',
+      outDir: typechainOutdir,
+    };
+
+    afterEach('cleanup test output dir', function() {
+      FileSystem.removeTree(typechainOutdir);
+    });
+
+    it('runs typechain in all files', async function() {
+      await this.compile({ manager: 'truffle', outputDir: artifactsDir, typechain });
+      fs.existsSync(path.join(typechainOutdir, 'GreeterLib.d.ts')).should.be.true;
+      fs.existsSync(path.join(typechainOutdir, 'GreeterImpl.d.ts')).should.be.true;
+    });
+
+    it('runs typechain in compiled files only', async function() {
+      await this.compile({ manager: 'openzeppelin', outputDir: artifactsDir, typechain });
+      fs.existsSync(path.join(typechainOutdir, 'GreeterLib.d.ts')).should.be.true;
+      fs.existsSync(path.join(typechainOutdir, 'GreeterImpl.d.ts')).should.be.false;
+    });
   });
 });

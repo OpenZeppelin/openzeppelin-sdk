@@ -8,7 +8,7 @@ import Dependency from '../dependency/Dependency';
 import { MANIFEST_VERSION, checkVersion } from './ManifestVersion';
 import { OPEN_ZEPPELIN_FOLDER } from './constants';
 import NetworkFile from './NetworkFile';
-import { ProjectCompilerOptions } from '../compiler/solidity/SolidityProjectCompiler';
+import { ProjectCompilerOptions } from '../compiler/ProjectCompilerOptions';
 
 interface ConfigFileCompilerOptions {
   manager: string;
