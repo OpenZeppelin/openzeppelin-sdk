@@ -33,7 +33,7 @@ async function action(projectName: string, version: string, options: any): Promi
   const args = {
     name: projectName,
     version,
-    typechainEnabled: typechain ? true : typechain,
+    typechainEnabled: typechain ? true : typechain, // keep undefined and false values separate, since undefined means that the user hasn't chosen, and false means they don't want to use it
     typechainTarget: typechain,
     typechainOutdir,
   };
