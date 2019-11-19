@@ -17,7 +17,7 @@ const register: (program: any) => any = program =>
     .command(signature, undefined, { noHelp: true })
     .usage('<project-name> [version]')
     .description(description)
-    .option('--publish', 'automatically publishes your project upon pushing it to a network')
+    .option('--publish', 'automatically publish your project upon pushing it to a network')
     .option('--force', 'overwrite existing project if there is one')
     .option('--typechain <target>', 'enable typechain support with specified target (web3-v1, ethers, or truffle)')
     .option('--typechain-outdir <path>', 'set output directory for typechain compilation (defaults to types/contracts)')
