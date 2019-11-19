@@ -20,7 +20,7 @@ const register: (program: any) => any = program =>
     .option('--publish', 'automatically publishes your project upon pushing it to a network')
     .option('--force', 'overwrite existing project if there is one')
     .option('--typechain <target>', 'enable typechain support with specified target (web3-v1, ethers, or truffle)')
-    .option('--typechain-outdir <path>', 'output directory for typechain compilation (defaults to types/contracts)')
+    .option('--typechain-outdir <path>', 'set output directory for typechain compilation (defaults to types/contracts)')
     .option('--link <dependency>', 'link to a dependency')
     .option('--no-install', 'skip installing packages dependencies locally')
     .withPushOptions()
