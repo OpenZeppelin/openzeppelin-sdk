@@ -3,7 +3,6 @@
 [![standard-readme compliant](https://img.shields.io/badge/readme%20style-standard-brightgreen.svg)](https://github.com/RichardLitt/standard-readme)
 [![NPM Package](https://img.shields.io/npm/v/@openzeppelin/upgrades.svg?style=flat-square)](https://www.npmjs.org/package/@openzeppelin/upgrades)
 [![CircleCI](https://circleci.com/gh/OpenZeppelin/openzeppelin-sdk/tree/master.svg?style=shield)](https://circleci.com/gh/OpenZeppelin/openzeppelin-sdk/tree/master)
-[![Coverage Status](https://coveralls.io/repos/github/zeppelinos/zos-lib/badge.svg?branch=master)](https://coveralls.io/github/zeppelinos/zos-lib?branch=master)
 
 > JavaScript library for the OpenZeppelin smart contract platform.
 

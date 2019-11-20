@@ -1,7 +1,8 @@
 'use strict';
 require('../setup');
 
-import utils from 'web3-utils';
+import { accounts } from '@openzeppelin/test-environment';
+
 import Contracts from '../../src/artifacts/Contracts';
 import encodeCall from '../../src/helpers/encodeCall';
 import assertRevert from '../../src/test/helpers/assertRevert';
@@ -12,8 +13,8 @@ const ImplV2 = Contracts.getFromLocal('DummyImplementationV2');
 const ProxyAdmin = Contracts.getFromLocal('ProxyAdmin');
 const AdminUpgradeabilityProxy = Contracts.getFromLocal('AdminUpgradeabilityProxy');
 
-contract('ProxyAdmin', function(accounts) {
-  const [_, proxyAdminOwner, newAdmin, anotherAccount] = accounts.map(utils.toChecksumAddress);
+describe('ProxyAdmin', function() {
+  const [proxyAdminOwner, newAdmin, anotherAccount] = accounts;
 
   before('set implementations', async function() {
     this.implementationV1 = await ImplV1.new();

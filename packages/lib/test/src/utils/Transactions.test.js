@@ -1,6 +1,8 @@
 'use strict';
 require('../../setup');
 
+import { accounts } from '@openzeppelin/test-environment';
+
 import times from 'lodash.times';
 import sinon from 'sinon';
 import axios from 'axios';
@@ -16,7 +18,7 @@ import Transactions, { state } from '../../../src/utils/Transactions';
 const DEFAULT_GAS = 6721975;
 const DEFAULT_PARAMS = [42, 'foo', [1, 2, 3]];
 
-contract('Transactions', function(accounts) {
+describe('Transactions', function() {
   accounts = accounts.map(utils.toChecksumAddress);
   const [_account1, account2] = accounts;
 
@@ -150,7 +152,7 @@ contract('Transactions', function(accounts) {
 
           it('retries estimating gas up to 3 times', async function() {
             const stub = sinon.stub(Transactions, '_calculateActualGas');
-            _.times(4, i =>
+            times(4, i =>
               stub.onCall(i).throws('Error', 'gas required exceeds allowance or always failing transaction'),
             );
 
@@ -284,7 +286,7 @@ contract('Transactions', function(accounts) {
 
           it('retries estimating gas', async function() {
             const stub = sinon.stub(ZWeb3, 'estimateGas');
-            _.times(3, i =>
+            times(3, i =>
               stub.onCall(i).throws('Error', 'gas required exceeds allowance or always failing transaction'),
             );
             stub.returns(800000);
@@ -295,7 +297,7 @@ contract('Transactions', function(accounts) {
 
           it('retries estimating gas up to 3 times', async function() {
             const stub = sinon.stub(ZWeb3, 'estimateGas');
-            _.times(4, i =>
+            times(4, i =>
               stub.onCall(i).throws('Error', 'gas required exceeds allowance or always failing transaction'),
             );
             stub.returns(800000);
@@ -458,7 +460,7 @@ contract('Transactions', function(accounts) {
 
           it('retries estimating gas', async function() {
             const stub = sinon.stub(ZWeb3, 'estimateGas');
-            _.times(3, i =>
+            times(3, i =>
               stub.onCall(i).throws('Error', 'gas required exceeds allowance or always failing transaction'),
             );
             stub.returns(800000);
@@ -470,7 +472,7 @@ contract('Transactions', function(accounts) {
 
           it('retries estimating gas up to 3 times', async function() {
             const stub = sinon.stub(ZWeb3, 'estimateGas');
-            _.times(4, i =>
+            times(4, i =>
               stub.onCall(i).throws('Error', 'gas required exceeds allowance or always failing transaction'),
             );
             stub.returns(800000);
@@ -713,7 +715,7 @@ contract('Transactions', function(accounts) {
 
             it('retries estimating gas', async function() {
               const stub = sinon.stub(ZWeb3, 'estimateGas');
-              _.times(3, i =>
+              times(3, i =>
                 stub.onCall(i).throws('Error', 'gas required exceeds allowance or always failing transaction'),
               );
               stub.returns(800000);
@@ -724,7 +726,7 @@ contract('Transactions', function(accounts) {
 
             it('retries estimating gas up to 3 times', async function() {
               const stub = sinon.stub(ZWeb3, 'estimateGas');
-              _.times(4, i =>
+              times(4, i =>
                 stub.onCall(i).throws('Error', 'gas required exceeds allowance or always failing transaction'),
               );
               stub.returns(800000);

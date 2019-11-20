@@ -4,7 +4,7 @@ require('../../setup');
 import { validate as validateContract } from '../../../src/validations';
 import Contracts from '../../../src/artifacts/Contracts';
 
-contract('Validations', function() {
+describe('Validations', function() {
   it('should warn when adding a contract with a constructor', async function() {
     validate('WithConstructor').hasConstructor.should.be.true;
   });
