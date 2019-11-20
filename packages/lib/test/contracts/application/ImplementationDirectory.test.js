@@ -2,18 +2,19 @@
 
 require('../../setup');
 
+import { accounts } from '@openzeppelin/test-environment';
+
 import Contracts from '../../../src/artifacts/Contracts';
 import { ZERO_ADDRESS } from '../../../src/utils/Addresses';
 import assertRevert from '../../../src/test/helpers/assertRevert';
 import shouldBehaveLikeOwnable from '../../../src/test/behaviors/Ownable';
-import utils from 'web3-utils';
+
+import { assert, expect } from 'chai';
 
 const DummyImplementation = Contracts.getFromLocal('DummyImplementation');
 const ImplementationDirectory = Contracts.getFromLocal('ImplementationDirectory');
 
-contract('ImplementationDirectory', function(accounts) {
-  accounts = accounts.map(utils.toChecksumAddress); // Required by Web3 v1.x.
-
+describe('ImplementationDirectory', function() {
   const [_, owner, anotherAddress] = accounts;
 
   beforeEach(async function() {

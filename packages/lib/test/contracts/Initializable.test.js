@@ -4,13 +4,15 @@ require('../setup');
 import Contracts from '../../src/artifacts/Contracts';
 import assertRevert from '../../src/test/helpers/assertRevert';
 
+import { assert } from 'chai';
+
 const InitializableMock = Contracts.getFromLocal('InitializableMock');
 const SampleMother = Contracts.getFromLocal('SampleMother');
 const SampleGramps = Contracts.getFromLocal('SampleGramps');
 const SampleFather = Contracts.getFromLocal('SampleFather');
 const SampleChild = Contracts.getFromLocal('SampleChild');
 
-contract('Initializable', function() {
+describe('Initializable', function() {
   describe('basic testing without inheritance', function() {
     beforeEach('deploying', async function() {
       this.contract = await InitializableMock.new();

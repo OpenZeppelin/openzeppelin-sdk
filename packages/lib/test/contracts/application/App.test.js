@@ -1,12 +1,13 @@
 'use strict';
 require('../../setup');
 
+import { accounts } from '@openzeppelin/test-environment';
+
 import Contracts from '../../../src/artifacts/Contracts';
 import shouldManageProxies from './ManageProxies.behavior';
 import shouldManagePackages from './ManagePackages.behavior';
 import shouldBehaveLikeOwnable from '../../../src/test/behaviors/Ownable';
 import { toSemanticVersion } from '../../../src/utils/Semver';
-import utils from 'web3-utils';
 
 const Package = Contracts.getFromLocal('Package');
 const ImplementationDirectory = Contracts.getFromLocal('ImplementationDirectory');
@@ -14,9 +15,7 @@ const AppContract = Contracts.getFromLocal('App');
 const DummyImplementation = Contracts.getFromLocal('DummyImplementation');
 const DummyImplementationV2 = Contracts.getFromLocal('DummyImplementationV2');
 
-contract('App', accounts => {
-  accounts = accounts.map(utils.toChecksumAddress); // Required by Web3 v1.x.
-
+describe('App', function() {
   const [_, appOwner, packageOwner, directoryOwner, anotherAccount] = accounts;
 
   // eslint-disable-next-line @typescript-eslint/camelcase

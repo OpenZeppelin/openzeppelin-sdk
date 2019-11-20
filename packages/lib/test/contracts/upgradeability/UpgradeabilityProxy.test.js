@@ -2,7 +2,7 @@
 
 require('../../setup');
 
-import utils from 'web3-utils';
+import { accounts } from '@openzeppelin/test-environment';
 
 import Contracts from '../../../src/artifacts/Contracts';
 import shouldBehaveLikeUpgradeabilityProxy from './UpgradeabilityProxy.behaviour';
@@ -12,8 +12,7 @@ import { DEPRECATED_IMPLEMENTATION_LABEL, IMPLEMENTATION_LABEL } from '../../../
 const UpgradeabilityProxy = Contracts.getFromLocal('UpgradeabilityProxy');
 const ZosUpgradeabilityProxy = Contracts.getFromLocal('ZosUpgradeabilityProxy');
 
-contract('UpgradeabilityProxy', function(accounts) {
-  accounts = accounts.map(utils.toChecksumAddress);
+describe('UpgradeabilityProxy', function() {
   const [_, proxyAdminOwner] = accounts;
   const labels = { label: IMPLEMENTATION_LABEL, deprecatedLabel: DEPRECATED_IMPLEMENTATION_LABEL };
 
