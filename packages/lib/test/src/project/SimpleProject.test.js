@@ -1,19 +1,19 @@
 'use strict';
 require('../../setup');
 
+import { accounts } from '@openzeppelin/test-environment';
+
 import SimpleProject from '../../../src/project/SimpleProject';
 import shouldManageProxies from './ProxyProject.behaviour';
 import shouldManageDependencies from './DependenciesProject.behaviour';
 import shouldManageImplementations from './Implementations.behaviour';
 import noop from 'lodash.noop';
 import Contracts from '../../../src/artifacts/Contracts';
-import utils from 'web3-utils';
 
 const ImplV1 = Contracts.getFromLocal('DummyImplementation');
 const ImplV2 = Contracts.getFromLocal('DummyImplementationV2');
 
-contract('SimpleProject', function(accounts) {
-  accounts = accounts.map(utils.toChecksumAddress);
+describe('SimpleProject', function() {
   const [_, owner, another] = accounts;
   const name = 'MyProject';
 

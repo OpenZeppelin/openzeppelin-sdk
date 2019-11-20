@@ -4,6 +4,8 @@ import BN from 'bignumber.js';
 import zipWith from 'lodash.zipwith';
 import encodeCall, { decodeCall } from '../../../src/helpers/encodeCall';
 
+import { expect } from 'chai';
+
 const FUNCTION_NAME = 'myFunction';
 
 describe('encodeCall helper', () => {

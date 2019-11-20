@@ -1,15 +1,14 @@
 'use strict';
 require('../../setup');
 
+import { accounts } from '@openzeppelin/test-environment';
+
 import Contracts from '../../../src/artifacts/Contracts';
 import ImplementationDirectory from '../../../src/application/ImplementationDirectory';
-import utils from 'web3-utils';
 
 const DummyImplementationV2 = Contracts.getFromLocal('DummyImplementationV2');
 
-contract('ImplementationDirectory', function(accounts) {
-  accounts = accounts.map(utils.toChecksumAddress);
-
+describe('ImplementationDirectory', function() {
   const [_, owner] = accounts;
   const txParams = { from: owner };
 

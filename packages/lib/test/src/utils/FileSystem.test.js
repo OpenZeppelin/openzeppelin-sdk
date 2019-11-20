@@ -4,7 +4,7 @@ require('../../setup');
 import tmp from 'tmp';
 import FileSystem from '../../../src/utils/FileSystem';
 
-contract('FileSystem', () => {
+describe('FileSystem', () => {
   describe('remove file', function() {
     it('can remove a file', async function() {
       FileSystem.write('tmp', 'dummy');
