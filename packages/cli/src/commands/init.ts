@@ -6,6 +6,7 @@ import { FileSystem } from '@openzeppelin/upgrades';
 import ProjectFile from '../models/files/ProjectFile';
 import { notEmpty } from '../prompts/validators';
 import Telemetry from '../telemetry';
+import { TypechainQuestions } from '../prompts/typechain';
 
 const name = 'init';
 const signature = `${name} [project-name] [version]`;
@@ -16,8 +17,10 @@ const register: (program: any) => any = program =>
     .command(signature, undefined, { noHelp: true })
     .usage('<project-name> [version]')
     .description(description)
-    .option('--publish', 'automatically publishes your project upon pushing it to a network')
+    .option('--publish', 'automatically publish your project upon pushing it to a network')
     .option('--force', 'overwrite existing project if there is one')
+    .option('--typechain <target>', 'enable typechain support with specified target (web3-v1, ethers, or truffle)')
+    .option('--typechain-outdir <path>', 'set output directory for typechain compilation (defaults to types/contracts)')
     .option('--link <dependency>', 'link to a dependency')
     .option('--no-install', 'skip installing packages dependencies locally')
     .withPushOptions()
@@ -25,9 +28,15 @@ const register: (program: any) => any = program =>
     .action(action);
 
 async function action(projectName: string, version: string, options: any): Promise<void> {
-  const { publish, force, link, install: installDependencies, interactive } = options;
+  const { publish, force, link, install: installDependencies, interactive, typechainOutdir, typechain } = options;
 
-  const args = { name: projectName, version };
+  const args = {
+    name: projectName,
+    version,
+    typechainEnabled: typechain ? true : typechain, // keep undefined and false values separate, since undefined means that the user hasn't chosen, and false means they don't want to use it
+    typechainTarget: typechain,
+    typechainOutdir,
+  };
   const props = getCommandProps();
   const defaults = FileSystem.parseJsonIfExists('package.json') || { version: '1.0.0' };
   const prompted = await promptIfNeeded({ args, defaults, props }, interactive);
@@ -65,6 +74,7 @@ function getCommandProps(): InquirerQuestions {
         return `Invalid semantic version: ${input}`;
       },
     },
+    ...TypechainQuestions,
   };
 }
 

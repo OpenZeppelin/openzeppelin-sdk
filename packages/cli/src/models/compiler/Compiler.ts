@@ -1,11 +1,13 @@
 import { execFile as callbackExecFile, ExecException } from 'child_process';
-import { Loggy } from '@openzeppelin/upgrades';
+import { Loggy, Contracts } from '@openzeppelin/upgrades';
 import Truffle from '../config/TruffleConfig';
-import { compileProject, ProjectCompilerOptions, ProjectCompileResult } from './solidity/SolidityProjectCompiler';
+import { compileProject, ProjectCompileResult } from './solidity/SolidityProjectCompiler';
+import { ProjectCompilerOptions } from './ProjectCompilerOptions';
 import findUp from 'find-up';
 import ProjectFile from '../files/ProjectFile';
 import { promisify } from 'util';
 import merge from 'lodash.merge';
+import typechain from './Typechain';
 
 const state = { alreadyCompiled: false };
 const execFile = promisify(callbackExecFile);
@@ -23,6 +25,8 @@ export async function compile(
       enabled: false,
       runs: 200,
     },
+    inputDir: Contracts.getLocalContractsDir(),
+    outputDir: Contracts.getLocalBuildDir(),
   };
   merge(resolvedOptions, projectFile.compilerOptions, compilerOptions);
 
@@ -42,6 +46,14 @@ export async function compile(
   const compileVersion = compileResult && compileResult.compilerVersion && compileResult.compilerVersion.version;
   const compileVersionOptions = compileVersion ? { version: compileVersion } : null;
 
+  // Run typechain if requested
+  if (resolvedOptions.typechain && resolvedOptions.typechain.enabled) {
+    const result = compileResult as ProjectCompileResult;
+    const filesList = result && result.artifacts ? result.artifacts.map(c => c.contractName).join(',') : '*';
+    const filesGlob = `${resolvedOptions.outputDir}/${filesList}.json`;
+    await typechain(filesGlob, resolvedOptions.typechain.outDir, resolvedOptions.typechain.target);
+  }
+
   // If compiled successfully, write back compiler settings to project.json to persist them
   projectFile.setCompilerOptions({
     ...resolvedOptions,
@@ -50,6 +62,7 @@ export async function compile(
   });
   if (projectFile.exists()) projectFile.write();
 
+  // Avoid multiple compilations per CLI run
   state.alreadyCompiled = true;
 }
 

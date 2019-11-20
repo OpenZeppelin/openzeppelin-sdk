@@ -8,7 +8,7 @@ import Dependency from '../dependency/Dependency';
 import { MANIFEST_VERSION, checkVersion } from './ManifestVersion';
 import { OPEN_ZEPPELIN_FOLDER } from './constants';
 import NetworkFile from './NetworkFile';
-import { ProjectCompilerOptions } from '../compiler/solidity/SolidityProjectCompiler';
+import { ProjectCompilerOptions } from '../compiler/ProjectCompilerOptions';
 
 interface ConfigFileCompilerOptions {
   manager: string;
@@ -21,6 +21,11 @@ interface ConfigFileCompilerOptions {
       enabled: boolean;
       runs?: string;
     };
+  };
+  typechain: {
+    enabled: boolean;
+    outDir?: string;
+    target?: string;
   };
 }
 
@@ -164,6 +169,7 @@ export default class ProjectFile {
     const inputDir = config && config.contractsDir;
     const outputDir = config && config.artifactsDir;
     const compilerSettings = config && config.compilerSettings;
+    const typechain = config && config.typechain;
     const evmVersion = compilerSettings && compilerSettings.evmVersion;
     const optimizer = compilerSettings && compilerSettings.optimizer;
 
@@ -177,6 +183,7 @@ export default class ProjectFile {
         enabled: optimizer && optimizer.enabled,
         runs: optimizer && optimizer.runs && parseInt(optimizer.runs),
       },
+      typechain,
     };
   }
 
@@ -187,7 +194,7 @@ export default class ProjectFile {
   }
 
   public setCompilerOptions(options: ProjectCompilerOptions): void {
-    const { manager, version, outputDir, inputDir, evmVersion, optimizer } = options;
+    const { manager, version, outputDir, inputDir, evmVersion, optimizer, typechain } = options;
     const configOptions: ConfigFileCompilerOptions = {
       manager,
       solcVersion: version,
@@ -200,6 +207,7 @@ export default class ProjectFile {
           runs: optimizer && optimizer.runs && optimizer.runs.toString(),
         },
       },
+      typechain,
     };
 
     this.data.compiler =
