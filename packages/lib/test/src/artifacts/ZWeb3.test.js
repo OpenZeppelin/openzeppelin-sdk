@@ -237,8 +237,11 @@ describe('ZWeb3', function() {
       });
     });
 
-    context.skip('when initializing ZWeb3 with an http url', function() {
+    context('when initializing ZWeb3 with an http url', function() {
       beforeEach('initialize web3', async function() {
+        const hostURL = provider.wrappedProvider.host;
+        expect(hostURL).to.have.string('http://');
+
         ZWeb3.initialize(provider.wrappedProvider.host);
       });
 
