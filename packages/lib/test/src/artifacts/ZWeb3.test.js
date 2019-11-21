@@ -1,6 +1,6 @@
 require('../../setup');
 
-import { accounts, defaultSender, provider } from '@openzeppelin/test-environment';
+import { accounts, defaultSender, provider, web3 } from '@openzeppelin/test-environment';
 
 import sinon from 'sinon';
 import ZWeb3 from '../../../src/artifacts/ZWeb3';
@@ -52,10 +52,10 @@ describe('ZWeb3', function() {
       defaultAccount.should.be.eq(defaultSender);
     });
 
-    it.skip('tells the balanace of a given account', async function() {
+    it('tells the balanace of a given account', async function() {
       const balance = await ZWeb3.getBalance(account);
       balance.should.be.an('string');
-      balance.should.equal((100e18).toString());
+      balance.should.equal(await web3.eth.getBalance(account));
     });
 
     it('tells the name of the current node', async function() {
