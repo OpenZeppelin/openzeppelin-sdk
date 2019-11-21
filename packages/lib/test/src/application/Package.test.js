@@ -10,7 +10,7 @@ import ImplementationDirectory from '../../../src/application/ImplementationDire
 const DummyImplementation = Contracts.getFromLocal('DummyImplementation');
 
 describe('Package', function() {
-  const [_, owner] = accounts;
+  const [owner] = accounts;
 
   const txParams = { from: owner };
   const contractName = 'DummyImplementation';

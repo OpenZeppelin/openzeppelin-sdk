@@ -7,7 +7,7 @@ import PackageProject from '../../../src/project/PackageProject';
 import shouldBehaveLikePackageProject from './PackageProject.behavior';
 
 describe('PackageProject', function() {
-  const [_, owner] = accounts;
+  const [owner] = accounts;
   const version = '0.2.0';
 
   beforeEach('deploying', async function() {

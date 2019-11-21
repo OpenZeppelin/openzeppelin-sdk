@@ -9,7 +9,7 @@ import ImplementationDirectory from '../../../src/application/ImplementationDire
 const DummyImplementationV2 = Contracts.getFromLocal('DummyImplementationV2');
 
 describe('ImplementationDirectory', function() {
-  const [_, owner] = accounts;
+  const [owner] = accounts;
   const txParams = { from: owner };
 
   beforeEach('deploying implementation directory', async function() {

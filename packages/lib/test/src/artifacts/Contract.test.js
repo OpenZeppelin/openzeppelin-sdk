@@ -13,7 +13,7 @@ const ContractWithConstructorImplementation = Contracts.getFromLocal('WithConstr
 const InitializableMock = Contracts.getFromLocal('InitializableMock');
 
 describe('Contract', function() {
-  const [_, account] = accounts;
+  const [account] = accounts;
   const txParams = { from: account };
 
   describe('methods', function() {

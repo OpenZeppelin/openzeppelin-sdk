@@ -15,7 +15,7 @@ const DummyImplementation = Contracts.getFromLocal('DummyImplementation');
 const ImplementationDirectory = Contracts.getFromLocal('ImplementationDirectory');
 
 describe('ImplementationDirectory', function() {
-  const [_, owner, anotherAddress] = accounts;
+  const [owner, anotherAddress] = accounts;
 
   beforeEach(async function() {
     // eslint-disable-next-line @typescript-eslint/camelcase

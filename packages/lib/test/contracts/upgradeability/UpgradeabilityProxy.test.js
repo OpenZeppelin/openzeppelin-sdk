@@ -13,7 +13,7 @@ const UpgradeabilityProxy = Contracts.getFromLocal('UpgradeabilityProxy');
 const ZosUpgradeabilityProxy = Contracts.getFromLocal('ZosUpgradeabilityProxy');
 
 describe('UpgradeabilityProxy', function() {
-  const [_, proxyAdminOwner] = accounts;
+  const [proxyAdminOwner] = accounts;
   const labels = { label: IMPLEMENTATION_LABEL, deprecatedLabel: DEPRECATED_IMPLEMENTATION_LABEL };
 
   const createProxy = async function(implementation, _admin, initData, opts) {

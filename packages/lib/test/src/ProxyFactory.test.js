@@ -13,7 +13,7 @@ const ImplV1 = Contracts.getFromLocal('DummyImplementation');
 const ImplV2 = Contracts.getFromLocal('DummyImplementationV2');
 
 function behavesLikeCreate2ProxyFactory(accounts, user, createProxy) {
-  const [_, admin, anotherAdmin, anotherFrom] = accounts;
+  const [admin, anotherAdmin, anotherFrom] = accounts;
 
   const salt1 = '2';
   const salt2 = '4';

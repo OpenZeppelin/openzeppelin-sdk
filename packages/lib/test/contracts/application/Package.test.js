@@ -13,7 +13,7 @@ import { assert, expect } from 'chai';
 const Package = Contracts.getFromLocal('Package');
 
 describe('Package', () => {
-  const [_, owner, anotherAddress, contractAddress, anotherContractAddress] = accounts;
+  const [owner, anotherAddress, contractAddress, anotherContractAddress] = accounts;
 
   const version = [1, 0, 0];
   const anotherVersion = [2, 0, 0];

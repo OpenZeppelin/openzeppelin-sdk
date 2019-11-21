@@ -14,7 +14,7 @@ const ImplV2 = Contracts.getFromLocal('DummyImplementationV2');
 const ProxyAdminContract = Contracts.getFromLocal('ProxyAdmin');
 
 describe('ProxyAdmin class', function() {
-  const [_, proxyAdminOwner, newAdmin, newAdminOwner, otherAccount] = accounts;
+  const [proxyAdminOwner, newAdmin, newAdminOwner, otherAccount] = accounts;
   const version = '0.0.1';
   const contentURI = '0x10';
 

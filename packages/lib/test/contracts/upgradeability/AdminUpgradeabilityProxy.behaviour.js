@@ -33,7 +33,7 @@ const sendTransaction = (target, method, args, values, opts) => {
 };
 
 export default function shouldBehaveLikeAdminUpgradeabilityProxy(createProxy, accounts) {
-  const [_, proxyAdminAddress, proxyAdminOwner, anotherAccount] = accounts;
+  const [proxyAdminAddress, proxyAdminOwner, anotherAccount] = accounts;
 
   before(async function() {
     // eslint-disable-next-line @typescript-eslint/camelcase

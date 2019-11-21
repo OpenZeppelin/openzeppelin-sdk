@@ -16,7 +16,7 @@ const ImplementationDirectory = Contracts.getFromLocal('ImplementationDirectory'
 const ImplV1 = Contracts.getFromLocal('DummyImplementation');
 
 describe('migrator', function() {
-  const [_, owner, proxyAdminAddress, anotherAccount, anotherAddress] = accounts;
+  const [owner, proxyAdminAddress, anotherAccount, anotherAddress] = accounts;
   const EMPTY_INITIALIZATION_DATA = Buffer.from('');
 
   before('initialize logic contracts', async function() {

@@ -11,7 +11,7 @@ import BN from 'bignumber.js';
 import { expect } from 'chai';
 
 describe('ZWeb3', function() {
-  const [_, account, account1, account2] = accounts;
+  const [account, account1, account2] = accounts;
 
   before('deploy dummy instance', async function() {
     this.DummyImplementation = Contracts.getFromLocal('DummyImplementation');

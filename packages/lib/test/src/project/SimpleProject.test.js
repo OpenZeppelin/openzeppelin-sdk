@@ -14,7 +14,7 @@ const ImplV1 = Contracts.getFromLocal('DummyImplementation');
 const ImplV2 = Contracts.getFromLocal('DummyImplementationV2');
 
 describe('SimpleProject', function() {
-  const [_, owner, another] = accounts;
+  const [owner, another] = accounts;
   const name = 'MyProject';
 
   beforeEach('initializing', async function() {

@@ -16,7 +16,7 @@ const DummyImplementation = Contracts.getFromLocal('DummyImplementation');
 const DummyImplementationV2 = Contracts.getFromLocal('DummyImplementationV2');
 
 describe('App', function() {
-  const [_, appOwner, packageOwner, directoryOwner, anotherAccount] = accounts;
+  const [appOwner, packageOwner, directoryOwner, anotherAccount] = accounts;
 
   // eslint-disable-next-line @typescript-eslint/camelcase
   const version_0 = '1.0.0';

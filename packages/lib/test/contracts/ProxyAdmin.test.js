@@ -14,7 +14,7 @@ const ProxyAdmin = Contracts.getFromLocal('ProxyAdmin');
 const AdminUpgradeabilityProxy = Contracts.getFromLocal('AdminUpgradeabilityProxy');
 
 describe('ProxyAdmin', function() {
-  const [_, proxyAdminOwner, newAdmin, anotherAccount] = accounts;
+  const [proxyAdminOwner, newAdmin, anotherAccount] = accounts;
 
   before('set implementations', async function() {
     this.implementationV1 = await ImplV1.new();

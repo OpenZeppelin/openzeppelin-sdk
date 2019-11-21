@@ -18,7 +18,7 @@ const InitializableAdminUpgradeabilityProxy = Contracts.getFromLocal('Initializa
 const ZosInitializableAdminUpgradeabilityProxy = Contracts.getFromLocal('ZosInitializableAdminUpgradeabilityProxy');
 
 describe('InitializableAdminUpgradeabilityProxy', function() {
-  const [_, proxyAdminAddress, proxyAdminOwner] = accounts;
+  const [proxyAdminAddress, proxyAdminOwner] = accounts;
   const labels = { label: ADMIN_LABEL, deprecatedLabel: DEPRECATED_ADMIN_LABEL };
 
   const createProxy = async function(logic, admin, initData, opts) {

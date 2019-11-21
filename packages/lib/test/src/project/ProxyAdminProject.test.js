@@ -21,7 +21,7 @@ async function setImplementations() {
 }
 
 describe('ProxyAdminProject', function() {
-  const [_, proxyAdminOwner, another] = accounts;
+  const [proxyAdminOwner, another] = accounts;
   const name = 'MyProxyAdminProject';
   const txParams = { from: proxyAdminOwner };
 

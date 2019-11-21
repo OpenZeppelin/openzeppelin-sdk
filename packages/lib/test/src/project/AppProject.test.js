@@ -25,7 +25,7 @@ async function setImplementations() {
 }
 
 describe('AppProject', function() {
-  const [_, owner, another] = accounts;
+  const [owner, another] = accounts;
   const name = 'MyProject';
   const version = '0.2.0';
   const newVersion = '0.3.0';
