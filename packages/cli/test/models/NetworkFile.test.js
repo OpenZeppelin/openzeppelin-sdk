@@ -7,7 +7,7 @@ import NetworkFile from '../../src/models/files/NetworkFile';
 import ProjectFile from '../../src/models/files/ProjectFile';
 import { MANIFEST_VERSION } from '../../src/models/files/ManifestVersion';
 
-contract('NetworkFile', function() {
+describe('NetworkFile', function() {
   beforeEach('loads parent package file', function() {
     this.appProjectFile = new ProjectFile('test/mocks/packages/package-empty.zos.json');
   });

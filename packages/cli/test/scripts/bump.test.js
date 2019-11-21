@@ -6,7 +6,7 @@ import bump from '../../src/scripts/bump';
 import link from '../../src/scripts/link';
 import ProjectFile from '../../src/models/files/ProjectFile';
 
-contract('bump script', function() {
+describe('bump script', function() {
   const newVersion = '0.2.0';
 
   describe('on app', function() {

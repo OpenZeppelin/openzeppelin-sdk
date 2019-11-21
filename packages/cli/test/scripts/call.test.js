@@ -1,6 +1,8 @@
 'use strict';
 require('../setup');
+
 import utils from 'web3-utils';
+import { accounts } from '@openzeppelin/test-environment';
 
 import add from '../../src/scripts/add';
 import push from '../../src/scripts/push';
@@ -12,9 +14,9 @@ import CaptureLogs from '../helpers/captureLogs';
 import ProjectFile from '../../src/models/files/ProjectFile';
 import NetworkFile from '../../src/models/files/NetworkFile';
 
-contract('call script', function(accounts) {
+describe('call script', function() {
   accounts = accounts.map(utils.toChecksumAddress);
-  const [_skipped, account] = accounts;
+  const [account] = accounts;
   const txParams = { from: account };
   const network = 'test';
 

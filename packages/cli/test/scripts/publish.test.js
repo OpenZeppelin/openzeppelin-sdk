@@ -2,6 +2,7 @@
 require('../setup');
 
 import { App, Package, ImplementationDirectory, Proxy } from '@openzeppelin/upgrades';
+import { accounts } from '@openzeppelin/test-environment';
 
 import publish from '../../src/scripts/publish';
 import push from '../../src/scripts/push';
@@ -13,9 +14,9 @@ import utils from 'web3-utils';
 
 const should = require('chai').should();
 
-contract('publish script', function(accounts) {
+describe('publish script', function() {
   accounts = accounts.map(utils.toChecksumAddress);
-  const [_, owner] = accounts;
+  const [owner] = accounts;
 
   const network = 'test';
   const txParams = { from: owner };

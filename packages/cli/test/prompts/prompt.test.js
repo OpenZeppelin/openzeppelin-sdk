@@ -2,6 +2,7 @@
 
 require('../setup');
 import sinon from 'sinon';
+import { expect } from 'chai';
 
 import * as prompt from '../../src/prompts/prompt';
 

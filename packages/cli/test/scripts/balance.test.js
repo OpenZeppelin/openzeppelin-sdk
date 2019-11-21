@@ -3,6 +3,8 @@ require('../setup');
 
 import utils from 'web3-utils';
 import { ZWeb3, Contracts } from '@openzeppelin/upgrades';
+import { accounts } from '@openzeppelin/test-environment';
+
 import CaptureLogs from '../helpers/captureLogs';
 
 import balance from '../../src/scripts/balance';
@@ -10,8 +12,8 @@ import balance from '../../src/scripts/balance';
 const ERC20 = Contracts.getFromLocal('ERC20Fake');
 const ERC20Detailed = Contracts.getFromLocal('ERC20FakeDetailed');
 
-contract('balance script', function(accounts) {
-  const [_, accountAddress] = accounts.map(utils.toChecksumAddress);
+describe('balance script', function() {
+  const [accountAddress] = accounts.map(utils.toChecksumAddress);
 
   beforeEach('set logger captures', function() {
     this.logs = new CaptureLogs();

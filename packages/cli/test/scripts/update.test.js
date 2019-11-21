@@ -4,6 +4,8 @@ require('../setup');
 import mapKeys from 'lodash.mapkeys';
 import omit from 'lodash.omit';
 import { Contracts, Proxy } from '@openzeppelin/upgrades';
+import { accounts } from '@openzeppelin/test-environment';
+
 import CaptureLogs from '../helpers/captureLogs';
 
 import add from '../../src/scripts/add';
@@ -22,9 +24,9 @@ const ImplV1 = Contracts.getFromLocal('ImplV1');
 const GreeterV1 = Contracts.getFromNodeModules('mock-stdlib', 'GreeterImpl');
 const GreeterV2 = Contracts.getFromNodeModules('mock-stdlib-2', 'GreeterImpl');
 
-contract('update script', function(accounts) {
+describe('update script', function() {
   accounts = accounts.map(utils.toChecksumAddress);
-  const [_skipped, owner, anotherAccount] = accounts;
+  const [owner, anotherAccount] = accounts;
 
   const network = 'test';
   const version1 = '0.1.0';

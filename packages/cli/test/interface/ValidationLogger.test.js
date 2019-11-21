@@ -5,7 +5,7 @@ import CaptureLogs from '../helpers/captureLogs';
 import { Contracts, getStorageLayout, compareStorageLayouts, getBuildArtifacts } from '@openzeppelin/upgrades';
 import ValidationLogger from '../../src/interface/ValidationLogger';
 
-contract('ValidationLogger', function() {
+describe('ValidationLogger', function() {
   beforeEach('capturing log output', function() {
     this.logs = new CaptureLogs();
   });

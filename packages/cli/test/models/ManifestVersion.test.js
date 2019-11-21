@@ -4,7 +4,7 @@ import { checkVersion, isMigratableManifestVersion } from '../../src/models/file
 
 const projectFileName = 'project.json';
 
-contract('ManifestVersion', function() {
+describe('ManifestVersion', function() {
   describe('functions', function() {
     describe('checkVersion', function() {
       context('when latest version', function() {

@@ -1,6 +1,8 @@
 'use strict';
 require('../setup');
 
+import { expect } from 'chai';
+
 import session from '../../src/scripts/session';
 import Session, { DEFAULT_TX_TIMEOUT } from '../../src/models/network/Session';
 
