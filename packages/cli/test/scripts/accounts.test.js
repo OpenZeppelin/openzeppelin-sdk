@@ -8,7 +8,7 @@ import { defaultSender, accounts as accountList } from '@openzeppelin/test-envir
 import accounts from '../../src/scripts/accounts';
 import CaptureLogs from '../helpers/captureLogs';
 
-describe.only('accounts script', function() {
+describe('accounts script', function() {
   const network = 'test';
 
   beforeEach('caputre logs', function() {
