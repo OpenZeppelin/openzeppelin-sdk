@@ -1,6 +1,7 @@
 require('../../setup');
 
 import { accounts, defaultSender, provider, web3 } from '@openzeppelin/test-environment';
+import { balance } from '@openzeppelin/test-helpers';
 
 import sinon from 'sinon';
 import ZWeb3 from '../../../src/artifacts/ZWeb3';
@@ -119,14 +120,15 @@ describe('ZWeb3', function() {
     describe('transactions', function() {
       beforeEach('sending transaction', async function() {
         const value = new BN(1e18).toString(10);
+        this.receiverBalanceTracker = await balance.tracker(receiverAccount);
         const receipt = await ZWeb3.sendTransaction({ from: accounts[0], to: receiverAccount, value });
         this.txHash = receipt.transactionHash;
       });
 
       describe('send transaction', function() {
-        it.skip('can send a transaction', async function() {
-          // The account
-          (await ZWeb3.getBalance(receiverAccount)).should.eq((101e18).toString());
+        it('can send a transaction', async function() {
+          // Note that BN here is bignumber.js, _not_ bn.js
+          (await this.receiverBalanceTracker.delta()).should.be.bignumber.equal(new BN(1e18).toString(10));
         });
       });
 

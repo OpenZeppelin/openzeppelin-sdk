@@ -93,6 +93,7 @@
   },
   "devDependencies": {
     "@openzeppelin/test-environment": "^0.1.0-rc.0",
+    "@openzeppelin/test-helpers": "^0.5.4",
     "@types/mocha": "^5.2.5",
     "@types/node": "^10.12.12",
     "@typescript-eslint/eslint-plugin": "^1.9.0",
