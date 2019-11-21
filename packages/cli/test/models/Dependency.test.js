@@ -2,11 +2,16 @@
 
 require('../setup');
 
+import { expect } from 'chai';
+import { accounts } from '@openzeppelin/test-environment';
+
 import sinon from 'sinon';
 import npm from 'npm-programmatic';
 import Dependency from '../../src/models/dependency/Dependency';
 
-contract('Dependency', function([_, from]) {
+const [from] = accounts;
+
+describe('Dependency', function() {
   describe('static methods', function() {
     describe('#satisfiesVersion', function() {
       it('verifies if requirement satisfies version', function() {

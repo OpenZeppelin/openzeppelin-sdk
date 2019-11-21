@@ -4,11 +4,12 @@ require('../setup');
 import utils from 'web3-utils';
 import sinon from 'sinon';
 import { ZWeb3 } from '@openzeppelin/upgrades';
+import { accounts as accountList } from '@openzeppelin/test-environment';
 
 import accounts from '../../src/scripts/accounts';
 import CaptureLogs from '../helpers/captureLogs';
 
-contract('accounts script', function(accountList) {
+describe('accounts script', function() {
   accountList = accountList.map(utils.toChecksumAddress);
   const [defaultAccount] = accountList;
   const network = 'test';

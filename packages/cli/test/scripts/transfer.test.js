@@ -2,12 +2,14 @@
 require('../setup');
 
 import utils from 'web3-utils';
+import { accounts } from '@openzeppelin/test-environment';
+
 import { ZWeb3 } from '@openzeppelin/upgrades';
 
 import transfer from '../../src/scripts/transfer';
 
-contract('transfer script', function(accounts) {
-  const [_, sender, receiver] = accounts.map(utils.toChecksumAddress);
+describe('transfer script', function() {
+  const [sender, receiver] = accounts.map(utils.toChecksumAddress);
 
   describe('validations', function() {
     context('when no recipient address is specified', function() {

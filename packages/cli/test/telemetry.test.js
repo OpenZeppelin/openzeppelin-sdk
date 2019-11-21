@@ -2,6 +2,8 @@
 
 require('./setup');
 
+import { expect } from 'chai';
+
 import fs from 'fs-extra';
 import sinon from 'sinon';
 import inquirer from 'inquirer';

@@ -9,7 +9,7 @@ import init from '../../src/scripts/init';
 import ProjectFile from '../../src/models/files/ProjectFile';
 import ConfigManager from '../../src/models/config/ConfigManager';
 
-contract('init script', function() {
+describe('init script', function() {
   const name = 'MyApp';
   const version = '0.3.0';
   const tmpDir = 'test/tmp';

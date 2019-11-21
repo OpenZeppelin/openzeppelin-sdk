@@ -3,6 +3,8 @@ import fs from 'fs-extra';
 process.env.NODE_ENV = 'test';
 
 import { ZWeb3, Contracts, Loggy } from '@openzeppelin/upgrades';
+import { provider } from '@openzeppelin/test-environment';
+
 import { OPEN_ZEPPELIN_FOLDER } from '../src/models/files/constants';
 import Dependency from '../src/models/dependency/Dependency';
 import ProjectFile from '../src/models/files/ProjectFile';
@@ -12,7 +14,7 @@ import Session from '../src/models/network/Session';
 fs.ensureDirSync(OPEN_ZEPPELIN_FOLDER);
 useTestProjectFile();
 doNotInstallStdlib();
-ZWeb3.initialize(web3.currentProvider);
+ZWeb3.initialize(provider);
 setArtifactDefaults();
 Loggy.silent(false);
 Loggy.testing(true);

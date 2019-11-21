@@ -7,7 +7,7 @@ import ProjectFile from '../../src/models/files/ProjectFile';
 
 const expect = require('chai').expect;
 
-contract('check script', function() {
+describe('check script', function() {
   beforeEach('setup', async function() {
     this.projectFile = new ProjectFile('test/mocks/packages/package-empty.zos.json');
   });

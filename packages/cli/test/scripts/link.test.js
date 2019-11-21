@@ -6,7 +6,7 @@ import ProjectFile from '../../src/models/files/ProjectFile';
 
 const should = require('chai').should();
 
-contract('link script', function() {
+describe('link script', function() {
   const shouldHaveDependency = function(name, version) {
     should.exist(this.projectFile.getDependencyVersion(name));
     this.projectFile.getDependencyVersion(name).should.eq(version);

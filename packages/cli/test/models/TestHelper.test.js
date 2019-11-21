@@ -3,14 +3,18 @@
 require('../setup');
 
 import { Contracts } from '@openzeppelin/upgrades';
+import { accounts } from '@openzeppelin/test-environment';
+
 import TestHelper from '../../src/models/TestHelper';
 import ProjectFile from '../../src/models/files/ProjectFile';
 import NetworkFile from '../../src/models/files/NetworkFile';
 
+const [owner] = accounts;
+
 const ImplV1 = Contracts.getFromLocal('ImplV1');
 const WithLibraryImpl = Contracts.getFromLocal('WithLibraryImplV1');
 
-contract('TestHelper', function([_, owner]) {
+describe('TestHelper', function() {
   const txParams = { from: owner };
   const projectName = 'Herbs';
   const initialVersion = '1.1.0';

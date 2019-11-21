@@ -2,6 +2,9 @@
 require('../setup');
 
 import random from 'lodash.random';
+import { accounts } from '@openzeppelin/test-environment';
+
+const [owner, otherAdmin] = accounts;
 
 import CaptureLogs from '../helpers/captureLogs';
 import { Contracts, Logger, helpers, Proxy, MinimalProxy, assertRevert } from '@openzeppelin/upgrades';
@@ -20,7 +23,7 @@ const should = require('chai').should();
 const ImplV1 = Contracts.getFromLocal('ImplV1');
 const BooleanContract = Contracts.getFromLocal('Boolean');
 
-contract('create script', function([_, owner, otherAdmin]) {
+describe('create script', function() {
   const contractName = 'ImplV1';
   const contractAlias = 'Impl';
   const anotherContractName = 'WithLibraryImplV1';

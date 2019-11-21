@@ -2,13 +2,15 @@
 
 require('../setup');
 
+import { expect } from 'chai';
+
 import sinon from 'sinon';
 import { FileSystem, Contracts } from '@openzeppelin/upgrades';
 import ContractManager from '../../src/models/local/ContractManager';
 import ProjectFile from '../../src/models/files/ProjectFile';
 import ConfigManager from '../../src/models/config/ConfigManager';
 
-contract('ContractManager', function([_, from]) {
+describe('ContractManager', function() {
   describe('methods', function() {
     describe('getContractNames', function() {
       context('without directory created', function() {
