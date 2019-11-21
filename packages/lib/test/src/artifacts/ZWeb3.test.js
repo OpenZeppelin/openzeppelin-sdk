@@ -63,14 +63,14 @@ describe('ZWeb3', function() {
       node.should.match(/EthereumJS TestRPC/);
     });
 
-    it.skip('tells the name of the current network ID', async function() {
+    it('tells the name of the current network ID', async function() {
       const network = await ZWeb3.getNetwork();
-      network.should.be.eq(4447);
+      network.should.be.eq(await web3.eth.net.getId());
     });
 
-    it.skip('tells the name of the current network', async function() {
+    it('tells the name of the current network', async function() {
       const networkName = await ZWeb3.getNetworkName();
-      networkName.should.be.eq('dev-4447');
+      networkName.should.be.eq(`dev-${await web3.eth.net.getId()}`);
     });
 
     describe('checkNetworkId', function() {
