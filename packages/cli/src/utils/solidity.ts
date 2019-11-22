@@ -1,5 +1,6 @@
 import { eq as semverEq, parse as parseSemver } from 'semver';
 import { CompilerVersionOptions } from '../models/compiler/solidity/SolidityContractsCompiler';
+import { getMetadata } from '@openzeppelin/fuzzy-solidity-import-parser';
 
 export function getPragma(source: string): string {
   if (!source) return null;
@@ -35,15 +36,5 @@ export function compilerSettingsMatch(s1: CompilerVersionOptions, s2: CompilerVe
 }
 
 export function getImports(source: string): string[] {
-  // Copied from https://github.com/nomiclabs/buidler/blob/1cd52f91d7f8b6756c5ac33b78f93b151b072ea4/packages/buidler-core/src/internal/solidity/imports.ts
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
-  const parser = require('solidity-parser-antlr');
-  const ast = parser.parse(source, { tolerant: true });
-
-  const importedFiles: string[] = [];
-  parser.visit(ast, {
-    ImportDirective: (node: { path: string }) => importedFiles.push(node.path),
-  });
-
-  return importedFiles;
+  return getMetadata(source).imports;
 }
