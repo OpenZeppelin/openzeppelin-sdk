@@ -8,7 +8,7 @@ const Package = Contracts.getFromLocal('Package');
 const ImplementationDirectory = Contracts.getFromLocal('ImplementationDirectory');
 
 export default function shouldManagePackages(accounts) {
-  const [_, appOwner, packageOwner, directoryOwner, anotherAccount] = accounts;
+  const [appOwner, packageOwner, directoryOwner, anotherAccount] = accounts;
 
   const version0 = toSemanticVersion('1.0.0');
   const version1 = toSemanticVersion('1.1.0');

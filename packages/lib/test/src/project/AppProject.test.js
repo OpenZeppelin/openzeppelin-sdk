@@ -1,6 +1,8 @@
 'use strict';
 require('../../setup');
 
+import { accounts } from '@openzeppelin/test-environment';
+
 import Contracts from '../../../src/artifacts/Contracts';
 import ProxyAdmin from '../../../src/proxy/ProxyAdmin';
 import AppProject from '../../../src/project/AppProject';
@@ -12,7 +14,6 @@ import shouldManageAdminProxy from './AdminProxy.behaviour';
 import assertRevert from '../../../src/test/helpers/assertRevert';
 import { toAddress } from '../../../src/utils/Addresses';
 import { Package } from '../../../src';
-import utils from 'web3-utils';
 import ProxyFactory from '../../../src/proxy/ProxyFactory';
 
 const ImplV1 = Contracts.getFromLocal('DummyImplementation');
@@ -23,10 +24,8 @@ async function setImplementations() {
   await this.project.setImplementation(ImplV2, 'DummyImplementationV2');
 }
 
-contract('AppProject', function(accounts) {
-  accounts = accounts.map(utils.toChecksumAddress);
-
-  const [_, owner, another] = accounts;
+describe('AppProject', function() {
+  const [owner, another] = accounts;
   const name = 'MyProject';
   const version = '0.2.0';
   const newVersion = '0.3.0';

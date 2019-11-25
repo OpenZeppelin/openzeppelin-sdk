@@ -1,18 +1,19 @@
 'use strict';
 require('../../setup');
 
+import { accounts } from '@openzeppelin/test-environment';
+
 import Contracts from '../../../src/artifacts/Contracts';
 import assertRevert from '../../../src/test/helpers/assertRevert';
 import shouldBehaveLikeOwnable from '../../../src/test/behaviors/Ownable';
 import { ZERO_ADDRESS } from '../../../src/utils/Addresses';
-import utils from 'web3-utils';
+
+import { assert, expect } from 'chai';
 
 const Package = Contracts.getFromLocal('Package');
 
-contract('Package', accounts => {
-  accounts = accounts.map(utils.toChecksumAddress); // Required by Web3 v1.x.
-
-  const [_, owner, anotherAddress, contractAddress, anotherContractAddress] = accounts;
+describe('Package', () => {
+  const [owner, anotherAddress, contractAddress, anotherContractAddress] = accounts;
 
   const version = [1, 0, 0];
   const anotherVersion = [2, 0, 0];

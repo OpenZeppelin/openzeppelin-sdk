@@ -1,15 +1,18 @@
 require('../../setup');
 
+import { accounts, defaultSender, provider, web3 } from '@openzeppelin/test-environment';
+import { balance } from '@openzeppelin/test-helpers';
+
 import sinon from 'sinon';
 import ZWeb3 from '../../../src/artifacts/ZWeb3';
 import Contracts from '../../../src/artifacts/Contracts';
 import { ZERO_ADDRESS } from '../../../src/utils/Addresses';
-import utils from 'web3-utils';
 import BN from 'bignumber.js';
 
-contract('ZWeb3', function(accounts) {
-  accounts = accounts.map(utils.toChecksumAddress);
-  const [_, account, account1, account2] = accounts;
+import { expect } from 'chai';
+
+describe('ZWeb3', function() {
+  const [account, account1, account2] = accounts;
 
   before('deploy dummy instance', async function() {
     this.DummyImplementation = Contracts.getFromLocal('DummyImplementation');
@@ -17,7 +20,7 @@ contract('ZWeb3', function(accounts) {
   });
 
   const shouldBehaveLikeWeb3Instance = (account, receiverAccount) => {
-    it('initializes web3 with a provider', function() {
+    it('initializes web3 with a provider', async function() {
       ZWeb3.web3().currentProvider.should.not.be.null;
     });
 
@@ -41,19 +44,19 @@ contract('ZWeb3', function(accounts) {
     });
 
     it('tells the list of existing accounts', async function() {
-      const accounts = await ZWeb3.accounts();
-      accounts.should.be.deep.equal(accounts);
+      const zweb3Accounts = await ZWeb3.accounts();
+      zweb3Accounts.should.be.deep.equal([defaultSender, ...accounts]);
     });
 
     it('tells the default existing account', async function() {
       const defaultAccount = await ZWeb3.defaultAccount();
-      defaultAccount.should.be.eq(accounts[0]);
+      defaultAccount.should.be.eq(defaultSender);
     });
 
     it('tells the balanace of a given account', async function() {
       const balance = await ZWeb3.getBalance(account);
       balance.should.be.an('string');
-      balance.should.equal((100e18).toString());
+      balance.should.equal(await web3.eth.getBalance(account));
     });
 
     it('tells the name of the current node', async function() {
@@ -63,12 +66,12 @@ contract('ZWeb3', function(accounts) {
 
     it('tells the name of the current network ID', async function() {
       const network = await ZWeb3.getNetwork();
-      network.should.be.eq(4447);
+      network.should.be.eq(await web3.eth.net.getId());
     });
 
     it('tells the name of the current network', async function() {
       const networkName = await ZWeb3.getNetworkName();
-      networkName.should.be.eq('dev-4447');
+      networkName.should.be.eq(`dev-${await web3.eth.net.getId()}`);
     });
 
     describe('checkNetworkId', function() {
@@ -117,13 +120,15 @@ contract('ZWeb3', function(accounts) {
     describe('transactions', function() {
       beforeEach('sending transaction', async function() {
         const value = new BN(1e18).toString(10);
+        this.receiverBalanceTracker = await balance.tracker(receiverAccount);
         const receipt = await ZWeb3.sendTransaction({ from: accounts[0], to: receiverAccount, value });
         this.txHash = receipt.transactionHash;
       });
 
       describe('send transaction', function() {
         it('can send a transaction', async function() {
-          (await ZWeb3.getBalance(receiverAccount)).should.eq((101e18).toString());
+          // Note that BN here is bignumber.js, _not_ bn.js
+          (await this.receiverBalanceTracker.delta()).should.be.bignumber.equal(new BN(1e18).toString(10));
         });
       });
 
@@ -190,7 +195,7 @@ contract('ZWeb3', function(accounts) {
                 `Transaction ${this.txHash} wasn't processed in ${this.timeout / 1000} seconds`,
               );
             }
-          });
+          }).timeout(5000);
         });
       });
 
@@ -235,8 +240,11 @@ contract('ZWeb3', function(accounts) {
     });
 
     context('when initializing ZWeb3 with an http url', function() {
-      beforeEach('initialize web3', function() {
-        ZWeb3.initialize('http://localhost:9555');
+      beforeEach('initialize web3', async function() {
+        const hostURL = provider.wrappedProvider.host;
+        expect(hostURL).to.have.string('http://');
+
+        ZWeb3.initialize(provider.wrappedProvider.host);
       });
 
       shouldBehaveLikeWeb3Instance(account, account2);
@@ -244,7 +252,7 @@ contract('ZWeb3', function(accounts) {
 
     context('when initializing ZWeb3 with a web3 provider', function() {
       beforeEach('initialize web3', function() {
-        ZWeb3.initialize(web3.currentProvider);
+        ZWeb3.initialize(provider);
       });
 
       shouldBehaveLikeWeb3Instance(account, account1);

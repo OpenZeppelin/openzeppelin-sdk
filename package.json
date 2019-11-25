@@ -1,6 +1,9 @@
 {
   "name": "root",
   "private": true,
+  "engines": {
+    "yarn": "^1.9.0"
+  },
   "workspaces": [
     "examples/*",
     "packages/*",

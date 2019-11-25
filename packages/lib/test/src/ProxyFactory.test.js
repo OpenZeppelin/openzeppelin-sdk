@@ -1,7 +1,8 @@
 'use strict';
 require('../setup');
 
-import utils from 'web3-utils';
+import { accounts } from '@openzeppelin/test-environment';
+
 import Contracts from '../../src/artifacts/Contracts';
 import assertRevert from '../../src/test/helpers/assertRevert';
 import ProxyFactory from '../../src/proxy/ProxyFactory';
@@ -12,7 +13,7 @@ const ImplV1 = Contracts.getFromLocal('DummyImplementation');
 const ImplV2 = Contracts.getFromLocal('DummyImplementationV2');
 
 function behavesLikeCreate2ProxyFactory(accounts, user, createProxy) {
-  const [_, admin, anotherAdmin, anotherFrom] = accounts.map(utils.toChecksumAddress);
+  const [admin, anotherAdmin, anotherFrom] = accounts;
 
   const salt1 = '2';
   const salt2 = '4';
@@ -76,8 +77,8 @@ function behavesLikeCreate2ProxyFactory(accounts, user, createProxy) {
   });
 }
 
-contract('ProxyFactory model', function(accounts) {
-  const sender = utils.toChecksumAddress(accounts[5]);
+describe('ProxyFactory model', function() {
+  const sender = accounts[5];
 
   before('set implementations', async function() {
     this.implementationV1 = await ImplV1.new();

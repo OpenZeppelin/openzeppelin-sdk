@@ -2,8 +2,9 @@
 
 require('../../setup');
 
+import { accounts } from '@openzeppelin/test-environment';
+
 import omit from 'lodash.omit';
-import utils from 'web3-utils';
 
 import assertRevert from '../../../src/test/helpers/assertRevert';
 import Contracts from '../../../src/artifacts/Contracts';
@@ -16,9 +17,8 @@ const DummyImplementation = Contracts.getFromLocal('DummyImplementation');
 const InitializableAdminUpgradeabilityProxy = Contracts.getFromLocal('InitializableAdminUpgradeabilityProxy');
 const ZosInitializableAdminUpgradeabilityProxy = Contracts.getFromLocal('ZosInitializableAdminUpgradeabilityProxy');
 
-contract('InitializableAdminUpgradeabilityProxy', function(accounts) {
-  accounts = accounts.map(utils.toChecksumAddress);
-  const [_, proxyAdminAddress, proxyAdminOwner] = accounts;
+describe('InitializableAdminUpgradeabilityProxy', function() {
+  const [proxyAdminAddress, proxyAdminOwner] = accounts;
   const labels = { label: ADMIN_LABEL, deprecatedLabel: DEPRECATED_ADMIN_LABEL };
 
   const createProxy = async function(logic, admin, initData, opts) {

@@ -1,17 +1,19 @@
 'use strict';
 require('../../setup');
 
-import utils from 'web3-utils';
+import { accounts, defaultSender } from '@openzeppelin/test-environment';
 
 import Contracts from '../../../src/artifacts/Contracts';
 import { contractMethodsFromAbi, ContractMethodMutability as Mutability } from '../../../src/artifacts/Contract';
+
+import { expect } from 'chai';
 
 const ContractWithStructInConstructor = Contracts.getFromLocal('WithStructInConstructor');
 const ContractWithConstructorImplementation = Contracts.getFromLocal('WithConstructorImplementation');
 const InitializableMock = Contracts.getFromLocal('InitializableMock');
 
-contract('Contract', function(accounts) {
-  const [_, account] = accounts.map(utils.toChecksumAddress);
+describe('Contract', function() {
+  const [account] = accounts;
   const txParams = { from: account };
 
   describe('methods', function() {
@@ -30,7 +32,7 @@ contract('Contract', function(accounts) {
             (await instance.methods.buz().call()).should.not.be.null;
             (await instance.methods.foo().call()).should.not.be.null;
             (await instance.methods.bar().call()).should.not.be.null;
-            (await instance.methods.sender().call()).should.eq(_);
+            (await instance.methods.sender().call()).should.eq(defaultSender);
           });
         });
 

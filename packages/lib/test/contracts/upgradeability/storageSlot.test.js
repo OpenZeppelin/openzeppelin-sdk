@@ -13,7 +13,7 @@ const DummyImplementation = Contracts.getFromLocal('DummyImplementation');
 
 export function shouldUseEIP1967StorageSlot(createProxy, accounts, labels, fnName) {
   const { label, deprecatedLabel } = labels;
-  const [_, proxyAdminAddress, proxyAdminOwner] = accounts;
+  const [proxyAdminAddress, proxyAdminOwner] = accounts;
 
   beforeEach(async function() {
     this.spy = sinon.spy(Proxy.prototype, 'getStorageAt');
@@ -44,7 +44,7 @@ export function shouldUseEIP1967StorageSlot(createProxy, accounts, labels, fnNam
 
 export function shouldUseLegacyStorageSlot(createProxy, accounts, labels, fnName) {
   const { label, deprecatedLabel } = labels;
-  const [_, proxyAdminAddress, proxyAdminOwner] = accounts;
+  const [proxyAdminAddress, proxyAdminOwner] = accounts;
 
   beforeEach(async function() {
     this.implementation = (await DummyImplementation.new()).address;

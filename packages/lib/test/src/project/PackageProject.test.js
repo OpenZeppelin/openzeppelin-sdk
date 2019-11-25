@@ -1,11 +1,13 @@
 'use strict';
 require('../../setup');
 
+import { accounts } from '@openzeppelin/test-environment';
+
 import PackageProject from '../../../src/project/PackageProject';
 import shouldBehaveLikePackageProject from './PackageProject.behavior';
 
-contract('PackageProject', function(accounts) {
-  const [_, owner] = accounts;
+describe('PackageProject', function() {
+  const [owner] = accounts;
   const version = '0.2.0';
 
   beforeEach('deploying', async function() {
