@@ -42,7 +42,7 @@ commands:
             - run:
                 command: yarn
                 working_directory: "~/openzeppelin/tests/cli/workdir"
-      - run: 
+      - run:
           name: "Test << parameters.workspace >>"
           command: "<< parameters.test-cmd >>"
           working_directory: "~/openzeppelin/<< parameters.workspace >>"
@@ -60,6 +60,9 @@ jobs:
       - run:
           name: Install dependencies and build
           command: yarn
+      - run:
+          name: Check lockfile is up-to-date
+          command: ./scripts/check-yarn-lockfile.sh
       - run:
           name: Lint check
           command: yarn lint:check
@@ -134,7 +137,7 @@ jobs:
           workspace: tests/cli/test
           run-yarn: true
           prepare-workdir: true
-  
+
   integration-cli-hdwallet:
     <<: *integration
     environment:
