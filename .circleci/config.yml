@@ -2,7 +2,7 @@ version: 2.1
 
 defaults: &defaults
   docker:
-    - image: circleci/node:10.13
+    - image: circleci/node:10.17
   environment:
     YARN_CACHE_FOLDER: ~/.cache/yarn/v6
   working_directory: ~/openzeppelin
