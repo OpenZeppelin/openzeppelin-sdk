@@ -71,6 +71,7 @@ describe('ContractManager', function() {
             });
 
             afterEach(function() {
+              FileSystem.removeTree(this.testDir);
               sinon.restore();
             });
 
