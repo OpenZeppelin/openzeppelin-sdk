@@ -10,12 +10,7 @@
     "strict": false,
     "resolveJsonModule": true,
     "esModuleInterop": true,
-    "lib": [
-      "es2017"
-    ]
+    "lib": ["es2017"]
   },
-  "exclude": [
-     "**/node_modules/*",
-     "**/*.spec.ts"
-  ]
+  "exclude": ["**/node_modules/*", "**/*.spec.ts"]
 }

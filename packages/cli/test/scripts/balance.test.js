@@ -2,7 +2,7 @@
 require('../setup');
 
 import utils from 'web3-utils';
-import { ZWeb3, Contracts } from '@openzeppelin/upgrades';
+import { Contracts } from '@openzeppelin/upgrades';
 import { accounts } from '@openzeppelin/test-environment';
 
 import CaptureLogs from '../helpers/captureLogs';
