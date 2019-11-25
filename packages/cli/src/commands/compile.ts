@@ -1,7 +1,11 @@
 import { compile } from '../models/compiler/Compiler';
 import { CompileParams } from '../scripts/interfaces';
-import { ProjectCompilerOptions } from '../models/compiler/solidity/SolidityProjectCompiler';
+import { ProjectCompilerOptions } from '../models/compiler/ProjectCompilerOptions';
 import Telemetry from '../telemetry';
+import ProjectFile from '../models/files/ProjectFile';
+import isundefined from 'lodash.isundefined';
+import { promptIfNeeded } from '../prompts/prompt';
+import { TypechainQuestions } from '../prompts/typechain';
 
 const name = 'compile';
 const signature = `${name}`;
@@ -31,7 +35,7 @@ const register: (program: any) => any = program =>
     .action(action);
 
 async function action(options: CompileParams & { interactive: boolean }): Promise<void> {
-  const { evmVersion, solcVersion: version, optimizer, optimizerRuns } = options;
+  const { evmVersion, solcVersion: version, optimizer, optimizerRuns, interactive } = options;
 
   // Handle optimizer option:
   //- on --optimizer or --optimizer=on, enable it
@@ -56,6 +60,28 @@ async function action(options: CompileParams & { interactive: boolean }): Promis
       runs: optimizerRuns && parseInt(optimizerRuns),
     },
   };
+
+  // If typechain settings are undefined, we are running from an old project, so we ask the user if they want to enable it if we find a ts-config (this last bit handled by the typechain questions)
+  const projectFile = new ProjectFile();
+  if (
+    !projectFile.compilerOptions ||
+    !projectFile.compilerOptions.typechain ||
+    isundefined(projectFile.compilerOptions.typechain.enabled)
+  ) {
+    const { typechainEnabled, typechainTarget, typechainOutdir } = await promptIfNeeded(
+      {
+        args: { typechainEnabled: undefined, typechainTarget: undefined, typechainOutdir: undefined },
+        defaults: {},
+        props: TypechainQuestions,
+      },
+      interactive,
+    );
+    compilerOptions.typechain = { enabled: typechainEnabled };
+    if (typechainEnabled) {
+      Object.assign(compilerOptions.typechain, { outDir: typechainOutdir, target: typechainTarget });
+      compilerOptions.force = true;
+    }
+  }
 
   await Telemetry.report(
     'compile',
