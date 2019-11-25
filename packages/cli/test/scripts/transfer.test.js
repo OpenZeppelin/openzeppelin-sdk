@@ -1,6 +1,8 @@
 'use strict';
 require('../setup');
 
+import BN from 'bignumber.js';
+
 import utils from 'web3-utils';
 import { accounts } from '@openzeppelin/test-environment';
 
@@ -50,8 +52,8 @@ describe('transfer script', function() {
 
     context('when sending a valid amount of ether', function() {
       it('transfers funds', async function() {
-        (await ZWeb3.getBalance(sender)).should.eq((100e18).toString());
-        (await ZWeb3.getBalance(receiver)).should.eq((100e18).toString());
+        const senderBalance = await ZWeb3.getBalance(sender);
+        const receiverBalance = await ZWeb3.getBalance(receiver);
 
         await transfer({
           from: sender,
@@ -60,8 +62,8 @@ describe('transfer script', function() {
           unit: 'ether',
         });
 
-        (await ZWeb3.getBalance(sender)).should.not.eq((100e18).toString());
-        (await ZWeb3.getBalance(receiver)).should.eq((110e18).toString());
+        (await ZWeb3.getBalance(sender)).should.not.eq(new BN(senderBalance).minus(10e18).toString());
+        (await ZWeb3.getBalance(receiver)).should.eq(new BN(receiverBalance).plus(10e18).toString());
       });
     });
   });

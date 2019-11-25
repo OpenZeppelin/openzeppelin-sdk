@@ -3,9 +3,10 @@ require('../setup');
 
 import utils from 'web3-utils';
 import { Contracts } from '@openzeppelin/upgrades';
-import { accounts } from '@openzeppelin/test-environment';
+import { accounts, web3 } from '@openzeppelin/test-environment';
 
 import CaptureLogs from '../helpers/captureLogs';
+import { fromWei } from '../../src/utils/units';
 
 import balance from '../../src/scripts/balance';
 
@@ -32,9 +33,10 @@ describe('balance script', function() {
 
     context('when not specifying an ERC20 token address', function() {
       it('logs balance in ETH', async function() {
+        const eth = fromWei(await web3.eth.getBalance(accountAddress), 'ether');
         await balance({ accountAddress });
         this.logs.infos.should.have.lengthOf(1);
-        this.logs.infos[0].should.eq('Balance: 100 ETH');
+        this.logs.infos[0].should.eq(`Balance: ${eth} ETH`);
       });
     });
 
