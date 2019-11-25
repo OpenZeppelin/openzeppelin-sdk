@@ -195,7 +195,7 @@ describe('ZWeb3', function() {
                 `Transaction ${this.txHash} wasn't processed in ${this.timeout / 1000} seconds`,
               );
             }
-          });
+          }).timeout(5000);
         });
       });
 
