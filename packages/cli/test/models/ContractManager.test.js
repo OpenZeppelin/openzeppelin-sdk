@@ -63,7 +63,8 @@ describe('ContractManager', function() {
                 bytecode: '0x124',
                 contractName: 'Foo',
               };
-              FileSystem.writeJson(`${this.testDir}/build/contracts/Foo.json`, builtContract);
+              this.fooContractPath = `${this.testDir}/build/contracts/Foo.json`;
+              FileSystem.writeJson(this.fooContractPath, builtContract);
               this.projectFile = new ProjectFile(`${this.testDir}/zos.json`);
               this.contractManager = new ContractManager(this.projectFile);
               sinon.stub(ConfigManager, 'getBuildDir').returns(`${this.testDir}/build/contracts`);
@@ -71,7 +72,7 @@ describe('ContractManager', function() {
             });
 
             afterEach(function() {
-              FileSystem.removeTree(this.testDir);
+              FileSystem.remove(this.fooContractPath);
               sinon.restore();
             });
 
