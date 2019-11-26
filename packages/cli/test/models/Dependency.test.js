@@ -29,7 +29,7 @@ describe('Dependency', function() {
       it('fetches version from npm for org package', async function() {
         const actual = await Dependency.fetchVersionFromNpm('@openzeppelin/cli');
         actual.should.match(/^@openzeppelin\/cli@\^\d+\.\d+\.0$/);
-      });
+      }).timeout(5000);
     });
 
     describe('#fromNameAndVersion', function() {
