@@ -1,13 +1,17 @@
 'use strict';
 require('../../setup');
 
+import { accounts } from '@openzeppelin/test-environment';
+
 import Package from '../../../src/application/Package';
 import Contracts from '../../../src/artifacts/Contracts';
 import ImplementationDirectory from '../../../src/application/ImplementationDirectory';
 
 const DummyImplementation = Contracts.getFromLocal('DummyImplementation');
 
-contract('Package', function([_, owner]) {
+describe('Package', function() {
+  const [owner] = accounts;
+
   const txParams = { from: owner };
   const contractName = 'DummyImplementation';
   const version = [1, 0, 0];

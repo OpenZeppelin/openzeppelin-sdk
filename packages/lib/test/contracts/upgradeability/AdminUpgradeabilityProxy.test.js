@@ -2,7 +2,8 @@
 
 require('../../setup');
 
-import utils from 'web3-utils';
+import { accounts } from '@openzeppelin/test-environment';
+
 import Contracts from '../../../src/artifacts/Contracts';
 import shouldBehaveLikeUpgradeabilityProxy from './UpgradeabilityProxy.behaviour';
 import shouldBehaveLikeAdminUpgradeabilityProxy from './AdminUpgradeabilityProxy.behaviour';
@@ -12,9 +13,8 @@ import { ADMIN_LABEL, DEPRECATED_ADMIN_LABEL } from '../../../src/utils/Constant
 const AdminUpgradeabilityProxy = Contracts.getFromLocal('AdminUpgradeabilityProxy');
 const ZosAdminUpgradeabilityProxy = Contracts.getFromLocal('ZosAdminUpgradeabilityProxy');
 
-contract('AdminUpgradeabilityProxy', function(accounts) {
-  accounts = accounts.map(utils.toChecksumAddress);
-  const [_, proxyAdminAddress, proxyAdminOwner] = accounts;
+describe('AdminUpgradeabilityProxy', function() {
+  const [proxyAdminAddress, proxyAdminOwner] = accounts;
   const labels = { label: ADMIN_LABEL, deprecatedLabel: DEPRECATED_ADMIN_LABEL };
 
   const createProxy = async function(logic, admin, initData, opts) {

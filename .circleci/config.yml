@@ -2,7 +2,7 @@ version: 2.1
 
 defaults: &defaults
   docker:
-    - image: circleci/node:10.13
+    - image: circleci/node:10.17
   environment:
     YARN_CACHE_FOLDER: ~/.cache/yarn/v6
   working_directory: ~/openzeppelin
@@ -59,6 +59,9 @@ jobs:
       - run:
           name: Install dependencies and build
           command: yarn
+      - run:
+          name: Check lockfile is up-to-date
+          command: ./scripts/check-yarn-lockfile.sh
       - run:
           name: Lint check
           command: yarn lint:check
@@ -123,7 +126,7 @@ jobs:
   integration-cli-geth: &integration
     <<: *defaults
     docker:
-      - image: circleci/node:10.13
+      - image: circleci/node:10.17
       - image: ethereum/client-go:release-1.8
         command: "--dev --dev.period=1 --rpc --rpcport=8545 --rpcaddr=localhost --networkid=9955"
     environment:

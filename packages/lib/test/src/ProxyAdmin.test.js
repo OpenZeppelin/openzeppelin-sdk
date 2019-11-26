@@ -1,7 +1,9 @@
 'use strict';
 
 require('../setup');
-import utils from 'web3-utils';
+
+import { accounts } from '@openzeppelin/test-environment';
+
 import ProxyAdmin from '../../src/proxy/ProxyAdmin';
 import Proxy from '../../src/proxy/Proxy';
 import Contracts from '../../src/artifacts/Contracts';
@@ -11,8 +13,8 @@ const ImplV1 = Contracts.getFromLocal('DummyImplementation');
 const ImplV2 = Contracts.getFromLocal('DummyImplementationV2');
 const ProxyAdminContract = Contracts.getFromLocal('ProxyAdmin');
 
-contract('ProxyAdmin class', function(accounts) {
-  const [_, proxyAdminOwner, newAdmin, newAdminOwner, otherAccount] = accounts.map(utils.toChecksumAddress);
+describe('ProxyAdmin class', function() {
+  const [proxyAdminOwner, newAdmin, newAdminOwner, otherAccount] = accounts;
   const version = '0.0.1';
   const contentURI = '0x10';
 

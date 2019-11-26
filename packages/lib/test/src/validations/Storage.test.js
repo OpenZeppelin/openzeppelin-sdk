@@ -2,15 +2,16 @@
 'use strict';
 require('../../setup');
 
-const should = require('chai').should();
-
 import util from 'util';
 import forEach from 'lodash.foreach';
+import mapKeys from 'lodash.mapkeys';
 
 import Contracts from '../../../src/artifacts/Contracts';
 import { getStorageLayout, getStructsOrEnums } from '../../../src/validations/Storage';
 
-contract('Storage', () => {
+const should = require('chai').should();
+
+describe('Storage', () => {
   function load(name) {
     beforeEach(`loading contract ${name}`, function() {
       const contractClass = Contracts.getFromLocal(name);
@@ -471,7 +472,7 @@ contract('Storage', () => {
       const instance = await StorageMockChainChild.new();
       const slots = await instance.methods.slots().call();
       const mappedSlots = [];
-      _.mapKeys(slots, (value, key) => {
+      mapKeys(slots, (value, key) => {
         if (isNaN(parseInt(key, 10))) mappedSlots.push(parseInt(value, 10));
       });
       mappedSlots.should.deep.eq([0, 1, 3, 5, 7]);

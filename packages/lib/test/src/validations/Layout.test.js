@@ -2,13 +2,11 @@
 'use strict';
 require('../../setup');
 
-const should = require('chai').should();
-
 import Contracts from '../../../src/artifacts/Contracts';
 import { getStorageLayout } from '../../../src/validations/Storage';
 import { compareStorageLayouts } from '../../../src/validations/Layout';
 
-contract('Layout', () => {
+describe('Layout', () => {
   function compare(originalContractName, updatedContractName) {
     return compareStorageLayouts(
       getStorageLayout(Contracts.getFromLocal(originalContractName)),

@@ -1,6 +1,7 @@
 'use strict';
 require('../../setup');
-import utils from 'web3-utils';
+
+import { accounts } from '@openzeppelin/test-environment';
 
 import ProxyAdmin from '../../../src/proxy/ProxyAdmin';
 import ProxyAdminProject from '../../../src/project/ProxyAdminProject';
@@ -19,8 +20,8 @@ async function setImplementations() {
   await this.project.setImplementation(ImplV2, 'DummyImplementationV2');
 }
 
-contract('ProxyAdminProject', function(accounts) {
-  const [_, proxyAdminOwner, another] = accounts.map(utils.toChecksumAddress);
+describe('ProxyAdminProject', function() {
+  const [proxyAdminOwner, another] = accounts;
   const name = 'MyProxyAdminProject';
   const txParams = { from: proxyAdminOwner };
 

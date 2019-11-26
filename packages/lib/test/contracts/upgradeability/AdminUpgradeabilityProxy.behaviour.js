@@ -14,6 +14,8 @@ import Contracts from '../../../src/artifacts/Contracts';
 import { ZERO_ADDRESS } from '../../../src/utils/Addresses';
 import { ADMIN_LABEL, DEPRECATED_ADMIN_LABEL } from '../../../src/utils/Constants';
 
+import { assert, expect } from 'chai';
+
 const Implementation1 = Contracts.getFromLocal('Implementation1');
 const Implementation2 = Contracts.getFromLocal('Implementation2');
 const Implementation3 = Contracts.getFromLocal('Implementation3');
@@ -31,7 +33,7 @@ const sendTransaction = (target, method, args, values, opts) => {
 };
 
 export default function shouldBehaveLikeAdminUpgradeabilityProxy(createProxy, accounts) {
-  const [_, proxyAdminAddress, proxyAdminOwner, anotherAccount] = accounts;
+  const [proxyAdminAddress, proxyAdminOwner, anotherAccount] = accounts;
 
   before(async function() {
     // eslint-disable-next-line @typescript-eslint/camelcase

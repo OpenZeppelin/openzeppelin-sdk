@@ -11,7 +11,7 @@ const ProxyAdmin = Contracts.getFromLocal('ProxyAdmin');
 const DummyImplementation = Contracts.getFromLocal('DummyImplementation');
 const DummyImplementationV2 = Contracts.getFromLocal('DummyImplementationV2');
 
-export default function shouldManageProxies([_, appOwner, directoryOwner, anotherAccount]) {
+export default function shouldManageProxies([appOwner, directoryOwner, anotherAccount]) {
   const EMPTY_INITIALIZATION_DATA = Buffer.from('');
   const proxyAdminOwner = appOwner;
 

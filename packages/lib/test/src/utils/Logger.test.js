@@ -19,6 +19,16 @@ describe('Logger', function() {
     sinon.restore();
   });
 
+  after(function() {
+    // Not all methods of Loggy are stubbed, causing these tests to create
+    // instances of spinnies. We need to stop them so that they are removed from
+    // the Node event loop.
+    // This does mean however that these tests will emit some text to stdout. To
+    // prevent this, we'd need to stub more of the Loggy internals, but that is
+    // tricky, will lead to fragile tests, and will make Loggy hard to refactor.
+    Loggy.stopAll();
+  });
+
   describe('methods', function() {
     describe('#silent', function() {
       it('changes isSilent property value', function() {
