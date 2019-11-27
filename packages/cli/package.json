@@ -7,9 +7,9 @@
   "license": "MIT",
   "scripts": {
     "copy-files": "./scripts/copy-files.sh",
-    "compile:ts": "rm -rf lib && tsc",
-    "compile:contracts": "rm -rf build/contracts && truffle compile",
-    "prepare": "npm run compile:contracts && npm run compile:ts && npm run copy-files && chmod 755 ./lib/bin/oz-cli.js",
+    "compile-ts": "rm -rf lib && tsc",
+    "compile-contracts": "rm -rf build/contracts && truffle compile",
+    "prepare": "npm run compile-contracts && npm run compile-ts && npm run copy-files && chmod 755 ./lib/bin/oz-cli.js",
     "test": "TS_NODE_PROJECT='tsconfig.test.json' npx mocha --require ts-node/register --recursive test",
     "gen-docs": "./scripts/gen-docs.sh",
     "watch": "tsc -w",
