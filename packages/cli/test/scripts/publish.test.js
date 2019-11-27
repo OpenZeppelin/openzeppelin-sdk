@@ -13,7 +13,6 @@ import NetworkFile from '../../src/models/files/NetworkFile';
 const should = require('chai').should();
 
 describe('publish script', function() {
-  accounts = accounts;
   const [owner] = accounts;
 
   const network = 'test';

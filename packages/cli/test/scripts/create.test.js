@@ -4,7 +4,6 @@ require('../setup');
 import random from 'lodash.random';
 import { accounts } from '@openzeppelin/test-environment';
 
-const [owner, otherAdmin] = accounts;
 
 import CaptureLogs from '../helpers/captureLogs';
 import { Contracts, Logger, helpers, Proxy, MinimalProxy, assertRevert } from '@openzeppelin/upgrades';
@@ -24,6 +23,8 @@ const ImplV1 = Contracts.getFromLocal('ImplV1');
 const BooleanContract = Contracts.getFromLocal('Boolean');
 
 describe('create script', function() {
+  const [owner, otherAdmin] = accounts;
+
   const contractName = 'ImplV1';
   const contractAlias = 'Impl';
   const anotherContractName = 'WithLibraryImplV1';

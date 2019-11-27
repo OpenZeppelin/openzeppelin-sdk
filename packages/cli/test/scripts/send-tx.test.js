@@ -14,8 +14,8 @@ import NetworkFile from '../../src/models/files/NetworkFile';
 const ImplV1 = Contracts.getFromLocal('ImplV1');
 
 describe('send-tx script', function() {
-  accounts = accounts;
   const [account] = accounts;
+
   const txParams = { from: account };
   const network = 'test';
 

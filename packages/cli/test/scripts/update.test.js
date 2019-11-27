@@ -24,7 +24,6 @@ const GreeterV1 = Contracts.getFromNodeModules('mock-stdlib', 'GreeterImpl');
 const GreeterV2 = Contracts.getFromNodeModules('mock-stdlib-2', 'GreeterImpl');
 
 describe('update script', function() {
-  accounts = accounts;
   const [owner, anotherAccount] = accounts;
 
   const network = 'test';

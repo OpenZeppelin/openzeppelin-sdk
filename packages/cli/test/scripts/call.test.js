@@ -14,9 +14,9 @@ import ProjectFile from '../../src/models/files/ProjectFile';
 import NetworkFile from '../../src/models/files/NetworkFile';
 
 describe('call script', function() {
-  accounts = accounts;
   const [account] = accounts;
   const txParams = { from: account };
+
   const network = 'test';
 
   beforeEach('setup', async function() {

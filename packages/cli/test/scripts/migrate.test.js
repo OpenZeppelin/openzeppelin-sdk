@@ -19,6 +19,7 @@ const ImplementationDirectory = Contracts.getFromLib('ImplementationDirectory');
 
 describe('migrate-manifest-version script', function() {
   const [owner, newAdmin, anotherAdmin] = accounts;
+
   const EMPTY_INITIALIZATION_DATA = Buffer.from('');
   const network = 'test';
   const txParams = { from: owner };

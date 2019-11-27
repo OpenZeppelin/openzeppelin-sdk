@@ -9,9 +9,10 @@ import freeze from '../../src/scripts/freeze';
 import ProjectFile from '../../src/models/files/ProjectFile';
 import NetworkFile from '../../src/models/files/NetworkFile';
 
-const [owner] = accounts;
 
 describe('freeze script', function() {
+  const [owner] = accounts;
+
   const network = 'test';
   const txParams = { from: owner };
 

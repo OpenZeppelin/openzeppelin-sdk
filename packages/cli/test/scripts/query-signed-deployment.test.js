@@ -12,9 +12,10 @@ import push from '../../src/scripts/push';
 import queryDeployment from '../../src/scripts/query-deployment';
 
 const should = require('chai').should();
-const [owner, another, admin] = accounts;
 
 describe('query-signed-deployment script', function() {
+  const [owner, another, admin] = accounts;
+
   const network = 'test';
   const version = '0.4.0';
   const txParams = { from: owner };

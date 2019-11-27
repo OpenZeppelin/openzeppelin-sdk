@@ -18,13 +18,14 @@ import CaptureLogs from '../helpers/captureLogs';
 
 const should = require('chai').should();
 
-const [owner] = accounts;
 
 const ImplV1 = Contracts.getFromLocal('ImplV1');
 const WithLibraryImplV1 = Contracts.getFromLocal('WithLibraryImplV1');
 const ImplementationDirectory = Contracts.getFromNodeModules('@openzeppelin/upgrades', 'ImplementationDirectory');
 
 describe('push script', function() {
+  const [owner] = accounts;
+
   const network = 'test';
   const txParams = { from: owner };
   const defaultVersion = '1.1.0';

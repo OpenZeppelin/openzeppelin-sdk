@@ -9,9 +9,10 @@ import ProjectFile from '../../src/models/files/ProjectFile';
 import NetworkFile from '../../src/models/files/NetworkFile';
 
 const should = require('chai').should();
-const [owner, another] = accounts;
 
 describe('query-deployment script', function() {
+  const [owner, another] = accounts;
+
   const network = 'test';
   const version = '0.4.0';
   const txParams = { from: owner };

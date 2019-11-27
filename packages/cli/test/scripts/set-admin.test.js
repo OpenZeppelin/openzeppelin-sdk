@@ -11,7 +11,6 @@ import ProjectFile from '../../src/models/files/ProjectFile';
 import NetworkFile from '../../src/models/files/NetworkFile';
 
 describe('set-admin script', function() {
-  accounts = accounts;
   const [owner, newAdmin, anotherNewAdmin] = accounts;
 
   const network = 'test';
