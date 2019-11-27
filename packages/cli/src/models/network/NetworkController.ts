@@ -236,7 +236,7 @@ export default class NetworkController {
   // Contract model || SolidityLib model
   private async _uploadSolidityLib(libClass: Contract): Promise<void> {
     const libName = libClass.schema.contractName;
-    await this._setSolidityLibs(libClass);
+    await this._setSolidityLibs(libClass); // Libraries may depend on other libraries themselves
     Loggy.spin(__filename, '_uploadSolidityLib', `upload-solidity-lib${libName}`, `Uploading ${libName} library`);
     const libInstance = await this.project.setImplementation(libClass, libName);
     this.networkFile.addSolidityLib(libName, libInstance);
