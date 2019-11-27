@@ -1055,22 +1055,6 @@
     try-require "^1.2.1"
     web3 "1.2.2"
 
-"@openzeppelin/test-environment@^0.1.0-rc.1":
-  version "0.1.0-rc.1"
-  resolved "https://registry.yarnpkg.com/@openzeppelin/test-environment/-/test-environment-0.1.0-rc.1.tgz#40f5c8ec3d06de6032a67ff65a1781b893a57bab"
-  dependencies:
-    "@openzeppelin/contract-loader" "^0.5.0"
-    "@truffle/contract" "^4.0.38"
-    ansi-colors "^4.1.1"
-    ethereumjs-wallet "^0.6.3"
-    find-up "^4.1.0"
-    ganache-core "^2.8.0"
-    lodash.merge "^4.6.2"
-    p-queue "^6.2.0"
-    semver "^6.3.0"
-    try-require "^1.2.1"
-    web3 "1.2.2"
-
 "@openzeppelin/test-helpers@^0.5.4":
   version "0.5.4"
   resolved "https://registry.yarnpkg.com/@openzeppelin/test-helpers/-/test-helpers-0.5.4.tgz#2366703c37849dc1b3768bff41ab9213aee28c5a"
@@ -7953,7 +7937,7 @@ mock-fs@^4.1.0:
 "mock-stdlib-invalid@file:./packages/cli/test/mocks/mock-stdlib-invalid":
   version "1.1.0"
 
-"mock-stdlib-root@file:./packages/cli/test/mocks/mock-stdlib":
+"mock-stdlib-root@file:./packages/cli/test/mocks/mock-stdlib", "mock-stdlib@file:./packages/cli/test/mocks/mock-stdlib":
   version "1.1.0"
 
 "mock-stdlib-undeployed-2@file:./packages/cli/test/mocks/mock-stdlib-undeployed-2":
@@ -7966,9 +7950,6 @@ mock-fs@^4.1.0:
   version "1.1.0"
 
 "mock-stdlib-unsupported@file:./packages/cli/test/mocks/mock-stdlib-unsupported":
-  version "1.1.0"
-
-"mock-stdlib@file:./packages/cli/test/mocks/mock-stdlib":
   version "1.1.0"
 
 "mock-stdlib@file:tests/cli/dependencies/mock-stdlib-1.1.0":
