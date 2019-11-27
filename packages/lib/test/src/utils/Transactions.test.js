@@ -7,6 +7,7 @@ import times from 'lodash.times';
 import sinon from 'sinon';
 import axios from 'axios';
 import { setInterval } from 'timers';
+import utils from 'web3-utils';
 
 import ZWeb3 from '../../../src/artifacts/ZWeb3';
 import Contracts from '../../../src/artifacts/Contracts';

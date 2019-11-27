@@ -61,7 +61,7 @@ describe('transfer script', function() {
           unit: 'ether',
         });
 
-        (await ZWeb3.getBalance(sender)).should.not.eq(new BN(senderBalance).minus(10e18).toString());
+        (await ZWeb3.getBalance(sender)).should.not.eq(new BN(senderBalance).toString());
         (await ZWeb3.getBalance(receiver)).should.eq(new BN(receiverBalance).plus(10e18).toString());
       });
     });
