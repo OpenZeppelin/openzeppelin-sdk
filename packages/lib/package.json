@@ -6,7 +6,7 @@
   "private": false,
   "license": "MIT",
   "scripts": {
-    "test": "TS_NODE_PROJECT='tsconfig.test.json' npx mocha --require ts-node/register --recursive test",
+    "test": "TS_NODE_PROJECT='tsconfig.test.json' mocha --require ts-node/register --recursive test",
     "prepublishOnly": "echo 'Removing mock contracts...' && grep -hoP '^\\s*contract \\K(\\w+)' contracts/mocks/*.sol | sort | uniq | xargs -t -I% rm build/contracts/%.json",
     "compile-contracts": "rm -rf build/contracts && ../../bootstrap/node_modules/.bin/oz compile --solc-version 0.5.3 --evm-version constantinople",
     "compile-ts": "rm -rf lib && tsc",
