@@ -89,9 +89,7 @@ describe('Contract', function() {
         it('returns methods without initializers', function() {
           const methods = this.methods.filter(({ hasInitializer }) => !hasInitializer);
           expect(methods).to.have.lengthOf(3);
-          expect(methods[0].name).to.eq('x');
-          expect(methods[1].name).to.eq('initializerRan');
-          expect(methods[2].name).to.eq('fail');
+          expect(methods.map(m => m.name)).to.have.members(['x', 'initializerRan', 'fail']);
         });
 
         it('sets selectors', function() {
@@ -114,9 +112,7 @@ describe('Contract', function() {
         it('returns methods with initializers', function() {
           const methods = this.methods.filter(({ hasInitializer }) => hasInitializer);
           expect(methods).to.have.lengthOf(3);
-          expect(methods[0].name).to.eq('initialize');
-          expect(methods[1].name).to.eq('initializeNested');
-          expect(methods[2].name).to.eq('initializeWithX');
+          expect(methods.map(m => m.name)).to.have.members(['initialize', 'initializeNested', 'initializeWithX']);
         });
 
         it('returns an array of methods', function() {
@@ -125,10 +121,12 @@ describe('Contract', function() {
         });
 
         it('sets selectors', function() {
-          expect(this.methods[0].selector).to.eq('initialize()');
-          expect(this.methods[1].selector).to.eq('initializeNested()');
-          expect(this.methods[2].selector).to.eq('initializeWithX(uint256)');
-          expect(this.methods[3].selector).to.eq('nonInitializable(uint256)');
+          expect(this.methods.map(m => m.selector)).to.have.members([
+            'initialize()',
+            'initializeNested()',
+            'initializeWithX(uint256)',
+            'nonInitializable(uint256)',
+          ]);
         });
       });
     });
