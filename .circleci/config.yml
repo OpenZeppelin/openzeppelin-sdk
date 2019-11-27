@@ -66,12 +66,16 @@ jobs:
       - run:
           name: Lint check
           command: yarn lint:check
+      - run:
+          name: Install global CLI
+          command: npm install --global @openzeppelin/cli@^2.6
       - save_cache:
           key: dependency-cache-v5-{{ checksum "yarn.lock" }}
           paths:
             - node_modules
             - packages/cli/node_modules
             - packages/lib/node_modules
+            - /usr/local/bin/node_modules
       - save_cache:
           key: yarn-cache-v7-{{ checksum "yarn.lock" }}
           paths:
