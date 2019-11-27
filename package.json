@@ -14,7 +14,7 @@
   ],
   "nohoist": ["**/mock-stdlib"],
   "scripts": {
-    "prepare": "lerna run prepare",
+    "prepare": "yarn --cwd bootstrap && lerna run prepare",
     "lint:check": "lerna run lint:check"
   },
   "devDependencies": {
