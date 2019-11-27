@@ -9,9 +9,8 @@ import sinon from 'sinon';
 import npm from 'npm-programmatic';
 import Dependency from '../../src/models/dependency/Dependency';
 
-const [from] = accounts;
-
 describe('Dependency', function() {
+  const [from] = accounts;
   describe('static methods', function() {
     describe('#satisfiesVersion', function() {
       it('verifies if requirement satisfies version', function() {
