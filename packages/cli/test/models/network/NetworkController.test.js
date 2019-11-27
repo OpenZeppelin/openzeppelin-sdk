@@ -42,7 +42,7 @@ contract('NetworkController', function() {
        *
        *  Expected ordering:
        *
-       *  [Y, D, E, G, F, A, C, B]
+       *  [D, Z, Y, E, G, F, A, C, B]
        *
        */
 
