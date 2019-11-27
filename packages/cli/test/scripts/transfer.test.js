@@ -3,7 +3,6 @@ require('../setup');
 
 import BN from 'bignumber.js';
 
-import utils from 'web3-utils';
 import { accounts } from '@openzeppelin/test-environment';
 
 import { ZWeb3 } from '@openzeppelin/upgrades';
@@ -11,7 +10,7 @@ import { ZWeb3 } from '@openzeppelin/upgrades';
 import transfer from '../../src/scripts/transfer';
 
 describe('transfer script', function() {
-  const [sender, receiver] = accounts.map(utils.toChecksumAddress);
+  const [sender, receiver] = accounts;
 
   describe('validations', function() {
     context('when no recipient address is specified', function() {

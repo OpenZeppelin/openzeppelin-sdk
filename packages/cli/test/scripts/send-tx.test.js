@@ -1,6 +1,5 @@
 'use strict';
 require('../setup');
-import utils from 'web3-utils';
 import { accounts } from '@openzeppelin/test-environment';
 
 import add from '../../src/scripts/add';
@@ -15,7 +14,7 @@ import NetworkFile from '../../src/models/files/NetworkFile';
 const ImplV1 = Contracts.getFromLocal('ImplV1');
 
 describe('send-tx script', function() {
-  accounts = accounts.map(utils.toChecksumAddress);
+  accounts = accounts;
   const [account] = accounts;
   const txParams = { from: account };
   const network = 'test';

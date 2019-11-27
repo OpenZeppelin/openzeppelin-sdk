@@ -14,7 +14,7 @@ const ERC20 = Contracts.getFromLocal('ERC20Fake');
 const ERC20Detailed = Contracts.getFromLocal('ERC20FakeDetailed');
 
 describe('balance script', function() {
-  const [accountAddress] = accounts.map(utils.toChecksumAddress);
+  const [accountAddress] = accounts;
 
   beforeEach('set logger captures', function() {
     this.logs = new CaptureLogs();

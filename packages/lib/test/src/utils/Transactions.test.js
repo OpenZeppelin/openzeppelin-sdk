@@ -7,7 +7,6 @@ import times from 'lodash.times';
 import sinon from 'sinon';
 import axios from 'axios';
 import { setInterval } from 'timers';
-import utils from 'web3-utils';
 
 import ZWeb3 from '../../../src/artifacts/ZWeb3';
 import Contracts from '../../../src/artifacts/Contracts';
@@ -19,7 +18,7 @@ const DEFAULT_GAS = 6721975;
 const DEFAULT_PARAMS = [42, 'foo', [1, 2, 3]];
 
 describe('Transactions', function() {
-  accounts = accounts.map(utils.toChecksumAddress);
+  accounts = accounts;
   const [_account1, account2] = accounts;
 
   beforeEach('load contract', function() {

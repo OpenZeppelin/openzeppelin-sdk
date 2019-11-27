@@ -7,15 +7,13 @@ import { accounts } from '@openzeppelin/test-environment';
 import publish from '../../src/scripts/publish';
 import push from '../../src/scripts/push';
 import create from '../../src/scripts/create';
-import setAdmin from '../../src/scripts/set-admin';
 import ProjectFile from '../../src/models/files/ProjectFile';
 import NetworkFile from '../../src/models/files/NetworkFile';
-import utils from 'web3-utils';
 
 const should = require('chai').should();
 
 describe('publish script', function() {
-  accounts = accounts.map(utils.toChecksumAddress);
+  accounts = accounts;
   const [owner] = accounts;
 
   const network = 'test';

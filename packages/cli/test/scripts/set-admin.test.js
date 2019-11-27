@@ -9,10 +9,9 @@ import createProxy from '../../src/scripts/create';
 import setAdmin from '../../src/scripts/set-admin';
 import ProjectFile from '../../src/models/files/ProjectFile';
 import NetworkFile from '../../src/models/files/NetworkFile';
-import utils from 'web3-utils';
 
 describe('set-admin script', function() {
-  accounts = accounts.map(utils.toChecksumAddress);
+  accounts = accounts;
   const [owner, newAdmin, anotherNewAdmin] = accounts;
 
   const network = 'test';
