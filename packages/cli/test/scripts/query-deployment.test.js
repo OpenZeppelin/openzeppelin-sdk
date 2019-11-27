@@ -2,13 +2,17 @@
 require('../setup');
 
 import random from 'lodash.random';
+import { accounts } from '@openzeppelin/test-environment';
+
 import queryDeployment from '../../src/scripts/query-deployment';
 import ProjectFile from '../../src/models/files/ProjectFile';
 import NetworkFile from '../../src/models/files/NetworkFile';
 
 const should = require('chai').should();
 
-contract('query-deployment script', function([_, owner, another]) {
+describe('query-deployment script', function() {
+  const [owner, another] = accounts;
+
   const network = 'test';
   const version = '0.4.0';
   const txParams = { from: owner };

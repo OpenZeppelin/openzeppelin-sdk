@@ -3,6 +3,7 @@ require('../setup');
 
 const zosLib = require('@openzeppelin/upgrades'); // eslint-disable-line @typescript-eslint/no-var-requires
 import { ZWeb3, Contracts, App, Package, ProxyAdmin, ProxyFactory } from '@openzeppelin/upgrades';
+import { accounts } from '@openzeppelin/test-environment';
 
 import sinon from 'sinon';
 import push from '../../src/scripts/push';
@@ -21,7 +22,9 @@ const ImplV1 = Contracts.getFromLocal('ImplV1');
 const WithLibraryImplV1 = Contracts.getFromLocal('WithLibraryImplV1');
 const ImplementationDirectory = Contracts.getFromNodeModules('@openzeppelin/upgrades', 'ImplementationDirectory');
 
-contract('push script', function([_, owner]) {
+describe('push script', function() {
+  const [owner] = accounts;
+
   const network = 'test';
   const txParams = { from: owner };
   const defaultVersion = '1.1.0';

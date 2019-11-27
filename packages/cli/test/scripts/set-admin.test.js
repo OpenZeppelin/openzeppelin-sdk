@@ -2,17 +2,16 @@
 require('../setup');
 
 import { Proxy, ProxyAdmin } from '@openzeppelin/upgrades';
+import { accounts } from '@openzeppelin/test-environment';
 
 import push from '../../src/scripts/push';
 import createProxy from '../../src/scripts/create';
 import setAdmin from '../../src/scripts/set-admin';
 import ProjectFile from '../../src/models/files/ProjectFile';
 import NetworkFile from '../../src/models/files/NetworkFile';
-import utils from 'web3-utils';
 
-contract('set-admin script', function(accounts) {
-  accounts = accounts.map(utils.toChecksumAddress);
-  const [_skipped, owner, newAdmin, anotherNewAdmin] = accounts;
+describe('set-admin script', function() {
+  const [owner, newAdmin, anotherNewAdmin] = accounts;
 
   const network = 'test';
   const txParams = { from: owner };

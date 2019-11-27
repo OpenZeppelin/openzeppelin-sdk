@@ -4,6 +4,8 @@ require('../setup');
 import mapKeys from 'lodash.mapkeys';
 import omit from 'lodash.omit';
 import { Contracts, Proxy } from '@openzeppelin/upgrades';
+import { accounts } from '@openzeppelin/test-environment';
+
 import CaptureLogs from '../helpers/captureLogs';
 
 import add from '../../src/scripts/add';
@@ -15,16 +17,14 @@ import update from '../../src/scripts/update';
 import setAdmin from '../../src/scripts/set-admin';
 import ProjectFile from '../../src/models/files/ProjectFile';
 import NetworkFile from '../../src/models/files/NetworkFile';
-import utils from 'web3-utils';
 import { ProxyType } from '../../src/scripts/interfaces';
 
 const ImplV1 = Contracts.getFromLocal('ImplV1');
 const GreeterV1 = Contracts.getFromNodeModules('mock-stdlib', 'GreeterImpl');
 const GreeterV2 = Contracts.getFromNodeModules('mock-stdlib-2', 'GreeterImpl');
 
-contract('update script', function(accounts) {
-  accounts = accounts.map(utils.toChecksumAddress);
-  const [_skipped, owner, anotherAccount] = accounts;
+describe('update script', function() {
+  const [owner, anotherAccount] = accounts;
 
   const network = 'test';
   const version1 = '0.1.0';

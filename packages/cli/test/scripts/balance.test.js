@@ -2,16 +2,19 @@
 require('../setup');
 
 import utils from 'web3-utils';
-import { ZWeb3, Contracts } from '@openzeppelin/upgrades';
+import { Contracts } from '@openzeppelin/upgrades';
+import { accounts, web3 } from '@openzeppelin/test-environment';
+
 import CaptureLogs from '../helpers/captureLogs';
+import { fromWei } from '../../src/utils/units';
 
 import balance from '../../src/scripts/balance';
 
 const ERC20 = Contracts.getFromLocal('ERC20Fake');
 const ERC20Detailed = Contracts.getFromLocal('ERC20FakeDetailed');
 
-contract('balance script', function(accounts) {
-  const [_, accountAddress] = accounts.map(utils.toChecksumAddress);
+describe('balance script', function() {
+  const [accountAddress] = accounts;
 
   beforeEach('set logger captures', function() {
     this.logs = new CaptureLogs();
@@ -30,9 +33,10 @@ contract('balance script', function(accounts) {
 
     context('when not specifying an ERC20 token address', function() {
       it('logs balance in ETH', async function() {
+        const eth = fromWei(await web3.eth.getBalance(accountAddress), 'ether');
         await balance({ accountAddress });
         this.logs.infos.should.have.lengthOf(1);
-        this.logs.infos[0].should.eq('Balance: 100 ETH');
+        this.logs.infos[0].should.eq(`Balance: ${eth} ETH`);
       });
     });
 

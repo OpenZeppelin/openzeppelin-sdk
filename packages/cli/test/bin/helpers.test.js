@@ -1,3 +1,4 @@
+import { expect } from 'chai';
 import findRootDirectory from '../../src/bin/helpers';
 
 describe('bin helpers', function() {

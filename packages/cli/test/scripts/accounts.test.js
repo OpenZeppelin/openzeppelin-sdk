@@ -1,16 +1,14 @@
 'use strict';
 
 require('../setup');
-import utils from 'web3-utils';
 import sinon from 'sinon';
 import { ZWeb3 } from '@openzeppelin/upgrades';
+import { defaultSender, accounts as accountList } from '@openzeppelin/test-environment';
 
 import accounts from '../../src/scripts/accounts';
 import CaptureLogs from '../helpers/captureLogs';
 
-contract('accounts script', function(accountList) {
-  accountList = accountList.map(utils.toChecksumAddress);
-  const [defaultAccount] = accountList;
+describe('accounts script', function() {
   const network = 'test';
 
   beforeEach('caputre logs', function() {
@@ -27,7 +25,7 @@ contract('accounts script', function(accountList) {
 
       this.logs.infos.should.have.lengthOf(3);
       this.logs.infos[0].should.eq(`Accounts for ${network}:`);
-      this.logs.infos[1].should.eq(`Default: ${defaultAccount}`);
+      this.logs.infos[1].should.eq(`Default: ${defaultSender}`);
       accountList.forEach(account => this.logs.infos[2].should.match(new RegExp(account)));
     });
   });

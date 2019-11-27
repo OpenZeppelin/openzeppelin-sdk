@@ -2,11 +2,13 @@
 require('../setup');
 
 import sinon from 'sinon';
+import { expect } from 'chai';
+
 import add from '../../src/scripts/add';
 import addAll from '../../src/scripts/add-all';
 import ProjectFile from '../../src/models/files/ProjectFile';
 
-contract('add script', function() {
+describe('add script', function() {
   const contractName = 'ImplV1';
   const contractAlias = 'Impl';
   const contractsData = [{ name: contractName, alias: contractAlias }];

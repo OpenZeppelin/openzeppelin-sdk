@@ -19,7 +19,7 @@ const DEFAULT_GAS = 6721975;
 const DEFAULT_PARAMS = [42, 'foo', [1, 2, 3]];
 
 describe('Transactions', function() {
-  accounts = accounts.map(utils.toChecksumAddress);
+  accounts = accounts;
   const [_account1, account2] = accounts;
 
   beforeEach('load contract', function() {

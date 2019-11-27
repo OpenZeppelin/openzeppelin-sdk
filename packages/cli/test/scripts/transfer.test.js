@@ -1,13 +1,16 @@
 'use strict';
 require('../setup');
 
-import utils from 'web3-utils';
+import BN from 'bignumber.js';
+
+import { accounts } from '@openzeppelin/test-environment';
+
 import { ZWeb3 } from '@openzeppelin/upgrades';
 
 import transfer from '../../src/scripts/transfer';
 
-contract('transfer script', function(accounts) {
-  const [_, sender, receiver] = accounts.map(utils.toChecksumAddress);
+describe('transfer script', function() {
+  const [sender, receiver] = accounts;
 
   describe('validations', function() {
     context('when no recipient address is specified', function() {
@@ -48,8 +51,8 @@ contract('transfer script', function(accounts) {
 
     context('when sending a valid amount of ether', function() {
       it('transfers funds', async function() {
-        (await ZWeb3.getBalance(sender)).should.eq((100e18).toString());
-        (await ZWeb3.getBalance(receiver)).should.eq((100e18).toString());
+        const senderBalance = await ZWeb3.getBalance(sender);
+        const receiverBalance = await ZWeb3.getBalance(receiver);
 
         await transfer({
           from: sender,
@@ -58,8 +61,8 @@ contract('transfer script', function(accounts) {
           unit: 'ether',
         });
 
-        (await ZWeb3.getBalance(sender)).should.not.eq((100e18).toString());
-        (await ZWeb3.getBalance(receiver)).should.eq((110e18).toString());
+        (await ZWeb3.getBalance(sender)).should.not.eq(new BN(senderBalance).toString());
+        (await ZWeb3.getBalance(receiver)).should.eq(new BN(receiverBalance).plus(10e18).toString());
       });
     });
   });

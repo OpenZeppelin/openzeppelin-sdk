@@ -7,7 +7,7 @@ import { FileSystem } from '@openzeppelin/upgrades';
 import TruffleConfig from '../../src/models/config/TruffleConfig';
 import CaptureLogs from '../helpers/captureLogs';
 
-contract('TruffleConfig', () => {
+describe('TruffleConfig', () => {
   const testDir = `${process.cwd()}/test/tmp`;
 
   beforeEach('create test dir', function() {

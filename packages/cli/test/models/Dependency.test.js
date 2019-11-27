@@ -2,11 +2,16 @@
 
 require('../setup');
 
+import { expect } from 'chai';
+import { accounts } from '@openzeppelin/test-environment';
+
 import sinon from 'sinon';
 import npm from 'npm-programmatic';
 import Dependency from '../../src/models/dependency/Dependency';
 
-contract('Dependency', function([_, from]) {
+describe('Dependency', function() {
+  const [from] = accounts;
+
   describe('static methods', function() {
     describe('#satisfiesVersion', function() {
       it('verifies if requirement satisfies version', function() {
@@ -24,7 +29,7 @@ contract('Dependency', function([_, from]) {
       it('fetches version from npm for org package', async function() {
         const actual = await Dependency.fetchVersionFromNpm('@openzeppelin/cli');
         actual.should.match(/^@openzeppelin\/cli@\^\d+\.\d+\.0$/);
-      });
+      }).timeout(5000);
     });
 
     describe('#fromNameAndVersion', function() {

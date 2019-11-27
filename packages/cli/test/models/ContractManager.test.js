@@ -2,13 +2,15 @@
 
 require('../setup');
 
+import { expect } from 'chai';
+
 import sinon from 'sinon';
 import { FileSystem, Contracts } from '@openzeppelin/upgrades';
 import ContractManager from '../../src/models/local/ContractManager';
 import ProjectFile from '../../src/models/files/ProjectFile';
 import ConfigManager from '../../src/models/config/ConfigManager';
 
-contract('ContractManager', function([_, from]) {
+describe('ContractManager', function() {
   describe('methods', function() {
     describe('getContractNames', function() {
       context('without directory created', function() {
@@ -61,7 +63,8 @@ contract('ContractManager', function([_, from]) {
                 bytecode: '0x124',
                 contractName: 'Foo',
               };
-              FileSystem.writeJson(`${this.testDir}/build/contracts/Foo.json`, builtContract);
+              this.fooContractPath = `${this.testDir}/build/contracts/Foo.json`;
+              FileSystem.writeJson(this.fooContractPath, builtContract);
               this.projectFile = new ProjectFile(`${this.testDir}/zos.json`);
               this.contractManager = new ContractManager(this.projectFile);
               sinon.stub(ConfigManager, 'getBuildDir').returns(`${this.testDir}/build/contracts`);
@@ -69,6 +72,7 @@ contract('ContractManager', function([_, from]) {
             });
 
             afterEach(function() {
+              FileSystem.remove(this.fooContractPath);
               sinon.restore();
             });
 
