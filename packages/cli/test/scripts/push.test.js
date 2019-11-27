@@ -18,7 +18,6 @@ import CaptureLogs from '../helpers/captureLogs';
 
 const should = require('chai').should();
 
-
 const ImplV1 = Contracts.getFromLocal('ImplV1');
 const WithLibraryImplV1 = Contracts.getFromLocal('WithLibraryImplV1');
 const ImplementationDirectory = Contracts.getFromNodeModules('@openzeppelin/upgrades', 'ImplementationDirectory');

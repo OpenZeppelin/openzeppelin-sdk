@@ -9,7 +9,6 @@ import freeze from '../../src/scripts/freeze';
 import ProjectFile from '../../src/models/files/ProjectFile';
 import NetworkFile from '../../src/models/files/NetworkFile';
 
-
 describe('freeze script', function() {
   const [owner] = accounts;
 

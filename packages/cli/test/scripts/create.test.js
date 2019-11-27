@@ -4,7 +4,6 @@ require('../setup');
 import random from 'lodash.random';
 import { accounts } from '@openzeppelin/test-environment';
 
-
 import CaptureLogs from '../helpers/captureLogs';
 import { Contracts, Logger, helpers, Proxy, MinimalProxy, assertRevert } from '@openzeppelin/upgrades';
 
