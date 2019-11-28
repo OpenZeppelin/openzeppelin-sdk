@@ -1,13 +1,15 @@
 'use strict';
 require('../../setup');
 
+import { assert, expect } from 'chai';
+
 import sinon from 'sinon';
 import NetworkController from '../../../src/models/network/NetworkController';
 import NetworkFile from '../../../src/models/files/NetworkFile';
 import ProjectFile from '../../../src/models/files/ProjectFile';
 import { AppProjectDeployer } from '../../../src/models/network/ProjectDeployer';
 
-contract('NetworkController', function() {
+describe('NetworkController', function() {
   let projectFile, networkFile, controller;
 
   beforeEach(() => {
