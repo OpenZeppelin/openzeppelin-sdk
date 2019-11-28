@@ -1,3 +1,5 @@
+require('ts-node/register')
+
 module.exports = {
   networks: {
     local: {
@@ -12,4 +14,13 @@ module.exports = {
       port: 9555
     },
   },
+  compilers: {
+    solc: {
+      version: "0.5.3",
+      evmVersion: "constantinople"
+    }
+  },
+  mocha: {
+    forbidOnly: !!process.env.CI
+  }
 }
