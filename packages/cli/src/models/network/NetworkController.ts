@@ -2,6 +2,7 @@
 
 import isEmpty from 'lodash.isempty';
 import intersection from 'lodash.intersection';
+import difference from 'lodash.difference';
 import uniq from 'lodash.uniq';
 import filter from 'lodash.filter';
 import every from 'lodash.every';
@@ -9,7 +10,7 @@ import partition from 'lodash.partition';
 import map from 'lodash.map';
 import concat from 'lodash.concat';
 import toPairs from 'lodash.topairs';
-import TopologicalSort from 'topological-sort';
+import toposort from 'toposort';
 
 import {
   Contracts,
@@ -318,27 +319,24 @@ export default class NetworkController {
 
   // Contract model || SolidityLib model
   private _getAllSolidityLibNames(contractNames: string[]): string[] {
-    const graph = new TopologicalSort<string, string>(new Map<string, string>());
+    const graph: string[][] = [];
+    const nodes: string[] = [];
 
     contractNames.forEach(contractName => {
-      const deps = this._getContractDependencies(contractName);
-      deps.forEach(dependencyContractName => {
-        this._populateDependencyGraph(dependencyContractName, graph);
-      });
+      this._populateDependencyGraph(contractName, nodes, graph);
     });
 
-    const sorted = graph.sort();
-    return [...sorted.keys()].reverse();
+    // exclude original contracts
+    return [...difference(toposort(graph), contractNames).reverse()];
   }
 
-  private _populateDependencyGraph(contractName: string, graph: TopologicalSort<string, string>) {
-    // @ts-ignore
-    if (!graph.nodes.has(contractName)) {
-      graph.addNode(contractName, contractName);
-      const deps = this._getContractDependencies(contractName);
-      deps.forEach(dependencyContractName => {
-        this._populateDependencyGraph(dependencyContractName, graph);
-        graph.addEdge(contractName, dependencyContractName);
+  private _populateDependencyGraph(contractName: string, nodes: string[], graph: string[][]) {
+    // if library is already added just ingore it
+    if (!nodes.includes(contractName)) {
+      nodes.push(contractName);
+      this._getContractDependencies(contractName).forEach(dependencyContractName => {
+        this._populateDependencyGraph(dependencyContractName, nodes, graph);
+        graph.push([contractName, dependencyContractName]);
       });
     }
   }

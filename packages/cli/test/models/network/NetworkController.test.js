@@ -42,7 +42,9 @@ contract('NetworkController', function() {
        *
        *  Expected ordering:
        *
-       *  [D, Z, Y, E, G, F, A, C, B]
+       *  Note, that order is not exactly fixed.
+       *  Some dependencies may swap positions without losing validity like (B, A) == (A, B)
+       *  [Z, Y, D, E, G, F, C, B, A]
        *
        */
 
@@ -98,7 +100,7 @@ contract('NetworkController', function() {
 
       const result = controller._getAllSolidityLibNames(['0']);
 
-      assert.deepEqual(result, ['D', 'Z', 'Y', 'E', 'G', 'F', 'A', 'C', 'B']);
+      assert.deepEqual(result, ['Z', 'Y', 'D', 'E', 'G', 'F', 'C', 'B', 'A']);
     });
 
     it('should throw on cycles', () => {
@@ -132,7 +134,7 @@ contract('NetworkController', function() {
 
       expect(() => {
         controller._getAllSolidityLibNames(['0']);
-      }).to.throw(/circular/);
+      }).to.throw(/Cyclic/);
     });
   });
 
