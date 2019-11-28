@@ -36,5 +36,9 @@ export function compilerSettingsMatch(s1: CompilerVersionOptions, s2: CompilerVe
 }
 
 export function getImports(source: string): string[] {
-  return getMetadata(source).imports;
+  try {
+    return getMetadata(source).imports;
+  } catch {
+    return [];
+  }
 }
