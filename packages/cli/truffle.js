@@ -1,5 +1,3 @@
-require('ts-node/register')
-
 module.exports = {
   networks: {
     local: {
