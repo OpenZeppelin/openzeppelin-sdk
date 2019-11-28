@@ -1,16 +1,16 @@
 'use strict';
 
 import isEmpty from 'lodash.isempty';
-import compact from 'lodash.compact';
 import intersection from 'lodash.intersection';
+import difference from 'lodash.difference';
 import uniq from 'lodash.uniq';
-import flatten from 'lodash.flatten';
 import filter from 'lodash.filter';
 import every from 'lodash.every';
 import partition from 'lodash.partition';
 import map from 'lodash.map';
 import concat from 'lodash.concat';
 import toPairs from 'lodash.topairs';
+import toposort from 'toposort';
 
 import {
   Contracts,
@@ -39,6 +39,7 @@ import {
   AppProxyMigrator,
   MinimalProxy,
 } from '@openzeppelin/upgrades';
+
 import { isMigratableManifestVersion } from '../files/ManifestVersion';
 import { allPromisesOrError } from '../../utils/async';
 import { toContractFullName } from '../../utils/naming';
@@ -208,7 +209,8 @@ export default class NetworkController {
   // Contract model || SolidityLib model
   private _solidityLibsForPush(onlyChanged: boolean = false): Contract[] | never {
     const { contractNames, contractAliases } = this.projectFile;
-    const libNames = this._getAllSolidityLibNames(contractNames);
+
+    let libNames = this._getAllSolidityLibNames(contractNames);
 
     const clashes = intersection(libNames, contractAliases);
     if (!isEmpty(clashes)) {
@@ -226,12 +228,16 @@ export default class NetworkController {
 
   // Contract model || SolidityLib model
   public async uploadSolidityLibs(libs: Contract[]): Promise<void> {
-    await allPromisesOrError(libs.map(lib => this._uploadSolidityLib(lib)));
+    // Libs may have dependencies, so deploy them in order
+    for (let i = 0; i < libs.length; i++) {
+      await this._uploadSolidityLib(libs[i]);
+    }
   }
 
   // Contract model || SolidityLib model
   private async _uploadSolidityLib(libClass: Contract): Promise<void> {
     const libName = libClass.schema.contractName;
+    await this._setSolidityLibs(libClass); // Libraries may depend on other libraries themselves
     Loggy.spin(__filename, '_uploadSolidityLib', `upload-solidity-lib${libName}`, `Uploading ${libName} library`);
     const libInstance = await this.project.setImplementation(libClass, libName);
     this.networkFile.addSolidityLib(libName, libInstance);
@@ -313,12 +319,31 @@ export default class NetworkController {
 
   // Contract model || SolidityLib model
   private _getAllSolidityLibNames(contractNames: string[]): string[] {
-    const libNames = contractNames.map(contractName => {
-      const contract = Contracts.getFromLocal(contractName);
-      return getSolidityLibNames(contract.schema.bytecode);
+    const graph: string[][] = [];
+    const nodes: string[] = [];
+
+    contractNames.forEach(contractName => {
+      this._populateDependencyGraph(contractName, nodes, graph);
     });
 
-    return uniq(flatten(libNames));
+    // exclude original contracts
+    return [...difference(toposort(graph), contractNames).reverse()];
+  }
+
+  private _populateDependencyGraph(contractName: string, nodes: string[], graph: string[][]) {
+    // if library is already added just ingore it
+    if (!nodes.includes(contractName)) {
+      nodes.push(contractName);
+      this._getContractDependencies(contractName).forEach(dependencyContractName => {
+        this._populateDependencyGraph(dependencyContractName, nodes, graph);
+        graph.push([contractName, dependencyContractName]);
+      });
+    }
+  }
+
+  private _getContractDependencies(contractName: string): string[] {
+    const contract = Contracts.getFromLocal(contractName);
+    return getSolidityLibNames(contract.schema.bytecode);
   }
 
   // Contract model
