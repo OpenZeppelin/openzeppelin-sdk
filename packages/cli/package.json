@@ -8,9 +8,9 @@
   "scripts": {
     "copy-files": "./scripts/copy-files.sh",
     "compile-ts": "rm -rf lib && tsc",
-    "compile-contracts": "rm -rf build/contracts && truffle compile",
+    "compile-contracts": "rm -rf build/contracts && ../../bootstrap/node_modules/.bin/oz compile --solc-version 0.5.3 --evm-version constantinople",
     "prepare": "npm run compile-contracts && npm run compile-ts && npm run copy-files && chmod 755 ./lib/bin/oz-cli.js",
-    "test": "TS_NODE_PROJECT='tsconfig.test.json' npx mocha --require ts-node/register --recursive test",
+    "test": "TS_NODE_PROJECT='tsconfig.test.json' mocha --require ts-node/register --recursive test",
     "gen-docs": "./scripts/gen-docs.sh",
     "watch": "tsc -w",
     "lint": "eslint '*/**/*.{js,ts}' --quiet --fix",
@@ -164,7 +164,6 @@
     "prettier": "^1.17.1",
     "sinon": "^6.1.4",
     "sinon-chai": "^3.2.0",
-    "truffle": "^5.0.5",
     "ts-node": "^7.0.1",
     "typescript": "^3.2.2",
     "yargs": "^7.1.0"
