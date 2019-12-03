@@ -1,4 +1,3 @@
-import tty from 'tty';
 import uniqBy from 'lodash.uniqby';
 import flatten from 'lodash.flatten';
 import isEmpty from 'lodash.isempty';
@@ -54,20 +53,10 @@ interface MethodOptions {
 }
 
 export let DISABLE_INTERACTIVITY: boolean =
-  !isStdinATerminal() ||
+  !process.stdin.isTTY ||
   !!process.env.OPENZEPPELIN_NON_INTERACTIVE ||
   !!process.env.ZOS_NON_INTERACTIVE ||
   process.env.DEBIAN_FRONTEND === 'noninteractive';
-
-function isStdinATerminal(): boolean {
-  // process.stdin doesn't necessarily have a file descriptor
-  const stdin = process.stdin as { fd?: number };
-  if (stdin.fd === undefined) {
-    return false;
-  } else {
-    return tty.isatty(stdin.fd);
-  }
-}
 
 /*
  * This function will parse and wrap both arguments and options into inquirer questions, where
