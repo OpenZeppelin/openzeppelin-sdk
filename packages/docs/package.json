@@ -31,6 +31,6 @@
     "babel-plugin-transform-object-rest-spread": "^6.26.0",
     "babel-polyfill": "^6.26.0",
     "babel-preset-env": "^1.7.0",
-    "openzeppelin-docs-preview": "github:OpenZeppelin/docs-preview-script"
+    "openzeppelin-docs-utils": "github:OpenZeppelin/docs-utils"
   }
 }

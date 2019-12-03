@@ -7374,6 +7374,11 @@ lodash.sortby@^4.7.0:
   version "4.7.0"
   resolved "https://registry.yarnpkg.com/lodash.sortby/-/lodash.sortby-4.7.0.tgz#edd14c824e2cc9c1e0b0a1b42bb5210516a42438"
 
+lodash.startcase@^4.4.0:
+  version "4.4.0"
+  resolved "https://registry.yarnpkg.com/lodash.startcase/-/lodash.startcase-4.4.0.tgz#9436e34ed26093ed7ffae1936144350915d9add8"
+  integrity sha1-lDbjTtJgk+1/+uGTYUQ1CRXZrdg=
+
 lodash.template@^4.0.2, lodash.template@^4.4.0, lodash.template@^4.5.0:
   version "4.5.0"
   resolved "https://registry.yarnpkg.com/lodash.template/-/lodash.template-4.5.0.tgz#f976195cf3f347d0d5f52483569fe8031ccce8ab"
@@ -7958,7 +7963,7 @@ mock-fs@^4.1.0:
 "mock-stdlib-libdeps@file:./packages/cli/test/mocks/mock-stdlib-libdeps":
   version "1.1.0"
 
-"mock-stdlib-root@file:./packages/cli/test/mocks/mock-stdlib", "mock-stdlib@file:./packages/cli/test/mocks/mock-stdlib":
+"mock-stdlib-root@file:./packages/cli/test/mocks/mock-stdlib":
   version "1.1.0"
 
 "mock-stdlib-undeployed-2@file:./packages/cli/test/mocks/mock-stdlib-undeployed-2":
@@ -7971,6 +7976,9 @@ mock-fs@^4.1.0:
   version "1.1.0"
 
 "mock-stdlib-unsupported@file:./packages/cli/test/mocks/mock-stdlib-unsupported":
+  version "1.1.0"
+
+"mock-stdlib@file:./packages/cli/test/mocks/mock-stdlib":
   version "1.1.0"
 
 "mock-stdlib@file:tests/cli/dependencies/mock-stdlib-1.1.0":
@@ -8458,9 +8466,9 @@ onetime@^5.1.0:
   dependencies:
     mimic-fn "^2.1.0"
 
-"openzeppelin-docs-preview@github:OpenZeppelin/docs-preview-script":
+"openzeppelin-docs-utils@github:OpenZeppelin/docs-utils":
   version "0.0.0"
-  resolved "https://codeload.github.com/OpenZeppelin/docs-preview-script/tar.gz/d012a140df023a5b81b4926e5bf595843cd9452e"
+  resolved "https://codeload.github.com/OpenZeppelin/docs-utils/tar.gz/8e3fa255734046186a0cd4c530cca6213629be36"
   dependencies:
     chalk "^3.0.0"
     chokidar "^3.3.0"
@@ -8469,6 +8477,7 @@ onetime@^5.1.0:
     is-port-reachable "^3.0.0"
     js-yaml "^3.13.1"
     live-server "^1.2.1"
+    lodash.startcase "^4.4.0"
     minimist "^1.2.0"
 
 openzeppelin-eth@^2.2.0:
