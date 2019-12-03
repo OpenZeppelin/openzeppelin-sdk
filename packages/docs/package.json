@@ -7,7 +7,7 @@
   "license": "MIT",
   "scripts": {
     "prepare-docs": "bash scripts/prepare-docs.sh",
-    "docs": "oz-docs",
+    "docs": "oz-docs -c .",
     "docs:watch": "npm run docs watch templates ../lib/contracts ../cli/src/{bin,commands}"
   },
   "files": [],

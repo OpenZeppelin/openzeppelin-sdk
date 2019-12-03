@@ -7963,7 +7963,7 @@ mock-fs@^4.1.0:
 "mock-stdlib-libdeps@file:./packages/cli/test/mocks/mock-stdlib-libdeps":
   version "1.1.0"
 
-"mock-stdlib-root@file:./packages/cli/test/mocks/mock-stdlib":
+"mock-stdlib-root@file:./packages/cli/test/mocks/mock-stdlib", "mock-stdlib@file:./packages/cli/test/mocks/mock-stdlib":
   version "1.1.0"
 
 "mock-stdlib-undeployed-2@file:./packages/cli/test/mocks/mock-stdlib-undeployed-2":
@@ -7976,9 +7976,6 @@ mock-fs@^4.1.0:
   version "1.1.0"
 
 "mock-stdlib-unsupported@file:./packages/cli/test/mocks/mock-stdlib-unsupported":
-  version "1.1.0"
-
-"mock-stdlib@file:./packages/cli/test/mocks/mock-stdlib":
   version "1.1.0"
 
 "mock-stdlib@file:tests/cli/dependencies/mock-stdlib-1.1.0":
@@ -8468,7 +8465,7 @@ onetime@^5.1.0:
 
 "openzeppelin-docs-utils@github:OpenZeppelin/docs-utils":
   version "0.0.0"
-  resolved "https://codeload.github.com/OpenZeppelin/docs-utils/tar.gz/8e3fa255734046186a0cd4c530cca6213629be36"
+  resolved "https://codeload.github.com/OpenZeppelin/docs-utils/tar.gz/8fc52787d3baeea11851606f31ece84f20641ef9"
   dependencies:
     chalk "^3.0.0"
     chokidar "^3.3.0"
