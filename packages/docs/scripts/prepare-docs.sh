@@ -6,6 +6,10 @@ log() {
   echo "$*" >&2
 }
 
+if [ ! -d node_modules ]; then
+  yarn --cwd ../..
+fi
+
 # lib
 log "Building lib docs..."
 solidity-docgen -i ../lib/contracts/ -o modules/api/pages -e ../lib/contracts/mocks -x adoc -t templates
@@ -14,13 +18,5 @@ log "Done"
 
 # cli
 log "Building CLI docs..."
-
-# [TODO] run this only if dependencies aren't installed yet
-cd ../..
-shopt -s globstar && rm -rf **/node_modules/websocket/.git
-npm ci
-npx lerna bootstrap
-cd packages/cli
-
-npm run gen-docs
+yarn --cwd ../cli gen-docs
 log "Done"

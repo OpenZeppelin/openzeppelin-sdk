@@ -7,7 +7,8 @@
   "license": "MIT",
   "scripts": {
     "prepare-docs": "bash scripts/prepare-docs.sh",
-    "docs": "bash scripts/docs.sh"
+    "docs": "oz-docs -c .",
+    "docs:watch": "npm run docs watch templates ../lib/contracts ../cli/src/{bin,commands}"
   },
   "files": [],
   "keywords": [
@@ -30,8 +31,6 @@
     "babel-plugin-transform-object-rest-spread": "^6.26.0",
     "babel-polyfill": "^6.26.0",
     "babel-preset-env": "^1.7.0",
-    "concurrently": "^4.1.1",
-    "http-server": "^0.11.1",
-    "nodemon": "^1.19.1"
+    "openzeppelin-docs-utils": "github:OpenZeppelin/docs-utils"
   }
 }

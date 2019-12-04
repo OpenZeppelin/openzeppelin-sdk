@@ -1,0 +1,3 @@
+[build]
+command = "yarn --cwd packages/docs docs"
+publish = "packages/docs/build/site"
