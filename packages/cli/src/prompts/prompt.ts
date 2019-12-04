@@ -53,6 +53,7 @@ interface MethodOptions {
 }
 
 export let DISABLE_INTERACTIVITY: boolean =
+  !process.stdin.isTTY ||
   !!process.env.OPENZEPPELIN_NON_INTERACTIVE ||
   !!process.env.ZOS_NON_INTERACTIVE ||
   process.env.DEBIAN_FRONTEND === 'noninteractive';
