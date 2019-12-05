@@ -1,4 +1,5 @@
 import { ResolverEngine } from '@openzeppelin/resolver-engine-core';
+import { Loggy } from '@openzeppelin/upgrades';
 import pathSys from 'path';
 import urlSys from 'url';
 import { getImports } from '../../../utils/solidity';
@@ -11,72 +12,6 @@ interface ImportFile {
   url: string;
   source: string;
   provider: string;
-}
-
-interface ImportTreeNode extends ImportFile {
-  uri: string;
-  // uri and url the same as in rest of resolver-engine
-  // it might mean github:user/repo/path.sol and raw link
-  // or it might mean relative vs absolute file path
-  imports: { uri: string; url: string }[];
-}
-
-/**
- * This function accepts root files to be searched for and resolves the sources, finds the imports in each source and traverses the whole dependency tree gathering absolute and uri paths
- * @param roots
- * @param workingDir
- * @param resolver
- */
-async function gatherDependencyTree(
-  roots: string[],
-  workingDir: string,
-  resolver: ResolverEngine<ImportFile>,
-): Promise<ImportTreeNode[]> {
-  const result: ImportTreeNode[] = [];
-  const alreadyImported = new Set();
-
-  /**
-   * This function traverses the depedency tree and calculates absolute paths for each import on the way storing each file in in a global array
-   * @param file File in a depedency that should now be traversed
-   * @returns An absolute path for the requested file
-   */
-  async function dfs(file: { searchCwd: string; uri: string }): Promise<string> {
-    const url = await resolver.resolve(file.uri, file.searchCwd);
-    if (alreadyImported.has(url)) {
-      return url;
-    }
-
-    const resolvedFile = await resolver.require(file.uri, file.searchCwd);
-
-    alreadyImported.add(url);
-
-    const foundImportURIs = getImports(resolvedFile.source);
-
-    const fileNode: ImportTreeNode = {
-      uri: file.uri,
-      imports: [],
-      ...resolvedFile,
-    };
-
-    const resolvedCwd = pathSys.dirname(url);
-    for (const importUri of foundImportURIs) {
-      const importUrl = await dfs({ searchCwd: resolvedCwd, uri: importUri });
-      fileNode.imports.push({ uri: importUri, url: importUrl });
-    }
-
-    result.push(fileNode);
-    return resolvedFile.url;
-  }
-
-  await Promise.all(roots.map(what => dfs({ searchCwd: workingDir, uri: what })));
-
-  return result;
-}
-
-function stripNodes(nodes: ImportTreeNode[]): ImportFile[] {
-  return nodes.map(node => {
-    return { url: node.url, source: node.source, provider: node.provider };
-  });
 }
 
 /**
@@ -106,8 +41,18 @@ export async function gatherSources(
   while (queue.length > 0) {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const fileData = queue.shift()!;
-    const resolvedFile: ImportFile = await resolveImportFile(resolver, fileData);
-    const foundImports = getImports(resolvedFile.source);
+
+    let resolvedFile: ImportFile;
+    try {
+      resolvedFile = await resolveImportFile(resolver, fileData);
+    } catch (err) {
+      // Our custom fuzzy parser may yield false positives, potentially asking for imports that don't exist. This can
+      // happen both due to parser bugs and to invalid Solidity sources the parser accepts. Because of this, we carry on
+      // to the compiler instead of erroring out: if an import is indeed missing or the code is incorrect, the compiler
+      // will complain about this with a more accurate error message.
+      Loggy.noSpin.warn(__filename, 'gatherSources', 'compile-warnings', `${err.message}`);
+      continue;
+    }
 
     // if imported path starts with '.' we assume it's relative and return it's
     // path relative to resolved name of the file that imported it
@@ -130,6 +75,7 @@ export async function gatherSources(
     }
 
     const fileParentDir = pathSys.dirname(resolvedFile.url);
+    const foundImports = getImports(resolvedFile.source, resolvedFile.url);
     for (const foundImport of foundImports) {
       let importName: string;
       // If it's relative, resolve it; otherwise, pass through
@@ -188,11 +134,13 @@ async function resolveImportFile(
           cwd: process.cwd(),
         });
       }
+
       const cwd = pathSys.relative(process.cwd(), fileData.cwd);
       const cwdDesc = cwd.length === 0 ? 'the project' : `folder ${cwd}`;
       const relativeTo = pathSys.relative(process.cwd(), fileData.relativeTo);
       err.message = `Could not find file ${fileData.file} in ${cwdDesc} (imported from ${relativeTo})`;
     }
+
     throw err;
   }
 }
