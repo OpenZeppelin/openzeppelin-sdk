@@ -159,7 +159,7 @@ class SolidityProjectCompiler {
     return (
       !maxArtifactsMtimes ||
       !maxSourcesMtimes ||
-      maxArtifactsMtimes < maxSourcesMtimes ||
+      maxArtifactsMtimes <= maxSourcesMtimes ||
       !artifactCompiledVersion ||
       !compilerVersionsMatch(artifactCompiledVersion, this.compilerVersion.longVersion) ||
       !compilerSettingsMatch(currentSettings, artifactSettings)
