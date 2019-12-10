@@ -1004,6 +1004,11 @@
     fs-extra "^8.1.0"
     try-require "^1.2.1"
 
+"@openzeppelin/fuzzy-solidity-import-parser@^0.1.0":
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/@openzeppelin/fuzzy-solidity-import-parser/-/fuzzy-solidity-import-parser-0.1.0.tgz#e137c091aa9ed7753f92b3f5f9d9338929e674ba"
+  integrity sha512-Vavzh+fLY80IVnWs7a4Oj9GO0Oem2I/rs0rIUILNPusMqKB4dxJ1IzD11YSkltjyEuDhm1DHWsRyXYZt9E1w4Q==
+
 "@openzeppelin/resolver-engine-core@^0.3.3":
   version "0.3.3"
   resolved "https://registry.yarnpkg.com/@openzeppelin/resolver-engine-core/-/resolver-engine-core-0.3.3.tgz#d03f08fbe86ea6a002276c7ab2b6a643b99dd5a7"
@@ -10144,7 +10149,7 @@ solidity-docgen@^0.3.5:
     semver "^6.3.0"
     solc "^0.5.12"
 
-solidity-parser-antlr@^0.4.11, solidity-parser-antlr@^0.4.2:
+solidity-parser-antlr@^0.4.11:
   version "0.4.11"
   resolved "https://registry.yarnpkg.com/solidity-parser-antlr/-/solidity-parser-antlr-0.4.11.tgz#af43e1f13b3b88309a875455f5d6e565b05ee5f1"
 

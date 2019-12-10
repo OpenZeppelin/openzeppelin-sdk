@@ -1,9 +1,10 @@
 require('../../../setup');
 
-import { FileSystem } from '@openzeppelin/upgrades';
+import { Loggy, FileSystem } from '@openzeppelin/upgrades';
 import { compileProject } from '../../../../src/models/compiler/solidity/SolidityProjectCompiler';
 import { unlinkSync, existsSync, statSync, utimesSync, writeFileSync } from 'fs';
 import path from 'path';
+import sinon from 'sinon';
 import { writeJSONSync, readJSONSync } from 'fs-extra';
 
 describe('SolidityProjectCompiler', function() {
@@ -93,9 +94,18 @@ describe('SolidityProjectCompiler', function() {
       schema.compiler.optimizer.should.be.deep.equal(optimizer);
     });
 
-    it('outputs friendly error on invalid import', async function() {
+    it('outputs friendly warning and solc error on invalid import', async function() {
+      const logWarnStub = sinon.stub(Loggy.noSpin, 'warn');
+
       writeFileSync(`${inputDir}/Invalid.sol`, 'pragma solidity ^0.5.0; import "./NotExists.sol";');
-      await compileProject({ inputDir, outputDir }).should.be.rejectedWith(/could not find file \.\/NotExists\.sol/i);
+      await compileProject({ inputDir, outputDir }).should.be.rejectedWith(/file import callback not supported/i);
+
+      logWarnStub.calledOnce.should.equal(true);
+      logWarnStub.firstCall.args.should.include(
+        'Could not find file ./NotExists.sol in folder test/mocks/mock-stdlib/contracts (imported from test/mocks/mock-stdlib/contracts/Invalid.sol)',
+      );
+
+      sinon.restore();
     });
 
     // For more info, see: https://github.com/zeppelinos/zos/issues/1071

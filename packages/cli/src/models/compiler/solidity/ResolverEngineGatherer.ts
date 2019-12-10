@@ -1,4 +1,5 @@
 import { ResolverEngine } from '@openzeppelin/resolver-engine-core';
+import { Loggy } from '@openzeppelin/upgrades';
 import pathSys from 'path';
 import urlSys from 'url';
 import { getImports } from '../../../utils/solidity';
@@ -11,72 +12,6 @@ interface ImportFile {
   url: string;
   source: string;
   provider: string;
-}
-
-interface ImportTreeNode extends ImportFile {
-  uri: string;
-  // uri and url the same as in rest of resolver-engine
-  // it might mean github:user/repo/path.sol and raw link
-  // or it might mean relative vs absolute file path
-  imports: { uri: string; url: string }[];
-}
-
-/**
- * This function accepts root files to be searched for and resolves the sources, finds the imports in each source and traverses the whole dependency tree gathering absolute and uri paths
- * @param roots
- * @param workingDir
- * @param resolver
- */
-async function gatherDependencyTree(
-  roots: string[],
-  workingDir: string,
-  resolver: ResolverEngine<ImportFile>,
-): Promise<ImportTreeNode[]> {
-  const result: ImportTreeNode[] = [];
-  const alreadyImported = new Set();
-
-  /**
-   * This function traverses the depedency tree and calculates absolute paths for each import on the way storing each file in in a global array
-   * @param file File in a depedency that should now be traversed
-   * @returns An absolute path for the requested file
-   */
-  async function dfs(file: { searchCwd: string; uri: string }): Promise<string> {
-    const url = await resolver.resolve(file.uri, file.searchCwd);
-    if (alreadyImported.has(url)) {
-      return url;
-    }
-
-    const resolvedFile = await resolver.require(file.uri, file.searchCwd);
-
-    alreadyImported.add(url);
-
-    const foundImportURIs = getImports(resolvedFile.source);
-
-    const fileNode: ImportTreeNode = {
-      uri: file.uri,
-      imports: [],
-      ...resolvedFile,
-    };
-
-    const resolvedCwd = pathSys.dirname(url);
-    for (const importUri of foundImportURIs) {
-      const importUrl = await dfs({ searchCwd: resolvedCwd, uri: importUri });
-      fileNode.imports.push({ uri: importUri, url: importUrl });
-    }
-
-    result.push(fileNode);
-    return resolvedFile.url;
-  }
-
-  await Promise.all(roots.map(what => dfs({ searchCwd: workingDir, uri: what })));
-
-  return result;
-}
-
-function stripNodes(nodes: ImportTreeNode[]): ImportFile[] {
-  return nodes.map(node => {
-    return { url: node.url, source: node.source, provider: node.provider };
-  });
 }
 
 /**
@@ -106,8 +41,18 @@ export async function gatherSources(
   while (queue.length > 0) {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const fileData = queue.shift()!;
-    const resolvedFile: ImportFile = await resolveImportFile(resolver, fileData);
-    const foundImports = getImports(resolvedFile.source);
+
+    let resolvedFile: ImportFile;
+    try {
+      resolvedFile = await resolveImportFile(resolver, fileData);
+    } catch (err) {
+      // Our custom fuzzy parser may yield false positives, potentially asking for imports that don't exist. This can
+      // happen both due to parser bugs and to invalid Solidity sources the parser accepts. Because of this, we carry on
+      // to the compiler instead of erroring out: if an import is indeed missing or the code is incorrect, the compiler
+      // will complain about this with a more accurate error message.
+      Loggy.noSpin.warn(__filename, 'gatherSources', 'compile-warnings', `${err.message}`);
+      continue;
+    }
 
     // if imported path starts with '.' we assume it's relative and return it's
     // path relative to resolved name of the file that imported it
@@ -129,7 +74,27 @@ export async function gatherSources(
       });
     }
 
+    let foundImports: string[];
+    try {
+      foundImports = getImports(resolvedFile.source);
+    } catch {
+      // The are two reasons why the parser may crash:
+      //  - the source is not valid Solidity code
+      //  - the parser has a bug
+      // Invalid source will be better diagnosed by the compiler, meaning we shouldn't halt execution so that it gets a
+      // chance to inspect the source. A buggy parser will produce false negatives, but since we're not able to detect
+      // that here, it makes more sense to fail loudly, hopefully leading to a bug report by a user.
+      Loggy.noSpin.warn(
+        __filename,
+        'gatherSources',
+        'solidity-parser-warnings',
+        `Error while parsing ${trimURL(resolvedFile.url)}`,
+      );
+      foundImports = [];
+    }
+
     const fileParentDir = pathSys.dirname(resolvedFile.url);
+
     for (const foundImport of foundImports) {
       let importName: string;
       // If it's relative, resolve it; otherwise, pass through
@@ -188,33 +153,17 @@ async function resolveImportFile(
           cwd: process.cwd(),
         });
       }
+
       const cwd = pathSys.relative(process.cwd(), fileData.cwd);
       const cwdDesc = cwd.length === 0 ? 'the project' : `folder ${cwd}`;
       const relativeTo = pathSys.relative(process.cwd(), fileData.relativeTo);
-      err.message = `Could not find file ${fileData.file} in ${cwdDesc} (imported from ${relativeTo})`;
+      err.message = `Could not find file ${trimURL(fileData.file)} in ${cwdDesc} (imported from ${relativeTo})`;
     }
+
     throw err;
   }
 }
 
-/**
- * This function gathers sources and **REWRITES IMPORTS** inside the source files into resolved, absolute paths instead of using shortcut forms
- * Because the remapping api in solc is not compatible with multiple existing projects and frameworks, changing relative paths to absolute paths
- * makes us avoid any need for finding imports after starting the solc compilation
- * @param roots
- * @param workingDir What's the starting working dir for resolving relative imports in roots
- * @param resolver
- */
-export async function gatherSourcesAndCanonizeImports(
-  roots: string[],
-  workingDir: string,
-  resolver: ResolverEngine<ImportFile>,
-): Promise<ImportFile[]> {
-  function canonizeFile(file: ImportTreeNode) {
-    file.imports.forEach(i => (file.source = file.source.replace(i.uri, i.url)));
-  }
-
-  const sources = await gatherDependencyTree(roots, workingDir, resolver);
-  sources.forEach(canonizeFile);
-  return stripNodes(sources);
+function trimURL(url: string): string {
+  return url.length < 40 ? url : url.substring(0, 40) + '...';
 }
