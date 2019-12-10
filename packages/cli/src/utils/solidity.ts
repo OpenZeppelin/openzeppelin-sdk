@@ -1,7 +1,6 @@
 import { eq as semverEq, parse as parseSemver } from 'semver';
 import { CompilerVersionOptions } from '../models/compiler/solidity/SolidityContractsCompiler';
 import { getMetadata } from '@openzeppelin/fuzzy-solidity-import-parser';
-import { Loggy } from '@openzeppelin/upgrades';
 
 export function getPragma(source: string): string {
   if (!source) return null;
@@ -36,21 +35,6 @@ export function compilerSettingsMatch(s1: CompilerVersionOptions, s2: CompilerVe
   );
 }
 
-export function getImports(source: string, url: string): string[] {
-  try {
-    return getMetadata(source).imports;
-  } catch {
-    // The are two reasons why the parser may crash:
-    //  - the source is not valid Solidity code
-    //  - the parser has a bug
-    // Invalid source will be better diagnosed by the compiler, meaning we shouldn't halt execution so that it gets a
-    // chance to inspect the source. A buggy parser will produce false negatives, but since we're not able to detect
-    // that here, it makes more sense to fail loudly, hopefully leading to a bug report by a user.
-    Loggy.noSpin.warn(__filename, 'getImports', 'solidity-parser-warnings', `Error while parsing ${trimURL(url)}`);
-    return [];
-  }
-}
-
-function trimURL(url: string): string {
-  return url.length < 40 ? url : url.substring(0, 40) + '...';
+export function getImports(source: string): string[] {
+  return getMetadata(source).imports;
 }

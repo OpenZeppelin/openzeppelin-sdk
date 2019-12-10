@@ -74,8 +74,27 @@ export async function gatherSources(
       });
     }
 
+    let foundImports: string[];
+    try {
+      foundImports = getImports(resolvedFile.source);
+    } catch {
+      // The are two reasons why the parser may crash:
+      //  - the source is not valid Solidity code
+      //  - the parser has a bug
+      // Invalid source will be better diagnosed by the compiler, meaning we shouldn't halt execution so that it gets a
+      // chance to inspect the source. A buggy parser will produce false negatives, but since we're not able to detect
+      // that here, it makes more sense to fail loudly, hopefully leading to a bug report by a user.
+      Loggy.noSpin.warn(
+        __filename,
+        'gatherSources',
+        'solidity-parser-warnings',
+        `Error while parsing ${trimURL(resolvedFile.url)}`,
+      );
+      foundImports = [];
+    }
+
     const fileParentDir = pathSys.dirname(resolvedFile.url);
-    const foundImports = getImports(resolvedFile.source, resolvedFile.url);
+
     for (const foundImport of foundImports) {
       let importName: string;
       // If it's relative, resolve it; otherwise, pass through
@@ -138,9 +157,13 @@ async function resolveImportFile(
       const cwd = pathSys.relative(process.cwd(), fileData.cwd);
       const cwdDesc = cwd.length === 0 ? 'the project' : `folder ${cwd}`;
       const relativeTo = pathSys.relative(process.cwd(), fileData.relativeTo);
-      err.message = `Could not find file ${fileData.file} in ${cwdDesc} (imported from ${relativeTo})`;
+      err.message = `Could not find file ${trimURL(fileData.file)} in ${cwdDesc} (imported from ${relativeTo})`;
     }
 
     throw err;
   }
+}
+
+function trimURL(url: string): string {
+  return url.length < 40 ? url : url.substring(0, 40) + '...';
 }
