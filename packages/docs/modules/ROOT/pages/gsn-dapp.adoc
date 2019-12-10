@@ -187,7 +187,6 @@ function App() {
   // load Counter Instance
   const [counterInstance, setCounterInstance] = useState(undefined);
 
-  let deployedNetwork = undefined;
   if (
     !counterInstance &&
     context &&
