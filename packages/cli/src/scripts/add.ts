@@ -14,7 +14,7 @@ export default function add({ contractsData, projectFile }: AddParams): void | n
   });
 
   if (contractsData.length > 1) {
-    Loggy.noSpin(__filename, 'add-contracts', 'All the selected contracts have been added to the project');
+    Loggy.noSpin(__filename, 'add', 'add-contracts', 'All the selected contracts have been added to the project');
   }
   controller.writePackage();
 }

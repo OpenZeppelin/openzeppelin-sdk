@@ -391,7 +391,7 @@ class BaseAppProject extends BasePackageProject {
           'getAndLogInitCallData',
           `${__filename}#getAndLogInitCallData`,
           logReference,
-          logMessage,
+          // logMessage, // TODO: Fix type error.
         );
       return null;
     }

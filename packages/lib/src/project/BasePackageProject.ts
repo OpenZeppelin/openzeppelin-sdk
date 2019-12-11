@@ -44,7 +44,12 @@ export default abstract class BasePackageProject {
     const implementation: any = await Transactions.deployContract(contract, [], this.txParams);
     const directory: ImplementationDirectory = await this.getCurrentDirectory();
     await directory.setImplementation(contractName, implementation.address);
-    Loggy.onVerbose(`set-implementation-${contractName}`, `Implementation set: ${implementation.address}`);
+    Loggy.onVerbose(
+      __filename,
+      'setImplementation',
+      `set-implementation-${contractName}`,
+      `Implementation set: ${implementation.address}`,
+    );
     return implementation;
   }
 
@@ -57,7 +62,12 @@ export default abstract class BasePackageProject {
     );
     const directory: ImplementationDirectory = await this.getCurrentDirectory();
     await directory.unsetImplementation(contractName);
-    Loggy.onVerbose(`unset-implementation-${contractName}`);
+    Loggy.onVerbose(
+      __filename,
+      'unsetImplementation',
+      `unset-implementation-${contractName}`,
+      `Unset implementation: ${contractName}`,
+    );
   }
 
   public async registerImplementation(contractName: string, { address }: { address: string }): Promise<void> {

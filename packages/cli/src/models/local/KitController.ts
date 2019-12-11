@@ -40,7 +40,7 @@ export default class KitController {
         // http://nicolasgallagher.com/git-checkout-specific-files-from-another-branch/
         await git.checkout([`origin/${branchName}`, `--`, ...config.files]);
       }
-      Loggy.update('unpack-kit', 'Unpacking kit');
+      Loggy.update('unpack-kit', { text: 'Unpacking kit' });
 
       // always delete .git folder
       await remove(path.join(workingDirPath, '.git'));
