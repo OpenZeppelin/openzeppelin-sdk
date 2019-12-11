@@ -271,10 +271,10 @@ export function proxyInfo(contractInfo: any, network: string): any {
 
 export async function promptForNetwork(options: any, getCommandProps: () => any): Promise<{ network: string }> {
   const { network: networkInOpts, interactive } = options;
-  const { network: networkInSession, expired } = Session.getNetwork();
+  const networkInSession = Session.getNetwork();
   const defaults = { network: networkInSession };
   const opts = {
-    network: networkInOpts || (!expired ? networkInSession : undefined),
+    network: networkInOpts || networkInSession,
   };
   const props = getCommandProps();
 
