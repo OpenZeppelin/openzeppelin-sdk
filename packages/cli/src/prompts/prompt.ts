@@ -85,9 +85,7 @@ export async function promptIfNeeded(
   if (DISABLE_INTERACTIVITY) interactive = false;
 
   const argsAndOptsQuestions = Object.keys(argsAndOpts)
-    .filter(
-      name => argsAndOpts[name] === undefined || (typeof argsAndOpts[name] !== 'boolean' && isEmpty(argsAndOpts[name])),
-    )
+    .filter(name => typeof argsAndOpts[name] !== 'boolean' && isEmpty(argsAndOpts[name]))
     .filter(name => props[name] && !hasEmptyChoices(props[name]))
     .map(name => promptFor(name, defaults, props));
 
