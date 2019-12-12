@@ -8470,7 +8470,7 @@ onetime@^5.1.0:
 
 "openzeppelin-docs-utils@github:OpenZeppelin/docs-utils":
   version "0.0.0"
-  resolved "https://codeload.github.com/OpenZeppelin/docs-utils/tar.gz/8fc52787d3baeea11851606f31ece84f20641ef9"
+  resolved "https://codeload.github.com/OpenZeppelin/docs-utils/tar.gz/dc7ce3006b6065cc4edebe53896644da5bd7dbec"
   dependencies:
     chalk "^3.0.0"
     chokidar "^3.3.0"
