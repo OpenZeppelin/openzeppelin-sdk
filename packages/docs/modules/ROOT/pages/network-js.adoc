@@ -150,15 +150,13 @@ export default function Web3Info(props) {
   const { web3Context } = props;
   const { networkId, networkName, accounts, providerName } = web3Context;
 
-  const requestAuth = async web3Context => {
+  const requestAccess = useCallback(async () => {
     try {
       await web3Context.requestAuth();
     } catch (e) {
       console.error(e);
     }
-  };
-
-  const requestAccess = useCallback(() => requestAuth(web3Context), []);
+  }, [web3Context]);
 
   return (
     <div>
@@ -213,15 +211,13 @@ export default function Web3Info(props) {
     getBalance();
   }, [accounts, getBalance, networkId]);
 
-  const requestAuth = async web3Context => {
+  const requestAccess = useCallback(async () => {
     try {
       await web3Context.requestAuth();
     } catch (e) {
       console.error(e);
     }
-  };
-
-  const requestAccess = useCallback(() => requestAuth(web3Context), []);
+  }, [web3Context]);
 
   return (
     <div>
