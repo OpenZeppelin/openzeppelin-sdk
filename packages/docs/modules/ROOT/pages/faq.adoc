@@ -9,7 +9,7 @@ Yes. The Solidity team guarantess that the compiler https://twitter.com/ethchris
 [[is-it-possible-to-specify-which-solidity-compiler-version-to-use-in-the-openzeppelin-sdk]]
 == Is it possible to specify which Solidity compiler version to use in the OpenZeppelin SDK?
 
-Yes. You can run `openzeppelin compile --solc-version 5.X` to compile your contracts with a specific Solidity compiler version. This choice will be saved to `.openzeppelin/project.json` for future runs.
+Yes. You can run `openzeppelin compile --solc-version 0.5.14` to compile your contracts with a specific Solidity compiler version e.g. `0.5.14`. This choice will be saved to `.openzeppelin/project.json` for future runs.
 
 [source,json]
 ----
@@ -19,7 +19,7 @@ Yes. You can run `openzeppelin compile --solc-version 5.X` to compile your contr
   "version": "1.0.0",
   "compiler": {
     "manager": "openzeppelin",
-    "solcVersion": "0.5.9"
+    "solcVersion": "0.5.14"
   }
 }
 ----
@@ -31,7 +31,7 @@ If you are using `truffle` for compiling your project,, you can specify which co
 module.exports = {
   compilers: {
      solc: {
-       version: "0.5.9"
+       version: "0.5.14"
      }
   }
 }
