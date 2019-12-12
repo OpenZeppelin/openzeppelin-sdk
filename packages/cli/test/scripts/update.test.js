@@ -476,7 +476,7 @@ describe('update script', function() {
           implementation: this.withLibraryImplV2Address,
         });
       });
-    });
+    }).timeout(5000);
   };
 
   const shouldHandleUpdateOnDependency = function() {
@@ -613,7 +613,7 @@ describe('update script', function() {
           .methods.version()
           .call()).should.eq('1.2.0');
       });
-    });
+    }).timeout(5000);
   };
 
   describe('on application contract', function() {
