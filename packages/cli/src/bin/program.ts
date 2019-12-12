@@ -23,6 +23,11 @@ interface CommandInterface {
 }
 
 let commandsList: CommandInterface[] = Object.values(commands);
+commandsList.sort((left, right): number => {
+  if (left.name < right.name) return -1;
+  if (left.name > right.name) return 1;
+  return 0;
+});
 commandsList.forEach((command: CommandInterface): void => command.register(program));
 // Remove the status command from the command list
 commandsList = commandsList.filter(c => c.name !== 'status');
