@@ -189,7 +189,7 @@ $ TOKEN=$(openzeppelin create TokenContract)
 $ openzeppelin create MyContract --init --args $TOKEN
 ----
 
-An advanced alternative, if you need to create upgradeable contracts on the fly, is to keep an instance of your OpenZeppelin SDK `App` in your contracts. The xref:api::lib.adoc#App[`App`] is a contract that acts as the entrypoint for your OpenZeppelin SDK project, which has references to your logic implementations, and can create new contract instances:
+An advanced alternative, if you need to create upgradeable contracts on the fly, is to keep an instance of your OpenZeppelin SDK `App` in your contracts. The xref:api::upgrades.adoc#App[`App`] is a contract that acts as the entrypoint for your OpenZeppelin SDK project, which has references to your logic implementations, and can create new contract instances:
 
 [source,solidity]
 ----
