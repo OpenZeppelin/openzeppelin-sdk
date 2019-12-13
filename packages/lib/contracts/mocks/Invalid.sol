@@ -1,5 +1,7 @@
 pragma solidity ^0.5.0;
 
+import "mock-dependency/contracts/Greeter.sol";
+
 contract WithConstructor {
   uint256 public value;
 
@@ -58,3 +60,5 @@ contract WithParentWithDelegateCall is WithDelegateCall {
     return "WithParentWithDelegateCall";
   }
 }
+
+contract WithVanillaBaseContract is Greeter { }
