@@ -257,7 +257,7 @@ describe('prompt', function() {
           it('returns an array of method arguments names', function() {
             const args = argsList('Greeter', 'greet(string)', Mutability.NotConstant, this.projectFile);
             args.should.be.an('array');
-            args[0].should.deep.equal({ name: 'who', type: 'string' });
+            args[0].should.deep.include({ name: 'who', type: 'string' });
           });
         });
 
@@ -265,7 +265,7 @@ describe('prompt', function() {
           it('returns an array of method arguments names', function() {
             const args = argsList('Greeter', 'greetings(uint256)', Mutability.Constant, this.projectFile);
             args.should.be.an('array');
-            args[0].should.deep.equal({ name: '#0', type: 'uint256' });
+            args[0].should.deep.include({ name: '#0', type: 'uint256' });
           });
         });
       });
