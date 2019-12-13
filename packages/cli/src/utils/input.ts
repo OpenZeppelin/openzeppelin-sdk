@@ -55,7 +55,7 @@ export function parseArg(input: string | string[], { type, components }: Pick<Me
 
   // Tuples: recursively parse
   if (type === 'tuple') {
-    const inputs = typeof input === 'string' ? parseArray(stripBrackets(input)) : input;
+    const inputs = typeof input === 'string' ? parseArray(stripParens(input), '(', ')') : input;
     if (inputs.length !== components.length)
       throw new Error(`Expected ${components.length} values but got ${input.length}`);
     return zipWith(inputs, components, parseArg);
@@ -118,6 +118,10 @@ export function stripBrackets(inputMaybeWithBrackets: string): string {
   return `${inputMaybeWithBrackets.replace(/^\s*\[/, '').replace(/\]\s*$/, '')}`;
 }
 
+export function stripParens(inputMaybeWithParens: string): string {
+  return `${inputMaybeWithParens.replace(/^\s*\(/, '').replace(/\)\s*$/, '')}`;
+}
+
 function requireInputString(arg: string | string[]): arg is string {
   if (typeof arg !== 'string') {
     throw new Error(`Expected ${flattenDeep(arg).join(',')} to be a scalar value but was an array`);
@@ -134,7 +138,7 @@ function requireInputString(arg: string | string[]): arg is string {
  * with arbitrarily nested string arrays, but ts has a hard time handling that,
  * so we're fooling it into thinking it's just one level deep.
  */
-export function parseArray(input: string): (string | string[])[] {
+export function parseArray(input: string, open = '[', close = ']'): (string | string[])[] {
   let i = 0; // index for traversing input
 
   function innerParseQuotedString(quoteChar: string): string {
@@ -156,9 +160,9 @@ export function parseArray(input: string): (string | string[])[] {
         return input.slice(start, i - 1);
       } else if (char === '"' || char === "'") {
         throw new Error(`Unexpected quote at position ${i}`);
-      } else if (char === '[' || char === "'") {
+      } else if (char === open || char === "'") {
         throw new Error(`Unexpected opening bracket at position ${i}`);
-      } else if (char === ']') {
+      } else if (char === close) {
         return input.slice(start, --i);
       }
     }
@@ -172,7 +176,7 @@ export function parseArray(input: string): (string | string[])[] {
         continue;
       } else if (char === ',') {
         return;
-      } else if (char === ']') {
+      } else if (char === close) {
         i--;
         return;
       } else {
@@ -191,11 +195,11 @@ export function parseArray(input: string): (string | string[])[] {
       } else if (char === '"' || char === "'") {
         result.push(innerParseQuotedString(char));
         requireCommaOrClosing();
-      } else if (char === '[') {
+      } else if (char === open) {
         const innerArray = innerParseArray();
         result.push(innerArray);
         requireCommaOrClosing();
-      } else if (char === ']') {
+      } else if (char === close) {
         if (!requireClosingBracket) throw new Error(`Unexpected closing array at position ${i + 1} in ${input}`);
         return result;
       } else {
@@ -271,9 +275,9 @@ export function getPlaceholder(arg: Pick<MethodArg, 'type' | 'components'>): str
   } else if (type === 'string') {
     return 'Hello world';
   } else if (type === 'tuple' && components) {
-    return `[${components.map(c => getPlaceholder(c)).join(', ')}]`;
+    return `(${components.map(c => getPlaceholder(c)).join(', ')})`;
   } else if (type === 'tuple') {
-    return `[Hello world, 42]`;
+    return `(Hello world, 42)`;
   } else {
     return null;
   }

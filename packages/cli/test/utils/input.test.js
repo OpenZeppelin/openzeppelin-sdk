@@ -146,9 +146,9 @@ describe('input', function() {
     itParses('foo', 'unknown', 'foo');
 
     itParsesTuple('42, foo', ['uint256', 'string'], ['42', 'foo']);
-    itParsesTuple('[42, foo]', ['uint256', 'string'], ['42', 'foo']);
-    itParsesTuple('[-1e3, foo]', ['uint256', 'string'], ['-1000', 'foo']);
-    itParsesTuple('[42, "foo, bar"]', ['uint256', 'string'], ['42', 'foo, bar']);
+    itParsesTuple('(42, foo)', ['uint256', 'string'], ['42', 'foo']);
+    itParsesTuple('(-1e3, foo)', ['uint256', 'string'], ['-1000', 'foo']);
+    itParsesTuple('(42, "foo, bar")', ['uint256', 'string'], ['42', 'foo, bar']);
     itParsesTuple('42', ['uint256'], ['42']);
     itParsesTuple('foo', ['string'], ['foo']);
 
@@ -222,7 +222,7 @@ describe('input', function() {
     it('handles dynamic arrays', testType('uint256[]', '[42, 42]'));
     it('handles static arrays', testType('uint256[3]', '[42, 42]'));
     it('handles dynamic string arrays', testType('string[]', '[Hello world, Hello world]'));
-    it('handles tuples of primitive types', testTuple(['uint256', 'string'], '[42, Hello world]'));
-    it('handles tuples of unknown components', testType('tuple', '[Hello world, 42]'));
+    it('handles tuples of primitive types', testTuple(['uint256', 'string'], '(42, Hello world)'));
+    it('handles tuples of unknown components', testType('tuple', '(Hello world, 42)'));
   });
 });
