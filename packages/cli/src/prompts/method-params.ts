@@ -3,7 +3,7 @@ import pickBy from 'lodash.pickby';
 import isUndefined from 'lodash.isundefined';
 import negate from 'lodash.negate';
 
-import { parseMethodParams, parseArg } from '../utils/input';
+import { parseMethodParams, parseArg, getPlaceholder } from '../utils/input';
 import { promptIfNeeded, argsList, methodsList, InquirerQuestions } from './prompt';
 
 type PropsFn = (any) => InquirerQuestions;
@@ -97,31 +97,4 @@ function getCommandProps(
     },
     ...args,
   };
-}
-
-function getPlaceholder(type: string): string {
-  const ARRAY_TYPE_REGEX = /(.+)\[\d*\]$/; // matches array type identifiers like uint[] or byte[4]
-
-  if (type.match(ARRAY_TYPE_REGEX)) {
-    const arrayType = type.match(ARRAY_TYPE_REGEX)[1];
-    const itemPlaceholder = getPlaceholder(arrayType);
-    return `[${itemPlaceholder}, ${itemPlaceholder}]`;
-  } else if (
-    type.startsWith('uint') ||
-    type.startsWith('int') ||
-    type.startsWith('fixed') ||
-    type.startsWith('ufixed')
-  ) {
-    return '42';
-  } else if (type === 'bool') {
-    return 'true';
-  } else if (type === 'bytes') {
-    return '0xabcdef';
-  } else if (type === 'address') {
-    return '0x1df62f291b2e969fb0849d99d9ce41e2f137006e';
-  } else if (type === 'string') {
-    return 'Hello world';
-  } else {
-    return null;
-  }
 }

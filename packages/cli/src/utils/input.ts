@@ -238,3 +238,32 @@ export function validateSalt(salt: string, required = false) {
     throw new Error(`Invalid salt ${salt}, must be an uint256 value.`);
   }
 }
+
+export function getPlaceholder(type: string): string {
+  const ARRAY_TYPE_REGEX = /(.+)\[\d*\]$/; // matches array type identifiers like uint[] or byte[4]
+
+  if (type.match(ARRAY_TYPE_REGEX)) {
+    const arrayType = type.match(ARRAY_TYPE_REGEX)[1];
+    const itemPlaceholder = getPlaceholder(arrayType);
+    return `[${itemPlaceholder}, ${itemPlaceholder}]`;
+  } else if (
+    type.startsWith('uint') ||
+    type.startsWith('int') ||
+    type.startsWith('fixed') ||
+    type.startsWith('ufixed')
+  ) {
+    return '42';
+  } else if (type === 'bool') {
+    return 'true';
+  } else if (type === 'bytes') {
+    return '0xabcdef';
+  } else if (type === 'address') {
+    return '0x1df62f291b2e969fb0849d99d9ce41e2f137006e';
+  } else if (type === 'string') {
+    return 'Hello world';
+  } else if (type === 'tuple') {
+    return null;
+  } else {
+    return null;
+  }
+}
