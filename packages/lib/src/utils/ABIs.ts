@@ -76,7 +76,7 @@ export function getABIType(arg : any) : string {
 
 function tryGetTargetFunction(contract: Contract, methodName: string, args: string[] | undefined): FunctionInfo {
   // Match foo(uint256,string) as method name, and look for that in the ABI
-  const match: string[] = methodName.match(/^\s*(.+)\((.*)\)\s*$/);
+  const match: string[] = methodName.match(/^\s*(.+?)\((.*)\)\s*$/);
   if (match) {
     const name = match[1];
     const inputs = match[2].split(',').map(arg => ({ type: arg }));
