@@ -5,6 +5,7 @@ import program from 'commander';
 import { Loggy } from '@openzeppelin/upgrades';
 import commands from '../commands';
 import registerErrorHandler from './errors';
+import sortBy from 'lodash.sortby';
 
 // Do not use import here or Typescript will create wrong build folder
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -23,6 +24,7 @@ interface CommandInterface {
 }
 
 let commandsList: CommandInterface[] = Object.values(commands);
+commandsList = sortBy(commandsList, 'name');
 commandsList.forEach((command: CommandInterface): void => command.register(program));
 // Remove the status command from the command list
 commandsList = commandsList.filter(c => c.name !== 'status');
