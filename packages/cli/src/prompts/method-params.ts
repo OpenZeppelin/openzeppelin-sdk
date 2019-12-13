@@ -68,9 +68,7 @@ function getCommandProps(
             return true;
           } catch (err) {
             const placeholder = getPlaceholder(arg);
-            const msg = placeholder
-              ? `Enter a valid ${arg.type} such as: ${getPlaceholder(arg)}`
-              : `Enter a valid ${arg.type}`;
+            const msg = placeholder ? `Enter a valid ${arg.type} such as: ${placeholder}` : `Enter a valid ${arg.type}`;
             return `${err.message}. ${msg}.`;
           }
         },
