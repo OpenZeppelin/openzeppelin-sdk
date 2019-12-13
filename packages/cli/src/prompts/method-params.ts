@@ -4,7 +4,7 @@ import isUndefined from 'lodash.isundefined';
 import negate from 'lodash.negate';
 
 import { parseMethodParams, parseArg, getPlaceholder } from '../utils/input';
-import { promptIfNeeded, argsList, methodsList, InquirerQuestions } from './prompt';
+import { promptIfNeeded, argsList, methodsList, InquirerQuestions, argLabel } from './prompt';
 
 type PropsFn = (any) => InquirerQuestions;
 
@@ -59,7 +59,7 @@ function getCommandProps(
     return {
       ...accum,
       [arg.name]: {
-        message: arg.name ? `${arg.name} (${arg.type}):` : `(${arg.type}):`, // TODO: better description for tuples
+        message: argLabel(arg),
         type: 'input',
         when: () => !methodArgs || !methodArgs[index],
         validate: (input: string) => {

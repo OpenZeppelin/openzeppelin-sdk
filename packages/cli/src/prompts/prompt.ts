@@ -4,7 +4,7 @@ import isEmpty from 'lodash.isempty';
 import groupBy from 'lodash.groupby';
 import difference from 'lodash.difference';
 import inquirer from 'inquirer';
-import { contractMethodsFromAbi, ContractMethodMutability as Mutability } from '@openzeppelin/upgrades';
+import { contractMethodsFromAbi, ContractMethodMutability as Mutability, ABI } from '@openzeppelin/upgrades';
 
 import Session from '../models/network/Session';
 import ConfigManager from '../models/config/ConfigManager';
@@ -53,7 +53,7 @@ interface MethodOptions {
 }
 
 export interface MethodArg {
-  name: string; 
+  name: string;
   type: string;
   internalType?: string;
   components?: MethodArg[];
@@ -180,7 +180,7 @@ export function methodsList(
   return contractMethods(contractFullName, constant, projectFile)
     .map(({ name, hasInitializer, inputs, selector }) => {
       const initializable = hasInitializer ? '* ' : '';
-      const args = inputs.map(({ name: inputName, type }) => (inputName ? `${inputName}: ${type}` : type));
+      const args = inputs.map(argLabel);
       const label = `${initializable}${name}(${args.join(', ')})`;
 
       return { name: label, value: { name, selector } };
@@ -194,6 +194,10 @@ export function methodsList(
         return 0;
       else if (!a.name.startsWith('*') && b.name.startsWith('*')) return 1;
     });
+}
+
+export function argLabel(arg : MethodArg) : string {
+  return arg.name ? `${arg.name}: ${ABI.getABIType(arg)}` : ABI.getABIType(arg);
 }
 
 // Returns an inquirer question with a list of arguments for a particular method

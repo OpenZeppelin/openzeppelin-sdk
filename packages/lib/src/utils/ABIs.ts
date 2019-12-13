@@ -66,6 +66,14 @@ export function getABIFunction(contract: Contract, methodName: string, args: any
   }
 }
 
+export function getABIType(arg : any) : string {
+  if (arg.type === 'tuple') {
+    return `(${arg.components.map(getABIType).join(',')})`;
+  } else {
+    return arg.type;
+  }
+}
+
 function tryGetTargetFunction(contract: Contract, methodName: string, args: string[] | undefined): FunctionInfo {
   // Match foo(uint256,string) as method name, and look for that in the ABI
   const match: string[] = methodName.match(/^\s*(.+)\((.*)\)\s*$/);
@@ -137,5 +145,6 @@ export function callDescription(method: any, args: string[]): string {
 export default {
   buildCallData,
   getABIFunction,
+  getABIType,
   callDescription,
 };
