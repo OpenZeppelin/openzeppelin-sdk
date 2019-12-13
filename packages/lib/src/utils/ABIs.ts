@@ -66,7 +66,7 @@ export function getABIFunction(contract: Contract, methodName: string, args: any
   }
 }
 
-export function getABIType(arg : any) : string {
+export function getABIType(arg: any): string {
   if (arg.type === 'tuple') {
     return `(${arg.components.map(getABIType).join(',')})`;
   } else {

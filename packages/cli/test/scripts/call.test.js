@@ -232,10 +232,12 @@ describe('call script', function() {
             networkFile: this.networkFile,
             proxyAddress,
             methodName: 'echoTuple((uint256,string))',
-            methodArgs: [['42','Hello']],
+            methodArgs: [['42', 'Hello']],
           });
 
-          this.logs.infos[this.logs.infos.length - 1].should.eq(`Method 'echoTuple((uint256,string))' returned: [42,Hello]`);
+          this.logs.infos[this.logs.infos.length - 1].should.eq(
+            `Method 'echoTuple((uint256,string))' returned: [42,Hello]`,
+          );
         });
       });
     });
