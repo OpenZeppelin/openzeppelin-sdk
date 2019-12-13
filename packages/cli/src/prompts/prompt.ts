@@ -52,6 +52,13 @@ interface MethodOptions {
   constant?: boolean;
 }
 
+export interface MethodArg {
+  name: string; 
+  type: string;
+  internalType?: string;
+  components?: MethodArg[];
+}
+
 export let DISABLE_INTERACTIVITY: boolean =
   !process.stdin.isTTY ||
   !!process.env.OPENZEPPELIN_NON_INTERACTIVE ||
@@ -195,7 +202,7 @@ export function argsList(
   methodIdentifier: string,
   constant?: Mutability,
   projectFile?: ProjectFile,
-): { name: string; type: string }[] {
+): MethodArg[] {
   const method = contractMethods(contractFullName, constant, projectFile).find(
     ({ name, selector }): any => selector === methodIdentifier || name === methodIdentifier,
   );

@@ -1,6 +1,7 @@
 import BN from 'bignumber.js';
 import flattenDeep from 'lodash.flattendeep';
 import { encodeParams, Loggy, ZWeb3 } from '@openzeppelin/upgrades';
+import { MethodArg } from '../prompts/prompt';
 
 // TODO: Deprecate in favor of a combination of parseArg and parseArray
 export function parseArgs(args: string): string[] | never {
@@ -239,12 +240,13 @@ export function validateSalt(salt: string, required = false) {
   }
 }
 
-export function getPlaceholder(type: string): string {
+export function getPlaceholder(arg: Pick<MethodArg, 'type' | 'components'>): string {
   const ARRAY_TYPE_REGEX = /(.+)\[\d*\]$/; // matches array type identifiers like uint[] or byte[4]
+  const { type, components } = arg;
 
   if (type.match(ARRAY_TYPE_REGEX)) {
     const arrayType = type.match(ARRAY_TYPE_REGEX)[1];
-    const itemPlaceholder = getPlaceholder(arrayType);
+    const itemPlaceholder = getPlaceholder({ type: arrayType });
     return `[${itemPlaceholder}, ${itemPlaceholder}]`;
   } else if (
     type.startsWith('uint') ||
@@ -261,8 +263,10 @@ export function getPlaceholder(type: string): string {
     return '0x1df62f291b2e969fb0849d99d9ce41e2f137006e';
   } else if (type === 'string') {
     return 'Hello world';
-  } else if (type === 'tuple') {
-    return null;
+  } else if (type === 'tuple' && components) {
+    return `[${components.map(c => getPlaceholder(c)).join(', ')}]`;
+  } else if (type === 'tuple') { 
+    return `[Hello world, 42]`;
   } else {
     return null;
   }

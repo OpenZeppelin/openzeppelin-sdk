@@ -3,7 +3,7 @@ require('../setup');
 
 const expect = require('chai').expect;
 
-import { parseArgs, parseMethodParams, parseArray, parseArg } from '../../src/utils/input';
+import { parseArgs, parseMethodParams, parseArray, parseArg, getPlaceholder } from '../../src/utils/input';
 
 describe('input', function() {
   describe('parseArgs', function() {
@@ -196,5 +196,19 @@ describe('input', function() {
     it('should init when args is set', testFn({ args: '20' }, defaulMethodName, ['20']));
     it('should init with specific function', testFn({ init: 'foo' }, 'foo', []));
     it('should init with specific function and args', testFn({ init: 'foo', args: '20' }, 'foo', ['20']));
+  });
+
+  describe('getPlaceholder', function() {
+    const testType = (type, expected) => 
+      () => getPlaceholder({ type }).should.eq(expected);
+    const testTuple = (components, expected) => 
+      () => getPlaceholder({ type: 'tuple', components: components.map(c => ({ type: c }))})
+        .should.eq(expected);
+
+    it('handles dynamic arrays', testType('uint256[]', '[42, 42]'));
+    it('handles static arrays', testType('uint256[3]', '[42, 42]'));
+    it('handles dynamic string arrays', testType('string[]', '[Hello world, Hello world]'));
+    it('handles tuples of primitive types', testTuple(['uint256', 'string'], '[42, Hello world]'));
+    it('handles tuples of unknown components', testType('tuple', '[Hello world, 42]'));
   });
 });
