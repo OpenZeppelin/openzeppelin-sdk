@@ -2,6 +2,7 @@ import BN from 'bignumber.js';
 import flattenDeep from 'lodash.flattendeep';
 import { encodeParams, Loggy, ZWeb3 } from '@openzeppelin/upgrades';
 import { MethodArg } from '../prompts/prompt';
+import zipWith from 'lodash.zipwith';
 
 // TODO: Deprecate in favor of a combination of parseArg and parseArray
 export function parseArgs(args: string): string[] | never {
@@ -47,18 +48,24 @@ function quoteArguments(args: string) {
   return args;
 }
 
-export function parseArg(input: string | string[], type: string): any {
+export function parseArg(input: string | string[], { type, components }: Pick<MethodArg, 'type' | 'components'>): any {
   const TRUE_VALUES = ['y', 'yes', 't', 'true', '1'];
   const FALSE_VALUES = ['n', 'no', 'f', 'false', '0'];
   const ARRAY_TYPE_REGEX = /(.+)\[\d*\]$/; // matches array type identifiers like uint[] or byte[4]
 
-  // TODO: Handle tuples in ABI specification
+  // Tuples: recursively parse
+  if (type === 'tuple') {
+    const inputs = typeof input === 'string' ? parseArray(stripBrackets(input)) : input;
+    if (inputs.length !== components.length)
+      throw new Error(`Expected ${components.length} values but got ${input.length}`);
+    return zipWith(inputs, components, parseArg);
+  }
 
   // Arrays: recursively parse
-  if (type.match(ARRAY_TYPE_REGEX)) {
+  else if (type.match(ARRAY_TYPE_REGEX)) {
     const arrayType = type.match(ARRAY_TYPE_REGEX)[1];
     const inputs = typeof input === 'string' ? parseArray(stripBrackets(input)) : input;
-    return inputs.map(input => parseArg(input, arrayType));
+    return inputs.map(input => parseArg(input, { type: arrayType }));
   }
 
   // Integers: passed via bignumber to handle signs and scientific notation
@@ -265,7 +272,7 @@ export function getPlaceholder(arg: Pick<MethodArg, 'type' | 'components'>): str
     return 'Hello world';
   } else if (type === 'tuple' && components) {
     return `[${components.map(c => getPlaceholder(c)).join(', ')}]`;
-  } else if (type === 'tuple') { 
+  } else if (type === 'tuple') {
     return `[Hello world, 42]`;
   } else {
     return null;

@@ -116,6 +116,7 @@
     "lodash.uniq": "^4.5.0",
     "lodash.uniqby": "^4.7.0",
     "lodash.uniqwith": "^4.5.0",
+    "lodash.zipwith": "^4.2.0",
     "npm-programmatic": "0.0.12",
     "rlp": "^2.2.3",
     "semver": "^5.5.0",

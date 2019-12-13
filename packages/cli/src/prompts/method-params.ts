@@ -59,18 +59,22 @@ function getCommandProps(
     return {
       ...accum,
       [arg.name]: {
-        message: arg.name ? `${arg.name} (${arg.type}):` : `(${arg.type}):`,
+        message: arg.name ? `${arg.name} (${arg.type}):` : `(${arg.type}):`, // TODO: better description for tuples
         type: 'input',
         when: () => !methodArgs || !methodArgs[index],
-        validate: input => {
+        validate: (input: string) => {
           try {
-            parseArg(input, arg.type);
+            parseArg(input, arg);
             return true;
           } catch (err) {
-            return `${err.message}. Enter a valid ${arg.type} such as: ${getPlaceholder(arg)}.`;
+            const placeholder = getPlaceholder(arg);
+            const msg = placeholder
+              ? `Enter a valid ${arg.type} such as: ${getPlaceholder(arg)}`
+              : `Enter a valid ${arg.type}`;
+            return `${err.message}. ${msg}.`;
           }
         },
-        normalize: input => parseArg(input, arg.type),
+        normalize: input => parseArg(input, arg),
       },
     };
   }, {});

@@ -76,13 +76,22 @@ describe('input', function() {
   describe('parseArg', function() {
     const itParses = (input, type, expected) => {
       return it(`parses ${input} as ${type}`, () => {
-        parseArg(input, type).should.deep.eq(expected, `Parsing: '${input}'`);
+        parseArg(input, { type }).should.deep.eq(expected, `Parsing: '${input}'`);
+      });
+    };
+
+    const itParsesTuple = (input, components, expected) => {
+      return it(`parses ${input} as ${components.join(',')}`, () => {
+        parseArg(input, { type: 'tuple', components: components.map(c => ({ type: c })) }).should.deep.eq(
+          expected,
+          `Parsing: '${input}'`,
+        );
       });
     };
 
     const itFailsToParse = (input, type, failure) => {
       return it(`parsing ${input} as ${type} fails`, () => {
-        expect(() => parseArg(input, type)).to.throw(failure);
+        expect(() => parseArg(input, { type })).to.throw(failure);
       });
     };
 
@@ -136,9 +145,16 @@ describe('input', function() {
 
     itParses('foo', 'unknown', 'foo');
 
+    itParsesTuple('42, foo', ['uint256', 'string'], ['42', 'foo']);
+    itParsesTuple('[42, foo]', ['uint256', 'string'], ['42', 'foo']);
+    itParsesTuple('[-1e3, foo]', ['uint256', 'string'], ['-1000', 'foo']);
+    itParsesTuple('[42, "foo, bar"]', ['uint256', 'string'], ['42', 'foo, bar']);
+    itParsesTuple('42', ['uint256'], ['42']);
+    itParsesTuple('foo', ['string'], ['foo']);
+
     context.skip('pending', function() {
-      itParses('[1,2,3]', 'uint256[][]', [['1', '2', '3']], true);
-      itParses('[1,2],[3,4]', 'uint256[][]', [['1', '2'], ['3', '4']], true);
+      itParses('[1,2,3]', 'uint256[][]', [['1', '2', '3']]);
+      itParses('[1,2],[3,4]', 'uint256[][]', [['1', '2'], ['3', '4']]);
     });
   });
 
@@ -199,11 +215,9 @@ describe('input', function() {
   });
 
   describe('getPlaceholder', function() {
-    const testType = (type, expected) => 
-      () => getPlaceholder({ type }).should.eq(expected);
-    const testTuple = (components, expected) => 
-      () => getPlaceholder({ type: 'tuple', components: components.map(c => ({ type: c }))})
-        .should.eq(expected);
+    const testType = (type, expected) => () => getPlaceholder({ type }).should.eq(expected);
+    const testTuple = (components, expected) => () =>
+      getPlaceholder({ type: 'tuple', components: components.map(c => ({ type: c })) }).should.eq(expected);
 
     it('handles dynamic arrays', testType('uint256[]', '[42, 42]'));
     it('handles static arrays', testType('uint256[3]', '[42, 42]'));
