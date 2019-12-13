@@ -9,7 +9,11 @@ the source code comments in this repository, in the smart contracts and in the C
 
 ## Development setup
 
-To get a local preview of the site, run `npm run docs start`, and navigate to `http://localhost:8080`.
+To get a local preview of the site, run `yarn docs:watch`, and navigate to `http://localhost:8080`.
+
+## Updating the site
+
+Each version that is published on the site corresponds to a branch in this repository with a name like `release-docs/*`, for example `release-docs/2.6`. In order to update the site we have to update those branches. Avoid commiting directly to those branches; instead, commit the fixes to `master` and then `git cherry-pick` the commits over to the appropriate branch.
 
 ## Maintainers
 
