@@ -111,6 +111,7 @@
     "lodash.pick": "^4.4.0",
     "lodash.pickby": "^4.6.0",
     "lodash.reverse": "^4.0.1",
+    "lodash.sortby": "^4.7.0",
     "lodash.topairs": "^4.3.0",
     "lodash.uniq": "^4.5.0",
     "lodash.uniqby": "^4.7.0",
