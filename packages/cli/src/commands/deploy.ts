@@ -1,11 +1,15 @@
 import { Command, Option } from 'commander';
 import Telemetry from '../telemetry';
+import { compile } from '../models/compiler/Compiler';
 
 export const name = 'deploy';
 export const signature = `${name} [contract] [arguments...]`;
 
 export function register(program: Command): void {
-  _register(program).action(withTelemetry(withPrompts(action, props)));
+  _register(program).action((...args) => {
+    preAction();
+    withTelemetry(withPrompts(action, spec))(...args)
+  });
 }
 
 function _register(program: Command): Command {
@@ -15,25 +19,40 @@ function _register(program: Command): Command {
 }
 
 interface Options {
-  upgradeable: boolean;
-  init: string;
+  skipCompile?: boolean;
+  upgradeable?: boolean;
+  init?: string;
 }
 
-async function action(contractName: string, deployArgs: string[], options: Options): Promise<Void> {
+async function preAction(options: Options): Promise<void> {
+  if (!options.skipCompile) {
+    await compile();
+  }
+}
+
+async function action(contractName: string, deployArgs: string[], options: Options): Promise<void> {
   if (options.upgradeable) {
-    return create(...);
+    return create(...); // TODO: skip compile
   }
 
-  compile(contractName);
   const contract = await getContract(contractName);
   const args = contract.parseConstructorArgs(deployArgs);
-  await contract.new(...args);
+  const instance = await contract.new(...args);
+
+  // store to json network file
+  // print instance info
 }
 
 type Action = (...args: unknown[]) => void;
 
+function withCompilation(action: Action): Action {
+}
+
+function withPrompts(action: Action, props: unknown): Action {
+}
+
 function withTelemetry(action: Action): Action {
-  return function (...args): void {
+  return function(...args): void {
     // args always contains the cmd in the last position
     const cmd: Command = args.pop() as Command;
     const name = cmd.name();
@@ -46,14 +65,46 @@ function withTelemetry(action: Action): Action {
 function commandArgsAndOpts(cmd: Command, args: unknown[]): Record<string, unknown> {
   const argsAndOpts = {};
 
-  for (let i = 0; i < args.length; i++) {
+  for (let i = 0; i < cmd._args.length; i++) {
     argsAndOpts[cmd._args[i].name] = args[i];
   }
 
-  for (const opt: Option of cmd.options) {
+  for (const opt of cmd.options) {
     const name = opt.attributeName();
     argsAndOpts[name] = cmd[name];
   }
 
   return argsAndOpts;
+}
+
+// query
+// parse 
+// validate
+
+const spec = [
+  {
+    name: 'network',
+    message: 'Pick a network',
+    async choices(): Promise<string[]> {
+      const { default: ConfigManager } = await import('../models/config/ConfigManager');
+      return ConfigManager.getNetworkNamesFromConfig();
+    },
+  },
+  {
+    name: 'contract',
+    message: 'Pick a contract to deploy',
+    async choices(): Promise<string[]> {
+    },
+  },
+  {
+    name: 'contract',
+    message: 'Pick a contract to deploy',
+    async choices(): Promise<string[]> {
+    },
+  },
+];
+
+function* prompts(args) {
+  yield* promptNetwork(args);
+
 }
