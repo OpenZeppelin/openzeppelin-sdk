@@ -12,6 +12,7 @@ export interface CalldataInfo {
 interface InputInfo {
   name?: string;
   type: string;
+  components?: InputInfo[];
 }
 
 interface FunctionInfo {
@@ -66,9 +67,9 @@ export function getABIFunction(contract: Contract, methodName: string, args: any
   }
 }
 
-export function getABIType(arg: any): string {
+export function getArgTypeLabel(arg: InputInfo): string {
   if (arg.type === 'tuple') {
-    return `(${arg.components.map(getABIType).join(',')})`;
+    return `(${arg.components.map(getArgTypeLabel).join(',')})`;
   } else {
     return arg.type;
   }
@@ -145,6 +146,6 @@ export function callDescription(method: any, args: string[]): string {
 export default {
   buildCallData,
   getABIFunction,
-  getABIType,
+  getABIType: getArgTypeLabel,
   callDescription,
 };

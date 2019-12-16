@@ -3,7 +3,7 @@ import pickBy from 'lodash.pickby';
 import isUndefined from 'lodash.isundefined';
 import negate from 'lodash.negate';
 
-import { parseMethodParams, parseArg, getPlaceholder } from '../utils/input';
+import { parseMethodParams, parseArg, getSampleInput } from '../utils/input';
 import { promptIfNeeded, argsList, methodsList, InquirerQuestions, argLabel } from './prompt';
 
 type PropsFn = (any) => InquirerQuestions;
@@ -59,7 +59,7 @@ function getCommandProps(
     return {
       ...accum,
       [arg.name]: {
-        message: argLabel(arg),
+        message: `${argLabel(arg)}:`,
         type: 'input',
         when: () => !methodArgs || !methodArgs[index],
         validate: (input: string) => {
@@ -67,7 +67,7 @@ function getCommandProps(
             parseArg(input, arg);
             return true;
           } catch (err) {
-            const placeholder = getPlaceholder(arg);
+            const placeholder = getSampleInput(arg);
             const msg = placeholder ? `Enter a valid ${arg.type} such as: ${placeholder}` : `Enter a valid ${arg.type}`;
             return `${err.message}. ${msg}.`;
           }

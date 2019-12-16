@@ -52,11 +52,14 @@ interface MethodOptions {
   constant?: boolean;
 }
 
-export interface MethodArg {
-  name: string;
+export interface MethodArgType {
   type: string;
   internalType?: string;
   components?: MethodArg[];
+}
+
+export interface MethodArg extends MethodArgType {
+  name: string;
 }
 
 export let DISABLE_INTERACTIVITY: boolean =

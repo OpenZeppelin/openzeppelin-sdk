@@ -1,7 +1,7 @@
 import BN from 'bignumber.js';
 import flattenDeep from 'lodash.flattendeep';
 import { encodeParams, Loggy, ZWeb3 } from '@openzeppelin/upgrades';
-import { MethodArg } from '../prompts/prompt';
+import { MethodArgType } from '../prompts/prompt';
 import zipWith from 'lodash.zipwith';
 
 // TODO: Deprecate in favor of a combination of parseArg and parseArray
@@ -48,7 +48,7 @@ function quoteArguments(args: string) {
   return args;
 }
 
-export function parseArg(input: string | string[], { type, components }: Pick<MethodArg, 'type' | 'components'>): any {
+export function parseArg(input: string | string[], { type, components }: MethodArgType): any {
   const TRUE_VALUES = ['y', 'yes', 't', 'true', '1'];
   const FALSE_VALUES = ['n', 'no', 'f', 'false', '0'];
   const ARRAY_TYPE_REGEX = /(.+)\[\d*\]$/; // matches array type identifiers like uint[] or byte[4]
@@ -251,13 +251,13 @@ export function validateSalt(salt: string, required = false) {
   }
 }
 
-export function getPlaceholder(arg: Pick<MethodArg, 'type' | 'components'>): string {
+export function getSampleInput(arg: MethodArgType): string | null {
   const ARRAY_TYPE_REGEX = /(.+)\[\d*\]$/; // matches array type identifiers like uint[] or byte[4]
   const { type, components } = arg;
 
   if (type.match(ARRAY_TYPE_REGEX)) {
     const arrayType = type.match(ARRAY_TYPE_REGEX)[1];
-    const itemPlaceholder = getPlaceholder({ type: arrayType });
+    const itemPlaceholder = getSampleInput({ type: arrayType });
     return `[${itemPlaceholder}, ${itemPlaceholder}]`;
   } else if (
     type.startsWith('uint') ||
@@ -275,7 +275,7 @@ export function getPlaceholder(arg: Pick<MethodArg, 'type' | 'components'>): str
   } else if (type === 'string') {
     return 'Hello world';
   } else if (type === 'tuple' && components) {
-    return `(${components.map(c => getPlaceholder(c)).join(', ')})`;
+    return `(${components.map(c => getSampleInput(c)).join(', ')})`;
   } else if (type === 'tuple') {
     return `(Hello world, 42)`;
   } else {
