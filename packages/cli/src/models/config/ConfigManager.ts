@@ -4,6 +4,8 @@ import Session from '../network/Session';
 import NetworkConfig from './NetworkConfig';
 
 import pick from 'lodash.pick';
+import pickBy from 'lodash.pickby';
+import isNil from 'lodash.isnil';
 
 const ConfigManager = {
   config: undefined,
@@ -40,7 +42,7 @@ const ConfigManager = {
       await ZWeb3.checkNetworkId(network.networkId);
       const txParams = {
         from: ZWeb3.toChecksumAddress(from || artifactDefaults.from || (await ZWeb3.defaultAccount())),
-        ...pick(artifactDefaults, ['gas', 'gasPrice']),
+        ...pickBy(pick(artifactDefaults, ['gas', 'gasPrice']), x => !isNil(x)),
       };
 
       return { network: await ZWeb3.getNetworkName(), txParams };
