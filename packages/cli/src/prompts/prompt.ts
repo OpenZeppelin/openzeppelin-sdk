@@ -200,7 +200,7 @@ export function methodsList(
 }
 
 export function argLabel(arg: MethodArg): string {
-  return arg.name ? `${arg.name}: ${ABI.getABIType(arg)}` : ABI.getABIType(arg);
+  return arg.name ? `${arg.name}: ${ABI.getArgTypeLabel(arg)}` : ABI.getArgTypeLabel(arg);
 }
 
 // Returns an inquirer question with a list of arguments for a particular method

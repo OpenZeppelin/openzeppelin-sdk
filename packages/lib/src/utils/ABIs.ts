@@ -146,6 +146,6 @@ export function callDescription(method: any, args: string[]): string {
 export default {
   buildCallData,
   getABIFunction,
-  getABIType: getArgTypeLabel,
+  getArgTypeLabel,
   callDescription,
 };
