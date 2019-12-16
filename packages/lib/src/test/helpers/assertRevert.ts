@@ -1,6 +1,6 @@
 import assert from 'assert';
 
-export default async function assertRevert(promise: Promise<any>, invariants = (): void => {}) {
+export default async function assertRevert(promise: Promise<any>, invariants = (): void => undefined) {
   try {
     await promise;
   } catch (error) {

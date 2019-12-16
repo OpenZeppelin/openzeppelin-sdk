@@ -2,7 +2,7 @@ import fs from 'fs-extra';
 
 process.env.NODE_ENV = 'test';
 
-import { ZWeb3, Contracts, Loggy } from '@openzeppelin/upgrades';
+import { ZWeb3, Contracts, Loggy, assertions } from '@openzeppelin/upgrades';
 import { provider } from '@openzeppelin/test-environment';
 
 import { OPEN_ZEPPELIN_FOLDER } from '../src/models/files/constants';
@@ -10,6 +10,10 @@ import Dependency from '../src/models/dependency/Dependency';
 import ProjectFile from '../src/models/files/ProjectFile';
 import NetworkFile from '../src/models/files/NetworkFile';
 import Session from '../src/models/network/Session';
+
+import chaiAsPromised from 'chai-as-promised';
+import chaiString from 'chai-string';
+import sinonChai from 'sinon-chai';
 
 fs.ensureDirSync(OPEN_ZEPPELIN_FOLDER);
 useTestProjectFile();
@@ -20,16 +24,16 @@ Loggy.silent(false);
 Loggy.testing(true);
 
 require('chai')
-  .use(require('chai-as-promised'))
-  .use(require('chai-string'))
-  .use(require('@openzeppelin/upgrades').assertions)
-  .use(require('sinon-chai'))
+  .use(chaiAsPromised)
+  .use(chaiString)
+  .use(assertions)
+  .use(sinonChai)
   .should();
 
 // TODO: Replace with fs mock or create openzeppelin folder and remove it later
 function useTestProjectFile() {
-  ProjectFile.prototype.write = () => {};
-  NetworkFile.prototype.write = () => {};
+  ProjectFile.prototype.write = () => undefined;
+  NetworkFile.prototype.write = () => undefined;
 }
 
 function doNotInstallStdlib() {

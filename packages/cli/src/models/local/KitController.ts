@@ -13,12 +13,7 @@ import child from '../../utils/child';
 const simpleGit = patch('simple-git/promise');
 
 export default class KitController {
-  public async unpack(
-    url: string,
-    branchName: string = 'stable',
-    workingDirPath: string = '',
-    config: KitFile,
-  ): Promise<void | never> {
+  public async unpack(url: string, branchName = 'stable', workingDirPath = '', config: KitFile): Promise<void | never> {
     if (!url) throw Error('A url must be provided.');
     if (!config) throw Error('A config must be provided.');
 
@@ -61,13 +56,15 @@ export default class KitController {
     }
   }
 
-  public async verifyRepo(url: string, branchName: string = 'stable'): Promise<KitFile | never> {
+  public async verifyRepo(url: string, branchName = 'stable'): Promise<KitFile | never> {
     if (!url) throw Error('A url must be provided.');
 
     try {
-      const config = (await axios.get(
-        url.replace('.git', `/${branchName}/kit.json`).replace('github.com', 'raw.githubusercontent.com'),
-      )).data as KitFile;
+      const config = (
+        await axios.get(
+          url.replace('.git', `/${branchName}/kit.json`).replace('github.com', 'raw.githubusercontent.com'),
+        )
+      ).data as KitFile;
 
       // validate our json config
       // TODO: derive the schema directly from the KitConfig type

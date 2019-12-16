@@ -210,8 +210,8 @@ export default {
 
   async awaitConfirmations(
     transactionHash: string,
-    confirmations: number = 12,
-    interval: number = 1000,
+    confirmations = 12,
+    interval = 1000,
     timeout: number = 10 * 60 * 1000,
   ): Promise<any | never> {
     if (await ZWeb3.isGanacheNode()) return;

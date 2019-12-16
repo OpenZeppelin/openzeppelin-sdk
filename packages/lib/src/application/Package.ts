@@ -63,7 +63,7 @@ export default class Package {
     return directory.getImplementation(contractName);
   }
 
-  public async newVersion(version: string, content: string = ''): Promise<ImplementationDirectory> {
+  public async newVersion(version: string, content = ''): Promise<ImplementationDirectory> {
     const semver: SemanticVersion = toSemanticVersion(version);
     const directory: ImplementationDirectory = await ImplementationDirectory.deploy({ ...this.txParams });
     await Transactions.sendTransaction(

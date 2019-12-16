@@ -15,7 +15,7 @@ import { fromContractFullName, toContractFullName } from '../utils/naming';
 import { ProxyType } from '../scripts/interfaces';
 import NetworkFile, { ProxyInterface } from '../models/files/NetworkFile';
 
-type ChoicesT = string[] | ({ [key: string]: any });
+type ChoicesT = string[] | { [key: string]: any };
 
 export interface InquirerQuestions {
   [key: string]: InquirerQuestion;
@@ -52,7 +52,7 @@ interface MethodOptions {
   constant?: boolean;
 }
 
-export let DISABLE_INTERACTIVITY: boolean =
+export const DISABLE_INTERACTIVITY: boolean =
   !process.stdin.isTTY ||
   !!process.env.OPENZEPPELIN_NON_INTERACTIVE ||
   !!process.env.ZOS_NON_INTERACTIVE ||
@@ -142,7 +142,10 @@ export function contractsList(name: string, message: string, type: string, sourc
     return inquirerQuestion(name, message, type, contractsFromBuild);
     // get contracts from project.json file
   } else if (source === 'notAdded') {
-    const contracts = difference(contractsFromBuild, contractsFromLocal.map(({ value }) => value));
+    const contracts = difference(
+      contractsFromBuild,
+      contractsFromLocal.map(({ value }) => value),
+    );
     return inquirerQuestion(name, message, type, contracts);
   } else if (source === 'added') {
     return inquirerQuestion(name, message, type, contractsFromLocal);

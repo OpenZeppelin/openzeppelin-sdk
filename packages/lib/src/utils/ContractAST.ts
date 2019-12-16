@@ -151,7 +151,7 @@ export default class ContractAST {
     return Object.values(visitedBaseContracts);
   }
 
-  public getLinearizedBaseContracts(mostDerivedFirst: boolean = false): Node[] {
+  public getLinearizedBaseContracts(mostDerivedFirst = false): Node[] {
     const contracts = this.getContractNode().linearizedBaseContracts.map(id => this.getNode(id, 'ContractDefinition'));
     return mostDerivedFirst ? contracts : reverse(contracts);
   }

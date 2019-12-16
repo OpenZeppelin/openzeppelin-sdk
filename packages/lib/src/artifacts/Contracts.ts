@@ -5,9 +5,9 @@ import ZWeb3 from './ZWeb3';
 import { getSolidityLibNames, hasUnlinkedVariables } from '../utils/Bytecode';
 
 export default class Contracts {
-  private static DEFAULT_SYNC_TIMEOUT: number = 240000;
-  private static DEFAULT_BUILD_DIR: string = `build/contracts`;
-  private static DEFAULT_CONTRACTS_DIR: string = `contracts`;
+  private static DEFAULT_SYNC_TIMEOUT = 240000;
+  private static DEFAULT_BUILD_DIR = `build/contracts`;
+  private static DEFAULT_CONTRACTS_DIR = `contracts`;
 
   private static timeout: number = Contracts.DEFAULT_SYNC_TIMEOUT;
   private static buildDir: string = Contracts.DEFAULT_BUILD_DIR;

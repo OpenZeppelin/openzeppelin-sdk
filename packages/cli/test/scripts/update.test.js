@@ -72,7 +72,10 @@ describe('update script', function() {
   const createProxies = async function() {
     this.networkFile = new NetworkFile(this.projectFile, network);
 
-    const contractsData = [{ name: 'ImplV1', alias: 'Impl' }, { name: 'WithLibraryImplV1', alias: 'WithLibraryImpl' }];
+    const contractsData = [
+      { name: 'ImplV1', alias: 'Impl' },
+      { name: 'WithLibraryImplV1', alias: 'WithLibraryImpl' },
+    ];
     await add({ contractsData, projectFile: this.projectFile });
     await push({ network, txParams, networkFile: this.networkFile });
 
@@ -563,15 +566,19 @@ describe('update script', function() {
         });
 
         const { address: proxyAddress } = await assertProxyInfo(this.networkFile, 'Greeter', 0, { version: '1.2.0' });
-        (await GreeterV2.at(proxyAddress)
-          .methods.version()
-          .call()).should.eq('1.2.0');
+        (
+          await GreeterV2.at(proxyAddress)
+            .methods.version()
+            .call()
+        ).should.eq('1.2.0');
         const { address: anotherProxyAddress } = await assertProxyInfo(this.networkFile, 'Greeter', 0, {
           version: '1.2.0',
         });
-        (await GreeterV2.at(anotherProxyAddress)
-          .methods.version()
-          .call()).should.eq('1.2.0');
+        (
+          await GreeterV2.at(anotherProxyAddress)
+            .methods.version()
+            .call()
+        ).should.eq('1.2.0');
       });
 
       it('should upgrade the version of all proxies given their package', async function() {
@@ -583,15 +590,19 @@ describe('update script', function() {
         });
 
         const { address: proxyAddress } = await assertProxyInfo(this.networkFile, 'Greeter', 0, { version: '1.2.0' });
-        (await GreeterV2.at(proxyAddress)
-          .methods.version()
-          .call()).should.eq('1.2.0');
+        (
+          await GreeterV2.at(proxyAddress)
+            .methods.version()
+            .call()
+        ).should.eq('1.2.0');
         const { address: anotherProxyAddress } = await assertProxyInfo(this.networkFile, 'Greeter', 0, {
           version: '1.2.0',
         });
-        (await GreeterV2.at(anotherProxyAddress)
-          .methods.version()
-          .call()).should.eq('1.2.0');
+        (
+          await GreeterV2.at(anotherProxyAddress)
+            .methods.version()
+            .call()
+        ).should.eq('1.2.0');
       });
 
       it('should upgrade the version of all proxies', async function() {
@@ -603,15 +614,19 @@ describe('update script', function() {
         });
 
         const { address: proxyAddress } = await assertProxyInfo(this.networkFile, 'Greeter', 0, { version: '1.2.0' });
-        (await GreeterV2.at(proxyAddress)
-          .methods.version()
-          .call()).should.eq('1.2.0');
+        (
+          await GreeterV2.at(proxyAddress)
+            .methods.version()
+            .call()
+        ).should.eq('1.2.0');
         const { address: anotherProxyAddress } = await assertProxyInfo(this.networkFile, 'Greeter', 0, {
           version: '1.2.0',
         });
-        (await GreeterV2.at(anotherProxyAddress)
-          .methods.version()
-          .call()).should.eq('1.2.0');
+        (
+          await GreeterV2.at(anotherProxyAddress)
+            .methods.version()
+            .call()
+        ).should.eq('1.2.0');
       });
     }).timeout(5000);
   };
