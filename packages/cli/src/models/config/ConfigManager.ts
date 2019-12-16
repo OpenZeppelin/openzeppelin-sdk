@@ -3,6 +3,8 @@ import TruffleConfig from './TruffleConfig';
 import Session from '../network/Session';
 import NetworkConfig from './NetworkConfig';
 
+import pick from 'lodash.pick';
+
 const ConfigManager = {
   config: undefined,
 
@@ -38,6 +40,7 @@ const ConfigManager = {
       await ZWeb3.checkNetworkId(network.networkId);
       const txParams = {
         from: ZWeb3.toChecksumAddress(from || artifactDefaults.from || (await ZWeb3.defaultAccount())),
+        ...pick(artifactDefaults, ['gas', 'gasPrice']),
       };
 
       return { network: await ZWeb3.getNetworkName(), txParams };
