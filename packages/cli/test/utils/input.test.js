@@ -3,7 +3,7 @@ require('../setup');
 
 const expect = require('chai').expect;
 
-import { parseArgs, parseMethodParams, parseArray, parseArg, getPlaceholder } from '../../src/utils/input';
+import { parseArgs, parseMethodParams, parseArray, parseArg, getSampleInput } from '../../src/utils/input';
 
 describe('input', function() {
   describe('parseArgs', function() {
@@ -214,10 +214,10 @@ describe('input', function() {
     it('should init with specific function and args', testFn({ init: 'foo', args: '20' }, 'foo', ['20']));
   });
 
-  describe('getPlaceholder', function() {
-    const testType = (type, expected) => () => getPlaceholder({ type }).should.eq(expected);
+  describe('getSampleInput', function() {
+    const testType = (type, expected) => () => getSampleInput({ type }).should.eq(expected);
     const testTuple = (components, expected) => () =>
-      getPlaceholder({ type: 'tuple', components: components.map(c => ({ type: c })) }).should.eq(expected);
+      getSampleInput({ type: 'tuple', components: components.map(c => ({ type: c })) }).should.eq(expected);
 
     it('handles dynamic arrays', testType('uint256[]', '[42, 42]'));
     it('handles static arrays', testType('uint256[3]', '[42, 42]'));
