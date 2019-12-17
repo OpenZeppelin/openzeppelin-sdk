@@ -8,7 +8,7 @@
   "scripts": {
     "copy-files": "./scripts/copy-files.sh",
     "compile-ts": "rm -rf lib && tsc",
-    "compile-contracts": "rm -rf build/contracts && ../../bootstrap/node_modules/.bin/oz compile --solc-version 0.5.3 --evm-version constantinople",
+    "compile-contracts": "rm -rf build/contracts && ../../bootstrap/node_modules/.bin/oz compile --solc-version 0.5.14 --evm-version constantinople",
     "prepare": "npm run compile-contracts && npm run compile-ts && npm run copy-files && chmod 755 ./lib/bin/oz-cli.js",
     "test": "TS_NODE_PROJECT='tsconfig.test.json' mocha --require ts-node/register --recursive test",
     "gen-docs": "./scripts/gen-docs.sh",
@@ -116,6 +116,7 @@
     "lodash.uniq": "^4.5.0",
     "lodash.uniqby": "^4.7.0",
     "lodash.uniqwith": "^4.5.0",
+    "lodash.zipwith": "^4.2.0",
     "npm-programmatic": "0.0.12",
     "rlp": "^2.2.3",
     "semver": "^5.5.0",

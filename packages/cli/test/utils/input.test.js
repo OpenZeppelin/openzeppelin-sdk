@@ -3,7 +3,7 @@ require('../setup');
 
 const expect = require('chai').expect;
 
-import { parseArgs, parseMethodParams, parseArray, parseArg } from '../../src/utils/input';
+import { parseArgs, parseMethodParams, parseArray, parseArg, getSampleInput } from '../../src/utils/input';
 
 describe('input', function() {
   describe('parseArgs', function() {
@@ -76,13 +76,22 @@ describe('input', function() {
   describe('parseArg', function() {
     const itParses = (input, type, expected) => {
       return it(`parses ${input} as ${type}`, () => {
-        parseArg(input, type).should.deep.eq(expected, `Parsing: '${input}'`);
+        parseArg(input, { type }).should.deep.eq(expected, `Parsing: '${input}'`);
+      });
+    };
+
+    const itParsesTuple = (input, components, expected) => {
+      return it(`parses ${input} as ${components.join(',')}`, () => {
+        parseArg(input, { type: 'tuple', components: components.map(c => ({ type: c })) }).should.deep.eq(
+          expected,
+          `Parsing: '${input}'`,
+        );
       });
     };
 
     const itFailsToParse = (input, type, failure) => {
       return it(`parsing ${input} as ${type} fails`, () => {
-        expect(() => parseArg(input, type)).to.throw(failure);
+        expect(() => parseArg(input, { type })).to.throw(failure);
       });
     };
 
@@ -139,17 +148,19 @@ describe('input', function() {
 
     itParses('foo', 'unknown', 'foo');
 
+    itParsesTuple('42, foo', ['uint256', 'string'], ['42', 'foo']);
+    itParsesTuple('(42, foo)', ['uint256', 'string'], ['42', 'foo']);
+    itParsesTuple('(-1e3, foo)', ['uint256', 'string'], ['-1000', 'foo']);
+    itParsesTuple('(42, "foo, bar")', ['uint256', 'string'], ['42', 'foo, bar']);
+    itParsesTuple('42', ['uint256'], ['42']);
+    itParsesTuple('foo', ['string'], ['foo']);
+
     context.skip('pending', function() {
-      itParses('[1,2,3]', 'uint256[][]', [['1', '2', '3']], true);
-      itParses(
-        '[1,2],[3,4]',
-        'uint256[][]',
-        [
-          ['1', '2'],
-          ['3', '4'],
-        ],
-        true,
-      );
+      itParses('[1,2,3]', 'uint256[][]', [['1', '2', '3']]);
+      itParses('[1,2],[3,4]', 'uint256[][]', [
+        ['1', '2'],
+        ['3', '4'],
+      ]);
     });
   });
 
@@ -207,5 +218,17 @@ describe('input', function() {
     it('should init when args is set', testFn({ args: '20' }, defaulMethodName, ['20']));
     it('should init with specific function', testFn({ init: 'foo' }, 'foo', []));
     it('should init with specific function and args', testFn({ init: 'foo', args: '20' }, 'foo', ['20']));
+  });
+
+  describe('getSampleInput', function() {
+    const testType = (type, expected) => () => getSampleInput({ type }).should.eq(expected);
+    const testTuple = (components, expected) => () =>
+      getSampleInput({ type: 'tuple', components: components.map(c => ({ type: c })) }).should.eq(expected);
+
+    it('handles dynamic arrays', testType('uint256[]', '[42, 42]'));
+    it('handles static arrays', testType('uint256[3]', '[42, 42]'));
+    it('handles dynamic string arrays', testType('string[]', '[Hello world, Hello world]'));
+    it('handles tuples of primitive types', testTuple(['uint256', 'string'], '(42, Hello world)'));
+    it('handles tuples of unknown components', testType('tuple', '(Hello world, 42)'));
   });
 });

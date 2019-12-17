@@ -11,7 +11,7 @@ import ProjectFile from '../files/ProjectFile';
 import NetworkFile from '../files/NetworkFile';
 import { describeEvents } from '../../utils/events';
 
-const { buildCallData, callDescription } = ABI;
+const { getABIFunction, callDescription } = ABI;
 
 interface ERC20TokenInfo {
   balance?: string;
@@ -137,7 +137,7 @@ export default class TransactionController {
     const { package: packageName, contract: contractName } = this.networkFile.getProxy(address);
     const contractManager = new ContractManager(this.projectFile);
     const contract = contractManager.getContractClass(packageName, contractName).at(address);
-    const { method } = buildCallData(contract, methodName, methodArgs);
+    const method = getABIFunction(contract, methodName, methodArgs);
 
     return { contract, method };
   }

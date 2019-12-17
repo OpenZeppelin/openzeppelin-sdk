@@ -4,6 +4,7 @@ import ContractAST from '../utils/ContractAST';
 import { StorageLayoutInfo } from '../validations/Storage';
 import { TransactionReceipt } from 'web3-core';
 import { Contract as Web3Contract } from 'web3-eth-contract';
+import { getArgTypeLabel } from '../utils/ABIs';
 
 /*
  * Contract is an interface that extends Web3's Contract interface, adding some properties and methods like:
@@ -140,7 +141,7 @@ export function contractMethodsFromAbi(
     .filter(({ constant: isConstantMethod, type }) => isConstant === isConstantMethod && type === 'function')
     .map(method => {
       const { name, inputs } = method;
-      const selector = `${name}(${inputs.map(({ type }) => type)})`;
+      const selector = `${name}(${inputs.map(getArgTypeLabel).join(',')})`;
       const infoFromAst = methodsFromAst.find(({ selector: selectorFromAst }) => selectorFromAst === selector);
       const modifiers = infoFromAst ? infoFromAst.modifiers : [];
       const initializer = modifiers.find(({ modifierName }) => modifierName.name === 'initializer');
