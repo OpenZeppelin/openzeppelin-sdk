@@ -41,7 +41,7 @@ async function action(options: any): Promise<void> {
   if (!options.dontExitProcess && process.env.NODE_ENV !== 'test') process.exit(0);
 }
 
-function getCommandProps(accounts: string[] = [], unit: string = 'ether'): InquirerQuestions {
+function getCommandProps(accounts: string[] = [], unit = 'ether'): InquirerQuestions {
   return {
     ...networksList('network', 'list'),
     from: {

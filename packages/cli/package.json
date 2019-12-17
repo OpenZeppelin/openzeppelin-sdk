@@ -139,8 +139,8 @@
     "@types/lodash": "^4.14.119",
     "@types/mocha": "^5.2.5",
     "@types/node": "^10.12.12",
-    "@typescript-eslint/eslint-plugin": "^1.9.0",
-    "@typescript-eslint/parser": "^1.9.0",
+    "@typescript-eslint/eslint-plugin": "^2.12.0",
+    "@typescript-eslint/parser": "^2.12.0",
     "chai": "^4.2.0",
     "chai-as-promised": "^7.1.1",
     "chai-bignumber": "^2.0.2",
@@ -163,11 +163,11 @@
     "mock-stdlib-undeployed-2": "file:./test/mocks/mock-stdlib-undeployed-2",
     "mock-stdlib-unpublished": "file:./test/mocks/mock-stdlib-unpublished",
     "mock-stdlib-unsupported": "file:./test/mocks/mock-stdlib-unsupported",
-    "prettier": "^1.17.1",
+    "prettier": "^1.19.1",
     "sinon": "^6.1.4",
     "sinon-chai": "^3.2.0",
-    "ts-node": "^7.0.1",
-    "typescript": "^3.2.2",
+    "ts-node": "^8.5.4",
+    "typescript": "^3.7.3",
     "yargs": "^7.1.0"
   }
 }

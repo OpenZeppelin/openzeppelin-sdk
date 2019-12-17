@@ -44,11 +44,7 @@ const Session = {
     return { network, expired: this._hasExpired(session) };
   },
 
-  open(
-    { network, from, timeout }: SessionOptions,
-    expires: number = DEFAULT_EXPIRATION_TIMEOUT,
-    logInfo: boolean = true,
-  ): void {
+  open({ network, from, timeout }: SessionOptions, expires: number = DEFAULT_EXPIRATION_TIMEOUT, logInfo = true): void {
     const expirationTimestamp = new Date(new Date().getTime() + expires * 1000);
     fs.writeJson(SESSION_PATH, {
       network,

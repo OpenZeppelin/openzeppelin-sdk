@@ -9,7 +9,7 @@ export function signDeploy(
   salt: string,
   logic: string,
   admin: string,
-  initData: string = '',
+  initData = '',
   pk: string = signerPk,
 ): string {
   // Encodes and tightly packs the arguments and calculates keccak256

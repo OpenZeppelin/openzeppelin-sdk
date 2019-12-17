@@ -15,7 +15,7 @@ const execFile = promisify(callbackExecFile);
 export async function compile(
   compilerOptions?: ProjectCompilerOptions,
   projectFile = new ProjectFile(),
-  force: boolean = false,
+  force = false,
 ): Promise<void> {
   if (!force && state.alreadyCompiled) return;
 

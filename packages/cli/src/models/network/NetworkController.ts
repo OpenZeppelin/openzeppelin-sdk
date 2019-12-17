@@ -126,7 +126,7 @@ export default class NetworkController {
   }
 
   // DeployerController
-  public async push(reupload: boolean = false, force: boolean = false): Promise<void | never> {
+  public async push(reupload = false, force = false): Promise<void | never> {
     const changedLibraries = this._solidityLibsForPush(!reupload);
     const contracts = this._contractsListForPush(!reupload, changedLibraries);
     const buildArtifacts = getBuildArtifacts();
@@ -183,7 +183,7 @@ export default class NetworkController {
   }
 
   // Contract model
-  private _contractsListForPush(onlyChanged: boolean = false, changedLibraries: Contract[] = []): [string, Contract][] {
+  private _contractsListForPush(onlyChanged = false, changedLibraries: Contract[] = []): [string, Contract][] {
     const newVersion = this._newVersionRequired();
     const pipeline = [
       contracts => toPairs(contracts),
@@ -207,10 +207,10 @@ export default class NetworkController {
   }
 
   // Contract model || SolidityLib model
-  private _solidityLibsForPush(onlyChanged: boolean = false): Contract[] | never {
+  private _solidityLibsForPush(onlyChanged = false): Contract[] | never {
     const { contractNames, contractAliases } = this.projectFile;
 
-    let libNames = this._getAllSolidityLibNames(contractNames);
+    const libNames = this._getAllSolidityLibNames(contractNames);
 
     const clashes = intersection(libNames, contractAliases);
     if (!isEmpty(clashes)) {
@@ -314,7 +314,12 @@ export default class NetworkController {
   // Contract model || SolidityLib model
   private _hasChangedLibraries(contract: Contract, changedLibraries: Contract[]): boolean {
     const libNames = getSolidityLibNames(contract.schema.bytecode);
-    return !isEmpty(intersection(changedLibraries.map(c => c.schema.contractName), libNames));
+    return !isEmpty(
+      intersection(
+        changedLibraries.map(c => c.schema.contractName),
+        libNames,
+      ),
+    );
   }
 
   // Contract model || SolidityLib model
@@ -398,14 +403,14 @@ export default class NetworkController {
   }
 
   // Contract model
-  public checkContractDeployed(packageName: string, contractAlias: string, throwIfFail: boolean = false): void {
+  public checkContractDeployed(packageName: string, contractAlias: string, throwIfFail = false): void {
     if (!packageName) packageName = this.projectFile.name;
     const err = this._errorForContractDeployed(packageName, contractAlias);
     if (err) this._handleErrorMessage(err, throwIfFail);
   }
 
   // Contract model
-  public checkLocalContractsDeployed(throwIfFail: boolean = false): void {
+  public checkLocalContractsDeployed(throwIfFail = false): void {
     const err = this._errorForLocalContractsDeployed();
     if (err) this._handleErrorMessage(err, throwIfFail);
   }
@@ -425,7 +430,7 @@ export default class NetworkController {
   }
 
   // Contract model
-  public checkLocalContractDeployed(contractAlias: string, throwIfFail: boolean = false): void {
+  public checkLocalContractDeployed(contractAlias: string, throwIfFail = false): void {
     // if (!packageName) packageName = this.projectFile.name
     const err = this._errorForLocalContractDeployed(contractAlias);
     if (err) this._handleErrorMessage(err, throwIfFail);
@@ -443,7 +448,7 @@ export default class NetworkController {
   }
 
   // TODO: move to utils folder or somewhere else
-  private _handleErrorMessage(msg: string, throwIfFail: boolean = false): void | never {
+  private _handleErrorMessage(msg: string, throwIfFail = false): void | never {
     if (throwIfFail) {
       throw Error(msg);
     } else {

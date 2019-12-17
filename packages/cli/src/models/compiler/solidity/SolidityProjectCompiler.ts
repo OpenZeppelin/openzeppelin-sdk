@@ -37,11 +37,6 @@ export async function compileProject(options: ProjectCompilerOptions = {}): Prom
   };
 }
 
-export interface CompiledContract {
-  filePath: string;
-  contractName: string;
-}
-
 export interface ProjectCompileResult {
   compilerVersion: SolcBuild;
   contracts: RawContract[];

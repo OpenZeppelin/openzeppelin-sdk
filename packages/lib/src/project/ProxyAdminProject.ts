@@ -11,7 +11,7 @@ class BaseProxyAdminProject extends BaseSimpleProject {
   public proxyAdmin: ProxyAdmin;
 
   public static async fetch(
-    name: string = 'main',
+    name = 'main',
     txParams: TxParams = {},
     proxyAdminAddress?: string,
     proxyFactoryAddress?: string,
@@ -21,7 +21,7 @@ class BaseProxyAdminProject extends BaseSimpleProject {
     return new ProxyAdminProject(name, proxyAdmin, proxyFactory, txParams);
   }
 
-  public constructor(name: string = 'main', proxyAdmin: ProxyAdmin, proxyFactory?: ProxyFactory, txParams: any = {}) {
+  public constructor(name = 'main', proxyAdmin: ProxyAdmin, proxyFactory?: ProxyFactory, txParams: any = {}) {
     super(name, proxyFactory, txParams);
     this.proxyAdmin = proxyAdmin;
   }

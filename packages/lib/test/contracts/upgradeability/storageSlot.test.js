@@ -48,9 +48,11 @@ export function shouldUseLegacyStorageSlot(createProxy, accounts, labels, fnName
 
   beforeEach(async function() {
     this.implementation = (await DummyImplementation.new()).address;
-    this.proxyAddress = (await createProxy(this.implementation, proxyAdminAddress, Buffer.from(''), {
-      from: proxyAdminOwner,
-    })).address;
+    this.proxyAddress = (
+      await createProxy(this.implementation, proxyAdminAddress, Buffer.from(''), {
+        from: proxyAdminOwner,
+      })
+    ).address;
     this.proxy = await Proxy.at(this.proxyAddress);
   });
 

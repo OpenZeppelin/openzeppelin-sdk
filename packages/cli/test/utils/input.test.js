@@ -123,7 +123,10 @@ describe('input', function() {
     itParses('1,-2,3e6', 'int256[]', ['1', '-2', '3000000']);
     itParses('[1,2,3]', 'uint256[]', ['1', '2', '3']);
     itParses('[[1,2,3]]', 'uint256[][]', [['1', '2', '3']]);
-    itParses('[[1,2],[3,4]]', 'uint256[][]', [['1', '2'], ['3', '4']]);
+    itParses('[[1,2],[3,4]]', 'uint256[][]', [
+      ['1', '2'],
+      ['3', '4'],
+    ]);
     itParses('foo,bar,baz', 'string[]', ['foo', 'bar', 'baz']);
     itParses('["foo","bar","baz"]', 'string[]', ['foo', 'bar', 'baz']);
     itParses("['foo','bar','baz']", 'string[]', ['foo', 'bar', 'baz']);
@@ -138,7 +141,15 @@ describe('input', function() {
 
     context.skip('pending', function() {
       itParses('[1,2,3]', 'uint256[][]', [['1', '2', '3']], true);
-      itParses('[1,2],[3,4]', 'uint256[][]', [['1', '2'], ['3', '4']], true);
+      itParses(
+        '[1,2],[3,4]',
+        'uint256[][]',
+        [
+          ['1', '2'],
+          ['3', '4'],
+        ],
+        true,
+      );
     });
   });
 
