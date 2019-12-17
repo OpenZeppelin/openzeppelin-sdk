@@ -389,9 +389,8 @@ class BaseAppProject extends BasePackageProject {
         Loggy.spin(
           __filename,
           'getAndLogInitCallData',
-          `${__filename}#getAndLogInitCallData`,
           logReference,
-          // logMessage, // TODO: Fix type error.
+          logMessage,
         );
       return null;
     }
