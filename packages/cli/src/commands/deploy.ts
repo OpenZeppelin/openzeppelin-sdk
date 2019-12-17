@@ -7,15 +7,13 @@ export const signature = `${name} [contract] [arguments...]`;
 
 export function register(program: Command): void {
   _register(program).action((...args) => {
-    preAction();
-    withTelemetry(withPrompts(action, spec))(...args)
+    (preAction as Action)(...args);
+    withTelemetry(action)(...args);
   });
 }
 
 function _register(program: Command): Command {
-  return program
-  .command(signature)
-  .description('deploy a contract instance');
+  return program.command(signature).description('deploy a contract instance');
 }
 
 interface Options {
@@ -32,9 +30,11 @@ async function preAction(options: Options): Promise<void> {
 
 async function action(contractName: string, deployArgs: string[], options: Options): Promise<void> {
   if (options.upgradeable) {
-    return create(...); // TODO: skip compile
+    // return create(...); // TODO: skip compile
+    throw new Error('unimplemented');
   }
 
+  const { contract: contractAlias, package: packageName } = fromContractFullName(contractFullName);
   const contract = await getContract(contractName);
   const args = contract.parseConstructorArgs(deployArgs);
   const instance = await contract.new(...args);
@@ -45,12 +45,6 @@ async function action(contractName: string, deployArgs: string[], options: Optio
 
 type Action = (...args: unknown[]) => void;
 
-function withCompilation(action: Action): Action {
-}
-
-function withPrompts(action: Action, props: unknown): Action {
-}
-
 function withTelemetry(action: Action): Action {
   return function(...args): void {
     // args always contains the cmd in the last position
@@ -59,7 +53,7 @@ function withTelemetry(action: Action): Action {
     const argsAndOpts = commandArgsAndOpts(cmd, args);
     Telemetry.report(name, argsAndOpts, !!argsAndOpts.interactive);
     return action(...args, cmd);
-  }
+  };
 }
 
 function commandArgsAndOpts(cmd: Command, args: unknown[]): Record<string, unknown> {
@@ -75,36 +69,4 @@ function commandArgsAndOpts(cmd: Command, args: unknown[]): Record<string, unkno
   }
 
   return argsAndOpts;
-}
-
-// query
-// parse 
-// validate
-
-const spec = [
-  {
-    name: 'network',
-    message: 'Pick a network',
-    async choices(): Promise<string[]> {
-      const { default: ConfigManager } = await import('../models/config/ConfigManager');
-      return ConfigManager.getNetworkNamesFromConfig();
-    },
-  },
-  {
-    name: 'contract',
-    message: 'Pick a contract to deploy',
-    async choices(): Promise<string[]> {
-    },
-  },
-  {
-    name: 'contract',
-    message: 'Pick a contract to deploy',
-    async choices(): Promise<string[]> {
-    },
-  },
-];
-
-function* prompts(args) {
-  yield* promptNetwork(args);
-
 }
