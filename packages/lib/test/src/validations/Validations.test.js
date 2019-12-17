@@ -3,6 +3,7 @@ require('../../setup');
 
 import { validate as validateContract } from '../../../src/validations';
 import Contracts from '../../../src/artifacts/Contracts';
+import { setVanillaContractsPackageName } from '../../../src/validations/VanillaContracts';
 
 describe('Validations', function() {
   it('should warn when adding a contract with a constructor', async function() {
@@ -35,6 +36,15 @@ describe('Validations', function() {
 
   it('should warn when adding a contract whose parent has initial values in fields declarations', async function() {
     validate('WithParentWithInitialValuesInFieldsDeclarations').hasInitialValuesInDeclarations.should.be.true;
+  });
+
+  it('should warn on contract that extends vanilla openzeppelin contracts', async function() {
+    setVanillaContractsPackageName('mock-dependency/');
+    validate('WithVanillaBaseContract').importsVanillaContracts.should.deep.eq(['Greeter.sol']);
+  });
+
+  after(function() {
+    setVanillaContractsPackageName('@openzeppelin/contracts/');
   });
 
   describe.skip('uninitialized base contracts', function() {

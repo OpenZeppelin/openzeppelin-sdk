@@ -63,7 +63,7 @@ class MultipleNodesFoundError extends Error {
 export default class ContractAST {
   private artifacts: BuildArtifacts;
   private contract: Contract;
-  private imports: Set<any>;
+  private imports: Set<string>;
   private nodes: NodeMapping;
   private types: TypeInfoMapping;
   private nodesFilter: string[];
@@ -94,6 +94,10 @@ export default class ContractAST {
     return this.contract.schema.ast.nodes.find(
       (node: Node) => node.nodeType === 'ContractDefinition' && node.name === this.contract.schema.contractName,
     );
+  }
+
+  public getImports(): Set<string> {
+    return this.imports;
   }
 
   public getMethods(attributes?: string[]): any {
@@ -140,7 +144,7 @@ export default class ContractAST {
       } catch (err) {
         if (err instanceof NodeNotFoundError) {
           throw new Error(
-            `Cannot find source data for contract ${name} (base contract of ${this.contract.schema.contractName}). This often happens because either:\n- An incremental compilation step went wrong. Clear your build folder and recompile.\n- There is more than one contract named ${name} in your project (including dependencies). Make sure all contracts have a unique name, and that you are not importing dependencies with duplicated contract names (for example, openzeppelin-eth and openzeppelin-solidity).`,
+            `Cannot find source data for contract ${name} (base contract of ${this.contract.schema.contractName}). This often happens because either:\n- An incremental compilation step went wrong. Clear your build folder and recompile.\n- There is more than one contract named ${name} in your project (including dependencies). Make sure all contracts have a unique name, and that you are not importing dependencies with duplicated contract names (for example, @openzeppelin/contracts-ethereum-package and @openzeppelin/contracts).`,
           );
         } else {
           throw err;
@@ -174,7 +178,7 @@ export default class ContractAST {
     ast.nodes
       .filter(node => node.nodeType === 'ImportDirective')
       .map(node => node.absolutePath)
-      .forEach(importPath => {
+      .forEach((importPath: string) => {
         if (this.imports.has(importPath)) return;
         this.imports.add(importPath);
         this.artifacts.getArtifactsFromSourcePath(importPath).forEach(importedArtifact => {

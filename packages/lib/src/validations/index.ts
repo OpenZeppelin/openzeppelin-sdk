@@ -13,6 +13,7 @@ import { getUninitializedBaseContracts } from './Initializers';
 import { getStorageLayout, getStructsOrEnums } from './Storage';
 import { compareStorageLayouts, Operation } from './Layout';
 import { hasInitialValuesInDeclarations } from './InitialValues';
+import { importsVanillaContracts } from './VanillaContracts';
 import Contract from '../artifacts/Contract.js';
 import ContractAST, { StorageInfo } from '../utils/ContractAST';
 
@@ -24,6 +25,7 @@ export interface ValidationInfo {
   uninitializedBaseContracts: any[];
   storageUncheckedVars?: StorageInfo[];
   storageDiff?: Operation[];
+  importsVanillaContracts?: string[];
 }
 
 export function validate(contract: Contract, existingContractInfo: any = {}, buildArtifacts?: any): any {
@@ -36,6 +38,7 @@ export function validate(contract: Contract, existingContractInfo: any = {}, bui
     hasSelfDestruct: hasSelfDestruct(contract),
     hasDelegateCall: hasDelegateCall(contract),
     hasInitialValuesInDeclarations: hasInitialValuesInDeclarations(contract),
+    importsVanillaContracts: importsVanillaContracts(contract, buildArtifacts),
     uninitializedBaseContracts,
     ...storageValidation,
   };
@@ -54,6 +57,10 @@ export function newValidationErrors(validations: any, existingValidations: any =
     ),
     storageUncheckedVars: difference(validations.storageUncheckedVars, existingValidations.storageUncheckedVars),
     storageDiff: validations.storageDiff,
+    importsVanillaContracts: difference(
+      validations.importsVanillaContracts,
+      existingValidations.importsVanillaContracts,
+    ),
   };
 }
 
@@ -64,7 +71,8 @@ export function validationPasses(validations: any): boolean {
     !validations.hasSelfDestruct &&
     !validations.hasDelegateCall &&
     !validations.hasInitialValuesInDeclarations &&
-    isEmpty(validations.uninitializedBaseContracts)
+    isEmpty(validations.uninitializedBaseContracts) &&
+    isEmpty(validations.importsVanillaContracts)
   );
 }
 
