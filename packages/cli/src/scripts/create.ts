@@ -1,6 +1,5 @@
 import stdout from '../utils/stdout';
 import NetworkController from '../models/network/NetworkController';
-import ScriptError from '../models/errors/ScriptError';
 import { CreateParams, ProxyType } from './interfaces';
 import { Contract } from '@openzeppelin/upgrades';
 import { validateSalt } from '../utils/input';
@@ -36,11 +35,9 @@ export default async function createProxy({
       kind,
     );
     stdout(proxy.address);
-    controller.writeNetworkPackageIfNeeded();
 
     return proxy;
-  } catch (error) {
-    const cb = () => controller.writeNetworkPackageIfNeeded();
-    throw new ScriptError(error, cb);
+  } finally {
+    controller.writeNetworkPackageIfNeeded();
   }
 }

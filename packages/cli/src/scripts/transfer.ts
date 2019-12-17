@@ -1,5 +1,4 @@
 import TransactionController from '../models/network/TransactionController';
-import ScriptError from '../models/errors/ScriptError';
 import { TransferParams } from './interfaces';
 
 export default async function transfer({

@@ -1,5 +1,4 @@
 import NetworkController from '../models/network/NetworkController';
-import ScriptError from '../models/errors/ScriptError';
 import { UpdateParams } from './interfaces';
 
 export default async function update({
@@ -25,9 +24,7 @@ export default async function update({
   try {
     await controller.checkLocalContractsDeployed(!force);
     const proxies = await controller.upgradeProxies(packageName, contractAlias, proxyAddress, methodName, methodArgs);
+  } finally {
     controller.writeNetworkPackageIfNeeded();
-  } catch (error) {
-    const cb = () => controller.writeNetworkPackageIfNeeded();
-    throw new ScriptError(error, cb);
   }
 }
