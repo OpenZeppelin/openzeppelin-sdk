@@ -3,9 +3,6 @@
   "version": "2.6.0",
   "license": "MIT",
   "private": true,
-  "bin": {
-    "oz-2.5.3": "node_modules/.bin/oz"
-  },
   "dependencies": {
     "@openzeppelin/cli": "2.5.3"
   },
