@@ -21,7 +21,7 @@ Create a new project by running:
 mkdir my-project
 cd my-project
 npm init --yes
-npm install @openzeppelin/cli @openzeppelin/upgrades @openzeppelin/contracts-ethereum-package truffle chai
+npm install @openzeppelin/cli @openzeppelin/upgrades @openzeppelin/contracts-ethereum-package @openzeppelin/test-environment mocha chai
 ----
 
 Now, run:
@@ -67,41 +67,41 @@ Now, let's create the test file `test/Sample.test.js`:
 
 [source,javascript]
 ----
+const { provider } = require('@openzeppelin/test-environment');
 const { TestHelper } = require('@openzeppelin/cli');
 const { Contracts, ZWeb3 } = require('@openzeppelin/upgrades');
 
-ZWeb3.initialize(web3.currentProvider);
+ZWeb3.initialize(provider);
 
 const Sample = Contracts.getFromLocal('Sample');
 const ERC20 = Contracts.getFromNodeModules('@openzeppelin/contracts-ethereum-package', 'ERC20');
 
 require('chai').should();
 
-contract('Sample', function () {
-
+describe('Sample', function () {
   beforeEach(async function () {
     this.project = await TestHelper();
-  })
+  });
 
   it('should create a proxy', async function () {
     const proxy = await this.project.createProxy(Sample);
     const result = await proxy.methods.greet().call();
     result.should.eq('A sample');
-  })
+  });
 
   it('should create a proxy for the Ethereum Package', async function () {
     const proxy = await this.project.createProxy(ERC20, { contractName: 'StandaloneERC20', packageName: '@openzeppelin/contracts-ethereum-package' });
     const result = await proxy.methods.totalSupply().call();
     result.should.eq('0');
-  })
-})
+  });
+});
 ----
 
 Next, modify your `package.json` file to include the following script:
 
 [source,json]
 ----
-"test": "truffle test"
+"test": "mocha --recursive test --exit"
 ----
 
 And run the test in your console with:
@@ -116,7 +116,14 @@ That's it! Now, let's look at what we just did in more detail.
 [[understanding-the-test-script]]
 == Understanding the test script
 
-We first require `TestHelper` from `@openzeppelin/cli`. This helper facilitates the creation of a project object that will set up the entire OpenZeppelin SDK project within a test environment.
+We first require the https://github.com/OpenZeppelin/openzeppelin-test-environment[`@openzeppelin/test-environment`], which will setup a local blockchain for our tests to run on, and exports a web3 `provider` connected to it.
+
+[source,js]
+----
+const { provider } = require('@openzeppelin/test-environment');
+----
+
+Then, we require `TestHelper` from `@openzeppelin/cli`. This helper facilitates the creation of a project object that will set up the entire OpenZeppelin SDK project within a test environment.
 
 [source,js]
 ----
@@ -129,7 +136,7 @@ We are also requiring `Contracts` and `ZWeb3` from `@openzeppelin/upgrades`. `Co
 ----
 const { Contracts, ZWeb3 } = require('@openzeppelin/upgrades');
 
-ZWeb3.initialize(web3.currentProvider);
+ZWeb3.initialize(provider);
 
 const Sample = Contracts.getFromLocal('Sample');
 const ERC20 = Contracts.getFromNodeModules('@openzeppelin/contracts-ethereum-package', 'ERC20');
@@ -175,39 +182,37 @@ This is how you should write tests for your OpenZeppelin SDK projects. The proje
 [[calling-initialize-functions-manually-in-your-tests]]
 == Calling initialize functions manually in your tests
 
-Sometimes, there are situations where a contract has functions that have matching names, but different arities. Here's an example of a `TimedCrowdsale` contract that inherits from `Crowdsale` which results in a contract that has two `initialize` functions with different arities:
+Sometimes, there are situations where a contract has functions that have matching names, but different arities. Here's an example of a `Derived` contract that inherits from `Base`, which results in a contract that has two `initialize` functions with different arities:
 
 [source,solidity]
 ----
-contract TimedCrowdsale is Crowdsale {
-
-  initialize(uint256 _openingTime, uint256 _closingTime) public initializer {
-    Crowdsale.initialize(_rate, _wallet, _token);
-  }
+contract Base {
+    function initialize(uint256 foo) public initializer {
+        // initialize self with foo
+    }
 }
 
-contract Crowdsale {
+contract Derived is Base {
+    function initialize(uint256 foo, uint256 bar) public initializer {
+        Base.initialize(foo);
 
-  initialize(uint256 _rate, address _wallet, ERC20 _token) public initializer {
-    // does something
-  }
+        // initialize self with bar
+    }
 }
 ----
 
-This means that calls to contracts with more than one function named `initialize`, as is the case with some contracts from OpenZeppelin (e.g., `TimedCrowdsale`), may revert if you call `initialize` directly from Truffle. `openzeppelin create` handles this correctly as it encodes the parameters. However, for your unit tests you will need to call `initialize` manually.
+On your unit tests, you will need to call the correct `initialize` function manually. This can be achieved by indexing the `methods` property with the full function signature.
 
-As of version 5, Truffle has the ability to overcome the problem depicted above. That is, you can call functions with matching names that have different arities in Javascript by using the methods property of Truffle Contract.
-
-To call TimedCrowdsale's initialize function, use the following syntax:
+This way, you can call `Base` 's initialization as follows:
 
 [source,javascript]
 ----
-timedCrowdsale.methods['initialize(uint256,uint256)'](openingTime, closingTime);
+myContract.methods['initialize(uint256)'].send(foo);
 ----
 
-And to call Crowdsale's initialize function,
+And to call `Derived` 's, use instead its two-argument signature:
 
 [source,javascript]
 ----
-timedCrowdsale.methods['initialize(uint256,address,address)'](rate, wallet, token);
+myContract.methods['initialize(uint256,uint256)'].send(foo, bar);
 ----

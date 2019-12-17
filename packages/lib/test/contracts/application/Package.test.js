@@ -163,7 +163,11 @@ describe('Package', () => {
       registeredContentURI.should.be.equal(contentURI);
     });
 
-    for (const latestVersion of [[2, 1, 5], [2, 2, 3], [3, 0, 3]]) {
+    for (const latestVersion of [
+      [2, 1, 5],
+      [2, 2, 3],
+      [3, 0, 3],
+    ]) {
       it(`returns latest version ${latestVersion}`, async function() {
         await this.package.methods.addVersion(latestVersion, contractAddress, contentURI).send({ from });
         await this.package.methods.addVersion([1, 0, 0], contractAddress, contentURI).send({ from });

@@ -18,7 +18,7 @@ const TruffleConfig = {
     return this.exists(path);
   },
 
-  async loadNetworkConfig(network: string, force: boolean = false, path: string = process.cwd()): Promise<any> {
+  async loadNetworkConfig(network: string, force = false, path: string = process.cwd()): Promise<any> {
     const config = this.getConfig(force);
     const { networks: networkList } = config;
     if (!networkList[network])
@@ -38,7 +38,7 @@ const TruffleConfig = {
     return config.contracts_build_directory;
   },
 
-  getConfig(force: boolean = false): any | never {
+  getConfig(force = false): any | never {
     if (!force && this.config) return this.config;
     try {
       this.config = TruffleConfigModule.detect({ logger: console });

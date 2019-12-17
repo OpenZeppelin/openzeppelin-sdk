@@ -268,9 +268,11 @@ describe('App', function() {
         );
         (await proxy.methods.name().call()).should.eq('ProxyCreator');
         const created = await proxy.methods.created().call();
-        (await ImplV1.at(created)
-          .methods.version()
-          .call()).should.eq('V1');
+        (
+          await ImplV1.at(created)
+            .methods.version()
+            .call()
+        ).should.eq('V1');
       });
     });
   });

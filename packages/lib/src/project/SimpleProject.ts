@@ -8,7 +8,7 @@ import ProxyFactory from '../proxy/ProxyFactory';
 import { TxParams } from '../artifacts/ZWeb3';
 
 export default class SimpleProject extends BaseSimpleProject {
-  public constructor(name: string = 'main', proxyFactory?: ProxyFactory, txParams: TxParams = {}) {
+  public constructor(name = 'main', proxyFactory?: ProxyFactory, txParams: TxParams = {}) {
     super(name, proxyFactory, txParams);
   }
 

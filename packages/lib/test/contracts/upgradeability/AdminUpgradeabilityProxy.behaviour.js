@@ -114,9 +114,9 @@ export default function shouldBehaveLikeAdminUpgradeabilityProxy(createProxy, ac
           const value = 1e5;
 
           beforeEach(async function() {
-            this.events = (await this.proxy.methods
-              .upgradeToAndCall(this.behavior.address, initializeData)
-              .send({ from, value })).events;
+            this.events = (
+              await this.proxy.methods.upgradeToAndCall(this.behavior.address, initializeData).send({ from, value })
+            ).events;
           });
 
           it('upgrades to the requested implementation', async function() {
@@ -185,9 +185,9 @@ export default function shouldBehaveLikeAdminUpgradeabilityProxy(createProxy, ac
             this.behavior_v1 = await MigratableMockV1.new();
             // eslint-disable-next-line @typescript-eslint/camelcase
             this.balancePrevious_v1 = new BN(await ZWeb3.getBalance(this.proxyAddress));
-            this.events = (await this.proxy.methods
-              .upgradeToAndCall(this.behavior_v1.address, v1MigrationData)
-              .send({ from, value })).events;
+            this.events = (
+              await this.proxy.methods.upgradeToAndCall(this.behavior_v1.address, v1MigrationData).send({ from, value })
+            ).events;
           });
 
           it('upgrades to the requested version and emits an event', async function() {
@@ -214,9 +214,11 @@ export default function shouldBehaveLikeAdminUpgradeabilityProxy(createProxy, ac
               this.behavior_v2 = await MigratableMockV2.new();
               // eslint-disable-next-line @typescript-eslint/camelcase
               this.balancePrevious_v2 = new BN(await ZWeb3.getBalance(this.proxyAddress));
-              this.events = (await this.proxy.methods
-                .upgradeToAndCall(this.behavior_v2.address, v2MigrationData)
-                .send({ from, value })).events;
+              this.events = (
+                await this.proxy.methods
+                  .upgradeToAndCall(this.behavior_v2.address, v2MigrationData)
+                  .send({ from, value })
+              ).events;
             });
 
             it('upgrades to the requested version and emits an event', async function() {
@@ -246,9 +248,11 @@ export default function shouldBehaveLikeAdminUpgradeabilityProxy(createProxy, ac
                 this.behavior_v3 = await MigratableMockV3.new();
                 // eslint-disable-next-line @typescript-eslint/camelcase
                 this.balancePrevious_v3 = new BN(await ZWeb3.getBalance(this.proxyAddress));
-                this.events = (await this.proxy.methods
-                  .upgradeToAndCall(this.behavior_v3.address, v3MigrationData)
-                  .send({ from, value })).events;
+                this.events = (
+                  await this.proxy.methods
+                    .upgradeToAndCall(this.behavior_v3.address, v3MigrationData)
+                    .send({ from, value })
+                ).events;
               });
 
               it('upgrades to the requested version and emits an event', async function() {
