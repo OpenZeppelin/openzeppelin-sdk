@@ -157,7 +157,10 @@ describe('input', function() {
 
     context.skip('pending', function() {
       itParses('[1,2,3]', 'uint256[][]', [['1', '2', '3']]);
-      itParses('[1,2],[3,4]', 'uint256[][]', [['1', '2'], ['3', '4']]);
+      itParses('[1,2],[3,4]', 'uint256[][]', [
+        ['1', '2'],
+        ['3', '4'],
+      ]);
     });
   });
 
