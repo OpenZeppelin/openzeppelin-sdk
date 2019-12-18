@@ -46,6 +46,12 @@ const defaultLogInfo = {
   spinnerAction: SpinnerAction.Add,
 };
 
+const logTypes = {
+  info: LogType.Info,
+  warn: LogType.Warn,
+  error: LogType.Err,
+};
+
 interface Logs {
   [reference: string]: {
     file: string;
@@ -196,12 +202,6 @@ type LogTypeFunctions = {
 };
 
 type LogSpinFunction = LogFunction & LogTypeFunctions & { onVerbose: LogFunction };
-
-const logTypes = {
-  info: LogType.Info,
-  warn: LogType.Warn,
-  error: LogType.Err,
-};
 
 function logSpinner(action: SpinnerAction): LogSpinFunction {
   const log: Partial<LogSpinFunction> = (file, fnName, reference, text): void =>
