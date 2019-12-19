@@ -63,7 +63,7 @@ export default class NetworkController {
   public network: string;
   public networkFile: NetworkFile;
   public project: Project;
-  private contractManager: ContractManager;
+  public contractManager: ContractManager;
 
   public constructor(network: string, txParams: TxParams, networkFile?: NetworkFile) {
     if (!networkFile) {
@@ -669,6 +669,24 @@ export default class NetworkController {
       await this._tryRegisterProxyAdmin();
       await this._tryRegisterProxyFactory();
     }
+  }
+
+  public async createInstance(packageName: string, contractAlias: string, initArgs: string[]): Promise<Contract> {
+    await this.migrateManifestVersionIfNeeded();
+    if (!packageName) packageName = this.projectFile.name;
+    const contract = this.contractManager.getContractClass(packageName, contractAlias);
+    await this._setSolidityLibs(contract);
+
+    const instance = await Transactions.deployContract(contract, initArgs, this.txParams);
+
+    // await this._updateTruffleDeployedInformation(contractAlias, instance);
+
+    // this.networkFile.addProxy(packageName, contractAlias, {
+    //   address: instance.address,
+    //   kind: ProxyType.Regular,
+    // });
+
+    return instance;
   }
 
   private async createProxyInstance(

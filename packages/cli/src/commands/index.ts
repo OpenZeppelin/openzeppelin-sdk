@@ -22,7 +22,7 @@ import sendTx from './send-tx';
 import call from './call';
 import compile from './compile';
 import accounts from './accounts';
-import deploy from './deploy';
+import * as deploy from './deploy/command';
 
 export default {
   add,
@@ -49,4 +49,5 @@ export default {
   call,
   compile,
   accounts,
+  deploy,
 };
