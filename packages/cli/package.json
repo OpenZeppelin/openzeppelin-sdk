@@ -14,8 +14,7 @@
     "gen-docs": "./scripts/gen-docs.sh",
     "watch": "tsc -w",
     "lint": "eslint '*/**/*.{js,ts}' --quiet --fix",
-    "lint:check": "eslint '*/**/*.{js,ts}' --quiet",
-    "precommit": "tsc --noEmit && lint-staged"
+    "lint:check": "eslint '*/**/*.{js,ts}' --quiet"
   },
   "lint-staged": {
     "gitDir": "../../",
@@ -150,8 +149,6 @@
     "eslint-config-prettier": "^4.3.0",
     "eslint-plugin-prettier": "^3.1.0",
     "ganache-cli": "^6.3.0",
-    "husky": "^2.7.0",
-    "lint-staged": "4.3.0",
     "lodash.isnil": "^4.0.0",
     "lodash.mapkeys": "^4.6.0",
     "lodash.random": "^3.2.0",

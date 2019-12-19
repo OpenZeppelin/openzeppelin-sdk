@@ -18,14 +18,8 @@
     "lint:check": "lerna run lint:check"
   },
   "devDependencies": {
-    "husky": "^2.7.0",
     "lerna": "^3.13.4",
     "mock-stdlib-root": "file:./packages/cli/test/mocks/mock-stdlib",
     "yarn": "^1.17.3"
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lerna run --concurrency 1 --stream precommit"
-    }
   }
 }
