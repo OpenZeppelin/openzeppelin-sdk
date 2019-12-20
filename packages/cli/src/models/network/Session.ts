@@ -76,7 +76,7 @@ const Session = {
         .toString()
         .indexOf(SESSION_PATH) < 0
     ) {
-      FileSystem.append(GIT_IGNORE, `\n${SESSION_PATH}\n`);
+      fs.appendFileSync(GIT_IGNORE, `\n${SESSION_PATH}\n`);
     }
   },
 
