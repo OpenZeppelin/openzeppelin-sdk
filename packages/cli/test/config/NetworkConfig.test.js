@@ -28,8 +28,8 @@ describe('NetworkConfig', function() {
         NetworkConfig.initialize(tmpDir);
 
         FileSystem.exists(contractsDir).should.be.true;
-        FileSystem.readDir(contractsDir).should.have.lengthOf(1);
-        FileSystem.readDir(contractsDir).should.include('.gitkeep');
+        fs.readdirSync(contractsDir, 'utf8').should.have.lengthOf(1);
+        fs.readdirSync(contractsDir, 'utf8').should.include('.gitkeep');
       });
 
       it('does not create an empty contracts folder if present', function() {
@@ -38,8 +38,8 @@ describe('NetworkConfig', function() {
         NetworkConfig.initialize(tmpDir);
 
         FileSystem.exists(contractsDir).should.be.true;
-        FileSystem.readDir(contractsDir).should.have.lengthOf(1);
-        FileSystem.readDir(contractsDir).should.include('Sample.sol');
+        fs.readdirSync(contractsDir, 'utf8').should.have.lengthOf(1);
+        fs.readdirSync(contractsDir, 'utf8').should.include('Sample.sol');
       });
 
       it('creates a networks.js file if missing', function() {

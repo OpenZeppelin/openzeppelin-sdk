@@ -3,10 +3,6 @@ import path from 'path';
 
 // TS-TODO: Analyze which of these functions could be encapsulated.
 
-export function readDir(dir: string): string[] {
-  return fs.readdirSync(dir, { encoding: 'utf8' });
-}
-
 export function exists(filename: string): boolean {
   return fs.existsSync(filename);
 }

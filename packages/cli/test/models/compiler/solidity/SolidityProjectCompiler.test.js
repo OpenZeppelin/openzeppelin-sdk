@@ -28,11 +28,11 @@ describe('SolidityProjectCompiler', function() {
 
     it('compiles all contracts in the project', function() {
       FileSystem.exists(outputDir).should.be.true;
-      FileSystem.readDir(outputDir).should.have.lengthOf(2);
+      fs.readdirSync(outputDir, 'utf8').should.have.lengthOf(2);
     });
 
     it('generates correct artifacts', function() {
-      FileSystem.readDir(outputDir).forEach(schemaFileName => {
+      fs.readdirSync(outputDir, 'utf8').forEach(schemaFileName => {
         const contractName = schemaFileName.substring(0, schemaFileName.lastIndexOf('.'));
         const contractPath = `${inputDir}/${contractName}.sol`;
         const schemaPath = `${outputDir}/${schemaFileName}`;
