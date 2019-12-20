@@ -3,10 +3,6 @@ import path from 'path';
 
 // TS-TODO: Analyze which of these functions could be encapsulated.
 
-export function isDir(targetPath: string): boolean {
-  return fs.lstatSync(targetPath).isDirectory();
-}
-
 export function ifExistsThrow(filename: string, message: string): void {
   if (exists(filename)) throw Error(message);
 }
