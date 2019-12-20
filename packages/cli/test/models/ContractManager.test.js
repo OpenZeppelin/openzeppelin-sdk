@@ -40,7 +40,7 @@ describe('ContractManager', function() {
             this.projectFile = new ProjectFile(`${this.testDir}/zos.json`);
             this.contractManager = new ContractManager(this.projectFile);
             fs.mkdirSync(this.testDir);
-            FileSystem.createDirPath(`${this.testDir}/build/contracts`);
+            fs.mkdirSync(`${this.testDir}/build/contracts`, { recursive: true });
             sinon.stub(ConfigManager, 'getBuildDir').returns(`${this.testDir}/build/contracts`);
           });
 

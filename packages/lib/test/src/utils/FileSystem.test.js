@@ -39,7 +39,7 @@ describe('FileSystem', () => {
       const simpleDir = `${process.cwd()}/test/tmp`;
       fs.existsSync(simpleDir).should.be.false;
 
-      FileSystem.createDirPath(simpleDir);
+      fs.mkdirSync(simpleDir, { recursive: true });
       fs.existsSync(simpleDir).should.be.true;
       FileSystem.removeTree(`${process.cwd()}/test/tmp/`);
     });
@@ -48,7 +48,7 @@ describe('FileSystem', () => {
       const nestedDir = `${process.cwd()}/test/tmp/nested`;
       fs.existsSync(nestedDir).should.be.false;
 
-      FileSystem.createDirPath(nestedDir);
+      fs.mkdirSync(nestedDir, { recursive: true });
       fs.existsSync(nestedDir).should.be.true;
       FileSystem.removeTree(`${process.cwd()}/test/tmp/`);
     });

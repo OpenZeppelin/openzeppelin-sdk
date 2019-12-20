@@ -3,15 +3,6 @@ import path from 'path';
 
 // TS-TODO: Analyze which of these functions could be encapsulated.
 
-export function createDirPath(dirPath: string): void {
-  const folders = dirPath.split('/');
-  folders.reduce((subDir, folder) => {
-    const subFolderPath = `${subDir}/${folder}`;
-    if (folder && !exists(subFolderPath)) createDir(subFolderPath);
-    return subFolderPath;
-  }, '');
-}
-
 export function isDir(targetPath: string): boolean {
   return fs.lstatSync(targetPath).isDirectory();
 }
