@@ -2,7 +2,7 @@
 
 require('../setup');
 
-import fs from 'fs';
+import fs from 'fs-extra';
 import { expect } from 'chai';
 
 import sinon from 'sinon';
@@ -65,7 +65,7 @@ describe('ContractManager', function() {
                 contractName: 'Foo',
               };
               this.fooContractPath = `${this.testDir}/build/contracts/Foo.json`;
-              FileSystem.writeJson(this.fooContractPath, builtContract);
+              fs.writeJsonSync(this.fooContractPath, builtContract, { spaces: 2 });
               this.projectFile = new ProjectFile(`${this.testDir}/zos.json`);
               this.contractManager = new ContractManager(this.projectFile);
               sinon.stub(ConfigManager, 'getBuildDir').returns(`${this.testDir}/build/contracts`);

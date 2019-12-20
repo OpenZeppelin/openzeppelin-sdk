@@ -1,4 +1,4 @@
-import fs from 'fs';
+import fs from 'fs-extra';
 import path from 'path';
 import pickBy from 'lodash.pickby';
 import isEqual from 'lodash.isequal';
@@ -260,7 +260,7 @@ export default class ProjectFile {
   public write(): void {
     if (this.hasChanged()) {
       const exists = this.exists();
-      FileSystem.writeJson(this.filePath, this.data);
+      fs.writeJsonSync(this.filePath, this.data, { spaces: 2 });
       Loggy.onVerbose(
         __filename,
         'write',

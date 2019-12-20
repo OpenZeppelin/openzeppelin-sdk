@@ -808,7 +808,7 @@ export default class NetworkController {
         // eslint-disable-next-line @typescript-eslint/camelcase
         updated_at: Date.now(),
       };
-      FileSystem.writeJson(path, data);
+      fs.writeJsonSync(path, data, { spaces: 2 });
     }
   }
 

@@ -13,11 +13,6 @@ export function editJson(file: string, edit: ({}) => void): void {
   this.writeJson(file, data);
 }
 
-export function writeJson(filename: string, data: {}): void {
-  const json: string = JSON.stringify(data, null, 2);
-  write(filename, json);
-}
-
 export function removeDir(dir: string): void {
   fs.rmdirSync(dir);
 }

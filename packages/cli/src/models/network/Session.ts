@@ -1,4 +1,4 @@
-import fs from 'fs';
+import fs from 'fs-extra';
 import omitBy from 'lodash.omitby';
 import isEmpty from 'lodash.isempty';
 import pick from 'lodash.pick';
@@ -47,12 +47,12 @@ const Session = {
 
   open({ network, from, timeout }: SessionOptions, expires: number = DEFAULT_EXPIRATION_TIMEOUT, logInfo = true): void {
     const expirationTimestamp = new Date(new Date().getTime() + expires * 1000);
-    FileSystem.writeJson(SESSION_PATH, {
+    fs.writeJsonSync(SESSION_PATH, {
       network,
       from,
       timeout,
       expires: expirationTimestamp,
-    });
+    }, { spaces: 2 });
     if (logInfo) {
       Loggy.noSpin(
         __filename,

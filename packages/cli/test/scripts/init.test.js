@@ -1,7 +1,7 @@
 'use strict';
 require('../setup');
 
-import fs from 'fs';
+import fs from 'fs-extra';
 import sinon from 'sinon';
 import { FileSystem } from '@openzeppelin/upgrades';
 import { cleanup } from '../helpers/cleanup';
@@ -72,7 +72,7 @@ describe('init script', function() {
     });
 
     it('should not overwrite existing file by default', async function() {
-      FileSystem.writeJson(this.projectFile.filePath, { name: 'previousApp' });
+      fs.writeJsonSync(this.projectFile.filePath, { name: 'previousApp' }, { spaces: 2 });
       await init({
         publish,
         name,
@@ -84,10 +84,10 @@ describe('init script', function() {
     });
 
     it('should overwrite existing file if requested', async function() {
-      FileSystem.writeJson(this.projectFile.filePath, {
+      fs.writeJsonSync(this.projectFile.filePath, {
         name: 'previousApp',
         version: '0',
-      });
+      }, { spaces: 2 });
       await init({
         publish,
         name,
