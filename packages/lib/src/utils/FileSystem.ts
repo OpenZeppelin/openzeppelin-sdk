@@ -13,25 +13,6 @@ export function editJson(file: string, edit: ({}) => void): void {
   this.writeJson(file, data);
 }
 
-export function removeDir(dir: string): void {
-  fs.rmdirSync(dir);
-}
-
-/**
- * Remove directory recursively
- * @param {string} dirPath
- * @see https://stackoverflow.com/a/42505874/3027390
- */
-export function removeTree(dirPath: string): void {
-  if (exists(dirPath)) {
-    readDir(dirPath).forEach(entry => {
-      const entryPath: string = path.join(dirPath, entry);
-      isDir(entryPath) ? removeTree(entryPath) : remove(entryPath);
-    });
-    removeDir(dirPath);
-  }
-}
-
 export default {
   read,
   readDir,

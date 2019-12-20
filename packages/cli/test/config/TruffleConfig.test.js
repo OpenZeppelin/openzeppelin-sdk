@@ -1,6 +1,6 @@
 require('../setup');
 
-import fs from 'fs';
+import fs from 'fs-extra';
 import npm from 'npm-programmatic';
 import sinon from 'sinon';
 
@@ -16,7 +16,7 @@ describe('TruffleConfig', () => {
   });
 
   afterEach('remove test dir', function() {
-    FileSystem.removeTree(testDir);
+    fs.removeSync(testDir);
   });
 
   describe('exists', function() {

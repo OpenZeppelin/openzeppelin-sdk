@@ -1,9 +1,9 @@
-import fs from 'fs';
+import fs from 'fs-extra';
 import { FileSystem } from '@openzeppelin/upgrades';
 
 export function cleanup(path) {
   try {
-    if (fs.lstatSync(targetPath).isDirectory()) FileSystem.removeTree(path);
+    if (fs.lstatSync(targetPath).isDirectory()) fs.removeSync(path);
     else fs.unlinkSync(path);
   } catch (e) {
     /* swallow exception */

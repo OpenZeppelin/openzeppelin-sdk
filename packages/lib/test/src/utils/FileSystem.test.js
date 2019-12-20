@@ -1,7 +1,7 @@
 'use strict';
 require('../../setup');
 
-import fs from 'fs';
+import fs from 'fs-extra';
 import tmp from 'tmp';
 import FileSystem from '../../../src/utils/FileSystem';
 
@@ -20,7 +20,7 @@ describe('FileSystem', () => {
     it('can remove an empty directory', async function() {
       const testDir = tmp.dirSync();
       fs.existsSync(testDir.name).should.be.true;
-      FileSystem.removeTree(testDir.name);
+      fs.removeSync(testDir.name);
       fs.existsSync(testDir.name).should.be.false;
     });
 
@@ -29,7 +29,7 @@ describe('FileSystem', () => {
       const testFilePath = `${testDir.name}/testfile`;
       fs.writeFileSync(testFilePath, 'dummy');
       fs.existsSync(testFilePath).should.be.true;
-      FileSystem.removeTree(testDir.name);
+      fs.removeSync(testDir.name);
       fs.existsSync(testDir.name).should.be.false;
     });
   });
@@ -41,7 +41,7 @@ describe('FileSystem', () => {
 
       fs.mkdirSync(simpleDir, { recursive: true });
       fs.existsSync(simpleDir).should.be.true;
-      FileSystem.removeTree(`${process.cwd()}/test/tmp/`);
+      fs.removeSync(`${process.cwd()}/test/tmp/`);
     });
 
     it('can create a nested dir', async function() {
@@ -50,7 +50,7 @@ describe('FileSystem', () => {
 
       fs.mkdirSync(nestedDir, { recursive: true });
       fs.existsSync(nestedDir).should.be.true;
-      FileSystem.removeTree(`${process.cwd()}/test/tmp/`);
+      fs.removeSync(`${process.cwd()}/test/tmp/`);
     });
   });
 
@@ -67,7 +67,7 @@ describe('FileSystem', () => {
       const destination = fs.readFileSync(destinationFilePath, 'utf8').toString();
       source.should.equal(destination);
 
-      FileSystem.removeTree(testDir.name);
+      fs.removeSync(testDir.name);
     });
 
     it('can copy a file when the destination already exists', function() {
@@ -83,7 +83,7 @@ describe('FileSystem', () => {
       const destination = fs.readFileSync(destinationFilePath, 'utf8').toString();
       source.should.equal(destination);
 
-      FileSystem.removeTree(testDir.name);
+      fs.removeSync(testDir.name);
     });
   });
 });

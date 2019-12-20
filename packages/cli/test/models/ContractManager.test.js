@@ -24,7 +24,7 @@ describe('ContractManager', function() {
         });
 
         afterEach('remove test dir', function() {
-          FileSystem.removeTree(this.testDir);
+          fs.removeSync(this.testDir);
           sinon.restore();
         });
 
@@ -45,7 +45,7 @@ describe('ContractManager', function() {
           });
 
           afterEach('remove test dir', function() {
-            FileSystem.removeTree(this.testDir);
+            fs.removeSync(this.testDir);
             sinon.restore();
           });
 

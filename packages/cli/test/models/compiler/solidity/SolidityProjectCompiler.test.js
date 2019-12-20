@@ -13,7 +13,7 @@ describe('SolidityProjectCompiler', function() {
   const baseTestBuildDir = `${rootDir}/test/tmp`;
 
   after('cleanup test build dir', function() {
-    FileSystem.removeTree(baseTestBuildDir);
+    fs.removeSync(baseTestBuildDir);
   });
 
   describe('in mock-stdlib project', function() {
