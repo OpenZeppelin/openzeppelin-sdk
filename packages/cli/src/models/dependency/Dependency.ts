@@ -150,7 +150,7 @@ export default class Dependency {
     if (!this._networkFiles[network]) {
       const filePath = this.getExistingNetworkFilePath(network);
 
-      if (!FileSystem.exists(filePath)) {
+      if (!fs.existsSync(filePath)) {
         throw Error(`Could not find a project file for network '${network}' for '${this.name}'`);
       }
 
@@ -162,7 +162,7 @@ export default class Dependency {
 
   public isDeployedOnNetwork(network: string): boolean {
     const filePath = this.getExistingNetworkFilePath(network);
-    if (!FileSystem.exists(filePath)) return false;
+    if (!fs.existsSync(filePath)) return false;
     return !!this.getNetworkFile(network).packageAddress;
   }
 

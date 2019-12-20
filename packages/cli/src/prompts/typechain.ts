@@ -8,7 +8,7 @@ export const TypechainQuestions: InquirerQuestions = {
     message: 'Enable typechain support?',
     type: 'confirm',
     default: true,
-    when: () => FileSystem.exists('tsconfig.json'),
+    when: () => fs.existsSync('tsconfig.json'),
   },
   typechainTarget: {
     message: 'Typechain compilation target',

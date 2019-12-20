@@ -3,10 +3,6 @@ import path from 'path';
 
 // TS-TODO: Analyze which of these functions could be encapsulated.
 
-export function exists(filename: string): boolean {
-  return fs.existsSync(filename);
-}
-
 export function createDir(dir: string): void {
   fs.mkdirSync(dir);
 }

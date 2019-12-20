@@ -35,7 +35,7 @@ export default class ContractManager {
   public getContractNames(root: string = process.cwd()): string[] {
     const buildDir = ConfigManager.getBuildDir();
     const contractsDir = Contracts.getLocalContractsDir();
-    if (FileSystem.exists(buildDir)) {
+    if (fs.existsSync(buildDir)) {
       return fs.readdirSync(buildDir, 'utf8')
         .filter(name => name.match(/\.json$/))
         .map(name => FileSystem.parseJsonIfExists(`${buildDir}/${name}`))

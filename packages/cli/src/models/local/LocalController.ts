@@ -100,7 +100,7 @@ export default class LocalController {
 
   public checkCanAdd(contractName: string): void | never {
     const path = Contracts.getLocalPath(contractName);
-    if (!FileSystem.exists(path)) {
+    if (!fs.existsSync(path)) {
       throw Error(`Contract ${contractName} not found in path ${path}`);
     }
     if (!this.hasBytecode(path)) {
@@ -125,7 +125,7 @@ export default class LocalController {
 
   // Contract model
   public hasBytecode(contractDataPath: string): boolean {
-    if (!FileSystem.exists(contractDataPath)) return false;
+    if (!fs.existsSync(contractDataPath)) return false;
     const bytecode = FileSystem.parseJson(contractDataPath).bytecode;
     return bytecode && bytecode !== '0x';
   }

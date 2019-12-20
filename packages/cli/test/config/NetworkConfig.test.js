@@ -27,7 +27,7 @@ describe('NetworkConfig', function() {
       it('creates an empty contracts folder if missing', function() {
         NetworkConfig.initialize(tmpDir);
 
-        FileSystem.exists(contractsDir).should.be.true;
+        fs.existsSync(contractsDir).should.be.true;
         fs.readdirSync(contractsDir, 'utf8').should.have.lengthOf(1);
         fs.readdirSync(contractsDir, 'utf8').should.include('.gitkeep');
       });
@@ -37,7 +37,7 @@ describe('NetworkConfig', function() {
         FileSystem.write(`${contractsDir}/Sample.sol`);
         NetworkConfig.initialize(tmpDir);
 
-        FileSystem.exists(contractsDir).should.be.true;
+        fs.existsSync(contractsDir).should.be.true;
         fs.readdirSync(contractsDir, 'utf8').should.have.lengthOf(1);
         fs.readdirSync(contractsDir, 'utf8').should.include('Sample.sol');
       });
@@ -45,7 +45,7 @@ describe('NetworkConfig', function() {
       it('creates a networks.js file if missing', function() {
         NetworkConfig.initialize(tmpDir);
 
-        FileSystem.exists(networkConfigPath).should.be.true;
+        fs.existsSync(networkConfigPath).should.be.true;
       });
 
       it('does not create a networks.js file if present', function() {

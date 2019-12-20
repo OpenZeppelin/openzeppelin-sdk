@@ -9,47 +9,47 @@ describe('FileSystem', () => {
   describe('remove file', function() {
     it('can remove a file', async function() {
       FileSystem.write('tmp', 'dummy');
-      FileSystem.exists('tmp').should.be.true;
+      fs.existsSync('tmp').should.be.true;
 
       FileSystem.remove('tmp');
-      FileSystem.exists('tmp').should.be.false;
+      fs.existsSync('tmp').should.be.false;
     });
   });
 
   describe('remove tree', function() {
     it('can remove an empty directory', async function() {
       const testDir = tmp.dirSync();
-      FileSystem.exists(testDir.name).should.be.true;
+      fs.existsSync(testDir.name).should.be.true;
       FileSystem.removeTree(testDir.name);
-      FileSystem.exists(testDir.name).should.be.false;
+      fs.existsSync(testDir.name).should.be.false;
     });
 
     it('can remove a non-empty directory', async function() {
       const testDir = tmp.dirSync();
       const testFilePath = `${testDir.name}/testfile`;
       FileSystem.write(testFilePath, 'dummy');
-      FileSystem.exists(testFilePath).should.be.true;
+      fs.existsSync(testFilePath).should.be.true;
       FileSystem.removeTree(testDir.name);
-      FileSystem.exists(testDir.name).should.be.false;
+      fs.existsSync(testDir.name).should.be.false;
     });
   });
 
   describe('create dir path', function() {
     it('can create a simple dir', async function() {
       const simpleDir = `${process.cwd()}/test/tmp`;
-      FileSystem.exists(simpleDir).should.be.false;
+      fs.existsSync(simpleDir).should.be.false;
 
       FileSystem.createDirPath(simpleDir);
-      FileSystem.exists(simpleDir).should.be.true;
+      fs.existsSync(simpleDir).should.be.true;
       FileSystem.removeTree(`${process.cwd()}/test/tmp/`);
     });
 
     it('can create a nested dir', async function() {
       const nestedDir = `${process.cwd()}/test/tmp/nested`;
-      FileSystem.exists(nestedDir).should.be.false;
+      fs.existsSync(nestedDir).should.be.false;
 
       FileSystem.createDirPath(nestedDir);
-      FileSystem.exists(nestedDir).should.be.true;
+      fs.existsSync(nestedDir).should.be.true;
       FileSystem.removeTree(`${process.cwd()}/test/tmp/`);
     });
   });

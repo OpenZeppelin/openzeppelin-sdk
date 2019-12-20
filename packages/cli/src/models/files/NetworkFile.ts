@@ -499,7 +499,7 @@ export default class NetworkFile {
     // TODO-v3: remove legacy project file support
     // Prefer the new format over the old one
     return [...paths, `${dir}/zos.${network}.json`, `${dir}/${OPEN_ZEPPELIN_FOLDER}/${network}.json`].find(
-      FileSystem.exists,
+      fs.existsSync,
     );
   }
 
@@ -509,6 +509,6 @@ export default class NetworkFile {
   }
 
   private exists(): boolean {
-    return FileSystem.exists(this.filePath);
+    return fs.existsSync(this.filePath);
   }
 }

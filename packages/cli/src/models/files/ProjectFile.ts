@@ -80,7 +80,7 @@ export default class ProjectFile {
   }
 
   public exists(): boolean {
-    return FileSystem.exists(this.filePath);
+    return fs.existsSync(this.filePath);
   }
 
   public get root(): string {
@@ -273,7 +273,7 @@ export default class ProjectFile {
   public static getExistingFilePath(dir: string = process.cwd(), ...paths: string[]): string {
     // TODO-v3: remove legacy project file support
     // Prefer the new format over the old one
-    return [...paths, `${dir}/${PROJECT_FILE_PATH}`, `${dir}/${LEGACY_PROJECT_FILE_NAME}`].find(FileSystem.exists);
+    return [...paths, `${dir}/${PROJECT_FILE_PATH}`, `${dir}/${LEGACY_PROJECT_FILE_NAME}`].find(fs.existsSync);
   }
 
   private hasChanged(): boolean {

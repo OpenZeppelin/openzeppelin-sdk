@@ -57,7 +57,7 @@ const NetworkConfig = {
   },
 
   exists(root: string = process.cwd()): boolean {
-    return FileSystem.exists(`${root}/networks.js`);
+    return fs.existsSync(`${root}/networks.js`);
   },
 
   getConfig(root: string = process.cwd()): ConfigInterface {
@@ -144,7 +144,7 @@ const NetworkConfig = {
   },
 
   createDir(dir: string): void {
-    if (!FileSystem.exists(dir)) {
+    if (!fs.existsSync(dir)) {
       FileSystem.createDir(dir);
       FileSystem.write(`${dir}/.gitkeep`, '');
     }

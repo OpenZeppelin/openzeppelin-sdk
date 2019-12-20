@@ -12,7 +12,7 @@ const TruffleConfig = {
   exists(path: string = process.cwd()): boolean {
     const truffleFile = `${path}/truffle.js`;
     const truffleConfigFile = `${path}/truffle-config.js`;
-    return FileSystem.exists(truffleFile) || FileSystem.exists(truffleConfigFile);
+    return fs.existsSync(truffleFile) || fs.existsSync(truffleConfigFile);
   },
 
   isTruffleProject(path: string = process.cwd()): boolean {
@@ -83,7 +83,7 @@ const TruffleConfig = {
 
   getTruffleConfigFileName(path: string): string {
     const truffleFile = `${path}/truffle.js`;
-    return FileSystem.exists(truffleFile) ? 'truffle.js' : 'truffle-config.js';
+    return fs.existsSync(truffleFile) ? 'truffle.js' : 'truffle-config.js';
   },
 };
 

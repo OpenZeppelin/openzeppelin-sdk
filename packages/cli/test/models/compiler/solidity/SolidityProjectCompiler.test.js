@@ -27,7 +27,7 @@ describe('SolidityProjectCompiler', function() {
     });
 
     it('compiles all contracts in the project', function() {
-      FileSystem.exists(outputDir).should.be.true;
+      fs.existsSync(outputDir).should.be.true;
       fs.readdirSync(outputDir, 'utf8').should.have.lengthOf(2);
     });
 
@@ -164,12 +164,12 @@ describe('SolidityProjectCompiler', function() {
     });
 
     it('compiles project contracts', async function() {
-      FileSystem.exists(greeterArtifactPath).should.be.true;
+      fs.existsSync(greeterArtifactPath).should.be.true;
       FileSystem.parseJson(greeterArtifactPath).bytecode.should.not.be.null;
     });
 
     it('compiles dependency contracts', async function() {
-      FileSystem.exists(dependencyArtifactPath).should.be.true;
+      fs.existsSync(dependencyArtifactPath).should.be.true;
       FileSystem.parseJson(dependencyArtifactPath).bytecode.should.not.be.null;
     });
   });
@@ -186,7 +186,7 @@ describe('SolidityProjectCompiler', function() {
     });
 
     it('compiles project contracts', async function() {
-      FileSystem.exists(greeterArtifactPath).should.be.true;
+      fs.existsSync(greeterArtifactPath).should.be.true;
       const schema = FileSystem.parseJson(greeterArtifactPath);
       schema.bytecode.should.not.be.null;
       schema.sourcePath.should.be.eq(`test/mocks/mock-stdlib with spaces/contracts/GreeterImpl.sol`);

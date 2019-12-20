@@ -64,14 +64,14 @@ const Session = {
   },
 
   close(): void {
-    if (FileSystem.exists(SESSION_PATH)) FileSystem.remove(SESSION_PATH);
+    if (fs.existsSync(SESSION_PATH)) FileSystem.remove(SESSION_PATH);
     Loggy.noSpin(__filename, 'getOptions', `close-session`, 'Closed openzeppelin session');
   },
 
   ignoreFile(): void {
     const GIT_IGNORE = '.gitignore';
     if (
-      FileSystem.exists(GIT_IGNORE) &&
+      fs.existsSync(GIT_IGNORE) &&
       fs.readFileSync(GIT_IGNORE, 'utf8')
         .toString()
         .indexOf(SESSION_PATH) < 0
