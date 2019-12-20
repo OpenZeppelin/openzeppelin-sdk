@@ -146,7 +146,7 @@ const NetworkConfig = {
   createDir(dir: string): void {
     if (!fs.existsSync(dir)) {
       fs.mkdirSync(dir);
-      FileSystem.write(`${dir}/.gitkeep`, '');
+      fs.writeFileSync(`${dir}/.gitkeep`, '');
     }
   },
 };

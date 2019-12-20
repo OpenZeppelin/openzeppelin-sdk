@@ -31,10 +31,6 @@ export function writeJson(filename: string, data: {}): void {
   write(filename, json);
 }
 
-export function write(filename: string, data: string): void {
-  fs.writeFileSync(filename, data);
-}
-
 export function append(filename: string, data: string): void {
   fs.appendFileSync(filename, data);
 }

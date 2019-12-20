@@ -8,7 +8,7 @@ import FileSystem from '../../../src/utils/FileSystem';
 describe('FileSystem', () => {
   describe('remove file', function() {
     it('can remove a file', async function() {
-      FileSystem.write('tmp', 'dummy');
+      fs.writeFileSync('tmp', 'dummy');
       fs.existsSync('tmp').should.be.true;
 
       FileSystem.remove('tmp');
@@ -27,7 +27,7 @@ describe('FileSystem', () => {
     it('can remove a non-empty directory', async function() {
       const testDir = tmp.dirSync();
       const testFilePath = `${testDir.name}/testfile`;
-      FileSystem.write(testFilePath, 'dummy');
+      fs.writeFileSync(testFilePath, 'dummy');
       fs.existsSync(testFilePath).should.be.true;
       FileSystem.removeTree(testDir.name);
       fs.existsSync(testDir.name).should.be.false;
@@ -59,7 +59,7 @@ describe('FileSystem', () => {
       const testDir = tmp.dirSync();
       const sourceFilePath = `${testDir.name}/test`;
       const destinationFilePath = `${testDir.name}/testCopy`;
-      FileSystem.write(sourceFilePath, 'Hello, World!');
+      fs.writeFileSync(sourceFilePath, 'Hello, World!');
 
       FileSystem.copy(sourceFilePath, destinationFilePath);
 
@@ -74,8 +74,8 @@ describe('FileSystem', () => {
       const testDir = tmp.dirSync();
       const sourceFilePath = `${testDir.name}/test`;
       const destinationFilePath = `${testDir.name}/testCopy`;
-      FileSystem.write(sourceFilePath, 'Hello, World!');
-      FileSystem.write(destinationFilePath, 'Foobar');
+      fs.writeFileSync(sourceFilePath, 'Hello, World!');
+      fs.writeFileSync(destinationFilePath, 'Foobar');
 
       FileSystem.copy(sourceFilePath, destinationFilePath);
 

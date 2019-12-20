@@ -34,7 +34,7 @@ describe('NetworkConfig', function() {
 
       it('does not create an empty contracts folder if present', function() {
         fs.mkdirSync(contractsDir);
-        FileSystem.write(`${contractsDir}/Sample.sol`);
+        fs.writeFileSync(`${contractsDir}/Sample.sol`, '');
         NetworkConfig.initialize(tmpDir);
 
         fs.existsSync(contractsDir).should.be.true;
@@ -49,7 +49,7 @@ describe('NetworkConfig', function() {
       });
 
       it('does not create a networks.js file if present', function() {
-        FileSystem.write(networkConfigFile, '');
+        fs.writeFileSync(networkConfigFile, '');
         NetworkConfig.initialize(tmpDir);
 
         fs.readFileSync(networkConfigPath, 'utf8').should.have.lengthOf(0);
