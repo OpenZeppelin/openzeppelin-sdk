@@ -64,7 +64,7 @@ const Session = {
   },
 
   close(): void {
-    if (fs.existsSync(SESSION_PATH)) FileSystem.remove(SESSION_PATH);
+    if (fs.existsSync(SESSION_PATH)) fs.unlinkSync(SESSION_PATH);
     Loggy.noSpin(__filename, 'getOptions', `close-session`, 'Closed openzeppelin session');
   },
 

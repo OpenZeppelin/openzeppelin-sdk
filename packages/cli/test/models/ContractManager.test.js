@@ -73,7 +73,7 @@ describe('ContractManager', function() {
             });
 
             afterEach(function() {
-              FileSystem.remove(this.fooContractPath);
+              fs.unlinkSync(this.fooContractPath);
               sinon.restore();
             });
 

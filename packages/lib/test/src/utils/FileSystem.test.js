@@ -11,7 +11,7 @@ describe('FileSystem', () => {
       fs.writeFileSync('tmp', 'dummy');
       fs.existsSync('tmp').should.be.true;
 
-      FileSystem.remove('tmp');
+      fs.unlinkSync('tmp');
       fs.existsSync('tmp').should.be.false;
     });
   });

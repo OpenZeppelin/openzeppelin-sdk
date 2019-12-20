@@ -74,7 +74,7 @@ describe('TruffleConfig', () => {
 
     afterEach('restore truffle-config file', function() {
       fs.copyFileSync(configFileBackup, configFile);
-      FileSystem.remove(configFileBackup);
+      fs.unlinkSync(configFileBackup);
     });
 
     context('when the requested network has default values', function() {

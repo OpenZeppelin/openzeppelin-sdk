@@ -31,10 +31,6 @@ export function writeJson(filename: string, data: {}): void {
   write(filename, json);
 }
 
-export function remove(filename: string): void {
-  fs.unlinkSync(filename);
-}
-
 export function removeDir(dir: string): void {
   fs.rmdirSync(dir);
 }
