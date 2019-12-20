@@ -61,7 +61,7 @@ describe('FileSystem', () => {
       const destinationFilePath = `${testDir.name}/testCopy`;
       fs.writeFileSync(sourceFilePath, 'Hello, World!');
 
-      FileSystem.copy(sourceFilePath, destinationFilePath);
+      fs.copyFileSync(sourceFilePath, destinationFilePath);
 
       const source = fs.readFileSync(sourceFilePath, 'utf8').toString();
       const destination = fs.readFileSync(destinationFilePath, 'utf8').toString();
@@ -77,7 +77,7 @@ describe('FileSystem', () => {
       fs.writeFileSync(sourceFilePath, 'Hello, World!');
       fs.writeFileSync(destinationFilePath, 'Foobar');
 
-      FileSystem.copy(sourceFilePath, destinationFilePath);
+      fs.copyFileSync(sourceFilePath, destinationFilePath);
 
       const source = fs.readFileSync(sourceFilePath, 'utf8').toString();
       const destination = fs.readFileSync(destinationFilePath, 'utf8').toString();

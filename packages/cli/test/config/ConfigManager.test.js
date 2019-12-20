@@ -69,12 +69,12 @@ describe('ConfigManager', function() {
     const configFileBackup = `${configFile}.backup`;
 
     before('backup config file', function() {
-      FileSystem.copy(configFile, configFileBackup);
+      fs.copyFileSync(configFile, configFileBackup);
       FileSystem.remove(configFile);
     });
 
     after('restore config file', function() {
-      FileSystem.copy(configFileBackup, configFile);
+      fs.copyFileSync(configFileBackup, configFile);
       FileSystem.remove(configFileBackup);
     });
 
@@ -105,12 +105,12 @@ describe('ConfigManager', function() {
     const configFileBackup = `${configFile}.backup`;
 
     before('backup config file', function() {
-      FileSystem.copy(configFile, configFileBackup);
+      fs.copyFileSync(configFile, configFileBackup);
       FileSystem.remove(configFile);
     });
 
     after('restore config file', function() {
-      FileSystem.copy(configFileBackup, configFile);
+      fs.copyFileSync(configFileBackup, configFile);
       FileSystem.remove(configFileBackup);
     });
 

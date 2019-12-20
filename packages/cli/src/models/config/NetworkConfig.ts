@@ -139,7 +139,7 @@ const NetworkConfig = {
   createNetworkConfigFile(root: string): void {
     if (!this.exists(root)) {
       const blueprint = path.resolve(__dirname, './blueprint.networks.js');
-      FileSystem.copy(blueprint, `${root}/networks.js`);
+      fs.copyFileSync(blueprint, `${root}/networks.js`);
     }
   },
 

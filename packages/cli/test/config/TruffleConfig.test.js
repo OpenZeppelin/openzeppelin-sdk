@@ -69,11 +69,11 @@ describe('TruffleConfig', () => {
     const configFileBackup = `${configFile}.backup`;
 
     beforeEach('backup truffle-config file', function() {
-      FileSystem.copy(configFile, configFileBackup);
+      fs.copyFileSync(configFile, configFileBackup);
     });
 
     afterEach('restore truffle-config file', function() {
-      FileSystem.copy(configFileBackup, configFile);
+      fs.copyFileSync(configFileBackup, configFile);
       FileSystem.remove(configFileBackup);
     });
 

@@ -31,10 +31,6 @@ export function writeJson(filename: string, data: {}): void {
   write(filename, json);
 }
 
-export function copy(source: string, target: string): void {
-  fs.copyFileSync(source, target);
-}
-
 export function remove(filename: string): void {
   fs.unlinkSync(filename);
 }
