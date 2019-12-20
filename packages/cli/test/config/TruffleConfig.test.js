@@ -12,7 +12,7 @@ describe('TruffleConfig', () => {
   const testDir = `${process.cwd()}/test/tmp`;
 
   beforeEach('create test dir', function() {
-    FileSystem.createDir(testDir);
+    fs.mkdirSync(testDir);
   });
 
   afterEach('remove test dir', function() {

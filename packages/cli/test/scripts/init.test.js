@@ -16,7 +16,7 @@ describe('init script', function() {
   const tmpDir = 'test/tmp';
 
   before('create tmp dir and stub ZosConfig#initialize', function() {
-    FileSystem.createDir(tmpDir);
+    fs.mkdirSync(tmpDir);
     sinon.stub(ConfigManager, 'initialize').returns();
   });
 

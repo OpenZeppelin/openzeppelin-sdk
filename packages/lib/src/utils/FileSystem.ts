@@ -3,10 +3,6 @@ import path from 'path';
 
 // TS-TODO: Analyze which of these functions could be encapsulated.
 
-export function createDir(dir: string): void {
-  fs.mkdirSync(dir);
-}
-
 export function createDirPath(dirPath: string): void {
   const folders = dirPath.split('/');
   folders.reduce((subDir, folder) => {
