@@ -2,6 +2,7 @@
 
 require('../setup');
 
+import fs from 'fs';
 import { expect } from 'chai';
 
 import sinon from 'sinon';

@@ -1,3 +1,4 @@
+import fs from 'fs';
 import { Contracts, Contract, FileSystem } from '@openzeppelin/upgrades';
 import Dependency from '../dependency/Dependency';
 import ProjectFile from '../files/ProjectFile';

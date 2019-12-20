@@ -1,3 +1,4 @@
+import fs from 'fs';
 import path from 'path';
 import pickBy from 'lodash.pickby';
 import isEqual from 'lodash.isequal';

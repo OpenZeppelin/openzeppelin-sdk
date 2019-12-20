@@ -1,3 +1,4 @@
+import fs from 'fs';
 import { FileSystem } from '@openzeppelin/upgrades';
 
 export function cleanup(path) {

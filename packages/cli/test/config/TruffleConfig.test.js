@@ -1,5 +1,6 @@
 require('../setup');
 
+import fs from 'fs';
 import npm from 'npm-programmatic';
 import sinon from 'sinon';
 

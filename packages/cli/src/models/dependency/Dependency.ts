@@ -1,3 +1,4 @@
+import fs from 'fs';
 import map from 'lodash.map';
 import uniq from 'lodash.uniq';
 import flatten from 'lodash.flatten';

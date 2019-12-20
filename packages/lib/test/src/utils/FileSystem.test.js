@@ -1,6 +1,7 @@
 'use strict';
 require('../../setup');
 
+import fs from 'fs';
 import tmp from 'tmp';
 import FileSystem from '../../../src/utils/FileSystem';
 

@@ -1,3 +1,4 @@
+import fs from 'fs';
 import path from 'path';
 import findIndex from 'lodash.findindex';
 import isEmpty from 'lodash.isempty';

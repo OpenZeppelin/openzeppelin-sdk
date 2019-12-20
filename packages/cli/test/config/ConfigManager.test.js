@@ -1,6 +1,7 @@
 'use strict';
 require('../setup');
 
+import fs from 'fs';
 import sinon from 'sinon';
 import { FileSystem, Contracts, ZWeb3 } from '@openzeppelin/upgrades';
 

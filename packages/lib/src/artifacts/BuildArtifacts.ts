@@ -1,3 +1,4 @@
+import fs from 'fs';
 import keys from 'lodash.keys';
 import flatten from 'lodash.flatten';
 import values from 'lodash.values';

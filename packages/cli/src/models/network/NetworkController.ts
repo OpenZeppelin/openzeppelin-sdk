@@ -1,3 +1,4 @@
+import fs from 'fs';
 'use strict';
 
 import isEmpty from 'lodash.isempty';

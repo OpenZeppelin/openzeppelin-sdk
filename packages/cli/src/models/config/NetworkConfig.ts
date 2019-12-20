@@ -1,3 +1,4 @@
+import fs from 'fs';
 import path from 'path';
 import pick from 'lodash.pick';
 import omit from 'lodash.omit';

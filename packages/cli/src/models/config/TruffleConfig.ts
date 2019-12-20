@@ -1,3 +1,4 @@
+import fs from 'fs';
 import pickBy from 'lodash.pickby';
 import pick from 'lodash.pick';
 import npm from 'npm-programmatic';

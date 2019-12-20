@@ -1,3 +1,4 @@
+import fs from 'fs';
 import push from './push';
 import init from '../scripts/init';
 import semver from 'semver';

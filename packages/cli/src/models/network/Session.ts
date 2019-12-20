@@ -1,3 +1,4 @@
+import fs from 'fs';
 import omitBy from 'lodash.omitby';
 import isEmpty from 'lodash.isempty';
 import pick from 'lodash.pick';
