@@ -63,8 +63,8 @@ describe('FileSystem', () => {
 
       FileSystem.copy(sourceFilePath, destinationFilePath);
 
-      const source = FileSystem.read(sourceFilePath).toString();
-      const destination = FileSystem.read(destinationFilePath).toString();
+      const source = fs.readFileSync(sourceFilePath, 'utf8').toString();
+      const destination = fs.readFileSync(destinationFilePath, 'utf8').toString();
       source.should.equal(destination);
 
       FileSystem.removeTree(testDir.name);
@@ -79,8 +79,8 @@ describe('FileSystem', () => {
 
       FileSystem.copy(sourceFilePath, destinationFilePath);
 
-      const source = FileSystem.read(sourceFilePath).toString();
-      const destination = FileSystem.read(destinationFilePath).toString();
+      const source = fs.readFileSync(sourceFilePath, 'utf8').toString();
+      const destination = fs.readFileSync(destinationFilePath, 'utf8').toString();
       source.should.equal(destination);
 
       FileSystem.removeTree(testDir.name);

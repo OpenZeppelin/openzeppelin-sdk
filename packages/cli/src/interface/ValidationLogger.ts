@@ -144,7 +144,7 @@ export default class ValidationLogger {
     const originalTypesInfo = this.existingContractInfo.types || {};
 
     storageDiff.forEach(({ updated, original, action }) => {
-      const updatedSourceCode = updated && FileSystem.exists(updated.path) && FileSystem.read(updated.path);
+      const updatedSourceCode = updated && FileSystem.exists(updated.path) && fs.readFileSync(updated.path, 'utf8');
       const updatedVarType = updated && updatedStorageInfo.types[updated.type];
       const updatedVarSource = updated && [updated.path, _srcToLineNumber(updated.path, updated.src)].join(':');
       const updatedVarDescription =

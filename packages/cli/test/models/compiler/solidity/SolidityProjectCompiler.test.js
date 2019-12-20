@@ -40,7 +40,7 @@ describe('SolidityProjectCompiler', function() {
 
         schema.fileName.should.be.eq(`${contractName}.sol`);
         schema.contractName.should.be.eq(contractName);
-        schema.source.should.be.eq(FileSystem.read(contractPath));
+        schema.source.should.be.eq(fs.readFileSync(contractPath, 'utf8'));
         schema.sourcePath.should.be.eq(`test/mocks/mock-stdlib/contracts/${contractName}.sol`);
         schema.sourceMap.should.not.be.null;
         schema.abi.should.not.be.null;

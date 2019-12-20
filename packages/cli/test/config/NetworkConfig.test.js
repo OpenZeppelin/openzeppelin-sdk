@@ -52,7 +52,7 @@ describe('NetworkConfig', function() {
         FileSystem.write(networkConfigFile, '');
         NetworkConfig.initialize(tmpDir);
 
-        FileSystem.read(networkConfigPath).should.have.lengthOf(0);
+        fs.readFileSync(networkConfigPath, 'utf8').should.have.lengthOf(0);
       });
     });
 

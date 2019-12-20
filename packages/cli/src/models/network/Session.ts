@@ -72,7 +72,7 @@ const Session = {
     const GIT_IGNORE = '.gitignore';
     if (
       FileSystem.exists(GIT_IGNORE) &&
-      FileSystem.read(GIT_IGNORE)
+      fs.readFileSync(GIT_IGNORE, 'utf8')
         .toString()
         .indexOf(SESSION_PATH) < 0
     ) {
