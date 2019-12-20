@@ -1,4 +1,4 @@
-import fs from 'fs';
+import fs from 'fs-extra';
 import push from './push';
 import init from '../scripts/init';
 import semver from 'semver';

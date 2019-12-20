@@ -1,6 +1,6 @@
-import fs from 'fs';
 'use strict';
 
+import fs from 'fs-extra';
 import every from 'lodash.every';
 import map from 'lodash.map';
 import {
@@ -126,7 +126,7 @@ export default class LocalController {
   // Contract model
   public hasBytecode(contractDataPath: string): boolean {
     if (!fs.existsSync(contractDataPath)) return false;
-    const bytecode = FileSystem.parseJson(contractDataPath).bytecode;
+    const bytecode = fs.readJsonSync(contractDataPath).bytecode;
     return bytecode && bytecode !== '0x';
   }
 
@@ -135,7 +135,7 @@ export default class LocalController {
     const contractName = this.projectFile.contract(contractAlias);
     if (contractName) {
       const contractDataPath = Contracts.getLocalPath(contractName);
-      const { compiler, sourcePath } = FileSystem.parseJson(contractDataPath);
+      const { compiler, sourcePath } = fs.readJsonSync(contractDataPath);
       return { sourcePath, compilerVersion: compiler.version };
     } else {
       throw Error(`Could not find ${contractAlias} in contracts directory.`);

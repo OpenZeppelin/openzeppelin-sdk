@@ -2,7 +2,7 @@ require('../../../setup');
 
 import { Loggy, FileSystem } from '@openzeppelin/upgrades';
 import { compileProject } from '../../../../src/models/compiler/solidity/SolidityProjectCompiler';
-import fs from 'fs';
+import fs from 'fs-extra';
 import { unlinkSync, existsSync, statSync, utimesSync, writeFileSync } from 'fs';
 import path from 'path';
 import sinon from 'sinon';
@@ -36,7 +36,7 @@ describe('SolidityProjectCompiler', function() {
         const contractName = schemaFileName.substring(0, schemaFileName.lastIndexOf('.'));
         const contractPath = `${inputDir}/${contractName}.sol`;
         const schemaPath = `${outputDir}/${schemaFileName}`;
-        const schema = FileSystem.parseJson(schemaPath);
+        const schema = fs.readJsonSync(schemaPath);
 
         schema.fileName.should.be.eq(`${contractName}.sol`);
         schema.contractName.should.be.eq(contractName);
@@ -55,7 +55,7 @@ describe('SolidityProjectCompiler', function() {
     });
 
     it('replaces library names', function() {
-      const schema = FileSystem.parseJson(greeterArtifactPath);
+      const schema = fs.readJsonSync(greeterArtifactPath);
       schema.bytecode.should.match(/__GreeterLib____________________________/);
       schema.deployedBytecode.should.match(/__GreeterLib____________________________/);
     });
@@ -77,7 +77,7 @@ describe('SolidityProjectCompiler', function() {
       const origMtime = statSync(greeterArtifactPath).mtimeMs;
       await compileProject({ inputDir, outputDir, version: '0.5.0' });
       statSync(greeterArtifactPath).mtimeMs.should.not.eq(origMtime);
-      const schema = FileSystem.parseJson(greeterArtifactPath);
+      const schema = fs.readJsonSync(greeterArtifactPath);
       schema.compiler.version.should.eq('0.5.0+commit.1d4f565a.Emscripten.clang');
     });
 
@@ -91,7 +91,7 @@ describe('SolidityProjectCompiler', function() {
         optimizer,
       });
       statSync(greeterArtifactPath).mtimeMs.should.not.eq(origMtime);
-      const schema = FileSystem.parseJson(greeterArtifactPath);
+      const schema = fs.readJsonSync(greeterArtifactPath);
       schema.compiler.optimizer.should.be.deep.equal(optimizer);
     });
 
@@ -165,12 +165,12 @@ describe('SolidityProjectCompiler', function() {
 
     it('compiles project contracts', async function() {
       fs.existsSync(greeterArtifactPath).should.be.true;
-      FileSystem.parseJson(greeterArtifactPath).bytecode.should.not.be.null;
+      fs.readJsonSync(greeterArtifactPath).bytecode.should.not.be.null;
     });
 
     it('compiles dependency contracts', async function() {
       fs.existsSync(dependencyArtifactPath).should.be.true;
-      FileSystem.parseJson(dependencyArtifactPath).bytecode.should.not.be.null;
+      fs.readJsonSync(dependencyArtifactPath).bytecode.should.not.be.null;
     });
   });
 
@@ -187,7 +187,7 @@ describe('SolidityProjectCompiler', function() {
 
     it('compiles project contracts', async function() {
       fs.existsSync(greeterArtifactPath).should.be.true;
-      const schema = FileSystem.parseJson(greeterArtifactPath);
+      const schema = fs.readJsonSync(greeterArtifactPath);
       schema.bytecode.should.not.be.null;
       schema.sourcePath.should.be.eq(`test/mocks/mock-stdlib with spaces/contracts/GreeterImpl.sol`);
     });

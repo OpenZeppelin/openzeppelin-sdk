@@ -3,11 +3,6 @@ import path from 'path';
 
 // TS-TODO: Analyze which of these functions could be encapsulated.
 
-// TS-TODO: Returned object could be of a more specific type
-export function parseJson(filename: string): any {
-  return JSON.parse(read(filename));
-}
-
 export function parseJsonIfExists(filename: string): any | null {
   return exists(filename) ? JSON.parse(read(filename)) : null;
 }

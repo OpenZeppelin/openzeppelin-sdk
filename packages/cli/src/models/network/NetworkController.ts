@@ -1,6 +1,6 @@
-import fs from 'fs';
 'use strict';
 
+import fs from 'fs-extra';
 import isEmpty from 'lodash.isempty';
 import intersection from 'lodash.intersection';
 import difference from 'lodash.difference';
@@ -796,7 +796,7 @@ export default class NetworkController {
     const contractName = this.projectFile.contract(contractAlias);
     if (contractName) {
       const path = Contracts.getLocalPath(contractName);
-      const data = FileSystem.parseJson(path);
+      const data = fs.readJsonSync(path);
       if (!data.networks) {
         data.networks = {};
       }
