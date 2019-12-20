@@ -7,12 +7,6 @@ export function parseJsonIfExists(filename: string): any | null {
   return exists(filename) ? JSON.parse(read(filename)) : null;
 }
 
-export function editJson(file: string, edit: ({}) => void): void {
-  const data: {} = this.parseJson(file);
-  edit(data);
-  this.writeJson(file, data);
-}
-
 export default {
   read,
   readDir,
