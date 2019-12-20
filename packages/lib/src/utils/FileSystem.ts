@@ -3,14 +3,6 @@ import path from 'path';
 
 // TS-TODO: Analyze which of these functions could be encapsulated.
 
-export function ifExistsThrow(filename: string, message: string): void {
-  if (exists(filename)) throw Error(message);
-}
-
-export function ifNotExistsThrow(filename: string, message: string): void {
-  if (!exists(filename)) throw Error(message);
-}
-
 // TS-TODO: Returned object could be of a more specific type
 export function parseJson(filename: string): any {
   return JSON.parse(read(filename));
