@@ -36,7 +36,8 @@ export default class ContractManager {
     const buildDir = ConfigManager.getBuildDir();
     const contractsDir = Contracts.getLocalContractsDir();
     if (fs.existsSync(buildDir)) {
-      return fs.readdirSync(buildDir, 'utf8')
+      return fs
+        .readdirSync(buildDir, 'utf8')
         .filter(name => name.match(/\.json$/))
         .map(name => fs.readJsonSync(`${buildDir}/${name}`, { throws: false }))
         .filter(contract => {

@@ -47,12 +47,16 @@ const Session = {
 
   open({ network, from, timeout }: SessionOptions, expires: number = DEFAULT_EXPIRATION_TIMEOUT, logInfo = true): void {
     const expirationTimestamp = new Date(new Date().getTime() + expires * 1000);
-    fs.writeJsonSync(SESSION_PATH, {
-      network,
-      from,
-      timeout,
-      expires: expirationTimestamp,
-    }, { spaces: 2 });
+    fs.writeJsonSync(
+      SESSION_PATH,
+      {
+        network,
+        from,
+        timeout,
+        expires: expirationTimestamp,
+      },
+      { spaces: 2 },
+    );
     if (logInfo) {
       Loggy.noSpin(
         __filename,
@@ -72,7 +76,8 @@ const Session = {
     const GIT_IGNORE = '.gitignore';
     if (
       fs.existsSync(GIT_IGNORE) &&
-      fs.readFileSync(GIT_IGNORE, 'utf8')
+      fs
+        .readFileSync(GIT_IGNORE, 'utf8')
         .toString()
         .indexOf(SESSION_PATH) < 0
     ) {

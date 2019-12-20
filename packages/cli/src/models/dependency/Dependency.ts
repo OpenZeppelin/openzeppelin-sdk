@@ -8,14 +8,7 @@ import npm from 'npm-programmatic';
 import { exec } from 'child_process';
 import { promisify } from 'util';
 
-import {
-  TxParams,
-  PackageProject,
-  Contracts,
-  Contract,
-  getSolidityLibNames,
-  Loggy,
-} from '@openzeppelin/upgrades';
+import { TxParams, PackageProject, Contracts, Contract, getSolidityLibNames, Loggy } from '@openzeppelin/upgrades';
 import ProjectFile, { LEGACY_PROJECT_FILE_NAME, PROJECT_FILE_PATH } from '../files/ProjectFile';
 import NetworkFile from '../files/NetworkFile';
 import { OPEN_ZEPPELIN_FOLDER } from '../files/constants';

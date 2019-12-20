@@ -83,10 +83,14 @@ describe('init script', function() {
     });
 
     it('should overwrite existing file if requested', async function() {
-      fs.writeJsonSync(this.projectFile.filePath, {
-        name: 'previousApp',
-        version: '0',
-      }, { spaces: 2 });
+      fs.writeJsonSync(
+        this.projectFile.filePath,
+        {
+          name: 'previousApp',
+          version: '0',
+        },
+        { spaces: 2 },
+      );
       await init({
         publish,
         name,
