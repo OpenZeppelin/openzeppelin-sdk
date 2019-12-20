@@ -11,7 +11,6 @@ import find from 'lodash.find';
 
 import {
   Loggy,
-  FileSystem,
   bytecodeDigest,
   bodyCode,
   constructorCode,

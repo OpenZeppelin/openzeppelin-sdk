@@ -3,7 +3,6 @@ import push from './push';
 import init from '../scripts/init';
 import semver from 'semver';
 import { promptIfNeeded, InquirerQuestions } from '../prompts/prompt';
-import { FileSystem } from '@openzeppelin/upgrades';
 import ProjectFile from '../models/files/ProjectFile';
 import { notEmpty } from '../prompts/validators';
 import Telemetry from '../telemetry';

@@ -17,7 +17,6 @@ import {
   Contracts,
   Contract,
   Loggy,
-  FileSystem,
   Proxy,
   Transactions,
   semanticVersionToString,

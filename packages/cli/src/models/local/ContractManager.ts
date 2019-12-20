@@ -1,5 +1,5 @@
 import fs from 'fs-extra';
-import { Contracts, Contract, FileSystem } from '@openzeppelin/upgrades';
+import { Contracts, Contract } from '@openzeppelin/upgrades';
 import Dependency from '../dependency/Dependency';
 import ProjectFile from '../files/ProjectFile';
 import ConfigManager from '../config/ConfigManager';

@@ -6,7 +6,6 @@ import map from 'lodash.map';
 import {
   Contracts,
   Loggy,
-  FileSystem,
   getBuildArtifacts,
   BuildArtifacts,
   validate as validateContract,

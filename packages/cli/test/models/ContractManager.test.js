@@ -6,7 +6,7 @@ import fs from 'fs-extra';
 import { expect } from 'chai';
 
 import sinon from 'sinon';
-import { FileSystem, Contracts } from '@openzeppelin/upgrades';
+import { Contracts } from '@openzeppelin/upgrades';
 import ContractManager from '../../src/models/local/ContractManager';
 import ProjectFile from '../../src/models/files/ProjectFile';
 import ConfigManager from '../../src/models/config/ConfigManager';

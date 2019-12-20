@@ -1,5 +1,4 @@
 import fs from 'fs-extra';
-import { FileSystem } from '@openzeppelin/upgrades';
 
 export function cleanup(path) {
   try {

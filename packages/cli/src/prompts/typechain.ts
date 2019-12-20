@@ -1,5 +1,4 @@
 import fs from 'fs';
-import { FileSystem } from '@openzeppelin/upgrades';
 import { notEmpty } from './validators';
 import { InquirerQuestions } from './prompt';
 

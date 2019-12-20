@@ -4,7 +4,6 @@ require('../setup');
 import fs from 'fs';
 import sinon from 'sinon';
 import path from 'path';
-import { FileSystem } from '@openzeppelin/upgrades';
 
 import { cleanupfn } from '../helpers/cleanup';
 import NetworkConfig from '../../src/models/config/NetworkConfig';

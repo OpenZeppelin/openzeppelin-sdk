@@ -6,7 +6,6 @@ import Truffle from '../../../src/models/config/TruffleConfig';
 import * as Compiler from '../../../src/models/compiler/Compiler';
 import ProjectFile from '../../../src/models/files/ProjectFile';
 import path from 'path';
-import { FileSystem } from '@openzeppelin/upgrades';
 import fs from 'fs-extra';
 
 describe('Compiler', function() {

@@ -10,7 +10,6 @@ import { promisify } from 'util';
 
 import {
   TxParams,
-  FileSystem,
   PackageProject,
   Contracts,
   Contract,

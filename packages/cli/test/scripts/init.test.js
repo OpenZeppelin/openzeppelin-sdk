@@ -3,7 +3,6 @@ require('../setup');
 
 import fs from 'fs-extra';
 import sinon from 'sinon';
-import { FileSystem } from '@openzeppelin/upgrades';
 import { cleanup } from '../helpers/cleanup';
 
 import init from '../../src/scripts/init';

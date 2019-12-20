@@ -5,7 +5,7 @@ import pick from 'lodash.pick';
 import compact from 'lodash.compact';
 import path from 'path';
 
-import { FileSystem, Loggy } from '@openzeppelin/upgrades';
+import { Loggy } from '@openzeppelin/upgrades';
 import { OPEN_ZEPPELIN_FOLDER } from '../files/constants';
 
 const state = { alreadyPrintedSessionInfo: false };
