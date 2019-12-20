@@ -63,7 +63,7 @@ export default class ProjectFile {
     this.filePath = ProjectFile.getExistingFilePath(process.cwd(), filePath);
     if (this.filePath) {
       try {
-        this.data = FileSystem.parseJsonIfExists(this.filePath);
+        this.data = fs.existsSync(this.filePath) ? fs.readJsonSync(this.filePath) : null;
         // if we failed to read and parse project file
       } catch (e) {
         e.message = `Failed to parse '${path.resolve(this.filePath)}' file. Please make sure that ${
@@ -277,7 +277,7 @@ export default class ProjectFile {
   }
 
   private hasChanged(): boolean {
-    const currentPackgeFile = FileSystem.parseJsonIfExists(this.filePath);
+    const currentPackgeFile = fs.existsSync(this.filePath) ? fs.readJsonSync(this.filePath) : null;
     return !isEqual(this.data, currentPackgeFile);
   }
 }

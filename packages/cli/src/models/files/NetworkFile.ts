@@ -89,7 +89,7 @@ export default class NetworkFile {
   public data: NetworkFileData;
 
   public static getManifestVersion(network: string): string | null {
-    const file = FileSystem.parseJsonIfExists(`zos.${network}.json`);
+    const file = fs.existsSync(`zos.${network}.json`) ? fs.readJsonSync(`zos.${network}.json`) : null;
     return file ? file.manifestVersion || file.zosversion : null;
   }
 
@@ -109,7 +109,7 @@ export default class NetworkFile {
 
     if (this.filePath) {
       try {
-        this.data = FileSystem.parseJsonIfExists(this.filePath);
+        this.data = fs.existsSync(this.filePath) ? fs.readJsonSync(this.filePath) : null;
       } catch (e) {
         e.message = `Failed to parse '${path.resolve(
           filePath,
@@ -504,7 +504,7 @@ export default class NetworkFile {
   }
 
   private hasChanged(): boolean {
-    const currentNetworkFile = FileSystem.parseJsonIfExists(this.filePath);
+    const currentNetworkFile = fs.existsSync(this.filePath) ? fs.readJsonSync(this.filePath) : null;
     return !isEqual(this.data, currentNetworkFile);
   }
 

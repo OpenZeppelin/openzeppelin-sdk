@@ -38,7 +38,7 @@ export default class ContractManager {
     if (fs.existsSync(buildDir)) {
       return fs.readdirSync(buildDir, 'utf8')
         .filter(name => name.match(/\.json$/))
-        .map(name => FileSystem.parseJsonIfExists(`${buildDir}/${name}`))
+        .map(name => fs.readJsonSync(`${buildDir}/${name}`, { throws: false }))
         .filter(contract => {
           return (
             this.isLocalContract(contractsDir, contract, root) &&

@@ -81,7 +81,7 @@ const Session = {
   },
 
   _parseSession(): SessionOptions | undefined {
-    const session = FileSystem.parseJsonIfExists(SESSION_PATH);
+    const session = fs.existsSync(SESSION_PATH) ? fs.readJsonSync(SESSION_PATH) : null;
     if (isEmpty(session)) return undefined;
     const parsedSession = pick(session, 'network', 'timeout', 'from', 'expires');
     return this._setDefaults(parsedSession);

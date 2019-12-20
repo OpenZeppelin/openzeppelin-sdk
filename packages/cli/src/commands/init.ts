@@ -39,7 +39,7 @@ async function action(projectName: string, version: string, options: any): Promi
     typechainOutdir,
   };
   const props = getCommandProps();
-  const defaults = FileSystem.parseJsonIfExists('package.json') || { version: '1.0.0' };
+  const defaults = fs.readJsonSync('package.json', { throws: false }) || { version: '1.0.0' };
   const prompted = await promptIfNeeded({ args, defaults, props }, interactive);
 
   const dependencies = link ? link.split(',') : [];
