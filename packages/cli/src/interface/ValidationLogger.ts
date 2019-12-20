@@ -1,6 +1,6 @@
 import isEmpty from 'lodash.isempty';
 import {
-  FileSystem as fs,
+  FileSystem,
   Loggy,
   getStorageLayout,
   ValidationInfo,
@@ -143,7 +143,7 @@ export default class ValidationLogger {
     const originalTypesInfo = this.existingContractInfo.types || {};
 
     storageDiff.forEach(({ updated, original, action }) => {
-      const updatedSourceCode = updated && fs.exists(updated.path) && fs.read(updated.path);
+      const updatedSourceCode = updated && FileSystem.exists(updated.path) && FileSystem.read(updated.path);
       const updatedVarType = updated && updatedStorageInfo.types[updated.type];
       const updatedVarSource = updated && [updated.path, _srcToLineNumber(updated.path, updated.src)].join(':');
       const updatedVarDescription =

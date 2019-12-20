@@ -10,7 +10,7 @@ import find from 'lodash.find';
 
 import {
   Loggy,
-  FileSystem as fs,
+  FileSystem,
   bytecodeDigest,
   bodyCode,
   constructorCode,
@@ -88,7 +88,7 @@ export default class NetworkFile {
   public data: NetworkFileData;
 
   public static getManifestVersion(network: string): string | null {
-    const file = fs.parseJsonIfExists(`zos.${network}.json`);
+    const file = FileSystem.parseJsonIfExists(`zos.${network}.json`);
     return file ? file.manifestVersion || file.zosversion : null;
   }
 
@@ -108,7 +108,7 @@ export default class NetworkFile {
 
     if (this.filePath) {
       try {
-        this.data = fs.parseJsonIfExists(this.filePath);
+        this.data = FileSystem.parseJsonIfExists(this.filePath);
       } catch (e) {
         e.message = `Failed to parse '${path.resolve(
           filePath,
@@ -484,7 +484,7 @@ export default class NetworkFile {
   public write(): void {
     if (this.hasChanged()) {
       const exists = this.exists();
-      fs.writeJson(this.filePath, this.data);
+      FileSystem.writeJson(this.filePath, this.data);
       Loggy.onVerbose(
         __filename,
         'write',
@@ -497,15 +497,17 @@ export default class NetworkFile {
   public static getExistingFilePath(network: string, dir: string = process.cwd(), ...paths: string[]): string {
     // TODO-v3: remove legacy project file support
     // Prefer the new format over the old one
-    return [...paths, `${dir}/zos.${network}.json`, `${dir}/${OPEN_ZEPPELIN_FOLDER}/${network}.json`].find(fs.exists);
+    return [...paths, `${dir}/zos.${network}.json`, `${dir}/${OPEN_ZEPPELIN_FOLDER}/${network}.json`].find(
+      FileSystem.exists,
+    );
   }
 
   private hasChanged(): boolean {
-    const currentNetworkFile = fs.parseJsonIfExists(this.filePath);
+    const currentNetworkFile = FileSystem.parseJsonIfExists(this.filePath);
     return !isEqual(this.data, currentNetworkFile);
   }
 
   private exists(): boolean {
-    return fs.exists(this.filePath);
+    return FileSystem.exists(this.filePath);
   }
 }

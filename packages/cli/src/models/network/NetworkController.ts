@@ -16,7 +16,7 @@ import {
   Contracts,
   Contract,
   Loggy,
-  FileSystem as fs,
+  FileSystem,
   Proxy,
   Transactions,
   semanticVersionToString,
@@ -795,7 +795,7 @@ export default class NetworkController {
     const contractName = this.projectFile.contract(contractAlias);
     if (contractName) {
       const path = Contracts.getLocalPath(contractName);
-      const data = fs.parseJson(path);
+      const data = FileSystem.parseJson(path);
       if (!data.networks) {
         data.networks = {};
       }
@@ -807,7 +807,7 @@ export default class NetworkController {
         // eslint-disable-next-line @typescript-eslint/camelcase
         updated_at: Date.now(),
       };
-      fs.writeJson(path, data);
+      FileSystem.writeJson(path, data);
     }
   }
 

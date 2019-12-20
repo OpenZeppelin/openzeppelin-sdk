@@ -4,7 +4,7 @@ import pick from 'lodash.pick';
 import compact from 'lodash.compact';
 import path from 'path';
 
-import { FileSystem as fs, Loggy } from '@openzeppelin/upgrades';
+import { FileSystem, Loggy } from '@openzeppelin/upgrades';
 import { OPEN_ZEPPELIN_FOLDER } from '../files/constants';
 
 const state = { alreadyPrintedSessionInfo: false };
@@ -46,7 +46,7 @@ const Session = {
 
   open({ network, from, timeout }: SessionOptions, expires: number = DEFAULT_EXPIRATION_TIMEOUT, logInfo = true): void {
     const expirationTimestamp = new Date(new Date().getTime() + expires * 1000);
-    fs.writeJson(SESSION_PATH, {
+    FileSystem.writeJson(SESSION_PATH, {
       network,
       from,
       timeout,
@@ -63,25 +63,24 @@ const Session = {
   },
 
   close(): void {
-    if (fs.exists(SESSION_PATH)) fs.remove(SESSION_PATH);
+    if (FileSystem.exists(SESSION_PATH)) FileSystem.remove(SESSION_PATH);
     Loggy.noSpin(__filename, 'getOptions', `close-session`, 'Closed openzeppelin session');
   },
 
   ignoreFile(): void {
     const GIT_IGNORE = '.gitignore';
     if (
-      fs.exists(GIT_IGNORE) &&
-      fs
-        .read(GIT_IGNORE)
+      FileSystem.exists(GIT_IGNORE) &&
+      FileSystem.read(GIT_IGNORE)
         .toString()
         .indexOf(SESSION_PATH) < 0
     ) {
-      fs.append(GIT_IGNORE, `\n${SESSION_PATH}\n`);
+      FileSystem.append(GIT_IGNORE, `\n${SESSION_PATH}\n`);
     }
   },
 
   _parseSession(): SessionOptions | undefined {
-    const session = fs.parseJsonIfExists(SESSION_PATH);
+    const session = FileSystem.parseJsonIfExists(SESSION_PATH);
     if (isEmpty(session)) return undefined;
     const parsedSession = pick(session, 'network', 'timeout', 'from', 'expires');
     return this._setDefaults(parsedSession);

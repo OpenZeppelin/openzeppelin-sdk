@@ -9,7 +9,7 @@ import { promisify } from 'util';
 
 import {
   TxParams,
-  FileSystem as fs,
+  FileSystem,
   PackageProject,
   Contracts,
   Contract,
@@ -149,7 +149,7 @@ export default class Dependency {
     if (!this._networkFiles[network]) {
       const filePath = this.getExistingNetworkFilePath(network);
 
-      if (!fs.exists(filePath)) {
+      if (!FileSystem.exists(filePath)) {
         throw Error(`Could not find a project file for network '${network}' for '${this.name}'`);
       }
 
@@ -161,7 +161,7 @@ export default class Dependency {
 
   public isDeployedOnNetwork(network: string): boolean {
     const filePath = this.getExistingNetworkFilePath(network);
-    if (!fs.exists(filePath)) return false;
+    if (!FileSystem.exists(filePath)) return false;
     return !!this.getNetworkFile(network).packageAddress;
   }
 

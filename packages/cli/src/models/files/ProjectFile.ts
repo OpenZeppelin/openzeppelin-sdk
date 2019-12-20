@@ -3,7 +3,7 @@ import pickBy from 'lodash.pickby';
 import isEqual from 'lodash.isequal';
 import isEmpty from 'lodash.isempty';
 
-import { Loggy, FileSystem as fs } from '@openzeppelin/upgrades';
+import { Loggy, FileSystem } from '@openzeppelin/upgrades';
 import Dependency from '../dependency/Dependency';
 import { MANIFEST_VERSION, checkVersion } from './ManifestVersion';
 import { OPEN_ZEPPELIN_FOLDER } from './constants';
@@ -62,7 +62,7 @@ export default class ProjectFile {
     this.filePath = ProjectFile.getExistingFilePath(process.cwd(), filePath);
     if (this.filePath) {
       try {
-        this.data = fs.parseJsonIfExists(this.filePath);
+        this.data = FileSystem.parseJsonIfExists(this.filePath);
         // if we failed to read and parse project file
       } catch (e) {
         e.message = `Failed to parse '${path.resolve(this.filePath)}' file. Please make sure that ${
@@ -79,7 +79,7 @@ export default class ProjectFile {
   }
 
   public exists(): boolean {
-    return fs.exists(this.filePath);
+    return FileSystem.exists(this.filePath);
   }
 
   public get root(): string {
@@ -259,7 +259,7 @@ export default class ProjectFile {
   public write(): void {
     if (this.hasChanged()) {
       const exists = this.exists();
-      fs.writeJson(this.filePath, this.data);
+      FileSystem.writeJson(this.filePath, this.data);
       Loggy.onVerbose(
         __filename,
         'write',
@@ -272,11 +272,11 @@ export default class ProjectFile {
   public static getExistingFilePath(dir: string = process.cwd(), ...paths: string[]): string {
     // TODO-v3: remove legacy project file support
     // Prefer the new format over the old one
-    return [...paths, `${dir}/${PROJECT_FILE_PATH}`, `${dir}/${LEGACY_PROJECT_FILE_NAME}`].find(fs.exists);
+    return [...paths, `${dir}/${PROJECT_FILE_PATH}`, `${dir}/${LEGACY_PROJECT_FILE_NAME}`].find(FileSystem.exists);
   }
 
   private hasChanged(): boolean {
-    const currentPackgeFile = fs.parseJsonIfExists(this.filePath);
+    const currentPackgeFile = FileSystem.parseJsonIfExists(this.filePath);
     return !isEqual(this.data, currentPackgeFile);
   }
 }

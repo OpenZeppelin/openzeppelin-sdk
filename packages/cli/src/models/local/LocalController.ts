@@ -5,7 +5,7 @@ import map from 'lodash.map';
 import {
   Contracts,
   Loggy,
-  FileSystem as fs,
+  FileSystem,
   getBuildArtifacts,
   BuildArtifacts,
   validate as validateContract,
@@ -99,7 +99,7 @@ export default class LocalController {
 
   public checkCanAdd(contractName: string): void | never {
     const path = Contracts.getLocalPath(contractName);
-    if (!fs.exists(path)) {
+    if (!FileSystem.exists(path)) {
       throw Error(`Contract ${contractName} not found in path ${path}`);
     }
     if (!this.hasBytecode(path)) {
@@ -124,8 +124,8 @@ export default class LocalController {
 
   // Contract model
   public hasBytecode(contractDataPath: string): boolean {
-    if (!fs.exists(contractDataPath)) return false;
-    const bytecode = fs.parseJson(contractDataPath).bytecode;
+    if (!FileSystem.exists(contractDataPath)) return false;
+    const bytecode = FileSystem.parseJson(contractDataPath).bytecode;
     return bytecode && bytecode !== '0x';
   }
 
@@ -134,7 +134,7 @@ export default class LocalController {
     const contractName = this.projectFile.contract(contractAlias);
     if (contractName) {
       const contractDataPath = Contracts.getLocalPath(contractName);
-      const { compiler, sourcePath } = fs.parseJson(contractDataPath);
+      const { compiler, sourcePath } = FileSystem.parseJson(contractDataPath);
       return { sourcePath, compilerVersion: compiler.version };
     } else {
       throw Error(`Could not find ${contractAlias} in contracts directory.`);
