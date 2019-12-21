@@ -1,4 +1,3 @@
-import fs from 'fs';
 // module information
 const version = 'v' + require('../package.json').version;
 
