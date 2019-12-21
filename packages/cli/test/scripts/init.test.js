@@ -88,6 +88,7 @@ describe('init script', function() {
         {
           name: 'previousApp',
           version: '0',
+          manifestVersion: '2.2',
         },
         { spaces: 2 },
       );
