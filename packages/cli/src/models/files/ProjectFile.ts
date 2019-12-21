@@ -60,7 +60,7 @@ export default class ProjectFile {
     const defaultData = {
       manifestVersion: MANIFEST_VERSION,
     } as any;
-    this.filePath = ProjectFile.getExistingFilePath(process.cwd(), filePath);
+    this.filePath = filePath ?? ProjectFile.getExistingFilePath(process.cwd());
     if (this.filePath) {
       try {
         this.data = fs.existsSync(this.filePath) ? fs.readJsonSync(this.filePath) : null;
