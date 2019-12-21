@@ -19,7 +19,7 @@ describe('ContractManager', function() {
           this.testDir = `${process.cwd()}/test/tmp`;
           this.projectFile = new ProjectFile(`${this.testDir}/zos.json`);
           this.contractManager = new ContractManager(this.projectFile);
-          fs.mkdirSync(this.testDir);
+          fs.mkdirSync(this.testDir, { recursive: true });
           sinon.stub(ConfigManager, 'getBuildDir').returns(`${this.testDir}/build/contracts`);
         });
 
@@ -39,7 +39,7 @@ describe('ContractManager', function() {
             this.testDir = `${process.cwd()}/test/tmp`;
             this.projectFile = new ProjectFile(`${this.testDir}/zos.json`);
             this.contractManager = new ContractManager(this.projectFile);
-            fs.mkdirSync(this.testDir);
+            fs.mkdirSync(this.testDir, { recursive: true });
             fs.mkdirSync(`${this.testDir}/build/contracts`, { recursive: true });
             sinon.stub(ConfigManager, 'getBuildDir').returns(`${this.testDir}/build/contracts`);
           });

@@ -16,7 +16,7 @@ describe('NetworkConfig', function() {
   const networkConfigPath = `${process.cwd()}/${networkConfigFile}`;
 
   beforeEach('create tmp dir', function() {
-    fs.mkdirSync(tmpDir);
+    fs.mkdirSync(tmpDir, { recursive: true });
   });
 
   afterEach('cleanup files and folders', cleanupfn(tmpDir));
@@ -32,7 +32,7 @@ describe('NetworkConfig', function() {
       });
 
       it('does not create an empty contracts folder if present', function() {
-        fs.mkdirSync(contractsDir);
+        fs.mkdirSync(contractsDir, { recursive: true });
         fs.writeFileSync(`${contractsDir}/Sample.sol`, '');
         NetworkConfig.initialize(tmpDir);
 

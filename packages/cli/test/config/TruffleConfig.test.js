@@ -11,7 +11,7 @@ describe('TruffleConfig', () => {
   const testDir = `${process.cwd()}/test/tmp`;
 
   beforeEach('create test dir', function() {
-    fs.mkdirSync(testDir);
+    fs.mkdirSync(testDir, { recursive: true });
   });
 
   afterEach('remove test dir', function() {
