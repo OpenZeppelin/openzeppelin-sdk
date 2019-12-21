@@ -611,7 +611,7 @@ export default class NetworkController {
   // DeployerController
   public async publish(): Promise<void> {
     if (this.appAddress) {
-      Loggy.noSpin(__filename, 'publish', `Project is already published to ${this.network}`);
+      Loggy.noSpin(__filename, 'publish', 'publish-project', `Project is already published to ${this.network}`);
       return;
     }
 

@@ -385,14 +385,9 @@ class BaseAppProject extends BasePackageProject {
         );
       return callData;
     } else {
-      if (actionLabel)
-        Loggy.spin(
-          __filename,
-          'getAndLogInitCallData',
-          `${__filename}#getAndLogInitCallData`,
-          logReference,
-          logMessage,
-        );
+      if (actionLabel) {
+        Loggy.spin(__filename, 'getAndLogInitCallData', logReference, logMessage);
+      }
       return null;
     }
   }

@@ -109,7 +109,7 @@ export function parseArg(input: string | string[], { type, components }: MethodA
 
   // Warn if we see a type we don't recognise, but return it as is
   else {
-    Loggy.noSpin.warn(__filename, 'parseArg', `Unknown argument ${type} (skipping input validation)`);
+    Loggy.noSpin.warn(__filename, 'parseArg', 'util-parse-arg', `Unknown argument ${type} (skipping input validation)`);
     return input;
   }
 }
