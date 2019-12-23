@@ -1,9 +1,9 @@
+import fs from 'fs-extra';
 import keys from 'lodash.keys';
 import flatten from 'lodash.flatten';
 import values from 'lodash.values';
 
 import Contracts from './Contracts';
-import { parseJson } from '../utils/FileSystem';
 
 export function getBuildArtifacts(path?: string): BuildArtifacts {
   return new BuildArtifacts(Contracts.listBuildArtifacts(path));
@@ -24,7 +24,7 @@ export class BuildArtifacts {
     this.sourcesToArtifacts = {};
 
     artifactsPaths.forEach(path => {
-      const artifact: any = parseJson(path);
+      const artifact: any = fs.readJsonSync(path);
       const sourcePath: string = this.getSourcePathFromArtifact(artifact);
       this.registerArtifactForSourcePath(sourcePath, artifact);
     });

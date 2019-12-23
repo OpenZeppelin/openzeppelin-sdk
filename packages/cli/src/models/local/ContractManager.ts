@@ -1,4 +1,5 @@
-import { Contracts, Contract, FileSystem } from '@openzeppelin/upgrades';
+import fs from 'fs-extra';
+import { Contracts, Contract } from '@openzeppelin/upgrades';
 import Dependency from '../dependency/Dependency';
 import ProjectFile from '../files/ProjectFile';
 import ConfigManager from '../config/ConfigManager';
@@ -34,10 +35,11 @@ export default class ContractManager {
   public getContractNames(root: string = process.cwd()): string[] {
     const buildDir = ConfigManager.getBuildDir();
     const contractsDir = Contracts.getLocalContractsDir();
-    if (FileSystem.exists(buildDir)) {
-      return FileSystem.readDir(buildDir)
+    if (fs.existsSync(buildDir)) {
+      return fs
+        .readdirSync(buildDir, 'utf8')
         .filter(name => name.match(/\.json$/))
-        .map(name => FileSystem.parseJsonIfExists(`${buildDir}/${name}`))
+        .map(name => (fs.existsSync(`${buildDir}/${name}`) ? fs.readJsonSync(`${buildDir}/${name}`) : null))
         .filter(contract => {
           return (
             this.isLocalContract(contractsDir, contract, root) &&

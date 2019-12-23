@@ -1,8 +1,9 @@
 'use strict';
 require('../setup');
 
+import fs from 'fs';
 import sinon from 'sinon';
-import { FileSystem, Contracts, ZWeb3 } from '@openzeppelin/upgrades';
+import { Contracts, ZWeb3 } from '@openzeppelin/upgrades';
 
 import ConfigManager from '../../src/models/config/ConfigManager';
 
@@ -68,13 +69,13 @@ describe('ConfigManager', function() {
     const configFileBackup = `${configFile}.backup`;
 
     before('backup config file', function() {
-      FileSystem.copy(configFile, configFileBackup);
-      FileSystem.remove(configFile);
+      fs.copyFileSync(configFile, configFileBackup);
+      fs.unlinkSync(configFile);
     });
 
     after('restore config file', function() {
-      FileSystem.copy(configFileBackup, configFile);
-      FileSystem.remove(configFileBackup);
+      fs.copyFileSync(configFileBackup, configFile);
+      fs.unlinkSync(configFileBackup);
     });
 
     expectToBehaveLikeConfig(configFileDir);
@@ -104,13 +105,13 @@ describe('ConfigManager', function() {
     const configFileBackup = `${configFile}.backup`;
 
     before('backup config file', function() {
-      FileSystem.copy(configFile, configFileBackup);
-      FileSystem.remove(configFile);
+      fs.copyFileSync(configFile, configFileBackup);
+      fs.unlinkSync(configFile);
     });
 
     after('restore config file', function() {
-      FileSystem.copy(configFileBackup, configFile);
-      FileSystem.remove(configFileBackup);
+      fs.copyFileSync(configFileBackup, configFile);
+      fs.unlinkSync(configFileBackup);
     });
 
     expectToBehaveLikeConfig(configFileDir);

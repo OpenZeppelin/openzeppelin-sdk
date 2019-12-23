@@ -1,9 +1,9 @@
 require('../setup');
 
+import fs from 'fs-extra';
 import npm from 'npm-programmatic';
 import sinon from 'sinon';
 
-import { FileSystem } from '@openzeppelin/upgrades';
 import TruffleConfig from '../../src/models/config/TruffleConfig';
 import CaptureLogs from '../helpers/captureLogs';
 
@@ -11,35 +11,35 @@ describe('TruffleConfig', () => {
   const testDir = `${process.cwd()}/test/tmp`;
 
   beforeEach('create test dir', function() {
-    FileSystem.createDir(testDir);
+    fs.mkdirSync(testDir, { recursive: true });
   });
 
   afterEach('remove test dir', function() {
-    FileSystem.removeTree(testDir);
+    fs.removeSync(testDir);
   });
 
   describe('exists', function() {
     it('returns true when there is a truffle.js file', function() {
-      FileSystem.write(`${testDir}/truffle.js`, 'dummy');
+      fs.writeFileSync(`${testDir}/truffle.js`, 'dummy');
 
       TruffleConfig.exists(testDir).should.be.true;
     });
 
     it('returns true when there is a truffle-config.js file', function() {
-      FileSystem.write(`${testDir}/truffle-config.js`, 'dummy');
+      fs.writeFileSync(`${testDir}/truffle-config.js`, 'dummy');
 
       TruffleConfig.exists(testDir).should.be.true;
     });
 
     it('returns true when there are both truffle config files', function() {
-      FileSystem.write(`${testDir}/truffle.js`, 'dummy');
-      FileSystem.write(`${testDir}/truffle-config.js`, 'dummy');
+      fs.writeFileSync(`${testDir}/truffle.js`, 'dummy');
+      fs.writeFileSync(`${testDir}/truffle-config.js`, 'dummy');
 
       TruffleConfig.exists(testDir).should.be.true;
     });
 
     it('returns false when there is no truffle config file', function() {
-      FileSystem.write(`${testDir}/bla.js`, 'dummy');
+      fs.writeFileSync(`${testDir}/bla.js`, 'dummy');
 
       TruffleConfig.exists(testDir).should.be.false;
     });
@@ -48,7 +48,7 @@ describe('TruffleConfig', () => {
   describe('isTruffleProject', function() {
     describe('when there is a truffle config file', function() {
       beforeEach('create truffle config file', function() {
-        FileSystem.write(`${testDir}/truffle-config.js`, 'dummy');
+        fs.writeFileSync(`${testDir}/truffle-config.js`, 'dummy');
       });
 
       it('returns true', function() {
@@ -68,17 +68,17 @@ describe('TruffleConfig', () => {
     const configFileBackup = `${configFile}.backup`;
 
     beforeEach('backup truffle-config file', function() {
-      FileSystem.copy(configFile, configFileBackup);
+      fs.copyFileSync(configFile, configFileBackup);
     });
 
     afterEach('restore truffle-config file', function() {
-      FileSystem.copy(configFileBackup, configFile);
-      FileSystem.remove(configFileBackup);
+      fs.copyFileSync(configFileBackup, configFile);
+      fs.unlinkSync(configFileBackup);
     });
 
     context('when the requested network has default values', function() {
       beforeEach('create truffle config file', async function() {
-        FileSystem.write(configFile, "module.exports = { networks: { test: { gas: 1, gasPrice: 2, from: '0x0' } } }");
+        fs.writeFileSync(configFile, "module.exports = { networks: { test: { gas: 1, gasPrice: 2, from: '0x0' } } }");
         this.config = await TruffleConfig.loadNetworkConfig('test', true);
       });
 
@@ -94,7 +94,7 @@ describe('TruffleConfig', () => {
 
     context('when the requested network does not have default values', function() {
       beforeEach('create truffle config file', async function() {
-        FileSystem.write(configFile, 'module.exports = { networks: { test: { } } }');
+        fs.writeFileSync(configFile, 'module.exports = { networks: { test: { } } }');
         this.config = await TruffleConfig.loadNetworkConfig('test', true);
       });
 
@@ -108,7 +108,7 @@ describe('TruffleConfig', () => {
 
     context('when the truffle config file is corrupted', function() {
       beforeEach('create truffle config file', function() {
-        FileSystem.write(configFile, 'module.exports = undefined.foo');
+        fs.writeFileSync(configFile, 'module.exports = undefined.foo');
       });
 
       it('throws an error', async function() {

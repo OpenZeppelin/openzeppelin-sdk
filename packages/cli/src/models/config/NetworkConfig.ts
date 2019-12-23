@@ -1,8 +1,8 @@
+import fs from 'fs';
 import path from 'path';
 import pick from 'lodash.pick';
 import omit from 'lodash.omit';
 import isUndefined from 'lodash.isundefined';
-import { FileSystem } from '@openzeppelin/upgrades';
 
 interface NetworkConfigInterface extends ConfigInterface {
   artifactDefaults: ArtifactDefaults;
@@ -56,7 +56,7 @@ const NetworkConfig = {
   },
 
   exists(root: string = process.cwd()): boolean {
-    return FileSystem.exists(`${root}/networks.js`);
+    return fs.existsSync(`${root}/networks.js`);
   },
 
   getConfig(root: string = process.cwd()): ConfigInterface {
@@ -138,14 +138,14 @@ const NetworkConfig = {
   createNetworkConfigFile(root: string): void {
     if (!this.exists(root)) {
       const blueprint = path.resolve(__dirname, './blueprint.networks.js');
-      FileSystem.copy(blueprint, `${root}/networks.js`);
+      fs.copyFileSync(blueprint, `${root}/networks.js`);
     }
   },
 
   createDir(dir: string): void {
-    if (!FileSystem.exists(dir)) {
-      FileSystem.createDir(dir);
-      FileSystem.write(`${dir}/.gitkeep`, '');
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir);
+      fs.writeFileSync(`${dir}/.gitkeep`, '');
     }
   },
 };

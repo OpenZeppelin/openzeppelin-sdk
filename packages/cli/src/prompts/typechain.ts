@@ -1,4 +1,4 @@
-import { FileSystem } from '@openzeppelin/upgrades';
+import fs from 'fs';
 import { notEmpty } from './validators';
 import { InquirerQuestions } from './prompt';
 
@@ -7,7 +7,7 @@ export const TypechainQuestions: InquirerQuestions = {
     message: 'Enable typechain support?',
     type: 'confirm',
     default: true,
-    when: () => FileSystem.exists('tsconfig.json'),
+    when: () => fs.existsSync('tsconfig.json'),
   },
   typechainTarget: {
     message: 'Typechain compilation target',

@@ -1,8 +1,8 @@
 'use strict';
 require('../setup');
 
+import fs from 'fs-extra';
 import sinon from 'sinon';
-import { FileSystem as fs } from '@openzeppelin/upgrades';
 import { cleanup } from '../helpers/cleanup';
 
 import init from '../../src/scripts/init';
@@ -15,7 +15,7 @@ describe('init script', function() {
   const tmpDir = 'test/tmp';
 
   before('create tmp dir and stub ZosConfig#initialize', function() {
-    fs.createDir(tmpDir);
+    fs.mkdirSync(tmpDir, { recursive: true });
     sinon.stub(ConfigManager, 'initialize').returns();
   });
 
@@ -71,7 +71,7 @@ describe('init script', function() {
     });
 
     it('should not overwrite existing file by default', async function() {
-      fs.writeJson(this.projectFile.filePath, { name: 'previousApp' });
+      fs.writeJsonSync(this.projectFile.filePath, { name: 'previousApp' }, { spaces: 2 });
       await init({
         publish,
         name,
@@ -83,10 +83,15 @@ describe('init script', function() {
     });
 
     it('should overwrite existing file if requested', async function() {
-      fs.writeJson(this.projectFile.filePath, {
-        name: 'previousApp',
-        version: '0',
-      });
+      fs.writeJsonSync(
+        this.projectFile.filePath,
+        {
+          name: 'previousApp',
+          version: '0',
+          manifestVersion: '2.2',
+        },
+        { spaces: 2 },
+      );
       await init({
         publish,
         name,

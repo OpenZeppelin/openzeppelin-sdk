@@ -1,5 +1,6 @@
 'use strict';
 
+import fs from 'fs-extra';
 import isEmpty from 'lodash.isempty';
 import intersection from 'lodash.intersection';
 import difference from 'lodash.difference';
@@ -16,7 +17,6 @@ import {
   Contracts,
   Contract,
   Loggy,
-  FileSystem as fs,
   Proxy,
   Transactions,
   semanticVersionToString,
@@ -795,7 +795,7 @@ export default class NetworkController {
     const contractName = this.projectFile.contract(contractAlias);
     if (contractName) {
       const path = Contracts.getLocalPath(contractName);
-      const data = fs.parseJson(path);
+      const data = fs.readJsonSync(path);
       if (!data.networks) {
         data.networks = {};
       }
@@ -807,7 +807,7 @@ export default class NetworkController {
         // eslint-disable-next-line @typescript-eslint/camelcase
         updated_at: Date.now(),
       };
-      fs.writeJson(path, data);
+      fs.writeJsonSync(path, data, { spaces: 2 });
     }
   }
 

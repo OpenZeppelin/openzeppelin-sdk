@@ -1,10 +1,11 @@
+import fs from 'fs-extra';
 import omitBy from 'lodash.omitby';
 import isEmpty from 'lodash.isempty';
 import pick from 'lodash.pick';
 import compact from 'lodash.compact';
 import path from 'path';
 
-import { FileSystem as fs, Loggy } from '@openzeppelin/upgrades';
+import { Loggy } from '@openzeppelin/upgrades';
 import { OPEN_ZEPPELIN_FOLDER } from '../files/constants';
 
 const state = { alreadyPrintedSessionInfo: false };
@@ -46,12 +47,16 @@ const Session = {
 
   open({ network, from, timeout }: SessionOptions, expires: number = DEFAULT_EXPIRATION_TIMEOUT, logInfo = true): void {
     const expirationTimestamp = new Date(new Date().getTime() + expires * 1000);
-    fs.writeJson(SESSION_PATH, {
-      network,
-      from,
-      timeout,
-      expires: expirationTimestamp,
-    });
+    fs.writeJsonSync(
+      SESSION_PATH,
+      {
+        network,
+        from,
+        timeout,
+        expires: expirationTimestamp,
+      },
+      { spaces: 2 },
+    );
     if (logInfo) {
       Loggy.noSpin(
         __filename,
@@ -63,25 +68,25 @@ const Session = {
   },
 
   close(): void {
-    if (fs.exists(SESSION_PATH)) fs.remove(SESSION_PATH);
+    if (fs.existsSync(SESSION_PATH)) fs.unlinkSync(SESSION_PATH);
     Loggy.noSpin(__filename, 'getOptions', `close-session`, 'Closed openzeppelin session');
   },
 
   ignoreFile(): void {
     const GIT_IGNORE = '.gitignore';
     if (
-      fs.exists(GIT_IGNORE) &&
+      fs.existsSync(GIT_IGNORE) &&
       fs
-        .read(GIT_IGNORE)
+        .readFileSync(GIT_IGNORE, 'utf8')
         .toString()
         .indexOf(SESSION_PATH) < 0
     ) {
-      fs.append(GIT_IGNORE, `\n${SESSION_PATH}\n`);
+      fs.appendFileSync(GIT_IGNORE, `\n${SESSION_PATH}\n`);
     }
   },
 
   _parseSession(): SessionOptions | undefined {
-    const session = fs.parseJsonIfExists(SESSION_PATH);
+    const session = fs.existsSync(SESSION_PATH) ? fs.readJsonSync(SESSION_PATH) : null;
     if (isEmpty(session)) return undefined;
     const parsedSession = pick(session, 'network', 'timeout', 'from', 'expires');
     return this._setDefaults(parsedSession);

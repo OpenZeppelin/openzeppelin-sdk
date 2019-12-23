@@ -6,8 +6,7 @@ import Truffle from '../../../src/models/config/TruffleConfig';
 import * as Compiler from '../../../src/models/compiler/Compiler';
 import ProjectFile from '../../../src/models/files/ProjectFile';
 import path from 'path';
-import { FileSystem } from '@openzeppelin/upgrades';
-import fs from 'fs';
+import fs from 'fs-extra';
 
 describe('Compiler', function() {
   beforeEach('setup', function() {
@@ -113,7 +112,7 @@ describe('Compiler', function() {
     };
 
     afterEach('cleanup test output dir', function() {
-      FileSystem.removeTree(typechainOutdir);
+      fs.removeSync(typechainOutdir);
     });
 
     it('runs typechain in all files', async function() {

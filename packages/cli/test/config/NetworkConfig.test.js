@@ -1,9 +1,9 @@
 'use strict';
 require('../setup');
 
+import fs from 'fs';
 import sinon from 'sinon';
 import path from 'path';
-import { FileSystem } from '@openzeppelin/upgrades';
 
 import { cleanupfn } from '../helpers/cleanup';
 import NetworkConfig from '../../src/models/config/NetworkConfig';
@@ -16,7 +16,7 @@ describe('NetworkConfig', function() {
   const networkConfigPath = `${process.cwd()}/${networkConfigFile}`;
 
   beforeEach('create tmp dir', function() {
-    FileSystem.createDir(tmpDir);
+    fs.mkdirSync(tmpDir, { recursive: true });
   });
 
   afterEach('cleanup files and folders', cleanupfn(tmpDir));
@@ -26,32 +26,32 @@ describe('NetworkConfig', function() {
       it('creates an empty contracts folder if missing', function() {
         NetworkConfig.initialize(tmpDir);
 
-        FileSystem.exists(contractsDir).should.be.true;
-        FileSystem.readDir(contractsDir).should.have.lengthOf(1);
-        FileSystem.readDir(contractsDir).should.include('.gitkeep');
+        fs.existsSync(contractsDir).should.be.true;
+        fs.readdirSync(contractsDir, 'utf8').should.have.lengthOf(1);
+        fs.readdirSync(contractsDir, 'utf8').should.include('.gitkeep');
       });
 
       it('does not create an empty contracts folder if present', function() {
-        FileSystem.createDir(contractsDir);
-        FileSystem.write(`${contractsDir}/Sample.sol`);
+        fs.mkdirSync(contractsDir, { recursive: true });
+        fs.writeFileSync(`${contractsDir}/Sample.sol`, '');
         NetworkConfig.initialize(tmpDir);
 
-        FileSystem.exists(contractsDir).should.be.true;
-        FileSystem.readDir(contractsDir).should.have.lengthOf(1);
-        FileSystem.readDir(contractsDir).should.include('Sample.sol');
+        fs.existsSync(contractsDir).should.be.true;
+        fs.readdirSync(contractsDir, 'utf8').should.have.lengthOf(1);
+        fs.readdirSync(contractsDir, 'utf8').should.include('Sample.sol');
       });
 
       it('creates a networks.js file if missing', function() {
         NetworkConfig.initialize(tmpDir);
 
-        FileSystem.exists(networkConfigPath).should.be.true;
+        fs.existsSync(networkConfigPath).should.be.true;
       });
 
       it('does not create a networks.js file if present', function() {
-        FileSystem.write(networkConfigFile, '');
+        fs.writeFileSync(networkConfigFile, '');
         NetworkConfig.initialize(tmpDir);
 
-        FileSystem.read(networkConfigPath).should.have.lengthOf(0);
+        fs.readFileSync(networkConfigPath, 'utf8').should.have.lengthOf(0);
       });
     });
 

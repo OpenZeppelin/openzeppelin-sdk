@@ -1,3 +1,4 @@
+import fs from 'fs';
 import map from 'lodash.map';
 import uniq from 'lodash.uniq';
 import flatten from 'lodash.flatten';
@@ -7,15 +8,7 @@ import npm from 'npm-programmatic';
 import { exec } from 'child_process';
 import { promisify } from 'util';
 
-import {
-  TxParams,
-  FileSystem as fs,
-  PackageProject,
-  Contracts,
-  Contract,
-  getSolidityLibNames,
-  Loggy,
-} from '@openzeppelin/upgrades';
+import { TxParams, PackageProject, Contracts, Contract, getSolidityLibNames, Loggy } from '@openzeppelin/upgrades';
 import ProjectFile, { LEGACY_PROJECT_FILE_NAME, PROJECT_FILE_PATH } from '../files/ProjectFile';
 import NetworkFile from '../files/NetworkFile';
 import { OPEN_ZEPPELIN_FOLDER } from '../files/constants';
@@ -149,7 +142,7 @@ export default class Dependency {
     if (!this._networkFiles[network]) {
       const filePath = this.getExistingNetworkFilePath(network);
 
-      if (!fs.exists(filePath)) {
+      if (!fs.existsSync(filePath)) {
         throw Error(`Could not find a project file for network '${network}' for '${this.name}'`);
       }
 
@@ -161,7 +154,7 @@ export default class Dependency {
 
   public isDeployedOnNetwork(network: string): boolean {
     const filePath = this.getExistingNetworkFilePath(network);
-    if (!fs.exists(filePath)) return false;
+    if (!fs.existsSync(filePath)) return false;
     return !!this.getNetworkFile(network).packageAddress;
   }
 

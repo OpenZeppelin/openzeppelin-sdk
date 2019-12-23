@@ -1,8 +1,8 @@
+import fs from 'fs-extra';
 import push from './push';
 import init from '../scripts/init';
 import semver from 'semver';
 import { promptIfNeeded, InquirerQuestions } from '../prompts/prompt';
-import { FileSystem } from '@openzeppelin/upgrades';
 import ProjectFile from '../models/files/ProjectFile';
 import { notEmpty } from '../prompts/validators';
 import Telemetry from '../telemetry';
@@ -38,7 +38,7 @@ async function action(projectName: string, version: string, options: any): Promi
     typechainOutdir,
   };
   const props = getCommandProps();
-  const defaults = FileSystem.parseJsonIfExists('package.json') || { version: '1.0.0' };
+  const defaults = fs.readJsonSync('package.json', { throws: false }) || { version: '1.0.0' };
   const prompted = await promptIfNeeded({ args, defaults, props }, interactive);
 
   const dependencies = link ? link.split(',') : [];

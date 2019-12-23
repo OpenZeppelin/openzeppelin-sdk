@@ -1,7 +1,8 @@
 require('../../../setup');
 
-import { Loggy, FileSystem } from '@openzeppelin/upgrades';
+import { Loggy } from '@openzeppelin/upgrades';
 import { compileProject } from '../../../../src/models/compiler/solidity/SolidityProjectCompiler';
+import fs from 'fs-extra';
 import { unlinkSync, existsSync, statSync, utimesSync, writeFileSync } from 'fs';
 import path from 'path';
 import sinon from 'sinon';
@@ -12,7 +13,7 @@ describe('SolidityProjectCompiler', function() {
   const baseTestBuildDir = `${rootDir}/test/tmp`;
 
   after('cleanup test build dir', function() {
-    FileSystem.removeTree(baseTestBuildDir);
+    fs.removeSync(baseTestBuildDir);
   });
 
   describe('in mock-stdlib project', function() {
@@ -26,20 +27,20 @@ describe('SolidityProjectCompiler', function() {
     });
 
     it('compiles all contracts in the project', function() {
-      FileSystem.exists(outputDir).should.be.true;
-      FileSystem.readDir(outputDir).should.have.lengthOf(2);
+      fs.existsSync(outputDir).should.be.true;
+      fs.readdirSync(outputDir, 'utf8').should.have.lengthOf(2);
     });
 
     it('generates correct artifacts', function() {
-      FileSystem.readDir(outputDir).forEach(schemaFileName => {
+      fs.readdirSync(outputDir, 'utf8').forEach(schemaFileName => {
         const contractName = schemaFileName.substring(0, schemaFileName.lastIndexOf('.'));
         const contractPath = `${inputDir}/${contractName}.sol`;
         const schemaPath = `${outputDir}/${schemaFileName}`;
-        const schema = FileSystem.parseJson(schemaPath);
+        const schema = fs.readJsonSync(schemaPath);
 
         schema.fileName.should.be.eq(`${contractName}.sol`);
         schema.contractName.should.be.eq(contractName);
-        schema.source.should.be.eq(FileSystem.read(contractPath));
+        schema.source.should.be.eq(fs.readFileSync(contractPath, 'utf8'));
         schema.sourcePath.should.be.eq(`test/mocks/mock-stdlib/contracts/${contractName}.sol`);
         schema.sourceMap.should.not.be.null;
         schema.abi.should.not.be.null;
@@ -54,7 +55,7 @@ describe('SolidityProjectCompiler', function() {
     });
 
     it('replaces library names', function() {
-      const schema = FileSystem.parseJson(greeterArtifactPath);
+      const schema = fs.readJsonSync(greeterArtifactPath);
       schema.bytecode.should.match(/__GreeterLib____________________________/);
       schema.deployedBytecode.should.match(/__GreeterLib____________________________/);
     });
@@ -76,7 +77,7 @@ describe('SolidityProjectCompiler', function() {
       const origMtime = statSync(greeterArtifactPath).mtimeMs;
       await compileProject({ inputDir, outputDir, version: '0.5.0' });
       statSync(greeterArtifactPath).mtimeMs.should.not.eq(origMtime);
-      const schema = FileSystem.parseJson(greeterArtifactPath);
+      const schema = fs.readJsonSync(greeterArtifactPath);
       schema.compiler.version.should.eq('0.5.0+commit.1d4f565a.Emscripten.clang');
     });
 
@@ -90,7 +91,7 @@ describe('SolidityProjectCompiler', function() {
         optimizer,
       });
       statSync(greeterArtifactPath).mtimeMs.should.not.eq(origMtime);
-      const schema = FileSystem.parseJson(greeterArtifactPath);
+      const schema = fs.readJsonSync(greeterArtifactPath);
       schema.compiler.optimizer.should.be.deep.equal(optimizer);
     });
 
@@ -163,13 +164,13 @@ describe('SolidityProjectCompiler', function() {
     });
 
     it('compiles project contracts', async function() {
-      FileSystem.exists(greeterArtifactPath).should.be.true;
-      FileSystem.parseJson(greeterArtifactPath).bytecode.should.not.be.null;
+      fs.existsSync(greeterArtifactPath).should.be.true;
+      fs.readJsonSync(greeterArtifactPath).bytecode.should.not.be.null;
     });
 
     it('compiles dependency contracts', async function() {
-      FileSystem.exists(dependencyArtifactPath).should.be.true;
-      FileSystem.parseJson(dependencyArtifactPath).bytecode.should.not.be.null;
+      fs.existsSync(dependencyArtifactPath).should.be.true;
+      fs.readJsonSync(dependencyArtifactPath).bytecode.should.not.be.null;
     });
   });
 
@@ -185,8 +186,8 @@ describe('SolidityProjectCompiler', function() {
     });
 
     it('compiles project contracts', async function() {
-      FileSystem.exists(greeterArtifactPath).should.be.true;
-      const schema = FileSystem.parseJson(greeterArtifactPath);
+      fs.existsSync(greeterArtifactPath).should.be.true;
+      const schema = fs.readJsonSync(greeterArtifactPath);
       schema.bytecode.should.not.be.null;
       schema.sourcePath.should.be.eq(`test/mocks/mock-stdlib with spaces/contracts/GreeterImpl.sol`);
     });
