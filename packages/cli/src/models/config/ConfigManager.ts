@@ -1,6 +1,6 @@
 import { ZWeb3, Contracts, TxParams } from '@openzeppelin/upgrades';
 import TruffleConfig from './TruffleConfig';
-import Session from '../network/Session';
+import { default as Session, SessionOptions } from '../network/Session';
 import NetworkConfig from './NetworkConfig';
 
 import pick from 'lodash.pick';
@@ -23,7 +23,7 @@ const ConfigManager = {
   },
 
   async initNetworkConfiguration(
-    options: any = {},
+    options: SessionOptions,
     silent?: boolean,
     root: string = process.cwd(),
   ): Promise<{ network: string; txParams: TxParams } | never> {

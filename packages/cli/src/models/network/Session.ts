@@ -14,7 +14,7 @@ const SESSION_PATH = path.join(OPEN_ZEPPELIN_FOLDER, SESSION_FILE);
 const DEFAULT_TX_TIMEOUT: number = 10 * 60; // 10 minutes
 const DEFAULT_EXPIRATION_TIMEOUT: number = 15 * 60; // 15 minutes
 
-interface SessionOptions {
+export interface SessionOptions {
   network?: string;
   from?: string;
   timeout?: number;
