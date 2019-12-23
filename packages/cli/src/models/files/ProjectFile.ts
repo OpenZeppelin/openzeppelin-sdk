@@ -215,6 +215,10 @@ export default class ProjectFile {
       manager === 'trufle' ? { manager: 'truffle' } : pickBy({ ...this.data.compiler, ...configOptions });
   }
 
+  public translateMaybeAlias(nameOrAlias: string): string {
+    return this.contracts[nameOrAlias] ?? nameOrAlias;
+  }
+
   public contract(alias: string): string {
     return this.contracts[alias];
   }
