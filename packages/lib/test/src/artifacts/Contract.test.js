@@ -70,7 +70,7 @@ describe('Contract', function() {
 
   describe('standalone functions', function() {
     describe('#contractMethodsFromAbi', function() {
-      context('solidity 0.5', function () {
+      context('solidity 0.5', function() {
         /* public methods in contract:
          * initialize()
          * initializeNested()
@@ -133,8 +133,8 @@ describe('Contract', function() {
         });
       });
 
-      context('solidity 0.6', function () {
-        it('queries constant methods', function () {
+      context('solidity 0.6', function() {
+        it('queries constant methods', function() {
           const methods = contractMethodsFromAbi(SampleSolc06, Mutability.Constant);
           expect(methods.map(m => [m.name, m.type, m.selector])).to.have.deep.members([
             ['value', 'function', 'value()'],
@@ -144,14 +144,14 @@ describe('Contract', function() {
           ]);
         });
 
-        it('queries non-constant methods', function () {
+        it('queries non-constant methods', function() {
           const methods = contractMethodsFromAbi(SampleSolc06, Mutability.NotConstant);
           expect(methods.map(m => [m.name, m.type, m.selector])).to.have.deep.members([
             ['samplePayable', 'function', 'samplePayable()'],
             ['sampleNonpayable', 'function', 'sampleNonpayable(uint256)'],
             ['basePayable', 'function', 'basePayable()'],
           ]);
-        })
+        });
       });
     });
   });

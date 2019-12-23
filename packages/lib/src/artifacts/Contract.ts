@@ -136,9 +136,10 @@ export function contractMethodsFromAbi(
   const methodsFromAst = getAstMethods(instance);
 
   return instance.schema.abi
-    .filter(({ stateMutability, constant: isConstantMethod, type }) => (
-      (isConstant === isConstantMethod || mutabilities.includes(stateMutability)) && type === 'function'
-    ))
+    .filter(
+      ({ stateMutability, constant: isConstantMethod, type }) =>
+        (isConstant === isConstantMethod || mutabilities.includes(stateMutability)) && type === 'function',
+    )
     .map(method => {
       const { name, inputs } = method;
       const selector = `${name}(${inputs.map(getArgTypeLabel).join(',')})`;
@@ -162,25 +163,23 @@ export function contractMethodsFromAst(
   const visibilities = ['public', 'external'];
 
   return getAstMethods(instance)
-    .filter(({ visibility, stateMutability }) => (
-      visibilities.includes(visibility) && mutabilities.includes(stateMutability)
-    ))
+    .filter(
+      ({ visibility, stateMutability }) => visibilities.includes(visibility) && mutabilities.includes(stateMutability),
+    )
     .map(method => {
       const initializer = method.modifiers.find(({ modifierName }) => modifierName.name === 'initializer');
       return { ...method, hasInitializer: initializer ? true : false };
     });
 }
 
-function getAstMethods(instance : Contract) : any[] {
+function getAstMethods(instance: Contract): any[] {
   return new ContractAST(instance, null, {
     nodesFilter: ['ContractDefinition'],
   }).getMethods();
 }
 
-function abiStateMutabilitiesFor(constant : ContractMethodMutability) {
-  return constant === ContractMethodMutability.Constant 
-    ? ['view', 'pure'] 
-    : ['payable', 'nonpayable'];
+function abiStateMutabilitiesFor(constant: ContractMethodMutability) {
+  return constant === ContractMethodMutability.Constant ? ['view', 'pure'] : ['payable', 'nonpayable'];
 }
 
 function parseArguments(passedArguments, abi) {
