@@ -679,12 +679,12 @@ export default class NetworkController {
 
     const instance = await Transactions.deployContract(contract, initArgs, this.txParams);
 
-    // await this._updateTruffleDeployedInformation(contractAlias, instance);
+    await this._updateTruffleDeployedInformation(contractAlias, instance);
 
-    // this.networkFile.addProxy(packageName, contractAlias, {
-    //   address: instance.address,
-    //   kind: ProxyType.Regular,
-    // });
+    this.networkFile.addProxy(packageName, contractAlias, {
+      address: instance.address,
+      kind: ProxyType.Regular,
+    });
 
     return instance;
   }

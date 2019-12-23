@@ -37,7 +37,10 @@ export async function action(contractName: string, deployArgs: string[], options
 
   const args = zipWith(deployArgs, constructorInputs, parseArg);
 
-  const instance = await controller.createInstance(packageName, contractAlias, args);
-
-  stdout(instance.address);
+  try {
+    const instance = await controller.createInstance(packageName, contractAlias, args);
+    stdout(instance.address);
+  } finally {
+    controller.writeNetworkPackageIfNeeded();
+  }
 }

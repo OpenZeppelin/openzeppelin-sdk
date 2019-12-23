@@ -37,6 +37,7 @@ interface Proxy extends Network, MethodParams, PackageArgs {
 export enum ProxyType {
   Upgradeable = 'Upgradeable',
   Minimal = 'Minimal',
+  Regular = 'Regular',
 }
 
 export type Params =
