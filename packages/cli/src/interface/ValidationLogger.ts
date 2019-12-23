@@ -54,15 +54,16 @@ export default class ValidationLogger {
   }
 
   public logImportsVanillaContracts(vanillaContracts: string[] | null): void {
-    if (!vanillaContracts) return;
-    Loggy.noSpin.warn(
-      __filename,
-      'logImportsVanillaContracts',
-      `validation-imports-vanilla-contracts`,
-      `- Contract ${this.contractName} imports ${vanillaContracts.join(
-        ', ',
-      )} from @openzeppelin/contracts. Use @openzeppelin/contracts-ethereum-package instead. See ${VANILLA_CONTRACTS_LINK}.`,
-    );
+    if (!isEmpty(vanillaContracts)) {
+      Loggy.noSpin.warn(
+        __filename,
+        'logImportsVanillaContracts',
+        `validation-imports-vanilla-contracts`,
+        `- Contract ${this.contractName} imports ${vanillaContracts.join(
+          ', ',
+        )} from @openzeppelin/contracts. Use @openzeppelin/contracts-ethereum-package instead. See ${VANILLA_CONTRACTS_LINK}.`,
+      );
+    }
   }
 
   public logHasSelfDestruct(hasSelfDestruct: boolean): void {
