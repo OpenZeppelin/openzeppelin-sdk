@@ -6,6 +6,7 @@ import { Loggy } from '@openzeppelin/upgrades';
 import { lockSync } from 'lockfile';
 import program from './program';
 import findRootDirectory from './helpers';
+import registerErrorHandler from './errors';
 import { LOCK_FILE_PATH, OPEN_ZEPPELIN_FOLDER } from '../models/files/constants';
 
 const IGNORED_COMMANDS_IN_ROOT_DIR = ['init', 'unpack'];
@@ -40,6 +41,8 @@ if (binPath.match(/zos$/)) {
     `'zos' command is deprecated and will be removed in the next major version. Please use 'openzeppelin' or 'oz' instead.`,
   );
 }
+
+registerErrorHandler(program);
 
 program.parse(process.argv);
 if (program.args.length === 0) program.help();

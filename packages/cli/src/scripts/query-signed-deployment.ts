@@ -1,6 +1,5 @@
 import stdout from '../utils/stdout';
 import NetworkController from '../models/network/NetworkController';
-import ScriptError from '../models/errors/ScriptError';
 import { CreateParams } from './interfaces';
 import { Loggy } from '@openzeppelin/upgrades';
 import { validateSalt } from '../utils/input';
@@ -37,11 +36,9 @@ export default async function querySignedDeployment({
       `Contract created with salt ${salt} signed by ${signer} will be deployed to the following address`,
     );
     stdout(address);
-    controller.writeNetworkPackageIfNeeded();
 
     return address;
-  } catch (error) {
-    const cb = () => controller.writeNetworkPackageIfNeeded();
-    throw new ScriptError(error, cb);
+  } finally {
+    controller.writeNetworkPackageIfNeeded();
   }
 }

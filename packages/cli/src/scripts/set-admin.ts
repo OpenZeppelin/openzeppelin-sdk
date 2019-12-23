@@ -1,5 +1,4 @@
 import NetworkController from '../models/network/NetworkController';
-import ScriptError from '../models/errors/ScriptError';
 import { SetAdminParams } from './interfaces';
 
 export default async function setAdmin({
@@ -27,9 +26,7 @@ export default async function setAdmin({
     } else {
       await controller.setProxyAdminOwner(newAdmin);
     }
+  } finally {
     controller.writeNetworkPackageIfNeeded();
-  } catch (error) {
-    const cb = () => controller.writeNetworkPackageIfNeeded();
-    throw new ScriptError(error, cb);
   }
 }

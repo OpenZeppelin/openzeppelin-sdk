@@ -31,7 +31,6 @@ import NetworkFile from '../../src/models/files/NetworkFile';
 import ProjectFile from '../../src/models/files/ProjectFile';
 import * as Compiler from '../../src/models/compiler/Compiler';
 import Dependency from '../../src/models/dependency/Dependency';
-import ErrorHandler from '../../src/models/errors/ErrorHandler';
 import ConfigManager from '../../src/models/config/ConfigManager';
 import Telemetry from '../../src/telemetry';
 
@@ -78,7 +77,6 @@ exports.stubCommands = function() {
     this.accounts = sinon.stub(accounts, 'default');
 
     this.compiler = sinon.stub(Compiler, 'compile');
-    this.errorHandler = sinon.stub(ErrorHandler.prototype, 'call').callsFake(() => null);
     this.initializer = sinon.stub(ConfigManager, 'initNetworkConfiguration').callsFake(function(options) {
       ConfigManager.initStaticConfiguration();
       const { network, from } = Session.getOptions(options);
