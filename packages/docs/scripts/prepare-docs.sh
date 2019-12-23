@@ -6,8 +6,16 @@ log() {
   echo "$*" >&2
 }
 
+yarn_with_mutex() {
+  if [ -n "$YARN_MUTEX" ]; then
+    yarn --mutex "$YARN_MUTEX" "$@"
+  else
+    yarn "$@"
+  fi
+}
+
 if [ ! -d node_modules ]; then
-  yarn --cwd ../..
+  yarn_with_mutex --cwd ../..
 fi
 
 # lib
