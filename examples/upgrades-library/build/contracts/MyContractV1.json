@@ -1,0 +1,280 @@
+{
+  "fileName": "MyContractV1.sol",
+  "contractName": "MyContractV1",
+  "source": "pragma solidity ^0.5.0;\n\nimport \"./MyContractV0.sol\";\n\ncontract MyContractV1 is MyContractV0 {\n  function add(uint256 _value) public {\n    value = value + _value;\n  }\n}\n\n",
+  "sourcePath": "contracts/MyContractV1.sol",
+  "sourceMap": "55:113:2:-;;;;8:9:-1;5:2;;;30:1;27;20:12;5:2;55:113:2;;;;;;;",
+  "deployedSourceMap": "55:113:2:-;;;;8:9:-1;5:2;;;30:1;27;20:12;5:2;55:113:2;;;;;;;;;;;;;;;;;;;;;;;;;;;;;97:69;;;;;;13:2:-1;8:3;5:11;2:2;;;29:1;26;19:12;2:2;97:69:2;;;;;;;;;;;;;;;;;:::i;:::-;;130:20:1;;;:::i;:::-;;;;;;;;;;;;;;;;;;;157:80;;;;;;13:2:-1;8:3;5:11;2:2;;;29:1;26;19:12;2:2;157:80:1;;;;;;;;;;;;;;;;;:::i;:::-;;97:69:2;155:6;147:5;;:14;139:5;:22;;;;97:69;:::o;130:20:1:-;;;;:::o;157:80::-;1024:12:0;;;;;;;;;;;:31;;;;1040:15;:13;:15::i;:::-;1024:31;:47;;;;1060:11;;;;;;;;;;;1059:12;1024:47;1016:106;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;1129:19;1152:12;;;;;;;;;;;1151:13;1129:35;;1174:14;1170:80;;;1213:4;1198:12;;:19;;;;;;;;;;;;;;;;;;1239:4;1225:11;;:18;;;;;;;;;;;;;;;;;;1170:80;226:6:1;218:5;:14;;;;1268::0;1264:55;;;1307:5;1292:12;;:20;;;;;;;;;;;;;;;;;;1264:55;157:80:1;;:::o;1409:467:0:-;1456:4;1797:10;1842:7;1830:20;1824:26;;1870:1;1864:2;:7;1857:14;;;1409:467;:::o",
+  "abi": [
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_value",
+          "type": "uint256"
+        }
+      ],
+      "name": "add",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_value",
+          "type": "uint256"
+        }
+      ],
+      "name": "initialize",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "value",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    }
+  ],
+  "ast": {
+    "absolutePath": "contracts/MyContractV1.sol",
+    "exportedSymbols": {
+      "MyContractV1": [
+        100
+      ]
+    },
+    "id": 101,
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 84,
+        "literals": [
+          "solidity",
+          "^",
+          "0.5",
+          ".0"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "0:23:2"
+      },
+      {
+        "absolutePath": "contracts/MyContractV0.sol",
+        "file": "./MyContractV0.sol",
+        "id": 85,
+        "nodeType": "ImportDirective",
+        "scope": 101,
+        "sourceUnit": 83,
+        "src": "25:28:2",
+        "symbolAliases": [],
+        "unitAlias": ""
+      },
+      {
+        "baseContracts": [
+          {
+            "arguments": null,
+            "baseName": {
+              "contractScope": null,
+              "id": 86,
+              "name": "MyContractV0",
+              "nodeType": "UserDefinedTypeName",
+              "referencedDeclaration": 82,
+              "src": "80:12:2",
+              "typeDescriptions": {
+                "typeIdentifier": "t_contract$_MyContractV0_$82",
+                "typeString": "contract MyContractV0"
+              }
+            },
+            "id": 87,
+            "nodeType": "InheritanceSpecifier",
+            "src": "80:12:2"
+          }
+        ],
+        "contractDependencies": [
+          62,
+          82
+        ],
+        "contractKind": "contract",
+        "documentation": null,
+        "fullyImplemented": true,
+        "id": 100,
+        "linearizedBaseContracts": [
+          100,
+          82,
+          62
+        ],
+        "name": "MyContractV1",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "body": {
+              "id": 98,
+              "nodeType": "Block",
+              "src": "133:33:2",
+              "statements": [
+                {
+                  "expression": {
+                    "argumentTypes": null,
+                    "id": 96,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "lValueRequested": false,
+                    "leftHandSide": {
+                      "argumentTypes": null,
+                      "id": 92,
+                      "name": "value",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 69,
+                      "src": "139:5:2",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_uint256",
+                        "typeString": "uint256"
+                      }
+                    },
+                    "nodeType": "Assignment",
+                    "operator": "=",
+                    "rightHandSide": {
+                      "argumentTypes": null,
+                      "commonType": {
+                        "typeIdentifier": "t_uint256",
+                        "typeString": "uint256"
+                      },
+                      "id": 95,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": false,
+                      "lValueRequested": false,
+                      "leftExpression": {
+                        "argumentTypes": null,
+                        "id": 93,
+                        "name": "value",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 69,
+                        "src": "147:5:2",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        }
+                      },
+                      "nodeType": "BinaryOperation",
+                      "operator": "+",
+                      "rightExpression": {
+                        "argumentTypes": null,
+                        "id": 94,
+                        "name": "_value",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 89,
+                        "src": "155:6:2",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        }
+                      },
+                      "src": "147:14:2",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_uint256",
+                        "typeString": "uint256"
+                      }
+                    },
+                    "src": "139:22:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "id": 97,
+                  "nodeType": "ExpressionStatement",
+                  "src": "139:22:2"
+                }
+              ]
+            },
+            "documentation": null,
+            "id": 99,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [],
+            "name": "add",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 90,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 89,
+                  "name": "_value",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 99,
+                  "src": "110:14:2",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 88,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "110:7:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "109:16:2"
+            },
+            "returnParameters": {
+              "id": 91,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "133:0:2"
+            },
+            "scope": 100,
+            "src": "97:69:2",
+            "stateMutability": "nonpayable",
+            "superFunction": null,
+            "visibility": "public"
+          }
+        ],
+        "scope": 101,
+        "src": "55:113:2"
+      }
+    ],
+    "src": "0:170:2"
+  },
+  "bytecode": "0x608060405234801561001057600080fd5b5061024f806100206000396000f3fe608060405234801561001057600080fd5b50600436106100415760003560e01c80631003e2d2146100465780633fa4f24514610074578063fe4b84df14610092575b600080fd5b6100726004803603602081101561005c57600080fd5b81019080803590602001909291905050506100c0565b005b61007c6100ce565b6040518082815260200191505060405180910390f35b6100be600480360360208110156100a857600080fd5b81019080803590602001909291905050506100d4565b005b806033540160338190555050565b60335481565b600060019054906101000a900460ff16806100f357506100f26101db565b5b8061010a57506000809054906101000a900460ff16155b61015f576040517f08c379a000000000000000000000000000000000000000000000000000000000815260040180806020018281038252602e8152602001806101ed602e913960400191505060405180910390fd5b60008060019054906101000a900460ff1615905080156101af576001600060016101000a81548160ff02191690831515021790555060016000806101000a81548160ff0219169083151502179055505b8160338190555080156101d75760008060016101000a81548160ff0219169083151502179055505b5050565b600080303b9050600081149150509056fe436f6e747261637420696e7374616e63652068617320616c7265616479206265656e20696e697469616c697a6564a265627a7a72315820a241c83ca6970da580c319b8589406d671bdcffa9dc794a66fb6ce9fe3daeb4264736f6c634300050f0032",
+  "deployedBytecode": "0x608060405234801561001057600080fd5b50600436106100415760003560e01c80631003e2d2146100465780633fa4f24514610074578063fe4b84df14610092575b600080fd5b6100726004803603602081101561005c57600080fd5b81019080803590602001909291905050506100c0565b005b61007c6100ce565b6040518082815260200191505060405180910390f35b6100be600480360360208110156100a857600080fd5b81019080803590602001909291905050506100d4565b005b806033540160338190555050565b60335481565b600060019054906101000a900460ff16806100f357506100f26101db565b5b8061010a57506000809054906101000a900460ff16155b61015f576040517f08c379a000000000000000000000000000000000000000000000000000000000815260040180806020018281038252602e8152602001806101ed602e913960400191505060405180910390fd5b60008060019054906101000a900460ff1615905080156101af576001600060016101000a81548160ff02191690831515021790555060016000806101000a81548160ff0219169083151502179055505b8160338190555080156101d75760008060016101000a81548160ff0219169083151502179055505b5050565b600080303b9050600081149150509056fe436f6e747261637420696e7374616e63652068617320616c7265616479206265656e20696e697469616c697a6564a265627a7a72315820a241c83ca6970da580c319b8589406d671bdcffa9dc794a66fb6ce9fe3daeb4264736f6c634300050f0032",
+  "compiler": {
+    "name": "solc",
+    "version": "0.5.15+commit.6a57276f.Emscripten.clang",
+    "optimizer": {
+      "enabled": false,
+      "runs": 200
+    },
+    "evmVersion": "petersburg"
+  }
+}
