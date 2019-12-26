@@ -1,6 +1,6 @@
 # OpenZeppelin SDK example: your first project
 
-This is a sample project with a single contract for getting started with the OpenZeppelin SDK. Head over to our [documentation](https://docs.zeppelinos.org) to see the guide for this project.
+This is a sample project with a single contract for getting started with the OpenZeppelin SDK. Head over to our [documentation](https://docs.openzeppelin.com) to see the guide for this project.
 
 To run it on your machine:
 - Install dependencies with `npm install`
