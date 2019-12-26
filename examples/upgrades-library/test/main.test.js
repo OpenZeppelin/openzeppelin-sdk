@@ -1,6 +1,6 @@
 const Web3 = require('web3');
 
-const provider = require('@openzeppelin/test-environment').provider;
+const { provider } = require('@openzeppelin/test-environment');
 const main = require('../index.js').main;
 const assert = require('chai').assert;
 
