@@ -22,9 +22,9 @@ fi
 log "Building lib docs..."
 solidity-docgen -i ../lib/contracts/ -o modules/api/pages -e ../lib/contracts/mocks -x adoc -t templates
 mv modules/api/pages/index.adoc modules/api/pages/upgrades.adoc
-log "Done"
+log "Building lib docs... Done"
 
 # cli
 log "Building CLI docs..."
 yarn --cwd ../cli gen-docs
-log "Done"
+log "Building CLI docs... Done"
