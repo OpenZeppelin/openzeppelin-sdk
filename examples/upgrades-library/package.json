@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-    "test": "NODE_ENV=test mocha"
+    "test": "oz compile && NODE_ENV=test mocha"
   },
   "license": "ISC",
   "dependencies": {
@@ -13,6 +13,7 @@
   },
   "devDependencies": {
     "@openzeppelin/test-environment": "^0.1.1",
+    "@openzeppelin/cli": "^2.6.0",
     "chai": "^4.1.2",
     "mocha": "^6.2.2"
   }
