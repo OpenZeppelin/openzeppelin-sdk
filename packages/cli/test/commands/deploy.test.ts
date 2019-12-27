@@ -55,7 +55,7 @@ describe('deploy (action)', function() {
     (await instance.methods.answer().call()).should.equal('42');
   });
 
-  it('should refuse to deploy an unknown contract', async function() {
+  it('should fail to deploy an unknown contract', async function() {
     await deploy('NotExists', [], {
       network,
       txParams,
