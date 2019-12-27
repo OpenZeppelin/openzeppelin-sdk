@@ -54,4 +54,12 @@ describe('deploy (action)', function() {
     const instance = WithConstructorNonUpgradeable.at(instanceInfo.address);
     (await instance.methods.answer().call()).should.equal('42');
   });
+
+  it('should refuse to deploy an unknown contract', async function() {
+    await deploy('NotExists', [], {
+      network,
+      txParams,
+      networkFile: this.networkFile,
+    }).should.be.rejectedWith('Contract NotExists not found');
+  });
 });
