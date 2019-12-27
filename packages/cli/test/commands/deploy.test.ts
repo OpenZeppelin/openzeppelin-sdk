@@ -3,6 +3,7 @@ import '../setup';
 import { Contracts } from '@openzeppelin/upgrades';
 import { accounts } from '@openzeppelin/test-environment';
 
+import { ProxyType } from '../../src/scripts/interfaces';
 import ProjectFile from '../../src/models/files/ProjectFile';
 import NetworkFile from '../../src/models/files/NetworkFile';
 
@@ -32,8 +33,9 @@ describe('deploy (action)', function() {
     const instances = this.networkFile.getProxies({ contract });
     instances.should.have.lengthOf(1);
 
-    const instanceAddress = instances[0].address;
-    const instance = SimpleNonUpgradeable.at(instanceAddress);
+    const instanceInfo = instances[0];
+    instanceInfo.kind.should.equal(ProxyType.Regular);
+    const instance = SimpleNonUpgradeable.at(instanceInfo.address);
     (await instance.methods.answer().call()).should.equal('42');
   });
 
@@ -47,8 +49,9 @@ describe('deploy (action)', function() {
     const instances = this.networkFile.getProxies({ contract });
     instances.should.have.lengthOf(1);
 
-    const instanceAddress = instances[0].address;
-    const instance = WithConstructorNonUpgradeable.at(instanceAddress);
+    const instanceInfo = instances[0];
+    instanceInfo.kind.should.equal(ProxyType.Regular);
+    const instance = WithConstructorNonUpgradeable.at(instanceInfo.address);
     (await instance.methods.answer().call()).should.equal('42');
   });
 });
