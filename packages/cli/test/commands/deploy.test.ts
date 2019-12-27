@@ -93,4 +93,27 @@ describe('deploy (action)', function() {
     const instances = this.networkFile.getProxies({ contract });
     instances.should.have.lengthOf(0);
   });
+
+  it.skip('should deploy a contract from a package', async function() {
+    const contract = 'mock-stdlib/GreeterImpl';
+    await deploy(contract, [], {
+      network,
+      txParams,
+      networkFile: this.networkFile,
+    });
+    const instances = this.networkFile.getProxies({ contract });
+    instances.should.have.lengthOf(1);
+
+    // const instanceInfo = instances[0];
+    // instanceInfo.kind.should.equal(ProxyType.NonProxy);
+    // const instance = SimpleNonUpgradeable.at(instanceInfo.address);
+    // (await instance.methods.answer().call()).should.equal('42');
+  });
+
+  // see push tests for reference
+  // local libraries
+  // dependencies
+  // test with alias
+  // custom gasprice in txparams
+  // saved in truffle artifact
 });
