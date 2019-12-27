@@ -63,6 +63,26 @@ describe('deploy (action)', function() {
     }).should.be.rejectedWith('Contract NotExists not found');
   });
 
+  it('should deploy multiple instances', async function() {
+    const contract = 'SimpleNonUpgradeable';
+    const deployArgs: Parameters<typeof deploy> = [
+      contract,
+      [],
+      {
+        network,
+        txParams,
+        networkFile: this.networkFile,
+      },
+    ];
+
+    await deploy(...deployArgs);
+    await deploy(...deployArgs);
+    await deploy(...deployArgs);
+
+    const instances = this.networkFile.getProxies({ contract });
+    instances.should.have.lengthOf(3);
+  });
+
   it('should fail to deploy without necessary constructor arguments', async function() {
     const contract = 'WithConstructorNonUpgradeable';
     await deploy(contract, [], {
