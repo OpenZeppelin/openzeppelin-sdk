@@ -3,13 +3,13 @@ import '../setup';
 import { Contracts } from '@openzeppelin/upgrades';
 import { accounts } from '@openzeppelin/test-environment';
 
-// import { should } from 'chai';
 import ProjectFile from '../../src/models/files/ProjectFile';
 import NetworkFile from '../../src/models/files/NetworkFile';
 
 import { action as deploy } from '../../src/commands/deploy/action';
 
 const SimpleNonUpgradeable = Contracts.getFromLocal('SimpleNonUpgradeable');
+const WithConstructorNonUpgradeable = Contracts.getFromLocal('WithConstructorNonUpgradeable');
 
 describe('deploy (action)', function() {
   const [owner] = accounts;
@@ -37,5 +37,18 @@ describe('deploy (action)', function() {
     (await instance.methods.answer().call()).should.equal('42');
   });
 
-  it('should deploy a simple contract with constructor arguments');
+  it('should deploy a simple contract with constructor arguments', async function() {
+    const contract = 'WithConstructorNonUpgradeable';
+    await deploy(contract, ['30', 'abcde', '[3, 7]'], {
+      network,
+      txParams,
+      networkFile: this.networkFile,
+    });
+    const instances = this.networkFile.getProxies({ contract });
+    instances.should.have.lengthOf(1);
+
+    const instanceAddress = instances[0].address;
+    const instance = WithConstructorNonUpgradeable.at(instanceAddress);
+    (await instance.methods.answer().call()).should.equal('42');
+  });
 });
