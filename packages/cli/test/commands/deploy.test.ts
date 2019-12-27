@@ -34,7 +34,7 @@ describe('deploy (action)', function() {
     instances.should.have.lengthOf(1);
 
     const instanceInfo = instances[0];
-    instanceInfo.kind.should.equal(ProxyType.Regular);
+    instanceInfo.kind.should.equal(ProxyType.NonProxy);
     const instance = SimpleNonUpgradeable.at(instanceInfo.address);
     (await instance.methods.answer().call()).should.equal('42');
   });
@@ -50,7 +50,7 @@ describe('deploy (action)', function() {
     instances.should.have.lengthOf(1);
 
     const instanceInfo = instances[0];
-    instanceInfo.kind.should.equal(ProxyType.Regular);
+    instanceInfo.kind.should.equal(ProxyType.NonProxy);
     const instance = WithConstructorNonUpgradeable.at(instanceInfo.address);
     (await instance.methods.answer().call()).should.equal('42');
   });

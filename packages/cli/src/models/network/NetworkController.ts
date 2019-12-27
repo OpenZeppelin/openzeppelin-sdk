@@ -683,7 +683,7 @@ export default class NetworkController {
 
     this.networkFile.addProxy(packageName, contractAlias, {
       address: instance.address,
-      kind: ProxyType.Regular,
+      kind: ProxyType.NonProxy,
     });
 
     return instance;
