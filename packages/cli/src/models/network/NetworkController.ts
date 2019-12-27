@@ -671,7 +671,7 @@ export default class NetworkController {
     }
   }
 
-  public async createInstance(packageName: string, contractAlias: string, initArgs: string[]): Promise<Contract> {
+  public async createInstance(packageName: string, contractAlias: string, initArgs: unknown[]): Promise<Contract> {
     await this.migrateManifestVersionIfNeeded();
     if (!packageName) packageName = this.projectFile.name;
     const contract = this.contractManager.getContractClass(packageName, contractAlias);

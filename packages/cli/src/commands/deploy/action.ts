@@ -6,7 +6,7 @@ import NetworkController from '../../models/network/NetworkController';
 import stdout from '../../utils/stdout';
 import zipWith from 'lodash.zipwith';
 import { MethodArgType } from '../../prompts/prompt';
-import { parseArg } from '../../utils/input';
+import { parseMultipleArgs } from '../../utils/input';
 import NetworkFile from '../../models/files/NetworkFile';
 
 interface Options {
@@ -42,7 +42,7 @@ export async function action(contractName: string, deployArgs: string[], options
   const contract = controller.contractManager.getContractClass(packageName, contractAlias);
   const constructorInputs: MethodArgType[] = contract.schema.abi.find(f => f.type === 'constructor')?.inputs ?? [];
 
-  const args = zipWith(deployArgs, constructorInputs, parseArg);
+  const args = parseMultipleArgs(deployArgs, constructorInputs);
 
   try {
     const instance = await controller.createInstance(packageName, contractAlias, args);

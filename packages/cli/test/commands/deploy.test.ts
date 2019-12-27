@@ -62,4 +62,15 @@ describe('deploy (action)', function() {
       networkFile: this.networkFile,
     }).should.be.rejectedWith('Contract NotExists not found');
   });
+
+  it('should fail to deploy without necessary constructor arguments', async function() {
+    const contract = 'WithConstructorNonUpgradeable';
+    await deploy(contract, [], {
+      network,
+      txParams,
+      networkFile: this.networkFile,
+    }).should.be.rejectedWith('Expected 3 values but got 0');
+    const instances = this.networkFile.getProxies({ contract });
+    instances.should.have.lengthOf(0);
+  });
 });
