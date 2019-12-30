@@ -31,22 +31,22 @@ describe('Transactions', function() {
   });
 
   const assertGasLt = async (txHash, expected) => {
-    const { gas } = await ZWeb3.getTransaction(txHash);
+    const { gas } = await ZWeb3.eth.getTransaction(txHash);
     gas.should.be.at.most(parseInt(expected));
   };
 
   const assertGas = async (txHash, expected) => {
-    const { gas } = await ZWeb3.getTransaction(txHash);
+    const { gas } = await ZWeb3.eth.getTransaction(txHash);
     gas.should.be.eq(parseInt(expected));
   };
 
   const assertGasPrice = async (txHash, expected) => {
-    const { gasPrice } = await ZWeb3.getTransaction(txHash);
+    const { gasPrice } = await ZWeb3.eth.getTransaction(txHash);
     parseInt(gasPrice, 10).should.be.eq(expected);
   };
 
   const assertFrom = async (txHash, expected) => {
-    const { from } = await ZWeb3.getTransaction(txHash);
+    const { from } = await ZWeb3.eth.getTransaction(txHash);
     from.should.be.eq(expected);
   };
 
@@ -389,7 +389,7 @@ describe('Transactions', function() {
             value: utils.toWei('1', 'ether'),
           };
           await Transactions.sendRawTransaction(this.instance.address, transactionParams, { from: account2 });
-          (await ZWeb3.getBalance(this.instance.address)).should.eq((1e18).toString());
+          (await ZWeb3.eth.getBalance(this.instance.address)).should.eq((1e18).toString());
         });
       });
 
@@ -402,7 +402,7 @@ describe('Transactions', function() {
           await assertRevert(
             Transactions.sendRawTransaction(this.instance.address, transactionParams, { from: account2 }),
           );
-          (await ZWeb3.getBalance(this.instance.address)).should.eq('0');
+          (await ZWeb3.eth.getBalance(this.instance.address)).should.eq('0');
         });
       });
     });

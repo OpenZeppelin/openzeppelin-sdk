@@ -103,42 +103,18 @@ export default class ZWeb3 {
     }
   }
 
-  public static async estimateGas(params: any): Promise<number> {
-    return ZWeb3.eth.estimateGas({ ...params });
-  }
-
-  public static async getBalance(address: string): Promise<string> {
-    return ZWeb3.eth.getBalance(address);
-  }
-
-  public static async getCode(address: string): Promise<string> {
-    return ZWeb3.eth.getCode(address);
-  }
-
   public static async hasBytecode(address): Promise<boolean> {
-    const bytecode = await ZWeb3.getCode(address);
+    const bytecode = await ZWeb3.eth.getCode(address);
     return bytecode.length > 2;
   }
 
-  public static async getStorageAt(address: string, position: string): Promise<string> {
-    return ZWeb3.eth.getStorageAt(address, position);
-  }
-
-  public static async getNode(): Promise<string> {
-    return ZWeb3.eth.getNodeInfo();
-  }
-
   public static async isGanacheNode(): Promise<boolean> {
-    const nodeVersion = await ZWeb3.getNode();
+    const nodeVersion = await ZWeb3.eth.getNodeInfo();
     return nodeVersion.match(/TestRPC/) !== null;
   }
 
-  public static async getBlock(filter: string | number): Promise<Block> {
-    return ZWeb3.eth.getBlock(filter);
-  }
-
   public static async getLatestBlock(): Promise<Block> {
-    return ZWeb3.getBlock('latest');
+    return ZWeb3.eth.getBlock('latest');
   }
 
   public static async getLatestBlockNumber(): Promise<number> {
@@ -158,10 +134,6 @@ export default class ZWeb3 {
     return NETWORKS[networkId] || `dev-${networkId}`;
   }
 
-  public static async sendTransaction(params: TxParams): Promise<TransactionReceipt> {
-    return ZWeb3.eth.sendTransaction({ ...params });
-  }
-
   public static sendTransactionWithoutReceipt(params: TxParams): Promise<string> {
     return new Promise((resolve, reject) => {
       ZWeb3.eth.sendTransaction({ ...params }, (error, txHash) => {
@@ -169,14 +141,6 @@ export default class ZWeb3 {
         else resolve(txHash);
       });
     });
-  }
-
-  public static async getTransaction(txHash: string): Promise<Transaction> {
-    return ZWeb3.eth.getTransaction(txHash);
-  }
-
-  public static async getTransactionReceipt(txHash: string): Promise<TransactionReceipt> {
-    return ZWeb3.eth.getTransactionReceipt(txHash);
   }
 
   public static async getTransactionReceiptWithTimeout(tx: string, timeout: number): Promise<TransactionReceipt> {
@@ -202,7 +166,7 @@ export default class ZWeb3 {
 
   private static async _tryGettingTransactionReceipt(tx: string): Promise<TransactionReceipt | never> {
     try {
-      return await ZWeb3.getTransactionReceipt(tx);
+      return await ZWeb3.eth.getTransactionReceipt(tx);
     } catch (error) {
       if (error.message.includes('unknown transaction')) return null;
       else throw error;

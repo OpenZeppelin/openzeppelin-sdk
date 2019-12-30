@@ -176,7 +176,7 @@ export default {
       // See https://github.com/ethereum/go-ethereum/issues/18973 for more info
       const txParamsWithoutGas = omit(txParams, 'gas');
       // Use json-rpc method estimateGas to retrieve estimated value
-      return await ZWeb3.estimateGas(txParamsWithoutGas);
+      return await ZWeb3.eth.estimateGas(txParamsWithoutGas);
     } catch (error) {
       if (retries <= 0) throw Error(error);
       await sleep(RETRY_SLEEP_TIME);
@@ -215,7 +215,7 @@ export default {
     timeout: number = 10 * 60 * 1000,
   ): Promise<any | never> {
     if (await ZWeb3.isGanacheNode()) return;
-    const getTxBlock = () => ZWeb3.getTransactionReceipt(transactionHash).then(r => r.blockNumber);
+    const getTxBlock = () => ZWeb3.eth.getTransactionReceipt(transactionHash).then(r => r.blockNumber);
     const now = +new Date();
 
     while (true) {

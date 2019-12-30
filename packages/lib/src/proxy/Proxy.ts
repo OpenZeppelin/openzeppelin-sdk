@@ -80,7 +80,7 @@ export default class Proxy {
   }
 
   public async getStorageAt(position: string): Promise<string> {
-    return ZWeb3.getStorageAt(this.address, position);
+    return ZWeb3.eth.getStorageAt(this.address, position);
   }
 
   private async checkAdmin(): Promise<void | never> {

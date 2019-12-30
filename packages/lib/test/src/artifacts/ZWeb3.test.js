@@ -41,7 +41,7 @@ describe('ZWeb3', function() {
     });
 
     it('tells the balanace of a given account', async function() {
-      const balance = await ZWeb3.getBalance(account);
+      const balance = await ZWeb3.eth.getBalance(account);
       balance.should.be.an('string');
       balance.should.equal(await web3.eth.getBalance(account));
     });
@@ -83,7 +83,7 @@ describe('ZWeb3', function() {
 
     describe('get code', function() {
       it('can tell the deployed bytecode of a certain address', async function() {
-        const bytecode = await ZWeb3.getCode(this.impl.address);
+        const bytecode = await ZWeb3.eth.getCode(this.impl.address);
         bytecode.should.be.equal(this.DummyImplementation.schema.linkedDeployedBytecode);
       });
     });
@@ -99,7 +99,7 @@ describe('ZWeb3', function() {
     describe('estimate gas', function() {
       it('can estimate the gas of a call', async function() {
         const { gasUsed: expectedGas } = this.impl.deployment.transactionReceipt;
-        const gas = await ZWeb3.estimateGas({ data: this.DummyImplementation.schema.linkedBytecode });
+        const gas = await ZWeb3.eth.estimateGas({ data: this.DummyImplementation.schema.linkedBytecode });
         gas.should.be.equal(expectedGas);
       });
     });
@@ -108,7 +108,7 @@ describe('ZWeb3', function() {
       beforeEach('sending transaction', async function() {
         const value = new BN(1e18).toString(10);
         this.receiverBalanceTracker = await balance.tracker(receiverAccount);
-        const receipt = await ZWeb3.sendTransaction({ from: accounts[0], to: receiverAccount, value });
+        const receipt = await ZWeb3.eth.sendTransaction({ from: accounts[0], to: receiverAccount, value });
         this.txHash = receipt.transactionHash;
       });
 
@@ -121,7 +121,7 @@ describe('ZWeb3', function() {
 
       describe('get transaction', function() {
         it('can estimate the gas of a call', async function() {
-          const transaction = await ZWeb3.getTransaction(this.txHash);
+          const transaction = await ZWeb3.eth.getTransaction(this.txHash);
 
           transaction.should.be.an('object');
           transaction.value.should.be.eq((1e18).toString());
@@ -138,7 +138,7 @@ describe('ZWeb3', function() {
 
       describe('get transaction receipt', function() {
         it('can estimate the gas of a call', async function() {
-          const receipt = await ZWeb3.getTransactionReceipt(this.txHash);
+          const receipt = await ZWeb3.eth.getTransactionReceipt(this.txHash);
 
           receipt.should.be.an('object');
           receipt.logs.should.not.be.null;
@@ -152,7 +152,7 @@ describe('ZWeb3', function() {
       describe('get transaction receipt with timeout', function() {
         beforeEach('get receipt', async function() {
           this.timeout = 3000;
-          this.receipt = await ZWeb3.getTransactionReceipt(this.txHash);
+          this.receipt = await ZWeb3.eth.getTransactionReceipt(this.txHash);
         });
 
         afterEach(() => sinon.restore());

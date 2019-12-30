@@ -84,7 +84,7 @@ describe('push script', function() {
 
     it('should deploy required libraries', async function() {
       const address = this.networkFile.solidityLib('UintLib').address;
-      const code = await ZWeb3.getCode(address);
+      const code = await ZWeb3.eth.getCode(address);
       const uintLib = Contracts.getFromLocal('UintLib');
       code.length.should.eq(uintLib.schema.deployedBytecode.length).and.be.greaterThan(40);
     });

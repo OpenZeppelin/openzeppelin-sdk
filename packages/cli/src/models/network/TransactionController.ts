@@ -58,7 +58,7 @@ export default class TransactionController {
 
       return balance;
     } else {
-      const balance = await ZWeb3.getBalance(accountAddress);
+      const balance = await ZWeb3.eth.getBalance(accountAddress);
       Loggy.noSpin(__filename, 'getBalanceOf', 'balance-of', `Balance: ${fromWei(balance, 'ether')} ETH`);
 
       return balance;
