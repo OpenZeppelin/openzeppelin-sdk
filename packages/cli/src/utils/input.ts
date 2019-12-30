@@ -3,6 +3,7 @@ import flattenDeep from 'lodash.flattendeep';
 import { encodeParams, Loggy, ZWeb3 } from '@openzeppelin/upgrades';
 import { MethodArgType } from '../prompts/prompt';
 import zipWith from 'lodash.zipwith';
+import { isAddress } from 'web3-utils';
 
 // TODO: Deprecate in favor of a combination of parseArg and parseArray
 export function parseArgs(args: string): string[] | never {
@@ -88,7 +89,7 @@ export function parseArg(input: string | string[], { type, components }: MethodA
 
   // Address: just validate them
   else if (type === 'address' && requireInputString(input)) {
-    if (!ZWeb3.isAddress(input)) {
+    if (!isAddress(input)) {
       throw new Error(`${input} is not a valid address`);
     }
     return input;

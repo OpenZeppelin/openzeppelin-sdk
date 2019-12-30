@@ -53,10 +53,6 @@ export default class ZWeb3 {
     return ZWeb3.web3instance;
   }
 
-  public static isAddress(address: string): boolean {
-    return Web3.utils.isAddress(address);
-  }
-
   public static isHex(hex: string): boolean {
     return Web3.utils.isHex(hex);
   }
