@@ -71,12 +71,8 @@ export default class ZWeb3 {
     return ZWeb3.web3().version;
   }
 
-  public static async accounts(): Promise<string[]> {
-    return await ZWeb3.eth.getAccounts();
-  }
-
   public static async defaultAccount(): Promise<string> {
-    return (await ZWeb3.accounts())[0];
+    return (await ZWeb3.eth.getAccounts())[0];
   }
 
   public static toChecksumAddress(address: string): string | null {

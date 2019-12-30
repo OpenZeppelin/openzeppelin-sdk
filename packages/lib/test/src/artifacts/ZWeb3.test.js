@@ -30,11 +30,6 @@ describe('ZWeb3', function() {
       ZWeb3.version.should.not.be.null;
     });
 
-    it('tells the list of existing accounts', async function() {
-      const zweb3Accounts = await ZWeb3.accounts();
-      zweb3Accounts.should.be.deep.equal([defaultSender, ...accounts]);
-    });
-
     it('tells the default existing account', async function() {
       const defaultAccount = await ZWeb3.defaultAccount();
       defaultAccount.should.be.eq(defaultSender);
