@@ -67,7 +67,7 @@ export default class ZWeb3 {
     return ZWeb3.web3().eth;
   }
 
-  public static version(): string {
+  public static get version(): string {
     return ZWeb3.web3().version;
   }
 
