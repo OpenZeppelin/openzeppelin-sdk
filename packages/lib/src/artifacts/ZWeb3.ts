@@ -53,10 +53,6 @@ export default class ZWeb3 {
     return ZWeb3.web3instance;
   }
 
-  public static sha3(value: string): string {
-    return Web3.utils.sha3(value);
-  }
-
   public static isAddress(address: string): boolean {
     return Web3.utils.isAddress(address);
   }

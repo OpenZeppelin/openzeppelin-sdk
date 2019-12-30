@@ -30,10 +30,6 @@ describe('ZWeb3', function() {
       ZWeb3.version().should.not.be.null;
     });
 
-    it('calculates sha3', function() {
-      ZWeb3.sha3('something').should.be.eq('0x68371d7e884c168ae2022c82bd837d51837718a7f7dfb7aa3f753074a35e1d87');
-    });
-
     it('tells whether an address is valid', function() {
       ZWeb3.isAddress(accounts[0]).should.be.true;
       ZWeb3.isAddress(ZERO_ADDRESS).should.be.true;

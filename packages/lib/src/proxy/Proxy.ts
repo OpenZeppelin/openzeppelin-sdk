@@ -1,4 +1,4 @@
-import { toBN, toHex } from 'web3-utils';
+import { toBN, toHex, sha3 } from 'web3-utils';
 import ZWeb3 from '../artifacts/ZWeb3';
 import Contracts from '../artifacts/Contracts';
 import { toAddress, uint256ToAddress } from '../utils/Addresses';
@@ -58,22 +58,22 @@ export default class Proxy {
   }
 
   public async implementation(): Promise<string> {
-    const hashedLabel = toHex(toBN(ZWeb3.sha3(IMPLEMENTATION_LABEL)).sub(toBN(1)));
+    const hashedLabel = toHex(toBN(sha3(IMPLEMENTATION_LABEL)).sub(toBN(1)));
     let storage = await this.getStorageAt(hashedLabel);
     // TODO-v3: Remove deprecated 'zos' support
     if (storage === '0x0') {
-      storage = await this.getStorageAt(ZWeb3.sha3(DEPRECATED_IMPLEMENTATION_LABEL));
+      storage = await this.getStorageAt(sha3(DEPRECATED_IMPLEMENTATION_LABEL));
     }
 
     return uint256ToAddress(storage);
   }
 
   public async admin(): Promise<string> {
-    const hashedLabel = toHex(toBN(ZWeb3.sha3(ADMIN_LABEL)).sub(toBN(1)));
+    const hashedLabel = toHex(toBN(sha3(ADMIN_LABEL)).sub(toBN(1)));
     let storage = await this.getStorageAt(hashedLabel);
     // TODO-v3: Remove deprecated 'zos' support
     if (storage === '0x0') {
-      storage = await this.getStorageAt(ZWeb3.sha3(DEPRECATED_ADMIN_LABEL));
+      storage = await this.getStorageAt(sha3(DEPRECATED_ADMIN_LABEL));
     }
 
     return uint256ToAddress(storage);
