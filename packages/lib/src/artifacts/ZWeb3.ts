@@ -42,7 +42,6 @@ export default class ZWeb3 {
     ZWeb3.web3instance = undefined;
   }
 
-  // TODO: this.web3 could be cached and initialized lazily?
   public static web3(forceReinit = false): any {
     if (ZWeb3.web3instance && !forceReinit) return ZWeb3.web3instance;
     if (!ZWeb3.provider) {
