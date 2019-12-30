@@ -26,7 +26,7 @@ describe('ZWeb3', function() {
 
     it('knows a web3 instance', function() {
       ZWeb3.web3().should.not.be.null;
-      ZWeb3.eth().should.not.be.null;
+      ZWeb3.eth.should.not.be.null;
       ZWeb3.version().should.not.be.null;
     });
 

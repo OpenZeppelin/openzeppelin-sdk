@@ -63,7 +63,7 @@ export default class ZWeb3 {
     }
   }
 
-  public static eth(): Eth {
+  public static get eth(): Eth {
     return ZWeb3.web3().eth;
   }
 
@@ -72,11 +72,11 @@ export default class ZWeb3 {
   }
 
   public static contract(abi: any, atAddress?: string, options?: any): Contract {
-    return new (ZWeb3.eth().Contract)(abi, atAddress, options);
+    return new ZWeb3.eth.Contract(abi, atAddress, options);
   }
 
   public static async accounts(): Promise<string[]> {
-    return await ZWeb3.eth().getAccounts();
+    return await ZWeb3.eth.getAccounts();
   }
 
   public static async defaultAccount(): Promise<string> {
@@ -104,15 +104,15 @@ export default class ZWeb3 {
   }
 
   public static async estimateGas(params: any): Promise<number> {
-    return ZWeb3.eth().estimateGas({ ...params });
+    return ZWeb3.eth.estimateGas({ ...params });
   }
 
   public static async getBalance(address: string): Promise<string> {
-    return ZWeb3.eth().getBalance(address);
+    return ZWeb3.eth.getBalance(address);
   }
 
   public static async getCode(address: string): Promise<string> {
-    return ZWeb3.eth().getCode(address);
+    return ZWeb3.eth.getCode(address);
   }
 
   public static async hasBytecode(address): Promise<boolean> {
@@ -121,11 +121,11 @@ export default class ZWeb3 {
   }
 
   public static async getStorageAt(address: string, position: string): Promise<string> {
-    return ZWeb3.eth().getStorageAt(address, position);
+    return ZWeb3.eth.getStorageAt(address, position);
   }
 
   public static async getNode(): Promise<string> {
-    return ZWeb3.eth().getNodeInfo();
+    return ZWeb3.eth.getNodeInfo();
   }
 
   public static async isGanacheNode(): Promise<boolean> {
@@ -134,7 +134,7 @@ export default class ZWeb3 {
   }
 
   public static async getBlock(filter: string | number): Promise<Block> {
-    return ZWeb3.eth().getBlock(filter);
+    return ZWeb3.eth.getBlock(filter);
   }
 
   public static async getLatestBlock(): Promise<Block> {
@@ -150,7 +150,7 @@ export default class ZWeb3 {
   }
 
   public static async getNetwork(): Promise<number> {
-    return ZWeb3.eth().net.getId();
+    return ZWeb3.eth.net.getId();
   }
 
   public static async getNetworkName(): Promise<string> {
@@ -159,12 +159,12 @@ export default class ZWeb3 {
   }
 
   public static async sendTransaction(params: TxParams): Promise<TransactionReceipt> {
-    return ZWeb3.eth().sendTransaction({ ...params });
+    return ZWeb3.eth.sendTransaction({ ...params });
   }
 
   public static sendTransactionWithoutReceipt(params: TxParams): Promise<string> {
     return new Promise((resolve, reject) => {
-      ZWeb3.eth().sendTransaction({ ...params }, (error, txHash) => {
+      ZWeb3.eth.sendTransaction({ ...params }, (error, txHash) => {
         if (error) reject(error.message);
         else resolve(txHash);
       });
@@ -172,11 +172,11 @@ export default class ZWeb3 {
   }
 
   public static async getTransaction(txHash: string): Promise<Transaction> {
-    return ZWeb3.eth().getTransaction(txHash);
+    return ZWeb3.eth.getTransaction(txHash);
   }
 
   public static async getTransactionReceipt(txHash: string): Promise<TransactionReceipt> {
-    return ZWeb3.eth().getTransactionReceipt(txHash);
+    return ZWeb3.eth.getTransactionReceipt(txHash);
   }
 
   public static async getTransactionReceiptWithTimeout(tx: string, timeout: number): Promise<TransactionReceipt> {

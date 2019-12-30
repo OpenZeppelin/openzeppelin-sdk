@@ -66,7 +66,7 @@ export default {
         Contracts.getArtifactsDefaults().gas ||
         (await this.estimateActualGas({ to: address, data, value }));
 
-      return ZWeb3.eth().sendTransaction({
+      return ZWeb3.eth.sendTransaction({
         to: address,
         data,
         value,
