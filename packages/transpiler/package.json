@@ -28,5 +28,19 @@
   "bugs": {
     "url": "https://github.com/OpenZeppelin/openzeppelin-sdk/issues"
   },
-  "homepage": "https://github.com/OpenZeppelin/openzeppelin-sdk#readme"
+  "homepage": "https://github.com/OpenZeppelin/openzeppelin-sdk#readme",
+  "dependencies": {
+    "@types/lodash.find": "^4.6.6",
+    "@types/node": "^13.1.2",
+    "@typescript-eslint/eslint-plugin": "^2.14.0",
+    "@typescript-eslint/parser": "^2.14.0",
+    "ajv": "^6.10.2",
+    "eslint": "^6.8.0",
+    "eslint-config-prettier": "^6.9.0",
+    "eslint-plugin-prettier": "^3.1.2",
+    "lodash.find": "^4.6.0",
+    "prettier": "^1.19.1",
+    "ts-node": "^8.5.4",
+    "typescript": "^3.7.4"
+  }
 }
