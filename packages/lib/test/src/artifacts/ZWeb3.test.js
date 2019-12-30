@@ -40,17 +40,6 @@ describe('ZWeb3', function() {
       defaultAccount.should.be.eq(defaultSender);
     });
 
-    it('tells the balanace of a given account', async function() {
-      const balance = await ZWeb3.eth.getBalance(account);
-      balance.should.be.an('string');
-      balance.should.equal(await web3.eth.getBalance(account));
-    });
-
-    it('tells the name of the current node', async function() {
-      const node = await ZWeb3.getNode();
-      node.should.match(/EthereumJS TestRPC/);
-    });
-
     it('tells the name of the current network ID', async function() {
       const network = await ZWeb3.getNetwork();
       network.should.be.eq(await web3.eth.net.getId());
@@ -81,72 +70,12 @@ describe('ZWeb3', function() {
       block.number.should.not.be.null;
     });
 
-    describe('get code', function() {
-      it('can tell the deployed bytecode of a certain address', async function() {
-        const bytecode = await ZWeb3.eth.getCode(this.impl.address);
-        bytecode.should.be.equal(this.DummyImplementation.schema.linkedDeployedBytecode);
-      });
-    });
-
-    describe('get storage', function() {
-      it('tells the value stored at a certain storage slot', async function() {
-        await this.impl.methods.initialize(32, 'hello', [1, 2, 3]).send();
-        const storage = await ZWeb3.getStorageAt(this.impl.address, 0);
-        storage.should.be.equal('0x20');
-      });
-    });
-
-    describe('estimate gas', function() {
-      it('can estimate the gas of a call', async function() {
-        const { gasUsed: expectedGas } = this.impl.deployment.transactionReceipt;
-        const gas = await ZWeb3.eth.estimateGas({ data: this.DummyImplementation.schema.linkedBytecode });
-        gas.should.be.equal(expectedGas);
-      });
-    });
-
     describe('transactions', function() {
       beforeEach('sending transaction', async function() {
         const value = new BN(1e18).toString(10);
         this.receiverBalanceTracker = await balance.tracker(receiverAccount);
         const receipt = await ZWeb3.eth.sendTransaction({ from: accounts[0], to: receiverAccount, value });
         this.txHash = receipt.transactionHash;
-      });
-
-      describe('send transaction', function() {
-        it('can send a transaction', async function() {
-          // Note that BN here is bignumber.js, _not_ bn.js
-          (await this.receiverBalanceTracker.delta()).should.be.bignumber.equal(new BN(1e18).toString(10));
-        });
-      });
-
-      describe('get transaction', function() {
-        it('can estimate the gas of a call', async function() {
-          const transaction = await ZWeb3.eth.getTransaction(this.txHash);
-
-          transaction.should.be.an('object');
-          transaction.value.should.be.eq((1e18).toString());
-          transaction.from.should.be.eq(accounts[0]);
-          transaction.to.should.be.eq(receiverAccount);
-          transaction.nonce.should.not.be.null;
-          transaction.blockNumber.should.not.be.null;
-          transaction.blockHash.should.not.be.null;
-          transaction.gas.should.not.be.null;
-          transaction.gasPrice.should.not.be.null;
-          transaction.hash.should.be.eq(this.txHash);
-        });
-      });
-
-      describe('get transaction receipt', function() {
-        it('can estimate the gas of a call', async function() {
-          const receipt = await ZWeb3.eth.getTransactionReceipt(this.txHash);
-
-          receipt.should.be.an('object');
-          receipt.logs.should.not.be.null;
-          receipt.blockNumber.should.not.be.null;
-          receipt.blockHash.should.not.be.null;
-          receipt.gasUsed.should.not.be.null;
-          receipt.transactionHash.should.not.be.null;
-        });
       });
 
       describe('get transaction receipt with timeout', function() {
