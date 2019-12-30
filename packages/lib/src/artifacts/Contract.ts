@@ -125,7 +125,7 @@ function _wrapContractInstance(schema: any, web3instance: Web3Contract): Contrac
 }
 
 export function createContract(schema: any): Contract {
-  const contract = ZWeb3.contract(schema.abi, null, Contracts.getArtifactsDefaults());
+  const contract = new ZWeb3.eth.Contract(schema.abi, null, Contracts.getArtifactsDefaults());
   return _wrapContractInstance(schema, contract);
 }
 

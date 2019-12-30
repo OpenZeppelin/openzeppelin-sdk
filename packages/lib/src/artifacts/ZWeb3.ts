@@ -71,10 +71,6 @@ export default class ZWeb3 {
     return ZWeb3.web3().version;
   }
 
-  public static contract(abi: any, atAddress?: string, options?: any): Contract {
-    return new ZWeb3.eth.Contract(abi, atAddress, options);
-  }
-
   public static async accounts(): Promise<string[]> {
     return await ZWeb3.eth.getAccounts();
   }
