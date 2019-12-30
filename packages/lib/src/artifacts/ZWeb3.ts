@@ -53,10 +53,6 @@ export default class ZWeb3 {
     return ZWeb3.web3instance;
   }
 
-  public static isHex(hex: string): boolean {
-    return Web3.utils.isHex(hex);
-  }
-
   public static async checkNetworkId(providedNetworkId?: string | number): Promise<void | never> {
     const networkId = await ZWeb3.getNetwork();
     if (

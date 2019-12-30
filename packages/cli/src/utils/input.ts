@@ -3,7 +3,7 @@ import flattenDeep from 'lodash.flattendeep';
 import { encodeParams, Loggy, ZWeb3 } from '@openzeppelin/upgrades';
 import { MethodArgType } from '../prompts/prompt';
 import zipWith from 'lodash.zipwith';
-import { isAddress } from 'web3-utils';
+import { isAddress, isHex } from 'web3-utils';
 
 // TODO: Deprecate in favor of a combination of parseArg and parseArray
 export function parseArgs(args: string): string[] | never {
@@ -97,7 +97,7 @@ export function parseArg(input: string | string[], { type, components }: MethodA
 
   // Bytes: same, just check they are a valid hex
   else if (type.startsWith('bytes') && requireInputString(input)) {
-    if (!ZWeb3.isHex(input)) {
+    if (!isHex(input)) {
       throw new Error(`${input} is not a valid hexadecimal`);
     }
     return input;
