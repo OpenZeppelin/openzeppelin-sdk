@@ -88,112 +88,93 @@ export type AnyNode = Node | VariableDeclaration | FunctionDefinition | EventDef
 
 const isASTNode = nodeSchemaValidator.compile(astNodeSchema);
 
-function throwIfInvalidNode(node: AnyNode) {
+export function throwIfInvalidNode(node: AnyNode) {
   if (!isASTNode(node)) {
     throw new Error(util.inspect(node) + ' is not a valid AST node.');
   }
 }
 
-function isContractKind(node: ContractDefinition, kind: ContractKind) {
+export function isContractKind(node: ContractDefinition, kind: ContractKind) {
   return node.contractKind === kind;
 }
 
-function isInterface(node: ContractDefinition) {
+export function isInterface(node: ContractDefinition) {
   return isContractKind(node, 'interface');
 }
 
-function isContract(node: ContractDefinition) {
+export function isContract(node: ContractDefinition) {
   return isContractKind(node, 'contract');
 }
 
-function isNodeType(node: Node, name: NodeType) {
+export function isNodeType(node: Node, name: NodeType) {
   return node.nodeType === name;
 }
 
-function isImportDirective(node: Node) {
+export function isImportDirective(node: Node) {
   return isNodeType(node, 'ImportDirective');
 }
 
-function isVarDeclaration(node: Node) {
+export function isVarDeclaration(node: Node) {
   return isNodeType(node, 'VariableDeclaration');
 }
 
-function isContractType(node: Node) {
+export function isContractType(node: Node) {
   return isNodeType(node, 'ContractDefinition');
 }
 
-function isPragmaDirective(node: Node) {
+export function isPragmaDirective(node: Node) {
   return isNodeType(node, 'PragmaDirective');
 }
 
-function idModifierInvocation(node: Node) {
+export function idModifierInvocation(node: Node) {
   return isNodeType(node, 'ModifierInvocation');
 }
 
-function getSourceIndices(node: Node) {
+export function getSourceIndices(node: Node) {
   return node.src
     .split(':')
     .map(val => parseInt(val))
     .slice(0, 2);
 }
 
-function getNodeSources(node: Node, source: string) {
+export function getNodeSources(node: Node, source: string) {
   const [start, len] = getSourceIndices(node);
   return [start, len, source.slice(start, start + len)];
 }
 
-function getNode(node: Node, predicate: (node: AnyNode) => boolean) {
+export function getNode(node: Node, predicate: (node: AnyNode) => boolean) {
   return find(node.nodes, predicate);
 }
 
-function getNodes(node: Node, predicate: (node: AnyNode) => boolean) {
-  return node.nodes && node.nodes.filter(predicate);
+export function getNodes(node: Node, predicate: (node: AnyNode) => boolean) {
+  if (!node.nodes) throw new Error('No has to have nodes defined');
+  return node.nodes.filter(predicate);
 }
 
-function getImportDirectives(node: Node) {
+export function getImportDirectives(node: Node) {
   return getNodes(node, isImportDirective);
 }
 
-function getPragmaDirectives(node: Node) {
+export function getPragmaDirectives(node: Node) {
   return getNodes(node, isPragmaDirective);
 }
 
-function getVarDeclarations(node: Node) {
+export function getVarDeclarations(node: Node) {
   return getNodes(node, isVarDeclaration);
 }
 
-function getContracts(node: Node) {
+export function getContracts(node: Node) {
   return getNodes(node, isContractType);
 }
 
-function getConstructor(node: FunctionDefinition) {
+export function getConstructor(node: FunctionDefinition) {
   return getNode(node, node => (node as FunctionDefinition).kind === 'constructor');
 }
 
-function getContract(node: ContractDefinition, contractName: string) {
+export function getContract(node: ContractDefinition, contractName: string) {
   return getNode(node, node => (node as ContractDefinition).name === contractName);
 }
 
-function getContractById(node: Node, id: number) {
+export function getContractById(node: Node, id: number) {
   return getNode(node, node => node.id === id);
 }
-
-module.exports = {
-  isASTNode,
-  getNode,
-  getConstructor,
-  getContract,
-  getContractById,
-  getSourceIndices,
-  getNodeSources,
-  isPragmaDirective,
-  isImportDirective,
-  getImportDirectives,
-  getPragmaDirectives,
-  getVarDeclarations,
-  getContracts,
-  idModifierInvocation,
-  isContract,
-  isInterface,
-  throwIfInvalidNode,
-};
