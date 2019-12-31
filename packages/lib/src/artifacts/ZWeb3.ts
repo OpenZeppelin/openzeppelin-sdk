@@ -1,9 +1,8 @@
 import { Loggy } from '../utils/Logger';
 import sleep from '../helpers/sleep';
 import Web3 from 'web3';
-import { TransactionReceipt, Transaction } from 'web3-core';
+import { TransactionReceipt, provider } from 'web3-core';
 import { Block, Eth } from 'web3-eth';
-import { Contract } from 'web3-eth-contract';
 import { toChecksumAddress } from 'web3-utils';
 
 // Reference: see https://github.com/ethereum/EIPs/blob/master/EIPS/eip-155.md#list-of-chain-ids
@@ -30,24 +29,21 @@ declare module 'web3-eth' {
   }
 }
 
-// TS-TODO: Type Web3.
 // TS-TODO: Review what could be private in this class.
 export default class ZWeb3 {
-  public static provider;
+  public static provider: provider;
 
-  public static web3instance;
+  public static web3instance: Web3;
 
-  public static initialize(provider: any): void {
+  public static initialize(provider: provider): void {
     ZWeb3.provider = provider;
     ZWeb3.web3instance = undefined;
   }
 
-  public static web3(forceReinit = false): any {
-    if (ZWeb3.web3instance && !forceReinit) return ZWeb3.web3instance;
-    if (!ZWeb3.provider) {
-      ZWeb3.web3instance = new Web3(null);
-      return ZWeb3.web3instance;
-    } else ZWeb3.web3instance = new Web3(ZWeb3.provider);
+  public static web3(forceReinit = false): Web3 {
+    if (ZWeb3.web3instance === undefined || forceReinit) {
+      ZWeb3.web3instance = new Web3(ZWeb3.provider ?? null);
+    }
 
     return ZWeb3.web3instance;
   }
@@ -83,7 +79,9 @@ export default class ZWeb3 {
         throw Error(
           `Given address \"${address}\" is not a valid Ethereum address or it has not been checksummed correctly.`,
         );
-      } else return address;
+      } else {
+        return address;
+      }
     } else {
       Loggy.noSpin.warn(
         __filename,
@@ -127,10 +125,13 @@ export default class ZWeb3 {
   }
 
   public static sendTransactionWithoutReceipt(params: TxParams): Promise<string> {
-    return new Promise((resolve, reject) => {
-      ZWeb3.eth.sendTransaction({ ...params }, (error, txHash) => {
-        if (error) reject(error.message);
-        else resolve(txHash);
+    return new Promise((resolve, reject): void => {
+      ZWeb3.eth.sendTransaction({ ...params }, (error, txHash): void => {
+        if (error) {
+          reject(error.message);
+        } else {
+          resolve(txHash);
+        }
       });
     });
   }
@@ -143,8 +144,8 @@ export default class ZWeb3 {
     tx: string,
     timeout: number,
     startTime: number,
-  ): Promise<TransactionReceipt | never> {
-    const receipt: any = await ZWeb3._tryGettingTransactionReceipt(tx);
+  ): Promise<TransactionReceipt | undefined> {
+    const receipt = await ZWeb3._tryGettingTransactionReceipt(tx);
     if (receipt) {
       if (receipt.status) return receipt;
       throw new Error(`Transaction: ${tx} exited with an error (status 0).`);
@@ -156,12 +157,15 @@ export default class ZWeb3 {
     throw new Error(`Transaction ${tx} wasn't processed in ${timeout / 1000} seconds`);
   }
 
-  private static async _tryGettingTransactionReceipt(tx: string): Promise<TransactionReceipt | never> {
+  private static async _tryGettingTransactionReceipt(tx: string): Promise<TransactionReceipt | undefined> {
     try {
       return await ZWeb3.eth.getTransactionReceipt(tx);
     } catch (error) {
-      if (error.message.includes('unknown transaction')) return null;
-      else throw error;
+      if (error.message.includes('unknown transaction')) {
+        return undefined;
+      } else {
+        throw error;
+      }
     }
   }
 }
