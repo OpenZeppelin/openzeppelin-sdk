@@ -285,7 +285,7 @@ describe('Transactions', function() {
           });
 
           it('retries estimating gas', async function() {
-            const stub = sinon.stub(ZWeb3, 'estimateGas');
+            const stub = sinon.stub(ZWeb3.eth, 'estimateGas');
             times(3, i =>
               stub.onCall(i).throws('Error', 'gas required exceeds allowance or always failing transaction'),
             );
@@ -296,7 +296,7 @@ describe('Transactions', function() {
           });
 
           it('retries estimating gas up to 3 times', async function() {
-            const stub = sinon.stub(ZWeb3, 'estimateGas');
+            const stub = sinon.stub(ZWeb3.eth, 'estimateGas');
             times(4, i =>
               stub.onCall(i).throws('Error', 'gas required exceeds allowance or always failing transaction'),
             );
@@ -459,7 +459,7 @@ describe('Transactions', function() {
           });
 
           it('retries estimating gas', async function() {
-            const stub = sinon.stub(ZWeb3, 'estimateGas');
+            const stub = sinon.stub(ZWeb3.eth, 'estimateGas');
             times(3, i =>
               stub.onCall(i).throws('Error', 'gas required exceeds allowance or always failing transaction'),
             );
@@ -471,7 +471,7 @@ describe('Transactions', function() {
           });
 
           it('retries estimating gas up to 3 times', async function() {
-            const stub = sinon.stub(ZWeb3, 'estimateGas');
+            const stub = sinon.stub(ZWeb3.eth, 'estimateGas');
             times(4, i =>
               stub.onCall(i).throws('Error', 'gas required exceeds allowance or always failing transaction'),
             );
@@ -714,7 +714,7 @@ describe('Transactions', function() {
             });
 
             it('retries estimating gas', async function() {
-              const stub = sinon.stub(ZWeb3, 'estimateGas');
+              const stub = sinon.stub(ZWeb3.eth, 'estimateGas');
               times(3, i =>
                 stub.onCall(i).throws('Error', 'gas required exceeds allowance or always failing transaction'),
               );
@@ -725,7 +725,7 @@ describe('Transactions', function() {
             });
 
             it('retries estimating gas up to 3 times', async function() {
-              const stub = sinon.stub(ZWeb3, 'estimateGas');
+              const stub = sinon.stub(ZWeb3.eth, 'estimateGas');
               times(4, i =>
                 stub.onCall(i).throws('Error', 'gas required exceeds allowance or always failing transaction'),
               );

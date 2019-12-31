@@ -83,7 +83,7 @@ describe('ZWeb3', function() {
 
         describe('when the transaction receipt takes less than the specified timeout', function() {
           beforeEach('stub ZWeb3', function() {
-            sinon.stub(ZWeb3, 'getTransactionReceipt').resolves(this.receipt);
+            sinon.stub(ZWeb3.eth, 'getTransactionReceipt').resolves(this.receipt);
           });
 
           it('returns the transaction receipt', async function() {
@@ -94,7 +94,7 @@ describe('ZWeb3', function() {
 
         describe('when the transaction receipt fails continuously', function() {
           beforeEach('stub ZWeb3', function() {
-            sinon.stub(ZWeb3, 'getTransactionReceipt').throws('Error', 'unknown transaction');
+            sinon.stub(ZWeb3.eth, 'getTransactionReceipt').throws('Error', 'unknown transaction');
           });
 
           it('fails', async function() {
