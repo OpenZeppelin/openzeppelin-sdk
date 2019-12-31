@@ -21,11 +21,11 @@ describe('ZWeb3', function() {
 
   const shouldBehaveLikeWeb3Instance = (account, receiverAccount) => {
     it('initializes web3 with a provider', async function() {
-      ZWeb3.web3().currentProvider.should.not.be.null;
+      ZWeb3.web3.currentProvider.should.not.be.null;
     });
 
     it('knows a web3 instance', function() {
-      ZWeb3.web3().should.not.be.null;
+      ZWeb3.web3.should.not.be.null;
       ZWeb3.eth.should.not.be.null;
       ZWeb3.version.should.not.be.null;
     });
@@ -144,9 +144,9 @@ describe('ZWeb3', function() {
     context('when initializing without a provider', function() {
       it('initializes web3 without a provider', async function() {
         ZWeb3.initialize();
-        ZWeb3.web3().should.not.be.null;
+        ZWeb3.web3.should.not.be.null;
 
-        expect(ZWeb3.web3().currentProvider).to.be.null;
+        expect(ZWeb3.web3.currentProvider).to.be.null;
       });
     });
 

@@ -40,8 +40,8 @@ export default class ZWeb3 {
     ZWeb3.web3instance = undefined;
   }
 
-  public static web3(forceReinit = false): Web3 {
-    if (ZWeb3.web3instance === undefined || forceReinit) {
+  public static get web3(): Web3 {
+    if (ZWeb3.web3instance === undefined) {
       ZWeb3.web3instance = new Web3(ZWeb3.provider ?? null);
     }
 
@@ -60,11 +60,11 @@ export default class ZWeb3 {
   }
 
   public static get eth(): Eth {
-    return ZWeb3.web3().eth;
+    return ZWeb3.web3.eth;
   }
 
   public static get version(): string {
-    return ZWeb3.web3().version;
+    return ZWeb3.web3.version;
   }
 
   public static async defaultAccount(): Promise<string> {
