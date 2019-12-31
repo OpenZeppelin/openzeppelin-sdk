@@ -3,283 +3,179 @@ import Ajv from 'ajv';
 import util from 'util';
 import astNodeSchema from './schemas/ast-node';
 
-let nodeSchemaValidator = new Ajv({ allErrors: true });
+const nodeSchemaValidator = new Ajv({ allErrors: true });
 
-/**
- * Check if given argument is an AST Node
- * @param {Object} possibleObject Argument to check for validity
- * @returns {Boolean} isAValidASTNode true if given argument is an AST node, false otherwise
- */
+export type NodeType =
+  | 'SourceUnit'
+  | 'ImportDirective'
+  | 'VariableDeclaration'
+  | 'ContractDefinition'
+  | 'ModifierInvocation'
+  | 'FunctionDefinition'
+  | 'EventDefinition'
+  | 'ModifierDefinition'
+  | 'PragmaDirective';
+
+export interface Node {
+  id: number;
+  nodeType: NodeType;
+  src: string;
+  nodes?: AnyNode[];
+}
+
+export interface SourceUnit extends Node {
+  nodeType: 'SourceUnit';
+}
+
+export type ContractKind = 'contract' | 'interface';
+
+export interface ContractDefinition extends Node {
+  nodeType: 'ContractDefinition';
+  id: number;
+  name: string;
+  documentation: string | null;
+  linearizedBaseContracts: number[];
+  contractKind: ContractKind;
+}
+
+export interface VariableDeclaration extends Node {
+  nodeType: 'VariableDeclaration';
+  visibility: 'internal' | 'public' | 'private';
+  name: string;
+  constant: boolean;
+  typeName: TypeName;
+}
+
+export interface FunctionDefinition extends Node {
+  nodeType: 'FunctionDefinition';
+  kind: 'function' | 'constructor' | 'fallback';
+  visibility: 'internal' | 'external' | 'public' | 'private';
+  name: string;
+  documentation: string | null;
+  parameters: ParameterList;
+  returnParameters: ParameterList;
+}
+
+export interface EventDefinition extends Node {
+  nodeType: 'EventDefinition';
+  name: string;
+  documentation: string | null;
+  parameters: ParameterList;
+}
+
+export interface ModifierDefinition extends Node {
+  nodeType: 'ModifierDefinition';
+  name: string;
+  documentation: string | null;
+  parameters: ParameterList;
+}
+
+export interface ParameterList {
+  parameters: {
+    name: string;
+    typeName: TypeName;
+  }[];
+}
+
+export interface TypeName {
+  nodeType: 'ElementaryTypeName' | 'UserDefinedTypeName';
+  typeDescriptions: {
+    typeString: string;
+  };
+}
+
+export type AnyNode = Node | VariableDeclaration | FunctionDefinition | EventDefinition | ModifierDefinition;
+
 const isASTNode = nodeSchemaValidator.compile(astNodeSchema);
 
-// For internal use. Throws if is passed an invalid AST node, else does nothing.
-function throwIfInvalidNode(node) {
+function throwIfInvalidNode(node: AnyNode) {
   if (!isASTNode(node)) {
     throw new Error(util.inspect(node) + ' is not a valid AST node.');
   }
 }
 
-function isContractKind(node, kind) {
-  throwIfInvalidNode(node);
-  return node['contractKind'] === kind;
+function isContractKind(node: ContractDefinition, kind: ContractKind) {
+  return node.contractKind === kind;
 }
 
-function isInterface(node) {
+function isInterface(node: ContractDefinition) {
   return isContractKind(node, 'interface');
 }
 
-function isInterface(node) {
-  return isContractKind(node, 'interface');
-}
-
-function isContract(node) {
+function isContract(node: ContractDefinition) {
   return isContractKind(node, 'contract');
 }
 
-/**
- * @param {Object} node The node to check
- * @param {String} name The type of the node
- * @returns {Boolean} true if the given node is the right type
- */
-function isNodeType(node, name) {
-  throwIfInvalidNode(node);
-  return node['nodeType'] === name;
+function isNodeType(node: Node, name: NodeType) {
+  return node.nodeType === name;
 }
 
-function isImportDirective(node) {
+function isImportDirective(node: Node) {
   return isNodeType(node, 'ImportDirective');
 }
 
-function isVarDeclaration(node) {
+function isVarDeclaration(node: Node) {
   return isNodeType(node, 'VariableDeclaration');
 }
 
-function isContractType(node) {
+function isContractType(node: Node) {
   return isNodeType(node, 'ContractDefinition');
 }
 
-function isPragmaDirective(node) {
+function isPragmaDirective(node: Node) {
   return isNodeType(node, 'PragmaDirective');
 }
 
-function idModifierInvocation(node) {
+function idModifierInvocation(node: Node) {
   return isNodeType(node, 'ModifierInvocation');
 }
 
-/**
- * @param {Object} node The node to check
- * @returns {Boolean} true if the given node is an BlockStatement
- */
-function isBlockStatement(node) {
-  return isNodeType(node, 'BlockStatement');
-}
-
-/**
- * @param {Object} node The node to check
- * @returns {Boolean} true if the given node is an BreakStatement
- */
-function isBreakStatement(node) {
-  return isNodeType(node, 'BreakStatement');
-}
-
-/**
- * @param {Object} node The node to check
- * @returns {Boolean} true if the given node is an ExpressionStatement
- */
-function isExpression(node) {
-  return isNodeType(node, 'ExpressionStatement');
-}
-
-/**
- * @param {Object} node The node to check
- * @returns {Boolean} true if the given node is an AssignmentStatement
- */
-function isAssignment(node) {
-  return isNodeType(node, 'AssignmentExpression');
-}
-
-/**
- * @param {Object} node The node to check
- * @returns {Boolean} true if the given node is an UpdateExpression
- */
-function isUpdate(node) {
-  return isNodeType(node, 'UpdateExpression');
-}
-
-/**
- * @param {Object} node The node to check
- * @returns {Boolean} true if the given node is an MemberExpression
- */
-function isMember(node) {
-  return isNodeType(node, 'MemberExpression');
-}
-
-/**
- * @param {Object} node The node to check
- * @returns {Boolean} true if the given node is an IfStatement
- */
-function isIfStatement(node) {
-  return isNodeType(node, 'IfStatement');
-}
-
-/**
- * @param {Object} node The node to check
- * @returns {Boolean} true if the given node is a type of loop statement
- */
-function isLoopStatement(node) {
-  return ['ForStatement', 'WhileStatement', 'DoWhileStatement'].indexOf(node['type']) >= 0;
-}
-
-/**
- * Determine whether a given node is a child of another given node
- * @param {Object} potentialChild AST Node to be tested for child
- * @param {Object} potentialParent AST Node to be tested for parent
- * @returns {Bool} true if potentialChild is indeed a child of potentialParent, false otherwise
- */
-function isAChildOf(potentialChild, potentialParent) {
-  throwIfInvalidNode(potentialChild);
-  throwIfInvalidNode(potentialParen);
-
-  // Note that if the start or end pos of both nodes is same,
-  // then they're considered to be the same node and DON'T have parent-child relationship.
-  return potentialChild.start > potentialParent.start && potentialChild.end < potentialParent.end;
-}
-
-function getSourceIndices(node) {
+function getSourceIndices(node: Node) {
   return node.src
     .split(':')
     .map(val => parseInt(val))
     .slice(0, 2);
 }
 
-function getNodeSources(node, source) {
+function getNodeSources(node: Node, source: string) {
   const [start, len] = getSourceIndices(node);
   return [start, len, source.slice(start, start + len)];
 }
 
-/**
- * Search for the node to satisfy a specified predicate
- * @param {Object} node The AST Node to start search from
- * @returns {Object} nodeResult Result of the search
- */
-function getNode(node, predicate) {
-  throwIfInvalidNode(node);
+function getNode(node: Node, predicate: (node: AnyNode) => boolean) {
   return find(node.nodes, predicate);
 }
 
-function getNodes(node, predicate) {
-  throwIfInvalidNode(node);
-  return node.nodes.filter(predicate);
+function getNodes(node: Node, predicate: (node: AnyNode) => boolean) {
+  return node.nodes && node.nodes.filter(predicate);
 }
 
-function getImportDirectives(node) {
+function getImportDirectives(node: Node) {
   return getNodes(node, isImportDirective);
 }
 
-function getPragmaDirectives(node) {
+function getPragmaDirectives(node: Node) {
   return getNodes(node, isPragmaDirective);
 }
 
-function getVarDeclarations(node) {
+function getVarDeclarations(node: Node) {
   return getNodes(node, isVarDeclaration);
 }
 
-function getContracts(node) {
+function getContracts(node: Node) {
   return getNodes(node, isContractType);
 }
 
-/**
- * Search for the constructor node
- * @param {Object} node The AST Node to start search from
- * @returns {Object} nodeResult Result of the search
- */
-function getConstructor(node) {
-  return getNode(node, ['kind', 'constructor']);
+function getConstructor(node: FunctionDefinition) {
+  return getNode(node, node => (node as FunctionDefinition).kind === 'constructor');
 }
 
-/**
- * Search for the contract node by name
- * @param {Object} node The AST Node to start search from
- * @returns {Object} nodeResult Result of the search
- */
-function getContract(node, contractName) {
-  return getNode(node, ['name', contractName]);
+function getContract(node: ContractDefinition, contractName: string) {
+  return getNode(node, node => (node as ContractDefinition).name === contractName);
 }
 
-function getContractById(node, id) {
-  return getNode(node, ['id', id]);
-}
-
-/**
- * Get the parent node of the specified node
- * @param {Object} node The AST Node to retrieve the parent of
- * @returns {Object} nodeParent Parent node of the given node
- */
-function getParent(node) {
-  throwIfInvalidNode(node);
-  return node.parent;
-}
-
-/**
- * Retrieve the line number on which the code for provided node STARTS
- * @param {Object} node The AST Node to retrieve the line number of
- * @returns {Integer} lineNumber Line number of code of the specified node. (LINES BEGIN FROM 1)
- */
-function getLine(node, sourceCodeText) {
-  throwIfInvalidNode(node, 'getLine');
-
-  let newLineCharsBefore = sourceCodeText.slice(0, node.start).match(/\n/g);
-
-  return (newLineCharsBefore ? newLineCharsBefore.length : 0) + 1;
-}
-
-/**
- * Retrieve the column number of the first character of the given node
- * @param {Object} node The AST Node to retrieve the column number of
- * @returns {Integer} columnNumber Column number of code of the specified node (COLUMNS BEGIN FROM 0)
- */
-function getColumn(node, sourceCodeText) {
-  throwIfInvalidNode(node);
-
-  //start looking from sourceCodeText [node.start] and stop upon encountering the first linebreak character
-  for (let i = node.start; i >= 0; i--) {
-    if (sourceCodeText[i] === '\n') {
-      return node.start - i - 1;
-    }
-  }
-
-  return node.start;
-}
-
-/**
- * Retrieve the line number on which the code for provided node ENDS
- * @param {Object} node The AST Node to retrieve the line number of
- * @returns {int} lineNumber Line number of code ending of the specified node. (LINES BEGIN FROM 1)
- */
-function getEndingLine(node, sourceCodeText) {
-  throwIfInvalidNode(node);
-
-  let newLineCharsBefore = sourceCodeText.slice(0, node.end).match(/\n/g);
-
-  return (newLineCharsBefore ? newLineCharsBefore.length : 0) + 1;
-}
-
-/**
- * Retrieve the column number of the last character that is part of the given node
- * @param {Object} node The AST Node to retrieve the ending column number of
- * @returns {Integer} columnNumber Column number of last char of the specified node (COLUMNS BEGIN FROM 0)
- */
-function getEndingColumn(node, sourceCodeText) {
-  throwIfInvalidNode(node);
-
-  //start looking from 1 character before node.start and stop upon encountering the first linebreak character
-  for (let i = node.end - 1; i >= 0; i--) {
-    if (sourceCodeText[i] === '\n') {
-      return node.end - i - 2;
-    }
-  }
-
-  return node.end - 1;
+function getContractById(node: Node, id: number) {
+  return getNode(node, node => node.id === id);
 }
 
 module.exports = {
@@ -299,4 +195,5 @@ module.exports = {
   idModifierInvocation,
   isContract,
   isInterface,
+  throwIfInvalidNode,
 };
