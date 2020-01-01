@@ -93,7 +93,7 @@ export function getVarDeclarations(node: Node) {
 }
 
 export function getContracts(node: Node) {
-  return getNodes(node, isContractType);
+  return getNodes(node, isContractType) as ContractDefinition[];
 }
 
 export function getConstructor(node: ContractDefinition) {
