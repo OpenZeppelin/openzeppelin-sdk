@@ -107,6 +107,13 @@ export interface ElementaryTypeName extends Node {
   };
 }
 
+export interface ImportDirective extends Node {
+  nodeType: 'ImportDirective';
+  sourceUnit: number;
+  file: string;
+  absolutePath: string;
+}
+
 export interface ParameterList {
   parameters: {
     name: string;

@@ -2,7 +2,16 @@ import find from 'lodash.find';
 import Ajv from 'ajv';
 import util from 'util';
 import astNodeSchema from './schemas/ast';
-import { AnyNode, Node, ContractKind, ContractDefinition, NodeType, FunctionDefinition, SourceUnit } from './ast-node';
+import {
+  AnyNode,
+  Node,
+  ContractKind,
+  ContractDefinition,
+  ImportDirective,
+  NodeType,
+  FunctionDefinition,
+  SourceUnit,
+} from './ast-node';
 
 const nodeSchemaValidator = new Ajv({ allErrors: true });
 
@@ -67,12 +76,12 @@ export function getNode(node: Node, predicate: (node: Node) => boolean) {
 }
 
 export function getNodes(node: Node, predicate: (node: AnyNode) => boolean) {
-  if (!node.nodes) throw new Error('No has to have nodes defined');
+  if (!node.nodes) throw new Error('Node has to have nodes defined');
   return node.nodes.filter(predicate);
 }
 
 export function getImportDirectives(node: Node) {
-  return getNodes(node, isImportDirective);
+  return getNodes(node, isImportDirective) as ImportDirective[];
 }
 
 export function getPragmaDirectives(node: Node) {
