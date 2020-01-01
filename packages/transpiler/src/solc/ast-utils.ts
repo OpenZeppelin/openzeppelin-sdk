@@ -66,7 +66,7 @@ export function getSourceIndices(node: Node) {
     .slice(0, 2);
 }
 
-export function getNodeSources(node: Node, source: string) {
+export function getNodeSources(node: Node, source: string): [number, number, string] {
   const [start, len] = getSourceIndices(node);
   return [start, len, source.slice(start, start + len)];
 }
