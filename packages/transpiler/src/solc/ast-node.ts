@@ -49,6 +49,7 @@ export interface VariableDeclaration extends Node {
   name: string;
   constant: boolean;
   typeName: ElementaryTypeName;
+  value?: Literal;
 }
 
 export interface FunctionDefinition extends Node {

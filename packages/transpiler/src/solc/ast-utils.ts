@@ -8,6 +8,7 @@ import {
   ContractKind,
   ContractDefinition,
   ImportDirective,
+  VariableDeclaration,
   NodeType,
   FunctionDefinition,
   SourceUnit,
@@ -89,7 +90,7 @@ export function getPragmaDirectives(node: Node) {
 }
 
 export function getVarDeclarations(node: Node) {
-  return getNodes(node, isVarDeclaration);
+  return getNodes(node, isVarDeclaration) as VariableDeclaration[];
 }
 
 export function getContracts(node: Node) {
