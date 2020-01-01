@@ -1,4 +1,5 @@
-import { getImportDirectives, getPragmaDirectives, getSourceIndices, Node } from '../ast-utils';
+import { getImportDirectives, getPragmaDirectives, getSourceIndices } from '../solc/ast-utils';
+import { Node } from '../solc/ast-node';
 
 export function appendDirective(fileNode: Node, directive: string) {
   const retVal = {
