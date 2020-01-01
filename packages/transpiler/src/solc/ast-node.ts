@@ -10,8 +10,10 @@ export type NodeType =
   | 'InheritanceSpecifier'
   | 'Identifier'
   | 'Literal'
+  | 'Block'
   | 'ElementaryTypeName'
   | 'UserDefinedTypeName'
+  | 'ParameterList'
   | 'PragmaDirective';
 
 export interface Node {
@@ -35,6 +37,7 @@ export interface ContractDefinition extends Node {
   linearizedBaseContracts: number[];
   contractKind: ContractKind;
   baseContracts: InheritanceSpecifier[];
+  fullyImplemented: boolean;
 }
 
 export interface InheritanceSpecifier extends Node {
@@ -61,6 +64,7 @@ export interface FunctionDefinition extends Node {
   parameters: ParameterList;
   returnParameters: ParameterList;
   modifiers: ModifierInvocation[];
+  body: Block;
 }
 
 export interface EventDefinition extends Node {
@@ -115,11 +119,13 @@ export interface ImportDirective extends Node {
   absolutePath: string;
 }
 
-export interface ParameterList {
-  parameters: {
-    name: string;
-    typeName: ElementaryTypeName;
-  }[];
+export interface Block extends Node {
+  nodeType: 'Block';
+}
+
+export interface ParameterList extends Node {
+  nodeType: 'ParameterList';
+  parameters: VariableDeclaration[];
 }
 
 export type AnyNode = Node | VariableDeclaration | FunctionDefinition | EventDefinition | ModifierDefinition;
