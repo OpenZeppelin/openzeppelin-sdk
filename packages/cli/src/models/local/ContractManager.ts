@@ -18,7 +18,7 @@ export default class ContractManager {
       return Contracts.getFromLocal(contractName);
     } else {
       const dependency = new Dependency(packageName);
-      const contractName = dependency.projectFile.contract(contractAlias);
+      const contractName = dependency.projectFile.translateMaybeAlias(contractAlias);
       return Contracts.getFromNodeModules(packageName, contractName);
     }
   }

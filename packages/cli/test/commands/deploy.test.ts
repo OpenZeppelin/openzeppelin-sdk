@@ -105,25 +105,17 @@ describe('deploy (action)', function() {
     instances.should.have.lengthOf(1);
   });
 
-  it.skip('should deploy a contract from a package', async function() {
-    const contract = 'mock-stdlib/GreeterImpl';
-    await deploy(contract, [], {
+  it('should deploy a contract from a dependency', async function() {
+    await deploy('mock-stdlib-undeployed/GreeterBase', [], {
       network,
       txParams,
       networkFile: this.networkFile,
     });
-    const instances = this.networkFile.getProxies({ contract });
+    const instances = this.networkFile.getProxies({ contract: 'GreeterBase' });
     instances.should.have.lengthOf(1);
-
-    // const instanceInfo = instances[0];
-    // instanceInfo.kind.should.equal(ProxyType.NonProxy);
-    // const instance = SimpleNonUpgradeable.at(instanceInfo.address);
-    // (await instance.methods.answer().call()).should.equal('42');
   });
 
   // see push tests for reference
-  // local libraries
-  // dependencies
   // test with alias
   // custom gasprice in txparams
   // saved in truffle artifact

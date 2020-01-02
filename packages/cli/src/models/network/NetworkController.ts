@@ -692,16 +692,24 @@ export default class NetworkController {
 
   public async createInstance(packageName: string, contractAlias: string, initArgs: unknown[]): Promise<Contract> {
     await this.migrateManifestVersionIfNeeded();
-    if (!packageName) packageName = this.projectFile.name;
 
-    await this.deployChangedSolidityLibs(contractAlias);
+    if (!packageName) {
+      packageName = this.projectFile.name;
+    }
+
+    // TODO: Fix for contracts from dependencies that may use libraries.
+    if (packageName === this.projectFile.name) {
+      await this.deployChangedSolidityLibs(contractAlias);
+    }
 
     const contract = this.contractManager.getContractClass(packageName, contractAlias);
     await this._setSolidityLibs(contract);
 
     const instance = await Transactions.deployContract(contract, initArgs, this.txParams);
 
-    await this._updateTruffleDeployedInformation(contractAlias, instance);
+    if (packageName === this.projectFile.name) {
+      await this._updateTruffleDeployedInformation(contractAlias, instance);
+    }
 
     this.networkFile.addProxy(packageName, contractAlias, {
       address: instance.address,
