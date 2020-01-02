@@ -73,7 +73,7 @@ export function transformConstructor(
         }`
     : '';
 
-  const [start, len, contractSource] = getNodeSources(contractNode, source);
+  const [start, , contractSource] = getNodeSources(contractNode, source);
 
   const match = /\bcontract[^\{]*{/.exec(contractSource);
   if (!match) throw new Error(`Can't find contract pattern in ${contractSource}`);
