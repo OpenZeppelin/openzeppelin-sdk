@@ -94,6 +94,17 @@ describe('deploy (action)', function() {
     instances.should.have.lengthOf(0);
   });
 
+  it('should deploy libraries if necessary', async function() {
+    const contract = 'WithLibraryNonUpgradeable';
+    await deploy(contract, [], {
+      network,
+      txParams,
+      networkFile: this.networkFile,
+    });
+    const instances = this.networkFile.getProxies({ contract });
+    instances.should.have.lengthOf(1);
+  });
+
   it.skip('should deploy a contract from a package', async function() {
     const contract = 'mock-stdlib/GreeterImpl';
     await deploy(contract, [], {

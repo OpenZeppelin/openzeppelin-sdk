@@ -125,6 +125,12 @@ export default class NetworkController {
     return this.project;
   }
 
+  public async deployChangedSolidityLibs(contractNames: string): Promise<void> {
+    const libNames = this._getAllSolidityLibNames([contractNames]);
+    const changedLibraries = this.getLibsToDeploy(libNames);
+    await this.uploadSolidityLibs(changedLibraries);
+  }
+
   // DeployerController
   public async push(reupload = false, force = false): Promise<void | never> {
     const changedLibraries = this._solidityLibsForPush(!reupload);
@@ -206,6 +212,16 @@ export default class NetworkController {
     return pipeline.reduce((xs, f) => f(xs), this.projectFile.contracts);
   }
 
+  private getLibsToDeploy(libNames: string[], onlyChanged = false): Contract[] {
+    return libNames
+      .map(libName => Contracts.getFromLocal(libName))
+      .filter(libClass => {
+        const hasSolidityLib = this.networkFile.hasSolidityLib(libClass.schema.contractName);
+        const hasChanged = this._hasSolidityLibChanged(libClass);
+        return !hasSolidityLib || !onlyChanged || hasChanged;
+      });
+  }
+
   // Contract model || SolidityLib model
   private _solidityLibsForPush(onlyChanged = false): Contract[] | never {
     const { contractNames, contractAliases } = this.projectFile;
@@ -217,13 +233,7 @@ export default class NetworkController {
       throw new Error(`Cannot upload libraries with the same name as a contract alias: ${clashes.join(', ')}`);
     }
 
-    return libNames
-      .map(libName => Contracts.getFromLocal(libName))
-      .filter(libClass => {
-        const hasSolidityLib = this.networkFile.hasSolidityLib(libClass.schema.contractName);
-        const hasChanged = this._hasSolidityLibChanged(libClass);
-        return !hasSolidityLib || !onlyChanged || hasChanged;
-      });
+    return this.getLibsToDeploy(libNames, onlyChanged);
   }
 
   // Contract model || SolidityLib model
@@ -239,8 +249,15 @@ export default class NetworkController {
     const libName = libClass.schema.contractName;
     await this._setSolidityLibs(libClass); // Libraries may depend on other libraries themselves
     Loggy.spin(__filename, '_uploadSolidityLib', `upload-solidity-lib${libName}`, `Uploading ${libName} library`);
-    const libInstance = await this.project.setImplementation(libClass, libName);
-    this.networkFile.addSolidityLib(libName, libInstance);
+
+    if (this.project !== undefined) {
+      const libInstance = await this.project.setImplementation(libClass, libName);
+      this.networkFile.addSolidityLib(libName, libInstance);
+    } else {
+      const libInstance = await Transactions.deployContract(libClass);
+      this.networkFile.addSolidityLib(libName, libInstance);
+    }
+
     Loggy.succeed(`upload-solidity-lib${libName}`, `${libName} library uploaded`);
   }
 
@@ -302,7 +319,9 @@ export default class NetworkController {
   private async _unsetSolidityLib(libName: string): Promise<void | never> {
     try {
       Loggy.spin(__filename, '_unsetSolidityLib', `unset-solidity-lib-${libName}`, `Removing ${libName} library`);
-      await this.project.unsetImplementation(libName);
+      if (this.project !== undefined) {
+        await this.project.unsetImplementation(libName);
+      }
       this.networkFile.unsetSolidityLib(libName);
       Loggy.succeed(`unset-solidity-lib-${libName}`);
     } catch (error) {
@@ -674,6 +693,9 @@ export default class NetworkController {
   public async createInstance(packageName: string, contractAlias: string, initArgs: unknown[]): Promise<Contract> {
     await this.migrateManifestVersionIfNeeded();
     if (!packageName) packageName = this.projectFile.name;
+
+    await this.deployChangedSolidityLibs(contractAlias);
+
     const contract = this.contractManager.getContractClass(packageName, contractAlias);
     await this._setSolidityLibs(contract);
 
