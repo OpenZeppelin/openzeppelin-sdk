@@ -1,7 +1,12 @@
 import { getNodeSources } from '../solc/ast-utils';
 import { ContractDefinition } from '../solc/ast-node';
+import { Transformation } from '../transformation';
 
-export function transformContractName(contractNode: ContractDefinition, source: string, newName: string) {
+export function transformContractName(
+  contractNode: ContractDefinition,
+  source: string,
+  newName: string,
+): Transformation {
   const [start, , nodeSource] = getNodeSources(contractNode, source);
 
   const subStart = nodeSource.indexOf(contractNode.name);

@@ -4,7 +4,7 @@ import { getInheritanceChain } from '../solc/get-inheritance-chain';
 import { ContractDefinition, ModifierInvocation, Literal } from '../solc/ast-node';
 import { Artifact } from '../solc/artifact';
 
-function buildSuperCall(args: Literal[], name: string, source: string) {
+function buildSuperCall(args: Literal[], name: string, source: string): string {
   let superCall = `\n            ${name}Upgradable.__init(false`;
   if (args && args.length) {
     superCall += args.reduce((acc, arg) => {
@@ -21,7 +21,7 @@ function buildSuperCalls(
   contracts: string[],
   mods: ModifierInvocation[],
   contractsToArtifactsMap: Record<string, Artifact>,
-) {
+): (string | never[])[] {
   const hasInheritance = node.baseContracts.length;
   if (hasInheritance) {
     return [
@@ -55,7 +55,7 @@ export function buildSuperCallsForChain(
   source: string,
   contracts: string[],
   contractsToArtifactsMap: Record<string, Artifact>,
-) {
+): string {
   const chain = getInheritanceChain(contractNode.name, contractsToArtifactsMap);
   const mods = chain
     .map(base => {

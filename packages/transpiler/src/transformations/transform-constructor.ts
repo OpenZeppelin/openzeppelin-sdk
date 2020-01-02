@@ -1,10 +1,10 @@
 import { getVarDeclarations, getNodeSources, getConstructor } from '../solc/ast-utils';
-
+import { Transformation } from '../transformation';
 import { buildSuperCallsForChain } from './build-super-calls-for-chain';
 import { ContractDefinition } from '../solc/ast-node';
 import { Artifact } from '../solc/artifact';
 
-function getVarInits(contractNode: ContractDefinition, source: string) {
+function getVarInits(contractNode: ContractDefinition, source: string): string {
   const varDeclarations = getVarDeclarations(contractNode);
   return varDeclarations
     .filter(vr => vr.value && !vr.constant)
@@ -23,7 +23,7 @@ export function transformConstructor(
   source: string,
   contracts: string[],
   contractsToArtifactsMap: Record<string, Artifact>,
-) {
+): Transformation[] {
   const superCalls = buildSuperCallsForChain(contractNode, source, contracts, contractsToArtifactsMap);
 
   const declarationInserts = getVarInits(contractNode, source);
@@ -90,5 +90,5 @@ export function transformConstructor(
         ${constructorBodySource}
     }\n`,
     },
-  ].filter(tran => tran !== null);
+  ].filter(tran => tran !== null) as Transformation[];
 }

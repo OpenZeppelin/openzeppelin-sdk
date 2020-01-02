@@ -1,7 +1,8 @@
 import { getVarDeclarations, getNodeSources } from '../solc/ast-utils';
 import { ContractDefinition } from '../solc/ast-node';
+import { Transformation } from '../transformation';
 
-export function purgeVarInits(contractNode: ContractDefinition, source: string) {
+export function purgeVarInits(contractNode: ContractDefinition, source: string): Transformation[] {
   const varDeclarations = getVarDeclarations(contractNode);
   return varDeclarations
     .filter(vr => vr.value && !vr.constant)

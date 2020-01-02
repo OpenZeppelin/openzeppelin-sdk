@@ -1,7 +1,8 @@
 import { getImportDirectives, getSourceIndices } from '../solc/ast-utils';
 import { Artifact } from '../solc/artifact';
+import { Transformation } from '../transformation';
 
-export function fixImportDirectives(artifact: Artifact, artifacts: Artifact[], contracts: string[]) {
+export function fixImportDirectives(artifact: Artifact, artifacts: Artifact[], contracts: string[]): Transformation[] {
   const imports = getImportDirectives(artifact.ast);
   return imports.map(imp => {
     const [start, len] = getSourceIndices(imp);

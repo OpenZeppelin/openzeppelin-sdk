@@ -1,6 +1,6 @@
 import { Transformation } from './transformation';
 
-export function transpile(source: string, transformations: Transformation[]) {
+export function transpile(source: string, transformations: Transformation[]): string {
   let cursor = 0;
 
   const sorted = transformations.sort((a, b) => {

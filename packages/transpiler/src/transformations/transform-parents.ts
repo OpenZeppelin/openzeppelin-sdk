@@ -1,7 +1,12 @@
 import { getNodeSources } from '../solc/ast-utils';
 import { ContractDefinition } from '../solc/ast-node';
+import { Transformation } from '../transformation';
 
-export function transformParents(contractNode: ContractDefinition, source: string, contracts: string[]) {
+export function transformParents(
+  contractNode: ContractDefinition,
+  source: string,
+  contracts: string[],
+): Transformation[] {
   const hasInheritance = contractNode.baseContracts.length;
 
   if (hasInheritance) {

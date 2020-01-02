@@ -119,6 +119,10 @@ export interface ImportDirective extends Node {
   absolutePath: string;
 }
 
+export interface PragmaDirective extends Node {
+  nodeType: 'PragmaDirective';
+}
+
 export interface Block extends Node {
   nodeType: 'Block';
 }
