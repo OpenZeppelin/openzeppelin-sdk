@@ -54,7 +54,12 @@ export default class Contracts {
   }
 
   public static getNodeModulesPath(dependency: string, contractName: string): string {
-    return require.resolve(`${dependency}/build/contracts/${contractName}.json`, { paths: [this.getProjectRoot()] });
+    const root = this.getProjectRoot();
+    try {
+      return require.resolve(`${dependency}/build/contracts/${contractName}.json`, { paths: [root] });
+    } catch (e) {
+      throw new ContractNotFound(contractName, dependency);
+    }
   }
 
   public static getFromLocal(contractName: string): Contract {
