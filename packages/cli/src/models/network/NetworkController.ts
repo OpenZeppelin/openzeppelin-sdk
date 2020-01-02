@@ -986,7 +986,7 @@ export default class NetworkController {
         __filename,
         '_fetchOwnedProxies',
         `fetch-owned-proxies`,
-        `No contract instances that match${criteriaDescription} were found`,
+        `No upgradeable contract instances that match${criteriaDescription} were found`,
       );
       return [];
     }
