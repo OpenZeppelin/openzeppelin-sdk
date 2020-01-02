@@ -6,6 +6,8 @@ import difference from 'lodash.difference';
 import inquirer from 'inquirer';
 import { contractMethodsFromAbi, ContractMethodMutability as Mutability, ABI } from '@openzeppelin/upgrades';
 
+import { ContractNotFound } from '@openzeppelin/upgrades/lib/errors';
+
 import Session from '../models/network/Session';
 import ConfigManager from '../models/config/ConfigManager';
 import ProjectFile from '../models/files/ProjectFile';
@@ -230,10 +232,17 @@ function contractMethods(
 ): any[] {
   const { contract: contractAlias, package: packageName } = fromContractFullName(contractFullName);
   const contractManager = new ContractManager(projectFile);
-  if (!contractManager.hasContract(packageName, contractAlias)) return [];
-  const contract = contractManager.getContractClass(packageName, contractAlias);
 
-  return contractMethodsFromAbi(contract, constant);
+  try {
+    const contract = contractManager.getContractClass(packageName, contractAlias);
+    return contractMethodsFromAbi(contract, constant);
+  } catch (e) {
+    if (e instanceof ContractNotFound) {
+      return [];
+    } else {
+      throw e;
+    }
+  }
 }
 
 export function proxyInfo(contractInfo: any, network: string): any {

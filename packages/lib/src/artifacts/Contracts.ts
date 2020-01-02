@@ -5,6 +5,8 @@ import Contract, { createContract } from './Contract';
 import ZWeb3 from './ZWeb3';
 import { getSolidityLibNames, hasUnlinkedVariables } from '../utils/Bytecode';
 
+import { ContractNotFound } from '../errors';
+
 export default class Contracts {
   private static DEFAULT_SYNC_TIMEOUT = 240000;
   private static DEFAULT_BUILD_DIR = `build/contracts`;
@@ -105,7 +107,7 @@ export default class Contracts {
   private static _getFromPath(targetPath: string, contractName: string): Contract {
     // eslint-disable-next-line @typescript-eslint/no-var-requires
     if (!fs.existsSync(targetPath)) {
-      throw new Error(`Contract ${contractName} not found`);
+      throw new ContractNotFound(contractName);
     }
     const schema = fs.readJsonSync(targetPath);
     schema.directory = path.dirname(targetPath);
