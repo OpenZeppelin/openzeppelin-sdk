@@ -138,7 +138,7 @@ export function contractMethodsFromAbi(
   return instance.schema.abi
     .filter(
       ({ stateMutability, constant: isConstantMethod, type }) =>
-        (isConstant === isConstantMethod || mutabilities.includes(stateMutability)) && type === 'function',
+        type === 'function' && (isConstant === isConstantMethod || mutabilities.includes(stateMutability)),
     )
     .map(method => {
       const { name, inputs } = method;
