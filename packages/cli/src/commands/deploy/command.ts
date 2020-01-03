@@ -15,10 +15,11 @@ export function register(program: Command): void {
   const command = program
     .command(signature)
     .description(description)
-    .action(async (...args) => {
+    .action(async (...args: unknown[]) => {
       const { preAction, action }: Action = await import('./action');
-      await preAction(...args);
-      await withTelemetry(action)(...args);
+      await preAction?.(...args);
+      reportTelemetry(...args);
+      await action(...args);
     });
 
   for (const opt of options) {
@@ -30,21 +31,18 @@ type ActionFunction = (...args: unknown[]) => void;
 
 interface Action {
   action: ActionFunction;
-  preAction: ActionFunction;
+  preAction?: ActionFunction;
 }
 
 type Option = [string, string];
 
-function withTelemetry(action: ActionFunction): ActionFunction {
-  return function(...args): void {
-    // args always contains the cmd in the last position
-    const cmd: Command = args.pop() as Command;
-    const name = cmd.name();
-    const argsAndOpts = commandArgsAndOpts(cmd, args);
-    // TODO: normalize network name (done by ConfigManager)
-    Telemetry.report(name, argsAndOpts, !!argsAndOpts.interactive);
-    return action(...args, cmd);
-  };
+function reportTelemetry(...args: unknown[]): void {
+  // args always contains the cmd in the last position
+  const cmd: Command = args.pop() as Command;
+  const name = cmd.name();
+  const argsAndOpts = commandArgsAndOpts(cmd, args);
+  // TODO: normalize network name (done by ConfigManager) and include txParams?
+  Telemetry.report(name, argsAndOpts, !!argsAndOpts.interactive);
 }
 
 function commandArgsAndOpts(cmd: Command, args: unknown[]): Record<string, unknown> {
