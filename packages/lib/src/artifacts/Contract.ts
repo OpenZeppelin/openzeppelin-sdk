@@ -132,13 +132,14 @@ export function contractMethodsFromAbi(
   constant: ContractMethodMutability = ContractMethodMutability.NotConstant,
 ): any[] {
   const isConstant = constant === ContractMethodMutability.Constant;
-  const contractAst = new ContractAST(instance, null, {
-    nodesFilter: ['ContractDefinition'],
-  });
-  const methodsFromAst = contractAst.getMethods();
+  const mutabilities = abiStateMutabilitiesFor(constant);
+  const methodsFromAst = getAstMethods(instance);
 
   return instance.schema.abi
-    .filter(({ constant: isConstantMethod, type }) => isConstant === isConstantMethod && type === 'function')
+    .filter(
+      ({ stateMutability, constant: isConstantMethod, type }) =>
+        type === 'function' && (isConstant === isConstantMethod || mutabilities.includes(stateMutability)),
+    )
     .map(method => {
       const { name, inputs } = method;
       const selector = `${name}(${inputs.map(getArgTypeLabel).join(',')})`;
@@ -158,21 +159,27 @@ export function contractMethodsFromAst(
   instance: Contract,
   constant: ContractMethodMutability = ContractMethodMutability.NotConstant,
 ): ContractMethod[] {
-  const mutabilities = constant === ContractMethodMutability.Constant ? ['view', 'pure'] : ['payable', 'nonpayable'];
-  const contractAst = new ContractAST(instance, null, {
-    nodesFilter: ['ContractDefinition'],
-  });
+  const mutabilities = abiStateMutabilitiesFor(constant);
+  const visibilities = ['public', 'external'];
 
-  return contractAst
-    .getMethods()
-    .filter(({ visibility, stateMutability }) => {
-      return (visibility === 'public' || visibility === 'external') && mutabilities.includes(stateMutability);
-    })
+  return getAstMethods(instance)
+    .filter(
+      ({ visibility, stateMutability }) => visibilities.includes(visibility) && mutabilities.includes(stateMutability),
+    )
     .map(method => {
       const initializer = method.modifiers.find(({ modifierName }) => modifierName.name === 'initializer');
-
       return { ...method, hasInitializer: initializer ? true : false };
     });
+}
+
+function getAstMethods(instance: Contract): any[] {
+  return new ContractAST(instance, null, {
+    nodesFilter: ['ContractDefinition'],
+  }).getMethods();
+}
+
+function abiStateMutabilitiesFor(constant: ContractMethodMutability) {
+  return constant === ContractMethodMutability.Constant ? ['view', 'pure'] : ['payable', 'nonpayable'];
 }
 
 function parseArguments(passedArguments, abi) {

@@ -100,7 +100,7 @@ export default class ContractAST {
     return this.imports;
   }
 
-  public getMethods(attributes?: string[]): any {
+  public getMethods(attributes?: string[]): any[] {
     const baseContracts = this.getLinearizedBaseContracts();
     return flatten(baseContracts.map(contract => contract.nodes))
       .filter(({ nodeType, name }) => nodeType === 'FunctionDefinition' && this._isValidMethodName(name))
