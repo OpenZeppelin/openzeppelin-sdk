@@ -4,7 +4,6 @@ import { fromContractFullName } from '../../utils/naming';
 import ConfigManager from '../../models/config/ConfigManager';
 import NetworkController from '../../models/network/NetworkController';
 import stdout from '../../utils/stdout';
-import zipWith from 'lodash.zipwith';
 import { MethodArgType } from '../../prompts/prompt';
 import { parseMultipleArgs } from '../../utils/input';
 import NetworkFile from '../../models/files/NetworkFile';
