@@ -14,8 +14,9 @@ import ProjectFile from '../models/files/ProjectFile';
 import ContractManager from '../models/local/ContractManager';
 import Dependency from '../models/dependency/Dependency';
 import { fromContractFullName, toContractFullName } from '../utils/naming';
-import { ProxyType } from '../scripts/interfaces';
 import NetworkFile, { ProxyInterface } from '../models/files/NetworkFile';
+
+import * as choices from './choices';
 
 type ChoicesT = string[] | { [key: string]: any };
 
@@ -136,45 +137,13 @@ export function proxiesList(
 }
 
 // Generate a list of contracts names
-export function contractsList(name: string, message: string, type: string, source?: string): { [key: string]: any } {
-  const localProjectFile = new ProjectFile();
-  const contractManager = new ContractManager(localProjectFile);
-  const contractsFromBuild = contractManager.getContractNames();
-  const contractsFromLocal = Object.keys(localProjectFile.contracts)
-    .map(alias => ({ name: localProjectFile.contracts[alias], alias }))
-    .map(({ name: contractName, alias }) => {
-      const label = contractName === alias ? alias : `${alias}[${contractName}]`;
-      return { name: label, value: alias };
-    });
-
-  // get contracts from `build/contracts`
-  if (!source || source === 'built') {
-    return inquirerQuestion(name, message, type, contractsFromBuild);
-    // get contracts from project.json file
-  } else if (source === 'notAdded') {
-    const contracts = difference(
-      contractsFromBuild,
-      contractsFromLocal.map(({ value }) => value),
-    );
-    return inquirerQuestion(name, message, type, contracts);
-  } else if (source === 'added') {
-    return inquirerQuestion(name, message, type, contractsFromLocal);
-    // generate a list of built contracts and package contracts
-  } else if (source === 'all') {
-    const packageContracts = Object.keys(localProjectFile.dependencies).map(dependencyName => {
-      const contractNames = new Dependency(dependencyName).projectFile.contractAliases.map(
-        contractName => `${dependencyName}/${contractName}`,
-      );
-
-      if (contractNames.length > 0) {
-        contractNames.unshift(new inquirer.Separator(` = ${dependencyName} =`));
-      }
-      return contractNames;
-    });
-    if (contractsFromBuild.length > 0) contractsFromBuild.unshift(new inquirer.Separator(` = Your contracts =`));
-
-    return inquirerQuestion(name, message, type, [...contractsFromBuild, ...flatten(packageContracts)]);
-  } else return [];
+export function contractsList(
+  name: string,
+  message: string,
+  type: string,
+  source?: choices.ContractsSource,
+): { [key: string]: any } {
+  return inquirerQuestion(name, message, type, choices.contracts(source));
 }
 
 // Generate a list of methods names for a particular contract
