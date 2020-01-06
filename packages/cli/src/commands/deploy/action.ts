@@ -18,7 +18,7 @@ interface Options {
   txParams?: TxParams;
 }
 
-export async function preAction(options: Options): Promise<void> {
+export async function preAction(contractName: string, deployArgs: string[], options: Options): Promise<void> {
   if (!options.skipCompile) {
     await compile();
   }
