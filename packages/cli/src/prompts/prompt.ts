@@ -171,8 +171,14 @@ export function methodsList(
     });
 }
 
-export function argLabel(arg: MethodArg): string {
-  return arg.name ? `${arg.name}: ${ABI.getArgTypeLabel(arg)}` : ABI.getArgTypeLabel(arg);
+export function argLabel(arg: MethodArg, index?: number): string {
+  const typeLabel = ABI.getArgTypeLabel(arg);
+  if (arg.name || index !== undefined) {
+    const prefix = arg.name || `#${index}`;
+    return `${prefix}: ${typeLabel}`;
+  } else {
+    return typeLabel;
+  }
 }
 
 // Returns an inquirer question with a list of arguments for a particular method
