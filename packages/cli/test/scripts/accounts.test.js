@@ -32,7 +32,7 @@ describe('accounts script', function() {
 
   context('when there are no accounts to list', function() {
     beforeEach('stubs ZWeb3', function() {
-      sinon.stub(ZWeb3, 'accounts').returns([]);
+      sinon.stub(ZWeb3.eth, 'getAccounts').returns([]);
     });
 
     afterEach('restores stubs', function() {

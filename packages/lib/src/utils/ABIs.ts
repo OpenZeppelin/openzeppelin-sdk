@@ -29,7 +29,7 @@ export function buildDeploymentCallData(contract: Contract, args: any[]): string
         contract.schema.linkedBytecode,
       ).join(', ')}`,
     );
-  return ZWeb3.contract(contract.schema.abi)
+  return new ZWeb3.eth.Contract(contract.schema.abi)
     .deploy({ data: contract.schema.linkedBytecode, arguments: args })
     .encodeABI();
 }

@@ -7,7 +7,7 @@ async function main(web3) {
   ZWeb3.initialize(web3.currentProvider)
 
   // Create an OpenZeppelin project
-  const [from] = await ZWeb3.accounts();
+  const [from] = await ZWeb3.eth.getAccounts();
   const project = new ProxyAdminProject('MyProject', null, null, { from, gas: 1e6, gasPrice: 1e9 });
 
   // Deploy an instance of MyContractV0

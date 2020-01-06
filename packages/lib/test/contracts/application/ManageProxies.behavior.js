@@ -106,7 +106,7 @@ export default function shouldManageProxies([appOwner, directoryOwner, anotherAc
         });
 
         it('sends given value to the proxy', async function() {
-          const balance = await ZWeb3.getBalance(this.proxyAddress);
+          const balance = await ZWeb3.eth.getBalance(this.proxyAddress);
           balance.should.eq(value.toString());
         });
       });
@@ -185,7 +185,7 @@ export default function shouldManageProxies([appOwner, directoryOwner, anotherAc
         });
 
         it('sends given value to the proxy', async function() {
-          const balance = await ZWeb3.getBalance(this.proxyAddress);
+          const balance = await ZWeb3.eth.getBalance(this.proxyAddress);
           balance.should.eq(value.toString());
         });
       });

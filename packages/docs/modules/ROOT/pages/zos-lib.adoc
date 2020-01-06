@@ -150,7 +150,7 @@ async function main() {
   const MyContract_v1 = Contracts.getFromLocal('MyContract_v1');
 
   /* Retrieve a couple of addresses to interact with the contracts. */
-  const [creatorAddress, initializerAddress] = await ZWeb3.accounts();
+  const [creatorAddress, initializerAddress] = await ZWeb3.eth.getAccounts();
 
   /* Create a SimpleProject to interact with OpenZeppelin programmatically. */
   const myProject = new SimpleProject('MyProject', null, { from: creatorAddress });

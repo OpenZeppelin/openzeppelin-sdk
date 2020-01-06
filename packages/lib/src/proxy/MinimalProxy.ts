@@ -17,7 +17,7 @@ export default class MinimalProxy {
     // (see http://eips.ethereum.org/EIPS/eip-1167)
     // We are slicing on the hex representation, hence 2 chars per byte,
     // and have also to account for the initial 0x in the string
-    const code = await ZWeb3.getCode(this.address);
+    const code = await ZWeb3.eth.getCode(this.address);
     return `0x${code.slice(22, 62)}`;
   }
 }

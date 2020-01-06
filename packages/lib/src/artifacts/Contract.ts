@@ -1,3 +1,5 @@
+import { isAddress } from 'web3-utils';
+
 import ZWeb3 from './ZWeb3';
 import Contracts from './Contracts';
 import ContractAST from '../utils/ContractAST';
@@ -93,7 +95,7 @@ function _wrapContractInstance(schema: any, web3instance: Web3Contract): Contrac
   };
 
   instance.at = function(address: string): Contract | never {
-    if (!ZWeb3.isAddress(address)) throw new Error('Given address is not valid: ' + address);
+    if (!isAddress(address)) throw new Error('Given address is not valid: ' + address);
     const newWeb3Instance = instance.clone();
     newWeb3Instance['_address'] = address;
     newWeb3Instance.options.address = address;
@@ -123,7 +125,7 @@ function _wrapContractInstance(schema: any, web3instance: Web3Contract): Contrac
 }
 
 export function createContract(schema: any): Contract {
-  const contract = ZWeb3.contract(schema.abi, null, Contracts.getArtifactsDefaults());
+  const contract = new ZWeb3.eth.Contract(schema.abi, null, Contracts.getArtifactsDefaults());
   return _wrapContractInstance(schema, contract);
 }
 

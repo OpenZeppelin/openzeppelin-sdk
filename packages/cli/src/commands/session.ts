@@ -32,7 +32,7 @@ async function action(options: any): Promise<void> {
       interactive,
     );
     const { network } = await ConfigManager.initNetworkConfiguration(promptedNetwork, true);
-    const accounts = await ZWeb3.accounts();
+    const accounts = await ZWeb3.eth.getAccounts();
     const promptedSession = await promptIfNeeded(
       { opts: { timeout, from, expires }, props: getCommandProps(accounts) },
       interactive,
