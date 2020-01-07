@@ -1,4 +1,3 @@
-import find from 'lodash.find';
 import Ajv from 'ajv';
 import util from 'util';
 import astNodeSchema from './schemas/ast';
@@ -73,8 +72,10 @@ export function getNodeSources(node: Node, source: string): [number, number, str
   return [start, len, source.slice(start, start + len)];
 }
 
-export function getNode(node: Node, predicate: (node: Node) => boolean): AnyNode | undefined {
-  return find(node.nodes, predicate);
+export function getNode(node: Node, predicate: (node: AnyNode) => boolean): AnyNode {
+  const ret = getNodes(node, predicate);
+  if (!ret.length) throw new Error(`Can't find a node to satisfy the given predicate in the ${node}`);
+  return ret[0];
 }
 
 export function getNodes(node: Node, predicate: (node: AnyNode) => boolean): AnyNode[] {
@@ -98,12 +99,12 @@ export function getContracts(node: Node): ContractDefinition[] {
   return getNodes(node, isContractType) as ContractDefinition[];
 }
 
-export function getConstructor(node: ContractDefinition): FunctionDefinition | undefined {
-  return getNode(node, node => (node as FunctionDefinition).kind === 'constructor') as FunctionDefinition | undefined;
+export function getConstructor(node: ContractDefinition): FunctionDefinition {
+  return getNode(node, node => (node as FunctionDefinition).kind === 'constructor') as FunctionDefinition;
 }
 
-export function getContract(node: SourceUnit, contractName: string): ContractDefinition | undefined {
-  return getNode(node, node => (node as ContractDefinition).name === contractName) as ContractDefinition | undefined;
+export function getContract(node: SourceUnit, contractName: string): ContractDefinition {
+  return getNode(node, node => (node as ContractDefinition).name === contractName) as ContractDefinition;
 }
 
 export function getContractById(node: Node, id: number): ContractDefinition {

@@ -4,4 +4,6 @@ export interface Artifact {
   contractName: string;
   fileName: string;
   ast: SourceUnit;
+  source: string;
+  sourcePath: string;
 }
