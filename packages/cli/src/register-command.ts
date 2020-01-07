@@ -15,7 +15,8 @@ export interface Question {
   validationError?: string;
 }
 
-// TODO: Validate that only last positional argument is variadic.
+// Param is the things common to both positional arguments (Arg) and options (Option).
+// TODO: Validate that only the last positional argument is variadic.
 type Param = ParamSimple | ParamVariadic;
 
 interface ParamSimple {
@@ -36,6 +37,9 @@ export interface Option extends ParamSimple {
   default?: string | boolean;
 }
 
+// This was added to support aborting deploy and running create instead. We
+// need to abort in the preAction so that the interactive prompts for deploy
+// are not presented to the user, because create manages its own interactivity.
 export class AbortAction {
   constructor(readonly callback: () => Promise<void>) {}
 }
@@ -176,6 +180,9 @@ async function askQuestion(name: string, question: Question): Promise<string> {
 
 export type ArgsAndOpts = Record<string, boolean | string | string[]>;
 
+// Converts the arguments that Commander passes to an action into an object
+// where the key-value pairs correspond to positional arguments and options,
+// and extracts the Command object.
 function getCommandArgsAndOpts(...args: unknown[]): [Command, ArgsAndOpts] {
   const cmd = args.pop() as Command;
 
@@ -193,6 +200,8 @@ function getCommandArgsAndOpts(...args: unknown[]): [Command, ArgsAndOpts] {
   return [cmd, argsAndOpts];
 }
 
+// The inverse of getCommandArgsAndOpts. Generates the array of arguments that
+// can be passed as arguments to an action.
 function generateActionArgs(cmd: Command, argsAndOpts: ArgsAndOpts): unknown[] {
   const args = [];
 
