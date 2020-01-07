@@ -20,9 +20,9 @@ const register: (program: any) => any = program =>
 
 async function action(accountAddress: string, options: any): Promise<void> {
   const { network: networkInOpts, erc20: contractAddress, interactive } = options;
-  const networkInSession = Session.getNetwork();
+  const { network: networkInSession, expired } = Session.getNetwork();
   const opts = {
-    network: networkInOpts || networkInSession,
+    network: networkInOpts || (!expired ? networkInSession : undefined),
   };
   const args = { accountAddress };
   const props = getCommandProps();

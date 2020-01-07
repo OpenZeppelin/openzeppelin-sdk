@@ -98,11 +98,11 @@ async function action(contractFullName: string, options: any): Promise<void> {
 
 async function promptForCreate(contractFullName: string, options: any): Promise<any> {
   const { force, network: networkInOpts, interactive } = options;
-  const networkInSession = Session.getNetwork();
+  const { network: networkInSession, expired } = Session.getNetwork();
   const defaultOpts = { network: networkInSession };
   const args = { contractFullName };
   const opts = {
-    network: networkInOpts || networkInSession,
+    network: networkInOpts || (!expired ? networkInSession : undefined),
   };
 
   return promptIfNeeded({ args, opts, defaults: defaultOpts, props: getCommandProps() }, interactive);

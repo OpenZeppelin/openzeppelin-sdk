@@ -39,13 +39,10 @@ const Session = {
     if (!session || this._hasExpired(session)) this.open({ network }, 0, false);
   },
 
-  getNetwork(): string | undefined {
+  getNetwork(): { network: string | undefined; expired: boolean } {
     const session = this._parseSession();
-    if (session === undefined || this._hasExpired(session)) {
-      return undefined;
-    } else {
-      return session.network;
-    }
+    const network = session ? session.network : undefined;
+    return { network, expired: this._hasExpired(session) };
   },
 
   open({ network, from, timeout }: SessionOptions, expires: number = DEFAULT_EXPIRATION_TIMEOUT, logInfo = true): void {

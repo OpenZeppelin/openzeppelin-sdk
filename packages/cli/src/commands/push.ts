@@ -54,9 +54,9 @@ async function action(options: any): Promise<void> {
     deployProxyFactory,
     interactive,
   } = options;
-  const networkInSession = Session.getNetwork();
+  const { network: networkInSession, expired } = Session.getNetwork();
   const opts = {
-    network: networkInOpts || networkInSession,
+    network: networkInOpts || (!expired ? networkInSession : undefined),
   };
   const defaults = { network: networkInSession };
   const props = getCommandProps();
