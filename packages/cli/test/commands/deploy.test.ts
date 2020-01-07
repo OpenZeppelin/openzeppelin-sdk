@@ -18,9 +18,12 @@ describe('deploy (action)', function() {
   const network = 'test';
   const txParams = { from: owner };
 
+  let projectFile: ProjectFile;
+  let networkFile: NetworkFile;
+
   beforeEach(function() {
-    this.projectFile = new ProjectFile('test/mocks/packages/package-empty.zos.json');
-    this.networkFile = new NetworkFile(this.projectFile, network);
+    projectFile = new ProjectFile('test/mocks/packages/package-empty.zos.json');
+    networkFile = new NetworkFile(projectFile, network);
   });
 
   it('should deploy a simple contract with no constructor', async function() {
@@ -28,9 +31,9 @@ describe('deploy (action)', function() {
     await deploy(contract, [], {
       network,
       txParams,
-      networkFile: this.networkFile,
+      networkFile: networkFile,
     });
-    const instances = this.networkFile.getProxies({ contract });
+    const instances = networkFile.getProxies({ contract });
     instances.should.have.lengthOf(1);
 
     const instanceInfo = instances[0];
@@ -44,9 +47,9 @@ describe('deploy (action)', function() {
     await deploy(contract, ['30', 'abcde', '[3, 7]'], {
       network,
       txParams,
-      networkFile: this.networkFile,
+      networkFile: networkFile,
     });
-    const instances = this.networkFile.getProxies({ contract });
+    const instances = networkFile.getProxies({ contract });
     instances.should.have.lengthOf(1);
 
     const instanceInfo = instances[0];
@@ -59,7 +62,7 @@ describe('deploy (action)', function() {
     await deploy('NotExists', [], {
       network,
       txParams,
-      networkFile: this.networkFile,
+      networkFile: networkFile,
     }).should.be.rejectedWith('Contract NotExists not found');
   });
 
@@ -71,7 +74,7 @@ describe('deploy (action)', function() {
       {
         network,
         txParams,
-        networkFile: this.networkFile,
+        networkFile: networkFile,
       },
     ];
 
@@ -79,7 +82,7 @@ describe('deploy (action)', function() {
     await deploy(...deployArgs);
     await deploy(...deployArgs);
 
-    const instances = this.networkFile.getProxies({ contract });
+    const instances = networkFile.getProxies({ contract });
     instances.should.have.lengthOf(3);
   });
 
@@ -88,9 +91,9 @@ describe('deploy (action)', function() {
     await deploy(contract, [], {
       network,
       txParams,
-      networkFile: this.networkFile,
+      networkFile: networkFile,
     }).should.be.rejectedWith('Expected 3 values but got 0');
-    const instances = this.networkFile.getProxies({ contract });
+    const instances = networkFile.getProxies({ contract });
     instances.should.have.lengthOf(0);
   });
 
@@ -99,9 +102,9 @@ describe('deploy (action)', function() {
     await deploy(contract, [], {
       network,
       txParams,
-      networkFile: this.networkFile,
+      networkFile: networkFile,
     });
-    const instances = this.networkFile.getProxies({ contract });
+    const instances = networkFile.getProxies({ contract });
     instances.should.have.lengthOf(1);
   });
 
@@ -109,9 +112,9 @@ describe('deploy (action)', function() {
     await deploy('mock-stdlib-undeployed/GreeterBase', [], {
       network,
       txParams,
-      networkFile: this.networkFile,
+      networkFile: networkFile,
     });
-    const instances = this.networkFile.getProxies({ contract: 'GreeterBase' });
+    const instances = networkFile.getProxies({ contract: 'GreeterBase' });
     instances.should.have.lengthOf(1);
   });
 
