@@ -2,9 +2,9 @@ import { Command } from 'commander';
 
 import { generateSignature, register as _register } from '../../register-command';
 
-import * as spec from './command';
+import * as spec from './spec';
 
-export { name, description } from './command';
+export { name, description } from './spec';
 
 export const signature = generateSignature(spec.name, spec.args);
 
