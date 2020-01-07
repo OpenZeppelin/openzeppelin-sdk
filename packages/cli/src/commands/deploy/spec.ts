@@ -26,7 +26,7 @@ export const args: Arg[] = [
     async prompt(argsAndOpts: ArgsAndOpts): Promise<Question[]> {
       const { fromContractFullName } = await import('../../utils/naming');
       const { default: ContractManager } = await import('../../models/local/ContractManager');
-      const { argLabel } = await import('../../prompts/prompt');
+      const { argLabelWithIndex } = await import('../../prompts/prompt');
       const { parseArg, getSampleInput } = await import('../../utils/input');
 
       const contractName = argsAndOpts.contract as string;
@@ -42,7 +42,7 @@ export const args: Arg[] = [
           : `Enter a valid ${arg.type}`;
 
         return {
-          message: `${argLabel(arg, index)}:`,
+          message: `${argLabelWithIndex(arg, index)}:`,
           validate: (value: string) => {
             try {
               parseArg(value, arg);
