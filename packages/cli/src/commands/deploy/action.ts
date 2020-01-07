@@ -9,7 +9,7 @@ import { parseMultipleArgs } from '../../utils/input';
 import NetworkFile from '../../models/files/NetworkFile';
 import { createAction } from '../create';
 
-import { AbortAction } from './command';
+import { AbortAction } from '../../register-command';
 
 interface Options {
   network: string;
@@ -33,7 +33,7 @@ export async function preAction(
   if (options.upgradeable === true) {
     throw new AbortAction(async () => {
       // Translate arguments to syntax expected by create.
-      options['args'] = deployArgs?.join?.(',');
+      options['args'] = deployArgs.join(',');
       await createAction(contractName, options);
     });
   }
