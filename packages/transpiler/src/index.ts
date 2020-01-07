@@ -13,6 +13,7 @@ import {
 import { getInheritanceChain } from './solc/get-inheritance-chain';
 import { Artifact } from './solc/artifact';
 import { Transformation } from './transformation';
+import util from 'util';
 
 export interface OutputFile {
   fileName: string;
@@ -29,40 +30,44 @@ interface FileTran {
 export function transpileContracts(contracts: string[], artifacts: Artifact[]): OutputFile[] {
   const contractsToArtifactsMap = artifacts.reduce<Record<string | number, Artifact>>((acc, art) => {
     acc[art.contractName] = art;
-    acc[getContract(art.ast, art.contractName).id] = art;
+    const contract = getContract(art.ast, art.contractName);
+    if (contract == null) throw new Error(`Can't find ${art.contractName} in ${util.inspect(art.ast)}`);
+    acc[contract.id] = art;
     return acc;
   }, {});
 
   const contractsWithInheritance = [
     ...new Set(contracts.map(contract => getInheritanceChain(contract, contractsToArtifactsMap)).flat()),
   ].filter(contract => {
-    const artifact = contractsToArtifactsMap[contract];
-    const contractNode = getContract(artifact.ast, contract);
+    const art = contractsToArtifactsMap[contract];
+    const contractNode = getContract(art.ast, contract);
+    if (contractNode == null) throw new Error(`Can't find ${art.contractName} in ${util.inspect(art.ast)}`);
     return isContract(contractNode);
   });
 
   const fileTrans = contractsWithInheritance.reduce<Record<string, FileTran>>((acc, contractName) => {
-    const artifact = contractsToArtifactsMap[contractName];
+    const art = contractsToArtifactsMap[contractName];
 
-    const source = artifact.source;
+    const source = art.source;
 
-    const contractNode = getContract(artifact.ast, contractName);
+    const contractNode = getContract(art.ast, contractName);
+    if (contractNode == null) throw new Error(`Can't find ${art.contractName} in ${util.inspect(art.ast)}`);
 
-    if (!acc[artifact.fileName]) {
+    if (!acc[art.fileName]) {
       const directive = `\nimport "@openzeppelin/upgrades/contracts/Initializable.sol";`;
 
-      acc[artifact.fileName] = {
+      acc[art.fileName] = {
         transformations: [
-          appendDirective(artifact.ast, directive),
-          ...fixImportDirectives(artifact, artifacts, contractsWithInheritance),
-          ...purgeContracts(artifact.ast, contractsWithInheritance),
+          appendDirective(art.ast, directive),
+          ...fixImportDirectives(art, artifacts, contractsWithInheritance),
+          ...purgeContracts(art.ast, contractsWithInheritance),
         ],
         source: '',
       };
     }
 
-    acc[artifact.fileName].transformations = [
-      ...acc[artifact.fileName].transformations,
+    acc[art.fileName].transformations = [
+      ...acc[art.fileName].transformations,
       prependBaseClass(contractNode, source, 'Initializable'),
       ...transformParents(contractNode, source, contractsWithInheritance),
       ...transformConstructor(contractNode, source, contractsWithInheritance, contractsToArtifactsMap),
