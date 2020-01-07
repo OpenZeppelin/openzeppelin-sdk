@@ -63,6 +63,10 @@ export const args: Arg[] = [
 
 export const options: Option[] = [
   {
+    format: '--no-interactive',
+    description: 'disable interactive prompts',
+  },
+  {
     format: '--skip-compile',
     description: 'use existing compilation artifacts',
     default: false,
@@ -126,6 +130,10 @@ interface Option extends ParamSimple {
   default?: string | boolean;
 }
 
+export class AbortAction {
+  constructor(readonly callback: () => Promise<void>) {}
+}
+
 export function register(program: Command): void {
   const signature = generateSignature(name, args);
 
@@ -134,7 +142,16 @@ export function register(program: Command): void {
     .description(description)
     .action(async (...actionArgs: unknown[]) => {
       const { preAction, action }: Action = await import('./action');
-      await preAction?.(...actionArgs);
+      try {
+        await preAction?.(...actionArgs);
+      } catch (e) {
+        if (e instanceof AbortAction) {
+          console.error('aborting');
+          return e.callback();
+        } else {
+          throw e;
+        }
+      }
       const [cmd, argsAndOpts] = getCommandArgsAndOpts(...actionArgs);
       await promptForMissing(cmd, options, args, argsAndOpts);
       // TODO: normalize network name and include txParams (ConfigManager)

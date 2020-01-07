@@ -7,6 +7,9 @@ import stdout from '../../utils/stdout';
 import { MethodArgType } from '../../prompts/prompt';
 import { parseMultipleArgs } from '../../utils/input';
 import NetworkFile from '../../models/files/NetworkFile';
+import { createAction } from '../create';
+
+import { AbortAction } from './command';
 
 interface Options {
   network: string;
@@ -18,17 +21,25 @@ interface Options {
   txParams?: TxParams;
 }
 
-export async function preAction(contractName: string, deployArgs: string[], options: Options): Promise<void> {
+export async function preAction(
+  contractName: string | undefined,
+  deployArgs: string[],
+  options: Options,
+): Promise<void> {
   if (!options.skipCompile) {
     await compile();
+  }
+
+  if (options.upgradeable === true) {
+    throw new AbortAction(async () => {
+      // Translate arguments to syntax expected by create.
+      options['args'] = deployArgs?.join?.(',');
+      await createAction(contractName, options);
+    });
   }
 }
 
 export async function action(contractName: string, deployArgs: string[], options: Options): Promise<void> {
-  if (options.upgradeable === true) {
-    throw new Error('unimplemented');
-  }
-
   // this is an interactive prompt, so should be handled by the prompts
   // if (!(await hasToMigrateProject(network))) process.exit(0);
 

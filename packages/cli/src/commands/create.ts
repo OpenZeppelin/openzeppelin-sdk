@@ -38,9 +38,9 @@ const register: (program: any) => any = program =>
     .withNetworkOptions()
     .withSkipCompileOption()
     .withNonInteractiveOption()
-    .action(commandActions);
+    .action(createAction);
 
-async function commandActions(contractFullName: string, options: any): Promise<void> {
+export async function createAction(contractFullName: string, options: any): Promise<void> {
   if (options.minimal) {
     Loggy.noSpin.warn(__filename, 'action', 'create-minimal-proxy', 'Minimal proxy support is still experimental.');
   }
