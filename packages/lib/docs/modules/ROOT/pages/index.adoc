@@ -1,0 +1,50 @@
+= Upgrades
+
+*Develop upgradeable smart contracts securely.*
+
+This library serves as a backend for the xref:cli::index.adoc[*OpenZeppelin CLI*], and its programmatic API is not yet very suitable for third-party users.
+
+However, you can still learn here about using upgrades, how they work under the hood and their limitations.
+
+TIP: Stay tuned for upcoming news about a new API! Meanwhile, consider using the CLI to manage your upgradeable contracts.
+
+== Overview
+
+=== Installation
+
+```console
+$ npm install @openzeppelin/upgrades
+```
+
+=== Usage
+
+This sample script deployes `MyContract` (which should be already compiled) to a blockchain network running locally at port 9545:
+
+```javascript
+const { ZWeb3, Contracts, SimpleProject } = require('@openzeppelin/upgrades');
+
+// Initialize a web3 provider
+ZWeb3.initialize("http://localhost:9545");
+
+// Load the contract
+const MyContract = Contracts.getFromLocal('MyContract');
+
+// Instantiate a project
+const myProject = new SimpleProject('MyProject', {
+  from: await ZWeb3.defaultAccount()
+});
+
+// Create a proxy for the contract
+const proxy = await myProject.createProxy(MyContract);
+
+// Make a change on the contract, and compile it
+const MyContractUpgraded = Contracts.getFromLocal('MyContract');
+myProject.upgradeProxy(proxy, MyContractUpgraded);
+```
+
+NOTE: Because the script uses https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/await[`await`], it should be located inside an `async` function.
+
+== Learn More
+
+ * Check out xref:writing-upgradeable.adoc[Writing Upgradeable Contracts] to learn about secure patterns when dealing with upgrades, and pitfalls to avoid.
+ * To know how upgrades work under the hood, xref:proxies.adoc[Proxies] will provide you with all the low-level detail you crave.
