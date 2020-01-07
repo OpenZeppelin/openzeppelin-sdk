@@ -13,6 +13,7 @@
     "lint": "tsc --noEmit && eslint '*/**/*.{js,ts}' --quiet --fix",
     "lint:check": "eslint '*/**/*.{js,ts}' --quiet",
     "prepare": "npm run compile-contracts && npm run compile-ts",
+    "prepare-docs": "bash scripts/prepare-docs.sh",
     "prepublishOnly": "echo 'Removing mock contracts...' && grep -hoP '^\\s*contract \\K(\\w+)' contracts/mocks/*.sol | sort | uniq | xargs -t -I% rm build/contracts/%.json",
     "test": "TS_NODE_PROJECT='tsconfig.test.json' mocha --require ts-node/register --recursive test",
     "watch": "tsc -w"
@@ -85,6 +86,7 @@
     "lodash.values": "^4.3.0",
     "lodash.without": "^4.4.0",
     "semver": "^5.5.1",
+    "solidity-docgen": "^0.3.5",
     "spinnies": "^0.4.2",
     "truffle-flattener": "^1.4.0",
     "web3": "1.2.2",

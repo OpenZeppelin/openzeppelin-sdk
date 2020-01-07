@@ -48,3 +48,4 @@ NOTE: Because the script uses https://developer.mozilla.org/en-US/docs/Web/JavaS
 
  * Check out xref:writing-upgradeable.adoc[Writing Upgradeable Contracts] to learn about secure patterns when dealing with upgrades, and pitfalls to avoid.
  * To know how upgrades work under the hood, xref:proxies.adoc[Proxies] will provide you with all the low-level detail you crave.
+ * Take a look at the xref:api.adoc[API Reference] for all smart contracts involved in an Upgrades project.
