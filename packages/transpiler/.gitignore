@@ -3,3 +3,4 @@ lib/
 coverage/
 coverage.json
 .node-xmlhttprequest-sync-*
+.session
