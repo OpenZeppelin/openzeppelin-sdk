@@ -4,5 +4,5 @@ coverage/
 coverage.json
 .node-xmlhttprequest-sync-*
 .session
-contract/__upgradable__
+__upgradable__
 build
