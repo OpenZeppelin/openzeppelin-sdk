@@ -1,8 +1,0 @@
-node_modules/
-lib/
-coverage/
-coverage.json
-.node-xmlhttprequest-sync-*
-.session
-./build
-./contracts/__upgradable__
