@@ -1,9 +1,5 @@
-import { transpileContracts } from '../../../src/';
-import fs from 'fs-extra';
-
-const artifacts = fs.readdirSync('./build/contracts/').map(file => {
-  return JSON.parse(fs.readFileSync(`./build/contracts/${file}`).toString());
-});
+import { transpileContracts } from '../../../../src/';
+import { artifacts } from '../setup';
 
 describe('GLDToken contract', (): void => {
   it('is converted to a valid GLDTokenUpgradable contract', (): void => {
