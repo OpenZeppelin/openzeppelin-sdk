@@ -35,7 +35,6 @@ function buildSuperCalls(
             const contractName = base.baseName.name;
             const art = contractsToArtifactsMap[contractName];
             const node = getContract(art.ast, contractName);
-            if (!node) throw new Error(`Failed to find ${base} at ${art.fileName}`);
             const constructorNode = getConstructor(node);
 
             return (constructorNode && !constructorNode.parameters.parameters.length) ||
@@ -61,7 +60,6 @@ export function buildSuperCallsForChain(
     .map(base => {
       const art = contractsToArtifactsMap[base];
       const node = getContract(art.ast, base);
-      if (!node) throw new Error(`Failed to find ${base} at ${art.fileName}`);
 
       const constructorNode = getConstructor(node);
       return constructorNode ? constructorNode.modifiers.filter(mod => idModifierInvocation(mod)) : [];
@@ -74,7 +72,6 @@ export function buildSuperCallsForChain(
         .map(base => {
           const art = contractsToArtifactsMap[base];
           const contract = getContract(art.ast, base);
-          if (!contract) throw new Error(`Failed to find ${base} at ${art.fileName}`);
 
           const calls = buildSuperCalls(contract, source, contracts, mods, contractsToArtifactsMap);
           return calls.reverse();

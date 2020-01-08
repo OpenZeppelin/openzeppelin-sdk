@@ -31,7 +31,6 @@ export function transpileContracts(contracts: string[], artifacts: Artifact[]): 
   const contractsToArtifactsMap = artifacts.reduce<Record<string | number, Artifact>>((acc, art) => {
     acc[art.contractName] = art;
     const contract = getContract(art.ast, art.contractName);
-    if (contract == null) throw new Error(`Can't find ${art.contractName} in ${util.inspect(art.ast)}`);
     acc[contract.id] = art;
     return acc;
   }, {});
@@ -41,7 +40,6 @@ export function transpileContracts(contracts: string[], artifacts: Artifact[]): 
   ].filter(contract => {
     const art = contractsToArtifactsMap[contract];
     const contractNode = getContract(art.ast, contract);
-    if (contractNode == null) throw new Error(`Can't find ${art.contractName} in ${util.inspect(art.ast)}`);
     return isContract(contractNode);
   });
 
@@ -51,7 +49,6 @@ export function transpileContracts(contracts: string[], artifacts: Artifact[]): 
     const source = art.source;
 
     const contractNode = getContract(art.ast, contractName);
-    if (contractNode == null) throw new Error(`Can't find ${art.contractName} in ${util.inspect(art.ast)}`);
 
     if (!acc[art.fileName]) {
       const directive = `\nimport "@openzeppelin/upgrades/contracts/Initializable.sol";`;
@@ -107,36 +104,3 @@ export function transpileContracts(contracts: string[], artifacts: Artifact[]): 
     return acc;
   }, []);
 }
-
-// async function main() {
-//   const artifacts = fs.readdirSync('./build/contracts/').map(file => {
-//     return JSON.parse(fs.readFileSync(`./build/contracts/${file}`));
-//   });
-
-//   const output = transpileContracts(
-//     [
-//       'GLDToken',
-//       'InheritanceWithParamsClassChild',
-//       'InheritanceWithParamsConstructorChild',
-//       'Simple',
-//       'DiamondC',
-//       'NoInheritance',
-//     ],
-//     artifacts,
-//   );
-
-//   for (const file of output) {
-//     let patchedFilePath = file.path;
-//     if (file.path.startsWith('contracts')) {
-//       patchedFilePath = file.path.replace('contracts/', '');
-//     }
-//     await fs.ensureDir(path.dirname(`./contracts/${patchedFilePath}`));
-//     fs.writeFileSync(`./contracts/${patchedFilePath}`, file.source);
-//   }
-// }
-
-// main().then(() => {
-//   // waiting for the fix of an issue
-//   // https://github.com/prettier-solidity/prettier-plugin-solidity/issues/211
-//   // require("child_process").execSync("npx prettier --write **/*.sol");
-// });

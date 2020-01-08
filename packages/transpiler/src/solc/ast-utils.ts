@@ -102,8 +102,10 @@ export function getConstructor(node: ContractDefinition): FunctionDefinition | n
   return getNode(node, node => (node as FunctionDefinition).kind === 'constructor') as FunctionDefinition | null;
 }
 
-export function getContract(node: SourceUnit, contractName: string): ContractDefinition | null {
-  return getNode(node, node => (node as ContractDefinition).name === contractName) as ContractDefinition | null;
+export function getContract(node: SourceUnit, contractName: string): ContractDefinition {
+  const ret = getNode(node, node => (node as ContractDefinition).name === contractName);
+  if (ret == null) throw new Error(`Can't find ${contractName} in ${util.inspect(node)}`);
+  return ret as ContractDefinition;
 }
 
 export function getContractById(node: Node, id: number): ContractDefinition | null {
