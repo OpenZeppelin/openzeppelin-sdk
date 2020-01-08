@@ -4,6 +4,8 @@ import { getInheritanceChain } from '../solc/get-inheritance-chain';
 import { ContractDefinition, ModifierInvocation, Literal } from '../solc/ast-node';
 import { Artifact } from '../solc/artifact';
 
+// builds an __init call with given arguments, for example
+// ERC20DetailedUpgradable.__init(false, "Gold", "GLD", 18)
 function buildSuperCall(args: Literal[], name: string, source: string): string {
   let superCall = `\n            ${name}Upgradable.__init(false`;
   if (args && args.length) {
@@ -15,6 +17,8 @@ function buildSuperCall(args: Literal[], name: string, source: string): string {
   return superCall + ');';
 }
 
+// builds all the __init calls for the parent of a given contract, for example
+// [ '\n            ContextUpgradable.__init(false);' ]
 function buildSuperCalls(
   node: ContractDefinition,
   source: string,
@@ -49,6 +53,9 @@ function buildSuperCalls(
   }
 }
 
+// builds all the __init calls a given contract, for example
+// ContextUpgradable.__init(false);
+ERC20DetailedUpgradable.__init(false, 'Gold', 'GLD', 18);
 export function buildSuperCallsForChain(
   contractNode: ContractDefinition,
   source: string,
@@ -70,11 +77,13 @@ export function buildSuperCallsForChain(
     ...new Set(
       chain
         .map(base => {
-          const art = contractsToArtifactsMap[base];
-          const contract = getContract(art.ast, base);
-
-          const calls = buildSuperCalls(contract, source, contracts, mods, contractsToArtifactsMap);
-          return calls.reverse();
+          return buildSuperCalls(
+            getContract(contractsToArtifactsMap[base].ast, base),
+            source,
+            contracts,
+            mods,
+            contractsToArtifactsMap,
+          ).reverse();
         })
         .flat(),
     ),
