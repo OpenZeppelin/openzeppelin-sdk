@@ -89,9 +89,15 @@ export function transpileContracts(contracts: string[], artifacts: Artifact[]): 
     }
     const entry = acc.find(o => o.fileName === artifact.fileName);
     if (!entry) {
+      const path = artifact.sourcePath.replace('.sol', 'Upgradable.sol');
+      let patchedFilePath = path;
+      if (path.startsWith('contracts')) {
+        patchedFilePath = path.replace('contracts/', '');
+      }
+      patchedFilePath = `./contracts/__upgradable__/${patchedFilePath}`;
       acc.push({
         source: fileTran.source,
-        path: artifact.sourcePath.replace('.sol', 'Upgradable.sol'),
+        path: patchedFilePath,
         fileName: artifact.fileName,
         contracts: [contractName],
       });
