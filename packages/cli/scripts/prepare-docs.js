@@ -1,11 +1,11 @@
 #!/usr/bin/env node
 
-import program from '../../src/bin/program';
+import program from '../src/bin/program';
 import { writeFileSync } from 'fs';
 import { ensureDirSync } from 'fs-extra';
 import path from 'path';
 
-const outputPath = '../docs/modules/api';
+const outputPath = 'docs/modules/ROOT/pages';
 
 function render(cmd) {
   const description = cmd.description() || '';
@@ -36,7 +36,8 @@ function run() {
 
   const docs = [main, ...cmds].join('\n');
 
-  writeFileSync(path.resolve(outputPath, 'pages/cli.adoc'), docs);
+  console.log(path.resolve(outputPath, 'commands.adoc'))
+  writeFileSync(path.resolve(outputPath, 'commands.adoc'), docs);
 }
 
 run();
