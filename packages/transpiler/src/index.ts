@@ -1,4 +1,4 @@
-import { getContract, isContract } from './solc/ast-utils';
+import { getContract, isContract, throwIfInvalidNode } from './solc/ast-utils';
 import { transpile } from './transpiler';
 import {
   transformConstructor,
@@ -13,7 +13,6 @@ import {
 import { getInheritanceChain } from './solc/get-inheritance-chain';
 import { Artifact } from './solc/artifact';
 import { Transformation } from './transformation';
-import util from 'util';
 
 export interface OutputFile {
   fileName: string;
@@ -28,6 +27,12 @@ interface FileTran {
 }
 
 export function transpileContracts(contracts: string[], artifacts: Artifact[]): OutputFile[] {
+  // check that we have valid ast tree
+  for (const art of artifacts) {
+    throwIfInvalidNode(art.ast);
+  }
+
+  // create contract name | id to artifact map for quick access to artifacts
   const contractsToArtifactsMap = artifacts.reduce<Record<string | number, Artifact>>((acc, art) => {
     acc[art.contractName] = art;
     const contract = getContract(art.ast, art.contractName);
@@ -35,6 +40,7 @@ export function transpileContracts(contracts: string[], artifacts: Artifact[]): 
     return acc;
   }, {});
 
+  // build a list of all contracts to transpile
   const contractsWithInheritance = [
     ...new Set(contracts.map(contract => getInheritanceChain(contract, contractsToArtifactsMap)).flat()),
   ].filter(contract => {
@@ -43,6 +49,7 @@ export function transpileContracts(contracts: string[], artifacts: Artifact[]): 
     return isContract(contractNode);
   });
 
+  // build a array of transformations per Solidity file
   const fileTrans = contractsWithInheritance.reduce<Record<string, FileTran>>((acc, contractName) => {
     const art = contractsToArtifactsMap[contractName];
 
@@ -75,6 +82,7 @@ export function transpileContracts(contracts: string[], artifacts: Artifact[]): 
     return acc;
   }, {});
 
+  // build a final array of files to return
   return contractsWithInheritance.reduce<OutputFile[]>((acc, contractName) => {
     const artifact = contractsToArtifactsMap[contractName];
 

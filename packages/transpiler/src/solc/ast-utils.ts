@@ -22,6 +22,11 @@ export function throwIfInvalidNode(node: AnyNode): void {
   if (!isASTNode(node)) {
     throw new Error(util.inspect(node) + ' is not a valid AST node.');
   }
+  if (node.nodes) {
+    for (const child of node.nodes) {
+      throwIfInvalidNode(child);
+    }
+  }
 }
 
 export function isContractKind(node: ContractDefinition, kind: ContractKind): boolean {
