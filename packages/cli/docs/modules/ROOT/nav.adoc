@@ -3,6 +3,7 @@
 * xref:dependencies.adoc[Using Dependencies]
 * xref:contracts-architecture.adoc[Contracts Architecture]
 * xref:truffle.adoc[Using With Truffle]
+* xref:faq.adoc[Frequently Asked Questions]
 
 .API Reference
 * xref:commands.adoc[Commands]
