@@ -55,7 +55,7 @@ function buildSuperCalls(
 
 // builds all the __init calls a given contract, for example
 // ContextUpgradable.__init(false);
-ERC20DetailedUpgradable.__init(false, 'Gold', 'GLD', 18);
+// ERC20DetailedUpgradable.__init(false, 'Gold', 'GLD', 18);
 export function buildSuperCallsForChain(
   contractNode: ContractDefinition,
   source: string,
