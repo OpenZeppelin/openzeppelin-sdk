@@ -4,7 +4,7 @@
   "description": "",
   "main": ".src/index.ts",
   "scripts": {
-    "compile-contracts": "rm -rf build/contracts && ../../../../bootstrap/node_modules/.bin/oz compile",
+    "compile-contracts": "rm -rf build/contracts && rm -rf contracts/__upgradable__ && ../../../../bootstrap/node_modules/.bin/oz compile",
     "test": "npm run compile-contracts && jest --verbose"
   },
   "author": "Igor Yalovoy <igor@openzeppelin.com>",
