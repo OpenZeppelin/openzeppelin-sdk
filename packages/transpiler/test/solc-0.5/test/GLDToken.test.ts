@@ -1,5 +1,5 @@
-import { transpileContracts } from '../../../../src/';
-import { artifacts } from '../setup';
+import { transpileContracts } from '../../../src/index';
+import { artifacts } from './setup';
 
 describe('GLDToken contract', (): void => {
   it('is converted to a valid GLDTokenUpgradable contract', (): void => {

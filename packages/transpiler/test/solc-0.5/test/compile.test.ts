@@ -1,4 +1,4 @@
-import { transpileAndSaveContracts, compileContracts } from '../src/index';
+import { transpileAndSaveContracts, compileContracts } from './setup';
 
 describe('When all the contracts transpilied and saved to contracts folder', (): void => {
   beforeAll(
