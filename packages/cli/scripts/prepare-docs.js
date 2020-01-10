@@ -35,8 +35,6 @@ function run() {
     .map(render);
 
   const docs = [main, ...cmds].join('\n');
-
-  console.log(path.resolve(outputPath, 'commands.adoc'))
   writeFileSync(path.resolve(outputPath, 'commands.adoc'), docs);
 }
 
