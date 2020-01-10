@@ -17,7 +17,9 @@ $ npx oz compile
 When executed for the first time, all smart contracts in the `contracts` directory will be compiled at once. Further invocations of `compile` however will _only_ compile contracts that have changed (along with their dependents), speeding up the process.
 
 == Settings
-All compilation settings are passed directly to the Solidity compiler. Check out [its documentation](https://solidity.readthedocs.io/en/v0.5.15/using-the-compiler.html) for more info on how each setting affects the compilation.
+
+All compilation settings are passed directly to the Solidity compiler. Check out its https://solidity.readthedocs.io/en/v0.5.15/using-the-compiler.html[documentation] for more info on how each setting affects compilation.
+
 === Picking a Compiler Version
 
 Each Solidity source files should be annotated with a https://solidity.readthedocs.io/en/v0.5.15/layout-of-source-files.html#version-pragma[version pragma] that indicates which compiler versions can be used to compile it.
@@ -32,7 +34,7 @@ Alternatively, you can also specify a compiler version when calling `oz compile`
 $ npx oz compile --solc-version 0.5.14
 ```
 
-In all cases, the selected Solidity compiler version will be automatically <<saving-your-settings, remembered>>, downloaded, and saved to cache from the https://solc-bin.ethereum.org/bin/list.json[official distribution list]. Once the version is set, subsequent compilations will <<saving-your-settings, use that same version>>. 
+In all cases, the selected Solidity compiler version will be automatically downloaded and saved to cache from the https://solc-bin.ethereum.org/bin/list.json[official distribution list]. Once the version is set, subsequent compilations will <<saving-your-settings, use that same version>>.
 
 TIP: For enhanced performance, you can https://solidity.readthedocs.io/en/v0.5.15/installing-solidity.html#binary-packages[install the native Solidity binaries] on your machine: the CLI will automatically pick it up when compiling if it matches the target version. Massive speedups can be achieved by doing this, specially on large projects. Just make sure it's available on your https://en.wikipedia.org/wiki/PATH_(variable)[`PATH`]!.
 

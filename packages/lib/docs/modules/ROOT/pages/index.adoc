@@ -2,12 +2,9 @@
 
 *Deploy and upgrade smart contracts securely* from your JavaScript code.
 
-This library powers the xref:cli::index.adoc[*OpenZeppelin CLI*], by implementing all its deployment and upgrade operations. You can call into this library directly from your scripts if you do not want to go through the CLI. 
+This library powers the xref:cli::index.adoc[*OpenZeppelin CLI*], by implementing all its deployment and upgrade operations. You can call into this library directly from your scripts if you do not want to go through the CLI.
 
 WARNING: The upgrades library only creates and upgrades contracts. It will not keep the xref:cli::configuration.adoc[CLI configuration] files up to date with new deployments, meaning that you will have to track your contract addresses on your own. We will be working on a new version of this library that can handle this in the future.
-
-
-
 
 == Overview
 
@@ -19,7 +16,7 @@ $ npm install @openzeppelin/upgrades
 
 === Usage
 
-This sample script deployes `MyContract` (which should be already compiled) to a blockchain network running locally at port 9545:
+This sample script deploys `MyContract` (which should be already compiled) to a blockchain network running locally at port 9545:
 
 ```javascript
 const { ZWeb3, Contracts, SimpleProject } = require('@openzeppelin/upgrades');
