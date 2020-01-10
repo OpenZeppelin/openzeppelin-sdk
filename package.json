@@ -12,7 +12,9 @@
     "tests/kits/test",
     "tests/kits/workdir"
   ],
-  "nohoist": ["**/mock-stdlib"],
+  "nohoist": [
+    "**/mock-stdlib"
+  ],
   "scripts": {
     "docs": "oz-docs -c packages/cli/docs -c packages/lib/docs",
     "docs:watch": "npm run docs watch packages/lib/contracts packages/cli/src/{commands,bin}",
