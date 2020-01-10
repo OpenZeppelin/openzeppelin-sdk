@@ -2,10 +2,10 @@
 
 *Develop, deploy and operate upgradeable smart contract projects*. Support for Ethereum and every other EVM and eWASM-powered blockchain.
 
-* *Interactive commands*: Send transactions, query balances, and interact with your contracts directly from the command line.
-* *Upgrade your contracts*: You can develop your smart contracts iteratively, speeding up development locally, or squashing bugs in production.
-* *Link Ethereum Packages*: Use code from contracts already deployed to the blockchain directly on your project, saving gas on deployments and managing your dependencies securely.
-* *Build a dapp*: Jumpstart your dapp by unpacking one of our starter kits, pre-configured with OpenZeppelin Contracts, React, and Infura.
+* *Interactive commands*: Send transactions, query balances, and interact with your contracts directly from the command line, using commands like `oz send-tx`, `oz call`, `oz balance`, and `oz transfer`.
+* *Deploy & upgrade your contracts*: You can develop your smart contracts iteratively, speeding up development locally, or squashing bugs in production. Run `oz create` to deploy your contracts, followed by `oz upgrade` any time you want to change their code.
+* *Link Ethereum Packages*: Use code from contracts already deployed to the blockchain directly on your project, saving gas on deployments and managing your dependencies securely, just with an `oz link` command.
+* *Bootstrap your dapp*: Jumpstart your dapp by unpacking one of our starter kits, pre-configured with OpenZeppelin Contracts, React, and Infura. Run `oz unpack` to start!
 
 == Overview
 

@@ -1,12 +1,13 @@
 = Upgrades
 
-*Develop upgradeable smart contracts securely.*
+*Deploy and upgrade smart contracts securely* from your JavaScript code.
 
-This library serves as a backend for the xref:cli::index.adoc[*OpenZeppelin CLI*], and its programmatic API is not yet very suitable for third-party users.
+This library powers the xref:cli::index.adoc[*OpenZeppelin CLI*], by implementing all its deployment and upgrade operations. You can call into this library directly from your scripts if you do not want to go through the CLI. 
 
-However, you can still learn here about using upgrades, how they work under the hood and their limitations.
+WARNING: The upgrades library only creates and upgrades contracts. It will not keep the xref:cli::configuration.adoc[CLI configuration] files up to date with new deployments, meaning that you will have to track your contract addresses on your own. We will be working on a new version of this library that can handle this in the future.
 
-TIP: Stay tuned for upcoming news about a new API! Meanwhile, consider using the CLI to manage your upgradeable contracts.
+
+
 
 == Overview
 
