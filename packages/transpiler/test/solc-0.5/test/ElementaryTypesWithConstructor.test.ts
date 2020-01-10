@@ -1,3 +1,5 @@
 import { shouldTranspileToValidContract } from './LocalConract.behaviour';
 
-shouldTranspileToValidContract('ElementaryTypesWithConstructor');
+shouldTranspileToValidContract('ElementaryTypesWithConstructor', 'ElementaryTypesWithConstructor', [
+  'ElementaryTypesWithConstructor',
+]);
