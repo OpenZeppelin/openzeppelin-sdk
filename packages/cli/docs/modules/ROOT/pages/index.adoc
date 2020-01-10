@@ -28,6 +28,8 @@ Below is a short list of the most used commands:
   * xref:commands.adoc#send[`oz send-tx`]: send a transaction to a contract and execute a function
   * xref:commands.adoc#call[`oz call`]: read data from the blockchain by calling `view` and `pure` functions
   * xref:commands.adoc#upgrade[`oz upgrade`]: upgrade a deployed contract to a new version without changing the address or state
+  * xref:commands.adoc#unpack[`oz unpack`]: bootstrap a project with a xref:starter-kits::index.adoc[Starter Kit]
+  * xref:commands.adoc#link[`oz link`]: reuse on-chain code by to a xref:dependencies.adoc[linking to Ethereum Packages]
 
 == Learn More
 
