@@ -3,7 +3,10 @@ import { transpileAndSaveContracts, compileContracts } from './setup';
 describe('When all the contracts transpilied and saved to contracts folder', (): void => {
   beforeAll(
     async (): Promise<void> => {
-      await transpileAndSaveContracts(['GLDToken'], './build/contracts/');
+      await transpileAndSaveContracts(
+        ['GLDToken', 'ElementaryTypesWithConstructor', 'ElementaryTypes'],
+        './build/contracts/',
+      );
     },
   );
   it('upgradeable contracts successfully compile', async (): Promise<void> => {

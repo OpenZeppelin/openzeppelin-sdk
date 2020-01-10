@@ -1,0 +1,32 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ElementaryTypes contract is converted to a valid ElementaryTypesUpgradable contract 1`] = `
+"pragma solidity ^0.5.0;
+import \\"@openzeppelin/upgrades/contracts/Initializable.sol\\";
+
+contract ElementaryTypesUpgradable is Initializable  {
+    function initialize() external initializer {
+        __init(true);
+    }
+
+    function __init(bool callChain) internal {
+        
+        
+        owner = address(0x123);
+        active = true;
+        hello = \\"hello\\";
+        count = -123;
+        ucount = 123;
+        samevar = \\"stringliteral\\";
+        
+    }
+
+    address public owner ;
+    bool active ;
+    string hello ;
+    int count ;
+    uint ucount ;
+    bytes32 samevar ;
+}
+"
+`;
