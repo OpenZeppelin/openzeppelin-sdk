@@ -23,26 +23,28 @@ This sample script deployes `MyContract` (which should be already compiled) to a
 ```javascript
 const { ZWeb3, Contracts, SimpleProject } = require('@openzeppelin/upgrades');
 
-// Initialize a web3 provider
-ZWeb3.initialize("http://localhost:9545");
+async function main() {
+  // Initialize a web3 provider
+  ZWeb3.initialize("http://localhost:9545");
 
-// Load the contract
-const MyContract = Contracts.getFromLocal('MyContract');
+  // Load the contract
+  const MyContract = Contracts.getFromLocal('MyContract');
 
-// Instantiate a project
-const myProject = new SimpleProject('MyProject', {
-  from: await ZWeb3.defaultAccount()
-});
+  // Instantiate a project
+  const myProject = new SimpleProject('MyProject', {
+    from: await ZWeb3.defaultAccount()
+  });
 
-// Create a proxy for the contract
-const proxy = await myProject.createProxy(MyContract);
+  // Create a proxy for the contract
+  const proxy = await myProject.createProxy(MyContract);
 
-// Make a change on the contract, and compile it
-const MyContractUpgraded = Contracts.getFromLocal('MyContractUpgraded');
-myProject.upgradeProxy(proxy, MyContractUpgraded);
+  // Make a change on the contract, and compile it
+  const MyContractUpgraded = Contracts.getFromLocal('MyContractUpgraded');
+  myProject.upgradeProxy(proxy, MyContractUpgraded);
+}
+
+main();
 ```
-
-NOTE: Because the script uses https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/await[`await`], it should be located inside an `async` function.
 
 == Learn More
 
