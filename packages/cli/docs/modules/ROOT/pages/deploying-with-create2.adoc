@@ -6,7 +6,7 @@ In this guide we will precompute the address where a contract will be deployed a
 
 [NOTE]
 ====
-This guide features advanced usage of OpenZeppelin tools, and require familiarity with Solidity, development blockchains and the OpenZeppelin CLI.
+This guide features advanced usage of OpenZeppelin tools, and requires familiarity with Solidity, development blockchains and the OpenZeppelin CLI.
 
 For a refresher on the topics, head to xref:learn::deploy-and-interact.adoc[Deploying and Interacting With Smart Contracts].
 ====
