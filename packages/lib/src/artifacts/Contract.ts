@@ -2,11 +2,12 @@ import { isAddress } from 'web3-utils';
 
 import ZWeb3 from './ZWeb3';
 import Contracts from './Contracts';
-import ContractAST from '../utils/ContractAST';
+import ContractAST, { ContractDefinitionFilter } from '../utils/ContractAST';
 import { StorageLayoutInfo } from '../validations/Storage';
 import { TransactionReceipt } from 'web3-core';
 import { Contract as Web3Contract } from 'web3-eth-contract';
 import { getArgTypeLabel } from '../utils/ABIs';
+import { Artifact } from './BuildArtifacts';
 
 /*
  * Contract is an interface that extends Web3's Contract interface, adding some properties and methods like:
@@ -27,29 +28,12 @@ export default interface Contract extends Web3Contract {
     transactionReceipt: TransactionReceipt;
   };
   schema: {
-    // openzeppelin schema specific.
     directory: string;
     linkedBytecode: string;
     linkedDeployedBytecode: string;
-    warnings: any;
     storageInfo: StorageLayoutInfo;
-
-    // Solidity schema.
-    schemaVersion: string;
-    contractName: string;
-    abi: any[];
-    bytecode: string;
-    deployedBytecode: string;
-    sourceMap: string;
-    deployedSourceMap: string;
-    source: string;
-    sourcePath: string;
-    ast: any;
-    legacyAST?: any;
-    compiler: any;
-    networks: any;
-    updatedAt: string;
-  };
+    warnings: any;
+  } & Artifact;
 }
 
 export enum ContractMethodMutability {
@@ -175,9 +159,7 @@ export function contractMethodsFromAst(
 }
 
 function getAstMethods(instance: Contract): any[] {
-  return new ContractAST(instance, null, {
-    nodesFilter: ['ContractDefinition'],
-  }).getMethods();
+  return new ContractAST(instance, null, ContractDefinitionFilter).getMethods();
 }
 
 function abiStateMutabilitiesFor(constant: ContractMethodMutability) {
