@@ -12,14 +12,19 @@
     "tests/kits/test",
     "tests/kits/workdir"
   ],
-  "nohoist": ["**/mock-stdlib"],
+  "nohoist": [
+    "**/mock-stdlib"
+  ],
   "scripts": {
-    "prepare": "yarn --cwd bootstrap && lerna run prepare",
-    "lint:check": "lerna run lint:check"
+    "docs": "oz-docs -c packages/cli/docs -c packages/lib/docs",
+    "docs:watch": "npm run docs watch packages/lib/contracts packages/cli/src/{commands,bin}",
+    "lint:check": "lerna run lint:check",
+    "prepare": "yarn --cwd bootstrap && lerna run prepare"
   },
   "devDependencies": {
     "lerna": "^3.13.4",
     "mock-stdlib-root": "file:./packages/cli/test/mocks/mock-stdlib",
+    "openzeppelin-docs-utils": "github:OpenZeppelin/docs-utils",
     "yarn": "^1.17.3"
   }
 }

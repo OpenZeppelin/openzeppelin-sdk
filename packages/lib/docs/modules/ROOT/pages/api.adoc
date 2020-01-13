@@ -1,0 +1,1338 @@
+= API Reference
+
+== Proxies
+
+:Proxy: pass:normal[xref:#Proxy[`Proxy`]]
+:fallback: pass:normal[xref:#Proxy-fallback--[`fallback`]]
+:_implementation: pass:normal[xref:#Proxy-_implementation--[`_implementation`]]
+:_delegate: pass:normal[xref:#Proxy-_delegate-address-[`_delegate`]]
+:_willFallback: pass:normal[xref:#Proxy-_willFallback--[`_willFallback`]]
+:_fallback: pass:normal[xref:#Proxy-_fallback--[`_fallback`]]
+
+[.contract]
+[[Proxy]]
+=== `Proxy`
+
+Implements delegation of calls to other contracts, with proper
+forwarding of return values and bubbling of failures.
+It defines a fallback function that delegates all calls to the address
+returned by the abstract _implementation() internal function.
+
+
+[.contract-index]
+.Functions
+--
+* xref:#Proxy-fallback--[`fallback()`]
+* xref:#Proxy-_implementation--[`_implementation()`]
+* xref:#Proxy-_delegate-address-[`_delegate(implementation)`]
+* xref:#Proxy-_willFallback--[`_willFallback()`]
+* xref:#Proxy-_fallback--[`_fallback()`]
+
+--
+
+
+
+[.contract-item]
+[[Proxy-fallback--]]
+==== `pass:normal[fallback()]` [.item-kind]#external#
+
+Fallback function.
+Implemented entirely in `_fallback`.
+
+[.contract-item]
+[[Proxy-_implementation--]]
+==== `pass:normal[_implementation() → [.var-type\]#address#]` [.item-kind]#internal#
+
+
+
+[.contract-item]
+[[Proxy-_delegate-address-]]
+==== `pass:normal[_delegate([.var-type\]#address# [.var-name\]#implementation#)]` [.item-kind]#internal#
+
+Delegates execution to an implementation contract.
+This is a low level function that doesn't return to its internal call site.
+It will return to the external caller whatever the implementation returns.
+
+
+[.contract-item]
+[[Proxy-_willFallback--]]
+==== `pass:normal[_willFallback()]` [.item-kind]#internal#
+
+Function that is run as the first thing in the fallback function.
+Can be redefined in derived contracts to add functionality.
+Redefinitions must call super._willFallback().
+
+[.contract-item]
+[[Proxy-_fallback--]]
+==== `pass:normal[_fallback()]` [.item-kind]#internal#
+
+fallback implementation.
+Extracted to enable manual triggering.
+
+
+
+
+:UpgradeabilityProxy: pass:normal[xref:#UpgradeabilityProxy[`UpgradeabilityProxy`]]
+:constructor: pass:normal[xref:#UpgradeabilityProxy-constructor-address-bytes-[`constructor`]]
+:_implementation: pass:normal[xref:#BaseUpgradeabilityProxy-_implementation--[`_implementation`]]
+:_upgradeTo: pass:normal[xref:#BaseUpgradeabilityProxy-_upgradeTo-address-[`_upgradeTo`]]
+:_setImplementation: pass:normal[xref:#BaseUpgradeabilityProxy-_setImplementation-address-[`_setImplementation`]]
+:fallback: pass:normal[xref:#Proxy-fallback--[`fallback`]]
+:_delegate: pass:normal[xref:#Proxy-_delegate-address-[`_delegate`]]
+:_willFallback: pass:normal[xref:#Proxy-_willFallback--[`_willFallback`]]
+:_fallback: pass:normal[xref:#Proxy-_fallback--[`_fallback`]]
+:Upgraded: pass:normal[xref:#BaseUpgradeabilityProxy-Upgraded-address-[`Upgraded`]]
+
+[.contract]
+[[UpgradeabilityProxy]]
+=== `UpgradeabilityProxy`
+
+Extends BaseUpgradeabilityProxy with a constructor for initializing
+implementation and init data.
+
+
+[.contract-index]
+.Functions
+--
+* xref:#UpgradeabilityProxy-constructor-address-bytes-[`constructor(_logic, _data)`]
+
+[.contract-subindex-inherited]
+.BaseUpgradeabilityProxy
+* xref:#BaseUpgradeabilityProxy-_implementation--[`_implementation()`]
+* xref:#BaseUpgradeabilityProxy-_upgradeTo-address-[`_upgradeTo(newImplementation)`]
+* xref:#BaseUpgradeabilityProxy-_setImplementation-address-[`_setImplementation(newImplementation)`]
+
+[.contract-subindex-inherited]
+.Proxy
+* xref:#Proxy-fallback--[`fallback()`]
+* xref:#Proxy-_delegate-address-[`_delegate(implementation)`]
+* xref:#Proxy-_willFallback--[`_willFallback()`]
+* xref:#Proxy-_fallback--[`_fallback()`]
+
+--
+
+[.contract-index]
+.Events
+--
+
+[.contract-subindex-inherited]
+.BaseUpgradeabilityProxy
+* xref:#BaseUpgradeabilityProxy-Upgraded-address-[`Upgraded(implementation)`]
+
+[.contract-subindex-inherited]
+.Proxy
+
+--
+
+
+[.contract-item]
+[[UpgradeabilityProxy-constructor-address-bytes-]]
+==== `pass:normal[constructor([.var-type\]#address# [.var-name\]#_logic#, [.var-type\]#bytes# [.var-name\]#_data#)]` [.item-kind]#public#
+
+Contract constructor.
+
+
+
+
+
+:AdminUpgradeabilityProxy: pass:normal[xref:#AdminUpgradeabilityProxy[`AdminUpgradeabilityProxy`]]
+:ifAdmin: pass:normal[xref:#BaseAdminUpgradeabilityProxy-ifAdmin--[`ifAdmin`]]
+:constructor: pass:normal[xref:#AdminUpgradeabilityProxy-constructor-address-address-bytes-[`constructor`]]
+:constructor: pass:normal[xref:#UpgradeabilityProxy-constructor-address-bytes-[`constructor`]]
+:admin: pass:normal[xref:#BaseAdminUpgradeabilityProxy-admin--[`admin`]]
+:implementation: pass:normal[xref:#BaseAdminUpgradeabilityProxy-implementation--[`implementation`]]
+:changeAdmin: pass:normal[xref:#BaseAdminUpgradeabilityProxy-changeAdmin-address-[`changeAdmin`]]
+:upgradeTo: pass:normal[xref:#BaseAdminUpgradeabilityProxy-upgradeTo-address-[`upgradeTo`]]
+:upgradeToAndCall: pass:normal[xref:#BaseAdminUpgradeabilityProxy-upgradeToAndCall-address-bytes-[`upgradeToAndCall`]]
+:_admin: pass:normal[xref:#BaseAdminUpgradeabilityProxy-_admin--[`_admin`]]
+:_setAdmin: pass:normal[xref:#BaseAdminUpgradeabilityProxy-_setAdmin-address-[`_setAdmin`]]
+:_willFallback: pass:normal[xref:#BaseAdminUpgradeabilityProxy-_willFallback--[`_willFallback`]]
+:_implementation: pass:normal[xref:#BaseUpgradeabilityProxy-_implementation--[`_implementation`]]
+:_upgradeTo: pass:normal[xref:#BaseUpgradeabilityProxy-_upgradeTo-address-[`_upgradeTo`]]
+:_setImplementation: pass:normal[xref:#BaseUpgradeabilityProxy-_setImplementation-address-[`_setImplementation`]]
+:fallback: pass:normal[xref:#Proxy-fallback--[`fallback`]]
+:_delegate: pass:normal[xref:#Proxy-_delegate-address-[`_delegate`]]
+:_fallback: pass:normal[xref:#Proxy-_fallback--[`_fallback`]]
+:AdminChanged: pass:normal[xref:#BaseAdminUpgradeabilityProxy-AdminChanged-address-address-[`AdminChanged`]]
+:Upgraded: pass:normal[xref:#BaseUpgradeabilityProxy-Upgraded-address-[`Upgraded`]]
+
+[.contract]
+[[AdminUpgradeabilityProxy]]
+=== `AdminUpgradeabilityProxy`
+
+Extends from BaseAdminUpgradeabilityProxy with a constructor for 
+initializing the implementation, admin, and init data.
+
+[.contract-index]
+.Modifiers
+--
+
+[.contract-subindex-inherited]
+.UpgradeabilityProxy
+
+[.contract-subindex-inherited]
+.BaseAdminUpgradeabilityProxy
+* xref:#BaseAdminUpgradeabilityProxy-ifAdmin--[`ifAdmin()`]
+
+[.contract-subindex-inherited]
+.BaseUpgradeabilityProxy
+
+[.contract-subindex-inherited]
+.Proxy
+
+--
+
+[.contract-index]
+.Functions
+--
+* xref:#AdminUpgradeabilityProxy-constructor-address-address-bytes-[`constructor(_logic, _admin, _data)`]
+
+[.contract-subindex-inherited]
+.UpgradeabilityProxy
+* xref:#UpgradeabilityProxy-constructor-address-bytes-[`constructor(_logic, _data)`]
+
+[.contract-subindex-inherited]
+.BaseAdminUpgradeabilityProxy
+* xref:#BaseAdminUpgradeabilityProxy-admin--[`admin()`]
+* xref:#BaseAdminUpgradeabilityProxy-implementation--[`implementation()`]
+* xref:#BaseAdminUpgradeabilityProxy-changeAdmin-address-[`changeAdmin(newAdmin)`]
+* xref:#BaseAdminUpgradeabilityProxy-upgradeTo-address-[`upgradeTo(newImplementation)`]
+* xref:#BaseAdminUpgradeabilityProxy-upgradeToAndCall-address-bytes-[`upgradeToAndCall(newImplementation, data)`]
+* xref:#BaseAdminUpgradeabilityProxy-_admin--[`_admin()`]
+* xref:#BaseAdminUpgradeabilityProxy-_setAdmin-address-[`_setAdmin(newAdmin)`]
+* xref:#BaseAdminUpgradeabilityProxy-_willFallback--[`_willFallback()`]
+
+[.contract-subindex-inherited]
+.BaseUpgradeabilityProxy
+* xref:#BaseUpgradeabilityProxy-_implementation--[`_implementation()`]
+* xref:#BaseUpgradeabilityProxy-_upgradeTo-address-[`_upgradeTo(newImplementation)`]
+* xref:#BaseUpgradeabilityProxy-_setImplementation-address-[`_setImplementation(newImplementation)`]
+
+[.contract-subindex-inherited]
+.Proxy
+* xref:#Proxy-fallback--[`fallback()`]
+* xref:#Proxy-_delegate-address-[`_delegate(implementation)`]
+* xref:#Proxy-_fallback--[`_fallback()`]
+
+--
+
+[.contract-index]
+.Events
+--
+
+[.contract-subindex-inherited]
+.UpgradeabilityProxy
+
+[.contract-subindex-inherited]
+.BaseAdminUpgradeabilityProxy
+* xref:#BaseAdminUpgradeabilityProxy-AdminChanged-address-address-[`AdminChanged(previousAdmin, newAdmin)`]
+
+[.contract-subindex-inherited]
+.BaseUpgradeabilityProxy
+* xref:#BaseUpgradeabilityProxy-Upgraded-address-[`Upgraded(implementation)`]
+
+[.contract-subindex-inherited]
+.Proxy
+
+--
+
+
+[.contract-item]
+[[AdminUpgradeabilityProxy-constructor-address-address-bytes-]]
+==== `pass:normal[constructor([.var-type\]#address# [.var-name\]#_logic#, [.var-type\]#address# [.var-name\]#_admin#, [.var-type\]#bytes# [.var-name\]#_data#)]` [.item-kind]#public#
+
+
+
+
+
+
+:BaseAdminUpgradeabilityProxy: pass:normal[xref:#BaseAdminUpgradeabilityProxy[`BaseAdminUpgradeabilityProxy`]]
+:ifAdmin: pass:normal[xref:#BaseAdminUpgradeabilityProxy-ifAdmin--[`ifAdmin`]]
+:admin: pass:normal[xref:#BaseAdminUpgradeabilityProxy-admin--[`admin`]]
+:implementation: pass:normal[xref:#BaseAdminUpgradeabilityProxy-implementation--[`implementation`]]
+:changeAdmin: pass:normal[xref:#BaseAdminUpgradeabilityProxy-changeAdmin-address-[`changeAdmin`]]
+:upgradeTo: pass:normal[xref:#BaseAdminUpgradeabilityProxy-upgradeTo-address-[`upgradeTo`]]
+:upgradeToAndCall: pass:normal[xref:#BaseAdminUpgradeabilityProxy-upgradeToAndCall-address-bytes-[`upgradeToAndCall`]]
+:_admin: pass:normal[xref:#BaseAdminUpgradeabilityProxy-_admin--[`_admin`]]
+:_setAdmin: pass:normal[xref:#BaseAdminUpgradeabilityProxy-_setAdmin-address-[`_setAdmin`]]
+:_willFallback: pass:normal[xref:#BaseAdminUpgradeabilityProxy-_willFallback--[`_willFallback`]]
+:_implementation: pass:normal[xref:#BaseUpgradeabilityProxy-_implementation--[`_implementation`]]
+:_upgradeTo: pass:normal[xref:#BaseUpgradeabilityProxy-_upgradeTo-address-[`_upgradeTo`]]
+:_setImplementation: pass:normal[xref:#BaseUpgradeabilityProxy-_setImplementation-address-[`_setImplementation`]]
+:fallback: pass:normal[xref:#Proxy-fallback--[`fallback`]]
+:_delegate: pass:normal[xref:#Proxy-_delegate-address-[`_delegate`]]
+:_fallback: pass:normal[xref:#Proxy-_fallback--[`_fallback`]]
+:AdminChanged: pass:normal[xref:#BaseAdminUpgradeabilityProxy-AdminChanged-address-address-[`AdminChanged`]]
+:Upgraded: pass:normal[xref:#BaseUpgradeabilityProxy-Upgraded-address-[`Upgraded`]]
+
+[.contract]
+[[BaseAdminUpgradeabilityProxy]]
+=== `BaseAdminUpgradeabilityProxy`
+
+This contract combines an upgradeability proxy with an authorization
+mechanism for administrative tasks.
+All external functions in this contract must be guarded by the
+`ifAdmin` modifier. See ethereum/solidity#3864 for a Solidity
+feature proposal that would enable this to be done automatically.
+
+[.contract-index]
+.Modifiers
+--
+* xref:#BaseAdminUpgradeabilityProxy-ifAdmin--[`ifAdmin()`]
+
+[.contract-subindex-inherited]
+.BaseUpgradeabilityProxy
+
+[.contract-subindex-inherited]
+.Proxy
+
+--
+
+[.contract-index]
+.Functions
+--
+* xref:#BaseAdminUpgradeabilityProxy-admin--[`admin()`]
+* xref:#BaseAdminUpgradeabilityProxy-implementation--[`implementation()`]
+* xref:#BaseAdminUpgradeabilityProxy-changeAdmin-address-[`changeAdmin(newAdmin)`]
+* xref:#BaseAdminUpgradeabilityProxy-upgradeTo-address-[`upgradeTo(newImplementation)`]
+* xref:#BaseAdminUpgradeabilityProxy-upgradeToAndCall-address-bytes-[`upgradeToAndCall(newImplementation, data)`]
+* xref:#BaseAdminUpgradeabilityProxy-_admin--[`_admin()`]
+* xref:#BaseAdminUpgradeabilityProxy-_setAdmin-address-[`_setAdmin(newAdmin)`]
+* xref:#BaseAdminUpgradeabilityProxy-_willFallback--[`_willFallback()`]
+
+[.contract-subindex-inherited]
+.BaseUpgradeabilityProxy
+* xref:#BaseUpgradeabilityProxy-_implementation--[`_implementation()`]
+* xref:#BaseUpgradeabilityProxy-_upgradeTo-address-[`_upgradeTo(newImplementation)`]
+* xref:#BaseUpgradeabilityProxy-_setImplementation-address-[`_setImplementation(newImplementation)`]
+
+[.contract-subindex-inherited]
+.Proxy
+* xref:#Proxy-fallback--[`fallback()`]
+* xref:#Proxy-_delegate-address-[`_delegate(implementation)`]
+* xref:#Proxy-_fallback--[`_fallback()`]
+
+--
+
+[.contract-index]
+.Events
+--
+* xref:#BaseAdminUpgradeabilityProxy-AdminChanged-address-address-[`AdminChanged(previousAdmin, newAdmin)`]
+
+[.contract-subindex-inherited]
+.BaseUpgradeabilityProxy
+* xref:#BaseUpgradeabilityProxy-Upgraded-address-[`Upgraded(implementation)`]
+
+[.contract-subindex-inherited]
+.Proxy
+
+--
+
+[.contract-item]
+[[BaseAdminUpgradeabilityProxy-ifAdmin--]]
+==== `pass:normal[ifAdmin()]` [.item-kind]#modifier#
+
+Modifier to check whether the `msg.sender` is the admin.
+If it is, it will run the function. Otherwise, it will delegate the call
+to the implementation.
+
+
+[.contract-item]
+[[BaseAdminUpgradeabilityProxy-admin--]]
+==== `pass:normal[admin() → [.var-type\]#address#]` [.item-kind]#external#
+
+
+
+[.contract-item]
+[[BaseAdminUpgradeabilityProxy-implementation--]]
+==== `pass:normal[implementation() → [.var-type\]#address#]` [.item-kind]#external#
+
+
+
+[.contract-item]
+[[BaseAdminUpgradeabilityProxy-changeAdmin-address-]]
+==== `pass:normal[changeAdmin([.var-type\]#address# [.var-name\]#newAdmin#)]` [.item-kind]#external#
+
+Changes the admin of the proxy.
+Only the current admin can call this function.
+
+
+[.contract-item]
+[[BaseAdminUpgradeabilityProxy-upgradeTo-address-]]
+==== `pass:normal[upgradeTo([.var-type\]#address# [.var-name\]#newImplementation#)]` [.item-kind]#external#
+
+Upgrade the backing implementation of the proxy.
+Only the admin can call this function.
+
+
+[.contract-item]
+[[BaseAdminUpgradeabilityProxy-upgradeToAndCall-address-bytes-]]
+==== `pass:normal[upgradeToAndCall([.var-type\]#address# [.var-name\]#newImplementation#, [.var-type\]#bytes# [.var-name\]#data#)]` [.item-kind]#external#
+
+Upgrade the backing implementation of the proxy and call a function
+on the new implementation.
+This is useful to initialize the proxied contract.
+
+
+[.contract-item]
+[[BaseAdminUpgradeabilityProxy-_admin--]]
+==== `pass:normal[_admin() → [.var-type\]#address# [.var-name\]#adm#]` [.item-kind]#internal#
+
+
+
+[.contract-item]
+[[BaseAdminUpgradeabilityProxy-_setAdmin-address-]]
+==== `pass:normal[_setAdmin([.var-type\]#address# [.var-name\]#newAdmin#)]` [.item-kind]#internal#
+
+Sets the address of the proxy admin.
+
+
+[.contract-item]
+[[BaseAdminUpgradeabilityProxy-_willFallback--]]
+==== `pass:normal[_willFallback()]` [.item-kind]#internal#
+
+Only fall back when the sender is not the admin.
+
+
+[.contract-item]
+[[BaseAdminUpgradeabilityProxy-AdminChanged-address-address-]]
+==== `pass:normal[AdminChanged([.var-type\]#address# [.var-name\]#previousAdmin#, [.var-type\]#address# [.var-name\]#newAdmin#)]` [.item-kind]#event#
+
+Emitted when the administration has been transferred.
+
+
+
+
+:BaseUpgradeabilityProxy: pass:normal[xref:#BaseUpgradeabilityProxy[`BaseUpgradeabilityProxy`]]
+:_implementation: pass:normal[xref:#BaseUpgradeabilityProxy-_implementation--[`_implementation`]]
+:_upgradeTo: pass:normal[xref:#BaseUpgradeabilityProxy-_upgradeTo-address-[`_upgradeTo`]]
+:_setImplementation: pass:normal[xref:#BaseUpgradeabilityProxy-_setImplementation-address-[`_setImplementation`]]
+:fallback: pass:normal[xref:#Proxy-fallback--[`fallback`]]
+:_delegate: pass:normal[xref:#Proxy-_delegate-address-[`_delegate`]]
+:_willFallback: pass:normal[xref:#Proxy-_willFallback--[`_willFallback`]]
+:_fallback: pass:normal[xref:#Proxy-_fallback--[`_fallback`]]
+:Upgraded: pass:normal[xref:#BaseUpgradeabilityProxy-Upgraded-address-[`Upgraded`]]
+
+[.contract]
+[[BaseUpgradeabilityProxy]]
+=== `BaseUpgradeabilityProxy`
+
+This contract implements a proxy that allows to change the
+implementation address to which it will delegate.
+Such a change is called an implementation upgrade.
+
+
+[.contract-index]
+.Functions
+--
+* xref:#BaseUpgradeabilityProxy-_implementation--[`_implementation()`]
+* xref:#BaseUpgradeabilityProxy-_upgradeTo-address-[`_upgradeTo(newImplementation)`]
+* xref:#BaseUpgradeabilityProxy-_setImplementation-address-[`_setImplementation(newImplementation)`]
+
+[.contract-subindex-inherited]
+.Proxy
+* xref:#Proxy-fallback--[`fallback()`]
+* xref:#Proxy-_delegate-address-[`_delegate(implementation)`]
+* xref:#Proxy-_willFallback--[`_willFallback()`]
+* xref:#Proxy-_fallback--[`_fallback()`]
+
+--
+
+[.contract-index]
+.Events
+--
+* xref:#BaseUpgradeabilityProxy-Upgraded-address-[`Upgraded(implementation)`]
+
+[.contract-subindex-inherited]
+.Proxy
+
+--
+
+
+[.contract-item]
+[[BaseUpgradeabilityProxy-_implementation--]]
+==== `pass:normal[_implementation() → [.var-type\]#address# [.var-name\]#impl#]` [.item-kind]#internal#
+
+Returns the current implementation.
+
+
+[.contract-item]
+[[BaseUpgradeabilityProxy-_upgradeTo-address-]]
+==== `pass:normal[_upgradeTo([.var-type\]#address# [.var-name\]#newImplementation#)]` [.item-kind]#internal#
+
+Upgrades the proxy to a new implementation.
+
+
+[.contract-item]
+[[BaseUpgradeabilityProxy-_setImplementation-address-]]
+==== `pass:normal[_setImplementation([.var-type\]#address# [.var-name\]#newImplementation#)]` [.item-kind]#internal#
+
+Sets the implementation address of the proxy.
+
+
+
+[.contract-item]
+[[BaseUpgradeabilityProxy-Upgraded-address-]]
+==== `pass:normal[Upgraded([.var-type\]#address# [.var-name\]#implementation#)]` [.item-kind]#event#
+
+Emitted when the implementation is upgraded.
+
+
+
+
+:InitializableAdminUpgradeabilityProxy: pass:normal[xref:#InitializableAdminUpgradeabilityProxy[`InitializableAdminUpgradeabilityProxy`]]
+:ifAdmin: pass:normal[xref:#BaseAdminUpgradeabilityProxy-ifAdmin--[`ifAdmin`]]
+:initialize: pass:normal[xref:#InitializableAdminUpgradeabilityProxy-initialize-address-address-bytes-[`initialize`]]
+:initialize: pass:normal[xref:#InitializableUpgradeabilityProxy-initialize-address-bytes-[`initialize`]]
+:admin: pass:normal[xref:#BaseAdminUpgradeabilityProxy-admin--[`admin`]]
+:implementation: pass:normal[xref:#BaseAdminUpgradeabilityProxy-implementation--[`implementation`]]
+:changeAdmin: pass:normal[xref:#BaseAdminUpgradeabilityProxy-changeAdmin-address-[`changeAdmin`]]
+:upgradeTo: pass:normal[xref:#BaseAdminUpgradeabilityProxy-upgradeTo-address-[`upgradeTo`]]
+:upgradeToAndCall: pass:normal[xref:#BaseAdminUpgradeabilityProxy-upgradeToAndCall-address-bytes-[`upgradeToAndCall`]]
+:_admin: pass:normal[xref:#BaseAdminUpgradeabilityProxy-_admin--[`_admin`]]
+:_setAdmin: pass:normal[xref:#BaseAdminUpgradeabilityProxy-_setAdmin-address-[`_setAdmin`]]
+:_willFallback: pass:normal[xref:#BaseAdminUpgradeabilityProxy-_willFallback--[`_willFallback`]]
+:_implementation: pass:normal[xref:#BaseUpgradeabilityProxy-_implementation--[`_implementation`]]
+:_upgradeTo: pass:normal[xref:#BaseUpgradeabilityProxy-_upgradeTo-address-[`_upgradeTo`]]
+:_setImplementation: pass:normal[xref:#BaseUpgradeabilityProxy-_setImplementation-address-[`_setImplementation`]]
+:fallback: pass:normal[xref:#Proxy-fallback--[`fallback`]]
+:_delegate: pass:normal[xref:#Proxy-_delegate-address-[`_delegate`]]
+:_fallback: pass:normal[xref:#Proxy-_fallback--[`_fallback`]]
+:AdminChanged: pass:normal[xref:#BaseAdminUpgradeabilityProxy-AdminChanged-address-address-[`AdminChanged`]]
+:Upgraded: pass:normal[xref:#BaseUpgradeabilityProxy-Upgraded-address-[`Upgraded`]]
+
+[.contract]
+[[InitializableAdminUpgradeabilityProxy]]
+=== `InitializableAdminUpgradeabilityProxy`
+
+Extends from BaseAdminUpgradeabilityProxy with an initializer for 
+initializing the implementation, admin, and init data.
+
+[.contract-index]
+.Modifiers
+--
+
+[.contract-subindex-inherited]
+.InitializableUpgradeabilityProxy
+
+[.contract-subindex-inherited]
+.BaseAdminUpgradeabilityProxy
+* xref:#BaseAdminUpgradeabilityProxy-ifAdmin--[`ifAdmin()`]
+
+[.contract-subindex-inherited]
+.BaseUpgradeabilityProxy
+
+[.contract-subindex-inherited]
+.Proxy
+
+--
+
+[.contract-index]
+.Functions
+--
+* xref:#InitializableAdminUpgradeabilityProxy-initialize-address-address-bytes-[`initialize(_logic, _admin, _data)`]
+
+[.contract-subindex-inherited]
+.InitializableUpgradeabilityProxy
+* xref:#InitializableUpgradeabilityProxy-initialize-address-bytes-[`initialize(_logic, _data)`]
+
+[.contract-subindex-inherited]
+.BaseAdminUpgradeabilityProxy
+* xref:#BaseAdminUpgradeabilityProxy-admin--[`admin()`]
+* xref:#BaseAdminUpgradeabilityProxy-implementation--[`implementation()`]
+* xref:#BaseAdminUpgradeabilityProxy-changeAdmin-address-[`changeAdmin(newAdmin)`]
+* xref:#BaseAdminUpgradeabilityProxy-upgradeTo-address-[`upgradeTo(newImplementation)`]
+* xref:#BaseAdminUpgradeabilityProxy-upgradeToAndCall-address-bytes-[`upgradeToAndCall(newImplementation, data)`]
+* xref:#BaseAdminUpgradeabilityProxy-_admin--[`_admin()`]
+* xref:#BaseAdminUpgradeabilityProxy-_setAdmin-address-[`_setAdmin(newAdmin)`]
+* xref:#BaseAdminUpgradeabilityProxy-_willFallback--[`_willFallback()`]
+
+[.contract-subindex-inherited]
+.BaseUpgradeabilityProxy
+* xref:#BaseUpgradeabilityProxy-_implementation--[`_implementation()`]
+* xref:#BaseUpgradeabilityProxy-_upgradeTo-address-[`_upgradeTo(newImplementation)`]
+* xref:#BaseUpgradeabilityProxy-_setImplementation-address-[`_setImplementation(newImplementation)`]
+
+[.contract-subindex-inherited]
+.Proxy
+* xref:#Proxy-fallback--[`fallback()`]
+* xref:#Proxy-_delegate-address-[`_delegate(implementation)`]
+* xref:#Proxy-_fallback--[`_fallback()`]
+
+--
+
+[.contract-index]
+.Events
+--
+
+[.contract-subindex-inherited]
+.InitializableUpgradeabilityProxy
+
+[.contract-subindex-inherited]
+.BaseAdminUpgradeabilityProxy
+* xref:#BaseAdminUpgradeabilityProxy-AdminChanged-address-address-[`AdminChanged(previousAdmin, newAdmin)`]
+
+[.contract-subindex-inherited]
+.BaseUpgradeabilityProxy
+* xref:#BaseUpgradeabilityProxy-Upgraded-address-[`Upgraded(implementation)`]
+
+[.contract-subindex-inherited]
+.Proxy
+
+--
+
+
+[.contract-item]
+[[InitializableAdminUpgradeabilityProxy-initialize-address-address-bytes-]]
+==== `pass:normal[initialize([.var-type\]#address# [.var-name\]#_logic#, [.var-type\]#address# [.var-name\]#_admin#, [.var-type\]#bytes# [.var-name\]#_data#)]` [.item-kind]#public#
+
+
+
+
+
+
+:InitializableUpgradeabilityProxy: pass:normal[xref:#InitializableUpgradeabilityProxy[`InitializableUpgradeabilityProxy`]]
+:initialize: pass:normal[xref:#InitializableUpgradeabilityProxy-initialize-address-bytes-[`initialize`]]
+:_implementation: pass:normal[xref:#BaseUpgradeabilityProxy-_implementation--[`_implementation`]]
+:_upgradeTo: pass:normal[xref:#BaseUpgradeabilityProxy-_upgradeTo-address-[`_upgradeTo`]]
+:_setImplementation: pass:normal[xref:#BaseUpgradeabilityProxy-_setImplementation-address-[`_setImplementation`]]
+:fallback: pass:normal[xref:#Proxy-fallback--[`fallback`]]
+:_delegate: pass:normal[xref:#Proxy-_delegate-address-[`_delegate`]]
+:_willFallback: pass:normal[xref:#Proxy-_willFallback--[`_willFallback`]]
+:_fallback: pass:normal[xref:#Proxy-_fallback--[`_fallback`]]
+:Upgraded: pass:normal[xref:#BaseUpgradeabilityProxy-Upgraded-address-[`Upgraded`]]
+
+[.contract]
+[[InitializableUpgradeabilityProxy]]
+=== `InitializableUpgradeabilityProxy`
+
+Extends BaseUpgradeabilityProxy with an initializer for initializing
+implementation and init data.
+
+
+[.contract-index]
+.Functions
+--
+* xref:#InitializableUpgradeabilityProxy-initialize-address-bytes-[`initialize(_logic, _data)`]
+
+[.contract-subindex-inherited]
+.BaseUpgradeabilityProxy
+* xref:#BaseUpgradeabilityProxy-_implementation--[`_implementation()`]
+* xref:#BaseUpgradeabilityProxy-_upgradeTo-address-[`_upgradeTo(newImplementation)`]
+* xref:#BaseUpgradeabilityProxy-_setImplementation-address-[`_setImplementation(newImplementation)`]
+
+[.contract-subindex-inherited]
+.Proxy
+* xref:#Proxy-fallback--[`fallback()`]
+* xref:#Proxy-_delegate-address-[`_delegate(implementation)`]
+* xref:#Proxy-_willFallback--[`_willFallback()`]
+* xref:#Proxy-_fallback--[`_fallback()`]
+
+--
+
+[.contract-index]
+.Events
+--
+
+[.contract-subindex-inherited]
+.BaseUpgradeabilityProxy
+* xref:#BaseUpgradeabilityProxy-Upgraded-address-[`Upgraded(implementation)`]
+
+[.contract-subindex-inherited]
+.Proxy
+
+--
+
+
+[.contract-item]
+[[InitializableUpgradeabilityProxy-initialize-address-bytes-]]
+==== `pass:normal[initialize([.var-type\]#address# [.var-name\]#_logic#, [.var-type\]#bytes# [.var-name\]#_data#)]` [.item-kind]#public#
+
+Contract initializer.
+
+
+
+
+
+:ProxyAdmin: pass:normal[xref:#ProxyAdmin[`ProxyAdmin`]]
+:onlyOwner: pass:normal[xref:#OpenZeppelinUpgradesOwnable-onlyOwner--[`onlyOwner`]]
+:getProxyImplementation: pass:normal[xref:#ProxyAdmin-getProxyImplementation-contract-AdminUpgradeabilityProxy-[`getProxyImplementation`]]
+:getProxyAdmin: pass:normal[xref:#ProxyAdmin-getProxyAdmin-contract-AdminUpgradeabilityProxy-[`getProxyAdmin`]]
+:changeProxyAdmin: pass:normal[xref:#ProxyAdmin-changeProxyAdmin-contract-AdminUpgradeabilityProxy-address-[`changeProxyAdmin`]]
+:upgrade: pass:normal[xref:#ProxyAdmin-upgrade-contract-AdminUpgradeabilityProxy-address-[`upgrade`]]
+:upgradeAndCall: pass:normal[xref:#ProxyAdmin-upgradeAndCall-contract-AdminUpgradeabilityProxy-address-bytes-[`upgradeAndCall`]]
+:constructor: pass:normal[xref:#OpenZeppelinUpgradesOwnable-constructor--[`constructor`]]
+:owner: pass:normal[xref:#OpenZeppelinUpgradesOwnable-owner--[`owner`]]
+:isOwner: pass:normal[xref:#OpenZeppelinUpgradesOwnable-isOwner--[`isOwner`]]
+:renounceOwnership: pass:normal[xref:#OpenZeppelinUpgradesOwnable-renounceOwnership--[`renounceOwnership`]]
+:transferOwnership: pass:normal[xref:#OpenZeppelinUpgradesOwnable-transferOwnership-address-[`transferOwnership`]]
+:_transferOwnership: pass:normal[xref:#OpenZeppelinUpgradesOwnable-_transferOwnership-address-[`_transferOwnership`]]
+:OwnershipTransferred: pass:normal[xref:#OpenZeppelinUpgradesOwnable-OwnershipTransferred-address-address-[`OwnershipTransferred`]]
+
+[.contract]
+[[ProxyAdmin]]
+=== `ProxyAdmin`
+
+This contract is the admin of a proxy, and is in charge
+of upgrading it as well as transferring it to another admin.
+
+[.contract-index]
+.Modifiers
+--
+
+[.contract-subindex-inherited]
+.OpenZeppelinUpgradesOwnable
+* xref:#OpenZeppelinUpgradesOwnable-onlyOwner--[`onlyOwner()`]
+
+--
+
+[.contract-index]
+.Functions
+--
+* xref:#ProxyAdmin-getProxyImplementation-contract-AdminUpgradeabilityProxy-[`getProxyImplementation(proxy)`]
+* xref:#ProxyAdmin-getProxyAdmin-contract-AdminUpgradeabilityProxy-[`getProxyAdmin(proxy)`]
+* xref:#ProxyAdmin-changeProxyAdmin-contract-AdminUpgradeabilityProxy-address-[`changeProxyAdmin(proxy, newAdmin)`]
+* xref:#ProxyAdmin-upgrade-contract-AdminUpgradeabilityProxy-address-[`upgrade(proxy, implementation)`]
+* xref:#ProxyAdmin-upgradeAndCall-contract-AdminUpgradeabilityProxy-address-bytes-[`upgradeAndCall(proxy, implementation, data)`]
+
+[.contract-subindex-inherited]
+.OpenZeppelinUpgradesOwnable
+* xref:#OpenZeppelinUpgradesOwnable-constructor--[`constructor()`]
+* xref:#OpenZeppelinUpgradesOwnable-owner--[`owner()`]
+* xref:#OpenZeppelinUpgradesOwnable-isOwner--[`isOwner()`]
+* xref:#OpenZeppelinUpgradesOwnable-renounceOwnership--[`renounceOwnership()`]
+* xref:#OpenZeppelinUpgradesOwnable-transferOwnership-address-[`transferOwnership(newOwner)`]
+* xref:#OpenZeppelinUpgradesOwnable-_transferOwnership-address-[`_transferOwnership(newOwner)`]
+
+--
+
+[.contract-index]
+.Events
+--
+
+[.contract-subindex-inherited]
+.OpenZeppelinUpgradesOwnable
+* xref:#OpenZeppelinUpgradesOwnable-OwnershipTransferred-address-address-[`OwnershipTransferred(previousOwner, newOwner)`]
+
+--
+
+
+[.contract-item]
+[[ProxyAdmin-getProxyImplementation-contract-AdminUpgradeabilityProxy-]]
+==== `pass:normal[getProxyImplementation([.var-type\]#contract AdminUpgradeabilityProxy# [.var-name\]#proxy#) → [.var-type\]#address#]` [.item-kind]#public#
+
+Returns the current implementation of a proxy.
+This is needed because only the proxy admin can query it.
+
+
+[.contract-item]
+[[ProxyAdmin-getProxyAdmin-contract-AdminUpgradeabilityProxy-]]
+==== `pass:normal[getProxyAdmin([.var-type\]#contract AdminUpgradeabilityProxy# [.var-name\]#proxy#) → [.var-type\]#address#]` [.item-kind]#public#
+
+Returns the admin of a proxy. Only the admin can query it.
+
+
+[.contract-item]
+[[ProxyAdmin-changeProxyAdmin-contract-AdminUpgradeabilityProxy-address-]]
+==== `pass:normal[changeProxyAdmin([.var-type\]#contract AdminUpgradeabilityProxy# [.var-name\]#proxy#, [.var-type\]#address# [.var-name\]#newAdmin#)]` [.item-kind]#public#
+
+Changes the admin of a proxy.
+
+
+[.contract-item]
+[[ProxyAdmin-upgrade-contract-AdminUpgradeabilityProxy-address-]]
+==== `pass:normal[upgrade([.var-type\]#contract AdminUpgradeabilityProxy# [.var-name\]#proxy#, [.var-type\]#address# [.var-name\]#implementation#)]` [.item-kind]#public#
+
+Upgrades a proxy to the newest implementation of a contract.
+
+
+[.contract-item]
+[[ProxyAdmin-upgradeAndCall-contract-AdminUpgradeabilityProxy-address-bytes-]]
+==== `pass:normal[upgradeAndCall([.var-type\]#contract AdminUpgradeabilityProxy# [.var-name\]#proxy#, [.var-type\]#address# [.var-name\]#implementation#, [.var-type\]#bytes# [.var-name\]#data#)]` [.item-kind]#public#
+
+Upgrades a proxy to the newest implementation of a contract and forwards a function call to it.
+This is useful to initialize the proxied contract.
+
+
+
+
+
+:ProxyFactory: pass:normal[xref:#ProxyFactory[`ProxyFactory`]]
+:constructor: pass:normal[xref:#ProxyFactory-constructor--[`constructor`]]
+:deployMinimal: pass:normal[xref:#ProxyFactory-deployMinimal-address-bytes-[`deployMinimal`]]
+:deploy: pass:normal[xref:#ProxyFactory-deploy-uint256-address-address-bytes-[`deploy`]]
+:deploySigned: pass:normal[xref:#ProxyFactory-deploySigned-uint256-address-address-bytes-bytes-[`deploySigned`]]
+:getDeploymentAddress: pass:normal[xref:#ProxyFactory-getDeploymentAddress-uint256-address-[`getDeploymentAddress`]]
+:getSigner: pass:normal[xref:#ProxyFactory-getSigner-uint256-address-address-bytes-bytes-[`getSigner`]]
+:_deployProxy: pass:normal[xref:#ProxyFactory-_deployProxy-uint256-address-address-bytes-address-[`_deployProxy`]]
+:_createProxy: pass:normal[xref:#ProxyFactory-_createProxy-uint256-address-[`_createProxy`]]
+:_getSalt: pass:normal[xref:#ProxyFactory-_getSalt-uint256-address-[`_getSalt`]]
+:ProxyCreated: pass:normal[xref:#ProxyFactory-ProxyCreated-address-[`ProxyCreated`]]
+
+[.contract]
+[[ProxyFactory]]
+=== `ProxyFactory`
+
+
+
+
+[.contract-index]
+.Functions
+--
+* xref:#ProxyFactory-constructor--[`constructor()`]
+* xref:#ProxyFactory-deployMinimal-address-bytes-[`deployMinimal(_logic, _data)`]
+* xref:#ProxyFactory-deploy-uint256-address-address-bytes-[`deploy(_salt, _logic, _admin, _data)`]
+* xref:#ProxyFactory-deploySigned-uint256-address-address-bytes-bytes-[`deploySigned(_salt, _logic, _admin, _data, _signature)`]
+* xref:#ProxyFactory-getDeploymentAddress-uint256-address-[`getDeploymentAddress(_salt, _sender)`]
+* xref:#ProxyFactory-getSigner-uint256-address-address-bytes-bytes-[`getSigner(_salt, _logic, _admin, _data, _signature)`]
+* xref:#ProxyFactory-_deployProxy-uint256-address-address-bytes-address-[`_deployProxy(_salt, _logic, _admin, _data, _sender)`]
+* xref:#ProxyFactory-_createProxy-uint256-address-[`_createProxy(_salt, _sender)`]
+* xref:#ProxyFactory-_getSalt-uint256-address-[`_getSalt(_salt, _sender)`]
+
+--
+
+[.contract-index]
+.Events
+--
+* xref:#ProxyFactory-ProxyCreated-address-[`ProxyCreated(proxy)`]
+
+--
+
+
+[.contract-item]
+[[ProxyFactory-constructor--]]
+==== `pass:normal[constructor()]` [.item-kind]#public#
+
+
+
+[.contract-item]
+[[ProxyFactory-deployMinimal-address-bytes-]]
+==== `pass:normal[deployMinimal([.var-type\]#address# [.var-name\]#_logic#, [.var-type\]#bytes# [.var-name\]#_data#) → [.var-type\]#address# [.var-name\]#proxy#]` [.item-kind]#public#
+
+
+
+[.contract-item]
+[[ProxyFactory-deploy-uint256-address-address-bytes-]]
+==== `pass:normal[deploy([.var-type\]#uint256# [.var-name\]#_salt#, [.var-type\]#address# [.var-name\]#_logic#, [.var-type\]#address# [.var-name\]#_admin#, [.var-type\]#bytes# [.var-name\]#_data#) → [.var-type\]#address#]` [.item-kind]#public#
+
+
+
+[.contract-item]
+[[ProxyFactory-deploySigned-uint256-address-address-bytes-bytes-]]
+==== `pass:normal[deploySigned([.var-type\]#uint256# [.var-name\]#_salt#, [.var-type\]#address# [.var-name\]#_logic#, [.var-type\]#address# [.var-name\]#_admin#, [.var-type\]#bytes# [.var-name\]#_data#, [.var-type\]#bytes# [.var-name\]#_signature#) → [.var-type\]#address#]` [.item-kind]#public#
+
+
+
+[.contract-item]
+[[ProxyFactory-getDeploymentAddress-uint256-address-]]
+==== `pass:normal[getDeploymentAddress([.var-type\]#uint256# [.var-name\]#_salt#, [.var-type\]#address# [.var-name\]#_sender#) → [.var-type\]#address#]` [.item-kind]#public#
+
+
+
+[.contract-item]
+[[ProxyFactory-getSigner-uint256-address-address-bytes-bytes-]]
+==== `pass:normal[getSigner([.var-type\]#uint256# [.var-name\]#_salt#, [.var-type\]#address# [.var-name\]#_logic#, [.var-type\]#address# [.var-name\]#_admin#, [.var-type\]#bytes# [.var-name\]#_data#, [.var-type\]#bytes# [.var-name\]#_signature#) → [.var-type\]#address#]` [.item-kind]#public#
+
+
+
+[.contract-item]
+[[ProxyFactory-_deployProxy-uint256-address-address-bytes-address-]]
+==== `pass:normal[_deployProxy([.var-type\]#uint256# [.var-name\]#_salt#, [.var-type\]#address# [.var-name\]#_logic#, [.var-type\]#address# [.var-name\]#_admin#, [.var-type\]#bytes# [.var-name\]#_data#, [.var-type\]#address# [.var-name\]#_sender#) → [.var-type\]#address#]` [.item-kind]#internal#
+
+
+
+[.contract-item]
+[[ProxyFactory-_createProxy-uint256-address-]]
+==== `pass:normal[_createProxy([.var-type\]#uint256# [.var-name\]#_salt#, [.var-type\]#address# [.var-name\]#_sender#) → [.var-type\]#contract InitializableAdminUpgradeabilityProxy#]` [.item-kind]#internal#
+
+
+
+[.contract-item]
+[[ProxyFactory-_getSalt-uint256-address-]]
+==== `pass:normal[_getSalt([.var-type\]#uint256# [.var-name\]#_salt#, [.var-type\]#address# [.var-name\]#_sender#) → [.var-type\]#bytes32#]` [.item-kind]#internal#
+
+
+
+
+[.contract-item]
+[[ProxyFactory-ProxyCreated-address-]]
+==== `pass:normal[ProxyCreated([.var-type\]#address# [.var-name\]#proxy#)]` [.item-kind]#event#
+
+
+
+
+
+== Application
+
+:App: pass:normal[xref:#App[`App`]]
+:onlyOwner: pass:normal[xref:#OpenZeppelinUpgradesOwnable-onlyOwner--[`onlyOwner`]]
+:constructor: pass:normal[xref:#App-constructor--[`constructor`]]
+:getProvider: pass:normal[xref:#App-getProvider-string-[`getProvider`]]
+:getPackage: pass:normal[xref:#App-getPackage-string-[`getPackage`]]
+:setPackage: pass:normal[xref:#App-setPackage-string-contract-Package-uint64-3--[`setPackage`]]
+:unsetPackage: pass:normal[xref:#App-unsetPackage-string-[`unsetPackage`]]
+:getImplementation: pass:normal[xref:#App-getImplementation-string-string-[`getImplementation`]]
+:create: pass:normal[xref:#App-create-string-string-address-bytes-[`create`]]
+:owner: pass:normal[xref:#OpenZeppelinUpgradesOwnable-owner--[`owner`]]
+:isOwner: pass:normal[xref:#OpenZeppelinUpgradesOwnable-isOwner--[`isOwner`]]
+:renounceOwnership: pass:normal[xref:#OpenZeppelinUpgradesOwnable-renounceOwnership--[`renounceOwnership`]]
+:transferOwnership: pass:normal[xref:#OpenZeppelinUpgradesOwnable-transferOwnership-address-[`transferOwnership`]]
+:_transferOwnership: pass:normal[xref:#OpenZeppelinUpgradesOwnable-_transferOwnership-address-[`_transferOwnership`]]
+:ProxyCreated: pass:normal[xref:#App-ProxyCreated-address-[`ProxyCreated`]]
+:PackageChanged: pass:normal[xref:#App-PackageChanged-string-address-uint64-3--[`PackageChanged`]]
+:OwnershipTransferred: pass:normal[xref:#OpenZeppelinUpgradesOwnable-OwnershipTransferred-address-address-[`OwnershipTransferred`]]
+
+[.contract]
+[[App]]
+=== `App`
+
+Contract for upgradeable applications.
+It handles the creation of proxies.
+
+[.contract-index]
+.Modifiers
+--
+
+[.contract-subindex-inherited]
+.OpenZeppelinUpgradesOwnable
+* xref:#OpenZeppelinUpgradesOwnable-onlyOwner--[`onlyOwner()`]
+
+--
+
+[.contract-index]
+.Functions
+--
+* xref:#App-constructor--[`constructor()`]
+* xref:#App-getProvider-string-[`getProvider(packageName)`]
+* xref:#App-getPackage-string-[`getPackage(packageName)`]
+* xref:#App-setPackage-string-contract-Package-uint64-3--[`setPackage(packageName, package, version)`]
+* xref:#App-unsetPackage-string-[`unsetPackage(packageName)`]
+* xref:#App-getImplementation-string-string-[`getImplementation(packageName, contractName)`]
+* xref:#App-create-string-string-address-bytes-[`create(packageName, contractName, admin, data)`]
+
+[.contract-subindex-inherited]
+.OpenZeppelinUpgradesOwnable
+* xref:#OpenZeppelinUpgradesOwnable-owner--[`owner()`]
+* xref:#OpenZeppelinUpgradesOwnable-isOwner--[`isOwner()`]
+* xref:#OpenZeppelinUpgradesOwnable-renounceOwnership--[`renounceOwnership()`]
+* xref:#OpenZeppelinUpgradesOwnable-transferOwnership-address-[`transferOwnership(newOwner)`]
+* xref:#OpenZeppelinUpgradesOwnable-_transferOwnership-address-[`_transferOwnership(newOwner)`]
+
+--
+
+[.contract-index]
+.Events
+--
+* xref:#App-ProxyCreated-address-[`ProxyCreated(proxy)`]
+* xref:#App-PackageChanged-string-address-uint64-3--[`PackageChanged(providerName, package, version)`]
+
+[.contract-subindex-inherited]
+.OpenZeppelinUpgradesOwnable
+* xref:#OpenZeppelinUpgradesOwnable-OwnershipTransferred-address-address-[`OwnershipTransferred(previousOwner, newOwner)`]
+
+--
+
+
+[.contract-item]
+[[App-constructor--]]
+==== `pass:normal[constructor()]` [.item-kind]#public#
+
+Constructor function.
+
+[.contract-item]
+[[App-getProvider-string-]]
+==== `pass:normal[getProvider([.var-type\]#string# [.var-name\]#packageName#) → [.var-type\]#contract ImplementationProvider# [.var-name\]#provider#]` [.item-kind]#public#
+
+Returns the provider for a given package name, or zero if not set.
+
+
+[.contract-item]
+[[App-getPackage-string-]]
+==== `pass:normal[getPackage([.var-type\]#string# [.var-name\]#packageName#) → [.var-type\]#contract Package#, [.var-type\]#uint64[3]#]` [.item-kind]#public#
+
+Returns information on a package given its name.
+
+
+[.contract-item]
+[[App-setPackage-string-contract-Package-uint64-3--]]
+==== `pass:normal[setPackage([.var-type\]#string# [.var-name\]#packageName#, [.var-type\]#contract Package# [.var-name\]#package#, [.var-type\]#uint64[3]# [.var-name\]#version#)]` [.item-kind]#public#
+
+Sets a package in a specific version as a dependency for this application.
+Requires the version to be present in the package.
+
+
+[.contract-item]
+[[App-unsetPackage-string-]]
+==== `pass:normal[unsetPackage([.var-type\]#string# [.var-name\]#packageName#)]` [.item-kind]#public#
+
+Unsets a package given its name.
+Reverts if the package is not set in the application.
+
+
+[.contract-item]
+[[App-getImplementation-string-string-]]
+==== `pass:normal[getImplementation([.var-type\]#string# [.var-name\]#packageName#, [.var-type\]#string# [.var-name\]#contractName#) → [.var-type\]#address#]` [.item-kind]#public#
+
+Returns the implementation address for a given contract name, provided by the `ImplementationProvider`.
+
+
+[.contract-item]
+[[App-create-string-string-address-bytes-]]
+==== `pass:normal[create([.var-type\]#string# [.var-name\]#packageName#, [.var-type\]#string# [.var-name\]#contractName#, [.var-type\]#address# [.var-name\]#admin#, [.var-type\]#bytes# [.var-name\]#data#) → [.var-type\]#contract AdminUpgradeabilityProxy#]` [.item-kind]#public#
+
+Creates a new proxy for the given contract and forwards a function call to it.
+This is useful to initialize the proxied contract.
+
+
+
+[.contract-item]
+[[App-ProxyCreated-address-]]
+==== `pass:normal[ProxyCreated([.var-type\]#address# [.var-name\]#proxy#)]` [.item-kind]#event#
+
+Emitted when a new proxy is created.
+
+
+[.contract-item]
+[[App-PackageChanged-string-address-uint64-3--]]
+==== `pass:normal[PackageChanged([.var-type\]#string# [.var-name\]#providerName#, [.var-type\]#address# [.var-name\]#package#, [.var-type\]#uint64[3]# [.var-name\]#version#)]` [.item-kind]#event#
+
+Emitted when a package dependency is changed in the application.
+
+
+
+
+:ImplementationDirectory: pass:normal[xref:#ImplementationDirectory[`ImplementationDirectory`]]
+:whenNotFrozen: pass:normal[xref:#ImplementationDirectory-whenNotFrozen--[`whenNotFrozen`]]
+:onlyOwner: pass:normal[xref:#OpenZeppelinUpgradesOwnable-onlyOwner--[`onlyOwner`]]
+:freeze: pass:normal[xref:#ImplementationDirectory-freeze--[`freeze`]]
+:getImplementation: pass:normal[xref:#ImplementationDirectory-getImplementation-string-[`getImplementation`]]
+:setImplementation: pass:normal[xref:#ImplementationDirectory-setImplementation-string-address-[`setImplementation`]]
+:unsetImplementation: pass:normal[xref:#ImplementationDirectory-unsetImplementation-string-[`unsetImplementation`]]
+:constructor: pass:normal[xref:#OpenZeppelinUpgradesOwnable-constructor--[`constructor`]]
+:owner: pass:normal[xref:#OpenZeppelinUpgradesOwnable-owner--[`owner`]]
+:isOwner: pass:normal[xref:#OpenZeppelinUpgradesOwnable-isOwner--[`isOwner`]]
+:renounceOwnership: pass:normal[xref:#OpenZeppelinUpgradesOwnable-renounceOwnership--[`renounceOwnership`]]
+:transferOwnership: pass:normal[xref:#OpenZeppelinUpgradesOwnable-transferOwnership-address-[`transferOwnership`]]
+:_transferOwnership: pass:normal[xref:#OpenZeppelinUpgradesOwnable-_transferOwnership-address-[`_transferOwnership`]]
+:ImplementationChanged: pass:normal[xref:#ImplementationDirectory-ImplementationChanged-string-address-[`ImplementationChanged`]]
+:Frozen: pass:normal[xref:#ImplementationDirectory-Frozen--[`Frozen`]]
+:OwnershipTransferred: pass:normal[xref:#OpenZeppelinUpgradesOwnable-OwnershipTransferred-address-address-[`OwnershipTransferred`]]
+
+[.contract]
+[[ImplementationDirectory]]
+=== `ImplementationDirectory`
+
+Implementation provider that stores contract implementations in a mapping.
+
+[.contract-index]
+.Modifiers
+--
+* xref:#ImplementationDirectory-whenNotFrozen--[`whenNotFrozen()`]
+
+[.contract-subindex-inherited]
+.OpenZeppelinUpgradesOwnable
+* xref:#OpenZeppelinUpgradesOwnable-onlyOwner--[`onlyOwner()`]
+
+[.contract-subindex-inherited]
+.ImplementationProvider
+
+--
+
+[.contract-index]
+.Functions
+--
+* xref:#ImplementationDirectory-freeze--[`freeze()`]
+* xref:#ImplementationDirectory-getImplementation-string-[`getImplementation(contractName)`]
+* xref:#ImplementationDirectory-setImplementation-string-address-[`setImplementation(contractName, implementation)`]
+* xref:#ImplementationDirectory-unsetImplementation-string-[`unsetImplementation(contractName)`]
+
+[.contract-subindex-inherited]
+.OpenZeppelinUpgradesOwnable
+* xref:#OpenZeppelinUpgradesOwnable-constructor--[`constructor()`]
+* xref:#OpenZeppelinUpgradesOwnable-owner--[`owner()`]
+* xref:#OpenZeppelinUpgradesOwnable-isOwner--[`isOwner()`]
+* xref:#OpenZeppelinUpgradesOwnable-renounceOwnership--[`renounceOwnership()`]
+* xref:#OpenZeppelinUpgradesOwnable-transferOwnership-address-[`transferOwnership(newOwner)`]
+* xref:#OpenZeppelinUpgradesOwnable-_transferOwnership-address-[`_transferOwnership(newOwner)`]
+
+[.contract-subindex-inherited]
+.ImplementationProvider
+
+--
+
+[.contract-index]
+.Events
+--
+* xref:#ImplementationDirectory-ImplementationChanged-string-address-[`ImplementationChanged(contractName, implementation)`]
+* xref:#ImplementationDirectory-Frozen--[`Frozen()`]
+
+[.contract-subindex-inherited]
+.OpenZeppelinUpgradesOwnable
+* xref:#OpenZeppelinUpgradesOwnable-OwnershipTransferred-address-address-[`OwnershipTransferred(previousOwner, newOwner)`]
+
+[.contract-subindex-inherited]
+.ImplementationProvider
+
+--
+
+[.contract-item]
+[[ImplementationDirectory-whenNotFrozen--]]
+==== `pass:normal[whenNotFrozen()]` [.item-kind]#modifier#
+
+Modifier that allows functions to be called only before the contract is frozen.
+
+
+[.contract-item]
+[[ImplementationDirectory-freeze--]]
+==== `pass:normal[freeze()]` [.item-kind]#public#
+
+Makes the directory irreversibly immutable.
+It can only be called once, by the owner.
+
+[.contract-item]
+[[ImplementationDirectory-getImplementation-string-]]
+==== `pass:normal[getImplementation([.var-type\]#string# [.var-name\]#contractName#) → [.var-type\]#address#]` [.item-kind]#public#
+
+Returns the implementation address of a contract.
+
+
+[.contract-item]
+[[ImplementationDirectory-setImplementation-string-address-]]
+==== `pass:normal[setImplementation([.var-type\]#string# [.var-name\]#contractName#, [.var-type\]#address# [.var-name\]#implementation#)]` [.item-kind]#public#
+
+Sets the address of the implementation of a contract in the directory.
+
+
+[.contract-item]
+[[ImplementationDirectory-unsetImplementation-string-]]
+==== `pass:normal[unsetImplementation([.var-type\]#string# [.var-name\]#contractName#)]` [.item-kind]#public#
+
+Removes the address of a contract implementation from the directory.
+
+
+
+[.contract-item]
+[[ImplementationDirectory-ImplementationChanged-string-address-]]
+==== `pass:normal[ImplementationChanged([.var-type\]#string# [.var-name\]#contractName#, [.var-type\]#address# [.var-name\]#implementation#)]` [.item-kind]#event#
+
+Emitted when the implementation of a contract is changed.
+
+
+[.contract-item]
+[[ImplementationDirectory-Frozen--]]
+==== `pass:normal[Frozen()]` [.item-kind]#event#
+
+Emitted when the implementation directory is frozen.
+
+
+
+:ImplementationProvider: pass:normal[xref:#ImplementationProvider[`ImplementationProvider`]]
+:getImplementation: pass:normal[xref:#ImplementationProvider-getImplementation-string-[`getImplementation`]]
+
+[.contract]
+[[ImplementationProvider]]
+=== `ImplementationProvider`
+
+Abstract contract for providing implementation addresses for other contracts by name.
+
+
+[.contract-index]
+.Functions
+--
+* xref:#ImplementationProvider-getImplementation-string-[`getImplementation(contractName)`]
+
+--
+
+
+
+[.contract-item]
+[[ImplementationProvider-getImplementation-string-]]
+==== `pass:normal[getImplementation([.var-type\]#string# [.var-name\]#contractName#) → [.var-type\]#address#]` [.item-kind]#public#
+
+Abstract function to return the implementation address of a contract.
+
+
+
+
+
+:Package: pass:normal[xref:#Package[`Package`]]
+:onlyOwner: pass:normal[xref:#OpenZeppelinUpgradesOwnable-onlyOwner--[`onlyOwner`]]
+:getVersion: pass:normal[xref:#Package-getVersion-uint64-3--[`getVersion`]]
+:getContract: pass:normal[xref:#Package-getContract-uint64-3--[`getContract`]]
+:addVersion: pass:normal[xref:#Package-addVersion-uint64-3--address-bytes-[`addVersion`]]
+:hasVersion: pass:normal[xref:#Package-hasVersion-uint64-3--[`hasVersion`]]
+:getLatest: pass:normal[xref:#Package-getLatest--[`getLatest`]]
+:getLatestByMajor: pass:normal[xref:#Package-getLatestByMajor-uint64-[`getLatestByMajor`]]
+:semanticVersionHash: pass:normal[xref:#Package-semanticVersionHash-uint64-3--[`semanticVersionHash`]]
+:semanticVersionIsZero: pass:normal[xref:#Package-semanticVersionIsZero-uint64-3--[`semanticVersionIsZero`]]
+:constructor: pass:normal[xref:#OpenZeppelinUpgradesOwnable-constructor--[`constructor`]]
+:owner: pass:normal[xref:#OpenZeppelinUpgradesOwnable-owner--[`owner`]]
+:isOwner: pass:normal[xref:#OpenZeppelinUpgradesOwnable-isOwner--[`isOwner`]]
+:renounceOwnership: pass:normal[xref:#OpenZeppelinUpgradesOwnable-renounceOwnership--[`renounceOwnership`]]
+:transferOwnership: pass:normal[xref:#OpenZeppelinUpgradesOwnable-transferOwnership-address-[`transferOwnership`]]
+:_transferOwnership: pass:normal[xref:#OpenZeppelinUpgradesOwnable-_transferOwnership-address-[`_transferOwnership`]]
+:VersionAdded: pass:normal[xref:#Package-VersionAdded-uint64-3--address-bytes-[`VersionAdded`]]
+:OwnershipTransferred: pass:normal[xref:#OpenZeppelinUpgradesOwnable-OwnershipTransferred-address-address-[`OwnershipTransferred`]]
+
+[.contract]
+[[Package]]
+=== `Package`
+
+A package is composed by a set of versions, identified via semantic versioning,
+where each version has a contract address that refers to a reusable implementation,
+plus an optional content URI with metadata. Note that the semver identifier is restricted
+to major, minor, and patch, as prerelease tags are not supported.
+
+[.contract-index]
+.Modifiers
+--
+
+[.contract-subindex-inherited]
+.OpenZeppelinUpgradesOwnable
+* xref:#OpenZeppelinUpgradesOwnable-onlyOwner--[`onlyOwner()`]
+
+--
+
+[.contract-index]
+.Functions
+--
+* xref:#Package-getVersion-uint64-3--[`getVersion(semanticVersion)`]
+* xref:#Package-getContract-uint64-3--[`getContract(semanticVersion)`]
+* xref:#Package-addVersion-uint64-3--address-bytes-[`addVersion(semanticVersion, contractAddress, contentURI)`]
+* xref:#Package-hasVersion-uint64-3--[`hasVersion(semanticVersion)`]
+* xref:#Package-getLatest--[`getLatest()`]
+* xref:#Package-getLatestByMajor-uint64-[`getLatestByMajor(major)`]
+* xref:#Package-semanticVersionHash-uint64-3--[`semanticVersionHash(version)`]
+* xref:#Package-semanticVersionIsZero-uint64-3--[`semanticVersionIsZero(version)`]
+
+[.contract-subindex-inherited]
+.OpenZeppelinUpgradesOwnable
+* xref:#OpenZeppelinUpgradesOwnable-constructor--[`constructor()`]
+* xref:#OpenZeppelinUpgradesOwnable-owner--[`owner()`]
+* xref:#OpenZeppelinUpgradesOwnable-isOwner--[`isOwner()`]
+* xref:#OpenZeppelinUpgradesOwnable-renounceOwnership--[`renounceOwnership()`]
+* xref:#OpenZeppelinUpgradesOwnable-transferOwnership-address-[`transferOwnership(newOwner)`]
+* xref:#OpenZeppelinUpgradesOwnable-_transferOwnership-address-[`_transferOwnership(newOwner)`]
+
+--
+
+[.contract-index]
+.Events
+--
+* xref:#Package-VersionAdded-uint64-3--address-bytes-[`VersionAdded(semanticVersion, contractAddress, contentURI)`]
+
+[.contract-subindex-inherited]
+.OpenZeppelinUpgradesOwnable
+* xref:#OpenZeppelinUpgradesOwnable-OwnershipTransferred-address-address-[`OwnershipTransferred(previousOwner, newOwner)`]
+
+--
+
+
+[.contract-item]
+[[Package-getVersion-uint64-3--]]
+==== `pass:normal[getVersion([.var-type\]#uint64[3]# [.var-name\]#semanticVersion#) → [.var-type\]#address# [.var-name\]#contractAddress#, [.var-type\]#bytes# [.var-name\]#contentURI#]` [.item-kind]#public#
+
+Returns a version given its semver identifier.
+
+
+[.contract-item]
+[[Package-getContract-uint64-3--]]
+==== `pass:normal[getContract([.var-type\]#uint64[3]# [.var-name\]#semanticVersion#) → [.var-type\]#address# [.var-name\]#contractAddress#]` [.item-kind]#public#
+
+Returns a contract for a version given its semver identifier.
+This method is equivalent to `getVersion`, but returns only the contract address.
+
+
+[.contract-item]
+[[Package-addVersion-uint64-3--address-bytes-]]
+==== `pass:normal[addVersion([.var-type\]#uint64[3]# [.var-name\]#semanticVersion#, [.var-type\]#address# [.var-name\]#contractAddress#, [.var-type\]#bytes# [.var-name\]#contentURI#)]` [.item-kind]#public#
+
+Adds a new version to the package. Only the Owner can add new versions.
+Reverts if the specified semver identifier already exists. 
+Emits a `VersionAdded` event if successful.
+
+
+[.contract-item]
+[[Package-hasVersion-uint64-3--]]
+==== `pass:normal[hasVersion([.var-type\]#uint64[3]# [.var-name\]#semanticVersion#) → [.var-type\]#bool#]` [.item-kind]#public#
+
+Checks whether a version is present in the package.
+
+
+[.contract-item]
+[[Package-getLatest--]]
+==== `pass:normal[getLatest() → [.var-type\]#uint64[3]# [.var-name\]#semanticVersion#, [.var-type\]#address# [.var-name\]#contractAddress#, [.var-type\]#bytes# [.var-name\]#contentURI#]` [.item-kind]#public#
+
+Returns the version with the highest semver identifier registered in the package.
+For instance, if `1.2.0`, `1.3.0`, and `2.0.0` are present, will always return `2.0.0`, regardless 
+of the order in which they were registered. Returns zero if no versions are registered.
+
+
+[.contract-item]
+[[Package-getLatestByMajor-uint64-]]
+==== `pass:normal[getLatestByMajor([.var-type\]#uint64# [.var-name\]#major#) → [.var-type\]#uint64[3]# [.var-name\]#semanticVersion#, [.var-type\]#address# [.var-name\]#contractAddress#, [.var-type\]#bytes# [.var-name\]#contentURI#]` [.item-kind]#public#
+
+Returns the version with the highest semver identifier for the given major.
+For instance, if `1.2.0`, `1.3.0`, and `2.0.0` are present, will return `1.3.0` for major `1`, 
+regardless of the order in which they were registered. Returns zero if no versions are registered
+for the specified major.
+
+
+[.contract-item]
+[[Package-semanticVersionHash-uint64-3--]]
+==== `pass:normal[semanticVersionHash([.var-type\]#uint64[3]# [.var-name\]#version#) → [.var-type\]#bytes32#]` [.item-kind]#internal#
+
+
+
+[.contract-item]
+[[Package-semanticVersionIsZero-uint64-3--]]
+==== `pass:normal[semanticVersionIsZero([.var-type\]#uint64[3]# [.var-name\]#version#) → [.var-type\]#bool#]` [.item-kind]#internal#
+
+
+
+
+[.contract-item]
+[[Package-VersionAdded-uint64-3--address-bytes-]]
+==== `pass:normal[VersionAdded([.var-type\]#uint64[3]# [.var-name\]#semanticVersion#, [.var-type\]#address# [.var-name\]#contractAddress#, [.var-type\]#bytes# [.var-name\]#contentURI#)]` [.item-kind]#event#
+
+Emitted when a version is added to the package.
+
+
+
+
+== Utility
+
+:Initializable: pass:normal[xref:#Initializable[`Initializable`]]
+:initializer: pass:normal[xref:#Initializable-initializer--[`initializer`]]
+
+[.contract]
+[[Initializable]]
+=== `Initializable`
+
+Helper contract to support initializer functions. To use it, replace
+the constructor with a function that has the `initializer` modifier.
+WARNING: Unlike constructors, initializer functions must be manually
+invoked. This applies both to deploying an Initializable contract, as well
+as extending an Initializable contract via inheritance.
+WARNING: When used with inheritance, manual care must be taken to not invoke
+a parent initializer twice, or ensure that all initializers are idempotent,
+because this is not dealt with automatically as with constructors.
+
+[.contract-index]
+.Modifiers
+--
+* xref:#Initializable-initializer--[`initializer()`]
+
+--
+
+
+
+[.contract-item]
+[[Initializable-initializer--]]
+==== `pass:normal[initializer()]` [.item-kind]#modifier#
+
+Modifier to use in the initializer function of a contract.
+
+
+
+

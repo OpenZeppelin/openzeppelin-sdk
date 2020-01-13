@@ -1,0 +1,5 @@
+name: 'upgrades'
+title: 'Upgrades'
+version: '2.x'
+nav:
+  - modules/ROOT/nav.adoc

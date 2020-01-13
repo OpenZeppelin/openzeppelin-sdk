@@ -10,6 +10,7 @@
     "compile-ts": "rm -rf lib && tsc",
     "compile-contracts": "rm -rf build/contracts && ../../bootstrap/node_modules/.bin/oz compile --solc-version 0.5.14 --evm-version constantinople",
     "prepare": "npm run compile-contracts && npm run compile-ts && npm run copy-files && chmod 755 ./lib/bin/oz-cli.js",
+    "prepare-docs": "TS_NODE_PROJECT='tsconfig.docs.json' ts-node scripts/prepare-docs.js",
     "test": "TS_NODE_PROJECT='tsconfig.test.json' mocha --require ts-node/register --recursive test",
     "gen-docs": "./scripts/gen-docs.sh",
     "watch": "tsc -w",
