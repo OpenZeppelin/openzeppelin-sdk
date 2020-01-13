@@ -33,7 +33,7 @@ const register: (program: any) => any = program =>
     .description(description)
     .option('--init [function]', `call function after creating contract. If none is given, 'initialize' will be used`)
     .option('--args <arg1, arg2, ...>', 'provide initialization arguments for your contract if required')
-    .option('--force', 'force creation even if contracts have local modifications')
+    .option('--force', 'ignore contracts validation errors')
     .option('--minimal', 'creates a cheaper but non-upgradeable instance instead, using a minimal proxy')
     .withNetworkOptions()
     .withSkipCompileOption()
@@ -62,7 +62,6 @@ async function commandActions(contractFullName: string, options: any): Promise<v
   await push.runActionIfNeeded(promptedContractFullName, network, {
     ...options,
     network: promptedNetwork,
-    force: true,
   });
 
   await action(promptedContractFullName, { ...options, network, txParams });
