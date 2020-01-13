@@ -19,6 +19,7 @@ interface SessionOptions {
   from?: string;
   timeout?: number;
   expires?: Date;
+  privateFor?: string[];
 }
 
 const Session = {

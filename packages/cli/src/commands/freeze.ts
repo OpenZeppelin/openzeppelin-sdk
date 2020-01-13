@@ -11,6 +11,7 @@ const register: (program: any) => any = program =>
     .command(signature, undefined, { noHelp: true })
     .usage('--network <network> [options]')
     .description(description)
+    .withPrivateForOption()
     .withNetworkOptions()
     .action(action);
 

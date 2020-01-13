@@ -35,6 +35,7 @@ const register: (program: any) => any = program =>
       '--deploy-proxy-factory',
       "eagerly deploys the project's proxy factory (if not deployed yet on the provided network)",
     )
+    .withPrivateForOption()
     .withNetworkOptions()
     .withNonInteractiveOption()
     .action(commandActions);

@@ -13,6 +13,7 @@ const register: (program: any) => any = program =>
     .command(signature, undefined, { noHelp: true })
     .usage('[dependencyName1... dependencyNameN]')
     .description(description)
+    .withPrivateForOption()
     .withPushOptions()
     .withNonInteractiveOption()
     .action(action);
