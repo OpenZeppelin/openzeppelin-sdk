@@ -1,4 +1,3 @@
-import { TxParams } from '@openzeppelin/upgrades';
 import { compile } from '../../models/compiler/Compiler';
 import { fromContractFullName } from '../../utils/naming';
 import ConfigManager from '../../models/config/ConfigManager';
@@ -6,20 +5,11 @@ import NetworkController from '../../models/network/NetworkController';
 import stdout from '../../utils/stdout';
 import { MethodArgType } from '../../prompts/prompt';
 import { parseMultipleArgs } from '../../utils/input';
-import NetworkFile from '../../models/files/NetworkFile';
 import { createAction } from '../create';
 
+import { Options } from './spec';
+
 import { AbortAction } from '../../register-command';
-
-interface Options {
-  network: string;
-  skipCompile?: boolean;
-  upgradeable?: boolean;
-
-  // The following are not available as CLI flags, and they are only used in tests.
-  networkFile?: NetworkFile;
-  txParams?: TxParams;
-}
 
 export async function preAction(
   contractName: string | undefined,
@@ -40,9 +30,6 @@ export async function preAction(
 }
 
 export async function action(contractName: string, deployArgs: string[], options: Options): Promise<void> {
-  // this is an interactive prompt, so should be handled by the prompts
-  // if (!(await hasToMigrateProject(network))) process.exit(0);
-
   const { network, txParams } = options.txParams ? options : await ConfigManager.initNetworkConfiguration(options);
 
   const { package: packageName, contract: contractAlias } = fromContractFullName(contractName);

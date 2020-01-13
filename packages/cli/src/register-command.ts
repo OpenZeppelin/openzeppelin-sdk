@@ -9,9 +9,10 @@ export function generateSignature(name: string, args: Arg[]): string {
 }
 
 export interface Question {
+  type?: 'confirm' | 'list' | 'input';
   message: string;
   choices?: Choice[];
-  validate: (value: string) => boolean;
+  validate: (value: string | boolean) => boolean;
   validationError?: string;
 }
 
@@ -21,7 +22,7 @@ type Param = ParamSimple | ParamVariadic;
 
 interface ParamSimple {
   variadic?: false;
-  prompt?: (argsAndOpts: ArgsAndOpts) => Promise<Question>;
+  prompt?: (argsAndOpts: ArgsAndOpts) => Promise<Question | undefined>;
 }
 
 interface ParamVariadic {
@@ -123,7 +124,9 @@ async function promptForMissing(cmd: Command, spec: CommandSpec, argsAndOpts: Ar
         argsAndOpts[name] = values;
       } else {
         const prompt = await param.prompt?.(argsAndOpts);
-        argsAndOpts[name] = prompt && (await askQuestion(name, prompt));
+        if (prompt) {
+          argsAndOpts[name] = await askQuestion(name, prompt);
+        }
       }
     } else {
       if (typeof value === 'boolean') {
@@ -160,7 +163,8 @@ async function promptForMissing(cmd: Command, spec: CommandSpec, argsAndOpts: Ar
 
 async function askQuestion(name: string, question: Question): Promise<string> {
   const { message, choices, validate: rawValidate, validationError } = question;
-  const type = choices === undefined ? 'input' : 'list';
+
+  const type = question.type ?? (choices === undefined ? 'input' : 'list');
 
   const validate = (value: string) => {
     const valid = rawValidate(value);

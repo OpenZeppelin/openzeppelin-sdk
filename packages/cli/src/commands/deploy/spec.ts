@@ -1,6 +1,18 @@
 import { Question, Arg, Option, ArgsAndOpts } from '../../register-command';
 import { MethodArg } from '../../prompts/prompt';
 
+import { TxParams } from '@openzeppelin/upgrades';
+import NetworkFile from '../../models/files/NetworkFile';
+
+export interface Options {
+  network?: string;
+  skipCompile?: boolean;
+  upgradeable?: boolean;
+  // The following are not available as CLI flags, and they are only used in tests.
+  networkFile?: NetworkFile;
+  txParams?: TxParams;
+}
+
 export const name = 'deploy';
 export const description = 'deploy a contract instance';
 
@@ -69,11 +81,6 @@ export const options: Option[] = [
     default: false,
   },
   {
-    format: '--upgradeable',
-    description: 'deploy an upgradeable instance',
-    default: false,
-  },
-  {
     format: '-n, --network <network>',
     description: 'network to use',
     async prompt(): Promise<Question> {
@@ -82,8 +89,33 @@ export const options: Option[] = [
       return {
         message: 'Pick a network',
         choices: networks,
-        validate: value => networks.includes(value),
+        validate: (value: string) => networks.includes(value),
       };
     },
+  },
+  {
+    // TODO: discuss option name
+    format: '--no-manifest-migration',
+    description: 'disable automatic migration of manifest format',
+    async prompt(options: Options) {
+      const { isMigratableManifestVersion } = await import('../../models/files/ManifestVersion');
+      const { default: NetworkFile } = await import('../../models/files/NetworkFile');
+
+      const version = NetworkFile.getManifestVersion(options.network);
+
+      if (isMigratableManifestVersion(version)) {
+        return {
+          type: 'confirm',
+          message: 'An old manifest version was detected and needs to be migrated to the latest one. Proceed?',
+          validate: (migrate: boolean) => migrate,
+          validationError: 'Cannot proceed without migrating the manifest file.',
+        };
+      }
+    },
+  },
+  {
+    format: '--upgradeable',
+    description: 'deploy an upgradeable instance',
+    default: false,
   },
 ];
