@@ -1,0 +1,52 @@
+= Upgrades
+
+*Deploy and upgrade smart contracts securely* from your JavaScript code.
+
+This library powers the xref:cli::index.adoc[*OpenZeppelin CLI*], by implementing all its deployment and upgrade operations. You can call into this library directly from your scripts if you do not want to go through the CLI.
+
+WARNING: The upgrades library only creates and upgrades contracts. It will not keep the xref:cli::configuration.adoc[CLI configuration] files up to date with new deployments, meaning that you will have to track your contract addresses on your own. We will be working on a new version of this library that can handle this in the future.
+
+== Overview
+
+=== Installation
+
+```console
+$ npm install @openzeppelin/upgrades
+```
+
+=== Usage
+
+This sample script deploys `MyContract` (which should be already compiled) to a blockchain network running locally at port 9545:
+
+```javascript
+const { ZWeb3, Contracts, SimpleProject } = require('@openzeppelin/upgrades');
+
+async function main() {
+  // Initialize a web3 provider
+  ZWeb3.initialize("http://localhost:9545");
+
+  // Load the contract
+  const MyContract = Contracts.getFromLocal('MyContract');
+
+  // Instantiate a project
+  const myProject = new SimpleProject('MyProject', {
+    from: await ZWeb3.defaultAccount()
+  });
+
+  // Create a proxy for the contract
+  const proxy = await myProject.createProxy(MyContract);
+
+  // Make a change on the contract, and compile it
+  const MyContractUpgraded = Contracts.getFromLocal('MyContractUpgraded');
+  myProject.upgradeProxy(proxy, MyContractUpgraded);
+}
+
+main();
+```
+
+== Learn More
+
+ * Check out xref:writing-upgradeable.adoc[Writing Upgradeable Contracts] to learn about secure patterns when dealing with upgrades, and pitfalls to avoid.
+ * xref:writing-upgradeable.adoc[Creating Upgradeable Contracts From Solidity] will teach you about contract factories that allow for upgrades.
+ * To know how upgrades work under the hood, xref:proxies.adoc[Proxies] will provide you with all the low-level detail you crave.
+ * Take a look at the xref:api.adoc[API Reference] for all smart contracts involved in an Upgrades project.
