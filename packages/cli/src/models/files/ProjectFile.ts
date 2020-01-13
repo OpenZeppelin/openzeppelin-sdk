@@ -48,6 +48,7 @@ export const LEGACY_PROJECT_FILE_NAME = 'zos.json';
 
 export default class ProjectFile {
   public filePath: string;
+  public root: string;
   public data: ProjectFileData;
 
   public static getLinkedDependencies(filePath: string = null): string[] {
@@ -60,7 +61,8 @@ export default class ProjectFile {
     const defaultData = {
       manifestVersion: MANIFEST_VERSION,
     } as any;
-    this.filePath = filePath ?? ProjectFile.getExistingFilePath(process.cwd());
+    this.root = filePath ? path.dirname(filePath) : process.cwd();
+    this.filePath = filePath ?? ProjectFile.getExistingFilePath(this.root);
     if (this.filePath) {
       try {
         this.data = fs.existsSync(this.filePath) ? fs.readJsonSync(this.filePath) : null;
@@ -81,10 +83,6 @@ export default class ProjectFile {
 
   public exists(): boolean {
     return fs.existsSync(this.filePath);
-  }
-
-  public get root(): string {
-    return path.dirname(this.filePath);
   }
 
   public set manifestVersion(version: string) {
@@ -199,8 +197,8 @@ export default class ProjectFile {
     const configOptions: ConfigFileCompilerOptions = {
       manager,
       solcVersion: version,
-      artifactsDir: outputDir,
-      contractsDir: inputDir,
+      artifactsDir: outputDir ? path.relative(this.root, outputDir) : undefined,
+      contractsDir: inputDir ? path.relative(this.root, inputDir) : undefined,
       compilerSettings: {
         evmVersion,
         optimizer: {
