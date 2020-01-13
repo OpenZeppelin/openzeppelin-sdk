@@ -1,5 +1,5 @@
 name: cli
-title: Command Line Interface (CLI)
+title: CLI
 version: 2.6
 nav:
   - modules/ROOT/nav.adoc
