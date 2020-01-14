@@ -30,7 +30,8 @@ export async function preAction(
 }
 
 export async function action(contractName: string, deployArgs: string[], options: Options): Promise<void> {
-  const { network, txParams } = options.txParams ? options : await ConfigManager.initNetworkConfiguration(options);
+  const { network, txParams } =
+    process.env.NODE_ENV === 'test' ? options : await ConfigManager.initNetworkConfiguration(options);
 
   const { package: packageName, contract: contractAlias } = fromContractFullName(contractName);
 
