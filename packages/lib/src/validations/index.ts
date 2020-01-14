@@ -15,7 +15,9 @@ import { compareStorageLayouts, Operation } from './Layout';
 import { hasInitialValuesInDeclarations } from './InitialValues';
 import { importsVanillaContracts } from './VanillaContracts';
 import Contract from '../artifacts/Contract.js';
-import ContractAST, { StorageInfo } from '../utils/ContractAST';
+import ContractAST, { StorageInfo, ContractDefinitionFilter } from '../utils/ContractAST';
+import { BuildArtifacts } from '..';
+import { getBuildArtifacts } from '../artifacts/BuildArtifacts';
 
 export interface ValidationInfo {
   hasConstructor: boolean;
@@ -28,13 +30,17 @@ export interface ValidationInfo {
   importsVanillaContracts?: string[];
 }
 
-export function validate(contract: Contract, existingContractInfo: any = {}, buildArtifacts?: any): any {
+export function validate(
+  contract: Contract,
+  existingContractInfo: any = {},
+  buildArtifacts: BuildArtifacts = getBuildArtifacts(),
+): any {
   checkArtifactsForImportedSources(contract, buildArtifacts);
   const storageValidation = validateStorage(contract, existingContractInfo, buildArtifacts);
   const uninitializedBaseContracts = [];
 
   return {
-    hasConstructor: hasConstructor(contract),
+    hasConstructor: hasConstructor(contract, buildArtifacts),
     hasSelfDestruct: hasSelfDestruct(contract),
     hasDelegateCall: hasDelegateCall(contract),
     hasInitialValuesInDeclarations: hasInitialValuesInDeclarations(contract),
@@ -110,8 +116,6 @@ function tryGetUninitializedBaseContracts(contract: Contract): string[] {
   }
 }
 
-function checkArtifactsForImportedSources(contract: Contract, buildArtifacts: any): void | never {
-  new ContractAST(contract, buildArtifacts, {
-    nodesFilter: ['ContractDefinition'],
-  }).getBaseContractsRecursively();
+function checkArtifactsForImportedSources(contract: Contract, buildArtifacts: BuildArtifacts): void | never {
+  new ContractAST(contract, buildArtifacts, ContractDefinitionFilter).getBaseContractsRecursively();
 }

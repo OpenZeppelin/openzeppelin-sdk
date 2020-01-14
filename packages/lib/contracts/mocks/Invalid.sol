@@ -1,6 +1,7 @@
 pragma solidity ^0.5.0;
 
 import "mock-dependency/contracts/Greeter.sol";
+import "mock-dependency/contracts/DependencyInvalid.sol";
 
 contract WithConstructor {
   uint256 public value;
@@ -12,6 +13,27 @@ contract WithConstructor {
   function say() public pure returns (string memory) {
     return "WithConstructor";
   }
+}
+
+contract WithParentConstructor is WithConstructor {
+}
+
+contract WithAncestorConstructor is WithParentConstructor {
+}
+
+contract WithDependencyParentConstructor is DependencyWithConstructor {
+}
+
+contract WithEmptyConstructor {
+  constructor() internal { }
+}
+
+contract WithModifierInConstructor {
+  modifier modifies { _; }
+  constructor() modifies internal { }
+}
+
+contract WithAncestorEmptyConstructor is WithEmptyConstructor {
 }
 
 contract WithFailingConstructor {

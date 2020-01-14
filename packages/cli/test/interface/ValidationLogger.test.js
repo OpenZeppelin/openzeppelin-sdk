@@ -17,7 +17,7 @@ describe('ValidationLogger', function() {
   describe('errors', function() {
     it('logs constructor', async function() {
       validationLogger().log({ hasConstructor: true });
-      this.logs.errors[0].should.match(/has an explicit constructor/);
+      this.logs.errors[0].should.match(/has a constructor/);
     });
   });
 
