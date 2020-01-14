@@ -6,7 +6,7 @@ import Contracts from '../../../src/artifacts/Contracts';
 import { setVanillaContractsPackageName } from '../../../src/validations/VanillaContracts';
 
 describe('Validations', function() {
-  describe('#hasConstructor', function () {
+  describe('#hasConstructor', function() {
     it('warns when adding a contract with a constructor', async function() {
       validate('WithConstructor').hasConstructor.should.be.true;
     });
