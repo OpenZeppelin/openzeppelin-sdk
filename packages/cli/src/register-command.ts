@@ -12,6 +12,7 @@ export interface Question {
   type?: 'confirm' | 'list' | 'input';
   message: string;
   choices?: Choice[];
+  preselect?: string;
   validate: (value: string | boolean) => boolean;
   validationError?: string;
 }
@@ -177,6 +178,7 @@ async function askQuestion(name: string, question: Question): Promise<string> {
     message,
     choices,
     validate,
+    default: question.preselect,
   });
 
   return answers.question;

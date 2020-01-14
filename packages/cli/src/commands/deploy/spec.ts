@@ -87,10 +87,15 @@ export const options: Option[] = [
     description: 'network to use',
     async prompt() {
       const { default: ConfigManager } = await import('../../models/config/ConfigManager');
+      const { default: Session } = await import('../../models/network/Session');
+
       const networks = ConfigManager.getNetworkNamesFromConfig();
+      const { network: lastNetwork } = Session.getNetwork();
+
       return {
         message: 'Pick a network',
         choices: networks,
+        preselect: lastNetwork,
         validate: (value: string) => networks.includes(value),
       };
     },
