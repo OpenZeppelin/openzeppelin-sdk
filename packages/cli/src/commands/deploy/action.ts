@@ -9,23 +9,21 @@ import { createAction } from '../create';
 
 import { Options } from './spec';
 
-import { AbortAction } from '../../register-command';
-
 export async function preAction(
   contractName: string | undefined,
   deployArgs: string[],
   options: Options,
-): Promise<void> {
+): Promise<void | (() => Promise<void>)> {
   if (!options.skipCompile) {
     await compile();
   }
 
   if (options.upgradeable === true) {
-    throw new AbortAction(async () => {
+    return async () => {
       // Translate arguments to syntax expected by create.
       options['args'] = deployArgs.join(',');
       await createAction(contractName, options);
-    });
+    };
   }
 }
 

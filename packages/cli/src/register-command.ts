@@ -39,13 +39,6 @@ export interface Option extends ParamSimple {
   default?: string | boolean;
 }
 
-// This was added to support aborting deploy and running create instead. We
-// need to abort in the preAction so that the interactive prompts for deploy
-// are not presented to the user, because create manages its own interactivity.
-export class AbortAction {
-  constructor(readonly callback: () => Promise<void>) {}
-}
-
 export function register(program: Command, spec: CommandSpec, getAction: () => Promise<Action>): void {
   const signature = generateSignature(spec.name, spec.args);
 
@@ -54,14 +47,9 @@ export function register(program: Command, spec: CommandSpec, getAction: () => P
     .description(spec.description)
     .action(async (...actionArgs: unknown[]) => {
       const { preAction, action }: Action = await getAction();
-      try {
-        await preAction?.(...actionArgs);
-      } catch (e) {
-        if (e instanceof AbortAction) {
-          return e.callback();
-        } else {
-          throw e;
-        }
+      const abort = await preAction?.(...actionArgs);
+      if (abort) {
+        return abort();
       }
       const [cmd, argsAndOpts] = getCommandArgsAndOpts(...actionArgs);
       await promptForMissing(cmd, spec, argsAndOpts);
@@ -74,11 +62,11 @@ export function register(program: Command, spec: CommandSpec, getAction: () => P
   }
 }
 
-type ActionFunction = (...args: unknown[]) => void;
+type AbortFunction = () => Promise<void>;
 
 interface Action {
-  action: ActionFunction;
-  preAction?: ActionFunction;
+  action: (...args: unknown[]) => Promise<void>;
+  preAction?: (...args: unknown[]) => Promise<void | AbortFunction>;
 }
 
 interface CommandSpec {
