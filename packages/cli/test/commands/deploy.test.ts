@@ -31,7 +31,7 @@ describe('deploy (action)', function() {
     await deploy(contract, [], {
       network,
       txParams,
-      networkFile: networkFile,
+      networkFile,
     });
     const instances = networkFile.getProxies({ contract });
     instances.should.have.lengthOf(1);
@@ -47,7 +47,7 @@ describe('deploy (action)', function() {
     await deploy(contract, ['30', 'abcde', '[3, 7]'], {
       network,
       txParams,
-      networkFile: networkFile,
+      networkFile,
     });
     const instances = networkFile.getProxies({ contract });
     instances.should.have.lengthOf(1);
@@ -62,7 +62,7 @@ describe('deploy (action)', function() {
     await deploy('NotExists', [], {
       network,
       txParams,
-      networkFile: networkFile,
+      networkFile,
     }).should.be.rejectedWith('Contract NotExists not found');
   });
 
@@ -74,7 +74,7 @@ describe('deploy (action)', function() {
       {
         network,
         txParams,
-        networkFile: networkFile,
+        networkFile,
       },
     ];
 
@@ -91,7 +91,7 @@ describe('deploy (action)', function() {
     await deploy(contract, [], {
       network,
       txParams,
-      networkFile: networkFile,
+      networkFile,
     }).should.be.rejectedWith('Expected 3 values but got 0');
     const instances = networkFile.getProxies({ contract });
     instances.should.have.lengthOf(0);
@@ -102,7 +102,7 @@ describe('deploy (action)', function() {
     await deploy(contract, [], {
       network,
       txParams,
-      networkFile: networkFile,
+      networkFile,
     });
     const instances = networkFile.getProxies({ contract });
     instances.should.have.lengthOf(1);
@@ -112,7 +112,7 @@ describe('deploy (action)', function() {
     await deploy('mock-stdlib-undeployed/GreeterBase', [], {
       network,
       txParams,
-      networkFile: networkFile,
+      networkFile,
     });
     const instances = networkFile.getProxies({ contract: 'GreeterBase' });
     instances.should.have.lengthOf(1);
