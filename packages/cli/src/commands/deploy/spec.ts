@@ -30,7 +30,7 @@ export const args: Arg[] = [
       return {
         message: 'Pick a contract to deploy',
         choices: contracts,
-        validate: value => contracts.includes(value),
+        validate: (value: string) => contracts.includes(value),
       };
     },
   },
@@ -85,7 +85,7 @@ export const options: Option[] = [
   {
     format: '-n, --network <network>',
     description: 'network to use',
-    async prompt(): Promise<Question> {
+    async prompt() {
       const { default: ConfigManager } = await import('../../models/config/ConfigManager');
       const networks = ConfigManager.getNetworkNamesFromConfig();
       return {
