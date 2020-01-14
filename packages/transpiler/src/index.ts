@@ -1,3 +1,5 @@
+import flatten from 'lodash.flatten';
+
 import { getContract, isContract, throwIfInvalidNode } from './solc/ast-utils';
 import { transpile } from './transpiler';
 import {
@@ -42,7 +44,7 @@ export function transpileContracts(contracts: string[], artifacts: Artifact[]): 
 
   // build a list of all contracts to transpile
   const contractsWithInheritance = [
-    ...new Set(contracts.map(contract => getInheritanceChain(contract, contractsToArtifactsMap)).flat()),
+    ...new Set(flatten(contracts.map(contract => getInheritanceChain(contract, contractsToArtifactsMap)))),
   ].filter(contract => {
     const art = contractsToArtifactsMap[contract];
     const contractNode = getContract(art.ast, contract);

@@ -1,3 +1,5 @@
+import flatten from 'lodash.flatten';
+
 import { getNodeSources, getConstructor, getContract, idModifierInvocation } from '../solc/ast-utils';
 
 import { getInheritanceChain } from '../solc/get-inheritance-chain';
@@ -63,20 +65,20 @@ export function buildSuperCallsForChain(
   contractsToArtifactsMap: Record<string, Artifact>,
 ): string {
   const chain = getInheritanceChain(contractNode.name, contractsToArtifactsMap);
-  const mods = chain
-    .map(base => {
+  const mods = flatten(
+    chain.map(base => {
       const art = contractsToArtifactsMap[base];
       const node = getContract(art.ast, base);
 
       const constructorNode = getConstructor(node);
       return constructorNode ? constructorNode.modifiers.filter(mod => idModifierInvocation(mod)) : [];
-    })
-    .flat();
+    }),
+  );
 
   return [
     ...new Set(
-      chain
-        .map(base => {
+      flatten(
+        chain.map(base => {
           return buildSuperCalls(
             getContract(contractsToArtifactsMap[base].ast, base),
             source,
@@ -84,8 +86,8 @@ export function buildSuperCallsForChain(
             mods,
             contractsToArtifactsMap,
           ).reverse();
-        })
-        .flat(),
+        }),
+      ),
     ),
   ]
     .reverse()
