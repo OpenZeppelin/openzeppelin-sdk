@@ -9,7 +9,6 @@ import {
   ImportDirective,
   PragmaDirective,
   VariableDeclaration,
-  NodeType,
   FunctionDefinition,
   SourceUnit,
   ModifierDefinition,
@@ -63,6 +62,14 @@ export function isModifierInvocation(node: Node): node is ModifierInvocation {
   return node.nodeType === 'ModifierInvocation';
 }
 
+export function isContractDefinition(node: Node): node is ContractDefinition {
+  return node.nodeType === 'ContractDefinition';
+}
+
+export function isFunctionDefinition(node: Node): node is FunctionDefinition {
+  return node.nodeType === 'FunctionDefinition';
+}
+
 export function getSourceIndices(node: Node): [number, number] {
   return node.src
     .split(':')
@@ -75,42 +82,45 @@ export function getNodeSources(node: Node, source: string): [number, number, str
   return [start, len, source.slice(start, start + len)];
 }
 
-export function getNode(node: Node, predicate: (node: AnyNode) => boolean): AnyNode | null {
+export function getNode<T extends AnyNode>(node: Node, predicate: (node: AnyNode) => node is T): T | null {
   const ret = getNodes(node, predicate);
   return ret.length ? ret[0] : null;
 }
 
-export function getNodes(node: Node, predicate: (node: AnyNode) => boolean): AnyNode[] {
+export function getNodes<T extends AnyNode>(node: AnyNode, predicate: (node: AnyNode) => node is T): T[] {
   if (!node.nodes) throw new Error('Node has to have nodes defined');
   return node.nodes.filter(predicate);
 }
 
 export function getImportDirectives(node: Node): ImportDirective[] {
-  return getNodes(node, isImportDirective) as ImportDirective[];
+  return getNodes(node, isImportDirective);
 }
 
 export function getPragmaDirectives(node: Node): PragmaDirective[] {
-  return getNodes(node, isPragmaDirective) as PragmaDirective[];
+  return getNodes(node, isPragmaDirective);
 }
 
 export function getVarDeclarations(node: Node): VariableDeclaration[] {
-  return getNodes(node, isVarDeclaration) as VariableDeclaration[];
+  return getNodes(node, isVarDeclaration);
 }
 
 export function getContracts(node: Node): ContractDefinition[] {
-  return getNodes(node, isContractType) as ContractDefinition[];
+  return getNodes(node, isContractType);
 }
 
 export function getConstructor(node: ContractDefinition): FunctionDefinition | null {
-  return getNode(node, node => (node as FunctionDefinition).kind === 'constructor') as FunctionDefinition | null;
+  return getNode(node, (node): node is FunctionDefinition => isFunctionDefinition(node) && node.kind === 'constructor');
 }
 
 export function getContract(node: SourceUnit, contractName: string): ContractDefinition {
-  const ret = getNode(node, node => (node as ContractDefinition).name === contractName);
+  const ret = getNode(
+    node,
+    (node): node is ContractDefinition => isContractDefinition(node) && node.name === contractName,
+  );
   if (ret == null) throw new Error(`Can't find ${contractName} in ${util.inspect(node)}`);
-  return ret as ContractDefinition;
+  return ret;
 }
 
 export function getContractById(node: Node, id: number): ContractDefinition | null {
-  return getNode(node, node => node.id === id) as ContractDefinition | null;
+  return getNode(node, (node): node is ContractDefinition => isContractDefinition(node) && node.id === id);
 }
