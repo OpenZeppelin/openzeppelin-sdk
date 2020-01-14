@@ -63,11 +63,11 @@ export function isModifierInvocation(node: Node): node is ModifierInvocation {
   return node.nodeType === 'ModifierInvocation';
 }
 
-export function getSourceIndices(node: Node): number[] {
+export function getSourceIndices(node: Node): [number, number] {
   return node.src
     .split(':')
     .map(val => parseInt(val))
-    .slice(0, 2);
+    .slice(0, 2) as [number, number];
 }
 
 export function getNodeSources(node: Node, source: string): [number, number, string] {
