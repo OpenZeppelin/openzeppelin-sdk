@@ -28,6 +28,11 @@ contract WithEmptyConstructor {
   constructor() internal { }
 }
 
+contract WithModifierInConstructor {
+  modifier modifies { _; }
+  constructor() modifies internal { }
+}
+
 contract WithAncestorEmptyConstructor is WithEmptyConstructor {
 }
 

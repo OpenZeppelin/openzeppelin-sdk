@@ -26,6 +26,10 @@ describe('Validations', function() {
     it('does not warn when adding a contract with an ancestor with an empty constructor', async function() {
       validate('WithAncestorEmptyConstructor').hasConstructor.should.be.false;
     });
+
+    it('warns when adding a contract with an empty constructor with modifiers', async function() {
+      validate('WithModifierInConstructor').hasConstructor.should.be.true;
+    });
   });
 
   it('warns when adding a contract with a selfdestruct call', async function() {

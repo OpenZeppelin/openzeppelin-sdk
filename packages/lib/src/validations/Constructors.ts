@@ -12,6 +12,6 @@ export function hasConstructor(contract: Contract, buildArtifacts: BuildArtifact
 function hasNonEmptyConstructorInAST(contractNode: any): boolean {
   return contractNode.nodes
     .filter((n: any) => n.nodeType === 'FunctionDefinition' && n.kind === 'constructor')
-    .filter((n: any) => n.body.statements.length > 0)
+    .filter((n: any) => n.body.statements.length > 0 || n.modifiers.length > 0)
     .length > 0;
 }
