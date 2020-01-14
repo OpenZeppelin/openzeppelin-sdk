@@ -1,8 +1,11 @@
 {
-  "name": "contracts-transpiler",
+  "name": "@openzeppelin/contracts-transpiler",
   "version": "0.0.1",
   "description": "Transpiles Solidity contracts to updgradable versions compatible with OpenZeppelin SDK.",
   "main": "./lib/index.js",
+  "files": [
+    "lib"
+  ],
   "scripts": {
     "test": "npm run test --prefix ./test/solc-0.5",
     "compile:ts": "rm -rf lib && tsc",
@@ -31,8 +34,7 @@
   "homepage": "https://github.com/OpenZeppelin/openzeppelin-sdk#readme",
   "dependencies": {
     "ajv": "^6.10.2",
-    "lodash.find": "^4.6.0",
-    "typescript": "^3.7.4"
+    "lodash.find": "^4.6.0"
   },
   "devDependencies": {
     "@types/lodash.find": "^4.6.6",
@@ -42,6 +44,7 @@
     "eslint": "^6.8.0",
     "eslint-config-prettier": "^6.9.0",
     "eslint-plugin-prettier": "^3.1.2",
-    "prettier": "^1.19.1"
+    "prettier": "^1.19.1",
+    "typescript": "^3.7.4"
   }
 }
