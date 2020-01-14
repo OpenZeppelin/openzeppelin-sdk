@@ -250,13 +250,16 @@ export default class NetworkController {
     await this._setSolidityLibs(libClass); // Libraries may depend on other libraries themselves
     Loggy.spin(__filename, '_uploadSolidityLib', `upload-solidity-lib${libName}`, `Uploading ${libName} library`);
 
-    if (this.project !== undefined) {
-      const libInstance = await this.project.setImplementation(libClass, libName);
-      this.networkFile.addSolidityLib(libName, libInstance);
+    let libInstance;
+
+    if (this.project === undefined) {
+      // There is no project for non-upgradeable deploys.
+      libInstance = await Transactions.deployContract(libClass);
     } else {
-      const libInstance = await Transactions.deployContract(libClass);
-      this.networkFile.addSolidityLib(libName, libInstance);
+      libInstance = await this.project.setImplementation(libClass, libName);
     }
+
+    this.networkFile.addSolidityLib(libName, libInstance);
 
     Loggy.succeed(`upload-solidity-lib${libName}`, `${libName} library uploaded`);
   }
@@ -319,6 +322,7 @@ export default class NetworkController {
   private async _unsetSolidityLib(libName: string): Promise<void | never> {
     try {
       Loggy.spin(__filename, '_unsetSolidityLib', `unset-solidity-lib-${libName}`, `Removing ${libName} library`);
+      // There is no project for non-upgradeable deploys.
       if (this.project !== undefined) {
         await this.project.unsetImplementation(libName);
       }
