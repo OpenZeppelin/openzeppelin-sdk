@@ -23,21 +23,22 @@ export function contracts(source: ContractsSource = 'built'): Choice[] {
       return { name: label, value: alias };
     });
 
-  // get contracts from `build/contracts`
+  // get contracts from build/contracts
   if (source === 'built') {
     return contractsFromBuild;
   }
 
   // get contracts from project.json file
+  if (source === 'added') {
+    return contractsFromLocal;
+  }
+
+  // get contracts from build/contracts that are not in project.json file
   if (source === 'notAdded') {
     return difference(
       contractsFromBuild,
-      contractsFromLocal.map(({ value }) => value),
+      contractsFromLocal.map(c => c.value),
     );
-  }
-
-  if (source === 'added') {
-    return contractsFromLocal;
   }
 
   // generate a list of built contracts and package contracts
