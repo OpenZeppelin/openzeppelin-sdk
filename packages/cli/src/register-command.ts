@@ -65,7 +65,6 @@ export function register(program: Command, spec: CommandSpec, getAction: () => P
       }
       const [cmd, argsAndOpts] = getCommandArgsAndOpts(...actionArgs);
       await promptForMissing(cmd, spec, argsAndOpts);
-      // TODO: normalize network name and include txParams (ConfigManager)
       Telemetry.report(cmd.name(), argsAndOpts, !!argsAndOpts.interactive);
       await action(...generateActionArgs(cmd, argsAndOpts));
     });
