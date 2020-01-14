@@ -5,6 +5,7 @@ import { TxParams } from '@openzeppelin/upgrades';
 import NetworkFile from '../../models/files/NetworkFile';
 
 export interface Options {
+  from?: string;
   network?: string;
   skipCompile?: boolean;
   upgradeable?: boolean;
@@ -112,6 +113,10 @@ export const options: Option[] = [
         };
       }
     },
+  },
+  {
+    format: '-f, --from <address>',
+    description: 'sender for the contract creation transaction',
   },
   {
     format: '--upgradeable',
