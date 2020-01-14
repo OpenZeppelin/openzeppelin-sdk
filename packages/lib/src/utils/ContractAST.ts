@@ -50,6 +50,10 @@ export const ContractDefinitionFilter = {
   nodesFilter: ['ContractDefinition'],
 };
 
+export const FunctionDefinitionFilter = {
+  nodesFilter: ['ContractDefinition', 'FunctionDefinition'],
+};
+
 class NodeNotFoundError extends Error {
   public constructor(id, type) {
     super(`No AST nodes of type ${type} with id ${id} found.`);

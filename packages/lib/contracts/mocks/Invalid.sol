@@ -24,6 +24,13 @@ contract WithAncestorConstructor is WithParentConstructor {
 contract WithDependencyParentConstructor is DependencyWithConstructor {
 }
 
+contract WithEmptyConstructor {
+  constructor() internal { }
+}
+
+contract WithAncestorEmptyConstructor is WithEmptyConstructor {
+}
+
 contract WithFailingConstructor {
   constructor() public {
     assert(false);

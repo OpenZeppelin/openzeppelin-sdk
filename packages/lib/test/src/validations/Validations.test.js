@@ -6,20 +6,26 @@ import Contracts from '../../../src/artifacts/Contracts';
 import { setVanillaContractsPackageName } from '../../../src/validations/VanillaContracts';
 
 describe('Validations', function() {
-  it('warns when adding a contract with a constructor', async function() {
-    validate('WithConstructor').hasConstructor.should.be.true;
-  });
+  describe.only('#hasConstructor', function () {
+    it('warns when adding a contract with a constructor', async function() {
+      validate('WithConstructor').hasConstructor.should.be.true;
+    });
 
-  it('warns when adding a contract with a parent with a constructor', async function() {
-    validate('WithParentConstructor').hasConstructor.should.be.true;
-  });
+    it('warns when adding a contract with a parent with a constructor', async function() {
+      validate('WithParentConstructor').hasConstructor.should.be.true;
+    });
 
-  it('warns when adding a contract with an ancestor with a constructor', async function() {
-    validate('WithAncestorConstructor').hasConstructor.should.be.true;
-  });
+    it('warns when adding a contract with an ancestor with a constructor', async function() {
+      validate('WithAncestorConstructor').hasConstructor.should.be.true;
+    });
 
-  it('warns when adding a contract with a parent from a dependency with a constructor', async function() {
-    validate('WithDependencyParentConstructor').hasConstructor.should.be.true;
+    it('warns when adding a contract with a parent from a dependency with a constructor', async function() {
+      validate('WithDependencyParentConstructor').hasConstructor.should.be.true;
+    });
+
+    it('does not warn when adding a contract with an ancestor with an empty constructor', async function() {
+      validate('WithAncestorEmptyConstructor').hasConstructor.should.be.false;
+    });
   });
 
   it('warns when adding a contract with a selfdestruct call', async function() {
