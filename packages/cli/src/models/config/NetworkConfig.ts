@@ -13,8 +13,6 @@ interface ConfigInterface {
   networks: { [network: string]: Network };
   provider: Provider;
   buildDir: string;
-  // TODO: remove after managing compiler info in project.json
-  compilers?: CompilersInfo;
 }
 
 interface NetworkCamelCase<T> {
@@ -29,7 +27,7 @@ type NetworkId<T> = NetworkCamelCase<T> | NetworkSnakeCase<T> | (NetworkCamelCas
 
 type Network = {
   host: string;
-  port: number | string;
+  port?: number | string;
   protocol?: string;
   from?: number | string;
   gas?: number | string;
@@ -44,8 +42,6 @@ interface ArtifactDefaults {
 }
 
 type Provider = string | ((any) => any);
-// TODO: remove after managing compiler info in project.json
-type CompilersInfo = any;
 
 const NetworkConfig = {
   name: 'NetworkConfig',
@@ -62,10 +58,9 @@ const NetworkConfig = {
   getConfig(root: string = process.cwd()): ConfigInterface {
     // eslint-disable-next-line @typescript-eslint/no-var-requires
     const zosConfigFile = require(`${root}/networks.js`);
-    const compilers = zosConfigFile.compilers || this.getDefaultCompilersProperties();
     const buildDir = `${root}/build/contracts`;
 
-    return { ...zosConfigFile, compilers, buildDir };
+    return { ...zosConfigFile, buildDir };
   },
 
   getBuildDir(): string {
@@ -114,20 +109,6 @@ const NetworkConfig = {
     const networkDefaults = omit(pick(network, defaults), isUndefined);
 
     return { ...configDefaults, ...networkDefaults };
-  },
-
-  getDefaultCompilersProperties(): CompilersInfo {
-    return {
-      vyper: {},
-      solc: {
-        settings: {
-          optimizer: {
-            enabled: false,
-            runs: 200,
-          },
-        },
-      },
-    };
   },
 
   createContractsDir(root: string): void {
