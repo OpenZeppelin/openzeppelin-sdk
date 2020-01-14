@@ -7,12 +7,11 @@ import path from 'path';
 
 import { Loggy } from '@openzeppelin/upgrades';
 import { OPEN_ZEPPELIN_FOLDER } from '../files/constants';
+import { DEFAULT_TX_TIMEOUT, DEFAULT_EXPIRATION_TIMEOUT } from './defaults';
 
 const state = { alreadyPrintedSessionInfo: false };
 const SESSION_FILE = '.session';
 const SESSION_PATH = path.join(OPEN_ZEPPELIN_FOLDER, SESSION_FILE);
-const DEFAULT_TX_TIMEOUT: number = 10 * 60; // 10 minutes
-const DEFAULT_EXPIRATION_TIMEOUT: number = 15 * 60; // 15 minutes
 
 export interface SessionOptions {
   network?: string;
@@ -112,5 +111,4 @@ function describe(session: SessionOptions): string {
   );
 }
 
-export { DEFAULT_TX_TIMEOUT };
 export default Session;

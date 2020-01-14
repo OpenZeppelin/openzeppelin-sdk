@@ -3,6 +3,7 @@ import { MethodArg } from '../../prompts/prompt';
 
 import { TxParams } from '@openzeppelin/upgrades';
 import NetworkFile from '../../models/files/NetworkFile';
+import { DEFAULT_TX_TIMEOUT } from '../../models/network/defaults';
 
 export interface Options {
   from?: string;
@@ -113,6 +114,10 @@ export const options: Option[] = [
         };
       }
     },
+  },
+  {
+    format: '--timeout <timeout>',
+    description: `timeout in seconds for each transaction (default: ${DEFAULT_TX_TIMEOUT})`,
   },
   {
     format: '-f, --from <address>',
