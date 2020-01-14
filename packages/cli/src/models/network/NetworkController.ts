@@ -127,7 +127,7 @@ export default class NetworkController {
 
   public async deployChangedSolidityLibs(contractNames: string): Promise<void> {
     const libNames = this._getAllSolidityLibNames([contractNames]);
-    const changedLibraries = this.getLibsToDeploy(libNames);
+    const changedLibraries = this.getLibsToDeploy(libNames, true);
     await this.uploadSolidityLibs(changedLibraries);
   }
 

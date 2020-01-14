@@ -1,6 +1,7 @@
 import '../setup';
+import sinon from 'sinon';
 
-import { Contracts } from '@openzeppelin/upgrades';
+import { Contracts, Transactions } from '@openzeppelin/upgrades';
 import { accounts } from '@openzeppelin/test-environment';
 
 import { ProxyType } from '../../src/scripts/interfaces';
@@ -116,6 +117,23 @@ describe('deploy (action)', function() {
     });
     const instances = networkFile.getProxies({ contract: 'GreeterBase' });
     instances.should.have.lengthOf(1);
+  });
+
+  // TODO: should redeploy changed libraries, but afaik no good way to test this currently
+  it('should not redeploy unchanged library', async function() {
+    const contract = 'WithLibraryNonUpgradeable';
+    const options = { network, txParams, networkFile };
+
+    const spy = sinon.spy(Transactions, 'deployContract');
+
+    await deploy(contract, [], options);
+    await deploy(contract, [], options);
+
+    const instances = networkFile.getProxies({ contract });
+    instances.should.have.lengthOf(2);
+
+    spy.callCount.should.equal(3); // 1 for each contract deploy, only 1 for the library (reused the second time)
+    spy.restore();
   });
 
   // see push tests for reference
