@@ -1,6 +1,6 @@
 import flatten from 'lodash.flatten';
 
-import { getNodeSources, getConstructor, getContract, idModifierInvocation } from '../solc/ast-utils';
+import { getNodeSources, getConstructor, getContract, isModifierInvocation } from '../solc/ast-utils';
 
 import { getInheritanceChain } from '../solc/get-inheritance-chain';
 import { ContractDefinition, ModifierInvocation, Literal } from '../solc/ast-node';
@@ -71,7 +71,7 @@ export function buildSuperCallsForChain(
       const node = getContract(art.ast, base);
 
       const constructorNode = getConstructor(node);
-      return constructorNode ? constructorNode.modifiers.filter(mod => idModifierInvocation(mod)) : [];
+      return constructorNode ? constructorNode.modifiers.filter(mod => isModifierInvocation(mod)) : [];
     }),
   );
 

@@ -12,6 +12,8 @@ import {
   NodeType,
   FunctionDefinition,
   SourceUnit,
+  ModifierDefinition,
+  ModifierInvocation,
 } from './ast-node';
 
 const nodeSchemaValidator = new Ajv({ allErrors: true });
@@ -41,28 +43,24 @@ export function isContract(node: ContractDefinition): boolean {
   return isContractKind(node, 'contract');
 }
 
-export function isNodeType(node: Node, name: NodeType): boolean {
-  return node.nodeType === name;
+export function isImportDirective(node: Node): node is ImportDirective {
+  return node.nodeType === 'ImportDirective';
 }
 
-export function isImportDirective(node: Node): boolean {
-  return isNodeType(node, 'ImportDirective');
+export function isVarDeclaration(node: Node): node is VariableDeclaration {
+  return node.nodeType === 'VariableDeclaration';
 }
 
-export function isVarDeclaration(node: Node): boolean {
-  return isNodeType(node, 'VariableDeclaration');
+export function isContractType(node: Node): node is ContractDefinition {
+  return node.nodeType === 'ContractDefinition';
 }
 
-export function isContractType(node: Node): boolean {
-  return isNodeType(node, 'ContractDefinition');
+export function isPragmaDirective(node: Node): node is PragmaDirective {
+  return node.nodeType === 'PragmaDirective';
 }
 
-export function isPragmaDirective(node: Node): boolean {
-  return isNodeType(node, 'PragmaDirective');
-}
-
-export function idModifierInvocation(node: Node): boolean {
-  return isNodeType(node, 'ModifierInvocation');
+export function isModifierInvocation(node: Node): node is ModifierInvocation {
+  return node.nodeType === 'ModifierInvocation';
 }
 
 export function getSourceIndices(node: Node): number[] {
