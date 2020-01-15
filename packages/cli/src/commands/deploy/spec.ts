@@ -1,4 +1,4 @@
-import { Question, Arg, Option } from '../../register-command';
+import { ParamDetails, Arg, Option } from '../../register-command';
 import { MethodArg } from '../../prompts/prompt';
 
 import { TxParams } from '@openzeppelin/upgrades';
@@ -26,14 +26,14 @@ export const description = 'deploy a contract instance';
 export const args: Arg[] = [
   {
     name: 'contract',
-    async prompt(): Promise<Question> {
+    async details(): Promise<ParamDetails> {
       const choices = await import('../../prompts/choices');
 
       // TODO: Make this include contracts from _unlinked_ dependencies.
       const contracts = choices.contracts('all');
 
       return {
-        message: 'Pick a contract to deploy',
+        prompt: 'Pick a contract to deploy',
         choices: contracts,
       };
     },
@@ -41,7 +41,7 @@ export const args: Arg[] = [
   {
     name: 'arguments',
     variadic: true,
-    async prompt(params: Options & Args): Promise<Question[]> {
+    async details(params: Options & Args): Promise<ParamDetails[]> {
       const { fromContractFullName } = await import('../../utils/naming');
       const { default: ContractManager } = await import('../../models/local/ContractManager');
       const { argLabelWithIndex } = await import('../../prompts/prompt');
@@ -89,7 +89,7 @@ export const options: Option[] = [
   {
     format: '-n, --network <network>',
     description: 'network to use',
-    async prompt() {
+    async details() {
       const { default: ConfigManager } = await import('../../models/config/ConfigManager');
       const { default: Session } = await import('../../models/network/Session');
 
@@ -97,7 +97,7 @@ export const options: Option[] = [
       const { network: lastNetwork } = Session.getNetwork();
 
       return {
-        message: 'Pick a network',
+        prompt: 'Pick a network',
         choices: networks,
         preselect: lastNetwork,
       };
@@ -107,7 +107,7 @@ export const options: Option[] = [
     // TODO: discuss option name
     format: '--no-manifest-migration',
     description: 'disable automatic migration of manifest format',
-    async prompt(options: Options) {
+    async details(options: Options) {
       const { isMigratableManifestVersion } = await import('../../models/files/ManifestVersion');
       const { default: NetworkFile } = await import('../../models/files/NetworkFile');
 
@@ -115,10 +115,10 @@ export const options: Option[] = [
 
       if (isMigratableManifestVersion(version)) {
         return {
-          type: 'confirm',
-          message: 'An old manifest version was detected and needs to be migrated to the latest one. Proceed?',
           validate: (migrate: boolean) => migrate,
           validationError: 'Cannot proceed without migrating the manifest file.',
+          prompt: 'An old manifest version was detected and needs to be migrated to the latest one. Proceed?',
+          promptType: 'confirm',
         };
       }
     },

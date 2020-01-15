@@ -12,9 +12,9 @@ interface CommonParams {
   interactive?: boolean;
 }
 
-export interface Question {
-  type?: 'confirm' | 'list' | 'input';
-  message: string;
+export interface ParamDetails {
+  prompt?: string;
+  promptType?: 'confirm' | 'list' | 'input';
   choices?: Choice[];
   preselect?: string;
   validate?: (value: string | boolean) => boolean;
@@ -27,12 +27,12 @@ type Param = ParamSimple | ParamVariadic;
 
 interface ParamSimple {
   variadic?: false;
-  prompt?: (params: object) => Promise<Question | undefined>;
+  details?: (params: object) => Promise<ParamDetails | undefined>;
 }
 
 interface ParamVariadic {
   variadic: true;
-  prompt?: (params: object) => Promise<Question[]>;
+  details?: (params: object) => Promise<ParamDetails[]>;
 }
 
 export type Arg = Param & { name: string };
@@ -109,16 +109,16 @@ async function promptForMissing(cmd: Command, spec: CommandSpec, params: object)
     if (value === undefined || (Array.isArray(value) && value.length === 0)) {
       // Seems redundant but it helps the type system.
       if (param.variadic === true) {
-        const prompt = await param.prompt?.(params);
+        const details = await param.details?.(params);
         const values = [];
-        for (const p of prompt) {
-          values.push(await askQuestion(name, p));
+        for (const d of details) {
+          values.push(await askQuestion(name, d));
         }
         params[name] = values;
       } else {
-        const prompt = await param.prompt?.(params);
-        if (prompt) {
-          params[name] = await askQuestion(name, prompt);
+        const details = await param.details?.(params);
+        if (details) {
+          params[name] = await askQuestion(name, details);
         }
       }
     } else {
@@ -129,14 +129,14 @@ async function promptForMissing(cmd: Command, spec: CommandSpec, params: object)
         if (!Array.isArray(value)) {
           throw new Error(`Expected multiple values for ${name}`);
         }
-        const prompt = await param.prompt?.(params);
-        if (prompt) {
-          if (prompt.length !== value.length) {
-            throw new Error(`Expected ${prompt.length} values for ${name} but got ${value.length}`);
+        const details = await param.details?.(params);
+        if (details) {
+          if (details.length !== value.length) {
+            throw new Error(`Expected ${details.length} values for ${name} but got ${value.length}`);
           }
 
-          for (const [i, p] of prompt.entries()) {
-            if (!p.validate(value[i])) {
+          for (const [i, d] of details.entries()) {
+            if (!d.validate(value[i])) {
               throw new Error(`Invalid ${name} '${value[i]}'`);
             }
           }
@@ -145,8 +145,8 @@ async function promptForMissing(cmd: Command, spec: CommandSpec, params: object)
         if (Array.isArray(value)) {
           throw new Error(`Expected a single value for ${name}`);
         }
-        const prompt = await param.prompt?.(params);
-        if (prompt && !prompt.validate(value)) {
+        const details = await param.details?.(params);
+        if (details && !details.validate(value)) {
           throw new Error(`Invalid ${name} '${value}'`);
         }
       }
@@ -154,10 +154,10 @@ async function promptForMissing(cmd: Command, spec: CommandSpec, params: object)
   }
 }
 
-async function askQuestion(name: string, question: Question): Promise<string> {
-  const { message, choices, validate: rawValidate, validationError } = question;
+async function askQuestion(name: string, details: ParamDetails): Promise<string> {
+  const { prompt, choices, validate: rawValidate, validationError } = details;
 
-  const type = question.type ?? (choices === undefined ? 'input' : 'list');
+  const type = details.promptType ?? (choices === undefined ? 'input' : 'list');
 
   const validate = (value: string) => {
     let valid: boolean;
@@ -176,10 +176,10 @@ async function askQuestion(name: string, question: Question): Promise<string> {
   const answers = await inquirer.prompt({
     name: 'question',
     type,
-    message,
+    message: prompt,
     choices,
     validate,
-    default: question.preselect,
+    default: details.preselect,
   });
 
   return answers.question;
