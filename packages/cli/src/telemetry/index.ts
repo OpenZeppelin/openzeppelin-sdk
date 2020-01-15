@@ -9,7 +9,6 @@ import proc from 'child_process';
 import process from 'process';
 
 import { DISABLE_INTERACTIVITY } from '../prompts/prompt';
-import { Params } from '../scripts/interfaces';
 import ProjectFile from '../models/files/ProjectFile';
 
 type Field = string | number | boolean;
@@ -20,10 +19,10 @@ interface GlobalTelemetryOptions {
   salt: string;
 }
 
-export type CommandData = Params & {
+export interface CommandData {
   name: string;
   network?: string;
-};
+}
 
 export interface UserEnvironment {
   platform: string;
@@ -39,7 +38,7 @@ export interface UserEnvironment {
 export default {
   DISABLE_TELEMETRY: !!process.env.OPENZEPPELIN_DISABLE_TELEMETRY,
 
-  async report(commandName: string, options: Params, interactive: boolean): Promise<void> {
+  async report(commandName: string, params: object, interactive: boolean): Promise<void> {
     const telemetryOptions = await checkOptIn(interactive);
     if (telemetryOptions === undefined || !telemetryOptions.optIn) return;
 
@@ -51,7 +50,7 @@ export default {
     }
 
     // Conceal data before sending it
-    const concealedData = concealData(options, telemetryOptions.salt);
+    const concealedData = concealData(params, telemetryOptions.salt);
     const commandData: Concealed<CommandData> = { ...concealedData, name: commandName };
     if (network !== undefined) commandData.network = network;
 

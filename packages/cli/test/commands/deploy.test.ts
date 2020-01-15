@@ -29,7 +29,9 @@ describe('deploy (action)', function() {
 
   it('should deploy a simple contract with no constructor', async function() {
     const contract = 'SimpleNonUpgradeable';
-    await deploy(contract, [], {
+    await deploy({
+      contract,
+      arguments: [],
       network,
       txParams,
       networkFile,
@@ -45,7 +47,9 @@ describe('deploy (action)', function() {
 
   it('should deploy a simple contract with constructor arguments', async function() {
     const contract = 'WithConstructorNonUpgradeable';
-    await deploy(contract, ['30', 'abcde', '[3, 7]'], {
+    await deploy({
+      contract,
+      arguments: ['30', 'abcde', '[3, 7]'],
       network,
       txParams,
       networkFile,
@@ -60,7 +64,9 @@ describe('deploy (action)', function() {
   });
 
   it('should fail to deploy an unknown contract', async function() {
-    await deploy('NotExists', [], {
+    await deploy({
+      contract: 'NotExists',
+      arguments: [],
       network,
       txParams,
       networkFile,
@@ -69,19 +75,17 @@ describe('deploy (action)', function() {
 
   it('should deploy multiple instances', async function() {
     const contract = 'SimpleNonUpgradeable';
-    const deployArgs: Parameters<typeof deploy> = [
+    const params = {
       contract,
-      [],
-      {
-        network,
-        txParams,
-        networkFile,
-      },
-    ];
+      arguments: [],
+      network,
+      txParams,
+      networkFile,
+    };
 
-    await deploy(...deployArgs);
-    await deploy(...deployArgs);
-    await deploy(...deployArgs);
+    await deploy(params);
+    await deploy(params);
+    await deploy(params);
 
     const instances = networkFile.getProxies({ contract });
     instances.should.have.lengthOf(3);
@@ -89,7 +93,9 @@ describe('deploy (action)', function() {
 
   it('should fail to deploy without necessary constructor arguments', async function() {
     const contract = 'WithConstructorNonUpgradeable';
-    await deploy(contract, [], {
+    await deploy({
+      contract,
+      arguments: [],
       network,
       txParams,
       networkFile,
@@ -100,7 +106,9 @@ describe('deploy (action)', function() {
 
   it('should deploy libraries if necessary', async function() {
     const contract = 'WithLibraryNonUpgradeable';
-    await deploy(contract, [], {
+    await deploy({
+      contract,
+      arguments: [],
       network,
       txParams,
       networkFile,
@@ -110,7 +118,9 @@ describe('deploy (action)', function() {
   });
 
   it('should deploy a contract from a dependency', async function() {
-    await deploy('mock-stdlib-undeployed/GreeterBase', [], {
+    await deploy({
+      contract: 'mock-stdlib-undeployed/GreeterBase',
+      arguments: [],
       network,
       txParams,
       networkFile,
@@ -122,12 +132,12 @@ describe('deploy (action)', function() {
   // TODO: should redeploy changed libraries, but afaik no good way to test this currently
   it('should not redeploy unchanged library', async function() {
     const contract = 'WithLibraryNonUpgradeable';
-    const options = { network, txParams, networkFile };
+    const options = { contract, network, txParams, networkFile, arguments: [] };
 
     const spy = sinon.spy(Transactions, 'deployContract');
 
-    await deploy(contract, [], options);
-    await deploy(contract, [], options);
+    await deploy(options);
+    await deploy(options);
 
     const instances = networkFile.getProxies({ contract });
     instances.should.have.lengthOf(2);

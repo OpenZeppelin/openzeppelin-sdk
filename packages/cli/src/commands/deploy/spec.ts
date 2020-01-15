@@ -1,9 +1,14 @@
-import { Question, Arg, Option, ArgsAndOpts } from '../../register-command';
+import { Question, Arg, Option } from '../../register-command';
 import { MethodArg } from '../../prompts/prompt';
 
 import { TxParams } from '@openzeppelin/upgrades';
 import NetworkFile from '../../models/files/NetworkFile';
 import { DEFAULT_TX_TIMEOUT } from '../../models/network/defaults';
+
+export interface Args {
+  contract: string;
+  arguments: string[];
+}
 
 export interface Options {
   from?: string;
@@ -37,13 +42,13 @@ export const args: Arg[] = [
   {
     name: 'arguments',
     variadic: true,
-    async prompt(argsAndOpts: ArgsAndOpts): Promise<Question[]> {
+    async prompt(params: Options & Args): Promise<Question[]> {
       const { fromContractFullName } = await import('../../utils/naming');
       const { default: ContractManager } = await import('../../models/local/ContractManager');
       const { argLabelWithIndex } = await import('../../prompts/prompt');
       const { parseArg, getSampleInput } = await import('../../utils/input');
 
-      const contractName = argsAndOpts.contract as string;
+      const contractName = params.contract;
 
       const { package: packageName, contract: contractAlias } = fromContractFullName(contractName);
       const contract = new ContractManager().getContractClass(packageName, contractAlias);

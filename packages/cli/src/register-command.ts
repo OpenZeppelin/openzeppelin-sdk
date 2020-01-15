@@ -8,6 +8,10 @@ export function generateSignature(name: string, args: Arg[]): string {
   return [name, ...args.map(a => `[${a.name}${a.variadic ? '...' : ''}]`)].join(' ');
 }
 
+interface CommonParams {
+  interactive?: boolean;
+}
+
 export interface Question {
   type?: 'confirm' | 'list' | 'input';
   message: string;
@@ -23,12 +27,12 @@ type Param = ParamSimple | ParamVariadic;
 
 interface ParamSimple {
   variadic?: false;
-  prompt?: (argsAndOpts: ArgsAndOpts) => Promise<Question | undefined>;
+  prompt?: (params: object) => Promise<Question | undefined>;
 }
 
 interface ParamVariadic {
   variadic: true;
-  prompt?: (argsAndOpts: ArgsAndOpts) => Promise<Question[]>;
+  prompt?: (params: object) => Promise<Question[]>;
 }
 
 export type Arg = Param & { name: string };
@@ -47,14 +51,15 @@ export function register(program: Command, spec: CommandSpec, getAction: () => P
     .description(spec.description)
     .action(async (...actionArgs: unknown[]) => {
       const { preAction, action }: Action = await getAction();
-      const abort = await preAction?.(...actionArgs);
+      const [, preParams] = getCommandParams(...actionArgs);
+      const abort = await preAction?.(preParams);
       if (abort) {
         return abort();
       }
-      const [cmd, argsAndOpts] = getCommandArgsAndOpts(...actionArgs);
-      await promptForMissing(cmd, spec, argsAndOpts);
-      Telemetry.report(cmd.name(), argsAndOpts, !!argsAndOpts.interactive);
-      await action(...generateActionArgs(cmd, argsAndOpts));
+      const [cmd, params] = getCommandParams(...actionArgs);
+      await promptForMissing(cmd, spec, params);
+      Telemetry.report(cmd.name(), params, !!params.interactive);
+      await action(params);
     });
 
   for (const opt of spec.options) {
@@ -65,8 +70,8 @@ export function register(program: Command, spec: CommandSpec, getAction: () => P
 type AbortFunction = () => Promise<void>;
 
 interface Action {
-  action: (...args: unknown[]) => Promise<void>;
-  preAction?: (...args: unknown[]) => Promise<void | AbortFunction>;
+  action: (params: object) => Promise<void>;
+  preAction?: (params: object) => Promise<void | AbortFunction>;
 }
 
 interface CommandSpec {
@@ -98,22 +103,22 @@ function* allParams(cmd: Command, spec: CommandSpec): Generator<[string, Param]>
   }
 }
 
-async function promptForMissing(cmd: Command, spec: CommandSpec, argsAndOpts: ArgsAndOpts) {
+async function promptForMissing(cmd: Command, spec: CommandSpec, params: object) {
   for (const [name, param] of allParams(cmd, spec)) {
-    const value = argsAndOpts[name];
+    const value = params[name];
     if (value === undefined || (Array.isArray(value) && value.length === 0)) {
       // Seems redundant but it helps the type system.
       if (param.variadic === true) {
-        const prompt = await param.prompt?.(argsAndOpts);
+        const prompt = await param.prompt?.(params);
         const values = [];
         for (const p of prompt) {
           values.push(await askQuestion(name, p));
         }
-        argsAndOpts[name] = values;
+        params[name] = values;
       } else {
-        const prompt = await param.prompt?.(argsAndOpts);
+        const prompt = await param.prompt?.(params);
         if (prompt) {
-          argsAndOpts[name] = await askQuestion(name, prompt);
+          params[name] = await askQuestion(name, prompt);
         }
       }
     } else {
@@ -124,7 +129,7 @@ async function promptForMissing(cmd: Command, spec: CommandSpec, argsAndOpts: Ar
         if (!Array.isArray(value)) {
           throw new Error(`Expected multiple values for ${name}`);
         }
-        const prompt = await param.prompt?.(argsAndOpts);
+        const prompt = await param.prompt?.(params);
         if (prompt) {
           if (prompt.length !== value.length) {
             throw new Error(`Expected ${prompt.length} values for ${name} but got ${value.length}`);
@@ -140,7 +145,7 @@ async function promptForMissing(cmd: Command, spec: CommandSpec, argsAndOpts: Ar
         if (Array.isArray(value)) {
           throw new Error(`Expected a single value for ${name}`);
         }
-        const prompt = await param.prompt?.(argsAndOpts);
+        const prompt = await param.prompt?.(params);
         if (prompt && !prompt.validate(value)) {
           throw new Error(`Invalid ${name} '${value}'`);
         }
@@ -171,43 +176,22 @@ async function askQuestion(name: string, question: Question): Promise<string> {
   return answers.question;
 }
 
-export type ArgsAndOpts = Record<string, boolean | string | string[]>;
-
 // Converts the arguments that Commander passes to an action into an object
 // where the key-value pairs correspond to positional arguments and options,
 // and extracts the Command object.
-function getCommandArgsAndOpts(...args: unknown[]): [Command, ArgsAndOpts] {
+function getCommandParams(...args: unknown[]): [Command, CommonParams] {
   const cmd = args.pop() as Command;
 
-  const argsAndOpts = {};
+  const params = {};
 
   for (let i = 0; i < cmd._args.length; i++) {
-    argsAndOpts[cmd._args[i].name] = args[i];
+    params[cmd._args[i].name] = args[i];
   }
 
   for (const opt of cmd.options) {
     const name = opt.attributeName();
-    argsAndOpts[name] = cmd[name];
+    params[name] = cmd[name];
   }
 
-  return [cmd, argsAndOpts];
-}
-
-// The inverse of getCommandArgsAndOpts. Generates the array of arguments that
-// can be passed as arguments to an action.
-function generateActionArgs(cmd: Command, argsAndOpts: ArgsAndOpts): unknown[] {
-  const args = [];
-
-  for (let i = 0; i < cmd._args.length; i++) {
-    args.push(argsAndOpts[cmd._args[i].name]);
-  }
-
-  for (const opt of cmd.options) {
-    const name = opt.attributeName();
-    cmd[name] = argsAndOpts[name];
-  }
-
-  args.push(cmd);
-
-  return args;
+  return [cmd, params];
 }

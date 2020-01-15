@@ -7,33 +7,31 @@ import { MethodArgType } from '../../prompts/prompt';
 import { parseMultipleArgs } from '../../utils/input';
 import { createAction } from '../create';
 
-import { Options } from './spec';
+import { Options, Args } from './spec';
 
-export async function preAction(
-  contractName: string | undefined,
-  deployArgs: string[],
-  options: Options,
-): Promise<void | (() => Promise<void>)> {
-  if (!options.skipCompile) {
+export async function preAction(params: Options & Args): Promise<void | (() => Promise<void>)> {
+  if (!params.skipCompile) {
     await compile();
   }
 
-  if (options.upgradeable === true) {
+  if (params.upgradeable === true) {
     return async () => {
       // Translate arguments to syntax expected by create.
-      options['args'] = deployArgs.join(',');
-      await createAction(contractName, options);
+      params['args'] = params.arguments.join(',');
+      await createAction(params.contract, params);
     };
   }
 }
 
-export async function action(contractName: string, deployArgs: string[], options: Options): Promise<void> {
+export async function action(params: Options & Args): Promise<void> {
+  const { contract: contractName, arguments: deployArgs } = params;
+
   const { network, txParams } =
-    process.env.NODE_ENV === 'test' ? options : await ConfigManager.initNetworkConfiguration(options);
+    process.env.NODE_ENV === 'test' ? params : await ConfigManager.initNetworkConfiguration(params);
 
   const { package: packageName, contract: contractAlias } = fromContractFullName(contractName);
 
-  const controller = new NetworkController(network, txParams, options.networkFile);
+  const controller = new NetworkController(network, txParams, params.networkFile);
 
   const contract = controller.contractManager.getContractClass(packageName, contractAlias);
   const constructorInputs: MethodArgType[] = contract.schema.abi.find(f => f.type === 'constructor')?.inputs ?? [];
