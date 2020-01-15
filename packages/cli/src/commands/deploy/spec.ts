@@ -35,7 +35,6 @@ export const args: Arg[] = [
       return {
         message: 'Pick a contract to deploy',
         choices: contracts,
-        validate: (value: string) => contracts.includes(value),
       };
     },
   },
@@ -101,7 +100,6 @@ export const options: Option[] = [
         message: 'Pick a network',
         choices: networks,
         preselect: lastNetwork,
-        validate: (value: string) => networks.includes(value),
       };
     },
   },

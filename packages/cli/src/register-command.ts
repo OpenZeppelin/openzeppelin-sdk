@@ -17,7 +17,7 @@ export interface Question {
   message: string;
   choices?: Choice[];
   preselect?: string;
-  validate: (value: string | boolean) => boolean;
+  validate?: (value: string | boolean) => boolean;
   validationError?: string;
 }
 
@@ -160,7 +160,16 @@ async function askQuestion(name: string, question: Question): Promise<string> {
   const type = question.type ?? (choices === undefined ? 'input' : 'list');
 
   const validate = (value: string) => {
-    const valid = rawValidate(value);
+    let valid: boolean;
+
+    if (rawValidate) {
+      valid = rawValidate(value);
+    } else if (type === 'list') {
+      valid = choices.includes(value);
+    } else {
+      valid = true;
+    }
+
     return valid || (validationError ?? `Invalid ${name}`);
   };
 
