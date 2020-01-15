@@ -10,9 +10,9 @@ export function transpile(source: string, transformations: Transformation[]): st
   for (let i = 0; i < sorted.length - 1; i++) {
     if (sorted[i].end > sorted[i + 1].start)
       throw new Error(
-        `Transformations ${sorted[i].start}:${sorted[i].end}:${sorted[i].text} and ${sorted[i + 1].start}:${
-          sorted[i + 1].end
-        }:${sorted[i + 1].text} overlap over the source file`,
+        `Transformations ${sorted[i].start}:${sorted[i].end}:${sorted[i].text.slice(20)}... and ${
+          sorted[i + 1].start
+        }:${sorted[i + 1].end}:${sorted[i + 1].text.slice(20)}... overlap over the source file`,
       );
   }
 
