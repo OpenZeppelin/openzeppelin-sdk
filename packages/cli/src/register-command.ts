@@ -51,12 +51,11 @@ export function register(program: Command, spec: CommandSpec, getAction: () => P
     .description(spec.description)
     .action(async (...actionArgs: unknown[]) => {
       const { preAction, action }: Action = await getAction();
-      const [, preParams] = getCommandParams(...actionArgs);
-      const abort = await preAction?.(preParams);
+      const [cmd, params] = getCommandParams(...actionArgs);
+      const abort = await preAction?.(params);
       if (abort) {
         return abort();
       }
-      const [cmd, params] = getCommandParams(...actionArgs);
       await promptForMissing(cmd, spec, params);
       Telemetry.report(cmd.name(), params, !!params.interactive);
       await action(params);
