@@ -43,7 +43,7 @@ export function transpileContracts(contracts: string[], artifacts: Artifact[]): 
   }, {});
 
   // build a list of all contracts to transpile
-  const contractsWithInheritance = [
+  const contractsToTranspile = [
     ...new Set(flatten(contracts.map(contract => getInheritanceChain(contract, contractsToArtifactsMap)))),
   ].filter(contract => {
     const art = contractsToArtifactsMap[contract];
@@ -52,7 +52,7 @@ export function transpileContracts(contracts: string[], artifacts: Artifact[]): 
   });
 
   // build a array of transformations per Solidity file
-  const fileTrans = contractsWithInheritance.reduce<Record<string, FileTran>>((acc, contractName) => {
+  const fileTrans = contractsToTranspile.reduce<Record<string, FileTran>>((acc, contractName) => {
     const art = contractsToArtifactsMap[contractName];
 
     const source = art.source;
@@ -65,8 +65,8 @@ export function transpileContracts(contracts: string[], artifacts: Artifact[]): 
       acc[art.fileName] = {
         transformations: [
           appendDirective(art.ast, directive),
-          ...fixImportDirectives(art, artifacts, contractsWithInheritance),
-          ...purgeContracts(art.ast, contractsWithInheritance),
+          ...fixImportDirectives(art, artifacts, contractsToTranspile),
+          ...purgeContracts(art.ast, contractsToTranspile),
         ],
         source: '',
       };
@@ -75,8 +75,8 @@ export function transpileContracts(contracts: string[], artifacts: Artifact[]): 
     acc[art.fileName].transformations = [
       ...acc[art.fileName].transformations,
       prependBaseClass(contractNode, source, 'Initializable'),
-      ...transformParents(contractNode, source, contractsWithInheritance),
-      ...transformConstructor(contractNode, source, contractsWithInheritance, contractsToArtifactsMap),
+      ...transformParents(contractNode, source, contractsToTranspile),
+      ...transformConstructor(contractNode, source, contractsToTranspile, contractsToArtifactsMap),
       ...purgeVarInits(contractNode, source),
       transformContractName(contractNode, source, `${contractName}Upgradable`),
     ];
@@ -85,7 +85,7 @@ export function transpileContracts(contracts: string[], artifacts: Artifact[]): 
   }, {});
 
   // build a final array of files to return
-  return contractsWithInheritance.reduce<OutputFile[]>((acc, contractName) => {
+  return contractsToTranspile.reduce<OutputFile[]>((acc, contractName) => {
     const artifact = contractsToArtifactsMap[contractName];
 
     const source = artifact.source;
