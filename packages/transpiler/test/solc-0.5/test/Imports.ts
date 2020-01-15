@@ -1,11 +1,17 @@
 import { shouldTranspileToValidContract } from './LocalConract.behaviour';
 
-describe(`GLDToken contract`, (): void => {
-  shouldTranspileToValidContract('GLDToken', {
-    GLDToken: {
-      path: 'GLDToken',
-      fileName: 'GLDToken',
-      contracts: ['GLDToken'],
+// todo: once all imports are supported enable this test
+describe(`Import contract`, (): void => {
+  shouldTranspileToValidContract('Imports', {
+    Imports: {
+      path: 'Imports',
+      fileName: 'Imports',
+      contracts: ['Imports'],
+    },
+    DC: {
+      path: 'DiamondInheritance',
+      fileName: 'DiamondInheritance',
+      contracts: ['DC', 'DB1', 'DB2', 'DA'],
     },
     ERC20Detailed: {
       path: '@openzeppelin/contracts/token/ERC20/ERC20Detailed',

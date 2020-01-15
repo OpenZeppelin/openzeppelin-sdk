@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`SIB contract is converted to a valid SIBUpgradable contract 1`] = `
+exports[`SimpleInheritance contract is converted to a valid SIBUpgradable contract 1`] = `
 "pragma solidity ^0.5.0;
 import \\"@openzeppelin/upgrades/contracts/Initializable.sol\\";
 

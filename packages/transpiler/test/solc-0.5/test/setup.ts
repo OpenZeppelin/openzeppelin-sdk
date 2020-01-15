@@ -21,14 +21,8 @@ export async function transpileAndSaveContracts(contracts: string[], dir: string
 }
 
 export async function compileContracts(): Promise<void> {
-  await exec('npm run compile-contracts');
+  await exec('npm run compile:contracts');
 }
-
-transpileAndSaveContracts(['GLDToken'], './build/contracts/').then(() => {
-  // waiting for the fix of an issue
-  // https://github.com/prettier-solidity/prettier-plugin-solidity/issues/211
-  // require("child_process").execSync("npx prettier --write **/*.sol");
-});
 
 export const artifacts = fs.readdirSync('./build/contracts/').map(file => {
   return JSON.parse(fs.readFileSync(`./build/contracts/${file}`).toString());

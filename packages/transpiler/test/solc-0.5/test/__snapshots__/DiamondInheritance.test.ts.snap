@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`DC contract is converted to a valid DCUpgradable contract 1`] = `
+exports[`Diamond contract is converted to a valid DCUpgradable contract 1`] = `
 "pragma solidity ^0.5.0;
 import \\"@openzeppelin/upgrades/contracts/Initializable.sol\\";
 
