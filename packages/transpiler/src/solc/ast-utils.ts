@@ -82,7 +82,7 @@ export function getNodeSources(node: Node, source: string): [number, number, str
   return [start, len, source.slice(start, start + len)];
 }
 
-export function getNode<T extends AnyNode>(node: Node, predicate: (node: AnyNode) => node is T): T | null {
+export function getFirstNode<T extends AnyNode>(node: Node, predicate: (node: AnyNode) => node is T): T | null {
   const ret = getNodes(node, predicate);
   return ret.length ? ret[0] : null;
 }
@@ -109,11 +109,14 @@ export function getContracts(node: Node): ContractDefinition[] {
 }
 
 export function getConstructor(node: ContractDefinition): FunctionDefinition | null {
-  return getNode(node, (node): node is FunctionDefinition => isFunctionDefinition(node) && node.kind === 'constructor');
+  return getFirstNode(
+    node,
+    (node): node is FunctionDefinition => isFunctionDefinition(node) && node.kind === 'constructor',
+  );
 }
 
 export function getContract(node: SourceUnit, contractName: string): ContractDefinition {
-  const ret = getNode(
+  const ret = getFirstNode(
     node,
     (node): node is ContractDefinition => isContractDefinition(node) && node.name === contractName,
   );
@@ -122,5 +125,5 @@ export function getContract(node: SourceUnit, contractName: string): ContractDef
 }
 
 export function getContractById(node: Node, id: number): ContractDefinition | null {
-  return getNode(node, (node): node is ContractDefinition => isContractDefinition(node) && node.id === id);
+  return getFirstNode(node, (node): node is ContractDefinition => isContractDefinition(node) && node.id === id);
 }
