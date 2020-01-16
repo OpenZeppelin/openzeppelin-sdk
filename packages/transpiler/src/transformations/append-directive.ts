@@ -10,7 +10,7 @@ export function appendDirective(fileNode: Node, directive: string): Transformati
   };
   const importsAndPragmas = [...getPragmaDirectives(fileNode), ...getImportDirectives(fileNode)];
   if (importsAndPragmas.length) {
-    const last = importsAndPragmas.slice(-1)[0];
+    const [last] = importsAndPragmas.slice(-1);
     const [start, len] = getSourceIndices(last);
     retVal.start = start + len;
     retVal.end = start + len;
