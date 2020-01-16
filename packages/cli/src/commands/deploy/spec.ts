@@ -100,9 +100,8 @@ export const options: Option[] = [
     },
   },
   {
-    // TODO: discuss option name
-    format: '--no-manifest-migration',
-    description: 'disable automatic migration of manifest format',
+    format: '--migrate-manifest',
+    description: 'enable automatic migration of manifest format',
     async details(options: Options) {
       const { isMigratableManifestVersion } = await import('../../models/files/ManifestVersion');
       const { default: NetworkFile } = await import('../../models/files/NetworkFile');

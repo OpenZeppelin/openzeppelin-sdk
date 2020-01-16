@@ -120,9 +120,6 @@ async function promptForMissing(cmd: Command, spec: CommandSpec, params: object)
         }
       }
     } else {
-      if (typeof value === 'boolean') {
-        continue;
-      }
       if (param.variadic === true) {
         if (!Array.isArray(value)) {
           throw new Error(`Expected multiple values for ${name}`);
@@ -164,7 +161,19 @@ async function askQuestion(name: string, details: ParamDetails): Promise<string>
     default: details.preselect,
   });
 
-  return answers.question;
+  const value = answers.question;
+
+  // Inquirer doesn't run validations for confirm (yes/no) prompts, but we do
+  // want to validate because in some cases only one answer is acceptable.
+  // (e.g. --migrate-manifest)
+  if (type === 'confirm' && validationError) {
+    const error = validationError(value);
+    if (error) {
+      throw new Error(error);
+    }
+  }
+
+  return value;
 }
 
 function throwIfInvalid(value: string, name: string, details?: ParamDetails): void {
