@@ -10,11 +10,11 @@ export function checkVersion(version: string, where: any): void | never {
   if (version === MANIFEST_VERSION) return;
   else if (isUndefined(version)) {
     throw Error(
-      `Manifest version identifier not found in ${where}. This means the project was built with an older version of ${OPEN_ZEPPELIN} (1.x), and needs to be upgraded. Please refer to the documentation at https://docs.openzeppelin.com for more info.`,
+      `Manifest version identifier not found in ${where}. This means the project was built with an older version of ${OPEN_ZEPPELIN} (1.x), and needs to be upgraded. Please refer to the documentation at https://docs.openzeppelin.com/cli for more info.`,
     );
   } else if (!isCurrentMajor(version) || (!isCurrentMinor(version) && !isUndefinedMinor(version))) {
     throw Error(
-      `Unrecognized manifest version identifier ${version} found in ${where}. This means the project was built with an unknown version of ${OPEN_ZEPPELIN}. Please refer to the documentation at https://docs.openzeppelin.com/sdk for more info.`,
+      `Unrecognized manifest version identifier ${version} found in ${where}. This means the project was built with an unknown version of ${OPEN_ZEPPELIN}. Please refer to the documentation at https://docs.openzeppelin.com/cli for more info.`,
     );
   }
 }
