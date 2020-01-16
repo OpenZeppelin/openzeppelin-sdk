@@ -1,5 +1,3 @@
-'use strict';
-
 import fs from 'fs-extra';
 import every from 'lodash.every';
 import map from 'lodash.map';
