@@ -54,7 +54,7 @@ export default {
     const commandData: Concealed<CommandData> = { ...concealedData, name: commandName };
     if (network !== undefined) commandData.network = network;
 
-    const userEnvironment = getUserEnvironment();
+    const userEnvironment = await getUserEnvironment();
     this.sendToFirebase(telemetryOptions.uuid, commandData, userEnvironment);
   },
 
@@ -111,16 +111,20 @@ async function checkOptIn(interactive: boolean): Promise<GlobalTelemetryOptions 
   return globalOptions;
 }
 
-function getUserEnvironment(): UserEnvironment {
+async function getUserEnvironment(): Promise<UserEnvironment> {
   return {
     platform: process.platform,
     arch: process.arch,
     nodeVersion: process.version,
-    cliVersion: require('../../package.json').version,
+    cliVersion: await getCLIVersion(),
     upgradesVersion: getDependencyVersion('@openzeppelin/upgrades'),
     truffleVersion: getDependencyVersion('truffle'),
     web3Version: getDependencyVersion('web3'),
   };
+}
+
+async function getCLIVersion(): Promise<string> {
+  return JSON.parse(await fs.readFile(__dirname + '/../../package.json', 'utf8')).version;
 }
 
 function getDependencyVersion(dep: string): string | undefined {
