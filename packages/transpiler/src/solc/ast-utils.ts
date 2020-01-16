@@ -14,6 +14,7 @@ import {
   ModifierDefinition,
   ModifierInvocation,
 } from './ast-node';
+import { Artifact } from './artifact';
 
 const nodeSchemaValidator = new Ajv({ allErrors: true });
 
@@ -115,12 +116,12 @@ export function getConstructor(node: ContractDefinition): FunctionDefinition | n
   );
 }
 
-export function getContract(node: SourceUnit, contractName: string): ContractDefinition {
+export function getContract(art: Artifact): ContractDefinition {
   const ret = getFirstNode(
-    node,
-    (node): node is ContractDefinition => isContractDefinition(node) && node.name === contractName,
+    art.ast,
+    (node): node is ContractDefinition => isContractDefinition(node) && node.name === art.contractName,
   );
-  if (ret == null) throw new Error(`Can't find ${contractName} in ${util.inspect(node)}`);
+  if (ret == null) throw new Error(`Can't find ${art.contractName} in ${util.inspect(art)}`);
   return ret;
 }
 

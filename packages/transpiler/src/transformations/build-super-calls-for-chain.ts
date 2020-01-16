@@ -24,7 +24,7 @@ function buildSuperCall(args: Literal[], name: string, source: string): string {
 function buildSuperCalls(
   node: ContractDefinition,
   source: string,
-  contracts: string[],
+  contracts: Artifact[],
   mods: ModifierInvocation[],
   contractsToArtifactsMap: Record<string, Artifact>,
 ): (string | never[])[] {
@@ -32,7 +32,7 @@ function buildSuperCalls(
   if (hasInheritance) {
     return [
       ...node.baseContracts
-        .filter(base => contracts.some(contract => base.baseName.name === contract))
+        .filter(base => contracts.some(contract => base.baseName.name === contract.contractName))
         .map(base => {
           const mod = mods.filter(mod => mod.modifierName.name === base.baseName.name)[0];
           if (mod) {
@@ -40,7 +40,7 @@ function buildSuperCalls(
           } else {
             const contractName = base.baseName.name;
             const art = contractsToArtifactsMap[contractName];
-            const node = getContract(art.ast, contractName);
+            const node = getContract(art);
             const constructorNode = getConstructor(node);
 
             return (constructorNode && !constructorNode.parameters.parameters.length) ||
@@ -61,14 +61,13 @@ function buildSuperCalls(
 export function buildSuperCallsForChain(
   contractNode: ContractDefinition,
   source: string,
-  contracts: string[],
+  contracts: Artifact[],
   contractsToArtifactsMap: Record<string, Artifact>,
 ): string {
   const chain = getInheritanceChain(contractNode.name, contractsToArtifactsMap);
   const mods = flatten(
-    chain.map(base => {
-      const art = contractsToArtifactsMap[base];
-      const node = getContract(art.ast, base);
+    chain.map(art => {
+      const node = getContract(art);
 
       const constructorNode = getConstructor(node);
       return constructorNode ? constructorNode.modifiers.filter(mod => isModifierInvocation(mod)) : [];
@@ -79,13 +78,7 @@ export function buildSuperCallsForChain(
     ...new Set(
       flatten(
         chain.map(base => {
-          return buildSuperCalls(
-            getContract(contractsToArtifactsMap[base].ast, base),
-            source,
-            contracts,
-            mods,
-            contractsToArtifactsMap,
-          ).reverse();
+          return buildSuperCalls(getContract(base), source, contracts, mods, contractsToArtifactsMap).reverse();
         }),
       ),
     ),

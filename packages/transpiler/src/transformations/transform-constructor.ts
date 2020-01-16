@@ -21,7 +21,7 @@ function getVarInits(contractNode: ContractDefinition, source: string): string {
 export function transformConstructor(
   contractNode: ContractDefinition,
   source: string,
-  contracts: string[],
+  contracts: Artifact[],
   contractsToArtifactsMap: Record<string, Artifact>,
 ): Transformation[] {
   const superCalls = buildSuperCallsForChain(contractNode, source, contracts, contractsToArtifactsMap);
