@@ -1,5 +1,3 @@
-'use strict';
-
 import fs from 'fs-extra';
 import isEmpty from 'lodash.isempty';
 import intersection from 'lodash.intersection';
