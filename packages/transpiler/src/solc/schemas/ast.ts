@@ -4,8 +4,6 @@
  * Additional attrs can exist depending on the entity the Node represents.
  */
 
-'use strict';
-
 // A fully qualified, minimal object for this Schema is:
 /*
 {
