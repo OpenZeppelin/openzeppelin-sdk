@@ -5,7 +5,5 @@ export function getInheritanceChain(contract: string, contractsToArtifactsMap: R
   const art = contractsToArtifactsMap[contract];
   const contractNode = getContract(art);
 
-  return contractNode.linearizedBaseContracts.map(base => {
-    return contractsToArtifactsMap[base];
-  });
+  return contractNode.linearizedBaseContracts.map(base => contractsToArtifactsMap[base]);
 }
