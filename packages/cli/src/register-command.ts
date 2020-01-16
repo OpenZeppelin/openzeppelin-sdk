@@ -200,15 +200,10 @@ function throwIfInvalid(value: string, name: string, details?: ParamDetails): vo
 function getCommandParams(...args: unknown[]): [Command, CommonParams] {
   const cmd = args.pop() as Command;
 
-  const params = {};
+  const params = { ...cmd.opts() };
 
   for (let i = 0; i < cmd._args.length; i++) {
     params[cmd._args[i].name] = args[i];
-  }
-
-  for (const opt of cmd.options) {
-    const name = opt.attributeName();
-    params[name] = cmd[name];
   }
 
   return [cmd, params];
