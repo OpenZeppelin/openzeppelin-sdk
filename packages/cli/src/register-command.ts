@@ -1,6 +1,7 @@
 import inquirer from 'inquirer';
 import { Command } from 'commander';
 
+import { DISABLE_INTERACTIVITY } from './prompts/prompt';
 import { Choice } from './prompts/choices';
 import Telemetry from './telemetry';
 
@@ -101,7 +102,7 @@ function* allParams(cmd: Command, spec: CommandSpec): Generator<[string, Param]>
   }
 }
 
-async function promptForMissing(cmd: Command, spec: CommandSpec, params: object) {
+async function promptForMissing(cmd: Command, spec: CommandSpec, params: CommonParams) {
   for (const [name, param] of allParams(cmd, spec)) {
     const value = params[name];
     if (value === undefined || (Array.isArray(value) && value.length === 0)) {
@@ -110,12 +111,18 @@ async function promptForMissing(cmd: Command, spec: CommandSpec, params: object)
         const details = await param.details?.(params);
         const values = [];
         for (const d of details) {
+          if (!params.interactive || DISABLE_INTERACTIVITY) {
+            throw new Error(`Missing required parameters ${name}`);
+          }
           values.push(await askQuestion(name, d));
         }
         params[name] = values;
       } else {
         const details = await param.details?.(params);
         if (details) {
+          if (!params.interactive || DISABLE_INTERACTIVITY) {
+            throw new Error(`Missing required parameter ${name}`);
+          }
           params[name] = await askQuestion(name, details);
         }
       }
