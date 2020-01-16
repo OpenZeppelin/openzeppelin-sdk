@@ -53,25 +53,21 @@ export const args: Arg[] = [
       const contract = new ContractManager().getContractClass(packageName, contractAlias);
       const constructorInputs: MethodArg[] = contract.schema.abi.find(f => f.type === 'constructor')?.inputs ?? [];
 
-      return constructorInputs.map((arg, index) => {
-        const placeholder = getSampleInput(arg);
-        const validationError = placeholder
-          ? `Enter a valid ${arg.type} such as: ${placeholder}`
-          : `Enter a valid ${arg.type}`;
-
-        return {
-          message: `${argLabelWithIndex(arg, index)}:`,
-          validate: (value: string) => {
-            try {
-              parseArg(value, arg);
-              return true;
-            } catch (err) {
-              return false;
+      return constructorInputs.map((arg, index) => ({
+        prompt: `${argLabelWithIndex(arg, index)}:`,
+        validationError: (value: string) => {
+          try {
+            parseArg(value, arg);
+          } catch (err) {
+            const placeholder = getSampleInput(arg);
+            if (placeholder) {
+              return `Enter a valid ${arg.type} such as: ${placeholder}`;
+            } else {
+              return `Enter a valid ${arg.type}`;
             }
-          },
-          validationError,
-        };
-      });
+          }
+        },
+      }));
     },
   },
 ];
@@ -115,10 +111,10 @@ export const options: Option[] = [
 
       if (isMigratableManifestVersion(version)) {
         return {
-          validate: (migrate: boolean) => migrate,
-          validationError: 'Cannot proceed without migrating the manifest file.',
           prompt: 'An old manifest version was detected and needs to be migrated to the latest one. Proceed?',
           promptType: 'confirm',
+          validationError: (migrate: boolean) =>
+            migrate ? undefined : 'Cannot proceed without migrating the manifest file.',
         };
       }
     },

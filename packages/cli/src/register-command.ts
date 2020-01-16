@@ -17,8 +17,7 @@ export interface ParamDetails {
   promptType?: 'confirm' | 'list' | 'input';
   choices?: Choice[];
   preselect?: string;
-  validate?: (value: string | boolean) => boolean;
-  validationError?: string;
+  validationError?: (value: string | boolean) => string | undefined;
 }
 
 // Param is the things common to both positional arguments (Arg) and options (Option).
@@ -135,9 +134,7 @@ async function promptForMissing(cmd: Command, spec: CommandSpec, params: object)
           }
 
           for (const [i, d] of details.entries()) {
-            if (!d.validate(value[i])) {
-              throw new Error(`Invalid ${name} '${value[i]}'`);
-            }
+            throwIfInvalid(value[i], name, d);
           }
         }
       } else {
@@ -145,32 +142,18 @@ async function promptForMissing(cmd: Command, spec: CommandSpec, params: object)
           throw new Error(`Expected a single value for ${name}`);
         }
         const details = await param.details?.(params);
-        if (details && !details.validate(value)) {
-          throw new Error(`Invalid ${name} '${value}'`);
-        }
+        throwIfInvalid(value, name, details);
       }
     }
   }
 }
 
 async function askQuestion(name: string, details: ParamDetails): Promise<string> {
-  const { prompt, choices, validate: rawValidate, validationError } = details;
+  const { prompt, choices, validationError } = details;
 
   const type = details.promptType ?? (choices === undefined ? 'input' : 'list');
 
-  const validate = (value: string) => {
-    let valid: boolean;
-
-    if (rawValidate) {
-      valid = rawValidate(value);
-    } else if (type === 'list') {
-      valid = choices.includes(value);
-    } else {
-      valid = true;
-    }
-
-    return valid || (validationError ?? `Invalid ${name}`);
-  };
+  const validate = value => validationError(value) ?? true;
 
   const answers = await inquirer.prompt({
     name: 'question',
@@ -182,6 +165,24 @@ async function askQuestion(name: string, details: ParamDetails): Promise<string>
   });
 
   return answers.question;
+}
+
+function throwIfInvalid(value: string, name: string, details?: ParamDetails): void {
+  const { validationError, choices } = details ?? {};
+
+  let error: string | undefined;
+
+  if (validationError) {
+    error = validationError(value);
+  } else if (choices) {
+    if (!choices.includes(value)) {
+      error = `Invalid ${name} '${value}'`;
+    }
+  }
+
+  if (error) {
+    throw new Error(error);
+  }
 }
 
 // Converts the arguments that Commander passes to an action into an object
