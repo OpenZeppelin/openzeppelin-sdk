@@ -60,5 +60,7 @@ async function runCreate(params: Options & Args): Promise<void> {
     params['minimal'] = true;
   }
 
+  params.skipCompile = true;
+
   await createAction(params.contract, params);
 }
