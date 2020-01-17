@@ -136,6 +136,7 @@ export interface SessionParams {
   close?: boolean;
   network?: string;
   timeout?: number;
+  blockTimeout?: number;
   expires?: number;
 }
 

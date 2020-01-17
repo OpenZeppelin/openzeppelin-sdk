@@ -3,6 +3,7 @@ import session from '../scripts/session';
 import { promptIfNeeded, networksList, InquirerQuestions } from '../prompts/prompt';
 import ConfigManager from '../models/config/ConfigManager';
 import Telemetry from '../telemetry';
+import { DEFAULT_TX_TIMEOUT, DEFAULT_TX_BLOCK_TIMEOUT } from '../models/network/Session';
 
 const name = 'session';
 const signature: string = name;
@@ -21,7 +22,7 @@ const register: (program: any) => any = program =>
     .action(action);
 
 async function action(options: any): Promise<void> {
-  const { network: networkInOpts, expires, timeout, from, close, interactive } = options;
+  const { network: networkInOpts, expires, timeout, blockTimeout, from, close, interactive } = options;
 
   if (close) {
     await Telemetry.report('session', { close }, options.interactive);
@@ -34,7 +35,7 @@ async function action(options: any): Promise<void> {
     const { network } = await ConfigManager.initNetworkConfiguration(promptedNetwork, true);
     const accounts = await ZWeb3.eth.getAccounts();
     const promptedSession = await promptIfNeeded(
-      { opts: { timeout, from, expires }, props: getCommandProps(accounts) },
+      { opts: { timeout, blockTimeout, from, expires }, props: getCommandProps(accounts) },
       interactive,
     );
 
@@ -58,8 +59,13 @@ function getCommandProps(accounts: string[] = []): InquirerQuestions {
     },
     timeout: {
       type: 'input',
-      message: 'Enter a timeout to use for all web3 transactions (in seconds)',
-      default: 3600,
+      message: 'Enter a timeout in seconds to use for http-based web3 transactions',
+      default: DEFAULT_TX_TIMEOUT,
+    },
+    blockTimeout: {
+      type: 'input',
+      message: 'Enter a timeout in blocks to use for websocket-based web3 transactions',
+      default: DEFAULT_TX_BLOCK_TIMEOUT,
     },
     expires: {
       type: 'input',

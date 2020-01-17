@@ -17,6 +17,7 @@ describe('session command', function() {
         from: undefined,
         network: 'test',
         timeout: undefined,
+        blockTimeout: undefined,
       });
     },
   );

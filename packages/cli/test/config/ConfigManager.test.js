@@ -92,8 +92,8 @@ describe('ConfigManager', function() {
     });
 
     it('initializes web3 instance with timeout', async function() {
-      await ConfigManager.initNetworkConfiguration({ network: 'local', timeout: 100 }, true, configFileDir);
-      this.initialize.should.have.been.calledWith('http://localhost:8545', { transactionPollingTimeout: 100 });
+      await ConfigManager.initNetworkConfiguration({ network: 'local', timeout: 100, blockTimeout: 5 }, true, configFileDir);
+      this.initialize.should.have.been.calledWith('http://localhost:8545', { pollingTimeout: 100, blockTimeout: 5 });
     });
 
     describe('#setBaseConfig', function() {
