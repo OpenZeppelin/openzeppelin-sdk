@@ -18,13 +18,13 @@ export async function preAction(params: Options & Args): Promise<void | (() => P
   // If the user requests upgradeability via flag, we short circuit to the
   // create action. This avoid issues parsing deploy arguments due to the
   // deploy action being unaware of initializer functions.
-  if (params.kind !== 'regular') {
+  if (params.kind && params.kind !== 'regular') {
     return () => runCreate(params);
   }
 }
 
 export async function action(params: Options & Args): Promise<void> {
-  if (params.kind !== 'regular') {
+  if (params.kind && params.kind !== 'regular') {
     return runCreate(params);
   }
 
