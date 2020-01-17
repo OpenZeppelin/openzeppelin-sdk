@@ -34,7 +34,6 @@ const ConfigManager = {
 
     const { provider, artifactDefaults, network } = await this.config.loadNetworkConfig(networkName, root);
 
-    Contracts.setSyncTimeout(timeout * 1000);
     Contracts.setArtifactsDefaults(artifactDefaults);
 
     try {
