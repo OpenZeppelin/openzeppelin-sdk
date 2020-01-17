@@ -11,8 +11,8 @@ import { OPEN_ZEPPELIN_FOLDER } from '../files/constants';
 const state = { alreadyPrintedSessionInfo: false };
 const SESSION_FILE = '.session';
 const SESSION_PATH = path.join(OPEN_ZEPPELIN_FOLDER, SESSION_FILE);
-const DEFAULT_TX_TIMEOUT: number = 750; // same as web3
-const DEFAULT_TX_BLOCK_TIMEOUT: number = 50; // same as web3
+const DEFAULT_TX_TIMEOUT = 750; // same as web3
+const DEFAULT_TX_BLOCK_TIMEOUT = 50; // same as web3
 const DEFAULT_EXPIRATION_TIMEOUT: number = 15 * 60; // 15 minutes
 
 interface SessionOptions {
@@ -47,7 +47,11 @@ const Session = {
     return { network, expired: this._hasExpired(session) };
   },
 
-  open({ network, from, timeout, blockTimeout }: SessionOptions, expires: number = DEFAULT_EXPIRATION_TIMEOUT, logInfo = true): void {
+  open(
+    { network, from, timeout, blockTimeout }: SessionOptions,
+    expires: number = DEFAULT_EXPIRATION_TIMEOUT,
+    logInfo = true,
+  ): void {
     const expirationTimestamp = new Date(new Date().getTime() + expires * 1000);
     fs.writeJsonSync(
       SESSION_PATH,

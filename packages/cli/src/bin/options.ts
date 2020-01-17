@@ -2,15 +2,13 @@ import program, { Command } from 'commander';
 import { DEFAULT_TX_TIMEOUT, DEFAULT_TX_BLOCK_TIMEOUT } from '../models/network/Session';
 
 program.Command.prototype.withNetworkTimeoutOption = function(): Command {
-  return this
-    .option(
-      '--timeout <timeout>',
-      `timeout in seconds for each transaction when using a polling connection (defaults to ${DEFAULT_TX_TIMEOUT} seconds)`,
-    )
-    .option(
-      '--blockTimeout <timeout>',
-      `timeout in blocks for each transaction when using a websocket connection (defaults to ${DEFAULT_TX_BLOCK_TIMEOUT} blocks)`
-    )
+  return this.option(
+    '--timeout <timeout>',
+    `timeout in seconds for each transaction when using a polling connection (defaults to ${DEFAULT_TX_TIMEOUT} seconds)`,
+  ).option(
+    '--blockTimeout <timeout>',
+    `timeout in blocks for each transaction when using a websocket connection (defaults to ${DEFAULT_TX_BLOCK_TIMEOUT} blocks)`,
+  );
 };
 
 program.Command.prototype.withNetworkOptions = function(): Command {

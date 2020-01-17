@@ -37,7 +37,7 @@ describe('session script', function() {
           session({ ...opts, expires: 0 });
           Session.getOptions().should.be.deep.equal({
             timeout: DEFAULT_TX_TIMEOUT,
-            blockTimeout: DEFAULT_TX_BLOCK_TIMEOUT
+            blockTimeout: DEFAULT_TX_BLOCK_TIMEOUT,
           });
         });
 
@@ -45,7 +45,7 @@ describe('session script', function() {
           Session.getOptions({ from: '0x2' }).should.be.deep.equal({
             from: '0x2',
             timeout: DEFAULT_TX_TIMEOUT,
-            blockTimeout: DEFAULT_TX_BLOCK_TIMEOUT
+            blockTimeout: DEFAULT_TX_BLOCK_TIMEOUT,
           });
         });
       });
@@ -60,7 +60,7 @@ describe('session script', function() {
           Session.getOptions().should.include({
             network: 'bar',
             timeout: DEFAULT_TX_TIMEOUT,
-            blockTimeout: DEFAULT_TX_BLOCK_TIMEOUT
+            blockTimeout: DEFAULT_TX_BLOCK_TIMEOUT,
           });
         });
       });
@@ -70,7 +70,7 @@ describe('session script', function() {
           session({ network: 'bar', expires: 0 });
           Session.getOptions().should.be.deep.equal({
             timeout: DEFAULT_TX_TIMEOUT,
-            blockTimeout: DEFAULT_TX_BLOCK_TIMEOUT
+            blockTimeout: DEFAULT_TX_BLOCK_TIMEOUT,
           });
         });
       });
@@ -83,7 +83,7 @@ describe('session script', function() {
         session({ close: true });
         Session.getOptions().should.be.deep.equal({
           timeout: DEFAULT_TX_TIMEOUT,
-          blockTimeout: DEFAULT_TX_BLOCK_TIMEOUT
+          blockTimeout: DEFAULT_TX_BLOCK_TIMEOUT,
         });
       });
     });
@@ -95,7 +95,7 @@ describe('session script', function() {
         session({ close: true });
         Session.getOptions().should.be.deep.equal({
           timeout: DEFAULT_TX_TIMEOUT,
-          blockTimeout: DEFAULT_TX_BLOCK_TIMEOUT
+          blockTimeout: DEFAULT_TX_BLOCK_TIMEOUT,
         });
       });
     });
