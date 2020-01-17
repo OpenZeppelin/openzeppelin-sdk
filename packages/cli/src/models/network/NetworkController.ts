@@ -38,6 +38,7 @@ import {
   SimpleProject,
   AppProxyMigrator,
   MinimalProxy,
+  bytecodeDigest,
 } from '@openzeppelin/upgrades';
 
 import { isMigratableManifestVersion } from '../files/ManifestVersion';
@@ -718,6 +719,7 @@ export default class NetworkController {
     this.networkFile.addProxy(packageName, contractAlias, {
       address: instance.address,
       kind: ProxyType.NonProxy,
+      bytecodeHash: bytecodeDigest(contract.schema.bytecode),
     });
 
     return instance;
