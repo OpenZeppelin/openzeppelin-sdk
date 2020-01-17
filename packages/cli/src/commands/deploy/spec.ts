@@ -1,5 +1,4 @@
 import { ParamDetails, Arg, Option } from '../../register-command';
-import { MethodArg } from '../../prompts/prompt';
 
 import { TxParams } from '@openzeppelin/upgrades';
 import NetworkFile from '../../models/files/NetworkFile';
@@ -46,12 +45,13 @@ export const args: Arg[] = [
       const { default: ContractManager } = await import('../../models/local/ContractManager');
       const { argLabelWithIndex } = await import('../../prompts/prompt');
       const { parseArg, getSampleInput } = await import('../../utils/input');
+      const { getConstructorInputs } = await import('@openzeppelin/upgrades');
 
       const contractName = params.contract;
 
       const { package: packageName, contract: contractAlias } = fromContractFullName(contractName);
       const contract = new ContractManager().getContractClass(packageName, contractAlias);
-      const constructorInputs: MethodArg[] = contract.schema.abi.find(f => f.type === 'constructor')?.inputs ?? [];
+      const constructorInputs = getConstructorInputs(contract);
 
       return constructorInputs.map((arg, index) => ({
         prompt: `${argLabelWithIndex(arg, index)}:`,

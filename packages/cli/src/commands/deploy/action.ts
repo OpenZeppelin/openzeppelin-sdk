@@ -1,9 +1,10 @@
+import { getConstructorInputs } from '@openzeppelin/upgrades';
+
 import { compile } from '../../models/compiler/Compiler';
 import { fromContractFullName } from '../../utils/naming';
 import ConfigManager from '../../models/config/ConfigManager';
 import NetworkController from '../../models/network/NetworkController';
 import stdout from '../../utils/stdout';
-import { MethodArgType } from '../../prompts/prompt';
 import { parseMultipleArgs } from '../../utils/input';
 import { createAction } from '../create';
 
@@ -34,7 +35,7 @@ export async function action(params: Options & Args): Promise<void> {
   const controller = new NetworkController(network, txParams, params.networkFile);
 
   const contract = controller.contractManager.getContractClass(packageName, contractAlias);
-  const constructorInputs: MethodArgType[] = contract.schema.abi.find(f => f.type === 'constructor')?.inputs ?? [];
+  const constructorInputs = getConstructorInputs(contract);
 
   const args = parseMultipleArgs(deployArgs, constructorInputs);
 

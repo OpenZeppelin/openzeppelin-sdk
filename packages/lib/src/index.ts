@@ -15,6 +15,7 @@ import Contract, {
   contractMethodsFromAst,
   contractMethodsFromAbi,
   ContractMethodMutability,
+  getConstructorInputs,
 } from './artifacts/Contract';
 import ZWeb3, { TxParams } from './artifacts/ZWeb3';
 import {
@@ -85,6 +86,7 @@ export {
   ContractMethodMutability,
   contractMethodsFromAst,
   contractMethodsFromAbi,
+  getConstructorInputs,
   replaceSolidityLibAddress,
   getSolidityLibNames,
   isSolidityLib,

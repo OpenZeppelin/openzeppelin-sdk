@@ -175,6 +175,17 @@ export function contractMethodsFromAst(
     });
 }
 
+interface MethodArg {
+  type: string;
+  internalType?: string;
+  components?: MethodArg[];
+  name: string;
+}
+
+export function getConstructorInputs(contract: Contract): MethodArg[] {
+  return contract.schema.abi.find(f => f.type === 'constructor')?.inputs ?? [];
+}
+
 function parseArguments(passedArguments, abi) {
   const constructorAbi = abi.find(elem => elem.type === 'constructor') || {};
   const constructorArgs = constructorAbi.inputs && constructorAbi.inputs.length > 0 ? constructorAbi.inputs : [];
