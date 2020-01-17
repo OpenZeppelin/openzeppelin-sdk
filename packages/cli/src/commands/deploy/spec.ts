@@ -4,6 +4,9 @@ import { TxParams } from '@openzeppelin/upgrades';
 import NetworkFile from '../../models/files/NetworkFile';
 import { DEFAULT_TX_TIMEOUT } from '../../models/network/defaults';
 
+const kinds = ['regular', 'upgradeable'] as const;
+type Kind = typeof kinds[number]; // Union of all members of the kinds array.
+
 export interface Args {
   contract: string;
   arguments: string[];
@@ -13,7 +16,7 @@ export interface Options {
   from?: string;
   network?: string;
   skipCompile?: boolean;
-  upgradeable?: boolean;
+  kind?: Kind;
   // The following are not available as CLI flags, and they are only used in tests.
   networkFile?: NetworkFile;
   txParams?: TxParams;
@@ -41,6 +44,12 @@ export const args: Arg[] = [
     name: 'arguments',
     variadic: true,
     async details(params: Options & Args): Promise<ParamDetails[]> {
+      // If the user requests an upgradeable deploy, we will internally call
+      // the create command and let it handle its own argument parsing.
+      if (params.kind === 'upgradeable') {
+        return [];
+      }
+
       const { fromContractFullName } = await import('../../utils/naming');
       const { default: ContractManager } = await import('../../models/local/ContractManager');
       const { argLabelWithIndex } = await import('../../prompts/prompt');
@@ -127,8 +136,13 @@ export const options: Option[] = [
     description: 'sender for the contract creation transaction',
   },
   {
-    format: '--upgradeable',
-    description: 'deploy an upgradeable instance',
-    default: false,
+    format: '-k, --kind <kind>',
+    description: `the kind of deployment (${kinds.join(', ')})`,
+    async details() {
+      return {
+        prompt: 'Choose the kind of deployment',
+        choices: kinds,
+      };
+    },
   },
 ];

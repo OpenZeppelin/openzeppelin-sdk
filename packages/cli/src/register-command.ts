@@ -16,7 +16,7 @@ interface CommonParams {
 export interface ParamDetails {
   prompt?: string;
   promptType?: 'confirm' | 'list' | 'input';
-  choices?: Choice[];
+  choices?: readonly Choice[];
   preselect?: string;
   validationError?: (value: string | boolean) => string | undefined;
 }
