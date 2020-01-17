@@ -56,7 +56,7 @@ export function register(program: Command, spec: CommandSpec, getAction: () => P
       if (abort) {
         return abort();
       }
-      await promptForMissing(cmd, spec, params);
+      await promptOrValidateAll(cmd, spec, params);
       Telemetry.report(cmd.name(), params, !!params.interactive);
       await action(params);
     });
@@ -102,52 +102,59 @@ function* allParams(cmd: Command, spec: CommandSpec): Generator<[string, Param]>
   }
 }
 
-async function promptForMissing(cmd: Command, spec: CommandSpec, params: CommonParams) {
+async function promptOrValidateAll(cmd: Command, spec: CommandSpec, params: CommonParams) {
   for (const [name, param] of allParams(cmd, spec)) {
-    const value = params[name];
-    if (value === undefined || (Array.isArray(value) && value.length === 0)) {
-      // Seems redundant but it helps the type system.
-      if (param.variadic === true) {
-        const details = await param.details?.(params);
-        const values = [];
-        for (const d of details) {
-          if (!params.interactive || DISABLE_INTERACTIVITY) {
-            throw new Error(`Missing required parameters ${name}`);
-          }
-          values.push(await askQuestion(name, d));
-        }
-        params[name] = values;
-      } else {
-        const details = await param.details?.(params);
-        if (details) {
-          if (!params.interactive || DISABLE_INTERACTIVITY) {
-            throw new Error(`Missing required parameter ${name}`);
-          }
-          params[name] = await askQuestion(name, details);
-        }
-      }
+    if (param.variadic === true) {
+      await promptOrValidateVariadic(name, param, params);
     } else {
-      if (param.variadic === true) {
-        if (!Array.isArray(value)) {
-          throw new Error(`Expected multiple values for ${name}`);
-        }
-        const details = await param.details?.(params);
-        if (details) {
-          if (details.length !== value.length) {
-            throw new Error(`Expected ${details.length} values for ${name} but got ${value.length}`);
-          }
+      await promptOrValidateSimple(name, param, params);
+    }
+  }
+}
 
-          for (const [i, d] of details.entries()) {
-            throwIfInvalid(value[i], name, d);
-          }
+async function promptOrValidateVariadic(name: string, param: ParamVariadic, params: CommonParams): Promise<void> {
+  const values = params[name];
+
+  if (!Array.isArray(values)) {
+    throw new Error(`Expected multiple values for ${name}`);
+  }
+
+  const details = await param.details?.(params);
+
+  if (details) {
+    if (values.length === 0) {
+      const values = [];
+      for (const d of details) {
+        if (!params.interactive || DISABLE_INTERACTIVITY) {
+          throw new Error(`Missing required parameters ${name}`);
         }
-      } else {
-        if (Array.isArray(value)) {
-          throw new Error(`Expected a single value for ${name}`);
-        }
-        const details = await param.details?.(params);
-        throwIfInvalid(value, name, details);
+        values.push(await askQuestion(name, d));
       }
+      params[name] = values;
+    } else {
+      if (details.length !== values.length) {
+        throw new Error(`Expected ${details.length} values for ${name} but got ${values.length}`);
+      }
+
+      for (const [i, d] of details.entries()) {
+        throwIfInvalid(values[i], name, d);
+      }
+    }
+  }
+}
+
+async function promptOrValidateSimple(name: string, param: ParamSimple, params: CommonParams): Promise<void> {
+  const value = params[name];
+  const details = await param.details?.(params);
+
+  if (details) {
+    if (value === undefined) {
+      if (!params.interactive || DISABLE_INTERACTIVITY) {
+        throw new Error(`Missing required parameter ${name}`);
+      }
+      params[name] = await askQuestion(name, details);
+    } else {
+      throwIfInvalid(value, name, details);
     }
   }
 }
