@@ -11,7 +11,7 @@ const ProxyAdmin = Contracts.getFromLocal('ProxyAdmin');
 const DummyImplementation = Contracts.getFromLocal('DummyImplementation');
 const DummyImplementationV2 = Contracts.getFromLocal('DummyImplementationV2');
 
-export default function shouldManageProxies([_, appOwner, directoryOwner, anotherAccount]) {
+export default function shouldManageProxies([appOwner, directoryOwner, anotherAccount]) {
   const EMPTY_INITIALIZATION_DATA = Buffer.from('');
   const proxyAdminOwner = appOwner;
 
@@ -106,7 +106,7 @@ export default function shouldManageProxies([_, appOwner, directoryOwner, anothe
         });
 
         it('sends given value to the proxy', async function() {
-          const balance = await ZWeb3.getBalance(this.proxyAddress);
+          const balance = await ZWeb3.eth.getBalance(this.proxyAddress);
           balance.should.eq(value.toString());
         });
       });
@@ -185,7 +185,7 @@ export default function shouldManageProxies([_, appOwner, directoryOwner, anothe
         });
 
         it('sends given value to the proxy', async function() {
-          const balance = await ZWeb3.getBalance(this.proxyAddress);
+          const balance = await ZWeb3.eth.getBalance(this.proxyAddress);
           balance.should.eq(value.toString());
         });
       });

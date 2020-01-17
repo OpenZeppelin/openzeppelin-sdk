@@ -1,7 +1,8 @@
 'use strict';
 
 require('../../setup');
-import utils from 'web3-utils';
+
+import { accounts } from '@openzeppelin/test-environment';
 
 import Contracts from '../../../src/artifacts/Contracts';
 import migrate from '../../../src/utils/Migrator';
@@ -14,8 +15,8 @@ const Proxy = Contracts.getFromLocal('DeprecatedAdminUpgradeabilityProxy');
 const ImplementationDirectory = Contracts.getFromLocal('ImplementationDirectory');
 const ImplV1 = Contracts.getFromLocal('DummyImplementation');
 
-contract('migrator', function(accounts) {
-  const [_, owner, proxyAdminAddress, anotherAccount, anotherAddress] = accounts.map(utils.toChecksumAddress);
+describe('migrator', function() {
+  const [owner, proxyAdminAddress, anotherAccount, anotherAddress] = accounts;
   const EMPTY_INITIALIZATION_DATA = Buffer.from('');
 
   before('initialize logic contracts', async function() {

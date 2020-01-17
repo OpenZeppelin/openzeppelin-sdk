@@ -1,10 +1,8 @@
-'use strict';
-
 import chalk from 'chalk';
 import program from 'commander';
 import { Loggy } from '@openzeppelin/upgrades';
 import commands from '../commands';
-import registerErrorHandler from './errors';
+import sortBy from 'lodash.sortby';
 
 // Do not use import here or Typescript will create wrong build folder
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -23,6 +21,7 @@ interface CommandInterface {
 }
 
 let commandsList: CommandInterface[] = Object.values(commands);
+commandsList = sortBy(commandsList, 'name');
 commandsList.forEach((command: CommandInterface): void => command.register(program));
 // Remove the status command from the command list
 commandsList = commandsList.filter(c => c.name !== 'status');
@@ -41,7 +40,5 @@ program
   .on('--help', () =>
     commandsList.forEach(c => console.log(`   ${chalk.bold(c.signature.padEnd(maxLength))}\t${c.description}\n`)),
   );
-
-registerErrorHandler(program);
 
 export default program;

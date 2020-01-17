@@ -4,7 +4,7 @@ import isEmpty from 'lodash.isempty';
 import groupBy from 'lodash.groupby';
 import difference from 'lodash.difference';
 import inquirer from 'inquirer';
-import { contractMethodsFromAbi, ContractMethodMutability as Mutability } from '@openzeppelin/upgrades';
+import { contractMethodsFromAbi, ContractMethodMutability as Mutability, ABI } from '@openzeppelin/upgrades';
 
 import Session from '../models/network/Session';
 import ConfigManager from '../models/config/ConfigManager';
@@ -15,7 +15,7 @@ import { fromContractFullName, toContractFullName } from '../utils/naming';
 import { ProxyType } from '../scripts/interfaces';
 import NetworkFile, { ProxyInterface } from '../models/files/NetworkFile';
 
-type ChoicesT = string[] | ({ [key: string]: any });
+type ChoicesT = string[] | { [key: string]: any };
 
 export interface InquirerQuestions {
   [key: string]: InquirerQuestion;
@@ -52,7 +52,18 @@ interface MethodOptions {
   constant?: boolean;
 }
 
-export let DISABLE_INTERACTIVITY: boolean =
+export interface MethodArgType {
+  type: string;
+  internalType?: string;
+  components?: MethodArg[];
+}
+
+export interface MethodArg extends MethodArgType {
+  name: string;
+}
+
+export const DISABLE_INTERACTIVITY: boolean =
+  !process.stdin.isTTY ||
   !!process.env.OPENZEPPELIN_NON_INTERACTIVE ||
   !!process.env.ZOS_NON_INTERACTIVE ||
   process.env.DEBIAN_FRONTEND === 'noninteractive';
@@ -141,7 +152,10 @@ export function contractsList(name: string, message: string, type: string, sourc
     return inquirerQuestion(name, message, type, contractsFromBuild);
     // get contracts from project.json file
   } else if (source === 'notAdded') {
-    const contracts = difference(contractsFromBuild, contractsFromLocal.map(({ value }) => value));
+    const contracts = difference(
+      contractsFromBuild,
+      contractsFromLocal.map(({ value }) => value),
+    );
     return inquirerQuestion(name, message, type, contracts);
   } else if (source === 'added') {
     return inquirerQuestion(name, message, type, contractsFromLocal);
@@ -172,7 +186,7 @@ export function methodsList(
   return contractMethods(contractFullName, constant, projectFile)
     .map(({ name, hasInitializer, inputs, selector }) => {
       const initializable = hasInitializer ? '* ' : '';
-      const args = inputs.map(({ name: inputName, type }) => (inputName ? `${inputName}: ${type}` : type));
+      const args = inputs.map(argLabel);
       const label = `${initializable}${name}(${args.join(', ')})`;
 
       return { name: label, value: { name, selector } };
@@ -188,13 +202,17 @@ export function methodsList(
     });
 }
 
+export function argLabel(arg: MethodArg): string {
+  return arg.name ? `${arg.name}: ${ABI.getArgTypeLabel(arg)}` : ABI.getArgTypeLabel(arg);
+}
+
 // Returns an inquirer question with a list of arguments for a particular method
 export function argsList(
   contractFullName: string,
   methodIdentifier: string,
   constant?: Mutability,
   projectFile?: ProjectFile,
-): { name: string; type: string }[] {
+): MethodArg[] {
   const method = contractMethods(contractFullName, constant, projectFile).find(
     ({ name, selector }): any => selector === methodIdentifier || name === methodIdentifier,
   );

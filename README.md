@@ -48,10 +48,8 @@ And initialize the OpenZeppelin SDK project:
 openzeppelin init my-project
 ```
 
-Now it is possible to add contracts to the project with the `openzeppelin add` command,
-push these contracts to a blockchain network with `openzeppelin push`, use
-`openzeppelin create` to create instances for these contracts that later can be
-upgraded, and many more things.
+Now it is possible to use `openzeppelin create` to create instances for these contracts that 
+later can be upgraded, and many more things.
 
 Run `openzeppelin --help` for more details about thes and all the other functions of the
 OpenZeppelin CLI.
@@ -74,19 +72,19 @@ give rewards for reported issues, according to impact and severity.
 * [@jcarpanelli](https://github.com/jcarpanelli)
 * [@ylv-io](https://github.com/ylv-io)
 
-## Development setup
+## Community
 
-Run `npm install` in the root of the project, followed by `npx lerna bootstrap` to have lerna install all dependencies in all packages and symlink them as needed.
-
-## Contribute
-
-To contribute, join our [forum](https://forum.openzeppelin.com) or
+Join our [Community Forum](https://forum.openzeppelin.com) or
 [community channel on Telegram](https://t.me/zeppelinos), where you can talk to
 all the OpenZeppelin developers, contributors, partners, and users.
 
-You can also follow the recent developments of the project in our
-[blog](https://blog.openzeppelin.com/) and
+You can also follow the recent developments of the project in the OpenZeppelin [blog](https://blog.openzeppelin.com/) and
 [Twitter account](https://twitter.com/openzeppelin).
+
+## Contributing
+To set up a local development environment for contributing, clone the repository and run `yarn` in the root of the project. 
+
+Please refer to the [contributing guide](CONTRIBUTING.md) for more details on how to contribute.
 
 ## License
 

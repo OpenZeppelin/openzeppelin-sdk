@@ -2,6 +2,8 @@
 
 require('../../setup');
 
+import { accounts } from '@openzeppelin/test-environment';
+
 import App from '../../../src/application/App';
 import ZWeb3 from '../../../src/artifacts/ZWeb3';
 import Package from '../../../src/application/Package';
@@ -10,15 +12,14 @@ import ProxyAdmin from '../../../src/proxy/ProxyAdmin';
 import { ZERO_ADDRESS } from '../../../src/utils/Addresses';
 import { ImplementationDirectory, Proxy } from '../../../src';
 import Transactions from '../../../src/utils/Transactions';
-import utils from 'web3-utils';
+
+import { expect } from 'chai';
 
 const ImplV1 = Contracts.getFromLocal('DummyImplementation');
 const ImplV2 = Contracts.getFromLocal('DummyImplementationV2');
 const ProxyCreator = Contracts.getFromLocal('ProxyCreator');
 
-contract('App', function(accounts) {
-  accounts = accounts.map(utils.toChecksumAddress); // Required by Web3 v1.x.
-
+describe('App', function() {
   const [_unused, owner, otherAdmin] = accounts;
   const txParams = { from: owner };
   const contractName = 'Impl';
@@ -267,9 +268,11 @@ contract('App', function(accounts) {
         );
         (await proxy.methods.name().call()).should.eq('ProxyCreator');
         const created = await proxy.methods.created().call();
-        (await ImplV1.at(created)
-          .methods.version()
-          .call()).should.eq('V1');
+        (
+          await ImplV1.at(created)
+            .methods.version()
+            .call()
+        ).should.eq('V1');
       });
     });
   });

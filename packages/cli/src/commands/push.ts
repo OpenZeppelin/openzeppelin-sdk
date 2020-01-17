@@ -6,12 +6,9 @@ import add from './add';
 import push from '../scripts/push';
 import Session from '../models/network/Session';
 import { compile } from '../models/compiler/Compiler';
-import { fromContractFullName } from '../utils/naming';
 import Dependency from '../models/dependency/Dependency';
-import ProjectFile from '../models/files/ProjectFile';
 import ConfigManager from '../models/config/ConfigManager';
 import { promptIfNeeded, networksList, InquirerQuestions } from '../prompts/prompt';
-import NetworkFile from '../models/files/NetworkFile';
 import Telemetry from '../telemetry';
 
 const name = 'push';
@@ -94,20 +91,8 @@ async function runActionIfRequested(externalOptions: any): Promise<void> {
 }
 
 async function runActionIfNeeded(contractName: string, network: string, options: any): Promise<void> {
-  const { force, interactive, network: promptedNetwork } = options;
-  const projectFile = new ProjectFile();
-  const networkFile = new NetworkFile(projectFile, network);
-  const { contract: contractAlias, package: packageName } = fromContractFullName(contractName);
-
-  if (interactive) {
-    if (
-      force ||
-      (!packageName && !networkFile.hasContract(contractAlias)) ||
-      (packageName && !networkFile.hasDependency(packageName))
-    ) {
-      await action({ ...options, dontExitProcess: true, skipTelemetry: true });
-    }
-  }
+  if (!options.interactive) return;
+  await action({ ...options, dontExitProcess: true, skipTelemetry: true });
 }
 
 async function promptForDeployDependencies(

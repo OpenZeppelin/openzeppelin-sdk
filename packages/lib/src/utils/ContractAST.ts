@@ -46,6 +46,14 @@ interface ContractASTProps {
   nodesFilter?: string[];
 }
 
+export const ContractDefinitionFilter = {
+  nodesFilter: ['ContractDefinition'],
+};
+
+export const FunctionDefinitionFilter = {
+  nodesFilter: ['ContractDefinition', 'FunctionDefinition'],
+};
+
 class NodeNotFoundError extends Error {
   public constructor(id, type) {
     super(`No AST nodes of type ${type} with id ${id} found.`);
@@ -63,7 +71,7 @@ class MultipleNodesFoundError extends Error {
 export default class ContractAST {
   private artifacts: BuildArtifacts;
   private contract: Contract;
-  private imports: Set<any>;
+  private imports: Set<string>;
   private nodes: NodeMapping;
   private types: TypeInfoMapping;
   private nodesFilter: string[];
@@ -96,7 +104,11 @@ export default class ContractAST {
     );
   }
 
-  public getMethods(attributes?: string[]): any {
+  public getImports(): Set<string> {
+    return this.imports;
+  }
+
+  public getMethods(attributes?: string[]): any[] {
     const baseContracts = this.getLinearizedBaseContracts();
     return flatten(baseContracts.map(contract => contract.nodes))
       .filter(({ nodeType, name }) => nodeType === 'FunctionDefinition' && this._isValidMethodName(name))
@@ -140,7 +152,7 @@ export default class ContractAST {
       } catch (err) {
         if (err instanceof NodeNotFoundError) {
           throw new Error(
-            `Cannot find source data for contract ${name} (base contract of ${this.contract.schema.contractName}). This often happens because either:\n- An incremental compilation step went wrong. Clear your build folder and recompile.\n- There is more than one contract named ${name} in your project (including dependencies). Make sure all contracts have a unique name, and that you are not importing dependencies with duplicated contract names (for example, openzeppelin-eth and openzeppelin-solidity).`,
+            `Cannot find source data for contract ${name} (base contract of ${this.contract.schema.contractName}). This often happens because either:\n- An incremental compilation step went wrong. Clear your build folder and recompile.\n- There is more than one contract named ${name} in your project (including dependencies). Make sure all contracts have a unique name, and that you are not importing dependencies with duplicated contract names (for example, @openzeppelin/contracts-ethereum-package and @openzeppelin/contracts).`,
           );
         } else {
           throw err;
@@ -151,7 +163,7 @@ export default class ContractAST {
     return Object.values(visitedBaseContracts);
   }
 
-  public getLinearizedBaseContracts(mostDerivedFirst: boolean = false): Node[] {
+  public getLinearizedBaseContracts(mostDerivedFirst = false): Node[] {
     const contracts = this.getContractNode().linearizedBaseContracts.map(id => this.getNode(id, 'ContractDefinition'));
     return mostDerivedFirst ? contracts : reverse(contracts);
   }
@@ -174,7 +186,7 @@ export default class ContractAST {
     ast.nodes
       .filter(node => node.nodeType === 'ImportDirective')
       .map(node => node.absolutePath)
-      .forEach(importPath => {
+      .forEach((importPath: string) => {
         if (this.imports.has(importPath)) return;
         this.imports.add(importPath);
         this.artifacts.getArtifactsFromSourcePath(importPath).forEach(importedArtifact => {

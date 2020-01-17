@@ -11,7 +11,7 @@ import ProjectFile from '../files/ProjectFile';
 import NetworkFile from '../files/NetworkFile';
 import { describeEvents } from '../../utils/events';
 
-const { buildCallData, callDescription } = ABI;
+const { getABIFunction, callDescription } = ABI;
 
 interface ERC20TokenInfo {
   balance?: string;
@@ -58,7 +58,7 @@ export default class TransactionController {
 
       return balance;
     } else {
-      const balance = await ZWeb3.getBalance(accountAddress);
+      const balance = await ZWeb3.eth.getBalance(accountAddress);
       Loggy.noSpin(__filename, 'getBalanceOf', 'balance-of', `Balance: ${fromWei(balance, 'ether')} ETH`);
 
       return balance;
@@ -112,7 +112,7 @@ export default class TransactionController {
   private async getTokenInfo(accountAddress: string, contractAddress: string): Promise<ERC20TokenInfo | never> {
     let balance, tokenSymbol, tokenDecimals;
     try {
-      const contract = ZWeb3.contract(ERC20_PARTIAL_ABI, contractAddress);
+      const contract = new ZWeb3.eth.Contract(ERC20_PARTIAL_ABI, contractAddress);
       balance = await contract.methods.balanceOf(accountAddress).call();
       [tokenSymbol, tokenDecimals] = await allPromisesOrError([
         contract.methods.symbol().call(),
@@ -137,7 +137,7 @@ export default class TransactionController {
     const { package: packageName, contract: contractName } = this.networkFile.getProxy(address);
     const contractManager = new ContractManager(this.projectFile);
     const contract = contractManager.getContractClass(packageName, contractName).at(address);
-    const { method } = buildCallData(contract, methodName, methodArgs);
+    const method = getABIFunction(contract, methodName, methodArgs);
 
     return { contract, method };
   }

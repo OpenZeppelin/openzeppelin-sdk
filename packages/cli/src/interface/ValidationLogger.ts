@@ -1,6 +1,6 @@
+import fs from 'fs';
 import isEmpty from 'lodash.isempty';
 import {
-  FileSystem as fs,
   Loggy,
   getStorageLayout,
   ValidationInfo,
@@ -11,11 +11,12 @@ import {
 } from '@openzeppelin/upgrades';
 import { ContractInterface } from '../models/files/NetworkFile';
 
-const DOCS_HOME = 'https://docs.openzeppelin.com/sdk/2.5';
+const DOCS_HOME = 'https://docs.openzeppelin.com/sdk/2.6';
 const DANGEROUS_OPERATIONS_LINK = `${DOCS_HOME}/writing-contracts#potentially-unsafe-operations`;
 const AVOID_INITIAL_VALUES_LINK = `${DOCS_HOME}/writing-contracts#avoid-initial-values-in-field-declarations`;
 const INITIALIZERS_LINK = `${DOCS_HOME}/writing-contracts#initializers`;
 const STORAGE_CHECKS_LINK = `${DOCS_HOME}/writing-contracts#modifying-your-contracts`;
+const VANILLA_CONTRACTS_LINK = `${DOCS_HOME}/linking#linking-the-contracts-ethereum-package`;
 
 export default class ValidationLogger {
   public contract: Contract;
@@ -39,6 +40,7 @@ export default class ValidationLogger {
       uninitializedBaseContracts,
       storageDiff,
       storageUncheckedVars,
+      importsVanillaContracts,
     } = validations;
 
     this.logHasConstructor(hasConstructor);
@@ -48,6 +50,20 @@ export default class ValidationLogger {
     this.logUncheckedVars(storageUncheckedVars);
     this.logUninitializedBaseContracts(uninitializedBaseContracts);
     this.logStorageLayoutDiffs(storageDiff, getStorageLayout(this.contract, buildArtifacts));
+    this.logImportsVanillaContracts(importsVanillaContracts);
+  }
+
+  public logImportsVanillaContracts(vanillaContracts: string[] | null): void {
+    if (!isEmpty(vanillaContracts)) {
+      Loggy.noSpin.warn(
+        __filename,
+        'logImportsVanillaContracts',
+        `validation-imports-vanilla-contracts`,
+        `- Contract ${this.contractName} imports ${vanillaContracts.join(
+          ', ',
+        )} from @openzeppelin/contracts. Use @openzeppelin/contracts-ethereum-package instead. See ${VANILLA_CONTRACTS_LINK}.`,
+      );
+    }
   }
 
   public logHasSelfDestruct(hasSelfDestruct: boolean): void {
@@ -89,7 +105,7 @@ export default class ValidationLogger {
         __filename,
         'logHasConstructor',
         `validation-has-constructor`,
-        `- Contract ${this.contractName} has an explicit constructor. Change it to an initializer function. See ${INITIALIZERS_LINK}.`,
+        `- Contract ${this.contractName} or an ancestor has a constructor. Change it to an initializer function. See ${INITIALIZERS_LINK}.`,
       );
     }
   }
@@ -128,7 +144,7 @@ export default class ValidationLogger {
     const originalTypesInfo = this.existingContractInfo.types || {};
 
     storageDiff.forEach(({ updated, original, action }) => {
-      const updatedSourceCode = updated && fs.exists(updated.path) && fs.read(updated.path);
+      const updatedSourceCode = updated && fs.existsSync(updated.path) && fs.readFileSync(updated.path, 'utf8');
       const updatedVarType = updated && updatedStorageInfo.types[updated.type];
       const updatedVarSource = updated && [updated.path, _srcToLineNumber(updated.path, updated.src)].join(':');
       const updatedVarDescription =

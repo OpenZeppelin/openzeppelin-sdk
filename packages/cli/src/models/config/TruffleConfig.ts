@@ -1,8 +1,9 @@
+import fs from 'fs';
 import pickBy from 'lodash.pickby';
 import pick from 'lodash.pick';
 import npm from 'npm-programmatic';
 import semver from 'semver';
-import { FileSystem, Loggy } from '@openzeppelin/upgrades';
+import { Loggy } from '@openzeppelin/upgrades';
 import TruffleConfigModule from 'truffle-config';
 
 const TruffleConfig = {
@@ -11,14 +12,14 @@ const TruffleConfig = {
   exists(path: string = process.cwd()): boolean {
     const truffleFile = `${path}/truffle.js`;
     const truffleConfigFile = `${path}/truffle-config.js`;
-    return FileSystem.exists(truffleFile) || FileSystem.exists(truffleConfigFile);
+    return fs.existsSync(truffleFile) || fs.existsSync(truffleConfigFile);
   },
 
   isTruffleProject(path: string = process.cwd()): boolean {
     return this.exists(path);
   },
 
-  async loadNetworkConfig(network: string, force: boolean = false, path: string = process.cwd()): Promise<any> {
+  async loadNetworkConfig(network: string, force = false, path: string = process.cwd()): Promise<any> {
     const config = this.getConfig(force);
     const { networks: networkList } = config;
     if (!networkList[network])
@@ -38,7 +39,7 @@ const TruffleConfig = {
     return config.contracts_build_directory;
   },
 
-  getConfig(force: boolean = false): any | never {
+  getConfig(force = false): any | never {
     if (!force && this.config) return this.config;
     try {
       this.config = TruffleConfigModule.detect({ logger: console });
@@ -82,7 +83,7 @@ const TruffleConfig = {
 
   getTruffleConfigFileName(path: string): string {
     const truffleFile = `${path}/truffle.js`;
-    return FileSystem.exists(truffleFile) ? 'truffle.js' : 'truffle-config.js';
+    return fs.existsSync(truffleFile) ? 'truffle.js' : 'truffle-config.js';
   },
 };
 

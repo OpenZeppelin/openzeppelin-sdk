@@ -2,13 +2,16 @@
 
 require('../setup');
 
+import fs from 'fs-extra';
+import { expect } from 'chai';
+
 import sinon from 'sinon';
-import { FileSystem, Contracts } from '@openzeppelin/upgrades';
+import { Contracts } from '@openzeppelin/upgrades';
 import ContractManager from '../../src/models/local/ContractManager';
 import ProjectFile from '../../src/models/files/ProjectFile';
 import ConfigManager from '../../src/models/config/ConfigManager';
 
-contract('ContractManager', function([_, from]) {
+describe('ContractManager', function() {
   describe('methods', function() {
     describe('getContractNames', function() {
       context('without directory created', function() {
@@ -16,12 +19,12 @@ contract('ContractManager', function([_, from]) {
           this.testDir = `${process.cwd()}/test/tmp`;
           this.projectFile = new ProjectFile(`${this.testDir}/zos.json`);
           this.contractManager = new ContractManager(this.projectFile);
-          FileSystem.createDir(this.testDir);
+          fs.mkdirSync(this.testDir, { recursive: true });
           sinon.stub(ConfigManager, 'getBuildDir').returns(`${this.testDir}/build/contracts`);
         });
 
         afterEach('remove test dir', function() {
-          FileSystem.removeTree(this.testDir);
+          fs.removeSync(this.testDir);
           sinon.restore();
         });
 
@@ -36,13 +39,13 @@ contract('ContractManager', function([_, from]) {
             this.testDir = `${process.cwd()}/test/tmp`;
             this.projectFile = new ProjectFile(`${this.testDir}/zos.json`);
             this.contractManager = new ContractManager(this.projectFile);
-            FileSystem.createDir(this.testDir);
-            FileSystem.createDirPath(`${this.testDir}/build/contracts`);
+            fs.mkdirSync(this.testDir, { recursive: true });
+            fs.mkdirSync(`${this.testDir}/build/contracts`, { recursive: true });
             sinon.stub(ConfigManager, 'getBuildDir').returns(`${this.testDir}/build/contracts`);
           });
 
           afterEach('remove test dir', function() {
-            FileSystem.removeTree(this.testDir);
+            fs.removeSync(this.testDir);
             sinon.restore();
           });
 
@@ -61,7 +64,8 @@ contract('ContractManager', function([_, from]) {
                 bytecode: '0x124',
                 contractName: 'Foo',
               };
-              FileSystem.writeJson(`${this.testDir}/build/contracts/Foo.json`, builtContract);
+              this.fooContractPath = `${this.testDir}/build/contracts/Foo.json`;
+              fs.writeJsonSync(this.fooContractPath, builtContract, { spaces: 2 });
               this.projectFile = new ProjectFile(`${this.testDir}/zos.json`);
               this.contractManager = new ContractManager(this.projectFile);
               sinon.stub(ConfigManager, 'getBuildDir').returns(`${this.testDir}/build/contracts`);
@@ -69,6 +73,7 @@ contract('ContractManager', function([_, from]) {
             });
 
             afterEach(function() {
+              fs.unlinkSync(this.fooContractPath);
               sinon.restore();
             });
 

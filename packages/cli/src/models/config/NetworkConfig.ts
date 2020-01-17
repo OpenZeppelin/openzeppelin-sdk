@@ -1,8 +1,8 @@
+import fs from 'fs';
 import path from 'path';
 import pick from 'lodash.pick';
 import omit from 'lodash.omit';
 import isUndefined from 'lodash.isundefined';
-import { FileSystem } from '@openzeppelin/upgrades';
 
 interface NetworkConfigInterface extends ConfigInterface {
   artifactDefaults: ArtifactDefaults;
@@ -13,8 +13,6 @@ interface ConfigInterface {
   networks: { [network: string]: Network };
   provider: Provider;
   buildDir: string;
-  // TODO: remove after managing compiler info in project.json
-  compilers?: CompilersInfo;
 }
 
 interface NetworkCamelCase<T> {
@@ -27,15 +25,26 @@ interface NetworkSnakeCase<T> {
 
 type NetworkId<T> = NetworkCamelCase<T> | NetworkSnakeCase<T> | (NetworkCamelCase<T> & NetworkSnakeCase<T>);
 
-type Network = {
+type NetworkURL = {
+  url: string;
+};
+
+type NetworkURLParts = {
   host: string;
-  port: number | string;
+  port?: number | string;
   protocol?: string;
-  from?: number | string;
-  gas?: number | string;
-  gasPrice?: number | string;
-  provider?: string | (() => any);
-} & NetworkId<string | number>;
+  path?: string;
+};
+
+type NetworkConnection = NetworkURL | NetworkURLParts;
+
+type Network = NetworkConnection &
+  NetworkId<string | number> & {
+    from?: number | string;
+    gas?: number | string;
+    gasPrice?: number | string;
+    provider?: string | (() => any);
+  };
 
 interface ArtifactDefaults {
   from?: number | string;
@@ -44,8 +53,6 @@ interface ArtifactDefaults {
 }
 
 type Provider = string | ((any) => any);
-// TODO: remove after managing compiler info in project.json
-type CompilersInfo = any;
 
 const NetworkConfig = {
   name: 'NetworkConfig',
@@ -56,16 +63,15 @@ const NetworkConfig = {
   },
 
   exists(root: string = process.cwd()): boolean {
-    return FileSystem.exists(`${root}/networks.js`);
+    return fs.existsSync(`${root}/networks.js`);
   },
 
   getConfig(root: string = process.cwd()): ConfigInterface {
     // eslint-disable-next-line @typescript-eslint/no-var-requires
     const zosConfigFile = require(`${root}/networks.js`);
-    const compilers = zosConfigFile.compilers || this.getDefaultCompilersProperties();
     const buildDir = `${root}/build/contracts`;
 
-    return { ...zosConfigFile, compilers, buildDir };
+    return { ...zosConfigFile, buildDir };
   },
 
   getBuildDir(): string {
@@ -94,18 +100,25 @@ const NetworkConfig = {
   },
 
   getProvider(network: Network): Provider {
-    let { provider } = network;
-
-    if (!provider) {
-      const { host, port, protocol } = network;
-      if (!host) throw Error('A host name must be specified');
-      if (!port) throw Error('A port must be specified');
-      provider = `${protocol ? protocol : 'http'}://${host}:${port}`;
-    } else if (typeof provider === 'function') {
-      provider = provider();
+    if (!network.provider) {
+      return this.getURL(network);
+    } else if (typeof network.provider === 'function') {
+      return network.provider();
+    } else {
+      return network.provider;
     }
+  },
 
-    return provider;
+  getURL(network: Network): string {
+    const networkUrl = (network as NetworkURL).url;
+    if (networkUrl) return networkUrl;
+
+    const { host, port, protocol, path } = network as NetworkURLParts;
+    if (!host) throw Error('A host name is required for the network connection');
+    let url = `${protocol ?? 'http'}://${host}`;
+    if (port) url += `:${port}`;
+    if (path) url += `/${path}`;
+    return url;
   },
 
   getArtifactDefaults(zosConfigFile: ConfigInterface, network: Network): ArtifactDefaults {
@@ -116,20 +129,6 @@ const NetworkConfig = {
     return { ...configDefaults, ...networkDefaults };
   },
 
-  getDefaultCompilersProperties(): CompilersInfo {
-    return {
-      vyper: {},
-      solc: {
-        settings: {
-          optimizer: {
-            enabled: false,
-            runs: 200,
-          },
-        },
-      },
-    };
-  },
-
   createContractsDir(root: string): void {
     const contractsDir = `${root}/contracts`;
     this.createDir(contractsDir);
@@ -138,14 +137,14 @@ const NetworkConfig = {
   createNetworkConfigFile(root: string): void {
     if (!this.exists(root)) {
       const blueprint = path.resolve(__dirname, './blueprint.networks.js');
-      FileSystem.copy(blueprint, `${root}/networks.js`);
+      fs.copyFileSync(blueprint, `${root}/networks.js`);
     }
   },
 
   createDir(dir: string): void {
-    if (!FileSystem.exists(dir)) {
-      FileSystem.createDir(dir);
-      FileSystem.write(`${dir}/.gitkeep`, '');
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir);
+      fs.writeFileSync(`${dir}/.gitkeep`, '');
     }
   },
 };

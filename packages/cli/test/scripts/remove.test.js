@@ -7,7 +7,7 @@ import CaptureLogs from '../helpers/captureLogs';
 
 const should = require('chai').should();
 
-contract('remove script', function() {
+describe('remove script', function() {
   const contractAlias = 'Impl';
   const anotherContractAlias = 'WithLibraryImpl';
 

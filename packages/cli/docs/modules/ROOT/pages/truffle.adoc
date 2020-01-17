@@ -1,0 +1,270 @@
+= Using the OpenZeppelin CLI With Truffle
+
+Truffle is a framework for writing, compiling, deploying and testing smart contracts. You’ll notice we haven’t used it so far - this is because the OpenZeppelin tools are self-sufficient. It brings its own compiler along, its own habits and best practices, its own configuration files, and with some of the starter kits even its own UI elements and frameworks. But what if you’re used to Truffle and prefer it for the additional features it can offer? Do you need to pick between the OpenZeppelin CLI and Truffle now?
+
+That’s a definitive _No_, captain. Let’s see how we can use them together.
+
+This tutorial assumes you’ve gone through the link:/sdk/first[basic SDK guide] and have at least a passing familiarity with Truffle.
+
+== Prerequisites
+
+We’ll assume that you have:
+
+* NodeJS and NPM installed, preferably via NVM
+* Ganache installed and available on the command line via `ganache-cli`
+* OpenZeppelin SDK installed and available on the command line, either globally or via NPX
+
+All of these conditions should be met if you’ve gone through the link:/sdk/first[basic guide], so if you haven’t please do so now.
+
+WARNING: If you have installed OpenZeppelin SDK globally, you will have to either install it again locally (`npm install @openzeppelin/cli`) or link to it with `npm link @openzeppelin/cli` which creates a symlink from the globally installed module to your local folder (works on newer versions of Windows 10, too). This is because there’s no easier way to import globally installed Node modules into local scripts.
+
+== Configuration
+
+When initializing a project with OpenZeppelin SDK, you’ll get a `network.js` file containing something like this:
+
+[source,js]
+----
+module.exports = {
+  networks: {
+    development: {
+      protocol: 'http',
+      host: 'localhost',
+      port: 8545,
+      gas: 5000000,
+      gasPrice: 5e9,
+      networkId: '*',
+    },
+  },
+};
+----
+
+This configuration makes OpenZeppelin SDK default to a locally running instance of a blockchain, usually Ganache. With Truffle, the configuration is in `truffle-config.js` or `truffle.js`, so in most cases all you need to integrate the two is just make sure that file exists. If it does, OpenZeppelin SDK will default to reading that one for network settings and offer those network names to you when you invoke CLI commands. That said, let’s look at ways to integrate the two.
+
+== Adding Truffle to an OpenZeppelin SDK project
+
+In your example project (the one created by the link:/sdk/first[basic guide]), run `npm install truffle`. Alternatively, have Truffle installed globally so it’s accessible from everywhere (`npm install -g truffle`) without having to run it with `npx`. We’ll use the `npx` approach in this guide - it makes it possible to use a specific Truffle version per project.
+
+Once Truffle is installed, run `truffle init` in the project folder to initialize the project, or manually create the `truffle-config.js` file.
+
+WARNING: if you say _yes_ when asked to overwrite an existing folder, e.g. if you already had a contracts folder, the contents of that folder will be deleted! The recommended approach is making a backup copy of the contracts folder, running `truffle init` with overwrites, and then merging the contents of the two folders later.
+
+If you used `init`, you should now have a very verbose `truffle-config.js` file in your project directory which, when the commented out examples are stripped out, comes down to this:
+
+[source,js]
+----
+module.exports = {
+  networks: {
+    development: {
+     host: "127.0.0.1",
+     port: 8545,
+     network_id: "*",
+    },
+  },
+
+  compilers: {
+    solc: {
+      version: "0.5.2",
+      docker: false,
+      settings: {
+       optimizer: {
+         enabled: true,
+         runs: 200
+       },
+       evmVersion: "byzantium"
+      }
+    }
+  }
+}
+----
+
+If you created `truffle-config.js` from scratch, paste this in. If not, feel free to just uncomment the relevant lines or just paste this over everything. We can now delete OpenZeppelin’s `networks.js` file.
+
+You should also have a file `contracts/Migrations.sol`. If you don’t, create it with the following content:
+
+[source,sol]
+----
+pragma solidity >=0.4.21 <0.6.0;
+
+contract Migrations {
+  address public owner;
+  uint public last_completed_migration;
+
+  constructor() public {
+    owner = msg.sender;
+  }
+
+  modifier restricted() {
+    if (msg.sender == owner) _;
+  }
+
+  function setCompleted(uint completed) public restricted {
+    last_completed_migration = completed;
+  }
+
+  function upgrade(address new_address) public restricted {
+    Migrations upgraded = Migrations(new_address);
+    upgraded.setCompleted(last_completed_migration);
+  }
+}
+----
+
+If you now run `openzeppelin create` or any other `openzeppelin` command that depends on compiling first, it will call `truffle compile` under the hood before proceeding with the other operations. The SDK will let you know about this:
+
+[source,bash]
+----
+λ openzeppelin create
+√ Compiling contracts with Truffle, using settings from truffle.js file
+Truffle output:
+
+Compiling your contracts...
+===========================
+> Compiling .\contracts\Counter.sol
+> Artifacts written to ~\repos\openzeppelin-sdk-guide\build\contracts
+> Compiled successfully using:
+   - solc: 0.5.2+commit.1df8f40c.Emscripten.clang
+
+
+? Pick a contract to instantiate ...
+----
+
+If you decide to instead recompile with OpenZeppelin, you can force this with `openzeppelin compile` which always compiles with OZ SDK.
+
+Note that network settings are *always* read from Truffle’s configuration if present and will fall back to OpenZeppelin’s `network.js` if not.
+
+== Adding OpenZeppelin SDK to a Truffle project
+
+To add OZ SDK to a Truffle project, simply install OpenZeppelin locally or globally and `openzeppelin init` in the Truffle project’s folder. The `networks.js` file will not be created as OpenZeppelin will detect that it’s initializing in a Truffle folder. OpenZeppelin’s SDK is careful about overwriting essential files, so it won’t cause any conflicts like those that might occur when adding Truffle into an OZ project.
+
+== Migrations
+
+Now that the projects are merged, let’s see how we perform some Migrations - Truffle’s incremental, linked deployments to the blockchain. Migrations are useful when you want to bootstrap a project; like making sure that contracts link to each other properly, ensuring that values are initialized, and so on. By removing human errors and fat fingers from the process of a project’s launch, you make the whole thing much safer.
+
+Our simple Counter contract gets deployed with a value of 0, so let’s write a migration which immediately sends a transaction increasing the value by 10.
+
+OpenZeppelin’s SDK comes with a JavaScript interface which the CLI also uses to execute commands. We can invoke those if we import them in another project or script - like a Truffle migration.
+
+Truffle comes with a default migration which makes subsequent migrations possible. Migrations are executed oredered by prefix - so if the name of a new migration file starts with 2, it will execute after `1_initial_migration.js`. Let’s create `2_deploy_counter.js` with the content:
+
+[source,js]
+----
+const { scripts, ConfigManager } = require('@openzeppelin/cli');
+const { add, push, create } = scripts;
+
+async function deploy(options) {
+  add({ contractsData: [{ name: 'Counter', alias: 'Counter' }] });
+  await push(options);
+  await create(Object.assign({ contractAlias: 'Counter' }, options));
+}
+
+module.exports = function(deployer, networkName, accounts) {
+  deployer.then(async () => {
+    const { network, txParams } = await ConfigManager.initNetworkConfiguration({ network: networkName, from: accounts[0] })
+    await deploy({ network, txParams })
+  })
+}
+----
+
+Let’s test it. Run:
+
+[source,bash]
+----
+truffle migrate --network development
+----
+
+[source,bash]
+----
+λ npx truffle migrate --network development
+Compiling .\contracts\Counter.sol...
+Compiling .\contracts\Migrations.sol...
+Writing artifacts to .\build\contracts
+----
+
+WARNING: If you're using an HDWalletProvider, it must be Web3 1.0 enabled or your migration will hang.
+
+----
+Starting migrations...
+======================
+> Network name:    'development'
+> Network id:      1564927897006
+> Block gas limit: 6721975
+
+
+1_initial_migration.js
+======================
+
+   Deploying 'Migrations'
+   ----------------------
+   > transaction hash:    0x18fd35c7395f6dbc2ad39a6cef6bbb05af41f3c1b24a7abdef7066ff14e9d0b2
+   > Blocks: 0            Seconds: 0
+   > contract address:    0xe78A0F7E598Cc8b0Bb87894B0F60dD2a88d6a8Ab
+   > account:             0x90F8bf6A479f320ead074411a4B0e7944Ea8c9C1
+   > balance:             99.99557658
+   > gas used:            221171
+   > gas price:           20 gwei
+   > value sent:          0 ETH
+   > total cost:          0.00442342 ETH
+
+   > Saving artifacts
+   -------------------------------------
+   > Total cost:          0.00442342 ETH
+
+
+2_deploy_counter.js
+===================
+0x254dffcd3277C0b1660F6d42EFbB754edaBAbC2B
+   -------------------------------------
+   > Total cost:                   0 ETH
+
+
+Summary
+=======
+> Total deployments:   1
+> Final cost:          0.00442342 ETH
+----
+
+It works! Let’s make sure and re-run migrations, it should tell us that we’re up to date.
+
+[source,bash]
+----
+λ npx truffle migrate
+
+Compiling your contracts...
+===========================
+> Everything is up to date, there is nothing to compile.
+
+Network up to date.
+----
+
+Our counter is deployed but to make sure let’s check if we can interact with it. We’ll use OZ SDK.
+
+[source,bash]
+----
+λ openzeppelin call
+? Pick a network development
+? Pick an instance Counter at 0x254dffcd3277C0b1660F6d42EFbB754edaBAbC2B
+? Select which function value()
+√ Method 'value()' returned: 0
+0
+----
+
+Perfect. Now let’s make the second migration which increases the counter value by 10. Create `migrations/3_increment.js`.
+
+[source,js]
+----
+const Counter = artifacts.require("Counter");
+
+module.exports = async function(deployer) {
+    const counter = await Counter.deployed();
+    await counter.increase(10);
+};
+----
+
+You’ll notice we used Truffle’s default migration process instead of `sendTx` or `call`, like we would when interacting with OpenZeppelin’s SDK on the command line. This is because the JavaScript API does not have those helper functions exported for the moment (a pending change), so we have to interact with contracts _the old way_.
+
+== Caveats
+
+Once you start using Truffle in an OpenZeppelin SDK project, it’s recommended you keep using it and don’t mix and match other than in the context of migration scripts where you can use the OpenZeppelin SDK API as much as you wish. The reason is that OpenZeppelin will not respect the migrations deployed by Truffle as it is not aware of them, and will instead deploy its own copy of the contracts you’re creating, possibly causing conflicts.
+
+---
+
+Now that you know the fusion of Truffle and OpenZeppelin SDK is a possibility, go forth, #buidl and https://twitter.com/openzeppelin[let us know] what you created!

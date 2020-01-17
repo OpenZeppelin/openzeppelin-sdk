@@ -2,12 +2,16 @@
 require('../setup');
 
 import { Package } from '@openzeppelin/upgrades';
+import { accounts } from '@openzeppelin/test-environment';
+
 import push from '../../src/scripts/push';
 import freeze from '../../src/scripts/freeze';
 import ProjectFile from '../../src/models/files/ProjectFile';
 import NetworkFile from '../../src/models/files/NetworkFile';
 
-contract('freeze script', function([_, owner]) {
+describe('freeze script', function() {
+  const [owner] = accounts;
+
   const network = 'test';
   const txParams = { from: owner };
 

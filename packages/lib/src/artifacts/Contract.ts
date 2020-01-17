@@ -1,9 +1,13 @@
+import { isAddress } from 'web3-utils';
+
 import ZWeb3 from './ZWeb3';
 import Contracts from './Contracts';
-import ContractAST from '../utils/ContractAST';
+import ContractAST, { ContractDefinitionFilter } from '../utils/ContractAST';
 import { StorageLayoutInfo } from '../validations/Storage';
 import { TransactionReceipt } from 'web3-core';
 import { Contract as Web3Contract } from 'web3-eth-contract';
+import { getArgTypeLabel } from '../utils/ABIs';
+import { Artifact } from './BuildArtifacts';
 
 /*
  * Contract is an interface that extends Web3's Contract interface, adding some properties and methods like:
@@ -24,29 +28,12 @@ export default interface Contract extends Web3Contract {
     transactionReceipt: TransactionReceipt;
   };
   schema: {
-    // openzeppelin schema specific.
     directory: string;
     linkedBytecode: string;
     linkedDeployedBytecode: string;
-    warnings: any;
     storageInfo: StorageLayoutInfo;
-
-    // Solidity schema.
-    schemaVersion: string;
-    contractName: string;
-    abi: any[];
-    bytecode: string;
-    deployedBytecode: string;
-    sourceMap: string;
-    deployedSourceMap: string;
-    source: string;
-    sourcePath: string;
-    ast: any;
-    legacyAST?: any;
-    compiler: any;
-    networks: any;
-    updatedAt: string;
-  };
+    warnings: any;
+  } & Artifact;
 }
 
 export enum ContractMethodMutability {
@@ -92,7 +79,7 @@ function _wrapContractInstance(schema: any, web3instance: Web3Contract): Contrac
   };
 
   instance.at = function(address: string): Contract | never {
-    if (!ZWeb3.isAddress(address)) throw new Error('Given address is not valid: ' + address);
+    if (!isAddress(address)) throw new Error('Given address is not valid: ' + address);
     const newWeb3Instance = instance.clone();
     newWeb3Instance['_address'] = address;
     newWeb3Instance.options.address = address;
@@ -122,7 +109,7 @@ function _wrapContractInstance(schema: any, web3instance: Web3Contract): Contrac
 }
 
 export function createContract(schema: any): Contract {
-  const contract = ZWeb3.contract(schema.abi, null, Contracts.getArtifactsDefaults());
+  const contract = new ZWeb3.eth.Contract(schema.abi, null, Contracts.getArtifactsDefaults());
   return _wrapContractInstance(schema, contract);
 }
 
@@ -131,16 +118,17 @@ export function contractMethodsFromAbi(
   constant: ContractMethodMutability = ContractMethodMutability.NotConstant,
 ): any[] {
   const isConstant = constant === ContractMethodMutability.Constant;
-  const contractAst = new ContractAST(instance, null, {
-    nodesFilter: ['ContractDefinition'],
-  });
-  const methodsFromAst = contractAst.getMethods();
+  const mutabilities = abiStateMutabilitiesFor(constant);
+  const methodsFromAst = getAstMethods(instance);
 
   return instance.schema.abi
-    .filter(({ constant: isConstantMethod, type }) => isConstant === isConstantMethod && type === 'function')
+    .filter(
+      ({ stateMutability, constant: isConstantMethod, type }) =>
+        type === 'function' && (isConstant === isConstantMethod || mutabilities.includes(stateMutability)),
+    )
     .map(method => {
       const { name, inputs } = method;
-      const selector = `${name}(${inputs.map(({ type }) => type)})`;
+      const selector = `${name}(${inputs.map(getArgTypeLabel).join(',')})`;
       const infoFromAst = methodsFromAst.find(({ selector: selectorFromAst }) => selectorFromAst === selector);
       const modifiers = infoFromAst ? infoFromAst.modifiers : [];
       const initializer = modifiers.find(({ modifierName }) => modifierName.name === 'initializer');
@@ -157,21 +145,25 @@ export function contractMethodsFromAst(
   instance: Contract,
   constant: ContractMethodMutability = ContractMethodMutability.NotConstant,
 ): ContractMethod[] {
-  const mutabilities = constant === ContractMethodMutability.Constant ? ['view', 'pure'] : ['payable', 'nonpayable'];
-  const contractAst = new ContractAST(instance, null, {
-    nodesFilter: ['ContractDefinition'],
-  });
+  const mutabilities = abiStateMutabilitiesFor(constant);
+  const visibilities = ['public', 'external'];
 
-  return contractAst
-    .getMethods()
-    .filter(({ visibility, stateMutability }) => {
-      return (visibility === 'public' || visibility === 'external') && mutabilities.includes(stateMutability);
-    })
+  return getAstMethods(instance)
+    .filter(
+      ({ visibility, stateMutability }) => visibilities.includes(visibility) && mutabilities.includes(stateMutability),
+    )
     .map(method => {
       const initializer = method.modifiers.find(({ modifierName }) => modifierName.name === 'initializer');
-
       return { ...method, hasInitializer: initializer ? true : false };
     });
+}
+
+function getAstMethods(instance: Contract): any[] {
+  return new ContractAST(instance, null, ContractDefinitionFilter).getMethods();
+}
+
+function abiStateMutabilitiesFor(constant: ContractMethodMutability) {
+  return constant === ContractMethodMutability.Constant ? ['view', 'pure'] : ['payable', 'nonpayable'];
 }
 
 function parseArguments(passedArguments, abi) {

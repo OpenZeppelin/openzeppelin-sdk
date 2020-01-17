@@ -4,7 +4,7 @@ require('../setup');
 import unlink from '../../src/scripts/unlink';
 import ProjectFile from '../../src/models/files/ProjectFile';
 
-contract('unlink script', function() {
+describe('unlink script', function() {
   beforeEach(async function() {
     this.projectFile = new ProjectFile('test/mocks/packages/package-with-multiple-stdlibs.zos.json');
   });

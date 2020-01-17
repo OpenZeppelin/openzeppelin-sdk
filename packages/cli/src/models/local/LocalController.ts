@@ -1,11 +1,9 @@
-'use strict';
-
+import fs from 'fs-extra';
 import every from 'lodash.every';
 import map from 'lodash.map';
 import {
   Contracts,
   Loggy,
-  FileSystem as fs,
   getBuildArtifacts,
   BuildArtifacts,
   validate as validateContract,
@@ -27,7 +25,7 @@ const DEFAULT_VERSION = '0.1.0';
 export default class LocalController {
   public projectFile: ProjectFile;
 
-  public constructor(projectFile: ProjectFile = new ProjectFile(), init: boolean = false) {
+  public constructor(projectFile: ProjectFile = new ProjectFile(), init = false) {
     if (!init && !projectFile.exists()) {
       throw Error(
         `OpenZeppelin file ${projectFile.filePath} not found. Run 'openzeppelin init' first to initialize the project.`,
@@ -36,14 +34,14 @@ export default class LocalController {
     this.projectFile = projectFile;
   }
 
-  public init(name: string, version: string, force: boolean = false, publish: boolean = false): void | never {
+  public init(name: string, version: string, force = false, publish = false): void | never {
     if (!name) throw Error('A project name must be provided to initialize the project.');
     this.initProjectFile(name, version, force, publish);
     Session.ignoreFile();
     ConfigManager.initialize();
   }
 
-  public initProjectFile(name: string, version: string, force: boolean = false, publish: boolean): void | never {
+  public initProjectFile(name: string, version: string, force = false, publish: boolean): void | never {
     if (this.projectFile.exists() && !force) {
       throw Error(`Cannot overwrite existing file ${this.projectFile.filePath}`);
     }
@@ -99,7 +97,7 @@ export default class LocalController {
 
   public checkCanAdd(contractName: string): void | never {
     const path = Contracts.getLocalPath(contractName);
-    if (!fs.exists(path)) {
+    if (!fs.existsSync(path)) {
       throw Error(`Contract ${contractName} not found in path ${path}`);
     }
     if (!this.hasBytecode(path)) {
@@ -124,8 +122,8 @@ export default class LocalController {
 
   // Contract model
   public hasBytecode(contractDataPath: string): boolean {
-    if (!fs.exists(contractDataPath)) return false;
-    const bytecode = fs.parseJson(contractDataPath).bytecode;
+    if (!fs.existsSync(contractDataPath)) return false;
+    const bytecode = fs.readJsonSync(contractDataPath).bytecode;
     return bytecode && bytecode !== '0x';
   }
 
@@ -134,7 +132,7 @@ export default class LocalController {
     const contractName = this.projectFile.contract(contractAlias);
     if (contractName) {
       const contractDataPath = Contracts.getLocalPath(contractName);
-      const { compiler, sourcePath } = fs.parseJson(contractDataPath);
+      const { compiler, sourcePath } = fs.readJsonSync(contractDataPath);
       return { sourcePath, compilerVersion: compiler.version };
     } else {
       throw Error(`Could not find ${contractAlias} in contracts directory.`);
@@ -146,7 +144,7 @@ export default class LocalController {
   }
 
   // DependencyController
-  public async linkDependencies(dependencies: string[], installDependencies: boolean = false): Promise<void> {
+  public async linkDependencies(dependencies: string[], installDependencies = false): Promise<void> {
     const linkedDependencies = await Promise.all(
       dependencies.map(
         async (depNameVersion: string): Promise<string> => {

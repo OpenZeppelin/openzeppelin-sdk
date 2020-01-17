@@ -2,7 +2,7 @@ version: 2.1
 
 defaults: &defaults
   docker:
-    - image: circleci/node:10.13
+    - image: circleci/node:10.17
   environment:
     YARN_CACHE_FOLDER: ~/.cache/yarn/v6
   working_directory: ~/openzeppelin
@@ -32,7 +32,7 @@ commands:
           condition: << parameters.run-yarn >>
           steps:
             - restore_cache:
-                key: yarn-cache-v7-
+                key: yarn-cache-v8-
             - run:
                 command: yarn
                 working_directory: "~/openzeppelin/<< parameters.workspace >>"
@@ -42,13 +42,12 @@ commands:
             - run:
                 command: yarn
                 working_directory: "~/openzeppelin/tests/cli/workdir"
-      - run: 
+      - run:
           name: "Test << parameters.workspace >>"
           command: "<< parameters.test-cmd >>"
           working_directory: "~/openzeppelin/<< parameters.workspace >>"
 
 jobs:
-
   setup:
     <<: *defaults
     steps:
@@ -56,10 +55,13 @@ jobs:
       - restore_cache:
           keys:
             - dependency-cache-v5-{{ checksum "yarn.lock" }}
-            - yarn-cache-v7-
+            - yarn-cache-v8-
       - run:
           name: Install dependencies and build
           command: yarn
+      - run:
+          name: Check lockfile is up-to-date
+          command: ./scripts/check-yarn-lockfile.sh
       - run:
           name: Lint check
           command: yarn lint:check
@@ -70,7 +72,7 @@ jobs:
             - packages/cli/node_modules
             - packages/lib/node_modules
       - save_cache:
-          key: yarn-cache-v7-{{ checksum "yarn.lock" }}
+          key: yarn-cache-v8-{{ checksum "yarn.lock" }}
           paths:
             - ~/.cache/yarn/v6
       - persist_to_workspace:
@@ -93,11 +95,11 @@ jobs:
       - test:
           workspace: packages/cli
 
-  example-lib-simple:
+  example-upgrades-library:
     <<: *defaults
     steps:
       - test:
-          workspace: examples/lib-simple
+          workspace: examples/upgrades-library
           run-yarn: true
 
   example-create-instances-from-solidity:
@@ -124,7 +126,7 @@ jobs:
   integration-cli-geth: &integration
     <<: *defaults
     docker:
-      - image: circleci/node:10.13
+      - image: circleci/node:10.17
       - image: ethereum/client-go:release-1.8
         command: "--dev --dev.period=1 --rpc --rpcport=8545 --rpcaddr=localhost --networkid=9955"
     environment:
@@ -134,7 +136,7 @@ jobs:
           workspace: tests/cli/test
           run-yarn: true
           prepare-workdir: true
-  
+
   integration-cli-hdwallet:
     <<: *integration
     environment:
@@ -158,7 +160,7 @@ workflows:
           requires: [setup]
       - test-cli:
           requires: [setup]
-      - example-lib-simple:
+      - example-upgrades-library:
           requires: [test-lib]
       - example-create-instances-from-solidity:
           requires: [test-lib, test-cli]

@@ -1,10 +1,12 @@
 'use strict';
 require('../setup');
 
+import { expect } from 'chai';
+
 import ProjectFile from '../../src/models/files/ProjectFile';
 import { MANIFEST_VERSION } from '../../src/models/files/ManifestVersion';
 
-contract('ProjectFile', function() {
+describe('ProjectFile', function() {
   describe('class methods', function() {
     describe('#getLinkedDependencies', function() {
       it('gets an array of dependencies', function() {

@@ -2,6 +2,7 @@
 
 require('../setup');
 import sinon from 'sinon';
+import { expect } from 'chai';
 
 import * as prompt from '../../src/prompts/prompt';
 
@@ -205,19 +206,17 @@ describe('prompt', function() {
           it('returns an array of constant methods', function() {
             this.methods.should.be.an('array');
             this.methods.should.have.lengthOf(3);
-            this.methods[0].should.be.an('object').that.has.all.keys('name', 'value');
-            this.methods[1].should.be.an('object').that.has.all.keys('name', 'value');
-            this.methods[2].should.be.an('object').that.has.all.keys('name', 'value');
+            this.methods.every(m => m.should.be.an('object').that.has.all.keys('name', 'value'));
           });
 
           it('avoids showing paramater name if not present', function() {
-            this.methods[0].name.should.eq('greetings(uint256)');
-            this.methods[0].value.should.be.an('object').that.has.all.keys('name', 'selector');
+            const method = this.methods.find(m => m.name === 'greetings(uint256)');
+            method.value.should.be.an('object').that.has.all.keys('name', 'selector');
           });
 
           it('shows paramater name if present', function() {
-            this.methods[1].name.should.eq('greeting(who: string)');
-            this.methods[1].value.should.be.an('object').that.has.all.keys('name', 'selector');
+            const method = this.methods.find(m => m.name === 'greeting(who: string)');
+            method.value.should.be.an('object').that.has.all.keys('name', 'selector');
           });
         });
 
@@ -258,7 +257,7 @@ describe('prompt', function() {
           it('returns an array of method arguments names', function() {
             const args = argsList('Greeter', 'greet(string)', Mutability.NotConstant, this.projectFile);
             args.should.be.an('array');
-            args[0].should.deep.equal({ name: 'who', type: 'string' });
+            args[0].should.deep.include({ name: 'who', type: 'string' });
           });
         });
 
@@ -266,7 +265,7 @@ describe('prompt', function() {
           it('returns an array of method arguments names', function() {
             const args = argsList('Greeter', 'greetings(uint256)', Mutability.Constant, this.projectFile);
             args.should.be.an('array');
-            args[0].should.deep.equal({ name: '#0', type: 'uint256' });
+            args[0].should.deep.include({ name: '#0', type: 'uint256' });
           });
         });
       });

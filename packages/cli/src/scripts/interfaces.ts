@@ -97,6 +97,9 @@ export interface InitParams extends Dependencies {
   force?: boolean;
   publish?: boolean;
   projectFile?: ProjectFile;
+  typechainEnabled?: boolean;
+  typechainTarget?: string;
+  typechainOutdir?: string;
 }
 
 export interface UnpackParams {

@@ -3,7 +3,7 @@ require('../setup');
 
 import { stubCommands, itShouldParse } from './share';
 
-contract('create2 command', function() {
+describe('create2 command', function() {
   stubCommands();
 
   itShouldParse(

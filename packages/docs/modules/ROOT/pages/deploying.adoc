@@ -1,4 +1,0 @@
-[[deploying-your-first-project]]
-= Deploying your first project
-
-This guide has been moved xref:first.adoc[here].

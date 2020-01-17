@@ -1,22 +1,20 @@
-'use strict';
-
+import fs from 'fs-extra';
 import isEmpty from 'lodash.isempty';
-import compact from 'lodash.compact';
 import intersection from 'lodash.intersection';
+import difference from 'lodash.difference';
 import uniq from 'lodash.uniq';
-import flatten from 'lodash.flatten';
 import filter from 'lodash.filter';
 import every from 'lodash.every';
 import partition from 'lodash.partition';
 import map from 'lodash.map';
 import concat from 'lodash.concat';
 import toPairs from 'lodash.topairs';
+import toposort from 'toposort';
 
 import {
   Contracts,
   Contract,
   Loggy,
-  FileSystem as fs,
   Proxy,
   Transactions,
   semanticVersionToString,
@@ -39,6 +37,7 @@ import {
   AppProxyMigrator,
   MinimalProxy,
 } from '@openzeppelin/upgrades';
+
 import { isMigratableManifestVersion } from '../files/ManifestVersion';
 import { allPromisesOrError } from '../../utils/async';
 import { toContractFullName } from '../../utils/naming';
@@ -125,7 +124,7 @@ export default class NetworkController {
   }
 
   // DeployerController
-  public async push(reupload: boolean = false, force: boolean = false): Promise<void | never> {
+  public async push(reupload = false, force = false): Promise<void | never> {
     const changedLibraries = this._solidityLibsForPush(!reupload);
     const contracts = this._contractsListForPush(!reupload, changedLibraries);
     const buildArtifacts = getBuildArtifacts();
@@ -182,7 +181,7 @@ export default class NetworkController {
   }
 
   // Contract model
-  private _contractsListForPush(onlyChanged: boolean = false, changedLibraries: Contract[] = []): [string, Contract][] {
+  private _contractsListForPush(onlyChanged = false, changedLibraries: Contract[] = []): [string, Contract][] {
     const newVersion = this._newVersionRequired();
     const pipeline = [
       contracts => toPairs(contracts),
@@ -206,8 +205,9 @@ export default class NetworkController {
   }
 
   // Contract model || SolidityLib model
-  private _solidityLibsForPush(onlyChanged: boolean = false): Contract[] | never {
+  private _solidityLibsForPush(onlyChanged = false): Contract[] | never {
     const { contractNames, contractAliases } = this.projectFile;
+
     const libNames = this._getAllSolidityLibNames(contractNames);
 
     const clashes = intersection(libNames, contractAliases);
@@ -226,12 +226,16 @@ export default class NetworkController {
 
   // Contract model || SolidityLib model
   public async uploadSolidityLibs(libs: Contract[]): Promise<void> {
-    await allPromisesOrError(libs.map(lib => this._uploadSolidityLib(lib)));
+    // Libs may have dependencies, so deploy them in order
+    for (let i = 0; i < libs.length; i++) {
+      await this._uploadSolidityLib(libs[i]);
+    }
   }
 
   // Contract model || SolidityLib model
   private async _uploadSolidityLib(libClass: Contract): Promise<void> {
     const libName = libClass.schema.contractName;
+    await this._setSolidityLibs(libClass); // Libraries may depend on other libraries themselves
     Loggy.spin(__filename, '_uploadSolidityLib', `upload-solidity-lib${libName}`, `Uploading ${libName} library`);
     const libInstance = await this.project.setImplementation(libClass, libName);
     this.networkFile.addSolidityLib(libName, libInstance);
@@ -308,17 +312,41 @@ export default class NetworkController {
   // Contract model || SolidityLib model
   private _hasChangedLibraries(contract: Contract, changedLibraries: Contract[]): boolean {
     const libNames = getSolidityLibNames(contract.schema.bytecode);
-    return !isEmpty(intersection(changedLibraries.map(c => c.schema.contractName), libNames));
+    return !isEmpty(
+      intersection(
+        changedLibraries.map(c => c.schema.contractName),
+        libNames,
+      ),
+    );
   }
 
   // Contract model || SolidityLib model
   private _getAllSolidityLibNames(contractNames: string[]): string[] {
-    const libNames = contractNames.map(contractName => {
-      const contract = Contracts.getFromLocal(contractName);
-      return getSolidityLibNames(contract.schema.bytecode);
+    const graph: string[][] = [];
+    const nodes: string[] = [];
+
+    contractNames.forEach(contractName => {
+      this._populateDependencyGraph(contractName, nodes, graph);
     });
 
-    return uniq(flatten(libNames));
+    // exclude original contracts
+    return [...difference(toposort(graph), contractNames).reverse()];
+  }
+
+  private _populateDependencyGraph(contractName: string, nodes: string[], graph: string[][]) {
+    // if library is already added just ingore it
+    if (!nodes.includes(contractName)) {
+      nodes.push(contractName);
+      this._getContractDependencies(contractName).forEach(dependencyContractName => {
+        this._populateDependencyGraph(dependencyContractName, nodes, graph);
+        graph.push([contractName, dependencyContractName]);
+      });
+    }
+  }
+
+  private _getContractDependencies(contractName: string): string[] {
+    const contract = Contracts.getFromLocal(contractName);
+    return getSolidityLibNames(contract.schema.bytecode);
   }
 
   // Contract model
@@ -373,14 +401,14 @@ export default class NetworkController {
   }
 
   // Contract model
-  public checkContractDeployed(packageName: string, contractAlias: string, throwIfFail: boolean = false): void {
+  public checkContractDeployed(packageName: string, contractAlias: string, throwIfFail = false): void {
     if (!packageName) packageName = this.projectFile.name;
     const err = this._errorForContractDeployed(packageName, contractAlias);
     if (err) this._handleErrorMessage(err, throwIfFail);
   }
 
   // Contract model
-  public checkLocalContractsDeployed(throwIfFail: boolean = false): void {
+  public checkLocalContractsDeployed(throwIfFail = false): void {
     const err = this._errorForLocalContractsDeployed();
     if (err) this._handleErrorMessage(err, throwIfFail);
   }
@@ -400,7 +428,7 @@ export default class NetworkController {
   }
 
   // Contract model
-  public checkLocalContractDeployed(contractAlias: string, throwIfFail: boolean = false): void {
+  public checkLocalContractDeployed(contractAlias: string, throwIfFail = false): void {
     // if (!packageName) packageName = this.projectFile.name
     const err = this._errorForLocalContractDeployed(contractAlias);
     if (err) this._handleErrorMessage(err, throwIfFail);
@@ -418,7 +446,7 @@ export default class NetworkController {
   }
 
   // TODO: move to utils folder or somewhere else
-  private _handleErrorMessage(msg: string, throwIfFail: boolean = false): void | never {
+  private _handleErrorMessage(msg: string, throwIfFail = false): void | never {
     if (throwIfFail) {
       throw Error(msg);
     } else {
@@ -581,7 +609,7 @@ export default class NetworkController {
   // DeployerController
   public async publish(): Promise<void> {
     if (this.appAddress) {
-      Loggy.noSpin(__filename, 'publish', `Project is already published to ${this.network}`);
+      Loggy.noSpin(__filename, 'publish', 'publish-project', `Project is already published to ${this.network}`);
       return;
     }
 
@@ -719,7 +747,7 @@ export default class NetworkController {
   // Proxy model
   private async _checkDeploymentAddress(salt: string) {
     const deploymentAddress = await this.getProxyDeploymentAddress(salt);
-    if ((await ZWeb3.getCode(deploymentAddress)) !== '0x')
+    if ((await ZWeb3.eth.getCode(deploymentAddress)) !== '0x')
       throw new Error(`Deployment address for salt ${salt} is already in use`);
   }
 
@@ -765,7 +793,7 @@ export default class NetworkController {
     const contractName = this.projectFile.contract(contractAlias);
     if (contractName) {
       const path = Contracts.getLocalPath(contractName);
-      const data = fs.parseJson(path);
+      const data = fs.readJsonSync(path);
       if (!data.networks) {
         data.networks = {};
       }
@@ -777,7 +805,7 @@ export default class NetworkController {
         // eslint-disable-next-line @typescript-eslint/camelcase
         updated_at: Date.now(),
       };
-      fs.writeJson(path, data);
+      fs.writeJsonSync(path, data, { spaces: 2 });
     }
   }
 

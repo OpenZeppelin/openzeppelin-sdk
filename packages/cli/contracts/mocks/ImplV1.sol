@@ -1,4 +1,5 @@
 pragma solidity ^0.5.0;
+pragma experimental ABIEncoderV2;
 
 import "./Libraries.sol";
 import "mock-stdlib/contracts/GreeterImpl.sol";
@@ -8,6 +9,8 @@ contract ImplV1 {
   uint256[] public numbers;
 
   event InitializeEvent(uint256 value);
+
+  struct MyTuple { uint256 value; string text; }
 
   function initialize(uint256 _value) public {
     value = _value;
@@ -37,6 +40,10 @@ contract ImplV1 {
 
   function sayNumbers() public view returns (uint256[] memory) {
     return numbers;
+  }
+
+  function echoTuple(MyTuple memory t) public pure returns (MyTuple memory) {
+    return t;
   }
 
   function doesNotReturn() public pure {

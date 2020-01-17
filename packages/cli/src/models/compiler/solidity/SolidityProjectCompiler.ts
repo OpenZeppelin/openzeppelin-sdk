@@ -10,7 +10,6 @@ import { Loggy, Contracts } from '@openzeppelin/upgrades';
 import {
   RawContract,
   CompiledContract,
-  CompilerOptions,
   resolveCompilerVersion,
   compileWith,
   DEFAULT_OPTIMIZER,
@@ -21,6 +20,7 @@ import { gatherSources } from './ResolverEngineGatherer';
 import { SolcBuild } from './CompilerProvider';
 import { compilerVersionsMatch, compilerSettingsMatch } from '../../../utils/solidity';
 import { tryFunc } from '../../../utils/try';
+import { ProjectCompilerOptions } from '../ProjectCompilerOptions';
 
 export async function compileProject(options: ProjectCompilerOptions = {}): Promise<ProjectCompileResult> {
   const projectCompiler = new SolidityProjectCompiler({
@@ -33,19 +33,14 @@ export async function compileProject(options: ProjectCompilerOptions = {}): Prom
   return {
     contracts: projectCompiler.contracts,
     compilerVersion: projectCompiler.compilerVersion,
+    artifacts: projectCompiler.compilerOutput,
   };
-}
-
-export interface ProjectCompilerOptions extends CompilerOptions {
-  manager?: string;
-  inputDir?: string;
-  outputDir?: string;
-  force?: boolean;
 }
 
 export interface ProjectCompileResult {
   compilerVersion: SolcBuild;
   contracts: RawContract[];
+  artifacts: CompiledContract[];
 }
 
 class SolidityProjectCompiler {
@@ -159,7 +154,7 @@ class SolidityProjectCompiler {
     return (
       !maxArtifactsMtimes ||
       !maxSourcesMtimes ||
-      maxArtifactsMtimes < maxSourcesMtimes ||
+      maxArtifactsMtimes <= maxSourcesMtimes ||
       !artifactCompiledVersion ||
       !compilerVersionsMatch(artifactCompiledVersion, this.compilerVersion.longVersion) ||
       !compilerSettingsMatch(currentSettings, artifactSettings)
@@ -191,6 +186,7 @@ class SolidityProjectCompiler {
         const buildFileName = `${this.outputDir}/${name}.json`;
         if (networksInfo[name]) Object.assign(data, { networks: networksInfo[name] });
         await writeJson(buildFileName, data, { spaces: 2 });
+        return { filePath: buildFileName, contractName: name };
       }),
     );
   }

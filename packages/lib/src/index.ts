@@ -10,7 +10,6 @@ import sleep from './helpers/sleep';
 import ABI from './utils/ABIs';
 import Semver from './utils/Semver';
 import { Loggy } from './utils/Logger';
-import FileSystem from './utils/FileSystem';
 import Contracts from './artifacts/Contracts';
 import Contract, {
   contractMethodsFromAst,
@@ -94,7 +93,6 @@ export {
   Proxy,
   ABI,
   Semver,
-  FileSystem,
   ZWeb3,
   TxParams,
   Transactions,

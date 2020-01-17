@@ -170,11 +170,11 @@ class SolidityContractsCompiler {
     });
   }
 
-  private _buildContractSchema(solcOutput: CompilerOutput, fileName: string, contractName: string): CompiledContract {
-    const output = solcOutput.contracts[fileName][contractName];
-    const source = solcOutput.sources[fileName];
-    fileName = path.basename(fileName);
-    const contract = this.contracts.find(aContract => aContract.fileName === fileName);
+  private _buildContractSchema(solcOutput: CompilerOutput, filePath: string, contractName: string): CompiledContract {
+    const output = solcOutput.contracts[filePath][contractName];
+    const source = solcOutput.sources[filePath];
+    const fileName = path.basename(filePath);
+    const contract = this.contracts.find(aContract => aContract.filePath === filePath);
 
     return {
       fileName,

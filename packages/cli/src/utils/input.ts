@@ -1,6 +1,9 @@
 import BN from 'bignumber.js';
 import flattenDeep from 'lodash.flattendeep';
 import { encodeParams, Loggy, ZWeb3 } from '@openzeppelin/upgrades';
+import { MethodArgType } from '../prompts/prompt';
+import zipWith from 'lodash.zipwith';
+import { isAddress, isHex } from 'web3-utils';
 
 // TODO: Deprecate in favor of a combination of parseArg and parseArray
 export function parseArgs(args: string): string[] | never {
@@ -46,18 +49,24 @@ function quoteArguments(args: string) {
   return args;
 }
 
-export function parseArg(input: string | string[], type: string): any {
+export function parseArg(input: string | string[], { type, components }: MethodArgType): any {
   const TRUE_VALUES = ['y', 'yes', 't', 'true', '1'];
   const FALSE_VALUES = ['n', 'no', 'f', 'false', '0'];
   const ARRAY_TYPE_REGEX = /(.+)\[\d*\]$/; // matches array type identifiers like uint[] or byte[4]
 
-  // TODO: Handle tuples in ABI specification
+  // Tuples: recursively parse
+  if (type === 'tuple') {
+    const inputs = typeof input === 'string' ? parseArray(stripParens(input), '(', ')') : input;
+    if (inputs.length !== components.length)
+      throw new Error(`Expected ${components.length} values but got ${input.length}`);
+    return zipWith(inputs, components, parseArg);
+  }
 
   // Arrays: recursively parse
-  if (type.match(ARRAY_TYPE_REGEX)) {
+  else if (type.match(ARRAY_TYPE_REGEX)) {
     const arrayType = type.match(ARRAY_TYPE_REGEX)[1];
     const inputs = typeof input === 'string' ? parseArray(stripBrackets(input)) : input;
-    return inputs.map(input => parseArg(input, arrayType));
+    return inputs.map(input => parseArg(input, { type: arrayType }));
   }
 
   // Integers: passed via bignumber to handle signs and scientific notation
@@ -80,7 +89,7 @@ export function parseArg(input: string | string[], type: string): any {
 
   // Address: just validate them
   else if (type === 'address' && requireInputString(input)) {
-    if (!ZWeb3.isAddress(input)) {
+    if (!isAddress(input)) {
       throw new Error(`${input} is not a valid address`);
     }
     return input;
@@ -88,7 +97,7 @@ export function parseArg(input: string | string[], type: string): any {
 
   // Bytes: same, just check they are a valid hex
   else if (type.startsWith('bytes') && requireInputString(input)) {
-    if (!ZWeb3.isHex(input)) {
+    if (!isHex(input)) {
       throw new Error(`${input} is not a valid hexadecimal`);
     }
     return input;
@@ -101,13 +110,17 @@ export function parseArg(input: string | string[], type: string): any {
 
   // Warn if we see a type we don't recognise, but return it as is
   else {
-    Loggy.noSpin.warn(__filename, 'parseArg', `Unknown argument ${type} (skipping input validation)`);
+    Loggy.noSpin.warn(__filename, 'parseArg', 'util-parse-arg', `Unknown argument ${type} (skipping input validation)`);
     return input;
   }
 }
 
 export function stripBrackets(inputMaybeWithBrackets: string): string {
   return `${inputMaybeWithBrackets.replace(/^\s*\[/, '').replace(/\]\s*$/, '')}`;
+}
+
+export function stripParens(inputMaybeWithParens: string): string {
+  return `${inputMaybeWithParens.replace(/^\s*\(/, '').replace(/\)\s*$/, '')}`;
 }
 
 function requireInputString(arg: string | string[]): arg is string {
@@ -126,7 +139,7 @@ function requireInputString(arg: string | string[]): arg is string {
  * with arbitrarily nested string arrays, but ts has a hard time handling that,
  * so we're fooling it into thinking it's just one level deep.
  */
-export function parseArray(input: string): (string | string[])[] {
+export function parseArray(input: string, open = '[', close = ']'): (string | string[])[] {
   let i = 0; // index for traversing input
 
   function innerParseQuotedString(quoteChar: string): string {
@@ -148,9 +161,9 @@ export function parseArray(input: string): (string | string[])[] {
         return input.slice(start, i - 1);
       } else if (char === '"' || char === "'") {
         throw new Error(`Unexpected quote at position ${i}`);
-      } else if (char === '[' || char === "'") {
+      } else if (char === open || char === "'") {
         throw new Error(`Unexpected opening bracket at position ${i}`);
-      } else if (char === ']') {
+      } else if (char === close) {
         return input.slice(start, --i);
       }
     }
@@ -164,7 +177,7 @@ export function parseArray(input: string): (string | string[])[] {
         continue;
       } else if (char === ',') {
         return;
-      } else if (char === ']') {
+      } else if (char === close) {
         i--;
         return;
       } else {
@@ -183,11 +196,11 @@ export function parseArray(input: string): (string | string[])[] {
       } else if (char === '"' || char === "'") {
         result.push(innerParseQuotedString(char));
         requireCommaOrClosing();
-      } else if (char === '[') {
+      } else if (char === open) {
         const innerArray = innerParseArray();
         result.push(innerArray);
         requireCommaOrClosing();
-      } else if (char === ']') {
+      } else if (char === close) {
         if (!requireClosingBracket) throw new Error(`Unexpected closing array at position ${i + 1} in ${input}`);
         return result;
       } else {
@@ -236,5 +249,37 @@ export function validateSalt(salt: string, required = false) {
     encodeParams(['uint256'], [salt]);
   } catch (err) {
     throw new Error(`Invalid salt ${salt}, must be an uint256 value.`);
+  }
+}
+
+export function getSampleInput(arg: MethodArgType): string | null {
+  const ARRAY_TYPE_REGEX = /(.+)\[\d*\]$/; // matches array type identifiers like uint[] or byte[4]
+  const { type, components } = arg;
+
+  if (type.match(ARRAY_TYPE_REGEX)) {
+    const arrayType = type.match(ARRAY_TYPE_REGEX)[1];
+    const itemPlaceholder = getSampleInput({ type: arrayType });
+    return `[${itemPlaceholder}, ${itemPlaceholder}]`;
+  } else if (
+    type.startsWith('uint') ||
+    type.startsWith('int') ||
+    type.startsWith('fixed') ||
+    type.startsWith('ufixed')
+  ) {
+    return '42';
+  } else if (type === 'bool') {
+    return 'true';
+  } else if (type === 'bytes') {
+    return '0xabcdef';
+  } else if (type === 'address') {
+    return '0x1df62f291b2e969fb0849d99d9ce41e2f137006e';
+  } else if (type === 'string') {
+    return 'Hello world';
+  } else if (type === 'tuple' && components) {
+    return `(${components.map(c => getSampleInput(c)).join(', ')})`;
+  } else if (type === 'tuple') {
+    return `(Hello world, 42)`;
+  } else {
+    return null;
   }
 }

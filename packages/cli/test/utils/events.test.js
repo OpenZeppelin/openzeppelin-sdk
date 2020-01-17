@@ -9,8 +9,7 @@ import { describeEvents } from '../../src/utils/events';
 
 const ImplV1 = Contracts.getFromLocal('ImplV1');
 
-contract('events', function(accounts) {
-  const [_, accountAddress] = accounts.map(utils.toChecksumAddress);
+describe('events', function() {
   beforeEach('set capture logs', async function() {
     this.implV1 = await ImplV1.new();
     this.logs = new CaptureLogs();

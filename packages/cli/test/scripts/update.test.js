@@ -4,6 +4,8 @@ require('../setup');
 import mapKeys from 'lodash.mapkeys';
 import omit from 'lodash.omit';
 import { Contracts, Proxy } from '@openzeppelin/upgrades';
+import { accounts } from '@openzeppelin/test-environment';
+
 import CaptureLogs from '../helpers/captureLogs';
 
 import add from '../../src/scripts/add';
@@ -15,16 +17,14 @@ import update from '../../src/scripts/update';
 import setAdmin from '../../src/scripts/set-admin';
 import ProjectFile from '../../src/models/files/ProjectFile';
 import NetworkFile from '../../src/models/files/NetworkFile';
-import utils from 'web3-utils';
 import { ProxyType } from '../../src/scripts/interfaces';
 
 const ImplV1 = Contracts.getFromLocal('ImplV1');
 const GreeterV1 = Contracts.getFromNodeModules('mock-stdlib', 'GreeterImpl');
 const GreeterV2 = Contracts.getFromNodeModules('mock-stdlib-2', 'GreeterImpl');
 
-contract('update script', function(accounts) {
-  accounts = accounts.map(utils.toChecksumAddress);
-  const [_skipped, owner, anotherAccount] = accounts;
+describe('update script', function() {
+  const [owner, anotherAccount] = accounts;
 
   const network = 'test';
   const version1 = '0.1.0';
@@ -72,7 +72,10 @@ contract('update script', function(accounts) {
   const createProxies = async function() {
     this.networkFile = new NetworkFile(this.projectFile, network);
 
-    const contractsData = [{ name: 'ImplV1', alias: 'Impl' }, { name: 'WithLibraryImplV1', alias: 'WithLibraryImpl' }];
+    const contractsData = [
+      { name: 'ImplV1', alias: 'Impl' },
+      { name: 'WithLibraryImplV1', alias: 'WithLibraryImpl' },
+    ];
     await add({ contractsData, projectFile: this.projectFile });
     await push({ network, txParams, networkFile: this.networkFile });
 
@@ -476,7 +479,7 @@ contract('update script', function(accounts) {
           implementation: this.withLibraryImplV2Address,
         });
       });
-    });
+    }).timeout(5000);
   };
 
   const shouldHandleUpdateOnDependency = function() {
@@ -563,15 +566,19 @@ contract('update script', function(accounts) {
         });
 
         const { address: proxyAddress } = await assertProxyInfo(this.networkFile, 'Greeter', 0, { version: '1.2.0' });
-        (await GreeterV2.at(proxyAddress)
-          .methods.version()
-          .call()).should.eq('1.2.0');
+        (
+          await GreeterV2.at(proxyAddress)
+            .methods.version()
+            .call()
+        ).should.eq('1.2.0');
         const { address: anotherProxyAddress } = await assertProxyInfo(this.networkFile, 'Greeter', 0, {
           version: '1.2.0',
         });
-        (await GreeterV2.at(anotherProxyAddress)
-          .methods.version()
-          .call()).should.eq('1.2.0');
+        (
+          await GreeterV2.at(anotherProxyAddress)
+            .methods.version()
+            .call()
+        ).should.eq('1.2.0');
       });
 
       it('should upgrade the version of all proxies given their package', async function() {
@@ -583,15 +590,19 @@ contract('update script', function(accounts) {
         });
 
         const { address: proxyAddress } = await assertProxyInfo(this.networkFile, 'Greeter', 0, { version: '1.2.0' });
-        (await GreeterV2.at(proxyAddress)
-          .methods.version()
-          .call()).should.eq('1.2.0');
+        (
+          await GreeterV2.at(proxyAddress)
+            .methods.version()
+            .call()
+        ).should.eq('1.2.0');
         const { address: anotherProxyAddress } = await assertProxyInfo(this.networkFile, 'Greeter', 0, {
           version: '1.2.0',
         });
-        (await GreeterV2.at(anotherProxyAddress)
-          .methods.version()
-          .call()).should.eq('1.2.0');
+        (
+          await GreeterV2.at(anotherProxyAddress)
+            .methods.version()
+            .call()
+        ).should.eq('1.2.0');
       });
 
       it('should upgrade the version of all proxies', async function() {
@@ -603,17 +614,21 @@ contract('update script', function(accounts) {
         });
 
         const { address: proxyAddress } = await assertProxyInfo(this.networkFile, 'Greeter', 0, { version: '1.2.0' });
-        (await GreeterV2.at(proxyAddress)
-          .methods.version()
-          .call()).should.eq('1.2.0');
+        (
+          await GreeterV2.at(proxyAddress)
+            .methods.version()
+            .call()
+        ).should.eq('1.2.0');
         const { address: anotherProxyAddress } = await assertProxyInfo(this.networkFile, 'Greeter', 0, {
           version: '1.2.0',
         });
-        (await GreeterV2.at(anotherProxyAddress)
-          .methods.version()
-          .call()).should.eq('1.2.0');
+        (
+          await GreeterV2.at(anotherProxyAddress)
+            .methods.version()
+            .call()
+        ).should.eq('1.2.0');
       });
-    });
+    }).timeout(5000);
   };
 
   describe('on application contract', function() {

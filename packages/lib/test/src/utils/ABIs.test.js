@@ -5,6 +5,8 @@ require('../../setup');
 import { getABIFunction as getFunction } from '../../../src/utils/ABIs';
 import Contracts from '../../../src/artifacts/Contracts';
 
+import { expect } from 'chai';
+
 const should = require('chai').should();
 
 describe('ABIs', function() {

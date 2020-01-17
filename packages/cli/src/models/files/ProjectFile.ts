@@ -1,14 +1,15 @@
+import fs from 'fs-extra';
 import path from 'path';
 import pickBy from 'lodash.pickby';
 import isEqual from 'lodash.isequal';
 import isEmpty from 'lodash.isempty';
 
-import { Loggy, FileSystem as fs } from '@openzeppelin/upgrades';
+import { Loggy } from '@openzeppelin/upgrades';
 import Dependency from '../dependency/Dependency';
 import { MANIFEST_VERSION, checkVersion } from './ManifestVersion';
 import { OPEN_ZEPPELIN_FOLDER } from './constants';
 import NetworkFile from './NetworkFile';
-import { ProjectCompilerOptions } from '../compiler/solidity/SolidityProjectCompiler';
+import { ProjectCompilerOptions } from '../compiler/ProjectCompilerOptions';
 
 interface ConfigFileCompilerOptions {
   manager: string;
@@ -21,6 +22,11 @@ interface ConfigFileCompilerOptions {
       enabled: boolean;
       runs?: string;
     };
+  };
+  typechain: {
+    enabled: boolean;
+    outDir?: string;
+    target?: string;
   };
 }
 
@@ -54,10 +60,10 @@ export default class ProjectFile {
     const defaultData = {
       manifestVersion: MANIFEST_VERSION,
     } as any;
-    this.filePath = ProjectFile.getExistingFilePath(process.cwd(), filePath);
+    this.filePath = filePath ?? ProjectFile.getExistingFilePath(process.cwd());
     if (this.filePath) {
       try {
-        this.data = fs.parseJsonIfExists(this.filePath);
+        this.data = fs.existsSync(this.filePath) ? fs.readJsonSync(this.filePath) : null;
         // if we failed to read and parse project file
       } catch (e) {
         e.message = `Failed to parse '${path.resolve(this.filePath)}' file. Please make sure that ${
@@ -74,7 +80,7 @@ export default class ProjectFile {
   }
 
   public exists(): boolean {
-    return fs.exists(this.filePath);
+    return fs.existsSync(this.filePath);
   }
 
   public get root(): string {
@@ -164,6 +170,7 @@ export default class ProjectFile {
     const inputDir = config && config.contractsDir;
     const outputDir = config && config.artifactsDir;
     const compilerSettings = config && config.compilerSettings;
+    const typechain = config && config.typechain;
     const evmVersion = compilerSettings && compilerSettings.evmVersion;
     const optimizer = compilerSettings && compilerSettings.optimizer;
 
@@ -177,6 +184,7 @@ export default class ProjectFile {
         enabled: optimizer && optimizer.enabled,
         runs: optimizer && optimizer.runs && parseInt(optimizer.runs),
       },
+      typechain,
     };
   }
 
@@ -187,7 +195,7 @@ export default class ProjectFile {
   }
 
   public setCompilerOptions(options: ProjectCompilerOptions): void {
-    const { manager, version, outputDir, inputDir, evmVersion, optimizer } = options;
+    const { manager, version, outputDir, inputDir, evmVersion, optimizer, typechain } = options;
     const configOptions: ConfigFileCompilerOptions = {
       manager,
       solcVersion: version,
@@ -200,6 +208,7 @@ export default class ProjectFile {
           runs: optimizer && optimizer.runs && optimizer.runs.toString(),
         },
       },
+      typechain,
     };
 
     this.data.compiler =
@@ -251,7 +260,7 @@ export default class ProjectFile {
   public write(): void {
     if (this.hasChanged()) {
       const exists = this.exists();
-      fs.writeJson(this.filePath, this.data);
+      fs.writeJsonSync(this.filePath, this.data, { spaces: 2 });
       Loggy.onVerbose(
         __filename,
         'write',
@@ -264,11 +273,11 @@ export default class ProjectFile {
   public static getExistingFilePath(dir: string = process.cwd(), ...paths: string[]): string {
     // TODO-v3: remove legacy project file support
     // Prefer the new format over the old one
-    return [...paths, `${dir}/${PROJECT_FILE_PATH}`, `${dir}/${LEGACY_PROJECT_FILE_NAME}`].find(fs.exists);
+    return [...paths, `${dir}/${PROJECT_FILE_PATH}`, `${dir}/${LEGACY_PROJECT_FILE_NAME}`].find(fs.existsSync);
   }
 
   private hasChanged(): boolean {
-    const currentPackgeFile = fs.parseJsonIfExists(this.filePath);
+    const currentPackgeFile = fs.existsSync(this.filePath) ? fs.readJsonSync(this.filePath) : null;
     return !isEqual(this.data, currentPackgeFile);
   }
 }

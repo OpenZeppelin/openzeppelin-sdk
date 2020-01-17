@@ -3,7 +3,7 @@ require('../../setup');
 
 import Contracts from '../../../src/artifacts/Contracts';
 
-contract('Contracts', function() {
+describe('Contracts', function() {
   it('can lookup contracts from the local project', async function() {
     const DummyImplementation = Contracts.getFromLocal('DummyImplementation');
     const instance = await DummyImplementation.new();

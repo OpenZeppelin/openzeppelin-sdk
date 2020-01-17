@@ -2,7 +2,7 @@ import { ZWeb3, Loggy } from '@openzeppelin/upgrades';
 
 export default async function accounts({ network }: { network: string }): Promise<void | never> {
   const defaultAccount = await ZWeb3.defaultAccount();
-  const accounts = await ZWeb3.accounts();
+  const accounts = await ZWeb3.eth.getAccounts();
 
   if (accounts && accounts.length !== 0) {
     Loggy.noSpin(__filename, `accounts`, `network-name`, `Accounts for ${network}:`);

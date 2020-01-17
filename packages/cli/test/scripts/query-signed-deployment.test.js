@@ -2,6 +2,8 @@
 require('../setup');
 
 import random from 'lodash.random';
+import { accounts } from '@openzeppelin/test-environment';
+
 import querySignedDeployment from '../../src/scripts/query-signed-deployment';
 import ProjectFile from '../../src/models/files/ProjectFile';
 import NetworkFile from '../../src/models/files/NetworkFile';
@@ -11,7 +13,9 @@ import queryDeployment from '../../src/scripts/query-deployment';
 
 const should = require('chai').should();
 
-contract('query-signed-deployment script', function([_, owner, another, admin]) {
+describe('query-signed-deployment script', function() {
+  const [owner, another, admin] = accounts;
+
   const network = 'test';
   const version = '0.4.0';
   const txParams = { from: owner };

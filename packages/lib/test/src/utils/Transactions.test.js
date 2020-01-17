@@ -1,6 +1,8 @@
 'use strict';
 require('../../setup');
 
+import { accounts } from '@openzeppelin/test-environment';
+
 import times from 'lodash.times';
 import sinon from 'sinon';
 import axios from 'axios';
@@ -16,8 +18,8 @@ import Transactions, { state } from '../../../src/utils/Transactions';
 const DEFAULT_GAS = 6721975;
 const DEFAULT_PARAMS = [42, 'foo', [1, 2, 3]];
 
-contract('Transactions', function(accounts) {
-  accounts = accounts.map(utils.toChecksumAddress);
+describe('Transactions', function() {
+  accounts = accounts;
   const [_account1, account2] = accounts;
 
   beforeEach('load contract', function() {
@@ -29,22 +31,22 @@ contract('Transactions', function(accounts) {
   });
 
   const assertGasLt = async (txHash, expected) => {
-    const { gas } = await ZWeb3.getTransaction(txHash);
+    const { gas } = await ZWeb3.eth.getTransaction(txHash);
     gas.should.be.at.most(parseInt(expected));
   };
 
   const assertGas = async (txHash, expected) => {
-    const { gas } = await ZWeb3.getTransaction(txHash);
+    const { gas } = await ZWeb3.eth.getTransaction(txHash);
     gas.should.be.eq(parseInt(expected));
   };
 
   const assertGasPrice = async (txHash, expected) => {
-    const { gasPrice } = await ZWeb3.getTransaction(txHash);
+    const { gasPrice } = await ZWeb3.eth.getTransaction(txHash);
     parseInt(gasPrice, 10).should.be.eq(expected);
   };
 
   const assertFrom = async (txHash, expected) => {
-    const { from } = await ZWeb3.getTransaction(txHash);
+    const { from } = await ZWeb3.eth.getTransaction(txHash);
     from.should.be.eq(expected);
   };
 
@@ -150,7 +152,7 @@ contract('Transactions', function(accounts) {
 
           it('retries estimating gas up to 3 times', async function() {
             const stub = sinon.stub(Transactions, '_calculateActualGas');
-            _.times(4, i =>
+            times(4, i =>
               stub.onCall(i).throws('Error', 'gas required exceeds allowance or always failing transaction'),
             );
 
@@ -283,8 +285,8 @@ contract('Transactions', function(accounts) {
           });
 
           it('retries estimating gas', async function() {
-            const stub = sinon.stub(ZWeb3, 'estimateGas');
-            _.times(3, i =>
+            const stub = sinon.stub(ZWeb3.eth, 'estimateGas');
+            times(3, i =>
               stub.onCall(i).throws('Error', 'gas required exceeds allowance or always failing transaction'),
             );
             stub.returns(800000);
@@ -294,8 +296,8 @@ contract('Transactions', function(accounts) {
           });
 
           it('retries estimating gas up to 3 times', async function() {
-            const stub = sinon.stub(ZWeb3, 'estimateGas');
-            _.times(4, i =>
+            const stub = sinon.stub(ZWeb3.eth, 'estimateGas');
+            times(4, i =>
               stub.onCall(i).throws('Error', 'gas required exceeds allowance or always failing transaction'),
             );
             stub.returns(800000);
@@ -387,7 +389,7 @@ contract('Transactions', function(accounts) {
             value: utils.toWei('1', 'ether'),
           };
           await Transactions.sendRawTransaction(this.instance.address, transactionParams, { from: account2 });
-          (await ZWeb3.getBalance(this.instance.address)).should.eq((1e18).toString());
+          (await ZWeb3.eth.getBalance(this.instance.address)).should.eq((1e18).toString());
         });
       });
 
@@ -400,7 +402,7 @@ contract('Transactions', function(accounts) {
           await assertRevert(
             Transactions.sendRawTransaction(this.instance.address, transactionParams, { from: account2 }),
           );
-          (await ZWeb3.getBalance(this.instance.address)).should.eq('0');
+          (await ZWeb3.eth.getBalance(this.instance.address)).should.eq('0');
         });
       });
     });
@@ -457,8 +459,8 @@ contract('Transactions', function(accounts) {
           });
 
           it('retries estimating gas', async function() {
-            const stub = sinon.stub(ZWeb3, 'estimateGas');
-            _.times(3, i =>
+            const stub = sinon.stub(ZWeb3.eth, 'estimateGas');
+            times(3, i =>
               stub.onCall(i).throws('Error', 'gas required exceeds allowance or always failing transaction'),
             );
             stub.returns(800000);
@@ -469,8 +471,8 @@ contract('Transactions', function(accounts) {
           });
 
           it('retries estimating gas up to 3 times', async function() {
-            const stub = sinon.stub(ZWeb3, 'estimateGas');
-            _.times(4, i =>
+            const stub = sinon.stub(ZWeb3.eth, 'estimateGas');
+            times(4, i =>
               stub.onCall(i).throws('Error', 'gas required exceeds allowance or always failing transaction'),
             );
             stub.returns(800000);
@@ -712,8 +714,8 @@ contract('Transactions', function(accounts) {
             });
 
             it('retries estimating gas', async function() {
-              const stub = sinon.stub(ZWeb3, 'estimateGas');
-              _.times(3, i =>
+              const stub = sinon.stub(ZWeb3.eth, 'estimateGas');
+              times(3, i =>
                 stub.onCall(i).throws('Error', 'gas required exceeds allowance or always failing transaction'),
               );
               stub.returns(800000);
@@ -723,8 +725,8 @@ contract('Transactions', function(accounts) {
             });
 
             it('retries estimating gas up to 3 times', async function() {
-              const stub = sinon.stub(ZWeb3, 'estimateGas');
-              _.times(4, i =>
+              const stub = sinon.stub(ZWeb3.eth, 'estimateGas');
+              times(4, i =>
                 stub.onCall(i).throws('Error', 'gas required exceeds allowance or always failing transaction'),
               );
               stub.returns(800000);

@@ -1,5 +1,8 @@
 pragma solidity ^0.5.0;
 
+import "mock-dependency/contracts/Greeter.sol";
+import "mock-dependency/contracts/DependencyInvalid.sol";
+
 contract WithConstructor {
   uint256 public value;
 
@@ -10,6 +13,27 @@ contract WithConstructor {
   function say() public pure returns (string memory) {
     return "WithConstructor";
   }
+}
+
+contract WithParentConstructor is WithConstructor {
+}
+
+contract WithAncestorConstructor is WithParentConstructor {
+}
+
+contract WithDependencyParentConstructor is DependencyWithConstructor {
+}
+
+contract WithEmptyConstructor {
+  constructor() internal { }
+}
+
+contract WithModifierInConstructor {
+  modifier modifies { _; }
+  constructor() modifies internal { }
+}
+
+contract WithAncestorEmptyConstructor is WithEmptyConstructor {
 }
 
 contract WithFailingConstructor {
@@ -59,13 +83,4 @@ contract WithParentWithDelegateCall is WithDelegateCall {
   }
 }
 
-contract WithConstructorImplementation {
-  uint256 public value;
-  string public text;
-
-  constructor(uint256 _value, string memory _text) public {
-    require(_value > 0);
-    value = _value;
-    text = _text;
-  }
-}
+contract WithVanillaBaseContract is Greeter { }

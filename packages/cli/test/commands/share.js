@@ -31,16 +31,14 @@ import NetworkFile from '../../src/models/files/NetworkFile';
 import ProjectFile from '../../src/models/files/ProjectFile';
 import * as Compiler from '../../src/models/compiler/Compiler';
 import Dependency from '../../src/models/dependency/Dependency';
-import ErrorHandler from '../../src/models/errors/ErrorHandler';
 import ConfigManager from '../../src/models/config/ConfigManager';
 import Telemetry from '../../src/telemetry';
 
 program.Command.prototype.parseReset = function() {
-  var self = this;
   this.args = [];
   this.rawArgs = [];
-  this.options.forEach(function(option) {
-    self[option.name()] = undefined;
+  this.options.forEach(option => {
+    this[option.name()] = undefined;
   });
   this.commands.forEach(function(command) {
     if (command.options) {
@@ -79,7 +77,6 @@ exports.stubCommands = function() {
     this.accounts = sinon.stub(accounts, 'default');
 
     this.compiler = sinon.stub(Compiler, 'compile');
-    this.errorHandler = sinon.stub(ErrorHandler.prototype, 'call').callsFake(() => null);
     this.initializer = sinon.stub(ConfigManager, 'initNetworkConfiguration').callsFake(function(options) {
       ConfigManager.initStaticConfiguration();
       const { network, from } = Session.getOptions(options);

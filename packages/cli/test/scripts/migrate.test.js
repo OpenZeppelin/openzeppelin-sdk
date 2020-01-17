@@ -3,6 +3,7 @@ require('../setup');
 
 import utils from 'web3-utils';
 import { Proxy, Contracts, toSemanticVersion } from '@openzeppelin/upgrades';
+import { accounts } from '@openzeppelin/test-environment';
 
 import push from '../../src/scripts/push';
 import create from '../../src/scripts/create';
@@ -16,8 +17,9 @@ const Package = Contracts.getFromLib('Package');
 const DeprecatedApp = Contracts.getFromLib('DeprecatedApp');
 const ImplementationDirectory = Contracts.getFromLib('ImplementationDirectory');
 
-contract('migrate-manifest-version script', function(accounts) {
-  const [_, owner, newAdmin, anotherAdmin] = accounts.map(utils.toChecksumAddress);
+describe('migrate-manifest-version script', function() {
+  const [owner, newAdmin, anotherAdmin] = accounts;
+
   const EMPTY_INITIALIZATION_DATA = Buffer.from('');
   const network = 'test';
   const txParams = { from: owner };

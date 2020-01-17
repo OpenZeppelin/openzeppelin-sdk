@@ -11,7 +11,10 @@ describe('allPromisesOrError', function() {
   });
 
   it('returns result from all promises with objects', async function() {
-    const promises = [[Promise.resolve(4), 4], [Promise.resolve(6), 6]];
+    const promises = [
+      [Promise.resolve(4), 4],
+      [Promise.resolve(6), 6],
+    ];
     const results = await allPromisesOrError(promises);
     results.should.deep.eq([4, 6]);
   });
@@ -27,7 +30,11 @@ describe('allPromisesOrError', function() {
   });
 
   it('customizes error messages with objects', async function() {
-    const promises = [[Promise.resolve(4), 4], [Promise.reject('FAIL'), 1], [Promise.reject('FAIL2'), 2]];
+    const promises = [
+      [Promise.resolve(4), 4],
+      [Promise.reject('FAIL'), 1],
+      [Promise.reject('FAIL2'), 2],
+    ];
     await allPromisesOrError(promises, (err, obj) => `ERROR:${err}:${obj}`).should.be.rejectedWith(
       'ERROR:FAIL:1\nERROR:FAIL2:2',
     );

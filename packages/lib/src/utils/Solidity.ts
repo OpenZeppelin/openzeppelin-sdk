@@ -1,5 +1,4 @@
-import flatten from 'truffle-flattener';
-
 export function flattenSourceCode(contractPaths: string[], root = process.cwd()): Promise<any> {
-  return flatten(contractPaths, root);
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  return require('truffle-flattener')(contractPaths, root);
 }

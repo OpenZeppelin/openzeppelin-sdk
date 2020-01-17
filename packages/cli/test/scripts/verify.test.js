@@ -11,7 +11,7 @@ import push from '../../src/scripts/push';
 import ProjectFile from '../../src/models/files/ProjectFile';
 import NetworkFile from '../../src/models/files/NetworkFile';
 
-contract('verify script', function() {
+describe('verify script', function() {
   const contractAlias = 'Impl';
   const network = 'test';
   const txParams = {};

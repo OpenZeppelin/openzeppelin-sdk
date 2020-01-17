@@ -5,7 +5,7 @@ import CaptureLogs from '../helpers/captureLogs';
 import { Contracts, getStorageLayout, compareStorageLayouts, getBuildArtifacts } from '@openzeppelin/upgrades';
 import ValidationLogger from '../../src/interface/ValidationLogger';
 
-contract('ValidationLogger', function() {
+describe('ValidationLogger', function() {
   beforeEach('capturing log output', function() {
     this.logs = new CaptureLogs();
   });
@@ -17,7 +17,7 @@ contract('ValidationLogger', function() {
   describe('errors', function() {
     it('logs constructor', async function() {
       validationLogger().log({ hasConstructor: true });
-      this.logs.errors[0].should.match(/has an explicit constructor/);
+      this.logs.errors[0].should.match(/has a constructor/);
     });
   });
 
@@ -49,6 +49,16 @@ contract('ValidationLogger', function() {
     it('logs when detecting initial values in fields declarations', async function() {
       validationLogger().log({ hasInitialValuesInDeclarations: true });
       this.logs.warns[0].should.match(/sets an initial value/);
+    });
+
+    it('logs when importing openzeppelin-contracts', async function() {
+      validationLogger().log({ importsVanillaContracts: ['Foo.sol', 'Bar.sol'] });
+      this.logs.warns[0].should.match(/@openzeppelin\/contracts/);
+    });
+
+    it('does not log with no imports', async function() {
+      validationLogger().log({ importsVanillaContracts: [] });
+      this.logs.warns.length.should.equal(0);
     });
   });
 
