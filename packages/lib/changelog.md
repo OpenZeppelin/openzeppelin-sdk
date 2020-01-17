@@ -4,6 +4,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## v2.6.1 - 2020-01-17
+
+### Added
+- Support for processing ABIs in contract artifacts compiled with Solidity 0.6. ([#1362](https://github.com/OpenZeppelin/openzeppelin-sdk/pull/1362))
+
+### Fixed
+- Check for parameterless constructors in ancestor contracts when validating an upgradeable contract. ([#1385](https://github.com/OpenZeppelin/openzeppelin-sdk/pull/1385))
+
+### Changed
+- Trimmed the API of the `ZWeb3` object to remove methods duplicated from `web3.js`. ([#1369](https://github.com/OpenZeppelin/openzeppelin-sdk/pull/1369))
+
+### Internal
+- Use the OpenZeppelin CLI to compile and test contracts in OpenZeppelin upgrades.js. ([#1294](https://github.com/OpenZeppelin/openzeppelin-sdk/pull/1294))
+
 ## v2.6.0 - 2019-11-07
 
 ### Changed

@@ -4,6 +4,28 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## v2.6.1 - 2020-01-17
+
+### Added
+- Add `path` property to `network.js` config file, to be used together with `protocol`, `host`, and `port`. Add `url` shorthand property as well. ([#1386](https://github.com/OpenZeppelin/openzeppelin-sdk/pull/1386))
+- Support for tuple parameters when calling methods in interactive commands such as `send-tx`, `create`, or `upgrade`. ([#1333](https://github.com/OpenZeppelin/openzeppelin-sdk/pull/1333))
+- Generate typechain contract wrappers in a typescript project. ([#1285](https://github.com/OpenZeppelin/openzeppelin-sdk/pull/1285))
+- Solidity libraries in a project can now recursively link to other Solidity libraries. ([#1252](https://github.com/OpenZeppelin/openzeppelin-sdk/pull/1252))
+- Warn when importing `@openzeppelin/contracts` instead of `@openzeppelin/contracts-ethereum-package`. ([#1335](https://github.com/OpenZeppelin/openzeppelin-sdk/pull/1335))
+
+### Changed
+- Use solidity fuzzy-import parser, to speed up nothing-to-compile checks by a 40%, and lazy-load truffle-flattener to decrease CLI startup time. ([#1291](https://github.com/OpenZeppelin/openzeppelin-sdk/pull/1291))
+- Disable interactivity if stdin is not a terminal. ([#1299](https://github.com/OpenZeppelin/openzeppelin-sdk/pull/1299))
+
+### Fixed
+- Abort interactive `create` or `upgrade` processes on contract validation errors, such as having a constructor. ([#1382](https://github.com/OpenZeppelin/openzeppelin-sdk/pull/1382))
+- Load `gas` and `gasPrice` from network configuration file. ([#1345](https://github.com/OpenZeppelin/openzeppelin-sdk/pull/1345))
+- Sort commands in alphabetical order for `--help`. ([#1321](https://github.com/OpenZeppelin/openzeppelin-sdk/pull/1321))
+- Prevent corruption of compiled artifacts if there are multiple contracts with the same name. ([#1296](https://github.com/OpenZeppelin/openzeppelin-sdk/pull/1296))
+
+### Internal
+- Use the OpenZeppelin CLI to compile and test contracts in the OpenZeppelin CLI. ([#1294](https://github.com/OpenZeppelin/openzeppelin-sdk/pull/1294), [#1288](https://github.com/OpenZeppelin/openzeppelin-sdk/pull/1288))
+
 ## v2.6.0 - 2019-11-07
 
 ### Added
