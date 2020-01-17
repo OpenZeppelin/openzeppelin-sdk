@@ -42,6 +42,20 @@ export interface Option extends ParamSimple {
   default?: string | boolean;
 }
 
+type AbortFunction = () => Promise<void>;
+
+interface Action {
+  action: (params: object) => Promise<void>;
+  preAction?: (params: object) => Promise<void | AbortFunction>;
+}
+
+interface CommandSpec {
+  name: string;
+  description: string;
+  args: Arg[];
+  options: Option[];
+}
+
 export function register(program: Command, spec: CommandSpec, getAction: () => Promise<Action>): void {
   validateSpec(spec);
 
@@ -65,20 +79,6 @@ export function register(program: Command, spec: CommandSpec, getAction: () => P
   for (const opt of spec.options) {
     command.option(opt.format, opt.description, opt.default);
   }
-}
-
-type AbortFunction = () => Promise<void>;
-
-interface Action {
-  action: (params: object) => Promise<void>;
-  preAction?: (params: object) => Promise<void | AbortFunction>;
-}
-
-interface CommandSpec {
-  name: string;
-  description: string;
-  args: Arg[];
-  options: Option[];
 }
 
 // Unifies both options and positional arguments under the same interface of name + Param.
