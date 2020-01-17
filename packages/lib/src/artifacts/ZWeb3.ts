@@ -1,7 +1,6 @@
 import { Loggy } from '../utils/Logger';
-import sleep from '../helpers/sleep';
 import Web3 from 'web3';
-import { TransactionReceipt, provider } from 'web3-core';
+import { provider } from 'web3-core';
 import { Block, Eth } from 'web3-eth';
 import { toChecksumAddress } from 'web3-utils';
 
@@ -122,50 +121,5 @@ export default class ZWeb3 {
   public static async getNetworkName(): Promise<string> {
     const networkId = await ZWeb3.getNetwork();
     return NETWORKS[networkId] || `dev-${networkId}`;
-  }
-
-  public static sendTransactionWithoutReceipt(params: TxParams): Promise<string> {
-    return new Promise((resolve, reject): void => {
-      ZWeb3.eth.sendTransaction({ ...params }, (error, txHash): void => {
-        if (error) {
-          reject(error.message);
-        } else {
-          resolve(txHash);
-        }
-      });
-    });
-  }
-
-  public static async getTransactionReceiptWithTimeout(tx: string, timeout: number): Promise<TransactionReceipt> {
-    return ZWeb3._getTransactionReceiptWithTimeout(tx, timeout, new Date().getTime());
-  }
-
-  private static async _getTransactionReceiptWithTimeout(
-    tx: string,
-    timeout: number,
-    startTime: number,
-  ): Promise<TransactionReceipt | undefined> {
-    const receipt = await ZWeb3._tryGettingTransactionReceipt(tx);
-    if (receipt) {
-      if (receipt.status) return receipt;
-      throw new Error(`Transaction: ${tx} exited with an error (status 0).`);
-    }
-
-    await sleep(1000);
-    const timeoutReached = timeout > 0 && new Date().getTime() - startTime > timeout;
-    if (!timeoutReached) return await ZWeb3._getTransactionReceiptWithTimeout(tx, timeout, startTime);
-    throw new Error(`Transaction ${tx} wasn't processed in ${timeout / 1000} seconds`);
-  }
-
-  private static async _tryGettingTransactionReceipt(tx: string): Promise<TransactionReceipt | undefined> {
-    try {
-      return await ZWeb3.eth.getTransactionReceipt(tx);
-    } catch (error) {
-      if (error.message.includes('unknown transaction')) {
-        return undefined;
-      } else {
-        throw error;
-      }
-    }
   }
 }
