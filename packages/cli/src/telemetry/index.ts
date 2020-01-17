@@ -124,7 +124,7 @@ async function getUserEnvironment(): Promise<UserEnvironment> {
 }
 
 async function getCLIVersion(): Promise<string> {
-  return JSON.parse(await fs.readFile(__dirname + '/../../package.json', 'utf8')).version;
+  return (await fs.readJson(__dirname + '/../../package.json')).version;
 }
 
 function getDependencyVersion(dep: string): string | undefined {
