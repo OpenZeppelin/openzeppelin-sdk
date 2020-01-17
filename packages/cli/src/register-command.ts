@@ -22,7 +22,6 @@ export interface ParamDetails {
 }
 
 // Param is the things common to both positional arguments (Arg) and options (Option).
-// TODO: Validate that only the last positional argument is variadic.
 type Param = ParamSimple | ParamVariadic;
 
 interface ParamSimple {
@@ -44,6 +43,8 @@ export interface Option extends ParamSimple {
 }
 
 export function register(program: Command, spec: CommandSpec, getAction: () => Promise<Action>): void {
+  validateSpec(spec);
+
   const signature = generateSignature(spec.name, spec.args);
 
   const command = program
@@ -221,4 +222,12 @@ function getCommandParams(...args: unknown[]): [Command, CommonParams] {
   }
 
   return [cmd, params];
+}
+
+function validateSpec(spec: CommandSpec) {
+  const firstVariadic = spec.args.findIndex(arg => arg.variadic);
+
+  if (firstVariadic !== -1 && firstVariadic < spec.args.length - 1) {
+    throw new Error('Only the last positional argument can be variadic');
+  }
 }
