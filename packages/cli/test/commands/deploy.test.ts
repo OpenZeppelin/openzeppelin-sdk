@@ -27,7 +27,7 @@ describe('deploy (action)', function() {
     networkFile = new NetworkFile(projectFile, network);
   });
 
-  it('should deploy a simple contract with no constructor', async function() {
+  it('deploys a simple contract with no constructor', async function() {
     const contract = 'SimpleNonUpgradeable';
     await deploy({
       contract,
@@ -45,7 +45,7 @@ describe('deploy (action)', function() {
     (await instance.methods.answer().call()).should.equal('42');
   });
 
-  it('should deploy a simple contract with constructor arguments', async function() {
+  it('deploys a simple contract with constructor arguments', async function() {
     const contract = 'WithConstructorNonUpgradeable';
     await deploy({
       contract,
@@ -73,7 +73,7 @@ describe('deploy (action)', function() {
     }).should.be.rejectedWith('Contract NotExists not found');
   });
 
-  it('should deploy multiple instances', async function() {
+  it('deploys multiple instances', async function() {
     const contract = 'SimpleNonUpgradeable';
     const params = {
       contract,
@@ -104,7 +104,7 @@ describe('deploy (action)', function() {
     instances.should.have.lengthOf(0);
   });
 
-  it('should deploy libraries if necessary', async function() {
+  it('deploys libraries if necessary', async function() {
     const contract = 'WithLibraryNonUpgradeable';
     await deploy({
       contract,
@@ -117,7 +117,7 @@ describe('deploy (action)', function() {
     instances.should.have.lengthOf(1);
   });
 
-  it('should deploy a contract from a dependency', async function() {
+  it('deploys a contract from a dependency', async function() {
     await deploy({
       contract: 'mock-stdlib-undeployed/GreeterBase',
       arguments: [],
@@ -130,7 +130,7 @@ describe('deploy (action)', function() {
   });
 
   // TODO: should redeploy changed libraries, but afaik no good way to test this currently
-  it('should not redeploy unchanged library', async function() {
+  it('does not redeploy unchanged library', async function() {
     const contract = 'WithLibraryNonUpgradeable';
     const options = { contract, network, txParams, networkFile, arguments: [] };
 
