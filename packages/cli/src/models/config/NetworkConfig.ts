@@ -147,6 +147,10 @@ const NetworkConfig = {
       fs.writeFileSync(`${dir}/.gitkeep`, '');
     }
   },
+
+  getConfigFileName(root: string): string {
+    return `${root}/networks.js`;
+  },
 };
 
 export default NetworkConfig;

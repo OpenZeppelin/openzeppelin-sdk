@@ -97,7 +97,9 @@ export async function promptIfNeeded(
 export function networksList(name: string, type: string, message?: string): { [key: string]: any } {
   message = message || 'Pick a network';
   const networks = ConfigManager.getNetworkNamesFromConfig();
-
+  if (isEmpty(networks)) {
+    throw new Error(`No 'networks' found in your configuration file ${ConfigManager.getConfigFileName()}`);
+  }
   return inquirerQuestion(name, message, type, networks);
 }
 
