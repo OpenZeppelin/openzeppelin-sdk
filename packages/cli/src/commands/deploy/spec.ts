@@ -31,7 +31,6 @@ export const args: Arg[] = [
     async details(): Promise<ParamDetails> {
       const choices = await import('../../prompts/choices');
 
-      // TODO: Make this include contracts from _unlinked_ dependencies.
       const contracts = choices.contracts('all');
 
       return {

@@ -129,7 +129,6 @@ describe('deploy (action)', function() {
     instances.should.have.lengthOf(1);
   });
 
-  // TODO: should redeploy changed libraries, but afaik no good way to test this currently
   it('does not redeploy unchanged library', async function() {
     const contract = 'WithLibraryNonUpgradeable';
     const options = { contract, network, txParams, networkFile, arguments: [] };

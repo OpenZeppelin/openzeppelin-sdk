@@ -700,7 +700,6 @@ export default class NetworkController {
       packageName = this.projectFile.name;
     }
 
-    // TODO: Fix for contracts from dependencies that may use libraries.
     if (packageName === this.projectFile.name) {
       await this.deployChangedSolidityLibs(contractAlias);
     }
