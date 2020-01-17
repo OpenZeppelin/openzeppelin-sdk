@@ -37,7 +37,7 @@ const ConfigManager = {
     Contracts.setArtifactsDefaults(artifactDefaults);
 
     try {
-      ZWeb3.initialize(provider);
+      ZWeb3.initialize(provider, { transactionPollingTimeout: timeout });
       await ZWeb3.checkNetworkId(network.networkId);
       const txParams = {
         from: ZWeb3.toChecksumAddress(from || artifactDefaults.from || (await ZWeb3.defaultAccount())),

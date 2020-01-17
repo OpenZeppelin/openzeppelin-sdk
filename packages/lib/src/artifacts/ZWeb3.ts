@@ -21,6 +21,11 @@ export interface TxParams {
   gasPrice?: number | string;
 }
 
+export interface Web3Options {
+  transactionBlockTimeout?: number; // https://web3js.readthedocs.io/en/v1.2.2/web3-eth.html?highlight=timeout#transactionblocktimeout
+  transactionPollingTimeout?: number; // https://web3js.readthedocs.io/en/v1.2.2/web3-eth.html?highlight=timeout#transactionpollingtimeout
+}
+
 // Patch typing for getStorageAt method -- see https://github.com/ethereum/web3.js/pull/3180
 declare module 'web3-eth' {
   interface Eth {
@@ -31,17 +36,21 @@ declare module 'web3-eth' {
 // TS-TODO: Review what could be private in this class.
 export default class ZWeb3 {
   public static provider: provider;
-
   public static web3instance: Web3;
+  public static web3Options: Web3Options;
 
-  public static initialize(provider: provider): void {
+  public static initialize(provider: provider, web3Options: Web3Options = {}): void {
     ZWeb3.provider = provider;
     ZWeb3.web3instance = undefined;
+    ZWeb3.web3Options = web3Options;
   }
 
   public static get web3(): Web3 {
     if (ZWeb3.web3instance === undefined) {
       ZWeb3.web3instance = new Web3(ZWeb3.provider ?? null);
+      const { transactionBlockTimeout, transactionPollingTimeout } = ZWeb3.web3Options;
+      if (transactionBlockTimeout) ZWeb3.web3instance.eth.transactionBlockTimeout = transactionBlockTimeout;
+      if (transactionPollingTimeout) ZWeb3.web3instance.eth.transactionPollingTimeout = transactionPollingTimeout;
     }
 
     return ZWeb3.web3instance;
