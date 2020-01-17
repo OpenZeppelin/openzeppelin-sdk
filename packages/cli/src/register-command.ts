@@ -122,7 +122,7 @@ async function promptOrValidateVariadic(name: string, param: ParamVariadic, para
   const details = await param.details?.(params);
 
   if (details) {
-    if (values.length === 0) {
+    if (values.length === 0 && details?.[0]?.prompt !== undefined) {
       const values = [];
       for (const d of details) {
         if (!params.interactive || DISABLE_INTERACTIVITY) {
@@ -148,7 +148,7 @@ async function promptOrValidateSimple(name: string, param: ParamSimple, params: 
   const details = await param.details?.(params);
 
   if (details) {
-    if (value === undefined) {
+    if (value === undefined && details?.prompt !== undefined) {
       if (!params.interactive || DISABLE_INTERACTIVITY) {
         throw new Error(`Missing required parameter ${name}`);
       }
