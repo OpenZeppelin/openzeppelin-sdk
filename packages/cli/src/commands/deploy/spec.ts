@@ -99,13 +99,15 @@ export const options: Option[] = [
       const { default: Session } = await import('../../models/network/Session');
 
       const networks = ConfigManager.getNetworkNamesFromConfig();
-      const { network: lastNetwork } = Session.getNetwork();
+      const { network: lastNetwork, expired } = Session.getNetwork();
 
-      return {
-        prompt: 'Pick a network',
-        choices: networks,
-        preselect: lastNetwork,
-      };
+      if (expired) {
+        return {
+          prompt: 'Pick a network',
+          choices: networks,
+          preselect: lastNetwork,
+        };
+      }
     },
   },
   {

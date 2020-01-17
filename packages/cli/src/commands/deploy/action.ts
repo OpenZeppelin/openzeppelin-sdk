@@ -1,5 +1,6 @@
 import { getConstructorInputs } from '@openzeppelin/upgrades';
 
+import Session from '../../models/network/Session';
 import { compile } from '../../models/compiler/Compiler';
 import { fromContractFullName } from '../../utils/naming';
 import ConfigManager from '../../models/config/ConfigManager';
@@ -30,8 +31,18 @@ export async function action(params: Options & Args): Promise<void> {
 
   const { contract: contractName, arguments: deployArgs } = params;
 
+  if (params.network === undefined) {
+    const { network: lastNetwork, expired } = Session.getNetwork();
+    if (!expired) {
+      params.network = lastNetwork;
+    }
+  }
+
   const { network, txParams } =
     process.env.NODE_ENV === 'test' ? params : await ConfigManager.initNetworkConfiguration(params);
+
+  // Used for network preselection in subsequent runs.
+  Session.setDefaultNetworkIfNeeded(network);
 
   const { package: packageName, contract: contractAlias } = fromContractFullName(contractName);
 
