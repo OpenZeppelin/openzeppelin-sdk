@@ -1,5 +1,3 @@
-'use strict';
-
 import chalk from 'chalk';
 import program from 'commander';
 import { Loggy } from '@openzeppelin/upgrades';

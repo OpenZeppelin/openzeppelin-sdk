@@ -105,7 +105,7 @@ export default class ValidationLogger {
         __filename,
         'logHasConstructor',
         `validation-has-constructor`,
-        `- Contract ${this.contractName} has an explicit constructor. Change it to an initializer function. See ${INITIALIZERS_LINK}.`,
+        `- Contract ${this.contractName} or an ancestor has a constructor. Change it to an initializer function. See ${INITIALIZERS_LINK}.`,
       );
     }
   }

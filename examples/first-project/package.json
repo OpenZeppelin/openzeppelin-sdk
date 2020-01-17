@@ -10,6 +10,7 @@
     "test": "scripts/test-ci.sh"
   },
   "dependencies": {
+    "@openzeppelin/contract-loader": "0.6.0",
     "web3": "1.2.2"
   },
   "devDependencies": {

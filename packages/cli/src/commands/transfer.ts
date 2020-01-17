@@ -32,7 +32,7 @@ async function action(options: any): Promise<void> {
   const { network, txParams } = await ConfigManager.initNetworkConfiguration(promptedConfig, true);
 
   const transferOpts = { from, to, value };
-  const transferProps = getCommandProps(await ZWeb3.accounts(), unit);
+  const transferProps = getCommandProps(await ZWeb3.eth.getAccounts(), unit);
   const promptedTransfer = await promptIfNeeded({ opts: transferOpts, props: transferProps }, interactive);
 
   await Telemetry.report('transfer', { ...promptedTransfer, unit, network, txParams }, interactive);

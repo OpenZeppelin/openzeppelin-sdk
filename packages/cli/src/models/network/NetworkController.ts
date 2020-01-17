@@ -1,5 +1,3 @@
-'use strict';
-
 import fs from 'fs-extra';
 import isEmpty from 'lodash.isempty';
 import intersection from 'lodash.intersection';
@@ -803,7 +801,7 @@ export default class NetworkController {
   // Proxy model
   private async _checkDeploymentAddress(salt: string) {
     const deploymentAddress = await this.getProxyDeploymentAddress(salt);
-    if ((await ZWeb3.getCode(deploymentAddress)) !== '0x')
+    if ((await ZWeb3.eth.getCode(deploymentAddress)) !== '0x')
       throw new Error(`Deployment address for salt ${salt} is already in use`);
   }
 

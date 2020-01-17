@@ -46,6 +46,14 @@ interface ContractASTProps {
   nodesFilter?: string[];
 }
 
+export const ContractDefinitionFilter = {
+  nodesFilter: ['ContractDefinition'],
+};
+
+export const FunctionDefinitionFilter = {
+  nodesFilter: ['ContractDefinition', 'FunctionDefinition'],
+};
+
 class NodeNotFoundError extends Error {
   public constructor(id, type) {
     super(`No AST nodes of type ${type} with id ${id} found.`);
@@ -100,7 +108,7 @@ export default class ContractAST {
     return this.imports;
   }
 
-  public getMethods(attributes?: string[]): any {
+  public getMethods(attributes?: string[]): any[] {
     const baseContracts = this.getLinearizedBaseContracts();
     return flatten(baseContracts.map(contract => contract.nodes))
       .filter(({ nodeType, name }) => nodeType === 'FunctionDefinition' && this._isValidMethodName(name))
