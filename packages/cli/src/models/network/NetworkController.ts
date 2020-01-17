@@ -249,14 +249,11 @@ export default class NetworkController {
     await this._setSolidityLibs(libClass); // Libraries may depend on other libraries themselves
     Loggy.spin(__filename, '_uploadSolidityLib', `upload-solidity-lib${libName}`, `Uploading ${libName} library`);
 
-    let libInstance;
-
-    if (this.project === undefined) {
-      // There is no project for non-upgradeable deploys.
-      libInstance = await Transactions.deployContract(libClass);
-    } else {
-      libInstance = await this.project.setImplementation(libClass, libName);
-    }
+    const libInstance =
+      this.project === undefined
+        ? // There is no project for non-upgradeable deploys.
+          await Transactions.deployContract(libClass)
+        : await this.project.setImplementation(libClass, libName);
 
     this.networkFile.addSolidityLib(libName, libInstance);
 
