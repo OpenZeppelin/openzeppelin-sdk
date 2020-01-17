@@ -4,7 +4,7 @@ import { TxParams } from '@openzeppelin/upgrades';
 import NetworkFile from '../../models/files/NetworkFile';
 import { DEFAULT_TX_TIMEOUT } from '../../models/network/defaults';
 
-const kinds = ['regular', 'upgradeable'] as const;
+const kinds = ['regular', 'upgradeable', 'minimal'] as const;
 type Kind = typeof kinds[number]; // Union of all members of the kinds array.
 
 export interface Args {

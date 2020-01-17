@@ -18,20 +18,14 @@ export async function preAction(params: Options & Args): Promise<void | (() => P
   // If the user requests upgradeability via flag, we short circuit to the
   // create action. This avoid issues parsing deploy arguments due to the
   // deploy action being unaware of initializer functions.
-  if (params.kind === 'upgradeable') {
-    return async () => {
-      if (params.arguments.length > 0) {
-        // Translate arguments to syntax expected by create.
-        params['args'] = params.arguments.join(',');
-      }
-      await createAction(params.contract, params);
-    };
+  if (params.kind !== 'regular') {
+    return () => runCreate(params);
   }
 }
 
 export async function action(params: Options & Args): Promise<void> {
-  if (params.kind === 'upgradeable') {
-    return createAction(params.contract, params);
+  if (params.kind !== 'regular') {
+    return runCreate(params);
   }
 
   const { contract: contractName, arguments: deployArgs } = params;
@@ -54,4 +48,17 @@ export async function action(params: Options & Args): Promise<void> {
   } finally {
     controller.writeNetworkPackageIfNeeded();
   }
+}
+
+async function runCreate(params: Options & Args): Promise<void> {
+  if (params.arguments.length > 0) {
+    // Translate arguments to syntax expected by create.
+    params['args'] = params.arguments.join(',');
+  }
+
+  if (params.kind === 'minimal') {
+    params['minimal'] = true;
+  }
+
+  await createAction(params.contract, params);
 }
