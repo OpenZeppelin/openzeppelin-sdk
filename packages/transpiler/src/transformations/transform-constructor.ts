@@ -1,20 +1,13 @@
-import { getVarDeclarations, getNodeSources, getConstructor } from '../solc/ast-utils';
+import { getNodeSources, getConstructor } from '../solc/ast-utils';
+import { getVarInits } from './get-var-inits';
 import { Transformation } from '../transformation';
 import { buildSuperCallsForChain } from './build-super-calls-for-chain';
 import { ContractDefinition } from '../solc/ast-node';
 import { Artifact } from '../solc/artifact';
 
-function getVarInits(contractNode: ContractDefinition, source: string): string {
-  const varDeclarations = getVarDeclarations(contractNode);
-  return varDeclarations
-    .filter(vr => vr.value && !vr.constant)
-    .map(vr => {
-      const [, , varSource] = getNodeSources(vr, source);
-
-      const match = /(.*)(=.*)/.exec(varSource);
-      if (!match) throw new Error(`Can't find = in ${varSource}`);
-      return `\n        ${vr.name} ${match[2]};`;
-    })
+function getVarInitsPart(contractNode: ContractDefinition, source: string): string {
+  return getVarInits(contractNode, source)
+    .map(([vr, , match]) => `\n        ${vr.name} ${match[2]};`)
     .join('');
 }
 
@@ -26,7 +19,7 @@ export function transformConstructor(
 ): Transformation[] {
   const superCalls = buildSuperCallsForChain(contractNode, source, contracts, contractsToArtifactsMap);
 
-  const declarationInserts = getVarInits(contractNode, source);
+  const declarationInserts = getVarInitsPart(contractNode, source);
 
   const constructorNode = getConstructor(contractNode);
 
