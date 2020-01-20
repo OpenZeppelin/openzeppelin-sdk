@@ -45,9 +45,9 @@ export function transformConstructor(
     constructorArgsList = constructorNode.parameters.parameters.map(par => par.name).join(',');
   }
 
-  constructorParameterList = constructorParameterList ? constructorParameterList : '';
+  constructorParameterList = constructorParameterList ?? '';
   const constructorParameterListWithComma = constructorParameterList ? `, ${constructorParameterList}` : '';
-  constructorBodySource = constructorBodySource ? constructorBodySource : '';
+  constructorBodySource = constructorBodySource ?? '';
   constructorArgsList = constructorArgsList ? `, ${constructorArgsList}` : '';
 
   const initializeFuncText = isFullyImplemented
