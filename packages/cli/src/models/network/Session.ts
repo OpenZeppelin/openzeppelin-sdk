@@ -116,7 +116,7 @@ function describe(session: SessionOptions): string {
       session.network && `network ${session.network}`,
       session.from && `sender address ${session.from}`,
       session.timeout && `timeout ${session.timeout} seconds`,
-      session.blockTimeout && `timeout ${session.blockTimeout} blocks`,
+      session.blockTimeout && `blockTimeout ${session.blockTimeout} blocks`,
     ]).join(', ') || 'no options'
   );
 }
