@@ -4,5 +4,5 @@ export { transformParents } from './transform-parents';
 export { transformContractName } from './transform-contract-name';
 export { purgeVarInits } from './purge-var-inits';
 export { transformConstructor } from './transform-constructor';
-export { purgeContracts } from './purge-contracts';
+export { purgeExceptContracts } from './purge-contracts';
 export { fixImportDirectives } from './fix-import-directives';

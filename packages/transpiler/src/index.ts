@@ -7,7 +7,7 @@ import {
   transformContractName,
   appendDirective,
   prependBaseClass,
-  purgeContracts,
+  purgeExceptContracts,
   transformParents,
   fixImportDirectives,
   purgeVarInits,
@@ -65,7 +65,7 @@ export function transpileContracts(contracts: string[], artifacts: Artifact[]): 
         transformations: [
           appendDirective(art.ast, directive),
           ...fixImportDirectives(art, artifacts, contractsToTranspile),
-          ...purgeContracts(art.ast, contractsToTranspile),
+          ...purgeExceptContracts(art.ast, contractsToTranspile),
         ],
         source: '',
       };
