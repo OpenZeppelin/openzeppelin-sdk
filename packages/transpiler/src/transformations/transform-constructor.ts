@@ -1,4 +1,4 @@
-import { getNodeSources, getConstructor } from '../solc/ast-utils';
+import { getNodeSources, getConstructor, stripBraces } from '../solc/ast-utils';
 import { getVarInits } from './get-var-inits';
 import { Transformation } from '../transformation';
 import { buildSuperCallsForChain } from './build-super-calls-for-chain';
@@ -30,13 +30,9 @@ export function transformConstructor(
   let constructorParameterList = null;
   let constructorArgsList = null;
   if (constructorNode) {
-    constructorBodySource = getNodeSources(constructorNode.body, source)[2]
-      .slice(1)
-      .slice(0, -1);
+    constructorBodySource = stripBraces(getNodeSources(constructorNode.body, source)[2]);
 
-    constructorParameterList = getNodeSources(constructorNode.parameters, source)[2]
-      .slice(1)
-      .slice(0, -1);
+    constructorParameterList = stripBraces(getNodeSources(constructorNode.parameters, source)[2]);
 
     const [start, len] = getNodeSources(constructorNode, source);
 

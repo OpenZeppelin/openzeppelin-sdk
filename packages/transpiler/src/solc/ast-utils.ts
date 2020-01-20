@@ -10,8 +10,6 @@ import {
   PragmaDirective,
   VariableDeclaration,
   FunctionDefinition,
-  SourceUnit,
-  ModifierDefinition,
   ModifierInvocation,
 } from './ast-node';
 import { Artifact } from './artifact';
@@ -127,4 +125,8 @@ export function getContract(art: Artifact): ContractDefinition {
 
 export function getContractById(node: Node, id: number): ContractDefinition | null {
   return getFirstNode(node, (node): node is ContractDefinition => isContractDefinition(node) && node.id === id);
+}
+
+export function stripBraces(source: string): string {
+  return source.slice(1).slice(0, -1);
 }
