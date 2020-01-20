@@ -14,13 +14,13 @@ export function transformParents(
     return contractNode.baseContracts
       .filter(base => contracts.some(contract => base.baseName.name === contract.contractName))
       .map(base => {
-        const [start, , baseSource] = getNodeSources(base.baseName, source);
+        const [start] = getNodeSources(base.baseName, source);
         const [, len] = getNodeSources(base, source);
 
         return {
           start: start,
           end: start + len,
-          text: `${baseSource}Upgradable`,
+          text: `${base.baseName.name}Upgradable`,
         };
       });
   } else return [];
