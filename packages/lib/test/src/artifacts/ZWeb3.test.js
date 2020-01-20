@@ -65,52 +65,6 @@ describe('ZWeb3', function() {
       block.number.should.not.be.null;
     });
 
-    describe('transactions', function() {
-      beforeEach('sending transaction', async function() {
-        const value = new BN(1e18).toString(10);
-        this.receiverBalanceTracker = await balance.tracker(receiverAccount);
-        const receipt = await ZWeb3.eth.sendTransaction({ from: accounts[0], to: receiverAccount, value });
-        this.txHash = receipt.transactionHash;
-      });
-
-      describe('get transaction receipt with timeout', function() {
-        beforeEach('get receipt', async function() {
-          this.timeout = 3000;
-          this.receipt = await ZWeb3.eth.getTransactionReceipt(this.txHash);
-        });
-
-        afterEach(() => sinon.restore());
-
-        describe('when the transaction receipt takes less than the specified timeout', function() {
-          beforeEach('stub ZWeb3', function() {
-            sinon.stub(ZWeb3.eth, 'getTransactionReceipt').resolves(this.receipt);
-          });
-
-          it('returns the transaction receipt', async function() {
-            const receipt = await ZWeb3.getTransactionReceiptWithTimeout(this.txHash, this.timeout);
-            receipt.should.be.deep.equal(this.receipt);
-          });
-        });
-
-        describe('when the transaction receipt fails continuously', function() {
-          beforeEach('stub ZWeb3', function() {
-            sinon.stub(ZWeb3.eth, 'getTransactionReceipt').throws('Error', 'unknown transaction');
-          });
-
-          it('fails', async function() {
-            try {
-              await ZWeb3.getTransactionReceiptWithTimeout(this.txHash, this.timeout);
-              assert.fail('expecting get transaction receipt to timeout');
-            } catch (error) {
-              error.message.should.be.eq(
-                `Transaction ${this.txHash} wasn't processed in ${this.timeout / 1000} seconds`,
-              );
-            }
-          }).timeout(5000);
-        });
-      });
-    });
-
     describe('checksum address', function() {
       context('when address has uppercase hexa letters', function() {
         context('when address is not well checksummed', function() {

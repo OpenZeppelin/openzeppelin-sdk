@@ -5,20 +5,14 @@ import ZWeb3 from './ZWeb3';
 import { getSolidityLibNames, hasUnlinkedVariables } from '../utils/Bytecode';
 
 export default class Contracts {
-  private static DEFAULT_SYNC_TIMEOUT = 240000;
   private static DEFAULT_BUILD_DIR = `build/contracts`;
   private static DEFAULT_CONTRACTS_DIR = `contracts`;
 
-  private static timeout: number = Contracts.DEFAULT_SYNC_TIMEOUT;
   private static buildDir: string = Contracts.DEFAULT_BUILD_DIR;
   private static contractsDir: string = Contracts.DEFAULT_CONTRACTS_DIR;
   private static projectRoot: string = null;
   private static artifactDefaults: any = {};
   private static defaultFromAddress: string;
-
-  public static getSyncTimeout(): number {
-    return Contracts.timeout || Contracts.DEFAULT_SYNC_TIMEOUT;
-  }
 
   public static getLocalBuildDir(): string {
     return path.resolve(Contracts.buildDir || Contracts.DEFAULT_BUILD_DIR);
@@ -76,10 +70,6 @@ export default class Contracts {
   public static listBuildArtifacts(pathName?: string): string[] {
     const buildDir = pathName || Contracts.getLocalBuildDir();
     return glob.sync(`${buildDir}/*.json`);
-  }
-
-  public static setSyncTimeout(value: number): void {
-    Contracts.timeout = value;
   }
 
   public static setLocalBuildDir(dir: string): void {

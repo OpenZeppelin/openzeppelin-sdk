@@ -1,7 +1,6 @@
 import { Loggy } from '../utils/Logger';
-import sleep from '../helpers/sleep';
 import Web3 from 'web3';
-import { TransactionReceipt, provider } from 'web3-core';
+import { provider } from 'web3-core';
 import { Block, Eth } from 'web3-eth';
 import { toChecksumAddress } from 'web3-utils';
 
@@ -22,6 +21,11 @@ export interface TxParams {
   gasPrice?: number | string;
 }
 
+export interface Web3Options {
+  blockTimeout?: number; // https://web3js.readthedocs.io/en/v1.2.2/web3-eth.html?highlight=timeout#transactionblocktimeout
+  pollingTimeout?: number; // https://web3js.readthedocs.io/en/v1.2.2/web3-eth.html?highlight=timeout#transactionpollingtimeout
+}
+
 // Patch typing for getStorageAt method -- see https://github.com/ethereum/web3.js/pull/3180
 declare module 'web3-eth' {
   interface Eth {
@@ -32,17 +36,21 @@ declare module 'web3-eth' {
 // TS-TODO: Review what could be private in this class.
 export default class ZWeb3 {
   public static provider: provider;
-
   public static web3instance: Web3;
+  public static web3Options: Web3Options;
 
-  public static initialize(provider: provider): void {
+  public static initialize(provider: provider, web3Options: Web3Options = {}): void {
     ZWeb3.provider = provider;
     ZWeb3.web3instance = undefined;
+    ZWeb3.web3Options = web3Options;
   }
 
   public static get web3(): Web3 {
     if (ZWeb3.web3instance === undefined) {
       ZWeb3.web3instance = new Web3(ZWeb3.provider ?? null);
+      const { blockTimeout, pollingTimeout } = ZWeb3.web3Options;
+      if (blockTimeout) ZWeb3.web3instance.eth.transactionBlockTimeout = blockTimeout;
+      if (pollingTimeout) ZWeb3.web3instance.eth.transactionPollingTimeout = pollingTimeout;
     }
 
     return ZWeb3.web3instance;
@@ -122,50 +130,5 @@ export default class ZWeb3 {
   public static async getNetworkName(): Promise<string> {
     const networkId = await ZWeb3.getNetwork();
     return NETWORKS[networkId] || `dev-${networkId}`;
-  }
-
-  public static sendTransactionWithoutReceipt(params: TxParams): Promise<string> {
-    return new Promise((resolve, reject): void => {
-      ZWeb3.eth.sendTransaction({ ...params }, (error, txHash): void => {
-        if (error) {
-          reject(error.message);
-        } else {
-          resolve(txHash);
-        }
-      });
-    });
-  }
-
-  public static async getTransactionReceiptWithTimeout(tx: string, timeout: number): Promise<TransactionReceipt> {
-    return ZWeb3._getTransactionReceiptWithTimeout(tx, timeout, new Date().getTime());
-  }
-
-  private static async _getTransactionReceiptWithTimeout(
-    tx: string,
-    timeout: number,
-    startTime: number,
-  ): Promise<TransactionReceipt | undefined> {
-    const receipt = await ZWeb3._tryGettingTransactionReceipt(tx);
-    if (receipt) {
-      if (receipt.status) return receipt;
-      throw new Error(`Transaction: ${tx} exited with an error (status 0).`);
-    }
-
-    await sleep(1000);
-    const timeoutReached = timeout > 0 && new Date().getTime() - startTime > timeout;
-    if (!timeoutReached) return await ZWeb3._getTransactionReceiptWithTimeout(tx, timeout, startTime);
-    throw new Error(`Transaction ${tx} wasn't processed in ${timeout / 1000} seconds`);
-  }
-
-  private static async _tryGettingTransactionReceipt(tx: string): Promise<TransactionReceipt | undefined> {
-    try {
-      return await ZWeb3.eth.getTransactionReceipt(tx);
-    } catch (error) {
-      if (error.message.includes('unknown transaction')) {
-        return undefined;
-      } else {
-        throw error;
-      }
-    }
   }
 }

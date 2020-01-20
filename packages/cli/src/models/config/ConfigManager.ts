@@ -28,17 +28,16 @@ const ConfigManager = {
     root: string = process.cwd(),
   ): Promise<{ network: string; txParams: TxParams } | never> {
     this.initStaticConfiguration(root);
-    const { network: networkName, from, timeout } = Session.getOptions(options, silent);
+    const { network: networkName, from, timeout, blockTimeout } = Session.getOptions(options, silent);
     Session.setDefaultNetworkIfNeeded(options.network);
     if (!networkName) throw Error('A network name must be provided to execute the requested action.');
 
     const { provider, artifactDefaults, network } = await this.config.loadNetworkConfig(networkName, root);
 
-    Contracts.setSyncTimeout(timeout * 1000);
     Contracts.setArtifactsDefaults(artifactDefaults);
 
     try {
-      ZWeb3.initialize(provider);
+      ZWeb3.initialize(provider, { pollingTimeout: timeout, blockTimeout });
       await ZWeb3.checkNetworkId(network.networkId);
       const txParams = {
         from: ZWeb3.toChecksumAddress(from || artifactDefaults.from || (await ZWeb3.defaultAccount())),
