@@ -19,11 +19,6 @@ interface GlobalTelemetryOptions {
   salt: string;
 }
 
-export interface CommandData {
-  name: string;
-  network?: string;
-}
-
 export interface UserEnvironment {
   platform: string;
   arch: string;
@@ -51,14 +46,14 @@ export default {
 
     // Conceal data before sending it
     const concealedData = concealData(params, telemetryOptions.salt);
-    const commandData: Concealed<CommandData> = { ...concealedData, name: commandName };
+    const commandData: StringObject = { ...concealedData, name: commandName };
     if (network !== undefined) commandData.network = network;
 
     const userEnvironment = await getUserEnvironment();
     this.sendToFirebase(telemetryOptions.uuid, commandData, userEnvironment);
   },
 
-  sendToFirebase(uuid: string, commandData: Concealed<CommandData>, userEnvironment: UserEnvironment): void {
+  sendToFirebase(uuid: string, commandData: StringObject, userEnvironment: UserEnvironment): void {
     // We send to Firebase in a child process so that the CLI is not blocked from exiting.
     const child = proc.fork(path.join(__dirname, './send-to-firebase'), [], {
       stdio: ['ignore', 'ignore', 'ignore', 'ipc'],
@@ -143,7 +138,7 @@ function hashField(field: Field, salt: string): string {
   return hash.digest('hex');
 }
 
-function concealData<T>(obj: T, salt: string): Concealed<T> {
+function concealData(obj: object, salt: string): StringObject {
   return mapValues(obj, function recur(val) {
     if (Array.isArray(val)) {
       return val.map(recur);
@@ -155,13 +150,4 @@ function concealData<T>(obj: T, salt: string): Concealed<T> {
   });
 }
 
-// This type essentially recursively converts everything into a string.
-type Concealed<T> = T extends (infer U)[]
-  ? ConcealedArray<U>
-  : T extends object
-  ? { [P in keyof T]: Concealed<T[P]> }
-  : string;
-
-// Necessary to avoid error on the recursive type alias.
-// https://github.com/Microsoft/TypeScript/issues/3496#issuecomment-128553540
-interface ConcealedArray<T> extends Array<Concealed<T>> {}
+export type StringObject = { [key in string]?: string | StringObject };
