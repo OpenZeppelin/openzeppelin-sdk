@@ -49,7 +49,7 @@ function getProjectPath(file: string, dir: string): [string, string] {
 
 function getRootFromFilePath(file: string): string {
   const dir = path.dirname(file);
-  return dir === OPEN_ZEPPELIN_FOLDER ? path.dirname(dir) : dir;
+  return path.basename(dir) === OPEN_ZEPPELIN_FOLDER ? path.dirname(dir) : dir;
 }
 
 function getFileFromRoot(dir: string): string {
