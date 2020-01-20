@@ -104,21 +104,24 @@ describe('prompt', function() {
     });
 
     describe('#networksList', function() {
-      beforeEach('set stub and initialize', function() {
-        this.stub = sinon.stub(ConfigManager, 'getNetworkNamesFromConfig').returns(['Meinet', 'Rinkebay']);
-      });
-
       afterEach('restore stub', function() {
         sinon.restore();
       });
 
       it('returns an object with correct keys and values', function() {
+        this.stub = sinon.stub(ConfigManager, 'getNetworkNamesFromConfig').returns(['Meinet', 'Rinkebay']);
+
         const networkList = networksList('network', 'listy');
         networkList.should.be.an('object');
         networkList.network.should.be.an('object').that.has.all.keys('type', 'message', 'choices');
         networkList.network.type.should.eq('listy');
         networkList.network.message.should.eq('Pick a network');
         networkList.network.choices.should.have.members(['Meinet', 'Rinkebay']);
+      });
+
+      it('throws if no networks are set', function() {
+        this.stub = sinon.stub(ConfigManager, 'getNetworkNamesFromConfig').returns(undefined);
+        expect(() => networksList('network', 'listy')).to.throw(/No 'networks' found/);
       });
     });
 

@@ -78,6 +78,11 @@ const ConfigManager = {
     return config && config.networks ? Object.keys(config.networks) : undefined;
   },
 
+  getConfigFileName(root: string = process.cwd()): string {
+    this.setBaseConfig(root);
+    return this.config.getConfigFileName(root);
+  },
+
   setBaseConfig(root: string = process.cwd()): void | null | never {
     if (this.config) return;
 
