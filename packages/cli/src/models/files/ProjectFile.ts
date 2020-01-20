@@ -8,7 +8,6 @@ import { Loggy } from '@openzeppelin/upgrades';
 import Dependency from '../dependency/Dependency';
 import { MANIFEST_VERSION, checkVersion } from './ManifestVersion';
 import { OPEN_ZEPPELIN_FOLDER } from './constants';
-import NetworkFile from './NetworkFile';
 import { ProjectCompilerOptions } from '../compiler/ProjectCompilerOptions';
 
 interface ConfigFileCompilerOptions {
@@ -42,6 +41,22 @@ interface ProjectFileData {
   telemetryOptIn?: boolean;
 }
 
+function getProjectPath(file: string, dir: string): [string, string] {
+  if (!dir) dir = file ? getRootFromFilePath(file) : process.cwd();
+  if (!file) file = getFileFromRoot(dir);
+  return [file, dir];
+}
+
+function getRootFromFilePath(file: string): string {
+  const dir = path.dirname(file);
+  return dir === OPEN_ZEPPELIN_FOLDER ? path.dirname(dir) : dir;
+}
+
+function getFileFromRoot(dir: string): string {
+  // TODO-v3: remove legacy project file support, preferring the new format over the old one
+  return [PROJECT_FILE_PATH, LEGACY_PROJECT_FILE_NAME].map(p => path.join(dir, p)).find(fs.existsSync);
+}
+
 export const PROJECT_FILE_NAME = 'project.json';
 export const PROJECT_FILE_PATH = path.join(OPEN_ZEPPELIN_FOLDER, PROJECT_FILE_NAME);
 export const LEGACY_PROJECT_FILE_NAME = 'zos.json';
@@ -57,12 +72,21 @@ export default class ProjectFile {
     return project.linkedDependencies;
   }
 
-  public constructor(filePath: string = null) {
+  public static getExistingProject(folder: string): ProjectFile {
+    const projectFile = new ProjectFile(null, folder);
+    if (!projectFile.exists()) {
+      throw new Error(`Could not find an .openzeppelin/project.json or zos.json file in ${folder}`);
+    }
+    return projectFile;
+  }
+
+  public constructor(filePath: string = null, root: string = null) {
     const defaultData = {
       manifestVersion: MANIFEST_VERSION,
     } as any;
-    this.root = filePath ? path.dirname(filePath) : process.cwd();
-    this.filePath = filePath ?? ProjectFile.getExistingFilePath(this.root);
+
+    [this.filePath, this.root] = getProjectPath(filePath, root);
+
     if (this.filePath) {
       try {
         this.data = fs.existsSync(this.filePath) ? fs.readJsonSync(this.filePath) : null;
@@ -266,12 +290,6 @@ export default class ProjectFile {
         exists ? `Updated ${this.filePath}` : `Created ${this.filePath}`,
       );
     }
-  }
-
-  public static getExistingFilePath(dir: string = process.cwd(), ...paths: string[]): string {
-    // TODO-v3: remove legacy project file support
-    // Prefer the new format over the old one
-    return [...paths, `${dir}/${PROJECT_FILE_PATH}`, `${dir}/${LEGACY_PROJECT_FILE_NAME}`].find(fs.existsSync);
   }
 
   private hasChanged(): boolean {
