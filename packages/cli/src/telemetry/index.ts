@@ -37,28 +37,25 @@ export default {
     const telemetryOptions = await checkOptIn(interactive);
     if (telemetryOptions === undefined || !telemetryOptions.optIn) return;
 
-    // normalize network name
-    const { ZWeb3 } = await import('@openzeppelin/upgrades');
-    let network = await ZWeb3.getNetworkName();
-    if (network.match(/dev-/)) {
-      network = 'development';
-    }
-
     // Conceal data before sending it
     const concealedData = concealData(params, telemetryOptions.salt);
     const commandData: StringObject = { ...concealedData, name: commandName };
-    if (network !== undefined) commandData.network = network;
 
     const userEnvironment = await getUserEnvironment();
-    this.sendToFirebase(telemetryOptions.uuid, commandData, userEnvironment);
+    this.sendToFirebase(telemetryOptions.uuid, commandData, userEnvironment, params['network']);
   },
 
-  sendToFirebase(uuid: string, commandData: StringObject, userEnvironment: UserEnvironment): void {
+  sendToFirebase(
+    uuid: string,
+    commandData: StringObject,
+    userEnvironment: UserEnvironment,
+    userNetwork?: string,
+  ): void {
     // We send to Firebase in a child process so that the CLI is not blocked from exiting.
     const child = proc.fork(path.join(__dirname, './send-to-firebase'), [], {
       stdio: ['ignore', 'ignore', 'ignore', 'ipc'],
     });
-    child.send({ uuid, commandData, userEnvironment });
+    child.send({ uuid, commandData, userEnvironment, userNetwork });
 
     // Allow this process to exit while the child is still alive.
     child.disconnect();
