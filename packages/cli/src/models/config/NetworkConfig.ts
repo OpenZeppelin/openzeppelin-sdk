@@ -63,15 +63,17 @@ const NetworkConfig = {
   },
 
   exists(root: string = process.cwd()): boolean {
-    return fs.existsSync(`${root}/networks.js`);
+    const filename = this.getConfigFileName(root);
+    return fs.existsSync(filename);
   },
 
   getConfig(root: string = process.cwd()): ConfigInterface {
+    const filename = this.getConfigFileName(root);
     // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const zosConfigFile = require(`${root}/networks.js`);
+    const networksConfigFile = require(filename);
     const buildDir = `${root}/build/contracts`;
 
-    return { ...zosConfigFile, buildDir };
+    return { ...networksConfigFile, buildDir };
   },
 
   getBuildDir(): string {
@@ -137,7 +139,8 @@ const NetworkConfig = {
   createNetworkConfigFile(root: string): void {
     if (!this.exists(root)) {
       const blueprint = path.resolve(__dirname, './blueprint.networks.js');
-      fs.copyFileSync(blueprint, `${root}/networks.js`);
+      const target = this.getConfigFileName(root);
+      fs.copyFileSync(blueprint, target);
     }
   },
 
@@ -146,6 +149,10 @@ const NetworkConfig = {
       fs.mkdirSync(dir);
       fs.writeFileSync(`${dir}/.gitkeep`, '');
     }
+  },
+
+  getConfigFileName(root: string): string {
+    return `${root}/networks.js`;
   },
 };
 

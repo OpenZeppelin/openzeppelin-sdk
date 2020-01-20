@@ -2,7 +2,7 @@
 require('../setup');
 
 import { expect } from 'chai';
-
+import path from 'path';
 import ProjectFile from '../../src/models/files/ProjectFile';
 import { MANIFEST_VERSION } from '../../src/models/files/ManifestVersion';
 
@@ -35,6 +35,21 @@ describe('ProjectFile', function() {
       expect(() => new ProjectFile('test/mocks/packages/package-unsupported-manifest-version.zos.json')).to.throw(
         /Unrecognized manifest version identifier 3/,
       );
+    });
+  });
+
+  describe('instance methods', function() {
+    describe('#setCompilerOptions', function() {
+      it('ensures relative paths to project file', function() {
+        const file = new ProjectFile('test/mocks/packages/new.zos.json');
+        file.setCompilerOptions({
+          inputDir: path.resolve('test/mocks/myContracts'), // path.resolve ensures absolute paths
+          outputDir: path.resolve('test/mocks/myBuild/contracts'),
+        });
+
+        file.compilerOptions.inputDir.should.eq('../myContracts');
+        file.compilerOptions.outputDir.should.eq('../myBuild/contracts');
+      });
     });
   });
 

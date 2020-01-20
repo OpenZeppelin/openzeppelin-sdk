@@ -1,6 +1,6 @@
 {
   "name": "example-openzeppelin-upgrades-simple",
-  "version": "2.6.0",
+  "version": "2.7.0-rc.0",
   "private": true,
   "main": "index.js",
   "scripts": {
@@ -9,11 +9,11 @@
   },
   "license": "ISC",
   "dependencies": {
-    "@openzeppelin/upgrades": "^2.6.0"
+    "@openzeppelin/upgrades": "2.7.0-rc.0"
   },
   "devDependencies": {
+    "@openzeppelin/cli": "2.7.0-rc.0",
     "@openzeppelin/test-environment": "^0.1.1",
-    "@openzeppelin/cli": "^2.6.0",
     "chai": "^4.1.2",
     "mocha": "^6.2.2"
   }
