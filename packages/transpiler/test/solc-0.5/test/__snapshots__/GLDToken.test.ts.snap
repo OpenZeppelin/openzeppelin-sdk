@@ -15,6 +15,7 @@ contract GLDTokenUpgradable is Initializable, ERC20Upgradable, ERC20DetailedUpgr
     function __init(bool callChain, uint256 initialSupply) internal {
         if(callChain) {
             ContextUpgradable.__init(false);
+            ERC20Upgradable.__init(false);
             ERC20DetailedUpgradable.__init(false, \\"Gold\\", \\"GLD\\", 18);
         }
         

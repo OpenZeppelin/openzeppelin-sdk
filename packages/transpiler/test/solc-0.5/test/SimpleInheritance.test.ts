@@ -1,7 +1,12 @@
 import { shouldTranspileToValidContract } from './LocalConract.behaviour';
 
 describe(`SimpleInheritance contract`, (): void => {
-  shouldTranspileToValidContract('SIB', {
+  shouldTranspileToValidContract('SIC', {
+    SIC: {
+      path: 'SimpleInheritance',
+      fileName: 'SimpleInheritance',
+      contracts: ['SIC', 'SIB', 'SIA'],
+    },
     SIB: {
       path: 'SimpleInheritance',
       fileName: 'SimpleInheritance',

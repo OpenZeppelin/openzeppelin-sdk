@@ -9,9 +9,13 @@ contract SIA {
 }
 
 contract SIB is SIA {
+    uint256 public val = 123;
+}
+
+contract SIC is SIB {
     string public bar = "hello";
-    constructor(string memory input) public {
-        bar = input;
-        emit log("SIB");
+    constructor() public {
+        bar = "changed";
+        emit log("SIC");
     }
 }

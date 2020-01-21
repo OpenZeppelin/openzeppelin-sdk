@@ -38,15 +38,7 @@ function buildSuperCalls(
           if (mod) {
             return buildSuperCall(mod.arguments, mod.modifierName.name, source);
           } else {
-            const contractName = base.baseName.name;
-            const art = contractsToArtifactsMap[contractName];
-            const node = getContract(art);
-            const constructorNode = getConstructor(node);
-
-            return (constructorNode && !constructorNode.parameters.parameters.length) ||
-              (base.arguments && base.arguments.length)
-              ? buildSuperCall(base.arguments, contractName, source)
-              : [];
+            return buildSuperCall(base.arguments, base.baseName.name, source);
           }
         }),
     ];
