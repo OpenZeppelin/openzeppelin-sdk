@@ -26,7 +26,6 @@ function buildSuperCalls(
   source: string,
   contracts: Artifact[],
   mods: ModifierInvocation[],
-  contractsToArtifactsMap: Record<string, Artifact>,
 ): (string | never[])[] {
   const hasInheritance = node.baseContracts.length;
   if (hasInheritance) {
@@ -70,7 +69,7 @@ export function buildSuperCallsForChain(
     ...new Set(
       flatten(
         chain.map(base => {
-          return buildSuperCalls(getContract(base), source, contracts, mods, contractsToArtifactsMap).reverse();
+          return buildSuperCalls(getContract(base), source, contracts, mods).reverse();
         }),
       ),
     ),

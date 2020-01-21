@@ -12,7 +12,7 @@ export function transformParents(
 
   if (hasInheritance) {
     return contractNode.baseContracts
-      .filter(base => contracts.some(contract => base.baseName.name === contract.contractName))
+      .filter(base => contracts.map(o => o.contractName).includes(base.baseName.name))
       .map(base => {
         const [start] = getNodeSources(base.baseName, source);
         const [, len] = getNodeSources(base, source);
