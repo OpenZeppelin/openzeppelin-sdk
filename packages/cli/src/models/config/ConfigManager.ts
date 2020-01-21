@@ -1,6 +1,6 @@
 import { ZWeb3, Contracts, TxParams } from '@openzeppelin/upgrades';
 import TruffleConfig from './TruffleConfig';
-import Session from '../network/Session';
+import { default as Session, SessionOptions } from '../network/Session';
 import NetworkConfig from './NetworkConfig';
 
 import pick from 'lodash.pick';
@@ -9,6 +9,7 @@ import isNil from 'lodash.isnil';
 
 const ConfigManager = {
   config: undefined,
+  cache: undefined,
 
   initialize(root: string = process.cwd()): void {
     if (!TruffleConfig.exists() && !NetworkConfig.exists()) {
@@ -23,7 +24,7 @@ const ConfigManager = {
   },
 
   async initNetworkConfiguration(
-    options: any = {},
+    options: SessionOptions,
     silent?: boolean,
     root: string = process.cwd(),
   ): Promise<{ network: string; txParams: TxParams } | never> {
@@ -44,7 +45,8 @@ const ConfigManager = {
         ...pickBy(pick(artifactDefaults, ['gas', 'gasPrice']), x => !isNil(x)),
       };
 
-      return { network: await ZWeb3.getNetworkName(), txParams };
+      this.cache = { network: await ZWeb3.getNetworkName(), txParams };
+      return this.cache;
     } catch (error) {
       if (this.config && this.config.name === 'NetworkConfig') {
         const providerInfo = typeof provider === 'string' ? ` on ${provider}` : '';

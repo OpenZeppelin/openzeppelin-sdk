@@ -36,6 +36,7 @@ import {
   SimpleProject,
   AppProxyMigrator,
   MinimalProxy,
+  bytecodeDigest,
 } from '@openzeppelin/upgrades';
 
 import { isMigratableManifestVersion } from '../files/ManifestVersion';
@@ -61,7 +62,7 @@ export default class NetworkController {
   public network: string;
   public networkFile: NetworkFile;
   public project: Project;
-  private contractManager: ContractManager;
+  public contractManager: ContractManager;
 
   public constructor(network: string, txParams: TxParams, networkFile?: NetworkFile) {
     if (!networkFile) {
@@ -121,6 +122,12 @@ export default class NetworkController {
   public async fetchOrDeploy(requestedVersion: string): Promise<Project> {
     this.project = await this.getDeployer(requestedVersion).fetchOrDeploy();
     return this.project;
+  }
+
+  public async deployChangedSolidityLibs(contractNames: string): Promise<void> {
+    const libNames = this._getAllSolidityLibNames([contractNames]);
+    const changedLibraries = this.getLibsToDeploy(libNames, true);
+    await this.uploadSolidityLibs(changedLibraries);
   }
 
   // DeployerController
@@ -204,6 +211,16 @@ export default class NetworkController {
     return pipeline.reduce((xs, f) => f(xs), this.projectFile.contracts);
   }
 
+  private getLibsToDeploy(libNames: string[], onlyChanged = false): Contract[] {
+    return libNames
+      .map(libName => Contracts.getFromLocal(libName))
+      .filter(libClass => {
+        const hasSolidityLib = this.networkFile.hasSolidityLib(libClass.schema.contractName);
+        const hasChanged = this._hasSolidityLibChanged(libClass);
+        return !hasSolidityLib || !onlyChanged || hasChanged;
+      });
+  }
+
   // Contract model || SolidityLib model
   private _solidityLibsForPush(onlyChanged = false): Contract[] | never {
     const { contractNames, contractAliases } = this.projectFile;
@@ -215,13 +232,7 @@ export default class NetworkController {
       throw new Error(`Cannot upload libraries with the same name as a contract alias: ${clashes.join(', ')}`);
     }
 
-    return libNames
-      .map(libName => Contracts.getFromLocal(libName))
-      .filter(libClass => {
-        const hasSolidityLib = this.networkFile.hasSolidityLib(libClass.schema.contractName);
-        const hasChanged = this._hasSolidityLibChanged(libClass);
-        return !hasSolidityLib || !onlyChanged || hasChanged;
-      });
+    return this.getLibsToDeploy(libNames, onlyChanged);
   }
 
   // Contract model || SolidityLib model
@@ -237,8 +248,15 @@ export default class NetworkController {
     const libName = libClass.schema.contractName;
     await this._setSolidityLibs(libClass); // Libraries may depend on other libraries themselves
     Loggy.spin(__filename, '_uploadSolidityLib', `upload-solidity-lib${libName}`, `Uploading ${libName} library`);
-    const libInstance = await this.project.setImplementation(libClass, libName);
+
+    const libInstance =
+      this.project === undefined
+        ? // There is no project for non-upgradeable deploys.
+          await Transactions.deployContract(libClass)
+        : await this.project.setImplementation(libClass, libName);
+
     this.networkFile.addSolidityLib(libName, libInstance);
+
     Loggy.succeed(`upload-solidity-lib${libName}`, `${libName} library uploaded`);
   }
 
@@ -300,7 +318,10 @@ export default class NetworkController {
   private async _unsetSolidityLib(libName: string): Promise<void | never> {
     try {
       Loggy.spin(__filename, '_unsetSolidityLib', `unset-solidity-lib-${libName}`, `Removing ${libName} library`);
-      await this.project.unsetImplementation(libName);
+      // There is no project for non-upgradeable deploys.
+      if (this.project !== undefined) {
+        await this.project.unsetImplementation(libName);
+      }
       this.networkFile.unsetSolidityLib(libName);
       Loggy.succeed(`unset-solidity-lib-${libName}`);
     } catch (error) {
@@ -669,6 +690,35 @@ export default class NetworkController {
     }
   }
 
+  public async createInstance(packageName: string, contractAlias: string, initArgs: unknown[]): Promise<Contract> {
+    await this.migrateManifestVersionIfNeeded();
+
+    if (!packageName) {
+      packageName = this.projectFile.name;
+    }
+
+    if (packageName === this.projectFile.name) {
+      await this.deployChangedSolidityLibs(contractAlias);
+    }
+
+    const contract = this.contractManager.getContractClass(packageName, contractAlias);
+    await this._setSolidityLibs(contract);
+
+    const instance = await Transactions.deployContract(contract, initArgs, this.txParams);
+
+    if (packageName === this.projectFile.name) {
+      await this._updateTruffleDeployedInformation(contractAlias, instance);
+    }
+
+    this.networkFile.addProxy(packageName, contractAlias, {
+      address: instance.address,
+      kind: ProxyType.NonProxy,
+      bytecodeHash: bytecodeDigest(contract.schema.bytecode),
+    });
+
+    return instance;
+  }
+
   private async createProxyInstance(
     kind: ProxyType,
     salt: string,
@@ -790,7 +840,7 @@ export default class NetworkController {
 
   // Proxy model
   private async _updateTruffleDeployedInformation(contractAlias: string, implementation: Contract): Promise<void> {
-    const contractName = this.projectFile.contract(contractAlias);
+    const contractName = this.projectFile.normalizeContractAlias(contractAlias);
     if (contractName) {
       const path = Contracts.getLocalPath(contractName);
       const data = fs.readJsonSync(path);
@@ -936,7 +986,7 @@ export default class NetworkController {
         __filename,
         '_fetchOwnedProxies',
         `fetch-owned-proxies`,
-        `No contract instances that match${criteriaDescription} were found`,
+        `No upgradeable contract instances that match${criteriaDescription} were found`,
       );
       return [];
     }

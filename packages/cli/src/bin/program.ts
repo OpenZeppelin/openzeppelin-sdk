@@ -16,8 +16,6 @@ interface CommandInterface {
   signature: string;
   description: string;
   register: any;
-  action: any;
-  tryAction?: any;
 }
 
 let commandsList: CommandInterface[] = Object.values(commands);

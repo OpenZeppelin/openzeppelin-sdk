@@ -4,7 +4,8 @@ require('../setup');
 import { expect } from 'chai';
 
 import session from '../../src/scripts/session';
-import Session, { DEFAULT_TX_TIMEOUT, DEFAULT_TX_BLOCK_TIMEOUT } from '../../src/models/network/Session';
+import Session from '../../src/models/network/Session';
+import { DEFAULT_TX_TIMEOUT, DEFAULT_TX_BLOCK_TIMEOUT } from '../../src/models/network/defaults';
 
 describe('session script', function() {
   afterEach(() => Session.close());

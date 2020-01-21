@@ -3,7 +3,8 @@ import firebase from 'firebase/app';
 import 'firebase/auth';
 import 'firebase/firestore';
 
-import { CommandData, UserEnvironment } from '.';
+import ConfigManager from '../models/config/ConfigManager';
+import { StringObject, UserEnvironment } from '.';
 
 const FIREBASE_CONFIG = {
   apiKey: 'AIzaSyAZoGB2p26UejODezZPmczgwehI6xlSKPs',
@@ -17,12 +18,26 @@ const FIREBASE_CONFIG = {
 
 interface Arguments {
   uuid: string;
-  commandData: CommandData;
+  commandData: StringObject;
   userEnvironment: UserEnvironment;
+  userNetwork?: string;
 }
 
-process.once('message', async function({ uuid, commandData, userEnvironment }: Arguments) {
+async function getCanonicalNetworkName(network: string) {
+  const config = ConfigManager.cache ?? (await ConfigManager.initNetworkConfiguration({ network }));
+  if (config.network.match(/^dev-/)) {
+    return 'development';
+  } else {
+    return config.network;
+  }
+}
+
+process.once('message', async function({ uuid, commandData, userEnvironment, userNetwork }: Arguments) {
   const unixWeek = Math.floor(Date.now() / (1000 * 60 * 60 * 24 * 7));
+
+  if (userNetwork !== undefined) {
+    commandData.network = await getCanonicalNetworkName(userNetwork);
+  }
 
   // Initialize Firebase and anonymously authenticate
   const app = firebase.initializeApp(FIREBASE_CONFIG);

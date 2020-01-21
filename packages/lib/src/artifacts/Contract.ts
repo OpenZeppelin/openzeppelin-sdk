@@ -158,6 +158,17 @@ export function contractMethodsFromAst(
     });
 }
 
+interface MethodArg {
+  type: string;
+  internalType?: string;
+  components?: MethodArg[];
+  name: string;
+}
+
+export function getConstructorInputs(contract: Contract): MethodArg[] {
+  return contract.schema.abi.find(f => f.type === 'constructor')?.inputs ?? [];
+}
+
 function getAstMethods(instance: Contract): any[] {
   return new ContractAST(instance, null, ContractDefinitionFilter).getMethods();
 }

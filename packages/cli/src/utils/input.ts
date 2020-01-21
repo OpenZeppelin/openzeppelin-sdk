@@ -49,7 +49,17 @@ function quoteArguments(args: string) {
   return args;
 }
 
-export function parseArg(input: string | string[], { type, components }: MethodArgType): any {
+type NestedArray<T> = T[] | NestedArray<T>[];
+
+export function parseMultipleArgs(args: NestedArray<string>, types: MethodArgType[]): unknown[] {
+  if (args.length !== types.length) {
+    throw new Error(`Expected ${types.length} values but got ${args.length}`);
+  }
+
+  return zipWith(args, types, parseArg);
+}
+
+export function parseArg(input: string | NestedArray<string>, { type, components }: MethodArgType): any {
   const TRUE_VALUES = ['y', 'yes', 't', 'true', '1'];
   const FALSE_VALUES = ['n', 'no', 'f', 'false', '0'];
   const ARRAY_TYPE_REGEX = /(.+)\[\d*\]$/; // matches array type identifiers like uint[] or byte[4]
@@ -57,16 +67,16 @@ export function parseArg(input: string | string[], { type, components }: MethodA
   // Tuples: recursively parse
   if (type === 'tuple') {
     const inputs = typeof input === 'string' ? parseArray(stripParens(input), '(', ')') : input;
-    if (inputs.length !== components.length)
-      throw new Error(`Expected ${components.length} values but got ${input.length}`);
-    return zipWith(inputs, components, parseArg);
+    return parseMultipleArgs(inputs, components);
   }
 
   // Arrays: recursively parse
   else if (type.match(ARRAY_TYPE_REGEX)) {
     const arrayType = type.match(ARRAY_TYPE_REGEX)[1];
     const inputs = typeof input === 'string' ? parseArray(stripBrackets(input)) : input;
-    return inputs.map(input => parseArg(input, { type: arrayType }));
+    // TypeScript cannot type the .map call because NestedArray<string> is too
+    // complex a union type. See https://github.com/TypeScript/pull/29011.
+    return (inputs as unknown[]).map((input: NestedArray<string>) => parseArg(input, { type: arrayType }));
   }
 
   // Integers: passed via bignumber to handle signs and scientific notation
@@ -123,7 +133,7 @@ export function stripParens(inputMaybeWithParens: string): string {
   return `${inputMaybeWithParens.replace(/^\s*\(/, '').replace(/\)\s*$/, '')}`;
 }
 
-function requireInputString(arg: string | string[]): arg is string {
+function requireInputString(arg: string | NestedArray<string>): arg is string {
   if (typeof arg !== 'string') {
     throw new Error(`Expected ${flattenDeep(arg).join(',')} to be a scalar value but was an array`);
   }
@@ -135,11 +145,8 @@ function requireInputString(arg: string | string[]): arg is string {
  * unquoted strings in the input, or quotes using both simple and double quotes.
  * @param input string to parse
  * @returns parsed ouput.
- * The return type is a lie! This function returns a recursive type,
- * with arbitrarily nested string arrays, but ts has a hard time handling that,
- * so we're fooling it into thinking it's just one level deep.
  */
-export function parseArray(input: string, open = '[', close = ']'): (string | string[])[] {
+export function parseArray(input: string, open = '[', close = ']'): NestedArray<string> {
   let i = 0; // index for traversing input
 
   function innerParseQuotedString(quoteChar: string): string {

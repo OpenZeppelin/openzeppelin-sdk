@@ -237,6 +237,12 @@ export default class ProjectFile {
       manager === 'trufle' ? { manager: 'truffle' } : pickBy({ ...this.data.compiler, ...configOptions });
   }
 
+  // If the argument is an existing contract alias, return its corresponding
+  // contract name. Otherwise, assume it's a contract name and return it as is.
+  public normalizeContractAlias(nameOrAlias: string): string {
+    return this.contracts[nameOrAlias] ?? nameOrAlias;
+  }
+
   public contract(alias: string): string {
     return this.contracts[alias];
   }

@@ -11,7 +11,7 @@
     "compile:contracts": "rm -rf build/contracts && ../../bootstrap/node_modules/.bin/oz compile --solc-version 0.5.14 --evm-version constantinople",
     "prepare": "npm run compile:contracts && npm run compile:ts && npm run copy-files && chmod 755 ./lib/bin/oz-cli.js",
     "prepare-docs": "TS_NODE_PROJECT='tsconfig.docs.json' ts-node scripts/prepare-docs.js",
-    "test": "TS_NODE_PROJECT='tsconfig.test.json' mocha --require ts-node/register --recursive test",
+    "test": "TS_NODE_PROJECT='tsconfig.test.json' mocha --require ts-node/register --recursive test --extension js,ts",
     "gen-docs": "./scripts/gen-docs.sh",
     "watch": "tsc -w",
     "lint": "eslint '*/**/*.{js,ts}' --quiet --fix",
@@ -137,6 +137,7 @@
     "web3-utils": "1.2.2"
   },
   "devDependencies": {
+    "@types/chai-as-promised": "^7.1.2",
     "@types/lodash": "^4.14.119",
     "@types/mocha": "^5.2.5",
     "@types/node": "^10.12.12",

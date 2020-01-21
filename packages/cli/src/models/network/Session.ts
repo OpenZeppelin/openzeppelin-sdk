@@ -7,15 +7,13 @@ import path from 'path';
 
 import { Loggy } from '@openzeppelin/upgrades';
 import { OPEN_ZEPPELIN_FOLDER } from '../files/constants';
+import { DEFAULT_TX_TIMEOUT, DEFAULT_TX_BLOCK_TIMEOUT, DEFAULT_EXPIRATION_TIMEOUT } from './defaults';
 
 const state = { alreadyPrintedSessionInfo: false };
 const SESSION_FILE = '.session';
 const SESSION_PATH = path.join(OPEN_ZEPPELIN_FOLDER, SESSION_FILE);
-const DEFAULT_TX_TIMEOUT = 750; // same as web3
-const DEFAULT_TX_BLOCK_TIMEOUT = 50; // same as web3
-const DEFAULT_EXPIRATION_TIMEOUT: number = 15 * 60; // 15 minutes
 
-interface SessionOptions {
+export interface SessionOptions {
   network?: string;
   from?: string;
   timeout?: number;
@@ -121,5 +119,4 @@ function describe(session: SessionOptions): string {
   );
 }
 
-export { DEFAULT_TX_TIMEOUT, DEFAULT_TX_BLOCK_TIMEOUT };
 export default Session;

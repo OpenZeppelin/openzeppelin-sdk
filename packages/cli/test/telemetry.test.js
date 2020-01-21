@@ -15,6 +15,7 @@ import 'firebase/firestore';
 
 import Telemetry from '../src/telemetry';
 import ProjectFile from '../src/models/files/ProjectFile';
+import ConfigManager from '../src/models/config/ConfigManager';
 
 import * as prompt from '../src/prompts/prompt';
 
@@ -131,24 +132,31 @@ describe('telemetry', function() {
             });
 
             context('when a non-development network is specified', function() {
-              it('conceals all options recursively except for the network name', async function() {
-                await Telemetry.report('create', { network: 'ropsten', ...this.commandData }, true);
+              it('conceals all options recursively except for the command name', async function() {
+                await Telemetry.report('create', this.commandData, true);
                 const [, commandData] = this.sendToFirebase.getCall(0).args;
 
                 commandData.name.should.eq('create');
-                commandData.network.should.eq('ropsten');
                 shouldConcealOptions(commandData);
               });
             });
 
             context('when a dev network is specified', function() {
               it('changes the network name to development', async function() {
-                await Telemetry.report('create', { network: 'dev-209384093', ...this.commandData }, true);
-                const [, commandData] = this.sendToFirebase.getCall(0).args;
+                const network = 'dev-209384093';
+
+                // sendToFirebase reads the network name from here.
+                const oldConfigValue = ConfigManager.cache;
+                ConfigManager.cache = { network };
+
+                await Telemetry.report('create', { network: 'development', ...this.commandData }, true);
+                const [, commandData, , userNetwork] = this.sendToFirebase.getCall(0).args;
 
                 commandData.name.should.eq('create');
-                commandData.network.should.eq('development');
+                userNetwork.should.eq('development');
                 shouldConcealOptions(commandData);
+
+                ConfigManager.cache = oldConfigValue;
               });
             });
 
