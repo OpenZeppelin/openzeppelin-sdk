@@ -24,7 +24,7 @@ interface Arguments {
 }
 
 async function getCanonicalNetworkName(network: string) {
-  const config = await ConfigManager.initNetworkConfiguration({ network });
+  const config = ConfigManager.cache ?? (await ConfigManager.initNetworkConfiguration({ network }));
   if (config.network.match(/^dev-/)) {
     return 'development';
   } else {
