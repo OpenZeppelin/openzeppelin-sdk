@@ -3,7 +3,7 @@ import { ContractDefinition } from '../solc/ast-node';
 import { Transformation } from '../transformation';
 import { Artifact } from '../solc/artifact';
 
-export function transformParents(
+export function transformParentsNames(
   contractNode: ContractDefinition,
   source: string,
   contracts: Artifact[],

@@ -8,7 +8,7 @@ import {
   appendDirective,
   prependBaseClass,
   purgeExceptContracts,
-  transformParents,
+  transformParentsNames,
   fixImportDirectives,
   purgeVarInits,
 } from './transformations/index';
@@ -74,7 +74,7 @@ export function transpileContracts(contracts: string[], artifacts: Artifact[]): 
     acc[art.fileName].transformations = [
       ...acc[art.fileName].transformations,
       prependBaseClass(contractNode, source, 'Initializable'),
-      ...transformParents(contractNode, source, contractsToTranspile),
+      ...transformParentsNames(contractNode, source, contractsToTranspile),
       ...transformConstructor(contractNode, source, contractsToTranspile, contractsToArtifactsMap),
       ...purgeVarInits(contractNode, source),
       transformContractName(contractNode, source, `${contractName}Upgradable`),
