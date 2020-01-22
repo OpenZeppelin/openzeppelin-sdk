@@ -110,6 +110,22 @@ export const options: Option[] = [
     },
   },
   {
+    format: '--timeout <timeout>',
+    description: `timeout in seconds for each transaction (default: ${DEFAULT_TX_TIMEOUT})`,
+  },
+  {
+    format: '-f, --from <address>',
+    description: 'sender for the contract creation transaction',
+    async postprocess(params) {
+      // Once we have all required params (network, timeout, from) we initialize the config.
+      if (process.env.NODE_ENV !== 'test') {
+        const { default: ConfigManager } = await import('../../models/config/ConfigManager');
+        const config = await ConfigManager.initNetworkConfiguration(params);
+        Object.assign(params, config);
+      }
+    },
+  },
+  {
     format: '--migrate-manifest',
     description: 'enable automatic migration of manifest format',
     async details(options: Options) {
@@ -127,14 +143,6 @@ export const options: Option[] = [
         };
       }
     },
-  },
-  {
-    format: '--timeout <timeout>',
-    description: `timeout in seconds for each transaction (default: ${DEFAULT_TX_TIMEOUT})`,
-  },
-  {
-    format: '-f, --from <address>',
-    description: 'sender for the contract creation transaction',
   },
   {
     format: '-k, --kind <kind>',

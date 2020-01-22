@@ -27,11 +27,13 @@ type Param = ParamSimple | ParamVariadic;
 interface ParamSimple {
   variadic?: false;
   details?: (params: object) => Promise<ParamDetails | undefined>;
+  postprocess?: (params: object) => Promise<void>;
 }
 
 interface ParamVariadic {
   variadic: true;
   details?: (params: object) => Promise<ParamDetails[]>;
+  postprocess?: (params: object) => Promise<void>;
 }
 
 export type Arg = Param & { name: string };
@@ -110,6 +112,7 @@ async function promptOrValidateAll(cmd: Command, spec: CommandSpec, params: Comm
     } else {
       await promptOrValidateSimple(name, param, params);
     }
+    await param.postprocess?.(params);
   }
 }
 

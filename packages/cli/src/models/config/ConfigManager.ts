@@ -9,7 +9,6 @@ import isNil from 'lodash.isnil';
 
 const ConfigManager = {
   config: undefined,
-  cache: undefined,
 
   initialize(root: string = process.cwd()): void {
     if (!TruffleConfig.exists() && !NetworkConfig.exists()) {
@@ -45,8 +44,7 @@ const ConfigManager = {
         ...pickBy(pick(artifactDefaults, ['gas', 'gasPrice']), x => !isNil(x)),
       };
 
-      this.cache = { network: await ZWeb3.getNetworkName(), txParams };
-      return this.cache;
+      return { network: await ZWeb3.getNetworkName(), txParams };
     } catch (error) {
       if (this.config && this.config.name === 'NetworkConfig') {
         const providerInfo = typeof provider === 'string' ? ` on ${provider}` : '';
