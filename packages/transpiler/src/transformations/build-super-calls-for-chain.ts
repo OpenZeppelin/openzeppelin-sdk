@@ -32,7 +32,7 @@ function buildSuperCalls(
     return node.baseContracts
       .filter(base => contracts.map(o => o.contractName).includes(base.baseName.name))
       .map(base => {
-        const mod = mods.filter(mod => mod.modifierName.name === base.baseName.name)[0];
+        const mod = mods.find(mod => mod.modifierName.name === base.baseName.name);
         if (mod) {
           return buildSuperCall(mod.arguments, mod.modifierName.name, source);
         } else {
