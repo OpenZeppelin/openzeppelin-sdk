@@ -38,8 +38,7 @@ export async function action(params: Options & Args): Promise<void> {
     }
   }
 
-  const { network, txParams } =
-    process.env.NODE_ENV === 'test' ? params : await ConfigManager.initNetworkConfiguration(params);
+  const { network, txParams } = params;
 
   // Used for network preselection in subsequent runs.
   Session.setDefaultNetworkIfNeeded(network);
