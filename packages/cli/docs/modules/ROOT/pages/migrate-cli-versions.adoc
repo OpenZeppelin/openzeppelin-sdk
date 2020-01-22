@@ -1,0 +1,38 @@
+[[migrate-cli-versions]]
+= Migrating to a new CLI version
+
+To migrate to a new OpenZeppelin CLI version is generally a matter of upgrading the OpenZeppelin CLI and OpenZeppelin Upgrades versions.
+
+```console
+$ npm upgrade @openzeppelin/cli @openzeppelin/upgrades
+```
+
+[[migrate-zos-to-oz]]
+== Migrating from ZeppelinOS to OpenZeppelin CLI
+
+ZeppelinOS was renamed to OpenZeppelin CLI as part of https://blog.openzeppelin.com/openzeppelin-rebranding/[rebranding the company and the projects].  OpenZeppelin CLI and OpenZeppelin Upgrades were first released as https://github.com/OpenZeppelin/openzeppelin-sdk/releases/tag/v2.5.0[version 2.5.0], to follow the ZeppelinOS versioning. 
+
+The CLI **changed the name of the executable from `zos` to `openzeppelin`** (or the alias `oz`, if you prefer shorter names). 
+It also has all configuration files under a single `.openzeppelin` folder, to avoid polluting your project's root. 
+The https://github.com/OpenZeppelin/openzeppelin-sdk/releases/tag/v2.5.0[version 2.5.0 release changelog] describes all modifications in more detail.
+
+However, **all the previous namings are still supported**, meaning that **you don't need to change anything on your project** 
+when you migrate. You can still run `zos` in your command line or scripts, and if a `zos.json` is found at the root of your project, 
+the CLI will still pick it up. Also, the Ethereum Package `openzeppelin-eth` will still be supported by the SDK, but you can opt-in 
+to the new `@openzeppelin/contracts-ethereum-package`.
+
+The only thing that will require a change on your end are import statements: for instance, if you are importing 
+`zos-lib/contracts/Initializable.sol`, you will now need to import `@openzeppelin/upgrades/contracts/Initializable.sol`.
+
+[[migrate-zos2-to-zos2.2]]
+== Migrating from ZeppelinOS 2.0 or 2.1 to ZeppelinOS 2.2
+
+If you created a project using ZeppelinOS 2.0 or 2.1, and then decided to upgrade your ZeppelinOS dependency to 2.2, 
+you need to create and set up a `ProxyAdmin` contract for each of the networks your project is deployed to. 
+Good news though! This can be done automatically by using the ZeppelinOS CLI.
+
+To trigger the migration in a particular network, you need to start a session in it (or use the `--network myNetwork` parameter) 
+and use any of the following commands: `create`, `update`, `set-admin`, or `publish`. The CLI will prompt if you want to migrate your 
+deployment on that specific network you are interacting with, and will set up the ProxyAdmin contract automatically.
+
+So you can go ahead and say yes, and the CLI will take care of the rest, to migrate you to ZeppelinOS 2.2.
