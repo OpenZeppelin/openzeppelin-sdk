@@ -1,7 +1,7 @@
 [[migrate-cli-versions]]
 = Migrating to a new CLI version
 
-Migration is generally a matter of upgrading the OpenZeppelin CLI and OpenZeppelin Upgrades.
+To migrate to a new OpenZeppelin CLI version is generally a matter of upgrading the OpenZeppelin CLI and OpenZeppelin Upgrades versions.
 
 ```console
 $ npm upgrade @openzeppelin/cli @openzeppelin/upgrades
@@ -10,13 +10,11 @@ $ npm upgrade @openzeppelin/cli @openzeppelin/upgrades
 [[migrate-zos-to-oz]]
 == Migrating from ZeppelinOS to OpenZeppelin CLI
 
-We released the https://www.npmjs.com/package/@openzeppelin/cli[OpenZeppelin CLI] and 
-https://www.npmjs.com/package/@openzeppelin/upgrades[@openzeppelin/upgrades] under 
-https://github.com/OpenZeppelin/openzeppelin-sdk/releases/tag/v2.5.0[version 2.5.0], to follow the versioning we were using for ZeppelinOS. 
+ZeppelinOS was renamed to OpenZeppelin CLI as part of https://blog.openzeppelin.com/openzeppelin-rebranding/[rebranding the company and the projects].  OpenZeppelin CLI and OpenZeppelin Upgrades were first released as https://github.com/OpenZeppelin/openzeppelin-sdk/releases/tag/v2.5.0[version 2.5.0], to follow the ZeppelinOS versioning. 
 
-The CLI **changes the name of the executable from `zos` to `openzeppelin`** (or `oz` if you prefer shorter names). 
-It also keeps all configuration files under a single `.openzeppelin` folder, to avoid polluting your project's root. 
-The https://github.com/OpenZeppelin/openzeppelin-sdk/releases/tag/v2.5.0[release changelog] describes all modifications in more detail.
+The CLI **changed the name of the executable from `zos` to `openzeppelin`** (or the alias `oz`, if you prefer shorter names). 
+It also has all configuration files under a single `.openzeppelin` folder, to avoid polluting your project's root. 
+The https://github.com/OpenZeppelin/openzeppelin-sdk/releases/tag/v2.5.0[version 2.5.0 release changelog] describes all modifications in more detail.
 
 However, **all the previous namings are still supported**, meaning that **you don't need to change anything on your project** 
 when you migrate. You can still run `zos` in your command line or scripts, and if a `zos.json` is found at the root of your project, 
@@ -30,11 +28,11 @@ The only thing that will require a change on your end are import statements: for
 == Migrating from ZeppelinOS 2.0 or 2.1 to ZeppelinOS 2.2
 
 If you created a project using ZeppelinOS 2.0 or 2.1, and then decided to upgrade your ZeppelinOS dependency to 2.2, 
-you need to create and set up a ProxyAdmin contract for each of the networks your project is deployed to. 
-Good news tho! This can be done automatically by using the ZeppelinOS CLI.
+you need to create and set up a `ProxyAdmin` contract for each of the networks your project is deployed to. 
+Good news though! This can be done automatically by using the ZeppelinOS CLI.
 
-To trigger the migration in a particular network, you need to start a session in it (or use the --network myNetwork parameter) 
-and use any of the following commands: create, update, set-admin, or publish. The CLI will prompt if you want to migrate your 
+To trigger the migration in a particular network, you need to start a session in it (or use the `--network myNetwork` parameter) 
+and use any of the following commands: `create`, `update`, `set-admin`, or `publish`. The CLI will prompt if you want to migrate your 
 deployment on that specific network you are interacting with, and will set up the ProxyAdmin contract automatically.
 
-So go ahead and say yes, and the CLI will take care of the rest, so that you are up to date with the latest release of ZeppelinOS!
+So you can go ahead and say yes, and the CLI will take care of the rest, to migrate you to ZeppelinOS 2.2.
