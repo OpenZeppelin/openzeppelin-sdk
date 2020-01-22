@@ -24,13 +24,13 @@ function buildSuperCall(args: Literal[], name: string, source: string): string {
 function buildSuperCalls(
   node: ContractDefinition,
   source: string,
-  contracts: Artifact[],
+  contractsToTranspile: Artifact[],
   mods: ModifierInvocation[],
 ): (string | never[])[] {
   const hasInheritance = node.baseContracts.length;
   if (hasInheritance) {
     return node.baseContracts
-      .filter(base => contracts.map(o => o.contractName).includes(base.baseName.name))
+      .filter(base => contractsToTranspile.map(o => o.contractName).includes(base.baseName.name))
       .map(base => {
         const mod = mods.find(mod => mod.modifierName.name === base.baseName.name);
         if (mod) {
@@ -50,14 +50,13 @@ function buildSuperCalls(
 export function buildSuperCallsForChain(
   contractNode: ContractDefinition,
   source: string,
-  contracts: Artifact[],
+  contractsToTranspile: Artifact[],
   contractsToArtifactsMap: Record<string, Artifact>,
 ): string {
   const chain = getInheritanceChain(contractNode.name, contractsToArtifactsMap);
   const mods = flatten(
     chain.map(art => {
       const node = getContract(art);
-
       const constructorNode = getConstructor(node);
       return constructorNode ? constructorNode.modifiers.filter(mod => isModifierInvocation(mod)) : [];
     }),
@@ -67,7 +66,7 @@ export function buildSuperCallsForChain(
     ...new Set(
       flatten(
         chain.map(base => {
-          return buildSuperCalls(getContract(base), source, contracts, mods).reverse();
+          return buildSuperCalls(getContract(base), source, contractsToTranspile, mods).reverse();
         }),
       ),
     ),
