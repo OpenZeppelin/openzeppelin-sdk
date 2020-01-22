@@ -29,18 +29,16 @@ function buildSuperCalls(
 ): (string | never[])[] {
   const hasInheritance = node.baseContracts.length;
   if (hasInheritance) {
-    return [
-      ...node.baseContracts
-        .filter(base => contracts.some(contract => base.baseName.name === contract.contractName))
-        .map(base => {
-          const mod = mods.filter(mod => mod.modifierName.name === base.baseName.name)[0];
-          if (mod) {
-            return buildSuperCall(mod.arguments, mod.modifierName.name, source);
-          } else {
-            return buildSuperCall(base.arguments, base.baseName.name, source);
-          }
-        }),
-    ];
+    return node.baseContracts
+      .filter(base => contracts.map(o => o.contractName).includes(base.baseName.name))
+      .map(base => {
+        const mod = mods.filter(mod => mod.modifierName.name === base.baseName.name)[0];
+        if (mod) {
+          return buildSuperCall(mod.arguments, mod.modifierName.name, source);
+        } else {
+          return buildSuperCall(base.arguments, base.baseName.name, source);
+        }
+      });
   } else {
     return [];
   }
