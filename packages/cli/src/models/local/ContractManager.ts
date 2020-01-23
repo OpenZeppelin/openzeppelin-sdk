@@ -14,11 +14,11 @@ export default class ContractManager {
 
   public getContractClass(packageName: string, contractAlias: string): Contract {
     if (!packageName || packageName === this.projectFile.name) {
-      const contractName = this.projectFile.contract(contractAlias);
+      const contractName = this.projectFile.normalizeContractAlias(contractAlias);
       return Contracts.getFromLocal(contractName);
     } else {
       const dependency = new Dependency(packageName);
-      const contractName = dependency.projectFile.contract(contractAlias);
+      const contractName = dependency.projectFile.normalizeContractAlias(contractAlias);
       return Contracts.getFromNodeModules(packageName, contractName);
     }
   }

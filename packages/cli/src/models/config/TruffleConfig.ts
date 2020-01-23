@@ -23,7 +23,7 @@ const TruffleConfig = {
     const config = this.getConfig(force);
     const { networks: networkList } = config;
     if (!networkList[network])
-      throw Error(`Given network '${network}' is not defined in your ${this.getTruffleConfigFileName(path)} file`);
+      throw Error(`Given network '${network}' is not defined in your ${this.getConfigFileName(path)} file`);
     config.network = network;
     config.networkId = config.network_id;
 
@@ -81,7 +81,7 @@ const TruffleConfig = {
     return { ...configDefaults, ...networkDefaults };
   },
 
-  getTruffleConfigFileName(path: string): string {
+  getConfigFileName(path: string): string {
     const truffleFile = `${path}/truffle.js`;
     return fs.existsSync(truffleFile) ? 'truffle.js' : 'truffle-config.js';
   },

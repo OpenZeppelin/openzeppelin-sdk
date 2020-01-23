@@ -3,10 +3,9 @@
 require('../../setup');
 
 import sinon from 'sinon';
-import { toBN, toHex } from 'web3-utils';
+import { toBN, toHex, sha3 } from 'web3-utils';
 
 import Proxy from '../../../src/proxy/Proxy';
-import ZWeb3 from '../../../src/artifacts/ZWeb3';
 import Contracts from '../../../src/artifacts/Contracts';
 
 const DummyImplementation = Contracts.getFromLocal('DummyImplementation');
@@ -34,11 +33,11 @@ export function shouldUseEIP1967StorageSlot(createProxy, accounts, labels, fnNam
     });
     const proxy = await Proxy.at(this.proxy.address);
     const address = await proxy[fnName]();
-    const hashedLabel = toHex(toBN(ZWeb3.sha3(label)).sub(toBN(1)));
+    const hashedLabel = toHex(toBN(sha3(label)).sub(toBN(1)));
 
     fnName === 'admin' ? address.should.eq(proxyAdminAddress) : address.should.eq(this.implementation);
     this.spy.should.have.been.calledOnceWith(hashedLabel);
-    this.spy.should.have.not.been.calledWith(ZWeb3.sha3(deprecatedLabel));
+    this.spy.should.have.not.been.calledWith(sha3(deprecatedLabel));
   });
 }
 
@@ -63,10 +62,10 @@ export function shouldUseLegacyStorageSlot(createProxy, accounts, labels, fnName
   it('uses the correct storage slot', async function() {
     const proxy = await Proxy.at(this.proxy.address);
     const address = await proxy[fnName]();
-    const hashedLabel = toHex(toBN(ZWeb3.sha3(label)).sub(toBN(1)));
+    const hashedLabel = toHex(toBN(sha3(label)).sub(toBN(1)));
 
     fnName === 'admin' ? address.should.eq(proxyAdminAddress) : address.should.eq(this.implementation);
     this.spy.should.have.been.calledWith(hashedLabel);
-    this.spy.should.have.been.calledWith(ZWeb3.sha3(deprecatedLabel));
+    this.spy.should.have.been.calledWith(sha3(deprecatedLabel));
   });
 }

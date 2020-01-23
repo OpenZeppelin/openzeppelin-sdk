@@ -1,5 +1,3 @@
-'use strict';
-
 import chalk from 'chalk';
 import program from 'commander';
 import { Loggy } from '@openzeppelin/upgrades';
@@ -18,8 +16,6 @@ interface CommandInterface {
   signature: string;
   description: string;
   register: any;
-  action: any;
-  tryAction?: any;
 }
 
 let commandsList: CommandInterface[] = Object.values(commands);

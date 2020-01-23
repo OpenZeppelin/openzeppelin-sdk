@@ -30,40 +30,33 @@ describe('Contracts', function() {
 
   describe('configuration', function() {
     it('has some default configuration', function() {
-      Contracts.getSyncTimeout().should.be.eq(240000);
       Contracts.getLocalBuildDir().should.be.eq(`${process.cwd()}/build/contracts`);
       Contracts.getLocalContractsDir().should.be.eq(`${process.cwd()}/contracts`);
     });
 
     describe('setting custom config', function() {
       beforeEach(function() {
-        this.previousTimeout = Contracts.getSyncTimeout();
         this.previousBuildDir = Contracts.getLocalBuildDir();
         this.previousContractsDir = Contracts.getLocalContractsDir();
       });
 
       afterEach(function() {
-        Contracts.setSyncTimeout(this.previousTimeout);
         Contracts.setLocalBuildDir(this.previousBuildDir);
         Contracts.setLocalContractsDir(this.previousContractsDir);
       });
 
       it('with relative paths', function() {
-        Contracts.setSyncTimeout(10);
         Contracts.setLocalBuildDir('build/bla');
         Contracts.setLocalContractsDir('bla');
 
-        Contracts.getSyncTimeout().should.be.eq(10);
         Contracts.getLocalBuildDir().should.be.eq(`${process.cwd()}/build/bla`);
         Contracts.getLocalContractsDir().should.be.eq(`${process.cwd()}/bla`);
       });
 
       it('with absolute paths', function() {
-        Contracts.setSyncTimeout(10);
         Contracts.setLocalBuildDir('/foo/bar/build/bla');
         Contracts.setLocalContractsDir('/foo/bar/bla');
 
-        Contracts.getSyncTimeout().should.be.eq(10);
         Contracts.getLocalBuildDir().should.be.eq(`/foo/bar/build/bla`);
         Contracts.getLocalContractsDir().should.be.eq(`/foo/bar/bla`);
       });

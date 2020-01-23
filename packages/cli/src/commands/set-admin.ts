@@ -77,8 +77,8 @@ async function action(proxyReference: string, newAdmin: string, options: any): P
 
   // has to check if a new admin address has balance or wallet
   // if not display yet another warning
-  const balance = await ZWeb3.getBalance(pickedNewAdmin);
-  const code = await ZWeb3.getCode(pickedNewAdmin);
+  const balance = await ZWeb3.eth.getBalance(pickedNewAdmin);
+  const code = await ZWeb3.eth.getCode(pickedNewAdmin);
   if (!force && balance === (0x0).toString() && code === '0x') {
     const { certain } = await promptIfNeeded(
       {

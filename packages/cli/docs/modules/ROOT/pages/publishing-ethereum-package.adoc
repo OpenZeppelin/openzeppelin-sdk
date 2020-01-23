@@ -1,0 +1,91 @@
+[[publishing-an-ethereum-package]]
+= Publishing an Ethereum Package
+
+In xref:dependencies.adoc[Using Dependencies], we showed how to use the xref:commands.adoc#link[`oz link`] command to use the https://github.com/OpenZeppelin/openzeppelin-contracts-ethereum-package[OpenZeppelin Contracts Ethereum Package] as a dependency, taking advantage of its contracts being _already deployed on the blockchain_.
+
+In this guide we'll describe how you can create your own Ethereum Package, and make it available to everyone via the OpenZeppelin CLI.
+
+[NOTE]
+====
+This guide features advanced usage of OpenZeppelin tools, and requires familiarity with using public networks, upgradeable contracts, and the OpenZeppelin CLI.
+
+For a refresher on the topics, head to xref:learn::public-staging.adoc[Deploying to a Public Test Network] and xref:learn::on-upgrades.adoc[Upgrades].
+====
+
+== Storing Your Project On-chain
+
+So far, we've mostly limited ourselves to depoying contracts using xref:commands.adoc#create[`oz create`], which creates _upgradeable instances_ by deploying _proxies_ to an existing implementation contract (refer to xref:learn::on-upgrades.adoc#how-upgrades-work[How Upgrades Work] to brush up on this). Here, we will instead deploy just the implementations, so that other people can create new proxies pointing to them.
+
+To achieve this, we'll use two low-level CLI commands: xref:commands.adoc#add[`oz add`] and xref:commands.adoc#push[`oz push`]. These work simmilarly to `git add` and `git push`: they will register contracts in your project and deploy them to a network.
+
+In your xref:getting-started.adoc#setting-up-your-project[OpenZeppelin project], run:
+
+[source,console]
+----
+$ npx oz add
+? Pick which contracts you want to add <contract-1>, <contract-2>
+✓ Added contract <contract-1>
+✓ Added contract <contract-2>
+All the selected contracts have been added to the project
+$ npx oz push
+? Pick a network mainnet
+✓ Contract <contract-1> deployed
+✓ Contract <contract-2> deployed
+All contracts have been deployed
+----
+
+NOTE: For your Ethereum Pacakge to be used by others, it needs to be deployed on a real network instead of a local one. Take a look at xref:learn::public-staging.adoc[Deploying to a Public Test Network] for detailed instructions for this process.
+
+Ethereum Packages are upgradeable, which means they track the different implementation contracts that correspond to each version of the package. We'll use the xref:commands.adoc#publish[`oz publish`] command for this, which will deploy an xref:contracts-architecture.adoc#app.sol[`App`] contract and register the implementations there:
+
+[source,console]
+----
+$ npx oz publish
+? Pick a network mainnet
+✓ Project structure deployed
+✓ Registering <contract-1> at 0x2c2eB5B599C2C4Bb2cA7e43179585aFec0D97D51 in directory
+✓ Registering <contract-2> at 0x6389e6409Ad106aF5e7e6bE8D95Fca637980fB63 in directory
+✓ Published to mainnet!
+----
+
+The Ethereum Package is complete! But we're still lacking something: a convenient way to tell people about its existence.
+
+== Distributing With `npm`
+
+For your Ethereum Package to xref:dependencies.adoc[usable from other projects], it needs to be published on the https://www.npmjs.com[npm registry]. If you havent't published an npm package before, go ahead and https://www.npmjs.com/signup[sign up for a free npm account].
+
+First, add your contract sources, compiled artifacts and OpenZeppelin project files to your package by including the following entries in your project's `package.json`:
+
+[source,diff]
+----
+ // package.json
+ {
+   ...,
+   "files": [
++    "build",
++    "contracts",
++    ".openzeppelin/*.json"
+   ]
+ }
+----
+
+NOTE: The files in your `.openzeppelin` directory that xref:configuration.adoc#configuration-files-in-version-control[should not be tracked in version control] are not required to be part of your published npm package: remove them before publishing to the registry.
+
+Almost done! Log into npm and upload your package with:
+
+[source,console]
+----
+$ npm login
+$ npm publish
+----
+
+Success! The Ethereum Package is now live on the blockchain, and accessible to everyone via the npm registry.
+
+Any OpenZeppelin project can now xref:commands.adoc#link[link] to your package:
+
+[source,console]
+----
+$ npx oz link <your-project-name>
+----
+
+NOTE: Your Ethereum Package's name is the same one you provided xref:getting-started.adoc#setting-up-your-project[during initialization].

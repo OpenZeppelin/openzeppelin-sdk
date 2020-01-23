@@ -11,7 +11,6 @@ import sleep from '../helpers/sleep';
 import ZWeb3 from '../artifacts/ZWeb3';
 import Contracts from '../artifacts/Contracts';
 import Contract from '../artifacts/Contract';
-import { TransactionReceipt } from 'web3-core';
 import { buildDeploymentCallData } from './ABIs';
 import { TxParams } from '../artifacts/ZWeb3';
 
@@ -66,7 +65,7 @@ export default {
         Contracts.getArtifactsDefaults().gas ||
         (await this.estimateActualGas({ to: address, data, value }));
 
-      return ZWeb3.eth().sendTransaction({
+      return ZWeb3.eth.sendTransaction({
         to: address,
         data,
         value,
@@ -139,33 +138,6 @@ export default {
     }
   },
 
-  /**
-   * Sends a transaction to the blockchain with data precalculated, estimating the gas to be used.
-   * Uses the node's estimateGas RPC call, and adds a 20% buffer on top of it, capped by the block gas limit.
-   * @param contract contract instance to send the tx to
-   * @param txParams all transaction parameters (data, from, gasPrice, etc)
-   * @param retries number of data transaction retries
-   */
-  async sendDataTransaction(
-    contract: Contract,
-    txParams: TxParams,
-    retries: number = RETRY_COUNT,
-  ): Promise<TransactionReceipt> {
-    await this._fixGasPrice(txParams);
-
-    try {
-      const gas =
-        txParams.gas ||
-        Contracts.getArtifactsDefaults().gas ||
-        (await this.estimateActualGas({ to: contract.address, ...txParams }));
-      return this._sendContractDataTransaction(contract, { ...txParams, gas });
-    } catch (error) {
-      const msg = typeof error === 'string' ? error : error.message;
-      if (!msg.match(/nonce too low/) || retries <= 0) throw error;
-      return this.sendDataTransaction(contract, txParams, retries - 1);
-    }
-  },
-
   async estimateGas(txParams: TxParams, retries: number = RETRY_COUNT): Promise<any> {
     // Retry if estimate fails. This could happen because we are depending
     // on a previous transaction being mined that still hasn't reach the node
@@ -176,7 +148,7 @@ export default {
       // See https://github.com/ethereum/go-ethereum/issues/18973 for more info
       const txParamsWithoutGas = omit(txParams, 'gas');
       // Use json-rpc method estimateGas to retrieve estimated value
-      return await ZWeb3.estimateGas(txParamsWithoutGas);
+      return await ZWeb3.eth.estimateGas(txParamsWithoutGas);
     } catch (error) {
       if (retries <= 0) throw Error(error);
       await sleep(RETRY_SLEEP_TIME);
@@ -215,7 +187,7 @@ export default {
     timeout: number = 10 * 60 * 1000,
   ): Promise<any | never> {
     if (await ZWeb3.isGanacheNode()) return;
-    const getTxBlock = () => ZWeb3.getTransactionReceipt(transactionHash).then(r => r.blockNumber);
+    const getTxBlock = () => ZWeb3.eth.getTransactionReceipt(transactionHash).then(r => r.blockNumber);
     const now = +new Date();
 
     while (true) {
@@ -228,13 +200,6 @@ export default {
       if (currentBlock - txBlock >= confirmations) return true;
       await sleep(interval);
     }
-  },
-
-  async _sendContractDataTransaction(contract: Contract, txParams: TxParams): Promise<TransactionReceipt> {
-    const defaults = await Contracts.getDefaultTxParams();
-    const tx = { to: contract.address, ...defaults, ...txParams };
-    const txHash = await ZWeb3.sendTransactionWithoutReceipt(tx);
-    return await ZWeb3.getTransactionReceiptWithTimeout(txHash, Contracts.getSyncTimeout());
   },
 
   async _getETHGasStationPrice(): Promise<any | never> {

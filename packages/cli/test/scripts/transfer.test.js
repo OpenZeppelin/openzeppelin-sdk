@@ -51,8 +51,8 @@ describe('transfer script', function() {
 
     context('when sending a valid amount of ether', function() {
       it('transfers funds', async function() {
-        const senderBalance = await ZWeb3.getBalance(sender);
-        const receiverBalance = await ZWeb3.getBalance(receiver);
+        const senderBalance = await ZWeb3.eth.getBalance(sender);
+        const receiverBalance = await ZWeb3.eth.getBalance(receiver);
 
         await transfer({
           from: sender,
@@ -61,8 +61,8 @@ describe('transfer script', function() {
           unit: 'ether',
         });
 
-        (await ZWeb3.getBalance(sender)).should.not.eq(new BN(senderBalance).toString());
-        (await ZWeb3.getBalance(receiver)).should.eq(new BN(receiverBalance).plus(10e18).toString());
+        (await ZWeb3.eth.getBalance(sender)).should.not.eq(new BN(senderBalance).toString());
+        (await ZWeb3.eth.getBalance(receiver)).should.eq(new BN(receiverBalance).plus(10e18).toString());
       });
     });
   });

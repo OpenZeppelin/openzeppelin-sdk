@@ -1,0 +1,167 @@
+= Creating Upgradeable Contracts From Solidity
+
+The xref:cli::index.adoc[*OpenZeppelin CLI*] lets you create upgradable contracts from the command line, and you can also use Upgrades directly from JavaScript, but there is a third use case: creating an upgradable contract directly from another contract.
+
+In this guide, we will learn how to create a contract https://en.wikipedia.org/wiki/Factory_(object-oriented_programming)[factory] where the resulting contracts are themselves upgradeable.
+
+[NOTE]
+====
+This guide features advanced usage of OpenZeppelin tools, and requires familiarity with Solidity, development blockchains and the OpenZeppelin CLI.
+
+For a refresher on the topics, head to xref:learn::deploy-and-interact.adoc[Deploying and Interacting With Smart Contracts].
+====
+
+== Setting Up
+
+Start by xref:cli::getting-started.adoc#setting-up-your-project[initializing an OpenZeppelin project] using the CLI:
+
+[source,console]
+----
+$ npx oz init creating-from-solidity 1.0.0
+----
+
+The project name is important: we'll be using it later from the Solidity code.
+
+We can now write the code for `Product`, a simple contract that stores a value. This is the contract that will be created by out contract factory.
+
+[source,solidity]
+----
+// contracts/Product.sol
+pragma solidity ^0.5.0;
+
+import "@openzeppelin/upgrades/contracts/Initializable.sol";
+
+contract Product is Initializable {
+    uint256 public value;
+
+    function initialize(uint256 _value) public initializer {
+        value = _value;
+    }
+}
+----
+
+The `Factory` is a bit more involved: we'll provide it with our project's xref:cli::contracts-architecture.adoc#app.sol[`App`] contract, and use it to create new upgradeable instances of `Product`. This is where your project's name comes into play: you'll need to provide this information to `App`:
+
+[source,solidity]
+----
+// contracts/Factory.sol
+pragma solidity ^0.5.0;
+
+import "@openzeppelin/upgrades/contracts/Initializable.sol";
+import "@openzeppelin/upgrades/contracts/application/App.sol";
+
+contract Factory is Initializable {
+    App private app;
+
+    event InstanceCreated(address);
+
+    function initialize(App _app) public initializer {
+      app = _app);
+    }
+
+    function createInstance(bytes memory _data) public {
+        string memory packageName = "creating-from-solidity";
+        string memory contractName = "Product";
+        address admin = msg.sender;
+
+        address product = address(
+            app.create(packageName, contractName, admin, _data)
+        );
+
+        emit InstanceCreated(product);
+    }
+}
+----
+
+== Connecting Our Factory to the App
+
+The `Factory` 's `initialize` method requires that we provide the address of our xref:cli::contracts-architecture.adoc#app.sol[`App`]. The `App` is an on-chain representation of your project, and must be published explicitly for us to use it this way.
+
+To do this, we'll first need to `add` the `Product` contract to our `App` (so that it can deploy new ones), `push` or deploy the underlying contracts, and finally `publish` the whole project to the blockchain
+
+[source,console]
+----
+$ npx oz add Product
+✓ Added contract Product
+$ npx oz push
+✓ Contract Product deployed
+All contracts have been deployed
+$ npx oz publish
+✓ Project structure deployed
+✓ Registering Product at 0x3064A4B40fcf4E68bCc5E2EBF44421A325C78b00 in directory
+✓ Published to dev-1578608628898!
+----
+
+Now that the `App` has been published and `Product` registered inside it, we're ready to use it! Head to your project's xref:cli::configuration.adoc#network.json[network configuration file] and look for the `app` entry:
+
+```json
+// .openzeppelin/dev-1578608628898.json
+  ...
+  "app": {
+    "address": "0x61F31Be60e7EA755cc034cD38FdE02bA4e3ecd47"
+  },
+  ...
+```
+
+With the `App` address at hand, we can deploy `Factory` using `oz create` as usual:
+
+[source,console]
+----
+$ npx oz create
+? Pick a contract to instantiate Factory
+✓ Added contract Factory
+✓ Contract Factory deployed
+All contracts have been deployed
+? Call a function to initialize the instance after creating it? Yes
+? Select which function * initialize(_appContractAddress: address)
+? _appContractAddress (address): 0x61F31Be60e7EA755cc034cD38FdE02bA4e3ecd47
+✓ Setting everything up to create contract instances
+✓ creating-from-solidity Factory instance created at 0xA7b8Fb47F9114278ece7d2d8161533d06B9203a4
+0xA7b8Fb47F9114278ece7d2d8161533d06B9203a4
+----
+
+[encoding-call-data]
+== Encoding Call Data
+
+Our `Factory` is ready for its `createInstace` method to be called, but there's still something missing: `Product` 's initialization data.
+
+Recall that `Product` has an `initialize` method: when creating a new one, we need to make sure it is called with the right arguments.
+
+[source,solidity]
+----
+// contracts/Product.sol
+    ...
+    function initialize(uint256 _value) public initializer {
+        value = _value;
+    }
+    ...
+----
+
+OpenZeppelin Upgrades provides a JavaScript utility function just for this sort of thing: `encodeCall`. It receives a method name, an array of argument types and an array of argument values, and outputs the call data that corresponds to that method invocation.
+
+Let's generate the call data for an initialization with the number 42:
+
+[source,console]
+----
+$ node
+> const { encodeCall } = require('@openzeppelin/upgrades');
+> encodeCall('initialize', ['uint256'], [42]);
+'0xfe4b84df000000000000000000000000000000000000000000000000000000000000002a'
+----
+
+== Creating the Instance contract
+
+With the call data <<encoding-call-data, we just generated>> we're finally ready to use `Factory` to create a new `Product`.
+
+[source,console]
+----
+$ npx oz send-tx
+? Pick an instance Factory at 0xA7b8Fb47F9114278ece7d2d8161533d06B9203a4
+? Select which function createInstance(_data: bytes)
+? _data (bytes): 0xfe4b84df000000000000000000000000000000000000000000000000000000000000002a
+✓ Transaction successful. Transaction hash: 0xc39b59dc10e1c68c681648d30d042b2b8c8a912839912533a349628c299ec619
+Events emitted:
+ - InstanceCreated(0x37838554CEb544A849cD4e5867AD0a9F7d4fB779)
+----
+
+We have now created a new upgradeable `Product` contract from our `Factory` contract! Note that the data provided to `createInstance` is the one we generated using `encodeCall`.

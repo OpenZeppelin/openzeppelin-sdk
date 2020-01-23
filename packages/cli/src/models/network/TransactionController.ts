@@ -58,7 +58,7 @@ export default class TransactionController {
 
       return balance;
     } else {
-      const balance = await ZWeb3.getBalance(accountAddress);
+      const balance = await ZWeb3.eth.getBalance(accountAddress);
       Loggy.noSpin(__filename, 'getBalanceOf', 'balance-of', `Balance: ${fromWei(balance, 'ether')} ETH`);
 
       return balance;
@@ -112,7 +112,7 @@ export default class TransactionController {
   private async getTokenInfo(accountAddress: string, contractAddress: string): Promise<ERC20TokenInfo | never> {
     let balance, tokenSymbol, tokenDecimals;
     try {
-      const contract = ZWeb3.contract(ERC20_PARTIAL_ABI, contractAddress);
+      const contract = new ZWeb3.eth.Contract(ERC20_PARTIAL_ABI, contractAddress);
       balance = await contract.methods.balanceOf(accountAddress).call();
       [tokenSymbol, tokenDecimals] = await allPromisesOrError([
         contract.methods.symbol().call(),

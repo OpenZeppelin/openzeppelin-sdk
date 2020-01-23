@@ -29,7 +29,7 @@ const ClashingImplementation = Contracts.getFromLocal('ClashingImplementation');
 
 const sendTransaction = (target, method, args, values, opts) => {
   const data = encodeCall(method, args, values);
-  return ZWeb3.sendTransaction({ ...opts, to: target.address, data });
+  return ZWeb3.eth.sendTransaction({ ...opts, to: target.address, data });
 };
 
 export default function shouldBehaveLikeAdminUpgradeabilityProxy(createProxy, accounts) {
@@ -135,7 +135,7 @@ export default function shouldBehaveLikeAdminUpgradeabilityProxy(createProxy, ac
           });
 
           it('sends given value to the proxy', async function() {
-            const balance = await ZWeb3.getBalance(this.proxyAddress);
+            const balance = await ZWeb3.eth.getBalance(this.proxyAddress);
             balance.toString().should.eq(value.toString());
           });
 
@@ -184,7 +184,7 @@ export default function shouldBehaveLikeAdminUpgradeabilityProxy(createProxy, ac
             // eslint-disable-next-line @typescript-eslint/camelcase
             this.behavior_v1 = await MigratableMockV1.new();
             // eslint-disable-next-line @typescript-eslint/camelcase
-            this.balancePrevious_v1 = new BN(await ZWeb3.getBalance(this.proxyAddress));
+            this.balancePrevious_v1 = new BN(await ZWeb3.eth.getBalance(this.proxyAddress));
             this.events = (
               await this.proxy.methods.upgradeToAndCall(this.behavior_v1.address, v1MigrationData).send({ from, value })
             ).events;
@@ -202,7 +202,7 @@ export default function shouldBehaveLikeAdminUpgradeabilityProxy(createProxy, ac
             const x = await migratable.methods.x().call();
             x.should.eq('42');
 
-            const balance = await ZWeb3.getBalance(this.proxyAddress);
+            const balance = await ZWeb3.eth.getBalance(this.proxyAddress);
             assert(new BN(balance).eq(this.balancePrevious_v1.plus(value)));
           });
 
@@ -213,7 +213,7 @@ export default function shouldBehaveLikeAdminUpgradeabilityProxy(createProxy, ac
               // eslint-disable-next-line @typescript-eslint/camelcase
               this.behavior_v2 = await MigratableMockV2.new();
               // eslint-disable-next-line @typescript-eslint/camelcase
-              this.balancePrevious_v2 = new BN(await ZWeb3.getBalance(this.proxyAddress));
+              this.balancePrevious_v2 = new BN(await ZWeb3.eth.getBalance(this.proxyAddress));
               this.events = (
                 await this.proxy.methods
                   .upgradeToAndCall(this.behavior_v2.address, v2MigrationData)
@@ -236,7 +236,7 @@ export default function shouldBehaveLikeAdminUpgradeabilityProxy(createProxy, ac
               const y = await migratable.methods.y().call();
               y.should.eq('42');
 
-              const balance = new BN(await ZWeb3.getBalance(this.proxyAddress));
+              const balance = new BN(await ZWeb3.eth.getBalance(this.proxyAddress));
               expect(balance).to.eql(this.balancePrevious_v2.plus(value));
             });
 
@@ -247,7 +247,7 @@ export default function shouldBehaveLikeAdminUpgradeabilityProxy(createProxy, ac
                 // eslint-disable-next-line @typescript-eslint/camelcase
                 this.behavior_v3 = await MigratableMockV3.new();
                 // eslint-disable-next-line @typescript-eslint/camelcase
-                this.balancePrevious_v3 = new BN(await ZWeb3.getBalance(this.proxyAddress));
+                this.balancePrevious_v3 = new BN(await ZWeb3.eth.getBalance(this.proxyAddress));
                 this.events = (
                   await this.proxy.methods
                     .upgradeToAndCall(this.behavior_v3.address, v3MigrationData)
@@ -270,7 +270,7 @@ export default function shouldBehaveLikeAdminUpgradeabilityProxy(createProxy, ac
                 const y = await migratable.methods.y().call();
                 y.should.eq('10');
 
-                const balance = new BN(await ZWeb3.getBalance(this.proxyAddress));
+                const balance = new BN(await ZWeb3.eth.getBalance(this.proxyAddress));
                 expect(balance).to.eql(this.balancePrevious_v3.plus(value));
               });
             });

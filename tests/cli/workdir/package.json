@@ -1,18 +1,18 @@
 {
   "name": "tests-cli-workdir",
   "private": true,
-  "version": "2.6.0",
+  "version": "2.7.0-rc.0",
   "description": "CLI app project for ZeppelinOS integration test",
   "author": "santiago@openzeppelin.com",
   "license": "MIT",
   "dependencies": {
-    "@openzeppelin/upgrades": "^2.6.0",
+    "@openzeppelin/upgrades": "2.7.0-rc.0",
     "bignumber.js": "^7.2.0",
     "mock-stdlib": "file:../dependencies/mock-stdlib-1.1.0",
     "truffle-hdwallet-provider": "0.0.6"
   },
   "devDependencies": {
-    "@openzeppelin/cli": "^2.6.0",
+    "@openzeppelin/cli": "2.7.0-rc.0",
     "truffle": "^4.1.14"
   }
 }

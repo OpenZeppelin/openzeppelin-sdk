@@ -31,22 +31,22 @@ describe('Transactions', function() {
   });
 
   const assertGasLt = async (txHash, expected) => {
-    const { gas } = await ZWeb3.getTransaction(txHash);
+    const { gas } = await ZWeb3.eth.getTransaction(txHash);
     gas.should.be.at.most(parseInt(expected));
   };
 
   const assertGas = async (txHash, expected) => {
-    const { gas } = await ZWeb3.getTransaction(txHash);
+    const { gas } = await ZWeb3.eth.getTransaction(txHash);
     gas.should.be.eq(parseInt(expected));
   };
 
   const assertGasPrice = async (txHash, expected) => {
-    const { gasPrice } = await ZWeb3.getTransaction(txHash);
+    const { gasPrice } = await ZWeb3.eth.getTransaction(txHash);
     parseInt(gasPrice, 10).should.be.eq(expected);
   };
 
   const assertFrom = async (txHash, expected) => {
-    const { from } = await ZWeb3.getTransaction(txHash);
+    const { from } = await ZWeb3.eth.getTransaction(txHash);
     from.should.be.eq(expected);
   };
 
@@ -205,155 +205,6 @@ describe('Transactions', function() {
     });
   });
 
-  describe('sendDataTransaction', function() {
-    beforeEach('deploys contract', async function() {
-      this.instance = await Transactions.deployContract(this.DummyImplementation);
-      this.encodedCall = encodeCall('initialize', ['uint256', 'string', 'uint256[]'], DEFAULT_PARAMS);
-    });
-
-    it('correctly sends the transaction', async function() {
-      await Transactions.sendDataTransaction(this.instance, {
-        data: this.encodedCall,
-      });
-      const actualValue = await this.instance.methods.value().call();
-      actualValue.should.eq('42');
-    });
-
-    it('honours other tx params', async function() {
-      const receipt = await Transactions.sendDataTransaction(this.instance, {
-        data: this.encodedCall,
-        from: account2,
-      });
-      await assertFrom(receipt.transactionHash, account2);
-    });
-
-    it('handles failing transactions', async function() {
-      await assertRevert(
-        Transactions.sendDataTransaction(this.instance, {
-          data: encodeCall('reverts'),
-        }),
-      );
-    });
-
-    describe('gas', function() {
-      describe('when there is a default gas amount defined', function() {
-        describe('when a gas amount is given', function() {
-          it('uses specified gas', async function() {
-            const receipt = await Transactions.sendDataTransaction(this.instance, {
-              data: this.encodedCall,
-              gas: 800000,
-            });
-            await assertGas(receipt.transactionHash, 800000);
-          });
-        });
-
-        describe('when no gas amount is given', function() {
-          it('uses the default gas amount', async function() {
-            const receipt = await Transactions.sendTransaction(this.instance.methods.initialize, DEFAULT_PARAMS);
-            await assertGas(receipt.transactionHash, DEFAULT_GAS);
-          });
-        });
-      });
-
-      describe('when there is no default gas defined', function() {
-        beforeEach('stub default gas amount', function() {
-          sinon.stub(Contracts, 'getArtifactsDefaults').resolves({
-            from: _account1,
-            gas: undefined,
-            gasPrice: 100000000000,
-          });
-        });
-
-        describe('when a gas amount is given', function() {
-          it('uses specified gas', async function() {
-            const receipt = await Transactions.sendDataTransaction(this.instance, {
-              data: this.encodedCall,
-              gas: 800000,
-            });
-            await assertGas(receipt.transactionHash, 800000);
-          });
-        });
-
-        describe('when no gas amount is given', function() {
-          beforeEach(function() {
-            sinon.stub(ZWeb3, 'isGanacheNode').resolves(false);
-          });
-
-          it('estimates gas', async function() {
-            const receipt = await Transactions.sendDataTransaction(this.instance, { data: this.encodedCall });
-            await assertGasLt(receipt.transactionHash, 1000000);
-          });
-
-          it('retries estimating gas', async function() {
-            const stub = sinon.stub(ZWeb3, 'estimateGas');
-            times(3, i =>
-              stub.onCall(i).throws('Error', 'gas required exceeds allowance or always failing transaction'),
-            );
-            stub.returns(800000);
-
-            const receipt = await Transactions.sendDataTransaction(this.instance, { data: this.encodedCall });
-            await assertGas(receipt.transactionHash, 800000 * 1.25);
-          });
-
-          it('retries estimating gas up to 3 times', async function() {
-            const stub = sinon.stub(ZWeb3, 'estimateGas');
-            times(4, i =>
-              stub.onCall(i).throws('Error', 'gas required exceeds allowance or always failing transaction'),
-            );
-            stub.returns(800000);
-
-            await Transactions.sendDataTransaction(this.instance, {
-              data: this.encodedCall,
-            }).should.be.rejectedWith(/always failing transaction/);
-          });
-        });
-      });
-    });
-
-    describe('gas price', function() {
-      describe('uses an API to determine gas price', async function() {
-        beforeEach('Stub API reply and simulate mainnet', async function() {
-          sinon.stub(ZWeb3, 'isMainnet').resolves(true);
-          sinon.stub(axios, 'get').resolves({ data: { average: 49 } });
-        });
-
-        afterEach('return to testnet', async function() {
-          delete state.gasPrice;
-        });
-
-        it('uses gas price API when gas not specified', async function() {
-          const receipt = await Transactions.sendDataTransaction(this.instance, { data: this.encodedCall });
-          await await assertGasPrice(receipt.transactionHash, 49 * 1e8);
-        });
-
-        it('does not use gas price API when gasPrice specified', async function() {
-          const receipt = await Transactions.sendDataTransaction(this.instance, {
-            gasPrice: 1234,
-            data: this.encodedCall,
-          });
-          await await assertGasPrice(receipt.transactionHash, 1234);
-        });
-      });
-
-      describe('does not blindly trust API', async function() {
-        beforeEach('stub API reply and simulate mainnet', async function() {
-          sinon.stub(ZWeb3, 'isMainnet').resolves(true);
-          sinon.stub(axios, 'get').resolves({ data: { average: 1234123412341234 } });
-        });
-
-        afterEach('return to testnet', async function() {
-          delete state.gasPrice;
-        });
-
-        it('produces an error when gas price API gives giant value', async function() {
-          await Transactions.sendDataTransaction(this.instance, {
-            data: this.encodedCall,
-          }).should.be.rejectedWith(/is over 100 gwei/);
-        });
-      });
-    });
-  });
-
   describe('sendRawTransaction', function() {
     beforeEach('deploys contract', async function() {
       this.instance = await Transactions.deployContract(this.DummyImplementation);
@@ -389,7 +240,7 @@ describe('Transactions', function() {
             value: utils.toWei('1', 'ether'),
           };
           await Transactions.sendRawTransaction(this.instance.address, transactionParams, { from: account2 });
-          (await ZWeb3.getBalance(this.instance.address)).should.eq((1e18).toString());
+          (await ZWeb3.eth.getBalance(this.instance.address)).should.eq((1e18).toString());
         });
       });
 
@@ -402,7 +253,7 @@ describe('Transactions', function() {
           await assertRevert(
             Transactions.sendRawTransaction(this.instance.address, transactionParams, { from: account2 }),
           );
-          (await ZWeb3.getBalance(this.instance.address)).should.eq('0');
+          (await ZWeb3.eth.getBalance(this.instance.address)).should.eq('0');
         });
       });
     });
@@ -459,7 +310,7 @@ describe('Transactions', function() {
           });
 
           it('retries estimating gas', async function() {
-            const stub = sinon.stub(ZWeb3, 'estimateGas');
+            const stub = sinon.stub(ZWeb3.eth, 'estimateGas');
             times(3, i =>
               stub.onCall(i).throws('Error', 'gas required exceeds allowance or always failing transaction'),
             );
@@ -471,7 +322,7 @@ describe('Transactions', function() {
           });
 
           it('retries estimating gas up to 3 times', async function() {
-            const stub = sinon.stub(ZWeb3, 'estimateGas');
+            const stub = sinon.stub(ZWeb3.eth, 'estimateGas');
             times(4, i =>
               stub.onCall(i).throws('Error', 'gas required exceeds allowance or always failing transaction'),
             );
@@ -714,7 +565,7 @@ describe('Transactions', function() {
             });
 
             it('retries estimating gas', async function() {
-              const stub = sinon.stub(ZWeb3, 'estimateGas');
+              const stub = sinon.stub(ZWeb3.eth, 'estimateGas');
               times(3, i =>
                 stub.onCall(i).throws('Error', 'gas required exceeds allowance or always failing transaction'),
               );
@@ -725,7 +576,7 @@ describe('Transactions', function() {
             });
 
             it('retries estimating gas up to 3 times', async function() {
-              const stub = sinon.stub(ZWeb3, 'estimateGas');
+              const stub = sinon.stub(ZWeb3.eth, 'estimateGas');
               times(4, i =>
                 stub.onCall(i).throws('Error', 'gas required exceeds allowance or always failing transaction'),
               );

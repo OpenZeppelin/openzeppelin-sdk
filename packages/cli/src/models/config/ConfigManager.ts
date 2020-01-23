@@ -1,6 +1,6 @@
 import { ZWeb3, Contracts, TxParams } from '@openzeppelin/upgrades';
 import TruffleConfig from './TruffleConfig';
-import Session from '../network/Session';
+import { default as Session, SessionOptions } from '../network/Session';
 import NetworkConfig from './NetworkConfig';
 
 import pick from 'lodash.pick';
@@ -23,22 +23,21 @@ const ConfigManager = {
   },
 
   async initNetworkConfiguration(
-    options: any = {},
+    options: SessionOptions,
     silent?: boolean,
     root: string = process.cwd(),
   ): Promise<{ network: string; txParams: TxParams } | never> {
     this.initStaticConfiguration(root);
-    const { network: networkName, from, timeout } = Session.getOptions(options, silent);
+    const { network: networkName, from, timeout, blockTimeout } = Session.getOptions(options, silent);
     Session.setDefaultNetworkIfNeeded(options.network);
     if (!networkName) throw Error('A network name must be provided to execute the requested action.');
 
     const { provider, artifactDefaults, network } = await this.config.loadNetworkConfig(networkName, root);
 
-    Contracts.setSyncTimeout(timeout * 1000);
     Contracts.setArtifactsDefaults(artifactDefaults);
 
     try {
-      ZWeb3.initialize(provider);
+      ZWeb3.initialize(provider, { pollingTimeout: timeout, blockTimeout });
       await ZWeb3.checkNetworkId(network.networkId);
       const txParams = {
         from: ZWeb3.toChecksumAddress(from || artifactDefaults.from || (await ZWeb3.defaultAccount())),
@@ -76,6 +75,11 @@ const ConfigManager = {
     this.setBaseConfig(root);
     const config = this.config.getConfig();
     return config && config.networks ? Object.keys(config.networks) : undefined;
+  },
+
+  getConfigFileName(root: string = process.cwd()): string {
+    this.setBaseConfig(root);
+    return this.config.getConfigFileName(root);
   },
 
   setBaseConfig(root: string = process.cwd()): void | null | never {

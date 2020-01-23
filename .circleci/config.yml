@@ -95,11 +95,11 @@ jobs:
       - test:
           workspace: packages/cli
 
-  example-lib-simple:
+  example-upgrades-library:
     <<: *defaults
     steps:
       - test:
-          workspace: examples/lib-simple
+          workspace: examples/upgrades-library
           run-yarn: true
 
   example-create-instances-from-solidity:
@@ -160,7 +160,7 @@ workflows:
           requires: [setup]
       - test-cli:
           requires: [setup]
-      - example-lib-simple:
+      - example-upgrades-library:
           requires: [test-lib]
       - example-create-instances-from-solidity:
           requires: [test-lib, test-cli]

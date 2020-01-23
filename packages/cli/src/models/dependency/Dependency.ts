@@ -129,11 +129,7 @@ export default class Dependency {
 
   public get projectFile(): ProjectFile | never {
     if (!this._projectFile) {
-      const filePath = ProjectFile.getExistingFilePath(this.getDependencyFolder());
-      if (!filePath) {
-        throw new Error(`Could not find an .openzeppelin/project.json or zos.json file for '${this.name}'`);
-      }
-      this._projectFile = new ProjectFile(filePath);
+      this._projectFile = ProjectFile.getExistingProject(this.getDependencyFolder());
     }
     return this._projectFile;
   }

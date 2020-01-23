@@ -1,24 +1,21 @@
+import fs from 'fs-extra';
 import glob from 'glob';
 import path from 'path';
 import Contract, { createContract } from './Contract';
 import ZWeb3 from './ZWeb3';
 import { getSolidityLibNames, hasUnlinkedVariables } from '../utils/Bytecode';
 
+import { ContractNotFound } from '../errors';
+
 export default class Contracts {
-  private static DEFAULT_SYNC_TIMEOUT = 240000;
   private static DEFAULT_BUILD_DIR = `build/contracts`;
   private static DEFAULT_CONTRACTS_DIR = `contracts`;
 
-  private static timeout: number = Contracts.DEFAULT_SYNC_TIMEOUT;
   private static buildDir: string = Contracts.DEFAULT_BUILD_DIR;
   private static contractsDir: string = Contracts.DEFAULT_CONTRACTS_DIR;
   private static projectRoot: string = null;
   private static artifactDefaults: any = {};
   private static defaultFromAddress: string;
-
-  public static getSyncTimeout(): number {
-    return Contracts.timeout || Contracts.DEFAULT_SYNC_TIMEOUT;
-  }
 
   public static getLocalBuildDir(): string {
     return path.resolve(Contracts.buildDir || Contracts.DEFAULT_BUILD_DIR);
@@ -51,19 +48,24 @@ export default class Contracts {
   }
 
   public static getNodeModulesPath(dependency: string, contractName: string): string {
-    return require.resolve(`${dependency}/build/contracts/${contractName}.json`, { paths: [this.getProjectRoot()] });
+    const root = this.getProjectRoot();
+    try {
+      return require.resolve(`${dependency}/build/contracts/${contractName}.json`, { paths: [root] });
+    } catch (e) {
+      throw new ContractNotFound(contractName, dependency);
+    }
   }
 
   public static getFromLocal(contractName: string): Contract {
-    return Contracts._getFromPath(Contracts.getLocalPath(contractName));
+    return Contracts._getFromPath(Contracts.getLocalPath(contractName), contractName);
   }
 
   public static getFromLib(contractName: string): Contract {
-    return Contracts._getFromPath(Contracts.getLibPath(contractName));
+    return Contracts._getFromPath(Contracts.getLibPath(contractName), contractName);
   }
 
   public static getFromNodeModules(dependency: string, contractName: string): Contract {
-    return Contracts._getFromPath(Contracts.getNodeModulesPath(dependency, contractName));
+    return Contracts._getFromPath(Contracts.getNodeModulesPath(dependency, contractName), contractName);
   }
 
   public static async getDefaultFromAddress() {
@@ -76,10 +78,6 @@ export default class Contracts {
   public static listBuildArtifacts(pathName?: string): string[] {
     const buildDir = pathName || Contracts.getLocalBuildDir();
     return glob.sync(`${buildDir}/*.json`);
-  }
-
-  public static setSyncTimeout(value: number): void {
-    Contracts.timeout = value;
   }
 
   public static setLocalBuildDir(dir: string): void {
@@ -101,9 +99,12 @@ export default class Contracts {
     };
   }
 
-  private static _getFromPath(targetPath: string): Contract {
+  private static _getFromPath(targetPath: string, contractName: string): Contract {
     // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const schema = require(targetPath);
+    if (!fs.existsSync(targetPath)) {
+      throw new ContractNotFound(contractName);
+    }
+    const schema = fs.readJsonSync(targetPath);
     schema.directory = path.dirname(targetPath);
     if (schema.bytecode === '') throw new Error(`A bytecode must be provided for contract ${schema.contractName}.`);
     if (!hasUnlinkedVariables(schema.bytecode)) {

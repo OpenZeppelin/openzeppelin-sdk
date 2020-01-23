@@ -1,0 +1,179 @@
+= Getting Started
+
+This tutorial will showcase usage of the OpenZeppelin CLI, giving you a taste of its capabilities and serving as a starting point for your own projects.
+
+We will cover:
+  * Create a new OpenZeppelin project with a smart contract
+  * Deploying our contract to a local development network
+  * Interacting with our contract from the terminal
+  * Upgrading the deployed contract to a new version
+
+[[prerequisites]]
+== Prerequisites
+
+The CLI is installed as a dependency to your Node project:
+
+[source,console]
+----
+$ npm install @openzeppelin/cli
+----
+
+TIP: If you're unfamiliar with Node and npm, head to our guide on xref:learn::set-up-dev-environment[Setting Up a Development Environment].
+
+We are installing the CLI https://docs.npmjs.com/downloading-and-installing-packages-locally[locally] instead of https://docs.npmjs.com/downloading-and-installing-packages-globally[globally], which means usage of the CLI will be prefixed with `npx`. This will avoid issues that arise from having global dependencies, and will let you have different versions of the CLI in each of your projects, if you so desire.
+
+[[setting-up-your-project]]
+== Setting up Your Project
+
+Inside your Node project, use the CLI to initialize an OpenZeppelin project:
+
+[source,console]
+----
+$ npx openzeppelin init
+----
+
+The CLI will prompt you for a project name and version, defaulting to the ones from the `package.json`, and then set up a few files and directories for running your OpenZeppelin project.
+
+TIP: If you'd rather type less, you can use the `oz` command alias, so `openzeppelin init` becomes just `oz init`. We'll use this throughout the tutorial.
+
+We are now ready to begin working on our project.
+
+NOTE: Should you get lost at any point during this tutorial, you can refer to the full code for this project in our https://github.com/OpenZeppelin/openzeppelin-sdk/tree/v2.4.0/examples/first-project[`Github repo`].
+
+[[your-first-contract]]
+== Your First Contract
+
+We will write a simple contract in https://solidity.readthedocs.io/[Solidity], the most popular language for Ethereum smart contracts. Create a new file `contracts/Counter.sol` in your project with the following content:
+
+[source,solidity]
+----
+// contracts/Counter.sol
+pragma solidity ^0.5.0;
+
+contract Counter {
+    uint256 public value;
+
+    function increase() public {
+      value++;
+    }
+}
+----
+
+This contract stores a numeric `value` that is increased by one every time we send a transaction to the `increase()` function.
+
+You can run `oz compile` to compile the contract and check for any errors. Once that's done, we'll be ready to deploy it.
+
+NOTE: You don't have to worry if you forget to compile your contract. The CLI will automatically check if your contract changed when you run any command, and compile it if needed.
+
+[[deploying-to-a-development-network]]
+== Deploying to a Development Network
+
+We will use https://truffleframework.com/ganache[Ganache] as a _development network_ to deploy our contract. If you don't have Ganache installed, do so now by running `npm install ganache-cli`.
+
+Development networks are mini blockchains that run just on your computer, and are much faster than the actual Ethereum network. We will use one for coding and testing.
+
+TIP: Head to xref:learn::deploy-and-interact.adoc#local-blockchain[Setting up a Local Blockchain] to learn more about using Ganache.
+
+Open a separate terminal and start a new Ganache process:
+
+[source,console]
+----
+$ npx ganache-cli --deterministic
+----
+
+This will start a new development network using a deterministic set of accounts, instead of random ones. We can now deploy our contract there, running `oz create`, and choosing to deploy the `Counter` contract to the `development` network.
+
+[source,console]
+----
+$ npx oz create
+✓ Compiled contracts with solc 0.5.9 (commit.e560f70d)
+? Pick a contract to instantiate: Counter
+? Pick a network: development
+✓ Added contract Counter
+✓ Contract Counter deployed
+? Call a function to initialize the instance after creating it?: No
+✓ Setting everything up to create contract instances
+✓ Instance created at 0xCfEB869F69431e42cdB54A4F4f105C19C080A601
+----
+
+NOTE: The addresses where your contracts are created and the transaction identifiers you see may differ from the ones listed here.
+
+Our `Counter` contract is deployed to the local development network and ready to go! We can test it out by interacting with it from the terminal. Let's try incrementing the counter, by sending a transaction to call the `increase` function through `oz send-tx`.
+
+[source,console]
+----
+$ npx oz send-tx
+? Pick a network: development
+? Pick an instance: Counter at 0xCfEB869F69431e42cdB54A4F4f105C19C080A601
+? Select which function: increase()
+✓ Transaction successful. Transaction hash: 0x20bef6583ea32cc57fe179e34dd57a5494db3c403e441624e56a886898cb52bd
+----
+
+We can now use `oz call` to query the contract's public `value`, and check that it was indeed increased from zero to one.
+
+[source,console]
+----
+$ npx oz call
+? Pick a network: development
+? Pick an instance: Counter at 0xCfEB869F69431e42cdB54A4F4f105C19C080A601
+? Select which function: value()
+✓ Method 'value()' returned: 1
+----
+
+[[upgrading-your-contract]]
+== Upgrading Your Contract
+
+We will now modify our `Counter` contract to make the `increase` function more interesting. Instead of increasing the counter by one, we will allow the caller to increase the counter by any value. Let's modify the code in `contracts/Counter.sol` to the following:
+
+[source,solidity]
+----
+// contracts/Counter.sol
+pragma solidity ^0.5.0;
+
+contract Counter {
+  uint256 public value;
+
+  function increase(uint256 amount) public {
+    value += amount;
+  }
+}
+----
+
+We can now upgrade the instance we created earlier to this new version:
+
+[source,console]
+----
+$ npx oz upgrade
+? Pick a network: development
+✓ Compiled contracts with solc 0.5.9 (commit.e560f70d)
+✓ Contract Counter deployed
+? Which proxies would you like to upgrade?: All proxies
+Instance upgraded at 0xCfEB869F69431e42cdB54A4F4f105C19C080A601.
+----
+
+Done! Our `Counter` instance has been upgraded to the latest version, and *neither its address nor its state have changed*. Let's check it out by increasing the counter by ten, which should yield eleven, since we had already increased it by one:
+
+[source,console]
+----
+$ npx oz send-tx
+? Pick a network: development
+? Pick an instance: Counter at 0xCfEB869F69431e42cdB54A4F4f105C19C080A601
+? Select which function: increase(amount: uint256)
+? amount (uint256): 10
+Transaction successful: 0x9c84faf32a87a33f517b424518712f1dc5ba0bdac4eae3a67ca80a393c555ece
+
+$ npx oz call
+? Pick a network: development
+? Pick an instance: Counter at 0xCfEB869F69431e42cdB54A4F4f105C19C080A601
+? Select which function: value()
+Returned "11"
+----
+
+[NOTE]
+====
+That smart contracts are immutable, so you may be wondering how the OpenZeppelin CLI achieved this feat. To learn about this, head to the docomentation for xref:upgrades::index.adoc[*OpenZeppelin Upgrades*], in particular the guide about xref:upgrades::proxies.adoc[Proxies].
+
+You will note that there are some changes that are not supported during upgrades. For instance, you cannot xref:upgrades::writing-upgradeable.adoc#modifying-your-contracts[remove or change the type of a contract state variable]. Nevertheless, you can change, add, or remove all the functions you want.
+====
+
+That's it! You now know how to start a simple OpenZeppelin project, create a contract, deploy it to a local network, and even upgrade it as you develop. Head over to the next tutorial to learn how to interact with your contract from your code.

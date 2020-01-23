@@ -41,7 +41,7 @@ export default function shouldBehaveLikeUpgradeabilityProxy(createProxy, proxyAd
     });
 
     it('has expected balance', async function() {
-      (await ZWeb3.getBalance(this.proxy)).should.eq(balance.toString());
+      (await ZWeb3.eth.getBalance(this.proxy)).should.eq(balance.toString());
     });
   };
 

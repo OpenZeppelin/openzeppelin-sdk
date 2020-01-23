@@ -37,6 +37,7 @@ interface Proxy extends Network, MethodParams, PackageArgs {
 export enum ProxyType {
   Upgradeable = 'Upgradeable',
   Minimal = 'Minimal',
+  NonProxy = 'NonProxy',
 }
 
 export type Params =
@@ -136,6 +137,7 @@ export interface SessionParams {
   close?: boolean;
   network?: string;
   timeout?: number;
+  blockTimeout?: number;
   expires?: number;
 }
 
