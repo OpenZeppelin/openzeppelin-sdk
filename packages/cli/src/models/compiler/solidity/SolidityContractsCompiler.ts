@@ -36,7 +36,6 @@ export interface CompiledContract {
 }
 
 export interface RawContract {
-  fileName: string;
   filePath: string;
   source: string;
   lastModified?: number;
@@ -154,8 +153,8 @@ class SolidityContractsCompiler {
       Loggy.onVerbose(
         __filename,
         '_buildSources',
-        `compile-contract-file-${contract.fileName}`,
-        `Compiling ${contract.fileName}`,
+        `compile-contract-file-${contract.filePath}`,
+        `Compiling ${contract.filePath}`,
       );
       sources[contract.filePath] = { content: contract.source };
       return sources;

@@ -99,11 +99,11 @@ describe('SolidityProjectCompiler', function() {
       const logWarnStub = sinon.stub(Loggy.noSpin, 'warn');
 
       writeFileSync(`${inputDir}/Invalid.sol`, 'pragma solidity ^0.5.0; import "./NotExists.sol";');
-      await compileProject({ inputDir, outputDir }).should.be.rejectedWith(/file import callback not supported/i);
+      await compileProject({ inputDir, outputDir }).should.be.rejectedWith(/File import callback not supported/i);
 
       logWarnStub.calledOnce.should.equal(true);
-      logWarnStub.firstCall.args.should.include(
-        'Could not find file ./NotExists.sol in folder test/mocks/mock-stdlib/contracts (imported from test/mocks/mock-stdlib/contracts/Invalid.sol)',
+      logWarnStub.firstCall.args[3].should.match(
+        /Could not find file \.\/NotExists\.sol/
       );
 
       sinon.restore();
@@ -151,29 +151,6 @@ describe('SolidityProjectCompiler', function() {
     });
   });
 
-  describe('in mock-stdlib-with-deps project', function() {
-    this.timeout(20000);
-
-    const inputDir = `${rootDir}/mocks/mock-stdlib-with-deps/contracts`;
-    const outputDir = `${baseTestBuildDir}/mock-stdlib-with-deps`;
-    const greeterArtifactPath = `${outputDir}/GreeterImpl.json`;
-    const dependencyArtifactPath = `${outputDir}/GreeterImpl.json`;
-
-    before('compiling', async function() {
-      await compileProject({ inputDir, outputDir, version: '0.5.9' });
-    });
-
-    it('compiles project contracts', async function() {
-      fs.existsSync(greeterArtifactPath).should.be.true;
-      fs.readJsonSync(greeterArtifactPath).bytecode.should.not.be.null;
-    });
-
-    it('compiles dependency contracts', async function() {
-      fs.existsSync(dependencyArtifactPath).should.be.true;
-      fs.readJsonSync(dependencyArtifactPath).bytecode.should.not.be.null;
-    });
-  });
-
   describe('in mock-stdlib-with-spaces project', function() {
     this.timeout(20000);
 
@@ -209,21 +186,37 @@ describe('SolidityProjectCompiler', function() {
     });
   });
 
-  describe('in mock-project-with-root-imports project', function() {
+  describe('in mock-project-to-compile project', function() {
     this.timeout(20000);
 
-    const projectDir = `${rootDir}/mocks/mock-project-with-root-imports`;
-    const inputDir = `${rootDir}/mocks/mock-project-with-root-imports/contracts`;
-    const outputDir = `${baseTestBuildDir}/mock-project-with-root-imports`;
+    const workingDir = `${rootDir}/test/mocks/mock-project-to-compile`;
+    const inputDir = `${rootDir}/test/mocks/mock-project-to-compile/contracts`;
+    const outputDir = `${baseTestBuildDir}/mock-project-to-compile`;
 
     it('compiles without errors', async function() {
-      this.cwd = process.cwd();
-      process.chdir(projectDir);
-      await compileProject({ inputDir, outputDir, version: '0.5.9' });
+      const { artifacts } = await compileProject({ workingDir, inputDir, outputDir, version: '0.5.9' });
+      artifacts.map(a => a.contractName).should.have.members([
+        'Greeter', 'GreeterLib', 'GreeterLib2', 'Dependency', 'DependencyLib'
+      ]);
     });
 
-    afterEach(function() {
-      process.chdir(this.cwd);
+    it('compiles including more than one import to the same file', async function() {
+      await fs.writeFile(`${inputDir}/Root.sol`, `
+        pragma solidity ^0.5.0;
+        import "./subfolder/GreeterLib.sol";
+        import "contracts/subfolder/GreeterLib2.sol";
+        contract Root { }
+      `);
+
+      const { artifacts } = await compileProject({ workingDir, inputDir, outputDir, version: '0.5.9' });
+      artifacts.map(a => a.contractName).should.have.members([
+        'Greeter', 'GreeterLib', 'GreeterLib2', 'Dependency', 'DependencyLib', 'Root'
+      ]);
     });
+
+    afterEach(async function () {
+      await fs.remove(`${inputDir}/Root.sol`);
+    });
+
   });
 });

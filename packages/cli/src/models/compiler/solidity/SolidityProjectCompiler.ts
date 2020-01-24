@@ -15,7 +15,6 @@ import {
   DEFAULT_OPTIMIZER,
   defaultEVMVersion,
 } from './SolidityContractsCompiler';
-import { ImportsFsEngine } from '@openzeppelin/resolver-engine-imports-fs';
 import { gatherSources } from './ResolverEngineGatherer';
 import { SolcBuild } from './CompilerProvider';
 import { compilerVersionsMatch, compilerSettingsMatch } from '../../../utils/solidity';
@@ -27,6 +26,7 @@ export async function compileProject(options: ProjectCompilerOptions = {}): Prom
     ...options,
     inputDir: options.inputDir || Contracts.getLocalContractsDir(),
     outputDir: options.outputDir || Contracts.getLocalBuildDir(),
+    workingDir: options.workingDir || process.cwd()
   });
 
   await projectCompiler.call();
@@ -63,6 +63,10 @@ class SolidityProjectCompiler {
 
   public get outputDir(): string {
     return this.options.outputDir;
+  }
+
+  public get workingDir(): string {
+    return this.options.workingDir;
   }
 
   public async call(): Promise<void> {
@@ -110,12 +114,11 @@ class SolidityProjectCompiler {
   }
 
   private async _loadDependencies() {
-    const importFiles = await gatherSources(this.roots, this.inputDir, ImportsFsEngine());
-    const cwd = process.cwd();
+    const importFiles = await gatherSources(this.roots, this.workingDir);    
     this.contracts = importFiles.map(file => ({
-      fileName: path.basename(file.url),
-      filePath: path.isAbsolute(file.url) ? path.relative(cwd, file.url) : file.url,
-      source: file.source,
+      fileName: path.basename(file.name),
+      filePath: file.name,
+      source: file.content,
       lastModified: tryFunc(() => statSync(file.url).mtimeMs),
     }));
   }
@@ -178,6 +181,8 @@ class SolidityProjectCompiler {
         }),
       );
     }
+
+    // TODO: Warn on repeated artifacts names
 
     // Write compiler output, saving networks info if present
     await Promise.all(
