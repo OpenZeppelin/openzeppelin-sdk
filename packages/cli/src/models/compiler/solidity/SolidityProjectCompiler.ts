@@ -28,7 +28,7 @@ export async function compileProject(options: ProjectCompilerOptions = {}): Prom
     ...options,
     inputDir: options.inputDir || Contracts.getLocalContractsDir(),
     outputDir: options.outputDir || Contracts.getLocalBuildDir(),
-    workingDir: options.workingDir || process.cwd()
+    workingDir: options.workingDir || process.cwd(),
   });
 
   await projectCompiler.call();
@@ -79,7 +79,7 @@ class SolidityProjectCompiler {
     }
 
     this.compilerVersion = await resolveCompilerVersion(this.contracts, this.options);
-    
+
     if (!this.shouldCompile()) {
       Loggy.noSpin(__filename, 'call', `compile-contracts`, 'Nothing to compile, all contracts are up to date.');
       return;
@@ -107,7 +107,7 @@ class SolidityProjectCompiler {
   }
 
   private async loadSolidityDependencies(roots: string[]): Promise<RawContract[]> {
-    const importFiles = await gatherSources(roots, this.workingDir);    
+    const importFiles = await gatherSources(roots, this.workingDir);
     return importFiles.map(file => ({
       fileName: path.basename(file.name),
       filePath: file.name,

@@ -102,9 +102,7 @@ describe('SolidityProjectCompiler', function() {
       await compileProject({ inputDir, outputDir }).should.be.rejectedWith(/File import callback not supported/i);
 
       logWarnStub.calledOnce.should.equal(true);
-      logWarnStub.firstCall.args[3].should.match(
-        /Could not find file \.\/NotExists\.sol/
-      );
+      logWarnStub.firstCall.args[3].should.match(/Could not find file \.\/NotExists\.sol/);
 
       sinon.restore();
     });
@@ -195,28 +193,30 @@ describe('SolidityProjectCompiler', function() {
 
     it('compiles without errors', async function() {
       const { artifacts } = await compileProject({ workingDir, inputDir, outputDir, version: '0.5.9' });
-      artifacts.map(a => a.contractName).should.have.members([
-        'Greeter', 'GreeterLib', 'GreeterLib2', 'Dependency', 'DependencyLib'
-      ]);
+      artifacts
+        .map(a => a.contractName)
+        .should.have.members(['Greeter', 'GreeterLib', 'GreeterLib2', 'Dependency', 'DependencyLib']);
     });
 
     it('compiles including more than one import to the same file', async function() {
-      await fs.writeFile(`${inputDir}/Root.sol`, `
+      await fs.writeFile(
+        `${inputDir}/Root.sol`,
+        `
         pragma solidity ^0.5.0;
         import "./subfolder/GreeterLib.sol";
         import "contracts/subfolder/GreeterLib2.sol";
         contract Root { }
-      `);
+      `,
+      );
 
       const { artifacts } = await compileProject({ workingDir, inputDir, outputDir, version: '0.5.9' });
-      artifacts.map(a => a.contractName).should.have.members([
-        'Greeter', 'GreeterLib', 'GreeterLib2', 'Dependency', 'DependencyLib', 'Root'
-      ]);
+      artifacts
+        .map(a => a.contractName)
+        .should.have.members(['Greeter', 'GreeterLib', 'GreeterLib2', 'Dependency', 'DependencyLib', 'Root']);
     });
 
-    afterEach(async function () {
+    afterEach(async function() {
       await fs.remove(`${inputDir}/Root.sol`);
     });
-
   });
 });

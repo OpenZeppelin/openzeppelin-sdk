@@ -7,7 +7,7 @@ import isUrl from 'is-url';
 import findUp from 'find-up';
 
 interface ImportStatement {
-  path: string; 
+  path: string;
   importedFrom: ResolvedFile;
 }
 
@@ -28,32 +28,29 @@ interface ResolvedFileWithContent extends ResolvedFile {
  * @param workingDir What's the starting working dir for resolving relative imports in roots
  * @param resolver
  */
-export async function gatherSources(
-  rootContracts: string[],
-  workingDir: string,
-): Promise<ResolvedFileWithContent[]> {
+export async function gatherSources(rootContracts: string[], workingDir: string): Promise<ResolvedFileWithContent[]> {
   const result: ResolvedFileWithContent[] = [];
   const queue: ResolvedFile[] = [];
   const alreadyProcessedUrls = new Set();
 
   for (const contract of rootContracts) {
-    queue.push({ 
+    queue.push({
       name: relative(workingDir, contract),
       url: resolve(workingDir, contract),
-      root: workingDir
+      root: workingDir,
     });
   }
 
   while (queue.length > 0) {
     const fileToProcess = queue.shift();
-    
+
     if (alreadyProcessedUrls.has(fileToProcess.url)) continue;
     alreadyProcessedUrls.add(fileToProcess.url);
-    
+
     const content = await promisify(fs.readFile)(fileToProcess.url, 'utf-8');
     const fileWithContent = { ...fileToProcess, content: content.toString() };
     result.push(fileWithContent);
-    
+
     const foundImports = tryGetImports(fileWithContent);
     for (const foundImport of foundImports) {
       const importStatement = { path: foundImport, importedFrom: fileToProcess };
@@ -65,7 +62,7 @@ export async function gatherSources(
   return result;
 }
 
-function tryGetImports(resolvedFile: ResolvedFileWithContent) : string[] {
+function tryGetImports(resolvedFile: ResolvedFileWithContent): string[] {
   try {
     return getImports(resolvedFile.content);
   } catch {
@@ -75,14 +72,17 @@ function tryGetImports(resolvedFile: ResolvedFileWithContent) : string[] {
     // Invalid source will be better diagnosed by the compiler, meaning we shouldn't halt execution so that it gets a
     // chance to inspect the source. A buggy parser will produce false negatives, but since we're not able to detect
     // that here, it makes more sense to fail loudly, hopefully leading to a bug report by a user.
-    Loggy.noSpin.warn(__filename, 'gatherSources', 'solidity-parser-warnings', `Error while parsing ${trimFile(resolvedFile.name)}`);
+    Loggy.noSpin.warn(
+      __filename,
+      'gatherSources',
+      'solidity-parser-warnings',
+      `Error while parsing ${trimFile(resolvedFile.name)}`,
+    );
     return [];
   }
 }
 
-async function tryResolveImportFile(
-  importStatement: ImportStatement,
-) : Promise<ResolvedFile | undefined> {
+async function tryResolveImportFile(importStatement: ImportStatement): Promise<ResolvedFile | undefined> {
   try {
     return await resolveImportFile(importStatement);
   } catch (err) {
@@ -94,15 +94,13 @@ async function tryResolveImportFile(
   }
 }
 
-async function resolveImportFile(
-  { path, importedFrom }: ImportStatement
-): Promise<ResolvedFile> {
+async function resolveImportFile({ path, importedFrom }: ImportStatement): Promise<ResolvedFile> {
   // We support the following import paths:
   // 1- An absolute path: /foo/bar/baz.sol
   // 2- A path relative to the current file: ../foo/bar.sol
   // 3- A path relative to the current project root: contracts/foo/bar.sol
   // 4- A path to a dependency: @openzeppelin/contracts/foo/bar.sol
-  
+
   if (isUrl(path)) {
     throw new Error(`Error resolving '${trimFile(path)}': URL imports are not supported`);
   }
@@ -122,15 +120,15 @@ async function resolveImportFile(
     if (await fileExists(url)) {
       // If relativeTo is absolute, then url and name are the same
       // so the global name is absolute as well
-      const name = isAbsolute(importedFrom.name)
-        ? url
-        : join(dirname(importedFrom.name), path);
+      const name = isAbsolute(importedFrom.name) ? url : join(dirname(importedFrom.name), path);
       return { ...importedFrom, name, url };
     } else {
-      throw new Error(`Could not find file ${trimFile(path)} relative to ${importedFrom.name} in project ${importedFrom.root}`);
+      throw new Error(
+        `Could not find file ${trimFile(path)} relative to ${importedFrom.name} in project ${importedFrom.root}`,
+      );
     }
   }
-  
+
   // 3- Path relative to project root
   const localUrl = join(importedFrom.root, path);
   if (await fileExists(localUrl)) {
@@ -143,12 +141,12 @@ async function resolveImportFile(
   const dependencyRoot = await findUp('package.json', { cwd: dependencyUrl });
   if (dependencyRoot === undefined) throw new Error(`Could not find package root for contract ${dependencyUrl}`);
   const dependencyName = require(dependencyRoot).name;
-  
+
   return {
     name: path,
     dependency: dependencyName,
     url: dependencyUrl,
-    root: dirname(dependencyRoot)
+    root: dirname(dependencyRoot),
   };
 }
 
