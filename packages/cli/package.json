@@ -73,6 +73,7 @@
     "find-up": "^3.0.0",
     "firebase": "^6.6.0",
     "fs-extra": "^7.0.1",
+    "glob": "^7.1.6",
     "inquirer": "^6.4.1",
     "is-url": "^1.2.4",
     "lockfile": "^1.0.4",
