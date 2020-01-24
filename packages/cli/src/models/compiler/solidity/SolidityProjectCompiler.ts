@@ -2,8 +2,12 @@ import path from 'path';
 import max from 'lodash.max';
 import maxBy from 'lodash.maxby';
 import pick from 'lodash.pick';
+import pickBy from 'lodash.pickby';
 import omitBy from 'lodash.omitby';
 import isUndefined from 'lodash.isundefined';
+import groupBy from 'lodash.groupby';
+import sortBy from 'lodash.sortby';
+import uniqBy from 'lodash.uniqby';
 import glob from 'glob';
 import { promisify } from 'util';
 import { readJsonSync, ensureDirSync, readJSON, writeJson, unlink } from 'fs-extra';
@@ -113,6 +117,7 @@ class SolidityProjectCompiler {
       filePath: file.name,
       source: file.content,
       lastModified: tryFunc(() => statSync(file.url).mtimeMs),
+      dependency: file.dependency,
     }));
   }
 
@@ -171,11 +176,32 @@ class SolidityProjectCompiler {
       );
     }
 
-    // TODO: Warn on repeated artifacts names
+    // Check and warn for repeated artifacts
+    const artifactsByName = groupBy(this.compilerOutput, (artifact: CompiledContract) => artifact.contractName);
+    const repeatedArtifacts = Object.keys(
+      pickBy(artifactsByName, (artifacts: CompiledContract[]) => artifacts.length > 1),
+    );
+    if (repeatedArtifacts.length > 0) {
+      for (const repeatedArtifact of repeatedArtifacts) {
+        Loggy.noSpin.warn(
+          __filename,
+          'writeOutput',
+          `repeated-artifact-${repeatedArtifact}`,
+          `There is more than one contract named ${repeatedArtifact}. The compiled artifact for only one of them will be generated.`,
+        );
+      }
+    }
+
+    // Delete repeated artifacts, sorting them by local first, assuming that artifacts from dependencies are less used
+    const sortedArtifactsByLocal = sortBy(
+      this.compilerOutput,
+      (artifact: CompiledContract) => this.contracts.find(c => c.filePath === artifact.sourcePath)?.dependency ?? '',
+    );
+    const uniqueArtifacts = uniqBy(sortedArtifactsByLocal, (artifact: CompiledContract) => artifact.contractName);
 
     // Write compiler output, saving networks info if present
     await Promise.all(
-      this.compilerOutput.map(async data => {
+      uniqueArtifacts.map(async (data: CompiledContract) => {
         const name = data.contractName;
         const buildFileName = `${this.outputDir}/${name}.json`;
         if (networksInfo[name]) Object.assign(data, { networks: networksInfo[name] });

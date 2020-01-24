@@ -39,6 +39,7 @@ export interface RawContract {
   filePath: string;
   source: string;
   lastModified?: number;
+  dependency?: string;
 }
 
 export interface CompilerVersionOptions {
