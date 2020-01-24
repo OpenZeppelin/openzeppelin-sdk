@@ -15,7 +15,7 @@ import {
   DEFAULT_OPTIMIZER,
   defaultEVMVersion,
 } from './SolidityContractsCompiler';
-import { gatherSources } from './ResolverEngineGatherer';
+import { gatherSources } from './SourcesGatherer';
 import { SolcBuild } from './CompilerProvider';
 import { compilerVersionsMatch, compilerSettingsMatch } from '../../../utils/solidity';
 import { tryFunc } from '../../../utils/try';
