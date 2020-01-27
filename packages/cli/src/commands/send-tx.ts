@@ -1,6 +1,7 @@
 import pickBy from 'lodash.pickby';
 
 import sendTx from '../scripts/send-tx';
+import { SendTxParams } from '../scripts/interfaces';
 import { parseContractReference } from '../utils/contract';
 import ConfigManager from '../models/config/ConfigManager';
 import {
@@ -11,7 +12,7 @@ import {
   proxyInfo,
   InquirerQuestions,
 } from '../prompts/prompt';
-import { SendTxPropsParams, SendTxSelectionParams } from './interfaces';
+import { SendTxSelectionParams } from './interfaces';
 import promptForMethodParams from '../prompts/method-params';
 import Telemetry from '../telemetry';
 
@@ -52,7 +53,7 @@ async function action(options: any): Promise<void> {
     proxyAddress: proxyReference,
     value,
     gas,
-  });
+  } as SendTxParams);
 
   await Telemetry.report('send-tx', { ...args, network, txParams }, interactive);
   await sendTx({ ...args, network, txParams });

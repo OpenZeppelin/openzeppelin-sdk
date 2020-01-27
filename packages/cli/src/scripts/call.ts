@@ -9,7 +9,7 @@ export default async function call({
   network,
   txParams,
   networkFile,
-}: CallParams): Promise<void | never> {
+}: Partial<CallParams>): Promise<void | never> {
   if (!proxyAddress) throw Error('A contract address must be specified.');
   if (!methodName) throw Error('A method name must be specified.');
 
