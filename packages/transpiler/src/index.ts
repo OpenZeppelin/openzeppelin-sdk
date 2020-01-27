@@ -23,7 +23,7 @@ export interface OutputFile {
   contracts: string[];
 }
 
-interface FileTran {
+interface FileTransformation {
   transformations: Transformation[];
   source: string;
 }
@@ -51,7 +51,7 @@ export function transpileContracts(contracts: string[], artifacts: Artifact[]): 
   });
 
   // build a array of transformations per Solidity file
-  const fileTrans = contractsToTranspile.reduce<Record<string, FileTran>>((acc, art) => {
+  const fileTrans = contractsToTranspile.reduce<Record<string, FileTransformation>>((acc, art) => {
     const contractName = art.contractName;
 
     const source = art.source;
