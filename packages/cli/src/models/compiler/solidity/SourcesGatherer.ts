@@ -31,7 +31,7 @@ interface ResolvedFileWithContent extends ResolvedFile {
 export async function gatherSources(rootContracts: string[], workingDir: string): Promise<ResolvedFileWithContent[]> {
   const result: ResolvedFileWithContent[] = [];
   const queue: ResolvedFile[] = [];
-  const alreadyProcessedUrls = new Set();
+  const alreadyProcessedUrls = new Set<string>();
 
   for (const contract of rootContracts) {
     queue.push({
