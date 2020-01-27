@@ -116,7 +116,7 @@ export const options: Option[] = [
   {
     format: '-f, --from <address>',
     description: 'sender for the contract creation transaction',
-    async postprocess(params) {
+    async after(params) {
       // Once we have all required params (network, timeout, from) we initialize the config.
       if (process.env.NODE_ENV !== 'test') {
         const { default: ConfigManager } = await import('../../models/config/ConfigManager');
