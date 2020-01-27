@@ -100,22 +100,6 @@ function validateStorage(
   };
 }
 
-function tryGetUninitializedBaseContracts(contract: Contract): string[] {
-  try {
-    const pipeline = [contracts => values(contracts), contracts => flatten(contracts), contracts => uniq(contracts)];
-
-    return pipeline.reduce((xs, f) => f(xs), getUninitializedBaseContracts(contract));
-  } catch (error) {
-    Loggy.noSpin.error(
-      __filename,
-      'tryGetUninitializedBaseContracts',
-      'try-get-uninitialized-base-contracts',
-      `- Skipping uninitialized base contracts validation due to error: ${error.message}`,
-    );
-    return [];
-  }
-}
-
 function checkArtifactsForImportedSources(contract: Contract, buildArtifacts: BuildArtifacts): void | never {
   new ContractAST(contract, buildArtifacts, ContractDefinitionFilter).getBaseContractsRecursively();
 }

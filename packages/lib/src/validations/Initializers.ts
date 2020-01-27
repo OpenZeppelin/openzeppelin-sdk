@@ -8,13 +8,20 @@ import { Node } from '../utils/ContractAST';
  * to an array of base contracts that are uninitialized.
  * @param {*} contract contract class to check (including all its ancestors)
  */
-export function getUninitializedBaseContracts(contract: Contract): string[] {
+export function getUninitializedBaseContracts(
+  contract: Contract,
+): {
+  [index: string]: string[];
+} {
   const uninitializedBaseContracts = {};
   getUninitializedDirectBaseContracts(contract, uninitializedBaseContracts);
   return invertBy(uninitializedBaseContracts);
 }
 
-function getUninitializedDirectBaseContracts(contract: Contract, uninitializedBaseContracts: any): void {
+function getUninitializedDirectBaseContracts(
+  contract: Contract,
+  uninitializedBaseContracts: { [index: string]: string },
+): void {
   // Check whether the contract has base contracts
   const baseContracts: any = contract.schema.ast.nodes.find(n => n.name === contract.schema.contractName).baseContracts;
   if (baseContracts.length === 0) return;
@@ -27,8 +34,8 @@ function getUninitializedDirectBaseContracts(contract: Contract, uninitializedBa
   }
 
   // Make a dict of base contracts that have "initialize" function
-  const baseContractsWithInitialize: any[] = [];
-  const baseContractInitializers: any = {};
+  const baseContractsWithInitialize: string[] = [];
+  const baseContractInitializers: { [index: string]: string } = {};
   for (const baseContract of baseContracts) {
     const baseContractName: string = baseContract.baseName.name;
     const baseContractClass: Contract = Contracts.getFromLocal(baseContractName);
@@ -56,7 +63,7 @@ function getUninitializedDirectBaseContracts(contract: Contract, uninitializedBa
   }
 
   // Update map with each call of "initialize" function of the base contract
-  const initializedContracts: any = {};
+  const initializedContracts: { [index: string]: boolean } = {};
   for (const statement of initializer.body.statements) {
     if (statement.nodeType === 'ExpressionStatement' && statement.expression.nodeType === 'FunctionCall') {
       const baseContractName: string = statement.expression.expression.expression.name;
