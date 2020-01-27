@@ -14,7 +14,6 @@ import { promptIfNeeded, networksList, contractsList, methodsList, InquirerQuest
 import promptForMethodParams from '../prompts/method-params';
 import { ProxyType, CreateParams } from '../scripts/interfaces';
 import Telemetry from '../telemetry';
-import undefined from 'firebase/empty-import';
 
 interface PropsParams {
   contractFullName?: string;
