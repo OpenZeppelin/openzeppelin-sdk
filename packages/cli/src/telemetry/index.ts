@@ -33,7 +33,7 @@ export interface UserEnvironment {
 export default {
   DISABLE_TELEMETRY: !!process.env.OPENZEPPELIN_DISABLE_TELEMETRY,
 
-  async report(commandName: string, params: object, interactive: boolean): Promise<void> {
+  async report(commandName: string, params: { [key: string]: unknown }, interactive: boolean): Promise<void> {
     const telemetryOptions = await checkOptIn(interactive);
     if (telemetryOptions === undefined || !telemetryOptions.optIn) return;
 
@@ -138,14 +138,14 @@ function hashField(field: Field, salt: string): string {
   return hash.digest('hex');
 }
 
-function concealData(obj: object, salt: string): StringObject {
+function concealData(obj: { [key: string]: unknown }, salt: string): StringObject {
   return mapValues(obj, function recur(val) {
     if (Array.isArray(val)) {
       return val.map(recur);
     } else if (typeof val === 'object') {
       return mapValues(val, recur);
     } else {
-      return hashField(val, salt);
+      return hashField(val as Field, salt);
     }
   });
 }

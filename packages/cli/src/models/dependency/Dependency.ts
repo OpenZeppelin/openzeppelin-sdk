@@ -97,22 +97,18 @@ export default class Dependency {
       contractAlias,
     ]) as [Contract, string][];
 
-    const pipeline = [
-      someContracts => map(someContracts, ([contract]) => getSolidityLibNames(contract.schema.bytecode)),
-      someContracts => flatten(someContracts),
-      someContracts => uniq(someContracts),
-    ];
-
-    const libraryNames = pipeline.reduce((xs, f) => f(xs), contracts);
+    const libraryNames = uniq(flatten(contracts.map(([contract]) => getSolidityLibNames(contract.schema.bytecode))));
 
     const libraries = fromPairs(
       await Promise.all(
         map(libraryNames, async libraryName => {
-          const implementation = await project.setImplementation(
-            Contracts.getFromNodeModules(this.name, libraryName),
-            libraryName,
-          );
-          return [libraryName, implementation.address];
+          if (typeof libraryName === 'string') {
+            const implementation = await project.setImplementation(
+              Contracts.getFromNodeModules(this.name, libraryName),
+              libraryName,
+            );
+            return [libraryName, implementation.address];
+          }
         }),
       ),
     );
