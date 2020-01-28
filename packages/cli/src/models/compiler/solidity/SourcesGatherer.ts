@@ -168,5 +168,5 @@ async function fileExists(file: string): Promise<boolean> {
 }
 
 function trimFile(file: string): string {
-  return file.length < 40 ? file : file.substring(0, 40) + '...';
+  return file.length < 100 ? file : file.substring(0, 100) + '...';
 }
