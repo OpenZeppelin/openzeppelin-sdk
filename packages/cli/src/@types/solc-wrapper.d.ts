@@ -17,6 +17,7 @@ declare module 'solc-wrapper' {
     evmVersion: string;
     outputSelection: any;
     optimizer: CompilerOptimizerOptions;
+    remappings?: string[];
   }
 
   export interface CompilerInput {

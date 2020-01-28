@@ -57,8 +57,6 @@
   "homepage": "https://github.com/OpenZeppelin/openzeppelin-sdk/tree/master/packages/cli#readme",
   "dependencies": {
     "@openzeppelin/fuzzy-solidity-import-parser": "^0.1.0",
-    "@openzeppelin/resolver-engine-core": "^0.3.3",
-    "@openzeppelin/resolver-engine-imports-fs": "^0.3.3",
     "@openzeppelin/test-environment": "^0.1.0",
     "@openzeppelin/upgrades": "2.7.0-rc.0",
     "@types/fs-extra": "^7.0.0",
@@ -75,6 +73,7 @@
     "find-up": "^3.0.0",
     "firebase": "^6.6.0",
     "fs-extra": "^7.0.1",
+    "glob": "^7.1.6",
     "inquirer": "^6.4.1",
     "is-url": "^1.2.4",
     "lockfile": "^1.0.4",
