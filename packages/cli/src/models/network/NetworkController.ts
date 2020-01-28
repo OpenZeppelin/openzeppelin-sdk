@@ -192,9 +192,7 @@ export default class NetworkController {
     const newVersion = this._newVersionRequired();
 
     return toPairs(this.projectFile.contracts)
-      .map(
-        ([contractAlias, contractName]) => [contractAlias, Contracts.getFromLocal(contractName)] as [string, Contract],
-      )
+      .map(([contractAlias, contractName]): [string, Contract] => [contractAlias, Contracts.getFromLocal(contractName)])
       .filter(
         ([contractAlias, contract]) =>
           newVersion ||
