@@ -9,7 +9,6 @@ import uniq from 'lodash.uniq';
 import { Loggy, SpinnerAction, LogType } from '../utils/Logger';
 import { hasConstructor } from './Constructors';
 import { hasSelfDestruct, hasDelegateCall } from './Instructions';
-import { getUninitializedBaseContracts } from './Initializers';
 import { getStorageLayout, getStructsOrEnums } from './Storage';
 import { compareStorageLayouts, Operation } from './Layout';
 import { hasInitialValuesInDeclarations } from './InitialValues';
