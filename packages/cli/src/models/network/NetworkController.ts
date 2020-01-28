@@ -190,25 +190,16 @@ export default class NetworkController {
   // Contract model
   private _contractsListForPush(onlyChanged = false, changedLibraries: Contract[] = []): [string, Contract][] {
     const newVersion = this._newVersionRequired();
-    const pipeline = [
-      contracts => toPairs(contracts),
-      contracts =>
-        map(contracts, ([contractAlias, contractName]): [string, Contract] => [
-          contractAlias,
-          Contracts.getFromLocal(contractName),
-        ]),
-      contracts =>
-        filter(
-          contracts,
-          ([contractAlias, contract]) =>
-            newVersion ||
-            !onlyChanged ||
-            this.hasContractChanged(contractAlias, contract) ||
-            this._hasChangedLibraries(contract, changedLibraries),
-        ),
-    ];
 
-    return pipeline.reduce((xs, f) => f(xs), this.projectFile.contracts);
+    return toPairs(this.projectFile.contracts)
+      .map(([contractAlias, contractName]): [string, Contract] => [contractAlias, Contracts.getFromLocal(contractName)])
+      .filter(
+        ([contractAlias, contract]) =>
+          newVersion ||
+          !onlyChanged ||
+          this.hasContractChanged(contractAlias, contract) ||
+          this._hasChangedLibraries(contract, changedLibraries),
+      );
   }
 
   private getLibsToDeploy(libNames: string[], onlyChanged = false): Contract[] {

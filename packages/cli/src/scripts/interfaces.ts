@@ -68,10 +68,10 @@ export type Params =
   | CompileParams;
 
 export interface CreateParams extends Proxy {
-  salt?: string;
-  signature?: string;
-  admin?: string;
-  kind?: ProxyType;
+  salt: string;
+  signature: string;
+  admin: string;
+  kind: ProxyType;
 }
 
 export interface CompareParams extends Network {}
@@ -85,7 +85,7 @@ export interface FreezeParams extends Network {}
 export interface PublishParams extends Network {}
 
 export interface UpdateParams extends Proxy {
-  all?: boolean;
+  all: boolean;
 }
 
 export interface LinkParams extends Dependencies {

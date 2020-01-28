@@ -9,7 +9,6 @@ import uniq from 'lodash.uniq';
 import { Loggy, SpinnerAction, LogType } from '../utils/Logger';
 import { hasConstructor } from './Constructors';
 import { hasSelfDestruct, hasDelegateCall } from './Instructions';
-import { getUninitializedBaseContracts } from './Initializers';
 import { getStorageLayout, getStructsOrEnums } from './Storage';
 import { compareStorageLayouts, Operation } from './Layout';
 import { hasInitialValuesInDeclarations } from './InitialValues';
@@ -98,22 +97,6 @@ function validateStorage(
     storageUncheckedVars,
     storageDiff,
   };
-}
-
-function tryGetUninitializedBaseContracts(contract: Contract): string[] {
-  try {
-    const pipeline = [contracts => values(contracts), contracts => flatten(contracts), contracts => uniq(contracts)];
-
-    return pipeline.reduce((xs, f) => f(xs), getUninitializedBaseContracts(contract));
-  } catch (error) {
-    Loggy.noSpin.error(
-      __filename,
-      'tryGetUninitializedBaseContracts',
-      'try-get-uninitialized-base-contracts',
-      `- Skipping uninitialized base contracts validation due to error: ${error.message}`,
-    );
-    return [];
-  }
 }
 
 function checkArtifactsForImportedSources(contract: Contract, buildArtifacts: BuildArtifacts): void | never {

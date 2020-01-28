@@ -37,7 +37,7 @@ interface ProjectFileData {
   dependencies: { [name: string]: string };
   contracts: { [alias: string]: string };
   publish: boolean;
-  compiler: ConfigFileCompilerOptions;
+  compiler: Partial<ConfigFileCompilerOptions>;
   telemetryOptIn?: boolean;
 }
 
@@ -186,7 +186,7 @@ export default class ProjectFile {
 
   public get compilerOptions(): ProjectCompilerOptions {
     // Awkward destructuring is due to https://github.com/microsoft/TypeScript/issues/26235
-    const config: ConfigFileCompilerOptions = this.data.compiler;
+    const config: Partial<ConfigFileCompilerOptions> = this.data.compiler;
     const manager = config && config.manager;
     const version = config && config.solcVersion;
     const inputDir = config && config.contractsDir;
@@ -234,7 +234,9 @@ export default class ProjectFile {
     };
 
     this.data.compiler =
-      manager === 'trufle' ? { manager: 'truffle' } : pickBy({ ...this.data.compiler, ...configOptions });
+      manager === 'trufle'
+        ? { manager: 'truffle' }
+        : pickBy({ ...this.data.compiler, ...configOptions } as ConfigFileCompilerOptions);
   }
 
   // If the argument is an existing contract alias, return its corresponding

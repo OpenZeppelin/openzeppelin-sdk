@@ -12,7 +12,7 @@ export default async function update({
   force = false,
   txParams = {},
   networkFile,
-}: UpdateParams) {
+}: Partial<UpdateParams>) {
   if (!packageName && !contractAlias && !proxyAddress && !all) {
     throw Error(
       'The package name, contract name, or address to upgrade must be provided, or set the `all` flag to upgrade all contracts in the application.',

@@ -17,7 +17,7 @@ export default async function createProxy({
   admin = null,
   kind = ProxyType.Upgradeable,
   networkFile,
-}: CreateParams): Promise<Contract | never> {
+}: Partial<CreateParams>): Promise<Contract | never> {
   if (!contractAlias) throw Error('A contract alias must be provided to create a new proxy.');
   validateSalt(salt, false);
 

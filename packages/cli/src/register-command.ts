@@ -74,7 +74,7 @@ export function register(program: Command, spec: CommandSpec, getAction: () => P
         return abort();
       }
       await promptOrValidateAll(cmd, spec, params);
-      Telemetry.report(cmd.name(), params, !!params.interactive);
+      Telemetry.report(cmd.name(), params as { [key: string]: unknown }, !!params.interactive);
       await action(params);
     });
 
