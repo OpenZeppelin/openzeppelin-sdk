@@ -1,6 +1,6 @@
 {
   "name": "@openzeppelin/cli",
-  "version": "2.7.0-rc.0",
+  "version": "2.7.0-rc.1",
   "description": "Command-line interface for the OpenZeppelin smart contract platform",
   "main": "./lib/index.js",
   "private": false,
@@ -58,7 +58,7 @@
   "dependencies": {
     "@openzeppelin/fuzzy-solidity-import-parser": "^0.1.0",
     "@openzeppelin/test-environment": "^0.1.0",
-    "@openzeppelin/upgrades": "2.7.0-rc.0",
+    "@openzeppelin/upgrades": "2.7.0-rc.1",
     "@types/fs-extra": "^7.0.0",
     "@types/npm": "^2.0.29",
     "@types/semver": "^5.5.0",
