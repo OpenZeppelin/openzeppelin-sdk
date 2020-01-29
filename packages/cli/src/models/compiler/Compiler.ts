@@ -48,10 +48,12 @@ export async function compile(
 
   // Run typechain if requested
   if (resolvedOptions.typechain && resolvedOptions.typechain.enabled) {
+    Loggy.spin(__filename, 'compile', 'compile-typechain', 'Generating typechain artifacts...');
     const result = compileResult as ProjectCompileResult;
     const filesList = result && result.artifacts ? result.artifacts.map(c => c.contractName).join(',') : '*';
-    const filesGlob = `${resolvedOptions.outputDir}/${filesList}.json`;
+    const filesGlob = `${resolvedOptions.outputDir}/{${filesList}}.json`;
     await typechain(filesGlob, resolvedOptions.typechain.outDir, resolvedOptions.typechain.target);
+    Loggy.succeed('compile-typechain', `Typechain artifacts generated with ${resolvedOptions.typechain.target}`);
   }
 
   // If compiled successfully, write back compiler settings to project.json to persist them
