@@ -2,7 +2,7 @@ import fs from 'fs';
 import { notEmpty } from './validators';
 import { InquirerQuestions } from './prompt';
 
-export const TypechainSettingsQuestions = (force: boolean) : InquirerQuestions => ({
+export const TypechainSettingsQuestions = (force: boolean): InquirerQuestions => ({
   typechainTarget: {
     message: 'Typechain compilation target',
     type: 'list',
@@ -29,5 +29,5 @@ export const TypechainQuestions: InquirerQuestions = {
     default: true,
     when: () => fs.existsSync('tsconfig.json'),
   },
-  ...TypechainSettingsQuestions(false)
+  ...TypechainSettingsQuestions(false),
 };

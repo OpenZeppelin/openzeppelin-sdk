@@ -43,13 +43,16 @@ describe('compile command', function() {
     'compiler',
     'zos compile --typechain=web3-v1 --typechain-outdir=foo --no-interactive',
     function(compiler) {
-      compiler.should.have.been.calledWith(sinon.match({
-        manager: 'openzeppelin',
-        typechain: {
-          enabled: true,
-          outDir: 'foo',
-          target: 'web3-v1'
-        }}));
+      compiler.should.have.been.calledWith(
+        sinon.match({
+          manager: 'openzeppelin',
+          typechain: {
+            enabled: true,
+            outDir: 'foo',
+            target: 'web3-v1',
+          },
+        }),
+      );
     },
   );
 });
