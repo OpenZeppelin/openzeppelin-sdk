@@ -6,6 +6,7 @@ import { ProjectCompilerOptions } from './ProjectCompilerOptions';
 import findUp from 'find-up';
 import ProjectFile from '../files/ProjectFile';
 import { promisify } from 'util';
+import { join } from 'path';
 import merge from 'lodash.merge';
 import typechain from './Typechain';
 
@@ -47,12 +48,21 @@ export async function compile(
   const compileVersionOptions = compileVersion ? { version: compileVersion } : null;
 
   // Run typechain if requested
-  if (resolvedOptions.typechain && resolvedOptions.typechain.enabled) {
+  if (resolvedOptions.typechain?.enabled) {
     Loggy.spin(__filename, 'compile', 'compile-typechain', 'Generating typechain artifacts...');
     const result = compileResult as ProjectCompileResult;
-    const filesList = result && result.artifacts ? result.artifacts.map(c => c.contractName).join(',') : '*';
-    const filesGlob = `${resolvedOptions.outputDir}/{${filesList}}.json`;
-    await typechain(filesGlob, resolvedOptions.typechain.outDir, resolvedOptions.typechain.target);
+    let filesGlob: string;
+    if (!result?.artifacts) {
+      filesGlob = '*.json';
+    } else if (result.artifacts.length === 1) {
+      filesGlob = `${result.artifacts[0].contractName}.json`;
+    } else {
+      const filesList = result.artifacts.map(c => c.contractName).join(',');
+      filesGlob = `{${filesList}}.json`;
+    }
+    const filesPath = join(resolvedOptions.outputDir, filesGlob);
+    console.log(`PATH ${filesPath}`);
+    await typechain(filesPath, resolvedOptions.typechain.outDir, resolvedOptions.typechain.target);
     Loggy.succeed('compile-typechain', `Typechain artifacts generated with ${resolvedOptions.typechain.target}`);
   }
 
