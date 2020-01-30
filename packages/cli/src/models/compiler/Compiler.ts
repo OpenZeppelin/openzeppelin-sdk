@@ -41,8 +41,9 @@ export async function compile(
   const useTruffle = manager === 'truffle' || (!manager && Truffle.isTruffleProject());
 
   // Compile! We use the exports syntax so we can stub them out during tests (nasty, but works!)
-  const { compileWithTruffle, compileWithSolc } = exports;
-  const compilePromise = useTruffle ? compileWithTruffle() : compileWithSolc(resolvedOptions);
+  const withTruffle: typeof compileWithTruffle = exports.compileWithTruffle;
+  const withSolc: typeof compileWithSolc = exports.compileWithSolc;
+  const compilePromise = useTruffle ? withTruffle() : withSolc(resolvedOptions);
   const compileResult = await compilePromise;
   const compileVersion = compileResult && compileResult.compilerVersion && compileResult.compilerVersion.version;
   const compileVersionOptions = compileVersion ? { version: compileVersion } : null;
@@ -50,14 +51,13 @@ export async function compile(
   // Run typechain if requested
   if (resolvedOptions.typechain?.enabled) {
     Loggy.spin(__filename, 'compile', 'compile-typechain', 'Generating typechain artifacts...');
-    const result = compileResult as ProjectCompileResult;
     let filesGlob: string;
-    if (!result?.artifacts) {
+    if (!compileResult?.artifacts) {
       filesGlob = '*.json';
-    } else if (result.artifacts.length === 1) {
-      filesGlob = `${result.artifacts[0].contractName}.json`;
+    } else if (compileResult.artifacts.length === 1) {
+      filesGlob = `${compileResult.artifacts[0].contractName}.json`;
     } else {
-      const filesList = result.artifacts.map(c => c.contractName).join(',');
+      const filesList = compileResult.artifacts.map(c => c.contractName).join(',');
       filesGlob = `{${filesList}}.json`;
     }
     const filesPath = join(resolvedOptions.outputDir, filesGlob);
@@ -82,7 +82,7 @@ export async function compileWithSolc(compilerOptions?: ProjectCompilerOptions):
   return compileProject(compilerOptions);
 }
 
-export async function compileWithTruffle(): Promise<void> {
+export async function compileWithTruffle(): Promise<undefined> {
   Loggy.spin(
     __filename,
     'compileWithTruffle',
@@ -110,6 +110,8 @@ export async function compileWithTruffle(): Promise<void> {
     if (stdout) console.log(`Truffle output:\n ${stdout}`);
     if (stderr) console.log(`Truffle output:\n ${stderr}`);
   }
+
+  return;
 }
 
 // Used for tests
