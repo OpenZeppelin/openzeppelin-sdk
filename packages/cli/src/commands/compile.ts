@@ -80,7 +80,7 @@ async function action(options: CompileParams & { interactive: boolean }): Promis
     // We need to define different sets of questions because, if typechainEnabled is set, promptIfNeeded will skip
     // the question, which will cause typechainEnabled *not* to be set in the inquirer questions, so the `when` clause
     // in the typechainTarget and typechainOutdir questions will not pass, and they will never be asked.
-    // We will probably tbe able to simplify this with the new interactive questions built in 2.8.
+    // We will probably be able to simplify this with the new interactive questions built in 2.8.
     ({ typechainEnabled, typechainTarget, typechainOutdir } = await promptIfNeeded(
       {
         args: { typechainEnabled, typechainTarget, typechainOutdir },

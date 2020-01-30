@@ -41,7 +41,7 @@ describe('compile command', function() {
   itShouldParse(
     'should call compile with typechain',
     'compiler',
-    'zos compile --typechain=web3-v1 --typechain-outdir=foo --no-interactive',
+    'oz compile --typechain=web3-v1 --typechain-outdir=foo --no-interactive',
     function(compiler) {
       compiler.should.have.been.calledWith(
         sinon.match({
