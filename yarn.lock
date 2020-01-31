@@ -7501,14 +7501,14 @@ mocha@^6.2.2:
     yargs-parser "13.1.1"
     yargs-unparser "1.6.0"
 
-"mock-dependency@file:packages/lib/test/mocks/mock-dependency":
+"mock-dependency@file:tests/mocks/mock-dependency":
   version "1.1.0"
 
 mock-fs@^4.1.0:
   version "4.10.2"
   resolved "https://registry.yarnpkg.com/mock-fs/-/mock-fs-4.10.2.tgz#ee11e5a3288b0235fb345efe8b25610f7dd397b8"
 
-"mock-solc-0.6@file:packages/lib/test/mocks/mock-solc-0.6":
+"mock-solc-0.6@file:tests/mocks/mock-solc-0.6":
   version "1.0.0"
 
 "mock-stdlib-2@file:./packages/cli/test/mocks/mock-stdlib-2":

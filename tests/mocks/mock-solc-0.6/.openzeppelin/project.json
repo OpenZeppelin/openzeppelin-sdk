@@ -7,12 +7,15 @@
   "telemetryOptIn": false,
   "compiler": {
     "manager": "openzeppelin",
-    "solcVersion": "0.6.0",
+    "solcVersion": "0.6.2",
     "compilerSettings": {
       "optimizer": {
         "enabled": false,
         "runs": "200"
       }
-    }
+    },
+    "artifactsDir": "build/contracts",
+    "contractsDir": "contracts",
+    "typechain": {}
   }
 }
