@@ -27,13 +27,13 @@ type Param = ParamSimple | ParamVariadic;
 interface ParamSimple {
   variadic?: false;
   details?: (params: object) => Promise<ParamDetails | undefined>;
-  postprocess?: (params: object) => Promise<void>;
+  after?: (params: object) => Promise<void>;
 }
 
 interface ParamVariadic {
   variadic: true;
   details?: (params: object) => Promise<ParamDetails[]>;
-  postprocess?: (params: object) => Promise<void>;
+  after?: (params: object) => Promise<void>;
 }
 
 export type Arg = Param & { name: string };
@@ -74,7 +74,7 @@ export function register(program: Command, spec: CommandSpec, getAction: () => P
         return abort();
       }
       await promptOrValidateAll(cmd, spec, params);
-      Telemetry.report(cmd.name(), params, !!params.interactive);
+      Telemetry.report(cmd.name(), params as { [key: string]: unknown }, !!params.interactive);
       await action(params);
     });
 
@@ -112,7 +112,7 @@ async function promptOrValidateAll(cmd: Command, spec: CommandSpec, params: Comm
     } else {
       await promptOrValidateSimple(name, param, params);
     }
-    await param.postprocess?.(params);
+    await param.after?.(params);
   }
 }
 

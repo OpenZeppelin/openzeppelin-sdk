@@ -3,6 +3,7 @@ import pickBy from 'lodash.pickby';
 import { TxParams } from '@openzeppelin/upgrades';
 
 import create from '../scripts/create';
+import { CreateParams } from '../scripts/interfaces';
 import queryDeployment from '../scripts/query-deployment';
 import querySignedDeployment from '../scripts/query-signed-deployment';
 import { parseMethodParams } from '../utils/input';
@@ -94,7 +95,7 @@ async function runSignatureQuery(options: any, network: string, txParams: TxPara
     salt,
     signature: signatureOption,
     admin,
-  });
+  } as CreateParams);
   await querySignedDeployment({ ...args, network, txParams });
 }
 
@@ -119,6 +120,6 @@ async function runCreate(options: any, network: string, txParams: TxParams) {
     salt,
     signature: signatureOption,
     admin,
-  });
+  } as CreateParams);
   await create({ ...args, network, txParams });
 }

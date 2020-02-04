@@ -12,7 +12,7 @@ import { hasToMigrateProject } from '../prompts/migrations';
 import ConfigManager from '../models/config/ConfigManager';
 import { promptIfNeeded, networksList, contractsList, methodsList, InquirerQuestions } from '../prompts/prompt';
 import promptForMethodParams from '../prompts/method-params';
-import { ProxyType } from '../scripts/interfaces';
+import { ProxyType, CreateParams } from '../scripts/interfaces';
 import Telemetry from '../telemetry';
 
 interface PropsParams {
@@ -84,7 +84,7 @@ async function action(contractFullName: string, options: any): Promise<void> {
     methodName,
     methodArgs,
     force,
-  });
+  } as CreateParams);
 
   if (options.minimal) args.kind = ProxyType.Minimal;
 

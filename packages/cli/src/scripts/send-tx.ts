@@ -10,7 +10,7 @@ export default async function sendTx({
   network,
   txParams,
   networkFile,
-}: SendTxParams): Promise<void | never> {
+}: Partial<SendTxParams>): Promise<void | never> {
   if (!proxyAddress) throw Error('A contract address must be specified.');
   if (!methodName) throw Error('A method name must be specified.');
   if (value) txParams = { value, ...txParams };
