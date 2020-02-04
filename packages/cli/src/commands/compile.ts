@@ -3,7 +3,7 @@ import { CompileParams } from '../scripts/interfaces';
 import { ProjectCompilerOptions } from '../models/compiler/ProjectCompilerOptions';
 import Telemetry from '../telemetry';
 import ProjectFile from '../models/files/ProjectFile';
-import isundefined from 'lodash.isundefined';
+import { isUndefined } from 'lodash';
 import { promptIfNeeded } from '../prompts/prompt';
 import { TypechainQuestions } from '../prompts/typechain';
 
@@ -66,7 +66,7 @@ async function action(options: CompileParams & { interactive: boolean }): Promis
   if (
     !projectFile.compilerOptions ||
     !projectFile.compilerOptions.typechain ||
-    isundefined(projectFile.compilerOptions.typechain.enabled)
+    isUndefined(projectFile.compilerOptions.typechain.enabled)
   ) {
     const { typechainEnabled, typechainTarget, typechainOutdir } = await promptIfNeeded(
       {

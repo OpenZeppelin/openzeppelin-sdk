@@ -1,8 +1,5 @@
 import fs from 'fs-extra';
-import omitBy from 'lodash.omitby';
-import isEmpty from 'lodash.isempty';
-import pick from 'lodash.pick';
-import compact from 'lodash.compact';
+import { omitBy, isEmpty, pick, compact } from 'lodash';
 import path from 'path';
 
 import { Loggy } from '@openzeppelin/upgrades';

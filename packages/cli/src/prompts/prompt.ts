@@ -1,8 +1,4 @@
-import uniqBy from 'lodash.uniqby';
-import flatten from 'lodash.flatten';
-import isEmpty from 'lodash.isempty';
-import groupBy from 'lodash.groupby';
-import difference from 'lodash.difference';
+import { uniqBy, flatten, isEmpty, groupBy } from 'lodash';
 import inquirer from 'inquirer';
 import { contractMethodsFromAbi, ContractMethodMutability as Mutability, ABI } from '@openzeppelin/upgrades';
 

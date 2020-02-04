@@ -3,7 +3,7 @@ import uuid from 'uuid/v4';
 import path from 'path';
 import crypto from 'crypto';
 import envPaths from 'env-paths';
-import mapValues from 'lodash.mapvalues';
+import { mapValues } from 'lodash';
 import inquirer from 'inquirer';
 import proc from 'child_process';
 import process from 'process';
