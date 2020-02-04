@@ -1,6 +1,4 @@
-import some from 'lodash.some';
-import isEqual from 'lodash.isequal';
-import reverse from 'lodash.reverse';
+import { some, isEqual, reverse } from 'lodash';
 import path from 'path';
 import process from 'process';
 import { getBuildArtifacts } from '../artifacts/BuildArtifacts';

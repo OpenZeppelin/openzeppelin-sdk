@@ -5,7 +5,7 @@
 // (see https://github.com/trufflesuite/truffle-contract/pull/95/files#diff-26bcc3534c5a2e62e22643287a7d3295R145)
 
 import axios from 'axios';
-import omit from 'lodash.omit';
+import { omit } from 'lodash';
 import BN from 'bignumber.js';
 import sleep from '../helpers/sleep';
 import ZWeb3 from '../artifacts/ZWeb3';

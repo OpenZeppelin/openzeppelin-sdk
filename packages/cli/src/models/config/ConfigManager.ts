@@ -3,9 +3,7 @@ import TruffleConfig from './TruffleConfig';
 import { default as Session, SessionOptions } from '../network/Session';
 import NetworkConfig from './NetworkConfig';
 
-import pick from 'lodash.pick';
-import pickBy from 'lodash.pickby';
-import isNil from 'lodash.isnil';
+import { pick, pickBy, isNil } from 'lodash';
 
 const ConfigManager = {
   config: undefined,

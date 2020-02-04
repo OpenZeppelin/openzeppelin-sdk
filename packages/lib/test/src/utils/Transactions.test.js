@@ -3,7 +3,7 @@ require('../../setup');
 
 import { accounts } from '@openzeppelin/test-environment';
 
-import times from 'lodash.times';
+import { times } from 'lodash';
 import sinon from 'sinon';
 import axios from 'axios';
 import { setInterval } from 'timers';

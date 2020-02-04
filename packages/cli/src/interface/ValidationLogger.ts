@@ -1,5 +1,5 @@
 import fs from 'fs';
-import isEmpty from 'lodash.isempty';
+import { isEmpty } from 'lodash';
 import {
   Loggy,
   getStorageLayout,

@@ -1,4 +1,4 @@
-import pickBy from 'lodash.pickby';
+import { pickBy } from 'lodash';
 import { ZWeb3 } from '@openzeppelin/upgrades';
 
 import { parseContractReference } from '../utils/contract';

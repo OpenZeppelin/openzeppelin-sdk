@@ -1,9 +1,5 @@
 import path from 'path';
-import max from 'lodash.max';
-import maxBy from 'lodash.maxby';
-import pick from 'lodash.pick';
-import omitBy from 'lodash.omitby';
-import isUndefined from 'lodash.isundefined';
+import { max, maxBy, pick, omitBy, isUndefined } from 'lodash';
 import { readJsonSync, ensureDirSync, readJSON, writeJson, unlink } from 'fs-extra';
 import { statSync, existsSync, readdirSync, lstatSync } from 'fs';
 import { Loggy, Contracts } from '@openzeppelin/upgrades';

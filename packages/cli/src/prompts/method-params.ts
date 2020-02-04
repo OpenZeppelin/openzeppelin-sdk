@@ -1,7 +1,5 @@
 import { ContractMethodMutability as Mutability } from '@openzeppelin/upgrades';
-import pickBy from 'lodash.pickby';
-import isUndefined from 'lodash.isundefined';
-import negate from 'lodash.negate';
+import { pickBy, isUndefined, negate } from 'lodash';
 
 import { parseMethodParams, parseArg, getSampleInput } from '../utils/input';
 import { promptIfNeeded, argsList, methodsList, InquirerQuestions, argLabel } from './prompt';

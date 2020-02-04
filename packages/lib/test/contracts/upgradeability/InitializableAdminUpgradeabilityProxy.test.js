@@ -4,7 +4,7 @@ require('../../setup');
 
 import { accounts } from '@openzeppelin/test-environment';
 
-import omit from 'lodash.omit';
+import { omit } from 'lodash';
 
 import assertRevert from '../../../src/test/helpers/assertRevert';
 import Contracts from '../../../src/artifacts/Contracts';

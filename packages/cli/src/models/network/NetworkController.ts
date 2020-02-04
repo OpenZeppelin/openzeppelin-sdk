@@ -1,14 +1,5 @@
 import fs from 'fs-extra';
-import isEmpty from 'lodash.isempty';
-import intersection from 'lodash.intersection';
-import difference from 'lodash.difference';
-import uniq from 'lodash.uniq';
-import filter from 'lodash.filter';
-import every from 'lodash.every';
-import partition from 'lodash.partition';
-import map from 'lodash.map';
-import concat from 'lodash.concat';
-import toPairs from 'lodash.topairs';
+import { isEmpty, intersection, difference, uniq, filter, every, partition, map, concat, toPairs } from 'lodash';
 import toposort from 'toposort';
 
 import {
