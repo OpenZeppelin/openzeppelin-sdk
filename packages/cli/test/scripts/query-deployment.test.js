@@ -1,7 +1,7 @@
 'use strict';
 require('../setup');
 
-import random from 'lodash.random';
+import { random } from 'lodash';
 import { accounts } from '@openzeppelin/test-environment';
 
 import queryDeployment from '../../src/scripts/query-deployment';

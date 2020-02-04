@@ -1,7 +1,7 @@
 require('../../setup');
 
 import BN from 'bignumber.js';
-import zipWith from 'lodash.zipwith';
+import { zipWith } from 'lodash';
 import encodeCall, { decodeCall } from '../../../src/helpers/encodeCall';
 
 import { expect } from 'chai';
