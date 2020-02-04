@@ -1,4 +1,4 @@
-import pickBy from 'lodash.pickby';
+import { pickBy } from 'lodash';
 
 export function toContractFullName(packageName: string, contractName: string): string {
   if (!packageName) return contractName;

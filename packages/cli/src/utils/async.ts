@@ -1,5 +1,4 @@
-import map from 'lodash.map';
-import isEmpty from 'lodash.isempty';
+import { map, isEmpty } from 'lodash';
 
 export async function allPromisesOrError(
   promisesWithObjects: any[],

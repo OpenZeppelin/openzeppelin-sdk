@@ -1,7 +1,6 @@
 import { Separator } from 'inquirer';
 
-import difference from 'lodash.difference';
-import flatten from 'lodash.flatten';
+import { difference, flatten } from 'lodash';
 import ProjectFile from '../models/files/ProjectFile';
 import ContractManager from '../models/local/ContractManager';
 import Dependency from '../models/dependency/Dependency';

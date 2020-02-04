@@ -1,4 +1,4 @@
-import pickBy from 'lodash.pickby';
+import { pickBy } from 'lodash';
 import { Loggy } from '@openzeppelin/upgrades';
 
 import link from './link';

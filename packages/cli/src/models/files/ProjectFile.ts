@@ -1,8 +1,6 @@
 import fs from 'fs-extra';
 import path from 'path';
-import pickBy from 'lodash.pickby';
-import isEqual from 'lodash.isequal';
-import isEmpty from 'lodash.isempty';
+import { pickBy, isEqual, isEmpty } from 'lodash';
 
 import { Loggy } from '@openzeppelin/upgrades';
 import Dependency from '../dependency/Dependency';

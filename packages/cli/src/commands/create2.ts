@@ -1,4 +1,4 @@
-import pickBy from 'lodash.pickby';
+import { pickBy } from 'lodash';
 
 import { TxParams } from '@openzeppelin/upgrades';
 
