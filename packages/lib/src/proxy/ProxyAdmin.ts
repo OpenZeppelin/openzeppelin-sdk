@@ -1,4 +1,4 @@
-import isEmpty from 'lodash.isempty';
+import { isEmpty } from 'lodash';
 
 import { Loggy } from '../utils/Logger';
 import Contracts from '../artifacts/Contracts';
