@@ -1,7 +1,5 @@
 import fs from 'fs-extra';
-import keys from 'lodash.keys';
-import flatten from 'lodash.flatten';
-import values from 'lodash.values';
+import { keys, flatten, values } from 'lodash';
 
 import Contracts from './Contracts';
 

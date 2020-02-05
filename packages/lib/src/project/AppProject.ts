@@ -1,6 +1,4 @@
-import concat from 'lodash.concat';
-import map from 'lodash.map';
-import isEmpty from 'lodash.isempty';
+import { concat, map, isEmpty } from 'lodash';
 
 import App from '../application/App';
 import Package from '../application/Package';

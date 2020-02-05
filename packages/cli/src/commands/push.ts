@@ -1,5 +1,4 @@
-import omit from 'lodash.omit';
-import isString from 'lodash.isstring';
+import { omit, isString } from 'lodash';
 import { ZWeb3 } from '@openzeppelin/upgrades';
 
 import add from './add';

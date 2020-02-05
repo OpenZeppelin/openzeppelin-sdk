@@ -3,8 +3,7 @@
 require('../../setup');
 
 import util from 'util';
-import forEach from 'lodash.foreach';
-import mapKeys from 'lodash.mapkeys';
+import { forEach, mapKeys } from 'lodash';
 
 import Contracts from '../../../src/artifacts/Contracts';
 import { getStorageLayout, getStructsOrEnums } from '../../../src/validations/Storage';

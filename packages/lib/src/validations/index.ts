@@ -1,12 +1,5 @@
-import difference from 'lodash.difference';
-import every from 'lodash.every';
-import isEmpty from 'lodash.isempty';
-import pick from 'lodash.pick';
-import values from 'lodash.values';
-import flatten from 'lodash.flatten';
-import uniq from 'lodash.uniq';
+import { difference, every, isEmpty, pick, values, flatten, uniq } from 'lodash';
 
-import { Loggy, SpinnerAction, LogType } from '../utils/Logger';
 import { hasConstructor } from './Constructors';
 import { hasSelfDestruct, hasDelegateCall } from './Instructions';
 import { getStorageLayout, getStructsOrEnums } from './Storage';

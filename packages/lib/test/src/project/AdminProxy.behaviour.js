@@ -4,7 +4,6 @@ require('../../setup');
 import Proxy from '../../../src/proxy/Proxy';
 import Contracts from '../../../src/artifacts/Contracts';
 import { toAddress } from '../../../src/utils/Addresses';
-import random from 'lodash.random';
 
 const Impl = Contracts.getFromLocal('Impl');
 const DummyImplementation = Contracts.getFromLocal('DummyImplementation');

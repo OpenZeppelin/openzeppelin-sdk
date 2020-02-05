@@ -1,6 +1,5 @@
 import fs from 'fs';
-import pickBy from 'lodash.pickby';
-import pick from 'lodash.pick';
+import { pickBy, pick } from 'lodash';
 import npm from 'npm-programmatic';
 import semver from 'semver';
 import { Loggy } from '@openzeppelin/upgrades';

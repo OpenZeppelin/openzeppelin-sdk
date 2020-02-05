@@ -1,5 +1,4 @@
-import isNull from 'lodash.isnull';
-import isUndefined from 'lodash.isundefined';
+import { isNull, isUndefined } from 'lodash';
 
 const OPEN_ZEPPELIN = 'openzeppelin';
 const CURRENT_MANIFEST_VERSION = ['2', '2'];

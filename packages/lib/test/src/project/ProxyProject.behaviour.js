@@ -5,7 +5,7 @@ import Proxy from '../../../src/proxy/Proxy';
 import Contracts from '../../../src/artifacts/Contracts';
 import { toAddress } from '../../../src/utils/Addresses';
 import { signDeploy, signer } from '../../../src/test/helpers/signing';
-import random from 'lodash.random';
+import { random } from 'lodash';
 import MinimalProxy from '../../../src/proxy/MinimalProxy';
 
 const Impl = Contracts.getFromLocal('Impl');

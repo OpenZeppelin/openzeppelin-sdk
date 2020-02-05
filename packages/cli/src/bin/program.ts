@@ -2,7 +2,7 @@ import chalk from 'chalk';
 import program from 'commander';
 import { Loggy } from '@openzeppelin/upgrades';
 import commands from '../commands';
-import sortBy from 'lodash.sortby';
+import { sortBy } from 'lodash';
 
 // Do not use import here or Typescript will create wrong build folder
 // eslint-disable-next-line @typescript-eslint/no-var-requires
