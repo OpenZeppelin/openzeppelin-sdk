@@ -7502,14 +7502,14 @@ mocha@^6.2.2:
     yargs-unparser "1.6.0"
 
 "mock-dependency@file:tests/mocks/mock-dependency":
-  version "1.1.0"
+  version "2.7.0-rc.2"
 
 mock-fs@^4.1.0:
   version "4.10.2"
   resolved "https://registry.yarnpkg.com/mock-fs/-/mock-fs-4.10.2.tgz#ee11e5a3288b0235fb345efe8b25610f7dd397b8"
 
 "mock-solc-0.6@file:tests/mocks/mock-solc-0.6":
-  version "1.0.0"
+  version "2.7.0-rc.2"
 
 "mock-stdlib-2@file:./packages/cli/test/mocks/mock-stdlib-2":
   version "1.2.0"
@@ -9498,13 +9498,14 @@ socks@~2.3.2:
     ip "^1.1.5"
     smart-buffer "4.0.2"
 
-solc-wrapper@^0.5.8:
-  version "0.5.8"
-  resolved "https://registry.yarnpkg.com/solc-wrapper/-/solc-wrapper-0.5.8.tgz#d64c4212296a5ca9a5dd955762025092bb9c1344"
+solc-wrapper@^0.6.3:
+  version "0.6.3"
+  resolved "https://registry.yarnpkg.com/solc-wrapper/-/solc-wrapper-0.6.3.tgz#3230f9665bf8dce9fbe5a1517bd81b96c605e3a3"
+  integrity sha512-FWBnuQfU537SVSsBxuE4XkOKcK88a/bpLMVde2gc3BZcj0VmPc38wYO0Hkqqxsek7ZLK2lmXuEDLmgXhXl8Kyw==
   dependencies:
     command-exists "^1.2.8"
     fs-extra "^0.30.0"
-    keccak "^1.0.2"
+    js-sha3 "0.8.0"
     memorystream "^0.3.1"
     require-from-string "^2.0.0"
     semver "^5.5.0"

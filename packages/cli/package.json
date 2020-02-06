@@ -120,7 +120,7 @@
     "rlp": "^2.2.3",
     "semver": "^5.5.0",
     "simple-git": "^1.110.0",
-    "solc-wrapper": "^0.5.8",
+    "solc-wrapper": "^0.6.3",
     "spinnies": "^0.3.0",
     "toposort": "^2.0.2",
     "truffle-config": "1.1.16",
