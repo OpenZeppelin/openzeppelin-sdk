@@ -45,7 +45,7 @@ export const args: Arg[] = [
     async details(params: Options & Args): Promise<ParamDetails[]> {
       // If the user requests an upgradeable deploy, we will internally call
       // the create command and let it handle its own argument parsing.
-      if (params.kind === 'upgradeable') {
+      if (params.kind && params.kind !== 'regular') {
         return [];
       }
 
@@ -91,6 +91,16 @@ export const options: Option[] = [
     default: false,
   },
   {
+    format: '-k, --kind <kind>',
+    description: `the kind of deployment (${kinds.join(', ')})`,
+    async details() {
+      return {
+        prompt: 'Choose the kind of deployment',
+        choices: kinds,
+      };
+    },
+  },
+  {
     format: '-n, --network <network>',
     description: 'network to use',
     async details() {
@@ -116,12 +126,14 @@ export const options: Option[] = [
   {
     format: '-f, --from <address>',
     description: 'sender for the contract creation transaction',
-    async after(params) {
+    async after(options: Options) {
       // Once we have all required params (network, timeout, from) we initialize the config.
-      if (process.env.NODE_ENV !== 'test') {
+      // We need to do this because it's necessary for the details of 'arguments' later.
+      // We skip it for regular deploys because the create command action will take care of it.
+      if (process.env.NODE_ENV !== 'test' && options.kind === 'regular') {
         const { default: ConfigManager } = await import('../../models/config/ConfigManager');
-        const config = await ConfigManager.initNetworkConfiguration(params);
-        Object.assign(params, config);
+        const config = await ConfigManager.initNetworkConfiguration(options);
+        Object.assign(options, config);
       }
     },
   },
@@ -142,16 +154,6 @@ export const options: Option[] = [
             migrate ? undefined : 'Cannot proceed without migrating the manifest file.',
         };
       }
-    },
-  },
-  {
-    format: '-k, --kind <kind>',
-    description: `the kind of deployment (${kinds.join(', ')})`,
-    async details() {
-      return {
-        prompt: 'Choose the kind of deployment',
-        choices: kinds,
-      };
     },
   },
 ];
