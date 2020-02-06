@@ -1013,10 +1013,10 @@
     fs-extra "^8.1.0"
     try-require "^1.2.1"
 
-"@openzeppelin/fuzzy-solidity-import-parser@^0.1.0":
-  version "0.1.0"
-  resolved "https://registry.yarnpkg.com/@openzeppelin/fuzzy-solidity-import-parser/-/fuzzy-solidity-import-parser-0.1.0.tgz#e137c091aa9ed7753f92b3f5f9d9338929e674ba"
-  integrity sha512-Vavzh+fLY80IVnWs7a4Oj9GO0Oem2I/rs0rIUILNPusMqKB4dxJ1IzD11YSkltjyEuDhm1DHWsRyXYZt9E1w4Q==
+"@openzeppelin/fuzzy-solidity-import-parser@^0.1.2":
+  version "0.1.2"
+  resolved "https://registry.yarnpkg.com/@openzeppelin/fuzzy-solidity-import-parser/-/fuzzy-solidity-import-parser-0.1.2.tgz#3b9f524d6028ca73df60474a313e0295e5610c51"
+  integrity sha512-leqEwfs8GlrPDrVcVc8Hv6LJ62ZzR0RgjwQNCkpT6H5jW9RB8YdR0a3inHoricSvw+sKI1b1hOqsCtPPZNnhng==
 
 "@openzeppelin/test-environment@^0.1.0":
   version "0.1.0"
@@ -7502,14 +7502,14 @@ mocha@^6.2.2:
     yargs-unparser "1.6.0"
 
 "mock-dependency@file:tests/mocks/mock-dependency":
-  version "1.1.0"
+  version "2.7.0-rc.2"
 
 mock-fs@^4.1.0:
   version "4.10.2"
   resolved "https://registry.yarnpkg.com/mock-fs/-/mock-fs-4.10.2.tgz#ee11e5a3288b0235fb345efe8b25610f7dd397b8"
 
 "mock-solc-0.6@file:tests/mocks/mock-solc-0.6":
-  version "1.0.0"
+  version "2.7.0-rc.2"
 
 "mock-stdlib-2@file:./packages/cli/test/mocks/mock-stdlib-2":
   version "1.2.0"

@@ -56,7 +56,7 @@
   },
   "homepage": "https://github.com/OpenZeppelin/openzeppelin-sdk/tree/master/packages/cli#readme",
   "dependencies": {
-    "@openzeppelin/fuzzy-solidity-import-parser": "^0.1.0",
+    "@openzeppelin/fuzzy-solidity-import-parser": "^0.1.2",
     "@openzeppelin/test-environment": "^0.1.0",
     "@openzeppelin/upgrades": "2.7.0-rc.2",
     "@types/fs-extra": "^7.0.0",
