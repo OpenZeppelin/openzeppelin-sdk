@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
-## v2.7.0 - 2020-01-20
+## v2.7.0 - 2020-01-31
 
 ### Added
 - Generate typechain contract wrappers in a typescript project. ([#1285](https://github.com/OpenZeppelin/openzeppelin-sdk/pull/1285))
@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Warn when importing `@openzeppelin/contracts` instead of `@openzeppelin/contracts-ethereum-package`. ([#1335](https://github.com/OpenZeppelin/openzeppelin-sdk/pull/1335))
 
 ### Changed
+- [**breaking**] Remove support for ambiguous Solidity imports relative to the current file not starting with a dot, to prevent corrupted artifacts. Warn when duplicate contract names are found. ([#1411](https://github.com/OpenZeppelin/openzeppelin-sdk/pull/1411))
 - Use solidity fuzzy-import parser, to speed up nothing-to-compile checks by a 40%, and lazy-load truffle-flattener to decrease CLI startup time. ([#1291](https://github.com/OpenZeppelin/openzeppelin-sdk/pull/1291))
 - Disable interactivity if stdin is not a terminal. ([#1299](https://github.com/OpenZeppelin/openzeppelin-sdk/pull/1299))
 
@@ -26,7 +27,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Prevent corruption of compiled artifacts if there are multiple contracts with the same name. ([#1296](https://github.com/OpenZeppelin/openzeppelin-sdk/pull/1296))
 - Ensure relative paths are stored in project configuration file. ([#1384](https://github.com/OpenZeppelin/openzeppelin-sdk/pull/1384))
 - Improve error message if no networks are set in `network.js` configuration file. ([#1394](https://github.com/OpenZeppelin/openzeppelin-sdk/pull/1394))
-
 
 ### Internal
 - Use the OpenZeppelin CLI to compile and test contracts in the OpenZeppelin CLI. ([#1294](https://github.com/OpenZeppelin/openzeppelin-sdk/pull/1294), [#1288](https://github.com/OpenZeppelin/openzeppelin-sdk/pull/1288))

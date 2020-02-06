@@ -145,9 +145,9 @@ export default class NetworkController {
     await this._unsetSolidityLibs();
 
     if (isEmpty(contracts) && isEmpty(changedLibraries)) {
-      Loggy.noSpin(__filename, 'push', `after-push`, `All contracts are up to date`);
+      Loggy.noSpin(__filename, 'push', `after-push`, `All implementations are up to date`);
     } else {
-      Loggy.noSpin(__filename, 'push', `after-push`, `All contracts have been deployed`);
+      Loggy.noSpin(__filename, 'push', `after-push`, `All implementations have been deployed`);
     }
   }
 
