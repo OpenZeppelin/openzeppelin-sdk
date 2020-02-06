@@ -541,7 +541,7 @@ describe('push script', function() {
       it('should notify if there was nothing to do since last push', async function() {
         const logs = new CaptureLogs();
         await push({ network, txParams, networkFile: this.networkFile });
-        logs.text.should.match(/all contracts are up to date/i);
+        logs.text.should.match(/all implementations are up to date/i);
         logs.restore();
       });
     });
@@ -667,7 +667,7 @@ describe('push script', function() {
     it('should run push', async function() {
       const logs = new CaptureLogs();
       await push({ network, txParams, networkFile: this.networkFile });
-      logs.text.should.match(/all contracts are up to date/i);
+      logs.text.should.match(/all implementations are up to date/i);
       logs.restore();
     });
 
