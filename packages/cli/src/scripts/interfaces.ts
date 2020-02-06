@@ -108,6 +108,7 @@ export interface UnpackParams {
 }
 
 export interface PushParams extends Network {
+  contractAliases?: string[];
   force?: boolean;
   reupload?: boolean;
   deployDependencies?: boolean;
