@@ -84,7 +84,6 @@
     "lodash.values": "^4.3.0",
     "lodash.without": "^4.4.0",
     "semver": "^5.5.1",
-    "solidity-docgen": "^0.3.5",
     "spinnies": "^0.4.2",
     "truffle-flattener": "^1.4.0",
     "web3": "1.2.2",
@@ -118,6 +117,7 @@
     "prettier": "^1.19.1",
     "sinon": "^6.1.4",
     "sinon-chai": "^3.3.0",
+    "solidity-docgen": "^0.3.5",
     "tmp": "^0.0.33",
     "ts-node": "^8.5.4",
     "typescript": "^3.7.3"
