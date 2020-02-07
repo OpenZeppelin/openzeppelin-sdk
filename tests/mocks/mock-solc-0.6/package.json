@@ -1,6 +1,6 @@
 {
   "name": "mock-solc-0.6",
-  "version": "2.7.0-rc.2",
+  "version": "2.7.0-rc.3",
   "description": "",
   "main": "index.js",
   "private": true,

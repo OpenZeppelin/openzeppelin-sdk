@@ -1,6 +1,6 @@
 {
   "name": "example-creating-instances-from-solidity",
-  "version": "2.7.0-rc.2",
+  "version": "2.7.0-rc.3",
   "private": true,
   "description": "",
   "main": "truffle-config.js",
@@ -13,10 +13,10 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "@openzeppelin/upgrades": "2.7.0-rc.2"
+    "@openzeppelin/upgrades": "2.7.0-rc.3"
   },
   "devDependencies": {
-    "@openzeppelin/cli": "2.7.0-rc.2",
+    "@openzeppelin/cli": "2.7.0-rc.3",
     "truffle": "^5.0.5"
   }
 }
