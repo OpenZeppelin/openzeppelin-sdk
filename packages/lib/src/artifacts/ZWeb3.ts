@@ -37,7 +37,7 @@ declare module 'web3-eth' {
 export default class ZWeb3 {
   public static provider: provider;
   public static web3instance: Web3;
-  public static web3Options: Web3Options;
+  public static web3Options: Web3Options = {};
 
   public static initialize(provider: provider, web3Options: Web3Options = {}): void {
     ZWeb3.provider = provider;
