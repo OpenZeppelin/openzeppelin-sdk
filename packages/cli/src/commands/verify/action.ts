@@ -19,7 +19,7 @@ export async function action(params: Options & Args & { dontExitProcess: boolean
     params.optimizer,
     (params as any).optimizerRuns ?? 200,
     params.remote,
-    (params as any).apiKey ?? ''
+    (params as any).apiKey ?? '',
   );
 
   if (!params.dontExitProcess && process.env.NODE_ENV !== 'test') process.exit(0);

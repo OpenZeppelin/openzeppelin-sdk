@@ -7,13 +7,13 @@ import { DEFAULT_TX_TIMEOUT } from '../../models/network/defaults';
 import ProjectFile from '../../models/files/ProjectFile';
 
 export const name = 'verify';
-export const description = 'verify a contract\'s source with Etherscan or Etherchain';
+export const description = "verify a contract's source with Etherscan or Etherchain";
 
 export interface Args {
   contract: string;
 }
 
-type OptimizerOptions = { optimizer: false } | { optimizer: true; optimizerRuns: number; };
+type OptimizerOptions = { optimizer: false } | { optimizer: true; optimizerRuns: number };
 
 type RemoteOptions = { remote: 'etherscan'; apiKey: string } | { remote: 'etherchain' };
 const endpoints = ['etherscan', 'etherchain'];
@@ -94,9 +94,9 @@ export const options: Option[] = [
     async details(params: Partial<Options>) {
       if (params.optimizer) {
         return {
-          prompt: 'Specify the optimizer \'runs\' parameter',
+          prompt: "Specify the optimizer 'runs' parameter",
           preselect: compilerDefaults.optimizerRuns,
-        }
+        };
       }
     },
   },
@@ -118,7 +118,7 @@ export const options: Option[] = [
       if (params.remote == 'etherscan') {
         return {
           prompt: 'Enter your Etherscan API key (get one at https://etherscan.io/myapikey)',
-        }
+        };
       }
     },
   },
