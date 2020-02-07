@@ -1,6 +1,8 @@
 'use strict';
 require('../setup');
 
+import { expect } from 'chai';
+
 const upgrades = require('@openzeppelin/upgrades'); // eslint-disable-line @typescript-eslint/no-var-requires
 import { ZWeb3, Contracts, App, Package, ProxyAdmin, ProxyFactory } from '@openzeppelin/upgrades';
 import { accounts } from '@openzeppelin/test-environment';
@@ -202,32 +204,86 @@ describe('push script', function() {
         this.withLibraryPreviousAddress = this.networkFile.contract('WithLibraryImpl').address;
       });
 
-      it('should not deploy contracts if unmodified', async function() {
-        await push({ contractAliases: ['Impl'], networkFile: this.networkFile, network, txParams });
-        this.networkFile.contract('Impl').address.should.eq(this.previousAddress);
-      });
-
-      it('should deploy unmodified contract if forced', async function() {
-        await push({
-          contractAliases: ['Impl'],
-          networkFile: this.networkFile,
-          network,
-          txParams,
-          reupload: true,
+      describe('when a NetworkFile is empty', function() {
+        beforeEach('purging NetworkFile', function() {
+          this.networkFile.data.contracts = {};
+          this.networkFile.data.proxies = {};
         });
-        this.networkFile.contract('Impl').address.should.not.eq(this.previousAddress);
+
+        it('should record contracts in network file', async function() {
+          await push({ contractAliases: ['Impl'], networkFile: this.networkFile, network, txParams });
+
+          const contract = this.networkFile.contract('Impl');
+          contract.address.should.be.nonzeroAddress;
+          contract.localBytecodeHash.should.not.be.empty;
+          contract.storage.should.not.be.empty;
+          contract.types.should.not.be.empty;
+          const deployed = await ImplV1.at(contract.address);
+          (await deployed.methods.say().call()).should.eq('V1');
+        });
+
+        it('should not record not specified contracts in network file', async function() {
+          await push({ contractAliases: ['Impl'], networkFile: this.networkFile, network, txParams });
+
+          const contract = this.networkFile.contract('WithLibraryImpl');
+          expect(contract).to.be.undefined;
+        });
+
+        it('should deploy contract instance', async function() {
+          await push({ contractAliases: ['Impl'], networkFile: this.networkFile, network, txParams });
+
+          const address = this.networkFile.contract('Impl').address;
+          const deployed = await ImplV1.at(address);
+          (await deployed.methods.say().call()).should.eq('V1');
+        });
+
+        it('should deploy required libraries', async function() {
+          await push({ contractAliases: ['WithLibraryImpl'], networkFile: this.networkFile, network, txParams });
+
+          const address = this.networkFile.solidityLib('UintLib').address;
+          const code = await ZWeb3.eth.getCode(address);
+          const uintLib = Contracts.getFromLocal('UintLib');
+          code.length.should.eq(uintLib.schema.deployedBytecode.length).and.be.greaterThan(40);
+        });
+
+        it('should deploy and link contracts that require libraries', async function() {
+          await push({ contractAliases: ['WithLibraryImpl'], networkFile: this.networkFile, network, txParams });
+
+          const address = this.networkFile.contract('WithLibraryImpl').address;
+          const deployed = await WithLibraryImplV1.at(address);
+          const result = await deployed.methods.double(10).call();
+          result.should.eq('20');
+        });
       });
 
-      it('should deploy contracts if modified', async function() {
-        modifyBytecode.call(this, 'Impl');
-        await push({ contractAliases: ['Impl'], networkFile: this.networkFile, network, txParams });
-        this.networkFile.contract('Impl').address.should.not.eq(this.previousAddress);
-      });
+      describe('on a redeploy', function() {
+        it('should not deploy contracts if unmodified', async function() {
+          await push({ contractAliases: ['Impl'], networkFile: this.networkFile, network, txParams });
+          this.networkFile.contract('Impl').address.should.eq(this.previousAddress);
+        });
 
-      it('should not deploy contracts if library is modified', async function() {
-        modifyLibraryBytecode.call(this, 'UintLib');
-        await push({ contractAliases: ['Impl'], networkFile: this.networkFile, network, txParams });
-        this.networkFile.contract('WithLibraryImpl').address.should.eq(this.withLibraryPreviousAddress);
+        it('should deploy unmodified contract if forced', async function() {
+          await push({
+            contractAliases: ['Impl'],
+            networkFile: this.networkFile,
+            network,
+            txParams,
+            reupload: true,
+          });
+          this.networkFile.contract('Impl').address.should.not.eq(this.previousAddress);
+        });
+
+        it('should deploy contracts if modified', async function() {
+          modifyBytecode.call(this, 'Impl');
+          await push({ contractAliases: ['Impl'], networkFile: this.networkFile, network, txParams });
+          this.networkFile.contract('Impl').address.should.not.eq(this.previousAddress);
+        });
+
+        it('should not deploy contracts if library is modified', async function() {
+          modifyLibraryBytecode.call(this, 'UintLib');
+          await push({ contractAliases: ['Impl'], networkFile: this.networkFile, network, txParams });
+          this.networkFile.contract('WithLibraryImpl').address.should.eq(this.withLibraryPreviousAddress);
+        });
       });
 
       context('validations', function() {
@@ -613,7 +669,7 @@ describe('push script', function() {
       this.networkFile = new NetworkFile(projectFile, network);
     });
 
-    describe.only('on push', function() {
+    describe('on push', function() {
       beforeEach('pushing', async function() {
         await push({ network, txParams, networkFile: this.networkFile });
         const newProjectFile = new ProjectFile('test/mocks/packages/package-with-contracts-v2.zos.json');
