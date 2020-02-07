@@ -35,7 +35,7 @@ $ npx oz link @openzeppelin/contracts-ethereum-package
 
 This command will download the Ethereum Package (bundled as a regular npm package), and connect it to your OpenZeppelin project. We now have all of OpenZeppelin contracts at our disposal, so let's create an ERC20 token!
 
-NOTE: Make sure you install `@openzeppelin/contracts-ethereum-package` and not the vanilla `@openzeppelin/contracts`. The latter is set up for general usage, while `@openzeppelin/contracts-ethereum-package` is tailored for being used with xref:upgrades::index.adoc[OpenZeppelin Upgrades]. This means that its contracts are xref:upgrades::writing-contracts.adoc#use-upgradeable-packages[already set up to be upgradeable].
+NOTE: Make sure you install `@openzeppelin/contracts-ethereum-package` and not the vanilla `@openzeppelin/contracts`. The latter is set up for general usage, while `@openzeppelin/contracts-ethereum-package` is tailored for being used with xref:upgrades::index.adoc[OpenZeppelin Upgrades]. This means that its contracts are xref:upgrades::writing-upgradeable.adoc#use-upgradeable-packages[already set up to be upgradeable].
 
 [[creating-an-erc20-token]]
 == Creating an ERC20 Token
@@ -228,7 +228,7 @@ contract TokenExchange is Initializable {
 
 When modifying your contract, you will have to place the `owner` variable *after* the other variables (xref:upgrades::writing-upgradeable.adoc#modifying-your-contracts[learn more] about this restriction). Don't worry if you forget about it, the CLI will check this for you when you try to upgrade.
 
-NOTE: If you are familiar with xref:contracts::index.adoc[*OpenZeppelin Contracts*], you may be wondering why we didn't simply extend from `Ownable` and used the `onlyOwner` modifier. The issue is OpenZeppelin Upgrades does not support extending from now contracts in an upgrade (if they declare their own state variables). Again, the CLI will alert you if you attempt to do this. Refer to the xref:writing-contracts.adoc#modifying-your-contracts[Upgrades documentation] for more info.
+NOTE: If you are familiar with xref:contracts::index.adoc[*OpenZeppelin Contracts*], you may be wondering why we didn't simply extend from `Ownable` and used the `onlyOwner` modifier. The issue is OpenZeppelin Upgrades does not support extending from now contracts in an upgrade (if they declare their own state variables). Again, the CLI will alert you if you attempt to do this. Refer to the xref:upgrades::writing-upgradeable.adoc#modifying-your-contracts[Upgrades documentation] for more info.
 
 The only thing missing is actually _setting_ the `owner` of the contract. To do this, we can add another function that we will call when upgrading, making sure it can only be called once:
 

@@ -1,7 +1,7 @@
 {
   "name": "tests-kit-test",
   "private": true,
-  "version": "2.7.0-rc.0",
+  "version": "2.7.0-rc.2",
   "description": "Integration tests for Starter kits and an unpack command",
   "author": "igor@zeppelin.solutions",
   "license": "MIT",

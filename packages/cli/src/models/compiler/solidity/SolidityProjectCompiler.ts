@@ -1,5 +1,7 @@
 import path from 'path';
-import { max, maxBy, pick, omitBy, isUndefined } from 'lodash';
+import { max, maxBy, pick, pickBy, omitBy, isUndefined, groupBy, sortBy, uniqBy } from 'lodash';
+import glob from 'glob';
+import { promisify } from 'util';
 import { readJsonSync, ensureDirSync, readJSON, writeJson, unlink } from 'fs-extra';
 import { statSync, existsSync, readdirSync, lstatSync } from 'fs';
 import { Loggy, Contracts } from '@openzeppelin/upgrades';
@@ -11,8 +13,7 @@ import {
   DEFAULT_OPTIMIZER,
   defaultEVMVersion,
 } from './SolidityContractsCompiler';
-import { ImportsFsEngine } from '@openzeppelin/resolver-engine-imports-fs';
-import { gatherSources } from './ResolverEngineGatherer';
+import { gatherSources } from './SourcesGatherer';
 import { SolcBuild } from './CompilerProvider';
 import { compilerVersionsMatch, compilerSettingsMatch } from '../../../utils/solidity';
 import { tryFunc } from '../../../utils/try';
@@ -23,6 +24,7 @@ export async function compileProject(options: ProjectCompilerOptions = {}): Prom
     ...options,
     inputDir: options.inputDir || Contracts.getLocalContractsDir(),
     outputDir: options.outputDir || Contracts.getLocalBuildDir(),
+    workingDir: options.workingDir || process.cwd(),
   });
 
   await projectCompiler.call();
@@ -40,14 +42,12 @@ export interface ProjectCompileResult {
 }
 
 class SolidityProjectCompiler {
-  public roots: string[];
   public contracts: RawContract[];
   public compilerOutput: CompiledContract[];
   public compilerVersion: SolcBuild;
   public options: ProjectCompilerOptions;
 
   public constructor(options: ProjectCompilerOptions = {}) {
-    this.roots = [];
     this.contracts = [];
     this.compilerOutput = [];
     this.options = options;
@@ -61,18 +61,22 @@ class SolidityProjectCompiler {
     return this.options.outputDir;
   }
 
+  public get workingDir(): string {
+    return this.options.workingDir;
+  }
+
   public async call(): Promise<void> {
-    await this._loadSoliditySourcesFromDir();
-    await this._loadDependencies();
+    const roots = await this.loadProjectSoliditySources();
+    this.contracts = await this.loadSolidityDependencies(roots);
 
     if (this.contracts.length === 0) {
       Loggy.noSpin(__filename, 'call', 'compile-contracts', 'No contracts found to compile.');
       return;
     }
 
-    await this._resolveCompilerVersion();
+    this.compilerVersion = await resolveCompilerVersion(this.contracts, this.options);
 
-    if (!this._shouldCompile()) {
+    if (!this.shouldCompile()) {
       Loggy.noSpin(__filename, 'call', `compile-contracts`, 'Nothing to compile, all contracts are up to date.');
       return;
     }
@@ -83,46 +87,35 @@ class SolidityProjectCompiler {
       'compile-contracts',
       `Compiling contracts with solc ${this.compilerVersion.version} (${this.compilerVersion.build})`,
     );
+
     this.compilerOutput = await compileWith(this.compilerVersion, this.contracts, this.options);
-    await this._writeOutput();
+    await this.writeOutput();
     Loggy.succeed(
       'compile-contracts',
       `Compiled contracts with solc ${this.compilerVersion.version} (${this.compilerVersion.build})`,
     );
   }
 
-  private _loadSoliditySourcesFromDir(dir = this.inputDir): void {
-    if (!existsSync(dir) || !lstatSync(dir).isDirectory) return;
-
-    // TODO: Replace by a glob expression
-    readdirSync(dir).forEach(fileName => {
-      const filePath = path.resolve(dir, fileName);
-      if (lstatSync(filePath).isDirectory()) {
-        this._loadSoliditySourcesFromDir(filePath);
-      } else if (path.extname(filePath).toLowerCase() === '.sol') {
-        this.roots.push(filePath);
-      }
-    });
+  private async loadProjectSoliditySources(): Promise<string[]> {
+    const dir = this.inputDir;
+    if (!existsSync(dir) || !lstatSync(dir).isDirectory) return [];
+    return promisify(glob)('**/*.sol', { cwd: dir, absolute: true });
   }
 
-  private async _loadDependencies() {
-    const importFiles = await gatherSources(this.roots, this.inputDir, ImportsFsEngine());
-    const cwd = process.cwd();
-    this.contracts = importFiles.map(file => ({
-      fileName: path.basename(file.url),
-      filePath: path.isAbsolute(file.url) ? path.relative(cwd, file.url) : file.url,
-      source: file.source,
+  private async loadSolidityDependencies(roots: string[]): Promise<RawContract[]> {
+    const importFiles = await gatherSources(roots, this.workingDir);
+    return importFiles.map(file => ({
+      fileName: path.basename(file.name),
+      filePath: file.name,
+      source: file.content,
       lastModified: tryFunc(() => statSync(file.url).mtimeMs),
+      dependency: file.dependency,
     }));
   }
 
-  private async _resolveCompilerVersion() {
-    this.compilerVersion = await resolveCompilerVersion(this.contracts, this.options);
-  }
-
-  private _shouldCompile(): boolean {
+  private shouldCompile(): boolean {
     if (this.options.force) return true;
-    const artifacts = this._listArtifacts();
+    const artifacts = this.listArtifacts();
     const artifactsWithMtimes = artifacts.map(artifact => ({
       artifact,
       mtime: statSync(artifact).mtimeMs,
@@ -157,14 +150,14 @@ class SolidityProjectCompiler {
     );
   }
 
-  private async _writeOutput(): Promise<void> {
+  private async writeOutput(): Promise<void> {
     // Create directory if not exists, or clear it of artifacts if it does,
     // preserving networks deployment info
     const networksInfo = {};
     if (!existsSync(this.outputDir)) {
       ensureDirSync(this.outputDir);
     } else {
-      const artifacts = this._listArtifacts();
+      const artifacts = this.listArtifacts();
       await Promise.all(
         artifacts.map(async filePath => {
           const name = path.basename(filePath, '.json');
@@ -175,9 +168,32 @@ class SolidityProjectCompiler {
       );
     }
 
+    // Check and warn for repeated artifacts
+    const artifactsByName = groupBy(this.compilerOutput, (artifact: CompiledContract) => artifact.contractName);
+    const repeatedArtifacts = Object.keys(
+      pickBy(artifactsByName, (artifacts: CompiledContract[]) => artifacts.length > 1),
+    );
+    if (repeatedArtifacts.length > 0) {
+      for (const repeatedArtifact of repeatedArtifacts) {
+        Loggy.noSpin.warn(
+          __filename,
+          'writeOutput',
+          `repeated-artifact-${repeatedArtifact}`,
+          `There is more than one contract named ${repeatedArtifact}. The compiled artifact for only one of them will be generated.`,
+        );
+      }
+    }
+
+    // Delete repeated artifacts, sorting them by local first, assuming that artifacts from dependencies are less used
+    const sortedArtifactsByLocal = sortBy(
+      this.compilerOutput,
+      (artifact: CompiledContract) => this.contracts.find(c => c.filePath === artifact.sourcePath)?.dependency ?? '',
+    );
+    const uniqueArtifacts = uniqBy(sortedArtifactsByLocal, (artifact: CompiledContract) => artifact.contractName);
+
     // Write compiler output, saving networks info if present
     await Promise.all(
-      this.compilerOutput.map(async data => {
+      uniqueArtifacts.map(async (data: CompiledContract) => {
         const name = data.contractName;
         const buildFileName = `${this.outputDir}/${name}.json`;
         if (networksInfo[name]) Object.assign(data, { networks: networksInfo[name] });
@@ -187,7 +203,7 @@ class SolidityProjectCompiler {
     );
   }
 
-  private _listArtifacts(): string[] {
+  private listArtifacts(): string[] {
     if (!existsSync(this.outputDir)) return [];
     return readdirSync(this.outputDir)
       .map(fileName => path.resolve(this.outputDir, fileName))
