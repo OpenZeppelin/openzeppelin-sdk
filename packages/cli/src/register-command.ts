@@ -18,7 +18,7 @@ export interface ParamDetails {
   promptType?: 'confirm' | 'list' | 'input';
   choices?: readonly Choice[];
   preselect?: string | boolean;
-  validationError?: (value: string | boolean) => string;
+  validationError?: (value: string | boolean) => string | undefined;
 }
 
 // Param is the things common to both positional arguments (Arg) and options (Option).
